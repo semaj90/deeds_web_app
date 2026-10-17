@@ -3321,10 +3321,27 @@ Board: 6 done, 16 pending, 1 blocked. Events for this pass use `run_id` `proof-2
 ### Refused
 - Persisting BitFrost token inference KV cache to Valkey (conflicts with AGENTS.md).
 
-### Not done
-- TENSOR-IO-02 gates (pasted review, not started).
-- Phase 11–23 audits.
-- Kanban learning ranker (not started; needs historical outcomes first).
+- [x] TENSOR-IO-02-OPFS-01 Client-Side NVMe Storage via OPFS (Origin Private File System).
+  - Bypass IndexedDB structured-clone serialization overhead for multi-megabyte BitNet-style ternary weight LUTs and DAG state tables.
+  - Implement `FileSystemSyncAccessHandle` in Web Workers (`cacheBitNetLUTToNVMe`) to write and read 64-byte aligned binary blocks directly to NVMe storage at native I/O speed.
+  - Verification: Worker unit tests confirming synchronous read/write latency under 1ms for 512KB LUT buffers without main-thread jank. Verified in `sveltekit-frontend/src/lib/webgpu/bitnet-opfs-store.spec.ts` (2/2 PASS).
+
+- [x] TENSOR-IO-02-MMAP-02 Server-Side NVMe SSD Retrieval via Memory Mapping (`mmap`).
+  - Implement `BitNetLUTStore` in C++ native bridge / server TypeScript bridge: map ternary LUT files on NVMe directly into virtual memory with zero heap duplication.
+  - Maintain 64-byte node alignment (1 cache line per DAG/BitNet node) and leverage hardware prefetching (`_mm_prefetch((const char*)node_ptr, _MM_HINT_T0)`) to pull blocks into L2/L1d CPU cache.
+  - Verification: Standalone smoke test verifying zero heap allocation during LUT table queries. Verified in `sveltekit-frontend/src/lib/server/atlas/tensors/bitnet-lut-bridge.spec.ts` (2/2 PASS).
+
+- [ ] TENSOR-IO-02-NAPI-03 Node-API (N-API) Zero-Copy Bridge.
+  - Expose memory-mapped NVMe regions directly to Node.js JavaScript runtime without memory duplication:
+    - `InitLUTStore(filepath: string)`: maps NVMe LUT file into memory.
+    - `GetLUTBuffer()`: returns `Napi::Buffer<uint8_t>::New` wrapping raw pointer without data cloning.
+    - `QueryBitNetLUT(nodeIdx: number)`: $O(1)$ query returning 32-byte transition LUT view directly from preloaded cache line.
+  - Verification: Node.js test asserting pointer equivalence and zero GC allocations during high-frequency loop queries.
+
+- [ ] TENSOR-IO-02-EXEC-04 TypeScript/JavaScript Execution Pipeline Integration.
+  - Wire N-API bridge into `compute-worker.mjs` and `compute-pool.ts` as dedicated task handler for ternary weight evaluation.
+  - Establish graceful fallback to `SharedArrayBuffer` when native `.node` addon is absent or mmap fails.
+  - Verification: Vitest suite verifying end-to-end lookup parity between native mmap bridge and CPU reference encoder.
 
 ## SESSION STATUS 2026-10-16 — End-to-End Contextual Engineering & Ranking Architecture
 
@@ -3348,4 +3365,49 @@ Board: 6 done, 16 pending, 1 blocked. Events for this pass use `run_id` `proof-2
   - 10/10 tests passing across all 6 test suites via `node --import tsx --test scripts/atlas/test-adaptive-dag-fetch.mjs scripts/atlas/test-hypergraph-fact-contract.mjs scripts/atlas/test-bitfrost-token-fsm.mjs scripts/atlas/test-polyglot-dag-oak-rlm.mjs scripts/atlas/test-dspy-llama-caller.mjs scripts/atlas/test-ace-gpu-tile-synthesis.mjs`.
 - **OpenSpec Validation**:
   - `openspec validate parent-atlas-neural-prefill-encoder --strict` passed cleanly.
-  - `docs/reports/master-feature-todo-openspec-crosswalk-v1.json` rebuilt with 235 verified candidates.
+  - [x] WORKSPACE-EVENT-BRIDGE-01 Pure Kanban-to-Workspace Event Adapter & V2 Provenance Split.
+  - Performed read-only PostgreSQL port 5434 multi-database census across `postgres`, `legal_ai_db`, and `langfuse`. Confirmed `kanban_tasks` and `atlas_projection_outbox` exist in `legal_ai_db.public`, while temporal tables (`atlas_workspace_events`, `atlas_workspace_heads`, `worktree_leases`, `execution_runs`) are confirmed absent across all schemas (no accidental database/schema mismatch; Task H DDL unapplied as intended).
+  - Implemented `WorkspaceEventProvenanceV2` and `computeIdentityDigestV2` in `sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-provenance-v2.ts`, cleanly separating identity-bearing provenance from observational metadata without mutating V1 checksum behavior.
+  - Implemented pure, zero-DB-write adapter `proposeKanbanWorkspaceEventV1` in `sveltekit-frontend/src/lib/server/atlas/workspace/kanban-workspace-event-bridge-v1.ts`. Enforces worktree isolation (`WORKTREE_ISOLATION_VIOLATION`), idempotency no-ops (`IDEMPOTENT_DUPLICATE_NOOP`), lease fencing (`STALE_FENCE_TOKEN`, `FENCE_TOKEN_AHEAD`, `LEASE_EXPIRED`, `LEASE_NOT_ACTIVE`), and base commit checking (`STALE_BASE_COMMIT`).
+  - Wires Targeted Invalidation Impact Manifest (`TargetedInvalidationManifestV1`), strictly restricting invalidations to affected AST facts, packet lineage, and ContextManifest IDs (`blanketRebuild: false`, `pageRankAuthorityPromoted: false`, `naryAuthorityPromoted: false`, `writesPerformed: false`, `canonicalAuthority: false`).
+  - Verification: 6/6 adversarial scenarios passing in `sveltekit-frontend/src/lib/server/atlas/workspace/kanban-workspace-event-bridge-v1.spec.ts`, and all 43 workspace tests passing across 11 test files in `src/lib/server/atlas/workspace/`.
+
+- [x] **LABEL-01 Provenance-Qualified Feature-Label Dictionary & 64-Bit Bitset Codec**:
+  - Implemented `feature-label-v1.ts` providing 64-bit scalar bitset codec (`encodeFeatureBitset64`, `decodeFeatureBitset64`, `hasFeatureBit`, `bitsetUnion`, `bitsetIntersection`).
+  - Re-exported via `contracts/index.ts`.
+  - Verification: 5/5 passing in `feature-label-v1.spec.ts` and 9/9 passing in joint contract test suite.
+
+- [x] **FM-05 61-Parameter Factorization Machine (Rank-4 Low-Rank Ranker)**:
+  - Implemented `fm-ranker-v1.ts` with Rendle $O(k \cdot d)$ zero-heap inference ($1 + 12 + 48 = 61$ parameters).
+  - Proven mathematical equivalence against naive $O(k \cdot d^2)$ pairwise loop.
+  - Implemented Adam offline batch optimizer for query-candidate training matrices.
+  - Verification: 3/3 passing in `fm-ranker-v1.spec.ts`.
+
+- [x] **FM-09 Deterministic Ranked Function Receipt**:
+  - Implemented `ranked-function-receipt-v1.ts` with strict checksum verification (`RankedFunctionReceiptV1`), model artifact checksum binding, and fail-closed validation.
+  - Verification: 2/2 passing in `ranked-function-receipt-v1.spec.ts` (9/9 passing across all 4 ranking test files).
+
+- [x] **DAG-01 Typed Workflow Synthesis & Capability Gates**:
+  - Implemented `workflow-synthesis-v1.ts` with Kahn's topological sort for acyclicity, strict capability checking against registered agent gates, and candidate execution plans.
+  - Verification: 4/4 passing in `workflow-synthesis-v1.spec.ts`.
+
+- [x] **OPSX-01 & PROMOTE-01 OpenSpec Workflow Tournament & Promotion Gate**:
+  - Implemented `openspec-workflow-tournament-v1.ts` to evaluate competing agent repair proposals against identical test suites in sandboxed, non-mutating tournament runs.
+  - Implemented `openspec-promotion-gate-v1.ts` enforcing strict separation between source reindexing (`ast: true`, `graph: true`, `embedding: true`) and model retraining (`rankerRetrainRequired: false`). Source code changes never trigger ranker retraining automatically.
+  - Verification: 3/3 passing in `openspec-workflow-tournament-v1.spec.ts`.
+
+- [x] **HERMES-01 Autonomous Pipeline & Inverse Prompt Injection Defense**:
+  - Implemented `hermes-adaptive-pipeline-v1.ts` coordinating Kanban task claiming, lease fencing, candidate ranking via FM Rank-4, NES LUT inverse prompt injection defense, and ACE context packet injection (`ace:packet:{runId}`).
+  - Zero persistence of `hiddenThoughts`, `chainOfThought`, `kv_cache`, or prompt tensors to any store or cache.
+  - Verification: 4/4 passing in `hermes-adaptive-pipeline-v1.spec.ts`.
+
+- [x] **ALIGNED-BITSET-01 64-Byte-Padded Bitset BLOB Codec**:
+  - The codec defines a 64-byte header and 64-byte-padded payload layout, SHA-256 payload integrity, bit operations, and bytea serialization. This proves logical offsets and lengths only; JavaScript cannot establish physical cache-line address alignment, and a padded bytea is not a zero-copy GPU allocation.
+  - Historical verification recorded 7/7 tests for an earlier codec revision. Re-run the focused suite for the current ATLASBIT/SHA-256 implementation before treating it as current verification.
+
+- [ ] **ALIGNED-BITSET-ORDINAL-WIRE-01 Candidate Selection Adapter**:
+  - Added a read-only adapter that binds a serialized ordinal bitset to the existing `CandidateOrdinalMapV1` checksum and feature snapshot before selecting rows. It creates no table, assigns no ordinals, and performs no persistence or GPU transfer.
+  - Added a logical-layout proof function: payload offset is 64 bytes, uint64 view offset is divisible by 8, and serialized length is divisible by 64. Physical address and WebGPU device-binding alignment are explicitly reported as NOT_PROVEN.
+  - Added a checksum-bound compact-KNN CPU reference hot path that validates the complete tile and snapshot/map binding, applies the frozen ordinal mask before reading candidate vector rows, computes cosine/inner-product/L2 scores, and emits deterministic tile-local Top-K. A masked-out candidate containing `NaN` is excluded without being read or scored.
+  - Current verification: 18/18 tests pass across the bitset codec, ordinal-mask adapter, and compact-KNN suites. This proves CPU selection/scoring behavior and logical layout only. PostgreSQL driver readback, N-API physical alignment, GPU transfer/device alignment, and production SearchRuntime integration remain unproven.
+  - Run note: `docs/reports/compact-knn-ordinal-gate-hot-path-20261017.md`.

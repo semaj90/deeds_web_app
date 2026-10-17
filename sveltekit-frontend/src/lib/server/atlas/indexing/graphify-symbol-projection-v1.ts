@@ -1,7 +1,10 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { StructuralExtractionFabricResultV1 } from '@deeds/parent-atlas';
+import { normalizeGitSourceRefV1 } from './git-revision-semantics-v1.js';
 import {
+  buildExportsForSourceV1,
+  parseImportStatementV1,
   resolveReferenceTargetV1,
   type ImportBindingV1,
 } from './graphify-import-target-resolver-v1.js';
@@ -99,6 +102,8 @@ export const graphifyEdgeProjectionCandidateV1Schema = z.object({
   subjectStableSymbolKey: nonEmpty,
   predicate: nonEmpty,
   objectStableSymbolKey: nonEmpty.nullable().optional(),
+  objectSourceRef: nonEmpty.nullable().optional(),
+  objectSourceRevision: nonEmpty.nullable().optional(),
   unresolvedTarget: nonEmpty.nullable().optional(),
   evidenceKind: nonEmpty,
   evidenceSpan: graphifyEdgeEvidenceSpanV1Schema,
@@ -113,6 +118,13 @@ export const graphifyEdgeProjectionCandidateV1Schema = z.object({
       code: z.ZodIssueCode.custom,
       path: ['objectStableSymbolKey'],
       message: 'exactly one of objectStableSymbolKey or unresolvedTarget is required',
+    });
+  }
+  if (hasObject && (!value.objectSourceRef || !value.objectSourceRevision)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['objectSourceRevision'],
+      message: 'resolved graph targets require their exact target source reference and revision',
     });
   }
   if (value.evidenceSpan.endByte < value.evidenceSpan.startByte) {
@@ -188,7 +200,130 @@ export type GraphifyImportResolutionContextV1 = {
   bindingsByLocalName: ReadonlyMap<string, ImportBindingV1>;
   knownSourceRefs: ReadonlySet<string>;
   exportsBySourceRef: ReadonlyMap<string, ReadonlyMap<string, readonly string[]>>;
+  sourceRevisionBySourceRef: ReadonlyMap<string, string>;
 };
+
+export type GraphifyImportContextSourceV1 = {
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  fabric: StructuralExtractionFabricResultV1;
+};
+
+function normalizeGraphifyImportSourceRef(sourceRef: string): string {
+  try {
+    return normalizeGitSourceRefV1(sourceRef);
+  } catch {
+    throw new Error('GRAPHIFY_IMPORT_CONTEXT_SOURCE_REF_INVALID');
+  }
+}
+
+export type GraphifyImportResolutionContextsV1 = {
+  schema: 'atlas.graphify-import-resolution-contexts.v1';
+  workspaceRevision: string;
+  contextsBySourceRef: ReadonlyMap<string, GraphifyImportResolutionContextV1>;
+  ambiguousLocalNamesBySourceRef: ReadonlyMap<string, readonly string[]>;
+  unparsedImportReferenceIds: string[];
+  checksum: string;
+  canonicalAuthority: false;
+  writesPerformed: false;
+};
+
+export function buildGraphifyImportResolutionContextsV1(
+  sources: readonly GraphifyImportContextSourceV1[],
+): GraphifyImportResolutionContextsV1 {
+  if (sources.length === 0) throw new Error('GRAPHIFY_IMPORT_CONTEXT_SOURCES_REQUIRED');
+  const workspaceRevisions = new Set(sources.map((source) => source.workspaceRevision));
+  if (workspaceRevisions.size !== 1 || !/^sha256:[a-f0-9]{64}$/i.test(sources[0]!.workspaceRevision)) {
+    throw new Error('GRAPHIFY_IMPORT_CONTEXT_WORKSPACE_REVISION_MISMATCH');
+  }
+  const workspaceRevision = sources[0]!.workspaceRevision;
+  const bySourceRef = new Map<string, GraphifyImportContextSourceV1>();
+  for (const source of sources) {
+    const sourceRef = normalizeGraphifyImportSourceRef(source.sourceRef);
+    if (!/^sha256:[a-f0-9]{64}$/i.test(source.sourceRevision)) {
+      throw new Error(`GRAPHIFY_IMPORT_CONTEXT_SOURCE_REVISION_INVALID:${sourceRef}`);
+    }
+    if (bySourceRef.has(sourceRef)) throw new Error(`GRAPHIFY_IMPORT_CONTEXT_SOURCE_REF_DUPLICATE:${sourceRef}`);
+    if (normalizeGraphifyImportSourceRef(source.fabric.receipt.source_ref) !== sourceRef
+      || source.fabric.receipt.source_revision !== source.sourceRevision
+      || source.fabric.receipt.workspace_revision !== workspaceRevision) {
+      throw new Error(`GRAPHIFY_IMPORT_CONTEXT_FABRIC_BINDING_MISMATCH:${sourceRef}`);
+    }
+    for (const record of [...source.fabric.symbol_nominations, ...source.fabric.reference_facts]) {
+      if (normalizeGraphifyImportSourceRef(record.source_ref) !== sourceRef
+        || record.source_revision !== source.sourceRevision
+        || record.workspace_revision !== workspaceRevision) {
+        throw new Error(`GRAPHIFY_IMPORT_CONTEXT_FACT_BINDING_MISMATCH:${sourceRef}`);
+      }
+    }
+    bySourceRef.set(sourceRef, source);
+  }
+
+  const knownSourceRefs = new Set(bySourceRef.keys());
+  const sourceRevisionBySourceRef = new Map([...bySourceRef.entries()].map(([ref, source]) => [ref, source.sourceRevision]));
+  const exportsBySourceRef = new Map<string, ReadonlyMap<string, readonly string[]>>();
+  for (const [sourceRef, source] of bySourceRef) {
+    exportsBySourceRef.set(sourceRef, buildExportsForSourceV1(source.fabric.symbol_nominations.map((nomination) => ({
+      name: nomination.name,
+      symbol_key: nomination.symbol_key,
+      parent_route: nomination.parent_route,
+    }))));
+  }
+
+  const contextsBySourceRef = new Map<string, GraphifyImportResolutionContextV1>();
+  const ambiguousLocalNamesBySourceRef = new Map<string, readonly string[]>();
+  const unparsedImportReferenceIds: string[] = [];
+  for (const [sourceRef, source] of bySourceRef) {
+    const bindingsByLocalName = new Map<string, ImportBindingV1>();
+    const ambiguous = new Set<string>();
+    for (const fact of source.fabric.reference_facts) {
+      if (fact.reference_kind !== 'import') continue;
+      const parsed = parseImportStatementV1(fact.target_text);
+      if (!parsed) {
+        unparsedImportReferenceIds.push(fact.reference_id);
+        continue;
+      }
+      for (const binding of parsed.bindings) {
+        if (ambiguous.has(binding.localName)) continue;
+        const previous = bindingsByLocalName.get(binding.localName);
+        if (!previous) {
+          bindingsByLocalName.set(binding.localName, binding);
+          continue;
+        }
+        if (JSON.stringify(previous) !== JSON.stringify(binding)) {
+          bindingsByLocalName.delete(binding.localName);
+          ambiguous.add(binding.localName);
+        }
+      }
+    }
+    if (ambiguous.size > 0) ambiguousLocalNamesBySourceRef.set(sourceRef, [...ambiguous].sort());
+    contextsBySourceRef.set(sourceRef, { bindingsByLocalName, knownSourceRefs, exportsBySourceRef, sourceRevisionBySourceRef });
+  }
+
+  const checksumInput = [...contextsBySourceRef.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([sourceRef, context]) => ({
+    sourceRef,
+    sourceRevision: bySourceRef.get(sourceRef)!.sourceRevision,
+    workspaceRevision,
+    imports: [...context.bindingsByLocalName.entries()].sort(([left], [right]) => left.localeCompare(right)),
+    ambiguousLocalNames: ambiguousLocalNamesBySourceRef.get(sourceRef) ?? [],
+    knownSourceRefs: [...context.knownSourceRefs].sort(),
+    exports: [...context.exportsBySourceRef.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([ref, exports]) => ({
+      sourceRef: ref,
+      names: [...exports.entries()].sort(([left], [right]) => left.localeCompare(right)),
+    })),
+  }));
+  return {
+    schema: 'atlas.graphify-import-resolution-contexts.v1',
+    workspaceRevision,
+    contextsBySourceRef,
+    ambiguousLocalNamesBySourceRef,
+    unparsedImportReferenceIds: unparsedImportReferenceIds.sort(),
+    checksum: checksum({ workspaceRevision, contexts: checksumInput }),
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+}
 
 function normalizeSourceRef(value: string): string {
   return value.replaceAll('\\', '/').replace(/^\.\//, '');
@@ -310,8 +445,21 @@ function toEdgeCandidate(
       ...importContext,
     })
     : null;
+  const importTargetRevision = importTarget?.status === 'RESOLVED_SYMBOL' && importTarget.targetSourceRef
+    ? importContext?.sourceRevisionBySourceRef.get(importTarget.targetSourceRef) ?? null
+    : null;
+  const qualifiedImportTarget = importTarget?.status === 'RESOLVED_SYMBOL'
+    && importTarget.targetSourceRef
+    && importTargetRevision
+    && /^sha256:[a-f0-9]{64}$/i.test(importTargetRevision);
   const objectStableSymbolKey = nativeTargetStableSymbolKey
-    ?? (importTarget?.status === 'RESOLVED_SYMBOL' ? importTarget.targetSymbolKey : null);
+    ?? (qualifiedImportTarget ? importTarget.targetSymbolKey : null);
+  const objectSourceRef = nativeTargetStableSymbolKey
+    ? normalizeSourceRef(input.sourceRef)
+    : qualifiedImportTarget ? importTarget.targetSourceRef : null;
+  const objectSourceRevision = nativeTargetStableSymbolKey
+    ? input.sourceRevision
+    : qualifiedImportTarget ? importTargetRevision : null;
 
   return graphifyEdgeProjectionCandidateV1Schema.parse({
     schema: 'atlas.graphify-edge-projection-candidate.v1',
@@ -322,6 +470,8 @@ function toEdgeCandidate(
     subjectStableSymbolKey: factSubjectKey(fact, byUpstreamNodeId),
     predicate: fact.reference_kind,
     objectStableSymbolKey,
+    objectSourceRef,
+    objectSourceRevision,
     unresolvedTarget: objectStableSymbolKey ? null : fact.target_text,
     evidenceKind: evidence.evidenceKind,
     evidenceSpan: {

@@ -6,13 +6,12 @@
  * back to docs/stage4/topology_facts.ndjson (nodes + edges) for legacy runs.
  * Process:
  *   1. Build directed graph from topology facts
- *   2. Compute PageRank with damping=0.85, 10 iterations
- *   3. Independent validation: compare vs simple reference implementation
- *   4. Gate: PageRank scores must be deterministic and valid
+ *   2. Compute PageRank with damping=0.85, max_iter=100, tol=1e-8
+ *   3. Compare scores against an independently produced NetworkX receipt
+ *   4. Database apply requires --apply after all parity and revision gates pass
  * Output: docs/stage5/pagerank_authority.ndjson + validation report
  *
- * Hard gate: NETWORKX_REFERENCE_PROVEN (parity check on reference impl)
- * Do NOT writeback to Postgres until gate passes.
+ * Without --apply and a matching NetworkX receipt, this remains a dry run.
  */
 
 import crypto from 'crypto';
@@ -20,6 +19,8 @@ import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
 import pg from 'pg';
+import { comparePageRankReferenceV1, decidePageRankPersistenceV1 } from './lib/stage5-pagerank-persistence-gate-v1.mjs';
+import { computePageRankV1, getTopPageRankV1, STAGE5_PAGERANK_CONFIGURATION_V1 } from './lib/stage5-pagerank-core-v1.mjs';
 
 const WORKSPACE_ID = 'legal-ai:deeds-web-app';
 const REPO_ROOT = process.cwd();
@@ -32,72 +33,6 @@ const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:12345
 
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-}
-
-class SimplePageRank {
-  constructor(nodes, edges, damping = 0.85, iterations = 10) {
-    this.nodes = nodes; // Set of node keys
-    this.edges = edges; // Array of {source, target}
-    this.damping = damping;
-    this.iterations = iterations;
-    this.scores = new Map();
-    this.incomingByTarget = new Map();
-    this.outgoingCountBySource = new Map();
-
-    // Initialize all nodes with equal score
-    const initialScore = 1 / Math.max(this.nodes.size, 1);
-    for (const node of this.nodes) {
-      this.scores.set(node, initialScore);
-    }
-
-    for (const edge of this.edges) {
-      const incoming = this.incomingByTarget.get(edge.target);
-      if (incoming) {
-        incoming.push(edge);
-      } else {
-        this.incomingByTarget.set(edge.target, [edge]);
-      }
-
-      this.outgoingCountBySource.set(edge.source, (this.outgoingCountBySource.get(edge.source) ?? 0) + 1);
-    }
-  }
-
-  compute() {
-    /**
-     * Simplified PageRank: power iteration method
-     */
-    for (let iter = 0; iter < this.iterations; iter++) {
-      const newScores = new Map();
-
-      for (const node of this.nodes) {
-        // Incoming edges to this node
-        const incoming = this.incomingByTarget.get(node) ?? [];
-        const rankSum = incoming.reduce((sum, e) => {
-          const sourceScore = this.scores.get(e.source) || 0;
-          const sourceOutDegree = this.outgoingCountBySource.get(e.source) ?? 0;
-          return sum + (sourceScore / Math.max(sourceOutDegree, 1));
-        }, 0);
-
-        const score = (1 - this.damping) / this.nodes.size + this.damping * rankSum;
-        newScores.set(node, score);
-      }
-
-      this.scores = newScores;
-    }
-
-    return this.scores;
-  }
-
-  getTopK(k = 20) {
-    const sorted = Array.from(this.scores.entries())
-      .sort((a, b) => {
-        const scoreDiff = b[1] - a[1];
-        if (scoreDiff !== 0) return scoreDiff;
-        return a[0].localeCompare(b[0]);
-      })
-      .slice(0, k);
-    return sorted;
-  }
 }
 
 async function buildGraph() {
@@ -185,14 +120,20 @@ async function computePageRank() {
     console.log(`  → Snapshot: ${snapshotId}`);
   }
 
-  console.log('\n[Stage 5] Step 2: Compute PageRank (damping=0.85, iter=10)');
-  const pr = new SimplePageRank(nodes, edges, 0.85, 10);
-  const scores = pr.compute();
+  console.log('\n[Stage 5] Step 2: Compute PageRank (NetworkX-compatible config)');
+  const pageRankConfig = STAGE5_PAGERANK_CONFIGURATION_V1;
+  const scores = computePageRankV1({
+    nodes: [...nodes],
+    edges,
+    alpha: pageRankConfig.alpha,
+    maxIterations: pageRankConfig.max_iter,
+    tolerance: pageRankConfig.tol,
+  });
 
   console.log(`  ✓ Computation complete (${scores.size} nodes scored)`);
 
   console.log('\n[Stage 5] Step 3: Validation (reference comparison)');
-  const topK = pr.getTopK(20);
+  const topK = getTopPageRankV1(scores, 20);
   console.log(`  Top 20 high-authority nodes:`);
   for (let i = 0; i < topK.length; i++) {
     console.log(`    ${i + 1}. ${topK[i][0]} (score: ${topK[i][1].toFixed(6)})`);
@@ -214,11 +155,20 @@ async function computePageRank() {
     max_score: maxScore,
     mean_score: meanScore,
     score_range_valid: maxScore > 0 && minScore >= 0,
-    deterministic_check: scores.size > 0,
+    deterministic_check: false,
     top_20_valid: topK.length > 0 && topK.length <= 20
   };
 
-  return { scores, edges, validation, topK, source, snapshotId, frozenSnapshot };
+  const replayScores = computePageRankV1({
+    nodes: [...nodes],
+    edges,
+    alpha: pageRankConfig.alpha,
+    maxIterations: pageRankConfig.max_iter,
+  });
+  validation.deterministic_check = replayScores.size === scores.size
+    && [...scores].every(([node, score]) => replayScores.get(node) === score);
+
+  return { scores, edges, nodes, validation, topK, source, snapshotId, frozenSnapshot };
 }
 
 function normalizeScores(scores) {
@@ -266,8 +216,15 @@ function stableJson(value) {
 }
 
 async function persistFrozenSnapshotAuthority(result) {
-  if (result.source !== 'frozen_snapshot_json' || !result.frozenSnapshot) {
-    return { status: 'SKIPPED_LEGACY_STAGE4', runId: null, persistedScores: 0 };
+  const decision = decidePageRankPersistenceV1({
+    applyRequested: result.applyRequested,
+    validationPassed: result.validationPassed,
+    parity: result.parity,
+    source: result.source,
+    frozenSnapshot: result.frozenSnapshot,
+  });
+  if (!decision.writesAllowed) {
+    return { status: decision.status, runId: null, persistedScores: 0, writesPerformed: false };
   }
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 1 });
@@ -440,10 +397,9 @@ async function persistFrozenSnapshotAuthority(result) {
           runId,
           snapshot.graphSnapshot.snapshotId,
           'networkx',
-          'stage5-simple-pagerank-v1',
+          'stage5-networkx-compatible-pagerank-v2',
           JSON.stringify({
-            damping_factor: 0.85,
-            iterations: 10,
+            ...STAGE5_PAGERANK_CONFIGURATION_V1,
             validation_gate: 'NETWORKX_REFERENCE_PROVEN',
             graph_source: result.source
           }),
@@ -474,7 +430,7 @@ async function persistFrozenSnapshotAuthority(result) {
               row.pagerankL1,
               row.authorityPercentile,
               row.authorityBand,
-              'stage5-simple-pagerank-v1',
+              'stage5-networkx-compatible-pagerank-v2',
               snapshot.graphSnapshot.topologyHash
             );
             return `($${offset + 1},$${offset + 2},$${offset + 3},$${offset + 4},$${offset + 5},$${offset + 6},$${offset + 7},$${offset + 8},$${offset + 9},$${offset + 10},NOW())`;
@@ -516,12 +472,35 @@ async function execute() {
   console.log('GRAPHIFY STAGE 5: PAGERANK AUTHORITY CALCULATION');
   console.log('═══════════════════════════════════════════════════════════\n');
 
-  const { scores, edges, validation, topK, source, snapshotId, frozenSnapshot } = await computePageRank();
-
-  let persistence = { status: 'SKIPPED', runId: null, persistedScores: 0 };
-  if (source === 'frozen_snapshot_json' && frozenSnapshot) {
-    persistence = await persistFrozenSnapshotAuthority({ scores, edges, validation, topK, source, snapshotId, frozenSnapshot });
+  const { scores, edges, nodes, validation, topK, source, snapshotId, frozenSnapshot } = await computePageRank();
+  const applyRequested = process.argv.includes('--apply');
+  const receiptArgument = process.argv.find((argument) => argument.startsWith('--networkx-parity-receipt='));
+  let reference = null;
+  let referenceLoadError = null;
+  if (receiptArgument) {
+    const receiptPath = path.resolve(REPO_ROOT, receiptArgument.slice('--networkx-parity-receipt='.length));
+    try {
+      reference = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+    } catch (error) {
+      referenceLoadError = error instanceof Error ? error.message : String(error);
+    }
   }
+  const topologyHash = frozenSnapshot?.graphSnapshot?.topologyHash ?? null;
+  const parity = reference
+    ? comparePageRankReferenceV1({ localScores: scores, reference, snapshotId, topologyHash })
+    : {
+      status: 'PARITY_NOT_PROVEN',
+      reasons: [referenceLoadError ? 'NETWORKX_REFERENCE_RECEIPT_UNREADABLE' : 'NETWORKX_REFERENCE_RECEIPT_REQUIRED'],
+      comparedNodeCount: 0,
+      maxAbsoluteDelta: null,
+      tolerance: 1e-8,
+    };
+  const validationPassed = validation.score_range_valid && validation.deterministic_check && validation.top_20_valid;
+  const gatePass = validationPassed && parity.status === 'PARITY_PROVEN';
+  const persistence = await persistFrozenSnapshotAuthority({
+    scores, edges, nodes, validation, topK, source, snapshotId, frozenSnapshot,
+    applyRequested, validationPassed, parity,
+  });
 
   console.log('\n[Stage 5] Step 4: Validation Report');
   console.log(`  Min score: ${validation.min_score.toFixed(6)}`);
@@ -531,15 +510,11 @@ async function execute() {
   console.log(`  Deterministic: ${validation.deterministic_check}`);
   console.log(`  Top-K ordering valid: ${validation.top_20_valid}`);
 
-  // Exit gate
-  const gatePass =
-    validation.score_range_valid &&
-    validation.deterministic_check &&
-    validation.top_20_valid;
-
   console.log('\n[Stage 5] Step 5: Exit Gate Decision');
   console.log(`  Gate: NETWORKX_REFERENCE_PROVEN`);
   console.log(`  Status: ${gatePass ? '✅ PASS' : '❌ FAIL'}`);
+  console.log(`  NetworkX parity: ${parity.status} (max delta: ${parity.maxAbsoluteDelta ?? 'n/a'})`);
+  console.log(`  Persistence: ${persistence.status}; apply requested: ${applyRequested}`);
 
   if (!gatePass) {
     console.log(`  ⚠ Validation failed; do NOT writeback to Postgres`);
@@ -554,7 +529,7 @@ async function execute() {
       node_key: node,
       pagerank_score: score,
       authority_level: score > 0.01 ? 'HIGH' : score > 0.005 ? 'MEDIUM' : 'LOW',
-      extraction_version: '1.0',
+      extraction_version: '2.0',
       extracted_at: new Date().toISOString()
     });
   }).join('\n') + (scores.size > 0 ? '\n' : '');
@@ -570,11 +545,13 @@ async function execute() {
     graph_source: source,
     graph_snapshot_id: snapshotId,
     persistence,
+    apply_requested: applyRequested,
+    database_writes_performed: persistence.writesPerformed === true,
     gate_name: 'NETWORKX_REFERENCE_PROVEN',
     gate_status: gatePass ? 'PASS' : 'FAIL',
+    networkx_parity: parity,
     configuration: {
-      damping_factor: 0.85,
-      iterations: 10,
+      ...STAGE5_PAGERANK_CONFIGURATION_V1,
       top_k_sample: 20
     },
     validation: {
@@ -586,7 +563,8 @@ async function execute() {
       checks: {
         score_range_valid: validation.score_range_valid,
         deterministic: validation.deterministic_check,
-        top_k_ordering_valid: validation.top_20_valid
+        top_k_ordering_valid: validation.top_20_valid,
+        networkx_parity: parity.status === 'PARITY_PROVEN'
       }
     },
     output_statistics: {
@@ -594,9 +572,11 @@ async function execute() {
       edges_processed: edges.length,
       top_20_nodes: topK.map(([node, score]) => ({ node, score }))
     },
-    next_action: gatePass
-      ? 'Writeback PageRank scores to Postgres + Neo4j topology edges'
-      : 'Debug PageRank computation; verify Stage 4 edges before retrying'
+    next_action: !gatePass
+      ? 'Provide a matching independent NetworkX score receipt for this exact frozen snapshot; do not apply'
+      : !applyRequested
+        ? 'Review the parity receipt and explicitly rerun with --apply only if authorized'
+        : persistence.status
   };
 
   fs.writeFileSync(VALIDATION_REPORT, JSON.stringify(report, null, 2), 'utf-8');

@@ -88,6 +88,8 @@ try {
     snapshotId: materialization.graphSnapshot.snapshotId,
     nodes: materialization.graphSnapshotNodes.map((node) => ({ ...node })),
     edges: materialization.graphSnapshotEdges.map((edge) => ({ ...edge })),
+    relationEvents: materialization.graphSnapshotRelationEvents.map((event) => ({ ...event })),
+    relationParticipants: materialization.graphSnapshotRelationParticipants.map((participant) => ({ ...participant })),
     manifest: {
       ...materialization.graphSnapshotManifest,
       workspaceRevision,
@@ -123,6 +125,8 @@ try {
     repository_id: repositoryId,
     node_count: materialization.graphSnapshotManifest.nodeCount,
     edge_count: materialization.graphSnapshotManifest.edgeCount,
+    relation_event_count: materialization.graphSnapshotManifest.relationEventCount,
+    relation_participant_count: materialization.graphSnapshotRelationParticipants.length,
     topology_hash: materialization.graphSnapshotManifest.topologyHash,
     graph_revision: revisionWrite.revision.graphRevision,
     revision_checksum: revisionWrite.revision.revisionChecksum,

@@ -22,6 +22,7 @@ export type GraphifyEdgeAdmissionV1 =
   | 'UNRESOLVED_TARGET'
   | 'SOURCE_REVISION_UNBOUND'
   | 'TARGET_REVISION_UNBOUND'
+  | 'TARGET_BINDING_MISMATCH'
   | 'WORKSPACE_REVISION_MISMATCH'
   | 'EVIDENCE_UNBOUND';
 
@@ -96,17 +97,23 @@ export function deriveGraphifyEdgeReplayVerdictV1(
   const object = edge.objectStableSymbolKey?.trim() ? edge.objectStableSymbolKey : null;
   if (!object) return reject('UNRESOLVED_TARGET');
   const targetRevision = ctx.targetSourceRevisionOf?.(object) ?? null;
-  if (!targetRevision || !SHA256_REVISION.test(targetRevision)) return reject('TARGET_REVISION_UNBOUND');
+  if (!targetRevision || !SHA256_REVISION.test(targetRevision)
+    || !edge.objectSourceRef || !edge.objectSourceRevision
+    || !SHA256_REVISION.test(edge.objectSourceRevision)) return reject('TARGET_REVISION_UNBOUND');
+  if (edge.objectSourceRevision !== targetRevision) return reject('TARGET_BINDING_MISMATCH', targetRevision);
   if (edge.workspaceRevision !== ctx.workspaceRevisionKey) return reject('WORKSPACE_REVISION_MISMATCH', targetRevision);
   if (!edge.evidenceRefs.some(nonEmpty) && !(edge.evidenceSpan.endByte > edge.evidenceSpan.startByte)) return reject('EVIDENCE_UNBOUND', targetRevision);
 
   const tuple = {
     schema: GRAPHIFY_EDGE_REPLAY_KEY_SCHEMA_V1,
+    workspaceId: edge.workspaceId,
     workspaceRevisionKey: ctx.workspaceRevisionKey,
     graphRevision: ctx.graphRevision,
     subject: edge.subjectStableSymbolKey,
+    sourceRef: edge.sourceRef,
     predicate: edge.predicate,
     object,
+    targetSourceRef: edge.objectSourceRef,
     sourceRevision: edge.sourceRevision,
     targetSourceRevision: targetRevision,
     producerRevision: ctx.producerRevision,
@@ -117,8 +124,13 @@ export function deriveGraphifyEdgeReplayVerdictV1(
 export interface GraphifyAdmittedEdgeV1 {
   edgeKey: string;
   subject: string;
+  sourceRef: string;
+  workspaceRevision: string;
+  graphRevision: string;
+  producerRevision: string;
   predicate: string;
   object: string;
+  targetSourceRef: string;
   sourceRevision: string;
   targetSourceRevision: string;
   /** Sorted, de-duplicated evidence entries for this logical edge (several call sites = one edge, many entries). */
@@ -146,6 +158,7 @@ export function planGraphifyEdgeReplayV1(
 ): GraphifyEdgeReplayPlanV1 {
   const counts = {
     ADMITTED: 0, UNRESOLVED_SOURCE: 0, UNRESOLVED_TARGET: 0, SOURCE_REVISION_UNBOUND: 0, TARGET_REVISION_UNBOUND: 0,
+    TARGET_BINDING_MISMATCH: 0,
     WORKSPACE_REVISION_MISMATCH: 0, EVIDENCE_UNBOUND: 0, total: edges.length, mergedEvidenceEntries: 0, collisions: 0,
   };
   const groups = new Map<string, { tuple: string; base: Omit<GraphifyAdmittedEdgeV1, 'evidence' | 'evidenceChecksum' | 'edgeKey'>; evidence: Map<string, GraphifyEdgeEvidenceEntryV1> }>();
@@ -158,14 +171,14 @@ export function planGraphifyEdgeReplayV1(
       rejected.push({ edge, admission: v.admission as Exclude<GraphifyEdgeAdmissionV1, 'ADMITTED'> });
       continue;
     }
-    const tuple = canonicalJson([edge.subjectStableSymbolKey, edge.predicate, edge.objectStableSymbolKey, edge.sourceRevision, v.targetSourceRevision]);
+    const tuple = canonicalJson([edge.subjectStableSymbolKey, edge.sourceRef, edge.workspaceRevision, ctx.graphRevision, ctx.producerRevision, edge.predicate, edge.objectStableSymbolKey, edge.sourceRevision, edge.objectSourceRef, v.targetSourceRevision]);
     const entry = evidenceEntryOfV1(edge);
     const entryKey = canonicalJson(entry);
     const existing = groups.get(v.edgeKey!);
     if (!existing) {
       groups.set(v.edgeKey!, {
         tuple,
-        base: { subject: edge.subjectStableSymbolKey, predicate: edge.predicate, object: edge.objectStableSymbolKey!, sourceRevision: edge.sourceRevision, targetSourceRevision: v.targetSourceRevision! },
+        base: { subject: edge.subjectStableSymbolKey, sourceRef: edge.sourceRef, workspaceRevision: edge.workspaceRevision, graphRevision: ctx.graphRevision, producerRevision: ctx.producerRevision, predicate: edge.predicate, object: edge.objectStableSymbolKey!, targetSourceRef: edge.objectSourceRef!, sourceRevision: edge.sourceRevision, targetSourceRevision: v.targetSourceRevision! },
         evidence: new Map([[entryKey, entry]]),
       });
     } else if (existing.tuple !== tuple) {

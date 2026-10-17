@@ -1,0 +1,7 @@
+# ast-grep project config. ast-grep 0.45.3 has no built-in Svelte language.
+# Template-level structural matching only (HTML grammar); Svelte syntax such as {#if} is not understood.
+# Script blocks are NOT matched here: svelte-rune-crosscheck-v1.mjs extracts them to a temp .ts file.
+# The svelte/compiler splitter (scripts/atlas/svelte-dom-splitter-v1.mjs) stays the authority; this is a challenger.
+ruleDirs: []
+languageGlobs:
+  html: ["*.svelte"]

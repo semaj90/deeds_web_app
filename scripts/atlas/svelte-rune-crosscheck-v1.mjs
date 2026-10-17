@@ -2,14 +2,15 @@
 // run over the same script contents. Two independent parsers must agree on every rune call.
 // Never writes to Postgres, Valkey, Qdrant or Neo4j. Receipts go to .tmp/atlas/ (gitignored).
 // Usage: node scripts/atlas/svelte-rune-crosscheck-v1.mjs <repo-relative .svelte file> [...]
+import { svelteReceiptFileNameV1, receiptMismatchReasonV1 } from './lib/svelte-receipt-name-v1.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { resolveSvelteSourceFileV1 } from './lib/resolve-svelte-source-file-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const RE_PATH = /^[A-Za-z0-9_.\-/()[\]]+\.svelte$/;
 const RUNES = ['$props', '$state', '$derived', '$effect'];
 const AST_GREP_BIN = [
   process.env.AST_GREP_BIN,
@@ -20,9 +21,6 @@ const AST_GREP_BIN = [
 const files = process.argv.slice(2);
 const runId = new Date().toISOString().replace(/[:.]/g, '-');
 if (files.length === 0) { console.error('usage: svelte-rune-crosscheck-v1.mjs <file.svelte> [...]'); process.exit(2); }
-for (const f of files) {
-  if (!RE_PATH.test(f) || f.includes('..') || path.isAbsolute(f)) { console.error(`rejected path ${JSON.stringify(f)}`); process.exit(2); }
-}
 
 // Byte offset of the first script's contents (after the opening tag's '>') and its end (before '</script>').
 function scriptContents(bytes) {
@@ -70,13 +68,17 @@ function analyze(rel) {
     try { const v = fn(); stages.push({ name, status: 'OK' }); return v; }
     catch (err) { stages.push({ name, status: 'FAILED', error: String(err?.message ?? err).slice(0, 300) }); return null; }
   };
-  const bytes = fs.readFileSync(path.join(repoRoot, rel));
+  let sourcePath;
+  try { sourcePath = resolveSvelteSourceFileV1(repoRoot, rel).absolutePath; }
+  catch (err) { return { rel, rejected: true, stages: [{ name: 'resolve_source_path', status: 'REJECTED', error: String(err?.message ?? err) }], receipt: null, outPath: null }; }
+  const bytes = fs.readFileSync(sourcePath);
   const sourceRevision = `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
   const sourceKey = crypto.createHash('sha256').update(rel).digest('hex').slice(0, 12);
-  const splitPath = path.join(repoRoot, '.tmp', 'atlas', `svelte-dom-split-v1-${path.basename(rel)}.json`);
+  const splitPath = path.join(repoRoot, '.tmp', 'atlas', svelteReceiptFileNameV1(rel));
   const split = stage('load_splitter_receipt', () => {
     const r = JSON.parse(fs.readFileSync(splitPath, 'utf8'));
-    if (r.source.disk_sha256 !== sourceRevision) throw new Error('splitter receipt is for different bytes; rerun the splitter');
+    const mismatch = receiptMismatchReasonV1(r, rel, sourceRevision);
+    if (mismatch) throw new Error(`${mismatch}: splitter receipt does not belong to this path and bytes; rerun the splitter`);
     return r;
   });
   const contents = stage('extract_script', () => scriptContents(bytes));
@@ -129,7 +131,7 @@ function analyze(rel) {
       handlerSpans.push({ attr: m[1], byteStart: toByte(m.index), byteEnd: toByte(m.index + m[1].length) });
     }
 
-    const splitElementNodes = split ? split.nodes.filter((n) => n.kind === 'RegularElement' || n.kind === 'Component') : [];
+    const splitElementNodes = split ? split.nodes.filter((n) => n.kind === 'RegularElement' || n.kind === 'Component' || n.kind === 'TitleElement') : [];
     const splitHandlerNodes = split ? split.eventHandlers : [];
 
     const spanMismatches = [];
@@ -192,12 +194,16 @@ function analyze(rel) {
 }
 
 const results = files.map(analyze);
-const failed = results.filter((r) => r.stages.some((s) => s.status === 'FAILED') || (r.receipt.mismatches.length > 0));
+const failed = results.filter((r) => !r.rejected && (r.stages.some((s) => s.status === 'FAILED') || (r.receipt?.mismatches.length > 0)));
+const rejected = results.filter((r) => r.rejected).length;
 const summary = {
   filesRequested: files.length,
+  filesProcessed: results.filter((r) => r.receipt !== null).length,
   filesFailed: failed.length,
-  exitCode: failed.length ? 1 : 0,
-  files: results.map((r) => ({ path: r.rel, counts: r.receipt.counts, stageStatus: r.stages.map((s) => `${s.name}:${s.status}`), outPath: r.outPath })),
+  filesRejected: rejected,
+  filesSkipped: 0,
+  exitCode: failed.length || rejected ? 1 : 0,
+  files: results.map((r) => ({ path: r.rel, rejected: r.rejected ?? false, counts: r.receipt?.counts ?? null, stageStatus: r.stages.map((s) => `${s.name}:${s.status}`), outPath: r.outPath })),
 };
 console.log(JSON.stringify(summary, null, 2));
 process.exit(summary.exitCode);

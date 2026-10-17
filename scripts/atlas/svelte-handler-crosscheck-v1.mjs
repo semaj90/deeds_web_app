@@ -10,14 +10,15 @@
  * Usage: node scripts/atlas/svelte-handler-crosscheck-v1.mjs <repo-relative .svelte file> [...]
  */
 
+import { svelteReceiptFileNameV1, receiptMismatchReasonV1 } from './lib/svelte-receipt-name-v1.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { resolveSvelteSourceFileV1 } from './lib/resolve-svelte-source-file-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const RE_PATH = /^[A-Za-z0-9_.\-/()[\]]+\.svelte$/;
 
 // Pattern matching Svelte 5 event attributes (e.g. onclick={...}, onkeydown="...")
 // and legacy directives (e.g. on:click={...}, on:click|preventDefault={...})
@@ -28,24 +29,23 @@ if (files.length === 0) {
   console.error('usage: svelte-handler-crosscheck-v1.mjs <file.svelte> [...]');
   process.exit(2);
 }
-for (const f of files) {
-  if (!RE_PATH.test(f) || f.includes('..') || path.isAbsolute(f)) {
-    console.error(`rejected path ${JSON.stringify(f)}`);
-    process.exit(2);
-  }
-}
 
 function ensureSplitterReceipt(rel) {
-  const base = path.basename(rel).replace(/[^\w.-]/g, '_');
-  const receiptPath = path.join(repoRoot, '.tmp', 'atlas', `svelte-dom-split-v1-${base}.json`);
-  if (!fs.existsSync(receiptPath)) {
+  const receiptPath = path.join(repoRoot, '.tmp', 'atlas', svelteReceiptFileNameV1(rel));
+  const revision = `sha256:${crypto.createHash('sha256').update(fs.readFileSync(path.join(repoRoot, rel))).digest('hex')}`;
+  const load = () => (fs.existsSync(receiptPath) ? JSON.parse(fs.readFileSync(receiptPath, 'utf8')) : null);
+  let receipt = load();
+  if (!receipt || receiptMismatchReasonV1(receipt, rel, revision)) {
     execFileSync(process.execPath, [path.join(repoRoot, 'scripts', 'atlas', 'svelte-dom-splitter-v1.mjs'), rel], {
       cwd: repoRoot,
       encoding: 'utf8',
       timeout: 30000,
     });
+    receipt = load();
   }
-  return JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+  const mismatch = receiptMismatchReasonV1(receipt, rel, revision);
+  if (mismatch) throw new Error(`${mismatch}: ${rel}`);
+  return receipt;
 }
 
 function byteOffsetFactory(source) {
@@ -94,9 +94,10 @@ let allPassed = true;
 const summary = [];
 
 for (const rel of files) {
-  const absPath = path.join(repoRoot, rel);
-  if (!fs.existsSync(absPath)) {
-    console.error(`missing file ${rel}`);
+  let absPath;
+  try { absPath = resolveSvelteSourceFileV1(repoRoot, rel).absolutePath; }
+  catch (err) {
+    summary.push({ file: rel, status: 'REJECTED', reason: String(err?.message ?? err) });
     allPassed = false;
     continue;
   }
@@ -154,5 +155,6 @@ for (const rel of files) {
   summary.push({ file: path.basename(rel), status: receipt.status, count: splitHandlers.length });
 }
 
+console.log(JSON.stringify({ filesRequested: files.length, filesProcessed: summary.filter((x) => x.status !== 'REJECTED').length, filesFailed: summary.filter((x) => x.status === 'MISMATCH').length, filesRejected: summary.filter((x) => x.status === 'REJECTED').length, filesSkipped: 0, results: summary }, null, 2));
 console.log(`\nOverall Handler Crosscheck: ${allPassed ? 'ALL PASSED' : 'FAILURES DETECTED'}`);
 process.exit(allPassed ? 0 : 1);

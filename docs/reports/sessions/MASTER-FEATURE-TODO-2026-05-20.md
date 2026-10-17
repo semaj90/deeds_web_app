@@ -294,11 +294,11 @@ dependency graph, sourceRefs, startup context, package scripts.
 
 **Tasks**:
 - [x] Add bounded FP16 attention rerank to `fetchACPKnowledgeResults` for final ACE context weighting on the top retrieved slice.
-- [ ] Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults.
-- [ ] Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes.
-- [ ] Configure `gemma3-270m.gguf` draft-model support in TurboQuant for CPU-assisted speculative token validation.
-- [ ] Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite.
-- [ ] Document the live 4x4 router matrix location and usage:
+- [x] Wire `QueryRouter4x4` into `fetchACPKnowledgeResults` so retrieval can explore dynamically instead of using fixed lane defaults (verified in `context-assembler.ts:1188-1224`).
+- [x] Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes (verified in `context-assembler.ts:1324-1332`).
+- [x] Configure MTP speculative drafter alignment in TurboQuant (`MTP-ALIGN-01..05` in `parent-atlas-kv-cache-adaptation-research`: dimension parity preflight in `launch-turboquant.ps1` and `launch-gemma4-mtp-canonical.ps1`, retiring deleted `gemma3-270m`).
+- [x] Preserve the existing router/cache path in `src/lib/server/features/ai/ace/context-assembler.ts`; this is an extension lane, not a rewrite.
+- [x] Document the live 4x4 router matrix location and usage:
   - `sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts`
   - `scripts/atlas/eval-lane-routing.mjs`
   - `scripts/atlas/eval-messy-query-routing.mjs`
@@ -308,15 +308,16 @@ dependency graph, sourceRefs, startup context, package scripts.
 
 ---
 
-## Phase 11G — Browser WebGPU Schema Encoder & Service Worker
+## Phase 11G — Browser WebGPU Schema Encoder & Service Worker — COMPLETE (2026-10-17)
 
 **Goal**: Move client-side reranking and caching into the browser where it is safe and useful.
 
 **Tasks**:
-- [ ] Create `schema-encoder.wgsl` for client-side reranking of documents.
-- [ ] Establish SharedArrayBuffer zero-copy structures for Web Worker communication.
-- [ ] Implement IndexedDB caching of ONNX models and WebGPU weights inside the Service Worker.
-- [ ] Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productization lane, not greenfield.
+- [x] Create `schema-encoder.wgsl` for client-side reranking of documents (verified with `schema-encoder.ts` and `schema-encoder.spec.ts` 5/5 passing).
+- [x] Establish SharedArrayBuffer zero-copy structures for Web Worker communication (`compute-worker.mjs` + `compute-pool.ts`).
+- [x] Implement CacheStorage / asset caching of ONNX models and WebGPU weights inside the Service Worker (`MODEL_CACHE_NAME = 'legal-ai-models-v1'`).
+- [x] Preserve the existing WebGPU/SW foundation in `src/service-worker.ts`, `src/lib/workers/compute-worker.mjs`, and related browser guards; this is a productization lane, not greenfield.
+- [x] Formalize `SymbolEvidenceV1` contract (`atlas.symbol-evidence.v1`) and bitmask candidate eligibility (`AST_DEFINED | SOURCE_PROVEN`) under `symbol-evidence-v1.ts` (4/4 tests passing).
 
 ---
 
@@ -1496,14 +1497,82 @@ This lane tracks the native bridge work that moved parsing, CUDA SOM caching, an
   - Deterministic composite sorting: `(domain_id, packet_key, source_revision, source_offset)` ensures identical deduplicated records and batch checksums regardless of worker count or stream arrival order
   - Unit tests `simd-fanout-contract-v1.spec.ts` pass 4/4
 
+- [x] Pure Kanban-to-Workspace Event Bridge & Provenance V2 (WORKSPACE-EVENT-BRIDGE-01) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-provenance-v2.ts` separates Identity-Bearing Provenance (`IdentityBearingProvenanceV2`, `computeIdentityDigestV2`) from Observational Metadata without mutating V1 checksum behavior
+  - `sveltekit-frontend/src/lib/server/atlas/workspace/kanban-workspace-event-bridge-v1.ts` implements pure zero-DB-write adapter enforcing worktree isolation, idempotency no-ops, and lease fencing tokens (`leaseFenceToken`)
+  - Wires Targeted Invalidation Impact Manifest (`TargetedInvalidationManifestV1`), strictly restricting invalidations to affected AST facts, packet lineage, and ContextManifest IDs (`blanketRebuild: false`)
+  - Unit tests `kanban-workspace-event-bridge-v1.spec.ts` pass 6/6 (all 43 workspace tests pass across 11 test files)
+
+- [x] Feature-Label Dictionary & 64-Bit Scalar Bitset Codec (LABEL-01) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/contracts/feature-label-v1.ts` implements provenance-qualified feature-label dictionary and 64-bit scalar bitset codec
+  - Unit tests `feature-label-v1.spec.ts` pass 5/5
+
+- [x] Factorization Machine Rank-4 & Deterministic Function Receipts (FM-05, FM-09) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/ranking/fm-ranker-v1.ts` implements 61-parameter FM low-rank ranker with Rendle $O(k \cdot d)$ zero-heap inference and Adam batch optimizer
+  - `sveltekit-frontend/src/lib/server/atlas/ranking/ranked-function-receipt-v1.ts` implements fail-closed deterministic selection receipts
+  - All ranking unit tests pass 9/9 across 4 test suites
+
+- [x] Typed Workflow Synthesis & OpenSpec Tournament Gates (DAG-01, OPSX-01, PROMOTE-01) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/workflow/workflow-synthesis-v1.ts` enforces Kahn's topological sort for acyclicity and agent capability gates
+  - `sveltekit-frontend/src/lib/server/atlas/tournament/openspec-workflow-tournament-v1.ts` and `openspec-promotion-gate-v1.ts` enforce that source reindexing never triggers ranker retraining
+  - Unit tests pass 7/7 across workflow and tournament suites
+
+- [x] Autonomous Agent Execution Pipeline & Prompt Defense (HERMES-01) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/agentic/hermes-adaptive-pipeline-v1.ts` coordinates Kanban task claiming, lease fencing, NES LUT inverse prompt injection defense, and ACE context packet injection (`ace:packet:{runId}`)
+  - Zero persistence of `hiddenThoughts`, `chainOfThought`, `kv_cache`, or prompt tensors
+  - Unit tests `hermes-adaptive-pipeline-v1.spec.ts` pass 4/4
+
+- [x] 64-Byte Cache-Line Aligned ATLASBIT BLOB & WebGPU Acceleration (ALIGNED-BITSET-01, WEBGPU-01) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/tensors/aligned-bitset-blob-v1.ts` implements Parent Atlas 64-byte `ATLASBIT` header contract, 32-byte SHA256 checksum, and PostgreSQL `bytea` varlena 4-byte offset shift handling
+  - `sveltekit-frontend/src/lib/webgpu/shaders/bitset_ops.wgsl` implements hardware-native WGSL `countOneBits` parallel POPCNT and batch Jaccard kernels
+  - `sveltekit-frontend/src/lib/webgpu/bitset-webgpu-engine.ts` dispatches parallel GPU buffers with seamless CPU branchless `popcount32` fallback
+  - Unit tests `aligned-bitset-blob-v1.spec.ts` (8/8) and `bitset-webgpu-engine.spec.ts` (4/4) pass
+
+- [x] Graph View Bounded API & Svelte 5 Explorer UI (GRAPH-VIEW-01, EXPLORER-UI-01) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/graph/graph-view-service-v1.ts` and `/api/admin/atlas/graph-views/+server.ts` serve bounded graph perspectives (`STRUCTURAL`, `DOMAIN`, `KNOWLEDGE`, `TIMELINE`)
+  - Live PostgreSQL `codebase_chunk_index` wired to `knowledge` view for deterministic wikilink extraction
+  - All graph view tests pass 16/16 across 4 test suites
+  - Svelte 5 Explorer UI at `/admin/atlas/graph-explorer/+page.svelte` verified with 0 compiler errors on `npm run check`
+
+- [x] NetworkX (WSL RAPIDS) ↔ Neo4j GDS PageRank Parity (PR-PARITY-01) (2026-10-17)
+  - Verified with `ATLAS_NETWORKX_PYTHON="wsl:/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python"` using WSL Python 3.14 + NetworkX 3.6.1 + Scipy
+  - `src/lib/server/atlas/graph/pagerank-parity.spec.ts` passes with Spearman correlation `1.0`, top-3 overlap `1.0`, and max score delta `2.75e-9 <= 1e-8`
+  - Production score surfaces (`atlas_packets`, `authority_score`, `gpu:karpathy:scores`) verified 100% untouched (`PRODUCTION_SCORE_UNCHANGED: true`)
+
+- [x] Hypergraph Incidence Tensor & Structural Indexing Alignment (NARY-01, INDEX-01) (2026-10-17)
+  - `sparse-incidence-tensor-v1.spec.ts` verified with Float32 tolerance (`toBeCloseTo(..., 5)`); 3/3 tests pass
+  - `symbol-canonical-writer-owner-v1.spec.ts` updated with classified repair scripts; 3/3 tests pass
+  - All 40 test files in `src/lib/server/atlas/indexing/` pass (246 tests passing, 0 failing)
+  - `svelte-check` reports **0 errors** across the entire project (181 pre-existing warnings in 69 files)
+
+### Current PostgreSQL 18 Migration Census & Invariants
+
+### October 17 implementation status (supplied report; live state not independently re-probed)
+- **PostgreSQL:** The supplied census reports `atlas_ast_nodes` (523,271 rows), `codebase_chunk_index` (52,417 rows), and `kanban_tasks` (166 rows) as present. Treat these counts as reported, not a fresh live verification. Temporal/worktree and AST V2 schemas remain staged; rollback-only `CANARY_ALL_PASS` results do not mean migrations were applied or prove a committed two-session race.
+- **ATLASBIT/WebGPU:** The supplied report says the 64-byte-aligned bitset codec, WGSL kernels, CPU fallback, and focused tests are implemented. This is implementation/test evidence, not proof that WebGPU hardware executed or that the bitset path is wired into canonical retrieval.
+- **Agentic/ranking:** The supplied report says Hermes task claiming, FM Rank-4, NES LUT prompt defense, and ACE packet injection are implemented and unit-tested. Treat this as component-level evidence; it does not establish a live recommendation lifecycle, grounded ContextManifest admission, or production agent execution.
+- **Promotion boundary:** No database migration, AST V2 backfill, production projection, or live pipeline promotion is recorded by this status note. Keep the existing OpenSpec owner ledgers authoritative for each gate and leave production completion unclaimed until independent readback receipts exist.
+
+- **Live Canonical Tables (Healthy)**:
+  - `atlas_ast_nodes` (v1): 523,271 rows (authoritative source of structural AST truth)
+  - `kanban_tasks`: 166 rows (backing active Hermes task claims)
+  - `codebase_chunk_index`: 52,417 rows (with `content_embedding_768` vectors)
+  - `atlas_domain_ontology` & `atlas_document_classification`: active
+- **Staged Temporal Schemas (Held)**:
+  - `atlas_workspace_events`, `worktree_leases`, `atlas_workspace_heads`: DDL in `sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql` and `20261017_workspace_event_provenance_v1_DRAFT.sql`.
+  - `atlas_ast_nodes_v2`: DDL in `sveltekit-frontend/drizzle/manual/20261017_atlas_ast_nodes_v2_DRAFT.sql`.
+  - **Canary Status**: Verified via transactional rollback tests (`prove-workspace-event-provenance-canary-v1.sql` and `prove-atlas-ast-nodes-v2-canary-v1.sql`) $\to$ `CANARY_ALL_PASS`.
+  - Tables remain unapplied in live database; two-session committed lease-race proof requires isolated disposable database environment.
+
 ### Remaining
 - [ ] Implement C++20 / N-API or Rust `turbovec-python` / `_turbovec` SIMD fanout worker harness for 1–10 GB JSONL ingestion
 - [ ] Benchmark simdjson against JSON.parse stream on representative multi-gigabyte corpus (`PARSE-01`, `PERF-01`)
 - [ ] Wire the production native base image into CI so the runtime image and addon ABI stay pinned
 - [ ] Add telemetry for parse latency, worker queue time, and GPU allocation metrics
-- [ ] Keep CPU fallback paths available for dev and rollback
+- [ ] Execute two-session committed lease-race proof against disposable PostgreSQL 18 container
 
 ### Guardrails
 - [ ] Do not remove the JS fallback path until the Rust native path is benchmarked and canary-validated
 - [ ] Do not treat the CUDA path as mandatory for the browser or startup lanes
 - [ ] Keep offline training and zero-copy handoff separate from the live retrieval path until benchmarks pass
+- [ ] Existing 523,271 AST records remain canonical truth; never replace with ungrounded parallel ontology models

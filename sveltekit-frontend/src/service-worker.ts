@@ -26,6 +26,18 @@ let redisWebGPUIntegration: any;
 let simdJSONClient: any;
 let somWebGPUCache: any;
 
+export const RUNTIME_CACHE_NAME = 'legal-ai-v1';
+export const MODEL_CACHE_NAME = 'legal-ai-models-v1';
+
+export function isModelOrWeightAsset(url: URL): boolean {
+	return (
+		/\.(onnx|wgsl|bin|wasm|gguf)$/i.test(url.pathname) ||
+		url.pathname.includes('/models/') ||
+		url.pathname.includes('/webgpu/') ||
+		url.pathname.includes('/transformers/')
+	);
+}
+
 // Global data structures for cache warming
 const warmingQueue: CacheWarmingTask[] = [];
 const activeWarmingTasks: Map<string, Promise<void>> = new Map();
@@ -106,8 +118,11 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 			await refreshRuntimeCacheReadiness();
 			webgpuInitialized = true;
 
-			await caches.open('legal-ai-v1');
-			console.log('Service Worker: Cache opened.');
+			await Promise.all([
+				caches.open(RUNTIME_CACHE_NAME),
+				caches.open(MODEL_CACHE_NAME)
+			]);
+			console.log('Service Worker: Caches opened.');
 		})()
 	);
 	(self as unknown as ServiceWorkerGlobalScope).skipWaiting();
@@ -119,7 +134,9 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 		(async () => {
 			const cacheNames = await caches.keys();
 			await Promise.all(
-				cacheNames.filter((name) => name !== 'legal-ai-v1').map((name) => caches.delete(name))
+				cacheNames
+					.filter((name) => name !== RUNTIME_CACHE_NAME && name !== MODEL_CACHE_NAME)
+					.map((name) => caches.delete(name))
 			);
 			console.log('Service Worker: Old caches cleared.');
 			await (self as unknown as ServiceWorkerGlobalScope).clients.claim();
@@ -158,6 +175,25 @@ self.addEventListener('sync', (event: any) => {
  */
 async function handleAPIRequest(request: Request): Promise<Response> {
 	const url = new URL(request.url);
+
+	// ── MODEL & WEIGHT CACHING (ONNX / WGSL / WASM / BIN / GGUF) ─────────
+	if (request.method === 'GET' && isModelOrWeightAsset(url)) {
+		try {
+			const modelCache = await caches.open(MODEL_CACHE_NAME);
+			const cached = await modelCache.match(request);
+			if (cached) {
+				return cached;
+			}
+			const networkResponse = await fetch(request);
+			if (networkResponse.ok) {
+				await modelCache.put(request, networkResponse.clone());
+			}
+			return networkResponse;
+		} catch (err) {
+			console.warn('[SW] Model/weight fetch or cache failed:', err);
+		}
+	}
+
 	const cacheKey = await buildRuntimeCacheKey(request);
 
 	// ── SPECIAL HANDLING: Instant Local Search (WebGPU) ───────────────────────
@@ -260,7 +296,7 @@ async function attemptLocalWebGPUSearch(body: any): Promise<any | null> {
 async function checkCacheHierarchy(cacheKey: string, request: Request): Promise<Response | null> {
 	try {
 		if (request.method === 'GET') {
-			const cache = await caches.open('legal-ai-v1');
+			const cache = await caches.open(RUNTIME_CACHE_NAME);
 			const cached = await cache.match(request);
 			if (cached) return cached;
 		}
@@ -326,7 +362,7 @@ async function cacheResponse(
 
 		// 1. Browser cache
 		if (request.method === 'GET') {
-			const cache = await caches.open('legal-ai-v1');
+			const cache = await caches.open(RUNTIME_CACHE_NAME);
 			cachePromises.push(cache.put(request, response.clone()));
 		}
 

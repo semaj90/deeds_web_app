@@ -8,6 +8,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
+import { svelteReceiptFileNameV1 } from './lib/svelte-receipt-name-v1.mjs';
+import { resolveSvelteSourceFileV1 } from './lib/resolve-svelte-source-file-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 // svelte lives in the SvelteKit app's node_modules, not at the repo root.
@@ -15,7 +17,6 @@ const require = createRequire(path.join(repoRoot, 'sveltekit-frontend', 'package
 const { parse } = require('svelte/compiler');
 
 const RE = {
-  relPath: /^[A-Za-z0-9_.\-/()[\]]+\.svelte$/,
   revision: /^sha256:[0-9a-f]{64}$/,
   rune: /^\$(props|state|derived|effect)(\.[a-z]+)?$/,
 };
@@ -25,13 +26,6 @@ if (files.length === 0) {
   console.error('usage: svelte-dom-splitter-v1.mjs <file.svelte> [...]');
   process.exit(2);
 }
-for (const f of files) {
-  if (!RE.relPath.test(f) || f.includes('..') || path.isAbsolute(f)) {
-    console.error(`svelte-dom-splitter-v1: rejected path ${JSON.stringify(f)}`);
-    process.exit(2);
-  }
-}
-
 // svelte/compiler offsets are UTF-16 code-unit indices into the JS string. Convert to UTF-8 bytes.
 function byteOffsetFactory(source) {
   const cache = new Map();
@@ -148,7 +142,9 @@ function analyze(rel) {
     }
   };
 
-  const bytes = stage('read_source', () => fs.readFileSync(path.join(repoRoot, rel)));
+  const target = stage('resolve_source_path', () => resolveSvelteSourceFileV1(repoRoot, rel));
+  if (!target) return { rel, stages, receipt: null, outPath: null, rejected: true };
+  const bytes = stage('read_source', () => fs.readFileSync(target.absolutePath));
   if (!bytes) return { rel, stages, receipt: null, outPath: null };
   const source = bytes.toString('utf8');
   const revision = `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
@@ -183,7 +179,8 @@ function analyze(rel) {
     const all = [...out.nodes, ...out.handlers, ...out.runes];
     for (const s of all) {
       // TemplateElement quasis may be empty (e.g. the segment between "${a}" and "${b}"); all other spans must be non-empty.
-      const emptyOk = s.kind === 'TemplateElement' && s.byteStart === s.byteEnd;
+      // An empty attribute value (alt="") is a zero-width Text node; that is valid, not a span error.
+      const emptyOk = (s.kind === 'TemplateElement' || s.kind === 'Text') && s.byteStart === s.byteEnd;
       if (!(s.byteStart >= 0 && s.byteEnd <= size && (s.byteStart < s.byteEnd || emptyOk))) {
         throw new Error(`span out of bounds: ${s.byteStart}-${s.byteEnd}`);
       }
@@ -218,16 +215,20 @@ function analyze(rel) {
 
   const outDir = path.join(repoRoot, '.tmp', 'atlas');
   fs.mkdirSync(outDir, { recursive: true });
-  const outPath = path.join(outDir, `svelte-dom-split-v1-${path.basename(rel).replace(/[^\w.-]/g, '_')}.json`);
+  const outPath = path.join(outDir, svelteReceiptFileNameV1(rel));
   fs.writeFileSync(outPath, JSON.stringify(receipt, null, 2) + '\n', 'utf8');
   return { rel, stages, receipt, outPath };
 }
 
 const results = files.map((f) => analyze(f));
 const failed = results.filter((r) => r.stages.some((s) => s.status === 'FAILED'));
+const rejected = results.filter((r) => r.rejected).length;
 const summary = {
   filesRequested: files.length,
-  filesFailed: failed.length,
+  filesProcessed: results.filter((r) => r.receipt !== null).length,
+  filesFailed: failed.length - rejected,
+  filesRejected: rejected,
+  filesSkipped: 0,
   exitCode: failed.length ? 1 : 0,
   files: results.map((r) => ({
     path: r.rel,

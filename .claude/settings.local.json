@@ -637,7 +637,10 @@
       "PowerShell($c = Get-NetTCPConnection -LocalPort 8788 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { \"listener pid=$\\($c.OwningProcess\\)\" } else { \"no listener on 8788\" })",
       "Bash(rg -c \"registerTool\\\\\\(\" src/mcp/trace-mcp-server.ts)",
       "Bash(rg -n \"z\\\\.record\\\\\\(\" src/mcp/)",
-      "PowerShell(Get-PSDrive -PSProvider FileSystem | Select-Object Name, @{n='UsedGB';e={[math]::Round\\($_.Used/1GB,1\\)}}, @{n='FreeGB';e={[math]::Round\\($_.Free/1GB,1\\)}} | Format-Table -AutoSize | Out-String; Set-Location C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app; \\(Get-ChildItem -Directory openspec\\\\changes -ErrorAction SilentlyContinue\\).Count; \\(Get-ChildItem -Directory sveltekit-frontend\\\\openspec\\\\changes -ErrorAction SilentlyContinue\\).Count; \\(Get-ChildItem -Directory sveltekit-frontend\\\\openspec\\\\changes\\\\archive -ErrorAction SilentlyContinue\\).Count)"
+      "PowerShell(Get-PSDrive -PSProvider FileSystem | Select-Object Name, @{n='UsedGB';e={[math]::Round\\($_.Used/1GB,1\\)}}, @{n='FreeGB';e={[math]::Round\\($_.Free/1GB,1\\)}} | Format-Table -AutoSize | Out-String; Set-Location C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app; \\(Get-ChildItem -Directory openspec\\\\changes -ErrorAction SilentlyContinue\\).Count; \\(Get-ChildItem -Directory sveltekit-frontend\\\\openspec\\\\changes -ErrorAction SilentlyContinue\\).Count; \\(Get-ChildItem -Directory sveltekit-frontend\\\\openspec\\\\changes\\\\archive -ErrorAction SilentlyContinue\\).Count)",
+      "PowerShell(try { Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/graphify/status' -TimeoutSec 15 | ConvertTo-Json -Depth 8 } catch { Write-Warning $_.Exception.Message })",
+      "PowerShell(docker exec legal-ai-postgres *)",
+      "PowerShell(Start-Sleep 3; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/graphify/status' -TimeoutSec 15; $r.status | ConvertTo-Json; $r.pipeline.stages | ForEach-Object { \"$\\($_.name\\) ready=$\\($_.ready\\) $\\($_.message\\)\" } } catch { Write-Warning $_.Exception.Message })"
     ],
     "deny": [],
     "ask": []

@@ -2,9 +2,9 @@
   "schema": "atlas.toc-oversized-source-skips.v1",
   "configuredMaxBytes": 16777216,
   "summary": {
-    "totalCandidates": 7441,
-    "includedCount": 7339,
-    "skippedCount": 102
+    "totalCandidates": 7668,
+    "includedCount": 7564,
+    "skippedCount": 104
   },
   "skips": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "sourcePath": "docs/reports/current-source-authority-repair-plan-v1.json",
-      "byteSize": 22613060,
+      "byteSize": 24095617,
       "maxBytes": 16777216,
       "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
     },
@@ -118,6 +118,18 @@
     {
       "sourcePath": "docs/reports/openspec-directory-graph-v1.json",
       "byteSize": 178717122,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json",
+      "byteSize": 123734066,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/20261015193714990-cd8858b116da/parser-diagnostics-v1.json",
+      "byteSize": 17882845,
       "maxBytes": 16777216,
       "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
     },

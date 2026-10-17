@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.graphify-symbol-shards.v1",
+  "manifestChecksum": "sha256:c7d1cadcab08d61c130edf3bc5245a8b1888b49bfac801165d9f3287f0448c38",
+  "sourceCount": 704,
+  "shardSize": 250,
+  "shards": [
+    {
+      "shardId": "GRAPHIFY-BASELINE-c7d1cadcab08-0001",
+      "manifestChecksum": "sha256:c7d1cadcab08d61c130edf3bc5245a8b1888b49bfac801165d9f3287f0448c38",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:213938acdfdb58faa0d0e48b1290c30c46abee3ef20d7fdfd75664e4f50e7b3f",
+      "offset": 0,
+      "maxFiles": 250,
+      "shardChecksum": "sha256:23d20196d7fab22ed17a5a5c85fe1c2f263fb84aca36d636e2454acaf4149f1d",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    },
+    {
+      "shardId": "GRAPHIFY-BASELINE-c7d1cadcab08-0002",
+      "manifestChecksum": "sha256:c7d1cadcab08d61c130edf3bc5245a8b1888b49bfac801165d9f3287f0448c38",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:213938acdfdb58faa0d0e48b1290c30c46abee3ef20d7fdfd75664e4f50e7b3f",
+      "offset": 250,
+      "maxFiles": 250,
+      "shardChecksum": "sha256:0a343a9c8382b1e64d318488d93c05cdae993ba972147d2977aa36a1c2372a73",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    },
+    {
+      "shardId": "GRAPHIFY-BASELINE-c7d1cadcab08-0003",
+      "manifestChecksum": "sha256:c7d1cadcab08d61c130edf3bc5245a8b1888b49bfac801165d9f3287f0448c38",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:213938acdfdb58faa0d0e48b1290c30c46abee3ef20d7fdfd75664e4f50e7b3f",
+      "offset": 500,
+      "maxFiles": 204,
+      "shardChecksum": "sha256:c95a46284642ae13aa273a489e3433660a95abc4be63959f2d1694db436ca2f6",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    }
+  ]
+}

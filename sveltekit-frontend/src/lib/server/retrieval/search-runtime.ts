@@ -231,6 +231,7 @@ export interface Candidate {
   workspaceRevision?: string | null;
   sourceRevision?: string | null;
   graphRevision?: string | null;
+  graphEvidenceRefs?: string[];
   representationId?: string | null;
   representationRevision?: number | null;
   qdrantPointId?: string | null;
@@ -456,6 +457,48 @@ export interface RetrievalProofSummary {
   functionRegistry: FunctionRegistryRetrievalProofV1;
 }
 
+export interface GraphCandidateEvidenceV1 {
+  packetKey: string;
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  graphRevision: string;
+  evidenceRefs: string[];
+}
+
+export function buildGraphCandidateEvidenceV1(
+  rawCandidates: readonly Candidate[],
+  finalPackets: readonly FeatureEnvelope[],
+): GraphCandidateEvidenceV1[] {
+  const finalByPacket = new Map(finalPackets
+    .filter((packet) => typeof packet.packet_key === 'string' && packet.packet_key.length > 0)
+    .map((packet) => [packet.packet_key!, packet]));
+  const evidenceByPacket = new Map<string, GraphCandidateEvidenceV1>();
+  for (const candidate of rawCandidates) {
+    if (candidate.graphEvidenceRefs?.length === 0 || !candidate.graphEvidenceRefs) continue;
+    const packet = finalByPacket.get(candidate.packetKey);
+    if (!packet
+      || packet.source_ref !== candidate.sourceRef
+      || packet.source_revision !== candidate.sourceRevision
+      || packet.workspace_revision !== candidate.workspaceRevision
+      || packet.graph_revision !== candidate.graphRevision
+      || !candidate.sourceRevision
+      || !candidate.workspaceRevision
+      || !candidate.graphRevision) continue;
+    const existing = evidenceByPacket.get(candidate.packetKey) ?? {
+      packetKey: candidate.packetKey,
+      sourceRef: candidate.sourceRef,
+      sourceRevision: candidate.sourceRevision,
+      workspaceRevision: candidate.workspaceRevision,
+      graphRevision: candidate.graphRevision,
+      evidenceRefs: [],
+    };
+    existing.evidenceRefs = [...new Set([...existing.evidenceRefs, ...candidate.graphEvidenceRefs])].sort();
+    evidenceByPacket.set(candidate.packetKey, existing);
+  }
+  return [...evidenceByPacket.values()].sort((left, right) => left.packetKey.localeCompare(right.packetKey));
+}
+
 /**
  * Final result (after reranking + rendering)
  */
@@ -508,6 +551,7 @@ export interface SearchResult {
      */
     hypergraphNeighbors?: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
     hypergraphGraphRevision?: string;
+    graphCandidateEvidence?: GraphCandidateEvidenceV1[];
     /**
      * True when this SearchRuntime instance was constructed with
    * `readOnly: true` (see `SearchRuntimeConfig.readOnly`) — i.e. this call
@@ -757,6 +801,7 @@ export class SearchRuntime {
         );
         const topPackets = hydrated.envelopes;
         const hypergraphNeighborsDegraded = await this.lookupHypergraphNeighbors(topPackets, query.workspaceRevision);
+        const graphCandidateEvidence = buildGraphCandidateEvidenceV1(candidates, topPackets);
 
         return {
           packets: topPackets,
@@ -797,6 +842,9 @@ export class SearchRuntime {
               hypergraphNeighbors: hypergraphNeighborsDegraded.neighbors,
               hypergraphGraphRevision: hypergraphNeighborsDegraded.graphRevision,
             } : {}),
+            ...(graphCandidateEvidence.length > 0
+              ? { graphCandidateEvidence }
+              : {}),
           },
         };
       }
@@ -1009,6 +1057,7 @@ export class SearchRuntime {
       }
 
       const hypergraphNeighbors = await this.lookupHypergraphNeighbors(finalPackets, query.workspaceRevision);
+      const graphCandidateEvidence = buildGraphCandidateEvidenceV1(candidates, finalPackets);
 
       return {
         packets: finalPackets,
@@ -1047,6 +1096,9 @@ export class SearchRuntime {
             hypergraphNeighbors: hypergraphNeighbors.neighbors,
             hypergraphGraphRevision: hypergraphNeighbors.graphRevision,
           } : {}),
+          ...(graphCandidateEvidence.length > 0
+            ? { graphCandidateEvidence }
+            : {}),
         },
       };
     } catch (error) {
@@ -1183,11 +1235,23 @@ export class SearchRuntime {
       }
       const existingPacketKeys = new Set(candidates.map((candidate) => candidate.packetKey));
       const seedScore = Math.max(...seeds.map((candidate) => candidate.score));
-      const bindings = receipt?.neighbors.flatMap((neighbor) => neighbor.candidateBindings ?? []) ?? [];
+      type QualifiedBinding = {
+        canonicalId: string;
+        packetKey: string;
+        sourceRef: string;
+        sourceRevision: string;
+        workspaceRevision: string;
+        graphRevision: string;
+        hyperedgeId?: string;
+        graphEvidenceRefs: string[];
+      };
+      const bindings: QualifiedBinding[] = (receipt?.neighbors ?? [])
+        .flatMap((neighbor) => neighbor.candidateBindings ?? [])
+        .map((binding) => ({ ...binding, graphEvidenceRefs: [`kag:${binding.hyperedgeId}`] }));
       const expanded: Candidate[] = [];
       try {
-        const { readGraphV2RetrievalFanoutStrictV1 } = await import('../atlas/integration/graph-v2-retrieval-fanout-v1.js');
-        const graphV2Candidates = await readGraphV2RetrievalFanoutStrictV1({
+        const { executeGraphV2BoundedTraversalV1 } = await import('../atlas/integration/graph-v2-bounded-traversal-v1.js');
+        const graphV2Candidates = await executeGraphV2BoundedTraversalV1({
           seeds: seeds.map((candidate) => ({
             packetKey: candidate.packetKey,
             sourceRef: candidate.sourceRef,
@@ -1196,6 +1260,7 @@ export class SearchRuntime {
           workspaceRevision: query.workspaceRevision,
           graphRevision,
           limit: Math.min(query.topK * 4, 64),
+          maxDepth: 3,
         });
         for (const binding of graphV2Candidates) {
           if (existingPacketKeys.has(binding.packetKey)) continue;
@@ -1206,11 +1271,13 @@ export class SearchRuntime {
             sourceRef: binding.sourceRef,
             summary: '',
             content: '',
-            score: seedScore * 0.8,
+            score: binding.relationConfidence,
             scoreSource: 'ast_tree',
+            retrievalExecutor: 'graph_v2_fanout',
             workspaceRevision: binding.workspaceRevision,
             sourceRevision: binding.sourceRevision,
             graphRevision: binding.graphRevision,
+            graphEvidenceRefs: binding.relationPathIds.map((relationId) => `graph-v2:${relationId}`),
           });
         }
       } catch (error) {
@@ -1218,7 +1285,7 @@ export class SearchRuntime {
       }
       const expandedCanonicalIds = new Set<string>();
       try {
-        const { createPostgresKagQuickHopReaderV1, executeKagQuickHopV1 } = await import('../atlas/integration/kag-quick-hop-v1.js');
+        const { createPostgresKagQuickHopReaderV1, executeKagQuickHopV1, quickHopEvidenceByTargetV1 } = await import('../atlas/integration/kag-quick-hop-v1.js');
         const { resolveKagPacketCandidateBindingsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
         const quickHopReader = await createPostgresKagQuickHopReaderV1();
         const traversal = await executeKagQuickHopV1({
@@ -1236,7 +1303,13 @@ export class SearchRuntime {
           [...expandedCanonicalIds],
           { workspaceRevision: query.workspaceRevision, graphRevision },
         );
-        bindings.push(...naryBindings.map((binding) => ({ ...binding, hyperedgeId: traversal.visitedHyperedgeIds.join(',') })));
+        const evidenceByTarget = quickHopEvidenceByTargetV1(traversal.paths);
+        bindings.push(...naryBindings.flatMap((binding) => {
+          const hyperedgeIds = evidenceByTarget.get(binding.canonicalId) ?? [];
+          return hyperedgeIds.length > 0
+            ? [{ ...binding, graphEvidenceRefs: hyperedgeIds.map((id) => `kag:${id}`) }]
+            : [];
+        }));
       } catch (error) {
         console.warn('[search-runtime] qualified n-ary graph fanout unavailable:', (error as Error).message);
       }
@@ -1260,6 +1333,7 @@ export class SearchRuntime {
           workspaceRevision: binding.workspaceRevision,
           sourceRevision: binding.sourceRevision,
           graphRevision: binding.graphRevision,
+          graphEvidenceRefs: binding.graphEvidenceRefs,
         });
         if (expanded.length >= Math.min(query.topK * 4, 64)) break;
       }

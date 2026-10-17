@@ -67,7 +67,9 @@ describe('Tetris 6DoF Hilbert step 1', () => {
 
     expect(a.quantizedPose6D).toEqual(b.quantizedPose6D);
     expect(a.hilbertIndexDecimal).toBe(b.hilbertIndexDecimal);
-    expect(a.physicalRotationQuaternion).toEqual(expect.arrayContaining(b.physicalRotationQuaternion));
+    a.physicalRotationQuaternion.forEach((val, idx) => {
+      expect(val).toBeCloseTo(b.physicalRotationQuaternion[idx], 10);
+    });
   });
 
   it('uses a canonical q/-q sign for physical quaternion fixture vectors', () => {

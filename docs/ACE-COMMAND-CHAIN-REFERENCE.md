@@ -2,6 +2,8 @@
 
 **Status**: ✅ **SESSION 81 COMPLETE** — Graphify Audit pipeline fixed and wired.
 
+> **Audit command correction (2026-10-17):** The Graphify audit entry points are advisory proposal tools, not an authorization to run the full ACE materialization chain below. The audit uses the local llama-server adapter with an Ornith profile; `graphify:audit:gemma4` is a legacy script-name alias, not proof that Gemma4 is loaded. Use `npm run graphify:audit:ornith:dry` for no-file-output diagnostics or `npm run graphify:audit:fixture` for fixture-only plumbing. Live inference requires `GET /health` and `GET /v1/models` to identify the expected model; as of this update `127.0.0.1:8090` refused both requests, so live extraction is **not verified**. Do not use the apply/materialization commands in this document as part of an audit-only run.
+
 ---
 
 ## Quick Start: Full Pipeline (Recommended)
@@ -64,8 +66,8 @@ npm run graphify:audit:dry
 # Step 2: Audit (apply)
 npm run graphify:audit
 
-# Step 3: Gemma4 enhancement (optional)
-npm run graphify:audit:gemma4
+# Step 3: Ornith-profile advisory audit (legacy script filename)
+npm run graphify:audit:ornith:dry
 
 # Step 4: Materialize to Qdrant
 npm run graphify:materialize
@@ -87,7 +89,8 @@ npm run atlas:startup:validate
 |---------|---------|------|
 | `graphify:audit:dry` | Preview changes | 0.9s |
 | `graphify:audit` | Run audit | 0.9s |
-| `graphify:audit:gemma4` | With Gemma4 enhancement | 30-60s |
+| `graphify:audit:ornith:dry` | Ornith-profile advisory audit; no receipt files | Not measured |
+| `graphify:audit:gemma4` | Legacy alias; actual model must be checked at `/v1/models` | Not measured |
 | `graphify:audit:full` | Full dataset (1000 limit) | 5-10min |
 | `graphify:daily` | Daily incremental (100 limit) | 2-3min |
 | `graphify:audit:health` | Health check with verbose output | 1-2s |

@@ -1,16 +1,17 @@
 {
-  "generatedAt": "2026-10-16T03:53:29.829Z",
+  "generatedAt": "2026-10-17T09:39:41.835Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
     "tablesChecked": 11,
-    "staticAligned": 7,
+    "staticAligned": 6,
     "liveAligned": 4,
     "liveMissing": 4,
     "liveUnavailable": 0,
     "blockers": [
       "kanban_tasks: static INDEX_MISMATCH",
       "feature_registry: live LIVE_TABLE_MISSING",
+      "atlas_workspace_events: static COLUMN_MISMATCH",
       "atlas_workspace_events: live LIVE_TABLE_MISSING",
       "atlas_workspace_event_participants: live LIVE_TABLE_MISSING",
       "atlas_workspace_heads: live LIVE_TABLE_MISSING",
@@ -301,10 +302,11 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\db\\schema\\workspace-events.ts"
       ],
       "manualSource": [
-        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260916_workspace_event_head_v1.sql"
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260916_workspace_event_head_v1.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261017_workspace_event_provenance_v1_DRAFT.sql"
       ],
       "static": {
-        "classification": "SQL_AND_DRIZZLE_ALIGNED",
+        "classification": "COLUMN_MISMATCH",
         "columns": [
           "after_state_checksum",
           "base_snapshot_revision",
@@ -320,10 +322,13 @@
           "previous_head_revision",
           "producer_revision",
           "sequence",
+          "task_id",
           "workspace_head_revision",
           "workspace_id"
         ],
         "indexes": [
+          "atlas_workspace_events_idempotency_uidx",
+          "atlas_workspace_events_task_idx",
           "atlas_workspace_events_workspace_sequence_idx"
         ],
         "schemaColumns": [
@@ -359,6 +364,7 @@
           "previous_head_revision",
           "producer_revision",
           "sequence",
+          "task_id",
           "workspace_head_revision",
           "workspace_id"
         ],
@@ -366,15 +372,22 @@
           "atlas_workspace_events_workspace_sequence_idx"
         ],
         "manualIndexes": [
+          "atlas_workspace_events_idempotency_uidx",
+          "atlas_workspace_events_task_idx",
           "atlas_workspace_events_workspace_sequence_idx"
         ],
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": []
+          "onlyInB": [
+            "task_id"
+          ]
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": []
+          "onlyInB": [
+            "atlas_workspace_events_idempotency_uidx",
+            "atlas_workspace_events_task_idx"
+          ]
         }
       },
       "live": {
@@ -401,6 +414,7 @@
             "previous_head_revision",
             "producer_revision",
             "sequence",
+            "task_id",
             "workspace_head_revision",
             "workspace_id"
           ],
@@ -408,13 +422,15 @@
         },
         "indexDiffs": {
           "onlyInA": [
+            "atlas_workspace_events_idempotency_uidx",
+            "atlas_workspace_events_task_idx",
             "atlas_workspace_events_workspace_sequence_idx"
           ],
           "onlyInB": []
         }
       },
       "classification": "LIVE_TABLE_MISSING",
-      "repairClass": "APPLY_EXISTING_SQL",
+      "repairClass": "ADD_DRIZZLE_MIRROR",
       "identityFields": [
         "event_id",
         "event_checksum",

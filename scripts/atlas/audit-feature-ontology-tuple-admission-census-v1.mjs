@@ -38,6 +38,7 @@ try {
   let totals = null;
   let evidenceShapes = [];
   let evidenceKeys = [];
+  let packetJoinCensus = null;
   let linkedTupleAudit = { present: false, columns: [], indexes: [], rowCount: null, evidenceStates: [] };
 
   if (tablePresent && missingRequired.length === 0) {
@@ -80,6 +81,41 @@ try {
         GROUP BY key
         ORDER BY key
       `)).rows;
+    }
+    const packetTable = await client.query(`SELECT to_regclass('public.atlas_packets') IS NOT NULL AS present`);
+    const packetColumns = packetTable.rows[0]?.present === true
+      ? (await client.query(`
+          SELECT column_name FROM information_schema.columns
+          WHERE table_schema = 'public' AND table_name = 'atlas_packets'
+        `)).rows.map((row) => row.column_name)
+      : [];
+    const requiredPacketColumns = ['packet_key', 'source_ref', 'source_revision', 'workspace_revision_key'];
+    const missingPacketColumns = requiredPacketColumns.filter((column) => !packetColumns.includes(column));
+    if (columns.includes('packet_key') && columns.includes('source_ref') && missingPacketColumns.length === 0) {
+      packetJoinCensus = (await client.query(`
+        SELECT count(*)::bigint AS total_rows,
+               count(*) FILTER (WHERE f.packet_key IS NOT NULL)::bigint AS tuple_rows_with_packet_key,
+               count(*) FILTER (WHERE p.packet_key IS NOT NULL)::bigint AS packet_key_join_rows,
+               count(*) FILTER (WHERE p.packet_key IS NOT NULL AND p.source_ref = f.source_ref)::bigint AS packet_source_exact_rows,
+               count(*) FILTER (WHERE p.packet_key IS NOT NULL
+                 AND p.source_ref = f.source_ref
+                 AND p.source_revision ~ '^sha256:[0-9a-f]{64}$'
+                 AND p.workspace_revision_key ~ '^sha256:[0-9a-f]{64}$')::bigint AS joined_rows_with_qualified_packet_revisions
+        FROM public.feature_ontology_tuples f
+        LEFT JOIN public.atlas_packets p ON p.packet_key = f.packet_key
+      `)).rows[0];
+      packetJoinCensus = {
+        status: 'READ_ONLY_PACKET_JOIN_COUNTS_TUPLE_REVISIONS_ABSENT',
+        tupleSourceRevisionColumnPresent: columns.includes('source_revision'),
+        tupleWorkspaceRevisionColumnPresent: columns.includes('workspace_revision'),
+        ...packetJoinCensus,
+      };
+    } else {
+      packetJoinCensus = {
+        status: 'BLOCKED_PACKET_JOIN_SCHEMA_INCOMPLETE',
+        missingFeatureColumns: ['packet_key', 'source_ref'].filter((column) => !columns.includes(column)),
+        missingPacketColumns,
+      };
     }
   }
 
@@ -140,6 +176,7 @@ try {
     grouped,
     evidenceShapes,
     evidenceKeys,
+    packetJoinCensus,
     existingGroundedTupleOwner: linkedTupleAudit,
     interpretation: {
       resolutionIsAdmission: false,
