@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.golden-relevance-review-queue-validation-v1",
+  "status": "INCOMPLETE_FAIL_CLOSED",
+  "canonicalAuthority": false,
+  "inputPath": ".tmp\\atlas\\golden-relevance-review-queue-pooled-v1.ndjson",
+  "inputChecksum": "sha256:cd37b7049febf3aa8e0db572a247977e8c7a36bebafbe62b3d584b356ef24ca6",
+  "reportPath": "docs\\reports\\golden-relevance-review-queue-validation-2026-10-16T16-56-25-155Z.json",
+  "judgmentValidationScope": "DECLARED_HUMAN_METADATA_NOT_REVIEWER_AUTHENTICATION_OR_SOURCE_AUTHORITY",
+  "queryCount": 60,
+  "judgmentCount": 1287,
+  "completedJudgmentCount": 0,
+  "blankJudgmentCount": 1287,
+  "invalidJudgmentCount": 0,
+  "hardNegativeCount": 0,
+  "hasAllGrades": false,
+  "errors": [],
+  "databaseWrites": false,
+  "importAllowed": false,
+  "nextRequiredStep": "Complete grades 0-3, reviewer/confidence metadata, and hard negatives; then rerun validation."
+}

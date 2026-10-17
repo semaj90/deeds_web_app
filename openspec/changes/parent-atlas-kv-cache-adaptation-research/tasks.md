@@ -775,3 +775,34 @@ APPLY_PROVEN / NOT_PROVEN (CLAUDE.md). Lane observations use: ABSENT / PRESENT /
 4. ALIGN-D2 choose one server challenger; D4 VRAM plan.
 5. ALIGN-F2 per-file Gemma4 pass, then F3 hardlink decisions.
 6. ALIGN-B2 real-KV capture only after A2 and an approved capture method.
+
+## H. Speculative Decoding & MTP Alignment Gate (added 2026-10-16)
+
+Scope: Align speculative decoding launchers and OpenSpec tasks to prevent runtime tensor dimension and architecture mismatches between target base models and MTP drafters.
+
+- [x] MTP-ALIGN-01 Document Backbone & Drafter Dimension Parity Invariant:
+  Target model hidden dimension (`embedding_length`) must strictly match speculative drafter output dimension (`embedding_length_out` / `backbone_hidden_size`) and vocabulary size.
+  - Ornith 1.5 9B (`general.architecture = 'qwen35'`, `embedding_length = 4096`, vocab = 152064) cannot pair with Gemma drafters (`n_embd = 1536` or `2560`, vocab = 256000).
+  - Gemma 4 E2B (`general.architecture = 'gemma4'`, `embedding_length = 1536`) cannot pair with Gemma 4 E4B Assistant drafter (`general.architecture = 'gemma4-assistant'`, `embedding_length_out = 2560`).
+  - Gemma 4 E4B Assistant drafter (`models/atlas-gemma4-e4b-assistant/mtp-f16/atlas-gemma4-e4b-assistant-mtp-f16.gguf` / HF `models/gemma4_assistant_huggingface_7_3_26`) requires an E4B target backbone (`n_embd = 2560`).
+  Status: WIRED (verified against live GGUF headers via GGUFReader).
+
+- [x] MTP-ALIGN-02 `launch-turboquant.ps1` Dimension & Architecture Compatibility Preflight:
+  In Gate 2 of `scripts/launch-turboquant.ps1`, update architecture pattern recognition to match hyphenated architectures (`gemma4-assistant`, `gemma4_assistant`). Inspect target model (`$model`) and draft model (`$env:MTP_DRAFT_MODEL`) architectures and embedding dimensions. If architectures differ or dimensions mismatch, emit an explicit warning and gracefully fall back to target-only execution (`$TurboDraftModel = $null`, `$TurboSpeculative = $false`) rather than causing `llama-server.exe` to abort or crash during initialization.
+  Status: WIRED.
+
+- [x] MTP-ALIGN-03 `launch-gemma4-mtp-canonical.ps1` Alignment & Safe Teardown:
+  Synchronize `scripts/launch-gemma4-mtp-canonical.ps1` with `launch-turboquant.ps1`:
+  - Point canonical drafter paths to valid on-disk fixtures (`models/atlas-gemma4-e4b-assistant/mtp-f16/atlas-gemma4-e4b-assistant-mtp-f16.gguf`) rather than missing `.tmp/atomic-mtp` paths.
+  - Do not pair Ornith 1.5 9B (`$repoRoot\models\ornith-1.5-9b` or `hforf.gguf`) with Gemma 4 drafters; require target model to match drafter family when testing MTP.
+  - Replace aggressive `Stop-Process -Force` with graceful server shutdown check or port inspection complying with repo policy ("Never taskkill /IM llama-server.exe").
+  Status: WIRED.
+
+- [x] MTP-ALIGN-04 `test-mtp-matrix.ps1` Benchmark Configuration Alignment:
+  Update `scripts/test-mtp-matrix.ps1` matrix parameters to ensure model/drafter pairing validity before running throughput benchmarks.
+  Status: WIRED.
+
+- [x] MTP-ALIGN-05 Strict OpenSpec Validation & Artifact Verification:
+  Validate `openspec validate parent-atlas-kv-cache-adaptation-research --strict` and produce execution receipt.
+  Status: APPLY_PROVEN (passed strict validation, verified with scripts/launch-turboquant.ps1 Gate 2).
+

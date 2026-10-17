@@ -7,14 +7,18 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
+import { goldenHumanJudgmentErrorsV1 } from './lib/golden-review-journal-v1.mjs';
 
 const root = process.cwd();
 const inputPath = path.resolve(root, process.argv[2] ?? '.tmp/atlas/golden-relevance-review-pool-bound-v1.ndjson');
-const reportPath = path.resolve(root, 'docs/reports/golden-relevance-review-pool-validation-v1.json');
+const reportPath = path.resolve(root, process.argv.find((arg) => arg.startsWith('--output='))?.slice(9)
+  ?? `docs/reports/golden-relevance-review-pool-validation-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
 
 if (!fs.existsSync(inputPath)) throw new Error(`Missing golden review pool: ${inputPath}`);
 
-const rows = fs.readFileSync(inputPath, 'utf8').split(/\r?\n/).filter(Boolean).map((line, index) => {
+const inputBytes = fs.readFileSync(inputPath);
+const rows = inputBytes.toString('utf8').split(/\r?\n/).filter(Boolean).map((line, index) => {
   try { return JSON.parse(line); } catch (error) { throw new Error(`Invalid JSON at line ${index + 1}: ${error.message}`); }
 });
 
@@ -23,6 +27,7 @@ const queryIds = new Set();
 let candidateCount = 0;
 let blankGradeCount = 0;
 let completedGradeCount = 0;
+let invalidGradeCount = 0;
 let revisionBoundQueryCount = 0;
 let revisionBoundCandidateCount = 0;
 let missingEvidenceCount = 0;
@@ -52,14 +57,10 @@ for (const [rowIndex, row] of rows.entries()) {
     if (typeof candidate.summary !== 'string' || candidate.summary.length === 0) missingEvidenceCount += 1;
     if (candidate.relevanceGrade === null || candidate.relevanceGrade === undefined) blankGradeCount += 1;
     else {
-      completedGradeCount += 1;
-      if (!Number.isInteger(candidate.relevanceGrade) || candidate.relevanceGrade < 0 || candidate.relevanceGrade > 3) {
-        errors.push(`${candidateLabel}: grade outside 0-3`);
-      }
-      if (typeof candidate.confidence !== 'number' || candidate.confidence < 0 || candidate.confidence > 1) {
-        errors.push(`${candidateLabel}: completed grade missing confidence`);
-      }
-      if (!candidate.reviewerId) errors.push(`${candidateLabel}: completed grade missing reviewerId`);
+      const judgmentErrors = goldenHumanJudgmentErrorsV1(candidate);
+      errors.push(...judgmentErrors.map((error) => `${candidateLabel}: ${error}`));
+      if (judgmentErrors.length === 0) completedGradeCount += 1;
+      else invalidGradeCount += 1;
     }
     if (candidate.candidateSnapshotRevision && candidate.ordinalMapChecksum) revisionBoundCandidateCount += 1;
   }
@@ -73,10 +74,14 @@ const report = {
     : 'INCOMPLETE_FAIL_CLOSED',
   canonicalAuthority: false,
   inputPath: path.relative(root, inputPath),
+  inputChecksum: `sha256:${createHash('sha256').update(inputBytes).digest('hex')}`,
+  reportPath: path.relative(root, reportPath),
+  judgmentValidationScope: 'DECLARED_HUMAN_METADATA_NOT_REVIEWER_AUTHENTICATION_OR_SOURCE_AUTHORITY',
   queryCount: rows.length,
   candidateCount,
   blankGradeCount,
   completedGradeCount,
+  invalidGradeCount,
   revisionBoundQueryCount,
   revisionBoundCandidateCount,
   missingEvidenceCount,
@@ -90,6 +95,6 @@ const report = {
 };
 
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
 console.log(JSON.stringify(report));
 if (report.status === 'INCOMPLETE_FAIL_CLOSED') process.exitCode = 1;

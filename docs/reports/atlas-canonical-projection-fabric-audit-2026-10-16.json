@@ -1,7 +1,7 @@
 {
   "schema_version": "atlas-canonical-projection-fabric-audit-v1",
-  "generated_at": "2026-10-16T06:10:29.961Z",
-  "repository_commit": "9de1faa659053b4d6761d4de43c2074a1a29dc38",
+  "generated_at": "2026-10-16T18:37:37.273Z",
+  "repository_commit": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d",
   "database_identity": "127.0.0.1:5434",
   "source_proposal": "ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)",
   "limitations": [],

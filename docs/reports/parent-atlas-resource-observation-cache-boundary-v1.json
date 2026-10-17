@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.goal-progress.v1",
+  "goalStatus": "ACTIVE_PARTIAL",
+  "previousGoalTurnClassification": "PROGRESS",
+  "likely_cause": "The GPU pipeline cached raw numerical arrays in Redis with incomplete hashes, duplicated telemetry emitters and guessed runtime/protocol labels; native-return and host wall-time labels were not CUDA kernel proof.",
+  "evidence": [
+    { "command": "npx vitest run src/lib/server/gpu/gpu-pipeline.telemetry.spec.ts src/lib/server/telemetry/gpu-telemetry.spec.ts src/lib/server/telemetry/packet-centric-telemetry.spec.ts src/lib/server/telemetry/ace-telemetry-emitter.spec.ts src/lib/server/grpc/transport-telemetry.spec.ts --environment node --maxWorkers=1 --minWorkers=1", "cwd": "sveltekit-frontend", "result": "5 files / 24 tests passed", "log": "docs/reports/gpu-resource-final-20261015T235534.txt" },
+    { "result": "All six existing CPU compute wrappers execute and emit one bounded resource observation each; no Redis access", "test": "gpu-pipeline.telemetry.spec.ts" },
+    { "result": "A native return stays unverified; a native exception yields CPU output/observation; host wall time never becomes kernel time", "test": "gpu-pipeline.telemetry.spec.ts" },
+    { "result": "Validated resource observations retain shape and provenance in the existing eval payload using a mocked database", "test": "packet-centric-telemetry.spec.ts" },
+    { "result": "Direct narrow tsc run is blocked by existing $lib alias resolution, not reported as a typecheck pass", "log": "docs/reports/gpu-resource-contract-types-20261015T235436.txt" }
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.ts",
+    "sveltekit-frontend/src/lib/server/gpu/gpu-pipeline.telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/gpu-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/gpu-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/retrieval-recorder.ts",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md",
+    "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md"
+  ],
+  "safe_next_command": "Review the existing residency descriptor owner and resource producers before any live GPU/cache run; do not restore raw-array Redis caching.",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/gpu/gpu-pipeline.telemetry.spec.ts src/lib/server/telemetry/gpu-telemetry.spec.ts src/lib/server/telemetry/packet-centric-telemetry.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-resource-observation-cache-boundary-v1.json",
+  "limits": { "cacheContainmentScope": "gpu-pipeline.ts only", "nativeExportsInTests": "mocked", "liveGpuRun": false,
+    "liveDatastoreWrite": false, "existingRedisKeysDeleted": false, "sharedServicesRestarted": false,
+    "actualCudaKernelTimingProven": false, "parallelCudaStreamsProven": false, "descriptorResidencyProven": false,
+    "canonicalAuthority": false, "sourceRevisionWritesPerformed": false, "productionQualificationProven": false,
+    "fullGoalComplete": false }
+}

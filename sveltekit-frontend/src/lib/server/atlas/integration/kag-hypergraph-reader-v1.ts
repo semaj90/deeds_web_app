@@ -1,6 +1,6 @@
 import { pool } from '$lib/server/db/client.js';
 import { buildKagMutualIndexV1 } from './kag-mutual-index-v1.js';
-import type { HyperedgeV1, HyperedgeParticipantV1 } from '../../graph/hyperedge-contract.js';
+import { createHyperedgeV1, HyperedgeV1Schema, type HyperedgeV1, type HyperedgeParticipantV1 } from '../../graph/hyperedge-contract.js';
 import { OntologyLinkedTupleV1Schema, type OntologyLinkedTupleV1 } from '../contracts/ontology-linked-tuple-v1.js';
 import { PACKET_KEY_V2_PATTERN } from '../identity/packet-key-v2.js';
 import {
@@ -38,6 +38,15 @@ export interface KagHypergraphNeighborV1 {
   hyperedgeIds: string[];
   neighborCanonicalIds?: string[];
   neighborStoragePacketKeys?: string[];
+  candidateBindings?: Array<{
+    canonicalId: string;
+    packetKey: string;
+    sourceRef: string;
+    sourceRevision: string;
+    workspaceRevision: string;
+    graphRevision: string;
+    hyperedgeId: string;
+  }>;
 }
 
 export interface KagHypergraphNeighborsReceiptV1 {
@@ -212,6 +221,17 @@ export async function readQualifiedOntologyTuplesStrictV1(
 function rowsToHyperedgeV1(contractHyperedgeId: string, rows: HyperedgeMemberRow[]): HyperedgeV1 | null {
   const first = rows[0];
   if (!first) return null;
+  const sameHeader = rows.every((row) => row.contract_hyperedge_id === first.contract_hyperedge_id
+    && row.relation_type === first.relation_type
+    && row.workspace_revision === first.workspace_revision
+    && row.source_revision === first.source_revision
+    && row.graph_revision === first.graph_revision
+    && row.producer_revision === first.producer_revision
+    && row.checksum === first.checksum
+    && JSON.stringify([...(row.evidence_refs ?? [])].sort()) === JSON.stringify([...(first.evidence_refs ?? [])].sort()));
+  if (!sameHeader || !/^sha256:[0-9a-f]{64}$/.test(first.source_revision)) {
+    throw new Error(`KAG_HYPEREDGE_HEADER_MISMATCH:${contractHyperedgeId}`);
+  }
   const participants: HyperedgeParticipantV1[] = rows
     .map((row) => ({
       canonicalId: row.member_id,
@@ -220,9 +240,8 @@ function rowsToHyperedgeV1(contractHyperedgeId: string, rows: HyperedgeMemberRow
     }))
     .filter((p) => p.canonicalId && p.role);
   if (participants.length < 2) return null;
-  return {
-    schemaVersion: 'atlas.hyperedge.v1',
-    hyperedgeId: contractHyperedgeId,
+  if (participants.length !== rows.length) throw new Error(`KAG_HYPEREDGE_DUPLICATE_OR_INVALID_MEMBER:${contractHyperedgeId}`);
+  const edge = createHyperedgeV1({
     predicate: first.relation_type,
     participants,
     evidenceRefs: first.evidence_refs ?? [],
@@ -230,8 +249,11 @@ function rowsToHyperedgeV1(contractHyperedgeId: string, rows: HyperedgeMemberRow
     graphRevision: first.graph_revision,
     sourceRevision: first.source_revision,
     producerRevision: first.producer_revision,
-    checksum: first.checksum,
-  };
+  });
+  if (edge.hyperedgeId !== contractHyperedgeId || edge.checksum !== first.checksum) {
+    throw new Error(`KAG_HYPEREDGE_CHECKSUM_MISMATCH:${contractHyperedgeId}`);
+  }
+  return HyperedgeV1Schema.parse(edge);
 }
 
 /**
@@ -368,15 +390,32 @@ async function readExactPacketIncidenceV1(
     throw new Error('KAG_PACKET_INCIDENCE_ROW_LIMIT_EXCEEDED');
   }
   const lineages = result.rows.map(parseStoredPacketIncidenceRowV1);
-  await verifyPacketIncidenceLineagesAgainstPostgresV1(lineages, snapshot);
-  const neighborsByPacket = new Map<string, { hyperedgeIds: Set<string>; canonicalIds: Set<string>; storageKeys: Set<string> }>();
+  const endpointResolutions = await verifyPacketIncidenceLineagesAgainstPostgresV1(lineages, snapshot);
+  const neighborsByPacket = new Map<string, {
+    hyperedgeIds: Set<string>;
+    canonicalIds: Set<string>;
+    storageKeys: Set<string>;
+    candidateBindings: Map<string, NonNullable<KagHypergraphNeighborV1['candidateBindings']>[number]>;
+  }>();
   for (const lineage of lineages) {
     const current = neighborsByPacket.get(lineage.canonicalId) ?? {
-      hyperedgeIds: new Set<string>(), canonicalIds: new Set<string>(), storageKeys: new Set<string>(),
+      hyperedgeIds: new Set<string>(), canonicalIds: new Set<string>(), storageKeys: new Set<string>(), candidateBindings: new Map(),
     };
     current.hyperedgeIds.add(`packet-incidence:${lineage.lineageChecksum}`);
     current.canonicalIds.add(lineage.neighborCanonicalId);
     current.storageKeys.add(lineage.neighborPacketKey);
+    const endpoint = endpointResolutions.get(lineage.neighborPacketKey);
+    if (endpoint?.status === 'RESOLVED' && endpoint.sourceRef && endpoint.sourceRevision) {
+      current.candidateBindings.set(lineage.neighborPacketKey, {
+        canonicalId: lineage.neighborCanonicalId,
+        packetKey: lineage.neighborPacketKey,
+        sourceRef: endpoint.sourceRef,
+        sourceRevision: endpoint.sourceRevision,
+        workspaceRevision: snapshot.workspaceRevision,
+        graphRevision: snapshot.graphRevision,
+        hyperedgeId: `packet-incidence:${lineage.lineageChecksum}`,
+      });
+    }
     neighborsByPacket.set(lineage.canonicalId, current);
   }
   return {
@@ -388,6 +427,7 @@ async function readExactPacketIncidenceV1(
       hyperedgeIds: [...value.hyperedgeIds].sort(),
       neighborCanonicalIds: [...value.canonicalIds].sort(),
       neighborStoragePacketKeys: [...value.storageKeys].sort(),
+      candidateBindings: [...value.candidateBindings.values()].sort((a, b) => a.packetKey.localeCompare(b.packetKey)),
     })),
   };
 }
@@ -448,6 +488,8 @@ export async function readKagHyperedgesStrictV1(
       WHERE h.contract_hyperedge_id IS NOT NULL
         AND h.workspace_revision = $2
         AND h.graph_revision = $3
+        AND h.source_revision ~ '^sha256:[0-9a-f]{64}$'
+        AND cardinality(h.evidence_refs) > 0
         AND h.hyperedge_id IN (
           SELECT DISTINCT hyperedge_id FROM atlas_hyperedge_members WHERE member_id = ANY($1::text[])
         )
@@ -461,7 +503,88 @@ export async function readKagHyperedgesStrictV1(
   }
   const grouped = new Map<string, HyperedgeMemberRow[]>();
   for (const row of result.rows) grouped.set(row.contract_hyperedge_id, [...(grouped.get(row.contract_hyperedge_id) ?? []), row]);
-  return [...grouped.entries()]
-    .map(([id, rows]) => rowsToHyperedgeV1(id, rows))
-    .filter((edge): edge is HyperedgeV1 => edge !== null);
+  const edges: HyperedgeV1[] = [];
+  for (const [id, rows] of grouped) {
+    const edge = rowsToHyperedgeV1(id, rows);
+    if (edge) edges.push(edge);
+  }
+  return edges;
+}
+
+const KAG_CODE_RELATIONS_V1 = [
+  'CALLS', 'IMPORTS', 'EXPORTS', 'REFERENCES', 'IMPLEMENTS', 'EXTENDS', 'DEPENDS_ON',
+  'TESTS', 'RUNE_DEPENDENCY', 'EVENT_DISPATCH', 'API_CONTRACT_OBSERVED',
+] as const;
+
+/** Strict n-ary code-fact reader for bounded retrieval expansion. Taxonomy and
+ * binary edges are excluded; every returned contract is checksum-verified. */
+export async function readKagCodeHyperedgesStrictV1(
+  canonicalIds: readonly string[],
+  snapshot: KagTraversalSnapshotV1,
+): Promise<HyperedgeV1[]> {
+  const edges = await readKagHyperedgesStrictV1(canonicalIds, snapshot);
+  return edges.filter((edge) => KAG_CODE_RELATIONS_V1.includes(edge.predicate as typeof KAG_CODE_RELATIONS_V1[number])
+    && edge.participants.length >= 3
+    && edge.participants.some((participant) => PACKET_KEY_V2_PATTERN.test(participant.canonicalId)));
+}
+
+export interface KagPacketCandidateBindingV1 {
+  canonicalId: string;
+  packetKey: string;
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  graphRevision: string;
+}
+
+/** Resolve traversed canonical packet identities back to exact current packet
+ * rows. This never derives identity from a path or accepts a stale revision. */
+export async function resolveKagPacketCandidateBindingsStrictV1(
+  canonicalIds: readonly string[],
+  snapshot: KagTraversalSnapshotV1,
+): Promise<KagPacketCandidateBindingV1[]> {
+  const unique = [...new Set(canonicalIds)].slice(0, MAX_CANONICAL_IDS);
+  if (unique.length === 0) return [];
+  const { resolvePacketKeyResolutionV2 } = await import('../identity/packet-identity-resolver.js');
+  const resolved = await Promise.all(unique.map(async (canonicalId) => {
+    try {
+      const identity = await resolvePacketKeyResolutionV2(canonicalId);
+      return identity.canonicalPacketKey === canonicalId ? { canonicalId, packetKey: identity.storagePacketKey } : null;
+    } catch {
+      return null;
+    }
+  }));
+  const identities = resolved.filter((value): value is { canonicalId: string; packetKey: string } => value !== null);
+  if (identities.length === 0) return [];
+  const packetKeys = [...new Set(identities.map((identity) => identity.packetKey))];
+  const result = await pool.query<{
+    packet_key: string;
+    source_ref: string | null;
+    source_revision: string | null;
+    workspace_revision_key: string | null;
+  }>(
+    `SELECT packet_key, source_ref, source_revision, workspace_revision_key
+       FROM atlas_packets
+      WHERE packet_key = ANY($1::text[])
+        AND workspace_revision_key = $2
+        AND source_revision ~ '^sha256:[0-9a-f]{64}$'`,
+    [packetKeys, snapshot.workspaceRevision],
+  );
+  const returnedKeys = new Set(result.rows.map((row) => row.packet_key));
+  if (returnedKeys.size !== result.rows.length) {
+    throw new Error('KAG_PACKET_BINDING_DUPLICATE_STORAGE_KEY');
+  }
+  const rows = new Map(result.rows.map((row) => [row.packet_key, row]));
+  return identities.flatMap(({ canonicalId, packetKey }) => {
+    const row = rows.get(packetKey);
+    if (!row?.source_ref?.trim() || !row.source_revision || !/^sha256:[0-9a-f]{64}$/.test(row.source_revision)) return [];
+    return [{
+      canonicalId,
+      packetKey,
+      sourceRef: row.source_ref,
+      sourceRevision: row.source_revision,
+      workspaceRevision: snapshot.workspaceRevision,
+      graphRevision: snapshot.graphRevision,
+    }];
+  });
 }

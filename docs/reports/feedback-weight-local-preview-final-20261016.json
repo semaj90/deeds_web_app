@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.card-weight-preview.v1",
+  "status": "PREVIEW_ONLY_APPLY_BLOCKED",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "trainingEligible": false,
+  "promotionEligible": false,
+  "artifactBaseDirectory": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "inputs": [
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\bifrost-trace.jsonl",
+      "exists": false,
+      "checksum": null,
+      "rowCount": 0
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-retrieval-loop.jsonl",
+      "exists": true,
+      "checksum": "sha256:ea5e29145d2436d84c3cf05cb70326e8048088175911056bdeeb3ac27bd84848",
+      "rowCount": 443
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\qdrant-cards.jsonl",
+      "exists": false,
+      "checksum": null,
+      "rowCount": 0
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas-cards-for-weights.jsonl",
+      "exists": true,
+      "checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rowCount": 0
+    },
+    {
+      "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\feedback-events.jsonl",
+      "exists": false,
+      "checksum": null,
+      "rowCount": 0
+    }
+  ],
+  "unresolvedRetrievalCardIdentityCount": 443,
+  "excludedObservations": 0,
+  "records": []
+}

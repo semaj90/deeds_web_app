@@ -17,10 +17,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { readGoldenReviewValidationEvidenceV1 } from './lib/golden-review-journal-v1.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..');
-const REPORT_JSON_PATH = path.join(ROOT, 'docs', 'reports', 'promotion-board-reconcile-v2.json');
-const REPORT_MD_PATH = path.join(ROOT, 'docs', 'reports', 'promotion-board-reconcile-v2.md');
+const REPORT_JSON_PATH = path.resolve(ROOT, process.argv.find((arg) => arg.startsWith('--output='))?.slice(9)
+  ?? 'docs/reports/promotion-board-reconcile-v2.json');
+const REPORT_MD_PATH = `${REPORT_JSON_PATH}.md`;
+const goldenValidationEvidence = readGoldenReviewValidationEvidenceV1(ROOT, process.argv.slice(2));
+if (fs.existsSync(REPORT_JSON_PATH) || fs.existsSync(REPORT_MD_PATH)) throw new Error('PROMOTION_REPORT_EXISTS_USE_NEW_OUTPUT');
 
 function readJson(relative) {
   const absolute = path.join(ROOT, relative);
@@ -52,7 +56,7 @@ const receipts = {
   semantic768WriterOwnership: readJson('docs/reports/semantic-768-writer-ownership-v1.json'),
   currentGraphArtifactReadiness: readJson('docs/reports/current-graph-artifact-readiness-v1.json'),
   domainClassifierLineage: readJson('docs/reports/domain-classifier-lineage-v1.json'),
-  goldenRelevanceReviewQueueValidation: readJson('docs/reports/golden-relevance-review-queue-validation-v1.json'),
+  goldenRelevanceReviewQueueValidation: goldenValidationEvidence,
   aceLiveDryInputReadiness: readJson('docs/reports/ace-live-dry-input-readiness-v2.json'),
 };
 
@@ -210,6 +214,12 @@ const retrievalFusion = {
 // ---------------------------------------------------------------------------
 const golden = receipts.goldenReviewCorpusCompatibility.value;
 const judgmentCorpusBlockers = [];
+judgmentCorpusBlockers.push({
+  code: goldenValidationEvidence.value.firstBlockingInvariant,
+  lane: 'JUDGMENT', severity: 'PROMOTION_BLOCKING',
+  receiptRefs: goldenValidationEvidence.path ? [goldenValidationEvidence.path] : [],
+  explanation: 'Explicit receipt/input checksum readback is diagnostic and does not grant journal, cohort, source, training or import authority.',
+});
 if ((golden?.compatibleManifestCount ?? 0) === 0) {
   judgmentCorpusBlockers.push({
     code: 'JUDGMENT_CORPUS_NOT_BOUND_TO_CURRENT_SEMANTIC_CORPUS',
@@ -221,6 +231,7 @@ if ((golden?.compatibleManifestCount ?? 0) === 0) {
 }
 
 const judgmentCorpus = {
+  validationReadback: goldenValidationEvidence,
   compatibleManifestCount: golden?.compatibleManifestCount ?? 0,
   currentCorpusChecksum: null,
   semanticCorpusChecksum: null,
@@ -437,6 +448,7 @@ const board = {
 
 const canonicalPayload = JSON.stringify({
   schemaVersion: board.schemaVersion,
+  goldenValidationEvidence,
   workspaceRevision: board.workspaceRevision,
   sourceAuthority: { status: board.sourceAuthority.status, blockers: [...board.sourceAuthority.blockers].sort() },
   semanticCorpus: { status: board.semanticCorpus.status, blockers: [...board.semanticCorpus.blockers].sort() },
@@ -503,7 +515,7 @@ const report = {
 };
 
 fs.mkdirSync(path.dirname(REPORT_JSON_PATH), { recursive: true });
-fs.writeFileSync(REPORT_JSON_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+fs.writeFileSync(REPORT_JSON_PATH, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
 
 const md = `# Promotion Board Reconcile 02
 
@@ -553,14 +565,14 @@ ${Object.entries(readOnlyInvariants).map(([k, v]) => `- ${k}: ${v}`).join('\n')}
 
 ${nextGateQueue.map((g) => `- ${g.priority}: ${g.gate} — ${g.note}`).join('\n')}
 
-Full detail: \`docs/reports/promotion-board-reconcile-v2.json\`.
+Full detail: \`${path.relative(ROOT, REPORT_JSON_PATH)}\`.
 `;
-fs.writeFileSync(REPORT_MD_PATH, md, 'utf8');
+fs.writeFileSync(REPORT_MD_PATH, md, { encoding: 'utf8', flag: 'wx' });
 
 console.log(JSON.stringify({
   status: 'PROMOTION_BOARD_RECONCILE_02_COMPLETE',
   checksum,
-  reportPath: 'docs/reports/promotion-board-reconcile-v2.json',
-  mdPath: 'docs/reports/promotion-board-reconcile-v2.md',
+  reportPath: path.relative(ROOT, REPORT_JSON_PATH),
+  mdPath: path.relative(ROOT, REPORT_MD_PATH),
   ...readOnlyInvariants,
 }, null, 2));

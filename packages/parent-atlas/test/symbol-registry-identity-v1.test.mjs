@@ -3,6 +3,7 @@ import test from 'node:test';
 import { createSymbolRegistryRepository } from '../dist/core/symbol-registry-repository.js';
 
 const hash = (value) => value.repeat(64).slice(0, 64);
+const sourceRevision = (value) => `sha256:${hash(value)}`;
 
 function nomination(overrides = {}) {
   return {
@@ -16,8 +17,8 @@ function nomination(overrides = {}) {
     name: 'Widget',
     qualified_name: 'ui.Widget',
     source_ref: 'src/ui.ts',
-    source_revision: hash('a'),
-    workspace_revision: hash('b'),
+    source_revision: sourceRevision('a'),
+    workspace_revision: sourceRevision('b'),
     upstream_file_id: 'file:ui',
     upstream_node_id: 'node:widget:r1',
     upstream_chunk_id: 'chunk:widget:r1',
@@ -61,8 +62,8 @@ test('logical symbol identity is stable across source revisions while symbol ver
   const secondDb = mockPool();
   const first = await promote(createSymbolRegistryRepository(firstDb.pool), nomination());
   const second = await promote(createSymbolRegistryRepository(secondDb.pool), nomination({
-    source_revision: hash('d'),
-    workspace_revision: hash('e'),
+    source_revision: sourceRevision('d'),
+    workspace_revision: sourceRevision('e'),
     upstream_node_id: 'node:widget:r2',
     upstream_chunk_id: 'chunk:widget:r2',
     byte_start: 20,
@@ -72,8 +73,8 @@ test('logical symbol identity is stable across source revisions while symbol ver
 
   assert.equal(first.resolution.stable_symbol_id, second.resolution.stable_symbol_id);
   assert.notEqual(first.version.symbol_version_id, second.version.symbol_version_id);
-  assert.equal(first.version.source_revision, hash('a'));
-  assert.equal(second.version.source_revision, hash('d'));
+  assert.equal(first.version.source_revision, sourceRevision('a'));
+  assert.equal(second.version.source_revision, sourceRevision('d'));
 });
 
 test('source byte spans are persisted as version evidence and do not define symbol identity', async () => {
@@ -102,4 +103,19 @@ test('symbol creation remains explicitly gated', async () => {
     /SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE/,
   );
   assert.equal(db.statements.length, 0);
+});
+
+test('symbol promotion rejects non-SHA source or workspace revisions before database access', async () => {
+  for (const invalid of [
+    nomination({ source_revision: '1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf' }),
+    nomination({ source_revision: 'workspace:0' }),
+    nomination({ workspace_revision: 'workspace:0' }),
+  ]) {
+    const db = mockPool();
+    await assert.rejects(
+      promote(createSymbolRegistryRepository(db.pool), invalid),
+      /SYMBOL_PROMOTION_REQUIRES_SHA256_SOURCE_AND_WORKSPACE_REVISIONS/,
+    );
+    assert.equal(db.statements.length, 0);
+  }
 });

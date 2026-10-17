@@ -12,7 +12,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import type { ResearchSource } from '$lib/server/research/web-research-ingester.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
-import { instrumentGrpcPackageCodecs, measureTransportCodec, observeTransport, type TransportTelemetry } from './transport-telemetry.js';
+import { annotateRetrievalDelivery, instrumentGrpcPackageCodecs, measureTransportCodec, observeTransport, recordFailedTransportAttempt, type TransportTelemetry } from './transport-telemetry.js';
 import { withRpcCache } from '$lib/server/cache/rpc-cache.js';
 import { RPC_TTL_SECONDS, RPC_DEADLINES_MS } from '$lib/types/rpc-cache.js';
 // Proto types were in generated/proto (archived — regenerate from proto/*.proto if gRPC revived)
@@ -363,7 +363,7 @@ async function callGrpcMethod<T>(
 
       resolve(response ?? null);
     });
-  }), methodName);
+  }), methodName, recordFailedTransportAttempt);
 }
 
 // ── gRPC evidence search ────────────────────────────────────────────────
@@ -409,7 +409,7 @@ export async function searchEvidenceViaGrpc(
         resolve(mapProtoResponse(response));
       }
     );
-  }), 'searchEvidence');
+  }), 'searchEvidence', recordFailedTransportAttempt);
 }
 
 // ── Response mapping (proto → TS) ───────────────────────────────────────
@@ -775,51 +775,51 @@ export async function getResearchContextViaGrpc(opts: {
 export const retrievalClient = {
   searchChunks: async (query: string, limit = 10, collection = 'codebase_chunks_768', tags: string[] = []) => {
     const args = { query, limit, collection, tags };
-    const { value } = await withRpcCache(
+    const cached = await withRpcCache(
       args,
       async () => (await searchChunksViaGrpc(query, limit, collection, tags)) ?? { results: [], totalMs: 0 },
       { transport: 'grpc', method: 'SearchChunks', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.SearchChunks'] },
     );
-    return value;
+    return annotateRetrievalDelivery(cached);
   },
 
   getClusterSummary: async (clusterId: number, clusterType: 'gpu' | 'som' = 'gpu') => {
     const args = { clusterId, clusterType };
-    const { value } = await withRpcCache(
+    const cached = await withRpcCache(
       args,
       async () => (await getClusterSummaryViaGrpc(clusterId, clusterType)) ?? { clusterId, summary: '', patterns: [], keywords: [], metadata: {} },
       { transport: 'grpc', method: 'GetClusterSummary', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.GetClusterSummary'] },
     );
-    return value;
+    return annotateRetrievalDelivery(cached);
   },
 
   expandAstNeighbors: async (symbol?: string, filePath?: string, depth = 1) => {
     const args = { symbol, filePath, depth };
-    const { value } = await withRpcCache(
+    const cached = await withRpcCache(
       args,
       async () => (await expandAstNeighborsViaGrpc(symbol, filePath, depth)) ?? { neighbors: [], edges: [] },
       { transport: 'grpc', method: 'ExpandAstNeighbors', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.ExpandAstNeighbors'] },
     );
-    return value;
+    return annotateRetrievalDelivery(cached);
   },
 
   getTopologyContext: async (bmuRow: number, bmuCol: number, radius = 1) => {
     const args = { bmuRow, bmuCol, radius };
-    const { value } = await withRpcCache(
+    const cached = await withRpcCache(
       args,
       async () => (await getTopologyContextViaGrpc(bmuRow, bmuCol, radius)) ?? { neighbors: [] },
       { transport: 'grpc', method: 'GetTopologyContext', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.GetTopologyContext'] },
     );
-    return value;
+    return annotateRetrievalDelivery(cached);
   },
 
   getResearchContext: async (opts: Parameters<typeof getResearchContextViaGrpc>[0]) => {
-    const { value } = await withRpcCache(
+    const cached = await withRpcCache(
       opts,
       () => getResearchContextViaGrpc(opts),
       { transport: 'grpc', method: 'GetResearchContext', ttlSeconds: RPC_TTL_SECONDS.grpc, deadlineMs: RPC_DEADLINES_MS['grpc.GetResearchContext'] },
     );
-    return value;
+    return annotateRetrievalDelivery(cached);
   },
 
   health: checkRetrievalHealth,
@@ -874,7 +874,7 @@ export async function searchEvidenceViaHttp(
     }
     return null;
   }
-  }, '/search/evidence');
+  }, '/search/evidence', recordFailedTransportAttempt);
 }
 
 export async function searchCodebaseViaHttp(params: {
@@ -946,7 +946,7 @@ export async function searchCodebaseViaHttp(params: {
     }
     return null;
   }
-  }, '/search/codebase');
+  }, '/search/codebase', recordFailedTransportAttempt);
 }
 
 // ── Health check ────────────────────────────────────────────────────────

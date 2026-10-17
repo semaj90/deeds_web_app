@@ -10,9 +10,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { readGoldenReviewValidationEvidenceV1 } from './lib/golden-review-journal-v1.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..', '..');
-const REPORT_PATH = path.join(ROOT, 'docs', 'reports', 'parent-atlas-promotion-gates-v1.json');
+const REPORT_PATH = path.resolve(ROOT, process.argv.find((arg) => arg.startsWith('--output='))?.slice(9)
+  ?? 'docs/reports/parent-atlas-promotion-gates-v1.json');
+const goldenValidationEvidence = readGoldenReviewValidationEvidenceV1(ROOT, process.argv.slice(2));
 
 const reportFiles = {
   sourceAuthority: 'docs/reports/current-graphify-snapshot-authority-v1.json',
@@ -73,7 +76,7 @@ function firstFailedCheck(value) {
 
 function readIndependentLaneFindings() {
   return Object.fromEntries(Object.entries(independentLaneReports).map(([lane, relative]) => {
-    const item = readJson(relative);
+    const item = lane === 'judgment' ? goldenValidationEvidence : readJson(relative);
     const value = item.value;
     const status = value?.status ?? value?.verdict ?? value?.decision ?? null;
     const firstBlockingInvariant = value?.firstBlockingInvariant
@@ -85,13 +88,14 @@ function readIndependentLaneFindings() {
         ? `STATUS_NOT_PROMOTABLE:${status}`
         : null);
     return [lane, {
-      report: relative,
+      report: item.path,
       exists: item.exists,
       status,
       proofLevel: value?.proofLevel ?? null,
       authority: value?.authority ?? value?.canonicalAuthority ?? false,
       writesPerformed: value?.writesPerformed ?? value?.databaseWrites ?? value?.datastoreWritesPerformed ?? false,
       firstBlockingInvariant,
+      ...(lane === 'judgment' ? { validationReadback: value } : {}),
     }];
   }));
 }
@@ -204,6 +208,7 @@ const counts = {
 
 const canonicalPayload = JSON.stringify({
   schema: 'atlas.parent-atlas-promotion-gates.v1',
+  goldenValidationEvidence,
   workspaceRevision,
   gates: gates.map(({ id, status, proofLevel, violations }) => ({ id, status, proofLevel, violations })),
 });
@@ -254,21 +259,13 @@ const report = {
   safeNextCommand: ownerProven
     ? 'npx tsx scripts/atlas/audit-current-structural-lineage-v1.mjs'
     : 'npx tsx scripts/atlas/audit-current-graphify-run-owner-v1.mjs',
-  reportPath: 'docs/reports/parent-atlas-promotion-gates-v1.json',
+  reportPath: path.relative(ROOT, REPORT_PATH),
   evidence: Object.fromEntries(Object.entries(reportFiles).map(([key, relative]) => [key, readJson(relative)])),
   checksum: `sha256:${crypto.createHash('sha256').update(canonicalPayload).digest('hex')}`,
 };
 
 fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
-const reportTempPath = `${REPORT_PATH}.${process.pid}.tmp`;
-fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-try {
-  fs.renameSync(reportTempPath, REPORT_PATH);
-} catch (error) {
-  try { fs.rmSync(reportTempPath, { force: true }); } catch {}
-  console.error(`PROMOTION_GATE_REPORT_WRITE_BLOCKED:${error instanceof Error ? error.message : String(error)}`);
-  process.exitCode = 1;
-}
+fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
 console.log(JSON.stringify({
   status: report.status,
   firstBlockingGate: report.firstBlockingGate,

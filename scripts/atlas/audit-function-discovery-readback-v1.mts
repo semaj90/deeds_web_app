@@ -6,6 +6,7 @@ import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.
 import { createFunctionRegistryPostgresReadPortsV1, createFunctionRegistrySidecarAstProviderV1, queryCallableSearchProjectionInReadOnlyTransactionV1 } from '../../sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-postgres-snapshot-loader-v1.ts';
 import { createFunctionRegistrySnapshotLoaderV1 } from '../../sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-snapshot-loader-v1.ts';
 import { createMiniforgeNlpSidecarClient } from '../../sveltekit-frontend/src/lib/server/nlp/miniforge-nlp-sidecar.ts';
+import { summarizeFunctionDiscoveryReadbackV1 } from './lib/function-discovery-readback-v1.mjs';
 
 const { values } = parseArgs({ options: {
   query: { type: 'string' },
@@ -42,8 +43,11 @@ try {
     SELECT c.symbol_version_id,
       c.source_revision AS projection_source_revision,
       c.workspace_revision AS projection_workspace_revision,
+      c.producer_revision AS projection_producer_revision,
+      c.updated_at AS projection_updated_at,
       sv.source_revision AS canonical_source_revision,
       sv.workspace_revision AS canonical_workspace_revision,
+      sv.producer_revision AS canonical_producer_revision,
       registry.status AS registry_status
     FROM public.atlas_callable_search c
     JOIN public.atlas_symbol_versions sv USING (symbol_version_id)
@@ -51,12 +55,8 @@ try {
     WHERE sv.symbol_version_id = ANY($1::text[])
     ORDER BY sv.symbol_version_id
   `, [candidates.map((candidate) => candidate.symbolVersionId)]);
-  const canonicalReadbackVerified = candidates.length > 0
-    && new Set(candidates.map((candidate) => candidate.symbolVersionId)).size === candidates.length
-    && readback.rows.length === candidates.length
-    && readback.rows.every((row) => row.canonical_workspace_revision === workspaceRevision
-      && row.registry_status === 'active'
-      && candidates.find((candidate) => candidate.symbolVersionId === row.symbol_version_id)?.sourceRevision === row.canonical_source_revision);
+  const { canonicalReadbackVerified, projectionRevisionDifferenceCount, projectionReadbackVerified } =
+    summarizeFunctionDiscoveryReadbackV1(candidates, readback.rows, workspaceRevision);
   const snapshotOutcomes = [];
   const astDiagnostics = [];
   if (values.qualify && canonicalReadbackVerified) {
@@ -106,10 +106,11 @@ try {
     }
   }
   const snapshotsQualified = snapshotOutcomes.length > 0 && snapshotOutcomes.every((outcome) => outcome.qualificationOutcome === 'QUALIFIED');
-  const proven = canonicalReadbackVerified && (!values.qualify || snapshotsQualified);
+  const proven = projectionReadbackVerified && (!values.qualify || snapshotsQualified);
   const sourceBindings = {} as Record<string, string>;
   for (const [owner, url] of [
     ['audit', new URL(import.meta.url)],
+    ['readbackVerifier', new URL('./lib/function-discovery-readback-v1.mjs', import.meta.url)],
     ['query', new URL('../../sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-postgres-snapshot-loader-v1.ts', import.meta.url)],
     ['qualifier', new URL('../../sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-read-adapter-v1.ts', import.meta.url)],
     ['pathPolicy', new URL('../../sveltekit-frontend/src/lib/server/atlas/function-registry/ast-node-storage-path-v1.ts', import.meta.url)],
@@ -118,7 +119,8 @@ try {
   }
   console.log(JSON.stringify({
     schema: 'atlas.function-discovery-readback.v1',
-    status: !canonicalReadbackVerified ? 'INCOMPLETE' : values.qualify
+    status: !canonicalReadbackVerified ? 'INCOMPLETE' : !projectionReadbackVerified
+      ? 'PROJECTION_REVISION_MISMATCH' : values.qualify
       ? snapshotsQualified ? 'QUALIFIED_SNAPSHOT_READBACK_PROVEN' : 'FUNCTION_QUALIFICATION_BLOCKED'
       : 'CANONICAL_DISCOVERY_READBACK_PROVEN',
     query,
@@ -128,9 +130,8 @@ try {
     candidateCount: candidates.length,
     candidates,
     readback: readback.rows,
-    projectionRevisionDifferenceCount: readback.rows.filter((row) =>
-      row.projection_source_revision !== row.canonical_source_revision
-      || row.projection_workspace_revision !== row.canonical_workspace_revision).length,
+    projectionRevisionDifferenceCount,
+    projectionReadbackVerified,
     canonicalReadbackVerified,
     qualificationRequested: values.qualify,
     astDiagnostics,

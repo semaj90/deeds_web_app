@@ -53,8 +53,8 @@ export interface KagQuickHopReaderV1 {
 /** Production composition point. Construction is side-effect free; the caller
  * still supplies the revision pair and decides when a governed traversal runs. */
 export async function createPostgresKagQuickHopReaderV1(): Promise<KagQuickHopReaderV1> {
-  const { readKagHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
-  return { readHyperedges: readKagHyperedgesStrictV1 };
+  const { readKagCodeHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+  return { readHyperedges: readKagCodeHyperedgesStrictV1 };
 }
 
 const text = (value: string, name: string) => {

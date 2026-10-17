@@ -15,6 +15,11 @@ beforeEach(() => {
 });
 
 describe('ACE telemetry provenance forwarding', () => {
+  it('forwards an explicitly supplied trace ID without generating one from packet identity or query', async () => {
+    await recordACERetrievalTelemetry({ query: 'fixture', latencyMs: 2, retrievalStrategy: 'fusion',
+      traceId: 'trace:ace-fixture', packetContext: { packet_id: 'packet:fixture' } });
+    expect(packetRecord.mock.calls[0][0].trace_id).toBe('trace:ace-fixture');
+  });
   it('does not fabricate a runtime or transport when metrics contain no observations', async () => {
     await recordACERetrievalTelemetry({ query: 'bounded diagnostic', latencyMs: 2, retrievalStrategy: 'fusion' });
     expect(packetRecord.mock.calls[0][0].packet_context).toMatchObject({ schema_version: null,

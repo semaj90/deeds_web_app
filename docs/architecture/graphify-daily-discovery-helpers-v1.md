@@ -10,6 +10,7 @@ npm run graphify:daily:search -- --query FunctionRegistryEntryV1 --include-untra
 npm run graphify:daily:search -- --query tree_node_id --owner parent-atlas-retrieval-lineage-dag-convergence
 npm run graphify:daily:search -- --query packetKey --receipt docs/reports/example.json
 npm run graphify:daily:helpers:test
+npm run graphify:daily:gates:test
 ```
 
 `inspect` counts physical root directories and tracked paths using NUL-delimited Git output. `--sizes` additionally measures working-tree file metadata by directory and counts missing files; unmeasured sizes/missing counts remain null. Installed dependencies and ignored contents are not traversed. Submodule Git links are reported separately. The membership checksum covers tracked path names, not source bytes or a canonical workspace revision. Discovery candidate counts are path/extension hints; current ignore rules and size limits still apply during `rg` execution.
@@ -31,6 +32,8 @@ Default limits: 250 candidate source files, 20 matches (maximum 100), five match
 Output is JSON on stdout. To save a local receipt, pass `--output docs/reports/<new-name>.json`. Creation is exclusive: existing reports are preserved. The receipt distinguishes local artifact creation from source/datastore writes. No database, embedding, service, GPU, model, cache or workboard mutation is performed.
 
 The existing `graphify:daily` maintenance command retains its lifecycle/admission checks and apply stages. These discovery commands do not invoke it. OpenSpec `tasks.md` remains the task ledger, and workboard generation remains with `build-openspec-workboard-v1.mjs`.
+
+The gate tests exercise local discovery, the eleven required projection predicates, and failure handling without running maintenance. An empty or partial predicate report cannot authorize projection. Direct `:chain`, `:fast`, and `:skip-validation` daily aliases now enforce projection admission first; `:full` delegates to the guarded chain. `GRAPHIFY_ALLOW_FALLBACK=1` no longer allows a failed daily run to launch the legacy startup pipeline. The terminal `graphify:daily complete` text ends the editor task watcher; it is not proof of successful admission. These checks do not certify live PostgreSQL/source lineage, projection alignment, or ContextManifest admission.
 
 Checkout observations (2026-10-15 local / 2026-10-16 UTC): a routine inspection plus optional graph hashing completed in approximately 2.4 seconds; a bounded `SearchRuntime` search completed in approximately 2.6 seconds. Measuring sizes across all tracked paths took approximately 20 seconds in a separate run. These are local smoke timings, not a benchmark or retrieval-quality evaluation. The inspection reported 139 physical root directories, 34,731 tracked paths, and 4,696 tracked directory prefixes. The two compatibility graphs had matching hashes; their mtimes were stale. The frozen 486 MB parity snapshot was skipped by the hash cap.
 

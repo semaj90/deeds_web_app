@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.component-proof.v1",
+  "gate": "FEEDBACK-WEIGHT-PREVIEW-QUARANTINE-01",
+  "status": "PREVIEW_CONTAINMENT_TESTED_PRODUCTION_LEARNING_UNPROVEN",
+  "canonicalAuthority": false,
+  "tests": {
+    "command": "node --test scripts/atlas/token-card-weight-updater.test.mjs sveltekit-frontend/scripts/atlas/phase19-retrieval-loop-seed.test.mjs",
+    "passed": 11,
+    "failed": 0,
+    "log": "docs/reports/feedback-weight-preview-tests-final-20261016.txt"
+  },
+  "localPreview": {
+    "path": "docs/reports/feedback-weight-local-preview-final-20261016.json",
+    "records": 0,
+    "unresolvedRetrievalCardIdentities": 443,
+    "trainingEligible": false,
+    "promotionEligible": false
+  },
+  "writesPerformed": { "workspaceCodeAndReports": true, "existingWeightsOrLogs": false, "database": false, "redis": false, "sourceRevision": false },
+  "remaining": [
+    "Resolve actual retrieval event schema to canonical feedback identity",
+    "Verified outcome and reviewed-data admission through the existing learning owner",
+    "Held-out ranking quality and model/weight promotion proof",
+    "Explicit approval and qualified cache publication contract"
+  ],
+  "likely_cause": "The historical updater mixed unqualified event observations into persistent weights and optional Redis state, including synthetic seeds, while mishandling multi-card payload precedence.",
+  "evidence": ["11 passing tests", "Actual local read-only preview with 443 unresolved identity observations", "No file/cache publication path remains in the updater"],
+  "patch_targets": [
+    "scripts/atlas/token-card-weight-updater.mjs",
+    "scripts/atlas/token-card-weight-updater.test.mjs",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "docs/reports/master-feature-phase-gates-review-20261016.md"
+  ],
+  "safe_next_command": "node --test scripts/atlas/token-card-weight-updater.test.mjs",
+  "smoke_command": "openspec validate parent-atlas-ace-rlm-bitfrost-integration --strict",
+  "report_path": "docs/reports/feedback-weight-preview-quarantine-20261016.json"
+}

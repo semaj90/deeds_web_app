@@ -123,6 +123,30 @@ describe('phase109b repository provenance workflow wrapper', () => {
         'production-projection',
       ),
     ).toBe(false);
+    // A real live-embedder run reports PROVEN with no heuristic files and must pass.
+    expect(
+      mod.evaluateWorkflowSuccess(
+        makeReport({
+          stages: {
+            validation: { pass: true },
+            semantic: { status: 'PROVEN', embeddedFiles: 24, heuristicFiles: 0 },
+          },
+        }),
+        'production-projection',
+      ),
+    ).toBe(true);
+    // Nothing sampled is still a failure.
+    expect(
+      mod.evaluateWorkflowSuccess(
+        makeReport({
+          stages: {
+            validation: { pass: true },
+            semantic: { status: 'SKIPPED', embeddedFiles: 0, heuristicFiles: 0 },
+          },
+        }),
+        'production-projection',
+      ),
+    ).toBe(false);
   });
 
   it('copies reports atomically and skips self copies', async () => {

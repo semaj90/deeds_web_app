@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.integration-progress.v1",
+  "status": "ACTIVE_PARTIAL",
+  "gate": "DISPATCHER-TELEMETRY-OWNER-01",
+  "implemented": [
+    "Optional explicit packet context retained in DispatcherState and actual LangGraph channel",
+    "Dispatcher wrapper normalizes supplied context without inferring identity from candidate rows",
+    "Removed direct passed-client Redis writes and assumed acp_telemetry SQL path",
+    "Existing packet writer receives strict dispatcher.node operation observations asynchronously",
+    "Preserved confidence zero, handler results, original exceptions and failed-state outcomes",
+    "No exception contents copied into new structured payload or dispatcher failure warning"
+  ],
+  "compatibility": {
+    "passedStoreClients": "Accepted but unused for telemetry persistence",
+    "redis_written": false,
+    "redis_key": "",
+    "postgres_deferred": "Scheduling only, not database acknowledgement or readback",
+    "historicalRedisKeys": "Untouched; aggregate reader is not newly refreshed by this wrapper"
+  },
+  "validation": {
+    "suitesPassed": 5,
+    "testsPassed": 29,
+    "log": "docs/reports/dispatcher-provenance-final-20261016T002957.txt",
+    "graphScope": "Actual compiled LangGraph and routing through synthesize decision, node handlers mocked",
+    "storeScope": "Real packet writer with mocked database; passed Redis/PostgreSQL direct-write spies unused",
+    "coverage": ["graph context channel", "final-state context", "same context at existing writer", "zero confidence", "original exception", "failed state", "pending writer", "no inferred candidate identity", "invalid duration rejected"],
+    "syntaxTranspileErrors": 0,
+    "fullTypecheck": "NOT_RUN",
+    "liveSynthesis": "NOT_RUN",
+    "durableReadback": "NOT_RUN"
+  },
+  "notPerformed": ["live database writes", "source-revision writes", "backfill", "service restart", "model load", "GPU job", "Svelte check", "promotion"],
+  "remaining": ["live qualified context construction", "request correlation", "per-RPC/tool/cache detail migration", "delivery and crash recovery", "all node permission boundaries", "independent readback", "full source identity and enrichment requirements of goal objective"],
+  "likely_cause": "Dispatcher telemetry bypassed the existing writer with direct store calls and its LangGraph state schema omitted packet provenance.",
+  "evidence": ["Actual dispatcher-graph wrapper callers", "Assumed-table SQL removed", "29 passing focused tests including compiled graph"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/telemetry/dispatcher-telemetry-wrapper.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/dispatcher-telemetry-wrapper.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/acp-observation.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/acp-mcp-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/langgraph/dispatcher-graph.ts",
+    "sveltekit-frontend/src/lib/server/langgraph/dispatcher-nodes/types.ts",
+    "docs/architecture/packet-telemetry-existing-writer-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-telemetry-lowrank-recommendation-okf-integration --strict",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/telemetry/dispatcher-telemetry-wrapper.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-dispatcher-provenance-owner-20261016.json",
+  "canonicalAuthority": false
+}

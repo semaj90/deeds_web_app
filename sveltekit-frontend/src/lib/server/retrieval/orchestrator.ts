@@ -39,6 +39,7 @@ import { rerank as semanticRerank, healthCheckReranker } from '$lib/server/retri
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { attentionScoreChunks } from '$lib/server/gpu/libtorch-bridge.js';
 import { getRedis } from '$lib/server/redis.js';
+import { observeStoreRequest } from '../telemetry/gpu-telemetry.js';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 
@@ -99,7 +100,7 @@ export interface RetrievalResult {
 export async function fetchEngramCache<T>(cacheKey: string): Promise<T | null> {
 	try {
 		const redis = getRedis();
-		const rawData = await redis.get(cacheKey);
+		const rawData = await observeStoreRequest('redis', 'get', () => redis.get(cacheKey));
 		if (!rawData) return null;
 		return fastJsonParse<T>(rawData);
 	} catch {
@@ -111,7 +112,7 @@ export async function fetchEngramCache<T>(cacheKey: string): Promise<T | null> {
 async function fetchGlyphRewardScores(): Promise<Record<string, number>> {
 	try {
 		const redis = getRedis();
-		const raw = await redis.hgetall('gpu:glyph:rewards');
+		const raw = await observeStoreRequest('redis', 'hgetall', () => redis.hgetall('gpu:glyph:rewards'));
 		if (!raw || Object.keys(raw).length === 0) return {};
 		const out: Record<string, number> = {};
 		for (const [k, v] of Object.entries(raw)) out[k] = Number(v) || 0;
@@ -152,14 +153,16 @@ async function searchCollection(
 			with_payload: true,
 		};
 		if (filter) body.filter = filter;
-    const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/query`, {
+    const raw = await observeStoreRequest('qdrant', 'points_query', async () => {
+      const res = await fetch(`${ENV.QDRANT_URL}/collections/${collection}/points/query`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(body),
 			signal: AbortSignal.timeout(5000),
 		});
-		if (!res.ok) return [];
-		const raw = await res.text();
+      if (!res.ok) throw new Error('Qdrant points query failed');
+      return res.text();
+    });
         const data = fastJsonParse<{ result?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }>; points?: Array<{ id: string | number; score: number; payload?: Record<string, unknown> }> }>(raw);
         return (data.points ?? data.result ?? []).map((r) => ({ ...r, _collection: collection }));
 	} catch {
@@ -402,7 +405,7 @@ export async function orchestrateRetrieval(req: RetrievalRequest): Promise<Retri
 					const filePaths = chunks.map((c) => c.sourceId).filter(Boolean);
 					if (filePaths.length === 0) return {} as Record<string, string>;
 					// HMGET returns values in same order as keys; nulls become empty string
-					const vals = await redis.hmget('gpu:karpathy:scores', ...filePaths);
+					const vals = await observeStoreRequest('redis', 'hmget', () => redis.hmget('gpu:karpathy:scores', ...filePaths));
 					const out: Record<string, string> = {};
 					filePaths.forEach((fp, i) => { if (vals[i]) out[fp] = vals[i] as string; });
 					return out;

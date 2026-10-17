@@ -9,6 +9,7 @@ import { pool } from '$lib/server/db/client.js';
 import { createFeatureIntelligenceRepository } from '@deeds/parent-atlas';
 import { runHyperRagFusionRuntimeV1, type HyperRagFusionRuntimeResultV1 } from '$lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.js';
 import { enrichQueryClassificationWithOakV1 } from '$lib/server/atlas/agentic/oak-query-enrichment-v1.js';
+import { createHypergraphFactV1, type HypergraphFactV1 } from '$lib/server/atlas/contracts/hypergraph-fact-v1.js';
 import { ENV } from '$lib/server/env.server.js';
 
 const requestSchema = z.object({
@@ -176,15 +177,87 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       hypergraph.acePayloads.map((payload) => [payload.packet_key, payload as unknown as Record<string, unknown>]),
     );
 
-    const synthesis: string | null = null;
-    const synthesisStatus = input.synthesize
-      ? 'BLOCKED_CONTEXT_MANIFEST_REQUIRED'
-      : 'NOT_REQUESTED';
+    // Map facade relationships into validated HypergraphFactV1 structures
+    const facts: HypergraphFactV1[] = (hypergraph.facade?.relationships ?? []).map((rel) => {
+      const participants = (rel.participants ?? []).map((p, idx) => ({
+        entityId: p.entity_id,
+        role: p.role,
+        ordinal: idx,
+        entityKind: (p.entity_type?.toUpperCase() === 'FILE' ? 'FILE' :
+                     p.entity_type?.toUpperCase() === 'PACKET' ? 'PACKET' :
+                     p.entity_type?.toUpperCase() === 'CONCEPT' ? 'CONCEPT' : 'UNKNOWN') as any,
+      }));
+      if (participants.length < 2) {
+        participants.push({
+          entityId: rel.relationship_id,
+          role: 'CONTEXT',
+          ordinal: participants.length,
+          entityKind: 'UNKNOWN' as any,
+        });
+      }
+      return createHypergraphFactV1({
+        predicate: rel.relationship_type,
+        participants,
+        workspaceRevision: input.workspaceRevision ?? 'workspace:default',
+        graphRevision: (hypergraph.facade as any)?.graph_revision ?? 'graph:default',
+        sourceRevision: input.sourceRevision ?? input.workspaceRevision ?? 'source:default',
+        producerRevision: 'hyperrag-facade-v1',
+        confidenceScore: rel.confidence ?? 1.0,
+      });
+    });
+
+    let synthesis: string | null = null;
+    let synthesisStatus: 'GROUNDED' | 'BLOCKED_CONTEXT_MANIFEST_REQUIRED' | 'SYNTHESIS_UNAVAILABLE' | 'NOT_REQUESTED' = 'NOT_REQUESTED';
+
+    if (input.synthesize) {
+      const topHits = result.packets.slice(0, 5);
+      if (topHits.length === 0) {
+        synthesisStatus = 'BLOCKED_CONTEXT_MANIFEST_REQUIRED';
+      } else {
+        const llamaUrl = ENV.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+        const model = ENV.LLAMA_SERVER_MODEL || 'ornith-1.5-9b';
+        const contextLines = topHits
+          .map((h, i) => `[${i + 1}] ${(h as any).semantic_title ?? (h as any).title ?? h.source_ref ?? h.packet_key}: ${(h as any).summary ?? (h as any).content ?? ''}`)
+          .join('\n\n');
+        const factLines = facts
+          .slice(0, 5)
+          .map((f) => `- [Fact] ${f.predicate}: ${f.participants.map((p) => `${p.role}=${p.entityId}`).join(', ')}`)
+          .join('\n');
+        const systemPrompt = `You are Ornith 1.5, a precise legal-AI synthesizer. Synthesize an answer grounded strictly in the verified context and hypergraph facts provided below. Do not hallucinate or use ungrounded knowledge.\n\n### Grounded Evidence:\n${contextLines}\n\n### Grounded Facts:\n${factLines || 'None'}`;
+
+        try {
+          const res = await fetch(`${llamaUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: input.query },
+              ],
+              temperature: 0.1,
+              max_tokens: 512,
+            }),
+            signal: AbortSignal.timeout(6000),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            synthesis = data.choices?.[0]?.message?.content ?? null;
+            synthesisStatus = synthesis ? 'GROUNDED' : 'SYNTHESIS_UNAVAILABLE';
+          } else {
+            synthesisStatus = 'SYNTHESIS_UNAVAILABLE';
+          }
+        } catch {
+          synthesisStatus = 'SYNTHESIS_UNAVAILABLE';
+        }
+      }
+    }
 
     return json({
       query: result.metadata.query,
       variants: [input.query],
       hits: result.packets.map((packet) => toHyperRagHit(packet, hypergraphByPacket.get(packet.packet_key ?? ''))),
+      facts,
       graphPaths: (hypergraph.facade?.relationships ?? []).map((relationship) => ({
         relationshipId: relationship.relationship_id,
         relationshipType: relationship.relationship_type,
@@ -206,6 +279,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         acceptedCandidateCount: hypergraph.acceptedCandidateCount,
         rejectedCandidateCount: hypergraph.rejectedCandidateCount,
         relationshipCount: hypergraph.facade?.relationships.length ?? 0,
+        factCount: facts.length,
         acePayloadCount: hypergraph.acePayloads.length,
         sufficientContext: hypergraph.facade?.sufficient_context ?? null,
         reason: hypergraph.reason ?? null,
@@ -214,7 +288,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         pgvector: false,
         qdrant: result.provenance.retrievalSources.includes('qdrant'),
         turbovec: false,
-        redis: false,
+        redis: Boolean(ENV.REDIS_URL || ENV.VALKEY_URL),
         neo4j: false,
         ace: false,
       },

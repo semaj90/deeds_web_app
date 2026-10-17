@@ -49,6 +49,7 @@ test('exports all 14 functions', () => {
     'graphSimilarity', 'clusterEmbeddings', 'computeCaseEmbedding',
     'lstmAdd', 'somCache', 'dotProduct', 'scale', 'relu',
     'simdJsonParse', 'simdJsonValidate', 'simdJsonExtractNumbers', 'simdJsonBackend',
+    'simdJsonValidateAstSpans',
   ];
   for (const name of expected) {
     assert(typeof a[name] === 'function', `Missing export: ${name}`);
@@ -63,6 +64,20 @@ test('checkCudaAvailable returns 0, 1, or 2', () => {
 test('simdJsonBackend returns non-empty string', () => {
   const backend = a.simdJsonBackend();
   assert(typeof backend === 'string' && backend.length > 0, `Got: "${backend}"`);
+});
+
+test('simdJsonValidateAstSpans rejects malformed and out-of-bounds spans', () => {
+  const ascii = new TextEncoder().encode('test');
+  assert.equal(a.simdJsonValidateAstSpans(new Uint32Array([0, 2, 2, 4]), ascii), true);
+  assert.equal(a.simdJsonValidateAstSpans(new Uint32Array([0, 5]), ascii), false);
+  assert.equal(a.simdJsonValidateAstSpans(new Uint32Array([3, 2]), ascii), false);
+  assert.equal(a.simdJsonValidateAstSpans(new Uint32Array([0, 2, 0, 2]), ascii), true);
+  const multibyte = new TextEncoder().encode('éx');
+  assert.equal(a.simdJsonValidateAstSpans(new Uint32Array([1, 2]), multibyte), false);
+  assert.equal(a.simdJsonValidateAstSpans(new Uint32Array([0, 2]), multibyte), true);
+  assert.equal(a.simdJsonValidateAstSpans(new Uint32Array([0, 2]), new Uint8Array([0xC0, 0xAF])), false);
+  assert.throws(() => a.simdJsonValidateAstSpans(new Uint32Array([0]), ascii));
+  assert.throws(() => a.simdJsonValidateAstSpans(new Uint32Array(), new Uint16Array(2)));
 });
 
 // ── SIMD dot product ────────────────────────────────────────────────

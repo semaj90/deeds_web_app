@@ -27,6 +27,8 @@ import { PgDatabase } from 'drizzle-orm/pg-core';
  * Define state schema for LangGraph
  */
 const DispatcherStateAnnotation = Annotation.Root({
+  trace_id: Annotation<DispatcherState['trace_id']>,
+  packet_context: Annotation<DispatcherState['packet_context']>,
   query: Annotation<string>,
   candidates: Annotation<any[]>,
   identity_lane: Annotation<string>,

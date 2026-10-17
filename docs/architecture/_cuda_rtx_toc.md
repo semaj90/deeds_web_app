@@ -6,7 +6,8 @@
 
 | Lane | Location | Contents | Status |
 |---|---|---|---|
-| cuTile / TileIR (WSL2) | `/home/james/.venvs/atlas-cutile-cu132` | `cuda-tile 1.5.0`, `cupy-cuda13x 14.2.0`, `nvidia-cuda-tileiras 13.2.78` | IMPORT_PROVEN |
+| cuTile / TileIR (WSL2 Python) | `/home/james/.venvs/atlas-cutile-cu132` | `cuda-tile`, `cupy-cuda13x`, `nvidia-cuda-tileiras`; CUDA 13.2 environment | Package/import observed; GPU runtime proof is separate |
+| CUDA 13.4 SIMT + C++ Tile (WSL2 Docker) | `docker/atlas-cuda134-simt/` | One-shot, no-port SM 8.6 challenger; compiles existing Level 2 SIMT and Level 3 Tile kernels against the same fixture | CREATED; build and GPU parity pending; [runbook](cuda134-simt-container-v1.md) |
 | RAPIDS / cuVS (WSL2) | `/home/james/miniforge3/envs/atlas-rapids-cu13` | cuVS KMeans executor | Free `:8090` first |
 | Host driver | Windows | NVIDIA 580.88, RTX 3060 Ti, SM 8.6 | Meets R580+ |
 | LibTorch N-API (Win32 x64) | `simd-bridge/cpp/build-x64-cuda` | LibTorch C++ host-buffer inputs, CUDA-if-available execution, SIMDJSON parser | Prior native probe reported CUDA available on RTX 3060 Ti; not re-probed in this documentation pass |
@@ -15,7 +16,7 @@
 
 | File | Role | Owner class | Status |
 |---|---|---|---|
-| `python/atlas_cuda_cutile_simt_gemm_probe_v1.py` | cuTile vs PyTorch SIMT FP16 GEMM: parity and timing | Owner for GEMM parity (needs `torch`) | Not run in cutile venv (no torch) |
+| `python/atlas_cuda_cutile_simt_gemm_probe_v1.py` | cuTile vs PyTorch SIMT FP16 GEMM: parity and timing | Owner for GEMM parity (needs `torch`) | Separate CUDA 13.2 experiment; not part of the CUDA 13.4 container |
 | `python/atlas_cuda_cutile_simt_probe_v1.py` | cuTile toolchain smoke: `vector_add_kernel` plus a tiny GEMM pair | Owner for toolchain smoke | Receipt below was produced by identical kernel code before consolidation; rerun this owner to re-attribute |
 | `python/atlas_gemma_rank_cuda_forward_probe_v1.py` | CUDA forward probe for AtlasGemmaRankV1 | Experiment | Not promoted |
 | `python/atlas_compute/rff_transform.py` | RFF challenger transform (Gaussian RBF approximation, receipt type, exact reference) | EXPERIMENT owner; untracked WIP | `python/tests/test_rff_transform.py` 5/5 OK in rapids env |

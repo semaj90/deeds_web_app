@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.ordinal-map-readback-closeout.v1",
+  "status": "ORDINAL_MAP_SEALED_PASS_OTHER_PROJECTION_GATES_OPEN",
+  "generatedAt": "2026-10-16T22:24:58.659Z",
+  "repositoryCommit": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d",
+  "scope": "READ_ONLY_CANONICAL_PROJECTION_FABRIC_RECHECK",
+  "canonicalWrites": 0,
+  "sourceRevisionWrites": 0,
+  "backfill": false,
+  "graphifyDailyRun": false,
+  "ordinalMap": {
+    "verdict": "PASS",
+    "rowCount": 16151,
+    "admittedRootCandidateCount": 16151,
+    "exactIdentityMatches": 16151,
+    "revisionExactMatches": 16151,
+    "missingOrdinal": 0,
+    "workspaceRevisionMatchesAdmitted": true,
+    "ordinalSequenceValid": true,
+    "ordinalMapChecksum": "413addb327254b5d4085aed35e886c03192aecad882e44ce2ea6b6dda84f2376",
+    "candidateSnapshotRevision": "sha256:85c19c1ac0e4fbfd114203f1a5d822a008e45a1af5c46e738baf86e436c34fd6",
+    "ownerReceipt": "docs/reports/cei24-candidate-snapshot-convergence-v1-20261016T222429.794Z.json",
+    "ownerReceiptSha256": "8931b0f7aca52abd0b686826dacb336fc22abb037f41b558d6412b6c2b56e3c6"
+  },
+  "priorReceiptMismatch": {
+    "status": "IMMUTABLE_INPUT_BYTES_DO_NOT_MATCH_PRIOR_RECEIPT",
+    "expectedMatrixReportSha256": "sha256:6ed79a1f261bd4f49a78860421a7aae3f70707856dd0859727be336b31d93032",
+    "observedMatrixReportSha256": "sha256:4affcc3f48927805a01f7bdb674d95bc7e01653f81cc0952f89c7f30c623722f",
+    "handling": "Preserved the prior receipt; generated a new artifact-only snapshot and relied on independent read-only audit. Historic cause of byte divergence is not established."
+  },
+  "independentAudit": {
+    "path": "docs/reports/ordinal-map-readback-20261016/atlas-canonical-projection-fabric-audit-2026-10-16.json",
+    "sha256": "7c765de14a169f57e73cf2800af3d83c86d033e691ade3d12f5874a5ed0d46dc",
+    "databaseIdentity": "127.0.0.1:5434",
+    "transaction": "READ ONLY; ROLLBACK",
+    "queryCount": 39,
+    "overallVerdict": "NOT_SAFE_TO_PROJECT",
+    "passingPredicates": 5,
+    "belowPassPredicates": 6
+  },
+  "remainingPredicates": {
+    "SYMBOLS_RESOLVED": "PARTIAL_PROVEN",
+    "SEMANTIC_OWNER_PROVEN": "PARTIAL_PROVEN",
+    "LATENT_FAMILY_PROVEN": "PARTIAL_PROVEN",
+    "PROJECTIONS_CHECKSUM_ALIGNED": "NOT_PROVEN",
+    "BITFROST_KEYS_DERIVABLE": "NOT_PROVEN",
+    "ACE_EVIDENCE_GROUNDED": "NOT_PROVEN"
+  },
+  "limits": [
+    "Candidate-ordinal qualification does not prove packet-to-chunk crosswalk or feature-lane admission.",
+    "The matrix report's prior-receipt hash mismatch was detected, but its historical cause was not established.",
+    "This result does not authorize projection promotion, cache warming, or canonical writes."
+  ],
+  "evidence": [
+    "docs/reports/cei24-candidate-snapshot-convergence-v1-20261016T222415.387Z.json",
+    "docs/reports/cei24-candidate-snapshot-convergence-v1-20261016T222429.794Z.json",
+    "docs/reports/ordinal-map-readback-20261016/atlas-canonical-projection-fabric-audit-2026-10-16.json"
+  ]
+}

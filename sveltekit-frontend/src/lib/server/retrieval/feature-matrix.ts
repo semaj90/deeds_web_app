@@ -24,8 +24,9 @@ async function getDb() {
 }
 
 export interface AuthorityLookupInput {
-  packetKeys: string[];
-  sourceRefs: string[];
+  identities: readonly { packetKey: string; sourceRef: string; sourceRevision: string }[];
+  workspaceRevision: string;
+  graphRevision: string;
 }
 
 /**
@@ -47,42 +48,98 @@ export interface AuthorityLookupInput {
 export async function fetchAuthorityScores(
   input: AuthorityLookupInput,
 ): Promise<Map<string, number>> {
-  const packetKeys = Array.from(new Set(input.packetKeys.filter((v) => v && v.trim() !== '')));
-  const sourceRefs = Array.from(new Set(input.sourceRefs.filter((v) => v && v.trim() !== '')));
+  const workspaceRevision = input.workspaceRevision.trim();
+  const graphRevision = input.graphRevision.trim();
+  if (!/^sha256:[a-f0-9]{64}$/i.test(workspaceRevision) || !/^[a-f0-9]{64}$/i.test(graphRevision)) return new Map();
 
-  if (packetKeys.length === 0 && sourceRefs.length === 0) {
-    return new Map();
+  const identities = [...new Map(input.identities
+    .filter((identity) => identity.packetKey.trim() && identity.sourceRef.trim() && /^sha256:[a-f0-9]{64}$/i.test(identity.sourceRevision.trim()))
+    .map((identity) => [`${identity.packetKey}\u001f${identity.sourceRef}\u001f${identity.sourceRevision}`, {
+      packetKey: identity.packetKey.trim(), sourceRef: identity.sourceRef.trim(), sourceRevision: identity.sourceRevision.trim(),
+    }])).values()];
+  if (identities.length === 0 || identities.length > 256) return new Map();
+  const packetIdentitySets = new Map<string, Set<string>>();
+  for (const identity of identities) {
+    const packetIdentities = packetIdentitySets.get(identity.packetKey) ?? new Set<string>();
+    packetIdentities.add(`${identity.sourceRef}\u001f${identity.sourceRevision}`);
+    packetIdentitySets.set(identity.packetKey, packetIdentities);
   }
+  if ([...packetIdentitySets.values()].some((packetIdentities) => packetIdentities.size !== 1)) return new Map();
+  const packetKeys = [...new Set(identities.map((identity) => identity.packetKey))];
+  const sourceRefs = [...new Set(identities.map((identity) => identity.sourceRef))];
+  const sourceRevisions = [...new Set(identities.map((identity) => identity.sourceRevision))];
+  const expectedPacketIdentity = new Map(identities.map((identity) => [
+    identity.packetKey,
+    `${identity.sourceRef}\u001f${identity.sourceRevision}`,
+  ]));
+  const sourceRevisionSets = new Map<string, Set<string>>();
+  for (const identity of identities) {
+    const revisions = sourceRevisionSets.get(identity.sourceRef) ?? new Set<string>();
+    revisions.add(identity.sourceRevision);
+    sourceRevisionSets.set(identity.sourceRef, revisions);
+  }
+  const expectedSourceRevision = new Map([...sourceRevisionSets]
+    .filter(([, revisions]) => revisions.size === 1)
+    .map(([sourceRef, revisions]) => [sourceRef, [...revisions][0]]));
 
   try {
     const db = await getDb();
     const result = await db.execute(sql`
-      SELECT s.packet_key, s.source_ref, s.authority_percentile
+      SELECT p.packet_key AS matched_packet_key, p.source_ref AS matched_source_ref,
+             p.source_revision AS matched_source_revision, s.authority_percentile
       FROM atlas_graph_authority_scores s
-      JOIN atlas_graph_authority_runs r ON r.run_id = s.run_id
+      JOIN atlas_graph_authority_runs r
+        ON r.run_id = s.run_id
+       AND r.graph_snapshot_id = s.graph_snapshot_id
+       AND r.status = 'promoted'
+       AND r.did_converge = true
+      JOIN atlas_graph_snapshots_v2 snap
+        ON snap.snapshot_id = s.graph_snapshot_id
+       AND snap.workspace_revision = ${workspaceRevision}
+       AND snap.graph_revision = ${graphRevision}
+       AND snap.status = 'VALIDATED'
+      JOIN atlas_packets p
+        ON p.workspace_revision_key = snap.workspace_revision
+       AND p.source_revision IS NOT NULL
+       AND (
+         (s.packet_key IS NOT NULL AND p.packet_key = s.packet_key)
+         OR (s.packet_key IS NULL AND s.source_ref IS NOT NULL AND p.source_ref = s.source_ref)
+       )
       WHERE r.status = 'promoted'
         AND (
           s.packet_key = ANY(${packetKeys}::text[])
           OR s.source_ref = ANY(${sourceRefs}::text[])
         )
+        AND p.source_revision = ANY(${sourceRevisions}::text[])
     `);
 
     type AuthorityRow = {
-      packet_key: string | null;
-      source_ref: string | null;
+      matched_packet_key: string;
+      matched_source_ref: string;
+      matched_source_revision: string;
       authority_percentile: number | string;
     };
 
     const bySourceRef = new Map<string, number>();
     const byPacketKey = new Map<string, number>();
+    const sourceScores = new Map<string, Set<number>>();
 
     for (const row of result.rows as AuthorityRow[]) {
       const score = typeof row.authority_percentile === 'string'
         ? Number.parseFloat(row.authority_percentile)
         : row.authority_percentile;
       if (!Number.isFinite(score)) continue;
-      if (row.packet_key) byPacketKey.set(row.packet_key, score);
-      if (row.source_ref) bySourceRef.set(row.source_ref, score);
+      if (expectedPacketIdentity.get(row.matched_packet_key) === `${row.matched_source_ref}\u001f${row.matched_source_revision}`) {
+        byPacketKey.set(row.matched_packet_key, score);
+      }
+      if (expectedSourceRevision.get(row.matched_source_ref) === row.matched_source_revision) {
+        const scores = sourceScores.get(row.matched_source_ref) ?? new Set<number>();
+        scores.add(score);
+        sourceScores.set(row.matched_source_ref, scores);
+      }
+    }
+    for (const [sourceRef, scores] of sourceScores) {
+      if (scores.size === 1) bySourceRef.set(sourceRef, [...scores][0]!);
     }
 
     // packet_key wins where both matched — same precedence as identity-resolution.ts

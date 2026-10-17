@@ -109,6 +109,7 @@ static ExportBackendClassification classifyExportBackend(
         "graphSimilarity", "graphSimilarityHalf", "clusterEmbeddings",
         "computeCaseEmbedding", "poolStats", "simdJsonParse",
         "simdJsonValidate", "simdJsonExtractNumbers", "simdJsonBackend",
+        "simdJsonValidateAstSpans",
         "simdJsonToCSR",
         "getBackendInfo", "checkCudaAvailable"})) {
     return {"cpu_fallback", "source_declares_cpu_implementation"};
@@ -258,6 +259,7 @@ extern "C" void runSOMCache(const float* in, float* out, int n);
 // simdjson bridge (simdjson_bridge.cc)
 extern "C" napi_value RegisterSimdJsonParse(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonValidate(napi_env env, napi_callback_info info);
+extern "C" napi_value RegisterSimdJsonValidateAstSpans(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonExtractNumbers(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonBackend(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonToCSR(napi_env env, napi_callback_info info);
@@ -2298,6 +2300,7 @@ static napi_value Init(napi_env env, napi_value exports) {
   // simdjson functions
   registerFn(env, exports, "simdJsonParse", RegisterSimdJsonParse);
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);
+  registerFn(env, exports, "simdJsonValidateAstSpans", RegisterSimdJsonValidateAstSpans);
   registerFn(env, exports, "simdJsonExtractNumbers", RegisterSimdJsonExtractNumbers);
   registerFn(env, exports, "simdJsonBackend", RegisterSimdJsonBackend);
   registerFn(env, exports, "simdJsonToCSR", RegisterSimdJsonToCSR);

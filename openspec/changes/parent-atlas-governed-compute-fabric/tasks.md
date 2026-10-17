@@ -639,3 +639,13 @@ population, model training, dependency upgrades, service restarts, or projection
       caches cannot bypass the existing exact-evidence promotion gates.
 - [ ] 22.10 `ROLLBACK_PROVEN`: disabling the governed kernel/native backend path restores the
       previous proven production owners without data migration or canonical-state repair.
+
+### P19 bounded deterministic policy proof cross-reference — 2026-10-16
+
+`docs/reports/p14-p15-p19-cache-fusion-policy-receipt-v1.json` records six
+deterministic policy-state decisions, legal-action-mask checks, high-pressure
+demotion, and classifier fallback from a legacy revision label. This is a
+bounded policy/helper proof only; it does not prove production classifier
+inputs, current model identity, trained/adaptive policy, or live retrieval and
+execution. Keep P19 partial and do not promote policy authority from this
+receipt.

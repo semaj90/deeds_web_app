@@ -29,6 +29,14 @@ export function classifyIndexedChunkReuseV1(expectedChunks, storedRows) {
       status = 'CHUNK_CONTENT_HASH_MISMATCH';
     } else if (stored.file_content_hash !== expected.file_hash) {
       status = 'SOURCE_FILE_HASH_MISMATCH';
+    } else if (expected.source_revision != null
+      && stored.source_revision !== expected.source_revision) {
+      status = 'SOURCE_REVISION_MISMATCH';
+    } else if (expected.workspace_revision != null
+      && stored.workspace_revision !== expected.workspace_revision) {
+      status = 'WORKSPACE_REVISION_MISMATCH';
+    } else if (stored.metadata?.packet_key === id) {
+      status = 'PROJECTION_ID_MISLABELED_AS_PACKET_KEY';
     } else {
       const expectedSpan = expected.metadata?.source_span;
       if (expectedSpan?.status === 'BYTE_MATCH_NOT_ADMITTED') {

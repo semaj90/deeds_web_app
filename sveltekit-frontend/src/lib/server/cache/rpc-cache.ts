@@ -149,6 +149,7 @@ export async function withRpcCache<T>(
   try {
     const activeStore = store ?? (store = createRedisCacheStore());
     const now = Date.now();
+    const persistedPayload = JSON.parse(JSON.stringify(value));
     const envelope = {
       schemaVersion: SCHEMA_VERSION,
       transport: opts.transport,
@@ -159,8 +160,8 @@ export async function withRpcCache<T>(
       createdAt: new Date(now).toISOString(),
       expiresAt: new Date(now + opts.ttlSeconds * 1000).toISOString(),
       hitLevel: 'MISS' as RpcHitLevel,
-      payloadChecksum: payloadChecksum(value),
-      payload: value,
+      payloadChecksum: payloadChecksum(persistedPayload),
+      payload: persistedPayload,
       provenance,
     };
     await activeStore.set(key, JSON.stringify(envelope), 'EX', opts.ttlSeconds);

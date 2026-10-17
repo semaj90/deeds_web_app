@@ -5,8 +5,9 @@
  * Pattern: Tool execution → emit routing decision → record async ops → flush telemetry
  */
 
-import { AcpTelemetryCollector } from './acp-mcp-telemetry.js';
+import { AcpTelemetryCollector, type AcpTelemetryConfig } from './acp-mcp-telemetry.js';
 import type Redis from 'ioredis';
+import { getPacketTelemetryContext, withPacketTelemetryContext } from './packet-telemetry-context.js';
 
 /**
  * Create a telemetry-wrapped MCP tool handler
@@ -22,8 +23,11 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
   handler: (args: T) => Promise<R>,
   getRedis: () => Redis
 ) {
-  return async (args: T): Promise<R> => {
+  return async (args: T, telemetryContext?: Pick<AcpTelemetryConfig, 'trace_id' | 'packet_context'>): Promise<R> => {
+    const inheritedContext = getPacketTelemetryContext();
     const collector = new AcpTelemetryCollector({
+      trace_id: telemetryContext?.trace_id === undefined ? inheritedContext?.trace_id : telemetryContext.trace_id,
+      packet_context: telemetryContext?.packet_context ?? inheritedContext?.packet_context ?? undefined,
       node_id: `mcp:${toolName}`,
       enable_async_flush: true,
       flush_interval_ms: 500, // Shorter flush for tool-level telemetry
@@ -43,25 +47,26 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
 
       // Execute handler and record as async operation
       const operationStart = Date.now();
-      const result = await handler(args);
+      const result = await withPacketTelemetryContext(telemetryContext ?? {}, () => handler(args));
       const operationDuration = Date.now() - operationStart;
+      const returnedFailure = result !== null && typeof result === 'object' && 'success' in result && result.success === false;
 
       // Record successful tool execution
       collector.recordAsyncOp({
         op_type: 'mcp.invoke',
         op_name: toolName,
         execution_time_ms: operationDuration,
-        status: 'success',
+        status: returnedFailure ? 'failure' : 'success',
       });
 
-      // Flush telemetry before returning
-      await collector.flush();
+      // Flush telemetry without delaying the tool result
+      void collector.flush();
 
       // Persist aggregated metrics to Redis (lazy resolution)
       const metrics = {
         tool_name: toolName,
         duration_ms: Date.now() - startMs,
-        status: 'success',
+        status: returnedFailure ? 'error' : 'success',
         timestamp: new Date().toISOString(),
       };
 
@@ -92,14 +97,14 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
       });
 
       // Flush error telemetry
-      await collector.flush();
+      void collector.flush();
 
       // Persist error metrics to Redis (lazy resolution)
       const metrics = {
         tool_name: toolName,
         duration_ms: durationMs,
         status: 'error',
-        error: errorMsg,
+        error_kind: 'HANDLER_THROWN',
         timestamp: new Date().toISOString(),
       };
 
@@ -116,6 +121,8 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
       }
 
       throw err;
+    } finally {
+      collector.destroy();
     }
   };
 }

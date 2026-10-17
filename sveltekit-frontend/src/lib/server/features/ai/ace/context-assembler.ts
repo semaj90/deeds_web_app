@@ -4354,21 +4354,21 @@ export async function assembleACEContext(opts: {
 
       // Extract packet/feature IDs from top results
       const acePayloads = Array.isArray(finalContext.acePayloads) ? finalContext.acePayloads : [];
-      const { selectedPacketKey, selectedFeatureId, featureIds: emittedFeatureIds } =
+      const { selectedPacketKey, selectedPacketKeys, selectedFeatureId, featureIds: emittedFeatureIds, packetContext } =
         extractPacketAndFeatureIds(acePayloads.slice(0, 5) as any);
 
       // Phase 2: Extract SOM cell and other packet context from top candidate
-      const topCandidate = (acePayloads[0] as any) ?? {};
-      const somCell = topCandidate.som_cluster ?? topCandidate.som_cell ?? null;
+      const somCell = packetContext.som_cell ?? null;
 
       // Emit telemetry asynchronously (includes Phase 2 packet-centric context)
       recordACERetrievalTelemetry({
+        traceId: opts.traceId,
         query,
         vectorHits: codebaseContextCount,
         trigramHits: ragChunkCount,
         ftsHits: kbChunkCount,
         selectedPacketKey,
-        selectedPacketKeys: selectedPacketKey ? [selectedPacketKey] : [],
+        selectedPacketKeys,
         selectedFeatureId,
         featureIds: emittedFeatureIds,
         fusionScore: undefined,
@@ -4380,6 +4380,7 @@ export async function assembleACEContext(opts: {
         fromParentAtlas: opts.mode === 'parent_atlas',
         // Phase 2: Packet-centric context (8 mandatory fields)
         somCell,
+        packetContext,
       }).catch(() => {
         // Telemetry failure is non-fatal
       });

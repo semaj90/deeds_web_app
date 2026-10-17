@@ -65,6 +65,7 @@ export interface ProjectionSnapshot {
 
 export interface ValidationResultV1 {
   // ── IDENTITY BEING VALIDATED ──────────────────────────────────
+
   packetKey: string; // the packet_key we're tracking
   workspaceId: string; // the workspace context
 
@@ -100,6 +101,13 @@ export interface ValidationResultV1 {
 }
 
 /**
+ * ContractValidationResult — Canonical admission envelope for packets and facts.
+ * Conforms to MASTER-FEATURE-TODO-2026-05-20 lines 946-952.
+ */
+export type ContractValidationResult = ValidationResultV1;
+
+/**
+
  * Gate status levels (used across all Phase 108 work)
  *
  * PRESENT — file/function exists in codebase

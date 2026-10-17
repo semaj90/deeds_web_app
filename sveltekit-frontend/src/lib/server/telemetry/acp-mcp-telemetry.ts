@@ -4,10 +4,16 @@
  * Used by dispatcher nodes, MCP tools, and LangGraph subagents
  */
 
+import { AcpObservationSchema } from './acp-observation.js';
+import type { PacketCentricContext, PacketCentricTelemetryEvent } from './packet-centric-telemetry.js';
+
 export interface AcpTelemetryConfig {
+  trace_id?: string | null;
   node_id?: string;
   enable_async_flush?: boolean;
   flush_interval_ms?: number;
+  max_buffer_events?: number;
+  packet_context?: PacketCentricContext;
 }
 
 export interface RoutingDecision {
@@ -28,7 +34,7 @@ export interface ToolCall {
 }
 
 export interface AsyncOp {
-  op_type: 'postgres.query' | 'redis.get' | 'qdrant.search' | 'neo4j.run' | 'grpc.call' | 'mcp.invoke';
+  op_type: 'postgres.query' | 'redis.get' | 'qdrant.search' | 'neo4j.run' | 'grpc.call' | 'mcp.invoke' | 'dispatcher.node';
   op_name: string;
   execution_time_ms: number;
   status: 'success' | 'failure' | 'timeout';
@@ -36,6 +42,8 @@ export interface AsyncOp {
 }
 
 export interface TelemetryEvent {
+  trace_id?: string | null;
+  packet_context?: PacketCentricContext;
   timestamp: string;
   node_id?: string;
   routing_decisions: RoutingDecision[];
@@ -51,7 +59,11 @@ export interface TelemetryEvent {
  */
 export class AcpTelemetryCollector {
   private events: TelemetryEvent[] = [];
-  private config: Required<AcpTelemetryConfig>;
+  private config: Required<Omit<AcpTelemetryConfig, 'packet_context' | 'trace_id'>>;
+  private traceId?: string | null;
+  private packetContext?: PacketCentricContext;
+  private flushPromise?: Promise<void>;
+  private droppedEvents = 0;
   private flushTimer?: NodeJS.Timeout;
 
   constructor(config: AcpTelemetryConfig = {}) {
@@ -59,7 +71,10 @@ export class AcpTelemetryCollector {
       node_id: config.node_id || 'unknown',
       enable_async_flush: config.enable_async_flush ?? true,
       flush_interval_ms: config.flush_interval_ms || 1000,
+      max_buffer_events: Math.max(1, Math.min(10000, Math.trunc(config.max_buffer_events ?? 1000) || 1000)),
     };
+    this.packetContext = config.packet_context ? { ...config.packet_context } : undefined;
+    this.traceId = config.trace_id;
 
     if (this.config.enable_async_flush) {
       this.startFlushTimer();
@@ -78,7 +93,7 @@ export class AcpTelemetryCollector {
       tool_calls: [],
       async_ops: [],
     };
-    this.events.push(event);
+    this.enqueue(event);
   }
 
   /**
@@ -93,7 +108,7 @@ export class AcpTelemetryCollector {
       tool_calls: [toolCall],
       async_ops: [],
     };
-    this.events.push(event);
+    this.enqueue(event);
   }
 
   /**
@@ -108,14 +123,14 @@ export class AcpTelemetryCollector {
       tool_calls: [],
       async_ops: [asyncOp],
     };
-    this.events.push(event);
+    this.enqueue(event);
   }
 
   /**
    * Record multiple events
    */
   recordEvents(events: TelemetryEvent[]): void {
-    this.events.push(...events);
+    for (const event of events) this.enqueue(event);
   }
 
   /**
@@ -136,14 +151,50 @@ export class AcpTelemetryCollector {
    * Flush events to storage
    * This is where you'd implement Redis/Postgres writes
    */
-  async flush(): Promise<void> {
-    if (this.events.length === 0) {
-      return;
-    }
+  flush(): Promise<void> {
+    if (this.flushPromise) return this.flushPromise;
+    const batch = this.events.slice(0, 16);
+    if (batch.length === 0) return Promise.resolve();
+    this.flushPromise = this.flushBatch(batch).finally(() => { this.flushPromise = undefined; });
+    return this.flushPromise;
+  }
 
-    // In real implementation, write to Redis/Postgres here
-    // For now, just clear the buffer
-    this.events = [];
+  getDeliveryStatus(): { pending: number; dropped: number } {
+    return { pending: this.events.length, dropped: this.droppedEvents };
+  }
+
+  private enqueue(event: TelemetryEvent): void {
+    this.events.push({ ...event, trace_id: Object.hasOwn(event, 'trace_id') ? event.trace_id : this.traceId,
+      packet_context: { ...(event.packet_context ?? this.packetContext) } });
+    const overflow = this.events.length - this.config.max_buffer_events;
+    if (overflow > 0) {
+      this.events.splice(0, overflow);
+      this.droppedEvents += overflow;
+    }
+  }
+
+  private async flushBatch(batch: TelemetryEvent[]): Promise<void> {
+    for (const event of batch) {
+      try {
+        const observation = AcpObservationSchema.parse({ schema: 'atlas.acp-observation.v1', timestamp: event.timestamp,
+          trace_id: event.trace_id,
+          node_id: event.node_id ?? null, canonicalAuthority: false,
+          routing_decisions: event.routing_decisions.map((decision) => ({ decision_type: decision.decision_type,
+            selected_path: decision.selected_path, confidence: decision.confidence, alternatives: decision.alternatives })),
+          tool_calls: event.tool_calls.map((call) => ({ tool_name: call.tool_name, execution_time_ms: call.execution_time_ms,
+            status: call.status, cache_hit: call.cache_hit ?? null })),
+          async_ops: event.async_ops.map((operation) => ({ op_type: operation.op_type, op_name: operation.op_name,
+            execution_time_ms: operation.execution_time_ms, status: operation.status })),
+        });
+        const payload: PacketCentricTelemetryEvent = { surface: 'acp', packet_context: event.packet_context,
+          trace_id: event.trace_id,
+          latency_ms: event.latency_ms, acp_observation: observation };
+        const { recordPacketCentricTelemetryAcknowledged } = await import('./packet-centric-telemetry.js');
+        if (await recordPacketCentricTelemetryAcknowledged(payload) === true) {
+          this.events = this.events.filter((pending) => pending !== event);
+        }
+      } catch { }
+    }
   }
 
   /**
@@ -157,6 +208,7 @@ export class AcpTelemetryCollector {
         console.error('[acp-telemetry] Flush error:', err);
       }
     }, this.config.flush_interval_ms);
+    this.flushTimer.unref?.();
   }
 
   /**

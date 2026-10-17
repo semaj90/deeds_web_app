@@ -7910,6 +7910,50 @@ collection-role audit) into one `ParentAtlasPromotionBoardV2` snapshot.
       (`INCOMPLETE_FAIL_CLOSED`). Done only when every sub-task below passes
       its validator. Review UI: `scripts/atlas/serve-golden-review-v1.mjs`
       (127.0.0.1 only, writes `.tmp/atlas/golden-relevance-judgments-v1.ndjson`).
+  - [x] `GOLDEN-RELEVANCE-VALIDATOR-HARDENING-01` (2026-10-16;
+        component-tested, not relevance completion): reuse the existing
+        `golden-review-journal-v1.mjs` human-judgment rules in both queue and
+        pool validators. Require finite confidence, nonblank reviewer,
+        `HUMAN_REVIEWED` source, boolean negative flag and grade-zero hard
+        negatives. Invalid grades/metadata no longer count as completed.
+        Journal readback also rejects proxy-source/blank-reviewer events.
+        Nineteen focused tests passed, including actual CLI rejection fixtures
+        and exclusive-write report preservation. Log:
+        `docs/reports/golden-review-validator-tests-20261016.txt`.
+        Fresh pooled queue receipt:
+        `docs/reports/golden-relevance-review-queue-validation-2026-10-16T16-56-25-155Z.json`
+        (60 queries, 1,287 blank, zero completed judgments). Fresh bound pool:
+        `docs/reports/golden-relevance-review-pool-validation-2026-10-16T16-56-36-671Z.json`
+        (60 queries, 2,433 blank, zero completed and zero revision-bound
+        candidates). Both retain `importAllowed:false`; no labels were assigned.
+        Reports now use exclusive timestamped output, or explicit `--output=...`,
+        and retain exact input SHA-256. Historical reports are not replaced.
+  - [ ] Bind promotion-audit consumers to an explicitly selected current
+        validation receipt and verify its exact input checksum. The two direct
+        golden-validation consumers now have the component proof below; other
+        reconciliation scripts and historical parent-board inputs still require
+        explicit current-input selection. Declared human
+        metadata validation is not reviewer authentication, journal/cohort
+        readback, query eligibility, rubric ratification, source authority,
+        training eligibility, or permission to import.
+    - [x] `GOLDEN-VALIDATION-CONSUMER-READBACK-01` (2026-10-16;
+          diagnostic artifact proof): both `audit-parent-atlas-promotion-gates-v1.mjs`
+          and `audit-promotion-board-reconcile-v2.mjs` require explicit
+          `--golden-validation-report=...` and `--golden-review-input=...`
+          for golden observations. Shared existing journal-owner helper reads
+          exact receipt/input bytes, validates schema/path/checksum/authority
+          flags, independently recomputes query/judgment counts, and records
+          both digests. No implicit newest-file or fixed historical fallback.
+          Missing/mismatched inputs remain rejected/unselected; bound observations
+          remain non-authoritative. Audit checksum includes selected evidence.
+          `--output=...` uses exclusive writes and refuses report replacement.
+          Twenty-eight focused tests passed, including real audit CLI fixtures.
+          Current local replay: 60 queries, 1,287 blank, zero completed labels;
+          `safeToImportJudgments=false`, `safeToConfigureRerank=false`.
+          Receipts: `docs/reports/parent-atlas-promotion-gates-golden-readback-20261016.json`
+          and `docs/reports/promotion-board-golden-readback-20261016.json`.
+          This does not refresh other historical evidence or prove runtime/source
+          authority. No DB/cache/model/service changes were performed.
   - [ ] `GOLDEN-RELEVANCE-ELIGIBILITY-01` — a human reviewer marks each of the
         60 queries `VALID`, `UNCLEAR`, `INVALID_META_PROMPT` or
         `INVALID_ARTIFACT` at `/eligibility`. Only `VALID` queries are graded.
@@ -15519,6 +15563,37 @@ and EmbeddingGemma via Ollama for embeddings; source compatibility routes still 
 audit. Intent caching, graph topology, TurboVec-in-ACE wiring, and prompt subagent handoff remain
 proposals. No database, Qdrant, Neo4j, Valkey, model, or GPU writes were performed in this audit.
 
+### Legacy Phase 11G claim audit — intent cache / labels / topology (2026-10-16)
+
+- The May checklist marks five legacy Phase 11G tasks checked, but source inspection classifies them as `CREATED`, not `WIRED` or production `PROVEN`. `scripts/ingest/intent-cache.mjs` reads `.opencode/ace-packet.json` and `.tmp/feature-labels.ndjson`, derives `acePacketId` from `generatedAt` (or the literal `unknown`), truncates the intent digest to 16 hex characters, writes a manifest even in `--dry-run`, and on normal execution writes `intent:*` and a label counter directly to Redis. It does not establish canonical packet/source qualification or a production caller. Do not run it as an audit command.
+- `scripts/graphify/feature-labeling.mjs` labels source-reference strings with ordered regexes; it is a heuristic proposal, not semantic evidence or a canonical taxonomy decision. It writes `.tmp/feature-labels.ndjson` unless `--dry-run`.
+- `scripts/graphify/domain-topology.mjs` creates pairwise links from shared heuristic labels (capped at 10 members per label), not source-grounded dependency/reference edges or N-ary facts. It writes `.tmp/domain-topology.{json,md}` unless `--dry-run`; no production Neo4j/PostgreSQL projection was established.
+- Current `sveltekit-frontend/package.json` has no `graphify:feature-labels`, `graphify:domain-topology`, or `recommendations:build` script; it has `atlas:recommendations:build`, which targets a different script. `startup-briefing.mjs` conditionally schedules the two graphify commands only if they exist in the selected package scripts. This is not caller proof for the legacy Phase 11G wiring claim.
+- No commands were run against Redis/Valkey, no helper was executed, and no cache, graph, or source state was changed. Keep `INTENT-ACE-LINEAGE-01`, `FEATURE-LABEL-PROPOSAL-01`, and `DOMAIN-TOPOLOGY-SHADOW-01` open pending qualified inputs, explicit safe consumer wiring, and readback receipts.
+
+### Legacy Phase 11H/11I claim audit — prompt and summary lifecycle (2026-10-16)
+
+- **11H:** `scripts/agent/prompt-generator.mjs` and `scripts/agent/turbovec-search-memory.mjs` exist. The root manifest has `atlas:agent:prompt:replay` and `atlas:agent:prompt:ornith`, but no `agent:prompt` or `agent:search-memory` alias matching the legacy checklist. No live prompt generation, Redis memory-cache roundtrip, source-qualified ACE handoff, or deterministic citation receipt was produced in this audit. Classify script presence as `CREATED`; checklist completion is not `WIRED`/`PROVEN` evidence.
+- **11I:** `scripts/opencode/nightly-summary.mjs` exists and can write a local nightly Markdown file plus Redis key, but no package alias or active scheduler/startup call to that producer was found. The weekly archive script is at `sveltekit-frontend/scripts/opencode/weekly-cold-archive.mjs`; its root resolves to `sveltekit-frontend`, while the nightly producer resolves to the repository root, so they read/write different `.opencode` trees. `sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs` does attempt `archive:weekly-cold` only in its changed-files branch, but `sveltekit-frontend/config/startup-ace-policy.json` denies that task and no corresponding package alias was found. Therefore this is not a functioning weekly schedule.
+- The weekly script's non-dry path directly writes archive files and inserts into `ace_context_sources`; this bypasses the repository's required promotion/schema-gated durable-mutation flow. Do not enable or run that path as a fix. Its `--dry-run` is safer but does not establish archive readback or production scheduling.
+- No prompt, cache, summary, database, or scheduler command was executed. Keep 11H/11I open until the owner/root mismatch, invocation contract, write authorization, provenance, and independent readback are resolved.
+
+### Legacy Phase 10B claim audit — TurboVec card rerank (2026-10-16)
+
+- The checklist's four checked items are not current production acceptance. `scripts/ingest/rerank-cards.mjs` exists and is called by the legacy `scripts/ingest/run-pipeline.mjs`, but the latter also runs PostgreSQL and Qdrant writers and has no scoped read-only validation mode. No `rerank:cards` or `recommendations:build` alias was found in root or frontend package manifests, and the user-facing SearchRuntime caller is not established by this script sequence.
+- Despite comments saying “never makes network calls,” the reranker fetches `http://127.0.0.1:8791/health` and may POST to `/rerank`. Its query vector is synthesized by averaging up to five candidate vectors because the actual query vector is unavailable. It then combines a path-derived authority heuristic and keyword-count heuristic with optional TurboVec scores; this is not evidence of query-relevance improvement or a valid semantic rerank.
+- The non-dry path overwrites `.tmp/retrieval-ranking-report.json` and writes `.tmp/rerank-diff.json`; `--dry-run` still performs health/rerank network calls. No run was performed. Prior owner evidence in this ledger reports the live TurboVec health as `indexed=0`, `dim=64`, `bits=4`, `turbovec=false`; do not treat service reachability or this legacy script as an active ranked lane.
+- Classification: `CREATED`; legacy pipeline caller exists but includes unrelated writes; production SearchRuntime `WIRED` is not proven; relevance/quality `PROVEN` is absent. Keep `TURBOVEC-ONE-LANE-01` open until a bounded frozen-candidate evaluation uses the actual query vector, exact identity mapping, deterministic baseline, Recall@K/MRR/nDCG, fallback, and independent receipt. TurboVec remains optional and cannot add a semantic vote.
+
+### Legacy Phase AC cartridge fallback audit — 2026-10-16
+
+- Current source confirms a conditional tier-3 call from `sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts`: it runs only after the earlier vector result set is empty and PostgreSQL FTS also returns no rows. `atlas-cartridge-seeds.ts` applies keyword overlap and caps score at 0.25; it is not a vector lane or canonical source resolver. This establishes source-level wiring, not a live request or final ContextManifest proof.
+- The local seed artifact `.tmp/atlas-cartridge-seeds.jsonl` was last modified 2026-06-08, is 2,794,908 bytes, and its inspected row has `sourceRef` but no `sourceRevision` or `workspaceRevision`. The generator's stable seed hash is over feature key + source reference, not source bytes/revision. Do not admit these rows as exact source evidence or infer current source identity from the path.
+- Fresh caller review confirms the read adapter only `JSON.parse`s each line and casts it to `AtlasSeedTile`; it does not schema-validate required fields or bind records to a source/workspace revision. Its cache invalidates on file mtime only. `queryAtlasSeeds` returns synthetic feature-card text with `filePath = sourceRef`, and the context assembler returns these matches directly from the Tier-3 fallback. This is candidate discovery only; it cannot establish exact source evidence or ContextManifest admission.
+- Read-only full snapshot census (2026-10-16): 4,173 valid JSONL rows, SHA-256 `sha256:0b92c794701939739f04027d41d53e9cc8a1026566ab9e6960acef39db25e468`; all 4,173 lack `packetKey`, `sourceRevision`, and `workspaceRevision`; no duplicate `seed_id` values. Artifact is gitignored at `.tmp/` and last modified `2026-06-08T23:13:28.262Z`. The generator uses truncated SHA-1 of feature key + `sourceRef`, not source bytes. `--dry-run` was source-inspected and does not write output files or attempt Redis publish; it was not executed.
+- The seed generator and fallback module exist; no focused `atlas-cartridge-seeds` test was found in the targeted retrieval directory, and the current artifact is stale. The May claims of 4,209 generated live seeds, mtime cache behavior and score ceiling are historical/component-level only; this audit did not regenerate the output, run a live request, or write stores.
+- Classification: fallback `WIRED` at source level and `CREATED`; current artifact freshness and source lineage `NOT_PROVEN`; production evidence admission `BLOCKED` until a current source-bound seed snapshot or qualified candidate path is used. Keep legal/evidence isolation and low-tier fallback behavior; do not promote or rewrite source/revision fields from this audit.
+
 ### Current source-inventory and binding gate (2026-10-12)
 
 - [x] Classified the repository-root `.archive/` directory as `BACKUP_OR_ARCHIVE` in
@@ -15923,6 +15998,165 @@ production wiring and end-to-end admission gates remain open.
 Status: **SOURCE_HARDENED / TEST_UNVERIFIED / LIVE_NOT_ENABLED**. Report: `docs/reports/trace-optional-six-tool-source-hardening-20261015.md`.
 ## Canonical-state correction — 2026-10-14
 
+### PHASE17-19-COMPLETION-PROOF-GUARD-01 (2026-10-16)
+
+#### BROWSER-11G-02A — existing scorer CPU contract and resource safeguards
+
+- [x] Extend the existing `src/lib/utils/gpu-reranker.ts`, not a second ranking
+  engine. Export `atlas.browser-doc-features.v1`, a 4,096-row cap and a finite
+  FP32 CPU oracle over the existing five-field layout. Reject missing,
+  nonfinite and non-FP32 features; preserve row order and return empty input
+  without device allocation. Existing heuristic weights are unchanged and
+  are not described as trained or relevance-calibrated.
+- [x] Extract the existing scoring kernel into
+  `src/lib/webgpu/schema-encoder.wgsl`, consumed by that same utility. Add
+  secure-context/SSR guards, shared concurrent initialization, disposal and
+  device-loss handling. GPU work checks buffer limits, compares readback with
+  CPU scores within `1e-5 + abs(reference)*1e-5`, and falls back on allocation,
+  mapping or numeric failures. Allocated buffers are destroyed in `finally`.
+- [x] Ten focused tests passed using real CPU math and mocked WebGPU objects,
+  including successful readback, numeric mismatch, partial allocation, mapping
+  failure, buffer limits, SSR, concurrent init and disposal. This is not GPU
+  execution or browser parity proof. Log:
+  `docs/reports/phase11g-browser-scorer-tests-20261016.txt`.
+- [x] Focused strict TypeScript check passed with installed WebGPU/Vite types.
+  Initial output exposed an ArrayBufferLike/SAB mismatch at GPU upload; packed
+  input now explicitly owns an ArrayBuffer. Logs preserve the initial failure
+  and final success:
+  `docs/reports/phase11g-browser-scorer-typecheck-20261016.txt` and
+  `docs/reports/phase11g-browser-scorer-typecheck-final-20261016.txt`.
+- [ ] `11G-02` real browser shader compilation, CPU/GPU numerical and rank-tie
+  parity, latency and device-loss proof. No physical GPU was requested here.
+- [ ] `11G-03` dedicated browser worker and versioned transfer/SAB ownership
+  protocol. The existing Node `compute-worker.mjs` is not that browser owner.
+- [ ] `11G-04` identify the deployed Service Worker and implement digest-bound
+  model/weight asset lifecycle, upgrade/quota/offline recovery without private
+  retrieval persistence or GPU work in the Service Worker.
+- [ ] `11G-05/06` preserve admitted candidate IDs/ContextManifest checksum at
+  the caller, feature-flag presentation-only integration, resource receipts and
+  golden shadow evaluation. No production caller, model-cache wiring, retrieval
+  vote, new canonical identity, server mutation or browser activation was added.
+- Receipt: `docs/reports/phase11g-browser-scorer-component-20261016.json`.
+
+#### PHASE11D-LEGACY-SEMANTIC-PROVENANCE-01 (2026-10-16)
+
+- [x] Trace `scripts/ingest/rank-cards.mjs` and its legacy embedding producer.
+  The ranker fabricated missing query/card vectors through SHA-256-derived
+  pseudo-embeddings. `embed-cards.mjs` also falls back to pseudo vectors but
+  writes the same `{id,vector,metadata}` shape without model/producer/source
+  qualification, so cache presence cannot distinguish actual embeddings.
+- [x] Remove pseudo-vector generation and implicit Ollama query requests from
+  the legacy ranker. All legacy-cache semantic signals remain null with
+  `semanticPresence=false` and explicit missing/unqualified reason; numeric
+  heuristic aggregation does not pretend a missing signal is a measured zero.
+  Ranking is now dry-run-only, non-training, non-promotional and advisory;
+  default/apply calls reject and no report replaces the historical ranking
+  artifact. Equal heuristic scores have an explicit card-ID tie-break.
+- [x] Three actual CLI tests passed using fixture card/cache files, covering
+  a present unqualified vector, a missing vector, missing semantic values,
+  deterministic ties, no writes/model requests, apply rejection and bounded
+  candidate-count validation. Log:
+  `docs/reports/phase11d-semantic-preview-tests-20261016.txt`.
+- [ ] Reconcile the still-active legacy `embed-cards.mjs` producer and any
+  historical pseudo-vector cache artifacts through the existing canonical
+  embedding/source owners. Do not relabel or overwrite those artifacts to
+  claim provenance. For production semantic ranking, use admitted
+  `semantic_768` through SearchRuntime rather than enabling this parallel
+  heuristic ranker. Golden reviewed labels, exact lineage, quality comparison
+  and ContextManifest admission remain separate open gates.
+- No real corpus ranking, model load, GPU execution, DB/cache/source-revision
+  writes or production context injection was performed. The existing
+  `compress-cards.mjs` source already blocks ACE promotion and emits candidate
+  packets only; this observation is static, not a fresh compressor test.
+- Receipt: `docs/reports/phase11d-legacy-semantic-provenance-20261016.json`.
+
+#### PHASE19-SYNTHETIC-FEEDBACK-QUARANTINE-01
+
+- [x] Trace the existing seed producer: it generated pseudo-cosines from hashed
+  card IDs, defaulted missing scores to 0.5 and appended them as retrieval
+  feedback. It is now import-safe and preview-only. Non-dry/default/`--apply`
+  invocations reject before input I/O; the append/report-write branch was
+  removed. `--dry-run` emits bounded non-authoritative proposals with exact
+  input-byte checksums, observed scores or null, and `trainingEligible=false`.
+  No fallback card ID, synthetic cosine, fabricated feedback or source alias
+  is generated. Identity duplicates, source conflicts and invalid scores reject.
+- [x] Six producer tests plus the existing ten hook tests passed (16 total).
+  Tests exercise the actual CLI, default/apply rejection before opening missing
+  inputs, read-only preview, exact digests and no output-file creation. Log:
+  `docs/reports/phase19-seed-quarantine-tests-20261016.txt`.
+- Root selection correction: the previous hook run inspected repo-root `.tmp`
+  (443 non-seed events with no `card_id`). The seed producer defaults to
+  `sveltekit-frontend/.tmp`, a different artifact root. That frontend log has
+  two rows: one card-ID/`phase19-seed` legacy seed and one other event. These
+  counts cannot be merged or used as outcomes. Existing logs were not edited.
+- [ ] Independently review legacy seed contamination and the downstream
+  weight-updater eligibility boundary without rewriting history. The existing
+  `audit-phase17-21-workstation.mjs` previously labelled Phase 19 `OPERATIONAL`
+  from a row-count threshold (>50). This false readiness claim is corrected
+  under `WORKSTATION-AUDIT-PROOF-QUALIFICATION-01` in
+  `parent-atlas-agent-framework-integration-hardening/tasks.md`; the current
+  offline audit leaves all P17–P21 gates `NOT_PROVEN` with null completion.
+- Receipt: `docs/reports/phase19-seed-quarantine-20261016.json`.
+
+#### FEEDBACK-WEIGHT-PREVIEW-QUARANTINE-01 (2026-10-16)
+
+- [x] Trace and contain `scripts/atlas/token-card-weight-updater.mjs`. Its
+  default local-weight writes and optional Redis mutation path are removed;
+  only explicit offline `--dry-run` preview is allowed. Default/apply/Redis
+  calls fail before input or service I/O. All preview rows remain heuristic,
+  non-authoritative, non-training-eligible and non-promotional.
+- [x] Exclude legacy `phase19-seed`, seed proposals and explicit
+  `trainingEligible=false` observations, including nested payload flags.
+  Fix the existing multi-card feedback ternary, which dereferenced a missing
+  payload instead of using `card_ids`. Identity envelope choices are explicit;
+  no packet identity is inferred from the observed IDs.
+- [x] Eleven focused tests passed (five updater and six producer tests),
+  including real CLI no-write preview and default/apply/Redis rejection.
+  Malformed JSONL rejects rather than disappearing silently; input reads are
+  capped at 16 MiB, strict UTF-8, and retain exact byte checksums and missing
+  input states. Log: `docs/reports/feedback-weight-preview-tests-final-20261016.txt`.
+- Local preview `docs/reports/feedback-weight-local-preview-final-20261016.json`
+  produced zero records: 443 root retrieval-log rows lack the updater's declared
+  card identity fields, several other inputs are absent and the card list is
+  empty. This is not proof that feedback is absent or unimportant; the live
+  event-schema/canonical-card crosswalk remains unproven. No field alias or
+  fake label was introduced to populate the result.
+- [ ] Admit source-bound, reviewed/verified outcome evidence through the
+  existing learning owner before production weights or cache publication can
+  resume. Preview metadata filtering is not reviewer authentication, training
+  admission, held-out evaluation or model promotion. Existing weights/logs were
+  preserved; no Redis/DB/cache/source-revision writes occurred.
+
+- [x] Harden the existing `sveltekit-frontend/scripts/atlas/phase-lane-completion.mjs`
+  diagnostic hook. File existence/mtime and card-ID coverage no longer produce
+  `READY_TO_PROMOTE`. Phase 19 rejects missing IDs, invalid/duplicate JSONL
+  identity rows, empty cohorts and inputs over 16 MiB instead of ignoring them
+  or falling back to a newer mtime. Complete ID coverage remains
+  `SEED_IDS_COVERED_PROOF_REQUIRED`. Ten fixture tests passed; log:
+  `docs/reports/phase-lane-proof-guard-tests-final-20261016.txt`.
+- [x] Run one local artifact-only audit with explicit new output. Receipt:
+  `docs/reports/phase-lane-artifact-audit-20261016.json`. It records file-byte
+  SHA-256 evidence and `promotionEligible=false`, `runtimeProof=false`,
+  `modelAdmission=false`, `sourceAdmission=false`. Phase 17 is
+  `STALE_NEEDS_REGEN`; Phase 18 is `FRESHNESS_OBSERVED_PROOF_REQUIRED`; Phase 19
+  is `INVALID_SEED_EVIDENCE`. The phase18 input has one valid card-ID row; the
+  retrieval-loop log has 443 JSON rows and all 443 lack `card_id`. No alias,
+  guessed identity or regeneration was substituted to make coverage pass.
+  This audit resolves paths relative to the recorded artifact base directory;
+  it does not establish a canonical source/packet/model corpus.
+- [x] Align the separate `ml/phase18-reranker.ts` compatibility status with its
+  existing `MODEL_UNAVAILABLE` result: it no longer claims active training or an
+  authority-score fallback. Five focused tests passed; log:
+  `docs/reports/phase18-unavailable-status-tests-20261016.txt`. This is not the
+  owned production reranker and was not wired or promoted.
+- [ ] Close live Phase 17 feature admission, trained/calibrated Phase 18 model
+  evaluation and source-qualified Phase 19 outcome replay. The master TODO's
+  historical 100/100 and checked-hook claims do not close these gates.
+- Output reports use exclusive timestamped paths (or explicit `--output=...`)
+  and do not replace historical `phase-lane-completion.json` snapshots. Imports
+  no longer execute the CLI. No DB/cache writes, training, service restart,
+  model load, Graphify refresh, source revision write or archive occurred.
+
 - Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
 - Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
 - Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
@@ -15942,3 +16176,86 @@ Status: **SOURCE_HARDENED / TEST_UNVERIFIED / LIVE_NOT_ENABLED**. Report: `docs/
 - [ ] Remaining parse failures (2): `sveltekit-frontend/tsconfig.frontend.json` and `sveltekit-frontend/.vscode/tasks.json` (JSONC; needs a JSON-shape policy v2 decision).
 - [x] `sveltekit-frontend/PACKAGE_SCRIPTS_SNIPPET.json` (`SOURCE_TEXT_ENVELOPE_OFFSET_SPLITS_SURROGATE`) looks like a stale `graphify_files` row, not a live bug: reproduced the real pipeline (`decodeSourceTextEnvelope` -> `extractJsonSymbols` -> `decodedOffsetToRawByte`) on 2026-10-16 with 0 failures across 52 symbols and 6 emoji keys. The row was last updated 2026-09-30 16:01Z and the envelope/extractor code changed in commit `68dedecf14` (2026-09-30); commit-vs-failure ordering not proven. Clears on the next authorized `--apply` extractor run; no code change.
 - [ ] Still blocking admission, unchanged: `ORDINAL_MAP_SEALED` (1,587 packets without chunk lineage; 223 AST + 1,337 text candidate chunks dry-run under `.tmp/atlas/candidate-chunk-dry-run-2026-10-15/`, text chunker owner UNDECIDED, 27 stale), `PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`, `ACE_EVIDENCE_GROUNDED`. Chunk and lineage writes need explicit authorization.
+
+### GOLDEN-REVIEW-DISPLAY-REDACTION-01 — display-only credential masking (2026-10-16)
+
+- [x] Added `scripts/atlas/lib/golden-review-display-redaction-v1.mjs` and wired it into `scripts/atlas/serve-golden-review-v1.mjs` for query text, candidate summaries, saved-note readback, eligibility output, and newly submitted notes. It masks common secret assignments, URL userinfo, bearer values, common provider-key shapes, and PEM private-key blocks. Frozen source pools and source checksums are unchanged.
+- [x] Focused test: `node --test scripts/atlas/lib/golden-review-display-redaction-v1.test.mjs` — 3/3 passed. Server syntax and scoped `git diff --check` passed.
+- [ ] This is defense-in-depth pattern redaction, not a secret scanner or proof all sensitive data is removed. Reviewers must still stop and report any unmasked credential-like material; do not grade/import until the review pool and rubric are approved.
+- [ ] Golden relevance remains open: 60 queries, 2,433 candidates, zero human grades, zero revision-bound candidates. No review server was started and no labels were written.
+
+### LEGACY-PHASE-11E-OWNER-AUDIT-01 — recommendation wiring and outcome ownership (2026-10-16)
+
+- [x] Static audit distinguishes the heuristic artifact builder, MCP preamble client, and multi-stage recommendation workflow; findings are in `docs/reports/master-feature-phase-gates-review-20261016.md`.
+- [x] Confirmed `buildStreamPreamble` calls intent classification plus RAG-context construction, not `build_recommendation` or `record_outcome`; ACE `/api/ace/stream` still uses a legacy packet path and lacks the admitted ContextManifest/V3 bridge.
+- [x] Confirmed the multi-stage workflow's normal execution writes diagnostic reports and its proposal/outcome flags trigger additional writes; the separate MCP `record_outcome` writes a local NDJSON ledger and attempts Neo4j projection writes.
+- [ ] Reconcile one authorized outcome owner and an idempotent/readback contract; do not use the MCP `record_outcome` as an audit probe.
+- [ ] Prove one qualified candidate through final SearchRuntime selection, hydration, ACE/ContextManifest admission, canonical prompt assembly, Ornith synthesis, and citation/readback. Keep this task open until independent receipt evidence exists.
+- [ ] Do not mark the historical Phase 11E recommendation checklist complete from code presence, preamble wiring, or fixture-only tests.
+
+### LEGACY-PHASE-11F-ROUTER-DRAFT-AUDIT-01 — adaptive routing and speculative decoding (2026-10-16)
+
+- [x] Reconciled stale checklist wording: `context-assembler.ts` already calls `QueryRouter4x4.route()` in the bounded Stage B Qdrant/PostgreSQL dispatch path and applies RRF to returned hits.
+- [x] Recorded boundary: CHR97 fast returns, TurboVec prefilter, and Tier-1 routing can precede/override Stage B; source wiring is not a live route/fallback proof.
+- [x] Recorded that current matrix adaptation uses backend hit shares and Redis persistence, not reviewer-validated relevance outcomes; no new router owner is authorized.
+- [ ] Capture a bounded live route/fallback receipt with lane dispatch, per-lane hit counts, final canonical identity qualification, latency, and fallback behavior; do not use this as source-authority proof.
+- [ ] Verify any proposed user-feedback adaptation against reviewed labels, minimum cohort, rollback, and deterministic baseline before enabling it.
+- [ ] Establish the exact draft-model artifact/configuration and prove speculative decoding acceptance, latency benefit, resource ceiling, and fallback; generic `draftModel` flags do not satisfy this gate.
+- [ ] Keep Phase 11F open until all applicable route and draft-model acceptance evidence is independently read back; see `docs/reports/master-feature-phase-gates-review-20261016.md`.
+
+### PHASE-10-19-CLUSTERCARD-ROUTE-01 — fixture proof scope (2026-10-16)
+
+- [x] Ran `npx vitest run tests/atlas/identity/cluster-cards-route.test.ts`: 1 file, 3 tests passed. The test mocks PostgreSQL `tracedQuery` and Redis; it covers auth, legacy-row DTO mapping, and validated cache-hit behavior.
+- [ ] Live PostgreSQL schema and route HTTP readback remain unproven; the mocked test does not establish Qdrant reconciliation or live cache behavior.
+- [ ] Keep the broader Phase 10–19 follow-on gate open for live reconciliation, model artifacts, calibrated quality, and lane-transition receipts. See `docs/reports/master-feature-phase-gates-review-20261016.md`.
+
+### PHASE-10-19-RETRIEVAL-PASS-01 — standalone prototype versus pipeline wiring (2026-10-16)
+
+- [x] Static audit found Ollama/Qdrant/Neo4j/Redis/Langfuse operations inside `scripts/ingest/retrieval-pass.mjs`; no package-script or production source caller was established, and `scripts/ingest/run-pipeline.mjs` does not invoke it.
+- [x] Recorded that `--dry-run` writes local report artifacts and that `NO_REDIS_WRITE` does not guard the embedding-cache write; do not treat it as a side-effect-free audit command.
+- [ ] Reconcile the standalone script with existing SearchRuntime and recommendation owners, or retire the legacy integration claim; no second fusion/ranking owner.
+- [ ] Require a bounded, revision-qualified replay with explicit read/write controls and independent receipt before claiming live retrieval, graph expansion, cache, trace, or recommendation integration.
+- [ ] Keep Phase 10–19 follow-on production status partial pending caller wiring, identity qualification, calibrated evaluation, and lane completion receipts.
+
+### PHASE-101C-LDR-ACE-CANONICAL-ADMISSION-01 — bridge and evidence boundary (2026-10-16)
+
+- [x] Static source audit found `ldr-ace-bridge.ts` exports `fetchLdrResearchForAce` but has no source caller under `sveltekit-frontend/src`; the separate `openai-facade.ts` `runLdrChat` path talks to LDR HTTP endpoints and does not establish ACE bridge adoption.
+- [x] Recorded that the bridge caches by an 8-hex query hash, returns URL-backed `sourceRefs`, and launches best-effort writes to Qdrant, Redis/ACE, PostgreSQL, TurboQuant prefix cache, and glyph cache. These are not revision-qualified canonical repository evidence or durable readback proof.
+- [x] Corrected integration status: `openai-facade.ts` calls `runLdrChat` for the `yorha-ldr` alias and as an inference fallback; this proves source wiring only. The separate `fetchLdrResearchForAce` bridge still has no source caller.
+- [x] Static hardening audit found localhost and `admin`/`admin` defaults, no login-response success check, and no fail-closed timeout when the LDR polling deadline expires. Do not claim a safe live LDR lane from the read-only inference replay; it does not establish this path.
+- [x] Reconciled the stale Phase 101C NES/CHROM note: the June 1 report says both relations existed (3 packets, 3 hits), while `drizzle/sidecar-migrations.json` records an August 26 additive restore after drift. Neither is a current catalog readback; the TODO statement that the relations are currently absent is not supported by its cited June report.
+- [x] Classified the checked `research_summaries.source_ref/source_refs` migration/backfill as historical, not current PostgreSQL 18 proof: manual migrations exist and the legacy TODO refers to a PostgreSQL 17.6 apply, but no current catalog/row-count receipt was found in this static audit.
+- [x] Verified the ANN default-selection contract: `node scripts/smoke/turbovec-ann-backend-smoke.mjs` passed with `default=qdrant override=turbovec`; source sends `cuvs` to the Qdrant fallback because cuVS is not implemented in this adapter. This is selector/config proof only, not retrieval or candidate-lineage proof.
+- [x] Rechecked proposal flow: `buildAgenticFixProposal` calls the existing engram writer; the controller calls the authenticated timeline endpoint; focused mocked spec passes 3/3 and now asserts `context_timeline`, `memory_registry`, and `engram_cards` writes with join aliases.
+- [x] Corrected execution claim: `Promise.all` fans out analysis-tool calls; no repair-subagent launch was established. The proposal path does not patch source files, but it writes durable metadata. The timeline insert uses unchecked `Promise.allSettled`, and the three stores are not transactional, so partial persistence is possible.
+- [ ] Add tests for typed-over-regex precedence, malformed/conflicting join keys, and timeline-insert failure; do not promote regex-derived values to canonical identity.
+- [ ] Obtain an approved current DB readback for a bounded proposal event across `context_timeline`, `memory_registry`, and `engram_cards`; require all-or-explicitly-partial outcomes before marking durable promotion proven.
+- [ ] Add focused contract tests for source/citation preservation, bounded output, cache miss/hit identity, and fail-closed handling when canonical evidence qualification is absent; tests must not call live stores.
+- [ ] Add mocked LDR-lane tests for missing URL/credentials, login failure, malformed research ID, terminal error, polling timeout, report failure, and successful completion; require configured non-default credentials and a valid service URL before network requests.
+- [ ] Replace the stale runtime note only after a reviewed read-only report run and independent catalog/readback establish current NES/CHROM relation and row status, including missing `parentAtlasCardId` coverage; do not run the report until its filesystem outputs and current DB target are confirmed.
+- [ ] Independently verify PostgreSQL 18 `research_summaries` columns/indexes and the URL-backed row counts; preserve the old PostgreSQL 17.6 note as historical evidence rather than current proof.
+- [ ] Prove one live, read-only ANN request through the selected default Qdrant executor, canonical PostgreSQL identity hydration, and SearchRuntime result normalization; keep TurboVec/cuVS as challenger executors and do not claim ACE/ContextManifest completion from the selector smoke.
+- [ ] Establish one approved owner for LDR research-result persistence/export and remove or gate fire-and-forget multi-store writes until idempotency, permissions, and independent readback are specified.
+- [ ] Prove one LDR result through the existing evidence qualification and SearchRuntime/ACE ContextManifest path; keep external URL citations distinct from canonical packet/chunk `sourceRef` identity and do not synthesize repository revisions.
+- [ ] Keep Phase 101C open until current caller wiring, tests, exact evidence admission, and independently read-back-verified outcomes are demonstrated. Findings: `docs/reports/master-feature-phase-gates-review-20261016.md`.
+
+## Golden-review reviewer provenance audit — 2026-10-16
+
+- [ ] Define reviewer identity assurance for `scripts/atlas/serve-golden-review-v1.mjs`. Current `reviewerId` is supplied by CLI/request input and is validated as nonblank metadata only; it is not authenticated. Specify whether a controlled named reviewer attestation, signed event, or another existing identity owner is required before labels may support evaluation or training.
+- [ ] Keep local append-only journal integrity (cohort/event checksums and authority flags) separate from reviewer authentication, query eligibility, rubric approval, source authority, and import authorization. Do not mark golden review complete from structurally valid or self-attributed labels alone.
+- [x] Static audit recorded in `docs/reports/master-feature-phase-gates-review-20261016.md`; no server was started, no judgments were created, and no database/cache/vector writes occurred.
+
+## Admitted-snapshot AST JSONL staging — 2026-10-16
+
+- [x] Extended the existing `run-ast-entity-prefill-yaml.mjs` owner with explicit admitted-snapshot reads, exact workspace-revision binding, source-path containment, UTF-8 byte-boundary validation, output checksums, and create-only JSONL/receipt output. No new parser, symbol writer, or canonical identity owner was added.
+- [x] Focused path/snapshot tests pass 8/8. One-source replay parsed 20 rows; an eight-source replay parsed 111 rows. Independent readback verified exact source digests, workspace/source revision fields, in-bounds UTF-8 byte spans, and output SHA-256 `sha256:e037c4f0440e604541d8363e47b84d5c34832e77ed1c47e5c1bb53cef10bb4b0`; datastore writes were zero. Artifacts: `.tmp/atlas/admitted-snapshot-ast-prefill-20261016/cohort-8.jsonl` and `.tmp/atlas/admitted-snapshot-ast-prefill-20261016/cohort-8.jsonl.receipt.json`.
+- [ ] This is diagnostic source-bound staging only: the 8-source rows have no packet identity (`packets_selected=0`), no resolved symbol registry identity, and no canonical promotion. Keep `SYMBOLS_RESOLVED` partial and the projection fabric blocked.
+- [ ] Next, reconcile staging rows through the existing canonical symbol/packet resolver using exact `(source_ref, source_revision, workspace_revision)` joins; record unresolved/ambiguous results without aliasing or synthesizing IDs. Do not apply Graphify or packet writes until that read-only join and its bounded apply plan pass review.
+
+### Exact packet and symbol-version crosswalk — 2026-10-16
+
+- [x] Extended admitted-snapshot AST staging to join source bindings to `atlas_packets` only on exact source ref, source revision, and workspace revision. A packet key is attached only for one exact packet match; zero or multiple matches remain unbound/ambiguous. Snapshot JSONL now records the canonical source ref, not the temporary snapshot filesystem path.
+- [x] Added read-only exact symbol-version matching against the existing `atlas_symbol_versions` owner and focused negative-control tests. Symbol IDs are attached only when packet key, source ref, source revision, workspace revision, qualified name, and exact byte span all agree. Four matcher tests pass.
+- [ ] Bounded live replay for `packages/atlas-core/src/packet-reader.ts`: one exact packet (`ace:packet:bf0f0228d6c8`) and 20 AST rows; the existing symbol-version owner has 8 rows for that same packet/revision. All 8 names have span mismatches and 12 AST candidates have no exact name match; exact symbol-version matches = 0. The packet is therefore identity-qualified for diagnosis but none of these AST rows is admitted as a canonical symbol. Preserve `SYMBOLS_RESOLVED` as partial and do not infer coordinate conversions or use ML to mint identity.
+- [x] Output is create-only, checksummed, `canonicalAuthority=false`, and records zero datastore/projection writes. JSONL checksum: `sha256:79c4bf54482bc765169a32540a942d147b44fc20754845ef69dd06bb6197a6e1`; receipt: `.tmp/atlas/admitted-snapshot-ast-prefill-20261016/packet-reader-symbol-audit.jsonl.receipt.json`.
+- [ ] Next diagnostic: compare stored `atlas_symbol_versions.byte_start/byte_end` to the same exact source bytes and independently invoked canonical producer; determine whether producer ranges differ by node-kind/coordinate convention or are stale. No fuzzy/name-only join, offset adjustment, Graphify apply, backfill, or embedding/training should proceed before that diagnosis.

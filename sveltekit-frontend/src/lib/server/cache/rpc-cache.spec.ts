@@ -34,6 +34,21 @@ describe('RPC cache key hashing', () => {
 });
 
 describe('RPC cache envelope validation', () => {
+  it('hashes the actual persisted JSON payload rather than undefined properties that JSON drops', async () => {
+    const cacheStore = new MemoryRpcCache();
+    const options = { transport: 'grpc' as const, method: 'SearchChunks', ttlSeconds: 60, cacheStore };
+    let computes = 0;
+    const compute = async () => {
+      computes += 1;
+      return { ids: ['node-1'], trace_id: undefined, nested: { absent: undefined, present: 'yes' }, values: [undefined, 1] };
+    };
+    const cold = await withRpcCache({ fixture: 'undefined-json' }, compute, options);
+    const warm = await withRpcCache({ fixture: 'undefined-json' }, compute, options);
+    expect(cold.cache.hit).toBe(false);
+    expect(warm.cache.hit).toBe(true);
+    expect(computes).toBe(1);
+    expect(warm.value).toEqual({ ids: ['node-1'], nested: { present: 'yes' }, values: [null, 1] });
+  });
 	it('returns a warm hit only after validating the versioned payload envelope', async () => {
 		const cacheStore = new MemoryRpcCache();
 		const args = { query: 'graph', sourceRevision: 'source-a' };

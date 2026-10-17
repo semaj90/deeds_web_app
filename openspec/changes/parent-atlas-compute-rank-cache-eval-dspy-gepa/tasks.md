@@ -560,3 +560,15 @@ Safe next steps: reconcile this remote ledger with local HEAD, inspect existing 
 - Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
 - Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
 - This note changes no database, Qdrant, or runtime state.
+
+### P20/P21 receipt scope correction — 2026-10-16
+
+`docs/reports/polyglot-aten-dspy-gepa-oak-receipt-v1.json` has top-level
+`status=PASS`, but it is not a DSPy/GEPA optimizer receipt. The cited producer,
+`python/prove_polyglot_aten_dspy_gepa_oak_v1.py`, computes its
+`gepaReflectiveMetric` directly from two local conditions (`trace_passed` and
+`mean_savings >= 0.65`) and assembles a proposal object; the proof path does not
+invoke a DSPy module or GEPA optimizer, freeze held-out splits, or perform model
+training. Treat the PASS as bounded synthetic/helper-pipeline evidence only.
+Keep P20 `DSPY-SIDECAR-01` and P21 `GEPA-VERSION-01`, `GEPA-HELDOUT-01`, and
+`GEPA-SHADOW-01` open. No receipt was rewritten.

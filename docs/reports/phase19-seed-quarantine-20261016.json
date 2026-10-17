@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.component-proof.v1",
+  "gate": "PHASE19-SYNTHETIC-FEEDBACK-QUARANTINE-01",
+  "status": "PRODUCER_QUARANTINED_EXISTING_FEEDBACK_AND_OUTCOMES_UNQUALIFIED",
+  "canonicalAuthority": false,
+  "tests": {
+    "command": "node --test sveltekit-frontend/scripts/atlas/phase19-retrieval-loop-seed.test.mjs sveltekit-frontend/scripts/atlas/phase-lane-completion.test.mjs",
+    "passed": 16,
+    "failed": 0,
+    "log": "docs/reports/phase19-seed-quarantine-tests-20261016.txt"
+  },
+  "artifactRoots": [
+    { "path": ".tmp/atlas-retrieval-loop.jsonl", "rows": 443, "cardIdRows": 0, "legacySeedRows": 0 },
+    { "path": "sveltekit-frontend/.tmp/atlas-retrieval-loop.jsonl", "rows": 2, "cardIdRows": 1, "legacySeedRows": 1 }
+  ],
+  "writesPerformed": { "codeAndReports": true, "feedbackLogs": false, "database": false, "cacheOrProjection": false, "sourceRevision": false },
+  "remaining": [
+    "Review existing legacy seed contamination without modifying historical logs",
+    "Reconcile downstream weight-updater eligibility",
+    "Replace row-count-based Phase 19 operational claims with actual outcome proof",
+    "Resolve explicit artifact roots and canonical source/packet/outcome identity",
+    "Complete reviewed golden labels and production phase gates"
+  ],
+  "likely_cause": "A historical seed script fabricated cosine-like signals and appended them to feedback despite lacking real retrieval outcomes or reviewed labels.",
+  "evidence": ["Seed producer source", "16 passing tests including actual CLI no-write checks", "Separate root/frontend artifact inventories"],
+  "patch_targets": [
+    "sveltekit-frontend/scripts/atlas/phase19-retrieval-loop-seed.mjs",
+    "sveltekit-frontend/scripts/atlas/phase19-retrieval-loop-seed.test.mjs",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "docs/reports/master-feature-phase-gates-review-20261016.md"
+  ],
+  "safe_next_command": "node --test sveltekit-frontend/scripts/atlas/phase19-retrieval-loop-seed.test.mjs",
+  "smoke_command": "openspec validate parent-atlas-ace-rlm-bitfrost-integration --strict",
+  "report_path": "docs/reports/phase19-seed-quarantine-20261016.json"
+}

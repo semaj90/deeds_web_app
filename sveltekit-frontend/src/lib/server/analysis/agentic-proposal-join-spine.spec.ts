@@ -247,5 +247,30 @@ describe('agentic proposal join spine', () => {
       missingFeatureId: false,
       warning: null,
     });
+
+    const memoryRows = (calls.insertedByTable.get('memory_registry') ?? []) as Array<Record<string, any>>;
+    expect(memoryRows).toHaveLength(1);
+    expect(memoryRows[0]).toMatchObject({
+      memoryId: 'agentic-proposal:session-3',
+      featureFamily: 'agentic_proposal',
+      userIntent: 'repair_proposal',
+      metadata: {
+        featureId: 'agentic.timeline',
+        feature_id: 'agentic.timeline',
+        sourceRef: 'src/routes/api/v1/agentic/+server.ts',
+        source_ref: 'src/routes/api/v1/agentic/+server.ts',
+      },
+    });
+
+    const cardRows = (calls.insertedByTable.get('engram_cards') ?? []) as Array<Record<string, any>>;
+    expect(cardRows).toHaveLength(1);
+    expect(cardRows[0]).toMatchObject({
+      memoryId: 'agentic-proposal:session-3',
+      labels: { kind: 'agentic_proposal', featureId: 'agentic.timeline' },
+      sourceRefs: [
+        'src/routes/api/v1/agentic/+server.ts',
+        'src/lib/server/analysis/agentic-fix-proposal.ts',
+      ],
+    });
   });
 });

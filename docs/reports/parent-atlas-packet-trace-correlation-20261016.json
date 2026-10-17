@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.integration-progress.v1",
+  "status": "ACTIVE_PARTIAL",
+  "gate": "PACKET-TRACE-CORRELATION-01",
+  "implemented": [
+    "Explicit trace_id remains separate from packet identity",
+    "Existing canonical string validator reused with local telemetry bound of 128 characters",
+    "Actual dispatcher state channel and final state preserve supplied trace",
+    "ACP events snapshot supplied context and respect explicit null correlation",
+    "MCP optional invocation context is separate from user tool arguments",
+    "Actual ACE assembler forwards opts.traceId through metrics into existing writer",
+    "Both existing writer entrypoints preserve trace in payload and reject top-level/ACP trace mismatch"
+  ],
+  "validation": {
+    "suitesPassed": 7,
+    "testsPassed": 38,
+    "log": "docs/reports/telemetry-trace-correlation-20261016T003424.txt",
+    "storeScope": "Mocked database/Redis; actual collector, wrapper, emitter, packet writer and eval fallback",
+    "graphScope": "Actual compiled graph with node handlers mocked",
+    "syntaxTranspileErrors": 0,
+    "syntaxProductionFiles": 10,
+    "fullTypecheck": "NOT_RUN",
+    "liveRequest": "NOT_RUN",
+    "durableReadback": "NOT_RUN"
+  },
+  "limits": [
+    "String validation does not establish source lineage, request uniqueness or authority",
+    "One-argument MCP callers still have unknown correlation unless caller supplies invocation context",
+    "Transport/resource trace propagation remains separate work",
+    "No live ACP-to-ACE-to-Ornith request or independent readback is proven"
+  ],
+  "notPerformed": ["live database writes", "source-revision writes", "backfill", "service restart", "model load", "GPU job", "Svelte check", "promotion"],
+  "likely_cause": "Existing telemetry handoffs retained packet metadata but omitted the explicitly supplied request trace, preventing reliable cross-stage correlation.",
+  "evidence": ["Actual ACE opts.traceId caller", "Actual dispatcher state annotation", "38 passing focused tests"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/telemetry/acp-observation.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/retrieval-recorder.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/acp-mcp-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-telemetry-emitter.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/mcp-tool-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/dispatcher-telemetry-wrapper.ts",
+    "sveltekit-frontend/src/lib/server/langgraph/dispatcher-graph.ts",
+    "sveltekit-frontend/src/lib/server/langgraph/dispatcher-nodes/types.ts",
+    "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/telemetry-trace-correlation.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/mcp-tool-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/dispatcher-telemetry-wrapper.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-telemetry-emitter.spec.ts",
+    "docs/architecture/packet-telemetry-existing-writer-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-telemetry-lowrank-recommendation-okf-integration --strict",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/telemetry/telemetry-trace-correlation.spec.ts src/lib/server/telemetry/dispatcher-telemetry-wrapper.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-packet-trace-correlation-20261016.json",
+  "canonicalAuthority": false
+}

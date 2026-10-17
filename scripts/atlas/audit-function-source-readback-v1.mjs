@@ -41,6 +41,8 @@ const sourcePath = (sourceRef) => {
 const client = await pool.connect();
 try {
   await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+  const transactionReadOnly = (await client.query('SHOW transaction_read_only')).rows[0]?.transaction_read_only === 'on';
+  if (!transactionReadOnly) throw new Error('FUNCTION_SOURCE_READ_ONLY_NOT_CONFIRMED');
   const symbols = (await client.query(`
     SELECT symbol_version_id, packet_key, source_ref, source_revision, workspace_revision,
       byte_start, byte_end, qualified_name, upstream_node_id, upstream_symbol_id,
@@ -61,7 +63,8 @@ try {
     const rpcPackets = await client.query(`SELECT packet_key, source_ref, content_hash, payload_contract_version, octet_length(msgpack) AS msgpack_bytes FROM public.atlas_rpc_packets WHERE packet_key = $1 AND source_ref = $2 LIMIT 3`, [symbol.packet_key, symbol.source_ref]);
     const artifacts = await client.query(`SELECT artifact_id::text, artifact_type, storage_backend, (storage_location IS NOT NULL) AS has_storage_location, content_hash, status FROM public.atlas_artifacts WHERE packet_key = $1 AND source_ref = $2 LIMIT 16`, [symbol.packet_key, symbol.source_ref]);
     const sourceRefs = await client.query(`SELECT source_ref_key, content_hash, CASE WHEN jsonb_typeof(fragments) = 'array' THEN jsonb_array_length(fragments) ELSE NULL END AS fragment_count, octet_length(fragments::text) AS fragments_json_bytes FROM public.atlas_source_refs WHERE relative_path = $1 AND content_hash = ANY($2::text[]) LIMIT 8`, [symbol.source_ref, [symbol.source_revision, normalizeDigest(symbol.source_revision)]]);
-    const chunks = await client.query(`SELECT line_start, line_end, content, file_content_hash, source_revision, workspace_revision FROM public.codebase_chunk_index WHERE relative_path = $1 AND file_content_hash = $2 ORDER BY line_start, line_end, id LIMIT 128`, [symbol.source_ref, normalizeDigest(symbol.source_revision)]);
+    const chunks = await client.query(`SELECT id::text AS chunk_row_id, source_ref, line_start, line_end, content, file_content_hash, source_revision, workspace_revision, metadata->>'packet_key' AS metadata_packet_key, output_meta->>'packet_key' AS output_packet_key, metadata->>'symbol_version_id' AS metadata_symbol_version_id, output_meta->>'symbol_version_id' AS output_symbol_version_id, COUNT(*) OVER ()::int AS total_matching_rows FROM public.codebase_chunk_index WHERE relative_path = $1 AND file_content_hash = $2 ORDER BY line_start, line_end, id LIMIT 128`, [symbol.source_ref, normalizeDigest(symbol.source_revision)]);
+    const packetChunkLineage = await client.query(`SELECT id::text AS lineage_id, canonical_chunk_id, chunk_row_id::text AS chunk_row_id, source_revision, membership_status, revision_status FROM public.atlas_packet_chunk_lineage WHERE packet_key = $1 AND source_ref = $2 ORDER BY id LIMIT 129`, [symbol.packet_key, symbol.source_ref]);
 
     const expectedDigest = normalizeDigest(symbol.source_revision);
     const localPath = sourcePath(symbol.source_ref);
@@ -176,6 +179,8 @@ try {
     console.log(JSON.stringify({
       schema: 'atlas.function-source-readback-audit.v1',
       status,
+      transactionReadOnly,
+      auditImplementationChecksum: `sha256:${sha256(await readFile(new URL(import.meta.url)))}`,
       canonical: { symbolVersionId, packetKey: symbol.packet_key, sourceRef: symbol.source_ref, sourceRevision: symbol.source_revision, workspaceRevision: symbol.workspace_revision, byteStart: symbol.byte_start, byteEnd: symbol.byte_end },
       binding: { rowCount: bindings.rows.length, uniqueExactBinding: bindings.rows.length === 1, byteLength: binding?.byte_length ?? null, gitBlobOidPresent: Boolean(binding?.git_blob_oid), contentDigestMatchesSourceRevision: binding ? normalizeDigest(binding.content_digest) === expectedDigest : false, bindingValid },
       packetRows: packets.rows.length,
@@ -185,7 +190,33 @@ try {
       rpcPackets: rpcPackets.rows,
       artifacts: artifacts.rows,
       sourceRefProjection: sourceRefs.rows,
-      chunkProjection: { rowCount: chunks.rows.length, maxLine, coveredLines: lineMap.size, missingLineCount: missingLines.length, conflictingLineCount: conflicts.size, malformedChunkRows: missingRows.length, reconstructedDigestMatches: chunkMatches.length > 0, matchingVariants: chunkMatches },
+      chunkProjection: {
+        rowCount: chunks.rows.length,
+        totalMatchingRows: chunks.rows[0]?.total_matching_rows ?? 0,
+        truncated: (chunks.rows[0]?.total_matching_rows ?? 0) > chunks.rows.length,
+        rows: chunks.rows.map((row) => ({
+          chunkRowId: row.chunk_row_id,
+          sourceRef: row.source_ref,
+          lineStart: row.line_start,
+          lineEnd: row.line_end,
+          sourceRevision: row.source_revision,
+          workspaceRevision: row.workspace_revision,
+          metadataPacketKey: row.metadata_packet_key,
+          outputPacketKey: row.output_packet_key,
+          metadataSymbolVersionId: row.metadata_symbol_version_id,
+          outputSymbolVersionId: row.output_symbol_version_id,
+          sourceRevisionMatches: row.source_revision === symbol.source_revision,
+          workspaceRevisionMatches: row.workspace_revision === symbol.workspace_revision,
+        })),
+        maxLine, coveredLines: lineMap.size, missingLineCount: missingLines.length,
+        conflictingLineCount: conflicts.size, malformedChunkRows: missingRows.length,
+        reconstructedDigestMatches: chunkMatches.length > 0, matchingVariants: chunkMatches,
+      },
+      packetChunkLineage: {
+        rows: packetChunkLineage.rows.slice(0, 128),
+        truncated: packetChunkLineage.rows.length > 128,
+        canonicalAdmissionProven: false,
+      },
       workingTree: local,
       gitHistory: { commitsExamined: commits.length, matchingBlobs: gitMatches },
       exactSourceBytesVerified: status === 'EXACT_SOURCE_BYTES_FOUND',

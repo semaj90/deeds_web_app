@@ -780,58 +780,86 @@ if ($safeProfile) {
         }
       }
       # Gate 2a — GGUF header scan: read the first 64 KB of the draft GGUF and
-      # look for MTP-head-only architecture strings (gemma4_assistant, etc.) that
-      # only AtomicBot binaries support. This runs before the binary probe because
-      # the CLI codepath (--model --n-predict 0) and the server codepath
-      # (--model-draft) use different architecture validators — the CLI path does
-      # not always surface the same "unknown model architecture" error that the
-      # server's srv_load_model does.
+      # look for MTP-head-only architecture strings (gemma4-assistant, etc.) and
+      # verify embedding dimension compatibility with the target model.
       $draftGgufArch = $null
+      $draftDim = 0
       try {
         $ggufStream = [System.IO.File]::OpenRead($env:MTP_DRAFT_MODEL)
         $ggufBuf    = New-Object byte[] 65536
         $ggufRead   = $ggufStream.Read($ggufBuf, 0, $ggufBuf.Length)
         $ggufStream.Close()
         $ggufText   = [System.Text.Encoding]::UTF8.GetString($ggufBuf, 0, $ggufRead)
-        # The general.architecture value is stored as a length-prefixed string in
-        # GGUF metadata. Scanning the raw bytes for known MTP-head arch names is
-        # reliable enough for a pre-flight gate.
-        $archNames  = @('gemma4_assistant', 'llama_assistant', 'qwen2_assistant')
+        # Scan raw bytes for known architecture names
+        $archNames  = @('gemma4-assistant', 'gemma4_assistant', 'llama-assistant', 'llama_assistant', 'qwen2-assistant', 'qwen2_assistant', 'gemma4', 'qwen35', 'qwen2', 'llama')
         foreach ($a in $archNames) {
           if ($ggufText -match [regex]::Escape($a)) { $draftGgufArch = $a; break }
+        }
+        $keyDraft = if ($ggufText.IndexOf('.embedding_length_out') -ge 0) { '.embedding_length_out' } else { '.embedding_length' }
+        $idxDraft = $ggufText.IndexOf($keyDraft)
+        if ($idxDraft -ge 0) {
+          $draftDim = [BitConverter]::ToUInt32($ggufBuf, $idxDraft + $keyDraft.Length + 4)
         }
       } catch {
         # Can't read the file — let the binary probe decide.
       }
 
-      $knownMtpOnlyArchs = @('gemma4_assistant', 'llama_assistant', 'qwen2_assistant')
-      $draftRequiresAtomicBot = $false
-      if ($draftGgufArch -and $knownMtpOnlyArchs -contains $draftGgufArch) {
-        $draftRequiresAtomicBot = $true
+      # Target model dimension & architecture preflight check
+      $targetGgufArch = $null
+      $targetDim = 0
+      if ($model -and (Test-Path $model)) {
+        try {
+          $tgtStream = [System.IO.File]::OpenRead($model)
+          $tgtBuf    = New-Object byte[] 65536
+          $tgtRead   = $tgtStream.Read($tgtBuf, 0, $tgtBuf.Length)
+          $tgtStream.Close()
+          $tgtText   = [System.Text.Encoding]::UTF8.GetString($tgtBuf, 0, $tgtRead)
+          $tgtArchs  = @('qwen35', 'qwen2', 'gemma4', 'llama')
+          foreach ($ta in $tgtArchs) {
+            if ($tgtText -match [regex]::Escape($ta)) { $targetGgufArch = $ta; break }
+          }
+          $idxTgt = $tgtText.IndexOf('.embedding_length')
+          if ($idxTgt -ge 0) {
+            $targetDim = [BitConverter]::ToUInt32($tgtBuf, $idxTgt + 17 + 4)
+          }
+        } catch {}
+      }
+
+      $knownMtpOnlyArchs = @('gemma4-assistant', 'gemma4_assistant', 'llama-assistant', 'llama_assistant', 'qwen2-assistant', 'qwen2_assistant')
+      $draftRequiresAtomicBot = ($draftGgufArch -and ($knownMtpOnlyArchs -contains $draftGgufArch))
+
+      if ($draftRequiresAtomicBot -and -not $binaryHasSpecDraft) {
         Write-Host ("Speculative decoding skipped: draft GGUF has MTP-head-only architecture '$draftGgufArch'. " +
           "The file '$($env:MTP_DRAFT_MODEL)' requires the AtomicBot llama-server binary. " +
           "Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set ENABLE_MTP_DRAFTER=false.") -ForegroundColor Yellow
+      } elseif ($draftDim -gt 0 -and $targetDim -gt 0 -and $draftDim -ne $targetDim) {
+        Write-Host ("Speculative decoding skipped: dimension mismatch between target model ($targetDim) and draft model ($draftDim). " +
+          "Target: '$model' ($targetGgufArch, dim=$targetDim) vs Draft: '$($env:MTP_DRAFT_MODEL)' ($draftGgufArch, dim_out=$draftDim). " +
+          "Speculative drafters must match the base model architecture and hidden dimension. Falling back to target-only execution.") -ForegroundColor Yellow
+      } elseif ($targetGgufArch -and $draftGgufArch -and ($targetGgufArch -match 'qwen' -and $draftGgufArch -match 'gemma')) {
+        Write-Host ("Speculative decoding skipped: cross-architecture mismatch between target '$targetGgufArch' and draft '$draftGgufArch'. " +
+          "Target model is Qwen/Ornith while draft model is Gemma. Falling back to target-only execution.") -ForegroundColor Yellow
       } else {
         # Gate 2b — Dry-load the draft GGUF with zero predictions and a minimal context.
         # Redirect stdout to null; capture stderr to detect arch errors.
         $draftProbeArgs = @(
           '--model', $env:MTP_DRAFT_MODEL,
-        '--ctx-size', '1',
-        '--n-predict', '0',
-        '--log-disable',
+          '--ctx-size', '1',
+          '--n-predict', '0',
+          '--log-disable',
           '--no-mmap'
-      )
-      $draftProbeOut = & $llama @draftProbeArgs 2>&1 | Out-String
-      $draftArchError = $draftProbeOut -match 'unknown model architecture'
+        )
+        $draftProbeOut = & $llama @draftProbeArgs 2>&1 | Out-String
+        $draftArchError = $draftProbeOut -match 'unknown model architecture'
 
-      if ($draftArchError) {
-        # Extract the arch name from the error for a useful message.
-        $archMatch = [regex]::Match($draftProbeOut, "unknown model architecture: '([^']+)'")
-        $badArch = if ($archMatch.Success) { $archMatch.Groups[1].Value } else { 'unknown' }
-        Write-Host ("Speculative decoding skipped: draft model has unsupported architecture '$badArch'. " +
-          "The GGUF at '$($env:MTP_DRAFT_MODEL)' is an MTP-head-only format that requires the AtomicBot " +
-          "llama-server binary. Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set " +
-          "ENABLE_MTP_DRAFTER=false to use the main model without speculative decoding.") -ForegroundColor Yellow
+        if ($draftArchError) {
+          # Extract the arch name from the error for a useful message.
+          $archMatch = [regex]::Match($draftProbeOut, "unknown model architecture: '([^']+)'")
+          $badArch = if ($archMatch.Success) { $archMatch.Groups[1].Value } else { 'unknown' }
+          Write-Host ("Speculative decoding skipped: draft model has unsupported architecture '$badArch'. " +
+            "The GGUF at '$($env:MTP_DRAFT_MODEL)' is an MTP-head-only format that requires the AtomicBot " +
+            "llama-server binary. Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set " +
+            "ENABLE_MTP_DRAFTER=false to use the main model without speculative decoding.") -ForegroundColor Yellow
         } else {
           $TurboDraftModel = $env:MTP_DRAFT_MODEL
           $TurboSpeculative = $true
@@ -840,7 +868,6 @@ if ($safeProfile) {
           } elseif ($binaryHasLegacyDraft -and $allowLegacyDraft) {
             $TurboDraftMode = 'legacy-draft'
           }
-        }
         }
       }
     }
@@ -913,6 +940,10 @@ if (-not $StatusOnly) {
             $modelOk = $false
             $reasoningOk = $false
             $runningModelAlias = $null
+            # A profile that wants vision must not accept a text-only server as "healthy":
+            # /props modalities.vision is false when the server was started without --mmproj.
+            $targetVision = [bool]($wantsVision -and -not $TextOnly -and $mmproj -and (Test-Path $mmproj))
+            $visionOk = $true
             # Prefer the profile's declared Alias over the raw filename: two profiles
             # (e.g. ornith / ornith-1.5) can point at files that both happen to be named
             # hforf.gguf, so a bare basename comparison cannot tell them apart. When no
@@ -935,6 +966,7 @@ if (-not $StatusOnly) {
                 } else { $runningReasoningFormat -in @('none', 'auto') }
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
+                if ($targetVision) { $visionOk = ($props.modalities.vision -eq $true) }
             } catch {
                 # /props unavailable on old builds — treat as unknown, require restart
                 $jinjaOk = $false
@@ -942,7 +974,7 @@ if (-not $StatusOnly) {
                 $modelOk = $false
             }
 
-            if ($ctxOk -and $jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk) {
+            if ($ctxOk -and $jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk -and $visionOk) {
                 Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                 exit 0
             } else {
@@ -952,6 +984,7 @@ if (-not $StatusOnly) {
                 if (-not $supportsTools) { $reason += "supports_tools:false (wrong template — needs custom_pub_chat_template_gemma4.jinja)" }
                 if (-not $modelOk)     { $reason += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
                 if (-not $reasoningOk) { $reason += "reasoning mismatch: running=$runningReasoningFormat target=$reasoningMode" }
+                if (-not $visionOk)    { $reason += "vision mismatch: profile wants vision but running server reports modalities.vision=false (started without --mmproj)" }
                 Write-Host ("TurboQuant on :$port needs restart — $($reason -join '; ')") -ForegroundColor Cyan
                 $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                 if ($runningPids) {
@@ -970,7 +1003,9 @@ if (-not $StatusOnly) {
                 $runningModelAlias = $props.model_alias
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
-                if ($jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk) {
+                $targetVision = [bool]($wantsVision -and -not $TextOnly -and $mmproj -and (Test-Path $mmproj))
+                $visionOk = if ($targetVision) { $props.modalities.vision -eq $true } else { $true }
+                if ($jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk -and $visionOk) {
                     Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                     exit 0
                 } else {
@@ -979,6 +1014,7 @@ if (-not $StatusOnly) {
                     if (-not $supportsTools) { $reason2 += "supports_tools:false (needs custom_pub_chat_template_gemma4.jinja)" }
                     if (-not $modelOk)     { $reason2 += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
                     if (-not $reasoningOk) { $reason2 += "reasoning mismatch: running=$runningReasoningFormat target=$reasoningMode" }
+                    if (-not $visionOk)    { $reason2 += "vision mismatch: profile wants vision but running server reports modalities.vision=false" }
                     Write-Host "TurboQuant on :$port needs restart — $($reason2 -join '; ')" -ForegroundColor Cyan
                     $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                     if ($runningPids) {

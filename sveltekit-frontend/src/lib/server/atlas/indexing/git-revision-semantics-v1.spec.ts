@@ -121,6 +121,15 @@ describe('git revision semantics v1', () => {
 
   it('normalizes repository-relative source refs and rejects traversal', () => {
     expect(normalizeGitSourceRefV1('.\\src\\a.ts')).toBe('src/a.ts');
+    expect(normalizeGitSourceRefV1('./src//a.ts')).toBe('src/a.ts');
     expect(() => normalizeGitSourceRefV1('../a.ts')).toThrow(/PARENT_TRAVERSAL/);
+    expect(() => normalizeGitSourceRefV1('src/%2e%2e/private.ts')).toThrow(/PARENT_TRAVERSAL/);
+    expect(() => normalizeGitSourceRefV1('src/%252e%252e/private.ts')).toThrow(/PARENT_TRAVERSAL/);
+    expect(() => normalizeGitSourceRefV1('src/%2fprivate.ts')).toThrow(/ENCODED_SEPARATOR/);
+    expect(() => normalizeGitSourceRefV1('https://example.test/a.ts')).toThrow(/URL_OR_SCHEME/);
+    expect(() => normalizeGitSourceRefV1('file:///repo/a.ts')).toThrow(/URL_OR_SCHEME/);
+    expect(() => normalizeGitSourceRefV1('C:\\repo\\a.ts')).toThrow(/REPOSITORY_RELATIVE/);
+    expect(() => normalizeGitSourceRefV1('\\\\server\\share\\a.ts')).toThrow(/REPOSITORY_RELATIVE/);
+    expect(() => normalizeGitSourceRefV1('src/a.ts?raw=1')).toThrow(/INVALID_CHARACTER/);
   });
 });

@@ -11,6 +11,7 @@ import {
 
 const id = z.string().min(1);
 const revision = z.string().min(1);
+const canonicalRevision = /^sha256:[a-f0-9]{64}$/;
 
 export const symbolRegistryReadbackReceiptSchema = z.object({
   schema: z.literal('atlas.symbol-registry-readback-receipt.v1').default('atlas.symbol-registry-readback-receipt.v1'),
@@ -143,6 +144,10 @@ export function createSymbolRegistryRepository(pool: Pool) {
       if (!input.allow_create) throw new Error('SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE');
 
       const nomination = input.nomination;
+      if (!canonicalRevision.test(nomination.source_revision)
+        || !canonicalRevision.test(nomination.workspace_revision)) {
+        throw new Error('SYMBOL_PROMOTION_REQUIRES_SHA256_SOURCE_AND_WORKSPACE_REVISIONS');
+      }
       const existing = await resolveNominationAgainstRegistry(pool, {
         nomination,
         registry_revision: input.registry_revision,

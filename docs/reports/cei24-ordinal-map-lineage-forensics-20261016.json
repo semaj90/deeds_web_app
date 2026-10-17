@@ -1,0 +1,96 @@
+{
+  "schema": "atlas.cei24-ordinal-map-lineage-forensics.v1",
+  "status": "RECONCILED_PACKET_ORDINAL_PROVEN_CHUNK_CROSSWALK_PENDING",
+  "generatedAt": "2026-10-16",
+  "mode": "READ_ONLY",
+  "target": "ORDINAL_MAP_SEALED",
+  "verdict": "RECEIPT_HASH_MISMATCH_EXPLAINED_BY_CRLF; NEW_PACKET_GRAIN_MAP_INDEPENDENTLY_READ_BACK; CHUNK_LINEAGE_REMAINS_SEPARATE",
+  "cause": {
+    "classification": "LINE_ENDING_BYTE_VARIANT",
+    "expectedMatrixReportSha256": "sha256:6ed79a1f261bd4f49a78860421a7aae3f70707856dd0859727be336b31d93032",
+    "workingTreeRawSha256": "sha256:4affcc3f48927805a01f7bdb674d95bc7e01653f81cc0952f89c7f30c623722f",
+    "lfNormalizedSha256": "sha256:6ed79a1f261bd4f49a78860421a7aae3f70707856dd0859727be336b31d93032",
+    "headBlobSha256": "sha256:6ed79a1f261bd4f49a78860421a7aae3f70707856dd0859727be336b31d93032",
+    "headBlobCommit": "e4f48689be9e7bff4b848f03cabe74123368b45d",
+    "workingFileBytes": 3315,
+    "crlfPairs": 105,
+    "lfNormalizedBytes": 3210,
+    "gitCoreAutocrlf": "true",
+    "normalizedBytesEqualHeadBlob": true,
+    "interpretation": "The prior CEI24 receipt hashed LF bytes; the current Windows checkout has CRLF bytes. JSON semantics and the referenced matrix ordinal artifact checksum remain unchanged."
+  },
+  "owners": {
+    "lineageQualifiedPacketCorpus": {
+      "producer": "scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts",
+      "outputs": [
+        "docs/reports/candidate-ordinal-corpus-v1.json",
+        "docs/reports/candidate-ordinal-corpus-receipt-v1.json"
+      ],
+      "contract": "Requires admitted repo:root source/revision membership and exact PROVEN packet-to-chunk lineage; output is a subset, not a full packet-only ordinal universe.",
+      "actualInvocation": "Not retained in the receipt; script usage documents --dry-run, --workspace-revision, and --candidate-snapshot-revision."
+    },
+    "cei24PacketOrdinalMap": {
+      "producer": "scripts/atlas/materialize-cei24-candidate-ordinal-map-v1.mts",
+      "owner": "canonical-candidate-v1.ts:materializeCandidateOrdinalMap",
+      "producerRevision": "cei24-packet-candidate-ordinal-map:v1",
+      "inputMatrixReport": "docs/reports/candidate-feature-matrix-draft-v1-20260926T174833Z.json",
+      "inputMatrixOrdinalArtifactSha256": "sha256:eca757eba2f7e55d3fc0728da0f344122ca2cf628f886b81c2200ff561620e85",
+      "mapArtifact": ".tmp/atlas/cei24-candidate-ordinal-map-v1/20261016T222429.794Z/candidate-ordinal-map-v1.json",
+      "mapArtifactSha256": "sha256:81173ec12f37bb618d1e8e907bdb967b2036b32c6fbd8c9ddfed769a94537755",
+      "ownerReceipt": "docs/reports/cei24-candidate-snapshot-convergence-v1-20261016T222429.794Z.json"
+    }
+  },
+  "cohortReconciliation": {
+    "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "admittedRepoRootPacketCount": 16151,
+    "olderLineageQualifiedMapRows": 14564,
+    "olderMapMissingLineage": 1587,
+    "olderMapMissingPacket": 7913,
+    "olderMapLineageRequired": true,
+    "olderMapFullAdmittedRootCoverage": false,
+    "explanation": "The 1,587 rows are explicitly classified as missing exact PROVEN packet-to-chunk lineage by the older producer receipt. They were excluded by that map's stricter contract; no identity should be inferred or filled. The 7,913 missing-packet count is outside that receipt's candidate-row denominator."
+  },
+  "latestOrdinalProof": {
+    "closeout": "docs/reports/ordinal-map-readback-closeout-20261016.json",
+    "status": "ORDINAL_MAP_SEALED_PASS_OTHER_PROJECTION_GATES_OPEN",
+    "verdict": "PASS",
+    "rows": 16151,
+    "exactIdentityMatches": 16151,
+    "revisionExactMatches": 16151,
+    "missingOrdinal": 0,
+    "ordinalMapChecksum": "413addb327254b5d4085aed35e886c03192aecad882e44ce2ea6b6dda84f2376",
+    "candidateSnapshotRevision": "sha256:85c19c1ac0e4fbfd114203f1a5d822a008e45a1af5c46e738baf86e436c34fd6",
+    "ownerReceiptSha256Verified": true,
+    "chunkIdentitiesIncluded": 0,
+    "semanticRepresentationBindings": 0,
+    "admittedFeatureLanes": 0,
+    "identityAuthority": false,
+    "canonicalAuthority": false,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0
+  },
+  "remainingBlockers": [
+    "The 16,151-row CEI24 map proves packet-grain ordinal identity only; it does not prove packet-to-chunk crosswalk or semantic feature admission.",
+    "The historical 14,564-row map remains a separate lineage-qualified subset and must not be overwritten or relabeled as full cohort coverage.",
+    "The overall fabric remains NOT_SAFE_TO_PROJECT; symbol, semantic, latent, projection-checksum, BitFrost, and ACE gates remain independently open or partial."
+  ],
+  "actionsPerformed": {
+    "databaseQueries": 0,
+    "databaseWrites": 0,
+    "ordinalRebuilds": 0,
+    "projectionPromotions": 0,
+    "cacheWrites": 0,
+    "graphifyRuns": 0,
+    "cudaOrPythonEnvironmentChanges": 0
+  },
+  "evidence": [
+    "docs/reports/cei24-candidate-snapshot-convergence-v1-20260926T175013.896Z.json",
+    "docs/reports/cei24-candidate-snapshot-convergence-v1-20260930T230547.280Z.json",
+    "docs/reports/cei24-candidate-snapshot-convergence-v1-20261016T222429.794Z.json",
+    "docs/reports/candidate-ordinal-corpus-receipt-v1.json",
+    "docs/reports/ordinal-map-readback-closeout-20261016.json",
+    "scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts",
+    "scripts/atlas/materialize-cei24-candidate-ordinal-map-v1.mts"
+  ]
+}

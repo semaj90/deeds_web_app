@@ -223,3 +223,20 @@ No unchecked task in this change authorizes production writes by implication. Wr
 - Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
 - Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
 - This note changes no database, Qdrant, or runtime state.
+
+## Legacy Phase 101A evidence reconciliation — 2026-10-16
+
+- [x] Recounted the current legacy Phase 101A checklist as 23 rows: 6 checked and 17 open. This is a checklist count, not a completion score.
+- [x] Confirmed the existing dirty-tree, crosswalk, archive-plan, and sourceRef-parent artifacts are dated 2026-06-02 through 2026-06-17. The 552-entry move list is explicitly read-only and lacks current workspace/source revision binding.
+- [ ] Rerun the current dirty-tree, sourceRef crosswalk, deterministic inventory, and archive candidate analysis against one captured workspace snapshot; include source checksum and Git/workspace revision in each receipt.
+- [ ] Independently validate every proposed move against current tracked status, source-byte checksum, imports/consumers, archive destination, and cold-original readback. Preserve the no-move rule until all reports agree.
+- [ ] Do not treat Phase 101A's historical checked items as authorization to move, delete, or collapse repository content. See `docs/reports/master-feature-phase-gates-review-20261016.md`.
+
+## Legacy Phase 101B evidence reconciliation — 2026-10-16
+
+- [x] Audited the AGENTS-card Qdrant payload writer and existing TRACE wiki-tool source/config. The Qdrant writer is part of the existing directory-card regeneration owner; no competing writer was added.
+- [x] Focused mocked test `npx vitest run tests/agents-regen-writers.spec.ts` passed 9/9, covering disabled/test-environment write guards, payload/filter shape, and HTTP failure handling.
+- [ ] Run a separately approved, bounded Qdrant backfill with frozen directory-card/source inputs and independent payload readback; fixture tests do not prove live projection state.
+- [ ] Reconcile Redis/CouchDB/Qdrant directory-card projections against the chosen canonical owner and current graph-export revision. Keep projections non-canonical until the identity/provenance contract is settled.
+- [ ] Verify TRACE MCP live tool listing/health and exercise wiki status/search read-only; keep directory refresh dry-run unless an approved bounded apply flow exists.
+- [ ] Keep all four legacy Phase 101B checklist boxes open until graph alignment, live MCP operation, and readback receipts are complete. See `docs/reports/master-feature-phase-gates-review-20261016.md`.

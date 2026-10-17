@@ -6,6 +6,7 @@ vi.mock('$lib/server/env.server.js', () => ({ ENV: {} }));
 
 import { buildPacketCentricEvent, extractPacketContext, normalizePacketContext, recordPacketCentricTelemetry } from './packet-centric-telemetry.js';
 import { observeTransport } from '../grpc/transport-telemetry.js';
+import { ResourceOperationObservationSchema } from './gpu-telemetry.js';
 
 beforeEach(() => query.mockReset().mockResolvedValue({ rows: [] }));
 
@@ -94,5 +95,20 @@ describe('packet telemetry provenance', () => {
     const invalid = Object.assign({}, observation.transportTelemetry, { tensor: [1, 2] });
     await recordPacketCentricTelemetry({ packet_context: { packet_id: 'packet:one' }, transport_telemetry: invalid });
     expect(query).not.toHaveBeenCalled();
+  });
+
+  it('retains validated operation wall time in the existing eval payload without inventing GPU kernel time', async () => {
+    query.mockRejectedValueOnce(Object.assign(new Error('missing relation'), { code: '42P01' }));
+    const resource = ResourceOperationObservationSchema.parse({ schema: 'atlas.resource-operation.v1', operation: 'topk',
+      native_export: null, requested_kernel: null, kernel_name: null, kernel_ms: null,
+      wall_ms: 3.5, duration_scope: 'PIPELINE_WALL_TIME', execution_backend: 'CPU_REFERENCE',
+      reported_backend: null, candidate_count: 3, input_dim: 1, output_dim: 2, canonicalAuthority: false });
+    await recordPacketCentricTelemetry({ resource_observation: resource, packet_context: { feature_id: 'gpu.pipeline.topk' } });
+    expect(query).toHaveBeenCalledTimes(2);
+    expect(query.mock.calls[1][0]).toContain('INSERT INTO atlas_retrieval_eval_times');
+    const payload = JSON.parse(query.mock.calls[1][1][21]);
+    expect(payload.resource_observation).toEqual(resource);
+    expect(payload.packet_context.gpu_kernel_version).toBeNull();
+    expect(payload.packet_context.rpc_transport).toBeNull();
   });
 });

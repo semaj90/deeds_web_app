@@ -1,0 +1,80 @@
+{
+  "schema": "atlas.function-chunk-live-boundary.v1",
+  "status": "CANONICAL_SNAPSHOT_QUALIFIED_PROJECTION_AND_CHUNKS_BLOCKED",
+  "supersedes": "docs/reports/function-chunk-live-boundary-20261016.json",
+  "correction": "The prior diagnostic incorrectly claimed zero projection revision differences. Actual readback reports one. The original discovery audit did not include that difference in its success criterion; this audit bug is now fixed. Original artifacts are preserved, not qualified as admission evidence.",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+  "packetKey": "packet:804cec79a65c",
+  "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+  "canonicalSourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+  "canonicalWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "projectionSourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+  "projectionWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "snapshotChecksum": "242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091",
+  "observed": {
+    "canonicalReadbackVerified": true,
+    "registrySnapshotQualified": true,
+    "projectionReadbackVerified": false,
+    "projectionRevisionDifferenceCount": 1,
+    "guardedLiveAuditExitCode": 3,
+    "guardedLiveAuditStatus": "PROJECTION_REVISION_MISMATCH",
+    "sourceByteLength": 1156,
+    "sourceDigestMatches": true,
+    "lineageLinkedChunkRows": 2,
+    "chunksMissingSourceRevision": 2,
+    "chunksMissingWorkspaceRevision": 2,
+    "chunkMetadataPacketKeyNamespaceReconciled": false,
+    "independentChunkJoinReadback": true,
+    "databaseEnforcedReadOnly": true
+  },
+  "firstBlockingBoundary": "CALLABLE_PROJECTION_REVISION_MISMATCH",
+  "existingProjectionWriter": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+  "projectionWriterFinding": "The existing upsert already selects canonical source/workspace revisions from atlas_symbol_versions. No duplicate writer is needed. A bounded, authorized replay/readback is still required; it was not run.",
+  "additionalBlockingBoundary": "CHUNK_ROW_REVISIONS_AND_PACKET_KEY_NAMESPACE_UNQUALIFIED",
+  "proofLimits": [
+    "Canonical source and AST qualification does not establish callable projection freshness",
+    "Multiple chunk rows per packet are legitimate; missing row qualification is not fixed by selecting the newest row",
+    "Two existing EXACT_MULTI_MEMBER / PROVEN lineage links do not fill null chunk revisions",
+    "SearchRuntime final Top-K, ContextManifest and BitFrost were not executed",
+    "No production predicate is closed by this single-candidate diagnostic"
+  ],
+  "evidence": [
+    "docs/reports/function-discovery-attempt-20261016T103545235.json",
+    "docs/reports/function-discovery-guarded-20261016T104036669.json",
+    "docs/reports/function-chunk-readback-20261016T103743854.json",
+    "docs/reports/function-chunk-independent-20261016T103815570.json"
+  ],
+  "validation": {
+    "focusedTestsPassed": 9,
+    "focusedTestsFailed": 0,
+    "testLog": "docs/reports/function-readback-regression-20261016T104036669.txt",
+    "guardedAuditExpectedBlockedExit": 3
+  },
+  "writes": {
+    "localDiagnosticArtifacts": true,
+    "database": false,
+    "cache": false,
+    "projections": false,
+    "sourceRevisionBackfill": false,
+    "telemetryInsert": false
+  },
+  "nextRepair": [
+    "Reconcile the existing callable projection producer and its revision propagation against canonical symbol rows; do not replace canonical revisions with projection tokens",
+    "Reconcile historical chunk packet-key namespaces using the existing canonical lineage owner",
+    "Derive and verify exact chunk content/spans through the existing source-qualified writer before any approved bounded apply/readback",
+    "Keep post-P20 source-write gates; retry the same actual retrieval/ContextManifest chain only after qualification"
+  ],
+  "likely_cause": "The callable projection is stale, the audit previously ignored that mismatch in its success condition, and downstream historical chunk rows remain unqualified.",
+  "patch_targets": [
+    "scripts/atlas/audit-function-discovery-readback-v1.mts",
+    "scripts/atlas/lib/function-discovery-readback-v1.mjs",
+    "scripts/atlas/lib/function-discovery-readback-v1.test.mjs",
+    "scripts/atlas/audit-function-source-readback-v1.mjs",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-function-source-readback-v1.mjs --symbol-version-id=symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+  "smoke_command": "node --test scripts/atlas/lib/function-discovery-readback-v1.test.mjs scripts/atlas/lib/function-native-source-alignment-v1.test.mjs",
+  "report_path": "docs/reports/function-chunk-live-boundary-corrected-20261016.json"
+}

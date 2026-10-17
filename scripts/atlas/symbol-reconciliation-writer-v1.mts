@@ -25,7 +25,7 @@ import pg from 'pg';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadEnvFiles, REPO_ROOT } from './connection-config.mjs';
+import { loadEnvFiles, loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 import { canonicalizeStructuralEvidence } from '../../packages/parent-atlas/dist/core/gis-canonicalization.js';
 import { createSymbolRegistryRepository } from '../../packages/parent-atlas/dist/core/symbol-registry-repository.js';
 import { deriveUpstreamSymbolNominationKey, STRUCTURAL_SYMBOL_KIND_VALUES } from '../../packages/parent-atlas/dist/core/structural-symbol.js';
@@ -102,6 +102,22 @@ async function checkGrounding(workspaceRevision: string, sourceRefs: readonly st
 }
 
 async function main() {
+  if (flag('--plan-callable-refresh')) {
+    if (apply || allowCreate) throw new Error('CALLABLE_REFRESH_PLAN_IS_DRY_RUN_ONLY');
+    if (!args.includes('--workspace-revision')) throw new Error('CALLABLE_PLAN_EXPLICIT_WORKSPACE_REQUIRED');
+    const { planCallableProjectionRefreshV1 } = await import('./lib/plan-callable-projection-refresh-v1.mts');
+    const readPool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, connectionTimeoutMillis: 5000, statement_timeout: 12000 });
+    try {
+      const plan = await planCallableProjectionRefreshV1({ pool: readPool, root: REPO_ROOT, symbolVersionId: opt('--symbol-version-id', ''), workspaceRevision: targetWorkspaceRevision });
+      writeReport(plan);
+      console.log(JSON.stringify(plan, null, 2));
+      if (plan.status === 'BLOCKED' || plan.status === 'RECONCILIATION_REQUIRES_AST_REVIEW') process.exitCode = 3;
+    } finally {
+      await readPool.end();
+      await pool.end();
+    }
+    return;
+  }
   const gate = await checkGrounding(targetWorkspaceRevision, sourceRefsFilter);
 
   const report: Record<string, unknown> = {
@@ -332,7 +348,7 @@ function writeReport(report: Record<string, unknown>) {
     : path.join(REPO_ROOT, 'docs', 'reports', `symbol-reconciliation-writer-v1-${Date.now()}.json`);
   const dir = path.dirname(outPath);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(outPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(outPath, JSON.stringify(report, null, 2) + '\n', { encoding: 'utf8', flag: 'wx' });
   (report as any)._reportPath = path.relative(REPO_ROOT, outPath);
 }
 

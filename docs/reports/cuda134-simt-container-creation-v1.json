@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.cuda134-simt-container-creation.v1",
+  "status": "CREATED_WIRED_BUILD_PENDING",
+  "createdAt": "2026-10-16",
+  "owner": "existing CUTILE-ACE-01 Level 2/Level 3 kernels and fixture oracle",
+  "package": {
+    "composeService": "atlas-cuda134-simt",
+    "composeProfile": "atlas-cuda134-simt",
+    "image": "atlas-cuda134-simt:13.4.1-sm86",
+    "ports": [],
+    "network": "none",
+    "fixtureMount": "read-only",
+    "canonicalStoresMounted": false
+  },
+  "wiring": {
+    "simtKernel": "native/cutile-ace-level2/glyph_kernels_bench.cu",
+    "tileKernel": "native/cutile-ace-level3/glyph_fused_tile.cu",
+    "fixtureOracle": "scripts/atlas/ace-radix-01/write-cutile-level2-fixtures.mjs",
+    "fixtureSizes": [256, 1000, 4000],
+    "fixtureWrapper": "scripts/atlas/prepare-cuda134-simt-fixtures.mjs"
+  },
+  "validation": {
+    "composeConfig": "PASS",
+    "fixtureWrapperSyntax": "PASS",
+    "runnerShellSyntax": "PASS",
+    "fixturePreparation": "PASS",
+    "imageBuild": "NOT_COMPLETED",
+    "gpuExecution": "NOT_RUN"
+  },
+  "runtimeAudit": {
+    "dockerContext": "desktop-linux",
+    "dockerEngine": "linux/x86_64",
+    "wslDistro": "Ubuntu 24.04.3 LTS",
+    "imagePlatform": "linux/amd64",
+    "cudaBaseOs": "Ubuntu 24.04",
+    "hostMountPathResolvesInWsl": true,
+    "publishedPorts": [],
+    "networkMode": "none",
+    "mounts": [
+      {
+        "target": "/fixtures",
+        "readOnly": true,
+        "hostPathAutoCreation": false
+      }
+    ],
+    "gpu": {
+      "model": "NVIDIA GeForce RTX 3060 Ti",
+      "computeCapability": "8.6",
+      "memoryMiB": 8192,
+      "freeAtAuditMiB": 1205,
+      "driver": "580.88",
+      "runAllowedByCurrentHeadroom": false,
+      "cuda134TileRuntimeCompatibility": "NOT_PROVEN; exact runtime/kernel check required"
+    },
+    "liveGpuContainersRemainUnchanged": [
+      "atlas-gpu-8098:8098",
+      "atlas-neural-decoder:8121"
+    ]
+  },
+  "buildAttempt": {
+    "baseImage": "nvidia/cuda:13.4.1-devel-ubuntu24.04",
+    "firstFailure": "Build context excluded the required source paths; package-scoped .dockerignore exceptions were added.",
+    "secondAttempt": "Stopped during multi-gigabyte base-image download before compilation; no GPU container was started.",
+    "interpretation": "No CUDA 13.4 compile or runtime parity claim."
+  },
+  "canonicalAuthority": false,
+  "productionQualified": false,
+  "writesToCanonicalStores": false,
+  "nextGate": "Complete image build, then wait for approved GPU/VRAM preflight before exact parity run."
+}

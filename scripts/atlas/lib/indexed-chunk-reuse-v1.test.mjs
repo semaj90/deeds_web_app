@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { classifyIndexedChunkReuseV1, resolveReusableIndexedChunkIdsV1 } from './indexed-chunk-reuse-v1.mjs';
 
 const expected = (id, content = 'content-a', file = 'file-a') => ({
@@ -69,4 +70,43 @@ test('reports deterministic non-reuse reasons without exposing chunk contents', 
       reusable: false,
     }]);
   }
+});
+
+test('unchanged hashes cannot hide absent or stale row revisions', () => {
+  const sourceRevision = `sha256:${'a'.repeat(64)}`;
+  const workspaceRevision = `sha256:${'b'.repeat(64)}`;
+  const chunk = { ...expected('same'), source_revision: sourceRevision, workspace_revision: workspaceRevision };
+  for (const source of [undefined, null, 'old-source']) {
+    const result = classifyIndexedChunkReuseV1([chunk], [{ ...stored('same'), source_revision: source }]);
+    assert.equal(result[0].status, 'SOURCE_REVISION_MISMATCH');
+    assert.equal(result[0].reusable, false);
+  }
+  for (const workspace of [undefined, null, 'old-workspace']) {
+    const result = classifyIndexedChunkReuseV1([chunk], [{
+      ...stored('same'), source_revision: sourceRevision, workspace_revision: workspace,
+    }]);
+    assert.equal(result[0].status, 'WORKSPACE_REVISION_MISMATCH');
+    assert.equal(result[0].reusable, false);
+  }
+  assert.equal(classifyIndexedChunkReuseV1([chunk], [{
+    ...stored('same'), source_revision: sourceRevision, workspace_revision: workspaceRevision,
+  }])[0].reusable, true);
+});
+
+test('projection IDs cannot qualify as canonical packet keys through a hash-only skip', () => {
+  const result = classifyIndexedChunkReuseV1([expected('same')], [{
+    ...stored('same'), metadata: { packet_key: 'same' },
+  }]);
+  assert.equal(result[0].status, 'PROJECTION_ID_MISLABELED_AS_PACKET_KEY');
+  assert.equal(result[0].reusable, false);
+});
+
+test('the existing index writer reads row revisions and keeps unresolved packet identity null', () => {
+  const source = readFileSync(new URL('../index-full-repo-for-search.mjs', import.meta.url), 'utf8');
+  assert.match(source, /SELECT qdrant_id, content_hash, file_content_hash, source_revision, workspace_revision, metadata/);
+  assert.doesNotMatch(source, /packet_key:\s*(?:qdrantId|chunk\.qdrant_id)/);
+  assert.match(source, /packet_key:\s*null,\s*qdrant_id:\s*qdrantId/);
+  assert.match(source, /packet_key:\s*null,\s*qdrant_id:\s*chunk\.qdrant_id/);
+  assert.match(source, /metadata\s*= EXCLUDED\.metadata \|\| CASE/);
+  assert.match(source, /jsonb_build_object\('packet_key', codebase_chunk_index\.metadata->'packet_key'\)/);
 });

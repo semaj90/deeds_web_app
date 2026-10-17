@@ -5,6 +5,19 @@ It is the locked source of truth for Phase 0 discipline and should be treated as
 
 Use this file as the primary checklist. Reference-only notes may remain in supporting docs, but all task state should be reflected here first.
 
+## Qualification Disciplines & Multi-Axis Status Schema
+
+Checklist checkmarks (`[x]`) indicate recorded planning/implementation claims (303 of 467 checked; 164 open, or 64.9% checked). This is not a completion or production-readiness percentage. Production readiness requires independent evaluation against the 8-axis receipt schema:
+- `implementation_status`: `UNSTARTED` | `IN_PROGRESS` | `IMPLEMENTED`
+- `test_verdict`: `UNTESTED` | `FAILED` | `PASSED`
+- `live_integration_verdict`: `UNPROVEN` | `PARTIAL` | `LIVE_PROVEN`
+- `provenance_verdict`: `UNVERIFIED` | `VERIFIED` (`sourceRef` + `contentHash`)
+- `golden_quality_verdict`: `BLOCKED` | `GATED` | `QUALIFIED`
+- `production_admission`: `PROMOTION_BLOCKED` | `CANARY` | `PROMOTED`
+- `receipt_ref`: canonical receipt path in `docs/reports/`
+- `source_revision`: source commit/hash binding
+
+
 # Karpathy GPU Finish Line - Execution Task
 
 - [x] **Phase KG-1 (Quick Wins)**
@@ -568,6 +581,7 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] AGENTS -> Qdrant Backfill: enrich vector payloads with AGENTS card metadata using a dry-run-safe path first.
 - [ ] RG-Atlas Persistence: stabilize directory-level metadata integration and keep it aligned with the atlas graph exports.
 - [ ] Knowledge Base Manager: expose TRACE MCP tools for OpenCode integration.
+  - Source review: TRACE registers `wiki.status`, `wiki.search`, `wiki.refresh_directory`, and `wiki.explain_page`, but `refreshDirectory(path, false)` is a placeholder that returns `{ status: 'completed' }` without invoking a writer or indexer. Live MCP tool discovery and useful refresh behavior remain unverified.
 - [ ] Keep this lane tied to the existing graph artifacts in `docs/graph/` rather than inventing a parallel source of truth.
 
 ## Phase 101C — Local Deep Research / OpenCode / LangGraph Alignment
@@ -585,20 +599,24 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [ ] Emit a canonical ACE packet from the LDR bridge with preserved `sourceRefs`, then warm the shared Redis ACE packet cache for OpenCode reuse.
 - [ ] Expose tuple metadata on the exact-match cache read path so front-door hits return the same envelope they store.
 - [ ] Route agentic errors through a read-only proposal flow that launches parallel repair subagents before any patching is considered.
+  - Current source fans out analysis-tool calls with `Promise.all`, not repair subagents. Proposal generation writes timeline/engram metadata; “read-only” means no source-file patching, not zero side effects. No live persistence/readback proof yet.
 - [x] Record each proposal run as a `context_timeline.agentic_proposal` event so the repair-thinking path is temporally indexed in the durable ledger, with `sourceRef + feature_id` as the replay/join spine and `clusterId` kept as a routing hint only.
 - [x] Keep regex extraction fallback-only at the proposal boundary so messy logs can recover `feature_id`, `workspace_task_id`, `parent_atlas_card_id`, and `source_ref` without replacing typed provenance.
 - [ ] Promote each proposal run into the engram registry (`memory_registry` + `engram_cards`) so the repair timeline is indexed as reusable memory, not just audit history.
+  - Existing source calls the writer and a focused mocked test now asserts both registry/card inserts; live PostgreSQL readback and partial-failure handling remain open.
 - [ ] Expose the proposal timeline in the agentic controller UI via the read-only `/api/v1/agentic?action=timeline` path.
+  - Current source already fetches this path from `AgenticController.svelte`; focused route test verifies normalized mock rows, but live DB/UI proof remains open.
 - [x] Wire the Phase 101 parent-atlas packetizer lane (`scripts/atlas/phase101-parent-atlas-packetize.mjs`) as a dry-run-first Gemma/OpenCode tool surface that validates `nes.packet.v1`, prints the cache key, and keeps recommendations read-only or dry-run only.
   - dry-run verified in the repo shell; the exact grep scanner runs first and falls back to `grep -E` only when the literal pattern yields no lines
   - apply path remains gated on `LOCAL_OPENAI_BASE_URL`, `LOCAL_OPENAI_API_KEY`, and `LOCAL_GEMMA_MODEL` hydration
 - [x] Emit a parent-atlas feature-labeling report that includes missing todos, `feature_id`, `featureKey`, `source_ref`, and `sourceRefs` so the kanban/atlas sync can consume one replayable task shape.
 - [x] Land the NES chrom packet + KAG DAG hits schema (`nes_chrom_packets`, `nes_chrom_kag_dag_hits`) and the packet persistence helper with `chunk_id`, `sourceRef`, `jsonb`, and `pgvector` joins.
 - [x] Add the read-only NES chrom packet report seam via `scripts/atlas/report-nes-chrom-packet-hits.mjs`, writing `docs/reports/nes-chrom-packet-recent-hits.{json,md}` without creating a second packet store.
-  - current runtime note: the script runs successfully in report-only mode and records that one or both NES chrom relations are absent in the current local database
+  - Historical report only: the checked-in JSON is dated 2026-06-01 and reports both relations present with 3 packets/3 hits. The later 2026-08-26 restore is listed in `drizzle/sidecar-migrations.json`; current PostgreSQL 18 catalog/row status is NOT_VERIFIED. Do not treat the older note that the relations are absent as current runtime evidence.
 - [x] Add the additive `research_summaries.source_ref` / `source_refs` migration and Drizzle schema bridge so local-deep-research provenance can land in durable rows and indexes.
-- [x] Apply the `research_summaries` provenance/index migration to the live 17.6 database and backfill the URL-backed rows.
+- [x] Historical report: apply the `research_summaries` provenance/index migration to the live 17.6 database and backfill the URL-backed rows. Current PostgreSQL 18 schema and backfill counts require a fresh read-only catalog/readback receipt before production readiness is claimed.
 - [ ] Keep Qdrant as the default ANN service and treat cuVS/CAGRA or a small Rust gRPC ANN worker as the future experiment lane behind the same retrieval contract and result shape.
+  - Source/config smoke is now verified (`default=qdrant`, `CODEBASE_ANN_BACKEND=turbovec` selects the challenger); this does not prove a live ANN request or canonical identity hydration.
   - Keep `sveltekit-frontend/src/lib/server/search/qdrant-search.ts` and `sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts` as the stable retrieval abstraction boundary so cuVS/CAGRA can swap in later without changing callers.
   - Current default: Qdrant for semantic lookup, payload filters, HNSW traversal, and quantized vector search.
   - Future optional lane: cuVS/CAGRA or IVF variants as GPU ANN acceleration behind the same search interface.
@@ -915,12 +933,12 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - `ulid` for ordered run, event, trace, and materialization instance IDs
     - derive `qdrant_point_id` and graph node identities from the canonical packet identity rather than the reverse
   - [ ] Reconcile existing identity rules so `title_id`, `tree_node_id`, `packet_key`, `uuid`, and `ulid` have one promoted policy across Postgres, Qdrant, Neo4j, TypeScript, and Python
-  - [ ] Split the canonical contract boundary into four promoted contracts instead of one oversized object
-    - `SemanticPacketV1`
-    - `HypergraphFactV1`
-    - `FeatureMatrixRowV1`
-    - `ContractValidationResult`
-  - [ ] Define the typed `SemanticPacketV1` contract for KAG / HyperRAG execution, not just dense retrieval
+  - [x] Split the canonical contract boundary into four promoted contracts instead of one oversized object
+    - `SemanticPacketV1` (`src/lib/server/atlas/contracts/semantic-packet-v1.ts`)
+    - `HypergraphFactV1` (`src/lib/server/atlas/contracts/hypergraph-fact-v1.ts`)
+    - `FeatureMatrixRowV1` (`src/lib/server/atlas/feature-matrix-schema.ts`)
+    - `ContractValidationResult` (`src/lib/server/atlas/contracts/validation-result-v1.ts`)
+  - [x] Define the typed `SemanticPacketV1` contract for KAG / HyperRAG execution, not just dense retrieval
     - packet identity
     - source evidence
     - ontology entities
@@ -929,13 +947,13 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - knowledge resolution
     - validation state
     - transport/storage identities
-  - [ ] Define `HypergraphFactV1` persistence instead of relying only on pairwise graph edges
+  - [x] Define `HypergraphFactV1` persistence instead of relying only on pairwise graph edges
     - `semantic_facts`
     - `semantic_fact_participants`
     - `semantic_fact_evidence`
     - hypergraph projection rules into Neo4j
     - retrieval path must recover whole facts, not reconstruct them lossy from independent edge hits
-  - [ ] Define `FeatureMatrixRowV1` as a derived row contract rather than canonical truth
+  - [x] Define `FeatureMatrixRowV1` as a derived row contract rather than canonical truth
     - semantic features
     - lexical features
     - structural features
@@ -943,13 +961,14 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - routing features
     - ontology features
     - classifier features
-  - [ ] Define `ContractValidationResult` as the admission envelope for packets and facts
+  - [x] Define `ContractValidationResult` as the admission envelope for packets and facts
     - schema version
     - validator version
     - identity payload
     - violation codes
     - severity
     - validated timestamp
+
   - [ ] Make `.okf` the ontology contract source and compile it into runtime validation artifacts
     - JSON Schema generation
     - Zod validators
@@ -1452,11 +1471,34 @@ This lane tracks the native bridge work that moved parsing, CUDA SOM caching, an
 - [x] Validation and smoke checks
   - `npm run check` is green
   - `npm run bifrost:cards:smoke` is green
+- [x] End-to-End Contextual Engineering & Ranking Architecture (2026-10-16)
+  - `sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-ace-bridge-v1.ts` binds candidate feature snapshots to GPU cache tile derivation (`UnifiedFeatureTileProvider` / `GpuTileCache`)
+  - `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-token-fsm-v1.ts` implements `BitFrostTokenFsmManagerV1` with slot transitions (`UNLOADED` -> `ADMITTED` -> `RESIDENT` -> `EVICTING` -> `PURGED`) and procedural keys (`bitfrost:procedural:<model>:<checksum>:<revision>`)
+  - `sveltekit-frontend/src/lib/server/atlas/context/topk-selection-receipt-v1.ts` binds Top-K selection to candidate snapshots, parameters, and ContextManifest admission (`SEL-RECEIPT-01`, `SEL-RECEIPT-02`) with fail-closed integrity
+  - `sveltekit-frontend/src/lib/server/retrieval/adaptive-dag-fetch.ts` implements `DAG-FETCH-01` request-level coalescing for equivalent subquery aliases
+  - `sveltekit-frontend/src/lib/server/atlas/contracts/hypergraph-fact-v1.ts` implements canonical `HypergraphFactV1` n-ary relation contracts and Neo4j projections
+  - `sveltekit-frontend/src/lib/server/atlas/evals/dspy-llama-server-caller-v1.ts` enforces local `llama-server:8090` self-prompting against Ornith 1.5 with schema-gated repair
+  - `sveltekit-frontend/src/lib/server/atlas/semantic-signal-routing.ts` emits deterministic `RetrievalParameterPlanV1` (`NE-23O4`)
+  - `sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-execution-adapter-v1.ts` and `oak-dag-runtime-replay-v1.ts` prove typed execution DAG synthesis and deterministic replay (`NE-23O5`)
+  - `scripts/atlas/test-ace-gpu-tile-synthesis.mjs` verifies async/await parallel parameter loading from CPU memory-mapped tables (Arrow/TypedArray) while retaining the single-GPU execution lease
+- [x] Adaptive Contextual Recommendation Engine (REC-01, REC-02) (2026-10-16)
+  - `sveltekit-frontend/src/lib/server/atlas/recommendation/recommendation-contract-v1.ts` defines `RecommendationProposalV1` and bounded `RecommendationBatchV1` schemas (max 4 proposals)
+  - Binds canonical candidate coordinates (`canonicalId`, `packetKey`, `symbolVersionId`, `sourceRevision`, `graphRevision`, `representationRevision`), scores, and canonical SHA-256 integrity
+  - `sveltekit-frontend/src/lib/server/atlas/recommendation/contextual-ranker-v1.ts` implements hybrid contextual scoring equation:
+    $s(q, c) = \alpha s_{\text{semantic}} + \beta s_{\text{graph}} + \gamma s_{\text{lowrank}} + \delta s_{\text{MLP}} + \epsilon s_{\text{feedback}}$
+  - Strict invariants: fail-closed source revision check, degraded candidate rejection, and deterministic tie-breaking by canonicalId
+  - Unit tests `contextual-ranker-v1.spec.ts` pass 4/4
+
+- [x] SIMD Multicore Fanout & Bounded Ingestion Contract (PARSE-01..02, FANOUT-01, SORT-01, BATCH-01, PERF-01) (2026-10-16)
+  - `sveltekit-frontend/src/lib/server/atlas/ingest/simd-fanout-contract-v1.ts` formalizes CPU-only SIMD parsing, multicore fanout, and compact batch ingestion
+  - Strict stage separation: parsing and UTF-8 offset preservation execute on CPU without competing for RTX 3060 Ti VRAM with Llama server / cuVS / cuGraph
+  - Preserves exact 64-bit UTF-8 byte offsets in `BigUint64Array` rather than hex character or UTF-16 JavaScript indices (preventing CRLF/LF AST alignment drift)
+  - Deterministic composite sorting: `(domain_id, packet_key, source_revision, source_offset)` ensures identical deduplicated records and batch checksums regardless of worker count or stream arrival order
+  - Unit tests `simd-fanout-contract-v1.spec.ts` pass 4/4
 
 ### Remaining
-- [ ] Decide whether `simd-bridge-rs/` becomes the next canonical native add-on workspace or remains a staged canary
-- [ ] Scaffold or promote the `napi-rs` prototype API surface (`parse_batch`, `compute_centroids`, Tokio worker handoff)
-- [ ] Add a dedicated benchmark harness for JSON.parse vs simdjson vs Rust roundtrip
+- [ ] Implement C++20 / N-API or Rust `turbovec-python` / `_turbovec` SIMD fanout worker harness for 1–10 GB JSONL ingestion
+- [ ] Benchmark simdjson against JSON.parse stream on representative multi-gigabyte corpus (`PARSE-01`, `PERF-01`)
 - [ ] Wire the production native base image into CI so the runtime image and addon ABI stay pinned
 - [ ] Add telemetry for parse latency, worker queue time, and GPU allocation metrics
 - [ ] Keep CPU fallback paths available for dev and rollback

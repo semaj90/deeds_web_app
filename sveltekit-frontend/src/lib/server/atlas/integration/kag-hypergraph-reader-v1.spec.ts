@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { buildPacketIncidenceLineageV1 } from '../lineage/packet-incidence-lineage-v1.js';
+import { createHyperedgeV1 } from '../../graph/hyperedge-contract.js';
 
 const queryMock = vi.fn();
 vi.mock('$lib/server/db/client.js', () => ({ pool: { query: (...args: unknown[]) => queryMock(...args) } }));
@@ -45,20 +46,32 @@ function tupleRow(overrides: Record<string, unknown> = {}) {
 }
 
 function hyperedgeMemberRows(overrides: Record<string, unknown> = {}) {
+  const edge = createHyperedgeV1({
+    predicate: 'CALLS',
+    participants: [
+      { canonicalId: 'packet:a', role: 'caller', ordinal: 0 },
+      { canonicalId: 'packet:b', role: 'callee', ordinal: 1 },
+    ],
+    evidenceRefs: ['source-span:src/a.ts:0-8'],
+    workspaceRevision: 'ws-1',
+    graphRevision: 'graph-1',
+    sourceRevision: `sha256:${'1'.repeat(64)}`,
+    producerRevision: `sha256:${'2'.repeat(64)}`,
+  });
   const base = {
     hyperedge_id: 'uuid-1',
-    contract_hyperedge_id: 'hyperedge:abc123',
-    relation_type: 'related_to',
-    workspace_revision: 'ws-1',
-    source_revision: 'src-1',
-    graph_revision: 'graph-1',
-    producer_revision: 'producer-1',
-    evidence_refs: ['packet:a'],
-    checksum: 'a'.repeat(64),
+    contract_hyperedge_id: edge.hyperedgeId,
+    relation_type: edge.predicate,
+    workspace_revision: edge.workspaceRevision,
+    source_revision: edge.sourceRevision,
+    graph_revision: edge.graphRevision,
+    producer_revision: edge.producerRevision,
+    evidence_refs: edge.evidenceRefs,
+    checksum: edge.checksum,
   };
   return [
-    { ...base, member_id: 'packet:a', member_role: 'actor', ordinal: 0, ...overrides },
-    { ...base, member_id: 'packet:b', member_role: 'target', ordinal: 1, ...overrides },
+    { ...base, member_id: 'packet:a', member_role: 'caller', ordinal: 0, ...overrides },
+    { ...base, member_id: 'packet:b', member_role: 'callee', ordinal: 1, ...overrides },
   ];
 }
 
@@ -143,7 +156,10 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     expect(result.requestedCanonicalIds).toBe(1);
     expect(result.matchedTuples).toBe(1);
     expect(result.matchedHyperedges).toBe(1);
-    expect(result.neighbors).toEqual([{ canonicalId: 'packet:a', hyperedgeIds: ['hyperedge:abc123'] }]);
+    expect(result.neighbors).toEqual([{
+      canonicalId: 'packet:a',
+      hyperedgeIds: [hyperedgeMemberRows()[0]!.contract_hyperedge_id!],
+    }]);
   });
 
   it('omits a canonicalId with no matching hyperedge participants', async () => {
@@ -203,9 +219,37 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     queryMock.mockResolvedValue({ rows: hyperedgeMemberRows() });
     const { readKagHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
     const result = await readKagHyperedgesStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' });
-    expect(result[0].participants.map((participant) => participant.role)).toEqual(['actor', 'target']);
+    expect(result[0].participants.map((participant) => participant.role)).toEqual(['caller', 'callee']);
     expect(queryMock.mock.calls[0][1]).toEqual([['packet:a'], 'ws-1', 'graph-1', 4097]);
     expect(String(queryMock.mock.calls[0][0])).toContain('LIMIT $4');
+  });
+
+  it('strict n-ary code reader excludes binary taxonomy facts and verifies checksums', async () => {
+    const edgeRows = hyperedgeMemberRows();
+    queryMock.mockResolvedValue({ rows: edgeRows });
+    const { readKagCodeHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    expect(await readKagCodeHyperedgesStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' })).toHaveLength(0);
+
+    const nary = createHyperedgeV1({
+      predicate: 'CALLS',
+      participants: [
+        { canonicalId: 'packet:00000000-0000-5000-8000-000000000001', role: 'caller', ordinal: 0 },
+        { canonicalId: 'packet:00000000-0000-5000-8000-000000000002', role: 'callee', ordinal: 1 },
+        { canonicalId: 'packet:c', role: 'context', ordinal: 2 },
+      ],
+      evidenceRefs: ['source-span:src/a.ts:0-8'],
+      workspaceRevision: 'ws-1', graphRevision: 'graph-1',
+      sourceRevision: `sha256:${'1'.repeat(64)}`, producerRevision: `sha256:${'2'.repeat(64)}`,
+    });
+    queryMock.mockResolvedValue({ rows: nary.participants.map((participant) => ({
+      ...edgeRows[0], contract_hyperedge_id: nary.hyperedgeId, relation_type: nary.predicate,
+      evidence_refs: nary.evidenceRefs, checksum: nary.checksum,
+      member_id: participant.canonicalId, member_role: participant.role, ordinal: participant.ordinal,
+    })) });
+    expect(await readKagCodeHyperedgesStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' })).toEqual([nary]);
+    queryMock.mockResolvedValue({ rows: edgeRows.map((row) => ({ ...row, checksum: 'a'.repeat(64) })) });
+    await expect(readKagCodeHyperedgesStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' }))
+      .rejects.toThrow('KAG_HYPEREDGE_CHECKSUM_MISMATCH');
   });
 
   it('strict traversal expands only a checksum-verified directed packet incidence row', async () => {
@@ -225,6 +269,15 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
       hyperedgeIds: [`packet-incidence:${fixture.lineage.lineageChecksum}`],
       neighborCanonicalIds: [fixture.lineage.neighborCanonicalId],
       neighborStoragePacketKeys: [fixture.lineage.neighborPacketKey],
+      candidateBindings: [{
+        canonicalId: fixture.lineage.neighborCanonicalId,
+        packetKey: fixture.lineage.neighborPacketKey,
+        sourceRef: 'src/b.ts',
+        sourceRevision: fixture.lineage.neighborSourceRevision,
+        workspaceRevision: 'ws-1',
+        graphRevision: 'graph-1',
+        hyperedgeId: `packet-incidence:${fixture.lineage.lineageChecksum}`,
+      }],
     }]);
   });
 

@@ -1,17 +1,17 @@
 /**
  * Phase 18: XGBoost Reranker
  *
- * Inference wrapper for trained XGBoost ranking model.
- * Consumes Phase 17 extracted features and returns learned ranking score.
+ * Compatibility boundary with no admitted trained model.
+ * Consumes Phase 17 extracted features and fails closed without a model score.
  *
  * Input: ExtractedFeatures from Phase 17
- * Output: rerank_score [0, 1]
+ * Output: MODEL_UNAVAILABLE or BLOCKED_INPUT with null score
  *
- * Phase 18 Status: Training phase (model training in progress)
- * Phase 19 Status: Inference integration (coming next)
+ * Phase 18 Status: No admitted model; training execution not established here
+ * Phase 19 Status: Production integration unproven
  */
 
-import type { ExtractedFeatures } from './phase17-schema';
+import type { ExtractedFeatures } from './phase17-schema.js';
 
 // ══════════════════════════════════════════════════════════════
 // TYPE DEFINITIONS
@@ -133,10 +133,10 @@ export interface RerankerStatus {
 
 export function getRerankerStatus(): RerankerStatus {
   return {
-    phase: 'Phase 18 (Training)',
+    phase: 'Phase 18 (Model unavailable)',
     isReady: false, // Awaiting model training
     modelLoaded: false,
-    fallbackActive: true,
-    message: 'Phase 18 XGBoost model training in progress. Using Phase 17 authority_score as fallback for Phase 19 integration.',
+    fallbackActive: false,
+    message: 'No trained Phase 18 model is admitted. No learned score or authority-score fallback is produced.',
   };
 }

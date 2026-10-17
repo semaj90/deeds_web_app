@@ -23,6 +23,7 @@ import {
   isDuplicateGoldenReviewDecisionV1,
   readGoldenReviewJournalV1,
 } from './lib/golden-review-journal-v1.mjs';
+import { redactGoldenReviewDisplayTextV1 } from './lib/golden-review-display-redaction-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const arg = (name, dflt) => (process.argv.find((a) => a.startsWith(`--${name}=`)) ?? '').split('=')[1] ?? dflt;
@@ -79,7 +80,7 @@ function persist() {
     judgments: q.judgments.map(({ display, ...j }) => {
       const s = saved.get(`${q.queryPacketKey}|${j.packetKey}`);
       return s ? { ...j, relevanceGrade: s.relevanceGrade, confidence: s.confidence, judgmentSource: s.judgmentSource,
-        reviewerId: s.reviewerId, notes: s.notes ?? null, isHardNegative: s.isHardNegative === true,
+        reviewerId: s.reviewerId, notes: redactGoldenReviewDisplayTextV1(s.notes), isHardNegative: s.isHardNegative === true,
         trainingEligible: false, canonicalAuthority: false,
         sourceAuthorityStatus: 'NOT_ESTABLISHED_BY_RELEVANCE_REVIEW' } : j;
     }),
@@ -96,9 +97,9 @@ function view(index) {
   return {
     index, total: items.length, graded: saved.size,
     queryIndex: qi + 1, queryTotal: queue.length,
-    queryText: q.queryText, querySourceRef: q.querySourceRef,
-    candidate: { sourceRef: j.display?.sourceRef ?? '(unknown)', summary: j.display?.summary ?? '' },
-    saved: s ? { relevanceGrade: s.relevanceGrade, confidence: s.confidence, notes: s.notes, isHardNegative: s.isHardNegative === true } : null,
+    queryText: redactGoldenReviewDisplayTextV1(q.queryText), querySourceRef: q.querySourceRef,
+    candidate: { sourceRef: j.display?.sourceRef ?? '(unknown)', summary: redactGoldenReviewDisplayTextV1(j.display?.summary) },
+    saved: s ? { relevanceGrade: s.relevanceGrade, confidence: s.confidence, notes: redactGoldenReviewDisplayTextV1(s.notes), isHardNegative: s.isHardNegative === true } : null,
   };
 }
 
@@ -186,7 +187,7 @@ const server = http.createServer((req, res) => {
     if (req.method === 'GET') {
       res.writeHead(200, { 'content-type': 'application/json' });
       return res.end(JSON.stringify(allQueue.map((q) => ({
-        queryPacketKey: q.queryPacketKey, querySourceRef: q.querySourceRef, queryText: q.queryText,
+        queryPacketKey: q.queryPacketKey, querySourceRef: q.querySourceRef, queryText: redactGoldenReviewDisplayTextV1(q.queryText),
         suggested: suggest(q.queryText), status: eligibility.get(q.queryPacketKey)?.status ?? null,
       }))));
     }
@@ -244,7 +245,7 @@ const server = http.createServer((req, res) => {
             relevanceGrade: b.relevanceGrade,
             confidence: b.confidence,
             reviewerId: b.reviewerId,
-            notes: b.notes ?? null,
+            notes: redactGoldenReviewDisplayTextV1(b.notes),
             isHardNegative: b.isHardNegative === true,
             previousEvent,
           });

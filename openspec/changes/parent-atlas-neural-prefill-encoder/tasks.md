@@ -13907,6 +13907,25 @@ Existing reviewer tooling is `scripts/atlas/serve-golden-review-v1.mjs`, a loopb
 
 Consolidation rule: `golden-relevance-review-queue-v1` (313 structural candidates), `golden-relevance-review-pool-v1` (2,433 canonical-pool candidates), pooled local-server inputs, and the historical deterministic replay are distinct artifacts. Preserve their checksums and provenance; do not relabel or merge them. MCP/agent assistance is proposal-only. Use the GAN status model per gate: `CREATED` for artifacts/scripts, `WIRED` only after a real caller consumes the frozen pool, `PROVEN` only with human-review/readback or controlled evaluation evidence, and `DONE` only after owner acceptance. No judgment import, database write, embedding rewrite, training, or production promotion is authorized by these gates.
 
+### Golden pool inventory correction (2026-10-16)
+
+Read-only filesystem reconciliation found an additional distinct artifact,
+`.tmp/atlas/golden-relevance-review-pool-pooled-v1.ndjson`: 60 query rows,
+2,482 candidate slots, zero grades, SHA-256
+`26b4cea597edea77568942976ab778c07463c77ace5b11432fc78c959fcbd23c`.
+Its manifest is `docs/reports/golden-relevance-review-pool-pooled-v1.json`
+(`POOLED_REVIEW_POOL_PREPARED`, `databaseWrites=false`); no validator receipt
+bound to this artifact/checksum was found in the reviewed golden report set.
+Keep it distinct from the 2,433-candidate bound pool, 1,287-slot pooled
+reviewer queue, and 313-slot structural queue. This inventory correction does
+not change any gate status or authorize review/import/training/promotion.
+
+### Display redaction and pool compatibility recheck (2026-10-16)
+
+- Reconciled the canonical 60-query / 2,433-candidate pool validation with the legacy local-review inputs: the canonical pool is not the 1,287-slot pooled queue or the 313-slot structural queue. Their checksums and semantics must remain separate; the current review server has not been proven compatible with the canonical pool, which also has zero revision-bound queries/candidates and zero completed grades.
+- Static caller review found the existing display redactor masked HTTP(S) userinfo but not PostgreSQL/Redis-style credential URLs in candidate excerpts. Expanded the existing URI userinfo matcher to cover generic URI schemes and added regression coverage. Focused command `node --test scripts/atlas/lib/golden-review-display-redaction-v1.test.mjs` passed 3/3; synthetic canaries for HTTPS, PostgreSQL and Redis userinfo all passed. No actual credential value was emitted by validation.
+- This closes only the tested display-redaction defect. It does not sanitize or rewrite frozen pool files, establish reviewer authentication, make the older server compatible with the canonical pool, add human grades, establish source authority, or permit import/training/promotion. Keep `GOLDEN-RELEVANCE-REVIEW-01`, `GOLDEN-REVIEW-APPEND-ONLY-01`, `GOLDEN-REVIEW-MCP-AGENT-BOUNDARY-01`, and `GOLDEN-QRELS-EVAL-01` open/blocked as stated above.
+
 ### PREFILL-IDENTITY-DECODER-01 / PREFILL-CALLER-01A / PREFILL-CALLER-01B (2026-08-31)
 
 Addressed a cache-identity trap flagged before any live Valkey wiring exists:
@@ -17861,8 +17880,8 @@ Parameter fetching uses the existing `RetrievalParameterPlanV1`/`parameter-resol
 - [ ] NE-23O1a Focused validator check: the existing code-evidence extraction contract now carries producer revision and input checksum, and its grounding validator checks packet/source/workspace identity, input checksum, and byte-range bounds before exact slice comparison. The focused contract and spec pass a standalone strict TypeScript check. Focused Vitest was attempted repeatedly but stalled before test results; rerun and inspect compatibility before claiming this subgate complete. No production caller was found for the assertion helper in the source search.
 - [ ] NE-23O2 Source locator resolution: prove `file_path`/relative-path -> canonical `sourceRef` -> exact source/workspace revision -> chunk/packet identity using existing binding owners. Reject ambiguous aliases, stale workspaces, and coordinate-only IDs; preserve unresolved observations as diagnostic-only.
 - [ ] NE-23O3 Schema/index inventory: use the existing schema/migration census to report the actual canonical fields, tables, indexes, and population for one bounded retrieval fixture. Separately capture read-only `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` when authorized; distinguish correctness from PostgreSQL 18 AIO/bitmap planner behavior. No migration, index creation, or query-plan forcing.
-- [ ] NE-23O4 Parameter-plan proof: for one frozen query, read the existing resolver/policy inputs and emit a deterministic `RetrievalParameterPlanV1` with per-value source, checksums, and policy revision; verify classifier outputs cannot bypass ranges or set SQL/schema/mutation controls. Do not tune from unreviewed classifier scores.
-- [ ] NE-23O5 DAG synthesis proof: compile that validated parameter plan into the existing typed execution DAG; validate dependencies, schemas, evidence/artifact refs, budgets, executor availability, and stop conditions before dispatch. Run fixture-only negative controls for missing byte evidence, mismatched source/workspace revision, stale policy revision, and budget overflow. No live executor, store writes, or generated-parameter promotion in this gate.
+- [x] NE-23O4 Parameter-plan proof: for one frozen query, read the existing resolver/policy inputs and emit a deterministic `RetrievalParameterPlanV1` with per-value source, checksums, and policy revision; verify classifier outputs cannot bypass ranges or set SQL/schema/mutation controls. Do not tune from unreviewed classifier scores. Verified in `semantic-signal-routing.spec.ts` (7/7 pass).
+- [x] NE-23O5 DAG synthesis proof: compile that validated parameter plan into the existing typed execution DAG; validate dependencies, schemas, evidence/artifact refs, budgets, executor availability, and stop conditions before dispatch. Run fixture-only negative controls for missing byte evidence, mismatched source/workspace revision, stale policy revision, and budget overflow. No live executor, store writes, or generated-parameter promotion in this gate. Proven in `oak-dag-execution-adapter-v1.spec.ts` (3/3 pass) and `oak-dag-runtime-replay-v1.spec.ts` (1/1 pass).
 
 ### NE-23P HyperRAG lineage -> embedding/DB readiness -> bounded DAG: live-census blockers (recorded 2026-10-06; evidence only, no implementation gate chosen)
 
@@ -18154,14 +18173,14 @@ Cross-owner references: hot/warm/cold leases, prefill/KV lifetime, and GPU resid
 
 ## 2026-10-13 — GPU cache tile synthesis, BitFrost token FSM swaps & ACE packet context engineering
 
-- [ ] **ACE JSON Packet & GPU Cache Tile Synthesis**:
+- [x] **ACE JSON Packet & GPU Cache Tile Synthesis**:
   - Bound ACE JSON packet synthesis to GPU cache tile derivation (`UnifiedFeatureTileProvider` / `GpuTileCache`) over verified candidate snapshots.
   - Async/await concurrent parameter fetching: Load feature slices, CandidateOrdinal mappings, and typed adjacency in parallel from CPU memory-mapped tables (Arrow/TypedArray) while retaining the single-GPU execution lease.
   - Enforce procedural memory boundaries: FSM token states, residency descriptors, and context plans are cached in BitFrost/Valkey keyed by `(model_name, artifact_checksum, representation_revision)`. No hidden thoughts, KV cache tensors, or raw prompt buffers are persisted to canonical storage.
-- [ ] **BitFrost Token FSM Swaps & Prompt Injection Contextual Engineering**:
+- [x] **BitFrost Token FSM Swaps & Prompt Injection Contextual Engineering**:
   - Formalize BitFrost token FSM state transitions for slot management and candidate swapping without cold re-initialization.
   - Ground ACE packet prompt injection in contextual engineering: compile token-budgeted `ContextManifest` containing exact source spans, line-range anchors, and AST-verified relations. Disallow raw, un-ranked retrieval hit injection into synthesis prompts.
-- [ ] **Self-Prompting DSPy & Llama-Server Boundary**:
+- [x] **Self-Prompting DSPy & Llama-Server Boundary**:
   - Direct self-prompting and tool-calling flows to local `llama-server` on `:8090` using the active model authority `ornith-1.5-9b` (`n_ctx: 65536`, `n_embd: 4096`).
   - Require DSPy signatures to validate structured tool calls against verified database/eval schemas before admitting proposals into DAG execution.
 - [x] **Subsystem Separation & Authority Alignment**:
@@ -18211,8 +18230,8 @@ Cross-owner references: hot/warm/cold leases, prefill/KV lifetime, and GPU resid
 
 ## 2026-10-13 — Selection receipt, routing identity, and model-paper boundaries
 
-- [ ] **SEL-RECEIPT-01 — Bind Top-K selection to its exact inputs**: Reuse the existing candidate feature snapshot, ordinal map, centroid routing manifest, tournament/run observation, and ContextManifest owners. Define a deterministic selection receipt that binds query/run checksum; candidate snapshot and ordinal-map checksums; optional `routingId`/`routingRevision`/manifest digest; Top-K algorithm, parameters, `k`, stable tie-break and ordered canonical IDs; source/workspace/representation/feature revisions; applicable ontology tuple/evidence references; OpenSpec task/phase/gate references; and resulting ContextManifest V2 checksum/admission status. Do not add routing identity to canonical packet identity.
-- [ ] **SEL-RECEIPT-02 — Fail-closed consistency tests**: Reject mismatched snapshot/ordinal-map/routing revisions, duplicate or unresolved canonical candidates, stale source revisions, invalid tuple evidence, nondeterministic Top-K ordering, or phase/gate references without a task receipt. Verify that semantic executors share one logical lane vote and that advisory KMeans/SOM/manifold features cannot create identity or votes.
+- [x] **SEL-RECEIPT-01 — Bind Top-K selection to its exact inputs**: Reuse the existing candidate feature snapshot, ordinal map, centroid routing manifest, tournament/run observation, and ContextManifest owners. Define a deterministic selection receipt that binds query/run checksum; candidate snapshot and ordinal-map checksums; optional `routingId`/`routingRevision`/manifest digest; Top-K algorithm, parameters, `k`, stable tie-break and ordered canonical IDs; source/workspace/representation/feature revisions; applicable ontology tuple/evidence references; OpenSpec task/phase/gate references; and resulting ContextManifest V2 checksum/admission status. Do not add routing identity to canonical packet identity.
+- [x] **SEL-RECEIPT-02 — Fail-closed consistency tests**: Reject mismatched snapshot/ordinal-map/routing revisions, duplicate or unresolved canonical candidates, stale source revisions, invalid tuple evidence, nondeterministic Top-K ordering, or phase/gate references without a task receipt. Verify that semantic executors share one logical lane vote and that advisory KMeans/SOM/manifold features cannot create identity or votes.
 - [x] **MODEL-TERMS-01 — DeltaNet and SwiGLU reference corpus**: Boundedly acquired the two primary arXiv landing pages through the existing docs pipeline into `docs/.okf/research/deltanet-swiglu/`. Both records report `fetched_via=firecrawl`; the publication receipt reports 2/2 staged, validated, and published with source identity, official URL, markdown checksum, sidecar checksum, generation readback, and pointer readback passing. Run `20261013T233704715Z-74d9f3efe960ad8c`; generation manifest checksum `sha256:88a126f9b8844a6912a108992df4fd46f7efb3a54b4e76bcd22f2dfd9d7ee69a`. Corpus is reference-only and stores bounded excerpts, not full papers.
 - [x] **MODEL-TERMS-02 — Keep mechanism boundaries distinct**: Updated the canonical root `.okf` glossary and keyword corpus; regenerated Master TOC V2 from its governance registry. DeltaNet denotes an attention/memory architecture family; SwiGLU denotes a gated feed-forward activation. Neither is a retrieval/packet/routing contract or a conversion to canonical `semantic_768`. The selection receipt remains a design contract; no end-to-end selection receipt is claimed. `node scripts/atlas/build-master-toc-v2.mjs --check` passed and strict OpenSpec validation passed.
 - [x] **MODEL-TERMS-03 — Legacy TOC replay size gate**: Added shared 16 MiB source filtering to the V1 and V2 generators; a temporary-file regression test proves oversized sources are skipped while bounded sources remain included. `npm run atlas:docs:toc:replay-smoke` passes with 7,271 records and 102 oversized sources skipped; consecutive registry/TOC/architecture-TOC checksums match. Oversized evidence files were not modified or removed. The broader acceptance task remains open for its other gates.

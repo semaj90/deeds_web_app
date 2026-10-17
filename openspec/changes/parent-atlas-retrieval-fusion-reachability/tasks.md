@@ -1891,3 +1891,12 @@ Next gate: reviewer completion and sealed judgment-set validation.
 Status: `IDENTITY_ENVELOPE_PARTIAL`; `authority=false`; `writesPerformed=false`.
 Evidence: `docs/reports/rrf-real-caller-identity-envelope-v1.json`.
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+### P15 bounded SearchRuntime fusion proof cross-reference — 2026-10-16
+
+`docs/reports/p14-p15-p19-cache-fusion-policy-receipt-v1.json` records
+exact RRF arithmetic and one vote per logical lane for a two-candidate fixture
+through the existing `fuseSearchRuntimeCandidates` owner. This proves the
+bounded fusion contract, not live Postgres/Qdrant retrieval, canonical source
+and workspace revision qualification, caller coverage, or ContextManifest
+admission. RF5/RF6 and live identity-envelope gates remain open.

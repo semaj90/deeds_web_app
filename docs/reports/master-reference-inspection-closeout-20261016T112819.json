@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.master-reference-inspection-closeout.v1",
+  "status": "FULL_CHECKLIST_REFERENCE_COVERAGE_ACCEPTANCE_REVIEW_OPEN",
+  "source": "docs/reports/sessions/MASTER-FEATURE-TODO-2026-05-20.md",
+  "sourceSha256": "60d43e671d3087311d3988d7f7bbf506cd010bd76518ab154ac2ee9b3a97ced2",
+  "priorSourceSha256": "34b4f018edb617274b9b34fcaff5ca3bdf2451d66f1861b9fce756a8de6bc5bf",
+  "claimIdsChanged": 0,
+  "claims": 466,
+  "headings": 31,
+  "checkedClaims": 302,
+  "openClaims": 164,
+  "claimByteSpansIndependentlyVerified": 466,
+  "claimsWithoutExplicitExtractedPath": 316,
+  "uniqueReferences": 146,
+  "referenceCounts": {
+    "exactCandidate": 64,
+    "ambiguousCandidate": 10,
+    "missingExactFile": 7,
+    "unresolvedDirectoryOrSymbolic": 65
+  },
+  "canonicalAuthority": false,
+  "productionReadinessEstablished": false,
+  "capabilityGatesClosed": 0,
+  "scopeLimits": [
+    "This inspects extracted literal paths, not every semantic requirement or acceptance receipt",
+    "Directory/symbolic references and missing paths do not establish absent capabilities",
+    "Untracked files are not automatically declared ignored",
+    "Root/frontend ambiguity is retained, not resolved by a newest-file or first-match guess",
+    "No file content or receipt assertion was evaluated by the reference inspector",
+    "Golden reviewed judgments, current service execution and production admission remain separate gates"
+  ],
+  "validation": {
+    "testsPassed": 14,
+    "testsFailed": 0,
+    "testLog": "docs/reports/master-reference-inspection-verified-tests-20261016T112819105.txt",
+    "inspection": "docs/reports/master-all-claims-reference-verified-20261016T112819105.json"
+  },
+  "likely_cause": "The master mixes historical completion claims, incomplete artifact references and duplicate root/frontend namespaces without a per-claim acceptance crosswalk.",
+  "evidence": [
+    "docs/reports/master-all-claims-reference-verified-20261016T112819105.json",
+    "docs/reports/master-feature-all-claims-20261016.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/extract-master-open-todos-v1.mjs",
+    "scripts/atlas/extract-master-open-todos-v1.test.mjs",
+    "openspec/changes/parent-atlas-document-governance-master-index/tasks.md",
+    "docs/reports/master-feature-phase-gates-review-20261016.md"
+  ],
+  "safe_next_command": "node scripts/atlas/extract-master-open-todos-v1.mjs --all --inspect-references",
+  "smoke_command": "node --test scripts/atlas/extract-master-open-todos-v1.test.mjs",
+  "report_path": "docs/reports/master-reference-inspection-closeout-20261016T112819.json"
+}

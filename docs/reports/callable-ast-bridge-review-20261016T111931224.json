@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.callable-ast-bridge-review.v1",
+  "planChecksum": "sha256:f58dc83c1c68260ad1d5b7896a67913e9fef10c7d034ee0ee5d28e6b1ef5be62",
+  "planReplayVerified": true,
+  "observedNodeId": "ef11d8916dfa50c9eb3b8046a3eed43ef41c55974fb26f532bc81b4e891d8b04",
+  "proposedNodeId": "3561bb301bdf5dcab4a7134afd843fb78da32acb",
+  "astRows": [],
+  "foreignKeyConstraints": [],
+  "transactionReadOnly": true,
+  "writesPerformed": false,
+  "eligibleForApply": false
+}

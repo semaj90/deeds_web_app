@@ -22,6 +22,15 @@
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\cuvs_bridge.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\graph_search.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\tree_ensemble.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\manifold_interpolate.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\vendor\simdjson.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.integration-progress.v1",
+  "status": "ACTIVE_PARTIAL",
+  "gate": "STORE-REQUEST-OBSERVATION-01",
+  "scope": "Bounded client request observations at existing retrieval callers; component validation only",
+  "implementation": {
+    "owner": "sveltekit-frontend/src/lib/server/telemetry/gpu-telemetry.ts",
+    "writer": "Existing packet-centric telemetry and atlas_retrieval_eval_times JSONB payload writer",
+    "operations": ["redis.get", "redis.hgetall", "redis.hmget", "qdrant.points_query", "neo4j.read_query"],
+    "durationScope": "CLIENT_REQUEST_WALL_TIME",
+    "outcomes": ["RETURNED", "THREW"],
+    "kernelName": null,
+    "kernelMs": null,
+    "newStore": false,
+    "capturesQueryKeysCredentialsResponsesVectors": false,
+    "canonicalAuthority": false
+  },
+  "validation": {
+    "focusedSuitesPassed": 6,
+    "focusedTestsPassed": 35,
+    "log": "docs/reports/store-resource-final-20261016T000616.txt",
+    "syntaxTranspileErrors": 0,
+    "syntaxScope": ["telemetry/gpu-telemetry.ts", "retrieval/orchestrator.ts", "retrieval/graph-context.ts"],
+    "fullTypecheck": "NOT_RUN",
+    "liveStoreReplay": "NOT_RUN",
+    "durableReadback": "NOT_RUN",
+    "priorFailedLogsPreserved": true,
+    "concurrencyFinding": "Focused concurrent observations initially lost delivery while awaiting separate lazy imports in the test environment; sharing the lazy module promise passes the regression without awaiting pending writes.",
+    "lockedFile": "Shared packet-centric-telemetry.spec.ts could not be edited; added adjacent store-operation-writer.spec.ts instead."
+  },
+  "notPerformed": ["live database writes", "source-revision writes", "backfill", "service restart", "model load", "GPU job", "Svelte check", "graph refresh", "promotion"],
+  "remaining": ["live operation replay", "qualified packet context at retrieval callers", "bounded delivery/backpressure", "durable independent readback", "actual kernel/backend proof", "ContextManifest end-to-end admission"],
+  "likely_cause": "Existing retrieval timings aggregate store work and do not distinguish individual request boundaries from kernel execution.",
+  "evidence": ["Existing orchestrator Redis/Qdrant requests", "Existing graph-context Neo4j session.run", "35 passing focused component tests"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/telemetry/gpu-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/gpu-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/store-operation-writer.spec.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/graph-context.ts",
+    "docs/architecture/gpu-resource-observations-and-cache-boundary-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-telemetry-lowrank-recommendation-okf-integration --strict",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/telemetry/gpu-telemetry.spec.ts src/lib/server/telemetry/store-operation-writer.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-store-request-observation-20261016.json"
+}

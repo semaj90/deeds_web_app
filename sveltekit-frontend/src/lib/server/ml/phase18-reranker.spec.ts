@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { predictRerankerScore, rerankerBatch, type Phase18RerankerInput } from './phase18-reranker';
+import { getRerankerStatus, predictRerankerScore, rerankerBatch, type Phase18RerankerInput } from './phase18-reranker.js';
 
 const makeInput = (
   packetKey: string,
@@ -29,6 +29,14 @@ const makeInput = (
 });
 
 describe('Phase 18 reranker unavailable boundary', () => {
+  test('status does not claim active training or an authority-score fallback', () => {
+    const status = getRerankerStatus();
+    expect(status.isReady).toBe(false);
+    expect(status.modelLoaded).toBe(false);
+    expect(status.fallbackActive).toBe(false);
+    expect(status.message).not.toContain('training in progress');
+    expect(status.message).toContain('No learned score');
+  });
   test.each(['pending', 'invalid'] as const)('blocks %s Phase 17 input', async (validationStatus) => {
     const result = await predictRerankerScore(makeInput('candidate', validationStatus));
 

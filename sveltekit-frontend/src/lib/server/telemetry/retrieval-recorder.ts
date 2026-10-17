@@ -12,6 +12,7 @@ import crypto from 'node:crypto';
 import type { PacketCentricContext } from './packet-centric-telemetry.js';
 import { TransportTelemetrySchema, type TransportTelemetry } from '../grpc/transport-telemetry.js';
 import { ResourceOperationObservationSchema, type ResourceOperationObservation } from './gpu-telemetry.js';
+import { validateTelemetryTraceBinding } from './acp-observation.js';
 
 /** One retrieved packet pointer — no payload, no body. */
 export interface RetrievalHit {
@@ -24,6 +25,8 @@ export interface RetrievalHit {
 
 /** Per-query hit summary stored in atlas_retrieval_eval_times.payload. */
 export interface RetrievalHitsPayload {
+  trace_id?: string | null;
+  acp_observation?: import('./acp-observation.js').AcpObservation;
   resource_observation?: ResourceOperationObservation;
   packet_context?: PacketCentricContext;
   transport_telemetry?: TransportTelemetry;
@@ -119,8 +122,15 @@ export type RetrievalEvalTelemetrySignal = Omit<RetrievalTelemetrySignal, 'query
 
 export async function recordRetrievalEvalTelemetry(signal: RetrievalEvalTelemetrySignal): Promise<void> {
   const hitsPayload = { ...signal.hitsPayload };
+  if (hitsPayload.acp_observation) {
+    const { AcpObservationSchema } = await import('./acp-observation.js');
+    hitsPayload.acp_observation = AcpObservationSchema.parse(hitsPayload.acp_observation);
+  }
+  hitsPayload.trace_id = validateTelemetryTraceBinding(hitsPayload.trace_id, hitsPayload.acp_observation);
   if (hitsPayload.transport_telemetry) hitsPayload.transport_telemetry = TransportTelemetrySchema.parse(hitsPayload.transport_telemetry);
   if (hitsPayload.resource_observation) hitsPayload.resource_observation = ResourceOperationObservationSchema.parse(hitsPayload.resource_observation);
+  validateTelemetryTraceBinding(hitsPayload.trace_id, hitsPayload.transport_telemetry);
+  validateTelemetryTraceBinding(hitsPayload.trace_id, hitsPayload.resource_observation);
   const queryHash = typeof signal.query === 'string' ? crypto.createHash('sha256').update(signal.query).digest('hex')
     : typeof signal.queryHash === 'string' && /^[a-f0-9]{64}$/.test(signal.queryHash) ? signal.queryHash : null;
   const selectedPacketKeys = cleanStringArray(signal.selectedPacketKeys);

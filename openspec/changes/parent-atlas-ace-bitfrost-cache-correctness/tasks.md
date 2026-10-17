@@ -1,5 +1,10 @@
 # Tasks: parent-atlas-ace-bitfrost-cache-correctness
 
+## Legacy GPU numeric result-cache containment
+
+- [x] `BF-GPU-NUMERIC-CACHE-01` Remove raw-array Redis read/write/serialization from `gpu-pipeline.ts`. Preserve CPU/native compute and expose disabled storage policy in diagnostics. Regression tests cover changed attention keys, tail-only score changes, all six CPU operations and zero Redis calls. Existing keys were not read or deleted; no descriptor cache was added. Receipt: `docs/reports/parent-atlas-resource-observation-cache-boundary-v1.json`.
+- [ ] Consume qualified descriptors through the existing ACE/BitFrost residency owner only after its source/representation/graph/device gates pass. This containment is not production residency, cross-model cache reuse, or repository-wide cache qualification. Source-revision writes remain deferred under the post-P20 rule.
+
 ## Taxonomy-aware RLM cache handoff — 2026-09-06
 
 - [x] Narrow request-cache handoff proven: `RlmSearchRequest.taxonomyRevision` and
@@ -1036,3 +1041,12 @@ policy-learning path.
 - Recovery now schema-validates the cursor and fails closed unless gates are nonempty and all PASS, the lane is `dense_768` at dimension 768, and packet/source/content/source-revision/workspace-revision/representation-revision bindings are present. Returned candidates preserve those bindings and the cursor score.
 - Existing cursor creation does not yet populate the required lineage fields; therefore these historical/session cursors intentionally become cache misses rather than evidence. Wiring a qualified cursor producer, caller reachability, current-source readback, and ACE/ContextManifest admission remain open.
 - Focused `context-assembler.spec.ts` passes 15/15. `npm run check` emitted the existing Svelte/Vite configuration warnings and was interrupted without diagnostics or a completion result; type-check status is not proven. No live Redis read/write or service change was performed.
+
+### P14 bounded policy/cache proof cross-reference — 2026-10-16
+
+`docs/reports/p14-p15-p19-cache-fusion-policy-receipt-v1.json` records a
+bounded P14 proof: revisioned cold/warm parity, stale-revision invalidation,
+and a 40,960-byte residency budget with 32,320 bytes selected. The proof uses
+an ephemeral in-memory cache client (`writesPerformed=false`); it does not
+establish live Valkey residency, production caller wiring, or full ACE/
+ContextManifest admission. Keep the live integration gates above open.

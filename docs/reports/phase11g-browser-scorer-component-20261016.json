@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.component-proof.v1",
+  "gate": "BROWSER-11G-02A",
+  "status": "CPU_AND_MOCKED_GPU_COMPONENT_TESTED_BROWSER_PRODUCTION_OPEN",
+  "canonicalAuthority": false,
+  "layout": {
+    "schema": "atlas.browser-doc-features.v1",
+    "fields": ["trust_tier", "som_cluster", "karpathy_blend", "pagerank", "risk_score"],
+    "dtype": "float32",
+    "strideBytes": 20,
+    "maximumRows": 4096,
+    "heuristicWeightsUnchanged": true,
+    "trainedModel": false
+  },
+  "tests": {
+    "command": "npx vitest run src/lib/utils/gpu-reranker.spec.ts --reporter=dot",
+    "workingDirectory": "sveltekit-frontend",
+    "passed": 10,
+    "failed": 0,
+    "log": "docs/reports/phase11g-browser-scorer-tests-20261016.txt",
+    "scope": "CPU numerical reference and mocked device/readback/lifecycle; no actual WGSL compilation or physical GPU execution"
+  },
+  "typecheck": {
+    "status": "PASSED",
+    "initialFailurePreserved": "docs/reports/phase11g-browser-scorer-typecheck-20261016.txt",
+    "finalLog": "docs/reports/phase11g-browser-scorer-typecheck-final-20261016.txt"
+  },
+  "writesPerformed": { "codeAndReports": true, "database": false, "cacheOrProjection": false, "sourceRevision": false },
+  "remaining": [
+    "Actual browser shader compilation and CPU/GPU parity",
+    "Browser worker and transfer/SAB ownership protocol",
+    "Deployed Service Worker and digest-verified cache lifecycle",
+    "Candidate and ContextManifest identity preservation at actual caller",
+    "Feature-flagged integration, telemetry and golden shadow evaluation"
+  ],
+  "likely_cause": "The existing uncalled browser scorer lacked bounded runtime validation, reliable initialization fallback, failure-path cleanup and a CPU readback oracle.",
+  "evidence": ["10 passing component tests", "Focused strict typecheck", "Existing browser utility reused with extracted WGSL asset"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/utils/gpu-reranker.ts",
+    "sveltekit-frontend/src/lib/utils/gpu-reranker.spec.ts",
+    "sveltekit-frontend/src/lib/webgpu/schema-encoder.wgsl",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "docs/reports/master-feature-phase-gates-review-20261016.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend && npx vitest run src/lib/utils/gpu-reranker.spec.ts --reporter=dot",
+  "smoke_command": "openspec validate parent-atlas-ace-rlm-bitfrost-integration --strict",
+  "report_path": "docs/reports/phase11g-browser-scorer-component-20261016.json"
+}

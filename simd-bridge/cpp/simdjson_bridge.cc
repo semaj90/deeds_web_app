@@ -11,6 +11,9 @@
 #include "vendor/simdjson.h"
 #include <vector>
 #include <string>
+#include <cmath>
+#include <cstdint>
+#include <limits>
 
 // Thread-local parser for zero-allocation reuse across calls
 static thread_local simdjson::ondemand::parser tl_parser;
@@ -82,6 +85,81 @@ static napi_value SimdJsonValidate(napi_env env, napi_callback_info info) {
 
   napi_value result;
   napi_get_boolean(env, error == simdjson::SUCCESS, &result);
+  return result;
+}
+
+static bool isValidUtf8Range(const uint8_t *bytes, uint32_t start, uint32_t end) {
+  uint32_t index = start;
+  while (index < end) {
+    const uint8_t first = bytes[index++];
+    if (first <= 0x7F) continue;
+    uint32_t codepoint = 0;
+    uint32_t continuation_count = 0;
+    if (first >= 0xC2 && first <= 0xDF) {
+      codepoint = first & 0x1F;
+      continuation_count = 1;
+    } else if (first >= 0xE0 && first <= 0xEF) {
+      codepoint = first & 0x0F;
+      continuation_count = 2;
+    } else if (first >= 0xF0 && first <= 0xF4) {
+      codepoint = first & 0x07;
+      continuation_count = 3;
+    } else {
+      return false;
+    }
+    if (end - index < continuation_count) return false;
+    for (uint32_t offset = 0; offset < continuation_count; ++offset) {
+      const uint8_t next = bytes[index++];
+      if ((next & 0xC0) != 0x80) return false;
+      codepoint = (codepoint << 6) | (next & 0x3F);
+    }
+    if ((continuation_count == 1 && codepoint < 0x80) ||
+        (continuation_count == 2 && codepoint < 0x800) ||
+        (continuation_count == 3 && codepoint < 0x10000) ||
+        (codepoint >= 0xD800 && codepoint <= 0xDFFF) || codepoint > 0x10FFFF) {
+      return false;
+    }
+  }
+  return true;
+}
+
+static napi_value SimdJsonValidateAstSpans(napi_env env, napi_callback_info info) {
+  size_t argc = 2;
+  napi_value argv[2];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 2) {
+    napi_throw_type_error(env, nullptr, "simdJsonValidateAstSpans: expected (Uint32Array spans, Uint8Array sourceBytes)");
+    return nullptr;
+  }
+  napi_typedarray_type type;
+  size_t length = 0;
+  void *data = nullptr;
+  napi_typedarray_type source_type;
+  size_t source_length = 0;
+  void *source_data = nullptr;
+  if (napi_get_typedarray_info(env, argv[0], &type, &length, &data, nullptr, nullptr) != napi_ok ||
+      type != napi_uint32_array || length % 2 != 0 ||
+      napi_get_typedarray_info(env, argv[1], &source_type, &source_length, &source_data, nullptr, nullptr) != napi_ok ||
+      source_type != napi_uint8_array || source_length > std::numeric_limits<uint32_t>::max()) {
+    napi_throw_type_error(env, nullptr, "simdJsonValidateAstSpans: expected Uint32Array spans and Uint8Array source bytes");
+    return nullptr;
+  }
+  const auto *spans = static_cast<const uint32_t *>(data);
+  const auto *source = static_cast<const uint8_t *>(source_data);
+  bool valid = true;
+  for (size_t index = 0; index < length; index += 2) {
+    const uint32_t start = spans[index];
+    const uint32_t end = spans[index + 1];
+    if (start >= end || end > source_length ||
+        (start > 0 && (source[start] & 0xC0) == 0x80) ||
+        (end < source_length && (source[end] & 0xC0) == 0x80) ||
+        !isValidUtf8Range(source, start, end)) {
+      valid = false;
+      break;
+    }
+  }
+  napi_value result;
+  napi_get_boolean(env, valid, &result);
   return result;
 }
 
@@ -490,6 +568,10 @@ napi_value RegisterSimdJsonParse(napi_env env, napi_callback_info info) {
 
 napi_value RegisterSimdJsonValidate(napi_env env, napi_callback_info info) {
   return SimdJsonValidate(env, info);
+}
+
+napi_value RegisterSimdJsonValidateAstSpans(napi_env env, napi_callback_info info) {
+  return SimdJsonValidateAstSpans(env, info);
 }
 
 napi_value RegisterSimdJsonExtractNumbers(napi_env env, napi_callback_info info) {

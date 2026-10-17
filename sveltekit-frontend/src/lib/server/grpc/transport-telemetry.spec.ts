@@ -1,7 +1,33 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { instrumentGrpcPackageCodecs, measureTransportCodec, observeTransport, TransportTelemetrySchema } from './transport-telemetry.js';
 
 describe('transport codec observations', () => {
+  it('retains failed codec measurements through the observer while preserving the original exception', async () => {
+    const failure = new Error('private fixture error');
+    const observer = vi.fn();
+    await expect(observeTransport('http', async () => measureTransportCodec('json_parse', () => { throw failure; }, () => 0),
+      '/fixture', observer)).rejects.toBe(failure);
+    expect(observer).toHaveBeenCalledTimes(1);
+    expect(observer.mock.calls[0][0]).toMatchObject({ attempt_outcome: 'THREW', operation: '/fixture',
+      measurements: { json_parse: { calls: 1, failedCalls: 1 } } });
+    expect(JSON.stringify(observer.mock.calls[0][0])).not.toContain(failure.message);
+  });
+
+  it('observes null fallback results without waiting for a pending writer', async () => {
+    const observer = vi.fn((_observation: unknown) => new Promise<void>(() => {}));
+    await expect(observeTransport('grpc', async () => null, 'SearchChunks', observer)).resolves.toBeNull();
+    expect(observer).toHaveBeenCalledTimes(1);
+    expect(observer.mock.calls[0][0]).toMatchObject({ attempt_outcome: 'NO_RESULT', rpc_transport: 'grpc' });
+  });
+
+  it('does not emit failure records for successful empty results or let observer errors replace a fallback', async () => {
+    const observer = vi.fn(() => { throw new Error('writer unavailable'); });
+    const result = await observeTransport('http', async () => ({ results: [] }), '/fixture', observer);
+    expect(result.transportTelemetry.attempt_outcome).toBe('RETURNED');
+    expect(observer).not.toHaveBeenCalled();
+    await expect(observeTransport('http', async () => null, '/fixture', observer)).resolves.toBeNull();
+  });
+
   it('measures only executed JSON operations and leaves unobserved HTTP version/codecs null', async () => {
     const result = await observeTransport('http', async () => {
       const text = measureTransportCodec('json_stringify', () => JSON.stringify({ title: 'λ' }), (value) => Buffer.byteLength(value));

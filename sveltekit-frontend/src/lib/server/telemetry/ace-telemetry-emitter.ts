@@ -8,11 +8,13 @@
  */
 
 import { recordRetrievalTelemetry, type RetrievalTelemetrySignal } from './retrieval-recorder.js';
-import { recordPacketCentricTelemetry, normalizePacketContext, type PacketCentricContext } from './packet-centric-telemetry.js';
+import { recordPacketCentricTelemetry, selectPacketTelemetryCandidates, type PacketCentricContext } from './packet-centric-telemetry.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { TransportTelemetry } from '../grpc/transport-telemetry.js';
+import { getPacketTelemetryContext } from './packet-telemetry-context.js';
 
 export interface ACERetrievalMetrics {
+  traceId?: string | null;
   transportTelemetry?: TransportTelemetry;
   query: string;
   vectorHits?: number;
@@ -81,6 +83,7 @@ export async function recordACERetrievalTelemetry(metrics: ACERetrievalMetrics):
 
   // Emit packet-centric telemetry (Phase 2)
   recordPacketCentricTelemetry({
+    trace_id: metrics.traceId === undefined ? getPacketTelemetryContext()?.trace_id : metrics.traceId,
     transport_telemetry: metrics.transportTelemetry,
     query: metrics.query,
     query_hash: metrics.query.slice(0, 64),
@@ -178,26 +181,14 @@ export function extractPacketAndFeatureIds(
   selectedPacketKeys: string[];
   selectedFeatureId: string | null;
   featureIds: string[];
+  packetContext: PacketCentricContext;
 } {
-  const packetKeys = new Set<string>();
-  const featureIds = new Set<string>();
-
-  for (const candidate of candidates) {
-    if (candidate.packet_key && typeof candidate.packet_key === 'string') {
-      packetKeys.add(candidate.packet_key);
-    }
-    if (candidate.feature_id && typeof candidate.feature_id === 'string') {
-      featureIds.add(candidate.feature_id);
-    }
-  }
-
-  const packetKeysArray = Array.from(packetKeys);
-  const featureIdsArray = Array.from(featureIds);
-
+  const selected = selectPacketTelemetryCandidates(candidates);
   return {
-    selectedPacketKey: packetKeysArray[0] ?? null,
-    selectedPacketKeys: packetKeysArray,
-    selectedFeatureId: featureIdsArray[0] ?? null,
-    featureIds: featureIdsArray,
+    selectedPacketKey: selected.selected_packet_key ?? null,
+    selectedPacketKeys: selected.selected_packet_keys ?? [],
+    selectedFeatureId: selected.selected_feature_id ?? null,
+    featureIds: selected.feature_ids ?? [],
+    packetContext: selected.packet_context ?? {},
   };
 }

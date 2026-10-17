@@ -144,17 +144,13 @@ export function evaluateWorkflowSuccess(
 ): boolean {
   let success = report.stages.validation.pass;
   if (profile === 'semantic-full' || profile === 'production-projection') {
-    // NOTE: the semantic stage can only ever report 'PARTIAL' or 'SKIPPED'
-    // (repository-provenance-workflow.ts marks it 'PARTIAL' whenever any
-    // entries were sampled, by design — semantic enrichment is inherently a
-    // bounded sample, unlike lexical/relationships/labeling which are
-    // exhaustive over all files and can report 'PROVEN'). Gating success on
-    // semantic.status === 'PROVEN' made semantic-full/production-projection
-    // fail unconditionally. Require 'PARTIAL' (i.e. not 'SKIPPED') plus the
-    // existing quality checks instead.
+    // Semantic enrichment is a bounded sample. It reports 'PARTIAL' for the hash-embedder smoke and
+    // 'PROVEN' only when every sample is a real (--live-embedder) embedding; 'SKIPPED' means nothing
+    // was sampled. Gating on 'PROVEN' alone would fail the default hash run, and gating on 'PARTIAL'
+    // alone would fail a real live run, so accept either plus the existing quality checks.
     success =
       success &&
-      report.stages.semantic.status === 'PARTIAL' &&
+      (report.stages.semantic.status === 'PARTIAL' || report.stages.semantic.status === 'PROVEN') &&
       (report.stages.semantic.embeddedFiles ?? 0) > 0 &&
       (report.stages.semantic.heuristicFiles ?? 0) === 0;
   }

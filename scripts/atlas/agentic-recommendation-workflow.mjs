@@ -248,6 +248,7 @@ function createWorkflowRun(query, normalizedQuery) {
     intent: null,
     active_context: null,
     ace_context: null,
+    dag_synthesis_packet: null,
     recommendation: null,
     outcome: null,
   };
@@ -575,6 +576,77 @@ export function buildAceEvidenceBlocks(aceContext) {
     : '';
 
   return { acePacket, aceCards, admittedCards };
+}
+
+export function buildAceDagSynthesisPacket({
+  workflow,
+  tocContext = [{ ref: 'docs/atlas/parent-atlas-table-of-contents.md', title: 'Parent Atlas architecture TOC' }],
+} = {}) {
+  const aceContext = workflow?.ace_context ?? workflow?.workflow_report?.ace_context;
+  const { admittedCards } = buildAceEvidenceBlocks(aceContext);
+  const reasons = [];
+
+  if (aceContext?.status !== 'ADMITTED') reasons.push('ACE_CONTEXT_NOT_ADMITTED');
+  if (!aceContext?.contextManifest || typeof aceContext.contextManifest !== 'object') {
+    reasons.push('CONTEXT_MANIFEST_MISSING');
+  }
+
+  const manifest = aceContext?.contextManifest;
+  const manifestPacketKeys = Array.isArray(manifest?.selected_packet_keys)
+    ? new Set(manifest.selected_packet_keys.filter((key) => typeof key === 'string' && key.length > 0))
+    : new Set();
+  if (manifestPacketKeys.size === 0) reasons.push('NO_MANIFEST_SELECTED_PACKET_KEYS');
+
+  const evidence = admittedCards.flatMap((card) => {
+    const packetKey = card.packetKey ?? card.packet_key;
+    const sourceRef = card.sourceRef ?? card.source_ref;
+    const treeNodeId = card.treeNodeId ?? card.tree_node_id;
+    const sourceRevision = card.sourceRevision ?? card.source_revision;
+    const workspaceRevision = card.workspaceRevision ?? card.workspace_revision;
+    const revisionPattern = /^sha256:[a-f0-9]{64}$/i;
+    if (!packetKey || !manifestPacketKeys.has(packetKey) || !sourceRef || !treeNodeId
+      || !revisionPattern.test(String(sourceRevision ?? ''))
+      || !revisionPattern.test(String(workspaceRevision ?? ''))) return [];
+    return [{
+      packet_key: packetKey,
+      source_ref: sourceRef,
+      tree_node_id: treeNodeId,
+      source_revision: sourceRevision,
+      workspace_revision: workspaceRevision,
+      evidence_id: card.evidenceId ?? card.evidence_id ?? null,
+      title: card.title ?? null,
+      content: typeof card.content === 'string' ? card.content : null,
+    }];
+  }).slice(0, 12);
+
+  if (evidence.length === 0) reasons.push('NO_EVIDENCE_BOUND_TO_MANIFEST');
+
+  const tocEntries = Array.isArray(tocContext)
+    ? tocContext.filter((entry) => entry && typeof entry.ref === 'string' && typeof entry.title === 'string')
+      .slice(0, 12)
+      .map(({ ref, title }) => ({ ref, title }))
+    : [];
+
+  return {
+    contract: 'atlas.ace-dag-synthesis-packet.v1',
+    status: reasons.length === 0 ? 'READY_FOR_DAG_SCAFFOLD' : 'BLOCKED',
+    evidence_qualification: 'SHAPE_ONLY_NOT_LIVE_READBACK',
+    synthesis_ready: false,
+    reasons,
+    request_id: manifest?.request_id ?? workflow?.run_id ?? null,
+    manifest_id: manifest?.manifest_id ?? null,
+    query: typeof workflow?.query === 'string' ? workflow.query : null,
+    ace_packet: reasons.length === 0 && typeof aceContext.promptPacket === 'string'
+      ? aceContext.promptPacket.slice(0, 16000)
+      : null,
+    toc_context: tocEntries,
+    evidence,
+    rejected_card_count: admittedCards.length - evidence.length,
+    dag: Array.isArray(workflow?.dag) ? workflow.dag.slice(0, 32) : [],
+    writes_performed: false,
+    model_invoked: false,
+    canonical_authority: false,
+  };
 }
 
 // ── L6: Ornith 1.5 synthesis (bounded) ────────────────────────────────────────
@@ -925,6 +997,8 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     evidenceRefs: recommendation.evidence.rg_matches.slice(0, 10),
   });
 
+  workflow.dag_synthesis_packet = buildAceDagSynthesisPacket({ workflow });
+
   await writeWorkflowReport(workflow, recommendation, workflow.outcome);
 
   return {
@@ -937,6 +1011,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     ace_context: aceContext,
     structured_recommendation: structuredRecommendation,
     workflow_report: workflow,
+    dag_synthesis_packet: workflow.dag_synthesis_packet,
   };
 }
 

@@ -31,6 +31,7 @@ export interface EndpointResolutionV1 {
   /** canonicalId comes only from the injected canonical packet-key resolver. */
   canonicalId: string | null;
   sourceRevision: string | null;
+  sourceRef: string | null;
 }
 
 export async function resolveIncidenceEndpointsV1(
@@ -56,6 +57,7 @@ export async function resolveIncidenceEndpointsV1(
       status,
       canonicalId: status === 'RESOLVED' ? canonicalByKey.get(key)! : null,
       sourceRevision: status === 'RESOLVED' ? row!.source_revision!.trim() : null,
+      sourceRef: status === 'RESOLVED' ? row!.source_ref!.trim() : null,
     });
   }
   return out;

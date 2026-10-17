@@ -627,3 +627,50 @@ export function compileFsmContextManifestV1(input: {
     leaseIds,
   };
 }
+
+export interface BitFrostProceduralKeyInputV1 {
+  modelName: string;
+  artifactChecksum: string;
+  representationRevision: string;
+  slotIndex?: number;
+}
+
+/**
+ * Builds the canonical Valkey/BitFrost procedural cache key keyed strictly by
+ * (model_name, artifact_checksum, representation_revision).
+ */
+export function buildBitFrostProceduralKeyV1(input: BitFrostProceduralKeyInputV1): string {
+  const base = `bitfrost:procedural:${input.modelName}:${input.artifactChecksum}:${input.representationRevision}`;
+  return input.slotIndex !== undefined ? `${base}:slot_${input.slotIndex}` : base;
+}
+
+export interface BitFrostProceduralDescriptorV1 {
+  schema: 'atlas.bitfrost-procedural-descriptor.v1';
+  proceduralKey: string;
+  modelName: string;
+  artifactChecksum: string;
+  representationRevision: string;
+  kvCachePersisted: false;
+  hiddenThoughtsPersisted: false;
+  rawTensorPersisted: false;
+}
+
+/**
+ * Enforces procedural memory boundaries: FSM token states, residency descriptors,
+ * and context plans are cached in BitFrost/Valkey keyed by (model_name, artifact_checksum, representation_revision).
+ * Strictly guarantees that no hidden thoughts, KV cache tensors, or raw prompt buffers are persisted.
+ */
+export function buildBitFrostProceduralDescriptorV1(
+  input: BitFrostProceduralKeyInputV1
+): BitFrostProceduralDescriptorV1 {
+  return {
+    schema: 'atlas.bitfrost-procedural-descriptor.v1',
+    proceduralKey: buildBitFrostProceduralKeyV1(input),
+    modelName: input.modelName,
+    artifactChecksum: input.artifactChecksum,
+    representationRevision: input.representationRevision,
+    kvCachePersisted: false,
+    hiddenThoughtsPersisted: false,
+    rawTensorPersisted: false,
+  };
+}

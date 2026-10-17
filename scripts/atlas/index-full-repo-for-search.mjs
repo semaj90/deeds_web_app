@@ -510,7 +510,12 @@ async function upsertPostgresMetadata(pool, chunk) {
        source_revision   = EXCLUDED.source_revision,
        domain            = EXCLUDED.domain,
        tags              = EXCLUDED.tags,
-       metadata          = EXCLUDED.metadata,
+       metadata          = EXCLUDED.metadata || CASE
+         WHEN codebase_chunk_index.metadata ? 'packet_key'
+           AND codebase_chunk_index.metadata->>'packet_key' IS DISTINCT FROM codebase_chunk_index.qdrant_id::text
+         THEN jsonb_build_object('packet_key', codebase_chunk_index.metadata->'packet_key')
+         ELSE '{}'::jsonb
+       END,
        updated_at        = NOW()`,
     [
       chunk.qdrant_id,
@@ -548,7 +553,7 @@ async function upsertPostgresMetadata(pool, chunk) {
 async function alreadyIndexed(pool, chunks) {
   if (chunks.length === 0) return new Map();
   const res = await pool.query(
-    `SELECT qdrant_id, content_hash, file_content_hash, metadata
+    `SELECT qdrant_id, content_hash, file_content_hash, source_revision, workspace_revision, metadata
        FROM codebase_chunk_index
       WHERE qdrant_id = ANY($1)`,
     [chunks.map(chunk => chunk.qdrant_id)]
@@ -681,7 +686,8 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
       metadata: {
         domain_class: domainClass,
         feature_id: featureId,
-        packet_key: qdrantId,
+        packet_key: null,
+        qdrant_id: qdrantId,
         key_path: c.key_path ?? null,
         chunk_kind: c.chunk_kind ?? (isLarge ? 'large-text' : 'text'),
         chunk_source: c.chunk_source ?? 'TEXT_FALLBACK',
@@ -783,7 +789,8 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
           path:         chunk.relative_path,
           file_path:    chunk.relative_path,
           source_ref:   chunk.relative_path,
-          packet_key:   chunk.qdrant_id,
+          packet_key:   null,
+          qdrant_id:    chunk.qdrant_id,
           feature_id:   chunk.feature_id,
           domain_class: chunk.domain_class,
           topology:     chunk.topology,

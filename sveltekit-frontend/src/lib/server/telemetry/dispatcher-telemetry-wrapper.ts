@@ -1,15 +1,19 @@
 /**
  * Dispatcher Telemetry Wrapper
  * Captures routing decisions, gRPC traces, tool invocations across all 9 dispatcher nodes
- * Non-blocking emission: Redis sync (<5ms) + Postgres deferred via queueMicrotask
+ * Non-blocking observation handoff through the existing packet telemetry writer.
  */
 
 import type { Redis } from 'ioredis';
 import type { DispatcherState } from '../langgraph/dispatcher-nodes/types.js';
 import { AcpTelemetryCollector } from './acp-mcp-telemetry.js';
-import { pool } from '../db/client.js';
+import { extractPacketContext, recordPacketCentricTelemetry, type PacketCentricContext } from './packet-centric-telemetry.js';
+import { AcpObservationSchema } from './acp-observation.js';
+import { getPacketTelemetryContext, withPacketTelemetryContext } from './packet-telemetry-context.js';
 
 export interface DispatcherTelemetryEvent {
+  trace_id?: string | null;
+  packet_context?: PacketCentricContext;
   node_id: string;
   timestamp: string;
   duration_ms: number;
@@ -52,7 +56,7 @@ export interface DispatcherTelemetryResult {
 
 /**
  * Emit telemetry for a dispatcher node
- * Redis write is synchronous (<5ms); Postgres write is deferred via queueMicrotask (non-blocking)
+ * Store clients remain compatibility parameters; the existing telemetry writer owns persistence.
  * @param nodeId - Dispatcher node identifier
  * @param state - Current dispatcher state
  * @param redis - ioredis client (for immediate write)
@@ -64,8 +68,8 @@ export interface DispatcherTelemetryResult {
 export async function emitDispatcherTelemetry(
   nodeId: string,
   state: DispatcherState,
-  redis: Redis,
-  postgres: any,
+  _redis: Redis,
+  _postgres: any,
   durationMs: number,
   metadata?: {
     decision?: string;
@@ -74,6 +78,8 @@ export async function emitDispatcherTelemetry(
     toolCalls?: DispatcherTelemetryEvent['tool_calls'];
     cacheHits?: DispatcherTelemetryEvent['cache_hits'];
     routingMetadata?: DispatcherTelemetryEvent['routing_metadata'];
+    packetContext?: PacketCentricContext;
+    executionStatus?: 'success' | 'failure' | 'timeout';
   }
 ): Promise<DispatcherTelemetryResult> {
   const timestamp = new Date().toISOString();
@@ -81,8 +87,10 @@ export async function emitDispatcherTelemetry(
     node_id: nodeId,
     timestamp,
     duration_ms: durationMs,
-    decision: metadata?.decision || state.dispatch_decision,
-    confidence: metadata?.confidence || state.dispatch_confidence,
+    trace_id: state.trace_id === undefined ? getPacketTelemetryContext()?.trace_id : state.trace_id,
+    packet_context: extractPacketContext({ packet_context: metadata?.packetContext ?? state.packet_context }),
+    decision: metadata?.decision ?? state.dispatch_decision,
+    confidence: metadata?.confidence ?? state.dispatch_confidence,
     candidates_count: state.candidates?.length || 0,
     grpc_traces: metadata?.grpcTraces,
     tool_calls: metadata?.toolCalls,
@@ -90,52 +98,18 @@ export async function emitDispatcherTelemetry(
     routing_metadata: metadata?.routingMetadata,
   };
 
-  const redisKey = `telemetry:dispatcher:${nodeId}:${Date.now()}`;
-
-  // ────────────────────────────────────────────────────────────
-  // STEP 1: Write to Redis immediately (sync, <5ms)
-  // ────────────────────────────────────────────────────────────
-  let redisWritten = false;
-  try {
-    await redis.setex(
-      redisKey,
-      86400, // 24-hour TTL
-      JSON.stringify(telemetryEvent)
-    );
-    redisWritten = true;
-  } catch (err) {
-    console.error(`[dispatcher-telemetry] Redis write failed for ${redisKey}:`, err);
-  }
-
-  // ────────────────────────────────────────────────────────────
-  // STEP 2: Defer Postgres write via queueMicrotask (non-blocking)
-  // ────────────────────────────────────────────────────────────
   let postgresDeferred = false;
   try {
-    queueMicrotask(async () => {
-      try {
-        // Write to acp_telemetry table (schema assumed from ACP spec)
-        // This is deferred, so it doesn't block the node handler
-        await postgres.run(`
-          INSERT INTO acp_telemetry (
-            node_id,
-            event_type,
-            timestamp,
-            duration_ms,
-            payload
-          ) VALUES ($1, $2, $3, $4, $5)
-          ON CONFLICT DO NOTHING
-        `, [
-          nodeId,
-          'dispatcher_node_execution',
-          timestamp,
-          durationMs,
-          JSON.stringify(telemetryEvent)
-        ]);
-      } catch (pgErr) {
-        // Non-blocking: log but don't propagate
-        console.error(`[dispatcher-telemetry] Postgres deferred write failed:`, pgErr);
-      }
+    const observation = AcpObservationSchema.parse({ schema: 'atlas.acp-observation.v1', timestamp, node_id: nodeId,
+      trace_id: telemetryEvent.trace_id,
+      routing_decisions: [{ decision_type: 'dispatcher_route', selected_path: telemetryEvent.decision,
+        confidence: telemetryEvent.confidence, alternatives: [] }], tool_calls: [],
+      async_ops: [{ op_type: 'dispatcher.node', op_name: nodeId, execution_time_ms: durationMs,
+        status: metadata?.executionStatus ?? (state.action === 'failed' ? 'failure' : 'success') }], canonicalAuthority: false });
+    queueMicrotask(() => {
+      void recordPacketCentricTelemetry({ surface: 'dispatcher', latency_ms: durationMs,
+        trace_id: telemetryEvent.trace_id,
+        packet_context: telemetryEvent.packet_context, acp_observation: observation }).catch(() => {});
     });
     postgresDeferred = true;
   } catch (err) {
@@ -143,10 +117,10 @@ export async function emitDispatcherTelemetry(
   }
 
   return {
-    redis_written: redisWritten,
+    redis_written: false,
     postgres_deferred: postgresDeferred,
     telemetry_event: telemetryEvent,
-    redis_key: redisKey,
+    redis_key: '',
   };
 }
 
@@ -167,13 +141,13 @@ export function withDispatcherTelemetry(
 ) {
   return async (state: DispatcherState): Promise<DispatcherState> => {
     const startMs = Date.now();
-    let error: string | undefined;
+    let failed = false;
     let result = state;
 
     try {
-      result = await handler(state);
+      result = await withPacketTelemetryContext({ trace_id: state.trace_id, packet_context: state.packet_context }, () => handler(state));
     } catch (err) {
-      error = String(err);
+      failed = true;
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
@@ -188,11 +162,12 @@ export function withDispatcherTelemetry(
         {
           decision: result.dispatch_decision,
           confidence: result.dispatch_confidence,
+          executionStatus: failed ? 'failure' : result.action === 'failed' ? 'failure' : 'success',
         }
       );
 
-      if (error) {
-        console.warn(`[dispatcher-telemetry] Node ${nodeId} error: ${error}`);
+      if (failed) {
+        console.warn(`[dispatcher-telemetry] Node ${nodeId} failed`);
       }
     }
 

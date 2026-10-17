@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.component-proof.v1",
+  "gate": "GOLDEN-VALIDATION-CONSUMER-READBACK-01",
+  "status": "DIAGNOSTIC_ARTIFACT_READBACK_PROVEN_PRODUCTION_OPEN",
+  "canonicalAuthority": false,
+  "tests": {
+    "passed": 28,
+    "failed": 0,
+    "command": "node --test scripts/atlas/golden-review-validation-readback-v1.test.mjs scripts/atlas/lib/golden-review-journal-v1.test.mjs scripts/atlas/golden-review-validator-contract-v1.test.mjs",
+    "log": "docs/reports/golden-validation-consumer-tests-20261016.txt"
+  },
+  "receiptSelection": {
+    "report": "docs/reports/golden-relevance-review-queue-validation-2026-10-16T16-56-25-155Z.json",
+    "reportChecksum": "sha256:d53d95d08a4c3c57881d51d4dc775c4cff41541c4453c913929b148123c62aaf",
+    "input": ".tmp/atlas/golden-relevance-review-queue-pooled-v1.ndjson",
+    "inputChecksum": "sha256:cd37b7049febf3aa8e0db572a247977e8c7a36bebafbe62b3d584b356ef24ca6"
+  },
+  "localReadback": {
+    "queryCount": 60,
+    "judgmentCount": 1287,
+    "completedJudgmentCount": 0,
+    "safeToImportJudgments": false,
+    "safeToConfigureRerank": false,
+    "reports": [
+      "docs/reports/parent-atlas-promotion-gates-golden-readback-20261016.json",
+      "docs/reports/promotion-board-golden-readback-20261016.json"
+    ]
+  },
+  "writesPerformed": { "localCodeAndReports": true, "database": false, "cache": false, "humanLabels": false },
+  "limits": [
+    "Artifact binding does not authenticate reviewers or qualify sources",
+    "Other audit input receipts remain historical",
+    "Canonical judgment-set and semantic cohort binding remain separate gates",
+    "Other promotion reconciliation consumers still need explicit current-input review"
+  ],
+  "likely_cause": "Direct golden-validation consumers read a fixed historical receipt without binding it to the exact current input bytes.",
+  "evidence": ["28 passing tests", "Both actual audit entrypoints replayed the selected local artifact", "Identical input and validation-receipt digests in independent outputs"],
+  "patch_targets": [
+    "scripts/atlas/lib/golden-review-journal-v1.mjs",
+    "scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs",
+    "scripts/atlas/audit-promotion-board-reconcile-v2.mjs",
+    "scripts/atlas/golden-review-validation-readback-v1.test.mjs",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "docs/reports/master-feature-phase-gates-review-20261016.md"
+  ],
+  "safe_next_command": "node --test scripts/atlas/golden-review-validation-readback-v1.test.mjs",
+  "smoke_command": "openspec validate parent-atlas-ace-rlm-bitfrost-integration --strict",
+  "report_path": "docs/reports/golden-validation-consumer-readback-20261016.json"
+}

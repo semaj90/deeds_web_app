@@ -1,5 +1,10 @@
 # OpenSpec: Parent Atlas GPU Sidecar + Patch Tournament — bounded first slice
 
+## CUDA 13.4 SIMT/cuTile challenger gate (2026-10-16)
+
+- [ ] **CUDA134-SIMT-CHALLENGER-01** Build the opt-in, network-isolated container in `docker/atlas-cuda134-simt/`; run the existing Level 2 SIMT and Level 3 CUDA C++ Tile kernels against the shared CPU-oracle fixtures only after the documented VRAM/Ornith preflight and operator approval. Acceptance requires successful CUDA 13.4 image compilation plus exact score/key parity for fixture sizes 256, 1,000, and 4,000; no canonical writes or production promotion.
+- Current evidence: package and fixture wrapper created; Compose, JavaScript, shell syntax, and fixture preparation pass. Ports/network/mount/platform audit passes (`linux/amd64`, no ports, `network_mode: none`, one read-only fixture mount). RTX 3060 Ti had only 1,205 MiB free at audit, so GPU execution is blocked. Image build was stopped during the multi-gigabyte CUDA base-image pull before compiler invocation. See `docs/reports/cuda134-simt-container-creation-v1.json` and `docs/architecture/cuda134-simt-container-v1.md`.
+
 ## Separate workstation integration backlog
 
 The broader GPU/runtime sequence is tracked separately in

@@ -22,12 +22,10 @@ const PARENT_ATLAS = path.resolve(ROOT, 'packages/parent-atlas');
 const DAILY_CHAIN_APPLY_SCRIPT = 'npm run graphify:daily:chain';
 const DAILY_CHAIN_TERMINAL_SCRIPT = 'npm run graphify:daily:dry';
 const PROMOTION_ADMISSION_SCRIPT = 'node scripts/atlas/require-canonical-projection-admission-v1.mjs';
-const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip-audit';
 const STARTUP_LOCK_FILE = path.resolve(ROOT, '.graphify-daily-start.lock');
 
 const quiet = process.env.GRAPHIFY_QUIET === '1';
 const refreshFeatures = process.env.GRAPHIFY_FEATURE_RECOMMENDATIONS === '1';
-const allowFallback = process.env.GRAPHIFY_ALLOW_FALLBACK === '1';
 const nativeStructural = process.env.GRAPHIFY_NATIVE_STRUCTURAL === '1';
 const nativeStructuralApply = process.env.GRAPHIFY_NATIVE_STRUCTURAL_APPLY === '1';
 const nativeStructuralAllowCreateSymbols = process.env.GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS === '1';
@@ -707,35 +705,12 @@ try {
   // The terminal authorization is deliberately limited to establishing a
   // snapshot-bound execution receipt. Never fall back from its read-only
   // chain into the legacy startup path, which may contain apply-capable work.
-  if (!allowFallback || process.env.ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION === TERMINAL_RUN_AUTHORIZATION) {
-    // The admission gate is a deliberate stop, not a crash: no lifecycle row was opened and no
-    // chain step ran. Say so explicitly. 'complete' stays as the lifecycle marker for tasks.json.
-    const blockedByAdmission = String(err.message).includes(PROMOTION_ADMISSION_SCRIPT);
-    console.error(blockedByAdmission
-      ? '[graphify:daily] Projection admission is NOT_SAFE_TO_PROJECT; the run stopped before the lifecycle row and before any chain step. Exit 1 is expected until admission is proven.'
-      : `[graphify:daily] Failed before completion: ${String(err.message).split('\n')[0]}`);
-    console.log(blockedByAdmission ? 'graphify:daily status: BLOCKED_BY_PROJECTION_ADMISSION' : 'graphify:daily status: FAILED');
-    console.error('[graphify:daily] Fallback disabled; exiting with failure.');
-    console.log('graphify:daily complete');
-    process.exit(1);
-  }
-
-  console.log('[graphify:daily] Falling back to startup pipeline...');
-
-  try {
-    execSync(FALLBACK_SCRIPT, {
-      cwd: FRONTEND,
-      stdio: 'inherit',
-      timeout: 10 * 60 * 1000,
-      shell: true,
-    });
-    console.log('[graphify:daily] fallback startup partial');
-    console.log('graphify:daily complete');
-    process.exit(0);
-  } catch (fallbackErr) {
-    console.error(`ERROR: graphify fallback failed: ${fallbackErr.message}`);
-    console.log('graphify:daily partial');
-    console.log('graphify:daily complete');
-    process.exit(1);
-  }
+  const blockedByAdmission = String(err.message).includes(PROMOTION_ADMISSION_SCRIPT);
+  console.error(blockedByAdmission
+    ? '[graphify:daily] Projection admission is NOT_SAFE_TO_PROJECT; no legacy fallback is permitted. Exit 1 is expected until admission is proven.'
+    : `[graphify:daily] Failed before completion: ${String(err.message).split('\n')[0]}`);
+  console.log(blockedByAdmission ? 'graphify:daily status: BLOCKED_BY_PROJECTION_ADMISSION' : 'graphify:daily status: FAILED');
+  console.error('[graphify:daily] Fallback disabled; exiting with failure.');
+  console.log('graphify:daily complete');
+  process.exit(1);
 }

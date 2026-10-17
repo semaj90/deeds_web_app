@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.function-chunk-origin-fixes.v1",
+  "status": "PRODUCER_DEFECTS_PATCHED_STORED_ROWS_UNREPAIRED",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "origins": {
+    "callableProjection": {
+      "table": "atlas_callable_search",
+      "observedProducerRevision": "atlas-ast-symbol-version-materializer-v1",
+      "observedProjectionUpdatedAt": "2026-08-30T04:10:31.796Z",
+      "historicalImplementation": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "retiredDirectSqlWriter": true,
+      "overrideUsed": false,
+      "finding": "Projection source/workspace revisions differ from the qualified canonical symbol row. The historical writer contains a canonical SELECT/upsert but its entrypoint is retired; it must not be replayed as the repair mechanism.",
+      "canonicalWorkflowReferences": [
+        "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+        "scripts/atlas/symbol-reconciliation-writer-v1.mts"
+      ],
+      "currentProjectionRefreshIntegrationProven": false
+    },
+    "chunkMetadata": {
+      "table": "codebase_chunk_index",
+      "implementation": "scripts/atlas/index-full-repo-for-search.mjs",
+      "formula": "hashToUuid(sha256('fullrepo:' + relativePath + ':' + chunkIndex))",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "computedAndObservedProjectionIds": [
+        "9944b400-3c15-4900-9688-8263ecb224cb",
+        "8c9328db-7b66-4eb9-8761-e2817b77ce5d"
+      ],
+      "finding": "The indexer labeled projection IDs as packet_key in metadata and Qdrant payloads. Its historical chunk rows lack row revisions, and the existing skip helper could reuse matching hashes without checking those revisions. The current SQL still does not establish a qualified workspace revision producer."
+    }
+  },
+  "codeFixes": [
+    "Read source_revision and workspace_revision for index reuse decisions",
+    "Reject row reuse for absent/stale expected source or workspace revisions",
+    "Reject row reuse for a projection ID mislabeled as packet_key",
+    "Emit Qdrant IDs under qdrant_id, keeping unresolved packet_key null",
+    "Preserve a different existing metadata packet binding on conflict without treating it as qualified",
+    "Expose observed producer revisions and projection update timestamp in the existing discovery audit"
+  ],
+  "validation": {
+    "focusedTestsPassed": 14,
+    "focusedTestsFailed": 0,
+    "testLog": "docs/reports/chunk-index-origin-fix-final-20261016T104540663.txt",
+    "postgresReadOnlySelectCasesPassed": 3,
+    "postgresSelectReceipt": "docs/reports/chunk-metadata-merge-select-proof-20261016T104627093.json",
+    "liveProducerReadback": "docs/reports/function-producer-origin-20261016T104540663.json",
+    "liveAuditExitCode": 3,
+    "liveAuditStatus": "PROJECTION_REVISION_MISMATCH",
+    "writerJavaScriptSyntax": "PASS",
+    "scopedWhitespace": "PASS"
+  },
+  "unchangedGates": [
+    "CLAUDE.md source_revision writes deferred until after P20",
+    "No legacy symbol writer override",
+    "No canonical ID guessed from paths, hashes or projection IDs",
+    "No SearchRuntime, ContextManifest or BitFrost production proof claimed"
+  ],
+  "writes": {
+    "codeAndLocalReports": true,
+    "postgres": false,
+    "qdrant": false,
+    "cache": false,
+    "sourceRevisionPropagation": false
+  },
+  "likely_cause": "A historical callable projection is stale, while the chunk indexer conflated projection IDs with packet identity and allowed hash-only row reuse despite missing revisions.",
+  "evidence": [
+    "docs/reports/function-producer-origin-20261016T104540663.json",
+    "docs/reports/function-chunk-independent-20261016T103815570.json",
+    "scripts/atlas/materialize-ast-symbol-versions.mjs",
+    "scripts/atlas/index-full-repo-for-search.mjs",
+    "scripts/atlas/lib/indexed-chunk-reuse-v1.mjs"
+  ],
+  "patch_targets": [
+    "scripts/atlas/index-full-repo-for-search.mjs",
+    "scripts/atlas/lib/indexed-chunk-reuse-v1.mjs",
+    "scripts/atlas/lib/indexed-chunk-reuse-v1.test.mjs",
+    "scripts/atlas/audit-function-discovery-readback-v1.mts",
+    "openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "node --test scripts/atlas/lib/indexed-chunk-reuse-v1.test.mjs scripts/atlas/lib/function-discovery-readback-v1.test.mjs",
+  "smoke_command": "node --check scripts/atlas/index-full-repo-for-search.mjs",
+  "report_path": "docs/reports/function-chunk-origin-fixes-20261016.json"
+}

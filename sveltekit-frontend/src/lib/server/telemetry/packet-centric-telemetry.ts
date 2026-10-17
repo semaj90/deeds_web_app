@@ -15,6 +15,7 @@ import { recordRetrievalEvalTelemetry } from './retrieval-recorder.js';
 import type { TransportTelemetry } from '../grpc/transport-telemetry.js';
 import { TransportTelemetrySchema } from '../grpc/transport-telemetry.js';
 import { ResourceOperationObservationSchema, type ResourceOperationObservation } from './gpu-telemetry.js';
+import { validateTelemetryTraceBinding } from './acp-observation.js';
 
 /** Packet-centric context added to every telemetry event. */
 export interface PacketCentricContext {
@@ -46,6 +47,8 @@ export interface PacketCentricContext {
 
 /** Enriched telemetry signal combining retrieval + packet context. */
 export interface PacketCentricTelemetryEvent {
+  trace_id?: string | null;
+  acp_observation?: import('./acp-observation.js').AcpObservation;
   resource_observation?: ResourceOperationObservation;
   transport_telemetry?: TransportTelemetry;
   // Base retrieval fields
@@ -147,10 +150,21 @@ export function normalizePacketContext(event: PacketCentricTelemetryEvent): Pack
  * @param event - Enriched telemetry event
  */
 export async function recordPacketCentricTelemetry(event: PacketCentricTelemetryEvent): Promise<void> {
+  await recordPacketCentricTelemetryAcknowledged(event);
+}
+
+export async function recordPacketCentricTelemetryAcknowledged(event: PacketCentricTelemetryEvent): Promise<boolean> {
   try {
     const normalized = normalizePacketContext(event);
+    if (normalized.acp_observation) {
+      const { AcpObservationSchema } = await import('./acp-observation.js');
+      normalized.acp_observation = AcpObservationSchema.parse(normalized.acp_observation);
+    }
+    normalized.trace_id = validateTelemetryTraceBinding(normalized.trace_id, normalized.acp_observation);
     if (normalized.transport_telemetry) normalized.transport_telemetry = TransportTelemetrySchema.parse(normalized.transport_telemetry);
     if (normalized.resource_observation) normalized.resource_observation = ResourceOperationObservationSchema.parse(normalized.resource_observation);
+    validateTelemetryTraceBinding(normalized.trace_id, normalized.transport_telemetry);
+    validateTelemetryTraceBinding(normalized.trace_id, normalized.resource_observation);
     const ctx = normalized.packet_context || {};
 
     // Try new phase_2_telemetry table first (if it exists)
@@ -207,13 +221,14 @@ export async function recordPacketCentricTelemetry(event: PacketCentricTelemetry
           timings: normalized.timings, accelerator: normalized.accelerator,
           cudaAvailable: normalized.cuda_available, matmulMs: normalized.matmul_ms,
           embeddingMs: normalized.embedding_ms,
-          hitsPayload: { packet_context: ctx, transport_telemetry: normalized.transport_telemetry,
-            resource_observation: normalized.resource_observation },
+          hitsPayload: { trace_id: normalized.trace_id, packet_context: ctx, transport_telemetry: normalized.transport_telemetry,
+            resource_observation: normalized.resource_observation, acp_observation: normalized.acp_observation },
         });
       } else {
         throw err;
       }
     }
+    return true;
   } catch (err) {
     // Non-blocking
     console.debug('[Packet-Centric Telemetry] Record failed (non-blocking):', {
@@ -221,6 +236,7 @@ export async function recordPacketCentricTelemetry(event: PacketCentricTelemetry
       feature_id: event.packet_context?.feature_id,
       error: err instanceof Error ? err.message : String(err),
     });
+    return false;
   }
 }
 
@@ -240,6 +256,13 @@ export function buildPacketCentricEvent(
   latencyMs: number,
   strategy: 'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom'
 ): PacketCentricTelemetryEvent {
+  return { ...selectPacketTelemetryCandidates(candidates), latency_ms: latencyMs,
+    retrieval_strategy: strategy, vector_hits: candidates.length };
+}
+
+export function selectPacketTelemetryCandidates(
+  candidates: Array<{ packet_key?: string; feature_id?: string; som_cluster?: string; [key: string]: unknown }>,
+): Pick<PacketCentricTelemetryEvent, 'selected_packet_key' | 'selected_packet_keys' | 'selected_feature_id' | 'feature_ids' | 'packet_context'> {
   const packetKeys = new Set<string>();
   const featureIds = new Set<string>();
 
@@ -254,21 +277,20 @@ export function buildPacketCentricEvent(
 
   const packetKeysArray = Array.from(packetKeys);
   const featureIdsArray = Array.from(featureIds);
-  const primaryCandidate = candidates.find((candidate) => candidate.packet_key === packetKeysArray[0]);
+  const primaryCandidate = packetKeysArray.length > 0
+    ? candidates.find((candidate) => candidate.packet_key === packetKeysArray[0]) : undefined;
 
   return {
     selected_packet_key: packetKeysArray[0] ?? null,
     selected_packet_keys: packetKeysArray,
     selected_feature_id: typeof primaryCandidate?.feature_id === 'string' ? primaryCandidate.feature_id : null,
     feature_ids: featureIdsArray,
-    latency_ms: latencyMs,
-    retrieval_strategy: strategy,
-    vector_hits: candidates.length,
     packet_context: {
       packet_id: packetKeysArray[0] ?? null,
       source_ref: typeof primaryCandidate?.source_ref === 'string' ? primaryCandidate.source_ref : null,
       feature_id: typeof primaryCandidate?.feature_id === 'string' ? primaryCandidate.feature_id : null,
-      som_cell: typeof primaryCandidate?.som_cluster === 'string' ? primaryCandidate.som_cluster : null,
+      som_cell: typeof primaryCandidate?.som_cell === 'string' ? primaryCandidate.som_cell
+        : typeof primaryCandidate?.som_cluster === 'string' ? primaryCandidate.som_cluster : null,
       schema_version: null,
       embedding_version: null,
       tool_version: null,

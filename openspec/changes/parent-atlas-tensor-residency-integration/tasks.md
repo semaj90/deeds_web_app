@@ -3325,3 +3325,27 @@ Board: 6 done, 16 pending, 1 blocked. Events for this pass use `run_id` `proof-2
 - TENSOR-IO-02 gates (pasted review, not started).
 - Phase 11–23 audits.
 - Kanban learning ranker (not started; needs historical outcomes first).
+
+## SESSION STATUS 2026-10-16 — End-to-End Contextual Engineering & Ranking Architecture
+
+### Verified this session (evidence on disk and test receipts)
+- **Python Runtime Boundary & Isolation**:
+  - Windows Native (Python 3.14): NAPI integration, ONNX Runtime CPU, and AVX2-accelerated SIMD wheel `turbovec 0.3.0` (`turbovec/Cargo.toml`).
+  - WSL2 Linux Sidecar (`/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python`): Dedicated PyTorch ATen, cuVS, cuGraph, and cuML lane. Preserves RTX 3060 Ti 8GB VRAM isolation from Ornith 1.5 `:8090` llama-server.
+- **Neo4j to NetworkX & cuGraph Alignment**:
+  - Neo4j remains a rebuildable navigation projection; PostgreSQL 18 owns `graphify_edges`, `codebase_chunk_index`, and canonical packet identities (`pkt_<32-hex>`).
+  - NetworkX serves as the deterministic CPU oracle; cuGraph and ATen feature matrix operations compute advisory PageRank scalars (`FeatureRowV1.personalizedPageRank`), strictly preserving the single-retrieval-vote invariant.
+- **ACE JSON Packet & GPU Cache Tile Synthesis Integration**:
+  - Bound ACE JSON packet synthesis to GPU cache tile derivation via `prepareUnifiedResidencyAceBridgeV1` and `UnifiedFeatureTileProvider`/`GpuTileCache`.
+  - Parallel asynchronous parameter fetching loads feature slices, CandidateOrdinal mappings, and typed adjacency in parallel from CPU memory-mapped tables (`Arrow`/`TypedArray`).
+  - BitFrost procedural cache keys keyed strictly by `(model_name, artifact_checksum, representation_revision)` with `kvCachePersisted: false`, `writesPerformed: false`, and `canonicalAuthority: false`.
+  - Verified in `scripts/atlas/test-ace-gpu-tile-synthesis.mjs` (PASS).
+- **Deterministic Top-K Selection Receipts (SEL-RECEIPT-01, SEL-RECEIPT-02)**:
+  - Formulated `TopkSelectionReceiptV1` in `sveltekit-frontend/src/lib/server/atlas/context/topk-selection-receipt-v1.ts`.
+  - Fail-closed verification enforces single-vote invariants, detects duplicate/unresolved candidates, stale source revisions, missing OpenSpec task receipts, and checksum tampering.
+  - Verified in `sveltekit-frontend/src/lib/server/atlas/context/topk-selection-receipt-v1.spec.ts` (8/8 PASS).
+- **Multi-Test Integration Suite**:
+  - 10/10 tests passing across all 6 test suites via `node --import tsx --test scripts/atlas/test-adaptive-dag-fetch.mjs scripts/atlas/test-hypergraph-fact-contract.mjs scripts/atlas/test-bitfrost-token-fsm.mjs scripts/atlas/test-polyglot-dag-oak-rlm.mjs scripts/atlas/test-dspy-llama-caller.mjs scripts/atlas/test-ace-gpu-tile-synthesis.mjs`.
+- **OpenSpec Validation**:
+  - `openspec validate parent-atlas-neural-prefill-encoder --strict` passed cleanly.
+  - `docs/reports/master-feature-todo-openspec-crosswalk-v1.json` rebuilt with 235 verified candidates.

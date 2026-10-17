@@ -12,6 +12,8 @@ const glob = (globPkg as any).glob ?? globPkg;
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { fork, type ChildProcess } from 'node:child_process';
+
 
 export interface MapReduceJob {
   id: string;

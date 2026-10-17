@@ -110,7 +110,18 @@ async function detectPacketTable(client) {
 }
 
 async function findExistingTreeNodeId(client, { sourceRef, packetKey, nodeType }) {
-  const conditions = ['node_type = $1'];
+  for (const identity of [sourceRef, packetKey]) {
+    if (identity != null && (typeof identity !== 'string' || identity.trim().length === 0)) {
+      throw new Error('TREE_NODE_INVALID_LOOKUP_IDENTITY');
+    }
+  }
+  if (typeof nodeType !== 'string' || nodeType.trim().length === 0 ||
+      (!sourceRef && !packetKey) ||
+      (nodeType === 'document' && !sourceRef) ||
+      (nodeType === 'chunk' && !packetKey)) {
+    throw new Error('TREE_NODE_MISSING_LOOKUP_IDENTITY');
+  }
+  const conditions = ["ledger_type = 'canonical'", 'node_type = $1'];
   const params = [nodeType];
 
   if (packetKey) {
@@ -127,12 +138,19 @@ async function findExistingTreeNodeId(client, { sourceRef, packetKey, nodeType }
     `SELECT node_id
        FROM atlas_tree_nodes
       WHERE ${conditions.join(' AND ')}
-      ORDER BY created_at ASC NULLS LAST, updated_at ASC NULLS LAST
-      LIMIT 1`,
+      LIMIT 2`,
     params
   );
 
-  return res.rows[0]?.node_id ?? null;
+  if (res.rows.length > 1) {
+    throw new Error('TREE_NODE_AMBIGUOUS_LOOKUP');
+  }
+  if (res.rows.length === 0) return null;
+  const nodeId = res.rows[0]?.node_id;
+  if (typeof nodeId !== 'string' || nodeId.trim().length === 0) {
+    throw new Error('TREE_NODE_INVALID_LOOKUP_RESULT');
+  }
+  return nodeId;
 }
 
 /**

@@ -1,25 +1,40 @@
 #!/usr/bin/env node
 import fs from 'fs/promises';
-import { createWriteStream } from 'fs';
 import path from 'path';
+import { pathToFileURL } from 'node:url';
+import { createHash } from 'node:crypto';
+
+export function feedbackCardIdsV1(event) {
+  const payload = event?.payload;
+  const raw = event?.card_id != null ? [event.card_id]
+    : event?.card_ids ?? payload?.card_ids ?? (payload?.card_id != null ? [payload.card_id] : []);
+  if (!Array.isArray(raw) || raw.some((id) => typeof id !== 'string' || !id.trim())) return [];
+  return [...new Set(raw)];
+}
+
+export function excludedWeightObservationV1(event) {
+  return [event, event?.payload].some((item) => item && (
+    item.trainingEligible === false || item.retrieval_mode === 'phase19-seed' ||
+    item.event_type === 'seed_proposal' || item.schema === 'atlas.retrieval-seed-proposal.v1'
+  ));
+}
 
 async function readJsonl(filePath) {
   try {
-    const data = await fs.readFile(filePath, 'utf8');
-    return data
+    const info = await fs.stat(filePath);
+    if (info.size > 16 * 1024 * 1024) throw new Error('WEIGHT_PREVIEW_INPUT_SIZE_LIMIT');
+    const bytes = await fs.readFile(filePath);
+    if (bytes.length > 16 * 1024 * 1024) throw new Error('WEIGHT_PREVIEW_INPUT_SIZE_LIMIT');
+    const data = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    const rows = data
       .split(/\r?\n/)
       .map((l) => l.trim())
       .filter(Boolean)
-      .map((l) => {
-        try {
-          return JSON.parse(l);
-        } catch (e) {
-          return null;
-        }
-      })
-      .filter(Boolean);
+      .map((l) => JSON.parse(l));
+    return { path: filePath, exists: true, checksum: `sha256:${createHash('sha256').update(bytes).digest('hex')}`, rows };
   } catch (e) {
-    return [];
+    if (e.code === 'ENOENT') return { path: filePath, exists: false, checksum: null, rows: [] };
+    throw e;
   }
 }
 
@@ -29,28 +44,6 @@ function safeNum(v, fallback = 0) {
 }
 
 function clamp01(x) { return Math.max(0, Math.min(1, x)); }
-
-async function maybeReadRedisStream(url = 'redis://127.0.0.1:6379', streamKey = 'feedback:events', count = 1000) {
-  try {
-    const ioredis = await import('ioredis');
-    const client = new ioredis.default(url);
-    // XRANGE stream - get last N entries
-    const entries = await client.xrange(streamKey, '-', '+', 'COUNT', count);
-    await client.quit();
-    // entries: [[id, [field1, val1, field2, val2]], ...]
-    return entries.map(([id, kv]) => {
-      const obj = { id };
-      for (let i = 0; i < kv.length; i += 2) obj[kv[i]] = kv[i+1];
-      // try parse json fields
-      if (obj.payload) {
-        try { obj.payload = JSON.parse(obj.payload); } catch(e){}
-      }
-      return obj;
-    });
-  } catch (e) {
-    return [];
-  }
-}
 
 function combineCounts(arr) {
   const out = { thumbs_up:0, thumbs_down:0, copied:0, clicked:0, total:0, dependency_hits:0 };
@@ -66,6 +59,9 @@ function combineCounts(arr) {
 }
 
 async function main() {
+  if (!process.argv.includes('--dry-run') || process.argv.includes('--redis') || process.argv.includes('--apply')) {
+    throw new Error('WEIGHT_UPDATE_APPLY_BLOCKED_USE_OFFLINE_DRY_RUN');
+  }
   const repoRoot = path.resolve(process.cwd());
   const bifrostPath = path.join(repoRoot, '.tmp', 'bifrost-trace.jsonl');
   const retrievalPath = path.join(repoRoot, '.tmp', 'atlas-retrieval-loop.jsonl');
@@ -73,22 +69,9 @@ async function main() {
   const atlasCardsPath = path.join(repoRoot, '.tmp', 'atlas-cards-for-weights.jsonl');
   const feedbackFile = path.join(repoRoot, '.tmp', 'feedback-events.jsonl');
 
-  console.log('Reading inputs...');
-  const bifrost = await readJsonl(bifrostPath);
-  const retrievals = await readJsonl(retrievalPath);
-  const qdrant = await readJsonl(qdrantPath);
-  const atlasCards = await readJsonl(atlasCardsPath);
-  const fileFeedback = await readJsonl(feedbackFile);
+  const inputs = await Promise.all([bifrostPath, retrievalPath, qdrantPath, atlasCardsPath, feedbackFile].map(readJsonl));
+  const [bifrost, retrievals, qdrant, atlasCards, fileFeedback] = inputs.map((input) => input.rows);
 
-  const redisUrl = process.env.REDIS_URL || process.env.REDIS || 'redis://127.0.0.1:6379';
-  const redisStreamKey = process.env.FEEDBACK_STREAM || 'feedback:events';
-  const redisEnabled = process.argv.includes('--redis');
-
-  let redisFeedback = [];
-  if (redisEnabled) {
-    console.log('Reading Redis stream', redisStreamKey);
-    redisFeedback = await maybeReadRedisStream(redisUrl, redisStreamKey, 2000);
-  }
 
   // index retrievals by card id
   const byCard = new Map();
@@ -98,7 +81,7 @@ async function main() {
     return byCard.get(id);
   }
 
-  retrievals.forEach(r => {
+  retrievals.filter((row) => !excludedWeightObservationV1(row)).forEach(r => {
     const id = r.card_id || r.id || r.card || r.payload?.card_id;
     if (!id) return;
     const c = ensureCard(id);
@@ -107,7 +90,7 @@ async function main() {
     if (r.intent) c.intents.push(r.intent);
   });
 
-  bifrost.forEach(b => {
+  bifrost.filter((row) => !excludedWeightObservationV1(row)).forEach(b => {
     const id = b.card_id || b.target_id || b.id || b.payload?.card_id;
     if (!id) return;
     const c = ensureCard(id);
@@ -116,7 +99,7 @@ async function main() {
   });
 
   // qdrant payloads may include authority/metadata
-  qdrant.forEach(q => {
+  qdrant.filter((row) => !excludedWeightObservationV1(row)).forEach(q => {
     const id = q.id || q.payload?.id || q.payload?.card_id;
     if (!id) return;
     const c = ensureCard(id);
@@ -125,26 +108,18 @@ async function main() {
   });
 
   // combine feedback events from files
-  const allFeedback = [...fileFeedback, ...redisFeedback];
-  allFeedback.forEach(ev => {
-    const ids = ev.card_id ? [ev.card_id] : ev.card_ids || ev.payload?.card_ids || ev.payload?.card_id ? [ev.payload.card_id] : [];
+  const allFeedback = fileFeedback;
+  allFeedback.filter((row) => !excludedWeightObservationV1(row)).forEach(ev => {
+    const ids = feedbackCardIdsV1(ev);
     ids.forEach(id => {
       const c = ensureCard(id);
       c.events.push(ev.payload ?? ev);
     });
   });
 
-  // prepare outputs
-  const outPath = path.join(repoRoot, '.tmp', 'token-card-weights.jsonl');
-  const summaryPath = path.join(repoRoot, 'reports', 'token-card-weight-summary.md');
-  await fs.mkdir(path.dirname(outPath), { recursive: true });
-  await fs.mkdir(path.dirname(summaryPath), { recursive: true });
-
-  const outStream = createWriteStream(outPath, { flags: 'w' });
-
   const results = [];
   // Seed from atlas cards input so cards with no retrievals are still considered
-  for (const c of atlasCards) {
+  for (const c of atlasCards.filter((row) => !excludedWeightObservationV1(row))) {
     const id = c.card_id || c.card || c.id;
     if (!id) continue;
     const info = ensureCard(id);
@@ -176,6 +151,10 @@ async function main() {
 
     const record = {
       card_id: id,
+      canonicalAuthority: false,
+      trainingEligible: false,
+      promotionEligible: false,
+      scoreQualification: 'HEURISTIC_PREVIEW_NOT_TRAINED_OR_EVALUATED',
       sourceRef: info.sourceRef ?? null,
       feature_label: info.feature_label || null,
       components: {
@@ -189,66 +168,23 @@ async function main() {
       counts
     };
 
-    outStream.write(JSON.stringify(record) + '\n');
     results.push(record);
   }
 
-  outStream.end();
+  console.log(JSON.stringify({ schema: 'atlas.card-weight-preview.v1', status: 'PREVIEW_ONLY_APPLY_BLOCKED',
+    writesPerformed: false, canonicalAuthority: false, trainingEligible: false, promotionEligible: false,
+    artifactBaseDirectory: repoRoot,
+    inputs: inputs.map(({ rows, ...input }) => ({ ...input, rowCount: rows.length })),
+    unresolvedRetrievalCardIdentityCount: retrievals.filter((row) => !row?.card_id && !row?.id && !row?.card && !row?.payload?.card_id).length,
+    excludedObservations: [...retrievals, ...bifrost, ...qdrant, ...allFeedback, ...atlasCards].filter(excludedWeightObservationV1).length,
+    records: results,
+  }, null, 2));
+}
 
-  // write markdown summary
-  results.sort((a,b)=>b.final_score - a.final_score);
-  const top = results.slice(0, 20);
-  const mdLines = [
-    '# Token / Card Weight Summary',
-    `Generated: ${new Date().toISOString()}`,
-    `Processed cards: ${results.length}`,
-    '',
-    '## Top cards by final_score',
-    '',
-    '| rank | card_id | score | feature | clicks | copies | thumbs_up | thumbs_down |',
-    '|---:|---|---:|---|---:|---:|---:|---:|'
-  ];
-  top.forEach((r,i) => {
-    mdLines.push(`| ${i+1} | ${r.card_id} | ${r.final_score} | ${r.feature_label || ''} | ${r.counts.clicked || 0} | ${r.counts.copied || 0} | ${r.counts.thumbs_up || 0} | ${r.counts.thumbs_down || 0} |`);
-  });
-  mdLines.push('', '## Notes', '', '- Scoring formula used:', '- final_score = 0.45*cosine + 0.20*authority + 0.15*user_intent_match + 0.10*recent_success_weight + 0.10*dependency_hotpath_weight');
-  await fs.writeFile(summaryPath, mdLines.join('\n'), 'utf8');
-
-  // optional publish to Redis
-  if (redisEnabled) {
-    try {
-      // Safety checks before publishing
-      if (!results || results.length === 0) {
-        console.log('Skipping Redis publish: no results to publish (processed cards = 0)');
-      } else if (!results.some(r => r.final_score && Number(r.final_score) > 0)) {
-        console.log('Skipping Redis publish: all final_score values are zero');
-      } else if (!results.every(r => (r.card_id && String(r.card_id).length) || (r.sourceRef && String(r.sourceRef).length))) {
-        console.log('Skipping Redis publish: some rows missing card_id and sourceRef');
-      } else {
-        const ioredis = await import('ioredis');
-        const client = new ioredis.default(redisUrl);
-        for (const r of results) {
-          const key = `atlas:weights:card:${r.card_id}`;
-          await client.hset(key, { score: String(r.final_score), updated: new Date().toISOString(), payload: JSON.stringify(r) });
-          if (r.feature_label) {
-            const fkey = `atlas:weights:feature:${r.feature_label}`;
-            await client.hincrbyfloat(fkey, 'aggregate_score', r.final_score);
-          }
-        }
-        await client.quit();
-        console.log('Published weights to Redis');
-      }
-    } catch (e) {
-      console.warn('Redis publish failed:', e.message || e);
-    }
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    console.log('Usage: node token-card-weight-updater.mjs --dry-run (apply and Redis publication blocked)');
+  } else {
+    main().catch(err => { console.error(err); process.exitCode = 2; });
   }
-
-  console.log('Wrote', outPath, 'and', summaryPath);
 }
-
-if (process.argv.includes('--help') || process.argv.includes('-h')) {
-  console.log('Usage: node token-card-weight-updater.mjs [--redis]');
-  process.exit(0);
-}
-
-main().catch(err => { console.error(err); process.exit(2); });

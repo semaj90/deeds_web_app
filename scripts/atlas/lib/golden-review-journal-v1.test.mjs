@@ -5,6 +5,7 @@ import {
   hashGoldenReviewCohortV1,
   isDuplicateGoldenReviewDecisionV1,
   readGoldenReviewJournalV1,
+  goldenHumanJudgmentErrorsV1,
 } from './golden-review-journal-v1.mjs';
 
 const cohortChecksum = hashGoldenReviewCohortV1('frozen-cohort');
@@ -71,4 +72,25 @@ test('rejects invalid human judgment fields', () => {
   assert.throws(() => createGoldenReviewJudgmentEventV1({ ...eventInput, confidence: Number.NaN }), /JUDGMENT_CONFIDENCE_INVALID/);
   assert.throws(() => createGoldenReviewJudgmentEventV1({ ...eventInput, reviewerId: ' ' }), /JUDGMENT_REVIEWER_REQUIRED/);
   assert.throws(() => createGoldenReviewJudgmentEventV1({ ...eventInput, relevanceGrade: 1 }), /HARD_NEGATIVE_MUST_BE_IRRELEVANT/);
+});
+
+test('requires finite confidence, explicit human source, nonblank reviewer and consistent negative flags', () => {
+  const valid = { ...eventInput, judgmentSource: 'HUMAN_REVIEWED' };
+  assert.deepEqual(goldenHumanJudgmentErrorsV1(valid), []);
+  for (const confidence of [NaN, Infinity, -Infinity]) {
+    assert.ok(goldenHumanJudgmentErrorsV1({ ...valid, confidence }).includes('JUDGMENT_CONFIDENCE_INVALID'));
+  }
+  for (const judgmentSource of ['MODEL_PROXY', 'langextract', '', null, undefined]) {
+    assert.ok(goldenHumanJudgmentErrorsV1({ ...valid, judgmentSource }).includes('JUDGMENT_HUMAN_REVIEW_REQUIRED'));
+  }
+  assert.ok(goldenHumanJudgmentErrorsV1({ ...valid, reviewerId: ' ' }).includes('JUDGMENT_REVIEWER_REQUIRED'));
+  assert.ok(goldenHumanJudgmentErrorsV1({ ...valid, isHardNegative: 'true' }).includes('HARD_NEGATIVE_FLAG_INVALID'));
+});
+
+test('journal read rejects proxy-source and whitespace-reviewer events before accepting them', () => {
+  const event = createGoldenReviewJudgmentEventV1(eventInput);
+  for (const patch of [{ judgmentSource: 'MODEL_PROXY' }, { reviewerId: ' ' }]) {
+    assert.throws(() => readGoldenReviewJournalV1(JSON.stringify({ ...event, ...patch }), cohortChecksum),
+      /JOURNAL_JUDGMENT_INVALID/);
+  }
 });

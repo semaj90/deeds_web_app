@@ -36,6 +36,13 @@ export interface HydratedCandidateV1 {
 export type HydrationFailureReason =
   | 'IDENTITY_MISSING'
   | 'CANONICAL_ROW_NOT_FOUND'
+  | 'CANONICAL_ROW_AMBIGUOUS'
+  | 'CONTENT_HASH_MISSING'
+  | 'SOURCE_REF_MISSING'
+  | 'SOURCE_REF_MISMATCH'
+  | 'CHUNK_ID_MISMATCH'
+  | 'CONTENT_MISSING'
+  | 'SCORE_INVALID'
   | 'CONTENT_HASH_MISMATCH';
 
 export interface HydrationFailureV1 {
@@ -65,6 +72,10 @@ export async function hydrateCanonicalCandidates(
       failures.push({ physicalPointId: c.physicalPointId, postgresId: c.postgresId, reason: 'IDENTITY_MISSING' });
       return false;
     }
+    if (!Number.isFinite(c.score)) {
+      failures.push({ physicalPointId: c.physicalPointId, postgresId: c.postgresId, reason: 'SCORE_INVALID' });
+      return false;
+    }
     return true;
   });
 
@@ -80,7 +91,7 @@ export async function hydrateCanonicalCandidates(
     contentHash: string | null;
   }
 
-  const ids = hydratable.map((c) => c.postgresId as string);
+  const ids = [...new Set(hydratable.map((c) => c.postgresId as string))];
   const rows = (await db
     .select({
       id: codebaseChunkIndex.id,
@@ -92,20 +103,34 @@ export async function hydrateCanonicalCandidates(
     .from(codebaseChunkIndex)
     .where(inArray(codebaseChunkIndex.id, ids))) as HydrationRow[];
 
-  const rowsById = new Map(rows.map((row) => [row.id, row]));
+  const rowsById = new Map<string, HydrationRow[]>();
+  for (const row of rows) {
+    const matches = rowsById.get(row.id) ?? [];
+    matches.push(row);
+    rowsById.set(row.id, matches);
+  }
 
   const hydrated: HydratedCandidateV1[] = [];
   for (const candidate of hydratable) {
-    const row = rowsById.get(candidate.postgresId as string);
-    if (!row) {
+    const matches = rowsById.get(candidate.postgresId as string) ?? [];
+    if (matches.length === 0) {
       failures.push({ physicalPointId: candidate.physicalPointId, postgresId: candidate.postgresId, reason: 'CANONICAL_ROW_NOT_FOUND' });
       continue;
     }
-    // Fail closed: if BOTH sides carry a content_hash and they disagree,
-    // do not silently hydrate -- the projection is stale relative to the
-    // current canonical row.
-    if (candidate.contentHash && row.contentHash && candidate.contentHash !== row.contentHash) {
-      failures.push({ physicalPointId: candidate.physicalPointId, postgresId: candidate.postgresId, reason: 'CONTENT_HASH_MISMATCH' });
+    if (matches.length !== 1) {
+      failures.push({ physicalPointId: candidate.physicalPointId, postgresId: candidate.postgresId, reason: 'CANONICAL_ROW_AMBIGUOUS' });
+      continue;
+    }
+    const row = matches[0];
+    let reason: HydrationFailureReason | null = null;
+    if (!candidate.contentHash?.trim() || !row.contentHash?.trim()) reason = 'CONTENT_HASH_MISSING';
+    else if (candidate.contentHash !== row.contentHash) reason = 'CONTENT_HASH_MISMATCH';
+    else if (!candidate.sourceRef?.trim() || !row.relativePath?.trim()) reason = 'SOURCE_REF_MISSING';
+    else if (candidate.sourceRef !== row.relativePath) reason = 'SOURCE_REF_MISMATCH';
+    else if (candidate.chunkId && candidate.chunkId !== row.chunkId) reason = 'CHUNK_ID_MISMATCH';
+    else if (row.content == null) reason = 'CONTENT_MISSING';
+    if (reason) {
+      failures.push({ physicalPointId: candidate.physicalPointId, postgresId: candidate.postgresId, reason });
       continue;
     }
 
@@ -119,10 +144,6 @@ export async function hydrateCanonicalCandidates(
       contentHash: row.contentHash,
     });
   }
-
-  // Preserve original Qdrant rank order (Map lookup above doesn't guarantee it).
-  const orderIndex = new Map(candidates.map((c, i) => [c.physicalPointId, i]));
-  hydrated.sort((a, b) => (orderIndex.get(a.projectionCandidate.physicalPointId) ?? 0) - (orderIndex.get(b.projectionCandidate.physicalPointId) ?? 0));
 
   return { hydrated, failures };
 }

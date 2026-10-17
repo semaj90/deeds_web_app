@@ -7,7 +7,7 @@
  *   PROMOTION: accepted answer → evaluation → persistence → future retrieval
  *
  * Core principle: Nothing else queries Qdrant, reranks, or calls Mixedbread.
- * All search flows through search() → retrieve() → fuse() → rerank() → promote() → return
+ * All search flows through search() → retrieve() → qualified graph fanout → fuse() → rerank() → promote() → return
  */
 
 import { z } from 'zod';
@@ -230,6 +230,7 @@ export interface Candidate {
   workspaceId?: string | null;
   workspaceRevision?: string | null;
   sourceRevision?: string | null;
+  graphRevision?: string | null;
   representationId?: string | null;
   representationRevision?: number | null;
   qdrantPointId?: string | null;
@@ -490,10 +491,11 @@ export interface SearchResult {
     promotionAttempted?: boolean;
     /**
      * KAG hypergraph neighbor evidence (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration,
-     * KAG-01/KAG-02/KAG-06), purely additive/informational — NEVER used for
-     * scoring, fusion, or reranking above. Populated by
+     * KAG-01/KAG-02/KAG-06), informational evidence about final packets.
+     * Qualified packet-incidence neighbors can separately enter candidates
+     * before fusion through `expandGraphCandidates()`. Populated by
      * `lookupHypergraphNeighbors()` (below) via
-     * `kag-hypergraph-reader-v1.ts::readKagHypergraphNeighborsV1()`, which
+     * `kag-hypergraph-reader-v1.ts::readKagHypergraphNeighborsStrictV1()`, which
      * reads real `atlas_ontology_linked_tuples`/`atlas_hyperedges` rows and
      * runs them through `kag-mutual-index-v1.ts::buildKagMutualIndexV1()`.
      *
@@ -671,6 +673,8 @@ export class SearchRuntime {
       // Stage 1: Retrieve candidates from multiple sources
       const retrieveStart = Date.now();
       const candidates = await this.retrieveCandidates(query, { includeVectorLanes: embeddingHealthy });
+      const graphExpandedCandidates = await this.expandGraphCandidates(candidates, query);
+      candidates.push(...graphExpandedCandidates);
       stageTiming.retrieve = Date.now() - retrieveStart;
       const denseSeedPacketKeys = selectDenseSearchSeedPacketKeys(candidates);
 
@@ -752,7 +756,7 @@ export class SearchRuntime {
           proofContext,
         );
         const topPackets = hydrated.envelopes;
-        const hypergraphNeighborsDegraded = await this.lookupHypergraphNeighbors(topPackets);
+        const hypergraphNeighborsDegraded = await this.lookupHypergraphNeighbors(topPackets, query.workspaceRevision);
 
         return {
           packets: topPackets,
@@ -801,6 +805,30 @@ export class SearchRuntime {
       // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
       const scoreStart = Date.now();
       const { scoreCandidates } = await import('./candidate-scorer.js');
+      let authorityScores = new Map<string, number>();
+      const graphRevisions = new Set(fused.map((candidate) => candidate.graphRevision?.trim()).filter(Boolean));
+      if (query.workspaceRevision && graphRevisions.size === 1) {
+        const graphRevision = [...graphRevisions][0]!;
+        const identities = fused.slice(0, 256).flatMap((candidate) => {
+          if (
+            !candidate.packetKey?.trim()
+            || !candidate.sourceRef?.trim()
+            || !candidate.sourceRevision?.trim()
+            || candidate.workspaceRevision !== query.workspaceRevision
+            || candidate.graphRevision !== graphRevision
+          ) return [];
+          return [{ packetKey: candidate.packetKey, sourceRef: candidate.sourceRef, sourceRevision: candidate.sourceRevision }];
+        });
+        if (identities.length > 0) {
+          try {
+            const { fetchAuthorityScores } = await import('./feature-matrix.js');
+            authorityScores = await fetchAuthorityScores({ identities, workspaceRevision: query.workspaceRevision, graphRevision });
+          } catch (error) {
+            console.warn('[search-runtime] snapshot-qualified PageRank unavailable:', (error as Error).message);
+          }
+        }
+      }
+      const { resolveAuthorityScore } = await import('./feature-matrix.js');
       const scoredValues = await scoreCandidates(
         query.text,
         fused.map(c => ({
@@ -812,18 +840,8 @@ export class SearchRuntime {
           scoreSource: c.scoreSource,
           qdrantPointId: (c as any).qdrantPointId,
           packetId: (c as any).packetId,
-          // Previously dropped here despite blendScores() having a live 0.1 weight for it —
-          // pagerank silently contributed zero to every ranked result. See
-          // openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy.
-          //
-          // graphScore (atlas_graph_authority_scores) deliberately NOT wired here yet —
-          // held pending an authority-provenance audit: atlas_graph_authority_scores also
-          // stores pagerank_raw/pagerank_l1 alongside authority_percentile, so it may be the
-          // SAME PageRank signal as pageRankScore under a different name. Wiring both would
-          // double-count one signal as 0.05·PR + 0.10·"authority" ≈ 0.15·PR. See the
-          // "2026-08-08 addendum" in the LOD taxonomy proposal.md — do not re-add graphScore
-          // here until that audit reaches a DISTINCT_SIGNAL verdict with evidence.
-          pagerankScore: c.pageRankScore ?? undefined,
+          // One canonical snapshot-qualified PageRank input; projection metadata is not mixed in.
+          pagerankScore: resolveAuthorityScore(authorityScores, c.packetKey, c.sourceRef),
         })) as any,
         this.scorerOptions,
       );
@@ -838,6 +856,7 @@ export class SearchRuntime {
           treeNodeId: source.treeNodeId ?? null,
           workspaceRevision: source.workspaceRevision ?? null,
           sourceRevision: source.sourceRevision ?? null,
+          graphRevision: source.graphRevision ?? null,
           functionRegistryEvidence: source.functionRegistryEvidence,
         };
       });
@@ -989,7 +1008,7 @@ export class SearchRuntime {
         );
       }
 
-      const hypergraphNeighbors = await this.lookupHypergraphNeighbors(finalPackets);
+      const hypergraphNeighbors = await this.lookupHypergraphNeighbors(finalPackets, query.workspaceRevision);
 
       return {
         packets: finalPackets,
@@ -1050,7 +1069,16 @@ export class SearchRuntime {
       const { retrieveAllCandidates } = await import('./retrieve-candidates.js');
       const baseCandidates = await retrieveAllCandidates(query.text, query.filters, undefined, options);
       const functionCandidates = await this.retrieveFunctionRegistryCandidates(query);
-      return applySearchMetadataFilter([...baseCandidates, ...functionCandidates], query.filters);
+      const candidatesWithGraphRevision = baseCandidates.map((candidate) => {
+        const raw = candidate as Candidate & { graph_revision?: unknown };
+        return {
+          ...candidate,
+          graphRevision: typeof raw.graphRevision === 'string'
+            ? raw.graphRevision
+            : typeof raw.graph_revision === 'string' ? raw.graph_revision : undefined,
+        };
+      });
+      return applySearchMetadataFilter([...candidatesWithGraphRevision, ...functionCandidates], query.filters);
     }
 
     const input = {
@@ -1094,6 +1122,7 @@ export class SearchRuntime {
       workspaceId: typeof lc.workspaceId === 'string' ? lc.workspaceId : undefined,
       workspaceRevision: typeof lc.workspaceRevision === 'string' ? lc.workspaceRevision : undefined,
       sourceRevision: typeof lc.sourceRevision === 'string' ? lc.sourceRevision : undefined,
+      graphRevision: typeof lc.metadata?.['graph_revision'] === 'string' ? String(lc.metadata['graph_revision']) : undefined,
       representationId: typeof lc.representationId === 'string' ? lc.representationId : undefined,
       representationRevision: typeof lc.representationRevision === 'number' ? lc.representationRevision : undefined,
       qdrantPointId: typeof lc.qdrantPointId === 'string' ? lc.qdrantPointId : undefined,
@@ -1112,6 +1141,133 @@ export class SearchRuntime {
             ? 'bm42'
             : undefined,
     })), query.filters);
+  }
+
+  private async expandGraphCandidates(candidates: Candidate[], query: SearchQuery): Promise<Candidate[]> {
+    if (!query.workspaceRevision || candidates.length === 0) return [];
+    const graphRevisions = new Set(candidates
+      .filter((candidate) => candidate.workspaceRevision === query.workspaceRevision)
+      .map((candidate) => candidate.graphRevision?.trim())
+      .filter((revision): revision is string => Boolean(revision)));
+    if (graphRevisions.size !== 1) return [];
+    const graphRevision = [...graphRevisions][0]!;
+    const seeds = candidates.filter((candidate) =>
+      candidate.workspaceRevision === query.workspaceRevision
+      && candidate.graphRevision === graphRevision
+      && candidate.packetKey?.trim()
+      && candidate.sourceRef?.trim()
+      && candidate.sourceRevision?.trim());
+    if (seeds.length === 0) return [];
+
+    try {
+      const { resolvePacketKeyResolutionV2 } = await import('../atlas/identity/packet-identity-resolver.js');
+      const resolvedSeeds = await Promise.all(seeds.slice(0, 64).map(async (candidate) => {
+        try {
+          const identity = await resolvePacketKeyResolutionV2(candidate.packetKey);
+          return identity.storagePacketKey === candidate.packetKey ? identity.canonicalPacketKey : null;
+        } catch {
+          return null;
+        }
+      }));
+      const canonicalIds = [...new Set(resolvedSeeds.filter((key): key is string => Boolean(key)))];
+      if (canonicalIds.length === 0) return [];
+      const { readKagHypergraphNeighborsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+      let receipt: Awaited<ReturnType<typeof readKagHypergraphNeighborsStrictV1>> | undefined;
+      try {
+        receipt = await readKagHypergraphNeighborsStrictV1(canonicalIds, {
+          workspaceRevision: query.workspaceRevision,
+          graphRevision,
+        });
+      } catch (error) {
+        console.warn('[search-runtime] packet-incidence fanout unavailable:', (error as Error).message);
+      }
+      const existingPacketKeys = new Set(candidates.map((candidate) => candidate.packetKey));
+      const seedScore = Math.max(...seeds.map((candidate) => candidate.score));
+      const bindings = receipt?.neighbors.flatMap((neighbor) => neighbor.candidateBindings ?? []) ?? [];
+      const expanded: Candidate[] = [];
+      try {
+        const { readGraphV2RetrievalFanoutStrictV1 } = await import('../atlas/integration/graph-v2-retrieval-fanout-v1.js');
+        const graphV2Candidates = await readGraphV2RetrievalFanoutStrictV1({
+          seeds: seeds.map((candidate) => ({
+            packetKey: candidate.packetKey,
+            sourceRef: candidate.sourceRef,
+            sourceRevision: candidate.sourceRevision!,
+          })),
+          workspaceRevision: query.workspaceRevision,
+          graphRevision,
+          limit: Math.min(query.topK * 4, 64),
+        });
+        for (const binding of graphV2Candidates) {
+          if (existingPacketKeys.has(binding.packetKey)) continue;
+          existingPacketKeys.add(binding.packetKey);
+          expanded.push({
+            id: binding.packetKey,
+            packetKey: binding.packetKey,
+            sourceRef: binding.sourceRef,
+            summary: '',
+            content: '',
+            score: seedScore * 0.8,
+            scoreSource: 'ast_tree',
+            workspaceRevision: binding.workspaceRevision,
+            sourceRevision: binding.sourceRevision,
+            graphRevision: binding.graphRevision,
+          });
+        }
+      } catch (error) {
+        console.warn('[search-runtime] GraphV2 packet fanout unavailable:', (error as Error).message);
+      }
+      const expandedCanonicalIds = new Set<string>();
+      try {
+        const { createPostgresKagQuickHopReaderV1, executeKagQuickHopV1 } = await import('../atlas/integration/kag-quick-hop-v1.js');
+        const { resolveKagPacketCandidateBindingsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+        const quickHopReader = await createPostgresKagQuickHopReaderV1();
+        const traversal = await executeKagQuickHopV1({
+          seedCanonicalIds: canonicalIds,
+          workspaceRevision: query.workspaceRevision,
+          graphRevision,
+        }, quickHopReader);
+        for (const canonicalId of traversal.visitedCanonicalIds) {
+          if (!canonicalIds.includes(canonicalId)
+            && /^packet:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(canonicalId)) {
+            expandedCanonicalIds.add(canonicalId);
+          }
+        }
+        const naryBindings = await resolveKagPacketCandidateBindingsStrictV1(
+          [...expandedCanonicalIds],
+          { workspaceRevision: query.workspaceRevision, graphRevision },
+        );
+        bindings.push(...naryBindings.map((binding) => ({ ...binding, hyperedgeId: traversal.visitedHyperedgeIds.join(',') })));
+      } catch (error) {
+        console.warn('[search-runtime] qualified n-ary graph fanout unavailable:', (error as Error).message);
+      }
+      for (const binding of bindings) {
+        if (
+          existingPacketKeys.has(binding.packetKey)
+          || binding.workspaceRevision !== query.workspaceRevision
+          || binding.graphRevision !== graphRevision
+          || !binding.sourceRef.trim()
+          || !/^sha256:[0-9a-f]{64}$/i.test(binding.sourceRevision)
+        ) continue;
+        existingPacketKeys.add(binding.packetKey);
+        expanded.push({
+          id: binding.packetKey,
+          packetKey: binding.packetKey,
+          sourceRef: binding.sourceRef,
+          summary: '',
+          content: '',
+          score: seedScore * 0.8,
+          scoreSource: 'ast_tree',
+          workspaceRevision: binding.workspaceRevision,
+          sourceRevision: binding.sourceRevision,
+          graphRevision: binding.graphRevision,
+        });
+        if (expanded.length >= Math.min(query.topK * 4, 64)) break;
+      }
+      return expanded;
+    } catch (error) {
+      console.warn('[search-runtime] qualified graph fanout unavailable:', (error as Error).message);
+      return [];
+    }
   }
 
   private async retrieveFunctionRegistryCandidates(query: SearchQuery): Promise<Candidate[]> {
@@ -1333,20 +1489,26 @@ export class SearchRuntime {
   /**
    * KAG "next steps" item 1 (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration):
    * looks up real hypergraph neighbor evidence for the final packet set via
-   * `kag-hypergraph-reader-v1.ts`. Purely additive/informational — called
+   * `kag-hypergraph-reader-v1.ts`. Informational for final packets; candidate
+   * expansion is performed before fusion by `expandGraphCandidates()`. Called
    * only after ranking is final, and never allowed to throw into the main
    * search path (fail-open, returns undefined on any error so `provenance`
    * simply omits the field, matching its pre-existing optional contract).
    */
   private async lookupHypergraphNeighbors(
     packets: FeatureEnvelope[],
+    requestedWorkspaceRevision?: string | null,
   ): Promise<{
     graphRevision?: string;
     neighbors: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
   } | undefined> {
-    // Revisions are informational here: provenance only, never ranking. Attach one only when the packets agree.
+    // Graph evidence is diagnostic only, but it must still be bound to one exact snapshot.
+    const workspaceRevisions = new Set(packets.map((packet) => packet.workspace_revision?.trim()).filter(Boolean));
     const graphRevisions = new Set(packets.map((packet) => packet.graph_revision?.trim()).filter(Boolean));
+    const workspaceRevision = workspaceRevisions.size === 1 ? [...workspaceRevisions][0] : undefined;
     const graphRevision = graphRevisions.size === 1 ? [...graphRevisions][0] : undefined;
+    if (!workspaceRevision || !graphRevision) return undefined;
+    if (requestedWorkspaceRevision?.trim() && requestedWorkspaceRevision.trim() !== workspaceRevision) return undefined;
 
     const packetKeys = [...new Set(packets.map((packet) => packet.packet_key?.trim()).filter((key): key is string => Boolean(key)))];
     if (packetKeys.length === 0) return undefined;
@@ -1364,9 +1526,8 @@ export class SearchRuntime {
         .map((resolution) => resolution?.canonicalPacketKey)
         .filter((key): key is string => Boolean(key)))];
       if (canonicalIds.length === 0) return undefined;
-      // Non-strict read: no revision filter, fail-open. Strict lineage reads stay in kag-hypergraph-reader-v1.
-      const { readKagHypergraphNeighborsV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
-      const receipt = await readKagHypergraphNeighborsV1(canonicalIds);
+      const { readKagHypergraphNeighborsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+      const receipt = await readKagHypergraphNeighborsStrictV1(canonicalIds, { workspaceRevision, graphRevision });
       // catch-all bucket, not a topic; excluded from provenance (hyperparameter, see OpenSpec visual/graph notes)
       const neighbors = receipt.neighbors.filter((n) => n.canonicalId !== 'topo:unclassified');
       return neighbors.length > 0 ? { graphRevision, neighbors } : undefined;

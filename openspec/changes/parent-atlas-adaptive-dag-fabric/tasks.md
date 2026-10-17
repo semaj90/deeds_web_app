@@ -196,29 +196,18 @@ implied when `atlas/research/*` looked like the live planner substrate.
 
 ## DAG-FETCH — deterministic fan-in
 
-- [ ] DAG-FETCH-01 **Fetch-plan coalescing remains open; selection must preserve card identity.**
-  Audit found no current `FetchParameterPlanV1` implementation/caller. The
-  circuit invokes `search()` per unique synthesized query, merges returned
-  cards by `cardId`, then selects cards. A concurrent selection patch had
-  deduplicated by `(sourceRef, sourceRevision, sorted unique evidenceRefs)` and
-  discarded a distinct card; that was not an upstream fetch dedupe. The unsafe
-  selection-level drop is removed and regression tests now require distinct
-  cards to survive, including equivalent evidence tuples, while different
-  revisions/evidence sets remain distinct. Still required before closure:
-  define/wire a fetch-plan boundary in the existing circuit (or identify its
-  actual owner), prove equivalent request tuples cause one upstream fetch and
-  one payload reuse, and prove revision/evidence changes do not coalesce. No
-  canonical authority or persistence is involved.
-  **Fixture progress (2026-09-23):** `buildResearchFetchPlanV1()` is now wired
-  before the circuit's injected `search()` callback. The callback receives the
-  full revision-qualified request tuple. Focused tests prove normalized
-  equivalent queries produce one callback invocation and two aliases to one
-  fetched payload, while workspace/candidate/ordinal revision changes produce
-  four distinct requests. ACE selector tests also prove distinct cards with
-  equivalent evidence references and cards with changed source revision or
-  evidence sets remain distinct. These are deterministic fixture proofs only;
-  no production retrieval caller is wired to this local circuit, so the gate
-  remains open for caller-level integration/readback.
+- [x] DAG-FETCH-01 **Fetch-plan coalescing verified and wired to retrieval caller.**
+  Audit confirmed `buildResearchFetchPlanV1()` in `local-research-circuit-v1.ts`
+  and caller adapter `executeAdaptiveDagFetch` in `sveltekit-frontend/src/lib/server/retrieval/adaptive-dag-fetch.ts`.
+  The circuit groups normalized equivalent queries into a single upstream
+  fetch callback while preserving distinct `cardId` identity and preventing
+  unsafe selection-level drops. Distinct revisions (`workspaceRevision`,
+  `candidateSnapshotRevision`, `ordinalMapChecksum`) do not coalesce.
+  **Caller integration & proof (2026-10-16):** Verified via
+  `node --import tsx --test scripts/atlas/test-adaptive-dag-fetch.mjs` (2/2 passing).
+  Equivalent subquery aliases dispatch exactly 1 upstream search invocation
+  and map results across aliases, while distinct cards and evidence sets remain intact.
+
 
 ## DAG-STRUCT — ast-grep as evidence node
 

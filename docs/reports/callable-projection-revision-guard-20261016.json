@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.callable-projection-revision-guard-receipt.v1",
+  "generatedAt": "2026-10-16",
+  "status": "FUTURE_PROMOTION_GUARDED_EXISTING_PROJECTION_UNREPAIRED",
+  "likely_cause": "The canonical symbol repository accepted arbitrary nonempty source/workspace revision strings, while the callable projection writer is retired and the live projection contains stale revision values.",
+  "observedMismatch": {
+    "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+    "canonicalSourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+    "projectionSourceRevision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+    "canonicalWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "projectionWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "reference": "docs/reports/graphrag-single-candidate-preflight-20261016T110902360.json"
+  },
+  "change": {
+    "owner": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+    "behavior": "Canonical symbol promotion rejects unless both source_revision and workspace_revision match sha256:<64 lowercase hex>; rejection occurs before any database connection or query.",
+    "openSpec": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/specs/retrieval-lineage-dag/spec.md",
+    "tests": "packages/parent-atlas/test/symbol-registry-identity-v1.test.mjs"
+  },
+  "validation": [
+    {
+      "command": "npm --prefix packages/parent-atlas run build",
+      "exitCode": 0,
+      "result": "TypeScript package build passed."
+    },
+    {
+      "command": "node --test packages/parent-atlas/test/symbol-registry-identity-v1.test.mjs",
+      "exitCode": 0,
+      "result": "4/4 tests passed, including 40-hex Git revision and workspace:0 rejection with zero database calls."
+    },
+    {
+      "command": "npx --no-install openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict",
+      "exitCode": 0,
+      "result": "Change is valid."
+    },
+    {
+      "command": "git diff --check -- <four changed source/spec/task paths>",
+      "exitCode": 0,
+      "result": "No whitespace errors."
+    }
+  ],
+  "stillOpen": [
+    "No active non-retired writer for atlas_callable_search was established; the historical materializer remains retired.",
+    "Existing callable projection source/workspace/tree-node values require post-P20 review and a separately authorized compare-and-swap/readback path.",
+    "The two source chunks still lack row-level source_revision and workspace_revision and have projection UUIDs in metadata instead of the canonical packet key.",
+    "SearchRuntime final Top-K, graph expansion, ACE/ContextManifest, Ornith citation readback, and production GraphRAG admission remain unproven."
+  ],
+  "canonicalAuthority": false,
+  "datastoreWritesPerformed": false,
+  "sourceOrRevisionRowsChanged": false,
+  "productionReadinessEstablished": false,
+  "evidence": [
+    "docs/reports/callable-projection-refresh-dry-run-20261016T111843.json",
+    "docs/reports/graphrag-single-candidate-preflight-20261016T110902360.json",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "patch_targets": [
+    "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+    "packages/parent-atlas/test/symbol-registry-identity-v1.test.mjs",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/specs/retrieval-lineage-dag/spec.md",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "npx --no-install openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict",
+  "smoke_command": "node --test packages/parent-atlas/test/symbol-registry-identity-v1.test.mjs",
+  "report_path": "docs/reports/callable-projection-revision-guard-20261016.json"
+}
