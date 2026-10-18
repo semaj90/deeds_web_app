@@ -872,6 +872,7 @@ if ($safeProfile) {
       }
     }
   }
+}
 
 if ($env:DRAFT_MODEL_PATH) {
   Write-Host 'Deprecated DRAFT_MODEL_PATH is ignored by this launcher. Use ENABLE_MTP_DRAFTER=true and MTP_DRAFT_MODEL=<path> instead.' -ForegroundColor Yellow

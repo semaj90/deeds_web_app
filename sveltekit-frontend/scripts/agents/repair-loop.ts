@@ -151,14 +151,15 @@ async function upsertTaskCard(pool: pg.Pool, card: RepairTaskCard): Promise<void
     await client.query('BEGIN');
     await client.query(
       `INSERT INTO kanban_tasks
-         (task_id, feature_id, feature_label, source_refs, lane, status, validation_command, priority, idempotency_key, updated_at)
-       VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, 0, $1, now())
+         (task_id, feature_id, feature_label, source_refs, lane, status, validation_command, priority, idempotency_key, workspace_id, updated_at)
+       VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, 0, $1, $8, now())
        ON CONFLICT (task_id) DO UPDATE SET
          -- A verified completion is never reset by a re-generated card.
          status             = CASE WHEN kanban_tasks.status = 'done' THEN kanban_tasks.status ELSE EXCLUDED.status END,
          lane               = CASE WHEN kanban_tasks.status = 'done' THEN kanban_tasks.lane ELSE EXCLUDED.lane END,
          validation_command = EXCLUDED.validation_command,
          source_refs        = EXCLUDED.source_refs,
+         workspace_id       = COALESCE(kanban_tasks.workspace_id, EXCLUDED.workspace_id),
          updated_at         = now()`,
       [
         card.id,
@@ -168,6 +169,7 @@ async function upsertTaskCard(pool: pg.Pool, card: RepairTaskCard): Promise<void
         CARD_LANE[card.status] ?? 'todo',
         card.status,
         card.checks.join('; ') || null,
+        process.env.ATLAS_WORKSPACE_ID || 'deeds-web-app',
       ]
     );
     await client.query(

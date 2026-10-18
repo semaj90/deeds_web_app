@@ -163,12 +163,14 @@ async function main() {
           lane,
           status,
           validation_command,
+          workspace_id,
           updated_at
         )
-        VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, now())
+        VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, $8, now())
         ON CONFLICT (task_id) DO UPDATE SET
           lane = EXCLUDED.lane,
           status = EXCLUDED.status,
+          workspace_id = COALESCE(kanban_tasks.workspace_id, EXCLUDED.workspace_id),
           updated_at = now()
       `, [
         taskId,
@@ -177,7 +179,8 @@ async function main() {
         JSON.stringify(sourceRefs),
         t.lane,
         t.status,
-        t.status === 'completed' ? 'npm run check:fast' : null
+        t.status === 'completed' ? 'npm run check:fast' : null,
+        process.env.ATLAS_WORKSPACE_ID || 'deeds-web-app'
       ]);
       
       kanbanSyncedCount++;

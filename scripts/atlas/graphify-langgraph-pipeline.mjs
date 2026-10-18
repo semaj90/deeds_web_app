@@ -8,7 +8,7 @@
  *   audit_coverage   → compute signal-density gaps (BM25, concept_ids, community_conf, Qdrant)
  *   feature_extract  → assign feature_id to packets missing it (path heuristic + domain label)
  *   kanban_task      → emit prioritised task evidence + TaskCandidate JSONL (what needs enrichment, in what order)
- *   embed_missing    → embed packets missing Qdrant vectors (nomic-embed-text → embeddinggemma fallback)
+ *   embed_missing    → embed packets missing Qdrant vectors (embeddinggemma:latest, 768-d; no nomic fallback)
  *   index_bm25       → backfill bm25_text in payload for packets that lack it
  *   rank_signals     → compute + persist RRF ranking signal coverage report
  *   prune_noise      → remove .cache/ artifact packets + flag duplicates
@@ -249,7 +249,8 @@ async function neo4jRun(stmt, params = {}) {
 }
 
 async function embed(text) {
-  for (const model of ['nomic-embed-text:latest', 'embeddinggemma:latest']) {
+  // embeddinggemma:latest is the only admitted embedding model (semantic_768); nomic-embed-text is not a fallback.
+  for (const model of [process.env.GRAPHIFY_EMBED_MODEL || 'embeddinggemma:latest']) {
     try {
       const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
         method: 'POST',
