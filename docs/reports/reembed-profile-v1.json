@@ -1,0 +1,66 @@
+{
+ "schema": "atlas.reembed-profile.v1",
+ "generatedAt": "2026-10-18T09:16:43.425Z",
+ "slice": "canary 1000 rows (already canonical)",
+ "snapshotSha256": "2d6db7d1e56b1dca6ff73c3ecebf3eae921f9427484185934c0771ee74d915b6",
+ "caveats": [
+  "writes rewrote already-canonical rows; unchanged-value updates may be HOT and understate HNSW insert cost of a first-time NULL fill"
+ ],
+ "embedBench": [
+  {
+   "batchSize": 1,
+   "rows": 192,
+   "seconds": 10.02,
+   "rowsPerSecond": 19.2,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 8,
+   "rows": 192,
+   "seconds": 5.2,
+   "rowsPerSecond": 36.9,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 16,
+   "rows": 192,
+   "seconds": 4.5,
+   "rowsPerSecond": 42.7,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 32,
+   "rows": 192,
+   "seconds": 4.6,
+   "rowsPerSecond": 41.7,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 64,
+   "rows": 192,
+   "seconds": 4.41,
+   "rowsPerSecond": 43.5,
+   "cosineMean": 1,
+   "cosineMin": 1
+  }
+ ],
+ "bestBatchSize": 64,
+ "parityGate": "PASS",
+ "writeBench": {
+  "perRowAutocommit": {
+   "rows": 200,
+   "seconds": 15.89,
+   "rowsPerSecond": 12.6
+  },
+  "batched50UnnestTxn": {
+   "rows": 200,
+   "seconds": 4.6,
+   "rowsPerSecond": 43.5
+  }
+ },
+ "checksum": "sha256:519929dcfaca605debb5861614b0b7fe29dd4da79022fe04fcf436f3d090999e"
+}
