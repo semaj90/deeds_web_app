@@ -1,0 +1,324 @@
+{
+ "schema": "atlas.domain-crosswalk-proposal.v1",
+ "generatedAt": "2026-10-17",
+ "source": "feature_domain.domain_class (61,659 rows, 40 distinct values) vs atlas_domain_ontology (17 group_ids)",
+ "groupIds": [
+  "api",
+  "auth",
+  "cache",
+  "compiler",
+  "database",
+  "devops",
+  "error-handling",
+  "frontend",
+  "gpu",
+  "graph",
+  "machine-learning",
+  "retrieval",
+  "test",
+  "database.postgresql",
+  "devops.env-config",
+  "devops.process-mgmt",
+  "frontend.sveltekit"
+ ],
+ "totalRows": 61659,
+ "rowsByStatus": {
+  "CASE_NORMALIZED": 8060,
+  "NEEDS_NEW_GROUP_OR_DECISION": 13045,
+  "INVALID_OR_UNCLASSIFIED": 5462,
+  "PROPOSED_NEEDS_REVIEW": 9068,
+  "EXACT": 23616,
+  "AMBIGUOUS_NEEDS_REVIEW": 2408
+ },
+ "rows": [
+  {
+   "legacy": "Graph",
+   "rows": 7716,
+   "status": "CASE_NORMALIZED",
+   "targetGroupId": "graph",
+   "reason": "NFC-lowercase equals a group_id"
+  },
+  {
+   "legacy": "documentation",
+   "rows": 6782,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "Other",
+   "rows": 5441,
+   "status": "INVALID_OR_UNCLASSIFIED",
+   "targetGroupId": null,
+   "reason": "not a domain"
+  },
+  {
+   "legacy": "UI",
+   "rows": 4365,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "frontend",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "test",
+   "rows": 4228,
+   "status": "EXACT",
+   "targetGroupId": "test",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "gpu",
+   "rows": 3876,
+   "status": "EXACT",
+   "targetGroupId": "gpu",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "compiler",
+   "rows": 3766,
+   "status": "EXACT",
+   "targetGroupId": "compiler",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "tool",
+   "rows": 3695,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "frontend",
+   "rows": 3190,
+   "status": "EXACT",
+   "targetGroupId": "frontend",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "database",
+   "rows": 2515,
+   "status": "EXACT",
+   "targetGroupId": "database",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "graph",
+   "rows": 2350,
+   "status": "EXACT",
+   "targetGroupId": "graph",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "MachineLearning",
+   "rows": 2341,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "machine-learning",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "retrieval",
+   "rows": 2306,
+   "status": "EXACT",
+   "targetGroupId": "retrieval",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "rag_retrieval",
+   "rows": 1805,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "retrieval",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "agent",
+   "rows": 1536,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "backend",
+   "rows": 1495,
+   "status": "AMBIGUOUS_NEEDS_REVIEW",
+   "targetGroupId": null,
+   "reason": "more than one plausible group"
+  },
+  {
+   "legacy": "cache",
+   "rows": 1385,
+   "status": "EXACT",
+   "targetGroupId": "cache",
+   "reason": "value equals a group_id"
+  },
+  {
+   "legacy": "Utility",
+   "rows": 525,
+   "status": "AMBIGUOUS_NEEDS_REVIEW",
+   "targetGroupId": null,
+   "reason": "more than one plausible group"
+  },
+  {
+   "legacy": "agent_orchestration",
+   "rows": 406,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "evidence_upload_storage",
+   "rows": 236,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "Library",
+   "rows": 221,
+   "status": "AMBIGUOUS_NEEDS_REVIEW",
+   "targetGroupId": null,
+   "reason": "more than one plausible group"
+  },
+  {
+   "legacy": "Database",
+   "rows": 180,
+   "status": "CASE_NORMALIZED",
+   "targetGroupId": "database",
+   "reason": "NFC-lowercase equals a group_id"
+  },
+  {
+   "legacy": "case_management",
+   "rows": 180,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "API",
+   "rows": 164,
+   "status": "CASE_NORMALIZED",
+   "targetGroupId": "api",
+   "reason": "NFC-lowercase equals a group_id"
+  },
+  {
+   "legacy": "infrastructure",
+   "rows": 138,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "devops",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "graph_topology",
+   "rows": 112,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "graph",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "cache_layer",
+   "rows": 106,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "cache",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "repair_workflow",
+   "rows": 100,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "error-handling",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "embedding_indexing",
+   "rows": 81,
+   "status": "AMBIGUOUS_NEEDS_REVIEW",
+   "targetGroupId": null,
+   "reason": "more than one plausible group"
+  },
+  {
+   "legacy": "mcp_agents",
+   "rows": 61,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "document_processing",
+   "rows": 57,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "Authentication",
+   "rows": 52,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "auth",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "citation_engine",
+   "rows": 52,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "auth_login_register",
+   "rows": 49,
+   "status": "PROPOSED_NEEDS_REVIEW",
+   "targetGroupId": "auth",
+   "reason": "inferred from the name only"
+  },
+  {
+   "legacy": "cluster_analysis",
+   "rows": 42,
+   "status": "AMBIGUOUS_NEEDS_REVIEW",
+   "targetGroupId": null,
+   "reason": "more than one plausible group"
+  },
+  {
+   "legacy": "legal_reports",
+   "rows": 34,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  },
+  {
+   "legacy": "memory_optimization",
+   "rows": 28,
+   "status": "AMBIGUOUS_NEEDS_REVIEW",
+   "targetGroupId": null,
+   "reason": "more than one plausible group"
+  },
+  {
+   "legacy": "Classification failed",
+   "rows": 21,
+   "status": "INVALID_OR_UNCLASSIFIED",
+   "targetGroupId": null,
+   "reason": "not a domain"
+  },
+  {
+   "legacy": "Embedding",
+   "rows": 16,
+   "status": "AMBIGUOUS_NEEDS_REVIEW",
+   "targetGroupId": null,
+   "reason": "more than one plausible group"
+  },
+  {
+   "legacy": "trace_mcp",
+   "rows": 6,
+   "status": "NEEDS_NEW_GROUP_OR_DECISION",
+   "targetGroupId": null,
+   "reason": "concept has no home among the 13 top-level groups"
+  }
+ ],
+ "notes": [
+  "PROPOSED_* statuses are name-based suggestions for human review, not classifier output or evidence.",
+  "No NES LUT ordinal is assigned here; ordinals come from a versioned registry after the crosswalk is approved.",
+  "Applying this would update feature_domain / packets; that write is NOT performed."
+ ],
+ "applied": false,
+ "writesPerformed": false,
+ "canonicalAuthority": false,
+ "checksum": "sha256:fe63b2329fc7b6fbd41d7783714064bc7ddaa1da5e9ffc2485251e839c332916"
+}

@@ -1,0 +1,51 @@
+{
+ "schema": "atlas.domain-calibration-topup.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "writesPerformed": false,
+ "target": 40,
+ "v1Rows": 142,
+ "addedRows": 378,
+ "totalRows": 520,
+ "perGroupProposed": {
+  "api": 40,
+  "auth": 40,
+  "cache": 40,
+  "compiler": 40,
+  "database": 40,
+  "devops": 40,
+  "error-handling": 40,
+  "frontend": 40,
+  "gpu": 40,
+  "graph": 40,
+  "machine-learning": 40,
+  "retrieval": 40,
+  "test": 40
+ },
+ "stillShort": {
+  "api": 0,
+  "auth": 0,
+  "cache": 0,
+  "compiler": 0,
+  "database": 0,
+  "devops": 0,
+  "error-handling": 0,
+  "frontend": 0,
+  "gpu": 0,
+  "graph": 0,
+  "machine-learning": 0,
+  "retrieval": 0,
+  "test": 0
+ },
+ "allUnreviewed": true,
+ "trustFloor": {
+  "reviewedRowsRequired": 200,
+  "perClassRequired": 30,
+  "note": "counts are CANDIDATES, not reviewed rows; some will be marked AMBIGUOUS / NOT_A_DOMAIN / SKIP"
+ },
+ "sourceChecksums": {
+  "draftV1": "sha256:43032069eea7e43207077a53e676778f8acc8ddf7fb34c8652218fe61124f83b",
+  "crosswalk": "sha256:fe63b2329fc7b6fbd41d7783714064bc7ddaa1da5e9ffc2485251e839c332916"
+ },
+ "outputChecksum": "sha256:1720026e5d402e7f855462de27e9656b55338d58c0094b8cca812dcca59e2da7"
+}

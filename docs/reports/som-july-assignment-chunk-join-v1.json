@@ -1,0 +1,27 @@
+{
+ "schema": "atlas.som-july-assignment-chunk-join.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "writesPerformed": false,
+ "julyAssignments": 32310,
+ "matchedChunkIds": 31010,
+ "keyedBy": "codebase_chunk_index.id (the file calls them packet_id)",
+ "currentChunkSomBmuAgreement": {
+  "chunksWithBmu": 31010,
+  "agree": 2187
+ },
+ "domainJoin": {
+  "chunksJoinedToSingleDomainSource": 31010,
+  "cells": 387,
+  "perCellMin": 1,
+  "perCellMax": 2841,
+  "weightedPurity": 0.5797,
+  "unweightedMeanPurity": 0.6454,
+  "majorityClassBaseline": 0.5792,
+  "shuffledNullWeightedPurityMean": 0.5799,
+  "NMI": 0.0691,
+  "shuffledNullNMIMean": 0.0259
+ },
+ "caveat": "domain labels are the legacy feature_domain vocabulary at file level; chunks of one file share a label, which inflates purity",
+ "checksum": "sha256:cb75cbe18ede7deb833346a26b640ce1ddc373664517197fd0345c648852a581"
+}

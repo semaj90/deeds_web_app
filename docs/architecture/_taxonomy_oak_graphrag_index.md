@@ -4,6 +4,22 @@
 
 ---
 
+## Domain taxonomy headers (for agentic / MCP `domain` query parameter)
+
+Source: `scripts/atlas/taxonomy/taxonomy-groups-snapshot-2026-10-13.json` (snapshot of `atlas_domain_ontology`; live table not re-read when this was written). Group IDs are exact strings; a query parameter value must equal one of them or be rejected, never fuzzy-matched.
+
+**Top-level groups (13)**: [api, auth, cache, compiler, database, devops, error-handling, frontend, gpu, graph, machine-learning, retrieval, test]
+
+**Child groups (4)**: [database.postgresql, devops.env-config, devops.process-mgmt, frontend.sveltekit]
+
+**Taxonomy tables (19)**: [atlas_domain_ontology, domain_taxonomy_v1, feature_domain, feature_domain_facts, taxonomy_nodes, taxonomy_edges, atlas_taxonomy_assignment_candidates, atlas_ontology_concepts, atlas_ontology_relations, atlas_ontology_tuples, atlas_ontology_linked_tuples, feature_ontology_tuples, registry_ontology_tuples, ontology_edges, ontology_keywords, ontology_coverage, ontology_domain_coverage, ontology_domain_tuples, codebase_chunk_eg2_domain_registry]
+
+| Item | Status |
+|---|---|
+| NES LUT ordinals per group | UNASSIGNED here; ordinals come only from a versioned registry, never from list position or UTF-8 bytes |
+| `feature_label` -> group mapping | NOT_PROVEN: 40,814 distinct labels, no join to `atlas_domain_ontology`; `primary_domain` empty on all packets |
+| Packet `domain_class` | Populated on all 61,718 packets but uses a different vocabulary (UI, Graph, documentation, Other, ...) than these group IDs |
+
 ## TL;DR
 
 Navigation for the taxonomy-to-GraphRAG integration. PostgreSQL is the owner for taxonomy terms. The existing OAK and PostgreSQL-boundary interfaces are intended to resolve terms, but the cited census marks that boundary as not yet wired to the live tables. NetworkX is a CPU parity executor, not an authority. The inverse-DAG work is proposal-only.

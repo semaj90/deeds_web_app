@@ -1,0 +1,45 @@
+{
+ "schema": "atlas.domain-prefilter-recall.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuUsed": false,
+ "canonicalAuthority": false,
+ "sample": {
+  "chunks": 9000,
+  "queries": 1500,
+  "k": 10,
+  "source": ".tmp/atlas/enrich-real-v1/stage1-n9000.npz"
+ },
+ "results": {
+  "legacy_domain": {
+   "meanRecallAtK": 0.5825,
+   "meanCandidateFraction": 0.2061,
+   "randomSubsetNullRecall": 0.2061,
+   "recallOverNull": 2.83,
+   "p10Recall": 0.1
+  },
+  "stored_cluster": {
+   "meanRecallAtK": 0.4253,
+   "meanCandidateFraction": 0.005,
+   "randomSubsetNullRecall": 0.005,
+   "recallOverNull": 84.38,
+   "p10Recall": 0.0
+  },
+  "top3_centroids": {
+   "meanRecallAtK": 0.6589,
+   "meanCandidateFraction": 0.0151,
+   "randomSubsetNullRecall": 0.0151,
+   "recallOverNull": 43.54,
+   "p10Recall": 0.3
+  }
+ },
+ "caveats": [
+  "self-queries on a 9,000-chunk sample, not a golden query set",
+  "legacy domain labels are weak",
+  "stored cluster centroids are STALE for current vectors (81.25% replay)",
+  "same-file neighbours excluded; sample is small so ANN effects are not tested (exact search inside the filter)",
+  "recall here = share of the unfiltered exact top-K kept by the filter; it says nothing about answer quality"
+ ],
+ "checksum": "sha256:5c2900866ca99de52cb3d9557b4d3144dc25a613adde218fb7fc12b96b99ab2c"
+}
