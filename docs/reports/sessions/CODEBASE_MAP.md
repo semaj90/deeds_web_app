@@ -247,7 +247,7 @@ Three workflows exist under `.github/workflows/`. `sveltekit-ci.yml` is the cano
 
 The script degrades through three modes:
 
-1. **Full agent mode** — uses `/api/ai/agent`, Gemma4, ACE retrieval, and `codebase_chunks_768`.
+1. **Full agent mode** — uses `/api/ai/agent`, ornith 1.5, ACE retrieval, and `codebase_chunks_768`.
 2. **RAG-only mode** — uses direct Qdrant access against `codebase_chunks_768` when no LLM is available.
 3. **Static-scan mode** — uses filesystem scans for TODOs, hardcoded localhost URLs, Zod coverage, and other production risks.
 
@@ -264,7 +264,7 @@ node sveltekit-frontend/scripts/tests/test-production-readiness.mjs --turbo --sk
 
 ## Analysis Path Mapping
 
-This repository already has a live codebase-intelligence pipeline; the main work is in extending and stabilizing that path, not inventing a second one from scratch. The most important split is: `codebase-index/*` builds and enriches graph/search artifacts, `ace/*` assembles those artifacts into synthesis context, and `ACPToolRegistry` is a separate tool-execution plane.
+This repository already has a live codebase-intelligence pipeline; the main work is in extending and stabilizing that path, not inventing a second one from scratch. The most important split is: `codebase-index/*` builds and enriches graph/search artifacts, `ace/*` assembles those artifacts into synthesis context, and `ACPToolRegistry` 'a2a' is a separate tool-execution plane.
 
 - `sveltekit-frontend/src/routes/api/codebase-index/orchestrate/+server.ts`
   This is the top-level orchestration route for codebase analysis. In sync mode it can run AST embedding, cluster assignment, SOM topology, Neo4j sync, PageRank, cluster summarization, GPU tagging, wiki export, 4D hypergraph tagging, community detection, and deep-research indexing in one staged SSE pipeline with Redis checkpoints.

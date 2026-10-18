@@ -5,11 +5,15 @@ import { and, eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { auditReportAction } from '$lib/server/reports/audit';
+import { invalidateReportCache } from '$lib/server/cache/invalidation.js';
 
 const saveReportSchema = z.object({
 	reportId: z.string().min(1, 'Report ID is required').max(500),
 	title: z.string().max(1000).optional(),
 	contentHtml: z.string().max(5_000_000).optional(),
+}).refine(({ title, contentHtml }) => title !== undefined || contentHtml !== undefined, {
+	message: 'At least one report field must be provided',
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -28,20 +32,31 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'Invalid report ID format' }, { status: 400 });
     }
 
-		// Update existing report
+		const updates: { updatedAt: Date; title?: string; content?: string } = {
+			updatedAt: new Date(),
+		};
+		if (title !== undefined) updates.title = title.trim() || 'Untitled Report';
+		if (contentHtml !== undefined) updates.content = contentHtml;
+
 		const [updated] = await db
       .update(reports)
-      .set({
-        title: title || 'Untitled Report',
-        content: contentHtml || '',
-        updatedAt: new Date(),
-      })
+      .set(updates)
       .where(and(eq(reports.id, reportId), eq(reports.createdBy, Number(locals.user.id))))
       .returning();
 
 		if (!updated) {
 			return json({ error: 'Report not found' }, { status: 404 });
 		}
+
+		await auditReportAction({
+			reportId: updated.id,
+			userId: locals.user.id,
+			action: 'updated',
+			changes: updates,
+			request,
+		});
+		await invalidateReportCache(updated.id, 'report_update', locals.user.id)
+			.catch((error) => console.warn('[Reports] Cache invalidation failed:', error));
 
 		return json({
 			success: true,

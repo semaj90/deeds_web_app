@@ -14,6 +14,16 @@
 import { z } from 'zod';
 import type { ACPToolRegistryEntry } from './acp-grpc-quic-bridge.js';
 import { acpToolRegistry } from './acp-grpc-quic-bridge.js';
+import {
+  toolIdentityRecover,
+  toolEnvelopeValidate,
+  toolMirrorSyncQdrant,
+  toolMirrorSyncNeo4j,
+  toolRetrievalRerank,
+  toolAnswerSynthesize,
+  toolEscalationRoute,
+  toolIdentityQuarantine,
+} from '$lib/server/dispatch/mcp-tool-implementations.js';
 
 // ─────────────────────────────────────────────────────────────────────
 // Dispatcher Tool Schemas (Zod, for validation)
@@ -261,17 +271,6 @@ async function dispatchToMCPTool(toolId: string, args: Record<string, any>): Pro
     return executeGraphExpandMcpTool(args);
   }
 
-  // Dynamic imports to avoid circular dependencies
-  const {
-    toolIdentityRecover,
-    toolEnvelopeValidate,
-    toolMirrorSyncQdrant,
-    toolMirrorSyncNeo4j,
-    toolRetrievalRerank,
-    toolAnswerSynthesize,
-    toolEscalationRoute,
-    toolIdentityQuarantine,
-  } = await import('$lib/server/dispatch/mcp-tool-implementations.js');
 
   const handlers: Record<string, (args: any) => Promise<any>> = {
     'identity:recover': toolIdentityRecover,

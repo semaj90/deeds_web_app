@@ -572,6 +572,11 @@ describe('/api/reports/save (POST)', () => {
 		expect(res.status).toBe(400);
 	});
 
+	it('returns 400 when no report fields are supplied', async () => {
+		const res = await POST({ request: mkRequest({ reportId: UUID1 }), locals: authedLocals });
+		expect(res.status).toBe(400);
+	});
+
 	it('saves report successfully', async () => {
 		const { db } = await import('$lib/server/db/client');
 		const updated = { id: UUID1, title: 'Saved Report', content: '<p>Updated</p>' };
@@ -593,6 +598,25 @@ describe('/api/reports/save (POST)', () => {
 		expect(data.report.title).toBe('Saved Report');
 	});
 
+	it('persists an empty document without overwriting an omitted title', async () => {
+		const { db } = await import('$lib/server/db/client');
+		const set = vi.fn((_updates: Record<string, unknown>) => ({
+			where: vi.fn(() => ({
+				returning: vi.fn(async () => [{ id: UUID1, title: 'Existing title', content: '' }]),
+			})),
+		}));
+		(db.update as any).mockReturnValueOnce({ set });
+
+		const res = await POST({
+			request: mkRequest({ reportId: UUID1, contentHtml: '' }),
+			locals: authedLocals,
+		});
+
+		expect(res.status).toBe(200);
+		expect(set).toHaveBeenCalledWith(expect.objectContaining({ content: '', updatedAt: expect.any(Date) }));
+		expect(set.mock.calls[0][0]).not.toHaveProperty('title');
+	});
+
 	it('returns 404 when report not found', async () => {
 		const { db } = await import('$lib/server/db/client');
 		(db.update as any).mockReturnValueOnce({
@@ -604,7 +628,7 @@ describe('/api/reports/save (POST)', () => {
 		});
 
 		const res = await POST({
-      request: mkRequest({ reportId: UUID2 }),
+      request: mkRequest({ reportId: UUID2, title: 'Missing report' }),
       locals: authedLocals,
     });
 		expect(res.status).toBe(404);
@@ -621,7 +645,7 @@ describe('/api/reports/save (POST)', () => {
 		});
 
 		const res = await POST({
-      request: mkRequest({ reportId: UUID1 }),
+      request: mkRequest({ reportId: UUID1, title: 'Save failure' }),
       locals: authedLocals,
     });
 		expect(res.status).toBe(500);

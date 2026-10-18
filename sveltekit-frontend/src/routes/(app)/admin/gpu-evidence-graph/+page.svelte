@@ -2,8 +2,6 @@
 	import type { PageData } from './$types';
 	import type { WebGPULegalDocumentGraph, PerformanceStats } from '$lib/webgpu/legal-document-graph.js';
 
-	export const ssr = false;
-
 	const { data }: { data: PageData & { connections?: Array<{ source: string; target: string; type: string; strength: number }> } } = $props();
 
 	let canvas: HTMLCanvasElement;

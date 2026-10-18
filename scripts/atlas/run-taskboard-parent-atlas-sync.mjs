@@ -130,8 +130,15 @@ try {
       PACKETS_DIR: '.\\.tmp\\parent_atlas_packets\\sourceRef-first',
       DATABASE_URL: DEFAULT_SOURCE_REF_DB,
     };
-    run('enqueue_parent_atlas_jobs', process.execPath, [path.join(ROOT, 'scripts', 'atlas', 'enqueue_parent_atlas_jobs.mjs')], env);
-    mark('enqueue-parent-atlas-jobs-sourceRef-first', 'ok');
+    if (WRITE) {
+      run('enqueue_parent_atlas_jobs', process.execPath, [path.join(ROOT, 'scripts', 'atlas', 'enqueue_parent_atlas_jobs.mjs')], env);
+      mark('enqueue-parent-atlas-jobs-sourceRef-first', 'ok', { write: true });
+    } else {
+      mark('enqueue-parent-atlas-jobs-sourceRef-first', 'skipped', {
+        reason: 'Requires --write because the enqueue step inserts PostgreSQL job rows.',
+        write: false,
+      });
+    }
 
     runNodeScript('scripts/atlas/validate-parent-atlas.mjs', []);
     mark('validate-parent-atlas', 'ok');

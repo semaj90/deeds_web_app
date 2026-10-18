@@ -1,0 +1,92 @@
+{
+  "schema": "atlas.pipeline-concurrency-benchmark.v1",
+  "timestamp": "2026-10-18T09:25:11.611Z",
+  "sampleRowsCount": 1000,
+  "batchSize": 50,
+  "model": "embeddinggemma:latest",
+  "runs": {
+    "concurrency1": {
+      "concurrency": 1,
+      "durationMs": 25088.56,
+      "rowsPerSec": 39.86
+    },
+    "concurrency2": {
+      "concurrency": 2,
+      "durationMs": 22451.75,
+      "rowsPerSec": 44.54
+    }
+  },
+  "speedupRatio": 1.117,
+  "parity": {
+    "minCosine": 1,
+    "parityProven": true,
+    "samplesChecked": 12,
+    "samples": [
+      {
+        "id": "0000136c-8cbb-4188-a860-28dce80d3b87",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "000cb829-8c9d-45f8-8b1d-6bcde6b7d3f0",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "001834e4-0d55-48fc-9faa-6e4ff803a9f6",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "003108ff-acf5-4d92-af70-cdac58181c13",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "004974fd-bbf9-4f20-b880-083068056c12",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "005e808f-09d3-405a-8415-4ef20675a612",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "0075e71e-d54e-4662-8637-1390762e4c64",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "008ecf70-a45a-4143-85b8-d0e5d7ac43a0",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "00a8d304-b667-4734-87f1-97a4ca4bea57",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "00c2a5a0-7a52-4f91-a8e3-9b563c6aa13b",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "00ddfe0d-b66c-4f3a-97e0-bf62859a0c18",
+        "cosine": 1,
+        "identicalHash": true
+      },
+      {
+        "id": "00f41406-1052-4398-92fd-6555f556d2bd",
+        "cosine": 1,
+        "identicalHash": true
+      }
+    ]
+  },
+  "hardwareConstraints": {
+    "ollamaNumParallel": 2,
+    "vramSafetyMarginMiB": 318,
+    "ornithPort8090Preserved": true
+  }
+}

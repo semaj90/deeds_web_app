@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v2.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `9b4ffdddcb6f78a23cbd96baedc2591b6907b355d2c2031332e7585f8df84a2e`
+Registry checksum: `b0ca1ecb5c4011ba2262d02df47c800018ebaf50c4547dba5b0c22b00772117a`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 
@@ -26,8 +26,10 @@ Registry checksum: `9b4ffdddcb6f78a23cbd96baedc2591b6907b355d2c2031332e7585f8df8
 | `n-gram` / `trigram` | N adjacent tokens/characters; `pg_trgm` provides PostgreSQL three-character similarity/pattern operators. | Feature/fuzzy lexical path, distinct from FTS. |
 | PostgreSQL FTS | Built-in `tsvector` queries ranked by `ts_rank`/`ts_rank_cd`. | Existing lexical lane; not strict Okapi BM25. |
 | `BM25` | Term-frequency/inverse-document-frequency ranking. | The compatibility-named `bm25-search.ts` path uses PostgreSQL FTS (`tsvector` / `ts_rank`); do not infer a separate BM25 index or production `pg_search` owner without caller evidence. |
-| `pgvector` / `HNSW` | PostgreSQL vector types/operators and an approximate-neighbor index option. | Existing `semantic_768` executor; lineage admission is separate. |
-| `semantic_768` | The canonical 768-dimensional dense representation stored in PostgreSQL `codebase_chunk_index.content_embedding_768`. | PostgreSQL owns canonical storage/eligibility; the unique production writer and Qdrant parity remain unproven. |
+| `pgvector` (768-D) | PostgreSQL vector types/operators and approximate-neighbor index (`HNSW`) storing 768-D vectors in `codebase_chunk_index.content_embedding_768`. | Canonical dense store. 384-D truncation is deprecated/prohibited. |
+| `semantic_768` | The canonical 768-dimensional dense representation stored in PostgreSQL `codebase_chunk_index.content_embedding_768`. | Sole canonical dense owner (219,998 rows). 384-D is legacy; `atlas_packets.embedding` is 88.8% placeholder and non-canonical. |
+| `KMeans 768` | GPU (RAPIDS cuVS) or CPU clustering operating on 768-dimensional dense semantic vectors. | Unsupervised topology over `semantic_768`; centroids and assignments must be 768-D, never 384-D. |
+| `EmbeddingGemma` (Ollama) | Canonical 768-D dense embedding provider on port 11434. Approved models: `embeddinggemma:latest` (GPU) & `embeddinggemma-cpu:latest` (CPU, cosine ~0.9999). | ⚠️ **PROHIBITED**: `embeddinggemma2:q8_0` produces an orthogonal vector space (cosine ~0.00) and MUST NOT be used with the existing 768-D corpus. |
 | AST / structural search | Abstract syntax tree observations describe parsed program structure and source spans; they are distinct from semantic embeddings. | Use exact source bytes, parser/version, and byte-span evidence; AST matches nominate evidence, not truth or relevance labels. |
 | Top cosine similarity | Order normalized vectors by descending cosine similarity (equivalently ascending cosine distance when defined as `1 - similarity`). | A dense-lane candidate score, not calibrated relevance or RRF; exact-rescore only the bounded candidate set when required. |
 | Inverse candidate LUT | A derived reverse lookup from an exact identity key or `(packetKey, sourceRef, sourceRevision)` tuple to an ordinal in a verified candidate map. | `buildCandidateReverseIndexV1`; rebuildable and non-authoritative. This is not reciprocal/inverse cosine scoring. |
@@ -91,7 +93,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 
 - [.claude/CLAUDE.md](.claude/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `13bc6179f4ad`
 - [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `fef20519d5e9`
-- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `2b0dede08ff0`
+- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `811a318ae8b9`
 - [claude-mem/CLAUDE.md](claude-mem/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `a6f297acd125`
 - [llm/claude.md](llm/claude.md) — CLAUDE_INSTRUCTIONS — `fdcdba7c73d7`
 - [mcp-server-mcp/CLAUDE.md](mcp-server-mcp/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `1707a6375458`
@@ -123,6 +125,27 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 ## Architecture index
 
 - [Parent Atlas Architecture TOC V2](architecture/ARCH-TOC-v2.md) — complete navigation, workstation owner map, and explicit temporal snapshot receipts.
+- [SvelteKit Frontend TOC](architecture/sveltekit-frontend-toc.md) — routes, server boundaries, Parent Atlas integration, build configuration, and validation entry points.
+- [Deferred dense-search session TODO](reports/sessions/MASTER-FEATURE-TODO-2026-05-20-pgvector-embeddinggemma-agentic-dense-search-todo.md) — historical task notes; consult current OpenSpec owners for status.
+- [Embedding Dimension Policy (Corrected)](architecture/CORRECTED-embedding-dimension-policy.md) — canonical 768-D policy replacing 384-D truncation assumptions.
+
+## EmbeddingGemma and pgvector 768-D Policy (embeddinggemma_toc)
+
+> [!CAUTION]
+> **CRITICAL MODEL & DIMENSION COMPATIBILITY GATEWAY**
+>
+> - **Canonical Vector Dimension**: `768-D` (`semantic_768`).
+>   - Canonical Truth Store: PostgreSQL `codebase_chunk_index.content_embedding_768` (pgvector 768).
+>   - Rebuildable ANN Mirror: Qdrant `codebase_chunks_768` (vector size 768, cosine distance).
+>   - Prohibited / Deprecated: `384-D` truncation is obsolete. Zero-row 384-D columns are archived. Never insert 384-D vectors or truncate 768-D vectors.
+> - **KMeans Clustering**: Must operate on `768-D` dense embeddings (`kmeans768`), using RAPIDS cuVS (GPU) or CPU KMeans over `semantic_768`, never on 384-D.
+> - **Approved Ollama Models (`:11434`)**:
+>   - `embeddinggemma:latest` — Primary canonical GPU model (768-D, L2-normalized).
+>   - `embeddinggemma-cpu:latest` — Approved CPU fallback (768-D, cosine similarity ~0.9999 vs GPU).
+> - ⚠️ **STRICT PROHIBITION — EmbeddingGemma 2 (`embeddinggemma2:q8_0`)**:
+>   - Testing on `:11434` confirmed that `embeddinggemma2:q8_0` produces vectors in an **orthogonal embedding space** to `embeddinggemma:latest` (cosine similarity $\sim 0.00$).
+>   - Querying or indexing with `embeddinggemma2` destroys pgvector/Qdrant cosine retrieval across the existing corpus.
+>   - `embeddinggemma2` is strictly forbidden unless an atomic database-wide re-embedding migration is executed.
 
 ## Code Capability Knowledge and Agentic DAG Retrieval
 
@@ -139,6 +162,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 
 - [_bitfrost_fsm_index](docs/architecture/_bitfrost_fsm_index.md) — UNCLASSIFIED
 - [_cuda_rtx_toc](docs/architecture/_cuda_rtx_toc.md) — UNCLASSIFIED
+- [_qdrant_ann_pipeline_toc](docs/architecture/_qdrant_ann_pipeline_toc.md) — UNCLASSIFIED
 - [_taxonomy_oak_graphrag_index](docs/architecture/_taxonomy_oak_graphrag_index.md) — UNCLASSIFIED
 - [_topology_classifier_index](docs/architecture/_topology_classifier_index.md) — UNCLASSIFIED
 - [ACP-GEMMA4-MEMORY-HIERARCHY](docs/architecture/ACP-GEMMA4-MEMORY-HIERARCHY.md) — UNCLASSIFIED
@@ -205,6 +229,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [PARENT_ATLAS_INSTRUCTION_AUTHORITY](docs/architecture/PARENT_ATLAS_INSTRUCTION_AUTHORITY.md) — UNCLASSIFIED
 - [PARENT_ATLAS_PACKAGE_BOUNDARIES](docs/architecture/PARENT_ATLAS_PACKAGE_BOUNDARIES.md) — UNCLASSIFIED
 - [PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY](docs/architecture/PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md) — UNCLASSIFIED
+- [parent-atlas-batch-execution-gates-v1](docs/architecture/parent-atlas-batch-execution-gates-v1.md) — UNCLASSIFIED
 - [parent-atlas-function-topology-search-index](docs/architecture/parent-atlas-function-topology-search-index.md) — UNCLASSIFIED
 - [parent-atlas-karpathy-pipeline](docs/architecture/parent-atlas-karpathy-pipeline.md) — UNCLASSIFIED
 - [parent-atlas-native-dawn-viewer-contract-v1](docs/architecture/parent-atlas-native-dawn-viewer-contract-v1.md) — UNCLASSIFIED
@@ -241,6 +266,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [simdjson-tensor-array-analysis-v1](docs/architecture/simdjson-tensor-array-analysis-v1.md) — UNCLASSIFIED
 - [storage-tier-schema](docs/architecture/storage-tier-schema.md) — UNCLASSIFIED
 - [subgraph-instruction-programming-kag-ace-topology](docs/architecture/subgraph-instruction-programming-kag-ace-topology.md) — UNCLASSIFIED
+- [sveltekit-frontend-toc](docs/architecture/sveltekit-frontend-toc.md) — UNCLASSIFIED
 - [trace-kag-web-development-guide](docs/architecture/trace-kag-web-development-guide.md) — UNCLASSIFIED
 - [trace-runtime-split](docs/architecture/trace-runtime-split.md) — UNCLASSIFIED
 - [TRANSPORT-WORKER-CHROM97-ALIGNMENT](docs/architecture/TRANSPORT-WORKER-CHROM97-ALIGNMENT.md) — UNCLASSIFIED
@@ -255,7 +281,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [agent-branch-review-fanout-ace-centroid-aug22](openspec/changes/agent-branch-review-fanout-ace-centroid-aug22) — 17/20 tasks (85%)
 - [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence) — 27/82 tasks (33%)
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22) — 16/28 tasks (57%)
-- [legal-corpus-california-codes](openspec/changes/legal-corpus-california-codes) — 8/15 tasks (53%)
+- [legal-corpus-california-codes](openspec/changes/legal-corpus-california-codes) — 56/102 tasks (55%)
 - [local-llm-offload-ownership](openspec/changes/local-llm-offload-ownership) — 49/82 tasks (60%)
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/132 tasks (74%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 57/110 tasks (52%)
@@ -282,7 +308,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [parent-atlas-error-embedding-768-migration](openspec/changes/parent-atlas-error-embedding-768-migration) — 12/26 tasks (46%)
 - [parent-atlas-gate2-chunk-lineage-convergence](openspec/changes/parent-atlas-gate2-chunk-lineage-convergence) — 3/20 tasks (15%)
 - [parent-atlas-governed-compute-fabric](openspec/changes/parent-atlas-governed-compute-fabric) — 2/180 tasks (1%)
-- [parent-atlas-gpu-graph-vector-substrate](openspec/changes/parent-atlas-gpu-graph-vector-substrate) — 3/56 tasks (5%)
+- [parent-atlas-gpu-graph-vector-substrate](openspec/changes/parent-atlas-gpu-graph-vector-substrate) — 3/57 tasks (5%)
 - [parent-atlas-gpu-prellm-recommendation-v1](openspec/changes/parent-atlas-gpu-prellm-recommendation-v1) — 35/37 tasks (95%)
 - [parent-atlas-gpu-runtime-abi-alignment](openspec/changes/parent-atlas-gpu-runtime-abi-alignment) — 17/22 tasks (77%)
 - [parent-atlas-gpu-sidecar-patch-tournament](openspec/changes/parent-atlas-gpu-sidecar-patch-tournament) — 18/122 tasks (15%)
@@ -306,7 +332,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 19/26 tasks (73%)
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 39/63 tasks (62%)
 - [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion) — 15/21 tasks (71%)
-- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 246/400 tasks (62%)
+- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 248/408 tasks (61%)
 - [parent-atlas-ontology-oaklib-fanout-bitmap](openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap) — 33/36 tasks (92%)
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof) — 2/19 tasks (11%)
 - [parent-atlas-openspec-ledger-reconciliation](openspec/changes/parent-atlas-openspec-ledger-reconciliation) — 0/13 tasks (0%)
@@ -317,11 +343,11 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration) — 36/40 tasks (90%)
 - [parent-atlas-prefill-routing-residency-convergence](openspec/changes/parent-atlas-prefill-routing-residency-convergence) — 127/171 tasks (74%)
 - [parent-atlas-qdrant-structural-payload-enrichment](openspec/changes/parent-atlas-qdrant-structural-payload-enrichment) — 17/23 tasks (74%)
-- [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier) — 47/107 tasks (44%)
+- [parent-atlas-query-routing-classifier](openspec/changes/parent-atlas-query-routing-classifier) — 49/113 tasks (43%)
 - [parent-atlas-repair-candidate-feature-matrix](openspec/changes/parent-atlas-repair-candidate-feature-matrix) — 135/174 tasks (78%)
 - [parent-atlas-retire-384-lane](openspec/changes/parent-atlas-retire-384-lane) — 17/31 tasks (55%)
 - [parent-atlas-retrieval-executor-compatibility-convergence](openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence) — 39/48 tasks (81%)
-- [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 119/144 tasks (83%)
+- [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 121/148 tasks (82%)
 - [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 865/1189 tasks (73%)
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 60/157 tasks (38%)
 - [parent-atlas-retrieval-logic-convergence](openspec/changes/parent-atlas-retrieval-logic-convergence) — 32/74 tasks (43%)
@@ -330,19 +356,19 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [parent-atlas-runtime-log-remediation](openspec/changes/parent-atlas-runtime-log-remediation) — 0/18 tasks (0%)
 - [parent-atlas-search-classifier-sidecar](openspec/changes/parent-atlas-search-classifier-sidecar) — 70/88 tasks (80%)
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
-- [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 59/90 tasks (66%)
+- [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 60/104 tasks (58%)
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration) — 17/55 tasks (31%)
 - [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 179/332 tasks (54%)
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission) — 37/58 tasks (64%)
-- [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries) — 44/102 tasks (43%)
+- [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries) — 44/106 tasks (42%)
 - [parent-atlas-unordered-execution-contract](openspec/changes/parent-atlas-unordered-execution-contract) — 7/26 tasks (27%)
 - [parent-atlas-versioned-doc-intelligence](openspec/changes/parent-atlas-versioned-doc-intelligence) — 57/98 tasks (58%)
 - [parent-atlas-workboard-feature-utility-fabric](openspec/changes/parent-atlas-workboard-feature-utility-fabric) — 28/70 tasks (40%)
 - [parent-atlas-workspace-snapshot-runtime](openspec/changes/parent-atlas-workspace-snapshot-runtime) — 6/44 tasks (14%)
-- [parent-atlas-workstation-domain-classifier](openspec/changes/parent-atlas-workstation-domain-classifier) — 143/213 tasks (67%)
+- [parent-atlas-workstation-domain-classifier](openspec/changes/parent-atlas-workstation-domain-classifier) — 143/219 tasks (65%)
 - [parent-atlas-xgboost-cuda-runtime-proof](openspec/changes/parent-atlas-xgboost-cuda-runtime-proof) — 12/30 tasks (40%)
 - [route-import-infra-isolation](openspec/changes/route-import-infra-isolation) — 16/17 tasks (94%)
-- [svelte-a11y-warning-remediation](openspec/changes/svelte-a11y-warning-remediation) — 13/15 tasks (87%)
+- [svelte-a11y-warning-remediation](openspec/changes/svelte-a11y-warning-remediation) — 13/20 tasks (65%)
 - [visual-element-rendering](openspec/changes/visual-element-rendering) — 15/16 tasks (94%)
 
 ## Ordered workboard

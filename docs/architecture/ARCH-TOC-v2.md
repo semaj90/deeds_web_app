@@ -31,33 +31,9 @@
 | Glyph / cartridge (NES, CHR97) | `routes/api/cartridge/export/+server.ts` | CANONICAL_OWNER |
 | Neural prefill | `ai/neural-decoder-prefill-caller-v1.ts` | CANONICAL_OWNER |
 | Low-rank / Tang sampling | `python/atlas_compute/low_rank.py`, `sample-query-matrix-v1.ts` | EXPERIMENT (non-canonical) |
-| Candidate feature matrix / ranking | `retrieval/retrieval-candidate-feature-matrix-v1.ts`; Python learning package | Derived/advisory; requires frozen identity-aligned rows and reviewed labels for learned promotion |
-| Valkey / HLL telemetry | `atlas/telemetry/atlas-hll-telemetry.ts`; Valkey cache adapters | Transient cache and approximate cardinality telemetry; neither owns identity or relevance |
-| MessagePack packet encoding | `@msgpack/msgpack`; `scripts/atlas/msgpack-envelope-materialize.mjs` | Serialization/export only; schema, identity, revisions, and checksums remain explicit |
-| RPC transport | `atlas/go-retrieval-grpc-client.ts`; active `.proto` contracts | gRPC transports typed requests; it is separate from MessagePack encoding, N-API, and tensor execution |
-| ACE / query-context boundary | `ace/context-assembler.ts`; ContextManifest bridge | Qualifies and budgets evidence before prompt compilation; raw retrieval must not go directly to synthesis |
-| NES LUT / glyph mapping | `python/parent_atlas_learning/ace_compiler.py`; cartridge export route | Palette/action mapping is derived metadata; no native C-pointer LUT authority is established |
 | cuTile / TensorRT challengers | registry: `OPTIONAL_CHALLENGER_*` | not production |
 | N-ary relationship synthesis | none in registry | **UNOWNED** |
 | Ghidra, QUIC, Titans/OaK, LSP feature matrix | no owner searched or found | **UNOWNED / unverified** |
-
-## Query-intelligence composition and proof boundary
-
-```text
-Query classification and explicit keyword suggestions
-  → SearchRuntime candidate generation and one-vote-per-logical-lane fusion
-  → PostgreSQL identity/revision/evidence qualification
-  → optional graph neighborhood and aligned feature matrix
-  → advisory PCA/SVD, clustering, or MLP ranking
-  → ACE cards and ContextManifest admission/token budget
-  → compiled prompt → Ornith synthesis/tool proposal → validated outcome receipt
-```
-
-This is a composition target, not a claim that the complete live path is proven. EmbeddingGemma supplies the dense embedding lane; Ornith supplies synthesis. PCA/SVD and K-Means are representation/topology challengers, while an MLP ranker requires reviewed query-candidate outcomes before promotion. HLL estimates cardinality only. MessagePack encodes structured payload bytes; Protobuf/gRPC defines and transports RPC messages; N-API is a local native binding. None of these makes a cache, codec, ordinal, glyph byte, or GPU tensor canonical identity. A passing episode fixture is not live retrieval, model-training, or production evidence.
-
-**Current graph-compute evidence:** `parent-atlas-ontology-kernel/tasks.md` records NetworkX/cuGraph PageRank parity on the 18-edge Svelte fixture (42 incidence nodes / 54 graph edges; max absolute delta `1.1e-16`; same top five), plus a separate 470-hyperedge dry-run (1,114 nodes; max delta `4.9e-17`; same top ten). The larger run was slower on GPU due to startup cost. These are bounded parity checks, not scale or production evidence: participants remain span-derived rather than canonical `tn_v1_` joins, and graph promotion stays blocked. The same ledger records a Neo4j shadow mirror readback; it is not a PostgreSQL canonical graph projection.
-
-Related contracts: [retrieval transport, codecs, and telemetry](./retrieval-transport-codec-telemetry-v1.md), [NES/CHROM97 glyph bitencoding](./NES-CHROM97-GLYPH-BITENCODING-ALIGNED.md), and [Parent Atlas workstation compute fabric](./parent-atlas-workstation-compute-fabric.md).
 
 ## Temporal snapshot history
 
@@ -71,6 +47,7 @@ Related contracts: [retrieval transport, codecs, and telemetry](./retrieval-tran
 
 - [_bitfrost_fsm_index](./_bitfrost_fsm_index.md)
 - [_cuda_rtx_toc](./_cuda_rtx_toc.md)
+- [_qdrant_ann_pipeline_toc](./_qdrant_ann_pipeline_toc.md)
 - [_taxonomy_oak_graphrag_index](./_taxonomy_oak_graphrag_index.md)
 - [_topology_classifier_index](./_topology_classifier_index.md)
 - [ACP-GEMMA4-MEMORY-HIERARCHY](./ACP-GEMMA4-MEMORY-HIERARCHY.md)
@@ -137,6 +114,7 @@ Related contracts: [retrieval transport, codecs, and telemetry](./retrieval-tran
 - [PARENT_ATLAS_INSTRUCTION_AUTHORITY](./PARENT_ATLAS_INSTRUCTION_AUTHORITY.md)
 - [PARENT_ATLAS_PACKAGE_BOUNDARIES](./PARENT_ATLAS_PACKAGE_BOUNDARIES.md)
 - [PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY](./PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md)
+- [parent-atlas-batch-execution-gates-v1](./parent-atlas-batch-execution-gates-v1.md)
 - [parent-atlas-function-topology-search-index](./parent-atlas-function-topology-search-index.md)
 - [parent-atlas-karpathy-pipeline](./parent-atlas-karpathy-pipeline.md)
 - [parent-atlas-native-dawn-viewer-contract-v1](./parent-atlas-native-dawn-viewer-contract-v1.md)
@@ -173,6 +151,7 @@ Related contracts: [retrieval transport, codecs, and telemetry](./retrieval-tran
 - [simdjson-tensor-array-analysis-v1](./simdjson-tensor-array-analysis-v1.md)
 - [storage-tier-schema](./storage-tier-schema.md)
 - [subgraph-instruction-programming-kag-ace-topology](./subgraph-instruction-programming-kag-ace-topology.md)
+- [sveltekit-frontend-toc](./sveltekit-frontend-toc.md)
 - [trace-kag-web-development-guide](./trace-kag-web-development-guide.md)
 - [trace-runtime-split](./trace-runtime-split.md)
 - [TRANSPORT-WORKER-CHROM97-ALIGNMENT](./TRANSPORT-WORKER-CHROM97-ALIGNMENT.md)

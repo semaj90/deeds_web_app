@@ -1,6 +1,6 @@
 {
   "schema": "atlas.pgvector-semantic-768-exact-hnsw-replay.v1",
-  "generatedAt": "2026-09-18T17:44:27.290Z",
+  "generatedAt": "2026-10-18T09:02:13.630Z",
   "readOnly": true,
   "writesPerformed": false,
   "canonicalAuthority": false,

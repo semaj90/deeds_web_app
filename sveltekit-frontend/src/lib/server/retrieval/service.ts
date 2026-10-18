@@ -159,7 +159,6 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   }
 
   // Step 2: Search all requested lanes in parallel
-  const { getSearchLaneRegistry } = await import('./search-lanes.js');
   const registry = getSearchLaneRegistry();
   const lanesAttempted: string[] = [];
   const lanesSucceeded: string[] = [];

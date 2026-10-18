@@ -15,8 +15,8 @@ import { deleteSessionCookie, setSessionCookie, validateSession } from '$lib/ser
 import { productionLogger } from '$lib/server/production-logger.js';
 import { SkillsService } from '$lib/server/admin/skills-service.js';
 
-// Initialize Gemma 4 Skills
-if (process.env.NODE_ENV !== 'test') {
+// Initialize Gemma 4 Skills (skip during production build and tests)
+if (!building && process.env.NODE_ENV !== 'test') {
   SkillsService.initializeSystemSkills().catch(e => console.warn('Failed to init skills:', e));
 }
 import { pool } from '$lib/server/db/client';

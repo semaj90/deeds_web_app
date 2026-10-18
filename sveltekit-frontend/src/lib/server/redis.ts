@@ -112,9 +112,10 @@ export const redis: Redis = new Proxy({} as Redis, {
  * Factory for creating specialized Redis instances with custom config
  * Use this for special cases that need non-pooled connections
  */
-export default function createRedisInstance(options: Record<string, unknown>): Redis {
+export function createRedisInstance(options: Record<string, unknown>): Redis {
 	return new Redis(options as any);
 }
+export default createRedisInstance;
 
 /**
  * Create a standalone Redis connection (non-pooled)

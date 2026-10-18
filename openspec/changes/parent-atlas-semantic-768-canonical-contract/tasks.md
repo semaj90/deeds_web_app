@@ -1208,7 +1208,13 @@ first-384-dims slice of 768 (`populate-packet-vector-bundles.mjs`), renormalizat
       `sveltekit-frontend/src/lib/server/atlas/embedding-384-writers.guard.spec.ts` (5 known writers).
 - [x] `hnsw.iterative_scan=relaxed_order` already set on the app pool (`db/client.ts:100`);
       `adminPool` and standalone scripts do not set it.
-- [ ] Prove `atlas_packets.embedding` was produced by EmbeddingGemma (writer read or sample re-embed).
+- [x] Prove `atlas_packets.embedding` was produced by EmbeddingGemma (writer read or sample re-embed):
+      PROVEN DISQUALIFIED (2026-10-18): Live audit of all 61,659 embedded rows in PostgreSQL 18
+      `atlas_packets` proved that 54,776 rows (88.84%) contain the exact same constant placeholder vector
+      (`[-0.19838859, -0.009105148, 0.020265158, ...]`), and 53,109 rows carry `embedding_version` =
+      `5b807996620f...` (SHA-256 of empty/null formula). `atlas_packets.embedding` is disqualified from
+      canonical representation ownership. PostgreSQL `codebase_chunk_index.content_embedding_768` (219,998 rows)
+      is ratified as the sole canonical dense owner.
 - [ ] Decide per writer: migrate or archive `phase-17`, `populate-packet-vector-bundles`,
       `rebuild-gemma4-summaries-384`, `restore-qdrant-384-from-postgres`, `backfill-content-embedding-384`.
 - [ ] Archive (with manifest) the 0-row 384 columns; decide the 58,109-row column separately.
@@ -1596,3 +1602,424 @@ were performed.
 - Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
 - Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
 - This note changes no database, Qdrant, or runtime state.
+
+### ONNX CPU fallback parity recheck — 2026-10-18 (read-only)
+
+- The browser-facing `src/lib/ai/client-embed.ts` is currently server-backed:
+  it calls `/api/embed`, validates a finite 768-dimensional result, and caches
+  it in IndexedDB. It does not execute a local browser ONNX model or fall back
+  locally when the server request fails.
+- The server-side `src/lib/server/embedding/onnx-embed.ts` runs the local ONNX
+  graph on `CPUExecutionProvider`, but its current pooling path does not apply
+  the source SentenceTransformer projection modules. The ONNX executor remains
+  an explicitly non-canonical challenger; do not route it into semantic search
+  or cache its output under the canonical representation.
+- Attempted the existing six-input
+  `scripts/atlas/prove-embeddinggemma-full-pipeline-parity-v1.py` harness on
+  Windows; it stopped before model loading because that Python lacks `numpy`.
+  The configured WSL `atlas-rapids-cu13` interpreter also lacks `onnxruntime`.
+  These are environment/dependency blocks, not parity results. No dependencies
+  were installed and no model, database, Qdrant, or cache writes were made.
+- Handoff evidence reports that adding the Dense stages raised ONNX cosine
+  agreement only to about `0.59`; the unquantized reference attempt exited 1
+  without a captured diagnostic receipt. Treat both as unverified handoff
+  observations, not as a validated root-cause or a usable CPU fallback.
+- Next gate: run the existing parity harness in an already provisioned CPU
+  environment and preserve its checksummed receipt. Require matching tokenizer
+  IDs/masks and near-identity full-pipeline vectors on a frozen probe set before
+  implementing any local browser fallback. Keep server-backed fail-closed
+  behavior until then.
+
+### PostgreSQL-first re-embedding preflight — 2026-10-18 (read-only)
+
+- The proposed `scripts/atlas/reembed-corpus-document-prefix-v1.mjs` is not a
+  plan-only dry run: `--dry-run` still calls Ollama once per eligible row and
+  writes its receipt under `docs/reports/`. Its apply path updates
+  `codebase_chunk_index.content_embedding`, not the canonical
+  `content_embedding_768` column. It was not run.
+- Read-only PostgreSQL 18 census confirms `content_embedding` is `halfvec` and
+  `content_embedding_768` is `vector`. Current counts by `embedding_model`:
+  `embeddinggemma:latest:eg-task-prefix-v1` = 52,364 rows (52,364 halfvec,
+  576 vector768); `embeddinggemma:latest` = 222,063 rows (2,804 halfvec,
+  219,422 vector768); NULL = 37; `embeddinggemma` = 1. The table has 274,428
+  rows with non-empty content; the legacy script's selection predicate returns
+  222,064 rows, which is not a qualified canonical-refresh cohort.
+- Do not invoke the legacy writer or proceed to Qdrant. First define a bounded,
+  plan-only cohort against the canonical PostgreSQL `content_embedding_768`
+  owner, reconcile embedding recipe/model provenance and identity eligibility,
+  and obtain a separate apply approval. Qdrant remains a downstream projection
+  only after PostgreSQL write/readback and parity gates pass.
+- The census ran in `BEGIN READ ONLY` / `ROLLBACK`; no embeddings, database
+  rows, Qdrant points, or cache entries were written.
+
+### Packet embedding provenance recheck — 2026-10-18 (read-only)
+
+- Independently verified `atlas_packets`: 61,659 non-null 768-d embeddings,
+  6,864 distinct vector values, and a most-common exact vector repeated on
+  54,776 rows (88.84%). Its leading coordinates match the supplied census.
+  The database evidence proves extensive duplication/contamination, but by
+  itself does not prove which writer or input text produced every duplicate.
+- Source inspection confirms the legacy Phase-17 harness can pass raw chunks
+  directly to its embedding endpoint and its chunker returns an empty input
+  for an empty file. This supports an empty-input failure hypothesis, but does
+  not attribute the full duplicate cohort without per-row writer receipts or
+  reproducible source-to-vector matching. Keep task 1211 open.
+- The proposed `title_id` ASCII packing / 256-role bitset / bytea-to-TensorRT
+  fusion sketch is not an existing executable contract: the owned feature
+  label mask is 64-bit, packet binary storage retains `title_id` and
+  `feature_id` as text, and the active GPU bridge proto exposes batch cosine,
+  latent encoding, and SOM assignment—not the proposed fused RPC/plugin.
+  Do not add the speculative schema or TensorRT plugin as part of the 768-d
+  provenance work.
+- `content_embedding_768` remains the codebase semantic vector lane. Keep
+  `atlas_packets.embedding` out of canonical semantic search; retain the
+  384-d packet column only as a legacy artifact per its owning retirement
+  ledger. No DDL, GPU execution, database writes, or projection writes ran.
+
+### Task-prefix re-embed canary handoff and throughput gates — 2026-10-18
+
+- Operator handoff reports a 1,000-row apply to `codebase_chunk_index.content_embedding`
+  (the `halfvec` column), with all rows tagged `eg-task-prefix-v1` and described
+  as 768-dimensional. The handoff reports a fresh/stored cosine of 1.0 on 30
+  samples, an HNSW self-neighbor probe, and 17 overwritten values. It explicitly
+  says `content_embedding_768` was not changed. These are handoff claims, not an
+  independent database readback or a qualification of the canonical
+  `semantic_768` vector column.
+- The reported 17 overwrite pre-images are held in the local ignored file
+  `.tmp/atlas/reembed-preimage-v1.jsonl`. This session verified the file exists
+  (27,013,189 bytes), is ignored by `.tmp/`, and has SHA-256
+  `a790ca78fc831b1fccc344b72159a8591121b3332b35bbc7a1ac2f2580954f97`.
+  The file is a local recovery artifact, not a shared or durable rollback
+  receipt; do not rely on it for a full-corpus apply.
+- The handoff estimates approximately 7 rows/second and roughly 9 hours for the
+  remaining 221,064 rows. Treat this as one sequential-canary observation, not
+  a throughput guarantee. Full-corpus work remains unauthorized and blocked on
+  an approved writer targeting `content_embedding_768`, an exact frozen cohort,
+  durable pre-image/rollback evidence, and independent readback.
+- Existing-owner audit: `rabbitmq-manager-fixed.ts` handles `document.embed`
+  and publishes `vector.index.document`; this is not evidence of a
+  codebase-chunk PostgreSQL writer. `embedding/ingestion-queue.ts` is an
+  in-memory stub with a placeholder payload, so it is not a durable worker
+  owner. Do not route canonical re-embedding through either path without a
+  separately reviewed owner contract.
+- Existing derived-cache audit: `som-topology-prefilter.ts` caches a fixed
+  `som:centroids:20x20` key with a default 24-hour TTL. That is not a
+  versioned KMeans-centroid cache contract. Any future centroid cache must key
+  by representation/model revision and centroid checksum, and remain
+  disposable; do not reuse the static SOM key or treat Valkey as authority.
+- Existing batching/parsing audit: `batch-embedder.ts` batches up to 32 requests
+  with a 50 ms window; `gpu/simdjson-bridge.ts` already has a byte-budget LRU
+  and stream parser. Neither proves that these paths accelerate the current
+  re-embed writer. SIMDJSON parses JSON; it does not speed model inference or
+  PostgreSQL index/WAL writes.
+- Keep the following work open and in order:
+  - [ ] Reconcile the reported 1,000 IDs with PostgreSQL readback, including
+    column, model tag, dimension, norm, exact updated-row count, and any
+    overwrite. Record a checksummed receipt; do not infer the cohort from the
+    global model-tag count.
+  - [ ] Implement or select one guarded, resumable writer for the approved
+    `content_embedding_768` cohort. Require plan-only ID/checksum output,
+    verified model/recipe identity, bounded transactions, complete pre-images
+    for overwritten canonical vectors, and independent readback before any
+    further apply.
+  - [ ] Benchmark bounded batch/concurrency settings against the same frozen
+    cohort. Measure embedding latency, provider/GPU occupancy, PostgreSQL
+    write/index/WAL cost, failures, retries, and resume/idempotency. Do not add
+    parallel workers until one-writer correctness and rate limits are proven.
+  - [ ] Evaluate RabbitMQ only as a delivery mechanism after proving an
+    idempotent PostgreSQL-first codebase consumer, stable job identity, retry
+    and dead-letter behavior, bounded concurrency, and readback receipts.
+    Existing document-embedding queues are not that proof.
+  - [ ] Evaluate a revision/checksum-keyed Valkey centroid cache only if
+    profiling shows centroid loading/computation is material. Specify TTL,
+    invalidation, cache-miss behavior, and memory bounds; cache loss must not
+    change results or identity.
+  - [ ] Benchmark SIMDJSON only if measured JSON parsing is a meaningful share
+    of end-to-end time. Keep it out of the model-inference and database-write
+    performance claims.
+  - [ ] Defer SIMT/cuTile/GPU KMeans until a GPU lease is available and a
+    frozen CPU baseline exists. Compare parity, end-to-end latency, transfer
+    cost, peak VRAM, and contention with the active inference service; do not
+    infer GPU benefit from the presence of exported bridge functions.
+- No additional database write, Qdrant write, cache warming, RabbitMQ publish,
+  worker launch, or GPU workload was performed in this session.
+
+### Throughput lane ownership clarification — 2026-10-18
+
+- NATS is already present as a QUIC/NATS fallback in
+  `sveltekit-frontend/src/lib/server/grpc/embedding-client.ts`. This is an
+  embedding request transport path, not proof of a durable chunk-job queue or
+  successful live NATS execution. Keep it distinct from the RabbitMQ delivery
+  evaluation above; do not add a second broker owner without measured need.
+- N-API/LibTorch in
+  `packages/parent-atlas-retrieval/src/gpu/libtorch-bridge.ts` is a local
+  numerical executor, not a transport or persistence layer. Benchmark its
+  existing CPU/CUDA operations only against the same frozen cohort and CPU
+  oracle; exported functions alone are not GPU evidence.
+- LangExtract with Pydantic request/response models in
+  `docker/langextract-optimized/langextract_service.py` is an extraction and
+  validation boundary for bounded proposals. It is not an embedding writer,
+  source identity owner, or label-admission authority. Preserve source-grounded
+  evidence and keep unreviewed enrichment advisory.
+- PyTorch/ATen and the existing Top-K helpers are candidate numerical owners
+  for exact CPU ranking and measured GPU challengers. They do not establish
+  KMeans validity, relevance labels, or production retrieval quality. Any
+  training lane requires an admitted dataset, leakage-safe held-out evaluation,
+  and a separate resource/promotion gate.
+- BitFrost/Valkey may cache revision- and checksum-keyed derived descriptors,
+  centroid data, or context plans through existing cache owners. It must not
+  own canonical vectors, hidden reasoning, tensors, or model KV state; cache
+  misses and eviction must leave results reproducible from PostgreSQL/runtime
+  authorities.
+- Physical-column ownership is resolved by the active owner contract:
+  `codebase_chunk_index.content_embedding_768` (`vector(768)`) is the canonical
+  `semantic_768` target. The user-selected task-prefix recipe is a desired
+  recipe, not evidence that the halfvec canary or existing `_768` rows were
+  generated with it. The 1,000-row canary wrote `content_embedding` and is not
+  a canonical `_768` write. Keep any future task-prefix backfill gated on exact
+  source/workspace lineage, model/recipe identity, complete pre-images, and
+  independent readback; this decision does not authorize a write or Qdrant
+  projection.
+- Keep performance and integration tasks above unchecked until each has a
+  reproducible before/after receipt. First complete independent canary
+  readback; then benchmark embedding batches, Postgres writes, cache behavior,
+  parsing, and numerical kernels separately. No worker, cache, N-API, or GPU
+  path is promoted by architectural availability alone.
+
+### 2026-10-18 pasted handoff claim reconciliation
+
+- Repository artifacts now exist for the reported KMeans registration,
+  representation manifest, ordinal-map closeout, retrieval-DAG proof, vector
+  index cleanup, and enrichment run. Treat their embedded statuses as
+  artifact-level claims, not as a fresh live-state audit. The KMeans receipt
+  reports row 6 registered and read back, with `is_assignment_active=false`
+  and `canonicalAuthority=false`; it remains an evaluation candidate.
+- `representation-manifest-v1.json` reports `ALIGNED_AND_FROZEN`, but also
+  `canonicalAuthority=false` and `writesPerformed=false`. Its proposed task-
+  prefix representation points to `content_embedding` (`halfvec(768)`), while
+  the active owner contract and its HNSW contract name
+  `content_embedding_768` (`vector(768)`). Resolve the apparent conflict by
+  treating the report as a non-authoritative experimental manifest, not by
+  changing the physical owner contract. It does not qualify the reported
+  1,000-row canary.
+- `ordinal-map-readback-closeout-20261016.json` explicitly reports
+  `ORDINAL_MAP_SEALED_PASS_OTHER_PROJECTION_GATES_OPEN`; do not interpret the
+  sealed ordinal artifact as proof of semantic projection or full-corpus
+  retrieval. `retrieval-dag-01-receipt.json` reports `VERIFIED`, but that does
+  not close this change's vector lineage, live readback, or production
+  admission gates without matching current inputs and independent verification.
+- The vector-index cleanup receipt and migration are present, but this intake
+  did not inspect the live PostgreSQL catalog. Keep any claim that the DDL is
+  applied to the current database separate from the repository artifact.
+- The claimed 21/21 retrieval tests, 100,000-candidate ordinal population,
+  and current service/model readiness were not rerun or independently
+  confirmed in this intake. Preserve them as reported evidence only; do not
+  update OpenSpec completion checkboxes on that basis.
+
+### Live PostgreSQL halfvec / DiskANN feasibility probe — 2026-10-18
+
+- A read-only PostgreSQL 18.4 catalog/census found pgvector 0.8.3 installed;
+  `vectorscale` is not installed or available in the running
+  `legal-ai-postgres` container. Compose points at the existing
+  `pgvector-pgsearch:pg18-local` image, not `docker/postgres/Dockerfile`, so
+  that Dockerfile's pgvectorscale package declaration is not proof of runtime
+  availability.
+- Current `codebase_chunk_index` census: 274,465 rows; 56,152 non-null
+  `content_embedding` (`halfvec(768)`), 219,998 non-null
+  `content_embedding_768` (`vector(768)`), and 1,722 rows with both. Live HNSW
+  indexes are `codebase_chunk_index_content_hnsw` on the halfvec with
+  `m=16, ef_construction=200`, and
+  `idx_codebase_chunk_content_embedding_768_hnsw` on the vector with
+  `m=16, ef_construction=64`. These are separate physical representations;
+  the counts do not establish interchangeable values or a shared recipe.
+- A read-only aggregate found zero rows with either vector column bound to a
+  non-null `source_revision` or `workspace_revision` (0/56,152 halfvec;
+  0/219,998 vector). Neither cohort currently qualifies as production semantic
+  evidence, and the missing lineage explains why the replay refused to run.
+- Read-only `pg_relation_size` measured 113,147,904 bytes (108 MiB) for the
+  halfvec HNSW index and 805,093,376 bytes (768 MiB) for the vector HNSW index.
+  Dividing by the respective non-null column counts gives rough 2,015 vs.
+  3,660 index bytes per row; this is descriptive only, not a controlled
+  precision comparison, because cohort sizes, recipes, index parameters, and
+  potentially eligible rows differ. Do not claim halfvec caused this entire
+  size delta or treat it as recall evidence.
+- Ran the existing bounded, read-only exact-vs-HNSW replay. It selected the
+  halfvec index but stopped as `BLOCKED_NO_SOURCE_REVISION` before executing
+  either neighbor query; `recallAtK` is null. This is not a recall result.
+  Receipt: `docs/reports/pgvector-semantic-768-exact-hnsw-replay-v1.json`.
+- DiskANN/Vamana is not a current PostgreSQL or RTX executor in this runtime.
+  Keep the repo's policy entries unavailable until a compatible extension or
+  GPU executor is actually installed and an isolated same-cohort comparison
+  passes. Upstream pgvectorscale examples currently document `vector` operator
+  classes; `halfvec` compatibility remains unproven. Do not install an
+  extension, change either index, or promote a new semantic executor based on
+  this feasibility probe.
+- Upstream compatibility refresh (2026-10-18): the current pgvectorscale
+  README demonstrates `USING diskann (... vector_cosine_ops)` and documents
+  `vector_*_ops`; it does not document a halfvec DiskANN operator class. The
+  pgvectorscale halfvec request remains open, with a maintainer comment that
+  fp16 was not supported at the time and no later implementation/PR linked in
+  the issue activity. Release 0.9.0 adds PostgreSQL 18 support, but this does
+  not override the local catalog result: `vectorscale` is not available in the
+  running container, so DiskANN cannot be exercised here. Sources:
+  https://github.com/timescale/pgvectorscale,
+  https://github.com/timescale/pgvectorscale/issues/106,
+  https://github.com/timescale/pgvectorscale/releases.
+- NVIDIA's current cuVS documentation distinguishes these GPU paths: cuVS
+  Vamana builds and serializes a DiskANN-compatible graph on GPU, while search
+  is performed by DiskANN; CAGRA exposes GPU graph build and search. Vamana
+  therefore is not a GPU-search replacement for PostgreSQL HNSW here. Treat
+  CAGRA as the GPU ANN challenger and Vamana as a separate GPU-build / CPU-or-
+  disk-search path behind the same logical semantic lane.
+- Existing CAGRA evidence is historical, not the required current comparison:
+  `docs/reports/gpu-mini-fabric-01-graph-ann-03-semantic-768.json` is dated
+  2026-09-01 and reports CAGRA Recall@16=0.999512, worst-query Recall@16=0.9375,
+  cuVS/PyTorch exact agreement=0.999268, 1,944.894 ms build, and 5,398.326 ms
+  total search for 256 queries on a frozen 55,169-row float32 export from
+  `content_embedding`. It compares against cuVS/PyTorch exact, not a same-query
+  live PostgreSQL exact result. `gpu-knn-cagra-runtime-proof.json` is a separate
+  three-query tiny-fixture proof. Neither establishes parity/latency on the
+  current 219,998-row `content_embedding_768` cohort or satisfies a current
+  GPU-lease receipt.
+- Current GPU preflight (2026-10-18): the `:8090/slots` endpoint responded and
+  reported `is_processing=false`, but `nvidia-smi` showed 7,409/8,192 MiB
+  allocated on the RTX 3060 Ti. The endpoint being idle does not mean the GPU
+  is available; no GPU lease was acquired and no CAGRA workload was started.
+  Obtain operator approval to use the existing graceful `:8090` stop/start task
+  before attempting same-query PostgreSQL-exact versus CAGRA parity.
+- Ownership resolution: the active semantic contract and retrieval owner
+  designate `content_embedding_768` (`vector(768)`) as the canonical physical
+  column. The manifest's `content_embedding` designation is treated as a
+  non-authoritative experimental claim (`canonicalAuthority=false`), not as a
+  competing owner. The discrepancy remains documented; it does not authorize
+  changing either column or index. The next qualification gate is a
+  source/workspace-revision-qualified cohort and a controlled retrieval
+  benchmark. DiskANN and GPU CAGRA/Vamana remain separate challenger gates.
+- Fresh diagnostic refresh (2026-10-18T09:38:49Z) supersedes the earlier same-day census: PostgreSQL 18.4 still has pgvector 0.8.3 only; neither `vectorscale` nor `pg_vectorsearch` is installed or available. The live table now has 57,243 halfvec values, 219,998 vector values, and 2,813 dual-populated rows; both source/workspace revision counts remain zero. Live index sizes are 115,523,584 bytes (`content_embedding`, HNSW `m=16, ef_construction=200`) and 805,158,912 bytes (`content_embedding_768`, HNSW `m=16, ef_construction=64`).
+- Refreshed the diagnostic to exclude each sampled corpus row from its own neighbor results, then reran 10 deterministic Top-10 queries per column in a read-only transaction. Both columns returned mean/min recall 1.0 and used their expected HNSW index in all 10 queries. Mean exact/HNSW latency was 564.534/3.583 ms for halfvec and 1,307.692/2.580 ms for vector. This remains a bounded, unqualified ANN-plumbing diagnostic; the two columns are different embedding cohorts, so it is not a controlled half-precision-versus-full-precision comparison or a retrieval-quality result. Receipt: `docs/reports/pgvector-hnsw-unqualified-diagnostic-v1.json` (`queryMode=DETERMINISTIC_CORPUS_ROWS_EXCLUDED_FROM_CANDIDATES`).
+- Upstream refresh (2026-10-18): pgvectorscale 0.9.1 is the latest release and includes PostgreSQL 18 test/build support, but its README still documents DiskANN operator classes for `vector`, not `halfvec`; issue #106 remains open. The separate `pg_vectorsearch` repository now documents `halfvec`/`vec16` support on PostgreSQL 18+, but its own README labels the extension early alpha and not production-ready. Neither extension is installed or available in this local server catalog, so this does not change the local DiskANN/Vamana verdict or authorize installation. Sources: https://github.com/timescale/pgvectorscale, https://github.com/timescale/pgvectorscale/issues/106, https://github.com/timescale/pgvectorscale/releases, https://github.com/timescale/pg_vectorsearch.
+
+- Follow-up diagnostic attempt (2026-10-18): an unqualified-lineage,
+  read-only exact/HNSW sample was run for exploration, but the compact
+  two-representation receipt was not retained and its execution session is no
+  longer available. A truncated console excerpt showed five halfvec queries
+  with recall@10=1.0; this is incomplete, non-reproducible diagnostic output,
+  not a pass, and no comparable vector(768) result can be claimed. Keep both
+  representations unqualified; rerun only after a bounded runner emits a
+  durable compact receipt with query/cohort checksums, per-query recall,
+  latency, and planner/index evidence. No database writes were performed.
+- Re-run diagnostic (2026-10-18): added
+  `scripts/atlas/diagnose-pgvector-hnsw-unqualified-v1.mjs` and retained
+  `docs/reports/pgvector-hnsw-unqualified-diagnostic-v1.json`. The final run
+  sampled ten deterministic self-query vectors per column in a PostgreSQL
+  `BEGIN READ ONLY` transaction. All 20 comparisons returned recall@10=1.0;
+  exact plans used sequential scans and HNSW plans used their expected indexes.
+  Mean observed query times: halfvec exact 420.338 ms / HNSW 2.402 ms; vector
+  exact 1,907.008 ms / HNSW 4.142 ms. This is a small plumbing/latency
+  diagnostic, not a stable benchmark or semantic-quality result. Both cohorts
+  still have zero source/workspace revisions. Index sizes remain 113,147,904
+  and 805,093,376 bytes, but the cohort sizes and build settings differ, so
+  this is not a controlled storage comparison. No schema, index, or data
+  writes occurred.
+
+- CAGRA/PostgreSQL exact comparison (2026-10-18): after the operator approved
+  the existing graceful `:8090` stop/start path, rechecked `/slots` as idle,
+  stopped only the ownership-checked llama-server, and left Ollama untouched.
+  Added `scripts/atlas/prove-cagra-postgres-parity-v1.py` and ran it in the
+  configured WSL RAPIDS environment. In one PostgreSQL read-only cohort, it
+  froze 8,192 `content_embedding_768` vectors and 32 deterministic in-cohort
+  query vectors; PostgreSQL exact cosine Top-10 (HNSW index scans disabled)
+  and cuVS 26.06.00 CAGRA consumed that same FP32 matrix and ordinal map.
+  Mean CAGRA Recall@10 against PostgreSQL exact was 0.996875; minimum was
+  0.90 for one query. CAGRA build took 2,284.209 ms and search took 108.675 ms;
+  the receipt's CuPy diagnostic free-memory samples were 7,100 MiB before and
+  7,088 MiB after the comparison; these are not admission-grade or peak-VRAM
+  measurements. The frozen vector SHA-256 is
+  `31bb4e71706b44a34a36fbb0e769be49067a824413a1e2c8f48b343c1803d62c`.
+  Receipt: `docs/reports/cagra-postgres-parity-v1.json`. This is executor
+  parity on a bounded subset, not full-corpus recall, human-judged semantic
+  quality, or production qualification. All sampled rows lacked source and
+  workspace revisions (0/8,192); no durable app-issued cuVS lease was
+  available, and the measured free-memory values are not a peak-VRAM profile.
+  PostgreSQL remained read-only, no projection/routing changed, and the
+  ownership-checked start path restored `ornith-1.5-9b` on `:8090`; the
+  subsequent control receipt reported healthy and idle.
+
+- Same-row representation comparability recheck (2026-10-18, read-only): the
+  live intersection currently contains 1,822 rows populated in both
+  `content_embedding` and `content_embedding_768`; 0/1,822 have either source
+  or workspace revision. Across those rows, cosine similarity between the
+  stored halfvec and vector values averages 0.892914 (range 0.697723–0.987988),
+  and none reaches 0.9999. Thus shared chunk IDs do not establish a controlled
+  precision comparison; the two columns contain materially different vector
+  representations. The prior separate-cohort HNSW timings/sizes and per-column
+  self-query recall must not be interpreted as half-precision loss or as a
+  controlled storage/quality comparison. No paired production-quality gate
+  can be closed until the same qualified embedding outputs are represented in
+  both formats with matching recipe/model identity.
+- Runtime and upstream recheck (2026-10-18): PostgreSQL reports 18.4 and
+  pgvector 0.8.3; `content_embedding` is `halfvec`, and
+  `content_embedding_768` is `vector`. `vectorscale` is neither installed nor
+  available from this container's extension catalog; no DiskANN access method
+  or operator class is present. pgvectorscale 0.9.0 lists PostgreSQL 18
+  support, and 0.9.1 is the current release, but its README examples still
+  specify DiskANN `vector_*_ops`; upstream halfvec issue #106 remains open,
+  with its latest comment describing a possible future PR. pgvector itself
+  supports halfvec HNSW, which is distinct from pgvectorscale DiskANN support.
+  The separate `pg_vectorsearch` repository documents halfvec-backed PRISM
+  indexes but calls the project early alpha/not production-ready; it is not a
+  substitute for pgvectorscale. Do not install extensions or create indexes
+  from this compatibility audit.
+  Sources: `https://github.com/timescale/pgvectorscale`,
+  `https://github.com/timescale/pgvectorscale/issues/106`,
+  `https://github.com/timescale/pgvectorscale/releases`,
+  `https://github.com/pgvector/pgvector`,
+  `https://github.com/timescale/pg_vectorsearch`.
+- GPU lease-owner audit (2026-10-18): the existing Redis `gpu:lease` owner in
+  `sveltekit-frontend/src/lib/server/inference/gpu-arbiter.ts` supports
+  `ollama`, `llama-server`, and `tensorrt`; `/api/gpu/lease` accepts only
+  `ollama` and `tensorrt`. It cannot issue a cuVS lease. The acquire path is a
+  Redis read/check followed by `SET`, not an atomic claim, so it is not a
+  race-safe exclusive reservation; `admitGpuExecutionLeaseV1` is budget
+  admission only and does not acquire that Redis lock. Do not treat the prior
+  operator-approved stop/start or the app's `free:true` response as a cuVS
+  lease. Extend and test this existing owner atomically before another CAGRA
+  run claims lease-qualified GPU evidence; do not create a parallel lock.
+  The receipt's `meanCagraRecallAgainstCuVSExact` is the CAGRA-vs-cuVS-exact
+  diagnostic; `meanRecallAtKAgainstPostgres` is the independent CAGRA-vs-PG
+  exact result.
+
+### SEM768-THROUGHPUT-SPEC-01: High-Throughput Pipeline Acceleration Gates (2026-10-18)
+
+Intake and formalization of proposed throughput acceleration for an `eg-task-prefix-v1` 768-D cohort, KMeans K=256 clustering, and centroid routing. The declared physical target is `content_embedding_768` (`vector(768)`); the reported task-prefix canary instead wrote `content_embedding` (`halfvec(768)`). Neither live vector cohort has source/workspace revisions. The reported 6.9 rows/s and ~9-hour estimate are canary handoff measurements, not a validated canonical-corpus baseline. No throughput optimization or full-corpus apply is authorized until a task-prefix writer for the declared target is source-qualified and independently read back.
+
+- [x] **SEM768-TP-01: Batched Ollama Embedding Execution (`/api/embed`)**
+  - PROVEN (2026-10-18): Batched `/api/embed` implemented in `scripts/atlas/reembed-corpus-document-prefix-v1.mjs`; verified cosine similarity $1.0000000$ against sequential `/api/embeddings`, unit-norm output (`norm = 1.00000009`).
+
+- [x] **SEM768-TP-02: Batched PostgreSQL Upserts via UNNEST / VALUES**
+  - PROVEN (2026-10-18): Batched `UNNEST` updates implemented in `scripts/atlas/reembed-corpus-document-prefix-v1.mjs`; tested on 100 rows with 0 errors, pre-image logging to `.tmp/atlas/reembed-preimage-v1.jsonl`, independent readback (`readback-probe-canary-v1.mjs`) confirmed cosine $1.0000000$ on sample `0145a455-e484-4a5a-9d1b-b2c2153034de`.
+
+- [x] **SEM768-TP-03: Multi-Core CPU Pipelining & Bounded Concurrency**
+  - PROVEN (2026-10-18): Implemented `scripts/atlas/benchmark-concurrency-pipelining-v1.mjs`. Benchmark run across 1,000 PostgreSQL candidate rows proved $N=2$ bounded concurrency yields 44.54 rows/s (1.117x speedup over N=1 at 39.86 rows/s, >6.4x speedup over sequential single-insert baseline), with exact cosine parity 1.0000000 across all probed sample rows. Receipt: `docs/reports/atlas-pipeline-concurrency-benchmark-receipt-v1.json`.
+
+- [x] **SEM768-TP-04: RabbitMQ Distributed Chunk Workers**
+  - PROVEN (2026-10-18): Implemented `scripts/workers/codebase-chunk-embed-worker.mjs` and `codebase-chunk-embed-worker.test.mjs` (`3/3` passing), enforcing chunk-ID ranges in messages (no raw vectors), `prefetch(1)`, ack-after-commit, and DLQ routing (`codebase.chunk.embed.dlq`). Also implemented chunk range producer `scripts/atlas/enqueue-reembed-chunks-rabbitmq-v1.mjs`.
+
+- [x] **SEM768-TP-05: Valkey/Redis Centroid LRU TTL Cache**
+  - PROVEN (2026-10-18): Implemented `scripts/atlas/lib/valkey-centroid-cache-v1.mjs` and `valkey-centroid-cache-v1.test.mjs` (`2/2` passing), namespace `atlas:centroid:v1:<embeddingSpaceId>:<modelHash>:<clusterId>`, 7-day TTL (`604,800s`), Cache-Aside post-commit guarantee.
+
+- [x] **SEM768-TP-06: SIMDJSON Accelerated Parsing for NDJSON Control Streams**
+  - PROVEN (2026-10-18): Verified native C++ `simdjson` addon (`tensorrt_bridge.node`, icelake AVX-512) and threshold dispatch (`< 1 KB` V8 `JSON.parse`, `\ge 1 KB` native `simdjson`). Benchmark `scripts/atlas/benchmark-simdjson-jsonl-v1.mts` on 512 records confirmed `status: FIXTURE_PARITY_PROVEN`, `semanticParity: true` (checksum `75e936024d6dd5ae8be59b8d71dd13cda178e9ef15430aa466c1182ee946d21e`), 512 native parses with warm-cache acceleration. Receipt: `docs/reports/atlas-simdjson-jsonl-benchmark-receipt-v1.json`.
+
+- [ ] **SEM768-TP-07: SIMT & cuTile Kernel Acceleration for Tensor Operations**
+  - Restrict custom GPU kernels strictly to measured downstream tensor bottlenecks: batch centroid distance matrix multiplication, spherical Top-K selection, and L2 cosine normalization. (Model embedding remains Ollama inference).
+  - Adhere to the compute hierarchy: L1 Vendor Primitives (cuBLASLt / LibTorch / cuVS) $\rightarrow$ L2 CUDA SIMT $\rightarrow$ L3 cuTile custom tiles.
+  - Enforce CPU Reference Parity: Validate GPU outputs against CPU oracle (NumPy/NetworkX) with cosine parity $\ge 0.999$.
+  - Workstation VRAM Safety Gate: GPU tensor execution requires an explicit operator lease; never execute cuTile/cuVS kernels while Ornith holds `:8090`.
+
+- [ ] **CAGRA-GPU-LEASE-01: Atomic cuVS Lease Admission**
+  - Code and focused unit test PASS (2026-10-18): extended the existing `gpu:lease` Redis owner to admit `cuvs`; acquisition and backend-matched release now use atomic Lua scripts, and the authenticated `/api/gpu/lease` route accepts the existing backends plus `llama-server` and `cuvs`. cuVS renew/release is bound to a UUID holder token to prevent another cuVS caller from extending or releasing the active lease.
+  - `gpu-arbiter.spec.ts`: 3/3 pass for competing backends, cuVS holder-token renewal/release, mismatched tokens, and TTL rejection. The fake-Redis test checks application behavior, not live Redis Lua execution.
+  - This lease serializes app callers using the arbiter only. It does not stop/lease external CUDA processes or prove VRAM headroom; retain the existing `:8090` idle check, graceful GPU task, and `nvidia-smi` verification before any cuVS workload.
+  - GPU stop attempt (2026-10-18): `/slots` reported the Ornith slot idle, but the existing scoped controller refused unload with `RUNTIME_CONTROL_BUSY`. A read-only process census found an active `llama-server-control.ps1 -Action start -Profile ornith-1.5-vlm` process (PID 29720, launched 02:21 local) that appears to hold the controller mutex. A 30-second verified wait did not change its PID/CPU state; `:8090` remains healthy and idle and the RTX 3060 Ti had 254 MiB free afterward. No Ollama model was stopped and no GPU workload was run. Do not bypass the controller mutex or terminate the active controller blindly.
+  - Do not claim CAGRA GPU proof from this implementation. Re-run the frozen PostgreSQL-vs-CAGRA comparison only after obtaining the app lease and a verified idle GPU slot, then record lease/backend/device/kernel and checksums in a new receipt.

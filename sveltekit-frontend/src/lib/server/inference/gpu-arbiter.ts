@@ -14,16 +14,18 @@
  *   - /api/gpu-wasm-integration — pipeline telemetry ✅
  */
 import type { Redis } from 'ioredis';
+import { randomUUID } from 'node:crypto';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
-export type InferenceBackend = 'ollama' | 'llama-server' | 'tensorrt';
+export type InferenceBackend = 'ollama' | 'llama-server' | 'tensorrt' | 'cuvs';
 
 interface GpuLease {
 	backend: InferenceBackend;
 	acquiredAt: number;
 	expiresAt: number;
+	leaseId?: string;
 }
 
 const LEASE_KEY = 'gpu:lease';
@@ -31,49 +33,68 @@ const DEFAULT_TTL_SEC = 120; // 2 minutes
 const SEMAPHORE_KEY = 'gpu:semaphore';
 const MAX_CONCURRENT_GPU_OPS = 2;
 
+const ACQUIRE_GPU_LEASE_SCRIPT = `
+local existing = redis.call('GET', KEYS[1])
+local now = tonumber(ARGV[2])
+local ttl = tonumber(ARGV[3])
+local lease
+if existing then
+  local ok, decoded = pcall(cjson.decode, existing)
+  if not ok or type(decoded) ~= 'table' or type(decoded.backend) ~= 'string' or type(decoded.acquiredAt) ~= 'number' or type(decoded.expiresAt) ~= 'number' then
+    return {-1, ''}
+  end
+  if decoded.expiresAt > now and (decoded.backend ~= ARGV[1] or (ARGV[1] == 'cuvs' and decoded.leaseId ~= ARGV[2])) then
+    return {0, existing}
+  end
+  local sameOwner = decoded.backend == ARGV[1] and decoded.expiresAt > now and (ARGV[1] ~= 'cuvs' or decoded.leaseId == ARGV[2])
+  lease = cjson.encode({backend = ARGV[1], acquiredAt = sameOwner and decoded.acquiredAt or now, expiresAt = now + ttl * 1000, leaseId = sameOwner and decoded.leaseId or ARGV[2]})
+else
+  lease = cjson.encode({backend = ARGV[1], acquiredAt = now, expiresAt = now + ttl * 1000, leaseId = ARGV[2]})
+end
+redis.call('SET', KEYS[1], lease, 'EX', ttl)
+return {1, lease}
+`;
+
+const RELEASE_GPU_LEASE_SCRIPT = `
+local existing = redis.call('GET', KEYS[1])
+if not existing then return 1 end
+local ok, lease = pcall(cjson.decode, existing)
+if not ok or type(lease) ~= 'table' then return -1 end
+if lease.backend ~= ARGV[1] or (ARGV[1] == 'cuvs' and lease.leaseId ~= ARGV[2]) then return 0 end
+redis.call('DEL', KEYS[1])
+return 1
+`;
+
 /**
  * Attempt to acquire exclusive GPU lease.
  * Returns the lease if acquired, null if another backend holds it.
  */
 export async function acquireGpuLease(
 	backend: InferenceBackend,
-	ttlSeconds = DEFAULT_TTL_SEC
+	ttlSeconds = DEFAULT_TTL_SEC,
+	leaseId = randomUUID()
 ): Promise<GpuLease | null> {
+	if (!Number.isInteger(ttlSeconds) || ttlSeconds < 1 || ttlSeconds > 3600 || !leaseId) return null;
 	try {
 		const redis: Redis = getRedis();
-		const existing = await redis.get(LEASE_KEY);
-		if (existing) {
-			const lease: GpuLease = JSON.parse(existing);
-			// Same backend already holds lease — extend it
-			if (lease.backend === backend) {
-				const extended: GpuLease = {
-					backend,
-					acquiredAt: lease.acquiredAt,
-					expiresAt: Date.now() + ttlSeconds * 1000
-				};
-				await redis.set(LEASE_KEY, JSON.stringify(extended), 'EX', ttlSeconds);
-				return extended;
-			}
-			// Different backend holds lease and it hasn't expired
-			if (lease.expiresAt > Date.now()) {
-				return null;
-			}
-			// Lease expired — fall through to acquire
-		}
-
-		// Acquire new lease
-		const lease: GpuLease = {
+		const result = await redis.eval(
+			ACQUIRE_GPU_LEASE_SCRIPT,
+			1,
+			LEASE_KEY,
 			backend,
-			acquiredAt: Date.now(),
-			expiresAt: Date.now() + ttlSeconds * 1000
-		};
+			leaseId,
+			Date.now(),
+			ttlSeconds
+		) as [number, string];
+		const [status, payload] = result;
+		if (status !== 1) return null;
+		const lease: GpuLease = JSON.parse(payload);
 
 		// If switching to TRT-LLM, unload Ollama models first
 		if (backend === 'tensorrt') {
 			await unloadEmbeddingModel();
 		}
 
-		await redis.set(LEASE_KEY, JSON.stringify(lease), 'EX', ttlSeconds);
 		return lease;
 	} catch (err) {
 		console.error('[GPU Arbiter] Failed to acquire lease:', err);
@@ -84,17 +105,12 @@ export async function acquireGpuLease(
 /**
  * Release GPU lease for the specified backend.
  */
-export async function releaseGpuLease(backend: InferenceBackend): Promise<boolean> {
+export async function releaseGpuLease(backend: InferenceBackend, leaseId?: string): Promise<boolean> {
+	if (backend === 'cuvs' && !leaseId) return false;
 	try {
 		const redis: Redis = getRedis();
-		const existing = await redis.get(LEASE_KEY);
-		if (!existing) return true;
-
-		const lease: GpuLease = JSON.parse(existing);
-		if (lease.backend !== backend) return false;
-
-		await redis.del(LEASE_KEY);
-		return true;
+		const result = await redis.eval(RELEASE_GPU_LEASE_SCRIPT, 1, LEASE_KEY, backend, leaseId ?? '');
+		return result === 1;
 	} catch (err) {
 		console.error('[GPU Arbiter] Failed to release lease:', err);
 		return false;
@@ -110,10 +126,7 @@ export async function getGpuLeaseStatus(): Promise<GpuLease | null> {
 		const existing = await redis.get(LEASE_KEY);
 		if (!existing) return null;
 		const lease: GpuLease = JSON.parse(existing);
-		if (lease.expiresAt < Date.now()) {
-			await redis.del(LEASE_KEY);
-			return null;
-		}
+		if (lease.expiresAt <= Date.now()) return null;
 		return lease;
 	} catch {
 		return null;

@@ -98,6 +98,7 @@ export interface RankedChunk {
 let metadataCache: ChunkMetadata[] = [];
 let fuseIndex: Fuse<ChunkMetadata> | null = null;
 let lastRefresh = 0;
+let refreshPromise: Promise<void> | null = null;
 const REFRESH_INTERVAL = 5 * 60 * 1000;
 
 const SCROLL_PAGE_SIZE = 1000;
@@ -111,9 +112,21 @@ const SCROLL_PAYLOAD_FIELDS = [
 const SCROLL_TOTAL_DEADLINE_MS = 20_000;
 
 export async function refreshMetadataCache(): Promise<void> {
+  if (building) return;
   const now = Date.now();
+  if (refreshPromise) return refreshPromise;
   if (fuseIndex && now - lastRefresh < REFRESH_INTERVAL) return;
 
+  const pendingRefresh = performMetadataRefresh();
+  refreshPromise = pendingRefresh;
+  try {
+    await pendingRefresh;
+  } finally {
+    refreshPromise = null;
+  }
+}
+
+async function performMetadataRefresh(): Promise<void> {
   try {
     const points: Array<{ payload: Record<string, unknown> }> = [];
     let offset: string | number | null = null;
@@ -168,7 +181,7 @@ export async function refreshMetadataCache(): Promise<void> {
       minMatchCharLength: 2,
     });
 
-    lastRefresh = now;
+    lastRefresh = Date.now();
   } catch (err) {
     console.error('[codebase-context] Failed to refresh metadata cache:', err);
   }
@@ -867,8 +880,3 @@ export async function searchCodebaseByCluster(
     })
   );
 }
-
-// -- Eager pre-warm on first import ------------------------------------------
-refreshMetadataCache().catch(() => {
-	/* Qdrant may not be ready at startup -- first search will retry */
-});

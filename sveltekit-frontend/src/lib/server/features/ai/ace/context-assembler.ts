@@ -1625,7 +1625,6 @@ export async function assembleACEContext(opts: {
   if (opts.mode === 'parent_atlas' || (opts.enableCodebaseContext && /\b(redis|valkey|qdrant|som|ace|bifrost|query router|codebase|indexing|nes|chrom|parent atlas|mapping|card)\b/i.test(opts.query))) {
     try {
       const { routeQuery } = await import('../../../ace/query-router.js');
-      const { BifrostCacheManager } = await import('$lib/server/ai/bifrost-cache-manager.js');
 
       // Identity path: caller knows the specific file — try NES card lookup first (O(1) Redis).
       // Falls through to freetext routeQuery on miss.
@@ -3945,9 +3944,6 @@ export async function assembleACEContext(opts: {
           // the most up-to-date aggregate (fallback to global Karpathy aggregate
           // when file-level links are missing).
           try {
-            const { getAuthorityForContext } = await import(
-              '$lib/server/graph/karpathy-authority.js'
-            );
             const authority = await getAuthorityForContext(finalContext).catch(() => ({
               score: 0,
               source: 'gpu',

@@ -11,7 +11,8 @@ interface Props {
 	initialContent?: string;
 	placeholder?: string;
 	readOnly?: boolean;
-	onSave?: (content: string) => Promise<void>;
+	glass?: boolean;
+	onSave?: (content: string) => Promise<void | boolean>;
 	onAutoSave?: (content: string) => void;
 	onUpdate?: (content: string) => void;
 }
@@ -20,6 +21,7 @@ let {
 	initialContent = '',
 	placeholder = 'Write something amazing...',
 	readOnly = false,
+	glass = false,
 	onSave,
 	onAutoSave,
 	onUpdate
@@ -90,7 +92,8 @@ if (!editor || !onSave) return;
 
 isSaving = true;
 try {
-await onSave(editor.getHTML());
+const saved = await onSave(editor.getHTML());
+if (saved === false) return;
 lastSaved = new Date();
 } finally {
 setTimeout(() => isSaving = false, 500);
@@ -153,10 +156,10 @@ return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 </script>
 
-<div class="report-editor-shell flex h-full min-h-[500px] flex-col overflow-hidden rounded-xl border border-neutral-300 bg-white text-neutral-900 shadow-sm">
+<div class="report-editor-shell flex h-full min-h-[500px] flex-col overflow-hidden rounded-xl border border-neutral-300 bg-white text-neutral-900 shadow-sm" class:glass-surface={glass}>
 <!-- Toolbar -->
 {#if !readOnly}
-<div class="editor-toolbar flex flex-wrap items-center gap-1 border-b border-neutral-200 bg-neutral-100 p-2">
+<div class="editor-toolbar flex flex-wrap items-center gap-1 border-b border-neutral-200 bg-neutral-100 p-2" class:glass-toolbar={glass}>
 <Button variant="ghost" size="sm"
 class={`toolbar-button ${isActive.bold ? 'toolbar-button-active' : ''}`}
 onclick={() => editor?.chain().focus().toggleBold().run()}
@@ -228,7 +231,7 @@ Save
 
 <!-- AI Menu -->
 {#if showAiMenu}
-<div class="border-b border-neutral-200 bg-neutral-100 p-3" transition:slide>
+<div class="border-b border-neutral-200 bg-neutral-100 p-3" class:glass-toolbar={glass} transition:slide>
 <div class="flex gap-2">
 <input
 type="text"
@@ -249,12 +252,12 @@ Generate
 {/if}
 
 <!-- Editor Area -->
-<div class="relative flex-1 overflow-hidden bg-white">
+<div class="relative flex-1 overflow-hidden bg-white" class:glass-canvas={glass}>
 <div bind:this={element} class="h-full max-w-none overflow-y-auto px-8 py-6 prose text-neutral-900 focus:outline-none"></div>
 </div>
 
 <!-- Status Bar -->
-<div class="flex items-center justify-between border-t border-neutral-200 bg-neutral-100 px-3 py-1.5 text-xs text-neutral-500">
+<div class="flex items-center justify-between border-t border-neutral-200 bg-neutral-100 px-3 py-1.5 text-xs text-neutral-500" class:glass-status={glass}>
 <div class="flex items-center gap-3">
 <span>{wordCount} words</span>
 {#if lastSaved}
@@ -273,6 +276,33 @@ Markdown Supported
 </div>
 
 <style>
+:global(.report-editor-shell.glass-surface) {
+	background: rgba(255, 255, 255, 0.055);
+	border-color: rgba(255, 255, 255, 0.14);
+	backdrop-filter: blur(18px);
+	box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28), inset 0 1px rgba(255, 255, 255, 0.08);
+	color: #f4f4f5;
+}
+
+.glass-toolbar {
+	background: rgba(255, 255, 255, 0.055) !important;
+	border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-canvas {
+	background: rgba(13, 16, 22, 0.3) !important;
+}
+
+.glass-canvas :global(.ProseMirror) {
+	color: rgba(250, 250, 249, 0.92);
+}
+
+.glass-status {
+	background: rgba(255, 255, 255, 0.045) !important;
+	border-color: rgba(255, 255, 255, 0.1) !important;
+	color: rgba(244, 244, 245, 0.62) !important;
+}
+
 :global(.toolbar-button) {
 color: #525252;
 }

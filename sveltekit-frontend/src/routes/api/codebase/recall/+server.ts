@@ -38,12 +38,25 @@ interface ChunkMetadataEntry {
 let metadataCache: ChunkMetadataEntry[] = [];
 let fuseIndex: Fuse<ChunkMetadataEntry> | null = null;
 let lastRefresh = 0;
+let refreshPromise: Promise<void> | null = null;
 const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
 
 async function refreshMetadataCache(): Promise<void> {
+	if (building) return;
 	const now = Date.now();
+	if (refreshPromise) return refreshPromise;
 	if (fuseIndex && now - lastRefresh < REFRESH_INTERVAL) return;
 
+	const pendingRefresh = performMetadataRefresh();
+	refreshPromise = pendingRefresh;
+	try {
+		await pendingRefresh;
+	} finally {
+		refreshPromise = null;
+	}
+}
+
+async function performMetadataRefresh(): Promise<void> {
 	try {
 		const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
 			method: 'POST',
@@ -90,17 +103,10 @@ async function refreshMetadataCache(): Promise<void> {
 			minMatchCharLength: 2
 		});
 
-		lastRefresh = now;
+		lastRefresh = Date.now();
 	} catch (err) {
 		console.error('[recall] Failed to refresh metadata cache:', err);
 	}
-}
-
-// Eager warm-up on first import (non-blocking, skipped during production build)
-if (!building) {
-	refreshMetadataCache().catch(() => {
-		/* Qdrant may not be ready at startup — first request will retry */
-	});
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
