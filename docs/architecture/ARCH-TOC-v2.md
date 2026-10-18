@@ -139,6 +139,7 @@ Related contracts: [retrieval transport, codecs, and telemetry](./retrieval-tran
 - [PARENT_ATLAS_PACKAGE_BOUNDARIES](./PARENT_ATLAS_PACKAGE_BOUNDARIES.md)
 - [PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY](./PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md)
 - [parent-atlas-batch-execution-gates-v1](./parent-atlas-batch-execution-gates-v1.md)
+- [parent-atlas-query-intelligence-owner-map-v1](./parent-atlas-query-intelligence-owner-map-v1.md)
 - [parent-atlas-function-topology-search-index](./parent-atlas-function-topology-search-index.md)
 - [parent-atlas-karpathy-pipeline](./parent-atlas-karpathy-pipeline.md)
 - [parent-atlas-native-dawn-viewer-contract-v1](./parent-atlas-native-dawn-viewer-contract-v1.md)
