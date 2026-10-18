@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { PageData } from './$types';
 	import RouteInspectorModal from '$lib/components/RouteInspectorModal.svelte';
 
 	const { data }: { data: PageData } = $props();
 
-	let routes = $state<any[]>([]);
+	let routes = $state<any[]>(untrack(() => Array.isArray(data?.routes) ? data.routes : []));
 	let searchQuery = $state('');
 	let filterKind = $state<'all' | 'page' | 'layout' | 'server' | 'endpoint'>('all');
 	let filterHealth = $state<'all' | 'healthy' | 'flaky' | 'broken'>('all');
@@ -161,7 +162,7 @@
 
 		{#if filteredRoutes.length > 0}
 			<div class="card-grid">
-				{#each filteredRoutes as route (route.id ?? route.path)}
+				{#each filteredRoutes as route, idx (`${route.id ?? route.path}:${route.file ?? ''}:${idx}`)}
 					{@const icon = getCardIcon(route)}
 					<button class="route-card" class:card-broken={route.errorState === 'broken'} class:card-flaky={route.errorState === 'flaky'} onclick={() => openRoute(route)}>
 						<div class="card-icon-wrap">

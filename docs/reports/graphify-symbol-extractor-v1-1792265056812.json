@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-345bc5460ecf-0544",
+    "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:e5c45155ac3365032ecc32c5acec31e984202453b052ba7235f80178ecba53c9",
+    "offset": 543,
+    "maxFiles": 1,
+    "shardChecksum": "sha256:d8bb22c2d9f57102680fc9ccf684d5bd773bf1e782b2c78425feaa62302e99ae",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "b1810b0c-9b1d-4ce0-8d2f-b942e1ab4060",
+      "sourceRef": "sveltekit-frontend/scripts/atlas/classify-qdrant-missing-packets.mjs.mjs",
+      "sourceRevision": "sha256:0a677f06728d604c5f42043ae83fee897f7c608224206d7b687b7456509b5bbe",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WOULD_EXTRACT",
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": 1,
+  "readbacks": [],
+  "generatedAt": "2026-10-17T19:24:16.812Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "ts_js": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 11,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "b1810b0c-9b1d-4ce0-8d2f-b942e1ab4060",
+      "sourceRef": "sveltekit-frontend/scripts/atlas/classify-qdrant-missing-packets.mjs.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:0a677f06728d604c5f42043ae83fee897f7c608224206d7b687b7456509b5bbe",
+      "sourceDigest": "sha256:0a677f06728d604c5f42043ae83fee897f7c608224206d7b687b7456509b5bbe",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    }
+  ]
+}

@@ -601,20 +601,32 @@ async function postgresPgvectorSearch(
   // Lazy import: the shared pool owner is only loaded when this executor runs, so the orchestrator stays importable without app DB env.
   const { pool } = await import('$lib/server/db/client');
   const admittedWorkspace = await readAdmittedWorkspaceRevision();
-  const res = await pool.query(
-    `WITH top AS (
-       SELECT id, relative_path, symbol, kind, source_ref, file_content_hash, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
-         FROM codebase_chunk_index
-        WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\')
-        ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2)
-     SELECT t.*, l.packet_key AS lineage_packet_key, l.source_revision AS lineage_source_revision, l.evidence_refs AS lineage_evidence_refs,
-            b.workspace_revision AS binding_workspace_revision, b.source_revision AS binding_source_revision
-       FROM top t LEFT JOIN atlas_packet_chunk_lineage l ON l.chunk_row_id = t.id AND l.revision_status = 'PROVEN'
-       LEFT JOIN atlas_workspace_source_bindings b ON $4::text IS NOT NULL AND b.workspace_revision = $4 AND b.canonical_source_ref = t.source_ref AND b.content_digest = t.file_content_hash
-      ORDER BY t.cosine DESC`,
-    [vec, n, refPrefix, admittedWorkspace],
-  );
-  const merged = res.rows as any[];
+  const client = await pool.connect();
+  let merged: any[] = [];
+  try {
+    await client.query('BEGIN');
+    await client.query('SET LOCAL hnsw.ef_search = 40');
+    const res = await client.query(
+      `WITH top AS (
+         SELECT id, relative_path, symbol, kind, source_ref, file_content_hash, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
+           FROM codebase_chunk_index
+          WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\\')
+          ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2)
+       SELECT t.*, l.packet_key AS lineage_packet_key, l.source_revision AS lineage_source_revision, l.evidence_refs AS lineage_evidence_refs,
+              b.workspace_revision AS binding_workspace_revision, b.source_revision AS binding_source_revision
+         FROM top t LEFT JOIN atlas_packet_chunk_lineage l ON l.chunk_row_id = t.id AND l.revision_status = 'PROVEN'
+         LEFT JOIN atlas_workspace_source_bindings b ON $4::text IS NOT NULL AND b.workspace_revision = $4 AND b.canonical_source_ref = t.source_ref AND b.content_digest = t.file_content_hash
+        ORDER BY t.cosine DESC`,
+      [vec, n, refPrefix, admittedWorkspace],
+    );
+    await client.query('COMMIT');
+    merged = res.rows as any[];
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
   const refs = [...new Set(merged.filter((r) => !r.lineage_packet_key).map((r) => r.source_ref).filter(Boolean))];
   const packetByRef = new Map<string, string | null>();
   if (refs.length) {

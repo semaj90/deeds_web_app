@@ -373,6 +373,8 @@
 			{#if !selectedFile}
 				<div
 					class="drop-zone {isDragging ? 'dragging' : ''}"
+					role="region"
+					aria-label="Image drop zone for VLM analysis"
 					ondragover={handleDragOver}
 					ondragleave={handleDragLeave}
 					ondrop={handleDrop}

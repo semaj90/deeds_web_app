@@ -1,0 +1,149 @@
+{
+  "audit_id": "PARENT-ATLAS-EPISODE-GROUP-LEARNING-01",
+  "generated_at": "2026-10-17T22:54:03Z",
+  "task_id": "TASK_ROUTE_AST_REPAIR_001",
+  "gates": {
+    "RL_ENV_01": "PASS",
+    "RL_CHECK_01": "PASS",
+    "RL_EPISODE_01": "PASS",
+    "ACE_PROMPT_01": "PASS",
+    "RL_MLP_01": "PASS",
+    "CANONICAL_ISOLATION_01": "PASS",
+    "EVIDENCE_INTEGRITY_01": "PASS"
+  },
+  "episode_group_receipt": {
+    "num_episodes": 8,
+    "mean_reward": 0.3617,
+    "std_reward": 0.4674,
+    "eligible_count": 3,
+    "immutable_sha256": "sha256:e650185c3a53c6223f9885cdcff4cd7bb414b44c16761ab88ad0a40f690624f4",
+    "episodes": [
+      {
+        "episode_id": 1,
+        "reward_raw": 0.9905,
+        "advantage": 1.3453,
+        "eligible": true,
+        "failures": [],
+        "latency_ms": 95.0
+      },
+      {
+        "episode_id": 2,
+        "reward_raw": 0.0,
+        "advantage": -0.7738,
+        "eligible": false,
+        "failures": [
+          "SCOPE_VIOLATION"
+        ],
+        "latency_ms": 110.0
+      },
+      {
+        "episode_id": 3,
+        "reward_raw": 0.988,
+        "advantage": 1.3399,
+        "eligible": true,
+        "failures": [],
+        "latency_ms": 120.0
+      },
+      {
+        "episode_id": 4,
+        "reward_raw": 0.0,
+        "advantage": -0.7738,
+        "eligible": false,
+        "failures": [
+          "TEST_FAILURE"
+        ],
+        "latency_ms": 130.0
+      },
+      {
+        "episode_id": 5,
+        "reward_raw": 0.0,
+        "advantage": -0.7738,
+        "eligible": false,
+        "failures": [
+          "UNQUALIFIED_EVIDENCE:fabricated/nonexistent/evidence/id.ts"
+        ],
+        "latency_ms": 105.0
+      },
+      {
+        "episode_id": 6,
+        "reward_raw": 0.915,
+        "advantage": 1.1837,
+        "eligible": true,
+        "failures": [],
+        "latency_ms": 850.0
+      },
+      {
+        "episode_id": 7,
+        "reward_raw": 0.0,
+        "advantage": -0.7738,
+        "eligible": false,
+        "failures": [
+          "INVALID_SCHEMA"
+        ],
+        "latency_ms": 100.0
+      },
+      {
+        "episode_id": 8,
+        "reward_raw": 0.0,
+        "advantage": -0.7738,
+        "eligible": false,
+        "failures": [
+          "WRONG_TASK"
+        ],
+        "latency_ms": 90.0
+      }
+    ]
+  },
+  "advisory_ranker_benchmark": {
+    "input_features": 8,
+    "hidden_neurons": 8,
+    "tensor_shape": [
+      3,
+      8
+    ],
+    "candidates_scored": [
+      {
+        "packet_key": "P001",
+        "evidence_ref": "sveltekit-frontend/src/routes/(app)/admin/all-routes/route-lineage.ts",
+        "advisory_score": 0.552084
+      },
+      {
+        "packet_key": "P002",
+        "evidence_ref": "docs/.okf/pinned/sveltekit/DIAGNOSTIC_WARNINGS_FIXES.md",
+        "advisory_score": 0.547354
+      },
+      {
+        "packet_key": "P003",
+        "evidence_ref": "docs/.okf/dev/pinned-docs.manifest.json",
+        "advisory_score": 0.543817
+      }
+    ]
+  },
+  "ace_packet_summary": {
+    "packet_id": "ace:packet:task-route-ast-repair-001-v1",
+    "nes_lut_byte": "0x2A",
+    "palette_name": "NES_2C02_CYAN_LIGHT",
+    "oak_python_tuple": "(\"sveltekit-frontend/src/routes/(app)/admin/all-routes/route-lineage.ts\", \"concept:sveltekit2:route_lineage_hardening:v1\", \"0x2A\", \"OPTION[RESOLVE_SVELTE_A11Y_WARNINGS]\", 0.98, 64, \"implements\")",
+    "prompt_injection_guard": {
+      "hidden_thoughts_persisted": false,
+      "forbidden_payloads": [
+        "hiddenThoughts",
+        "chainOfThought",
+        "kv_cache",
+        "raw_tensor"
+      ],
+      "max_context_bytes": 16384
+    },
+    "bitfrost_caching": {
+      "redis_key": "ace:packet:task-route-ast-repair-001-v1",
+      "centroid_lru_key": "bitfrost:centroid:lru:cuml-kmeans-k16-0x2a",
+      "eviction_policy": "allkeys-lru"
+    },
+    "checksum": "sha256:14e92b93da05ebb45b9f2476d9e28768db2c75285270eb4c9093450eee9070d9"
+  },
+  "canonical_boundary_invariants": {
+    "canonical_authority": false,
+    "writes_performed": false,
+    "forbidden_payloads_enforced": true
+  }
+}

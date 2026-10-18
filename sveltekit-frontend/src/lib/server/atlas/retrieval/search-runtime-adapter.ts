@@ -344,6 +344,7 @@ export async function projectAtlasSearchResponseToQasFromAsyncSources(input: {
 export function createAtlasSearchAdapter(config?: {
   userId?: string;
   caseId?: string;
+  readOnly?: boolean;
   runtime?: Pick<SearchRuntime, 'search'>;
 }) {
   const runtime = config?.runtime ?? new SearchRuntime(config ?? {});

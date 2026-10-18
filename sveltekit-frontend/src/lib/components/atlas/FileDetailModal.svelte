@@ -119,8 +119,9 @@
                 <div class="space-y-4 border-t border-neutral-200 dark:border-neutral-800 pt-4">
                   <!-- Purpose Select -->
                   <div>
-                    <label class="block text-sm font-medium mb-2">File Purpose</label>
+                    <label for="file-detail-purpose" class="block text-sm font-medium mb-2">File Purpose</label>
                     <select
+                      id="file-detail-purpose"
                       bind:value={localFile.file_purpose}
                       class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900"
                     >
@@ -132,7 +133,7 @@
 
                   <!-- Thoroughness Scale (1-5) -->
                   <div>
-                    <label class="block text-sm font-medium mb-2">Thoroughness (1-5)</label>
+                    <span class="block text-sm font-medium mb-2">Thoroughness (1-5)</span>
                     <div class="flex gap-2">
                       {#each ThoroughnessEnum.options as level}
                         <button
@@ -155,8 +156,9 @@
 
                   <!-- Criticality Select -->
                   <div>
-                    <label class="block text-sm font-medium mb-2">App Criticality</label>
+                    <label for="file-detail-criticality" class="block text-sm font-medium mb-2">App Criticality</label>
                     <select
+                      id="file-detail-criticality"
                       bind:value={localFile.app_criticality}
                       class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded bg-white dark:bg-neutral-900"
                     >
@@ -168,9 +170,10 @@
 
                   <!-- Test Coverage % -->
                   <div>
-                    <label class="block text-sm font-medium mb-2">Test Coverage %</label>
+                    <label for="file-detail-coverage" class="block text-sm font-medium mb-2">Test Coverage %</label>
                     <div class="flex gap-2">
                       <input
+                        id="file-detail-coverage"
                         type="range"
                         min="0"
                         max="100"

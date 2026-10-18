@@ -9,6 +9,8 @@ const {
   readFileMock,
   existsSyncMock,
   searchMock,
+  createAtlasSearchAdapterMock,
+  persistKagDagRunFromStepsMock,
 } = vi.hoisted(() => {
   const memoryStore = new Map<string, string>();
 
@@ -56,7 +58,10 @@ const {
     topPacketKeys: ['pkt-1'],
   }));
 
-  return { memoryStore, mkdirMock, writeFileMock, readFileMock, existsSyncMock, searchMock };
+  const createAtlasSearchAdapterMock = vi.fn(() => ({ search: searchMock }));
+  const persistKagDagRunFromStepsMock = vi.fn(async () => null);
+
+  return { memoryStore, mkdirMock, writeFileMock, readFileMock, existsSyncMock, searchMock, createAtlasSearchAdapterMock, persistKagDagRunFromStepsMock };
 });
 
 vi.mock('node:fs', () => ({
@@ -73,9 +78,7 @@ vi.mock('$lib/server/mcp/atlas-tools-client.js', () => ({
 }));
 
 vi.mock('$lib/server/atlas/retrieval/search-runtime-adapter.js', () => ({
-  createAtlasSearchAdapter: vi.fn(() => ({
-    search: searchMock,
-  })),
+  createAtlasSearchAdapter: createAtlasSearchAdapterMock,
 }));
 
 vi.mock('$lib/server/search/rust-napi-search-backend.js', () => ({
@@ -83,7 +86,7 @@ vi.mock('$lib/server/search/rust-napi-search-backend.js', () => ({
 }));
 
 vi.mock('$lib/server/features/ai/ace/kag-dag-runner.js', () => ({
-  persistKagDagRunFromSteps: vi.fn(async () => null),
+  persistKagDagRunFromSteps: persistKagDagRunFromStepsMock,
 }));
 
 vi.mock('./embedding-service.js', () => ({
@@ -101,6 +104,8 @@ describe('semantic search workflow', () => {
     readFileMock.mockClear();
     existsSyncMock.mockClear();
     searchMock.mockClear();
+    createAtlasSearchAdapterMock.mockClear();
+    persistKagDagRunFromStepsMock.mockClear();
   });
 
   it('persists a workflow report and makes it readable by the daily board loader', async () => {
@@ -169,5 +174,36 @@ describe('semantic search workflow', () => {
       withGraphExpansion: true,
     }));
     expect(result.metadata.queryClassification).not.toHaveProperty('canonicalAuthority');
+  });
+
+  it('suppresses SearchRuntime, KAG audit, and report writes in diagnostic read-only mode', async () => {
+    await runSemanticSearchWorkflow({
+      query: 'read-only search workflow',
+      topK: 1,
+      includeWorkflowPreamble: false,
+      includeAcePacket: false,
+      compareRustShadow: false,
+      withGraphExpansion: false,
+      persistReport: true,
+    }, { diagnosticReadOnly: true });
+
+    expect(createAtlasSearchAdapterMock).toHaveBeenCalledWith(expect.objectContaining({ readOnly: true }));
+    expect(persistKagDagRunFromStepsMock).not.toHaveBeenCalled();
+    expect(writeFileMock).not.toHaveBeenCalled();
+  });
+
+  it('does not opt into diagnostic mode unless explicitly requested', async () => {
+    await runSemanticSearchWorkflow({
+      query: 'default search workflow',
+      topK: 1,
+      includeWorkflowPreamble: false,
+      includeAcePacket: false,
+      compareRustShadow: false,
+      withGraphExpansion: false,
+      persistReport: false,
+    });
+
+    expect(createAtlasSearchAdapterMock).toHaveBeenCalledWith(expect.not.objectContaining({ readOnly: true }));
+    expect(persistKagDagRunFromStepsMock).toHaveBeenCalledTimes(1);
   });
 });

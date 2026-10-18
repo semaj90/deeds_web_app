@@ -213,10 +213,10 @@
 </script>
 
 {#if isOpen}
-  <div class="ai-assistant-overlay" transition:fade={{ duration: 200 }} onclick={onClose} role="button" tabindex="-1">
+  <div class="ai-assistant-overlay" transition:fade={{ duration: 200 }} onclick={(e) => { if (e.target === e.currentTarget) onClose(); }} role="presentation">
     <div class="ai-assistant-container {gamingConfigProps.enableScanlines ? 'crt-scanlines' : ''}"
       style="width: {containerWidth}px; height: {containerHeight}px;"
-      onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" tabindex="0">
+      role="dialog" aria-modal="true" tabindex="-1">
       
       <!-- Gamified CRT Overlay -->
       <div class="crt-overlay pointer-events-none absolute inset-0 z-50 mix-blend-overlay"></div>

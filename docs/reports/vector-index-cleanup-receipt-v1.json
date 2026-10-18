@@ -1,0 +1,80 @@
+{
+  "schema": "atlas.vector-index-cleanup-receipt.v1",
+  "executedAt": "2026-10-18T04:18:05.727Z",
+  "dryRun": false,
+  "actionsExecuted": [
+    "DROP INDEX CONCURRENTLY IF EXISTS idx_codebase_chunk_summary_embedding_384_hnsw",
+    "DROP INDEX CONCURRENTLY IF EXISTS idx_cci_kmeans384_cluster",
+    "DROP INDEX CONCURRENTLY IF EXISTS idx_codebase_chunk_summary_embedding_ivfflat",
+    "CREATE INDEX CONCURRENTLY idx_codebase_chunk_summary_embedding_768_hnsw (partial)",
+    "DROP INDEX CONCURRENTLY IF EXISTS codebase_chunk_index_summary_hnsw",
+    "CREATE INDEX CONCURRENTLY idx_codebase_chunk_error_embedding_768_hnsw (partial)",
+    "DROP INDEX CONCURRENTLY IF EXISTS idx_codebase_chunk_index_error_embedding_hnsw"
+  ],
+  "verification": {
+    "summaryIndexValid": true,
+    "errorIndexValid": true,
+    "remainingVectorIndexes": [
+      {
+        "indexName": "idx_codebase_chunk_content_embedding_768_hnsw",
+        "method": "hnsw",
+        "size": "768 MB",
+        "definition": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "indexName": "codebase_chunk_index_content_hnsw",
+        "method": "hnsw",
+        "size": "106 MB",
+        "definition": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+      },
+      {
+        "indexName": "idx_codebase_chunk_latent_256_hnsw",
+        "method": "hnsw",
+        "size": "43 MB",
+        "definition": "CREATE INDEX idx_codebase_chunk_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (latent_256 halfvec_cosine_ops) WHERE (latent_256 IS NOT NULL)"
+      },
+      {
+        "indexName": "idx_codebase_chunk_latent_128_hnsw",
+        "method": "hnsw",
+        "size": "29 MB",
+        "definition": "CREATE INDEX idx_codebase_chunk_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (latent_128 halfvec_cosine_ops) WHERE (latent_128 IS NOT NULL)"
+      },
+      {
+        "indexName": "idx_codebase_chunk_summary_embedding_768_hnsw",
+        "method": "hnsw",
+        "size": "2312 kB",
+        "definition": "CREATE INDEX idx_codebase_chunk_summary_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200') WHERE (summary_embedding IS NOT NULL)"
+      },
+      {
+        "indexName": "idx_codebase_chunk_latent64_hnsw",
+        "method": "hnsw",
+        "size": "952 kB",
+        "definition": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+      },
+      {
+        "indexName": "idx_codebase_chunk_error_embedding_768_hnsw",
+        "method": "hnsw",
+        "size": "48 kB",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64') WHERE (error_embedding IS NOT NULL)"
+      },
+      {
+        "indexName": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+        "method": "hnsw",
+        "size": "40 kB",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_256 halfvec_cosine_ops) WHERE (error_embedding_latent_256 IS NOT NULL)"
+      },
+      {
+        "indexName": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+        "method": "hnsw",
+        "size": "32 kB",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_128 halfvec_cosine_ops) WHERE (error_embedding_latent_128 IS NOT NULL)"
+      },
+      {
+        "indexName": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+        "method": "hnsw",
+        "size": "32 kB",
+        "definition": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
+      }
+    ]
+  }
+}

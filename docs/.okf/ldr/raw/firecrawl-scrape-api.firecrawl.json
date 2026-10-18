@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.okf.ldr.capture.v1",
+  "runId": "ebab0307-97e2-4026-ab7e-6d08db44499b",
+  "sourceId": "firecrawl-scrape-api",
+  "requestedUrl": "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+  "resolvedUrl": "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+  "title": "Scrape - Firecrawl Docs",
+  "fetcher": "FIRECRAWL_V2",
+  "rawChecksum": "e7fa7a924209fa143c973dcc0d9660300bbc5b10a232eab46d656ebae89afdf2",
+  "normalizedChecksum": "9ffa7406ddad3b2c9fe8c8f0a394d831387dc85332ab0f1a3896644b22f74354",
+  "capturedMarkdownSha256": "9ffa7406ddad3b2c9fe8c8f0a394d831387dc85332ab0f1a3896644b22f74354",
+  "capturedAt": "2026-10-18T00:50:29.617Z",
+  "parser": null,
+  "parserVersion": null,
+  "canonicalAuthority": false
+}

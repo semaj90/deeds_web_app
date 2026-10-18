@@ -184,9 +184,11 @@
     },
     "semantic_768": {
       "owner": {
-        "classification": "UNKNOWN",
+        "classification": "CANONICAL_STORAGE_AND_QUALIFICATION",
+        "path": "PostgreSQL 18 public.codebase_chunk_index.content_embedding_768",
+        "writer_status": "UNRESOLVED_NOT_PROVEN",
         "unproven": true,
-        "note": "Which service actually generates semantic_768 in production was not independently confirmed this session — openspec/changes/parent-atlas-semantic-768-canonical-contract/ should be read before recording an owner here. Do not guess."
+        "note": "PostgreSQL owns canonical semantic_768 storage and row eligibility at codebase_chunk_index.content_embedding_768. This does not establish a unique production embedding writer, complete representation provenance, or Qdrant projection parity. Qdrant/cuVS and graph projections may nominate candidates but must be requalified against PostgreSQL before SearchRuntime fusion. See docs/architecture/parent-atlas-workstation-compute-fabric.md and openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md."
       }
     },
     "lexical_exact": {

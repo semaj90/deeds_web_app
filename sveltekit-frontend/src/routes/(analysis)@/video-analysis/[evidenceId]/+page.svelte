@@ -343,7 +343,7 @@
 						{#if analysis && analysis.frameAnalysis.length > 0}
 							<div class="frames-grid">
 								{#each analysis.frameAnalysis as frame, idx}
-									<div class="frame-card" class:selected={currentFrame === idx} onclick={() => (currentFrame = idx)}>
+									<button type="button" class="frame-card" class:selected={currentFrame === idx} onclick={() => (currentFrame = idx)}>
 										{#if frame.framePath}
 											<div class="frame-thumbnail">
 												<img src={frame.framePath} alt="Frame at {formatTimestamp(frame.timestamp)}" />
@@ -373,7 +373,7 @@
 												<span class="confidence-text">{Math.round(frame.confidence * 100)}%</span>
 											</div>
 										</div>
-									</div>
+									</button>
 								{/each}
 							</div>
 						{:else}

@@ -64,8 +64,8 @@
 				onclick={action.onClick}
 				disabled={action.disabled}
 			>
-				<div class="action-icon-wrapper">
-					<Icon name={action.icon} class="action-icon" />
+				<div class="action-icon-wrapper action-icon">
+					<Icon name={action.icon} />
 				</div>
 				<div class="action-content">
 					<div class="action-label">{action.label}</div>
@@ -73,7 +73,9 @@
 						<div class="action-description">{action.description}</div>
 					{/if}
 				</div>
-				<Icon name="chevron-right" class="action-arrow" />
+				<span class="action-arrow">
+					<Icon name="chevron-right" />
+				</span>
 			</button>
 		{/each}
 

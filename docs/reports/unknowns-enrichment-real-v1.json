@@ -29,7 +29,7 @@
  },
  "atenDescriptor": {
   "library": "torch",
-  "version": "2.13.0+cu130",
+  "version": "2.8.0+cu128",
   "device": "cpu",
   "chunkTensor": {
    "dtype": "float32",
@@ -58,19 +58,37 @@
    "macroF1": 0.476
   },
   "xgboost_path_svd48": {
-   "accuracy": 0.7818,
-   "macroF1": 0.501,
-   "seconds": 10.7
+   "accuracy": 0.7996,
+   "macroF1": 0.5259,
+   "seconds": 9.1,
+   "training": {
+    "resumeStatus": "TRAINED",
+    "completedRounds": 120,
+    "checkpoint": ".tmp\\atlas\\enrich-real-v1\\models\\xgboost_path_svd48.json",
+    "inputFingerprint": "sha256:043b71a70eafa8b36304c9bc1eace6b1508612e332d99b694eb79e40ae39d9df"
+   }
   },
   "xgboost_path_svd48_plus_centroid_features": {
-   "accuracy": 0.7836,
-   "macroF1": 0.5195,
-   "seconds": 17.7
+   "accuracy": 0.7923,
+   "macroF1": 0.5124,
+   "seconds": 15.1,
+   "training": {
+    "resumeStatus": "TRAINED",
+    "completedRounds": 120,
+    "checkpoint": ".tmp\\atlas\\enrich-real-v1\\models\\xgboost_path_svd48_plus_centroid_features.json",
+    "inputFingerprint": "sha256:2e680c6395323629b708d2f64f0413702f017c6e3a1a69337bc8dfde9b77d50c"
+   }
   },
   "xgboost_centroid_features_only": {
-   "accuracy": 0.6268,
-   "macroF1": 0.2428,
-   "seconds": 7.6
+   "accuracy": 0.6414,
+   "macroF1": 0.2461,
+   "seconds": 11.9,
+   "training": {
+    "resumeStatus": "TRAINED",
+    "completedRounds": 120,
+    "checkpoint": ".tmp\\atlas\\enrich-real-v1\\models\\xgboost_centroid_features_only.json",
+    "inputFingerprint": "sha256:ba2ee79901f74f326cffe2de4ca198ed8f50ecfecb9ec7dfb4d658893105e4fc"
+   }
   }
  },
  "pos": {
@@ -103,7 +121,7 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.998
+     "prob": 0.9983
     },
     {
      "domain": "agent_orchestration",
@@ -111,7 +129,7 @@
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0001
+     "prob": 0.0002
     }
    ],
    "centroidTop5": [
@@ -160,6 +178,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -198,15 +220,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9984
+     "prob": 0.9981
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0006
+     "prob": 0.0009
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0002
+     "prob": 0.0004
     }
    ],
    "centroidTop5": [
@@ -255,6 +277,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -293,15 +319,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9986
+     "prob": 0.9987
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0005
+     "prob": 0.0006
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0001
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -350,6 +376,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -388,15 +418,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9983
+     "prob": 0.9984
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0006
+     "prob": 0.0007
     },
     {
-     "domain": "trace_mcp",
-     "prob": 0.0001
+     "domain": "auth_login_register",
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -445,6 +475,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -483,15 +517,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9985
+     "prob": 0.9984
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0006
+     "prob": 0.0007
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0001
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -540,6 +574,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -578,15 +616,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9982
+     "prob": 0.9984
     },
     {
      "domain": "agent_orchestration",
      "prob": 0.0007
     },
     {
-     "domain": "trace_mcp",
-     "prob": 0.0001
+     "domain": "auth_login_register",
+     "prob": 0.0002
     }
    ],
    "centroidTop5": [
@@ -635,6 +673,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -673,15 +715,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.998
+     "prob": 0.9981
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0009
+     "prob": 0.0007
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0003
+     "prob": 0.0006
     }
    ],
    "centroidTop5": [
@@ -730,6 +772,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -768,15 +814,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9983
+     "prob": 0.9984
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0006
+     "prob": 0.0007
     },
     {
-     "domain": "trace_mcp",
-     "prob": 0.0001
+     "domain": "auth_login_register",
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -825,6 +871,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -867,11 +917,11 @@
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0006
+     "prob": 0.0007
     },
     {
-     "domain": "trace_mcp",
-     "prob": 0.0001
+     "domain": "auth_login_register",
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -920,6 +970,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -958,15 +1012,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9985
+     "prob": 0.9986
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0006
+     "prob": 0.0005
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0001
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -1015,6 +1069,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1053,15 +1111,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9976
+     "prob": 0.9981
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.001
+     "prob": 0.0008
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0002
+     "prob": 0.0004
     }
    ],
    "centroidTop5": [
@@ -1110,6 +1168,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1148,15 +1210,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9979
+     "prob": 0.9982
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0008
+     "prob": 0.0009
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0001
+     "prob": 0.0002
     }
    ],
    "centroidTop5": [
@@ -1205,6 +1267,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1243,15 +1309,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.998
+     "prob": 0.9982
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0008
+     "prob": 0.0009
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0001
+     "prob": 0.0002
     }
    ],
    "centroidTop5": [
@@ -1300,6 +1366,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1338,15 +1408,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9979
+     "prob": 0.9984
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0009
+     "prob": 0.0007
     },
     {
-     "domain": "trace_mcp",
-     "prob": 0.0001
+     "domain": "auth_login_register",
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -1395,6 +1465,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1433,15 +1507,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9976
+     "prob": 0.9983
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0011
+     "prob": 0.0008
     },
     {
-     "domain": "trace_mcp",
-     "prob": 0.0001
+     "domain": "auth_login_register",
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -1490,6 +1564,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1528,15 +1606,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9981
+     "prob": 0.998
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0007
+     "prob": 0.0008
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0003
+     "prob": 0.0007
     }
    ],
    "centroidTop5": [
@@ -1585,6 +1663,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1623,7 +1705,7 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9982
+     "prob": 0.9981
     },
     {
      "domain": "agent_orchestration",
@@ -1631,7 +1713,7 @@
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0002
+     "prob": 0.0005
     }
    ],
    "centroidTop5": [
@@ -1680,6 +1762,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1718,15 +1804,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9983
-    },
-    {
-     "domain": "agent_orchestration",
-     "prob": 0.0006
+     "prob": 0.9979
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0003
+     "prob": 0.0008
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
     }
    ],
    "centroidTop5": [
@@ -1775,6 +1861,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1813,7 +1903,7 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9984
+     "prob": 0.9985
     },
     {
      "domain": "agent_orchestration",
@@ -1821,7 +1911,7 @@
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0001
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -1870,6 +1960,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -1912,11 +2006,11 @@
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0009
+     "prob": 0.0008
     },
     {
      "domain": "auth_login_register",
-     "prob": 0.0002
+     "prob": 0.0007
     }
    ],
    "centroidTop5": [
@@ -1965,6 +2059,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -2003,15 +2101,15 @@
    "xgboostTop3": [
     {
      "domain": "rag_retrieval",
-     "prob": 0.9982
+     "prob": 0.9983
     },
     {
      "domain": "agent_orchestration",
-     "prob": 0.0007
+     "prob": 0.0008
     },
     {
-     "domain": "trace_mcp",
-     "prob": 0.0001
+     "domain": "auth_login_register",
+     "prob": 0.0003
     }
    ],
    "centroidTop5": [
@@ -2060,6 +2158,10 @@
      "server",
      "src"
     ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
     "adjectives": [],
     "verbs": [],
     "lemmas": [
@@ -2077,12 +2179,12 @@
    "predictionIsLabel": false
   }
  ],
- "totalSeconds": 82.6,
+ "totalSeconds": 37.7,
  "caveats": [
   "legacy labels are weak and partly path-derived; accuracy shows predictability, not correctness",
   "centroids are stale for current vectors",
   "unknown-chunk predictions are advisory, not labels",
   "no reviewed labels, so no external truth is measured"
  ],
- "checksum": "sha256:e92fd94ecb4003cfa9e545379f93895637cc2acd0d0600cc2edb8f44194a424d"
+ "checksum": "sha256:e2edd63798357ddef7b8f5f05c948b5d00ffc810a442e1407ad56404e8d80daa"
 }

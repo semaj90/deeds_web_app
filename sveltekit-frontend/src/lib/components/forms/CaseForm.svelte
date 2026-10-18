@@ -1,5 +1,6 @@
 <!-- Case Form Component - Svelte 5 + Superforms v2 -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import type { Case } from '$lib/types';
   import { caseFormSchema } from '$lib/schemas/forms';
   import { z } from 'zod';
@@ -32,13 +33,34 @@
     { id: '3', name: 'Mike Johnson', role: 'legal_assistant' }
   ]);
 
-  // Capture initial values for form init (intentionally non-reactive)
-  function getInitialData() { return initialData; }
+  // Capture initial values for form init (provide defaults so superForm never receives undefined)
+  const initialPayload = untrack(() => initialData);
+  function getInitialData(): CaseFormType {
+    return {
+      title: '',
+      description: '',
+      caseNumber: '',
+      status: 'open',
+      priority: 'medium',
+      practiceArea: '',
+      jurisdiction: '',
+      court: '',
+      clientName: '',
+      opposingParty: '',
+      assignedTo: '',
+      dueDate: '',
+      tags: [],
+      isConfidential: false,
+      notifyAssignee: true,
+      ...(initialPayload ?? {})
+    } as CaseFormType;
+  }
 
   // Initialize superForm with Zod validation
   const { form, errors, constraints, enhance, submitting, delayed, message } = superForm(
     getInitialData() as any,
     {
+      SPA: !initialPayload ? true : undefined,
       validators: zodClient(caseFormSchema),
       resetForm: false,
       invalidateAll: false,

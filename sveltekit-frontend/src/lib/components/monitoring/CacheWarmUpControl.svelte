@@ -103,8 +103,9 @@
 		<div class="space-y-3">
 			<!-- Domain Selection -->
 			<div>
-				<label class="text-xs font-medium text-sand-11 block mb-1">Domain</label>
+				<label for="warmup-domain" class="text-xs font-medium text-sand-11 block mb-1">Domain</label>
 				<select
+					id="warmup-domain"
 					bind:value={selectedDomain}
 					disabled={isRunning}
 					class="w-full bg-sand-2 border border-sand-6 rounded px-3 py-2 text-sm"
@@ -123,8 +124,9 @@
 				<div class="mt-2 space-y-2 pl-4 border-l-2 border-sand-5">
 					<div class="grid grid-cols-2 gap-2">
 						<div>
-							<label class="text-xs text-sand-11">Batch Size</label>
+							<label for="warmup-batch-size" class="text-xs text-sand-11">Batch Size</label>
 							<input
+								id="warmup-batch-size"
 								type="number"
 								bind:value={batchSize}
 								min="1"
@@ -134,8 +136,9 @@
 							/>
 						</div>
 						<div>
-							<label class="text-xs text-sand-11">Delay (ms)</label>
+							<label for="warmup-delay" class="text-xs text-sand-11">Delay (ms)</label>
 							<input
+								id="warmup-delay"
 								type="number"
 								bind:value={delayMs}
 								min="0"
@@ -175,7 +178,9 @@
 				class="w-full flex items-center justify-center gap-2"
 			>
 				{#if isRunning}
-					<Icon name="loader-2" size={16} class="animate-spin" />
+					<span class="animate-spin inline-flex">
+						<Icon name="loader-2" size={16} />
+					</span>
 					Running Warm-Up...
 				{:else}
 					<Icon name="play" size={16} />

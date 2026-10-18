@@ -30,6 +30,7 @@
 	let searchQ = $state('');
 	let searchResults = $state<Array<Record<string, unknown>>>([]);
 	let searching = $state(false);
+	let hasSearched = $state(false);
 	let searchError = $state<string | null>(null);
 	let suggestions = $state<string[]>([]);
 	let suggestTimer: ReturnType<typeof setTimeout> | null = null;
@@ -98,12 +99,13 @@
 	async function runSearch() {
 		if (!searchQ.trim() || !data.document) return;
 		searching = true;
+		hasSearched = true;
 		searchError = null;
 		try {
 			const res = await fetch('/api/library/search', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ query: searchQ, limit: 10 }),
+				body: JSON.stringify({ query: searchQ, documentId: data.document.id, limit: 10 }),
 				signal: AbortSignal.timeout(30_000)
 			});
 			if (!res.ok) throw new Error('Search failed');
@@ -283,6 +285,8 @@
 										</div>
 									{/each}
 								</div>
+							{:else if hasSearched && !searching && !searchError}
+								<p class="lr-search-empty">No matching sections found for "{searchQ}".</p>
 							{/if}
 						</div>
 

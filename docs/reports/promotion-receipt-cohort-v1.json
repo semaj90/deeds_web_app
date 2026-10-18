@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "atlas.promotion-receipt-cohort.v1",
+  "generatedAt": "2026-10-18T05:11:48.991Z",
+  "mode": "READ_ONLY_RECONCILIATION",
+  "status": "PROMOTION_RECEIPT_COHORT_BLOCKED",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "candidateSnapshotRevision": "current-chunk-lineage:sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc:f04bec4f5580035d9d0fc294aaa946fc32ec1c889fef8be2b94b707ea792ba98:v2",
+  "graphRevision": null,
+  "ordinalMapChecksum": "1cbcce5bd4c5acc19f0b228fb95d04cfc5b7238bef3b89b14133827170532512",
+  "ordinalWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "candidateCount": 100000,
+  "currentReceiptRefs": [
+    "docs/reports/current-source-cohort-lineage-v1.json",
+    "docs/reports/graphify-daily-lifecycle-v1.json",
+    "docs/reports/graphify-snapshot-native-readback-v1.json",
+    "docs/reports/parent-atlas-promotion-gates-v1.json"
+  ],
+  "excludedReceipts": [
+    {
+      "receiptRef": "docs/reports/current-graph-artifact-readiness-v1.json",
+      "classification": "STALE_WORKSPACE",
+      "reason": "Receipt workspace sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc does not match sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc."
+    },
+    {
+      "receiptRef": "docs/reports/current-repair-candidate-feature-matrix-v1.json",
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/domain-classifier-lineage-v1.json",
+      "classification": "STALE_WORKSPACE",
+      "reason": "Receipt workspace graphify_files.workspace_revision does not match sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc."
+    },
+    {
+      "receiptRef": "docs/reports/feature-ontology-current-cohort-v1.json",
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/lineage-semantic-768-cohort-v1.json",
+      "classification": "STALE_WORKSPACE",
+      "reason": "Receipt workspace sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc does not match sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc."
+    },
+    {
+      "receiptRef": "docs/reports/mcp-tool-selection-audit.json",
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/qdrant-packet-fanout-v1.json",
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/semantic-768-contract-proof.json",
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    }
+  ],
+  "receiptDetails": [
+    {
+      "receiptRef": "docs/reports/current-graph-artifact-readiness-v1.json",
+      "receiptChecksum": "c981e2117a21ac32ee4118ef49097f57456d70cf78aa7fbab10206df5983afe3",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+      "graphRevision": "sha256:5ff4c788d662d8148d9b7b1d5603c295a1dadeb9f8b6e8d62044e8510cfa5025",
+      "classification": "STALE_WORKSPACE",
+      "reason": "Receipt workspace sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc does not match sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc."
+    },
+    {
+      "receiptRef": "docs/reports/current-repair-candidate-feature-matrix-v1.json",
+      "receiptChecksum": "cb98d02ac08bcf528388457054e7dfc93942fdf4338866c7b683b5759050d1b6",
+      "workspaceRevision": null,
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+      "graphRevision": null,
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/current-source-cohort-lineage-v1.json",
+      "receiptChecksum": "9c6a2c7b9f174566b255f3f465e19814bf8634f661343809a6bffdd661310b02",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "CURRENT_MATCH",
+      "reason": "Receipt does not contradict the selected cohort on the revision fields it exposes."
+    },
+    {
+      "receiptRef": "docs/reports/domain-classifier-lineage-v1.json",
+      "receiptChecksum": "a33e907379516aeccf3df8755c2001df13bad6bc4076eba3bbcf8ef7b3daf392",
+      "workspaceRevision": "graphify_files.workspace_revision",
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "STALE_WORKSPACE",
+      "reason": "Receipt workspace graphify_files.workspace_revision does not match sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc."
+    },
+    {
+      "receiptRef": "docs/reports/feature-ontology-current-cohort-v1.json",
+      "receiptChecksum": "79416feb28016558852cda2f5aad4231bc569a9e11d1afe328d9c94c2a53f2ae",
+      "workspaceRevision": null,
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/graphify-daily-lifecycle-v1.json",
+      "receiptChecksum": "4b87de9c823ecb4bfca9dd50d9b931be3ece19d33f36507b59a7d9a939c2e233",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "CURRENT_MATCH",
+      "reason": "Receipt does not contradict the selected cohort on the revision fields it exposes."
+    },
+    {
+      "receiptRef": "docs/reports/graphify-snapshot-native-readback-v1.json",
+      "receiptChecksum": "bcbacb652c2af25f73ddb499bed67f8464132920594858763abe317b0c1fd3f1",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "CURRENT_MATCH",
+      "reason": "Receipt does not contradict the selected cohort on the revision fields it exposes."
+    },
+    {
+      "receiptRef": "docs/reports/lineage-semantic-768-cohort-v1.json",
+      "receiptChecksum": "f9ed0856ad49673b3d48b50d5f5befbc64b9797e146ec0a13f2dfed89250184d",
+      "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+      "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+      "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+      "graphRevision": null,
+      "classification": "STALE_WORKSPACE",
+      "reason": "Receipt workspace sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc does not match sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc."
+    },
+    {
+      "receiptRef": "docs/reports/mcp-tool-selection-audit.json",
+      "receiptChecksum": "59990566651fb90dcc2294003c7fb490facb801d08741b77bfa2f412d7c0e0bf",
+      "workspaceRevision": null,
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/parent-atlas-promotion-gates-v1.json",
+      "receiptChecksum": "66cb90124560a42994431485f674e72cca32430f552c49029122938d24f23167",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "CURRENT_MATCH",
+      "reason": "Receipt does not contradict the selected cohort on the revision fields it exposes."
+    },
+    {
+      "receiptRef": "docs/reports/qdrant-packet-fanout-v1.json",
+      "receiptChecksum": "80f684cde120deee055778fced1f27dc1db5c50799c09d5c6cf80838975fdc61",
+      "workspaceRevision": null,
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    },
+    {
+      "receiptRef": "docs/reports/semantic-768-contract-proof.json",
+      "receiptChecksum": "74c526e123ac297a26bad0dbe770eb9cb5392cc1b8d833d092b19c3ddcbfa513",
+      "workspaceRevision": null,
+      "candidateSnapshotRevision": null,
+      "ordinalMapChecksum": null,
+      "graphRevision": null,
+      "classification": "MISSING_REVISION_EVIDENCE",
+      "reason": "Receipt does not bind itself to a workspace revision."
+    }
+  ],
+  "checks": {
+    "oneWorkspaceRevision": true,
+    "oneCandidateSnapshotRevision": true,
+    "oneOrdinalMapChecksum": true,
+    "ordinalMapBoundToWorkspace": true,
+    "candidateMapArtifactPresent": true,
+    "candidateMapMatchesReceipt": true,
+    "oneCompatibleGraphRevision": false,
+    "mixedRevisionAggregation": false,
+    "missingRevisionEvidenceInSelectedCohort": 0
+  },
+  "blockers": [
+    "CURRENT_GRAPH_REVISION_NOT_PROVEN_FOR_SELECTED_WORKSPACE"
+  ],
+  "sourceReports": {
+    "currentness": "docs/reports/promotion-gate-receipt-currentness-v1.json",
+    "lineageQualifiedCandidateReceipt": "docs/reports/lineage-qualified-candidate-map-v1.json",
+    "lineageQualifiedCandidateMap": ".tmp/atlas/lineage-qualified-candidate-map-v1.json",
+    "currentGraphArtifactReadiness": "docs/reports/current-graph-artifact-readiness-v1.json"
+  },
+  "authority": false,
+  "writesPerformed": false,
+  "nextGate": "REBUILD_LINEAGE_QUALIFIED_CANDIDATE_MAP_AND_GRAPH_FOR_SELECTED_WORKSPACE",
+  "checksum": "350cf5ac600c20b5d52cdcfdc874e2187d2871f29924079a46da02397f70720a"
+}

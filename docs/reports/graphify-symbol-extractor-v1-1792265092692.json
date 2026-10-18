@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-345bc5460ecf-0669",
+    "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:e5c45155ac3365032ecc32c5acec31e984202453b052ba7235f80178ecba53c9",
+    "offset": 668,
+    "maxFiles": 1,
+    "shardChecksum": "sha256:447aab763f7c6f69e933a9e7ed4b108c5452b0364ca769efafdf68ecc27f959a",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "5b371257-31a5-410f-a802-afe34b7b5ae0",
+      "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-1.0-BASELINE.md",
+      "sourceRevision": "sha256:c0f541212d548b025e957e543b17aaea5ece0e04fbc7def77edb163c1c3af69a",
+      "fileKind": "markdown",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WOULD_EXTRACT",
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": 1,
+  "readbacks": [],
+  "generatedAt": "2026-10-17T19:24:52.692Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 8,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "5b371257-31a5-410f-a802-afe34b7b5ae0",
+      "sourceRef": "packages/parent-atlas/docs/atlas/ATLAS-1.0-BASELINE.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:c0f541212d548b025e957e543b17aaea5ece0e04fbc7def77edb163c1c3af69a",
+      "sourceDigest": "sha256:c0f541212d548b025e957e543b17aaea5ece0e04fbc7def77edb163c1c3af69a",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    }
+  ]
+}

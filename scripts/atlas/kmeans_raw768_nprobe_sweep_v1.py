@@ -11,9 +11,9 @@ Run: /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python scripts/atlas/kmea
 import argparse, hashlib, json, os, re, sys, time
 from pathlib import Path
 import numpy as np, psycopg
-from sklearn.cluster import MiniBatchKMeans
+from sklearn.cluster import MiniBatchKMeans, KMeans
 
-ap = argparse.ArgumentParser(); ap.add_argument('--queries', type=int, default=1000); ap.add_argument('--k', type=int, default=10); ap.add_argument('--K', type=int, default=256)
+ap = argparse.ArgumentParser(); ap.add_argument('--queries', type=int, default=1000); ap.add_argument('--k', type=int, default=10); ap.add_argument('--K', type=int, default=256); ap.add_argument('--algo', choices=['minibatch', 'lloyd'], default='minibatch')
 a = ap.parse_args()
 ROOT = Path(__file__).resolve().parents[2]; D = ROOT / '.tmp' / 'atlas' / 'kmeans-raw768'
 V = np.load(D / 'V0.npy'); ids = json.loads((D / 'ids0.json').read_text()); X = V / np.linalg.norm(V, axis=1, keepdims=True)
@@ -35,7 +35,8 @@ for q in qs:
     t = np.argpartition(-s, K)[:K]; truth.append(set(t.tolist()))
 res = {}
 for seed in (42, 43):
-    km = MiniBatchKMeans(n_clusters=a.K, batch_size=4096, n_init=3, max_iter=100, random_state=seed).fit(Xtr)
+    km = (MiniBatchKMeans(n_clusters=a.K, batch_size=4096, n_init=3, max_iter=100, random_state=seed) if a.algo == 'minibatch'
+          else KMeans(n_clusters=a.K, n_init=1, max_iter=100, algorithm='lloyd', random_state=seed)).fit(Xtr)
     asg = km.predict(Xtr); C = km.cluster_centers_
     members = [np.where(asg == c)[0] for c in range(a.K)]
     sizes = np.array([len(m) for m in members])
@@ -49,10 +50,10 @@ for seed in (42, 43):
         rows[p] = {'recallAt10': round(float(np.mean(rec)), 4), 'p10Recall': round(float(np.percentile(rec, 10)), 3),
                    'candidateFraction': round(float(np.mean(frac)), 4), 'recallOverNull': round(float(np.mean(rec) / np.mean(frac)), 1)}
         print(seed, p, rows[p], flush=True)
-    res[seed] = rows
+    res[seed] = rows; res[(seed, 'sizes')] = [int(sizes.min()), int(np.median(sizes)), int(sizes.max())]
 out = {'schema': 'atlas.kmeans-raw768-nprobe-sweep.v1', 'generatedAt': time.strftime('%Y-%m-%d'), 'readOnly': True, 'writesPerformed': False, 'gpuUsed': False, 'canonicalAuthority': False,
-       'recipe': 'RAW content_embedding_768', 'k': a.K, 'train': int(len(tr)), 'queries': int(len(qs)), 'topK': K, 'bySeed': {str(s): r for s, r in res.items()},
+       'recipe': 'RAW content_embedding_768', 'k': a.K, 'train': int(len(tr)), 'queries': int(len(qs)), 'topK': K, 'algo': a.algo, 'bySeed': {str(s): r for s, r in res.items() if not isinstance(s, tuple)}, 'clusterSizesMinMedMax': {str(s[0]): r for s, r in res.items() if isinstance(s, tuple)},
        'caveats': ['self-query proxy (holdout chunks), NOT a golden query set', 'same-source_ref chunks excluded from truth and candidates', 'exact search inside probed clusters; no HNSW/ANN effects',
                    'recall = share of the exact top-K kept by the partition; says nothing about answer quality', 'seed-to-seed ARI ~0.45, so compare seeds before trusting any single number']}
 out['checksum'] = 'sha256:' + hashlib.sha256(json.dumps(out, sort_keys=True).encode()).hexdigest()
-(ROOT / 'docs' / 'reports' / 'kmeans-raw768-nprobe-sweep-v1.json').write_text(json.dumps(out, indent=1), encoding='utf-8')
+(ROOT / 'docs' / 'reports' / ('kmeans-raw768-nprobe-sweep-v1.json' if a.algo == 'minibatch' else f'kmeans-raw768-nprobe-sweep-{a.algo}-v1.json')).write_text(json.dumps(out, indent=1), encoding='utf-8')

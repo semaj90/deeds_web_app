@@ -18,6 +18,7 @@
  *             Chunks that appear in error-vector results are promoted in the final ranking.
  */
 import Fuse from 'fuse.js';
+import { building } from '$app/environment';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { pool } from '$lib/server/db/client';

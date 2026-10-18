@@ -20,6 +20,8 @@ const pool = new pg.Pool({
   password: process.env.DB_PASSWORD || process.env.PGPASSWORD,
   connectionTimeoutMillis: 15000,
 });
+let readOnlyClient = null;
+let readOnlyTransactionOpen = false;
 
 const loadWorkspaceRevision = () => {
   try {
@@ -30,7 +32,10 @@ const loadWorkspaceRevision = () => {
 };
 
 async function main() {
-  const tables = await pool.query(`
+  readOnlyClient = await pool.connect();
+  await readOnlyClient.query('BEGIN TRANSACTION READ ONLY');
+  readOnlyTransactionOpen = true;
+  const tables = await readOnlyClient.query(`
     SELECT table_name
     FROM information_schema.tables
     WHERE table_schema = 'public'
@@ -45,14 +50,14 @@ async function main() {
   const revisionlessTables = {};
   const tableColumns = {};
   for (const table of present) {
-    const columns = await pool.query(`
+    const columns = await readOnlyClient.query(`
       SELECT column_name FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = $1
     `, [table]);
     const names = new Set(columns.rows.map((row) => row.column_name));
     tableColumns[table] = [...names].sort();
     if (!names.has('graph_revision')) {
-      const count = await pool.query(`SELECT count(*)::integer AS rows FROM public.${table}`);
+      const count = await readOnlyClient.query(`SELECT count(*)::integer AS rows FROM public.${table}`);
       revisionlessTables[table] = {
         rows: Number(count.rows[0]?.rows ?? 0),
         reason: 'GRAPH_REVISION_COLUMN_UNAVAILABLE',
@@ -60,7 +65,7 @@ async function main() {
       continue;
     }
     const workspace = names.has('workspace_revision') ? 'workspace_revision' : 'NULL::text';
-    const result = await pool.query(`
+    const result = await readOnlyClient.query(`
       SELECT count(*)::integer AS rows,
              count(*) FILTER (WHERE graph_revision IS NOT NULL)::integer AS graph_revision_present,
              count(DISTINCT graph_revision)::integer AS graph_revision_distinct,
@@ -68,7 +73,7 @@ async function main() {
              count(DISTINCT ${workspace})::integer AS workspace_revision_distinct
       FROM public.${table}
     `);
-    const samples = await pool.query(`
+    const samples = await readOnlyClient.query(`
       SELECT DISTINCT graph_revision::text AS graph_revision,
              ${workspace}::text AS workspace_revision
       FROM public.${table}
@@ -84,7 +89,7 @@ async function main() {
     'atlas_graph_relation_participants_v2', 'atlas_packets',
   ];
   const graphV2Crosswalk = graphV2CrosswalkTables.every((table) => present.has(table))
-    ? await pool.query(`
+    ? await readOnlyClient.query(`
       WITH validated_snapshots AS MATERIALIZED (
         SELECT snapshot_id, source_manifest->>'workspaceRevision' AS workspace_revision, topology_hash
         FROM atlas_graph_snapshots_v2
@@ -139,6 +144,10 @@ async function main() {
       FROM relation_summary
     `, [workspaceRevision])
     : null;
+  await readOnlyClient.query('ROLLBACK');
+  readOnlyTransactionOpen = false;
+  readOnlyClient.release();
+  readOnlyClient = null;
   const snapshotOwner = revisionTables.atlas_graph_snapshots_v2 ?? null;
   const analysisOwner = revisionTables.graph_analysis_runs ?? null;
   const report = {
@@ -178,6 +187,11 @@ async function main() {
 }
 
 main().catch(async (error) => {
+  if (readOnlyClient) {
+    if (readOnlyTransactionOpen) await readOnlyClient.query('ROLLBACK').catch(() => {});
+    readOnlyClient.release();
+    readOnlyClient = null;
+  }
   await pool.end().catch(() => {});
   console.error(`[graph-revision-owner] ${error instanceof Error ? error.message : String(error)}`);
   process.exitCode = 1;

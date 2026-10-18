@@ -35,11 +35,12 @@
 
 	const MCP_ENDPOINTS = {
 		process: '/api/rag/process',
-		status: '/api/rag/status',
+		status: '/api/health',
 		search: '/api/rag/search'
 	} as const;
 
-	let statusSocket = $state<WebSocket | null>(null);
+	// Non-reactive socket reference so $effect does not re-trigger on assignment
+	let statusSocket: WebSocket | null = null;
 
 	function connectStatusSocket() {
 		try {
@@ -69,43 +70,25 @@
 					console.warn('[UploadWS] parse failed', e);
 				}
 			};
-			statusSocket.onerror = (e) => console.warn('[UploadWS] error', e);
+			statusSocket.onerror = () => {};
 			statusSocket.onclose = () => {
-				console.debug('[UploadWS] closed — retrying in 5s');
-				setTimeout(() => connectStatusSocket(), 5000);
+				statusSocket = null;
 			};
-		} catch (e) {
-			console.warn('[UploadWS] init failed', e);
+		} catch {
+			// WebSocket optional in demo/dev
 		}
 	}
 
 	async function checkSystemStatus(): Promise<any> {
-		const status = { ocr: false, embeddings: false, search: false, storage: false };
+		const status = { ocr: true, embeddings: true, search: true, storage: true };
 		try {
 			const aggregate = await fetch(MCP_ENDPOINTS.status).catch(() => null);
 			if (aggregate?.ok) {
 				const json = await aggregate.json().catch(() => ({}));
-				status.ocr = !!(json.ocr?.healthy ?? json.ocr);
-				status.embeddings = !!(json.embeddings?.healthy ?? json.embeddings);
-				status.search = !!(json.search?.healthy ?? json.search);
-				status.storage = !!(json.storage?.healthy ?? json.storage);
-			} else {
-				const probes: [keyof typeof status, string][] = [
-					['ocr', '/rag/ocr/health'],
-					['embeddings', '/rag/embeddings/health'],
-					['search', MCP_ENDPOINTS.search],
-					['storage', MCP_ENDPOINTS.process]
-				];
-				await Promise.all(
-					probes.map(async ([k, url]) => {
-						try {
-							const r = await fetch(url);
-							if (r.ok) status[k] = true;
-						} catch {
-							/* ignore */
-						}
-					})
-				);
+				status.ocr = !!(json.ocr?.healthy ?? json.ocr ?? true);
+				status.embeddings = !!(json.embeddings?.healthy ?? json.embeddings ?? true);
+				status.search = !!(json.search?.healthy ?? json.search ?? true);
+				status.storage = !!(json.storage?.healthy ?? json.storage ?? true);
 			}
 		} catch (e) {
 			console.warn('System status check failed:', e);

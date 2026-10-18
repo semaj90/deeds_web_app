@@ -8,6 +8,7 @@
  * No embeddings needed — pure string matching on indexed metadata.
  */
 import { json, error } from '@sveltejs/kit';
+import { building } from '$app/environment';
 import type { RequestHandler } from './$types';
 import Fuse from 'fuse.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -95,10 +96,12 @@ async function refreshMetadataCache(): Promise<void> {
 	}
 }
 
-// Eager warm-up on first import (non-blocking)
-refreshMetadataCache().catch(() => {
-	/* Qdrant may not be ready at startup — first request will retry */
-});
+// Eager warm-up on first import (non-blocking, skipped during production build)
+if (!building) {
+	refreshMetadataCache().catch(() => {
+		/* Qdrant may not be ready at startup — first request will retry */
+	});
+}
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });

@@ -1,0 +1,1481 @@
+{
+  "schema": "atlas.unknowns-enrichment-provenance.v1",
+  "generatedAt": "2026-10-18T01:37:33.978Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "totalEnrichedChunks": 10,
+  "goldenRetrievalProvenance": {
+    "contractVersion": "ContextManifestV1",
+    "lineageBound": true,
+    "forbiddenPayloadsBlocked": [
+      "hiddenThoughts",
+      "chainOfThought",
+      "kv_cache",
+      "raw_tensor"
+    ]
+  },
+  "records": [
+    {
+      "chunkId": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+      "canonicalMetadata": {
+        "sourceRef": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+        "extension": "svelte",
+        "fileDepth": 5,
+        "provenanceHash": "sha256:22b006f419e4e8d4899680b30203d425257eb13ad95520c9f0a4cb64b57621f3",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 6,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "lib",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "components",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "evidence",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "evidenceprimaryupload",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "svelte",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 5
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "01e87f18-4164-43e4-8466-c189e0f8f0c5",
+      "canonicalMetadata": {
+        "sourceRef": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+        "extension": "svelte",
+        "fileDepth": 5,
+        "provenanceHash": "sha256:22b006f419e4e8d4899680b30203d425257eb13ad95520c9f0a4cb64b57621f3",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 6,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "lib",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "components",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "evidence",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "evidenceprimaryupload",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "svelte",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 5
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "0001981c-da69-4b0e-9acb-ad29544029c8",
+      "canonicalMetadata": {
+        "sourceRef": "src/routes/(app)/demos/+page.svelte",
+        "extension": "svelte",
+        "fileDepth": 5,
+        "provenanceHash": "sha256:27380d0c115660fcb8fe9601c6b0098351dcd8d8fdcf523356a73454b6557edb",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 6,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "routes",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "(app)",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "demos",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "+page",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "svelte",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 5
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "07f23175-a295-4824-b881-c9864ab682f6",
+      "canonicalMetadata": {
+        "sourceRef": "src/routes/(app)/demos/+page.svelte",
+        "extension": "svelte",
+        "fileDepth": 5,
+        "provenanceHash": "sha256:27380d0c115660fcb8fe9601c6b0098351dcd8d8fdcf523356a73454b6557edb",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 6,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "routes",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "(app)",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "demos",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "+page",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "svelte",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 5
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "0002c4d4-3f96-4a8f-934d-61d8c6985340",
+      "canonicalMetadata": {
+        "sourceRef": "src/routes/(app)/demos/notifications/+page.svelte",
+        "extension": "svelte",
+        "fileDepth": 6,
+        "provenanceHash": "sha256:1a8506eacdcb8cce6c8577bbbf3a998c1a645f4ad1504595818a02851f84d9d7",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 7,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "routes",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "(app)",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "demos",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "notifications",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "+page",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "svelte",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 6
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "0004791e-40fe-4736-be3b-d84796ac5476",
+      "canonicalMetadata": {
+        "sourceRef": "src/routes/(app)/admin/codebase-index/+page.svelte",
+        "extension": "svelte",
+        "fileDepth": 6,
+        "provenanceHash": "sha256:717acaa37a87b7b2457adb68fcafedf9b452e188fab08850f0acb0b235f2fafa",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 8,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "routes",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "(app)",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "admin",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "codebase",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "index",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "+page",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "svelte",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 7
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "00bc830e-5f84-4609-a314-a513aa409a30",
+      "canonicalMetadata": {
+        "sourceRef": "src/routes/(app)/admin/codebase-index/+page.svelte",
+        "extension": "svelte",
+        "fileDepth": 6,
+        "provenanceHash": "sha256:717acaa37a87b7b2457adb68fcafedf9b452e188fab08850f0acb0b235f2fafa",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 8,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "routes",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "(app)",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "admin",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "codebase",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "index",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "+page",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "svelte",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 7
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "0005b01a-8f57-4e30-8f61-5dc85bcd991d",
+      "canonicalMetadata": {
+        "sourceRef": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+        "extension": "ts",
+        "fileDepth": 5,
+        "provenanceHash": "sha256:f687fb79f3a03e82fde83687937b16b38a92043b29465d0351696be317c04de6",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 9,
+        "taggedTokens": [
+          {
+            "token": "packages",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "parent",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "atlas",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "retrieval",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "gpu",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "gpu",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "job",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "queue",
+            "tag": "IDENTIFIER"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 0,
+          "identifiers": 9
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "retrieval",
+        "scoreMargin": 0.192,
+        "candidateRankings": [
+          {
+            "domain": "retrieval",
+            "score": -0.71
+          },
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          }
+        ],
+        "calibratedConfidence": 0.7192
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+      "canonicalMetadata": {
+        "sourceRef": "src/lib/server/analytics/unified-research-query.ts",
+        "extension": "ts",
+        "fileDepth": 5,
+        "provenanceHash": "sha256:df8b4a29338c2f074f524dc9da7a74d03284043db9e6b6265c96a3235217e406",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 7,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "lib",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "server",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "analytics",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "unified",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "research",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "query",
+            "tag": "IDENTIFIER"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 0,
+          "identifiers": 7
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    },
+    {
+      "chunkId": "000700dd-d698-4589-a3b3-62c404909095",
+      "canonicalMetadata": {
+        "sourceRef": "src/lib/server/db/schema-postgres.ts",
+        "extension": "ts",
+        "fileDepth": 5,
+        "provenanceHash": "sha256:4c56fd544344bf4f1979e1c7756f6d2cbdea597083ba235b15023a164a74e9a1",
+        "authorityState": "CURRENT_ADMITTED"
+      },
+      "posEnrichment": {
+        "totalTokens": 5,
+        "taggedTokens": [
+          {
+            "token": "src",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "lib",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "server",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "schema",
+            "tag": "IDENTIFIER"
+          },
+          {
+            "token": "postgres",
+            "tag": "PROPN"
+          }
+        ],
+        "posDistribution": {
+          "nouns": 0,
+          "verbs": 0,
+          "adj": 0,
+          "propn": 1,
+          "identifiers": 4
+        }
+      },
+      "naiveBayesEnrichment": {
+        "predictedDomain": "frontend",
+        "scoreMargin": 0.606,
+        "candidateRankings": [
+          {
+            "domain": "frontend",
+            "score": -0.9
+          },
+          {
+            "domain": "agent",
+            "score": -1.51
+          },
+          {
+            "domain": "retrieval",
+            "score": -2.21
+          }
+        ],
+        "calibratedConfidence": 0.7605999999999999
+      },
+      "xgboostClusteringParameters": {
+        "method": "topk_inverse_pagination_centroid_clusters",
+        "topK": 5,
+        "centroidMatches": [
+          {
+            "centroidId": 42,
+            "rank": 1,
+            "inversePaginationWeight": 1,
+            "calibratedRankScore": 0.89,
+            "xgboostFeatureVector": [
+              0.89,
+              1,
+              0.89,
+              1
+            ]
+          },
+          {
+            "centroidId": 108,
+            "rank": 2,
+            "inversePaginationWeight": 0.631,
+            "calibratedRankScore": 0.511,
+            "xgboostFeatureVector": [
+              0.81,
+              0.6309297535714575,
+              0.511,
+              1
+            ]
+          },
+          {
+            "centroidId": 17,
+            "rank": 3,
+            "inversePaginationWeight": 0.5,
+            "calibratedRankScore": 0.37,
+            "xgboostFeatureVector": [
+              0.74,
+              0.5,
+              0.37,
+              1
+            ]
+          },
+          {
+            "centroidId": 219,
+            "rank": 4,
+            "inversePaginationWeight": 0.431,
+            "calibratedRankScore": 0.293,
+            "xgboostFeatureVector": [
+              0.68,
+              0.43067655807339306,
+              0.293,
+              1
+            ]
+          },
+          {
+            "centroidId": 88,
+            "rank": 5,
+            "inversePaginationWeight": 0.387,
+            "calibratedRankScore": 0.24,
+            "xgboostFeatureVector": [
+              0.62,
+              0.38685280723454163,
+              0.24,
+              1
+            ]
+          }
+        ],
+        "selectedBestFitCentroid": 42
+      },
+      "pytorchAtenDescriptor": {
+        "tensorType": "at::kFloat",
+        "shape": [
+          1,
+          768
+        ],
+        "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+        "device": "CPU",
+        "zeroCopyBlob": true,
+        "hiddenThoughtsPersisted": false
+      }
+    }
+  ]
+}

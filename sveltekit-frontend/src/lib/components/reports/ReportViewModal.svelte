@@ -65,12 +65,16 @@
 {#if open && report}
 	<div
 		class="rvm-backdrop"
-		role="dialog"
-		aria-modal="true"
-		aria-label="Report preview"
+		role="presentation"
 		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
 	>
-		<div class="rvm-panel">
+		<div
+			class="rvm-panel"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Report preview"
+			tabindex="-1"
+		>
 			<!-- Header -->
 			<div class="rvm-header">
 				<div class="rvm-title-row">

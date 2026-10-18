@@ -1,75 +1,340 @@
 {
-  "schema": "nes_chrom_packet_recent_hits_report.v1",
-  "generatedAt": "2026-06-01T20:20:19.904Z",
-  "tables": {
-    "packetTable": "nes_chrom_packets",
-    "hitTable": "nes_chrom_kag_dag_hits"
-  },
-  "counts": {
-    "packets": 3,
-    "hits": 3
-  },
-  "coverage": {
-    "sourceRef": 1,
-    "featureId": 1,
-    "parentAtlasCardId": 0,
-    "queryHash": 1,
-    "chunkId": 1
-  },
-  "missing": {
-    "featureId": [],
-    "sourceRef": []
-  },
-  "top": {
-    "sourceRefs": [
-      {
-        "value": "src/lib/components/ui/gaming/index.ts",
-        "count": 1
-      },
-      {
-        "value": "src/lib/components/ui/gaming/n64/index.ts",
-        "count": 1
-      },
-      {
-        "value": "src/lib/components/ui/index.ts",
-        "count": 1
-      }
-    ],
-    "featureIds": [
-      {
-        "value": "ui",
-        "count": 3
-      }
-    ]
+  "schema": "atlas.nes-chrom-packet-recent-hits.v1",
+  "generatedAt": "2026-10-17T17:12:04.445Z",
+  "readOnlyTransaction": "ROLLED_BACK",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "queryRoutes": {
+    "sveltekitEndpoint": "/api/atlas/nes-chrom",
+    "cliRunner": "scripts/atlas/query-nes-chrom-recent-hits-v1.mjs"
   },
   "filters": {
     "sourceRef": null,
     "featureId": null,
     "queryHash": null,
-    "parentAtlasCardId": null,
-    "limit": 3
+    "parentAtlasCardId": null
   },
-  "inspection": {
-    "writerPath": "sveltekit-frontend/src/lib/server/features/ai/ace/nes-chrom-packet-service.ts",
-    "aceAssemblyHookPath": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-    "readQueryPath": "sveltekit-frontend/src/routes/api/atlas/nes-chrom/+server.ts",
-    "existingReportPaths": [
-      "docs/reports/nes-chrom-packet-kag-dag-map.md",
-      "docs/reports/nes-chrom-packet-recent-hits.{json,md}"
+  "counts": {
+    "totalLoadedPackets": 100,
+    "matchedPackets": 100,
+    "matchedHits": 0
+  },
+  "summary": {
+    "sourceRefCoverage": 1,
+    "featureIdCoverage": 1,
+    "queryHashCoverage": 1,
+    "chunkIdCoverage": 1,
+    "parentAtlasCoverage": 0
+  },
+  "top": {
+    "sourceRefs": [
+      {
+        "value": "src/lib/components/shells/AGENTS.md",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/shells/BridgeActions.svelte",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/shells/index.ts",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/shells/InvestigationShell.svelte",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/shells/ResearchShell.svelte",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/source-validation/AGENTS.md",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/source-validation/AnswerGenerator.svelte",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/source-validation/CitationInspector.svelte",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/source-validation/ProvenanceGraph.svelte",
+        "count": 1
+      },
+      {
+        "value": "src/lib/components/source-validation/SourceValidator.svelte",
+        "count": 1
+      }
     ],
-    "chr97VsNesChrom": "separate-but-adjacent lanes: CHR97 is the cartridge fast-path search lane; NES chrom is the durable ACE packet + hit report lane.",
-    "canonicalReportPath": "docs/reports/nes-chrom-packet-kag-dag-map.md + docs/reports/nes-chrom-packet-recent-hits.{json,md}"
+    "featureIds": [
+      {
+        "value": "AGENTS",
+        "count": 11
+      },
+      {
+        "value": "index",
+        "count": 6
+      },
+      {
+        "value": "sveltekit-frontend.Badge",
+        "count": 2
+      },
+      {
+        "value": "sveltekit-frontend.Button",
+        "count": 2
+      },
+      {
+        "value": "sveltekit-frontend.Card",
+        "count": 2
+      },
+      {
+        "value": "sveltekit-frontend.CardDescription",
+        "count": 2
+      },
+      {
+        "value": "sveltekit-frontend.CardFooter",
+        "count": 2
+      },
+      {
+        "value": "sveltekit-frontend.CardHeader",
+        "count": 2
+      },
+      {
+        "value": "AccessibilityPanel",
+        "count": 1
+      },
+      {
+        "value": "AIDropdown",
+        "count": 1
+      }
+    ],
+    "queryHashes": [
+      {
+        "value": "009d14c8",
+        "count": 1
+      },
+      {
+        "value": "03513d81",
+        "count": 1
+      },
+      {
+        "value": "043b4e0e",
+        "count": 1
+      },
+      {
+        "value": "04a989f3",
+        "count": 1
+      },
+      {
+        "value": "0a63e65d",
+        "count": 1
+      },
+      {
+        "value": "0bb38acc",
+        "count": 1
+      },
+      {
+        "value": "0da17480",
+        "count": 1
+      },
+      {
+        "value": "1029742e",
+        "count": 1
+      },
+      {
+        "value": "11fe2462",
+        "count": 1
+      },
+      {
+        "value": "16062ebd",
+        "count": 1
+      }
+    ]
   },
-  "integrity": {
-    "sourceRefPreserved": true,
-    "sourceRefsPreserved": true,
-    "featureIdPreserved": true,
-    "parentAtlasCardIdPreserved": false,
-    "sourceRefFeatureIdReplaySpineIntact": true
-  },
-  "databaseStatus": {
-    "packetTablePresent": true,
-    "hitTablePresent": true,
-    "note": "Both NES chrom tables are present in the current database."
-  }
+  "samplePackets": [
+    {
+      "id": "a1689f7a-719b-4d14-a20d-f2a34f464038",
+      "packetKey": "nes:sveltekit-frontend_dialogheader:1b2fd286",
+      "sourceRef": "src/lib/components/ui/dialog/DialogHeader.svelte",
+      "featureId": "sveltekit-frontend.DialogHeader",
+      "queryHash": "b5b94e02",
+      "chunkId": "1b2fd286",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.509Z"
+    },
+    {
+      "id": "8e7a63ee-2a69-4218-bb6d-78c451591338",
+      "packetKey": "nes:dialogfooter:9646a844",
+      "sourceRef": "src/lib/components/ui/dialog/DialogFooter.svelte",
+      "featureId": "DialogFooter",
+      "queryHash": "c5d25f6e",
+      "chunkId": "9646a844",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.498Z"
+    },
+    {
+      "id": "bade74b8-5d34-4c1b-a91e-2f4dc2c734c7",
+      "packetKey": "nes:dialogdescription:a91bee96",
+      "sourceRef": "src/lib/components/ui/dialog/DialogDescription.svelte",
+      "featureId": "DialogDescription",
+      "queryHash": "19121881",
+      "chunkId": "a91bee96",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.479Z"
+    },
+    {
+      "id": "530cd319-c66c-4187-98fc-ff9def09264d",
+      "packetKey": "nes:dialogcontent:1065d153",
+      "sourceRef": "src/lib/components/ui/dialog/DialogContent.svelte",
+      "featureId": "DialogContent",
+      "queryHash": "5a07549b",
+      "chunkId": "1065d153",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.458Z"
+    },
+    {
+      "id": "4479625d-9eae-4afb-9444-eab896d2b990",
+      "packetKey": "nes:sveltekit-frontend_dialogclose:e076e6ad",
+      "sourceRef": "src/lib/components/ui/dialog/DialogClose.svelte",
+      "featureId": "sveltekit-frontend.DialogClose",
+      "queryHash": "f00f82a9",
+      "chunkId": "e076e6ad",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.441Z"
+    },
+    {
+      "id": "18120ff3-5499-4910-86d8-2823398dcbf2",
+      "packetKey": "nes:agents:42c6c2f6",
+      "sourceRef": "src/lib/components/ui/dialog/AGENTS.md",
+      "featureId": "AGENTS",
+      "queryHash": "65cb4153",
+      "chunkId": "42c6c2f6",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.413Z"
+    },
+    {
+      "id": "2e480e2d-9e64-4bfb-99dd-3ab31d8170bc",
+      "packetKey": "nes:sveltekit-frontend_textarea:6c0cd9ce",
+      "sourceRef": "src/lib/components/ui/core/Textarea.svelte",
+      "featureId": "sveltekit-frontend.Textarea",
+      "queryHash": "9c4d2c0e",
+      "chunkId": "6c0cd9ce",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.399Z"
+    },
+    {
+      "id": "51c3bf99-ebcd-4dfa-a9d7-55dc54e868db",
+      "packetKey": "nes:label:4ce57bdb",
+      "sourceRef": "src/lib/components/ui/core/Label.svelte",
+      "featureId": "Label",
+      "queryHash": "7b763da7",
+      "chunkId": "4ce57bdb",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.387Z"
+    },
+    {
+      "id": "9dcb7763-09c6-4d34-bac7-d6fad60d169a",
+      "packetKey": "nes:agents:3c626865",
+      "sourceRef": "src/lib/components/ui/core/AGENTS.md",
+      "featureId": "AGENTS",
+      "queryHash": "3677b24a",
+      "chunkId": "3c626865",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.377Z"
+    },
+    {
+      "id": "33c90ac7-d475-4628-91af-3ff7c8cd4e77",
+      "packetKey": "nes:sveltekit-frontend_contextmenutrigger:189bcfec",
+      "sourceRef": "src/lib/components/ui/ContextMenuTrigger.svelte",
+      "featureId": "sveltekit-frontend.ContextMenuTrigger",
+      "queryHash": "d3f916a2",
+      "chunkId": "189bcfec",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.360Z"
+    },
+    {
+      "id": "7884b8d1-52f9-44d0-ba90-89efa317138a",
+      "packetKey": "nes:contextmenuseparator:c2926512",
+      "sourceRef": "src/lib/components/ui/ContextMenuSeparator.svelte",
+      "featureId": "ContextMenuSeparator",
+      "queryHash": "d55d2546",
+      "chunkId": "c2926512",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.340Z"
+    },
+    {
+      "id": "e22c77b4-ecd4-4cbc-866d-23ca868f1aca",
+      "packetKey": "nes:context-menu:aadc96bf",
+      "sourceRef": "src/lib/components/ui/context-menu.js",
+      "featureId": "context-menu",
+      "queryHash": "804b9000",
+      "chunkId": "aadc96bf",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.328Z"
+    },
+    {
+      "id": "12f2d085-1b4d-46eb-b40b-c7d61e159da1",
+      "packetKey": "nes:sveltekit-frontend_contextmenuitem:ed05fa38",
+      "sourceRef": "src/lib/components/ui/ContextMenuItem.svelte",
+      "featureId": "sveltekit-frontend.ContextMenuItem",
+      "queryHash": "043b4e0e",
+      "chunkId": "ed05fa38",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.316Z"
+    },
+    {
+      "id": "8b3839b4-efc5-4732-82b9-fc24557ad823",
+      "packetKey": "nes:contextmenucontent:aba191b8",
+      "sourceRef": "src/lib/components/ui/ContextMenuContent.svelte",
+      "featureId": "ContextMenuContent",
+      "queryHash": "6d745aec",
+      "chunkId": "aba191b8",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.301Z"
+    },
+    {
+      "id": "7780e959-f655-4aaa-ab54-3087bfb411f4",
+      "packetKey": "nes:sveltekit-frontend_commandpalette:dfba946a",
+      "sourceRef": "src/lib/components/ui/CommandPalette.svelte",
+      "featureId": "sveltekit-frontend.CommandPalette",
+      "queryHash": "6ec57241",
+      "chunkId": "dfba946a",
+      "lane": "atlas_materialized",
+      "packetType": "nes_chrom",
+      "qdrantPointId": null,
+      "createdAt": "2026-08-27T00:04:45.260Z"
+    }
+  ],
+  "sampleHits": []
 }

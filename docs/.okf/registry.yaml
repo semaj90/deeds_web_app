@@ -91,6 +91,17 @@ fabric:
       required: [packetKey, sourceRef, workspaceRevision, evidenceRefs]
       hiddenReasoningPersistence: forbidden
 contracts:
+  - name: local-deep-research-documentation-v1
+    owner: docs/.okf/ldr/README.md
+    role: pinned, checksummed external documentation capture for LearningCircuit LDR and its Firecrawl/BeautifulSoup acquisition adapters
+    notes:
+      - ldr_runtime_version_1.10.1
+      - upstream_commit_8239c688206976926752ddfda8a76d9362a3e021
+      - captures_noncanonical_and_local_only
+      - ldr_report_generation_is_separate
+      - checksum_verified_chunk_staging_helper_plan_only_by_default
+      - optional_embedding_output_is_derived_jsonl_not_postgresql_admission
+      - no_source_revision_backfill_or_atlas_promotion
   - name: parent-atlas-code-exploration-index-v1
     owner: .okf/indexes/code-exploration.yaml
     role: rebuildable AST-grep and Tree-sitter exploration projection contract

@@ -90,7 +90,7 @@ const tabs = [
 				<Svelte5TabPanel value="form">
 					<div class="space-y-4 p-4 bg-sand/10 rounded-lg">
 						<div>
-							<label class="block text-sm font-medium text-slate-300 mb-1">Document Name</label>
+							<span class="block text-sm font-medium text-slate-300 mb-1">Document Name</span>
 							<Svelte5Input
 								bind:value={inputValue}
 								placeholder="Enter document name..."

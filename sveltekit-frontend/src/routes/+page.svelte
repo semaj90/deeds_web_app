@@ -1603,11 +1603,6 @@
 	color: #8a7a5a;
  }
 
- .dialog-hint code {
-	color: #b4a080;
-	font-size: 0.7rem;
- }
-
  /* Responsive */
  @media (max-width: 1200px) {
  .content-grid {

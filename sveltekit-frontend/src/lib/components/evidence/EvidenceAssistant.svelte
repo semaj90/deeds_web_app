@@ -210,7 +210,7 @@ description: suggestion },
 </DialogRoot>
 
 <style>
- .evidence-dialog {
+ :global(.evidence-dialog) {
  max-width: 600px;
  max-height: 80vh;
  overflow-y: auto;
@@ -308,7 +308,7 @@ description: suggestion },
  }
 
  .edit-form input,
- .edit-form textarea { padding: 0.5rem;
+ .edit-form :global(textarea) { padding: 0.5rem;
 		border: 1px solid #d1d5db;
  border-radius: 4px;
  font-size: 0.9rem;

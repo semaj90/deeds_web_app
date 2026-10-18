@@ -9,7 +9,7 @@ const pgPool = new Pool({ connectionString: ENV.DATABASE_URL });
 async function probeService(name: string, url: string) {
   const startedAt = Date.now();
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(1200) });
     return {
       name,
       ok: res.ok,
@@ -158,7 +158,7 @@ export const load: PageServerLoad = async ({ locals }) => {
   // 3. Qdrant Stats (Mock or fetch if possible)
   let qdrantStats = { collectionCount: 0, points: 0 };
   try {
-    const res = await fetch(`${ENV.QDRANT_URL}/collections`);
+    const res = await fetch(`${ENV.QDRANT_URL}/collections`, { signal: AbortSignal.timeout(1200) });
     const data = await res.json();
     qdrantStats.collectionCount = data.result?.collections?.length || 0;
     qdrantStats.points = data.result?.collections?.reduce((acc: number, item: { vectors_count?: number }) => acc + (item.vectors_count ?? 0), 0) || 0;

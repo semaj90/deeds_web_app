@@ -21,10 +21,6 @@
 </main>
 
 <style>
- .page-container {
- min-height: 100vh;
-	background: #f8fafc;
- }
  .case-scoring-dashboard {
  padding: 1rem;
 	background: var(--surface, #fff);

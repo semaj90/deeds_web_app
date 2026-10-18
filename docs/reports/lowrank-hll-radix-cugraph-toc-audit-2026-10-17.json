@@ -1,0 +1,769 @@
+{
+  "auditId": "LOWRANK-HLL-RADIX-CUGRAPH-TOC-AUDIT-01",
+  "generatedAt": "2026-10-17T20:05:36.901Z",
+  "readiness": {
+    "devGpuScript": "node scripts/startup/dev-gpu-runtime.mjs",
+    "devClusterGpuScript": null,
+    "recommendedLogCommand": "cd sveltekit-frontend && npm run dev:gpu 2>&1 | Tee-Object -FilePath ../logs/dev-gpu-startup.log",
+    "sidecar8095": {
+      "url": "http://127.0.0.1:8095/health",
+      "reachable": true,
+      "status": 200
+    }
+  },
+  "svelteAstGrepProbe": {
+    "symbols": [
+      "import:svelte",
+      "refreshCatalog",
+      "routes",
+      "snippet:routeRow",
+      "totalCount"
+    ],
+    "coverage": 1,
+    "method": "ast_grep",
+    "error": null
+  },
+  "svelteKitDocsComparison": {
+    "legacyLlmsTxt": {
+      "path": "docs/llms/generated/sveltekit.llms-full.txt",
+      "bytes": 3067,
+      "lines": 57,
+      "topicsCovered": [
+        "form-actions",
+        "load",
+        "routing"
+      ],
+      "hasSvelte5Runes": false,
+      "hasByteSpansOrChecksums": false
+    },
+    "okfPinnedSvelteKit": {
+      "manifestPath": "docs/.okf/dev/pinned-docs.manifest.json",
+      "sveltekitChunksPath": "docs/.okf/pinned/sveltekit/chunks.jsonl",
+      "sveltekitChunkCount": 233,
+      "svelte5RunesChunksPath": "docs/.okf/pinned/svelte5-runes/chunks.jsonl",
+      "svelte5RunesChunkCount": 113,
+      "totalOkfSvelteChunks": 346,
+      "pagesCovered": [
+        "https://svelte.dev/docs/kit/load",
+        "https://svelte.dev/docs/kit/page-options",
+        "https://svelte.dev/docs/kit/state-management",
+        "https://svelte.dev/docs/kit/hooks",
+        "https://svelte.dev/docs/kit/form-actions",
+        "https://svelte.dev/docs/svelte/$state",
+        "https://svelte.dev/docs/svelte/$derived",
+        "https://svelte.dev/docs/svelte/$effect",
+        "https://svelte.dev/docs/svelte/$props"
+      ],
+      "hasByteSpansAndChecksums": true,
+      "canonicalAuthority": false
+    }
+  },
+  "domainLinkedListBatchGemm": {
+    "llmsTxtSummary": {
+      "sectionCount": 4,
+      "domainDistribution": {
+        "auth": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "ui": {
+          "count": 2,
+          "headKey": "llms_txt:sveltekit:0",
+          "tailKey": "llms_txt:sveltekit:2"
+        },
+        "retrieval": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "network": {
+          "count": 2,
+          "headKey": "llms_txt:sveltekit:1",
+          "tailKey": "llms_txt:sveltekit:3"
+        },
+        "database": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "cache": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "agent": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "graph": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "ml": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "general": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        }
+      }
+    },
+    "okfPinnedSummary": {
+      "totalChunksIngested": 346,
+      "sveltekitChunks": 233,
+      "svelte5RunesChunks": 113,
+      "domainDistribution": {
+        "auth": {
+          "count": 2,
+          "headKey": "doc:sveltekit:7a324db7f230dd74:13",
+          "tailKey": "doc:sveltekit:7a324db7f230dd74:16"
+        },
+        "ui": {
+          "count": 146,
+          "headKey": "doc:sveltekit:06e90a20fdbc13da:6",
+          "tailKey": "doc:svelte5-runes:402c1c1b8e627c1b:18"
+        },
+        "retrieval": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "network": {
+          "count": 181,
+          "headKey": "doc:sveltekit:06e90a20fdbc13da:0",
+          "tailKey": "doc:svelte5-runes:5d3788ea029a5a8d:48"
+        },
+        "database": {
+          "count": 13,
+          "headKey": "doc:sveltekit:67117dfcf89f6564:3",
+          "tailKey": "doc:svelte5-runes:402c1c1b8e627c1b:6"
+        },
+        "cache": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "agent": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "graph": {
+          "count": 4,
+          "headKey": "doc:sveltekit:67117dfcf89f6564:2",
+          "tailKey": "doc:sveltekit:c2b99e4ad0d9394f:48"
+        },
+        "ml": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        },
+        "general": {
+          "count": 0,
+          "headKey": null,
+          "tailKey": null
+        }
+      },
+      "sampleUiLinkedChainFirst3": [
+        {
+          "id": "doc:sveltekit:06e90a20fdbc13da:6",
+          "primaryDomain": "ui",
+          "prevKey": null,
+          "nextKey": "doc:sveltekit:06e90a20fdbc13da:9",
+          "lutByte": 2,
+          "nesHex": "0x2A",
+          "confidence": 0.5111
+        },
+        {
+          "id": "doc:sveltekit:06e90a20fdbc13da:9",
+          "primaryDomain": "ui",
+          "prevKey": "doc:sveltekit:06e90a20fdbc13da:6",
+          "nextKey": "doc:sveltekit:06e90a20fdbc13da:13",
+          "lutByte": 2,
+          "nesHex": "0x2A",
+          "confidence": 0.5786
+        },
+        {
+          "id": "doc:sveltekit:06e90a20fdbc13da:13",
+          "primaryDomain": "ui",
+          "prevKey": "doc:sveltekit:06e90a20fdbc13da:9",
+          "nextKey": "doc:sveltekit:06e90a20fdbc13da:14",
+          "lutByte": 2,
+          "nesHex": "0x2A",
+          "confidence": 0.8167
+        }
+      ],
+      "sampleNetworkLinkedChainFirst3": [
+        {
+          "id": "doc:sveltekit:06e90a20fdbc13da:0",
+          "primaryDomain": "network",
+          "prevKey": null,
+          "nextKey": "doc:sveltekit:06e90a20fdbc13da:1",
+          "lutByte": 4,
+          "nesHex": "0x2C",
+          "confidence": 0.7192
+        },
+        {
+          "id": "doc:sveltekit:06e90a20fdbc13da:1",
+          "primaryDomain": "network",
+          "prevKey": "doc:sveltekit:06e90a20fdbc13da:0",
+          "nextKey": "doc:sveltekit:06e90a20fdbc13da:2",
+          "lutByte": 4,
+          "nesHex": "0x2C",
+          "confidence": 0.5675
+        },
+        {
+          "id": "doc:sveltekit:06e90a20fdbc13da:2",
+          "primaryDomain": "network",
+          "prevKey": "doc:sveltekit:06e90a20fdbc13da:1",
+          "nextKey": "doc:sveltekit:06e90a20fdbc13da:3",
+          "lutByte": 4,
+          "nesHex": "0x2C",
+          "confidence": 0.5825
+        }
+      ]
+    },
+    "pytorchCollateVerification": {
+      "batchSize": 32,
+      "featureCols": 25,
+      "byteLength": 3200,
+      "dmaAligned4Byte": true,
+      "pytorchDataLoaderSpec": {
+        "datasetType": "MapStyleDataset",
+        "collateFn": "default_collate_fn_map[LinkedDomainNode -> torch.float32]",
+        "pinMemory": true,
+        "nonBlockingH2D": true,
+        "tensorShape": [
+          32,
+          25
+        ],
+        "dtype": "torch.float32 (ATen::kFloat)"
+      }
+    },
+    "tensorRtRtxGemmVerification": {
+      "schema": "atlas.tensorrt-rtx-batch-gemm-receipt.v1",
+      "inputShape": [
+        32,
+        25
+      ],
+      "weightShape": [
+        25,
+        64
+      ],
+      "outputShape": [
+        32,
+        64
+      ],
+      "outputByteLength": 8192,
+      "allFinite": true,
+      "sampleRow0First8": [
+        0,
+        0.4099070131778717,
+        0,
+        0.44949400424957275,
+        0,
+        0.20668800175189972,
+        0,
+        0
+      ],
+      "outputSha256": "sha256:a2973d5fe71179205681e16ed9accebfe020e75d0e04302abb75200911e7a17d",
+      "tensorRtRtxEngineContract": {
+        "operation": "GEMM_BIAS_RELU (cublasGemmEx / TensorRT-RTX IMatrixMultiplyLayer)",
+        "targetToolkit": "CUDA 13.3 / 13.4 + TensorRT-RTX",
+        "precisionModes": [
+          "FP32_ORACLE",
+          "BF16_TENSOR_CORE",
+          "FP8_E4M3"
+        ],
+        "canonicalAuthority": false,
+        "writesPerformed": false
+      }
+    }
+  },
+  "oakErrorStream": {
+    "ndjsonPath": "logs/error-stream-embeddinggemma-oak-v1.ndjson",
+    "totalEventsLogged": 7,
+    "uniqueFilesEstimatedHll": 7,
+    "exactUniqueFiles": 7,
+    "topOakPythonTuples": [
+      {
+        "ordinal": 0,
+        "file_path": "scripts/workers/legal-chunk-embed-worker.mjs",
+        "lane": "embeddinggemma_chunking",
+        "errorCount": 1,
+        "lutCode": "0x01",
+        "okfPredicate": "implements",
+        "optionId": "OPTION[embeddinggemma_768_chunk_gate]",
+        "rewardPrior": 0.6753,
+        "pythonTuple": "(\"file:scripts/workers/legal-chunk-embed-worker.mjs\", \"oak:curie:emb-chunk-worker-01\", \"0x01\", \"OPTION[embeddinggemma_768_chunk_gate]\", 0.6753, 64, \"implements\")",
+        "langchainDagAnalysis": {
+          "nodeId": "dag:oak:0",
+          "ornithModel": "ornith-1.5-9b",
+          "langExtractSidecar": "http://127.0.0.1:8095/analyze",
+          "rlmPointerTag": "<rlm_call label=\"oak:emb-chunk-worker-01\" />",
+          "canonicalAuthority": false,
+          "canonicalWritesAllowed": false
+        }
+      },
+      {
+        "ordinal": 1,
+        "file_path": "sveltekit-frontend/src/routes/admin/all-routes/+page.svelte",
+        "lane": "route_hardening_playwright",
+        "errorCount": 1,
+        "lutCode": "0x01",
+        "okfPredicate": "observed_at_runtime",
+        "optionId": "OPTION[route_ssr_hydration_guard]",
+        "rewardPrior": 0.6753,
+        "pythonTuple": "(\"file:sveltekit-frontend/src/routes/admin/all-routes/+page.svelte\", \"oak:curie:route-admin_all_routes\", \"0x01\", \"OPTION[route_ssr_hydration_guard]\", 0.6753, 64, \"observed_at_runtime\")",
+        "langchainDagAnalysis": {
+          "nodeId": "dag:oak:1",
+          "ornithModel": "ornith-1.5-9b",
+          "langExtractSidecar": "http://127.0.0.1:8095/analyze",
+          "rlmPointerTag": "<rlm_call label=\"oak:route-admin_all_routes\" />",
+          "canonicalAuthority": false,
+          "canonicalWritesAllowed": false
+        }
+      },
+      {
+        "ordinal": 2,
+        "file_path": "sveltekit-frontend/src/routes/admin/codebase-index/+page.svelte",
+        "lane": "route_hardening_playwright",
+        "errorCount": 1,
+        "lutCode": "0x01",
+        "okfPredicate": "observed_at_runtime",
+        "optionId": "OPTION[route_ssr_hydration_guard]",
+        "rewardPrior": 0.6753,
+        "pythonTuple": "(\"file:sveltekit-frontend/src/routes/admin/codebase-index/+page.svelte\", \"oak:curie:route-admin_codebase_index\", \"0x01\", \"OPTION[route_ssr_hydration_guard]\", 0.6753, 64, \"observed_at_runtime\")",
+        "langchainDagAnalysis": {
+          "nodeId": "dag:oak:2",
+          "ornithModel": "ornith-1.5-9b",
+          "langExtractSidecar": "http://127.0.0.1:8095/analyze",
+          "rlmPointerTag": "<rlm_call label=\"oak:route-admin_codebase_index\" />",
+          "canonicalAuthority": false,
+          "canonicalWritesAllowed": false
+        }
+      },
+      {
+        "ordinal": 3,
+        "file_path": "sveltekit-frontend/src/routes/api/library/search/+server.ts",
+        "lane": "embeddinggemma_chunking",
+        "errorCount": 1,
+        "lutCode": "0x01",
+        "okfPredicate": "validates",
+        "optionId": "OPTION[embeddinggemma_768_chunk_gate]",
+        "rewardPrior": 0.6753,
+        "pythonTuple": "(\"file:sveltekit-frontend/src/routes/api/library/search/+server.ts\", \"oak:curie:emb-chunk-search-02\", \"0x01\", \"OPTION[embeddinggemma_768_chunk_gate]\", 0.6753, 64, \"validates\")",
+        "langchainDagAnalysis": {
+          "nodeId": "dag:oak:3",
+          "ornithModel": "ornith-1.5-9b",
+          "langExtractSidecar": "http://127.0.0.1:8095/analyze",
+          "rlmPointerTag": "<rlm_call label=\"oak:emb-chunk-search-02\" />",
+          "canonicalAuthority": false,
+          "canonicalWritesAllowed": false
+        }
+      },
+      {
+        "ordinal": 4,
+        "file_path": "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.svelte",
+        "lane": "route_hardening_playwright",
+        "errorCount": 1,
+        "lutCode": "0x01",
+        "okfPredicate": "observed_at_runtime",
+        "optionId": "OPTION[route_ssr_hydration_guard]",
+        "rewardPrior": 0.6753,
+        "pythonTuple": "(\"file:sveltekit-frontend/src/routes/atlas/studio/openspec/+page.svelte\", \"oak:curie:route-atlas_studio_openspec\", \"0x01\", \"OPTION[route_ssr_hydration_guard]\", 0.6753, 64, \"observed_at_runtime\")",
+        "langchainDagAnalysis": {
+          "nodeId": "dag:oak:4",
+          "ornithModel": "ornith-1.5-9b",
+          "langExtractSidecar": "http://127.0.0.1:8095/analyze",
+          "rlmPointerTag": "<rlm_call label=\"oak:route-atlas_studio_openspec\" />",
+          "canonicalAuthority": false,
+          "canonicalWritesAllowed": false
+        }
+      },
+      {
+        "ordinal": 5,
+        "file_path": "sveltekit-frontend/src/routes/demos/nes-elements/+page.svelte",
+        "lane": "route_hardening_playwright",
+        "errorCount": 1,
+        "lutCode": "0x01",
+        "okfPredicate": "observed_at_runtime",
+        "optionId": "OPTION[route_ssr_hydration_guard]",
+        "rewardPrior": 0.6753,
+        "pythonTuple": "(\"file:sveltekit-frontend/src/routes/demos/nes-elements/+page.svelte\", \"oak:curie:route-demos_nes_elements\", \"0x01\", \"OPTION[route_ssr_hydration_guard]\", 0.6753, 64, \"observed_at_runtime\")",
+        "langchainDagAnalysis": {
+          "nodeId": "dag:oak:5",
+          "ornithModel": "ornith-1.5-9b",
+          "langExtractSidecar": "http://127.0.0.1:8095/analyze",
+          "rlmPointerTag": "<rlm_call label=\"oak:route-demos_nes_elements\" />",
+          "canonicalAuthority": false,
+          "canonicalWritesAllowed": false
+        }
+      },
+      {
+        "ordinal": 6,
+        "file_path": "sveltekit-frontend/src/routes/demos/synthesis-chat/+page.svelte",
+        "lane": "route_hardening_playwright",
+        "errorCount": 1,
+        "lutCode": "0x01",
+        "okfPredicate": "observed_at_runtime",
+        "optionId": "OPTION[route_ssr_hydration_guard]",
+        "rewardPrior": 0.6753,
+        "pythonTuple": "(\"file:sveltekit-frontend/src/routes/demos/synthesis-chat/+page.svelte\", \"oak:curie:route-demos_synthesis_chat\", \"0x01\", \"OPTION[route_ssr_hydration_guard]\", 0.6753, 64, \"observed_at_runtime\")",
+        "langchainDagAnalysis": {
+          "nodeId": "dag:oak:6",
+          "ornithModel": "ornith-1.5-9b",
+          "langExtractSidecar": "http://127.0.0.1:8095/analyze",
+          "rlmPointerTag": "<rlm_call label=\"oak:route-demos_synthesis_chat\" />",
+          "canonicalAuthority": false,
+          "canonicalWritesAllowed": false
+        }
+      }
+    ]
+  },
+  "ownershipInventory": [
+    {
+      "subsystem": "Phase 72 AST & Route Graph",
+      "canonicalOwner": "static/phase72/route-ast-graph.json + 8095 Tree-sitter/AST-grep sidecar",
+      "status": "APPLY_PROVEN",
+      "existingArtifacts": [
+        {
+          "path": "sveltekit-frontend/static/phase72/route-ast-graph.json",
+          "exists": true
+        },
+        {
+          "path": "sveltekit-frontend/src/routes/(app)/admin/all-routes/route-lineage.ts",
+          "exists": true
+        }
+      ],
+      "boundaryRule": "8095 owns CST/AST spans; resolveRouteFields normalizes routePath/filePath without promoting filesystem-only routes."
+    },
+    {
+      "subsystem": "Phase 66 RAG / HyperGraphRAG",
+      "canonicalOwner": "SearchRuntime + PostgreSQL 18 (semantic_768) + Qdrant projection",
+      "status": "PARTIAL_PROVEN",
+      "existingArtifacts": [
+        {
+          "path": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+          "exists": true
+        },
+        {
+          "path": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+          "exists": true
+        }
+      ],
+      "boundaryRule": "PostgreSQL 18 owns packet/chunk identity and content_embedding_768; HyperGraphRAG consumes revision-bound tuples without adding a second RRF vote."
+    },
+    {
+      "subsystem": "NetworkX CPU Oracle & nx-cugraph GPU Backend",
+      "canonicalOwner": "NetworkX (CPU parity oracle) + WSL2 nx-cugraph-cu13 (:8098 lane)",
+      "status": "FIXTURE_PROVEN",
+      "existingArtifacts": [
+        {
+          "path": "scripts/atlas/audit-lowrank-hll-radix-cugraph-toc-v1.mjs",
+          "exists": true
+        }
+      ],
+      "boundaryRule": "PageRank and Louvain communities are derived structural traversal projections; never create CandidateOrdinal or identity."
+    },
+    {
+      "subsystem": "EmbeddingGemma 768-d & Contextual ACE JSON Tuples -> PyTorch ATen",
+      "canonicalOwner": "embeddinggemma:latest (:11434 GPU query / :11435 CPU backfill) + CandidateFeatureMatrixV1",
+      "status": "APPLY_PROVEN",
+      "existingArtifacts": [
+        {
+          "path": "scripts/workers/legal-chunk-embed-worker.mjs",
+          "exists": true
+        },
+        {
+          "path": "docs/reports/embedding-contextual-mlp-aten-audit-2026-10-17.json",
+          "exists": true
+        }
+      ],
+      "boundaryRule": "ACE JSON packets provide revision-bound key-value tuples mapped via CandidateOrdinalMapV1 into ATen float32 feature matrices."
+    },
+    {
+      "subsystem": "XGBoost Stage-2 Reranker & Low-Rank PCA/SVD (768 -> 64)",
+      "canonicalOwner": "Stage-2 Feature Matrix Reranker (shadow/bounded candidate rescore)",
+      "status": "SHADOW_ONLY",
+      "existingArtifacts": [
+        {
+          "path": "docs/reports/embedding-contextual-mlp-aten-audit-2026-10-17.json",
+          "exists": true
+        }
+      ],
+      "boundaryRule": "Rescores bounded top-K candidates only after deterministic filter + ANN retrieval; never mutates canonical Postgres stores."
+    },
+    {
+      "subsystem": "gRPC Go Retrieval Executor",
+      "canonicalOwner": "services/go-retrieval (StreamCodebase / StreamEvidence)",
+      "status": "PARTIAL_PROVEN",
+      "existingArtifacts": [
+        {
+          "path": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+          "exists": true
+        }
+      ],
+      "boundaryRule": "Read-only progressive streaming executor; SearchRuntime owns cross-executor normalization and final RRF."
+    },
+    {
+      "subsystem": "OaK 2026 / RL / DSPy-GEPA / RLM / Agent Patterns (Paperclip, Hermes)",
+      "canonicalOwner": "LangGraph / Shadow Evaluation & KernelDagCandidate Gate",
+      "status": "SHADOW_ONLY",
+      "existingArtifacts": [
+        {
+          "path": "sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts",
+          "exists": true
+        }
+      ],
+      "boundaryRule": "Allowed in shadow/dry-run evaluation only; durable mutations require verified claim -> KernelDagCandidate -> schema/lineage admission -> bounded apply script."
+    }
+  ],
+  "hllVerification": {
+    "precisionP": 10,
+    "registersM": 1024,
+    "exactCardinality": 237,
+    "estimatedCardinality": 238,
+    "relativeError": 0.0042
+  },
+  "radixSortTopKVerification": {
+    "sortedOrder": [
+      {
+        "file_path": "sveltekit-frontend/src/routes/(app)/admin/+page.svelte",
+        "errorCount": 27
+      },
+      {
+        "file_path": "sveltekit-frontend/src/routes/(app)/demos/+page.svelte",
+        "errorCount": 16
+      },
+      {
+        "file_path": "sveltekit-frontend/src/routes/(app)/admin/all-routes/+page.server.ts",
+        "errorCount": 14
+      },
+      {
+        "file_path": "sveltekit-frontend/src/routes/api/library/search/+server.ts",
+        "errorCount": 4
+      }
+    ],
+    "topKPage1": {
+      "page": 1,
+      "pageSize": 3,
+      "totalBuckets": 4,
+      "totalPages": 2,
+      "items": [
+        {
+          "file_path": "sveltekit-frontend/src/routes/(app)/admin/+page.svelte",
+          "errorCount": 27,
+          "clusterId": "km-c03",
+          "sampleMessage": "Organized all 46 static /admin/* routes across 5 categories",
+          "key": 27
+        },
+        {
+          "file_path": "sveltekit-frontend/src/routes/(app)/demos/+page.svelte",
+          "errorCount": 16,
+          "clusterId": "km-c02",
+          "sampleMessage": "Indexed 14 missing demos and fixed 2 broken showcase links",
+          "key": 16
+        },
+        {
+          "file_path": "sveltekit-frontend/src/routes/(app)/admin/all-routes/+page.server.ts",
+          "errorCount": 14,
+          "clusterId": "km-c01",
+          "sampleMessage": "Resolved routePath/filePath and extracted route-lineage.ts for SvelteKit 2 compliance",
+          "key": 14
+        }
+      ]
+    }
+  },
+  "lowRankProjectionVerification": {
+    "inputDim": 768,
+    "outputDim": 64,
+    "sampleFirst8": [
+      -0.004191000014543533,
+      -0.0027910000644624233,
+      -0.00041700000292621553,
+      0.0021039999555796385,
+      0.003889000043272972,
+      0.004315999802201986,
+      0.003234999952837825,
+      0.0010239999974146485
+    ]
+  },
+  "nesTocPacket": {
+    "schemaVersion": "nes-lut-ace-toc-v1",
+    "redisKey": "ace:packet:audit-2026-10-17",
+    "bitfrostCentroidKey": "bitfrost:centroid:lru:cuml-kmeans-k16-c03",
+    "ttlSeconds": 604800,
+    "workspaceRevision": "HEAD",
+    "lowRankDim": 64,
+    "okfSchemaContract": {
+      "manifestPath": ".okf/manifest.yaml",
+      "predicateRegistryPath": ".okf/predicates/feature-relationships.yaml",
+      "renderedDocsRoot": "docs/.okf/parent-atlas",
+      "astGrepSupportedLanguages": [
+        "typescript",
+        "javascript",
+        "svelte"
+      ],
+      "canonicalAuthority": false,
+      "canonicalWritesAllowed": false
+    },
+    "ornithAndLangExtractDag": {
+      "synthesisModel": "ornith-1.5-9b",
+      "llamaServerEndpoint": "http://127.0.0.1:8090/v1/chat/completions",
+      "langExtractFastApiSidecar": "http://127.0.0.1:8095/analyze",
+      "oakKernelSidecar": "http://127.0.0.1:8095/oak/resolve",
+      "dagPrefillLutSchema": "atlas.retrieval-dag-prefill-lut.v1"
+    },
+    "promptInjectionGuard": {
+      "status": "ENFORCED",
+      "hiddenThoughtsPersisted": false,
+      "kvCachePersisted": false,
+      "rawStreamBypassBlocked": true
+    },
+    "nesLutSeverityPalette": {
+      "0x00": {
+        "label": "CLEAN_PROVEN",
+        "nesPaletteHex": "0x2A",
+        "priorityWeight": 0.1
+      },
+      "0x01": {
+        "label": "INFO_DRIFT",
+        "nesPaletteHex": "0x21",
+        "priorityWeight": 0.35
+      },
+      "0x02": {
+        "label": "WARN_FLAKY",
+        "nesPaletteHex": "0x27",
+        "priorityWeight": 0.7
+      },
+      "0x03": {
+        "label": "ERR_CRITICAL_FIX",
+        "nesPaletteHex": "0x16",
+        "priorityWeight": 1
+      }
+    },
+    "_toc": {
+      "totalIndexedFiles": 4,
+      "entries": [
+        {
+          "ordinal": 0,
+          "sourceRef": "file:sveltekit-frontend/src/routes/(app)/admin/+page.svelte",
+          "conceptId": "concept:error_cluster:km-c03",
+          "conceptCurie": "oak:concept:km-c03",
+          "lutCode": "0x03",
+          "nesPaletteHex": "0x16",
+          "errorCount": 27,
+          "confidenceScore": 0.8394,
+          "okfPredicate": "observed_at_runtime",
+          "okfArtifactPath": "docs/.okf/parent-atlas/evidence/km-c03.md",
+          "pythonTupleLiteral": "(\"file:sveltekit-frontend/src/routes/(app)/admin/+page.svelte\", \"oak:concept:km-c03\", \"0x03\", \"OPTION[verify_dag_lineage_and_repair]\", 0.8394, 64, \"observed_at_runtime\")",
+          "sanitizedSummary": "Organized all 46 static /admin/* routes across 5 categories"
+        },
+        {
+          "ordinal": 1,
+          "sourceRef": "file:sveltekit-frontend/src/routes/(app)/demos/+page.svelte",
+          "conceptId": "concept:error_cluster:km-c02",
+          "conceptCurie": "oak:concept:km-c02",
+          "lutCode": "0x03",
+          "nesPaletteHex": "0x16",
+          "errorCount": 16,
+          "confidenceScore": 0.7961,
+          "okfPredicate": "observed_at_runtime",
+          "okfArtifactPath": "docs/.okf/parent-atlas/evidence/km-c02.md",
+          "pythonTupleLiteral": "(\"file:sveltekit-frontend/src/routes/(app)/demos/+page.svelte\", \"oak:concept:km-c02\", \"0x03\", \"OPTION[verify_dag_lineage_and_repair]\", 0.7961, 64, \"observed_at_runtime\")",
+          "sanitizedSummary": "Indexed 14 missing demos and fixed 2 broken showcase links"
+        },
+        {
+          "ordinal": 2,
+          "sourceRef": "file:sveltekit-frontend/src/routes/(app)/admin/all-routes/+page.server.ts",
+          "conceptId": "concept:error_cluster:km-c01",
+          "conceptCurie": "oak:concept:km-c01",
+          "lutCode": "0x03",
+          "nesPaletteHex": "0x16",
+          "errorCount": 14,
+          "confidenceScore": 0.7852,
+          "okfPredicate": "observed_at_runtime",
+          "okfArtifactPath": "docs/.okf/parent-atlas/evidence/km-c01.md",
+          "pythonTupleLiteral": "(\"file:sveltekit-frontend/src/routes/(app)/admin/all-routes/+page.server.ts\", \"oak:concept:km-c01\", \"0x03\", \"OPTION[verify_dag_lineage_and_repair]\", 0.7852, 64, \"observed_at_runtime\")",
+          "sanitizedSummary": "Resolved routePath/filePath and extracted route-lineage.ts for SvelteKit 2 compliance"
+        },
+        {
+          "ordinal": 3,
+          "sourceRef": "file:sveltekit-frontend/src/routes/api/library/search/+server.ts",
+          "conceptId": "concept:error_cluster:km-c04",
+          "conceptCurie": "oak:concept:km-c04",
+          "lutCode": "0x02",
+          "nesPaletteHex": "0x27",
+          "errorCount": 4,
+          "confidenceScore": 0.6898,
+          "okfPredicate": "observed_at_runtime",
+          "okfArtifactPath": "docs/.okf/parent-atlas/evidence/km-c04.md",
+          "pythonTupleLiteral": "(\"file:sveltekit-frontend/src/routes/api/library/search/+server.ts\", \"oak:concept:km-c04\", \"0x02\", \"OPTION[verify_dag_lineage_and_repair]\", 0.6898, 64, \"observed_at_runtime\")",
+          "sanitizedSummary": "Enforced >= 0.45 cosine floor and documentId filter in POST/GET"
+        }
+      ]
+    },
+    "checksum": "sha256:54225f1dd0eacd8ccd715c6929567f0f0a07195c7b42cd0f04865072c9618f37"
+  },
+  "cuda13AndCuGraphMatrix": {
+    "nxCuGraph": {
+      "package": "nx-cugraph-cu13",
+      "condaInstall": "conda install -c rapidsai -c conda-forge nx-cugraph cuda-version=13.3",
+      "pipInstall": "pip install nx-cugraph-cu13 --extra-index-url https://pypi.nvidia.com",
+      "zeroCodeChangeEnv": "NETWORKX_AUTOMATIC_BACKENDS=cugraph",
+      "supportedAlgorithms": [
+        "pagerank",
+        "louvain_communities",
+        "betweenness_centrality",
+        "bfs_edges"
+      ],
+      "authorityRule": "Derived routing/traversal projection only; CPU NetworkX remains parity oracle; never creates CandidateOrdinal or a second RRF vote."
+    },
+    "cuda13Readiness": {
+      "targetToolkit": "CUDA 13.3 / 13.4",
+      "cuTile": "Tile-based virtual ISA coexisting with SIMT thread blocks; compiler maps tile operations to Tensor Cores and shared-memory TMA.",
+      "tensorRtRtx": "Strict CUDA 13 major/minor parity required for TensorRT-RTX engine serialization (FP4/FP8/BF16/INT4 WoQ on RTX).",
+      "gpuContentionRule": "8 GiB VRAM budget: run VS Code task \"GPU: Prepare cuVS KMeans\" before WSL2 RAPIDS/cuGraph/cuML jobs, then restart \"TurboQuant: Start (vision, CPU projector, :8090)\"."
+    },
+    "bitfrostRedisValkeyCache": {
+      "ttlSeconds": 604800,
+      "ttlDays": 7,
+      "evictionPolicy": "allkeys-lru",
+      "keyNamespaces": [
+        "ace:packet:{runId}",
+        "bitfrost:centroid:lru:{centroidId}",
+        "bitfrost:token_budget:{conceptId}"
+      ],
+      "forbiddenPayloads": [
+        "hiddenThoughts",
+        "chainOfThought",
+        "kv_cache",
+        "raw_tensor"
+      ]
+    }
+  },
+  "gates": {
+    "DEV_GPU_SCRIPT_VERIFIED": "PASS",
+    "SIDECAR_8095_LANGEXTRACT_HEALTH": "PASS",
+    "AST_GREP_SVELTE_EXTRACTION_VERIFIED": "PASS",
+    "OKF_SCHEMA_TO_NES_LUT_ACE_PACKET_VERIFIED": "PASS",
+    "OKF_SVELTEKIT_VS_LLMS_TXT_COMPARISON_VERIFIED": "PASS",
+    "DOMAIN_LINKED_LIST_BATCH_GEMM_VERIFIED": "PASS",
+    "EMBEDDINGGEMMA_SIMDJSON_OAK_PYTHON_TUPLES_LOGGED": "PASS",
+    "HLL_CARDINALITY_SKETCH_BOUNDED": "PASS",
+    "RADIX_SORT_TOPK_DETERMINISTIC": "PASS",
+    "LOW_RANK_768_TO_64_VALID": "PASS",
+    "NES_LUT_ACE_TOC_PACKET_VALID": "PASS",
+    "NX_CUGRAPH_CUDA13_MATRIX_DOCUMENTED": "PASS",
+    "SUBSYSTEM_OWNERSHIP_INVENTORY_COMPLETE": "PASS"
+  },
+  "allRoutesReportPresent": true,
+  "routeHardeningDirPresent": true
+}

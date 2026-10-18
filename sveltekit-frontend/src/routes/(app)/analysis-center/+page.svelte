@@ -1356,13 +1356,6 @@
 		margin-left: auto;
 	}
 
-	/* Summary Toggle */
-	.summary-toggle {
-		position: relative;
-		z-index: 1;
-		padding: 0.5rem 1rem;
-	}
-
 	.summary-reader-container {
 		position: relative;
 		z-index: 1;

@@ -21,9 +21,11 @@ import os
 import hashlib
 import inspect
 import json
+import logging
 import re
 import tempfile
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Literal, Optional
@@ -129,10 +131,21 @@ class WebEvidenceResponseV1(BaseModel):
     writes_performed: Literal[False] = False
 
 
+@asynccontextmanager
+async def lifespan(_app):
+    try:
+        if legacy._capabilities()["spacy_pos"]:
+            legacy._spacy_pos_tags("Parent Atlas NLP sidecar startup warmup.")
+    except Exception:
+        logging.getLogger(__name__).exception("NLP sidecar spaCy warmup failed")
+    yield
+
+
 app = FastAPI(
     title="Parent Atlas NLP Sidecar",
     version="2.0.0",
     description="Provenance-preserving Consiliency + LangExtract facade over the Atlas NLP sidecar",
+    lifespan=lifespan,
 )
 app.add_middleware(
     CORSMiddleware,

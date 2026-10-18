@@ -2,7 +2,8 @@
 /**
  * Phase 106: Apply Naive Bayes predictions.
  *
- * Writes JSONB predictions to atlas_packet_metrics.naive_bayes_predictions.
+ * Writes JSONB predictions to atlas_packet_metrics.naive_bayes_predictions only
+ * when explicitly invoked with --apply. The default mode is read-only.
  * No ACP jobs, no identity mutation.
  */
 
@@ -21,7 +22,13 @@ const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
 const MODEL_JSON = path.join(TMP_DIR, 'semantic-naive-bayes-model.json');
 
 const argv = process.argv.slice(2);
-const DRY_RUN = argv.includes('--dry-run') || argv.includes('--dry');
+export function resolveExecutionMode(args) {
+  const apply = args.includes('--apply');
+  const dryRun = args.includes('--dry-run') || args.includes('--dry');
+  if (apply && dryRun) throw new Error('CONFLICTING_EXECUTION_MODE_FLAGS');
+  return { dryRun: !apply, apply };
+}
+const { dryRun: DRY_RUN } = resolveExecutionMode(argv);
 const LIMIT = parseIntFlag(argv, '--limit', 500);
 const OFFSET = parseIntFlag(argv, '--offset', 0);
 const RUN_ID = new Date().toISOString().replace(/[:.]/g, '-');
@@ -157,10 +164,8 @@ async function loadRows(limit, offset) {
   const client = await pool.connect();
   let readOnlyTransaction = false;
   try {
-    if (DRY_RUN) {
-      await client.query('BEGIN TRANSACTION READ ONLY');
-      readOnlyTransaction = true;
-    }
+    await client.query('BEGIN TRANSACTION READ ONLY');
+    readOnlyTransaction = true;
     const packetCols = await getColumns(client, 'atlas_packets');
     const featuresExists = await tableExists(client, 'atlas_packet_features');
     const metricsExists = await tableExists(client, 'atlas_packet_metrics');
@@ -324,9 +329,11 @@ async function main() {
   }, null, 2));
 }
 
-main()
-  .catch((error) => {
-    console.error('[apply-naive-bayes-predictions] failed:', error?.stack || error?.message || String(error));
-    process.exitCode = 1;
-  })
-  .finally(() => pool.end());
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main()
+    .catch((error) => {
+      console.error('[apply-naive-bayes-predictions] failed:', error?.stack || error?.message || String(error));
+      process.exitCode = 1;
+    })
+    .finally(() => pool.end());
+}

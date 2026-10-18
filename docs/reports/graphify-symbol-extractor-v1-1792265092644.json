@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-345bc5460ecf-0668",
+    "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:e5c45155ac3365032ecc32c5acec31e984202453b052ba7235f80178ecba53c9",
+    "offset": 667,
+    "maxFiles": 1,
+    "shardChecksum": "sha256:4895a6d4d0868eb29fb69c490d36e11b1d633e80bd4c9f5d9ea734802db49ab8",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "04bf425c-774b-4ae1-85c4-96c8b55e692c",
+      "sourceRef": "packages/parent-atlas/docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
+      "sourceRevision": "sha256:bb9555c987f5617407b496633467a01f0b100fd13dd330a47af6abb5f9b93896",
+      "fileKind": "markdown",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WOULD_EXTRACT",
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": 1,
+  "readbacks": [],
+  "generatedAt": "2026-10-17T19:24:52.644Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 97,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "04bf425c-774b-4ae1-85c4-96c8b55e692c",
+      "sourceRef": "packages/parent-atlas/docs/atlas/AGENT-TASK-PACKAGES-2026-06-13.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:bb9555c987f5617407b496633467a01f0b100fd13dd330a47af6abb5f9b93896",
+      "sourceDigest": "sha256:bb9555c987f5617407b496633467a01f0b100fd13dd330a47af6abb5f9b93896",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 97
+    }
+  ]
+}

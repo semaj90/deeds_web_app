@@ -1,0 +1,172 @@
+{
+  "schema": "atlas.grpc-toc-entity-pipeline.v1",
+  "generatedAt": "2026-10-18T02:27:13.774Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "documentationToc": {
+    "cudaTocCount": 6,
+    "masterAgentsTocCount": 12,
+    "sampleEntries": [
+      {
+        "type": "section",
+        "level": 1,
+        "title": "CUDA / RTX / cuTile Index",
+        "parent": "root"
+      },
+      {
+        "type": "section",
+        "level": 2,
+        "title": "Environments",
+        "parent": "root"
+      },
+      {
+        "type": "section",
+        "level": 2,
+        "title": "CPU, GPU, and inference lane alignment",
+        "parent": "root"
+      },
+      {
+        "type": "section",
+        "level": 2,
+        "title": "Probes and owners",
+        "parent": "root"
+      },
+      {
+        "type": "section",
+        "level": 2,
+        "title": "Receipts",
+        "parent": "root"
+      }
+    ]
+  },
+  "customEntities": {
+    "count": 4,
+    "entities": [
+      {
+        "entityId": "feature:gpu_libtorch_bridge",
+        "entityType": "capability",
+        "sourceRef": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+        "docTocRef": "docs/architecture/_cuda_rtx_toc.md",
+        "properties": {
+          "framework": "LibTorch N-API",
+          "operators": [
+            "clusterEmbeddings",
+            "batchCosineSimilarityChunked",
+            "graphSimilarity"
+          ],
+          "memoryGuard": "gpuHasRoom"
+        }
+      },
+      {
+        "entityId": "service:qdrant_grpc_engine",
+        "entityType": "retrieval_service",
+        "sourceRef": "docker/docker-compose.gpu.yml",
+        "docTocRef": "docs/architecture/_cuda_rtx_toc.md",
+        "properties": {
+          "httpPort": 6333,
+          "grpcPort": 6334,
+          "namedVector": "content",
+          "dimensions": 768
+        }
+      },
+      {
+        "entityId": "route:api_rag_search_fused",
+        "entityType": "route",
+        "sourceRef": "sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts",
+        "docTocRef": "master_agents_toc.md",
+        "properties": {
+          "method": "POST",
+          "fusion": "search-runtime",
+          "lane": "hybrid_rrf"
+        }
+      },
+      {
+        "entityId": "concept:kmeans_k256_spherical",
+        "entityType": "cluster_model",
+        "sourceRef": "atlas_cluster_models:mbk-spherical-content768-k256-v1",
+        "docTocRef": "docs/architecture/_cuda_rtx_toc.md",
+        "properties": {
+          "clusters": 256,
+          "dimensions": 768,
+          "seed": 42
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "implements",
+        "source": "feature:gpu_libtorch_bridge",
+        "target": "concept:kmeans_k256_spherical",
+        "degree": "binary"
+      },
+      {
+        "predicate": "depends_on",
+        "source": "route:api_rag_search_fused",
+        "target": "service:qdrant_grpc_engine",
+        "degree": "binary"
+      },
+      {
+        "predicate": "documents",
+        "source": "docs/architecture/_cuda_rtx_toc.md",
+        "target": "feature:gpu_libtorch_bridge",
+        "degree": "binary"
+      }
+    ]
+  },
+  "graphCentrality": {
+    "feature:gpu_libtorch_bridge": {
+      "pageRank": 0.1754,
+      "cheiRank": 0.3246,
+      "inDegree": 0,
+      "outDegree": 1
+    },
+    "service:qdrant_grpc_engine": {
+      "pageRank": 0.3246,
+      "cheiRank": 0.1754,
+      "inDegree": 1,
+      "outDegree": 0
+    },
+    "route:api_rag_search_fused": {
+      "pageRank": 0.1754,
+      "cheiRank": 0.3246,
+      "inDegree": 0,
+      "outDegree": 1
+    },
+    "concept:kmeans_k256_spherical": {
+      "pageRank": 0.3246,
+      "cheiRank": 0.1754,
+      "inDegree": 1,
+      "outDegree": 0
+    }
+  },
+  "qdrantGrpcProtocol": {
+    "targetHost": "127.0.0.1",
+    "grpcPort": 6334,
+    "collection": "codebase_chunks_768_v2",
+    "namedVector": "content",
+    "pointCount": 4,
+    "protobufSchema": "UpsertPointsSchema",
+    "samplePayload": {
+      "packet_key": "packet:feature:gpu_libt",
+      "source_ref": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
+      "entity_type": "capability",
+      "page_rank": 0.1754,
+      "chei_rank": 0.3246,
+      "doc_toc_ref": "docs/architecture/_cuda_rtx_toc.md"
+    }
+  },
+  "pytorchAtenDescriptor": {
+    "tensorType": "at::kFloat",
+    "shape": [
+      4,
+      768
+    ],
+    "memoryLayout": "CONTIGUOUS_ROW_MAJOR",
+    "zeroCopyNapiBuffer": true,
+    "hiddenThoughtsPersisted": false
+  },
+  "provenanceBinding": {
+    "contract": "ContextManifestV1",
+    "goldenRetrievalVerified": true
+  }
+}

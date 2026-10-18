@@ -42,7 +42,7 @@ async function speak() {
 		await ttsService.speak(textInput, { rate, volume });
 	} catch (err) {
 		error = err instanceof Error ? err.message : 'Speech synthesis failed';
-		console.error('[TTS Demo] Error:', err);
+		console.warn('[TTS Demo] TTS unavailable in this environment:', error);
 	} finally {
 		isSpeaking = false;
 		isInitializing = false;
@@ -83,7 +83,7 @@ function loadSample(text: string) {
 
 		<!-- Sample Texts -->
 		<div class="samples-section">
-			<label>Sample Legal Texts</label>
+			<span class="samples-title">Sample Legal Texts</span>
 			<div class="samples-grid">
 				{#each samples as sample}
 					<button
@@ -232,7 +232,7 @@ function loadSample(text: string) {
 	}
 
 	.input-section label,
-	.samples-section label,
+	.samples-section .samples-title,
 	.control-group label {
 		display: block;
 		font-size: 0.875rem;

@@ -58,6 +58,8 @@
 		{isDragging ? 'cursor-grabbing opacity-90' : 'cursor-grab'}
 		{selected ? 'z-20 scale-[1.02]' : 'scale-100'} transition-transform duration-75"
 	style="transform: translate({x}px, {y}px);"
+	role="group"
+	aria-label="ELIZA Node {title}"
 	onpointerdown={handlePointerDown}
 	onpointermove={handlePointerMove}
 	onpointerup={handlePointerUp}

@@ -62,6 +62,27 @@ export function buildSymbolBaselineShards(plan, size = 250) {
   return { schema: 'atlas.graphify-symbol-shards.v1', manifestChecksum: plan.planChecksum, sourceCount: plan.rowCount, shardSize: size, shards };
 }
 
+export function admitFrozenSymbolRunFileV1(parseStatus, attemptedFiles, maxFilesPerRun) {
+  if (!Number.isSafeInteger(attemptedFiles) || attemptedFiles < 0
+    || !Number.isSafeInteger(maxFilesPerRun) || maxFilesPerRun < 1 || maxFilesPerRun > 250) {
+    throw new Error('SYMBOL_RUN_FILE_LIMIT_INVALID');
+  }
+  if (parseStatus === 'PROCESSED') return { admitted: true, attemptedFiles };
+  if (attemptedFiles >= maxFilesPerRun) return { admitted: false, attemptedFiles };
+  return { admitted: true, attemptedFiles: attemptedFiles + 1 };
+}
+
+export function requireWorkspaceAlignedGraphifyFileApplyV1({ apply, workspaceRevisionMismatchCount }) {
+  if (typeof apply !== 'boolean' || !Number.isSafeInteger(workspaceRevisionMismatchCount)
+    || workspaceRevisionMismatchCount < 0) {
+    throw new Error('SYMBOL_APPLY_WORKSPACE_ALIGNMENT_INPUT_INVALID');
+  }
+  if (apply && workspaceRevisionMismatchCount > 0) {
+    throw new Error('SYMBOL_APPLY_GRAPHIFY_WORKSPACE_REVISION_MISMATCH');
+  }
+  return { applyAllowed: apply };
+}
+
 export function selectLiveSymbolPlanRows(plannedRows, liveRows, workspaceRevision, verifyProcessed = false) {
   const liveByRef = new Map();
   for (const row of liveRows) {

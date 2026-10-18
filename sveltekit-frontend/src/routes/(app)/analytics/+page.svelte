@@ -1810,38 +1810,6 @@
 		justify-content: flex-end;
 	}
 
-	.dr-provider-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.125rem;
-		padding: 0.2rem;
-		background: rgba(255, 255, 255, 0.03);
-		border: 1px solid rgba(212, 199, 163, 0.1);
-		border-radius: 0.45rem;
-	}
-
-	.dr-provider-toggle button {
-		padding: 0.28rem 0.55rem;
-		font-size: 0.65rem;
-		font-weight: 600;
-		color: rgba(212, 199, 163, 0.45);
-		background: transparent;
-		border: 0;
-		border-radius: 0.3rem;
-		cursor: pointer;
-		transition: all 0.15s;
-	}
-
-	.dr-provider-toggle button:hover {
-		color: rgba(212, 199, 163, 0.8);
-		background: rgba(255, 255, 255, 0.04);
-	}
-
-	.dr-provider-toggle button.dr-provider-btn-active {
-		color: rgba(15, 23, 42, 0.9);
-		background: rgba(212, 199, 163, 0.9);
-	}
-
 	.dr-refresh-btn {
 		display: inline-flex;
 		align-items: center;
@@ -2018,27 +1986,6 @@
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 		gap: 0.75rem;
 		margin-top: 0.75rem;
-	}
-	.dr-image-card {
-		margin: 0;
-		padding: 0.5rem;
-		background: rgba(255, 255, 255, 0.02);
-		border: 1px solid rgba(212, 199, 163, 0.08);
-		border-radius: 0.5rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.375rem;
-	}
-	.dr-image-card img {
-		width: 100%;
-		height: auto;
-		border-radius: 0.35rem;
-		border: 1px solid rgba(212, 199, 163, 0.08);
-		background: rgba(0, 0, 0, 0.2);
-	}
-	.dr-image-card figcaption {
-		font-size: 0.62rem;
-		color: rgba(212, 199, 163, 0.45);
 	}
 	.dr-plan-controls {
 		margin-top: 0.9rem;

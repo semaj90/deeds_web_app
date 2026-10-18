@@ -426,6 +426,8 @@ const sessionSeed =
  <div class="modal-grid">
  <section class="chat-panel" aria-label="AI contextual chat">
  <div
+ role="region"
+ aria-label="Evidence File Drop Zone"
  class:drop-active={dropActive}
  class="drop-zone"
  ondragenter={(e: DragEvent) => { e.preventDefault(); dropActive = true }}

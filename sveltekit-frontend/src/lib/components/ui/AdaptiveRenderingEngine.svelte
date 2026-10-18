@@ -136,7 +136,7 @@
     animationFrameId = requestAnimationFrame(loop);
   }
 
-  $effect(() => {
+  onMount(() => {
     if (canvasElement) {
       renderContext = canvasElement.getContext('2d');
       isMonitoring = true;

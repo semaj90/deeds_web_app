@@ -1,63 +1,56 @@
-# NES Chrom Packet Recent Hits
+# NES/CHROM Packet Recent Hits & `task_semantic_packets` Live Schema Report
 
-Generated: 2026-06-01T20:20:19.904Z
+- **Generated At**: `2026-10-17T17:12:04.445Z`
+- **Read-Only Transaction**: `ROLLED_BACK`
+- **Writes Performed**: `false`
+- **Live API Endpoint**: `GET /api/atlas/nes-chrom?sourceRef=...&featureId=...&queryHash=...`
+- **CLI Query Script**: `node scripts/atlas/query-nes-chrom-recent-hits-v1.mjs`
 
-## Inspection
+## 1. NES/CHROM Packet & Recent Hits Summary
 
-1. Writer path: sveltekit-frontend/src/lib/server/features/ai/ace/nes-chrom-packet-service.ts
-2. ACE assembly hook path: sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts
-3. Read/query path: sveltekit-frontend/src/routes/api/atlas/nes-chrom/+server.ts
-4. DB table names: nes_chrom_packets, nes_chrom_kag_dag_hits
-5. Existing report paths: docs/reports/nes-chrom-packet-kag-dag-map.md, docs/reports/nes-chrom-packet-recent-hits.{json,md}
-6. sourceRef/sourceRefs preserved: yes / yes
-7. featureId/feature_id preserved: yes
-8. parentAtlasCardId/parent_atlas_card_id preserved: no
-9. CHR97 and NES chrom lane relationship: separate-but-adjacent lanes: CHR97 is the cartridge fast-path search lane; NES chrom is the durable ACE packet + hit report lane.
-10. Recommended canonical report path: docs/reports/nes-chrom-packet-kag-dag-map.md + docs/reports/nes-chrom-packet-recent-hits.{json,md}
+| Metric | Value |
+|---|---|
+| Matched Packets | 100 / 100 |
+| Matched KAG/DAG Hits | 0 |
+| `source_ref` Coverage | 100.0% |
+| `feature_id` Coverage | 100.0% |
+| `query_hash` Coverage | 100.0% |
+| `chunk_id` Coverage | 100.0% |
 
-## Counts
+### Top `source_ref` Entries
 
-- packets: 3
-- hits: 3
+| `source_ref` | Count |
+|---|---|
+| `src/lib/components/shells/AGENTS.md` | 1 |
+| `src/lib/components/shells/BridgeActions.svelte` | 1 |
+| `src/lib/components/shells/index.ts` | 1 |
+| `src/lib/components/shells/InvestigationShell.svelte` | 1 |
+| `src/lib/components/shells/ResearchShell.svelte` | 1 |
+| `src/lib/components/source-validation/AGENTS.md` | 1 |
+| `src/lib/components/source-validation/AnswerGenerator.svelte` | 1 |
+| `src/lib/components/source-validation/CitationInspector.svelte` | 1 |
+| `src/lib/components/source-validation/ProvenanceGraph.svelte` | 1 |
+| `src/lib/components/source-validation/SourceValidator.svelte` | 1 |
 
-## Database Status
+### Top `feature_id` Entries
 
-- packet table present: yes
-- hit table present: yes
-- note: Both NES chrom tables are present in the current database.
+| `feature_id` | Count |
+|---|---|
+| `AGENTS` | 11 |
+| `index` | 6 |
+| `sveltekit-frontend.Badge` | 2 |
+| `sveltekit-frontend.Button` | 2 |
+| `sveltekit-frontend.Card` | 2 |
+| `sveltekit-frontend.CardDescription` | 2 |
+| `sveltekit-frontend.CardFooter` | 2 |
+| `sveltekit-frontend.CardHeader` | 2 |
+| `AccessibilityPanel` | 1 |
+| `AIDropdown` | 1 |
 
-## Coverage
+## 2. Live `task_semantic_packets` Schema Reconciliation
 
-- sourceRef: 1
-- featureId: 1
-- parentAtlasCardId: 0
-- queryHash: 1
-- chunkId: 1
-
-## Replay Spine
-
-- sourceRef + feature_id intact: yes
-- packets with sourceRefs array: all sampled packets
-
-## Top SourceRefs
-
-- src/lib/components/ui/gaming/index.ts: 1
-- src/lib/components/ui/gaming/n64/index.ts: 1
-- src/lib/components/ui/index.ts: 1
-
-## Top FeatureIds
-
-- ui: 3
-
-## Missing feature_id rows
-
-- none
-
-## Missing sourceRef rows
-
-- none
-
-## Notes
-
-- parentAtlasCardId coverage reflects payload/metadata presence only; there is no dedicated packet-table column for it in the current lane.
-- This script is read-only and reports on the existing NES chrom packet tables without mutating schemas, packets, or retrieval behavior.
+- **Total Live Columns**: `39`
+- **`alias_id` Column**: `character varying (nullable=NO)`
+- **`feature_id` Column**: `character varying (nullable=NO)`
+- **`source_ref` Column**: `character varying (nullable=NO)`
+- **Live Rows**: `2` (with `feature_id`: `2`, with `source_ref`: `2`, with `alias_id`: `2`)

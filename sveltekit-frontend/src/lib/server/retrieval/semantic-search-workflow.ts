@@ -168,6 +168,7 @@ export async function runSemanticSearchWorkflow(
   runtimeOptions?: {
     userId?: string | null;
     caseId?: string | null;
+    diagnosticReadOnly?: boolean;
     contextManifestShadow?: SearchRuntimeContextManifestShadowConfigV1;
   },
 ): Promise<SemanticSearchWorkflowResult> {
@@ -223,6 +224,9 @@ export async function runSemanticSearchWorkflow(
   const adapter = createAtlasSearchAdapter({
     userId: searchRequest.userId,
     caseId: searchRequest.caseId,
+    ...(runtimeOptions?.diagnosticReadOnly === undefined
+      ? {}
+      : { readOnly: runtimeOptions.diagnosticReadOnly }),
   });
   const adapterResult = await adapter.search({
     query: searchRequest.query,
@@ -333,7 +337,7 @@ export async function runSemanticSearchWorkflow(
     shadow,
   });
 
-  if (validated.persistReport) {
+  if (validated.persistReport && !runtimeOptions?.diagnosticReadOnly) {
     try {
       await persistSemanticSearchWorkflowReport(result);
     } catch {
@@ -348,14 +352,16 @@ export async function runSemanticSearchWorkflow(
   // (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md).
   // Fire-and-forget: persistKagDagRunFromSteps() fails open internally and
   // must never block or fail the live search response.
-  void persistKagDagRunFromSteps({
-    query,
-    workflowState: result.workflowState,
-    steps: workflowDag,
-    finalJson: { topPacketKeys: result.topPacketKeys, topK: result.topK },
-  }).catch((error) => {
-    console.warn('[semantic-search-workflow] kag_dag audit persistence failed (non-blocking):', error);
-  });
+  if (!runtimeOptions?.diagnosticReadOnly) {
+    void persistKagDagRunFromSteps({
+      query,
+      workflowState: result.workflowState,
+      steps: workflowDag,
+      finalJson: { topPacketKeys: result.topPacketKeys, topK: result.topK },
+    }).catch((error) => {
+      console.warn('[semantic-search-workflow] kag_dag audit persistence failed (non-blocking):', error);
+    });
+  }
 
   return result;
 }

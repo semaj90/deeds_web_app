@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.graphify-symbol-baseline-run.v1",
+  "generatedAt": "2026-10-17T21:47:47.920Z",
+  "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+  "manifestRowCount": 704,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "apply": false,
+  "firstShard": 1,
+  "requestedBatches": 10,
+  "shardSize": 10,
+  "visitedMembers": 100,
+  "independentlyVerifiedMembers": 0,
+  "fullManifestVisited": false,
+  "baselineSealProven": false,
+  "filesAttemptedThisRun": 100,
+  "filesCommittedThisRun": 0,
+  "outcomeCounts": {
+    "WOULD_EXTRACT": 100
+  },
+  "receipts": [
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273666488.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273666654.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273666834.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273667002.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273667188.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273667344.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273667549.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273667705.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273667802.json",
+    "docs\\reports\\graphify-symbol-extractor-v1-1792273667917.json"
+  ],
+  "canonicalAuthority": false,
+  "projectionAdmissionPromoted": false
+}

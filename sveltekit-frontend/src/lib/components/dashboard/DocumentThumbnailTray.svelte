@@ -44,8 +44,18 @@
 </div>
 
 {#if showErrorModal && selectedPageError}
-	<div class="error-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="error-modal-title">
-		<div class="error-modal" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="error-modal-overlay"
+		onclick={(e) => { if (e.target === e.currentTarget) closeErrorModal(); }}
+		role="presentation"
+	>
+		<div
+			class="error-modal"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="error-modal-title"
+			tabindex="-1"
+		>
 			<div class="error-modal-header">
 				<h3 id="error-modal-title" class="error-modal-title">Page {selectedPageError.pageNumber} Error</h3>
 				<button class="error-modal-close" onclick={closeErrorModal} aria-label="Close modal">✕</button>

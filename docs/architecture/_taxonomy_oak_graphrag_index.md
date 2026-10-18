@@ -52,6 +52,34 @@ schema-validated corpus + exact source lineage
 
 Keep the ledgers distinct: `keyword → term candidate`, `term → resolved concept ID`, `text mention → typed canonical entity`, and `participants + predicate → fact`. Do not join them on display name alone. Until the live OAK/PostgreSQL resolver and corpus-wide crosswalk are verified, corpus coverage and concept-resolution completeness remain **PARTIAL / NOT_PROVEN**; no learned clusters or GPU graph results may fill missing canonical links.
 
+## HyperGraphRAG + NES LUT integration boundary (2026-10-17)
+
+PostgreSQL remains canonical for packet/source identity, revisions, evidence, and admitted N-ary facts. Reuse the normalized `atlas_hyperedges` + `atlas_hyperedge_members` representation; do not create a parallel array-based hyperedge table. One hyperedge header represents one multi-participant fact, and each participant row carries its canonical member ID, type, semantic role, and ordinal. Existing readers and SearchRuntime graph callers establish code ownership, not proof that qualified relations currently exist in PostgreSQL.
+
+Build a master ordinal LUT and domain-specific LUTs only as **derived, snapshot-scoped artifacts**:
+
+```text
+sealed candidate snapshot + canonical identity/revision checks
+  → one master ordinal map and checksum
+      ├─ domain postings / eligibility bitsets (same ordinals)
+      ├─ packet ↔ hyperedge incidence CSR (same graph revision)
+      └─ feature rows / semantic references (same snapshot binding)
+  → bounded retrieval nomination
+  → PostgreSQL identity, revision, and evidence requalification
+  → SearchRuntime single-owner fusion / Top-K
+  → ACE / ContextManifest admission and token budget
+```
+
+Contract rules:
+
+- A domain LUT may filter or prioritize candidates only when its taxonomy/classifier revision and candidate snapshot match the master ordinal map. It must not create an independent ordinal namespace or canonical identity.
+- Incidence CSR and reverse packet-to-hyperedge lookup are rebuildable accelerators. Preserve source hyperedge IDs, participant roles, evidence references, and graph/source/workspace revisions so projections do not erase the original N-ary fact.
+- A packed bitset answers exact membership only for its declared ordinal-map revision. Valkey HLL is approximate cardinality telemetry, not membership or evidence. Neither establishes identity or admission.
+- `bytea` may hold a versioned binary artifact if an existing reviewed owner requires durable artifact storage; it is not itself an incidence index. B-tree/GIN indexes serve relational lookup. Planner bitmap scans and PostgreSQL 18 AIO are execution choices, not application-managed LUTs. Merkle roots/checksums verify frozen artifact inputs; they are not PostgreSQL index types.
+- PCA/SVD, low-rank/FM/MLP ranking, PageRank, and GPU execution operate only on aligned derived features. They cannot repair missing participants, mint revisions, or override PostgreSQL qualification. Learned promotion requires reviewed query-candidate outcomes and held-out evaluation.
+
+**Current evidence limit:** the latest recorded read-only PostgreSQL census (2026-10-17; not re-probed while updating this index) found 62,802 legacy binary taxonomy hyperedges, no qualified N-ary code facts, empty ontology tuple tables, and no fully packet-qualified N-ary GraphV2 relations. Sample incidence/PageRank parity is fixture evidence only. Keep production HyperGraphRAG, LUT population, and learned ranking gated until one source-bound N-ary fact is persisted through the existing owner, independently read back, retrieved, and admitted through ContextManifest.
+
 ## Taxonomy tables (historical read-only census, 2026-10-13)
 
 | Table | Identity | Domain key | FKs | Census status |
@@ -76,7 +104,8 @@ Measured 2026-10-13 with `.tmp/census-readonly-2026-10-13.sql` (single read-only
 | OAK bridge (TS) | `sveltekit-frontend/src/lib/server/atlas/oaklib/python-fastapi-oaklib-bridge-v1.ts` | parses OAK payloads, builds cache plans | exists; spec present |
 | OAK kernel (Python) | `python/atlas_oak_kernel.py` | term resolution on `:8095` | exists; not run here |
 | OAK resolution evidence | `sveltekit-frontend/src/lib/server/atlas/agentic/contracts/oak-resolution-evidence-v1.ts` | evidence contract | exists |
-| GraphRAG retrieval (proposed owner) | `sveltekit-frontend/src/lib/server/atlas/retrieval/hypergraph-retrieval-v1.ts` | query integration | exists; caller NOT_CONFIRMED |
+| GraphRAG retrieval | `sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts`; `sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts` | strict KAG reader and SearchRuntime graph callers | code path exists; live qualified N-ary data/retrieval NOT_PROVEN |
+| Hyperedge incidence / NES LUT | existing `atlas_hyperedges` + `atlas_hyperedge_members`; snapshot-bound ordinal/incidence artifacts | derived master/domain LUTs and packet↔hyperedge incidence | no separate LUT authority; live qualified N-ary source cohort NOT_PROVEN |
 | Low-rank sampling | `python/atlas_compute/low_rank.py`; `sveltekit-frontend/src/lib/server/atlas/sampling/sample-query-matrix-v1.ts` | EXPERIMENT per CLAUDE.md | exists |
 | Low-rank task recommender (advisory) | `python/build_low_rank_task_recommendation_v2.py` | OpenSpec task ordering only | exists; deterministic rank stays authority |
 | NetworkX parity | `python/graph_snapshot_parity_networkx_oracle.py` | CPU reference | exists |

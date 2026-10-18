@@ -333,6 +333,8 @@
 		class="messages-container"
 		class:drop-highlight={dropActive}
 		bind:this={messagesContainer}
+		role="region"
+		aria-label="Case Chat Messages"
 		ondragenter={(e) => { e.preventDefault(); dropActive = true; }}
 		ondragover={(e) => { e.preventDefault(); dropActive = true; }}
 		ondragleave={(e) => { if (e.currentTarget === e.target) dropActive = false; }}

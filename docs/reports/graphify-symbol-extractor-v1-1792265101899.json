@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-345bc5460ecf-0687",
+    "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:e5c45155ac3365032ecc32c5acec31e984202453b052ba7235f80178ecba53c9",
+    "offset": 686,
+    "maxFiles": 1,
+    "shardChecksum": "sha256:525dcd3abf83c03934f18f77989dfcda802c5619755870c989ed6926ce46e924",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "9407fe30-8ece-49ec-8261-7397cc7fe710",
+      "sourceRef": "reports/archive/phase-2a-packet-materialization-checklist.md",
+      "sourceRevision": "sha256:51592d66e40417475755275dc3219d8fa670a0a801b43fc5b668c9208e8001eb",
+      "fileKind": "markdown",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WOULD_EXTRACT",
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": 1,
+  "readbacks": [],
+  "generatedAt": "2026-10-17T19:25:01.899Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 43,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "9407fe30-8ece-49ec-8261-7397cc7fe710",
+      "sourceRef": "reports/archive/phase-2a-packet-materialization-checklist.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:51592d66e40417475755275dc3219d8fa670a0a801b43fc5b668c9208e8001eb",
+      "sourceDigest": "sha256:51592d66e40417475755275dc3219d8fa670a0a801b43fc5b668c9208e8001eb",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    }
+  ]
+}

@@ -5,88 +5,18 @@ import path from 'node:path';
 // Types for /all-routes UI (matches ErrorModal.svelte)
 // ─────────────────────────────────────────────────────────
 
-export type RouteNode = {
-  id: string;
-  path: string;
-  url?: string;
-  href?: string;
-  file?: string;
-  kind?: 'page' | 'layout' | 'server' | 'endpoint' | string;
-  group?: string;
-  status?: 'ok' | 'warning' | 'error';
-  tags?: string[];
-  category?: string;
-  lastModified?: string;
-  hasLoad?: boolean;
-  hasActions?: boolean;
-  hasAiImports?: boolean;
-  errorCount?: number;
-  warningCount?: number;
-  infoCount?: number;
-  lastErrorAt?: string;
-  lastErrorMessage?: string;
-  suggestionCount?: number;
-  patchSuccessRate?: number;
-  errorState?: 'healthy' | 'flaky' | 'broken';
-};
+import {
+  astNodeToRouteNode,
+  resolveRouteFields,
+  type ResolvedRouteFields,
+  type RouteErrorCluster,
+  type RouteNode,
+} from './route-lineage.js';
 
-export type RouteErrorCluster = {
-  id: string;
-  routeId: string;
-  tool: 'svelte-check' | 'tsc' | 'vite' | 'drizzle' | 'custom' | string;
-  code: string;
-  message: string;
-  severity: 'info' | 'warning' | 'error' | string;
-  count: number;
-  lastSeen?: string;
-  file?: string;
-  rawLogSnippet?: string;
-};
+export type { ResolvedRouteFields, RouteErrorCluster, RouteNode };
+export const _resolveRouteFields = resolveRouteFields;
+export const _astNodeToRouteNode = astNodeToRouteNode;
 
-// ─────────────────────────────────────────────────────────
-// Helper: map AST nodes to RouteNode
-// ─────────────────────────────────────────────────────────
-
-function astNodeToRouteNode(astNode: Record<string, unknown>): RouteNode {
-  const nodeId = (astNode.id as string) || (astNode.path as string) || String(Math.random());
-  const routePath = (astNode.path as string) ?? '';
-  const file = astNode.file as string | undefined;
-
-  // Parse SvelteKit route pattern to extract group
-  const groupMatch = routePath.match(/\(([^)]+)\)/);
-  const group = groupMatch ? `(${groupMatch[1]})` : undefined;
-
-  // Infer kind from file extension or name
-  let kind: RouteNode['kind'] = 'page';
-  if (file?.includes('+layout')) kind = 'layout';
-  else if (file?.includes('+server')) kind = 'server';
-  else if (file?.includes('api/')) kind = 'endpoint';
-
-  // Build tags from file structure or keywords
-  const tags: string[] = [];
-  if (routePath.includes('cases')) tags.push('case');
-  if (routePath.includes('evidence')) tags.push('evidence');
-  if (routePath.includes('persons')) tags.push('person');
-  if (routePath.includes('api')) tags.push('api');
-  if (routePath.includes('yorha')) tags.push('yorha');
-  if (astNode.hasAiImports) tags.push('ai');
-
-  return {
-    id: nodeId,
-    path: routePath,
-    href: routePath,
-    file,
-    kind,
-    group,
-    status: 'ok',
-    tags: tags.length > 0 ? tags : undefined,
-    category: group ? `Routes/${group}` : 'Routes/root',
-    lastModified: astNode.lastModified as string | undefined,
-    hasLoad: (astNode.hasLoad as boolean) ?? false,
-    hasActions: (astNode.hasActions as boolean) ?? false,
-    hasAiImports: (astNode.hasAiImports as boolean) ?? false,
-  };
-}
 
 // ─────────────────────────────────────────────────────────
 // Phase 6: Database Enrichment Functions
@@ -197,6 +127,10 @@ const STATIC_DIR = path.resolve('static');
 const PHASE72_GRAPH_PATH = path.join(STATIC_DIR, 'phase72', 'route-ast-graph.json');
 const PHASE90_SHIELD_PATH = path.join(STATIC_DIR, 'phase90', 'state-machine-shield.json');
 const ERROR_SUMMARY_PATH = path.join(STATIC_DIR, 'errors', 'error-summary.json');
+const SSR_VALKEY_KEY = 'bitfrost:all-routes:ssr:v1';
+const SSR_VALKEY_TTL_SECONDS = 300;
+
+let ssrMemoryCache: { ts: number; payload: Record<string, unknown> } | null = null;
 
 async function readJsonFile<T = Record<string, unknown>>(filePath: string): Promise<T | null> {
   try {
@@ -208,6 +142,36 @@ async function readJsonFile<T = Record<string, unknown>>(filePath: string): Prom
 }
 
 export const load = async () => {
+  // 0. Check L0 memory cache (60s) and L1 Redis/Valkey cache (300s) for fast SSR hydration
+  if (ssrMemoryCache && Date.now() - ssrMemoryCache.ts < 60_000) {
+    return {
+      ...ssrMemoryCache.payload,
+      ssrCacheSource: 'memory-l0',
+    };
+  }
+
+  try {
+    const [{ getRedis }, { fastJsonParse }] = await Promise.all([
+      import('$lib/server/redis.js'),
+      import('$lib/server/gpu/simdjson-bridge.js'),
+    ]);
+    const redis = getRedis();
+    const cachedRaw = await Promise.race([
+      redis.get(SSR_VALKEY_KEY),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 200)),
+    ]);
+    if (cachedRaw) {
+      const parsed = fastJsonParse<Record<string, unknown>>(cachedRaw);
+      ssrMemoryCache = { ts: Date.now(), payload: parsed };
+      return {
+        ...parsed,
+        ssrCacheSource: 'valkey-l1',
+      };
+    }
+  } catch {
+    // Non-fatal: fall through to disk + DB assembly
+  }
+
   let astGraph: {
     nodes: unknown[];
     edges: unknown[];
@@ -224,10 +188,13 @@ export const load = async () => {
   const phase72Graph = await readJsonFile<typeof astGraph>(PHASE72_GRAPH_PATH);
   if (phase72Graph?.nodes) {
     astGraph = phase72Graph;
-    routes = phase72Graph.nodes.map((node) => astNodeToRouteNode(node as Record<string, unknown>));
-  } else {
-    // Static graph not found — routes will be empty
+    routes = phase72Graph.nodes
+      .map((node) => astNodeToRouteNode(node as Record<string, unknown>))
+      .filter((r): r is RouteNode => r !== null);
   }
+
+  // Note: Live filesystem routes from getAllRouteEndpoints ($lib/server/api-metadata-extractor.js)
+  // are loaded asynchronously via /api/routes/metadata in +page.svelte onMount() (L2 IndexedDB <-> L1 Valkey).
 
   // ─────────────────────────────────────────────────────────
   // Step 2: Enrich routes with database data (Phase 6)
@@ -236,7 +203,7 @@ export const load = async () => {
   try {
     routes = await Promise.race([
       enrichRoutesWithDatabase(routes),
-      new Promise<RouteNode[]>((resolve) => setTimeout(() => resolve(routes), 1500)),
+      new Promise<RouteNode[]>((resolve) => setTimeout(() => resolve(routes), 400)),
     ]);
   } catch (error) {
     console.error('[Phase 6] Database enrichment error:', error);
@@ -281,10 +248,10 @@ export const load = async () => {
   errorSummary = await readJsonFile(ERROR_SUMMARY_PATH);
 
   // ─────────────────────────────────────────────────────────
-  // Step 6: Return shaped data for UI
+  // Step 6: Cache in L0/L1 Valkey and return shaped data for SSR
   // ─────────────────────────────────────────────────────────
 
-  return {
+  const payload = {
     routes,
     errorClusters,
     shieldData,
@@ -295,5 +262,23 @@ export const load = async () => {
       errorCount: errorClusters.filter((c) => c.severity === 'error').length,
       warningCount: errorClusters.filter((c) => c.severity === 'warning').length,
     },
+  };
+
+  ssrMemoryCache = { ts: Date.now(), payload };
+
+  try {
+    const { getRedis } = await import('$lib/server/redis.js');
+    const redis = getRedis();
+    await Promise.race([
+      redis.set(SSR_VALKEY_KEY, JSON.stringify(payload), 'EX', SSR_VALKEY_TTL_SECONDS),
+      new Promise((resolve) => setTimeout(resolve, 200)),
+    ]);
+  } catch {
+    // Non-fatal
+  }
+
+  return {
+    ...payload,
+    ssrCacheSource: 'computed',
   };
 };

@@ -42,7 +42,13 @@ import { materializeWorkspaceRevisionOriginV1 } from '../../sveltekit-frontend/s
 import { buildSourceNamespaceFromGraphifyFilesV1 } from '../../sveltekit-frontend/src/lib/server/atlas/embedding/source-namespace-v1.js';
 
 const root = process.cwd();
-const reportPath = path.resolve(root, 'docs/reports/current-source-evidence-authority-v1.json');
+const reportArg = process.argv.find((value) => value.startsWith('--report='))?.slice('--report='.length);
+const reportPath = path.resolve(root, reportArg ?? 'docs/reports/current-source-evidence-authority-v1.json');
+const reportRelativePath = path.relative(root, reportPath);
+if (path.isAbsolute(reportRelativePath) || reportRelativePath === '..'
+  || reportRelativePath.startsWith(`..${path.sep}`)) {
+  throw new Error('SOURCE_AUTHORITY_REPORT_PATH_OUTSIDE_REPOSITORY');
+}
 const repositoryId = process.env.ATLAS_REPOSITORY_ID ?? 'semaj90/deeds_web_app';
 const producerRevision = 'atlas.current-source-evidence-authority.v1';
 const sha256 = (value: string) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
@@ -155,6 +161,7 @@ const report = {
   mode: 'READ_ONLY',
   canonicalAuthority: false,
   writesPerformed: false,
+  reportPath: reportRelativePath.replaceAll('\\', '/'),
   status,
   toleranceWindow: { toleranceMs, nowMs, checkedAt: new Date(nowMs).toISOString() },
   currentWorkspace: {
@@ -204,5 +211,5 @@ console.log(JSON.stringify({
   ambiguityCount: report.ambiguityCount,
   selectedRunId: selectedRun?.run_id ?? null,
   sourceCount: report.selection?.sourceCount ?? 0,
-  reportPath: 'docs/reports/current-source-evidence-authority-v1.json',
+  reportPath: report.reportPath,
 }, null, 2));

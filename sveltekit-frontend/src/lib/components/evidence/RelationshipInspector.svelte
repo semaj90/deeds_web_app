@@ -133,6 +133,9 @@
  {#if relationship.label}
  <div class="relationship-label">{relationship.label}</div>
  {/if}
+ {#if relationship.notes}
+ <div class="relationship-notes">{relationship.notes}</div>
+ {/if}
  <div class="relationship-meta">
  <span class="strength">Strength: {relationship.strength}</span>
  <span class="created">Created: {new Date(relationship.createdAt).toLocaleDateString()}</span>

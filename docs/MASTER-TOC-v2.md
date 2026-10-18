@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v2.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `8ae15d128ffbfad6dca1b70c84c61ad95b70188c2128bcb55aede1d9448463be`
+Registry checksum: `9b4ffdddcb6f78a23cbd96baedc2591b6907b355d2c2031332e7585f8df84a2e`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 
@@ -27,6 +27,10 @@ Registry checksum: `8ae15d128ffbfad6dca1b70c84c61ad95b70188c2128bcb55aede1d94484
 | PostgreSQL FTS | Built-in `tsvector` queries ranked by `ts_rank`/`ts_rank_cd`. | Existing lexical lane; not strict Okapi BM25. |
 | `BM25` | Term-frequency/inverse-document-frequency ranking. | The compatibility-named `bm25-search.ts` path uses PostgreSQL FTS (`tsvector` / `ts_rank`); do not infer a separate BM25 index or production `pg_search` owner without caller evidence. |
 | `pgvector` / `HNSW` | PostgreSQL vector types/operators and an approximate-neighbor index option. | Existing `semantic_768` executor; lineage admission is separate. |
+| `semantic_768` | The canonical 768-dimensional dense representation stored in PostgreSQL `codebase_chunk_index.content_embedding_768`. | PostgreSQL owns canonical storage/eligibility; the unique production writer and Qdrant parity remain unproven. |
+| AST / structural search | Abstract syntax tree observations describe parsed program structure and source spans; they are distinct from semantic embeddings. | Use exact source bytes, parser/version, and byte-span evidence; AST matches nominate evidence, not truth or relevance labels. |
+| Top cosine similarity | Order normalized vectors by descending cosine similarity (equivalently ascending cosine distance when defined as `1 - similarity`). | A dense-lane candidate score, not calibrated relevance or RRF; exact-rescore only the bounded candidate set when required. |
+| Inverse candidate LUT | A derived reverse lookup from an exact identity key or `(packetKey, sourceRef, sourceRevision)` tuple to an ordinal in a verified candidate map. | `buildCandidateReverseIndexV1`; rebuildable and non-authoritative. This is not reciprocal/inverse cosine scoring. |
 | Qdrant snapshot / upsert | Snapshot captures collection state; upsert replaces point state for an ID. | Rebuild from qualified canonical rows; verify full payload/vectors and readback before cutover. |
 | Hash map / dictionary | In-memory key/value lookup. | Cache/lookup only; not durable identity, uniqueness, or admission. |
 | Bag-of-words / n-gram | Sparse term counts / adjacent token-or-character features. | Lexical feature representations with versioned tokenization. |
@@ -34,6 +38,16 @@ Registry checksum: `8ae15d128ffbfad6dca1b70c84c61ad95b70188c2128bcb55aede1d94484
 | Matrix / tensor / GEMM / cuBLAS | Dense numeric arrays and GPU matrix multiplication. | Numeric execution only; dtype/layout/revision and parity remain explicit. |
 | `rg` / `sed` | Ripgrep search / stream editing. | Source-navigation utilities, not parsers or canonical indexers. |
 | RAPIDS / cuVS / cuGraph | GPU data processing / vector search / graph analytics libraries. | Optional executors over frozen qualified inputs, never canonical owners. |
+| NetworkX | Python graph construction and algorithms, used here as a CPU reference/parity oracle. | Compare against the same frozen, source-qualified graph and stable node/edge mapping; not canonical storage. |
+| cuGraph / RAPIDS | RAPIDS cuGraph provides GPU graph algorithms; RAPIDS is the larger GPU data-science library family. | GPU challenger to CPU graph results; require graph-revision binding and numerical/ordering parity before use. |
+| cuVS CAGRA | GPU approximate-nearest-neighbor search using a graph-based index. | Optional dense executor/projection; not Neo4j, not graph truth, and not an extra semantic RRF vote. |
+| RTX | NVIDIA GPU hardware (workstation target: RTX 3060 Ti, 8 GiB VRAM). | A compute resource, not an algorithm, datastore, or proof that a GPU kernel ran. |
+| Latent topology | Derived low-dimensional coordinates, clusters, or neighborhood structure computed from a versioned feature/embedding matrix. | Advisory topology only; cannot create identity, source authority, relevance labels, or canonical graph edges. |
+| K-Means | Unsupervised clustering that assigns vectors to centroid-defined groups. | Cluster membership can prefilter or add a feature; it is not a relevance rank, canonical ordinal, or evidence of related source facts. |
+| RRF | Reciprocal Rank Fusion combines ranked candidate lists using rank-based contributions (commonly `1 / (k + rank)`). | SearchRuntime owns final fusion; same-logical-lane executors are deduplicated to one vote. |
+| MCP search | A model-context-protocol tool call that searches a named evidence source (for example packet, KAG, or compact ACE search). | Tool discovery/invocation is not the same as SearchRuntime fusion; returned candidates still require canonical identity/revision qualification and ACE admission. |
+| ACP | This repository's typed agent/tool registry and invocation/control surface. | Carries bounded tool requests/results; it does not grant canonical write authority or establish evidence provenance. |
+| A2A | Agent-to-Agent discovery/delegation, exposed in this app through the agent-card and task interfaces. | Orchestration/control projection only; delegated results must return through canonical evidence and authorization gates. |
 | Agentic dense search / LUT | Dense candidate retrieval plus identity, revision, evidence, and tool-permission checks. | Advisory routing; one semantic vote, no direct mutation authority. |
 
 ## Retrieval and learning distinctions
@@ -55,6 +69,23 @@ Registry checksum: `8ae15d128ffbfad6dca1b70c84c61ad95b70188c2128bcb55aede1d94484
 | AlphaGo / TabFM research analogies | External research can suggest evaluation methods or experiments. | AlphaGo self-play is not Atlas unsupervised learning; evaluate a named TabFM configuration only on a frozen, independently labeled Atlas dataset. |
 
 These methods are separate experiment stages: candidate generation → deterministic fusion → optional feature/reranking challengers → source qualification → ContextManifest admission. A passing fixture or algorithm test does not prove live corpus quality or production integration.
+
+## Repository directory analysis and audit glossary
+
+| Term | Meaning | Owner / safe interpretation |
+| --- | --- | --- |
+| Physical directory count | Directories present on disk, including untracked and ignored trees, under the stated root and traversal policy. | Do not compare with Git path-prefix counts unless root, depth, symlink behavior, and exclusions match. |
+| Tracked directory count | Unique parent-path prefixes derived from `git ls-files` at a stated revision. | Counts versioned paths only; it is not a count of all physical directories. |
+| Ignored directory | A path excluded by Git ignore rules; verify an exact path with `git check-ignore -v`. | Ignore status does not mean generated, safe to delete, or unused. Keep ignored/model/dependency bytes separate from source-corpus statistics. |
+| Directory inventory | A bounded census of paths, file counts, bytes, extensions, tracked/ignored state, and declared exclusions. | `scripts/atlas/audit-ignored-directories.mjs` emits diagnostic reports and task candidates; it is not a canonical index writer. |
+| Directory role map / card | Derived labeling such as `source`, `tests`, `migrations`, `generated_reports`, `build_cache`, or `binary_artifact`, with owner and search policy. | `docs/reports/directory-analysis-report.md` is dated 2026-05-16; treat as historical until regenerated and bound to a current workspace revision. A card is not authority to move/archive content. |
+| Directory relevance | Evidence-weighted assessment using tracked source, imports/callers, tests, runtime/deployment references, ownership, and recent activity. | File count or byte size alone cannot establish relevance, production status, or deletion eligibility. |
+| Dev / test / production classification | Role inferred from explicit package scripts, service manifests, runtime callers, deployment config, and proof receipts. | A folder name, test fixture, historical checkbox, or successful build alone is insufficient to call a capability production-live. |
+| Generated graph / ignored JSON | A derived snapshot or cache with a producer, input revision, digest, freshness, and known consumers. | Keep out of tracked source totals unless separately reported; stale or ignored graphs are not live ownership evidence. |
+| Directory LUT | Proposed lookup from directory identity/path to derived directory metadata or candidates. | `atlas_directories` is schema scaffolding in the recorded audit: no qualified producer/reader/population caller was found, and source/workspace revision evidence is missing. Do not treat it as a populated search index. |
+| OpenSpec ledger vs. workboard | `tasks.md` records task claims and evidence; the generated workboard summarizes them for navigation. | The workboard is a projection, not a second status authority; a checked box is not production proof without its acceptance evidence. |
+
+Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mjs`, `scripts/atlas/audit-hidden-directory-kanban.mjs`, `openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md`, and `docs/reports/directory-analysis-report.md`. Do not run an apply-capable refresh or infer archive/delete permission from a directory inventory.
 
 ## Canonical source documents
 
@@ -224,8 +255,9 @@ These methods are separate experiment stages: candidate generation → determini
 - [agent-branch-review-fanout-ace-centroid-aug22](openspec/changes/agent-branch-review-fanout-ace-centroid-aug22) — 17/20 tasks (85%)
 - [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence) — 27/82 tasks (33%)
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22) — 16/28 tasks (57%)
+- [legal-corpus-california-codes](openspec/changes/legal-corpus-california-codes) — 8/15 tasks (53%)
 - [local-llm-offload-ownership](openspec/changes/local-llm-offload-ownership) — 49/82 tasks (60%)
-- [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/131 tasks (75%)
+- [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/132 tasks (74%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 57/110 tasks (52%)
 - [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 981/1493 tasks (66%)
 - [parent-atlas-adaptive-backprop-hll-monitoring](openspec/changes/parent-atlas-adaptive-backprop-hll-monitoring) — 10/64 tasks (16%)
@@ -234,7 +266,7 @@ These methods are separate experiment stages: candidate generation → determini
 - [parent-atlas-agentic-completion](openspec/changes/parent-atlas-agentic-completion) — 10/11 tasks (91%)
 - [parent-atlas-agentic-file-compiler](openspec/changes/parent-atlas-agentic-file-compiler) — 56/81 tasks (69%)
 - [parent-atlas-agentic-repair-bundle-integration](openspec/changes/parent-atlas-agentic-repair-bundle-integration) — 29/96 tasks (30%)
-- [parent-atlas-agentic-repair-fabric](openspec/changes/parent-atlas-agentic-repair-fabric) — 41/42 tasks (98%)
+- [parent-atlas-agentic-repair-fabric](openspec/changes/parent-atlas-agentic-repair-fabric) — 45/54 tasks (83%)
 - [parent-atlas-analysis-pass-ornith-adapter](openspec/changes/parent-atlas-analysis-pass-ornith-adapter) — 24/25 tasks (96%)
 - [parent-atlas-best-fit-score-fabric](openspec/changes/parent-atlas-best-fit-score-fabric) — 422/714 tasks (59%)
 - [parent-atlas-branch-merge-consolidation-aug20](openspec/changes/parent-atlas-branch-merge-consolidation-aug20) — 18/35 tasks (51%)
@@ -274,7 +306,7 @@ These methods are separate experiment stages: candidate generation → determini
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 19/26 tasks (73%)
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 39/63 tasks (62%)
 - [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion) — 15/21 tasks (71%)
-- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 233/385 tasks (61%)
+- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 246/400 tasks (62%)
 - [parent-atlas-ontology-oaklib-fanout-bitmap](openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap) — 33/36 tasks (92%)
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof) — 2/19 tasks (11%)
 - [parent-atlas-openspec-ledger-reconciliation](openspec/changes/parent-atlas-openspec-ledger-reconciliation) — 0/13 tasks (0%)
@@ -290,7 +322,7 @@ These methods are separate experiment stages: candidate generation → determini
 - [parent-atlas-retire-384-lane](openspec/changes/parent-atlas-retire-384-lane) — 17/31 tasks (55%)
 - [parent-atlas-retrieval-executor-compatibility-convergence](openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence) — 39/48 tasks (81%)
 - [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 119/144 tasks (83%)
-- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 860/1172 tasks (73%)
+- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 865/1189 tasks (73%)
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 60/157 tasks (38%)
 - [parent-atlas-retrieval-logic-convergence](openspec/changes/parent-atlas-retrieval-logic-convergence) — 32/74 tasks (43%)
 - [parent-atlas-rpc-packet-registry-fabric](openspec/changes/parent-atlas-rpc-packet-registry-fabric) — 30/41 tasks (73%)

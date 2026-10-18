@@ -1,19 +1,30 @@
 {
   "schema": "atlas.graphify-binding-02-adapter-feasibility.v1",
   "task": "GRAPHIFY-BINDING-02",
-  "generatedAt": "2026-09-29T03:34:35.628Z",
+  "generatedAt": "2026-10-17T20:48:10.082Z",
   "mode": "READ_ONLY_FEASIBILITY_PROBE",
   "writesPerformed": false,
   "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
   "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
   "snapshotSourceCount": 25542,
+  "sourceScope": "repo:root",
+  "admittedRevisionContract": {
+    "policyRevision": null,
+    "sourceCount": 25542,
+    "repositoryCount": 7,
+    "candidate": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+    "matchesAdmission": true
+  },
   "errors": [],
-  "entriesMapped": 25542,
+  "selectedSourceCount": 24456,
+  "excludedNestedRepositorySourceCount": 1086,
+  "entriesMapped": 24456,
   "recordBuilt": true,
-  "recomputedWorkspaceRevision": "sha256:4cf21f7afbabe0f4b8ea4dd66c5789b533b964199675650650cb227d52ddbfed",
+  "recomputedWorkspaceRevision": "sha256:669bffa0c644b839d30b5a5557a20c803dc1fbe1b955f4341850cb54d5c5408e",
   "recomputedMatchesAdmitted": false,
   "bindingsBuilt": true,
-  "bindingsCount": 25542,
+  "bindingsCount": 24456,
   "sampleEntries": [
     {
       "sourceRef": "__tests__/data-hashing.spec.ts",
@@ -33,7 +44,7 @@
   "sampleBindings": [
     {
       "schema": "atlas.workspace-source-binding.v1",
-      "workspaceRevision": "sha256:4cf21f7afbabe0f4b8ea4dd66c5789b533b964199675650650cb227d52ddbfed",
+      "workspaceRevision": "sha256:669bffa0c644b839d30b5a5557a20c803dc1fbe1b955f4341850cb54d5c5408e",
       "sourceRef": "__tests__/data-hashing.spec.ts",
       "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
       "contentDigest": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
@@ -47,11 +58,11 @@
       "readOnlyObservation": true,
       "canonicalAuthority": false,
       "producerRevision": "GRAPHIFY-BINDING-02:v1",
-      "checksum": "cfac9d2c73b080a26b1df3c5ea871a70b69285bbc597b4d377176b4b02328045"
+      "checksum": "760f5283ad616405b246fa20a384a160a3ea70e5a8797877a807f00849a57471"
     },
     {
       "schema": "atlas.workspace-source-binding.v1",
-      "workspaceRevision": "sha256:4cf21f7afbabe0f4b8ea4dd66c5789b533b964199675650650cb227d52ddbfed",
+      "workspaceRevision": "sha256:669bffa0c644b839d30b5a5557a20c803dc1fbe1b955f4341850cb54d5c5408e",
       "sourceRef": ".clarity/ff1-plan.md",
       "sourceRevision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
       "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
@@ -65,8 +76,8 @@
       "readOnlyObservation": true,
       "canonicalAuthority": false,
       "producerRevision": "GRAPHIFY-BINDING-02:v1",
-      "checksum": "cf2bca2eca4092f00e5a73b89a5dab20cd5387b6731c64685a03bc0456c53a70"
+      "checksum": "00854a49a42dcf11066997a9de795164f57db691063615907d85e201f6ee0769"
     }
   ],
-  "verdict": "DIGEST_MISMATCH_INVESTIGATE_BEFORE_PROCEEDING"
+  "verdict": "MULTI_REPOSITORY_REVISION_NOT_REPRESENTABLE_BY_SINGLE_REPOSITORY_BINDING_V1"
 }

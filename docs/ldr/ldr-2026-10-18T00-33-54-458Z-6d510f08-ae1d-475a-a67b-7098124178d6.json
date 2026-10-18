@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.ldr.report.v1",
+  "executionId": "6d510f08-ae1d-475a-a67b-7098124178d6",
+  "createdAt": "2026-10-18T00:33:54.458Z",
+  "query": null,
+  "status": "BLOCKED",
+  "taskId": null,
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "researchStartAttempted": false,
+  "sourceRevisionDeferred": true,
+  "reportSha256": "9931a56779a4a8403b0d7cbcf03a04cff6e1a8d1a8a64e0987de7fbfedbd1c4e",
+  "tools": [
+    "ldr.start_research",
+    "ldr.get_report",
+    "ldr.poll_status",
+    "ldr.search_history",
+    "ldr.quick_summary"
+  ],
+  "error": "data.find is not a function"
+}

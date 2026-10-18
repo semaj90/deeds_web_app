@@ -4,7 +4,7 @@
  * extraction lane already produces for TS/JS via ts-ast-extractor.mjs, just for a different kind
  * of "symbol": an addressable key path rather than a function/class declaration.
  *
- * Strict JSON validation precedes location extraction through the existing TypeScript compiler.
+ * JSON/JSONC validation precedes location extraction through the existing TypeScript compiler.
  * Offsets are decoded UTF-16 string indices; the source envelope maps these to raw bytes at the
  * writer boundary. The observation limit is checked before constructing the location tree.
  */

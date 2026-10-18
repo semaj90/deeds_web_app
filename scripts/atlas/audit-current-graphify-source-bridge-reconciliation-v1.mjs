@@ -17,12 +17,16 @@ import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs'
 const root = REPO_ROOT;
 const admissionPath = path.join(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const ownerPlanPath = path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
-const reportPath = path.join(root, 'docs/reports/current-graphify-source-bridge-reconciliation-v1.json');
 const args = process.argv.slice(2);
 const valueFor = (name) => {
   const index = args.indexOf(name);
   return index >= 0 ? args[index + 1] ?? null : null;
 };
+const requestedReportPath = valueFor('--output') ?? 'docs/reports/current-graphify-source-bridge-reconciliation-v1.json';
+const reportPath = path.resolve(root, requestedReportPath);
+if (reportPath === root || !reportPath.startsWith(`${root}${path.sep}`)) {
+  throw new Error('SOURCE_BRIDGE_REPORT_OUTPUT_MUST_REMAIN_WITHIN_REPOSITORY');
+}
 const digest = (value) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
 const normalizeRef = (value) => String(value ?? '').trim().replaceAll('\\', '/').replace(/^\.\//, '');
 const normalizeDigest = (value) => String(value ?? '').trim().replace(/^sha256:/i, '').toLowerCase();

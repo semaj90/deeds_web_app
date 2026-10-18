@@ -1,0 +1,1304 @@
+[
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\ContextualEvidenceChatModal.svelte",
+    "line": 428,
+    "col": 2,
+    "message": "`<div>` with a dragenter, dragover, dragleave or drop handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\SystemStatus.svelte",
+    "line": 280,
+    "col": 2,
+    "message": "Unused CSS selector \".alert-info .alert-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\SystemStatus.svelte",
+    "line": 289,
+    "col": 2,
+    "message": "Unused CSS selector \".alert-warning .alert-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\SystemStatus.svelte",
+    "line": 298,
+    "col": 2,
+    "message": "Unused CSS selector \".alert-error .alert-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\SystemStatus.svelte",
+    "line": 307,
+    "col": 2,
+    "message": "Unused CSS selector \".alert-success .alert-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\QuickActions.svelte",
+    "line": 89,
+    "col": 8,
+    "message": "Unused CSS selector \".action-button:hover:not(:disabled) .action-arrow\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\QuickActions.svelte",
+    "line": 89,
+    "col": 8,
+    "message": "Unused CSS selector \".action-primary .action-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\QuickActions.svelte",
+    "line": 89,
+    "col": 8,
+    "message": "Unused CSS selector \".action-success .action-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\QuickActions.svelte",
+    "line": 89,
+    "col": 8,
+    "message": "Unused CSS selector \".action-warning .action-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\QuickActions.svelte",
+    "line": 89,
+    "col": 8,
+    "message": "Unused CSS selector \".action-danger .action-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\gaming\\n64\\Dialog.svelte",
+    "line": 150,
+    "col": 5,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\gaming\\n64\\Dialog.svelte",
+    "line": 150,
+    "col": 5,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\gaming\\n64\\Select.svelte",
+    "line": 173,
+    "col": 13,
+    "message": "Visible, non-interactive element `<span>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\gaming\\n64\\Switch.svelte",
+    "line": 193,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\APITesterModal.svelte",
+    "line": 132,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\APITesterModal.svelte",
+    "line": 142,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\APITesterModal.svelte",
+    "line": 154,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\KeyboardShortcutsPanel.svelte",
+    "line": 69,
+    "col": 2,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\KeyboardShortcutsPanel.svelte",
+    "line": 69,
+    "col": 2,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\KeyboardShortcutsPanel.svelte",
+    "line": 76,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\KeyboardShortcutsPanel.svelte",
+    "line": 76,
+    "col": 3,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\EnhancedDocumentUploader.svelte",
+    "line": 617,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\EnhancedLegalAIChatWithSynthesis.svelte",
+    "line": 1050,
+    "col": 15,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\Gemma270MWebAssembly.svelte",
+    "line": 374,
+    "col": 5,
+    "message": "`<div>` with a dragover, dragleave or drop handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\LLMSelector.svelte",
+    "line": 143,
+    "col": 2,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\LocalImageGenerator.svelte",
+    "line": 131,
+    "col": 3,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\ThinkingStyleToggle.svelte",
+    "line": 165,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ai\\CaseScoringDashboard\\CaseScoringDashboard.svelte",
+    "line": 23,
+    "col": 8,
+    "message": "Unused CSS selector \".page-container\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 223,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 236,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 309,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 509,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 612,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 653,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 700,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 731,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 760,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 780,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 799,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 832,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 857,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\analysis\\AnalysisPanel.svelte",
+    "line": 898,
+    "col": 6,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\atlas\\AtlasGraphCanvas.svelte",
+    "line": 90,
+    "col": 3,
+    "message": "Visible, non-interactive element `<svg>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\atlas\\FileDetailModal.svelte",
+    "line": 122,
+    "col": 21,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\atlas\\FileDetailModal.svelte",
+    "line": 135,
+    "col": 21,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\atlas\\FileDetailModal.svelte",
+    "line": 158,
+    "col": 21,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\atlas\\FileDetailModal.svelte",
+    "line": 171,
+    "col": 21,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\cases\\CaseViewModal.svelte",
+    "line": 88,
+    "col": 2,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\cases\\CaseViewModal.svelte",
+    "line": 88,
+    "col": 2,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\citations\\CitationViewModal.svelte",
+    "line": 74,
+    "col": 2,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\citations\\CitationViewModal.svelte",
+    "line": 74,
+    "col": 2,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\DocumentThumbnailTray.svelte",
+    "line": 48,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\dashboard\\DocumentThumbnailTray.svelte",
+    "line": 48,
+    "col": 3,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\demos\\TTSDemo.svelte",
+    "line": 86,
+    "col": 4,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\CaseEvidenceOrganizer.svelte",
+    "line": 559,
+    "col": 8,
+    "message": "Unused CSS selector \".ceo-card.compact p\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\EvidenceCustodyFlow.svelte",
+    "line": 492,
+    "col": 3,
+    "message": "Unused CSS selector \".workflow-transition\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\RelationshipInspector.svelte",
+    "line": 237,
+    "col": 2,
+    "message": "Unused CSS selector \".relationship-notes\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceAssistant.svelte",
+    "line": 212,
+    "col": 8,
+    "message": "Unused CSS selector \".evidence-dialog\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceAssistant.svelte",
+    "line": 212,
+    "col": 8,
+    "message": "Unused CSS selector \".edit-form textarea\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceBoard.svelte",
+    "line": 1286,
+    "col": 4,
+    "message": "`<div>` with a dragleave or drop handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\forms\\EnhancedFileUpload.svelte",
+    "line": 406,
+    "col": 13,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\forms\\EnhancedFileUpload.svelte",
+    "line": 429,
+    "col": 13,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceImageSearch.svelte",
+    "line": 306,
+    "col": 6,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceUploadModal.svelte",
+    "line": 226,
+    "col": 2,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceUploadModal.svelte",
+    "line": 226,
+    "col": 2,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceUploadModal.svelte",
+    "line": 227,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceUploadModal.svelte",
+    "line": 227,
+    "col": 3,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\TagInput.svelte",
+    "line": 48,
+    "col": 1,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceViewModal.svelte",
+    "line": 571,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceViewModal.svelte",
+    "line": 571,
+    "col": 3,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceViewModal.svelte",
+    "line": 586,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\evidence\\EvidenceViewModal.svelte",
+    "line": 586,
+    "col": 3,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\forms\\CaseForm.svelte",
+    "line": 61,
+    "col": 13,
+    "message": "This reference only captures the initial value of `initialData`. Did you mean to reference it inside a closure instead?",
+    "code": "state_referenced_locally"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\graph\\GraphifyViewer.svelte",
+    "line": 1044,
+    "col": 8,
+    "message": "Unused CSS selector \".atlas-compare-row input\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\ContractAnalyzer.svelte",
+    "line": 334,
+    "col": 8,
+    "message": "Unused CSS selector \".contract-title\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\ContractAnalyzer.svelte",
+    "line": 334,
+    "col": 8,
+    "message": "Unused CSS selector \".status-draft\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\ContractAnalyzer.svelte",
+    "line": 334,
+    "col": 8,
+    "message": "Unused CSS selector \".status-review\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\ContractAnalyzer.svelte",
+    "line": 334,
+    "col": 8,
+    "message": "Unused CSS selector \".status-approved\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\ContractAnalyzer.svelte",
+    "line": 334,
+    "col": 8,
+    "message": "Unused CSS selector \".status-executed\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\ContractAnalyzer.svelte",
+    "line": 334,
+    "col": 8,
+    "message": "Unused CSS selector \".export-btn\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\ContractAnalyzer.svelte",
+    "line": 334,
+    "col": 8,
+    "message": "Unused CSS selector \".contract-title\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal\\PDFViewer.svelte",
+    "line": 111,
+    "col": 1,
+    "message": "`<div>` with a keydown handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\legal-ai\\CaseChatPanel.svelte",
+    "line": 332,
+    "col": 2,
+    "message": "`<div>` with a dragenter, dragover, dragleave or drop handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\modals\\EvidenceCRUDModal.svelte",
+    "line": 435,
+    "col": 17,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\modals\\EvidenceCRUDModal.svelte",
+    "line": 482,
+    "col": 19,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\modals\\EvidenceCRUDModal.svelte",
+    "line": 532,
+    "col": 19,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\modals\\EvidenceCRUDModal.svelte",
+    "line": 590,
+    "col": 19,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\monitoring\\CacheWarmUpControl.svelte",
+    "line": 106,
+    "col": 5,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\monitoring\\CacheWarmUpControl.svelte",
+    "line": 126,
+    "col": 8,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\monitoring\\CacheWarmUpControl.svelte",
+    "line": 137,
+    "col": 8,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\monitoring\\CacheWarmUpControl.svelte",
+    "line": 289,
+    "col": 8,
+    "message": "Unused CSS selector \".animate-spin\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\monitoring\\CacheWarmUpSimple.svelte",
+    "line": 49,
+    "col": 3,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\poi\\AddPoiModal.svelte",
+    "line": 126,
+    "col": 11,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\poi\\AddPoiModal.svelte",
+    "line": 130,
+    "col": 11,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\poi\\AddPoiModal.svelte",
+    "line": 138,
+    "col": 11,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\poi\\AddPoiModal.svelte",
+    "line": 152,
+    "col": 11,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\poi\\AddPoiModal.svelte",
+    "line": 162,
+    "col": 11,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\poi\\AddPoiModal.svelte",
+    "line": 169,
+    "col": 10,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\poi\\AddPoiModal.svelte",
+    "line": 175,
+    "col": 10,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\rag\\AnswerWithCitations.svelte",
+    "line": 208,
+    "col": 3,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\rag\\AnswerWithCitations.svelte",
+    "line": 208,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\rag\\AnswerWithCitations.svelte",
+    "line": 214,
+    "col": 5,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\rag\\AnswerWithCitations.svelte",
+    "line": 214,
+    "col": 5,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\rag\\RagDocumentGrid.svelte",
+    "line": 178,
+    "col": 4,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\rag\\RagDocumentGrid.svelte",
+    "line": 178,
+    "col": 4,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\reports\\ReportViewModal.svelte",
+    "line": 66,
+    "col": 2,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\reports\\ReportViewModal.svelte",
+    "line": 66,
+    "col": 2,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\BitsUIDemo.svelte",
+    "line": 59,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\BitsUIDemo.svelte",
+    "line": 80,
+    "col": 9,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\BitsUIDemo.svelte",
+    "line": 95,
+    "col": 9,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\BitsUIDemo.svelte",
+    "line": 142,
+    "col": 13,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\BitsUIDemo.svelte",
+    "line": 154,
+    "col": 13,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\BitsUIDemo.svelte",
+    "line": 166,
+    "col": 13,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\CommandPalette.svelte",
+    "line": 175,
+    "col": 7,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\GlobalCommandPalette.svelte",
+    "line": 172,
+    "col": 2,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\StyleSettings.svelte",
+    "line": 40,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\StyleSettings.svelte",
+    "line": 56,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\StyleSettings.svelte",
+    "line": 74,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\StyleSettings.svelte",
+    "line": 91,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\StyleSettings.svelte",
+    "line": 108,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\StyleSettings.svelte",
+    "line": 125,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\components\\ui\\StyleSettings.svelte",
+    "line": 142,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\+page.svelte",
+    "line": 639,
+    "col": 8,
+    "message": "Unused CSS selector \".dialog-hint code\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(analysis)\\video-analysis\\[evidenceId]\\+page.svelte",
+    "line": 372,
+    "col": 10,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(analysis)\\video-analysis\\[evidenceId]\\+page.svelte",
+    "line": 372,
+    "col": 10,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(analysis)@\\video-analysis\\[evidenceId]\\+page.svelte",
+    "line": 346,
+    "col": 10,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(analysis)@\\video-analysis\\[evidenceId]\\+page.svelte",
+    "line": 346,
+    "col": 10,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\admin\\all-routes\\+page.svelte",
+    "line": 25,
+    "col": 43,
+    "message": "This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?",
+    "code": "state_referenced_locally"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\admin\\all-routes\\+page.svelte",
+    "line": 25,
+    "col": 59,
+    "message": "This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?",
+    "code": "state_referenced_locally"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\analysis-center\\+page.svelte",
+    "line": 746,
+    "col": 8,
+    "message": "Unused CSS selector \".summary-toggle\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\analytics\\+page.svelte",
+    "line": 1492,
+    "col": 8,
+    "message": "Unused CSS selector \".dr-provider-toggle button\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\analytics\\+page.svelte",
+    "line": 1492,
+    "col": 8,
+    "message": "Unused CSS selector \".dr-provider-toggle button:hover\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\analytics\\+page.svelte",
+    "line": 1492,
+    "col": 8,
+    "message": "Unused CSS selector \".dr-provider-toggle button.dr-provider-btn-active\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\analytics\\+page.svelte",
+    "line": 1492,
+    "col": 8,
+    "message": "Unused CSS selector \".dr-image-card img\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\analytics\\+page.svelte",
+    "line": 1492,
+    "col": 8,
+    "message": "Unused CSS selector \".dr-image-card figcaption\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 692,
+    "col": 9,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 712,
+    "col": 15,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 712,
+    "col": 15,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 783,
+    "col": 11,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 783,
+    "col": 11,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 809,
+    "col": 15,
+    "message": "Visible, non-interactive element `<span>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 821,
+    "col": 15,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\citations\\+page.svelte",
+    "line": 821,
+    "col": 15,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\code-intel\\+page.svelte",
+    "line": 170,
+    "col": 8,
+    "message": "Unused CSS selector \".cluster-list\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\code-intel\\+page.svelte",
+    "line": 170,
+    "col": 8,
+    "message": "Unused CSS selector \"h3\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\code-intel\\+page.svelte",
+    "line": 170,
+    "col": 8,
+    "message": "Unused CSS selector \".cluster-item\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\code-intel\\+page.svelte",
+    "line": 170,
+    "col": 8,
+    "message": "Unused CSS selector \".name\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\code-intel\\+page.svelte",
+    "line": 170,
+    "col": 8,
+    "message": "Unused CSS selector \".count\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\codebase-graph\\CodebaseGraphSidebar.svelte",
+    "line": 132,
+    "col": 5,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\command-center\\retrieval\\+page.svelte",
+    "line": 80,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\command-center\\retrieval\\+page.svelte",
+    "line": 94,
+    "col": 7,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\celestial-icons\\+page.svelte",
+    "line": 120,
+    "col": 4,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\celestial-icons\\+page.svelte",
+    "line": 128,
+    "col": 4,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\celestial-icons\\+page.svelte",
+    "line": 142,
+    "col": 4,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte",
+    "line": 519,
+    "col": 9,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte",
+    "line": 531,
+    "col": 9,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte",
+    "line": 540,
+    "col": 9,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte",
+    "line": 622,
+    "col": 5,
+    "message": "`<div>` with a dragover or drop handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\nes-graph\\ElizaNode.svelte",
+    "line": 56,
+    "col": 1,
+    "message": "`<div>` with a pointerdown, pointermove, pointerup or pointercancel handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\nes-graph\\+page.svelte",
+    "line": 141,
+    "col": 1,
+    "message": "`<div>` with a pointerdown, pointermove, pointerup or pointercancel handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\nes-routes\\+page.svelte",
+    "line": 7,
+    "col": 43,
+    "message": "This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?",
+    "code": "state_referenced_locally"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\nes-routes\\+page.svelte",
+    "line": 7,
+    "col": 59,
+    "message": "This reference only captures the initial value of `data`. Did you mean to reference it inside a derived instead?",
+    "code": "state_referenced_locally"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\spotlight\\+page.svelte",
+    "line": 167,
+    "col": 2,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\svelte5-components\\+page.svelte",
+    "line": 93,
+    "col": 8,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\ui-components\\+page.svelte",
+    "line": 188,
+    "col": 5,
+    "message": "A form label must be associated with a control",
+    "code": "a11y_label_has_associated_control"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\ui-components\\+page.svelte",
+    "line": 528,
+    "col": 8,
+    "message": "Unused CSS selector \".section-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\yorha\\components\\EnhancedYoRHaAIAssistant.svelte",
+    "line": 216,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\yorha\\components\\EnhancedYoRHaAIAssistant.svelte",
+    "line": 217,
+    "col": 5,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\demos\\yorha-icons\\+page.svelte",
+    "line": 164,
+    "col": 8,
+    "message": "Unused CSS selector \".control-group label\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\global-search\\+page.svelte",
+    "line": 990,
+    "col": 6,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\global-search\\+page.svelte",
+    "line": 1036,
+    "col": 6,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\global-search\\+page.svelte",
+    "line": 1117,
+    "col": 6,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\global-search\\+page.svelte",
+    "line": 1551,
+    "col": 2,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\global-search\\+page.svelte",
+    "line": 1551,
+    "col": 2,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\global-search\\+page.svelte",
+    "line": 1552,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\global-search\\+page.svelte",
+    "line": 1552,
+    "col": 3,
+    "message": "`<div>` with a click handler must have an ARIA role",
+    "code": "a11y_no_static_element_interactions"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\knowledge\\+page.svelte",
+    "line": 209,
+    "col": 8,
+    "message": "Unused CSS selector \".provider-select\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\knowledge\\+page.svelte",
+    "line": 209,
+    "col": 8,
+    "message": "Unused CSS selector \".web-search-toggle\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\knowledge\\+page.svelte",
+    "line": 209,
+    "col": 8,
+    "message": "Unused CSS selector \".web-search-toggle span\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte",
+    "line": 991,
+    "col": 8,
+    "message": "Unused CSS selector \".search-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte",
+    "line": 991,
+    "col": 8,
+    "message": "Unused CSS selector \".official-text-reader\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte",
+    "line": 991,
+    "col": 8,
+    "message": "Unused CSS selector \".info-icon\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte",
+    "line": 991,
+    "col": 8,
+    "message": "Unused CSS selector \".pill-x\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte",
+    "line": 991,
+    "col": 8,
+    "message": "Unused CSS selector \".search-icon-sm\"",
+    "code": "css_unused_selector"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\library\\corpus\\+page.svelte",
+    "line": 325,
+    "col": 3,
+    "message": "Elements with the 'dialog' interactive role must have a tabindex value",
+    "code": "a11y_interactive_supports_focus"
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\(app)\\library\\corpus\\+page.svelte",
+    "line": 325,
+    "col": 3,
+    "message": "Visible, non-interactive element `<div>` with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\"button\">` or `<a>` might be more appropriate",
+    "code": "a11y_click_events_have_key_events"
+  }
+]

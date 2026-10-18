@@ -41,3 +41,13 @@ Offline Diagnostic Report: `docs/reports/svelte-check-all-warnings-errors-2026-1
 - Open: TSK-14 (repo-wide svelte-check warnings, 181 left; deferred by request).
 - Open: TSK-15 (test gate). Full-suite run crashes with ERR_IPC_CHANNEL_CLOSED after tests/errors-feedback-fictional-routes.spec.ts; that file alone has 8 failing tests. Shard runs (4 shards, cache file excluded) completed without crash: 425 failing tests across 112 files in total before the spec-contract fixes.
 - Next: triage the 8 failures in errors-feedback-fictional-routes.spec.ts, then rerun shards to confirm the crash source.
+
+## SVELTE-A11Y-EVIDENCE-01 — source-grounded repair fixture (2026-10-17)
+
+- [ ] **SVELTE-A11Y-EVIDENCE-01** Build a bounded, read-only local evidence fixture from the official Svelte accessibility documentation for one explicitly selected accessibility rule. Preserve the official URL, retrieved-document checksum, retrieval time, and documentation version when available; mark this material as reference evidence, not canonical source authority.
+- [ ] Bind the fixture to one exact Svelte source revision and the compiler warning/rule evidence. Keep deterministic compiler/AST observations authoritative; documentation and any model-generated summary remain advisory.
+- [ ] Compile the proposed patch with the repository's Svelte compiler/checker and require the targeted warning to be absent without introducing new errors or warnings in the changed file. Record before/after diagnostics, patch checksum, checker version, and outcome in a deterministic receipt.
+- [ ] Validate citation grounding against the local fixture and require abstention when the rule, cited passage, source revision, or checker result cannot be resolved. Do not fetch into `atlas_external_doc_pages`, write PostgreSQL/Valkey/Qdrant/Neo4j, publish a task, or promote a repair as part of this gate.
+- [ ] Run focused fixture and compiler tests, then record exact commands, denominators, checksums, changed files, and residual risks. This gate is independent of full domain-taxonomy coverage.
+
+Status: **OPEN / LOCAL FIXTURE ONLY**. This is a proposed proof gate; no official documentation acquisition, Svelte repair, or live model execution is claimed here.

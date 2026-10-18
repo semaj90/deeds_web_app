@@ -47,7 +47,7 @@ import { decodeSourceTextEnvelope, decodedOffsetToRawByte, classifySourceKind, M
 import { writeAtlasAstNodes, indexSafeQualifiedSymbolV1 } from './lib/atlas-ast-nodes-writer.mjs';
 import { isGraphifySymbolExcludedArtifactV2, selectBoundedSupportedExtractorCandidates } from './lib/graphify-symbol-candidate-selection-v1.mjs';
 import { resolveSourceReadRootV1 } from './lib/source-read-root-v1.mjs';
-import { buildSymbolBatchPlan, validateSymbolBatchPlan, buildSymbolBaselineShards, selectLiveSymbolPlanRows, verifySymbolObservationReadback, requireSymbolBatchHeadroom, findSymbolIdentityConflicts, disambiguateSymbolOccurrenceKeysV1, disambiguateAstOccurrenceNamesV1 } from './lib/graphify-symbol-batch-plan-v1.mjs';
+import { admitFrozenSymbolRunFileV1, buildSymbolBatchPlan, validateSymbolBatchPlan, buildSymbolBaselineShards, selectLiveSymbolPlanRows, verifySymbolObservationReadback, requireSymbolBatchHeadroom, findSymbolIdentityConflicts, disambiguateSymbolOccurrenceKeysV1, disambiguateAstOccurrenceNamesV1, requireWorkspaceAlignedGraphifyFileApplyV1 } from './lib/graphify-symbol-batch-plan-v1.mjs';
 
 type ExtractedSymbol = {
   kind: string;
@@ -84,6 +84,7 @@ const inputPlanPath = opt('--plan', '');
 const rebindPlanPath = opt('--rebind-plan', '');
 const shardIndex = Number(opt('--shard', '0'));
 const batches = Number(opt('--batches', '1'));
+const shardSize = Number(opt('--shard-size', '250'));
 const maxFilesPerRun = Number(opt('--max-files', '250'));
 const workspaceIdFilter = opt('--workspace-id', '');
 const workspaceRevisionFilter = opt('--workspace-revision', '');
@@ -111,7 +112,8 @@ if (flag('--help') || flag('-h')) {
     '  --use-lsp                   Use the opt-in LSP symbol provider',
     '  --freeze-plan <path>        Freeze ALL exact-byte unprocessed refs; local artifacts only',
     '  --rebind-plan <old>         With --freeze-plan, revalidate the SAME cohort under new parser bytes',
-    '  --plan <path> --shard <n>    Run a fixed 1-based, 250-file shard (dry-run unless --apply)',
+    '  --plan <path> --shard <n>    Run a 1-based frozen shard (dry-run unless --apply)',
+    '  --shard-size <n>             Frozen shard size, 1..250 (default: 250)',
     '  --batches <n>               Consecutive frozen shards (default: 1, maximum: 64)',
     '  --max-files <n>             Maximum newly processed files per shard (1..250; resume same shard)',
     '  --apply                     Apply extraction writes (explicit)',
@@ -133,13 +135,15 @@ if (freezePlanPath || inputPlanPath) {
   if (rebindPlanPath && (!freezePlanPath || inputPlanPath)) throw new Error('SYMBOL_PLAN_REBIND_REQUIRES_FREEZE');
   if (useLsp) throw new Error('SYMBOL_BASELINE_REQUIRES_DETERMINISTIC_PARSER');
   if (!Number.isSafeInteger(batches) || batches < 1 || batches > 64
+    || !Number.isSafeInteger(shardSize) || shardSize < 1 || shardSize > 250
     || !Number.isSafeInteger(maxFilesPerRun) || maxFilesPerRun < 1 || maxFilesPerRun > 250) {
     throw new Error('SYMBOL_PLAN_BATCH_BOUNDS_INVALID');
   }
   if (inputPlanPath && (!Number.isSafeInteger(shardIndex) || shardIndex < 1)) {
     throw new Error('SYMBOL_PLAN_SHARD_REQUIRED');
   }
-} else if (args.includes('--shard') || args.includes('--batches') || args.includes('--max-files') || rebindPlanPath) {
+} else if (args.includes('--shard') || args.includes('--batches') || args.includes('--shard-size')
+  || args.includes('--max-files') || rebindPlanPath) {
   throw new Error('SYMBOL_PLAN_SHARD_REQUIRES_PLAN');
 }
 
@@ -155,6 +159,7 @@ function symbolPlanContext() {
     'scripts/atlas/graphify-symbol-extractor-v1.mts',
     'scripts/graphify/lib/ts-ast-extractor.mjs',
     'scripts/atlas/lib/json-symbol-extractor.mjs',
+    'scripts/atlas/lib/json-source-shape-policy-v1.mjs',
     'scripts/atlas/lib/markdown-symbol-extractor.mjs',
     'scripts/atlas/lib/source-text-envelope.mjs',
     'scripts/atlas/lib/atlas-ast-nodes-writer.mjs',
@@ -468,7 +473,7 @@ function expectedObservations(extraction: ExtractionResult, row: { file_id: stri
     node_kind: node.kind, qualified_symbol: indexSafeQualifiedSymbolV1(node.qualifiedSymbol),
     source_revision: row.source_revision, source_content_hash: extraction.sourceDigest,
     parser_name: kind === 'json' ? 'json-symbol-extractor' : 'markdown-symbol-extractor',
-    parser_version: kind === 'json' ? 'json-symbol-extractor-v1' : 'markdown-symbol-extractor-v1',
+    parser_version: kind === 'json' ? 'json-symbol-extractor-v2' : 'markdown-symbol-extractor-v1',
     start_byte: node.startByte, end_byte: node.endByte,
   }));
   return { symbols, ast };
@@ -520,9 +525,9 @@ async function main(currentShard = shardIndex) {
     : null;
   const previousPlan = rebindPlanPath ? JSON.parse(fs.readFileSync(path.resolve(REPO_ROOT, rebindPlanPath), 'utf8')) : null;
   if (previousPlan) validateSymbolBatchPlan(previousPlan, { ...planContext, producerRevision: previousPlan.producerRevision });
-  const shard = frozenPlan ? buildSymbolBaselineShards(frozenPlan).shards[currentShard - 1] : null;
+  const shard = frozenPlan ? buildSymbolBaselineShards(frozenPlan, shardSize).shards[currentShard - 1] : null;
   if (frozenPlan && !shard) throw new Error('SYMBOL_PLAN_SHARD_OUT_OF_RANGE');
-  if (frozenPlan && shardIndex + batches - 1 > buildSymbolBaselineShards(frozenPlan).shards.length) {
+  if (frozenPlan && shardIndex + batches - 1 > buildSymbolBaselineShards(frozenPlan, shardSize).shards.length) {
     throw new Error('SYMBOL_PLAN_BATCH_RANGE_OUT_OF_BOUNDS');
   }
   const plannedRows = previousPlan?.rows ?? (shard ? frozenPlan.rows.slice(shard.offset, shard.offset + shard.maxFiles) : null);
@@ -622,7 +627,7 @@ async function main(currentShard = shardIndex) {
     if (fs.existsSync(output) || fs.existsSync(shardsPath)) throw new Error('SYMBOL_PLAN_OUTPUT_EXISTS');
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx' });
-    const shards = buildSymbolBaselineShards(manifest);
+    const shards = buildSymbolBaselineShards(manifest, shardSize);
     fs.writeFileSync(shardsPath, JSON.stringify(shards, null, 2) + '\n', { flag: 'wx' });
     fs.writeFileSync(`${output}.freeze.json`, JSON.stringify({
       schema: 'atlas.graphify-symbol-baseline-freeze.v1', generatedAt: new Date().toISOString(),
@@ -658,12 +663,14 @@ async function main(currentShard = shardIndex) {
   let totalSymbolsExtracted = 0;
   let totalSymbolsInserted = 0;
   let filesProcessed = 0;
+  let filesAttempted = 0;
   let filesFailed = 0;
   const byFileKind: Record<string, number> = {};
   const workspaceRevisions = new Set(supportedRows.map(({ row }) => row.workspace_revision).filter(Boolean));
   const graphifyWorkspaceRevisionMismatchCount = supportedRows.filter(({ row }) =>
     Boolean(workspaceRevisionFilter) && row.graphify_workspace_revision !== workspaceRevisionFilter,
   ).length;
+  requireWorkspaceAlignedGraphifyFileApplyV1({ apply, workspaceRevisionMismatchCount: graphifyWorkspaceRevisionMismatchCount });
   let sourceRevisionMismatchCount = 0;
   let fatalError: string | null = null;
   const readbacks: Array<Record<string, unknown>> = [];
@@ -674,12 +681,16 @@ async function main(currentShard = shardIndex) {
   for (const { row, kind } of supportedRows) {
     byFileKind[kind] = (byFileKind[kind] ?? 0) + 1;
     const absPath = path.join(SOURCE_READ.root, row.source_ref);
-    if (frozenPlan && apply && row.parse_status !== 'PROCESSED' && filesProcessed >= maxFilesPerRun) {
+    const admission = frozenPlan
+      ? admitFrozenSymbolRunFileV1(row.parse_status, filesAttempted, maxFilesPerRun)
+      : null;
+    if (admission && !admission.admitted) {
       plan.push({ fileId: row.file_id, sourceRef: row.source_ref, sourceRevision: row.source_revision,
         workspaceRevision: row.workspace_revision, graphifyWorkspaceRevision: row.graphify_workspace_revision,
         workspaceRevisionMatches: true, fileKind: kind, outcome: 'NOT_ATTEMPTED_RUN_LIMIT' });
       continue;
     }
+    if (admission) filesAttempted = admission.attemptedFiles;
     if (!fs.existsSync(absPath)) {
       plan.push({
         fileId: row.file_id, sourceRef: row.source_ref, workspaceRevision: row.workspace_revision,
@@ -915,7 +926,7 @@ async function main(currentShard = shardIndex) {
         // extractor run. Record the actual producer revision unconditionally; never inherit a
         // stale-but-non-null version from the legacy row.
         const parserVersion = kind === 'json'
-          ? 'json-symbol-extractor-v1'
+          ? 'json-symbol-extractor-v2'
           : 'markdown-symbol-extractor-v1';
         const { inserted } = await writeAtlasAstNodes(client, {
           sourceRef: row.source_ref,
@@ -990,6 +1001,7 @@ async function main(currentShard = shardIndex) {
     fatalError,
     availableBytes,
     maxFilesPerRun,
+    shardSize: frozenPlan ? shardSize : null,
     readbacks,
     generatedAt: new Date().toISOString(),
     apply,
@@ -1014,6 +1026,7 @@ async function main(currentShard = shardIndex) {
     skippedUnsupported,
     byFileKind,
     filesProcessed,
+    filesAttempted,
     filesFailed,
     totalSymbolsExtracted,
     totalSymbolsInserted: apply ? totalSymbolsInserted : null,
@@ -1054,10 +1067,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const summary = {
         schema: 'atlas.graphify-symbol-baseline-run.v1', generatedAt: new Date().toISOString(),
         manifestChecksum: reports[0].frozenManifestChecksum, manifestRowCount: manifest.rowCount,
-        workspaceRevision: workspaceRevisionFilter, apply, firstShard: shardIndex, requestedBatches: batches,
+        workspaceRevision: workspaceRevisionFilter, apply, firstShard: shardIndex, requestedBatches: batches, shardSize,
         visitedMembers: members.length, independentlyVerifiedMembers: verified, fullManifestVisited,
         baselineSealProven: fullManifestVisited && verified === manifest.rowCount
           && reports.every(report => report.shardCompletionProven),
+        filesAttemptedThisRun: reports.reduce((n, report) => n + report.filesAttempted, 0),
         filesCommittedThisRun: reports.reduce((n, report) => n + report.filesProcessed, 0),
         outcomeCounts, receipts: reports.map(report => report.reportPath),
         canonicalAuthority: false, projectionAdmissionPromoted: false,

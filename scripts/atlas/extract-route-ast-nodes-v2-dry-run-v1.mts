@@ -36,7 +36,9 @@ const HTTP = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'
 const exe = process.env.AST_GREP_EXE
   ?? 'C:/Users/james/AppData/Roaming/npm/node_modules/@ast-grep/cli/node_modules/@ast-grep/cli-win32-x64-msvc/ast-grep.exe';
 if (!fs.existsSync(exe)) throw new Error(`ast-grep binary not found: ${exe} (set AST_GREP_EXE)`);
-const version = spawnSync(exe, ['--version'], { encoding: 'utf8' }).stdout.trim();
+const versionResult = spawnSync(exe, ['--version'], { encoding: 'utf8', timeout: 30000 });
+if (versionResult.error || versionResult.status !== 0) throw new Error('ast-grep version probe failed');
+const version = versionResult.stdout.trim();
 
 const abs = path.join(frontendRoot, routeRel);
 const bytes = fs.readFileSync(abs);
@@ -45,7 +47,8 @@ const canonicalRepoPath = `sveltekit-frontend/${routeRel}`;
 
 type Match = { text: string; start: number; end: number; line0: number; endLine0: number; vars: Record<string, string> };
 function run(pattern: string): Match[] {
-  const r = spawnSync(exe, ['run', '--lang', 'ts', '-p', pattern, '--json=compact', abs], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+  const r = spawnSync(exe, ['run', '--lang', 'ts', '-p', pattern, '--json=compact', abs], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 30000 });
+  if (r.error) throw new Error(`ast-grep execution failed for ${pattern}: ${r.error.message}`);
   if (r.status !== 0 && !r.stdout) throw new Error(`ast-grep failed for ${pattern}: ${r.stderr.slice(0, 200)}`);
   const raw = JSON.parse(r.stdout || '[]') as Array<any>;
   return raw.map((m) => {
@@ -134,7 +137,7 @@ for (const r of list) {
 if (!/^sha256:[0-9a-f]{64}$/.test(sourceRevision)) problems.push('REVISION');
 
 async function main() {
-  const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 2 });
+  const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 2, connectionTimeoutMillis: 5000, statement_timeout: 10000 });
   const client = await pool.connect();
   const diagnostics: string[] = [];
   let dbVerification: Record<string, unknown> | null = null;
@@ -193,10 +196,15 @@ async function main() {
       nodeCount: list.length, byKind: Object.fromEntries([...new Set(list.map((r) => r.node_kind))].map((k) => [k, list.filter((r) => r.node_kind === k).length])),
       nodes: list, validationProblems: problems, diagnostics, dbVerification,
     };
-    const out = path.join(repoRoot, '.tmp/atlas/ast-nodes-v2-route-extraction-dry-run-v1.json');
+    const receiptChecksum = crypto.createHash('sha256').update(JSON.stringify(receipt)).digest('hex');
+    const out = path.join(repoRoot, '.tmp/atlas', `ast-nodes-v2-route-extraction-dry-run-${crypto.randomUUID()}.json`);
     fs.mkdirSync(path.dirname(out), { recursive: true });
-    fs.writeFileSync(out, JSON.stringify(receipt, null, 2));
-    console.log(JSON.stringify({ route: routeRel, sourceRevision, nodeCount: list.length, byKind: receipt.byKind, validationProblems: problems, diagnostics, dbVerification }, null, 2));
+    fs.writeFileSync(out, JSON.stringify({ ...receipt, receiptChecksum }, null, 2), { flag: 'wx' });
+    const { receiptChecksum: readbackChecksum, ...readbackReceipt } = JSON.parse(fs.readFileSync(out, 'utf8'));
+    if (readbackChecksum !== receiptChecksum || crypto.createHash('sha256').update(JSON.stringify(readbackReceipt)).digest('hex') !== receiptChecksum) {
+      throw new Error('RECEIPT_READBACK_CHECKSUM_MISMATCH');
+    }
+    console.log(JSON.stringify({ route: routeRel, sourceRevision, nodeCount: list.length, byKind: receipt.byKind, validationProblems: problems, diagnostics, dbVerification, receiptChecksum, receiptReadback: 'MATCH' }, null, 2));
     for (const r of list) console.log(`${r.node_kind.padEnd(10)} ${r.qualified_symbol.padEnd(20)} bytes ${r.start_byte}-${r.end_byte} utf16 ${r.start_utf16}-${r.end_utf16} L${r.line_start}-${r.line_end} parent=${r.parent_tree_node_id?.slice(0, 14) ?? '-'}`);
     console.log(`RECEIPT ${path.relative(repoRoot, out)}`);
     process.exitCode = problems.length > 0 || (dbVerification && dbVerification.error) ? 1 : 0;

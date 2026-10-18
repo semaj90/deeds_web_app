@@ -3,13 +3,17 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { isAbsolute, relative, resolve } from 'node:path';
 import { Client } from 'pg';
 import { loadAuthorityShadowV1, type AuthorityShadowObservationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = process.cwd();
-const databaseUrl = process.env.DATABASE_URL?.trim();
-if (!databaseUrl) throw new Error('DATABASE_URL_REQUIRED');
+const databaseUrl = resolveDatabaseUrl(loadRepoEnv(process.env));
 const producerRevision = 'atlas.current-graphify-snapshot-authority.v1';
-const reportDirArgIndex = process.argv.indexOf('--report-dir');
-const reportDirArg = reportDirArgIndex >= 0 ? process.argv[reportDirArgIndex + 1]?.trim() : undefined;
+const reportDirArgIndex = process.argv.findIndex((arg) => arg === '--report-dir' || arg.startsWith('--report-dir='));
+const reportDirArg = reportDirArgIndex < 0
+  ? undefined
+  : process.argv[reportDirArgIndex] === '--report-dir'
+    ? process.argv[reportDirArgIndex + 1]?.trim()
+    : process.argv[reportDirArgIndex].slice('--report-dir='.length).trim();
 if (reportDirArgIndex >= 0 && !reportDirArg) throw new Error('REPORT_DIR_REQUIRED');
 const reportDir = resolve(root, reportDirArg || 'docs/reports');
 const scratchReportRoot = resolve(root, '.tmp/atlas');

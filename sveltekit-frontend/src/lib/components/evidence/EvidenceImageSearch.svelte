@@ -302,19 +302,18 @@
 					</div>
 
 					<!-- Feedback buttons -->
-					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-					<div class="shrink-0 flex gap-1" onclick={(e) => e.stopPropagation()} role="group" aria-label="Feedback">
+					<div class="shrink-0 flex gap-1" role="group" aria-label="Feedback">
 						<button
 							class="p-1.5 rounded hover:bg-green-500/20 transition-colors {fb === true ? 'text-green-400' : 'text-gray-500'}"
 							title="Relevant result"
-							onclick={() => sendFeedback(hit, true)}
+							onclick={(e) => { e.stopPropagation(); sendFeedback(hit, true); }}
 						>
 							<Icon name="thumbs-up" class="w-4 h-4" />
 						</button>
 						<button
 							class="p-1.5 rounded hover:bg-red-500/20 transition-colors {fb === false ? 'text-red-400' : 'text-gray-500'}"
 							title="Not relevant"
-							onclick={() => sendFeedback(hit, false)}
+							onclick={(e) => { e.stopPropagation(); sendFeedback(hit, false); }}
 						>
 							<Icon name="thumbs-down" class="w-4 h-4" />
 						</button>

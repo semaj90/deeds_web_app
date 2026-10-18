@@ -21,6 +21,26 @@
 | **cuVS** | GPU Vector Search | WSL2 RAPIDS / CUDA C-ABI | Exact Top-K brute-force oracle and CAGRA graph ANN challenger. |
 | **Ornith 1.5-9b** | Synthesis & Tool-Use Agent | `llama-server.exe` (`:8090`) | Bounded prompt synthesis, JSON structured outputs, function tool calling. |
 
+### 1.1 Canonical vector authority and projected retrieval order
+
+PostgreSQL 18 owns canonical packet/chunk identity, source and workspace revisions, eligibility, evidence, and the designated `semantic_768` storage target (`codebase_chunk_index.content_embedding_768`). The target column's existence does **not** prove a unique production embedding writer or complete row-level representation provenance; keep that writer gate open until independently qualified.
+
+`pgvector` is the canonical dense representation/query surface, not a requirement that every request synchronously execute a PostgreSQL vector scan before any other executor runs. Qdrant, Neo4j/GraphV2, cuVS, and other executors are candidate-nomination/projection lanes. Their IDs, scores, ordinals, and graph topology cannot establish canonical identity or eligibility. Every candidate—including PostgreSQL-produced candidates—must be requalified against canonical packet/chunk/source/workspace and representation evidence before admission to fusion.
+
+The request contract is:
+
+```text
+canonical request snapshot + revisions
+  → PostgreSQL identity/eligibility and semantic_768 authority
+  → bounded candidate nominations (pgvector and/or rebuildable Qdrant / graph projections)
+  → revision-qualified graph expansion (where available)
+  → PostgreSQL hydration and exact candidate requalification
+  → SearchRuntime normalization, same-lane deduplication, and one RRF fusion
+  → final Top-K → ACE / ContextManifest admission
+```
+
+Executors may run in parallel when the request contract permits; this is not a mandated serial network-call order. The authority order is strict: projected results cannot bypass PostgreSQL qualification, and multiple executors for one logical semantic lane receive one RRF vote. Graph expansion nominates bounded candidates; it does not prove a current graph or create a second fusion owner. Live projection parity, full lineage, and the complete SearchRuntime-to-ContextManifest path remain separate proof gates.
+
 ---
 
 ## 2. Workstation VRAM Budgeting & Coexistence (8 GiB Ceiling)

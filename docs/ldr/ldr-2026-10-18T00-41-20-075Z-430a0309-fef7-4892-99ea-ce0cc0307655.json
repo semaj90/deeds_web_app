@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.ldr.report.v1",
+  "executionId": "430a0309-fef7-4892-99ea-ce0cc0307655",
+  "createdAt": "2026-10-18T00:41:20.075Z",
+  "query": "Run an integration smoke test: identify the official Model Context Protocol specification site and summarize what MCP tools/list and tools/call do. Use one research iteration, cite sources, and keep this as unreviewed diagnostic research.",
+  "status": "BLOCKED",
+  "taskId": "cffe97d9-d95e-4b81-ac0d-4b8a050bfb11",
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "researchStartAttempted": true,
+  "sourceRevisionDeferred": true,
+  "reportSha256": "910d1d8db0f25f2c32751feb2241cfd0d3410e8c8df6870f57eafbc1b8c5fd30",
+  "tools": [
+    "ldr.start_research",
+    "ldr.get_report",
+    "ldr.poll_status",
+    "ldr.search_history",
+    "ldr.quick_summary"
+  ],
+  "researchStatus": "in_progress",
+  "error": "The operation was aborted due to timeout"
+}

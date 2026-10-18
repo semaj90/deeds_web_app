@@ -1,0 +1,93 @@
+{
+  "schema": "atlas.graphify-symbol-jsonc-diagnostic.v1",
+  "generatedAt": "2026-10-17T18:04:41.908Z",
+  "status": "JSONC_PARSER_FIX_VALIDATED_ON_ADMITTED_SNAPSHOT",
+  "sourceSnapshot": {
+    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "candidatePlanChecksum": "sha256:0205920709138a366336132ec10436014b50f550f22299e458881f4f3486b560",
+    "candidatePlanRowCount": 704
+  },
+  "parser": {
+    "policyRevision": "atlas.json-source-shape-policy.v2",
+    "extractorRevision": "json-symbol-extractor-v2",
+    "producerRevision": "sha256:86777d2154199b75652c279feb88a341c3a2d7b6a11df69200b7f441248bacad"
+  },
+  "validatedSources": [
+    {
+      "sourceRef": "sveltekit-frontend/.vscode/settings.json",
+      "sourceRevision": "sha256:80399a9274248b1dd6a6b080f1f6dd1c71633789fa2b682c44bbd479a0947289",
+      "byteLength": 5998,
+      "structuralObservations": 110,
+      "parseStatus": "PASS"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/.vscode/settings.optimized.json",
+      "sourceRevision": "sha256:ba7a792c9b453b52484c4e2ff0c79e395ed3ebcb1a889b94d319551ea0742cfd",
+      "byteLength": 4730,
+      "structuralObservations": 109,
+      "parseStatus": "PASS"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tsconfig.json",
+      "sourceRevision": "sha256:82a3bc5e864a2556cd3abd75c4efc92c5df4e7c9ab64a7745d68d6280149cee2",
+      "byteLength": 6480,
+      "structuralObservations": 18,
+      "parseStatus": "PASS"
+    }
+  ],
+  "postChangeDatabaseRun": {
+    "status": "CONNECTION_TIMEOUT_BEFORE_EXTRACTION",
+    "failureReceipt": "docs/reports/graphify-symbol-runtime-failure-1792260257395.json",
+    "failureReceiptSha256": "a4bb63afbc2c9ea3a330a97519192766e03865f2da127f237f28bf333d7fd757"
+  },
+  "postChangeFrozenDryRun": {
+    "planRowCount": 704,
+    "planChecksum": "sha256:0205920709138a366336132ec10436014b50f550f22299e458881f4f3486b560",
+    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "producerRevision": "sha256:86777d2154199b75652c279feb88a341c3a2d7b6a11df69200b7f441248bacad",
+    "shard1": {
+      "receipt": "docs/reports/graphify-symbol-extractor-v1-1792260393810.json",
+      "candidateCount": 250,
+      "wouldExtractCount": 250,
+      "symbolsProposed": 3124,
+      "precheckRevisionMismatchRows": 0,
+      "precheckMissingSourceRows": 0,
+      "precheckReadErrorRows": 0,
+      "apply": false,
+      "datastoreWriteAttempted": false,
+      "shardCompletionProven": false
+    },
+    "shard2": {
+      "status": "STOPPED_WITHOUT_RECEIPT",
+      "candidateCount": 250,
+      "apply": false,
+      "datastoreWriteAttempted": false,
+      "elapsedMinutesApprox": 24,
+      "exitCode": 1,
+      "reason": "CPU-bound dry-run exceeded 20 minutes without emitting a receipt; operator stopped it. Partial per-file outcomes are unverified and not counted."
+    },
+    "shard3": {
+      "receipt": "docs/reports/graphify-symbol-extractor-v1-1792260373253.json",
+      "candidateCount": 204,
+      "wouldExtractCount": 204,
+      "symbolsProposed": 2725,
+      "precheckRevisionMismatchRows": 0,
+      "precheckMissingSourceRows": 0,
+      "precheckReadErrorRows": 0,
+      "apply": false,
+      "datastoreWriteAttempted": false,
+      "shardCompletionProven": false
+    }
+  },
+  "canonicalAuthority": false,
+  "symbolsPersisted": false,
+  "datastoreWritesPerformed": false,
+  "projectionAdmissionPromoted": false,
+  "limitations": [
+    "Direct parser validation covers the three JSONC files that failed in the prior exact-snapshot shard, not all 704 candidates; frozen extractor shard 2 was stopped after an extended CPU-bound run and emitted no receipt.",
+    "No database-backed extraction or independent symbol-row readback completed after the parser update.",
+    "The 616 missing Graphify inventory refs and 539 stale-revision-only refs remain unresolved."
+  ]
+}

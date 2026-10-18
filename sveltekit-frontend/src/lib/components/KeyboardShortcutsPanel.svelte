@@ -50,9 +50,11 @@
 		]},
 	];
 
-	function handleBackdropClick() {
-		open = false;
-		onclose?.();
+	function handleBackdropClick(e: MouseEvent) {
+		if (e.target === e.currentTarget) {
+			open = false;
+			onclose?.();
+		}
 	}
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -69,11 +71,15 @@
 	<div
 		class="shortcut-backdrop"
 		onclick={handleBackdropClick}
-		role="dialog"
-		aria-modal="true"
-		aria-label="Keyboard Shortcuts"
+		role="presentation"
 	>
-		<div class="shortcut-dialog" onclick={(e) => e.stopPropagation()}>
+		<div
+			class="shortcut-dialog"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Keyboard Shortcuts"
+			tabindex="-1"
+		>
 			<!-- Header -->
 			<div class="shortcut-header">
 				<div class="shortcut-header-left">

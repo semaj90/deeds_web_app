@@ -1,0 +1,252 @@
+{
+  "schema": "atlas.domain-baseline-evaluation.v1",
+  "generatedAt": "2026-10-18T01:24:36.473Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "model": {
+    "classifierKind": "multinomial_naive_bayes",
+    "version": "1.0.0",
+    "smoothingAlpha": 1,
+    "vocabularySize": 885,
+    "totalTrainingDocuments": 1413,
+    "classes": [
+      "agent",
+      "auth",
+      "cache",
+      "devops",
+      "documentation",
+      "error-handling",
+      "frontend",
+      "graph",
+      "machine-learning",
+      "retrieval"
+    ]
+  },
+  "splitIntegrity": {
+    "trainCount": 1413,
+    "validationCount": 315,
+    "testCount": 272,
+    "fileLeakage": 0
+  },
+  "metrics": {
+    "testSampleCount": 272,
+    "overallAccuracy": 0.846,
+    "macroPrecision": 0.722,
+    "macroRecall": 0.513,
+    "macroF1": 0.543
+  },
+  "perDomain": {
+    "agent": {
+      "testSamples": 57,
+      "truePositives": 53,
+      "falsePositives": 23,
+      "falseNegatives": 4,
+      "precision": 0.697,
+      "recall": 0.93,
+      "f1": 0.797
+    },
+    "auth": {
+      "testSamples": 1,
+      "truePositives": 0,
+      "falsePositives": 0,
+      "falseNegatives": 1,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    "cache": {
+      "testSamples": 7,
+      "truePositives": 1,
+      "falsePositives": 0,
+      "falseNegatives": 6,
+      "precision": 1,
+      "recall": 0.143,
+      "f1": 0.25
+    },
+    "devops": {
+      "testSamples": 17,
+      "truePositives": 16,
+      "falsePositives": 3,
+      "falseNegatives": 1,
+      "precision": 0.842,
+      "recall": 0.941,
+      "f1": 0.889
+    },
+    "documentation": {
+      "testSamples": 28,
+      "truePositives": 23,
+      "falsePositives": 4,
+      "falseNegatives": 5,
+      "precision": 0.852,
+      "recall": 0.821,
+      "f1": 0.836
+    },
+    "error-handling": {
+      "testSamples": 6,
+      "truePositives": 0,
+      "falsePositives": 0,
+      "falseNegatives": 6,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0
+    },
+    "frontend": {
+      "testSamples": 117,
+      "truePositives": 115,
+      "falsePositives": 10,
+      "falseNegatives": 2,
+      "precision": 0.92,
+      "recall": 0.983,
+      "f1": 0.95
+    },
+    "graph": {
+      "testSamples": 6,
+      "truePositives": 1,
+      "falsePositives": 0,
+      "falseNegatives": 5,
+      "precision": 1,
+      "recall": 0.167,
+      "f1": 0.286
+    },
+    "machine-learning": {
+      "testSamples": 2,
+      "truePositives": 1,
+      "falsePositives": 0,
+      "falseNegatives": 1,
+      "precision": 1,
+      "recall": 0.5,
+      "f1": 0.667
+    },
+    "retrieval": {
+      "testSamples": 31,
+      "truePositives": 20,
+      "falsePositives": 2,
+      "falseNegatives": 11,
+      "precision": 0.909,
+      "recall": 0.645,
+      "f1": 0.755
+    }
+  },
+  "confusionMatrix": {
+    "agent": {
+      "agent": 53,
+      "auth": 0,
+      "cache": 0,
+      "devops": 0,
+      "documentation": 0,
+      "error-handling": 0,
+      "frontend": 2,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 2
+    },
+    "auth": {
+      "agent": 0,
+      "auth": 0,
+      "cache": 0,
+      "devops": 1,
+      "documentation": 0,
+      "error-handling": 0,
+      "frontend": 0,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 0
+    },
+    "cache": {
+      "agent": 6,
+      "auth": 0,
+      "cache": 1,
+      "devops": 0,
+      "documentation": 0,
+      "error-handling": 0,
+      "frontend": 0,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 0
+    },
+    "devops": {
+      "agent": 0,
+      "auth": 0,
+      "cache": 0,
+      "devops": 16,
+      "documentation": 1,
+      "error-handling": 0,
+      "frontend": 0,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 0
+    },
+    "documentation": {
+      "agent": 3,
+      "auth": 0,
+      "cache": 0,
+      "devops": 0,
+      "documentation": 23,
+      "error-handling": 0,
+      "frontend": 2,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 0
+    },
+    "error-handling": {
+      "agent": 5,
+      "auth": 0,
+      "cache": 0,
+      "devops": 0,
+      "documentation": 0,
+      "error-handling": 0,
+      "frontend": 1,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 0
+    },
+    "frontend": {
+      "agent": 0,
+      "auth": 0,
+      "cache": 0,
+      "devops": 1,
+      "documentation": 1,
+      "error-handling": 0,
+      "frontend": 115,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 0
+    },
+    "graph": {
+      "agent": 2,
+      "auth": 0,
+      "cache": 0,
+      "devops": 1,
+      "documentation": 2,
+      "error-handling": 0,
+      "frontend": 0,
+      "graph": 1,
+      "machine-learning": 0,
+      "retrieval": 0
+    },
+    "machine-learning": {
+      "agent": 1,
+      "auth": 0,
+      "cache": 0,
+      "devops": 0,
+      "documentation": 0,
+      "error-handling": 0,
+      "frontend": 0,
+      "graph": 0,
+      "machine-learning": 1,
+      "retrieval": 0
+    },
+    "retrieval": {
+      "agent": 6,
+      "auth": 0,
+      "cache": 0,
+      "devops": 0,
+      "documentation": 0,
+      "error-handling": 0,
+      "frontend": 5,
+      "graph": 0,
+      "machine-learning": 0,
+      "retrieval": 20
+    }
+  }
+}

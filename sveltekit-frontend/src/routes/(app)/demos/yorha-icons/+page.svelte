@@ -267,7 +267,6 @@
 		flex-direction: column;
 		gap: 0.5rem;
 	}
-	.control-group label,
 	.control-group .control-label {
 		font-size: 0.7rem;
 		text-transform: uppercase;

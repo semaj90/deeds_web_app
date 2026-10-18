@@ -1,0 +1,846 @@
+{
+  "auditId": "ALL-ROUTES-ADMIN-DEMOS-AUDIT-01",
+  "generatedAt": "2026-10-17T19:06:34.009Z",
+  "workspaceRevision": "e1cbfd496149",
+  "denominators": {
+    "totalFilesystemPages": 237,
+    "staticFilesystemPages": 202,
+    "dynamicFilesystemPages": 35,
+    "totalRegisteredApiEndpoints": 852,
+    "adminDemosTargetStaticCount": 130,
+    "phase72AstGraphTotalNodes": 1495,
+    "phase72AstGraphUniqueRoutePaths": 1413,
+    "phase72AstGraphRejectedNodes": 0,
+    "lineageBreakdown": {
+      "PROVEN": 27,
+      "PARTIAL": 0,
+      "MISSING": 210
+    }
+  },
+  "catalogAudit": {
+    "totalFilesystemPages": 237,
+    "staticFilesystemPages": 202,
+    "dynamicFilesystemPages": 35,
+    "demosCatalog": {
+      "catalogCount": 92,
+      "actualDemoRoutesCount": 82,
+      "brokenDemoLinks": [],
+      "unindexedDemoPages": []
+    },
+    "adminCatalog": {
+      "catalogCount": 46,
+      "actualAdminRoutesCount": 46,
+      "brokenAdminLinks": [],
+      "unindexedAdminPages": []
+    },
+    "allRoutesLoader": {
+      "supportsPhase72RoutePath": true,
+      "exportsResolveRouteFields": true,
+      "enforcesLineageSeparation": true,
+      "mergesLiveRouteEndpoints": true
+    }
+  },
+  "sourceHealth": {
+    "totalScannedPages": 132,
+    "totalRegisteredApis": 852,
+    "deadApiRefsCount": 0,
+    "brokenLibImportsCount": 0,
+    "svelte4LegacyCount": 0,
+    "deadApiRefs": [],
+    "brokenLibImports": [],
+    "svelte4LegacyWarnings": []
+  },
+  "hardeningLogsSummary": {
+    "present": true,
+    "totalFiles": 202,
+    "status200Count": 139,
+    "connectionRefusedCount": 56,
+    "http5xxCount": 4,
+    "routesWithPageErrors": [
+      {
+        "route": "/admin/codebase-viewer",
+        "file": "admin_codebase_viewer.json",
+        "pageErrors": [
+          "Cannot read properties of undefined (reading 'toLowerCase')\n\n\tin <unknown>\n\tin +page.svelte\n\tin +layout.svelte\n\tin ErrorBoundary.svelte\n\tin tooltip-provider.svelte\n\tin +layout.svelte\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n"
+        ]
+      },
+      {
+        "route": "/citations",
+        "file": "citations.json",
+        "pageErrors": [
+          "state_unsafe_mutation\nUpdating state inside `$derived(...)`, `$inspect(...)` or a template expression is forbidden. If the value should not be reactive, declare it without `$state`\nhttps://svelte.dev/e/state_unsafe_mutation\n\n\tin <unknown>\n\tin +page.svelte\n\tin ResearchShell.svelte\n\tin +layout.svelte\n"
+        ]
+      },
+      {
+        "route": "/demos/case-form",
+        "file": "demos_case_form.json",
+        "pageErrors": [
+          "No form data sent to superForm. Make sure the output from superValidate is used (usually data.form) and that it's not null or undefined. Alternatively, an object with default values for the form can also be used, but then constraints won't be available.\n\n\tin <unknown>\n\tin +page.svelte\n\tin ErrorBound"
+        ]
+      },
+      {
+        "route": "/demos/enhanced-upload",
+        "file": "demos_enhanced_upload.json",
+        "pageErrors": [
+          "effect_update_depth_exceeded\nMaximum update depth exceeded. This typically indicates that an effect reads and writes the same piece of state\nhttps://svelte.dev/e/effect_update_depth_exceeded"
+        ]
+      },
+      {
+        "route": "/demos/nes-routes",
+        "file": "demos_nes_routes.json",
+        "pageErrors": [
+          "each_key_duplicate\nKeyed each block has duplicate key `route__ai__ai-dashboard` at indexes 2 and 3\nhttps://svelte.dev/e/each_key_duplicate\n\n\tin <unknown>\n\tin +page.svelte\n\tin ErrorBoundary.svelte\n\tin tooltip-provider.svelte\n\tin +layout.svelte\n\tin +layout.svelte\n\tin root.svelte\n\tin undefined\n"
+        ]
+      }
+    ],
+    "routesWithFailedResponses": [
+      {
+        "route": "/admin/all-routes",
+        "file": "admin_all_routes.json",
+        "failedResponses": [
+          {
+            "status": 504,
+            "url": "/admin/all-routes"
+          }
+        ]
+      },
+      {
+        "route": "/admin/codebase-index",
+        "file": "admin_codebase_index.json",
+        "failedResponses": [
+          {
+            "status": 500,
+            "url": "/api/admin/ai-chat/sessions"
+          }
+        ]
+      },
+      {
+        "route": "/admin/dev-tools",
+        "file": "admin_dev_tools.json",
+        "failedResponses": [
+          {
+            "status": 504,
+            "url": "/admin/dev-tools"
+          }
+        ]
+      },
+      {
+        "route": "/admin/unified-indexing-studio",
+        "file": "admin_unified_indexing_studio.json",
+        "failedResponses": [
+          {
+            "status": 504,
+            "url": "/admin/unified-indexing-studio"
+          }
+        ]
+      },
+      {
+        "route": "/atlas/studio/openspec",
+        "file": "atlas_studio_openspec.json",
+        "failedResponses": [
+          {
+            "status": 504,
+            "url": "/atlas/studio/openspec"
+          }
+        ]
+      },
+      {
+        "route": "/demos/enhanced-upload",
+        "file": "demos_enhanced_upload.json",
+        "failedResponses": [
+          {
+            "status": 404,
+            "url": "/api/rag/status"
+          },
+          {
+            "status": 404,
+            "url": "/api/rag/status"
+          },
+          {
+            "status": 404,
+            "url": "/api/rag/status"
+          },
+          {
+            "status": 404,
+            "url": "/api/rag/status"
+          },
+          {
+            "status": 404,
+            "url": "/api/rag/status"
+          }
+        ]
+      },
+      {
+        "route": "/demos/nes-elements",
+        "file": "demos_nes_elements.json",
+        "failedResponses": [
+          {
+            "status": 404,
+            "url": "/demos/data,%20image/svg+xml,%3Csvg%20xmlns='http,%20//www.w3.org/2000/svg'%20width='100'%20height='50'%3E%3Crect%20width='100'%20height='50'%20fill='%23666'/%3"
+          }
+        ]
+      }
+    ]
+  },
+  "dynamicRoutesClassified": [
+    {
+      "routePath": "/@/audio-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "evidenceId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/@/document-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "evidenceId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/@/video-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "evidenceId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/admin/codebase-index/[fileId]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/[fileId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "fileId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/admin/phase78/routes/[routePath]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/phase78/routes/[routePath]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "routePath"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/audio-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)/audio-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "evidenceId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/ai",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/ai/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/board",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/board/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/canvas",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/canvas/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/chat",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/chat/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/evidence",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/evidence/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/evidence/upload",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/evidence/upload/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/notes",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/notes/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/overview",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/overview/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/persons",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/persons/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/cases/[id]/reports",
+      "filePath": "sveltekit-frontend/src/routes/(app)/cases/[id]/reports/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/chat/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/chat/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/citations/[...label]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/citations/[...label]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "...label"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/citations/law/[citation]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/citations/law/[citation]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "citation"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/code-intel/clusters/[clusterKey]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/code-intel/clusters/[clusterKey]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "clusterKey"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/command-center/codebase/clusters/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/command-center/codebase/clusters/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/command-center/codebase/components/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/command-center/codebase/components/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/dev/file-card/[...sourceRef]",
+      "filePath": "sveltekit-frontend/src/routes/dev/file-card/[...sourceRef]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "...sourceRef"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/document-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "evidenceId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/evidence/[id]/view",
+      "filePath": "sveltekit-frontend/src/routes/(app)/evidence/[id]/view/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/fictional-cases/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/fictional-cases/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/legal-corpus/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/legal-corpus/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/library/[documentId]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/library/[documentId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "documentId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/library/[documentId]/node/[nodeId]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/library/[documentId]/node/[nodeId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "documentId",
+        "nodeId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/library/[documentId]/reader",
+      "filePath": "sveltekit-frontend/src/routes/(app)/library/[documentId]/reader/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "documentId"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/persons-of-interest/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/persons-of-interest/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/reports/[id]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/reports/[id]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/reports/[id]/edit",
+      "filePath": "sveltekit-frontend/src/routes/(app)/reports/[id]/edit/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "id"
+      ],
+      "requiresFixtureId": true
+    },
+    {
+      "routePath": "/video-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "params": [
+        "evidenceId"
+      ],
+      "requiresFixtureId": true
+    }
+  ],
+  "httpProbes": {
+    "mode": "critical_hubs_crawl_safe",
+    "baseUrl": "http://127.0.0.1:5173",
+    "serverReachable": true,
+    "healthProbe": {
+      "pathname": "/",
+      "ok": true,
+      "status": 200,
+      "durationMs": 6804,
+      "failureClass": null,
+      "errorCode": null,
+      "errorMessage": null
+    },
+    "abortedEarly": false,
+    "abortReason": null,
+    "probedCount": 3,
+    "passedCount": 3,
+    "http500Count": 0,
+    "transportFailureCount": 0,
+    "failures": [],
+    "criticalHubResults": [
+      {
+        "pathname": "/admin",
+        "ok": true,
+        "status": 200,
+        "durationMs": 2996,
+        "failureClass": null,
+        "errorCode": null,
+        "errorMessage": null
+      },
+      {
+        "pathname": "/admin/all-routes",
+        "ok": true,
+        "status": 200,
+        "durationMs": 3101,
+        "failureClass": null,
+        "errorCode": null,
+        "errorMessage": null
+      },
+      {
+        "pathname": "/demos",
+        "ok": true,
+        "status": 200,
+        "durationMs": 54,
+        "failureClass": null,
+        "errorCode": null,
+        "errorMessage": null
+      }
+    ]
+  },
+  "inventorySample": [
+    {
+      "routeId": "route__admin_",
+      "routePath": "/",
+      "filePath": "sveltekit-frontend/src/routes/+page.svelte",
+      "kind": "static",
+      "source": "route_ast_graph",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:b1f4de766672abbf",
+      "astNodeId": "route__admin_",
+      "lineageStatus": "PROVEN"
+    },
+    {
+      "routeId": "fs:/@/audio-analysis/[evidenceId]",
+      "routePath": "/@/audio-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:0e651d20e4ce83a0",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/@/document-analysis/[evidenceId]",
+      "routePath": "/@/document-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:371df19fc32c081d",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/@/video-analysis/[evidenceId]",
+      "routePath": "/@/video-analysis/[evidenceId]",
+      "filePath": "sveltekit-frontend/src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
+      "kind": "dynamic",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:b0a9c4bdc54d4b04",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/acp",
+      "routePath": "/acp",
+      "filePath": "sveltekit-frontend/src/routes/(app)/acp/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:cf9a300160bd44aa",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "route_active-cases",
+      "routePath": "/active-cases",
+      "filePath": "sveltekit-frontend/src/routes/(app)/active-cases/+page.svelte",
+      "kind": "static",
+      "source": "route_ast_graph",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:047012da84a261e8",
+      "astNodeId": "route_active-cases",
+      "lineageStatus": "PROVEN"
+    },
+    {
+      "routeId": "route_admin",
+      "routePath": "/admin",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/+page.svelte",
+      "kind": "static",
+      "source": "route_ast_graph",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:d832a56c29535fa2",
+      "astNodeId": "route_admin",
+      "lineageStatus": "PROVEN"
+    },
+    {
+      "routeId": "fs:/admin/ai-dashboard",
+      "routePath": "/admin/ai-dashboard",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:1eda414620754536",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/ai-dashboard/lab",
+      "routePath": "/admin/ai-dashboard/lab",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/lab/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:3d5902d7878775c4",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/ai-dashboard/operator",
+      "routePath": "/admin/ai-dashboard/operator",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/operator/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:3fe1d9d8f0ae51e8",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/all-routes",
+      "routePath": "/admin/all-routes",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/all-routes/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:318ab527c8b18fa7",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/ast-topology",
+      "routePath": "/admin/ast-topology",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/ast-topology/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:d55498a5fdf6b858",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/atlas",
+      "routePath": "/admin/atlas",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/atlas/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:6c84d339240f4888",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/atlas/graph-explorer",
+      "routePath": "/admin/atlas/graph-explorer",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/atlas/graph-explorer/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:5d75bf91e46b50ff",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/atlas/ontology",
+      "routePath": "/admin/atlas/ontology",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/atlas/ontology/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:a6d9c68d422388ac",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/batch-embeddings",
+      "routePath": "/admin/batch-embeddings",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/batch-embeddings/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:9904fe7ede66c85b",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/batch-summaries",
+      "routePath": "/admin/batch-summaries",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/batch-summaries/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:9de34ea553558923",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/cache",
+      "routePath": "/admin/cache",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:8160fd5dc6d874ae",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/case-graph",
+      "routePath": "/admin/case-graph",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/case-graph/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:9beb55f0d84c2ecf",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/chat-memory",
+      "routePath": "/admin/chat-memory",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/chat-memory/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:1519bd10b2b595e0",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/codebase-graph",
+      "routePath": "/admin/codebase-graph",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/codebase-graph/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:b175df770d806cf0",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/codebase-index",
+      "routePath": "/admin/codebase-index",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:7fd0712ce4108b32",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/codebase-index/[fileId]",
+      "routePath": "/admin/codebase-index/[fileId]",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/[fileId]/+page.svelte",
+      "kind": "dynamic",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:2ad2888e4bff5cd4",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/codebase-viewer",
+      "routePath": "/admin/codebase-viewer",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/codebase-viewer/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:2c7d8a42114aafd3",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    },
+    {
+      "routeId": "fs:/admin/component-analysis",
+      "routePath": "/admin/component-analysis",
+      "filePath": "sveltekit-frontend/src/routes/(app)/admin/component-analysis/+page.svelte",
+      "kind": "static",
+      "source": "filesystem",
+      "workspaceRevision": "e1cbfd496149",
+      "sourceRevision": "sha256:43f2e34f929f8b49",
+      "astNodeId": null,
+      "lineageStatus": "MISSING"
+    }
+  ],
+  "gates": {
+    "SERVER_REACHABLE": "PASS",
+    "ROUTE_INVENTORY_COMPLETE": "PASS",
+    "CATALOG_SCHEMA_VALID": "PASS",
+    "CATALOG_LINEAGE_QUALIFIED": "PASS",
+    "STATIC_ROUTE_HTTP_PROBED": "PASS",
+    "DYNAMIC_ROUTE_CLASSIFIED": "PASS",
+    "SSR_ROUTE_HEALTH": "PASS",
+    "AUDIT_RECEIPT_VALID": "PASS",
+    "DEMOS_ZERO_BROKEN_LINKS": "PASS",
+    "DEMOS_100_PERCENT_INDEXED": "PASS",
+    "ADMIN_ZERO_BROKEN_LINKS": "PASS",
+    "ADMIN_100_PERCENT_INDEXED": "PASS",
+    "ALL_ROUTES_PHASE72_AND_LIVE_MERGE": "PASS",
+    "ZERO_BROKEN_LIB_IMPORTS": "PASS"
+  }
+}

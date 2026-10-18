@@ -106,9 +106,10 @@ export class WebGPUTextureStreamer {
                 return true;
             }
 
-            throw new Error('Neither WebGPU nor WebGL2 available');
+            console.warn('⚠️ Texture streaming running in software fallback mode: Neither WebGPU nor WebGL2 available');
+            return false;
         } catch (error: Error | unknown) {
-            console.error('❌ Texture streaming initialization failed:', error);
+            console.warn('⚠️ Texture streaming initialization encountered an issue:', error);
             return false;
         }
     }

@@ -25,7 +25,7 @@ test('array members remain opaque; byte and object-observation limits defer expl
   assert.throws(() => extractJsonSymbols(wideObject, 'wide.json'), /STRUCTURAL_RESOURCE_LIMIT_DEFERRED:OBSERVATIONS_EXCEED_LIMIT/);
   assert.throws(() => extractJsonSymbols('{"x":1}', 'bytes.json', { maxSourceBytes: 4 }),
     /STRUCTURAL_RESOURCE_LIMIT_DEFERRED:SOURCE_BYTES_EXCEED_LIMIT/);
-  assert.throws(() => extractJsonSymbols('{"x":1,}', 'malformed.json', {maxSymbols: 2000}), /JSON_PARSE_FAILED/);
+  assert.throws(() => extractJsonSymbols('{"x":}', 'malformed.json', {maxSymbols: 2000}), /JSON_PARSE_FAILED/);
   assert.deepEqual(extractJsonSymbols('null', 'empty.json'), []);
 });
 

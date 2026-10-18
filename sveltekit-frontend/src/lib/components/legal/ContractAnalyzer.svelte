@@ -159,17 +159,18 @@
   >
     <Card>
       <CardHeader>
-        <CardTitle class="contract-title">
-          <div class="title-section">
-            <span class="contract-icon">{'\u{1F4CB}'}</span>
+        <CardTitle>
+          <div class="contract-title">
+            <div class="title-section">
+              <span class="contract-icon">{'\u{1F4CB}'}</span>
 
-            <div class="title-text">
-              <h2>{contractData.title}</h2>
+              <div class="title-text">
+                <h2>{contractData.title}</h2>
 
-              <div class="contract-meta">
-                <span class="contract-type">{contractData.type.toUpperCase()}</span>
+                <div class="contract-meta">
+                  <span class="contract-type">{contractData.type.toUpperCase()}</span>
 
-                <span class="contract-status">{contractData.status}</span>
+                  <span class="contract-status status-{contractData.status}">{contractData.status}</span>
 
                 <span
                   class="risk-score"
@@ -205,6 +206,7 @@
                 <button onclick={() => exportContract('json')}>{'\u{1F527}'} JSON</button>
               </div>
             </div>
+          </div>
           </div>
         </CardTitle>
       </CardHeader>
@@ -386,7 +388,7 @@
     align-items: center;
   }
   .export-dropdown { position: relative; }
-  .export-btn {
+  :global(.export-btn) {
     background: var(--enhanced-bits-secondary);
     color: #000;
   }

@@ -1,5 +1,23 @@
+import asyncio
+
 import miniforge_nlp_sidecar as sidecar
 from miniforge_nlp_sidecar import _linguistic_input, _build_pass_results, AnalyzeRequest
+
+
+def test_v2_startup_warms_shared_spacy_pipeline(monkeypatch):
+    import miniforge_nlp_sidecar_v2 as sidecar_v2
+
+    calls = []
+    monkeypatch.setattr(sidecar_v2.legacy, '_capabilities', lambda: {'spacy_pos': True})
+    monkeypatch.setattr(sidecar_v2.legacy, '_spacy_pos_tags', lambda text: calls.append(text))
+
+    async def run_lifespan():
+        async with sidecar_v2.lifespan(sidecar_v2.app):
+            pass
+
+    asyncio.run(run_lifespan())
+
+    assert calls == ['Parent Atlas NLP sidecar startup warmup.']
 
 
 def test_linguistic_input_masks_code_and_preserves_comments_and_strings():

@@ -8,6 +8,8 @@
 
 ## What This Is
 
+**Execution policy clarification (2026-10-17):** source-revision propagation/backfill and production lineage closure remain deferred by operator decision. Missing `source_revision` / `code_source_revision` does not block the index-first A–G workflow. Preserve known revisions and keep unknown values explicit; do not infer or backfill them to satisfy an indexing gate. Production graph/ACE admission remains a separate proof track. The original A1–G5 definitions below are unchanged; see [current scope alignment](../architecture/parent-atlas-batch-execution-gates-v1.md).
+
 A **comprehensive, gates-validated roadmap** for transitioning from incomplete structural identity to production-ready semantic indexing. It replaces premature GPU work with deterministic, reproducible infrastructure.
 
 **Timeline**: 29–39 hours of work across 7 sequential batches (A–G), unblocking GPU acceleration only after Batch E search experiments PASS.
@@ -73,11 +75,11 @@ npm run batch:a:dry
 # If successful (exit 0):
 npm run batch:a              # Execute Batch A
 
-# Monitor gates (all must PASS)
-watch -n 2 'tail reports/batch-a/batch-a-structural-audit.json | jq ".gates"'
+# Inspect the uniquely named audit/snapshot paths printed by Batch A.
+# Native syntax coverage/replay can pass for the selected diagnostic cohort.
 
 # Validate determinism
-npm run batch:a:validate
+npm run batch:a:validate -- --first <first-snapshot.json> --second <independent-snapshot.json>
 
 # If all gates PASS:
 npm run batch:b              # Proceed to Batch B
@@ -86,6 +88,8 @@ npm run batch:b              # Proceed to Batch B
 ---
 
 ## Batches at a Glance
+
+**Current Batch A command (2026-10-17):** `batch:a` and `batch:a:dry` now run native, index-only extraction and independent replay, bounded to 20 tracked supported sources by default. Use `--limit=1` through `--limit=1000` and repeat `--file=<repo-relative-path>` for an explicit cohort. TS/TSX/JS/JSX use the existing Node Tree-sitter provider; Svelte uses the existing splitter's `svelte/compiler` entry point. Exact UTF-8 spans, local observation IDs, parents and checksums are emitted to unique local snapshots. Source/workspace revisions remain null when deferred. Default execution opens no database connection; `--apply` is rejected without separate canonical writer admission. A bounded syntax-cohort PASS does not establish corpus coverage or production materialization.
 
 | Batch | Purpose | Effort | Gate Blocker | Prerequisites |
 |-------|---------|--------|--------------|---------------|
@@ -230,7 +234,7 @@ directory_path → source_ref → file_path → function_symbol
 1. Follow **BATCH-EXECUTION-STARTUP.md** quick-start section
 2. Run `npm run batch:a:dry` to verify setup
 3. Execute `npm run batch:a` when ready
-4. Monitor gates with `watch -n 2 'tail reports/batch-a/batch-a-structural-audit.json | jq ".gates"'`
+4. Inspect the audit/snapshot paths printed by Batch A; compare independently captured snapshots with `batch:a:validate -- --first <first-snapshot.json> --second <independent-snapshot.json>`. Unique receipt filenames preserve prior reports; the legacy fixed filename is historical evidence.
 
 ### For Troubleshooting
 1. Check "Common Issues" in **BATCH-EXECUTION-STARTUP.md**

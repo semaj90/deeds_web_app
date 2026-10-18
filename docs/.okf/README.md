@@ -7,6 +7,7 @@ Use `registry.yaml` to find the live owner for each contract. Do not move or dup
 Primary references:
 
 - `registry.yaml` — navigation layer for contract ownership
+- `ldr/` — version-pinned LearningCircuit LDR, Firecrawl, and Beautiful Soup documentation captures
 - `schema.yaml` — OKF schema definition
 - `IMPLEMENTATION_GUIDE.md` — operational guidance and audit gates
 

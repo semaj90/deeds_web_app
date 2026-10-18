@@ -1900,3 +1900,23 @@ through the existing `fuseSearchRuntimeCandidates` owner. This proves the
 bounded fusion contract, not live Postgres/Qdrant retrieval, canonical source
 and workspace revision qualification, caller coverage, or ContextManifest
 admission. RF5/RF6 and live identity-envelope gates remain open.
+
+### RRF legacy-caller migration preflight — 2026-10-17
+
+- [x] Reconfirmed the Svelte `search-fused` route performs a Legal-AI retrieval:
+  Qdrant `legal_documents` dense hits plus PostgreSQL `sparseLegalSearch`, with
+  configured 0.6/0.4 weights and its own response/timing contract.
+- [x] Reconfirmed the MCP repair tool ranks a different candidate shape across
+  Qdrant, lexical, semantic, AST, noun, and path signals with its own weights.
+- [ ] Do not replace either caller with the codebase `SearchRuntime` by import
+  alone. First define canonical IDs for each retrieval domain, map executor
+  aliases to one logical lane, and produce caller-specific output/parity tests
+  against the existing behavior. `fusion-core-v1` is a possible shared math
+  primitive, not yet proof that either adapter is identity-safe or equivalent.
+- [ ] Migrate callers only after the canonical identity envelope and bounded
+  caller replay pass; preserve endpoint contracts and one vote per logical lane.
+
+Evidence: `sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts`,
+`sveltekit-frontend/src/mcp/tools/repair_tools.ts`,
+`sveltekit-frontend/src/lib/server/retrieval/fusion-core-v1.ts`, and the open
+identity-envelope tasks above. No caller was changed in this preflight.

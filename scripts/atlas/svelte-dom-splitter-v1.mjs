@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { svelteReceiptFileNameV1 } from './lib/svelte-receipt-name-v1.mjs';
 import { resolveSvelteSourceFileV1 } from './lib/resolve-svelte-source-file-v1.mjs';
 
@@ -21,10 +21,8 @@ const RE = {
   rune: /^\$(props|state|derived|effect)(\.[a-z]+)?$/,
 };
 
-const files = process.argv.slice(2);
-if (files.length === 0) {
-  console.error('usage: svelte-dom-splitter-v1.mjs <file.svelte> [...]');
-  process.exit(2);
+export function parseSvelteStructuralSourceV1(source) {
+  return { ast: parse(source, { modern: true }), parserVersion: require('svelte/package.json').version };
 }
 // svelte/compiler offsets are UTF-16 code-unit indices into the JS string. Convert to UTF-8 bytes.
 function byteOffsetFactory(source) {
@@ -151,7 +149,7 @@ function analyze(rel) {
   if (!RE.revision.test(revision)) throw new Error('revision failed its own regex');
   const toByte = byteOffsetFactory(source);
 
-  const ast = stage('svelte_parse', () => parse(source, { modern: true }));
+  const ast = stage('svelte_parse', () => parseSvelteStructuralSourceV1(source).ast);
   const out = { nodes: [], handlers: [], runes: [] };
   if (ast) {
     stage('template_walk', () => walkTemplate(ast.fragment, 0, null, out, toByte, source));
@@ -220,23 +218,33 @@ function analyze(rel) {
   return { rel, stages, receipt, outPath };
 }
 
-const results = files.map((f) => analyze(f));
-const failed = results.filter((r) => r.stages.some((s) => s.status === 'FAILED'));
-const rejected = results.filter((r) => r.rejected).length;
-const summary = {
-  filesRequested: files.length,
-  filesProcessed: results.filter((r) => r.receipt !== null).length,
-  filesFailed: failed.length - rejected,
-  filesRejected: rejected,
-  filesSkipped: 0,
-  exitCode: failed.length ? 1 : 0,
-  files: results.map((r) => ({
-    path: r.rel,
-    outPath: r.outPath,
-    stageStatus: r.stages.map((s) => `${s.name}:${s.status}`),
-    counts: r.receipt?.counts ?? null,
-    receiptChecksum: r.receipt?.receiptChecksum ?? null,
-  })),
-};
-console.log(JSON.stringify(summary, null, 2));
-process.exit(summary.exitCode);
+export function runSvelteDomSplitterV1(files) {
+  if (files.length === 0) {
+    console.error('usage: svelte-dom-splitter-v1.mjs <file.svelte> [...]');
+    return 2;
+  }
+  const results = files.map((f) => analyze(f));
+  const failed = results.filter((r) => r.stages.some((s) => s.status === 'FAILED'));
+  const rejected = results.filter((r) => r.rejected).length;
+  const summary = {
+    filesRequested: files.length,
+    filesProcessed: results.filter((r) => r.receipt !== null).length,
+    filesFailed: failed.length - rejected,
+    filesRejected: rejected,
+    filesSkipped: 0,
+    exitCode: failed.length ? 1 : 0,
+    files: results.map((r) => ({
+      path: r.rel,
+      outPath: r.outPath,
+      stageStatus: r.stages.map((s) => `${s.name}:${s.status}`),
+      counts: r.receipt?.counts ?? null,
+      receiptChecksum: r.receipt?.receiptChecksum ?? null,
+    })),
+  };
+  console.log(JSON.stringify(summary, null, 2));
+  return summary.exitCode;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  process.exitCode = runSvelteDomSplitterV1(process.argv.slice(2));
+}

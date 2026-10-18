@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.kmeans-raw768-model-registration.v1",
+  "generatedAt": "2026-10-18T06:46:17.985Z",
+  "mode": "READ_ONLY_EXISTING_VERIFICATION",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "modelId": 7,
+  "modelVersion": "mbk-euclidean-content-embedding-768-k256-column-v1",
+  "artifactFileChecksum": "sha256:5ffe8d9ac2bc0b54befccd3f45acb329020ff0674f0eaa1d853a336645e96534",
+  "cohortChecksum": "sha256:99a49e8009b4ffa977af8572ebafdcff7e4146d9f6609af9a226c496b97ea647",
+  "centroidChecksum": "sha256:7558cf68cb1224683f33757ab75d6d3f0c147cc040b3969687e1680303a03cc8",
+  "centroidsReadBack": 256,
+  "dimensionsReadBack": 768,
+  "trainingCount": 197987,
+  "sourceRevisionCoverage": "NOT_PROVEN",
+  "modelRole": "EVALUATION_CANDIDATE",
+  "isAssignmentActive": false,
+  "status": "EXISTING_CANDIDATE_VERIFIED",
+  "receiptChecksum": "sha256:9f71b0cf92f293ac51ff16879ec3f4b6b5761910e5227a5589adb459c6b0e1ab"
+}

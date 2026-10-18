@@ -538,7 +538,7 @@
 					</section>
 
 				{:else if activeTab === 'official-text'}
-					<section id="full-text" class="yorha-card">
+					<section id="full-text" class="yorha-card official-text-reader">
 						<h2 class="section-heading">
 							<Icon name="scroll-text" size={16} class="text-amber" /> Official Text
 							<span class="highlight-hint">(highlight text to save as citation)</span>
@@ -1090,7 +1090,7 @@
 		color: rgba(42, 37, 32, 0.8);
 	}
 	.search-input::placeholder { color: rgba(42, 37, 32, 0.3); }
-	.search-icon { color: rgba(42, 37, 32, 0.25); }
+	:global(.search-icon) { color: rgba(42, 37, 32, 0.25); }
 	.search-actions {
 		display: flex;
 		gap: 0.5rem;
@@ -1555,7 +1555,7 @@
 		border-color: rgba(196, 117, 43, 0.12);
 		margin-top: 0.5rem;
 	}
-	.info-icon {
+	:global(.info-icon) {
 		flex-shrink: 0;
 		color: #c4752b;
 		margin-top: 0.125rem;
@@ -1584,7 +1584,7 @@
 		transition: border-color 0.15s;
 	}
 	.term-pill-btn:hover { border-color: rgba(196, 117, 43, 0.3); }
-	.pill-x { color: rgba(42, 37, 32, 0.3); }
+	:global(.pill-x) { color: rgba(42, 37, 32, 0.3); }
 	.pill-action {
 		color: rgba(42, 37, 32, 0.2);
 		background: none;
@@ -1649,7 +1649,7 @@
 		padding: 0;
 		padding-left: 0.75rem;
 	}
-	.search-icon-sm { color: rgba(74, 66, 56, 0.4); }
+	:global(.search-icon-sm) { color: rgba(74, 66, 56, 0.4); }
 	.glossary-search-input {
 		flex: 1;
 		background: transparent;

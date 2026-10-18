@@ -27,6 +27,19 @@ Audit and safety:
 
 If a feature exists in another lane, carry the logic forward only if it maps cleanly to this stack and does not break canonical feature IDs, labels, or storage ownership.
 
+## Local Deep Research MCP (2026-10-17)
+
+- When asked to use "LDR" or create a deep-research report, reuse the existing `ldr-research` stdio server: `sveltekit-frontend/scripts/mcp/ldr-mcp.mjs`, registered in `.opencode/opencode.jsonc`. Do not create a second research engine or expose generic Docker/shell control to a model. Registration in OpenCode does not prove a tool is available in another agent session.
+- The vendored upstream is LearningCircuit's `local-deep-research` project (`tools/agentic-research/src/local-deep-research`; GitHub `LearningCircuit/local-deep-research`). “LearningCircuit” here names the upstream project; it is not a separate learning-circuit training subsystem.
+- Tool sequence: `ldr.search_history` (authenticated lookup) → `ldr.start_research` (explicitly authorized LDR-local job) → `ldr.poll_status` → `ldr.get_report` (final Markdown/sources). Select one supported search engine and a bounded iteration count. `ldr.quick_summary` is retained only for compatibility and returns an unsupported-operation error.
+- Keep the other research paths distinct: `atlas-ldr-mcp.mjs` exposes `atlas_deep_research` and `atlas_research_health` for repository retrieval through AtlasTaskKernel; TRACE's `ldr_research` tool runs the SvelteKit application orchestrator. Neither is the LearningCircuit Docker MCP, and the Docker MCP does not qualify results into ACE automatically.
+- Credentials load from gitignored `sveltekit-frontend/.env.ldr.local` using `LDR_USERNAME` / `LDR_PASSWORD`; process environment takes precedence. Never print, commit, or include credentials/session tokens in reports. The existing session helper logs in on loopback only, retains cookies in memory, refreshes CSRF after login, and attempts login at most once per MCP process. Restart the MCP process after session expiry; do not bypass authentication.
+- If direct MCP tools are unavailable, use the existing client from the repo root: `node scripts/atlas/ldr-report-v1.mjs --probe`; start an authorized job with `--start --query="RESEARCH QUESTION"`, or resume/export with `--task-id="EXISTING_ID"`. No implicit research launch on probe.
+- Reports and checksummed JSON receipts go to `docs/ldr/`. A pending or blocked receipt is not completed research; jobs may continue in LDR after bounded polling ends. Preserve the task ID for resumption. Treat final research and citations as unreviewed derived proposals, not canonical code evidence or ContextManifest admission.
+- Verified October 17: authenticated MCP history access passed; eight focused tests passed. Completed live research/report generation remains a separate gate. Ornith readiness/model identity must be checked live; an LDR HTTP 401 is authentication failure, not evidence that llama-server is down.
+- Research authorization permits the requested LDR-local history/report artifacts, not canonical PostgreSQL writes, Graphify publication, Qdrant/Neo4j projection, Valkey warming, model/service lifecycle changes, or training. Source-revision backfill stays deferred. No hidden reasoning, KV cache, or tensors may be persisted.
+- Validation: `node --test scripts/atlas/ldr-report-v1.test.mjs scripts/atlas/ldr-session-v1.test.mjs`. Details and closeout fields: `docs/ldr/README.md`.
+
 ## OpenSpec audit execution
 
 ## Main repository and package ownership

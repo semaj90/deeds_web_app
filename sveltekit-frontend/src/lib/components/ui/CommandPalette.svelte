@@ -165,18 +165,17 @@
   <!-- Backdrop -->
   <div
     class="fixed inset-0 z-50 bg-black/50"
-    onclick={close}
-    role="button"
-    tabindex="0"
-    onkeydown={(e: KeyboardEvent) => e.key === 'Enter' && close()}
+    onclick={(e) => { if (e.target === e.currentTarget) close(); }}
+    role="presentation"
   >
     <!-- Command palette -->
     <div class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl">
       <div
         class="bg-nier-surface border border-nier-gray rounded-lg shadow-2xl"
-        onclick={(e) => e.stopPropagation()}
         role="dialog"
-        tabindex="0"
+        aria-modal="true"
+        aria-label="Command Palette"
+        tabindex="-1"
       >
         <!-- Search input -->
         <div class="flex items-center gap-3 px-4 border-b border-nier-gray">

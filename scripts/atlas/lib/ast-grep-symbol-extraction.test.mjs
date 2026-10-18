@@ -50,3 +50,28 @@ test('extracts return-typed functions (regression: typed-return function was sil
   const result = extractSymbolsViaAstGrep(src, 'typescript');
   assert.ok(result.symbols.includes('d'), `expected 'd' in ${JSON.stringify(result.symbols)}`);
 });
+
+test('extracts Svelte 5 (.svelte) <script lang="ts"> functions, runes ($state, $derived), imports, and {#snippet} blocks', { skip: !isAstGrepAvailable() }, () => {
+  const svelteSrc = `
+<script lang="ts">
+  import { onMount } from 'svelte';
+  let count = $state(0);
+  let doubled = $derived(count * 2);
+  function increment(): void {
+    count += 1;
+  }
+</script>
+{#snippet headerRow(title)}
+  <h1>{title}</h1>
+{/snippet}
+<button onclick={increment}>{doubled}</button>
+`;
+  const result = extractSymbolsViaAstGrep(svelteSrc, 'svelte');
+  assert.equal(result.method, 'ast_grep');
+  assert.ok(result.symbols.includes('import:svelte'));
+  assert.ok(result.symbols.includes('count'));
+  assert.ok(result.symbols.includes('doubled'));
+  assert.ok(result.symbols.includes('increment'));
+  assert.ok(result.symbols.includes('snippet:headerRow'));
+});
+

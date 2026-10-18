@@ -1,0 +1,136 @@
+{
+  "schema": "atlas.kanban-runtime-proof.v1",
+  "generated": "2026-10-17T19:32:10.853Z",
+  "taskContractResolved": true,
+  "dispatcherCallerProven": false,
+  "durableWriterProven": false,
+  "claimHeartbeatReclaimProven": false,
+  "timelineRevisionLinkProven": false,
+  "uiReadModelProven": true,
+  "graphifyAdmissionProven": false,
+  "writesPerformed": false,
+  "evidence": {
+    "contracts": {
+      "workflowFamily": {
+        "files": [
+          {
+            "file": "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts",
+            "exists": true
+          },
+          {
+            "file": "sveltekit-frontend/src/lib/server/atlas/workflow/task-run-contract-v1.ts",
+            "exists": true
+          }
+        ],
+        "prodImporters": []
+      },
+      "liveBoardFamily": {
+        "files": [
+          {
+            "file": "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts",
+            "exists": true
+          },
+          {
+            "file": "sveltekit-frontend/src/lib/server/atlas/kanban-task-event-contracts.ts",
+            "exists": true
+          },
+          {
+            "file": "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board.ts",
+            "exists": true
+          }
+        ],
+        "prodImporters": [
+          "sveltekit-frontend/src/lib/server/atlas/atlas-index.ts",
+          "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
+          "sveltekit-frontend/src/lib/server/atlas/board/fabric-gpu-benchmark.ts",
+          "sveltekit-frontend/src/lib/server/atlas/board/graphify-task-candidates.ts",
+          "sveltekit-frontend/src/lib/server/atlas/board/phase89-workflow.ts",
+          "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts",
+          "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
+          "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+          "sveltekit-frontend/src/routes/api/phase89/workflow/+server.ts"
+        ]
+      },
+      "familiesSplit": false,
+      "note": "workflow-action-event-v1/task-run-contract-v1 vs the live board kanban-task-board/kanban-task-event-contracts: count production importers of each."
+    },
+    "dispatchers": {
+      "executeHermesAgentStepV1_prodCallers": [],
+      "kanbanErrorFixingAgent_prodCallers": []
+    },
+    "liveStore": {
+      "tableRows": {
+        "kanban_tasks": 166,
+        "kanban_task_events": 160,
+        "kanban_task_attempts": 0,
+        "kanban_task_dependencies": 0,
+        "workflow_action_leases": 2,
+        "workflow_events": 0,
+        "agent_runs": 0,
+        "agent_tasks": 0,
+        "hermes_dag_runs": 0
+      },
+      "kanbanTaskStatus": [
+        {
+          "status": "pending",
+          "n": 160
+        },
+        {
+          "status": "done",
+          "n": 6
+        }
+      ],
+      "kanbanEventTypes": [
+        {
+          "event_type": "file_feed_snapshot",
+          "n": 143
+        },
+        {
+          "event_type": "proof_run",
+          "n": 11
+        },
+        {
+          "event_type": "probe",
+          "n": 5
+        },
+        {
+          "event_type": "code_change",
+          "n": 1
+        }
+      ],
+      "claimLikeEvents": 0,
+      "tasksWithClaimToken": 0,
+      "tasksWithHeartbeat": 0,
+      "eventsWithWorkspaceRevision": 0
+    },
+    "writers": {
+      "prodFilesWritingEventTables": [
+        "sveltekit-frontend/src/lib/server/agent/action-writer.ts",
+        "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts"
+      ],
+      "prodFilesTouchingClaimColumns": [
+        "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts",
+        "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-head-postgres-adapter-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts"
+      ]
+    },
+    "uiReaders": [
+      "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "sveltekit-frontend/src/routes/api/phase89/workflow/+server.ts"
+    ],
+    "graphify": {
+      "file": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-17.json",
+      "verdict": "NOT_SAFE_TO_PROJECT"
+    },
+    "fabricatedEvidenceRisk": {
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic/hermes-adaptive-pipeline-v1.ts",
+      "hardcodedStagePassLiterals": 3,
+      "hardcodedToolVersions": true,
+      "feedsAdaptiveBackprop": true,
+      "note": "Tournament stage results are literals, not tool output; adaptive backprop labels come from outcomeSuccess."
+    }
+  },
+  "verdict": "NOT_PROVEN"
+}

@@ -5,6 +5,7 @@ import sys
 from hashlib import sha256
 from pathlib import Path
 import torch
+import pytest
 
 from atlas_compute.latent_autoencoder import (
     NestedAutoencoderConfig,
@@ -14,6 +15,7 @@ from atlas_compute.latent_autoencoder import (
     nested_autoencoder_loss,
 )
 from provision_qdrant_latent256 import build_candidate_point, build_candidate_upsert_request
+from train_latent_autoencoder import build_input_row_digest_ledger, semantic_input_snapshot_revision
 
 
 def test_embeddinggemma_input_and_requested_encoder_ladder():
@@ -75,6 +77,42 @@ def test_knn_recall_is_one_for_identical_representation():
     rng = np.random.default_rng(5)
     matrix = rng.normal(size=(16, 12)).astype(np.float32)
     assert knn_recall(matrix, matrix.copy(), 3) == 1.0
+
+
+def test_training_input_row_digest_ledger_binds_lineage_and_exact_vector_bytes():
+    workspace_revision = f"sha256:{'a' * 64}"
+    source_revisions = [f"sha256:{'b' * 64}", f"sha256:{'c' * 64}"]
+    matrix = np.zeros((2, 768), dtype=np.float32)
+    matrix[1, 0] = 0.25
+    payload, checksum, observed_workspace_revision = build_input_row_digest_ledger(
+        ["chunk-a", "chunk-b"],
+        ["src/a.ts", "src/b.ts"],
+        source_revisions,
+        [workspace_revision, workspace_revision],
+        matrix,
+    )
+
+    rows = [json.loads(line) for line in payload.decode("utf-8").splitlines()]
+    assert observed_workspace_revision == workspace_revision
+    assert checksum == sha256(payload).hexdigest()
+    assert [row["ordinal"] for row in rows] == [0, 1]
+    assert [row["sourceRevision"] for row in rows] == source_revisions
+    assert rows[0]["embeddingSha256"] != rows[1]["embeddingSha256"]
+    assert semantic_input_snapshot_revision(workspace_revision, checksum, "d" * 64).startswith("sha256:")
+
+
+def test_training_input_row_digest_ledger_rejects_unqualified_or_mixed_lineage():
+    matrix = np.zeros((2, 768), dtype=np.float32)
+    common = (["chunk-a", "chunk-b"], ["src/a.ts", "src/b.ts"], [f"sha256:{'b' * 64}", f"sha256:{'c' * 64}"], matrix)
+
+    with pytest.raises(ValueError, match="WORKSPACE_REVISION_UNQUALIFIED"):
+        build_input_row_digest_ledger(*common[:3], ["workspace:old", "workspace:old"], common[3])
+
+    with pytest.raises(ValueError, match="WORKSPACE_REVISION_MIXED"):
+        build_input_row_digest_ledger(*common[:3], [f"sha256:{'a' * 64}", f"sha256:{'d' * 64}"], common[3])
+
+    with pytest.raises(ValueError, match="SOURCE_REVISION_UNQUALIFIED"):
+        build_input_row_digest_ledger(common[0], common[1], ["source:old", common[2][1]], [f"sha256:{'a' * 64}"] * 2, matrix)
 
 
 def test_training_entrypoint_fails_closed_before_database_or_artifact_io():

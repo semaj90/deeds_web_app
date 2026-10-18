@@ -184,6 +184,27 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 - [ ] Learned router must beat or materially simplify the static policy before
   promotion.
 
+### Domain prefilter paired replay (2026-10-17)
+
+- [ ] Supply a frozen candidate-pool snapshot, held-out query-domain predictions,
+  taxonomy revision, and complete relevance judgments independently admitted by
+  the existing golden-review owner; current local GA8 inputs are absent and the
+  review queue remains ungraded.
+- [x] Add an offline paired evaluator that compares baseline rank order with a
+  strict domain prefilter, verifies candidate/judgment checksums, and reports
+  removed relevant candidates, nDCG@K, MRR@K, and judged-pool Recall@K.
+- [x] Add fixture tests proving the evaluator exposes relevant-result loss,
+  rejects model-generated labels, and rejects snapshot tampering.
+- [ ] Verify the human-review admission receipt and reviewer authority outside
+  this evaluator; row markers and checksums alone are not proof of review.
+- [ ] Run on the qualified reviewed cohort; proxy/LLM labels do not qualify.
+- [ ] Keep domain as a routing/filter feature, never an independent RRF lane;
+  do not promote without paired quality and coverage evidence.
+
+Evidence: `python/domain_filter_retrieval_replay_v1.py` and
+`python/test_domain_filter_retrieval_replay_v1.py`. No database, vector-store,
+cache, or production retrieval writes are performed by this evaluator.
+
 ## NLP-8 — shadow runtime
 
 - [ ] Run classifier beside current routing only.

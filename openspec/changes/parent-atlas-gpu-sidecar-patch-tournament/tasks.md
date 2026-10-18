@@ -1,5 +1,20 @@
 # OpenSpec: Parent Atlas GPU Sidecar + Patch Tournament — bounded first slice
 
+## AVX2 / CUDA / inference architecture crosswalk (2026-10-17)
+
+The attached execution-architecture review is aligned to existing owners; it does not justify a second universal dispatcher or new canonical data owner. Its gate labels are mapped below to the owning OpenSpec work. Presence of source/build artifacts is not runtime, parity, or production proof.
+
+| Review gate | Existing owner | Remaining proof / boundary |
+|---|---|---|
+| `CPU-AVX2-01` | `parent-atlas-retrieval-lod-algorithm-taxonomy`; `simd-bridge/cpp` | **PARTIAL (host only, 2026-10-17):** Windows reports i7-11700F, 8C/16T; .NET runtime reports AVX2/FMA/AVX512F supported. Still required: native addon dispatch evidence, exact KNN numerical/order parity and scalar fallback. SIMDJSON parsing or a build flag alone does not close the gate. |
+| `CPU-VEC-01` / `TURBOVEC-01` | `parent-atlas-retrieval-lod-algorithm-taxonomy` | Compare AVX2 exact and TurboVec against the same frozen `semantic_768` exact-KNN oracle; record Recall@K, ordering, latency and memory. All remain one SearchRuntime semantic lane and one fusion vote. |
+| `GPU-TILE-01` / `GPU-GEMM-01` | `CUDA134-SIMT-CHALLENGER-01`; `python/atlas_cuda_cutile_simt_gemm_probe_v1.py` | Preserve the separate CUDA 13.2 cuTile and CUDA 13.4 SIMT/Tile lanes. Require same-input CPU parity, timing and VRAM receipts; current GPU/Ornith preflight and operator approval still gate execution. |
+| `TRT-RTX-01` | `sveltekit-frontend/openspec/changes/parent-atlas-cuda134-tensorrt-rtx-lane` | Separate TensorRT-RTX ONNX engine proof from the existing LibTorch/N-API bridge and TensorRT-LLM. SDK/package, engine build, deserialize/inference parity and cache compatibility are not established by bridge artifacts. |
+| `TRT-LLM-01` / `KV-CACHE-01` | `parent-atlas-kv-cache-adaptation-research` | Keep llama-server as current inference/KV owner. Treat TensorRT-LLM and KV quantization as separate challengers; require exact model/runtime identity, output-quality, throughput and VRAM evidence before changing serving configuration. |
+| `GPU-OWNER-01` | `GPU-24A`–`GPU-24E` below | Cross-process acquire/renew/release, contention/failure injection and fallback receipt remain open. Do not co-schedule graph/vector work, inference and training without the shared lease. |
+
+No gate above is closed by this documentation crosswalk. Existing hardware/runtime entries are navigated from `docs/architecture/_cuda_rtx_toc.md`; update the owning task ledger when a gate receives new evidence.
+
 ## CUDA 13.4 SIMT/cuTile challenger gate (2026-10-16)
 
 - [ ] **CUDA134-SIMT-CHALLENGER-01** Build the opt-in, network-isolated container in `docker/atlas-cuda134-simt/`; run the existing Level 2 SIMT and Level 3 CUDA C++ Tile kernels against the shared CPU-oracle fixtures only after the documented VRAM/Ornith preflight and operator approval. Acceptance requires successful CUDA 13.4 image compilation plus exact score/key parity for fixture sizes 256, 1,000, and 4,000; no canonical writes or production promotion.

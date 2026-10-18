@@ -22,6 +22,10 @@
         "ATLAS_TOOLS_MOCK": "0"
       }
     },
+    "ldr-research": {
+      "command": "node",
+      "args": ["./sveltekit-frontend/scripts/mcp/ldr-mcp.mjs"]
+    },
     "gemma4-offload": {
       "command": "node",
       "args": ["./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"]

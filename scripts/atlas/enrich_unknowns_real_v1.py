@@ -177,21 +177,25 @@ if len(pick) > 0:
 else:
     nb_lp, xp = None, None
 def fetch_pos_tags(phrase: str):
-    try:
-        payload = json.dumps({'text': phrase}).encode('utf-8')
-        req = urllib.request.Request('http://127.0.0.1:8095/pos', data=payload, headers={'Content-Type': 'application/json'})
-        with urllib.request.urlopen(req, timeout=5.0) as res:
-            if res.status == 200:
-                body = json.loads(res.read().decode('utf-8'))
-                return {
-                    'nouns': body.get('nouns', []),
-                    'adjectives': body.get('adjectives', []),
-                    'verbs': body.get('verbs', []),
-                    'lemmas': body.get('lemmas', []),
-                    'noun_phrases': body.get('noun_phrases', []),
-                }
-    except Exception as exc:
-        return {'status': 'ERROR', 'error': str(exc)[:80]}
+    for attempt in range(2):
+        try:
+            payload = json.dumps({'text': phrase}).encode('utf-8')
+            req = urllib.request.Request('http://127.0.0.1:8095/pos', data=payload, headers={'Content-Type': 'application/json'})
+            with urllib.request.urlopen(req, timeout=15.0) as res:
+                if res.status == 200:
+                    body = json.loads(res.read().decode('utf-8'))
+                    return {
+                        'nouns': body.get('nouns', []),
+                        'proper_nouns': body.get('proper_nouns', []),
+                        'adjectives': body.get('adjectives', []),
+                        'verbs': body.get('verbs', []),
+                        'lemmas': body.get('lemmas', []),
+                        'noun_phrases': body.get('noun_phrases', []),
+                    }
+        except Exception as exc:
+            if attempt == 1:
+                return {'status': 'ERROR', 'error': str(exc)[:80]}
+            time.sleep(0.5)
     return {'status': 'UNAVAILABLE'}
 
 records = []

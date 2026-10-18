@@ -66,33 +66,77 @@ function runPattern(content, lang, pattern) {
   }
 }
 
+const SVELTE_RUNE_PATTERNS = [
+  { kind: 'RUNE_STATE', pattern: 'let $NAME = $state($$$ARGS)' },
+  { kind: 'RUNE_DERIVED', pattern: 'let $NAME = $derived($$$ARGS)' },
+  { kind: 'RUNE_DERIVED_CONST', pattern: 'const $NAME = $derived($$$ARGS)' },
+];
+
+function extractSvelteScriptBlocks(content) {
+  const blocks = [];
+  const regex = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    if (match[1]?.trim()) blocks.push(match[1]);
+  }
+  return blocks;
+}
+
+function extractSvelteSnippetNames(content) {
+  const names = [];
+  const regex = /\{#snippet\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/g;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    if (match[1]) names.push(`snippet:${match[1]}`);
+  }
+  return names;
+}
+
 /**
- * Real ast-grep structural extraction for TypeScript/JavaScript.
- * Returns null (not an empty result) when the language isn't TS/JS or the
+ * Real ast-grep structural extraction for TypeScript/JavaScript/Svelte (.svelte).
+ * Returns null (not an empty result) when the language isn't TS/JS/Svelte or the
  * `ast-grep` binary isn't on PATH, so callers can distinguish "ran and found
  * nothing" from "didn't run" and fall back to the regex extractor honestly.
  */
 export function extractSymbolsViaAstGrep(content, language) {
-  const lang = language === 'typescript' ? 'ts' : language === 'javascript' ? 'js' : null;
+  const isSvelte = language === 'svelte';
+  const lang =
+    language === 'typescript' || isSvelte
+      ? 'ts'
+      : language === 'javascript'
+        ? 'js'
+        : null;
   if (!lang) return null;
   if (!checkAstGrepAvailable()) return null;
 
   const symbols = new Set();
-  for (const { kind, pattern } of TS_JS_PATTERNS) {
-    let matches;
-    try {
-      matches = runPattern(content, lang, pattern);
-    } catch {
-      continue;
-    }
-    for (const match of matches) {
-      if (kind === 'IMPORT') {
-        const src = match.metaVariables?.single?.SRC?.text;
-        if (src) symbols.add(`import:${src.replace(/^['"]|['"]$/g, '')}`);
+  const sourcesToScan = isSvelte ? extractSvelteScriptBlocks(content) : [content];
+  const patternsToRun = isSvelte
+    ? [...TS_JS_PATTERNS, ...SVELTE_RUNE_PATTERNS]
+    : TS_JS_PATTERNS;
+
+  for (const snippetName of isSvelte ? extractSvelteSnippetNames(content) : []) {
+    symbols.add(snippetName);
+  }
+
+  for (const block of sourcesToScan) {
+    if (!block) continue;
+    for (const { kind, pattern } of patternsToRun) {
+      let matches;
+      try {
+        matches = runPattern(block, lang, pattern);
+      } catch {
         continue;
       }
-      const name = match.metaVariables?.single?.NAME?.text;
-      if (name) symbols.add(name);
+      for (const match of matches) {
+        if (kind === 'IMPORT') {
+          const src = match.metaVariables?.single?.SRC?.text;
+          if (src) symbols.add(`import:${src.replace(/^['"]|['"]$/g, '')}`);
+          continue;
+        }
+        const name = match.metaVariables?.single?.NAME?.text;
+        if (name) symbols.add(name);
+      }
     }
   }
 

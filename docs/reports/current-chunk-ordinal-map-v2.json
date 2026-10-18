@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.current-chunk-ordinal-map.v2",
+  "generatedAt": "2026-10-18T03:49:51.855Z",
+  "mode": "READ_ONLY_CURRENT_CHUNK_IDENTITY",
+  "status": "CURRENT_CHUNK_ORDINAL_MAP_READY",
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "candidateSnapshotRevision": "current-chunk-lineage:sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc:f04bec4f5580035d9d0fc294aaa946fc32ec1c889fef8be2b94b707ea792ba98:v2",
+  "sourceRevisionSetChecksum": "f04bec4f5580035d9d0fc294aaa946fc32ec1c889fef8be2b94b707ea792ba98",
+  "identitySetChecksum": "7d58e1c8ea5180e9e1fc4c1f5e4f4486612202db51fe914fc84dbeb6f0837920",
+  "candidateCount": 100000,
+  "canonicalChunkCount": 100000,
+  "ordinalMapChecksum": "1cbcce5bd4c5acc19f0b228fb95d04cfc5b7238bef3b89b14133827170532512",
+  "identityGrain": "CANONICAL_CHUNK",
+  "identityOwner": "atlas_packet_chunk_lineage",
+  "workspaceBindingOwner": "atlas_workspace_source_bindings",
+  "checks": {
+    "exactWorkspaceBinding": true,
+    "provenPacketChunkLineage": true,
+    "duplicateCanonicalIds": 0,
+    "duplicateChunkRows": 0,
+    "sourceRevisionsQualified": true,
+    "semanticRevisionFabricated": false,
+    "graphRevisionFabricated": false
+  },
+  "sample": [
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0046a5745d5d9e09",
+      "chunkRowId": "b833a977-60ad-4185-9263-09927ac17976",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0050320904c52c61",
+      "chunkRowId": "dd9a8ee4-bd68-4f6e-86d6-a2bdf916661d",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:01dd89db9af965b1",
+      "chunkRowId": "09298111-1924-4454-9ef9-62dfd91a85c3",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0225c68b377e87ce",
+      "chunkRowId": "982148a1-5f24-4020-b9ad-ba8ebacc3fa7",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0763a425e136439e",
+      "chunkRowId": "70a85d61-209e-4676-8477-d82d2ad9a8a6",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:079da512f1aeb97c",
+      "chunkRowId": "aa1ff761-bec8-4ae1-9406-9cf3db0925ac",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:09494005c852513e",
+      "chunkRowId": "300fcee9-8b34-47a2-ad90-259826c8d9d6",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:0c4f553ca529631c",
+      "chunkRowId": "4056e6ff-53c6-4957-8d23-dae2f50ee887",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:1152ade674cc08fb",
+      "chunkRowId": "a3483bc2-748e-406a-a8e2-78f825b2af63",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    },
+    {
+      "canonicalChunkId": "card:src/lib/server/ace/context-assembler.ts:16bd5192541e4e41",
+      "chunkRowId": "d9e57dd0-bf59-4737-a0c4-94d1c697ace5",
+      "packetKey": "packet:cacfc82e8b96",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "sourceRevision": "sha256:9e4e0face3b24bf37f8465cd476ee62eb094a3a53cb3a7920435c2fafafb98fe"
+    }
+  ],
+  "output": ".tmp/atlas/current-chunk-ordinal-map-v2.json",
+  "nextGate": "PROMOTION-RECEIPT-COHORT-01"
+}

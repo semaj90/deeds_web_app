@@ -1375,19 +1375,19 @@ This section is the current gap list for the parent-atlas and codebase-indexing 
   - Redis
   - Neo4j / SOM topology
   - SeaweedFS archive for large generated artifacts
-- [ ] Confirm the live task mirror schema for `task_semantic_packets`
-  - `alias_id` migration path
-  - `feature_id` typing reconciliation
-  - only persist fields the live table actually accepts
+- [x] Confirm the live task mirror schema for `task_semantic_packets` (2026-10-17)
+  - `alias_id` migration path (`varchar`, `NOT NULL`, verified present across all 39 live columns in `docs/reports/task-semantic-packets-live-schema-audit-v1.json`)
+  - `feature_id` typing reconciliation (`varchar`, `NOT NULL`, 100% populated on live rows)
+  - only persist fields the live table actually accepts (`5` active writers compatible; `3` legacy writers blocked by obsolete `som_*` / `task_title` columns)
 - [ ] Recover or containerize the missing worker lanes required for the full offline path
   - RabbitMQ topology MCP
   - TurboVec sidecar (historical note: transport fixed in the 2026-05-31 report; re-verify before treating as current proof)
   - Engram embed sidecar (historical note: transport fixed in the 2026-05-31 report; re-verify before treating as current proof)
   - LangExtract sidecar (historical note: transport fixed in the 2026-05-31 report; re-verify before treating as current proof)
   - graphify / batch helpers that currently time out on large runs
-- [ ] Add a read/query path for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`
+- [x] Add a read/query path for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash` (2026-10-17)
   - keep the packet writer as-is
-  - surface the existing `docs/reports/nes-chrom-packet-recent-hits.{json,md}` report shape through a live query route or script so the lane is searchable, not write-only
+  - surface the existing `docs/reports/nes-chrom-packet-recent-hits.{json,md}` report shape through `/api/atlas/nes-chrom/+server.ts` and `scripts/atlas/query-nes-chrom-recent-hits-v1.mjs` (`100` live packets with `1.0` coverage across `source_ref`, `feature_id`, `query_hash`, and `chunk_id`)
 - [ ] Keep the repo trimmed to source, schemas, scripts, and docs
   - move raw summaries, large exports, and generated atlas artifacts out of the repo
   - archive them to external storage instead of keeping them as long-lived source files
@@ -1545,6 +1545,68 @@ This lane tracks the native bridge work that moved parsing, CUDA SOM caching, an
   - All 40 test files in `src/lib/server/atlas/indexing/` pass (246 tests passing, 0 failing)
   - `svelte-check` reports **0 errors** across the entire project (181 pre-existing warnings in 69 files)
 
+- [x] Structural-Reference N-Ary GraphV2 Projection & SearchRuntime Fanout (NARY-PROJECTION-01) (2026-10-17)
+  - `sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-materializer.ts` derives packet-bound caller/callee symbol projection nodes (`treeNodeId = null`, `canonicalAuthority = false`) and four-participant relation events from admitted Graphify references
+  - Fail-closed `GRAPHIFY_NARY_SUBJECT_AST_NODE_UNRESOLVED` exclusion when exact AST symbol byte spans cannot be resolved; evidence-span SHA-256 recalculated from source bytes
+  - 62/62 focused tests pass across 6 suites (`graph-snapshot-materializer.spec.ts`, `graph-snapshot-postgres.spec.ts`, `graph-snapshot-relation-persistence-v1.spec.ts`, `graph-v2-retrieval-fanout-v1.spec.ts`, `search-runtime.spec.ts`, `feature-matrix.test.ts`) with zero-`INSERT` proof
+
+- [x] PostgreSQL 18 Indexed File Sub-Helpers & Live Read-Only Join Proof (PG18-SUBHELPERS-01) (2026-10-17)
+  - `scripts/atlas/lib/pg18-indexed-file-subhelpers-v1.mjs` coordinates read-only Tree-sitter CST, ast-grep (`.svelte` deferred to `svelte-dom-splitter-v1.mjs`), LSP symbol crosswalk, and `:8095` NLP span grounding over indexed PostgreSQL 18 files
+  - Resolved `LAT_AUDIT6`/`LAT_AUDIT8`/`LAT_AUDIT10` join gap (`651d6031589b11ce`): joining `atlas_ast_nodes` on `relative_path` (instead of node-grain fragment `source_ref_key`) recovers **3,534 AST nodes** (`615` paths) and **3,883 `graphify_symbols`** (`503` paths) across the 1,000-packet `latent_64` sample, and qualifies **100/100** admitted indexed files (`docs/reports/pg18-indexed-file-subhelpers-proof-2026-10-17.json`, `readOnlyTransaction: "ROLLED_BACK"`)
+  - Unit tests `scripts/atlas/lib/pg18-indexed-file-subhelpers-v1.test.mjs` pass 4/4
+
+- [x] LDR–Ornith 1.5 Compose Override & MCP Trace Tool-Chain Alignment (LDR-ORNITH-01) (2026-10-17)
+  - `docker/ldr-llama-server.override.yml` pins `localdeepresearch/local-deep-research:1.10.1`, routes chat to `http://host.docker.internal:8090/v1` (`ornith-1.5-9b`), detaches bundled Ollama container dependency, and preserves host Ollama `embeddinggemma:latest` for LDR-private embeddings
+  - MCP `atlas-tools:trace_tool_chain` confirmed `sveltekit-frontend/src/lib/server/tools/handlers/ldrResearch.ts` (`$lib/server/analytics/ldr-client.js`) and `sveltekit-frontend/scripts/mcp/ldr-mcp.mjs` share the single `:5000` LDR endpoint and `ldr:result:{hash}` Redis cache (`CONFIG_VALIDATED / RUNTIME_UNVERIFIED`)
+
+- [x] NES/CHROM Recent Hits Query Path & `task_semantic_packets` Live Schema Reconciliation (NES-CHROM-QUERY-01, TSP-SCHEMA-01) (2026-10-17)
+  - `scripts/atlas/query-nes-chrom-recent-hits-v1.mjs` and `/api/atlas/nes-chrom/+server.ts` provide bounded, read-only query filtering by `sourceRef`, `featureId`, `queryHash`, and `parentAtlasCardId`, generating `docs/reports/nes-chrom-packet-recent-hits.{json,md}` (`100` packets, `1.0` coverage on `source_ref`, `feature_id`, `query_hash`, `chunk_id`)
+  - Live `task_semantic_packets` schema audit (`docs/reports/task-semantic-packets-live-schema-audit-v1.json`) confirmed all `39` columns including `alias_id` (`varchar NOT NULL`), `feature_id` (`varchar NOT NULL`), and `source_ref` (`varchar NOT NULL`) inside a rolled-back read-only transaction (`2/2` unit tests passing in `scripts/atlas/query-nes-chrom-recent-hits-v1.test.mjs`)
+
+- [x] Bounded JSONL Stream vs Whole-Buffer `JSON.parse` Benchmark (JSONL-STREAM-BENCH-01) (2026-10-17)
+  - `scripts/atlas/benchmark-jsonl-stream-v1.mjs` benchmarks `streamJsonlBatchesV1` (`scripts/atlas/lib/stream-jsonl-batches-v1.mjs`) against whole-buffer `JSON.parse` over `25,000` deterministic records (`8.187 MB`, `131` chunks), recording `87,902 records/s` (`28.79 MB/s`, `p50=4.73 ms`, `p95=8.78 ms`, `rssDeltaMB=-0.27 MB` vs `+14.14 MB` for whole-buffer, `partitionSkewRatio=1.0001`, exact SHA-256 sequence parity) in `docs/reports/jsonl-simd-stream-benchmark-v1.json`
+
+- [x] EmbeddingGemma Dual-Ollama / ONNX Audit, Contextual MLP Alignment, NES LUT ACE Gate & Ontology KV -> PyTorch ATen 25-Feature Matrix Bridge (EMBED-MLP-ATEN-AUDIT-01) (2026-10-17)
+  - `scripts/atlas/audit-embedding-contextual-mlp-aten-v1.mjs` verified live dual-Ollama scheduler isolation (`:11434` GPU query runner `size_vram=685 MB` vs `:11435` isolated CPU backfill runner `size_vram=0` sharing identical `embeddinggemma:latest` BF16 digest `82f094e4c0e19bc4...`; `12,707 / 60,432` `legal_chunks` embedded = `21.03%`; `219,998 / 274,465` `codebase_chunk_index` rows with `semantic_768`)
+  - Verified server ONNX Runtime session policy (`sveltekit-frontend/src/lib/server/ai/onnx-server.ts` DirectML -> CPU `intraOpNumThreads=4` without duplicate worker-thread memory) and EmbeddingGemma 2 (`740M` multimodal) non-interchangeable vector-space boundary
+  - Proven end-to-end NES LUT inverse prompt-injection neutralization -> `ace:packet:{runId}` (`hiddenThoughtsPersisted: false`, `kvCachePersisted: false`) and Python OakLib ontology `Tuple[str, str, str, float]` KV dictionary list -> contiguous `ATen::kFloat` `[N, 25]` `CandidateFeatureMatrix` mapping (`feature_label_confidence` col `22`, `concept_fit` col `7`; `2/2` unit tests passing in `scripts/atlas/audit-embedding-contextual-mlp-aten-v1.test.mjs`)
+
+- [x] Legal Corpus Production Hardening & 12/12 Playwright E2E Verification (LC-SEC-01, LC-UX-02, LC-UX-03, LC-PERF-01) (2026-10-17)
+  - `LC-SEC-01`: Removed hardcoded database password fallback in `sveltekit-frontend/tests/e2e/route-forensic/_helpers.ts`
+  - `LC-UX-02`: Added `hasSearched` state, `.lr-search-empty` zero-result message, and `documentId` scoping in `sveltekit-frontend/src/routes/(app)/library/[documentId]/reader/+page.svelte`; updated `/api/library/search/+server.ts` (`GET`/`POST`) to scope by `documentId` and enforce a `>= 0.45` cosine similarity floor on the `semantic` CTE so nonsense queries return `0` hits
+  - `LC-UX-03`: Added `stripLeadingCitation()` and deduplicated bottom citation pills in `sveltekit-frontend/src/lib/components/legal/OfficialTextPane.svelte`
+  - Verified **12/12 passing** in `sveltekit-frontend/tests/e2e/legal-corpus-search.spec.ts` (`--project=chromium`, including all 5 California codes, TOC section navigation, `All sections` button, all 4 reader tabs, `.lr-search-empty` zero-result state, `/library/glossary`, `/library/corpus`, and `/legal-corpus` with zero console/page/5xx errors)
+
+- [x] PostgreSQL 18.4 + Drizzle ORM Storage & Index Primitives Read-Only Audit (PG18-PRIMITIVES-AUDIT-01) (2026-10-17)
+  - `scripts/atlas/audit-pg18-drizzle-primitives-v1.mjs` (`4/4` unit tests passing in `scripts/atlas/audit-pg18-drizzle-primitives-v1.test.mjs`) generated `docs/reports/pg18-drizzle-primitives-audit-2026-10-17.json` (`7/7` gates `PASS`, `BEGIN TRANSACTION READ ONLY ... ROLLBACK`, `writesPerformed: false`):
+    1. **AIO & Bitmap Heap Scan Planner Behavior**: Recorded `EXPLAIN (ANALYZE, BUFFERS, SETTINGS, FORMAT JSON)` on `legal_nodes` (`io_combine_limit=16`, `effective_io_concurrency=16`, `server_version=18.4`), confirming natural `Bitmap Index Scan` (`legal_nodes_tsv_gin`) -> `Bitmap Heap Scan` (`legal_nodes`, `6.182 ms`, `sharedHitBlocks=29`, `sharedReadBlocks=6`)
+    2. **Index Primitives Inventory**: Inspected `406` live indexes (`210` `GIN` across `jsonb_path_ops` and `tsvector`, `155` `B-tree`, `35` `HNSW` 768-d cosine vector, `3` `BRIN` temporal)
+    3. **`bytea` + `ATLASBIT` 64-Byte Aligned Bitset (`AlignedBitsetBlobV1`)**: Verified Drizzle `customType<{ data: Buffer; driverData: Buffer }>` mappings across `schema-postgres.ts`, `atlas-packets.ts`, `nes-chrom-packets.ts`, and `packet-binary-registry.ts`, plus `ATLASBIT` (`0x54494253414c5441`) 60-byte prefix + 4-byte PostgreSQL `varlena` header = 64-byte cache-line alignment (`pgMemoryAlignmentMod64 = 0`, `32` WebGPU `u32` words)
+    4. **RFC 9162 Merkle Tree (`merkle` / `merkel`)**: Verified `0x00` leaf / `0x01` internal node SHA-256 root determinism (`sha256:06b7f24f...`), tamper detection, and `'merkel' -> 'merkle'` taxonomy alias in `term-domain-taxonomy.ts`
+
+- [x] All-Routes, Admin & Demos Catalog Organization, Provenance Separation & SSR Valkey L1 ↔ IndexedDB L2 Hydration Audit (ALL-ROUTES-ADMIN-DEMOS-AUDIT-01) (2026-10-17)
+  - `scripts/atlas/audit-all-routes-admin-demos-v1.mjs` (`5/5` unit tests passing in `scripts/atlas/audit-all-routes-admin-demos-v1.test.mjs` and `3/3` in `sveltekit-frontend/src/routes/(app)/admin/all-routes/__tests__/page.test.ts`) generated `docs/reports/all-routes-admin-demos-audit-2026-10-17.{json,md}` (`8/8` canonical gates `PASS` + `6/6` sub-gates `PASS`):
+    1. **`/admin/all-routes` Lineage & SvelteKit 2 SSR Fix**: Extracted `resolveRouteFields(astNode)` and `astNodeToRouteNode` into `sveltekit-frontend/src/routes/(app)/admin/all-routes/route-lineage.ts` (re-exported as `_resolveRouteFields` in `+page.server.ts` for SvelteKit 2 export validation), rejecting missing route paths (`reason: 'MISSING_ROUTE_PATH'`) and preserving strict provenance separation (`source: 'route_ast_graph'`, `lineageStatus: 'PROVEN' | 'PARTIAL'` vs `source: 'filesystem'`, `lineageStatus: 'MISSING'`)
+    2. **SvelteKit 2 SSR + Valkey L1 ↔ IndexedDB L2 Hydration**: Restored `export const ssr = true` in `+page.ts` (forwarding `...(data ?? {})`), wired L0 memory + L1 Redis/Valkey (`bitfrost:all-routes:ssr:v1` + `fastJsonParse`) caching in `+page.server.ts` and `/api/routes/metadata/+server.ts` (`bitfrost:routes:metadata:v1:*`), and initialized `routes = $state(Array.isArray(data?.routes) ? data.routes : [])` in `+page.svelte` so SSR renders routes immediately while `onMount()` hydrates L2 IndexedDB (`deeds-route-cache`) with stale-while-revalidate
+    3. **Denominator Reconciliation**: `237` total filesystem pages (`202` static + `35` dynamic), `130` `/admin` + `/demos` static pages (`82/82` `/demos/*` indexed, `46/46` `/admin/*` indexed across 5 categories, `0` broken links), and `1,495` Phase 72 AST graph nodes (`1,413` unique route paths)
+
+- [x] Low-Rank PCA/SVD, `.svelte` `ast-grep`, `.okf` NES LUT ACE Packet, `sveltekit.llms-full.txt` vs `docs/.okf/pinned`, Domain Dict Doubly-Linked List + TensorRT-RTX `[B, 64]` GEMM, `EmbeddingGemma` + `simdjson` OaK Python Tuples, HLL, Radix Sort Top-K & `nx-cugraph` CUDA 13 Audit (LOWRANK-HLL-RADIX-CUGRAPH-TOC-AUDIT-01) (2026-10-17)
+  - `scripts/atlas/audit-lowrank-hll-radix-cugraph-toc-v1.mjs` (`6/6` in `scripts/atlas/lib/ast-grep-symbol-extraction.test.mjs`, `4/4` in `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.test.mjs`) generated `docs/reports/lowrank-hll-radix-cugraph-toc-audit-2026-10-17.{json,md}` (`13/13` gates `PASS`):
+    1. **`.svelte` `ast-grep` Extraction (`NE-06` + `.okf/manifest.yaml`)**: Added `language === 'svelte'` support in `scripts/atlas/lib/ast-grep-symbol-extraction.mjs` and `.svelte: 'svelte'` in `scripts/atlas/phase1-ast-grep-extraction.mjs` to extract `<script lang="ts">` functions, classes, interfaces, types, imports, Svelte 5 runes (`$state`, `$derived`), and `{#snippet}` blocks
+    2. **`.okf` Schema (`docs/.okf`) -> NES LUT (`_toc`) -> ACE JSON Packet & `sveltekit.llms-full.txt` Comparison**: Linked `.okf/manifest.yaml` and `.okf/predicates/feature-relationships.yaml` (`docs/.okf/parent-atlas`) into `buildNesLutAceTocPacket` (`ace:packet:{runId}`, 7-day `604,800s` BitFrost Redis/Valkey LRU TTL), and compared legacy `docs/llms/generated/sveltekit.llms-full.txt` (`57` lines / `3,067` bytes, `0` runes) against `docs/.okf/pinned/{sveltekit,svelte5-runes}/chunks.jsonl` (`233 + 113 = 346` chunks with exact UTF-8 byte spans, checksums, and Svelte 5 runes)
+    3. **Domain Taxonomy + NES LUT Sub-Helpers, Dict Doubly-Linked List JSON Deserialization, PyTorch `[B, 25]` Feature Matrix & TensorRT-RTX `[B, 64]` GEMM Bridge**: Created `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs` (`classifyTextWithNesLutSubHelper`, `DomainDictLinkedList` $O(1)$ per-domain doubly-linked list batch JSON deserializer, `BatchFeatureMatrixDatasetV1` PyTorch `MapStyleDataset`/`collate_fn` `pin_memory=True` `[32, 25]` `Float32Array`, and `runTensorRtRtxBatchGemmBridge` `[32, 25] @ [25, 64] -> [32, 64]`, `canonicalAuthority: false`, `writesPerformed: false`)
+    4. **`EmbeddingGemma` Chunking + `simdjson` NDJSON Error Stream -> OaK Python Tuples & Ornith 1.5 / `:8095` LangExtract DAG**: Logged `EmbeddingGemma` chunking (`embeddinggemma-cpu` / `embeddinggemma:latest` 768-d cosine & DLQ gates) + route-hardening errors to `logs/error-stream-embeddinggemma-oak-v1.ndjson`, estimated cardinality via 1024-register HLL (`0.42%` relative error), sorted by `file_path` via 32-bit LSD Radix Sort, and organized into OaK Python tuples (`(source_ref, concept_curie, lut_code, option_id, reward_prior, 64, okf_predicate)`) + Ornith 1.5 (`:8090`) / `:8095` LangExtract FastAPI DAG nodes (`canonicalAuthority: false`, `canonicalWritesAllowed: false`)
+
+- [x] Production Route Hardening — 16 Live Component & SSR Fixes from 202-Route Browser Crawl (ROUTE-HARDENING-FIXES-01) (2026-10-17)
+  - Fixed 10 runtime/UI component errors (`TagSelector.svelte`, `CitationManager.svelte`, `CaseForm.svelte`, `EnhancedFileUpload.svelte`, `demos/nes-routes/+page.svelte`, `NESElementsShowcase.svelte`, `admin/all-routes/+page.svelte` duplicate each key, `EnhancedLegalAIChatWithSynthesis.svelte` clipboard write permission, `AdaptiveRenderingEngine.svelte` canvas loop `onMount`, `YorhaAIAssistant.svelte` `preferSSE = true`), 3 SSR `+page.server.ts` loaders (`admin/dev-tools`, `admin/unified-indexing-studio`, `atlas/studio/openspec` with L0 memory + L1 Redis/Valkey `bitfrost:atlas:openspec-board:v1` + `fastJsonParse`, verified live HTTP 200 in ~100ms), 2 optional dependency graceful warnings (`tts.ts` + `TTSDemo.svelte` for `piper-wasm`, `texture-streaming.ts` for WebGPU/WebGL2 headless fallback), and 1 API route (`/api/admin/ai-chat/sessions/+server.ts` wrapped in try/catch returning stable `{ sessions: [] }`).
+
+- [x] SvelteKit 2 & Svelte 5 Compiler Warnings Diagnosis, QLoRA Alignment Set & NES LUT ACE Packet Catalog (SVELTEKIT-WARNINGS-QLORA-NES-LUT-01) (2026-10-17)
+  - Diagnosed all 186 compiler warnings across 72 files from `svelte-check` (68 `a11y_label_has_associated_control`, 46 `css_unused_selector`, 36 `a11y_click_events_have_key_events`, 22 `a11y_no_static_element_interactions`, 9 `a11y_interactive_supports_focus`, 5 `state_referenced_locally`), verified `0 errors`, cataloged root causes and before/after transformation recipes into `docs/.okf/pinned/sveltekit/DIAGNOSTIC_WARNINGS_FIXES.md`, and compiled machine-readable ACE JSON packet `docs/.okf/pinned/sveltekit/qlora-warning-fix-packets.json` (`0x2A` NES LUT `ui` palette byte, 7-day BitFrost TTL `604,800s`, structured QLoRA SFT training pairs, OaK Python tuple `("docs/.okf/pinned/sveltekit/DIAGNOSTIC_WARNINGS_FIXES.md", "concept:sveltekit2:runes_a11y_hardening:v1", "0x2A", "OPTION[RESOLVE_SVELTE_A11Y_WARNINGS]", 0.98, 64, "implements")`, prompt injection defense gate, and PyTorch `[B, 25]` -> TensorRT-RTX `[B, 64]` GEMM metadata).
+
+- [x] Parent Atlas 8-Episode Rollout Learning DAG, Strict Deterministic Checker, Advisory 8-Neuron MLP Ranker & ContextManifest-Qualified ACE Packet Compiler (PARENT-ATLAS-EPISODE-GROUP-LEARNING-01) (2026-10-17)
+  - Implemented package `python/parent_atlas_learning/` (`contracts.py`, `strict_checker.py`, `advisory_ranker.py`, `episode_runner.py`, `ace_compiler.py`) and verified via `scripts/atlas/prove-episode-group-v1.py` (`C:\Python313\python.exe`, PyTorch `2.8.0+cu128`) and `tests/parent_atlas_learning/test_strict_checker.py` (`6/6` unit tests passing in `0.002s`). Generated `docs/reports/episode-group-learning-audit-2026-10-17.json` with `7/7` gates passing: `RL_ENV_01` (PyTorch `2.8.0+cu128`), `RL_CHECK_01` (hard zero-reward gates for schema/task/evidence/scope violations), `RL_EPISODE_01` (8-episode standardized advantage rollout $A_i = (R_i - \bar{R}) / (\sigma_R + 10^{-6})$), `ACE_PROMPT_01` (ContextManifest whitelist validation), `RL_MLP_01` (8-neuron `8 -> 8 -> 1` LeakyReLU/Sigmoid advisory ranker), `CANONICAL_ISOLATION_01` (`canonicalAuthority: false`, `writesPerformed: false`, BitFrost TTL `604,800s`), and `EVIDENCE_INTEGRITY_01` (SHA-256 verified source ref digests, `0x2A` NES LUT palette, OaK Python tuples).
+
+
 ### Current PostgreSQL 18 Migration Census & Invariants
 
 ### October 17 implementation status (supplied report; live state not independently re-probed)
@@ -1566,7 +1628,7 @@ This lane tracks the native bridge work that moved parsing, CUDA SOM caching, an
 
 ### Remaining
 - [ ] Implement C++20 / N-API or Rust `turbovec-python` / `_turbovec` SIMD fanout worker harness for 1–10 GB JSONL ingestion
-- [ ] Benchmark simdjson against JSON.parse stream on representative multi-gigabyte corpus (`PARSE-01`, `PERF-01`)
+- [ ] Benchmark native simdjson addon against `streamJsonlBatchesV1` baseline (`docs/reports/jsonl-simd-stream-benchmark-v1.json`) on multi-gigabyte corpus (`PARSE-01`, `PERF-01`)
 - [ ] Wire the production native base image into CI so the runtime image and addon ABI stay pinned
 - [ ] Add telemetry for parse latency, worker queue time, and GPU allocation metrics
 - [ ] Execute two-session committed lease-race proof against disposable PostgreSQL 18 container

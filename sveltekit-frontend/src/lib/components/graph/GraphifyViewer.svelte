@@ -1284,10 +1284,6 @@
     display: flex; align-items: flex-end; gap: 0.65rem; flex-wrap: wrap; margin-top: 0.25rem;
   }
   .atlas-compare-row label { font-size: 0.72rem; color: #99b; display: flex; flex-direction: column; gap: 3px; }
-  .atlas-compare-row input {
-    width: 90px; padding: 3px 6px; background: #111; border: 1px solid #334;
-    color: #eee; border-radius: 4px; font-size: 0.75rem;
-  }
   .atlas-compare-row button {
     padding: 4px 12px; background: #111; border: 1px solid #334; color: #88f;
     border-radius: 4px; cursor: pointer; font-size: 0.75rem;

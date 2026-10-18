@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.workspace-revision-backfill.v1",
+  "generatedAt": "2026-10-18T03:34:35.207Z",
+  "dryRun": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "targetWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "batchSize": 5000,
+  "statistics": {
+    "totalChunksInTable": 274465,
+    "priorNullWorkspaceRevision": 274465,
+    "priorNullSourceRevision": 274465,
+    "priorNullLineageChecksum": 274465,
+    "eligibleToBackfill": 180081,
+    "unmatchedChunksCount": 94384,
+    "batchesPlanned": 37,
+    "batchesExecuted": 0,
+    "rowsUpdated": 0
+  },
+  "status": "DRY_RUN_AUDIT_PASSED",
+  "checksum": "sha256:58b1f41268b3731666d40f6b1ec423e9a66ad6c2808e6d4eb10bdf555c72d106"
+}

@@ -21,7 +21,7 @@ async function main() {
   console.log('Total error_logs count:', countRes.rows[0].count);
 
   const recent = await client.query(
-    'SELECT * FROM error_logs ORDER BY id DESC LIMIT 5'
+    'SELECT * FROM error_logs ORDER BY created_at DESC LIMIT 5' // id is a random uuid, so ORDER BY id is not "latest"
   );
   console.log('Recent 5 error logs:');
   recent.rows.forEach(r => {

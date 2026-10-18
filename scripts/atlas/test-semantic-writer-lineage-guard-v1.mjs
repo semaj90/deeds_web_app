@@ -9,6 +9,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const writer = fs.readFileSync(path.join(ROOT, 'scripts/atlas/backfill-graphify-file-embeddings-768.mjs'), 'utf8');
 const census = fs.readFileSync(path.join(ROOT, 'scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs'), 'utf8');
 const legacyRoute = fs.readFileSync(path.join(ROOT, 'sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts'), 'utf8');
+const legacyFullCorpusWriter = fs.readFileSync(path.join(ROOT, 'sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs'), 'utf8');
 
 test('canonical semantic writer requires proven packet/chunk and workspace/source lineage', () => {
   assert.match(writer, /atlas_packet_chunk_lineage/);
@@ -43,4 +44,14 @@ test('writer census matches content_embedding exactly rather than content_embedd
   assert.match(legacyRoute, /INSERT INTO codebase_chunk_index/);
   assert.doesNotMatch(legacyRoute, /content_embedding_768/i);
   assert.doesNotMatch(legacyRoute, /\bcontent_embedding\b(?!_768)\s*=/);
+});
+
+test('legacy full-corpus canonical-target writer is explicitly quarantined before execution', () => {
+  const quarantine = legacyFullCorpusWriter.indexOf('SEMANTIC_768_LINEAGE_GATE_BLOCKED');
+  const execution = legacyFullCorpusWriter.indexOf('await backfillEmbeddings()');
+  assert.notEqual(quarantine, -1);
+  assert.notEqual(execution, -1);
+  assert.ok(quarantine < execution, 'quarantine must precede embedding and persistence work');
+  assert.match(census, /applyQuarantined/);
+  assert.match(census, /canonicalTargetApplyEnabledWriterCandidates/);
 });

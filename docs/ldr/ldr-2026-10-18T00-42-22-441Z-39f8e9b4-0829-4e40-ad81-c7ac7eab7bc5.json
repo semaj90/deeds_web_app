@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.ldr.report.v1",
+  "executionId": "39f8e9b4-0829-4e40-ad81-c7ac7eab7bc5",
+  "createdAt": "2026-10-18T00:42:22.441Z",
+  "query": null,
+  "status": "BLOCKED",
+  "taskId": "cffe97d9-d95e-4b81-ac0d-4b8a050bfb11",
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "researchStartAttempted": false,
+  "sourceRevisionDeferred": true,
+  "reportSha256": "f322023d52542d61334e651294c3d685f89c8dab937742651bb9b861aa336d5d",
+  "tools": [
+    "ldr.start_research",
+    "ldr.get_report",
+    "ldr.poll_status",
+    "ldr.search_history",
+    "ldr.quick_summary"
+  ],
+  "error": "LDR_LOGIN_FAILED (HTTP 429)"
+}

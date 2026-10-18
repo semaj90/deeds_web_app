@@ -185,8 +185,8 @@
 
 		<div class="demo-row">
 			<div class="progress-control">
-				<label>Value: {progressValue}%</label>
-				<input type="range" min="0" max="100" bind:value={progressValue} class="range-input" />
+				<label for="ui-progress-value">Value: {progressValue}%</label>
+				<input id="ui-progress-value" type="range" min="0" max="100" bind:value={progressValue} class="range-input" />
 			</div>
 		</div>
 
@@ -578,7 +578,7 @@
 		margin-bottom: 0.25rem;
 	}
 	.section-head h2 { font-size: 1.15rem; font-weight: 600; margin: 0; }
-	.section-icon { color: #c4b5fd; }
+	:global(.section-icon) { color: #c4b5fd; }
 	.component-path {
 		font-size: 0.65rem;
 		color: #475569;

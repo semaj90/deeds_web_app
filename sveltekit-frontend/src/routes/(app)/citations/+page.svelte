@@ -692,6 +692,7 @@
         <div
           class="cit-card"
           onclick={() => (selectedCitation = selectedCitation?.id === citation.id ? null : { id: citation.id, statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, source_type: 'auto_extracted' as const, highlighted_text: citation.quotedText, notes: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() })}
+          onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { selectedCitation = selectedCitation?.id === citation.id ? null : { id: citation.id, statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, source_type: 'auto_extracted' as const, highlighted_text: citation.quotedText, notes: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }; } }}
           role="button"
           tabindex="0"
         >
@@ -709,7 +710,7 @@
                 citation={{ statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, highlighted_text: citation.quotedText, source_type: 'auto_extracted' }}
                 size="sm"
               />
-              <div class="cit-collection-wrap" onclick={(e) => e.stopPropagation()}>
+              <div class="cit-collection-wrap">
                 <button
                   class="cit-mini-btn"
                   onclick={() => { addingToCollectionFor = addingToCollectionFor === citation.id ? null : citation.id; loadUserCollections(); }}
@@ -780,7 +781,7 @@
           </div>
 
           <!-- Research workflow actions -->
-          <div class="cit-card-workflow" onclick={(e) => e.stopPropagation()}>
+          <div class="cit-card-workflow">
             {#if citation.sourceUrl}
               <a
                 href={citation.sourceUrl}
@@ -806,19 +807,18 @@
           <!-- Tags row -->
           <div class="cit-card-tags">
             {#each citationTagsMap[citation.id] ?? [] as t (t.tag)}
-              <span
+              <button
+                type="button"
                 class="cit-tag-pill"
                 style="background-color: {t.color}"
                 onclick={(e) => { e.stopPropagation(); removeTagFromCitation(citation.id, t.tag); }}
                 title="Click to remove"
-                role="button"
-                tabindex="0"
               >
                 {t.tag} ×
-              </span>
+              </button>
             {/each}
             {#if addingTagFor === citation.id}
-              <div class="cit-tag-adder" onclick={(e) => e.stopPropagation()}>
+              <div class="cit-tag-adder">
                 {#each TAG_PRESETS as preset}
                   <button
                     class="cit-tag-preset"

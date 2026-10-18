@@ -1,0 +1,239 @@
+{
+  "schema": "atlas.graphify-admission-current-audit-summary.v1",
+  "observedAt": "2026-10-17T19:34:36.297Z",
+  "sourceReceipt": ".tmp/atlas/fabric-recheck-20261017-v2/atlas-canonical-projection-fabric-audit-2026-10-17.json",
+  "sourceReceiptSha256": "0a18b468086cf019286bf025380da712a9bea445342959d1e4c3240db6ad228b",
+  "repositoryCommit": "e1cbfd496149326ad40aa1f22d4cd61dc6233701",
+  "overallVerdict": "NOT_SAFE_TO_PROJECT",
+  "predicateCounts": {
+    "pass": 5,
+    "partialProven": 3,
+    "notProven": 3
+  },
+  "predicates": {
+    "IDENTITY_ALIGNED": "PASS",
+    "REVISION_QUALIFIED": "PASS",
+    "SYMBOLS_RESOLVED": "PARTIAL_PROVEN",
+    "SEMANTIC_OWNER_PROVEN": "PARTIAL_PROVEN",
+    "LATENT_FAMILY_PROVEN": "PARTIAL_PROVEN",
+    "GRAPH_MANIFEST_SEALED": "PASS",
+    "ONTOLOGY_COHORT_NONEMPTY": "PASS",
+    "ORDINAL_MAP_SEALED": "PASS",
+    "PROJECTIONS_CHECKSUM_ALIGNED": "NOT_PROVEN",
+    "BITFROST_KEYS_DERIVABLE": "NOT_PROVEN",
+    "ACE_EVIDENCE_GROUNDED": "NOT_PROVEN"
+  },
+  "materialFindings": {
+    "symbols": {
+      "processed": 18881,
+      "supported": 20744,
+      "unprocessedExactRevision": 704,
+      "missingExactGraphifyRevision": 1155,
+      "noGraphifySourceRef": 616,
+      "otherRevisionOnly": 539,
+      "parseFailures": 4,
+      "latestFrozenShardDryRun": {
+        "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+        "shardOffset": 25,
+        "shardSize": 25,
+        "status": "SHARD_INCOMPLETE",
+        "sourceReadMode": "WORKING_TREE",
+        "sourceReadSnapshotRevision": null,
+        "precheckRowsExamined": 25,
+        "revisionMismatches": 25,
+        "filesProcessed": 0,
+        "datastoreWriteAttempted": false,
+        "receipt": "docs/reports/graphify-symbol-extractor-v1-1792264714052.json",
+        "receiptSha256": "b9ec818065154018fb286035b2c6aab88b816f199074726e44ef5daa751507b5",
+        "interpretation": "The extractor read the current working tree, not the frozen source snapshot. This shard cannot be counted as parser coverage; do not continue frozen-plan extraction until the source-byte reader is bound to the admitted snapshot or a new snapshot is sealed."
+      },
+      "latestSnapshotBoundDryRun": {
+        "receipt": ".tmp/atlas/graphify-symbol-snapshot-dryrun-summary-20261017.json",
+        "receiptChecksum": "39f25e27f6b81fad72e024fb733b829ef01c34fdd7b4ead7f73e7cc632b4b2ce",
+        "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+        "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "plannedMembers": 704,
+        "exactSnapshotMembersDryRun": 703,
+        "remaining": 1,
+        "proposedSymbolCount": 7792,
+        "parseFailures": 0,
+        "revisionMismatches": 0,
+        "datastoreWrites": 0,
+        "readbackProven": false,
+        "excludedSourceRef": "scripts/atlas/audit-qdrant-noise.mjs",
+        "excludedReason": "Historical frozen bytes contain a malformed block-comment terminator and the TypeScript parser times out; no completed extraction receipt.",
+        "interpretation": "Snapshot-bound dry-run coverage only. These WOULD_EXTRACT observations are not persisted symbols or independent readback; the symbol admission predicate remains PARTIAL_PROVEN."
+      }
+    },
+    "semanticOwner": {
+      "canonicalTarget": "codebase_chunk_index.content_embedding_768",
+      "writerOwnerStatus": "UNRESOLVED_NOT_PROMOTED",
+      "historicalSurfaces": ["atlas_packets.embedding", "codebase_chunk_index.content_embedding"],
+      "staticWriterCensus": {
+        "receipt": ".tmp/atlas/semantic-768-writer-ownership-static-20261017.json",
+        "sha256": "06944de6333058be3eedc6601408b874daf070baafb5af8d88ac46aee4e26861",
+        "mode": "STATIC_ONLY",
+        "writerCandidates": 18,
+        "canonicalTargetCandidates": 2,
+        "applyEnabledCanonicalTargetWriters": ["scripts/atlas/apply-lineage-qualified-semantic-768-backfill-v1.mjs"],
+        "quarantinedCanonicalTargetWriters": ["sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs"],
+        "legacySurfaceWriterCandidates": 14,
+        "verdict": "OWNER_NOT_PROVEN",
+        "reason": "The only apply-enabled canonical-target writer is a 15-row cohort writer; legacy surfaces and full-corpus provenance/readback remain unresolved."
+      }
+    },
+    "latentFamily": {
+      "verifiedArtifacts": 3,
+      "perRowInputDigestLedgerExists": false,
+      "lifecycle": "CANDIDATE",
+      "admittedSourceBindingDiagnosticSample": {
+        "sampleRule": "first 1000 non-null content_embedding_768 rows ordered by id",
+        "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "sampledRows": 1000,
+        "exactSourceBindingRows": 751,
+        "unboundRows": 249,
+        "matchedWorkspaceRevisionCount": 1,
+        "representativeSample": false,
+        "matrixChecksumRecomputed": false,
+        "interpretation": "Cannot construct a complete training-input lineage ledger from this 1000-row diagnostic. This does not prove that the original 55169 training rows mismatch; original row membership and input-time source revisions remain unverified."
+      },
+      "boundedLatent64PacketSample": {
+        "receipt": ".tmp/atlas/latent-identity-audit-20261017/latent-representation-identity-audit-2026-10-17.json",
+        "receiptSha256": "31c1498ba7cf3ad630b95073fe962b7b5359bda8dc446fb37a48e5bfe90f24e3",
+        "sampleRule": "first 1000 atlas_packets rows with latent_64, ordered by packet_id",
+        "sampleSelectionDigest": "63204034d8c7c16ac5a865a5a5a3f0e4688ce0586c1585dee08d94c749822a2f",
+        "sampledRows": 1000,
+        "exactPacketWorkspaceAndSourceRevisionBindings": 272,
+        "unboundOrMismatchedRows": 728,
+        "treeNodeHierarchyJoins": 1000,
+        "graphifySymbolJoins": 157,
+        "symbolVersionIdsPresent": 0,
+        "latent64ByteLength": 256,
+        "representationRegistryJoin": 0,
+        "inputDigestRows": 0,
+        "parametersDigestRows": 0,
+        "qdrantScrollPoints": 250,
+        "interpretation": "A distinct packet-grain latent_64 sample has present bytes but incomplete source/workspace binding and no symbol-version or representation-registry/input-digest joins. Uniform 256-byte payloads are only consistent with the existing float32 little-endian writer; the audit does not infer encoding from bytes. This sample is not representative and does not establish mismatch in the original 55169-row training cohort or training-time provenance."
+      }
+    },
+    "ordinalMap": {
+      "rows": 16151,
+      "admittedCandidates": 16151,
+      "missingOrdinal": 0,
+      "checksum": "413addb327254b5d4085aed35e886c03192aecad882e44ce2ea6b6dda84f2376",
+      "candidateSnapshotRevision": "sha256:85c19c1ac0e4fbfd114203f1a5d822a008e45a1af5c46e738baf86e436c34fd6"
+    },
+    "latestAdmissionRecheck": {
+      "receipt": ".tmp/atlas/fabric-recheck-20261017-v2/atlas-canonical-projection-fabric-audit-2026-10-17.json",
+      "receiptSha256": "0a18b468086cf019286bf025380da712a9bea445342959d1e4c3240db6ad228b",
+      "generatedAt": "2026-10-17T19:34:36.297Z",
+      "overallVerdict": "NOT_SAFE_TO_PROJECT",
+      "pass": 5,
+      "partialProven": 3,
+      "notProven": 3,
+      "ordinalMapSealed": "PASS",
+      "projectionChecksumColumnsFound": 0,
+      "productionWrites": false,
+      "databaseTransaction": "READ ONLY then ROLLBACK"
+    },
+    "selectedExistingProjectionReceipts": {
+      "currentOrdinalMap": {
+        "candidateCount": 16151,
+        "candidateSnapshotRevision": "sha256:85c19c1ac0e4fbfd114203f1a5d822a008e45a1af5c46e738baf86e436c34fd6",
+        "ordinalMapChecksum": "413addb327254b5d4085aed35e886c03192aecad882e44ce2ea6b6dda84f2376"
+      },
+      "aceCandidateFeatureSnapshot": {
+        "path": "docs/reports/ace-candidate-feature-snapshot-v1.json",
+        "candidateCount": 15,
+        "candidateSnapshotRevision": "ace-golden-feature-snapshot:v1:c735ceac89bd0b02e0e040a9ededcd7e1222006a7e6ad531060212b1097d3cd4",
+        "ordinalMapChecksum": "0f652cc5d1dbe6ca362145c600ad22759b9a9a8bc5f86ff42a78115025d24c6f",
+        "matchesCurrentMap": false
+      },
+      "aceProducerTrace": {
+        "path": "docs/reports/ace-producer-trace-01-v1.json",
+        "packetCount": 200,
+        "candidateSnapshotRevision": "sha256:6b420eb2f48538df46b4dedabf7486bc4f87e5f37dd33a5ceb7234f9e784ca57",
+        "ordinalMapChecksum": "d601d7b7525a8b39e16ac9f6983d3865439faf7b9b649c33baf854ce0d7e4203",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "matchesCurrentMap": false
+      },
+      "interpretation": "The inspected historical ACE receipts carry ordinal checksums, but their candidate counts, snapshot revisions, and map checksums differ from the current admitted 16151-candidate map. They cannot satisfy current cross-projection checksum alignment or substitute for independent live projection readback."
+    },
+    "projectionChecksums": {
+      "ordinalMapChecksumColumns": 0,
+      "perRunProjectionBindingProven": false
+    },
+    "bitfrost": {
+      "v1NamespaceKeys": 0,
+      "legacyPacketKeys": 0
+    },
+    "ace": {
+      "legacyDiagnosticRows": 0,
+      "canonicalContextManifestReceiptProven": false,
+      "historicalReadOnlyReceipt": {
+        "path": "docs/reports/ace3-hyperrag-live-readonly-proof-v1.json",
+        "generatedAt": "2026-09-26T06:09:50.350Z",
+        "status": "LIVE_READBACK_PROVEN",
+        "mode": "READ_ONLY_TRANSACTION_LOCAL_COMPOSITION",
+        "packetKey": "packet:00ce699acf88",
+        "relationshipsRead": 8,
+        "relationshipsWithExactCurrentBindings": 8,
+        "productionCallerProven": false,
+        "contextManifestProven": false,
+        "qualification": "HISTORICAL_DIAGNOSTIC_ONLY"
+      },
+      "currentRouteCacheGuard": {
+        "path": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+        "cacheAdmissionCall": "admitAceRouteCacheIdentityV1(undefined, cacheKey)",
+        "revisionedCacheReadOrWritePossible": false,
+        "guardReason": "The route does not yet assemble a server-owned admitted ContextManifest/V3 bridge; client-supplied identity is rejected by design.",
+        "runtimeCallerProof": "STATIC_CALLSITE_ONLY",
+        "interpretation": "The zero live v1 key count is consistent with the deliberate fail-closed route guard. Do not fabricate identity fields or warm keys until the canonical ACE/ContextManifest path exists and is independently qualified."
+      },
+      "currentModelInjectionPath": {
+        "route": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+        "packetProducer": "sveltekit-frontend/scripts/ace/build-packet.mjs",
+        "packetProducerWrites": "sveltekit-frontend/.tmp/ace/packet-<queryHash>.json",
+        "fallbackSourceRef": "doc:local_cache",
+        "contextManifestBuiltOrPassed": false,
+        "injectedValue": "JSON.stringify({ query, acePacket: packetToUse })",
+        "producerFieldsObserved": ["query", "cacheSources", "sourceRefs", "rankedCards", "failureHints", "nextActions", "promptCacheKey", "degraded", "varianceRecovery"],
+        "sourceOrWorkspaceRevisionFieldsObserved": false,
+        "interpretation": "Static source tracing shows the stream route injects the legacy packet-builder output rather than a ContextManifest-bound candidate. The builder may fall back to doc:local_cache and writes a query packet under .tmp. This is not a live execution proof; do not treat this as canonical evidence admission."
+      }
+    }
+  },
+  "safety": {
+    "databaseTransaction": "READ ONLY then ROLLBACK",
+    "productionWrites": false,
+    "projectionPromotion": false,
+    "dailyApplyChainRun": false
+  },
+  "staleGraphClaimReview": {
+    "repoRootGraph": "Tracked legacy artifact; observed 2026-08-30",
+    "frontendGraph": "Git-ignored generated artifact; observed 2026-10-17",
+    "currentClaudeHookSource": ".claude/settings.json reads graphify-daily-lifecycle-v1.json completion status, not codebase-graph.json mtime",
+    "lifecycleReceiptStatus": "SNAPSHOT_NATIVE_EXECUTION_OPENED",
+    "conclusion": "The pasted claim that the current Claude hook checks the root graph file mtime is not supported by current hook code. A separate stop-hook warning may have another owner; do not change graph paths based on that claim alone."
+  },
+  "historicalParserOutlier": {
+    "sourceRef": "scripts/atlas/audit-qdrant-noise.mjs",
+    "frozenPlanOffset": 415,
+    "frozenSourceRevision": "sha256:11415c43f6c3280935addf25123222f2d3857d5e9d7c58f0a14e42a41d37c98a",
+    "frozenSourceBytes": 12346,
+    "frozenLine26": "granite-docling-*/  Model artifact directories",
+    "frozenNodeCheck": "SYNTAX_ERROR at line 26; the */ sequence closes the block comment",
+    "typescriptVersion": "5.9.3",
+    "typescriptCreateSourceFileTimeoutSeconds": 15,
+    "extractorTimeoutSeconds": 30,
+    "currentWorktreeSourceRevision": "sha256:fe82dc3ba23806e90b516e0347fddc4b263f5c2886c526b6882386fde8d2078f",
+    "currentWorktreeLine26": "granite-docling-<suffix>/  Model artifact directories",
+    "currentNodeCheck": "PASS",
+    "interpretation": "The current source already fixes the comment, but its bytes differ from the older admitted frozen snapshot. Do not parse current bytes under the frozen source revision or count this row as extracted. The old-snapshot syntax defect explains a parser outlier; it does not authorize rewriting identity or spans."
+  },
+  "limitations": [
+    "This summary is a projection of one fresh audit receipt; it is not a production admission receipt.",
+    "ORDINAL_MAP_SEALED is now PASS and should not be rebuilt; physical packet-to-chunk projection alignment remains a separate gate.",
+    "No predicate below PASS is closed by this audit."
+  ]
+}

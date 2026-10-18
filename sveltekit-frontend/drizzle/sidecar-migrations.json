@@ -2,6 +2,24 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "../../drizzle/manual/20261017_reconcile_summary_768_and_vector_io_cleanup.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Drops obsolete idx_codebase_chunk_summary_embedding_384_hnsw (10 rows) and redundant IVFFlat summary index; stages partial HNSW indexes for summary_embedding halfvec(768) and error_embedding halfvec(768) to eliminate DataFileRead I/O bottlenecks during non-HOT updates. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-vector-indexes-io-bottleneck-v1.mjs"
+    },
+    {
+      "file": "../../drizzle/manual/20261017_codebase_chunk_index_hnsw.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Builds a distinct ef_construction=200 HNSW candidate concurrently for codebase_chunk_index.content_embedding_768. Existing ef_construction=64 index must remain until independent catalog validity, planner, storage, and exact-recall checks pass; any old-index drop is a separate authorized operation.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL catalog check for indisvalid and pg_get_indexdef; compare exact-search and HNSW Recall@10 with ef_search 40, 64, and 80 before any replacement/drop."
+    },
+    {
       "file": "manual/20261013_feature_registry_DRAFT.sql",
       "status": "planned_sidecar",
       "reason": "DRAFT, NOT APPLIED. Creates public.feature_registry (declared in feature-registry.ts, missing live per the 2026-10-14 contract audit). Rehearsed in a rolled-back transaction (15 columns in-transaction; table absent afterward). Does not include the workspace-event tables, which are owned by 20260916_workspace_event_head_v1.sql (requires disposable canary). Requires approval.",

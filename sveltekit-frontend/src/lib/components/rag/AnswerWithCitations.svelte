@@ -207,13 +207,15 @@ function formatTime(ms: number): string {
 {#if activeCitation}
   <div
     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-    onclick={closeCitation}
-    role="dialog"
-    aria-modal="true"
+    onclick={(e) => { if (e.target === e.currentTarget) closeCitation(); }}
+    role="presentation"
   >
     <div
       class="bg-base-100 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
-      onclick={(e) => e.stopPropagation()}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Citation details"
+      tabindex="-1"
     >
       <div class="p-6">
         <div class="flex items-start justify-between mb-4">

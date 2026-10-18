@@ -6,6 +6,12 @@ import { readOpenSpecAwarenessSnapshot } from '$lib/server/atlas/openspec-board/
 import { readParentAtlasCapabilityCensus } from '$lib/server/atlas/openspec-board/capability-census';
 import { readOpenSpecEvidenceHealthSnapshot } from '$lib/server/atlas/openspec-board/evidence-health';
 import { readEvidenceReadinessChipsV1 } from '$lib/server/atlas/openspec-board/evidence-readiness';
+import { getRedis } from '$lib/server/redis.js';
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+
+const OPENSPEC_REDIS_KEY = 'bitfrost:atlas:openspec-board:v1';
+const OPENSPEC_REDIS_TTL_SECONDS = 300;
+let _l0OpenSpecCache: { payload: Record<string, unknown>; expiresAt: number } | null = null;
 
 function requireUser(locals: App.Locals) {
   if (!locals.user) throw redirect(303, '/login');
@@ -15,6 +21,30 @@ function requireUser(locals: App.Locals) {
 export const load: PageServerLoad = async ({ locals, depends }) => {
   requireUser(locals);
   depends('atlas:openspec-board');
+
+  if (_l0OpenSpecCache && Date.now() < _l0OpenSpecCache.expiresAt) {
+    return {
+      ..._l0OpenSpecCache.payload,
+      cacheSource: 'l0_memory'
+    };
+  }
+
+  try {
+    const redis = getRedis();
+    const cachedRaw = await redis.get(OPENSPEC_REDIS_KEY);
+    if (cachedRaw) {
+      const parsed = fastJsonParse<Record<string, unknown>>(cachedRaw);
+      if (parsed && typeof parsed === 'object' && parsed.board) {
+        _l0OpenSpecCache = { payload: parsed, expiresAt: Date.now() + 60_000 };
+        return {
+          ...parsed,
+          cacheSource: 'l1_redis_valkey'
+        };
+      }
+    }
+  } catch {
+    // Non-fatal: proceed to build fresh OpenSpec snapshot
+  }
 
   const [board, awareness, capabilityCensus, evidenceHealth, evidenceReadiness] = await Promise.all([
     readOpenSpecBoardSnapshot(),
@@ -37,7 +67,7 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
     .slice(0, 20)
     .map(([changeId, count]) => ({ changeId, count }));
 
-  return {
+  const payload = {
     board,
     awareness,
     capabilityCensus,
@@ -52,4 +82,18 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
       writesPerformed: false
     }
   };
+
+  _l0OpenSpecCache = { payload, expiresAt: Date.now() + 60_000 };
+  try {
+    const redis = getRedis();
+    await redis.set(OPENSPEC_REDIS_KEY, JSON.stringify(payload), 'EX', OPENSPEC_REDIS_TTL_SECONDS);
+  } catch {
+    // Non-fatal
+  }
+
+  return {
+    ...payload,
+    cacheSource: 'fresh_build'
+  };
 };
+

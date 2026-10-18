@@ -23,7 +23,7 @@ interface IndexingStatus {
 async function checkServiceHealth(
 	name: string,
 	url: string,
-	timeout = 3000
+	timeout = 1200
 ): Promise<ServiceHealth> {
 	const start = Date.now();
 	try {
@@ -63,8 +63,8 @@ async function getQdrantCollections(signal?: AbortSignal): Promise<{
 		const data = await res.json();
 
 		const allCols = data.result?.collections ?? [];
-		// Limit to first 30 collections to prevent connection exhaustion
-		const colSlice = allCols.slice(0, 30);
+		// Limit to first 10 collections to prevent connection exhaustion and SSR 504s
+		const colSlice = allCols.slice(0, 10);
 
 		const collections = await Promise.all(
 			colSlice.map(async (col: { name: string }) => {
@@ -151,7 +151,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	// AbortController cancels ALL pending fetches when timeout fires (no connection leak)
 	const controller = new AbortController();
 	const { signal } = controller;
-	const timer = setTimeout(() => controller.abort(), 8000);
+	const timer = setTimeout(() => controller.abort(), 2500);
 
 	try {
 		const [services, qdrant, indexing, docker] = await Promise.all([

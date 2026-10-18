@@ -77,8 +77,9 @@
 
   <div class="flex gap-4 items-end">
     <div>
-      <label class="text-sm font-medium text-gray-700">Sort</label>
+      <label for="retrieval-sort-by" class="text-sm font-medium text-gray-700">Sort</label>
       <select
+        id="retrieval-sort-by"
         bind:value={sortBy}
         onchange={() => {
           offset = 0;
@@ -91,8 +92,9 @@
       </select>
     </div>
     <div>
-      <label class="text-sm font-medium text-gray-700">Order</label>
+      <label for="retrieval-order" class="text-sm font-medium text-gray-700">Order</label>
       <select
+        id="retrieval-order"
         bind:value={order}
         onchange={() => {
           offset = 0;

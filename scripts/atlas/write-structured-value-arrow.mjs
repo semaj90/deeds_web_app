@@ -13,7 +13,58 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { tableFromArrays, tableFromIPC, tableToIPC } from 'apache-arrow';
+import {
+  tableFromArrays,
+  tableFromIPC,
+  tableToIPC,
+  vectorFromArray,
+  Bool,
+  Float64,
+  Utf8,
+  Int32,
+  Field,
+  Struct,
+  List,
+} from 'apache-arrow';
+
+const provenanceStruct = new Struct([
+  new Field('source_ref', new Utf8(), true),
+  new Field('source_revision', new Utf8(), true),
+  new Field('workspace_revision', new Utf8(), true),
+  new Field('language', new Utf8(), true),
+  new Field('parser_name', new Utf8(), true),
+  new Field('parser_revision', new Utf8(), true),
+  new Field('grammar_revision', new Utf8(), true),
+  new Field('node_type', new Utf8(), true),
+  new Field('start_byte', new Int32(), true),
+  new Field('end_byte', new Int32(), true),
+  new Field('source_span_checksum', new Utf8(), true),
+  new Field('tree_node_id', new Utf8(), true),
+  new Field('upstream_node_id', new Utf8(), true),
+  new Field('upstream_chunk_id', new Utf8(), true),
+  new Field('identity_status', new Utf8(), true),
+  new Field('ast_path_json', new Utf8(), true),
+]);
+
+const memberStruct = new Struct([
+  new Field('ordinal', new Int32(), true),
+  new Field('role', new Utf8(), true),
+  new Field('field_name', new Utf8(), true),
+  new Field('child_value_ordinal', new Int32(), true),
+]);
+const membersType = new List(new Field('item', memberStruct, true));
+
+const entryStruct = new Struct([
+  new Field('ordinal', new Int32(), true),
+  new Field('entry_kind', new Utf8(), true),
+  new Field('key_text', new Utf8(), true),
+  new Field('key_node_type', new Utf8(), true),
+  new Field('computed', new Bool(), true),
+  new Field('spread', new Bool(), true),
+  new Field('child_value_ordinal', new Int32(), true),
+  new Field('entry_source_span_checksum', new Utf8(), true),
+]);
+const entriesType = new List(new Field('item', entryStruct, true));
 
 function parseArg(name, fallback = null) {
   const prefix = `--${name}=`;
@@ -47,19 +98,19 @@ function assertDenseRows(rows) {
 export function buildStructuredValueArrowTable(rows) {
   assertDenseRows(rows);
   return tableFromArrays({
-    value_ordinal: rows.map((row) => row.value_ordinal),
-    value_id: rows.map((row) => row.value_id),
-    kind: rows.map((row) => row.kind),
-    source_text: rows.map((row) => row.source_text),
-    null_value: rows.map((row) => row.null_value),
-    boolean_value: rows.map((row) => row.boolean_value),
-    number_value: rows.map((row) => row.number_value),
-    string_value: rows.map((row) => row.string_value),
-    expression_node_type: rows.map((row) => row.expression_node_type),
+    value_ordinal: vectorFromArray(rows.map((row) => row.value_ordinal), new Int32()),
+    value_id: vectorFromArray(rows.map((row) => row.value_id), new Utf8()),
+    kind: vectorFromArray(rows.map((row) => row.kind), new Utf8()),
+    source_text: vectorFromArray(rows.map((row) => row.source_text), new Utf8()),
+    null_value: vectorFromArray(rows.map((row) => row.null_value), new Bool()),
+    boolean_value: vectorFromArray(rows.map((row) => row.boolean_value), new Bool()),
+    number_value: vectorFromArray(rows.map((row) => row.number_value), new Float64()),
+    string_value: vectorFromArray(rows.map((row) => row.string_value), new Utf8()),
+    expression_node_type: vectorFromArray(rows.map((row) => row.expression_node_type), new Utf8()),
     // These are intentionally true Arrow nested columns, not JSON strings.
-    provenance: rows.map((row) => row.provenance),
-    members: rows.map((row) => row.members ?? []),
-    entries: rows.map((row) => row.entries ?? []),
+    provenance: vectorFromArray(rows.map((row) => row.provenance), provenanceStruct),
+    members: vectorFromArray(rows.map((row) => row.members ?? []), membersType),
+    entries: vectorFromArray(rows.map((row) => row.entries ?? []), entriesType),
   });
 }
 

@@ -1,0 +1,96 @@
+{
+  "schema": "atlas.graph-algorithm-ownership.v1",
+  "revision": "2026-10-17",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "rules": {
+    "single_fusion_owner": "SearchRuntime (sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts)",
+    "chunk_identity_owner": "PostgreSQL 18 (codebase_chunk_index.id)",
+    "dense_embedding_owner": "codebase_chunk_index.content_embedding_768 (EmbeddingGemma:eg-task-prefix-v1)",
+    "graph_coordinates_promotional": false,
+    "extra_rrf_vote_allowed": false,
+    "gpu_contention_guard": "RTX 3060 Ti 8GB cannot run GPU graph algorithms concurrently with llama-server :8090"
+  },
+  "algorithms": {
+    "pagerank": {
+      "description": "Directed link centrality measuring structural authority across documentation and code entities.",
+      "canonicalOracle": "NetworkX (CPU deterministic power iteration, alpha=0.85, tol=1e-10)",
+      "accelerationLane": "nx-cugraph (:8098 lane / WSL2 RAPIDS cu13)",
+      "cpuFallback": "in-memory Float64 power iteration",
+      "parityStatus": "FIXTURE_PROVEN",
+      "evidenceReport": "docs/reports/nx-cugraph-backend-parity-v1.json",
+      "maxAbsDiffTolerance": 0.0001,
+      "minTopKOverlap": 0.9,
+      "boundFeatureKey": "topo_pagerank"
+    },
+    "cheirank": {
+      "description": "Transposed directed link centrality measuring communicative/out-degree hubness.",
+      "canonicalOracle": "NetworkX (CPU deterministic power iteration on transposed graph A^T)",
+      "accelerationLane": "nx-cugraph (:8098 lane / WSL2 RAPIDS cu13, reversed graph)",
+      "cpuFallback": "in-memory Float64 transposed power iteration",
+      "parityStatus": "APPLY_PROVEN",
+      "evidenceReport": "docs/reports/grpc-toc-entity-pipeline-v1.json",
+      "maxAbsDiffTolerance": 0.0001,
+      "minTopKOverlap": 0.9,
+      "boundFeatureKey": "topo_cheirank"
+    },
+    "bfs_shortest_paths": {
+      "description": "Exact graph topological distance from source nodes for neighborhood expansion.",
+      "canonicalOracle": "NetworkX (single_source_shortest_path_length)",
+      "accelerationLane": "nx-cugraph (BFS shortest path)",
+      "cpuFallback": "deterministic queue BFS",
+      "parityStatus": "FIXTURE_PROVEN",
+      "evidenceReport": "docs/reports/nx-cugraph-backend-parity-v1.json",
+      "exactEqualityRequired": true,
+      "boundFeatureKey": "topo_bfs_depth"
+    },
+    "connected_components": {
+      "description": "Partitioning graph into weakly and strongly connected components.",
+      "canonicalOracle": "NetworkX (connected_components / strongly_connected_components)",
+      "accelerationLane": "nx-cugraph (connected_components)",
+      "cpuFallback": "Disjoint-set Union-Find",
+      "parityStatus": "FIXTURE_PROVEN",
+      "evidenceReport": "docs/reports/nx-cugraph-backend-parity-v1.json",
+      "exactEqualityRequired": true,
+      "boundFeatureKey": "topo_component_id"
+    },
+    "louvain_modularity": {
+      "description": "Community detection via modularity optimization for cluster topological class assignment.",
+      "canonicalOracle": "networkx.community.louvain_communities (resolution=1.0, seed=42)",
+      "accelerationLane": "nx-cugraph (Louvain community detection)",
+      "cpuFallback": "deterministic greedy modularity communities",
+      "parityStatus": "SPECIFIED_GATED",
+      "evidenceReport": "docs/reports/lowrank-hll-radix-cugraph-toc-audit-2026-10-17.md",
+      "boundFeatureKey": "topo_class"
+    },
+    "betweenness_centrality": {
+      "description": "Shortest-path vertex betweenness measuring broker / gateway entities.",
+      "canonicalOracle": "NetworkX (betweenness_centrality, Brandes algorithm)",
+      "accelerationLane": "nx-cugraph (betweenness_centrality)",
+      "cpuFallback": "sampled Brandes CPU traversal",
+      "parityStatus": "SPECIFIED_GATED",
+      "evidenceReport": "docs/reports/lowrank-hll-radix-cugraph-toc-audit-2026-10-17.md",
+      "boundFeatureKey": "topo_betweenness"
+    },
+    "cypher_multi_hop": {
+      "description": "Multi-hop ontology traversal and relationship path queries.",
+      "canonicalOracle": "Neo4j Bolt Engine (:7687)",
+      "accelerationLane": "none",
+      "cpuFallback": "in-memory NetworkX MultiDiGraph / route-ast-graph.json subgraph match",
+      "parityStatus": "READONLY_FALLBACK_ACTIVE",
+      "evidenceReport": "docs/reports/kanban-runtime-ownership-v1.json",
+      "boundFeatureKey": "neo4j_traversal_path"
+    }
+  },
+  "generatedAt": "2026-10-18T02:43:14.744Z",
+  "status": "SPECIFIED_AND_ENFORCED",
+  "summary": {
+    "totalAlgorithmsMapped": 7,
+    "primaryOracle": "NetworkX CPU",
+    "accelerationBackend": "nx-cugraph (WSL2 RAPIDS cu13)",
+    "queryEngine": "Neo4j with NetworkX in-memory fallback",
+    "gpuSafeModeActive": true,
+    "databaseMutationsAllowed": false
+  },
+  "checksum": "sha256:d3cd78548e0ceb3f9e73b48768f5ac506ebbfeb83d65ba0781318a510c261939"
+}

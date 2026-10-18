@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.ldr.report.v1",
+  "executionId": "a2c3bda3-3f97-4b31-a3dd-890b21865ec9",
+  "createdAt": "2026-10-18T00:38:09.681Z",
+  "query": null,
+  "status": "MCP_AND_HISTORY_REACHABLE",
+  "taskId": null,
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "researchStartAttempted": false,
+  "sourceRevisionDeferred": true,
+  "reportSha256": "6f6b35ee16fa32d882828bac8dca99a92547a87da9c199f21ce6e0dfab7de32a",
+  "tools": [
+    "ldr.start_research",
+    "ldr.get_report",
+    "ldr.poll_status",
+    "ldr.search_history",
+    "ldr.quick_summary"
+  ]
+}

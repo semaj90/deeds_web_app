@@ -37,7 +37,7 @@
   <div class="settings-grid">
     <!-- Font Scale -->
     <div class="setting-group">
-      <label class="setting-label">TYPEFACE_SCALE</label>
+      <span class="setting-label">TYPEFACE_SCALE</span>
       <div class="toggle-group">
         {#each fontScaleSteps as step}
           <button
@@ -53,7 +53,7 @@
 
     <!-- Panel Density -->
     <div class="setting-group">
-      <label class="setting-label">DENSITY</label>
+      <span class="setting-label">DENSITY</span>
       <div class="toggle-group">
         {#each densityOptions as opt}
           <button
@@ -71,7 +71,7 @@
 
     <!-- Corner Sharpness -->
     <div class="setting-group">
-      <label class="setting-label">PANEL_SHARPNESS</label>
+      <span class="setting-label">PANEL_SHARPNESS</span>
       <div class="toggle-group">
         {#each borderOptions as opt}
           <button
@@ -88,11 +88,12 @@
 
     <!-- Glow Intensity -->
     <div class="setting-group">
-      <label class="setting-label">
+      <label for="glow-intensity" class="setting-label">
         GLOW_INTENSITY
         <span class="setting-value">{Math.round(themeStore.settings.glowIntensity * 100)}%</span>
       </label>
       <input
+        id="glow-intensity"
         type="range"
         class="slider"
         min="0"
@@ -105,11 +106,12 @@
 
     <!-- Scanline / Grain -->
     <div class="setting-group">
-      <label class="setting-label">
+      <label for="scanline-opacity" class="setting-label">
         SCANLINE_STRENGTH
         <span class="setting-value">{Math.round(themeStore.settings.scanlineOpacity * 100)}%</span>
       </label>
       <input
+        id="scanline-opacity"
         type="range"
         class="slider"
         min="0"
@@ -122,11 +124,12 @@
 
     <!-- Panel Noise -->
     <div class="setting-group">
-      <label class="setting-label">
+      <label for="paper-grain" class="setting-label">
         PAPER_GRAIN
         <span class="setting-value">{Math.round(themeStore.settings.panelNoise * 100)}%</span>
       </label>
       <input
+        id="paper-grain"
         type="range"
         class="slider"
         min="0"
@@ -139,7 +142,7 @@
 
     <!-- Accent Color Presets -->
     <div class="setting-group accent-group">
-      <label class="setting-label">ACCENT_PROFILE</label>
+      <span class="setting-label">ACCENT_PROFILE</span>
       <div class="accent-swatches">
         {#each currentAccents as color}
           <button

@@ -1838,6 +1838,15 @@ scratch output directory may be a bounded candidate, but page-load network
 effects have not been fully traced or blocked. No Playwright command was run;
 do not call this test lane safe or proven yet.
 
+**Bounded legal-library spec (2026-10-17; executed):** `tests/e2e/legal-corpus-search.spec.ts` (12 tests) and the six
+`tests/e2e/route-forensic/{library,library-detail,library-api,legal-corpus,legal-corpus-detail,legal-corpus-api}` specs
+(30 tests) passed against a running dev server (`DEV_BYPASS_AUTH`) using the general config with
+`PLAYWRIGHT_SKIP_GLOBAL_SETUP=true` (no `[PW-TEST]` seed/cleanup). Effects: reads and search POSTs only; the upload form
+is opened but never submitted; the general config's `test-results/` is wiped each run, so the forensic JSON goes to
+`logs/task-output/legal-corpus-e2e-errors.json`. Not traced: the storage side effect of `recordSearchQuery` in the search
+routes. This is one bounded, executed role for the legal-library routes, not closure of `PLAYWRIGHT-CONFIG-ROLE-01`.
+Tracking: `openspec/changes/legal-corpus-california-codes/tasks.md`.
+
 ### Job identity key (apply to PF4 ledger + PF1 queue going forward)
 
 The review's job_identity composite is stricter than what's currently in

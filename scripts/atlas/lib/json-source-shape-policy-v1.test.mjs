@@ -20,6 +20,14 @@ test('valid root arrays and scalars are valid zero-observation inputs', () => {
   }
 });
 
+test('accepts TypeScript JSONC comments and trailing commas while rejecting invalid syntax', () => {
+  const result = inspectJsonSourceShapeV1('{\n  // workspace settings\n  "compilerOptions": { "strict": true, },\n}', 'tsconfig.json');
+  assert.equal(result.rootKind, 'object');
+  assert.equal(result.potentialObservations, 2);
+  assert.equal(result.policyRevision, 'atlas.json-source-shape-policy.v2');
+  assert.throws(() => inspectJsonSourceShapeV1('{ unquoted: true }', 'invalid.json'), /JSON_PARSE_FAILED/);
+});
+
 test('enforces UTF-8 byte and observation ceilings without partial counts', () => {
   assert.throws(() => inspectJsonSourceShapeV1('{"é":1}', 'multibyte.json', { maxSourceBytes: 6 }),
     /STRUCTURAL_RESOURCE_LIMIT_DEFERRED:SOURCE_BYTES_EXCEED_LIMIT/);

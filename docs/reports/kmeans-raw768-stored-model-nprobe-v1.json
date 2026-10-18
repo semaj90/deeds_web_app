@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.kmeans-raw768-stored-model-nprobe.v1",
+  "generatedAt": "2026-10-18T06:44:53Z",
+  "modelVersion": "mbk-euclidean-content-embedding-768-k256-column-v1",
+  "modelRole": "EVALUATION_CANDIDATE",
+  "isAssignmentActive": false,
+  "databaseTransactionReadOnly": true,
+  "writesPerformed": false,
+  "modelReadFromPostgres": true,
+  "independentReadbackCentroidChecksum": "sha256:7558cf68cb1224683f33757ab75d6d3f0c147cc040b3969687e1680303a03cc8",
+  "cohortChecksum": "sha256:99a49e8009b4ffa977af8572ebafdcff7e4146d9f6609af9a226c496b97ea647",
+  "matrixChecksumMatches": true,
+  "orderedIdChecksumMatches": true,
+  "currentDatabaseIdOrderMatchesFrozenCohort": true,
+  "sourceRevisionCoverage": "NOT_PROVEN",
+  "workspaceRevision": null,
+  "trainingCount": 197987,
+  "holdoutCount": 22011,
+  "queries": 1000,
+  "topK": 10,
+  "probeResults": {
+    "1": {
+      "recallAt10": 0.664,
+      "p10Recall": 0.2,
+      "candidateFraction": 0.0053
+    },
+    "2": {
+      "recallAt10": 0.7777,
+      "p10Recall": 0.4,
+      "candidateFraction": 0.0104
+    },
+    "3": {
+      "recallAt10": 0.8284,
+      "p10Recall": 0.5,
+      "candidateFraction": 0.0156
+    },
+    "5": {
+      "recallAt10": 0.8815,
+      "p10Recall": 0.6,
+      "candidateFraction": 0.0248
+    },
+    "8": {
+      "recallAt10": 0.9211,
+      "p10Recall": 0.7,
+      "candidateFraction": 0.0384
+    },
+    "16": {
+      "recallAt10": 0.9609,
+      "p10Recall": 0.9,
+      "candidateFraction": 0.0748
+    },
+    "32": {
+      "recallAt10": 0.9841,
+      "p10Recall": 0.9,
+      "candidateFraction": 0.1449
+    }
+  },
+  "elapsedSeconds": 8.811,
+  "caveats": [
+    "Self-query proxy, not human-judged golden retrieval evaluation.",
+    "Vectors are frozen by local matrix checksum; source/workspace/representation revisions are not proven.",
+    "This is a read-only candidate evaluation and does not enable routing or update assignments."
+  ],
+  "canonicalAuthority": false,
+  "checksum": "sha256:59243aff7fee2086cbd24ac11094048fd8b965418495a9e95cddd5c5703f655e"
+}

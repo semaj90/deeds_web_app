@@ -101,8 +101,9 @@ name: newTagName.trim().toLowerCase().replace(/\s+/g, '-'),
 	const filteredTags = $derived(
 		availableTags.filter(
 			(tag) =>
+				tag &&
 				!selectedTags.includes(tag.id) &&
-				tag.name.toLowerCase().includes(searchQuery.toLowerCase())
+				(tag.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
 		)
 	);
 </script>

@@ -12,6 +12,15 @@
 | Host driver | Windows | NVIDIA 580.88, RTX 3060 Ti, SM 8.6 | Meets R580+ |
 | LibTorch N-API (Win32 x64) | `simd-bridge/cpp/build-x64-cuda` | LibTorch C++ host-buffer inputs, CUDA-if-available execution, SIMDJSON parser | Prior native probe reported CUDA available on RTX 3060 Ti; not re-probed in this documentation pass |
 
+## CPU, GPU, and inference lane alignment
+
+- **Host SIMD:** this workstation reports an Intel Core i7-11700F (8 cores / 16 threads); Intel lists AVX2 and AVX-512 support for this SKU. SIMDJSON/N-API parsing is CPU work. Runtime dispatch/build flags and throughput still require a native probe; CPU AVX2 is not CUDA SIMT.
+- **GPU execution:** CUDA SIMT kernels, cuTile tile kernels, LibTorch/ATen, cuBLASLt, cuVS/CAGRA, and cuGraph are distinct executors. Keep the existing CUDA 13.2 cuTile experiment and CUDA 13.4 SIMT/Tile container separate; both remain challengers until same-input CPU parity, numerical tolerance, resource, and timing receipts pass.
+- **Retrieval:** TurboVec is a candidate-search/prefilter executor, not an embedding or identity owner. PostgreSQL remains canonical for qualified `semantic_768`; Qdrant, TurboVec, and cuVS/CAGRA must normalize into one SearchRuntime semantic lane and one fusion vote. Compare ANN results with exact KNN ground truth.
+- **LLM inference and KV:** TensorRT-LLM/Triton serving, TensorRT for RTX engine execution, and the app's KV-compression interfaces are separate runtime paths. QLoRA weights are adapter parameters, PTX is kernel code, and KV cache is inference state; none is interchangeable. The `kv-compression-backend-v1` FP16 passthrough contract is not proof of the llama-server's live KV-cache implementation. Do not co-schedule training, graph/vector GPU work, or another inference owner without an explicit GPU lease.
+- **ACE namespacing:** Parent Atlas ACE means Agent Context/packet/context assembly. NVIDIA cuVS ACE means Augmented Core Extraction for partitioned HNSW construction. Keep distinct identifiers, schemas, and receipts; neither implies the other ran.
+- **Representation manifest gap:** `PacketRepresentationManifestV1` binds packet/source/workspace revisions, representation/artifact checksums, codec, dtype, shape, and executor allowlist. It does not yet bind the embedding recipe/normalization, cluster-model revision, or ordinal-map checksum needed for the proposed frozen tournament input. Do not treat it as that complete manifest or make a parallel canonical registry; extend the existing contract only through its owning change.
+
 ## Probes and owners
 
 | File | Role | Owner class | Status |

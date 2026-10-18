@@ -359,3 +359,58 @@ current as of this commit); re-litigate the OAK-kernel-duplication correction (a
   mutations, live MCP/OpenCode dispatch, production authorization, and replay-state persistence out
   of this tranche. Schema assertions, owner audit, smoke receipt, and fixture tests confirm no such
   writes or dispatch occurred.
+
+
+## 15. AR-15 — ACE feature/proposal/outcome adapter and Kanban runtime ownership audit (2026-10-17)
+
+Reviewed against the repo before building. Existing owners kept: `FeatureSignalAlignmentV1` (`packages/parent-atlas/src/core/feature-signal-alignment.ts`), `PromptPlanV1`/`ContextManifestV2` (AFC-04), `AceContextPacketV1` and `buildAceContextPacketV1` (NES-LUT sanitized, in `hermes-adaptive-pipeline-v1.ts`), AR-11 `OfflineProgramEvalSnapshotV1`, AR-12 GEPA challenger tournament, `python/parent_atlas_dspy_repair.py` (signatures, metric, optimizer builder, baseline-vs-optimized). The new code fills only the gaps and hands off to them.
+
+- [x] 15.1 **ACE-FEATURE-01** CREATED. `scripts/atlas/ace_packet_proposal_v1.py`: positional tuples to canonical rows (sorted, duplicate-rejecting, missing values masked, never silently zero) to a payload accepted by the existing TS `featureSignalAlignmentSchema`. Evidence: 15/15 offline tests (`scripts/atlas/test_ace_packet_proposal_v1.py`) on Windows Python and on the WSL RAPIDS Python (torch 2.13: tensor bytes hash to the payload checksums); TS contract parses the payload and the TS `checksumFeatureSignalAlignment` equals the Python checksum.
+- [x] 15.2 **ACE-PROMPT-01** CREATED (validator and DSPy signature only). `validate_ace_packet_proposal_v1` fails closed: exact field set, required revisions (never defaulted), evidence refs and packet key within the ContextManifest allowlist, manifest and alignment checksum match, `advisoryOnly`, hidden-state keys rejected recursively. `build_compose_program_v1` is a lazy DSPy `Predict`. DSPy 3.4.1 and GEPA 0.1.4 are installed only in `/home/james/.venvs/atlas-dspy-exp` (329 MB, no torch); `import dspy` does not load LiteLLM.
+- [ ] 15.3 **ACE-PROMPT-02** OPEN. Inject a `dspy.BaseLM` subclass that calls Bifrost (`:3040`, model id `openai/ornith-1.5-9b`) directly so LiteLLM is never used for calls. Not tested: DSPy behavior with LiteLLM removed.
+- [ ] 15.4 **ACE-CONTEXT-01** OPEN. Render a validated proposal into the existing `buildAceContextPacketV1` `rawEvidence` (NES-LUT sanitized) and the `ContextManifestV2` to `PromptPlanV1` path (AFC-04B); do not add a second prompt compiler or budget.
+- [x] 15.5 **ACE-OUTCOME-01** CREATED (offline). Hash-chained `atlas.ace-outcome-receipt.v1`, `writesPerformed=false`, tamper and reorder detection tested. No persistence, no live caller.
+- [x] 15.6 **KANBAN-RUNTIME-OWNERSHIP-01** audit CREATED, verdict **NOT_PROVEN**. `scripts/atlas/audit-kanban-runtime-ownership-v1.mjs` writes `docs/reports/kanban-runtime-ownership-v1.json` from verified evidence only (read-only).
+
+| Gate | Proven? | Evidence |
+|---|---|---|
+| taskContractResolved | true | live board family (`kanban-task-board.ts`, `kanban-task-event-contracts.ts`, `board/daily-graphify-board.ts`) has production importers; the newer `workflow-action-event-v1.ts`/`task-run-contract-v1.ts` family has **none** (unwired scaffold, commits `ab11561789`, `d526695c60`) |
+| uiReadModelProven | true | `admin/ai-dashboard/+page.server.ts` and `api/phase89/workflow/+server.ts` read the board; live store has 166 `kanban_tasks` (160 pending, 6 done) and 160 `kanban_task_events` (143 `file_feed_snapshot`, 11 `proof_run`, 5 `probe`, 1 `code_change`) |
+| dispatcherCallerProven | false | `executeHermesAgentStepV1` and the LangGraph `kanban-error-fixing-agent` have **0** production callers (spec/cli only) |
+| durableWriterProven | false | `workflow_events` has 0 rows |
+| claimHeartbeatReclaimProven | false | no claim/heartbeat/reclaim events; `kanban_task_attempts` 0, `kanban_task_dependencies` 0, `agent_runs` 0, `hermes_dag_runs` 0; claim logic only in `python/prove_dag_*_v1.py` proofs; 2 rows in `workflow_action_leases` |
+| timelineRevisionLinkProven | false | 0 task events carry a workspace revision |
+| graphifyAdmissionProven | false | latest `atlas-canonical-projection-fabric-audit` is `NOT_SAFE_TO_PROJECT` |
+
+- [ ] 15.7 **HERMES-STAGE-EVIDENCE-01** OPEN, file under active extraction (not edited here). `executeHermesAgentStepV1` hardcodes the tournament stages (`typecheck pass`, `unitTests 15 passed`, `graphEvidence pass`, `durationMs 420`) and tool versions, and `adaptRankerFromOutcomesV1` trains the 61-parameter FM Rank-4 model on `outcomeSuccess`. Required: stage results must come from tool events (ids, exit codes, hashes); until then outcome labels are fabricated and must not feed adaptive backprop. Also: `buildAceContextPacketV1` is pure (no Redis write) although its comment says "injected to Redis".
+- [ ] 15.8 **KANBAN-RUNTIME-PROOF-01** OPEN. One read-only repair-diagnostic task on a fixture: dependency readiness, claim, lease, heartbeat, completion, immutable receipt, deterministic replay, `writesPerformed=false`; then a separate authorized worktree-edit gate. Decide which contract family is canonical (live board vs workflow-event) before any new writer.
+- [ ] 15.9 **AWM-04-02 / ACE-GEPA-01** OPEN (existing AR-12). Frozen baseline vs challenger on CPU, held-out split, labels only from reviewed outcomes; no label from 15.7 until fixed.
+- [ ] 15.10 **ACE-MLP8-01** OPEN (P2, optional). No 8-node network exists; the only MLP is the policy reranker (in-128-64-32-1) and the FM Rank-4 model. "siglrelu" matches nothing in the repo. Any 8-8-1 challenger must beat both on frozen candidates (Recall@K, MRR, stability, latency).
+- [ ] 15.11 **ACE-GRPO-01** OPEN (P3, offline only). Reward design for one task to N episodes needs a **strict checker** first: deterministic grader that re-runs real tools, forbids reward hacking (no model-reported success), and trains only on "edge" tasks the model sometimes solves. GRPO tooling (TRL) is not installed; no trainer, no episode store, no checker exist yet.
+- [ ] 15.12 **ACE-HLL-01** OPEN. Distinct-candidate telemetry (HLL) with error checks; `breadth_score` feature currently has no producer.
+
+Not found in the repo (searched): "logi" (any spelling); a Paperclip agent (only icons and one route comment: "Mastra/paperclip orchestration"); GRPO self-prompting loop. OaK here means Ontology-as-a-Kernel (`python/atlas_oak_kernel.py`, 8095 `/oak/*`).
+
+
+### AR-15 suggestions by lane (1-3 each; grounded in what exists, nothing here is started)
+
+**LangExtract / 8095 Python helpers**
+1. Make the runtime explicit and visible: `python/atlas_langextract_runtime.py` defaults `LANGEXTRACT_RUNTIME` to the local shim unless set to `official`, while 8095 `/health` only says `langextract:true`. Report the active runtime in `/health` before any helper-registry entry relies on it.
+2. Error-to-source grounding helper: use the existing `/extract/file` and `/ast/chunk` endpoints to attribute each `error_logs` row (route plus message) to a source file and span, so `file_path`/`line_number` stop being null. Read-only; evidence only, no byte identity invented.
+3. Register as a read-only helper only after parity vs the shim on a frozen sample (existing `helper-registry-v1.ts` owner; do not create a second registry).
+
+**.okf / docs**
+1. Wrap the crawl findings as a schema-validated `.okf` artifact (schema check, semantic check, canonical serialization, checksum) before agents read them, per the `.okf` rule in `AGENTS.md`; `.okf` output stays non-canonical.
+2. Add one `.okf` topic entry for "route hardening" so `atlas_okf_topic_extractor.py` can route it, instead of a free-text note.
+
+**NES LUT inverse (prompt-injection) sanitization**
+1. Run `sanitizeContentViaNesLut` over every `error_logs.message` that can contain page text (console errors, uncaught errors) before it enters any prompt or ACE packet; add adversarial cases (directive-like strings) to its spec.
+2. Make `buildAceContextPacketV1` input real evidence: today `rawEvidence` is one line (`Function X from Y`), so the sanitizer has almost nothing to sanitize. Feed it the grounded error plus source excerpt.
+
+**DAG synthesis for agentic error fixing alignment**
+1. Blocked on HERMES-STAGE-EVIDENCE-01: `synthesizeWorkflowDagV1` and the tournament may only consume stage results that come from tool events. Fix that first.
+2. Then map each critical/high `error_logs` row (RH-01..RH-12) to one READ_ONLY + EXECUTE_TESTS DAG on the existing `synthesizeAgenticDagV1` wrapper (AR-13); execution stays a separate authorized gate.
+3. Close the loop only through `kanban_tasks`/`kanban_task_events` (the live board owner): one task per distinct fingerprint, `idempotency_key` = fingerprint.
+
+**DSPy / GEPA / GRPO / OaK use today**
+- DSPy 3.4.1 + GEPA 0.1.4 are installed (`atlas-dspy-exp` venv) but no LM is wired (ACE-PROMPT-02), so nothing has been optimized or run; no GRPO tooling is installed and no strict checker exists (ACE-GRPO-01); OaK (Ontology-as-a-Kernel) is served at 8095 `/oak/*` and is only an evidence input. Do not describe any of these as "in use" until a receipt shows an executed, validated run.

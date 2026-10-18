@@ -275,13 +275,11 @@
 	.num { font-size: 1.5rem; font-weight: 700; color: #818cf8; }
 	.lab { font-size: 0.75rem; color: #64748b; text-transform: uppercase; margin-top: 0.25rem; }
 
-	.memory-list, .cluster-list {
+	.memory-list {
 		margin-top: 1.5rem;
 	}
 
-	h3 { font-size: 1rem; color: #64748b; margin-bottom: 1rem; }
-
-	.memory-item, .cluster-item {
+	.memory-item {
 		background: #0f172a;
 		padding: 1rem;
 		border-radius: 12px;
@@ -299,8 +297,8 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.topic, .name { font-weight: 600; color: #f8fafc; }
-	.score, .count { font-size: 0.875rem; color: #64748b; }
+	.topic { font-weight: 600; color: #f8fafc; }
+	.score { font-size: 0.875rem; color: #64748b; }
 
 	.reason { font-size: 0.875rem; color: #94a3b8; }
 </style>

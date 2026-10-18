@@ -56,6 +56,17 @@ writesPerformed=false.
 First blocker: `LIVE_CLASSIFIER_PRODUCER_NOT_WIRED`.
 Next gate: current source-bound query/label producer proof.
 
+## TAXONOMY-CROSSWALK-01 — reviewed legacy vocabulary reconciliation (2026-10-17)
+
+- [ ] **TAXONOMY-CROSSWALK-01.1** Produce a deterministic, read-only inventory of observed legacy labels against the frozen 17-entry `domain_taxonomy_v1` snapshot. Keep the 13 top-level groups and four child IDs distinct; do not mix in the separate 43-class byte taxonomy, cluster IDs, file counts, or incomplete chunk-index values.
+- [ ] **TAXONOMY-CROSSWALK-01.2** Emit a reviewable mapping proposal with exact-match, case-only, proposed mapping, unresolved, and ambiguous statuses; preserve original label, source table/row identity where available, evidence, and taxonomy revision. Normalize case-only matches only in the derived proposal; do not update canonical source records.
+- [ ] **TAXONOMY-CROSSWALK-01.3** Keep legacy labels such as `documentation`, `tool`, `agent`, and `Other` `UNRESOLVED` unless a reviewer accepts a specific mapping supported by examples. Never map unknown labels to `Other` by default.
+- [ ] **TAXONOMY-CROSSWALK-01.4** Validate proposed mappings against reviewed examples and existing domain-classification owners; report exact/case-only/unresolved/ambiguous counts with conservation checks and a checksummed receipt. No LLM or classifier score alone may establish a mapping.
+- [ ] **TAXONOMY-CROSSWALK-01.5** Freeze and checksum the approved taxonomy snapshot before assigning versioned NES LUT ordinals. Generate ordinals from that immutable snapshot and explicit registry order, never alphabetical order or mutable group position; attach labels to feature evidence/ACE only through existing qualification owners.
+- [ ] **TAXONOMY-CROSSWALK-01.6** Add focused tests for deterministic replay, case-only normalization, unresolved legacy labels, ambiguous mappings, taxonomy-revision mismatch, and ordinal stability. No database migration, canonical packet update, taxonomy-row remap, or production routing change is authorized by this task.
+
+Status: **OPEN / REVIEW REQUIRED**. The audit counts (including 61,659 assessed packet rows and reported exact/case-only/unmatched proportions) are prior-reported inputs and must be revalidated by the read-only producer before they are treated as current evidence. NES LUT ordinal minting remains blocked until mapping review and taxonomy freeze pass.
+
 ## Built this session (2026-08-12)
 
 - [x] New module: `sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts`

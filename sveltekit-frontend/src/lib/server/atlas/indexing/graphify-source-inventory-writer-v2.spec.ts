@@ -6,6 +6,7 @@ import {
   buildWorkspaceSourceBindingsV1,
 } from '../identity/workspace-source-binding-v1.js';
 import {
+  buildSealedSnapshotWorkspaceRevisionBindingInputFromInventoryPlanV1,
   compareSealedSnapshotGraphifyInventoryReadbackV1,
   buildSealedSnapshotGraphifyInventoryPlanV1,
   writeGraphifySourceInventoryInTransactionV2,
@@ -53,6 +54,7 @@ function fixture() {
 function clientFor(input: {
   contentDigest?: string;
   byteLength?: number;
+  sourceRevisionAuthority?: string;
 } = {}): GraphifySourceInventorySqlClientV2 & { queries: string[] } {
   const f = fixture();
   const queries: string[] = [];
@@ -98,6 +100,7 @@ function clientFor(input: {
             workspace_revision: f.record.workspaceRevision,
             source_ref: 'src/x.ts',
             source_revision: f.record.baseCommitOid,
+            source_revision_authority: input.sourceRevisionAuthority ?? 'content_hash',
             content_hash: input.contentDigest ?? f.entry.contentDigest,
             code_source_revision: f.entry.sourceRevision,
             byte_length: input.byteLength ?? f.entry.byteLength,
@@ -114,6 +117,7 @@ function clientFor(input: {
             workspace_revision: f.record.workspaceRevision,
             source_ref: 'src/x.ts',
             source_revision: f.record.baseCommitOid,
+            source_revision_authority: input.sourceRevisionAuthority ?? 'content_hash',
             content_hash: input.contentDigest ?? f.entry.contentDigest,
             code_source_revision: f.entry.sourceRevision,
             byte_length: input.byteLength ?? f.entry.byteLength,
@@ -127,38 +131,127 @@ function clientFor(input: {
 }
 
 describe('GraphifySourceInventoryWriterV2', () => {
-  it('builds a write-free sealed-snapshot plan without inventing legacy Git provenance', () => {
+  it('builds a write-free plan binding captured Git provenance separately from exact source hashes', () => {
     const sourceRevision = `sha256:${digest('snapshot source')}`;
     const plan = buildSealedSnapshotGraphifyInventoryPlanV1({
       snapshotRevision: `sha256:${'1'.repeat(64)}`,
       workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
       sourceManifestDigest: '3'.repeat(64),
       snapshotMembershipChecksum: '4'.repeat(64),
-      snapshotSourceCount: 1,
+      snapshotSourceCount: 7,
+      scopeSourceCount: 1,
       sources: [{
         repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts',
         sourceRevision, contentDigest: sourceRevision, byteLength: 15,
       }],
       candidates: [{
         sourceRef: 'src/a.ts', workspaceRevision: `sha256:${'2'.repeat(64)}`, sourceRevision,
-        inventoryState: 'OTHER_REVISION_ROW_ONLY', byteStatus: 'MATCH',
+        inventoryState: 'EXACT_SOURCE_REVISION_ROW', byteStatus: 'MATCH',
+        priorFirstSeenRunId: '55555555-5555-4555-8555-555555555555',
+        priorFirstSeenWorkspaceId: workspaceId,
         observedContentDigest: sourceRevision, observedByteLength: 15,
       }],
     });
 
     expect(plan.rows[0]).toMatchObject({
       sourceRef: 'src/a.ts',
-      legacySourceRevision: null,
+      legacySourceRevision: 'a'.repeat(40),
       codeSourceRevision: sourceRevision,
       sourceRevisionAuthority: 'content_hash',
-      priorInventoryState: 'OTHER_REVISION_ROW_ONLY',
+      priorInventoryState: 'EXACT_SOURCE_REVISION_ROW',
+      priorFirstSeenRunId: '55555555-5555-4555-8555-555555555555',
+      priorFirstSeenWorkspaceId: workspaceId,
     });
     expect(plan).toMatchObject({
-      legacyGitWriterCompatible: false,
+      snapshotSourceCount: 7,
+      sourceScope: 'repo:root',
+      scopeSourceCount: 1,
+      writerRowShapeCompatible: true,
+      existingWriterExecutionCompatible: false,
       canonicalAuthority: false,
       executionAuthorized: false,
       writesPerformed: false,
     });
+  });
+
+  it('keeps full multi-repository snapshot size separate from root-scope source count', () => {
+    const sourceRevision = `sha256:${digest('root source')}`;
+    const plan = buildSealedSnapshotGraphifyInventoryPlanV1({
+      snapshotRevision: `sha256:${'1'.repeat(64)}`,
+      workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
+      sourceManifestDigest: '3'.repeat(64),
+      snapshotMembershipChecksum: '4'.repeat(64),
+      snapshotSourceCount: 25542,
+      scopeSourceCount: 1,
+      sources: [{
+        repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts',
+        sourceRevision, contentDigest: sourceRevision, byteLength: 12,
+      }],
+      candidates: [{
+        sourceRef: 'src/a.ts', workspaceRevision: `sha256:${'2'.repeat(64)}`, sourceRevision,
+        inventoryState: 'NO_GRAPHIFY_ROW', byteStatus: 'MATCH',
+        observedContentDigest: sourceRevision, observedByteLength: 12,
+      }],
+    });
+    expect(plan).toMatchObject({
+      snapshotSourceCount: 25542,
+      sourceScope: 'repo:root',
+      scopeSourceCount: 1,
+      selectedSourceCount: 1,
+    });
+    expect(buildSealedSnapshotWorkspaceRevisionBindingInputFromInventoryPlanV1(plan)).toEqual({
+      schema: 'atlas.sealed-snapshot-workspace-revision-binding.v1',
+      workspaceRevision: plan.workspaceRevision,
+      snapshotRevision: plan.snapshotRevision,
+      sourceManifestDigest: plan.sourceManifestDigest,
+      sourceCount: 25542,
+    });
+    expect(() => buildSealedSnapshotWorkspaceRevisionBindingInputFromInventoryPlanV1({
+      ...plan,
+      selectedSourceCount: plan.selectedSourceCount + 1,
+    })).toThrow('GRAPHIFY_SEALED_SNAPSHOT_SELECTED_SOURCE_COUNT_MISMATCH');
+    expect(() => buildSealedSnapshotWorkspaceRevisionBindingInputFromInventoryPlanV1({
+      ...plan,
+      rows: plan.rows.map((row) => ({ ...row, workspaceRevision: `sha256:${'5'.repeat(64)}` })),
+    })).toThrow('GRAPHIFY_SEALED_SNAPSHOT_ROW_WORKSPACE_REVISION_MISMATCH');
+  });
+
+  it('rejects scope counts that do not match the supplied root sources', () => {
+    const sourceRevision = `sha256:${digest('root source')}`;
+    expect(() => buildSealedSnapshotGraphifyInventoryPlanV1({
+      snapshotRevision: `sha256:${'1'.repeat(64)}`,
+      workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
+      sourceManifestDigest: '3'.repeat(64),
+      snapshotMembershipChecksum: '4'.repeat(64),
+      snapshotSourceCount: 7,
+      scopeSourceCount: 2,
+      sources: [{
+        repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts',
+        sourceRevision, contentDigest: sourceRevision, byteLength: 12,
+      }],
+      candidates: [],
+    })).toThrow('GRAPHIFY_SEALED_SNAPSHOT_SCOPE_SOURCE_COUNT_MISMATCH');
+  });
+
+  it('rejects nested-repository entries from a root-scoped plan', () => {
+    const sourceRevision = `sha256:${digest('nested source')}`;
+    expect(() => buildSealedSnapshotGraphifyInventoryPlanV1({
+      snapshotRevision: `sha256:${'1'.repeat(64)}`,
+      workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
+      sourceManifestDigest: '3'.repeat(64),
+      snapshotMembershipChecksum: '4'.repeat(64),
+      snapshotSourceCount: 7,
+      scopeSourceCount: 1,
+      sources: [{
+        repositoryId: 'repo:vendor', repositoryRelativePath: 'vendor/a.ts', sourceRef: 'vendor/a.ts',
+        sourceRevision, contentDigest: sourceRevision, byteLength: 12,
+      }],
+      candidates: [],
+    })).toThrow('GRAPHIFY_SEALED_SNAPSHOT_SOURCE_OUTSIDE_ROOT_SCOPE');
   });
 
   it('rejects a selected source whose digest or byte length differs from the sealed snapshot', () => {
@@ -166,9 +259,11 @@ describe('GraphifySourceInventoryWriterV2', () => {
     const base = {
       snapshotRevision: `sha256:${'1'.repeat(64)}`,
       workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
       sourceManifestDigest: '3'.repeat(64),
       snapshotMembershipChecksum: '4'.repeat(64),
       snapshotSourceCount: 1,
+      scopeSourceCount: 1,
       sources: [{
         repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts',
         sourceRevision, contentDigest: sourceRevision, byteLength: 15,
@@ -197,9 +292,11 @@ describe('GraphifySourceInventoryWriterV2', () => {
     const base = {
       snapshotRevision: `sha256:${'1'.repeat(64)}`,
       workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
       sourceManifestDigest: '3'.repeat(64),
       snapshotMembershipChecksum: '4'.repeat(64),
       snapshotSourceCount: 1,
+      scopeSourceCount: 1,
       sources: [{
         repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts',
         sourceRevision, contentDigest: sourceRevision, byteLength: 15,
@@ -232,9 +329,11 @@ describe('GraphifySourceInventoryWriterV2', () => {
     const base = {
       snapshotRevision: `sha256:${'1'.repeat(64)}`,
       workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
       sourceManifestDigest: '3'.repeat(64),
       snapshotMembershipChecksum: '4'.repeat(64),
       snapshotSourceCount: 2,
+      scopeSourceCount: 2,
     };
     expect(() => buildSealedSnapshotGraphifyInventoryPlanV1({
       ...base, sources: [source, source], candidates: [],
@@ -250,14 +349,16 @@ describe('GraphifySourceInventoryWriterV2', () => {
     })).toThrow('GRAPHIFY_SEALED_SNAPSHOT_DUPLICATE_CANDIDATE');
   });
 
-  it('compares exact graphify_files readback fields without claiming to perform a write', () => {
+  it('compares exact graphify_files readback fields including the captured Git base revision', () => {
     const sourceRevision = `sha256:${digest('snapshot source')}`;
     const plan = buildSealedSnapshotGraphifyInventoryPlanV1({
       snapshotRevision: `sha256:${'1'.repeat(64)}`,
       workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
       sourceManifestDigest: '3'.repeat(64),
       snapshotMembershipChecksum: '4'.repeat(64),
       snapshotSourceCount: 1,
+      scopeSourceCount: 1,
       sources: [{ repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', sourceRevision, contentDigest: sourceRevision, byteLength: 15 }],
       candidates: [{ sourceRef: 'src/a.ts', workspaceRevision: `sha256:${'2'.repeat(64)}`, sourceRevision, inventoryState: 'NO_GRAPHIFY_ROW', byteStatus: 'MATCH', observedContentDigest: sourceRevision, observedByteLength: 15 }],
     });
@@ -265,7 +366,7 @@ describe('GraphifySourceInventoryWriterV2', () => {
       file_id: fileId,
       workspace_id: workspaceId,
       source_ref: 'src/a.ts',
-      source_revision: null,
+      source_revision: 'a'.repeat(40),
       code_source_revision: sourceRevision,
       content_hash: digest('snapshot source'),
       byte_length: 15,
@@ -282,11 +383,63 @@ describe('GraphifySourceInventoryWriterV2', () => {
       mismatchReasons: [], writesPerformed: false, canonicalAuthority: false,
     });
     expect(compareSealedSnapshotGraphifyInventoryReadbackV1({
-      plan, workspaceId, runId, observedRows: [{ ...row, source_revision: 'git-oid' }],
+      plan, workspaceId, runId, observedRows: [{ ...row, source_revision: 'b'.repeat(40) }],
     }).mismatchReasons).toContain('READBACK_FIELD_MISMATCH:src/a.ts:LEGACY_SOURCE_REVISION');
     expect(compareSealedSnapshotGraphifyInventoryReadbackV1({
       plan, workspaceId, runId, observedRows: [{ ...row, code_source_revision: `sha256:${'5'.repeat(64)}` }],
     }).mismatchReasons).toContain('READBACK_FIELD_MISMATCH:src/a.ts:CODE_SOURCE_REVISION');
+  });
+
+  it('expects the preserved first-seen run for an existing exact source revision', () => {
+    const sourceRevision = `sha256:${digest('snapshot source')}`;
+    const firstSeenRunId = '55555555-5555-4555-8555-555555555555';
+    const plan = buildSealedSnapshotGraphifyInventoryPlanV1({
+      snapshotRevision: `sha256:${'1'.repeat(64)}`,
+      workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
+      sourceManifestDigest: '3'.repeat(64),
+      snapshotMembershipChecksum: '4'.repeat(64),
+      snapshotSourceCount: 1,
+      scopeSourceCount: 1,
+      sources: [{ repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', sourceRevision, contentDigest: sourceRevision, byteLength: 15 }],
+      candidates: [{
+        sourceRef: 'src/a.ts', workspaceRevision: `sha256:${'2'.repeat(64)}`, sourceRevision,
+        inventoryState: 'EXACT_SOURCE_REVISION_ROW', priorFirstSeenRunId: firstSeenRunId,
+        priorFirstSeenWorkspaceId: workspaceId,
+        byteStatus: 'MATCH', observedContentDigest: sourceRevision, observedByteLength: 15,
+      }],
+    });
+    const row = {
+      file_id: fileId, workspace_id: workspaceId, source_ref: 'src/a.ts', source_revision: 'a'.repeat(40),
+      code_source_revision: sourceRevision, content_hash: digest('snapshot source'), byte_length: 15,
+      workspace_revision: `sha256:${'2'.repeat(64)}`, source_revision_authority: 'content_hash' as const,
+      first_seen_run_id: firstSeenRunId, last_seen_run_id: runId,
+    };
+    expect(compareSealedSnapshotGraphifyInventoryReadbackV1({ plan, workspaceId, runId, observedRows: [row] }))
+      .toMatchObject({ outcome: 'MATCH', matchedRowCount: 1, mismatchReasons: [] });
+    expect(compareSealedSnapshotGraphifyInventoryReadbackV1({
+      plan, workspaceId, runId, observedRows: [{ ...row, first_seen_run_id: runId }],
+    }).mismatchReasons).toContain('READBACK_FIELD_MISMATCH:src/a.ts:FIRST_SEEN_RUN_ID');
+    const otherWorkspaceRow = { ...row, first_seen_run_id: runId };
+    const otherWorkspacePlan = buildSealedSnapshotGraphifyInventoryPlanV1({
+      snapshotRevision: `sha256:${'1'.repeat(64)}`,
+      workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
+      sourceManifestDigest: '3'.repeat(64),
+      snapshotMembershipChecksum: '4'.repeat(64),
+      snapshotSourceCount: 1,
+      scopeSourceCount: 1,
+      sources: [{ repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', sourceRevision, contentDigest: sourceRevision, byteLength: 15 }],
+      candidates: [{
+        sourceRef: 'src/a.ts', workspaceRevision: `sha256:${'2'.repeat(64)}`, sourceRevision,
+        inventoryState: 'EXACT_SOURCE_REVISION_ROW', priorFirstSeenRunId: firstSeenRunId,
+        priorFirstSeenWorkspaceId: '77777777-7777-4777-8777-777777777777',
+        byteStatus: 'MATCH', observedContentDigest: sourceRevision, observedByteLength: 15,
+      }],
+    });
+    expect(compareSealedSnapshotGraphifyInventoryReadbackV1({
+      plan: otherWorkspacePlan, workspaceId, runId, observedRows: [otherWorkspaceRow],
+    })).toMatchObject({ outcome: 'MATCH', matchedRowCount: 1, mismatchReasons: [] });
   });
 
   it('reports missing, duplicate, and unexpected readback identities as mismatches', () => {
@@ -294,14 +447,16 @@ describe('GraphifySourceInventoryWriterV2', () => {
     const plan = buildSealedSnapshotGraphifyInventoryPlanV1({
       snapshotRevision: `sha256:${'1'.repeat(64)}`,
       workspaceRevision: `sha256:${'2'.repeat(64)}`,
+      baseCommitOid: 'a'.repeat(40),
       sourceManifestDigest: '3'.repeat(64),
       snapshotMembershipChecksum: '4'.repeat(64),
       snapshotSourceCount: 1,
+      scopeSourceCount: 1,
       sources: [{ repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', sourceRevision, contentDigest: sourceRevision, byteLength: 15 }],
       candidates: [{ sourceRef: 'src/a.ts', workspaceRevision: `sha256:${'2'.repeat(64)}`, sourceRevision, inventoryState: 'NO_GRAPHIFY_ROW', byteStatus: 'MATCH', observedContentDigest: sourceRevision, observedByteLength: 15 }],
     });
     const row = {
-      file_id: fileId, workspace_id: workspaceId, source_ref: 'src/a.ts', source_revision: null,
+      file_id: fileId, workspace_id: workspaceId, source_ref: 'src/a.ts', source_revision: 'a'.repeat(40),
       code_source_revision: sourceRevision, content_hash: digest('snapshot source'), byte_length: 15,
       workspace_revision: `sha256:${'2'.repeat(64)}`, source_revision_authority: 'content_hash' as const,
       first_seen_run_id: runId, last_seen_run_id: runId,
@@ -337,7 +492,9 @@ describe('GraphifySourceInventoryWriterV2', () => {
     expect(client.queries[1]).toContain('FROM public.graphify_runs');
     expect(client.queries[2]).toContain('ON CONFLICT (workspace_id, source_ref, code_source_revision)');
     expect(client.queries[2]).toContain('WHERE code_source_revision IS NOT NULL');
+    expect(client.queries[2]).toContain('source_revision_authority');
     expect(client.queries[3]).toContain('FROM public.graphify_files');
+    expect(client.queries[3]).toContain('source_revision_authority');
   });
 
   it('fails closed when persisted bytes disagree with the canonical binding', async () => {
@@ -351,6 +508,19 @@ describe('GraphifySourceInventoryWriterV2', () => {
       parserContractVersion: 'parser:v1',
       extractionContractVersion: 'extract:v1',
     })).rejects.toThrow('GRAPHIFY_CONTENT_DIGEST_READBACK_MISMATCH');
+  });
+
+  it('fails closed when source revision authority readback is not content_hash', async () => {
+    const f = fixture();
+    const client = clientFor({ sourceRevisionAuthority: 'source_revision' });
+    await expect(writeGraphifySourceInventoryInTransactionV2({
+      client,
+      workspaceId,
+      record: f.record,
+      bindings: f.bindings,
+      parserContractVersion: 'parser:v1',
+      extractionContractVersion: 'extract:v1',
+    })).rejects.toThrow('GRAPHIFY_SOURCE_REVISION_AUTHORITY_MISMATCH');
   });
 
   it('rejects a selected source that is not in the canonical manifest', async () => {

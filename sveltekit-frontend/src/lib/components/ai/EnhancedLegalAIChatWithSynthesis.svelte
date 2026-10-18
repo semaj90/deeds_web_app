@@ -949,8 +949,14 @@ ${relatedReports.length > 0 ? `**Database Stats:**
 
   function getStatusIcon(status: string): string { switch (status) { case 'active': return 'circle-check'; case 'inactive': return 'triangle-alert'; default: return 'loader-circle'; } }
 
-  function copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text);
+  async function copyToClipboard(text: string) {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      }
+    } catch {
+      /* clipboard write permission denied in headless/non-secure context */
+    }
   }
 </script>
 

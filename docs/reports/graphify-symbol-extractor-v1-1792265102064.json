@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-345bc5460ecf-0689",
+    "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:e5c45155ac3365032ecc32c5acec31e984202453b052ba7235f80178ecba53c9",
+    "offset": 688,
+    "maxFiles": 1,
+    "shardChecksum": "sha256:7c47d5aeb9e925823322aac6dc641d4b4ae43f4e3763ba2ea739ed9702b19f34",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "17aeab22-871d-4007-a632-27cc833b38fa",
+      "sourceRef": "sveltekit-frontend/openspec/changes/add-packet-ontology-registry/tasks.md",
+      "sourceRevision": "sha256:24415d8519bed8b007e4dc0b1b22f173d924701cbde049cdf0d692333836b096",
+      "fileKind": "markdown",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WOULD_EXTRACT",
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": 1,
+  "readbacks": [],
+  "generatedAt": "2026-10-17T19:25:02.064Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 10,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "17aeab22-871d-4007-a632-27cc833b38fa",
+      "sourceRef": "sveltekit-frontend/openspec/changes/add-packet-ontology-registry/tasks.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:24415d8519bed8b007e4dc0b1b22f173d924701cbde049cdf0d692333836b096",
+      "sourceDigest": "sha256:24415d8519bed8b007e4dc0b1b22f173d924701cbde049cdf0d692333836b096",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    }
+  ]
+}

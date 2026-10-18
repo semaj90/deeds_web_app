@@ -128,11 +128,12 @@ async function main(): Promise<void> {
         min(canonical_chunk_id::text) AS canonical_chunk_id,
         min(l.packet_key::text) AS packet_key,
         min(l.source_ref::text) AS source_ref,
-        min(l.source_revision::text) AS source_revision
+        min(l.source_revision::text) AS source_revision,
+        min(b.workspace_revision::text) AS workspace_revision
       FROM public.atlas_packet_chunk_lineage l
       JOIN bound b
         ON b.source_ref = l.source_ref::text
-       AND b.source_revision = l.source_revision::text
+       AND b.source_revision = l.source_revision
       WHERE l.revision_status = 'PROVEN'
         AND l.canonical_chunk_id IS NOT NULL
         AND l.packet_key IS NOT NULL
@@ -151,14 +152,11 @@ async function main(): Promise<void> {
       l.packet_key,
       l.source_ref,
       l.source_revision,
-      b.workspace_revision
+      l.workspace_revision
     FROM lineage_one l
     JOIN public.codebase_chunk_index c
       ON c.id = l.chunk_row_id
      AND c.source_ref = l.source_ref
-    JOIN bound b
-      ON b.source_ref = l.source_ref
-     AND b.source_revision = l.source_revision
     ORDER BY l.source_ref, l.canonical_chunk_id, c.id
     LIMIT $2
   `, [workspaceRevision, limit]);
