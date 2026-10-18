@@ -1,0 +1,51 @@
+{
+ "schema": "atlas.kmeans-raw768-gpu-dryrun.v1",
+ "generatedAt": "2026-10-18",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuUsed": true,
+ "canonicalAuthority": false,
+ "recipe": "RAW content_embedding_768 (L2-normalised)",
+ "executor": "cuml.cluster.KMeans (k-means|| init, n_init=1)",
+ "k": 256,
+ "rows": 219998,
+ "train": 197987,
+ "holdout": 22011,
+ "freeMiBAtStart": 7097,
+ "cupyPoolMiB": 0,
+ "models": [
+  {
+   "seed": 42,
+   "fitSeconds": 10.1,
+   "inertia": 75129.562,
+   "iterations": 22,
+   "replayFitVsPredict": 1.0,
+   "emptyClusters": 0,
+   "sizeMin": 20,
+   "sizeMedian": 707,
+   "sizeMax": 6520
+  },
+  {
+   "seed": 43,
+   "fitSeconds": 2.5,
+   "inertia": 75459.484,
+   "iterations": 24,
+   "replayFitVsPredict": 1.0,
+   "emptyClusters": 0,
+   "sizeMin": 17,
+   "sizeMedian": 682,
+   "sizeMax": 5682
+  }
+ ],
+ "stability": {
+  "trainARI_seed42_vs_43": 0.6413,
+  "holdoutARI_seed42_vs_43": 0.6317
+ },
+ "caveats": [
+  "models are not stored",
+  "compare with docs/reports/kmeans-raw768-dryrun-v1.json (CPU MiniBatchKMeans, n_init=3)",
+  "seed ARI shows stability, not semantic quality",
+  "one run, no timing repetition"
+ ],
+ "checksum": "sha256:433977f3b6400cf855ece207902e0cc667fe0b0956cedef64d441a2ef03c6647"
+}
