@@ -1,8 +1,12 @@
 /**
- * Client-Side Embedding via ONNX — first real local inference target.
+ * Client-side embedding access (server-backed).
  *
- * Single forward pass → validate vector.length === 768 → cache in IndexedDB.
- * Uses embeddinggemma 300M QInt8 ONNX model from static/.
+ * The browser used to run the QInt8 `model.onnx` locally, but that graph exposes only `last_hidden_state`
+ * and this module skipped EmbeddingGemma's two Dense projection layers, so its vectors were NOT in the
+ * `embeddinggemma:latest` space (cosine ~0 against stored vectors; ~0.59 even with Dense added).
+ * See openspec/changes/legal-corpus-california-codes/tasks.md ONNX-ROOTCAUSE-01.
+ * Vectors are therefore requested from the canonical server route, POST /api/embed, and cached per
+ * browser under a versioned key so entries written by the old ONNX path are never served.
  *
  * Usage:
  *   import { embedText, isEmbeddingModelReady } from '$lib/ai/client-embed.js';
@@ -10,213 +14,73 @@
  *   // vector.length === 768
  */
 
-import {
-	CLIENT_EMBEDDING_ONNX_PATH,
-	CLIENT_EMBEDDING_TOKENIZER_PATH,
-	CLIENT_EMBEDDING_DIMS
-} from './model-ids.js';
-import { getOnnxSession, getProviderLabel, isSessionCached } from './onnx/session.js';
+import { CLIENT_EMBEDDING_DIMS } from './model-ids.js';
 import { clientCache } from './client-cache.js';
 
-let tokenizer: any = null;
-let tokenizerLoading: Promise<any> | null = null;
-
-function simpleHash(str: string): string {
-	let hash = 0;
-	for (let i = 0; i < str.length; i++) {
-		const char = str.charCodeAt(i);
-		hash = ((hash << 5) - hash) + char;
-		hash |= 0;
-	}
-	return hash.toString(36);
-}
-
-/** Load the embedding tokenizer (memoized) */
-async function ensureTokenizer(): Promise<any> {
-	if (tokenizer) return tokenizer;
-	if (tokenizerLoading) return tokenizerLoading;
-
-	tokenizerLoading = (async () => {
-		const transformers = await import('@huggingface/transformers');
-		// Allow loading tokenizer from local static/ files
-		transformers.env.allowLocalModels = true;
-		transformers.env.allowRemoteModels = false;
-		tokenizer = await transformers.AutoTokenizer.from_pretrained(
-			CLIENT_EMBEDDING_TOKENIZER_PATH.replace('/tokenizer.json', ''),
-			{ local_files_only: true }
-		);
-		return tokenizer;
-	})();
-
-	return tokenizerLoading;
-}
+const EMBED_ROUTE = '/api/embed';
+/** Bump when the vector source changes; old cache entries are keyed differently and are ignored. */
+const EMBED_CACHE_NAMESPACE = 'server-embed-v1::';
+const EMBED_TIMEOUT_MS = 30_000;
+const BACKEND_LABEL = 'server:/api/embed';
 
 /**
- * Generate a 768-dim embedding vector for the given text, client-side.
+ * Generate a 768-dim embedding vector for the given text via the canonical server route.
  *
  * Flow:
- *   1. Check IndexedDB cache → return if hit
- *   2. Tokenize with embeddinggemma tokenizer
- *   3. Run ONNX InferenceSession (WebGPU → WASM fallback)
- *   4. Mean-pool token embeddings → normalize → 768-dim vector
- *   5. Cache result in IndexedDB (7-day TTL)
+ *   1. Check IndexedDB cache (versioned key) -> return if hit
+ *   2. POST /api/embed {text, model:'embeddinggemma'}
+ *   3. Fail closed on any non-200, wrong dimension, or non-finite value (no local fallback vector)
+ *   4. Cache result in IndexedDB (7-day TTL)
  *
  * @param text - Input text to embed
- * @returns Float32Array vector of length 768 (for zero-copy transfer)
+ * @returns Float32Array vector of length 768
  */
 export async function embedText(text: string): Promise<Float32Array> {
 	if (typeof window === 'undefined') {
 		throw new Error('embedText() is browser-only');
 	}
+	if (!text || !text.trim()) {
+		throw new Error('CLIENT_EMBED_EMPTY_TEXT');
+	}
 
-	const tokenCacheKey = simpleHash(`${CLIENT_EMBEDDING_ONNX_PATH}::${text}`);
-
-	// 1. Check cache (convert number[] to Float32Array if needed)
-	const cached = await clientCache.getEmbedding(text);
+	const cacheKey = `${EMBED_CACHE_NAMESPACE}${text}`;
+	const cached = await clientCache.getEmbedding(cacheKey);
 	if (cached && cached.length === CLIENT_EMBEDDING_DIMS) {
 		return cached instanceof Float32Array ? cached : new Float32Array(cached);
 	}
 
-	// 2. Reuse cached tokenization when available; otherwise tokenize and cache.
-	const cachedTokens = await clientCache.getTokenizedInput(tokenCacheKey);
-	let encoded: {
-		input_ids: { data: Int32Array };
-		attention_mask: { data: Int32Array };
-		token_type_ids?: { data: Int32Array };
-	};
-
-	if (cachedTokens) {
-		encoded = {
-			input_ids: { data: Int32Array.from(cachedTokens.inputIds) },
-			attention_mask: { data: Int32Array.from(cachedTokens.attentionMask) },
-			...(cachedTokens.tokenTypeIds
-				? { token_type_ids: { data: Int32Array.from(cachedTokens.tokenTypeIds) } }
-				: {})
-		};
-	} else {
-		const tok = await ensureTokenizer();
-		const fresh = tok(text, {
-			return_tensors: 'np',
-			padding: true,
-			truncation: true,
-			max_length: 512
-		});
-		encoded = fresh;
-		await clientCache.putTokenizedInput(tokenCacheKey, {
-			modelId: CLIENT_EMBEDDING_ONNX_PATH,
-			inputIds: Array.from(fresh.input_ids.data as ArrayLike<number>),
-			attentionMask: Array.from(fresh.attention_mask.data as ArrayLike<number>),
-			...(fresh.token_type_ids
-				? {
-						tokenTypeIds: Array.from(fresh.token_type_ids.data as ArrayLike<number>)
-					}
-				: {})
-		});
+	const response = await fetch(EMBED_ROUTE, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ text, model: 'embeddinggemma' }),
+		signal: AbortSignal.timeout(EMBED_TIMEOUT_MS)
+	});
+	if (!response.ok) {
+		throw new Error(`CLIENT_EMBED_SERVER_${response.status}`);
+	}
+	const data = (await response.json()) as { embedding?: unknown };
+	const raw = data?.embedding;
+	if (
+		!Array.isArray(raw) ||
+		raw.length !== CLIENT_EMBEDDING_DIMS ||
+		!raw.every((v) => typeof v === 'number' && Number.isFinite(v))
+	) {
+		throw new Error('CLIENT_EMBED_INVALID_VECTOR');
 	}
 
-	// 3. Load model session
-	const session = await getOnnxSession(CLIENT_EMBEDDING_ONNX_PATH);
-
-	// 4. Build ONNX tensors
-	const { Tensor } = await import('onnxruntime-web');
-	const inputIds = new Tensor(
-		'int64',
-		new BigInt64Array(Array.from(encoded.input_ids.data as ArrayLike<number>, (v) => BigInt(v))),
-		[1, encoded.input_ids.data.length]
-	);
-	const attentionMask = new Tensor(
-		'int64',
-		new BigInt64Array(Array.from(encoded.attention_mask.data as ArrayLike<number>, (v) => BigInt(v))),
-		[1, encoded.attention_mask.data.length]
-	);
-
-	// 5. Run inference
-	const feeds: Record<string, any> = {
-		input_ids: inputIds,
-		attention_mask: attentionMask
-	};
-
-	// Some models also expect token_type_ids
-	if (encoded.token_type_ids) {
-		feeds.token_type_ids = new Tensor(
-			'int64',
-			new BigInt64Array(Array.from(encoded.token_type_ids.data as ArrayLike<number>, (v) => BigInt(v))),
-			[1, encoded.token_type_ids.data.length]
-		);
-	}
-
-	const results = await session.run(feeds);
-
-	// 6. Extract embeddings — try common output names
-	const outputKey = results.last_hidden_state
-		? 'last_hidden_state'
-		: results.token_embeddings
-			? 'token_embeddings'
-			: Object.keys(results)[0];
-
-	const outputData = results[outputKey].data as Float32Array;
-	const seqLen = encoded.input_ids.data.length;
-	const dims = CLIENT_EMBEDDING_DIMS;
-
-	// 7. Mean pooling over sequence dimension (with attention mask)
-	const maskData = encoded.attention_mask.data as ArrayLike<number>;
-	const pooled = new Float32Array(dims);
-	let maskSum = 0;
-
-	for (let t = 0; t < seqLen; t++) {
-		if (maskData[t] === 0) continue;
-		maskSum += 1;
-		for (let d = 0; d < dims; d++) {
-			pooled[d] += outputData[t * dims + d];
-		}
-	}
-
-	if (maskSum > 0) {
-		for (let d = 0; d < dims; d++) {
-			pooled[d] /= maskSum;
-		}
-	}
-
-	// 8. L2 normalize
-	let norm = 0;
-	for (let d = 0; d < dims; d++) {
-		norm += pooled[d] * pooled[d];
-	}
-	norm = Math.sqrt(norm);
-	if (norm > 0) {
-		for (let d = 0; d < dims; d++) {
-			pooled[d] /= norm;
-		}
-	}
-
-	// 9. Validate dimensions (use pooled Float32Array directly, not Array.from)
-	if (pooled.length !== CLIENT_EMBEDDING_DIMS) {
-		console.error(`[ClientEmbed] Expected ${CLIENT_EMBEDDING_DIMS} dims, got ${pooled.length}`);
-	}
-
-	// 10. Cache in IndexedDB (convert to number[] for storage)
-	await clientCache.putEmbedding(text, Array.from(pooled));
-
-	console.info(
-		`[ClientEmbed] Generated ${dims}-dim embedding via ${getProviderLabel(CLIENT_EMBEDDING_ONNX_PATH)} (Float32Array for zero-copy transfer)`
-	);
-
-	// Return Float32Array directly for transferable ArrayBuffer support
-	return pooled;
+	const vector = Float32Array.from(raw as number[]);
+	await clientCache.putEmbedding(cacheKey, Array.from(vector));
+	return vector;
 }
 
-/** Check if the embedding model is loaded and ready */
+/** The server route needs no local model; ready whenever the browser reports it is online. */
 export function isEmbeddingModelReady(): boolean {
-	return isSessionCached(CLIENT_EMBEDDING_ONNX_PATH) && tokenizer !== null;
+	return typeof navigator === 'undefined' ? false : navigator.onLine !== false;
 }
 
-/** Preload the embedding model + tokenizer without running inference */
+/** Kept for API compatibility: there is no local model or tokenizer to preload any more. */
 export async function preloadEmbeddingModel(): Promise<void> {
-	await Promise.all([
-		getOnnxSession(CLIENT_EMBEDDING_ONNX_PATH),
-		ensureTokenizer()
-	]);
-	console.info('[ClientEmbed] Model + tokenizer preloaded');
+	console.info('[ClientEmbed] Server-backed embeddings; nothing to preload');
 }
 
 /** Cosine similarity between two vectors */
@@ -305,12 +169,12 @@ if (typeof window !== 'undefined') {
 			const start = performance.now();
 			const vector = await embedText(text);
 			const durationMs = Math.round(performance.now() - start);
-			const backend = getProviderLabel(CLIENT_EMBEDDING_ONNX_PATH);
+			const backend = BACKEND_LABEL;
 			return { vector, dim: vector.length, backend, durationMs };
 		},
 		async preload() {
 			await preloadEmbeddingModel();
-			return { ready: isEmbeddingModelReady(), backend: getProviderLabel(CLIENT_EMBEDDING_ONNX_PATH) };
+			return { ready: isEmbeddingModelReady(), backend: BACKEND_LABEL };
 		}
 	};
 	(window as any).__deedsClientInference = hook;
