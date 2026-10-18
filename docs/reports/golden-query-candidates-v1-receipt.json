@@ -1,0 +1,18 @@
+{
+ "schema": "atlas.golden-query-candidates.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "queries": 30,
+ "candidates": 397,
+ "goldLabels": 0,
+ "jsonl": "docs/reports/golden-query-candidates-v1.jsonl",
+ "sheet": "docs/reports/golden-query-review-sheet-v1.html",
+ "recipe": "raw query embedding vs RAW content_embedding_768",
+ "caveats": [
+  "queries hand-written by the assistant, review/replace them",
+  "pooling favours the embedding under test; FTS lane reduces but does not remove bias",
+  "no gold labels until a human labels",
+  "chunks outside the raw-cache snapshot are not pooled"
+ ],
+ "checksum": "sha256:de0513d4468e215b15ee86ba64455ed1a91247ce95a67abb03ebcc7ff3fb30ab"
+}
