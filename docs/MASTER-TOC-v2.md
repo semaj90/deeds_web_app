@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v2.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `8e757fe51847abeda459e0253da2b7eef7f6590377de703248d53d01c39a9f97`
+Registry checksum: `ad666b0ef647e035ad3007a78523d572634895b8a63b03f6e73b0d9de4f1d5e1`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 

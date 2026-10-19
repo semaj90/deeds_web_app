@@ -18,6 +18,8 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5
 export async function startQdrantSyncWorker(): Promise<void> {
   try {
     const connection = await (amqp as any).connect(RABBITMQ_URL);
+    // An unhandled amqplib 'error' (e.g. heartbeat ECONNRESET) would crash the whole Node process.
+    connection.on('error', (err: unknown) => console.error('[qdrant-sync-worker] RabbitMQ connection error (handled):', err instanceof Error ? err.message : err));
     channel = await connection.createChannel();
 
     await channel.assertQueue(QUEUE_NAME, { durable: true });

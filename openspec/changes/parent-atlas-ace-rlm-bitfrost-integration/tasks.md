@@ -17122,6 +17122,22 @@ Module `sveltekit-frontend/src/lib/server/atlas/execution/patch-check-receipt-v1
 
 **Limits (do not over-read):** the replay shares the tsc/apply helpers with the executor, so it proves reproducibility from recorded inputs in a clean directory, not that those helpers are bug-free; the workspace is a synthetic temp repo (`temp-repo:git:<sha>`), not an admitted workspace revision; compiling is not behavioural correctness; one real error, three samples; nothing committed to Postgres (the rolled-back transaction is the only DB contact); no reward is assigned; a live write needs explicit operator authorization. Also fixed in the same pass: the deterministic worktree fixture's readback (untracked files, no-op detection) and the planner's failed-check status rule are recorded in TOURNAMENT-FIXTURE-RUN-01 and PATCH-TOURNAMENT-PLANNER-FIX-01.
 
+## CENSUS-GITIGNORE-01 + AMQP-ERROR-LISTENER-01 (2026-10-19) `DONE_LOCAL_COMMIT_NOT_PUSHED`
+
+**Census kept searchable, out of git.** `docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json` (123,734,066 bytes, over GitHub's 100 MB file limit, so it was excluded from the push) is now in `.gitignore` and re-included in `.rgignore` with a `!path` rule (the existing convention for >10 MB generated reports): `git status` no longer lists it, plain `rg --files` and `rg` content search still find it. Recovery manifest (tracked, small): `docs/reports/census-v1-20261015-archive-manifest.json` with sha256 `781f9f255965e0a786dec3ca5ffa513c33b3649e121e046931c623aa54ea345c`. The file was never deleted or moved. Content: top-level `source`, `summary` (59 keys), `changes` (130), `tasks` (13,106), `duplicateTaskIdGroups` (23,795), `evidenceReceipts` (137), `receiptBindings` (1,250), `proofEligibleReceiptMatches` (0), etc.
+
+| Analysis lane | State |
+|---|---|
+| CPU simdjson (`pysimdjson`, py3.13) | verified: parses the 123.7 MB file in 225 ms |
+| Native `tensorrt_bridge.node` | loads; exports `simdJsonParse`, `simdJsonValidate`, `simdJsonToCSR`, `simdJsonExtractNumbers`, `batchCosineTopK`, ... (rule: native parse only for payloads >= 1 KB, Zod-validate, never promotes identity); not run on the full file |
+| DuckDB | Python `duckdb` is NOT installed for py3.13 (a `./duckdb` directory at the repo root made `find_spec` report True; this is a false positive, do not trust `find_spec` from the repo root); Node `duckdb` exists under `node_modules` and `packages/atlas-duckdb`; no install attempted (DEPENDENCY-CAPABILITY-GUARD-01) |
+| cuDF / pylibcudf | only in WSL env `atlas-rapids-cu13` (cudf 26.6.1); needs `:8090` freed first (GPU Prepare task); not run |
+| PyTorch / RTX | tensor work only: convert numeric columns to Arrow/raw F32 first; never feed JSON through torch |
+
+`granite-docling-258M` (1 GB) is a registered git submodule with untracked content, so a `.gitignore` rule cannot affect it; left as is.
+
+**Crash fix (from the dev-server log pasted by the operator):** an unhandled amqplib `'error'` event (`write ECONNRESET` from the heartbeat, `Connection.sendHeartbeat`) terminated the whole Node process. Five worker modules called `amqp.connect(...)` with NO `error` listener: `workers/code-evidence-projection-worker.ts`, `mirror-sync-publisher.ts`, `neo4j-sync-worker.ts`, `qdrant-sync-worker.ts`, `redis-invalidate-worker.ts`. Each now attaches a logging-only `connection.on('error', ...)` right after connect (10 lines added in total; syntax check 0 diagnostics on all five; no reconnect logic was invented). The main `rabbitmq.js` / `rabbitmq.ts` and `connection-pool.ts` already had listeners. Which of the five was live in the crashing dev server is not established from the log; no runtime reproduction was done and no spec covers these workers. **Not fixed, only observed:** `[AnalysisJobs] Connection terminated due to connection timeout` (the SKIP LOCKED poller on `analysis_jobs`) and a 4.8 s `/api/health` with ~1.1 GB RSS in the same log, consistent with the host memory pressure seen earlier this session; needs a pool/timeout review, not a blind retry change.
+
 ## HANDOFF 2026-10-19 (late addendum to the 2026-10-18 handoff above; supersedes its state table and decisions)
 Everything here is UNCOMMITTED and several other sessions edit the same tree. Read this before the older handoff.
 

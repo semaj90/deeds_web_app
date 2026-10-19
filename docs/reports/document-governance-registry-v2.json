@@ -101347,6 +101347,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:c94b64f60ba2e9e75201ef71fe5054a503284f26274fe4a1994786463b04c20e",
+      "path": "docs/reports/census-v1-20261015-archive-manifest.json",
+      "sha256": "1645638fd2e0fdba7a7c8e68c9b389597844263aa2ada40ebc78ebc545e31217",
+      "bytes": 3179,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:c7f25723e6566da7ed5cda91225ba1d5c1bd3a5ac605576c748d7cc61785a893",
       "path": "docs/reports/centroid-cache-families-v1.json",
       "sha256": "b1e50efb3dd456f60151155dba668d3f3b7634b97b43bccc1b9b45284cc6d699",
@@ -328741,8 +328784,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:6ceaa383eaee756c4354de38eda50f9455333af51aa369a1be723b37919e4fed",
       "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-      "sha256": "39d83637910e259da9e35e4cd6c60e28c3b009a07e5b1294c72eb73af2cdfe31",
-      "bytes": 1483134,
+      "sha256": "b1ec33fd478125e11988fb1b4bb194fac8109697781da932dcd4ffb46291ac67",
+      "bytes": 1486350,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",

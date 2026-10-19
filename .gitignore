@@ -1115,3 +1115,5 @@ docs/reports/openspec-evidence/pipeline-attempt-20261003T*/
 docs/reports/openspec-evidence/pipeline-current-worktree-20261003*.json
 docs/reports/staging/
 !/services/go-health-aggregator/go.sum
+# >100 MB generated OpenSpec evidence census: over GitHub's file limit, kept on disk and searchable (see .rgignore); recover via docs/reports/census-v1-20261015-archive-manifest.json
+docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json

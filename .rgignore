@@ -115,3 +115,5 @@
 # re-include gitignored >10 MB generated reports so plain rg from the repo root finds them (searchable != authoritative; regenerate before citing)
 !docs/reports/openspec-directory-graph-v1.json
 !docs/reports/openspec-file-labels-v1.json
+# re-include the >100 MB gitignored OpenSpec census so plain rg and DuckDB/cuDF/simdjson tooling find it (searchable != authoritative; regenerate before citing)
+!docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json

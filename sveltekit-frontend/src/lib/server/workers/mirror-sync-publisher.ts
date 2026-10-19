@@ -46,6 +46,8 @@ export async function initializeMirrorSyncPublisher(): Promise<void> {
 
   try {
     connection = await (amqp as any).connect(RABBITMQ_URL);
+    // An unhandled amqplib 'error' (e.g. heartbeat ECONNRESET) would crash the whole Node process.
+    connection.on('error', (err: unknown) => console.error('[mirror-sync-publisher] RabbitMQ connection error (handled):', err instanceof Error ? err.message : err));
     channel = await connection.createChannel();
 
     await channel.assertExchange(EXCHANGE_NAME, 'topic', {

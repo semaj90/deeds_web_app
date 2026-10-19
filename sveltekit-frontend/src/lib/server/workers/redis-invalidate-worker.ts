@@ -26,6 +26,8 @@ const QUEUE_NAME = 'redis-invalidate-workers';
 export async function startRedisInvalidateWorker(): Promise<void> {
   try {
     const connection = await (amqp as any).connect(ENV.RABBITMQ_URL);
+    // An unhandled amqplib 'error' (e.g. heartbeat ECONNRESET) would crash the whole Node process.
+    connection.on('error', (err: unknown) => console.error('[redis-invalidate-worker] RabbitMQ connection error (handled):', err instanceof Error ? err.message : err));
     channel = await connection.createChannel();
 
     redis = getValkeyClient().duplicate({
