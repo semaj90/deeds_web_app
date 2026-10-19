@@ -126,24 +126,38 @@ export async function startErrorAgentRepairWorker(
   await consume(ERROR_AGENT_REPAIR_QUEUE, async (payload, ack, nack) => {
     if (!verifyErrorAgentRepairRequestV1(payload as ErrorAgentRepairRequestV1)) {
       nack();
-      await options.onMessageSettled?.('NACK', null);
+      await notifySettled(options.onMessageSettled, 'NACK', null);
       return;
     }
 
+    let settledStatus: 'ACK' | 'NACK';
     try {
       const execution = await options.execute(payload as ErrorAgentRepairRequestV1);
       if (execution.ok) {
         ack();
-        await options.onMessageSettled?.('ACK', payload as ErrorAgentRepairRequestV1);
+        settledStatus = 'ACK';
       } else {
         nack();
-        await options.onMessageSettled?.('NACK', payload as ErrorAgentRepairRequestV1);
+        settledStatus = 'NACK';
       }
     } catch {
       nack();
-      await options.onMessageSettled?.('NACK', payload as ErrorAgentRepairRequestV1);
+      settledStatus = 'NACK';
     }
+    await notifySettled(options.onMessageSettled, settledStatus, payload as ErrorAgentRepairRequestV1);
   });
 
   return startResult('STARTED', 'WORKER_CONSUMER_REGISTERED');
+}
+
+async function notifySettled(
+  callback: RepairWorkerStartOptionsV1['onMessageSettled'],
+  status: 'ACK' | 'NACK',
+  request: ErrorAgentRepairRequestV1 | null,
+): Promise<void> {
+  try {
+    await callback?.(status, request);
+  } catch (error) {
+    console.error('[ErrorAgentRepairWorker] settlement observer failed:', error);
+  }
 }

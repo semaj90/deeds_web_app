@@ -49,12 +49,12 @@ export function isRetired384SearchResult(result: Pick<SearchResult, 'source' | '
 export function selectLaneNamesForTier(tier: 'hot' | 'warm' | 'cold'): SearchRequest['lanes'] {
   switch (tier) {
     case 'hot':
-      return ['lexical', 'qdrant-768', 'gpu-cuvs', 'bm25'];
+      return ['lexical', 'qdrant-768', 'bm25'];
     case 'cold':
-      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs'];
+      return ['lexical', 'qdrant-768', 'bm25'];
     case 'warm':
     default:
-      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs'];
+      return ['lexical', 'qdrant-768', 'bm25'];
   }
 }
 

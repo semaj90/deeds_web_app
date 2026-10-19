@@ -1,7 +1,7 @@
 # Session 2026-05-29 Deliverables
 
-**Date**: May 29, 2026  
-**Status**: ALL COMPLETE ✅  
+**Date**: May 29, 2026
+**Status**: ALL COMPLETE ✅
 **Next Phase**: Ready to implement TypeScript AST CALLS extractor
 
 ---
@@ -79,7 +79,7 @@
 | **2** | **TypeScript AST CALLS extractor** | **3-4h (NEXT)** |
 | 3 | USES_DB edges | 2-3h |
 | 4 | USES_TOOL edges | 2-3h |
-| 5 | Neo4j sync + indexes | 1-2h |
+| 5 | Neo4j sync + postgresql 18 aio bitmap bin gin btree tsvector turobvec nes lut rpc indexes | 1-2h |
 | 6 | Feature Graph | 3-4h |
 | 7 | Autoencoder 768→64 | 2-3h |
 | 8 | SOM clustering | 1-2h |

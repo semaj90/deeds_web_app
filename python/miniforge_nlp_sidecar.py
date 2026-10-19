@@ -233,6 +233,8 @@ class AstChunkRequest(BaseModel):
     language: str = Field(..., min_length=1, max_length=64)
     file_path: str = Field(..., alias="filePath", min_length=1, max_length=2_000)
     source_revision: str = Field(..., alias="sourceRevision", min_length=1, max_length=256)
+    source_ref: Optional[str] = Field(default=None, alias="sourceRef", max_length=2_000)
+    workspace_revision: Optional[str] = Field(default=None, alias="workspaceRevision", max_length=256)
 
     model_config = {"populate_by_name": True}
 
@@ -267,6 +269,7 @@ class AstEvidenceEdge(BaseModel):
     # enclosing CHUNK's boundary, unchanged, for backward compatibility with existing consumers.
     # Absolute source positions as [1-based line, 0-based UTF-8 byte column].
     occurrence_positions: Optional[list[list[int]]] = None
+    occurrence_byte_spans: Optional[list[list[int]]] = None
 
 
 class AstEvidenceResponse(BaseModel):
@@ -761,6 +764,14 @@ def _runtime_info() -> dict[str, Any]:
 def _module_proof() -> dict[str, Any]:
     langextract_module_path = _module_path(langextract) if LANGEXTRACT_AVAILABLE else None
     langextract_version = getattr(langextract, "__atlas_runtime_version__", None) or _package_version("langextract")
+    requested_langextract_runtime = os.getenv("LANGEXTRACT_RUNTIME", "shim").strip().lower()
+    active_langextract_runtime = (
+        "unavailable"
+        if not LANGEXTRACT_AVAILABLE or langextract is None
+        else "official"
+        if getattr(langextract, "__atlas_runtime_version__", None)
+        else "shim"
+    )
     tree_sitter_pack_version = _package_version("tree-sitter-language-pack", "tree_sitter_language_pack")
     ast_grep_version = _package_version("ast-grep-py", "ast_grep_py")
     treesitter_chunker_version = _package_version("treesitter-chunker", "treesitter_chunker", "tree_sitter_chunker", "chunker")
@@ -768,6 +779,10 @@ def _module_proof() -> dict[str, Any]:
     return {
         "langextract": {
             "available": LANGEXTRACT_AVAILABLE,
+            "requestedRuntime": requested_langextract_runtime,
+            "activeRuntime": active_langextract_runtime,
+            "runtimeMismatch": requested_langextract_runtime not in {"shim", "official"}
+            or active_langextract_runtime != requested_langextract_runtime,
             "version": langextract_version,
             "modulePath": langextract_module_path,
             "importVerified": LANGEXTRACT_AVAILABLE and bool(langextract_module_path),

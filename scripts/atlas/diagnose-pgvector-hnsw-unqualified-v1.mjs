@@ -15,7 +15,14 @@ if (!Number.isInteger(topK) || topK < 1 || topK > 100) {
   throw new Error('PGVECTOR_DIAGNOSTIC_TOP_K must be an integer from 1 to 100');
 }
 
-const outputPath = path.join(REPO_ROOT, 'docs/reports/pgvector-hnsw-unqualified-diagnostic-v1.json');
+const outputPath = path.resolve(
+  REPO_ROOT,
+  process.env.PGVECTOR_DIAGNOSTIC_OUTPUT ?? 'docs/reports/pgvector-hnsw-unqualified-diagnostic-v1.json',
+);
+const reportsRoot = path.resolve(REPO_ROOT, 'docs/reports') + path.sep;
+if (!outputPath.startsWith(reportsRoot)) {
+  throw new Error('PGVECTOR_DIAGNOSTIC_OUTPUT must stay under docs/reports');
+}
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)),
   max: 1,

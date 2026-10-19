@@ -438,8 +438,9 @@
 		tagBackfillRunning = false;
 	}
 
-	// ── Claude-Assist debug panel state ────────────────────────────────────
+	// ── ACE assist debug panel state ────────────────────────────────────────
 	let assistDebugQuery    = $state('');
+	let assistUseLocalModel = $state(true);
 	let assistDebugLoading  = $state(false);
 	let assistDebugResult   = $state<Record<string, unknown> | null>(null);
 	let assistDebugError    = $state<string | null>(null);
@@ -460,6 +461,7 @@
 					compactContext: true,
 					preferCachedResearch: true,
 					debug: true,
+					generateAnswer: assistUseLocalModel,
 				}),
 				signal: AbortSignal.timeout(120_000)
 			});
@@ -2401,9 +2403,9 @@
 <div class="si-grid wide">
 	<section class="panel span2">
 		<div class="panel-hdr">
-			<span class="panel-title"><Icon name="sparkles" class="w-4 h-4" style="color:#a78bfa" /> Claude Assist Debug</span>
+			<span class="panel-title"><Icon name="sparkles" class="w-4 h-4" style="color:#a78bfa" /> ACE Assist Debug</span>
 			<span class="panel-sub">
-				Run a compact claude-assist query with debug=true to inspect latency, cache, budgets, and retrieval counts.
+				Inspect retrieval and ACE context; optionally generate a grounded answer with the configured local llama-server.
 			</span>
 		</div>
 
@@ -2420,6 +2422,10 @@
 				{assistDebugLoading ? 'Running…' : 'Run'}
 			</button>
 		</div>
+		<label class="ad-local-model-toggle">
+			<input type="checkbox" bind:checked={assistUseLocalModel} disabled={assistDebugLoading} />
+			Generate answer with local llama-server (configured endpoint, usually :8090)
+		</label>
 
 		{#if assistDebugError}
 			<div class="ad-error">❌ {assistDebugError}</div>
@@ -2427,6 +2433,19 @@
 
 		{#if assistDebugResult}
 			{@const r = assistDebugResult as Record<string, any>}
+			{#if r.generation}
+				<section class="ad-details ad-answer">
+					<strong>{r.generation.ok ? 'Local model answer' : 'Local model unavailable'}</strong>
+					{#if r.generation.backend}
+						<span class="ad-label">{r.generation.model} · {r.generation.backend} · {r.generation.latencyMs}ms</span>
+					{/if}
+					{#if r.generation.answer}
+						<p>{r.generation.answer}</p>
+					{:else if r.generation.error}
+						<p class="ad-error">{r.generation.error}</p>
+					{/if}
+				</section>
+			{/if}
 			<div class="ad-cards">
 				<div class="ad-card">
 					<span class="ad-label">Latency</span>
@@ -4065,6 +4084,9 @@ h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; color: #f0e8
 }
 .ad-btn:hover:not(:disabled) { background: #a78bfa28; }
 .ad-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.ad-local-model-toggle { display: flex; align-items: center; gap: 0.45rem; margin: 0 0 0.75rem; color: #a39f90; font-size: 0.72rem; }
+.ad-answer { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.75rem; border: 1px solid #a78bfa33; border-radius: 6px; color: #e5e7eb; }
+.ad-answer p { margin: 0; white-space: pre-wrap; font-size: 0.8rem; line-height: 1.55; }
 .ad-error {
 	font-size: 0.72rem; color: #f87171; padding: 0.4rem 0.6rem;
 	background: #f871710d; border: 1px solid #f8717122; border-radius: 5px;

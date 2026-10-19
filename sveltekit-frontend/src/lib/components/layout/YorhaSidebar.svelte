@@ -2,8 +2,22 @@
 	import { page } from '$app/state';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 
 	let collapsed = $state(false);
+	let narrowViewport = $state(false);
+	let mobileExpanded = $state(false);
+	let visibleCollapsed = $derived(narrowViewport ? !mobileExpanded : collapsed);
+	onMount(() => {
+		const viewport = window.matchMedia('(max-width: 768px)');
+		const updateViewport = () => {
+			narrowViewport = viewport.matches;
+			mobileExpanded = false;
+		};
+		updateViewport();
+		viewport.addEventListener('change', updateViewport);
+		return () => viewport.removeEventListener('change', updateViewport);
+	});
 	let userToggledManually = $state(false);
 	let currentTime = $state(new Date().toLocaleString());
 
@@ -74,7 +88,7 @@
 		{ label: 'GPU GRAPH', icon: 'share-2', href: '/admin/gpu-evidence-graph' },
 		{ label: 'ERROR BRAIN', icon: 'bug', href: '/admin/error-brain' },
 		{ label: 'AGENTIC ERRORS', icon: 'bot', href: '/agentic-errors' },
-		{ label: 'CODEBASE INDEX', icon: 'database', href: '/codebase-index' },
+		{ label: 'CODEBASE INDEX', icon: 'database', href: '/admin/codebase-index' },
 	];
 
 	function isActive(href: string): boolean {
@@ -89,7 +103,7 @@
 	});
 </script>
 
-<aside class="yorha-sidebar" class:collapsed>
+<aside class="yorha-sidebar" class:collapsed={visibleCollapsed}>
 	<!-- Header -->
 	<div class="sidebar-header">
 		<div class="branding">
@@ -98,10 +112,13 @@
 		</div>
 		<button
 			class="collapse-btn"
-			onclick={() => { collapsed = !collapsed; userToggledManually = true; }}
-			title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+			onclick={() => {
+				if (narrowViewport) mobileExpanded = !mobileExpanded;
+				else { collapsed = !collapsed; userToggledManually = true; }
+			}}
+			title={visibleCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
 		>
-			<Icon name={collapsed ? 'yorha-panel-open' : 'yorha-panel-close'} size={16} />
+			<Icon name={visibleCollapsed ? 'yorha-panel-open' : 'yorha-panel-close'} size={16} />
 		</button>
 	</div>
 
@@ -113,11 +130,11 @@
 				href={item.href}
 				class="nav-item"
 				class:active={isActive(item.href)}
-				aria-label={collapsed ? item.label : undefined}
-				title={collapsed ? item.label : undefined}
+				aria-label={visibleCollapsed ? item.label : undefined}
+				title={visibleCollapsed ? item.label : undefined}
 			>
 				<Icon name={item.icon} size={14} />
-				{#if !collapsed}
+				{#if !visibleCollapsed}
 					<span class="nav-label">{item.label}</span>
 				{/if}
 			</a>
@@ -128,7 +145,7 @@
 
 		<!-- Admin Section -->
 		<div class="section-divider">
-			{#if !collapsed}
+			{#if !visibleCollapsed}
 				<span class="section-label">SYSTEM</span>
 			{/if}
 		</div>
@@ -138,11 +155,11 @@
 				href={item.href}
 				class="nav-item admin-item"
 				class:active={isActive(item.href)}
-				aria-label={collapsed ? item.label : undefined}
-				title={collapsed ? item.label : undefined}
+				aria-label={visibleCollapsed ? item.label : undefined}
+				title={visibleCollapsed ? item.label : undefined}
 			>
 				<Icon name={item.icon} size={14} />
-				{#if !collapsed}
+				{#if !visibleCollapsed}
 					<span class="nav-label">{item.label}</span>
 				{/if}
 			</a>
@@ -150,7 +167,7 @@
 	</nav>
 
 	<!-- Footer Status -->
-	{#if !collapsed}
+	{#if !visibleCollapsed}
 		<div class="sidebar-footer">
 			<div class="status-indicator">
 				<span class="status-dot online"></span>

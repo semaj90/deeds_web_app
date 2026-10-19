@@ -1,7 +1,6 @@
 import {
 	CLIENT_EMBEDDING_MODEL,
 	CLIENT_E2B_MODEL_ID,
-	CLIENT_LLM_MODEL,
 	LITERT_E4B_MODEL_ID,
 	LITERT_E2B_MODEL_ID,
 	SERVER_CHAT_MODEL,
@@ -97,13 +96,6 @@ export const MODEL_REGISTRY = {
 		enabled: true,
 		notes: 'Larger opt-in client helper; still not the default reasoning lane.',
 	},
-	client_gemma3_helper: {
-		key: CLIENT_LLM_MODEL,
-		role: 'client-helper',
-		backend: 'onnx',
-		enabled: true,
-		notes: 'Legacy ONNX helper fallback for simple browser/local UI tasks.',
-	},
 } satisfies Record<string, ModelRegistryEntry>;
 
 export function getModelRegistryEntry(key: string): ModelRegistryEntry | null {
@@ -127,7 +119,7 @@ export function getReasoningModelId(kind: 'legal' | 'general' = 'legal'): string
 }
 
 export function getClientHelperModelId(): string {
-	return CLIENT_LLM_MODEL;
+	return getModelsByRole('client-helper')[0]?.key ?? CLIENT_E2B_MODEL_ID;
 }
 
 /**

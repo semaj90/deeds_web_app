@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { env as publicEnv } from '$env/dynamic/public';
 	import * as Bits from 'bits-ui';
+	import { onMount } from 'svelte';
 	import type {
 		AtlasNode,
 		AtlasEdge,
@@ -544,10 +544,14 @@
 	}
 
 	// ── TurboVec Panel ───────────────────────────────────────────────────────
-	type TurboVecHealth = { ok: boolean; indexed: number; dim: number; bits: number; backend: string } | null;
+	type TurboVecHealth = {
+		ok: boolean; indexed: number; dim: number; bits: number; backend: string | null;
+		source: string | null; collection: string | null; representationId: string | null; role: string | null;
+	} | null;
 	type TurboVecClusterResult = { clusterIds: number[]; centroidScores: Record<string, number>; backend: string; qdrantFilter: unknown };
 	let tvHealth = $state<TurboVecHealth>(null);
 	let tvLoading = $state(false);
+	let tvHealthError = $state<string | null>(null);
 	let tvQuery = $state('');
 	let tvResult = $state<TurboVecClusterResult | null>(null);
 	let tvResultLoading = $state(false);
@@ -555,9 +559,14 @@
 	async function loadTurboVec() {
 		tvLoading = true;
 		try {
-			const r = await fetch(`${publicEnv.PUBLIC_TURBOVEC_URL ?? 'http://localhost:8099'}/health`);
-			tvHealth = r.ok ? await r.json() : null;
-		} catch { tvHealth = null; } finally { tvLoading = false; }
+			const r = await fetch('/api/admin/atlas/turbovec-prefilter');
+			const body = await r.json() as { health: TurboVecHealth; error: string | null };
+			tvHealth = r.ok ? body.health : null;
+			tvHealthError = body.error;
+		} catch {
+			tvHealth = null;
+			tvHealthError = 'TURBOVEC_HEALTH_REQUEST_FAILED';
+		} finally { tvLoading = false; }
 	}
 
 	async function runTvPrefilter() {
@@ -680,6 +689,8 @@
 	// ── Active Tab ────────────────────────────────────────────────────────────
 	type Tab = 'graph' | 'chunks' | 'trace' | 'cache' | 'turbovec' | 'couchdb' | 'hyperrag' | 'search';
 	let activeTab = $state<Tab>('graph');
+	let tabsReady = $state(false);
+	onMount(() => { tabsReady = true; });
 
 	// ── Helpers ───────────────────────────────────────────────────────────────
 	function serviceStatus(svc: { ok: boolean; latencyMs: number } | undefined) {
@@ -1516,6 +1527,7 @@
 				<div class="flex items-center gap-1.5">
 					{#each (['graph', 'chunks', 'trace', 'cache', 'turbovec', 'couchdb', 'hyperrag', 'search'] as Tab[]) as tab (tab)}
 						<button
+							disabled={!tabsReady}
 							onclick={() => { activeTab = tab; if (tab === 'cache' && !cacheView) loadCache(); if (tab === 'turbovec' && !tvHealth) loadTurboVec(); if (tab === 'couchdb' && !couchDbStatus) loadCouchDb(); if (tab === 'hyperrag' && !hyperResult) runHyperRAG(); }}
 							class={`px-3 py-1 text-xs uppercase tracking-wider font-bold transition-all ${activeTab === tab ? 'bg-[#8b9dbb] text-[#1c1b18]' : 'text-[#a39f90] hover:text-[#efede4] hover:bg-[#313028]'} ${tab === 'hyperrag' ? 'border border-[#4a5568]' : ''} ${tab === 'hyperrag' && hyperRunning ? 'animate-pulse' : ''}`}
 						>
@@ -1523,6 +1535,7 @@
 						</button>
 					{/each}
 				</div>
+				<a href="/admin/atlas/task-sources" class="border border-[#5c594c] px-2 py-1 text-[0.62rem] font-bold uppercase tracking-wider text-[#a39f90] hover:border-[#8b9dbb] hover:text-[#efede4]">Task source index</a>
 				{#if activeTab === 'graph' && nodes.length > 0}
 					<div class="flex items-center gap-3 text-xs">
 						<span class="text-[#a39f90] font-bold">{nodes.length} NODES · {edges.length} EDGES</span>
@@ -1884,9 +1897,9 @@
 
 			<!-- ── TurboVec Tab ──────────────────────────────────────────────────── -->
 			{#if activeTab === 'turbovec'}
-				<div class="flex-1 overflow-y-auto p-4 space-y-4">
+				<section aria-label="TurboVec sidecar health" class="flex-1 overflow-y-auto p-4 space-y-4">
 					<div class="flex items-center justify-between border-b border-[#3f3e37] pb-2 gap-3">
-						<div class="text-xs font-bold text-[#d1cdb8] uppercase tracking-wider">// TurboVec ANN Sidecar :8099</div>
+						<div class="text-xs font-bold text-[#d1cdb8] uppercase tracking-wider">// TurboVec ANN Sidecar</div>
 						<button onclick={loadTurboVec} disabled={tvLoading} class="px-2.5 py-1 border border-[#5c594c] bg-[#1c1b18] hover:bg-[#d1cdb8] hover:text-[#1c1b18] text-xs font-bold transition-all disabled:opacity-40">
 							{tvLoading ? 'PROBING…' : 'REFRESH_HEALTH'}
 						</button>
@@ -1907,13 +1920,21 @@
 							</div>
 							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
 								<div class="text-[#a39f90] font-bold uppercase">BACKEND</div>
-								<div class="mt-1 font-bold text-[#d1cdb8] uppercase">{tvHealth.backend}</div>
+								<div class="mt-1 font-bold text-[#d1cdb8] uppercase">{tvHealth.backend ?? 'UNREPORTED'}</div>
 							</div>
 						</div>
+						<dl class="space-y-2 border border-[#3f3e37] bg-[#23221c] px-3 py-2 text-xs">
+							<div><dt class="text-[#a39f90] uppercase">SOURCE</dt><dd>{tvHealth.source ?? 'UNREPORTED'}</dd></div>
+							<div><dt class="text-[#a39f90] uppercase">COLLECTION</dt><dd class="break-all">{tvHealth.collection ?? 'UNREPORTED'}</dd></div>
+							<div><dt class="text-[#a39f90] uppercase">REPRESENTATION</dt><dd class="break-all">{tvHealth.representationId ?? 'UNREPORTED'}</dd></div>
+							<div><dt class="text-[#a39f90] uppercase">ROLE</dt><dd>{tvHealth.role ?? 'UNREPORTED'}</dd></div>
+						</dl>
+						<p class="text-xs text-[#a39f90]">Health reports service availability. Retrieval qualification requires separate identity and recall evidence.</p>
 					{:else if !tvLoading}
 						<div class="text-center py-6 text-[#c25953] border border-[#c25953]/25 bg-[#c25953]/5 p-4">
 							<div class="font-bold uppercase">SIDECAR_OFFLINE</div>
-							<p class="text-xs mt-1">TurboVec not reachable at localhost:8099</p>
+							<p class="text-xs mt-1">The configured sidecar did not return valid health data.</p>
+							{#if tvHealthError}<p class="text-xs mt-1">{tvHealthError}</p>{/if}
 						</div>
 					{/if}
 					<div class="space-y-2 pt-2 border-t border-[#3f3e37]">
@@ -1964,7 +1985,7 @@
 							</div>
 						</div>
 					{/if}
-				</div>
+				</section>
 			{/if}
 
 			<!-- ── CouchDB Writer Tab ──────────────────────────────────────────────── -->

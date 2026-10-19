@@ -70,18 +70,6 @@ async function main() {
       throw new Error('GRAPHIFY_SNAPSHOT_MATERIALIZED_ROOT_REQUIRES_SNAPSHOT_NATIVE_COORDINATOR');
     }
 
-    const opened = await openGraphifyRunV1({
-      client: wrappedClient,
-      workspaceId: CANONICAL_WORKSPACE_ID,
-      repositoryRevision,
-      parserContractVersion: PARSER_CONTRACT_VERSION,
-      extractionContractVersion: EXTRACTION_CONTRACT_VERSION,
-      dryRun: false,
-      configuration: { wrapper: 'scripts/startup/run-graphify-daily-startup.mjs' },
-    });
-    console.log(JSON.stringify({ step: 'opened', runId: opened.runId, workspaceId: opened.workspaceId, repositoryRevision: opened.repositoryRevision }));
-
-    const openedAt = new Date().toISOString();
     const materialized = materializeWorkspaceRevisionOriginV1({
       workspaceRoot: sourceSnapshotRoot ?? ROOT,
       repositoryId: CANONICAL_REPOSITORY_ID,
@@ -98,6 +86,19 @@ async function main() {
       skippedCount: materialized.skipped.length,
       dirty: materialized.record.dirty,
     }));
+
+    const opened = await openGraphifyRunV1({
+      client: wrappedClient,
+      workspaceId: CANONICAL_WORKSPACE_ID,
+      repositoryRevision,
+      parserContractVersion: PARSER_CONTRACT_VERSION,
+      extractionContractVersion: EXTRACTION_CONTRACT_VERSION,
+      dryRun: false,
+      configuration: { wrapper: 'scripts/startup/run-graphify-daily-startup.mjs' },
+    });
+    console.log(JSON.stringify({ step: 'opened', runId: opened.runId, workspaceId: opened.workspaceId, repositoryRevision: opened.repositoryRevision }));
+
+    const openedAt = new Date().toISOString();
 
     const bound = await bindWorkspaceRevisionV1({
       client: wrappedClient,

@@ -73,6 +73,7 @@ export interface InferenceRequest {
   temperature?: number;
   systemPrompt?: string;
   preferTensorrt?: boolean;
+  backendPreference?: 'llama-server';
   stream?: boolean;
   /** Base64-encoded image for VLM analysis (TurboQuant with --mmproj, HF VLM, or llama-server) */
   imageBase64?: string;
@@ -143,6 +144,18 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
       error:
         'No VLM backend available — TurboQuant (mmproj), HF server (:8085), and llama-server VLM all failed',
     };
+  }
+
+  if (request.backendPreference === 'llama-server') {
+    const localResult = await llamaServerInference(request, start);
+    localResult.latencyMs = Math.round(performance.now() - start);
+    logLLMInference({
+      model: localResult.model,
+      backend: 'llama-server',
+      latencyMs: localResult.latencyMs,
+      tokenCount: localResult.usage?.total_tokens,
+    });
+    return localResult;
   }
 
   // Try TensorRT first if preferred and available

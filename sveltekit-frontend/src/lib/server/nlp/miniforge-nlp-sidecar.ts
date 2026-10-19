@@ -99,6 +99,7 @@ export interface AtlasStructuralEvidenceEdge {
   resolved: boolean;
   resolution?: string | null;
   occurrence_positions?: Array<[line1Based: number, utf8ByteColumn0Based: number]> | null;
+  occurrence_byte_spans?: Array<[startByte: number, endByte: number]> | null;
 }
 
 function parseOccurrencePositions(value: unknown): Array<[number, number]> | null {
@@ -111,6 +112,27 @@ function parseOccurrencePositions(value: unknown): Array<[number, number]> | nul
       throw new Error('[miniforge-nlp] ast/chunk returned invalid occurrence_positions');
     }
     return [position[0] as number, position[1] as number];
+  });
+}
+
+function parseOccurrenceByteSpans(value: unknown, source: string): Array<[number, number]> | null {
+  if (value == null) return null;
+  if (!Array.isArray(value)) throw new Error('[miniforge-nlp] ast/chunk returned invalid occurrence_byte_spans');
+  const sourceBytes = new TextEncoder().encode(source);
+  const decoder = new TextDecoder('utf-8', { fatal: true });
+  return value.map((span) => {
+    if (!Array.isArray(span) || span.length !== 2
+      || !Number.isInteger(span[0]) || span[0] < 0
+      || !Number.isInteger(span[1]) || span[1] <= span[0]
+      || span[1] > sourceBytes.length) {
+      throw new Error('[miniforge-nlp] ast/chunk returned invalid occurrence_byte_spans');
+    }
+    try {
+      decoder.decode(sourceBytes.subarray(span[0], span[1]));
+    } catch {
+      throw new Error('[miniforge-nlp] ast/chunk returned non-UTF-8-aligned occurrence_byte_spans');
+    }
+    return [span[0] as number, span[1] as number];
   });
 }
 
@@ -725,6 +747,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           resolved: Boolean(edge.resolved),
           resolution: edge.resolution ?? null,
           occurrence_positions: parseOccurrencePositions(edge.occurrence_positions),
+          occurrence_byte_spans: parseOccurrenceByteSpans(edge.occurrence_byte_spans, req.source),
         })) : [],
         diagnostics: Array.isArray(raw.diagnostics) ? raw.diagnostics.map(String) : [],
         error_tag: raw.error_tag === 'ChunkingError' || raw.error_tag === 'UnsupportedLanguageError' ? raw.error_tag : null,

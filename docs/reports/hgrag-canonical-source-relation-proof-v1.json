@@ -1,0 +1,90 @@
+{
+  "receiptSchema": "atlas.hgrag-canonical-source-relation-proof.v1",
+  "generatedAt": "2026-10-19T09:32:48Z",
+  "taskId": "HGRAG-RELATION-01",
+  "taskSource": {
+    "taskId": "HGRAG-RELATION-01",
+    "title": "Canonical Source Relation Proof & Graph Parity Qualification",
+    "board": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "changeId": "parent-atlas-ace-rlm-bitfrost-integration",
+    "status": "IN_PROGRESS"
+  },
+  "astSourceInspection": {
+    "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+    "sourceRevision": "rev_94ccacba006a3752",
+    "sourceHash": "94ccacba006a3752168e81798c82da20bc4eb2cada1e4393f8fa42b543b179ee",
+    "fileBytes": 15807,
+    "sidecarUrl": "http://127.0.0.1:8095",
+    "chunksCount": 66,
+    "edgesCount": 444,
+    "callsEdgesCount": 178,
+    "extractionDurationMs": 1195.94
+  },
+  "canonicalCallsRelation": {
+    "schema": "atlas.calls-fact.v1",
+    "callerSymbolVersionId": "sym:f37f0df5f987954feaccb3e4d3107874",
+    "callerSymbolName": "import",
+    "calleeExpression": "String",
+    "calleeSymbolVersionId": "sym:expr:2585009ae440ec899098b8069b834835",
+    "relation": "CALLS",
+    "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+    "sourceRevision": "rev_94ccacba006a3752",
+    "lineSnippet": "const searchCodebase: Gemma4Tool = {",
+    "resolution": "EXACT"
+  },
+  "graphParityLadder": {
+    "totalNodes": 646,
+    "totalEdges": 1104,
+    "rung1_networkx_cpu": {
+      "engine": "networkx.pagerank",
+      "device": "cpu",
+      "durationMs": 1275.04,
+      "top5": [
+        {
+          "node": "ACEContext",
+          "score": 0.0059095040711340825
+        },
+        {
+          "node": "String",
+          "score": 0.0058507689585746295
+        },
+        {
+          "node": "item",
+          "score": 0.005115764878528114
+        },
+        {
+          "node": "ErrorSummary",
+          "score": 0.004988515596719816
+        },
+        {
+          "node": "CANONICAL_SOURCE_COLLECTION",
+          "score": 0.004817758354428488
+        }
+      ]
+    },
+    "rung2_pytorch_cpu": {
+      "engine": "torch.matmul_power_iteration",
+      "device": "cpu",
+      "durationMs": 122.64,
+      "maxAbsoluteDiffVsRung1": 6.938893903907228e-18,
+      "pearsonCorrelationVsRung1": 1.0
+    },
+    "rung3_pytorch_cuda_gpu": {
+      "engine": "torch.matmul_power_iteration",
+      "device": "cuda",
+      "durationMs": 1707.08,
+      "maxAbsoluteDiffVsRung1": 6.938893903907228e-18,
+      "pearsonCorrelationVsRung1": 1.0,
+      "peakVramMb": 11.33,
+      "vramSafeBudgetMb": 200.0,
+      "vramBudgetCompliant": true
+    },
+    "parityVerdict": "VERIFIED_PASS"
+  },
+  "authorityBoundary": {
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "promotable": false,
+    "note": "Read-only qualification proof. Zero writes to PostgreSQL, Qdrant, or Valkey."
+  }
+}

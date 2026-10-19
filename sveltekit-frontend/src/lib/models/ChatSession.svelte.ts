@@ -1,10 +1,10 @@
 /**
  * Phase 76: ChatSession Reactive Class (Svelte 5 Runes)
  * Real SSE streaming via /api/sse/chat with reconnection logic.
- * Client router: lightweight queries → local ONNX, legal/RAG → server Ollama.
+ * Client router: eligible local E2B requests or the configured server model.
  */
 import { shouldEscalateToServer, fetchCapabilities, type RouterDecision } from '$lib/ai/client-router.js';
-import { SERVER_CHAT_MODEL, CLIENT_LLM_ONNX_PATH, CLIENT_LLM_TOKENIZER_PATH } from '$lib/ai/model-ids.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import type { InferenceSource } from '$lib/ai/model-ids.js';
 import { clientCache } from '$lib/ai/client-cache.js';
 import { updateTextEmotion, getEmotionSystemPrompt, getEmotionState } from '$lib/ai/emotion-context.js';
@@ -103,12 +103,6 @@ export interface SSEChunk {
   hyperedgeHash?: string;
 }
 
-type OnnxGenerationOutput = {
-  content: string;
-  provider: string;
-  tokensGenerated: number;
-};
-
 type AttachmentIngestResult = {
   jobId?: string;
   attachmentSourceHash?: string;
@@ -177,18 +171,6 @@ function logDebugSseChunk(chatId: string, chunk: SSEChunk): void {
   );
 }
 
-function normalizeTokenIds(value: unknown): number[] {
-  if (Array.isArray(value)) {
-    return value.filter((token): token is number => Number.isInteger(token));
-  }
-
-  if (typeof value === 'number' && Number.isInteger(value)) {
-    return [value];
-  }
-
-  return [];
-}
-
 function normalizeAttachmentPreview(value: string | undefined, maxLength = 320): string {
   if (!value) return '';
   const normalized = value
@@ -197,112 +179,6 @@ function normalizeAttachmentPreview(value: string | undefined, maxLength = 320):
     .trim();
   if (normalized.length <= maxLength) return normalized;
   return normalized.slice(0, maxLength) + '...';
-}
-
-async function generateLocalOnnxReply(message: string): Promise<OnnxGenerationOutput> {
-  const { getOnnxSession, getProviderLabel } = await import('$lib/ai/onnx/session.js');
-  const { AutoTokenizer } = await import('@huggingface/transformers');
-  const { Tensor } = await import('onnxruntime-web');
-
-  const [session, tokenizer] = await Promise.all([
-    getOnnxSession(CLIENT_LLM_ONNX_PATH),
-    AutoTokenizer.from_pretrained(CLIENT_LLM_TOKENIZER_PATH.replace('/tokenizer.json', ''), {
-      local_files_only: true,
-    }),
-  ]);
-
-  const prompt = [
-    'You are a concise legal AI assistant.',
-    'Answer the user directly. If the request needs documents or case context, say so briefly.',
-    `User: ${message}`,
-    'Assistant:',
-  ].join('\n');
-
-  const encoded = await tokenizer(prompt, {
-    truncation: true,
-    max_length: 384,
-  });
-
-  const initialInputIds = Array.from(encoded.input_ids ?? []);
-  if (initialInputIds.length === 0) {
-    throw new Error('Tokenizer produced no input ids');
-  }
-
-  const currentTokens = [...initialInputIds];
-  const generatedTokens: number[] = [];
-  const eosTokenIds = new Set([
-    ...normalizeTokenIds((tokenizer as any).eos_token_id),
-    ...normalizeTokenIds((tokenizer as any).eos_token_ids),
-    ...normalizeTokenIds((tokenizer as any).model?.eos_token_id),
-  ]);
-
-  const maxGeneratedTokens = 64;
-  const maxContextTokens = 512;
-
-  for (let step = 0; step < maxGeneratedTokens; step++) {
-    const trimmedTokens = currentTokens.slice(-maxContextTokens);
-    const inputIds = new Tensor('int32', Int32Array.from(trimmedTokens), [1, trimmedTokens.length]);
-    const attentionMask = new Tensor('int32', new Int32Array(trimmedTokens.length).fill(1), [
-      1,
-      trimmedTokens.length,
-    ]);
-
-    const results = await session.run({
-      input_ids: inputIds,
-      attention_mask: attentionMask,
-    });
-
-    const outputTensor = (results.logits ?? results[Object.keys(results)[0]]) as {
-      data?: ArrayLike<number>;
-      dims?: number[];
-    };
-
-    const logits = outputTensor?.data;
-    if (!logits) {
-      throw new Error('No logits output from ONNX model');
-    }
-
-    const vocabSize =
-      outputTensor?.dims?.[outputTensor.dims.length - 1] ??
-      Math.floor(logits.length / trimmedTokens.length);
-    if (!Number.isFinite(vocabSize) || vocabSize <= 0) {
-      throw new Error('Unable to infer ONNX vocab size');
-    }
-
-    const lastRowOffset = (trimmedTokens.length - 1) * vocabSize;
-    let bestToken = -1;
-    let bestScore = -Infinity;
-
-    for (let tokenIndex = 0; tokenIndex < vocabSize; tokenIndex++) {
-      const score = Number(logits[lastRowOffset + tokenIndex] ?? -Infinity);
-      if (score > bestScore) {
-        bestScore = score;
-        bestToken = tokenIndex;
-      }
-    }
-
-    if (bestToken < 0) {
-      throw new Error('ONNX decode step produced no next token');
-    }
-
-    if (eosTokenIds.has(bestToken)) {
-      break;
-    }
-
-    generatedTokens.push(bestToken);
-    currentTokens.push(bestToken);
-  }
-
-  const content = tokenizer.decode(generatedTokens, { skip_special_tokens: true }).trim();
-  if (!content) {
-    throw new Error('Local ONNX generated an empty response');
-  }
-
-  return {
-    content,
-    provider: getProviderLabel(CLIENT_LLM_ONNX_PATH),
-    tokensGenerated: generatedTokens.length,
-  };
 }
 
 export class ChatSession {
@@ -521,9 +397,8 @@ export class ChatSession {
   }
 
   /**
-   * Send a message — routes through client router to decide local vs server.
-   * Local ONNX path: TODO — wire onnxruntime-web InferenceSession here.
-   * Server path: SSE stream via /api/sse/chat (existing, fully wired).
+   * Send a message through the client policy router and configured inference paths.
+   * Server responses stream through /api/sse/chat.
    */
   async sendMessage(content?: string, options?: SendMessageOptions) {
     if (content) {
@@ -628,7 +503,7 @@ export class ChatSession {
   /**
    * E2B inference via Gemma 4 E2B 2.3B (Transformers.js + WebGPU).
    * Primary client-side path when E2B model is loaded.
-   * Falls back to 270M ONNX on failure.
+   * Falls back to the configured server model on failure.
    */
   private async _handleE2BInference(message: string, decision: RouterDecision) {
     const t0 = performance.now();
@@ -637,8 +512,8 @@ export class ChatSession {
 
     // Step 0: Bifrost L2 semantic cache fast-path. The unified-generation cascade
     // checks Bifrost (vector similarity) BEFORE running local inference — a hit
-    // returns in 2-5s without touching E2B/ONNX/server. Only attempt for short
-    // queries; long-context messages bypass this and go straight to local infra.
+    // returns in 2-5s without running local E2B or server inference. Only attempt
+    // for short queries; long-context messages bypass this fast path.
     if (message.length > 0 && message.length < 1000) {
       try {
         const bifrost = await unifiedGenerate({
@@ -666,7 +541,7 @@ export class ChatSession {
       } catch { /* non-fatal — fall through to local cascade */ }
     }
 
-    // Check synthesis cache first (shared with ONNX path)
+    // Check synthesis cache first.
     const cached = await clientCache.getReply(message);
     if (cached) {
       console.info('[ChatRouter] Cache hit (IndexedDB)', { source: cached.source });
@@ -739,104 +614,26 @@ export class ChatSession {
       };
       console.info(`[ChatRouter] E2B response: ${result.tokensGenerated} tokens in ${result.durationMs}ms (${result.tokPerSec} tok/s)`);
     } catch (err: any) {
-      // E2B failed → fall back to 270M ONNX
-      console.warn('[ChatRouter] E2B failed, falling back to ONNX:', err.message);
-      await this._handleLocalInference(message, {
+      console.warn('[ChatRouter] E2B failed, falling back to the configured server model:', err.message);
+      await this._handleServerInference(message, {
         ...decision,
-        source: 'local-onnx',
+        source: 'server-ollama',
         reason: `e2b-fallback(${decision.reason}): ${err.message}`,
       });
     }
   }
 
-  /**
-   * Local ONNX inference via onnxruntime-web + WebGPU (Dawn).
-   *
-   * Flow:
-   *   1. Check IndexedDB cache → return cached reply if hit
-   *   2. Load model + tokenizer via getOnnxSession()
-   *   3. Tokenize → run InferenceSession → greedy decode
-   *   4. Cache result in IndexedDB (persistent)
-   *   5. If ONNX fails → auto-escalate to server
-   */
   private async _handleLocalInference(message: string, decision: RouterDecision) {
-    const t0 = performance.now();
-    this.status = 'thinking';
-    this.error = null;
-
-    // Check IndexedDB cache first
-    const cached = await clientCache.getReply(message);
-    if (cached) {
-      console.info('[ChatRouter] Cache hit (IndexedDB)', { source: cached.source });
-      this.messages.push({
-        role: 'assistant',
-        content: cached.content,
-        timestamp: new Date().toISOString(),
-        source: 'local-onnx',
-        metadata: { routerDecision: decision },
-      });
-      clientCache.saveChatMessage(this._chatId, 'assistant', cached.content, {
-        source: 'local-onnx',
-        routerDecision: decision,
-      });
-      this.status = 'idle';
-      this.lastSource = 'local-onnx';
-      this.debugInfo = {
-        ...this.debugInfo,
-        cacheHit: 'idb',
-        latencyMs: Math.round(performance.now() - t0),
-        provider: 'cache',
-      };
-      return;
-    }
-
-    try {
-      this.status = 'streaming';
-      const { content, provider, tokensGenerated } = await generateLocalOnnxReply(message);
-
-      // Add assistant message
-      this.messages.push({
-        role: 'assistant',
-        content,
-        timestamp: new Date().toISOString(),
-        source: 'local-onnx',
-        metadata: { routerDecision: decision },
-      });
-
-      // Cache in IndexedDB (reply cache + chat history)
-      await clientCache.putReply(message, content, 'local-onnx');
-      clientCache.saveChatMessage(this._chatId, 'assistant', content, {
-        source: 'local-onnx',
-        routerDecision: decision,
-      });
-
-      this.status = 'idle';
-      this.lastSource = 'local-onnx';
-      this.lastConfidence = decision.confidence;
-      this.debugInfo = {
-        ...this.debugInfo,
-        cacheHit: 'none',
-        latencyMs: Math.round(performance.now() - t0),
-        provider,
-      };
-      console.info(`[ChatRouter] Local ONNX response via ${provider}`, {
-        tokens: tokensGenerated,
-        reason: decision.reason,
-      });
-    } catch (err: any) {
-      // ONNX failed → auto-escalate to server
-      console.warn('[ChatRouter] Local ONNX failed, escalating to server:', err.message);
-      await this._handleServerInference(message, {
-        ...decision,
-        source: 'server-ollama',
-        reason: `local-fallback(${decision.reason}): ${err.message}`,
-      });
-    }
+    await this._handleServerInference(message, {
+      ...decision,
+      source: 'server-ollama',
+      reason: `legacy-local-route-disabled(${decision.reason})`,
+    });
   }
 
   /**
    * Retrieval-hybrid inference: client embeds query → server RAG search with
-   * precomputed embedding → GPU rerank chunks → local ONNX generation.
+   * precomputed embedding → GPU rerank chunks → E2B or configured server generation.
    * Falls back to server on any failure.
    */
   private async _handleRetrievalInference(message: string, decision: RouterDecision) {
@@ -950,11 +747,11 @@ export class ChatSession {
         `[ChatRouter] Retrieval-hybrid: ${topChunks.length} chunks (confidence=${retrievalConfidence.toFixed(2)}), attempting local synthesis`
       );
 
-      // Step 5: Try synthesis cache first (RAG-context-aware), then E2B/ONNX
+      // Step 5: Try synthesis cache first (RAG-context-aware), then E2B.
       try {
         const synthResult = await synthesize(message, ragContext);
 
-        if (synthResult.cached || (synthResult.text && synthResult.source !== 'local-onnx')) {
+        if (synthResult.cached || synthResult.text) {
           // Cache hit or successful E2B generation — check quality
           if (synthResult.text) {
             const quality = evaluateSynthesisQuality(synthResult.text, message);
@@ -994,12 +791,12 @@ export class ChatSession {
           }
         }
 
-        // Synthesis returned empty (E2B not ready, no cache) → fall through to ONNX
+        // Synthesis returned empty (E2B not ready, no cache); use the server model.
         const augmentedMessage = `Based on these legal documents:\n${ragContext}\n\nAnswer this question concisely: ${message}`;
         await this._handleLocalInference(augmentedMessage, {
           ...decision,
           source: 'retrieval-hybrid',
-          reason: `retrieval(${topChunks.length}-chunks)+local-onnx`,
+          reason: `retrieval(${topChunks.length}-chunks)+configured-server`,
         });
 
         // Verify answer quality via quality schema — escalate if insufficient

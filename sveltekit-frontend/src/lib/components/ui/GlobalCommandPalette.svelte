@@ -63,7 +63,7 @@
 		3: [
 			{ label: 'Global Search', desc: 'Search across all data sources', icon: 'scan-search', href: '/global-search' },
 			{ label: 'Legal Corpus Search', desc: 'Search statutes and law', icon: 'book-open', href: '/legal-corpus' },
-			{ label: 'Codebase Index', desc: 'Search the codebase', icon: 'database', href: '/codebase-index' },
+			{ label: 'Codebase Index', desc: 'Search the codebase', icon: 'database', href: '/admin/codebase-index' },
 			{ label: 'Analysis Center', desc: 'Advanced search and analysis', icon: 'search', href: '/analysis-center' },
 		],
 		4: [

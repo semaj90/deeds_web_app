@@ -98,8 +98,13 @@ export const AceContextPacketV1Schema = z
 export type AceContextPacketV1 = z.infer<typeof AceContextPacketV1Schema>;
 
 /**
- * ACE/Atlas Context Editor Gate: Compiles sanitized ranked candidates into a canonical ACE JSON packet.
- * Injected to Redis (`ace:packet:{runId}`) for the current session.
+ * Pure packet synthesis: builds an ACE context packet descriptor and its proposed Redis key
+ * (`ace:packet:{runId}`) from qualified inputs.
+ *
+ * - Performs no I/O: it opens no Redis connection, writes nothing, and asserts no storage success.
+ * - `redisKey` is a cache locator, not the packet's identity. Identity stays with the packet fabric
+ *   (`sourceRef`, `packetChecksum`); a Redis write must never change canonicality (`canonicalAuthority` is false).
+ * - Persistence and injection belong to a separate adapter, which must emit its own write/read-back receipt.
  */
 export function buildAceContextPacketV1(input: {
   runId: string;
@@ -136,6 +141,25 @@ export function buildAceContextPacketV1(input: {
   });
 }
 
+export const HermesStageToolEventV1Schema = z
+  .object({
+    toolEventId: z.string().min(1),
+    stage: z.enum(['typecheck', 'unitTests', 'graphEvidence']),
+    toolName: z.string().min(1),
+    toolVersion: z.string().min(1),
+    exitCode: z.number().int(),
+    stdoutHash: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+    durationMs: z.number().nonnegative(),
+    diagnosticsCount: z.number().int().nonnegative().optional(),
+    passedTests: z.number().int().nonnegative().optional(),
+    failedTests: z.number().int().nonnegative().optional(),
+    suiteReceiptRef: z.string().optional(),
+    unresolvedNodesCount: z.number().int().nonnegative().optional(),
+    peakMemoryMb: z.number().nonnegative().optional(),
+  })
+  .strict();
+export type HermesStageToolEventV1 = z.infer<typeof HermesStageToolEventV1Schema>;
+
 export interface HermesAgentStepInputV1 {
   taskId: string;
   taskGoal: string;
@@ -145,6 +169,7 @@ export interface HermesAgentStepInputV1 {
   rawCandidates: readonly RawCandidateFunctionInputV1[];
   model: FmRank4ModelArtifactV1;
   workspaceRevision: string;
+  stageToolEvents?: readonly HermesStageToolEventV1[];
   approvalDecision?: {
     approved: boolean;
     approvedBy: string;
@@ -199,17 +224,48 @@ export function executeHermesAgentStepV1(input: HermesAgentStepInputV1): HermesA
   const winningCandidate = rankedReceipt.rankedCandidates[0];
   const patchSha = `sha256:${createHash('sha256').update(winningCandidate.symbolName).digest('hex')}`;
 
+  const toolEvents = input.stageToolEvents ?? [];
+  const tcEvent = toolEvents.find((e) => e.stage === 'typecheck');
+  const utEvent = toolEvents.find((e) => e.stage === 'unitTests');
+  const geEvent = toolEvents.find((e) => e.stage === 'graphEvidence');
+
+  const toolVersions: Record<string, string> = {};
+  for (const event of toolEvents) {
+    toolVersions[event.toolName] = event.toolVersion;
+  }
+
+  const typecheckPass = !!tcEvent && tcEvent.exitCode === 0 && (tcEvent.diagnosticsCount ?? 0) === 0;
+  const unitTestsPass = !!utEvent && utEvent.exitCode === 0 && (utEvent.failedTests ?? 0) === 0;
+  const graphEvidencePass = !!geEvent && geEvent.exitCode === 0 && (geEvent.unresolvedNodesCount ?? 0) === 0;
+
+  const totalDuration = toolEvents.reduce((acc, e) => acc + e.durationMs, 0);
+  const peakMem = toolEvents.reduce((acc, e) => Math.max(acc, e.peakMemoryMb ?? 0), 0);
+
   const tournamentProposal: TournamentCandidateProposalV1 = {
     candidateId: winningCandidate.canonicalId,
     agentId: input.lease.ownerAgent,
     dag: synthesizedDag,
     patchDigest: patchSha,
-    toolVersions: { vitest: '3.2.7', 'web-tree-sitter': '0.22.6' },
+    toolVersions: Object.keys(toolVersions).length > 0 ? toolVersions : { unverified: '0.0.0' },
     stages: {
-      typecheck: { pass: true, diagnosticsCount: 0 },
-      unitTests: { pass: true, passedTests: 15, failedTests: 0, suiteReceiptRef: 'vitest:pass_1' },
-      graphEvidence: { pass: true, unresolvedNodesCount: 0 },
-      resourceUsage: { durationMs: 420 },
+      typecheck: {
+        pass: typecheckPass,
+        diagnosticsCount: tcEvent?.diagnosticsCount ?? (typecheckPass ? 0 : 1),
+      },
+      unitTests: {
+        pass: unitTestsPass,
+        passedTests: utEvent?.passedTests ?? 0,
+        failedTests: utEvent?.failedTests ?? (unitTestsPass ? 0 : 1),
+        suiteReceiptRef: utEvent?.suiteReceiptRef,
+      },
+      graphEvidence: {
+        pass: graphEvidencePass,
+        unresolvedNodesCount: geEvent?.unresolvedNodesCount ?? (graphEvidencePass ? 0 : 1),
+      },
+      resourceUsage: {
+        durationMs: totalDuration,
+        peakMemoryMb: peakMem > 0 ? peakMem : undefined,
+      },
     },
   };
 
@@ -281,20 +337,38 @@ export function executeHermesAgentStepV1(input: HermesAgentStepInputV1): HermesA
   };
 }
 
+export interface TournamentOutcomeTrainingInputV1 {
+  queryId: string;
+  candidateId: string;
+  features: readonly number[];
+  outcomeSuccess: boolean;
+  /**
+   * Provenance gate: Must provide verified tool event evidence or tournament receipt checksum.
+   * If unverified or fabricated, the row is rejected from backpropagation to avoid training on fabricated outcomes.
+   */
+  verifiedEvidenceRef?: string;
+  stageEventHashes?: readonly string[];
+}
+
 /**
  * Adaptive Backpropagation: Updates the 61-parameter FM Rank-4 model from reviewed tournament outcomes.
  * Offline optimization ensures model updates occur without mutating live state mid-request.
+ * Strictly requires verified tool evidence refs; rejects fabricated or ungrounded tournament outcomes.
  */
 export function adaptRankerFromOutcomesV1(
   currentModel: FmRank4ModelArtifactV1,
-  outcomes: ReadonlyArray<{
-    queryId: string;
-    candidateId: string;
-    features: readonly number[];
-    outcomeSuccess: boolean;
-  }>
+  outcomes: ReadonlyArray<TournamentOutcomeTrainingInputV1>
 ): FmRank4ModelArtifactV1 {
-  const trainingRows: QueryCandidateTrainingRowV1[] = outcomes.map((o) => ({
+  const verifiedRows = outcomes.filter(
+    (o) => o.verifiedEvidenceRef && o.stageEventHashes && o.stageEventHashes.length > 0
+  );
+
+  if (verifiedRows.length === 0) {
+    // Zero verified outcomes; do not mutate weights with ungrounded data
+    return currentModel;
+  }
+
+  const trainingRows: QueryCandidateTrainingRowV1[] = verifiedRows.map((o) => ({
     queryId: o.queryId,
     candidateId: o.candidateId,
     features: o.features,

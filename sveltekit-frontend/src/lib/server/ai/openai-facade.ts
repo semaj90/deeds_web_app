@@ -2431,10 +2431,8 @@ export const ADVERTISED_MODELS = [
   { id: 'gemma4-agent',   owned_by: 'local' },  // → canonical local model (ACE/KAG/RAG brain)
   { id: 'gemma4-raw',     owned_by: 'local' },  // → canonical local model (direct, no ACE)
   { id: 'yorha-legal',    owned_by: 'yorha' },   // → canonical local model (alias)
-  { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
+  { id: 'yorha-fast',     owned_by: 'yorha' },   // → canonical local model
   { id: 'yorha-ldr',      owned_by: 'yorha' },   // → local-deep-research (LDR_BASE_URL)
   { id: 'ornith-1.5-9b',   owned_by: 'yorha' },   // legacy alias, resolved to canonical local model
-  { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
-  { id: 'gemma3:270m',    owned_by: 'ollama' },
 ] as const;
 

@@ -1,19 +1,23 @@
 {
-  "auditRunId": "simd-audit-1789791227254",
-  "timestamp": "2026-09-19T04:13:47.254Z",
+  "auditRunId": "simd-audit-1792397008711",
+  "timestamp": "2026-10-19T08:03:28.711Z",
   "filesScanned": [
     "binding.cc",
     "cuda_graph_bridge.cu",
     "cuvs_bridge.cc",
     "gpu_error_codes.h",
+    "graph_search.cc",
     "libtorch_stubs.cc",
     "lstm_bridge.cc",
     "lstm_gpu.cu",
+    "manifold_interpolate.cc",
+    "native_runtime_info.cu",
     "pytorch_graph.cc",
     "pytorch_graph_fp16.cc",
     "simdjson_bridge.cc",
     "som_cache.cu",
-    "tensor_bridge.cc"
+    "tensor_bridge.cc",
+    "tree_ensemble.cc"
   ],
   "findings": [
     {
@@ -27,7 +31,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 59,
+      "line": 60,
       "codeSnippet": "napi_status napi_create_external_arraybuffer(napi_env, void*, size_t, napi_finalize, void*, napi_value*);",
       "patternMatched": "napi_create_external_arraybuffer",
       "classification": "napi_buffer",
@@ -36,7 +40,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 156,
+      "line": 269,
       "codeSnippet": "// Strategy: napi_create_external_arraybuffer transfers ownership of a raw",
       "patternMatched": "napi_create_external_arraybuffer",
       "classification": "napi_buffer",
@@ -45,7 +49,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 158,
+      "line": 271,
       "codeSnippet": "// and either recycles the region into g_ab_pool or free()s it.",
       "patternMatched": "free",
       "classification": "napi_buffer",
@@ -54,7 +58,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 207,
+      "line": 320,
       "codeSnippet": "bucket.push_back(data);  // recycle — no free()",
       "patternMatched": "free",
       "classification": "napi_buffer",
@@ -63,7 +67,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 209,
+      "line": 322,
       "codeSnippet": "free(data);              // bucket full — release to OS",
       "patternMatched": "free",
       "classification": "napi_buffer",
@@ -72,7 +76,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 230,
+      "line": 343,
       "codeSnippet": "void* ptr = malloc(cap);",
       "patternMatched": "malloc",
       "classification": "napi_buffer",
@@ -81,7 +85,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 239,
+      "line": 352,
       "codeSnippet": "static napi_status create_pooled_ab(napi_env env, size_t bytes,",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -90,7 +94,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 246,
+      "line": 359,
       "codeSnippet": "return napi_create_external_arraybuffer(",
       "patternMatched": "napi_create_external_arraybuffer",
       "classification": "napi_buffer",
@@ -99,7 +103,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 340,
+      "line": 455,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)output_len * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -108,7 +112,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 386,
+      "line": 501,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -117,7 +121,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 442,
+      "line": 557,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)dim * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -126,7 +130,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 479,
+      "line": 594,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -135,7 +139,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 512,
+      "line": 627,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -144,7 +148,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 552,
+      "line": 667,
       "codeSnippet": "if (create_pooled_ab(env, sizeof(float), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -153,7 +157,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 590,
+      "line": 705,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -162,7 +166,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 623,
+      "line": 738,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &arraybuffer) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -171,7 +175,70 @@
     },
     {
       "file": "binding.cc",
-      "line": 735,
+      "line": 833,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(k) * sizeof(int32_t), &indices_data, &indices_ab) != napi_ok ||",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 834,
+      "codeSnippet": "create_pooled_ab(env, static_cast<size_t>(k) * sizeof(float), &scores_data, &scores_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 950,
+      "codeSnippet": "if (create_pooled_ab(env, gathered_bytes, &gathered_data, &ab_gathered) != napi_ok) {",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 963,
+      "codeSnippet": "create_pooled_ab(env, static_cast<size_t>(actual_k) * sizeof(float), &scores_data, &ab_scores);",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 964,
+      "codeSnippet": "create_pooled_ab(env, static_cast<size_t>(actual_k) * sizeof(int32_t), &topk_idx_data, &ab_topk_idx);",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 966,
+      "codeSnippet": "create_pooled_ab(env, static_cast<size_t>(candidate_count) * sizeof(float), &scores_data, &ab_scores);",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1008,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(actual_k) * sizeof(int32_t), &ord_data, &ab_ord) == napi_ok) {",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1090,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -180,7 +247,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 757,
+      "line": 1112,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -189,7 +256,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 779,
+      "line": 1134,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -198,7 +265,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 800,
+      "line": 1155,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -207,7 +274,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 822,
+      "line": 1177,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -216,7 +283,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 842,
+      "line": 1197,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -225,7 +292,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 862,
+      "line": 1217,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -234,7 +301,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 884,
+      "line": 1239,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)k * sizeof(int32_t), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -243,7 +310,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 913,
+      "line": 1268,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &a_data, &a_ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -252,7 +319,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 916,
+      "line": 1271,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)k * dim * sizeof(float), &c_data, &c_ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -261,7 +328,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 967,
+      "line": 1322,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)neurons * dim * sizeof(float), &w_data, &w_ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -270,7 +337,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 970,
+      "line": 1325,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * sizeof(int32_t), &b_data, &b_ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -279,7 +346,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 1048,
+      "line": 1403,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * hidden * sizeof(float), &out_data, &out_ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -288,7 +355,7 @@
     },
     {
       "file": "binding.cc",
-      "line": 1082,
+      "line": 1437,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * output_dim * sizeof(float), &out_data, &out_ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
@@ -297,8 +364,116 @@
     },
     {
       "file": "binding.cc",
-      "line": 1115,
+      "line": 1470,
       "codeSnippet": "if (create_pooled_ab(env, (size_t)n * k * sizeof(float), &out_data, &out_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1817,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(max_nodes) * sizeof(int32_t), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1882,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(max_visited) * sizeof(int32_t), &visited_data, &visited_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1888,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(num_nodes) * sizeof(int32_t), &distances_data, &distances_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1894,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(num_nodes) * sizeof(int32_t), &preds_data, &preds_ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1990,
+      "codeSnippet": "create_pooled_ab(env, sizeof(int32_t), &out_data, &ab);",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 1998,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(out_count) * sizeof(int32_t), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 2050,
+      "codeSnippet": "create_pooled_ab(env, sizeof(int32_t), &out_data, &ab);",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 2058,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(out_count) * sizeof(int32_t), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 2091,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(max_nodes) * sizeof(int32_t), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 2146,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(n_rows) * sizeof(float), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 2192,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(dim) * sizeof(float), &out_data, &ab) != napi_ok)",
+      "patternMatched": "create_pooled_ab",
+      "classification": "safe",
+      "severity": "low",
+      "description": "Safe thread_local ArrayBuffer reuse pool hit"
+    },
+    {
+      "file": "binding.cc",
+      "line": 2243,
+      "codeSnippet": "if (create_pooled_ab(env, static_cast<size_t>(dim) * sizeof(float), &out_data, &ab) != napi_ok)",
       "patternMatched": "create_pooled_ab",
       "classification": "safe",
       "severity": "low",
@@ -836,6 +1011,15 @@
       "description": "Native entrypoint \"run_relu\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
     },
     {
+      "file": "native_runtime_info.cu",
+      "line": 1,
+      "codeSnippet": "Function boundary: atlasGetCudaRuntimeInfo",
+      "patternMatched": "missing_timeout",
+      "classification": "missing_timeout",
+      "severity": "medium",
+      "description": "Native entrypoint \"atlasGetCudaRuntimeInfo\" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."
+    },
+    {
       "file": "pytorch_graph_fp16.cc",
       "line": 1,
       "codeSnippet": "Function boundary: attentionScoreGPU_fp16",
@@ -955,20 +1139,20 @@
   ],
   "concurrencyAssessments": [],
   "summary": {
-    "totalFindings": 104,
+    "totalFindings": 124,
     "byClassification": {
       "gpu_allocation": 14,
       "napi_buffer": 12,
       "tensor_lifetime": 0,
-      "missing_timeout": 45,
+      "missing_timeout": 46,
       "missing_cpu_fallback": 2,
       "possible_concurrent_gpu_job": 7,
-      "safe": 24
+      "safe": 43
     },
     "bySeverity": {
       "high": 13,
-      "medium": 58,
-      "low": 33
+      "medium": 59,
+      "low": 52
     }
   }
 }

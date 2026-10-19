@@ -386,6 +386,18 @@ export const atlasPacketSearchInputSchema = z.object({
   { message: 'At least one non-empty packet search filter is required.' },
 );
 
+export const atlasProceduralSequenceSearchInputSchema = z.object({
+  sequence_id: z.string().trim().min(1).max(256).optional(),
+  feature_id: z.string().trim().min(1).max(256).optional(),
+  feature_label: z.string().trim().min(1).max(256).optional(),
+  limit: z.number().int().min(1).max(50).default(20).optional(),
+}).refine(
+  (filters) => filters.sequence_id !== undefined
+    || filters.feature_id !== undefined
+    || filters.feature_label !== undefined,
+  { message: 'At least one sequence_id, feature_id, or feature_label filter is required.' },
+);
+
 const atlasPacketDenseCodeSearchInputSchema = z.object({
   scope: z.literal('CODE').optional(),
   feature_id: z.string().trim().min(1).max(PACKET_DENSE_FILTER_MAX_CHARS).optional(),

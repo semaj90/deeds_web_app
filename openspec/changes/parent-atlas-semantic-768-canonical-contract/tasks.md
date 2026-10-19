@@ -1,5 +1,88 @@
 # Tasks — Semantic 768 Canonical Contract
 
+## Current authority resolution (2026-10-18)
+
+- The active repository contract (`AGENTS.md`) and
+  `packages/semantic-contracts/src/vector-manifest.ts` designate
+  `codebase_chunk_index.content_embedding_768` (`vector(768)`) as the physical
+  PostgreSQL owner for `semantic_768`. `content_embedding` (`halfvec(768)`) is
+  a historical/parallel surface, not the current canonical owner.
+- Historical V1 manifests and dated task entries that name `content_embedding`
+  are preserved as historical evidence only; they do not override the active
+  contract. The old `representation-manifest-v1.json` is explicitly
+  non-authoritative and must not be rewritten to make declarations appear
+  aligned.
+- Physical-column ownership does **not** qualify every stored vector: the
+  production writer, per-row model/tokenizer/input/source lineage, and
+  retrieval-quality evidence remain separate open gates. Do not migrate,
+  backfill, re-index, or promote based on this clarification.
+
+### PostgreSQL exact/HNSW and DiskANN gate refresh (2026-10-18; read-only)
+
+- Live catalog transaction confirmed PostgreSQL 18's `vector` extension is
+  version `0.8.3`; `vectorscale` is absent. `content_embedding_768` is
+  `vector(768)` with an HNSW `vector_cosine_ops` index (`m=16`,
+  `ef_construction=64`). The separate `content_embedding` is `halfvec(768)`
+  with HNSW `halfvec_cosine_ops` (`m=16`, `ef_construction=200`). These are
+  distinct indexed surfaces; the latter does not change the declared owner.
+- Current physical census: 274,465 rows; `content_embedding_768` is populated
+  on 219,998, `content_embedding` on 57,243, and both on 2,813. The respective
+  HNSW index sizes are 805,158,912 bytes (768 MiB) and 115,523,584 bytes
+  (110 MiB); this is not an equal-cohort comparison because coverage and
+  representation provenance differ.
+- The initial `limit=2`, `top-k=5` replay found **0 revision-qualified
+  vectors** and stopped before retrieval comparison. The corrected explicit
+  `--allow-unqualified-diagnostic` run compared two deterministic sample
+  queries over the 219,998-row physical vector population: exact plans were
+  sequential scans, HNSW plans used the named index, and both queries had
+  Recall@5 `1.0`. Its status is `PGVECTOR_UNQUALIFIED_DIAGNOSTIC`, not a
+  production pass: `stableEvidenceMetadata=false`, source-qualified cohort
+  remains zero, and the source-revision blocker is retained. Receipt:
+  `.tmp/atlas/semantic768-exact-hnsw-diagnostic-20261018.json`; repeatable-read
+  transaction rolled back, `writesPerformed=false`, `canonicalAuthority=false`.
+- A separate opt-in `--lineage-join --workspace-revision=<sealed revision>`
+  path now qualifies via exact `atlas_packet_chunk_lineage.chunk_row_id` /
+  `source_ref` plus matching `atlas_workspace_source_bindings` source and
+  workspace revisions; it does not backfill the null row-revision columns.
+  For workspace `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+  the read-only census found 116,657 vector rows with exact lineage. A two-query
+  `top-k=5` replay returned exact sequential plans, HNSW index plans, and Recall@5
+  `1.0` on both queries. Receipt:
+  `.tmp/atlas/semantic768-lineage-exact-hnsw-20261018.json`, status
+  `PGVECTOR_LINEAGE_DIAGNOSTIC`, `stableEvidenceMetadata=true`, but
+  `SEMANTIC_REPRESENTATION_PROVENANCE_UNAVAILABLE`; row-level model/recipe
+  provenance remains unproven. This is a small diagnostic, not a golden-query
+  benchmark or production pass.
+- Upstream pgvectorscale README documents `vector_cosine_ops`, `vector_l2_ops`,
+  and `vector_ip_ops` for DiskANN; its `halfvec` support issue remains open,
+  including a maintainer response that FP16 is not supported. The README's
+  current examples therefore do not establish `halfvec` compatibility. This
+  codebase's PostgreSQL runtime also has no `vectorscale` extension installed.
+  DiskANN/Vamana is CPU/PostgreSQL-side, not an RTX executor. No extension
+  install, migration, index change, or GPU operation was attempted. Next gate
+  is to prove source/workspace lineage for
+  a bounded `content_embedding_768` cohort, then run exact-vs-HNSW replay;
+  only after that should a separately approved vectorscale/halfvec feasibility
+  check be considered.
+
+- **Fresh exact/HNSW lineage replay (2026-10-18; PostgreSQL read-only):**
+  Re-ran the existing executor with exact `atlas_packet_chunk_lineage` and
+  `atlas_workspace_source_bindings` joins for the sealed workspace revision.
+  The qualified cohort remains 116,657 `content_embedding_768` rows. Eight
+  deterministic queries at top-K 10 returned mean and minimum Recall@10 of
+  1.0; exact plans used sequential scans and HNSW plans used the existing
+  `idx_codebase_chunk_content_embedding_768_hnsw`. Status remains
+  `PGVECTOR_LINEAGE_DIAGNOSTIC`, blocked only by
+  `SEMANTIC_REPRESENTATION_PROVENANCE_UNAVAILABLE`. This is not a golden-query
+  relevance test or production semantic qualification. No row revision fields
+  were backfilled; `source_revision` remains deferred on the chunk table (the
+  read-only diagnostic obtained source revisions from existing lineage joins).
+  Full scratch receipt `.tmp/atlas/semantic768-lineage-exact-hnsw-20261018-8x10.json`,
+  SHA-256 `ccfe4ad97b8874f90872054610ab03bc49ca3ad6fb2d814b1f3a89a54c41825c`;
+  durable summary `docs/reports/pgvector-semantic-768-lineage-hnsw-refresh-v1.json`.
+  Refreshed the existing `PGVECTOR_EXACT_HNSW_REPLAY` daily Kanban proposal via
+  the merge owner; no index, Qdrant, GPU, or canonical data writes.
+
 ## Follow-up investigation moved out of this document (2026-08-11)
 
 The `tests/routes/auto/**` route-handler stub-test hang investigation (the "117 failures" finding
@@ -1276,7 +1359,8 @@ that window (`codebase_chunks_768`: 105,762 → 328,348 points, see
 - [x] Confirmed the verdict logic itself did not silently change: still
       `OWNER_NOT_PROVEN`, still `19` writer surfaces, still
       `UNRESOLVED_WRITER_SPLIT` between `activeCandidate:
-      codebase_chunk_index.content_embedding` (the still-current pick),
+      codebase_chunk_index.content_embedding` (the pick at the time of this
+      2026-09-27 audit; superseded by the 2026-10-18 authority resolution above),
       `historicalDominantProducer: reembed-corpus-document-prefix-v1.mjs`,
       and `operatorReachableCandidate: backfill-graphify-file-embeddings-768.mjs`
       — same three-way split as before, not resolved by the backfill.
@@ -1795,13 +1879,13 @@ were performed.
   reports row 6 registered and read back, with `is_assignment_active=false`
   and `canonicalAuthority=false`; it remains an evaluation candidate.
 - `representation-manifest-v1.json` reports `ALIGNED_AND_FROZEN`, but also
-  `canonicalAuthority=false` and `writesPerformed=false`. Its proposed task-
-  prefix representation points to `content_embedding` (`halfvec(768)`), while
-  the active owner contract and its HNSW contract name
-  `content_embedding_768` (`vector(768)`). Resolve the apparent conflict by
-  treating the report as a non-authoritative experimental manifest, not by
-  changing the physical owner contract. It does not qualify the reported
-  1,000-row canary.
+  `canonicalAuthority=false` and `writesPerformed=false`; internally it calls
+  task-prefix `content_embedding` (`halfvec(768)`) canonical and raw
+  `content_embedding_768` (`vector(768)`) a challenger. The governing owner
+  contract names `_768` canonical. Treat v1 as a non-authoritative historical
+  artifact, not a promotion or recipe-qualification receipt. The owning script
+  emitted this contradictory declaration; the follow-up below records its
+  fail-closed correction. It does not qualify the reported 1,000-row canary.
 - `ordinal-map-readback-closeout-20261016.json` explicitly reports
   `ORDINAL_MAP_SEALED_PASS_OTHER_PROJECTION_GATES_OPEN`; do not interpret the
   sealed ordinal artifact as proof of semantic projection or full-corpus
@@ -2023,3 +2107,54 @@ Intake and formalization of proposed throughput acceleration for an `eg-task-pre
   - This lease serializes app callers using the arbiter only. It does not stop/lease external CUDA processes or prove VRAM headroom; retain the existing `:8090` idle check, graceful GPU task, and `nvidia-smi` verification before any cuVS workload.
   - GPU stop attempt (2026-10-18): `/slots` reported the Ornith slot idle, but the existing scoped controller refused unload with `RUNTIME_CONTROL_BUSY`. A read-only process census found an active `llama-server-control.ps1 -Action start -Profile ornith-1.5-vlm` process (PID 29720, launched 02:21 local) that appears to hold the controller mutex. A 30-second verified wait did not change its PID/CPU state; `:8090` remains healthy and idle and the RTX 3060 Ti had 254 MiB free afterward. No Ollama model was stopped and no GPU workload was run. Do not bypass the controller mutex or terminate the active controller blindly.
   - Do not claim CAGRA GPU proof from this implementation. Re-run the frozen PostgreSQL-vs-CAGRA comparison only after obtaining the app lease and a verified idle GPU slot, then record lease/backend/device/kernel and checksums in a new receipt.
+
+### Fresh DiskANN / HNSW / cuVS follow-up — 2026-10-18
+
+- Fresh read-only PostgreSQL catalog: PostgreSQL 18.4, pgvector 0.8.3; `vector` is installed and is the only one of `vector`, `vectorscale`, and `pg_vectorsearch` installed or available in this container. The 274,465-row table has 57,243 non-null `content_embedding` halfvecs and 219,998 non-null `content_embedding_768` vectors, with 2,813 rows present in both columns. `source_revision` and `workspace_revision` are populated on zero rows.
+- Active contract resolution: repository policy (`AGENTS.md`) and the semantic canonical-contract ledger name `content_embedding_768` (`vector(768)`) as the canonical physical column. The representation manifest has top-level `canonicalAuthority:false`, but internally labels task-prefix `content_embedding` as `representations.canonical` and raw `_768` as `representations.challenger`; this is an explicit document conflict, not proof that the authority changed. Follow the governing repository contract and treat the manifest as non-authoritative pending a separately reviewed superseding manifest. The canary/tag does not override the physical owner. No column or index migration is authorized by this resolution.
+- Fresh bounded exact-vs-HNSW diagnostic (`docs/reports/pgvector-hnsw-unqualified-diagnostic-v1.json`, generated 2026-10-18 09:47 UTC): five deterministic self-excluded Top-10 probes per column; exact/HNSW overlap was 10/10 on both cohorts and the expected HNSW index appeared in all 10 plans. Mean exact/HNSW latency was 454.3/2.73 ms for halfvec and 2,414.0/4.60 ms for vector. These are tiny in-sample probes, not a recall guarantee or a controlled comparison: the cohorts and embedding recipes differ, and lineage is absent.
+- Fresh index sizes: halfvec HNSW `codebase_chunk_index_content_hnsw` is 115,523,584 bytes (110 MiB); vector HNSW `idx_codebase_chunk_content_embedding_768_hnsw` is 805,158,912 bytes (768 MiB). Row counts and recipes differ, so this does not isolate a halfvec storage advantage. No index was changed.
+- Vamana metric prerequisite: a read-only first-100-by-primary-key sample had all 100 `content_embedding_768` vectors and all 100 `content_embedding` halfvecs within 0.001 of unit L2 norm (vector norm ranges 0.9999655–1.0000278; halfvec 0.9999713–1.0000282). This supports cosine/L2 ranking equivalence only for that bounded sample; it does not qualify the full cohort.
+- Upstream compatibility check: pgvectorscale 0.9.1 documents PostgreSQL 18 and StreamingDiskANN examples with `vector_*_ops`; its halfvec support issue remains open. The separate `pg_vectorsearch` project documents PRISM over existing halfvec/vector columns on PostgreSQL 18+, but labels itself early alpha/not production-ready and is not DiskANN. Sources: https://github.com/timescale/pgvectorscale, https://github.com/timescale/pgvectorscale/issues/106, https://github.com/timescale/pg_vectorsearch.
+- NVIDIA cuVS distinction: Vamana currently builds and serializes a DiskANN-compatible graph, but cuVS does not expose Vamana graph search; search uses the DiskANN library. The current Vamana API lists L2 distance, so cosine-equivalent use depends on verified unit-normalized vectors. CAGRA exposes GPU graph build and search and is the relevant RTX challenger for this cosine workload. Sources: https://docs.nvidia.com/cuvs/user-guide/api-guides/indexing-guide/vamana, https://docs.nvidia.com/cuvs/user-guide/api-guides/indexing-guide/cagra.
+- Lease defect fixed in `sveltekit-frontend/src/lib/server/inference/gpu-arbiter.ts`: the Lua acquire script interpreted the holder UUID as its timestamp/TTL arguments. It now reads the call's actual timestamp and TTL positions. `gpu-arbiter.spec.ts` passes 3/3; the live SvelteKit/Valkey endpoint acquired a cuVS lease, read back the matching holder UUID, released it, and returned `free=true`.
+- GPU proof remains pending. With the cuVS lease held, the guarded `llama-server-control.ps1 -Action unload` returned `RUNTIME_CONTROL_BUSY` without changing the server. A process census found another long-running `llama-server-control.ps1 -Action start -Profile ornith-1.5-vlm` process (PID 39040); the prior approval named PID 29720 and does not authorize stopping this new process. The cuVS lease was released; `:8090` remains healthy. No CAGRA kernel ran, no database/schema/index changes occurred, and the CAGRA/TP-07 gates remain open.
+
+### Leased CAGRA parity follow-up — 2026-10-18
+
+- **Correction to the preceding status:** the operator explicitly authorized stopping controller PID 39040 only. It was confirmed absent before GPU preparation; the separate `llama-server.exe` process was not killed. The guarded unload then stopped the idle Ornith server, and `nvidia-smi` observed 7,122 MiB free before the cuVS run.
+- Acquired cuVS lease `d839d2d0-731e-4be9-b565-ba77b64d48f7`, verified it active before and after execution, then released it. The bounded CUDA CAGRA diagnostic completed on WSL RAPIDS/cuVS 26.06.00 and the RTX 3060 Ti; it compared the same frozen cohort against PostgreSQL exact cosine Top-10.
+- Receipt: `docs/reports/cagra-postgres-parity-leased-20261018.json`. Cohort: 8,192 vectors, 32 queries, Top-10; vector digest `31bb4e71706b44a34a36fbb0e769be49067a824413a1e2c8f48b343c1803d62c`; identity-order digest `2a5a602cc970fb83e0502b9906f0b694974012e14914e3a04154332194c8e1d8`.
+- Results: mean CAGRA Recall@10 against PostgreSQL exact `0.996875`, minimum per-query `0.90`; CAGRA build `3185.3 ms`, CAGRA search `58.8 ms`, cuVS exact search `203.2 ms`. Mean CAGRA recall against cuVS exact was `0.99375`. This is bounded executor-parity evidence, not retrieval-quality evidence; the minimum-query result misses a strict 0.99-per-query gate.
+- The cohort selector's `ORDER BY md5(id::text)` spilled to PostgreSQL temporary files while scanning the full eligible vector population; it completed read-only. Optimize cohort selection before repeating larger sweeps. No PostgreSQL rows, schema, indexes, Qdrant, or graph projections were changed.
+- **Gate remains open:** source/workspace revisions are absent in this cohort; there are no reviewed relevance judgments; CUDA memory telemetry in the receipt is diagnostic rather than admission-grade; and the observed minimum recall is 0.90. Do not promote CAGRA or mark `SEM768-TP-07` complete from this run.
+- Restored the guarded Ornith profile after execution; `/health` returned `ok`, `/v1/models` reported `ornith-1.5-9b`, and the cuVS lease endpoint returned `free=true` after release.
+
+### Expanded pgvector exact/HNSW diagnostic — 2026-10-18
+
+- The prior five-probe receipt was preserved. `scripts/atlas/diagnose-pgvector-hnsw-unqualified-v1.mjs` now accepts `PGVECTOR_DIAGNOSTIC_OUTPUT`, constrained to `docs/reports`, so expanded diagnostics do not overwrite the earlier receipt.
+- New read-only receipt: `docs/reports/pgvector-hnsw-unqualified-diagnostic-10-v1.json`; ten deterministic corpus self-query probes per physical column, each excluding its query row, Top-10, `hnsw.ef_search=100`, strict-order scan, and recorded `EXPLAIN (ANALYZE, BUFFERS)` plans. The expected HNSW index appeared in every approximate plan; exact plans used sequential scans.
+- `content_embedding` (`halfvec`, 57,243 rows): mean/min Recall@10 `1.0/1.0`; mean exact/HNSW execution `752.7/5.22 ms`; HNSW index size `115,523,584` bytes (110 MiB).
+- `content_embedding_768` (`vector`, 219,998 rows): mean/min Recall@10 `1.0/1.0`; mean exact/HNSW execution `1,524.8/2.98 ms`; HNSW index size `805,158,912` bytes (768 MiB).
+- Interpretation: this validates approximate-vs-exact self-neighbor replay on ten queries for each column, not relevance or external-query recall. The two sample sets, row counts, embedding recipes, and index build parameters differ; these timings and sizes do not isolate halfvec's storage/performance benefit. Source/workspace revisions remain absent, so neither representation is lineage-qualified.
+- Validation: diagnostic returned `DIAGNOSTIC_COMPLETE_UNQUALIFIED_LINEAGE`; both index plans were present; `node --check`, receipt checks, and OpenSpec strict validation passed. No database/schema/index changes were made.
+- DiskANN feasibility refresh (2026-10-18): PostgreSQL 18.4 and pgvector 0.8.3 are live, but `pg_available_extensions` and `pg_extension` show only `vector`; `vectorscale` and `pg_vectorsearch` are unavailable/uninstalled. Current pgvectorscale upstream build instructions explicitly include PostgreSQL 18 and its README documents StreamingDiskANN with `vector_cosine_ops`, so a separately staged PG18 vector-column evaluation appears technically feasible, but the local extension is not installed or runtime-tested. The README has no `halfvec` operator-class documentation; upstream issue #106 requesting `halfvec` support remains open. Do not plan DiskANN for the halfvec column without a version-pinned compatibility proof. `pg_vectorsearch` documents existing `vector`/`halfvec` support and PostgreSQL 18, but remains alpha/not production-ready and is PRISM, not DiskANN. Sources: https://github.com/timescale/pgvectorscale, https://github.com/timescale/pgvectorscale/issues/106, https://github.com/timescale/pg_vectorsearch.
+- No extension was installed and no index DDL was run. The next DiskANN gate is a disposable PG18 compatibility build/probe on a separate evaluation database/image, first for `vector(768)`; halfvec compatibility remains a separate explicit gate.
+
+### Representation-manifest conflict detector — 2026-10-18
+
+- Root cause found in `scripts/atlas/verify-representation-alignment-v1.mjs`: it previously hardcoded task-prefix `content_embedding` as canonical and `_768` as challenger, then emitted `ALIGNED_AND_FROZEN` despite `canonicalAuthority:false` and contrary to the repository's governing contract. Its filesystem-presence checks did not prove representation alignment.
+- Reworked the script to preserve `representation-manifest-v1.json` as historical evidence and emit `docs/reports/representation-alignment-audit-v2.json` instead. The audit hashes the exact source-file bytes, reads the governing physical column from `AGENTS.md`, reports the prior manifest's conflicting field, never sets canonical authority, and explicitly leaves recipe/source-lineage qualification false. A detected mismatch intentionally exits with code 2 after writing its diagnostic.
+- Fresh output reports `NONAUTHORITATIVE_MANIFEST_CONFLICT`: governing physical owner `codebase_chunk_index.content_embedding_768`; historical manifest field `content_embedding`. Its raw-byte SHA-256 was independently recomputed and matched. This resolves which physical column the active repository contract governs; it does **not** qualify the embedding recipe, source lineage, or semantic retrieval, and it does not rewrite or silently supersede the immutable v1 artifact.
+- Validation: JavaScript syntax passed; audit produced the expected conflict code/status; checksum and key fields verified; OpenSpec strict validation and `git diff --check` passed. No DB, index, or projection writes occurred. A reviewed replacement representation manifest remains a separate open gate.
+
+### PostgreSQL storage audit implementation — 2026-10-18
+
+- [x] PG-STORAGE-OBS-01: Extended the existing `scripts/atlas/audit-postgres-index-capability-v1.mjs` owner with `postgres-index-storage-observations-v1.mjs`, rather than adding an index executor. Records installed/available extensions, FTS column/trigger/function definitions, 48 index definitions/validity/readiness/sizes/usage/I/O counters, and reset/maintenance statistics. Sessions enforce read-only mode and bounded statement/lock timeouts; explicit `--output` paths cannot overwrite previous receipts. Six focused Node tests passed, including broad/disabled/incomplete trigger and failed-catalog negative controls. Live receipt: `.tmp/atlas-admin-health-20261018/storage-index-audit-v1.json`; report: `docs/reports/postgres-storage-audit-20261018.md`.
+- [x] PG-FTS-TRIGGER-OBS-01: Independently observed native tsvector plus valid/ready GIN `idx_codebase_chunk_bm25_search`. The live trigger already filters INSERT / UPDATE OF exactly the eight search-input columns; embedding/domain_id-only updates do not select this trigger. No trigger was disabled or altered. Function dependency review remains explicit, and historical broad-trigger migrations must not be blindly replayed.
+- [x] PG-LEXICAL-PLAN-OBS-01: Extended the existing FTS-vs-pg_search benchmark with enforced repeatable-read/read-only scope, 10-second statement and 3-second lock deadlines, and both lanes' EXPLAIN ANALYZE/BUFFERS/SETTINGS JSON. All eight queries completed with transaction_read_only=on and no errors. Receipt: `.tmp/atlas-admin-health-20261018/lexical-benchmark-v1.json`. One FTS-first trial, uncontrolled cache effects and ties: latency/Top-10 overlap are descriptive only, not relevance, Recall@K, or controlled speed proof.
+- [ ] PG-INDEX-MAINTENANCE-REVIEW-01: Establish a representative statistics observation window and measured bloat/write-amplification evidence before index consolidation, VACUUM tuning, fillfactor changes or DDL. Live n_live_tup=0 and null reset/maintenance timestamps are unreliable estimates, not an empty-table proof. Zero scan counts are not drop authorization. The audit also flags two existing atlas_symbol_versions leading-column contract gaps; inspect composite indexes and actual queries before proposing new indexes. HOT is conditional, not guaranteed by fillfactor=90.
+- [ ] PG-DISKANN-ISOLATED-01: Keep the existing disposable PG18 vector(768) compatibility/recall gate open. vectorscale/pg_vectorsearch are neither installed nor available locally; vector 0.8.3, pg_trgm 1.6 and pg_search 0.25.1 are installed. Verify version-pinned operator classes, same-cohort exact oracle, filters, tail recall and storage/I/O before any installation/promotion. halfvec compatibility and Docker-volume-to-host-NVMe backing remain separate unproven gates. No new HLL/Merkle/BRIN/GIN/task-reconciliation objects were introduced.
+- [ ] TRAIN-TRANSPORT-OWNER-ALIGNMENT-01: Follow existing Kafka initiative and QLoRA owners, not a new broker/training lane. `queue/outbox.ts` owns PostgreSQL/RabbitMQ delivery; `atlas-work-event-inbox.ts` is process-local, not durable Kafka proof. `qlora-training-gate.ts` and `adapters/adapter-registry-v1.ts` need caller/admission/deployed-readback evidence; `scripts/train_lora_adapter.py` currently shows FP16 and a fixed Gemma tokenizer, not demonstrated checkpoint-compatible NF4 QLoRA. Q/K/V/O LoRA targets and routing policy heads do not prove attention-head training. Preserve accepted-receipt/cohort, held-out evaluation, artifact checksums, rollback and explicit promotion gates. No training or GPU lease was started.
+
+Boundary recap: HLL is approximate Valkey telemetry (`atlas-hll-telemetry.ts`), never exact candidate deduplication. Existing canonical identity/SearchRuntime owners retain dedup/fusion authority. NVMe is storage; StreamingDiskANN is vector ANN, not typed ontology graph analysis; BitNet is a separate compatible low-bit model experiment, not SSD offload for Ornith. Existing semantic-column/recipe conflict detection, source lineage, reviewed labels and Graphify production gates remain open.

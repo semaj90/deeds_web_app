@@ -661,6 +661,26 @@ export function setupToolHandlers() {
         },
       },
       {
+        name: 'atlas.procedural_sequence_search',
+        description:
+          'Read admitted, revision-qualified procedure sequences by sequence_id, feature_id, or exact feature_label. ' +
+          'Returns descriptive steps only and never executes a sequence.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            sequence_id: { type: 'string', maxLength: 256 },
+            feature_id: { type: 'string', maxLength: 256 },
+            feature_label: { type: 'string', maxLength: 256 },
+            limit: { type: 'number', minimum: 1, maximum: 50 },
+          },
+          anyOf: [
+            { required: ['sequence_id'] },
+            { required: ['feature_id'] },
+            { required: ['feature_label'] },
+          ],
+        },
+      },
+      {
         name: 'atlas.coverage',
         description:
           'Phase 3I verification gate: reports coverage metrics for atlas_packets. ' +
@@ -2294,6 +2314,27 @@ export function setupToolHandlers() {
           return { content: data.result?.content ?? [{ type: 'text', text: JSON.stringify({ error: 'No content from TRACE' }) }] };
         } catch (err) {
           return { content: [{ type: 'text', text: JSON.stringify({ error: String(err), hint: 'Is TRACE MCP server running on :8788?' }) }] };
+        }
+      }
+
+      case 'atlas.procedural_sequence_search': {
+        const { sequence_id, feature_id, feature_label, limit } = args as {
+          sequence_id?: string; feature_id?: string; feature_label?: string; limit?: number;
+        };
+        try {
+          const res = await fetch(`${(ENV.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '')}/mcp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0', id: 1, method: 'tools/call',
+              params: { name: 'atlas.procedural_sequence_search', arguments: { sequence_id, feature_id, feature_label, limit } },
+            }),
+            signal: AbortSignal.timeout(4000),
+          });
+          const data = await res.json() as { result?: { content?: unknown[] } };
+          return { content: data.result?.content ?? [{ type: 'text', text: JSON.stringify({ ok: false, count: 0, sequences: [], error: 'No content from TRACE' }) }] };
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ ok: false, count: 0, sequences: [], error: String(err) }) }] };
         }
       }
 

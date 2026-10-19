@@ -24,7 +24,7 @@ describe('Hermes Agentic Loop & Adaptive Backprop Pipeline V1', () => {
     baseCommit: dummySha,
     status: 'ACTIVE',
     leaseFenceToken: 10,
-    expiresAt: '2026-10-18T00:00:00.000Z',
+    expiresAt: new Date(Date.now() + 86400000).toISOString(),
     releasedAt: null,
   };
 
@@ -121,6 +121,42 @@ describe('Hermes Agentic Loop & Adaptive Backprop Pipeline V1', () => {
   });
 
   it('executes a full Hermes agent step: ranking, DAG synthesis, tournament evaluation, promotion, workspace event, and ACE packet', () => {
+    const dummyStdoutHash = 'sha256:' + 'e'.repeat(64);
+    const mockToolEvents = [
+      {
+        toolEventId: 'evt_tc_01',
+        stage: 'typecheck' as const,
+        toolName: 'typescript',
+        toolVersion: '5.7.3',
+        exitCode: 0,
+        stdoutHash: dummyStdoutHash,
+        durationMs: 120,
+        diagnosticsCount: 0,
+      },
+      {
+        toolEventId: 'evt_ut_01',
+        stage: 'unitTests' as const,
+        toolName: 'vitest',
+        toolVersion: '3.2.7',
+        exitCode: 0,
+        stdoutHash: dummyStdoutHash,
+        durationMs: 250,
+        passedTests: 15,
+        failedTests: 0,
+        suiteReceiptRef: 'vitest:pass_1',
+      },
+      {
+        toolEventId: 'evt_ge_01',
+        stage: 'graphEvidence' as const,
+        toolName: 'web-tree-sitter',
+        toolVersion: '0.22.6',
+        exitCode: 0,
+        stdoutHash: dummyStdoutHash,
+        durationMs: 50,
+        unresolvedNodesCount: 0,
+      },
+    ];
+
     const result = executeHermesAgentStepV1({
       taskId: 'task_paperclip_42',
       taskGoal: 'Validate deed signatures and emit report',
@@ -130,6 +166,7 @@ describe('Hermes Agentic Loop & Adaptive Backprop Pipeline V1', () => {
       rawCandidates: [candidate],
       model: mockModel,
       workspaceRevision,
+      stageToolEvents: mockToolEvents,
       approvalDecision: {
         approved: true,
         approvedBy: 'operator:james',
@@ -144,8 +181,11 @@ describe('Hermes Agentic Loop & Adaptive Backprop Pipeline V1', () => {
     expect(result.synthesizedDag.actions.length).toBe(2); // 1 candidate edit action + 1 verification action
     expect(result.synthesizedDag.topologicalOrder.length).toBe(2);
 
-    // 3. OPSX-01 Tournament evaluation
+    // 3. OPSX-01 Tournament evaluation from verified tool events
     expect(result.tournamentReceipt.winnerCandidateId).toBe('symbol:validateDeedSignature');
+    expect(result.tournamentReceipt.winnerEvaluation.typecheck.pass).toBe(true);
+    expect(result.tournamentReceipt.winnerEvaluation.unitTests.passedTests).toBe(15);
+    expect(result.tournamentReceipt.winnerEvaluation.resourceUsage.durationMs).toBe(420);
     expect(result.tournamentReceipt.canPromote).toBe(true);
 
     // 4. PROMOTE-01 Promotion gate
@@ -164,6 +204,38 @@ describe('Hermes Agentic Loop & Adaptive Backprop Pipeline V1', () => {
     expect(result.aceContextPacket.injectionSanitized).toBe(true);
   });
 
+  it('rejects tournament promotion when tool events are missing or report failure', () => {
+    expect(() =>
+      executeHermesAgentStepV1({
+        taskId: 'task_paperclip_43',
+        taskGoal: 'Unverified repair step',
+        runId: 'run_hermes_002',
+        lease: mockLease,
+        streamHead: mockHead,
+        rawCandidates: [candidate],
+        model: mockModel,
+        workspaceRevision,
+        // No stageToolEvents provided
+      })
+    ).toThrow('NO_ELIGIBLE_TOURNAMENT_WINNER: all candidates failed hard gates');
+  });
+
+  it('rejects adaptive backpropagation training when evidence provenance is missing', () => {
+    const fabricatedOutcomes = [
+      {
+        queryId: 'q_valid_deed',
+        candidateId: 'symbol:validateDeedSignature',
+        features: candidate.features,
+        outcomeSuccess: true, // Fabricated: no verifiedEvidenceRef or stage hashes
+      },
+    ];
+
+    const modelUnchanged = adaptRankerFromOutcomesV1(mockModel, fabricatedOutcomes);
+    // Model should remain identical because fabricated outcomes are dropped
+    expect(modelUnchanged.modelRevision).toBe(mockModel.modelRevision);
+    expect(modelUnchanged).toBe(mockModel);
+  });
+
   it('performs adaptive backpropagation to update FM Rank-4 weights from verified outcomes offline', () => {
     const outcomes = [
       {
@@ -171,12 +243,16 @@ describe('Hermes Agentic Loop & Adaptive Backprop Pipeline V1', () => {
         candidateId: 'symbol:validateDeedSignature',
         features: candidate.features,
         outcomeSuccess: true, // Successful tournament promotion
+        verifiedEvidenceRef: 'receipt:tourn_hermes_001',
+        stageEventHashes: ['sha256:' + 'f'.repeat(64)],
       },
       {
         queryId: 'q_valid_deed',
         candidateId: 'symbol:brokenStub',
         features: [0.1, 0.2, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0],
         outcomeSuccess: false, // Failing tests
+        verifiedEvidenceRef: 'receipt:tourn_hermes_002',
+        stageEventHashes: ['sha256:' + '0'.repeat(64)],
       },
     ];
 

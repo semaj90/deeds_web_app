@@ -404,6 +404,60 @@ describe('miniforge-nlp-sidecar', () => {
     })).rejects.toThrow(/invalid occurrence_positions/);
   });
 
+  it('preserves exact UTF-8 call spans and rejects spans outside source bytes', async () => {
+    const source = "const résumé = path.join('a');";
+    const start = new TextEncoder().encode('const résumé = ').length;
+    const end = new TextEncoder().encode(source).length;
+    const response = (span: [number, number]) => new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      chunks: [],
+      edges: [{
+        from_evidence_key: 'caller', to_evidence_key: 'path.join', type: 'CALLS',
+        evidence_start_line: 1, evidence_start_column: 0,
+        evidence_end_line: 1, evidence_end_column: end,
+        resolved: false, resolution: 'unresolved_target',
+        occurrence_byte_spans: [span],
+      }],
+      diagnostics: [],
+    }), { status: 200 });
+
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(response([start, end]))
+      .mockResolvedValueOnce(response([start, end + 1]));
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    const request = { source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1' };
+    const evidence = await client.astChunk(request);
+    expect(evidence.edges[0]?.occurrence_byte_spans).toEqual([[start, end]]);
+    await expect(client.astChunk(request)).rejects.toThrow(/invalid occurrence_byte_spans/);
+  });
+
+  it('rejects call spans that split a UTF-8 code point', async () => {
+    const source = 'const résumé = invoke();';
+    const sourceBytes = new TextEncoder().encode(source);
+    const accentByte = sourceBytes.indexOf(0xc3);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      chunks: [],
+      edges: [{
+        from_evidence_key: 'caller', to_evidence_key: 'invoke', type: 'CALLS',
+        evidence_start_line: 1, evidence_start_column: 0,
+        evidence_end_line: 1, evidence_end_column: sourceBytes.length,
+        resolved: false, resolution: 'unresolved_target',
+        occurrence_byte_spans: [[accentByte + 1, accentByte + 2]],
+      }],
+    }), { status: 200 }));
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    await expect(client.astChunk({
+      source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+    })).rejects.toThrow(/non-UTF-8-aligned occurrence_byte_spans/);
+  });
+
   it('calls the read-only POS endpoint and preserves UTF-8 token byte offsets', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any, init?: any) => {
       expect(String(input)).toBe('http://127.0.0.1:9997/pos');

@@ -151,6 +151,9 @@ export async function getOnnxSession(
 	modelUrl: string,
 	preferredEps?: string[]
 ): Promise<any> {
+	if (modelUrl.includes('/gemma3_270m_onnx/')) {
+		throw new Error('Gemma3 270M browser chat inference is retired.');
+	}
 	if (typeof window === 'undefined') {
 		throw new Error('getOnnxSession() is browser-only — cannot run on server');
 	}

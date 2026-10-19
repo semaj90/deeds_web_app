@@ -58,4 +58,40 @@ describe('repair worker boundary', () => {
     expect(ack).not.toHaveBeenCalled();
     expect(nack).toHaveBeenCalledTimes(2);
   });
+
+  it('does not nack an acknowledged delivery when the settlement observer fails', async () => {
+    const ack = vi.fn();
+    const nack = vi.fn();
+    const consume = vi.fn(async (_queue, processor) => {
+      await processor(request, ack, nack);
+    });
+
+    await startErrorAgentRepairWorker({
+      enabled: true,
+      execute: vi.fn().mockResolvedValue({ ok: true, proofRefs: ['receipt:test'] }),
+      consume,
+      onMessageSettled: vi.fn().mockRejectedValue(new Error('observer unavailable')),
+    });
+
+    expect(ack).toHaveBeenCalledOnce();
+    expect(nack).not.toHaveBeenCalled();
+  });
+
+  it('notifies a failed settlement only after issuing one nack', async () => {
+    const ack = vi.fn();
+    const nack = vi.fn();
+    const consume = vi.fn(async (_queue, processor) => {
+      await processor({ ...request, taskKey: 'tampered' }, ack, nack);
+    });
+
+    await startErrorAgentRepairWorker({
+      enabled: true,
+      execute: vi.fn(),
+      consume,
+      onMessageSettled: vi.fn().mockRejectedValue(new Error('observer unavailable')),
+    });
+
+    expect(ack).not.toHaveBeenCalled();
+    expect(nack).toHaveBeenCalledOnce();
+  });
 });

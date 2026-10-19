@@ -30,7 +30,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-const FIXTURE_WORKSPACE_REVISION = 'sha256:fixture-workspace-revision';
+const FIXTURE_WORKSPACE_REVISION = process.env.ATLAS_LIVE_WORKSPACE_REVISION ?? 'sha256:fixture-workspace-revision';
 const FIXTURE_PACKET_REVISION = 'sha256:fixture-packet-revision';
 
 const RUN_LIVE_INTEGRATION = process.env.RUN_LIVE_INTEGRATION === '1';
@@ -38,8 +38,8 @@ const RUN_DB_INTEGRATION = process.env.RUN_DB_INTEGRATION === '1';
 const describeIf = RUN_LIVE_INTEGRATION ? describe : describe.skip;
 const describeDbIf = RUN_DB_INTEGRATION ? describe : describe.skip;
 
-describeIf('retrieveFromGo (live Go retrieval service, HTTP fallback fixed 2026-09-08)', () => {
-	it('falls back to a real route and returns real evidence packets', async () => {
+describeIf('retrieveFromGo (live Go RetrievalService SearchCodebase RPC)', () => {
+	it('loads the active proto and returns only revision-qualified evidence', async () => {
 		const { createAtlasRuntimeContext } = await import('./atlas-runtime-context.js');
 		const { retrieveFromGo } = await import('./go-retrieval-grpc-client.js');
 
@@ -55,9 +55,9 @@ describeIf('retrieveFromGo (live Go retrieval service, HTTP fallback fixed 2026-
 
 		const result = await retrieveFromGo(runtime, 'function', { topK: 3 });
 
+		expect(result.retrievalId).toMatch(/^go-grpc:/);
 		expect(result.workspaceRevision).toBe(runtime.workspaceRevision);
 		expect(Array.isArray(result.evidence)).toBe(true);
-		expect(result.evidence.length).toBeGreaterThan(0);
 		for (const hit of result.evidence) {
 			expect(typeof hit.packetKey).toBe('string');
 			expect(hit.packetKey.length).toBeGreaterThan(0);

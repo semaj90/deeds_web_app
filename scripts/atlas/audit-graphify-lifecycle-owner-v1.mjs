@@ -12,9 +12,17 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import {
+  classifyGraphifyOwnerRoleV1,
+  compareGraphifyExecutionReceiptsV1,
+  findGraphifyTransitionPrimitivesV1,
+  resolveGraphifyAuditOutputDirV1,
+  summarizeGraphifyOwnerRolesV1,
+} from './lib/graphify-owner-role-audit-v1.mjs';
 
 const root = REPO_ROOT;
-const reportsDir = path.join(root, 'docs', 'reports');
+const sourceReportsDir = path.join(root, 'docs', 'reports');
+const reportsDir = resolveGraphifyAuditOutputDirV1(root, process.env.ATLAS_GRAPHIFY_LIFECYCLE_REPORT_DIR);
 const ownerReportPath = path.join(reportsDir, 'graphify-lifecycle-owner-v1.json');
 const portfolioReportPath = path.join(reportsDir, 'graphify-stale-run-portfolio-v1.json');
 const eligibilityReportPath = path.join(reportsDir, 'graphify-current-run-eligibility-v1.json');
@@ -37,33 +45,40 @@ function commitDistance(revision, head) {
 }
 
 function classifyLifecyclePath(filePath, text) {
-  const normalized = filePath.replaceAll('\\', '/');
-  if (/audit-|audit\//i.test(normalized)) return 'READ_ONLY_AUDITOR';
-  if (/plan-|planner/i.test(normalized)) return 'PLANNER_ONLY';
-  if (/UPDATE\s+[^;]*graphify_runs|INSERT\s+INTO\s+[^;]*graphify_runs/i.test(text)) return 'LEGACY_WRITER';
-  if (/graphify_runs/i.test(text)) return 'UNKNOWN';
-  return null;
+  return classifyGraphifyOwnerRoleV1(filePath, text);
 }
 
 function findLifecyclePaths() {
   let listing = '';
   try {
-    listing = execFileSync('rg', ['-l', 'graphify_runs', 'scripts/atlas', 'sveltekit-frontend/src', 'packages', '--glob', '!**/node_modules/**', '--glob', '!docs/**'], { cwd: root, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+    listing = execFileSync('rg', ['-l', 'graphify_(?:runs|executions|execution_authority)', 'scripts/atlas', 'sveltekit-frontend/src', 'packages', '--glob', '!**/node_modules/**', '--glob', '!docs/**'], { cwd: root, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
   } catch { return []; }
-  return listing.split(/\r?\n/).filter(Boolean).filter((relativePath) => !/(?:\.spec\.|\.test\.|__tests__[\\/])/i.test(relativePath)).map((relativePath) => {
+  const discovered = listing.split(/\r?\n/).filter(Boolean).filter((relativePath) => !/(?:\.spec\.|\.test\.|__tests__[\\/])/i.test(relativePath));
+  const requiredRolePaths = [
+    'scripts/startup/run-graphify-daily-startup.mjs',
+    'sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts',
+    'sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts',
+    'scripts/atlas/lib/graphify-owner-decision-v1.mjs',
+    'scripts/atlas/apply-graphify-stale-run-reconciliation-v1.mjs',
+  ];
+  for (const requiredPath of requiredRolePaths) {
+    if (existsSync(path.join(root, requiredPath)) && !discovered.includes(requiredPath)) discovered.push(requiredPath);
+  }
+  return [...new Set(discovered.map((relativePath) => relativePath.replaceAll('\\', '/')))].map((relativePath) => {
     const text = readFileSync(path.join(root, relativePath), 'utf8');
-    return { path: relativePath.replaceAll('\\', '/'), classification: classifyLifecyclePath(relativePath, text), mutationSignals: [...text.matchAll(/(?:UPDATE|INSERT\s+INTO)\s+[^\n;]*graphify_runs/gi)].map((match) => match[0].slice(0, 180)) };
+    return { path: relativePath.replaceAll('\\', '/'), classification: classifyLifecyclePath(relativePath, text), mutationSignals: [...text.matchAll(/(?:UPDATE|INSERT\s+INTO|DELETE\s+FROM)\s+[^\n;]*graphify_(?:runs|executions|execution_authority)/gi)].map((match) => match[0].slice(0, 180)), transitionPrimitives: [...text.matchAll(/\b(completeExecution|completeGraphifyRunInTransactionV2|completeGraphifyRunV2)\b/g)].map((match) => match[1]) };
   }).filter((entry) => entry.classification);
 }
 
 const headRevision = gitHead();
-const namespacePath = path.join(reportsDir, 'workspace-source-namespace-v1.json');
+const namespacePath = path.join(sourceReportsDir, 'workspace-source-namespace-v1.json');
 const namespaceReport = existsSync(namespacePath) ? JSON.parse(readFileSync(namespacePath, 'utf8')) : null;
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
 let databaseError = null;
 let runs = [];
 let statusValues = [];
 let columns = [];
+let authorityRows = [];
 try {
   const columnResult = await pool.query(`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'graphify_runs' ORDER BY ordinal_position`);
   columns = columnResult.rows.map((row) => row.column_name);
@@ -74,6 +89,15 @@ try {
     const statuses = await pool.query(`SELECT DISTINCT status::text AS status FROM public.graphify_runs ORDER BY status::text`);
     statusValues = statuses.rows.map((row) => row.status);
   }
+  const authorityTable = await pool.query("SELECT to_regclass('public.graphify_execution_authority') AS relation");
+  if (authorityTable.rows[0]?.relation) {
+    const authorityColumns = await pool.query("SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='graphify_execution_authority'");
+    const available = new Set(authorityColumns.rows.map((row) => row.column_name));
+    if (available.has('execution_id') && available.has('authority_state')) {
+      const result = await pool.query('SELECT execution_id::text AS execution_id, authority_state::text AS authority_state FROM public.graphify_execution_authority ORDER BY execution_id');
+      authorityRows = result.rows;
+    }
+  }
 } catch (error) {
   databaseError = error instanceof Error ? error.message : String(error);
 } finally {
@@ -81,8 +105,13 @@ try {
 }
 
 const lifecyclePaths = findLifecyclePaths();
-const mutationOwners = lifecyclePaths.filter((entry) => entry.classification === 'LEGACY_WRITER');
-const owner = mutationOwners.length === 1 ? mutationOwners[0].path : null;
+const ownerRoles = summarizeGraphifyOwnerRolesV1(lifecyclePaths);
+const transitionPrimitives = findGraphifyTransitionPrimitivesV1(lifecyclePaths);
+const decisionReceiptPath = path.join(root, 'docs', 'reports', 'current-graphify-execution-owner-decision-v1.json');
+const dailyReceiptPath = path.join(root, 'docs', 'reports', 'graphify-daily-lifecycle-v1.json');
+const decisionReceipt = existsSync(decisionReceiptPath) ? JSON.parse(readFileSync(decisionReceiptPath, 'utf8')) : null;
+const dailyReceipt = existsSync(dailyReceiptPath) ? JSON.parse(readFileSync(dailyReceiptPath, 'utf8')) : null;
+const receiptConsistency = compareGraphifyExecutionReceiptsV1({ decisionReceipt, dailyReceipt, authorityRows });
 const runningRunCount = runs.filter((run) => run.status === 'RUNNING').length;
 const portfolio = runs.map((run) => {
   const distance = commitDistance(run.repository_revision, headRevision);
@@ -122,10 +151,14 @@ const ownerReport = {
   generatedAt: new Date().toISOString(),
   mode: 'READ_ONLY_LIFECYCLE_OWNER_AUDIT',
   databaseError,
-  lifecycleOwner: owner,
-  lifecycleOwnerStatus: mutationOwners.length === 1 ? 'CURRENT_LIFECYCLE_OWNER_CANDIDATE' : 'LIFECYCLE_OWNER_UNPROVEN',
+  lifecycleOwner: null,
+  lifecycleOwnerStatus: ownerRoles.status,
+  ownerRoles,
+  receiptConsistency,
+  authorityRows,
   supportedLifecycleStates: statusValues,
-  transitionPrimitiveExists: false,
+  transitionPrimitiveExists: transitionPrimitives.length > 0,
+  transitionPrimitives,
   lifecyclePaths,
   runningRunCount,
   staleRunCount,
@@ -150,7 +183,8 @@ const portfolioReport = {
 
 const blockers = [];
 if (databaseError) blockers.push('DATABASE_AUDIT_FAILED');
-if (mutationOwners.length !== 1) blockers.push('LIFECYCLE_OWNER_UNPROVEN');
+if (ownerRoles.status !== 'OWNER_ROLES_IDENTIFIED') blockers.push('LIFECYCLE_OWNER_ROLES_UNPROVEN');
+if (receiptConsistency.status !== 'RECEIPTS_CONSISTENT') blockers.push(...receiptConsistency.reasonCodes);
 if (runningRunCount - currentRunCount > 0) blockers.push('STALE_RUNS_NOT_RECONCILED');
 if (currentRunCount !== 1) blockers.push('CURRENT_RUN_NOT_ESTABLISHED');
 if (namespaceReport?.status !== 'WORKSPACE_SOURCE_NAMESPACE_PROVEN') blockers.push('SOURCE_NAMESPACE_UNPROVEN');
@@ -163,10 +197,14 @@ const eligibilityReport = {
   runningRunCount,
   staleRunCount,
   currentRunCount,
-  lifecycleOwner: owner,
-  lifecycleOwnerProven: mutationOwners.length === 1,
+  lifecycleOwner: null,
+  lifecycleOwnerProven: false,
+  ownerRoles,
+  receiptConsistency,
+  authorityRows,
   supportedLifecycleStates: statusValues,
-  transitionPrimitiveExists: false,
+  transitionPrimitiveExists: transitionPrimitives.length > 0,
+  transitionPrimitives,
   staleRunsReconciled: runningRunCount - currentRunCount === 0,
   namespaceOwner,
   namespaceAuthorityStatus: namespaceReport?.status === 'WORKSPACE_SOURCE_NAMESPACE_PROVEN' ? 'PROVEN' : 'UNRESOLVED',
@@ -186,6 +224,8 @@ writeFileSync(portfolioReportPath, `${JSON.stringify(portfolioReport, null, 2)}\
 writeFileSync(eligibilityReportPath, `${JSON.stringify(eligibilityReport, null, 2)}\n`);
 console.log(JSON.stringify({
   lifecycleOwnerStatus: ownerReport.lifecycleOwnerStatus,
+  ownerRoles: ownerRoles.status,
+  receiptConsistency: receiptConsistency.status,
   runningRunCount,
   staleRunCount,
   currentRunCount,

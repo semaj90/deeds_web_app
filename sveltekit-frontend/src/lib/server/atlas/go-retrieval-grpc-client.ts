@@ -4,37 +4,22 @@
  * Fallback to HTTP/JSON for debugging or when gRPC unavailable.
  */
 
-import { Channel, ChannelCredentials, Metadata } from '@grpc/grpc-js';
+import { Metadata } from '@grpc/grpc-js';
+import { randomUUID } from 'node:crypto';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import { AtlasRuntimeContext, assertAtlasRuntimeRevisionQualified, RuntimeToolReceiptV1Schema, type RuntimeToolReceiptV1 } from './atlas-runtime-context';
 import { pool } from '$lib/server/db/client.js';
 import { ENV } from '$lib/server/env.server.js';
 
-// TODO: Generate from .proto with protoc
-// For now, mock the client interface
 interface RetrievalServiceClient {
-  retrieve(
-    request: RetrieveRequest,
-    metadata?: Metadata
-  ): Promise<RetrieveResponse>;
-  buildContext(
-    request: BuildContextRequest,
-    metadata?: Metadata
-  ): Promise<ContextPacket>;
-  validatePacket(
-    request: ValidatePacketRequest,
-    metadata?: Metadata
-  ): Promise<ValidationResult>;
-}
-
-interface RetrieveRequest {
-  runId: string;
-  threadId: string;
-  workspaceId: string;
-  workspaceRevision: string;
-  query: string;
-  topK: number;
-  lanes: RetrievalLane[];
-  tokenBudget: number;
+  searchCodebase(
+    request: Record<string, unknown>,
+    metadata: Metadata,
+    options: { deadline: Date },
+    callback: (error: Error | null, response?: Record<string, any>) => void
+  ): void;
+  close(): void;
 }
 
 type RetrievalLane = 'DENSE' | 'SPARSE' | 'GRAPH' | 'SYMBOL' | 'TEMPORAL' | 'CENTROID';
@@ -56,24 +41,12 @@ interface RetrieveResponse {
   receipt?: RuntimeToolReceiptV1;
 }
 
-interface BuildContextRequest {
-  workspaceId: string;
-  packetKeys: string[];
-  maxTokens: number;
-}
-
 interface ContextPacket {
   prompt: string;
   evidence: Record<string, unknown>[];
   metadata: Record<string, unknown>;
   tokenCount: number;
   receipt?: RuntimeToolReceiptV1;
-}
-
-interface ValidatePacketRequest {
-  workspaceId: string;
-  packetKey: string;
-  proposedChange: Record<string, unknown>;
 }
 
 interface ValidationResult {
@@ -87,29 +60,47 @@ interface ValidationResult {
 // Channel Management
 // ─────────────────────────────────────────────────────────────────────────
 
-let globalChannel: Channel | null = null;
 let globalClient: RetrievalServiceClient | null = null;
+let globalClientUrl: string | null = null;
 
 export async function getRetrievalGrpcClient(): Promise<RetrievalServiceClient> {
-  const url = process.env.GO_RETRIEVAL_GRPC_URL || 'localhost:50051';
+  const url = ENV.RETRIEVAL_GRPC_URL || '127.0.0.1:50053';
 
-  if (globalChannel && globalClient) {
+  if (globalClient && globalClientUrl === url) {
     return globalClient;
   }
 
-  globalChannel = new Channel(url, ChannelCredentials.createInsecure(), {});
-  // TODO: Load the actual proto and create the client stub
-  // globalClient = new RetrievalServiceClient(url, ChannelCredentials.createInsecure());
+  globalClient?.close();
+  const grpc = await import('@grpc/grpc-js');
+  const protoLoader = await import('@grpc/proto-loader');
+  const protoCandidates = [
+    path.resolve(process.cwd(), '../proto/active/retrieval.proto'),
+    path.resolve(process.cwd(), 'proto/active/retrieval.proto'),
+    path.resolve(process.cwd(), '../../proto/active/retrieval.proto'),
+  ];
+  const protoPath = protoCandidates.find((candidate) => existsSync(candidate));
+  if (!protoPath) throw new Error('RETRIEVAL_PROTO_NOT_FOUND');
+  const packageDefinition = await protoLoader.load(protoPath, {
+    includeDirs: [path.dirname(protoPath), path.dirname(path.dirname(protoPath))],
+    keepCase: false,
+    longs: Number,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+  });
+  const descriptor = grpc.loadPackageDefinition(packageDefinition) as any;
+  const RetrievalService = descriptor.yorha?.retrieval?.RetrievalService;
+  if (!RetrievalService) throw new Error('RETRIEVAL_SERVICE_PROTO_DESCRIPTOR_MISSING');
+  globalClient = new RetrievalService(url, grpc.credentials.createInsecure()) as RetrievalServiceClient;
+  globalClientUrl = url;
 
-  return globalClient!;
+  return globalClient;
 }
 
 export async function closeRetrievalGrpcClient(): Promise<void> {
-  if (globalChannel) {
-    globalChannel.close();
-    globalChannel = null;
-    globalClient = null;
-  }
+  globalClient?.close();
+  globalClient = null;
+  globalClientUrl = null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -125,25 +116,84 @@ export async function retrieveFromGo(
   }
 ): Promise<RetrieveResponse> {
   assertAtlasRuntimeRevisionQualified(runtime);
-  const client = await getRetrievalGrpcClient();
-
-  const request: RetrieveRequest = {
-    runId: runtime.runId,
-    threadId: runtime.threadId,
-    workspaceId: runtime.workspaceId,
-    workspaceRevision: runtime.workspaceRevision,
-    query,
-    topK: options?.topK ?? 12,
-    lanes: options?.lanes ?? ['DENSE', 'SPARSE', 'GRAPH'],
-    tokenBudget: runtime.tokenBudget.maximumInput,
-  };
-
-  const metadata = new Metadata();
-  metadata.add('workspace-revision', runtime.workspaceRevision);
-  metadata.add('run-id', runtime.runId);
-
   try {
-    return await client.retrieve(request, metadata);
+    const client = await getRetrievalGrpcClient();
+    const metadata = new Metadata();
+    metadata.add('workspace-revision', runtime.workspaceRevision);
+    metadata.add('run-id', runtime.runId);
+    const response = await new Promise<Record<string, any>>((resolve, reject) => {
+      client.searchCodebase(
+        {
+          query,
+          limit: options?.topK ?? 12,
+          atlasContext: {
+            toolCallId: runtime.correlationId ?? randomUUID(),
+            runId: runtime.runId,
+            workspaceId: runtime.workspaceId,
+            workspaceRevision: runtime.workspaceRevision,
+            packetKey: runtime.packetKey,
+            packetRevision: runtime.packetRevision,
+          },
+        },
+        metadata,
+        { deadline: new Date(Date.now() + 10_000) },
+        (error, result) => error ? reject(error) : resolve(result ?? {}),
+      );
+    });
+    const receipt = response.receipt;
+    const mappedReceipt = mapGoReceiptV2(receipt ? {
+      schema: receipt.schema,
+      receipt_id: receipt.receiptId,
+      receipt_checksum: receipt.receiptChecksum,
+      tool_call_id: receipt.toolCallId,
+      tool_name: receipt.toolName,
+      run_id: receipt.runId,
+      workspace_id: receipt.workspaceId,
+      workspace_revision: receipt.workspaceRevision,
+      packet_key: receipt.packetKey,
+      packet_revision: receipt.packetRevision,
+      succeeded: receipt.succeeded,
+      error_code: receipt.errorCode,
+      retrieval_confidence: receipt.retrievalConfidence,
+      evidence_count: receipt.evidenceCount,
+      validation_status: receipt.validationStatus,
+      output_checksum: receipt.outputChecksum,
+      writes_performed: receipt.writesPerformed,
+      canonical_authority: receipt.canonicalAuthority,
+    } : undefined);
+    const chunks = response.receipt?.validationStatus === 'PASS' ? response.chunks ?? [] : [];
+    const evidence = chunks.filter((chunk: Record<string, any>) => (
+      typeof chunk.packetKey === 'string' && chunk.packetKey.trim().length > 0 &&
+      typeof chunk.sourceRef === 'string' && chunk.sourceRef.trim().length > 0 &&
+      typeof chunk.contentHash === 'string' && chunk.contentHash.trim().length > 0 &&
+      chunk.workspaceRevision === runtime.workspaceRevision &&
+      typeof chunk.sourceRevision === 'string' && chunk.sourceRevision.trim().length > 0 &&
+      typeof chunk.candidateId === 'string' && chunk.candidateId.trim().length > 0
+    ));
+    if (response.receipt?.validationStatus !== 'PASS') {
+      console.warn('[go-retrieval] SearchCodebase returned a non-qualified receipt', {
+        validationStatus: response.receipt?.validationStatus ?? 'MISSING',
+        errorCode: response.receipt?.errorCode ?? null,
+        returnedChunks: response.chunks?.length ?? 0,
+      });
+    } else if ((response.chunks?.length ?? 0) > 0 && evidence.length === 0) {
+      console.warn('[go-retrieval] SearchCodebase hits failed revision/identity admission', {
+        returnedChunks: response.chunks.length,
+        rejectedChunks: response.chunks.length,
+        workspaceRevision: runtime.workspaceRevision,
+      });
+    }
+    return {
+      retrievalId: `go-grpc:${runtime.runId}:${Date.now()}`,
+      workspaceRevision: runtime.workspaceRevision,
+      evidence: evidence.map((chunk: Record<string, any>): EvidenceRef => ({
+        packetKey: chunk.packetKey,
+        sourceRef: chunk.sourceRef,
+        contentHash: chunk.contentHash,
+        denseScore: typeof chunk.score === 'number' ? chunk.score : undefined,
+      })),
+      receipt: mappedReceipt,
+    };
   } catch (err) {
     console.error('gRPC retrieval failed, falling back to HTTP:', err);
     return retrieveFromGoHttp(runtime, query, options);
@@ -156,20 +206,7 @@ export async function buildContextFromGo(
   maxTokens?: number
 ): Promise<ContextPacket> {
   assertAtlasRuntimeRevisionQualified(runtime);
-  const client = await getRetrievalGrpcClient();
-
-  const request: BuildContextRequest = {
-    workspaceId: runtime.workspaceId,
-    packetKeys,
-    maxTokens: maxTokens ?? runtime.tokenBudget.maximumInput,
-  };
-
-  try {
-    return await client.buildContext(request);
-  } catch (err) {
-    console.error('gRPC buildContext failed, falling back to HTTP:', err);
-    return buildContextFromGoHttp(runtime, packetKeys, maxTokens);
-  }
+  return buildContextFromGoHttp(runtime, packetKeys, maxTokens);
 }
 
 export async function validatePacketFromGo(
@@ -178,20 +215,7 @@ export async function validatePacketFromGo(
   proposedChange: Record<string, unknown>
 ): Promise<ValidationResult> {
   assertAtlasRuntimeRevisionQualified(runtime);
-  const client = await getRetrievalGrpcClient();
-
-  const request: ValidatePacketRequest = {
-    workspaceId: runtime.workspaceId,
-    packetKey,
-    proposedChange,
-  };
-
-  try {
-    return await client.validatePacket(request);
-  } catch (err) {
-    console.error('gRPC validatePacket failed, falling back to HTTP:', err);
-    return validatePacketFromGoHttp(runtime, packetKey, proposedChange);
-  }
+  return validatePacketFromGoHttp(runtime, packetKey, proposedChange);
 }
 
 // ─────────────────────────────────────────────────────────────────────────

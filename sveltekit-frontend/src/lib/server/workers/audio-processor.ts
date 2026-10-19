@@ -309,7 +309,7 @@ export class AudioProcessor {
    */
   private async analyzeWithACE(text: string, caseId: string | null): Promise<ACEAnalysisResult> {
     try {
-      // Call Ollama with gemma3-legal model
+      // Use the configured canonical server chat model.
       const systemPrompt = `You are a legal AI assistant. Analyze the following audio transcription and provide:
 1. A concise summary (2-3 sentences)
 2. Key claims or statements made

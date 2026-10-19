@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "generatedAt": "2026-10-18T19:45:35.388Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_REPLAY_BACKED_OPERATOR_TASK",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "candidates": [
+    {
+      "fingerprint": "sha256:f82b9697bd3d40ec",
+      "kind": "RETRIEVAL_OR_PROJECTION",
+      "gateId": "PGVECTOR_EXACT_HNSW_REPLAY",
+      "owner": "PostgreSQL semantic representation and retrieval qualification",
+      "file": "scripts/atlas/prove-postgres-pgvector-exact-hnsw-replay-v1.mjs",
+      "diagnostic": "Fresh lineage-qualified PostgreSQL exact-vs-HNSW replay: 116657 candidates in the sealed workspace, 8 deterministic probes, topK=10, mean/min Recall@10=1.0; exact plans used sequential scans and HNSW plans used the named index. Status remains PGVECTOR_LINEAGE_DIAGNOSTIC because SEMANTIC_REPRESENTATION_PROVENANCE_UNAVAILABLE. No codebase_chunk_index revision columns were backfilled; source_revision remains deferred.",
+      "proposedAction": "Resolve the existing writer/model/recipe provenance for the qualified semantic_768 vectors; retain the exact/HNSW parity receipt as a diagnostic and do not promote retrieval until representation identity is independently proven.",
+      "recommendedMcpTools": [],
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ]
+}

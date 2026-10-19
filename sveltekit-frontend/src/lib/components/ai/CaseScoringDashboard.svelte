@@ -117,18 +117,11 @@
 		},
 	];
 
-	async function loadScores() {
+	function loadScores() {
 		isLoading = true;
 		errorMessage = '';
-		try {
-			const response = await fetch('/api/ai/case-scoring');
-			if (!response.ok) throw new Error('API unavailable');
-			cases = await response.json();
-		} catch {
-			cases = mockCases;
-		} finally {
-			isLoading = false;
-		}
+		cases = mockCases;
+		isLoading = false;
 	}
 
 	let filtered = $derived.by(() => {
@@ -187,6 +180,7 @@
 			</button>
 		</div>
 	</div>
+	<p class="sample-data-notice" role="note">Sample scoring examples only. For live per-case scoring, submit a case ID to the POST scoring endpoint.</p>
 
 	{#if errorMessage}
 		<div class="error-bar">

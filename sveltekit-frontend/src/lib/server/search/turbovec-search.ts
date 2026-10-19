@@ -6,12 +6,10 @@
  *
  * The seam stays stable while the backend can swap between:
  *   1) native N-API TurboVec module
- *   2) TurboVec HTTP sidecar (:8791) for GPU-assisted rerank
- *   3) Qdrant + in-process rerank fallback
+ *   2) Qdrant + in-process rerank fallback
  *
  * Qdrant remains the default ANN store. TurboVec is an optional acceleration
- * layer for load handling and rerank reshaping; callers never see a contract
- * change.
+ * N-API remains optional; the incompatible HTTP sidecar rerank hop is retired.
  */
 
 import { createRequire } from 'node:module';
@@ -105,10 +103,6 @@ function getNativeModuleName(): string | null {
     '';
   const trimmed = raw.trim();
   return trimmed.length > 0 ? trimmed : null;
-}
-
-function getTurboVecSidecarUrl(): string {
-  return (ENV.TURBOVEC_SIDECAR || 'http://127.0.0.1:8791').trim();
 }
 
 function getTurboVecMaxCandidates(limit: number): number {
@@ -448,105 +442,6 @@ async function searchTurboVecNative(
   return rows.map(mapResult);
 }
 
-async function searchTurboVecSidecar(
-  embedding: number[],
-  limit: number,
-  topoClass?: string,
-  collection = 'codebase_chunks_768'
-): Promise<QdrantCodeResult[] | null> {
-  const sidecarUrl = getTurboVecSidecarUrl();
-  if (!sidecarUrl) return null;
-
-  const candidates = await searchQdrantWithVectors(embedding, limit, topoClass, collection);
-  if (!candidates.length) return [];
-
-  const candidateRows = pruneCandidatesBySomCluster(
-    candidates
-    .map((point) => {
-      const vector = extractVector(point.vector ?? point.vectors);
-      if (!vector) return null;
-      const payload = point.payload ?? {};
-      return {
-        id: String(point.id),
-        vector,
-        payload,
-        score: Number(point.score ?? 0),
-      };
-    })
-    .filter(
-      (
-        row
-      ): row is {
-        id: string;
-        vector: number[];
-        payload: Record<string, unknown>;
-        score: number;
-      } => row !== null
-    ),
-    limit
-  );
-
-  if (!candidateRows.length) return null;
-
-  try {
-    const res = await fetch(`${sidecarUrl}/rerank`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: embedding,
-        candidates: candidateRows.map((row) => ({
-          id: row.id,
-          vector: row.vector,
-          payload: row.payload,
-        })),
-        top_k: limit,
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as {
-      results?: Array<{ id: string | number; turbovec_score?: number; rank?: number }>;
-    };
-    const rows = Array.isArray(data.results) ? data.results : [];
-    if (!rows.length) return [];
-
-    return rows
-      .map((row) => {
-        const candidate = candidateRows.find((entry) => entry.id === String(row.id));
-        if (!candidate) return null;
-        const payload = candidate.payload ?? {};
-        return {
-          stable_key: String(payload.stable_key ?? payload.chunk_id ?? candidate.id),
-          file_path: String(payload.file_path ?? ''),
-          symbol_name: payload.symbol_name ? String(payload.symbol_name) : undefined,
-          symbol_kind: payload.symbol_kind ? String(payload.symbol_kind) : undefined,
-          language: payload.language ? String(payload.language) : undefined,
-          content: String(payload.content ?? payload.chunk_text ?? ''),
-          tags: payload.tags ? String(payload.tags) : undefined,
-          topo_class: payload.topo_class ? String(payload.topo_class) : undefined,
-          graph_authority_score:
-            typeof payload.graph_authority_score === 'number'
-              ? payload.graph_authority_score
-              : undefined,
-          semantic_score: Number(row.turbovec_score ?? candidate.score ?? 0),
-          qdrant_id: candidate.id,
-          som_cluster: typeof payload.som_cluster === 'number' ? payload.som_cluster : undefined,
-          som_bmu_row: typeof payload.som_bmu_row === 'number' ? payload.som_bmu_row : undefined,
-          som_bmu_col: typeof payload.som_bmu_col === 'number' ? payload.som_bmu_col : undefined,
-          centroid_id: payload.centroid_id ? String(payload.centroid_id) : undefined,
-          quaternion_bucket: payload.quaternion_bucket ? String(payload.quaternion_bucket) : undefined,
-        } satisfies QdrantCodeResult;
-      })
-      .filter((row) => row !== null)
-      .slice(0, limit) as QdrantCodeResult[];
-  } catch (err) {
-    console.warn('[turbovec-search] sidecar rerank unavailable, falling back to Qdrant:', err);
-    return null;
-  }
-}
-
 function buildRerankHits(rows: QdrantCodeResult[]) {
   return rows.map((row) => ({
     id: row.qdrant_id || row.stable_key,
@@ -574,14 +469,17 @@ async function searchTurboVecFallback(
   embedding: number[],
   limit: number,
   topoClass?: string,
-  collection = 'codebase_chunks_768'
+  collection = 'codebase_chunks_768',
+  prefetchedCandidates?: QdrantScrollPoint[]
 ): Promise<QdrantCodeResult[]> {
-  const qdrantCandidates = await searchQdrantWithVectors(
-    embedding,
-    Math.max(limit * 2, limit),
-    topoClass,
-    collection
-  );
+  const qdrantCandidates =
+    prefetchedCandidates ??
+    (await searchQdrantWithVectors(
+      embedding,
+      Math.max(limit * 2, limit),
+      topoClass,
+      collection
+    ));
   if (!qdrantCandidates.length) return [];
 
   const candidates: TurboCandidate[] = pruneCandidatesBySomCluster(
@@ -788,10 +686,22 @@ export async function searchTurboVecCode(
   const native = await searchTurboVecNative(embedding, limit, topoClass, collection);
   if (native) return native;
 
-  const sidecar = await searchTurboVecSidecar(embedding, limit, topoClass, collection);
-  if (sidecar) return sidecar;
+  // Single Qdrant candidate query: fetch candidate points with vectors ONCE (ALIGN-TV-07)
+  const qdrantCandidates = await searchQdrantWithVectors(
+    embedding,
+    Math.max(limit * 2, limit),
+    topoClass,
+    collection
+  );
 
-  return searchTurboVecFallback(embedding, limit, topoClass, collection);
+  // The resident :8791 ANN process has no compatible /rerank contract; keep this path local.
+  return searchTurboVecFallback(
+    embedding,
+    limit,
+    topoClass,
+    collection,
+    qdrantCandidates
+  );
 }
 
 export async function searchQdrantCode(

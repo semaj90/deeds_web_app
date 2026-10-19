@@ -13,6 +13,7 @@ import json
 import re
 import statistics
 import time
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
@@ -117,9 +118,15 @@ def main() -> int:
     parser.add_argument("--rows", type=int, default=DEFAULT_ROWS)
     parser.add_argument("--queries", type=int, default=DEFAULT_QUERIES)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--gpu-lease-id")
     args = parser.parse_args()
     if not (TOP_K + 2 <= args.rows <= 16000) or not (1 <= args.queries <= 64):
         raise SystemExit("BOUNDS: rows 12..16000; queries 1..64")
+    if args.gpu_lease_id:
+        try:
+            args.gpu_lease_id = str(uuid.UUID(args.gpu_lease_id))
+        except ValueError as error:
+            raise SystemExit("INVALID_GPU_LEASE_ID") from error
 
     ids, vectors, source_revisions, workspace_revisions = _load_corpus(args.rows)
     if len(set(ids)) != len(ids):
@@ -171,6 +178,11 @@ def main() -> int:
         "canonicalAuthority": False,
         "productionRoutingChanged": False,
         "databaseWritesPerformed": False,
+        "gpuLease": {
+            "backend": "cuvs",
+            "leaseId": args.gpu_lease_id,
+            "status": "EXTERNALLY_VALIDATED" if args.gpu_lease_id else "NOT_PROVIDED",
+        },
         "representation": {
             "column": "public.codebase_chunk_index.content_embedding_768",
             "dimensions": 768,
@@ -222,7 +234,9 @@ def main() -> int:
             "Bounded 16K-row maximum diagnostic cohort; not full-corpus retrieval evaluation.",
             "No reviewed relevance judgments; nearest-neighbor parity is not semantic quality.",
             "Missing source/workspace revisions prevent production evidence qualification.",
-            "No durable cuVS GPU lease was issued; this was an operator-approved diagnostic after idle :8090 shutdown, and CuPy memory samples are not admission-grade.",
+            *(["No durable cuVS GPU lease was provided; this remains an unleased diagnostic."] if not args.gpu_lease_id else []),
+            "A supplied lease ID is only receipt metadata; the caller must independently confirm it is active before and after execution.",
+            "CuPy memory samples are diagnostic only and are not admission-grade.",
         ],
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)

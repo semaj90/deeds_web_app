@@ -1,6 +1,6 @@
 {
   "schema": "atlas.rrf-lane-weight-census.v1",
-  "generatedAt": "2026-09-10T18:56:18.866Z",
+  "generatedAt": "2026-10-18T19:53:21.402Z",
   "mode": "READ_ONLY",
   "status": "CENSUS_COMPLETE_MIGRATION_NOT_AUTHORIZED",
   "authority": false,
@@ -8,6 +8,86 @@
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
   "weightSources": [
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:9",
+      "file": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts",
+      "symbol": "const policy = { lanes: ['semantic_768', 'lexical'], rrfK: 60, pageCap: 3 };",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "rrfK",
+          "numericWeight": 60
+        },
+        {
+          "rawLaneName": "pageCap",
+          "numericWeight": 3
+        }
+      ],
+      "entryKind": "WEIGHT_DEFINITION_OR_APPLICATION",
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:15",
+      "file": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts",
+      "symbol": "const b = contentAddressedRevisionV1('retrieval-policy', { pageCap: 3, rrfK: 60, lanes: ['semantic_768', 'lexical'] });",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "pageCap",
+          "numericWeight": 3
+        },
+        {
+          "rawLaneName": "rrfK",
+          "numericWeight": 60
+        }
+      ],
+      "entryKind": "WEIGHT_DEFINITION_OR_APPLICATION",
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:22",
+      "file": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts",
+      "symbol": "expect(contentAddressedRevisionV1('retrieval-policy', { ...policy, rrfK: 61 })).not.toBe(base);",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "rrfK",
+          "numericWeight": 61
+        }
+      ],
+      "entryKind": "WEIGHT_DEFINITION_OR_APPLICATION",
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:34",
+      "file": "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts",
+      "symbol": "const other = contentAddressedRevisionV1('retrieval-policy', { ...policy, rrfK: 1 });",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "rrfK",
+          "numericWeight": 1
+        }
+      ],
+      "entryKind": "WEIGHT_DEFINITION_OR_APPLICATION",
+      "classification": "LOGICAL_LANE",
+      "semanticClass": "RRF_FUSION_WEIGHT",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
+    },
     {
       "sourceId": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts:44",
       "file": "sveltekit-frontend/src/lib/server/atlas/kernel/governed-compute-progress.ts",
@@ -351,7 +431,7 @@
       "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:109",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:113",
       "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
       "symbol": "laneWeight: 1.0,",
       "consumers": [],
@@ -369,7 +449,7 @@
       "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:123",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:127",
       "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts",
       "symbol": "laneWeight: 1.0, // Will be set by caller if needed",
       "consumers": [],
@@ -387,7 +467,7 @@
       "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:120",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:123",
       "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
       "symbol": "const laneWeight = weights[laneName] ?? 1.0;",
       "consumers": [],
@@ -405,7 +485,7 @@
       "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:124",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:127",
       "file": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
       "symbol": "const rrfComponent = laneWeight / (k + (rank + 1)); // 1-indexed",
       "consumers": [],
@@ -1017,7 +1097,7 @@
       "canonicalLogicalLaneId": null
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/service.ts:455",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/service.ts:376",
       "file": "sveltekit-frontend/src/lib/server/retrieval/service.ts",
       "symbol": "const weighted = rrf * laneConfig.weight;",
       "consumers": [],
@@ -1035,7 +1115,7 @@
       "canonicalLogicalLaneId": null
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/types.ts:20",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/types.ts:21",
       "file": "sveltekit-frontend/src/lib/server/retrieval/types.ts",
       "symbol": "export const RRF_WEIGHTS_BY_LANE_KIND: Record<LaneRegistryKind, number> = {",
       "consumers": [],
@@ -1053,7 +1133,7 @@
       "canonicalLogicalLaneId": null
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:190",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:229",
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
       "symbol": "const RRF_LANE_WEIGHTS = {",
       "consumers": [],
@@ -1071,7 +1151,7 @@
       "canonicalLogicalLaneId": "UNRESOLVED_RRF_LANE"
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:534",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:692",
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
       "symbol": "function laneContribution(rank: number, laneWeight: number): number {",
       "consumers": [],
@@ -1089,7 +1169,7 @@
       "canonicalLogicalLaneId": null
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:535",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:693",
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
       "symbol": "return laneWeight / (RRF_CONSTANT_K + rank);",
       "consumers": [],
@@ -1107,7 +1187,7 @@
       "canonicalLogicalLaneId": null
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:550",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:708",
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
       "symbol": "rrfContribution: laneContribution(idx + 1, RRF_LANE_WEIGHTS.dense_vector),",
       "consumers": [],
@@ -1125,7 +1205,7 @@
       "canonicalLogicalLaneId": null
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:565",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:723",
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
       "symbol": "rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.turbovec),",
       "consumers": [],
@@ -1143,9 +1223,27 @@
       "canonicalLogicalLaneId": null
     },
     {
-      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:575",
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:733",
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
       "symbol": "rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.lexical),",
+      "consumers": [],
+      "entries": [
+        {
+          "rawLaneName": "UNPARSED",
+          "numericWeight": null
+        }
+      ],
+      "entryKind": "REFERENCE_ONLY",
+      "classification": "DIAGNOSTIC_ONLY",
+      "semanticClass": "UNKNOWN",
+      "applicationStage": "RRF_FUSION",
+      "policyScope": "UNKNOWN",
+      "canonicalLogicalLaneId": null
+    },
+    {
+      "sourceId": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-cross-primitive-parity.test.ts:88",
+      "file": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-cross-primitive-parity.test.ts",
+      "symbol": "it('diverges from the canonical when a non-default laneWeight is supplied (a real, not hypothetical, difference)', () => {",
       "consumers": [],
       "entries": [
         {
@@ -1256,20 +1354,25 @@
       "logicalLaneId": "UNRESOLVED_RRF_LANE",
       "aliases": [
         "laneWeight",
+        "pageCap",
         "rrfK"
       ],
       "executors": [],
       "voteCount": 1,
       "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:15",
+        "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:22",
+        "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:34",
+        "sveltekit-frontend/src/lib/server/atlas/context/revision-authority-v1.spec.ts:9",
         "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts:392",
         "sveltekit-frontend/src/lib/server/retrieval/compute-rrf-score.ts:19",
         "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:52",
         "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:89",
         "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts:90",
-        "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:109",
-        "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:123",
+        "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:113",
+        "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:127",
         "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner-utils.ts:29",
-        "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:120",
+        "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts:123",
         "sveltekit-frontend/src/lib/server/retrieval/rrf-contract.ts:63",
         "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:128",
         "sveltekit-frontend/src/lib/server/retrieval/rrf-fuse.ts:137",
@@ -1278,16 +1381,16 @@
         "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:126",
         "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:41",
         "sveltekit-frontend/src/lib/server/retrieval/rrf-lane-ranker.ts:94",
-        "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:190",
+        "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts:229",
         "sveltekit-frontend/src/routes/api/codebase-index/gpu-pipeline/+server.ts:360"
       ]
     }
   ],
   "conflicts": [],
   "metrics": {
-    "sourceCount": 69,
-    "rawLaneNameCount": 3,
-    "canonicalLaneCount": 19,
+    "sourceCount": 74,
+    "rawLaneNameCount": 4,
+    "canonicalLaneCount": 23,
     "unclassifiedCount": 0,
     "executorAsLaneCount": 0,
     "semanticConflictCount": 0

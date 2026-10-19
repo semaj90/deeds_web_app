@@ -716,7 +716,6 @@ export class SearchLaneRegistry {
   private fallbackChain: string[] = [];
 
   constructor() {
-    this.register(new GpuCuvSLane());
     // 768-dim lane: explicit source semantic lane for adaptive hot/warm/cold routing.
     this.register(new QdrantLane768());
     // Backward-compatible alias used by older retrieval call sites.
@@ -724,8 +723,9 @@ export class SearchLaneRegistry {
     // Legacy 384 lane is not part of the active runtime registry.
     this.register(new LexicalLane());
     this.register(new Bm25Lane());
-    // Fallback chain for single-lane queries — prefers the explicit 768 source lane before any legacy alias.
-    this.fallbackChain = ['gpu-cuvs', 'qdrant-768', 'qdrant', 'lexical', 'bm25'];
+    // The resident TurboVec sidecar is a CPU candidate prefilter, not a cuVS executor or RRF lane.
+    // Keep it out of this legacy result-lane registry; the qualified 768 lane remains the fallback.
+    this.fallbackChain = ['qdrant-768', 'qdrant', 'lexical', 'bm25'];
   }
 
   register(lane: ISearchLane): void {

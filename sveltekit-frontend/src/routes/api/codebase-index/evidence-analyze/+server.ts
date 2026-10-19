@@ -7,7 +7,7 @@
  *   3. Tracks success/failure rates and latency metrics
  *   4. Writes analysis summary to CouchDB evidence_analysis
  *
- * Default model: gemma3:270m (fast, 4.5s avg) — use model: 'ornith-1.5-9b' for complex analysis
+ * Uses the configured server chat model for evidence analysis.
  *
  * Returns immediately with jobId. Poll GET ?jobId=<id> for status.
  *
@@ -15,7 +15,6 @@
  * Body (optional): {
  *   domain?: 'evidence' | 'evidence-analysis' | 'all',
  *   batchSize?: number,
- *   model?: string (default: 'gemma3:270m'),
  *   maxQueries?: number
  * }
  */
@@ -25,14 +24,13 @@ import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { warmUpCache, warmUpDomain, type WarmUpReport } from '$lib/server/cache/warm-up.js';
 import { couchdb } from '$lib/server/services/couchdb-client.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 const COUCH_DB = 'evidence_analysis';
 
 const bodySchema = z.object({
 	domain: z.enum(['evidence', 'evidence-analysis', 'all']).optional().default('evidence-analysis'),
 	batchSize: z.number().int().min(1).max(20).optional().default(5),
-	// Default to gemma3:270m (fast, 4.5s avg) — use ornith-1.5-9b for complex analysis
-	model: z.string().optional().default('gemma3:270m'),
 	maxQueries: z.number().int().min(1).max(200).optional(),
 });
 
@@ -86,12 +84,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const analysisPromise = opts.domain === 'all'
 		? warmUpCache({
 				batchSize: opts.batchSize,
-				model: opts.model,
+				model: SERVER_CHAT_MODEL,
 				delayMs: 1000,
 		  })
 		: warmUpDomain(opts.domain, {
 				batchSize: opts.batchSize,
-				model: opts.model,
+				model: SERVER_CHAT_MODEL,
 				delayMs: 1000,
 		  });
 
@@ -123,7 +121,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				await couchdb.put(COUCH_DB, docId, {
 					jobId,
 					domain: opts.domain,
-					model: opts.model,
+					model: SERVER_CHAT_MODEL,
 					batchSize: opts.batchSize,
 					totalQueries: report.totalQueries,
 					successful: report.successful,
@@ -148,12 +146,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	return json({
 		jobId,
 		status: 'started',
-		message: `Evidence analysis started (domain: ${opts.domain}, queries: ${opts.domain === 'all' ? 120 : 20}, model: ${opts.model}). Poll GET /api/codebase-index/evidence-analyze?jobId=${jobId}`,
+		message: `Evidence analysis started (domain: ${opts.domain}, queries: ${opts.domain === 'all' ? 120 : 20}, model: ${SERVER_CHAT_MODEL}). Poll GET /api/codebase-index/evidence-analyze?jobId=${jobId}`,
 		config: {
 			domain: opts.domain,
 			totalQueries: opts.domain === 'all' ? 120 : 20,
 			batchSize: opts.batchSize,
-			model: opts.model,
+			model: SERVER_CHAT_MODEL,
 		},
 	});
 };

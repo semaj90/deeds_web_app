@@ -104,6 +104,7 @@ export * from './codebase-relationship-reports.js';
 export * from './vector-smoke.js';
 export * from './atlas-feature-map-synthesized.js';
 export * from './atlas-feature-packets.js';
+export * from './atlas-procedural-sequences.js';
 
 // Round 3 (Tier-D promotions from real-gap-classification.md):
 // `embeddings` is FK-referenced by case_chunks.chunk_embedding_id.
@@ -126,3 +127,4 @@ export * from './atlas-structural-intelligence.js';
 export * from './retrieval-eval-times.js';
 export * from './repo-function-registry.js';
 export * from './topology-eval-times.js';
+export * from './openspec-task-source-index.js';

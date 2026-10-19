@@ -1,33 +1,6 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
-  // Migrated to $effect
-
   // Props from server load
   let { data } = $props<{ data: any }>();
-
-  interface GraphNode { id: string, label: string;
-    type: 'route' | 'component' | 'lib' | 'api' | 'error';
-    status: 'normal' | 'error' | 'fixing' | 'fixed';
-    errorCount: number;
-	path: string;
-    x?: number;
-    y?: number;
-    fx?: number | null;
-    fy?: number | null;
-  }
-
-  interface GraphEdge {
-    source: string | GraphNode;
-    target:string | GraphNode;
-    type: 'import' | 'dependency' | 'error-propagation';
-  }
-
-  interface Activity { id: string, type: 'detecting' | 'fixing' | 'fixed' | 'learning';
-    title: string;
-	description: string;
-    timestamp: Date;
-    file?: string;
-  }
 
   interface Stats { totalErrors: number, fixedToday: number;
     inProgress: number;
@@ -36,10 +9,13 @@
   }
 
   // State
-  let errorStats = $derived(data.errorStats);
-  let topologyData = $derived(data.topologyData);
-  let recentActivity = $derived(data.recentActivity);
-  let isConnected = $state(false);
+  let errorStats = $state(data.errorStats);
+  let topologyData = $state(data.topologyData);
+  let recentActivity = $state(data.recentActivity);
+  let topologyError = $state(data.topologyError ?? null);
+  let snapshotCurrent = $state(true);
+  let snapshotUpdatedAt = $state<string | null>(null);
+  let refreshInFlight = false;
   let selectedNode = $state<string | null>(null);
   let viewMode = $state<'tree' | 'graph' | 'list'>('graph');
   let filterSource = $state('all');
@@ -58,7 +34,6 @@
     edges = data.topologyData?.edges ?? [];
   });
 
-  let activities = $state<Activity[]>([]);
   let stats = $state<Stats>({
     totalErrors: 0,
     fixedToday: 0,
@@ -80,17 +55,14 @@
 
   let isAutoFixing = $state(false);
 
-  // SSE connection for real-time updates
-  let eventSource: EventSource | null = null;
-
   // File tree structure
   let fileTree: Map<string, Set<string>> = new Map();
 
   // Build file tree from error data
   $effect(() => {
-    if (!topologyData?.nodes) return;
+    if (!nodes.length) return;
     fileTree.clear();
-    for (const node of topologyData.nodes) {
+    for (const node of nodes) {
       if (node.type === 'file') {
         const parts = node.id.split('/');
         let currentPath = '';
@@ -110,107 +82,62 @@
     }
   });
 
-  // Connect to SSE for real-time updates
-  function connectSSE() {
-    if (!browser) return;
-
-    try {
-      eventSource = new EventSource('/api/agentic-events');
-
-      eventSource.onopen = () => {
-        isConnected = true;
-      };
-
-      // Fix proposed
-      eventSource.addEventListener('fix_proposed', (e: MessageEvent) => {
-        const data = JSON.parse(e.data);
-        addActivity('fixing', 'Fix Proposed', data.description, data.file);
-        updateNodeStatus(data.nodeId, 'fixing');
-      });
-
-      eventSource.addEventListener('fix_applied', (e: MessageEvent) => {
-        const data = JSON.parse(e.data);
-        addActivity('fixed', 'Fix Applied', data.description, data.file);
-        updateNodeStatus(data.nodeId, 'fixed');
-        stats.fixedToday++;
-        stats.totalErrors--;
-      });
-
-      eventSource.addEventListener('pattern_learned', (e: MessageEvent) => {
-        const data = JSON.parse(e.data);
-        addActivity('learning', 'Pattern Learned', data.pattern, undefined);
-        stats.confidence = data.confidence;
-      });
-
-      eventSource.addEventListener('error_detected', (e: MessageEvent) => {
-        const data = JSON.parse(e.data);
-        addActivity('detecting', 'Error Detected', data.description, data.file);
-        updateNodeStatus(data.nodeId, 'error');
-        stats.totalErrors++;
-      });
-
-      eventSource.onerror = () => {
-        isConnected = false;
-        console.warn('SSE connection error: reconnecting...');
-        eventSource?.close();
-        setTimeout(connectSSE, 5000);
-      };
-    } catch (e) {
-      console.warn('Failed to connect SSE:', e);
-    }
-  }
-
-  function addActivity(type: Activity['type'], title: string, description: string, file?: string) {
-    const activity: Activity = {
-      id: crypto.randomUUID(),
-      type,
-      title,
-      description,
-      timestamp: new Date(),
-      file
-    };
-    activities = [activity, ...activities.slice(0, 49)]; // Keep last 50
-  }
-
-  function updateNodeStatus(nodeId: string, status: GraphNode['status']) {
-    const node = nodes.find(n => n.id === nodeId);
-    if (node) {
-      node.status = status;
-      // Graph update handled by reactivity
-    }
-  }
-
-  function updateGraph() {
-    // Force reactivity update
-    nodes = [...nodes];
-    edges = [...edges];
-  }
-
   $effect(() => {
-    connectSSE();
-    // Fetch initial topology
-    fetchTopology();
-
-    // Cleanup on unmount
-    return () => {
-      eventSource?.close();
-    };
+    void refreshSnapshot();
+    const interval = setInterval(() => void refreshSnapshot(), 30_000);
+    return () => clearInterval(interval);
   });
 
-  async function fetchTopology() {
+  async function refreshSnapshot() {
+    if (refreshInFlight) return;
+    refreshInFlight = true;
     try {
-      const res = await fetch('/api/phase89/topology');
-      if (res.ok) {
-        const data = await res.json();
-        // Update local state if needed
+      const [topologyRes, statsRes, activityRes] = await Promise.all([
+        fetch('/api/phase89/topology', { cache: 'no-store' }),
+        fetch('/api/phase89/stats', { cache: 'no-store' }),
+        fetch('/api/phase89/activity', { cache: 'no-store' })
+      ]);
+
+      if (!topologyRes.ok) throw new Error(`TOPOLOGY_HTTP_${topologyRes.status}`);
+      if (!statsRes.ok) throw new Error(`STATS_HTTP_${statsRes.status}`);
+      if (!activityRes.ok) throw new Error(`ACTIVITY_HTTP_${activityRes.status}`);
+      const topologyResponse = await topologyRes.json();
+      const nextTopology = topologyResponse.topology;
+      if (!Array.isArray(nextTopology?.nodes) || !Array.isArray(nextTopology?.edges)) {
+        throw new Error('TOPOLOGY_RESPONSE_INVALID');
       }
-    } catch (e) {
-      console.warn('Failed to fetch topology:', e);
+      if (topologyResponse.error) throw new Error(String(topologyResponse.error));
+
+      topologyData = nextTopology;
+      topologyError = topologyResponse.error ?? null;
+      nodes = nextTopology.nodes;
+      edges = nextTopology.edges;
+
+      const nextStats = await statsRes.json();
+      errorStats = {
+        ...errorStats,
+        total: Number(nextTopology.summary?.totalErrors ?? nextStats.error_nodes ?? 0),
+        embedded: Number(nextTopology.summary?.totalEmbedded ?? nextStats.error_embeddings ?? 0)
+      };
+      stats.totalErrors = errorStats.total;
+      stats.fixedToday = errorStats.fixed;
+
+      const nextActivity = await activityRes.json();
+      if (!Array.isArray(nextActivity.activity)) throw new Error('ACTIVITY_RESPONSE_INVALID');
+      recentActivity = nextActivity.activity;
+
+      snapshotCurrent = true;
+      snapshotUpdatedAt = new Date().toISOString();
+    } catch (error) {
+      snapshotCurrent = false;
+      console.warn('Failed to refresh Phase 89 snapshot:', error);
+    } finally {
+      refreshInFlight = false;
     }
   }
 
   // Filter nodes
-  let filteredNodes = $derived(topologyData?.nodes?.filter(node => {
+  let filteredNodes = $derived(nodes.filter(node => {
     if (filterSource !== 'all' && !node.id.includes(filterSource)) return false;
     if (searchQuery && !node.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
@@ -238,10 +165,10 @@ file: nodeId })
 
       if (res.ok) {
         // Update node to fixing status
-        const nodeIndex = topologyData.nodes.findIndex(n => n.id === nodeId);
+        const nodeIndex = nodes.findIndex(n => n.id === nodeId);
         if (nodeIndex >= 0) {
-          topologyData.nodes[nodeIndex].status = 'fixing';
-          topologyData = { ...topologyData };
+          nodes[nodeIndex] = { ...nodes[nodeIndex], status: 'fixing' };
+          nodes = [...nodes];
         }
       }
     } catch (e) {
@@ -259,8 +186,9 @@ file: nodeId })
   <header class="explorer-header">
     <div class="header-left">
       <h1>🕸️ AST Topology Explorer</h1>
-      <span class="connection-status" class:connected={isConnected}>
-        {isConnected ? '🟢 Live' : '🔴 Disconnected'}
+      <span class="connection-status" class:connected={snapshotCurrent}>
+        {snapshotCurrent ? '🟢 Snapshot current' : '🟠 Snapshot refresh unavailable'}
+        {#if snapshotUpdatedAt}<span> · {new Date(snapshotUpdatedAt).toLocaleTimeString()}</span>{/if}
       </span>
     </div>
 
@@ -373,8 +301,16 @@ file: nodeId })
         </div>
       {:else}
         <div class="graph-placeholder">
-          <p>🕸️ Graph visualization coming soon...</p>
-          <p class="hint">Will use D3.js or force-graph for interactive exploration</p>
+          {#if topologyError}
+            <p>Topology data is unavailable.</p>
+            <p class="hint">{topologyError}</p>
+          {:else if nodes.length === 0}
+            <p>No Phase 89 error instances are indexed.</p>
+            <p class="hint">Runtime errors are ranked separately on the <a href="/admin/ai-dashboard#runtime-errors-title">Daily Diagnostic Board</a>.</p>
+          {:else}
+            <p>Interactive graph rendering is not available yet.</p>
+            <p class="hint">Use Tree or List to inspect the loaded {nodes.length} file groups.</p>
+          {/if}
         </div>
       {/if}
     </div>

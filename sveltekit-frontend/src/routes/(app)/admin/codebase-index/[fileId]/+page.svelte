@@ -73,7 +73,7 @@
 
 	<main class="container mx-auto px-6 py-8">
 		<!-- Back Link -->
-		<a href="/codebase-index" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-cyan-400 mb-6">
+		<a href="/admin/codebase-index" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-cyan-400 mb-6">
 			<span>←</span> Back to Dashboard
 		</a>
 

@@ -140,7 +140,7 @@
   "plane3_inverseHardwareSearchAndAtenSmoke": {
     "hardwareReadinessVector": {
       "device_name": "NVIDIA GeForce RTX 3060 Ti",
-      "vram_free_mb": 7126,
+      "vram_free_mb": 6036,
       "sm_count": 38,
       "supports_fp16_tensor_core": true,
       "pcie_pinned_bandwidth_gbps": 14.2,
@@ -167,7 +167,7 @@
       ],
       "hasNan": false,
       "hasInf": false,
-      "dmaAndConcatMs": 842.7556,
+      "dmaAndConcatMs": 579.1796,
       "concatTensorSha256": "46a05542c1a8bcc7663b2e3e9346043a5d21f448562c8bcb10d807ebd1c23581"
     }
   },

@@ -35,8 +35,8 @@ const MAX_CONCURRENT_GPU_OPS = 2;
 
 const ACQUIRE_GPU_LEASE_SCRIPT = `
 local existing = redis.call('GET', KEYS[1])
-local now = tonumber(ARGV[2])
-local ttl = tonumber(ARGV[3])
+local now = tonumber(ARGV[3])
+local ttl = tonumber(ARGV[4])
 local lease
 if existing then
   local ok, decoded = pcall(cjson.decode, existing)
@@ -72,7 +72,7 @@ return 1
 export async function acquireGpuLease(
 	backend: InferenceBackend,
 	ttlSeconds = DEFAULT_TTL_SEC,
-	leaseId = randomUUID()
+	leaseId: string = randomUUID()
 ): Promise<GpuLease | null> {
 	if (!Number.isInteger(ttlSeconds) || ttlSeconds < 1 || ttlSeconds > 3600 || !leaseId) return null;
 	try {

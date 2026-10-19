@@ -37,7 +37,7 @@ const FEATURE_LABELS_PATH = path.join(FRONTEND_ROOT, '.tmp', 'feature_labels.jso
 const KANBAN_TASKS_PATH = path.join(FRONTEND_ROOT, '.tmp', 'kanban_tasks.jsonl');
 const MISSING_TODOS_PATH = path.join(FRONTEND_ROOT, '.tmp', 'missing_feature_todos.jsonl');
 
-const TURBOVEC_URL = process.env.TURBOVEC_URL ?? 'http://127.0.0.1:8792';
+const TURBOVEC_URL = process.env.TURBOVEC_PYTHON_URL ?? process.env.TURBOVEC_URL ?? 'http://127.0.0.1:8791';
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const SVELTEKIT_URL = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 const EMBED_MODEL = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
@@ -93,31 +93,6 @@ function ensureDir(filePath) {
 
 function sha1(input) {
   return createHash('sha1').update(String(input ?? '')).digest('hex').slice(0, 16);
-}
-
-function fnv1a(input) {
-  let hash = 0x811c9dc5 >>> 0;
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193) >>> 0;
-  }
-  return hash >>> 0;
-}
-
-function fallbackVector(text, dimension = 768) {
-  const vec = new Array(dimension).fill(0);
-  const seed = fnv1a(text);
-  let state = seed || 1;
-  const rand = () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let t = state;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-  for (let i = 0; i < dimension; i++) vec[i] = rand() - 0.5;
-  const norm = Math.sqrt(vec.reduce((sum, value) => sum + value * value, 0)) || 1;
-  return vec.map((value) => value / norm);
 }
 
 function normalizeList(value) {
@@ -262,23 +237,20 @@ async function postJson(url, body, timeoutMs) {
   return res.json();
 }
 
-// Which backend actually produced each vector; a run with fallback vectors is degraded and must
-// not be cited as semantic-embedding evidence.
-const semanticEmbedding = { requestedBackend: 'ollama', ollama: 0, sveltekit: 0, deterministicFallback: 0 };
+// Only model-produced vectors may enter semantic grouping; unavailable rows remain unembedded.
+const semanticEmbedding = { requestedBackend: 'ollama', ollama: 0, sveltekit: 0, unavailable: 0 };
 // Ollama answers HTTP 400 "Post http://127.0.0.1:<port>/tokenize ... refused" when its runner is
 // transiently gone; that (and network/timeout errors) is retried, ordinary contract errors are not.
 const TRANSIENT_EMBED_ERROR = /tokenize|dial tcp|actively refused|ECONNREFUSED|ECONNRESET|fetch failed|timeout|aborted| 5\d\d:/i;
 // The SvelteKit route is rate-limited to 60 req/min, so it cannot absorb a large batch.
 const SVELTEKIT_FALLBACK_MAX_TEXTS = 50;
 
-function fallbackBatch(texts) {
-  semanticEmbedding.deterministicFallback += texts.length;
-  return texts.map((text) => fallbackVector(text));
-}
-
 async function embedBatch(texts) {
   if (!texts.length) return [];
-  if (embeddingServiceUnavailable) return fallbackBatch(texts);
+  if (embeddingServiceUnavailable) {
+    semanticEmbedding.unavailable += texts.length;
+    return texts.map(() => null);
+  }
 
   // Each endpoint has its own request/response shape (see lib/embed-request-contract.mjs).
   const candidates = [
@@ -320,17 +292,13 @@ async function embedBatch(texts) {
   }
 
   embeddingServiceUnavailable = true;
-  // Last resort: deterministic pseudo-vectors (degraded, counted in semanticEmbedding).
-  return fallbackBatch(texts);
+  semanticEmbedding.unavailable += texts.length;
+  return texts.map(() => null);
 }
 
 async function turbovecPrefilter(vector) {
   if (turbovecServiceUnavailable) {
-    const seed = sha1(JSON.stringify(vector.slice(0, 16)));
-    const base = parseInt(seed.slice(0, 8), 16) || 1;
-    const clusterIds = [base % 128, (base + 17) % 128, (base + 31) % 128].slice(0, TOP_CLUSTERS);
-    const centroidScores = Object.fromEntries(clusterIds.map((cid, idx) => [String(cid), Number((1 - idx * 0.15).toFixed(4))]));
-    return { clusterIds, centroidScores, backend: 'offline' };
+    return { clusterIds: [], centroidScores: {}, backend: 'unavailable' };
   }
   try {
     const data = await postJson(`${TURBOVEC_URL}/prefilter`, {
@@ -362,11 +330,7 @@ async function turbovecPrefilter(vector) {
       return { clusterIds, centroidScores, backend: data?.backend ?? 'search-derived' };
     } catch {
       turbovecServiceUnavailable = true;
-      const seed = sha1(JSON.stringify(vector.slice(0, 16)));
-      const base = parseInt(seed.slice(0, 8), 16) || 1;
-      const clusterIds = [base % 128, (base + 17) % 128, (base + 31) % 128].slice(0, TOP_CLUSTERS);
-      const centroidScores = Object.fromEntries(clusterIds.map((cid, idx) => [String(cid), Number((1 - idx * 0.15).toFixed(4))]));
-      return { clusterIds, centroidScores, backend: 'offline' };
+      return { clusterIds: [], centroidScores: {}, backend: 'unavailable' };
     }
   }
 }
@@ -517,16 +481,18 @@ async function main() {
           turbovec: {
             clusterIds: [],
             centroidScores: {},
-            backend: 'offline',
-            analysis: 'embed-miss',
+            backend: 'unavailable',
+            analysis: 'embedding-unavailable',
           },
-          consolidationGroupId: `${featureFamily}:fallback`,
+          consolidationGroupId: `${featureFamily}:unclustered:${recordHash}`,
         };
       }
 
       const prefilter = await turbovecPrefilter(vector);
       const primaryCluster = prefilter.clusterIds[0] ?? null;
-      const consolidationGroupId = `${featureFamily}:cluster:${primaryCluster ?? 'none'}`;
+      const consolidationGroupId = primaryCluster === null
+        ? `${featureFamily}:unclustered:${recordHash}`
+        : `${featureFamily}:cluster:${primaryCluster}`;
       return {
         ...record,
         featureFamily,
@@ -685,7 +651,7 @@ async function main() {
       uniqueRecordCount: deduped.length,
       scopedRecordCount: scopedRecords.length,
       embeddedCount: vectors.filter(Boolean).length,
-      semanticEmbedding: { ...semanticEmbedding, degraded: semanticEmbedding.deterministicFallback > 0 },
+      semanticEmbedding: { ...semanticEmbedding, degraded: semanticEmbedding.unavailable > 0 },
       groupCount: groups.length,
       consolidationCandidateGroups: groups.filter((group) => group.recordCount > 1).length,
       highOverlapGroups: groups.filter((group) => group.recordCount > 4 && group.openCount > 1).length,

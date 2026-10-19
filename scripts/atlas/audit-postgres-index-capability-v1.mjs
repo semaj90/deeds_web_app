@@ -17,9 +17,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { collectStorageObservations } from './postgres-index-storage-observations-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-const run = (sql, stdin = false) => execFileSync('docker', ['exec', ...(stdin ? ['-i'] : []), 'legal-ai-postgres', 'psql', '-U', 'legal_admin', '-d', 'legal_ai_db', '-qAt', '-F', '|', ...(stdin ? ['-f', '-'] : ['-c', sql])], { input: stdin ? sql : undefined, maxBuffer: 1 << 26, timeout: 120000 }).toString().trim();
+const run = (sql, stdin = false) => execFileSync('docker', ['exec', ...(stdin ? ['-i'] : []), '-e', 'PGOPTIONS=-c default_transaction_read_only=on -c statement_timeout=30000 -c lock_timeout=3000', 'legal-ai-postgres', 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'legal_admin', '-d', 'legal_ai_db', '-qAt', '-F', '|', ...(stdin ? ['-f', '-'] : ['-c', sql])], { input: stdin ? sql : undefined, maxBuffer: 1 << 26, timeout: 120000 }).toString().trim();
 const q = (sql) => { try { return run(sql); } catch (e) { return `ERR:${String(e.message).slice(0, 100)}`; } };
 const rows = (sql) => q(sql).split('\n').filter((l) => l && !l.startsWith('ERR:')).map((l) => l.split('|'));
 const lit = (s) => `'${String(s).replaceAll("'", "''")}'`;
@@ -33,7 +34,7 @@ const CONTRACT = {
   atlas_ast_nodes: { required: ['tree_node_id', 'structural_key', 'relative_path', 'node_kind', 'qualified_symbol', 'source_content_hash', 'source_revision'], capabilities: [
     { name: 'relative_path lookup', column: 'relative_path', am: 'btree' }, { name: 'source_revision filter', column: 'source_revision', am: 'btree' }, { name: 'source_content_hash lookup', column: 'source_content_hash', am: 'btree' }, { name: 'node_kind filter', column: 'node_kind', am: 'btree' }, { name: 'ast_generation filter', column: 'ast_generation', am: 'btree', optional: true }] },
   atlas_packets: { required: ['packet_key', 'source_ref', 'domain_class'], capabilities: [{ name: 'packet_key exact', column: 'packet_key', am: 'btree' }, { name: 'source_ref lookup', column: 'source_ref', am: 'btree' }, { name: 'domain_class filter', column: 'domain_class', am: 'btree', optional: true }] },
-  codebase_chunk_index: { required: ['content_embedding'], capabilities: [{ name: 'semantic_768 ANN', column: 'content_embedding', am: 'hnsw', vector: true }] },
+  codebase_chunk_index: { required: ['content_embedding_768', 'search_vector'], capabilities: [{ name: 'governing physical semantic_768 ANN (recipe qualification separate)', column: 'content_embedding_768', am: 'hnsw', vector: true }, { name: 'task-prefix halfvec challenger ANN', column: 'content_embedding', am: 'hnsw', vector: true, optional: true }, { name: 'full-text search', column: 'search_vector', am: 'gin' }] },
 };
 
 const report = { schema: 'atlas.postgres-index-capability.v1', generatedAt: new Date().toISOString(), server: {}, tables: {}, fixtures: [], aio: {}, verdicts: {}, canonicalAuthority: false, writesPerformed: false };
@@ -108,5 +109,10 @@ report.verdicts = {
 };
 const missing = Object.entries(report.tables).flatMap(([t, v]) => v.capabilities.filter((c) => /^MISSING/.test(c.status)).map((c) => `${t}.${c.column} (${c.name}: ${c.status})`));
 report.gaps = missing;
-fs.writeFileSync(path.join(ROOT, 'docs/reports/postgres-index-capability-v1.json'), `${JSON.stringify(report, null, 2)}\n`);
+report.storage = collectStorageObservations(run);
+const outputArgument = process.argv.slice(2).find((argument) => argument.startsWith('--output='));
+const outputPath = outputArgument ? path.resolve(ROOT, outputArgument.slice('--output='.length)) : path.join(ROOT, 'docs/reports/postgres-index-capability-v1.json');
+fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, { flag: outputArgument ? 'wx' : 'w' });
+if (report.storage.errors.length) process.exitCode = 1;
 console.log(JSON.stringify({ server: { v: report.server.version, io: report.server.ioMethod, eic: report.server.effectiveIoConcurrency }, verdicts: report.verdicts, gaps: missing, fixtures: report.fixtures.map((f) => `${f.id}: ${f.verdict} | default=[${f.defaultPlan.nodes}] | bitmapProbe=[${f.bitmapProbe.nodes}] ${f.defaultPlan.executionMs}ms`) }, null, 1));

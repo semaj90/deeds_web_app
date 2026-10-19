@@ -15,9 +15,9 @@ describe('model lanes', () => {
 		expect([SERVER_CHAT_MODEL, SERVER_GEMMA4_MODEL]).toContain(getReasoningModelId('legal'));
 	});
 
-	it('defaults client chat to helper ONNX instead of client Gemma4', () => {
+	it('defaults chat to the configured server model instead of legacy ONNX', () => {
 		const decision = shouldEscalateToServer('hello', [], {});
-		expect(decision.source).toBe('local-onnx');
+		expect(decision.source).toBe('server-ollama');
 	});
 
 	it('allows client Gemma4 only when explicitly enabled', () => {

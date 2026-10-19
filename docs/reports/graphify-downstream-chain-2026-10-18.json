@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-10-18T19:00:09.331Z",
+  "mode": "dry-run",
+  "dryRun": true,
+  "stages": {
+    "graphify_readiness_check": {
+      "status": "pass",
+      "polls": 37,
+      "elapsed_ms": 127004,
+      "coreStatus": "PASS"
+    },
+    "pagerank": {
+      "status": "pass"
+    },
+    "kanban_emit": {
+      "status": "pass"
+    },
+    "turbovec": {
+      "status": "timeout",
+      "error": "TurboVec timeout (180s)"
+    },
+    "kanban_db_write": {
+      "status": "pass",
+      "tasks_found": 4,
+      "note": "dry-run mode, no writes"
+    }
+  },
+  "errors": [],
+  "summary": {
+    "success": false,
+    "message": "Pipeline incomplete; unsuccessful stages: turbovec",
+    "elapsed_ms": 334473
+  }
+}

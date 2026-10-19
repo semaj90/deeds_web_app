@@ -1,10 +1,52 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 	let workflowBusy = $state(false);
 	let workflowStatus = $state('');
+	let showAllRuntimeErrors = $state(false);
+	let showTop100Tasks = $state(false);
+	let runtimeErrorOverride = $state<PageData['runtimeErrorPriorities'] | null>(null);
+	const runtimeErrorPriorities = $derived(runtimeErrorOverride ?? data.runtimeErrorPriorities);
+	let runtimeErrorsRefreshing = $state(false);
+	let runtimeErrorsRefreshFailed = $state(false);
+	let runtimeErrorsUpdatedAt = $state(new Date().toISOString());
+
+	$effect(() => {
+		if (data.runtimeErrorPriorities.status) runtimeErrorOverride = null;
+	});
+
+	async function refreshRuntimeErrors() {
+		if (runtimeErrorsRefreshing || document.visibilityState !== 'visible') return;
+		runtimeErrorsRefreshing = true;
+		try {
+			const response = await fetch('/api/admin/ai-dashboard/runtime-errors', {
+				headers: { accept: 'application/json' },
+				cache: 'no-store',
+			});
+			if (!response.ok) throw new Error(`Refresh failed (${response.status})`);
+			const report = (await response.json()) as typeof runtimeErrorPriorities;
+			if (
+				(report.status === 'AVAILABLE' || report.status === 'UNAVAILABLE') &&
+				Array.isArray(report.top10) && Array.isArray(report.top100)
+			) {
+				runtimeErrorOverride = report;
+				runtimeErrorsUpdatedAt = new Date().toISOString();
+				runtimeErrorsRefreshFailed = false;
+			}
+		} catch {
+			runtimeErrorsRefreshFailed = true;
+		} finally {
+			runtimeErrorsRefreshing = false;
+		}
+	}
+
+	onMount(() => {
+		const interval = window.setInterval(() => void refreshRuntimeErrors(), 15_000);
+		return () => window.clearInterval(interval);
+	});
 
 	const board = () => data.dailyGraphifyBoard;
 
@@ -84,9 +126,11 @@
 		<div class="board-header">
 			<div>
 				<p class="eyebrow">Daily Graphify</p>
-				<h2>Kanban Task Board</h2>
+				<h2>Daily Diagnostic Board</h2>
 				<p class="subtitle compact">
-					Promoted recommendation work flows into the daily board. Review-required proposals remain visible, and the temporal lane shows the current agentic workflow recommendations.
+					File-backed diagnostic proposals, separate from PostgreSQL Kanban tasks and the
+					<a href="/admin/atlas/task-sources">OpenSpec source index</a>.
+					Proposals do not authorize execution; reviewed recommendations remain in their own lanes.
 				</p>
 			</div>
 			<div class="board-meta">
@@ -104,6 +148,70 @@
 				</div>
 			</div>
 		</div>
+
+		<section class="runtime-errors" aria-labelledby="runtime-errors-title">
+			<div class="ledger-head">
+				<div>
+					<h3 id="runtime-errors-title">Runtime error priority</h3>
+					<p class="subtitle compact">Diagnostic-only, grouped from the last 30 days across client error events and unresolved server error logs. Severity, repeat count, and recency form a heuristic score; these are not Kanban tasks or verified Graphify findings.</p>
+				</div>
+				<div class="runtime-error-controls" aria-label="Runtime error ranking size">
+					<button type="button" aria-pressed={!showAllRuntimeErrors} onclick={() => (showAllRuntimeErrors = false)}>Top 10</button>
+					<button type="button" aria-pressed={showAllRuntimeErrors} onclick={() => (showAllRuntimeErrors = true)}>Top 100</button>
+					<button type="button" disabled={runtimeErrorsRefreshing} onclick={() => void refreshRuntimeErrors()}>
+						{runtimeErrorsRefreshing ? 'Refreshing…' : 'Refresh'}
+					</button>
+				</div>
+			</div>
+			<p class="runtime-error-refresh" aria-live="polite">
+				{runtimeErrorsRefreshFailed ? 'Refresh failed; showing last loaded results.' : `Updated ${new Date(runtimeErrorsUpdatedAt).toLocaleTimeString()} · auto-refresh 15s`}
+			</p>
+			{#if runtimeErrorPriorities.status === 'UNAVAILABLE'}
+				<p class="empty-state">Runtime error ranking is unavailable; the task board remains usable.</p>
+			{:else if runtimeErrorPriorities.top100.length === 0}
+				<p class="empty-state">No client/runtime errors were reported in the last 30 days.</p>
+			{:else}
+				<p class="runtime-error-count">Showing {showAllRuntimeErrors ? runtimeErrorPriorities.top100.length : runtimeErrorPriorities.top10.length} of up to {runtimeErrorPriorities.total} ranked groups.</p>
+				<div class="runtime-error-list">
+					{#each (showAllRuntimeErrors ? runtimeErrorPriorities.top100 : runtimeErrorPriorities.top10) as item, index (item.fingerprint)}
+						<article class="runtime-error-card">
+							<div class="task-topline"><span>#{index + 1} · {item.source} · {item.kind}/{item.severity}</span><span class="task-status">score {item.priorityScore}</span></div>
+							<h4>{item.routePath}</h4>
+							<p>{item.message}</p>
+							<div class="chip-row"><span class="chip">{item.occurrences} occurrences</span><span class="chip">last seen {new Date(item.lastSeen).toLocaleString()}</span></div>
+						</article>
+					{/each}
+				</div>
+			{/if}
+		</section>
+
+		<section class="task-priority-preview" aria-labelledby="task-priority-title">
+			<div class="ledger-head">
+				<div>
+					<h3 id="task-priority-title">Daily task priority</h3>
+					<p class="subtitle compact">Read-only ranking from explicit board P0–P3 labels; score is a label mapping, not a learned importance or Graphify confidence. Blockers remain visible and this view does not queue or promote tasks.</p>
+				</div>
+				<div class="runtime-error-controls" aria-label="Daily task ranking size">
+					<button type="button" aria-pressed={!showTop100Tasks} onclick={() => (showTop100Tasks = false)}>Top 10</button>
+					<button type="button" aria-pressed={showTop100Tasks} onclick={() => (showTop100Tasks = true)}>Top 100</button>
+				</div>
+			</div>
+			<p class="runtime-error-count">Showing {Math.min(showTop100Tasks ? 100 : 10, data.dailyGraphifyTaskPriorities.length)} of {data.dailyGraphifyTaskPriorities.length} file-backed daily board tasks · source: {board().boardSource}</p>
+			{#if data.dailyGraphifyTaskPriorities.length === 0}
+				<p class="empty-state">No daily board tasks are available to rank.</p>
+			{:else}
+				<div class="runtime-error-list">
+					{#each data.dailyGraphifyTaskPriorities.slice(0, showTop100Tasks ? 100 : 10) as task (task.taskId)}
+						<article class="runtime-error-card">
+							<div class="task-topline"><span>#{task.rank} · {task.taskId} · {task.priority}</span><span class="task-status">priority score {task.priorityScore}</span></div>
+							<h4>{task.label}</h4>
+							<p>Status: {task.status ?? 'unspecified'}{task.blockedBy.length ? ` · blocked by ${task.blockedBy.join(', ')}` : ''}</p>
+							{#if task.sourceRef}<p>{task.sourceRef}</p>{/if}
+						</article>
+					{/each}
+				</div>
+			{/if}
+		</section>
 
 		<div class="board-grid">
 			{#each board().columns as column}
@@ -127,6 +235,23 @@
 								<h4>{task.label}</h4>
 								{#if task.gate}
 									<p>{task.gate}</p>
+								{/if}
+								{#if task.reason_codes.length}
+									<div class="chip-row" aria-label="Task reason codes">
+										{#each task.reason_codes as reasonCode}
+											<span class="chip">{reasonCode}</span>
+										{/each}
+									</div>
+								{/if}
+								{#if task.evidence_refs.length}
+									<details class="task-evidence">
+										<summary>Evidence ({task.evidence_refs.length})</summary>
+										<ul>
+											{#each task.evidence_refs as evidenceRef}
+												<li>{evidenceRef}</li>
+											{/each}
+										</ul>
+									</details>
 								{/if}
 								{#if task.blockedBy?.length}
 									<div class="chip-row">
@@ -357,6 +482,87 @@
 		margin-bottom: 1rem;
 	}
 
+	.runtime-errors {
+		margin: 0 0 1rem;
+		padding: 1rem;
+		border: 1px solid rgba(245, 158, 11, 0.18);
+		border-radius: 14px;
+		background: rgba(245, 158, 11, 0.035);
+	}
+
+	.runtime-error-controls {
+		display: flex;
+		gap: 0.4rem;
+		flex-shrink: 0;
+	}
+
+	.runtime-error-controls button {
+		padding: 0.4rem 0.7rem;
+		border: 1px solid rgba(212, 199, 163, 0.18);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.04);
+		color: inherit;
+		cursor: pointer;
+	}
+
+	.runtime-error-controls button[aria-pressed='true'] {
+		border-color: rgba(245, 158, 11, 0.55);
+		background: rgba(245, 158, 11, 0.12);
+	}
+
+	.runtime-error-controls button:disabled {
+		cursor: wait;
+		opacity: 0.65;
+	}
+
+	.runtime-error-count {
+		margin: 0 0 0.65rem;
+		font-size: 0.8rem;
+		color: rgba(212, 199, 163, 0.65);
+	}
+
+	.runtime-error-refresh {
+		margin: 0 0 0.5rem;
+		font-size: 0.72rem;
+		color: rgba(212, 199, 163, 0.5);
+	}
+
+	.runtime-error-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+		gap: 0.55rem;
+		max-height: 34rem;
+		overflow: auto;
+	}
+
+	.runtime-error-card {
+		min-width: 0;
+		padding: 0.7rem;
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		border-radius: 10px;
+		background: rgba(0, 0, 0, 0.16);
+	}
+
+	.runtime-error-card h4,
+	.runtime-error-card p {
+		overflow-wrap: anywhere;
+	}
+
+	.runtime-error-card h4 {
+		margin: 0.35rem 0;
+		font-size: 0.86rem;
+	}
+
+	.runtime-error-card p {
+		display: -webkit-box;
+		margin: 0 0 0.45rem;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		font-size: 0.78rem;
+		color: rgba(212, 199, 163, 0.72);
+	}
+
 	.compact {
 		max-width: 56rem;
 		font-size: 0.92rem;
@@ -364,12 +570,14 @@
 
 	.board-meta {
 		display: grid;
+		max-width: 100%;
 		gap: 0.75rem;
 		min-width: 14rem;
 	}
 
 	.board-meta strong {
 		display: block;
+		overflow-wrap: anywhere;
 		margin-top: 0.2rem;
 		color: rgba(245, 240, 223, 0.96);
 	}
@@ -384,11 +592,12 @@
 
 	.board-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
 		gap: 0.9rem;
 	}
 
 	.priority-column {
+		min-width: 0;
 		min-height: 240px;
 		padding: 0.95rem;
 		border-radius: 14px;
@@ -416,6 +625,7 @@
 	}
 
 	.task-card {
+		min-width: 0;
 		padding: 0.9rem;
 		border-radius: 12px;
 		background: rgba(255, 255, 255, 0.03);
@@ -425,6 +635,7 @@
 
 	.task-topline {
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: space-between;
 		gap: 0.5rem;
 		font-size: 0.72rem;
@@ -432,12 +643,23 @@
 		margin-bottom: 0.35rem;
 	}
 
+	.task-topline > span:first-child {
+		min-width: 0;
+		flex: 1 1 12rem;
+		overflow-wrap: anywhere;
+	}
+
 	.task-status {
+		flex-shrink: 0;
 		color: #93c5fd;
 	}
 
 	.task-card h4 {
 		margin: 0;
+		text-transform: none;
+		letter-spacing: normal;
+		overflow-wrap: anywhere;
+		line-height: 1.5;
 		font-size: 0.96rem;
 		color: rgba(245, 240, 223, 0.96);
 	}
@@ -447,6 +669,28 @@
 		font-size: 0.84rem;
 		color: rgba(212, 199, 163, 0.72);
 		line-height: 1.5;
+	}
+
+	.task-evidence {
+		margin-top: 0.6rem;
+		font-size: 0.76rem;
+		color: rgba(212, 199, 163, 0.72);
+	}
+
+	.task-evidence summary {
+		cursor: pointer;
+		color: #bfdbfe;
+	}
+
+	.task-evidence ul {
+		padding-left: 1rem;
+		margin: 0.45rem 0 0;
+	}
+
+	.task-evidence li {
+		margin-top: 0.35rem;
+		overflow-wrap: anywhere;
+		line-height: 1.45;
 	}
 
 	.task-actions {
@@ -482,6 +726,8 @@
 
 	.chip {
 		display: inline-flex;
+		max-width: 100%;
+		overflow-wrap: anywhere;
 		align-items: center;
 		padding: 0.22rem 0.52rem;
 		border-radius: 999px;
@@ -595,6 +841,12 @@
 		border: 1px solid rgba(212, 199, 163, 0.08);
 	}
 
+	.footer-card strong {
+		display: block;
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
 	.workflow-card strong {
 		line-height: 1.4;
 	}
@@ -664,6 +916,23 @@
 	}
 
 	@media (max-width: 720px) {
+		.ai-dashboard-hub {
+			margin: 0;
+			padding: 1rem;
+		}
+
+		.board-header {
+			flex-direction: column;
+		}
+
+		.board-meta {
+			min-width: 0;
+		}
+
+		.board-shell, .priority-column, .task-card {
+			padding: 0.65rem;
+		}
+
 		.hub-header {
 			flex-direction: column;
 		}

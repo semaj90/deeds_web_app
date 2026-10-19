@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.representation-alignment-audit.v2",
+  "generatedAt": "2026-10-18T10:12:39.834Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "NONAUTHORITATIVE_MANIFEST_CONFLICT",
+  "governingContract": {
+    "path": "AGENTS.md",
+    "sha256": "sha256:fef20519d5e98c78b446672480bf637e3a324a78c6a9a97f1742478f709b509e",
+    "declaredCanonicalPhysicalColumn": "codebase_chunk_index.content_embedding_768"
+  },
+  "priorManifest": {
+    "path": "docs/reports/representation-manifest-v1.json",
+    "schema": "atlas.representation-manifest.v1",
+    "sha256": "sha256:d2250e2bcd9163151981a154877eb6e2467ae426c6577d6bc7fb5444815cbf30",
+    "canonicalAuthority": false,
+    "status": "ALIGNED_AND_FROZEN",
+    "declaredCanonicalColumn": "content_embedding",
+    "declaredCanonicalDataType": "halfvec(768)"
+  },
+  "resolution": {
+    "authority": "AGENTS.md repository contract",
+    "canonicalPhysicalColumn": "codebase_chunk_index.content_embedding_768",
+    "conflictingArtifactIsAuthoritative": false,
+    "representationRecipeQualified": false,
+    "sourceLineageQualified": false,
+    "requiredAction": "Keep the historical v1 manifest immutable; issue a reviewed replacement only after recipe and lineage qualification."
+  }
+}

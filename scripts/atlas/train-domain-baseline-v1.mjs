@@ -2,10 +2,10 @@
 /**
  * TRAIN-DOMAIN-BASELINE-V1
  *
- * Implements Milestone 3: CPU Baselines (Multinomial Naive Bayes with Laplace Smoothing)
+ * Diagnostic only: path-heuristic label predictability, not taxonomy accuracy.
  *
  * Requirements:
- * 1. Consumes the strictly grouped training split from domain-training-split-manifest-v1.json.
+ * 1. Requires the historical split manifest to exist; rows are split deterministically by source_ref below.
  * 2. Trains a Multinomial Naive Bayes model on lexical + structural path tokens with Laplace smoothing (alpha = 1.0).
  * 3. Evaluates on the held-out test split (zero file overlap).
  * 4. Computes exact macro metrics: Accuracy, Macro-Precision, Macro-Recall, Macro-F1, and Confusion Matrix.
@@ -18,11 +18,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { REPO_ROOT } from './connection-config.mjs';
+import { DOMAIN_PATH_LABELING_V1, deriveSyntheticPathDomainV1 } from './lib/domain-path-labeling-v1.mjs';
 
 const manifestPath = path.join(REPO_ROOT, 'docs/reports/domain-training-split-manifest-v1.json');
 const outputPath = path.join(REPO_ROOT, 'docs/reports/domain-baseline-evaluation-v1.json');
 
-console.log('🚀 Loading grouped domain training splits...');
+console.log('Loading path-heuristic diagnostic split (not reviewed ground truth)...');
 if (!fs.existsSync(manifestPath)) {
   throw new Error(`MANIFEST_NOT_FOUND: ${manifestPath}`);
 }
@@ -51,24 +52,10 @@ function assignSplitBySourceRef(sourceRef) {
   return 'test';
 }
 
-function mapPathToReviewedDomain(sourceRef) {
-  const norm = sourceRef.toLowerCase().replace(/\\/g, '/');
-  if (norm.includes('retrieval') || norm.includes('qdrant') || norm.includes('search') || norm.includes('vector')) return 'retrieval';
-  if (norm.includes('svelte') || norm.includes('components') || norm.includes('routes') || norm.includes('ui')) return 'frontend';
-  if (norm.includes('onnx') || norm.includes('model') || norm.includes('embedding') || norm.includes('torch') || norm.includes('kmeans')) return 'machine-learning';
-  if (norm.includes('graph') || norm.includes('cst') || norm.includes('tree-sitter') || norm.includes('topology')) return 'graph';
-  if (norm.includes('cache') || norm.includes('valkey') || norm.includes('redis')) return 'cache';
-  if (norm.includes('auth') || norm.includes('login') || norm.includes('permission')) return 'auth';
-  if (norm.includes('docker') || norm.includes('deploy') || norm.includes('script') || norm.includes('infra')) return 'devops';
-  if (norm.includes('error') || norm.includes('diagnos') || norm.includes('repair') || norm.includes('warning')) return 'error-handling';
-  if (norm.includes('docs') || norm.includes('readme') || norm.includes('.md') || norm.includes('okf')) return 'documentation';
-  return 'agent';
-}
-
 for (const row of rawFixture.rows) {
   const ref = row.source_ref || 'unknown';
   const split = assignSplitBySourceRef(ref);
-  const domain = mapPathToReviewedDomain(ref);
+  const domain = deriveSyntheticPathDomainV1(ref);
   const tokens = ref.toLowerCase().split(/[/\\_.-]+/).filter((t) => t.length > 2);
   const item = { sourceRef: ref, split, domain, tokens, vector: row.vector };
 
@@ -152,7 +139,7 @@ console.log(`Model trained. Vocabulary size: ${nb.vocabulary.size} unique terms 
 // -------------------------------------------------------------
 console.log('📊 Evaluating on held-out Test set (zero file leakage)...');
 
-const domains = [...new Set(rawFixture.rows.map((r) => mapPathToReviewedDomain(r.source_ref)))].sort();
+const domains = [...new Set(rawFixture.rows.map((r) => deriveSyntheticPathDomainV1(r.source_ref)))].sort();
 const confusionMatrix = {};
 for (const d1 of domains) {
   confusionMatrix[d1] = {};
@@ -226,6 +213,9 @@ const evaluationReceipt = {
   generatedAt: new Date().toISOString(),
   canonicalAuthority: false,
   writesPerformed: false,
+  ...DOMAIN_PATH_LABELING_V1,
+  splitMethod: 'SHA256_SOURCE_REF_MOD_100',
+  splitManifestUsed: false,
   model: {
     classifierKind: 'multinomial_naive_bayes',
     version: '1.0.0',

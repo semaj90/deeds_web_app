@@ -129,6 +129,7 @@ import {
   atlasPacketDenseSearchAdvertisedSchema,
   atlasPacketDenseSearchInputSchema,
   atlasPacketSearchInputSchema,
+  atlasProceduralSequenceSearchInputSchema,
   featureDocumentReadInputSchema,
   FEATURE_DOCUMENT_READ_STATEMENT_TIMEOUT_MS,
   FEATURE_DOCUMENT_MANIFEST_MAX_BYTES,
@@ -9827,6 +9828,64 @@ server.registerTool(
       };
     }
   }
+);
+
+server.registerTool(
+  'atlas.procedural_sequence_search',
+  {
+    description:
+      'Read admitted, revision-qualified procedure sequences by sequence_id, feature_id, or exact feature_label. ' +
+      'Returns descriptive steps only; this tool never executes a sequence.',
+    inputSchema: atlasProceduralSequenceSearchInputSchema,
+  },
+  async ({ sequence_id, feature_id, feature_label, limit = 20 }) => {
+    const conditions: string[] = ["admission_status = 'ADMITTED'"];
+    const params: unknown[] = [];
+    let parameter = 1;
+    if (sequence_id) {
+      conditions.push(`sequence_id = $${parameter++}`);
+      params.push(sequence_id);
+    }
+    if (feature_id) {
+      conditions.push(`feature_id = $${parameter++}`);
+      params.push(feature_id);
+    }
+    if (feature_label) {
+      conditions.push(`lower(feature_label) = lower($${parameter++})`);
+      params.push(feature_label);
+    }
+    const client = await pool.connect();
+    let transactionOpen = false;
+    try {
+      await client.query('BEGIN READ ONLY');
+      transactionOpen = true;
+      await client.query("SELECT set_config('statement_timeout', '2000ms', true)");
+      const result = await client.query({
+        text: `SELECT sequence_id, sequence_revision, feature_id, feature_label, sequence_kind,
+                      source_ref, source_revision, workspace_revision, evidence_refs, steps,
+                      sequence_checksum, created_at
+               FROM public.atlas_procedural_sequences_v1
+               WHERE ${conditions.join(' AND ')}
+                 AND source_revision IS NOT NULL
+                 AND workspace_revision IS NOT NULL
+                 AND cardinality(evidence_refs) > 0
+                 AND canonical_authority = false
+                 AND execution_allowed = false
+               ORDER BY feature_id, sequence_id, sequence_revision
+               LIMIT $${parameter}`,
+        values: [...params, limit ?? 20],
+        query_timeout: 2500,
+      });
+      await client.query('ROLLBACK');
+      transactionOpen = false;
+      return { content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: true, count: result.rowCount, sequences: result.rows }) }] };
+    } catch (error) {
+      if (transactionOpen) await client.query('ROLLBACK').catch(() => undefined);
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, count: 0, sequences: [], error: String(error).slice(0, 300) }) }], isError: true };
+    } finally {
+      client.release();
+    }
+  },
 );
 
 // Stage-tagged dense-search failure. Keeps only the stage name and the underlying error code

@@ -25,12 +25,6 @@ export const load: PageServerLoad = async () => {
 				huggingface: 'https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX',
 				note: 'Replaces Gemma3 270M — 4x faster, better reasoning'
 			},
-			deprecatedModel: {
-				name: 'Gemma3 270M (ONNX) — DEPRECATED',
-				path: '/gemma3_270m_onnx/gemma3_270m_w8a16.onnx',
-				size: '418 MB',
-				status: 'Safe to delete after E2B download'
-			},
 			summaryModel: {
 				name: 'Gemma4 9B (TurboQuant)',
 				location: 'server (llama-server :8090)',

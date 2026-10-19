@@ -1,9 +1,6 @@
 <script lang="ts">
 	import ClientGemmaDemo from '$lib/components/ClientGemmaDemo.svelte';
-	import ClientGemmaInference from '$lib/components/ClientGemmaInference.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
-
-	let activeTab = $state<'ollama' | 'onnx'>('ollama');
 
 </script>
 
@@ -15,28 +12,13 @@
 			</div>
 			<div>
 				<h1 class="brand-title">Client Inference Lab</h1>
-				<p class="brand-sub">Compare Ollama server-side vs ONNX client-side (WebGPU) inference</p>
+				<p class="brand-sub">Chat uses the configured local server model; embeddings remain a separate service.</p>
 			</div>
 		</div>
 	</header>
 
-	<nav class="tab-bar">
-		<button class="tab" class:active={activeTab === 'ollama'} onclick={() => activeTab = 'ollama'}>
-			<Icon name="server" size={14} />
-			Ollama (Server)
-		</button>
-		<button class="tab" class:active={activeTab === 'onnx'} onclick={() => activeTab = 'onnx'}>
-			<Icon name="monitor" size={14} />
-			ONNX (Client WebGPU)
-		</button>
-	</nav>
-
 	<div class="tab-content">
-		{#if activeTab === 'ollama'}
-			<ClientGemmaDemo />
-		{:else}
-			<ClientGemmaInference />
-		{/if}
+		<ClientGemmaDemo />
 	</div>
 </div>
 

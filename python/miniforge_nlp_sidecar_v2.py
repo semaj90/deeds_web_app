@@ -28,21 +28,23 @@ import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 import miniforge_nlp_sidecar as legacy
 import atlas_external_docs as external_docs
 from atlas_structural_provenance import (
+    find_call_expression_byte_spans,
     find_occurrence_positions,
     normalize_langextract_extraction,
     normalize_treesitter_chunker_chunk,
     occurrence_to_absolute_position,
 )
 from atlas_treesitter_span_compat import resolve_chunk_byte_span
+from atlas_ast_chunk_helpers_v1 import AstChunkHelperAnalysisV1, build_ast_chunk_helper_analysis_v1
 
 _RUNTIME_MODULE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 _LEGACY_MODULE_SHA256 = hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest()
@@ -83,6 +85,7 @@ class AstEvidenceResponseV2(BaseModel):
     diagnostics: list[str] = Field(default_factory=list)
     error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
     syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
+    helper_analysis: Optional[AstChunkHelperAnalysisV1] = Field(default=None, alias="helperAnalysis")
 
 
 def validate_ast_evidence_byte_spans(chunks: list[AstEvidenceChunkV2], source_bytes: bytes) -> list[dict[str, Any]]:
@@ -1186,6 +1189,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         resolved: bool,
         resolution: str,
         occurrence_map: dict[str, list[tuple[int, int]]] | None = None,
+        occurrence_byte_spans: dict[str, list[tuple[int, int]]] | None = None,
     ) -> None:
         candidate = (source_key, target_key, edge_type, chunk.start_line)
         if candidate in seen_edges:
@@ -1217,6 +1221,11 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 resolved=resolved,
                 resolution=resolution,
                 occurrence_positions=occurrence_positions,
+                occurrence_byte_spans=(
+                    [[chunk.start_byte + start, chunk.start_byte + end] for start, end in occurrence_byte_spans.get(target_key, [])]
+                    if occurrence_byte_spans is not None and edge_type == "CALLS"
+                    else None
+                ),
             )
         )
 
@@ -1233,18 +1242,27 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         # occurrence_positions=None exactly as it did before this change.
         chunk_names = [*chunk.imports, *chunk.exports, *chunk.calls, *chunk_deps]
         occurrence_map: dict[str, list[tuple[int, int]]] = {}
+        call_span_map: dict[str, list[tuple[int, int]]] = {}
         if chunk_names:
             try:
-                chunk_text = source_utf8_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8", errors="ignore")
+                chunk_text = source_utf8_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8")
                 occurrence_map = find_occurrence_positions(chunk_text, language, chunk_names)
+                call_span_map = find_call_expression_byte_spans(chunk_text, language, chunk.calls)
             except Exception:
                 occurrence_map = {}
+                call_span_map = {}
         for value in chunk.imports:
             add_edge(file_key, value, "IMPORTS", chunk, resolved=False, resolution="syntax_only", occurrence_map=occurrence_map)
         for value in chunk.exports:
             add_edge(file_key, value, "EXPORTS", chunk, resolved=False, resolution="syntax_only", occurrence_map=occurrence_map)
         for value in chunk.calls:
-            add_edge(source_key, value, "CALLS", chunk, resolved=False, resolution="unresolved_target", occurrence_map=occurrence_map)
+            add_edge(
+                source_key, value, "CALLS", chunk,
+                resolved=False,
+                resolution="unresolved_target",
+                occurrence_map=occurrence_map,
+                occurrence_byte_spans=call_span_map,
+            )
         for value in chunk_deps:
             add_edge(source_key, value, "REFERENCES", chunk, resolved=False, resolution="unresolved_target", occurrence_map=occurrence_map)
 
@@ -1305,8 +1323,28 @@ def capabilities() -> dict[str, Any]:
 
 
 @app.post("/ast/chunk", response_model=AstEvidenceResponseV2)
-def ast_chunk(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
-    return _native_ast_evidence(req)
+def ast_chunk(
+    req: legacy.AstChunkRequest,
+    include_helpers: Annotated[bool, Query(alias="includeHelpers")] = False,
+    include_tensor_features: Annotated[bool, Query(alias="includeTensorFeatures")] = False,
+    max_helper_chunks: Annotated[int, Query(alias="maxHelperChunks", ge=1, le=512)] = 256,
+) -> AstEvidenceResponseV2:
+    if not _source_revision_is_consistent(req.source, req.source_revision):
+        raise HTTPException(status_code=422, detail="SOURCE_REVISION_MISMATCH")
+    response = _native_ast_evidence(req)
+    if include_helpers or include_tensor_features:
+        response.helper_analysis = build_ast_chunk_helper_analysis_v1(
+            source=req.source,
+            file_path=req.file_path,
+            language=req.language,
+            source_ref=req.source_ref,
+            source_revision=req.source_revision,
+            workspace_revision=req.workspace_revision,
+            chunks=response.chunks,
+            include_tensor_features=include_tensor_features,
+            max_chunks=max_helper_chunks,
+        )
+    return response
 
 
 @app.post("/analyze", response_model=legacy.AnalyzeResponse)
