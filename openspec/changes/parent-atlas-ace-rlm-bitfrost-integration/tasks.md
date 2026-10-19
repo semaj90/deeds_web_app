@@ -17255,5 +17255,39 @@ GPU anything (no CUDA run, no CPU/GPU parity, no VRAM figure for Top-K, low-rank
     - **Rung 3 (PyTorch CUDA GPU Vector Engine):** 1707.08ms; max absolute difference vs Rung 1: $6.94 \times 10^{-18}$, Pearson correlation: 1.000000; peak VRAM: **11.33 MB** (strictly compliant with $<200\text{ MB}$ safe budget, zero interference with `:8090` Ornith).
   - Emitted read-only qualification receipt to `docs/reports/hgrag-canonical-source-relation-proof-v1.json` with `writesPerformed: false`, `canonicalAuthority: false`, `promotable: false`. Parity verdict: `VERIFIED_PASS`.
 
+## HANDOFF 2026-10-19 (end of session; supersedes the "late addendum" above where they differ)
 
+**Git:** `origin/main` = `c10bc7ebad` at time of writing (fast-forward pushes, no force). Commits this session: `d463237119` (57 scoped files: low-rank scoring, Top-K receipts, patch-tournament verified evidence, frozen-corpus SOM reports, phase89 route fixes, ledger + TOC), `35a58f4bcd` (239 files left by parallel sessions, committed as-is and NOT re-verified here), `c10bc7ebad` (five-worker amqplib `error` listeners; 123.7 MB census gitignored but searchable + SHA-256 manifest). **Uncommitted at this handoff (committed right after, see git log):** `docs/reports/graphify-parquet-export-manifest-v1.json`, this handoff; **never committed:** `.claude/settings.local.json` (machine-local, never commit), submodule working trees (`claude-mem`, `models/embeddinggemma_300m`, `turbovec`), `granite-docling-258M` (submodule with untracked content). The 123.7 MB census file stays ON DISK only.
 
+### Live state (verified this session unless marked)
+| Item | State |
+|---|---|
+| Graphify daily lifecycle | `SNAPSHOT_NATIVE_EXECUTION_COMPLETED / COMPLETED` (execution `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`, workspace `sha256:e24bb971...`, 25,542 sources); the earlier "stuck RUNNING" notes are stale |
+| Receipt / verifier / registry tables | `atlas_algorithm_execution_receipts` 0 rows, `atlas_learned_artifact_admission_v1` 0, test receipts 32 (all passed), verifier results 32; every tournament write this session was BEGIN...ROLLBACK, nothing live |
+| Source authority | `graphify_files.source_revision_authority` empty on all 26,014 files; AST edge census 0 eligible of 3,556 (IMPORTS now 74/86 structurally eligible via the GSP-5 resolver); `graphify_edges` 0; `source_revision` writes on `codebase_chunk_index` still deferred past Phase 20 |
+| Data assets | `graphify_symbols` 73,309 (byte spans + revision via files); frozen corpus 03 = 98,335 chunks / 10,249 files (manifest `61ae0c08...`); SOM v2 candidate (256-d prefix, TE 0.060 train / 0.071 held-out files) NOT admitted; exact 768-d kNN recall 1.0 vs float64; legal glossary tables empty |
+| Graphify Parquet export | `.tmp/atlas/graphify-export-v1/graphify_files.parquet` (26,014 rows) and `graphify_symbols.parquet` (73,309 rows), manifest `docs/reports/graphify-parquet-export-manifest-v1.json`; **pyarrow readback PASSED**: SHA-256 and row counts match, 0 symbol file_ids missing from files (10,734 distinct), 0 null/inverted byte spans, 0 null source hashes; BUT files span 7 workspace revisions (filter to `sha256:e24bb971...` before revision-qualified use) and parse_status is PROCESSED 19,448 / UNPROCESSED 6,552 / PARSE_FAILED 14 (UNPROCESSED files have no symbols) |
+| Services | `:8090` Ornith idle, `:8095/:8097/:8098/:8100/:8788` up, `:8791` TurboVec down (restart only on request, py3.13) |
+
+### Validation matrix (last results this session)
+Python: stage 3 + stage 4 specs 12 passed (52 across the low-rank/tile set earlier). TS (vitest): Top-K pipeline 19, RPC descriptor 5, patch outcome receipts 7, patch check receipts 7, planner `patch-tournament.spec.ts` 17 (4 new), test-receipt-ingest 13, latent matrix 4 (other session's). Runners: `run-patch-tournament-worktree-fixture-v1.mts --rehearse-db` exit 0 (6 expectations true); `run-patch-tournament-real-error-v1.mts --rehearse-db` exit 0 (candidate-1 `ALL_CHECKS_PASSED_VERIFIED`, 5 of 6 receipts resolved, 0 rows left behind). TOC: `MASTER_TOC_V2_CHECK_OK`. **No validation yet:** the five amqplib listener edits (syntax-checked only, no runtime or spec); GPU parity beyond the 11-candidate fixture; anything on a live Postgres commit path.
+
+### Operator decisions still open
+1. Authorize (or decline) a LIVE commit of real tournament receipts; synthetic rehearsal rows must stay out of the live table.
+2. Review the 69 near-duplicate groups at cosine 0.98 (147 files) before any exclusion; 0.95 is unusable (365-file chain).
+3. Provide/approve the 200-row reviewed golden label set (30 per class): the blocker for MLP, XGBoost, DSPy/GEPA, QLoRA/DPO.
+4. Pool/timeout review for the `AnalysisJobs` SKIP LOCKED poller (`Connection terminated due to connection timeout`) and the slow `/api/health` (4.8 s, ~1.1 GB RSS) seen in the dev log; likely host memory pressure.
+5. Valkey/BitFrost centroid writes, TurboVec restart, `:8090` free for WSL cuDF/cuVS: each needs an explicit go.
+6. Legal glossary content (sourced, jurisdiction-tagged, reviewed) if the legal lane needs term resolution.
+
+### Traps found this session
+- `importlib.util.find_spec('duckdb')` from the REPO ROOT returns True because `./duckdb` is a directory; Python duckdb is not installed for py3.13. Do not trust find_spec from the repo root. Dependency installs need a proven gap (DEPENDENCY-CAPABILITY-GUARD-01).
+- A zero-byte `.git/index.lock` appeared while only idle fsmonitor daemons ran; removed once after verifying no live git process. Check before removing.
+- GitHub rejects files over 100 MB: keep such artifacts gitignored (+ `!path` in `.rgignore` to stay searchable) with a tracked SHA-256 manifest. On Windows, `rg --files` prints backslashes; grep separator-agnostically.
+- Editing regexes through Python string literals turned `\b` into a backspace character twice; use the editor tool for regex edits. `py -3.13 -I` drops user site-packages (numpy/torch import fails).
+- Seeded Ornith runs (T=0.8, seeds 101/202/303) reproduced the same three candidates on this server build; do not assume that elsewhere. PCA-initialised SOM runs are deterministic, so "three seeds" show nothing about seed stability.
+- A free-RAM reading under 1 GB blocked GPU work earlier (`FreePhysicalMemory` excludes reclaimable cache; use the `Available MBytes` counter) and later recovered to ~9 GB without action.
+- Shared files: `tasks.md` and the TOC outputs also contain other sessions' edits; commit with explicit path lists, never `git add -A` without the exclusion checks used in `35a58f4bcd`.
+
+### Next steps in order
+(1) Finish/verify the Parquet readback, commit the manifest + handoff (ask before push). (2) Reviewed labels. (3) Source authority + AST edge admission after Phase 20, then a code-relation hyperedge set with BFS baseline. (4) Wire the real-error runner to a persisted, authorized receipt path. (5) Near-duplicate review. (6) Only then XGBoost on leakage-safe labels and shadow-only policy learning via `LearningOutcomeV1`; SOM/kNN/PageRank stay advisory.

@@ -137424,6 +137424,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:3203fb187ab1792307d75831f7f726385bb4b973095ebf7df7a7516f9e201e8a",
+      "path": "docs/reports/graphify-downstream-chain-2026-10-19.json",
+      "sha256": "a03331cc69b15db813b878b22c5ddc6f2b2e496eff370a0038f1e71b87999ec5",
+      "bytes": 753,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:14c07914fe4683a4c9f5c6a7678e5a57ba0a90f991f46c1cf67690f271636927",
       "path": "docs/reports/graphify-embedding-qdrant-content-projection-v1.json",
       "sha256": "abf04fbc70c6a66e8c8b4a2168747a95ba62ef879c255a3834512cd2f4b7dff6",
@@ -139234,6 +139277,49 @@
       "path": "docs/reports/graphify-packet-source-coverage-v1.json",
       "sha256": "5cf99a19e83f407d09860e13bae8176fd35319b74b8332b97ecd89660bb14c67",
       "bytes": 330576,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:1db7dbb6b5569c96c09fb956c3cf2b15f8ace77133d88efc2077fa43ff857a60",
+      "path": "docs/reports/graphify-parquet-export-manifest-v1.json",
+      "sha256": "0ed703fc4eddd0d6f95edd961c38e023823630d77cd57534af221e0ffa4d1bc8",
+      "bytes": 3243,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -328784,8 +328870,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:6ceaa383eaee756c4354de38eda50f9455333af51aa369a1be723b37919e4fed",
       "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-      "sha256": "b1ec33fd478125e11988fb1b4bb194fac8109697781da932dcd4ffb46291ac67",
-      "bytes": 1486350,
+      "sha256": "b36260443e4b2c085501e05c7b75250426eeb2b4bab70847a8a153c2bbcea2a3",
+      "bytes": 1492819,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -342931,8 +343017,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:d1f72aaca72e8e5dd5a2f3c23e790e8c9390fd72046b75060a80031bcbedd5f8",
       "path": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "sha256": "7e582fce230efa32daa11e9ad31231d9fac7127dc8c926dbfd21f26e51b9df37",
-      "bytes": 1913496,
+      "sha256": "a4acc8d31d10770bb53759a352c84aa428ca12f367da8df2c8bd1d36527c7bc3",
+      "bytes": 1915822,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",

@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.graphify-parquet-export-manifest.v1",
+  "generatedAt": "2026-10-19T10:33:44.969919+00:00",
+  "purpose": "columnar, analysis-ready export of the daily Graphify codebase tables for cuDF / DuckDB / pyarrow / PyTorch feature work",
+  "source": "PostgreSQL graphify_files + graphify_symbols via a READ ONLY session (rolled back, no writes)",
+  "lifecycle": {
+    "status": "SNAPSHOT_NATIVE_EXECUTION_COMPLETED",
+    "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "selectedSourceCount": 25542
+  },
+  "files": {
+    "graphify_files": {
+      "file": ".tmp/atlas/graphify-export-v1/graphify_files.parquet",
+      "rows": 26014,
+      "columns": [
+        "file_id",
+        "workspace_id",
+        "source_ref",
+        "source_revision",
+        "content_hash",
+        "byte_length",
+        "language",
+        "parser_name",
+        "parser_version",
+        "parse_status",
+        "code_source_revision",
+        "workspace_revision",
+        "source_revision_authority",
+        "producer_revision",
+        "git_blob_oid",
+        "created_at",
+        "updated_at"
+      ],
+      "bytes": 2831195,
+      "sha256": "a87266532bdfa999e24cb897c4176304e116966478ca4fdfda446be8a662f401"
+    },
+    "graphify_symbols": {
+      "file": ".tmp/atlas/graphify-export-v1/graphify_symbols.parquet",
+      "rows": 73309,
+      "columns": [
+        "symbol_id",
+        "file_id",
+        "stable_symbol_key",
+        "symbol_kind",
+        "qualified_name",
+        "parent_symbol_id",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "end_row",
+        "signature_text",
+        "source_text_hash",
+        "ast_fingerprint"
+      ],
+      "bytes": 11474387,
+      "sha256": "e229be574848a3ad490a85dcfa97c901f40af2d95a023b4ffd67f89ed4c98ccc"
+    }
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "gitPolicy": "parquet files live in gitignored .tmp/atlas/; this manifest (tracked) records row counts and SHA-256 for recovery and re-derivation",
+  "limits": "symbols carry source_revision only through graphify_files; graphify_files.source_revision_authority is empty on all rows, so authority is NOT proven; graphify_edges is empty (0), so there are no relations in this export.",
+  "readback": {
+    "method": "pyarrow reload of both files; SHA-256 and row counts re-checked against this manifest",
+    "shaMatches": true,
+    "rowCountsMatch": true,
+    "symbolFileIdsMissingFromFiles": 0,
+    "distinctSymbolFileIds": 10734,
+    "nullStartOrEndByte": 0,
+    "nullSourceTextHash": 0,
+    "rowsWhereEndBeforeStart": 0,
+    "filesWithNullSourceRevision": 0,
+    "distinctWorkspaceRevisionsInFiles": 7,
+    "parseStatus": {
+      "PROCESSED": 19448,
+      "UNPROCESSED": 6552,
+      "PARSE_FAILED": 14
+    },
+    "note": "files from 7 workspace revisions are mixed; filter to the lifecycle workspaceRevision before any revision-qualified analysis. 6,552 files are UNPROCESSED and have no symbols."
+  }
+}
