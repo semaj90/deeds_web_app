@@ -8,12 +8,15 @@ import postgres from 'postgres';
 import type { RequestHandler } from './$types';
 
 import { embedOrChatFetch } from '$lib/server/ollama.js';
-import { isUuid } from '$lib/server/validation.js';
+import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 const sql = postgres(ENV.DATABASE_URL);
 const QDRANT_URL = ENV.QDRANT_URL;
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const KNOWLEDGE_COLLECTION = 'phase76_knowledge_base';
+
+// kg_nodes.id is an integer (serial), not a UUID.
+const nodeIdSchema = z.coerce.number().int().min(1).max(2147483647);
 
 async function generateEmbedding(text: string): Promise<number[]> {
   const response = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
@@ -30,15 +33,15 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-  const { id } = params;
-
-  if (!isUuid(id)) {
+  const parsedId = nodeIdSchema.safeParse(params.id);
+  if (!parsedId.success || !/^\d+$/.test(params.id)) {
     return json({ error: 'Invalid ID format' }, { status: 400 });
   }
+  const id = parsedId.data;
 
   try {
-    // Get node details
-    const [node] = await sql`SELECT id, kind, label, meta, embedding FROM kg_nodes WHERE id = ${id}`;
+    // Get node details (kg_nodes columns: id, node_type, label, properties; aliases keep kind/meta stable)
+    const [node] = await sql`SELECT id, node_type AS kind, label, properties AS meta FROM kg_nodes WHERE id = ${id}`;
 
     if (!node) {
       return json({ error: 'Node not found' }, { status: 404 });

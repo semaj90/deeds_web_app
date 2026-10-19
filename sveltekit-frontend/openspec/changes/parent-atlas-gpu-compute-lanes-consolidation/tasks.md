@@ -1883,3 +1883,29 @@ No install was needed: `nx-cugraph 26.6.0`, `cugraph 26.6.0`, `cudf`, `cuml 26.6
 - Converted-graph cache is on by default (`nx.config.cache_converted_graphs=True`) and warns that mutating a graph by hand makes the cache stale; clear with `G.__networkx_cache__.clear()`.
 - [ ] Open: real Atlas graph (162,234 nodes / 108,156 edges parity snapshot) not run; other algorithms (Louvain, betweenness) not tested; unsupported-algorithm fallback behavior untested; memory overhead on the 8 GB card shared with Ornith untested. **Do not set `NETWORKX_AUTOMATIC_BACKENDS` globally on this evidence.**
 - ACE feature tensor parity (`ace_packet_proposal_v1.py`) also passed under this env's torch 2.13 (15/15 tests).
+
+## TRITON-CHALLENGER-01 (2026-10-18): fused remap + tiled GEMM + bit-FSM kernel recorded as a challenger only (paper entry; no code, no install, no GPU run)
+
+Source: an externally pasted Triton sketch (token remap gather -> tiled GEMM `num_stages=3` -> bit-packed 4-bit FSM mask). Reviewed against this repo; cross-ref `parent-atlas-ace-rlm-bitfrost-integration/tasks.md` `ALIGN-RTX-01`.
+
+**Classification.** `EXPERIMENT` / LEVEL 2-3 challenger under this change. Not a new owner, not a default, not a retrieval vote. Triton imports under Windows py3.13 (`site-packages\triton`) but no repo module uses it and no owner lists it.
+
+**Standing ladder (unchanged).** LEVEL 1 vendor primitive / CPU oracle (cuBLASLt, LibTorch) -> LEVEL 2 simple SIMT -> LEVEL 3 cuTile. Anchors: `python/tests/test_avx2_cutile_miras_fsm.py`, `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs`. A Triton kernel may only be a challenger at LEVEL 2/3. No rung skipped.
+
+**Gates before any challenger run (all required, each recorded as an explicit null with reason if it fails):**
+- [ ] TRITON-GATE-VRAM Free-VRAM check from `nvidia-smi` outside the CUDA process (not `cudaMemGetInfo`, which overstates on WDDM). Budget < ~1 GiB alongside `:8090` Ornith (~6.2-6.7 GiB of 8 GiB). Never stop `:8090` for this.
+- [ ] TRITON-GATE-ORACLE CPU-oracle parity on ordering, masks, dims and checksums with a bounded tolerance; seeded.
+- [ ] TRITON-GATE-RECEIPT One validated row in `atlas_algorithm_execution_receipts` (live columns verified 2026-10-18: `execution_id, workflow_id, action_id, dag_node_id, stage, logical_lane, algorithm_class, algorithm, geometry, metric, compute_backend, compilation_mode, transport, serialization, source_snapshot_revision, representation_revision, graph_snapshot_revision, relationship_snapshot_revision, input/output/manifest checksums, manifest jsonb`). The table has no outcome status; a pass/fail verdict still needs `atlas_receipt_verification_v1` (RECEIPT-OWNER-01, unapproved).
+- [ ] TRITON-GATE-NOBUILD Do not modify CUDA/native build files (`tensorrt_bridge.node`, CMake) or `legal-ai-postgres` settings; keep `io_method=worker` (live: `io_workers=3`, `effective_io_concurrency=16`).
+
+**Defects in the sketch to fix before it is even a fixture:**
+- [ ] TRITON-FIX-01 FP16 mask: `-1e9` cast to fp16 becomes `-inf`; use `torch.finfo(torch.float16).min` (-65504) or keep the epilogue in fp32.
+- [ ] TRITON-FIX-02 Not a true FSM: next state is `(table[state] >> 4*(offs_n & 15)) & 0xF` per column, and `FSM_States` is never written back. A real FSM must persist the transition only after token selection (or run a persistent multi-step kernel).
+- [ ] TRITON-FIX-03 Remap is a no-op permutation: rows gathered by `Token_Map` are scattered back to the same indices. Justify only if `B` is grouped per expert/state or the output stays permuted for the next layer; otherwise drop the gather.
+- [ ] TRITON-FIX-04 Sm_86 reality: GeForce Ampere fp16 tensor math with fp32 accumulate runs at half rate; the pasted ">85% FLOPs", "3-10 us launch" and "2.5-3x io_uring" figures are unsourced and must not be cited.
+
+**Postgres 18 AIO (decision, no change).** AIO and bitmap scans are planner behavior (AGENTS.md); no application abstraction. Keep `io_method=worker`: `io_uring` is Linux-only and Docker's default seccomp profile may block it. The hot vector path is pgvector HNSW index scans, not bitmap heap scans. Record `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` when evaluating. The pasted `token_blocks` example table does not exist (`to_regclass` null).
+
+**Not ratified here.** The pasted note calls `codebase_chunks_768_v2` part of the right setup; that default is an open risk (ALIGN-TV-06: `_v2` has 52,816 points vs 219,998 Postgres chunks) and is not endorsed by this entry.
+
+Next (needs a decision): none of the above starts without an explicit request for a Triton fixture; the cheapest first step would be a CPU-only reference of the remap+mask epilogue to settle TRITON-FIX-01..03.

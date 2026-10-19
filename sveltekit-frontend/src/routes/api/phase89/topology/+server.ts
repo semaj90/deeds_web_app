@@ -13,15 +13,12 @@ export const GET: RequestHandler = async ({ locals }) => {
     // Get errors grouped by file
     const errorsResult = await pool.query(`
       SELECT
-        COALESCE(
-          SUBSTRING(raw_text FROM '^([^:(]+)'),
-          'unknown'
-        ) as file_path,
-        source,
-        COUNT(*) as error_count,
-        COUNT(CASE WHEN embedding IS NOT NULL THEN 1 END) as embedded_count
-      FROM raw_error_embeddings
-      GROUP BY file_path, source
+        COALESCE(NULLIF(i.file_path, ''), 'unknown') as file_path,
+        COUNT(DISTINCT i.id)::integer as error_count,
+        COUNT(DISTINCT i.id) FILTER (WHERE e.embedding IS NOT NULL)::integer as embedded_count
+      FROM phase89_error_instances i
+      LEFT JOIN raw_error_embeddings e ON e.error_hash = i.error_hash
+      GROUP BY COALESCE(NULLIF(i.file_path, ''), 'unknown')
       ORDER BY error_count DESC
       LIMIT 500
     `);
@@ -33,7 +30,6 @@ export const GET: RequestHandler = async ({ locals }) => {
       type: 'file' as const,
       errorCount: parseInt(row.error_count),
       embeddedCount: parseInt(row.embedded_count),
-      source: row.source,
       status: parseInt(row.embedded_count) === parseInt(row.error_count)
         ? 'clean' as const
         : parseInt(row.error_count) > 10

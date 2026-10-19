@@ -56,6 +56,33 @@
       "validationCommand": "Read-only: three diagnostic_* tables exist; row counts 0."
     },
     {
+      "file": "manual/20261018_atlas_receipt_verification_v1.sql",
+      "status": "applied",
+      "reason": "View atlas_receipt_verification_v1 over canonical atlas_test_execution_receipts for verified pass/fail verdicts and trainable outcomes.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: view atlas_receipt_verification_v1 exists and selects from atlas_test_execution_receipts."
+    },
+    {
+      "file": "manual/20261018_atlas_receipt_verifier_results_v1.sql",
+      "status": "applied",
+      "reason": "Additive verifier-written table atlas_receipt_verifier_results_v1 (canonical=false by CHECK; VERIFIED_PASS requires evidence_resolved) over atlas_test_execution_receipts. Applied after a rolled-back rehearsal that exercised all three CHECK/UNIQUE guards. 0 rows; no writer yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: to_regclass('atlas_receipt_verifier_results_v1') is not null; row count 0."
+    },
+    {
+      "file": "manual/20261018_atlas_learned_artifact_admission_v1.sql",
+      "status": "applied",
+      "reason": "Additive registry atlas_learned_artifact_admission_v1 (canonical=false by CHECK): admission state, evaluation evidence, stored-weights reference and verified-receipt-set digest for learned artifacts (logistic head, low-rank basis, policy/value net, PPO policy, GEPA prompt set, procedural-memory snapshot, XGBoost model). References only. Applied after a rolled-back rehearsal covering 3 valid and 8 rejected rows. 0 rows; no writer yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: to_regclass('atlas_learned_artifact_admission_v1') is not null; row count 0."
+    },
+    {
       "file": "manual/20261001_openspec_task_identity_history_v1.sql",
       "status": "design_unapplied",
       "reason": "EVF stable identity/history companion: immutable canonical task keys, internal surrogate IDs, claim revision snapshots, and alias preservation. No rows are imported or source files mutated; apply only after deterministic identity parity and schema-owner authorization.",
@@ -768,6 +795,24 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "Rehearsal: run the draft with COMMIT removed, exercise the constraints, ROLLBACK, and confirm 0 tables afterward (script kept in the session scratchpad); production apply needs explicit operator approval, a backup, and CREATE ... IF NOT EXISTS re-run to prove idempotence."
+    },
+    {
+      "file": "manual/20261018_atlas_procedural_sequences_v1_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Versioned, non-executable procedure catalog keyed by (sequence_id, sequence_revision), searchable by feature_id and feature_label, with admission gated on source/workspace revisions and evidence references. No procedures seeded and MCP lookup is read-only.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Review DDL and test read-only MCP filter contract; apply only after explicit operator authorization, rollback rehearsal, and ownership review."
+    },
+    {
+      "file": "manual/20261018_openspec_task_source_index_v1.sql",
+      "status": "applied",
+      "reason": "Additive immutable source locator/search projection for 5,640 OpenSpec task lines in the latest post-commit readback. Source files remain authoritative; identity status is retained, source revisions remain deferred, and no executable Kanban or canonical task identity is written. Exact post-commit readback checksum recorded in .tmp/openspec-task-source-index-v1/receipt.json.",
+      "appliedBy": "operator-authorized-goal-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Recorded post-commit readback in .tmp/openspec-task-source-index-v1/receipt.json: 5,640 rows; 5,640 unique source refs; 0 invalid rows; 204 ambiguous identities retained; canonicalTaskPromotionCount=0; executableKanbanWrites=0; workspace snapshot sha256:72bf1846a8827d8ab0f6a128c550de2e4021f9a6f09ecdea30ed427070320536; row-manifest checksum sha256:aacb5bd18e6007449d10a76202335239202437707a38b4f21822d344e41a1cea."
     }
   ]
 }

@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.frozen-corpus-manifest-summary.v1",
+  "version": 2,
+  "generatedAt": "2026-10-19T08:21:05.580565+00:00",
+  "derivedFrom": "FROZEN-CORPUS-01 manifest sha256 e8f8a9af83256ef95dd12b63e0628a6c19d34f4fb43bfc6c51fdb90eb354464f",
+  "excludePattern": "(phase104-backups|[-_/]backups?/|archived-schemas|routes_parked|_parked/|demos/yorha/components/_simulations/)",
+  "excludedRows": 6185,
+  "excludedByPattern": {
+    "phase104-backups": 6059,
+    "archived-schemas": 35,
+    "demos/yorha/components/_simulations/": 91
+  },
+  "keptRows": 100086,
+  "distinctFiles": 10421,
+  "exactDuplicateVectorGroups": 730,
+  "rowsInDuplicateGroups": 2020,
+  "byLanguage": {
+    "javascript": 35759,
+    "typescript": 51370,
+    "svelte": 11672,
+    "python": 1285
+  },
+  "byTopDirectory": {
+    "sveltekit-frontend/src": 49961,
+    "scripts/atlas": 23666,
+    "sveltekit-frontend/scripts": 14197,
+    "sveltekit-frontend/tests": 9730,
+    "packages/parent-atlas": 2532
+  },
+  "manifestSha256": "1672ee495b28fffd45995cdb5b2073d893d0a34283e506e2a179b041c8d7acde",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "note": "excluded paths are archived-in-place source, not deleted; freeze is by content hashes only (no revision columns populated)"
+}

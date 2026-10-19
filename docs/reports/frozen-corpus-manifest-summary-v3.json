@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.frozen-corpus-manifest-summary.v1",
+  "version": 3,
+  "generatedAt": "2026-10-19T08:43:01.537526+00:00",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "derivedFrom": "FROZEN-CORPUS-02 (manifest sha256 1672ee495b28fffd45995cdb5b2073d893d0a34283e506e2a179b041c8d7acde)",
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "revisionOverlay": {
+    "source": "atlas_workspace_source_bindings (read-only join on canonical_source_ref = relative_path)",
+    "fileStatus": {
+      "QUALIFIED": 10316,
+      "DIGEST_MISMATCH": 39,
+      "UNBOUND": 66
+    },
+    "chunkStatus": {
+      "QUALIFIED": 98808,
+      "DIGEST_MISMATCH": 654,
+      "UNBOUND": 624
+    },
+    "rule": "QUALIFIED = binding at the admitted workspace AND chunk file_content_hash == binding content_digest; others excluded, never repaired"
+  },
+  "dedup": {
+    "rule": "exact whole-file content hash groups; representative = shallowest path then lexicographic; copies flagged and excluded, never deleted",
+    "duplicateGroups": 63,
+    "copyFilesExcluded": 67,
+    "chunksExcluded": 473,
+    "largestGroups": [
+      {
+        "representative": "sveltekit-frontend/src/routes/(app)/cases/[id]/ai/+page.server.ts",
+        "copies": 3
+      },
+      {
+        "representative": "sveltekit-frontend/src/routes/(app)/admin/cache/+page.server.ts",
+        "copies": 2
+      },
+      {
+        "representative": "sveltekit-frontend/src/routes/(app)/citations/+layout.svelte",
+        "copies": 2
+      },
+      {
+        "representative": "sveltekit-frontend/scripts/atlas/phase4-stability-test.mjs",
+        "copies": 1
+      },
+      {
+        "representative": "sveltekit-frontend/src/lib/components/yorha/cases/CaseStats.svelte",
+        "copies": 1
+      },
+      {
+        "representative": "sveltekit-frontend/src/lib/components/yorha/dashboard/GPUMetrics.svelte",
+        "copies": 1
+      },
+      {
+        "representative": "sveltekit-frontend/src/lib/components/yorha/YoRHaTable.svelte",
+        "copies": 1
+      },
+      {
+        "representative": "sveltekit-frontend/src/lib/components/yorha/YoRHaDialog.svelte",
+        "copies": 1
+      },
+      {
+        "representative": "sveltekit-frontend/src/lib/components/yorha/PoliceReportGenerator.svelte",
+        "copies": 1
+      },
+      {
+        "representative": "sveltekit-frontend/src/lib/components/yorha/ContradictionReveal.svelte",
+        "copies": 1
+      }
+    ]
+  },
+  "keptRows": 98335,
+  "distinctFiles": 10249,
+  "byLanguage": {
+    "javascript": 34801,
+    "typescript": 50967,
+    "svelte": 11309,
+    "python": 1258
+  },
+  "byTopDirectory": {
+    "sveltekit-frontend/src": 49254,
+    "scripts/atlas": 23052,
+    "sveltekit-frontend/scripts": 13819,
+    "sveltekit-frontend/tests": 9706,
+    "packages/parent-atlas": 2504
+  },
+  "exactDuplicateVectorGroupsRemaining": 267,
+  "manifestSha256": "61ae0c08f0d212c25bc0bb7378ec6a6c67c212d2fe03e77ed199087e60eeb257",
+  "manifestFile": ".tmp/atlas/frozen-corpus-03-manifest.tsv (gitignored)",
+  "ordinalNote": "column 0 is a freeze-local ordinal, NOT the canonical CandidateOrdinal map",
+  "revisionNote": "source_revision/workspace_revision come from the file-level bindings overlay; codebase_chunk_index columns remain NULL (write deferred past Phase 20)"
+}

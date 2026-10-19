@@ -1,0 +1,529 @@
+{
+ "schema": "atlas.frozen-corpus-relation-som.v1",
+ "version": 3,
+ "generatedAt": "2026-10-19T08:44:00.206568+00:00",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "rows": 98335,
+ "torch": "2.8.0+cu128",
+ "device": "NVIDIA GeForce RTX 3060 Ti",
+ "manifestSha256": "61ae0c08f0d212c25bc0bb7378ec6a6c67c212d2fe03e77ed199087e60eeb257",
+ "relationAnalysis": {
+  "k": 10,
+  "peakCudaAllocatedMiB": 127.1,
+  "seconds": 30.1,
+  "cpuOracleSample": 300,
+  "tieAwareRecallVsFloat64Oracle": 1.0,
+  "worstSortedScoreAbsDiff": 0.0,
+  "meanCosineAtRank": [
+   0.8080263733863831,
+   0.7751975655555725,
+   0.7570304870605469,
+   0.7447875142097473,
+   0.7357181310653687,
+   0.7285415530204773,
+   0.7226659059524536,
+   0.7177287936210632,
+   0.7134379744529724,
+   0.7096968293190002
+  ],
+  "sameFileNeighborFraction": 0.2863731123201302,
+  "identicalVectorNeighborFraction": 0.004871103879595261,
+  "directories": [
+   "packages/parent-atlas",
+   "scripts/atlas",
+   "sveltekit-frontend/scripts",
+   "sveltekit-frontend/src",
+   "sveltekit-frontend/tests"
+  ],
+  "neighborDirectoryMatrix": [
+   [
+    18044,
+    947,
+    198,
+    5819,
+    32
+   ],
+   [
+    1421,
+    174318,
+    36211,
+    17988,
+    582
+   ],
+   [
+    201,
+    37840,
+    79960,
+    18366,
+    1823
+   ],
+   [
+    6662,
+    18758,
+    18411,
+    441088,
+    7621
+   ],
+   [
+    37,
+    841,
+    1552,
+    6762,
+    87868
+   ]
+  ],
+  "sameDirectoryShare": {
+   "packages/parent-atlas": 0.7206070287539936,
+   "scripts/atlas": 0.7561946902654867,
+   "sveltekit-frontend/scripts": 0.5786236341269267,
+   "sveltekit-frontend/src": 0.8955374182807487,
+   "sveltekit-frontend/tests": 0.9052956933855347
+  },
+  "topCrossFilePairs": [
+   [
+    "sveltekit-frontend/src/lib/components/legal-corpus/LegalCorpusClassicView.svelte",
+    "sveltekit-frontend/src/routes/(app)/legal-corpus/[id]/+page.svelte",
+    155
+   ],
+   [
+    "sveltekit-frontend/src/lib/components/yorha/YoRHaDetectiveCommandCenter.svelte",
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/YoRHaDetectiveCommandCenter.svelte",
+    152
+   ],
+   [
+    "scripts/atlas/backfill-latent-vectors.mjs",
+    "scripts/atlas/backfill-packet-metadata-to-postgres.mjs",
+    149
+   ],
+   [
+    "sveltekit-frontend/tests/sse-chat-attachment-metadata.spec.ts",
+    "sveltekit-frontend/tests/sse-chat-glossary-metadata.spec.ts",
+    141
+   ],
+   [
+    "scripts/atlas/extract-md-checkbox-features.ts",
+    "scripts/atlas/rlm-condense-index.ts",
+    128
+   ],
+   [
+    "sveltekit-frontend/src/routes/(app)/demos/courtroom-sim/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/simulation/+page.svelte",
+    124
+   ],
+   [
+    "scripts/atlas/qdrant-parity-repair-core.mjs",
+    "sveltekit-frontend/scripts/atlas/audit-qdrant-component-parity.mjs",
+    121
+   ],
+   [
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    110
+   ],
+   [
+    "sveltekit-frontend/src/routes/(analysis)/video-analysis/[evidenceId]/+page.svelte",
+    "sveltekit-frontend/src/routes/(analysis)@/video-analysis/[evidenceId]/+page.svelte",
+    108
+   ],
+   [
+    "scripts/atlas/rebuild-gemma4-summaries-384.mjs",
+    "scripts/atlas/rebuild-gemma4-summaries-768.mjs",
+    102
+   ],
+   [
+    "scripts/atlas/audit-final-completion-report.mjs",
+    "scripts/atlas/audit-parent-atlas-final-completion.mjs",
+    94
+   ],
+   [
+    "sveltekit-frontend/scripts/atlas/kmeans-chunk-cluster-384.py",
+    "sveltekit-frontend/scripts/atlas/kmeans-chunk-cluster.py",
+    93
+   ],
+   [
+    "scripts/atlas/audit-proto-registry.mjs",
+    "scripts/atlas/packetize-proto-rpc-tools.mjs",
+    93
+   ],
+   [
+    "sveltekit-frontend/scripts/index-legal-pdfs.ts",
+    "sveltekit-frontend/scripts/ingest-govinfo-federal.ts",
+    92
+   ],
+   [
+    "sveltekit-frontend/src/routes/(analysis)/document-analysis/[evidenceId]/+page.svelte",
+    "sveltekit-frontend/src/routes/(analysis)@/document-analysis/[evidenceId]/+page.svelte",
+    91
+   ]
+  ],
+  "status": "EXPLORATORY_NOT_RETRIEVAL_AUTHORITY"
+ },
+ "somV3Candidate": {
+  "grid": [
+   20,
+   20
+  ],
+  "chosen": {
+   "dim": 256,
+   "sigma0": 10.0,
+   "sigmaEnd": 1.0,
+   "init": "pca",
+   "epochs": 60,
+   "qe": 0.6328351497650146,
+   "te": 0.060568464941272215,
+   "nbp2": 0.7081476585142624,
+   "emptyCells": 0,
+   "occMin": 6,
+   "occMax": 1154
+  },
+  "finalEpochs": 150,
+  "finalRuns": [
+   {
+    "seed": 20261019,
+    "qe": 0.631706953048706,
+    "te": 0.059734580769817414,
+    "nbp2": 0.7101520313215031,
+    "emptyCells": 0,
+    "occMin": 2,
+    "occMax": 943
+   },
+   {
+    "seed": 1,
+    "qe": 0.6317158937454224,
+    "te": 0.05953119438653587,
+    "nbp2": 0.710002542329791,
+    "emptyCells": 0,
+    "occMin": 2,
+    "occMax": 937
+   },
+   {
+    "seed": 2,
+    "qe": 0.6317273378372192,
+    "te": 0.05988712055727874,
+    "nbp2": 0.7101428789342553,
+    "emptyCells": 0,
+    "occMin": 2,
+    "occMax": 930
+   }
+  ],
+  "weightsSha256": "a86dc85c67d60cd7c62233a0b171066120aede7943eeed2e175de5a5b279ee34",
+  "bmuParityCudaF32VsNumpyF64GenuineMismatches": 0,
+  "sweepSeconds": 28.2,
+  "status": "CANDIDATE_ONLY_NOT_ADMITTED",
+  "sweep": [
+   {
+    "dim": 64,
+    "sigma0": 10.0,
+    "sigmaEnd": 1.0,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6275572180747986,
+    "te": 0.06572430975746169,
+    "nbp2": 0.6138567142929781,
+    "emptyCells": 0,
+    "occMin": 19,
+    "occMax": 818
+   },
+   {
+    "dim": 64,
+    "sigma0": 10.0,
+    "sigmaEnd": 1.0,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6271690726280212,
+    "te": 0.06914120099659327,
+    "nbp2": 0.6125947017847155,
+    "emptyCells": 0,
+    "occMin": 28,
+    "occMax": 948
+   },
+   {
+    "dim": 64,
+    "sigma0": 10.0,
+    "sigmaEnd": 0.5,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6042138338088989,
+    "te": 0.26564295520414904,
+    "nbp2": 0.6029175776681751,
+    "emptyCells": 0,
+    "occMin": 16,
+    "occMax": 750
+   },
+   {
+    "dim": 64,
+    "sigma0": 10.0,
+    "sigmaEnd": 0.5,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6041982173919678,
+    "te": 0.26192098439009504,
+    "nbp2": 0.6023725021609804,
+    "emptyCells": 0,
+    "occMin": 18,
+    "occMax": 757
+   },
+   {
+    "dim": 64,
+    "sigma0": 6.0,
+    "sigmaEnd": 1.0,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6266741156578064,
+    "te": 0.06847002593176388,
+    "nbp2": 0.6182224030101184,
+    "emptyCells": 0,
+    "occMin": 33,
+    "occMax": 768
+   },
+   {
+    "dim": 64,
+    "sigma0": 6.0,
+    "sigmaEnd": 1.0,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6272953152656555,
+    "te": 0.07139878985101944,
+    "nbp2": 0.6141241673869935,
+    "emptyCells": 0,
+    "occMin": 21,
+    "occMax": 774
+   },
+   {
+    "dim": 64,
+    "sigma0": 6.0,
+    "sigmaEnd": 0.5,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.603567361831665,
+    "te": 0.26117862409111714,
+    "nbp2": 0.6084649412721819,
+    "emptyCells": 0,
+    "occMin": 14,
+    "occMax": 747
+   },
+   {
+    "dim": 64,
+    "sigma0": 6.0,
+    "sigmaEnd": 0.5,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6037988066673279,
+    "te": 0.2722530126608024,
+    "nbp2": 0.6046697513601464,
+    "emptyCells": 0,
+    "occMin": 10,
+    "occMax": 740
+   },
+   {
+    "dim": 128,
+    "sigma0": 10.0,
+    "sigmaEnd": 1.0,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6103728413581848,
+    "te": 0.06392434026541927,
+    "nbp2": 0.6778369858137998,
+    "emptyCells": 0,
+    "occMin": 5,
+    "occMax": 1091
+   },
+   {
+    "dim": 128,
+    "sigma0": 10.0,
+    "sigmaEnd": 1.0,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6106225252151489,
+    "te": 0.06290740834901098,
+    "nbp2": 0.6713387908679513,
+    "emptyCells": 0,
+    "occMin": 17,
+    "occMax": 1091
+   },
+   {
+    "dim": 128,
+    "sigma0": 10.0,
+    "sigmaEnd": 0.5,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.5888237953186035,
+    "te": 0.25146692428941886,
+    "nbp2": 0.6645253470280165,
+    "emptyCells": 0,
+    "occMin": 14,
+    "occMax": 759
+   },
+   {
+    "dim": 128,
+    "sigma0": 10.0,
+    "sigmaEnd": 0.5,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.5889201760292053,
+    "te": 0.2556363451466924,
+    "nbp2": 0.6631758783749429,
+    "emptyCells": 0,
+    "occMin": 9,
+    "occMax": 758
+   },
+   {
+    "dim": 128,
+    "sigma0": 6.0,
+    "sigmaEnd": 1.0,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6101996302604675,
+    "te": 0.06388366298876291,
+    "nbp2": 0.6775746173793664,
+    "emptyCells": 0,
+    "occMin": 3,
+    "occMax": 1172
+   },
+   {
+    "dim": 128,
+    "sigma0": 6.0,
+    "sigmaEnd": 1.0,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6100252866744995,
+    "te": 0.06655819392891649,
+    "nbp2": 0.6717252249961865,
+    "emptyCells": 0,
+    "occMin": 14,
+    "occMax": 955
+   },
+   {
+    "dim": 128,
+    "sigma0": 6.0,
+    "sigmaEnd": 0.5,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.5885600447654724,
+    "te": 0.2579549499161031,
+    "nbp2": 0.663876544465348,
+    "emptyCells": 0,
+    "occMin": 5,
+    "occMax": 757
+   },
+   {
+    "dim": 128,
+    "sigma0": 6.0,
+    "sigmaEnd": 0.5,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.5886661410331726,
+    "te": 0.2575380078303757,
+    "nbp2": 0.6646148370366604,
+    "emptyCells": 0,
+    "occMin": 6,
+    "occMax": 759
+   },
+   {
+    "dim": 256,
+    "sigma0": 10.0,
+    "sigmaEnd": 1.0,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6326313018798828,
+    "te": 0.06684293486551074,
+    "nbp2": 0.7018253927899527,
+    "emptyCells": 0,
+    "occMin": 4,
+    "occMax": 976
+   },
+   {
+    "dim": 256,
+    "sigma0": 10.0,
+    "sigmaEnd": 1.0,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6328351497650146,
+    "te": 0.060568464941272215,
+    "nbp2": 0.7081476585142624,
+    "emptyCells": 0,
+    "occMin": 6,
+    "occMax": 1154
+   },
+   {
+    "dim": 256,
+    "sigma0": 10.0,
+    "sigmaEnd": 0.5,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6109618544578552,
+    "te": 0.24689073066558198,
+    "nbp2": 0.6946733106218539,
+    "emptyCells": 0,
+    "occMin": 3,
+    "occMax": 763
+   },
+   {
+    "dim": 256,
+    "sigma0": 10.0,
+    "sigmaEnd": 0.5,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6107003092765808,
+    "te": 0.25023643667056494,
+    "nbp2": 0.6986607006660904,
+    "emptyCells": 0,
+    "occMin": 2,
+    "occMax": 763
+   },
+   {
+    "dim": 256,
+    "sigma0": 6.0,
+    "sigmaEnd": 1.0,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6321897506713867,
+    "te": 0.06303960949814413,
+    "nbp2": 0.7025097879696954,
+    "emptyCells": 0,
+    "occMin": 2,
+    "occMax": 1351
+   },
+   {
+    "dim": 256,
+    "sigma0": 6.0,
+    "sigmaEnd": 1.0,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6324405074119568,
+    "te": 0.061595566176844474,
+    "nbp2": 0.7079900340672192,
+    "emptyCells": 0,
+    "occMin": 4,
+    "occMax": 1173
+   },
+   {
+    "dim": 256,
+    "sigma0": 6.0,
+    "sigmaEnd": 0.5,
+    "init": "random",
+    "epochs": 60,
+    "qe": 0.6109011173248291,
+    "te": 0.25336858697310216,
+    "nbp2": 0.6916133624853816,
+    "emptyCells": 1,
+    "occMin": 0,
+    "occMax": 761
+   },
+   {
+    "dim": 256,
+    "sigma0": 6.0,
+    "sigmaEnd": 0.5,
+    "init": "pca",
+    "epochs": 60,
+    "qe": 0.6105166077613831,
+    "te": 0.2513347231402857,
+    "nbp2": 0.6947068693750953,
+    "emptyCells": 0,
+    "occMin": 6,
+    "occMax": 763
+   }
+  ]
+ }
+}

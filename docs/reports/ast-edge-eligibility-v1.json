@@ -1,134 +1,133 @@
 {
   "schema": "atlas.ast-edge-eligibility.v1",
-  "generatedAt": "2026-10-05T18:48:52.432Z",
+  "generatedAt": "2026-10-19T06:43:15.505Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "sidecar": "http://127.0.0.1:8095/ast/chunk",
-  "note": "Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.",
+  "note": "Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: IMPORTS targets now use the existing GSP-5 resolver (graphify-import-target-resolver-v1.ts), and PacketKeyV2 / workspace / graph revisions are required.",
   "sourceAuthority": {
     "WORKSPACE_REVISION_MISMATCH": 4,
     "SOURCE_NOT_ADMITTED": 2
   },
   "totals": {
     "files": 6,
-    "edges": 3084,
-    "total": 3084,
-    "resolvedBySidecar": 331,
-    "structuralEligible": 1439,
+    "edges": 3556,
+    "total": 3556,
+    "resolvedBySidecar": 383,
+    "structuralEligible": 1721,
     "eligible": 0,
     "structuralReasons": {
-      "SUBJECT_SYMBOL_UNMAPPED": 664,
-      "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 634,
-      "NODE_UNQUALIFIED_BUILTIN": 222,
-      "TARGET_SYMBOL_UNRESOLVED_NEEDS_MODULE_RESOLVER": 80,
-      "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 45
+      "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 753,
+      "SUBJECT_SYMBOL_UNMAPPED": 745,
+      "NODE_UNQUALIFIED_BUILTIN": 280,
+      "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 57
     }
   },
   "byKind": {
     "DEFINES": {
-      "total": 331,
-      "resolvedBySidecar": 331,
-      "structuralEligible": 331,
+      "total": 383,
+      "resolvedBySidecar": 383,
+      "structuralEligible": 383,
       "eligible": 0,
       "structuralReasons": {}
     },
     "CALLS": {
-      "total": 948,
+      "total": 1158,
       "resolvedBySidecar": 0,
-      "structuralEligible": 370,
+      "structuralEligible": 438,
       "eligible": 0,
       "structuralReasons": {
-        "NODE_UNQUALIFIED_BUILTIN": 143,
-        "SUBJECT_SYMBOL_UNMAPPED": 243,
-        "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 174,
+        "NODE_UNQUALIFIED_BUILTIN": 197,
+        "SUBJECT_SYMBOL_UNMAPPED": 285,
+        "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 220,
         "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 18
       }
     },
     "REFERENCES": {
-      "total": 1632,
+      "total": 1829,
       "resolvedBySidecar": 0,
-      "structuralEligible": 645,
+      "structuralEligible": 726,
       "eligible": 0,
       "structuralReasons": {
-        "SUBJECT_SYMBOL_UNMAPPED": 421,
-        "NODE_UNQUALIFIED_BUILTIN": 79,
-        "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 460,
+        "SUBJECT_SYMBOL_UNMAPPED": 460,
+        "NODE_UNQUALIFIED_BUILTIN": 83,
+        "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 533,
         "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 27
       }
     },
     "IMPORTS": {
-      "total": 80,
+      "total": 86,
       "resolvedBySidecar": 0,
-      "structuralEligible": 0,
+      "structuralEligible": 74,
       "eligible": 0,
       "structuralReasons": {
-        "TARGET_SYMBOL_UNRESOLVED_NEEDS_MODULE_RESOLVER": 80
+        "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 12
       }
     },
     "EXPORTS": {
-      "total": 93,
+      "total": 100,
       "resolvedBySidecar": 0,
-      "structuralEligible": 93,
+      "structuralEligible": 100,
       "eligible": 0,
       "structuralReasons": {}
     }
   },
   "subjectClasses": {
-    "FILE_MODULE": 504,
-    "CHUNK_NO_SYMBOL": 664,
-    "SYMBOL": 1916
+    "FILE_MODULE": 569,
+    "CHUNK_NO_SYMBOL": 745,
+    "SYMBOL": 2242
   },
   "nodeClasses": {
-    "MODULE": 80,
-    "IMPORTED_INTERNAL": 415,
-    "EXPORTED_SYMBOL": 543,
-    "LOCAL_SYMBOL": 893,
-    "BUILTIN": 282,
-    "LOCAL_OR_PARAMETER": 787,
-    "EXTERNAL_PACKAGE": 84
+    "EXTERNAL_PACKAGE": 96,
+    "MODULE": 74,
+    "IMPORTED_INTERNAL": 452,
+    "EXPORTED_SYMBOL": 589,
+    "LOCAL_SYMBOL": 1067,
+    "BUILTIN": 347,
+    "LOCAL_OR_PARAMETER": 931
   },
   "perFile": [
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
       "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
-      "chunks": 183,
-      "edges": 1060,
-      "structuralEligible": 537
+      "chunks": 220,
+      "edges": 1242,
+      "structuralEligible": 666
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/parent-atlas-bridge.ts",
       "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
       "chunks": 34,
       "edges": 206,
-      "structuralEligible": 86
+      "structuralEligible": 89
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/operations/atlas-operation-runtime-v1.ts",
       "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
       "chunks": 56,
       "edges": 315,
-      "structuralEligible": 93
+      "structuralEligible": 107
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.ts",
       "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
-      "chunks": 94,
-      "edges": 575,
-      "structuralEligible": 309
+      "chunks": 98,
+      "edges": 613,
+      "structuralEligible": 329
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts",
       "sourceAuthority": "SOURCE_NOT_ADMITTED",
-      "chunks": 87,
-      "edges": 651,
-      "structuralEligible": 293
+      "chunks": 123,
+      "edges": 903,
+      "structuralEligible": 403
     },
     {
       "file": "packages/parent-atlas/src/core/ast-relation-graph-v1.ts",
       "sourceAuthority": "SOURCE_NOT_ADMITTED",
       "chunks": 44,
       "edges": 277,
-      "structuralEligible": 121
+      "structuralEligible": 127
     }
   ]
 }

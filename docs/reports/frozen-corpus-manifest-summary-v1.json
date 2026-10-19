@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.frozen-corpus-manifest-summary.v1",
+  "generatedAt": "2026-10-19T07:31:15.707762+00:00",
+  "purpose": "frozen input set for RTX relation / SOM v2 analysis (code cut)",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "selection": {
+    "languages": [
+      "typescript",
+      "javascript",
+      "svelte",
+      "python"
+    ],
+    "pathPrefixes": [
+      "sveltekit-frontend/src/",
+      "scripts/atlas/",
+      "sveltekit-frontend/scripts/",
+      "sveltekit-frontend/tests/",
+      "packages/parent-atlas/"
+    ],
+    "requires": "content_embedding_768 not null, chunk content_hash, file_content_hash"
+  },
+  "exclusions": {},
+  "candidateRows": 106271,
+  "keptRows": 106271,
+  "distinctFiles": 10839,
+  "exactDuplicateVectorGroups": 817,
+  "rowsInDuplicateGroupsKept": 2198,
+  "byLanguage": {
+    "javascript": 35759,
+    "typescript": 57464,
+    "svelte": 11763,
+    "python": 1285
+  },
+  "byTopDirectory": {
+    "sveltekit-frontend/src": 50087,
+    "scripts/atlas": 23666,
+    "sveltekit-frontend/scripts": 20256,
+    "sveltekit-frontend/tests": 9730,
+    "packages/parent-atlas": 2532
+  },
+  "manifestSha256": "e8f8a9af83256ef95dd12b63e0628a6c19d34f4fb43bfc6c51fdb90eb354464f",
+  "manifestFile": ".tmp/atlas/frozen-corpus-manifest-v1.tsv (gitignored)",
+  "ordinalNote": "column 0 is a freeze-local ordinal (rank of chunk id), NOT the canonical CandidateOrdinal map",
+  "revisionNote": "workspace_revision/source_revision/representation_revision are NULL on every chunk; freeze is by content hashes only"
+}

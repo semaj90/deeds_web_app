@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v2.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `b0ca1ecb5c4011ba2262d02df47c800018ebaf50c4547dba5b0c22b00772117a`
+Registry checksum: `8e757fe51847abeda459e0253da2b7eef7f6590377de703248d53d01c39a9f97`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 
@@ -93,7 +93,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 
 - [.claude/CLAUDE.md](.claude/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `13bc6179f4ad`
 - [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `fef20519d5e9`
-- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `811a318ae8b9`
+- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `06dbd589d887`
 - [claude-mem/CLAUDE.md](claude-mem/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `a6f297acd125`
 - [llm/claude.md](llm/claude.md) — CLAUDE_INSTRUCTIONS — `fdcdba7c73d7`
 - [mcp-server-mcp/CLAUDE.md](mcp-server-mcp/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `1707a6375458`
@@ -234,6 +234,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [parent-atlas-karpathy-pipeline](docs/architecture/parent-atlas-karpathy-pipeline.md) — UNCLASSIFIED
 - [parent-atlas-native-dawn-viewer-contract-v1](docs/architecture/parent-atlas-native-dawn-viewer-contract-v1.md) — UNCLASSIFIED
 - [parent-atlas-policy-routing](docs/architecture/parent-atlas-policy-routing.md) — UNCLASSIFIED
+- [parent-atlas-query-intelligence-owner-map-v1](docs/architecture/parent-atlas-query-intelligence-owner-map-v1.md) — UNCLASSIFIED
 - [parent-atlas-representation-structural-contract](docs/architecture/parent-atlas-representation-structural-contract.md) — UNCLASSIFIED
 - [parent-atlas-selection-receipt-and-model-boundaries-v1](docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md) — UNCLASSIFIED
 - [PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT](docs/architecture/PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT.md) — UNCLASSIFIED
@@ -281,18 +282,18 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [agent-branch-review-fanout-ace-centroid-aug22](openspec/changes/agent-branch-review-fanout-ace-centroid-aug22) — 17/20 tasks (85%)
 - [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence) — 27/82 tasks (33%)
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22) — 16/28 tasks (57%)
-- [legal-corpus-california-codes](openspec/changes/legal-corpus-california-codes) — 56/102 tasks (55%)
+- [legal-corpus-california-codes](openspec/changes/legal-corpus-california-codes) — 61/107 tasks (57%)
 - [local-llm-offload-ownership](openspec/changes/local-llm-offload-ownership) — 49/82 tasks (60%)
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/132 tasks (74%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 57/110 tasks (52%)
-- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 981/1493 tasks (66%)
+- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 1035/1648 tasks (63%)
 - [parent-atlas-adaptive-backprop-hll-monitoring](openspec/changes/parent-atlas-adaptive-backprop-hll-monitoring) — 10/64 tasks (16%)
 - [parent-atlas-adaptive-dag-fabric](openspec/changes/parent-atlas-adaptive-dag-fabric) — 12/13 tasks (92%)
 - [parent-atlas-agent-framework-integration-hardening](openspec/changes/parent-atlas-agent-framework-integration-hardening) — 12/71 tasks (17%)
 - [parent-atlas-agentic-completion](openspec/changes/parent-atlas-agentic-completion) — 10/11 tasks (91%)
 - [parent-atlas-agentic-file-compiler](openspec/changes/parent-atlas-agentic-file-compiler) — 56/81 tasks (69%)
 - [parent-atlas-agentic-repair-bundle-integration](openspec/changes/parent-atlas-agentic-repair-bundle-integration) — 29/96 tasks (30%)
-- [parent-atlas-agentic-repair-fabric](openspec/changes/parent-atlas-agentic-repair-fabric) — 45/54 tasks (83%)
+- [parent-atlas-agentic-repair-fabric](openspec/changes/parent-atlas-agentic-repair-fabric) — 55/62 tasks (89%)
 - [parent-atlas-analysis-pass-ornith-adapter](openspec/changes/parent-atlas-analysis-pass-ornith-adapter) — 24/25 tasks (96%)
 - [parent-atlas-best-fit-score-fabric](openspec/changes/parent-atlas-best-fit-score-fabric) — 422/714 tasks (59%)
 - [parent-atlas-branch-merge-consolidation-aug20](openspec/changes/parent-atlas-branch-merge-consolidation-aug20) — 18/35 tasks (51%)
@@ -356,7 +357,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [parent-atlas-runtime-log-remediation](openspec/changes/parent-atlas-runtime-log-remediation) — 0/18 tasks (0%)
 - [parent-atlas-search-classifier-sidecar](openspec/changes/parent-atlas-search-classifier-sidecar) — 70/88 tasks (80%)
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
-- [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 60/104 tasks (58%)
+- [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 69/111 tasks (62%)
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration) — 17/55 tasks (31%)
 - [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 179/332 tasks (54%)
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission) — 37/58 tasks (64%)

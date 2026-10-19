@@ -19,6 +19,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
+// Existing owner of import-target resolution (GSP-5); runs under tsx: `cd sveltekit-frontend && npx tsx ../scripts/atlas/audit-ast-edge-eligibility-v1.mjs`.
+import { parseImportStatementV1, resolveImportSpecifierV1 } from '../../sveltekit-frontend/src/lib/server/atlas/indexing/graphify-import-target-resolver-v1.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const argIdx = process.argv.indexOf('--files');
@@ -30,6 +33,9 @@ const FILES = argIdx > 0 ? process.argv[argIdx + 1].split(',') : [
   'sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts',
   'packages/parent-atlas/src/core/ast-relation-graph-v1.ts',
 ];
+const KNOWN_SOURCE_REFS = new Set(execSync('git ls-files', { cwd: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..'), maxBuffer: 1 << 28 }).toString().split(String.fromCharCode(10)).filter(Boolean));
+// source_refs here are repo-relative, so the app-root `$lib/` default alias must be stated explicitly (never inferred).
+const ALIASES = { '$lib/': 'sveltekit-frontend/src/lib/' };
 const REPORT = path.join(ROOT, 'docs/reports/ast-edge-eligibility-v1.json');
 const BUILTINS = new Set(['Array', 'Object', 'Map', 'Set', 'WeakMap', 'Promise', 'Error', 'JSON', 'Math', 'Date', 'Number', 'String', 'Boolean', 'Symbol', 'RegExp', 'URL', 'Buffer',
   'console', 'process', 'parseInt', 'parseFloat', 'isNaN', 'isFinite', 'setTimeout', 'clearTimeout', 'fetch', 'AbortSignal', 'TextDecoder', 'TextEncoder', 'Uint8Array', 'Float32Array',
@@ -67,7 +73,7 @@ const kinds = ['DEFINES', 'CALLS', 'REFERENCES', 'IMPORTS', 'EXPORTS'];
 const blank = () => ({ total: 0, resolvedBySidecar: 0, structuralEligible: 0, eligible: 0, structuralReasons: {} });
 const out = { schema: 'atlas.ast-edge-eligibility.v1', generatedAt: new Date().toISOString(), canonicalAuthority: false, writesPerformed: false,
   sidecar: 'http://127.0.0.1:8095/ast/chunk',
-  note: 'Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.',
+  note: 'Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: IMPORTS targets now use the existing GSP-5 resolver (graphify-import-target-resolver-v1.ts), and PacketKeyV2 / workspace / graph revisions are required.',
   sourceAuthority: {}, totals: { files: 0, edges: 0, ...blank() }, byKind: Object.fromEntries(kinds.map((k) => [k, blank()])), subjectClasses: {}, nodeClasses: {}, perFile: [] };
 
 for (const file of FILES) {
@@ -83,6 +89,7 @@ for (const file of FILES) {
   const declared = new Set(chunks.filter((c) => c.name).map((c) => c.name));
   const exported = new Set(edges.filter((e) => e.type === 'EXPORTS').map((e) => e.to_evidence_key));
   const imports = importBindings(edges);
+  const importStatementBySubject = new Map(edges.filter((x) => x.type === 'IMPORTS' && /^import\b/.test(x.to_evidence_key)).map((x) => [x.from_evidence_key, x.to_evidence_key]));
   const authority = authorityByFile.get(file) ?? 'UNPROVEN';
   bump(out.sourceAuthority, authority);
   const per = { file, sourceAuthority: authority, chunks: chunks.length, edges: edges.length, structuralEligible: 0 };
@@ -106,7 +113,14 @@ for (const file of FILES) {
     // target / node class
     let nodeClass, targetReason = null;
     if (e.type === 'DEFINES') nodeClass = subjectIndex.has(e.to_evidence_key) || chunkIds.has(e.to_evidence_key) ? 'LOCAL_SYMBOL' : 'UNRESOLVED';
-    else if (e.type === 'IMPORTS') { nodeClass = 'MODULE'; targetReason = 'TARGET_SYMBOL_UNRESOLVED_NEEDS_MODULE_RESOLVER'; }
+    else if (e.type === 'IMPORTS') {
+      const stmt = /^import\b/.test(e.to_evidence_key) ? e.to_evidence_key : importStatementBySubject.get(e.from_evidence_key);
+      const parsed = stmt ? parseImportStatementV1(stmt) : null;
+      const res = parsed ? resolveImportSpecifierV1(file, parsed.specifier, KNOWN_SOURCE_REFS, ALIASES) : null;
+      if (res?.status === 'RESOLVED') nodeClass = 'MODULE';
+      else if (res?.status === 'EXTERNAL_PACKAGE') { nodeClass = 'EXTERNAL_PACKAGE'; targetReason = 'NODE_UNQUALIFIED_EXTERNAL_PACKAGE'; }
+      else { nodeClass = 'MODULE'; targetReason = res ? `IMPORT_SPECIFIER_${res.status}` : 'IMPORT_STATEMENT_UNPARSED'; }
+    }
     else {
       const root = e.to_evidence_key.replace(/^new\s+/, '').split(/[.(\[]/)[0].trim();
       if (declared.has(root)) nodeClass = exported.has(root) ? 'EXPORTED_SYMBOL' : 'LOCAL_SYMBOL';
