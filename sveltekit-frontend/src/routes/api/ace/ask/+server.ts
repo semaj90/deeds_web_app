@@ -1,13 +1,9 @@
 import { json } from '@sveltejs/kit';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
 import { z } from 'zod';
 import { safeValidateRequest } from '$lib/server/utils/validateRequest';
+import { runAceScriptV1 } from '$lib/server/ace/ace-script-runner-v1.js';
 
 import { requireUser } from '$lib/server/auth-utils.js';
-
-const execAsync = promisify(exec);
 
 const AceAskSchema = z.object({
   query: z.string().min(1),
@@ -25,9 +21,8 @@ export const POST = async (event) => {
   })) as any;
 
   const { query } = body;
-  const scriptPath = path.join(process.cwd(), 'scripts', 'ace', 'ask-gemma4.mjs');
   try {
-    const { stdout } = await execAsync(`node ${scriptPath} "${query}"`);
+    const { stdout } = await runAceScriptV1('ask-gemma4.mjs', query);
     return json({ result: stdout });
   } catch (err) {
     return json(
