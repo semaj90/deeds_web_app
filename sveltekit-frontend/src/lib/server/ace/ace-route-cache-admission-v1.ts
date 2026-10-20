@@ -18,6 +18,12 @@ export type AceRouteCacheAdmissionV1 =
       reason: 'ACE_ROUTE_IDENTITY_REQUIRED' | 'ACE_ROUTE_IDENTITY_INVALID';
     };
 
+export function isAceRouteSynthesisAdmittedV1(
+  admission: AceRouteCacheAdmissionV1,
+): boolean {
+  return admission.status === 'ADMITTED';
+}
+
 /**
  * Route boundary for production ACE packet cache use.
  *

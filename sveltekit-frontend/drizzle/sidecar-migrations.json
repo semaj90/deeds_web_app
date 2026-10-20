@@ -813,6 +813,15 @@
       "appliedAt": "2026-10-18",
       "requiresJournalEntry": false,
       "validationCommand": "Recorded post-commit readback in .tmp/openspec-task-source-index-v1/receipt.json: 5,640 rows; 5,640 unique source refs; 0 invalid rows; 204 ambiguous identities retained; canonicalTaskPromotionCount=0; executableKanbanWrites=0; workspace snapshot sha256:72bf1846a8827d8ab0f6a128c550de2e4021f9a6f09ecdea30ed427070320536; row-manifest checksum sha256:aacb5bd18e6007449d10a76202335239202437707a38b4f21822d344e41a1cea."
+    },
+    {
+      "file": "manual/20261020_atlas_packet_identity_registry_v1_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Separates canonical PacketKeyV2 logical identities and evidence-backed legacy aliases from physical atlas_packets rows and projection/cache metadata. No identities or aliases are seeded. Repository-scope mapping, source/workspace revision qualification, and identity writes remain separately gated.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Run the packet-identity-registry-v1 Vitest suite and a disposable PostgreSQL 18 rollback rehearsal; do not apply to the live database without explicit operator authorization."
     }
   ]
 }

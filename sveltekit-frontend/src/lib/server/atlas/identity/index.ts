@@ -18,5 +18,7 @@
  */
 
 export * from './packet-key-builder.js';
+export * from './packet-identity-registry-v1.js';
+export * from './packet-identity-registry-postgres-v1.js';
 export * from './packet-digest-bridge-v1.js';
 export * from './current-packet-digest-readback-v1.js';

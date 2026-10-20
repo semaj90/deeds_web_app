@@ -27,6 +27,39 @@ except Exception:  # pragma: no cover - reported by health when torch is unavail
     NestedSemanticAutoencoder = None  # type: ignore[assignment,misc]
 
 
+
+if torch is not None:
+    from torch import nn
+    from torch.nn import functional as F
+
+    class LegacyV3AE(nn.Module):
+        """Historical 2026-08-29 3-tier AE for backward-compatibility with v3 checkpoints."""
+
+        def __init__(self) -> None:
+            super().__init__()
+            self.encoder = nn.Sequential(
+                nn.Linear(768, 384), nn.GELU(), nn.Linear(384, 256), nn.LayerNorm(256)
+            )
+            self.decoder256 = nn.Sequential(nn.Linear(256, 384), nn.GELU(), nn.Linear(384, 768))
+            self.decoder128 = nn.Sequential(nn.Linear(128, 384), nn.GELU(), nn.Linear(384, 768))
+            self.decoder64 = nn.Sequential(nn.Linear(64, 384), nn.GELU(), nn.Linear(384, 768))
+
+        def encode(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+            l256 = F.normalize(self.encoder(x), p=2, dim=-1)
+            l128 = F.normalize(l256[:, :128], p=2, dim=-1)
+            l64 = F.normalize(l128[:, :64], p=2, dim=-1)
+            return l256, l128, l64
+
+        def decode256(self, z: torch.Tensor) -> torch.Tensor:
+            return F.normalize(self.decoder256(z), p=2, dim=-1)
+
+        def decode128(self, z: torch.Tensor) -> torch.Tensor:
+            return F.normalize(self.decoder128(z), p=2, dim=-1)
+
+        def decode64(self, z: torch.Tensor) -> torch.Tensor:
+            return F.normalize(self.decoder64(z), p=2, dim=-1)
+
+
 SERVICE_SCHEMA = "atlas.neural-decoder-service.v1"
 CHECKPOINT_REVISION = "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259"
 MAX_BATCH = 32
@@ -98,6 +131,7 @@ class NeuralDecoderRuntime:
         self.device_name: str | None = None
         self.checkpoint_path: Path | None = None
         self.checkpoint_sha256: str | None = None
+        self.arch: str | None = None
 
     def load(self) -> None:
         if torch is None or NestedSemanticAutoencoder is None or NestedAutoencoderConfig is None:
@@ -108,9 +142,21 @@ class NeuralDecoderRuntime:
         if os.getenv("ATLAS_NEURAL_DECODER_CHECKPOINT_REVISION", CHECKPOINT_REVISION) != CHECKPOINT_REVISION:
             raise RuntimeError("NEURAL_DECODER_CHECKPOINT_REVISION_MISMATCH")
         self.device_name = _device()
-        model = NestedSemanticAutoencoder(NestedAutoencoderConfig())
         state = torch.load(path, map_location=self.device_name, weights_only=True)
-        model.load_state_dict(state)
+        if isinstance(state, dict) and "state_dict" in state:
+            state = state["state_dict"]
+        # 1. Prioritize canonical architecture (768 -> 512 -> 256 -> 128)
+        canonical_model = NestedSemanticAutoencoder(NestedAutoencoderConfig())
+        try:
+            canonical_model.load_state_dict(state, strict=True)
+            model = canonical_model
+            self.arch = "canonical_768_512_256_128"
+        except RuntimeError:
+            # 2. Backward compatibility with legacy v3 checkpoint (768 -> 384 -> 256)
+            legacy_model = LegacyV3AE()
+            legacy_model.load_state_dict(state, strict=True)
+            model = legacy_model
+            self.arch = "legacy_v3_768_384_256"
         model.eval().to(self.device_name)
         self.model = model
         self.checkpoint_path = path
@@ -158,6 +204,7 @@ def health() -> dict[str, Any]:
         "checkpointRevision": CHECKPOINT_REVISION,
         "checkpointPath": str(runtime.checkpoint_path) if runtime.checkpoint_path else None,
         "checkpointSha256": runtime.checkpoint_sha256,
+        "arch": runtime.arch,
         "representations": {
             "input": "semantic_768",
             "physical": "latent_256",
@@ -176,6 +223,7 @@ def encode(request: EncodeRequest) -> dict[str, Any]:
         "schema": "atlas.neural-decoder-encode.v1",
         "checkpointRevision": CHECKPOINT_REVISION,
         "checkpointSha256": runtime.checkpoint_sha256,
+        "arch": runtime.arch,
         "representationRevision": CHECKPOINT_REVISION,
         "batchSize": len(request.semantic_768),
         "canonicalAuthority": False,
@@ -190,6 +238,7 @@ def decode(request: DecodeRequest) -> dict[str, Any]:
         "schema": "atlas.neural-decoder-decode.v1",
         "checkpointRevision": CHECKPOINT_REVISION,
         "checkpointSha256": runtime.checkpoint_sha256,
+        "arch": runtime.arch,
         "representationRevision": CHECKPOINT_REVISION,
         "representation": request.representation,
         "batchSize": len(request.vectors),
@@ -206,6 +255,7 @@ def reconstruct(request: ReconstructRequest) -> dict[str, Any]:
         "schema": "atlas.neural-decoder-reconstruct.v1",
         "checkpointRevision": CHECKPOINT_REVISION,
         "checkpointSha256": runtime.checkpoint_sha256,
+        "arch": runtime.arch,
         "representationRevision": CHECKPOINT_REVISION,
         "batchSize": len(request.semantic_768),
         "semantic_768": request.semantic_768,

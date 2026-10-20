@@ -1,0 +1,98 @@
+{
+  "schema": "atlas.turbovec-ae-quantized-benchmark.v1",
+  "generatedAt": "2026-10-20T17:59:25Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "diagnosticOnly": true,
+  "matrix": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\semantic768\\frozen_semantic_768_v4_matrix.f32bin",
+    "rows": 55169,
+    "sha256": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0"
+  },
+  "queryCohort": {
+    "queries": 500,
+    "seed": 684453,
+    "selfExcluded": true
+  },
+  "benchmarks": {
+    "exact_768": {
+      "dim": 768,
+      "format": "float32",
+      "recall10_tie_aware": 1.0,
+      "recall10_set_overlap": 1.0,
+      "mrr_of_exact_top1": 1.0,
+      "latency_us_per_query": 603.3
+    },
+    "mrl_128_float32": {
+      "dim": 128,
+      "format": "float32",
+      "recall10_tie_aware": 0.7538,
+      "recall10_set_overlap": 0.7534,
+      "mrr_of_exact_top1": 0.8725,
+      "latency_us_per_query": 281.6
+    },
+    "turbovec_128_4bit_avx2": {
+      "dim": 128,
+      "format": "uint4_avx2",
+      "recall10_tie_aware": 0.7787,
+      "recall10_set_overlap": 0.7006,
+      "mrr_of_exact_top1": 0.865,
+      "latency_us_per_query": 43.3,
+      "index_build_sec": 1.036
+    },
+    "autoencoder_128_latent": {
+      "dim": 128,
+      "format": "float32",
+      "recall10_tie_aware": 0.8278,
+      "recall10_set_overlap": 0.8276,
+      "mrr_of_exact_top1": 0.9079,
+      "latency_us_per_query": 225.9,
+      "checkpoint": "nested_semantic_autoencoder_v3_full01.pt"
+    },
+    "mrl_64_float32": {
+      "dim": 64,
+      "format": "float32",
+      "recall10_tie_aware": 0.6208,
+      "recall10_set_overlap": 0.6206,
+      "mrr_of_exact_top1": 0.7948
+    },
+    "turbovec_64_4bit_avx2": {
+      "dim": 64,
+      "format": "uint4_avx2",
+      "recall10_tie_aware": 0.6396,
+      "recall10_set_overlap": 0.5754,
+      "mrr_of_exact_top1": 0.7794
+    }
+  },
+  "liveSidecar": {
+    "status": "HEALTHY",
+    "health": {
+      "ok": true,
+      "indexed": 219998,
+      "dim": 128,
+      "bits": 4,
+      "turbovec": true,
+      "collection": "codebase_chunks_768_v2",
+      "source": "postgres",
+      "projection": "mrl",
+      "representationId": "embeddinggemma_mrl128_l2_4bit_v1",
+      "domainSlotPopulated": true,
+      "domainResolved": 114177,
+      "domainOrdinals": {
+        "cache": 0,
+        "compiler": 1,
+        "frontend": 2,
+        "gpu": 3,
+        "graph": 4,
+        "retrieval": 5
+      },
+      "role": "CHALLENGER_ONLY",
+      "defaultK": 100
+    },
+    "sampleQueriesTested": 20,
+    "meanHttpLatencyMs": 20.009,
+    "medianHttpLatencyMs": 21.0,
+    "p95HttpLatencyMs": 26.899
+  }
+}

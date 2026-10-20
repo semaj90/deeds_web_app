@@ -1,6 +1,9 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { admitAceRouteCacheIdentityV1 } from './ace-route-cache-admission-v1.js';
+import {
+  admitAceRouteCacheIdentityV1,
+  isAceRouteSynthesisAdmittedV1,
+} from './ace-route-cache-admission-v1.js';
 
 const identity = {
   cacheKind: 'ACE_PACKET',
@@ -43,10 +46,16 @@ describe('ACE route cache admission', () => {
   it('admits only a complete ACE_PACKET identity with a revisioned key', () => {
     const result = admitAceRouteCacheIdentityV1(identity, 'ace:packet:query-1');
     expect(result.status).toBe('ADMITTED');
+    expect(isAceRouteSynthesisAdmittedV1(result)).toBe(true);
     if (result.status === 'ADMITTED') {
       expect(result.identity).toEqual(identity);
       expect(result.cacheKey).toMatch(/^atlas:bitfrost:v1:ace_packet:/);
       expect(result.reason).toBeNull();
     }
+  });
+
+  it('keeps synthesis blocked whenever the manifest-derived identity is absent', () => {
+    const result = admitAceRouteCacheIdentityV1(undefined, 'ace:packet:query-1');
+    expect(isAceRouteSynthesisAdmittedV1(result)).toBe(false);
   });
 });

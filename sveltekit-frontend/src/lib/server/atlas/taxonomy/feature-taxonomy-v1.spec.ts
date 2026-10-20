@@ -1,9 +1,13 @@
 import { describe, it, expect } from 'vitest';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   CANONICAL_FEATURE_LABELS,
   FEATURE_TAXONOMY_V1,
   matchFeatureLabel,
   isCanonicalFeatureLabel,
+  resolveFeatureLabel,
+  proposeCanonicalFeatureLabelForSourceRefV1,
 } from './feature-taxonomy-v1.js';
 
 describe('FeatureTaxonomyV1 Contract', () => {
@@ -15,6 +19,16 @@ describe('FeatureTaxonomyV1 Contract', () => {
       expect(FEATURE_TAXONOMY_V1[label].tokenBudget).toBeGreaterThan(0);
       expect(FEATURE_TAXONOMY_V1[label].nesFsmState).toMatch(/^NES_STATE_/);
     }
+  });
+
+  it('keeps every SvelteKit example anchored to an existing source file', () => {
+    const missing = CANONICAL_FEATURE_LABELS.flatMap((label) =>
+      FEATURE_TAXONOMY_V1[label].coreComponents
+        .filter((sourceRef) => !existsSync(resolve(process.cwd(), sourceRef)))
+        .map((sourceRef) => `${label}: ${sourceRef}`),
+    );
+
+    expect(missing).toEqual([]);
   });
 
   it('correctly matches direct labels and route paths', () => {
@@ -42,5 +56,46 @@ describe('FeatureTaxonomyV1 Contract', () => {
     expect(isCanonicalFeatureLabel('auth')).toBe(true);
     expect(isCanonicalFeatureLabel('chat')).toBe(true);
     expect(isCanonicalFeatureLabel('not_a_feature')).toBe(false);
+  });
+
+  it('keeps unsupported product names as aliases, not canonical labels', () => {
+    expect(resolveFeatureLabel('forum')).toBe('chat');
+    expect(resolveFeatureLabel('photo_editor')).toBe('image_creator');
+    expect(resolveFeatureLabel('video_editor')).toBe('media_transcribe');
+    expect(isCanonicalFeatureLabel('forum')).toBe(false);
+    expect(isCanonicalFeatureLabel('photo_editor')).toBe(false);
+    expect(isCanonicalFeatureLabel('video_editor')).toBe(false);
+  });
+
+  it('maps exact packet source references to existing catalog labels as proposals', () => {
+    const examples = [
+      ['sveltekit-frontend/src/routes/(app)/chat/+page.svelte', 'chat'],
+      ['sveltekit-frontend/src/routes/login/+page.svelte', 'auth'],
+      ['sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceGraphPane.svelte', 'canvas'],
+      ['sveltekit-frontend/src/lib/server/ai/whisper.ts', 'media_transcribe'],
+      ['sveltekit-frontend/src/lib/server/indexer/pipeline/chunk-stream-pipeline.ts', 'code_intel'],
+    ] as const;
+
+    for (const [sourceRef, featureLabel] of examples) {
+      expect(proposeCanonicalFeatureLabelForSourceRefV1(sourceRef)).toMatchObject({
+        status: 'EXACT',
+        authority: 'CATALOG_ANCHOR_PROPOSAL',
+        sourceRef,
+        featureLabel,
+      });
+    }
+  });
+
+  it('normalizes Windows separators and rejects fuzzy or traversal-based source matches', () => {
+    expect(proposeCanonicalFeatureLabelForSourceRefV1('sveltekit-frontend\\src\\routes\\login\\+page.svelte')).toMatchObject({
+      status: 'EXACT',
+      featureLabel: 'auth',
+    });
+    expect(proposeCanonicalFeatureLabelForSourceRefV1('src/unknown/chat-auth.ts')).toMatchObject({
+      status: 'UNMAPPED',
+    });
+    expect(proposeCanonicalFeatureLabelForSourceRefV1('sveltekit-frontend/../src/routes/login/+page.svelte')).toMatchObject({
+      status: 'UNMAPPED',
+    });
   });
 });

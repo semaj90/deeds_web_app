@@ -1,6 +1,6 @@
 {
   "schema": "atlas.pipeline-router-matrix-surfaces.v1",
-  "generatedAt": "2026-09-20T23:50:02.722Z",
+  "generatedAt": "2026-10-20T19:29:33.856Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "authority": false,
@@ -538,7 +538,9 @@
           "producer_revision",
           "input_digest",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "source_revision",
+          "registry_revision"
         ],
         "columnTypes": {
           "packet_key": "text",
@@ -566,7 +568,9 @@
           "producer_revision": "text",
           "input_digest": "text",
           "created_at": "timestamp with time zone",
-          "updated_at": "timestamp with time zone"
+          "updated_at": "timestamp with time zone",
+          "source_revision": "text",
+          "registry_revision": "text"
         },
         "missingRequiredColumns": []
       },
@@ -673,7 +677,10 @@
           "source_revision",
           "representation_revision",
           "lineage_binding_checksum",
-          "lineage_producer_revision"
+          "lineage_producer_revision",
+          "summary_provenance",
+          "summary_text",
+          "domain_id"
         ],
         "columnTypes": {
           "id": "uuid",
@@ -776,7 +783,10 @@
           "source_revision": "text",
           "representation_revision": "text",
           "lineage_binding_checksum": "text",
-          "lineage_producer_revision": "text"
+          "lineage_producer_revision": "text",
+          "summary_provenance": "jsonb",
+          "summary_text": "text",
+          "domain_id": "text"
         },
         "missingRequiredColumns": []
       },
@@ -800,7 +810,8 @@
           "error_code",
           "error_receipt",
           "reused_graph_revision",
-          "canonical_authority"
+          "canonical_authority",
+          "input_identity"
         ],
         "columnTypes": {
           "execution_id": "uuid",
@@ -820,7 +831,8 @@
           "error_code": "text",
           "error_receipt": "jsonb",
           "reused_graph_revision": "text",
-          "canonical_authority": "boolean"
+          "canonical_authority": "boolean",
+          "input_identity": "text"
         },
         "missingRequiredColumns": []
       },
@@ -1141,6 +1153,16 @@
         "tablename": "atlas_packets",
         "indexname": "atlas_packets_pkey",
         "indexdef": "CREATE UNIQUE INDEX atlas_packets_pkey ON public.atlas_packets USING btree (packet_id)"
+      },
+      {
+        "tablename": "atlas_packets",
+        "indexname": "atlas_packets_source_ref_lower_pattern_idx",
+        "indexdef": "CREATE INDEX atlas_packets_source_ref_lower_pattern_idx ON public.atlas_packets USING btree (lower(source_ref) text_pattern_ops)"
+      },
+      {
+        "tablename": "atlas_packets",
+        "indexname": "atlas_packets_source_ref_pattern_idx",
+        "indexdef": "CREATE INDEX atlas_packets_source_ref_pattern_idx ON public.atlas_packets USING btree (source_ref text_pattern_ops)"
       },
       {
         "tablename": "atlas_packets",
@@ -1699,18 +1721,8 @@
       },
       {
         "tablename": "codebase_chunk_index",
-        "indexname": "codebase_chunk_index_summary_hnsw",
-        "indexdef": "CREATE INDEX codebase_chunk_index_summary_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
-      },
-      {
-        "tablename": "codebase_chunk_index",
         "indexname": "codebase_chunk_index_tags_idx",
         "indexdef": "CREATE INDEX codebase_chunk_index_tags_idx ON public.codebase_chunk_index USING gin (tags)"
-      },
-      {
-        "tablename": "codebase_chunk_index",
-        "indexname": "idx_cci_kmeans384_cluster",
-        "indexdef": "CREATE INDEX idx_cci_kmeans384_cluster ON public.codebase_chunk_index USING btree (kmeans384_cluster) WHERE (kmeans384_cluster IS NOT NULL)"
       },
       {
         "tablename": "codebase_chunk_index",
@@ -1739,6 +1751,11 @@
       },
       {
         "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_768_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64') WHERE (error_embedding IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
         "indexname": "idx_codebase_chunk_error_embedding_latent64_hnsw",
         "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
       },
@@ -1761,11 +1778,6 @@
         "tablename": "codebase_chunk_index",
         "indexname": "idx_codebase_chunk_error_embedding_latent_valid",
         "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_valid ON public.codebase_chunk_index USING btree (error_embedding_latent_valid)"
-      },
-      {
-        "tablename": "codebase_chunk_index",
-        "indexname": "idx_codebase_chunk_index_error_embedding_hnsw",
-        "indexdef": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64')"
       },
       {
         "tablename": "codebase_chunk_index",
@@ -1854,13 +1866,8 @@
       },
       {
         "tablename": "codebase_chunk_index",
-        "indexname": "idx_codebase_chunk_summary_embedding_384_hnsw",
-        "indexdef": "CREATE INDEX idx_codebase_chunk_summary_embedding_384_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding_384 vector_cosine_ops) WITH (m='12', ef_construction='48')"
-      },
-      {
-        "tablename": "codebase_chunk_index",
-        "indexname": "idx_codebase_chunk_summary_embedding_ivfflat",
-        "indexdef": "CREATE INDEX idx_codebase_chunk_summary_embedding_ivfflat ON public.codebase_chunk_index USING ivfflat (summary_embedding halfvec_cosine_ops) WITH (lists='100')"
+        "indexname": "idx_codebase_chunk_summary_embedding_768_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_summary_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200') WHERE (summary_embedding IS NOT NULL)"
       },
       {
         "tablename": "codebase_chunk_index",
@@ -1894,8 +1901,18 @@
       },
       {
         "tablename": "graphify_executions",
+        "indexname": "graphify_executions_input_identity_idx_v1",
+        "indexdef": "CREATE INDEX graphify_executions_input_identity_idx_v1 ON public.graphify_executions USING btree (workspace_id, input_identity) WHERE (input_identity IS NOT NULL)"
+      },
+      {
+        "tablename": "graphify_executions",
         "indexname": "graphify_executions_legacy_graphify_run_id_idx_v1",
         "indexdef": "CREATE INDEX graphify_executions_legacy_graphify_run_id_idx_v1 ON public.graphify_executions USING btree (legacy_graphify_run_id) WHERE (legacy_graphify_run_id IS NOT NULL)"
+      },
+      {
+        "tablename": "graphify_executions",
+        "indexname": "graphify_executions_one_canonical_uidx_v1",
+        "indexdef": "CREATE UNIQUE INDEX graphify_executions_one_canonical_uidx_v1 ON public.graphify_executions USING btree (workspace_id, workspace_revision) WHERE (canonical_authority IS TRUE)"
       },
       {
         "tablename": "graphify_executions",
@@ -1916,6 +1933,11 @@
         "tablename": "graphify_executions",
         "indexname": "graphify_executions_workspace_revision_idx_v1",
         "indexdef": "CREATE INDEX graphify_executions_workspace_revision_idx_v1 ON public.graphify_executions USING btree (workspace_id, workspace_revision)"
+      },
+      {
+        "tablename": "graphify_executions",
+        "indexname": "graphify_executions_ws_rev_id_uidx_v1",
+        "indexdef": "CREATE UNIQUE INDEX graphify_executions_ws_rev_id_uidx_v1 ON public.graphify_executions USING btree (workspace_id, workspace_revision, execution_id)"
       },
       {
         "tablename": "semantic_lifecycle_events",

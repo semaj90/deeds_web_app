@@ -440,7 +440,7 @@ export function createAtlasSearchAdapter(config?: {
         modelRevision: options.modelRevision,
         promptTemplateRevision: options.promptTemplateRevision,
       });
-      const { ordinalMap, ...aceAdmission } = ace;
+      const { ordinalMap, snapshot: _snapshot, ...aceAdmission } = ace;
       const cachedPacketCandidateResolution = options.cachedPacketHints
         ? resolveCachedPacketCandidatesV1({
             workspaceRevision: options.workspaceRevision,

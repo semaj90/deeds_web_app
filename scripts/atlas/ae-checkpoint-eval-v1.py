@@ -140,6 +140,8 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=684453)
     ap.add_argument("--out", type=Path, help="optional JSON receipt path (the only write)")
     args = ap.parse_args()
+    if args.queries < 1:
+        ap.error("--queries must be at least 1")
 
     report: dict = {
         "schema": "atlas.ae-checkpoint-eval.v1",
@@ -179,6 +181,10 @@ def main() -> int:
     model.eval()
 
     x, matrix_info = load_matrix(args.matrix, args.matrix_sha256 or None)
+    if len(x) < 11:
+        raise SystemExit(f"MATRIX_TOO_SMALL: need at least 11 rows for self-excluded recall@10, got {len(x)}")
+    if args.queries > len(x):
+        ap.error(f"--queries cannot exceed the matrix row count ({len(x)})")
     report["matrix"] = matrix_info
     xn = F.normalize(x, p=2, dim=-1)
 

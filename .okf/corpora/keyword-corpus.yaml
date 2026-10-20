@@ -11,10 +11,10 @@ source_refs:
   - .okf/domains/structured-value.yaml
 generated:
   by: human-reviewed-repository-sources
-  at: 2026-10-13
+  at: "2026-10-13"
 verified:
   by: repository-source-review
-  at: 2026-10-13
+  at: "2026-10-13"
 indexing:
   populated: false
   searchable: false
@@ -78,7 +78,7 @@ entries:
       server_authority_id: parent-atlas:mcp:atlas-tools
       tool_surface_revision: 9f7e3db94d93a310f75294cb11a0b71d3ec2621d9a9c66639102d30dd9a8e137
       discovery_status: ALL_SERVERS_REACHABLE
-      captured_at: 2026-10-12T23:42:13.843Z
+      captured_at: "2026-10-12T23:42:13.843Z"
       tools:
         - tool_name: classify_intent
           input_schema_digest: 14836a42ad0c9adde8d9f888eb6e0bcdc39b7f7a5fc804ffbdd8da080026b95b
@@ -313,13 +313,15 @@ entries:
     retrieval_policy: require_admitted_revision_qualified_evidence_and_contextmanifest; dag_is_not_write_authority; preserve_hyperedge_roles
 
   - id: topology-som-kmeans-advisory-features
-    terms: [TopologyFeature4, 4D topology coordinates, SOM 20x20, K-means, cluster assignment, feature remapping]
+    terms: [TopologyFeature4, 4D topology coordinates, four-dimensional topology, 4D manifold, manifold mapping, topology mapping, data analytics, SOM 20x20, self-organizing map, K-means, K-means clustering, cluster assignment, centroid, feature remapping, latent feature]
     definition: >-
-      K-means assignments, SOM cells, and four-dimensional topology coordinates are separate,
-      revision-qualified derived features. They may be evaluated as advisory routing or ranking
-      features on a frozen, source-qualified cohort; they do not create canonical identity,
-      ontology edges, prompt evidence, or additional semantic retrieval votes. The 20x20 grid is
-      an existing experiment parameter, not a universal requirement or proof of production value.
+      Four-dimensional topology and manifold mappings are derived data-analytics views whose
+      component axes retain distinct meanings and revision lineage. K-means cluster assignments,
+      centroids, latent features, and SOM cells are separate derived outputs; future clustering
+      may be evaluated for exploratory analysis or advisory routing on a frozen,
+      source-qualified cohort. None creates canonical identity, ontology edges, prompt evidence,
+      reviewed labels, or additional semantic retrieval votes. The 20x20 SOM grid is an existing
+      experiment parameter, not a universal requirement or proof of production value.
     evidence_status: IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN
     source_refs:
       - openspec/changes/parent-atlas-topology-representation-admission/proposal.md
@@ -329,3 +331,24 @@ entries:
       - python/atlas_compute/aligned_snapshot_experiment.py
       - .okf/systems/parent-atlas-compute-ownership.md
     retrieval_policy: advisory_only_until_frozen_cohort_revision_feature_schema_and_held_out_ablation_pass; no_identity_or_evidence_promotion
+
+  - id: revision-qualification
+    terms: [revision, revision-qualified, sourceRevision, workspaceRevision, source revision, workspace revision, representation revision, feature revision, producer revision, registry revision]
+    definition: >-
+      A revision is a checksummed identifier for exactly one version of one input or derived artifact.
+      Revision namespaces are separate and never interchangeable. sourceRevision is sha256 of the exact
+      UTF-8 bytes of one source file. workspaceRevision is a sha256 over an admitted, sorted manifest of
+      source revisions. Representation, feature, producer, and registry revisions name derived artifacts
+      and must trace to a source or workspace revision. A value is revision-qualified only when its
+      namespace, algorithm, and parent identity all match. Null, 0, "unknown", and placeholder strings
+      such as "codebase-graph:unknown" are unqualified: reject them, never coerce or default them, and
+      never backfill a historical revision from current worktree bytes without independently verified
+      producer evidence.
+    evidence_status: CONTRACT_DEFINED_LIVE_COVERAGE_UNQUALIFIED_ORF_0_OF_1808_ROWS_WORKSPACE_QUALIFIED_2026-10-20
+    source_refs:
+      - docs/MASTER-TOC-v2.md
+      - sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/retrieval/orf-feature-row-reader-v1.ts
+    retrieval_policy: reference_only; evidence is admitted only after exact namespace and parent-identity match; unqualified rows are excluded and reported, never repaired in place

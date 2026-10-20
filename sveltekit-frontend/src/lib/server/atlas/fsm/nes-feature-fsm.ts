@@ -2,7 +2,7 @@
  * NES Feature Finite State Machine (NES-FSM-V1)
  *
  * Implements the lifecycle:
- * IDLE -> QUERY_RECEIVED -> FEATURE_CLASSIFIED -> EWIN_TANG_SAMPLED -> ACE_PACKET_ADMITTED -> PREFIX_HOT
+ * IDLE -> QUERY_RECEIVED -> FEATURE_CLASSIFIED -> LOW_RANK_UNAVAILABLE -> ACE_PACKET_PROPOSED -> DESCRIPTOR_READY
  *
  * Adheres strictly to AGENTS.md:
  * - No forbidden keys: never persist hiddenThoughts, chainOfThought, kv_cache, or tensor bytes.
@@ -23,13 +23,20 @@ export const NES_FSM_STATES = [
   'IDLE',
   'QUERY_RECEIVED',
   'FEATURE_CLASSIFIED',
-  'EWIN_TANG_SAMPLED',
-  'ACE_PACKET_ADMITTED',
-  'PREFIX_HOT',
+  'LOW_RANK_UNAVAILABLE',
+  'ACE_PACKET_PROPOSED',
+  'DESCRIPTOR_READY',
   'FAILED',
 ] as const;
 
 export type NesFsmState = (typeof NES_FSM_STATES)[number];
+
+export class FeatureClassificationUnavailableError extends Error {
+  constructor() {
+    super('No feature taxonomy match was found for the query.');
+    this.name = 'FeatureClassificationUnavailableError';
+  }
+}
 
 export const FORBIDDEN_STORAGE_KEYS = new Set([
   'hiddenthoughts',
@@ -138,8 +145,9 @@ export interface CacheInstructionsTensorDescriptorV1 {
   tokenBudget: number;
   allocatedTokens: number;
   promptPrefix: string;
-  admittedComponents: readonly string[];
-  admittedDatabaseTables: readonly string[];
+  suggestedComponents: readonly string[];
+  suggestedDatabaseTables: readonly string[];
+  lowRankStatus: 'NOT_RUN_NO_QUALIFIED_FEATURE_MATRIX';
   backendServices: readonly string[];
   residencySlot: string;
   valkeyPacketKey: string;
@@ -154,8 +162,7 @@ export interface NesFsmContext {
   rawFeatureCandidate?: string;
   featureLabel?: CanonicalFeatureLabel;
   tokenBudget: number;
-  samplingResult?: EwinTangSampleResult;
-  admittedComponents: string[];
+  suggestedComponents: string[];
   descriptor?: CacheInstructionsTensorDescriptorV1;
   error?: string;
 }
@@ -168,7 +175,7 @@ export class NesFeatureFsm {
       state: 'IDLE',
       query: '',
       tokenBudget: 0,
-      admittedComponents: [],
+      suggestedComponents: [],
     };
   }
 
@@ -207,8 +214,9 @@ export class NesFeatureFsm {
       resolved = matchFeatureLabel(this.context.query);
     }
     if (!resolved) {
-      // Default safely to chat if unclassified
-      resolved = 'chat';
+      this.context.state = 'FAILED';
+      this.context.error = 'No feature taxonomy match was found for the query.';
+      return this.context.state;
     }
 
     const taxonomyEntry = getFeatureTaxonomyEntry(resolved);
@@ -218,48 +226,33 @@ export class NesFeatureFsm {
     return this.context.state;
   }
 
-  public stepEwinTangSample(seed: number = 42): NesFsmState {
+  public stepLowRankUnavailable(): NesFsmState {
     if (this.context.state !== 'FEATURE_CLASSIFIED' || !this.context.featureLabel) {
       this.context.state = 'FAILED';
-      this.context.error = `Invalid state transition from ${this.context.state} to EWIN_TANG_SAMPLED`;
+      this.context.error = `Invalid state transition from ${this.context.state} to LOW_RANK_UNAVAILABLE`;
       return this.context.state;
     }
 
     const entry = getFeatureTaxonomyEntry(this.context.featureLabel);
-    const components = entry.coreComponents;
-
-    // Build synthetic feature matrix based on component string length and route overlap
-    const matrix: number[][] = components.map((comp) => {
-      const len = comp.length;
-      const isRoute = comp.includes('+page') ? 2.0 : 1.0;
-      const depth = comp.split('/').length;
-      return [len / 100, isRoute, depth / 10, entry.tokenBudget / 4096];
-    });
-
-    const sampling = sampleEwinTangLowRank(matrix, Math.min(2, components.length), seed);
-    const shortlisted = sampling.shortlistIndices.map((idx) => components[idx] ?? components[0]);
-
-    sampling.shortlistComponents = shortlisted;
-    this.context.samplingResult = sampling;
-    this.context.admittedComponents = shortlisted;
-    this.context.state = 'EWIN_TANG_SAMPLED';
+    this.context.suggestedComponents = [...entry.coreComponents];
+    this.context.state = 'LOW_RANK_UNAVAILABLE';
     return this.context.state;
   }
 
-  public stepAdmitAcePacket(runId?: string): NesFsmState {
-    if (this.context.state !== 'EWIN_TANG_SAMPLED' || !this.context.featureLabel) {
+  public stepProposeAcePacket(): NesFsmState {
+    if (this.context.state !== 'LOW_RANK_UNAVAILABLE' || !this.context.featureLabel) {
       this.context.state = 'FAILED';
-      this.context.error = `Invalid state transition from ${this.context.state} to ACE_PACKET_ADMITTED`;
+      this.context.error = `Invalid state transition from ${this.context.state} to ACE_PACKET_PROPOSED`;
       return this.context.state;
     }
 
-    this.context.state = 'ACE_PACKET_ADMITTED';
+    this.context.state = 'ACE_PACKET_PROPOSED';
     return this.context.state;
   }
 
-  public stepPrefixHot(runId?: string): CacheInstructionsTensorDescriptorV1 {
-    if (this.context.state !== 'ACE_PACKET_ADMITTED' || !this.context.featureLabel) {
-      throw new Error(`Cannot transition to PREFIX_HOT from state ${this.context.state}`);
+  public buildCacheDescriptor(runId?: string): CacheInstructionsTensorDescriptorV1 {
+    if (this.context.state !== 'ACE_PACKET_PROPOSED' || !this.context.featureLabel) {
+      throw new Error(`Cannot build cache descriptor from state ${this.context.state}`);
     }
 
     const entry = getFeatureTaxonomyEntry(this.context.featureLabel);
@@ -270,8 +263,8 @@ export class NesFeatureFsm {
     const promptPrefix = [
       `[FEATURE_CONTEXT: ${entry.displayName.toUpperCase()}]`,
       `Feature: ${entry.featureLabel} (${entry.description})`,
-      `Verified Components: ${this.context.admittedComponents.join(', ')}`,
-      `Verified Tables: ${entry.databaseTables.join(', ')}`,
+      `Suggested Components (unranked): ${this.context.suggestedComponents.join(', ')}`,
+      `Suggested Tables: ${entry.databaseTables.join(', ')}`,
       `FSM State: ${entry.nesFsmState}`,
     ].join('\n');
 
@@ -285,12 +278,13 @@ export class NesFeatureFsm {
       schema: 'atlas.token-cache-instructions.v1' as const,
       runId: resolvedRunId,
       featureLabel: this.context.featureLabel,
-      fsmState: 'PREFIX_HOT' as const,
+      fsmState: 'DESCRIPTOR_READY' as const,
       tokenBudget: entry.tokenBudget,
       allocatedTokens,
       promptPrefix,
-      admittedComponents: this.context.admittedComponents,
-      admittedDatabaseTables: entry.databaseTables,
+      suggestedComponents: this.context.suggestedComponents,
+      suggestedDatabaseTables: entry.databaseTables,
+      lowRankStatus: 'NOT_RUN_NO_QUALIFIED_FEATURE_MATRIX' as const,
       backendServices: entry.backendServices,
       residencySlot: `valkey:slot:${this.context.featureLabel}`,
       valkeyPacketKey: packetKey,
@@ -316,7 +310,7 @@ export class NesFeatureFsm {
     };
 
     this.context.descriptor = finalDescriptor;
-    this.context.state = 'PREFIX_HOT';
+    this.context.state = 'DESCRIPTOR_READY';
     return finalDescriptor;
   }
 }

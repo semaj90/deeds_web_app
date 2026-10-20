@@ -39,7 +39,8 @@
 ## Open decisions
 | Decision | Note |
 |---|---|
-| `chat` vs `ai_chat` | overlap; split here as server chat vs client ONNX chat. Merge if preferred |
+| `chat` vs `ai_chat` | Retain both existing labels; `chat` is server messaging and `ai_chat` is assistant/client inference. Do not merge in this iteration. |
+| Labels without dedicated routes | Keep the existing 21-label catalog unchanged. `forum` resolves to `chat`, `photo_editor` to `image_creator`, and `video_editor` to `media_transcribe` as aliases only; do not add canonical labels without route examples and review. This decision does not approve DB persistence or production taxonomy admission. |
 | Storage | new controlled-label table requires schema approval (Drizzle Safety Rule); never mutate `atlas_packets.feature_label` in place |
 | Packet binding | label → one ACE packet via `buildAcePacketV3`; join by `packet_key` + `source_ref`, never `feature_id` alone |
 | Other languages | Go, Python repeat after SvelteKit is settled |

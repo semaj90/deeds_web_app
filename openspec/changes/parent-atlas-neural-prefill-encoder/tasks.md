@@ -539,6 +539,29 @@ database, vector, cache, graph, or service data was modified by this audit.
 
 ## Source Revision Authority Gate (2026-08-27)
 
+**Canary helper claim correction (2026-10-20):** `scripts/source_revision_canary_01.py`
+previously echoed caller-supplied workspace revision and canonical ID as if
+verified, although it only checked the source file digest and optionally read
+the `graphify_files` schema. It now reports those values as claims, sets
+workspace verification and canonical resolution false, labels the computed
+digest `SOURCE_CONTENT_HASH` (not `source_revision`), and labels the DB check
+`SCHEMA_ONLY_NOT_CHECKED` (or `NOT_CHECKED_NO_PSYCOPG2`). The regression suite
+`py -3.13 -m unittest scripts.test_source_revision_canary_01` passes 3/3,
+covering the no-database branch, schema-only read branch, and digest mismatch
+before DB connection. This is a fail-closed preflight correction only: no
+workspace revision, canonical identity, writer, row persistence, or independent
+readback is proven; the canary tasks below remain open.
+
+**Workspace availability recheck (2026-10-20; read-only):** environment
+variables for `ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID` and
+`ATLAS_GRAPHIFY_PRODUCTION_WORKSPACE_ID` are unset. A read-only query found no
+workspace titled/keyed as canary, test, or non-production; the only workspace
+joined to `graphify_files` is `Graphify Default Workspace`
+(`legal-ai:deeds-web-app`, 26,014 rows). All 26,014 have a non-NULL
+`source_revision`, but this census did not verify path-scoped revision
+semantics, content hashes, workspace revision matches, or canonical identity.
+Do not treat this default workspace as an approved canary target.
+
 - [ ] **SOURCE-REVISION-CANARY-01 — Persist one approved Graphify canary.**
   The controlled writer must receive an operator-provided existing
   non-production `ATLAS_GRAPHIFY_CANARY_WORKSPACE_ID`. Do not fabricate a UUID
@@ -18251,3 +18274,10 @@ Cross-owner references: hot/warm/cold leases, prefill/KV lifetime, and GPU resid
 - Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
 - Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
 - This note changes no database, Qdrant, or runtime state.
+
+## 2026-10-20 — Checkpoint-faithful AE evaluation replay
+
+- Saved the read-only evaluator at `scripts/atlas/ae-checkpoint-eval-v1.py`. The current `NestedSemanticAutoencoder` (768→512→256→128, separately learned `latent_128`) remains canonical; `--arch legacy-v3` exists only to reproduce historical checkpoint behavior. No checkpoint for the canonical architecture exists, and its trainer remains fail-closed pending `TRAINING_AUTHORITY_PROVEN`.
+- Replayed the legacy v3 checkpoint on CPU over 500 seeded queries from the frozen 55,169×768 matrix. Checkpoint SHA-256 `ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5` and matrix SHA-256 `bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0` matched. Tie-aware recall@10 was AE 256/128/64 = 0.8880/0.8278/0.7358; same-width MRL prefix = 0.8410/0.7538/0.6208.
+- Results are optimistic diagnostic agreement with exact neighbors: query rows overlap the checkpoint's possible training data, held-out split is unavailable, and source/workspace/representation revisions are absent. `promotionEligible=false`; no training, checkpoint writes, database reads/writes, or GPU execution occurred.
+- `py -3.13 -m unittest python.test_export_frozen_semantic768_snapshot_contract -v` passed 4/4. No AE training or production promotion task is marked complete by this replay.

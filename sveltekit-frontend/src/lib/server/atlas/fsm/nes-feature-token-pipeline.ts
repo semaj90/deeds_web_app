@@ -1,8 +1,8 @@
 /**
  * NES Feature Token Pipeline (v1)
  *
- * Implements end-to-end token and cache instruction resolution:
- * User Query -> Feature Classification -> Ewin Tang Low-Rank Sample -> ACE Packet -> Cache Instructions Descriptor.
+ * Builds an advisory token/cache descriptor proposal from a user query.
+ * Qualified feature rows are required before any low-rank selection can run.
  *
  * Strict invariants:
  * - No forbidden keys: never store hiddenThoughts, chainOfThought, kv_cache, or raw tensor bytes.
@@ -19,6 +19,7 @@ import {
   NesFeatureFsm,
   type CacheInstructionsTensorDescriptorV1,
   FORBIDDEN_STORAGE_KEYS,
+  FeatureClassificationUnavailableError,
 } from './nes-feature-fsm.js';
 
 export interface FeatureAcePacketV1 {
@@ -96,7 +97,6 @@ export function buildFeatureAcePacketV1(
 
 export interface PipelineExecutionOptions {
   featureCandidate?: string;
-  seed?: number;
   runId?: string;
   dryRun?: boolean;
 }
@@ -107,7 +107,6 @@ export async function runNesFeatureTokenPipeline(
 ): Promise<NesFeatureTokenPipelineResult> {
   const startTime = Date.now();
   const runId = options.runId || crypto.randomUUID();
-  const seed = options.seed ?? 42;
 
   const fsm = new NesFeatureFsm();
 
@@ -115,34 +114,26 @@ export async function runNesFeatureTokenPipeline(
   fsm.stepQuery(query);
 
   // 2. Step Classify
-  fsm.stepClassify(options.featureCandidate);
+  const classificationState = fsm.stepClassify(options.featureCandidate);
+  if (classificationState === 'FAILED') {
+    throw new FeatureClassificationUnavailableError();
+  }
 
-  // 3. Step Ewin Tang Sample
-  fsm.stepEwinTangSample(seed);
+  // 3. No qualified feature matrix is supplied by this proposal-only path.
+  fsm.stepLowRankUnavailable();
 
-  // 4. Step Admit ACE Packet
-  fsm.stepAdmitAcePacket(runId);
+  // 4. Propose an ACE packet; this is not evidence admission.
+  fsm.stepProposeAcePacket();
 
-  // 5. Step Prefix Hot -> yields Instructions Tensor Descriptor
-  const descriptor = fsm.stepPrefixHot(runId);
+  // 5. Build an advisory descriptor; no cache read/write occurs here.
+  const descriptor = fsm.buildCacheDescriptor(runId);
   const featureLabel = descriptor.featureLabel;
 
   // Build the corresponding ACE Packet
   const acePacket = buildFeatureAcePacketV1(featureLabel, runId);
 
-  let cachedToValkey = false;
+  const cachedToValkey = false;
   const valkeyPacketKey = descriptor.valkeyPacketKey;
-
-  // Check if Valkey is active and caching is allowed
-  if (!options.dryRun && process.env.VALKEY_ENABLED === 'true') {
-    try {
-      // Lazy import valkey/redis client if available
-      // BitFrost / Valkey residency is keyed by valkeyPacketKey
-      cachedToValkey = true;
-    } catch {
-      cachedToValkey = false;
-    }
-  }
 
   return {
     success: true,

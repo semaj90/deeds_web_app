@@ -34,6 +34,15 @@ describe('Parent Atlas .okf keyword corpus search', () => {
     expect(result.writesPerformed).toBe(false);
   });
 
+  it('finds 4D manifold mapping and future K-means analytics as advisory vocabulary', () => {
+    const result = searchKeywordCorpusV1({ query: '4D manifold mapping K-means clustering data analytics', corpusPath, schemaPath, limit: 5 });
+    expect(result.status).toBe('OK');
+    expect(result.items[0]?.entryId).toBe('topology-som-kmeans-advisory-features');
+    expect(result.items[0]?.retrievalPolicy).toContain('advisory_only');
+    expect(result.canonicalAuthority).toBe(false);
+    expect(result.writesPerformed).toBe(false);
+  });
+
   it('paginates against a frozen corpus checksum and rejects a cursor reused for another query', () => {
     const first = searchKeywordCorpusV1({ query: 'atlas', corpusPath, schemaPath, limit: 1 });
     expect(first.status).toBe('OK');

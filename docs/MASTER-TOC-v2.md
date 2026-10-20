@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v2.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `12a4e0adbff5689337e3e3b40c9ce351333f28084f16836dbd56818834497b39`
+Registry checksum: `96591c588f66be36457071e95a59ab11a0b9a6bde397edbecfb731b8b0b61c70`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 
@@ -93,7 +93,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 
 - [.claude/CLAUDE.md](.claude/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `13bc6179f4ad`
 - [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `fef20519d5e9`
-- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `5cd4caea3f38`
+- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `4649f28479ee`
 - [claude-mem/CLAUDE.md](claude-mem/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `a6f297acd125`
 - [llm/claude.md](llm/claude.md) — CLAUDE_INSTRUCTIONS — `fdcdba7c73d7`
 - [mcp-server-mcp/CLAUDE.md](mcp-server-mcp/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `1707a6375458`
@@ -288,7 +288,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [local-llm-offload-ownership](openspec/changes/local-llm-offload-ownership) — 49/82 tasks (60%)
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/132 tasks (74%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 57/110 tasks (52%)
-- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 1035/1648 tasks (63%)
+- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 1044/1660 tasks (63%)
 - [parent-atlas-adaptive-backprop-hll-monitoring](openspec/changes/parent-atlas-adaptive-backprop-hll-monitoring) — 10/64 tasks (16%)
 - [parent-atlas-adaptive-dag-fabric](openspec/changes/parent-atlas-adaptive-dag-fabric) — 12/13 tasks (92%)
 - [parent-atlas-agent-framework-integration-hardening](openspec/changes/parent-atlas-agent-framework-integration-hardening) — 12/71 tasks (17%)

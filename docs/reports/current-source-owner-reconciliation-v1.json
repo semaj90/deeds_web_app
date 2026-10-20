@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-owner-reconciliation.v1",
-  "generatedAt": "2026-10-05T17:29:31.487Z",
+  "generatedAt": "2026-10-20T19:01:03.229Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "databaseWrites": 0,
@@ -11,17 +11,17 @@
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "gitRoot": "C:/Users/james/Videos/deeds-web-app",
     "gitCommonDir": ".git",
-    "headCommit": "ae9651941ea3ed0ebfd5630ca22be4ccdb496b45",
-    "headTree": "0f7b71ef26b575b6ec44df4ec345cd48d83ecf11",
+    "headCommit": "68b5f7d91dbe5bfff3be85ff94d1c35d0cfbac55",
+    "headTree": "54758bc59033e87e1001117da8a0cc3bba3fa1d8",
     "hostname": "DESKTOP-Q18MPHM",
     "dirty": true,
-    "sourceCount": 26748,
-    "sourceRefChecksum": "sha256:2eed529628ede1aab620bc5bd3f4f0b4ffe328f4e8630d0346e32bbbe18e4141",
+    "sourceCount": 28738,
+    "sourceRefChecksum": "sha256:9319c4ffd34eaf064af4a061058de72d9a8e097cec7f4b55c4179593a34819e6",
     "inventoryPolicy": {
       "command": "git ls-files --cached --others --exclude-standard -z",
-      "trackedAtHeadCount": 32739,
-      "candidateCount": 26787,
-      "admittedCount": 26748,
+      "trackedAtHeadCount": 36021,
+      "candidateCount": 28777,
+      "admittedCount": 28738,
       "skippedCount": 39,
       "maxSourceBytes": 5242880,
       "generatedPrefixesExcluded": [
@@ -77,40 +77,40 @@
     "admittedSnapshotDelta": {
       "snapshotRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "snapshotSourceCount": 25542,
-      "currentSourceCount": 26748,
-      "sharedSourceCount": 24446,
-      "currentOnlyCount": 2302,
-      "admittedOnlyCount": 1096,
-      "sharedDigestMatchCount": 23265,
-      "sharedDigestMismatchCount": 1181,
+      "currentSourceCount": 28738,
+      "sharedSourceCount": 24439,
+      "currentOnlyCount": 4299,
+      "admittedOnlyCount": 1103,
+      "sharedDigestMatchCount": 22279,
+      "sharedDigestMismatchCount": 2160,
       "dispositionCounts": {
-        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23265,
-        "WORKTREE_BYTES_DRIFTED": 1181,
-        "WORKTREE_ADDED_AFTER_SNAPSHOT": 2302,
-        "MISSING_FROM_CURRENT_WORKTREE": 1096
+        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 22279,
+        "WORKTREE_BYTES_DRIFTED": 2160,
+        "WORKTREE_ADDED_AFTER_SNAPSHOT": 4299,
+        "MISSING_FROM_CURRENT_WORKTREE": 1103
       },
       "requiresSnapshotRefresh": true,
       "currentOnlySample": [
-        ".claude/skills/openspec-quickhit/SKILL.md",
-        ".claude/skills/parent-atlas-workstation/SKILL.md",
-        ".claude/skills/validating-parent-atlas/SKILL.md",
-        ".claude/skills/validating-parent-atlas/reference/adversarial-probes.md",
-        ".claude/skills/validating-parent-atlas/reference/identity-and-lineage.md",
-        ".claude/skills/validating-parent-atlas/reference/proof-levels.md",
-        ".claude/skills/validating-parent-atlas/reference/runtime-side-effects.md",
-        ".claude/skills/validating-parent-atlas/reference/semantic-projection.md",
-        ".claude/skills/validating-parent-atlas/reference/structural-lineage.md",
-        ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
-        ".okf/docs/dspy/corpus-3.4.0.json",
-        ".okf/docs/dspy/corpus.json",
-        ".okf/docs/dspy/postgres-index-contract.md",
-        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/indexes/firecrawl-map.json",
-        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/manifest.json",
-        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0150a9bf3908b8d567987f068e43b5108781feff2b8ccbb7edc2ba0aa090d051.md",
-        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/04565bee03781ddd66524ca26fcf64c4a8425f3ebabfc57f99ba9d904d6ab69a.md",
-        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0507794de7baf379eb626ddd1ebde433a82b06b3e0910e2203b0d9cc24c79ae0.md",
-        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/07ae7e91bf239d28c4d0a4eaffbefdfd07ed73a3cf5b50b179ffe998178cbc5e.md",
-        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/097569378fbff92f48e8e3af03f37b06107c6467bb36897ef5e85fc48733bba0.md"
+        ".archive/2026-10-06-workboard-backup/OPENSPEC-WORKBOARD.md",
+        ".archive/2026-10-06-workspace-reseal-historical/workspace-snapshot-reseal-v1.2026-09-18.json",
+        ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+        ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+        ".archive/2026-10-18-4x6-tile/execution.atlas-feature-matrix-4x6-v1.ts",
+        ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.spec.ts",
+        ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.ts",
+        ".archive/duplicates-2026-10-13/manifest.json",
+        ".archive/duplicates-2026-10-13/python_atlas_cuda_cutile_vecadd_smoke_v1.py",
+        ".archive/duplicates-2026-10-13/python_atlas_rff_features_v1.py",
+        ".archive/duplicates-2026-10-13/python_test_atlas_rff_features_v1.py",
+        ".archive/duplicates-2026-10-13/scripts_atlas_graph_stream_batch_v1.py",
+        ".archive/duplicates-2026-10-13/tests_test_graph_stream_batch_v1.py",
+        ".archive/knn-contract-move-2026-10-12/knn_contract.py",
+        ".archive/knn-contract-move-2026-10-12/services-original/knn_contract.py",
+        ".archive/knn-contract-move-2026-10-12/services-original/test_knn_contract.py",
+        ".archive/knn-contract-move-2026-10-12/test_knn_contract.py",
+        ".archive/production-hardening-2026-10-12/.opencode/candidates/ace-packet-2026-10-12T05-48-24-210Z.json",
+        ".archive/production-hardening-2026-10-12/.opencode/production/ace-packet-2026-06-12.json",
+        ".archive/production-hardening-2026-10-12/.opencode/production/ace-packet-summary-2026-06-12.md"
       ],
       "admittedOnlySample": [
         "claude-mem/.agent/rules/claude-mem-context.md",
@@ -135,28 +135,28 @@
         "claude-mem/.windsurf/rules/claude-mem-context.md"
       ],
       "sharedDigestMismatchSample": [
+        ".claude/settings.json",
         ".claude/settings.local.json",
         ".claude/skills/drizzle-schema-review/SKILL.md",
+        ".claude/skills/trace-mcp-tooling/SKILL.md",
+        ".mcp.json",
         ".okf/index.md",
+        ".okf/manifest.yaml",
+        ".okf/predicates/feature-relationships.yaml",
+        ".opencode/agents/rg-atlas.md",
+        ".opencode/skills/trace-mcp-tooling/SKILL.md",
+        ".opencode/system.md",
         ".vscode/tasks.json",
         "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
         "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
         "AGENTS.md",
+        "TOPOLOGY-DERIVATION-CONTRACT.md",
         "claude.md",
         "codex.md",
-        "crates/turbovec-napi/index.d.ts",
-        "crates/turbovec-napi/index.js",
-        "crates/turbovec-napi/src/lib.rs",
-        "docker-compose.yml",
-        "docker/bifrost/config.json",
-        "docker/clickhouse-mirror/clickhouse-mirror.py",
-        "docker/docker-compose.gpu.yml",
-        "docker/docling-vlm/app.py",
-        "docker/image-synthesis/app.py",
-        "docker/langgraph-synthesis/app.py",
-        "docs/.okf/registry.yaml"
+        "crates/atlas_packet_parser/src/lib.rs",
+        "crates/turbovec-napi/index.d.ts"
       ],
-      "deltaChecksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
+      "deltaChecksum": "sha256:5dd13c20dbec655de36abc21274c1c741f1c3acaaa3af6e32c38f87a04c2d664"
     }
   },
   "currentExecutionCandidates": [
@@ -933,7 +933,7 @@
       "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
       "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
       "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
-      "observedAt": "2026-09-21T22:53:47.662Z"
+      "observedAt": "2026-10-17T17:54:27.819Z"
     },
     "qualifyingExecutionIds": [
       "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -1341,5 +1341,5 @@
       }
     ]
   },
-  "checksum": "sha256:ff75a46dcaea076347ff1bc0c20beb53ac50de1857629869c319f301a3848a6f"
+  "checksum": "sha256:0dc0003a4dc21aaa8cf8468ad546a49df19cc8791629492c425683543eb8a21c"
 }

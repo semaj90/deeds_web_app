@@ -40,7 +40,7 @@ function makeGroundedSourceBindingReceipt() {
   };
 }
 
-function makeCentroidCandidateHint() {
+function makeCentroidCandidateHint(evidenceRefs = ['src/one.ts']) {
   const ordinalMap = materializeCandidateOrdinalMap({
     candidateSnapshotRevision: 'snapshot:search:r1',
     workspaceRevision,
@@ -56,7 +56,7 @@ function makeCentroidCandidateHint() {
       graphRevision: 'graph:r1',
       semanticRevision: 'semantic_768:r1',
       degradedIdentity: false,
-      evidenceRefs: ['src/one.ts'],
+      evidenceRefs,
       representationBindings: [],
     }],
   });
@@ -216,7 +216,7 @@ describe('SearchRuntime QAS projection boundary', () => {
         { hintId: 'valkey:source:one', kind: 'SOURCE_REF', sourceRef: 'src/one.ts' },
         { hintId: 'valkey:centroid:one', kind: 'CENTROID' },
       ],
-      centroidCandidateHint: makeCentroidCandidateHint(),
+      centroidCandidateHint: makeCentroidCandidateHint(['graph-v2:relation:one', 'src/one.ts']),
       cachedPacketSourceEvidence: [{
         hintId: 'valkey:source:one',
         evidence: {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { executeSearchRuntimeTopKV1 } from './search-runtime-topk-caller-v1.js';
+import { executeSearchRuntimeTopKV1, type SearchRuntimeTopKCallerInputV1 } from './search-runtime-topk-caller-v1.js';
 import { LiveSourceFetchPortV1 } from './live-source-fetch-port-v1.js';
 import { sourceRevisionOfBytes } from './topk-evidence-fetch-v1.js';
 import { materializeCandidateOrdinalMap } from '../features/canonical-candidate-v1.js';
@@ -101,7 +101,16 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
     // Run the SearchRuntime Top-K caller
     const result = executeSearchRuntimeTopKV1({
       requestId: 'req:sr-topk:test-1',
+      queryDigest: 'query:test-1',
       graphRevision: 'graph:v1',
+      taxonomyRevision: 'taxonomy:v1',
+      featureSchemaRevision: 'feature-schema:v1',
+      evidenceRevision: 'evidence:v1',
+      producerRevision: 'producer:search-runtime:v1',
+      tokenBudget: 4000,
+      retrievalPolicyRevision: 'retrieval-policy:v1',
+      acePlaybookRevision: 'ace-playbook:v1',
+      representationRevision: 'representation:v1',
       ordinalMap,
       columnar,
       snapshot,
@@ -193,7 +202,16 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
 
     const result = executeSearchRuntimeTopKV1({
       requestId: 'req:sr-topk:test-2',
+      queryDigest: 'query:test-2',
       graphRevision: 'graph:v1',
+      taxonomyRevision: 'taxonomy:v1',
+      featureSchemaRevision: 'feature-schema:v1',
+      evidenceRevision: 'evidence:v1',
+      producerRevision: 'producer:search-runtime:v1',
+      tokenBudget: 4000,
+      retrievalPolicyRevision: 'retrieval-policy:v1',
+      acePlaybookRevision: 'ace-playbook:v1',
+      representationRevision: 'representation:v1',
       ordinalMap,
       columnar,
       snapshot,
@@ -210,5 +228,30 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
     expect(result.evidence.rejected[0].reason).toBe('SOURCE_REVISION_STALE');
     expect(result.contextManifestAdmission.status).toBe('BLOCKED');
     expect(result.status).toBe('BLOCKED_EVIDENCE_UNQUALIFIED');
+  });
+
+  it('rejects missing revisions and Graphify lifecycle instead of inventing defaults', () => {
+    const incomplete = {
+      requestId: 'req:missing-lineage',
+      queryDigest: 'query:fixture',
+      graphRevision: '',
+      taxonomyRevision: 'taxonomy:fixture',
+      featureSchemaRevision: 'schema:fixture',
+      evidenceRevision: 'evidence:fixture',
+      producerRevision: 'producer:fixture',
+      tokenBudget: 100,
+      retrievalPolicyRevision: 'policy:fixture',
+      acePlaybookRevision: 'playbook:fixture',
+      representationRevision: 'representation:fixture',
+    } as unknown as SearchRuntimeTopKCallerInputV1;
+
+    expect(() => executeSearchRuntimeTopKV1(incomplete)).toThrow(
+      'SEARCH_RUNTIME_TOPK_REQUIRED_REVISION:graphRevision',
+    );
+
+    incomplete.graphRevision = 'graph:fixture';
+    expect(() => executeSearchRuntimeTopKV1(incomplete)).toThrow(
+      'SEARCH_RUNTIME_TOPK_GRAPHIFY_LIFECYCLE_REQUIRED',
+    );
   });
 });

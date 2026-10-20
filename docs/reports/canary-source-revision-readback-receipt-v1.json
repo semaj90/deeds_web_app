@@ -1,0 +1,155 @@
+{
+  "schema": "atlas.canary-source-revision-readback-receipt.v1",
+  "generatedAt": "2026-10-20T16:47:16.297Z",
+  "cohortSize": 5,
+  "allMatched": true,
+  "verifiedCohortCount": 5,
+  "totalChunksVerified": 234,
+  "totalPacketsVerified": 5,
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "cohortResults": [
+    {
+      "sourceRef": "scripts/atlas/enrich_atlas_packets.mjs",
+      "onDiskSha256": "d06efceb2e44399f831d9217b24420299431a040028e79dcbe6f1e2de1271c54",
+      "graphifyFiles": {
+        "present": true,
+        "contentHash": "d06efceb2e44399f831d9217b24420299431a040028e79dcbe6f1e2de1271c54",
+        "gitCommit": "b05e25b18ec817b9c21aafdf39196465e206179e",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "parseStatus": "PROCESSED"
+      },
+      "codebaseChunkIndex": {
+        "present": true,
+        "chunkCount": 34,
+        "fileContentHash": "d06efceb2e44399f831d9217b24420299431a040028e79dcbe6f1e2de1271c54"
+      },
+      "atlasPackets": {
+        "present": true,
+        "packetKey": "packet:34f2c7d8a5d3",
+        "sourceRevision": "sha256:d06efceb2e44399f831d9217b24420299431a040028e79dcbe6f1e2de1271c54",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      },
+      "matches": {
+        "diskEqualsGraphify": true,
+        "graphifyEqualsChunkIndex": true,
+        "graphifyEqualsAtlasPackets": true,
+        "fourWayVerified": true
+      }
+    },
+    {
+      "sourceRef": "docs/atlas/feature-registry.json",
+      "onDiskSha256": "d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+      "graphifyFiles": {
+        "present": true,
+        "contentHash": "d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+        "gitCommit": "b05e25b18ec817b9c21aafdf39196465e206179e",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "parseStatus": "PROCESSED"
+      },
+      "codebaseChunkIndex": {
+        "present": true,
+        "chunkCount": 50,
+        "fileContentHash": "d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+      },
+      "atlasPackets": {
+        "present": true,
+        "packetKey": "packet:5c4e29307ca5",
+        "sourceRevision": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      },
+      "matches": {
+        "diskEqualsGraphify": true,
+        "graphifyEqualsChunkIndex": true,
+        "graphifyEqualsAtlasPackets": true,
+        "fourWayVerified": true
+      }
+    },
+    {
+      "sourceRef": "docs/engram-offline-processing-pipeline.md",
+      "onDiskSha256": "e1292e814c3ce5619d23de69150811b58a3cd193d494af2040d88c65cd5b67d9",
+      "graphifyFiles": {
+        "present": true,
+        "contentHash": "e1292e814c3ce5619d23de69150811b58a3cd193d494af2040d88c65cd5b67d9",
+        "gitCommit": "b05e25b18ec817b9c21aafdf39196465e206179e",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "parseStatus": "PROCESSED"
+      },
+      "codebaseChunkIndex": {
+        "present": true,
+        "chunkCount": 50,
+        "fileContentHash": "e1292e814c3ce5619d23de69150811b58a3cd193d494af2040d88c65cd5b67d9"
+      },
+      "atlasPackets": {
+        "present": true,
+        "packetKey": "packet:dc443730ea56",
+        "sourceRevision": "sha256:e1292e814c3ce5619d23de69150811b58a3cd193d494af2040d88c65cd5b67d9",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      },
+      "matches": {
+        "diskEqualsGraphify": true,
+        "graphifyEqualsChunkIndex": true,
+        "graphifyEqualsAtlasPackets": true,
+        "fourWayVerified": true
+      }
+    },
+    {
+      "sourceRef": "docs/graph/codebase-feature-map.json",
+      "onDiskSha256": "bca60b034c784887123cce7754ba6c9e05ed8419d5f36c484cde4e9ebe50759a",
+      "graphifyFiles": {
+        "present": true,
+        "contentHash": "bca60b034c784887123cce7754ba6c9e05ed8419d5f36c484cde4e9ebe50759a",
+        "gitCommit": "b05e25b18ec817b9c21aafdf39196465e206179e",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "parseStatus": "PROCESSED"
+      },
+      "codebaseChunkIndex": {
+        "present": true,
+        "chunkCount": 50,
+        "fileContentHash": "bca60b034c784887123cce7754ba6c9e05ed8419d5f36c484cde4e9ebe50759a"
+      },
+      "atlasPackets": {
+        "present": true,
+        "packetKey": "packet:461679ee2536",
+        "sourceRevision": "sha256:bca60b034c784887123cce7754ba6c9e05ed8419d5f36c484cde4e9ebe50759a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      },
+      "matches": {
+        "diskEqualsGraphify": true,
+        "graphifyEqualsChunkIndex": true,
+        "graphifyEqualsAtlasPackets": true,
+        "fourWayVerified": true
+      }
+    },
+    {
+      "sourceRef": "docs/graph/codebase-semantics-neo4j-report.json",
+      "onDiskSha256": "d1fda6bdfe8f590596ea9fc931a5078e73d3984226b326f45755c78d73ae0a48",
+      "graphifyFiles": {
+        "present": true,
+        "contentHash": "d1fda6bdfe8f590596ea9fc931a5078e73d3984226b326f45755c78d73ae0a48",
+        "gitCommit": "b05e25b18ec817b9c21aafdf39196465e206179e",
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "parseStatus": "PROCESSED"
+      },
+      "codebaseChunkIndex": {
+        "present": true,
+        "chunkCount": 50,
+        "fileContentHash": "d1fda6bdfe8f590596ea9fc931a5078e73d3984226b326f45755c78d73ae0a48"
+      },
+      "atlasPackets": {
+        "present": true,
+        "packetKey": "packet:3fc42f3a4715",
+        "sourceRevision": "sha256:d1fda6bdfe8f590596ea9fc931a5078e73d3984226b326f45755c78d73ae0a48",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      },
+      "matches": {
+        "diskEqualsGraphify": true,
+        "graphifyEqualsChunkIndex": true,
+        "graphifyEqualsAtlasPackets": true,
+        "fourWayVerified": true
+      }
+    }
+  ],
+  "checksum": "sha256:63714d4efe8a0c5d0cf533cb472db0dc416278961de64c6c6e3a1ac3d9ccf90d"
+}

@@ -30,16 +30,16 @@ import { TILE_CHANNEL_CANONICAL_INDEX } from './atlas-feature-matrix-4x6-v1.js';
 
 export interface SearchRuntimeTopKCallerInputV1 {
   requestId: string;
-  queryDigest?: string;
-  graphRevision?: string;
-  taxonomyRevision?: string;
-  featureSchemaRevision?: string;
-  evidenceRevision?: string;
-  producerRevision?: string;
-  tokenBudget?: number;
-  retrievalPolicyRevision?: string;
-  acePlaybookRevision?: string;
-  representationRevision?: string | null;
+  queryDigest: string;
+  graphRevision: string;
+  taxonomyRevision: string;
+  featureSchemaRevision: string;
+  evidenceRevision: string;
+  producerRevision: string;
+  tokenBudget: number;
+  retrievalPolicyRevision: string;
+  acePlaybookRevision: string;
+  representationRevision: string;
   ordinalMap: CandidateOrdinalMapV1;
   columnar: CandidateFeatureColumnarV1;
   snapshot: CandidateFeatureSnapshotV1;
@@ -48,7 +48,7 @@ export interface SearchRuntimeTopKCallerInputV1 {
   bias?: number;
   k?: number;
   sourceFetchPort: SourceFetchPortV1;
-  graphifyLifecycle?: GraphifyLifecycleV1;
+  graphifyLifecycle: GraphifyLifecycleV1;
 }
 
 export interface SearchRuntimeTopKExecutionResultV1 {
@@ -83,18 +83,42 @@ const DEFAULT_WEIGHTS = [0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625];
 export function executeSearchRuntimeTopKV1(
   params: SearchRuntimeTopKCallerInputV1,
 ): SearchRuntimeTopKExecutionResultV1 {
+  const requiredRevisions = {
+    requestId: params.requestId,
+    queryDigest: params.queryDigest,
+    graphRevision: params.graphRevision,
+    taxonomyRevision: params.taxonomyRevision,
+    featureSchemaRevision: params.featureSchemaRevision,
+    evidenceRevision: params.evidenceRevision,
+    producerRevision: params.producerRevision,
+    retrievalPolicyRevision: params.retrievalPolicyRevision,
+    acePlaybookRevision: params.acePlaybookRevision,
+    representationRevision: params.representationRevision,
+  };
+  for (const [field, value] of Object.entries(requiredRevisions)) {
+    if (typeof value !== 'string' || value.trim().length === 0) {
+      throw new Error(`SEARCH_RUNTIME_TOPK_REQUIRED_REVISION:${field}`);
+    }
+  }
+  if (!Number.isSafeInteger(params.tokenBudget) || params.tokenBudget <= 0) {
+    throw new Error('SEARCH_RUNTIME_TOPK_INVALID_TOKEN_BUDGET');
+  }
+  if (!['COMPLETED', 'NOT_COMPLETED', 'UNKNOWN'].includes(params.graphifyLifecycle)) {
+    throw new Error('SEARCH_RUNTIME_TOPK_GRAPHIFY_LIFECYCLE_REQUIRED');
+  }
+
   const k = params.k ?? 10;
-  const graphifyLifecycle = params.graphifyLifecycle ?? 'COMPLETED';
-  const queryDigest = params.queryDigest ?? 'query:search-runtime:v1';
-  const graphRevision = params.graphRevision ?? 'graph:search-runtime:v1';
-  const taxonomyRevision = params.taxonomyRevision ?? 'taxonomy:search-runtime:v1';
-  const featureSchemaRevision = params.featureSchemaRevision ?? 'schema:search-runtime:v1';
-  const evidenceRevision = params.evidenceRevision ?? 'evidence:search-runtime:v1';
-  const producerRevision = params.producerRevision ?? 'sr-topk:v1';
-  const tokenBudget = params.tokenBudget ?? 4000;
-  const retrievalPolicyRevision = params.retrievalPolicyRevision ?? 'policy:retrieval:v1';
-  const acePlaybookRevision = params.acePlaybookRevision ?? 'playbook:ace:v1';
-  const representationRevision = params.representationRevision ?? params.columnar.featureRevision;
+  const graphifyLifecycle = params.graphifyLifecycle;
+  const queryDigest = params.queryDigest;
+  const graphRevision = params.graphRevision;
+  const taxonomyRevision = params.taxonomyRevision;
+  const featureSchemaRevision = params.featureSchemaRevision;
+  const evidenceRevision = params.evidenceRevision;
+  const producerRevision = params.producerRevision;
+  const tokenBudget = params.tokenBudget;
+  const retrievalPolicyRevision = params.retrievalPolicyRevision;
+  const acePlaybookRevision = params.acePlaybookRevision;
+  const representationRevision = params.representationRevision;
 
   const ordinals = params.candidateOrdinals ?? params.ordinalMap.candidates.map((c) => c.candidateOrdinal);
 

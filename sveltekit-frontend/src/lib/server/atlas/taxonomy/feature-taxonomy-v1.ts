@@ -80,7 +80,7 @@ export const FEATURE_TAXONOMY_V1: Record<CanonicalFeatureLabel, FeatureTaxonomyE
     displayName: 'Authentication & Session Control',
     description: 'User login, registration, session management, and Lucia auth.',
     sveltekitRoutes: ['/login', '/register', '/api/auth'],
-    coreComponents: ['src/lib/components/auth/LoginForm.svelte', 'src/lib/server/auth/lucia.ts'],
+    coreComponents: ['src/routes/login/+page.svelte', 'src/lib/server/lucia.ts'],
     databaseTables: ['user', 'session', 'user_roles'],
     backendServices: ['PostgreSQL 18 (:5434)', 'Valkey Session Cache (:6379)'],
     tokenBudget: 1024,
@@ -92,7 +92,7 @@ export const FEATURE_TAXONOMY_V1: Record<CanonicalFeatureLabel, FeatureTaxonomyE
     displayName: 'Interactive Evidence Canvas',
     description: 'Collaborative evidence canvas, graph layout nodes, and 2D visual boards.',
     sveltekitRoutes: ['/demos/collab-canvas', '/demos/evidence-canvas', '/api/collaboration'],
-    coreComponents: ['src/lib/components/evidence/EvidenceGraphVisualization.svelte', 'src/lib/components/ui/gaming/n64/Switch.svelte'],
+    coreComponents: ['src/lib/features/evidence-command-center/EvidenceGraphPane.svelte', 'src/lib/components/ui/gaming/n64/Switch.svelte'],
     databaseTables: ['graph_node_metrics', 'topology_clusters'],
     backendServices: ['cuGraph (:8098)', 'Qdrant (:6333)'],
     tokenBudget: 2048,
@@ -236,7 +236,7 @@ export const FEATURE_TAXONOMY_V1: Record<CanonicalFeatureLabel, FeatureTaxonomyE
     displayName: 'Audio & Video Transcription Engine',
     description: 'Speech-to-text pipeline, whisper diarization, and audio ingestion services.',
     sveltekitRoutes: ['/api/video', '/api/audio', '/api/whisper'],
-    coreComponents: ['src/lib/server/audio/whisper-client.ts'],
+    coreComponents: ['src/lib/server/ai/whisper.ts'],
     databaseTables: ['transcription_jobs'],
     backendServices: ['nodejs-whisper / PyTorch STT', 'SeaweedFS (:8333)'],
     tokenBudget: 1536,
@@ -272,7 +272,7 @@ export const FEATURE_TAXONOMY_V1: Record<CanonicalFeatureLabel, FeatureTaxonomyE
     displayName: 'Codebase Intelligence & AST Indexer',
     description: 'Tree-sitter CST analysis, semantic chunking, and repository function indexing.',
     sveltekitRoutes: ['/code-intel', '/codebase-index', '/api/codeintel'],
-    coreComponents: ['src/lib/server/indexer/chunk-stream-pipeline.ts', 'src/lib/server/indexer/ast-ingest-logger.ts'],
+    coreComponents: ['src/lib/server/indexer/pipeline/chunk-stream-pipeline.ts', 'src/lib/server/indexer/ast-ingest-logger.ts'],
     databaseTables: ['codebase_chunk_index', 'repo_function_registry'],
     backendServices: ['Tree-sitter Sidecar (:8095)', 'PostgreSQL 18 (:5434)'],
     tokenBudget: 3072,
@@ -344,6 +344,83 @@ export function resolveFeatureLabel(labelOrAlias: string): CanonicalFeatureLabel
 
 export function getFeatureTaxonomyEntry(label: CanonicalFeatureLabel): FeatureTaxonomyEntryV1 {
   return FEATURE_TAXONOMY_V1[label];
+}
+
+export const FEATURE_SOURCE_LABEL_RESOLUTION_SCHEMA_V1 = 'atlas.feature-source-label-resolution.v1' as const;
+
+export type FeatureSourceLabelResolutionV1 =
+  | {
+      schema: typeof FEATURE_SOURCE_LABEL_RESOLUTION_SCHEMA_V1;
+      status: 'EXACT';
+      authority: 'CATALOG_ANCHOR_PROPOSAL';
+      sourceRef: string;
+      componentRef: string;
+      featureLabel: CanonicalFeatureLabel;
+    }
+  | {
+      schema: typeof FEATURE_SOURCE_LABEL_RESOLUTION_SCHEMA_V1;
+      status: 'AMBIGUOUS';
+      authority: 'CATALOG_ANCHOR_PROPOSAL';
+      sourceRef: string;
+      featureLabels: readonly CanonicalFeatureLabel[];
+    }
+  | {
+      schema: typeof FEATURE_SOURCE_LABEL_RESOLUTION_SCHEMA_V1;
+      status: 'UNMAPPED';
+      authority: 'CATALOG_ANCHOR_PROPOSAL';
+      sourceRef: string;
+    };
+
+function normalizeFeatureSourceRef(sourceRef: string): string | null {
+  const trimmed = sourceRef.trim().replace(/\\/g, '/').replace(/^\.\/+/, '');
+  if (!trimmed || trimmed.startsWith('/') || /^[A-Za-z]:/.test(trimmed)) return null;
+
+  const segments = trimmed.split('/').filter((segment) => segment && segment !== '.');
+  if (segments.includes('..')) return null;
+  if (segments[0] === 'sveltekit-frontend') segments.shift();
+  return segments.length > 0 ? segments.join('/') : null;
+}
+
+export function proposeCanonicalFeatureLabelForSourceRefV1(sourceRef: string): FeatureSourceLabelResolutionV1 {
+  const normalizedRef = normalizeFeatureSourceRef(sourceRef);
+  const matches = normalizedRef
+    ? (Object.entries(FEATURE_TAXONOMY_V1) as [CanonicalFeatureLabel, FeatureTaxonomyEntryV1][])
+        .flatMap(([featureLabel, entry]) =>
+          entry.coreComponents
+            .filter((componentRef) => normalizeFeatureSourceRef(componentRef) === normalizedRef)
+            .map((componentRef) => ({ featureLabel, componentRef })),
+        )
+    : [];
+  const featureLabels = [...new Set(matches.map((match) => match.featureLabel))].sort();
+
+  if (featureLabels.length === 1) {
+    const match = matches.find((candidate) => candidate.featureLabel === featureLabels[0])!;
+    return {
+      schema: FEATURE_SOURCE_LABEL_RESOLUTION_SCHEMA_V1,
+      status: 'EXACT',
+      authority: 'CATALOG_ANCHOR_PROPOSAL',
+      sourceRef,
+      componentRef: match.componentRef,
+      featureLabel: featureLabels[0],
+    };
+  }
+
+  if (featureLabels.length > 1) {
+    return {
+      schema: FEATURE_SOURCE_LABEL_RESOLUTION_SCHEMA_V1,
+      status: 'AMBIGUOUS',
+      authority: 'CATALOG_ANCHOR_PROPOSAL',
+      sourceRef,
+      featureLabels,
+    };
+  }
+
+  return {
+    schema: FEATURE_SOURCE_LABEL_RESOLUTION_SCHEMA_V1,
+    status: 'UNMAPPED',
+    authority: 'CATALOG_ANCHOR_PROPOSAL',
+    sourceRef,
+  };
 }
 
 export function matchFeatureLabel(queryOrPath: string): CanonicalFeatureLabel | null {

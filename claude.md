@@ -1,5 +1,29 @@
 # Legal AI Platform — Claude Project Instructions
 
+## Pipeline coverage: embed → index → summarize → rank → 4D topology (live, 2026-10-20)
+
+Read-only counts from `legal-ai-postgres` (`legal_ai_db`) and the service health endpoints. Not a receipt for any gate.
+
+| Stage | Live state | Owner |
+|---|---|---|
+| Embed (768-d, `embeddinggemma:latest`) | `codebase_chunk_index.content_embedding_768`: 219,998 of 274,465 chunks (80.1%). External docs: 852 of 852 chunks have `content_embedding` | Canonical semantic_768 (see Embedding Dimensions Policy) |
+| Index, pgvector | HNSW on `content_embedding` (halfvec 768); the 768 vector column is the canonical dense owner | Postgres is truth |
+| Index, TurboVec | `:8791` `indexed: 219,998`, dim 128, 4-bit, source `postgres`, projection `mrl` | Challenger (`CHALLENGER_ONLY`) |
+| Index, Qdrant | `codebase_chunks_768_v2`: 52,816 points, `green`. Mirror is partial versus the 219,998 Postgres vectors | Rebuildable mirror |
+| AST | `atlas_ast_nodes`: 523,271 rows with `source_revision` and `grammar_version`. ast-grep 0.45.3 on PATH; `:8095` reports `ast_grep: true` and `tree_sitter: true` | AST truth (native parser) |
+| NLP extraction | `:8095` `status: ok`; `langextract: true` (1.6.0), spaCy and BeautifulSoup loaded | Evidence-only proposals; no identity |
+| Summarize | `codebase_chunk_index.summary` non-blank on 40,306 chunks (14.7%) | Summaries are derived, not canonical |
+| Embed + summarize together | 560 chunks have both a summary and a 768-d embedding (0.2%) | Gap: ranking that uses summaries cannot cover the corpus yet |
+| Rank | SearchRuntime owns fusion (not re-verified in this pass) | `SearchRuntime` (single fusion owner) |
+| 4D topology | `atlas_topology_index`: 67,189 rows, all four coordinates populated: `x_cosine`, `y_graph`, `z_som`, `w_authority` | Derived projection; cannot create identity |
+| "Manifold" | No table named `manifold`. The 4D topology above is the manifold-shaped artifact | — |
+
+**MCP tool calling.** The dense-search tool is `atlas.packet_dense_search`, registered in the TRACE server (`sveltekit-frontend/src/mcp/trace-mcp-server.ts`), which combines a Postgres prefilter with a Qdrant dense rerank. A read-only probe on 2026-10-20 returned TRACE `:8788` health 200 with MCP, Postgres, and Redis healthy; this proves service health only, not that this Atlas tool returns revision-qualified results. The `$app/environment` alias is resolved in `scripts/node-ts-loader.mjs`. `atlas_embedding_tools.ts` uses `qdrant_dense_search`, which is the mirror path, not Postgres. A model calling tools never reaches Postgres or Qdrant directly; it calls the named tool.
+
+**Summary lineage caveat (2026-10-20).** A current read-only count found 40,306 nonblank `codebase_chunk_index.summary` values, 219,998 canonical 768-d vectors, and 560 rows with both. `updated_at` is a row-level timestamp and does not prove when or by whom a summary was written. The historical July provenance receipt (`docs/reports/july-summary-provenance-reconciliation-v1.json`, generated 2026-09-25) found July 4 summary-layer rows and July 20–21 packet embedding timestamps, but explicitly did not prove the exact summary writer or embedding input. Treat summaries as derived, revision-sensitive features; do not use them as a corpus-wide rank signal until coverage and provenance are qualified.
+
+**Recommendation for consolidation editing.** Before using summaries to rank or to recommend edits, backfill summaries only for chunks that already have a 768-d embedding, under an explicit write authorization, with pre-image and readback. Rankings that mix summarized and unsummarized chunks will be biased toward the 14.7% that have summaries.
+
 ## Retrieval canary, TurboVec and domain tables (2026-10-18)
 
 Detail: `docs/PROGRESS-1018-TURBOVEC-DOMAIN-ALIGNMENT.md`; tasks `openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md` (CANARY-*, GAP-*, TV-SEAM-*).
@@ -9,7 +33,7 @@ Detail: `docs/PROGRESS-1018-TURBOVEC-DOMAIN-ALIGNMENT.md`; tasks `openspec/chang
 - **Domain join = a VIEW, not a column:** use `v_chunk_domain_resolved_v1` (pinned to crosswalk `atlas.domain-vocab-crosswalk.v1`, NORMALIZED_EXACT; 125,309 of 274,465 resolved; 100-id lookup ~10 ms). The crosswalk is `canonical = false` by CHECK: never filter it with `canonical = true` (matches 0 rows, so any ambiguity check passes vacuously).
 - **`codebase_chunk_index` is write-amplified:** 48 indexes (incl. a 768 MB HNSW), 0.57% HOT, fillfactor 100. Do not add per-row columns or batch-update it. A `domain_id` column appeared with no migration and a partial backfill (DOMAIN-ID-COLUMN-01): do not continue it without operator approval.
 - **Authority tables:** `atlas_graph_authority_scores_v2` comes from 54,078 disjoint 3-node components (2 distinct PageRank/CheiRank values): not a rerank feature. Usable signal is `graph_node_metrics` (Neo4j GDS, 58,546 packets, PageRank 863 / CheiRank 822 distinct values, three different graph revisions, duplicate runs). Custom executor: `python/atlas_graph_runtime/networkx_executor.py` (`run_pagerank_v2`, `run_cheirank` = PageRank of the reversed graph).
-- **Pasted external plans** repeatedly named nonexistent columns/tables (`packet_key`/`domain_id` on the chunk table, `slug` on `domain_taxonomy_v1`); verify columns before running pasted SQL. A CUDA 13.4 / TensorRT-RTX 1.7 / Titans-MIRAS plan was rejected (unverifiable; conflicts with preserve-CUDA-13.0 and the capability guard).
+- **Pasted external plans** repeatedly named nonexistent columns/tables (`packet_key`/`domain_id` on the chunk table, `slug` on `domain_taxonomy_v1`); verify columns before running pasted SQL. A CUDA 13.4 / TensorRT-RTX 1.7 / Titans-MIRAS plan was not approved; it conflicts with the preserved CUDA 13.0 lane and capability guard. The 2026-10-18 run was CPU-only, Python 3.13, and `turbovec` 1.0.0, with no GPU or TensorRT execution.
 
 ## ACE packet production, provenance and supersession (2026-10-12)
 
@@ -37,7 +61,7 @@ Verbatim original (all bullets, the 8-step remaining implementation order, the M
 - **Admission closed:** `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json` = `NOT_SAFE_TO_PROJECT` (only the ontology-cohort predicate passes); `gan-readonly-live-proof-v1-20260928T022800Z.json`: 61,718 packet rows read, 5 structural `source_ref` failures, 1,520/1,520 qualified chunks, semantic projection `NOT_EXERCISED`. No promotion follows from a receipt's existence.
 - **Separate cache path:** the admitted Karpathy path wrote `gpu:karpathy:scores` (190 fields first run); this is not `BITFROST-LIVE-WARM-01` proof (blocked pending admitted packet identity and a bounded write/readback/expiry canary). Last BitFrost census 2026-09-27 — not a live measurement.
 - **MCP:** TRACE MCP tools and the HyperRAG HTTP Packet RPC are separate surfaces; process presence is not a live handshake. TRACE tool counts are runtime- vs static-derived (2026-09-08 reconciliation: static 120, runtime 176, 0 unexplained — `npm run trace:mcp:census-reconcile`, `TRACE-MCP-AUDIT-COMPLETE.md`); never cite one count as "the" count. Active config wires `trace` plus local `atlas-tools`.
-- **Remaining order:** `ACE-GATE-RECONCILE-01` → `ACE-STARTUP-BOUNDARY-01` → `ACE-PRODUCER-TRACE-01` → `ACE-BITFROST-CALLER-01` → `ACE-BITFROST-CANARY-01` (explicit operator authorization) → sealed `LearningOutcomeV1` into OaK/DSPy-GEPA in shadow mode only → optional breadth plane (HLL telemetry, `CentroidArtifactV1`, simdjson/Arrow/mmap, bounded RLM/OaK DAG; cuTile stays a challenger behind cuBLASLt/LibTorch/cuVS) → LangGraph Headroom V2 (see tasks.md `HEADROOM-V2-01`).
+- **Remaining order (updated 2026-10-20):** `ACE-GATE-RECONCILE-01` is closed as a status reconciliation (re-run 2026-10-20: 6/11 predicates below PASS, still `NOT_SAFE_TO_PROJECT`). `ACE-STARTUP-BOUNDARY-01` is spec-pinned (8/8 boundary specs pass). Next: `ACE-PRODUCER-TRACE-01` → `ACE-BITFROST-CALLER-01` → `ACE-BITFROST-CANARY-01` (explicit operator authorization) → sealed `LearningOutcomeV1` into OaK/DSPy-GEPA in shadow mode only → optional breadth plane (HLL telemetry, `CentroidArtifactV1`, simdjson/Arrow/mmap, bounded RLM/OaK DAG; cuTile stays a challenger behind cuBLASLt/LibTorch/cuVS) → LangGraph Headroom V2 (see tasks.md `HEADROOM-V2-01`).
 
 ---
 
@@ -86,7 +110,7 @@ removed from this stack entirely, including the embeddings lane (currently the *
 "Ollama vs llama-server Boundary" hard rule elsewhere in this file permits it to do — see that
 section, and the mirrored note in `sveltekit-frontend/CLAUDE.md`, for the full rule). **No
 replacement has been chosen.** Two live/in-progress candidates, neither confirmed final:
-- Go Embedding service (`:8097`) — already running, health-checked 768-dim/GPU this session.
+- Go Embedding service (`:8097`) — running. Live check 2026-10-20: `status: healthy`, `model_loaded: true`, `device: cpu`. The earlier "GPU" note is not current; re-check `device` before claiming GPU embedding.
 - Local llama.cpp GGUF embedding executor ("EG-GGUF") — early-stage proof (gates 0-2 only),
   not yet parity-checked against Ollama's actual output.
 
@@ -135,7 +159,7 @@ cache-type-v: q8_0
 
 ### 3-Point Validation Contract (PROVED Aug 4)
 1. **Clean streaming** ✅ — No control tokens in content (test 1 PASS)
-2. **Tool calls parsed** ✅ — Real `tool_calls` array, not textual (test 2 PASS)  
+2. **Tool calls parsed** ✅ — Real `tool_calls` array, not textual (test 2 PASS)
 3. **Model identity correct** ✅ — hforf.gguf (alias: gemma4-legal-iq4xs-direct.gguf), context=65536 (live /slots)
 
 ### Launcher Change (FROZEN)
@@ -189,7 +213,7 @@ Verbatim original (forensic trace of the 5 policy flips, live Qdrant census, lat
 - **Derived lanes only after a validated 768 source:** MRL-prefix + L2-renorm 512/256/128 are optional secondary lanes (Qdrant `codebase_chunks_512` exists, derived; `_256`/`_128` do not exist — don't build them speculatively). Never primary retrieval authority; never computed ahead of or in place of an incomplete 768 index; a cache/collection miss must not block retrieval.
 - **384 is retired from active retrieval, not physically dropped:** the 2026-10-12 read-only PostgreSQL audit found `atlas_packets.content_embedding_384` populated on 58,109 rows. Its producer/model and archive/readback evidence are unresolved; retain the column and values until a checksummed archive and separately authorized DDL plan exist. Do not reintroduce a 384-D retrieval lane or cite `gpu:warden:cache:384d:*` as current.
 - **Autoencoder latents are a separate, learned mechanism (not MRL):** `latent_256` real (55,169 rows PG + Qdrant `codebase_chunks_latent256`); `latent_128` derived by `SLICE_FIRST_N`+renorm of latent_256 (55,169 rows, PG only, registry promotion skipped); `latent_64` 1,703 rows PG only (autoencoder weights recorded untrained). Routing prefilters, never retrieval truth.
-  - **Canonical AE architecture (operator decision 2026-10-19): the CURRENT code.** `python/atlas_compute/latent_autoencoder.py` (768→512→256→128; `latent_128` is a separately learned bottleneck; `latent_64` is the renormalized 64-prefix of `latent_128`; trainer `python/train_latent_autoencoder.py`, fail-closed until `TRAINING_AUTHORITY_PROVEN`). **No checkpoint exists for it yet.** The 2026-08-29 `nested_semantic_autoencoder_v3_full01.pt` (sha256 `ac5c069d…16c5`) is a LEGACY 3-tier model (768→384→256, git `0cddd29d39`; `latent_128`/`latent_64` are prefixes of `latent_256`) that cannot load into the current class. Do not cite its latents or metrics as the canonical AE. Evaluate any checkpoint with `scripts/atlas/ae-checkpoint-eval-v1.py` (`--arch current` default, `--arch legacy-v3` diagnostic only; read-only, CPU-only, diagnostic, never promotion evidence).
+  - **Canonical AE architecture (operator decision 2026-10-19): the CURRENT code.** `python/atlas_compute/latent_autoencoder.py` (768→512→256→128; `latent_128` is a separately learned bottleneck; `latent_64` is the renormalized 64-prefix of `latent_128`; trainer `python/train_latent_autoencoder.py`, fail-closed until `TRAINING_AUTHORITY_PROVEN`). **No checkpoint exists for it yet.** The 2026-08-29 `nested_semantic_autoencoder_v3_full01.pt` (sha256 `ac5c069d…16c5`) is a LEGACY 3-tier model (768→384→256, git `0cddd29d39`; `latent_128`/`latent_64` are prefixes of `latent_256`) that cannot load into the current class. Do not cite its latents or metrics as the canonical AE. Evaluate any checkpoint with `scripts/atlas/ae-checkpoint-eval-v1.py` (`--arch current` default, `--arch legacy-v3` diagnostic only; read-only, CPU-only, diagnostic, never promotion evidence). A fresh 2026-10-20 500-query CPU replay reproduced the legacy diagnostic (tie-aware recall@10 AE 256/128/64 = 0.888/0.828/0.736; MRL = 0.841/0.754/0.621); this does not qualify the checkpoint or cohort.
   - **Equations (from `python/atlas_compute/latent_autoencoder.py`, the code is authoritative):** `z256 = normalize(LayerNorm(GELU(W2·GELU(W1·x+b1)+b2)))`; `z128 = normalize(LayerNorm(W3·z256+b3))` (a separately learned bottleneck, **not** a slice of z256); `z64 = normalize(z128[:64])`. `x` is the L2-normalized 768-d semantic vector.
   - **MRL prefix (`python/atlas_compute/mrl_gpu_fanout_evaluation_v1.py`):** `v_k = normalize(v_768[:k])` for k in {512, 256, 128, 64}; rejects zero-norm prefixes (`MRL_<k>_PREFIX_HAS_ZERO_NORM`).
   - **Conflict RESOLVED (2026-10-19):** the 55,169 `latent_128` rows are `SLICE_FIRST_N`+renorm of `latent_256` because they came from the legacy v3 checkpoint, whose architecture differs from the canonical current code (see the canonical-architecture bullet above). Those PG rows are legacy-architecture derivatives, not canonical-AE output; do not treat them as such. Diagnostic only (CPU, frozen cohort without per-row revisions, includes training rows): tie-aware recall@10 vs exact 768-d for the legacy checkpoint was AE 256/128/64 = 0.888/0.828/0.736 against same-size MRL prefixes 0.841/0.754/0.621. The evaluation gate stays `BLOCKED_NO_REVISION_QUALIFIED_COHORT` (0 of 219,998 vector rows carry source/workspace/representation revision).
@@ -534,7 +558,7 @@ Verbatim in `docs/archive/claude-md-stale-status-and-bitfrost-audit-2026-10-03.m
 
 **Canonical Identity Chain** (immutable):
 ```
-directory_path → source_ref → file_path → function_symbol 
+directory_path → source_ref → file_path → function_symbol
 → feature_id → feature_label → packet_key
 ```
 
@@ -627,7 +651,7 @@ See `memory/ide-linter-workarounds.md` for full details.
 - **Server Cache**: Valkey (`valkey/valkey-bundle:8` — AGPL-free Redis Stack drop-in with valkey-json + valkey-search; bind `127.0.0.1:6379`; zero ioredis code changes)
 - **Database**: PostgreSQL 18.4 + Drizzle ORM 0.44 + pgvector
 - **Vector DB**: Qdrant (GPU-accelerated)
-- **AI Models**: 
+- **AI Models**:
     - **Embeddings Lane**: Ollama (`embeddinggemma:latest` via `/api/embed`)
     - **Generation Lane**: `Gemma4` / `Qwen` via `llama-server` (TurboQuant + Bitfrost)
     - **Vision**: `gemma4-rotorquant:latest` (unified text+vision, GRPO legal LoRA merged)
@@ -1256,6 +1280,7 @@ docker exec legal-ai-qdrant curl -s http://localhost:6333/collections
 
 Verbatim original (architecture diagram, simdjson/LibTorch bridge APIs, N-API build, troubleshooting, perf tables): `docs/archive/claude-md-legacy-reference-2026-10-03.md`. Standing rules:
 - **GPU accelerates tensor math only** (embeddings, cosine/matmul, top-k, rerank batches, AE/SOM/kmeans, LibTorch inference). NOT GPU: AST/tree-sitter parsing, JSON parsing/validation, CRUD, joins, Postgres FTS — use CPU parallelism (worker pool), not a GPU port (e.g. `scripts/atlas/lib/ast-grep-symbol-extraction.mjs` is a sequential loop; a pool helps, a GPU rewrite does not). simdjson is AVX2/SSE4.2 **CPU SIMD**, not GPU; TurboVec is CPU-side 4-bit ANN.
+- **Live runtime check (2026-10-20):** Ollama `:11434` serves `embeddinggemma:latest` (canonical), plus `embeddinggemma-cpu:latest` and `embeddinggemma2:q8_0` (not canonical; do not switch callers to them without a parity receipt). WSL `atlas-rapids-cu13` (`MSYS_NO_PATHCONV=1 wsl -d Ubuntu --exec /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python`): cudf 26.06.01, cuvs 26.06.00, cugraph 26.06.00, pylibcudf imports (no `__version__`), torch 2.13.0+cu130 with CUDA available. Windows `py -3.13`: torch 2.8.0+cu128, CUDA available. libcudf is not probed separately; it reaches the project only through the RAPIDS env. Addons present: `tensorrt_bridge.node` at `simd-bridge/cpp/build-x64-cuda/Release/` (built 2026-10-19) and `simd_bridge_rs.node` at `simd-bridge/rust-simdjson/target/release/`.
 - **Native addon:** `tensorrt_bridge.node` (prefer `simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node`) exposes `simdJsonParse`, `libtorchCosineSimilarity`, `tensorrtInference`. TS wrappers: `src/lib/server/gpu/simdjson-bridge.ts` (`fastJsonParse`, falls back to V8 `JSON.parse`; payloads <1 KB bypass native) and `libtorch-bridge.ts` (`computeGpuSimilarity`, `isCudaAvailable`). If the addon fails with `ERR_DLOPEN_FAILED`, CUDA/LibTorch DLLs are not on PATH — V8 fallback is acceptable. Backend audit gate G17 checks `isSimdJsonAvailable()`.
 - **NetworkX vs Neo4j:** NetworkX = CPU parity oracle (`python/graph_snapshot_parity_networkx_oracle.py` vs cuGraph `…_cugraph_oracle.py`, driven by `scripts/atlas/export-graph-snapshot-parity-parquet.mts`); Neo4j = topology **mirror** only. The NetworkX↔cuGraph pipeline is the trusted PageRank + Louvain compute path (162,234 nodes / 108,156 edges, `status: PASS`, correlation 1, ARI/NMI 1.0 — `sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json`). Neo4j GDS `pageRank` properties (3,667 nodes) predate the pivot and are stale — never the canonical PageRank. Before adding a graph computation check `src/lib/server/graph/graph-analysis-runner.ts` and its adapters (pagerank/kcore/betweenness/cheirank → `graph_community_assignments`, `graph_communities`, `graph_node_metrics`); the repo already has too many graph-algorithm owners.
 

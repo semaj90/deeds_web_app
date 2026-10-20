@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.codebase-chunk-lineage-backfill.v2",
+  "gate": "CHUNK-LINEAGE-APPLY-01",
+  "mode": "READ_ONLY_DRY_RUN",
+  "repositoryId": "deeds-web-app",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "limit": 5000,
+  "selectionPolicy": "FROZEN_V1_CASE_FOLDED_5000_ROW_COHORT; CASE_SENSITIVE_CANONICAL_PATH_AND_EXACT_DIGEST_REQUIRED_FOR_ADMISSION",
+  "representationRevisionTouched": false,
+  "representationRevision": null,
+  "authorizationPresent": false,
+  "transactionCommitted": false,
+  "writesPerformed": false,
+  "writeColumns": [
+    "workspace_revision",
+    "source_revision",
+    "lineage_binding_checksum",
+    "lineage_producer_revision"
+  ],
+  "candidateCount": 5000,
+  "candidateChecksum": "sha256:3e8130269e8d05575bca3a281c42e25f667868ef104f70f64458144ddeab9dc8",
+  "eligibleCount": 4999,
+  "bridgeBindingConflictCount": 0,
+  "conflictCount": 0,
+  "skippedCount": 1,
+  "rejections": {
+    "CASE_INSENSITIVE_SOURCE_REF_ONLY": 1
+  },
+  "caseInsensitiveOnlyExcludedCount": 16,
+  "caseOnlyFrozenCandidateCount": 1,
+  "beforeNullCounts": {
+    "workspaceRevision": 5000,
+    "sourceRevision": 5000,
+    "lineageBindingChecksum": 5000,
+    "lineageProducerRevision": 5000,
+    "representationRevision": 5000
+  },
+  "bridgeBackedCount": 3498,
+  "updatedCount": 0,
+  "afterNullCounts": {
+    "workspaceRevision": 5000,
+    "sourceRevision": 5000,
+    "lineageBindingChecksum": 5000,
+    "lineageProducerRevision": 5000,
+    "representationRevision": 5000
+  },
+  "readbackPass": null,
+  "status": "DRY_RUN_CANDIDATES_READY"
+}

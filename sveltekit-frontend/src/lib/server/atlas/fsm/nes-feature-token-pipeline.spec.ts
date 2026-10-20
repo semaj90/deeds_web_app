@@ -11,7 +11,7 @@ import {
 import { CANONICAL_FEATURE_LABELS } from '../taxonomy/feature-taxonomy-v1.js';
 
 describe('NES Feature FSM & Low-Rank Ewin Tang Token Pipeline', () => {
-  it('transitions through the full lifecycle to PREFIX_HOT', () => {
+  it('builds unranked suggestions when no qualified low-rank matrix exists', () => {
     const fsm = new NesFeatureFsm();
     expect(fsm.getState()).toBe('IDLE');
 
@@ -22,17 +22,18 @@ describe('NES Feature FSM & Low-Rank Ewin Tang Token Pipeline', () => {
     expect(fsm.getState()).toBe('FEATURE_CLASSIFIED');
     expect(fsm.getContext().featureLabel).toBe('auth');
 
-    fsm.stepEwinTangSample(42);
-    expect(fsm.getState()).toBe('EWIN_TANG_SAMPLED');
-    expect(fsm.getContext().admittedComponents.length).toBeGreaterThan(0);
+    fsm.stepLowRankUnavailable();
+    expect(fsm.getState()).toBe('LOW_RANK_UNAVAILABLE');
+    expect(fsm.getContext().suggestedComponents.length).toBeGreaterThan(0);
 
-    fsm.stepAdmitAcePacket('test-run-001');
-    expect(fsm.getState()).toBe('ACE_PACKET_ADMITTED');
+    fsm.stepProposeAcePacket();
+    expect(fsm.getState()).toBe('ACE_PACKET_PROPOSED');
 
-    const descriptor = fsm.stepPrefixHot('test-run-001');
-    expect(fsm.getState()).toBe('PREFIX_HOT');
+    const descriptor = fsm.buildCacheDescriptor('test-run-001');
+    expect(fsm.getState()).toBe('DESCRIPTOR_READY');
     expect(descriptor.schema).toBe('atlas.token-cache-instructions.v1');
     expect(descriptor.featureLabel).toBe('auth');
+    expect(descriptor.lowRankStatus).toBe('NOT_RUN_NO_QUALIFIED_FEATURE_MATRIX');
     expect(descriptor.allocatedTokens).toBeGreaterThan(0);
     expect(descriptor.checksum).toMatch(/^[0-9a-f]{64}$/);
   });
@@ -74,7 +75,8 @@ describe('NES Feature FSM & Low-Rank Ewin Tang Token Pipeline', () => {
       const result = await runNesFeatureTokenPipeline(tc.query);
       expect(result.success).toBe(true);
       expect(result.featureLabel).toBe(tc.expected);
-      expect(result.fsmState).toBe('PREFIX_HOT');
+      expect(result.fsmState).toBe('DESCRIPTOR_READY');
+      expect(result.descriptor.lowRankStatus).toBe('NOT_RUN_NO_QUALIFIED_FEATURE_MATRIX');
       expect(result.descriptor.tokenBudget).toBeGreaterThan(0);
     }
   });
@@ -90,5 +92,29 @@ describe('NES Feature FSM & Low-Rank Ewin Tang Token Pipeline', () => {
     expect(acePacket.canonicalAuthority).toBe(false);
     expect(acePacket.writesPerformed).toBe(false);
     expect(acePacket.checksum.length).toBe(64);
+  });
+
+  it('never claims Valkey persistence when no cache writer is wired', async () => {
+    const previousValkeyEnabled = process.env.VALKEY_ENABLED;
+    process.env.VALKEY_ENABLED = 'true';
+
+    try {
+      const result = await runNesFeatureTokenPipeline('search the codebase', {
+        runId: 'cache-writer-absent',
+        dryRun: false,
+      });
+
+      expect(result.cachedToValkey).toBe(false);
+      expect(result.valkeyPacketKey).toBeTruthy();
+    } finally {
+      if (previousValkeyEnabled === undefined) delete process.env.VALKEY_ENABLED;
+      else process.env.VALKEY_ENABLED = previousValkeyEnabled;
+    }
+  });
+
+  it('rejects an unmatched query instead of silently assigning chat', async () => {
+    await expect(runNesFeatureTokenPipeline('zzqv unmapped phrase')).rejects.toThrow(
+      'No feature taxonomy match was found for the query.'
+    );
   });
 });

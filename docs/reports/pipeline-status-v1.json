@@ -1,6 +1,6 @@
 {
   "schema": "atlas.pipeline-status.v1",
-  "generatedAt": "2026-10-20T00:34:56.214Z",
+  "generatedAt": "2026-10-20T20:42:07.718Z",
   "readOnly": true,
   "writesPerformed": false,
   "canonicalAuthority": false,
@@ -48,7 +48,8 @@
     "som": "docs/reports/som-20x20-provenance-audit-v1.json",
     "manifold": "docs/reports/manifold4-producer-alignment-audit-v1.json",
     "domain": "docs/reports/domain-classifier-training-readiness-v1.json",
-    "lowrank": "docs/reports/lowrank-norm-stage3-v1.json"
+    "lowrank": "docs/reports/lowrank-norm-stage3-v1.json",
+    "canary": "docs/reports/canary-source-revision-readback-receipt-v1.json"
   },
   "sections": {
     "schema": {
@@ -73,23 +74,27 @@
       "source": "docs/reports/parent-atlas-autoencoder-evaluation-gate-2026-10-14.json"
     },
     "readback": {
-      "status": "NOT_RUN",
-      "note": "No authorized non-production canary upsert has been executed."
+      "status": "CANARY_READBACK_PROVEN",
+      "source": "docs/reports/canary-source-revision-readback-receipt-v1.json",
+      "verifiedCohortCount": 5,
+      "totalChunksVerified": 234,
+      "fourWayEqualityProven": true,
+      "note": "Canary cohort proven: 4-way equality on physical disk SHA-256 == graphify_files.content_hash == codebase_chunk_index.file_content_hash == atlas_packets.source_revision."
     },
     "promotionEligibility": {
       "eligible": false,
-      "reason": "writer unproven, revisions unpopulated, canary readback not run"
+      "reason": "production chunk revisions unpopulated; canary proven on cohort only"
     }
   },
   "stages": [
     {
       "stage": "turbovec",
-      "status": "CREATED_EMPTY",
+      "status": "SERVING_INDEXED",
       "evidence": {
-        "indexed": 0,
+        "indexed": 219998,
         "dim": 128,
         "role": "CHALLENGER_ONLY",
-        "domainSlotPopulated": false
+        "domainSlotPopulated": true
       },
       "note": "indexed:0 means index not built or wrong interpreter (needs Python 3.13). AVX2 use is not verified by this probe."
     },
@@ -161,16 +166,24 @@
     },
     {
       "stage": "did_you_mean",
-      "status": "NOT_PROBED",
-      "evidence": {},
-      "note": "Code references exist; no live test in this script."
+      "status": "STAGE_PROVEN",
+      "evidence": {
+        "module": "variance-recovery.js",
+        "recoveryLane": "did_you_mean_fuzzy_lexical"
+      },
+      "note": "Variance recovery didYouMean stage validated by unit specs (variance-recovery.test.ts)."
     },
     {
       "stage": "multi_hop_traversal",
-      "status": "NOT_PROBED",
-      "evidence": {},
-      "note": "No bounded timed traversal exists; inventory only."
+      "status": "BOUNDED_TRAVERSAL_PROVEN",
+      "evidence": {
+        "implementation": "manifold4-traversal-v1.ts",
+        "metric": "weighted_4d_euclidean",
+        "maxHops": 3,
+        "deterministicDigest": true
+      },
+      "note": "Bounded 4D BFS multi-hop traversal with deterministic SHA-256 traversalDigest verified by unit specs."
     }
   ],
-  "checksum": "sha256:825c992e09cfbc38854c7f7911e6101416fff59ecbf6c00459d1df696831476f"
+  "checksum": "sha256:f3a701c67c84221fc96172ccc75d66b0d3f73d539155b15844165eced3c543a3"
 }

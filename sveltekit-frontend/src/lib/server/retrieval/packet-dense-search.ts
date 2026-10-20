@@ -5,7 +5,7 @@
  * Ties together the three stages:
  *   1. packet-bitmap-prefilter.ts  — Postgres bitmap-scan narrowing to a candidate packet_key set
  *   2. packet-dense-rerank.ts      — Qdrant ANN restricted to that candidate set
- *   3. join-back                  — re-read atlas_packets by packet_key/source_ref (never
+ *   3. join-back                  — re-read atlas_packets by packet_key (never
  *                                    feature_id alone) to attach summary/reward_prior/etc. and
  *                                    shape the response.
  *
@@ -55,9 +55,15 @@ export interface PacketDenseSearchResult {
   packetKey: string;
   titleId: string | null;
   sourceRevision: string | null;
-  workspaceRevision: string | number | null;
+  workspaceRevision: string | null;
   representationRevision: string | number | null;
-  identityResolutionSource: 'qdrant_payload_source_ref';
+  /** true only when the row carries both an admitted source_revision and a workspace_revision_key. */
+  revisionQualified: boolean;
+  missingLineageFields: Array<'workspace_revision_key' | 'source_revision' | 'admitted_packet_lineage'>;
+  identityResolutionSource: 'postgres_id_packet_chunk_lineage';
+  winningChunkRowId: string;
+  winningCanonicalChunkId: string;
+  matchedChunkRowIds: string[];
   score: number;
   controlWord: PacketControlWordV1;
   payload?: {
@@ -65,12 +71,14 @@ export interface PacketDenseSearchResult {
     rewardPrior: number | null;
     communityId: number | null;
     pageRankScore: number | null;
-    sourceRef: string | null;
+    sourceRefHint: string | null;
     featureId: string | null;
   };
 }
 
 export type PacketDenseSearchDegradationReason =
+  | 'CHUNK_LINEAGE_UNRESOLVED'
+  | 'QDRANT_SOURCE_REF_DRIFT'
   | 'NO_SELECTIVE_FILTER'
   | 'CANDIDATE_CAP_EXCEEDED'
   | 'QUERY_REPRESENTATION_UNAVAILABLE'
@@ -99,6 +107,15 @@ export interface PacketDenseSearchResponse {
   status: 'OK' | 'NO_RESULTS' | 'IDENTITY_BRIDGE_UNAVAILABLE' | 'REPRESENTATION_MISMATCH' | 'DENSE_REPRESENTATION_UNAVAILABLE';
   degradedReasons: PacketDenseSearchDegradationReason[];
   results: PacketDenseSearchResult[];
+  unresolvedHits: Array<{
+    qdrantPointId: string | number;
+    chunkRowId: string | null;
+    packetKeyHint: string | null;
+    sourceRef: string | null;
+    score: number;
+    revisionQualified: false;
+    missingLineageFields: ['admitted_packet_lineage'];
+  }>;
   candidateSetTruncated: boolean;
   candidateCount: number;
   receipt?: PacketDenseSearchReceiptV1;
@@ -108,6 +125,7 @@ interface JoinBackRow {
   packet_key: string;
   title_id: string | null;
   workspace_revision: string | null;
+  workspace_revision_key: string | null;
   source_revision: string | null;
   representation_revision: string | null;
   source_ref: string | null;
@@ -131,15 +149,72 @@ interface JoinBackRow {
   canonical: boolean | null;
 }
 
+interface QualifiedChunkLineageRow {
+  postgres_id: string;
+  canonical_chunk_id: string;
+  packet_key: string;
+  source_ref: string;
+  source_revision: string;
+  workspace_revision_key: string;
+  representation_revision: string | number | null;
+}
+
+const QUALIFIED_CHUNK_LINEAGE_SELECT = `
+  SELECT DISTINCT l.chunk_row_id::text AS postgres_id, l.canonical_chunk_id, l.packet_key,
+         l.source_ref, l.source_revision, p.workspace_revision_key, p.representation_revision
+    FROM atlas_packet_chunk_lineage l
+    JOIN atlas_packets p ON p.packet_key = l.packet_key
+    JOIN codebase_chunk_index c
+      ON c.id = l.chunk_row_id
+     AND c.chunk_id = l.canonical_chunk_id
+   WHERE l.membership_status IN ('EXACT_SINGLE_MEMBER', 'EXACT_MULTI_MEMBER')
+     AND l.revision_status = 'PROVEN'
+     AND p.source_ref = l.source_ref
+     AND p.source_revision = l.source_revision
+     AND EXISTS (
+       SELECT 1
+         FROM atlas_workspace_source_bindings b
+        WHERE b.workspace_revision = p.workspace_revision_key
+          AND b.canonical_source_ref = l.source_ref
+          AND b.source_revision = l.source_revision
+     )
+     AND p.workspace_revision_key IS NOT NULL
+     AND lower(btrim(p.workspace_revision_key)) NOT IN ('', '0', 'null', 'unknown')
+     AND p.source_revision IS NOT NULL
+     AND lower(btrim(p.source_revision)) NOT IN ('', '0', 'null', 'unknown')
+`;
+
+async function readQualifiedChunkLineage(
+  db: PgQueryable,
+  selector: { packetKeys?: string[]; chunkRowIds?: string[] },
+): Promise<QualifiedChunkLineageRow[]> {
+  const packetKeys = selector.packetKeys ?? [];
+  const chunkRowIds = selector.chunkRowIds ?? [];
+  if (packetKeys.length === 0 && chunkRowIds.length === 0) return [];
+  const predicate = packetKeys.length > 0
+    ? 'AND l.packet_key = ANY($1::text[])'
+    : 'AND l.chunk_row_id::text = ANY($1::text[])';
+  const values = packetKeys.length > 0 ? packetKeys : chunkRowIds;
+  return (await db.query<QualifiedChunkLineageRow>(`${QUALIFIED_CHUNK_LINEAGE_SELECT} ${predicate}`, [values])).rows;
+}
+
 function byteFromString(value: string | null): number {
   if (!value) return 0;
   return createHash('sha256').update(value).digest()[0];
 }
 
+function isValidRevisionValue(value: string | null | undefined): value is string {
+  if (typeof value !== 'string') return false;
+  const normalized = value.trim().toLowerCase();
+  return normalized.length > 0 && normalized !== '0' && normalized !== 'null' && !normalized.includes('unknown');
+}
+
 function deriveControlWord(row: JoinBackRow): PacketControlWordV1 {
   const presentBits: PacketControlWordBitV1[] = ['UTF8_VALID']; // Postgres text is UTF8 — unconditional
   if (row.title_id) presentBits.push('TITLE_BOUND');
-  if (row.workspace_revision) presentBits.push('SOURCE_REVISION_PROVEN');
+  if (isValidRevisionValue(row.workspace_revision_key) && isValidRevisionValue(row.source_revision)) {
+    presentBits.push('SOURCE_REVISION_PROVEN');
+  }
   if (row.ast_score !== null) presentBits.push('AST_PRESENT');
   if (row.tree_node_id) presentBits.push('CST_PRESENT');
   if (row.bm25_terms && row.bm25_terms.length > 0) presentBits.push('LEXICAL_PRESENT');
@@ -158,7 +233,7 @@ function deriveControlWord(row: JoinBackRow): PacketControlWordV1 {
   // live via \d atlas_packets, 2026-09-16) — encodePacketControlWordV1 requires string
   // revisions, so coerce rather than pass the raw pg driver number through.
   return encodePacketControlWordV1({
-    packetRevision: row.workspace_revision !== null && row.workspace_revision !== undefined ? String(row.workspace_revision) : 'unknown',
+    packetRevision: isValidRevisionValue(row.workspace_revision_key) ? row.workspace_revision_key : 'unknown',
     featureRevision: row.representation_revision !== null && row.representation_revision !== undefined ? String(row.representation_revision) : 'unknown',
     controlWordSchemaRevision: CONTROL_WORD_SCHEMA_REVISION,
     presentBits,
@@ -188,6 +263,7 @@ export async function runPacketDenseSearch(
       status: 'REPRESENTATION_MISMATCH',
       degradedReasons,
       results: [],
+      unresolvedHits: [],
       candidateSetTruncated: false,
       candidateCount: 0,
       receipt: {
@@ -217,6 +293,7 @@ export async function runPacketDenseSearch(
       status: 'NO_RESULTS',
       degradedReasons,
       results: [],
+      unresolvedHits: [],
       candidateSetTruncated: prefilter.candidateSetTruncated,
       candidateCount: 0,
       receipt: {
@@ -233,12 +310,29 @@ export async function runPacketDenseSearch(
     };
   }
 
-  // Stage 2 — Qdrant ANN restricted to the candidate source_ref set.
+  // Resolve candidate packet keys to admitted chunk IDs before querying Qdrant. The sparse
+  // packet_key OR branch is only a locator fallback; those hits remain unresolved without a chunk ID.
+  const candidateByPacketKey = new Map(prefilter.candidates.map((candidate) => [candidate.packetKey, candidate] as const));
+  const stage2LineageRows = await readQualifiedChunkLineage(deps.db, {
+    packetKeys: prefilter.candidates.map((candidate) => candidate.packetKey),
+  });
+  const qualifiedCandidateLineage = stage2LineageRows.filter((row) => {
+    const candidate = candidateByPacketKey.get(row.packet_key);
+    return isValidRevisionValue(row.source_revision)
+      && isValidRevisionValue(row.workspace_revision_key)
+      && candidate?.sourceRef === row.source_ref
+      && candidate.sourceRevision === row.source_revision
+      && String(candidate.workspaceRevision ?? '') === row.workspace_revision_key;
+  });
+  const candidateChunkIds = [...new Set(qualifiedCandidateLineage.map((row) => row.postgres_id))];
+
   const candidateSourceRefs = [...new Set(prefilter.candidates.map((c) => c.sourceRef))];
   const hits = await runPacketDenseRerank(deps.queryQdrantPoints, {
     queryVector: req.queryVector,
     collection: req.collection,
     candidateSourceRefs,
+    candidateChunkIds,
+    candidatePacketKeys: prefilter.candidates.map((candidate) => candidate.packetKey),
     limit: req.denseLimit,
     scoreThreshold: req.scoreThreshold,
   });
@@ -248,6 +342,7 @@ export async function runPacketDenseSearch(
       status: 'NO_RESULTS',
       degradedReasons,
       results: [],
+      unresolvedHits: [],
       candidateSetTruncated: prefilter.candidateSetTruncated,
       candidateCount,
       receipt: {
@@ -264,25 +359,65 @@ export async function runPacketDenseSearch(
     };
   }
 
-  // Map Qdrant hits (keyed by source_ref) back to Stage 1's packet_key candidates.
-  const packetKeysBySourceRef = new Map<string, string[]>();
-  for (const candidate of prefilter.candidates) {
-    const list = packetKeysBySourceRef.get(candidate.sourceRef) ?? [];
-    list.push(candidate.packetKey);
-    packetKeysBySourceRef.set(candidate.sourceRef, list);
+  // Map each Qdrant hit to packets through its chunk identity, never through source_ref alone.
+  // A hit carries payload.postgres_id (the codebase_chunk_index row id); atlas_packet_chunk_lineage
+  // maps that chunk to its packets. A source_ref match would credit every packet sharing the file.
+  const chunkIds = [...new Set(hits.map((hit) => String(hit.payload?.postgres_id ?? '')).filter(Boolean))];
+  const lineageRows = await readQualifiedChunkLineage(deps.db, { chunkRowIds: chunkIds });
+  const packetKeysByChunk = new Map<string, QualifiedChunkLineageRow[]>();
+  for (const row of lineageRows) {
+    const candidate = candidateByPacketKey.get(row.packet_key);
+    if (!isValidRevisionValue(row.source_revision) || !isValidRevisionValue(row.workspace_revision_key)
+      || !candidate || candidate.sourceRef !== row.source_ref || candidate.sourceRevision !== row.source_revision
+      || String(candidate.workspaceRevision ?? '') !== row.workspace_revision_key) continue;
+    const rows = packetKeysByChunk.get(row.postgres_id) ?? [];
+    rows.push(row);
+    packetKeysByChunk.set(row.postgres_id, rows);
   }
 
-  const bestScoreByPacketKey = new Map<string, number>();
+  const packetEvidenceByKey = new Map<string, {
+    score: number;
+    winner: QualifiedChunkLineageRow;
+    matchedChunkRowIds: Set<string>;
+  }>();
+  const unresolvedHits: PacketDenseSearchResponse['unresolvedHits'] = [];
+  let qdrantSourceRefDriftCount = 0;
   for (const hit of hits) {
-    for (const packetKey of packetKeysBySourceRef.get(hit.sourceRef) ?? []) {
-      const existing = bestScoreByPacketKey.get(packetKey);
-      if (existing === undefined || hit.score > existing) {
-        bestScoreByPacketKey.set(packetKey, hit.score);
+    const hitChunkId = String(hit.payload?.postgres_id ?? '');
+    const matchingLineage = packetKeysByChunk.get(hitChunkId) ?? [];
+    if (matchingLineage.length === 0) {
+      unresolvedHits.push({
+        qdrantPointId: hit.id,
+        chunkRowId: hitChunkId || null,
+        packetKeyHint: typeof hit.payload?.packet_key === 'string' ? hit.payload.packet_key : null,
+        sourceRef: hit.sourceRef,
+        score: hit.score,
+        revisionQualified: false,
+        missingLineageFields: ['admitted_packet_lineage'],
+      });
+      continue;
+    }
+    for (const row of matchingLineage) {
+      if (hit.sourceRef && hit.sourceRef !== row.source_ref) qdrantSourceRefDriftCount += 1;
+      const existing = packetEvidenceByKey.get(row.packet_key);
+      if (!existing) {
+        packetEvidenceByKey.set(row.packet_key, { score: hit.score, winner: row, matchedChunkRowIds: new Set([row.postgres_id]) });
+      } else {
+        existing.matchedChunkRowIds.add(row.postgres_id);
+        if (hit.score > existing.score) {
+          packetEvidenceByKey.set(row.packet_key, {
+            score: hit.score,
+            winner: row,
+            matchedChunkRowIds: existing.matchedChunkRowIds,
+          });
+        }
       }
     }
   }
-  const scoredPacketKeys: Array<{ packetKey: string; score: number }> = [...bestScoreByPacketKey.entries()]
-    .map(([packetKey, score]) => ({ packetKey, score }))
+  if (unresolvedHits.length > 0) degradedReasons.push('CHUNK_LINEAGE_UNRESOLVED');
+  if (qdrantSourceRefDriftCount > 0) degradedReasons.push('QDRANT_SOURCE_REF_DRIFT');
+  const scoredPacketKeys: Array<{ packetKey: string; score: number; winner: QualifiedChunkLineageRow; matchedChunkRowIds: string[] }> = [...packetEvidenceByKey.entries()]
+    .map(([packetKey, evidence]) => ({ packetKey, score: evidence.score, winner: evidence.winner, matchedChunkRowIds: [...evidence.matchedChunkRowIds].sort() }))
     .sort((a, b) => b.score - a.score);
 
   if (scoredPacketKeys.length === 0) {
@@ -290,6 +425,7 @@ export async function runPacketDenseSearch(
       status: 'NO_RESULTS',
       degradedReasons,
       results: [],
+      unresolvedHits,
       candidateSetTruncated: prefilter.candidateSetTruncated,
       candidateCount,
       receipt: {
@@ -309,7 +445,7 @@ export async function runPacketDenseSearch(
   // Stage 3 — join back to atlas_packets by packet_key (never feature_id or source_ref alone)
   const packetKeys = scoredPacketKeys.map((h) => h.packetKey);
   const joinSql = `
-    SELECT packet_key, title_id, workspace_revision, source_revision, representation_revision, source_ref,
+    SELECT packet_key, title_id, workspace_revision, workspace_revision_key, source_revision, representation_revision, source_ref,
            feature_id, summary, reward_prior, community_id, page_rank_score, domain_class,
            ast_score, tree_node_id, bm25_terms, trigrams, taxonomy_level, ontology,
            neo4j_node_id, used_concepts, latent_64, qdrant_point_id, rerank_features, canonical
@@ -324,16 +460,26 @@ export async function runPacketDenseSearch(
       const row = byPacketKey.get(scored.packetKey);
       if (!row) return null; // no matching canonical row — drop rather than fabricate identity
       const candidate = prefilter.candidates.find((item) => item.packetKey === row.packet_key);
-      if (!candidate || candidate.sourceRef !== row.source_ref || candidate.sourceRevision !== (row.source_revision ?? null) || String(candidate.workspaceRevision ?? '') !== String(row.workspace_revision ?? '')) {
+      const workspaceRevision = isValidRevisionValue(row.workspace_revision_key) ? row.workspace_revision_key : null;
+      const sourceRevision = isValidRevisionValue(row.source_revision) ? row.source_revision : null;
+      if (!candidate || !workspaceRevision || !sourceRevision || candidate.sourceRef !== row.source_ref || candidate.sourceRevision !== row.source_revision || String(candidate.workspaceRevision ?? '') !== row.workspace_revision_key) {
         return null;
       }
+      const missingLineageFields: PacketDenseSearchResult['missingLineageFields'] = [];
+      if (!workspaceRevision) missingLineageFields.push('workspace_revision_key');
+      if (!sourceRevision) missingLineageFields.push('source_revision');
       const result: PacketDenseSearchResult = {
         packetKey: row.packet_key,
         titleId: row.title_id,
-        sourceRevision: row.source_revision,
-        workspaceRevision: row.workspace_revision,
+        sourceRevision,
+        workspaceRevision,
         representationRevision: row.representation_revision,
-        identityResolutionSource: 'qdrant_payload_source_ref',
+        revisionQualified: missingLineageFields.length === 0,
+        missingLineageFields,
+        identityResolutionSource: 'postgres_id_packet_chunk_lineage',
+        winningChunkRowId: scored.winner.postgres_id,
+        winningCanonicalChunkId: scored.winner.canonical_chunk_id,
+        matchedChunkRowIds: scored.matchedChunkRowIds,
         score: scored.score,
         controlWord: deriveControlWord(row),
       };
@@ -343,7 +489,7 @@ export async function runPacketDenseSearch(
           rewardPrior: row.reward_prior,
           communityId: row.community_id,
           pageRankScore: row.page_rank_score,
-          sourceRef: row.source_ref,
+          sourceRefHint: row.source_ref,
           featureId: row.feature_id,
         };
       }
@@ -359,6 +505,7 @@ export async function runPacketDenseSearch(
     status: results.length > 0 ? 'OK' : 'IDENTITY_BRIDGE_UNAVAILABLE',
     degradedReasons,
     results,
+    unresolvedHits,
     candidateSetTruncated: prefilter.candidateSetTruncated,
     candidateCount,
     receipt: {

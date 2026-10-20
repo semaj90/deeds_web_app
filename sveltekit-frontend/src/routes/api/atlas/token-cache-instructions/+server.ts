@@ -2,19 +2,20 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types.js';
 import { runNesFeatureTokenPipeline } from '$lib/server/atlas/fsm/nes-feature-token-pipeline.js';
+import { FeatureClassificationUnavailableError } from '$lib/server/atlas/fsm/nes-feature-fsm.js';
+import { loadFeatureAnchorPacketEvidenceV1 } from '$lib/server/atlas/taxonomy/feature-anchor-packet-evidence-v1.js';
 
 const requestSchema = z.object({
   query: z.string().min(1),
   featureCandidate: z.string().optional(),
-  seed: z.number().int().optional(),
   dryRun: z.boolean().optional().default(true),
 });
 
 /**
  * POST /api/atlas/token-cache-instructions
  *
- * Runs the end-to-end token and cache instruction resolution pipeline:
- * User Query -> Feature Label Resolution -> NES FSM -> Ewin Tang Low-Rank Sample -> ACE Packet -> Token Cache Instructions.
+ * Builds an advisory token/cache descriptor proposal. This does not verify
+ * source evidence, read or write Valkey, or populate a model KV cache.
  *
  * Adheres strictly to AGENTS.md:
  * - Stable JSON response shape on success and error.
@@ -35,6 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
           fsmState: 'FAILED',
           descriptor: null,
           acePacket: null,
+          sourceEvidence: null,
           cachedToValkey: false,
           valkeyPacketKey: '',
           durationMs: 0,
@@ -44,13 +46,13 @@ export const POST: RequestHandler = async ({ request }) => {
       );
     }
 
-    const { query, featureCandidate, seed, dryRun } = parseResult.data;
+    const { query, featureCandidate, dryRun } = parseResult.data;
 
     const result = await runNesFeatureTokenPipeline(query, {
       featureCandidate,
-      seed,
       dryRun,
     });
+    const sourceEvidence = await loadFeatureAnchorPacketEvidenceV1(result.featureLabel);
 
     return json({
       success: true,
@@ -59,6 +61,7 @@ export const POST: RequestHandler = async ({ request }) => {
       fsmState: result.fsmState,
       descriptor: result.descriptor,
       acePacket: result.acePacket,
+      sourceEvidence,
       cachedToValkey: result.cachedToValkey,
       valkeyPacketKey: result.valkeyPacketKey,
       durationMs: result.durationMs,
@@ -66,6 +69,7 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
+    const status = err instanceof FeatureClassificationUnavailableError ? 422 : 500;
     return json(
       {
         success: false,
@@ -74,12 +78,13 @@ export const POST: RequestHandler = async ({ request }) => {
         fsmState: 'FAILED',
         descriptor: null,
         acePacket: null,
+        sourceEvidence: null,
         cachedToValkey: false,
         valkeyPacketKey: '',
         durationMs: 0,
         error: message,
       },
-      { status: 500 }
+      { status }
     );
   }
 };

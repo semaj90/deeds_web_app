@@ -7,6 +7,15 @@ import ts from 'typescript';
 const LOADER_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 export async function resolve(specifier, context, nextResolve) {
+  // Standalone (non-Vite) processes such as the TRACE MCP server run outside SvelteKit,
+  // so `$app/environment` must resolve to a runtime stub: not building, dev-like.
+  if (specifier === '$app/environment') {
+    return {
+      url: 'data:text/javascript,export const building = false; export const dev = true;',
+      shortCircuit: true,
+    };
+  }
+
   if (specifier.startsWith('$lib/')) {
     const candidate = path.resolve(
       LOADER_ROOT,

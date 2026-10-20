@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -22,7 +23,7 @@ test('native N-API SIMDJSON parses a UTF-8 payload independently of RAPIDS ABI',
 
 	const require = createRequire(import.meta.url);
 	const addon = require(addonPath);
-	for (const name of ['simdJsonParse', 'simdJsonBackend', 'simdJsonToCSR', 'batchCosineTopK']) {
+	for (const name of ['simdJsonParse', 'simdJsonBackend', 'simdJsonToCSR', 'simdJsonExtractNumbers', 'batchCosineTopK']) {
 		assert.equal(typeof addon[name], 'function', `missing native export ${name}`);
 	}
 
@@ -37,6 +38,67 @@ test('native N-API SIMDJSON parses a UTF-8 payload independently of RAPIDS ABI',
 	assert.ok(graph.colIndices instanceof Int32Array);
 	assert.deepEqual(Array.from(graph.rowPtr), [0, 2, 2, 3]);
 	assert.deepEqual(Array.from(graph.colIndices), [1, 2, 1]);
+
+	const extracted = addon.simdJsonExtractNumbers('{"embedding":[0.25,-1,3.5]}', '/embedding');
+	assert.ok(extracted instanceof Float64Array);
+	assert.deepEqual(Array.from(extracted), [0.25, -1, 3.5]);
+	const torchInput = Float32Array.from(extracted);
+	assert.equal(torchInput.byteLength, 3 * Float32Array.BYTES_PER_ELEMENT);
+	assert.deepEqual(Array.from(new Float32Array(torchInput.buffer)), [0.25, -1, 3.5]);
+	const payloadBytes = Buffer.from(torchInput.buffer, torchInput.byteOffset, torchInput.byteLength);
+	const sourceRevision = `sha256:${createHash('sha256').update('fixture source bytes').digest('hex')}`;
+	const workspaceRevision = `sha256:${createHash('sha256').update('fixture workspace').digest('hex')}`;
+	const ordinalMap = [{
+		candidateOrdinal: 0,
+		canonicalId: 'fixture:chunk:0',
+		packetKey: 'fixture:packet:0',
+		sourceRef: 'src/fixture.ts',
+		sourceRevision,
+		workspaceRevision,
+	}];
+	const descriptor = {
+		schema: 'atlas.typed-tensor-payload-descriptor.fixture.v1',
+		artifactId: 'fixture:semantic-tensor:0',
+		candidateSnapshotRevision: 'fixture:snapshot:r1',
+		ordinalMap,
+		ordinalMapChecksum: createHash('sha256').update(JSON.stringify(ordinalMap)).digest('hex'),
+		candidateOrdinal: 0,
+		representationRevision: 'fixture:semantic-3:r1',
+		dtype: 'float32-le',
+		shape: [1, 3],
+		payloadSha256: createHash('sha256').update(payloadBytes).digest('hex'),
+	};
+	assert.equal(JSON.parse(JSON.stringify(descriptor)).ordinalMap[0].sourceRevision, sourceRevision);
+	assert.equal(new DataView(payloadBytes.buffer, payloadBytes.byteOffset, payloadBytes.byteLength).getFloat32(0, true), 0.25);
+	if (process.platform === 'win32') {
+		const payloadHex = payloadBytes.toString('hex');
+		const python = [
+			'import hashlib, json, sys, torch',
+			'meta = json.loads(sys.argv[1])',
+			'raw = bytes.fromhex(sys.argv[2])',
+			'assert meta["dtype"] == "float32-le" and meta["shape"] == [1, 3]',
+			'assert len(raw) == meta["shape"][0] * meta["shape"][1] * 4',
+			'assert hashlib.sha256(raw).hexdigest() == meta["payloadSha256"]',
+			'assert hashlib.sha256(json.dumps(meta["ordinalMap"], separators=(",", ":"), ensure_ascii=False).encode()).hexdigest() == meta["ordinalMapChecksum"]',
+			'row = meta["ordinalMap"][meta["candidateOrdinal"]]',
+			'assert row["sourceRevision"].startswith("sha256:") and row["workspaceRevision"].startswith("sha256:")',
+			'values = torch.frombuffer(raw, dtype=torch.float32)',
+			'print(json.dumps({"descriptor": meta, "values": values.tolist()}, separators=(",", ":")))',
+		].join('; ');
+		const stdout = execFileSync('wsl.exe', ['-d', 'Ubuntu', '--', wslPython, '-c', python, JSON.stringify(descriptor), payloadHex], {
+			cwd: repoRoot,
+			encoding: 'utf8',
+			timeout: 90_000,
+			stdio: ['ignore', 'pipe', 'pipe'],
+		});
+		const roundTrip = JSON.parse(stdout.trim());
+		assert.deepEqual(roundTrip.descriptor, descriptor);
+		assert.deepEqual(roundTrip.values, [0.25, -1, 3.5]);
+	}
+	assert.throws(
+		() => addon.simdJsonExtractNumbers('{"embedding":[0.25,"missing"]}', '/embedding'),
+		/array contains non-numeric value/
+	);
 });
 
 test('WSL RAPIDS and PyTorch versions are discoverable without invoking CUDA kernels', (t) => {

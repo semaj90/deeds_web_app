@@ -120,6 +120,7 @@ export * from './agent-os-registry.js';
 export * from './worktree-leases.js';
 export * from './agent-traces.js';
 export * from './atlas-packets.js';
+export * from './atlas-packet-identities.js';
 export * from './packet-binary-registry.js';
 export * from './atlas-tree-nodes.js';
 export * from './atlas-ast-nodes.js';

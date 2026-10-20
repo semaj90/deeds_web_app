@@ -2,32 +2,10 @@
  * packet-dense-rerank.ts — Stage 2 of atlas.packet_dense_search
  * (openspec/changes/parent-atlas-packet-dense-bitmap-search/).
  *
- * Runs a Qdrant ANN query restricted (via a payload `must` filter) to the source_ref candidate
- * set produced by Stage 1 (packet-bitmap-prefilter.ts). This is deliberately NOT an unfiltered
- * top-K sweep — the whole point of the two-stage design is that Postgres' existing bitmap
- * indexes narrow the field first, cheaply, before any vector math runs.
- *
- * Filters by `source_ref`, not `packet_key`. **Corrected twice, 2026-09-16** (an earlier version
- * of this comment claimed neither collection "carries a packet_key field" at all — wrong, found
- * by checking `GET /collections/{name}` `payload_schema`, which only lists *indexed* fields, not
- * all keys actually present on points; a follow-up correction then claimed `codebase_chunks_768_v2`
- * has NO packet_key field based on a 3-point sample, which was too small — a 1000-point resample
- * found ~12.8% coverage, matching a separate 5,000-point census's 11.96% finding):
- *   - `codebase_chunks_768`: `packet_key` IS present (inconsistently duplicated as camelCase
- *     `packetKey` on some points too — a real data-quality finding, not addressed here), just not
- *     `payload_schema`-indexed.
- *   - `codebase_chunks_768_v2`: `packet_key` present on only ~12% of points (11.96%-12.80% across
- *     two independent samples) — sparse, not absent, and definitely not reliable enough to filter
- *     on for correctness.
- *   - `source_ref` is indexed and 100%-populated on both collections in every sample taken.
- * `source_ref` remains the right filter key on both grounds: it's actually indexed (packet_key
- * isn't, on either collection) AND it has complete coverage (packet_key doesn't, especially on
- * `_v2`). An earlier version of this module filtered on `packet_key` and timed out against
- * `codebase_chunks_768` (328K points) in a live proof run — the real cause is the missing index
- * forcing an unindexed linear scan, not a missing field. The Stage 3 join-back in
- * packet-dense-search.ts still uses `packet_key` (never `source_ref` alone) once Qdrant hits are
- * mapped back to Stage 1 candidates, which come from Postgres `atlas_packets` — not from Qdrant's
- * own (partial, unindexed) `packet_key` payload field.
+ * Qdrant is filtered by exact chunk row IDs resolved through PostgreSQL's admitted packet/chunk
+ * lineage, with packet_key as a sparse locator fallback. Neither Qdrant payload field is identity:
+ * every hit must map back through PostgreSQL before it can rank a packet. source_ref-only filtering
+ * remains available solely for legacy callers that do not supply canonical candidate identities.
  *
  * The caller (packet-dense-search.ts) must supply the query vector and an explicit target
  * collection — this module does not default to codebase_chunks_768 vs. _768_v2 (see
@@ -51,16 +29,25 @@ export class PacketDenseRerankValidationError extends Error {
 export interface PacketDenseRerankRequest {
   queryVector: number[];
   collection: DenseRerankCollection;
+  /** Legacy path: source_ref filter; canonical chunk/packet filters take precedence. */
   candidateSourceRefs: string[];
+  /**
+   * Preferred path: restrict Qdrant to the chunk identities (payload.postgres_id = codebase_chunk_index.id)
+   * that the Stage 1 packets resolve to through atlas_packet_chunk_lineage. Identity is exact, so the
+   * source_ref namespace (Qdrant stores paths relative to sveltekit-frontend/) does not gate results.
+   */
+  candidateChunkIds?: string[];
+  candidatePacketKeys?: string[];
   limit?: number;
   scoreThreshold?: number;
 }
 
 export interface PacketDenseRerankHit {
-  sourceRef: string;
+  id: string | number;
+  sourceRef: string | null;
   score: number;
   payload: Record<string, unknown>;
-  identitySource: 'qdrant_payload_source_ref';
+  identitySource: 'qdrant_payload';
 }
 
 export interface ExactDenseCandidate {
@@ -117,7 +104,7 @@ function assertValidRequest(req: PacketDenseRerankRequest): void {
 
 /**
  * Runs the filtered Qdrant ANN query. Returns [] without calling Qdrant when
- * candidateSourceRefs is empty — Stage 1 found nothing, so there is nothing to rerank
+ * all bounded candidate identity lists are empty — Stage 1 found nothing, so there is nothing to rerank
  * (spec: "Handle the case where the candidate set is empty").
  */
 export async function runPacketDenseRerank(
@@ -126,13 +113,21 @@ export async function runPacketDenseRerank(
 ): Promise<PacketDenseRerankHit[]> {
   assertValidRequest(req);
 
-  if (req.candidateSourceRefs.length === 0) {
+  const candidateChunkIds = req.candidateChunkIds ?? [];
+  const candidatePacketKeys = req.candidatePacketKeys ?? [];
+  const useCanonicalIdentityFilter = candidateChunkIds.length > 0 || candidatePacketKeys.length > 0;
+  if (!useCanonicalIdentityFilter && req.candidateSourceRefs.length === 0) {
     return [];
   }
 
-  const filter = {
-    must: [{ key: 'source_ref', match: { any: req.candidateSourceRefs } }],
-  };
+  const filter = useCanonicalIdentityFilter
+    ? {
+        should: [
+          ...(candidateChunkIds.length > 0 ? [{ key: 'postgres_id', match: { any: candidateChunkIds } }] : []),
+          ...(candidatePacketKeys.length > 0 ? [{ key: 'packet_key', match: { any: candidatePacketKeys } }] : []),
+        ],
+      }
+    : { must: [{ key: 'source_ref', match: { any: req.candidateSourceRefs } }] };
 
   const body = {
     query: req.queryVector,
@@ -148,11 +143,13 @@ export async function runPacketDenseRerank(
   const candidateSet = new Set(req.candidateSourceRefs);
 
   return points
-    .map((pt) => {
-      const sourceRef = typeof pt.payload?.source_ref === 'string' ? pt.payload.source_ref : null;
-      if (!sourceRef) return null;
-      return { sourceRef, score: pt.score, payload: pt.payload ?? {}, identitySource: 'qdrant_payload_source_ref' as const };
-    })
-    .filter((hit): hit is PacketDenseRerankHit => hit !== null)
-    .filter((hit) => candidateSet.has(hit.sourceRef));
+    .filter((point) => !Number.isNaN(point.score) && Number.isFinite(point.score))
+    .filter((point) => useCanonicalIdentityFilter || candidateSet.has(String(point.payload?.source_ref ?? '')))
+    .map((point) => ({
+      id: point.id,
+      sourceRef: typeof point.payload?.source_ref === 'string' ? point.payload.source_ref : null,
+      score: point.score,
+      payload: point.payload ?? {},
+      identitySource: 'qdrant_payload' as const,
+    }));
 }
