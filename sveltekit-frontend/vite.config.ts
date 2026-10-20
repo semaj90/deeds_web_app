@@ -331,7 +331,6 @@ export default defineConfig(({ mode }) => {
         '@internationalized/date',
         'drizzle-orm',
         'svelte',
-        '@sveltejs/kit',
         'onnxruntime-web',
       ],
       esbuildOptions: {

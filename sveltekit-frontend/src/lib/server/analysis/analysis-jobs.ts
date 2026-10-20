@@ -236,13 +236,24 @@ export async function claimBatch(
       throw err; // Let caller handle backoff
     }
 
+    const details = postgresErrorDetails(err);
+    const detailsText = `${details.drizzleMessage ?? ''} ${details.postgresMessage ?? ''}`.toLowerCase();
+
+    if (
+      classifyPostgresError(err).retryable ||
+      classifyPostgresError(details.postgresMessage).retryable ||
+      /timeout|timed out|connection terminated/.test(detailsText)
+    ) {
+      throw err;
+    }
+
     if (isMissingAnalysisJobsTableError(err)) {
       markAnalysisJobsUnavailable();
       return [];
     }
 
     // Other errors: log once and return empty
-    console.error('[AnalysisJobs] Unexpected DB error:', postgresErrorDetails(err));
+    console.error('[AnalysisJobs] Unexpected DB error:', details);
     return [];
   }
 }

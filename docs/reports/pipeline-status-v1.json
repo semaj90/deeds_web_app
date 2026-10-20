@@ -1,0 +1,176 @@
+{
+  "schema": "atlas.pipeline-status.v1",
+  "generatedAt": "2026-10-20T00:34:56.214Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "services": {
+    "turbovec": {
+      "url": "http://127.0.0.1:8791/health",
+      "up": true
+    },
+    "decoder": {
+      "url": "http://127.0.0.1:8121/health",
+      "up": true
+    },
+    "nlp": {
+      "url": "http://127.0.0.1:8095/health",
+      "up": true
+    },
+    "retrieval": {
+      "url": "http://127.0.0.1:8100/health",
+      "up": true
+    },
+    "gpu": {
+      "url": "http://127.0.0.1:8098/health",
+      "up": true
+    }
+  },
+  "db": {
+    "counts": {
+      "chunks": 274465,
+      "content_embedding_768": 219998,
+      "kmeans_cluster": 52380,
+      "som_bmu_row": 49301,
+      "som_cluster": 49483,
+      "manifold4": 11625,
+      "latent_256": 55169,
+      "latent_128": 55169,
+      "latent_64": 1703,
+      "domain_id": 2214,
+      "source_revision": 0,
+      "workspace_revision": 0,
+      "representation_revision": 0
+    }
+  },
+  "receiptsRead": {
+    "kmeans": "docs/reports/kmeans-raw768-model-registration-v1.json",
+    "som": "docs/reports/som-20x20-provenance-audit-v1.json",
+    "manifold": "docs/reports/manifold4-producer-alignment-audit-v1.json",
+    "domain": "docs/reports/domain-classifier-training-readiness-v1.json",
+    "lowrank": "docs/reports/lowrank-norm-stage3-v1.json"
+  },
+  "sections": {
+    "schema": {
+      "status": "SCHEMA_MATCHES_DRIZZLE_DECLARATION",
+      "mismatches": []
+    },
+    "population": {
+      "chunks": 274465,
+      "content_embedding_768": 219998
+    },
+    "lineage": {
+      "status": "LINEAGE_BLOCKED",
+      "chunkRowsWithRevision": {
+        "source_revision": 0,
+        "workspace_revision": 0,
+        "representation_revision": 0
+      },
+      "note": "Rows with a populated vector but no source/workspace/representation revision are not admissible."
+    },
+    "writer": {
+      "status": "OWNER_NOT_PROVEN",
+      "source": "docs/reports/parent-atlas-autoencoder-evaluation-gate-2026-10-14.json"
+    },
+    "readback": {
+      "status": "NOT_RUN",
+      "note": "No authorized non-production canary upsert has been executed."
+    },
+    "promotionEligibility": {
+      "eligible": false,
+      "reason": "writer unproven, revisions unpopulated, canary readback not run"
+    }
+  },
+  "stages": [
+    {
+      "stage": "turbovec",
+      "status": "CREATED_EMPTY",
+      "evidence": {
+        "indexed": 0,
+        "dim": 128,
+        "role": "CHALLENGER_ONLY",
+        "domainSlotPopulated": false
+      },
+      "note": "indexed:0 means index not built or wrong interpreter (needs Python 3.13). AVX2 use is not verified by this probe."
+    },
+    {
+      "stage": "kmeans",
+      "status": "CANDIDATE_NOT_ACTIVE",
+      "evidence": {
+        "chunksWithKmeansCluster": 52380,
+        "chunksTotal": 274465,
+        "modelTrainingCount": 197987,
+        "receiptStatus": "EXISTING_CANDIDATE_VERIFIED"
+      }
+    },
+    {
+      "stage": "som_20x20",
+      "status": "BLOCKED",
+      "evidence": {
+        "chunksWithSomBmuRow": 49301,
+        "chunksWithSomCluster": 49483
+      },
+      "note": "Receipt: no real BMU writer found; candidate writers hash packet_key."
+    },
+    {
+      "stage": "manifold4",
+      "status": "MAN4_PRODUCER_ALIGNMENT_BLOCKED",
+      "evidence": {
+        "chunksWithManifold4": 11625
+      }
+    },
+    {
+      "stage": "autoencoder_latents",
+      "status": "DECODER_UP_QUALITY_UNPROVEN",
+      "evidence": {
+        "decoderStatus": "degraded",
+        "latent256": 55169,
+        "latent128": 55169,
+        "latent64": 1703
+      },
+      "note": "status:\"degraded\" before first encode = lazy model not loaded. Latent identity audit has NOT_PROVEN gates."
+    },
+    {
+      "stage": "domain_classification",
+      "status": "DOMAIN_CLASSIFIER_TRAINING_READY_FALSE",
+      "evidence": {
+        "labeledRows": 13,
+        "classes": 3,
+        "revisionQualifiedRows": 0,
+        "chunksWithDomainId": 2214
+      },
+      "note": "Trust floor: 200 reviewed rows and 30 per class. domain_id backfill must not be continued without operator approval."
+    },
+    {
+      "stage": "low_rank_recommendations",
+      "status": "FIXTURE_PROVEN",
+      "evidence": {
+        "candidateCount": 11
+      }
+    },
+    {
+      "stage": "postgres_schema",
+      "status": "SCHEMA_MATCHES_DRIZZLE_DECLARATION",
+      "evidence": {
+        "pgvector": "0.8.3",
+        "checked": 14,
+        "mismatches": [],
+        "hnswIndexes": 10
+      },
+      "note": "Read-only. Mismatches need comparison with Drizzle definitions/writer contracts; schema changes need operator approval (Drizzle Safety Rule)."
+    },
+    {
+      "stage": "did_you_mean",
+      "status": "NOT_PROBED",
+      "evidence": {},
+      "note": "Code references exist; no live test in this script."
+    },
+    {
+      "stage": "multi_hop_traversal",
+      "status": "NOT_PROBED",
+      "evidence": {},
+      "note": "No bounded timed traversal exists; inventory only."
+    }
+  ],
+  "checksum": "sha256:825c992e09cfbc38854c7f7911e6101416fff59ecbf6c00459d1df696831476f"
+}

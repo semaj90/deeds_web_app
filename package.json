@@ -216,6 +216,7 @@
     "atlas:docs:symbol-materializer-freshness": "node scripts/atlas/audit-tree-bound-symbol-materializer-freshness-v1.mjs",
     "atlas:docs:ast-source-worktree": "node scripts/atlas/run-resource-guarded-script-v1.mjs scripts/atlas/audit-ast-source-parity-worktree-v1.mjs",
     "atlas:test:ast-canary-readiness": "node scripts/atlas/test-ast-canary-readiness-v1.mjs",
+    "atlas:test:cross-runtime-abi": "node --test scripts/atlas/cross-runtime-abi-v1.spec.mjs",
     "atlas:docs:ontology-population-decision": "node scripts/atlas/run-resource-guarded-script-v1.mjs scripts/atlas/audit-ontology-population-decision-v1.mjs",
     "atlas:docs:packet-source-scope": "node scripts/atlas/run-resource-guarded-script-v1.mjs scripts/atlas/audit-packet-source-scope-v1.mjs",
     "atlas:test:packet-source-scope": "node scripts/atlas/test-packet-source-scope-v1.mjs",

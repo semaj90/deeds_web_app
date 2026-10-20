@@ -35,6 +35,9 @@ class SomReceipt:
     input_checksum: str
     initial_centroids_checksum: str
     initialization_receipt_checksum: str | None
+    seed: int
+    initialization_perturbation: float
+    update_rule: str
     canonical_authority: bool
 
     def to_dict(self) -> dict[str, Any]:
@@ -82,6 +85,60 @@ def _farthest_seed_ordinals(matrix: np.ndarray, count: int) -> list[int]:
     return chosen
 
 
+def _pca_lattice_seed_matrix(
+    matrix: np.ndarray,
+    grid_rows: int,
+    grid_columns: int,
+    *,
+    seed: int,
+    perturbation: float,
+) -> np.ndarray:
+    if matrix.shape[1] < 2:
+        raise ValueError("PCA_LATTICE_REQUIRES_AT_LEAST_TWO_FEATURES")
+    centered = matrix.astype(np.float64, copy=False) - matrix.mean(axis=0, dtype=np.float64)
+    _, _, components = np.linalg.svd(centered, full_matrices=False)
+    axes = components[:2].copy()
+    scores = centered @ axes.T
+    for index in range(2):
+        anchor = int(np.argmax(np.abs(axes[index])))
+        if axes[index, anchor] < 0:
+            axes[index] *= -1
+            scores[:, index] *= -1
+    mean = matrix.mean(axis=0, dtype=np.float64)
+    row_values = np.linspace(scores[:, 0].min(), scores[:, 0].max(), grid_rows)
+    column_values = np.linspace(scores[:, 1].min(), scores[:, 1].max(), grid_columns)
+    rng = np.random.default_rng(seed)
+    noise = rng.normal(size=(grid_rows * grid_columns, 2))
+    noise *= np.std(scores, axis=0, dtype=np.float64) * perturbation
+    lattice = np.empty((grid_rows * grid_columns, matrix.shape[1]), dtype=np.float64)
+    ordinal = 0
+    for row_value in row_values:
+        for column_value in column_values:
+            lattice[ordinal] = (
+                mean
+                + (row_value + noise[ordinal, 0]) * axes[0]
+                + (column_value + noise[ordinal, 1]) * axes[1]
+            )
+            ordinal += 1
+    return np.asarray(lattice, dtype=np.float32, order="C")
+
+
+def _batch_bmus(matrix: Any, codebook: Any, batch_rows: int):
+    import torch
+
+    code_norm = torch.sum(codebook * codebook, dim=1).reshape(1, -1)
+    winners = []
+    for start in range(0, int(matrix.shape[0]), batch_rows):
+        batch = matrix[start : start + batch_rows]
+        distances = (
+            torch.sum(batch * batch, dim=1, keepdim=True)
+            + code_norm
+            - 2.0 * torch.matmul(batch, codebook.T)
+        )
+        winners.append(torch.argmin(distances, dim=1))
+    return torch.cat(winners)
+
+
 def train_deterministic_som(
     matrix: Sequence[Sequence[float]] | np.ndarray,
     *,
@@ -93,6 +150,10 @@ def train_deterministic_som(
     device: str | None = None,
     seed: int = 0xA71A5,
     kmeans_artifact: RapidsKMeansArtifact | None = None,
+    initialization: str = "deterministic_farthest_sample_rows",
+    initialization_perturbation: float = 0.0,
+    update_rule: str = "online_v1",
+    assignment_batch_rows: int = 4096,
 ):
     """Train a deterministic online SOM and return BMU coordinates + receipt."""
 
@@ -108,17 +169,34 @@ def train_deterministic_som(
         raise ValueError("grid dimensions and epochs must be positive")
     if learning_rate <= 0:
         raise ValueError("learning_rate must be positive")
+    if not np.isfinite(initialization_perturbation) or initialization_perturbation < 0:
+        raise ValueError("initialization_perturbation must be finite and nonnegative")
+    if initialization != "pca_lattice_v1" and initialization_perturbation != 0:
+        raise ValueError("INITIALIZATION_PERTURBATION_REQUIRES_PCA_LATTICE")
+    if update_rule not in {"online_v1", "batch_neighborhood_v1"}:
+        raise ValueError(f"UNSUPPORTED_SOM_UPDATE_RULE:{update_rule}")
+    if assignment_batch_rows <= 0:
+        raise ValueError("assignment_batch_rows must be positive")
 
     resolved_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     x = torch.as_tensor(source, dtype=torch.float32, device=resolved_device)
     unit_count = grid_rows * grid_columns
     input_checksum = _checksum(source)
     initialization_receipt_checksum = None
-    if kmeans_artifact is None:
+    if kmeans_artifact is None and initialization == "deterministic_farthest_sample_rows":
         initial_ordinals = _farthest_seed_ordinals(source, unit_count)
         seed_matrix = source[np.asarray(initial_ordinals)]
         initialization_method = "deterministic_farthest_sample_rows"
-    else:
+    elif kmeans_artifact is None and initialization == "pca_lattice_v1":
+        seed_matrix = _pca_lattice_seed_matrix(
+            source,
+            grid_rows,
+            grid_columns,
+            seed=seed,
+            perturbation=initialization_perturbation,
+        )
+        initialization_method = "pca_lattice_v1"
+    elif kmeans_artifact is not None and initialization == "deterministic_farthest_sample_rows":
         seed_matrix = np.array(kmeans_artifact.centroids, dtype=np.float32, copy=True, order="C")
         if seed_matrix.shape != (unit_count, source.shape[1]):
             raise ValueError("KMEANS_CENTROID_SHAPE_MISMATCH")
@@ -142,6 +220,10 @@ def train_deterministic_som(
             json.dumps(receipt, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
         ).hexdigest()
         initialization_method = "checksum_verified_cuvs_kmeans_centroids"
+    elif kmeans_artifact is not None:
+        raise ValueError("SOM_INITIALIZATION_CONFLICT")
+    else:
+        raise ValueError(f"UNSUPPORTED_SOM_INITIALIZATION:{initialization}")
     initial_centroids_checksum = _checksum(seed_matrix)
     codebook = torch.as_tensor(seed_matrix, dtype=torch.float32, device=resolved_device).clone()
 
@@ -150,6 +232,8 @@ def train_deterministic_som(
     grid_y, grid_x = torch.meshgrid(row_coords, col_coords, indexing="ij")
     grid = torch.stack((grid_y.reshape(-1), grid_x.reshape(-1)), dim=1)
     sigma_start = float(sigma if sigma is not None else max(grid_rows, grid_columns) / 2.0)
+    grid_delta = grid[:, None, :] - grid[None, :, :]
+    grid_distance = torch.sum(grid_delta * grid_delta, dim=2)
 
     with torch.inference_mode():
         for epoch in range(epochs):
@@ -157,17 +241,31 @@ def train_deterministic_som(
             lr = float(learning_rate * (1.0 - 0.9 * progress))
             current_sigma = max(float(sigma_start * (1.0 - 0.9 * progress)), 0.5)
             denom = 2.0 * current_sigma * current_sigma
-            for ordinal in range(int(x.shape[0])):
-                sample = x[ordinal]
-                distances = torch.sum((codebook - sample) ** 2, dim=1)
-                bmu = int(torch.argmin(distances).item())
-                grid_distance = torch.sum((grid - grid[bmu]) ** 2, dim=1)
-                neighborhood = torch.exp(-grid_distance / denom).reshape(-1, 1)
-                codebook += lr * neighborhood * (sample - codebook)
+            if update_rule == "online_v1":
+                for ordinal in range(int(x.shape[0])):
+                    sample = x[ordinal]
+                    distances = torch.sum((codebook - sample) ** 2, dim=1)
+                    bmu = int(torch.argmin(distances).item())
+                    neighborhood = torch.exp(-grid_distance[bmu] / denom).reshape(-1, 1)
+                    codebook += lr * neighborhood * (sample - codebook)
+            else:
+                bmus = _batch_bmus(x, codebook, assignment_batch_rows)
+                counts = torch.bincount(bmus, minlength=unit_count).to(dtype=x.dtype)
+                sums = torch.zeros_like(codebook)
+                sums.index_add_(0, bmus, x)
+                neighborhood = torch.exp(-grid_distance / denom)
+                weighted_counts = torch.matmul(neighborhood, counts).reshape(-1, 1)
+                weighted_sums = torch.matmul(neighborhood, sums)
+                targets = weighted_sums / weighted_counts.clamp_min(torch.finfo(x.dtype).tiny)
+                codebook += lr * (targets - codebook)
 
-        squared = torch.sum((x[:, None, :] - codebook[None, :, :]) ** 2, dim=2)
-        bmus = torch.argmin(squared, dim=1)
-        quantization_error = torch.sqrt(torch.gather(squared, 1, bmus[:, None]).squeeze(1)).mean()
+        bmus = _batch_bmus(x, codebook, assignment_batch_rows)
+        squared_minima = []
+        for start in range(0, int(x.shape[0]), assignment_batch_rows):
+            batch = x[start : start + assignment_batch_rows]
+            batch_codebook = codebook.index_select(0, bmus[start : start + assignment_batch_rows])
+            squared_minima.append(torch.sum((batch - batch_codebook) ** 2, dim=1))
+        quantization_error = torch.sqrt(torch.cat(squared_minima).clamp_min(0)).mean()
         coordinates = grid.index_select(0, bmus)
 
     coords_host = coordinates.detach().cpu().numpy().astype(np.float32, copy=False)
@@ -188,6 +286,9 @@ def train_deterministic_som(
         input_checksum=input_checksum,
         initial_centroids_checksum=initial_centroids_checksum,
         initialization_receipt_checksum=initialization_receipt_checksum,
+        seed=int(seed),
+        initialization_perturbation=float(initialization_perturbation),
+        update_rule=update_rule,
         canonical_authority=False,
     )
     return coordinates, codebook, receipt

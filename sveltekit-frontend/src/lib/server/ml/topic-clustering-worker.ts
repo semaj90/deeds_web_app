@@ -233,6 +233,12 @@ async function invalidateCache(jobId: string): Promise<{ invalidated: boolean }>
     };
     const amqp = amqpMod;
 		const connection = await amqp.connect(rabbitmqUrl);
+		(connection as any).on?.('error', (err: unknown) => {
+			console.error('[topic-clustering-worker] RabbitMQ connection error (handled):', err instanceof Error ? err.message : err);
+		});
+		(connection as any).on?.('close', () => {
+			console.warn('[topic-clustering-worker] RabbitMQ connection closed');
+		});
 		const channel = await connection.createChannel();
 
 		const exchangeName = 'deeds.cache';

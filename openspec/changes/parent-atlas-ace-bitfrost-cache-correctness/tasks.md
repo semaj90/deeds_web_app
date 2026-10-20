@@ -99,6 +99,25 @@
   Include exact rendered request/prompt and generation parameters where output reuse
   depends on them; a manifest alone does not cover a changed user question.
   Use canonical structured serialization, not ambiguous string concatenation.
+- 2026-10-19 read-only caller audit: `/api/ace/stream` deliberately calls
+  `admitAceRouteCacheIdentityV1(undefined, cacheKey)`, so its revisioned Redis GET/SET
+  branches are unreachable until a server-owned admitted manifest is supplied. The
+  separate `buildAcePromptPreflight` cache still keys by query/intent/backend and can
+  return a cached prompt without the required ContextManifestV2, model/template/tool,
+  rendered-request, and generation-control identity. The strict prefix-descriptor
+  reader has no production caller. CACHE-PREFILL-01 remains open; no cache or data-store
+  writes were performed, and no missing revision was inferred.
+- Caller refinement: `openai-facade.ts` wraps that builder with a second key containing
+  query, model, system/tool hashes, repository revision, case/file scope, source/chunk/
+  packet IDs, and optional manifest identity; it still does not bind source revisions,
+  and `contextManifestIdentity` can be null. The facade passes `aceCtx`, while the
+  builder's declared field is `aceContext` and the builder does not consume either.
+  Therefore neither key establishes the required revision-qualified context. The
+  existing outer cache should remain non-authoritative until this input contract is
+  repaired and the true source revisions are available. `revisionedExactAnswerCache`
+  has a strict V2 key builder in `openai-facade.ts`, but repository search found no
+  production caller supplying it; the ACE stream route also does not supply a V2
+  manifest.
 - [x] CACHE-PREFILL-02 fixture-proven 2026-09-15: the canonical V2 completion-key
   fixture returns a repeatable HIT for identical complete identity and an isolated
   MISS for changed query, manifest, model, chat-template, tool-schema, prompt-template,

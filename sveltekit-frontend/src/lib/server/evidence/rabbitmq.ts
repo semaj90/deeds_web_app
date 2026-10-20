@@ -6,6 +6,12 @@ const RABBITMQ_URL = ENV.RABBITMQ_URL;
 export async function connectRabbit(): Promise<{
 	conn: any, channel: any }> {
     const conn = await (amqp as any).connect(RABBITMQ_URL);
+    conn.on('error', (err: unknown) => {
+        console.error('[evidence-rabbitmq] RabbitMQ connection error (handled):', err instanceof Error ? err.message : err);
+    });
+    conn.on('close', () => {
+        console.warn('[evidence-rabbitmq] RabbitMQ connection closed');
+    });
     const channel = await conn.createChannel();
     return { conn, channel };
 }

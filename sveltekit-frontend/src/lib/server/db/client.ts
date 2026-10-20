@@ -66,7 +66,7 @@ export function resetPoolHealth(): void {
 const POOL_CONFIG = {
 	max: 10, // Default for node-postgres
 	idleTimeoutMillis: 30000,
-	connectionTimeoutMillis: 5000,
+	connectionTimeoutMillis: 15000,
 };
 
 // Log canonical DB on boot (Sprint 3.6 G17). console.error (stderr), not

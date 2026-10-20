@@ -5,7 +5,9 @@
  * instead. This module remains for compatibility with existing call sites.
  */
 import { ENV } from '$lib/server/env.server.js';
-import { Client } from 'minio';
+import type { Client } from 'minio';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 import crypto from 'crypto';
 
 // Centralized MinIO-compatible client initialization — singleton
@@ -43,7 +45,8 @@ export function getMinioClient(): Client {
     const endpointInput = ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT;
     const fallbackPort = Number.parseInt(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT, 10);
     const { endPoint, port } = parseMinioEndpoint(endpointInput, fallbackPort);
-    minioClient = new Client({
+    const { Client: MinioClient } = require('minio');
+    minioClient = new MinioClient({
       endPoint,
       port,
       useSSL: ENV.MINIO_USE_SSL === 'true',

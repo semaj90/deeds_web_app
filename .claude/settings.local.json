@@ -649,7 +649,8 @@
     "playwright",
     "atlas-tools",
     "socraticode",
-    "trace"
+    "trace",
+    "ldr-research"
   ],
   "disabledMcpjsonServers": [
     "atlas-task-kernel",

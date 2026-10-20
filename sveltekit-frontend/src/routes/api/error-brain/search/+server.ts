@@ -42,13 +42,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	// historical fixes and remains a candidate source, not an admission decision.
 	try {
 		const errorLogResults = await db.execute(sql`
-			SELECT id::text, error_category, severity, message, route_path, file_path,
-			       line_number, packet_key, source_ref, resolved, created_at
-			FROM public.error_logs
-			WHERE message ILIKE ${searchPattern} ESCAPE '\\'
-			   OR COALESCE(file_path, '') ILIKE ${searchPattern} ESCAPE '\\'
-			   OR COALESCE(route_path, '') ILIKE ${searchPattern} ESCAPE '\\'
-			ORDER BY created_at DESC
+			SELECT e.id::text, e.error_category, e.diagnostic_code, e.diagnostic_run_id,
+			       e.diagnostic_log_sha256, e.diagnostic_log_line,
+			       e.severity, e.message, e.route_path, e.file_path,
+			       e.line_number, e.packet_key, e.source_ref, e.resolved, e.created_at,
+			       (
+			         SELECT jsonb_agg(jsonb_build_object(
+			           'taskId', kt.task_id,
+			           'featureLabel', kt.feature_label,
+			           'lane', kt.lane,
+			           'status', kt.status
+			         ) ORDER BY kt.created_at DESC)
+			         FROM public.kanban_tasks kt
+			         WHERE kt.source_refs @> jsonb_build_array('error_log:' || e.id::text)
+			       ) AS kanban_tasks
+			FROM public.error_logs e
+			WHERE e.message ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.diagnostic_code, '') ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.diagnostic_run_id, '') ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.file_path, '') ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.route_path, '') ILIKE ${searchPattern} ESCAPE '\\'
+			ORDER BY e.created_at DESC
 			LIMIT ${limit}
 		`).catch(() => {
 			errorLogSearchStatus = 'unavailable';
@@ -59,10 +73,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			sources.push({
 				type: 'error_log',
 				id: String(row.id),
-				content: `[${row.severity}] ${row.message}`,
+				content: `[${row.severity}]${row.diagnostic_code ? ` [${row.diagnostic_code}]` : ''} ${row.message}`,
 				relevance: 0.5,
 				metadata: {
 					category: row.error_category,
+					diagnosticCode: row.diagnostic_code,
+					diagnosticRunId: row.diagnostic_run_id,
+					diagnosticLogSha256: row.diagnostic_log_sha256,
+					diagnosticLogLine: row.diagnostic_log_line,
 					severity: row.severity,
 					filePath: row.file_path,
 					routePath: row.route_path,
@@ -71,6 +89,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					sourceRef: row.source_ref,
 					resolved: row.resolved,
 					createdAt: row.created_at,
+					kanbanTasks: Array.isArray(row.kanban_tasks) ? row.kanban_tasks : [],
 					rankKind: 'lexical_candidate',
 				},
 			});

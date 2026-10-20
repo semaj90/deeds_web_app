@@ -31,6 +31,36 @@ import SuggestionsList from '../../../(admin)/error-brain/components/Suggestions
  let diagnosisRunning = $state(false);
  let diagnosisResult = $state<any>(null);
 
+ let buildDiagnosticQuery = $state('0xC0000005');
+ let buildDiagnosticResults = $state<Array<{
+	type: string;
+	id: string;
+	content: string;
+	metadata: Record<string, unknown>;
+ }>>([]);
+ let buildDiagnosticSearching = $state(false);
+ let buildDiagnosticError = $state<string | null>(null);
+
+ async function searchBuildDiagnostics() {
+	if (!buildDiagnosticQuery.trim()) return;
+	buildDiagnosticSearching = true;
+	buildDiagnosticError = null;
+	try {
+		const response = await fetch('/api/error-brain/search', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ errorMessage: buildDiagnosticQuery, limit: 10 }),
+		});
+		const payload = await response.json();
+		if (!response.ok) throw new Error(payload.error ?? `Search failed (${response.status})`);
+		buildDiagnosticResults = (payload.sources ?? []).filter((source: { type?: string }) => source.type === 'error_log');
+	} catch (searchError) {
+		buildDiagnosticError = searchError instanceof Error ? searchError.message : String(searchError);
+	} finally {
+		buildDiagnosticSearching = false;
+	}
+ }
+
  async function runDiagnosis() {
 	if (!diagnosisQuery.trim()) return;
 	diagnosisRunning = true;
@@ -205,6 +235,47 @@ import SuggestionsList from '../../../(admin)/error-brain/components/Suggestions
 		<Button onclick={() => { if (selectedRoute) showErrorModal = true; }}>Error Modal</Button>
 	</div>
  </div>
+
+ <Card>
+	<CardHeader>
+		<CardTitle>Build diagnostics</CardTitle>
+		<CardDescription>Search captured build failures in PostgreSQL and view linked Kanban follow-ups.</CardDescription>
+	</CardHeader>
+	<CardContent class="space-y-4">
+		<form class="flex gap-2" onsubmit={(event) => { event.preventDefault(); void searchBuildDiagnostics(); }}>
+			<input
+				aria-label="Search build diagnostics"
+				bind:value={buildDiagnosticQuery}
+				class="min-w-0 flex-1 rounded border px-3 py-2"
+				placeholder="Search an error code or message"
+			/>
+			<Button type="submit" disabled={buildDiagnosticSearching}>
+				{buildDiagnosticSearching ? 'Searching…' : 'Search'}
+			</Button>
+		</form>
+		{#if buildDiagnosticError}
+			<p role="alert" class="text-sm text-red-600">{buildDiagnosticError}</p>
+		{:else if buildDiagnosticResults.length === 0}
+			<p class="text-sm text-muted-foreground">Search for a build error to see captured diagnostics and linked tasks.</p>
+		{:else}
+			<ul class="space-y-3">
+				{#each buildDiagnosticResults as result (result.id)}
+					<li class="rounded border p-3">
+						<p class="font-medium">{result.content}</p>
+						<p class="mt-1 break-all text-xs text-muted-foreground">{String(result.metadata.sourceRef ?? result.id)}</p>
+						{#if Array.isArray(result.metadata.kanbanTasks) && result.metadata.kanbanTasks.length > 0}
+							<div class="mt-2 flex flex-wrap gap-2">
+								{#each result.metadata.kanbanTasks as task (String(task.taskId))}
+									<Badge variant="secondary">{String(task.taskId)} · {String(task.status)}</Badge>
+								{/each}
+							</div>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</CardContent>
+ </Card>
 
  {#if showErrorBrain}
 	<Phase72ErrorBrain routePath={selectedRoute} onClose={() => (showErrorBrain = false)} />

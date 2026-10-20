@@ -49,6 +49,10 @@ function startFlushTimer(): void {
   flushTimer = setInterval(flushErrors, FLUSH_INTERVAL_MS);
 }
 
+export function init(): void {
+  startFlushTimer();
+}
+
 // ── SvelteKit handleError ──────────────────────────────────
 
 export const handleError: HandleClientError = ({ error, event, status, message }) => {
@@ -113,8 +117,6 @@ if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
 }
 
 // ── Flush on page unload ───────────────────────────────────
-
-startFlushTimer();
 
 window.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') flushErrors();

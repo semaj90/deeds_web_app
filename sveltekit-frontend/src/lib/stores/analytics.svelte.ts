@@ -36,10 +36,10 @@ class AnalyticsStore {
 	private initialized = false;
 
 	/** Call once from root layout's onMount */
-	init(userId?: string | null) {
+	init(userId?: string | number | null) {
 		if (this.initialized) return;
 		this.initialized = true;
-		this.userId = userId ?? null;
+		this.userId = userId != null ? String(userId) : null;
 		this.sessionId = `s_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
 		// Flush every 30s
@@ -83,7 +83,7 @@ class AnalyticsStore {
 		const events = this.queue.splice(0);
 
 		try {
-			await fetch('/api/analytics/events', {
+			const response = await fetch('/api/analytics/events', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -96,18 +96,25 @@ class AnalyticsStore {
 				}),
 				keepalive: true // Ensures delivery on page unload
 			});
-		} catch {
-			// Re-queue on failure (up to limit)
-			for (const event of events) {
-				if (this.queue.length >= MAX_QUEUE_SIZE) break;
-				this.queue.push(event);
+			if (!response.ok) {
+				console.warn(`[analytics] Event batch rejected with HTTP ${response.status}`);
+				if (response.status >= 500) this.requeue(events);
 			}
+		} catch {
+			this.requeue(events);
+		}
+	}
+
+	private requeue(events: QueuedEvent[]) {
+		for (const event of events) {
+			if (this.queue.length >= MAX_QUEUE_SIZE) break;
+			this.queue.push(event);
 		}
 	}
 
 	/** Set user ID after login */
-	setUser(userId: string) {
-		this.userId = userId;
+	setUser(userId: string | number | null) {
+		this.userId = userId != null ? String(userId) : null;
 	}
 
 	/** Clean up on unmount */

@@ -34,7 +34,15 @@
     { type: 'statute', title: '18 U.S.C. § 1001', snippet: 'Statements or entries generally in federal matters...', similarity: 0.98 },
     { type: 'precedent', title: 'Miranda v. Arizona', snippet: 'Fifth Amendment privilege against self-incrimination...', similarity: 0.85 }
   ]);
-  let kbSearching = $state(false);
+  let wwwhError = $state('');
+
+  let filteredKBResults = $derived.by(() => {
+    const query = kbQuery.trim().toLocaleLowerCase();
+    if (!query) return kbResults;
+    return kbResults.filter((result) =>
+      `${result.type} ${result.title} ${result.snippet}`.toLocaleLowerCase().includes(query)
+    );
+  });
 
   // WWWH Generator State
   let wwwhNotes = $state('');
@@ -63,14 +71,25 @@
 
   function handleKBSearch(query: string) {
     kbQuery = query;
-    if (query.length < 2) return;
-    kbSearching = true;
-    setTimeout(() => kbSearching = false, 600);
   }
 
   function clearWWWH() {
     wwwhNotes = ''; wwwhWho = ''; wwwhWhat = ''; wwwhWhy = ''; wwwhHow = '';
-    wwwhTitle = ''; wwwhStatus = 'open';
+    wwwhTitle = ''; wwwhStatus = 'open'; wwwhSuccess = ''; wwwhError = '';
+  }
+
+  function prepareWWWHDraft() {
+    const notes = wwwhNotes.trim();
+    wwwhSuccess = '';
+    wwwhError = '';
+    if (!notes) {
+      wwwhError = 'Add notes before preparing a draft.';
+      return;
+    }
+
+    wwwhTitle = notes.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 120) ?? '';
+    wwwhWhat = notes;
+    wwwhSuccess = 'Local draft prepared. Review it before creating a case; nothing has been saved.';
   }
 
   // Utility
@@ -142,17 +161,12 @@
             oninput={(e) => handleKBSearch((e.target as HTMLInputElement).value)}
           />
           <Icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/20" size={18} />
-          {#if kbSearching}
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 animate-spin">
-              <Icon name="loader-circle" size={16} class="text-blue-400" />
-            </div>
-          {/if}
         </div>
 
         <div class="flex-1 overflow-y-auto custom-scrollbar min-h-[200px]">
           <div class="space-y-3">
-            {#each kbResults as result}
-              <button class="w-full text-left p-4 rounded-2xl bg-white/2 hover:bg-white/5 border border-white/5 transition-all group">
+            {#each filteredKBResults as result}
+              <article class="w-full text-left p-4 rounded-2xl bg-white/2 border border-white/5">
                 <div class="flex items-center justify-between mb-2">
                   <span class={cn(
                     "text-[9px] font-black px-2 py-0.5 rounded uppercase",
@@ -164,7 +178,9 @@
                 </div>
                 <h4 class="font-bold text-sm mb-1">{result.title}</h4>
                 <p class="text-xs text-white/40 line-clamp-2">{result.snippet}</p>
-              </button>
+              </article>
+            {:else}
+              <p class="p-4 text-sm text-white/50" role="status">No demo results match “{kbQuery}”.</p>
             {/each}
           </div>
         </div>
@@ -175,20 +191,20 @@
         <h2 class="font-bold text-lg flex items-center gap-3 mb-4">
           <Icon name="zap" class="text-amber-400" /> Fast Tracks
         </h2>
-        <button class="w-full flex items-center justify-between p-4 rounded-2xl bg-white/2 hover:bg-white/5 border border-white/5 transition-all group">
+        <a href="/cases/new" class="w-full flex items-center justify-between p-4 rounded-2xl bg-white/2 hover:bg-white/5 border border-white/5 transition-all group">
           <div class="flex items-center gap-3">
             <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-400"><Icon name="plus" size={18} /></div>
             <span class="text-sm font-bold">New Investigation</span>
           </div>
           <Icon name="chevron-right" size={14} class="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-        </button>
-        <button class="w-full flex items-center justify-between p-4 rounded-2xl bg-white/2 hover:bg-white/5 border border-white/5 transition-all group">
+        </a>
+        <a href="/evidence/upload" class="w-full flex items-center justify-between p-4 rounded-2xl bg-white/2 hover:bg-white/5 border border-white/5 transition-all group">
           <div class="flex items-center gap-3">
             <div class="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400"><Icon name="upload" size={18} /></div>
             <span class="text-sm font-bold">Ingest Evidence</span>
           </div>
           <Icon name="chevron-right" size={14} class="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-        </button>
+        </a>
       </div>
 
       <!-- Neural Pipeline -->
@@ -203,7 +219,7 @@
             <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400"><Icon name="sparkles" size={16} /></div>
             <h3 class="font-bold uppercase tracking-widest text-xs">Use Case Generator</h3>
           </div>
-          <button onclick={() => wwwhCollapsed = !wwwhCollapsed} class="text-white/20 hover:text-white transition-colors">
+          <button type="button" aria-label={wwwhCollapsed ? 'Expand use case generator' : 'Collapse use case generator'} aria-expanded={!wwwhCollapsed} onclick={() => wwwhCollapsed = !wwwhCollapsed} class="text-white/20 hover:text-white transition-colors">
             <Icon name={wwwhCollapsed ? "chevron-down" : "chevron-up"} size={16} />
           </button>
         </div>
@@ -217,18 +233,20 @@
                 class="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm min-h-[180px] focus:ring-2 focus:ring-blue-500/40 outline-none"
               ></textarea>
               <div class="flex gap-3">
-                <Button variant="primary" size="sm" class="flex-1" onclick={() => wwwhSuccess = 'Extracted'} disabled={wwwhSaving}>Analyze</Button>
-                <Button variant="secondary" size="sm" onclick={clearWWWH}><Icon name="eraser" size={14} /></Button>
+                <Button variant="primary" size="sm" class="flex-1" onclick={prepareWWWHDraft} disabled={wwwhSaving}>Prepare Draft</Button>
+                <Button variant="secondary" size="sm" onclick={clearWWWH} aria-label="Clear draft"><Icon name="eraser" size={14} /></Button>
+                {#if wwwhError}<p class="text-sm text-rose-300" role="alert">{wwwhError}</p>{/if}
+                {#if wwwhSuccess}<p class="text-sm text-emerald-300" role="status">{wwwhSuccess}</p>{/if}
               </div>
             </div>
             <div class="space-y-4">
               <div class="grid grid-cols-2 gap-4">
-                {#each [{id:'who', label:'Who', icon:'user', value:wwwhWho, bind:(v:string)=>wwwhWho=v}, {id:'what', label:'What', icon:'file-text', value:wwwhWhat, bind:(v:string)=>wwwhWhat=v}] as f}
+                {#each [{id:'title', label:'Title', icon:'file-text', value:wwwhTitle, bind:(v:string)=>wwwhTitle=v}, {id:'who', label:'Who', icon:'user', value:wwwhWho, bind:(v:string)=>wwwhWho=v}, {id:'what', label:'What', icon:'file-text', value:wwwhWhat, bind:(v:string)=>wwwhWhat=v}] as f}
                   <div class="space-y-1.5">
-                    <label class="text-[10px] uppercase font-black text-white/20 tracking-tighter flex items-center gap-1.5">
+                    <label for="wwwh-{f.id}" class="text-[10px] uppercase font-black text-white/20 tracking-tighter flex items-center gap-1.5">
                       <Icon name={f.icon} size={10} /> {f.label}
                     </label>
-                    <input type="text" value={f.value} oninput={e => f.bind((e.target as HTMLInputElement).value)} class="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500/40" />
+                    <input id="wwwh-{f.id}" type="text" value={f.value} oninput={e => f.bind((e.target as HTMLInputElement).value)} class="w-full bg-white/5 border border-white/5 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500/40" />
                   </div>
                 {/each}
               </div>

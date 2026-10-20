@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.cudf-feature-json-ingest-receipt.v1",
+  "run_id": "run_1792455472",
+  "timestamp": "2026-10-20T00:17:53Z",
+  "canonical_authority": false,
+  "writes_performed": false,
+  "ingest_result": {
+    "engine_used": "cudf_gpu",
+    "row_count": 21,
+    "json_raw_bytes": 6862,
+    "total_token_budget": 52224,
+    "total_allocated_tokens": 39168,
+    "elapsed_ms": 1423.013962999903
+  },
+  "features_covered": [
+    "chat",
+    "ai_chat",
+    "auth",
+    "canvas",
+    "html5_visual_playground",
+    "image_creator",
+    "wiki",
+    "user_db",
+    "cases",
+    "evidence",
+    "search_rag",
+    "knowledge_graph",
+    "recommendations",
+    "reports",
+    "reconstruction_sim",
+    "media_transcribe",
+    "upload_ingest",
+    "rich_text",
+    "code_intel",
+    "admin_ops",
+    "terminal"
+  ],
+  "forbidden_keys_detected": 0,
+  "status": "SUCCEEDED"
+}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { appStore } from '$lib/stores/app-store.svelte';
 
   let activeCases: any[] = $state([]);
@@ -111,7 +112,7 @@
  {#if loading}
  <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
  {/if}
- <button class="px-3 py-1 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
+ <button onclick={() => goto('/cases')} class="px-3 py-1 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
  View All
  </button>
  </div>
@@ -126,7 +127,13 @@
 
  <div class="space-y-4">
  {#each activeCases as caseItem}
- <div class="bg-panelSoft/30 rounded-lg p-4 border-l-4 {getPriorityColor(caseItem.priority)}">
+ <div 
+  role="button"
+  tabindex="0"
+  onclick={() => goto(`/cases/${caseItem.id}`)}
+  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') goto(`/cases/${caseItem.id}`); }}
+  class="bg-panelSoft/30 hover:bg-panelSoft/50 cursor-pointer rounded-lg p-4 border-l-4 transition-all {getPriorityColor(caseItem.priority)}"
+ >
  <div class="flex items-start justify-between mb-2">
  <div>
  <h3 class="font-medium text-white text-sm">{caseItem.title}</h3>
@@ -154,7 +161,7 @@
  {#if !loading}
  <div class="text-center py-8">
  <div class="text-sand/40 mb-2">No active cases found</div>
- <button class="px-4 py-2 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
+ <button onclick={() => goto('/cases/new')} class="px-4 py-2 bg-info/20 hover:bg-info/30 text-info text-sm rounded transition-colors">
  Create New Case
  </button>
  </div>

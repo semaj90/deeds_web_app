@@ -15,6 +15,7 @@
  */
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { building } from '$app/environment';
 import { ENV } from '$lib/server/env.server.js';
 import { resolveLoadedLlamaModel, normalizeLlamaServerBaseUrlV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 
@@ -28,7 +29,7 @@ export const LLM_BASE_URL = normalizeLlamaServerBaseUrlV1(
   'http://127.0.0.1:8090'
 );
 
-const resolvedModelPath = ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? null;
+const resolvedModelPath = ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? (building ? 'BUILD_TIME_STUB.gguf' : null);
 
 if (!resolvedModelPath) {
   throw new Error(

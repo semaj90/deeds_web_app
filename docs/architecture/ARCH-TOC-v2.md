@@ -80,6 +80,8 @@ Related contracts: [retrieval transport, codecs, and telemetry](./retrieval-tran
 - [AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL](./AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL.md)
 - [agentic-error-proposal-flow](./agentic-error-proposal-flow.md)
 - [agentic-openspec-tasks-error-fixing-playbook](./agentic-openspec-tasks-error-fixing-playbook.md)
+- [atlas-feature-taxonomy-sveltekit-draft](./atlas-feature-taxonomy-sveltekit-draft.md)
+- [atlas-python-environment-routing](./atlas-python-environment-routing.md)
 - [atlas-retrieval-parity-admission-gates-v1](./atlas-retrieval-parity-admission-gates-v1.md)
 - [atlas-store-ownership-and-derived-representations-v1](./atlas-store-ownership-and-derived-representations-v1.md)
 - [atlas-topic-identity-read-model-v1](./atlas-topic-identity-read-model-v1.md)

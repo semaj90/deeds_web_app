@@ -9,10 +9,19 @@
   }
 
   // State
-  let errorStats = $state(data.errorStats);
-  let topologyData = $state(data.topologyData);
-  let recentActivity = $state(data.recentActivity);
-  let topologyError = $state(data.topologyError ?? null);
+  let errorStats = $state({
+    total: 0,
+    embedded: 0,
+    fixed: 0,
+    sources: [] as { source: string; count: number; embedded: number }[]
+  });
+  let topologyData = $state({
+    nodes: [] as Array<{ id: string; label: string; type: 'file' | 'directory' | 'error' | 'cluster'; errorCount: number; status: 'clean' | 'warning' | 'error' | 'fixing' }>,
+    edges: [] as Array<{ from: string; to: string; type: string }>,
+    summary: { totalFiles: 0, totalErrors: 0, totalEmbedded: 0 }
+  });
+  let recentActivity = $state<Array<{ id: string; type: 'fix' | 'embed' | 'learn'; message: string; timestamp: string }>>([]);
+  let topologyError = $state<string | null>(null);
   let snapshotCurrent = $state(true);
   let snapshotUpdatedAt = $state<string | null>(null);
   let refreshInFlight = false;
@@ -30,6 +39,10 @@
   let edges = $state([]);
 
   $effect(() => {
+    if (data.errorStats) errorStats = data.errorStats;
+    if (data.topologyData) topologyData = data.topologyData;
+    recentActivity = data.recentActivity ?? [];
+    topologyError = data.topologyError ?? null;
     nodes = data.topologyData?.nodes ?? [];
     edges = data.topologyData?.edges ?? [];
   });

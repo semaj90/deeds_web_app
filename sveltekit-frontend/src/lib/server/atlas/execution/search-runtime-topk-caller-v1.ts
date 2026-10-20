@@ -11,6 +11,7 @@ import {
   verifyTopKExecutionReceiptV1,
   type AlgorithmExecutionReceiptRowV1,
   type TopKExecutionV1,
+  type TopKTimingV1,
   type TopKVerificationV1,
 } from './topk-execution-receipt-v1.js';
 import {
@@ -146,6 +147,7 @@ export function executeSearchRuntimeTopKV1(
   });
 
   // 3. Build deterministic CPU exact Top-K execution receipt
+  const startHrTime = process.hrtime.bigint();
   const execution: TopKExecutionV1 = buildTopKExecutionV1({
     requestId: params.requestId,
     input,
@@ -153,9 +155,10 @@ export function executeSearchRuntimeTopKV1(
     ordinalMap: params.ordinalMap,
     k,
   });
+  const timing: TopKTimingV1 = { durationNs: (process.hrtime.bigint() - startHrTime).toString() };
 
   // 4. Format receipt row
-  const receiptRow: AlgorithmExecutionReceiptRowV1 = toAlgorithmExecutionReceiptRowV1(execution);
+  const receiptRow: AlgorithmExecutionReceiptRowV1 = toAlgorithmExecutionReceiptRowV1(execution, timing);
 
   // 5. Independently replay and verify execution from the receipt row
   const verification: TopKVerificationV1 = verifyTopKExecutionReceiptV1({

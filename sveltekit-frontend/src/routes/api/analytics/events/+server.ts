@@ -25,7 +25,9 @@ function normalizeEventType(eventType: AnalyticsEventInputType): AnalyticsEvent[
 }
 
 const singleEventSchema = z.object({
-	userId: z.string().max(200).nullish(),
+	userId: z.union([z.string().max(200), z.number().int().safe().nonnegative()])
+		.transform((value) => String(value))
+		.nullish(),
 	sessionId: z.string().max(100).nullish(),
 	eventType: z.enum(ANALYTICS_EVENT_TYPES),
 	payload: z.record(z.string(), z.unknown()).optional().default({})

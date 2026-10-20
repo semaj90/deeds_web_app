@@ -8,6 +8,9 @@ export async function summarizeWithQueue(content: string, documentId: string): P
     try {
         const amqplib = await import("amqplib") as any;
         const connection = await (amqplib.connect ?? amqplib.default)(RABBITMQ_URL);
+        connection.on('error', (error: unknown) => {
+            console.error('[pgai-summarize] RabbitMQ connection error (handled):', error instanceof Error ? error.message : error);
+        });
         const channel = await connection.createChannel();
         await channel.assertQueue(QUEUE_NAME, { durable: true });
 

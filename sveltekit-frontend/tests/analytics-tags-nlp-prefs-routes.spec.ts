@@ -293,6 +293,23 @@ describe('/api/analytics/events (POST)', () => {
     expect(data.ok).toBe(true);
   });
 
+  it('accepts a numeric user ID from the authenticated client', async () => {
+    const res = await POST({
+      request: mkRequest({ userId: 2, eventType: 'route_opened', payload: { route: '/persons-of-interest' } }),
+      locals: authedLocals,
+    });
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toMatchObject({ ok: true });
+  });
+
+  it('rejects unsafe numeric user IDs', async () => {
+    const res = await POST({
+      request: mkRequest({ userId: Number.MAX_SAFE_INTEGER + 1, eventType: 'route_opened' }),
+      locals: authedLocals,
+    });
+    expect(res.status).toBe(400);
+  });
+
   it('logs batch events', async () => {
     const res = await POST({
       request: mkRequest({

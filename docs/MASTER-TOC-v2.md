@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v2.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `78f905966b447e0e3e3273360f3df4ddc49964eeb47bfaafefeb2fdff899e9aa`
+Registry checksum: `12a4e0adbff5689337e3e3b40c9ce351333f28084f16836dbd56818834497b39`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 
@@ -93,7 +93,7 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 
 - [.claude/CLAUDE.md](.claude/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `13bc6179f4ad`
 - [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `fef20519d5e9`
-- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `06dbd589d887`
+- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `5cd4caea3f38`
 - [claude-mem/CLAUDE.md](claude-mem/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `a6f297acd125`
 - [llm/claude.md](llm/claude.md) — CLAUDE_INSTRUCTIONS — `fdcdba7c73d7`
 - [mcp-server-mcp/CLAUDE.md](mcp-server-mcp/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `1707a6375458`
@@ -171,6 +171,8 @@ Directory audit owners and evidence: `scripts/atlas/audit-ignored-directories.mj
 - [AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL](docs/architecture/AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL.md) — UNCLASSIFIED
 - [agentic-error-proposal-flow](docs/architecture/agentic-error-proposal-flow.md) — UNCLASSIFIED
 - [agentic-openspec-tasks-error-fixing-playbook](docs/architecture/agentic-openspec-tasks-error-fixing-playbook.md) — UNCLASSIFIED
+- [atlas-feature-taxonomy-sveltekit-draft](docs/architecture/atlas-feature-taxonomy-sveltekit-draft.md) — UNCLASSIFIED
+- [atlas-python-environment-routing](docs/architecture/atlas-python-environment-routing.md) — UNCLASSIFIED
 - [atlas-retrieval-parity-admission-gates-v1](docs/architecture/atlas-retrieval-parity-admission-gates-v1.md) — UNCLASSIFIED
 - [atlas-store-ownership-and-derived-representations-v1](docs/architecture/atlas-store-ownership-and-derived-representations-v1.md) — UNCLASSIFIED
 - [atlas-topic-identity-read-model-v1](docs/architecture/atlas-topic-identity-read-model-v1.md) — UNCLASSIFIED

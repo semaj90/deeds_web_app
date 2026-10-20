@@ -8,7 +8,9 @@
  * This module stays as a compatibility shim because SeaweedFS exposes an S3
  * gateway and the existing client shape still works.
  */
-import { Client } from 'minio';
+import type { Client } from 'minio';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
 import { ENV } from '$lib/server/env.server.js';
 
 export interface MinioS3ClientConfig {
@@ -36,7 +38,8 @@ let minioClientInstance: Client | null = null;
 export function getMinioS3Client(): Client {
   if (!minioClientInstance) {
     const config = getMinioConfig();
-    minioClientInstance = new Client({
+    const { Client: MinioClient } = require('minio');
+    minioClientInstance = new MinioClient({
       endPoint: config.endPoint,
       port: config.port,
       useSSL: config.useSSL,
