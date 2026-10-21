@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.embedding-backfill-raw.v1",
+  "date": "2026-10-20",
+  "scope": "codebase_chunk_index.content_embedding_768 rows that were NULL",
+  "authorization": "operator said 'yes backfill them' for the 54,467 NULL rows (raw recipe)",
+  "recipe": {
+    "model": "embeddinggemma:latest",
+    "inputText": "chunk content as stored (no task prefix)",
+    "dim": 768,
+    "normalized": true,
+    "writer": "sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs was fail-closed; one-off script run from scratchpad (backfill-semantic-768-raw.mjs)",
+    "stampedEmbeddingModel": "embeddinggemma:latest",
+    "stampedEmbeddingVersion": "semantic_768:embeddinggemma:latest",
+    "recipeMarkerNote": "rows written by this run share the model tag with the 219k earlier raw rows; the source of these rows is recorded only by embedding_created_at >= 2026-10-20 22:10 UTC"
+  },
+  "counts": {
+    "totalChunks": 274465,
+    "nullBefore": 54467,
+    "eligibleBefore": 54430,
+    "blankContentStillNull": 37,
+    "writtenByFinalRestart": 44686,
+    "writtenByEarlierRestartsNote": "the rest of the 54,430 eligible rows were written by earlier restarts of the same script; the exact per-run split was not logged",
+    "failedRows": 0,
+    "embeddedAfter": 274428,
+    "badDims": 0
+  },
+  "readback": {
+    "sampleRows": 200,
+    "minCosineStoredVsFreshEmbed": 0.9999990243376667
+  },
+  "parityProbeBeforeSwitch": {
+    "endpoint": "llama-server :8081 (embeddinggemma-300m-f16.gguf)",
+    "sampled": 200,
+    "minCosine": 0.9995311672504998,
+    "medianCosine": 0.9999797278954773,
+    "note": "probe only; this run used Ollama embeddinggemma:latest, not :8081"
+  },
+  "artifacts": {
+    "preImage": "scratchpad/preimage-missing-content-embedding-768.json",
+    "runReport": "scratchpad/backfill-report.json",
+    "parityProbe": "scratchpad/parity-8081-vs-stored.json"
+  },
+  "notDone": [
+    "no Qdrant write",
+    "no TurboVec re-index",
+    "no manifold4 write",
+    "single-chain verifier reports QDRANT_POINT_MISSING, so chainIntact=false",
+    "embedding_model tag does not distinguish raw from prefixed recipes for the new rows"
+  ],
+  "canonicalAuthority": false
+}

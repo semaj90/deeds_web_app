@@ -1,5 +1,5 @@
 # Atlas Packet Materialization — Ready for Deployment
-**Status:** 2026-06-10 17:00 UTC  
+**Status:** 2026-06-10 17:00 UTC
 **Operator:** Ready to hand off
 
 ## What's Ready
@@ -17,7 +17,7 @@
 ⏳ **.env Credentials** — Not created (contains ATLAS_DB_PASSWORD)
 ⏳ **Docker Network Connectivity** — Not tested from Windows host
 ⏳ **Full Materializer Run** — Blocked until .env setup complete
-⏳ **Summarizer Enrichment** — Blocked on materializer + Gemma4 availability
+⏳ **Summarizer Enrichment** — Blocked on materializer + ornith 1.5 llama-server 8090 availability
 
 ## Next Operator Steps (45 min)
 

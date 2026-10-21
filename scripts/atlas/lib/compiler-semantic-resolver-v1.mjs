@@ -42,10 +42,9 @@ const SERVER_CONFIG = {
   svelte: {
     id: 'svelte-language-server',
     version: '0.18.3',
-    commandRelative: 'node_modules/.bin/svelteserver.cmd',
-    // Preserved from the pre-extraction proof script: always cmd.exe-wrapped, not platform-gated.
-    // Not silently "fixed" here — flagged as a known latent cross-platform gap, unchanged.
-    useShellWrapper: true,
+    commandRelative: 'node_modules/svelte-language-server/bin/server.js',
+    useNodeExecutable: true,
+    useShellWrapper: false,
     args: ['--stdio'],
     languageId: 'svelte',
   },
@@ -67,7 +66,7 @@ const SERVER_CONFIG = {
  * '<dir-with-a-real-node_modules>'` (e.g. `sveltekit-frontend/`) while still rooting the actual
  * LSP session (`rootUri`) at `workspaceRoot`.
  */
-export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot = workspaceRoot, clientName = 'parent-atlas-compiler-semantic-resolver', clientVersion = '1' }) {
+export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot = workspaceRoot, clientName = 'parent-atlas-compiler-semantic-resolver', clientVersion = '1', initializationOptions = null }) {
   const servers = new Map();
   const workspaceUri = pathToFileURL(workspaceRoot).href;
 
@@ -86,7 +85,12 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
     if (!existsSync(command)) {
       throw new Error(`COMPILER_SEMANTIC_RESOLVER_BINARY_NOT_FOUND:${command} (serverBinaryRoot=${serverBinaryRoot}) — the LSP binary must actually exist at this path; a missing binary spawned via the Windows shell wrapper silently hangs to an initialize timeout instead of failing fast, which is exactly the failure mode this check exists to prevent.`);
     }
-    const lsp = spawnLspServer({ command, args: config.args, cwd: workspaceRoot, useShellWrapper: config.useShellWrapper });
+    const lsp = spawnLspServer({
+      command: config.useNodeExecutable ? process.execPath : command,
+      args: config.useNodeExecutable ? [command, ...config.args] : config.args,
+      cwd: workspaceRoot,
+      useShellWrapper: config.useShellWrapper,
+    });
     const initializeResult = await lsp.initialize({
       processId: process.pid,
       rootUri: workspaceUri,
@@ -95,6 +99,7 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
       // the encoding this resolver actually implements; do not negotiate an
       // encoding that would make byteOffsetToPosition() semantically wrong.
       capabilities: { general: { positionEncodings: ['utf-16'] } },
+      ...(initializationOptions ? { initializationOptions } : {}),
       clientInfo: { name: clientName, version: clientVersion },
     }, 60000);
     const entry = { lsp, config, initializeResult, openedUris: new Set(), languagesServed: new Set() };
@@ -230,6 +235,57 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
     };
   }
 
+  async function documentSymbols({
+    requestId = null,
+    workspaceRevision = null,
+    sourceRef,
+    sourceRevision,
+    sourceAbsolutePath,
+    sourceText,
+    sourceBuffer,
+    language,
+    timeoutMs = 20000,
+  }) {
+    const base = {
+      schema: 'atlas.compiler-semantic-document-symbols.v1',
+      requestId,
+      workspaceRevision,
+      sourceRef,
+      sourceRevision,
+      language,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    };
+    const resolvedSourceText = sourceText ?? (sourceBuffer ? sourceBuffer.toString('utf8') : null);
+    if (!resolvedSourceText || (sourceBuffer && !Buffer.from(resolvedSourceText, 'utf8').equals(sourceBuffer))) {
+      return { ...base, resolver: null, result: { status: 'STALE_SOURCE', symbols: [], error: 'COMPILER_SEMANTIC_RESOLVER_SOURCE_TEXT_BUFFER_MISMATCH' } };
+    }
+    let entry;
+    try {
+      entry = await getServer(language);
+    } catch (error) {
+      return { ...base, resolver: null, result: { status: 'SERVER_ERROR', symbols: [], error: error instanceof Error ? error.message : String(error) } };
+    }
+    const resolverMeta = {
+      server: entry.config.id,
+      serverRevision: entry.config.version,
+      resolverRevision: RESOLVER_REVISION,
+      negotiatedPositionEncoding: entry.initializeResult?.result?.capabilities?.positionEncoding ?? 'utf-16-default',
+    };
+    entry.languagesServed.add(language);
+    const uri = ensureOpen(entry, { sourceAbsolutePath, sourceText: resolvedSourceText, languageId: SERVER_CONFIG[language].languageId });
+    try {
+      const response = await entry.lsp.request('textDocument/documentSymbol', { textDocument: { uri } }, timeoutMs);
+      if (response.error) return { ...base, resolver: resolverMeta, result: { status: 'SERVER_ERROR', symbols: [], error: JSON.stringify(response.error) } };
+      return { ...base, resolver: resolverMeta, result: { status: 'OBSERVED', symbols: Array.isArray(response.result) ? response.result : [], error: null, serverRequests: entry.lsp.getObservedServerRequests?.() ?? [], serverNotifications: entry.lsp.getObservedNotifications?.() ?? [] } };
+    } catch (error) {
+      const isTimeout = error instanceof Error && error.message.startsWith('LSP_TIMEOUT');
+      const stderr = entry.lsp.getStderr?.();
+      const diagnostic = typeof stderr === 'string' ? stderr.slice(-1600).trim() : '';
+      return { ...base, resolver: resolverMeta, result: { status: isTimeout ? 'TIMEOUT' : 'SERVER_ERROR', symbols: [], error: error instanceof Error ? error.message : String(error), serverRequests: entry.lsp.getObservedServerRequests?.() ?? [], serverNotifications: entry.lsp.getObservedNotifications?.() ?? [], ...(diagnostic ? { serverDiagnostic: diagnostic } : {}) } };
+    }
+  }
+
   async function dispose() {
     for (const entry of servers.values()) await entry.lsp.dispose();
     servers.clear();
@@ -237,7 +293,11 @@ export function createCompilerSemanticResolver({ workspaceRoot, serverBinaryRoot
 
   return {
     resolveDefinition,
+    documentSymbols,
     dispose,
+    getServerProcessDiagnostics: () => [...servers.values()].map(entry => ({
+      processId: entry.lsp.processHandle.pid, stderr: entry.lsp.getStderr(),
+    })),
     // Distinct languages actually served across every spawned server process — NOT the same as
     // "one entry per language" any more, since typescript/javascript now share one process. Kept
     // as a diagnostic helper (zero callers currently) rather than removed outright.

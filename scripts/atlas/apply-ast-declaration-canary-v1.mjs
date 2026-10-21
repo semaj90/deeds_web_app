@@ -2,11 +2,14 @@
 /**
  * Guarded canary writer for atlas_ast_nodes code-declaration rows (AST-ID-06 / 14.3a).
  *
- * Default = REHEARSAL: performs the real inserts and the full readback inside a transaction, then ROLLS BACK.
+ * Default = REHEARSAL: performs inserts and transaction-local readback, then ROLLS BACK. Persist mode additionally
+ * requires independent post-commit readback through repository identity and the exact workspace/source binding.
  * Persistence requires BOTH `--apply` and `--operator-approved`, and a bounded `--limit` (default 50, max 200).
  * Input is the proof's hand-off `.tmp/atlas/ast-canary-eligible-v1.jsonl` (already lineage-stamped from the admitted
  * snapshot, ambiguity-excluded, net-new only). Reuses the existing `writeAtlasAstNodes` owner (no second writer).
- * Column alignment: workspace_id/source_revision from the admitted snapshot binding; source_content_hash = whole-file
+ * Column alignment: workspace_id/source_revision from the admitted snapshot binding; the exact workspace revision is
+ * independently proved through atlas_workspace_source_bindings because atlas_ast_nodes has no workspace_revision column.
+ * source_content_hash = whole-file
  * raw digest; parser_version = ast-grep-napi version; grammar_version NULL (not established); created_at/updated_at
  * left to DB defaults (now()); no file_path column exists (relative_path is the path).
  * Never deletes. Rollback of a persisted canary is via `superseded_by`, not DELETE.
@@ -18,9 +21,11 @@ import crypto from 'node:crypto';
 import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { writeAtlasAstNodes } from './lib/atlas-ast-nodes-writer.mjs';
+import { verifyAtlasAstNodesIndependentReadbackV1 } from './lib/atlas-ast-nodes-independent-readback-v1.mjs';
 import { decodeSourceTextEnvelope } from './lib/source-text-envelope.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const SOURCE_AUTHORITY_REPO_ID = 'deeds-web-app';
 const { values: args } = parseArgs({ options: { apply: { type: 'boolean', default: false }, 'operator-approved': { type: 'boolean', default: false }, 'know09-reviewed': { type: 'boolean', default: false }, eligible: { type: 'string', default: '' }, limit: { type: 'string', default: '50' }, cohort: { type: 'string', default: '' }, 'ast-generation': { type: 'string', default: '' }, 'rehearse-migration': { type: 'boolean', default: false } }, strict: false });
 // Persistence needs ALL of: --apply, --operator-approved, --know09-reviewed (current-source-authority gate acknowledged by a human).
 const PERSIST = Boolean(args.apply && args['operator-approved'] && args['know09-reviewed']);
@@ -122,6 +127,11 @@ try {
 
   const expected = new Map();
   for (const [, rows] of picked) for (const r of rows) expected.set(r.tree_node_id, r);
+  const workspaceRevisions = new Set([...expected.values()].map((row) => row.workspace_revision));
+  const workspaceIds = new Set([...expected.values()].map((row) => row.workspace_id));
+  if (workspaceRevisions.size !== 1 || !/^sha256:[0-9a-f]{64}$/.test([...workspaceRevisions][0] ?? '') || workspaceIds.size !== 1) {
+    throw new Error('CANARY_REQUIRES_ONE_QUALIFIED_WORKSPACE_SNAPSHOT');
+  }
   const pre = await client.query('SELECT tree_node_id FROM atlas_ast_nodes WHERE tree_node_id = ANY($1::text[])', [[...expected.keys()]]);
   if (pre.rowCount) throw new Error(`PRE_EXISTING_TREE_NODE_IDS:${pre.rowCount}`);
   receipt.steps.before = { existingRows: (await client.query('SELECT count(*)::int AS n FROM atlas_ast_nodes')).rows[0].n };
@@ -192,7 +202,45 @@ try {
   await client.query('SET CONSTRAINTS ALL IMMEDIATE');
   receipt.steps.constraintCheck = 'PASS (SET CONSTRAINTS ALL IMMEDIATE)';
 
-  if (PERSIST) { await client.query('COMMIT'); committed = true; } else { await client.query('ROLLBACK'); }
+  if (PERSIST) {
+    await client.query('COMMIT');
+    committed = true;
+    const independentPool = new pg.Pool({ connectionString: DATABASE_URL, max: 1, connectionTimeoutMillis: 5000 });
+    let independentClient;
+    try {
+      independentClient = await independentPool.connect();
+      await independentClient.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      const independentReadback = await verifyAtlasAstNodesIndependentReadbackV1(independentClient, {
+        expectedRows: [...expected.entries()].map(([treeNodeId, row]) => ({
+          treeNodeId,
+          relativePath: row.np,
+          sourceRef: row.canonical_path,
+          nodeKind: row.kind,
+          qualifiedSymbol: row.qualified_symbol,
+          startByte: Number(row.start_byte),
+          endByte: Number(row.end_byte),
+          lineStart: Number(row.line_start),
+          lineEnd: Number(row.line_end),
+          workspaceId: row.workspace_id,
+          sourceRevision: row.source_revision,
+          sourceContentDigest: row.source_content_digest,
+          parserName: row.parser_name,
+          parserVersion: row.parser_version,
+        })),
+        workspaceId: [...new Set([...expected.values()].map((row) => row.workspace_id))][0],
+        workspaceRevision: [...new Set([...expected.values()].map((row) => row.workspace_revision))][0],
+        sourceAuthorityRepoId: SOURCE_AUTHORITY_REPO_ID,
+      });
+      await independentClient.query('ROLLBACK');
+      receipt.steps.independentReadback = independentReadback;
+      if (independentReadback.status !== 'INDEXED_READBACK_PROVEN') throw new Error('INDEPENDENT_COMMITTED_READBACK_FAILED');
+    } finally {
+      independentClient?.release();
+      await independentPool.end();
+    }
+  } else {
+    await client.query('ROLLBACK');
+  }
   const final = (await client.query('SELECT count(*)::int AS n FROM atlas_ast_nodes')).rows[0].n; // same client: pool max=1, pool.query here would deadlock
   receipt.steps.after = { rowsInTable: final, persisted: committed, expectedRowsInTable: receipt.steps.before.existingRows + (committed ? expected.size : 0), generationColumnAfter: await generationColumnExists() };
   // A rehearsal must leave the schema exactly as it found it (the in-transaction migration included).
@@ -200,9 +248,9 @@ try {
   if (final !== receipt.steps.after.expectedRowsInTable) throw new Error('POST_TXN_ROW_COUNT_MISMATCH');
   finish(committed ? 'APPLY_PROVEN_CANARY' : 'REHEARSAL_PROVEN');
 } catch (err) {
-  try { await client.query('ROLLBACK'); } catch { /* already closed */ }
+  if (!committed) { try { await client.query('ROLLBACK'); } catch { /* already closed */ } }
   receipt.errors.push(String(err?.message ?? err));
-  finish('FAILED_ROLLED_BACK');
+  finish(committed ? 'APPLY_COMMITTED_VERIFICATION_FAILED' : 'FAILED_ROLLED_BACK');
 } finally {
   client.release();
   await pool.end();

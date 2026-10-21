@@ -1,0 +1,60 @@
+{
+ "schema": "atlas.ae-checkpoint-eval.v1",
+ "arch": "legacy-v3",
+ "canonicalArch": false,
+ "device": "cpu",
+ "readOnly": true,
+ "canonicalAuthority": false,
+ "diagnosticOnly": true,
+ "queryCohort": "seeded random 100, self excluded; includes rows a model may have trained on (optimistic)",
+ "promotionEligible": false,
+ "promotionBlockedBy": "frozen matrix has no per-row source/workspace/representation revisions",
+ "checkpoint": {
+  "path": "models\\nested-semantic-autoencoder\\nested_semantic_autoencoder_v3_full01.pt",
+  "sha256": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5"
+ },
+ "matrix": {
+  "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\semantic768\\frozen_semantic_768_v4_matrix.f32bin",
+  "sha256": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+  "sha256Matches": true,
+  "rows": 55169
+ },
+ "reconstructionCosineMean": {
+  "256": 0.9587,
+  "128": 0.9287,
+  "64": 0.8975
+ },
+ "queries": 100,
+ "spaces": {
+  "AE_latent_256": {
+   "recall10_set_overlap": 0.894,
+   "recall10_tie_aware": 0.894,
+   "mrr_of_exact_top1": 0.9492
+  },
+  "AE_latent_128": {
+   "recall10_set_overlap": 0.826,
+   "recall10_tie_aware": 0.826,
+   "mrr_of_exact_top1": 0.9114
+  },
+  "AE_latent_64": {
+   "recall10_set_overlap": 0.737,
+   "recall10_tie_aware": 0.737,
+   "mrr_of_exact_top1": 0.8521
+  },
+  "MRL_prefix_256": {
+   "recall10_set_overlap": 0.838,
+   "recall10_tie_aware": 0.838,
+   "mrr_of_exact_top1": 0.9633
+  },
+  "MRL_prefix_128": {
+   "recall10_set_overlap": 0.777,
+   "recall10_tie_aware": 0.777,
+   "mrr_of_exact_top1": 0.8933
+  },
+  "MRL_prefix_64": {
+   "recall10_set_overlap": 0.636,
+   "recall10_tie_aware": 0.636,
+   "mrr_of_exact_top1": 0.8114
+  }
+ }
+}

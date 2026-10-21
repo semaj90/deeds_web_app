@@ -58,7 +58,7 @@ class LspFramedReader {
  * @param {{ command: string, args: string[], languageId: string, content: string, fileUri: string, timeoutMs?: number }} input
  */
 export async function requestDocumentSymbolsOnce(input) {
-  const { command, args, languageId, content, fileUri, timeoutMs = 10000 } = input;
+  const { command, args, languageId, content, fileUri, cwd, timeoutMs = 10000 } = input;
 
   return new Promise((resolve, reject) => {
     // Spawn the real Node entry point directly (not the .cmd/.ps1 shim). Shelling through a
@@ -67,7 +67,7 @@ export async function requestDocumentSymbolsOnce(input) {
     // child.kill() on timeout -- an orphaned tsserver process kept running detached after a
     // hung request during testing. Spawning the resolved .mjs/.js entry with `node` directly
     // avoids the wrapper layer entirely, so kill() always terminates the real process.
-    const child = spawn(command, args, { stdio: ['pipe', 'pipe', 'pipe'] });
+    const child = spawn(command, args, { cwd, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
     const reader = new LspFramedReader();
     let nextId = 1;
     let settled = false;

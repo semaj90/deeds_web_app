@@ -1,6 +1,6 @@
 -- DRAFT ONLY -- DO NOT APPLY.  AST-NODES-V2-01 (openspec: parent-atlas-ontology-kernel).
 -- Not validated against a live server. Needs migration-owner review, then a rollback-only canary:
---   BEGIN; <this file>; <scripts/atlas/sql/prove-atlas-ast-nodes-v2-canary-v1.sql>; ROLLBACK;
+--   BEGIN; <this file>; <scripts/atlas/sql/prove-atlas-ast-nodes-v2-contract-canary-v2.sql>; ROLLBACK;
 --
 -- Why a NEW table instead of altering atlas_ast_nodes (523,271 rows, PK tree_node_id, kept as the legacy owner):
 --   * v1 allows NULL spans/revisions (route+file nodes: 238 files / 260 route nodes have none), and its
@@ -13,11 +13,13 @@
 
 CREATE TABLE IF NOT EXISTS public.atlas_ast_nodes_v2 (
   tree_node_id text PRIMARY KEY
-    CHECK (tree_node_id ~ '^([0-9a-f]{64}|tn_v1_[0-9a-f]{32})$'),
+    CHECK (tree_node_id ~ '^[0-9a-f]{64}$'),
   v1_tree_node_id text,                       -- provenance only; v1 identity is never reused as v2 identity
   repo_id uuid NOT NULL,
   workspace_id text NOT NULL,
-  workspace_revision text CHECK (workspace_revision IS NULL OR workspace_revision ~ '^sha256:[0-9a-f]{64}$'),
+  workspace_revision text NOT NULL CHECK (workspace_revision ~ '^sha256:[0-9a-f]{64}$'),
+  identity_revision text NOT NULL DEFAULT 'atlas.ast-node.v2.identity.v2'
+    CHECK (identity_revision = 'atlas.ast-node.v2.identity.v2'),
   -- explicit path namespace; no fuzzy path matching. relative_path is relative to the namespace root.
   path_namespace text NOT NULL CHECK (path_namespace IN ('REPO_ROOT', 'FRONTEND_ROOT')),
   relative_path text NOT NULL CHECK (relative_path <> '' AND relative_path !~ '^/' AND relative_path !~ '\.\.'),
@@ -32,9 +34,9 @@ CREATE TABLE IF NOT EXISTS public.atlas_ast_nodes_v2 (
     'route', 'schema', 'auth_guard', 'test', 'call_site', 'import', 'export', 'heading', 'field'
   )),
   qualified_symbol text NOT NULL DEFAULT '',
-  structural_key text NOT NULL,
-  normalized_node_hash text NOT NULL,         -- node-grain hash; NOT a source revision (see audit-ast-hash-grain-classification)
-  normalized_signature text NOT NULL DEFAULT '',
+  occurrence integer NOT NULL CHECK (occurrence >= 0),
+  source_span_sha256 text NOT NULL CHECK (source_span_sha256 ~ '^sha256:[0-9a-f]{64}$'),
+  extraction_contract_revision text NOT NULL CHECK (extraction_contract_revision ~ '^sha256:[0-9a-f]{64}$'),
   -- exact coordinates: UTF-8 bytes are authoritative; UTF-16 code units are for JS/Svelte consumers
   offset_encoding text NOT NULL DEFAULT 'utf-8' CHECK (offset_encoding = 'utf-8'),
   start_byte bigint NOT NULL CHECK (start_byte >= 0),
@@ -56,15 +58,24 @@ CREATE TABLE IF NOT EXISTS public.atlas_ast_nodes_v2 (
   CONSTRAINT atlas_ast_nodes_v2_span_in_source CHECK (end_byte <= source_byte_length),
   CONSTRAINT atlas_ast_nodes_v2_not_self_parent CHECK (parent_tree_node_id IS NULL OR parent_tree_node_id <> tree_node_id),
   CONSTRAINT atlas_ast_nodes_v2_supersede_pair CHECK ((superseded_by IS NULL) = (superseded_at IS NULL)),
-  CONSTRAINT atlas_ast_nodes_v2_parent_fkey FOREIGN KEY (parent_tree_node_id)
-    REFERENCES public.atlas_ast_nodes_v2 (tree_node_id) DEFERRABLE INITIALLY DEFERRED,
+  CONSTRAINT atlas_ast_nodes_v2_parent_identity_unique UNIQUE
+    (tree_node_id, repo_id, workspace_id, workspace_revision, path_namespace, relative_path, source_revision),
+  CONSTRAINT atlas_ast_nodes_v2_parent_fkey FOREIGN KEY
+    (parent_tree_node_id, repo_id, workspace_id, workspace_revision, path_namespace, relative_path, source_revision)
+    REFERENCES public.atlas_ast_nodes_v2
+    (tree_node_id, repo_id, workspace_id, workspace_revision, path_namespace, relative_path, source_revision)
+    DEFERRABLE INITIALLY DEFERRED,
   CONSTRAINT atlas_ast_nodes_v2_superseded_by_fkey FOREIGN KEY (superseded_by)
     REFERENCES public.atlas_ast_nodes_v2 (tree_node_id) DEFERRABLE INITIALLY DEFERRED
 );
 
--- Revision-scoped natural key: the same symbol at the same span can exist once per source revision.
+-- Replay key includes all producer and workspace revisions; NULL parents compare as equal in PostgreSQL 15+.
 CREATE UNIQUE INDEX IF NOT EXISTS atlas_ast_nodes_v2_natural_uidx
-  ON public.atlas_ast_nodes_v2 (repo_id, path_namespace, relative_path, source_revision, node_kind, qualified_symbol, start_byte, end_byte);
+  ON public.atlas_ast_nodes_v2
+  (repo_id, workspace_id, workspace_revision, path_namespace, relative_path, source_revision,
+   identity_revision, parser_name, parser_version, parser_language, grammar_version, extraction_contract_revision,
+   node_kind, qualified_symbol, occurrence, start_byte, end_byte, parent_tree_node_id)
+  NULLS NOT DISTINCT;
 CREATE INDEX IF NOT EXISTS atlas_ast_nodes_v2_file_rev_idx
   ON public.atlas_ast_nodes_v2 (repo_id, path_namespace, relative_path, source_revision);
 CREATE INDEX IF NOT EXISTS atlas_ast_nodes_v2_canonical_path_idx ON public.atlas_ast_nodes_v2 (canonical_repo_path);

@@ -1828,11 +1828,32 @@ def _code_chunks_regex(text: str, language: str) -> list[Chunk]:
     return chunks
 
 
+# ast-grep has its own grammar registry. Only these languages are admitted to it; anything else
+# (for example "svelte", which the chunker accepts) is skipped before SgRoot is called, because a
+# Rust-side panic in ast-grep-py is a BaseException and is not caught by `except Exception`.
+_AST_GREP_GRAMMARS: dict[str, str] = {
+    "typescript": "typescript",
+    "ts": "typescript",
+    "javascript": "javascript",
+    "js": "javascript",
+    "tsx": "tsx",
+    "python": "python",
+    "py": "python",
+}
+
+
+def _ast_grep_grammar_for(language: str) -> str | None:
+    return _AST_GREP_GRAMMARS.get((language or "").strip().lower())
+
+
 def _code_features_ast_grep(text: str, language: str) -> list[Feature]:
     if not AST_GREP_AVAILABLE:
         return []
+    grammar = _ast_grep_grammar_for(language)
+    if grammar is None:
+        return []
     try:
-        root = SgRoot(text, language).root()  # type: ignore[call-arg]
+        root = SgRoot(text, grammar).root()  # type: ignore[call-arg]
     except Exception:
         return []
 
