@@ -2,6 +2,55 @@
 
 Status vocabulary follows CLAUDE.md: CREATED, WIRED, PARTIAL, PROVEN, BLOCKED, DONE. A passing unit test does not prove integration. Each DONE item needs its exact command, a revision-qualified input, and an output receipt.
 
+## Handoff 2026-10-22
+
+Branch `chore/parent-atlas-session-2026-10-17`, commit `30c3cf5fa2`, pushed to origin. `main` was not touched.
+
+| Item | Status | Evidence |
+|---|---|---|
+| This change (proposal, tasks, spec delta) | CREATED | `openspec validate parent-atlas-ast-summary-lineage-pipeline --strict` passes |
+| Language-coverage inventory (separate change, `parent-atlas-nlp-sidecar-feature-compiler`) | PROVEN for the inventory only | Report `.tmp/atlas/language-coverage/20261021T212933-452177ac/inventory.json`, digest `cf7323c3…bf87d` recomputed, 5 Python tests pass with `PYTHONPATH=python` |
+| Durable execution journal tables (`0040`, live) | APPLIED | `execution_runs`, `execution_journal_steps`, `execution_side_effects`, `execution_dependencies` exist, 0 rows. `agent_memory_registry` ALTER block skipped (table absent) |
+| `feature_label_id` (UUIDv8 via `deriveUUID`) | DRAFT, NOT APPLIED | Added to the superseded `20261020_atlas_feature_labels_v1.sql`. CHECK verified read-only |
+| `20261021_feature_identity_v2.sql` (designated owner of labels) | DRAFT, NOT APPLIED | Contract test passes 17/17. `atlas_feature_labels` keyed by `canonical_feature_id`, no FK to `atlas_features` |
+| `svelte-check` baseline | CLEAN, recorded separately from pipeline evidence | 16,215 files, 0 errors, 0 warnings (machine output) |
+| Pipeline stages ASTSUM-01…09 | OPEN / BLOCKED (see gates below) | None proven end to end |
+
+**Known conflicts to resolve first**
+- Two drafts create `atlas_feature_labels` with different columns and keys. `CREATE TABLE IF NOT EXISTS` would silently keep whichever runs first. Mark `20261020_atlas_feature_labels_v1.sql` superseded (do not delete) and make v2 the only owner, or record the reason it is not.
+- `atlas_features` has 0 rows and needs provenance fields (`tree_node_id`, `content_hash`, `schema_id`, `extractor_version`) that `atlas_feature_map` does not carry. Do not populate it from `atlas_feature_map`.
+- `atlas_feature_map` is not unique on `feature_id` (4,748 rows, 3,151 distinct), so it cannot be a foreign-key target.
+
+## Gates (from the 2026-10-22 review)
+
+Order: frozen source → deterministic extraction → canonical evidence payload → LangExtract + Ornith proposals → EmbeddingGemma vectors → PostgreSQL/pgvector projection. No stage mints canonical AST or packet identity.
+
+| Gate | Deliverable | Status |
+|---|---|---|
+| ASTSUM-01 | Existing owner/caller inventory | OPEN |
+| ASTSUM-02 | Frozen source → `:8095` chunk receipt | OPEN |
+| ASTSUM-03 | ast-grep symbols + source-bound LSP observations | OPEN |
+| ASTSUM-04 | Canonical source/chunk/symbol/feature-label joins | BLOCKED (lineage) |
+| ASTSUM-05 | Python tuple/ordinal reference with deterministic ordering | OPEN |
+| ASTSUM-06 | LangExtract grounded-span adapter | OPEN |
+| ASTSUM-07 | Ornith `:8090` evidence-grounded summary | OPEN |
+| PGVECTOR-01 | Extension, vector-column, index and metric census | OPEN |
+| PGVECTOR-02 | Exact-search oracle and embedding-recipe parity | OPEN |
+| PGVECTOR-03 | HNSW/IVFFlat benchmark against exact Top-K | NOT AUTHORIZED for production |
+| ASTSUM-08 | Independent summary/vector readback | BLOCKED |
+| ASTSUM-09 | Governed backfill/admission | BLOCKED |
+
+**Milestone:** one real source file passes every boundary above with matching canonical `sourceRef` and `sourceRevision` at each step. Scaling summary coverage and ANN evaluation come after that.
+
+## Ownership rules (carry into every stage)
+
+- PostgreSQL + pgvector: canonical source-qualified vector record and exact-search reference.
+- Qdrant: derived semantic ANN. cuVS: GPU exact/CAGRA executor once admitted. Neo4j/cuGraph: graph projection. Redis/Valkey: cache only.
+- Qdrant and cuVS are separate executors, never independent identity or retrieval-vote owners.
+- LangExtract produces grounded evidence proposals. Ornith produces derived summaries. EmbeddingGemma produces vectors. None mints identity.
+- Summaries and source chunks are different representations. Summary embeddings need their own representation identity and must never overwrite canonical chunk embeddings.
+- Data structures: dictionaries for identity lookup, ordered tuples/arrays for frozen ordinal maps, CSR/COO for sparse graph analytics. Do not put linked lists in the hot retrieval path.
+
 ## 0. Owner audit (before any build)
 
 - [ ] 0.1 Confirm the `:8095` `/ast/chunk` route is the only chunker owner: `rg -n "ast/chunk" python sveltekit-frontend/src scripts`.
@@ -59,3 +108,78 @@ Status vocabulary follows CLAUDE.md: CREATED, WIRED, PARTIAL, PROVEN, BLOCKED, D
 - [ ] 9.1 Any Postgres write, including the summary backfill and the `summary_model` column (the column is missing on rows that already have summaries).
 - [ ] 9.2 Any index DDL on `codebase_chunk_index` (write-amplified table).
 - [ ] 9.3 Starting or stopping llama-server `:8090`. Lifecycle stays with the operator.
+- [ ] 9.4 Creating any HNSW or IVFFlat index, altering embedding dimensions, upserting Qdrant, or triggering Graphify daily.
+
+## 10. PGVECTOR-ALIGN-01 (pgvector alignment workstream)
+
+Keep this inside this change. Do not add another embedding or chunk-identity owner. pgvector is either the active exact-search owner or a derived comparison surface, and the census decides which.
+
+- [ ] 10.1 **PGVECTOR-01 census (read-only).** Run against `legal_ai_db` and record the output with the connection fingerprint (`inet_server_port()`, `data_directory`, `version()`):
+
+  ```sql
+  SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';
+
+  SELECT table_schema, table_name, column_name, data_type, udt_name
+  FROM information_schema.columns
+  WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+    AND (udt_name IN ('vector', 'halfvec', 'sparsevec') OR column_name ILIKE '%embedding%')
+  ORDER BY table_schema, table_name, column_name;
+
+  SELECT schemaname, tablename, indexname, indexdef
+  FROM pg_indexes
+  WHERE indexdef ILIKE '%hnsw%' OR indexdef ILIKE '%ivfflat%' OR indexdef ILIKE '%vector_%'
+  ORDER BY schemaname, tablename, indexname;
+  ```
+
+  Also record: the live retrieval query text and its distance operator, the metric each index's operator class uses, and the row count the query filters to. Operator and operator class must agree (`<=>` with `vector_cosine_ops`, `<#>` with `vector_ip_ops`, `<->` with `vector_l2_ops`).
+- [ ] 10.2 **Decide the executor.** Exact search needs no index. Record whether an ordinary B-tree-assisted exact search is faster than any ANN index on the real filter selectivity before proposing one.
+- [ ] 10.3 **PGVECTOR-02 parity.** Exact Top-K from pgvector must match a numpy/Python oracle on the same frozen embedding recipe. Record the recipe identity: model digest, tokenizer/preprocessing recipe, pooling, normalization, input content digest, and representation revision. Tie-aware comparison, not set overlap alone.
+- [ ] 10.4 **PGVECTOR-03 (not authorized for production).** Any HNSW/IVFFlat benchmark runs only against an exact Top-K oracle, in a scratch comparison, with recall reported tie-aware.
+- [ ] 10.5 Qdrant and cuVS stay separate executors. Each is checked for parity against PostgreSQL, and neither casts a retrieval vote on its own.
+
+## 11. Source-qualified summary contract
+
+- [ ] 11.1 Create or extend one typed proposal contract. Reuse the existing summary schema owner if one exists (check first).
+
+  ```ts
+  type SourceQualifiedSummaryV1 = {
+    sourceRef: string;
+    sourceRevision: string;
+    chunkId: string;
+    chunkStartByte: number;
+    chunkEndByte: number;
+    symbolVersionIds: readonly string[];
+    featureLabels: readonly string[];
+    evidenceRefs: readonly string[];
+    summaryText: string;
+    summaryModelId: string;
+    summaryModelRevision: string;
+    promptRevision: string;
+    evidenceDigest: string;
+    qualification: 'PROPOSED' | 'VALIDATED' | 'STALE';
+  };
+  ```
+
+- [ ] 11.2 A summary is stored only when its claims are supported by qualifying evidence and its lineage survives independent readback. Valid JSON from Ornith is not enough.
+
+## 12. LangExtract span conversion (ASTSUM-06)
+
+- [ ] 12.1 Prove the bridge: LangExtract character interval → original Unicode source → UTF-8 byte span → canonical `sourceRevision`. Compare the result against the exact original bytes, not against a re-decoded string.
+- [ ] 12.2 Reject ungrounded, ambiguous, or revision-mismatched evidence. Record each rejection; do not drop it silently.
+- [ ] 12.3 Keep LangExtract's character offsets separate from AST UTF-8 byte offsets. Never treat one as the other.
+
+## 13. Local-agent continuation (next session)
+
+Start with read-only work, in this order:
+1. Ownership census: 10.1, plus summary lineage fields and the existing summary generator.
+2. Trace the real call path through `:8095` `/ast/chunk`, `ast-grep-symbol-extraction.mjs`, the LSP adapter, the LangExtract route, and the summary generator. Do not build a duplicate chunker, symbol registry, or feature-label schema.
+3. Proof on one file: source → chunk → symbols → spans → summary proposal → EmbeddingGemma vector → pgvector exact Top-K, with matching identity at every boundary.
+4. Keep the proof bounded. Do not backfill summaries, create indexes, alter dimensions, upsert Qdrant, or change model runtimes.
+5. Run focused tests, `openspec validate … --strict`, and scoped diff checks. Report PASS / PARTIAL / BLOCKED, and keep the svelte-check baseline separate from pipeline evidence.
+
+## 14. Open decisions (need an answer before stage 4 or stage 9)
+
+- Which feature-label draft is the single owner? (Recommended: `20261021_feature_identity_v2.sql`. Mark the 2026-10-20 draft superseded.)
+- Does `atlas_features` get populated from a source that carries its provenance fields, or does the label table reference concepts only? (v2 chose concepts only.)
+- Summary coverage backfill (the 40,306 existing summaries stay on hold until provenance is proven).
+- Whether the `execution_reviews` table (14 columns, live, not defined in `0040`) is in scope.
