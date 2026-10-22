@@ -2,9 +2,32 @@
 
 Status vocabulary follows CLAUDE.md: CREATED, WIRED, PARTIAL, PROVEN, BLOCKED, DONE. A passing unit test does not prove integration. Each DONE item needs its exact command, a revision-qualified input, and an output receipt.
 
-## Handoff 2026-10-22
+## Resume here (handoff 2026-10-22, end of session)
 
-Branch `chore/parent-atlas-session-2026-10-17`, commit `30c3cf5fa2`, pushed to origin. `main` was not touched.
+**Git state**
+- PR #120 merged the branch into `origin/main` (`7c9f7026ca`). Commits `3376feb172`, `30c3cf5fa2`, `f5ba83ab7a` are in `origin/main`.
+- Branch `chore/parent-atlas-session-2026-10-17` has one commit not in `origin/main`: `4287d6e3ab` (feature-ID census, live MCP checkpoints, read-only script update). It is pushed to origin.
+- Local `main` is 48 commits behind `origin/main`. Run `git checkout main && git pull --ff-only` before any `main` work.
+- Uncommitted and deliberately excluded: `docs/reports/document-governance-registry-v2.json` (10.99 MB, over the 10 MB limit) and four submodule pointers (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec`).
+- A stale `.git/index.lock` was removed on 2026-10-22 after confirming the lock was stale; check `git status` before relying on it.
+
+**Decisions waiting on you**
+1. Open a PR from `chore/parent-atlas-session-2026-10-17` into `main` for `4287d6e3ab`? (Outward-facing; not done.)
+2. Delete the merged branch after PR #120 (remote and local). Not done.
+3. Feature labels: make `20261021_feature_identity_v2.sql` the only owner and mark `20261020_atlas_feature_labels_v1.sql` superseded (not deleted). Applying either draft to `legal_ai_db` still needs explicit authorization.
+4. `atlas_features` has 0 rows and needs provenance fields that `atlas_feature_map` lacks. Do not populate it from `atlas_feature_map`.
+5. Two committed `matrix.arrow.corrupted` files from offline replay: keep as evidence, or move to an archive folder with a manifest.
+6. The golden-breadth receipts that failed a naive JSON check parse as UTF-8 (the earlier failure was a Windows codec issue). Nothing to fix there.
+
+**First steps tomorrow (read-only unless noted)**
+1. `git fetch && git status -sb`; confirm the branch and remote state above.
+2. Run `openspec validate parent-atlas-ast-summary-lineage-pipeline --strict`.
+3. Pick the open decisions above; the PR and branch deletion are the first two.
+4. Next proof milestone (see §10–§12): one real source file through chunk → symbols → LangExtract spans → Ornith summary proposal → EmbeddingGemma vector → pgvector exact Top-K, with matching identity at every boundary.
+
+## Handoff 2026-10-22 (earlier detail)
+
+Branch `chore/parent-atlas-session-2026-10-17`, commit `30c3cf5fa2`, pushed to origin. `main` was not touched at that point.
 
 | Item | Status | Evidence |
 |---|---|---|
