@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REPO_ROOT } from './connection-config.mjs';
+import { assertCompleteAstScan } from './lib/source-observation-http-v1.mjs';
 
 const SIDECAR_URL = process.env.ATLAS_NLP_SIDECAR_URL ?? 'http://127.0.0.1:8095';
 const OUT_DIR = path.join(REPO_ROOT, '.tmp', 'atlas');
@@ -78,7 +79,10 @@ async function fetchAstFromSidecar(sourceRef, sourceText) {
   if (!response.ok) {
     throw new Error(`SIDECAR_HTTP_${response.status}: ${await response.text()}`);
   }
-  return response.json();
+  const body = await response.json();
+  // Fail closed: a partial or unreceipted scan must not be indexed as complete structure.
+  assertCompleteAstScan(body);
+  return body;
 }
 
 async function processWithConcurrency(items, concurrency, fn) {

@@ -25,6 +25,7 @@ import logging
 import re
 import tempfile
 import time
+from bisect import bisect_left, bisect_right
 from contextlib import asynccontextmanager
 from pathlib import Path
 from types import SimpleNamespace
@@ -86,6 +87,11 @@ class AstEvidenceResponseV2(BaseModel):
     error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
     syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
     helper_analysis: Optional[AstChunkHelperAnalysisV1] = Field(default=None, alias="helperAnalysis")
+    # Additive receipt (2026-10-21). PARTIAL_AST_FAILED = the AST extractor raised or was unavailable,
+    # so chunks/edges are not a complete structural scan of this source. Source syntax errors are NOT
+    # partial (see syntax_status). This route runs no NLP, so no NLP skip is reported here.
+    scan_completeness: Literal["COMPLETE", "PARTIAL_AST_FAILED"] = "COMPLETE"
+    scan_failure: Optional[str] = None
 
 
 def validate_ast_evidence_byte_spans(chunks: list[AstEvidenceChunkV2], source_bytes: bytes) -> list[dict[str, Any]]:
@@ -793,24 +799,26 @@ def _declarator_kind_override(node_type: str, span_text: str) -> str | None:
 
 def _syntax_signature_and_ancestry(
     source_bytes: bytes,
-    root: Any,
+    node_index: dict[str, tuple[list[int], list[Any]]],
     node_type: str,
     start_byte: int,
     end_byte: int,
     name: str | None,
 ) -> tuple[str | None, list[dict[str, Any]]]:
-    stack = [root]
+    indexed = node_index.get(node_type)
+    if indexed is None:
+        return None, []
+    starts, candidates = indexed
     matches = []
-    while stack:
-        node = stack.pop()
-        if (str(getattr(node, "type", "")) == node_type
-            and int(getattr(node, "start_byte", -1)) >= start_byte
-            and int(getattr(node, "end_byte", -1)) <= end_byte):
+    candidate_index = bisect_left(starts, start_byte)
+    while candidate_index < len(candidates) and starts[candidate_index] <= end_byte:
+        node = candidates[candidate_index]
+        if int(getattr(node, "end_byte", -1)) <= end_byte:
             name_node = node.child_by_field_name("name") if hasattr(node, "child_by_field_name") else None
             observed_name = source_bytes[name_node.start_byte:name_node.end_byte].decode("utf-8") if name_node else None
             if name is None or observed_name == name:
                 matches.append(node)
-        stack.extend(reversed(list(getattr(node, "children", []))))
+        candidate_index += 1
     if len(matches) != 1:
         return None, []
 
@@ -838,6 +846,27 @@ def _syntax_signature_and_ancestry(
         ancestor = ancestor.parent
     ancestors.reverse()
     return signature_text, ancestors
+
+
+def _index_syntax_nodes(root: Any) -> dict[str, tuple[list[int], list[Any]]]:
+    nodes_by_type: dict[str, list[Any]] = {}
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        nodes_by_type.setdefault(str(getattr(node, "type", "")), []).append(node)
+        stack.extend(reversed(list(getattr(node, "children", []))))
+    indexed: dict[str, tuple[list[int], list[Any]]] = {}
+    for node_type, nodes in nodes_by_type.items():
+        nodes.sort(key=lambda node: (int(getattr(node, "start_byte", -1)), int(getattr(node, "end_byte", -1))))
+        indexed[node_type] = ([int(node.start_byte) for node in nodes], nodes)
+    return indexed
+
+
+def _byte_offset_line_column(source_bytes: bytes, line_starts: list[int], offset: int) -> tuple[int, int]:
+    bounded = max(0, min(int(offset), len(source_bytes)))
+    line_index = bisect_right(line_starts, bounded) - 1
+    column = len(source_bytes[line_starts[line_index]:bounded].decode("utf-8", errors="ignore"))
+    return line_index + 1, column
 
 
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
@@ -1047,6 +1076,9 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             diagnostics=[language_error],
             error_tag="UnsupportedLanguageError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            # Fail closed: an unsupported language is an incomplete scan, never a complete empty one.
+            scan_completeness="PARTIAL_AST_FAILED",
+            scan_failure=language_error,
         )
 
     if not legacy.TREESITTER_CHUNKER_AVAILABLE:
@@ -1061,13 +1093,17 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             diagnostics=["treesitter-chunker is unavailable; no replacement evidence was produced"],
             error_tag="ChunkingError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            scan_completeness="PARTIAL_AST_FAILED",
+            scan_failure="treesitter-chunker unavailable",
         )
 
     identity_path_preserved = False
+    scan_failure: Optional[str] = None
     try:
         raw_chunks, identity_path_preserved = _raw_chunk_file(req.source, language, req.file_path)
     except Exception as exc:
         raw_chunks = []
+        scan_failure = f"{type(exc).__name__}: {exc}"
         diagnostics.append(f"ChunkingError: treesitter-chunker extraction failed: {exc}")
 
     if raw_chunks and not identity_path_preserved:
@@ -1075,11 +1111,16 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             "CONSILIENCY_IDENTITY_PATH_UNPROVEN: chunker API rejected identity_path; upstream IDs may be tempfile-affine and are not promotable"
         )
 
+    source_bytes = req.source.encode("utf-8")
+    line_starts = [0]
+    line_starts.extend(index + 1 for index, byte in enumerate(source_bytes) if byte == 0x0A)
     diagnostics.extend(legacy._syntax_diagnostics(req.source, language))
     syntax_root = None
+    syntax_node_index: dict[str, tuple[list[int], list[Any]]] = {}
     if legacy.TREE_SITTER_AVAILABLE and legacy.get_parser is not None:
         try:
-            syntax_root = legacy.get_parser(language).parse(req.source.encode("utf-8")).root_node
+            syntax_root = legacy.get_parser(language).parse(source_bytes).root_node
+            syntax_node_index = _index_syntax_nodes(syntax_root)
         except Exception:
             diagnostics.append("Tree-sitter signature and ancestry extraction unavailable")
     evidence_chunks: list[AstEvidenceChunkV2] = []
@@ -1129,16 +1170,16 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
 
         start = max(0, int(start))
         end = max(start, int(end))
-        start_row, start_column = legacy._offset_line_column(req.source, start)
-        end_row, end_column = legacy._offset_line_column(req.source, end)
+        start_row, start_column = _byte_offset_line_column(source_bytes, line_starts, start)
+        end_row, end_column = _byte_offset_line_column(source_bytes, line_starts, end)
         node_type = str(normalized.get("node_type") or "fragment")
-        span_text = req.source.encode("utf-8")[start:end].decode("utf-8", errors="ignore")
+        span_text = source_bytes[start:end].decode("utf-8", errors="ignore")
         kind_node_type = _declarator_kind_override(node_type, span_text) or node_type
         signature_text, syntax_ancestry = (None, [])
         if syntax_root is not None:
             signature_text, syntax_ancestry = _syntax_signature_and_ancestry(
-                req.source.encode("utf-8"),
-                syntax_root,
+                source_bytes,
+                syntax_node_index,
                 node_type,
                 start,
                 end,
@@ -1288,6 +1329,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         diagnostics=diagnostics,
         error_tag="ChunkingError" if fatal_diagnostics else None,
         syntax_status="RECOVERED_WITH_ERRORS" if fatal_diagnostics else "CLEAN",
+        scan_completeness="PARTIAL_AST_FAILED" if scan_failure else "COMPLETE",
+        scan_failure=scan_failure,
     )
 
 

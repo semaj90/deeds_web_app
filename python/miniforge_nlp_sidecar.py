@@ -221,15 +221,18 @@ class AnalyzeRequest(BaseModel):
     packet_key: Optional[str] = None
     language: Optional[str] = None
     model_id: Optional[str] = None
-    max_chars: int = Field(default=50_000, ge=1, le=200_000)
+    max_chars: int = Field(default=50_000, ge=1, le=1_000_000)
     passes: list[Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]] = Field(default_factory=list)
     grounded_extraction_required: bool = False
 
     model_config = {"populate_by_name": True}
 
 
+MAX_AST_SOURCE_CHARS = 1_000_000
+
+
 class AstChunkRequest(BaseModel):
-    source: str = Field(..., min_length=1, max_length=200_000)
+    source: str = Field(..., min_length=1, max_length=MAX_AST_SOURCE_CHARS)
     language: str = Field(..., min_length=1, max_length=64)
     file_path: str = Field(..., alias="filePath", min_length=1, max_length=2_000)
     source_revision: str = Field(..., alias="sourceRevision", min_length=1, max_length=256)
@@ -1570,9 +1573,11 @@ def _provider_revision() -> str:
     """Stable per-call provenance for the analysis provider and parser stack."""
     explicit = os.getenv("NLP_SIDECAR_PROVIDER_REVISION", "parent-atlas-nlp-sidecar:analysis-v1").strip()
     parser = _package_version("ast-grep-py", "ast-grep") or "unavailable"
-    tree_sitter = _package_version("tree-sitter-language-pack", "tree-sitter") or "unavailable"
+    # Report the tree-sitter runtime itself, not the language-pack version (the pack is reported separately).
+    tree_sitter = _package_version("tree-sitter", "tree_sitter") or "unavailable"
+    pack = _package_version("tree-sitter-language-pack", "tree_sitter_language_pack") or "unavailable"
     chunker = _package_version("treesitter-chunker", "tree-sitter-chunker", "chunker") or "unavailable"
-    return f"{explicit}|ast-grep={parser}|tree-sitter={tree_sitter}|chunker={chunker}"
+    return f"{explicit}|ast-grep={parser}|tree-sitter={tree_sitter}|tree-sitter-language-pack={pack}|chunker={chunker}"
 
 
 def _line_span_to_offsets(text: str, start_line: int, end_line: int) -> tuple[int, int]:
@@ -1828,11 +1833,32 @@ def _code_chunks_regex(text: str, language: str) -> list[Chunk]:
     return chunks
 
 
+# ast-grep has its own grammar registry. Only these languages are admitted to it; anything else
+# (for example "svelte", which the chunker accepts) is skipped before SgRoot is called, because a
+# Rust-side panic in ast-grep-py is a BaseException and is not caught by `except Exception`.
+_AST_GREP_GRAMMARS: dict[str, str] = {
+    "typescript": "typescript",
+    "ts": "typescript",
+    "javascript": "javascript",
+    "js": "javascript",
+    "tsx": "tsx",
+    "python": "python",
+    "py": "python",
+}
+
+
+def _ast_grep_grammar_for(language: str) -> str | None:
+    return _AST_GREP_GRAMMARS.get((language or "").strip().lower())
+
+
 def _code_features_ast_grep(text: str, language: str) -> list[Feature]:
     if not AST_GREP_AVAILABLE:
         return []
+    grammar = _ast_grep_grammar_for(language)
+    if grammar is None:
+        return []
     try:
-        root = SgRoot(text, language).root()  # type: ignore[call-arg]
+        root = SgRoot(text, grammar).root()  # type: ignore[call-arg]
     except Exception:
         return []
 

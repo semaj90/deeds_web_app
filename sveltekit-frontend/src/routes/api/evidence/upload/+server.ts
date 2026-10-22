@@ -841,7 +841,7 @@ async function extractText(
       return { text: ocrResult.text, method: `ocr-${ocrResult.method}` };
     }
 
-    // VLM fallback: when OCR fails or returns too little text, use Gemma3-vision to describe the image
+    // VLM fallback: when OCR fails or returns too little text, use the Ornith 1.5 VLM on llama-server :8090 to describe the image
     console.log(
       `[Upload] OCR text too short (${ocrResult.text.trim().length} chars), trying VLM for ${fileName}`
     );

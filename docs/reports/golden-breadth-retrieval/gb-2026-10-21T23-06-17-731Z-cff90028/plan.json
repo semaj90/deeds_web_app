@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.golden-breadth-plan.v1",
+  "runId": "gb-2026-10-21T23-06-17-731Z-cff90028",
+  "mode": "LIVE",
+  "queryCount": 1,
+  "startIndex": 39,
+  "queriesSha256": "a001ebe2ab7cef986333f88f54569698193aa5005dd4de194fbc930b04dbc98b",
+  "queries": [
+    {
+      "id": "GB-040",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Sanitising a user query before prompt injection",
+      "category": "ace"
+    }
+  ]
+}

@@ -1088,6 +1088,12 @@ const handlers: Record<string, HandlerFn> = {
         return fail(`NLP sidecar /ast/chunk failed: HTTP ${response.status}${detail ? ` — ${detail.slice(0, 300)}` : ''}`, startTime);
       }
       const data = await response.json();
+      // Fail closed: a partial AST scan must never reach an agent as a complete result.
+      // A missing field (older sidecar) is treated as incomplete, not as COMPLETE.
+      if (data?.scan_completeness !== 'COMPLETE') {
+        const reason = data?.scan_failure ? ` — ${String(data.scan_failure).slice(0, 300)}` : '';
+        return fail(`NLP sidecar /ast/chunk scan incomplete: ${data?.scan_completeness ?? 'MISSING_RECEIPT'}${reason}`, startTime);
+      }
       return { success: true, kind: 'result', data, duration: Date.now() - startTime };
     } catch (error: any) {
       return fail(error.message ?? String(error), startTime);

@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.golden-breadth-manifest.v1",
+  "runId": "gb-2026-10-21T22-57-58-137Z-5a8bf078",
+  "mode": "LIVE",
+  "files": {
+    "plan.json": "0619b68560d77b347034176eb630f7eb2649b8adcc06a04fa4748fdbef029410",
+    "results.json": "16d91eabd9dbb4d12aa4790821745115b620a165af5b61336cb5cee9e7d589d6",
+    "retrieval-index.json": "f5d8532d64b10220a1b2c058b20e085414bcafd6901719f089d362b0a4d975d8",
+    "cache-plan.json": "9148f07ad976e8346420d0fd1e50486d4a5224fe7ee787affb5ce2a00d8738f6"
+  }
+}

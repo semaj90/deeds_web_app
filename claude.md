@@ -1829,6 +1829,12 @@ Verbatim original: `docs/archive/claude-md-status-and-governance-2026-10-03.md`.
 - The portfolio runner may use a bounded multi-process CPU stage pool only for independent readers of one frozen census. Its default concurrency is two and its hard cap is three; set `OPENSPEC_EVIDENCE_MAX_CONCURRENT_STAGES=1` for serial replay. Do not increase concurrency without checking peak RSS and repeat-run stability.
 - Keep parser → independent census readers → dependent receipt binding/reconciliation/cards/workboard/final authority ordering explicit. Pooled stages require unique run-scoped outputs and identical run/census identity; any failure blocks downstream stages and final authority.
 - Do not add Redis/Valkey caching or GPU acceleration to Markdown/JSON parsing by default. Cache only measured, rebuildable intermediates, keyed by workspace revision, exact input checksums, parser/schema revision, and output checksum. A cache hit is never evidence or proof.
+
+**General parallelism policy (2026-10-21; mirrored in `codex.md`):** measure the serial baseline first and keep serial as the replay oracle. Bounded pools only (default 2–4, hard cap, concurrency recorded in the receipt). Parallelise independent readers of one frozen input; keep dependent stages ordered and fail-closed. Pooled units write unique run-scoped outputs. Stdio MCP servers spawned by `npx` cap at one concurrent call (cold start ~10 s). Side-effecting writes to PostgreSQL, Valkey, Qdrant or Neo4j stay serial and gated. CPU pools for parsing/AST/JSON; GPU only for measured tensor kernels with CPU parity.
+
+**MCP/query batch profile:** the 50-query golden-breadth runner is currently sequential. Keep it as the oracle; a future pool is capped at four independent queries, with separate per-server limits starting at one (especially Svelte `npx` stdio). Record ordered per-query outcomes, failures, latency and memory, then assemble the run receipt serially. Do not parallelize writes, promote unjudged retrieval results, warm Valkey from the query set, or inject raw MCP output into ACE. GPU batch enhancements are deferred to a separately scoped OpenSpec under the existing numerical owner; no GPU work is implied by this audit.
+
+The `.okf/indexes/feature-intelligence.yaml` file specifies canonical PostgreSQL ownership, retrieval projections/executors and projection receipts; it does not set cache, model-KV or threading policy. Do not infer those policies from the index registry.
 - Reserve GPU executors for measured numerical kernels (e.g. qualified sparse graph ranking or dense feature matrices), with CPU-oracle parity and executor receipts. GPU is not a filesystem scanner or report-authority mechanism.
 
 **Domain review sheet + rules (2026-09-20):** `node scripts/atlas/build-domain-review-sheet-v1.mjs` builds an offline searchable review page `docs/reports/domain-review-sheet-v1.html` (blind mode, localStorage autosave, JSONL export the eval harness reads via `python python/atlas_domain_classifier_eval_v1.py --input <file>`). Labeling rules: judge primary responsibility from the path/file (the LLM evidence text is not truth); one of the 13 top-level `atlas_domain_ontology` groups; `AMBIGUOUS` / `NOT_A_DOMAIN` / `SKIP` are counted, never gold; second reviewer on >=10%. Trust floor 200 reviewed rows AND 30 per class; the 49 revision-qualified rows are far short (largest class 11; machine-learning, compiler, error-handling have 0), and closing that depends on CURRENT_SOURCE_AUTHORITY_PROVEN, not on labelling alone. Report Tier A (revision-qualified) and Tier B (unresolved-revision, evaluation only) separately.
@@ -1907,3 +1913,43 @@ Permanent rules only. Phase status, receipts, and implementation tasks live in t
 - Each completed gate needs its authoritative owner, the exact test command, a revision-qualified input, an output receipt, and independent readback.
 - Keep OpenSpec phase IDs distinct from legacy phase numbering.
 - Do not overwrite unrelated uncommitted worktree changes.
+
+## MCP pre-flight + WSL2 Python env wiring (verified 2026-10-21)
+
+Read-only gate before any `npm install` / `pip install`. Verified by running it; it prints only what is missing and writes no state.
+
+| Check | Command | Verified result |
+|---|---|---|
+| Node deps (`apache-arrow`, `ajv`) | `node -e "for (const p of ['apache-arrow','ajv']) { try { require.resolve(p) } catch { console.log(p,'MISSING') } }"` (run in `sveltekit-frontend/`) | both resolve |
+| WSL conda env (`atlas-rapids-cu13`) | `MSYS_NO_PATHCONV=1 wsl -d Ubuntu --exec /home/james/miniforge3/bin/conda list -n atlas-rapids-cu13 --json > <scratch>/conda.json` | exit 0, ~97 KB |
+| Missing pip packages | `jq -r '[.[].name] as $i \| ["pyarrow","msgspec","xxhash"] \| map(select(. as $p \| ($i \| any(test("^"+$p+"$"))) \| not)) \| .[]' <scratch>/conda.json` | prints `msgspec`, `xxhash` (`pyarrow` 24.0.0 installed) |
+
+Rules:
+- Use the absolute conda path. `conda` is not on the non-interactive WSL PATH (`conda: command not found`), and `conda activate` fails in MCP subshells. Use `conda run -n atlas-rapids-cu13 <cmd>` for execution.
+- `MSYS_NO_PATHCONV=1` is required from Git Bash. Without it `/home/...` is rewritten to `C:/Program...` and the call fails with exit 127.
+- Write scratch output to the session scratchpad, not the repo.
+- `yq` is not installed (`command -v yq` empty). Do not use yq-based checks until it is installed, and only after a proven capability gap (DEPENDENCY-CAPABILITY-GUARD-01).
+- Not verified, so not documented as working: the `yq` `environment.yml` example (its expression has a stray brace), and the `redis-cli --scan` / `hg:*` example (truncated). The `:8095` replay-receipt jq example needs a real receipt file before use.
+- Installing is still a separate, explicit step: `conda run -n atlas-rapids-cu13 pip install <pkg>` only for packages the check reports missing.
+
+## Domain wiring: routing helpers + NES LUT palettes (verified 2026-10-21)
+
+No identifier named `PromptLUT` exists in the repo. The prompt path described here is what the code shows.
+
+| Component | Location | Role | Status |
+|---|---|---|---|
+| Canonical NES palette (candidate) | `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs` (`NES_LUT_DOMAIN_PALETTE`) | 10 domains, each with `lutByte` (0x00–0x09), `nesHex`, `label`, `priorWeight` | Source for `atlas_nes_lut_v1` (see the earlier section); preferred owner |
+| AST routing helper | `python/atlas_compute/ast_chunk_routing_helpers.py` (`AstChunkDomainRouter`) | Routes `/ast/chunk` chunks to a domain; `lut_byte` values match the palette's `lutByte` | `resolve_domain_76` is exact normalized match against a supplied crosswalk, else `UNRESOLVED` (`0x00`). Adds `svelte5_runes` (`0x2A`), which the palette does not have |
+| ACE palette | `python/parent_atlas_learning/ace_compiler.py` (`NES_LUT_PALETTES`, used at line 52 to pick a palette per domain) | Selects palette entries for ACE context | Duplicate owner. `nes_hex` values disagree with the `.mjs` palette for 8 of the 10 domains (`auth` and `ui` agree) |
+| Other callers | `python/atlas_compute/procedural_canary_graph_router_v1.py`, `ast_chunk_routing_helpers_v2.py` | Import the helpers | Not yet audited for which palette they read |
+
+Rules:
+- `lut_byte` and `nes_hex` are different fields. Never substitute one for the other.
+- Domain resolution is exact normalized match only. No aliases, no fuzzy matching, and unresolved is a first-class result.
+- The ACE palette must not diverge from the `.mjs` palette. Either import one from the other or record the divergence, under the one-owner rule.
+
+Open:
+- Decide which hex set is canonical. The `.mjs` palette is the candidate.
+- Align or retire `ace_compiler.py` `NES_LUT_PALETTES`.
+- Decide whether `svelte5_runes` (`0x2A`) becomes a palette entry or stays a router-only label.
+- Confirm where the ACE palette reaches prompt text. Line 52 only selects it; the injection site hasn't been traced.

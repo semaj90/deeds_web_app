@@ -66,43 +66,6 @@
 		margin: 0.125rem 0 0;
 	}
 
-	.tab-bar {
-		display: flex;
-		gap: 0.25rem;
-		margin-bottom: 1.5rem;
-		background: color-mix(in srgb, var(--t-text) 4%, transparent);
-		border: 1px solid color-mix(in srgb, var(--t-border) 40%, transparent);
-		border-radius: 0.5rem;
-		padding: 3px;
-	}
-
-	.tab {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.375rem;
-		padding: 0.5rem 1rem;
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: var(--t-text-muted);
-		background: none;
-		border: none;
-		border-radius: 0.375rem;
-		cursor: pointer;
-		transition: color 0.15s, background 0.15s;
-	}
-
-	.tab:hover {
-		color: var(--t-text);
-	}
-
-	.tab.active {
-		color: var(--t-text);
-		background: color-mix(in srgb, var(--t-text) 8%, transparent);
-		font-weight: 600;
-	}
-
 	.tab-content {
 		border: 1px solid color-mix(in srgb, var(--t-border) 30%, transparent);
 		border-radius: 0.75rem;

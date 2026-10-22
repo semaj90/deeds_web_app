@@ -9,6 +9,7 @@
  * Powers the "What does cluster N do?" answer in the codebase viewer
  * and in Claude / Copilot context enrichment.
  */
+import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
@@ -30,6 +31,40 @@ export interface ClusterSummary {
 	keyFiles:  string[];
 	warnings:  string[];
 	generatedAt: string;
+}
+
+// ── LLM output validation ─────────────────────────────────────────────────────
+
+// Reasoning or hidden-thought markers must never reach the summary store (AGENTS.md "No hidden thoughts").
+const HIDDEN_THOUGHT_MARKER = /<think>|<\/think>|<\|channel>|chainOfThought|hiddenThoughts|reasoning_content/i;
+
+const ClusterSummaryOutputSchema = z.object({
+  summary:  z.string().trim().min(20).max(4000).refine((s) => !HIDDEN_THOUGHT_MARKER.test(s), 'hidden-thought marker'),
+  purpose:  z.string().trim().min(1).max(500),
+  patterns: z.array(z.string().trim().min(1).max(200)).max(20),
+  keyFiles: z.array(z.string().trim().min(1).max(300)).max(10),
+  warnings: z.array(z.string().trim().min(1).max(300)).max(20),
+});
+
+type ClusterSummaryOutput = z.infer<typeof ClusterSummaryOutputSchema>;
+
+// Parses and validates the model's JSON. Returns a reason instead of coercing bad output,
+// so an empty or malformed summary is never persisted.
+export function validateClusterSummaryOutput(
+  jsonText: string,
+): { ok: true; value: ClusterSummaryOutput } | { ok: false; reason: string } {
+  let json: unknown;
+  try {
+    json = JSON.parse(jsonText);
+  } catch {
+    return { ok: false, reason: `JSON parse failed (${jsonText.length} chars)` };
+  }
+  const result = ClusterSummaryOutputSchema.safeParse(json);
+  if (!result.success) {
+    const issue = result.error.issues[0];
+    return { ok: false, reason: `schema: ${issue.path.join('.') || '(root)'} ${issue.message}` };
+  }
+  return { ok: true, value: result.data };
 }
 
 // ── Redis helpers ─────────────────────────────────────────────────────────────
@@ -441,33 +476,15 @@ export async function generateClusterSummary(
     return { ok: false, reason: `llama-server returned empty response for cluster ${clusterId}` };
   }
 
-  let parsed: {
-    summary: string;
-    purpose: string;
-    patterns: string[];
-    keyFiles: string[];
-    warnings: string[];
-  };
-  try {
-    parsed = JSON.parse(extractJson(raw));
-  } catch {
-    console.warn(
-      `[cluster-summary] JSON parse failed for cluster ${clusterId}. Raw:`,
-      raw.slice(0, 200)
-    );
-    return {
-      ok: false,
-      reason: `JSON parse failed (${raw.length} chars). Preview: ${raw.slice(0, 120)}`,
-    };
+  const checked = validateClusterSummaryOutput(extractJson(raw));
+  if (checked.ok === false) {
+    console.warn(`[cluster-summary] rejected LLM output for cluster ${clusterId}: ${checked.reason}`);
+    return { ok: false, reason: checked.reason };
   }
 
   const summary: ClusterSummary = {
     clusterId,
-    summary: String(parsed.summary ?? ''),
-    purpose: String(parsed.purpose ?? ''),
-    patterns: Array.isArray(parsed.patterns) ? parsed.patterns.map(String) : [],
-    keyFiles: Array.isArray(parsed.keyFiles) ? parsed.keyFiles.map(String) : [],
-    warnings: Array.isArray(parsed.warnings) ? parsed.warnings.map(String) : [],
+    ...checked.value,
     generatedAt: new Date().toISOString(),
   };
 

@@ -2,7 +2,7 @@
 // each keyed in a Map. Never writes to Postgres, Valkey, Qdrant or Neo4j. Receipts go to .tmp/atlas/ (gitignored).
 // Fail-closed: any stage that throws is recorded as FAILED in that file's receipt and the process exits 1.
 // Usage:
-//   node scripts/atlas/ast-chunk-keyed-map-v1.mjs <file> [<file> ...] [--chunk-spans=<json>] [--sidecar=http://127.0.0.1:8095]
+//   node scripts/atlas/ast-chunk-keyed-map-v1.mjs <file> [<file> ...] [--chunk-spans=<json>] [--sidecar=http://127.0.0.1:8095] [--source-root=<repo-or-snapshot>] [--source-revision=<sha256>]
 // --chunk-spans applies only when exactly one file is given (spans belong to one source).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,12 +10,13 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parseAstGrepJsonOutputV1 } from './lib/ast-grep-result-v1.mjs';
+import { isValidAstChunkSourcePathV1 } from './lib/ast-chunk-source-path-v1.mjs';
+import { assertCompleteAstScan, fetchSourceObservationJsonV1 } from './lib/source-observation-http-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 // ---- input validation (regex gates; reject before any I/O on the value) ----
 const RE = {
-  relPath: /^[A-Za-z0-9_.\-/()[\]]+\.(ts|tsx|js|jsx|mjs|mts|cjs|cts|py|pyi|rs|go|java|svelte|cc|cpp|hpp)$/,
   revision: /^sha256:[0-9a-f]{64}$/,
   uuid: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
   loopbackUrl: /^http:\/\/127\.0\.0\.1:\d{2,5}$/,
@@ -37,11 +38,24 @@ const opt = (name, fallback) => {
 };
 if (files.length === 0) fail('usage: <file> [<file> ...] [--chunk-spans=<json>] [--sidecar=<url>]');
 for (const f of files) {
-  if (!RE.relPath.test(f) || f.includes('..') || path.isAbsolute(f)) fail(`rejected path: ${JSON.stringify(f)}`);
+  if (!isValidAstChunkSourcePathV1(f)) fail(`rejected path: ${JSON.stringify(f)}`);
 }
 const sidecar = opt('sidecar', 'http://127.0.0.1:8095');
 if (!RE.loopbackUrl.test(sidecar)) fail(`sidecar must be loopback http://127.0.0.1:<port>: ${sidecar}`);
 const chunkSpansPath = opt('chunk-spans', null);
+const sourceRootInput = opt('source-root', repoRoot);
+const expectedSourceRevision = opt('source-revision', null);
+let sourceRoot;
+try { sourceRoot = fs.realpathSync(path.resolve(sourceRootInput)); }
+catch { fail('source root is unavailable'); }
+const repoRootReal = fs.realpathSync(repoRoot);
+const sourceRootRelative = path.relative(repoRootReal, sourceRoot);
+const snapshotRoot = path.join(repoRootReal, '.tmp', 'workspace-source-snapshots');
+const snapshotRevision = path.relative(snapshotRoot, sourceRoot);
+if ((sourceRoot !== repoRootReal && !/^[0-9a-f]{64}$/.test(snapshotRevision)) ||
+    sourceRootRelative.startsWith('..') || path.isAbsolute(sourceRootRelative)) fail('source root must be the repository root or a materialized workspace snapshot');
+if (expectedSourceRevision && !RE.revision.test(expectedSourceRevision)) fail('source revision must be SHA-256 qualified');
+if (sourceRoot !== repoRootReal && (!expectedSourceRevision || files.length !== 1)) fail('snapshot input requires one file and an expected source revision');
 if (chunkSpansPath && files.length !== 1) fail('--chunk-spans requires exactly one file');
 
 // ---- ast-grep binary: Node cannot spawn the npm .cmd shim by name on Windows ----
@@ -140,7 +154,9 @@ async function analyzeFile(rel, chunkSpansFile) {
       stages.push({ name, status: 'OK' });
       return out;
     } catch (err) {
-      stages.push({ name, status: 'FAILED', error: String(err?.message ?? err).slice(0, 500) });
+      stages.push({ name, status: 'FAILED', error: String(err?.message ?? err).slice(0, 500),
+        ...(typeof err?.cause?.code === 'string' ? { causeCode: err.cause.code } : {}),
+        ...(err?.observationAttempts ? { transportAttempts: err.observationAttempts } : {}) });
       return null;
     }
   };
@@ -148,30 +164,41 @@ async function analyzeFile(rel, chunkSpansFile) {
   const extension = path.extname(rel).toLowerCase();
   const sidecarLanguage = languageAuthority.get(extension) ?? null;
   const language = sidecarLanguage ?? (CPP_EXTENSIONS.has(extension) ? 'cpp' : null);
+  let sourceFilePath;
   const source = await stage('read_source', () => {
     if (!language) throw new Error(`unsupported extension: ${rel}`);
-    const abs = path.join(repoRoot, rel);
+    const abs = path.resolve(sourceRoot, ...rel.split('/'));
     if (!fs.existsSync(abs)) throw new Error(`file not found: ${rel}`);
-    return fs.readFileSync(abs);
+    sourceFilePath = fs.realpathSync(abs);
+    const relative = path.relative(sourceRoot, sourceFilePath);
+    if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) throw new Error(`source escapes root: ${rel}`);
+    return fs.readFileSync(sourceFilePath);
   });
 
   if (!source) return { rel, stages, receipt: null, outPath: null };
 
   const sourceRevision = `sha256:${crypto.createHash('sha256').update(source).digest('hex')}`;
+  if (expectedSourceRevision && sourceRevision !== expectedSourceRevision) {
+    stages.push({ name: 'source_revision', status: 'FAILED', error: 'source bytes do not match the expected revision' });
+    return { rel, stages, receipt: null, outPath: null };
+  }
 
   // ---- native AST via sidecar, schema-checked ----
   let ast = null;
+  let astTransportAttempts = [];
   if (sidecarLanguage) {
     ast = await stage('sidecar_ast_chunk', async () => {
-      const res = await fetch(`${sidecar}/ast/chunk`, {
+      const observation = await fetchSourceObservationJsonV1(`${sidecar}/ast/chunk`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source: source.toString('utf8'), language: sidecarLanguage, filePath: rel, sourceRevision }),
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(300000),
       });
-      if (!res.ok) throw new Error(`/ast/chunk HTTP ${res.status}`);
-      const body = await res.json();
+      astTransportAttempts = observation.attempts;
+      const body = observation.body;
       if (body?.schema !== 'atlas.ast.evidence.v1') throw new Error(`unexpected schema: ${body?.schema}`);
+      // Fail closed: a partial or unreceipted scan is recorded as a stage failure, never as native AST evidence.
+      assertCompleteAstScan(body);
       validateAstByteSpans(body, source, rel, sourceRevision);
       return body;
     });
@@ -222,7 +249,7 @@ async function analyzeFile(rel, chunkSpansFile) {
       let exitCode = 0;
       let stderr = '';
       try {
-        raw = execFileSync(astGrepBin, ['run', '-p', rule.pattern, '-l', astGrepLanguage, '--json=compact', path.join(repoRoot, rel)], {
+        raw = execFileSync(astGrepBin, ['run', '-p', rule.pattern, '-l', astGrepLanguage, '--json=compact', sourceFilePath], {
           encoding: 'utf8', timeout: 30000, maxBuffer: 16 * 1024 * 1024,
         });
       } catch (err) {
@@ -296,7 +323,7 @@ async function analyzeFile(rel, chunkSpansFile) {
     canonicalAuthority: false,
     writesPerformed: false,
     source: { path: rel, disk_sha256: sourceRevision, disk_bytes: source.length, language },
-    sidecar: ast ? { url: sidecar, engine: ast.engine, engine_version: ast.engine_version, syntax_status: ast.syntax_status ?? null, error_tag: ast.error_tag ?? null } : null,
+    sidecar: ast ? { url: sidecar, engine: ast.engine, engine_version: ast.engine_version, syntax_status: ast.syntax_status ?? null, error_tag: ast.error_tag ?? null, transportAttempts: astTransportAttempts } : null,
     stages,
     counts: {
       nativeChunks: ast ? ast.chunks.length : 0,
@@ -355,6 +382,7 @@ const summary = {
   exitCode: failed.length > 0 ? 1 : 0,
   files: results.map((r) => ({
     path: r.rel,
+    source: r.receipt?.source ?? null,
     outPath: r.outPath,
     stageStatus: r.stages.map((s) => `${s.name}:${s.status}`),
     counts: r.receipt?.counts ?? null,

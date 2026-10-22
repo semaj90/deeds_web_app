@@ -1,6 +1,6 @@
 {
   "schema": "atlas.single-chain-provenance-verification.v1",
-  "verifiedAt": "2026-10-20T21:53:15.259Z",
+  "verifiedAt": "2026-10-20T22:18:45.020Z",
   "chain": {
     "step1_sourceContent": {
       "path": "src/routes/api/admin/knowledge/+server.ts",
@@ -37,7 +37,10 @@
     },
     "step8_admittedWorkspaceRevisionKey": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb"
   },
-  "chainIntact": true,
+  "chainIntact": false,
+  "blockingReasons": [
+    "QDRANT_POINT_MISSING"
+  ],
   "canonicalAuthority": false,
   "writesPerformed": false
 }

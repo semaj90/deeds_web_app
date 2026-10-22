@@ -559,6 +559,7 @@
 		overflow: hidden;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 3;
+		line-clamp: 3;
 		font-size: 0.78rem;
 		color: rgba(212, 199, 163, 0.72);
 	}

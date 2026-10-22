@@ -1,0 +1,272 @@
+{
+  "schema": "atlas.clustering-ace-diagnostic-receipt.v1",
+  "cohort": "UNQUALIFIED_COMPARISON",
+  "productionAdmission": false,
+  "D1_audit": {
+    "verdict": "PASS_WITH_CAVEATS",
+    "rowsMatch": true,
+    "matrixChecksumMatch": true,
+    "nonFinite": 0,
+    "normMaxDeviation": 1.4500302070175053e-08,
+    "distinctFiles": 11479,
+    "caveat": "memory/runs 3371 and scripts/api-cleanup/reports 1179 of 19990 rows are generated artifacts"
+  },
+  "D2_baselines": {
+    "results": [
+      {
+        "method": "kmeans_full768",
+        "k": 16,
+        "dims": 768,
+        "meanARI": 0.5795,
+        "minARI": 0.5474,
+        "silhouetteCos2000": 0.0779,
+        "nnSameClusterFraction": 0.7435,
+        "occupancy": {
+          "empty": 0,
+          "min": 620,
+          "max": 1417,
+          "gini_like_max_over_mean": 1.42
+        },
+        "elapsedSeconds": 5.87
+      },
+      {
+        "method": "kmeans_full768",
+        "k": 32,
+        "dims": 768,
+        "meanARI": 0.6439,
+        "minARI": 0.6194,
+        "silhouetteCos2000": 0.0701,
+        "nnSameClusterFraction": 0.706,
+        "occupancy": {
+          "empty": 0,
+          "min": 129,
+          "max": 899,
+          "gini_like_max_over_mean": 1.8
+        },
+        "elapsedSeconds": 5.08
+      },
+      {
+        "method": "kmeans_full768",
+        "k": 64,
+        "dims": 768,
+        "meanARI": 0.5875,
+        "minARI": 0.5872,
+        "silhouetteCos2000": 0.066,
+        "nnSameClusterFraction": 0.6672,
+        "occupancy": {
+          "empty": 0,
+          "min": 54,
+          "max": 447,
+          "gini_like_max_over_mean": 1.79
+        },
+        "elapsedSeconds": 10.96
+      },
+      {
+        "method": "kmeans_full768",
+        "k": 128,
+        "dims": 768,
+        "meanARI": 0.5234,
+        "minARI": 0.5141,
+        "silhouetteCos2000": 0.0772,
+        "nnSameClusterFraction": 0.5943,
+        "occupancy": {
+          "empty": 0,
+          "min": 12,
+          "max": 308,
+          "gini_like_max_over_mean": 2.47
+        },
+        "elapsedSeconds": 15.05
+      },
+      {
+        "method": "minibatch_full768",
+        "k": 32,
+        "dims": 768,
+        "meanARI": 0.4311,
+        "minARI": 0.4155,
+        "silhouetteCos2000": 0.0632,
+        "nnSameClusterFraction": 0.6795,
+        "occupancy": {
+          "empty": 0,
+          "min": 120,
+          "max": 903,
+          "gini_like_max_over_mean": 1.81
+        },
+        "elapsedSeconds": 6.29
+      },
+      {
+        "method": "minibatch_full768",
+        "k": 64,
+        "dims": 768,
+        "meanARI": 0.4491,
+        "minARI": 0.4318,
+        "silhouetteCos2000": 0.0599,
+        "nnSameClusterFraction": 0.6374,
+        "occupancy": {
+          "empty": 0,
+          "min": 65,
+          "max": 505,
+          "gini_like_max_over_mean": 2.03
+        },
+        "elapsedSeconds": 11.15
+      },
+      {
+        "method": "spherical_pca128_train",
+        "k": 32,
+        "dims": 128,
+        "meanARI": 0.6777,
+        "minARI": 0.6158,
+        "silhouetteCos2000": 0.1314,
+        "nnSameClusterFraction": 0.7405,
+        "occupancy": {
+          "empty": 0,
+          "min": 187,
+          "max": 846,
+          "gini_like_max_over_mean": 1.7
+        },
+        "elapsedSeconds": 1.96
+      }
+    ],
+    "sourceHeldOut": {
+      "kmeans_k32": {
+        "heldoutNN": 0.6147,
+        "leakage": "train and held-out file sets are disjoint"
+      },
+      "kmeans_k64": {
+        "heldoutNN": 0.572,
+        "leakage": "train and held-out file sets are disjoint"
+      }
+    },
+    "peakWorkingSetMiB": 695.1
+  },
+  "kSweep": [
+    {
+      "k": 16,
+      "meanARI": 0.5453,
+      "minARI": 0.4691,
+      "inertiaMean": 10087.5,
+      "silhouetteCosine2000": 0.0538,
+      "elapsedSeconds": 18.9
+    },
+    {
+      "k": 24,
+      "meanARI": 0.6732,
+      "minARI": 0.6293,
+      "inertiaMean": 9696.2,
+      "silhouetteCosine2000": 0.0636,
+      "elapsedSeconds": 14.8
+    },
+    {
+      "k": 32,
+      "meanARI": 0.6282,
+      "minARI": 0.5808,
+      "inertiaMean": 9446.2,
+      "silhouetteCosine2000": 0.0658,
+      "elapsedSeconds": 24.3
+    },
+    {
+      "k": 48,
+      "meanARI": 0.6184,
+      "minARI": 0.6126,
+      "inertiaMean": 9076.4,
+      "silhouetteCosine2000": 0.0788,
+      "elapsedSeconds": 34.1
+    },
+    {
+      "k": 64,
+      "meanARI": 0.6107,
+      "minARI": 0.5573,
+      "inertiaMean": 8842.1,
+      "silhouetteCosine2000": 0.0635,
+      "elapsedSeconds": 36.0
+    }
+  ],
+  "D3_symbolCoverage": {
+    "denominator": 6640,
+    "currentRuleValid": 4584,
+    "currentPct": 69.04,
+    "uncoveredRefinement": {
+      "AMBIENT_DECLARATION_FILE": 22,
+      "NON_DECLARING_MODULE": 228,
+      "HAS_DECLARATIONS_UNEXTRACTED": 1790,
+      "EMPTY_FILE": 4,
+      "OVERSIZE_OR_REJECTED_BY_SIDECAR": 12
+    },
+    "kindMappingSample": {
+      "sampled": 300,
+      "currentRule": 0,
+      "nodeTypeRule": 284
+    },
+    "projectedPctIfNodeTypeRuleAdopted": 81.69,
+    "decisionPending": "whether to change the coverage rule; not changed here"
+  },
+  "D4_adapter": {
+    "module": "scripts/atlas/clustering-ace-diagnostic-adapter-v1.mjs",
+    "run": {
+      "schema": "atlas.clustering-ace-diagnostic-run.v1",
+      "cohort": "UNQUALIFIED_COMPARISON",
+      "requested": 50,
+      "proposed": 50,
+      "rejected": 0,
+      "rejectionReasons": {},
+      "aceAdmissionEligible": 0,
+      "identityKeysUnique": true,
+      "checksumReproducible": true,
+      "sourceRevisionQualified": 0,
+      "packetChecksums": [
+        "sha256:a9d8951705807831285ef5b442ff7311541501d47f0a6287e80c1a75ca429c23",
+        "sha256:fce97c4288b3929a048df85b08d368f51352d87f1be1faa2a8f90c1617712fd2",
+        "sha256:804ac88106e586ecf0b99e714919b9fd9ac80332d90b4d1b4b6a06b4d5ef06a2",
+        "sha256:a7f20a3015fcb18e39f79301db73ff00bd18f57bf583ed0e8ebbef03bc3e544e",
+        "sha256:0a80a55a956b5704dbba5fac89354692768e6c8102a398eda18d87b8141b6807",
+        "sha256:ddf9f75bdd54c4515c7e501c2c0d9ccad86d2063edd3bb6aa1493c1b75e4156f",
+        "sha256:af99290361f57792b09c4cef104c461555d51b1399322e118a07a41cb85e27ef",
+        "sha256:44855b7259c933a1a9abe901f882e60db454027e0f8ae6f22d3e43ae6a7a35ae",
+        "sha256:5e2642fe61e55b59ba18dd592647f268b0f53cdd7a8a5f4c14c56a8e0198443a",
+        "sha256:72a9005a0e5a2e174789ecb32429a6d39688529093d33be0207733d4e4faf850",
+        "sha256:0cafcc2911e8ba4eb3dafd3de619c0ba8db73c60cc58f821e4c8771cde9661ac",
+        "sha256:a8084e726e4d5316d0bf28158964ae6a2c1247018b7a598e290088c034152400",
+        "sha256:8df4c1fe0939908026ba3dc7a8e8a96e91d8e88bbc1fc4a3f193e9f0b14d3ec4",
+        "sha256:fc7f47bcb5e56271ac87403786dbe23d8081d7240ff5be90163525aaf466693b",
+        "sha256:c9ef4d7ccc3817ffdd24d26951f7b6ad043aace5040402dc9b8d9acb6ac8fc06",
+        "sha256:1ba907768040e50c9071f31e0aef43961fbc84caba6b9d80b24f3c91cab86df3",
+        "sha256:295e7c2c91ac00967547ce27f736bbd9454440dd9939b790d325796d951685da",
+        "sha256:0709023de7dee81ff18af3dd872d5b008d57d73c69805791d05da8bf25b21ad6",
+        "sha256:a4b7f498c1f9398a740432c0f990de2bc01422cd3f6b2267e1ad223b8f26e1a6",
+        "sha256:f02639d63e6f3313ba1b89f810256684238ac710ed041b7ca080847255592b52",
+        "sha256:da7b2af30adeb21f6565d5a5b6fc29815eb8facf5ec6ae8d292ab2dfd87f9398",
+        "sha256:7290994ba7cba347a37b4d380e4d12a917791506a8b2f1f0a7544eafda50c446",
+        "sha256:b9d9d213e580392f61ccc7e0cfdbe641c59f76d27315703b227c390ea092f84f",
+        "sha256:678e1ab8681746d880a9c0b1628a986fa8c8bb6a09017bf8ae881887c67dcd45",
+        "sha256:29353b7abef9e682a157a7c34dd52b1296cb6f11f36f8b47d7ec9897ce13fdad",
+        "sha256:530f0577e1b09b10dd5b43bd22b52b7e35a31b150d882ca9e021cf718e35e5e6",
+        "sha256:e668a0592287c329bff4124e4b73d68c8bf805f1ae41e051c1a80b48f75c2087",
+        "sha256:c6f7ffea3c6ea759b632ebab1e4b4e6f56b3f2096d397a59bcb40bff60951512",
+        "sha256:8e33975fe96f85e05c1b541f3034598e867adc038490a64c4603b6ca3230480e",
+        "sha256:8ec85c3e237947f19307b9955595dcba30a394ea88654531cc6cfe6f7764d008",
+        "sha256:5e5106d62a9067f87f4bd1800dad205433f847b4e99d8d293473c4177a2f4cbc",
+        "sha256:690cbc159eae5bd8be5765d742185a2e430c493aa0e932ed78fcc4acc1836d1f",
+        "sha256:c3d35000e1510b0d7d614b527081409ccc0cf8754c60830f9b7f5df5739fe02f",
+        "sha256:4087d9592861551d401121445795369a9a3dda2665066df301fa0688fce271a6",
+        "sha256:28b6937843e374a406824d7e24096a5ee54737d5d58c34d6db1d75230d05c0ec",
+        "sha256:44250f76f2d9d95700dc256c7f19ad82c21cff19a9d63ab99d17fda6341fa47d",
+        "sha256:f7898de8b67f3095b5bdb434b3fe23741352ed9b0f1c4bec1c21bc5fa3f36ff6",
+        "sha256:f55785e221b83d6a44e7319e7052781faf70a6d061b1572e2c5babf55edb9b7d",
+        "sha256:191d6c403fbacc7cfcbafa5ba1e4b3a5d2766aa3b5283f24fa4da263997c5adf",
+        "sha256:c4b9c4de22acd14d737c3b28b4da05b5045d2b977a962827df0ea826bf81fca6",
+        "sha256:231e8acc042cf83b84c451040954cd58e448bab9db8d2390609f85da7c51fe9c",
+        "sha256:7ee2e61d706bde751031cd0c60e67d3d81d7a4efaf17f9b16549a9ad931b57f0",
+        "sha256:0299192aaa4f05bf5679aee347cfdae7dd8405d66f8299a03d6dac06cdf844a7",
+        "sha256:f793db0f1b2f0d92367ecc77ae4bc333cd186e32a3e9a766cd42e3b3f69e006d",
+        "sha256:c96cd956f826563e02eaf0f45687a25260f54ecb5f9c16a4389f1311999b4ef8",
+        "sha256:0ad12f568565adc3b363d5b381fd40b963870aaa71380fd09a8e5c0e7d86fb64",
+        "sha256:03b3ed2868262d57502208df102861f8d6736639885c1c765029a49db5a79a77",
+        "sha256:d167a2237a34e61ea8ca09805aad95f8892ed187267ef489320c755fa008f249",
+        "sha256:5beb1ed687cec8264be9da870867112d1d6905d497409ed8564f5ebd3cb9d3c9",
+        "sha256:2a2999ebcfcf1ab5a39c4cba596aa75c40a7537c849bc42a50118ffc5cc062af"
+      ],
+      "writesPerformed": 0
+    }
+  },
+  "GPU": "RESOURCE_BLOCKED",
+  "writesPerformed": 0
+}

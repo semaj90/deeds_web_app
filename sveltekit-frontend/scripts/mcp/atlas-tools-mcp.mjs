@@ -21,6 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import Ajv from 'ajv';
 import neo4j from 'neo4j-driver';
 import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
 
@@ -312,6 +313,25 @@ const TOOLS = [
     },
   },
 ];
+
+const toolArgumentAjv = new Ajv({ allErrors: true, strict: false });
+const toolArgumentValidators = new Map(
+  TOOLS.map((tool) => [tool.name, toolArgumentAjv.compile(tool.inputSchema)]),
+);
+
+export function validateToolCallArguments(name, args) {
+  const validate = toolArgumentValidators.get(name);
+  if (!validate) return { valid: false, errors: [`Unknown tool: ${name}`] };
+  const valid = validate(args);
+  return {
+    valid,
+    errors: valid ? [] : (validate.errors ?? []).map((error) => ({
+      path: error.instancePath || '/',
+      keyword: error.keyword,
+      message: error.message ?? 'invalid value',
+    })),
+  };
+}
 
 // ── Tool implementations ────────────────────────────────────────────────────────
 
@@ -1609,7 +1629,7 @@ async function findRoute({ route }) {
 
 // ── JSON-RPC dispatch ──────────────────────────────────────────────────────────
 
-async function dispatch(method, params, id) {
+export async function dispatch(method, params, id) {
   if (method === 'initialize') {
     return {
       protocolVersion: PROTOCOL_VERSION,
@@ -1624,6 +1644,10 @@ async function dispatch(method, params, id) {
   if (method === 'tools/call') {
     const { name, arguments: args = {} } = params ?? {};
     try {
+      const validation = validateToolCallArguments(name, args);
+      if (!validation.valid) {
+        throw new Error(`Invalid arguments for ${name}: ${JSON.stringify(validation.errors)}`);
+      }
       let result;
       if (name === 'classify_intent') result = classifyIntent(args);
       else if (name === 'build_agentic_rag_context') result = await buildAgenticRagContextLive(args);

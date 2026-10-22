@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import test from 'node:test';
 import { runIndexedSourceAstGrepV1 } from './indexed-source-ast-grep-v1.mjs';
 import { runIndexedSourceLspV1 } from './indexed-source-lsp-v1.mjs';
@@ -12,7 +13,7 @@ test('AST-grep refuses working-tree bytes that do not match the indexed revision
     sidecarUrl: 'http://127.0.0.1:8095',
   });
 
-  assert.equal(result.status, 'SKIPPED_WORKING_TREE_REVISION_MISMATCH');
+  assert.equal(result.status, 'SKIPPED_BOUND_SOURCE_REVISION_MISMATCH');
 });
 
 test('LSP subhelper skips unknown languages without starting a server', async () => {
@@ -60,21 +61,142 @@ test('NLP subhelper returns revision-bound proposals as non-authoritative', asyn
   }
 });
 
-test('NLP subhelper bounds input before making a network request', async () => {
+test('Svelte NLP subhelper uses POS-only UTF-8 byte evidence and binds it to the exact source revision', async () => {
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = async () => {
-    throw new Error('FETCH_MUST_NOT_RUN');
+  const sourceText = '<script lang="ts">\nconst heading = "🧭";\n</script>';
+  const sourceBytes = Buffer.from(sourceText, 'utf8');
+  const startByte = sourceBytes.indexOf(Buffer.from('🧭', 'utf8'));
+  const sourceRevision = `sha256:${crypto.createHash('sha256').update(sourceBytes).digest('hex')}`;
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url, body: JSON.parse(options.body) };
+    return {
+      ok: true,
+      json: async () => ({
+        coordinate_basis: 'UTF8_BYTES',
+        token_assertions: [{ text: '🧭', start_byte: startByte, end_byte: startByte + 4 }],
+        noun_phrase_spans: [],
+        dependency_edges: [],
+        dependency_parser_available: true,
+      }),
+    };
   };
 
   try {
     const result = await runIndexedSourceNlpV1({
-      sourceText: 'x'.repeat(50_001),
+      sourceText,
+      sourceRef: 'src/component.svelte',
+      sourceRevision,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      sidecarUrl: 'http://127.0.0.1:8095',
+    });
+
+    assert.equal(request.url, 'http://127.0.0.1:8095/pos');
+    assert.deepEqual(request.body, { text: sourceText });
+    assert.equal(result.status, 'ADVISORY_POS_ONLY_PROPOSAL');
+    assert.equal(result.providerMode, 'POS_ONLY');
+    assert.equal(result.sourceRevision, sourceRevision);
+    assert.equal(result.coordinateBasis, 'UTF8_BYTES');
+    assert.equal(result.verifiedUtf8SpanCount, 1);
+    assert.equal(result.canonicalAuthority, false);
+    assert.equal(result.writesPerformed, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('Svelte NLP subhelper rejects POS spans that do not match source bytes', async () => {
+  const originalFetch = globalThis.fetch;
+  const sourceText = '<script lang="ts">const value = "🧭";</script>';
+  const sourceRevision = `sha256:${crypto.createHash('sha256').update(Buffer.from(sourceText, 'utf8')).digest('hex')}`;
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      coordinate_basis: 'UTF8_BYTES',
+      token_assertions: [{ text: '🧭', start_byte: 0, end_byte: 4 }],
+      noun_phrase_spans: [],
+      dependency_edges: [],
+    }),
+  });
+
+  try {
+    await assert.rejects(runIndexedSourceNlpV1({
+      sourceText,
+      sourceRef: 'src/component.svelte',
+      sourceRevision,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      sidecarUrl: 'http://127.0.0.1:8095',
+    }), /NLP_SIDECAR_UTF8_SPAN_MISMATCH/);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('NLP subhelper sends sources above the former 50 KB limit without truncation', async () => {
+  const originalFetch = globalThis.fetch;
+  const sourceText = 'x'.repeat(50_001);
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url, body: JSON.parse(options.body) };
+    return {
+      ok: true,
+      json: async () => ({
+        pass_results: [{ source_ref: 'src/file.ts', source_revision: `sha256:${'a'.repeat(64)}` }],
+      }),
+    };
+  };
+
+  try {
+    const result = await runIndexedSourceNlpV1({
+      sourceText,
       sourceRef: 'src/file.ts',
       sourceRevision: `sha256:${'a'.repeat(64)}`,
       workspaceRevision: `sha256:${'b'.repeat(64)}`,
       sidecarUrl: 'http://127.0.0.1:8095',
     });
-    assert.deepEqual(result, { status: 'SKIPPED_SOURCE_OVER_50000_BYTES' });
+    assert.equal(request.body.text, sourceText);
+    assert.equal(request.body.text.length, 50_001);
+    assert.equal(request.body.max_chars, 1_000_000);
+    assert.equal(result.exactRevisionPassCount, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('NLP subhelper accepts large bounded sources and skips only above the sidecar analyze contract', async () => {
+  const originalFetch = globalThis.fetch;
+  let requested;
+  globalThis.fetch = async (_url, options) => {
+    requested = JSON.parse(options.body);
+    return {
+      ok: true,
+      json: async () => ({
+        pass_results: [{ source_ref: 'src/file.ts', source_revision: `sha256:${'a'.repeat(64)}` }],
+        classification_proposal: null,
+      }),
+    };
+  };
+
+  try {
+    const largeResult = await runIndexedSourceNlpV1({
+      sourceText: 'x'.repeat(328_372),
+      sourceRef: 'src/file.ts',
+      sourceRevision: `sha256:${'a'.repeat(64)}`,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      sidecarUrl: 'http://127.0.0.1:8095',
+    });
+    assert.equal(requested.text.length, 328_372);
+    assert.equal(requested.max_chars, 1_000_000);
+    assert.equal(largeResult.exactRevisionPassCount, 1);
+
+    const oversizedResult = await runIndexedSourceNlpV1({
+      sourceText: 'x'.repeat(1_000_001),
+      sourceRef: 'src/file.ts',
+      sourceRevision: `sha256:${'a'.repeat(64)}`,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      sidecarUrl: 'http://127.0.0.1:8095',
+    });
+    assert.deepEqual(oversizedResult, { status: 'SKIPPED_SOURCE_OVER_1000000_CHARS' });
   } finally {
     globalThis.fetch = originalFetch;
   }

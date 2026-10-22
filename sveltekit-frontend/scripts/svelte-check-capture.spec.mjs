@@ -15,9 +15,17 @@ import {
   loadValidatedOkfVocabulary,
   parseMachineDiagnostic,
   parseSavedLog,
+  resolveTsconfig,
   SVELTE_DIAGNOSTIC_MCP_TOOL_POLICY,
   summarizeDiagnostics,
 } from './svelte-check-capture.mjs';
+
+test('binds captures to a regular in-frontend tsconfig and its checksum', () => {
+  const config = resolveTsconfig();
+  assert.equal(config.path, 'tsconfig.json');
+  assert.match(config.sha256, /^sha256:[a-f0-9]{64}$/);
+  assert.throws(() => resolveTsconfig('../package.json'), /TSCONFIG_PATH_MUST_BE_INSIDE_FRONTEND/);
+});
 
 test('parses machine-format Svelte diagnostics and normalizes Windows paths', () => {
   const diagnostic = parseMachineDiagnostic(
@@ -58,6 +66,8 @@ test('replays a saved log deterministically and binds diagnostics to exact input
     timedOut: false,
     interrupted: false,
     exitCode: 1,
+    errors: 1,
+    warnings: 0,
     outputs: { logSha256 },
   };
   const options = { logPath: 'saved.txt', logSha256, sourceRunSummary, replayWorkspaceRevision: 'current-revision' };
@@ -66,6 +76,7 @@ test('replays a saved log deterministically and binds diagnostics to exact input
 
   assert.deepEqual(first, second);
   assert.equal(first.summary.status, 'COMPLETE');
+  assert.equal(first.summary.countsMatchCaptureSummary, true);
   assert.equal(first.summary.sourceGitRevision, 'source-revision');
   assert.equal(first.summary.replayWorkspaceRevision, 'current-revision');
   assert.equal(first.diagnostics[0].logEvidence.line, 2);
@@ -86,6 +97,34 @@ test('replays a saved log deterministically and binds diagnostics to exact input
   });
   assert.deepEqual(firstTodos.tasks, secondTodos.tasks);
   assert.deepEqual(firstTodos.executionDag, secondTodos.executionDag);
+});
+
+test('rejects abnormal exits and capture-summary count mismatches', () => {
+  const content = '1787249391766 ERROR "src\\\\lib\\\\example.ts" 4:2 "TS2322: Type mismatch"';
+  const logSha256 = `sha256:${createHash('sha256').update(content).digest('hex')}`;
+  const base = {
+    runId: 'aborted-run',
+    gitRevision: 'source-revision',
+    timedOut: false,
+    interrupted: false,
+    errors: 1,
+    warnings: 0,
+    outputs: { logSha256 },
+  };
+  const abnormal = parseSavedLog(content, {
+    logPath: 'saved.txt', logSha256,
+    sourceRunSummary: { ...base, exitCode: 134 },
+  });
+  assert.equal(abnormal.summary.acceptedExitCode, false);
+  assert.equal(abnormal.summary.status, 'INCOMPLETE');
+  assert.equal(buildReplayProposal(abnormal).tasks.length, 0);
+
+  const mismatched = parseSavedLog(content, {
+    logPath: 'saved.txt', logSha256,
+    sourceRunSummary: { ...base, exitCode: 1, errors: 0 },
+  });
+  assert.equal(mismatched.summary.countsMatchCaptureSummary, false);
+  assert.equal(mismatched.summary.status, 'INCOMPLETE');
 });
 
 test('marks logs without checksum-matched run receipts incomplete and retains partial diagnostics', () => {

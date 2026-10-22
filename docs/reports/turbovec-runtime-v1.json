@@ -1,11 +1,11 @@
 {
   "schema": "atlas.turbovec-runtime-receipt.v1",
-  "generatedAt": "2026-09-20T22:54:08.941Z",
+  "generatedAt": "2026-10-20T23:21:04.548Z",
   "status": "RUNTIME_OBSERVED_UNPROMOTED",
   "endpoint": "http://127.0.0.1:8791",
   "importProbe": {
     "importable": true,
-    "origin": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\turbovec\\__init__.py"
+    "origin": null
   },
   "wheelPaths": [
     {
@@ -22,11 +22,26 @@
     "ok": true,
     "body": {
       "ok": true,
-      "indexed": 327820,
-      "dim": 64,
+      "indexed": 219998,
+      "dim": 128,
       "bits": 4,
       "turbovec": true,
-      "collection": "codebase_chunks_768"
+      "collection": "codebase_chunks_768_v2",
+      "source": "postgres",
+      "projection": "mrl",
+      "representationId": "embeddinggemma_mrl128_l2_4bit_v1",
+      "domainSlotPopulated": true,
+      "domainResolved": 114177,
+      "domainOrdinals": {
+        "cache": 0,
+        "compiler": 1,
+        "frontend": 2,
+        "gpu": 3,
+        "graph": 4,
+        "retrieval": 5
+      },
+      "role": "CHALLENGER_ONLY",
+      "defaultK": 100
     }
   },
   "executor": "turbovec",

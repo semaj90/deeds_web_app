@@ -129,8 +129,8 @@
 
 				<!-- Method Selector -->
 				<div class="form-row">
-					<label class="form-label">METHOD</label>
-					<select bind:value={selectedMethod} class="method-select">
+					<label class="form-label" for="api-tester-method">METHOD</label>
+					<select id="api-tester-method" bind:value={selectedMethod} class="method-select">
 						{#each endpoint.methods as method}
 							<option value={method}>{method}</option>
 						{/each}
@@ -139,8 +139,9 @@
 
 				<!-- Request Headers -->
 				<div class="form-row">
-					<label class="form-label">HEADERS (JSON)</label>
+					<label class="form-label" for="api-tester-headers">HEADERS (JSON)</label>
 					<textarea
+						id="api-tester-headers"
 						bind:value={requestHeaders}
 						class="json-input"
 						rows="3"
@@ -151,8 +152,9 @@
 				<!-- Request Body -->
 				{#if selectedMethod !== 'GET'}
 					<div class="form-row">
-						<label class="form-label">BODY (JSON)</label>
+						<label class="form-label" for="api-tester-body">BODY (JSON)</label>
 						<textarea
+							id="api-tester-body"
 							bind:value={requestBody}
 							class="json-input"
 							rows="8"

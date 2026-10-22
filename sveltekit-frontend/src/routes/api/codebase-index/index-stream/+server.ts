@@ -15,7 +15,7 @@
  * Query params:
  *   cluster  — GPU/SOM cluster ID to index (required unless tags provided)
  *   tags     — comma-separated Qdrant tags to filter
- *   limit    — max chunks per batch (default 50, max 200)
+ *   limit    — max chunks per request (default 50, max 200); pages fetched until reached
  *   force    — bypass summary Redis cache (default false)
  *   dryRun   — skip writes, stream stages only (default false)
  *   gpuTag   — run GPU Karpathy semantic tagging (default false)
@@ -41,20 +41,35 @@ interface QdrantChunk {
 	vector?: Record<string, number[]>;
 }
 
+// `limit` is the total chunk cap per request (existing contract). Pages are fetched
+// until the cap is reached or Qdrant has no more points.
+const QDRANT_SCROLL_PAGE = 200;
+
+// A failed page throws so the route reports an error instead of a silently partial set.
+// `vectorNames` lists only the named vectors the run reads (Qdrant returns no vectors for []).
 async function scrollQdrant(
 	filter: Record<string, unknown>,
 	limit: number,
-	withVectors: boolean,
-): Promise<QdrantChunk[]> {
-	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ limit, with_payload: true, with_vector: withVectors, filter }),
-		signal: AbortSignal.timeout(30_000),
-	});
-	if (!res.ok) return [];
-	const data = await res.json() as { result?: { points?: QdrantChunk[] } };
-	return data.result?.points ?? [];
+	vectorNames: string[],
+): Promise<{ points: QdrantChunk[]; truncated: boolean }> {
+	const points: QdrantChunk[] = [];
+	let offset: string | number | null = null;
+	do {
+		const pageSize = Math.min(QDRANT_SCROLL_PAGE, limit - points.length);
+		const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ limit: pageSize, offset, with_payload: true, with_vector: vectorNames, filter }),
+			signal: AbortSignal.timeout(30_000),
+		});
+		if (!res.ok) throw new Error(`Qdrant scroll failed: HTTP ${res.status}`);
+		const data = await res.json() as {
+			result?: { points?: QdrantChunk[]; next_page_offset?: string | number | null };
+		};
+		points.push(...(data.result?.points ?? []));
+		offset = data.result?.next_page_offset ?? null;
+	} while (offset != null && points.length < limit);
+	return { points, truncated: offset != null };
 }
 
 // ── Embed text via Ollama ────────────────────────────────────────────────────
@@ -81,20 +96,35 @@ async function embedTexts(texts: string[]): Promise<(number[] | null)[]> {
 
 // ── Qdrant upsert named vector ───────────────────────────────────────────────
 
-async function upsertQdrantVector(
-	pointId: string | number,
+// Points per PUT /points/vectors request. Same summary vector goes to every chunk in the cluster.
+const QDRANT_UPSERT_BATCH = 100;
+
+// Returns the number of points whose batch request succeeded. Failures are logged with
+// their reason so a short count can be diagnosed.
+async function upsertQdrantVectors(
+	pointIds: (string | number)[],
 	vectorName: string,
 	vector: number[],
-): Promise<boolean> {
-	const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/vectors`, {
-		method: 'PUT',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			points: [{ id: pointId, vector: { [vectorName]: vector } }],
-		}),
-		signal: AbortSignal.timeout(10_000),
-	});
-	return res.ok;
+): Promise<number> {
+	let upserted = 0;
+	for (let i = 0; i < pointIds.length; i += QDRANT_UPSERT_BATCH) {
+		const batch = pointIds.slice(i, i + QDRANT_UPSERT_BATCH);
+		try {
+			const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/vectors`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					points: batch.map((id) => ({ id, vector: { [vectorName]: vector } })),
+				}),
+				signal: AbortSignal.timeout(30_000),
+			});
+			if (res.ok) upserted += batch.length;
+			else console.warn(`[index-stream] qdrant vectors batch ${i} failed: HTTP ${res.status}`);
+		} catch (err) {
+			console.warn(`[index-stream] qdrant vectors batch ${i} error: ${(err as Error)?.message ?? err}`);
+		}
+	}
+	return upserted;
 }
 
 // ── PostgreSQL mirror upsert ─────────────────────────────────────────────────
@@ -217,10 +247,13 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 					filter.must = [{ key: 'tags', match: { any: tags } }];
 				}
 
-				const chunks = await scrollQdrant(filter, limit, true);
+				// Stage 5 reads `signature`; Stage 6 (gpuTag) also reads `content`. `error` is unused.
+				const wantedVectors = gpuTag ? ['signature', 'content'] : ['signature'];
+				const { points: chunks, truncated } = await scrollQdrant(filter, limit, wantedVectors);
 				emit('scroll', {
 					stage: 1,
 					chunksFound: chunks.length,
+					truncated,
 					clusterId,
 					tags,
 					durationMs: Math.round(performance.now() - t0),
@@ -270,11 +303,7 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 				// ── Stage 4: Upsert summary vector to Qdrant ────────────────────
 				if (summaryVec && !dryRun) {
 					const t4 = performance.now();
-					let upserted = 0;
-					for (const chunk of chunks) {
-						const ok = await upsertQdrantVector(chunk.id, 'summary', summaryVec);
-						if (ok) upserted++;
-					}
+					const upserted = await upsertQdrantVectors(chunks.map((c) => c.id), 'summary', summaryVec);
 					emit('qdrant_upsert', {
 						stage: 4,
 						vectorName: 'summary',

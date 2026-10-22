@@ -137,6 +137,12 @@
     }
   }
 
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    handleToggle();
+  }
+
   function handleToggle(e?: MouseEvent) {
     if (disabled || readonly || loading) return;
     isPressed = true;
@@ -214,6 +220,7 @@
     tabindex={disabled ? -1 : 0}
     aria-checked={checked}
     onclick={handleToggle}
+    onkeydown={handleKeydown}
     onfocus={() => isFocused = true}
     onblur={() => isFocused = false}
     onmouseenter={() => isHovered = true}

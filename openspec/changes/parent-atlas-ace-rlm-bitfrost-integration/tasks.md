@@ -17618,14 +17618,14 @@ Parsing 768-d embedding text (`content_embedding`, ~9.5 KB/row) from `.tmp/atlas
 - Indexing: `scripts/index-codebase-fast.mjs` indexes six extensions (`.ts .svelte .js .mjs .cjs .json`) by extension only. No LSP pass.
 - GPU: RAPIDS and cuVS code exists (`python/atlas_compute/cugraph_ppr.py`, `cudf_ace_packet_builder.py`, `python/atlas_cuvs_resident_sidecar.py`, `docker/cuvs-grpc/`). WSL imports verified (cudf 26.06.01, cuvs and cugraph 26.06.00, torch 2.13.0+cu130, CUDA available). No executed-on-real-corpus receipt found. `:8090` holds about 6.4 GiB of the 8 GiB card; a GPU run needs it stopped first, which requires explicit approval.
 - Open: chunk-owned source revisions; Qdrant mirror backfill for admitted chunks (write, approval required); vocabulary authority and link table; provenance steps 2 to 9; library inventory scope.
-- **Single-Chain Provenance Verification (2026-10-20; Acceptance Test Passed):**
-  - Demonstrated and verified the complete 8-link provenance chain with zero synthesized identity or unauthorized store mutations:
+- **Single-Chain Provenance Verification (2026-10-20; Partial, Qdrant projection missing):**
+  - Demonstrated a partial source-to-packet diagnostic with zero synthesized identity or unauthorized store mutations; the absent Qdrant point means the complete 8-link acceptance test did not pass:
     1. **Source Content on Disk:** `src/routes/api/admin/knowledge/+server.ts` (3,837 bytes), exact SHA-256 `sha256:bb7658b7e7cb30d009eaf43e6c6b71ef234388b4797a689c66efc108458a4d81`.
     2. **Source Revision Matching:** Exact match to `graphify_files.code_source_revision` and `atlas_observation_feature_rows.source_revision`.
     3. **Canonical Chunk:** `codebase_chunk_index.id = '04db8e47-0c29-4211-830d-d7c7ff0bfe18'`, `chunk_id = 'card:src/routes/api/admin/knowledge/+server.ts:47ed45bf5b8f0420'`.
     4. **Embedding Recipe:** `embeddinggemma:latest:eg-task-prefix-v1`, version `e1058505985ae5dba56dc72b5794e424bf64f23fb1d877c7795884191236459f`, dimension 768, unit L2 norm (1.000000).
     5. **Canonical Semantic Vector:** `codebase_chunk_index.content_embedding_768` persisted in PostgreSQL 18 pgvector.
     6. **Packet Key Binding:** `ace:packet:47172f2a06fc` linked to canonical ORF feature row with `representation_revision = 'semantic_768:canonical:v1'`.
-    7. **Qdrant Point Identity:** Reconciled projection point ID `2ab9035f-7a8f-2328-9ae0-17d1b44e8eda` with zero writes performed (`writesPerformed: false`, `canonicalAuthority: false`).
+    7. **Qdrant Point Identity:** Expected projection point ID `2ab9035f-7a8f-2328-9ae0-17d1b44e8eda` was not found in `codebase_chunks_768_v2`; source-ref readback is therefore absent. This blocks the complete-chain acceptance test.
     8. **Admitted Workspace Revision:** Sealed key `sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb`.
-  - Persisted receipt: `docs/reports/single-chain-provenance-verification-v1.json` (`chainIntact: true`).
+  - Persisted receipt: `docs/reports/single-chain-provenance-verification-v1.json` (`chainIntact: false`, `blockingReasons: ["QDRANT_POINT_MISSING"]`). The source, vector, packet, and workspace evidence is a partial diagnostic chain; it does not prove Qdrant projection coverage or canonical authority.

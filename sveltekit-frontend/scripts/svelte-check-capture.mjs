@@ -33,6 +33,28 @@ function option(name, fallback) {
   return index === -1 ? fallback : args[index + 1];
 }
 
+function resolveTsconfig(configPath = 'tsconfig.json', { root = frontendRoot } = {}) {
+  const absolutePath = path.resolve(root, configPath);
+  const relativePath = path.relative(root, absolutePath);
+  if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+    if (relativePath !== 'tsconfig.json') throw new Error('TSCONFIG_PATH_MUST_BE_INSIDE_FRONTEND');
+  }
+  if (lstatSync(absolutePath).isSymbolicLink() || !statSync(absolutePath).isFile()) {
+    throw new Error('TSCONFIG_MUST_BE_A_REGULAR_FILE');
+  }
+  const realRoot = realpathSync(root);
+  const realPath = realpathSync(absolutePath);
+  const realRelativePath = path.relative(realRoot, realPath);
+  if (realRelativePath.startsWith('..') || path.isAbsolute(realRelativePath)) {
+    throw new Error('TSCONFIG_PATH_MUST_BE_INSIDE_FRONTEND');
+  }
+  const bytes = readFileSync(realPath);
+  return {
+    path: relativePath.replace(/\\/g, '/') || 'tsconfig.json',
+    sha256: `sha256:${createHash('sha256').update(bytes).digest('hex')}`,
+  };
+}
+
 function parseMachineDiagnostic(line) {
   const match = line.match(/^(\d+)\s+(ERROR|WARNING)\s+("(?:\\.|[^"\\])*")\s+(\d+):(\d+)\s+("(?:\\.|[^"\\])*")\s*$/);
   if (!match) return null;
@@ -241,7 +263,11 @@ function parseSavedLog(content, { logPath, logSha256, sourceRunSummary = null, r
     ? checkerSummary.errors === parsedCounts.errors && checkerSummary.warnings === parsedCounts.warnings
     : null;
   const matchingSummary = sourceRunSummary && sourceRunSummary.outputs?.logSha256 === logSha256;
-  const complete = Boolean(matchingSummary && countsMatchCheckerSummary !== false && typeof sourceRunSummary.runId === 'string' &&
+  const countsMatchCaptureSummary = matchingSummary && Number.isInteger(sourceRunSummary.errors) && Number.isInteger(sourceRunSummary.warnings)
+    ? sourceRunSummary.errors === parsedCounts.errors && sourceRunSummary.warnings === parsedCounts.warnings
+    : null;
+  const acceptedExitCode = matchingSummary && [0, 1].includes(sourceRunSummary.exitCode);
+  const complete = Boolean(matchingSummary && acceptedExitCode && countsMatchCheckerSummary !== false && countsMatchCaptureSummary !== false && typeof sourceRunSummary.runId === 'string' &&
     typeof sourceRunSummary.gitRevision === 'string' && sourceRunSummary.timedOut === false &&
     sourceRunSummary.interrupted === false && Number.isInteger(sourceRunSummary.exitCode));
   const sourceRunId = matchingSummary ? sourceRunSummary.runId : null;
@@ -256,6 +282,8 @@ function parseSavedLog(content, { logPath, logSha256, sourceRunSummary = null, r
     completionEvidence: complete ? 'CHECKSUM_MATCHED_CAPTURE_SUMMARY' : 'MISSING_OR_UNMATCHED_CAPTURE_SUMMARY',
     checkerSummary,
     countsMatchCheckerSummary,
+    countsMatchCaptureSummary,
+    acceptedExitCode: acceptedExitCode ?? false,
     sourceGitRevision,
     replayWorkspaceRevision,
     sourceRevisionStatus: sourceGitRevision ? 'RECORDED_REQUIRES_FILE_LEVEL_REVALIDATION' : 'NOT_PROVEN',
@@ -867,7 +895,7 @@ function gitRevision() {
 
 async function main() {
   if (args.includes('--help')) {
-    process.stdout.write('Usage: npm run check:logged [-- --output-dir <path> --timeout-ms <ms> --enhance --mcp-enrich]\n       npm run check:replay -- <saved-log.txt> [--enhance --mcp-enrich]\n');
+    process.stdout.write('Usage: npm run check:logged [-- --tsconfig <path> --output-dir <path> --timeout-ms <ms> --enhance --mcp-enrich]\n       npm run check:replay -- <saved-log.txt> [--enhance --mcp-enrich]\n');
     return 0;
   }
 
@@ -967,6 +995,7 @@ async function main() {
 
   const outputDir = path.resolve(frontendRoot, option('--output-dir', '../.tmp/atlas/svelte-check-runs'));
   mkdirSync(outputDir, { recursive: true });
+  const tsconfig = resolveTsconfig(option('--tsconfig', 'tsconfig.json'));
 
   const startedAt = new Date();
   const runId = startedAt.toISOString().replace(/[:.]/g, '-');
@@ -977,7 +1006,7 @@ async function main() {
     summary: path.join(outputDir, `svelte-check-${runId}.summary.json`),
   };
   const checkCli = path.join(frontendRoot, 'node_modules', 'svelte-check', 'bin', 'svelte-check');
-  const commandArgs = ['--tsconfig', './tsconfig.json', '--output', 'machine', '--no-color'];
+  const commandArgs = ['--tsconfig', tsconfig.path, '--output', 'machine', '--no-color'];
   const logStream = createWriteStream(paths.log, { flags: 'wx' });
   const diagnosticsStream = createWriteStream(paths.diagnostics, { flags: 'wx' });
   const diagnostics = [];
@@ -1065,6 +1094,7 @@ async function main() {
     completedAt: completedAt.toISOString(),
     durationMs: completedAt.getTime() - startedAt.getTime(),
     gitRevision: gitRevision(),
+    tsconfig,
     command: `node ${path.relative(frontendRoot, checkCli).replace(/\\/g, '/')} ${commandArgs.join(' ')}`,
     exitCode,
     signal: pendingSignal ?? signal,
@@ -1092,7 +1122,7 @@ async function main() {
     todoList = buildWorkboardContext(todoList);
   }
   if (args.includes('--mcp-enrich')) {
-    const captureStatus = !timedOut && !interrupted && Number.isInteger(exitCode) ? 'COMPLETE' : 'INCOMPLETE';
+    const captureStatus = !timedOut && !interrupted && [0, 1].includes(exitCode) ? 'COMPLETE' : 'INCOMPLETE';
     if (captureStatus !== 'COMPLETE' || todoList.tasks.length === 0) {
       todoList = await enrichTodoList(todoList, async () => {
         throw new Error('MCP_ENRICHMENT_BLOCKED');
@@ -1144,6 +1174,7 @@ export {
   matchPublishedDocs,
   parseMachineDiagnostic,
   parseSavedLog,
+  resolveTsconfig,
   summarizeDiagnostics,
 };
 

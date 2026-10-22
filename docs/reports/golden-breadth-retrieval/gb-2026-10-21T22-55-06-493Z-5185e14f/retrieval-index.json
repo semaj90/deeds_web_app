@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.golden-breadth-retrieval-index.v1",
+  "runId": "gb-2026-10-21T22-55-06-493Z-5185e14f",
+  "note": "Retrieval index is derived from live MCP results. Results are candidates, not proof of correctness.",
+  "entries": [
+    {
+      "id": "GB-001",
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "okLanes": [
+        "svelte"
+      ],
+      "failedLanes": []
+    },
+    {
+      "id": "GB-002",
+      "query": "SvelteKit 2 form actions with use:enhance and superforms",
+      "okLanes": [
+        "svelte"
+      ],
+      "failedLanes": []
+    }
+  ]
+}

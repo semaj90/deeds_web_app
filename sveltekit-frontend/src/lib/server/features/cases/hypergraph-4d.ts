@@ -1307,15 +1307,32 @@ export async function getHypergraphStats(): Promise<{
   };
 }
 
-/** Invalidate the entire hypergraph cache. */
+/**
+ * Invalidate the entire hypergraph cache. Throws if a SCAN or DEL fails, so callers
+ * never treat a partial invalidation as success.
+ *
+ * SCAN instead of KEYS: KEYS blocks Valkey for the whole keyspace walk. SCAN is not a
+ * point-in-time snapshot, so keys written during the walk may survive; rebuilds should
+ * run after invalidation, not concurrently with it.
+ */
 export async function invalidateHypergraph(): Promise<void> {
   const redis = getRedis();
+  const scanPattern = (match: string): Promise<string[]> =>
+    new Promise<string[]>((resolve, reject) => {
+      const keys: string[] = [];
+      const stream = redis.scanStream({ match, count: 500 });
+      stream.on('data', (batch: string[]) => keys.push(...batch));
+      stream.on('end', () => resolve(keys));
+      stream.on('error', reject);
+    });
   const [edgeKeys, coordKeys] = await Promise.all([
-    redis.keys('hg:edge:*').catch(() => [] as string[]),
-    redis.keys('hg:4d:*').catch(() => [] as string[]),
+    scanPattern('hg:edge:*'),
+    scanPattern('hg:4d:*'),
   ]);
   const all = [...edgeKeys, ...coordKeys, HG_IDX_KEY, HG_BUILT_KEY];
-  if (all.length) await redis.del(...all).catch(() => {});
+  for (let i = 0; i < all.length; i += 500) {
+    await redis.del(...all.slice(i, i + 500));
+  }
 }
 
 // ── Adaptive Memory Interface ──────────────────────────────────────────────────

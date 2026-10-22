@@ -926,6 +926,9 @@ evidence.
   `codebase_chunks_768_v2`, and named vector `content` without applying a
   collection migration.
 - [ ] Wire the adapter to the existing SearchRuntime/ContextManifest seam.
+- Caller audit update (2026-10-21): SearchRuntime itself has application callers, including `/api/search/hyperrag` (configured `readOnly: true`) and the ACE search helper. However, `executeSearchRuntimeTopKV1` has no non-test importer, and the ordinal selected-candidate/feature-row builders have no application caller. `/api/ace/stream` currently passes no server-owned cache identity to admission and returns `ACE_CONTEXT_MANIFEST_ADMISSION_REQUIRED` before synthesis. Thus existing SearchRuntime use does not prove the ordinal adapter → selected features → ContextManifest handoff. Keep this task open; first blocker is the missing caller-owned bridge/input binding, not the GPU runtime.
+- Additional review finding (2026-10-21): `/api/search/hyperrag` has a synthesis branch that formats `result.packets` titles/summaries/content and hypergraph facts directly into a llama-server prompt. This bypasses the repository's required admitted ContextManifest boundary. Do not treat that branch as grounded ACE synthesis; require existing ContextManifest admission/selection before model invocation. No runtime code was changed in this audit.
+- MCP smoke (2026-10-21): `atlas.packet_search` returned 3 candidates, but source digest mismatch and absent revision/span bindings blocked admission; see `docs/reports/parent-atlas-contextual-engineering-ranking-audit-20261021.md`. No model call or write occurred.
 - [ ] Prove native LibTorch/N-API GEMM parity against the CPU feature-head
   oracle.
 - [ ] Prove same-corpus cuVS/CAGRA ordinal parity and keep TurboVec/DiskANN as
@@ -3399,15 +3402,17 @@ Board: 6 done, 16 pending, 1 blocked. Events for this pass use `run_id` `proof-2
 - [x] **HERMES-01 Autonomous Pipeline & Inverse Prompt Injection Defense**:
   - Implemented `hermes-adaptive-pipeline-v1.ts` coordinating Kanban task claiming, lease fencing, candidate ranking via FM Rank-4, NES LUT inverse prompt injection defense, and ACE context packet injection (`ace:packet:{runId}`).
   - Zero persistence of `hiddenThoughts`, `chainOfThought`, `kv_cache`, or prompt tensors to any store or cache.
-  - Verification: 4/4 passing in `hermes-adaptive-pipeline-v1.spec.ts`.
+  - Component verification (2026-10-21): `hermes-adaptive-pipeline-v1.spec.ts` passes 6/6 in the focused 10-file Vitest run; this verifies pure helper behavior only.
+  - Runtime wiring audit (2026-10-21): no non-test application caller of `executeHermesAgentStepV1` or `adaptRankerFromOutcomesV1` was found. The DAG and promotion helpers are composed inside the Hermes module; that is not an application entrypoint. `buildAceContextPacketV1` is also used by `ace-context-proposal-renderer-v1.ts`, but it creates a descriptor and does not prove Redis persistence or readback. Treat this checked item as a component milestone, not a live autonomous pipeline.
 
 - [x] **ALIGNED-BITSET-01 64-Byte-Padded Bitset BLOB Codec**:
   - The codec defines a 64-byte header and 64-byte-padded payload layout, SHA-256 payload integrity, bit operations, and bytea serialization. This proves logical offsets and lengths only; JavaScript cannot establish physical cache-line address alignment, and a padded bytea is not a zero-copy GPU allocation.
-  - Historical verification recorded 7/7 tests for an earlier codec revision. Re-run the focused suite for the current ATLASBIT/SHA-256 implementation before treating it as current verification.
+  - Current component verification (2026-10-21): `aligned-bitset-blob-v1.spec.ts` passes 8/8 in the focused 10-file Vitest run. This proves the serialized logical layout and codec behavior only; physical address alignment, PostgreSQL bytea driver round-trip, N-API alignment, and device binding remain unproven.
 
 - [ ] **ALIGNED-BITSET-ORDINAL-WIRE-01 Candidate Selection Adapter**:
   - Added a read-only adapter that binds a serialized ordinal bitset to the existing `CandidateOrdinalMapV1` checksum and feature snapshot before selecting rows. It creates no table, assigns no ordinals, and performs no persistence or GPU transfer.
   - Added a logical-layout proof function: payload offset is 64 bytes, uint64 view offset is divisible by 8, and serialized length is divisible by 64. Physical address and WebGPU device-binding alignment are explicitly reported as NOT_PROVEN.
   - Added a checksum-bound compact-KNN CPU reference hot path that validates the complete tile and snapshot/map binding, applies the frozen ordinal mask before reading candidate vector rows, computes cosine/inner-product/L2 scores, and emits deterministic tile-local Top-K. A masked-out candidate containing `NaN` is excluded without being read or scored.
-  - Current verification: 18/18 tests pass across the bitset codec, ordinal-mask adapter, and compact-KNN suites. This proves CPU selection/scoring behavior and logical layout only. PostgreSQL driver readback, N-API physical alignment, GPU transfer/device alignment, and production SearchRuntime integration remain unproven.
+  - Current verification (2026-10-21): a focused Vitest run passed 10 files / 49 tests; the three directly covering this lane passed 18/18 (`aligned-bitset-blob-v1` 8, `candidate-ordinal-bitset-selection-v1` 5, `compact-knn-topk` 5). The six-script Node integration suite also passed 10/10. These results prove component and fixture behavior, not a production caller.
+  - Wiring and production gates remain open: no application importer of the ordinal selector or compact-KNN scorer was found. PostgreSQL driver readback, N-API physical alignment, GPU/device alignment, SearchRuntime integration, and frozen-source end-to-end retrieval quality remain NOT_PROVEN. Keep this task unchecked.
   - Run note: `docs/reports/compact-knn-ordinal-gate-hot-path-20261017.md`.

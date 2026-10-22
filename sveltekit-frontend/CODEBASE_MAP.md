@@ -160,7 +160,7 @@ This quick-sort table mirrors the root-level triage view, but for the noisiest `
 | Codebase indexing | `src/routes/api/codebase-index/orchestrate/+server.ts`, `src/routes/api/codebase-index/index-stream/+server.ts`, `src/lib/components/admin/PipelineProgress.svelte` | This is the live indexing spine that scans files, builds embeddings, summarizes clusters, and writes graph/search artifacts. It also has direct UI consumers. |
 | ACE context assembly | `src/lib/server/ace/context-assembler.ts`, `src/routes/api/synthesis/generate/+server.ts`, `src/routes/api/sse/chat/+server.ts` | This is the main synthesis plane. It merges RAG, KAG, graph/community context, chat memory, and optional codebase context into promptable bundles used by live routes. |
 | ACP tool plane | `src/lib/services/knowledge-search/ACPToolRegistry.ts`, `src/routes/api/acp/tools/+server.ts`, `src/routes/api/acp/execute/+server.ts` | This is the bounded execution surface for tool schemas and tool calls. Keep it distinct from ACE: ACP executes tools, ACE assembles context. |
-| Graph augmentation | `src/lib/server/graph/community-graph.ts`, `src/lib/server/retrieval/topological-search.ts`, `src/lib/server/graph/hypergraph-4d.ts` | These modules add GraphRAG communities and hypergraph/topological boosts on top of vector retrieval. They are the graph-memory path that already exists in live code. |
+| Graph augmentation | `src/lib/server/graph/community-graph.ts`, `src/lib/server/retrieval/topological-search.ts`, `src/lib/server/graph/hypergraph-4d.ts` (re-export facade) → `src/lib/server/features/cases/hypergraph-4d.ts`; standalone `scripts/run-hypergraph.ts` | The codebase-index orchestrator's optional Stage 9 calls `buildHypergraph4D()` through the facade. The feature implementation and standalone script both write overlapping Redis keys (`hg:edge:*`, `hg:edge:idx`, `hg:4d:*`, `hg:built_at`); the script additionally syncs Neo4j and attempts PostgreSQL `hypergraph_edges` upserts. They are distinct implementations, not proven-compatible owners; select/retire/converge an owner before calling either canonical. Stage 9 hydrates its PageRank inputs from `couchdb:pagerank_scores`, populated by the CouchDB power-iteration path. This is separate from the NetworkX↔cuGraph parity workflow and the Neo4j-GDS authority-score pipeline; do not label the Stage 9 manifold as NetworkX/Neo4j PageRank authority. All graph scores remain derived signals, not identity or admission authority. |
 | Cache and semantic retrieval | `src/lib/server/ollama.ts`, `src/lib/server/cache/redis-exact-match.ts`, `src/routes/api/cache/bifrost/check/+server.ts` | This is the L1 exact-match plus L2 Bifrost semantic-cache path used across synthesis, analytics, and codebase analysis. |
 | Inference routing | `src/lib/server/inference/inference-router.ts`, `src/routes/api/ai/chat/+server.ts`, `src/routes/api/knowledge/stream/+server.ts` | This is the active server-side inference cascade. Use it when validating which backend tier is actually serving a request. |
 | LangGraph sidecar | `src/lib/server/ai/langgraph-client.ts`, `src/routes/api/synthesis/generate/+server.ts`, `src/mcp/server.ts` | This is a real optional integration layer, not just a planning concept. It is live code behind env gating and Docker wiring. |
@@ -178,7 +178,7 @@ The current repo already follows the clean split: EmbeddingGemma is the vector b
 ### Gemma PLE vs Retrieval Embeddings
 Some smaller Gemma-family edge models use Per-Layer Embeddings (PLE) and MatFormer-style parameter-efficient execution. PLE is an internal inference/runtime optimization that helps smaller effective-parameter models run efficiently on local devices. It is not the same thing as the semantic embeddings used for vector search.
 
-For retrieval, semantic caching, clustering, and Qdrant indexing, this codebase uses EmbeddingGemma. For planning, synthesis, tool-call generation, and multimodal reasoning, it uses Gemma 4-family reasoning models. PLE-capable edge models may eventually be used as cheaper local routers or planners, but their per-layer embeddings are not the authoritative vector representation in Qdrant.
+For retrieval, semantic caching, clustering, pg vector,  Qdrant indexing, this codebase uses EmbeddingGemma. For planning, synthesis, tool-call generation, and multimodal reasoning, it uses Gemma 4-family reasoning models. PLE-capable edge models may eventually be used as cheaper local routers or planners, but their per-layer embeddings are not the authoritative vector representation in Qdrant.
 
 ### Capability Routing Reality Check (May 3, 2026)
 - `src/lib/ai/model-ids.ts` now carries a central `MODEL_CAPABILITIES` registry plus `pickModelForRole`, `getModelCapabilities`, and embedding-model validation helpers.
@@ -568,26 +568,26 @@ simd-bridge/cpp/
 | Component | Status | Details |
 |-----------|--------|---------|
 | RTX 3060 Ti | ACTIVE | 8192 MiB VRAM, driver 580.88 |
-| Ollama (native) | RUNNING | Port 11434, GPU, 4 models loaded |
-| gemma4-rotorquant:latest | LOADED | 11.8B Q4_K_M (7.3GB) |
+| Ollama embeddinggemma | RUNNING | Port 11434, GPU, 4 models loaded |
+| ornith 1.5 llama-server 8090 | LOADED |  Q4_K_M (7.3GB) |
 | embeddinggemma | LOADED | 307M BF16 (622MB, 768-dim) |
 | TRT-LLM | AVAILABLE | API routes exist, engine not built |
 ---
 ## Cross-Service Communication Map
 ```
-SvelteKit ←─ gRPC ──→ Go embedding-server ←─ HTTP ──→ Ollama
-    │                       ↑
-    │            ←─ NATS ──→│ (quic-nats-bridge)
-    │
-    ├── HTTP ──→ Ollama (direct, Tier 3/4)
-    ├── HTTP ──→ Go SIMD sidecar (SeaweedFS metadata)
-    ├── N-API ──→ tensorrt_bridge.node (LibTorch CUDA)
-    ├── bolt:// ──→ Neo4j (graph queries)
-    ├── TCP ──→ Redis (cache + lease + sessions)
-    ├── TCP ──→ PostgreSQL (primary storage)
-    ├── HTTP ──→ Qdrant (vector search)
-    ├── AMQP ──→ RabbitMQ (async jobs)
-    └── HTTP ──→ CouchDB (tag catalog)
+SvelteKit ←─ gRPC ──→ Go embedding-server ←─ HTTP ──→ Ollama embeddingegmma only
+│  ↑
+│ ←─ NATS ──→│ (quic-nats-bridge)
+│ llama-server 8090 ornith 1.5
+├── HTTP ──→ Ollama embeddingemma only (direct, Tier 3/4)
+├── HTTP ──→ Go SIMD sidecar (SeaweedFS metadata)
+├── N-API ──→ tensorrt_bridge.node (LibTorch CUDA)
+├── bolt:// ──→ Neo4j (graph queries)
+├── TCP ──→ Redis (cache + lease + sessions)
+├── TCP ──→ PostgreSQL (primary storage)
+├── HTTP ──→ Qdrant (vector search)
+├── AMQP ──→ RabbitMQ (async jobs)
+└── HTTP ──→ CouchDB (tag catalog)
 ```
 ---
 ## 10-Layer Import Audit Protocol (Gemini Audit — April 7, 2026)
@@ -811,7 +811,7 @@ Status note: percentages below are carried forward from earlier project tracking
 
 | Phase | What it checks | Result |
 |-------|---------------|--------|
-| 1 — Service Health | Dev :5173, Qdrant :6333, Ollama :11434, Redis | ✅ All pass |
+| 1 — Service Health | Dev :5173, Qdrant :6333, Ollama :11434, Redis-valkey  | ✅ All pass |
 | 2 — GPU Codebase Index | Qdrant chunk count, dual-vector, cluster field | Skipped (--skip-index) |
 | 3 — Gemma4 Agent | 5 agent queries via `/api/ai/agent` | ⚠️ Requires VRAM headroom |
 | 3b — Per-Dir Deep Audit | Agent audit per `src/lib/server/` subdirectory | ⚠️ Requires VRAM headroom |

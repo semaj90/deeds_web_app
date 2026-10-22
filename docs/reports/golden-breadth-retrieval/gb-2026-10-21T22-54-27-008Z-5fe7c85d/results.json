@@ -1,0 +1,56 @@
+{
+  "runId": "gb-2026-10-21T22-54-27-008Z-5fe7c85d",
+  "mode": "LIVE",
+  "results": [
+    {
+      "id": "GB-001",
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "lanes": {
+        "svelte": {
+          "status": "TOOL_ERROR",
+          "result": {
+            "isError": true,
+            "content": [
+              {
+                "type": "text",
+                "text": "Invalid arguments for tool get-documentation: [{\"kind\":\"schema\",\"type\":\"object\",\"expected\":\"\\\"section\\\"\",\"received\":\"undefined\",\"message\":\"Invalid key: Expected \\\"section\\\" but received undefined\",\"path\":[{\"type\":\"object\",\"origin\":\"key\",\"input\":{\"sections\":[\"How do SvelteKit 2 load functions return data to +page.svelte?\"]},\"key\":\"section\"}]}]"
+              }
+            ]
+          },
+          "tools": [
+            "get-documentation",
+            "list-sections",
+            "playground-link",
+            "svelte-autofixer"
+          ],
+          "latencyMs": 14519
+        }
+      }
+    },
+    {
+      "id": "GB-002",
+      "query": "SvelteKit 2 form actions with use:enhance and superforms",
+      "lanes": {
+        "svelte": {
+          "status": "TOOL_ERROR",
+          "result": {
+            "isError": true,
+            "content": [
+              {
+                "type": "text",
+                "text": "Invalid arguments for tool get-documentation: [{\"kind\":\"schema\",\"type\":\"object\",\"expected\":\"\\\"section\\\"\",\"received\":\"undefined\",\"message\":\"Invalid key: Expected \\\"section\\\" but received undefined\",\"path\":[{\"type\":\"object\",\"origin\":\"key\",\"input\":{\"sections\":[\"SvelteKit 2 form actions with use:enhance and superforms\"]},\"key\":\"section\"}]}]"
+              }
+            ]
+          },
+          "tools": [
+            "get-documentation",
+            "list-sections",
+            "playground-link",
+            "svelte-autofixer"
+          ],
+          "latencyMs": 7505
+        }
+      }
+    }
+  ]
+}

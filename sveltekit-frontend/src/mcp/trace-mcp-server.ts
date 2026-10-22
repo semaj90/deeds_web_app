@@ -66,6 +66,7 @@ import { trace } from '@opentelemetry/api';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { waitForMcpResponseFinish } from './response-finish.js';
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
@@ -231,6 +232,7 @@ const server = new McpServer({
 });
 
 type ServiceWorkerKind =
+  | 'analysis.indexed_source_batch'
   | 'context.build_ace_packet'
   | 'context.build_indexed_source_packet'
   | 'miniforge.analyze'
@@ -478,7 +480,19 @@ async function pumpServiceWorkers(): Promise<void> {
         const payload = job.payload;
         let result: unknown;
 
-        if (job.kind === 'context.build_ace_packet') {
+        if (job.kind === 'analysis.indexed_source_batch') {
+          const { auditIndexedSourceDirectoryV1 } = await import(
+            new URL('../../../scripts/atlas/audit-indexed-source-batch-v1.mjs', import.meta.url).href
+          );
+          result = await auditIndexedSourceDirectoryV1({
+            directory: payload.directory,
+            workspaceRevision: payload.workspaceRevision,
+            limit: payload.limit,
+            afterSourceRef: payload.afterSourceRef ?? null,
+            concurrency: 1,
+            sidecarUrl: ENV.MINIFORGE_SIDECAR_URL ?? ENV.LANGEXTRACT_URL,
+          });
+        } else if (job.kind === 'context.build_ace_packet') {
           const sourceRef = typeof payload.sourceRef === 'string' ? payload.sourceRef : undefined;
           const markdown = typeof payload.markdown === 'string' ? payload.markdown : undefined;
           const query = typeof payload.query === 'string' ? payload.query : undefined;
@@ -8885,29 +8899,7 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
   try {
     await server.connect(transport);
     await transport.handleRequest(req, res);
-    // Wait until the SDK has handed the response body to Node before closing
-    // this stateless transport. `handleRequest()` may return after headers/body
-    // are scheduled but before `finish`; closing immediately can produce a 200
-    // with an empty SSE body. Do not wait for keep-alive `close`, which may never
-    // arrive after a successful POST. The timeout keeps one malformed request
-    // from wedging the serialized MCP queue.
-    if (!res.writableFinished) {
-      await new Promise<void>((resolve) => {
-        let settled = false;
-        const settle = () => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          res.off('finish', settle);
-          res.off('close', settle);
-          resolve();
-        };
-        const timer = setTimeout(settle, 5000);
-        res.on('finish', settle);
-        res.on('close', settle);
-        if (res.writableFinished) settle();
-      });
-    }
+    await waitForMcpResponseFinish(res);
   } catch (err: any) {
     console.error('[MCP per-request handler threw]', {
       url: req.url,
@@ -10975,6 +10967,35 @@ server.registerTool(
       const errorMsg = err instanceof Error ? err.message : String(err);
       return { status: 'error', error: errorMsg.slice(0, 500) };
     }
+  }
+);
+
+server.registerTool(
+  'analysis.indexed_source_batch',
+  {
+    description: 'Queue bounded diagnostics for an already indexed directory/workspace. Rechecks exact source bytes; returns proposal receipts through service_workers.result. Database access is read-only; this does not admit evidence or refresh wiki/cache state.',
+    inputSchema: z.object({
+      directory: z.string().min(1).max(500).regex(/^(?![A-Za-z][A-Za-z0-9+.-]*:)(?!\/)(?!.*[\\\u0000-\u001f\u007f?#])[^/]+(?:\/[^/]+)*$/)
+        .refine(value => value.split('/').every(segment => segment !== '.' && segment !== '..')),
+      workspaceRevision: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+      limit: z.number().int().min(1).max(16).default(8),
+      afterSourceRef: z.string().min(1).max(500).optional().describe('Exact next-page cursor returned as nextSourceRef; keep the workspace and directory unchanged'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    if (serviceWorkerQueue.length >= 32) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ status: 'busy', error: 'INDEXED_SOURCE_BATCH_QUEUE_FULL' }) }], isError: true };
+    }
+    const job = enqueueServiceWorker('analysis.indexed_source_batch', {
+      directory: input.directory,
+      workspaceRevision: input.workspaceRevision,
+      limit: input.limit ?? 8,
+      afterSourceRef: input.afterSourceRef ?? null,
+    });
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify({ status: 'queued', job_id: job.id, job_kind: job.kind,
+        worker: snapshotServiceWorkers(), canonicalAuthority: false, datastoreWritesPerformed: false }) }],
+    };
   }
 );
 

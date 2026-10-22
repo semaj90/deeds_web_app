@@ -6,6 +6,7 @@ import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { compareFunctionNativeAstReadbackV1 } from './lib/function-native-source-alignment-v1.mjs';
+import { assertCompleteAstScan } from './lib/source-observation-http-v1.mjs';
 
 const root = path.resolve(import.meta.dirname, '../..');
 const symbolArg = process.argv.find((arg) => arg.startsWith('--symbol-version-id='));
@@ -163,12 +164,15 @@ try {
             responseChunks.push(chunk);
           }
           const responseBytes = Buffer.concat(responseChunks, responseByteCount);
+          const evidence = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(responseBytes));
+          // Fail closed: a partial or unreceipted native scan is REJECTED, never compared as admitted evidence.
+          assertCompleteAstScan(evidence);
           nativeAst = { ...compareFunctionNativeAstReadbackV1({
             symbol: { symbolVersionId, packetKey: symbol.packet_key, sourceRef: symbol.source_ref,
               sourceRevision: symbol.source_revision, workspaceRevision: symbol.workspace_revision,
               qualifiedName: symbol.qualified_name, language: symbol.language, upstreamNodeId: symbol.upstream_node_id,
               upstreamSymbolId: symbol.upstream_symbol_id, startByte: Number(symbol.byte_start), endByte: Number(symbol.byte_end) },
-            sourceBytes, evidence: JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(responseBytes)),
+            sourceBytes, evidence,
           }), responseSha256: sha256(responseBytes) };
         } catch (error) {
           nativeAst = { status: 'REJECTED', reason: error instanceof Error ? error.message : 'NATIVE_READ_FAILED' };

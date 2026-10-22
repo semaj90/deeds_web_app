@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.golden-breadth-plan.v1",
+  "runId": "gb-2026-10-21T23-06-31-471Z-0ebe7bba",
+  "mode": "LIVE",
+  "queryCount": 1,
+  "startIndex": 46,
+  "queriesSha256": "a001ebe2ab7cef986333f88f54569698193aa5005dd4de194fbc930b04dbc98b",
+  "queries": [
+    {
+      "id": "GB-047",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Count of TRACE MCP tools registered in trace-mcp-server",
+      "category": "trace"
+    }
+  ]
+}

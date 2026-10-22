@@ -1,0 +1,443 @@
+{
+  "schema": "atlas.golden-breadth-plan.v1",
+  "runId": "gb-2026-10-21T22-57-58-137Z-5a8bf078",
+  "mode": "LIVE",
+  "queryCount": 50,
+  "startIndex": 0,
+  "queriesSha256": "a001ebe2ab7cef986333f88f54569698193aa5005dd4de194fbc930b04dbc98b",
+  "queries": [
+    {
+      "id": "GB-001",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-002",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 form actions with use:enhance and superforms",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-003",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "Svelte 5 $props with a TypeScript interface",
+      "category": "svelte5"
+    },
+    {
+      "id": "GB-004",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "Svelte 5 $derived.by for multi-statement derivation",
+      "category": "svelte5"
+    },
+    {
+      "id": "GB-005",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "Svelte 5 $effect cleanup return function",
+      "category": "svelte5"
+    },
+    {
+      "id": "GB-006",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "Svelte 5 snippets replacing slots",
+      "category": "svelte5"
+    },
+    {
+      "id": "GB-007",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "Svelte 5 onclick event attributes instead of on:click",
+      "category": "svelte5"
+    },
+    {
+      "id": "GB-008",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 +server.ts RequestHandler POST returning json",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-009",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 hooks.server.ts handle function and event.locals",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-010",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 error() and redirect() thrown from load",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-011",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 $env/static/private versus $env/dynamic/private",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-012",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 prerender and ssr page options",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-013",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "Svelte 5 bind:value on a component with $bindable props",
+      "category": "svelte5"
+    },
+    {
+      "id": "GB-014",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 route parameter matchers",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-015",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 layout data inheritance with parent()",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-016",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Zod schema validating request.json in a SvelteKit route",
+      "category": "zod"
+    },
+    {
+      "id": "GB-017",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "sveltekit-superforms v2 superValidate with the zod adapter",
+      "category": "zod"
+    },
+    {
+      "id": "GB-018",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "svelte-autofixer rules for runes misuse",
+      "category": "svelte5"
+    },
+    {
+      "id": "GB-019",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Drizzle migrate versus push on a database with live data",
+      "category": "drizzle"
+    },
+    {
+      "id": "GB-020",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "pgvector halfvec cosine HNSW index on codebase_chunk_index",
+      "category": "postgres18"
+    },
+    {
+      "id": "GB-021",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "PostgreSQL 18 io_method worker and io_workers settings",
+      "category": "postgres18"
+    },
+    {
+      "id": "GB-022",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Drizzle schema for atlas_packets with a jsonb envelope",
+      "category": "drizzle"
+    },
+    {
+      "id": "GB-023",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "pg_trgm GIN index for trigram search on function names",
+      "category": "postgres18"
+    },
+    {
+      "id": "GB-024",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Canonical packet join on packet_key with source_ref and feature_id",
+      "category": "identity"
+    },
+    {
+      "id": "GB-025",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Symbol versions that are revision qualified",
+      "category": "identity"
+    },
+    {
+      "id": "GB-026",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Valkey centroid cache key pattern for kmeans, som and domain",
+      "category": "cache"
+    },
+    {
+      "id": "GB-027",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "BitFrost L1 and L2 cache invalidation after a Postgres write",
+      "category": "cache"
+    },
+    {
+      "id": "GB-028",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "ioredis lazyConnect and retryStrategy pattern for scripts",
+      "category": "cache"
+    },
+    {
+      "id": "GB-029",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Centroid cache partitioned by kmeans, som and domain keys",
+      "category": "cache"
+    },
+    {
+      "id": "GB-030",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "ACE hit-demand Redis rank key and its TTL",
+      "category": "cache"
+    },
+    {
+      "id": "GB-031",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Replacing redis KEYS with SCAN for a hypergraph reset",
+      "category": "cache"
+    },
+    {
+      "id": "GB-032",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "opencode.jsonc mcp registration for the trace server",
+      "category": "opencode"
+    },
+    {
+      "id": "GB-033",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "OpenCode agent permission default deny with explicit allows",
+      "category": "opencode"
+    },
+    {
+      "id": "GB-034",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "OpenCode instructions list must exclude generated cards",
+      "category": "opencode"
+    },
+    {
+      "id": "GB-035",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Ornith atlas kernel agent restricted to curated tools",
+      "category": "opencode"
+    },
+    {
+      "id": "GB-036",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "llama-server model resolver for chat requests on port 8090",
+      "category": "opencode"
+    },
+    {
+      "id": "GB-037",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "OpenCode SKILL.md loaded on demand",
+      "category": "opencode"
+    },
+    {
+      "id": "GB-038",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "ACE context editor writes a canonical packet to Redis",
+      "category": "ace"
+    },
+    {
+      "id": "GB-039",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "ContextManifest checksum and token budget",
+      "category": "ace"
+    },
+    {
+      "id": "GB-040",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Sanitising a user query before prompt injection",
+      "category": "ace"
+    },
+    {
+      "id": "GB-041",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Hidden thoughts and chain of thought must not persist in cache",
+      "category": "ace"
+    },
+    {
+      "id": "GB-042",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Agentic RAG context built from retrieval hits",
+      "category": "ace"
+    },
+    {
+      "id": "GB-043",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "ACE scoring spine weights for semantic, tag, ast and som",
+      "category": "ace"
+    },
+    {
+      "id": "GB-044",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Retrieved text is data and never an instruction to the model",
+      "category": "ace"
+    },
+    {
+      "id": "GB-045",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "find_feature lookup for an Atlas feature label",
+      "category": "atlas-tools"
+    },
+    {
+      "id": "GB-046",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "find_source_refs for a symbol source reference",
+      "category": "atlas-tools"
+    },
+    {
+      "id": "GB-047",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "Count of TRACE MCP tools registered in trace-mcp-server",
+      "category": "trace"
+    },
+    {
+      "id": "GB-048",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "ATLAS_TOOLS_MOCK must be 0 for live atlas tools",
+      "category": "atlas-tools"
+    },
+    {
+      "id": "GB-049",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "MCP tool selection narrowed by the tool query hint",
+      "category": "trace"
+    },
+    {
+      "id": "GB-050",
+      "lanes": [
+        "trace",
+        "atlas"
+      ],
+      "query": "KAG search hybrid retrieval with neighbourhood expansion",
+      "category": "trace"
+    }
+  ]
+}

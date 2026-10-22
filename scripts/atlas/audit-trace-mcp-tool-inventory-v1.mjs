@@ -48,7 +48,7 @@ function main() {
     sourceChecksum,
     static: true,
     runtimeVerified: false,
-    runtimeBlocker: 'TRACE :8788 refused connections (ECONNREFUSED) at the time of the audit',
+    runtimeBlocker: 'LIVE_TOOLS_LIST_NOT_PERFORMED_BY_THIS_STATIC_AUDIT',
     ...result,
     canonicalAuthority: false,
     writesPerformed: false,

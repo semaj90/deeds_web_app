@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 // Existing owner of import-target resolution (GSP-5); runs under tsx: `cd sveltekit-frontend && npx tsx ../scripts/atlas/audit-ast-edge-eligibility-v1.mjs`.
 import { parseImportStatementV1, resolveImportSpecifierV1 } from '../../sveltekit-frontend/src/lib/server/atlas/indexing/graphify-import-target-resolver-v1.ts';
+import { assertCompleteAstScan } from './lib/source-observation-http-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const argIdx = process.argv.indexOf('--files');
@@ -50,7 +51,10 @@ async function sidecar(file) {
   const r = await fetch('http://127.0.0.1:8095/ast/chunk', { method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(90000),
     body: JSON.stringify({ source, language: file.endsWith('.tsx') ? 'tsx' : 'typescript', filePath: file, sourceRevision: 'ast-edge-eligibility-v1' }) });
   if (!r.ok) throw new Error(`SIDECAR_HTTP_${r.status}`);
-  return r.json();
+  const body = await r.json();
+  // Fail closed: a partial or unreceipted scan is never used for edge eligibility.
+  assertCompleteAstScan(body);
+  return body;
 }
 
 function importBindings(edges) {
@@ -74,10 +78,17 @@ const blank = () => ({ total: 0, resolvedBySidecar: 0, structuralEligible: 0, el
 const out = { schema: 'atlas.ast-edge-eligibility.v1', generatedAt: new Date().toISOString(), canonicalAuthority: false, writesPerformed: false,
   sidecar: 'http://127.0.0.1:8095/ast/chunk',
   note: 'Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: IMPORTS targets now use the existing GSP-5 resolver (graphify-import-target-resolver-v1.ts), and PacketKeyV2 / workspace / graph revisions are required.',
-  sourceAuthority: {}, totals: { files: 0, edges: 0, ...blank() }, byKind: Object.fromEntries(kinds.map((k) => [k, blank()])), subjectClasses: {}, nodeClasses: {}, perFile: [] };
+  sourceAuthority: {}, totals: { files: 0, edges: 0, ...blank() }, byKind: Object.fromEntries(kinds.map((k) => [k, blank()])), subjectClasses: {}, nodeClasses: {}, perFile: [], refusedFiles: [] };
 
 for (const file of FILES) {
-  const j = await sidecar(file);
+  let j;
+  try {
+    j = await sidecar(file);
+  } catch (error) {
+    // Refused, not skipped silently: the reason stays in the diagnostic report, and no edges from this file count.
+    out.refusedFiles.push({ file, reason: String(error?.message ?? error) });
+    continue;
+  }
   const { chunks, edges } = j;
   const subjectIndex = new Map();
   for (const c of chunks) {

@@ -134,10 +134,16 @@
       onchange?.(value, option);
   }
 
-  function clearSelection(e: MouseEvent) {
+  function clearSelection(e: Event) {
       e.stopPropagation();
       value = '';
       onchange?.('', undefined);
+  }
+
+  function handleClearKeydown(e: KeyboardEvent) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      clearSelection(e);
   }
 
   function handleOutsideClick(e: MouseEvent) {
@@ -170,7 +176,7 @@
 
     <div class="select-actions">
         {#if clearable && value}
-            <span class="clear-icon" onclick={clearSelection} role="button" tabindex="0">×</span>
+            <span class="clear-icon" onclick={clearSelection} onkeydown={handleClearKeydown} role="button" tabindex="0">×</span>
         {/if}
         <span class="arrow-icon" class:rotated={isOpen}>▼</span>
     </div>

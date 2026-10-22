@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.repair-baseline-receipt.v1",
+  "cohort": "R01b",
+  "command": "npm run check -- --output machine (cwd sveltekit-frontend; expands to svelte-check --tsconfig ./tsconfig.json --output machine)",
+  "baselineReceipt": "docs/reports/agentic-diagnostic-repair/r01-svelte-check-baseline.json",
+  "runs": [
+    {
+      "exit": 0,
+      "seconds": 347,
+      "diagnosticsSha256Stripped": "1a761b32abba3c377a9d264f73d3de57ff361ea3c71c6a09a56d86c471d84577"
+    },
+    {
+      "exit": 0,
+      "seconds": 295,
+      "diagnosticsSha256Stripped": "1a761b32abba3c377a9d264f73d3de57ff361ea3c71c6a09a56d86c471d84577"
+    }
+  ],
+  "diagnosticsHashMethod": "sha256 over ERROR/WARNING lines with the leading machine timestamp removed (cut -d' ' -f2-)",
+  "stable": true,
+  "summary": {
+    "files": 16213,
+    "errors": 0,
+    "warnings": 15,
+    "filesWithProblems": 10,
+    "distinctDiagnosticFiles": 10
+  },
+  "agreementWithR01": {
+    "countsMatch": true,
+    "diagnosticSetMatchesR02Identities": "not re-verified in this receipt; R02 ids were derived from the R01 run",
+    "hashComparable": false,
+    "hashComparableReason": "R01 diagnosticsSha256 was computed over a scope not reproduced here; counts match, hashes are not compared"
+  },
+  "provenance": {
+    "git": "3376feb172cdb41c86c764f6c6cbcb153f199889",
+    "branch": "chore/parent-atlas-session-2026-10-17",
+    "workingTreeDirtyEntries": 58,
+    "workingTreeDirtyEntriesAtR01": 55,
+    "cleanCheckout": false,
+    "tsconfigSha256": "6f1fcff10c32e0a25c806ef38f2174ff48f9430318fc3c66c2f50d7200a8c655",
+    "tsconfigSha256Matches": true
+  },
+  "status": "BASELINE_REPEATED_STABLE_NOT_CLEAN_TREE"
+}

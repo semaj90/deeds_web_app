@@ -128,7 +128,7 @@
 
 	<!-- Legal Templates -->
 	<div>
-		<label class="block text-xs font-medium mb-1.5 opacity-70">Legal Templates</label>
+		<span class="block text-xs font-medium mb-1.5 opacity-70">Legal Templates</span>
 		<div class="flex flex-wrap gap-1.5">
 			{#each legalTemplates as template}
 				<button

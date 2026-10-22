@@ -71,7 +71,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  * 1. Validate + hash + upload original to object storage
  * 2. Generate thumbnail via Sharp → upload to object storage
  * 3. Insert DB record (returns immediately to client)
- * 4. Background: Gemma3 VLM analysis (caption + tags + forensics)
+ * 4. Background: Ornith 1.5 VLM analysis via llama-server :8090 (caption + tags + forensics)
  * 5. Background: EmbeddingGemma → caption embedding → Qdrant
  * 6. Background: Auto-tag + mirror to stores
  * 7. Background: LangExtract OCR for any text in image
@@ -238,7 +238,7 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
 
 /**
  * Runs the full VLM analysis pipeline after photo upload:
- *   Gemma3 VLM → caption + tags + forensic flags
+ *   Ornith 1.5 VLM (llama-server :8090) → caption + tags + forensic flags
  *   EmbeddingGemma → 768-dim caption embedding
  *   Qdrant → store in evidence_items for vector search
  *   LangExtract → OCR any text in image
@@ -264,7 +264,7 @@ async function runVLMAnalysisPipeline(
 
   const base64Image = vlmBuffer.toString('base64');
 
-  // ── Step 1: Gemma3 VLM Analysis ──
+  // ── Step 1: Ornith 1.5 VLM Analysis (llama-server :8090) ──
   let aiCaption = '';
   let aiTags: string[] = [];
   let forensicData: Record<string, unknown> = {};

@@ -9,6 +9,25 @@ const env = loadRepoEnv();
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), max: 1 });
 const client = await pool.connect();
 const qdrant = new QdrantClient({ url: process.env.QDRANT_URL || 'http://127.0.0.1:6333' });
+const targetFileRelative = process.argv[2] || 'src/routes/api/admin/knowledge/+server.ts';
+
+function resolveSourcePath(sourceRef) {
+  if (typeof sourceRef !== 'string' || !sourceRef || path.isAbsolute(sourceRef) || sourceRef.includes('\\')) {
+    throw new Error('SOURCE_REF_INVALID');
+  }
+
+  const segments = sourceRef.split('/');
+  if (segments.some((segment) => !segment || segment === '.' || segment === '..')) {
+    throw new Error('SOURCE_REF_INVALID');
+  }
+
+  const candidates = sourceRef.startsWith('sveltekit-frontend/')
+    ? [path.resolve(REPO_ROOT, sourceRef)]
+    : [path.resolve(REPO_ROOT, sourceRef), path.resolve(REPO_ROOT, 'sveltekit-frontend', sourceRef)];
+  const root = path.resolve(REPO_ROOT);
+  const contained = candidates.filter((candidate) => candidate.startsWith(`${root}${path.sep}`));
+  return contained.find((candidate) => fs.existsSync(candidate)) ?? contained[0] ?? null;
+}
 
 try {
   await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
@@ -32,10 +51,11 @@ try {
     FROM codebase_chunk_index c
     JOIN atlas_observation_feature_rows o ON c.source_ref = o.source_ref
     JOIN graphify_files g ON o.source_ref = g.source_ref OR ('sveltekit-frontend/' || o.source_ref) = g.source_ref
-    WHERE c.content_embedding_768 IS NOT NULL
+    WHERE o.source_ref = $1
+      AND c.content_embedding_768 IS NOT NULL
       AND o.source_revision IS NOT NULL
     LIMIT 1;
-  `);
+  `, [targetFileRelative]);
 
   if (!cand.rows.length) {
     console.log('No chunk found with both content_embedding_768 and ORF row.');
@@ -45,11 +65,13 @@ try {
   const row = cand.rows[0];
   console.log('Found candidate row:', row);
 
-  const targetFileRelative = row.source_ref;
-  const targetDiskPath = path.join(REPO_ROOT, 'sveltekit-frontend', targetFileRelative);
+  if (row.source_ref !== targetFileRelative) {
+    throw new Error('SOURCE_REF_SELECTION_MISMATCH');
+  }
+  const targetDiskPath = resolveSourcePath(row.source_ref);
   let diskSha256 = null;
   let fileBytesLength = 0;
-  if (fs.existsSync(targetDiskPath)) {
+  if (targetDiskPath && fs.existsSync(targetDiskPath)) {
     const bytes = fs.readFileSync(targetDiskPath);
     fileBytesLength = bytes.byteLength;
     diskSha256 = 'sha256:' + crypto.createHash('sha256').update(bytes).digest('hex');
@@ -123,15 +145,29 @@ try {
     },
     chainIntact: Boolean(
       diskSha256 === row.source_revision &&
+      diskSha256 === row.code_source_revision &&
       vectorLength === 768 &&
       row.packet_key &&
-      row.workspace_revision === row.g_workspace_revision
+      row.workspace_revision === row.g_workspace_revision &&
+      qdrantPoint &&
+      qdrantPoint.id === row.qdrant_id &&
+      qdrantPoint.payload?.source_ref === row.source_ref
     ),
+    blockingReasons: [
+      ...(diskSha256 !== row.source_revision ? ['SOURCE_REVISION_MISMATCH'] : []),
+      ...(diskSha256 !== row.code_source_revision ? ['GRAPHIFY_SOURCE_REVISION_MISMATCH'] : []),
+      ...(vectorLength !== 768 ? ['CANONICAL_VECTOR_INVALID'] : []),
+      ...(!row.packet_key ? ['PACKET_KEY_MISSING'] : []),
+      ...(row.workspace_revision !== row.g_workspace_revision ? ['WORKSPACE_REVISION_MISMATCH'] : []),
+      ...(!qdrantPoint ? ['QDRANT_POINT_MISSING'] : []),
+      ...(qdrantPoint && qdrantPoint.id !== row.qdrant_id ? ['QDRANT_POINT_ID_MISMATCH'] : []),
+      ...(qdrantPoint && qdrantPoint.payload?.source_ref !== row.source_ref ? ['QDRANT_SOURCE_REF_MISMATCH'] : []),
+    ],
     canonicalAuthority: false,
     writesPerformed: false,
   };
 
-  console.log('\n=== VERIFIED COMPLETE PROVENANCE CHAIN ===');
+  console.log(`\n=== PROVENANCE DIAGNOSTIC: ${chain.chainIntact ? 'COMPLETE' : 'PARTIAL'} ===`);
   console.log(JSON.stringify(chain, null, 2));
 } catch (error) {
   await client.query('ROLLBACK').catch(() => {});

@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.agentic-diagnostic-repair-check-exclusion-audit.v1",
+  "verifiedAt": "2026-10-21",
+  "gitHead": "3376feb172cdb41c86c764f6c6cbcb153f199889",
+  "dirtyPathCount": 74,
+  "command": "npm run check -- --output machine",
+  "nodeOptions": "--max-old-space-size=8192",
+  "runs": [
+    {
+      "exitCode": 0,
+      "startedAtEpochMs": 1792622216043,
+      "completedAtEpochMs": 1792622567297,
+      "durationSeconds": 352.254,
+      "filesReported": 16213,
+      "errors": 0,
+      "warnings": 0,
+      "filesWithProblems": 0,
+      "outputPath": ".tmp/atlas/agentic-diagnostic-repair/r04-current-check.txt",
+      "outputSha256": "43a28cd340a92e0e87c1c10bae0cbd3000b97d226cefe36926818ff498a5efca"
+    },
+    {
+      "exitCode": 0,
+      "startedAtEpochMs": 1792622595892,
+      "completedAtEpochMs": 1792622974465,
+      "durationSeconds": 378.573,
+      "filesReported": 16213,
+      "errors": 0,
+      "warnings": 0,
+      "filesWithProblems": 0,
+      "outputPath": ".tmp/atlas/agentic-diagnostic-repair/r04-current-check-2.txt",
+      "outputSha256": "b04d2b85e76266a6eb6b3c0b71a1fd16fe5b16681edba992a83384f80a2ca85d"
+    }
+  ],
+  "stability": {
+    "machineOutputIdenticalAfterTimestampNormalization": true,
+    "interpretation": "Stable for this dirty checkout and this tsconfig scope; not a clean-commit baseline and not equivalent to the expanded-source scan."
+  },
+  "sourceInventory": {
+    "srcSvelteFiles": 930,
+    "srcTypeScriptFiles": 5637,
+    "srcSpecTypeScriptFilesExcluded": 1107,
+    "srcTestTypeScriptFilesExcluded": 156,
+    "srcWorkerTypeScriptFilesExcludedBySuffix": 5,
+    "serviceWorkerTypeScriptFilesExcluded": 1,
+    "srcWasmTypeScriptFilesExcluded": 2,
+    "srcTestsFilesExcluded": 1,
+    "srcJavaScriptFilesNotIncludedAsRoots": 41,
+    "srcProtoGrpcFlatbufFilesPresent": 0
+  },
+  "review": {
+    "highRiskExclusions": [
+      "**/*.worker.ts: five source files; at least graph-layout.worker.ts, admin-chat.worker.ts, and browser-context-embed.worker.ts are referenced by runtime Worker construction.",
+      "**/service-worker.ts: one SvelteKit service worker; src/lib/client/sw-register.ts is called from src/routes/+layout.svelte.",
+      "**/*.spec.ts and **/*.test.ts: 1263 files omitted from svelte-check; retain as a separate Vitest/typecheck lane rather than treating them as covered by this check."
+    ],
+    "needsSeparateDisposition": [
+      "src/wasm/**: two TypeScript files are excluded; current repository search found no code import of vector-operations.ts or vector-operations-basic.ts, but dead-code status is not proven.",
+      "src/**/*.js: 41 JavaScript files are explicitly excluded; inspect runtime entry points and give maintained JS a separate check if it remains in scope.",
+      "src/**/*.mjs and src/**/*.mts are not in the configured include patterns; the expanded scan used a different scope."
+    ],
+    "currentlyEmptyExcludedTrees": [
+      "src/proto/**",
+      "src/grpc/**",
+      "src/flatbuf/**"
+    ],
+    "notExcludedAsDirectories": [
+      "src/lib/gpu/**",
+      "src/lib/webgpu/**",
+      "src/lib/server/services/**",
+      "src/lib/services/error-analysis/**"
+    ]
+  },
+  "excludedRuntimeCodeProbe": {
+    "method": "Read-only TypeScript compiler API probe rooted at the six excluded worker entry points, using the WebWorker library set; no files or stores were written.",
+    "results": {
+      "fiveBrowserWorkerRoots": {
+        "errors": 4,
+        "diagnostics": [
+          "browser-context-embed.worker.ts:23 TS2451 redeclares self",
+          "browser-context-embed.worker.ts:58,61,96 TS2578 unused @ts-expect-error directives"
+        ]
+      },
+      "serviceWorkerRoot": {
+        "errors": 3,
+        "diagnostics": [
+          "service-worker.ts:641 TS2339: event.waitUntil is unavailable because its callback is explicitly typed as MessageEvent at line 619",
+          "phase18-offline-sync.ts:92,133 TS2304: localStorage is referenced by a helper imported into the service worker"
+        ]
+      }
+    },
+    "sourceEvidence": {
+      "serviceWorkerSha256": "1340575e8cd0b9f0322ca516837e44329d816b038d3a77218ab64cfcb2307c7e",
+      "serviceWorkerRegistration": "src/routes/+layout.svelte calls registerServiceWorker from src/lib/client/sw-register.ts",
+      "workerTypeDeclaration": "TypeScript lib.webworker.d.ts maps ServiceWorkerGlobalScope message events to ExtendableMessageEvent",
+      "offlineHelperImport": "src/service-worker.ts imports ./lib/client/phase18-offline-sync.js"
+    },
+    "inMemoryCounterfactual": {
+      "change": "Changed only the service-worker callback annotation from MessageEvent to ExtendableMessageEvent in a TypeScript compiler host; the checkout was not modified.",
+      "result": "The TS2339 waitUntil diagnostic disappeared. Two TS2304 localStorage errors remained in the imported helper.",
+      "interpretation": "Strongly supports the annotation as the waitUntil type error cause; the service-worker/helper boundary still needs a browser-safe storage design and a maintained worker check."
+    },
+    "limitations": "This is an isolated compiler probe, not a canonical project worker tsconfig or Svelte check. It identifies concrete review candidates; confirm with a maintained worker-specific check before accepting fixes.",
+    "status": "EXCLUDED_LIVE_CODE_HAS_TARGETED_TYPE_DIAGNOSTICS"
+  },
+  "status": "PROJECT_CHECK_STABLE_WITH_SCOPE_EXCLUSIONS_REVIEWED_NOT_FULL_SRC_COVERAGE",
+  "writesPerformed": false
+}

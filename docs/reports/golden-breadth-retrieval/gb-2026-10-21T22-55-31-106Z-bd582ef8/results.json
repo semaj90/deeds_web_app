@@ -1,0 +1,42 @@
+{
+  "runId": "gb-2026-10-21T22-55-31-106Z-bd582ef8",
+  "mode": "LIVE",
+  "results": [
+    {
+      "id": "GB-016",
+      "query": "Zod schema validating request.json in a SvelteKit route",
+      "lanes": {
+        "trace": {
+          "status": "UNREACHABLE",
+          "error": "Unexpected end of JSON input",
+          "latencyMs": 5278
+        },
+        "atlas": {
+          "status": "TOOL_ERROR",
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"error\":\"Expected parameter(s): feature\"}"
+              }
+            ],
+            "isError": true
+          },
+          "tools": [
+            "classify_intent",
+            "build_agentic_rag_context",
+            "build_recommendation",
+            "record_outcome",
+            "find_dependencies",
+            "trace_database",
+            "trace_tool_chain",
+            "find_source_refs",
+            "find_feature",
+            "find_route"
+          ],
+          "latencyMs": 14977
+        }
+      }
+    }
+  ]
+}

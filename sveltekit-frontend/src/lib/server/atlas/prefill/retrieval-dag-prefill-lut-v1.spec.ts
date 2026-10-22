@@ -73,4 +73,44 @@ describe('RetrievalDagPrefillLutV1 — NES .f32bin OS Slice & Topological DAG Pr
     expect(plan.promptPlan.totalTokens).toBeLessThanOrEqual(plan.promptPlan.maxInputTokens);
     expect(plan.contextPrefixIdentity.checksum).toMatch(/^[0-9a-f]{64}$/);
   });
+
+  it('rejects a shaped LUT whose contents no longer match its checksum', () => {
+    const lut = RetrievalDagPrefillLutV1Schema.parse(
+      JSON.parse(fs.readFileSync(LUT_PATH, 'utf8'))
+    );
+    const tampered = {
+      ...lut,
+      entries: lut.entries.map((entry, index) =>
+        index === 0 ? { ...entry, sourceRef: `${entry.sourceRef}.changed` } : entry
+      ),
+    };
+
+    expect(() =>
+      synthesizeRetrievalDagPrefillPlanV1({
+        repoRoot: ROOT,
+        lut: tampered,
+        selectedOrdinals: [0],
+        requestId: 'req:test-tampered-lut',
+        contextManifestChecksum: 'a'.repeat(64),
+        userQuery: 'Check tamper handling.',
+      })
+    ).toThrow('LUT_CHECKSUM_MISMATCH');
+  });
+
+  it('rejects duplicate selected ordinals instead of silently collapsing DAG nodes', () => {
+    const lut = RetrievalDagPrefillLutV1Schema.parse(
+      JSON.parse(fs.readFileSync(LUT_PATH, 'utf8'))
+    );
+
+    expect(() =>
+      synthesizeRetrievalDagPrefillPlanV1({
+        repoRoot: ROOT,
+        lut,
+        selectedOrdinals: [0, 0],
+        requestId: 'req:test-duplicate-ordinal',
+        contextManifestChecksum: 'a'.repeat(64),
+        userQuery: 'Check duplicate selection.',
+      })
+    ).toThrow('DUPLICATE_SELECTED_LUT_ORDINAL');
+  });
 });

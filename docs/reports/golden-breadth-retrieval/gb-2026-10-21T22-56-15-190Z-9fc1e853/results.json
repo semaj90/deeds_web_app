@@ -1,0 +1,31 @@
+{
+  "runId": "gb-2026-10-21T22-56-15-190Z-9fc1e853",
+  "mode": "LIVE",
+  "results": [
+    {
+      "id": "GB-001",
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "lanes": {
+        "svelte": {
+          "status": "TOOL_ERROR",
+          "result": {
+            "isError": true,
+            "content": [
+              {
+                "type": "text",
+                "text": "Invalid arguments for tool get-documentation: [{\"kind\":\"schema\",\"type\":\"object\",\"expected\":\"\\\"section\\\"\",\"received\":\"undefined\",\"message\":\"Invalid key: Expected \\\"section\\\" but received undefined\",\"path\":[{\"type\":\"object\",\"origin\":\"key\",\"input\":{\"sections\":[\"kit/load\"]},\"key\":\"section\"}]}]"
+              }
+            ]
+          },
+          "tools": [
+            "get-documentation",
+            "list-sections",
+            "playground-link",
+            "svelte-autofixer"
+          ],
+          "latencyMs": 16009
+        }
+      }
+    }
+  ]
+}
