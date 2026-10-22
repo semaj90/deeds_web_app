@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.trace-retrieval-boundary-receipt.v1",
+  "gate": "R06",
+  "runId": "20261022T022939Z",
+  "supersedes": "docs/reports/trace-retrieval-r06/receipt-20261022T022824Z.json",
+  "supersededReason": "The earlier receipt said the empty-response failure was deterministic. Ten later calls succeeded; the earlier receipt also lacked the failing rows.",
+  "endpoint": "http://127.0.0.1:8788/mcp",
+  "readOnly": true,
+  "writes": 0,
+  "requestChecksum": "sha256:2c5ced3f810a7c72bb7c9266abceeaa8b255f1a7b78bda9e58bec686608f9d1e",
+  "dependencyProbes": {
+    "embedding8097": 200,
+    "ollama11434": 200,
+    "qdrant6333": 200,
+    "llama8090": 200,
+    "go8100": 200,
+    "trace8788Health": 200
+  },
+  "intermittentObservation": {
+    "window": "same session, before this receipt",
+    "symptom": "HTTP 200 text/event-stream, 0 response bytes, about 5.0 s, twice with curl",
+    "recovered": true,
+    "reproducedAfter": 10,
+    "rootCause": "UNIDENTIFIED"
+  },
+  "atlasQueryRuns": {
+    "curlAfterRecovery": 2,
+    "nodeRepeat": 8,
+    "allHttp200": true,
+    "responseBytesEach": 8981,
+    "durationMsRange": [
+      1600,
+      2700
+    ]
+  },
+  "resultQualification": {
+    "hits": 5,
+    "sourceRevisionPresent": 0,
+    "workspaceRevisionPresent": 0,
+    "topPaths": "memory/runs/*/graph_edges.json (generated artifacts, not source files)",
+    "contentBytesEach": 800
+  },
+  "firstDemonstratedBlockedBoundary": "Source qualification: hits lack sourceRevision and workspaceRevision; top hits are generated run artifacts.",
+  "outcome": "SOURCE_EVIDENCE_UNQUALIFIED",
+  "canonicalAuthority": false,
+  "admission": "NONE",
+  "notDone": [
+    "atlas.packet_search R06 run (control only)",
+    "DSPy invocation",
+    "ContextManifest admission",
+    "R04 report and OpenSpec ledger update"
+  ]
+}

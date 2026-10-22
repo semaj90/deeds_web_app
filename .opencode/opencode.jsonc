@@ -69,6 +69,12 @@
       "enabled": false,
       "timeout": 120000,
     },
+    "svelte": {
+      "type": "local",
+      "command": ["cmd", "/c", "npx", "-y", "@sveltejs/mcp"],
+      "enabled": true,
+      "timeout": 60000,
+    },
   },
   "agent": {
     // Defined in repo-root opencode.json and merged by name: re-enable TRACE (globally off above) for agents that use it.

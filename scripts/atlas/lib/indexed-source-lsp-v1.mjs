@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { positionToByteOffset } from './lsp-jsonrpc-client.mjs';
 import { createCompilerSemanticResolver } from './compiler-semantic-resolver-v1.mjs';
+import { decodeSourceUtf8V1 } from './source-byte-revision-v1.mjs';
 
 const LSP_LANGUAGE_IDS = new Map([
   ['.ts', 'typescript'], ['.tsx', 'typescript'], ['.js', 'javascript'], ['.jsx', 'javascript'],
@@ -56,7 +57,7 @@ export async function runIndexedSourceLspV1({ repoRoot, sourceRef, absolutePath,
     return { status: 'STALE_SOURCE', symbolCount: 0, error: 'INDEXED_SOURCE_LSP_REVISION_INVALID', sourceRevision, workspaceRevision };
   }
   let decodedSource;
-  try { decodedSource = new TextDecoder('utf-8', { fatal: true }).decode(sourceBytes); }
+  try { decodedSource = decodeSourceUtf8V1(sourceBytes); }
   catch { return { status: 'STALE_SOURCE', symbolCount: 0, error: 'INDEXED_SOURCE_LSP_SOURCE_INVALID_UTF8', sourceRevision, workspaceRevision }; }
   const actualSourceRevision = `sha256:${crypto.createHash('sha256').update(sourceBytes).digest('hex')}`;
   if (decodedSource !== sourceText || actualSourceRevision !== sourceRevision) {

@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { REPO_ROOT } from './connection-config.mjs';
 import { deriveGraphNodeKeyV1 } from '../../packages/parent-atlas/dist/index.js';
+import { astScanCompleteness } from './lib/source-observation-http-v1.mjs';
 
 const root = REPO_ROOT;
 const sourcePlanPath = path.resolve(process.env.ATLAS_SOURCE_GRAPHIFY_PLAN ?? path.join(root, 'docs/reports/current-source-graphify-batch-plan-v1.json'));
@@ -89,6 +90,12 @@ async function main() {
       continue;
     }
     const evidence = await response.json();
+    // Fail closed: edges are only planned from a COMPLETE AST scan.
+    const scan = astScanCompleteness(evidence);
+    if (!scan.complete) {
+      errors.push({ sourceRef: source.sourceRef, error: `AST_SCAN_INCOMPLETE:${scan.scanCompleteness}${scan.scanFailure ? `:${scan.scanFailure}` : ''}` });
+      continue;
+    }
     const chunks = (evidence.chunks ?? []).map((chunk) => ({ ...chunk, sourceRef: source.sourceRef, sourceRevision: source.sourceRevision }));
     chunkCount += chunks.length;
     const byNativeId = new Map();
@@ -154,13 +161,16 @@ async function main() {
     selectedSourceCount: selected.length,
     sourceCount,
     chunkCount,
-    nodeCount: canonicalNodes.length,
-    edgeCount: canonicalEdges.length,
+    // Fail closed: nodes and edges are withheld unless every selected source produced a COMPLETE scan.
+    nodeCount: errors.length === 0 ? canonicalNodes.length : 0,
+    edgeCount: errors.length === 0 ? canonicalEdges.length : 0,
+    withheldNodeCount: errors.length === 0 ? 0 : canonicalNodes.length,
+    withheldEdgeCount: errors.length === 0 ? 0 : canonicalEdges.length,
     unresolvedEdgeCount: unresolved.length,
     occurrencePositionedUnresolvedEdgeCount: unresolved.filter((edge) => edge.positionSource === 'PER_OCCURRENCE').length,
     legacyOnlyUnresolvedEdgeCount: unresolved.filter((edge) => edge.positionSource === 'LEGACY_EDGE_POSITION').length,
-    nodes: canonicalNodes,
-    edges: canonicalEdges,
+    nodes: errors.length === 0 ? canonicalNodes : [],
+    edges: errors.length === 0 ? canonicalEdges : [],
     unresolvedEdges: unresolved,
     unsupportedSourceRefs,
     unsupportedSourceCount: unsupportedSourceRefs.length,

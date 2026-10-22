@@ -117,7 +117,13 @@ export function createLiveStructuralLaneRetrieverV1(input: {
         if (!matchingEntries.every((entry) => entry.sourceRevision === sourceRevision) || !sourceRevision) continue;
         if (!sourceRevisionMatchesUtf8SourceV1(record.source, sourceRevision)) continue;
         const sourceBytes = Buffer.from(record.source, 'utf8');
-        const evidence = await input.sidecar.astChunk({ source: record.source, language, filePath: sourceRef, sourceRevision });
+        // Fail closed per file: a partial or unreceipted scan (the client throws) contributes no hits, and the rest of the batch continues.
+        let evidence: Awaited<ReturnType<typeof input.sidecar.astChunk>>;
+        try {
+          evidence = await input.sidecar.astChunk({ source: record.source, language, filePath: sourceRef, sourceRevision });
+        } catch {
+          continue;
+        }
         if (evidence.source_revision !== sourceRevision || evidence.file_path !== sourceRef) continue;
         const grepLanguage = astGrepLanguage(language);
         if (grepLanguage === null) continue;

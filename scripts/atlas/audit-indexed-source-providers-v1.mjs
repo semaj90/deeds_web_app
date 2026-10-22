@@ -12,6 +12,7 @@ import { runIndexedSourceLspV1 } from './lib/indexed-source-lsp-v1.mjs';
 import { runIndexedSourceNlpV1 } from './lib/indexed-source-nlp-v1.mjs';
 import { analyzeIndexedSvelteTypeScriptV1 } from './lib/indexed-source-svelte-typescript-v1.mjs';
 import { classifyIndexedSourceProviderResultV1, validateExactIndexedSourcePathV1 } from './lib/indexed-source-batch-v1.mjs';
+import { decodeSourceUtf8V1 } from './lib/source-byte-revision-v1.mjs';
 
 const args = process.argv.slice(2);
 const sourceRefInput = args[0];
@@ -79,7 +80,7 @@ async function loadExactIndexedSource(sourceRef) {
     const sourceBytes = fs.readFileSync(fileReal);
     if (sha256(sourceBytes) !== binding.source_revision) throw new Error('SOURCE_BYTES_DO_NOT_MATCH_BOUND_REVISION');
     let sourceText;
-    try { sourceText = new TextDecoder('utf-8', { fatal: true }).decode(sourceBytes); }
+    try { sourceText = decodeSourceUtf8V1(sourceBytes); }
     catch { throw new Error('SOURCE_NOT_VALID_UTF8'); }
     if (Buffer.byteLength(sourceText, 'utf8') !== sourceBytes.length) throw new Error('SOURCE_UTF8_ROUNDTRIP_MISMATCH');
     await client.query('ROLLBACK');

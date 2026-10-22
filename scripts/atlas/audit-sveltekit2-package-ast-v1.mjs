@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertCompleteAstScan } from './lib/source-observation-http-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const PACKAGE_ROOT = path.join(ROOT, 'sveltekit-frontend', 'node_modules', '@sveltejs', 'kit');
@@ -70,6 +71,8 @@ async function main() {
           signal: AbortSignal.timeout(45_000),
         });
         const body = await response.json();
+        // Fail closed: a partial or unreceipted scan is recorded as an error for this file, not as a result.
+        assertCompleteAstScan(body);
         const identityMatches = body.source_revision === source.row.sha256 && body.file_path === source.row.path;
         results[index] = { path: source.row.path, sourceRevision: source.row.sha256, bytes: source.row.bytes,
           language: source.language, httpStatus: response.status, identityMatches,

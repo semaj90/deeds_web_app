@@ -120,6 +120,28 @@ def test_native_ast_evidence_derives_function_signature_and_ancestor_spans(monke
     assert source.encode('utf-8')[chunk.syntax_ancestry[-1]['start_byte']:chunk.syntax_ancestry[-1]['end_byte']] == source.encode('utf-8')
 
 
+def test_syntax_node_index_keeps_matching_scoped_to_node_type_and_span():
+    source = 'export function first() {}\nfunction second() {}'
+    source_bytes = source.encode('utf-8')
+    root = sidecar_v2.legacy.get_parser('typescript').parse(source_bytes).root_node
+    node_index = sidecar_v2._index_syntax_nodes(root)
+    first_start = source_bytes.index(b'function first')
+    first_end = source_bytes.index(b'\n')
+
+    signature, ancestry = sidecar_v2._syntax_signature_and_ancestry(
+        source_bytes,
+        node_index,
+        'function_declaration',
+        first_start,
+        first_end,
+        'first',
+    )
+
+    assert signature == 'function first() '
+    assert ancestry[-1]['node_type'] == 'export_statement'
+    assert sidecar_v2._byte_offset_line_column(source_bytes, [0, source_bytes.index(b'\n') + 1], first_start) == (1, 7)
+
+
 def test_native_ast_evidence_leaves_signature_missing_when_parser_evidence_is_ambiguous(monkeypatch):
     source = 'function resolve() {} function resolve() {}'
     chunk = _run_single_chunk(

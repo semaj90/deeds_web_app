@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.repair-baseline-receipt.v1",
+  "cohort": "R01",
+  "command": "npx svelte-check --output machine (cwd sveltekit-frontend, default threshold)",
+  "runs": [
+    {
+      "exit": 0,
+      "seconds": 374,
+      "diagnosticsSha256": "d2c3367a08660cce1a12f34723d4c83115d87777e72e19ed283cc2085688cb7f"
+    },
+    {
+      "exit": 0,
+      "seconds": 394,
+      "diagnosticsSha256": "d2c3367a08660cce1a12f34723d4c83115d87777e72e19ed283cc2085688cb7f"
+    }
+  ],
+  "stable": true,
+  "summary": {
+    "files": 16213,
+    "errors": 0,
+    "warnings": 15,
+    "filesWithProblems": 10,
+    "distinctDiagnosticFiles": 10
+  },
+  "byCode": {
+    "WARNING Visible, non-interactive elements with a click event must be accompani": 2,
+    "WARNING A form label must be associated with a control\\nhttps://svelte.dev/e/a": 8,
+    "WARNING Also define the standard property 'line-clamp' for compatibility": 1,
+    "WARNING Unused CSS selector \\": 4
+  },
+  "provenance": {
+    "git": "3376feb172cdb41c86c764f6c6cbcb153f199889",
+    "branch": "chore/parent-atlas-session-2026-10-17",
+    "workingTreeDirtyEntries": 55,
+    "cleanCheckout": false,
+    "node": "v22.23.3",
+    "svelteCheck": "4.3.4",
+    "typescript": "5.9.3",
+    "svelte": "5.53.3",
+    "tsconfigSha256": "6f1fcff10c32e0a25c806ef38f2174ff48f9430318fc3c66c2f50d7200a8c655"
+  },
+  "caveat": "Earlier notes cite tens of thousands of svelte-check errors; this run reports 0 errors at the default threshold. The count depends on the command, config and threshold, so the earlier figure is not comparable and is not used here.",
+  "status": "BASELINE_CAPTURED_NOT_CLEAN_TREE"
+}

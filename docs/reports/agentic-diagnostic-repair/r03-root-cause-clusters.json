@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.repair-root-cause-clusters.v1",
+  "cohort": "R03",
+  "identityReceipt": "docs/reports/agentic-diagnostic-repair/r02-diagnostic-identities.json",
+  "baselineReceipt": "docs/reports/agentic-diagnostic-repair/r01-svelte-check-baseline.json",
+  "diagnosticCount": 15,
+  "clusterCount": 4,
+  "clusters": [
+    {
+      "clusterId": "RC-01",
+      "rule": "a11y form label must be associated with a control",
+      "hypothesis": "Label elements lack a for/id pairing or a nested control. Each file is a separate instance, so fixes are per file, but the pattern is one rule.",
+      "diagnosticIds": ["diag-62bf633085b4", "diag-8d7a0e568b32", "diag-5b835b62f21a", "diag-9276f2822abe", "diag-6695cb425678", "diag-663f1ddc1530", "diag-d7c574a82e8b", "diag-9edce417e735"],
+      "files": 7,
+      "dependentDiagnostics": 0,
+      "confidence": "medium",
+      "note": "Three of the eight are in APITesterModal.svelte, so one file-level change may clear three."
+    },
+    {
+      "clusterId": "RC-02",
+      "rule": "a11y click handler on non-interactive element",
+      "hypothesis": "Clickable containers in the n64 gaming UI primitives have no keyboard handler or role. Both files share a component family, so one pattern fix may cover both.",
+      "diagnosticIds": ["diag-ac36b24b7930", "diag-382c72988ed5"],
+      "files": 2,
+      "dependentDiagnostics": 0,
+      "confidence": "medium"
+    },
+    {
+      "clusterId": "RC-03",
+      "rule": "unused CSS selector",
+      "hypothesis": "The .tab-bar and .tab rules in the client-inference demo page no longer match any markup, so the tab markup was probably removed or renamed. One markup or style change covers all four.",
+      "diagnosticIds": ["diag-24ed2be356cf", "diag-29992e545729", "diag-f1377648afe6", "diag-bef9d986f7fc"],
+      "files": 1,
+      "dependentDiagnostics": 0,
+      "confidence": "high"
+    },
+    {
+      "clusterId": "RC-04",
+      "rule": "standard property line-clamp for compatibility",
+      "hypothesis": "A vendor-prefixed line-clamp is used without the standard property. Single instance.",
+      "diagnosticIds": ["diag-ca5ee350623f"],
+      "files": 1,
+      "dependentDiagnostics": 0,
+      "confidence": "high"
+    }
+  ],
+  "reduction": {
+    "rootCauses": 4,
+    "diagnostics": 15,
+    "note": "15 diagnostics reduce to 4 root-cause clusters, but only 3 are one-change-per-cluster. RC-01 needs one change per file. Warnings do not cascade, so dependentDiagnostics is 0 throughout."
+  },
+  "status": "CLUSTERS_HYPOTHESIZED_NOT_VERIFIED",
+  "verificationNote": "These hypotheses come from the rule text and the code locations only. None has been checked against the source. R04 (exact source evidence) must confirm each one."
+}

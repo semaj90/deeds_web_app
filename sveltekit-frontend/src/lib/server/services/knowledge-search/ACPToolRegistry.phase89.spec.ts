@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { executeACPTool, getACPToolRegistry, getACPToolSchema, toolSupportsDryRun } from './ACPToolRegistry.js';
 
 describe('ACP tool registry phase89 workflow', () => {
@@ -44,5 +44,63 @@ describe('ACP NLP sidecar tools', () => {
 
 		expect(invalidMode.success).toBe(false);
 		expect(oversizedSource.success).toBe(false);
+	});
+
+	describe('nlp:ast-chunk scan completeness (fail closed)', () => {
+		const astArgs = {
+			source: 'export function foo() {}',
+			language: 'typescript',
+			filePath: 'src/foo.ts',
+			sourceRevision: 'sha256:abc'
+		};
+
+		afterEach(() => {
+			vi.unstubAllGlobals();
+		});
+
+		it('returns success when the sidecar reports COMPLETE', async () => {
+			vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+				scan_completeness: 'COMPLETE',
+				scan_failure: null,
+				chunks: []
+			}), { status: 200, headers: { 'Content-Type': 'application/json' } })));
+
+			const result = await executeACPTool('nlp:ast-chunk', astArgs);
+			expect(result.success).toBe(true);
+		});
+
+		it('fails when the sidecar reports PARTIAL_AST_FAILED', async () => {
+			vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+				scan_completeness: 'PARTIAL_AST_FAILED',
+				scan_failure: 'RuntimeError: chunker exploded',
+				chunks: []
+			}), { status: 200, headers: { 'Content-Type': 'application/json' } })));
+
+			const result = await executeACPTool('nlp:ast-chunk', astArgs);
+			expect(result.success).toBe(false);
+			expect(result.error).toContain('PARTIAL_AST_FAILED');
+			expect(result.error).toContain('chunker exploded');
+		});
+
+		it('fails when the receipt field is missing (older sidecar)', async () => {
+			vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ chunks: [] }), {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' }
+			})));
+
+			const result = await executeACPTool('nlp:ast-chunk', astArgs);
+			expect(result.success).toBe(false);
+			expect(result.error).toContain('MISSING_RECEIPT');
+		});
+
+		it('fails (never succeeds) when the sidecar call times out or is aborted', async () => {
+			vi.stubGlobal('fetch', vi.fn(async () => {
+				throw new DOMException('The operation was aborted due to timeout', 'TimeoutError');
+			}));
+
+			const result = await executeACPTool('nlp:ast-chunk', astArgs);
+			expect(result.success).toBe(false);
+			expect(result.error).toContain('timeout');
+		});
 	});
 });

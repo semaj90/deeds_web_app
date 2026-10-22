@@ -203,3 +203,25 @@ VS Code tasks (Terminal > Run Task; defined in `.vscode/tasks.json`; lifecycle i
 | bring it back | `TurboQuant: Start (vision, CPU projector, :8090)` then Status | expect `vision=True`; never leave `:8090` down silently |
 
 Rules: check `:8090/slots` is idle and ask the operator before stopping; never `taskkill /IM llama-server.exe` (Ollama's embedding runner shares the image name); never force-kill. While `:8090` is down, chat, tool loop, synthesis, captioning and the `:8085` proxy fail (Ollama embeddings, Postgres, Qdrant and the app keep running). Known: `run_cuvs_soft_kmeans` fails on cuvs 26.6.0 until `pairwise_distance` output is wrapped with `cp.asarray` (see the lane-consolidation `tasks.md`, 2026-10-04).
+
+## Parallelism optimization policy (2026-10-21)
+
+- **Measure first.** Time the serial run and record the baseline before adding concurrency. Keep the serial path as the replay mode and the oracle for results.
+- **Bounded pools only.** Default concurrency 2–4 with a hard cap; record the concurrency used in the receipt. Do not raise it without checking peak memory and repeat-run stability.
+- **Independent work only.** Parallelise independent readers of one frozen input. Keep dependent stages (binding, reconciliation, authority, final writes) ordered. Any failed unit blocks downstream stages.
+- **Run-scoped outputs.** Pooled units write unique, run-scoped outputs that share one run and input identity. Never let two units write the same file or key.
+- **Stdio MCP servers are expensive.** Each lane call may spawn a process (a cold `npx` start takes about 10 s). Cap concurrent calls per server at 1 for `npx`-spawned servers, and reuse a session where the server supports it.
+- **CPU pools for CPU work.** Parsing, chunking, AST, JSON and joins use CPU worker pools. GPU is for measured tensor kernels only, with CPU-oracle parity.
+- **Side effects stay serial.** No parallel writes to PostgreSQL, Valkey, Qdrant or Neo4j. Writes follow the existing gates, one owner at a time.
+- **Caching is not proof.** A cache hit never substitutes for evidence. Cache only rebuildable intermediates keyed by revision and checksum.
+
+### MCP query-batch profile
+
+- The 50-query golden-breadth runner is currently sequential. Its serial receipt is the baseline; do not claim a speedup until a repeatable comparison exists.
+- A future query-level pool may use at most four independent queries, preserving the frozen query-set hash and output order. Keep provider calls as distinct lanes with separate per-server semaphores; start at one in-flight call per MCP server. In particular, serialize Svelte `npx` stdio calls because each currently starts a process and has a costly cold start. Raise a lane cap only after a bounded concurrency/replay test.
+- Each query gets an isolated result; one lane failure is recorded, never silently dropped. Merge results and write the single run manifest serially after all workers settle. A partial run is not complete.
+- Keep retrieval results marked untrusted candidate evidence. Do not inject raw MCP text into Ornith/ACE, create “gold” relevance labels, or warm Valkey centroid/query keys from unreviewed results. Cache writes remain a separate authorized, revision-qualified step with independent readback.
+- CPU parsing, JSON normalization, checksumming, and source enrichment use measured bounded CPU pools. A larger system RAM budget or Node heap flag is not evidence that concurrency is safe; record RSS/heap, latency, timeout, and repeat-run behavior first.
+- **GPU batch work is deferred.** Do not use a GPU for JSON, AST parsing, or MCP fanout. A later GPU batch enhancement must use an existing numerical executor/owner, frozen revisioned inputs, bounded batch/memory limits, CPU-oracle parity, operator resource approval, and its own OpenSpec/receipt. Do not stop or replace `:8090` without the existing GPU-window approval path.
+
+The `.okf/indexes/feature-intelligence.yaml` policy defines PostgreSQL authority, logical lanes, rebuildable projections, executor roles, and projection receipts. It does **not** define Valkey/BitFrost cache policy, model KV state, or thread/concurrency limits; use the runtime rules in `AGENTS.md`/`CLAUDE.md` for those concerns.

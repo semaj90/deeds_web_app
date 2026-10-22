@@ -34,7 +34,13 @@
 BEGIN;
 
 -- 1. Table
+-- feature_label_id is a derived alias, not identity. The composite key (feature_id, label_revision)
+-- stays the primary key. The UUID is produced by deriveUUID('atlas.feature_label',
+-- {feature_id, label_revision}) in src/lib/utils/uuid.ts (UUIDv8, revision
+-- atlas.uuid.derive.sha256-canonical-json-uuidv8.v1). Derivation happens in application code, so
+-- the column has no default. The CHECK enforces the v8 version and RFC 4122 variant bits.
 CREATE TABLE IF NOT EXISTS atlas_feature_labels (
+  feature_label_id uuid        NOT NULL,
   feature_id       text        NOT NULL,
   label_revision   integer     NOT NULL DEFAULT 1,
   feature_label    text        NOT NULL,
@@ -50,6 +56,10 @@ CREATE TABLE IF NOT EXISTS atlas_feature_labels (
   created_at       timestamptz NOT NULL DEFAULT now(),
   updated_at       timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT atlas_feature_labels_pk PRIMARY KEY (feature_id, label_revision),
+  CONSTRAINT atlas_feature_labels_id_unique UNIQUE (feature_label_id),
+  CONSTRAINT atlas_feature_labels_id_uuidv8 CHECK (
+    substr(feature_label_id::text, 15, 1) = '8' AND substr(feature_label_id::text, 20, 1) IN ('8', '9', 'a', 'b')
+  ),
   CONSTRAINT atlas_feature_labels_revision_positive CHECK (label_revision >= 1),
   CONSTRAINT atlas_feature_labels_label_nonblank CHECK (btrim(feature_label) <> ''),
   CONSTRAINT atlas_feature_labels_status_valid CHECK (label_status IN ('PROPOSED', 'REVIEWED', 'SUPERSEDED', 'WITHDRAWN')),

@@ -186,6 +186,26 @@ export interface NlpAnalyzeRequest {
   groundedExtractionRequired?: boolean;
 }
 
+// Mirrors the sidecar's MAX_TEXT_CHARS default (NLP_SIDEcar_MAX_CHARS, 50000) for the /pos route,
+// which does not receive a max_chars parameter.
+const POS_MAX_CHARS = 50_000;
+
+export interface SizeLimitReceipt {
+  reason: 'SIZE_LIMIT_EXCEEDED' | null;
+  maxChars: number;
+  originalChars: number;
+}
+
+// Length is compared in characters, the same unit the sidecar truncates by (Python str slicing).
+export function sizeLimitReceipt(text: string, maxChars: number): SizeLimitReceipt {
+  const originalChars = Array.from(text).length;
+  return {
+    reason: originalChars > maxChars ? 'SIZE_LIMIT_EXCEEDED' : null,
+    maxChars,
+    originalChars,
+  };
+}
+
 export interface NlpAnalyzeResponse {
   document_id: string;
   provider_revision?: string;
@@ -198,6 +218,8 @@ export interface NlpAnalyzeResponse {
   features: NlpFeature[];
   metadata: Record<string, unknown>;
   groundedExecutionObservation?: GroundedExecutionObservationV1 | null;
+  // Additive (P9-03). The sidecar truncates text silently at max_chars; this records that it happened.
+  sizeLimit?: SizeLimitReceipt;
   capabilities: {
     spacy: boolean;
     langextract: boolean;
@@ -283,6 +305,7 @@ export interface NlpExtractResponse {
 export interface NlpPosResponse {
   source: 'spacy' | 'unavailable';
   coordinate_basis: 'UTF8_BYTES';
+  sizeLimit?: SizeLimitReceipt;
   token_assertions: Array<{
     text: string;
     lemma: string;
@@ -309,6 +332,7 @@ export interface NlpHealthResponse {
   };
   capabilities?: {
     spacy?: boolean;
+    spacy_pos?: boolean;
     langextract?: boolean;
     tree_sitter?: boolean;
     treesitter_chunker?: boolean;
@@ -581,6 +605,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
         provider_revision: typeof raw.provider_revision === 'string' ? raw.provider_revision : undefined,
         source_type: (raw.source_type ?? req.sourceType ?? 'plain_text') as NlpSourceType,
         extraction_mode: (raw.extraction_mode ?? req.extractionMode ?? 'full') as NlpExtractionMode,
+        sizeLimit: sizeLimitReceipt(req.text, req.maxChars ?? 50_000),
         entities: Array.isArray(raw.entities) ? raw.entities : [],
         relationships: Array.isArray(raw.relationships) ? raw.relationships : [],
         concepts: Array.isArray(raw.concepts) ? raw.concepts : [],
@@ -636,6 +661,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
       return {
         source: raw.source,
         coordinate_basis: 'UTF8_BYTES',
+        sizeLimit: sizeLimitReceipt(text, POS_MAX_CHARS),
         token_assertions: tokenAssertions,
         noun_phrase_spans: raw.noun_phrase_spans as NlpPosResponse['noun_phrase_spans'],
         dependency_edges: raw.dependency_edges as NlpPosResponse['dependency_edges'],
@@ -702,6 +728,15 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
       }
       if (raw.file_path !== req.filePath) {
         throw new Error('[miniforge-nlp] ast/chunk file_path does not match the requested source reference');
+      }
+      // Fail closed: a partial AST scan is never returned as complete evidence.
+      // A missing receipt (older sidecar) is treated as incomplete.
+      const scanCompleteness = (raw as { scan_completeness?: string }).scan_completeness;
+      if (scanCompleteness !== 'COMPLETE') {
+        const scanFailure = (raw as { scan_failure?: string | null }).scan_failure;
+        throw new Error(
+          `[miniforge-nlp] ast/chunk scan incomplete: ${scanCompleteness ?? 'MISSING_RECEIPT'}${scanFailure ? ` — ${scanFailure}` : ''}`,
+        );
       }
       return {
         schema: raw.schema,

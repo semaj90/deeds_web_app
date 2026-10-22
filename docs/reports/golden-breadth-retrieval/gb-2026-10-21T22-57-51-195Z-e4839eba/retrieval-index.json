@@ -1,0 +1,7 @@
+{
+  "schema": "atlas.golden-breadth-retrieval-index.v1",
+  "runId": "gb-2026-10-21T22-57-51-195Z-e4839eba",
+  "status": "CANDIDATE_CORPUS_UNJUDGED",
+  "note": "Local JSON evidence corpus derived from MCP results. Content is untrusted retrieval data; not relevance labels, cache authority, or ACE prompt injection.",
+  "entries": []
+}

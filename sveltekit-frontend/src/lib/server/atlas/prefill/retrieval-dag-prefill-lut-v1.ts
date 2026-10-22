@@ -117,9 +117,38 @@ export function buildRetrievalDagPrefillLutV1(input: {
     .map((e) => RetrievalDagPrefillLutEntryV1Schema.parse(e))
     .sort((a, b) => a.ordinal - b.ordinal);
 
+  const canonicalIds = new Set<string>();
+  const packetKeys = new Set<string>();
+  const treeNodeIds = new Set<string>();
+
   for (let i = 0; i < entries.length; i++) {
-    if (entries[i]!.ordinal !== i) {
-      throw new Error(`LUT ordinal gap at index ${i}: got ${entries[i]!.ordinal}`);
+    const entry = entries[i]!;
+    if (entry.ordinal !== i) {
+      throw new Error(`LUT ordinal gap at index ${i}: got ${entry.ordinal}`);
+    }
+    if (entry.representationRevision !== input.representationRevision) {
+      throw new Error(`LUT representation revision mismatch at ordinal ${entry.ordinal}`);
+    }
+    if (canonicalIds.has(entry.canonicalId) || packetKeys.has(entry.packetKey) || treeNodeIds.has(entry.treeNodeId)) {
+      throw new Error(`Duplicate canonical, packet, or tree-node identity at ordinal ${entry.ordinal}`);
+    }
+    canonicalIds.add(entry.canonicalId);
+    packetKeys.add(entry.packetKey);
+    treeNodeIds.add(entry.treeNodeId);
+    for (const linkedOrdinal of [...entry.dependencyOrdinals, ...entry.dependentOrdinals]) {
+      if (linkedOrdinal >= entries.length || linkedOrdinal === entry.ordinal) {
+        throw new Error(`Invalid DAG link ${entry.ordinal} -> ${linkedOrdinal}`);
+      }
+    }
+    for (const dependencyOrdinal of entry.dependencyOrdinals) {
+      if (!entries[dependencyOrdinal]!.dependentOrdinals.includes(entry.ordinal)) {
+        throw new Error(`DAG dependency link is not reciprocal: ${dependencyOrdinal} -> ${entry.ordinal}`);
+      }
+    }
+    for (const dependentOrdinal of entry.dependentOrdinals) {
+      if (!entries[dependentOrdinal]!.dependencyOrdinals.includes(entry.ordinal)) {
+        throw new Error(`DAG dependent link is not reciprocal: ${entry.ordinal} -> ${dependentOrdinal}`);
+      }
     }
   }
 
@@ -334,10 +363,24 @@ export function synthesizeRetrievalDagPrefillPlanV1(input: {
   previousStablePrefix?: string;
   maxBytesPerEvidenceSlice?: number;
 }): SynthesizedDagPrefillPlanV1 {
+  const lut = RetrievalDagPrefillLutV1Schema.parse(input.lut);
+  const { checksumSha256, ...lutPayload } = lut;
+  const actualLutChecksum = createHash('sha256')
+    .update(canonicalEncodeV1(lutPayload), 'utf8')
+    .digest('hex');
+  if (actualLutChecksum !== checksumSha256) {
+    throw new Error('LUT_CHECKSUM_MISMATCH');
+  }
+  if (new Set(input.selectedOrdinals).size !== input.selectedOrdinals.length) {
+    throw new Error('DUPLICATE_SELECTED_LUT_ORDINAL');
+  }
   const selectedEntries = input.selectedOrdinals.map((ord) => {
-    const entry = input.lut.entries[ord];
+    if (!Number.isInteger(ord) || ord < 0) {
+      throw new Error(`Invalid LUT ordinal ${ord}`);
+    }
+    const entry = lut.entries[ord];
     if (!entry) {
-      throw new Error(`Invalid LUT ordinal ${ord} (LUT size: ${input.lut.entries.length})`);
+      throw new Error(`Invalid LUT ordinal ${ord} (LUT size: ${lut.entries.length})`);
     }
     return entry;
   });

@@ -1,0 +1,8 @@
+{
+  "schema": "atlas.golden-breadth-cache-plan.v1",
+  "runId": "gb-2026-10-21T22-56-52-821Z-8f397ee9",
+  "status": "NOT_WRITTEN",
+  "note": "No cache keys are proposed from unjudged benchmark queries. Cache population requires a separately approved, revision-qualified descriptor and readback.",
+  "writes": 0,
+  "plannedKeys": []
+}

@@ -44,3 +44,14 @@ The bounded scan SHALL reconcile exact source identities and revisions against a
 #### Scenario: finite diagnostics finish
 - **WHEN** every selected source has verified diagnostic readback, cursor continuity holds, and there are no missing or duplicate identities
 - **THEN** the scan stops and emits per-file outcomes and consolidated totals without claiming durable AST indexing or admission
+
+### Requirement: Large-source NLP remains source-bound and resource-bounded
+The diagnostic NLP provider SHALL accept exact source text up to its explicit 1,000,000-character limit without truncation, preserve the complete source and source/workspace revisions in the request, and return an explicit skip above that limit. The client request timeout and server character limit SHALL be aligned; a partial or failed provider result SHALL keep the source diagnostic status partial.
+
+#### Scenario: source fits the configured bound
+- **WHEN** a revision-verified source is larger than the former 300,000-character client limit but no larger than 1,000,000 characters
+- **THEN** the complete exact text is sent to the sidecar with the same source identity and revisions, and the provider result remains advisory and non-authoritative
+
+#### Scenario: source exceeds the configured bound
+- **WHEN** a source exceeds 1,000,000 characters
+- **THEN** NLP reports an explicit skip before networking and the scan does not mark that source provider-complete

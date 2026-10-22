@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.repair-diagnostic-identity.v1",
+  "cohort": "R02",
+  "baselineReceipt": "docs/reports/agentic-diagnostic-repair/r01-svelte-check-baseline.json",
+  "qualifier": "3376feb172cdb41c86c764f6c6cbcb153f199889|dirty=55",
+  "count": 15,
+  "parseFailures": 0,
+  "uniqueIds": 15,
+  "diagnostics": [
+    {
+      "id": "diag-ac36b24b7930",
+      "severity": "WARNING",
+      "file": "src/lib/components/ui/gaming/n64/Select.svelte",
+      "line": 173,
+      "column": 13,
+      "code": "Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\\\"button\\\">` or `<a>` might be more appropriate"
+    },
+    {
+      "id": "diag-382c72988ed5",
+      "severity": "WARNING",
+      "file": "src/lib/components/ui/gaming/n64/Switch.svelte",
+      "line": 193,
+      "column": 3,
+      "code": "Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type=\\\"button\\\">` or `<a>` might be more appropriate"
+    },
+    {
+      "id": "diag-62bf633085b4",
+      "severity": "WARNING",
+      "file": "src/lib/components/APITesterModal.svelte",
+      "line": 132,
+      "column": 6,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-8d7a0e568b32",
+      "severity": "WARNING",
+      "file": "src/lib/components/APITesterModal.svelte",
+      "line": 142,
+      "column": 6,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-5b835b62f21a",
+      "severity": "WARNING",
+      "file": "src/lib/components/APITesterModal.svelte",
+      "line": 154,
+      "column": 7,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-9276f2822abe",
+      "severity": "WARNING",
+      "file": "src/lib/components/ai/EnhancedDocumentUploader.svelte",
+      "line": 617,
+      "column": 7,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-6695cb425678",
+      "severity": "WARNING",
+      "file": "src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte",
+      "line": 1050,
+      "column": 15,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-663f1ddc1530",
+      "severity": "WARNING",
+      "file": "src/lib/components/ai/LLMSelector.svelte",
+      "line": 143,
+      "column": 2,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-d7c574a82e8b",
+      "severity": "WARNING",
+      "file": "src/lib/components/ai/LocalImageGenerator.svelte",
+      "line": 131,
+      "column": 3,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-9edce417e735",
+      "severity": "WARNING",
+      "file": "src/lib/components/ai/ThinkingStyleToggle.svelte",
+      "line": 165,
+      "column": 6,
+      "code": "A form label must be associated with a control"
+    },
+    {
+      "id": "diag-ca5ee350623f",
+      "severity": "WARNING",
+      "file": "src/routes/(app)/admin/ai-dashboard/+page.svelte",
+      "line": 561,
+      "column": 3,
+      "code": "Also define the standard property 'line-clamp' for compatibility"
+    },
+    {
+      "id": "diag-24ed2be356cf",
+      "severity": "WARNING",
+      "file": "src/routes/(app)/demos/client-inference/+page.svelte",
+      "line": 69,
+      "column": 2,
+      "code": "Unused CSS selector \\\".tab-bar\\\""
+    },
+    {
+      "id": "diag-29992e545729",
+      "severity": "WARNING",
+      "file": "src/routes/(app)/demos/client-inference/+page.svelte",
+      "line": 79,
+      "column": 2,
+      "code": "Unused CSS selector \\\".tab\\\""
+    },
+    {
+      "id": "diag-f1377648afe6",
+      "severity": "WARNING",
+      "file": "src/routes/(app)/demos/client-inference/+page.svelte",
+      "line": 96,
+      "column": 2,
+      "code": "Unused CSS selector \\\".tab:hover\\\""
+    },
+    {
+      "id": "diag-bef9d986f7fc",
+      "severity": "WARNING",
+      "file": "src/routes/(app)/demos/client-inference/+page.svelte",
+      "line": 100,
+      "column": 2,
+      "code": "Unused CSS selector \\\".tab.active\\\""
+    }
+  ]
+}

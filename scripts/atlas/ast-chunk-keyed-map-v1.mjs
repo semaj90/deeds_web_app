@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parseAstGrepJsonOutputV1 } from './lib/ast-grep-result-v1.mjs';
 import { isValidAstChunkSourcePathV1 } from './lib/ast-chunk-source-path-v1.mjs';
-import { fetchSourceObservationJsonV1 } from './lib/source-observation-http-v1.mjs';
+import { assertCompleteAstScan, fetchSourceObservationJsonV1 } from './lib/source-observation-http-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -192,11 +192,13 @@ async function analyzeFile(rel, chunkSpansFile) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source: source.toString('utf8'), language: sidecarLanguage, filePath: rel, sourceRevision }),
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(300000),
       });
       astTransportAttempts = observation.attempts;
       const body = observation.body;
       if (body?.schema !== 'atlas.ast.evidence.v1') throw new Error(`unexpected schema: ${body?.schema}`);
+      // Fail closed: a partial or unreceipted scan is recorded as a stage failure, never as native AST evidence.
+      assertCompleteAstScan(body);
       validateAstByteSpans(body, source, rel, sourceRevision);
       return body;
     });

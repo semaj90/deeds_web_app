@@ -132,21 +132,71 @@ test('Svelte NLP subhelper rejects POS spans that do not match source bytes', as
   }
 });
 
-test('NLP subhelper bounds input before making a network request', async () => {
+test('NLP subhelper sends sources above the former 50 KB limit without truncation', async () => {
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = async () => {
-    throw new Error('FETCH_MUST_NOT_RUN');
+  const sourceText = 'x'.repeat(50_001);
+  let request;
+  globalThis.fetch = async (url, options) => {
+    request = { url, body: JSON.parse(options.body) };
+    return {
+      ok: true,
+      json: async () => ({
+        pass_results: [{ source_ref: 'src/file.ts', source_revision: `sha256:${'a'.repeat(64)}` }],
+      }),
+    };
   };
 
   try {
     const result = await runIndexedSourceNlpV1({
-      sourceText: 'x'.repeat(50_001),
+      sourceText,
       sourceRef: 'src/file.ts',
       sourceRevision: `sha256:${'a'.repeat(64)}`,
       workspaceRevision: `sha256:${'b'.repeat(64)}`,
       sidecarUrl: 'http://127.0.0.1:8095',
     });
-    assert.deepEqual(result, { status: 'SKIPPED_SOURCE_OVER_50000_BYTES' });
+    assert.equal(request.body.text, sourceText);
+    assert.equal(request.body.text.length, 50_001);
+    assert.equal(request.body.max_chars, 1_000_000);
+    assert.equal(result.exactRevisionPassCount, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('NLP subhelper accepts large bounded sources and skips only above the sidecar analyze contract', async () => {
+  const originalFetch = globalThis.fetch;
+  let requested;
+  globalThis.fetch = async (_url, options) => {
+    requested = JSON.parse(options.body);
+    return {
+      ok: true,
+      json: async () => ({
+        pass_results: [{ source_ref: 'src/file.ts', source_revision: `sha256:${'a'.repeat(64)}` }],
+        classification_proposal: null,
+      }),
+    };
+  };
+
+  try {
+    const largeResult = await runIndexedSourceNlpV1({
+      sourceText: 'x'.repeat(328_372),
+      sourceRef: 'src/file.ts',
+      sourceRevision: `sha256:${'a'.repeat(64)}`,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      sidecarUrl: 'http://127.0.0.1:8095',
+    });
+    assert.equal(requested.text.length, 328_372);
+    assert.equal(requested.max_chars, 1_000_000);
+    assert.equal(largeResult.exactRevisionPassCount, 1);
+
+    const oversizedResult = await runIndexedSourceNlpV1({
+      sourceText: 'x'.repeat(1_000_001),
+      sourceRef: 'src/file.ts',
+      sourceRevision: `sha256:${'a'.repeat(64)}`,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      sidecarUrl: 'http://127.0.0.1:8095',
+    });
+    assert.deepEqual(oversizedResult, { status: 'SKIPPED_SOURCE_OVER_1000000_CHARS' });
   } finally {
     globalThis.fetch = originalFetch;
   }

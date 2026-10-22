@@ -263,3 +263,62 @@
       `sveltekit-frontend` that was previously unable to even start can now run. No other spec
       suites were run as part of this task; only the one directly relevant to this capability's
       own unproven claim was re-verified.
+
+## 9. Contextual engineering recommendation extension — proposed, not implemented
+
+- [x] 9.1 Trace the current recommendation, retrieval, progress, ACE, and synthesis owners. The
+      trace found a SearchRuntime packet path in `semantic-search-workflow.ts` and an optional
+      ContextManifest shadow bridge, but the public tRPC caller supplies no feature-source resolver
+      or revision configuration. `recommendContextualCandidatesV1` and
+      `compileRecommendationEvidenceBundleV1` have no non-test production callers;
+      `buildDagTimeBudgetV1` has no non-test caller; and `executeDspyLlamaServerRepair` is reached
+      only by its script tests. Thus these are disconnected utilities, not a wired recommendation
+      pipeline. Keep fusion, ContextManifest admission, and Ornith invocation with their existing
+      owners; do not add a second owner. Evidence: `sveltekit-frontend/src/lib/server/trpc/routers/search.ts`,
+      `sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts`,
+      `sveltekit-frontend/src/lib/server/atlas/recommendations/contextual-candidate-ranker-v1.ts`,
+      `sveltekit-frontend/src/lib/server/atlas/recommendations/recommendation-evidence-bundle-v1.ts`,
+      `sveltekit-frontend/src/lib/server/atlas/orchestration/dag-time-budget-v1.ts`,
+      `sveltekit-frontend/src/lib/server/atlas/evals/dspy-llama-server-caller-v1.ts`.
+- [ ] 9.2 Define a frozen, read-only Top-K evaluation fixture with stable candidate IDs, source and
+      workspace revisions where available, query checksum, exact byte spans, and expected citation
+      text. Preserve unknown lineage as unknown and exclude it from admitted context.
+- [ ] 9.3 Implement bounded background analysis over independent providers (AST/symbol, imports and
+      references, tests/examples, optional LangExtract and graph neighbors). Begin with a small CPU
+      pool and per-provider semaphore; emit stable stage events, cancellation and partial/failure
+      receipts. Do not introduce GPU or broad MCP fanout in this task.
+- [ ] 9.4 Add byte-exact citation validation: reread the frozen source, verify its digest and byte
+      span, and derive citation excerpt from those bytes. Reject model-authored or NLP-authored
+      source coordinates that do not match the source slice.
+- [ ] 9.5 Compare existing exact retrieval and low-rank advisory ranking with any proposed adaptive
+      sampling or transformer/cross-encoder challenger. Report judged Recall@K/NDCG (where labels
+      exist), candidate recall, ranking agreement, latency, peak memory, and abstention. No
+      training or promotion without a reviewed, revision-bound outcome set and held-out split.
+      Shadow-evaluator implementation exists at `contextual-ranker-shadow-eval-v1.ts`; it requires
+      an ADMITTED feature snapshot, compares SearchRuntime score order with the advisory scorer,
+      and emits diagnostics only. No qualified real snapshot or reviewed judgments were available
+      for this run, so 9.5 remains unchecked and no quality claim is made.
+- [ ] 9.6 Build the existing ContextManifest only from qualified evidence; pass it to Ornith for a
+      schema-constrained repair proposal. Validate every cited evidence reference against the
+      manifest and require human/action authorization before execution. Store no hidden reasoning,
+      KV state, tensors, or raw unqualified MCP results.
+- [ ] 9.7 Add deterministic tests for bounded concurrency, stable ordering, timeouts/partial results,
+      stale source hashes, invalid byte ranges, citation rejection, and progress states; produce a
+      run-scoped checksum receipt. Acceptance remains diagnostic/shadow-only until live ownership,
+      lineage, and independent readback gates are separately proven.
+- [x] 9.8 Establish the recommendation-control-plane baseline and bounded deep-audit inventory without
+      deleting or consolidating implementations. G56 passed 16/16 adversarial fixtures; G57 completed
+      a read-only 61,718-row census with zero writes; G58 passed sealed TypeScript/Python parity for
+      `atlas.recommendation-outcome-receipt.v1`; G60 observed named Valkey prefixes read-only; G59 is
+      blocked because the canonical graph is stale; G61 is partial; G62 is static-only. The full
+      graph-dependent G1–G55 audit was not run. MCP discovery returned 200 tools but did not prove
+      eligibility or execution. Inventory and limits: `docs/reports/parent-atlas-recommendation-control-plane-inventory-20261021.md`;
+      baseline: `.tmp/atlas/recommendation-control-plane-baseline-20261021.json`.
+- [x] 9.9 Define the proposed event → bounded DAG → `await` result → source revalidation → tensor
+      batch → optional policy/value/MCTS recommendation → FSM authorization → verified outcome hook.
+      Keep CPU and CUDA synchronization semantics distinct; no live weights update from single
+      feedback, no implicit GPU authorization, and project G56 adversarial gates are not GAN model
+      training. The contract and primary references are in `design.md`, Addendum 4. Focused execution
+      tests were attempted but blocked locally: Python 3.14 lacks NumPy for importing the DAG worker,
+      and the targeted Vitest process did not finish within the bounded observation window. This is
+      design completion, not runtime proof.

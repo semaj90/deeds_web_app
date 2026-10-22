@@ -1909,3 +1909,11 @@ Source: an externally pasted Triton sketch (token remap gather -> tiled GEMM `nu
 **Not ratified here.** The pasted note calls `codebase_chunks_768_v2` part of the right setup; that default is an open risk (ALIGN-TV-06: `_v2` has 52,816 points vs 219,998 Postgres chunks) and is not endorsed by this entry.
 
 Next (needs a decision): none of the above starts without an explicit request for a Triton fixture; the cheapest first step would be a CPU-only reference of the remap+mask epilogue to settle TRITON-FIX-01..03.
+
+## CODEBASE-INDEX-OPTIMIZE-01 (2026-10-21) — hypergraph writer ownership finding (no decision yet)
+
+- Two live writers of `hg:4d:*`, `hg:edge:*`, `hg:edge:idx`, `hg:built_at`: `scripts/run-hypergraph.ts` (CI smoke `scripts/ci-smoke-hypergraph.mjs` expects its keys) and `src/lib/server/features/cases/hypergraph-4d.ts` (re-exported by `src/lib/server/graph/hypergraph-4d.ts`; called by `/api/codebase-index/orchestrate` Stage 9 and `gemma4-agent.ts`).
+- `docs/architecture/runtime-ownership-registry.json` has no hypergraph entry, so no canonical owner is recorded.
+- Operator answer (2026-10-21): the two writers serve different logic (legal-case / Parent Atlas path vs `scripts/atlas` standalone run), so they are distinct producers, not duplicates. Neither is removed.
+- Still open: the shared key names collide. Splitting by producer namespace needs reader changes in `topological-search.ts` and `ci-smoke-hypergraph.mjs` plus a decision on the namespace scheme.
+- `invalidateHypergraph()` now uses `SCAN` instead of `KEYS` (same change set).

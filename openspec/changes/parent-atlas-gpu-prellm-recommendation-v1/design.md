@@ -1,5 +1,141 @@
 ## Context
 
+## Addendum 3 (2026-10-21): Contextual engineering recommendations — proposal only
+
+This addendum scopes a future, read-only recommendation path over existing owners. It does not
+claim that the low-rank helper artifact is trained, that DLSS code is reusable for retrieval, or
+that LangExtract/HyperGraphRAG/Ornith are wired together by this change.
+
+### Stage boundaries
+
+1. **Frozen input and exact retrieval:** SearchRuntime remains the sole fusion owner. Retrieve a
+   bounded Top-K candidate set and freeze query, candidate IDs/order, source revisions, and lane
+   receipts. The low-rank scorer may nominate helper/actions or rerank only after the existing
+   fusion boundary; it never adds another semantic vote.
+2. **Progressive context analysis:** A bounded background DAG may run independent source/AST,
+   import/reference, test-example, and optional NLP/ontology reads concurrently. Start with a
+   small CPU worker cap and per-provider semaphores; preserve stable output ordering and report
+   queue depth, elapsed time, cancellation, timeout, and partial results. Progress is stage-based
+   (`queued`, `retrieving`, `analyzing`, `assembling`, terminal status), not a fabricated percent.
+3. **Evidence and citations:** Every excerpt is reconstructed from exact source bytes after checking
+   the source digest and validated byte span. A citation contains source identity/revision, byte
+   range, digest, and exact excerpt; generated summaries are never citation text. Reject stale,
+   ambiguous, truncated, or out-of-range evidence.
+4. **Optional contextual enrichers:** LangExtract outputs remain span-grounded proposals. KAG or
+   hypergraph neighbors are optional, separately identified evidence and require revision-qualified
+   joins. Missing or unresolved ontology links do not block a first repair recommendation.
+5. **ACE/Ornith synthesis:** Only the existing ACE/ContextManifest owner selects and token-admits
+   evidence. Ornith receives that validated manifest, not raw MCP hits, graph rows, worker output,
+   hidden reasoning, tensors, or a low-rank artifact. Its proposed repair is schema-validated and
+   remains review-only until the existing action authorization gate permits execution.
+
+### DLSS-inspired analogy limits
+
+DLSS is a trained graphics reconstruction system, not a drop-in low-rank matrix sampler. The
+transferable research question is whether an adaptive compute budget can preserve the exact
+retrieval shortlist while spending more work on uncertain cases. Any transformer/cross-encoder or
+adaptive-subsampling implementation is a challenger: compare it with the existing deterministic
+low-rank/exact baseline on frozen queries and candidate IDs, report Recall@K/NDCG or judged utility,
+ranking agreement, latency, memory, and abstention rate, and never replace source identity or
+canonical vectors. No online weight updates from a single +1/-1 outcome; learning requires a
+versioned, reviewed outcome set and held-out evaluation.
+
+### Failure and replay policy
+
+Provider errors remain visible per stage. A timeout or missing receipt yields a partial/blocked
+recommendation, not a successful empty result. Retries are bounded and idempotent. The loading
+surface displays completed/active/blocked stages and elapsed time; it must not claim completion
+percentage unless the DAG has a validated total-work estimate. All output receipts are run-scoped
+and checksummed; no cache warming or datastore writes are introduced here.
+
+## Addendum 4 (2026-10-21): Event-to-tensor recommendation and learning contract — proposal only
+
+This defines the sequence; it does not add a worker, train a model, or authorize GPU work.
+
+### Event, DAG, and `await` semantics
+
+1. **Capture an immutable request event.** Assign `runId`, `correlationId`, query checksum,
+   tool-manifest/schema revision, policy revision, candidate-snapshot checksum, authorization
+   scope, and deadline. Do not put prompt reasoning, tensors, or model KV state in the event.
+2. **Apply hard eligibility before ranking.** Exclude tools/actions that fail schema, permission,
+   effect, environment/ABI, freshness, or approval checks. Scores cannot override a refusal.
+3. **Build a bounded dependency DAG.** Each node has a stable node ID, explicit dependencies,
+   provider lane (`async_io`, `cpu_native`, `cpu_process`, or separately approved `gpu`), timeout,
+   idempotency key, cancellation signal, and result schema. Independent read-only evidence nodes may
+   run concurrently; dependent nodes wait for their prerequisites.
+4. **Dispatch by actual work type.** `await` yields the orchestrator while an asynchronous network
+   operation is pending; it does not make synchronous CPU parsing parallel. Use native async I/O for
+   HTTP/DB calls, a bounded thread pool for I/O or native code that releases the GIL, and a small
+   process pool only for measured Python CPU-bound work. Enforce per-provider semaphores and one
+   overall worker/memory budget; preserve original node IDs and deterministic merge order.
+5. **Handle completion as an event.** Each task returns a typed `{nodeId, status, resultRef,
+   elapsedMs, errorCode}` outcome. An event/queue consumer emits progress after completion, timeout,
+   cancellation, or refusal. It records partials explicitly; fan-out must not silently discard
+   individual failures. Awaiting a task means the caller receives its completion result or error,
+   not that downstream persistence/admission has occurred.
+6. **Revalidate before using results.** Re-read the source binding/revision after asynchronous work;
+   reject changed source bytes, stale workspace revisions, schema drift, duplicate node results,
+   late completions past the deadline, and mismatched checksums. The receipt remains diagnostic until
+   an existing owner independently reads back any separately authorized durable write.
+
+### Tensor batch boundary and PyTorch execution
+
+- Construct a fixed-order feature batch only after retrieval/eligibility: candidate IDs and order,
+  feature schema/revision, row mask for missing values, finite-value checks, dtype, shape, device,
+  and tensor-content checksum. Keep identifiers and provenance outside the floating-point matrix;
+  never let a tensor row index become canonical identity.
+- Begin with a deterministic CPU scorer. If a PyTorch challenger is later authorized, load one
+  immutable model/checkpoint revision and call `model.eval()` plus `torch.inference_mode()` for
+  scoring. Batch candidates; avoid `.item()` or device-to-host synchronization inside the per-row
+  loop. Copy scores back once, then join by the frozen candidate IDs.
+- CPU concurrency must be budgeted across outer workers and PyTorch/OpenMP threads. Do not multiply
+  process workers by unrestricted intra-op threads. Measure throughput, p95 latency, peak RSS, queue
+  wait, and failures against a serial oracle before increasing concurrency.
+- CUDA is a later, separately approved challenger. Keep data loading, transfer, and kernels bounded;
+  use CUDA events or explicit synchronization for valid timing. An `await` on a Python future is not
+  a CUDA fence. Synchronize only at the result boundary that needs host-visible scores; do not
+  persist device tensors or optimizer/KV state in Valkey, Postgres, Qdrant, or ACE packets.
+
+### AlphaGo-style policy/value and outcome hook
+
+- The analogy is **policy prior + value estimate + bounded search**, not a claim that software repair
+  is a Go game. A policy head proposes ordering; a value head estimates expected verified utility;
+  bounded MCTS may choose which eligible experiment to test. The FSM/authorization gate remains the
+  sole execution authority and may reject every proposed action.
+- The feedback hook fires only after a named test/build/runtime evaluation has a reproducible,
+  source-bound result. Store an append-only outcome event with action ID, candidate/input snapshot,
+  model/policy revision, test command and exit code, result receipt checksum, attribution state, and
+  reviewer/approval state. Missing or ambiguous attribution is `UNKNOWN`, not a negative reward.
+- A later offline training job may form policy/value targets from reviewed, held-out outcomes;
+  compute loss, `backward()`, check finite gradients, apply clipping if configured, then optimizer
+  step. Record seed, batch IDs, loss, optimizer/config, input and checkpoint checksums. Never update
+  live serving weights from a single `+1/-1` event; publish a new immutable challenger checkpoint
+  and require offline evaluation and explicit promotion.
+- If “GAN validation” means the repository's G56 suite, it is a gate-adversarial fixture suite, not
+  a Generative Adversarial Network trainer. Reuse it for refusal/robustness checks. An actual GAN
+  model is a distinct research proposal and is not required for this policy/value ranker.
+- “Adaptive decode” is limited to bounded presentation choices (e.g. evidence budget or next
+  read-only analysis node) and must emit a decision event with its rule/model revision and reason.
+  It cannot widen permissions, change the frozen candidate set, invent progress percentages, or
+  skip citation checks.
+
+### Validation order
+
+Run deterministic CPU tests first: DAG dependency ordering, max in-flight counts, stable results
+under varied completion order, timeout/cancel/error receipts, stale-binding rejection, tensor shape
+and finiteness, gradient finite-difference/parity checks, reproducible checkpoint checksum, and
+policy/FSM disagreement (FSM refusal wins). Then compare serial and bounded-parallel outputs on the
+same frozen inputs. GPU is permitted only after CPU correctness and a separate resource window.
+
+Reference patterns (not evidence that this repository implements them): PyTorch autograd and
+inference modes, asyncio executor semantics, PyTorch CUDA events/stream synchronization, and MCP
+tool-list change notifications:
+
+- https://docs.pytorch.org/docs/stable/notes/autograd.html
+- https://docs.python.org/3/library/asyncio-eventloop.html#executing-code-in-thread-or-process-pools
+- https://docs.pytorch.org/docs/stable/notes/cuda.html
+- https://modelcontextprotocol.io/specification/2025-11-25/server/tools
+
 `openspec/changes/parent-atlas-memory-architecture-freeze/proposal.md` addendum 9 recorded a
 review of the operator's "camera/LOD" design framing and noted 7 correction claims against an
 earlier GPU/pre-LLM patch this session could not locate in `sveltekit-frontend/src`. The operator

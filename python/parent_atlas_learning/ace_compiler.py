@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
-from typing import Any, Mapping, Sequence, Set
+from typing import Any, Mapping
 
 NES_LUT_PALETTES = {
     "ui": {"byte": "0x2A", "name": "NES_2C02_CYAN_LIGHT", "weight": 0.95},
@@ -27,56 +28,102 @@ def compile_ace_packet_from_proposal(
     context_manifest: Mapping[str, Any],
     domain: str = "ui",
     ttl_seconds: int = 604_800,  # 7 days
+    created_at: str | None = None,
 ) -> dict[str, Any]:
-    """Compile an untrusted proposal into a qualified ACE packet.
+    """Compile a bounded, review-only packet descriptor from an untrusted proposal.
 
-    Enforces ContextManifest evidence boundaries, prompt injection guards,
-    NES LUT palette mapping, and Redis/Valkey residency descriptors.
+    This helper does not admit packets or write to a store. Legacy palette
+    values remain proposal-only and are not LUT ordinals.
     """
     manifest_checksum = context_manifest.get("checksum", "")
-    allowed_evidence: Set[str] = set(context_manifest.get("evidenceRefs", []))
+    if not isinstance(manifest_checksum, str) or not manifest_checksum.strip():
+        raise ValueError("INVALID_CONTEXT_MANIFEST_CHECKSUM")
+    manifest_refs = context_manifest.get("evidenceRefs")
+    if not isinstance(manifest_refs, list) or any(not isinstance(ref, str) or not ref.strip() for ref in manifest_refs):
+        raise ValueError("INVALID_CONTEXT_MANIFEST_EVIDENCE_REFS")
+    allowed_evidence = set(manifest_refs)
 
     # 1. Evidence whitelist validation
+    if proposal.get("schema") != "atlas.ace-packet-proposal.v1":
+        raise ValueError("UNSUPPORTED_PROPOSAL_SCHEMA")
     proposed_refs = proposal.get("evidenceRefs", [])
-    if not proposed_refs:
+    if not isinstance(proposed_refs, list) or not proposed_refs or any(not isinstance(ref, str) or not ref.strip() for ref in proposed_refs):
         raise ValueError("Cannot compile ACE packet: proposal has no evidenceRefs")
+    if len(set(proposed_refs)) != len(proposed_refs):
+        raise ValueError("DUPLICATE_EVIDENCE_REFS")
     unauthorized = [ref for ref in proposed_refs if ref not in allowed_evidence]
     if unauthorized:
         raise ValueError(f"UNAUTHORIZED_EVIDENCE: {unauthorized}")
 
-    # 2. Checksum validation
     if proposal.get("contextManifestChecksum") != manifest_checksum:
         raise ValueError("CONTEXT_MANIFEST_CHECKSUM_MISMATCH")
+    if proposal.get("writesPerformed") is True:
+        raise ValueError("PROPOSAL_CLAIMS_WRITES_PERFORMED")
 
-    # 3. NES LUT mapping
-    palette = NES_LUT_PALETTES.get(domain, NES_LUT_PALETTES["general"])
-    concept_id = proposal.get("conceptId", f"concept:{domain}:runes_hardening:v1")
-    task_id = proposal.get("taskId", "TASK_001")
-    source_ref = proposed_refs[0] if proposed_refs else "docs/.okf/pinned/sveltekit/DIAGNOSTIC_WARNINGS_FIXES.md"
+    task_id = proposal.get("taskId")
+    if not isinstance(task_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{0,127}", task_id):
+        raise ValueError("INVALID_TASK_ID")
+    concept_id = proposal.get("conceptId")
+    if not isinstance(concept_id, str) or not concept_id.strip():
+        raise ValueError("INVALID_CONCEPT_ID")
+    instruction = proposal.get("instruction")
+    if not isinstance(instruction, str) or not instruction.strip():
+        raise ValueError("INVALID_INSTRUCTION")
+    if isinstance(ttl_seconds, bool) or not isinstance(ttl_seconds, int) or ttl_seconds <= 0:
+        raise ValueError("INVALID_TTL_SECONDS")
+    confidence_score = proposal.get("confidenceScore")
+    if confidence_score is not None and (isinstance(confidence_score, bool) or not isinstance(confidence_score, (int, float)) or not 0 <= confidence_score <= 1):
+        raise ValueError("INVALID_CONFIDENCE_SCORE")
+    timestamp = created_at if created_at is not None else time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    if not isinstance(timestamp, str) or not timestamp.strip():
+        raise ValueError("INVALID_CREATED_AT")
 
-    # 4. OaK Python tuple format
+    if not isinstance(domain, str) or not domain.strip():
+        raise ValueError("INVALID_DOMAIN")
+    resolved_domain = domain if domain in NES_LUT_PALETTES else "general"
+    palette = NES_LUT_PALETTES[resolved_domain]
+    source_ref = sorted(proposed_refs)[0]
+
     oak_tuple = (
-        f'("{source_ref}", "{concept_id}", "{palette["byte"]}", '
-        f'"OPTION[RESOLVE_SVELTE_A11Y_WARNINGS]", 0.98, 64, "implements")'
+        f"({json.dumps(source_ref)}, {json.dumps(concept_id)}, {json.dumps(palette['byte'])}, "
+        f"{json.dumps(instruction)}, {confidence_score if confidence_score is not None else 'None'}, 64, "
+        f'"implements")'
     )
 
-    packet_id = f"ace:packet:{task_id.lower().replace('_', '-')}-v1"
+    proposal_identity = {
+        "taskId": task_id,
+        "conceptId": concept_id,
+        "evidenceRefs": sorted(proposed_refs),
+        "instruction": instruction,
+        "contextManifestChecksum": manifest_checksum,
+        "domain": domain,
+    }
+    proposal_digest = hashlib.sha256(
+        json.dumps(proposal_identity, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()[:16]
+    packet_id = f"ace:packet:{task_id.lower().replace('_', '-')}-{proposal_digest}-v1"
 
     packet = {
         "$schema": "https://deeds-web-app.internal/schemas/ace-packet.v1.json",
         "packet_id": packet_id,
-        "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "created_at": timestamp,
         "ttl_seconds": ttl_seconds,
         "concept_id": concept_id,
         "source_ref": source_ref,
-        "confidence_score": 0.98,
+        "confidence_score": confidence_score,
         "canonical_authority": False,
         "writes_performed": False,
         "nes_lut": {
             "domain": domain,
+            "resolved_domain": resolved_domain,
+            "lut_byte": None,
+            "nes_hex": palette["byte"],
             "palette_byte": palette["byte"],
             "palette_name": palette["name"],
             "prior_weight": palette["weight"],
+            "mapping_status": (
+                "LEGACY_CONFLICT_UNRESOLVED" if resolved_domain == domain else "UNKNOWN_DOMAIN_FALLBACK_GENERAL"
+            ),
             "predicate": "implements",
         },
         "oak_python_tuple": oak_tuple,
@@ -94,7 +141,7 @@ def compile_ace_packet_from_proposal(
             "context_manifest_checksum": manifest_checksum,
             "qualified_evidence_refs": sorted(proposed_refs),
             "evidence_count": len(proposed_refs),
-            "admission_status": "ADMITTED_READ_ONLY",
+            "admission_status": "PROPOSED_NOT_ADMITTED",
         },
         "bitfrost_caching": {
             "redis_key": packet_id,

@@ -135,7 +135,7 @@ test('directory driver passes the selected Svelte LSP profile after rolling back
       assert.deepEqual(args.slice(1, 3), [sourceRow.canonical_source_ref, workspaceRevision]);
       assert.ok(args.includes('--svelte-typescript-plugin=off'));
       assert.equal(options.shell, undefined);
-      assert.equal(options.timeout, 200_000);
+      assert.equal(options.timeout, 420_000);
       return { stdout: JSON.stringify(fixture.summary) };
     },
     readReceipt: () => fixture.receipt,

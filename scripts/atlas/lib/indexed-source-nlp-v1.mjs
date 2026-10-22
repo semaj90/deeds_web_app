@@ -6,6 +6,8 @@ const LSP_LANGUAGE_IDS = new Map([
   ['.mts', 'typescript'], ['.cts', 'typescript'], ['.mjs', 'javascript'], ['.cjs', 'javascript'],
 ]);
 const SHA256 = /^sha256:[0-9a-f]{64}$/;
+const MAX_ANALYZE_SOURCE_CHARS = 1_000_000;
+const MAX_POS_SOURCE_BYTES = 50_000;
 
 function sha256(value) {
   return `sha256:${crypto.createHash('sha256').update(value).digest('hex')}`;
@@ -63,10 +65,11 @@ async function analyzeSveltePosV1({ sourceText, sourceRef, sourceRevision, works
 }
 
 export async function runIndexedSourceNlpV1({ sourceText, sourceRef, sourceRevision, workspaceRevision, sidecarUrl }) {
-  if (Buffer.byteLength(sourceText) > 50_000) return { status: 'SKIPPED_SOURCE_OVER_50000_BYTES' };
   if (path.extname(sourceRef).toLowerCase() === '.svelte') {
+    if (Buffer.byteLength(sourceText) > MAX_POS_SOURCE_BYTES) return { status: 'SKIPPED_SVELTE_POS_SOURCE_OVER_50000_BYTES' };
     return analyzeSveltePosV1({ sourceText, sourceRef, sourceRevision, workspaceRevision, sidecarUrl });
   }
+  if (sourceText.length > MAX_ANALYZE_SOURCE_CHARS) return { status: 'SKIPPED_SOURCE_OVER_1000000_CHARS' };
   const response = await fetch(`${sidecarUrl}/analyze`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -78,11 +81,11 @@ export async function runIndexedSourceNlpV1({ sourceText, sourceRef, sourceRevis
       sourceRevision,
       workspaceRevision,
       language: LSP_LANGUAGE_IDS.get(path.extname(sourceRef).toLowerCase()) ?? 'unknown',
-      max_chars: 50_000,
+      max_chars: MAX_ANALYZE_SOURCE_CHARS,
       passes: ['structural', 'linguistic', 'classify'],
       grounded_extraction_required: true,
     }),
-    signal: AbortSignal.timeout(60000),
+    signal: AbortSignal.timeout(180000),
   });
   if (!response.ok) throw new Error(`NLP_SIDECAR_HTTP_${response.status}`);
   const result = await response.json();

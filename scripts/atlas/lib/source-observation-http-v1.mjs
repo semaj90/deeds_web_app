@@ -17,3 +17,22 @@ export async function fetchSourceObservationJsonV1(url, options, { fetchImpl = g
     }
   }
 }
+
+// Receipt check for /ast/chunk payloads. Only COMPLETE may be used as evidence. A missing receipt
+// (older sidecar) is reported as MISSING_RECEIPT and is never treated as complete.
+export function astScanCompleteness(payload) {
+  const scanCompleteness = payload?.scan_completeness ?? 'MISSING_RECEIPT';
+  return {
+    complete: scanCompleteness === 'COMPLETE',
+    scanCompleteness,
+    scanFailure: payload?.scan_failure ?? null,
+  };
+}
+
+export function assertCompleteAstScan(payload) {
+  const scan = astScanCompleteness(payload);
+  if (!scan.complete) {
+    throw new Error(`AST_SCAN_INCOMPLETE:${scan.scanCompleteness}${scan.scanFailure ? `:${scan.scanFailure}` : ''}`);
+  }
+  return scan;
+}

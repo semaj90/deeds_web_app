@@ -34,7 +34,7 @@ export function runIndexedSourceAstGrepV1({ repoRoot, sourceRef, expectedRevisio
   const script = path.join(repoRoot, 'scripts', 'atlas', 'ast-chunk-keyed-map-v1.mjs');
   const result = spawnSync(process.execPath, [script, sourceRef, `--sidecar=${sidecarUrl}`,
     `--source-root=${sourceRootReal}`, `--source-revision=${expectedRevision}`], {
-    cwd: repoRoot, encoding: 'utf8', timeout: 90000, maxBuffer: 8 * 1024 * 1024,
+    cwd: repoRoot, encoding: 'utf8', timeout: 360000, maxBuffer: 8 * 1024 * 1024,
   });
   if (result.error) throw result.error;
   let summary;

@@ -1,0 +1,6 @@
+{
+  "schema": "atlas.golden-breadth-retrieval-index.v1",
+  "runId": "gb-2026-10-21T22-51-29-346Z-3a21a9e5",
+  "note": "Retrieval index is derived from live MCP results. Results are candidates, not proof of correctness.",
+  "entries": []
+}

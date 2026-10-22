@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { assertCompleteAstScan } from './lib/source-observation-http-v1.mjs';
 
 const root = process.cwd();
 const sidecarUrl = (process.env.ATLAS_AST_SIDECAR_URL ?? 'http://127.0.0.1:8095').replace(/\/$/, '');
@@ -102,6 +103,8 @@ async function fetchEvidence() {
   if (payload.schema !== 'atlas.ast.evidence.v1' || !Array.isArray(payload.chunks)) {
     throw new Error('AST_SIDECAR_SCHEMA_INVALID');
   }
+  // Fail closed: cards are only built from a COMPLETE AST scan. The caller's catch records the reason.
+  assertCompleteAstScan(payload);
   return payload;
 }
 

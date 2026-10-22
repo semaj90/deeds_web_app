@@ -614,7 +614,7 @@
 					</div>
 
 					<div class="ai-options">
-						<label class="section-label">AI Processing Options</label>
+						<span class="section-label">AI Processing Options</span>
 						<div class="checkbox-group">
 							<label class="checkbox-label">
 								<input

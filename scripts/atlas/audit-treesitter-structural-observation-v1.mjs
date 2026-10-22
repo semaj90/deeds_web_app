@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { adaptTreeSitterEvidence } from './lib/treesitter-structural-observation-v1.mjs';
+import { assertCompleteAstScan } from './lib/source-observation-http-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const sidecarUrl = process.env.ATLAS_NLP_SIDECAR_URL || 'http://127.0.0.1:8095';
@@ -90,6 +91,8 @@ async function main() {
       const response = await fetch(`${sidecarUrl}/ast/chunk`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ source, language, filePath: sourceRef, sourceRevision: effectiveSourceRevision }), signal: AbortSignal.timeout(15000) });
       if (!response.ok) throw new Error(`SIDECAR_HTTP_${response.status}`);
       const raw = await response.json();
+      // Fail closed: a partial AST scan must not produce snapshot rows. The catch below records the failure.
+      assertCompleteAstScan(raw);
       const adapted = adaptTreeSitterEvidence({ sourceRef, sourceRevision: effectiveSourceRevision, response: raw });
       const sourceBytes = Buffer.from(source, 'utf8');
       for (const chunk of adapted.chunks) {
@@ -118,15 +121,19 @@ async function main() {
     } catch (error) { failures.push({ sourceRef, error: String(error?.message ?? error) }); }
   }
   snapshotRows.sort((a, b) => `${a.sourceRef}|${a.sourceRevision}|${String(a.startByte).padStart(12, '0')}|${String(a.endByte).padStart(12, '0')}|${a.nodeKind}|${a.upstreamNodeId ?? ''}`.localeCompare(`${b.sourceRef}|${b.sourceRevision}|${String(b.startByte).padStart(12, '0')}|${String(b.endByte).padStart(12, '0')}|${b.nodeKind}|${b.upstreamNodeId ?? ''}`));
-  const snapshotPath = path.join(root, '.tmp/atlas/current-source-ast-snapshot-v1.ndjson');
+  // Fail closed: only a run with zero failures writes the canonical snapshot path. A partial run writes a separate
+  // INCOMPLETE file and reports no checksum, so later steps cannot read partial rows as the complete snapshot.
+  const snapshotComplete = failures.length === 0;
+  const snapshotName = snapshotComplete ? '.tmp/atlas/current-source-ast-snapshot-v1.ndjson' : '.tmp/atlas/current-source-ast-snapshot-v1.INCOMPLETE.ndjson';
+  const snapshotPath = path.join(root, snapshotName);
   fs.mkdirSync(path.dirname(snapshotPath), { recursive: true });
   const snapshotText = snapshotRows.map((row) => JSON.stringify(row)).join('\n') + (snapshotRows.length ? '\n' : '');
   fs.writeFileSync(snapshotPath, snapshotText);
-  const snapshotChecksum = `sha256:${hash(snapshotText)}`;
+  const snapshotChecksum = snapshotComplete ? `sha256:${hash(snapshotText)}` : null;
   const boundWorkspaceRevision = currentMode
     ? text(admission?.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' ? admission.workspaceRevision : null)
     : text(observation.record?.workspaceRevision);
-  const report = { schema: 'atlas.treesitter-structural-observation.v1', generatedAt: new Date().toISOString(), mode: currentMode ? 'READ_ONLY_CURRENT_GRAPHIFY_COHORT' : 'READ_ONLY_AUDIT', postgresWrites: false, qdrantWrites: false, neo4jWrites: false, valkeyWrites: false, sidecar: { url: sidecarUrl, endpoint: '/ast/chunk', engine: 'treesitter-chunker' }, selectionChecksum: text(approval.selectionChecksum), sourceRevisionReport: currentMode ? 'docs/reports/current-graphify-source-revision-v1.json' : null, providerRevisionRule: currentMode ? 'SHA256_CONTENT_HASH' : 'SOURCE_BINDING_REVISION', workspaceRevision: boundWorkspaceRevision, workspaceRevisionSource: currentMode ? 'TOURNAMENT_ADMISSION_RECEIPT' : 'SOURCE_BINDING_OBSERVATION', requestedSourceCount: allRefs.length, selectedSourceCount: selectedRefs.length, nominationRecordCount: nominationRows?.length ?? null, availableNominationSourceCount: allNominatedRefs?.size ?? null, nominationSourceCount: nominatedRefs?.size ?? null, nominationSourcesOutsideCurrentCohort: allNominatedRefs && nominatedRefs ? [...allNominatedRefs].filter((sourceRef) => !nominatedRefs.has(sourceRef)).length : null, nominationSourcesUnsupported: nominatedRefs ? [...nominatedRefs].filter((sourceRef) => !supportedExtensions.has(path.extname(sourceRef).toLowerCase())).length : null, supportedCandidateCount: candidateRefs.length, sourceCount: refs.length, truncated: refs.length < candidateRefs.length, limit: requestedLimit, selectionMode: nominationsPath ? 'NOMINATED_SOURCES_ONLY' : 'ALL_SUPPORTED_SOURCES', nominationsPath: nominationsPath ? path.relative(root, nominationsPath).replaceAll('\\', '/') : null, extractedCount: results.filter((row) => row.syntaxStatus !== 'UNSUPPORTED_LANGUAGE').length, unsupportedCount: results.filter((row) => row.syntaxStatus === 'UNSUPPORTED_LANGUAGE').length, astRowCount: snapshotRows.length, snapshotPath: '.tmp/atlas/current-source-ast-snapshot-v1.ndjson', snapshotChecksum, failures, results, canonicalAuthority: false, status: failures.length === 0 ? 'STRUCTURAL_OBSERVATIONS_PROVEN' : 'STRUCTURAL_OBSERVATIONS_INCOMPLETE', nextGate: 'AST_IDENTITY_ADAPTER_AND_LSP_RESOLUTION' };
+  const report = { schema: 'atlas.treesitter-structural-observation.v1', generatedAt: new Date().toISOString(), mode: currentMode ? 'READ_ONLY_CURRENT_GRAPHIFY_COHORT' : 'READ_ONLY_AUDIT', postgresWrites: false, qdrantWrites: false, neo4jWrites: false, valkeyWrites: false, sidecar: { url: sidecarUrl, endpoint: '/ast/chunk', engine: 'treesitter-chunker' }, selectionChecksum: text(approval.selectionChecksum), sourceRevisionReport: currentMode ? 'docs/reports/current-graphify-source-revision-v1.json' : null, providerRevisionRule: currentMode ? 'SHA256_CONTENT_HASH' : 'SOURCE_BINDING_REVISION', workspaceRevision: boundWorkspaceRevision, workspaceRevisionSource: currentMode ? 'TOURNAMENT_ADMISSION_RECEIPT' : 'SOURCE_BINDING_OBSERVATION', requestedSourceCount: allRefs.length, selectedSourceCount: selectedRefs.length, nominationRecordCount: nominationRows?.length ?? null, availableNominationSourceCount: allNominatedRefs?.size ?? null, nominationSourceCount: nominatedRefs?.size ?? null, nominationSourcesOutsideCurrentCohort: allNominatedRefs && nominatedRefs ? [...allNominatedRefs].filter((sourceRef) => !nominatedRefs.has(sourceRef)).length : null, nominationSourcesUnsupported: nominatedRefs ? [...nominatedRefs].filter((sourceRef) => !supportedExtensions.has(path.extname(sourceRef).toLowerCase())).length : null, supportedCandidateCount: candidateRefs.length, sourceCount: refs.length, truncated: refs.length < candidateRefs.length, limit: requestedLimit, selectionMode: nominationsPath ? 'NOMINATED_SOURCES_ONLY' : 'ALL_SUPPORTED_SOURCES', nominationsPath: nominationsPath ? path.relative(root, nominationsPath).replaceAll('\\', '/') : null, extractedCount: results.filter((row) => row.syntaxStatus !== 'UNSUPPORTED_LANGUAGE').length, unsupportedCount: results.filter((row) => row.syntaxStatus === 'UNSUPPORTED_LANGUAGE').length, astRowCount: snapshotRows.length, snapshotPath: snapshotName, snapshotChecksum, failures, results, canonicalAuthority: false, status: failures.length === 0 ? 'STRUCTURAL_OBSERVATIONS_PROVEN' : 'STRUCTURAL_OBSERVATIONS_INCOMPLETE', nextGate: 'AST_IDENTITY_ADAPTER_AND_LSP_RESOLUTION' };
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({ status: report.status, sourceCount: refs.length, extractedCount: report.extractedCount, unsupportedCount: report.unsupportedCount, failures: failures.length, chunks: results.reduce((sum, row) => sum + row.chunkCount, 0), edges: results.reduce((sum, row) => sum + row.edgeCount, 0), astRowCount: report.astRowCount, snapshotChecksum: report.snapshotChecksum, reportPath: 'docs/reports/treesitter-structural-observation-v1.json' }, null, 2));

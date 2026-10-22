@@ -1,6 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { fetchSourceObservationJsonV1 } from './source-observation-http-v1.mjs';
+import { assertCompleteAstScan, astScanCompleteness, fetchSourceObservationJsonV1 } from './source-observation-http-v1.mjs';
+
+test('accepts only a COMPLETE AST receipt as evidence', () => {
+  assert.equal(astScanCompleteness({ scan_completeness: 'COMPLETE' }).complete, true);
+  assert.equal(astScanCompleteness({ scan_completeness: 'PARTIAL_AST_FAILED', scan_failure: 'boom' }).complete, false);
+  assert.equal(astScanCompleteness({ chunks: [] }).scanCompleteness, 'MISSING_RECEIPT');
+  assert.throws(() => assertCompleteAstScan({ scan_completeness: 'PARTIAL_AST_FAILED', scan_failure: 'boom' }),
+    /AST_SCAN_INCOMPLETE:PARTIAL_AST_FAILED:boom/);
+  assert.throws(() => assertCompleteAstScan({ chunks: [] }), /AST_SCAN_INCOMPLETE:MISSING_RECEIPT/);
+  assert.equal(assertCompleteAstScan({ scan_completeness: 'COMPLETE' }).complete, true);
+});
 
 test('retries one transport failure with identical request and deadline, preserving both attempts', async () => {
   const options = { method: 'POST', body: '{"source":"exact bytes"}', signal: AbortSignal.timeout(5000) };

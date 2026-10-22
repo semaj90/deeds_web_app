@@ -66,6 +66,7 @@ import { trace } from '@opentelemetry/api';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { waitForMcpResponseFinish } from './response-finish.js';
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
@@ -8898,29 +8899,7 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
   try {
     await server.connect(transport);
     await transport.handleRequest(req, res);
-    // Wait until the SDK has handed the response body to Node before closing
-    // this stateless transport. `handleRequest()` may return after headers/body
-    // are scheduled but before `finish`; closing immediately can produce a 200
-    // with an empty SSE body. Do not wait for keep-alive `close`, which may never
-    // arrive after a successful POST. The timeout keeps one malformed request
-    // from wedging the serialized MCP queue.
-    if (!res.writableFinished) {
-      await new Promise<void>((resolve) => {
-        let settled = false;
-        const settle = () => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          res.off('finish', settle);
-          res.off('close', settle);
-          resolve();
-        };
-        const timer = setTimeout(settle, 5000);
-        res.on('finish', settle);
-        res.on('close', settle);
-        if (res.writableFinished) settle();
-      });
-    }
+    await waitForMcpResponseFinish(res);
   } catch (err: any) {
     console.error('[MCP per-request handler threw]', {
       url: req.url,

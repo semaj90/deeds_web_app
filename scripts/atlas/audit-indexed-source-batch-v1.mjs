@@ -102,7 +102,7 @@ export async function auditIndexedSourceDirectoryV1(input, dependencies = {}) {
     const sveltePluginSetting = request.enableSvelteTypeScriptPlugin ? 'on' : 'off';
     const { stdout } = await execute(process.execPath, [script, row.canonical_source_ref, request.workspaceRevision,
       `--sidecar=${sidecarUrl}`, `--svelte-typescript-plugin=${sveltePluginSetting}`], {
-      cwd: REPO_ROOT, timeout: 200_000, maxBuffer: 1024 * 1024, windowsHide: true,
+      cwd: REPO_ROOT, timeout: 420_000, maxBuffer: 1024 * 1024, windowsHide: true,
     });
     const summary = JSON.parse(stdout);
     const receipt = (dependencies.readReceipt ?? readProviderReceipt)(summary.receiptPath);

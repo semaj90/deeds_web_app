@@ -1047,13 +1047,14 @@ ${relatedReports.length > 0 ? `**Database Stats:**
           <!-- Typewriter Speed Control -->
           {#if settings.enableTypewriterEffect}
             <div class="mt-4 space-y-2">
-              <label class="text-sm font-medium">Typewriter Speed</label>
+              <label class="text-sm font-medium" for="typewriter-speed">Typewriter Speed</label>
               <div class="flex items-center gap-2">
                 <span class="text-xs text-sand/60">Fast</span>
                 <input
                   type="range"
                   min="10"
                   max="100"
+                  id="typewriter-speed"
                   bind:value={settings.typewriterSpeed}
                   class="flex-1 h-2 bg-sand/10 rounded-lg appearance-none cursor-pointer"
                 />
