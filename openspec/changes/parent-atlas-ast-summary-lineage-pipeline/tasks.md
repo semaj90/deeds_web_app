@@ -11,15 +11,42 @@ Branch `chore/parent-atlas-session-2026-10-17`, commit `30c3cf5fa2`, pushed to o
 | This change (proposal, tasks, spec delta) | CREATED | `openspec validate parent-atlas-ast-summary-lineage-pipeline --strict` passes |
 | Language-coverage inventory (separate change, `parent-atlas-nlp-sidecar-feature-compiler`) | PROVEN for the inventory only | Report `.tmp/atlas/language-coverage/20261021T212933-452177ac/inventory.json`, digest `cf7323c3…bf87d` recomputed, 5 Python tests pass with `PYTHONPATH=python` |
 | Durable execution journal tables (`0040`, live) | APPLIED | `execution_runs`, `execution_journal_steps`, `execution_side_effects`, `execution_dependencies` exist, 0 rows. `agent_memory_registry` ALTER block skipped (table absent) |
-| `feature_label_id` (UUIDv8 via `deriveUUID`) | DRAFT, NOT APPLIED | Added to the superseded `20261020_atlas_feature_labels_v1.sql`. CHECK verified read-only |
-| `20261021_feature_identity_v2.sql` (designated owner of labels) | DRAFT, NOT APPLIED | Contract test passes 17/17. `atlas_feature_labels` keyed by `canonical_feature_id`, no FK to `atlas_features` |
+| `feature_label_id` (UUIDv8 via `deriveUUID`) | DRAFT-ONLY ALIAS | Exists only in the incompatible 2026-10-20 draft; absent from live schema and omitted by v2. It is not canonical identity and is not required for model/graph alignment |
+| `20261021_feature_identity_v2.sql` (proposed label/concept owner) | DRAFT, NOT APPLIED | Contract test passes 17/17. Defines text `canonical_feature_id`, composite label key `(canonical_feature_id, label_revision)`, reviewed source crosswalk; all v2 tables absent live |
 | `svelte-check` baseline | CLEAN, recorded separately from pipeline evidence | 16,215 files, 0 errors, 0 warnings (machine output) |
 | Pipeline stages ASTSUM-01…09 | OPEN / BLOCKED (see gates below) | None proven end to end |
 
 **Known conflicts to resolve first**
-- Two drafts create `atlas_feature_labels` with different columns and keys. `CREATE TABLE IF NOT EXISTS` would silently keep whichever runs first. Mark `20261020_atlas_feature_labels_v1.sql` superseded (do not delete) and make v2 the only owner, or record the reason it is not.
+- Two drafts create `atlas_feature_labels` with different columns, keys, and foreign-key parents. `CREATE TABLE IF NOT EXISTS` would silently keep whichever runs first. The 2026-10-21 v2 is the proposed design owner, but the older 2026-10-20 file remains present and is not explicitly registered as superseded. Resolve/label that conflict before any migration approval; archive, never delete.
 - `atlas_features` has 0 rows and needs provenance fields (`tree_node_id`, `content_hash`, `schema_id`, `extractor_version`) that `atlas_feature_map` does not carry. Do not populate it from `atlas_feature_map`.
-- `atlas_feature_map` is not unique on `feature_id` (4,748 rows, 3,151 distinct), so it cannot be a foreign-key target.
+- `atlas_feature_map` is not unique on `feature_id` (4,748 rows, 3,151 distinct, 4,747 non-null), so it cannot be a foreign-key target.
+
+## Read-only feature-ID/schema census (2026-10-21)
+
+Live check ran in `legal_ai_db` on PostgreSQL 18.4 inside `BEGIN TRANSACTION READ ONLY` (`transaction_read_only=on`). These are current database observations, not migration intent:
+
+| Owner/object | Live finding | Identity/index meaning |
+|---|---|---|
+| `atlas_feature_labels`, `atlas_feature_concepts`, `atlas_feature_source_identities`, `atlas_feature_concept_crosswalk` | Absent; no live `feature_label_id` column | The 2026-10-20 and 2026-10-21 designs are not installed |
+| `atlas_features` | 0 rows; PK `feature_id` text; FKs to AST nodes and schema registry; indexes on namespace/type, tree node, and JSONB labels | AST-derived structural facts, not a populated label dictionary |
+| `atlas_fi_features` | 7 rows, all `active`; PK `feature_id` text with `uuidv7()` default; unique `feature_key`; self-FK `parent_feature_id`; indexes on domain/status, feature revision, and metadata | Existing product-feature candidate registry, not the v2 reviewed concept registry |
+| `atlas_feature_aliases` | PK `(feature_id, normalized_alias)`; FK to `atlas_fi_features`; btree index on normalized alias | Aliases belong to the product-feature registry, not canonical concept labels |
+| `atlas_feature_map` | 4,748 rows; 4,747 non-null and 3,151 distinct `feature_id`; PK `normalized_path`; btree indexes on feature ID, Qdrant point ID, and SOM cluster; no feature-ID FK/unique constraint | A path projection; not a canonical feature-ID target |
+| `code_features` | 1,477 rows; PK `feature_id`; unique `(source_ref, symbol, kind)`; indexes on source ref, symbol, kind, language, and domain | No `source_revision` column, so this uniqueness does not prove revision-qualified symbol identity |
+| `atlas_feature_evidence` | PK `(packet_key, content_hash, extractor_version)`; indexes on packet key and AST primary-functional-symbol expression; exact row count not taken | Has evidence/source revision fields but no demonstrated canonical-symbol join |
+| `atlas_feature_envelopes` | 58,365 rows; PK `packet_key`; FK to `atlas_packets`; indexes on feature ID, source ref, title, and community; stores text `feature_label` | Packet-keyed denormalized envelope, not a label registry |
+| `atlas_feature_recommendation_index` | Planner estimate: 1,000 rows | Existing derived analytics projection; not canonical identity or reviewed-label authority |
+| `feature_registry`, `feature_maps`, `features`, `feature_records` | `feature_registry` absent; the latter three exist but have 0 rows. `feature_maps` PK `id`; `features` PK `id` and unique `(project_id, feature_key)`; `feature_records` PK UUID `feature_id` | Other schemas do not provide a populated canonical Atlas label owner |
+
+The manual migration names have no match in `drizzle/sidecar-migrations.json` or `drizzle/meta/_journal.json`; the live `drizzle.__drizzle_migrations` table returned zero rows. Independently, all tables created by identity v2 and both candidate `atlas_feature_labels` definitions are absent. No database writes were performed.
+
+### Missing schema gates before mapping or analytics work
+
+1. **Single migration owner:** explicitly supersede/retain the 2026-10-20 label draft and register only the reviewed migration path. Do not apply either draft during this change.
+2. **Canonical identity decision:** v2's `canonical_feature_id` text plus `(canonical_feature_id, label_revision)` is the proposed label key. The v1 UUIDv8 `feature_label_id` is only an alias proposal and does not align algorithm outputs; keep it out unless a separately evidenced consumer requires it.
+3. **Source-to-symbol mapping:** prove the join from exact source bytes/revision and symbol/span to a namespaced local feature ID. Existing `code_features` lacks source revision; `atlas_feature_evidence` has content/source/extractor lineage but is not yet shown joined to a canonical symbol. Unresolved mappings must abstain.
+4. **Reviewed crosswalk and labels:** no mapping is authoritative until a source identity is linked to a canonical concept by a reviewed, evidence-bearing crosswalk and a reviewed label revision. Do not derive semantic truth from UUIDs, KMeans, PageRank, XGBoost, or embeddings.
+5. **Analytics shape and indexes:** reuse derived snapshot/artifact contracts first. Add a persistent analytics table or index only after a concrete query, cardinality, `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` baseline, owner review, and migration/readback plan show a gap. Keep Python dict/tuple and frozen ordinal/bitset representations as derived in-memory/snapshot structures, not identity owners.
 
 ## Gates (from the 2026-10-22 review)
 
@@ -87,7 +114,7 @@ Order: frozen source → deterministic extraction → canonical evidence payload
 
 ## 6. feature_label tie-in (OpenSpec)
 
-- [ ] 6.1 Link each payload to its `feature_label` through the existing feature-labels table (`drizzle/manual/20261020_atlas_feature_labels_v1.sql`). Do not create a new label table.
+- [ ] 6.1 Link a payload only after exact source/symbol lineage resolves through the reviewed crosswalk to the proposed v2 `atlas_feature_labels` owner (`drizzle/manual/20261021_feature_identity_v2.sql`, not applied). Do not join on label text, `atlas_feature_map.feature_id`, or a UUID alias; do not create another label table.
 - [ ] 6.2 Record unlabeled chunks as `UNRESOLVED`, not as a default label.
 
 ## 7. Summaries (last step)
