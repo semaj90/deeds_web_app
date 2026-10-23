@@ -17,7 +17,14 @@ vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
   }),
 }));
 
-import { retrieveQdrant } from './retrieve-candidates.js';
+import { buildLexicalExpansionQuery, retrieveQdrant } from './retrieve-candidates.js';
+
+describe('buildLexicalExpansionQuery', () => {
+  it('deduplicates and bounds additions to the original lexical query without rewriting it', () => {
+    expect(buildLexicalExpansionQuery('SvelteKit route Drizzle', [' drizzle-orm ', 'SvelteKit', '', 'route functions']))
+      .toBe('SvelteKit route Drizzle drizzle-orm SvelteKit route functions');
+  });
+});
 
 describe('retrieveQdrant', () => {
   beforeEach(() => {

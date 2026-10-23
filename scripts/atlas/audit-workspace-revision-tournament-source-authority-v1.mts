@@ -93,6 +93,7 @@ const report = {
   derivationPath: DERIVATION,
   hygienePath: HYGIENE,
   manifestPath: derivation.snapshotPath,
+  manifestSha256: `sha256:${createHash('sha256').update(await readFile(derivation.snapshotPath)).digest('hex')}`,
   snapshotSourceCount: derivation.sourceCount ?? 0,
   sourceCount: plan.sourceCount ?? 0,
   sourceSelectionChecksum: plan.sourceSelectionChecksum ?? null,

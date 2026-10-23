@@ -1,7 +1,8 @@
 const compare = (left, right) => left < right ? -1 : left > right ? 1 : 0;
 
-export function buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, taskPathRows, summaryRows, domainRows }) {
-  if (![baseNodes, baseEdges, taskPathRows, summaryRows, domainRows].every(Array.isArray)) {
+export function buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, taskPathRows, summaryRows, domainRows,
+  runtimeOwnerRows = [] }) {
+  if (![baseNodes, baseEdges, taskPathRows, summaryRows, domainRows, runtimeOwnerRows].every(Array.isArray)) {
     throw new TypeError('DOMAIN_GRAPH_INPUT_INVALID');
   }
 
@@ -114,6 +115,50 @@ export function buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, task
     }
   }
 
+  const runtimeCapabilityIds = new Set();
+  for (const row of runtimeOwnerRows) {
+    if (typeof row.capabilityId !== 'string' || !row.capabilityId || runtimeCapabilityIds.has(row.capabilityId)
+      || typeof row.ownerPath !== 'string' || !/^[a-f0-9]{64}$/.test(row.ownerFileSha256 ?? '')
+      || row.parentDirectoryPath !== (row.ownerPath.includes('/') ? row.ownerPath.slice(0, row.ownerPath.lastIndexOf('/')) : '.')
+      || row.evidenceKind !== 'DECLARED_RUNTIME_OWNER_PATH_CANDIDATE' || row.executionProven !== false
+      || row.sourceRevisionQualified !== false) throw new Error('RUNTIME_OWNER_GRAPH_ROW_INVALID');
+    runtimeCapabilityIds.add(row.capabilityId);
+    const directoryKey = `dir:${row.parentDirectoryPath}`;
+    if (!nodes.has(directoryKey)) nodes.set(directoryKey, {
+      nodeKey: directoryKey,
+      nodeType: 'DIRECTORY',
+      relativePath: row.parentDirectoryPath,
+      sourceSha256: '',
+      identityStatus: 'PATH_DERIVED_DIRECTORY_CANDIDATE_NOT_CANONICAL_ID',
+    });
+    const runtimeKey = `runtime-owner-candidate:${row.capabilityId}`;
+    if (nodes.has(runtimeKey)) throw new Error('RUNTIME_OWNER_GRAPH_NODE_COLLISION');
+    nodes.set(runtimeKey, {
+      nodeKey: runtimeKey,
+      nodeType: 'RUNTIME_OWNER_CANDIDATE',
+      relativePath: row.ownerPath,
+      sourceSha256: row.ownerFileSha256,
+      ownerClassification: row.ownerClassification ?? 'UNCLASSIFIED',
+      capabilityId: row.capabilityId,
+      identityStatus: 'DECLARED_CAPABILITY_LABEL_NOT_RUNTIME_ID',
+      executionProven: false,
+      sourceRevisionQualified: false,
+    });
+    edges.push({
+      sourceNode: directoryKey,
+      targetNode: runtimeKey,
+      edgeType: 'DIRECTORY_DECLARED_RUNTIME_OWNER_CANDIDATE',
+      evidenceStatus: 'DECLARED_OWNER_REGISTRY_AND_CURRENT_BYTES_ONLY',
+      sourcePath: row.ownerPath,
+      sourceSha256: row.ownerFileSha256,
+      capabilityId: row.capabilityId,
+      ownerClassification: row.ownerClassification ?? 'UNCLASSIFIED',
+      executionProven: false,
+      sourceRevisionQualified: false,
+      workspaceRevision: '',
+    });
+  }
+
   const nodeRows = [...nodes.values()].sort((left, right) => compare(left.nodeKey, right.nodeKey))
     .map((node, ordinal) => ({ ...node, ordinal }));
   const ordinalByKey = new Map(nodeRows.map(node => [node.nodeKey, node.ordinal]));
@@ -126,7 +171,7 @@ export function buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, task
     const key = JSON.stringify([sourceOrdinal, targetOrdinal, row.edgeType, row.sourcePath ?? '', row.sourceSha256 ?? '',
       row.importSpecifier ?? '', row.startByte ?? 0, row.endByte ?? 0, row.evidenceSha256 ?? '',
       row.evidenceStartByte ?? 0, row.evidenceEndByte ?? 0, row.taskBlockSha256 ?? '',
-      row.summarySha256 ?? '', row.domainGroupId ?? '', row.candidateKind ?? '']);
+      row.summarySha256 ?? '', row.domainGroupId ?? '', row.candidateKind ?? '', row.capabilityId ?? '']);
     uniqueEdges.set(key, row);
   }
   const edgeRows = [...uniqueEdges.values()].sort((left, right) => left.sourceOrdinal - right.sourceOrdinal
@@ -134,16 +179,21 @@ export function buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, task
   return { nodes: nodeRows, edges: edgeRows };
 }
 
-export function createOpenSpecDomainCandidateTraversalIndexV1({ nodes, edges, edgeTypes }) {
+export function createOpenSpecDomainCandidateTraversalIndexV1({ nodes, edges, edgeTypes, evidenceStatuses }) {
   if (!Array.isArray(nodes) || !Array.isArray(edges)) throw new TypeError('DOMAIN_GRAPH_INDEX_INPUT_INVALID');
   if (edgeTypes !== undefined && (!Array.isArray(edgeTypes) || edgeTypes.some(type => typeof type !== 'string')))
     throw new TypeError('DOMAIN_GRAPH_INDEX_EDGE_TYPES_INVALID');
+  if (evidenceStatuses !== undefined && (!Array.isArray(evidenceStatuses)
+    || evidenceStatuses.some(status => typeof status !== 'string')))
+    throw new TypeError('DOMAIN_GRAPH_INDEX_EVIDENCE_STATUSES_INVALID');
   const allowedEdgeTypes = edgeTypes ? new Set(edgeTypes) : null;
+  const allowedEvidenceStatuses = evidenceStatuses ? new Set(evidenceStatuses) : null;
   const nodesByKey = new Map(nodes.map(node => [node.nodeKey, node]));
   if (nodesByKey.size !== nodes.length) throw new Error('DOMAIN_GRAPH_INDEX_DUPLICATE_NODE');
   const adjacency = new Map();
   for (const edge of edges) {
     if (allowedEdgeTypes && !allowedEdgeTypes.has(edge.edgeType)) continue;
+    if (allowedEvidenceStatuses && !allowedEvidenceStatuses.has(edge.evidenceStatus)) continue;
     const sourceNode = edge.sourceNode ?? nodes[edge.sourceOrdinal]?.nodeKey;
     const targetNode = edge.targetNode ?? nodes[edge.targetOrdinal]?.nodeKey;
     if (!nodesByKey.has(sourceNode) || !nodesByKey.has(targetNode)) throw new Error('DOMAIN_GRAPH_INDEX_EDGE_ENDPOINT_MISSING');
@@ -154,11 +204,14 @@ export function createOpenSpecDomainCandidateTraversalIndexV1({ nodes, edges, ed
     (left.edge.targetOrdinal ?? 0) - (right.edge.targetOrdinal ?? 0)
       || compare(left.edge.edgeType ?? '', right.edge.edgeType ?? '')
       || (left.edge.startByte ?? 0) - (right.edge.startByte ?? 0));
-  return { nodesByKey, adjacency };
+  return { nodesByKey, adjacency,
+    allowedEdgeTypes: allowedEdgeTypes ? [...allowedEdgeTypes].sort(compare) : null,
+    allowedEvidenceStatuses: allowedEvidenceStatuses ? [...allowedEvidenceStatuses].sort(compare) : null };
 }
 
-export function traverseOpenSpecDomainCandidateGraphV1({ index, nodes, edges, startNodeKey, maxHops = 3, maxFanout = 20 }) {
-  const traversalIndex = index ?? createOpenSpecDomainCandidateTraversalIndexV1({ nodes, edges });
+export function traverseOpenSpecDomainCandidateGraphV1({ index, nodes, edges, startNodeKey, maxHops = 3, maxFanout = 20,
+  edgeTypes, evidenceStatuses }) {
+  const traversalIndex = index ?? createOpenSpecDomainCandidateTraversalIndexV1({ nodes, edges, edgeTypes, evidenceStatuses });
   if (!Number.isInteger(maxHops) || maxHops < 1 || maxHops > 4
     || !Number.isInteger(maxFanout) || maxFanout < 1 || maxFanout > 100) throw new Error('TRAVERSAL_BOUNDS_INVALID');
   if (!traversalIndex.nodesByKey.has(startNodeKey)) throw new Error('TRAVERSAL_START_NODE_MISSING');
@@ -181,6 +234,8 @@ export function traverseOpenSpecDomainCandidateGraphV1({ index, nodes, edges, st
     }
   }
   const result = { startNodeKey, maxHops, maxFanout, reached, fanoutTruncated,
+    allowedEdgeTypes: traversalIndex.allowedEdgeTypes ?? null,
+    allowedEvidenceStatuses: traversalIndex.allowedEvidenceStatuses ?? null,
     status: fanoutTruncated ? 'BOUNDED_CANDIDATE_TRAVERSAL_TRUNCATED' : 'BOUNDED_CANDIDATE_TRAVERSAL_COMPLETE' };
   return { ...result, authorityStatus: 'ADVISORY_DOMAIN_CANDIDATE_TRAVERSAL_ONLY', canonicalAuthority: false,
     workspaceRevision: null };

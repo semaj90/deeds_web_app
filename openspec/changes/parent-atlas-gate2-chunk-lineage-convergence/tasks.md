@@ -33,14 +33,14 @@
 > repo's documented pre-commit hook rejecting files >10MB. This is expected, not a mistake; the
 > file is still on disk and still usable for task 2.x next session. Do not try to force-add it.
 
-- [ ] 2.1 Present the fresh snapshot's readback-proven receipt to the operator and request
+- [x] 2.1 (2026-10-23: operator gave explicit authorization) Present the fresh snapshot's readback-proven receipt to the operator and request
       explicit authorization (matching the existing `approval.confirmation:
       "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1"` contract) before writing a new
       `workspace-revision-tournament-admission-v1.json`.
-- [ ] 2.2 On authorization, write the new admission receipt with `authority: true`, referencing
+- [x] 2.2 (2026-10-23: archived prior live receipt to .tmp/atlas/tournament-admission-archive/, installed admission3.json as live receipt; new receipt authority true, workspaceRevision sha256:6ea386a1…, snapshotRevision sha256:8a27e034…) On authorization, write the new admission receipt with `authority: true`, referencing
       the fresh `snapshotRevision`. On refusal or no response, stop — leave the prior admission
       receipt as the live one, unchanged.
-- [ ] 2.3 Re-run `resolveCurrentWorkspaceFrameV1()` + `computeWorkspaceFrameAuthorityV1()`
+- [x] 2.3 (2026-10-23: resolveCurrentWorkspaceFrameV1 selected sha256:6ea386a1…, computeWorkspaceFrameAuthorityV1 frameAuthoritative=true, authorityConflict=false, blockers=[]; graph expansion and projection remain unauthorized) Re-run `resolveCurrentWorkspaceFrameV1()` + `computeWorkspaceFrameAuthorityV1()`
       against the new admission and confirm `frameAuthoritative: true`, `authorityConflict:
       false`, zero blockers — the same bar Gate 1 already proved for the prior admission.
 

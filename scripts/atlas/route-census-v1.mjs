@@ -40,11 +40,19 @@ const refs = readFileSync(admittedPath, 'utf8').split('\n').map((r) => r.trim())
 let authority = null;
 let authorityStatus;
 let authorityRevision = null;
+let runtimeSourceBindings = null;
+let runtimeProcessId = null;
+let runtimeProcessStartedMonotonicNs = null;
+let sidecarContract = null;
 try {
   authority = await loadSidecarLanguageAuthority(sidecarUrl);
   authorityStatus = 'LIVE_READBACK';
   const first = [...authority.values()][0];
   authorityRevision = first?.authorityRevision ?? null;
+  runtimeSourceBindings = authority.runtimeSourceBindings ?? null;
+  runtimeProcessId = authority.runtimeProcessId ?? null;
+  runtimeProcessStartedMonotonicNs = authority.runtimeProcessStartedMonotonicNs ?? null;
+  sidecarContract = authority.sidecarContract ?? null;
 } catch (error) {
   authorityStatus = `UNAVAILABLE:${error.message}`;
 }
@@ -85,7 +93,7 @@ const body = {
   admittedListPath: admittedPath.replace(/\\/g, '/').split('/').slice(-2).join('/'),
   admittedListSha256: sha(readFileSync(admittedPath)),
   denominator: refs.length,
-  sidecar: { url: sidecarUrl, authorityStatus, authorityRevision },
+  sidecar: { url: sidecarUrl, authorityStatus, authorityRevision, contract: sidecarContract, runtimeProcessId, runtimeProcessStartedMonotonicNs, runtimeSourceBindings },
   statusCounts: byStatus,
   routedByLanguage: byLanguage,
   byExtension,

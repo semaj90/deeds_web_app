@@ -69,6 +69,52 @@ def test_additional_repository_parser_routes_match_their_declared_language():
         assert _resolve_ast_language(language, f"fixture{extension}") == (language, None)
 
 
+def test_ambiguous_h_headers_require_explicit_c_or_cpp_language():
+    assert _resolve_ast_language("c", "include/shared.h") == ("c", None)
+    assert _resolve_ast_language("cpp", "include/shared.h") == ("cpp", None)
+    language, error = _resolve_ast_language("python", "include/shared.h")
+    assert language == "python"
+    assert error is not None and "unsupported file extension '.h'" in error
+
+
+@pytest.mark.skipif(get_parser is None, reason="Tree-sitter language pack is unavailable")
+def test_ambiguous_h_cpp_override_produces_complete_ast_with_exact_byte_spans():
+    source = "#pragma once\nstruct AtlasHeader { int value; };\n"
+    source_bytes = source.encode("utf-8")
+    revision = "sha256:" + hashlib.sha256(source_bytes).hexdigest()
+    evidence = _ast_evidence(AstChunkRequest(
+        source=source,
+        language="cpp",
+        file_path="include/shared.h",
+        source_ref="include/shared.h",
+        source_revision=revision,
+    ))
+    assert evidence.scan_completeness == "COMPLETE"
+    assert evidence.syntax_status == "CLEAN"
+    assert evidence.source_revision == revision
+    assert evidence.chunks
+    assert all(0 <= chunk.start_byte < chunk.end_byte <= len(source_bytes) for chunk in evidence.chunks)
+
+
+def test_cpp_linkage_block_function_prototype_is_emitted_with_original_span():
+    source = '#define ATLAS_API\nextern "C" {\nATLAS_API int atlasGemm(int value);\n}\n'
+    source_bytes = source.encode("utf-8")
+    revision = "sha256:" + hashlib.sha256(source_bytes).hexdigest()
+    evidence = _ast_evidence(AstChunkRequest(
+        source=source,
+        language="cpp",
+        file_path="include/atlas.h",
+        source_ref="include/atlas.h",
+        source_revision=revision,
+    ))
+    matches = [chunk for chunk in evidence.chunks if chunk.name == "atlasGemm"]
+    assert len(matches) == 1
+    chunk = matches[0]
+    assert chunk.node_type == "function_declaration"
+    assert source_bytes[chunk.start_byte:chunk.end_byte] == b"ATLAS_API int atlasGemm(int value);"
+    assert evidence.source_revision == revision
+
+
 @pytest.mark.skipif(get_parser is None, reason="Tree-sitter language pack is unavailable")
 def test_additional_repository_grammars_parse_clean_minimal_fixtures():
     fixtures = {

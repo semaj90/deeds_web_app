@@ -1,0 +1,107 @@
+{
+  "schema": "atlas.source-class-split.report.v1",
+  "policyRevision": "atlas.source-class-split.2026-10-22.v1",
+  "classificationOnly": true,
+  "sourceAdmission": "NOT_ADMITTED_NO_WORKSPACE_REVISION",
+  "lineageExceptions": [
+    "INVENTORY_JSON_CHECKSUM_NOT_REPRODUCED"
+  ],
+  "classCounts": {
+    "FIRST_PARTY_SOURCE": {
+      "files": 229403,
+      "bytes": 6995512815
+    },
+    "OPENSPEC_REQUIREMENTS": {
+      "files": 2510,
+      "bytes": 37136343
+    },
+    "EXTERNAL_DEPENDENCY": {
+      "files": 444837,
+      "bytes": 8629177462
+    },
+    "GENERATED_SOURCE": {
+      "files": 24758,
+      "bytes": 9991661315
+    },
+    "TELEMETRY_REPORT": {
+      "files": 110368,
+      "bytes": 52055039013
+    },
+    "MODEL_ARTIFACT": {
+      "files": 118,
+      "bytes": 29347656235
+    },
+    "BINARY_ASSET": {
+      "files": 8533,
+      "bytes": 16737132125
+    },
+    "ENVIRONMENT_CACHE": {
+      "files": 390394,
+      "bytes": 35416984624
+    },
+    "UNKNOWN": {
+      "files": 7517,
+      "bytes": 14127828297
+    }
+  },
+  "entryKinds": {
+    "files": 1218438,
+    "directories": 143396,
+    "symlinksOrJunctions": 5466
+  },
+  "byEligibility": {
+    "EXCLUDED_GITIGNORED": {
+      "rows": 978986,
+      "bytes": 145133563673
+    },
+    "EXCLUDED_DEFAULT": {
+      "rows": 134732,
+      "bytes": 18117082551
+    },
+    "PRIORITY_CANDIDATE_REVISION_PENDING": {
+      "rows": 36800,
+      "bytes": 1308671501
+    },
+    "STRUCTURED_EXTRACTION_ONLY": {
+      "rows": 33253,
+      "bytes": 8218036298
+    },
+    "EXCLUDED_DUPLICATE_OR_SCRATCH": {
+      "rows": 32586,
+      "bytes": 271298875
+    },
+    "EXCLUDED_UNCLASSIFIED": {
+      "rows": 2043,
+      "bytes": 283034864
+    },
+    "SELECTIVE_ONLY": {
+      "rows": 18,
+      "bytes": 16599
+    },
+    "SECONDARY_CANDIDATE_UNTRACKED_REVISION_PENDING": {
+      "rows": 11,
+      "bytes": 198646
+    },
+    "SELECTED_API_SURFACE_ONLY": {
+      "rows": 9,
+      "bytes": 6225222
+    }
+  },
+  "unknownCount": 7517,
+  "reconciliation": {
+    "classBytes": 173338128229,
+    "classFiles": 1218438,
+    "independentFileBytes": 173338128229,
+    "independentFileCount": 1218438,
+    "bytesReconcile": true,
+    "filesReconcile": true
+  },
+  "artifacts": {
+    "runDirectory": ".tmp/atlas/source-class-split-v1/source-class-split-v1-20261023T024108Z",
+    "classifiedRowsSha256": "e244cd274e32c8437fc4b326bd40b49b5f2d13de18e540e0e8597ac2cf189bcb",
+    "aggregatesSha256": "338fc73f0da83d21cedd3109b68595cd1dce33a458db3ad9bf19ce558cefe966",
+    "candidatesSha256": "59cb020a6a65bd9c8d07fbd240e21ff72d810cb65df6a47a9c9e0612e6cea201",
+    "handoffSha256": "427f249a666ad4d987563814359156f482e7be5e889d624e2b46216241e70c2d"
+  },
+  "receiptPath": ".tmp/atlas/source-class-split-v1/source-class-split-v1-20261023T024108Z/receipt.json"
+}

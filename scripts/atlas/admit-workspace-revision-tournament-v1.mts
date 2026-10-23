@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 /** Bounded, explicit snapshot admission for the tournament control plane. */
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -39,6 +40,15 @@ const sourceInventoryBindingValid = typeof preflight.sourceInventoryRevision ===
   && /^sha256:[0-9a-f]{64}$/i.test(preflight.sourceSelectionChecksum)
   && Number.isInteger(preflight.sourceCount)
   && preflight.sourceCount > 0;
+// WSR-09a / WSR-13: the admitted manifest must be the exact bytes the preflight validated.
+const manifestBytes = manifestPath ? await readFile(manifestPath).catch(() => null) : null;
+const manifestSha256 = manifestBytes ? `sha256:${createHash('sha256').update(manifestBytes).digest('hex')}` : null;
+const validationReceiptSha256 = `sha256:${createHash('sha256').update(await readFile(PREFLIGHT)).digest('hex')}`;
+const manifestBindingValid = manifestSha256 !== null && typeof preflight.manifestSha256 === 'string' && preflight.manifestSha256 === manifestSha256;
+// Operator-supplied expectations: the approval must name the exact manifest and validation receipt it authorizes.
+const expectedManifestSha256 = process.argv.slice(2).find((v) => v.startsWith('--expected-manifest-sha256='))?.split('=').slice(1).join('=') ?? null;
+const expectedValidationSha256 = process.argv.slice(2).find((v) => v.startsWith('--expected-validation-sha256='))?.split('=').slice(1).join('=') ?? null;
+const operatorBindingValid = manifestSha256 !== null && expectedManifestSha256 === manifestSha256 && expectedValidationSha256 === validationReceiptSha256;
 const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION'
   && preflight.authority === false
   && preflight.workspaceRevision === null
@@ -48,7 +58,9 @@ const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMI
   && workspaceRevision === preflight.workspaceRevisionCandidate
   && snapshotBindingValid
   && sourceInventoryBindingValid
-  && preflight.approvalRequired === true;
+  && preflight.approvalRequired === true
+  && manifestBindingValid
+  && operatorBindingValid;
 
 async function atomicWriteJson(path: string, value: unknown): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
@@ -59,6 +71,8 @@ async function atomicWriteJson(path: string, value: unknown): Promise<void> {
 
 if (!ready) {
   const blocker = snapshotBindingError
+    ?? (!manifestBindingValid ? 'MANIFEST_SHA256_NOT_BOUND_OR_MISMATCH' : null)
+    ?? (!operatorBindingValid ? 'OPERATOR_BINDING_NOT_PROVIDED_OR_MISMATCH' : null)
     ?? (!sourceInventoryBindingValid
       ? 'SOURCE_INVENTORY_PROVENANCE_MISSING_OR_INVALID'
       : (workspaceRevision !== preflight.workspaceRevisionCandidate
@@ -66,7 +80,7 @@ if (!ready) {
         : (!snapshotBindingValid ? 'PREFLIGHT_SNAPSHOT_BINDING_MISMATCH' : 'SNAPSHOT_REVISION_IS_NOT_WORKSPACE_REVISION')));
   const correction = {
     schema: 'atlas.workspace-revision-tournament-admission.v1', generatedAt: new Date().toISOString(),
-    mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT', status: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_BLOCKED_REVISION_KIND_MISMATCH',
+    mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT', status: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_BLOCKED',
     proofLevel: 'BLOCKED', authority: false, workspaceRevision: null,
     snapshotRevision: preflight.snapshotRevision ?? null,
     workspaceRevisionCandidate: null, approvalRequired: true, autoApply: false, training: false,
@@ -101,6 +115,8 @@ if (!ready) {
     sourceInventoryWriterRevisionChecksum: preflight.sourceInventoryWriterRevisionChecksum ?? null,
     snapshotMembershipChecksum: preflight.snapshotMembershipChecksum,
     manifestPath,
+    manifestSha256,
+    validationReceiptSha256,
     approval: { confirmation: REQUIRED, scope: 'TOURNAMENT_SOURCE_AUTHORITY_ONLY' },
     graphifyExecutionAuthorized: false,
     projectionWritesAuthorized: false,

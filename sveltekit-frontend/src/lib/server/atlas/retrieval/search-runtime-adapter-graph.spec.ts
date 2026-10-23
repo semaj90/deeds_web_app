@@ -1,61 +1,44 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from 'vitest';
-
-const { mockGraphRetrieve } = vi.hoisted(() => ({ mockGraphRetrieve: vi.fn() }));
-
-vi.mock('./graph-retriever.js', () => ({ graphRetrieve: mockGraphRetrieve }));
-
 import { createAtlasSearchAdapter } from './search-runtime-adapter.js';
 
-describe('Atlas SearchRuntime graph expansion wiring', () => {
-  it('waits for SearchRuntime and seeds only from its explicit pre-fusion dense set', async () => {
-    mockGraphRetrieve.mockReset().mockResolvedValue([
-      {
-        packetKey: 'pkt:neighbor',
-        seedPacketKey: 'pkt:dense-seed',
-        relationshipPath: ['CALLS'],
-        relationshipEdges: [{ fromPacketKey: 'pkt:dense-seed', toPacketKey: 'pkt:neighbor', relationshipType: 'CALLS' }],
-        depth: 1,
-        graphScore: 0.2,
-      },
-    ]);
-    const adapter = createAtlasSearchAdapter({
-      runtime: {
-        search: vi.fn().mockResolvedValue({
-          packets: [{ packet_key: 'pkt:fused-top' }],
-          denseSeedPacketKeys: ['pkt:dense-seed'],
-          metadata: {},
-          provenance: {},
-        }),
-      } as never,
+describe('Atlas SearchRuntime graph expansion ownership', () => {
+  it('does not expose a second unqualified projection traversal', async () => {
+    const runtimeSearch = vi.fn().mockResolvedValue({
+      packets: [{ packet_key: 'pkt:fused-top' }],
+      denseSeedPacketKeys: ['pkt:dense-seed'],
+      metadata: {},
+      provenance: {},
+    });
+    const adapter = createAtlasSearchAdapter({ runtime: { search: runtimeSearch } as never });
+
+    const result = await adapter.search({
+      query: 'find neighbors',
+      lexicalExpansion: ['drizzle-orm', 'sveltekit route'],
+      withGraphExpansion: true,
+      workspaceRevision: `sha256:${'a'.repeat(64)}`,
     });
 
-    const result = await adapter.search({ query: 'find neighbors', withGraphExpansion: true });
-
-    expect(mockGraphRetrieve).toHaveBeenCalledWith({
-      seedPacketKeys: ['pkt:dense-seed'],
-      allowedRelationships: ['IMPORTS', 'CALLS', 'SIMILAR_TOPOLOGY', 'USES_CONCEPT'],
-      maxDepth: 2,
-      maxCandidates: 20,
-    });
+    expect(runtimeSearch).toHaveBeenCalledOnce();
+    expect(runtimeSearch).toHaveBeenCalledWith(expect.objectContaining({
+      text: 'find neighbors',
+      lexicalExpansion: ['drizzle-orm', 'sveltekit route'],
+    }));
     expect(result.topPacketKeys).toEqual(['pkt:fused-top']);
-    expect(result.graphExpanded).toHaveLength(1);
+    expect(result.graphExpansionStatus).toBe('DELEGATED_TO_SEARCH_RUNTIME');
+    expect(result).not.toHaveProperty('graphExpanded');
   });
 
-  it('does not call graph expansion when the dense lane has no canonical seed', async () => {
-    mockGraphRetrieve.mockReset();
+  it('preserves the SearchRuntime result when no graph revision is supplied', async () => {
+    const packets = [{ packet_key: 'pkt:lexical-only' }];
     const adapter = createAtlasSearchAdapter({
-      runtime: {
-        search: vi.fn().mockResolvedValue({
-          packets: [{ packet_key: 'pkt:lexical-only' }],
-          metadata: {},
-          provenance: {},
-        }),
-      } as never,
+      runtime: { search: vi.fn().mockResolvedValue({ packets, metadata: {}, provenance: {} }) } as never,
     });
 
     const result = await adapter.search({ query: 'lexical only', withGraphExpansion: true });
-    expect(mockGraphRetrieve).not.toHaveBeenCalled();
-    expect(result.graphExpanded).toBeUndefined();
+
+    expect(result.packets).toBe(packets);
+    expect(result.graphExpansionStatus).toBe('BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING');
+    expect(result).not.toHaveProperty('graphExpanded');
   });
 });

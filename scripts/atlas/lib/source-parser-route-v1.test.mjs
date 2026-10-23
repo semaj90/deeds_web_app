@@ -78,24 +78,34 @@ test('sidecar authority rejects duplicate and revisionless bindings and routes o
 });
 
 test('live capability loader consumes the sidecar-owned extension map', async () => {
+  const health = { status: 'ok', contract: 'provenance-v2', processId: 123, processStartedMonotonicNs: '1000', runtimeSourceBindings: { modules: {
+    miniforge_nlp_sidecar_v2: `sha256:${'a'.repeat(64)}`, miniforge_nlp_sidecar: `sha256:${'b'.repeat(64)}`,
+  } } };
   const authority = await loadSidecarLanguageAuthority('http://sidecar.test/', async (url) => {
+    if (url.endsWith('/health')) return { ok: true, json: async () => health };
     assert.equal(url, 'http://sidecar.test/capabilities');
     return { ok: true, json: async () => ({ ast: { available: true, languageBindings: [
       { fromNamespace: 'FILE_EXTENSION', fromLabel: '.svelte', toNamespace: 'SIDECAR_LANGUAGE', toLabel: 'svelte', authorityRevision: 'owner-r7', authorityOwner: 'python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS', evidenceRefs: ['python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS'] },
     ] } }) };
   });
   assert.equal(resolveSourceParserRouteV1('Component.svelte', authority).authorityRevision, 'owner-r7');
+  assert.equal(authority.runtimeSourceBindings.miniforge_nlp_sidecar_v2, `sha256:${'a'.repeat(64)}`);
+  assert.equal(authority.runtimeProcessId, 123);
+  assert.equal(authority.runtimeProcessStartedMonotonicNs, '1000');
+  assert.equal(authority.sidecarContract, 'provenance-v2');
   await assert.rejects(loadSidecarLanguageAuthority('http://sidecar.test', async () => ({ ok: false, status: 503 })), /HTTP_503/);
 });
 
 test('capability loading bypasses caches and observes a changed live revision', async () => {
-  let requestCount = 0;
   const revisions = ['owner-r7', 'owner-r8'];
-  const fetchImpl = async (_url, init) => {
-    requestCount += 1;
+  let capabilityCount = 0;
+  const fetchImpl = async (url, init) => {
     assert.equal(init.cache, 'no-store');
     assert.equal(init.headers['cache-control'], 'no-cache');
-    const revision = revisions[requestCount - 1];
+    if (url.endsWith('/health')) return { ok: true, json: async () => ({ status: 'ok', contract: 'provenance-v2', processId: 456, processStartedMonotonicNs: '2000', runtimeSourceBindings: { modules: {
+      miniforge_nlp_sidecar_v2: `sha256:${'a'.repeat(64)}`, miniforge_nlp_sidecar: `sha256:${'b'.repeat(64)}`,
+    } } }) };
+    const revision = revisions[capabilityCount++];
     return { ok: true, json: async () => ({ ast: { available: true, languageBindings: [
       { fromNamespace: 'FILE_EXTENSION', fromLabel: '.svelte', toNamespace: 'SIDECAR_LANGUAGE',
         toLabel: 'svelte', authorityRevision: revision,
@@ -105,9 +115,27 @@ test('capability loading bypasses caches and observes a changed live revision', 
   };
   const first = await loadSidecarLanguageAuthority('http://sidecar.test', fetchImpl);
   const second = await loadSidecarLanguageAuthority('http://sidecar.test', fetchImpl);
-  assert.equal(requestCount, 2);
+  assert.equal(capabilityCount, 2);
   assert.equal(first.get('.svelte').authorityRevision, 'owner-r7');
   assert.equal(second.get('.svelte').authorityRevision, 'owner-r8');
+});
+
+test('runtime identity loader rejects incomplete health and process changes during capability reads', async () => {
+  await assert.rejects(loadSidecarLanguageAuthority('http://sidecar.test', async () => ({
+    ok: true, json: async () => ({ status: 'ok', contract: 'provenance-v2' }),
+  })), /RUNTIME_BINDING_INVALID/);
+  let healthCount = 0;
+  await assert.rejects(loadSidecarLanguageAuthority('http://sidecar.test', async (url) => {
+    if (url.endsWith('/capabilities')) return { ok: true, json: async () => ({ ast: { available: true, languageBindings: [
+      { fromNamespace: 'FILE_EXTENSION', fromLabel: '.py', toNamespace: 'SIDECAR_LANGUAGE', toLabel: 'python', authorityRevision: 'r1', authorityOwner: 'python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS', evidenceRefs: ['python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS'] },
+    ] } }) };
+    const digest = 'a';
+    const processId = healthCount++ === 0 ? 100 : 200;
+    const started = healthCount === 1 ? '1000' : '2000';
+    return { ok: true, json: async () => ({ status: 'ok', contract: 'provenance-v2', processId, processStartedMonotonicNs: started, runtimeSourceBindings: { modules: {
+      miniforge_nlp_sidecar_v2: `sha256:${digest.repeat(64)}`, miniforge_nlp_sidecar: `sha256:${'b'.repeat(64)}`,
+    } } }) };
+  }), /RUNTIME_CHANGED_DURING_CAPABILITY_READ/);
 });
 
 test('AST receipt requires complete, clean, matching evidence and producer version', () => {

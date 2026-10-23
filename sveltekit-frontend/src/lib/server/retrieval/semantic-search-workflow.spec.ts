@@ -149,7 +149,7 @@ describe('semantic search workflow', () => {
 
   it('carries bounded query classification through the real workflow caller', async () => {
     const result = await runSemanticSearchWorkflow({
-      query: 'Find the code that connects Valkey caching to the ACE assembler and explain its behavior',
+      query: 'Find the code that connects Valkey caching to the ACE assembler using Drizzle ORM repo:sveltekit-frontend and explain its behavior',
       topK: 5,
       includeWorkflowPreamble: false,
       includeAcePacket: true,
@@ -162,6 +162,8 @@ describe('semantic search workflow', () => {
       schema: 'atlas.query-classification.v1',
       producerRevision: 'semantic-search-workflow-v1',
       domains: ['ace', 'cache'],
+      packageCandidates: ['@sveltejs/kit', 'drizzle-orm'],
+      repositoryScopeCandidates: ['sveltekit-frontend'],
       retrievalNeeds: { lexical: true, ast: true, semantic: true, graph: true },
       operation: 'INSPECT',
     });
@@ -172,8 +174,22 @@ describe('semantic search workflow', () => {
     }));
     expect(searchMock).toHaveBeenCalledWith(expect.objectContaining({
       withGraphExpansion: true,
+      lexicalExpansion: expect.arrayContaining(['drizzle-orm', '@sveltejs/kit']),
     }));
+    expect(searchMock.mock.calls[0]?.[0]).not.toHaveProperty('workspaceRevision');
+    expect(result.graphExpansionStatus).toBe('BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING');
     expect(result.metadata.queryClassification).not.toHaveProperty('canonicalAuthority');
+  });
+
+  it('rejects caller-supplied workspace authority instead of forwarding it to SearchRuntime', async () => {
+    await expect(runSemanticSearchWorkflow({
+      query: 'Find route helpers repo:sveltekit-frontend',
+      workspaceRevision: `sha256:${'a'.repeat(64)}`,
+      topK: 2,
+      withGraphExpansion: true,
+    } as never)).rejects.toThrow();
+
+    expect(searchMock).not.toHaveBeenCalled();
   });
 
   it('suppresses SearchRuntime, KAG audit, and report writes in diagnostic read-only mode', async () => {

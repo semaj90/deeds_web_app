@@ -61,17 +61,49 @@ export async function loadSidecarLanguageAuthority(baseUrl, fetchImpl = fetch) {
   if (typeof baseUrl !== 'string' || !/^https?:\/\//.test(baseUrl)) {
     throw new TypeError('SIDECAR_URL_INVALID');
   }
-  const response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/capabilities`, {
-    signal: AbortSignal.timeout(15000),
-    cache: 'no-store',
-    headers: { 'cache-control': 'no-cache' },
-  });
-  if (!response.ok) throw new Error(`SIDECAR_CAPABILITIES_HTTP_${response.status}`);
-  const body = await response.json();
+  const base = baseUrl.replace(/\/$/, '');
+  const get = async (endpoint) => {
+    const response = await fetchImpl(`${base}${endpoint}`, {
+      signal: AbortSignal.timeout(15000),
+      cache: 'no-store',
+      headers: { 'cache-control': 'no-cache' },
+    });
+    if (!response.ok) throw new Error(`SIDECAR_${endpoint.slice(1).toUpperCase()}_HTTP_${response.status}`);
+    return response.json();
+  };
+  const validateHealth = (health) => {
+    const modules = health?.runtimeSourceBindings?.modules;
+    if (health?.status !== 'ok' || health?.contract !== 'provenance-v2'
+      || !Number.isSafeInteger(health.processId) || health.processId <= 0
+      || !/^[1-9][0-9]*$/.test(health.processStartedMonotonicNs ?? '')
+      || !modules || !/^sha256:[a-f0-9]{64}$/.test(modules.miniforge_nlp_sidecar_v2 ?? '')
+      || !/^sha256:[a-f0-9]{64}$/.test(modules.miniforge_nlp_sidecar ?? '')) {
+      throw new TypeError('SIDECAR_RUNTIME_BINDING_INVALID');
+    }
+    return Object.freeze({
+      processId: health.processId,
+      processStartedMonotonicNs: health.processStartedMonotonicNs,
+      miniforge_nlp_sidecar_v2: modules.miniforge_nlp_sidecar_v2,
+      miniforge_nlp_sidecar: modules.miniforge_nlp_sidecar,
+    });
+  };
+  const before = validateHealth(await get('/health'));
+  const body = await get('/capabilities');
+  const after = validateHealth(await get('/health'));
+  if (before.processId !== after.processId
+    || before.processStartedMonotonicNs !== after.processStartedMonotonicNs
+    || before.miniforge_nlp_sidecar_v2 !== after.miniforge_nlp_sidecar_v2
+    || before.miniforge_nlp_sidecar !== after.miniforge_nlp_sidecar) {
+    throw new Error('SIDECAR_RUNTIME_CHANGED_DURING_CAPABILITY_READ');
+  }
   const bindings = body?.ast?.languageBindings;
   if (!Array.isArray(bindings)) throw new TypeError('SIDECAR_CAPABILITIES_INVALID');
   const authority = validateSidecarLanguageBindings(bindings);
   if (body?.ast?.available !== true) throw new Error('SIDECAR_AST_UNAVAILABLE');
+  authority.runtimeSourceBindings = after;
+  authority.runtimeProcessId = after.processId;
+  authority.runtimeProcessStartedMonotonicNs = after.processStartedMonotonicNs;
+  authority.sidecarContract = 'provenance-v2';
   return authority;
 }
 

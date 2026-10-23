@@ -1636,6 +1636,54 @@ def _suffix_for_language(language: str) -> str:
     return ".ts"
 
 
+def _cpp_function_declaration_chunks(text: str) -> list[Chunk]:
+    if not TREE_SITTER_AVAILABLE or get_parser is None:
+        return []
+    try:
+        source_bytes = text.encode("utf-8")
+        root = get_parser("cpp").parse(source_bytes).root_node
+    except Exception:
+        return []
+
+    chunks: list[Chunk] = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        stack.extend(reversed(list(getattr(node, "named_children", []))))
+        if node.type not in {"declaration", "field_declaration"}:
+            continue
+        declarator = node.child_by_field_name("declarator")
+        if declarator is None or declarator.type != "function_declarator":
+            continue
+        name_node = declarator.child_by_field_name("declarator")
+        while name_node is not None and name_node.type in {
+            "function_declarator", "pointer_declarator", "reference_declarator", "parenthesized_declarator",
+        }:
+            name_node = name_node.child_by_field_name("declarator")
+        if name_node is None:
+            continue
+        start = int(node.start_byte)
+        end = int(node.end_byte)
+        if end <= start:
+            continue
+        try:
+            snippet = source_bytes[start:end].decode("utf-8").strip()
+            symbol = name_node.text.decode("utf-8")
+        except (UnicodeDecodeError, AttributeError):
+            continue
+        if not snippet or not symbol:
+            continue
+        chunks.append(Chunk(
+            kind="function_declaration",
+            text=snippet[:10_000],
+            start=start,
+            end=end,
+            symbol=symbol,
+            language="cpp",
+        ))
+    return chunks
+
+
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
     # Canonical structural chunking prefers the installed treesitter-chunker package in the
     # Python sidecar. The local tree-sitter parser remains a compatibility fallback only.
@@ -1705,6 +1753,13 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
                 )
 
             if chunks:
+                if language.lower() == "cpp":
+                    existing_spans = {(chunk.start, chunk.end) for chunk in chunks}
+                    chunks.extend(
+                        declaration
+                        for declaration in _cpp_function_declaration_chunks(text)
+                        if (declaration.start, declaration.end) not in existing_spans
+                    )
                 return chunks
 
     if not TREE_SITTER_AVAILABLE:
@@ -1739,6 +1794,13 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
                 symbol=None,
                 language=language,
             )
+        )
+    if language.lower() == "cpp":
+        existing_spans = {(chunk.start, chunk.end) for chunk in chunks}
+        chunks.extend(
+            declaration
+            for declaration in _cpp_function_declaration_chunks(text)
+            if (declaration.start, declaration.end) not in existing_spans
         )
     return chunks
 
@@ -3250,9 +3312,10 @@ def _resolve_ast_language(language: str, file_path: str) -> tuple[str, Optional[
     if requested not in supported and requested not in {"typescriptreact", "javascriptreact"}:
         return requested, f"UnsupportedLanguageError: unsupported language '{language}' for '{file_path}'"
     extension_language = _AST_LANGUAGE_EXTENSIONS.get(suffix)
+    ambiguous_c_header = suffix == ".h" and requested in {"c", "cpp"}
     if extension_language and requested not in {extension_language, "typescriptreact", "javascriptreact"}:
         return requested, f"UnsupportedLanguageError: extension '{suffix}' does not match language '{language}'"
-    if suffix and suffix not in _AST_LANGUAGE_EXTENSIONS:
+    if suffix and suffix not in _AST_LANGUAGE_EXTENSIONS and not ambiguous_c_header:
         return requested, f"UnsupportedLanguageError: unsupported file extension '{suffix}'"
     return requested, None
 

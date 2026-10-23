@@ -9,6 +9,7 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { classifyCurrentExecutionRegistryCoverageV1 } from './lib/current-execution-registry-guard-v1.mjs';
 
 const ROOT = resolve(import.meta.dirname, '../..');
+import { assertCanonicalWriteAuthorized } from './lib/admission-write-guard-v1.mjs';
 const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const REPORT = resolve(ROOT, 'docs/reports/current-execution-workspace-bindings-v1.json');
 const executionArg = process.argv.indexOf('--execution-id');
@@ -22,8 +23,8 @@ const admission = JSON.parse(readFileSync(ADMISSION, 'utf8'));
 if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
   throw new Error('CURRENT_EXECUTION_WORKSPACE_BINDINGS_ADMISSION_REQUIRED');
 }
-const snapshotPath = resolve(ROOT, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
-const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'));
+const { manifest: snapshot } = assertCanonicalWriteAuthorized({ root: ROOT, admission, apply, argv: process.argv.slice(2),
+  confirmToken: '--confirm-current-execution-workspace-bindings-v1' });
 const expected = new Map(snapshot.sources.filter((s) => s.repositoryId === 'repo:root')
   .map((s) => [String(s.repositoryRelativePath).replaceAll('\\', '/').replace(/^\.\//, ''), s]));
 if (snapshot.snapshotRevision !== admission.snapshotRevision || expected.size === 0) throw new Error('CURRENT_EXECUTION_WORKSPACE_BINDINGS_SNAPSHOT_INVALID');

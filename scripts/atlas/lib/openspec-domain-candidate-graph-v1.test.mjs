@@ -57,3 +57,67 @@ test('preserves distinct package import spans while deduplicating identical grap
   assert.equal(graph.edges.filter(edge => edge.edgeType === 'USES_PACKAGE_CANDIDATE').length, 2);
   assert.equal(graph.edges.filter(edge => edge.edgeType === 'FILE_PARENT_DIRECTORY_CANDIDATE').length, 1);
 });
+
+test('filters bounded traversal by explicit evidence status and preserves the advisory boundary', () => {
+  const nodes = [
+    { ordinal: 0, nodeKey: 'task:filtered:1', nodeType: 'TASK_CANDIDATE' },
+    { ordinal: 1, nodeKey: 'file:filtered.ts', nodeType: 'FILE' },
+    { ordinal: 2, nodeKey: 'directory:src', nodeType: 'DIRECTORY' },
+    { ordinal: 3, nodeKey: 'domain:candidate', nodeType: 'DOMAIN_CANDIDATE' },
+    { ordinal: 4, nodeKey: 'domain:unqualified', nodeType: 'DOMAIN_CANDIDATE' },
+  ];
+  const edges = [
+    { sourceOrdinal: 0, targetOrdinal: 1, edgeType: 'TASK_FILE_CANDIDATE', evidenceStatus: 'CURRENT_BYTES_SPAN_VERIFIED' },
+    { sourceOrdinal: 1, targetOrdinal: 2, edgeType: 'FILE_DIRECTORY_CANDIDATE', evidenceStatus: 'CURRENT_BYTES_VERIFIED' },
+    { sourceOrdinal: 2, targetOrdinal: 3, edgeType: 'DIRECTORY_DOMAIN_CANDIDATE', evidenceStatus: 'SUMMARY_DERIVED_PROPOSAL_ONLY' },
+    { sourceOrdinal: 2, targetOrdinal: 4, edgeType: 'DIRECTORY_DOMAIN_CANDIDATE' },
+  ];
+  const traversal = traverseOpenSpecDomainCandidateGraphV1({ nodes, edges,
+    startNodeKey: 'task:filtered:1', maxHops: 3, maxFanout: 4,
+    evidenceStatuses: ['CURRENT_BYTES_SPAN_VERIFIED', 'CURRENT_BYTES_VERIFIED', 'SUMMARY_DERIVED_PROPOSAL_ONLY'] });
+  assert.deepEqual(traversal.reached.map(row => row.nodeKey), [
+    'file:filtered.ts', 'directory:src', 'domain:candidate',
+  ]);
+  assert.deepEqual(traversal.allowedEvidenceStatuses, [
+    'CURRENT_BYTES_SPAN_VERIFIED', 'CURRENT_BYTES_VERIFIED', 'SUMMARY_DERIVED_PROPOSAL_ONLY',
+  ]);
+  assert.equal(traversal.canonicalAuthority, false);
+  assert.equal(traversal.status, 'BOUNDED_CANDIDATE_TRAVERSAL_COMPLETE');
+});
+
+test('adds declared runtime-owner path as a typed advisory multi-hop candidate', () => {
+  const graph = buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, taskPathRows, summaryRows, domainRows,
+    runtimeOwnerRows: [{
+      capabilityId: 'graph-analysis', ownerClassification: 'CANONICAL_OWNER', ownerPath: 'src/a.ts',
+      ownerFileSha256: digest, parentDirectoryPath: 'src', evidenceKind: 'DECLARED_RUNTIME_OWNER_PATH_CANDIDATE',
+      executionProven: false, sourceRevisionQualified: false,
+    }],
+  });
+  const edge = graph.edges.find(row => row.edgeType === 'DIRECTORY_DECLARED_RUNTIME_OWNER_CANDIDATE');
+  assert.equal(edge.evidenceStatus, 'DECLARED_OWNER_REGISTRY_AND_CURRENT_BYTES_ONLY');
+  assert.equal(edge.executionProven, false);
+  assert.equal(edge.sourceRevisionQualified, false);
+  const target = graph.nodes.find(row => row.nodeKey === 'runtime-owner-candidate:graph-analysis');
+  assert.equal(target.nodeType, 'RUNTIME_OWNER_CANDIDATE');
+  assert.equal(target.identityStatus, 'DECLARED_CAPABILITY_LABEL_NOT_RUNTIME_ID');
+  const traversal = traverseOpenSpecDomainCandidateGraphV1({ nodes: graph.nodes, edges: graph.edges,
+    startNodeKey: 'task:demo:1', maxHops: 3, maxFanout: 20 });
+  assert.equal(traversal.reached.some(row => row.nodeKey === target.nodeKey), true);
+  assert.equal(traversal.canonicalAuthority, false);
+});
+
+test('rejects runtime-owner rows with revision authority or mismatched parent paths', () => {
+  const candidate = { capabilityId: 'graph-analysis', ownerPath: 'src/a.ts', ownerFileSha256: digest,
+    parentDirectoryPath: 'src', evidenceKind: 'DECLARED_RUNTIME_OWNER_PATH_CANDIDATE',
+    executionProven: false, sourceRevisionQualified: false };
+  assert.throws(() => buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, taskPathRows, summaryRows, domainRows,
+    runtimeOwnerRows: [{ ...candidate, sourceRevisionQualified: true }] }), /RUNTIME_OWNER_GRAPH_ROW_INVALID/);
+  assert.throws(() => buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, taskPathRows, summaryRows, domainRows,
+    runtimeOwnerRows: [{ ...candidate, parentDirectoryPath: 'other' }] }), /RUNTIME_OWNER_GRAPH_ROW_INVALID/);
+});
+
+test('rejects malformed evidence-status filters instead of treating them as permission', () => {
+  assert.throws(() => traverseOpenSpecDomainCandidateGraphV1({ nodes: baseNodes, edges: baseEdges,
+    startNodeKey: 'task:demo:1', evidenceStatuses: 'CURRENT_BYTES_VERIFIED' }),
+  /DOMAIN_GRAPH_INDEX_EVIDENCE_STATUSES_INVALID/);
+});

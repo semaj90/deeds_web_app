@@ -178,6 +178,7 @@ export async function initializeSearchRuntime(): Promise<void> {
  */
 export const SearchQuerySchema = z.object({
   text: z.string().min(1).max(1000),
+  lexicalExpansion: z.array(z.string().trim().min(1).max(100)).max(32).optional(),
   userId: z.string().min(1).optional(),
   caseId: z.string().optional(),
   workspaceId: z.string().min(1).optional(),
@@ -1119,7 +1120,10 @@ export class SearchRuntime {
   ): Promise<Candidate[]> {
     if (!this.injectedRetrievers || this.injectedRetrievers.length === 0) {
       const { retrieveAllCandidates } = await import('./retrieve-candidates.js');
-      const baseCandidates = await retrieveAllCandidates(query.text, query.filters, undefined, options);
+      const baseCandidates = await retrieveAllCandidates(query.text, query.filters, undefined, {
+        ...options,
+        lexicalExpansion: query.lexicalExpansion,
+      });
       const functionCandidates = await this.retrieveFunctionRegistryCandidates(query);
       const candidatesWithGraphRevision = baseCandidates.map((candidate) => {
         const raw = candidate as Candidate & { graph_revision?: unknown };
