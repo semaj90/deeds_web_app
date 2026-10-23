@@ -1,0 +1,9 @@
+# Java Language Profile for OKF
+
+version: 1
+language: java
+name: Java
+grammar: java
+
+extensions:
+  - .java

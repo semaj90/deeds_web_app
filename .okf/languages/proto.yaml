@@ -1,0 +1,9 @@
+# Protocol Buffers Language Profile for OKF
+
+version: 1
+language: proto
+name: Protocol Buffers
+grammar: proto
+
+extensions:
+  - .proto

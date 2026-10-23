@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "routeReceipt": {
+    "total": 1,
+    "covered": 0,
+    "partial": 0,
+    "rejected": 1,
+    "outcomeCounts": {
+      "PARSE_FAILED": 1
+    },
+    "completeByLanguage": {},
+    "accounting": {
+      "submitted": 1,
+      "dispositions": {
+        "CANDIDATE_OUTCOME:PARSE_FAILED": 1
+      },
+      "notInPool": [],
+      "reconciled": true
+    }
+  },
+  "frozenManifestChecksum": null,
+  "shard": null,
+  "frozenMemberChecks": null,
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": null,
+  "readbacks": [],
+  "generatedAt": "2026-10-22T20:35:07.620Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "unsupportedRouteCounts": {},
+  "unsupportedRouteSample": [],
+  "byFileKind": {
+    "ts_js": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 0,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "0b174fd6-4ee8-4a1a-a2bb-997118c514d9",
+      "sourceRef": "scripts/atlas/audit-qdrant-noise.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:11415c43f6c3280935addf25123222f2d3857d5e9d7c58f0a14e42a41d37c98a",
+      "fileKind": "ts_js",
+      "outcome": "PARSE_FAILED",
+      "error": "PARSE_TIMEOUT: scripts/atlas/audit-qdrant-noise.mjs exceeded 10000ms"
+    }
+  ]
+}

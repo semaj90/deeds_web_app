@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 
 const SCHEMA = 'atlas.graphify-symbol-batch-plan.v1';
 const SHA256 = /^sha256:[0-9a-f]{64}$/;
-const KINDS = ['ts_js', 'markdown', 'text', 'json'];
+const KINDS = ['ts_js', 'markdown', 'text', 'json', 'sidecar_code'];
 const digest = value => `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 

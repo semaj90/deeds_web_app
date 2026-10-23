@@ -287,6 +287,8 @@ class AstEvidenceResponse(BaseModel):
     diagnostics: list[str] = Field(default_factory=list)
     error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
     syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
+    scan_completeness: Literal["COMPLETE", "INCOMPLETE"]
+    scan_failure: Optional[str] = None
 
 
 class Chunk(BaseModel):
@@ -3227,6 +3229,17 @@ _AST_LANGUAGE_EXTENSIONS: dict[str, str] = {
     ".js": "javascript", ".jsx": "javascript", ".mjs": "javascript", ".cjs": "javascript",
     ".py": "python", ".pyi": "python", ".rs": "rust", ".go": "go", ".java": "java",
     ".svelte": "svelte",
+    ".sql": "sql",
+    ".ps1": "powershell", ".psm1": "powershell", ".psd1": "powershell",
+    ".proto": "proto",
+    ".sh": "bash", ".bash": "bash",
+    ".yaml": "yaml", ".yml": "yaml",
+    ".cmake": "cmake",
+    ".lua": "lua",
+    ".comp": "glsl", ".glsl": "glsl",
+    ".c": "c",
+    ".cc": "cpp", ".cpp": "cpp", ".cxx": "cpp", ".hh": "cpp", ".hpp": "cpp", ".cu": "cpp",
+    ".toml": "toml",
 }
 
 
@@ -3260,6 +3273,8 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
             diagnostics=[language_error],
             error_tag="UnsupportedLanguageError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            scan_completeness="INCOMPLETE",
+            scan_failure="UNSUPPORTED_LANGUAGE",
         )
     if not TREESITTER_CHUNKER_AVAILABLE:
         diagnostics.append("treesitter-chunker is unavailable; no replacement evidence was produced")
@@ -3275,13 +3290,19 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
             diagnostics=diagnostics,
             error_tag="ChunkingError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            scan_completeness="INCOMPLETE",
+            scan_failure="PARSER_UNAVAILABLE",
         )
 
+    scan_completeness: Literal["COMPLETE", "INCOMPLETE"] = "COMPLETE"
+    scan_failure: Optional[str] = None
     try:
         chunks = _code_chunks_tree_sitter(req.source, language)
     except Exception as exc:
         diagnostics.append(f"ChunkingError: treesitter-chunker extraction failed: {exc}")
         chunks = []
+        scan_completeness = "INCOMPLETE"
+        scan_failure = "CHUNK_EXTRACTION_FAILED"
 
     diagnostics.extend(_syntax_diagnostics(req.source, language))
 
@@ -3445,6 +3466,8 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
         diagnostics=diagnostics,
         error_tag="ChunkingError" if fatal_diagnostics else None,
         syntax_status="RECOVERED_WITH_ERRORS" if fatal_diagnostics else "CLEAN",
+        scan_completeness=scan_completeness,
+        scan_failure=scan_failure,
     )
 
 

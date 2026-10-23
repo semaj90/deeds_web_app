@@ -8,6 +8,61 @@ import {
 const sha256Prefixed = z.string().regex(/^sha256:[a-f0-9]{64}$/);
 const nonEmptyText = z.string().trim().min(1);
 
+export const DspyRepairRequestV1Schema = z.object({
+	schema: z.literal('atlas.dspy-repair-request.v1'),
+	contextManifestChecksum: sha256Prefixed,
+	query: nonEmptyText,
+	diagnosisContext: z.string().max(32_000).nullable(),
+	allowedTargetCandidateIds: z.array(nonEmptyText).min(1).max(512),
+	allowedEvidenceRefs: z.array(nonEmptyText).min(1).max(512),
+	authority: z.literal('PROPOSAL_ONLY'),
+}).strict();
+
+export type DspyRepairRequestV1 = z.infer<typeof DspyRepairRequestV1Schema>;
+
+export function serializeDspyRepairRequestV1(input: DspyRepairRequestV1): string {
+	return JSON.stringify(DspyRepairRequestV1Schema.parse(input));
+}
+
+export function parseDspyRepairRequestV1(raw: string | unknown): DspyRepairRequestV1 {
+	let decoded: unknown = raw;
+	if (typeof raw === 'string') {
+		try {
+			decoded = JSON.parse(raw) as unknown;
+		} catch {
+			throw new Error('DSPY_REPAIR_REQUEST_INVALID_JSON');
+		}
+	}
+	return DspyRepairRequestV1Schema.parse(decoded);
+}
+
+export function buildDspyRepairRequestV1(
+	manifestInput: ContextManifestV2,
+	input: { diagnosisContext?: string },
+): DspyRepairRequestV1 {
+	const manifest = ContextManifestV2Schema.parse(manifestInput);
+	const recomputedManifest = buildContextManifestV2(manifest.v1, manifest.identityInput);
+	if (recomputedManifest.identityChecksum !== manifest.identityChecksum) {
+		throw new Error('CONTEXT_MANIFEST_IDENTITY_CHECKSUM_INVALID');
+	}
+	const request = DspyRepairRequestV1Schema.parse({
+		schema: 'atlas.dspy-repair-request.v1',
+		contextManifestChecksum: `sha256:${manifest.identityChecksum}`,
+		query: manifest.v1.query,
+		diagnosisContext: input.diagnosisContext ?? null,
+		allowedTargetCandidateIds: manifest.v1.selectedNodeKeys,
+		allowedEvidenceRefs: manifest.v1.evidenceRefs,
+		authority: 'PROPOSAL_ONLY',
+	});
+	if (new Set(request.allowedTargetCandidateIds).size !== request.allowedTargetCandidateIds.length) {
+		throw new Error('CONTEXT_MANIFEST_TARGET_ALLOWLIST_INVALID');
+	}
+	if (new Set(request.allowedEvidenceRefs).size !== request.allowedEvidenceRefs.length) {
+		throw new Error('CONTEXT_MANIFEST_EVIDENCE_ALLOWLIST_INVALID');
+	}
+	return request;
+}
+
 export const DspyRepairOutputV1Schema = z.object({
 	schema: z.literal('atlas.dspy-repair-output.v1'),
 	contextManifestChecksum: sha256Prefixed,

@@ -17629,3 +17629,13 @@ Parsing 768-d embedding text (`content_embedding`, ~9.5 KB/row) from `.tmp/atlas
     7. **Qdrant Point Identity:** Expected projection point ID `2ab9035f-7a8f-2328-9ae0-17d1b44e8eda` was not found in `codebase_chunks_768_v2`; source-ref readback is therefore absent. This blocks the complete-chain acceptance test.
     8. **Admitted Workspace Revision:** Sealed key `sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb`.
   - Persisted receipt: `docs/reports/single-chain-provenance-verification-v1.json` (`chainIntact: false`, `blockingReasons: ["QDRANT_POINT_MISSING"]`). The source, vector, packet, and workspace evidence is a partial diagnostic chain; it does not prove Qdrant projection coverage or canonical authority.
+
+### SOURCE-TEXT-ENCODING-01-ASTRAL-OFFSETS-2026-10-22
+
+- [x] Added regression coverage for UTF-16 decoded offsets around an astral Unicode character: valid boundaries map to original UTF-8 byte offsets, a split surrogate is rejected, and UTF-8 byte offsets convert to the expected LSP UTF-16 line/character position.
+- [x] `node --test scripts/atlas/lib/source-text-envelope.test.mjs` passes 13/13.
+- [x] No parser, source, database, graph, vector, cache, model, or projection data was changed.
+- [ ] Live extractor and language-wide parser readback remain unproven; this is a bounded coordinate-conversion test only.
+
+Evidence: `scripts/atlas/lib/source-text-envelope.mjs` and `scripts/atlas/lib/source-text-envelope.test.mjs`.
+Status: `SOURCE_BYTE_COORDINATE_MAPPING_TESTED`; canonical authority=false; writesPerformed=false.

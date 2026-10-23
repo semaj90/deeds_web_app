@@ -204,3 +204,25 @@ test('recomputes changed-file byte digests and rejects malformed UTF-8', () => {
     changedObservations: [{ sourceRef: 'one.ts', status: 'SOURCE', source: invalidSource, bytes: invalidBytes }],
   }).reason, 'CHANGED_SOURCE_NOT_VALID_UTF8:one.ts');
 });
+
+test('detects same-size edits and newline changes by exact bytes and replays deterministically', () => {
+  const previous = snapshot([source('one.ts', 'alpha')]);
+  const sameSizeEdit = source('one.ts', 'bravo');
+  const args = {
+    previousSnapshot: previous,
+    previousReadback: readback(previous),
+    repositoryDelta: delta([{ sourceRef: 'one.ts', operation: 'MODIFY' }]),
+    changedObservations: [observation(sameSizeEdit, 'bravo')],
+  };
+
+  const first = buildIncrementalWorkspaceSourceInventoryV1(args);
+  const replay = buildIncrementalWorkspaceSourceInventoryV1(args);
+  assert.notEqual(first.sources[0].sourceRevision, previous.sources[0].sourceRevision);
+  assert.equal(first.sources[0].byteLength, previous.sources[0].byteLength);
+  assert.deepEqual(replay, first);
+
+  const lf = source('one.ts', 'line\n');
+  const crlf = source('one.ts', 'line\r\n');
+  assert.notEqual(lf.sourceRevision, crlf.sourceRevision);
+  assert.equal(lf.byteLength + 1, crlf.byteLength);
+});

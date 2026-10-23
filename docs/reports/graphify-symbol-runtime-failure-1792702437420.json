@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.graphify-symbol-runtime-failure.v1",
+  "generatedAt": "2026-10-22T20:53:57.420Z",
+  "status": "EXECUTION_BLOCKED",
+  "apply": true,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "manifestPath": "C:\\Users\\james\\AppData\\Local\\Temp/symbol-freeze-plan.json",
+  "shardIndex": 8,
+  "datastoreWriteAttempted": false,
+  "datastoreWritesMayHaveOccurred": false,
+  "errorCode": null,
+  "error": "SYMBOL_APPLY_GRAPHIFY_WORKSPACE_REVISION_MISMATCH"
+}

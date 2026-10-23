@@ -13,6 +13,7 @@ const HARD_MAX_BATCH_RECORDS = 2_000;
 export async function* streamJsonlBatchesV1(readable, {
   maxLineBytes = DEFAULT_MAX_LINE_BYTES,
   batchRecords = DEFAULT_BATCH_RECORDS,
+  includeSpans = false,
 } = {}) {
   if (!readable || typeof readable[Symbol.asyncIterator] !== 'function') {
     throw new TypeError('JSONL_INPUT_MUST_BE_ASYNC_ITERABLE');
@@ -31,6 +32,9 @@ export async function* streamJsonlBatchesV1(readable, {
   let batchHash = createHash('sha256');
   let lineNumber = 0;
   let batchFirstLine = 0;
+  let lineStartByte = 0;
+  let consumedBytes = 0;
+  let spans = [];
 
   function appendPending(segment) {
     if (segment.length === 0) return;
@@ -40,7 +44,7 @@ export async function* streamJsonlBatchesV1(readable, {
     if (pending.length >= 128) pending = [Buffer.concat(pending, pendingBytes)];
   }
 
-  function parseLine(lineBytes) {
+  function parseLine(lineBytes, startByte) {
     lineNumber += 1;
     const hasCr = lineBytes.length > 0 && lineBytes[lineBytes.length - 1] === 13;
     const body = hasCr ? lineBytes.subarray(0, lineBytes.length - 1) : lineBytes;
@@ -55,14 +59,17 @@ export async function* streamJsonlBatchesV1(readable, {
     if (value === null || typeof value !== 'object' || Array.isArray(value)) {
       throw new Error(`JSONL_RECORD_MUST_BE_OBJECT:${lineNumber}`);
     }
-    return { value, raw: body };
+    return includeSpans
+      ? { value, raw: body, span: { lineNumber, startByte, endByte: startByte + body.length } }
+      : { value, raw: body };
   }
 
   function addLine(lineBytes) {
-    const parsed = parseLine(lineBytes);
+    const parsed = parseLine(lineBytes, lineStartByte);
     if (!parsed) return null;
     if (batch.length === 0) batchFirstLine = lineNumber;
     batch.push(parsed.value);
+    if (includeSpans) spans.push(parsed.span);
     batchHash.update(parsed.raw);
     batchHash.update('\n');
     if (batch.length < batchRecords) return null;
@@ -74,8 +81,10 @@ export async function* streamJsonlBatchesV1(readable, {
       recordCount: batch.length,
       checksum: `sha256:${batchHash.digest('hex')}`,
       records: batch,
+      ...(includeSpans ? { recordSpans: spans } : {}),
     };
     batch = [];
+    spans = [];
     batchHash = createHash('sha256');
     return result;
   }
@@ -97,6 +106,7 @@ export async function* streamJsonlBatchesV1(readable, {
       pendingBytes = 0;
       const output = addLine(lineBytes);
       if (output) yield { ...output, batchIndex: batchIndex++ };
+      lineStartByte = consumedBytes + i + 1;
       start = i + 1;
     }
     if (start < chunk.length) {
@@ -106,6 +116,7 @@ export async function* streamJsonlBatchesV1(readable, {
         throw new Error(`JSONL_LINE_TOO_LARGE:${lineNumber + 1}:${pendingBytes}:${maxLineBytes}`);
       }
     }
+    consumedBytes += chunk.length;
   }
 
   if (pendingBytes > 0) {
@@ -122,6 +133,7 @@ export async function* streamJsonlBatchesV1(readable, {
       recordCount: batch.length,
       checksum: `sha256:${batchHash.digest('hex')}`,
       records: batch,
+      ...(includeSpans ? { recordSpans: spans } : {}),
     };
   }
 }

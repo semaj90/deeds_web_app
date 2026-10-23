@@ -1,0 +1,9 @@
+# CSS Language Profile for OKF
+
+version: 1
+language: css
+name: CSS
+grammar: css
+
+extensions:
+  - .css

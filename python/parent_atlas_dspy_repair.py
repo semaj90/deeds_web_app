@@ -419,6 +419,63 @@ def validate_dspy_repair_output_v1(
     }
 
 
+def validate_dspy_repair_request_v1(request: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate the serialized TypeScript-to-DSPy proposal-only request DTO."""
+    expected_fields = {
+        "schema",
+        "contextManifestChecksum",
+        "query",
+        "diagnosisContext",
+        "allowedTargetCandidateIds",
+        "allowedEvidenceRefs",
+        "authority",
+    }
+    if not isinstance(request, Mapping) or set(request) != expected_fields:
+        raise ValueError(f"repair request must contain exactly {sorted(expected_fields)}")
+    if request["schema"] != "atlas.dspy-repair-request.v1":
+        raise ValueError("schema must be atlas.dspy-repair-request.v1")
+    if request["authority"] != "PROPOSAL_ONLY":
+        raise ValueError("authority must be PROPOSAL_ONLY")
+
+    def text(value: Any, label: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{label} must be non-empty text")
+        return value.strip()
+
+    checksum = text(request["contextManifestChecksum"], "contextManifestChecksum")
+    if (
+        len(checksum) != 71
+        or not checksum.startswith("sha256:")
+        or any(char not in "0123456789abcdef" for char in checksum[7:])
+    ):
+        raise ValueError("contextManifestChecksum must be sha256:<64 lowercase hex>")
+
+    diagnosis = request["diagnosisContext"]
+    if diagnosis is not None and (
+        not isinstance(diagnosis, str)
+        or len(diagnosis.encode("utf-16-le")) // 2 > 32_000
+    ):
+        raise ValueError("diagnosisContext exceeds 32000 UTF-16 code units")
+
+    def allowlist(value: Any, label: str) -> list[str]:
+        if not isinstance(value, list) or not value or len(value) > 512:
+            raise ValueError(f"{label} must contain between 1 and 512 identifiers")
+        normalized = [text(item, f"{label}[]") for item in value]
+        if len(normalized) != len(set(normalized)):
+            raise ValueError(f"{label} contains duplicate identifiers")
+        return normalized
+
+    return {
+        "schema": "atlas.dspy-repair-request.v1",
+        "contextManifestChecksum": checksum,
+        "query": text(request["query"], "query"),
+        "diagnosisContext": diagnosis,
+        "allowedTargetCandidateIds": allowlist(request["allowedTargetCandidateIds"], "allowedTargetCandidateIds"),
+        "allowedEvidenceRefs": allowlist(request["allowedEvidenceRefs"], "allowedEvidenceRefs"),
+        "authority": "PROPOSAL_ONLY",
+    }
+
+
 def _p(value: float) -> float:
     value = float(value)
     if value != value or value in (float("inf"), float("-inf")):

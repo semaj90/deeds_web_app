@@ -3,11 +3,29 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import {
   CANONICAL_PROJECTION_PREDICATES_V1,
+  summarizeCanonicalProjectionAuditPredicatesV1,
   summarizeCanonicalProjectionAdmissionV1,
 } from './canonical-projection-admission-summary-v1.mjs';
 
 const currentAudit = JSON.parse(readFileSync(new URL('../../docs/reports/atlas-canonical-projection-fabric-audit-2026-10-16.json', import.meta.url), 'utf8'));
 const auditSource = readFileSync(new URL('./audit-canonical-projection-fabric.mjs', import.meta.url), 'utf8');
+
+test('serialized admission predicate summary reports pass and below-pass counts accurately', () => {
+  const predicates = Object.fromEntries(CANONICAL_PROJECTION_PREDICATES_V1.map((gateId) => [gateId, { verdict: 'PASS' }]));
+  predicates.SYMBOLS_RESOLVED = { verdict: 'PARTIAL_PROVEN' };
+  predicates.SEMANTIC_OWNER_PROVEN = { verdict: 'PARTIAL_PROVEN' };
+  predicates.LATENT_FAMILY_PROVEN = { verdict: 'PARTIAL_PROVEN' };
+  predicates.PROJECTIONS_CHECKSUM_ALIGNED = { verdict: 'NOT_PROVEN' };
+  predicates.BITFROST_KEYS_DERIVABLE = { verdict: 'NOT_PROVEN' };
+  predicates.ACE_EVIDENCE_GROUNDED = { verdict: 'NOT_PROVEN' };
+  const summary = summarizeCanonicalProjectionAuditPredicatesV1(predicates);
+  assert.equal(summary.totalPredicateCount, 11);
+  assert.equal(summary.passCount, 5);
+  assert.equal(summary.belowPassCount, 6);
+  assert.equal(summary.verdict, 'NOT_SAFE_TO_PROJECT');
+  assert.match(summary.reason, /^6\/11 predicates below PASS:/);
+  assert.match(auditSource, /summarizeCanonicalProjectionAuditPredicatesV1\(report\.predicates\)/);
+});
 
 test('current Graphify audit remains blocked by each non-PASS admission predicate', () => {
   const summary = summarizeCanonicalProjectionAdmissionV1(currentAudit);
@@ -32,6 +50,7 @@ test('fabric audit guards database reads and rolls back while keeping report out
   assert.match(auditSource, /BEGIN TRANSACTION READ ONLY/);
   assert.match(auditSource, /await client\.query\('ROLLBACK'\)/);
   assert.match(auditSource, /ATLAS_AUDIT_REPORT_DIR_MUST_BE_WITHIN_REPOSITORY/);
+  assert.match(auditSource, /summarizeCanonicalProjectionAuditPredicatesV1\(report\.predicates\)/);
 });
 
 test('missing required predicates block admission even if the overall verdict says safe', () => {

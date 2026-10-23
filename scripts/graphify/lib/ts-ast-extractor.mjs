@@ -30,7 +30,8 @@
  */
 
 import fs from 'fs';
-import { fileURLToPath } from 'url';
+import { execFileSync } from 'child_process';
+import { fileURLToPath, pathToFileURL } from 'url';
 import crypto from 'crypto';
 
 // Import TypeScript Compiler
@@ -62,6 +63,14 @@ export function extractSymbolsFromSource(content, filePath) {
     TypeScript.ScriptTarget.Latest,
     true
   );
+  if (sourceFile.parseDiagnostics.length > 0) {
+    const diagnostic = sourceFile.parseDiagnostics[0];
+    const { line, character } = sourceFile.getLineAndCharacterOfPosition(diagnostic.start ?? 0);
+    const message = TypeScript.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+    const error = new Error(`PARSE_FAILED: ${filePath}:${line + 1}:${character + 1}: ${message}`);
+    error.code = 'PARSE_FAILED';
+    throw error;
+  }
 
   const symbols = [];
   const parentStack = [];
@@ -137,6 +146,48 @@ export function extractSymbolsFromSource(content, filePath) {
   visit(sourceFile);
 
   return symbols;
+}
+
+const PARSE_TIMEOUT_MS = 10_000;
+
+/**
+ * Synchronous guard around extractSymbolsFromSource. The TypeScript parser can fail to return
+ * on some malformed input (observed: a stray `*\/` in a source file), so the parse runs in a
+ * child process with a timeout. A hang becomes PARSE_TIMEOUT for this file instead of stalling
+ * the batch. Costs one process spawn per call; use it where input may be untrusted or malformed.
+ */
+export function extractSymbolsFromSourceGuarded(content, filePath, timeoutMs = PARSE_TIMEOUT_MS) {
+  const moduleUrl = pathToFileURL(fileURLToPath(import.meta.url)).href;
+  const childSource = [
+    `import(${JSON.stringify(moduleUrl)}).then((m) => {`,
+    `  let input = '';`,
+    `  process.stdin.setEncoding('utf8');`,
+    `  process.stdin.on('data', (chunk) => { input += chunk; });`,
+    `  process.stdin.on('end', () => {`,
+    `    const req = JSON.parse(input);`,
+    `    process.stdout.write(JSON.stringify(m.extractSymbolsFromSource(req.content, req.filePath)));`,
+    `  });`,
+    `});`,
+  ].join('\n');
+  try {
+    const out = execFileSync(process.execPath, ['-e', childSource], {
+      input: JSON.stringify({ content, filePath }),
+      timeout: timeoutMs,
+      maxBuffer: 256 * 1024 * 1024,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+    return JSON.parse(out);
+  } catch (err) {
+    if (err.code === 'ETIMEDOUT') {
+      const timeoutErr = new Error(`PARSE_TIMEOUT: ${filePath} exceeded ${timeoutMs}ms`);
+      timeoutErr.code = 'PARSE_TIMEOUT';
+      throw timeoutErr;
+    }
+    const failure = new Error(`PARSE_FAILED: ${filePath}: ${String(err.stderr || err.message).slice(0, 500)}`);
+    failure.code = 'PARSE_FAILED';
+    throw failure;
+  }
 }
 
 /**

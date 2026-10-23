@@ -67,10 +67,12 @@ async function main() {
 
     // 2. Real namespace + revision authority -- graphify_files only, never
     //    atlas_packets.repository_id (confirmed corrupted).
+    // Select only the admitted workspace revision. Without this filter, a file with rows at
+    // several revisions returns whichever row comes first, which can attach the wrong revision.
     const { rows: gfRows } = await pool.query(
       `SELECT workspace_id, source_revision, code_source_revision
-       FROM graphify_files WHERE source_ref = $1 LIMIT 1`,
-      [fixture.sourceRef],
+       FROM graphify_files WHERE source_ref = $1 AND workspace_revision = $2 LIMIT 1`,
+      [fixture.sourceRef, 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc'],
     );
     const gf = gfRows[0];
     const namespaceProven = !!gf;

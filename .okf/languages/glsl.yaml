@@ -1,0 +1,10 @@
+# GLSL Language Profile for OKF
+
+version: 1
+language: glsl
+name: GLSL
+grammar: glsl
+
+extensions:
+  - .comp
+  - .glsl

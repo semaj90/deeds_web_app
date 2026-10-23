@@ -11,12 +11,17 @@ async function collect(chunks, options) {
 
 test('streams CRLF JSONL into bounded batches and preserves UTF-8 across chunk boundaries', async () => {
   const bytes = Buffer.from('{"name":"café"}\r\n{"id":2}\n{"id":3}', 'utf8');
-  const batches = await collect([bytes.subarray(0, 11), bytes.subarray(11, 15), bytes.subarray(15)], { batchRecords: 2 });
+  const batches = await collect([bytes.subarray(0, 11), bytes.subarray(11, 15), bytes.subarray(15)], { batchRecords: 2, includeSpans: true });
   assert.equal(batches.length, 2);
   assert.deepEqual(batches.map(batch => batch.records), [[{ name: 'café' }, { id: 2 }], [{ id: 3 }]]);
   assert.deepEqual(batches.map(batch => batch.recordCount), [2, 1]);
   assert.deepEqual(batches.map(batch => batch.batchIndex), [0, 1]);
   assert.match(batches[0].checksum, /^sha256:[0-9a-f]{64}$/);
+  assert.deepEqual(batches.flatMap(batch => batch.recordSpans), [
+    { lineNumber: 1, startByte: 0, endByte: Buffer.byteLength('{"name":"café"}') },
+    { lineNumber: 2, startByte: Buffer.byteLength('{"name":"café"}\r\n'), endByte: Buffer.byteLength('{"name":"café"}\r\n{"id":2}') },
+    { lineNumber: 3, startByte: Buffer.byteLength('{"name":"café"}\r\n{"id":2}\n'), endByte: bytes.length },
+  ]);
 });
 
 test('rejects oversized records, malformed JSON, non-object rows and invalid UTF-8', async () => {
@@ -32,4 +37,9 @@ test('enforces implementation hard bounds and skips blank lines without hiding m
   assert.equal(batches.length, 1);
   assert.equal(batches[0].firstLine, 2);
   assert.equal(batches[0].lastLine, 2);
+});
+
+test('keeps span metadata opt-in to preserve existing stream batch shape', async () => {
+  const [batch] = await collect(['{}\n']);
+  assert.equal(Object.hasOwn(batch, 'recordSpans'), false);
 });

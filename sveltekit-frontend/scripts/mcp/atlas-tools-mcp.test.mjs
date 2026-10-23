@@ -326,10 +326,24 @@ test('a packet content checksum does not satisfy source revision, and proofUsabl
 });
 
 test('only an explicit source revision field removes MISSING_SOURCE_REVISION', async () => {
-  const sourcePacket = { ...packet('packet:aaa', 'src/a.ts', 'abc123'), source_revision: 'sha256:source-v1' };
+  const sourcePacket = {
+    ...packet('packet:aaa', 'src/a.ts', 'abc123'),
+    source_revision: 'sha256:source-v1',
+    workspace_revision: 'sha256:workspace-v1',
+    byte_start: 12,
+    byte_end: 32,
+  };
   const trace = fakeTrace({ 'atlas.query': () => [hit('c1', 'src/a.ts', 0.5)], 'atlas.packet_search': () => ({ packets: [sourcePacket] }) });
   const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
   assert.ok(!result.cards[0].rejectionReasons.includes('MISSING_SOURCE_REVISION'));
+  assert.deepEqual(result.cards[0].packetBindings, [{
+    packetKey: 'packet:aaa',
+    sourceRevision: 'sha256:source-v1',
+    workspaceRevision: 'sha256:workspace-v1',
+    sha256: 'abc123',
+    byteStart: 12,
+    byteEnd: 32,
+  }]);
   assert.equal(result.cards[0].proofUsable, false);
 });
 
@@ -446,13 +460,14 @@ test('classifyInspectRef separates paths, packet keys, names and empties', () =>
 });
 
 test('a path resolves to exactly one packet and is identity-bound but revision-unqualified', async () => {
-  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts')] }) });
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { workspace_revision: 'sha256:workspace-v1' })] }) });
   const result = await findSourceRefs({ query: 'sveltekit-frontend/src/a.ts' }, { trace });
   assert.equal(trace.calls[0].args.source_ref, 'src/a.ts'); // the canonical workspace-relative form is what is searched
   const [item] = result.inspected;
   assert.equal(item.status, 'IDENTITY_BOUND');
   assert.deepEqual(item.packetKeys, ['packet:aaa']);
   assert.equal(item.packets[0].summary, 'a summary'); // whitespace collapsed
+  assert.equal(item.packets[0].workspaceRevision, 'sha256:workspace-v1');
   assert.equal(result.provenance.authority, 'atlas_packets_via_trace');
   assert.equal(result.provenance.status, 'IDENTITY_BOUND_REVISION_UNQUALIFIED');
   assert.equal(result.provenance.graphRevision, null);

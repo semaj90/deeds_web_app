@@ -1,0 +1,26 @@
+# Binary and Compiled Artifact Profile for OKF (never parsed; classified only)
+
+version: 1
+language: binary
+name: Binary / compiled artifacts
+grammar: none
+
+extensions:
+  - .exe
+  - .dll
+  - .node
+  - .so
+  - .dylib
+  - .o
+  - .obj
+  - .lib
+  - .a
+  - .pdb
+  - .wasm
+  - .pyc
+  - .pyd
+  - .gguf
+  - .onnx
+  - .pt
+  - .pth
+  - .bin

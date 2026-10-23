@@ -197,23 +197,25 @@ class AstChunkDomainRouter:
     def route_non_ast_chunk(cls, file_path: str, chunk_text: str) -> Dict[str, Any]:
         """Routes the remaining 53% non-AST corpus (144,675 chunks) before raising errors.
         
-        - JSON (57,058) & YAML (590): simdjson control-stream / okf schema.
-        - Markdown (36,670) & Text (7,301): parent-atlas-versioned-doc-intelligence + spacy_pos.
+        - JSON/JSONL/NDJSON and YAML: simdjson control-stream / okf schema route.
+        - Markdown/MDX/Text: parent-atlas-versioned-doc-intelligence + spacy_pos route.
         - SQL (3,180): DDL / migration regex & table reference extraction.
         - Null (39,006), C/C++ (862), TOML (8): lang_id=255 and domain UNRESOLVED.
         """
         ext = Path(file_path).suffix.lower()
-        if ext in (".json", ".jsonl", ".yaml", ".yml"):
+        if ext in (".json", ".jsonl", ".ndjson", ".yaml", ".yml"):
             return {
                 "route_target": "simdjson_okf_validator",
+                "route_status": "ROUTE_RULE_PRESENT_NOT_EXECUTED",
                 "lang_id": 255,
                 "domain": cls.UNRESOLVED,  # extension is not classification evidence
                 "lut_byte": cls.NES_DOMAIN_LUT["unresolved"],
                 "requires_ast": False,
             }
-        elif ext in (".md", ".txt", ".rst"):
+        elif ext in (".md", ".mdx", ".txt", ".rst"):
             return {
                 "route_target": "doc_intelligence_spacy_pos",
+                "route_status": "ROUTE_RULE_PRESENT_NOT_EXECUTED",
                 "lang_id": 255,
                 "domain": cls.UNRESOLVED,  # extension is not classification evidence
                 "lut_byte": cls.NES_DOMAIN_LUT["unresolved"],
@@ -222,6 +224,7 @@ class AstChunkDomainRouter:
         elif ext in (".sql", ".drizzle"):
             return {
                 "route_target": "ddl_migration_regex_extractor",
+                "route_status": "ROUTE_RULE_PRESENT_NOT_EXECUTED",
                 "lang_id": 255,
                 "domain": cls.UNRESOLVED,  # extension is not classification evidence
                 "lut_byte": cls.NES_DOMAIN_LUT["unresolved"],
@@ -230,6 +233,8 @@ class AstChunkDomainRouter:
         else:
             return {
                 "route_target": "unresolved_generic_carrier",
+                "route_status": "NO_PARSER_RULE",
+                "reason": f"unsupported extension: {ext or '<none>'}",
                 "lang_id": 255,
                 "domain": "unresolved",
                 "lut_byte": cls.NES_DOMAIN_LUT["unresolved"],

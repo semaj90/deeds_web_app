@@ -1,0 +1,10 @@
+# JSON Language Profile for OKF
+
+version: 1
+language: json
+name: JSON / JSONC
+grammar: json
+
+extensions:
+  - .json
+  - .jsonc

@@ -972,7 +972,15 @@ def _span_matches_original(
         if reported_start_line is not None and actual_start_line != reported_start_line:
             return False
         if reported_end_line is not None and actual_end_line != reported_end_line:
-            return False
+            terminal_newline_line_convention = (
+                reported_end_line == actual_end_line + 1
+                and end == len(source_bytes)
+                and source_bytes[start:end].endswith(b"\n")
+                and content_bytes is not None
+                and source_bytes[start:end] == content_bytes
+            )
+            if not terminal_newline_line_convention:
+                return False
     return True
 
 
@@ -1063,6 +1071,9 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         "tree_sitter_chunker",
         "chunker",
     ) or "unknown"
+    response_engine = "treesitter-chunker"
+    response_engine_version = engine_version
+    used_tree_sitter_fallback = False
 
     if language_error:
         return AstEvidenceResponseV2(
@@ -1123,6 +1134,29 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             syntax_node_index = _index_syntax_nodes(syntax_root)
         except Exception:
             diagnostics.append("Tree-sitter signature and ancestry extraction unavailable")
+    if not raw_chunks and syntax_root is not None and not legacy._fatal_structural_diagnostics(diagnostics):
+        used_tree_sitter_fallback = True
+        response_engine = "tree-sitter-language-pack"
+        response_engine_version = legacy._package_version(
+            "tree-sitter-language-pack",
+            "tree_sitter_language_pack",
+        ) or "unknown"
+        for node in getattr(syntax_root, "children", []):
+            if not getattr(node, "is_named", True):
+                continue
+            start = int(getattr(node, "start_byte", -1))
+            end = int(getattr(node, "end_byte", -1))
+            if start < 0 or end <= start or end > len(source_bytes):
+                continue
+            raw_chunks.append({
+                "node_type": str(getattr(node, "type", "node")),
+                "byte_start": start,
+                "byte_end": end,
+                "content": source_bytes[start:end],
+            })
+        if used_tree_sitter_fallback and not raw_chunks:
+            diagnostics.append("Tree-sitter fallback produced no named root nodes")
+            scan_failure = scan_failure or "NO_STRUCTURAL_CHUNKS"
     evidence_chunks: list[AstEvidenceChunkV2] = []
     dependencies_by_chunk: list[list[str]] = []
 
@@ -1213,7 +1247,9 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         dependencies_by_chunk.append(list(normalized.get("dependencies") or []))
 
     if not evidence_chunks:
-        diagnostics.append("treesitter-chunker returned no structural chunks")
+        if not used_tree_sitter_fallback:
+            diagnostics.append("treesitter-chunker returned no structural chunks")
+            scan_failure = scan_failure or "NO_STRUCTURAL_CHUNKS"
 
     edges: list[legacy.AstEvidenceEdge] = []
     seen_edges: set[tuple[str, str, str, int]] = set()
@@ -1319,8 +1355,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
     fatal_diagnostics = legacy._fatal_structural_diagnostics(diagnostics)
     return AstEvidenceResponseV2(
         schema="atlas.ast.evidence.v1",
-        engine="treesitter-chunker",
-        engine_version=engine_version,
+        engine=response_engine,
+        engine_version=response_engine_version,
         language=language,
         file_path=req.file_path,
         source_revision=req.source_revision,

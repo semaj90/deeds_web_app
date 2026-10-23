@@ -33,6 +33,7 @@ const client = new Client({ name: 'parent-atlas-readonly-tool-call', version: '1
 let rawResult: unknown = null;
 let callError: string | null = null;
 let surfaceEntry: any;
+let serverInfo: Record<string, unknown> | null = null;
 
 try {
   await client.connect(new StdioClientTransport({
@@ -40,15 +41,17 @@ try {
     args: [serverPath],
     env: { ...process.env, ATLAS_TOOLS_MOCK: '0' } as Record<string, string>,
   }));
+  serverInfo = client.getServerVersion() as Record<string, unknown> | null;
   const listed = await client.listTools();
   const tool = listed.tools.find((entry) => entry.name === TOOL_NAME);
   if (!tool?.inputSchema) throw new Error('LIVE_TOOL_SCHEMA_MISSING');
-  const validate = new Ajv({ allErrors: true, strict: false }).compile(tool.inputSchema);
+  const validate = new Ajv({ allErrors: true }).compile(tool.inputSchema);
   const toolArgs = { query, maxCards: 8, maxPayloadBytes: 8192 };
   if (!validate(toolArgs)) throw new Error(`LIVE_TOOL_ARGUMENT_SCHEMA_REJECTED:${JSON.stringify(validate.errors ?? [])}`);
   if (tool.description?.includes('mock') || process.env.ATLAS_TOOLS_MOCK === '1') throw new Error('MOCK_TOOL_SURFACE_FORBIDDEN');
   surfaceEntry = {
     toolName: tool.name,
+    inputSchema: tool.inputSchema,
     inputSchemaDigest: sha256(tool.inputSchema),
     descriptionDigest: sha256(tool.description ?? ''),
   };
@@ -85,6 +88,7 @@ const receiptBody = {
   schema: 'atlas.mcp-readonly-tool-call-receipt.v1',
   runId,
   serverAuthority: 'atlas-tools:stdio:local-script',
+  serverInfo,
   toolName: TOOL_NAME,
   toolSchema: surfaceEntry,
   argumentsChecksum: sha256({ query, maxCards: 8, maxPayloadBytes: 8192 }),
@@ -94,6 +98,9 @@ const receiptBody = {
   toolReportedError: Boolean((rawResult as any)?.isError),
   returnedCardCount: Number.isInteger(parsedResult?.totalCards) ? parsedResult?.totalCards : null,
   returnedSourceRefCount: Array.isArray(parsedResult?.sourceRefs) ? parsedResult.sourceRefs.length : null,
+  retrievalStatus: parsedResult?.liveRetrieval?.status ?? null,
+  retrievalFailure: parsedResult?.liveRetrieval?.failure ?? null,
+  candidateSetBasis: parsedResult?.candidateSetBasis ?? null,
   proofUsable: false,
   admissionStatus: parsedResult?.admissionStatus ?? 'NOT_AVAILABLE',
   writesPerformed: false,

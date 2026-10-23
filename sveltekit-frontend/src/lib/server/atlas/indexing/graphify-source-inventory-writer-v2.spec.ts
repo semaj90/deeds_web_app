@@ -490,7 +490,7 @@ describe('GraphifySourceInventoryWriterV2', () => {
     expect(client.queries[0]).toContain('ON CONFLICT (workspace_id, workspace_revision, parser_contract_version)');
     expect(client.queries[0]).toContain('WHERE workspace_revision IS NOT NULL');
     expect(client.queries[1]).toContain('FROM public.graphify_runs');
-    expect(client.queries[2]).toContain('ON CONFLICT (workspace_id, source_ref, code_source_revision)');
+    expect(client.queries[2]).toContain("ON CONFLICT (workspace_id, source_ref, code_source_revision, (COALESCE(workspace_revision, '')))");
     expect(client.queries[2]).toContain('WHERE code_source_revision IS NOT NULL');
     expect(client.queries[2]).toContain('source_revision_authority');
     expect(client.queries[3]).toContain('FROM public.graphify_files');

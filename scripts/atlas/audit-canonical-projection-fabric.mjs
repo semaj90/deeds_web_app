@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import { readSubmodulePaths, classifyRepositoryId } from './lib/gitmodules-registry.mjs';
 import { GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { summarizeCanonicalProjectionAuditPredicatesV1 } from './canonical-projection-admission-summary-v1.mjs';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 loadAtlasEnv(REPO_ROOT);
@@ -1055,12 +1056,9 @@ async function main() {
       ACE_EVIDENCE_GROUNDED: aceEvidenceGrounded,
     };
 
-    const verdicts = Object.values(report.predicates).map((p) => p.verdict);
-    const allPass = verdicts.every((v) => v === 'PASS');
-    report.overall_verdict = allPass ? 'SAFE_TO_PROJECT' : 'NOT_SAFE_TO_PROJECT';
-    report.overall_verdict_reason = allPass
-      ? 'All 11 predicates PASS.'
-      : `${verdicts.filter((v) => v !== 'PASS').length}/11 predicates below PASS: ${Object.entries(report.predicates).filter(([, p]) => p.verdict !== 'PASS').map(([k, p]) => `${k}=${p.verdict}`).join(', ')}`;
+    const predicateSummary = summarizeCanonicalProjectionAuditPredicatesV1(report.predicates);
+    report.overall_verdict = predicateSummary.verdict;
+    report.overall_verdict_reason = predicateSummary.reason;
 
     // ── Write reports ──
     const reportsDir = REPORT_DIR;

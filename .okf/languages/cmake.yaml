@@ -1,0 +1,9 @@
+# CMake Language Profile for OKF
+
+version: 1
+language: cmake
+name: CMake
+grammar: cmake
+
+extensions:
+  - .cmake
