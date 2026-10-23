@@ -24,6 +24,7 @@ import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+import { assertCanonicalWriteAuthorized } from './lib/admission-write-guard-v1.mjs';
 const ADMISSION_PATH = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const REPORT_PATH = resolve(ROOT, 'docs/reports/apply-file-level-source-refs-content-reconciled-v1.json');
 const REPO_ID = 'deeds-web-app';
@@ -35,8 +36,8 @@ const admission = JSON.parse(readFileSync(ADMISSION_PATH, 'utf8'));
 if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
   throw new Error('ADMITTED_WORKSPACE_REVISION_RECEIPT_NOT_AUTHORITATIVE');
 }
-const snapshotPath = resolve(ROOT, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
-const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'));
+const { manifest: snapshot } = assertCanonicalWriteAuthorized({ root: ROOT, admission, apply: APPLY, argv: process.argv.slice(2),
+  confirmToken: '--confirm-file-level-source-refs-v1=AUTHORIZE_FILE_LEVEL_SOURCE_REFS_WRITE_V1' });
 if (snapshot.snapshotRevision !== admission.snapshotRevision) throw new Error('SEALED_SNAPSHOT_MISMATCH');
 const rootSources = snapshot.sources.filter((s) => s.repositoryId === 'repo:root');
 
