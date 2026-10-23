@@ -35,6 +35,7 @@ registries:
       - feature-intelligence.yaml
       - parent-atlas-execution.yaml
       - structured-value.yaml
+      - atlas-domain-taxonomy.yaml   # validates against ../schemas/domain-taxonomy-v1.schema.json
 
   corpora:
     path: corpora/
