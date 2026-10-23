@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -42,6 +44,63 @@ test('rejects current or corrupted bytes substituted for the frozen source', () 
   const corrupted = Buffer.from(sourceBytes);
   corrupted[corrupted.length - 1] ^= 1;
   assert.throws(() => verifyAstParserSymbolSpanCandidateV1(fixture, corrupted, parserResponse), /FROZEN_SOURCE_BYTES_MISMATCH/);
+});
+
+test('loader strips exactly one terminal LF and verifies digest before returning parser input', () => {
+  assert.equal(sourceBytes.length, fixture.source.byteLength);
+  assert.equal(sourceBytes[sourceBytes.length - 1], 0x3b);
+  const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), 'atlas-frozen-source-'));
+  try {
+    const artifactPath = path.join(temporaryRoot, 'source.ts');
+    const artifact = readFileSync(path.join(root, fixture.sourceArtifact.path));
+    writeFileSync(artifactPath, Buffer.concat([artifact, Buffer.from('\n')]));
+    assert.throws(() => loadAstParserSymbolSpanCandidateSourceV1({
+      ...fixture,
+      sourceArtifact: { ...fixture.sourceArtifact, path: 'source.ts' },
+    }, temporaryRoot), /FROZEN_SOURCE_BYTES_MISMATCH/);
+  } finally {
+    rmSync(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test('loader preserves a source-owned terminal LF separately from the storage sentinel', () => {
+  const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), 'atlas-frozen-source-'));
+  const expectedSource = Buffer.from('export const value = 1;\n', 'utf8');
+  const sourceDigest = createHash('sha256').update(expectedSource).digest('hex');
+  const localFixture = {
+    ...fixture,
+    source: {
+      ...fixture.source,
+      sourceRevision: `sha256:${sourceDigest}`,
+      sha256: sourceDigest,
+      byteLength: expectedSource.length,
+    },
+    sourceArtifact: { ...fixture.sourceArtifact, path: 'source.ts' },
+  };
+  try {
+    writeFileSync(path.join(temporaryRoot, 'source.ts'), Buffer.concat([expectedSource, Buffer.from('\n')]));
+    assert.deepEqual(loadAstParserSymbolSpanCandidateSourceV1(localFixture, temporaryRoot), expectedSource);
+  } finally {
+    rmSync(temporaryRoot, { recursive: true, force: true });
+  }
+});
+
+test('loader rejects CRLF and invalid UTF-8 instead of normalizing frozen evidence', () => {
+  const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), 'atlas-frozen-source-'));
+  const localFixture = {
+    ...fixture,
+    source: { ...fixture.source, byteLength: 1, sha256: createHash('sha256').update('x').digest('hex'), sourceRevision: `sha256:${createHash('sha256').update('x').digest('hex')}` },
+    sourceArtifact: { ...fixture.sourceArtifact, path: 'source.ts' },
+  };
+  try {
+    const artifactPath = path.join(temporaryRoot, 'source.ts');
+    writeFileSync(artifactPath, Buffer.from('x\r\n'));
+    assert.throws(() => loadAstParserSymbolSpanCandidateSourceV1(localFixture, temporaryRoot), /SOURCE_ARTIFACT_LINE_ENDING_INVALID/);
+    writeFileSync(artifactPath, Buffer.from([0xff, 0x0a]));
+    assert.throws(() => loadAstParserSymbolSpanCandidateSourceV1(localFixture, temporaryRoot), /SOURCE_ARTIFACT_UTF8_INVALID/);
+  } finally {
+    rmSync(temporaryRoot, { recursive: true, force: true });
+  }
 });
 
 test('rejects parser revision drift and duplicate matching chunks', () => {

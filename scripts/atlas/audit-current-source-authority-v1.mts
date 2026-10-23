@@ -12,6 +12,8 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
+import { resolveAdmissionSnapshotManifestPathV1 } from './lib/admission-snapshot-manifest-path-v1.mjs';
+import { requireCanonicalWorkspaceIdV1 } from './lib/canonical-workspace-id-v1.mjs';
 import { classifyCurrentSourcesV1, classifyLiveDriftV1, membershipSetChecksumV1, type MembershipRowV1, type RegistryBindingV1, type SnapshotSourceV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/current-source-authority-v1.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -21,10 +23,11 @@ const digest = (v: string | Buffer) => `sha256:${createHash('sha256').update(v).
 
 const admission = readJson('docs/reports/workspace-revision-tournament-admission-v1.json');
 const workspaceRevision: string = admission.workspaceRevision;
-const manifestRel = `docs/reports/workspace-source-snapshots/${String(admission.snapshotRevision).replace(/^sha256:/, '')}.json`;
-if (!existsSync(resolve(ROOT, manifestRel))) throw new Error(`SNAPSHOT_MANIFEST_MISSING ${manifestRel}`);
-const snapshotBytes = readFileSync(resolve(ROOT, manifestRel));
+const { manifestPath, relativePath: manifestRel } = resolveAdmissionSnapshotManifestPathV1(ROOT, admission);
+if (!existsSync(manifestPath)) throw new Error(`SNAPSHOT_MANIFEST_MISSING ${manifestRel}`);
+const snapshotBytes = readFileSync(manifestPath);
 const snapshot = JSON.parse(snapshotBytes.toString('utf8'));
+const workspaceId = requireCanonicalWorkspaceIdV1(snapshot.workspaceId);
 
 // Manifest self-digest, recomputed independently (same rule as capture: hash of the body without the sealed fields). Source bytes are NOT re-read from the working tree here.
 const { schema: _schema, snapshotRevision: _snapshotRevision, workspaceRevision: _snapshotWorkspaceRevision, status: _snapshotStatus, canonicalAuthority: _snapshotAuthority, datastoreWritesPerformed: _snapshotWrites, ...snapshotBody } = snapshot;
@@ -36,7 +39,6 @@ const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(proc
 const client = await pool.connect();
 await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
 try {
-  const workspaceId: string = snapshot.workspaceId;
   // The owner execution for this admitted revision: the legacy canonical row, cross-checked against the authority table via the ONE shared shadow helper.
   const owners = (await client.query(`SELECT execution_id::text AS execution_id FROM public.graphify_executions WHERE workspace_id = $1::uuid AND workspace_revision = $2 AND canonical_authority IS TRUE AND status = 'COMPLETED'`, [workspaceId, workspaceRevision])).rows;
   const { loadAuthorityShadowV1 } = await loadAuthorityShadowModuleV1();

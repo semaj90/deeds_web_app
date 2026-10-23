@@ -24,8 +24,22 @@ export function extensionOf(sourceRef) {
   return i > 0 ? base.slice(i + 1).toLowerCase() : '';
 }
 
+export function parserExclusionReasonV1(sourceRef) {
+  const segments = String(sourceRef).replaceAll('\\', '/').split('/').filter(Boolean);
+  const directories = segments.slice(0, -1);
+  if (directories.some((segment) => segment === 'CMakeFiles'
+    || segment === 'node_modules' || segment === '.git' || segment === '.tmp'
+    || segment === '.svelte-kit' || segment === 'dist' || segment === 'target'
+    || segment === 'build' || segment.startsWith('build-'))) {
+    return 'GENERATED_OR_DEPENDENCY_PATH';
+  }
+  return null;
+}
+
 /** lineageClass comes from classifyCurrentAstSourceV1. Symbol resolution and parse-failure ledgers are not measured here. */
 export function classifyFileCapabilityV1({ sourceRef, lineageClass }) {
+  const exclusionReason = parserExclusionReasonV1(sourceRef);
+  if (exclusionReason) return { outcome: 'NOT_AST_ELIGIBLE', reason: exclusionReason, language: null };
   const ext = extensionOf(sourceRef);
   const language = PROVIDER_EXT.get(ext) ?? null;
   if (!language) {

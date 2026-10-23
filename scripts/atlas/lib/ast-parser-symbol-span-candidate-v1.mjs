@@ -8,13 +8,36 @@ export function loadAstParserSymbolSpanCandidateSourceV1(fixture, repositoryRoot
   if (fixture?.sourceArtifact?.storageEncoding !== 'UTF8_LF_WITH_ONE_TERMINAL_LF_STRIPPED') {
     throw new Error('SOURCE_ARTIFACT_ENCODING_UNSUPPORTED');
   }
+  const source = fixture.source;
+  if (!source || !digestPattern.test(source.sourceRevision)
+    || source.sha256 !== source.sourceRevision.slice('sha256:'.length)
+    || !Number.isSafeInteger(source.byteLength) || source.byteLength < 0) {
+    throw new Error('FIXTURE_SOURCE_DIGEST_INVALID');
+  }
   const artifactPath = path.resolve(repositoryRoot, fixture.sourceArtifact.path);
   if (!artifactPath.startsWith(`${path.resolve(repositoryRoot)}${path.sep}`)) {
     throw new Error('SOURCE_ARTIFACT_PATH_OUTSIDE_REPOSITORY');
   }
-  let sourceText = readFileSync(artifactPath, 'utf8').replaceAll('\r\n', '\n');
-  if (sourceText.endsWith('\n')) sourceText = sourceText.slice(0, -1);
-  return Buffer.from(sourceText, 'utf8');
+  const artifactBytes = readFileSync(artifactPath);
+  let artifactText;
+  try {
+    artifactText = new TextDecoder('utf-8', { fatal: true }).decode(artifactBytes);
+  } catch {
+    throw new Error('SOURCE_ARTIFACT_UTF8_INVALID');
+  }
+  if (artifactText.includes('\r')) throw new Error('SOURCE_ARTIFACT_LINE_ENDING_INVALID');
+  if (!artifactText.endsWith('\n')) throw new Error('SOURCE_ARTIFACT_TERMINAL_LF_MISSING');
+  const sourceBytes = artifactBytes.subarray(0, artifactBytes.length - 1);
+  try {
+    new TextDecoder('utf-8', { fatal: true }).decode(sourceBytes);
+  } catch {
+    throw new Error('SOURCE_ARTIFACT_UTF8_INVALID');
+  }
+  const actualDigest = createHash('sha256').update(sourceBytes).digest('hex');
+  if (sourceBytes.length !== source.byteLength || actualDigest !== source.sha256) {
+    throw new Error('FROZEN_SOURCE_BYTES_MISMATCH');
+  }
+  return sourceBytes;
 }
 
 export function verifyAstParserSymbolSpanCandidateV1(fixture, sourceBytes, parserResponse) {
