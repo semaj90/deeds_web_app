@@ -649,3 +649,4 @@ bounded policy/helper proof only; it does not prove production classifier
 inputs, current model identity, trained/adaptive policy, or live retrieval and
 execution. Keep P19 partial and do not promote policy authority from this
 receipt.
+P12/P17 source-symbol authority checkpoint (2026-10-23): see `.tmp/atlas/source-symbol-authority-readiness/20261023T-current01/receipt.json` (SHA-256 `e2ed39cd5cb512603724414efd63b97adf6667b8069560bed4394557ea1650f1`). A repeatable-read, read-only join proves one exact source binding for the historical symbol row but finds no AST row at its path and an unqualified packet (`source_revision=NULL`, legacy `workspace_revision=0`). The v2 AST table is absent; its DDL remains draft-only. Preserve P12/P17 and projection gates as open; no write or Graphify execution is authorized.
