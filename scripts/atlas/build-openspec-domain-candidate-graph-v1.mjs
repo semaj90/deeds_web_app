@@ -6,10 +6,10 @@ import { Int32, Table, Utf8, tableFromIPC, tableToIPC, vectorFromArray } from 'a
 import { buildOpenSpecDomainCandidateGraphV1, createOpenSpecDomainCandidateTraversalIndexV1,
   traverseOpenSpecDomainCandidateGraphV1 } from './lib/openspec-domain-candidate-graph-v1.mjs';
 
-const [packageManifestArg, taskPathManifestArg, domainManifestArg, runId] = process.argv.slice(2);
+const [packageManifestArg, taskPathManifestArg, domainManifestArg, runId, runtimeOwnerManifestArg] = process.argv.slice(2);
 if (!packageManifestArg || !taskPathManifestArg || !domainManifestArg
   || !/^[a-zA-Z0-9][a-zA-Z0-9-]{2,63}$/.test(runId ?? '')) {
-  throw new Error('USAGE: node scripts/atlas/build-openspec-domain-candidate-graph-v1.mjs <package-graph-manifest> <task-path-manifest> <domain-manifest> <run-id>');
+  throw new Error('USAGE: node scripts/atlas/build-openspec-domain-candidate-graph-v1.mjs <package-graph-manifest> <task-path-manifest> <domain-manifest> <run-id> [runtime-owner-manifest]');
 }
 
 const root = process.cwd();
@@ -118,6 +118,43 @@ if (domainRows.some(row => row.candidateGroupId && !validGroupIds.has(row.candid
   throw new Error('DOMAIN_GROUP_NOT_IN_VOCABULARY');
 }
 
+let runtimeOwnerManifest = null;
+let runtimeOwnerManifestBytes = null;
+let runtimeOwnerArtifactBytes = null;
+let runtimeOwnerRows = [];
+if (runtimeOwnerManifestArg) {
+  const runtimeOwnerManifestPath = resolveInsideRoot(runtimeOwnerManifestArg);
+  runtimeOwnerManifestBytes = readFileSync(runtimeOwnerManifestPath);
+  runtimeOwnerManifest = JSON.parse(runtimeOwnerManifestBytes.toString('utf8'));
+  verifyBodyChecksum(runtimeOwnerManifest, 'receiptSha256', 'atlas.runtime-owner-directory-candidates.v1', true);
+  if (runtimeOwnerManifest.status !== 'DECLARED_OWNER_PATHS_ADVISORY_ONLY'
+    || runtimeOwnerManifest.canonicalAuthority !== false || runtimeOwnerManifest.executionProven !== false
+    || runtimeOwnerManifest.sourceRevisionQualified !== false || runtimeOwnerManifest.productionStoreWrites !== false
+    || runtimeOwnerManifest.inventorySha256 !== summaryManifest.sourceInventorySha256
+    || runtimeOwnerManifest.directoryArtifactSha256 !== summaryManifest.inputBindings.directoryRollupArtifactSha256) {
+    throw new Error('RUNTIME_OWNER_GRAPH_INPUT_LINEAGE_MISMATCH');
+  }
+  const runtimeOwnerArtifactPath = resolveInsideRoot(path.join(path.dirname(runtimeOwnerManifestArg), 'runtime-owner-candidates.arrow'));
+  runtimeOwnerArtifactBytes = readFileSync(runtimeOwnerArtifactPath);
+  if (sha256(runtimeOwnerArtifactBytes) !== runtimeOwnerManifest.artifacts?.['runtime-owner-candidates.arrow']?.sha256) {
+    throw new Error('RUNTIME_OWNER_GRAPH_ARTIFACT_CHECKSUM_INVALID');
+  }
+  const runtimeTable = tableFromIPC(runtimeOwnerArtifactBytes);
+  if (runtimeTable.numRows !== runtimeOwnerManifest.ownerCandidates) throw new Error('RUNTIME_OWNER_GRAPH_ROW_COUNT_INVALID');
+  runtimeOwnerRows = rowsFromArrow(runtimeTable).map(row => ({
+    ...row,
+    executionProven: row.executionProven === 1,
+    sourceRevisionQualified: row.sourceRevisionQualified === 1,
+  }));
+  for (const row of runtimeOwnerRows) {
+    const ownerPath = resolveInsideRoot(row.ownerPath);
+    const ownerStat = lstatSync(ownerPath);
+    if (!ownerStat.isFile() || ownerStat.isSymbolicLink() || sha256(readFileSync(ownerPath)) !== row.ownerFileSha256) {
+      throw new Error(`RUNTIME_OWNER_CURRENT_BYTES_MISMATCH:${row.capabilityId}`);
+    }
+  }
+}
+
 const rejectCounts = { TARGET_NOT_REGULAR: 0, TARGET_DIGEST_MISSING: 0, TARGET_DIGEST_MISMATCH: 0,
   DIRECTORY_PARENT_MISMATCH: 0 };
 const currentTaskPathRows = [];
@@ -148,12 +185,21 @@ for (const row of taskPathRows) {
   currentTaskPathRows.push(row);
 }
 
-const graph = buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, taskPathRows: currentTaskPathRows, summaryRows, domainRows });
+const graph = buildOpenSpecDomainCandidateGraphV1({ baseNodes, baseEdges, taskPathRows: currentTaskPathRows,
+  summaryRows, domainRows, runtimeOwnerRows });
+const traversalEvidenceStatuses = [
+  'EXACT_PATH_AND_TARGET_DIGEST_CAPTURED',
+  'PATH_PARENT_AND_SUMMARY_DIGEST_MATCH_ADVISORY',
+  'SUMMARY_DERIVED_PROPOSAL_ONLY',
+];
+const traversalEdgeTypes = ['OPENSPEC_TASK_REFERENCES_PATH_CANDIDATE', 'FILE_PARENT_DIRECTORY_CANDIDATE', 'DIRECTORY_DOMAIN_CANDIDATE'];
+const traversalEvidenceExcludedEdgeCount = graph.edges.filter(edge => traversalEdgeTypes.includes(edge.edgeType)
+  && !traversalEvidenceStatuses.includes(edge.evidenceStatus)).length;
 const traversals = [];
 const domainReachCounts = new Map();
 let fanoutTruncatedTaskCount = 0;
 const traversalIndex = createOpenSpecDomainCandidateTraversalIndexV1({ nodes: graph.nodes, edges: graph.edges,
-  edgeTypes: ['OPENSPEC_TASK_REFERENCES_PATH_CANDIDATE', 'FILE_PARENT_DIRECTORY_CANDIDATE', 'DIRECTORY_DOMAIN_CANDIDATE'] });
+  edgeTypes: traversalEdgeTypes, evidenceStatuses: traversalEvidenceStatuses });
 for (const taskNode of graph.nodes.filter(node => node.nodeType === 'TASK_CANDIDATE')) {
   const result = traverseOpenSpecDomainCandidateGraphV1({ index: traversalIndex,
     startNodeKey: taskNode.nodeKey, maxHops: 3, maxFanout: 20 });
@@ -167,12 +213,34 @@ for (const taskNode of graph.nodes.filter(node => node.nodeType === 'TASK_CANDID
 traversals.sort((left, right) => left.taskRef.localeCompare(right.taskRef));
 const domainReach = [...domainReachCounts].map(([domainGroupCandidate, taskCount]) => ({ domainGroupCandidate, taskCount }))
   .sort((left, right) => right.taskCount - left.taskCount || left.domainGroupCandidate.localeCompare(right.domainGroupCandidate));
+const runtimeTraversalEdgeTypes = [...traversalEdgeTypes, 'DIRECTORY_DECLARED_RUNTIME_OWNER_CANDIDATE'];
+const runtimeTraversalEvidenceStatuses = [...traversalEvidenceStatuses, 'DECLARED_OWNER_REGISTRY_AND_CURRENT_BYTES_ONLY'];
+const runtimeTraversalIndex = createOpenSpecDomainCandidateTraversalIndexV1({ nodes: graph.nodes, edges: graph.edges,
+  edgeTypes: runtimeTraversalEdgeTypes, evidenceStatuses: runtimeTraversalEvidenceStatuses });
+const runtimeOwnerTraversals = [];
+const runtimeOwnerReachCounts = new Map();
+let runtimeFanoutTruncatedTaskCount = 0;
+for (const taskNode of graph.nodes.filter(node => node.nodeType === 'TASK_CANDIDATE')) {
+  const result = traverseOpenSpecDomainCandidateGraphV1({ index: runtimeTraversalIndex,
+    startNodeKey: taskNode.nodeKey, maxHops: 3, maxFanout: 20 });
+  if (result.fanoutTruncated) runtimeFanoutTruncatedTaskCount += 1;
+  const runtimeOwners = result.reached.filter(node => node.nodeType === 'RUNTIME_OWNER_CANDIDATE')
+    .map(node => node.nodeKey.slice('runtime-owner-candidate:'.length)).sort();
+  for (const capabilityId of new Set(runtimeOwners)) runtimeOwnerReachCounts.set(capabilityId,
+    (runtimeOwnerReachCounts.get(capabilityId) ?? 0) + 1);
+  runtimeOwnerTraversals.push({ taskRef: taskNode.taskRef, taskBlockSha256: taskNode.taskBlockSha256,
+    runtimeOwnerCapabilities: runtimeOwners, reachedCount: result.reached.length, fanoutTruncated: result.fanoutTruncated });
+}
+runtimeOwnerTraversals.sort((left, right) => left.taskRef.localeCompare(right.taskRef));
+const runtimeOwnerReach = [...runtimeOwnerReachCounts].map(([capabilityId, taskCount]) => ({ capabilityId, taskCount }))
+  .sort((left, right) => right.taskCount - left.taskCount || left.capabilityId.localeCompare(right.capabilityId));
 
 const nodeFields = [
   ['ordinal', Int32], ['nodeKey', Utf8], ['nodeType', Utf8], ['relativePath', Utf8], ['sourceSha256', Utf8],
   ['ecosystem', Utf8], ['packageName', Utf8], ['identityStatus', Utf8], ['taskRef', Utf8], ['taskKey', Utf8],
   ['taskBlockSha256', Utf8], ['workspaceRevision', Utf8], ['domainGroupId', Utf8],
   ['directorySummarySha256', Utf8], ['directoryInputDigest', Utf8],
+  ['ownerClassification', Utf8], ['capabilityId', Utf8], ['executionProven', Int32], ['sourceRevisionQualified', Int32],
 ];
 const edgeFields = [
   ['sourceOrdinal', Int32], ['targetOrdinal', Int32], ['edgeType', Utf8], ['evidenceStatus', Utf8],
@@ -181,6 +249,7 @@ const edgeFields = [
   ['evidenceSha256', Utf8], ['evidenceStartByte', Int32], ['evidenceEndByte', Int32], ['targetSha256', Utf8],
   ['workspaceRevision', Utf8], ['summarySha256', Utf8], ['inputDigest', Utf8], ['domainGroupId', Utf8],
   ['candidateKind', Utf8], ['score', Int32], ['matchedPathTermsJson', Utf8], ['matchedPackageTermsJson', Utf8],
+  ['capabilityId', Utf8], ['ownerClassification', Utf8], ['executionProven', Int32], ['sourceRevisionQualified', Int32],
 ];
 const toArrow = (fields, values) => tableToIPC(new Table(Object.fromEntries(fields.map(([name, Type]) => [name,
   vectorFromArray(values.map(row => row[name] ?? (Type === Int32 ? 0 : '')), Type === Int32 ? new Int32() : new Utf8())]))), 'file');
@@ -188,26 +257,35 @@ const nodesBytes = toArrow(nodeFields, graph.nodes);
 const edgesBytes = toArrow(edgeFields, graph.edges);
 const traversalBytes = Buffer.from(`${JSON.stringify({
   schema: 'atlas.openspec-domain-candidate-traversals.v1', maxHops: 3, maxFanout: 20,
+  allowedEvidenceStatuses: traversalEvidenceStatuses, excludedEdgeCount: traversalEvidenceExcludedEdgeCount,
   traversals, domainReach,
   fanoutTruncatedTaskCount,
   authorityStatus: 'ADVISORY_DOMAIN_CANDIDATE_TRAVERSAL_ONLY',
 }, null, 2)}\n`, 'utf8');
+const runtimeTraversalBytes = runtimeOwnerManifest ? Buffer.from(`${JSON.stringify({
+  schema: 'atlas.openspec-runtime-owner-candidate-traversals.v1', maxHops: 3, maxFanout: 20,
+  allowedEdgeTypes: runtimeTraversalEdgeTypes, allowedEvidenceStatuses: runtimeTraversalEvidenceStatuses,
+  traversals: runtimeOwnerTraversals, runtimeOwnerReach, fanoutTruncatedTaskCount: runtimeFanoutTruncatedTaskCount,
+  authorityStatus: 'ADVISORY_DECLARED_RUNTIME_OWNER_CANDIDATE_TRAVERSAL_ONLY', canonicalAuthority: false,
+}, null, 2)}\n`, 'utf8') : null;
 const edgeTypeCounts = Object.fromEntries([...new Set(graph.edges.map(edge => edge.edgeType))].sort()
   .map(type => [type, graph.edges.filter(edge => edge.edgeType === type).length]));
 const outputDir = path.join(root, '.tmp', 'atlas', 'directory-intelligence', 'openspec-domain-candidate-graph', runId);
 const availableBytes = statfsSync(root).bavail * statfsSync(root).bsize;
-const requiredBytes = nodesBytes.byteLength + edgesBytes.byteLength + traversalBytes.byteLength + 1_000_000;
+const requiredBytes = nodesBytes.byteLength + edgesBytes.byteLength + traversalBytes.byteLength + (runtimeTraversalBytes?.byteLength ?? 0) + 1_000_000;
 if (availableBytes < requiredBytes * 2) throw new Error('INSUFFICIENT_OUTPUT_DISK_HEADROOM');
 mkdirSync(path.dirname(outputDir), { recursive: true });
 mkdirSync(outputDir, { recursive: false });
-const outputRows = [['nodes.arrow', nodesBytes], ['typed-edges.arrow', edgesBytes], ['task-domain-traversals.json', traversalBytes]];
+const outputRows = [['nodes.arrow', nodesBytes], ['typed-edges.arrow', edgesBytes], ['task-domain-traversals.json', traversalBytes],
+  ...(runtimeTraversalBytes ? [['task-runtime-owner-traversals.json', runtimeTraversalBytes]] : [])];
 for (const [name, bytes] of outputRows) writeExclusive(path.join(outputDir, name), bytes);
 const artifacts = Object.fromEntries(outputRows.map(([name, bytes]) => [name, {
   path: path.relative(root, path.join(outputDir, name)).replaceAll(path.sep, '/'), sha256: sha256(bytes), bytes: bytes.byteLength,
 }]));
 const body = {
   schema: 'atlas.openspec-domain-candidate-graph-manifest.v1', runId,
-  status: 'ADVISORY_TASK_FILE_DIRECTORY_DOMAIN_CANDIDATE_GRAPH', canonicalAuthority: false, workspaceRevision: null,
+  status: runtimeOwnerManifest ? 'ADVISORY_TASK_FILE_DIRECTORY_DOMAIN_RUNTIME_CANDIDATE_GRAPH'
+    : 'ADVISORY_TASK_FILE_DIRECTORY_DOMAIN_CANDIDATE_GRAPH', canonicalAuthority: false, workspaceRevision: null,
   inputs: {
     packageGraphManifestSha256: sha256(packageManifestBytes),
     packageGraphNodesSha256: packageManifest.artifacts['nodes.arrow'].sha256,
@@ -219,6 +297,9 @@ const body = {
     directorySummaryManifestSha256: sha256(summaryManifestBytes),
     directorySummaryArtifactSha256: sha256(summaryBytes),
     domainVocabularySha256: sha256(vocabularyBytes),
+    runtimeOwnerManifestSha256: runtimeOwnerManifestBytes ? sha256(runtimeOwnerManifestBytes) : null,
+    runtimeOwnerManifestPath: runtimeOwnerManifestArg ?? null,
+    runtimeOwnerArtifactSha256: runtimeOwnerManifest?.artifacts?.['runtime-owner-candidates.arrow']?.sha256 ?? null,
   },
   counts: {
     baseNodeCount: baseNodes.length, baseEdgeCount: baseEdges.length,
@@ -227,14 +308,23 @@ const body = {
     summaryDirectoryCount: summaryRows.length, domainCandidateRows: domainRows.length,
     taskDirectoryEdges: graph.edges.filter(edge => edge.edgeType === 'FILE_PARENT_DIRECTORY_CANDIDATE').length,
     directoryDomainCandidateEdges: graph.edges.filter(edge => edge.edgeType === 'DIRECTORY_DOMAIN_CANDIDATE').length,
+    runtimeOwnerCandidateEdges: graph.edges.filter(edge => edge.edgeType === 'DIRECTORY_DECLARED_RUNTIME_OWNER_CANDIDATE').length,
+    tasksWithRuntimeOwnerCandidates: runtimeOwnerTraversals.filter(row => row.runtimeOwnerCapabilities.length > 0).length,
+    distinctRuntimeOwnerCandidatesReached: runtimeOwnerReach.length,
+    runtimeFanoutTruncatedTaskCount,
     nodeCount: graph.nodes.length, edgeCount: graph.edges.length, edgeTypeCounts,
     tasksWithDomainCandidates: traversals.filter(row => row.domainGroups.length > 0).length,
     distinctDomainGroupsReached: domainReach.length, fanoutTruncatedTaskCount,
+    traversalEvidenceExcludedEdgeCount,
   },
-  traversal: { maxHops: 3, maxFanout: 20 }, artifacts,
+  traversal: { maxHops: 3, maxFanout: 20, allowedEvidenceStatuses: traversalEvidenceStatuses },
+  runtimeTraversal: runtimeOwnerManifest ? { maxHops: 3, maxFanout: 20,
+    allowedEdgeTypes: runtimeTraversalEdgeTypes, allowedEvidenceStatuses: runtimeTraversalEvidenceStatuses } : null,
+  artifacts,
   limitations: [
     'OpenSpec literal paths and file-parent relationships are advisory candidates, not requirement or ownership proof.',
     'Directory domain assignments are lexical/package-derived proposals from existing summaries, not canonical ontology admissions.',
+    'Declared runtime-owner paths are ownership candidates only; they do not prove runtime execution or traffic.',
     'Candidate group identifiers are namespaced run-local graph labels and do not create domain identities.',
     'Current worktree bytes are not bound to an admitted workspace revision; workspaceRevision remains null.',
     'This local graph does not establish canonical Graphify symbol edges, ACE eligibility, production retrieval, or GPU input qualification.',

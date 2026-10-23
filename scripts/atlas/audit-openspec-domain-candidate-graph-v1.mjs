@@ -42,6 +42,9 @@ const nodes = arrowRows(readGraphArtifact('nodes.arrow'));
 const edges = arrowRows(readGraphArtifact('typed-edges.arrow'));
 const traversalBytes = readGraphArtifact('task-domain-traversals.json');
 const traversalsArtifact = JSON.parse(traversalBytes.toString('utf8'));
+const runtimeTraversalBytes = graphManifest.artifacts['task-runtime-owner-traversals.json']
+  ? readGraphArtifact('task-runtime-owner-traversals.json') : null;
+const runtimeTraversalsArtifact = runtimeTraversalBytes ? JSON.parse(runtimeTraversalBytes.toString('utf8')) : null;
 const byKey = new Map();
 const byOrdinal = new Map();
 for (let index = 0; index < nodes.length; index += 1) {
@@ -74,6 +77,39 @@ if (sha256(summaryBytes) !== graphManifest.inputs.directorySummaryArtifactSha256
 const summaryRows = arrowRows(summaryBytes);
 const summaryByPath = new Map(summaryRows.map(row => [row.relativePath, row]));
 if (summaryByPath.size !== summaryRows.length) throw new Error('DUPLICATE_SUMMARY_PATH');
+let runtimeOwnerRows = [];
+let runtimeOwnerByCapability = new Map();
+if (graphManifest.inputs.runtimeOwnerManifestPath) {
+  const runtimeManifestPath = inside(graphManifest.inputs.runtimeOwnerManifestPath);
+  const runtimeManifestBytes = readFileSync(runtimeManifestPath);
+  const runtimeManifest = JSON.parse(runtimeManifestBytes.toString('utf8'));
+  const runtimeBody = { ...runtimeManifest };
+  delete runtimeBody.receiptSha256;
+  if (runtimeManifest.schema !== 'atlas.runtime-owner-directory-candidates.v1'
+    || sha256(Buffer.from(canonical(runtimeBody))) !== runtimeManifest.receiptSha256
+    || sha256(runtimeManifestBytes) !== graphManifest.inputs.runtimeOwnerManifestSha256
+    || runtimeManifest.status !== 'DECLARED_OWNER_PATHS_ADVISORY_ONLY'
+    || runtimeManifest.canonicalAuthority !== false || runtimeManifest.executionProven !== false
+    || runtimeManifest.sourceRevisionQualified !== false
+    || runtimeManifest.inventorySha256 !== JSON.parse(readFileSync(path.join(path.dirname(inside(domainManifest.inputs.directorySummaryPath)), 'manifest.json'), 'utf8')).sourceInventorySha256
+    || runtimeManifest.directoryArtifactSha256 !== JSON.parse(readFileSync(path.join(path.dirname(inside(domainManifest.inputs.directorySummaryPath)), 'manifest.json'), 'utf8')).inputBindings.directoryRollupArtifactSha256) {
+    throw new Error('RUNTIME_OWNER_GRAPH_MANIFEST_BINDING_INVALID');
+  }
+  const runtimeArtifactPath = inside(path.join(path.dirname(graphManifest.inputs.runtimeOwnerManifestPath), 'runtime-owner-candidates.arrow'));
+  const runtimeBytes = readFileSync(runtimeArtifactPath);
+  if (sha256(runtimeBytes) !== graphManifest.inputs.runtimeOwnerArtifactSha256
+    || sha256(runtimeBytes) !== runtimeManifest.artifacts?.['runtime-owner-candidates.arrow']?.sha256) {
+    throw new Error('RUNTIME_OWNER_GRAPH_ARTIFACT_BINDING_INVALID');
+  }
+  runtimeOwnerRows = arrowRows(runtimeBytes).map(row => ({
+    ...row, executionProven: row.executionProven === 1, sourceRevisionQualified: row.sourceRevisionQualified === 1,
+  }));
+  if (runtimeOwnerRows.length !== runtimeManifest.ownerCandidates) throw new Error('RUNTIME_OWNER_GRAPH_ROW_COUNT_INVALID');
+  for (const row of runtimeOwnerRows) {
+    if (runtimeOwnerByCapability.has(row.capabilityId)) throw new Error('RUNTIME_OWNER_GRAPH_DUPLICATE_CAPABILITY');
+    runtimeOwnerByCapability.set(row.capabilityId, row);
+  }
+}
 const domainRows = arrowRows(domainBytes);
 const vocabulary = readJson(domainManifest.inputs.vocabularyPath);
 const groupIds = new Set(vocabulary.groups.map(group => group.group_id ?? group.id));
@@ -96,6 +132,7 @@ const typeCounts = {};
 const fileDigestCache = new Map();
 let taskDirectoryVerified = 0;
 let domainEdgesVerified = 0;
+let runtimeOwnerEdgesVerified = 0;
 for (const edge of edges) {
   const source = byOrdinal.get(edge.sourceOrdinal);
   const target = byOrdinal.get(edge.targetOrdinal);
@@ -133,16 +170,50 @@ for (const edge of edges) {
       || edge.evidenceStatus !== 'SUMMARY_DERIVED_PROPOSAL_ONLY') throw new Error('DIRECTORY_DOMAIN_EDGE_EVIDENCE_MISMATCH');
     domainEdgesVerified += 1;
   }
+  if (edge.edgeType === 'DIRECTORY_DECLARED_RUNTIME_OWNER_CANDIDATE') {
+    const runtime = runtimeOwnerByCapability.get(edge.capabilityId);
+    if (!runtime || source.nodeType !== 'DIRECTORY' || target.nodeType !== 'RUNTIME_OWNER_CANDIDATE'
+      || source.relativePath !== runtime.parentDirectoryPath || edge.sourcePath !== runtime.ownerPath
+      || edge.sourceSha256 !== runtime.ownerFileSha256 || target.relativePath !== runtime.ownerPath
+      || target.sourceSha256 !== runtime.ownerFileSha256 || target.capabilityId !== runtime.capabilityId
+      || edge.evidenceStatus !== 'DECLARED_OWNER_REGISTRY_AND_CURRENT_BYTES_ONLY'
+      || edge.executionProven !== 0 || edge.sourceRevisionQualified !== 0
+      || target.executionProven !== 0 || target.sourceRevisionQualified !== 0) throw new Error('RUNTIME_OWNER_GRAPH_EDGE_INVALID');
+    const ownerPath = inside(runtime.ownerPath);
+    const stat = lstatSync(ownerPath);
+    if (!stat.isFile() || stat.isSymbolicLink() || sha256(readFileSync(ownerPath)) !== runtime.ownerFileSha256) {
+      throw new Error('RUNTIME_OWNER_GRAPH_CURRENT_BYTES_MISMATCH');
+    }
+    runtimeOwnerEdgesVerified += 1;
+  }
 }
 if (nodes.length !== graphManifest.counts.nodeCount || edges.length !== graphManifest.counts.edgeCount
   || canonical(typeCounts) !== canonical(graphManifest.counts.edgeTypeCounts)
   || taskDirectoryVerified !== graphManifest.counts.taskDirectoryEdges
-  || domainEdgesVerified !== graphManifest.counts.directoryDomainCandidateEdges) throw new Error('GRAPH_READBACK_COUNTS_MISMATCH');
+  || domainEdgesVerified !== graphManifest.counts.directoryDomainCandidateEdges
+  || runtimeOwnerEdgesVerified !== (graphManifest.counts.runtimeOwnerCandidateEdges ?? 0)
+  || runtimeOwnerEdgesVerified !== runtimeOwnerRows.length) throw new Error('GRAPH_READBACK_COUNTS_MISMATCH');
 
 const allowedTypes = new Set(['OPENSPEC_TASK_REFERENCES_PATH_CANDIDATE', 'FILE_PARENT_DIRECTORY_CANDIDATE', 'DIRECTORY_DOMAIN_CANDIDATE']);
+const allowedEvidenceStatuses = [
+  'EXACT_PATH_AND_TARGET_DIGEST_CAPTURED',
+  'PATH_PARENT_AND_SUMMARY_DIGEST_MATCH_ADVISORY',
+  'SUMMARY_DERIVED_PROPOSAL_ONLY',
+];
+if (JSON.stringify(traversalsArtifact.allowedEvidenceStatuses) !== JSON.stringify(allowedEvidenceStatuses)
+  || graphManifest.traversal?.allowedEvidenceStatuses?.join('\0') !== allowedEvidenceStatuses.join('\0')) {
+  throw new Error('TRAVERSAL_EVIDENCE_POLICY_MISMATCH');
+}
+const allowedStatusSet = new Set(allowedEvidenceStatuses);
+const traversalEvidenceExcludedEdgeCount = edges.filter(edge => allowedTypes.has(edge.edgeType)
+  && !allowedStatusSet.has(edge.evidenceStatus)).length;
+if (traversalsArtifact.excludedEdgeCount !== traversalEvidenceExcludedEdgeCount
+  || graphManifest.counts.traversalEvidenceExcludedEdgeCount !== traversalEvidenceExcludedEdgeCount) {
+  throw new Error('TRAVERSAL_EVIDENCE_EXCLUSION_COUNT_MISMATCH');
+}
 const adjacency = new Map();
 for (const edge of edges) {
-  if (!allowedTypes.has(edge.edgeType)) continue;
+  if (!allowedTypes.has(edge.edgeType) || !allowedStatusSet.has(edge.evidenceStatus)) continue;
   if (!adjacency.has(edge.sourceOrdinal)) adjacency.set(edge.sourceOrdinal, []);
   adjacency.get(edge.sourceOrdinal).push(edge);
 }
@@ -183,6 +254,71 @@ for (let index = 0; index < taskNodes.length; index += 1) {
 if (traversalDomainTasks !== graphManifest.counts.tasksWithDomainCandidates
   || traversalTruncated !== graphManifest.counts.fanoutTruncatedTaskCount) throw new Error('TRAVERSAL_SUMMARY_MISMATCH');
 
+let runtimeTraversalTaskCount = 0;
+let runtimeTraversalTruncated = 0;
+const runtimeReachCountByCapability = new Map();
+if (runtimeTraversalsArtifact) {
+  const expectedTypes = [...allowedTypes, 'DIRECTORY_DECLARED_RUNTIME_OWNER_CANDIDATE'];
+  const expectedStatuses = [...allowedEvidenceStatuses, 'DECLARED_OWNER_REGISTRY_AND_CURRENT_BYTES_ONLY'];
+  if (runtimeTraversalsArtifact.schema !== 'atlas.openspec-runtime-owner-candidate-traversals.v1'
+    || runtimeTraversalsArtifact.authorityStatus !== 'ADVISORY_DECLARED_RUNTIME_OWNER_CANDIDATE_TRAVERSAL_ONLY'
+    || runtimeTraversalsArtifact.canonicalAuthority !== false
+    || JSON.stringify(runtimeTraversalsArtifact.allowedEdgeTypes) !== JSON.stringify(expectedTypes)
+    || JSON.stringify(runtimeTraversalsArtifact.allowedEvidenceStatuses) !== JSON.stringify(expectedStatuses)
+    || graphManifest.runtimeTraversal?.allowedEdgeTypes?.join('\0') !== expectedTypes.join('\0')
+    || graphManifest.runtimeTraversal?.allowedEvidenceStatuses?.join('\0') !== expectedStatuses.join('\0')) {
+    throw new Error('RUNTIME_TRAVERSAL_POLICY_MISMATCH');
+  }
+  const typeSet = new Set(expectedTypes);
+  const statusSet = new Set(expectedStatuses);
+  const runtimeAdjacency = new Map();
+  for (const edge of edges) {
+    if (!typeSet.has(edge.edgeType) || !statusSet.has(edge.evidenceStatus)) continue;
+    if (!runtimeAdjacency.has(edge.sourceOrdinal)) runtimeAdjacency.set(edge.sourceOrdinal, []);
+    runtimeAdjacency.get(edge.sourceOrdinal).push(edge);
+  }
+  for (const rows of runtimeAdjacency.values()) rows.sort((left, right) => left.targetOrdinal - right.targetOrdinal
+    || left.edgeType.localeCompare(right.edgeType) || left.startByte - right.startByte);
+  if (runtimeTraversalsArtifact.traversals.length !== taskNodes.length) throw new Error('RUNTIME_TRAVERSAL_TASK_COUNT_MISMATCH');
+  for (let index = 0; index < taskNodes.length; index += 1) {
+    const task = taskNodes[index];
+    const expected = runtimeTraversalsArtifact.traversals[index];
+    if (expected.taskRef !== task.taskRef || expected.taskBlockSha256 !== task.taskBlockSha256) throw new Error('RUNTIME_TRAVERSAL_TASK_IDENTITY_MISMATCH');
+    const queue = [{ ordinal: task.ordinal, hops: 0 }];
+    const visited = new Set([task.ordinal]);
+    const capabilities = new Set();
+    let truncated = false;
+    for (let head = 0; head < queue.length; head += 1) {
+      const current = queue[head];
+      if (current.hops >= 3) continue;
+      const neighbors = runtimeAdjacency.get(current.ordinal) ?? [];
+      if (neighbors.length > 20) truncated = true;
+      for (const edge of neighbors.slice(0, 20)) {
+        if (visited.has(edge.targetOrdinal)) continue;
+        visited.add(edge.targetOrdinal);
+        const target = byOrdinal.get(edge.targetOrdinal);
+        if (target.nodeType === 'RUNTIME_OWNER_CANDIDATE') capabilities.add(target.capabilityId);
+        queue.push({ ordinal: edge.targetOrdinal, hops: current.hops + 1 });
+      }
+    }
+    const sortedCapabilities = [...capabilities].sort();
+    if (JSON.stringify(sortedCapabilities) !== JSON.stringify(expected.runtimeOwnerCapabilities)
+      || expected.fanoutTruncated !== truncated) throw new Error(`RUNTIME_TRAVERSAL_RESULT_MISMATCH:${task.taskRef}`);
+    if (sortedCapabilities.length) runtimeTraversalTaskCount += 1;
+    if (truncated) runtimeTraversalTruncated += 1;
+    for (const capabilityId of sortedCapabilities) runtimeReachCountByCapability.set(capabilityId,
+      (runtimeReachCountByCapability.get(capabilityId) ?? 0) + 1);
+  }
+  const expectedReach = [...runtimeReachCountByCapability].map(([capabilityId, taskCount]) => ({ capabilityId, taskCount }))
+    .sort((left, right) => right.taskCount - left.taskCount || left.capabilityId.localeCompare(right.capabilityId));
+  if (JSON.stringify(expectedReach) !== JSON.stringify(runtimeTraversalsArtifact.runtimeOwnerReach)
+    || runtimeTraversalTaskCount !== graphManifest.counts.tasksWithRuntimeOwnerCandidates
+    || expectedReach.length !== graphManifest.counts.distinctRuntimeOwnerCandidatesReached
+    || runtimeTraversalTruncated !== graphManifest.counts.runtimeFanoutTruncatedTaskCount) {
+    throw new Error('RUNTIME_TRAVERSAL_SUMMARY_MISMATCH');
+  }
+}
+
 const body = {
   schema: 'atlas.openspec-domain-candidate-graph-independent-readback.v1',
   runId: graphManifest.runId,
@@ -195,11 +331,17 @@ const body = {
   edgeTypeCounts: typeCounts,
   taskDirectoryEdgesVerified: taskDirectoryVerified,
   directoryDomainEdgesVerified: domainEdgesVerified,
+  runtimeOwnerEdgesVerified,
+  traversalEvidenceStatuses: allowedEvidenceStatuses,
+  traversalEvidenceExcludedEdgeCount,
   domainRowsLineageVerified: domainRows.length,
   currentSourceFilesRehashed: fileDigestCache.size,
   taskCount: taskNodes.length,
   tasksWithDomainCandidates: traversalDomainTasks,
   fanoutTruncatedTaskCount: traversalTruncated,
+  runtimeOwnerTaskCount: runtimeTraversalTaskCount,
+  distinctRuntimeOwnerCandidatesReached: runtimeReachCountByCapability.size,
+  runtimeOwnerFanoutTruncatedTaskCount: runtimeTraversalTruncated,
   productionWrites: false,
 };
 const receiptBytes = Buffer.from(`${JSON.stringify({ ...body, receiptSha256: sha256(Buffer.from(canonical(body))) }, null, 2)}\n`, 'utf8');
