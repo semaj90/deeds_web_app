@@ -1864,6 +1864,17 @@ The `.okf/indexes/feature-intelligence.yaml` file specifies canonical PostgreSQL
 - **Authority engine:** the authority table is fed by Neo4j GDS (`implementation: 'neo4j-gds'`, `promote-pagerank-authority-from-neo4j.mjs`). NetworkX is the CPU parity reference, not the table's source.
 - **Qdrant parity canonical:** `codebase_chunks_768_v2` (`atlas-qdrant-768-v2`). `codebase_chunks_768` is `legacy: true`; the 384 contracts are retired and must not be used as canonical in specs or fixtures.
 
+## Parent Atlas workstation: source identity and schema-change rules (2026-10-22)
+
+Permanent rules for the Parent Atlas workstation subhelpers. Receipts and task status stay in the OpenSpec owners.
+
+- **Match a source by checksum + `source_ref` + `file_path` together.** Never match on `source_ref` or `file_path` alone, and never treat a checksum match as proof of workspace admission.
+- **Write source identity as an upsert, not a plain insert.** The conflict target must name the live unique key (for `graphify_files`, `workspace_id`, `source_ref`, `code_source_revision`, and `COALESCE(workspace_revision, '')`), and the update must not overwrite a different workspace revision.
+- **Keep these identity checks in the same module as the existing metadata subhelpers.** Do not add a second copy elsewhere.
+- **Schema change = table, index, or migrate, done in this order:** (1) write a `drizzle/manual/*.sql` file with a pre-image note and a post-check, (2) test it in a transaction that ends in `ROLLBACK`, (3) apply only with explicit approval, (4) verify the row count and index state afterward, and (5) record the result in the owning OpenSpec `tasks.md`.
+- **Before dropping or changing a unique index, search for `ON CONFLICT` targets that use it.** A writer using the old conflict target fails once the index is gone. Change the writer in the same release.
+- **Historical rows are not overwritten.** New workspace-revision rows need independently verified source evidence. A new unique key does not validate old results.
+
 ## Parent Atlas — Canonical Source, AST, and Retrieval Invariants (2026-10-15)
 
 Permanent rules only. Phase status, receipts, and implementation tasks live in the OpenSpec owners (`openspec/changes/parent-atlas-retrieval-lineage-dag-convergence`, `parent-atlas-chunk-index-whole-file-hash`, `parent-atlas-retrieval-lod-algorithm-taxonomy`, `parent-atlas-adaptive-backprop-hll-monitoring`).

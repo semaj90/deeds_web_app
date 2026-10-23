@@ -19,6 +19,15 @@ describe('resolveStructuralLanguageV1', () => {
     });
   });
 
+  it('routes Svelte files through the sidecar Svelte parser, not ast-grep', () => {
+    expect(resolveStructuralLanguageV1({ sourceRef: 'src/routes/+page.svelte' })).toEqual({
+      status: 'RESOLVED',
+      language: 'svelte',
+      provider: 'treesitter-chunker-8095',
+      source: 'FILE_EXTENSION',
+    });
+  });
+
   it('rejects conflicting LSP, explicit, and extension language evidence', () => {
     expect(resolveStructuralLanguageV1({
       sourceRef: 'src/parser.py',

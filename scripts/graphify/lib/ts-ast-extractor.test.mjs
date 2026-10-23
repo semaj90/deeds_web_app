@@ -1,8 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import { extractSymbolsFromSource } from './ts-ast-extractor.mjs';
+import { extractSymbolsFromSource, extractSymbolsFromSourceGuarded } from './ts-ast-extractor.mjs';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const admittedHangingSource = path.join(
+  repoRoot,
+  '.tmp',
+  'workspace-source-snapshots',
+  '6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b',
+  'scripts',
+  'atlas',
+  'audit-qdrant-noise.mjs',
+);
 
 test('extracts a top-level function with correct byte offsets and fingerprint', () => {
   const source = `export function PATCH() { return authorizeCase(); }\n`;
@@ -56,3 +70,32 @@ test('two structurally different symbols never collide on ast_fingerprint', () =
   const fingerprints = symbols.map((s) => s.ast_fingerprint);
   assert.equal(new Set(fingerprints).size, fingerprints.length);
 });
+
+test('malformed syntax fails closed with PARSE_FAILED', () => {
+  assert.throws(
+    () => extractSymbolsFromSource('const value = ;', 'malformed.ts'),
+    (err) => err.code === 'PARSE_FAILED' && /malformed\.ts:1:15/.test(err.message),
+  );
+});
+
+test('guarded extraction returns the same symbols as the in-process parse for valid source', () => {
+  const source = `export function PATCH() { return 1; }\ninterface Shape { area(): number; }\n`;
+  assert.deepEqual(
+    extractSymbolsFromSourceGuarded(source, 'fixture.ts', 20_000),
+    extractSymbolsFromSource(source, 'fixture.ts'),
+  );
+});
+
+test(
+  'admitted audit-qdrant-noise.mjs bytes fail fast as PARSE_TIMEOUT instead of stalling',
+  { skip: !fs.existsSync(admittedHangingSource) && 'admitted snapshot not present' },
+  () => {
+    const content = fs.readFileSync(admittedHangingSource, 'utf8');
+    const started = Date.now();
+    assert.throws(
+      () => extractSymbolsFromSourceGuarded(content, 'audit-qdrant-noise.mjs', 3_000),
+      (err) => err.code === 'PARSE_TIMEOUT',
+    );
+    assert.ok(Date.now() - started < 15_000, 'guard must return near its timeout, not hang');
+  },
+);

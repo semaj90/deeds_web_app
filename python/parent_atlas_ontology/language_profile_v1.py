@@ -55,14 +55,23 @@ def validate_profile(profile: dict[str, Any], schema: dict[str, Any]) -> list[st
     ]
 
 
-def validate_profile_directory(profile_dir: Path, schema_path: Path) -> dict[str, Any]:
+def validate_profile_directory(
+    profile_dir: Path,
+    schema_path: Path,
+    profile_names: list[str] | None = None,
+) -> dict[str, Any]:
     schema_bytes = schema_path.read_bytes()
     schema = json.loads(schema_bytes)
     Draft202012Validator.check_schema(schema)
     profiles = []
     errors = []
     input_hashes = []
-    for path in sorted(profile_dir.glob("*.yaml"), key=lambda item: item.name.casefold()):
+    profile_paths = (
+        [profile_dir / name for name in profile_names]
+        if profile_names is not None
+        else list(profile_dir.glob("*.yaml"))
+    )
+    for path in sorted(profile_paths, key=lambda item: item.name.casefold()):
         profile_bytes = path.read_bytes()
         input_hashes.append({"path": path.as_posix(), "sha256": hashlib.sha256(profile_bytes).hexdigest()})
         try:
@@ -111,9 +120,14 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile-dir", type=Path, required=True)
     parser.add_argument("--schema", type=Path, required=True)
+    parser.add_argument("--manifest", type=Path)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    result = validate_profile_directory(args.profile_dir, args.schema)
+    profile_names = None
+    if args.manifest:
+        manifest = parse_profile(args.manifest.read_text(encoding="utf-8"))
+        profile_names = manifest["registries"]["languages"]["schemas"]
+    result = validate_profile_directory(args.profile_dir, args.schema, profile_names)
     result["reportPath"] = args.output.as_posix() if args.output else None
     result["reportWritten"] = args.output is not None
     rendered = json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2) + "\n"

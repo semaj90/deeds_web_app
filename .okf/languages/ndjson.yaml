@@ -1,0 +1,10 @@
+# Newline-Delimited JSON Profile for OKF (line-oriented; no Tree-sitter grammar in the catalog)
+
+version: 1
+language: ndjson
+name: NDJSON / JSON Lines
+grammar: none
+
+extensions:
+  - .ndjson
+  - .jsonl

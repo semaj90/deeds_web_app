@@ -35,7 +35,7 @@ export const codeRevisionAuthorityV2Schema = z.object({
   callerSuppliedWorkspaceRevisionAccepted: z.literal(false),
   callerSuppliedSourceRevisionAccepted: z.literal(false),
   gitCommitIsProvenanceOnly: z.literal(true),
-  canonicalWritesAllowed: z.boolean(),
+  canonicalWritesAllowed: z.literal(false),
   producerRevision: revision,
   authorityChecksum: sha256,
 }).strict();
@@ -67,10 +67,10 @@ function normalizeSourceRef(workspaceRoot: string, absolutePath: string): string
 export function deriveCodeRevisionAuthorityV2(input: {
   workspaceRoot: string;
   absoluteSourcePath: string;
+  sourceBytes: Uint8Array;
   workspaceRecord: WorkspaceRevisionRecordV1;
   sourceBinding: WorkspaceSourceBindingV1;
   producerRevision: string;
-  canonicalWritesAllowed?: boolean;
 }): CodeRevisionAuthorityV2 {
   const workspaceRoot = path.resolve(input.workspaceRoot);
   const absoluteSourcePath = path.resolve(input.absoluteSourcePath);
@@ -89,6 +89,18 @@ export function deriveCodeRevisionAuthorityV2(input: {
   }
   if (sourceBinding.sourceRevision !== `sha256:${sourceBinding.contentDigest}`) {
     throw new Error('CODE_REVISION_SOURCE_BINDING_DIGEST_MISMATCH');
+  }
+  if (!ArrayBuffer.isView(input.sourceBytes) || input.sourceBytes.BYTES_PER_ELEMENT !== 1 || input.sourceBytes.byteLength === 0) {
+    throw new Error('CODE_REVISION_SOURCE_BYTES_REQUIRED');
+  }
+  try {
+    new TextDecoder('utf-8', { fatal: true }).decode(input.sourceBytes);
+  } catch {
+    throw new Error('CODE_REVISION_SOURCE_BYTES_NOT_UTF8');
+  }
+  const sourceContentDigest = createHash('sha256').update(input.sourceBytes).digest('hex');
+  if (sourceContentDigest !== sourceBinding.contentDigest || input.sourceBytes.byteLength !== sourceBinding.byteLength) {
+    throw new Error('CODE_REVISION_SOURCE_BYTES_BINDING_MISMATCH');
   }
 
   const payload = {
@@ -110,7 +122,7 @@ export function deriveCodeRevisionAuthorityV2(input: {
     callerSuppliedWorkspaceRevisionAccepted: false as const,
     callerSuppliedSourceRevisionAccepted: false as const,
     gitCommitIsProvenanceOnly: true as const,
-    canonicalWritesAllowed: input.canonicalWritesAllowed ?? false,
+    canonicalWritesAllowed: false as const,
     producerRevision: input.producerRevision,
   };
 

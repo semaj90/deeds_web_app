@@ -357,8 +357,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:4153f11326a13edfea351faf2dec434f757af960ab24a3643bbabcabb7f7d79b",
       "path": ".okf/corpora/keyword-corpus.yaml",
-      "sha256": "10efdc0e0f48f3ad0797c4b1202cb38ca6718dae32d7d89ce6fa3232d63bd2a5",
-      "bytes": 21321,
+      "sha256": "784e95d70137468418c53fa255e596986019f3d905b19ab37b8bc2c761135143",
+      "bytes": 23121,
       "title": null,
       "documentKind": "DOCUMENT",
       "status": "ACTIVE_SUPPORTING",
@@ -1518,8 +1518,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
       "path": "CLAUDE.md",
-      "sha256": "5cd4caea3f383fa4699fd6b81b443d37967f57f046134cb84ac75f6d7da912f0",
-      "bytes": 177292,
+      "sha256": "4649f28479eef4dec67203cb609378b83980c428fa53b4960b15ea026660320c",
+      "bytes": 182378,
       "title": null,
       "documentKind": "CLAUDE_INSTRUCTIONS",
       "status": "CANONICAL_CURRENT",
@@ -55620,8 +55620,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:5779e2fb9656ce514231cba36ec6c9a1d3d1b8dc51af884218876c82337c3c34",
       "path": "docs/architecture/atlas-feature-taxonomy-sveltekit-draft.md",
-      "sha256": "6816311ae012f88825f47e6cf9aa34c31eb4fefc0109572bd478cbd983e8b424",
-      "bytes": 4988,
+      "sha256": "f13f6187164a85d7940950a140a8765e970d682645125d3aad4203b624a81f29",
+      "bytes": 5394,
       "title": null,
       "documentKind": "ARCHITECTURE",
       "status": "UNCLASSIFIED",
@@ -59322,6 +59322,49 @@
       "path": "docs/archive/2026-10-15/source-revision-backfill-disposition-v1.json",
       "sha256": "e97b9de71d53da69252967268deb329001bb93ce1eda80416d15265aa80b1da9",
       "bytes": 581,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:26ad1553eb16ca7639d8a7803776aad288b4665bdf4c3cb5f8bc3dc73d74b907",
+      "path": "docs/archive/CLAUDE-pre-consolidation-2026-10-20.md",
+      "sha256": "142816d22c054982d9e5b95f42cd3c930bfbfb842fa08733c4b0ec09840fe354",
+      "bytes": 178689,
       "title": null,
       "documentKind": "DOCUMENT",
       "status": "UNCLASSIFIED",
@@ -74970,6 +75013,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:a7f4398b98d8fb22955c1c38fa6991ae317136f56e9e6d6b7b9ee4162647ade7",
+      "path": "docs/reports/PARENT-ATLAS-OKF-MASTER-REPORT-2026-10-20.md",
+      "sha256": "b4218136851d47af6794c359ff3b4383f1517e14378cacac180ce8f210d33136",
+      "bytes": 17205,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:cba9e2865e0ea6dbc0f4ee45f61cadf0d0603413abc20957abca4d99342d0913",
       "path": "docs/reports/PARENT_ATLAS_CONTEXTUAL_TREE_SNAPSHOT.md",
       "sha256": "92b0d2426524057e6ce803c7d06d26871c8fbce154f353a9d14c96fe6a86e9db",
@@ -88275,6 +88361,92 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:f18ba80605faea606b20597c2185344c64bb9bc4b0ca6aa304e1d0428696b21f",
+      "path": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-20.json",
+      "sha256": "f2a663f36a02008907303983ec1ee32c3c3f85a3d913190b7f5bae1afe8f9156",
+      "bytes": 22730,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:db74eee53bd9ef8dee03f610cbeb7379364fcf6b66bc88d8ad2cbfff4a90dd1d",
+      "path": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-20.md",
+      "sha256": "0ac8d1af90640fe7abe559b5f8e8ff86175b1ac9771dd08cb23b5037a3baf160",
+      "bytes": 16831,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:a1ce311e77d017be5b79be31273c61a6e7221458d71cc29814fc3c569f6a31a1",
       "path": "docs/reports/atlas-canonical-projection-fabric-audit-followup-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json",
       "sha256": "c46631e14960621bb642901bd1e6c524f2e7b5af1c7dd69fa1cc0a57efc65a1b",
@@ -98423,6 +98595,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:172b361fd5a41ceb66ffae62ca9ba3e593a6ec4229cf4b620fd7fd8601a481a0",
+      "path": "docs/reports/canary-source-revision-readback-receipt-v1.json",
+      "sha256": "6dbbd64034e4ea13be45d377644c92e426b6f920bb7ecffcabb7dd05b9a47c62",
+      "bytes": 6398,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:981c2e5758e5a0e0db88ad7e4c0d52abbfbe121bd099d29d40f89fde2467d427",
       "path": "docs/reports/candidate-corpus-lineage-v1.json",
       "sha256": "4d1d0d97fd155be38c7fe45a3088510887c9fae32ce833fe3b4f947a6043f4fd",
@@ -99330,6 +99545,49 @@
       "path": "docs/reports/candidate-hydration-proof-v1-function-registry-seed.json",
       "sha256": "7689f427b31f0dbf1ff4b882d452f15014f040f116901694603b70c4707ba378",
       "bytes": 1770,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:517518aa761bb1ca03d2f06139839e8d9eee16f4a4baac63c0f6255856f2e47f",
+      "path": "docs/reports/candidate-lineage-backfill-plan-v1.json",
+      "sha256": "1007ddf8505f9c52712a315cdadcb763e213bd672783bce4f41952c48251b35c",
+      "bytes": 8017,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -105776,6 +106034,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:f1ddecfba239fad5cdddca4fec33754e4351f95b8c2c65c5e5a6acbe6f5fb1b7",
+      "path": "docs/reports/cudf-ace-packet-batch-receipt-v1.json",
+      "sha256": "6976151a165ca71289663c5099466044b77ceb8e67de4d5e91073c90230e3435",
+      "bytes": 16324,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:cfbeec13b56581daf8f46b1526ffd2c8ff976d5c173bd4cefe49cb0ed5250a6e",
       "path": "docs/reports/cudf-feature-json-ingest-receipt.json",
       "sha256": "c7b435a68c82979afa63816cc5eed7cb5fb155eeee45ed641aab6a89ec1d3e0a",
@@ -108401,8 +108702,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:afc595ed737f520cebd5e11c25b65325af6d2d19b44c653ba49ca87371857713",
       "path": "docs/reports/current-source-owner-reconciliation-v1.json",
-      "sha256": "b472439b93451b96fd15191def4e12551ae906788719d629c47d94a489a03479",
-      "bytes": 61955,
+      "sha256": "e684601ff0d289d76ac1a1700cf5fdd6b49df63f31b56ea593a0f22f68f5b3f7",
+      "bytes": 60536,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -108444,8 +108745,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:ed99827277429bdbcad4909b4ee12d00f5a3a2dff8370ac12b10e343d92d8e04",
       "path": "docs/reports/current-source-owner-reconciliation-v1.md",
-      "sha256": "ec42ee86ec2a8918d535ffe5bdbcae00cac9e6173a81c07e5728ed8e74651caf",
-      "bytes": 621,
+      "sha256": "edb7533300299dab970c3ee13e16374ef89e9044a15ec5d3bdab4ee8d01f20b0",
+      "bytes": 603,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -259847,8 +260148,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:fd9596fa09b9a4d7f535d11686fead42b5df77008cfd1c256cb01fcf5c47de08",
       "path": "docs/reports/pipeline-comprehensive-report-20261019.md",
-      "sha256": "b53d286f154e2d5ac2e3aaeda524d21bbde3d78b0bacaefcb42e2b252fcb56a4",
-      "bytes": 13527,
+      "sha256": "78d5b06d35b848261f057c83187e2d7d7d8950ab6ae571f26c823f9805ae752a",
+      "bytes": 14198,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -259890,8 +260191,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:296bad73db007dbc0c40128236c804f0561970ee7ae021745a07c7b4f0c9e2aa",
       "path": "docs/reports/pipeline-router-matrix-surfaces-v1.json",
-      "sha256": "9c950ecd61b28c02448d82ef89cf9736a0f675eef20759cbec4f7cb1d1054530",
-      "bytes": 86277,
+      "sha256": "9f4861d0e63bdf15e8bb3ad0a3146fb74645ba33f7c19b17de78dd24f5a4a21b",
+      "bytes": 87294,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -259933,8 +260234,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:62f4fbbb1e19994f33ef4d881964de7666d11d15af92fa03013ad7ffc19a7a8a",
       "path": "docs/reports/pipeline-status-v1.json",
-      "sha256": "4ec8c1d3815d34116e8f91e669c98556ee46e7e01840461c9ac80e1dbf8a328e",
-      "bytes": 5794,
+      "sha256": "1337fcee1aefa0ccf2b68d4743ad5cf3bbc987ec3129c18adc4ef4c8f9ac0718",
+      "bytes": 5872,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -312606,6 +312907,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e9c82dbe6829726111a7e1732c0c3d197cb86c93d25e5b0f376c207fc288f0f5",
+      "path": "docs/reports/turbovec-ae-quantized-benchmark-receipt-v1.json",
+      "sha256": "668dd252792db13672c71726a1683ba0489d4578342bce45a3e507ce4cf92780",
+      "bytes": 2761,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:15db95ace07aeedb16386553f067f9741a19f4c8241f6961128823db8b3a8a92",
       "path": "docs/reports/turbovec-ann-grpc-proof-v2-replay.json",
       "sha256": "d443278040cd477349440005336ec9e0a3026541aaf6fd954271e93f4b2b7bd5",
@@ -329128,8 +329472,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:6ceaa383eaee756c4354de38eda50f9455333af51aa369a1be723b37919e4fed",
       "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-      "sha256": "126025581bb4c969973405c0fd03ae3840db3be17b6aeae05d312520851da08e",
-      "bytes": 1514278,
+      "sha256": "fcc521ed94dab0b0ab36283202182d1586832c9cbb3e9f9f7bb4542635a08a46",
+      "bytes": 1580248,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -329143,9 +329487,9 @@
       "openspec": {
         "change": "parent-atlas-ace-rlm-bitfrost-integration",
         "taskRefs": [],
-        "completedTasks": 1035,
-        "totalTasks": 1648,
-        "progressFraction": 0.6280339805825242
+        "completedTasks": 1044,
+        "totalTasks": 1660,
+        "progressFraction": 0.6289156626506024
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -338631,8 +338975,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:c64cb69eaf88c4a744cb37be41b6949bcdf6b3b567fd2b463dea19d9c53b21fd",
       "path": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "sha256": "6d79479f50de0151d29696cf196e7ef0f00ba0dc96ccbe5975df972d2502278f",
-      "bytes": 1267004,
+      "sha256": "b308f4e510784380d975530ac105207a51a3442b01c06eaa728ce61286988ff3",
+      "bytes": 1269920,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -339964,8 +340308,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:53f81a1edf09df15cdd6e3963f1b7b4a873462f6de8fd81a25f6fbce76c0ec81",
       "path": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
-      "sha256": "62235a051493b882e13064789883d443015a5443605ade7b84a87463ff083888",
-      "bytes": 514266,
+      "sha256": "4a97cfc360e167183c1439e2534f4d301f0bcab8b99125fb13e1356433cc4df7",
+      "bytes": 516458,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -343275,8 +343619,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:d1f72aaca72e8e5dd5a2f3c23e790e8c9390fd72046b75060a80031bcbedd5f8",
       "path": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "sha256": "a4acc8d31d10770bb53759a352c84aa428ca12f367da8df2c8bd1d36527c7bc3",
-      "bytes": 1915822,
+      "sha256": "63c8d36759a0cc1b1f6596ab3987cdc8d89a26c98bc234ee68fe50c2d37cfaa3",
+      "bytes": 1918764,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -347231,8 +347575,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:6ee0b6856deefeddc74a0d8d757b0ccb1ca8dc99f699f44c8b7dc6c02a393373",
       "path": "openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md",
-      "sha256": "608d49c66f2039b40fb67c2da0ccd6ea8216332046d5920e49823f6c63b9d681",
-      "bytes": 216425,
+      "sha256": "d62432aea0583c66075363ffe4cab04b1ef733349e18e76c3f5c403c3d7cb5af",
+      "bytes": 217615,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",

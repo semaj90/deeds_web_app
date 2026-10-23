@@ -9,6 +9,7 @@ from python.parent_atlas_dspy_repair import (
     build_semantic_768_gepa_example_v1,
     compare_baseline_and_optimized_v1,
     validate_dspy_repair_output_v1,
+    validate_dspy_repair_request_v1,
 )
 
 
@@ -179,6 +180,48 @@ def test_dspy_repair_output_accepts_only_manifest_bound_refs_and_preserves_rank_
     )
     assert validated["targetCandidates"] == ["function:cache.lookup", "file:src/cache.ts"]
     assert validated["evidenceRefs"] == ["src/cache.ts#symbol:lookup", "tests/cache.test.ts"]
+
+
+def test_dspy_repair_request_contract_is_strict_and_normalizes_allowlists():
+    request = {
+        "schema": "atlas.dspy-repair-request.v1",
+        "contextManifestChecksum": "sha256:" + "a" * 64,
+        "query": "  inspect cache lookup  ",
+        "diagnosisContext": None,
+        "allowedTargetCandidateIds": [" file:cache.ts ", "function:cache.lookup"],
+        "allowedEvidenceRefs": ["src/cache.ts", "tests/cache.test.ts"],
+        "authority": "PROPOSAL_ONLY",
+    }
+    validated = validate_dspy_repair_request_v1(request)
+    assert validated["query"] == "inspect cache lookup"
+    assert validated["allowedTargetCandidateIds"] == ["file:cache.ts", "function:cache.lookup"]
+    assert validated["diagnosisContext"] is None
+
+
+@pytest.mark.parametrize(
+    ("mutate", "message"),
+    [
+        (lambda x: x.update(contextManifestChecksum="sha256:" + "z" * 64), "contextManifestChecksum"),
+        (lambda x: x.update(allowedEvidenceRefs=["src/cache.ts", "src/cache.ts"]), "duplicate identifiers"),
+        (lambda x: x.update(allowedTargetCandidateIds=[str(i) for i in range(513)]), "between 1 and 512"),
+        (lambda x: x.update(authority="CANONICAL"), "authority must be PROPOSAL_ONLY"),
+        (lambda x: x.update(diagnosisContext="😀" * 16_001), "32000 UTF-16 code units"),
+        (lambda x: x.update(unexpected=True), "exactly"),
+    ],
+)
+def test_dspy_repair_request_contract_fails_closed(mutate, message):
+    request = {
+        "schema": "atlas.dspy-repair-request.v1",
+        "contextManifestChecksum": "sha256:" + "a" * 64,
+        "query": "inspect cache lookup",
+        "diagnosisContext": None,
+        "allowedTargetCandidateIds": ["file:cache.ts"],
+        "allowedEvidenceRefs": ["src/cache.ts"],
+        "authority": "PROPOSAL_ONLY",
+    }
+    mutate(request)
+    with pytest.raises(ValueError, match=message):
+        validate_dspy_repair_request_v1(request)
 
 
 @pytest.mark.parametrize(

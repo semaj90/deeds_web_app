@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:ee7e5f1b15852409441b97bc88ba38f7f6230d499471ef0bc8d7daa4eaf0f954",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-ee7e5f1b1585-0421",
+    "manifestChecksum": "sha256:ee7e5f1b15852409441b97bc88ba38f7f6230d499471ef0bc8d7daa4eaf0f954",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:06c78f04394668786c057275bfff22d5f1291f456d79181c7296a5495d70a8cd",
+    "offset": 420,
+    "maxFiles": 1,
+    "shardChecksum": "sha256:f09229a7353e62ee7b572929924c7423cddfdc91fb284969f0e65b8b11940870",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "2d325184-ac0b-423c-b9c8-e172af32a855",
+      "sourceRef": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
+      "sourceRevision": "sha256:a69cb12bc99fb1e941566c051b8496092bf900b17f176b961f5533878e2f56e5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WOULD_EXTRACT",
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": 1,
+  "readbacks": [],
+  "generatedAt": "2026-10-22T17:18:49.216Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "ts_js": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 13,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "2d325184-ac0b-423c-b9c8-e172af32a855",
+      "sourceRef": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:a69cb12bc99fb1e941566c051b8496092bf900b17f176b961f5533878e2f56e5",
+      "sourceDigest": "sha256:a69cb12bc99fb1e941566c051b8496092bf900b17f176b961f5533878e2f56e5",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    }
+  ]
+}

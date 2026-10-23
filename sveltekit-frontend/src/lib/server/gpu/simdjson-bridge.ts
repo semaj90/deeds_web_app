@@ -203,6 +203,10 @@ export function getSimdStats() {
 
 const MAX_INPUT_BYTES = 64 * 1024 * 1024; // 64 MB — beyond this, bail early
 
+function utf8InputByteLength(input: string): number {
+	return Buffer.byteLength(input, 'utf8');
+}
+
 /** Minimum payload size for native simdjson path (V8 is faster for small strings) */
 const MIN_NATIVE_BYTES = 1024;
 
@@ -216,10 +220,12 @@ const MIN_NATIVE_BYTES = 1024;
 export type FastJsonParseBackend = 'SIMDJSON_NAPI' | 'V8_JSON_PARSE' | 'CACHE';
 
 export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T; backend: FastJsonParseBackend } {
+	const inputBytes = utf8InputByteLength(input);
+
 	// OOM guard — bail before any allocation
-	if (input.length > MAX_INPUT_BYTES) {
+	if (inputBytes > MAX_INPUT_BYTES) {
 		throw new RangeError(
-			`[simdjson-bridge] Input too large (${(input.length / 1e6).toFixed(1)} MB). ` +
+			`[simdjson-bridge] Input too large (${(inputBytes / 1e6).toFixed(1)} MB). ` +
 			`Max is ${MAX_INPUT_BYTES / 1e6} MB.`
 		);
 	}
@@ -230,10 +236,10 @@ export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T
 	if (cached !== undefined) return { value: cached as T, backend: 'CACHE' };
 
 	stats.misses++;
-	stats.totalBytesParsed += input.length;
+	stats.totalBytesParsed += inputBytes;
 
 	let result: T;
-	const native = input.length >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
+	const native = inputBytes >= MIN_NATIVE_BYTES ? getSimdJsonAddon() : null;
 
 	if (native) {
 		const start = performance.now();
@@ -268,7 +274,7 @@ export function fastJsonParse<T = unknown>(input: string): T {
  * Falls back to try/catch JSON.parse if addon unavailable.
  */
 export function fastJsonValidate(input: string): boolean {
-	if (input.length > MAX_INPUT_BYTES) return false;
+	if (utf8InputByteLength(input) > MAX_INPUT_BYTES) return false;
 
 	const native = getSimdJsonAddon();
 	if (native) {
@@ -292,7 +298,7 @@ export function fastJsonValidate(input: string): boolean {
  * Returns null if addon unavailable or path not found.
  */
 export function fastJsonExtractNumbers(input: string, pointer: string): Float64Array | null {
-	if (input.length > MAX_INPUT_BYTES) return null;
+	if (utf8InputByteLength(input) > MAX_INPUT_BYTES) return null;
 	const native = getSimdJsonAddon();
 	if (!native) return null;
 	try {
@@ -308,7 +314,7 @@ export function fastJsonExtractNumbers(input: string, pointer: string): Float64A
  * Example: fastJsonExtractField('{"model":"gemma4","status":"ok"}', "status") → "ok"
  */
 export function fastJsonExtractField(input: string, key: string): string | null {
-	if (input.length > MAX_INPUT_BYTES) return null;
+	if (utf8InputByteLength(input) > MAX_INPUT_BYTES) return null;
 
 	// Fast regex — captures first occurrence of `"key": <value>`
 	const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

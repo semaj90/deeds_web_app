@@ -1,0 +1,11 @@
+# PowerShell Language Profile for OKF
+
+version: 1
+language: powershell
+name: PowerShell
+grammar: powershell
+
+extensions:
+  - .ps1
+  - .psm1
+  - .psd1

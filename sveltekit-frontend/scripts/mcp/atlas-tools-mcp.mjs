@@ -973,6 +973,14 @@ export async function buildLiveAtlasContext(
       typeof (p.source_revision ?? p.sourceRevision) === 'string' &&
       (p.source_revision ?? p.sourceRevision).trim().length > 0,
     );
+    const packetBindings = packets.map((packet) => ({
+      packetKey: packet.packet_key ?? packet.packetKey ?? null,
+      sourceRevision: packet.source_revision ?? packet.sourceRevision ?? null,
+      workspaceRevision: packet.workspace_revision ?? packet.workspaceRevision ?? null,
+      sha256: packet.sha256 ?? null,
+      byteStart: packet.byte_start ?? packet.byteStart ?? null,
+      byteEnd: packet.byte_end ?? packet.byteEnd ?? null,
+    }));
     const rejectionReasons = [
       'NON_CANONICAL',
       ...(sourceRevisionKnown ? [] : ['MISSING_SOURCE_REVISION']),
@@ -989,6 +997,7 @@ export async function buildLiveAtlasContext(
       chunkIds: file.chunkIds.slice(0, 5),
       packetKey: identityBound ? packetKeys[0] : null,
       packetKeys,
+      packetBindings,
       featureId: packets[0]?.feature_id ?? null,
       identityBound,
       identityConflict,
@@ -1506,6 +1515,7 @@ function packetIdentityView(packet) {
     summary: typeof packet.summary === 'string' ? packet.summary.replace(/\s+/g, ' ').trim().slice(0, 300) : null,
     sha256: packet.sha256 ?? null,
     sourceRevision: packet.source_revision ?? packet.sourceRevision ?? null,
+    workspaceRevision: packet.workspace_revision ?? packet.workspaceRevision ?? null,
     byteStart: packet.byte_start ?? null,
     byteEnd: packet.byte_end ?? null,
     identityLane: packet.identity_lane ?? null,

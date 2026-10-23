@@ -115,6 +115,7 @@ try {
         SELECT source_ref, source_revision, content_hash
         FROM graphify_files
         WHERE source_ref IS NOT NULL
+          AND workspace_revision = 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc'
         ORDER BY source_ref
         LIMIT $1
       `, [limit])).rows

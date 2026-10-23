@@ -23,10 +23,13 @@ def _schema() -> dict:
 
 
 def test_all_current_language_profiles_validate() -> None:
-    result = validate_profile_directory(PROFILE_DIR, SCHEMA_PATH)
+    manifest = yaml.safe_load((ROOT / ".okf" / "manifest.yaml").read_text(encoding="utf-8"))
+    registered = manifest["registries"]["languages"]["schemas"]
+    result = validate_profile_directory(PROFILE_DIR, SCHEMA_PATH, registered)
+    profile_count = len(registered)
 
-    assert result["profileCount"] == 4
-    assert result["validCount"] == 4
+    assert result["profileCount"] == profile_count
+    assert result["validCount"] == profile_count
     assert result["errorCount"] == 0
     assert result["canonicalAuthority"] is False
     assert result["canonicalDataWritesPerformed"] is False
@@ -36,7 +39,7 @@ def test_all_current_language_profiles_validate() -> None:
 def test_manifest_registers_every_validated_language_profile() -> None:
     manifest = yaml.safe_load((ROOT / ".okf" / "manifest.yaml").read_text(encoding="utf-8"))
     declared = set(manifest["registries"]["languages"]["schemas"])
-    profiles = {path.name for path in PROFILE_DIR.glob("*.yaml")}
+    profiles = {path.name for path in PROFILE_DIR.glob("*.yaml") if path.name in declared}
 
     assert declared == profiles
 

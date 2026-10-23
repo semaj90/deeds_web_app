@@ -1,0 +1,190 @@
+{
+  "schema": "atlas.source-parser-route-census.v1",
+  "admittedListPath": "atlas/admitted.txt",
+  "admittedListSha256": "sha256:5ddcd68a259f41ef255257659a90cbe30e617f3f5af86b3a1562a16ad119a6c9",
+  "denominator": 24456,
+  "sidecar": {
+    "url": "http://127.0.0.1:8095",
+    "authorityStatus": "LIVE_READBACK",
+    "authorityRevision": "sha256:4407f506bcdde65937a4a76c2239f49bea71a9df2be68687fa84de546be5c039"
+  },
+  "statusCounts": {
+    "ROUTED": 23127,
+    "NO_PARSER_RULE": 1329
+  },
+  "routedByLanguage": {
+    "markdown": 7912,
+    "javascript": 4027,
+    "python": 578,
+    "json": 1597,
+    "typescript": 8048,
+    "go": 22,
+    "rust": 10,
+    "java": 1,
+    "svelte": 932
+  },
+  "byExtension": {
+    ".md": {
+      "total": 7912,
+      "statuses": {
+        "ROUTED": 7912
+      }
+    },
+    ".toml": {
+      "total": 12,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 12
+      }
+    },
+    ".mjs": {
+      "total": 3812,
+      "statuses": {
+        "ROUTED": 3812
+      }
+    },
+    ".js": {
+      "total": 124,
+      "statuses": {
+        "ROUTED": 124
+      }
+    },
+    ".py": {
+      "total": 578,
+      "statuses": {
+        "ROUTED": 578
+      }
+    },
+    ".yml": {
+      "total": 27,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 27
+      }
+    },
+    ".json": {
+      "total": 1597,
+      "statuses": {
+        "ROUTED": 1597
+      }
+    },
+    ".ps1": {
+      "total": 301,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 301
+      }
+    },
+    ".sh": {
+      "total": 99,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 99
+      }
+    },
+    ".sql": {
+      "total": 655,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 655
+      }
+    },
+    ".ts": {
+      "total": 7509,
+      "statuses": {
+        "ROUTED": 7509
+      }
+    },
+    ".go": {
+      "total": 22,
+      "statuses": {
+        "ROUTED": 22
+      }
+    },
+    ".rs": {
+      "total": 10,
+      "statuses": {
+        "ROUTED": 10
+      }
+    },
+    ".proto": {
+      "total": 101,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 101
+      }
+    },
+    ".yaml": {
+      "total": 78,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 78
+      }
+    },
+    ".cjs": {
+      "total": 91,
+      "statuses": {
+        "ROUTED": 91
+      }
+    },
+    ".jsonl": {
+      "total": 11,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 11
+      }
+    },
+    ".mts": {
+      "total": 539,
+      "statuses": {
+        "ROUTED": 539
+      }
+    },
+    ".h": {
+      "total": 3,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 3
+      }
+    },
+    ".cpp": {
+      "total": 16,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 16
+      }
+    },
+    ".java": {
+      "total": 1,
+      "statuses": {
+        "ROUTED": 1
+      }
+    },
+    ".psm1": {
+      "total": 1,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 1
+      }
+    },
+    ".c": {
+      "total": 10,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 10
+      }
+    },
+    ".cc": {
+      "total": 14,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 14
+      }
+    },
+    ".svelte": {
+      "total": 932,
+      "statuses": {
+        "ROUTED": 932
+      }
+    },
+    ".hpp": {
+      "total": 1,
+      "statuses": {
+        "NO_PARSER_RULE:UNSUPPORTED_EXTENSION": 1
+      }
+    }
+  },
+  "routeRows": 24456,
+  "routeRowsSha256": "sha256:6f16fea92078ec997d01677f9f64a8d453fd1eae8c4f80b973e1908f7c9dae4a",
+  "symbolPolicy": "Route status is not symbol authority; ROUTED sources remain candidates until canonical resolution.",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "receiptChecksum": "sha256:77ed0e5f7586d86025c0af74c310f5f92157d72059a40bfbe1ce4fb5a569236b"
+}

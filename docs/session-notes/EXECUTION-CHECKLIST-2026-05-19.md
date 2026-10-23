@@ -50,7 +50,7 @@ Capture the current runtime truth, required infra fixes, validation steps that b
 
 ## 8. Feature-labeling execution plan
 ### Goal
-Use AVX2/simdjson parsing to normalize connection payloads into stable labels, then feed those labels into Redis, Qdrant, JSONL export, ClusterCards, Hermes routing, ACE compaction, and cluster-summary prompts.
+Use AVX2/simdjson parsing to normalize connection payloads into stable labels, then feed those labels into Redis-valkey, Qdrant, JSONL export, ClusterCards, Hermes routing, ACE compaction, and cluster-summary prompts.
 
 ### Steps
 - Identify every payload parsing path that already uses `simdjson-bridge.ts`.

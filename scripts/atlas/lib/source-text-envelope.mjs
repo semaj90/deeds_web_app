@@ -25,22 +25,34 @@ const UTF16_BE_BOM = Buffer.from([0xfe, 0xff]);
  * documentKind governs downstream behavior (see graphify-symbol-extractor-v1.mts):
  *   code      -> symbol nominations allowed (graphify_symbols)
  *   json      -> JSON Pointer structural nodes, NO stableSymbolId, NO symbol promotion (atlas_ast_nodes)
+ *   jsonl     -> bounded record nodes, NO code symbols or record-derived identity (atlas_ast_nodes)
  *   markdown  -> heading/section nodes (atlas_ast_nodes); embedded fenced code MAY recurse into
  *                the code parser and gain real symbol identity, with explicit document/section
  *                provenance -- the heading itself is never a code symbol
  *   plaintext -> document/paragraph nodes only, no symbol promotion (out of scope for v1: no
  *                structural extraction at all yet, reserved for future lexical/NLP enrichment)
+ *   sidecar_code -> parser observations selected only from the runtime capability map; never a
+ *                   local parser guess or deterministic graphify symbol nomination
  */
 export const SOURCE_KINDS = {
   '.ts': { documentKind: 'code', parserLanguage: 'typescript', lspLanguageId: 'typescript' },
   '.mts': { documentKind: 'code', parserLanguage: 'typescript', lspLanguageId: 'typescript' },
+  '.cts': { documentKind: 'code', parserLanguage: 'typescript', lspLanguageId: 'typescript' },
   '.tsx': { documentKind: 'code', parserLanguage: 'typescript', lspLanguageId: 'typescriptreact' },
   '.js': { documentKind: 'code', parserLanguage: 'javascript', lspLanguageId: 'javascript' },
   '.mjs': { documentKind: 'code', parserLanguage: 'javascript', lspLanguageId: 'javascript' },
   '.cjs': { documentKind: 'code', parserLanguage: 'javascript', lspLanguageId: 'javascript' },
   '.jsx': { documentKind: 'code', parserLanguage: 'javascript', lspLanguageId: 'javascriptreact' },
+  '.svelte': { documentKind: 'sidecar_code', parserLanguage: null, lspLanguageId: 'svelte' },
+  '.py': { documentKind: 'sidecar_code', parserLanguage: null, lspLanguageId: 'python' },
+  '.pyi': { documentKind: 'sidecar_code', parserLanguage: null, lspLanguageId: 'python' },
+  '.go': { documentKind: 'sidecar_code', parserLanguage: null, lspLanguageId: 'go' },
+  '.rs': { documentKind: 'sidecar_code', parserLanguage: null, lspLanguageId: 'rust' },
+  '.java': { documentKind: 'sidecar_code', parserLanguage: null, lspLanguageId: 'java' },
   '.json': { documentKind: 'json', parserLanguage: 'json', lspLanguageId: 'json' },
   '.jsonc': { documentKind: 'json', parserLanguage: 'jsonc', lspLanguageId: 'jsonc' },
+  '.jsonl': { documentKind: 'jsonl', parserLanguage: 'jsonl', lspLanguageId: 'jsonl' },
+  '.ndjson': { documentKind: 'jsonl', parserLanguage: 'jsonl', lspLanguageId: 'jsonl' },
   '.md': { documentKind: 'markdown', parserLanguage: 'markdown', lspLanguageId: 'markdown' },
   '.markdown': { documentKind: 'markdown', parserLanguage: 'markdown', lspLanguageId: 'markdown' },
   '.txt': { documentKind: 'plaintext', parserLanguage: 'plaintext', lspLanguageId: 'plaintext' },

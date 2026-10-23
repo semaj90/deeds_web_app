@@ -1,0 +1,10 @@
+# Shell Language Profile for OKF
+
+version: 1
+language: bash
+name: Bash / POSIX shell
+grammar: bash
+
+extensions:
+  - .sh
+  - .bash

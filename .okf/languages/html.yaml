@@ -1,0 +1,10 @@
+# HTML Language Profile for OKF
+
+version: 1
+language: html
+name: HTML
+grammar: html
+
+extensions:
+  - .html
+  - .htm

@@ -1,0 +1,10 @@
+# YAML Language Profile for OKF
+
+version: 1
+language: yaml
+name: YAML
+grammar: yaml
+
+extensions:
+  - .yaml
+  - .yml

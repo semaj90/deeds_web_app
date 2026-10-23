@@ -496,6 +496,11 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
     throw new Error('GRAPHIFY_RUN_CONTRACT_READBACK_MISMATCH');
   }
 
+  // New rows must be qualified by a verified workspace revision. A NULL here would land in the
+  // legacy compatibility bucket, which is not a proven workspace identity.
+  if (typeof record.workspaceRevision !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(record.workspaceRevision)) {
+    throw new Error('GRAPHIFY_WORKSPACE_REVISION_REQUIRED');
+  }
   const files: GraphifySourceInventoryWriterReceiptV2['files'] = [];
   for (const binding of selected) {
     // Legacy source_revision remains Git/base-commit provenance. For untracked
@@ -518,7 +523,7 @@ export async function writeGraphifySourceInventoryInTransactionV2(input: {
          first_seen_run_id,
          last_seen_run_id
        ) VALUES ($1,$2,$3,$4,'content_hash',$5,$6,$7,'UNPROCESSED',$8,$8)
-       ON CONFLICT (workspace_id, source_ref, code_source_revision)
+       ON CONFLICT (workspace_id, source_ref, code_source_revision, (COALESCE(workspace_revision, '')))
          WHERE code_source_revision IS NOT NULL
       DO UPDATE SET
          workspace_revision = EXCLUDED.workspace_revision,

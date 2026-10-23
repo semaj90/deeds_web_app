@@ -1,0 +1,10 @@
+# Markdown Language Profile for OKF
+
+version: 1
+language: markdown
+name: Markdown
+grammar: markdown
+
+extensions:
+  - .md
+  - .markdown

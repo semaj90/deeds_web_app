@@ -14,10 +14,27 @@ const workspaceRevision = arg('--workspace-revision');
 const executionId = arg('--execution-id');
 const expectedMembershipChecksum = arg('--membership-checksum');
 const repairRoot = arg('--repair-root-sha256');
+const emitRows = arg('--emit-rows');
+const reportOutput = arg('--report-out');
 if (!/^sha256:[0-9a-f]{64}$/.test(workspaceRevision ?? '')) throw new Error('EXPLICIT_WORKSPACE_REVISION_REQUIRED');
 if (!/^[0-9a-f-]{36}$/.test(executionId ?? '')) throw new Error('EXPLICIT_EXECUTION_ID_REQUIRED');
 if (!/^sha256:[0-9a-f]{64}$/.test(expectedMembershipChecksum ?? '')) throw new Error('EXPLICIT_MEMBERSHIP_CHECKSUM_REQUIRED');
 if (!/^[0-9a-f]{64}$/.test(repairRoot ?? '')) throw new Error('EXPLICIT_REPAIR_ROOT_SHA256_REQUIRED');
+
+const tmpAtlasRoot = path.resolve(REPO_ROOT, '.tmp/atlas');
+const resolveTmpOutput = (candidate, name) => {
+  if (!candidate) return null;
+  const resolved = path.resolve(REPO_ROOT, candidate);
+  const relative = path.relative(tmpAtlasRoot, resolved);
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error(`${name}_MUST_BE_UNDER_TMP_ATLAS`);
+  }
+  if (fs.existsSync(resolved)) throw new Error(`${name}_ALREADY_EXISTS`);
+  fs.mkdirSync(path.dirname(resolved), { recursive: true });
+  return resolved;
+};
+const emitRowsPath = resolveTmpOutput(emitRows, 'EMIT_ROWS');
+const reportOutputPath = resolveTmpOutput(reportOutput, 'REPORT_OUTPUT');
 
 const reports = path.join(REPO_ROOT, 'docs/reports');
 const scope = JSON.parse(fs.readFileSync(path.join(reports, 'current-workspace-lineage-scope-closure-v1.json'), 'utf8'));
@@ -73,7 +90,9 @@ try {
              bool_or(ast_revision IS NOT NULL AND ast_revision <> admitted_revision) AS has_other_revision
       FROM candidates GROUP BY source_ref, admitted_revision, admitted_content_hash
     )
-    SELECT source_ref, ast_rows, coalesce(workspace_match, false) AS workspace_match,
+    SELECT source_ref, admitted_revision AS source_revision,
+           admitted_content_hash AS source_content_digest, ast_rows,
+           coalesce(workspace_match, false) AS workspace_match,
            coalesce(workspace_mismatch, false) AS workspace_mismatch,
            coalesce(workspace_binding_missing, false) AS workspace_binding_missing,
            coalesce(revision_missing, false) AS revision_missing,
@@ -120,6 +139,16 @@ const capabilityOutcomes = Object.fromEntries(CAPABILITY_OUTCOMES_V1.map((name) 
 const reasonsByOutcome = {};
 for (const { cap } of capabilityRows) if (cap.reason) { const b = (reasonsByOutcome[cap.outcome] ??= {}); b[cap.reason] = (b[cap.reason] ?? 0) + 1; }
 const eligibleIdentities = capabilityRows.filter((c) => c.cap.language).length;
+const rowJsonl = capabilityRows.map(({ row, cap }) => JSON.stringify({
+  sourceRef: row.source_ref,
+  sourceRevision: row.source_revision,
+  sourceContentDigest: row.source_content_digest,
+  astRows: Number(row.ast_rows),
+  lineageClass: row.classification,
+  capabilityOutcome: cap.outcome,
+  capabilityReason: cap.reason ?? null,
+  language: cap.language,
+})).join(String.fromCharCode(10)) + String.fromCharCode(10);
 const capabilityCensus = {
   schema: 'atlas.current-file-analysis-capability-census.v1', derivedOnly: true, identityOwner: false,
   denominator: { membershipRowsRepoRoot: Number(membership.repoRootRows), distinctSourceIdentities: rows.length, duplicateMembershipRows: Number(membership.repoRootRows) - rows.length },
@@ -159,15 +188,19 @@ const report = {
   },
   classifications: classes,
   capabilityCensus,
+  ...(emitRowsPath ? { rowExport: {
+    path: path.relative(REPO_ROOT, emitRowsPath).replaceAll('\\', '/'),
+    rowCount: capabilityRows.length,
+    sha256: crypto.createHash('sha256').update(rowJsonl).digest('hex'),
+  } } : {}),
   gate: { name: 'CURRENT_WORKSPACE_LINEAGE', status: revisionQualifiedSources > 0 && classes.AST_EVIDENCE_ABSENT === 0 && classes.AST_REVISION_MISSING === 0 && classes.AST_SOURCE_MISMATCH === 0 && classes.AST_WORKSPACE_MISMATCH === 0 && classes.AST_STALE_OTHER_REVISION === 0 && classes.AST_WORKSPACE_BINDING_MISSING === 0 ? 'CURRENT_WORKSPACE_LINEAGE_PROVEN' : 'BLOCKED', blocker: revisionQualifiedSources === 0 ? 'CURRENT_AST_EVIDENCE_MISSING' : 'CURRENT_AST_EVIDENCE_INCOMPLETE_OR_UNBOUND' },
   generatedAt: new Date().toISOString(),
 };
 const canonicalReport = JSON.stringify(report, null, 2) + '\n';
 const reportDigest = crypto.createHash('sha256').update(canonicalReport).digest('hex');
 report.reportSha256 = reportDigest;
-const emitRows = arg('--emit-rows');
-if (emitRows) fs.writeFileSync(path.resolve(REPO_ROOT, emitRows), capabilityRows.map(({ row, cap }) => JSON.stringify({ sourceRef: row.source_ref, lineageClass: row.classification, capabilityOutcome: cap.outcome, language: cap.language })).join(String.fromCharCode(10)) + String.fromCharCode(10), 'utf8');
-const outPath = path.join(reports, `current-workspace-ast-lineage-v1-${reportDigest.slice(0, 16)}.json`);
+if (emitRowsPath) fs.writeFileSync(emitRowsPath, rowJsonl, { encoding: 'utf8', flag: 'wx' });
+const outPath = reportOutputPath ?? path.join(reports, `current-workspace-ast-lineage-v1-${reportDigest.slice(0, 16)}.json`);
 if (fs.existsSync(outPath)) throw new Error(`IMMUTABLE_REPORT_ALREADY_EXISTS:${path.basename(outPath)}`);
 fs.writeFileSync(outPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
 console.log(JSON.stringify({ reportPath: path.relative(REPO_ROOT, outPath), scope: report.scope, denominators: report.denominators, classifications: report.classifications, capabilityCensus: report.capabilityCensus, gate: report.gate }, null, 2));

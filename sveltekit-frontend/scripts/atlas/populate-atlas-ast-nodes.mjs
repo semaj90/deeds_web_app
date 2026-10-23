@@ -35,6 +35,12 @@ const scopeArg  = process.argv.find(a => a.startsWith('--scope='));
 const scopePath = scopeArg ? path.resolve(scopeArg.slice('--scope='.length).trim()) : null;
 const graphifyParse = process.argv.includes('--graphify-parse');
 const declarationsOnly = process.argv.includes('--declarations-only');
+// Exact-byte input mode: read each source from the admitted snapshot instead of the working tree.
+// Every read is digest-checked against the snapshot's sourceRevision before parsing (fail closed).
+const snapshotJsonArg = process.argv.find(a => a.startsWith('--snapshot-json='));
+const snapshotJsonPath = snapshotJsonArg ? path.resolve(snapshotJsonArg.slice('--snapshot-json='.length).trim()) : null;
+const snapshotRootArg = process.argv.find(a => a.startsWith('--snapshot-root='));
+const snapshotRoot = snapshotRootArg ? path.resolve(snapshotRootArg.slice('--snapshot-root='.length).trim()) : null;
 const graphifyReportArg = process.argv.find(a => a.startsWith('--out='));
 const graphifyReportPath = graphifyReportArg
   ? path.resolve(graphifyReportArg.slice('--out='.length).trim())
@@ -254,15 +260,51 @@ async function runGraphifyParseProbe() {
     extractor: 'ast-grep-napi',
   };
   const allCandidates = [];
+  const snapshotEntries = snapshotJsonPath
+    ? new Map(JSON.parse(readFileSync(snapshotJsonPath, 'utf8')).sources
+        .filter((s) => s.repositoryId === 'repo:root')
+        .map((s) => [s.sourceRef, s]))
+    : null;
+  if (snapshotEntries && !snapshotRoot) throw new Error('SNAPSHOT_ROOT_REQUIRED_WITH_SNAPSHOT_JSON');
+  // Admitted workspace revision for exact-byte mode: only from an explicit, authoritative admission receipt.
+  let snapshotWorkspaceRevision = null;
+  if (snapshotEntries) {
+    const admission = JSON.parse(readFileSync(path.join(REPO_ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+    if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
+      throw new Error('ADMITTED_WORKSPACE_REVISION_REQUIRED_FOR_SNAPSHOT_MODE');
+    }
+    snapshotWorkspaceRevision = admission.workspaceRevision;
+  }
   for (const sourceRef of boundedRefs) {
-    const absolutePath = resolveGraphifyFile(sourceRef);
-    if (!absolutePath) {
-      report.filesMissing++;
-      if (report.missingSample.length < 20) report.missingSample.push(sourceRef);
-      continue;
+    let absolutePath;
+    let sourceText;
+    let snapshotEntry = null;
+    if (snapshotEntries) {
+      const entry = snapshotEntries.get(sourceRef);
+      if (!entry) {
+        report.filesMissing++;
+        if (report.missingSample.length < 20) report.missingSample.push(sourceRef);
+        continue;
+      }
+      absolutePath = path.join(snapshotRoot, sourceRef);
+      const bytes = readFileSync(absolutePath);
+      if (`sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}` !== entry.sourceRevision) {
+        report.filesDigestMismatch = (report.filesDigestMismatch ?? 0) + 1;
+        continue;
+      }
+      sourceText = bytes.toString('utf8');
+      snapshotEntry = entry;
+    } else {
+      absolutePath = resolveGraphifyFile(sourceRef);
+      if (!absolutePath) {
+        report.filesMissing++;
+        if (report.missingSample.length < 20) report.missingSample.push(sourceRef);
+        continue;
+      }
+      sourceText = readFileSync(absolutePath, 'utf8');
     }
     report.filesResolved++;
-    const extracted = graphifyAstCandidates(sourceRef, absolutePath, readFileSync(absolutePath, 'utf8'));
+    const extracted = graphifyAstCandidates(sourceRef, absolutePath, sourceText);
     if (extracted.skipped) {
       report.filesSkippedUnsupported++;
       continue;
@@ -283,6 +325,12 @@ async function runGraphifyParseProbe() {
         candidate.source_revision = packet.source_revision ?? null;
         candidate.workspace_revision = packet.workspace_revision ?? null;
         candidate.domain_class = packet.domain_class ?? null;
+      }
+      if (snapshotEntry) {
+        // Exact-byte mode: bind to the verified snapshot digest and the admitted workspace revision.
+        // Packet-index placeholders (workspace:0 / 0) are overwritten, never kept.
+        candidate.source_revision = snapshotEntry.sourceRevision;
+        candidate.workspace_revision = snapshotWorkspaceRevision;
       }
       if (candidatesOutputPath) allCandidates.push(candidate);
       report.candidatesByKind[candidate.symbol_kind] = (report.candidatesByKind[candidate.symbol_kind] ?? 0) + 1;

@@ -6,7 +6,8 @@ export type StructuralLanguageV1 =
   | 'python'
   | 'rust'
   | 'go'
-  | 'java';
+  | 'java'
+  | 'svelte';
 
 export type StructuralLanguageResolutionV1 =
   | {
@@ -40,6 +41,7 @@ const LANGUAGE_ALIASES: Readonly<Record<string, StructuralLanguageV1>> = {
   go: 'go',
   golang: 'go',
   java: 'java',
+  svelte: 'svelte',
 };
 
 const EXTENSION_LANGUAGES: Readonly<Record<string, StructuralLanguageV1>> = {
@@ -55,6 +57,7 @@ const EXTENSION_LANGUAGES: Readonly<Record<string, StructuralLanguageV1>> = {
   '.rs': 'rust',
   '.go': 'go',
   '.java': 'java',
+  '.svelte': 'svelte',
 };
 
 function family(language: StructuralLanguageV1): string {

@@ -40,6 +40,11 @@ test('executeDspyLlamaServerRepair validates output against ContextManifestV2 al
     req.on('end', () => {
       const parsedBody = JSON.parse(body);
       assert.equal(parsedBody.model, 'ornith-1.5-9b');
+      const requestEnvelope = parsedBody.messages?.find((message) => message.role === 'user')?.content ?? '';
+      assert.match(requestEnvelope, /atlas\.dspy-repair-request\.v1/);
+      assert.match(requestEnvelope, new RegExp(`sha256:${manifest.identityChecksum}`));
+      assert.match(requestEnvelope, /allowedEvidenceRefs/);
+      assert.match(requestEnvelope, /PROPOSAL_ONLY/);
 
       const responsePayload = {
         choices: [

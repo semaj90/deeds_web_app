@@ -9713,7 +9713,7 @@ server.registerTool(
     description:
       'Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), ' +
       'feature_id, concept_id membership, or free-text summary match. ' +
-      'Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. ' +
+      'Returns packet identity, source/workspace revisions, byte spans, feature metadata, summary, and reward_prior. ' +
       'Use this to find which packets are associated with a file or feature before querying Qdrant.',
     inputSchema: atlasPacketSearchInputSchema,
   },
@@ -9772,7 +9772,7 @@ server.registerTool(
       const sql = `
         SELECT packet_id, packet_key, source_ref, feature_id, feature_label,
                community_id, concept_ids, cluster_id, summary,
-               byte_start, byte_end, sha256, metadata,
+               byte_start, byte_end, sha256, source_revision, workspace_revision, metadata,
                identity_lane, qdrant_point_id, reward_prior, created_at
         FROM atlas_packets
         ${where}

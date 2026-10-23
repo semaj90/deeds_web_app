@@ -108,7 +108,10 @@ class TestNonAstRouting(unittest.TestCase):
     def test_routes_and_no_domain_from_extension(self):
         for path, target in (
             ("docs/config.json", "simdjson_okf_validator"),
+            (".opencode/outcome.ndjson", "simdjson_okf_validator"),
             ("docs/spec.md", "doc_intelligence_spacy_pos"),
+            ("docs/spec.mdx", "doc_intelligence_spacy_pos"),
+            ("notes/readme.txt", "doc_intelligence_spacy_pos"),
             ("drizzle/0001_init.sql", "ddl_migration_regex_extractor"),
             ("cargo.toml", "unresolved_generic_carrier"),
         ):
@@ -117,6 +120,13 @@ class TestNonAstRouting(unittest.TestCase):
             self.assertEqual(r["lang_id"], 255)
             self.assertEqual(r["domain"], "unresolved")  # a file extension is not classification evidence
             self.assertEqual(r["lut_byte"], 0x00)
+            if path.endswith(".toml"):
+                self.assertEqual(r["route_status"], "NO_PARSER_RULE")
+            else:
+                self.assertEqual(r["route_status"], "ROUTE_RULE_PRESENT_NOT_EXECUTED")
+        jsonc = R.route_non_ast_chunk("opencode.jsonc", "{ // comment\n}")
+        self.assertEqual(jsonc["route_status"], "NO_PARSER_RULE")
+        self.assertEqual(jsonc["reason"], "unsupported extension: .jsonc")
 
 
 class TestBuildLinkedTuplesAndMmap(unittest.TestCase):

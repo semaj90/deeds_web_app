@@ -1,6 +1,8 @@
 import { ENV } from '$lib/server/env.server.js';
 import type { ContextManifestV2 } from '../graph/context-manifest-v2.js';
 import {
+	buildDspyRepairRequestV1,
+	serializeDspyRepairRequestV1,
   parseDspyRepairOutputV1,
   type DspyRepairOutputV1,
 } from './dspy-repair-output-v1.js';
@@ -44,9 +46,13 @@ export async function executeDspyLlamaServerRepair(input: {
   const timeoutMs = input.options?.timeoutMs ?? 7000;
 
   const manifest = input.manifest;
-  const manifestChecksum = `sha256:${manifest.identityChecksum}`;
-  const allowedEvidence = manifest.v1.evidenceRefs;
-  const allowedTargets = manifest.v1.selectedNodeKeys;
+  const request = buildDspyRepairRequestV1(manifest, {
+    diagnosisContext: input.diagnosisContext,
+  });
+  const serializedRequest = serializeDspyRepairRequestV1(request);
+  const manifestChecksum = request.contextManifestChecksum;
+  const allowedEvidence = request.allowedEvidenceRefs;
+  const allowedTargets = request.allowedTargetCandidateIds;
 
   const systemPrompt = [
     'You are Ornith 1.5 acting as a structured DSPy repair program.',
@@ -66,10 +72,7 @@ export async function executeDspyLlamaServerRepair(input: {
     'Do not invent any candidate or evidence ID outside the allowed lists. Respond with JSON only.',
   ].join('\n');
 
-  const userPrompt = [
-    `Context Manifest Query: ${manifest.v1.query}`,
-    input.diagnosisContext ? `Diagnosis Context:\n${input.diagnosisContext}` : '',
-  ].filter(Boolean).join('\n\n');
+  const userPrompt = `Serialized proposal-only request envelope:\n${serializedRequest}`;
 
   try {
     const res = await fetch(`${llamaUrl}/v1/chat/completions`, {

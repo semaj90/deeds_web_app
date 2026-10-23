@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.graphify-symbol-baseline-run.v1",
+  "generatedAt": "2026-10-22T20:51:13.647Z",
+  "manifestChecksum": "sha256:6940055c5dfba9d39cfd7105092adeac77f3cec8110bda73e924861f16f9bbea",
+  "manifestRowCount": 2173,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "apply": false,
+  "firstShard": 2,
+  "requestedBatches": 1,
+  "shardSize": 250,
+  "visitedMembers": 250,
+  "independentlyVerifiedMembers": 0,
+  "fullManifestVisited": false,
+  "baselineSealProven": false,
+  "filesAttemptedThisRun": 250,
+  "filesCommittedThisRun": 0,
+  "outcomeCounts": {
+    "WOULD_EXTRACT": 249,
+    "PARSE_FAILED": 1
+  },
+  "receipts": [
+    "docs\\reports\\graphify-symbol-extractor-v1-1792702273641.json"
+  ],
+  "canonicalAuthority": false,
+  "projectionAdmissionPromoted": false
+}

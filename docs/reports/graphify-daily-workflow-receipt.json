@@ -1,9 +1,9 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "c2dd8f24-ae69-4283-ab91-caf2cff46971",
-  "repositoryRevision": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d",
-  "generatedAt": "2026-10-16T18:28:16.968Z",
+  "runId": "6381c3d9-08ef-4ab4-bdd0-5b8cf3baabf0",
+  "repositoryRevision": "ee336464f4127ed09281814b2425de8fbc17ac76",
+  "generatedAt": "2026-10-22T16:26:15.168Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
@@ -11,8 +11,8 @@
       "status": "PROVEN",
       "totalFiles": 25542,
       "totalBytes": 473214249,
-      "currentRevision": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d",
-      "priorRevision": "9de1faa659053b4d6761d4de43c2074a1a29dc38"
+      "currentRevision": "ee336464f4127ed09281814b2425de8fbc17ac76",
+      "priorRevision": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d"
     },
     "inventory": {
       "status": "PROVEN",
@@ -1955,6 +1955,7 @@
       "modelNames": [
         "deterministic-hash-embedder"
       ],
+      "evidenceClass": "HASH_SMOKE",
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -2510,7 +2511,7 @@
       "redisProjectionRecords": 25542,
       "representationName": "semantic_768",
       "denseVectorName": "content",
-      "collectionName": "codebase_chunks_768"
+      "collectionName": "codebase_chunks_768_v2"
     },
     "validation": {
       "status": "PROVEN",

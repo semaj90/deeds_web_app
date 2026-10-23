@@ -19,6 +19,36 @@ The active web app in this repository lives in `sveltekit-frontend`.
 - npm
 - Optional but recommended on Windows: Git for Windows and Docker Desktop with WSL2 enabled
 
+## Parent Atlas Directory Intelligence (2026-10-22 status)
+
+Read-only mapping of the repo's files, languages and parser routes. Outputs are scratch receipts, not canonical authority.
+
+| Step | What it does | Where the output lands |
+|---|---|---|
+| Language profiles | 20 YAML profiles map 60 extensions to languages; `.h` stays unmapped (C or C++) | `.okf/languages/*.yaml` |
+| Coverage inventory | Walks the repo without pruning and records each path's role and scope (`python -m parent_atlas_ontology.language_coverage_v1`) | `.tmp/atlas/full-walk/` |
+| Embedding census | Counts chunks with 768-dim embeddings per top-level directory (Postgres, read-only) | used by the relevance score |
+| Relevance score | 0-100 per directory: 0.30 source share + 0.20 parser share + 0.30 embedding coverage + 0.20 log volume. A heuristic score, not a calibrated probability or a query-conditioned ranker | `docs/reports/directory-relevance-scores-2026-10-22.{md,json}` |
+| Valkey centroids | Language-distribution centroids per directory (not EmbeddingGemma semantic centroids), written under `atlas:dirintel:v1:centroid:*` with a 24-hour TTL | `.tmp/atlas/directory-intel/receipts/valkey-write-receipt.json` |
+| Parser route census | Routes all 24,456 admitted sources through the sidecar capability map (ROUTED 23,127; NO_PARSER_RULE 1,329) | `docs/reports/source-parser-route-census-2026-10-22.{md,json}` |
+| Completeness gate | A sidecar AST counts as complete only if `syntax_status` is `CLEAN`; partial parses are withheld | `scripts/atlas/lib/graphify-route-receipt-v1.mjs` |
+
+Verification status (what has been observed, not what is proven end to end):
+
+- Valkey: the write receipt lists the written keys. I read back the key count (95) and a sample TTL (86,385 seconds) directly from the container.
+- Route census: the sidecar capability readback returned authority revision `sha256:4407f506…`. The fail-closed path was exercised with the sidecar pointed at a dead port.
+- LangExtract: the running sidecar reports the official package loaded. A grounded request was refused for missing workspace lineage (`SOURCE_PACKET_WORKSPACE_LINEAGE_REQUIRED`), so no LangExtract evidence has been produced.
+
+Planned, not implemented: directory inventory → qualified source evidence → EmbeddingGemma 768d → contextual features → experimental 256d MLP → retrieval evaluation.
+
+Known limits:
+
+- Relevance scores are heuristic and unreviewed. They are not query relevance.
+- Embedding attribution per directory is approximate, because chunk path prefixes are mixed.
+- Valkey writes use `valkey-cli` inside the `legal-ai-valkey` container. `redis-py` is not used.
+- The `langextract` runtime is a local shim by default, so it is not yet usable as evidence.
+- The extractor's partial-parse rule is tested as a pure function. There is no end-to-end test with a real partial file yet.
+
 ## Audit And Mapping Tools
 
 The repo's audit playbooks assume `rg` is available for fast codebase-wide search.
