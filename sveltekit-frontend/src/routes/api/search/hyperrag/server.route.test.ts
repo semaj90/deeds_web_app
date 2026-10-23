@@ -152,28 +152,47 @@ describe('/api/search/hyperrag', () => {
     expect(mocks.bifrostChat).not.toHaveBeenCalled();
   });
 
-  it('compiles a revision-qualified retrieval plan and applies its candidate budget', async () => {
+  it('ignores caller-supplied workspace revisions and abstains from graph expansion', async () => {
     const { POST } = await import('./+server.js');
     const request = new Request('http://localhost/api/search/hyperrag', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-request-id': 'req-plan-1' },
-      body: JSON.stringify({ query: 'graph retrieval', workspaceRevision: 'sha256:workspace-1', topK: 7 }),
+      body: JSON.stringify({
+        query: 'Find SvelteKit 2 route functions that use Drizzle ORM',
+        workspaceId: 'forged-workspace',
+        workspaceRevision: 'sha256:workspace-1',
+        sourceRevision: 'sha256:source-1',
+        representationId: 'semantic_768',
+        representationRevision: 3,
+        topK: 7,
+        useGraph: true,
+      }),
     });
 
     const response = await POST({ request, url: new URL(request.url), locals: { user: { id: 'u1' } } } as any);
     expect(response.status).toBe(200);
     const body = await response.json();
-    expect(body.retrievalPlan).toEqual(expect.objectContaining({
-      schema: 'atlas.retrieval-plan.v1',
-      requestId: 'req-plan-1',
-      workspaceRevision: 'sha256:workspace-1',
-      candidateBudget: 7,
-      semanticRepresentation: 'semantic_768',
+    expect(body.retrievalPlan).toBeNull();
+    expect(body.workspaceAuthority).toEqual({
+      status: 'UNAVAILABLE',
+      reason: 'TRUSTED_WORKSPACE_AUTHORITY_RESOLVER_NOT_WIRED',
+      callerSuppliedWorkspaceContextIgnored: true,
+    });
+    expect(body.hypergraph.reason).toBe('TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE');
+    expect(body.graphPaths).toEqual([]);
+    expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({
+      text: 'Find SvelteKit 2 route functions that use Drizzle ORM',
+      topK: 7,
+      lexicalExpansion: expect.arrayContaining(['drizzle-orm', '@sveltejs/kit']),
     }));
-    expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({ topK: 7 }));
+    expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('workspaceId');
+    expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('workspaceRevision');
+    expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('sourceRevision');
+    expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('representationId');
+    expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('representationRevision');
   });
 
-  it('keeps function-registry retrieval off by default and enables it only with explicit config plus workspace revision', async () => {
+  it('does not enable the function registry from a caller-supplied revision', async () => {
     const { POST } = await import('./+server.js');
     const makeRequest = () => new Request('http://localhost/api/search/hyperrag', {
       method: 'POST',
@@ -189,15 +208,12 @@ describe('/api/search/hyperrag', () => {
     mocks.env.ATLAS_FUNCTION_REGISTRY_REPO_ROOT = 'C:/repo';
     const enabledRequest = makeRequest();
     await POST({ request: enabledRequest, url: new URL(enabledRequest.url), locals: { user: { id: 'u1' } } } as any);
-    expect(mocks.runtimeConfigs.at(-1)?.['functionRegistry']).toEqual({
-      enabled: true,
-      repoRoot: 'C:/repo',
-      maxCandidates: 4,
-    });
+    expect(mocks.runtimeConfigs.at(-1)?.['functionRegistry']).toBeUndefined();
   });
 
   it('blocks synthesis until admitted ContextManifest evidence is wired', async () => {
     const { POST } = await import('./+server.js');
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
     const request = new Request('http://localhost/api/search/hyperrag', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -212,6 +228,8 @@ describe('/api/search/hyperrag', () => {
     expect(body.synthesisStatus).toBe('BLOCKED_CONTEXT_MANIFEST_REQUIRED');
     expect(body.hits).toHaveLength(1);
     expect(mocks.bifrostChat).not.toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    fetchSpy.mockRestore();
   });
 
   it('redacts internal retrieval errors', async () => {
