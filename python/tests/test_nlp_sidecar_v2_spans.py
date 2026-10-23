@@ -168,3 +168,61 @@ def test_all_eight_new_language_routes_have_clean_v2_fixtures():
             span = source_bytes[chunk.start_byte:chunk.end_byte]
             assert span, language
             span.decode("utf-8")
+
+
+def test_v2_cpp_macro_function_declarations_keep_exact_original_spans():
+    source = """#define ATLAS_GEMM_API
+extern "C" {
+ATLAS_GEMM_API int atlasGemm(int value);
+ATLAS_GEMM_API int atlasGemmCpuF32(float value);
+}
+"""
+    source_bytes = source.encode("utf-8")
+    revision = "sha256:" + hashlib.sha256(source_bytes).hexdigest()
+
+    result = _native_ast_evidence(
+        AstChunkRequest(
+            source=source,
+            language="cpp",
+            filePath="gemm_contract.h",
+            sourceRevision=revision,
+        )
+    )
+
+    declarations = [chunk for chunk in result.chunks if chunk.name in {"atlasGemm", "atlasGemmCpuF32"}]
+    assert {chunk.name for chunk in declarations} == {"atlasGemm", "atlasGemmCpuF32"}
+    assert len(declarations) == 2
+    assert result.scan_completeness == "COMPLETE"
+    assert result.syntax_status == "RECOVERED_WITH_ERRORS"
+    expected = {
+        "atlasGemm": "ATLAS_GEMM_API int atlasGemm(int value);",
+        "atlasGemmCpuF32": "ATLAS_GEMM_API int atlasGemmCpuF32(float value);",
+    }
+    for chunk in declarations:
+        assert source_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8").strip() == expected[chunk.name]
+        assert chunk.upstream_symbol_id is None
+        assert chunk.upstream_node_id is None
+
+
+def test_v2_cpp_include_emits_exact_unresolved_import_observation():
+    source = '#include "local/header.h"\nint run() { return 0; }\n'
+    source_bytes = source.encode("utf-8")
+    revision = "sha256:" + hashlib.sha256(source_bytes).hexdigest()
+
+    result = _native_ast_evidence(
+        AstChunkRequest(
+            source=source,
+            language="cpp",
+            filePath="src/run.cpp",
+            sourceRevision=revision,
+        )
+    )
+
+    includes = [chunk for chunk in result.chunks if "local/header.h" in chunk.imports]
+    assert len(includes) == 1
+    include = includes[0]
+    assert source_bytes[include.start_byte:include.end_byte] == b'#include "local/header.h"\n'
+    assert include.kind == "import"
+    edge = next(edge for edge in result.edges if edge.type == "IMPORTS" and edge.to_evidence_key == "local/header.h")
+    assert edge.resolved is False
+    assert edge.resolution == "syntax_only"

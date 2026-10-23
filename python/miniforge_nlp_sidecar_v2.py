@@ -49,6 +49,7 @@ from atlas_ast_chunk_helpers_v1 import AstChunkHelperAnalysisV1, build_ast_chunk
 
 _RUNTIME_MODULE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 _LEGACY_MODULE_SHA256 = hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest()
+_PROCESS_STARTED_MONOTONIC_NS = str(time.monotonic_ns())
 
 
 class AstEvidenceChunkV2(BaseModel):
@@ -1062,6 +1063,50 @@ def _diagnostics_have_errors(diagnostics: list[str]) -> bool:
     return bool(legacy._fatal_structural_diagnostics(diagnostics))
 
 
+def _cpp_include_chunks(source: str) -> list[dict[str, Any]]:
+    if not legacy.TREE_SITTER_AVAILABLE or legacy.get_parser is None:
+        return []
+    try:
+        source_bytes = source.encode("utf-8")
+        root = legacy.get_parser("cpp").parse(source_bytes).root_node
+    except Exception:
+        return []
+
+    chunks: list[dict[str, Any]] = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        stack.extend(reversed(list(getattr(node, "named_children", []))))
+        if getattr(node, "type", None) != "preproc_include":
+            continue
+        path_node = node.child_by_field_name("path")
+        if path_node is None:
+            continue
+        start = int(node.start_byte)
+        end = int(node.end_byte)
+        try:
+            path_value = source_bytes[int(path_node.start_byte):int(path_node.end_byte)].decode("utf-8")
+            content = source_bytes[start:end]
+        except (UnicodeDecodeError, ValueError):
+            continue
+        if path_node.type == "string_literal" and len(path_value) >= 2 and path_value[0] == '"' and path_value[-1] == '"':
+            specifier = path_value[1:-1]
+        elif path_node.type == "system_lib_string" and len(path_value) >= 2 and path_value[0] == "<" and path_value[-1] == ">":
+            specifier = path_value[1:-1]
+        else:
+            continue
+        if not specifier or end <= start:
+            continue
+        chunks.append({
+            "node_type": "preproc_include",
+            "byte_start": start,
+            "byte_end": end,
+            "content": content,
+            "metadata": {"imports": [specifier]},
+        })
+    return chunks
+
+
 def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
     diagnostics: list[str] = []
     language, language_error = legacy._resolve_ast_language(req.language, req.file_path)
@@ -1116,6 +1161,46 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         raw_chunks = []
         scan_failure = f"{type(exc).__name__}: {exc}"
         diagnostics.append(f"ChunkingError: treesitter-chunker extraction failed: {exc}")
+
+    if language == "cpp":
+        existing_include_spans = {
+            (normalized.get("byte_start"), normalized.get("byte_end"), specifier)
+            for raw in raw_chunks
+            for normalized in [normalize_treesitter_chunker_chunk(raw)]
+            for specifier in normalized.get("imports", [])
+        }
+        for include_chunk in _cpp_include_chunks(req.source):
+            normalized = normalize_treesitter_chunker_chunk(include_chunk)
+            for specifier in normalized.get("imports", []):
+                key = (normalized.get("byte_start"), normalized.get("byte_end"), specifier)
+                if key not in existing_include_spans:
+                    raw_chunks.append(include_chunk)
+                    existing_include_spans.add(key)
+
+    if language == "cpp":
+        existing_spans = {
+            (int(normalized.get("byte_start")), int(normalized.get("byte_end")), normalized.get("name"))
+            for raw in raw_chunks
+            for normalized in [normalize_treesitter_chunker_chunk(raw)]
+            if normalized.get("byte_start") is not None
+            and normalized.get("byte_end") is not None
+        }
+        for declaration in legacy._cpp_function_declaration_chunks(req.source):
+            key = (int(declaration.start), int(declaration.end), declaration.symbol)
+            if key in existing_spans:
+                continue
+            raw_chunks.append({
+                "node_type": "function_declaration",
+                "name": declaration.symbol,
+                "byte_start": int(declaration.start),
+                "byte_end": int(declaration.end),
+                "content": req.source.encode("utf-8")[declaration.start:declaration.end],
+                "calls": [],
+                "imports": [],
+                "exports": [],
+                "dependencies": [],
+            })
+            existing_spans.add(key)
 
     if raw_chunks and not identity_path_preserved:
         diagnostics.append(
@@ -1209,6 +1294,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         node_type = str(normalized.get("node_type") or "fragment")
         span_text = source_bytes[start:end].decode("utf-8", errors="ignore")
         kind_node_type = _declarator_kind_override(node_type, span_text) or node_type
+        if node_type == "preproc_include":
+            kind_node_type = "import_directive"
         signature_text, syntax_ancestry = (None, [])
         if syntax_root is not None:
             signature_text, syntax_ancestry = _syntax_signature_and_ancestry(
@@ -1374,6 +1461,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
 def health() -> dict[str, Any]:
     result = dict(legacy.health())
     result["contract"] = "provenance-v2"
+    result["processId"] = os.getpid()
+    result["processStartedMonotonicNs"] = _PROCESS_STARTED_MONOTONIC_NS
     grounded_parameters = inspect.signature(_native_grounded_extractions).parameters
     result["runtimeSourceBindings"] = {
         "modules": {
