@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.ast-parser-symbol-span-match-candidate.v1",
+  "status": "SNAPSHOT_BOUND_AST_SYMBOL_SPAN_MATCH_CANDIDATE",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshot": {
+    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "status": "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK",
+    "canonicalAuthority": false
+  },
+  "source": {
+    "sourceRef": "packages/atlas-core/src/cli.ts",
+    "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+    "byteLength": 2375,
+    "sha256": "496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3"
+  },
+  "sourceArtifact": {
+    "path": "scripts/atlas/fixtures/ast-parser-symbol-span-match-candidate-v1.source.ts",
+    "gitRevision": "75b5b4ff941f79adc624d7de1939c36992e6da3b",
+    "storageEncoding": "UTF8_LF_WITH_ONE_TERMINAL_LF_STRIPPED"
+  },
+  "symbolCandidate": {
+    "symbolVersionId": "symbol-version:c348581151cac882c6b2964e40aa9722185e23cc6c78492d04be677e1cf1c373",
+    "qualifiedName": "main",
+    "byteStart": 302,
+    "byteEnd": 2366,
+    "exactSourceBindingRows": 1,
+    "packetRevisionMissing": true
+  },
+  "parser": {
+    "service": "miniforge-nlp-sidecar",
+    "mappingRevision": "sha256:4242640240e93908ef37cbb7c7238840fc16c2d18b2477dec3f9bc103e74b022",
+    "httpStatus": 200,
+    "scanCompleteness": "COMPLETE",
+    "syntaxStatus": "CLEAN",
+    "chunkCount": 14,
+    "exactSymbolSpanMatches": 1,
+    "matchedChunk": {
+      "kind": "function",
+      "name": "main",
+      "nodeType": "function_declaration"
+    }
+  },
+  "evidence": {
+    "sourceReceipt": ".tmp/atlas/directory-intelligence/ast-symbol-probes/ast-symbol-probe-20261023T1792719169635Z/receipt.json",
+    "sourceReceiptSha256": "sha256:4bd4430e95c2fd914bad76255b586b3cf72bc2bd2911a563c6fda6ca0b9928fd",
+    "crosswalk": "docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-23T01-30-04-728Z.json",
+    "crosswalkSha256": "sha256:6f1f7b9e27fcc33f64103ca202f83a767acd9fdd8f7750cc7d6f7b6facb6cea4"
+  },
+  "limitations": [
+    "Current working-tree bytes differ from the frozen snapshot bytes.",
+    "The selected snapshot is not canonical authority.",
+    "Parser output was not persisted to atlas_ast_nodes.",
+    "The symbol candidate packet revision is missing.",
+    "This fixture records a bounded parser/span match only; it does not prove canonical AST or symbol admission."
+  ]
+}
