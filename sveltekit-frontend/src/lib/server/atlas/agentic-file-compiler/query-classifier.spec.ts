@@ -43,4 +43,32 @@ describe('classifyAtlasQuery', () => {
     expect(out.requiresMutation).toBe(false);
     expect(out.retrievalNeeds.ast).toBe(true);
   });
+
+  it('emits bounded advisory package, ordered n-gram, and explicit repository-scope hints', () => {
+    const input = {
+      requestId: 'query-adaptive-drizzle',
+      query: 'Find SvelteKit 2 route helpers using Drizzle ORM repo:sveltekit-frontend package:@acme/db',
+      producerRevision: 'query-classifier-fixture-v1',
+    };
+    const first = classifyAtlasQuery(input);
+    const second = classifyAtlasQuery(input);
+
+    expect(first.exactTerms.slice(0, 4)).toEqual(['Find', 'SvelteKit', '2', 'route']);
+    expect(first.ngrams).toContain('sveltekit 2');
+    expect(first.packageCandidates).toEqual(['@acme/db', '@sveltejs/kit', 'drizzle-orm']);
+    expect(first.repositoryScopeCandidates).toEqual(['sveltekit-frontend']);
+    expect(first.checksum).toBe(second.checksum);
+    expect(first.retrievalNeeds).toEqual(second.retrievalNeeds);
+    expect(first.repositoryScopeCandidates).toHaveLength(1);
+  });
+
+  it('does not infer repository scope from ordinary path or repository prose', () => {
+    const out = classifyAtlasQuery({
+      requestId: 'unscoped-repository-prose',
+      query: 'Find a SvelteKit route in the nested repository src/routes/server.ts',
+    });
+
+    expect(out.targetHints).toContain('src/routes/server.ts');
+    expect(out.repositoryScopeCandidates).toEqual([]);
+  });
 });

@@ -100,11 +100,11 @@ export const SemanticSearchWorkflowResultSchema = z.object({
     .nullable(),
   topPacketKeys: z.array(z.string().min(1)),
   packets: z.array(z.record(z.string(), z.unknown())),
+  graphExpansionStatus: z.enum(['NOT_REQUESTED', 'DELEGATED_TO_SEARCH_RUNTIME', 'BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING']),
   metadata: z.record(z.string(), z.unknown()),
   provenance: z.record(z.string(), z.unknown()),
   ace: z.record(z.string(), z.unknown()).nullable(),
   contextManifestShadow: z.record(z.string(), z.unknown()),
-  graphExpanded: z.array(z.record(z.string(), z.unknown())).optional(),
   shadow: SearchShadowSchema.nullable(),
   error: z.string().nullable().optional(),
 });
@@ -199,6 +199,7 @@ export async function runSemanticSearchWorkflow(
 
   const searchRequest = {
     query,
+    lexicalExpansion: [...new Set([...queryClassification.ngrams, ...queryClassification.packageCandidates])].slice(0, 32),
     topK: validated.topK,
     userId: validated.userId ?? runtimeOptions?.userId ?? undefined,
     caseId: validated.caseId ?? runtimeOptions?.caseId ?? undefined,
@@ -230,6 +231,7 @@ export async function runSemanticSearchWorkflow(
   });
   const adapterResult = await adapter.search({
     query: searchRequest.query,
+    lexicalExpansion: searchRequest.lexicalExpansion,
     topK: searchRequest.topK,
     userId: searchRequest.userId,
     caseId: searchRequest.caseId,
@@ -318,6 +320,8 @@ export async function runSemanticSearchWorkflow(
     preamble,
     topPacketKeys,
     packets: adapterResult.packets as Array<Record<string, unknown>>,
+    graphExpansionStatus: adapterResult.graphExpansionStatus
+      ?? (searchRequest.withGraphExpansion ? 'BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING' : 'NOT_REQUESTED'),
     metadata: {
       ...adapterResult.metadata,
       queryClassification: {
@@ -326,6 +330,11 @@ export async function runSemanticSearchWorkflow(
         producerRevision: queryClassification.producerRevision,
         checksum: queryClassification.checksum,
         domains: queryClassification.domains,
+        exactTerms: queryClassification.exactTerms,
+        ngrams: queryClassification.ngrams,
+        packageCandidates: queryClassification.packageCandidates,
+        lexicalExpansion: searchRequest.lexicalExpansion,
+        repositoryScopeCandidates: queryClassification.repositoryScopeCandidates,
         retrievalNeeds: queryClassification.retrievalNeeds,
         operation: queryClassification.operation,
       },
@@ -333,7 +342,6 @@ export async function runSemanticSearchWorkflow(
     provenance: adapterResult.provenance as Record<string, unknown>,
     ace,
     contextManifestShadow,
-    ...(adapterResult.graphExpanded ? { graphExpanded: adapterResult.graphExpanded as unknown as Array<Record<string, unknown>> } : {}),
     shadow,
   });
 

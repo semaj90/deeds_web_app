@@ -1,5 +1,4 @@
 import { SearchRuntime, type SearchQuery, type SearchResult } from '../../retrieval/search-runtime.js';
-import { graphRetrieve, type GraphCandidate } from './graph-retriever.js';
 import { RETRIEVAL_LIMITS, SearchMetadataFilterSchema } from '../../retrieval/search-contract.js';
 import {
   buildSearchRuntimeQasRows,
@@ -53,6 +52,7 @@ interface CachedPacketSourceEvidenceInputV1 {
 
 export interface AtlasSearchRequest {
   query: string;
+  lexicalExpansion?: string[];
   topK?: number;
   userId?: string;
   caseId?: string;
@@ -69,8 +69,7 @@ export interface AtlasSearchResponse {
   topPacketKeys: string[];
   metadata: SearchResult['metadata'];
   provenance: SearchResult['provenance'];
-  /** Graph candidates seeded only from SearchRuntime's pre-fusion canonical dense lane. */
-  graphExpanded?: GraphCandidate[];
+  graphExpansionStatus: 'NOT_REQUESTED' | 'DELEGATED_TO_SEARCH_RUNTIME' | 'BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING';
 }
 
 interface AtlasSearchQasOptionsBase {
@@ -352,6 +351,7 @@ export function createAtlasSearchAdapter(config?: {
     async search(req: AtlasSearchRequest): Promise<AtlasSearchResponse> {
       const query: SearchQuery = {
         text: req.query,
+        lexicalExpansion: req.lexicalExpansion,
         topK: req.topK ?? RETRIEVAL_LIMITS.defaultTopKPerLane,
         userId: req.userId ?? config?.userId,
         caseId: req.caseId ?? config?.caseId,
@@ -366,32 +366,16 @@ export function createAtlasSearchAdapter(config?: {
         .map(p => (p as Record<string, unknown>).packet_key ?? (p as Record<string, unknown>).chunk_id ?? '')
         .filter((k): k is string => typeof k === 'string' && k.length > 0)
         .slice(0, 5);
-      const denseSeedPacketKeys = result.denseSeedPacketKeys ?? [];
-
-      let graphExpanded: GraphCandidate[] | undefined;
-      if (req.withGraphExpansion && denseSeedPacketKeys.length > 0) {
-        try {
-          graphExpanded = await graphRetrieve({
-            seedPacketKeys: denseSeedPacketKeys,
-            allowedRelationships: ['IMPORTS', 'CALLS', 'SIMILAR_TOPOLOGY', 'USES_CONCEPT'],
-            maxDepth: 2,
-            maxCandidates: 20,
-          });
-          // Remove results already present in the main fused response.
-          const existingKeys = new Set(topPacketKeys);
-          graphExpanded = graphExpanded.filter(g => !existingKeys.has(g.packetKey));
-        } catch {
-          // Graph expansion is best-effort; never degrades the main result
-          graphExpanded = [];
-        }
-      }
-
       return {
         packets: result.packets,
         topPacketKeys,
         metadata: result.metadata,
         provenance: result.provenance,
-        ...(graphExpanded !== undefined ? { graphExpanded } : {}),
+        graphExpansionStatus: !req.withGraphExpansion
+          ? 'NOT_REQUESTED'
+          : req.workspaceRevision
+            ? 'DELEGATED_TO_SEARCH_RUNTIME'
+            : 'BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING',
       };
     },
     /**

@@ -29,6 +29,15 @@ const EXACT_LIMIT = RETRIEVAL_LIMITS.exactLexicalTopK;
 const AST_LIMIT = RETRIEVAL_LIMITS.topologyTopK;
 const RG_LIMIT = RETRIEVAL_LIMITS.maxGraphNeighbors;
 
+export function buildLexicalExpansionQuery(query: string, expansion: readonly string[] = []): string {
+  const terms = new Map<string, string>();
+  for (const term of [query, ...expansion].map((value) => value.trim()).filter(Boolean)) {
+    const key = term.toLocaleLowerCase('en-US');
+    if (!terms.has(key)) terms.set(key, term);
+  }
+  return [...terms.values()].join(' ');
+}
+
 function pickString(...values: unknown[]): string | null {
   for (const value of values) {
     if (typeof value === 'string') {
@@ -149,12 +158,13 @@ export async function retrieveAllCandidates(
   query: string,
   filters?: { sourceRefs?: string[]; pathPrefixes?: string[] },
   _limit: number = 128,
-  options?: { includeVectorLanes?: boolean },
+  options?: { includeVectorLanes?: boolean; lexicalExpansion?: string[] },
 ): Promise<Candidate[]> {
   const includeVectorLanes = options?.includeVectorLanes ?? true;
+  const lexicalQuery = buildLexicalExpansionQuery(query, options?.lexicalExpansion);
 
   const [bm25, qdrant, exact, ast, rg] = await Promise.all([
-    retrieveBM25(query),
+    retrieveBM25(lexicalQuery),
     includeVectorLanes ? withTimeout(retrieveQdrant(query), 5000, []) : Promise.resolve([]),
     retrieveExactMatches(query),
     retrieveASTMatches(query),
