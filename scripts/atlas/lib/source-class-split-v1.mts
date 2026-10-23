@@ -1,10 +1,26 @@
 // NS-7 SOURCE-CLASS-SPLIT-V1: pure classification of frozen physical inventory rows.
 // Classification only. Source admission, revision qualification and embedding
 // eligibility are separate fields and never implied by a class.
+import { createHash } from 'node:crypto';
 import { classifyInventoryPath, normalizeInventoryPath } from './canonical-source-inventory-hygiene-v1.mts';
 
 export const SOURCE_CLASS_SPLIT_POLICY_REVISION = 'atlas.source-class-split.2026-10-22.v1' as const;
 export const NOT_ADMITTED = 'NOT_ADMITTED_NO_WORKSPACE_REVISION' as const;
+
+function sortJsonKeys(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortJsonKeys);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortJsonKeys((value as Record<string, unknown>)[key])]));
+  }
+  return value;
+}
+
+export function canonicalInventorySha256(inventory: Record<string, unknown>): string | null {
+  const { inventorySha256, ...body } = inventory;
+  if (typeof inventorySha256 !== 'string' || !/^[a-f0-9]{64}$/.test(inventorySha256)) return null;
+  const canonical = JSON.stringify(sortJsonKeys(body));
+  return createHash('sha256').update(canonical, 'utf8').digest('hex') === inventorySha256 ? inventorySha256 : null;
+}
 
 export const SOURCE_CLASSES = [
   'FIRST_PARTY_SOURCE',
@@ -68,6 +84,19 @@ export type ClassificationResult = {
   embedding768Status: 'HAS_UNQUALIFIED_768_VECTORS' | 'NO_768_VECTOR' | 'NOT_APPLICABLE';
   admissionState: typeof NOT_ADMITTED;
 };
+
+export function isGitIgnoredPath(relativePath: string, ignoredPaths?: ReadonlySet<string>): boolean {
+  const normalized = normalizeInventoryPath(relativePath);
+  if (!ignoredPaths || ignoredPaths.size === 0) return false;
+  if (ignoredPaths.has(normalized)) return true;
+
+  let separator = normalized.indexOf('/');
+  while (separator !== -1) {
+    if (ignoredPaths.has(`${normalized.slice(0, separator)}/`)) return true;
+    separator = normalized.indexOf('/', separator + 1);
+  }
+  return false;
+}
 
 const MODEL_EXT = new Set(['gguf', 'safetensors', 'pt', 'pth', 'ckpt', 'onnx', 'ubj', 'pkl', 'joblib', 'h5', 'tflite', 'keras', 'mlmodel']);
 const BINARY_EXT = new Set([
@@ -155,7 +184,7 @@ export function classifyRow(row: InventoryRow, ctx: OwnershipContext): Classific
   const ownerRel = ownerRelativePath(path, owner);
   const inventoryClassification = classifyInventoryPath(path);
   const tracked = ctx.trackedByOwner.get(owner)?.has(ownerRel) ?? false;
-  const ignored = (ctx.ignoredByOwner.get(owner)?.has(ownerRel) ?? false) && !tracked;
+  const ignored = isGitIgnoredPath(ownerRel, ctx.ignoredByOwner.get(owner)) && !tracked;
   const census = ctx.censusByPath?.get(path);
   const embedding768Status = row.entryKind !== 'FILE' ? 'NOT_APPLICABLE'
     : (census?.embedding768ChunkCount ?? 0) > 0 ? 'HAS_UNQUALIFIED_768_VECTORS' : 'NO_768_VECTOR';

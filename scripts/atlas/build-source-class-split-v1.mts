@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import readline from 'node:readline';
 import {
   classifyRow,
+  canonicalInventorySha256,
   emptyClassTotals,
   normalizeExtension,
   reconcileBytes,
@@ -67,17 +68,16 @@ async function main() {
   if (pathsSha !== EXPECTED_PATHS_SHA) throw new Error(`PATHS_SHA_MISMATCH:${pathsSha}`);
   const snapshot = JSON.parse(readFileSync(path.join(root, snapshotManifestPath), 'utf8'));
   if (snapshot.pathManifestSha256 !== pathsSha || snapshot.rows !== EXPECTED_ROWS) throw new Error('SNAPSHOT_MANIFEST_BINDING_MISMATCH');
-  // inventory.json's recorded checksum is not reproduced by any common serialization; keep it as a lineage exception.
-  const inventoryChecksumReproduced = invSha === EXPECTED_INVENTORY_SHA;
   const inventoryJson = JSON.parse(readFileSync(path.join(root, inventoryPath), 'utf8'));
+  const canonicalInventoryDigest = canonicalInventorySha256(inventoryJson);
+  const inventoryChecksumReproduced = canonicalInventoryDigest === EXPECTED_INVENTORY_SHA;
   const censusSha = await sha256Stream(path.join(root, censusPath));
   if (existsSync(path.join(root, STABLE_REPORT))) throw new Error('STABLE_REPORT_EXISTS_REFUSING_OVERWRITE');
   const head = gitHead();
 
-  // Pass 1: nested repository roots, independent file totals, and per-owner untracked file lists.
+  // Pass 1: nested repository roots and independent physical-file totals.
   const nestedRepoRoots: string[] = [];
   const independent = { files: 0, bytes: 0, rows: 0, dirs: 0, links: 0 };
-  const untrackedByOwner = new Map<string, string[]>();
   const nestedSeen: InventoryRow[] = [];
   for await (const { row } of rowsOf(path.join(root, pathsPath))) {
     independent.rows++;
@@ -110,30 +110,13 @@ async function main() {
       trackedByOwner.set(owner, new Set());
       ownerGit[owner] = { trackedCount: 0, gitStatus: 'UNREADABLE' };
     }
-    untrackedByOwner.set(owner, []);
-  }
-  const ownerOf = (p: string) => {
-    let best = 'ROOT';
-    for (const r of nestedRepoRoots) if ((p === r || p.startsWith(`${r}/`)) && r.length > best.length) best = r;
-    return best;
-  };
-  for await (const { row } of rowsOf(path.join(root, pathsPath))) {
-    if (row.entryKind !== 'FILE') continue;
-    const owner = ownerOf(row.relativePath);
-    const rel = owner === 'ROOT' ? row.relativePath : row.relativePath.slice(owner.length + 1);
-    if (!trackedByOwner.get(owner)?.has(rel)) untrackedByOwner.get(owner)!.push(rel);
   }
 
-  // Gitignore status is evaluated per owner and only for untracked files.
+  // Git collapses wholly ignored directories into one entry with --directory.
   const ignoredByOwner = new Map<string, Set<string>>();
   for (const owner of owners) {
     const cwd = owner === 'ROOT' ? root : path.join(root, owner);
-    const list = untrackedByOwner.get(owner)!;
-    const input = Buffer.from(list.join('\0') + (list.length ? '\0' : ''), 'utf8');
-    let ignored: string[] = [];
-    if (list.length) {
-      try { ignored = gitLines(cwd, ['check-ignore', '--stdin', '-z'], input); } catch { ignored = []; }
-    }
+    const ignored = gitLines(cwd, ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory', '-z']);
     ignoredByOwner.set(owner, new Set(ignored));
   }
 
@@ -326,7 +309,8 @@ async function main() {
     embeddingsGenerated: 0,
     sourceAdmission: NOT_ADMITTED,
     inputs: {
-      inventoryPath, inventorySha256: invSha, inventorySha256Recorded: EXPECTED_INVENTORY_SHA, inventoryChecksumReproduced,
+      inventoryPath, inventorySha256: invSha, inventorySha256Recorded: inventoryJson.inventorySha256,
+      inventoryCanonicalSha256Recomputed: canonicalInventoryDigest, inventoryChecksumReproduced,
       inventoryCountsReconcile,
       pathsPath, pathsSha256: pathsSha,
       snapshotManifestPath, snapshotManifestSha256: sha256File(path.join(root, snapshotManifestPath)),

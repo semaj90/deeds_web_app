@@ -1,14 +1,53 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { test } from 'node:test';
 import {
   classifyRow,
+  canonicalInventorySha256,
   emptyClassTotals,
+  isGitIgnoredPath,
   matchRules,
   reconcileBytes,
   SOURCE_CLASSES,
   type InventoryRow,
   type OwnershipContext,
 } from './source-class-split-v1.mts';
+import { createHash } from 'node:crypto';
+
+test('reproduces Python canonical inventory checksums and rejects tampering', () => {
+  const body = { schema: 'fixture.v1', values: [{ z: 2, a: 'é' }], canonicalAuthority: false };
+  const canonical = JSON.stringify({ canonicalAuthority: false, schema: 'fixture.v1', values: [{ a: 'é', z: 2 }] });
+  const inventory = { ...body, inventorySha256: createHash('sha256').update(canonical, 'utf8').digest('hex') };
+  assert.equal(canonicalInventorySha256(inventory), inventory.inventorySha256);
+  assert.equal(canonicalInventorySha256({ ...inventory, values: [{ z: 3, a: 'é' }] }), null);
+});
+
+test('recognizes Git-collapsed ignored directories without prefix collisions', () => {
+  const ignored = new Set(['node_modules/', '.cache/excluded/']);
+  assert.equal(isGitIgnoredPath('node_modules/pkg/index.js', ignored), true);
+  assert.equal(isGitIgnoredPath('.cache/excluded/data.json', ignored), true);
+  assert.equal(isGitIgnoredPath('node_modules-old/pkg/index.js', ignored), false);
+  assert.equal(isGitIgnoredPath('.cache/included/data.json', ignored), false);
+});
+
+test('git ls-files --directory emits a collapsed ignored-directory prefix', () => {
+  const directory = mkdtempSync(path.join(tmpdir(), 'atlas-source-class-ignore-'));
+  try {
+    execFileSync('git', ['init', '-q'], { cwd: directory });
+    writeFileSync(path.join(directory, '.gitignore'), 'node_modules/\n');
+    mkdirSync(path.join(directory, 'node_modules', 'pkg'), { recursive: true });
+    writeFileSync(path.join(directory, 'node_modules', 'pkg', 'index.js'), 'module.exports = 1;\n');
+    const output = execFileSync('git', ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory', '-z'], {
+      cwd: directory,
+    });
+    assert.deepEqual(output.toString('utf8').split('\0').filter(Boolean), ['node_modules/']);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 
 function ctx(overrides: Partial<OwnershipContext> = {}): OwnershipContext {
   return {

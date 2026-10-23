@@ -6,7 +6,7 @@ import { createReadStream, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import readline from 'node:readline';
-import { matchRules, SOURCE_CLASSES, EMBEDDING_POLICIES, type InventoryRow, type SourceClass } from './lib/source-class-split-v1.mts';
+import { canonicalInventorySha256, matchRules, SOURCE_CLASSES, EMBEDDING_POLICIES, type InventoryRow, type SourceClass } from './lib/source-class-split-v1.mts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const receiptArg = process.argv[2];
@@ -16,6 +16,7 @@ const receipt = JSON.parse(readFileSync(receiptFile, 'utf8'));
 const runDir = path.dirname(receiptFile);
 const checks: Record<string, boolean> = {};
 const failures: string[] = [];
+const warnings: string[] = [];
 const check = (name: string, ok: boolean, detail = '') => {
   checks[name] = ok;
   if (!ok) failures.push(`${name}${detail ? `: ${detail}` : ''}`);
@@ -35,6 +36,14 @@ async function* lines(file: string): AsyncGenerator<string> {
 async function main() {
   // 1. Frozen inputs still match the receipt's bound checksums.
   check('inventory_sha', sha256File(path.join(root, receipt.inputs.inventoryPath)) === receipt.inputs.inventorySha256);
+  const inventoryJson = JSON.parse(readFileSync(path.join(root, receipt.inputs.inventoryPath), 'utf8'));
+  const canonicalInventoryDigest = canonicalInventorySha256(inventoryJson);
+  check('inventory_canonical_sha', canonicalInventoryDigest !== null
+    && canonicalInventoryDigest === receipt.inputs.inventorySha256Recorded
+    && canonicalInventoryDigest === inventoryJson.inventorySha256);
+  if (receipt.inputs.inventoryChecksumReproduced !== true && canonicalInventoryDigest !== null) {
+    warnings.push('HISTORICAL_RECEIPT_FLAG_FALSE_BUT_CANONICAL_INVENTORY_DIGEST_REPRODUCES');
+  }
   check('paths_sha', (await sha256Stream(path.join(root, receipt.inputs.pathsPath))) === receipt.inputs.pathsSha256);
   check('census_sha', (await sha256Stream(path.join(root, receipt.inputs.censusPath))) === receipt.inputs.censusSha256);
 
@@ -151,6 +160,7 @@ async function main() {
     receiptVerdict: receipt.sourceClassSplitVerdict,
     rowsReadBack: rowCount,
     failures,
+    warnings,
     checks,
     classTotalsRecomputed: totals,
     eligibilityRecomputed: eligibility,
