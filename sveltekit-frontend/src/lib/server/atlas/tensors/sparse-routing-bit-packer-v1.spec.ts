@@ -6,6 +6,7 @@ import {
 	unpackSparseRoutingBuffer,
 	synthesizeAceSparseRoutingEnvelopeV1,
 	applyAvx2SparseRoutingToFloatTensor,
+	encodeBitNetPolynomialRoutingByte,
 	PackedSparseRoutingEnvelopeV1Schema,
 } from './sparse-routing-bit-packer-v1.js';
 
@@ -217,6 +218,55 @@ describe('SparseRoutingBitPackerV1', () => {
 			expect(fp32Bytes).toBe(10000);
 			expect(packedRoutingBytes).toBe(250);
 			expect(compressionRatio).toBe(40); // 40x wire payload reduction for routing phase
+		});
+	});
+
+	describe('BIT-04: Lineage-gated BitNet Polynomial Encoding (PostgreSQL Fail-Closed)', () => {
+		it('prunes to 0x00 when AIO bitmap check fails', () => {
+			const byte = encodeBitNetPolynomialRoutingByte({
+				passedAioBitmap: false,
+				isCanonicalLineageVerified: true,
+				requireCanonicalLineage: true,
+				dotProductNormalized: 1.0,
+				baseShifter7: 100,
+			});
+			expect(byte).toBe(0x00);
+		});
+
+		it('prunes to 0x00 when canonical lineage is required but unverified (UNRESOLVED tuples)', () => {
+			const byte = encodeBitNetPolynomialRoutingByte({
+				passedAioBitmap: true,
+				isCanonicalLineageVerified: false,
+				requireCanonicalLineage: true,
+				dotProductNormalized: 0.95,
+				baseShifter7: 120,
+			});
+			expect(byte).toBe(0x00); // Fail-closed quarantine
+		});
+
+		it('caps shifter at <= 48 when unverified lineage is allowed for proposal-only lane', () => {
+			const byte = encodeBitNetPolynomialRoutingByte({
+				passedAioBitmap: true,
+				isCanonicalLineageVerified: false,
+				requireCanonicalLineage: false, // Advisory proposal lane
+				dotProductNormalized: 1.0,      // Max confidence
+				baseShifter7: 127,
+			});
+			// Active gate (0x80) + capped shifter (<= 48)
+			expect((byte & 0x80) !== 0).toBe(true);
+			const shifter = byte & 0x7f;
+			expect(shifter).toBeLessThanOrEqual(48);
+		});
+
+		it('allows full dynamic range up to 127 when canonical lineage is verified', () => {
+			const byte = encodeBitNetPolynomialRoutingByte({
+				passedAioBitmap: true,
+				isCanonicalLineageVerified: true,
+				requireCanonicalLineage: true,
+				dotProductNormalized: 1.0, // u = 1.0, poly01 = 1.0
+				baseShifter7: 120,
+			});
+			expect(byte).toBe(0x80 | 120);
 		});
 	});
 });

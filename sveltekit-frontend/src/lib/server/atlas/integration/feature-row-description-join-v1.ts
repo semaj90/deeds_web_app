@@ -25,6 +25,9 @@ export function joinFeatureRowAndDescriptionV1(input: {
 }): FeatureRowDescriptionJoinV1 {
 	const featureRow = FeatureRowV1Schema.parse(input.featureRow);
 	const description = FeatureDescriptionV1Schema.parse(input.description);
+	if (description.status !== 'PROPOSAL_ONLY') {
+		throw new Error('FEATURE_DESCRIPTION_REVIEWED_OWNER_REQUIRED');
+	}
 	if (description.canonicalId !== featureRow.canonicalId) throw new Error('FEATURE_DESCRIPTION_JOIN_CANONICAL_ID_MISMATCH');
 	if (description.packetKey !== featureRow.packetKey) throw new Error('FEATURE_DESCRIPTION_JOIN_PACKET_KEY_MISMATCH');
 	if (description.sourceRef !== featureRow.sourceRef) throw new Error('FEATURE_DESCRIPTION_JOIN_SOURCE_REF_MISMATCH');
