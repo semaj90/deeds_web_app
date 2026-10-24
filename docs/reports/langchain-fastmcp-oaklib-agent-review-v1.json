@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.langchain-fastmcp-oaklib-review.v1",
+  "generatedAt": "2026-10-24T01:28:00.000Z",
+  "agentArchitecture": {
+    "framework": "@langchain/langgraph/prebuilt::createReactAgent",
+    "pattern": "ReAct (Reasoning + Acting)",
+    "activeModel": "local-llama-chat-model (Ornith-1.5-9B on :8090 / Ollama)",
+    "fastMcpBridge": "$lib/server/mcp-bridge.ts"
+  },
+  "canonical14FastMcpTools": [
+    { "name": "evidence_analyze", "category": "evidence", "risk": "read_only" },
+    { "name": "multimodal_analyze", "category": "multimodal", "risk": "read_only" },
+    { "name": "detect_objects", "category": "vision", "risk": "read_only" },
+    { "name": "transcribe_audio", "category": "audio", "risk": "read_only" },
+    { "name": "search_similar", "category": "cross_modal", "risk": "read_only" },
+    { "name": "web_search", "category": "detective_mode", "risk": "read_only" },
+    { "name": "ripgrep_search", "category": "detective_mode", "risk": "read_only" },
+    { "name": "find_files", "category": "detective_mode", "risk": "read_only" },
+    { "name": "analyze_file", "category": "detective_mode", "risk": "read_only" },
+    { "name": "extract_pattern", "category": "detective_mode", "risk": "read_only" },
+    { "name": "analyze_imports", "category": "detective_mode", "risk": "read_only" },
+    { "name": "cases_load", "category": "retrieval", "risk": "read_only" },
+    { "name": "rag_search", "category": "retrieval", "risk": "read_only" },
+    { "name": "ast_query", "category": "ast", "risk": "read_only" }
+  ],
+  "addedGroundingTool": {
+    "name": "oak_resolve_concept",
+    "source": "src/lib/server/agent/tools/oak-resolve.ts",
+    "description": "Resolves domain keywords and legal concepts against the live OAK kernel (:8095)",
+    "status": "WIRED_AND_INTEGRATED",
+    "integrationTargets": [
+      "src/lib/server/agent/autonomous-agent.ts",
+      "src/lib/server/agent/subagents.ts"
+    ],
+    "testSuites": [
+      "src/lib/server/agent/tools/oak-resolve-tool.spec.ts",
+      "src/lib/server/agent/autonomous-agent.spec.ts"
+    ],
+    "canonicalAuthority": false
+  },
+  "boundaryAudits": {
+    "langGraphDirectWriteConstraint": {
+      "status": "ENFORCED",
+      "enforcement": "AutonomousAgent enforces proposalOnly: true by default across all mutation tools (cases_create, cases_update, citations_add, evidence_upload, case_notes). Violating mutations are intercepted and returned as PROPOSED_MUTATION receipts.",
+      "receiptStatus": "PROPOSED_MUTATION"
+    },
+    "toolRankerIntegration": {
+      "status": "ACTIVE_POLICY",
+      "policySource": "src/lib/server/ai/tool-selection-policy.ts",
+      "recommendation": "Use tool-selection-policy to bound ReAct prompt tool definitions to top-K candidates to preserve Ornith context budgets."
+    },
+    "fastMcpBridgeProtocol": "Tools route through mcpBridge.call for unified tracing, JSON-RPC, and SIMDJSON logging"
+  }
+}

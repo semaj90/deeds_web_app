@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T09:39:41.835Z",
+  "generatedAt": "2026-10-24T01:45:22.871Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
@@ -9,7 +9,7 @@
     "liveMissing": 4,
     "liveUnavailable": 0,
     "blockers": [
-      "kanban_tasks: static INDEX_MISMATCH",
+      "kanban_tasks: static COLUMN_MISMATCH",
       "feature_registry: live LIVE_TABLE_MISSING",
       "atlas_workspace_events: static COLUMN_MISMATCH",
       "atlas_workspace_events: live LIVE_TABLE_MISSING",
@@ -30,10 +30,11 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\db\\schema\\kanban-tasks.ts"
       ],
       "manualSource": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261017_work_item_source_provenance.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\kanban_task_lifecycle_baseline.sql"
       ],
       "static": {
-        "classification": "INDEX_MISMATCH",
+        "classification": "COLUMN_MISMATCH",
         "columns": [
           "assignee",
           "attempt_count",
@@ -51,13 +52,17 @@
           "max_retries",
           "priority",
           "source_refs",
+          "source_revision",
+          "source_url",
           "started_at",
           "status",
           "task_id",
           "updated_at",
-          "validation_command"
+          "validation_command",
+          "workspace_id"
         ],
         "indexes": [
+          "idx_kanban_tasks_workspace_id",
           "kanban_ready_idx",
           "kanban_running_heartbeat_idx"
         ],
@@ -101,24 +106,33 @@
           "max_retries",
           "priority",
           "source_refs",
+          "source_revision",
+          "source_url",
           "started_at",
           "status",
           "task_id",
           "updated_at",
-          "validation_command"
+          "validation_command",
+          "workspace_id"
         ],
         "schemaIndexes": [],
         "manualIndexes": [
+          "idx_kanban_tasks_workspace_id",
           "kanban_ready_idx",
           "kanban_running_heartbeat_idx"
         ],
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": []
+          "onlyInB": [
+            "source_revision",
+            "source_url",
+            "workspace_id"
+          ]
         },
         "indexDiffs": {
           "onlyInA": [],
           "onlyInB": [
+            "idx_kanban_tasks_workspace_id",
             "kanban_ready_idx",
             "kanban_running_heartbeat_idx"
           ]
@@ -150,14 +164,18 @@
           "completed_at",
           "idempotency_key",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "workspace_id",
+          "source_url",
+          "source_revision"
         ],
         "indexes": [
+          "idx_kanban_tasks_workspace_id",
           "kanban_ready_idx",
           "kanban_running_heartbeat_idx",
           "kanban_tasks_pkey"
         ],
-        "rowCount": 166,
+        "rowCount": 167,
         "columnDiffs": {
           "onlyInA": [],
           "onlyInB": []
