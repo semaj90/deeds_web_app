@@ -1,0 +1,29 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 11,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "atlas-copilotkit-mastra-agui-acquisition-v1-2026-10-24",
+  "page_count": 1,
+  "producer_revision": "atlas_okf_docs_pipeline.py:acquire-only",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "38ef0b6a263cd9146351de732be99f6934fb35a9ae8d8f0f575e73a1c4c0231b",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 11,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\copilotkit-mastra-agui-quickstart\\chunks.jsonl",
+      "page_receipt_checksum": "f30b2fbf7cd83a098a6d9b5169e723cb208e3536da8650b94e8f4fff98b08c5f",
+      "pages": 1,
+      "source_id": "copilotkit-mastra-agui-quickstart",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "copilotkit-mastra-agui-official-source-list-v1-2026-10-24",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

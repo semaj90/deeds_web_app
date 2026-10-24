@@ -1,0 +1,30 @@
+{
+  "manifest_revision": "atlas-copilotkit-mastra-agui-acquisition-v1-2026-10-24",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "source_snapshot_revision": "copilotkit-mastra-agui-official-source-list-v1-2026-10-24",
+  "producer_revision": "atlas_okf_docs_pipeline.py:acquire-only",
+  "output_root": ".",
+  "sources": [
+    {
+      "source_id": "copilotkit-mastra-agui-quickstart",
+      "source_revision": "CURRENT_UPSTREAM_CAPTURE_2026-10-24",
+      "title": "CopilotKit Mastra AG-UI quickstart",
+      "base_urls": ["https://docs.copilotkit.ai/mastra/quickstart"],
+      "allowed_domains": ["docs.copilotkit.ai"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/engineering-acquisition/utf8-v2/copilotkit-mastra-agui-quickstart",
+      "include_paths": [],
+      "exclude_paths": [],
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "follow_sitemap": false,
+      "pages": ["https://docs.copilotkit.ai/mastra/quickstart"],
+      "ldr_export_files": [],
+      "provider": "CopilotKit",
+      "product": "Mastra AG-UI integration",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "publisher": "CopilotKit"
+    }
+  ]
+}

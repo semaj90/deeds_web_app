@@ -1,0 +1,29 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 14,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "engineering-acquisition-v1-f1f3875c43153c10",
+  "page_count": 1,
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "0e7c80dfd6b18b4a5aea784c8ece34fb056df303c412c2504cde7871954206f9",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 14,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\langfuse-mastra-integration\\chunks.jsonl",
+      "page_receipt_checksum": "a36fdb4a46683eb8cfdce505e102eecbe719320f58e875c6e50958bd1bb389be",
+      "pages": 1,
+      "source_id": "langfuse-mastra-integration",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

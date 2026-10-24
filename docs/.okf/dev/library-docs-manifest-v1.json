@@ -1,6 +1,6 @@
 {
   "schema": "atlas.library-docs-source-manifest.v1",
-  "revision": "atlas-library-docs-source-manifest-v1-2026-10-12",
+  "revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
   "canonicalAuthority": false,
   "acquisitionStatus": "PLANNED_NOT_FETCHED_IN_THIS_MANIFEST",
   "packageInventoryBasis": [
@@ -24,7 +24,8 @@
     "mcpWriteTools": 0
   },
   "sources": [
-    { "id": "postgresql-pgvector", "languages": ["sql", "c"], "priority": "P0", "urls": ["https://www.postgresql.org/docs/current/", "https://github.com/pgvector/pgvector"] },
+    { "id": "postgresql-pgvector", "languages": ["sql", "c"], "priority": "P0", "urls": ["https://www.postgresql.org/docs/current/", "https://www.postgresql.org/docs/18/indexes-multicolumn.html", "https://github.com/pgvector/pgvector"] },
+    { "id": "postgresql-18-multicolumn", "languages": ["sql"], "priority": "P1", "urls": ["https://www.postgresql.org/docs/18/indexes-multicolumn.html", "https://www.postgresql.org/docs/18/textsearch-indexes.html"] },
     { "id": "drizzle", "languages": ["typescript"], "priority": "P0", "urls": ["https://orm.drizzle.team/docs/overview", "https://orm.drizzle.team/docs/migrations", "https://orm.drizzle.team/docs/sql-schema-declaration"] },
     { "id": "zod", "languages": ["typescript"], "priority": "P0", "urls": ["https://zod.dev/"] },
     { "id": "qdrant", "languages": ["typescript", "python", "go"], "priority": "P0", "urls": ["https://qdrant.tech/documentation/concepts/points/", "https://qdrant.tech/documentation/manage-data/vectors/", "https://qdrant.tech/documentation/search/text-search/hybrid-search/"] },
@@ -48,6 +49,12 @@
     { "id": "oaklib", "languages": ["python"], "priority": "P2", "urls": ["https://oaklib.readthedocs.io/en/latest/"] },
     { "id": "rust-workspace", "languages": ["rust"], "priority": "P2", "urls": ["https://doc.rust-lang.org/book/", "https://napi.rs/", "https://docs.rs/tokio/latest/tokio/", "https://docs.rs/rayon/latest/rayon/", "https://serde.rs/"] },
     { "id": "simdjson-cpp", "languages": ["cpp"], "priority": "P2", "urls": ["https://simdjson.org/", "https://github.com/simdjson/simdjson"] },
-    { "id": "beautifulsoup-firecrawl", "languages": ["python", "http"], "priority": "P2", "urls": ["https://www.crummy.com/software/BeautifulSoup/bs4/doc/", "https://docs.firecrawl.dev/"] }
+    { "id": "beautifulsoup-firecrawl", "languages": ["python", "http"], "priority": "P2", "urls": ["https://www.crummy.com/software/BeautifulSoup/bs4/doc/", "https://docs.firecrawl.dev/"] },
+    { "id": "firecrawl-v2-scrape-api", "languages": ["typescript", "http"], "priority": "P1", "urls": ["https://docs.firecrawl.dev/api-reference/endpoint/scrape"] },
+    { "id": "langfuse-opentelemetry", "languages": ["typescript", "opentelemetry"], "priority": "P1", "urls": ["https://langfuse.com/integrations/native/opentelemetry"] },
+    { "id": "langfuse-mastra-integration", "languages": ["typescript", "opentelemetry", "agents"], "priority": "P1", "urls": ["https://langfuse.com/integrations/frameworks/mastra"] },
+    { "id": "mastra-tracing-agents", "languages": ["typescript", "opentelemetry"], "priority": "P1", "urls": ["https://mastra.ai/reference/observability/tracing/bridges/otel", "https://mastra.ai/docs/agents/overview"] },
+    { "id": "opentelemetry-javascript", "languages": ["typescript", "opentelemetry"], "priority": "P1", "urls": ["https://opentelemetry.io/docs/languages/js/exporters/"] },
+    { "id": "opentelemetry-nodejs-instrumentation", "languages": ["typescript", "opentelemetry", "nodejs"], "priority": "P1", "urls": ["https://opentelemetry.io/docs/languages/js/getting-started/nodejs/"] }
   ]
 }

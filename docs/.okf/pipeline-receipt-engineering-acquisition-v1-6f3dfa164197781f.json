@@ -1,0 +1,29 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 24,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "engineering-acquisition-v1-6f3dfa164197781f",
+  "page_count": 1,
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "2c3a539e584568079230b6fab342538c44e062be4e2d64145f1b7d52eec8a964",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 24,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\firecrawl-v2-scrape-api\\chunks.jsonl",
+      "page_receipt_checksum": "a3d8094cb84d015db7b8af85472fc8db2cbc22c5600bcec8162308f717b39dd0",
+      "pages": 1,
+      "source_id": "firecrawl-v2-scrape-api",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}
