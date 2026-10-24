@@ -1,3 +1,11 @@
+import type { EvidenceLocatorV1 } from '../contracts/evidence-locator-v1.js';
+import { buildFeatureRowV1, type FeatureRowV1 } from './feature-row-v1.js';
+import {
+  assertSemanticRecipeCompatibilityV1,
+  type SemanticEmbeddingRecipeV1,
+} from '../../embedding/semantic-recipe-compatibility-v1.js';
+import type { PageRankAuthorityLike } from '../../topology/pagerank-authority.js';
+
 export const PACKET_FEATURE_NAMES = [
   'semanticScore',
   'centroidAffinity',
@@ -165,4 +173,192 @@ export function getPacketFeatureRow(
 
   const start = rowIndex * matrix.cols;
   return matrix.values.slice(start, start + matrix.cols);
+}
+
+export interface BridgePacketFeatureRowToFeatureRowV1Input {
+  packetRow: PacketFeatureRow;
+  locator: EvidenceLocatorV1;
+  semanticEvidence: {
+    packetKey: string;
+    canonicalId: string;
+    sourceRef: string;
+    workspaceRevision: string;
+    sourceRevision: string;
+    representationId: 'semantic_768';
+    representationRevision: string;
+    queryRecipe: SemanticEmbeddingRecipeV1;
+    documentRecipe: SemanticEmbeddingRecipeV1;
+  };
+  featureRevision: string;
+  pagerank: PageRankAuthorityLike & {
+    runId: string;
+    graphRevision: string;
+    status: 'promoted';
+    didConverge: true;
+  };
+  semanticRevision: string;
+  sparse?: number;
+  rrf?: number;
+  ast?: number;
+  pprAffinity?: number | null;
+  crossEncoder?: number | null;
+  evidenceRefs: readonly string[];
+}
+
+export function bridgePacketFeatureRowToFeatureRowV1(
+  input: BridgePacketFeatureRowToFeatureRowV1Input,
+): FeatureRowV1 {
+  const { packetRow, locator, semanticEvidence, pagerank } = input;
+  if (!packetRow.packetKey || packetRow.packetKey.trim().length === 0) {
+    throw new Error('packetKey is required');
+  }
+  if (locator.packetKey && locator.packetKey !== packetRow.packetKey) {
+    throw new Error(`PACKET_KEY_MISMATCH: ${packetRow.packetKey} vs ${locator.packetKey}`);
+  }
+  if (!locator.canonicalId) {
+    throw new Error('canonicalId is required on EvidenceLocatorV1');
+  }
+  if (semanticEvidence.representationId !== 'semantic_768') {
+    throw new Error(`FEATURE_ROW_SEMANTIC_REPRESENTATION_UNSUPPORTED:${semanticEvidence.representationId}`);
+  }
+  if (semanticEvidence.packetKey !== packetRow.packetKey || semanticEvidence.packetKey !== locator.packetKey) {
+    throw new Error('FEATURE_ROW_SEMANTIC_PACKET_KEY_MISMATCH');
+  }
+  if (semanticEvidence.canonicalId !== locator.canonicalId) {
+    throw new Error('FEATURE_ROW_SEMANTIC_CANONICAL_ID_MISMATCH');
+  }
+  if (semanticEvidence.sourceRef !== locator.sourceRef) {
+    throw new Error('FEATURE_ROW_SEMANTIC_SOURCE_REF_MISMATCH');
+  }
+  if (semanticEvidence.workspaceRevision !== locator.workspaceRevision) {
+    throw new Error('FEATURE_ROW_SEMANTIC_WORKSPACE_REVISION_MISMATCH');
+  }
+  if (semanticEvidence.sourceRevision !== locator.sourceRevision) {
+    throw new Error('FEATURE_ROW_SEMANTIC_SOURCE_REVISION_MISMATCH');
+  }
+  if (semanticEvidence.representationRevision !== input.semanticRevision) {
+    throw new Error('FEATURE_ROW_SEMANTIC_REVISION_MISMATCH');
+  }
+  if (!pagerank.runId.trim() || !pagerank.graphRevision.trim()) {
+    throw new Error('FEATURE_ROW_PAGERANK_PROVENANCE_REQUIRED');
+  }
+  if (pagerank.status !== 'promoted') {
+    throw new Error('FEATURE_ROW_PAGERANK_NOT_PROMOTED');
+  }
+  if (pagerank.didConverge !== true) {
+    throw new Error('FEATURE_ROW_PAGERANK_CONVERGENCE_UNVERIFIED');
+  }
+  assertSemanticRecipeCompatibilityV1({
+    query: semanticEvidence.queryRecipe,
+    document: semanticEvidence.documentRecipe,
+  });
+
+  return buildFeatureRowV1({
+    locator: {
+      ...locator,
+      packetKey: packetRow.packetKey,
+    },
+    featureRevision: input.featureRevision,
+    graphRevision: pagerank.graphRevision,
+    semanticRevision: input.semanticRevision,
+    dense: packetRow.semanticScore,
+    sparse: input.sparse ?? 0,
+    rrf: input.rrf ?? 0,
+    ast: input.ast ?? 0,
+    pagerank,
+    pprAffinity: input.pprAffinity ?? null,
+    domainAffinity: packetRow.centroidAffinity,
+    freshness: packetRow.recency,
+    crossEncoder: input.crossEncoder ?? null,
+    executionUtility: packetRow.executionUtility,
+    evidenceRefs: input.evidenceRefs,
+  });
+}
+
+export interface CanonicalIdentityRoundTripProofV1 {
+  candidatePacketKey: string;
+  canonicalId: string;
+  featureRowPacketKey: string;
+  featureRowCanonicalId: string;
+  sourceRef: string;
+  contentHash: string;
+  verifiedEvidenceRef: string;
+  roundTripProven: true;
+}
+
+export function proveCanonicalIdentityRoundTripV1(input: {
+  candidate: { packetKey: string; canonicalId: string };
+  locator: EvidenceLocatorV1;
+  featureRow: FeatureRowV1;
+  evidenceStore: ReadonlyMap<string, EvidenceLocatorV1>;
+}): CanonicalIdentityRoundTripProofV1 {
+  const { candidate, locator, featureRow, evidenceStore } = input;
+
+  if (candidate.packetKey !== featureRow.packetKey) {
+    throw new Error(`ROUND_TRIP_PACKET_KEY_DRIFT: candidate=${candidate.packetKey} row=${featureRow.packetKey}`);
+  }
+  if (!candidate.canonicalId.trim()) {
+    throw new Error('ROUND_TRIP_CANONICAL_ID_REQUIRED');
+  }
+  if (candidate.canonicalId !== featureRow.canonicalId) {
+    throw new Error(`ROUND_TRIP_CANONICAL_ID_DRIFT: candidate=${candidate.canonicalId} row=${featureRow.canonicalId}`);
+  }
+  if (locator.packetKey && locator.packetKey !== featureRow.packetKey) {
+    throw new Error(`ROUND_TRIP_LOCATOR_PACKET_DRIFT: locator=${locator.packetKey} row=${featureRow.packetKey}`);
+  }
+  if (locator.canonicalId !== featureRow.canonicalId) {
+    throw new Error(`ROUND_TRIP_LOCATOR_CANONICAL_DRIFT: locator=${locator.canonicalId} row=${featureRow.canonicalId}`);
+  }
+  if (locator.sourceRef !== featureRow.sourceRef) {
+    throw new Error(`ROUND_TRIP_SOURCE_REF_DRIFT: locator=${locator.sourceRef} row=${featureRow.sourceRef}`);
+  }
+  if (locator.sourceRevision !== featureRow.sourceRevision) {
+    throw new Error(`ROUND_TRIP_SOURCE_REVISION_DRIFT: locator=${locator.sourceRevision} row=${featureRow.sourceRevision}`);
+  }
+
+  if (!featureRow.evidenceRefs || featureRow.evidenceRefs.length === 0) {
+    throw new Error('ROUND_TRIP_EVIDENCE_REFS_EMPTY');
+  }
+
+  const primaryEvidenceRef = featureRow.evidenceRefs[0];
+  const resolvedEvidence = evidenceStore.get(primaryEvidenceRef);
+  if (!resolvedEvidence) {
+    throw new Error(`ROUND_TRIP_EVIDENCE_UNRESOLVED: ref=${primaryEvidenceRef}`);
+  }
+
+  if (resolvedEvidence.canonicalId !== featureRow.canonicalId) {
+    throw new Error(`ROUND_TRIP_RESOLVED_CANONICAL_MISMATCH: ${resolvedEvidence.canonicalId} vs ${featureRow.canonicalId}`);
+  }
+  if (resolvedEvidence.sourceRef !== featureRow.sourceRef) {
+    throw new Error(`ROUND_TRIP_RESOLVED_SOURCE_REF_MISMATCH: ${resolvedEvidence.sourceRef} vs ${featureRow.sourceRef}`);
+  }
+  if (resolvedEvidence.sourceRevision !== featureRow.sourceRevision) {
+    throw new Error(`ROUND_TRIP_SOURCE_REVISION_MISMATCH: ${resolvedEvidence.sourceRevision} vs ${featureRow.sourceRevision}`);
+  }
+  if (resolvedEvidence.sourceKind !== locator.sourceKind) {
+    throw new Error(`ROUND_TRIP_SOURCE_KIND_MISMATCH: ${resolvedEvidence.sourceKind} vs ${locator.sourceKind}`);
+  }
+  if (resolvedEvidence.filePath !== locator.filePath) {
+    throw new Error(`ROUND_TRIP_FILE_PATH_MISMATCH: ${resolvedEvidence.filePath} vs ${locator.filePath}`);
+  }
+  if (resolvedEvidence.sourceUrl !== locator.sourceUrl) {
+    throw new Error(`ROUND_TRIP_SOURCE_URL_MISMATCH: ${resolvedEvidence.sourceUrl} vs ${locator.sourceUrl}`);
+  }
+  if (resolvedEvidence.contentHash !== locator.contentHash) {
+    throw new Error(`ROUND_TRIP_CONTENT_HASH_MISMATCH: ${resolvedEvidence.contentHash} vs ${locator.contentHash}`);
+  }
+  if (resolvedEvidence.workspaceRevision !== featureRow.workspaceRevision) {
+    throw new Error(`ROUND_TRIP_WORKSPACE_REVISION_MISMATCH: ${resolvedEvidence.workspaceRevision} vs ${featureRow.workspaceRevision}`);
+  }
+
+  return {
+    candidatePacketKey: candidate.packetKey,
+    canonicalId: featureRow.canonicalId,
+    featureRowPacketKey: featureRow.packetKey,
+    featureRowCanonicalId: featureRow.canonicalId,
+    sourceRef: featureRow.sourceRef,
+    contentHash: resolvedEvidence.contentHash,
+    verifiedEvidenceRef: primaryEvidenceRef,
+    roundTripProven: true,
+  };
 }

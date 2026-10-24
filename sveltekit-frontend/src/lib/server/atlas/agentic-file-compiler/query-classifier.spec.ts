@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyAtlasQuery } from './query-classifier.js';
+import { classifyAtlasQuery, packageOntologyLabelCandidatesV1 } from './query-classifier.js';
 
 describe('classifyAtlasQuery', () => {
   it('classifies a bounded file create and asks for exact promotion', () => {
@@ -60,6 +60,11 @@ describe('classifyAtlasQuery', () => {
     expect(first.checksum).toBe(second.checksum);
     expect(first.retrievalNeeds).toEqual(second.retrievalNeeds);
     expect(first.repositoryScopeCandidates).toHaveLength(1);
+  });
+
+  it('derives display labels for only the recognized package candidates', () => {
+    expect(packageOntologyLabelCandidatesV1(['drizzle-orm', '@sveltejs/kit', '@acme/db']))
+      .toEqual(['Drizzle ORM', 'SvelteKit']);
   });
 
   it('does not infer repository scope from ordinary path or repository prose', () => {

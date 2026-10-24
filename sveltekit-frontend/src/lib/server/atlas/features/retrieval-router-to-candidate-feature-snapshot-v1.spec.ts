@@ -34,6 +34,7 @@ const routerRow = {
   canonicalId: 'canonical:1',
   packetKey: 'packet:1',
   sourceRef: 'src/file.ts',
+  sourceRevision: 'source:r1',
   treeNodeId: 'tree:1',
   sourceVersionReceiptId: null,
   reconciliationReceiptId: null,
@@ -79,6 +80,34 @@ describe('retrieval-router to candidate feature snapshot adapter', () => {
       laneMaskByOrdinal: { '0': ['semantic'] },
       producerRevision: 'snapshot-producer:r1',
     })).toThrow('ACE_FEATURE_ROW_WORKSPACE_REVISION_MISMATCH:0');
+  });
+
+  it('rejects source identity and semantic representation revision drift', () => {
+    expect(() => materializeCandidateFeatureSnapshotFromRetrievalRowsV1({
+      ordinalMap,
+      rows: [{ ...routerRow, sourceRef: 'src/other.ts' }],
+      laneMaskByOrdinal: { '0': ['semantic'] },
+      producerRevision: 'snapshot-producer:r1',
+    })).toThrow('ACE_FEATURE_ROW_SOURCE_REF_MISMATCH:0');
+
+    expect(() => materializeCandidateFeatureSnapshotFromRetrievalRowsV1({
+      ordinalMap,
+      rows: [{
+        ...routerRow,
+        semantic: { ...routerRow.semantic, representationRevision: 'semantic:r2' },
+      }],
+      laneMaskByOrdinal: { '0': ['semantic'] },
+      producerRevision: 'snapshot-producer:r1',
+    })).toThrow('ACE_FEATURE_ROW_SEMANTIC_REVISION_MISMATCH:0');
+  });
+
+  it('rejects source revision drift against the ordinal map', () => {
+    expect(() => materializeCandidateFeatureSnapshotFromRetrievalRowsV1({
+      ordinalMap,
+      rows: [{ ...routerRow, sourceRevision: 'source:stale' }],
+      laneMaskByOrdinal: { '0': ['semantic'] },
+      producerRevision: 'producer:r1',
+    })).toThrow('ACE_FEATURE_ROW_SOURCE_REVISION_MISMATCH:0');
   });
 
   it('builds a deterministic snapshot from revision-qualified QAS rows', () => {

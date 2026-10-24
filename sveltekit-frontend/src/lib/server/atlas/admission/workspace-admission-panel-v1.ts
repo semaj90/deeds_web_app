@@ -11,7 +11,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-export type PanelBadge = 'LIVE_PROVEN' | 'DEGRADED_READ_ONLY' | 'STALE_RECEIPT' | 'UNAVAILABLE';
+export type PanelBadge = 'LIVE_PROVEN' | 'DEGRADED_READ_ONLY' | 'STALE_RECEIPT' | 'UNAVAILABLE' | 'CURRENTNESS_BLOCKED';
 
 export interface ReceiptRead {
   ok: boolean;
@@ -44,6 +44,13 @@ export interface AdmissionPanelInputs {
   /** stat() of the candidate snapshot artifact (never parsed: it is ~15 MB). */
   candidateArtifact: { exists: boolean; bytes: number | null };
   executions: { ok: boolean; rows: ExecutionRow[]; error: string | null };
+  /**
+   * Independent currentness result for the workspace frame. LIVE_PROVEN requires `current === true`.
+   * Absent, unknown, or false yields CURRENTNESS_BLOCKED: a receipt's internal consistency is not currentness.
+   */
+  currentness?: { current: boolean | null; reason: string | null };
+  /** Live byte readback of the workspace (independent of the selected frame); absent means unknown. */
+  liveReadback?: { ok: boolean; snapshotRevision: string | null; proven: boolean; error: string | null };
   /** Optional shadow observations (loader supplies them; absent in pure tests). */
   authorityShadow?: { observations: AuthorityShadowObservationV1[]; error: string | null };
   now?: Date;
@@ -122,6 +129,24 @@ function ageSeconds(generatedAt: string | null, now: Date): number | null {
 }
 
 /** Pure: same inputs, same panel. All authority-looking fields are derived from receipts, never invented. */
+/** Only an explicit, independent currentness result of true may yield LIVE_PROVEN. */
+function currentnessBadge(currentness: boolean | null): PanelBadge {
+  return currentness === true ? 'LIVE_PROVEN' : 'CURRENTNESS_BLOCKED';
+}
+
+/** Independent currentness: a live byte readback whose snapshot revision equals the admitted snapshot. */
+export function deriveCurrentnessV1(
+  live: AdmissionPanelInputs['liveReadback'],
+  admittedSnapshot: string | null,
+): { current: boolean | null; reason: string } {
+  if (!live || !live.ok) return { current: null, reason: 'NO_LIVE_READBACK' };
+  if (!live.proven || !live.snapshotRevision) return { current: null, reason: 'LIVE_READBACK_NOT_PROVEN' };
+  if (!admittedSnapshot) return { current: null, reason: 'NO_ADMITTED_SNAPSHOT' };
+  return live.snapshotRevision === admittedSnapshot
+    ? { current: true, reason: 'LIVE_SNAPSHOT_MATCHES_ADMITTED' }
+    : { current: false, reason: 'LIVE_SNAPSHOT_DIFFERS_FROM_ADMITTED' };
+}
+
 export function buildWorkspaceAdmissionPanelV1(inputs: AdmissionPanelInputs): WorkspaceAdmissionPanelV1 {
   const now = inputs.now ?? new Date();
   const derive = inputs.derive.value;
@@ -137,6 +162,9 @@ export function buildWorkspaceAdmissionPanelV1(inputs: AdmissionPanelInputs): Wo
   const candidateRevision = str(derive?.workspaceRevisionCandidate);
   const admittedWorkspace = str(binding?.admittedWorkspaceRevision);
   const admittedSnapshot = str(binding?.snapshotRevision);
+  const currentness = inputs.currentness?.current !== undefined
+    ? inputs.currentness.current
+    : deriveCurrentnessV1(inputs.liveReadback, admittedSnapshot).current;
 
   const admittedRows = inputs.executions.ok
     ? inputs.executions.rows.filter((r) => admittedWorkspace !== null && r.workspaceRevision === admittedWorkspace)
@@ -185,14 +213,14 @@ export function buildWorkspaceAdmissionPanelV1(inputs: AdmissionPanelInputs): Wo
       ? 'STALE_RECEIPT'
       : !inputs.executions.ok
         ? 'DEGRADED_READ_ONLY'
-        : 'LIVE_PROVEN';
+        : currentnessBadge(currentness);
   const admittedBadge: PanelBadge = !inputs.binding.ok
     ? 'UNAVAILABLE'
     : !inputs.executions.ok
       ? 'DEGRADED_READ_ONLY'
       : consistency.some((c) => !c.ok && c.check.startsWith('binding'))
         ? 'STALE_RECEIPT'
-        : 'LIVE_PROVEN';
+        : currentnessBadge(currentness);
 
   const canonicalState: WorkspaceAdmissionPanelV1['admitted']['canonicalState'] =
     !inputs.executions.ok || !inputs.binding.ok || matching.length === 0
@@ -383,5 +411,26 @@ export async function loadWorkspaceAdmissionPanelV1(): Promise<WorkspaceAdmissio
     }
   }
 
-  return buildWorkspaceAdmissionPanelV1({ derive, preflight, binding, candidateArtifact, executions, authorityShadow });
+  const liveReadback = await readLatestLiveReadbackV1(await findRepoRoot());
+  return buildWorkspaceAdmissionPanelV1({ derive, preflight, binding, candidateArtifact, executions, authorityShadow, liveReadback });
+}
+
+/** Newest scratch capture summary: the byte readback is computed from live files, not from the selected frame. */
+export async function readLatestLiveReadbackV1(root: string | null): Promise<NonNullable<AdmissionPanelInputs['liveReadback']>> {
+  if (!root) return { ok: false, snapshotRevision: null, proven: false, error: 'REPO_ROOT_NOT_FOUND' };
+  const base = path.join(root, '.tmp', 'atlas', 'workspace-snapshot-scratch-v1');
+  try {
+    const dirs = (await fs.readdir(base)).filter((d) => d.startsWith('scratch-snapshot-')).sort();
+    const latest = dirs[dirs.length - 1];
+    if (!latest) return { ok: false, snapshotRevision: null, proven: false, error: 'NO_LIVE_CAPTURE' };
+    const summary = JSON.parse(await fs.readFile(path.join(base, latest, 'summary.json'), 'utf8'));
+    const readback = summary?.readback ?? {};
+    const proven = readback.status === 'SNAPSHOT_BYTES_READBACK_PROVEN'
+      && Array.isArray(readback.violations) && readback.violations.length === 0
+      && readback.exactMatches === readback.sourceCount
+      && summary.transientDriftObserved === false;
+    return { ok: true, snapshotRevision: typeof summary.snapshotRevision === 'string' ? summary.snapshotRevision : null, proven, error: null };
+  } catch (error) {
+    return { ok: false, snapshotRevision: null, proven: false, error: error instanceof Error ? error.message : String(error) };
+  }
 }

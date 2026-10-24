@@ -11,6 +11,7 @@ function classification(overrides: Partial<QueryClassificationV1> = {}): QueryCl
     operation: 'ANSWER',
     mutationKind: null,
     domains: ['retrieval'],
+    packageCandidates: [],
     artifactKinds: [],
     targetHints: [],
     symbols: ['classifyAtlasQuery'],
@@ -59,6 +60,27 @@ describe('AR-07: OAK query enrichment (additive, over an already-computed classi
     );
 
     expect(result.evidence).toHaveLength(1);
+  });
+
+  it('resolves package candidates as advisory ontology labels', async () => {
+    const resolvedLabels: string[] = [];
+    global.fetch = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as { query: string };
+      resolvedLabels.push(body.query);
+      return new Response(JSON.stringify({ matches: [] }), { status: 200 });
+    }) as unknown as typeof fetch;
+
+    const { enrichQueryClassificationWithOakV1 } = await import('./oak-query-enrichment-v1.js');
+    const result = await enrichQueryClassificationWithOakV1(classification({
+      domains: [],
+      packageCandidates: ['drizzle-orm', '@sveltejs/kit'],
+      symbols: [],
+      targetHints: [],
+    }));
+
+    expect(resolvedLabels).toEqual(['drizzle-orm', '@sveltejs/kit']);
+    expect(result.evidence.map((evidence) => evidence.rawLabel)).toEqual(resolvedLabels);
+    expect(result.evidence.every((evidence) => evidence.canonicalAuthority === false)).toBe(true);
   });
 
   it('respects maxLabels and never exceeds it', async () => {

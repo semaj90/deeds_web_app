@@ -4,12 +4,13 @@
  */
 
 import { z } from 'zod';
+import { refuseVerifiedContextV1, verifyVerifiedContextMastraReadbackV1, VerifiedContextRequestV1Schema, VerifiedContextResponseV1Schema, type VerifiedContextServiceV1 } from './execution/verified-context-service-v1.js';
 
 // The frontend deliberately keeps this local tool seam until a real Mastra
 // runtime is proven compatible with the PostgreSQL/Drizzle ownership model.
-// The isolated @deeds/atlas-orchestrator workspace declares @mastra/core, but
-// the currently resolved 0.1.x runtime eagerly imports @prisma-app/client.
-// Adding Prisma here would create an unauthorized second persistence owner.
+// The isolated @deeds/atlas-orchestrator workspace declares @mastra/core 1.71.0.
+// Mastra's own storage packages (@mastra/pg, @mastra/redis) would create a second
+// persistence owner beside Drizzle/PostgreSQL and Valkey, so they stay unwired.
 // This shim preserves the call shape (id/description/inputSchema/outputSchema/
 // execute) so the seven tool definitions remain callable, while making no
 // claim that Mastra's agent loop, workflow runtime, or snapshot persistence is
@@ -178,6 +179,25 @@ export const atlasBuildContextTool = createTool({
   }),
   execute: async (input, context) => {
     throw new AtlasAdapterUnavailableError('ATLAS_CONTEXT_ADAPTER_UNAVAILABLE_ACE_OWNER_REQUIRED');
+  },
+});
+
+export const atlasVerifiedContextTool = createTool({
+  id: 'atlas.verified_context',
+  description: 'Request a server-verified Top-K context packet. Returns an immutable packet reference and digest or an explicit refusal; never returns raw search hits.',
+  inputSchema: VerifiedContextRequestV1Schema.omit({ requestId: true }),
+  outputSchema: VerifiedContextResponseV1Schema,
+  execute: async (input, context) => {
+    const trusted = context as { verifiedContextService?: VerifiedContextServiceV1; authenticatedActorId?: string; requestId?: string } | undefined;
+    const requestId = trusted?.requestId?.trim();
+    if (!requestId || !trusted?.authenticatedActorId || !trusted.verifiedContextService) {
+      return refuseVerifiedContextV1(requestId || 'unbound', 'VERIFIED_CONTEXT_AUTHORITY_UNAVAILABLE');
+    }
+    const untrustedInput = input as { query?: unknown; topK?: unknown };
+    const request = VerifiedContextRequestV1Schema.safeParse({ ...untrustedInput, requestId });
+    if (!request.success) return refuseVerifiedContextV1(requestId, 'INVALID_VERIFIED_CONTEXT_REQUEST');
+    const result = await trusted.verifiedContextService.execute(trusted.authenticatedActorId, request.data);
+    return verifyVerifiedContextMastraReadbackV1(result);
   },
 });
 
@@ -351,6 +371,7 @@ function getToolsForState(state: AtlasState): string[] {
     [AtlasState.DISCOVER]: ['atlas.discover', 'atlas.inspect_runtime'],
     [AtlasState.RETRIEVE]: [
       'atlas.retrieve',
+      'atlas.verified_context',
       'atlas.embedding_neighbors',
       'atlas.graph_traversal',
       'atlas.inspect_runtime',

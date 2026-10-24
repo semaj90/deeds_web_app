@@ -48,7 +48,10 @@ export interface BuildFeatureRowV1Input {
 }
 
 function clamp01(value: number | null | undefined): number {
-	if (!Number.isFinite(Number(value))) return 0;
+	if (value != null && !Number.isFinite(value)) {
+		throw new Error('FEATURE_ROW_NON_FINITE_SCORE');
+	}
+	if (value == null) return 0;
 	return Math.max(0, Math.min(1, Number(value)));
 }
 

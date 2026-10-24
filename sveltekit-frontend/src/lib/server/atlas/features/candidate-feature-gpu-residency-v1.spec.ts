@@ -29,13 +29,15 @@ function observationChecksum(value: object): string {
 
 function pack() {
   return {
-    schema: 'atlas.candidate-feature-gpu-pack.v1' as const,
+    schema: 'atlas.candidate-feature-gpu-pack.v2' as const,
     candidateSnapshotRevision: 'candidate:r1',
     ordinalMapChecksum: H('ordinal-map'),
     featureSnapshotChecksum: H('feature-snapshot'),
     workspaceRevision: 'workspace:r1',
     featureRevision: 'feature:r1',
     sourceRevisions: ['source:a:r1', 'source:b:r1'],
+    candidateOrdinalsChecksum: H('candidate-ordinals'),
+    rowIdentityChecksum: H('row-identity'),
     columnarChecksum: H('columnar'),
     logicalRows: 2,
     physicalRows: PHYSICAL_ROWS,

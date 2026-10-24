@@ -31,13 +31,20 @@ const SYMBOL_HINT = /(?:method|function|class|type|interface|variable|symbol)s?\
 function uniq(values: string[]): string[] { return [...new Set(values.filter(Boolean))].sort(); }
 function orderedUnique(values: string[]): string[] { return [...new Set(values.filter(Boolean))]; }
 
-const PACKAGE_ALIASES: ReadonlyArray<[RegExp, string]> = [
-  [/\bdrizzle(?:\s+orm|-orm)\b/i, 'drizzle-orm'],
-  [/\bsveltekit(?:\s+2)?\b/i, '@sveltejs/kit'],
-  [/\bvitest\b/i, 'vitest'],
-  [/\bneo4j(?:\s+driver|-driver)\b/i, 'neo4j-driver'],
-  [/\bpostgres(?:ql)?\b/i, 'postgres'],
+const PACKAGE_ALIASES: ReadonlyArray<[RegExp, string, string]> = [
+  [/\bdrizzle(?:\s+orm|-orm)\b/i, 'drizzle-orm', 'Drizzle ORM'],
+  [/\bsveltekit(?:\s+2)?\b/i, '@sveltejs/kit', 'SvelteKit'],
+  [/\bvitest\b/i, 'vitest', 'Vitest'],
+  [/\bneo4j(?:\s+driver|-driver)\b/i, 'neo4j-driver', 'Neo4j Driver'],
+  [/\bpostgres(?:ql)?\b/i, 'postgres', 'Postgres'],
 ];
+
+export function packageOntologyLabelCandidatesV1(packageCandidates: readonly string[]): string[] {
+  const selectedPackages = new Set(packageCandidates);
+  return uniq(PACKAGE_ALIASES
+    .filter(([, packageName]) => selectedPackages.has(packageName))
+    .map(([, , ontologyLabel]) => ontologyLabel));
+}
 
 function queryTerms(query: string): string[] {
   return orderedUnique(query.match(/[A-Za-z_$][\w$-]*|\d+/g) ?? []).slice(0, 64);

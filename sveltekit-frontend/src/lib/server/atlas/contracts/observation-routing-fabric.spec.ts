@@ -104,6 +104,7 @@ describe('Observation Routing Fabric contracts', () => {
       temporal: { recency: 0.95, changeFrequency: 2, mutationStatus: 'FRESH' },
       evidence: { groundingExact: true, validatorPassed: true, authorityWeight: 0.9 },
     });
+    expect(row.sourceRevision).toBe(observation.sourceRevision);
 
     expect(row.semantic.dimension).toBe(768);
     expect(row.semantic.representationId).toBe('semantic_768');

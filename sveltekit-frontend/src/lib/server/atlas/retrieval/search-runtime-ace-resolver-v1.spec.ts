@@ -68,6 +68,7 @@ describe('SearchRuntimeAceResolverV1', () => {
         canonicalId: 'packet:1',
         packetKey: 'packet:1',
         sourceRef: 'src/one.ts',
+        sourceRevision: `sha256:${'b'.repeat(64)}`,
         treeNodeId: null,
         sourceVersionReceiptId: null,
         reconciliationReceiptId: null,

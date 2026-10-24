@@ -37,6 +37,7 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
         {
           canonicalId: 'canon:file-app-d-ts',
           packetKey: 'packet:1',
+          sourceRef: 'src/app.d.ts',
           treeNodeId: 'tree:1',
           symbolVersionId: 'symbol:1',
           workspaceRevision,
@@ -49,6 +50,7 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
         {
           canonicalId: 'canon:file-pkg-json',
           packetKey: 'packet:2',
+          sourceRef: 'package.json',
           treeNodeId: 'tree:2',
           symbolVersionId: 'symbol:2',
           workspaceRevision,
@@ -71,6 +73,7 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
         candidateOrdinal: ordinal,
         canonicalId: c.canonicalId,
         packetKey: c.packetKey,
+        sourceRef: c.sourceRef,
         treeNodeId: c.treeNodeId,
         symbolVersionId: c.symbolVersionId,
         workspaceRevision: c.workspaceRevision,
@@ -151,6 +154,7 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
         {
           canonicalId: 'canon:stale-file',
           packetKey: 'packet:stale',
+          sourceRef: 'src/app.d.ts',
           treeNodeId: 'tree:stale',
           symbolVersionId: 'symbol:stale',
           workspaceRevision,
@@ -173,6 +177,7 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
         candidateOrdinal: ordinal,
         canonicalId: c.canonicalId,
         packetKey: c.packetKey,
+        sourceRef: c.sourceRef,
         treeNodeId: c.treeNodeId,
         symbolVersionId: c.symbolVersionId,
         workspaceRevision: c.workspaceRevision,

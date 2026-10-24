@@ -57,6 +57,7 @@ import {
   analyzeImports,
   formatAnalyzeImportsResults,
   fetchPageContent,
+  createOakResolveTool,
 } from './tools/index.js';
 
 // FastMCP Tool Wrapper
@@ -83,6 +84,7 @@ interface AgentConfig {
 	maxIterations?: number;
 	temperature?: number;
 	verbose?: boolean;
+	proposalOnly?: boolean;
 }
 
 // Investigation Result
@@ -109,6 +111,7 @@ export class AutonomousAgent {
       maxIterations: 10,
       temperature: 0.7,
       verbose: true,
+      proposalOnly: config.proposalOnly ?? true,
       ...config,
     };
 
@@ -642,6 +645,15 @@ export class AutonomousAgent {
         }),
         func: async ({ title, description, status, priority }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'cases_create',
+                proposal: { title, description, status, priority },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const response = await fetchWithTimeout(`${AGENT_API_BASE()}/cases`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -669,6 +681,15 @@ export class AutonomousAgent {
         }),
         func: async ({ caseId, ...updates }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'cases_update',
+                proposal: { caseId, updates },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const response = await fetchWithTimeout(`${AGENT_API_BASE()}/cases/${caseId}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
@@ -724,6 +745,15 @@ export class AutonomousAgent {
         }),
         func: async ({ caseId, citationText, sourceTitle, pageNumber }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'citations_add',
+                proposal: { caseId, citationText, sourceTitle, pageNumber },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const response = await fetchWithTimeout(
               `${AGENT_API_BASE()}/cases/${caseId}/citations`,
               {
@@ -957,6 +987,15 @@ export class AutonomousAgent {
         }),
         func: async ({ filePath, caseId }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'evidence_upload',
+                proposal: { filePath, caseId },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct storage/database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const safePath = validateAgentFilePath(filePath);
             const fs = await import('fs');
             const path = await import('path');
@@ -1054,6 +1093,15 @@ export class AutonomousAgent {
               );
               return JSON.stringify(await response.json());
             } else {
+              if (this.config.proposalOnly) {
+                return JSON.stringify({
+                  status: 'PROPOSED_MUTATION',
+                  tool: 'case_notes_add',
+                  proposal: { caseId, content },
+                  admitted: false,
+                  reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+                });
+              }
               const response = await fetchWithTimeout(
                 `${AGENT_API_BASE()}/cases/${caseId}/notes`,
                 {
@@ -1215,6 +1263,9 @@ export class AutonomousAgent {
       })
     );
 
+    // 33. OAK Domain & Concept Resolution Tool (Read-only ontology grounding)
+    tools.push(createOakResolveTool());
+
     return tools;
   }
 
@@ -1331,9 +1382,13 @@ export class AutonomousAgent {
       'terminology',
       'concept of',
       'refers to',
+      'ontology',
+      'oak',
+      'curie',
+      'taxonomy',
     ];
     if (DEFINITION_KEYWORDS.some((kw) => q.includes(kw))) {
-      selected.unshift('glossary_search');
+      selected.unshift('glossary_search', 'oak_resolve_concept');
     }
 
     // Fallback: general investigation tools

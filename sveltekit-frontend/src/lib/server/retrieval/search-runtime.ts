@@ -15,7 +15,7 @@ import { createHash } from 'node:crypto';
 import type { FeatureEnvelope } from './feature-envelope.js';
 import type { ScorerOptions } from './candidate-scorer.js';
 import type { PostProcessConfig } from './post-process-reranker.js';
-import type { Retriever, Reranker } from './lane-contracts.js';
+import type { LaneCandidate, Retriever, Reranker } from './lane-contracts.js';
 import { ENV } from '../env.server.js';
 import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
 import type { HydrationProofContext, HydrationProofSummary, HydratedCandidatesWithProof } from './hydrate-candidates.js';
@@ -984,7 +984,12 @@ export class SearchRuntime {
           scorerVersion: 'passthrough',
           modelScored: false,
         };
-        return { ...base, blendedScore: base.blendedScore || (reranked.length - idx) / reranked.length };
+        return {
+          ...base,
+          blendedScore: this.injectedReranker
+            ? env.blended_score ?? (reranked.length - idx) / reranked.length
+            : base.blendedScore || (reranked.length - idx) / reranked.length,
+        };
       });
 
       const { postProcessCandidates } = await import('./post-process-reranker.js');
@@ -1090,7 +1095,11 @@ export class SearchRuntime {
           retrievalSources: this.getRetrievalSources(candidates),
           fusionMethod: 'rrf',
           rerankModel: reranked[0]?.model_version ?? 'mixedbread-ai/mxbai-rerank-base-v2',
-          rerankerUsed: reranked.length > 0,
+          rerankerUsed: reranked.length > 0 && !reranked.some((packet) => [
+            'injected-reranker-invalid-input',
+            'injected-reranker-invalid-output',
+            'injected-reranker-error-fallback',
+          ].includes(packet.model_version ?? '')),
           promotionAttempted: !this.readOnly,
           readOnly: this.readOnly,
           ...(hypergraphNeighbors ? {
@@ -1439,6 +1448,91 @@ export class SearchRuntime {
     envelopes: FeatureEnvelope[],
     query: SearchQuery,
   ): Promise<Array<FeatureEnvelope & { model_version?: string; blended_score?: number }>> {
+    if (this.injectedReranker) {
+      const identity = (candidate: LaneCandidate) => ({
+        packetKey: candidate.packetKey,
+        sourceRef: candidate.sourceRef,
+        sourceRevision: candidate.sourceRevision,
+        workspaceRevision: candidate.workspaceRevision,
+        representationId: candidate.representationId,
+        representationRevision: candidate.representationRevision,
+      });
+      const inputs: LaneCandidate[] = [];
+      const envelopesByKey = new Map<string, FeatureEnvelope>();
+
+      for (const [index, envelope] of envelopes.entries()) {
+        const packetKey = envelope.packet_key?.trim();
+        const sourceRef = envelope.source_ref?.trim();
+        if (!packetKey || !sourceRef || envelopesByKey.has(packetKey)) {
+          console.warn('[stage:rerank] injected reranker skipped: candidate identity is missing or duplicated');
+          return envelopes.map((item) => ({ ...item, model_version: 'injected-reranker-invalid-input' }));
+        }
+        const lane = envelope.retrieval_source;
+        const normalizedLane = lane ? normalizeRetrievalLane(lane) : undefined;
+        const rerankerLane: LaneCandidate['lane'] = normalizedLane === 'dense'
+          ? 'dense'
+          : normalizedLane === 'lexical'
+            ? 'bm25'
+            : lane === 'sparse' || lane === 'bm42' || lane === 'bm25' || lane === 'exact'
+              || lane === 'ast' || lane === 'ast_tree' || lane === 'rg'
+              || lane === 'rg_keyword' || lane === 'go-retrieval'
+              ? lane === 'ast_tree'
+                ? 'ast'
+                : lane === 'rg_keyword'
+                  ? 'rg'
+                  : lane
+              : 'exact';
+        const candidate: LaneCandidate = {
+          packetKey,
+          sourceRef,
+          sourceRevision: envelope.source_revision,
+          workspaceRevision: envelope.workspace_revision,
+          representationId: envelope.representation_id,
+          representationRevision: envelope.representation_revision,
+          rank: envelope.retrieved_rank ?? index + 1,
+          score: envelope.retrieval_score ?? envelope.fusion_score ?? envelope.rrf_score ?? null,
+          lane: rerankerLane,
+          metadata: {
+            ...(envelope.domain ? { domain: envelope.domain } : {}),
+            ...(envelope.domain_class ? { domainClass: envelope.domain_class } : {}),
+            ...(envelope.language ? { language: envelope.language } : {}),
+            ...(envelope.kind ? { kind: envelope.kind } : {}),
+          },
+          fusionStage: 'search_runtime',
+        };
+        inputs.push(candidate);
+        envelopesByKey.set(packetKey, envelope);
+      }
+
+      try {
+        const result = await this.injectedReranker.rerank({ query: query.text, candidates: inputs });
+        const ranked = result.ranked;
+        const inputByKey = new Map(inputs.map((candidate) => [candidate.packetKey, candidate]));
+        const rankedKeys = ranked.map((candidate) => candidate.packetKey);
+        const validPermutation = ranked.length === inputs.length
+          && new Set(rankedKeys).size === inputs.length
+          && ranked.every((candidate) => {
+            const original = inputByKey.get(candidate.packetKey);
+            return original
+              && JSON.stringify(identity(candidate)) === JSON.stringify(identity(original));
+          });
+
+        if (!validPermutation) {
+          console.warn('[stage:rerank] injected reranker rejected: output is not an identity-preserving permutation');
+          return envelopes.map((item) => ({ ...item, model_version: 'injected-reranker-invalid-output' }));
+        }
+
+        return ranked.map((candidate, index) => ({
+          ...envelopesByKey.get(candidate.packetKey)!,
+          model_version: result.modelVersion || this.injectedReranker!.modelVersion,
+          blended_score: (ranked.length - index) / ranked.length,
+        }));
+      } catch (error) {
+        console.warn('[stage:rerank] injected reranker failed; preserving retrieval order', error);
+        return envelopes.map((item) => ({ ...item, model_version: 'injected-reranker-error-fallback' }));
+      }
+    }
+
     const { rerankCanonicalFeatureEnvelopes } = await import('./canonical-rerank-executor.js');
     const policyInput = buildPolicyStateFromRerankSignals({
       query: query.text,
@@ -2006,6 +2100,7 @@ export function createSearchRuntime(config?: {
   userId?: string;
   caseId?: string;
   readOnly?: boolean;
+  reranker?: SearchRuntimeConfig['reranker'];
   functionRegistry?: SearchRuntimeConfig['functionRegistry'];
 }): SearchRuntime {
   return new SearchRuntime(config ?? {});
@@ -2019,6 +2114,7 @@ export function createProductionSearchRuntime(config?: {
   userId?: string;
   caseId?: string;
   readOnly?: boolean;
+  reranker?: SearchRuntimeConfig['reranker'];
   functionRegistry?: SearchRuntimeConfig['functionRegistry'];
 }): SearchRuntime {
   return new SearchRuntime({ ...(config ?? {}) });

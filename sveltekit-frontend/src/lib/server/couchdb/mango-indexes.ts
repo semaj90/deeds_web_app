@@ -13,11 +13,7 @@
  *
  * Call ensureMangoIndexes() once at startup (idempotent).
  */
-import { ENV } from '$lib/server/env.server.js';
-
-const COUCHDB_URL  = ENV.COUCHDB_URL;
-const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = (process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass');
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -121,16 +117,13 @@ const ATLAS_INDEXES = [
 
 // ── HTTP helpers ──────────────────────────────────────────────────────────────
 
-function authHeader(): string {
-  return 'Basic ' + Buffer.from(COUCHDB_USER + ':' + COUCHDB_PASS).toString('base64');
-}
-
 async function couchFetch(path: string, init?: RequestInit): Promise<Response> {
-  return fetch(COUCHDB_URL + '/' + path, {
+  const couchDb = resolveCouchDbConfigV1(process.env);
+  return fetch(couchDb.baseUrl + '/' + path, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: authHeader(),
+      Authorization: couchDb.authorization,
       ...(init?.headers ?? {}),
     },
   });

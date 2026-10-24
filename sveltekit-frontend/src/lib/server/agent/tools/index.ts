@@ -5,3 +5,4 @@ export { findFiles, formatFindFilesResults } from './find-files.js';
 export { analyzeFile, formatAnalyzeFileResults } from './analyze-file.js';
 export { extractPattern, formatExtractPatternResults } from './extract-pattern.js';
 export { analyzeImports, formatAnalyzeImportsResults } from './analyze-imports.js';
+export { createOakResolveTool } from './oak-resolve.js';

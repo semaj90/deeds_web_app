@@ -47,6 +47,42 @@ describe('OAKLIB-equivalent resolution boundary (ontology-resolution-boundary-po
     expect(result.matchMethod).toBe('alias');
   });
 
+  it('resolves the SvelteKit and Drizzle package display labels through exact ontology aliases', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: [
+      ...seedRows(),
+      {
+        group_id: 'database',
+        group_label: 'Database & Persistence',
+        parent_group_id: null,
+        examples: ['Postgres', 'Drizzle ORM', 'pgvector', 'migrations'],
+        updated_at: FIXED_UPDATED_AT,
+      },
+      {
+        group_id: 'frontend.sveltekit',
+        group_label: 'SvelteKit / Svelte',
+        parent_group_id: 'frontend',
+        examples: ['SvelteKit', 'Svelte', 'Svelte 5', 'runes'],
+        updated_at: FIXED_UPDATED_AT,
+      },
+      {
+        group_id: 'frontend',
+        group_label: 'Frontend & UI',
+        parent_group_id: null,
+        examples: ['Svelte', 'SvelteKit', 'UI components'],
+        updated_at: FIXED_UPDATED_AT,
+      },
+    ] });
+    const { resolveOntologyLabelV1 } = await import('./ontology-resolution-boundary-postgres.js');
+
+    const [drizzle, sveltekit] = await Promise.all(['Drizzle ORM', 'SvelteKit'].map((label) =>
+      resolveOntologyLabelV1({ schemaVersion: 'atlas.ontology-resolution-request.v1', label })
+    ));
+
+    expect(drizzle).toMatchObject({ resolutionState: 'RESOLVED', conceptId: 'concept:database', matchMethod: 'alias' });
+    expect(sveltekit).toMatchObject({ resolutionState: 'AMBIGUOUS', conceptId: null, candidateConceptIds: ['concept:frontend', 'concept:frontend.sveltekit'] });
+  });
+
   it('does not invent a concept for an unknown label (spec.md: unknown label does not resolve)', async () => {
     queryMock.mockClear();
     queryMock.mockResolvedValue({ rows: seedRows() });

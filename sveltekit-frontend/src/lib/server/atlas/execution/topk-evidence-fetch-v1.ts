@@ -55,7 +55,8 @@ export interface QualifiedEvidenceV1 {
 
 export type RejectedEvidenceReasonV1 =
   | 'UNRESOLVED_CANDIDATE' | 'DEGRADED_IDENTITY' | 'SPAN_UNAVAILABLE' | 'SOURCE_UNREADABLE'
-  | 'SOURCE_REVISION_NOT_SHA256' | 'SOURCE_REVISION_STALE' | 'SPAN_OUT_OF_RANGE' | 'SPAN_NOT_UTF8_BOUNDARY' | 'SPAN_UNSAFE_PATH';
+  | 'SOURCE_REF_MISSING' | 'SPAN_SOURCE_REF_MISMATCH' | 'SOURCE_REVISION_NOT_SHA256' | 'SOURCE_REVISION_STALE'
+  | 'SPAN_OUT_OF_RANGE' | 'SPAN_NOT_UTF8_BOUNDARY' | 'SPAN_UNSAFE_PATH';
 
 export interface RejectedEvidenceV1 { rank: number; ordinal: number; canonicalId: string; reason: RejectedEvidenceReasonV1 }
 
@@ -108,6 +109,7 @@ export function resolveTopKEvidenceV1(params: {
     const candidate = map.candidates[pick.ordinal];
     if (!candidate || candidate.candidateOrdinal !== pick.ordinal || candidate.canonicalId !== pick.canonicalId) { reject('UNRESOLVED_CANDIDATE'); continue; }
     if (candidate.degradedIdentity) { reject('DEGRADED_IDENTITY'); continue; }
+    if (!candidate.sourceRef) { reject('SOURCE_REF_MISSING'); continue; }
     if (!/^sha256:[a-f0-9]{64}$/.test(candidate.sourceRevision)) { reject('SOURCE_REVISION_NOT_SHA256'); continue; }
 
     const span = params.port.lookupSpan({
@@ -116,6 +118,7 @@ export function resolveTopKEvidenceV1(params: {
     });
     if (!span) { reject('SPAN_UNAVAILABLE'); continue; }
     if (!SAFE_SOURCE_REF.test(span.sourceRef)) { reject('SPAN_UNSAFE_PATH'); continue; }
+    if (span.sourceRef !== candidate.sourceRef) { reject('SPAN_SOURCE_REF_MISMATCH'); continue; }
     const bytes = params.port.readBytes(span.sourceRef);
     if (!bytes) { reject('SOURCE_UNREADABLE'); continue; }
     if (sourceRevisionOfBytes(bytes) !== candidate.sourceRevision) { reject('SOURCE_REVISION_STALE'); continue; }

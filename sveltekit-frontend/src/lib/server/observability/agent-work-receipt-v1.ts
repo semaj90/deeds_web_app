@@ -4,6 +4,18 @@ import { z } from 'zod';
 const revision = z.string().min(1).nullable();
 const checksum = z.string().regex(/^sha256:[a-f0-9]{64}$/).nullable();
 
+export const AgentCorrelationV1Schema = z.object({
+  schema: z.literal('atlas.agent-correlation.v1'),
+  requestId: z.string().min(1),
+  runId: z.string().min(1).nullable(),
+  traceId: z.string().min(1).nullable(),
+  contextManifestDigest: checksum,
+  packetReceiptDigest: checksum,
+  correlationStatus: z.enum(['VERIFIED', 'UNAVAILABLE']),
+}).strict();
+
+export type AgentCorrelationV1 = z.infer<typeof AgentCorrelationV1Schema>;
+
 export const AgentWorkReceiptV1Schema = z.object({
   schema: z.literal('atlas.agent-work-receipt.v1'),
   receiptId: z.string().min(1),
@@ -36,6 +48,7 @@ export const AgentWorkReceiptV1Schema = z.object({
   status: z.enum(['RUNNING', 'SUCCEEDED', 'PARTIAL', 'FAILED']),
   writesPerformed: z.boolean(),
   completionChecksum: checksum,
+  correlation: AgentCorrelationV1Schema.nullable().optional(),
 }).strict();
 
 export type AgentWorkReceiptV1 = z.infer<typeof AgentWorkReceiptV1Schema>;

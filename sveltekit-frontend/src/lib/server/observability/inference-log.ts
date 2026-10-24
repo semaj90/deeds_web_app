@@ -16,40 +16,13 @@
  */
 
 import { traceCouchDB } from './langfuse.js';
-import { ENV } from '$lib/server/env.server.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 const INFERENCE_LOG_DB = 'inference_log';
 const FLUSH_INTERVAL_MS = 5_000;
 const FLUSH_THRESHOLD = 50;
 const RETENTION_DAYS = 7;
 const CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000; // every 6 hours
-
-function stripCredentials(url: string): string {
-	try {
-		const parsed = new URL(url);
-		parsed.username = '';
-		parsed.password = '';
-		return parsed.toString().replace(/\/$/, ''); // remove trailing slash if any
-	} catch {
-		return url.replace(/\/$/, '');
-	}
-}
-
-/**
- * Extracts basic auth from ENV.COUCHDB_URL or falls back to standard defaults
- */
-function getAuthHeader(): string {
-	try {
-		const url = new URL(ENV.COUCHDB_URL);
-		if (url.username && url.password) {
-			return 'Basic ' + Buffer.from(`${url.username}:${url.password}`).toString('base64');
-		}
-	} catch { /* ignore */ }
-	
-	const user = process.env.COUCHDB_USER ?? 'admin';
-	const pass = process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
-	return 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
-}
 
 export interface InferenceLogEntry {
   type: 'llm' | 'embedding' | 'vector_search' | 'graph_query' | 'dag_ordering' | 'policy' | 'turbovec_rerank';
@@ -144,14 +117,15 @@ async function flushBuffer(): Promise<void> {
 				_id: `${entry.timestamp.replace(/[:.]/g, '-')}-${i}-${Math.random().toString(36).slice(2, 8)}`,
 				...entry,
 			}));
+			const couchDb = resolveCouchDbConfigV1(process.env);
 
 			const res = await fetch(
-				`${stripCredentials(ENV.COUCHDB_URL)}/${INFERENCE_LOG_DB}/_bulk_docs`,
+				`${couchDb.baseUrl}/${INFERENCE_LOG_DB}/_bulk_docs`,
 				{
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: getAuthHeader(),
+						Authorization: couchDb.authorization,
 					},
 					body: JSON.stringify({ docs }),
 				}
@@ -233,13 +207,14 @@ export function logVectorSearch(params: {
  */
 export async function cleanupOldInferenceLogs(): Promise<{ deleted: number; error?: string }> {
 	try {
+		const couchDb = resolveCouchDbConfigV1(process.env);
 		const cutoff = new Date(Date.now() - RETENTION_DAYS * 24 * 60 * 60 * 1000).toISOString().replace(/[:.]/g, '-');
-		const baseUrl = stripCredentials(ENV.COUCHDB_URL);
+		const baseUrl = couchDb.baseUrl;
 
 		// Fetch all doc IDs up to the cutoff (IDs are timestamp-prefixed, so lexicographic order works)
 		const res = await fetch(
 			`${baseUrl}/${INFERENCE_LOG_DB}/_all_docs?endkey=${JSON.stringify(cutoff)}&limit=1000`,
-			{ headers: { Authorization: getAuthHeader() }, signal: AbortSignal.timeout(10_000) }
+			{ headers: { Authorization: couchDb.authorization }, signal: AbortSignal.timeout(10_000) }
 		);
 		if (!res.ok) return { deleted: 0, error: `_all_docs failed: ${res.status}` };
 
@@ -253,7 +228,7 @@ export async function cleanupOldInferenceLogs(): Promise<{ deleted: number; erro
 			`${baseUrl}/${INFERENCE_LOG_DB}/_bulk_docs`,
 			{
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Authorization: getAuthHeader() },
+				headers: { 'Content-Type': 'application/json', Authorization: couchDb.authorization },
 				body: JSON.stringify({ docs: deleteDocs }),
 				signal: AbortSignal.timeout(15_000),
 			}

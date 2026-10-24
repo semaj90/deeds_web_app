@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import {
   buildAceContextPacketV1,
   type AceContextPacketV1,
@@ -134,8 +135,8 @@ export function renderAceProposalContextAndPlanV1(
     throw new Error('DUPLICATE_PROPOSAL_EVIDENCE_REF');
   }
 
-  const sourceRevision = manifest.identityInput.evidenceRevisions.sourceRevision;
-  if (!sourceRevision) {
+  const sourceRevisionSet = manifest.identityInput.evidenceRevisions.sourceRevision;
+  if (!sourceRevisionSet) {
     throw new Error('MANIFEST_SOURCE_REVISION_MISSING');
   }
 
@@ -148,14 +149,19 @@ export function renderAceProposalContextAndPlanV1(
     if (!binding.sourceRef.trim() || !binding.packetKey.trim()) {
       throw new Error(`EVIDENCE_IDENTITY_MISSING:${ref}`);
     }
-    if (binding.sourceRevision !== sourceRevision) {
-      throw new Error(`EVIDENCE_SOURCE_REVISION_MISMATCH:${ref}`);
-    }
     if (sha(binding.content) !== binding.contentChecksum) {
       throw new Error(`EVIDENCE_CONTENT_CHECKSUM_MISMATCH:${ref}`);
     }
     return { ref, ...binding };
   });
+
+  const observedSourceRevisions = [...new Set(evidenceBindings.map((binding) => binding.sourceRevision))].sort((a, b) => a.localeCompare(b, 'en'));
+  const exactRevisionSet = canonicalSha256V1({ schema: 'atlas.ace-context-source-revision-set.v1', revisions: observedSourceRevisions });
+  if (sourceRevisionSet !== exactRevisionSet && !(observedSourceRevisions.length === 1 && sourceRevisionSet === observedSourceRevisions[0])) {
+    const mismatchedBinding = evidenceBindings.find((binding) => binding.sourceRevision !== sourceRevisionSet);
+    if (mismatchedBinding) throw new Error(`EVIDENCE_SOURCE_REVISION_MISMATCH:${mismatchedBinding.ref}`);
+    throw new Error('EVIDENCE_SOURCE_REVISION_SET_MISMATCH');
+  }
 
   // 3. Render into buildAceContextPacketV1 rawEvidence (sanitized via NES-LUT)
   const patchInstruction = proposal.patchPlan;

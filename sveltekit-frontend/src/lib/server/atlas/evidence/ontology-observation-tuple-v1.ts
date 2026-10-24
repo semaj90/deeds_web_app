@@ -61,3 +61,17 @@ export function materializeOntologyObservationTupleV1(input: Omit<
     canonicalWritesAllowed: false,
   });
 }
+
+export function verifyOntologyObservationTupleV1(value: unknown): OntologyObservationTupleV1 {
+  const tuple = ontologyObservationTupleV1Schema.parse(value);
+  const {
+    schema: _schema,
+    tupleChecksum,
+    canonicalAuthority: _canonicalAuthority,
+    canonicalWritesAllowed: _canonicalWritesAllowed,
+    ...checksumBody
+  } = tuple;
+  const expected = createHash('sha256').update(canonicalJson(checksumBody), 'utf8').digest('hex');
+  if (expected !== tupleChecksum) throw new Error('ONTOLOGY_OBSERVATION_TUPLE_CHECKSUM_MISMATCH');
+  return tuple;
+}
