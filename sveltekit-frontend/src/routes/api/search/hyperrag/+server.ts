@@ -3,10 +3,12 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { createSearchRuntime, type SearchResult } from '$lib/server/retrieval/search-runtime.js';
 import { randomUUID } from 'node:crypto';
-import { classifyAtlasQuery, type QueryClassificationV1 } from '$lib/server/atlas/agentic-file-compiler/query-classifier.js';
+import { classifyAtlasQuery, packageOntologyLabelCandidatesV1, type QueryClassificationV1 } from '$lib/server/atlas/agentic-file-compiler/query-classifier.js';
 import { enrichQueryClassificationWithOakV1 } from '$lib/server/atlas/agentic/oak-query-enrichment-v1.js';
+import { resolveOntologyLabelV1 } from '$lib/server/atlas/ontology-resolution-boundary-postgres.js';
 import type { HyperRagFusionRuntimeResultV1 } from '$lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.js';
 import { ENV } from '$lib/server/env.server.js';
+import { resolveTrustedWorkspaceAuthorityV1 } from '$lib/server/retrieval/trusted-workspace-authority-v1.js';
 
 const requestSchema = z.object({
   query: z.string().trim().min(1, 'Query string is required').max(1024, 'Query string is too long'),
@@ -35,7 +37,9 @@ function emptyResult(error: string, status: number) {
       proof: null,
       classification: null,
       retrievalPlan: null,
-      workspaceAuthority: { status: 'UNAVAILABLE', reason: 'TRUSTED_WORKSPACE_AUTHORITY_RESOLVER_NOT_WIRED', callerSuppliedWorkspaceContextIgnored: false },
+      ontologyQueryEvidence: [],
+      workspaceAuthority: { status: 'UNAVAILABLE', workspaceRevision: null, reason: 'NOT_EVALUATED', callerSuppliedWorkspaceContextIgnored: false },
+      graphExpansionStatus: 'NOT_EVALUATED',
       hypergraph: { status: 'UNAVAILABLE', acceptedCandidateCount: 0, rejectedCandidateCount: 0, relationshipCount: 0, acePayloadCount: 0 },
       oakEvidence: [],
       error,
@@ -91,6 +95,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const input = parsed.data;
+    // Server-side only: the resolver never reads request workspace fields.
+    const trustedWorkspace = await resolveTrustedWorkspaceAuthorityV1();
     const requestId = request.headers.get('x-request-id')?.trim() || `hyperrag:${randomUUID()}`;
     const classification: QueryClassificationV1 = classifyAtlasQuery({
       requestId,
@@ -98,9 +104,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       producerRevision: 'hyperrag-front-door-v1',
     });
     const retrievalPlan = null;
+    const ontologyLabels = packageOntologyLabelCandidatesV1(classification.packageCandidates);
+    const ontologyResolutions = await Promise.all(ontologyLabels.map((label) =>
+      resolveOntologyLabelV1({ schemaVersion: 'atlas.ontology-resolution-request.v1', label })
+    ));
+    const resolvedOntologyLabels = ontologyResolutions
+      .filter((resolution) => resolution.resolutionState === 'RESOLVED' && resolution.conceptId !== null)
+      .map((resolution) => resolution.label);
     const lexicalExpansion = [...new Set([
       ...classification.ngrams,
       ...classification.packageCandidates,
+      ...resolvedOntologyLabels,
     ])].slice(0, 32);
     // AR-07: additive OAK concept-evidence enrichment, called AFTER classification
     // (never inside classifyAtlasQuery itself, which stays synchronous). Bounded,
@@ -118,6 +132,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       text: input.query,
       lexicalExpansion,
       topK: input.topK ?? 15,
+      ...(input.useGraph && trustedWorkspace.status === 'TRUSTED'
+        ? { workspaceRevision: trustedWorkspace.workspaceRevision }
+        : {}),
       filters: {
         includeGenerated: false,
         includeLegacy: false,
@@ -130,8 +147,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       rejectedCandidateCount: 0,
       acePayloads: [],
       facade: null,
-      reason: input.useGraph ? 'TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE' : 'HYPERRAG_GRAPH_NOT_REQUESTED',
+      reason: !input.useGraph
+        ? 'HYPERRAG_GRAPH_NOT_REQUESTED'
+        : trustedWorkspace.status !== 'TRUSTED'
+          ? 'TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE'
+          : 'SEARCH_RUNTIME_GRAPH_EXPANSION_DELEGATED',
     };
+    const graphExpansionStatus = !input.useGraph
+      ? 'NOT_REQUESTED'
+      : trustedWorkspace.status !== 'TRUSTED'
+        ? 'BLOCKED_TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE'
+        : 'DELEGATED_TO_SEARCH_RUNTIME';
 
     const hypergraphByPacket = new Map<string, Record<string, unknown>>();
 
@@ -164,13 +190,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       proof: result.proof ?? null,
       classification,
       retrievalPlan,
+      ontologyQueryEvidence: ontologyResolutions.map((resolution) => ({
+        ...resolution,
+        canonicalAuthority: false,
+      })),
       workspaceAuthority: {
-        status: 'UNAVAILABLE',
-        reason: 'TRUSTED_WORKSPACE_AUTHORITY_RESOLVER_NOT_WIRED',
+        ...trustedWorkspace,
         callerSuppliedWorkspaceContextIgnored: Boolean(
           input.workspaceId || input.workspaceRevision || input.sourceRevision || input.representationId || input.representationRevision,
         ),
       },
+      graphExpansionStatus,
       oakEvidence: oakEnrichment.evidence,
       hypergraph: {
         status: hypergraph.status,
