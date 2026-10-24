@@ -2072,3 +2072,46 @@ Next steps
 2. Review and commit the 239 paths by area, starting with the smallest.
 3. Restore Ornith on `:8090`, then run one bounded live procedural candidate and record the receipt.
 4. Confirm the loader owner and the authorization owner.
+
+### HANDOFF UPDATE (2026-10-24, late session)
+
+State
+- Branch `chore/parent-atlas-session-2026-10-17` is pushed to origin through `ebb40b2db5`, including tool-call argument validation (`1abcbc2487`).
+- Four test-only fixture commits are local and not pushed: `872d1c862c`, `97c7c32fdf`, `1fe375c0ba`, `1d6900584f`.
+- `origin/main` has PR #123 merge `237fe580bc`. A dry-run merge of the branch into `origin/main` is conflict-free. Not merged. Not pushed to `main`.
+- Excluded from every commit: `docs/reports/document-governance-registry-v1.json` (11.4 MB) and four submodule gitlinks (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec`).
+
+Tool-call validation (`1abcbc2487`)
+- `dispatchToolCall` checks arguments against the cached tools/list schema. Invalid arguments are refused with `INVALID_TOOL_ARGUMENTS`.
+- No cached schema: the call proceeds with a printed warning. This is the chosen policy, not a fail-closed one.
+- Not exercised against a live TRACE server.
+
+Test status (atlas and AI suites, run on the committed batches)
+- 786 files: 765 passed, 4 skipped, 17 reported failed. The log names only 8 failing files, so the count of 17 is unreconciled.
+- Fixed and committed: bundle-provider (4/4), both temporal recorders (3/3, 4/4), projection registry (4/4), policy extractor (5/5).
+- Open:
+  - `openspec-board/workboard-contract-v1.spec.ts` (9 tests): 121 architecture-tagged WAVE-00 tasks have no work package. The gap is in program-plan packaging (`scripts/atlas/lib/openspec-program-plan-v1.mjs`), not the artifact. A builder-side filter on wave membership reduced the count to 121 but did not pass the spec, and was reverted.
+  - `cached-packet-candidate-resolution-v1.spec.ts` (1 test): spec expects `CACHED_PACKET_SOURCE_BINDING_RECEIPT_…`; source throws `SOURCE_BINDING_RECEIPT_MISMATCH`. Canonical code needs a decision.
+  - `polyglot-dag-oak-rlm-prefill.spec.ts` (1 test): LUT hash for `src/routes/api/ace/ask/+server.ts` is stale. Needs LUT regeneration.
+
+Unresolved
+- `scripts/atlas/build-openspec-workboard-v1.mjs` may have had an uncommitted change from outside this session. A `git checkout` during revert may have discarded it. Recovery not found; editor history search timed out.
+- `docs/reports/openspec-workboard-v1.json` matches HEAD (55,603,833 bytes).
+
+NES lineage (`NES-ATLAS-LINEAGE-PRODUCER-01`, read-only)
+- Producer `scripts/atlas/materialize-addressable-packets.mjs` writes `.tmp/addressable-packets.ndjson` (61,718 rows). No row carries `source_revision` or `workspace_revision`.
+- Stop rule applied: NES rows are legacy projection data. No crosswalk built. The 1,992-row match in the paste is unverified here.
+- Security: `ingest-nes-chrom.mjs` hardcodes a database password in its connection string. Move it to `.env` and rotate.
+
+Operations
+- llama-server `:8090` refused connections in the last check. Ornith is down. Restart with the TurboQuant start task before any live procedural run.
+- Procedural sequence steps 1–2 (table DDL, Drizzle entry) are not started. Steps 3–4 are built with fixtures only; no live generation has run.
+
+Next steps
+1. Decide whether to merge the branch into `main` and push the four fixture commits.
+2. Packaging gap in `openspec-program-plan-v1.mjs` for the workboard spec.
+3. Decide the canonical error code for `cached-packet-candidate-resolution`.
+4. Regenerate the polyglot LUT.
+5. Reconcile the 17-vs-8 failing-file count.
+6. Confirm whether the workboard builder had an uncommitted change that was lost.
+7. Move the NES ingest password to `.env` and rotate it.
