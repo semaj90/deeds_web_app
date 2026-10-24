@@ -1119,3 +1119,6 @@ docs/reports/staging/
 docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json
 # llms.txt reference files under docs/.okf are source material for OKF; re-include them past the *.txt rule above
 !docs/.okf/**/llms.txt
+
+# Nested claude-mem repo and node_modules (local plugin data, not project source)
+/claude-mem/
