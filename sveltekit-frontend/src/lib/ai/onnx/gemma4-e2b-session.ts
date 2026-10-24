@@ -12,7 +12,9 @@
 
 import { getOnnxSession, getProviderLabel } from './session.js';
 
-const MODEL_PATH = '/gemma4_e2b_onnx/model.onnx';
+// The root model.onnx references decoder_model_merged_q4.onnx_data, which is not on disk.
+// The q4f16 decoder in onnx/ references its own data file, which is present (download.sh variant).
+const MODEL_PATH = '/gemma4_e2b_onnx/onnx/decoder_model_merged_q4f16.onnx';
 const MODEL_NAME = 'Gemma4 E2B (Effective 2 Billion)';
 
 /**

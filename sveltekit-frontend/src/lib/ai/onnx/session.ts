@@ -38,6 +38,33 @@ const sessionCache = new Map<string, Promise<any>>();
 const modelBufferCache = new Map<string, ArrayBuffer>();
 
 /**
+ * ONNX graphs can keep weights in sibling `.onnx_data` files (e.g. the Gemma 4 E2B q4f16 decoder).
+ * When a graph is created from a buffer, ORT cannot resolve those files by name, so they must be
+ * passed explicitly as externalData. Returns [] for graphs with no external data (unchanged path).
+ */
+function externalDataNamesV1(buffer: ArrayBuffer): string[] {
+	const text = new TextDecoder('latin1').decode(new Uint8Array(buffer));
+	const names = new Set<string>();
+	for (const m of text.matchAll(/[A-Za-z0-9_.\/-]{1,200}\.onnx_data/g)) {
+		names.add(m[0].split('/').pop() as string);
+	}
+	return [...names];
+}
+
+async function fetchExternalDataV1(modelUrl: string, buffer: ArrayBuffer): Promise<{ path: string; data: Uint8Array }[]> {
+	const names = externalDataNamesV1(buffer);
+	if (names.length === 0) return [];
+	const dir = modelUrl.slice(0, modelUrl.lastIndexOf('/') + 1);
+	const out: { path: string; data: Uint8Array }[] = [];
+	for (const name of names) {
+		const response = await fetch(dir + name);
+		if (!response.ok) throw new Error(`[ONNX] external data ${name} HTTP ${response.status}`);
+		out.push({ path: name, data: new Uint8Array(await response.arrayBuffer()) });
+	}
+	return out;
+}
+
+/**
  * WebGPU device singleton — created once, reused across sessions.
  * Device creation involves GPU pipeline compilation; reusing it cuts
  * ~200ms from every subsequent session creation.
@@ -254,9 +281,12 @@ async function _createSession(modelUrl: string, preferredEps?: string[]): Promis
 	let lastError: Error | null = null;
 	for (const ep of eps) {
 		try {
+			const externalData = await fetchExternalDataV1(modelUrl, modelBuffer);
 			const session = await runtime.InferenceSession.create(
 				modelBuffer,
-				{ executionProviders: [ep] }
+				externalData.length > 0
+					? { executionProviders: [ep], externalData }
+					: { executionProviders: [ep] }
 			);
 			providerMap.set(modelUrl, ep);
 			const label = ep === 'webgpu' ? 'WebGPU (Dawn)' : ep.toUpperCase();

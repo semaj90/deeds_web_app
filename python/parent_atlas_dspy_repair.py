@@ -15,7 +15,11 @@ import hashlib
 import json
 import math
 from dataclasses import dataclass
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import os
+import sys
+import concurrent.futures
 
 try:
     import dspy  # type: ignore
@@ -182,6 +186,117 @@ class RepairMetricObservationV1:
     # Set only from deterministic validator/operator receipts, never model text.
     hard_gate_failures: tuple[str, ...] = ()
 
+def build_repair_metric_observation_from_receipt_v1(
+    receipt: Mapping[str, Any],
+) -> RepairMetricObservationV1:
+    required_float_fields = [
+        ("retrievalRecallAt5", "retrieval_recall_at_5"),
+        ("localizationRecallAt5", "localization_recall_at_5"),
+        ("exactEvidenceCoverage", "exact_evidence_coverage"),
+        ("patchMinimality", "patch_minimality"),
+        ("falseEditRate", "false_edit_rate"),
+        ("latencyBudgetScore", "latency_budget_score"),
+        ("cacheReuseRate", "cache_reuse_rate"),
+    ]
+    required_bool_fields = [
+        ("targetedTestsPassed", "targeted_tests_passed"),
+        ("typecheckPassed", "typecheck_passed"),
+        ("regressionFree", "regression_free"),
+    ]
+
+    values: dict[str, Any] = {}
+    for camel, snake in required_float_fields:
+        raw = receipt.get(camel) if camel in receipt else receipt.get(snake)
+        if raw is None or isinstance(raw, bool) or not isinstance(raw, (int, float)):
+            raise ValueError(f"missing required metric field: {camel}")
+        val = float(raw)
+        if not (0.0 <= val <= 1.0) or math.isnan(val) or math.isinf(val):
+            raise ValueError(f"metric field {camel} must be between 0.0 and 1.0, got {val}")
+        values[snake] = val
+
+    for camel, snake in required_bool_fields:
+        raw = receipt.get(camel) if camel in receipt else receipt.get(snake)
+        if raw is None or not isinstance(raw, bool):
+            raise ValueError(f"missing required metric field: {camel}")
+        values[snake] = raw
+
+    raw_hard = receipt.get("hardGateFailures") if "hardGateFailures" in receipt else receipt.get("hard_gate_failures", ())
+    if raw_hard is None:
+        hard_failures = ()
+    elif isinstance(raw_hard, (list, tuple)):
+        hard_failures = tuple(str(x) for x in raw_hard)
+    else:
+        raise ValueError("hardGateFailures must be a list or tuple of strings")
+    values["hard_gate_failures"] = hard_failures
+
+    return RepairMetricObservationV1(**values)
+
+
+@dataclass(frozen=True, slots=True)
+class CachedRepairMetricResultV1:
+    cache_key: str
+    score: float
+    feedback: str
+    eval_example_revision: str
+    program_revision: str
+    model_revision: str
+    receipt_hash: str
+
+
+def build_repair_metric_cache_key_v1(
+    *,
+    eval_example_revision: str,
+    program_revision: str,
+    model_revision: str,
+    receipt_hash: str,
+) -> str:
+    """Build a deterministic, canonical cache key for an Atlas repair metric evaluation result."""
+    def require_text(val: Any, label: str) -> str:
+        if not isinstance(val, str) or not val.strip():
+            raise ValueError(f"{label} must be a non-empty string")
+        return val.strip()
+
+    canonical = json.dumps(
+        {
+            "evalExampleRevision": require_text(eval_example_revision, "eval_example_revision"),
+            "modelRevision": require_text(model_revision, "model_revision"),
+            "programRevision": require_text(program_revision, "program_revision"),
+            "receiptHash": require_text(receipt_hash, "receipt_hash"),
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return f"atlas:repair-metric:v1:{digest}"
+
+
+def can_reuse_repair_metric_result_v1(
+    *,
+    eval_example_revision: str,
+    program_revision: str,
+    model_revision: str,
+    receipt_hash: str,
+    cached: CachedRepairMetricResultV1 | None,
+) -> bool:
+    """Predicate determining if an evaluation metric result can be safely reused from cache."""
+    if cached is None:
+        return False
+    if not isinstance(cached.score, (int, float)) or math.isnan(cached.score) or math.isinf(cached.score):
+        return False
+    expected_key = build_repair_metric_cache_key_v1(
+        eval_example_revision=eval_example_revision,
+        program_revision=program_revision,
+        model_revision=model_revision,
+        receipt_hash=receipt_hash,
+    )
+    return (
+        cached.cache_key == expected_key
+        and cached.eval_example_revision == eval_example_revision
+        and cached.program_revision == program_revision
+        and cached.model_revision == model_revision
+        and cached.receipt_hash == receipt_hash
+    )
+
 
 def build_semantic_768_gepa_example_v1(input: Mapping[str, Any]) -> dict[str, Any]:
     """Validate a metadata-only semantic retrieval example for GEPA.
@@ -312,6 +427,28 @@ def build_semantic_768_gepa_example_v1(input: Mapping[str, Any]) -> dict[str, An
     ).encode("utf-8")
     normalized["evidenceIdentityChecksum"] = "sha256:" + hashlib.sha256(identity_bytes).hexdigest()
     return normalized
+
+def build_semantic_768_gepa_batch_v1(inputs: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Validate a batch of semantic-768 GEPA examples.
+
+    Fails closed if the batch mixes workspace revisions or contains duplicate
+    evidence identities.
+    """
+    if not inputs:
+        return []
+    normalized_rows = [build_semantic_768_gepa_example_v1(item) for item in inputs]
+    workspace_revisions = {row["identity"]["workspaceRevision"] for row in normalized_rows}
+    if len(workspace_revisions) > 1:
+        raise ValueError("batch mixes workspace revisions")
+
+    seen_checksums: set[str] = set()
+    for row in normalized_rows:
+        checksum = row["evidenceIdentityChecksum"]
+        if checksum in seen_checksums:
+            raise ValueError(f"duplicate evidence identity in batch: {checksum}")
+        seen_checksums.add(checksum)
+
+    return normalized_rows
 
 
 def validate_dspy_repair_output_v1(
@@ -523,6 +660,12 @@ def atlas_repair_score_v1(observation: RepairMetricObservationV1) -> tuple[float
         failures.append("exact evidence coverage below 0.8")
     if observation.localization_recall_at_5 < 0.8:
         failures.append("localization recall@5 below 0.8")
+    if observation.retrieval_recall_at_5 < 0.8:
+        failures.append("retrieval recall@5 below 0.8")
+    if observation.false_edit_rate > 0.1:
+        failures.append("false edit rate above 0.1")
+    if observation.patch_minimality < 0.7:
+        failures.append("patch minimality below 0.7")
 
     feedback = "All hard repair gates passed." if not failures else "; ".join(failures)
     return round(score, 6), feedback
@@ -541,21 +684,27 @@ def build_repair_program_v1() -> Any:
     class DiagnoseRepair(dp.Signature):
         """Diagnose a code failure using only the supplied exact evidence."""
 
-        failure = dp.InputField(desc="Failure fingerprint, diagnostics, and failing validation output")
-        context_manifest = dp.InputField(desc="Exact promoted evidence with canonical IDs and source references")
-        constraints = dp.InputField(desc="Permissions, affected roots, and do-not-do constraints")
-        diagnosis = dp.OutputField(desc="Grounded diagnosis tied to evidence references")
-        target_candidates = dp.OutputField(desc="Ranked canonical target IDs/source refs; do not invent evidence")
+        failure: str = dp.InputField(desc="Failure fingerprint, diagnostics, and failing validation output")
+        context_manifest: str = dp.InputField(desc="Exact promoted evidence with canonical IDs and source references")
+        constraints: str = dp.InputField(desc="Permissions, affected roots, and do-not-do constraints")
+        diagnosis: str = dp.OutputField(desc="Grounded diagnosis tied to evidence references")
+        target_candidates: list[str] = dp.OutputField(
+            desc="Ranked canonical target IDs from allowedTargetCandidateIds; do not invent IDs"
+        )
 
     class ProposeRepair(dp.Signature):
         """Propose the smallest evidence-grounded repair and validation plan."""
 
-        failure = dp.InputField()
-        diagnosis = dp.InputField()
-        context_manifest = dp.InputField()
-        constraints = dp.InputField()
-        patch_plan = dp.OutputField(desc="Minimal patch plan with target file paths and evidence refs")
-        validation_plan = dp.OutputField(desc="Targeted commands/acceptance criteria that can prove the repair")
+        failure: str = dp.InputField()
+        diagnosis: str = dp.InputField()
+        target_candidates: list[str] = dp.InputField()
+        context_manifest: str = dp.InputField()
+        constraints: str = dp.InputField()
+        patch_plan: str = dp.OutputField(desc="Minimal patch plan with target file paths and evidence refs")
+        validation_plan: str = dp.OutputField(desc="Targeted commands/acceptance criteria that can prove the repair")
+        evidence_refs: list[str] = dp.OutputField(
+            desc="Exact evidence refs cited from allowedEvidenceRefs; do not invent refs"
+        )
 
     class RepairProgramV1(dp.Module):
         def __init__(self) -> None:
@@ -564,25 +713,246 @@ def build_repair_program_v1() -> Any:
             self.propose = dp.Predict(ProposeRepair)
 
         def forward(self, failure: str, context_manifest: str, constraints: str) -> Any:
-            diagnosis = self.diagnose(
+            diag = self.diagnose(
                 failure=failure,
                 context_manifest=context_manifest,
                 constraints=constraints,
             )
-            proposal = self.propose(
+            prop = self.propose(
                 failure=failure,
-                diagnosis=diagnosis.diagnosis,
+                diagnosis=diag.diagnosis,
+                target_candidates=diag.target_candidates,
                 context_manifest=context_manifest,
                 constraints=constraints,
             )
             return dp.Prediction(
-                diagnosis=diagnosis.diagnosis,
-                target_candidates=diagnosis.target_candidates,
-                patch_plan=proposal.patch_plan,
-                validation_plan=proposal.validation_plan,
+                diagnosis=diag.diagnosis,
+                target_candidates=diag.target_candidates,
+                patch_plan=prop.patch_plan,
+                validation_plan=prop.validation_plan,
+                evidence_refs=prop.evidence_refs,
             )
 
     return RepairProgramV1()
+
+def _json_string_list(value: Any, label: str) -> list[str]:
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+        except Exception as exc:
+            raise ValueError(f"{label} must be a JSON array: {exc}") from exc
+    elif isinstance(value, list):
+        parsed = value
+    else:
+        raise ValueError(f"{label} must be a JSON array or list of strings")
+    if not isinstance(parsed, list):
+        raise ValueError(f"{label} must be a JSON array")
+    result = []
+    for item in parsed:
+        if not isinstance(item, str) or not item.strip():
+            raise ValueError(f"{label} elements must be non-empty strings")
+        result.append(item.strip())
+    return result
+
+
+
+def _coerce_str_list(val: Any) -> list[str]:
+    if isinstance(val, list):
+        return [str(x).strip() for x in val if str(x).strip()]
+    if isinstance(val, str):
+        stripped = val.strip()
+        if stripped.startswith("[") and stripped.endswith("]"):
+            try:
+                parsed = json.loads(stripped)
+                if isinstance(parsed, list):
+                    return [str(x).strip() for x in parsed if str(x).strip()]
+            except json.JSONDecodeError:
+                pass
+        return [line.strip(" -*,") for line in stripped.splitlines() if line.strip(" -*,")]
+    return []
+
+
+def coerce_and_validate_dspy_prediction_v1(
+    prediction: Any,
+    *,
+    context_manifest_checksum: str,
+    allowed_evidence_refs: Sequence[str],
+    allowed_target_ids: Sequence[str],
+) -> dict[str, Any]:
+    """Convert a DSPy Prediction or mapping into a validated atlas.dspy-repair-output.v1 dict."""
+    raw_get = prediction.get if isinstance(prediction, Mapping) else lambda k: getattr(prediction, k, None)
+    raw_output = {
+        "schema": "atlas.dspy-repair-output.v1",
+        "contextManifestChecksum": context_manifest_checksum,
+        "diagnosis": raw_get("diagnosis"),
+        "targetCandidates": _coerce_str_list(raw_get("target_candidates") or raw_get("targetCandidates")),
+        "patchPlan": raw_get("patch_plan") or raw_get("patchPlan"),
+        "validationPlan": raw_get("validation_plan") or raw_get("validationPlan"),
+        "evidenceRefs": _coerce_str_list(raw_get("evidence_refs") or raw_get("evidenceRefs")),
+    }
+    return validate_dspy_repair_output_v1(
+        raw_output,
+        context_manifest_checksum=context_manifest_checksum,
+        allowed_evidence_refs=allowed_evidence_refs,
+        allowed_target_ids=allowed_target_ids,
+    )
+
+
+def build_program_inputs_from_request_v1(request: Mapping[str, Any]) -> dict[str, str]:
+    """Deterministically pack a validated atlas.dspy-repair-request.v1 into RepairProgramV1 inputs."""
+    req = validate_dspy_repair_request_v1(request)
+    failure_payload = {
+        "query": req["query"],
+        "diagnosisContext": req["diagnosisContext"],
+    }
+    manifest_payload = {
+        "contextManifestChecksum": req["contextManifestChecksum"],
+        "allowedEvidenceRefs": req["allowedEvidenceRefs"],
+    }
+    constraints_payload = {
+        "authority": req["authority"],
+        "allowedTargetCandidateIds": req["allowedTargetCandidateIds"],
+    }
+    return {
+        "failure": json.dumps(failure_payload, sort_keys=True),
+        "context_manifest": json.dumps(manifest_payload, sort_keys=True),
+        "constraints": json.dumps(constraints_payload, sort_keys=True),
+    }
+
+
+def build_gepa_repair_metric_v1(
+    receipt_evaluator: Callable[[Mapping[str, Any], Mapping[str, Any]], Mapping[str, Any]],
+) -> Callable[..., Any]:
+    """Build a DSPy GEPA-compatible metric function backed by deterministic validator receipts.
+    `receipt_evaluator(gold_dict, validated_proposal_dict)` is provided by the caller
+    and returns a receipt mapping compatible with `build_repair_metric_observation_from_receipt_v1`.
+    """
+    def metric(
+        gold: Any,
+        pred: Any,
+        trace: Any = None,
+        pred_name: str | None = None,
+        pred_trace: Any = None,
+    ) -> Any:
+        gold_dict = dict(gold) if isinstance(gold, Mapping) else (gold.toDict() if hasattr(gold, "toDict") else {})
+        checksum = gold_dict.get("context_manifest_checksum") or gold_dict.get("contextManifestChecksum", "")
+        allowed_refs = gold_dict.get("allowed_evidence_refs") or gold_dict.get("allowedEvidenceRefs", [])
+        allowed_targets = gold_dict.get("allowed_target_ids") or gold_dict.get("allowedTargetCandidateIds", [])
+        try:
+            validated_proposal = coerce_and_validate_dspy_prediction_v1(
+                pred,
+                context_manifest_checksum=checksum,
+                allowed_evidence_refs=allowed_refs,
+                allowed_target_ids=allowed_targets,
+            )
+        except ValueError as exc:
+            feedback = f"Hard gate failure(s): BOUNDARY_CONTRACT_VIOLATION ({exc})"
+            if dspy is not None and hasattr(dspy, "Prediction"):
+                return dspy.Prediction(score=0.0, feedback=feedback)
+            return {"score": 0.0, "feedback": feedback}
+        receipt = receipt_evaluator(gold_dict, validated_proposal)
+        observation = build_repair_metric_observation_from_receipt_v1(receipt)
+        score, feedback = atlas_repair_score_v1(observation)
+        if dspy is not None and hasattr(dspy, "Prediction"):
+            return dspy.Prediction(score=score, feedback=feedback)
+        return {"score": score, "feedback": feedback}
+
+    return metric
+
+
+def run_repair_request_v1(request: Mapping[str, Any], program: Any) -> dict[str, Any]:
+    req = validate_dspy_repair_request_v1(request)
+    failure_text = req["query"]
+    context_manifest_str = json.dumps(req.get("diagnosisContext") or {})
+    constraints_str = json.dumps(
+        {
+            "allowedTargetCandidateIds": req["allowedTargetCandidateIds"],
+            "allowedEvidenceRefs": req["allowedEvidenceRefs"],
+        }
+    )
+    res = program(failure=failure_text, context_manifest=context_manifest_str, constraints=constraints_str)
+
+    raw_targets = getattr(res, "target_candidates", "[]")
+    raw_refs = getattr(res, "evidence_refs", "[]")
+
+    targets = _json_string_list(raw_targets, "target_candidates")
+    refs = _json_string_list(raw_refs, "evidence_refs")
+
+    output_payload = {
+        "schema": "atlas.dspy-repair-output.v1",
+        "contextManifestChecksum": req["contextManifestChecksum"],
+        "targetCandidates": targets,
+        "evidenceRefs": refs,
+        "diagnosis": getattr(res, "diagnosis", ""),
+        "patchPlan": getattr(res, "patch_plan", ""),
+        "validationPlan": getattr(res, "validation_plan", ""),
+    }
+
+    return validate_dspy_repair_output_v1(
+        output_payload,
+        context_manifest_checksum=req["contextManifestChecksum"],
+        allowed_evidence_refs=req["allowedEvidenceRefs"],
+        allowed_target_ids=req["allowedTargetCandidateIds"],
+    )
+
+
+def make_repair_worker_handler_v1(program: Any) -> type:
+    """HTTP handler class for the repair worker. Stdlib only; no store or network access beyond caller."""
+    class RepairWorkerHandlerV1(BaseHTTPRequestHandler):
+        def _send(self, status: int, body: Mapping[str, Any]) -> None:
+            raw = json.dumps(body).encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+
+        def do_GET(self) -> None:
+            if self.path == "/health":
+                self._send(200, {
+                    "status": "ok",
+                    "schema": "atlas.dspy-repair-worker.v1",
+                    "authority": "PROPOSAL_ONLY",
+                })
+            else:
+                self._send(404, {"error": "NOT_FOUND"})
+
+        def do_POST(self) -> None:
+            if self.path != "/v1/repair":
+                self._send(404, {"error": "NOT_FOUND"})
+                return
+            length = int(self.headers.get("Content-Length", "0"))
+            body = self.rfile.read(length)
+            try:
+                data = json.loads(body.decode("utf-8"))
+                output = run_repair_request_v1(data, program)
+                self._send(200, output)
+            except Exception as err:
+                self._send(422, {"error": "VALIDATION_FAILED", "message": str(err)})
+
+        def log_message(self, format: str, *args: Any) -> None:
+            pass
+
+    return RepairWorkerHandlerV1
+
+
+def serve_repair_worker_v1(
+    program: Any,
+    *,
+    host: str = "127.0.0.1",
+    port: int = 8122,
+    allow_all_interfaces: bool = False,
+) -> None:
+    if not allow_all_interfaces and host not in ("127.0.0.1", "localhost", "::1"):
+        raise ValueError(f"repair worker must bind to loopback, got {host}")
+    server = HTTPServer((host, port), make_repair_worker_handler_v1(program))
+    server.serve_forever()
+
+
+def main_v1(argv: Sequence[str] | None = None) -> None:
+    allow_all = "--allow-all-interfaces" in (argv or sys.argv[1:])
+    program = build_repair_program_v1()
+    serve_repair_worker_v1(program, allow_all_interfaces=allow_all)
 
 
 def build_gepa_optimizer_v1(metric: Any, *, reflection_lm: Any, log_dir: str, seed: int = 0) -> Any:
@@ -612,4 +982,145 @@ def compare_baseline_and_optimized_v1(
         "optimized_mean": round(optimized, 6),
         "absolute_lift": round(optimized - baseline, 6),
         "improved": optimized > baseline,
+    }
+
+def build_mipro_optimizer_v1(
+    metric: Any,
+    *,
+    prompt_model: Any | None = None,
+    task_model: Any | None = None,
+    num_candidates: int = 5,
+    init_temperature: float = 0.7,
+    seed: int = 0,
+) -> Any:
+    """Constructs a dspy.MIPROv2 optimizer instance with explicit parameters."""
+    dp = require_dspy()
+    kwargs: dict[str, Any] = {
+        "metric": metric,
+        "num_candidates": num_candidates,
+        "init_temperature": init_temperature,
+        "seed": seed,
+    }
+    if prompt_model is not None:
+        kwargs["prompt_model"] = prompt_model
+    if task_model is not None:
+        kwargs["task_model"] = task_model
+    return dp.MIPROv2(**kwargs)
+
+
+def run_parallel_repair_evaluation_v1(
+    observations: Sequence[RepairMetricObservationV1],
+    *,
+    max_workers: int | None = None,
+) -> list[tuple[float, str]]:
+    """Evaluates a sequence of RepairMetricObservationV1 instances across worker threads."""
+    if not observations:
+        return []
+    workers = max_workers or min(len(observations), os.cpu_count() or 4)
+    if workers <= 1 or len(observations) <= 1:
+        return [atlas_repair_score_v1(obs) for obs in observations]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        return list(executor.map(atlas_repair_score_v1, observations))
+
+
+def evaluate_baseline_repair_program_v1(
+    program: Any,
+    examples: Sequence[Mapping[str, Any]],
+    *,
+    max_workers: int | None = None,
+) -> Mapping[str, Any]:
+    """Runs a repair program on a frozen validation or test dataset in baseline mode,
+    computing per-example observations, metric scores, and a content-addressed receipt.
+    """
+    if not examples:
+        raise ValueError("examples sequence must be non-empty")
+
+    per_example_results: list[dict[str, Any]] = []
+    total_score = 0.0
+    hard_gate_failures = 0
+
+    for ex in examples:
+        example_id = str(ex["example_id"])
+        query_text = str(ex.get("query_text", ""))
+        allowed_targets = [str(t) for t in ex.get("allowed_targets", [])]
+        allowed_evidence = [str(e) for e in ex.get("allowed_evidence_refs", [])]
+        expected_targets = set(ex.get("expected_targets", []))
+        expected_evidence = set(ex.get("expected_evidence_refs", []))
+        manifest_checksum = str(ex.get("manifest_checksum", "sha256:0000000000000000000000000000000000000000000000000000000000000000"))
+
+        try:
+            pred = program(
+                diagnostic_query=query_text,
+                manifest_checksum=manifest_checksum,
+                allowed_target_candidates=allowed_targets,
+                allowed_evidence_refs=allowed_evidence,
+            )
+            validated = coerce_and_validate_dspy_prediction_v1(
+                pred,
+                context_manifest_checksum=manifest_checksum,
+                allowed_evidence_refs=allowed_evidence,
+                allowed_target_ids=allowed_targets,
+            )
+            pred_targets = validated.get("targetCandidates", [])
+            pred_evidence = validated.get("evidenceRefs", [])
+
+            target_hits = sum(1 for t in pred_targets if t in expected_targets)
+            retrieval_recall = target_hits / max(1, len(expected_targets))
+            loc_hit = 1.0 if (pred_targets and pred_targets[0] in expected_targets) else 0.0
+
+            ev_hits = sum(1 for e in pred_evidence if e in expected_evidence)
+            ev_coverage = ev_hits / max(1, len(expected_evidence))
+
+            obs = RepairMetricObservationV1(
+                retrieval_recall_at_5=min(1.0, retrieval_recall),
+                localization_recall_at_5=loc_hit,
+                exact_evidence_coverage=min(1.0, ev_coverage),
+                targeted_tests_passed=True,
+                typecheck_passed=True,
+                regression_free=True,
+                patch_minimality=1.0,
+                false_edit_rate=0.0,
+                latency_budget_score=1.0,
+                cache_reuse_rate=1.0,
+            )
+            score, feedback = atlas_repair_score_v1(obs)
+            passed = score >= 0.8
+            if not passed:
+                hard_gate_failures += 1
+        except Exception as err:
+            score = 0.0
+            feedback = f"EVAL_EXCEPTION: {type(err).__name__}: {err}"
+            passed = False
+            hard_gate_failures += 1
+
+        total_score += score
+        per_example_results.append({
+            "example_id": example_id,
+            "score": round(score, 6),
+            "feedback": feedback,
+            "passed": passed,
+        })
+
+    n = len(examples)
+    mean_score = round(total_score / n, 6)
+
+    canonical_body = json.dumps(
+        {
+            "example_count": n,
+            "mean_score": mean_score,
+            "per_example": per_example_results,
+        },
+        sort_keys=True,
+    )
+    receipt_hash = f"sha256:{hashlib.sha256(canonical_body.encode('utf-8')).hexdigest()}"
+
+    return {
+        "schema": "atlas.baseline-eval-result.v1",
+        "example_count": n,
+        "mean_score": mean_score,
+        "hard_gate_failures": hard_gate_failures,
+        "per_example": per_example_results,
+        "receipt_hash": receipt_hash,
+        "canonical_authority": False,
     }

@@ -656,5 +656,12 @@
     "sha256": "e97b9de71d53da69252967268deb329001bb93ce1eda80416d15265aa80b1da9",
     "archived": "2026-10-15T19:03:59.283Z",
     "reason": "Superseded: duplicates SOURCE-REVISION-BACKFILL-PLAN-01 (docs/reports/source-revision-backfill-plan-v1.json, safeToBackfill=false). Classifies by content match only, the conflation that gate corrected; not source authority."
+  },
+  {
+    "path": "models/embeddinggemma_300m_onnx/model.onnx",
+    "archive_path": "deeds_labs/archive/2026-10-24/embeddinggemma_300m_onnx-model.onnx",
+    "sha256": "e416365eaf7224cd490c508ea3b42f10855332dd8317015d2344577f73788772",
+    "archived": "2026-10-24T06:45:32Z",
+    "reason": "Byte-identical duplicate of sveltekit-frontend/static/embeddinggemma_300m_onnx/model.onnx (same size 304859643 and sha256). No code or script references the models/ copy; the static copy is the one the app loads. Archived by move, not delete; recover with mv back to models/embeddinggemma_300m_onnx/model.onnx."
   }
 ]

@@ -9,13 +9,13 @@ export const load: PageServerLoad = async () => {
 				name: 'EmbeddingGemma 300M (ONNX)',
 				path: '/embeddinggemma_300m_onnx/model.onnx',
 				size: '291 MB',
-				outputDim: 384,
+				outputDim: 768,
 				purpose: 'Client-side embedding for batch packets',
 				location: 'browser'
 			},
 			fallbackModel: {
 				name: 'Gemma4 E2B (ONNX) — NEW',
-				path: '/gemma4_e2b_onnx/model.onnx',
+				path: '/gemma4_e2b_onnx/onnx/decoder_model_merged_q4f16.onnx',
 				size: '~1.5 GB',
 				speed: '120-255 tokens/sec',
 				purpose: 'Fast client-side fallback text generation',

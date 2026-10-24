@@ -9,6 +9,7 @@ import {
 
 export interface DspyLlamaCallerOptions {
   llamaServerUrl?: string;
+  workerUrl?: string;
   model?: string;
   timeoutMs?: number;
   temperature?: number;
@@ -41,6 +42,7 @@ export async function executeDspyLlamaServerRepair(input: {
   diagnosisContext?: string;
   options?: DspyLlamaCallerOptions;
 }): Promise<DspyLlamaCallerResult> {
+  const workerUrl = input.options?.workerUrl || (ENV as Record<string, any>).DSPY_WORKER_URL;
   const llamaUrl = input.options?.llamaServerUrl || ENV.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
   const model = input.options?.model || ENV.LLAMA_SERVER_MODEL || 'ornith-1.5-9b';
   const timeoutMs = input.options?.timeoutMs ?? 7000;
@@ -49,6 +51,70 @@ export async function executeDspyLlamaServerRepair(input: {
   const request = buildDspyRepairRequestV1(manifest, {
     diagnosisContext: input.diagnosisContext,
   });
+
+  if (workerUrl) {
+    try {
+      const res = await fetch(`${workerUrl}/v1/repair`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        return {
+          status: res.status === 422 ? 'REJECTED_VALIDATION_FAILED' : 'LLAMA_SERVER_UNAVAILABLE',
+          proposal: null,
+          rawText: errorText,
+          error: `HTTP ${res.status}: ${errorText}`,
+          model,
+          endpoint: workerUrl,
+          kvCachePersisted: false,
+          canonicalAuthority: false,
+        };
+      }
+
+      const data = await res.json();
+      let validatedProposal: DspyRepairOutputV1;
+      try {
+        validatedProposal = parseDspyRepairOutputV1(data, manifest);
+      } catch (valErr) {
+        // A rejected output is a validation outcome, not a transport outage.
+        return {
+          status: 'REJECTED_VALIDATION_FAILED',
+          proposal: null,
+          rawText: JSON.stringify(data),
+          error: valErr instanceof Error ? valErr.message : 'DSPY_VALIDATION_FAILED',
+          model,
+          endpoint: workerUrl,
+          kvCachePersisted: false,
+          canonicalAuthority: false,
+        };
+      }
+      return {
+        status: 'ADMITTED',
+        proposal: validatedProposal,
+        rawText: JSON.stringify(data),
+        model,
+        endpoint: workerUrl,
+        kvCachePersisted: false,
+        canonicalAuthority: false,
+      };
+    } catch (err) {
+      return {
+        status: 'LLAMA_SERVER_UNAVAILABLE',
+        proposal: null,
+        rawText: null,
+        error: err instanceof Error ? err.message : 'WORKER_NETWORK_ERROR',
+        model,
+        endpoint: workerUrl,
+        kvCachePersisted: false,
+        canonicalAuthority: false,
+      };
+    }
+  }
+
   const serializedRequest = serializeDspyRepairRequestV1(request);
   const manifestChecksum = request.contextManifestChecksum;
   const allowedEvidence = request.allowedEvidenceRefs;

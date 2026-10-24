@@ -1917,3 +1917,119 @@ Next (needs a decision): none of the above starts without an explicit request fo
 - Operator answer (2026-10-21): the two writers serve different logic (legal-case / Parent Atlas path vs `scripts/atlas` standalone run), so they are distinct producers, not duplicates. Neither is removed.
 - Still open: the shared key names collide. Splitting by producer namespace needs reader changes in `topological-search.ts` and `ci-smoke-hypergraph.mjs` plus a decision on the namespace scheme.
 - `invalidateHypergraph()` now uses `SCAN` instead of `KEYS` (same change set).
+
+### ATen/PyTorch/RTX tensor sequence RPC packet synthesis fusion: ownership audit (2026-10-24, read-only, no code)
+
+Status: AUDIT ONLY. No new owner is proposed. Each capability below needs an explicit extend-or-new decision before implementation (DEPENDENCY-CAPABILITY-GUARD-01 and the one-owner rule in CLAUDE.md).
+
+| Existing owner | Purpose (from header) | Production callers | Relation to the request |
+|---|---|---|---|
+| `python/prove_polyglot_aten_dspy_gepa_oak_v1.py` | Five-plane polyglot proof (tiered memory, ATen, DSPy/GEPA, OaK) | Proof script only | ATen proof lane; a challenger, not a service |
+| `python/atlas_compute/` (e.g. `async_dag_worker_v1.py`, `concept_tile_*`, `cugraph_ppr.py`, `cluster_softmax.py`) | Numerical compute modules | Mixed; not audited per module | Candidate home for tensor sequence work; extend, do not duplicate |
+| `docker/atlas-neural-decoder` (`:8121`) | NestedSemanticAutoencoder projection, PyTorch 2.13 cu132 | Live-proven encode path | RTX tensor service; numerical only |
+| `docker/atlas-gemma-rank` | AtlasGemmaRankV1 reranker, PyTorch 2.13 cu132 | Ranker container | RTX tensor service; numerical only |
+| `sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts` | Retrieval packet RPC (pg, ACE envelope) | `packet-search.tool.ts`, `topk-rpc-descriptor-v1.ts`, `master-feature-map.ts`, `api/atlas/hyperrag-packet-rpc/+server.ts` | The existing RPC packet owner; a sequence packet must join here, not beside it |
+| `sveltekit-frontend/src/lib/server/atlas/transport/feature-row-rpc-packet-v1.*` | Feature-row RPC packet encode/decode with tests | Tests and the feature-row contract | Existing typed packet codec; reuse its encoding rules |
+
+Findings:
+- Two RTX services already exist. A new tensor-sequence service would be a third; extend one of the two, or decide that the sequence work belongs to the packet owner rather than a tensor service.
+- "Packet synthesis fusion" overlaps `hyperrag-packet-rpc.ts`, which already returns the ACE envelope. A sequence packet needs its own contract that the existing envelope can carry.
+- Wire-format rule (CLAUDE.md): JSON for descriptors, raw F32LE or Arrow for bulk tensors. A sequence packet must carry references, not inline float arrays.
+- Procedural sequences (see the DSPy change tasks.md) are text-keyed and not yet stored (table absent in `legal_ai_db`). The sequence-fusion step depends on that storage gate.
+
+Decisions needed before implementation:
+1. Which owner receives sequence fusion: the packet RPC owner, or one of the two RTX services?
+2. Is the first deliverable a CPU-reference fusion over the feature-row codec, with GPU execution deferred? (The rules require CPU parity before any GPU promotion.)
+3. Confirm the wire format: descriptor JSON plus raw F32LE tensor references, with no inline vectors.
+
+No code changed. No database or service writes.
+
+### Sequence fusion decisions: defaults recorded (2026-10-24)
+
+- Decision 2 (CPU first): ADOPTED. CLAUDE.md requires a CPU-reference result with parity before any GPU promotion. The first deliverable is a CPU-reference fusion; GPU execution is deferred.
+- Decision 3 (wire format): ADOPTED. CLAUDE.md wire-format rule: JSON for descriptors, raw F32LE or Arrow for bulk tensors, references instead of inline vectors.
+- Decision 1 (owner): OPEN, operator to confirm. Recommended: the packet RPC owner (`hyperrag-packet-rpc.ts`) as the only existing packet owner. The two RTX services stay numerical-only.
+- Implementation: not started. It begins only after decision 1 is confirmed, and it is bounded to the CPU reference over the feature-row codec.
+
+### RTX tensor loader: RPC packets into PyTorch, after the XGBoost stage (2026-10-24, plan only)
+
+Status: PLAN ONLY. No code. Two inputs are still open.
+
+Open inputs:
+- Owner (decision 1 above): operator to confirm. Recommended: the packet RPC owner.
+- XGBoost role: XGBoost is supervised; it has no unsupervised mode. Operator to confirm which design applies:
+  (a) unsupervised clustering (KMeans, cuVS) produces labels, and XGBoost learns from them;
+  (b) XGBoost classifies feature rows with reviewed or pseudo labels;
+  (c) XGBoost leaf indices are used as features for a downstream PyTorch model.
+
+Plan once the inputs are confirmed:
+1. Contract: a descriptor JSON per RPC packet, carrying `packetKey`, `sourceRef`, revisions, and a reference (path, byte offset, dtype F32LE, shape) to the raw tensor. No inline vectors.
+2. CPU reference loader: decode the descriptor, verify the byte length and checksum, and produce a tensor. Parity is checked against the feature-row codec.
+3. RTX load (only after CPU parity): copy the verified tensor to the GPU. Runs under the existing compute executor; no new service.
+4. Stage ordering: the XGBoost output is an input reference, not an identity. Labels or leaf indices must stay bound to the same `packetKey`.
+5. Gates: no canonical write, no admission, no Graphify promotion. A GPU result is promotion-eligible only after CPU parity.
+
+### RTX tensor RPC loader: CPU reference built (2026-10-24, fixture only, no production wiring)
+
+- Module: `python/atlas_compute/rtx_tensor_rpc_loader_v1.py` (provisional location; owner decision still open). Descriptor schema `atlas.rpc-tensor-descriptor.v1`; raw little-endian float32 file referenced by relative path, byte offset, shape and SHA-256.
+- Fail-closed checks: schema, packetKey, sourceRevision format, dtype, shape, byte offset, relative and in-root paths (POSIX and Windows absolute forms rejected), byte length, checksum, finite values.
+- Output: a derived tensor with `packetKey` and `sourceRevision` carried through unchanged; `canonical_authority` is always False.
+- Tests: `py -3.13 -m pytest python/tests/test_rtx_tensor_rpc_loader_v1.py -q` → 15 passed (fixture files in a temp directory; no database, no GPU).
+- Not done: GPU copy (gated on CPU parity in production data); production wiring; XGBoost placement; the actor-to-workspace authorization owner (verified-context service stays fail-closed).
+- Open inputs: owner (decision 1); XGBoost role (it may be one of the NB/LR classifiers or its own stage); whether the loader should be fed by real packets only after the authorization owner exists.
+
+### NEXT STEPS (2026-10-24, ordered; nothing below is marked complete)
+
+| # | Step | Owner | Gate | Blocked by |
+|---|---|---|---|---|
+| 1 | Operator confirms the owner for the RTX tensor loader (recommended: packet RPC owner) | Operator | Written decision here | Nothing |
+| 2 | Operator confirms the XGBoost placement: a classifier among NB/LR, or its own stage | Operator | Written decision here | Nothing |
+| 3 | Identify the actor-to-workspace/repository authorization owner; keep the verified-context service fail-closed until found | Application authorization (to be identified) | Named owner plus a fail-closed test | Step 1 for ownership context |
+| 4 | Restore Ornith on `:8090` (TurboQuant start task); run one bounded live candidate through `procedural-candidate-generator-v1.ts` | Operator plus `ornith-1.5-9b` | Receipt with raw output preserved | Operator action |
+| 5 | Procedural sequence storage: apply the draft DDL only after explicit approval; first confirm the table is absent or present in the target database | PostgreSQL 18 via manual SQL | Rollback test, pre-image note, post-check | Operator approval; database location unconfirmed |
+| 6 | Loader to GPU copy: only after CPU parity against real production descriptors | Chosen owner from step 1 | CPU parity receipt, then the GPU copy | Steps 1, 3, and a real descriptor source |
+| 7 | Stage wiring: bind XGBoost or classifier outputs to `packetKey` as references, never as identity | Chosen owner from steps 1 and 2 | Test that a label-only match is rejected | Steps 1 and 2 |
+
+Status of work already done (not repeated as tasks): CPU-reference loader with 15 fixture tests; procedural contract and generator with 13 tests; ownership audit recorded; DSPy repair worker in its own ledger.
+
+### Operator decisions recorded (2026-10-24)
+
+- XGBoost role: DECIDED, option (a). XGBoost is the contextual tree stage over KMeans clustering: KMeans (cuVS) produces cluster labels, and XGBoost learns contextual trees from them. It is not unsupervised. Its outputs bind to `packetKey` as references only.
+- Loader owner: operator wrote "loaders own". Recorded literally. Working interpretation (to confirm): the RPC tensor loader is owned by the packet RPC loader lane, i.e. the packet RPC owner recommended in decision 1. Until confirmed, the loader stays provisional in `python/atlas_compute/`.
+- Next-steps table above: steps 1 and 2 are now decided. Steps 3 to 7 unchanged.
+
+### Constraints from the active-goal report (2026-10-24, recorded)
+
+- `feature_label` is descriptive/evidence only. It may summarize a feature and its related files from joined evidence. It must not be identity, authorization, or numeric tensor input. The RTX tensor loader already excludes it: it loads only verified float32 tensors keyed by `packetKey`.
+- Oaklib-normalized candidates stay distinct from reviewed ontology tuples. Neither feeds the loader as identity.
+- Ontology tuple regression checks for sourceRef, workspaceRevision and sourceRevision mismatches pass (15/15, focused adapter suite). Owner: the ontology tuple lane, not this ledger.
+- Production path stays blocked on the actor-to-workspace/repository grant owner. Case ownership is not a substitute. Next-steps step 3 is unchanged.
+
+### /deep-audit report (2026-10-24; scope and gates as requested; mode=report; no fixes applied)
+
+Scope: procedural folder, `gemma4-tool-controller.ts`, ` onnx/session.ts`, `atlas/evals`, the RTX loader, the DSPy repair module, and the DSPy worker container.
+Serial pass (concurrency 1). Graph read once from `sveltekit-frontend/docs/graph/codebase-graph.json` (34,183 files).
+
+| Gate | Result | Notes |
+|---|---|---|
+| G59 index freshness | STALE | Graph mtime Oct 17 (more than 24h). New procedural files are not in the graph. |
+| G1 imports / G2 dynamic | 24 / 5 | Counts only, no failure. |
+| G4 auth on routes | 0 | No scoped route handlers. |
+| G5 Zod on body parsing | 0 | No scoped route handlers. |
+| G8 TODOs | 0 | |
+| G11 localhost refs | 1 warning | `atlas/evals/dspy-llama-server-caller-v1.ts`: default `http://127.0.0.1:8090` fallback. Existing pattern is `ENV.LLAMA_SERVER_URL` with a fallback; consider the `ENV` pattern. |
+| G14 Svelte 4 | 0 | |
+| G15 SSR-unsafe | 0 | |
+| G16 test pairing | 0 | Scoped files are not routes. |
+| Cycles | 16 (repo-wide) | Not scoped. |
+
+Coverage gaps (not gate failures):
+- The new TypeScript files (`procedural-sequence-contract-v1.ts`, `procedural-candidate-generator-v1.ts`, and their spec) are not in the graph, so the code gates did not cover them. A fresh index run is needed.
+- The Python files (`rtx_tensor_rpc_loader_v1.py`, `parent_atlas_dspy_repair.py`) and the DSPy worker container are outside the TypeScript graph. Covered only by their tests (loader 15, DSPy 72).
+
+Top remediation (priority order):
+1. Regenerate the index (`npm run index:codebase:fast`) so G59 and gate coverage include today's files. Read-only apart from the probe output.
+2. Decide the G11 pattern for `dspy-llama-server-caller-v1.ts`: keep the existing `ENV` fallback as-is, or route it through the `ENV` helper.
+3. No Python gate exists in the graph. Add a Python test gate to the next audit run.
+
+Run: serial, concurrency 1, wall time not measured; serial oracle: not run (single pass). No database, Valkey, Qdrant or Neo4j writes. Graph freshness is the main limit on this report.
