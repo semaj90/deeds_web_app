@@ -2043,3 +2043,32 @@ Run: serial, concurrency 1, wall time not measured; serial oracle: not run (sing
 ### Correction (2026-10-24)
 
 - The Redis writes from the index run (1,677 `wiki:note:dir:*` notes) are intended. The indexer writes them by design; `--skip-redis` is only an opt-out. The earlier recommendation to clear them is withdrawn. The deep-audit rule against Valkey writes applies to the audit gates themselves, not to the indexer run.
+
+### HANDOFF (2026-10-24, end of session)
+
+State
+- Branch `chore/parent-atlas-session-2026-10-17` is pushed to origin at `d0061e099c`. Local and origin match.
+- `main` was fast-forwarded to `f72b8941c6` earlier (no content change from the merge with origin/main).
+- Commits from this session on the branch: `d44aac816c` (DSPy worker, procedural contract and generator, RTX loader, browser embedding fix), `18117eb7a6` (ignore claude-mem), `817b539e5a` (.okf/systems), `9c5796b0ea` (openspec/changes), `a133b3e3d8` (sveltekit-frontend/openspec), `21f773f600` (docs/.okf), `d0061e099c` (docs/reports).
+
+Open work
+- 239 uncommitted paths still need review and commit, in batches, by area. Largest: `sveltekit-frontend/src` (139), then `scripts/atlas` (53, untracked 40), `docs/reports` remainder (none, done), and smaller areas. Owners of in-progress work should review before commit.
+- `docs/reports/document-governance-registry-v1.json` (11.4 MB) is excluded. It is a regenerated projection with other sessions' progress. Do not commit as-is.
+- `claude-mem` is a tracked gitlink (commit 5f0a63fa). `.gitignore` does not affect it. Decision needed: unregister the gitlink or keep it.
+- Ornith on `:8090` is stopped. Restart with the TurboQuant start task before any live run.
+- Procedural sequence table is absent from `legal_ai_db`. Need the database and port that hold it, or confirmation it is still a draft.
+- Loader owner: "loaders own" recorded literally; working reading is the packet RPC loader lane. Confirm.
+- Authorization: no actor-to-workspace owner exists. Verified-context service stays fail-closed.
+- Deep-audit: code index probe `codebase-graph.2026-10-24T08-01-47-190Z-40892.json`; canonical graph still Oct 17. Gate G11 warning only.
+
+Batch procedure (used for the committed batches)
+1. Scan the area's files for secret patterns and files over 10 MB (stat, not find on directories).
+2. Commit only clean batches, one commit per area, with a summary and the Co-Authored-By line.
+3. Exclude any file over 10 MB and say so in the commit message.
+4. Push as a fast-forward only. No force.
+
+Next steps
+1. Resolve the claude-mem gitlink decision.
+2. Review and commit the 239 paths by area, starting with the smallest.
+3. Restore Ornith on `:8090`, then run one bounded live procedural candidate and record the receipt.
+4. Confirm the loader owner and the authorization owner.
