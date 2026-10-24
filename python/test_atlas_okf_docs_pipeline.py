@@ -155,7 +155,7 @@ class OkfDocsPipelineTests(unittest.TestCase):
             text="# Guide\n\nA source-grounded computer engineering guide.",
             fetcher="BEAUTIFULSOUP_HTTP",
             raw_checksum="raw-sha256",
-            normalized_checksum="normalized-sha256",
+            normalized_checksum=sha256(b"# Guide\n\nA source-grounded computer engineering guide.").hexdigest(),
             outgoing_urls=(),
             metadata={},
             retrieved_at="2026-10-04T00:00:00Z",
@@ -180,6 +180,16 @@ class OkfDocsPipelineTests(unittest.TestCase):
             self.assertTrue(receipt["writes_performed"])
             self.assertEqual(receipt["page_count"], 1)
             self.assertGreater(receipt["chunk_count"], 0)
+            raw_root = Path(tmp) / source.output_namespace / "raw"
+            markdown_path = next(raw_root.glob("*.md"))
+            page_receipt = json.loads(next(raw_root.glob("*.json")).read_text(encoding="utf-8"))
+            markdown_bytes = markdown_path.read_bytes()
+            self.assertEqual(markdown_bytes, page.text.encode("utf-8"))
+            self.assertEqual(sha256(markdown_bytes).hexdigest(), page.normalized_checksum)
+            self.assertFalse(page_receipt["canonical_authority"])
+            chunks_bytes = (Path(tmp) / source.output_namespace / "chunks.jsonl").read_bytes()
+            self.assertNotIn(b"\r\n", chunks_bytes)
+            self.assertTrue(chunks_bytes.endswith(b"\n"))
 
     def test_firecrawl_request_uses_manifest_bounds_and_disables_domain_expansion(self) -> None:
         source = SourceConfig(

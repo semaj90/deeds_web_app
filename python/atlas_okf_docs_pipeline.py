@@ -65,6 +65,10 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def _write_utf8(path: Path, value: str) -> None:
+    path.write_bytes(value.encode("utf-8"))
+
+
 def _http_json(
     url: str,
     *,
@@ -935,7 +939,7 @@ def write_source_artifacts(root: Path, source: SourceConfig, pages: Sequence[Pag
         name = _safe_filename(page.resolved_url)
         markdown_path = raw_root / f"{name}.md"
         receipt_path = raw_root / f"{name}.json"
-        markdown_path.write_text(page.text, encoding="utf-8")
+        _write_utf8(markdown_path, page.text)
         receipt = {
             **asdict(page),
             "text": None,
@@ -943,12 +947,14 @@ def write_source_artifacts(root: Path, source: SourceConfig, pages: Sequence[Pag
             "fetched_at": page.retrieved_at or _now(),
             "canonical_authority": False,
         }
-        receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True), encoding="utf-8")
+        _write_utf8(receipt_path, json.dumps(receipt, indent=2, sort_keys=True) + "\n")
         page_receipts.append(receipt)
     chunks_path = source_root / "chunks.jsonl"
-    with chunks_path.open("w", encoding="utf-8") as handle:
-        for chunk in chunks:
-            handle.write(json.dumps(chunk.to_dict(), sort_keys=True, ensure_ascii=False) + "\n")
+    chunks_bytes = "".join(
+        json.dumps(chunk.to_dict(), sort_keys=True, ensure_ascii=False) + "\n"
+        for chunk in chunks
+    )
+    _write_utf8(chunks_path, chunks_bytes)
     return {
         "source_id": source.source_id,
         "source_namespace": source.source_namespace,
@@ -1030,7 +1036,7 @@ def run_pipeline(
         receipt_root = root / "docs/.okf"
         receipt_root.mkdir(parents=True, exist_ok=True)
         receipt_path = receipt_root / f"pipeline-receipt-{manifest.manifest_revision}.json"
-        receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True), encoding="utf-8")
+        _write_utf8(receipt_path, json.dumps(receipt, indent=2, sort_keys=True) + "\n")
         return receipt
 
     embeddings = embed_llama_server_768(
@@ -1109,7 +1115,7 @@ def run_pipeline(
     receipt_root = root / "docs/.okf"
     receipt_root.mkdir(parents=True, exist_ok=True)
     receipt_path = receipt_root / f"pipeline-receipt-{manifest.manifest_revision}.json"
-    receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True), encoding="utf-8")
+    _write_utf8(receipt_path, json.dumps(receipt, indent=2, sort_keys=True) + "\n")
     return receipt
 
 

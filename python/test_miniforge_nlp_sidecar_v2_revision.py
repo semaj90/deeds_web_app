@@ -108,6 +108,9 @@ def test_ast_chunk_http_route_accepts_large_source():
 
     assert response.status_code == 200
     assert response.json()["source_revision"] == revision
+    # Wire contract: the HTTP key stays "schema" even though the Python attribute is schema_.
+    assert response.json()["schema"] == "atlas.ast.evidence.v1"
+    assert "schema_" not in response.json()
 
 
 def test_ast_chunk_request_rejects_source_above_explicit_cap():
@@ -161,3 +164,52 @@ def test_unsupported_language_is_partial_not_complete():
     assert result.chunks == []
     assert result.scan_completeness == "PARTIAL_AST_FAILED"
     assert result.scan_failure and result.scan_failure.startswith("UnsupportedLanguageError")
+
+
+def test_ast_evidence_response_model_schema_field_is_aliased_to_schema():
+    props = AstEvidenceResponseV2.model_json_schema(by_alias=True)["properties"]
+    assert "schema" in props and "schema_" not in props
+    assert AstEvidenceResponseV2.model_fields["schema_"].alias == "schema"
+
+
+_EXISTING_PACKET = {
+    "schema": "atlas.ast.evidence.v1",
+    "engine": "treesitter-chunker",
+    "engine_version": "fixture",
+    "language": "python",
+    "file_path": "src/a.py",
+    "source_revision": "sha256:" + "a" * 64,
+    "chunks": [],
+}
+
+
+def test_existing_json_packet_deserializes_unchanged_and_keeps_provenance():
+    response = AstEvidenceResponseV2.model_validate(_EXISTING_PACKET)
+    assert response.schema_ == "atlas.ast.evidence.v1"
+    assert response.source_revision == _EXISTING_PACKET["source_revision"]
+    assert response.file_path == "src/a.py"
+    assert response.language == "python"
+
+
+def test_serialized_packet_keeps_schema_key_and_emits_no_internal_names_or_extra_keys():
+    response = AstEvidenceResponseV2.model_validate(_EXISTING_PACKET)
+    dumped = response.model_dump(by_alias=True)
+    allowed = set(AstEvidenceResponseV2.model_json_schema(by_alias=True)["properties"])
+    assert dumped["schema"] == "atlas.ast.evidence.v1"
+    assert "schema_" not in dumped
+    assert set(dumped) <= allowed
+    assert dumped["source_revision"] == _EXISTING_PACKET["source_revision"]
+
+
+def test_schema_field_validation_is_unchanged_for_missing_and_wrong_values():
+    from pydantic import ValidationError
+
+    missing = {k: v for k, v in _EXISTING_PACKET.items() if k != "schema"}
+    with pytest.raises(ValidationError):
+        AstEvidenceResponseV2.model_validate(missing)
+    wrong = {**_EXISTING_PACKET, "schema": "atlas.ast.evidence.v0"}
+    with pytest.raises(ValidationError):
+        AstEvidenceResponseV2.model_validate(wrong)
+    no_engine = {k: v for k, v in _EXISTING_PACKET.items() if k != "engine"}
+    with pytest.raises(ValidationError):
+        AstEvidenceResponseV2.model_validate(no_engine)

@@ -5,6 +5,7 @@ import path from 'path';
 import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 import { loadRuntimeEnv } from './src/lib/server/config/load-runtime-env.js';
+import { ensureOpenTelemetry } from './src/lib/server/observability/opentelemetry.js';
 
 // vite.config.ts is the actual Node.js entrypoint for `vite dev` / `npm run dev`.
 // It does NOT get .env populated into process.env automatically (Vite's own
@@ -146,6 +147,10 @@ const stripDashedDefineKeys = {
     }
   },
 };
+
+// OBS-06: start the OpenTelemetry SDK before Vite creates the dev HTTP server, so the inbound
+// request instrumentation wraps it. Runs after loadRuntimeEnv() above. The hooks-level call remains and is idempotent.
+await ensureOpenTelemetry();
 
 export default defineConfig(({ mode }) => {
   // Don't load env vars with loadEnv - let SvelteKit handle it naturally

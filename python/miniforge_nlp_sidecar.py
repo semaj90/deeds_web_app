@@ -25,7 +25,7 @@ import hashlib
 import importlib
 import json
 from importlib import metadata as importlib_metadata
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import re
 import sys
@@ -276,7 +276,7 @@ class AstEvidenceEdge(BaseModel):
 
 
 class AstEvidenceResponse(BaseModel):
-    schema: Literal["atlas.ast.evidence.v1"]
+    schema_: Literal["atlas.ast.evidence.v1"] = Field(alias="schema")
     engine: str
     engine_version: str
     language: str
@@ -2263,7 +2263,7 @@ def _build_hmm_observations(
     observations: list[HMMObservation] = []
     source_ref = req.source_ref or req.document_id or "unknown"
     source_revision = req.source_revision or "unknown"
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
 
     tokens: list[tuple[str, float, str]] = []
     if chunks:
@@ -2324,7 +2324,7 @@ def _build_event_hypergraph(
     source_ref = req.source_ref
     source_revision = req.source_revision
     workspace_revision = req.workspace_revision
-    observed_at = datetime.utcnow().isoformat() + "Z"
+    observed_at = datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
     packet_key = req.packet_key
 
     events: list[dict[str, Any]] = []
@@ -2788,7 +2788,7 @@ def _build_pass_results(
 
     source_ref = req.source_ref
     source_revision = req.source_revision
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
     ast_units = _build_ast_units(req, text, chunks, req.language or "unknown") if "structural" in requested else []
     semantic_cards = _build_semantic_cards(req, text, ast_units, entities, features) if "semantic" in requested else []
     observations = _build_hmm_observations(req, text, entities, relationships, chunks, semantic_cards) if "sequence" in requested else []

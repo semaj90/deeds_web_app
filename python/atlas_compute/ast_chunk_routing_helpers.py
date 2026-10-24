@@ -16,6 +16,7 @@ import mmap
 import os
 from pathlib import Path
 from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, Union
+from .nes_lut_palette import load_nes_lut_palette
 
 try:
     import numpy as np
@@ -39,7 +40,7 @@ except ImportError:
 class AstChunkRouteTuple(NamedTuple):
     """Immutable Python Tuple for K/V Routing & NES LUT Palette Tagging.
     
-    NOTE: nes_lut_byte (e.g., 0x2A for Svelte 5 runes) is derived metadata only.
+    NOTE: nes_lut_byte and nes_hex are separate derived metadata fields only.
     It must never be used as canonical identity or database primary keys.
     """
     source_ref: str          # Canonical file path / URI
@@ -47,9 +48,10 @@ class AstChunkRouteTuple(NamedTuple):
     start_byte: int          # UTF-8 byte offset from Tree-sitter CST
     end_byte: int            # UTF-8 byte offset
     lang_id: int             # 0..7 for the 8 supported AST languages, 255 for non-AST
-    nes_lut_byte: int        # 0x00..0x0F (or 0x2A rune sub-palette)
+    nes_lut_byte: int        # Domain classification byte; 0x00 is unresolved only
     prev_ordinal: int        # O(1) intrusive linked-list prev index (-1 if head)
     next_ordinal: int        # O(1) intrusive linked-list next index (-1 if tail)
+    nes_hex: str = "0x00"    # Separate NES color/sub-label value
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -66,19 +68,11 @@ class AstChunkDomainRouter:
     - 1 UNRESOLVED fallback = 76 total mapped domain entities.
     """
 
-    # NES 8-bit palette mapping (0x00..0x0F, with 0x2A for Svelte 5 runes)
+    # Generated palette is the shared domain-byte and NES-color contract.
+    _PALETTE = load_nes_lut_palette()
     NES_DOMAIN_LUT: Dict[str, int] = {
-        "auth": 0x01,
-        "ui": 0x02,
-        "retrieval": 0x03,
-        "network": 0x04,
-        "database": 0x05,
-        "cache": 0x06,
-        "agent": 0x07,
-        "graph": 0x08,
-        "ml": 0x09,
-        "svelte5_runes": 0x2A,
-        "unresolved": 0x00,
+        **{name: entry["lutByte"] for name, entry in _PALETTE["domains"].items()},
+        "unresolved": _PALETTE["unresolved"]["lutByte"],
     }
 
     # Supported AST Languages (0..7)
@@ -298,11 +292,11 @@ class AstChunkDomainRouter:
 
                 for i, ch in enumerate(raw_chunks):
                     domain_slug = cls.resolve_domain_76(ch.get("domain_proposal", ""), crosswalk)
-                    # Special Svelte 5 runes palette check
-                    if ch.get("has_svelte_runes") or "$state" in ch.get("text", "") or "$derived" in ch.get("text", ""):
-                        lut_byte = cls.NES_DOMAIN_LUT["svelte5_runes"]
-                    else:
-                        lut_byte = cls.NES_DOMAIN_LUT.get(domain_slug, cls.NES_DOMAIN_LUT["unresolved"])
+                    has_svelte_runes = ch.get("has_svelte_runes") or "$state" in ch.get("text", "") or "$derived" in ch.get("text", "")
+                    if has_svelte_runes and domain_slug == "unresolved":
+                        domain_slug = "ui"
+                    lut_byte = cls.NES_DOMAIN_LUT.get(domain_slug, cls.NES_DOMAIN_LUT["unresolved"])
+                    nes_hex = cls._PALETTE["subLabels"]["svelte5_runes"]["nesHex"] if has_svelte_runes else cls._PALETTE["domains"].get(domain_slug, {}).get("nesHex", "0x00")
 
                     source_ref = ch["source_ref"]
                     start_byte = ch["start_byte"]
@@ -318,6 +312,7 @@ class AstChunkDomainRouter:
                         nes_lut_byte=lut_byte,
                         prev_ordinal=prev_of[i],
                         next_ordinal=next_of[i],
+                        nes_hex=nes_hex,
                     )
                     # Keyed by canonical coordinate tuple (source_ref, start_byte, end_byte)
                     kv_route_dict[(source_ref, start_byte, end_byte)] = route_tuple

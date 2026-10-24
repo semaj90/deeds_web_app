@@ -12,11 +12,12 @@
   },
   "key_patterns": {
     "centroid_vector": {
-      "pattern": "centroid:som:{cluster_id}",
-      "type": "string (base64-encoded float32 array)",
+      "pattern": "atlas:centroid:som:{cluster_id}",
+      "legacy_alias_pattern": "centroid:som:{cluster_id}",
+      "type": "string (base64-encoded float32 array or JSON float array)",
       "ttl_seconds": 86400,
       "size_bytes": 3140,
-      "example": "centroid:som:0x0f42",
+      "example": "atlas:centroid:som:15:66",
       "contents": "SOM BMU centroid at grid (15, 66), 768-dim embedding"
     },
     "cluster_members": {

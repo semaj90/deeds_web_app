@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9bc415`
+Registry checksum: `76c366553ac1f098232451706285c756c83854de851b6eb25e2abc53ac15070c`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 
@@ -19,7 +19,7 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 
 - [.claude/CLAUDE.md](.claude/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `13bc6179f4ad`
 - [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `fef20519d5e9`
-- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `811a318ae8b9`
+- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `bd00fba0920c`
 - [claude-mem/CLAUDE.md](claude-mem/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `a6f297acd125`
 - [llm/claude.md](llm/claude.md) — CLAUDE_INSTRUCTIONS — `fdcdba7c73d7`
 - [mcp-server-mcp/CLAUDE.md](mcp-server-mcp/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `1707a6375458`
@@ -109,6 +109,8 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 - [agentic-error-proposal-flow](docs/architecture/agentic-error-proposal-flow.md) — UNCLASSIFIED
 - [agentic-openspec-tasks-error-fixing-playbook](docs/architecture/agentic-openspec-tasks-error-fixing-playbook.md) — UNCLASSIFIED
 - [ARCH-TOC-v2](docs/architecture/ARCH-TOC-v2.md) — UNCLASSIFIED
+- [atlas-feature-taxonomy-sveltekit-draft](docs/architecture/atlas-feature-taxonomy-sveltekit-draft.md) — UNCLASSIFIED
+- [atlas-python-environment-routing](docs/architecture/atlas-python-environment-routing.md) — UNCLASSIFIED
 - [atlas-retrieval-parity-admission-gates-v1](docs/architecture/atlas-retrieval-parity-admission-gates-v1.md) — UNCLASSIFIED
 - [atlas-store-ownership-and-derived-representations-v1](docs/architecture/atlas-store-ownership-and-derived-representations-v1.md) — UNCLASSIFIED
 - [atlas-topic-identity-read-model-v1](docs/architecture/atlas-topic-identity-read-model-v1.md) — UNCLASSIFIED
@@ -168,10 +170,12 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 - [PARENT_ATLAS_PACKAGE_BOUNDARIES](docs/architecture/PARENT_ATLAS_PACKAGE_BOUNDARIES.md) — UNCLASSIFIED
 - [PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY](docs/architecture/PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md) — UNCLASSIFIED
 - [parent-atlas-batch-execution-gates-v1](docs/architecture/parent-atlas-batch-execution-gates-v1.md) — UNCLASSIFIED
+- [parent-atlas-event-driven-bulk-data-flow-v1](docs/architecture/parent-atlas-event-driven-bulk-data-flow-v1.md) — UNCLASSIFIED
 - [parent-atlas-function-topology-search-index](docs/architecture/parent-atlas-function-topology-search-index.md) — UNCLASSIFIED
 - [parent-atlas-karpathy-pipeline](docs/architecture/parent-atlas-karpathy-pipeline.md) — UNCLASSIFIED
 - [parent-atlas-native-dawn-viewer-contract-v1](docs/architecture/parent-atlas-native-dawn-viewer-contract-v1.md) — UNCLASSIFIED
 - [parent-atlas-policy-routing](docs/architecture/parent-atlas-policy-routing.md) — UNCLASSIFIED
+- [parent-atlas-query-intelligence-owner-map-v1](docs/architecture/parent-atlas-query-intelligence-owner-map-v1.md) — UNCLASSIFIED
 - [parent-atlas-representation-structural-contract](docs/architecture/parent-atlas-representation-structural-contract.md) — UNCLASSIFIED
 - [parent-atlas-selection-receipt-and-model-boundaries-v1](docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md) — UNCLASSIFIED
 - [PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT](docs/architecture/PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT.md) — UNCLASSIFIED
@@ -219,37 +223,39 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 - [agent-branch-review-fanout-ace-centroid-aug22](openspec/changes/agent-branch-review-fanout-ace-centroid-aug22) — 17/20 tasks (85%)
 - [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence) — 27/82 tasks (33%)
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22) — 16/28 tasks (57%)
-- [legal-corpus-california-codes](openspec/changes/legal-corpus-california-codes) — 56/102 tasks (55%)
+- [feature-label-semantic-derivation](openspec/changes/feature-label-semantic-derivation) — 6/9 tasks (67%)
+- [legal-corpus-california-codes](openspec/changes/legal-corpus-california-codes) — 61/107 tasks (57%)
 - [local-llm-offload-ownership](openspec/changes/local-llm-offload-ownership) — 49/82 tasks (60%)
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/132 tasks (74%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 57/110 tasks (52%)
-- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 981/1493 tasks (66%)
+- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 1047/1664 tasks (63%)
 - [parent-atlas-adaptive-backprop-hll-monitoring](openspec/changes/parent-atlas-adaptive-backprop-hll-monitoring) — 10/64 tasks (16%)
 - [parent-atlas-adaptive-dag-fabric](openspec/changes/parent-atlas-adaptive-dag-fabric) — 12/13 tasks (92%)
 - [parent-atlas-agent-framework-integration-hardening](openspec/changes/parent-atlas-agent-framework-integration-hardening) — 12/71 tasks (17%)
 - [parent-atlas-agentic-completion](openspec/changes/parent-atlas-agentic-completion) — 10/11 tasks (91%)
 - [parent-atlas-agentic-file-compiler](openspec/changes/parent-atlas-agentic-file-compiler) — 56/81 tasks (69%)
 - [parent-atlas-agentic-repair-bundle-integration](openspec/changes/parent-atlas-agentic-repair-bundle-integration) — 29/96 tasks (30%)
-- [parent-atlas-agentic-repair-fabric](openspec/changes/parent-atlas-agentic-repair-fabric) — 45/54 tasks (83%)
+- [parent-atlas-agentic-repair-fabric](openspec/changes/parent-atlas-agentic-repair-fabric) — 55/62 tasks (89%)
 - [parent-atlas-analysis-pass-ornith-adapter](openspec/changes/parent-atlas-analysis-pass-ornith-adapter) — 24/25 tasks (96%)
+- [parent-atlas-ast-summary-lineage-pipeline](openspec/changes/parent-atlas-ast-summary-lineage-pipeline) — 2/43 tasks (5%)
 - [parent-atlas-best-fit-score-fabric](openspec/changes/parent-atlas-best-fit-score-fabric) — 422/714 tasks (59%)
 - [parent-atlas-branch-merge-consolidation-aug20](openspec/changes/parent-atlas-branch-merge-consolidation-aug20) — 18/35 tasks (51%)
 - [parent-atlas-candidate-feature-execution-fabric](openspec/changes/parent-atlas-candidate-feature-execution-fabric) — 311/471 tasks (66%)
-- [parent-atlas-canonical-directory-ingestion-fabric](openspec/changes/parent-atlas-canonical-directory-ingestion-fabric) — 25/77 tasks (32%)
+- [parent-atlas-canonical-directory-ingestion-fabric](openspec/changes/parent-atlas-canonical-directory-ingestion-fabric) — 27/86 tasks (31%)
 - [parent-atlas-chunk-index-whole-file-hash](openspec/changes/parent-atlas-chunk-index-whole-file-hash) — 25/29 tasks (86%)
 - [parent-atlas-code-ingestion-pipeline](openspec/changes/parent-atlas-code-ingestion-pipeline) — 26/35 tasks (74%)
 - [parent-atlas-code-intel-e2e](openspec/changes/parent-atlas-code-intel-e2e) — 2/28 tasks (7%)
 - [parent-atlas-compiler-semantic-graph-resolution](openspec/changes/parent-atlas-compiler-semantic-graph-resolution) — 40/89 tasks (45%)
-- [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa) — 37/148 tasks (25%)
+- [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa) — 56/148 tasks (38%)
 - [parent-atlas-deep-research-ingestion](openspec/changes/parent-atlas-deep-research-ingestion) — 6/7 tasks (86%)
 - [parent-atlas-document-governance-master-index](openspec/changes/parent-atlas-document-governance-master-index) — 60/80 tasks (75%)
 - [parent-atlas-error-embedding-768-migration](openspec/changes/parent-atlas-error-embedding-768-migration) — 12/26 tasks (46%)
-- [parent-atlas-gate2-chunk-lineage-convergence](openspec/changes/parent-atlas-gate2-chunk-lineage-convergence) — 3/20 tasks (15%)
+- [parent-atlas-gate2-chunk-lineage-convergence](openspec/changes/parent-atlas-gate2-chunk-lineage-convergence) — 6/20 tasks (30%)
 - [parent-atlas-governed-compute-fabric](openspec/changes/parent-atlas-governed-compute-fabric) — 2/180 tasks (1%)
 - [parent-atlas-gpu-graph-vector-substrate](openspec/changes/parent-atlas-gpu-graph-vector-substrate) — 3/57 tasks (5%)
-- [parent-atlas-gpu-prellm-recommendation-v1](openspec/changes/parent-atlas-gpu-prellm-recommendation-v1) — 35/37 tasks (95%)
+- [parent-atlas-gpu-prellm-recommendation-v1](openspec/changes/parent-atlas-gpu-prellm-recommendation-v1) — 38/46 tasks (83%)
 - [parent-atlas-gpu-runtime-abi-alignment](openspec/changes/parent-atlas-gpu-runtime-abi-alignment) — 17/22 tasks (77%)
-- [parent-atlas-gpu-sidecar-patch-tournament](openspec/changes/parent-atlas-gpu-sidecar-patch-tournament) — 18/122 tasks (15%)
+- [parent-atlas-gpu-sidecar-patch-tournament](openspec/changes/parent-atlas-gpu-sidecar-patch-tournament) — 18/130 tasks (14%)
 - [parent-atlas-graph-analysis-contract](openspec/changes/parent-atlas-graph-analysis-contract) — 68/128 tasks (53%)
 - [parent-atlas-graph-pagerank-okf-fanout-hardening](openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening) — 6/10 tasks (60%)
 - [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof) — 165/293 tasks (56%)
@@ -264,13 +270,14 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 - [parent-atlas-ml-graph-retrieval-convergence](openspec/changes/parent-atlas-ml-graph-retrieval-convergence) — 72/254 tasks (28%)
 - [parent-atlas-multi-agent-wave-plan](openspec/changes/parent-atlas-multi-agent-wave-plan) — 21/36 tasks (58%)
 - [parent-atlas-native-acceleration-cabi](openspec/changes/parent-atlas-native-acceleration-cabi) — 39/63 tasks (62%)
+- [parent-atlas-nes-lut-single-owner](openspec/changes/parent-atlas-nes-lut-single-owner) — 5/7 tasks (71%)
 - [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1546/2239 tasks (69%)
 - [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 102/160 tasks (64%)
 - [parent-atlas-nlp-sidecar-okf-alignment](openspec/changes/parent-atlas-nlp-sidecar-okf-alignment) — 8/16 tasks (50%)
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 19/26 tasks (73%)
 - [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 39/63 tasks (62%)
 - [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion) — 15/21 tasks (71%)
-- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 248/408 tasks (61%)
+- [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 250/410 tasks (61%)
 - [parent-atlas-ontology-oaklib-fanout-bitmap](openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap) — 33/36 tasks (92%)
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof) — 2/19 tasks (11%)
 - [parent-atlas-openspec-ledger-reconciliation](openspec/changes/parent-atlas-openspec-ledger-reconciliation) — 0/13 tasks (0%)
@@ -286,7 +293,7 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 - [parent-atlas-retire-384-lane](openspec/changes/parent-atlas-retire-384-lane) — 17/31 tasks (55%)
 - [parent-atlas-retrieval-executor-compatibility-convergence](openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence) — 39/48 tasks (81%)
 - [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 121/148 tasks (82%)
-- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 865/1189 tasks (73%)
+- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 865/1190 tasks (73%)
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 60/157 tasks (38%)
 - [parent-atlas-retrieval-logic-convergence](openspec/changes/parent-atlas-retrieval-logic-convergence) — 32/74 tasks (43%)
 - [parent-atlas-rpc-packet-registry-fabric](openspec/changes/parent-atlas-rpc-packet-registry-fabric) — 30/41 tasks (73%)
@@ -294,7 +301,8 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 - [parent-atlas-runtime-log-remediation](openspec/changes/parent-atlas-runtime-log-remediation) — 0/18 tasks (0%)
 - [parent-atlas-search-classifier-sidecar](openspec/changes/parent-atlas-search-classifier-sidecar) — 70/88 tasks (80%)
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
-- [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 60/104 tasks (58%)
+- [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 69/111 tasks (62%)
+- [parent-atlas-source-qualified-corpus-admission](openspec/changes/parent-atlas-source-qualified-corpus-admission) — 21/94 tasks (22%)
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration) — 17/55 tasks (31%)
 - [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 179/332 tasks (54%)
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission) — 37/58 tasks (64%)
@@ -302,11 +310,12 @@ Registry checksum: `5b6183ab1a0a537272a28b78b47ef20325754a65a6f620fa528280d28c9b
 - [parent-atlas-unordered-execution-contract](openspec/changes/parent-atlas-unordered-execution-contract) — 7/26 tasks (27%)
 - [parent-atlas-versioned-doc-intelligence](openspec/changes/parent-atlas-versioned-doc-intelligence) — 57/98 tasks (58%)
 - [parent-atlas-workboard-feature-utility-fabric](openspec/changes/parent-atlas-workboard-feature-utility-fabric) — 28/70 tasks (40%)
-- [parent-atlas-workspace-snapshot-runtime](openspec/changes/parent-atlas-workspace-snapshot-runtime) — 6/44 tasks (14%)
-- [parent-atlas-workstation-domain-classifier](openspec/changes/parent-atlas-workstation-domain-classifier) — 143/219 tasks (65%)
+- [parent-atlas-workspace-snapshot-runtime](openspec/changes/parent-atlas-workspace-snapshot-runtime) — 8/44 tasks (18%)
+- [parent-atlas-workstation-domain-classifier](openspec/changes/parent-atlas-workstation-domain-classifier) — 148/234 tasks (63%)
 - [parent-atlas-xgboost-cuda-runtime-proof](openspec/changes/parent-atlas-xgboost-cuda-runtime-proof) — 12/30 tasks (40%)
 - [route-import-infra-isolation](openspec/changes/route-import-infra-isolation) — 16/17 tasks (94%)
 - [svelte-a11y-warning-remediation](openspec/changes/svelte-a11y-warning-remediation) — 13/20 tasks (65%)
+- [sveltekit2-docs-corpus-analysis](openspec/changes/sveltekit2-docs-corpus-analysis) — 9/19 tasks (47%)
 - [visual-element-rendering](openspec/changes/visual-element-rendering) — 15/16 tasks (94%)
 
 ## Ordered workboard

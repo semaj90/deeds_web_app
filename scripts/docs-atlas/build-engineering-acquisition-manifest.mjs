@@ -24,6 +24,8 @@ export function buildEngineeringAcquisitionManifestV1(catalog, {
 	outputRoot,
 	fetcher = 'BEAUTIFULSOUP_HTTP',
 	maximumPagesPerSource = 8,
+	sourceIds = null,
+	outputPrefix = 'docs/.okf/engineering-acquisition',
 } = {}) {
 	if (!catalog || catalog.schema !== 'atlas.library-docs-source-manifest.v1') {
 		throw new Error('ENGINEERING_SOURCE_CATALOG_SCHEMA_INVALID');
@@ -34,11 +36,24 @@ export function buildEngineeringAcquisitionManifestV1(catalog, {
 	if (!outputRoot || !Number.isInteger(maximumPagesPerSource) || maximumPagesPerSource < 1) {
 		throw new Error('OUTPUT_ROOT_AND_POSITIVE_PAGE_BOUND_REQUIRED');
 	}
+	if (!/^docs\/\.okf\/[A-Za-z0-9._/-]+$/.test(outputPrefix) || outputPrefix.split('/').some((part) => part === '.' || part === '..')) {
+		throw new Error('OUTPUT_PREFIX_MUST_STAY_UNDER_DOCS_OKF');
+	}
 	if (!['BEAUTIFULSOUP_HTTP', 'FIRECRAWL_V2'].includes(fetcher)) {
 		throw new Error('UNSUPPORTED_FETCHER');
 	}
+	const selectedSources = sourceIds === null
+		? catalog.sources
+		: (() => {
+			const requested = [...new Set(sourceIds)];
+			const byId = new Map(catalog.sources.map((source) => [source.id, source]));
+			const unknown = requested.filter((id) => !byId.has(id));
+			if (unknown.length) throw new Error(`UNKNOWN_SOURCE_ID:${unknown.join(',')}`);
+			if (!requested.length) throw new Error('SOURCE_IDS_REQUIRED');
+			return requested.map((id) => byId.get(id));
+		})();
 	const seen = new Set();
-	const sources = catalog.sources.map((source) => {
+	const sources = selectedSources.map((source) => {
 		if (!source.id || seen.has(source.id) || !Array.isArray(source.urls) || source.urls.length === 0) {
 			throw new Error(`INVALID_OR_DUPLICATE_SOURCE:${source.id ?? 'unknown'}`);
 		}
@@ -60,7 +75,7 @@ export function buildEngineeringAcquisitionManifestV1(catalog, {
 			allowed_domains: allowedDomains,
 			authority_class: 'OFFICIAL_PRIMARY',
 			default_fetcher: fetcher,
-			output_namespace: `docs/.okf/engineering-acquisition/${source.id}`,
+			output_namespace: `${outputPrefix}/${source.id}`,
 			maximum_pages: urls.length,
 			maximum_depth: 0,
 			follow_sitemap: false,
@@ -82,7 +97,7 @@ export function buildEngineeringAcquisitionManifestV1(catalog, {
 }
 
 function parseArgs(argv) {
-	const options = { catalog: defaultCatalog, fetcher: 'BEAUTIFULSOUP_HTTP', maximumPagesPerSource: 8 };
+	const options = { catalog: defaultCatalog, fetcher: 'BEAUTIFULSOUP_HTTP', maximumPagesPerSource: 8, sourceIds: null };
 	for (let index = 0; index < argv.length; index += 1) {
 		const key = argv[index];
 		if (key === '--help') return { help: true };
@@ -93,6 +108,11 @@ function parseArgs(argv) {
 		else if (key === '--output-root') options.outputRoot = resolve(value);
 		else if (key === '--fetcher') options.fetcher = value;
 		else if (key === '--maximum-pages-per-source') options.maximumPagesPerSource = Number(value);
+		else if (key === '--source-id') {
+			options.sourceIds ??= [];
+			options.sourceIds.push(value);
+		}
+		else if (key === '--output-prefix') options.outputPrefix = value;
 		else throw new Error(`UNKNOWN_ARGUMENT:${key}`);
 		index += 1;
 	}
@@ -103,7 +123,7 @@ function parseArgs(argv) {
 async function main(argv) {
 	const options = parseArgs(argv);
 	if (options.help) {
-		process.stdout.write('Build a bounded fetch manifest from the reviewed library-docs catalog.\n--catalog PATH --output PATH --output-root PATH [--fetcher BEAUTIFULSOUP_HTTP|FIRECRAWL_V2] [--maximum-pages-per-source N]\n');
+		process.stdout.write('Build a bounded fetch manifest from the reviewed library-docs catalog.\n--catalog PATH --output PATH --output-root PATH [--fetcher BEAUTIFULSOUP_HTTP|FIRECRAWL_V2] [--maximum-pages-per-source N] [--source-id ID ...] [--output-prefix docs/.okf/PATH]\n');
 		return 0;
 	}
 	const catalog = JSON.parse(await readFile(options.catalog, 'utf8'));

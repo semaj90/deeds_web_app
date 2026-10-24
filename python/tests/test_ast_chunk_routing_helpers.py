@@ -147,7 +147,8 @@ class TestBuildLinkedTuplesAndMmap(unittest.TestCase):
         b = kv[("src/b.svelte", 0, 50)]
         self.assertEqual((b.prev_ordinal, b.next_ordinal), (-1, -1))  # never linked across files
         self.assertEqual(b.lang_id, 2)
-        self.assertEqual(b.nes_lut_byte, 0x2A)
+        self.assertEqual(b.nes_lut_byte, R.NES_DOMAIN_LUT["ui"])
+        self.assertEqual(b.nes_hex, "0x2A")
         if HAVE_TORCH:
             import torch
             self.assertEqual(tuple(tensor.shape), (3, 25))

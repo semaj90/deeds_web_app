@@ -79,7 +79,7 @@ class TestAvx2CuTileMirasFsm(unittest.TestCase):
                 self.assertEqual(mapped_np[0, 28], 42.0)      # kv_block_id 42
 
                 # Row 1: Svelte runes chunk
-                self.assertEqual(mapped_np[1, 2], 42.0)       # NES LUT: 0x2A (runes = 42)
+                self.assertEqual(mapped_np[1, 2], 2.0)        # Domain lutByte: ui = 0x02
                 self.assertAlmostEqual(mapped_np[1, 25], 0.12, places=4)
                 self.assertEqual(mapped_np[1, 27], 18.0)      # LoD tier 18
                 self.assertEqual(mapped_np[1, 28], 99.0)

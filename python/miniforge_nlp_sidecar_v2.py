@@ -76,7 +76,7 @@ class AstEvidenceChunkV2(BaseModel):
 
 
 class AstEvidenceResponseV2(BaseModel):
-    schema: Literal["atlas.ast.evidence.v1"]
+    schema_: Literal["atlas.ast.evidence.v1"] = Field(alias="schema")
     engine: str
     engine_version: str
     language: str
@@ -129,7 +129,7 @@ class WebEvidenceRequestV1(BaseModel):
 
 
 class WebEvidenceResponseV1(BaseModel):
-    schema: Literal["atlas.external-web-evidence.v1"]
+    schema_: Literal["atlas.external-web-evidence.v1"] = Field(alias="schema")
     fetcher: str
     source_id: str
     source_revision: str

@@ -31,6 +31,12 @@
 | Glyph / cartridge (NES, CHR97) | `routes/api/cartridge/export/+server.ts` | CANONICAL_OWNER |
 | Neural prefill | `ai/neural-decoder-prefill-caller-v1.ts` | CANONICAL_OWNER |
 | Low-rank / Tang sampling | `python/atlas_compute/low_rank.py`, `sample-query-matrix-v1.ts` | EXPERIMENT (non-canonical) |
+| Candidate feature matrix / ranking | `retrieval/retrieval-candidate-feature-matrix-v1.ts`; Python learning package | Derived/advisory; requires frozen identity-aligned rows and reviewed labels for learned promotion |
+| Valkey / HLL telemetry | `atlas/telemetry/atlas-hll-telemetry.ts`; Valkey cache adapters | Transient cache and approximate cardinality telemetry; neither owns identity or relevance |
+| MessagePack packet encoding | `@msgpack/msgpack`; `scripts/atlas/msgpack-envelope-materialize.mjs` | Serialization/export only; schema, identity, revisions, and checksums remain explicit |
+| RPC transport | `atlas/go-retrieval-grpc-client.ts`; active `.proto` contracts | gRPC transports typed requests; it is separate from MessagePack encoding, N-API, and tensor execution |
+| ACE / query-context boundary | `ace/context-assembler.ts`; ContextManifest bridge | Qualifies and budgets evidence before prompt compilation; raw retrieval must not go directly to synthesis |
+| NES LUT / glyph mapping | `python/parent_atlas_learning/ace_compiler.py`; cartridge export route | Palette/action mapping is derived metadata; no native C-pointer LUT authority is established |
 | cuTile / TensorRT challengers | registry: `OPTIONAL_CHALLENGER_*` | not production |
 | N-ary relationship synthesis | none in registry | **UNOWNED** |
 | Ghidra, QUIC, Titans/OaK, LSP feature matrix | no owner searched or found | **UNOWNED / unverified** |
@@ -57,6 +63,8 @@
 - [agentic-error-proposal-flow](./agentic-error-proposal-flow.md)
 - [agentic-openspec-tasks-error-fixing-playbook](./agentic-openspec-tasks-error-fixing-playbook.md)
 - [ARCH-TOC-v2](./ARCH-TOC-v2.md)
+- [atlas-feature-taxonomy-sveltekit-draft](./atlas-feature-taxonomy-sveltekit-draft.md)
+- [atlas-python-environment-routing](./atlas-python-environment-routing.md)
 - [atlas-retrieval-parity-admission-gates-v1](./atlas-retrieval-parity-admission-gates-v1.md)
 - [atlas-store-ownership-and-derived-representations-v1](./atlas-store-ownership-and-derived-representations-v1.md)
 - [atlas-topic-identity-read-model-v1](./atlas-topic-identity-read-model-v1.md)
@@ -116,10 +124,12 @@
 - [PARENT_ATLAS_PACKAGE_BOUNDARIES](./PARENT_ATLAS_PACKAGE_BOUNDARIES.md)
 - [PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY](./PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md)
 - [parent-atlas-batch-execution-gates-v1](./parent-atlas-batch-execution-gates-v1.md)
+- [parent-atlas-event-driven-bulk-data-flow-v1](./parent-atlas-event-driven-bulk-data-flow-v1.md)
 - [parent-atlas-function-topology-search-index](./parent-atlas-function-topology-search-index.md)
 - [parent-atlas-karpathy-pipeline](./parent-atlas-karpathy-pipeline.md)
 - [parent-atlas-native-dawn-viewer-contract-v1](./parent-atlas-native-dawn-viewer-contract-v1.md)
 - [parent-atlas-policy-routing](./parent-atlas-policy-routing.md)
+- [parent-atlas-query-intelligence-owner-map-v1](./parent-atlas-query-intelligence-owner-map-v1.md)
 - [parent-atlas-representation-structural-contract](./parent-atlas-representation-structural-contract.md)
 - [parent-atlas-selection-receipt-and-model-boundaries-v1](./parent-atlas-selection-receipt-and-model-boundaries-v1.md)
 - [PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT](./PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT.md)

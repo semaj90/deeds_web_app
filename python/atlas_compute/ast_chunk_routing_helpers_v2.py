@@ -83,10 +83,10 @@ def allocate_avx2_aligned_mmap_tensor(
                 for i, ch in enumerate(raw_chunks):
                     # Resolve domain & NES LUT byte
                     domain_slug = AstChunkDomainRouter.resolve_domain_76(ch.get("domain_proposal", "unresolved"))
-                    if ch.get("has_svelte_runes") or "$state" in ch.get("text", "") or "$derived" in ch.get("text", ""):
-                        lut_byte = AstChunkDomainRouter.NES_DOMAIN_LUT["svelte5_runes"]
-                    else:
-                        lut_byte = AstChunkDomainRouter.NES_DOMAIN_LUT.get(domain_slug, AstChunkDomainRouter.NES_DOMAIN_LUT["unresolved"])
+                    has_svelte_runes = ch.get("has_svelte_runes") or "$state" in ch.get("text", "") or "$derived" in ch.get("text", "")
+                    if has_svelte_runes and domain_slug == "unresolved":
+                        domain_slug = "ui"
+                    lut_byte = AstChunkDomainRouter.NES_DOMAIN_LUT.get(domain_slug, AstChunkDomainRouter.NES_DOMAIN_LUT["unresolved"])
 
                     # 1. Cols 0..24: Standard [B, 25] features
                     start_byte = ch.get("start_byte", 0)

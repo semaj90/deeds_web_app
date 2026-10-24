@@ -57,6 +57,11 @@ const config = {
     // Ensure we explicitly use the Node adapter (not adapter-auto)
     adapter: nodeAdapter({ out: 'build', precompress: true }),
 
+    experimental: {
+      tracing: { server: true },
+      instrumentation: { server: true },
+    },
+
     // CSRF protection — reject cross-origin form submissions and API mutations
     csrf: {
       trustedOrigins: ['self'],
