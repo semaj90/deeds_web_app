@@ -1,0 +1,45 @@
+{
+  "manifest_revision": "engineering-acquisition-v1-1ef6c03b76039ba4",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "output_root": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "embedding": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma-300m-f16.gguf"
+  },
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "external_programming_docs_768"
+  },
+  "features": {
+    "low_rank": 64,
+    "kmeans_clusters": 64,
+    "som": {
+      "rows": 20,
+      "columns": 20
+    }
+  },
+  "sources": [
+    {
+      "source_id": "postgresql-18-multicolumn",
+      "source_revision": "sha256:64f353a621194bb3b7d9bb169ea0fb2bc0cb5a1277036564778b375a70d02636",
+      "title": "postgresql-18-multicolumn",
+      "base_urls": [
+        "https://www.postgresql.org/"
+      ],
+      "allowed_domains": [
+        "www.postgresql.org"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/engineering-acquisition/utf8-v2/postgresql-18-multicolumn",
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "follow_sitemap": false,
+      "pages": [
+        "https://www.postgresql.org/docs/18/indexes-multicolumn.html"
+      ]
+    }
+  ]
+}

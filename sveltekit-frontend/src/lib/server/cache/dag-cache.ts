@@ -12,6 +12,7 @@
  * Cache keys: `dag:{queryHash}` where queryHash = MD5 of sorted document ID set
  */
 
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { traceCouchDB } from '$lib/server/observability/langfuse.js';
@@ -26,6 +27,7 @@ import {
 import type { SemanticTag } from '$lib/server/indexer/gpu-karpathy-tagger.js';
 
 const DAG_CACHE_DB = 'dag_cache';
+
 const DEFAULT_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 interface CachedDAGOrdering {
@@ -149,10 +151,7 @@ export async function purgeAllDAGCache(): Promise<{ deleted: number; error?: str
 
 		if (toDelete.length === 0) return { deleted: 0 };
 
-		const baseUrl = ENV.COUCHDB_URL;
-		const auth = 'Basic ' + Buffer.from(
-			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
-		).toString('base64');
+		const { baseUrl, authorization: auth } = resolveCouchDbConfigV1();
 
 		const res = await fetch(`${baseUrl}/${DAG_CACHE_DB}/_bulk_docs`, {
 			method: 'POST',
@@ -204,10 +203,7 @@ export async function cleanupExpiredDAGCache(): Promise<{ deleted: number; error
 
 		if (expired.length === 0) return { deleted: 0 };
 
-		const baseUrl = ENV.COUCHDB_URL;
-		const auth = 'Basic ' + Buffer.from(
-			`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass'}`
-		).toString('base64');
+		const { baseUrl, authorization: auth } = resolveCouchDbConfigV1();
 
 		const res = await fetch(`${baseUrl}/${DAG_CACHE_DB}/_bulk_docs`, {
 			method: 'POST',

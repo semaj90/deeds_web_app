@@ -16,12 +16,9 @@
 import { cardIdForDir, readCardFromRedis, agentsDirectoryCardSchema } from '../../agents-card-store.js';
 import type { AgentsDirectoryCard } from '../../agents-card-store.js';
 import type { LoadExistingCardResult } from './types.js';
-import { ENV } from '../../../env.server.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
-const COUCHDB_URL  = ENV.COUCHDB_URL;
 const COUCHDB_DB   = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
-const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
 const COUCHDB_TIMEOUT_MS = 2_000;
 
 export async function loadExistingCard(dirPath: string): Promise<LoadExistingCardResult> {
@@ -46,13 +43,13 @@ export async function loadExistingCard(dirPath: string): Promise<LoadExistingCar
 
 async function readCardFromCouch(dirPath: string): Promise<AgentsDirectoryCard | null> {
 	const id  = cardIdForDir(dirPath);
-	const url = `${COUCHDB_URL}/${COUCHDB_DB}/${encodeURIComponent(id)}`;
-	const auth = 'Basic ' + Buffer.from(`${COUCHDB_USER}:${COUCHDB_PASS}`).toString('base64');
+	const couchDb = resolveCouchDbConfigV1(process.env);
+	const url = `${couchDb.baseUrl}/${COUCHDB_DB}/${encodeURIComponent(id)}`;
 
 	let res: Response;
 	try {
 		res = await fetch(url, {
-			headers: { Authorization: auth },
+			headers: { Authorization: couchDb.authorization },
 			signal:  AbortSignal.timeout(COUCHDB_TIMEOUT_MS),
 		});
 	} catch {

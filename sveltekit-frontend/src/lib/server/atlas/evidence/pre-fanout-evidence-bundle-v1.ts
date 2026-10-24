@@ -2,7 +2,10 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { candidateOrdinalMapV1Schema, type CandidateOrdinalMapV1 } from '../features/canonical-candidate-v1.js';
 import { fanoutAdmissionV1Schema, type FanoutAdmissionV1 } from '../graph/fanout-admission-v1.js';
-import { ontologyObservationTupleV1Schema } from './ontology-observation-tuple-v1.js';
+import {
+  ontologyObservationTupleV1Schema,
+  verifyOntologyObservationTupleV1,
+} from './ontology-observation-tuple-v1.js';
 
 export const PRE_FANOUT_EVIDENCE_BUNDLE_SCHEMA_V1 = 'atlas.pre-fanout-evidence-bundle.v1' as const;
 
@@ -112,7 +115,7 @@ export function materializePreFanoutEvidenceBundleV1(input: {
   const structuralEvidenceRefs = Array.from(new Set(input.structuralEvidenceRefs.map(String))).sort();
   if (structuralEvidenceRefs.length === 0) throw new Error('PRE_FANOUT_STRUCTURAL_EVIDENCE_REQUIRED');
 
-  const ontologyTuples = (input.ontologyTuples ?? []).map((tuple) => ontologyObservationTupleV1Schema.parse(tuple));
+  const ontologyTuples = (input.ontologyTuples ?? []).map(verifyOntologyObservationTupleV1);
   for (const tuple of ontologyTuples) {
     if (tuple.subjectCanonicalId !== candidate.canonicalId) throw new Error('PRE_FANOUT_ONTOLOGY_SUBJECT_MISMATCH');
     if (tuple.workspaceRevision !== candidate.workspaceRevision) throw new Error('PRE_FANOUT_ONTOLOGY_WORKSPACE_REVISION_MISMATCH');

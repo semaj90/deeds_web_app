@@ -23,8 +23,20 @@ A capability SHALL carry one status from CREATED, WIRED, DRY_RUN_PROVEN, APPLY_P
 ### Requirement: GPU results require CPU parity
 A GPU owner SHALL NOT be promoted above DRY_RUN_PROVEN until a CPU oracle produces the same ordering, masks, dimensions and checksums within a bounded tolerance.
 
+#### Scenario: GPU output differs from CPU oracle
+- **WHEN** the bounded parity comparison exceeds its declared tolerance
+- **THEN** the GPU result SHALL remain unpromoted and the mismatch SHALL be recorded
+
 ### Requirement: Missing capabilities are recorded, not invented
 A capability with no owner SHALL be recorded as MISSING with its gap. No owner SHALL be created in this change.
 
+#### Scenario: No implementation owner exists
+- **WHEN** the verifier cannot locate an implementation owner for a capability
+- **THEN** the matrix SHALL report MISSING and name the unfilled responsibility
+
 ### Requirement: Read-only verification
 The verification step SHALL NOT write to PostgreSQL, Valkey, Qdrant, Neo4j, or the filesystem outside the change folder and its receipts.
+
+#### Scenario: Verification runs
+- **WHEN** the owner matrix and receipts are generated
+- **THEN** no production datastore or out-of-scope filesystem write SHALL occur

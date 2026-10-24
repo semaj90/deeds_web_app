@@ -8,7 +8,7 @@ import {
   type CandidateScalarFeatureName,
 } from './candidate-feature-columnar-v1.js';
 
-export const CANDIDATE_FEATURE_GPU_PACK_SCHEMA = 'atlas.candidate-feature-gpu-pack.v1' as const;
+export const CANDIDATE_FEATURE_GPU_PACK_SCHEMA = 'atlas.candidate-feature-gpu-pack.v2' as const;
 export const CANDIDATE_FEATURE_GPU_GATHER_SCHEMA = 'atlas.candidate-feature-gpu-gather-reference.v1' as const;
 export const DEFAULT_GPU_ROW_ALIGNMENT = 32;
 export const GPU_PADDING_POLICY = 'ZERO_INVALID_MASKED_V1' as const;
@@ -98,6 +98,8 @@ export const candidateFeatureGpuPackV1Schema = z.object({
   workspaceRevision: revision,
   featureRevision: revision,
   sourceRevisions: z.array(revision),
+  candidateOrdinalsChecksum: checksum,
+  rowIdentityChecksum: checksum,
   columnarChecksum: checksum,
   logicalRows: z.number().int().nonnegative(),
   physicalRows: z.number().int().nonnegative(),
@@ -250,6 +252,8 @@ export function materializeCandidateFeatureGpuPack(input: {
     ordinalMapChecksum: columnar.ordinalMapChecksum,
     featureSnapshotChecksum: columnar.featureSnapshotChecksum,
     columnarChecksum: columnar.columnarChecksum,
+    candidateOrdinalsChecksum: columnar.candidateOrdinalsChecksum,
+    rowIdentityChecksum: columnar.rowIdentityChecksum,
     logicalRows: columnar.rowCount,
     physicalRows,
     rowAlignment,
@@ -271,6 +275,8 @@ export function materializeCandidateFeatureGpuPack(input: {
     workspaceRevision: columnar.workspaceRevision,
     featureRevision: columnar.featureRevision,
     sourceRevisions: [...columnar.sourceRevisions],
+    candidateOrdinalsChecksum: columnar.candidateOrdinalsChecksum,
+    rowIdentityChecksum: columnar.rowIdentityChecksum,
     columnarChecksum: columnar.columnarChecksum,
     logicalRows: columnar.rowCount,
     physicalRows,

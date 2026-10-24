@@ -391,3 +391,10 @@
         implementing a real Tang-style sampling algorithm from scratch is a disproportionately
         large research effort with no identified caller in this pipeline; flagged rather than
         attempted speculatively.
+
+## Domain/keyword alignment recheck (2026-10-24)
+
+- Existing authorities remain distinct: PostgreSQL `atlas_domain_ontology` (17 groups), the nine-domain code taxonomy, and packet/domain labels. The recorded PostgreSQL structure/readback has 17 rows in each taxonomy table; this is structural parity only. The crosswalk has 59 candidate rows but semantic classification/review is not complete. Keep `EXACT`, `BROADER`, `NARROWER`, `AMBIGUOUS`, and `UNMAPPED` as explicit outcomes; do not auto-approve mappings.
+- The `.okf` acquisition is source/chunk evidence, not a populated keyword corpus. The latest read-only database census reported `public.keyword_corpus` absent. No PostgreSQL keyword DDL/DML or index creation is authorized by this audit.
+- OAKLIB remains an optional external normalization/candidate adapter. `oaklib_external_adapter.py` and its fixture check exist; this does not establish a live OAKLIB service, canonical mapping authority, or approval of candidate synonyms.
+- Missing integration boundary: no source-revision-qualified keyword/posting artifact joined to a sealed CandidateOrdinalMap and admitted feature snapshot. Do not create domain bitmaps or query filters from labels alone. The NES LUT byte is a derived encoding, not `domainId`, packet identity, or admission proof.

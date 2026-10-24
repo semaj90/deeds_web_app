@@ -1,3 +1,6 @@
+import { spawnSync } from 'node:child_process';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { materializeCandidateOrdinalMap } from './canonical-candidate-v1.js';
@@ -10,6 +13,8 @@ import {
   materializeCandidateFeatureGpuPack,
 } from './candidate-feature-gpu-pack-v1.js';
 import { verifyCandidateFeatureGpuParity } from './candidate-feature-gpu-parity-v1.js';
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../../../');
 
 function fixture() {
   const ordinalMap = materializeCandidateOrdinalMap({
@@ -159,5 +164,56 @@ describe('CandidateFeatureGpuPackV1', () => {
     expect(computeGpuPhysicalRows(33, 32)).toBe(64);
     expect(computeGpuPhysicalRows(0, 32)).toBe(0);
     expect(() => computeGpuPhysicalRows(3, 3)).toThrow('FEATURE_GPU_PACK_ROW_ALIGNMENT_INVALID:3');
+  });
+
+  it('loads the TypeScript-produced pack through the verified Python CPU consumer', () => {
+    const columnar = fixture();
+    const pack = materializeCandidateFeatureGpuPack({ columnar, rowAlignment: 4, producerRevision: 'gpu-pack-test:v1' });
+    const expectedBinding = {
+      candidateSnapshotRevision: columnar.candidateSnapshotRevision,
+      ordinalMapChecksum: columnar.ordinalMapChecksum,
+      featureSnapshotChecksum: columnar.featureSnapshotChecksum,
+      workspaceRevision: columnar.workspaceRevision,
+      featureRevision: columnar.featureRevision,
+      columnarChecksum: columnar.columnarChecksum,
+      candidateOrdinalsChecksum: columnar.candidateOrdinalsChecksum,
+      rowIdentityChecksum: columnar.rowIdentityChecksum,
+      logicalRows: columnar.rowCount,
+      featureCount: columnar.featureCount,
+      featureNames: columnar.featureNames,
+      sourceRevisions: columnar.sourceRevisions,
+    };
+    const pythonCode = [
+      'import json, sys',
+      'from parent_atlas_candidate_feature_gpu_resident import load_candidate_feature_pack_cpu',
+      'request = json.load(sys.stdin)',
+      'tensors = load_candidate_feature_pack_cpu(request["pack"], request["expectedBinding"])',
+      'json.dump({"device": tensors["featureValues"].device.type, "values": tensors["featureValues"].tolist(), "presence": tensors["featurePresence"].tolist(), "valid": tensors["validMask"].tolist()}, sys.stdout, separators=(",", ":"))',
+    ].join('; ');
+    const configuredPython = process.env.ATLAS_PYTHON_EXECUTABLE;
+    const python = configuredPython ?? (process.platform === 'win32' ? 'py' : 'python3');
+    const args = configuredPython
+      ? ['-c', pythonCode]
+      : process.platform === 'win32'
+        ? ['-3.13', '-c', pythonCode]
+        : ['-c', pythonCode];
+    const result = spawnSync(python, args, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      input: JSON.stringify({ pack, expectedBinding }),
+      timeout: 30000,
+      env: {
+        ...process.env,
+        PYTHONPATH: [resolve(repoRoot, 'python'), process.env.PYTHONPATH].filter(Boolean).join(process.platform === 'win32' ? ';' : ':'),
+      },
+    });
+
+    expect(result.error?.message).toBeUndefined();
+    expect(result.status, result.stderr).toBe(0);
+    const readback = JSON.parse(result.stdout) as { device: string; values: number[][]; presence: number[][]; valid: number[] };
+    expect(readback.device).toBe('cpu');
+    expect(readback.values.flat()).toEqual(pack.featureValues);
+    expect(readback.presence.flat()).toEqual(pack.featurePresence);
+    expect(readback.valid).toEqual(pack.validMask);
   });
 });

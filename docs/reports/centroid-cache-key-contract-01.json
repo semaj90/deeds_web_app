@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.centroid-cache-key-contract.v1",
+  "generatedAt": "2026-10-24T00:27:30.000Z",
+  "contractId": "CENTROID-CACHE-KEY-CONTRACT-01",
+  "mode": "PROPOSAL_AND_TEST_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "canonicalNamespace": "atlas:centroid:v1",
+  "canonicalKeyFormat": "atlas:centroid:v1:{family}:{featureSnapshotId}:{modelRevisionId}:{cellId}",
+  "families": {
+    "som": {
+      "cellFormat": "r{row}c{col}",
+      "cellExample": "r07c12",
+      "modelRevisionSource": "Trained SOM weight matrix artifact checksum",
+      "featureSnapshotSource": "Frozen codebase feature snapshot checksum"
+    },
+    "kmeans": {
+      "cellFormat": "k{clusterIndex:03d}",
+      "cellExample": "k003",
+      "modelRevisionSource": "Trained KMeans model artifact checksum",
+      "featureSnapshotSource": "Frozen codebase feature snapshot checksum"
+    },
+    "domain": {
+      "cellFormat": "{governedDomainId}",
+      "cellExample": "database",
+      "modelRevisionSource": "Governed domain_taxonomy_v1 revision checksum",
+      "featureSnapshotSource": "Frozen codebase feature snapshot checksum"
+    }
+  },
+  "descriptorBindings": [
+    "graphifyExecutionId",
+    "workspaceRevision",
+    "sourceRevision",
+    "taxonomyRevision",
+    "domainId",
+    "conceptIds",
+    "entityIds",
+    "memberCount",
+    "centroidDigest",
+    "dim",
+    "createdAt",
+    "expiresAt"
+  ],
+  "latent64Decoding": {
+    "supportedInputs": ["pgvector 256-byte Float32LE Buffer", "Float32Array", "Array<number>", "JSON number array string"],
+    "validation": "assertPublishableCentroidV1 rejects empty, NaN, Inf, zero-norm, or length mismatches",
+    "testParity": "PASS"
+  },
+  "reconciliationAndRollback": {
+    "lookupResolver": "resolveCentroidLookupKeysV1",
+    "somFallbacks": ["atlas:centroid:som:{row}:{col}", "centroid:som_cell:{row}:{col}", "centroid:som:{row}:{col}"],
+    "kmeansFallbacks": ["atlas:centroid:kmeans:{index}", "centroid:som:{index}", "taxonomy:clusters:gpu:{index}"],
+    "domainFallbacks": ["atlas:centroid:domain:{domainId}", "taxonomy:clusters:domain:{domainId}"],
+    "liveValkeyPolicy": "Existing keys untouched; publication blocked while projectionAdmission is NOT_SAFE_TO_PROJECT"
+  },
+  "tests": {
+    "unitTestSuite": "scripts/atlas/lib/centroid-cache-key-contract-v1.test.mjs",
+    "passed": 13,
+    "failed": 0
+  }
+}

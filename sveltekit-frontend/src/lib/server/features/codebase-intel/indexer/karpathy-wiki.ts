@@ -20,6 +20,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { pool } from '$lib/server/db/client';
 import { bifrostChat } from '$lib/server/ollama.js';
@@ -27,7 +28,6 @@ import { bifrostChat } from '$lib/server/ollama.js';
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const COUCHDB_DB   = 'karpathy_wiki';
-const COUCHDB_URL  = () => ENV.COUCHDB_URL;
 const REDIS_PREFIX = 'wiki:note:';
 const REDIS_TTL    = 86_400; // 24h
 const CHAT_MODEL   = LLM_MODEL_ID;
@@ -119,18 +119,11 @@ export function docId(note: WikiNote): string {
 }
 
 async function couchFetch(path: string, options: RequestInit = {}): Promise<Response> {
-	const urlObj = new URL(COUCHDB_URL());
-	const username = urlObj.username;
-	const password = urlObj.password;
-	urlObj.username = '';
-	urlObj.password = '';
-
+	const couchDb = resolveCouchDbConfigV1(process.env);
 	const headers = new Headers(options.headers || {});
-	if (username || password) {
-		headers.set('Authorization', `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`);
-	}
+	if (!headers.has('Authorization')) headers.set('Authorization', couchDb.authorization);
 
-	return fetch(`${urlObj.origin}${path}`, {
+	return fetch(`${couchDb.baseUrl}${path}`, {
 		...options,
 		headers
 	});

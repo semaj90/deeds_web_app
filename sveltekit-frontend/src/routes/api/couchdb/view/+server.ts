@@ -11,7 +11,7 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 const ALLOWED_DBS = new Set(['karpathy_wiki', 'graph_recommendations']);
 
@@ -52,11 +52,16 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   }
   if (!upstream.has('limit')) upstream.set('limit', '20');
 
-  const couchUrl  = ENV.COUCHDB_URL ?? 'http://admin:legal_ai_pass@127.0.0.1:5984';
-  const viewPath  = `${couchUrl}/${db}/_design/${design}/_view/${view}?${upstream.toString()}`;
+  let couchDb: ReturnType<typeof resolveCouchDbConfigV1>;
+  try {
+    couchDb = resolveCouchDbConfigV1(process.env);
+  } catch {
+    return json({ error: 'CouchDB is not configured', detail: 'Required server configuration is missing' }, { status: 503 });
+  }
+  const viewPath  = `${couchDb.baseUrl}/${db}/_design/${design}/_view/${view}?${upstream.toString()}`;
 
   try {
-    const res = await fetch(viewPath, { signal: AbortSignal.timeout(10_000) });
+    const res = await fetch(viewPath, { headers: { Authorization: couchDb.authorization }, signal: AbortSignal.timeout(10_000) });
     if (!res.ok) {
       const body = await res.text();
       return json({ error: `CouchDB ${res.status}`, detail: body }, { status: res.status >= 500 ? 502 : res.status });

@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 import secrets
 from typing import Any, Literal
 
@@ -85,6 +86,156 @@ def verify_pack_source_checksums(pack: dict[str, Any]) -> None:
             raise GpuResidentLeaseError(f"FEATURE_GPU_RESIDENT_{field.upper()}_MISMATCH")
 
 
+def verify_pack_binding(pack: dict[str, Any], expected: dict[str, Any]) -> None:
+    required = (
+        "candidateSnapshotRevision",
+        "ordinalMapChecksum",
+        "featureSnapshotChecksum",
+        "workspaceRevision",
+        "featureRevision",
+        "columnarChecksum",
+        "candidateOrdinalsChecksum",
+        "rowIdentityChecksum",
+        "logicalRows",
+        "featureCount",
+        "featureNames",
+        "sourceRevisions",
+    )
+    for field in required:
+        actual = pack.get(field)
+        wanted = expected.get(field)
+        if actual is None or wanted is None:
+            raise GpuResidentLeaseError(f"FEATURE_GPU_RESIDENT_BINDING_{field.upper()}_MISSING")
+        if actual != wanted:
+            raise GpuResidentLeaseError(f"FEATURE_GPU_RESIDENT_BINDING_{field.upper()}_MISMATCH")
+
+
+def _gpu_pack_checksum(pack: dict[str, Any]) -> str:
+    payload = {
+        "candidateSnapshotRevision": pack["candidateSnapshotRevision"],
+        "ordinalMapChecksum": pack["ordinalMapChecksum"],
+        "featureSnapshotChecksum": pack["featureSnapshotChecksum"],
+        "columnarChecksum": pack["columnarChecksum"],
+        "candidateOrdinalsChecksum": pack["candidateOrdinalsChecksum"],
+        "rowIdentityChecksum": pack["rowIdentityChecksum"],
+        "logicalRows": pack["logicalRows"],
+        "physicalRows": pack["physicalRows"],
+        "rowAlignment": pack["rowAlignment"],
+        "featureNames": pack["featureNames"],
+        "sourceRevisions": pack["sourceRevisions"],
+        "featureValuesChecksum": pack["featureValuesChecksum"],
+        "featurePresenceChecksum": pack["featurePresenceChecksum"],
+        "validMaskChecksum": pack["validMaskChecksum"],
+        "laneMaskChecksum": pack["laneMaskChecksum"],
+        "degradedIdentityChecksum": pack["degradedIdentityChecksum"],
+        "paddingPolicy": pack["paddingPolicy"],
+    }
+    return _sha256_bytes(json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+
+
+def _verify_pack_shape(pack: dict[str, Any]) -> tuple[int, int]:
+    if pack.get("schema") != "atlas.candidate-feature-gpu-pack.v2":
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_SCHEMA_INVALID")
+    if pack.get("byteOrder") != "little-endian" or pack.get("featureDtype") != "float32":
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_FEATURE_REPRESENTATION_INVALID")
+    if pack.get("presenceDtype") != "uint8" or pack.get("validMaskDtype") != "uint8":
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_MASK_REPRESENTATION_INVALID")
+    if pack.get("laneMaskSourceDtype") != "uint16":
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_LANE_REPRESENTATION_INVALID")
+    if pack.get("paddingPolicy") != "ZERO_INVALID_MASKED_V1":
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_PADDING_POLICY_INVALID")
+    if (
+        pack.get("identityAuthority") is not False
+        or pack.get("canonicalOwnerChanged") is not False
+        or pack.get("gpuResident") is not False
+        or pack.get("paddedRowsCarryIdentity") is not False
+        or pack.get("logicalOrdinalEqualsPhysicalRowForValidPrefix") is not True
+    ):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_AUTHORITY_FLAG_INVALID")
+
+    logical_rows = pack.get("logicalRows")
+    physical_rows = pack.get("physicalRows")
+    feature_count = pack.get("featureCount")
+    alignment = pack.get("rowAlignment")
+    if any(type(value) is not int or value < 0 for value in (logical_rows, physical_rows, feature_count)):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_SHAPE_INVALID")
+    if feature_count < 1 or physical_rows < logical_rows:
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_SHAPE_INVALID")
+    if type(alignment) is not int or alignment < 1 or alignment & (alignment - 1):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_ALIGNMENT_INVALID")
+    if pack.get("paddingRows") != physical_rows - logical_rows:
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_PADDING_INVALID")
+    if logical_rows and physical_rows % alignment:
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_ALIGNMENT_INVALID")
+    if not logical_rows and physical_rows:
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_EMPTY_SHAPE_INVALID")
+
+    array_fields = ("featureValues", "featurePresence", "validMask", "laneMaskU16", "degradedIdentity", "sourceRevisions", "featureNames")
+    if any(not isinstance(pack.get(field), list) for field in array_fields):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_ARRAY_FIELD_INVALID")
+
+    cells = physical_rows * feature_count
+    if len(pack["featureValues"]) != cells or len(pack["featurePresence"]) != cells:
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_CELL_COUNT_MISMATCH")
+    for field in ("validMask", "laneMaskU16", "degradedIdentity"):
+        if len(pack[field]) != physical_rows:
+            raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_ROW_BUFFER_LENGTH_MISMATCH")
+    if len(pack["sourceRevisions"]) != logical_rows or any(not isinstance(value, str) or not value for value in pack["sourceRevisions"]):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_SOURCE_REVISION_LENGTH_MISMATCH")
+    if len(pack["featureNames"]) != feature_count or any(not isinstance(value, str) or not value for value in pack["featureNames"]):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_FEATURE_NAMES_LENGTH_MISMATCH")
+    if any(type(value) not in (float, int) or not math.isfinite(value) for value in pack["featureValues"]):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_FEATURE_VALUE_INVALID")
+    for field in ("featurePresence", "validMask", "degradedIdentity"):
+        if any(type(value) is not int or value not in (0, 1) for value in pack[field]):
+            raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_MASK_VALUE_INVALID")
+    if any(type(value) is not int or value < 0 or value > 0xFFFF for value in pack["laneMaskU16"]):
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_LANE_VALUE_INVALID")
+
+    for row in range(physical_rows):
+        if pack["validMask"][row] != (1 if row < logical_rows else 0):
+            raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_VALID_MASK_NOT_PREFIX")
+        if row >= logical_rows:
+            start = row * feature_count
+            if any(pack["featureValues"][start:start + feature_count]) or any(pack["featurePresence"][start:start + feature_count]):
+                raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_PADDED_CELL_NONZERO")
+            if pack["laneMaskU16"][row] or pack["degradedIdentity"][row]:
+                raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_PADDED_METADATA_NONZERO")
+    return physical_rows, feature_count
+
+
+def load_candidate_feature_pack_cpu(pack: dict[str, Any], expected: dict[str, Any]):
+    """Verify a pack against a trusted descriptor, then materialize CPU tensors.
+
+    The expected descriptor must come from the caller's already-verified ordinal
+    and feature-snapshot owners; this function does not confer canonical authority.
+    """
+    verify_pack_binding(pack, expected)
+    physical_rows, feature_count = _verify_pack_shape(pack)
+    verify_pack_source_checksums(pack)
+    expected_pack_checksum = _require_sha256(pack.get("gpuPackChecksum"), "GPU_PACK_CHECKSUM")
+    if _gpu_pack_checksum(pack) != expected_pack_checksum:
+        raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_GPU_PACK_CHECKSUM_MISMATCH")
+    try:
+        import numpy as np  # type: ignore
+        import torch  # type: ignore
+    except Exception as exc:
+        raise GpuResidentLeaseError(f"CPU_TENSOR_DEPENDENCY_UNAVAILABLE:{type(exc).__name__}") from exc
+
+    values = np.asarray(pack["featureValues"], dtype="<f4").reshape(physical_rows, feature_count)
+    presence = np.asarray(pack["featurePresence"], dtype=np.uint8).reshape(physical_rows, feature_count)
+    valid = np.asarray(pack["validMask"], dtype=np.uint8)
+    lane = np.asarray(pack["laneMaskU16"], dtype="<u2")
+    degraded = np.asarray(pack["degradedIdentity"], dtype=np.uint8)
+    return {
+        "featureValues": torch.from_numpy(values),
+        "featurePresence": torch.from_numpy(presence),
+        "validMask": torch.from_numpy(valid),
+        "laneMaskU16": torch.from_numpy(lane),
+        "degradedIdentity": torch.from_numpy(degraded),
+    }
+
+
 def resident_physical_checksums(pack: dict[str, Any]) -> dict[BufferKind, str]:
     return {
         "FEATURE_VALUES": _sha256_bytes(_f32_le([float(v) for v in pack["featureValues"]])),
@@ -147,6 +298,7 @@ class CandidateFeatureGpuResidentStore:
         self,
         *,
         pack: dict[str, Any],
+        expected_binding: dict[str, Any],
         lease_id: str,
         created_at: str,
         expires_at: str,
@@ -159,12 +311,15 @@ class CandidateFeatureGpuResidentStore:
         if self._parse_time(expires_at) <= self._parse_time(created_at):
             raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_EXPIRY_INVALID")
 
+        verify_pack_binding(pack, expected_binding)
+        physical_rows, feature_count = _verify_pack_shape(pack)
         verify_pack_source_checksums(pack)
+        expected_pack_checksum = _require_sha256(pack.get("gpuPackChecksum"), "GPU_PACK_CHECKSUM")
+        if _gpu_pack_checksum(pack) != expected_pack_checksum:
+            raise GpuResidentLeaseError("FEATURE_GPU_RESIDENT_GPU_PACK_CHECKSUM_MISMATCH")
         resident_checksums = resident_physical_checksums(pack)
         torch = self._torch()
         device = torch.device(f"cuda:{self.device_id}")
-        physical_rows = int(pack["physicalRows"])
-        feature_count = int(pack["featureCount"])
 
         cpu_values = torch.tensor(pack["featureValues"], dtype=torch.float32).reshape(physical_rows, feature_count)
         cpu_presence = torch.tensor(pack["featurePresence"], dtype=torch.uint8).reshape(physical_rows, feature_count)

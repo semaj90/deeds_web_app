@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.nes-domain-palette.v1",
+  "revision": "nes-domain-palette-v1",
+  "unresolved": {
+    "lutByte": 0,
+    "status": "UNRESOLVED"
+  },
+  "domains": {
+    "auth": {
+      "lutByte": 1,
+      "nesHex": "0x16",
+      "label": "DOM_AUTH_GUARD",
+      "priorWeight": 0.9
+    },
+    "ui": {
+      "lutByte": 2,
+      "nesHex": "0x2A",
+      "label": "DOM_UI_SVELTE5_RUNES",
+      "priorWeight": 0.85
+    },
+    "retrieval": {
+      "lutByte": 3,
+      "nesHex": "0x21",
+      "label": "DOM_RETRIEVAL_ANN_RRF",
+      "priorWeight": 0.95
+    },
+    "network": {
+      "lutByte": 4,
+      "nesHex": "0x2C",
+      "label": "DOM_NETWORK_HTTP_TRPC",
+      "priorWeight": 0.8
+    },
+    "database": {
+      "lutByte": 5,
+      "nesHex": "0x12",
+      "label": "DOM_PG18_DRIZZLE",
+      "priorWeight": 0.95
+    },
+    "cache": {
+      "lutByte": 6,
+      "nesHex": "0x27",
+      "label": "DOM_VALKEY_BITFROST_LRU",
+      "priorWeight": 0.88
+    },
+    "agent": {
+      "lutByte": 7,
+      "nesHex": "0x24",
+      "label": "DOM_AGENT_OAK_RLM_DSPY",
+      "priorWeight": 0.92
+    },
+    "graph": {
+      "lutByte": 8,
+      "nesHex": "0x1A",
+      "label": "DOM_GRAPH_CUGRAPH_PAGERANK",
+      "priorWeight": 0.9
+    },
+    "ml": {
+      "lutByte": 9,
+      "nesHex": "0x14",
+      "label": "DOM_ML_ATEN_TENSORRT_GEMM",
+      "priorWeight": 0.94
+    },
+    "general": {
+      "lutByte": 10,
+      "nesHex": "0x0F",
+      "label": "DOM_GENERAL_FALLBACK",
+      "priorWeight": 0.4
+    }
+  },
+  "subLabels": {
+    "svelte5_runes": {
+      "domain": "ui",
+      "nesHex": "0x2A"
+    }
+  },
+  "checksum": "sha256:e1b8ccdc6661a3faed3316cf276f01dd16a1edf80a9aba2d465def40461b9b0f"
+}

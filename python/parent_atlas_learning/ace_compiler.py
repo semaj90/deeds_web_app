@@ -7,19 +7,10 @@ import json
 import re
 import time
 from typing import Any, Mapping
+from atlas_compute.nes_lut_palette import load_nes_lut_palette
 
-NES_LUT_PALETTES = {
-    "ui": {"byte": "0x2A", "name": "NES_2C02_CYAN_LIGHT", "weight": 0.95},
-    "network": {"byte": "0x21", "name": "NES_2C02_BLUE_MEDIUM", "weight": 0.90},
-    "database": {"byte": "0x28", "name": "NES_2C02_ORANGE_WARM", "weight": 0.85},
-    "auth": {"byte": "0x16", "name": "NES_2C02_RED_DEEP", "weight": 0.80},
-    "retrieval": {"byte": "0x1A", "name": "NES_2C02_GREEN_FOREST", "weight": 0.92},
-    "cache": {"byte": "0x2C", "name": "NES_2C02_CYAN_MUTED", "weight": 0.88},
-    "agent": {"byte": "0x14", "name": "NES_2C02_PURPLE_VIOLET", "weight": 0.82},
-    "graph": {"byte": "0x24", "name": "NES_2C02_MAGENTA_ROSE", "weight": 0.86},
-    "ml": {"byte": "0x11", "name": "NES_2C02_BLUE_AZURE", "weight": 0.78},
-    "general": {"byte": "0x20", "name": "NES_2C02_WHITE_PURE", "weight": 0.50},
-}
+_PALETTE = load_nes_lut_palette()
+NES_LUT_PALETTES = _PALETTE["domains"]
 
 
 def compile_ace_packet_from_proposal(
@@ -32,8 +23,8 @@ def compile_ace_packet_from_proposal(
 ) -> dict[str, Any]:
     """Compile a bounded, review-only packet descriptor from an untrusted proposal.
 
-    This helper does not admit packets or write to a store. Legacy palette
-    values remain proposal-only and are not LUT ordinals.
+    Palette bytes and colors come from the shared versioned artifact. This
+    helper does not admit packets or write to a store.
     """
     manifest_checksum = context_manifest.get("checksum", "")
     if not isinstance(manifest_checksum, str) or not manifest_checksum.strip():
@@ -85,7 +76,7 @@ def compile_ace_packet_from_proposal(
     source_ref = sorted(proposed_refs)[0]
 
     oak_tuple = (
-        f"({json.dumps(source_ref)}, {json.dumps(concept_id)}, {json.dumps(palette['byte'])}, "
+        f"({json.dumps(source_ref)}, {json.dumps(concept_id)}, {json.dumps(palette['nesHex'])}, "
         f"{json.dumps(instruction)}, {confidence_score if confidence_score is not None else 'None'}, 64, "
         f'"implements")'
     )
@@ -116,13 +107,13 @@ def compile_ace_packet_from_proposal(
         "nes_lut": {
             "domain": domain,
             "resolved_domain": resolved_domain,
-            "lut_byte": None,
-            "nes_hex": palette["byte"],
-            "palette_byte": palette["byte"],
-            "palette_name": palette["name"],
-            "prior_weight": palette["weight"],
+            "lut_byte": palette["lutByte"],
+            "nes_hex": palette["nesHex"],
+            "palette_byte": palette["nesHex"],
+            "palette_name": palette["label"],
+            "prior_weight": palette["priorWeight"],
             "mapping_status": (
-                "LEGACY_CONFLICT_UNRESOLVED" if resolved_domain == domain else "UNKNOWN_DOMAIN_FALLBACK_GENERAL"
+                "EXACT_SHARED_PALETTE" if resolved_domain == domain else "UNKNOWN_DOMAIN_FALLBACK_GENERAL"
             ),
             "predicate": "implements",
         },
@@ -145,7 +136,7 @@ def compile_ace_packet_from_proposal(
         },
         "bitfrost_caching": {
             "redis_key": packet_id,
-            "centroid_lru_key": f"bitfrost:centroid:lru:cuml-kmeans-k16-{palette['byte'].lower()}",
+            "centroid_lru_key": f"bitfrost:centroid:lru:cuml-kmeans-k16-nes-domain-palette-v1-{palette['nesHex'].lower()}",
             "eviction_policy": "allkeys-lru",
         },
     }

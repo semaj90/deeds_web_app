@@ -62,7 +62,16 @@ function createTestExecutor(mode: string) {
       }
 
       if (input?.delayMs) {
-        await new Promise((resolve) => setTimeout(resolve, input.delayMs));
+        // Wake early on abort so the caller's timeout bounds the wait, not the full delay.
+        await new Promise<void>((resolve) => {
+          const done = () => {
+            clearTimeout(timer);
+            context.signal?.removeEventListener('abort', done);
+            resolve();
+          };
+          const timer = setTimeout(done, input.delayMs);
+          context.signal?.addEventListener('abort', done, { once: true });
+        });
       }
 
       if (context.signal?.aborted) {
@@ -123,8 +132,10 @@ class TestExecutorTree {
       const executor = await this.initPromises.get(mode);
       const result = await executor.execute(input, context);
 
+      // Error instances serialize to {} over JSON, so normalize the failure to a plain message.
       return {
         ...result,
+        ...(result.error ? { error: { message: result.error.message } } : {}),
         executorPath: [mode, ...result.executorPath],
       };
     } catch (err) {

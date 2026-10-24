@@ -1,13 +1,31 @@
 import { z } from 'zod';
 
-import { publicProcedure, router } from '../init.js';
+import { protectedProcedure, publicProcedure, router } from '../init.js';
 import {
   runSemanticSearchWorkflow,
   SemanticSearchWorkflowRequestSchema,
   SemanticSearchWorkflowResultSchema,
 } from '$lib/server/retrieval/semantic-search-workflow.js';
+import { refuseVerifiedContextV1, VerifiedContextRequestV1Schema, VerifiedContextResponseV1Schema } from '$lib/server/atlas/execution/verified-context-service-v1.js';
 
 export const searchRouter = router({
+  verifiedContext: protectedProcedure
+    .input(VerifiedContextRequestV1Schema.omit({ requestId: true }))
+    .output(VerifiedContextResponseV1Schema)
+    .query(async ({ input, ctx }) => {
+      const request = { ...input, requestId: ctx.requestId };
+      if (!ctx.verifiedContextService) return refuseVerifiedContextV1(ctx.requestId, 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED');
+      try {
+        return await ctx.verifiedContextService.execute(String(ctx.userId), request);
+      } catch (error) {
+        return refuseVerifiedContextV1(
+          ctx.requestId,
+          error instanceof Error ? error.message : 'VERIFIED_CONTEXT_REQUEST_FAILED',
+          'REQUEST_VALIDATION',
+        );
+      }
+    }),
+
   semanticSearch: publicProcedure
     .input(
       SemanticSearchWorkflowRequestSchema.extend({
@@ -69,6 +87,7 @@ export const searchRouter = router({
           ace: null,
           contextManifestShadow: {},
           shadow: null,
+          graphExpansionStatus: 'BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING' as const,
           error: error instanceof Error ? error.message : 'Search workflow failed',
         };
       }

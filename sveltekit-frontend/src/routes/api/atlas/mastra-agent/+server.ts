@@ -1,59 +1,28 @@
-/**
- * Request-scoped Mastra execution for an already admitted ContextManifest and
- * compiled PromptPlan. Candidate selection and packet identity stay upstream.
- */
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { executeMastraPromptPlanV1 } from '@deeds/atlas-orchestrator/prompt-plan-agent';
-import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
-import { ENV } from '$lib/server/env.server.js';
-import { aceContextManifestAdmissionV1Schema } from '$lib/server/atlas/context/ace-context-manifest-admission-v1.js';
-import { buildContextManifestV2 } from '$lib/server/atlas/graph/context-manifest-v2.js';
-import { readContextManifestV2FromPostgresV1 } from '$lib/server/atlas/graph/context-manifest-v2-postgres-readback-v1.js';
-import { canonicalSha256V1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
-import { PromptPlanV1Schema } from '$lib/server/atlas/prefill/prompt-plan-v1.js';
+import { trace } from '@opentelemetry/api';
+import { VerifiedContextRequestV1Schema, type VerifiedContextServiceV1 } from '$lib/server/atlas/execution/verified-context-service-v1.js';
 import { z } from 'zod';
 
-const SegmentContentSchema = z.object({
-  ordinal: z.number().int().nonnegative(),
-  content: z.string().max(100_000),
-}).strict();
+const RequestSchema = VerifiedContextRequestV1Schema.omit({ requestId: true });
 
-const RequestSchema = z.object({
-  admission: z.unknown(),
-  promptPlan: z.unknown(),
-  segmentContent: z.array(SegmentContentSchema).min(1).max(128),
-}).strict();
-
-function validatesManifestBoundPlan(
-  admissionValue: unknown,
-  planValue: unknown,
-  contentValue: unknown,
-): { admission: ReturnType<typeof aceContextManifestAdmissionV1Schema.parse>; promptPlan: ReturnType<typeof PromptPlanV1Schema.parse>; segmentContent: z.infer<typeof SegmentContentSchema>[] } | null {
-  try {
-    const admission = aceContextManifestAdmissionV1Schema.parse(admissionValue);
-    const promptPlan = PromptPlanV1Schema.parse(planValue);
-    const segmentContent = z.array(SegmentContentSchema).min(1).max(128).parse(contentValue);
-    const manifest = admission.manifest;
-    const rebuilt = buildContextManifestV2(manifest.v1, manifest.identityInput);
-    if (rebuilt.identityChecksum !== manifest.identityChecksum) return null;
-    if (admission.selectedOrdinalSetChecksum !== manifest.identityInput.selectedOrdinalSetChecksum) return null;
-    if (promptPlan.requestId !== manifest.v1.requestId) return null;
-    if (promptPlan.contextManifestChecksum !== manifest.identityChecksum) return null;
-
-    const selectedPacketKeys = new Set(manifest.v1.selectedNodeKeys);
-    const evidenceSegments = promptPlan.segments.filter((segment) => segment.kind === 'EVIDENCE');
-    if (!evidenceSegments.length || evidenceSegments.some((segment) => !segment.packetKey || !selectedPacketKeys.has(segment.packetKey))) return null;
-    const planEvidenceRefs = evidenceSegments.flatMap((segment) => segment.evidenceRefs);
-    if (new Set(planEvidenceRefs).size !== planEvidenceRefs.length) return null;
-    if (
-      planEvidenceRefs.length !== manifest.v1.evidenceRefs.length
-      || manifest.v1.evidenceRefs.some((ref) => !planEvidenceRefs.includes(ref))
-    ) return null;
-    return { admission, promptPlan, segmentContent };
-  } catch {
-    return null;
-  }
+function recordVerifiedContextOutcomeV1(input: {
+  requestId: string;
+  serviceHealth: 'AVAILABLE' | 'NOT_CONFIGURED' | 'ERROR';
+  evidenceValidity: 'NOT_VERIFIED' | 'NOT_ADMITTED' | 'VERIFIED_NONCANONICAL';
+  firstFailingBoundary: string | null;
+  refusalCode: string | null;
+}) {
+  trace.getActiveSpan()?.setAttributes({
+    'parent_atlas.request_id': input.requestId,
+    'parent_atlas.service_health': input.serviceHealth,
+    'parent_atlas.agent_execution_status': 'NOT_STARTED',
+    'parent_atlas.evidence_validity': input.evidenceValidity,
+    'parent_atlas.canonical_admission': 'NOT_ADMITTED',
+    'parent_atlas.first_failing_boundary': input.firstFailingBoundary ?? 'NONE',
+    'parent_atlas.refusal_code': input.refusalCode ?? 'NONE',
+    'parent_atlas.writes_performed': false,
+  });
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -68,49 +37,54 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ success: false, error: 'INVALID_REQUEST', writesPerformed: false }, { status: 400 });
   }
 
-  const bound = validatesManifestBoundPlan(body.admission, body.promptPlan, body.segmentContent);
-  if (!bound) {
-    return json({ success: false, error: 'CONTEXT_PROMPT_PLAN_BINDING_INVALID', writesPerformed: false }, { status: 422 });
+  const requestId = locals.requestId ?? crypto.randomUUID();
+  const verifiedContextService = (locals as typeof locals & { verifiedContextService?: VerifiedContextServiceV1 }).verifiedContextService;
+  if (!verifiedContextService) {
+    recordVerifiedContextOutcomeV1({
+      requestId, serviceHealth: 'NOT_CONFIGURED', evidenceValidity: 'NOT_VERIFIED',
+      firstFailingBoundary: 'SERVICE_CONFIGURATION', refusalCode: 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED',
+    });
+    return json({ success: false, error: 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED', requestId, writesPerformed: false }, { status: 503 });
   }
 
-  const manifestReadback = await readContextManifestV2FromPostgresV1(bound.admission.manifest.identityChecksum);
-  if (manifestReadback.status !== 'READBACK_MATCH_NOT_ADMITTED' || !manifestReadback.manifest) {
+  let context;
+  try {
+    context = await verifiedContextService.execute(locals.user.id, { ...body, requestId });
+  } catch {
+    recordVerifiedContextOutcomeV1({
+      requestId, serviceHealth: 'ERROR', evidenceValidity: 'NOT_VERIFIED',
+      firstFailingBoundary: 'VERIFIED_CONTEXT_SERVICE', refusalCode: 'VERIFIED_CONTEXT_SERVICE_FAILED',
+    });
+    return json({ success: false, error: 'VERIFIED_CONTEXT_SERVICE_FAILED', requestId, writesPerformed: false }, { status: 503 });
+  }
+
+  if (context.status !== 'ADMITTED') {
+    recordVerifiedContextOutcomeV1({
+      requestId: context.requestId, serviceHealth: 'AVAILABLE', evidenceValidity: 'NOT_ADMITTED',
+      firstFailingBoundary: context.firstFailingBoundary, refusalCode: context.refusalCode,
+    });
     return json({
       success: false,
-      error: 'CONTEXT_MANIFEST_READBACK_BLOCKED',
-      reason: manifestReadback.reason,
+      error: context.refusalCode,
+      requestId: context.requestId,
+      firstFailingBoundary: context.firstFailingBoundary,
+      receipt: context.receipt,
       writesPerformed: false,
-    }, { status: 503 });
-  }
-  if (canonicalSha256V1(bound.admission.manifest) !== canonicalSha256V1(manifestReadback.manifest)) {
-    return json({ success: false, error: 'CONTEXT_MANIFEST_REQUEST_READBACK_MISMATCH', writesPerformed: false }, { status: 422 });
+    }, { status: 409 });
   }
 
-  if (!ENV.LLAMA_SERVER_URL) {
-    return json({ success: false, error: 'LLAMA_SERVER_URL_UNCONFIGURED', writesPerformed: false }, { status: 503 });
-  }
-
-  try {
-    const resolved = await resolveLoadedLlamaModel(ENV.LLAMA_SERVER_URL, ENV.LLAMA_SERVER_MODEL ?? null);
-    const result = await executeMastraPromptPlanV1({
-      baseUrl: ENV.LLAMA_SERVER_URL,
-      resolvedModel: resolved.resolvedModel,
-      promptPlan: bound.promptPlan,
-      segmentContent: bound.segmentContent,
-    });
-    return json({
-      success: true,
-      error: null,
-      result: {
-        ...result,
-        modelResolutionSource: resolved.source,
-        modelArtifactRevision: null,
-        canonicalAuthority: false,
-        writesPerformed: false,
-        durableStatePersisted: false,
-      },
-    });
-  } catch {
-    return json({ success: false, error: 'MASTRA_INFERENCE_FAILED', writesPerformed: false }, { status: 502 });
-  }
+  recordVerifiedContextOutcomeV1({
+    requestId: context.requestId, serviceHealth: 'AVAILABLE', evidenceValidity: 'VERIFIED_NONCANONICAL',
+    firstFailingBoundary: 'IMMUTABLE_PACKET_HYDRATOR', refusalCode: 'VERIFIED_CONTEXT_PACKET_HYDRATOR_NOT_CONFIGURED',
+  });
+  return json({
+    success: false,
+    error: 'VERIFIED_CONTEXT_PACKET_HYDRATOR_NOT_CONFIGURED',
+    requestId: context.requestId,
+    contextPacketRef: context.contextPacketRef,
+    contextPacketDigest: context.contextPacketDigest,
+    promptPlanChecksum: context.promptPlanChecksum,
+    receipt: context.receipt,
+    writesPerformed: false,
+  }, { status: 503 });
 };

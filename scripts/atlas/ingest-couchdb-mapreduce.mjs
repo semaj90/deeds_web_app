@@ -1,4 +1,5 @@
 import pg from 'pg';
+import { resolveCouchDbConfigV1 } from '../../sveltekit-frontend/src/lib/server/config/couchdb-config.ts';
 import {
   loadConfig,
   loadRouteMap,
@@ -44,11 +45,7 @@ const aliases = loadClusterAliases(config);
 console.log(`Starting CouchDB MapReduce Ingestion [WRITE=${WRITE}] [runId=${EFFECTIVE_RUN_ID}]`);
 
 if (WRITE) {
-  const rawUrl = process.env.COUCHDB_URL || 'http://admin:deeds123@localhost:5984';
-  const urlMatch = rawUrl.match(/^https?:\/\/([^:]+):([^@]+)@(.+)$/);
-  const [, COUCH_USER, COUCH_PASS, COUCH_HOST] = urlMatch ?? ['', 'admin', 'deeds123', 'localhost:5984'];
-  const BASE = `http://${COUCH_HOST}`;
-  const AUTH = 'Basic ' + Buffer.from(`${COUCH_USER}:${COUCH_PASS}`).toString('base64');
+  const { baseUrl: BASE, authorization: AUTH } = resolveCouchDbConfigV1();
   
   console.log(`Connecting to CouchDB at ${BASE}...`);
   try {
@@ -61,7 +58,8 @@ if (WRITE) {
 }
 
 // Query Postgres for authoritative lineage
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) throw new Error('DATABASE_URL is not configured; set it in the environment (no fallback credential)');
 let files = [];
 try {
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
@@ -290,11 +288,7 @@ const docs = [
 ];
 
 if (WRITE) {
-  const rawUrl = process.env.COUCHDB_URL || 'http://admin:deeds123@localhost:5984';
-  const urlMatch = rawUrl.match(/^https?:\/\/([^:]+):([^@]+)@(.+)$/);
-  const [, COUCH_USER, COUCH_PASS, COUCH_HOST] = urlMatch ?? ['', 'admin', 'deeds123', 'localhost:5984'];
-  const BASE = `http://${COUCH_HOST}`;
-  const AUTH = 'Basic ' + Buffer.from(`${COUCH_USER}:${COUCH_PASS}`).toString('base64');
+  const { baseUrl: BASE, authorization: AUTH } = resolveCouchDbConfigV1();
   
   const allDocs = [
     ...directoryDocs.values(),

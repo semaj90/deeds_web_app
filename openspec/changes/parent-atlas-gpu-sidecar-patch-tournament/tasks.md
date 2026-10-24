@@ -15,6 +15,38 @@ The attached execution-architecture review is aligned to existing owners; it doe
 
 No gate above is closed by this documentation crosswalk. Existing hardware/runtime entries are navigated from `docs/architecture/_cuda_rtx_toc.md`; update the owning task ledger when a gate receives new evidence.
 
+## Track C — Phase 1 deterministic tournament evaluation and gates (2026-10-23)
+
+Canonical dense owner: Postgres `semantic_768`. TurboVec 128-d MRL is challenger-only: no vote, no identity, no write.
+QLoRA and write-guard `--apply` runs are gated behind the receipts below.
+
+- [ ] **TOUR-P1-EVAL-01** Phase 1 is deterministic. Replay TOUR9 (integration) and TOUR10 (fresh replay) on the same frozen inputs and
+      compare ranking output. Evidence: two runs with identical ordering and identical candidate identities. Status: TOUR10 harness exists (`scripts/atlas/run-patch-tournament-replay-v1.mts`); TOUR9 NOT_RUN.
+- [ ] **TOUR-TURBOVEC-CHALLENGER-01** TurboVec 128-d MRL is scored against the exact `semantic_768` oracle as a challenger. Evidence:
+      Recall@K, ordering, latency, and memory receipt. It never enters fusion as a vote.
+- [ ] **TOUR-RECEIPT-01** A tournament receipt is a separate artifact from the admission receipt. The existing
+      `docs/reports/workspace-revision-tournament-admission-v1.json` is an admission record, not a tournament result.
+      Evidence: a tournament receipt schema with candidate IDs, ordering checksum, and workspace revision. Current admission receipt is not current-workspace authority (see the 2026-10-23 handoff).
+- [ ] **TOUR-WRITEGUARD-GATE-01** Write-guard `--apply` runs (`apply-admitted-workspace-source-bindings`, `apply-file-level-source-refs`,
+      `apply-current-execution-workspace-bindings`) require, in addition to operator approval: a current admitted receipt and a
+      passing TOUR-RECEIPT-01. Evidence: the writers refuse when either is missing. Status: writers currently refuse the current receipt.
+- [ ] **TOUR-QLORA-GATE-01** QLoRA adapter activation requires TOUR-P1-EVAL-01 PASS, TOUR20 PASS, and TOUR-RECEIPT-01 on the adapter's
+      training window. Until then, status NOT_STARTED. Evidence: gate test that refuses an adapter without the receipts.
+
+## Linkage to prefill DAG and NES palette (2026-10-23)
+
+Ownership stays with `sveltekit-frontend/openspec/changes/parent-atlas-ace-json-dag-prefill-pipeline/tasks.md`. This section
+only records what the tournament must wait for.
+
+- [ ] **TOUR-PREFILL-LINK-01** Tournament candidate context comes from the admitted ContextManifest and the Phase 5 prefill
+      packet, not raw retrieval hits. Evidence: a TOUR9 integration run records a manifest checksum on each candidate.
+      Blocked until prefill Phase 4 (ContextManifest gate) passes.
+- [ ] **TOUR-NES-DOMAIN-01** `TournamentAcePacket` records the domain `lutByte` from the shared palette artifact. Palette parity
+      is now locally tested (`general=0x0A`, unresolved=`0x00`, `svelte5_runes` is the `ui` sub-label); packet linkage remains
+      blocked until the admitted ContextManifest/prefill and tournament packet owners are wired and read back.
+- [ ] **TOUR-QLORA-HOLD-01** Keep `TOUR20` and training at NOT_STARTED. Do not export training data from tournament outcomes
+      until `TOUR20` passes and reward-hacking monitoring exists.
+
 ## CUDA 13.4 SIMT/cuTile challenger gate (2026-10-16)
 
 - [ ] **CUDA134-SIMT-CHALLENGER-01** Build the opt-in, network-isolated container in `docker/atlas-cuda134-simt/`; run the existing Level 2 SIMT and Level 3 CUDA C++ Tile kernels against the shared CPU-oracle fixtures only after the documented VRAM/Ornith preflight and operator approval. Acceptance requires successful CUDA 13.4 image compilation plus exact score/key parity for fixture sizes 256, 1,000, and 4,000; no canonical writes or production promotion.

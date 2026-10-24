@@ -45,8 +45,10 @@ class TestAceCompiler(unittest.TestCase):
         self.assertIs(first["canonical_authority"], False)
         self.assertIs(first["writes_performed"], False)
         self.assertEqual(first["evidence_qualification"]["admission_status"], "PROPOSED_NOT_ADMITTED")
-        self.assertIsNone(first["nes_lut"]["lut_byte"])
-        self.assertEqual(first["nes_lut"]["mapping_status"], "LEGACY_CONFLICT_UNRESOLVED")
+        # NLUT-04: lut_byte comes from the generated canonical palette artifact (ui = 0x02), not a local dict.
+        self.assertEqual(first["nes_lut"]["lut_byte"], 2)
+        self.assertEqual(first["nes_lut"]["nes_hex"], "0x2A")
+        self.assertEqual(first["nes_lut"]["mapping_status"], "EXACT_SHARED_PALETTE")
         self.assertTrue(first["checksum"].startswith("sha256:"))
 
     def test_rejects_invalid_proposal_inputs(self):
@@ -81,7 +83,8 @@ class TestAceCompiler(unittest.TestCase):
 
         self.assertNotEqual(first["packet_id"], second["packet_id"])
         self.assertEqual(second["nes_lut"]["resolved_domain"], "general")
-        self.assertIsNone(second["nes_lut"]["lut_byte"])
+        # general = 0x0A in the canonical artifact; 0x00 is reserved for UNRESOLVED only.
+        self.assertEqual(second["nes_lut"]["lut_byte"], 10)
         self.assertEqual(second["nes_lut"]["mapping_status"], "UNKNOWN_DOMAIN_FALLBACK_GENERAL")
 
     def test_rejects_invalid_manifest_and_ttl(self):

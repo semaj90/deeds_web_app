@@ -136,6 +136,102 @@ describe('search runtime bridge', () => {
     });
   });
 
+  it('uses the injected reranker order without allowing candidate identity or revision changes', async () => {
+    const sourceRevision = `sha256:${'a'.repeat(64)}`;
+    const workspaceRevision = `sha256:${'b'.repeat(64)}`;
+    const candidates = [
+      { packetKey: 'packet-1', sourceRef: 'src/a/route.ts', sourceRevision, workspaceRevision, rank: 1, score: 0.9, lane: 'ast' as const },
+      { packetKey: 'packet-2', sourceRef: 'src/b/helper.ts', sourceRevision, workspaceRevision, rank: 2, score: 0.8, lane: 'ast' as const },
+    ];
+    const envelopes = candidates.map((candidate, index) => ({
+      chunk_id: candidate.packetKey,
+      packet_key: candidate.packetKey,
+      source_ref: candidate.sourceRef,
+      source_revision: candidate.sourceRevision,
+      workspace_revision: candidate.workspaceRevision,
+      retrieved_rank: index + 1,
+      retrieval_source: 'ast',
+      fusion_score: 0.5 - index / 10,
+    }));
+    mockHydrateCandidatesWithProof.mockResolvedValue({
+      envelopes,
+      proof: {
+        canonicalJoinedCount: 2, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0, representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0, graphScoreMissingCount: 2, summaryResolvedCount: 2,
+        summaryStaleRejectedCount: 0, validationReasons: {},
+      },
+    });
+    const reranker = {
+      modelVersion: 'test-context-ranker-v1',
+      rerank: vi.fn(async ({ candidates: input }: { candidates: typeof candidates }) => ({
+        ranked: [...input].reverse(),
+        modelVersion: 'test-context-ranker-v1',
+      })),
+    };
+    const runtime = createSearchRuntime({
+      readOnly: true,
+      reranker,
+      postProcessConfig: { dedupPrefixDepth: 0 },
+      retrievers: [{ lane: 'ast', retrieve: async () => candidates }],
+    });
+
+    const result = await runtime.search({ text: 'drizzle route helper', topK: 2, workspaceRevision });
+
+    expect(reranker.rerank).toHaveBeenCalledWith(expect.objectContaining({
+      query: 'drizzle route helper',
+      candidates: expect.arrayContaining([
+        expect.objectContaining({ packetKey: 'packet-1', sourceRef: 'src/a/route.ts', sourceRevision, workspaceRevision }),
+        expect.objectContaining({ packetKey: 'packet-2', sourceRef: 'src/b/helper.ts', sourceRevision, workspaceRevision }),
+      ]),
+    }));
+    expect(mockRerankCanonicalFeatureEnvelopes).not.toHaveBeenCalled();
+    expect(result.packets.map((packet) => packet.packet_key)).toEqual(['packet-2', 'packet-1']);
+    expect(result.provenance.rerankModel).toBe('test-context-ranker-v1');
+  });
+
+  it('rejects injected reranker output that mutates a source binding', async () => {
+    const sourceRevision = `sha256:${'c'.repeat(64)}`;
+    const workspaceRevision = `sha256:${'d'.repeat(64)}`;
+    const candidate = {
+      packetKey: 'packet-1', sourceRef: 'src/a/route.ts', sourceRevision,
+      workspaceRevision, rank: 1, score: 0.9, lane: 'ast' as const,
+    };
+    mockHydrateCandidatesWithProof.mockResolvedValue({
+      envelopes: [{
+        chunk_id: candidate.packetKey, packet_key: candidate.packetKey, source_ref: candidate.sourceRef,
+        source_revision: sourceRevision, workspace_revision: workspaceRevision, retrieved_rank: 1,
+        retrieval_source: 'ast', fusion_score: 0.9,
+      }],
+      proof: {
+        canonicalJoinedCount: 1, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0, representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0, graphScoreMissingCount: 1, summaryResolvedCount: 1,
+        summaryStaleRejectedCount: 0, validationReasons: {},
+      },
+    });
+    const runtime = new SearchRuntime({
+      readOnly: true,
+      reranker: {
+        modelVersion: 'malicious-ranker',
+        rerank: async ({ candidates: input }) => ({
+          ranked: [{ ...input[0]!, sourceRef: 'src/forged.ts' }],
+          modelVersion: 'malicious-ranker',
+        }),
+      },
+      postProcessConfig: { dedupPrefixDepth: 0 },
+      retrievers: [{ lane: 'ast', retrieve: async () => [candidate] }],
+    });
+
+    const result = await runtime.search({ text: 'drizzle route helper', topK: 1, workspaceRevision });
+
+    expect(result.packets.map((packet) => packet.source_ref)).toEqual(['src/a/route.ts']);
+    expect(result.provenance.rerankModel).toBe('injected-reranker-invalid-output');
+    expect(result.provenance.rerankerUsed).toBe(false);
+  });
+
   it('retrieves from multiple lanes, reranks canonically, and returns feature envelopes', async () => {
     mockRetrieveAllCandidates.mockResolvedValue([
       {

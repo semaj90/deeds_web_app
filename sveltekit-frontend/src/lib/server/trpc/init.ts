@@ -11,6 +11,7 @@
 
 import { initTRPC, TRPCError } from '@trpc/server';
 import type { RequestEvent } from '@sveltejs/kit';
+import type { VerifiedContextServiceV1 } from '$lib/server/atlas/execution/verified-context-service-v1.js';
 
 // ---------------------------------------------------------------------------
 // Context
@@ -24,6 +25,7 @@ export interface TRPCContext {
   userId: number | null;
   sessionId: string | null;
   requestId: string;
+  verifiedContextService?: VerifiedContextServiceV1;
 }
 
 export async function createContext(event: RequestEvent): Promise<TRPCContext> {
@@ -39,6 +41,7 @@ export async function createContext(event: RequestEvent): Promise<TRPCContext> {
     userId,
     sessionId: event.locals.session?.id ?? null,
     requestId: event.locals.requestId ?? crypto.randomUUID(),
+    verifiedContextService: (event.locals as typeof event.locals & { verifiedContextService?: VerifiedContextServiceV1 }).verifiedContextService,
   };
 }
 

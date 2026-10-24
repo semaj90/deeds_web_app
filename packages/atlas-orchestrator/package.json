@@ -12,7 +12,8 @@
     "./steps": "./dist/steps/index.js",
     "./executors": "./dist/executors/index.js",
     "./models": "./dist/models/index.js",
-    "./prompt-plan-agent": "./dist/models/prompt-plan-agent.js"
+    "./prompt-plan-agent": "./dist/models/prompt-plan-agent.js",
+    "./tools/verified-context-tool": "./dist/tools/verified-context-tool.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

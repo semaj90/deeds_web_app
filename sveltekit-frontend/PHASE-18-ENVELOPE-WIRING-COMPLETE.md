@@ -1,7 +1,7 @@
 # Phase 18 XGBoost Reranker — Canonical Envelope Wiring Complete ✅
 
-**Date**: July 26, 2026  
-**Status**: ✅ WIRED — All 4 transports connected to canonical envelope schemas  
+**Date**: July 26, 2026
+**Status**: ✅ WIRED — All 4 transports connected to canonical envelope schemas
 **Confidence**: 99%+
 
 ---
@@ -56,7 +56,7 @@ Phase 18 canonical envelope schemas are now **wired into all transport layers**:
 ### 3. Offline Storage + Sync
 **File**: `src/lib/client/phase18-offline-sync.ts` (340 lines)
 
-- **Exports**: 
+- **Exports**:
   - `initializePhase18OfflineDB()` — Setup IndexedDB stores
   - `storePhase18RequestOffline()` — Persist requests for offline access
   - `storePhase18ResponseOffline()` — Cache responses with TTL
@@ -212,28 +212,28 @@ Phase 18 canonical envelope schemas are now **wired into all transport layers**:
 ## Key Design Decisions (Locked)
 
 ### 1. Single Schema Everywhere
-**Decision**: One `phase18-envelope-schema.ts` = all transports  
-**Why**: Type safety, consistency, maintainability  
+**Decision**: One `phase18-envelope-schema.ts` = all transports
+**Why**: Type safety, consistency, maintainability
 **Alternative rejected**: Separate schemas per transport (error-prone, duplicate definitions)
 
 ### 2. Asymmetric Request/Response
-**Decision**: Request has `packets[]`, Response has `results[]`  
-**Why**: Semantic clarity (input vs output), natural match to reranking API  
+**Decision**: Request has `packets[]`, Response has `results[]`
+**Why**: Semantic clarity (input vs output), natural match to reranking API
 **Alternative rejected**: Symmetric envelope (confusing semantics)
 
 ### 3. Placeholder Implementation
-**Decision**: Return synthetic scores now, wire real model later  
-**Why**: Unblocks schema wiring, allows concurrent feature extraction work  
+**Decision**: Return synthetic scores now, wire real model later
+**Why**: Unblocks schema wiring, allows concurrent feature extraction work
 **Gate**: Must implement Phase 17C (Qdrant persistence) before real training
 
 ### 4. Offline-First Service Worker
-**Decision**: IndexedDB + LocalStorage + sync queue  
-**Why**: Works offline, survives crashes, supports batch sync  
+**Decision**: IndexedDB + LocalStorage + sync queue
+**Why**: Works offline, survives crashes, supports batch sync
 **Alternative rejected**: Request-time disk access (not standard in browsers)
 
 ### 5. tRPC Query vs Mutation Split
-**Decision**: Query = read-only, Mutation = with audit trail + side effects  
-**Why**: Semantic correctness, audit trail separation, production safety  
+**Decision**: Query = read-only, Mutation = with audit trail + side effects
+**Why**: Semantic correctness, audit trail separation, production safety
 **Alternative rejected**: Single procedure (loses auditability)
 
 ---
@@ -251,7 +251,7 @@ Phase 18 canonical envelope schemas are now **wired into all transport layers**:
 - [ ] Dry-run validation (verify all 45 tests pass)
 - [ ] Phase 18B implementation (Python + model)
 - [ ] Postgres persistence wiring
-- [ ] Redis caching wiring
+- [ ] Redis-valkey caching wiring
 - [ ] Event emission wiring
 - [ ] Phase 17C completion (Qdrant persistence)
 - [ ] Production deployment gates

@@ -44,7 +44,7 @@
 import { TOOL_DISPATCH, type MCPToolResult } from './mcp-tool-dispatch.js';
 import { compressToHCACard, hcaCardToContextSnippet, type HCACard } from './hca-compressor.js';
 import { recordAgentAction } from '$lib/server/trace/trace-collector.js';
-import { callTraceMcpTool } from './mcp-tool-bridge.js';
+import { callTraceMcpTool, validateToolArgsAgainstSchemaV1 } from './mcp-tool-bridge.js';
 import { recordToolUsage } from './tool-selection.js';
 import { createHash } from 'crypto';
 import { db } from '$lib/server/db/client.js';
@@ -228,6 +228,19 @@ export async function dispatchToolCall(
       result:     { tool: toolName, success: false, data: null, error: validation.reason } satisfies MCPToolResult,
       fromServer: false,
     };
+  }
+
+  // Arguments are checked against the tool's cached tools/list schema. Invalid arguments are refused.
+  // When no schema is cached (tools/list unavailable), the call proceeds with a printed warning.
+  const argsCheck = await validateToolArgsAgainstSchemaV1(toolName, args);
+  if (argsCheck.status === 'INVALID') {
+    return {
+      result:     { tool: toolName, success: false, data: null, error: `INVALID_TOOL_ARGUMENTS: ${argsCheck.reasons.join('; ')}` } satisfies MCPToolResult,
+      fromServer: false,
+    };
+  }
+  if (argsCheck.status === 'NO_CACHED_SCHEMA') {
+    console.warn(`[tool-args] no cached schema for ${toolName}; arguments not validated`);
   }
 
   // Try HTTP server first

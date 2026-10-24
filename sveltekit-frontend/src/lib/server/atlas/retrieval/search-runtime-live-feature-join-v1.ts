@@ -49,8 +49,13 @@ export interface SearchRuntimeLiveFeatureSupplementV1 {
 export type SearchRuntimeLiveFeatureJoinBlockCode =
   | 'SEARCH_RUNTIME_NOT_READ_ONLY'
   | 'PROFILE_NOT_FOUND_FOR_CHUNK'
+  | 'DUPLICATE_PROFILE_FOR_CHUNK'
   | 'PROFILE_INVALID'
   | 'PROFILE_CHECKSUM_INVALID'
+  | 'RUNTIME_PACKET_IDENTITY_MISSING'
+  | 'RUNTIME_SOURCE_REF_MISSING'
+  | 'RUNTIME_WORKSPACE_REVISION_MISSING'
+  | 'RUNTIME_SOURCE_REVISION_MISSING'
   | 'PACKET_KEY_MISMATCH'
   | 'SOURCE_REF_MISMATCH'
   | 'WORKSPACE_REVISION_MISMATCH'
@@ -59,6 +64,7 @@ export type SearchRuntimeLiveFeatureJoinBlockCode =
   | 'SEMANTIC_REVISION_MISSING'
   | 'REPRESENTATION_REVISION_MISMATCH'
   | 'SUPPLEMENT_MISSING'
+  | 'DUPLICATE_SUPPLEMENT_FOR_PACKET'
   | 'SUPPLEMENT_PACKET_KEY_MISMATCH'
   | 'SUPPLEMENT_FEATURE_REVISION_MISMATCH'
   | 'SUPPLEMENT_PRODUCER_REVISION_MISSING'
@@ -224,10 +230,30 @@ export function compileSearchRuntimeLiveFeatureJoinV1(input: {
       });
       continue;
     }
+    if (profilesByChunkRowId.has(profile.chunkRowId)) {
+      rejections.push({
+        chunkRowId: profile.chunkRowId,
+        packetKey: profile.packetKey,
+        code: 'DUPLICATE_PROFILE_FOR_CHUNK',
+      });
+      continue;
+    }
     profilesByChunkRowId.set(profile.chunkRowId, profile);
   }
 
-  const supplementsByPacketKey = new Map(input.supplements.map((supplement) => [supplement.packetKey, supplement]));
+  const supplementsByPacketKey = new Map<string, SearchRuntimeLiveFeatureSupplementV1>();
+  for (const supplement of input.supplements) {
+    if (supplementsByPacketKey.has(supplement.packetKey)) {
+      const profile = [...profilesByChunkRowId.values()].find((candidate) => candidate.packetKey === supplement.packetKey);
+      rejections.push({
+        chunkRowId: profile?.chunkRowId ?? 'unknown',
+        packetKey: supplement.packetKey,
+        code: 'DUPLICATE_SUPPLEMENT_FOR_PACKET',
+      });
+      continue;
+    }
+    supplementsByPacketKey.set(supplement.packetKey, supplement);
+  }
 
   for (const packet of input.response.packets) {
     const profile = profilesByChunkRowId.get(packet.chunk_id);
@@ -240,7 +266,11 @@ export function compileSearchRuntimeLiveFeatureJoinV1(input: {
       continue;
     }
 
-    if (packet.packet_key && packet.packet_key !== profile.packetKey) {
+    if (!packet.packet_key?.trim()) {
+      rejections.push({ chunkRowId: packet.chunk_id, packetKey: profile.packetKey, code: 'RUNTIME_PACKET_IDENTITY_MISSING' });
+      continue;
+    }
+    if (packet.packet_key !== profile.packetKey) {
       rejections.push({
         chunkRowId: packet.chunk_id,
         packetKey: packet.packet_key,
@@ -249,7 +279,11 @@ export function compileSearchRuntimeLiveFeatureJoinV1(input: {
       });
       continue;
     }
-    if (packet.source_ref && packet.source_ref !== profile.sourceRef) {
+    if (!packet.source_ref?.trim()) {
+      rejections.push({ chunkRowId: packet.chunk_id, packetKey: profile.packetKey, code: 'RUNTIME_SOURCE_REF_MISSING' });
+      continue;
+    }
+    if (packet.source_ref !== profile.sourceRef) {
       rejections.push({
         chunkRowId: packet.chunk_id,
         packetKey: profile.packetKey,
@@ -258,7 +292,11 @@ export function compileSearchRuntimeLiveFeatureJoinV1(input: {
       });
       continue;
     }
-    if (packet.workspace_revision && packet.workspace_revision !== profile.workspaceRevision) {
+    if (!packet.workspace_revision || !String(packet.workspace_revision).trim()) {
+      rejections.push({ chunkRowId: packet.chunk_id, packetKey: profile.packetKey, code: 'RUNTIME_WORKSPACE_REVISION_MISSING' });
+      continue;
+    }
+    if (packet.workspace_revision !== profile.workspaceRevision) {
       rejections.push({
         chunkRowId: packet.chunk_id,
         packetKey: profile.packetKey,
@@ -276,7 +314,11 @@ export function compileSearchRuntimeLiveFeatureJoinV1(input: {
       });
       continue;
     }
-    if (packet.source_revision && packet.source_revision !== profile.sourceRevision) {
+    if (!packet.source_revision?.trim()) {
+      rejections.push({ chunkRowId: packet.chunk_id, packetKey: profile.packetKey, code: 'RUNTIME_SOURCE_REVISION_MISSING' });
+      continue;
+    }
+    if (packet.source_revision !== profile.sourceRevision) {
       rejections.push({
         chunkRowId: packet.chunk_id,
         packetKey: profile.packetKey,

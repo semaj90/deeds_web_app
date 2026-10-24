@@ -23,7 +23,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { HermesMastraOrchestrator } from '$lib/server/ace/hermes-mastra-orchestrator.js';
+import { refuseVerifiedContextV1, type VerifiedContextServiceV1 } from '$lib/server/atlas/execution/verified-context-service-v1.js';
 
 const requestSchema = z.object({
   query: z.string().min(1).max(4000),
@@ -40,24 +40,48 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   try {
     const body = await request.json();
-    const { query, intent, fileContext, caseId, sessionId } = requestSchema.parse(body);
+    const { query } = requestSchema.parse(body);
+    const requestId = globalThis.crypto.randomUUID();
+    const verifiedContextService = (locals as typeof locals & { verifiedContextService?: VerifiedContextServiceV1 }).verifiedContextService;
+    const context = verifiedContextService
+      ? await verifiedContextService.execute(locals.user.id, { requestId, query, topK: 5 })
+      : refuseVerifiedContextV1(requestId, 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED', 'SERVICE_CONFIGURATION');
 
-    // Orchestrate via Hermes (Mastra planner → MCP tools → Gemma4 fallback)
-    const result = await HermesMastraOrchestrator.orchestrate({
-      query,
-      intent: intent as any,
-      fileContext,
-      caseId,
-      sessionId,
-      userId: locals.user.id,
-    });
+    if (context.status === 'REFUSED') {
+      return json({
+        status: 'refused',
+        query,
+        requestId: context.requestId,
+        refusalCode: context.refusalCode,
+        firstFailingBoundary: context.firstFailingBoundary,
+        receipt: context.receipt,
+        canonicalAuthority: false,
+        writesPerformed: false,
+      }, { status: 409 });
+    }
 
+    const packetHydrationRefusal = refuseVerifiedContextV1(
+      requestId,
+      'VERIFIED_CONTEXT_PACKET_HYDRATOR_NOT_CONFIGURED',
+      'PACKET_HYDRATION',
+      {
+        contextPacketRef: context.contextPacketRef,
+        contextPacketDigest: context.contextPacketDigest,
+        contextManifestChecksum: context.contextManifestChecksum,
+        promptPlanChecksum: context.promptPlanChecksum,
+      },
+    );
     return json({
-      status: 'ok',
+      status: 'refused',
       query,
-      intent: intent || 'auto',
-      ...result,
-    });
+      requestId: packetHydrationRefusal.requestId,
+      refusalCode: packetHydrationRefusal.refusalCode,
+      firstFailingBoundary: packetHydrationRefusal.firstFailingBoundary,
+      receipt: packetHydrationRefusal.receipt,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    }, { status: 409 });
+
   } catch (err) {
     const message = err instanceof z.ZodError ? 'Invalid request' : err instanceof Error ? err.message : 'Internal error';
     return error(err instanceof z.ZodError ? 400 : 500, message);

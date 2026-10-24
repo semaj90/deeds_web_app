@@ -1,0 +1,23 @@
+# OMR-OTEL-01 local trace store. All ports bound to 127.0.0.1; no volume holds Atlas data.
+# Start: docker compose -f docker/otel-trace/docker-compose.yml up -d
+# Stop:  docker compose -f docker/otel-trace/docker-compose.yml down   (no -v)
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.64.0
+    ports:
+      - "127.0.0.1:16686:16686"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.118.0
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
+    depends_on:
+      - jaeger
+    restart: unless-stopped

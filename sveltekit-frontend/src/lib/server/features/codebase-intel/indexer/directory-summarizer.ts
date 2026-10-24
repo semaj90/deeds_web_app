@@ -11,6 +11,7 @@
 
 import { pool, db } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { getRedis } from '$lib/server/redis.js';
 
@@ -108,34 +109,15 @@ function extractRagTags(summary: string | DirRagSummary | null | undefined): str
 // ── Karpathy-wiki helpers (CouchDB + Redis) ───────────────────────────────────
 
 const COUCHDB_DB  = 'karpathy_wiki';
-const COUCHDB_URL = () => ENV.COUCHDB_URL;
 const REDIS_TTL   = 86_400; // 24h
 
-function parseCouchUrl(rawUrl: string): { baseUrl: string; authHeader: Record<string, string> } {
-  try {
-    const url = new URL(rawUrl);
-    const authHeader: Record<string, string> = {};
-
-    if (url.username) {
-      authHeader.Authorization =
-        'Basic ' + Buffer.from(`${decodeURIComponent(url.username)}:${decodeURIComponent(url.password)}`).toString('base64');
-      url.username = '';
-      url.password = '';
-    }
-
-    return { baseUrl: url.toString().replace(/\/$/, ''), authHeader };
-  } catch {
-    return { baseUrl: rawUrl.replace(/\/$/, ''), authHeader: {} };
-  }
-}
-
 async function upsertWikiNote(id: string, doc: Record<string, unknown>): Promise<void> {
-  const { baseUrl, authHeader } = parseCouchUrl(COUCHDB_URL());
-  const base = `${baseUrl}/${COUCHDB_DB}/${encodeURIComponent(id)}`;
+  const couchDb = resolveCouchDbConfigV1(process.env);
+  const base = `${couchDb.baseUrl}/${COUCHDB_DB}/${encodeURIComponent(id)}`;
   // Fetch existing _rev so we can update
   let rev: string | undefined;
   try {
-    const check = await fetch(base, { headers: { Accept: 'application/json', ...authHeader } });
+    const check = await fetch(base, { headers: { Accept: 'application/json', Authorization: couchDb.authorization } });
     if (check.ok) {
       const existing = await check.json() as { _rev?: string };
       rev = existing._rev;
@@ -145,7 +127,7 @@ async function upsertWikiNote(id: string, doc: Record<string, unknown>): Promise
   const body = rev ? { ...doc, _rev: rev } : doc;
   await fetch(base, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...authHeader },
+    headers: { 'Content-Type': 'application/json', Authorization: couchDb.authorization },
     body: JSON.stringify(body),
   });
 

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { createHyperedgeV1 } from '../../graph/hyperedge-contract.js';
 import { EvidenceLocatorV1Schema } from '../contracts/evidence-locator-v1.js';
+import { buildLexicalInputProof, sha256Utf8 } from '../contracts/lexical-input-proof-v1.js';
+import { spanChecksumOf } from '../execution/topk-evidence-fetch-v1.js';
 import { CandidateFeatureRowV1Schema } from '../features/candidate-feature-row-v1.js';
 import { buildRouteMaskV1, routeHammingDistanceV1 } from '../routing/route-mask-v1.js';
 import { decodeCandidateFiberLineageV1 } from './candidate-fiber-viterbi-adapter-v1.js';
@@ -14,6 +16,7 @@ describe('Parent Atlas Aug-16 integration boundaries', () => {
       candidateOrdinal: 7,
       canonicalId: 'symbol:auth.verify',
       packetKey: 'packet:7',
+      sourceRef: 'src/auth.ts#verify',
       treeNodeId: 'tree:7',
       symbolVersionId: 'symbol-version:7',
       workspaceRevision: 'ws:1',
@@ -21,6 +24,18 @@ describe('Parent Atlas Aug-16 integration boundaries', () => {
       graphRevision: 'graph:1',
       semanticRevision: 'semantic:1',
       featureRevision: 'feature:1',
+      representationBindings: [{
+        representationId: 'semantic_768',
+        family: 'EMBEDDINGGEMMA_MRL',
+        dimensions: 768,
+        modelRevision: 'embeddinggemma:test:v1',
+        projectionKind: 'NONE',
+        sourceRepresentationId: null,
+        projectionRevision: null,
+        normalized: true,
+        available: true,
+        availabilityReason: null,
+      }],
       semanticRelevance: 0.91,
       lexicalRelevance: 0.72,
       astAffinity: 0.83,
@@ -46,7 +61,7 @@ describe('Parent Atlas Aug-16 integration boundaries', () => {
       sourceKind: 'code_file',
       filePath: 'src/auth.ts',
       sourceUrl: null,
-      contentHash: 'sha256:fixture',
+      contentHash: `sha256:${sha256Utf8('fixture source')}`,
       workspaceRevision: 'ws:1',
       sourceRevision: 'src:1',
       span: { startByte: 10, endByte: 42 },
@@ -56,7 +71,80 @@ describe('Parent Atlas Aug-16 integration boundaries', () => {
     const row = promoteCandidateFeatureRowV1({
       candidate,
       locator,
-      pagerank: { pagerank_l1: 0.61 },
+      semanticEvidence: {
+        packetKey: candidate.packetKey!,
+        canonicalId: candidate.canonicalId,
+        sourceRef: candidate.sourceRef!,
+        workspaceRevision: candidate.workspaceRevision,
+        sourceRevision: candidate.sourceRevision,
+        queryRecipe: {
+          representationId: 'semantic_768', representationRevision: candidate.semanticRevision!,
+          modelArtifactRevision: 'embeddinggemma:test:v1', tokenizerRevision: 'tokenizer:test:v1',
+          inputPolicyRevision: 'input-policy:test:v1', promptRevision: 'prompt:test:v1', mode: 'retrieval_query',
+          dimension: 768, metric: 'COSINE', normalization: 'L2', inputChecksum: 'a'.repeat(64),
+        },
+        documentRecipe: {
+          representationId: 'semantic_768', representationRevision: candidate.semanticRevision!,
+          modelArtifactRevision: 'embeddinggemma:test:v1', tokenizerRevision: 'tokenizer:test:v1',
+          inputPolicyRevision: 'input-policy:test:v1', promptRevision: 'prompt:test:v1', mode: 'retrieval_document',
+          dimension: 768, metric: 'COSINE', normalization: 'L2', inputChecksum: 'b'.repeat(64),
+        },
+      },
+      lexicalEvidence: buildLexicalInputProof({
+        packetKey: candidate.packetKey!,
+        sourceRef: candidate.sourceRef!,
+        content: 'fixture source',
+        declaredContentHash: sha256Utf8('fixture source'),
+        sourceRevision: candidate.sourceRevision,
+        workspaceRevision: candidate.workspaceRevision,
+        sourceRevisionProven: true,
+        workspaceRevisionCurrent: true,
+        canonicalBindingExact: true,
+        tokenizerRevision: 'tokenizer:test:v1',
+        lexicalDerivationRevision: 'lexical:test:v1',
+        textSearchConfig: 'english',
+      }),
+      astEvidence: {
+        treeNodeId: candidate.treeNodeId!,
+        symbolVersionId: candidate.symbolVersionId!,
+        canonicalId: candidate.canonicalId,
+        packetKey: candidate.packetKey!,
+        sourceRef: candidate.sourceRef!,
+        sourceRevision: candidate.sourceRevision,
+        workspaceRevision: candidate.workspaceRevision,
+        sourceContentHash: sha256Utf8('fixture source'),
+        startByte: 10,
+        endByte: 42,
+        sourceEvidence: (() => {
+          const byteStart = 0;
+          const byteEnd = 50;
+          const text = 'x'.repeat(byteEnd - byteStart);
+          return {
+            schema: 'atlas.qualified-evidence.v1' as const,
+            qualification: 'QUALIFIED' as const,
+            rank: 1,
+            ordinal: candidate.candidateOrdinal,
+            canonicalId: candidate.canonicalId,
+            sourceRef: candidate.sourceRef!,
+            sourceRevision: candidate.sourceRevision,
+            spanUnit: 'bytes' as const,
+            spanStart: byteStart,
+            spanEnd: byteEnd,
+            byteStart,
+            byteEnd,
+            text,
+            spanChecksum: spanChecksumOf({ sourceRevision: candidate.sourceRevision, byteStart, byteEnd, text }),
+            evidenceRefs: ['source-evidence:fixture'],
+            canonicalAuthority: false as const,
+          };
+        })(),
+      },
+      pagerank: {
+        pagerank_l1: 0.61,
+        graphRevision: candidate.graphRevision,
+        status: 'promoted',
+        didConverge: true,
+      },
       rrf: 0.8,
       freshness: 0.9,
     });

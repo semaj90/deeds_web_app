@@ -1,0 +1,29 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 12,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "engineering-acquisition-v1-78658fb885939f7b",
+  "page_count": 2,
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "bf7067f13b013252758f8943bc3dd4d4f7806a0343635e365d7829f6513de6c0",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 12,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\pg18-indexing-20261024\\postgresql-18-multicolumn\\chunks.jsonl",
+      "page_receipt_checksum": "db7c1871dcba46ba7363ae215494def9552de8db3f164f08ca2775342f59b526",
+      "pages": 2,
+      "source_id": "postgresql-18-multicolumn",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

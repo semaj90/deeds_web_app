@@ -2,6 +2,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 
@@ -928,9 +929,8 @@ Return JSON with exactly these fields:
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
         }),
         probe('couchdb', async () => {
-          const base = process.env.COUCHDB_URL ?? 'http://localhost:5984';
-          const auth = Buffer.from(`${process.env.COUCHDB_USER ?? 'admin'}:${process.env.COUCHDB_PASSWORD ?? 'deeds123'}`).toString('base64');
-          const r = await fetch(`${base}/`, { headers: { Authorization: `Basic ${auth}` }, signal: AbortSignal.timeout(4_000) });
+          const { baseUrl, authorization } = resolveCouchDbConfigV1();
+          const r = await fetch(`${baseUrl}/`, { headers: { Authorization: authorization }, signal: AbortSignal.timeout(4_000) });
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
         }),
         probe('seaweedfs', async () => {

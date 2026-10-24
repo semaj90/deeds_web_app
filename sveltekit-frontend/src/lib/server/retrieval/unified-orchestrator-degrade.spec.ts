@@ -13,7 +13,13 @@ vi.mock('./embedding-service.js', () => ({ embedQueryForLane: mocks.embed }));
 vi.mock('$lib/server/search/rg-pool.js', () => ({ getRgPool: () => ({ search: mocks.rgSearch }) }));
 vi.mock('$lib/server/search/create-codebase-search-backend.js', () => ({ createCodebaseSearchBackendFromEnv: () => ({ kind: 'qdrant' }) }));
 vi.mock('node-fetch', () => ({ default: mocks.fetch }));
-vi.mock('$lib/server/db/client', () => ({ pool: { query: (...args: unknown[]) => mocks.pgQuery(...args) } }));
+vi.mock('$lib/server/db/client', () => ({
+  pool: {
+    query: (...args: unknown[]) => mocks.pgQuery(...args),
+    // The pgvector executor runs BEGIN / SET LOCAL / query / COMMIT on one checked-out client.
+    connect: async () => ({ query: (...args: unknown[]) => mocks.pgQuery(...args), release() {} }),
+  },
+}));
 vi.mock('pg', () => ({ Pool: class { query = mocks.pgQuery; end = () => Promise.resolve(); on = () => this; connect = () => Promise.resolve({ release() {} }); } }));
 vi.mock('./parent-atlas-bridge.js', () => ({
   resolveParentAtlasContext: vi.fn(),
@@ -176,20 +182,20 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
   });
 
   it('attaches workspaceRevision only through an exact binding at the admitted workspace; the query binds the admitted revision as a parameter', async () => {
-    process.env.ATLAS_ADMITTED_WORKSPACE_REVISION = 'sha256:ws-admitted';
+    process.env.ATLAS_ADMITTED_WORKSPACE_REVISION = 'sha256:abababababababababababababababababababababababababababababababab';
     try {
-      wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:srcrev', lineage_evidence_refs: ['chunk:c1'], binding_workspace_revision: 'sha256:ws-admitted', binding_source_revision: 'sha256:srcrev' }] });
+      wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:srcrev', lineage_evidence_refs: ['chunk:c1'], binding_workspace_revision: 'sha256:abababababababababababababababababababababababababababababababab', binding_source_revision: 'sha256:srcrev' }] });
       const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
-      expect(r.candidates[0].identity).toMatchObject({ workspaceRevision: 'sha256:ws-admitted', sourceRevision: 'sha256:srcrev', revisionBinding: 'EXACT_BINDING' });
+      expect(r.candidates[0].identity).toMatchObject({ workspaceRevision: 'sha256:abababababababababababababababababababababababababababababababab', sourceRevision: 'sha256:srcrev', revisionBinding: 'EXACT_BINDING' });
       expect(r.candidates[0].identity.missingFields).toEqual([]);
       const call = mocks.pgQuery.mock.calls.find((c) => /atlas_workspace_source_bindings/.test(String(c[0])))!;
       expect(String(call[0])).toMatch(/b.content_digest = t.file_content_hash/);
-      expect(call[1][3]).toBe('sha256:ws-admitted');
+      expect(call[1][3]).toBe('sha256:abababababababababababababababababababababababababababababababab');
     } finally { delete process.env.ATLAS_ADMITTED_WORKSPACE_REVISION; }
   });
 
   it('attaches NO revision when the bridge and the binding disagree on source_revision (conflict, never a pick)', async () => {
-    wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:A', binding_workspace_revision: 'sha256:ws-admitted', binding_source_revision: 'sha256:B' }] });
+    wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:A', binding_workspace_revision: 'sha256:abababababababababababababababababababababababababababababababab', binding_source_revision: 'sha256:B' }] });
     const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
     expect(r.candidates[0].identity).toMatchObject({ sourceRevision: null, workspaceRevision: null, revisionBinding: 'REVISION_CONFLICT' });
     expect(r.candidates[0].identity.missingFields).toEqual(expect.arrayContaining(['sourceRevision', 'workspaceRevision']));
@@ -208,7 +214,8 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
     expect(r.lanes?.semantic).toMatchObject({ status: 'UNAVAILABLE', reason: 'SEMANTIC_SEARCH_FAILED' });
     wirePg();
     await executeUnifiedRetrieval({ query: 'find a' }, config);
-    for (const [sql] of mocks.pgQuery.mock.calls) { expect(String(sql)).toMatch(/^\s*(WITH|SELECT)/i); expect(String(sql)).not.toMatch(/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)\b/i); }
+    // Transaction control is allowed (the read path runs BEGIN READ ONLY); data statements must be SELECT/WITH and never DML/DDL.
+    for (const [sql] of mocks.pgQuery.mock.calls) { expect(String(sql)).toMatch(/^\s*(BEGIN READ ONLY|SET LOCAL|COMMIT|ROLLBACK|WITH|SELECT)/i); expect(String(sql)).not.toMatch(/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)\b/i); }
   });
 
   it('fails the lane instead of silently dropping a filter it cannot apply', async () => {

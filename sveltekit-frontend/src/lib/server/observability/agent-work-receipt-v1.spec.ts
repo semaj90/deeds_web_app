@@ -46,4 +46,22 @@ describe('AgentWorkReceiptV1', () => {
     });
     expect(replay).toBe(first);
   });
+
+  it('validates optional AgentCorrelationV1 structure', () => {
+    const withCorr = {
+      ...base,
+      correlation: {
+        schema: 'atlas.agent-correlation.v1' as const,
+        requestId: 'req-12345',
+        runId: 'run-1',
+        traceId: 'trace-abcdef1234567890',
+        contextManifestDigest: null,
+        packetReceiptDigest: 'sha256:' + 'a'.repeat(64),
+        correlationStatus: 'VERIFIED' as const,
+      },
+    };
+    const parsed = AgentWorkReceiptV1Schema.parse(withCorr);
+    expect(parsed.correlation?.correlationStatus).toBe('VERIFIED');
+    expect(parsed.correlation?.traceId).toBe('trace-abcdef1234567890');
+  });
 });

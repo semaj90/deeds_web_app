@@ -1,11 +1,19 @@
 {
   "schema": "atlas.centroid-cache-families.v1",
-  "generatedAt": "2026-09-18T16:49:38.940Z",
+  "generatedAt": "2026-10-24T00:26:27.282Z",
   "readOnly": true,
   "writesPerformed": false,
   "canonicalAuthority": false,
   "redisUrl": "redis://:***@127.0.0.1:6379",
   "families": {
+    "atlas:centroid:v1:*": {
+      "keyCount": 0,
+      "sample": []
+    },
+    "atlas:centroid:*": {
+      "keyCount": 0,
+      "sample": []
+    },
     "centroid:*": {
       "keyCount": 0,
       "sample": []

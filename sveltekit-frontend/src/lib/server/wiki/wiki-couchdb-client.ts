@@ -1,5 +1,5 @@
 import type { WikiCard, WikiGap, GapReport } from './types.js';
-import { ENV } from '$lib/server/env.server.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // wiki-couchdb-client.ts
@@ -8,21 +8,15 @@ import { ENV } from '$lib/server/env.server.js';
 // CouchDB = human-readable wiki documents layer.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const COUCHDB_URL = ENV.COUCHDB_URL;
-const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = process.env.COUCHDB_PASS ?? 'password';
 const WIKI_DB = process.env.COUCHDB_WIKI_DB ?? 'wiki';
 
-function authHeader(): string {
-	return 'Basic ' + Buffer.from(`${COUCHDB_USER}:${COUCHDB_PASS}`).toString('base64');
-}
-
 async function couchFetch(path: string, init: RequestInit = {}): Promise<Response> {
-	return fetch(`${COUCHDB_URL}${path}`, {
+	const couchDb = resolveCouchDbConfigV1(process.env);
+	return fetch(`${couchDb.baseUrl}${path}`, {
 		...init,
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: authHeader(),
+			Authorization: couchDb.authorization,
 			...(init.headers as Record<string, string> | undefined),
 		},
 	});

@@ -29,6 +29,7 @@ import {
   atlasValidateChangeTool,
   atlasApplyChangeTool,
   atlasBuildContextTool,
+  atlasVerifiedContextTool,
   atlasDiscoverTool,
   atlasInspectRuntimeTool,
   createAtlasRequestContext,
@@ -98,6 +99,7 @@ export const atlasRetrievalWorkflow = defineWorkflow({
     atlasRetrieveTool,
     atlasValidateChangeTool,
     atlasBuildContextTool,
+    atlasVerifiedContextTool,
     atlasInspectRuntimeTool,
   ],
 

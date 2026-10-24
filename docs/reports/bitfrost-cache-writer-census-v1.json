@@ -1,6 +1,6 @@
 {
   "schema": "atlas.bitfrost-cache-writer-census.v1",
-  "generatedAt": "2026-09-20T23:34:21.889Z",
+  "generatedAt": "2026-10-23T23:30:40.320Z",
   "mode": "READ_ONLY_STATIC_SOURCE_CENSUS",
   "scope": {
     "roots": [
@@ -8,7 +8,7 @@
       "sveltekit-frontend/src",
       "sveltekit-frontend/scripts"
     ],
-    "filesScanned": 11428
+    "filesScanned": 13627
   },
   "canonicalBuilder": "sveltekit-frontend/src/lib/server/cache-keys.ts",
   "policy": {
@@ -18,28 +18,28 @@
     "noCacheOrDatabaseWrites": true
   },
   "summary": {
-    "occurrences": 4829,
-    "writers": 969,
-    "readers": 1089,
-    "runtimeWriters": 184,
-    "scriptWriters": 785,
-    "writersUsingCanonicalBuilder": 25,
-    "writersWithoutCanonicalBuilder": 944
+    "occurrences": 5434,
+    "writers": 1029,
+    "readers": 1139,
+    "runtimeWriters": 208,
+    "scriptWriters": 821,
+    "writersUsingCanonicalBuilder": 24,
+    "writersWithoutCanonicalBuilder": 1005
   },
   "byPrefix": {
     "bifrost:": {
-      "occurrences": 458,
-      "writers": 127,
-      "readers": 143
+      "occurrences": 467,
+      "writers": 126,
+      "readers": 144
     },
     "bitfrost:": {
-      "occurrences": 339,
-      "writers": 145,
-      "readers": 87
+      "occurrences": 360,
+      "writers": 148,
+      "readers": 88
     },
     "centroid:": {
-      "occurrences": 319,
-      "writers": 76,
+      "occurrences": 363,
+      "writers": 79,
       "readers": 96
     },
     "taxonomy:clusters:": {
@@ -48,19 +48,19 @@
       "readers": 6
     },
     "atlas:centroid:": {
-      "occurrences": 42,
-      "writers": 6,
+      "occurrences": 53,
+      "writers": 7,
       "readers": 3
     },
     "ace:": {
-      "occurrences": 2862,
-      "writers": 479,
-      "readers": 507
+      "occurrences": 3323,
+      "writers": 531,
+      "readers": 546
     },
     "gpu:": {
-      "occurrences": 786,
-      "writers": 131,
-      "readers": 247
+      "occurrences": 845,
+      "writers": 133,
+      "readers": 256
     }
   },
   "writerCensus": [
@@ -355,7 +355,41 @@
     },
     {
       "file": "scripts/atlas/ace-packet-assembly.mjs",
-      "line": 286,
+      "line": 33,
+      "function": "DEPRECATED",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "existsSync",
+        "TTL.",
+        "exit(78"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/ace-packet-assembly.mjs",
+      "line": 33,
+      "function": "DEPRECATED",
+      "prefix": "bitfrost:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "existsSync",
+        "TTL.",
+        "exit(78"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/ace-packet-assembly.mjs",
+      "line": 294,
       "function": "for",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -374,7 +408,7 @@
     },
     {
       "file": "scripts/atlas/ace-packet-assembly.mjs",
-      "line": 286,
+      "line": 294,
       "function": "for",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -436,6 +470,19 @@
         "extractKeywords(text",
         "extractRoutes(text"
       ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-ast-source-authority-v1.mjs",
+      "line": 63,
+      "function": "push",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
@@ -864,6 +911,51 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts",
+      "line": 53,
+      "function": "bump",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "examples[name] ??= []",
+        "examples[name].push(sample",
+        "EXECUTION'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-qdrant-v2-admitted-mirror-census-v1.mjs",
+      "line": 302,
+      "function": "Date",
+      "prefix": "gpu:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs",
+      "line": 241,
+      "function": "Date",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex.content_embedding_768'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/audit-workspace-snapshot-namespace-dedup-v1.mts",
       "line": 68,
       "function": "digest",
@@ -894,7 +986,7 @@
     },
     {
       "file": "scripts/atlas/backfill-latent-vectors.mjs",
-      "line": 871,
+      "line": 867,
       "function": "setex",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -928,7 +1020,7 @@
     },
     {
       "file": "scripts/atlas/backfill-packet-metadata-to-postgres.mjs",
-      "line": 685,
+      "line": 690,
       "function": "setex",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -1033,7 +1125,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 133,
+      "line": 135,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -1050,7 +1142,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 146,
+      "line": 148,
       "function": "zadd",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -1067,7 +1159,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 151,
+      "line": 153,
       "function": "sadd",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -1084,7 +1176,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 152,
+      "line": 154,
       "function": "expire",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -1101,7 +1193,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 157,
+      "line": 159,
       "function": "sadd",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -1118,7 +1210,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 158,
+      "line": 160,
       "function": "expire",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -1135,41 +1227,41 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 162,
-      "function": "hset",
-      "prefix": "bifrost:",
-      "operation": "WRITE",
-      "payloadShape": [],
-      "ttlEvidence": [
-        "ex updates",
-        "expire(`bifrost:${dirHash}`",
-        "TTL_SECONDS"
-      ],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 163,
-      "function": "hset",
-      "prefix": "bifrost:",
-      "operation": "WRITE",
-      "payloadShape": [],
-      "ttlEvidence": [
-        "ex updates",
-        "expire(`bifrost:${dirHash}`",
-        "TTL_SECONDS"
-      ],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
       "line": 164,
+      "function": "hset",
+      "prefix": "bifrost:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex updates",
+        "expire(`bifrost:${dirHash}`",
+        "TTL_SECONDS"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
+      "line": 165,
+      "function": "hset",
+      "prefix": "bifrost:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex updates",
+        "expire(`bifrost:${dirHash}`",
+        "TTL_SECONDS"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
+      "line": 166,
       "function": "expire",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -1186,7 +1278,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 306,
+      "line": 308,
       "function": "log",
       "prefix": "bifrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -1201,7 +1293,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 307,
+      "line": 309,
       "function": "keys",
       "prefix": "bifrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -1313,6 +1405,19 @@
         "ext_assembly'",
         "ext':    'ace.context_assembly'"
       ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/build-feature-identity-review-manifest-v2.mjs",
+      "line": 38,
+      "function": "push",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
@@ -1753,6 +1858,21 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/build-unknown-resolution-set-v1.mts",
+      "line": 60,
+      "function": "sha",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [
+        "JSON.stringify({ builder: 'build-unknown-resolution-set-v1', upstream: fr.producerRevision, namespace: UNKNOWN_RESOLUTION_NAMESPACE_V1, script: sha(fs.readFileSync(fileURLToPath(import.meta.url))) }));"
+      ],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/cache-feature-cards.mjs",
       "line": 196,
       "function": "for",
@@ -2008,7 +2128,7 @@
     },
     {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 471,
+      "line": 475,
       "function": "if",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2027,7 +2147,7 @@
     },
     {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 471,
+      "line": 475,
       "function": "if",
       "prefix": "taxonomy:clusters:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2046,7 +2166,7 @@
     },
     {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 520,
+      "line": 524,
       "function": "setex",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -2066,7 +2186,7 @@
     },
     {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 523,
+      "line": 527,
       "function": "setex",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -2086,7 +2206,7 @@
     },
     {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 544,
+      "line": 548,
       "function": "zadd",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -2104,7 +2224,7 @@
     },
     {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 547,
+      "line": 551,
       "function": "setex",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -2181,6 +2301,26 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/extract-route-ast-nodes-v2-dry-run-v1.mts",
+      "line": 194,
+      "function": "Number",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [
+        "JSON.stringify(receipt)).digest('hex');",
+        "JSON.stringify({ ...receipt, receiptChecksum }, null, 2), { flag: 'wx' });"
+      ],
+      "ttlEvidence": [
+        "extraction-dry-run.v1'",
+        "ex'",
+        "extraction-dry-run-${crypto.randomUUID("
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/feature-labels-to-atlas-feature-map.mjs",
       "line": 77,
       "function": "toLowerCase",
@@ -2188,6 +2328,53 @@
       "operation": "WRITE",
       "payloadShape": [],
       "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/freeze-pkt-lineage-current-single-chunk-v1.mjs",
+      "line": 62,
+      "function": "end",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/freeze-symbol-revision-placeholder-repair-manifest-v1.mjs",
+      "line": 33,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex'",
+        "exit(2",
+        "ext[]"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/freeze-symbol-revision-repair-manifest-v1.mjs",
+      "line": 42,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exit(2",
+        "EXACT_REPAIR version population directly",
+        "exact provenance under the admitted workspace revision"
+      ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
@@ -2221,6 +2408,26 @@
         "EX'",
         "TTL_24H",
         "TTL 24h"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/generate-recovery-templates.mjs",
+      "line": 156,
+      "function": "if",
+      "prefix": "bifrost:",
+      "operation": "WRITE",
+      "payloadShape": [
+        "JSON.stringify(payload), 'EX', CACHE_TTL);",
+        "JSON.stringify(activePayload), 'EX', CACHE_TTL);"
+      ],
+      "ttlEvidence": [
+        "EX'",
+        "TTL",
+        "EX'"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -2439,7 +2646,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1002,
+      "line": 1023,
       "function": "for",
       "prefix": "atlas:centroid:",
       "operation": "WRITE",
@@ -2457,7 +2664,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1002,
+      "line": 1023,
       "function": "for",
       "prefix": "centroid:",
       "operation": "WRITE",
@@ -2475,7 +2682,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1015,
+      "line": 1036,
       "function": "for",
       "prefix": "atlas:centroid:",
       "operation": "WRITE",
@@ -2493,7 +2700,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1015,
+      "line": 1036,
       "function": "for",
       "prefix": "centroid:",
       "operation": "WRITE",
@@ -2511,7 +2718,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1021,
+      "line": 1042,
       "function": "log",
       "prefix": "atlas:centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2529,7 +2736,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1021,
+      "line": 1042,
       "function": "log",
       "prefix": "centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2547,7 +2754,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1022,
+      "line": 1043,
       "function": "log",
       "prefix": "atlas:centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2565,7 +2772,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1022,
+      "line": 1043,
       "function": "log",
       "prefix": "centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2583,7 +2790,7 @@
     },
     {
       "file": "scripts/atlas/ingest-couchdb-mapreduce.mjs",
-      "line": 172,
+      "line": 170,
       "function": "workspaceForPath",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -2758,7 +2965,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 907,
+      "line": 915,
       "function": "warn",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -2771,7 +2978,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 918,
+      "line": 926,
       "function": "del",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -2790,7 +2997,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 920,
+      "line": 928,
       "function": "hset",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2809,7 +3016,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 922,
+      "line": 930,
       "function": "expire",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2828,7 +3035,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 926,
+      "line": 934,
       "function": "del",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2847,7 +3054,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 930,
+      "line": 938,
       "function": "setex",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2864,7 +3071,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 931,
+      "line": 939,
       "function": "zadd",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -2881,7 +3088,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 937,
+      "line": 945,
       "function": "expire",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -2898,7 +3105,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 942,
+      "line": 950,
       "function": "encoded",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -2915,7 +3122,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 945,
+      "line": 953,
       "function": "del",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -2934,7 +3141,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 947,
+      "line": 955,
       "function": "hset",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -2953,7 +3160,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 949,
+      "line": 957,
       "function": "expire",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -2972,7 +3179,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 953,
+      "line": 961,
       "function": "setex",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -3036,6 +3243,38 @@
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/lib/valkey-centroid-cache-v1.test.mjs",
+      "line": 31,
+      "function": "match",
+      "prefix": "atlas:centroid:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex",
+        "ttl"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/lib/valkey-centroid-cache-v1.test.mjs",
+      "line": 31,
+      "function": "match",
+      "prefix": "centroid:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex",
+        "ttl"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
       "activeCandidate": false
     },
     {
@@ -3377,6 +3616,21 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "line": 61,
+      "function": "Error",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "explicit --limit=N'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/materialize-nes-packets.mjs",
       "line": 104,
       "function": "setex",
@@ -3410,6 +3664,21 @@
         "TTL  = 3600; // 1h",
         "setex(`ace:packet:${packetKey}`",
         "TTL"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/materialize-observation-feature-rows.mjs",
+      "line": 131,
+      "function": "Boolean",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exit(1"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -3512,6 +3781,19 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/packet-key-id-update-plan-v1.test.mjs",
+      "line": 43,
+      "function": "plan",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/patch-neschrom97-qdrant-tags.mjs",
       "line": 286,
       "function": "Set",
@@ -3590,7 +3872,7 @@
     },
     {
       "file": "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs",
-      "line": 242,
+      "line": 245,
       "function": "redisUpsert",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -3609,7 +3891,7 @@
     },
     {
       "file": "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs",
-      "line": 243,
+      "line": 246,
       "function": "redisUpsert",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -3628,7 +3910,7 @@
     },
     {
       "file": "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs",
-      "line": 245,
+      "line": 248,
       "function": "multi",
       "prefix": "centroid:",
       "operation": "WRITE",
@@ -3743,82 +4025,6 @@
         "TTL (604800 seconds",
         "setex(centroidKey",
         "TTL"
-      ],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
-      "line": 1227,
-      "function": "stringify",
-      "prefix": "ace:",
-      "operation": "WRITE",
-      "payloadShape": [
-        "JSON.stringify(packetJson);"
-      ],
-      "ttlEvidence": [
-        "EX: 1800 }",
-        "EX: 1800 }",
-        "EX: 1800 }"
-      ],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
-      "line": 1228,
-      "function": "stringify",
-      "prefix": "bifrost:",
-      "operation": "WRITE",
-      "payloadShape": [
-        "JSON.stringify(packetJson);"
-      ],
-      "ttlEvidence": [
-        "EX: 1800 }",
-        "EX: 1800 }",
-        "EX: 1800 }"
-      ],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
-      "line": 1231,
-      "function": "set",
-      "prefix": "ace:",
-      "operation": "WRITE",
-      "payloadShape": [
-        "JSON.stringify(packetJson);"
-      ],
-      "ttlEvidence": [
-        "EX: 1800 }",
-        "EX: 1800 }",
-        "EX: 1800 }"
-      ],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
-      "line": 1232,
-      "function": "set",
-      "prefix": "bifrost:",
-      "operation": "WRITE",
-      "payloadShape": [
-        "JSON.stringify(packetJson);"
-      ],
-      "ttlEvidence": [
-        "EX: 1800 }",
-        "EX: 1800 }",
-        "EX: 1800 }"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -4397,6 +4603,53 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/plan-symbol-revision-placeholder-repair-preview-v1.mjs",
+      "line": 102,
+      "function": "filter",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exCount = versionRowsRaw.filter((r",
+        "EXPECTED = { versionsTotal: 479",
+        "exCount: 85"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/plan-symbol-revision-repair-preview-v1.mjs",
+      "line": 58,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext[]"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/plan-symbol-revision-repair-preview-v1.mjs",
+      "line": 59,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext[]"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/plan-tree-bound-symbol-registry-reconciliation-v1.mjs",
       "line": 53,
       "function": "if",
@@ -4616,6 +4869,23 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "line": 84,
+      "function": "error",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "explicit --limit=N — canonical identity writes are always bounded here.'",
+        "exit(1",
+        "exit(1"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/promote-pagerank-authority-from-neo4j.mjs",
       "line": 364,
       "function": "String",
@@ -4703,6 +4973,32 @@
       "ttlEvidence": [
         "ext from gpu_cluster_centroids\""
       ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/prove-workspace-event-fenced-race-v1.mts",
+      "line": 220,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/prove-workspace-event-fenced-race-v1.mts",
+      "line": 223,
+      "function": "release",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
@@ -4822,6 +5118,120 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/rank-open-tasks-v1.mjs",
+      "line": 20,
+      "function": "Set",
+      "prefix": "centroid:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "export const RANK_SCHEMA = 'atlas.open-task-ranking.v1';",
+        "export const TASK_CARD_RANK_SCHEMA = 'atlas.openspec-task-card-ranking.v1';",
+        "extract|taxonom|ontolog|classif/i"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 71,
+      "function": "text",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext(payload.source_ref",
+        "ext(payload.chunk_id"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 74,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext(payload.source_ref",
+        "ext(payload.chunk_id"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 87,
+      "function": "startsWith",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 88,
+      "function": "slice",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 90,
+      "function": "slice",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 383,
+      "function": "startsWith",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 387,
+      "function": "slice",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/regenerate-multihop-with-enrichment.mjs",
       "line": 149,
       "function": "hgetall",
@@ -4836,13 +5246,13 @@
     },
     {
       "file": "scripts/atlas/register-orphaned-chunks.mjs",
-      "line": 515,
+      "line": 620,
       "function": "set",
       "prefix": "ace:",
       "operation": "WRITE",
       "payloadShape": [],
       "ttlEvidence": [
-        "execution_files' : (CAPTURE_LINEAGE ? 'graphify_files_legacy_bridge' : null",
+        "execution_file_membership_v2' : (CAPTURE_LINEAGE ? 'graphify_files_legacy_bridge' : null",
         "ExecutionId: GRAPHIFY_SNAPSHOT_RECEIPT?.executionId ?? null"
       ],
       "canonicalBuilderImported": false,
@@ -4861,6 +5271,37 @@
         "existing identity",
         "exist with the old row (UNIQUE includes normalized_node_hash",
         "external dependents (verified"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/repair-symbol-version-workspace-placeholder-v1.mjs",
+      "line": 4,
+      "function": null,
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "existing atlas_source_refs fragment hash",
+        "exact token as argv."
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/repair-symbol-version-workspace-placeholder-v1.mjs",
+      "line": 36,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ExistingPath(ref"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -4888,7 +5329,7 @@
     },
     {
       "file": "scripts/atlas/run-som-on-chunks.mjs",
-      "line": 180,
+      "line": 193,
       "function": "log",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -4907,7 +5348,7 @@
     },
     {
       "file": "scripts/atlas/run-som-on-chunks.mjs",
-      "line": 185,
+      "line": 198,
       "function": "setex",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -5395,7 +5836,7 @@
     },
     {
       "file": "scripts/atlas/summarize-rank-embed-centroids.mjs",
-      "line": 422,
+      "line": 424,
       "function": "if",
       "prefix": "centroid:",
       "operation": "WRITE",
@@ -5412,7 +5853,7 @@
     },
     {
       "file": "scripts/atlas/summarize-rank-embed-centroids.mjs",
-      "line": 478,
+      "line": 480,
       "function": "if",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -5581,8 +6022,37 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/test-reconcile-semantic-768-physical-owner-v1.mjs",
+      "line": 96,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex.content_embedding'",
+        "ex SET content_embedding=$1::halfvec WHERE id=$2;"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/test-reconcile-semantic-768-physical-owner-v1.mjs",
+      "line": 117,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/train-autoencoder-768-64.mjs",
-      "line": 510,
+      "line": 548,
       "function": "hset",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -5595,7 +6065,7 @@
     },
     {
       "file": "scripts/atlas/train-autoencoder-768-64.mjs",
-      "line": 516,
+      "line": 554,
       "function": "hset",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -5608,7 +6078,7 @@
     },
     {
       "file": "scripts/atlas/train-autoencoder-768-64.mjs",
-      "line": 526,
+      "line": 564,
       "function": "xadd",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -5621,7 +6091,7 @@
     },
     {
       "file": "scripts/atlas/train-autoencoder-768-64.mjs",
-      "line": 533,
+      "line": 571,
       "function": "log",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -5758,7 +6228,7 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 124,
+      "line": 134,
       "function": "Date",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -5776,7 +6246,7 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 127,
+      "line": 137,
       "function": "setex",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -5794,8 +6264,8 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 135,
-      "function": "if",
+      "line": 145,
+      "function": "push",
       "prefix": "bitfrost:",
       "operation": "WRITE",
       "payloadShape": [
@@ -5814,7 +6284,7 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 138,
+      "line": 148,
       "function": "setex",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -5832,8 +6302,8 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 146,
-      "function": "if",
+      "line": 156,
+      "function": "push",
       "prefix": "bitfrost:",
       "operation": "WRITE",
       "payloadShape": [
@@ -5852,7 +6322,7 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 149,
+      "line": 159,
       "function": "setex",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -5870,8 +6340,8 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 157,
-      "function": "if",
+      "line": 167,
+      "function": "push",
       "prefix": "bitfrost:",
       "operation": "WRITE",
       "payloadShape": [
@@ -5890,7 +6360,7 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 160,
+      "line": 170,
       "function": "setex",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -5908,8 +6378,8 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 168,
-      "function": "if",
+      "line": 178,
+      "function": "push",
       "prefix": "bitfrost:",
       "operation": "WRITE",
       "payloadShape": [
@@ -5928,7 +6398,7 @@
     },
     {
       "file": "scripts/atlas/warm-bitfrost-agent-cache.mjs",
-      "line": 171,
+      "line": 181,
       "function": "setex",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -6886,7 +7356,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 142,
+      "line": 152,
       "function": "key",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -6903,7 +7373,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 143,
+      "line": 153,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -6920,7 +7390,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 148,
+      "line": 158,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -6937,7 +7407,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 150,
+      "line": 160,
       "function": "zadd",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -6954,7 +7424,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 154,
+      "line": 164,
       "function": "zadd",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -6971,7 +7441,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 160,
+      "line": 170,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -6988,7 +7458,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 180,
+      "line": 190,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -7007,7 +7477,7 @@
     },
     {
       "file": "scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 189,
+      "line": 199,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -7042,7 +7512,7 @@
     },
     {
       "file": "scripts/codebase-semantic-indexer.mjs",
-      "line": 503,
+      "line": 504,
       "function": "cards",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -7059,7 +7529,7 @@
     },
     {
       "file": "scripts/codebase-semantic-indexer.mjs",
-      "line": 510,
+      "line": 511,
       "function": "map",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -7078,7 +7548,7 @@
     },
     {
       "file": "scripts/codebase-semantic-indexer.mjs",
-      "line": 512,
+      "line": 513,
       "function": "hset",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -7095,7 +7565,7 @@
     },
     {
       "file": "scripts/codebase-semantic-indexer.mjs",
-      "line": 525,
+      "line": 526,
       "function": "Date",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -7114,7 +7584,7 @@
     },
     {
       "file": "scripts/codebase-semantic-indexer.mjs",
-      "line": 529,
+      "line": 530,
       "function": "hset",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -8423,6 +8893,21 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/startup/ace-startup-boundary.spec.mjs",
+      "line": 20,
+      "function": "read",
+      "prefix": "bitfrost:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "setex\\(|\\.set\\(/"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/valkey/cache_ace_packet.mjs",
       "line": 23,
       "function": "createHash",
@@ -9412,6 +9897,19 @@
       "ttlEvidence": [
         "exec("
       ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/scripts/atlas/materialize-full-corpus-graph-snapshot-v3.mts",
+      "line": 321,
+      "function": "map",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
@@ -11057,7 +11555,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 103,
+      "line": 114,
       "function": "if",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -11073,7 +11571,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 111,
+      "line": 122,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -11090,7 +11588,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 115,
+      "line": 126,
       "function": "setex",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -11107,7 +11605,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 121,
+      "line": 132,
       "function": "if",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -11124,7 +11622,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 125,
+      "line": 136,
       "function": "zadd",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -11141,7 +11639,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs",
-      "line": 128,
+      "line": 139,
       "function": "if",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -11706,6 +12204,23 @@
       "activeCandidate": false
     },
     {
+      "file": "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs",
+      "line": 1041,
+      "function": "filter",
+      "prefix": "centroid:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext",
+        "exical: []",
+        "extSource: {"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs",
       "line": 398,
       "function": "async",
@@ -12177,6 +12692,27 @@
         "ext7Service } from '$lib/services/context7Service.js'; // --- Added/Modified Type Definitions ---",
         "export interface SourceDocument { pageContent? string : string; content?",
         "export interface ResponseSourceDocument { content: string; similarity: number"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts",
+      "line": 22,
+      "function": "getContextAttributes",
+      "prefix": "gpu:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [
+        "Float32Array",
+        "Float32Array",
+        "Float32Array"
+      ],
+      "ttlEvidence": [
+        "extends WebGLObject { }interface WebGLProgram extends WebGLObject { }interface WebGLUniformLocation { }interface WebGLActiveInfo { name: string; size: number",
+        "ext { readonly canvas: HTMLCanvasElement",
+        "extAttributes("
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -12681,7 +13217,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
-      "line": 284,
+      "line": 272,
       "function": "cards",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -12698,7 +13234,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
-      "line": 291,
+      "line": 279,
       "function": "runStep",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -12715,7 +13251,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
-      "line": 296,
+      "line": 284,
       "function": "runStep",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -12732,7 +13268,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
-      "line": 504,
+      "line": 492,
       "function": "hset",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -13366,7 +13902,7 @@
       "ttlEvidence": [
         "TTL\n    for (const [domain",
         "setex(",
-        "TTL\n        JSON.stringify({"
+        "TTL (rebuildable centroid cache; Valkey volatile-lru evicts it under pressure"
       ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
@@ -13407,7 +13943,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/features/som-clustering.ts",
-      "line": 312,
+      "line": 283,
       "function": "for",
       "prefix": "centroid:",
       "operation": "WRITE",
@@ -13456,7 +13992,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
-      "line": 195,
+      "line": 210,
       "function": "set",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -13464,7 +14000,7 @@
         "JSON.stringify(packet));"
       ],
       "ttlEvidence": [
-        "expect(repoChanged",
+        "expect(buildContextCacheKey(base",
         "extCacheSources'",
         "extPackJson: makePacket({ summary: 'postgres fallback' }"
       ],
@@ -13475,7 +14011,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
-      "line": 252,
+      "line": 254,
       "function": "set",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -13494,7 +14030,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
-      "line": 353,
+      "line": 355,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -13513,7 +14049,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
-      "line": 359,
+      "line": 361,
       "function": "set",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -13552,23 +14088,6 @@
       "payloadShape": [],
       "ttlEvidence": [],
       "canonicalBuilderImported": false,
-      "lane": "RUNTIME",
-      "historicalOrFixture": false,
-      "activeCandidate": true
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/ace/query-router.ts",
-      "line": 623,
-      "function": "bifrostRetrievalCacheKeyV2",
-      "prefix": "bitfrost:",
-      "operation": "WRITE",
-      "payloadShape": [
-        "JSON.stringify({"
-      ],
-      "ttlEvidence": [
-        "extPolicyRevision: opts.contextPolicyRevision"
-      ],
-      "canonicalBuilderImported": true,
       "lane": "RUNTIME",
       "historicalOrFixture": false,
       "activeCandidate": true
@@ -14205,8 +14724,127 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-registry-v1.ts",
+      "line": 52,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exact'",
+        "executionSurface: 'REQUEST_RUNTIME'",
+        "ext-match']"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-registry-v1.ts",
+      "line": 53,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exact'",
+        "executionSurface: 'REQUEST_RUNTIME'",
+        "ext-match']"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-registry-v1.ts",
+      "line": 54,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exact'",
+        "executionSurface: 'REQUEST_RUNTIME'",
+        "ext-match']"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-registry-v1.ts",
+      "line": 55,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "executionSurface: 'REQUEST_RUNTIME'",
+        "explain']",
+        "exical-hit']"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-registry-v1.ts",
+      "line": 56,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "executionSurface: 'REQUEST_RUNTIME'",
+        "exical-hit']",
+        "executionSurface: 'SERVICE_ADAPTER'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-registry-v1.ts",
+      "line": 57,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "executionSurface: 'SERVICE_ADAPTER'",
+        "executionSurface: 'LOCAL_TOOLING'",
+        "executionSurface: 'LOCAL_TOOLING'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-centroid-lookup-v1.spec.ts",
+      "line": 19,
+      "function": "expect",
+      "prefix": "bitfrost:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expect(buildCentroidLookupKeyV1(base",
+        "expect(buildCentroidLookupKeyV1(base",
+        "expect(new Set(keys"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 190,
+      "line": 317,
       "function": "expect",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -14225,7 +14863,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 332,
+      "line": 475,
       "function": "set",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -14242,7 +14880,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 333,
+      "line": 476,
       "function": "get",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -14259,7 +14897,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 336,
+      "line": 479,
       "function": "zcard",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -14268,6 +14906,108 @@
         "ext write",
         "existing REWARD_ZSET_MAX pattern in atlas-reward-cache.ts.",
         "expect(size"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
+      "line": 523,
+      "function": "expect",
+      "prefix": "bitfrost:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expect(write.status",
+        "expect(write.cacheKey",
+        "expected: expectationForPacket(packet"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 134,
+      "function": "makeFixture",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "explicit effect accounting'",
+        "extPrefixDescriptorFromBitfrostV1(redis as unknown as Pick<Redis",
+        "expect(miss.status"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 161,
+      "function": "makeFixture",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "extPrefixDescriptorToBitfrostV1(redis as unknown as Pick<Redis",
+        "expect(write.status",
+        "extPrefixDescriptorFromBitfrostV1(redis as unknown as Pick<Redis"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 168,
+      "function": "readContextPrefixDescriptorFromBitfrostV1",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "extPrefixDescriptorToBitfrostV1(redis as unknown as Pick<Redis",
+        "expect(write.status",
+        "extPrefixDescriptorFromBitfrostV1(redis as unknown as Pick<Redis"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 180,
+      "function": "makeFixture",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [
+        "JSON.stringify(value));"
+      ],
+      "ttlEvidence": [
+        "extPrefixDescriptorToBitfrostV1(redis as unknown as Pick<Redis"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 217,
+      "function": "writeContextPrefixDescriptorToBitfrostV1",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "TTLs outside the disposable-cache bound'",
+        "extPrefixDescriptorToBitfrostV1(redis as unknown as Pick<Redis",
+        "ttlSeconds: 86_401"
       ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
@@ -14320,6 +15060,23 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/lib/server/atlas/execution/patch-tournament-outcome-receipt-v1.spec.ts",
+      "line": 108,
+      "function": "expect",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expect(persistPatchOutcomeReceiptV1(client",
+        "expect(persistPatchOutcomeReceiptV1(client",
+        "expect(persistPatchOutcomeReceiptV1(client"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/lib/server/atlas/feature-context-matrix.ts",
       "line": 141,
       "function": "if",
@@ -14344,6 +15101,40 @@
       "ttlEvidence": [
         "expectedPacketKeys: ['packet:a'",
         "exact sealed current graph feature set without claiming authority'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/identity/symbol-identity-audit-v1.spec.ts",
+      "line": 11,
+      "function": "expect",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expect(revisionShapeV1(R('a'",
+        "expect(revisionShapeV1('workspace:0'",
+        "expect(revisionShapeV1('a'.repeat(40"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/identity/symbol-identity-audit-v1.spec.ts",
+      "line": 14,
+      "function": "expect",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expect(revisionShapeV1(R('a'",
+        "expect(revisionShapeV1('workspace:0'",
+        "expect(revisionShapeV1('a'.repeat(40"
       ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
@@ -14547,7 +15338,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-      "line": 239,
+      "line": 236,
       "function": "set",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -14565,7 +15356,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-      "line": 457,
+      "line": 462,
       "function": "set",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -14872,7 +15663,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/cache/rpc-cache.ts",
-      "line": 165,
+      "line": 234,
       "function": "getRedis",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -14892,7 +15683,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/cache/rpc-cache.ts",
-      "line": 174,
+      "line": 243,
       "function": "somRangeKey",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -15046,7 +15837,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
-      "line": 107,
+      "line": 102,
       "function": "invalidateBitfrostKeys",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -15059,7 +15850,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
-      "line": 108,
+      "line": 103,
       "function": "invalidateBitfrostKeys",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15072,7 +15863,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
-      "line": 108,
+      "line": 103,
       "function": "invalidateBitfrostKeys",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -15085,7 +15876,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
-      "line": 109,
+      "line": 104,
       "function": "invalidateBitfrostKeys",
       "prefix": "bifrost:",
       "operation": "WRITE",
@@ -15100,7 +15891,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 246,
+      "line": 249,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -15113,7 +15904,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 258,
+      "line": 261,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15129,7 +15920,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 302,
+      "line": 305,
       "function": "if",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15144,24 +15935,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 463,
-      "function": "set",
-      "prefix": "ace:",
-      "operation": "WRITE",
-      "payloadShape": [],
-      "ttlEvidence": [
-        "EX'",
-        "TTL.ACE_TOPO_KAG_PROMPT",
-        "extPackets with GDS data from Redis ace:authority:top."
-      ],
-      "canonicalBuilderImported": false,
-      "lane": "RUNTIME",
-      "historicalOrFixture": false,
-      "activeCandidate": true
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 853,
+      "line": 905,
       "function": "cache",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15178,7 +15952,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 2148,
+      "line": 2190,
       "function": "layer",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15193,7 +15967,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 2151,
+      "line": 2193,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15210,7 +15984,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 2152,
+      "line": 2194,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15227,7 +16001,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 3684,
+      "line": 3726,
       "function": "for",
       "prefix": "gpu:",
       "operation": "WRITE",
@@ -15243,7 +16017,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 3980,
+      "line": 4019,
       "function": "String",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15260,7 +16034,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 3985,
+      "line": 4024,
       "function": "String",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15364,7 +16138,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-compressor.ts",
-      "line": 130,
+      "line": 115,
       "function": "Redis",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -15808,6 +16582,23 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 557,
+      "function": "pool",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "executor",
+        "executor returns the canonical",
+        "ex.id and revision columns directly instead of relying on a Qdrant id mapping. Same lane as qdrantSearch (lane != executor"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/lib/server/rg-atlas/karpathy-blend.ts",
       "line": 10,
       "function": null,
@@ -15967,6 +16758,144 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/dispatcher-telemetry-wrapper.spec.ts",
+      "line": 19,
+      "function": "state",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ExpandTopology: node",
+        "setex: directWrite } as unknown as Redis;",
+        "ext: { packet_id: 'packet:fixture'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/mcp-tool-telemetry.spec.ts",
+      "line": 18,
+      "function": "wrapped",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "setex.mockReset(",
+        "explicit invocation trace context separate from untrusted tool arguments'",
+        "ext: { packet_id: 'packet:qualified-input' }"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/mcp-tool-telemetry.spec.ts",
+      "line": 19,
+      "function": "wrapped",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [
+        "JSON.stringify(payload)).not.toContain('argument-not-authority');"
+      ],
+      "ttlEvidence": [
+        "setex.mockReset(",
+        "explicit invocation trace context separate from untrusted tool arguments'",
+        "ext: { packet_id: 'packet:qualified-input' }"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/packet-telemetry-context.spec.ts",
+      "line": 59,
+      "function": "withPacketTelemetryContext",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expect(Object.isFrozen(getPacketTelemetryContext(",
+        "ext",
+        "ext("
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/packet-telemetry-context.spec.ts",
+      "line": 61,
+      "function": "expect",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext(",
+        "expect(withPacketTelemetryContext({ trace_id: 'x'.repeat(129",
+        "ext: null }"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/packet-telemetry-context.spec.ts",
+      "line": 65,
+      "function": "wrapped",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext({ trace_id: 'trace:invocation'",
+        "ext: { packet_id: 'packet:invocation' } }",
+        "expect(getPacketTelemetryContext("
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/packet-telemetry-context.spec.ts",
+      "line": 68,
+      "function": "expect",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expect(getPacketTelemetryContext(",
+        "setex: async (",
+        "expect(record"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/packet-telemetry-context.spec.ts",
+      "line": 71,
+      "function": "expect",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "setex: async (",
+        "expect(record",
+        "expect(record.mock.calls[0][0]"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/lib/server/tensor/tensor-analysis-cache.ts",
       "line": 221,
       "function": "enqueueGpuProjectionIfNeeded",
@@ -16079,7 +17008,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 4360,
+      "line": 4507,
       "function": "setex",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -16096,7 +17025,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 4399,
+      "line": 4546,
       "function": "setex",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -16113,7 +17042,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 4445,
+      "line": 4592,
       "function": "if",
       "prefix": "ace:",
       "operation": "WRITE",
@@ -16160,7 +17089,7 @@
     },
     {
       "file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
-      "line": 565,
+      "line": 542,
       "function": "push",
       "prefix": "bitfrost:",
       "operation": "WRITE",
@@ -16175,7 +17104,7 @@
     },
     {
       "file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
-      "line": 996,
+      "line": 920,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -16190,7 +17119,7 @@
     },
     {
       "file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
-      "line": 1006,
+      "line": 930,
       "function": "sha256",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -16211,6 +17140,24 @@
       "ttlEvidence": [
         "ttl: z.number(",
         "export const POST: RequestHandler = async ({ request"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/codebase-index/claude-assist/+server.ts",
+      "line": 408,
+      "function": "probe",
+      "prefix": "ace:",
+      "operation": "WRITE",
+      "payloadShape": [
+        "JSON.stringify(aceContext));"
+      ],
+      "ttlEvidence": [
+        "setex(cacheSlot",
+        "ext"
       ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
@@ -16334,13 +17281,14 @@
   "readerCensus": [
     {
       "file": "scripts/agent/prompt-generator.mjs",
-      "line": 106,
+      "line": 107,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [
-        "existsSync(p"
+        "existsSync(p",
+        "Explicit status: the static feature-label fallback is used"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -17653,13 +18601,14 @@
     },
     {
       "file": "scripts/atlas/audit-canonical-projection-fabric.mjs",
-      "line": 310,
-      "function": "keys",
+      "line": 1006,
+      "function": "scanCount",
       "prefix": "bitfrost:",
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [
-        "existing summary cache namespace is populated.'"
+        "extCursor",
+        "extCursor;"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -17668,13 +18617,14 @@
     },
     {
       "file": "scripts/atlas/audit-canonical-projection-fabric.mjs",
-      "line": 314,
-      "function": "keys",
+      "line": 1007,
+      "function": "scanCount",
       "prefix": "bitfrost:",
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [
-        "existing summary cache namespace is populated.'"
+        "extCursor",
+        "extCursor;"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -17948,6 +18898,23 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts",
+      "line": 53,
+      "function": "bump",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "examples[name] ??= []",
+        "examples[name].push(sample",
+        "EXECUTION'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/audit-parent-atlas-consistency.mjs",
       "line": 145,
       "function": "keys",
@@ -17988,7 +18955,7 @@
     },
     {
       "file": "scripts/atlas/audit-parent-atlas-promotion-gates-v1.mjs",
-      "line": 43,
+      "line": 46,
       "function": null,
       "prefix": "ace:",
       "operation": "READ",
@@ -18043,6 +19010,178 @@
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-stable-file-identity-owner-v1.mts",
+      "line": 205,
+      "function": "rows",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exactStableIdentity: 0",
+        "exists for any admitted source. For repo:root the registry holds PATH-keyed file-level rows (24",
+        "EXCLUDES_file'] : []"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-startup-task-npm-scripts-v1.mjs",
+      "line": 7,
+      "function": "day",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exact failure mode found",
+        "exists so a"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-startup-task-npm-scripts-v1.mjs",
+      "line": 8,
+      "function": "day",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exact failure mode found",
+        "exists so a"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-symbol-identity-v1.mts",
+      "line": 25,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex'",
+        "existsSync(pointer",
+        "existsSync(resolve(ROOT"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-symbol-producer-ownership-v1.mjs",
+      "line": 118,
+      "function": "filter",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [
+        "JSON.stringify(body));",
+        "JSON.stringify(receipt, null, 2)}\\n`);",
+        "JSON.stringify({ ...receipt, versionedReceipt: versionedRel }, null, 2)}\\n`);"
+      ],
+      "ttlEvidence": [
+        "ext.size",
+        "exOf(v",
+        "exact origin of the `workspace:0` value in the 2026-08-24 input artifact is not recoverable']"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-symbol-revision-producer-census-v1.mts",
+      "line": 21,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex'",
+        "existsSync(pointer",
+        "EX' WHEN ${col} IS NULL THEN 'NULL' ELSE 'OTHER' END`;"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-symbol-revision-producer-census-v1.mts",
+      "line": 25,
+      "function": "revision",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex'",
+        "existsSync(pointer",
+        "EX' WHEN ${col} IS NULL THEN 'NULL' ELSE 'OTHER' END`;"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-symbol-revision-producer-census-v1.mts",
+      "line": 37,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "existsSync(resolve(ROOT",
+        "Exp",
+        "ext: x.l.trim("
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-symbol-revision-producer-census-v1.mts",
+      "line": 64,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "execFileSync('git'",
+        "execFileSync('git'",
+        "ex-v1/ast-symbol-nominations.jsonl'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/audit-symbol-revision-producer-census-v1.mts",
+      "line": 74,
+      "function": "input",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex-v1/ast-symbol-nominations.jsonl'",
+        "exists in this form' };",
+        "ExactExpression: 'NOT a fallback expression in any symbol writer: no writer contains a `workspace:` literal or a revision fallback. The writers PASS THROUGH the revision value of their input row. The literal value `workspace:0` was already present in the 2026-08-24 nominations input (a `workspace:${workspace_id}` namespace label with workspace_id 0 used where a revision belongs; prove-ast-backfill-idempotency.mjs calls these \"legacy-coerced\""
+      ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
@@ -18171,7 +19310,7 @@
     },
     {
       "file": "scripts/atlas/backfill-latent-vectors.mjs",
-      "line": 871,
+      "line": 867,
       "function": "setex",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -18442,7 +19581,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 257,
+      "line": 259,
       "function": "if",
       "prefix": "bifrost:",
       "operation": "READ",
@@ -18458,7 +19597,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 263,
+      "line": 265,
       "function": "keys",
       "prefix": "bifrost:",
       "operation": "READ",
@@ -18475,7 +19614,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 272,
+      "line": 274,
       "function": "keys",
       "prefix": "bifrost:",
       "operation": "READ",
@@ -18492,7 +19631,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 276,
+      "line": 278,
       "function": "zcard",
       "prefix": "bifrost:",
       "operation": "READ",
@@ -18511,7 +19650,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 280,
+      "line": 282,
       "function": "hgetall",
       "prefix": "bifrost:",
       "operation": "READ",
@@ -18530,7 +19669,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 306,
+      "line": 308,
       "function": "log",
       "prefix": "bifrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -18545,7 +19684,7 @@
     },
     {
       "file": "scripts/atlas/bitfrost-packet-upsert-optimized.mjs",
-      "line": 307,
+      "line": 309,
       "function": "keys",
       "prefix": "bifrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -18611,6 +19750,19 @@
       "function": "for",
       "prefix": "ace:",
       "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/build-feature-identity-review-manifest-v2.mjs",
+      "line": 38,
+      "function": "push",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
       "payloadShape": [],
       "ttlEvidence": [],
       "canonicalBuilderImported": false,
@@ -18747,6 +19899,21 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/build-unknown-resolution-set-v1.mts",
+      "line": 60,
+      "function": "sha",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [
+        "JSON.stringify({ builder: 'build-unknown-resolution-set-v1', upstream: fr.producerRevision, namespace: UNKNOWN_RESOLUTION_NAMESPACE_V1, script: sha(fs.readFileSync(fileURLToPath(import.meta.url))) }));"
+      ],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/capture-bounded-lineage-snapshot-v1.mts",
       "line": 23,
       "function": "join",
@@ -18794,8 +19961,39 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/cudf_feature_json_ingest.py",
+      "line": 69,
+      "function": "ingest_feature_records",
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exdigest("
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/deep-audit-hll-telemetry-v1.mts",
+      "line": 81,
+      "function": "EXACT_SET_ADAPTER",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex'",
+        "EXACT_SET_ADAPTER (in-memory"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 471,
+      "line": 475,
       "function": "if",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -18814,7 +20012,7 @@
     },
     {
       "file": "scripts/atlas/dir-pipeline.mjs",
-      "line": 471,
+      "line": 475,
       "function": "if",
       "prefix": "taxonomy:clusters:",
       "operation": "READ_WRITE_CONTEXT",
@@ -18829,6 +20027,27 @@
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
       "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/draft-unknown-resolution-v2.mts",
+      "line": 117,
+      "function": "uuidStr",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [
+        "JSON.stringify(d)).join('\\n') + '\\n';",
+        "JSON.stringify(receipt, null, 2));",
+        "JSON.stringify({ receiptPath: rel(receiptPath), draftRows: drafts.length, byReason, checks, packetLevelSummaryPresentAmongDrafts: receipt.packetLevelSummaryPresentAmongDrafts, uuidNamespace: receipt.uuidNamespace }, null, 2));"
+      ],
+      "ttlEvidence": [
+        "EXISTING owner; additive UnknownResolutionV1 columns PROPOSED",
+        "exists'",
+        "existing unknown owners. Not identity"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
       "activeCandidate": false
     },
     {
@@ -18952,6 +20171,36 @@
       "payloadShape": [],
       "ttlEvidence": [
         "ext; an explicit bridge is required.'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/freeze-pkt-lineage-current-single-chunk-v1.mjs",
+      "line": 62,
+      "function": "end",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/freeze-symbol-revision-placeholder-repair-manifest-v1.mjs",
+      "line": 33,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex'",
+        "exit(2",
+        "ext[]"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -19094,7 +20343,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1021,
+      "line": 1042,
       "function": "log",
       "prefix": "atlas:centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19112,7 +20361,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1021,
+      "line": 1042,
       "function": "log",
       "prefix": "centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19130,7 +20379,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1022,
+      "line": 1043,
       "function": "log",
       "prefix": "atlas:centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19148,7 +20397,7 @@
     },
     {
       "file": "scripts/atlas/index-full-repo-for-search.mjs",
-      "line": 1022,
+      "line": 1043,
       "function": "log",
       "prefix": "centroid:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19220,7 +20469,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 850,
+      "line": 858,
       "function": "slice",
       "prefix": "ace:",
       "operation": "READ",
@@ -19235,7 +20484,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 851,
+      "line": 859,
       "function": "slice",
       "prefix": "gpu:",
       "operation": "READ",
@@ -19250,7 +20499,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 858,
+      "line": 866,
       "function": "hgetall",
       "prefix": "ace:",
       "operation": "READ",
@@ -19266,7 +20515,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 859,
+      "line": 867,
       "function": "hgetall",
       "prefix": "ace:",
       "operation": "READ",
@@ -19282,7 +20531,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 920,
+      "line": 928,
       "function": "hset",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19301,7 +20550,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 922,
+      "line": 930,
       "function": "expire",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19320,7 +20569,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 926,
+      "line": 934,
       "function": "del",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19339,7 +20588,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 930,
+      "line": 938,
       "function": "setex",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19356,7 +20605,7 @@
     },
     {
       "file": "scripts/atlas/karpathy-gpu-enrich.mjs",
-      "line": 931,
+      "line": 939,
       "function": "zadd",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -19373,7 +20622,7 @@
     },
     {
       "file": "scripts/atlas/latent64-sample-backfill.mjs",
-      "line": 109,
+      "line": 114,
       "function": "hget",
       "prefix": "ace:",
       "operation": "READ",
@@ -19933,9 +21182,35 @@
     },
     {
       "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
-      "line": 545,
+      "line": 543,
       "function": "if",
       "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
+      "line": 544,
+      "function": "if",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
+      "line": 545,
+      "function": "if",
+      "prefix": "bifrost:",
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [],
@@ -19960,32 +21235,6 @@
     {
       "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
       "line": 547,
-      "function": "if",
-      "prefix": "bifrost:",
-      "operation": "READ",
-      "payloadShape": [],
-      "ttlEvidence": [],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
-      "line": 548,
-      "function": "if",
-      "prefix": "ace:",
-      "operation": "READ",
-      "payloadShape": [],
-      "ttlEvidence": [],
-      "canonicalBuilderImported": false,
-      "lane": "SCRIPT",
-      "historicalOrFixture": false,
-      "activeCandidate": false
-    },
-    {
-      "file": "scripts/atlas/phase108d-select-and-prove-packet.mts",
-      "line": 549,
       "function": "if",
       "prefix": "bifrost:",
       "operation": "READ",
@@ -20086,6 +21335,57 @@
       "ttlEvidence": [
         "exists: false",
         "extGate: 'GRAPH-RESOLVE-02 add or bind a revision-qualified producer; do not warm cache from legacy rows'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/plan-symbol-revision-placeholder-repair-preview-v1.mjs",
+      "line": 102,
+      "function": "filter",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exCount = versionRowsRaw.filter((r",
+        "EXPECTED = { versionsTotal: 479",
+        "exCount: 85"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/plan-symbol-revision-placeholder-repair-preview-v1.mjs",
+      "line": 105,
+      "function": "filter",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exCount = versionRowsRaw.filter((r",
+        "EXPECTED = { versionsTotal: 479",
+        "exCount: 85"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/plan-symbol-revision-placeholder-repair-preview-v1.mjs",
+      "line": 164,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "exSubclassEquals85: versionRows.filter((r",
+        "EX_EXACT' || (/^[0-9a-f]{40}$/.test(r.priorSourceRevision",
+        "exact_repairable"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -20392,7 +21692,7 @@
     },
     {
       "file": "scripts/atlas/prove-one-packet-vector-lineage.mts",
-      "line": 335,
+      "line": 336,
       "function": "now",
       "prefix": "gpu:",
       "operation": "READ",
@@ -20423,7 +21723,7 @@
     },
     {
       "file": "scripts/atlas/prove-postgres-pgvector-exact-hnsw-replay-v1.mjs",
-      "line": 26,
+      "line": 31,
       "function": "btrim",
       "prefix": "ace:",
       "operation": "READ",
@@ -20454,10 +21754,142 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/prove-relationship-graph-readonly-replay-v1.mts",
+      "line": 261,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ExcludedMissingWorkspace: missingWorkspace.length",
+        "ExcludedWorkspaceMismatch: mismatchedWorkspace.length"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/qdrant-cluster-tag-audit.mjs",
       "line": 152,
       "function": "for",
       "prefix": "gpu:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/query-lifecycle-fixture-v1.mts",
+      "line": 168,
+      "function": "stringify",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [
+        "JSON.stringify({ model, messages: prepared.messages, tools: [], tool_choice: 'none', temperature: attempt === 1 ? 0 : 0.3, seed: rec.seed, max_tokens: 1500, stream: false,"
+      ],
+      "ttlEvidence": [
+        "externalEvidenceId'",
+        "externalEvidenceId: { type: 'string' }",
+        "externalEvidenceId'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 71,
+      "function": "text",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext(payload.source_ref",
+        "ext(payload.chunk_id"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 74,
+      "function": "test",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext(payload.source_ref",
+        "ext(payload.chunk_id"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 87,
+      "function": "startsWith",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 88,
+      "function": "slice",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 90,
+      "function": "slice",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 383,
+      "function": "startsWith",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+      "line": 387,
+      "function": "slice",
+      "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
       "payloadShape": [],
       "ttlEvidence": [],
@@ -20490,6 +21922,21 @@
         "exists to point at.",
         "exists yet",
         "exPath: null"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/repair-symbol-version-workspace-placeholder-v1.mjs",
+      "line": 36,
+      "function": "query",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ExistingPath(ref"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -20579,7 +22026,7 @@
     },
     {
       "file": "scripts/atlas/run-som-on-chunks.mjs",
-      "line": 180,
+      "line": 193,
       "function": "log",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -21040,8 +22487,25 @@
       "activeCandidate": false
     },
     {
+      "file": "scripts/atlas/test-route-hardening-16-fixes.mjs",
+      "line": 27,
+      "function": "ok",
+      "prefix": "bitfrost:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "existsSync(filePath",
+        "exists'",
+        "existsSync(filePath"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
       "file": "scripts/atlas/train-autoencoder-768-64.mjs",
-      "line": 445,
+      "line": 483,
       "function": "hget",
       "prefix": "ace:",
       "operation": "READ",
@@ -21158,13 +22622,15 @@
     },
     {
       "file": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
-      "line": 99,
+      "line": 104,
       "function": "Date",
       "prefix": "ace:",
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [
-        "ext_safe: isTextSafe"
+        "ext_safe: isTextSafe",
+        "exclusion_policy_revision: WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION",
+        "exclusion_policy_checksum: exclusionPolicyChecksum("
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -21672,6 +23138,23 @@
         "exists ? 'PASS' : 'FAIL'} (${report.files.package_dist.path}",
         "exists ? 'PASS' : 'FAIL'} (${report.files.legacy_shim.path}",
         "exists ? `PASS (${report.files.gemma4_ndjson.rows} rows"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "scripts/atlas/warm-bitfrost-semantic-cache.mjs",
+      "line": 9,
+      "function": "mjs",
+      "prefix": "bifrost:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ex`",
+        "exported",
+        "exists — see `BITFROST-LIVE-WARM-01` in"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -27609,6 +29092,27 @@
       "activeCandidate": false
     },
     {
+      "file": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/gpu-cluster-acceleration.ts",
+      "line": 22,
+      "function": "getContextAttributes",
+      "prefix": "gpu:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [
+        "Float32Array",
+        "Float32Array",
+        "Float32Array"
+      ],
+      "ttlEvidence": [
+        "extends WebGLObject { }interface WebGLProgram extends WebGLObject { }interface WebGLUniformLocation { }interface WebGLActiveInfo { name: string; size: number",
+        "ext { readonly canvas: HTMLCanvasElement",
+        "extAttributes("
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
       "file": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/nodejs-orchestrator.ts",
       "line": 5,
       "function": "Map",
@@ -27793,6 +29297,23 @@
         "export interface QuantizationConfig { method: 'binary' | 'int8' | 'product' | 'scalar`",
         "export interface QuantizedVector { id: string; original: Float32Array | quantized",
         "export interface ProductQuantizationCodebook { centroids: Float32Array[0]"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "SCRIPT",
+      "historicalOrFixture": false,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/scripts/phase104-backups/src/lib/types/gpu-services.ts",
+      "line": 8,
+      "function": null,
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "export type GPUTaskType = 'embedding' | 'similarity' | 'autoindex' | 'som_train' | 'matrix_multiply' | 'batch_process'; export interface GPUTask { id?: string",
+        "export interface GPUResult { task_id: string",
+        "export interface GPUStatus { orchestrator_status: 'running' | 'stopped' | 'error'"
       ],
       "canonicalBuilderImported": false,
       "lane": "SCRIPT",
@@ -28257,7 +29778,7 @@
     },
     {
       "file": "sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs",
-      "line": 460,
+      "line": 448,
       "function": "runStep",
       "prefix": "ace:",
       "operation": "READ",
@@ -28829,6 +30350,22 @@
       "activeCandidate": false
     },
     {
+      "file": "sveltekit-frontend/src/lib/ai/gemma4-e2b-client.ts",
+      "line": 89,
+      "function": "inspectE2BGpuAdmissionV1",
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "export async function isE2BAvailable(",
+        "exists here. Therefore do not request model weights."
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/lib/config/pgvector-gpu-config.js",
       "line": 19,
       "function": "join",
@@ -28920,7 +30457,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-      "line": 314,
+      "line": 318,
       "function": "getCachedCursorPacket",
       "prefix": "ace:",
       "operation": "READ",
@@ -29112,7 +30649,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
-      "line": 182,
+      "line": 184,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -29129,7 +30666,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
-      "line": 353,
+      "line": 355,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -29148,7 +30685,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.ts",
-      "line": 359,
+      "line": 361,
       "function": "set",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -29217,21 +30754,6 @@
       "payloadShape": [],
       "ttlEvidence": [],
       "canonicalBuilderImported": false,
-      "lane": "RUNTIME",
-      "historicalOrFixture": false,
-      "activeCandidate": true
-    },
-    {
-      "file": "sveltekit-frontend/src/lib/server/ace/query-router.ts",
-      "line": 231,
-      "function": "bifrostRetrievalCacheKeyV2",
-      "prefix": "bitfrost:",
-      "operation": "READ",
-      "payloadShape": [],
-      "ttlEvidence": [
-        "extPolicyRevision: opts.contextPolicyRevision!"
-      ],
-      "canonicalBuilderImported": true,
       "lane": "RUNTIME",
       "historicalOrFixture": false,
       "activeCandidate": true
@@ -29678,7 +31200,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 281,
+      "line": 424,
       "function": "expect",
       "prefix": "bifrost:",
       "operation": "READ",
@@ -29698,7 +31220,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 332,
+      "line": 475,
       "function": "set",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -29715,7 +31237,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 333,
+      "line": 476,
       "function": "get",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -29732,7 +31254,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
-      "line": 336,
+      "line": 479,
       "function": "zcard",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -29741,6 +31263,74 @@
         "ext write",
         "existing REWARD_ZSET_MAX pattern in atlas-reward-cache.ts.",
         "expect(size"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 134,
+      "function": "makeFixture",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "explicit effect accounting'",
+        "extPrefixDescriptorFromBitfrostV1(redis as unknown as Pick<Redis",
+        "expect(miss.status"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 161,
+      "function": "makeFixture",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "extPrefixDescriptorToBitfrostV1(redis as unknown as Pick<Redis",
+        "expect(write.status",
+        "extPrefixDescriptorFromBitfrostV1(redis as unknown as Pick<Redis"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 168,
+      "function": "readContextPrefixDescriptorFromBitfrostV1",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "extPrefixDescriptorToBitfrostV1(redis as unknown as Pick<Redis",
+        "expect(write.status",
+        "extPrefixDescriptorFromBitfrostV1(redis as unknown as Pick<Redis"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/context-prefix-bitfrost-v1.test.ts",
+      "line": 180,
+      "function": "makeFixture",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [
+        "JSON.stringify(value));"
+      ],
+      "ttlEvidence": [
+        "extPrefixDescriptorToBitfrostV1(redis as unknown as Pick<Redis"
       ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
@@ -29785,6 +31375,23 @@
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/execution/topk-rpc-descriptor-v1.spec.ts",
+      "line": 30,
+      "function": "h",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "Executed: false",
+        "expansions: 0",
+        "execution: execution("
+      ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
       "historicalOrFixture": false,
@@ -29896,6 +31503,21 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/lib/server/atlas/recommendations/contextual-ranker-shadow-eval-v1.ts",
+      "line": 178,
+      "function": "seal",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "extual-ranker-shadow-eval.v1'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/lib/server/atlas/retrieval/atlas-rapids-resident-index-client.ts",
       "line": 96,
       "function": "stringify",
@@ -29963,7 +31585,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/taxonomy-topology-packet.ts",
-      "line": 151,
+      "line": 212,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -29976,7 +31598,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/taxonomy-topology-packet.ts",
-      "line": 152,
+      "line": 213,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30189,7 +31811,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
-      "line": 129,
+      "line": 130,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -30359,7 +31981,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/cache/rpc-cache.ts",
-      "line": 174,
+      "line": 243,
       "function": "somRangeKey",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -30527,7 +32149,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 246,
+      "line": 249,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "READ_WRITE_CONTEXT",
@@ -30540,7 +32162,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 322,
+      "line": 325,
       "function": "find",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30553,7 +32175,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 477,
+      "line": 529,
       "function": "if",
       "prefix": "ace:",
       "operation": "READ",
@@ -30566,7 +32188,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 478,
+      "line": 530,
       "function": "hget",
       "prefix": "ace:",
       "operation": "READ",
@@ -30579,7 +32201,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 639,
+      "line": 691,
       "function": "topoQueryHash",
       "prefix": "ace:",
       "operation": "READ",
@@ -30592,7 +32214,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 641,
+      "line": 693,
       "function": "topoQueryHash",
       "prefix": "ace:",
       "operation": "READ",
@@ -30605,7 +32227,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 653,
+      "line": 705,
       "function": "get",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30618,7 +32240,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 657,
+      "line": 709,
       "function": "hlen",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30631,7 +32253,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 709,
+      "line": 761,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30648,7 +32270,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 982,
+      "line": 1034,
       "function": "map",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30663,7 +32285,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 1124,
+      "line": 1176,
       "function": "hget",
       "prefix": "ace:",
       "operation": "READ",
@@ -30678,7 +32300,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 2042,
+      "line": 2084,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "READ",
@@ -30694,7 +32316,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 2043,
+      "line": 2085,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "READ",
@@ -30710,7 +32332,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 2046,
+      "line": 2088,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -30725,7 +32347,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 3103,
+      "line": 3145,
       "function": "reranking",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30740,7 +32362,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 3108,
+      "line": 3150,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30755,7 +32377,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 3734,
+      "line": 3776,
       "function": "get",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30768,13 +32390,13 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 4789,
+      "line": 4765,
       "function": "buildACEPromptCached",
       "prefix": "ace:",
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [
-        "ext fingerprint hasn't changed (24h TTL",
+        "exact rendered prompt and source identity (24h TTL",
         "export async function buildACEPromptCached(",
         "ext: ACEContext"
       ],
@@ -30785,7 +32407,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 4796,
+      "line": 4772,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -30801,7 +32423,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
-      "line": 7383,
+      "line": 7387,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -30875,7 +32497,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-compressor.ts",
-      "line": 145,
+      "line": 130,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "READ",
@@ -30890,7 +32512,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-compressor.ts",
-      "line": 153,
+      "line": 138,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -30903,7 +32525,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-compressor.ts",
-      "line": 154,
+      "line": 139,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -30916,7 +32538,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-compressor.ts",
-      "line": 155,
+      "line": 140,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -31007,7 +32629,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/rag/retrieval-lanes.ts",
-      "line": 152,
+      "line": 154,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -31020,7 +32642,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/features/rag/retrieval-lanes.ts",
-      "line": 325,
+      "line": 327,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -31035,8 +32657,8 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts",
-      "line": 26,
-      "function": null,
+      "line": 36,
+      "function": "Error",
       "prefix": "ace:",
       "operation": "READ",
       "payloadShape": [],
@@ -31050,7 +32672,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts",
-      "line": 31,
+      "line": 42,
       "function": "hgetall",
       "prefix": "ace:",
       "operation": "READ",
@@ -31067,7 +32689,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts",
-      "line": 32,
+      "line": 43,
       "function": "hgetall",
       "prefix": "ace:",
       "operation": "READ",
@@ -31084,7 +32706,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts",
-      "line": 69,
+      "line": 81,
       "function": "getRedis",
       "prefix": "ace:",
       "operation": "READ",
@@ -31099,7 +32721,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
-      "line": 1021,
+      "line": 1032,
       "function": "createHash",
       "prefix": "gpu:",
       "operation": "READ",
@@ -31160,6 +32782,40 @@
       ],
       "ttlEvidence": [
         "ex\n *  - For each neuron"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/inference/gpu-arbiter.ts",
+      "line": 31,
+      "function": null,
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expiresAt: number;",
+        "TTL_SEC = 120; // 2 minutes",
+        "existing = redis.call('GET'"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/inference/gpu-arbiter.ts",
+      "line": 33,
+      "function": null,
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "expiresAt: number;",
+        "TTL_SEC = 120; // 2 minutes",
+        "existing = redis.call('GET'"
       ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
@@ -31496,12 +33152,14 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/feature-matrix.ts",
-      "line": 13,
+      "line": 11,
       "function": "table",
       "prefix": "gpu:",
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [
+        "existing GraphV2 PageRank projection (`atlas_graph_authority_scores_v2`",
+        "exact validated snapshot and converged authority run. Domain 5 (weighted scoring",
         "exists correctly as `runtime-reranker.ts::blendScores("
       ],
       "canonicalBuilderImported": false,
@@ -31537,7 +33195,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
-      "line": 112,
+      "line": 111,
       "function": "rewards",
       "prefix": "gpu:",
       "operation": "READ",
@@ -31550,8 +33208,8 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
-      "line": 116,
-      "function": "hgetall",
+      "line": 115,
+      "function": "observeStoreRequest",
       "prefix": "gpu:",
       "operation": "READ",
       "payloadShape": [],
@@ -31569,6 +33227,23 @@
       "operation": "READ",
       "payloadShape": [],
       "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "line": 557,
+      "function": "pool",
+      "prefix": "ace:",
+      "operation": "READ_WRITE_CONTEXT",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "executor",
+        "executor returns the canonical",
+        "ex.id and revision columns directly instead of relying on a Qdrant id mapping. Same lane as qdrantSearch (lane != executor"
+      ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
       "historicalOrFixture": false,
@@ -31727,6 +33402,40 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/packet-telemetry-context.spec.ts",
+      "line": 19,
+      "function": "all",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext'",
+        "ext'",
+        "ext({"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/telemetry/packet-telemetry-context.spec.ts",
+      "line": 26,
+      "function": "expect",
+      "prefix": "ace:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "ext({",
+        "ext: { packet_id: `packet:${name}`",
+        "expect(results"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/lib/server/trace/trace-collector.ts",
       "line": 100,
       "function": null,
@@ -31838,7 +33547,7 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/types/rpc-cache.ts",
-      "line": 85,
+      "line": 86,
       "function": "budgets",
       "prefix": "gpu:",
       "operation": "READ",
@@ -31982,8 +33691,25 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/mcp/native-acceleration-tools.spec.ts",
+      "line": 129,
+      "function": "register",
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "executionCounters: (",
+        "exactTopK: (",
+        "expect(result.result.arrayMetrics.embeddings.shape"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/mcp/server.ts",
-      "line": 2109,
+      "line": 2146,
       "function": "Set",
       "prefix": "gpu:",
       "operation": "READ",
@@ -31999,12 +33725,16 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 3114,
-      "function": "keys",
+      "line": 3243,
+      "function": "scan",
       "prefix": "ace:",
       "operation": "READ",
       "payloadShape": [],
-      "ttlEvidence": [],
+      "ttlEvidence": [
+        "EXPLAIN_TOTAL_TIMEOUT_MS",
+        "EXPLAIN_SCAN_MAX_PAGES; page++",
+        "extCursor"
+      ],
       "canonicalBuilderImported": false,
       "lane": "RUNTIME",
       "historicalOrFixture": false,
@@ -32012,7 +33742,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 3542,
+      "line": 3689,
       "function": "catch",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32029,7 +33759,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 5009,
+      "line": 5156,
       "function": "connect",
       "prefix": "ace:",
       "operation": "READ",
@@ -32044,7 +33774,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 5010,
+      "line": 5157,
       "function": "keys",
       "prefix": "ace:",
       "operation": "READ",
@@ -32060,7 +33790,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 5011,
+      "line": 5158,
       "function": "slice",
       "prefix": "ace:",
       "operation": "READ",
@@ -32076,7 +33806,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 5596,
+      "line": 5743,
       "function": "if",
       "prefix": "ace:",
       "operation": "READ",
@@ -32091,7 +33821,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 6547,
+      "line": 6673,
       "function": "O",
       "prefix": "ace:",
       "operation": "READ",
@@ -32106,7 +33836,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 6579,
+      "line": 6705,
       "function": "get",
       "prefix": "ace:",
       "operation": "READ",
@@ -32121,7 +33851,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 7937,
+      "line": 8057,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32134,7 +33864,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 9204,
+      "line": 9287,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32147,7 +33877,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 10025,
+      "line": 10546,
       "function": "await",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32164,7 +33894,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 10084,
+      "line": 10605,
       "function": "state",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32177,7 +33907,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 10096,
+      "line": 10617,
       "function": "await",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32192,7 +33922,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 10129,
+      "line": 10650,
       "function": "await",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32205,7 +33935,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 10264,
+      "line": 10786,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32218,7 +33948,7 @@
     },
     {
       "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
-      "line": 10265,
+      "line": 10787,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ",
@@ -32243,6 +33973,32 @@
       "lane": "RUNTIME",
       "historicalOrFixture": false,
       "activeCandidate": true
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/(app)/demos/gpu-pipeline/+page.server.ts",
+      "line": 45,
+      "function": "get",
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/(app)/demos/gpu-pipeline/+page.server.ts",
+      "line": 46,
+      "function": "hrandfield",
+      "prefix": "gpu:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": true,
+      "activeCandidate": false
     },
     {
       "file": "sveltekit-frontend/src/routes/admin/parents-atlas/+page.server.ts",
@@ -32760,7 +34516,7 @@
     },
     {
       "file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
-      "line": 540,
+      "line": 517,
       "function": "sha256",
       "prefix": "bitfrost:",
       "operation": "READ",
@@ -32775,7 +34531,7 @@
     },
     {
       "file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
-      "line": 996,
+      "line": 920,
       "function": "hgetall",
       "prefix": "gpu:",
       "operation": "READ_WRITE_CONTEXT",
@@ -32790,7 +34546,7 @@
     },
     {
       "file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
-      "line": 1006,
+      "line": 930,
       "function": "sha256",
       "prefix": "bitfrost:",
       "operation": "READ_WRITE_CONTEXT",
@@ -33039,6 +34795,21 @@
       "activeCandidate": true
     },
     {
+      "file": "sveltekit-frontend/src/routes/api/routes/metadata/+server.ts",
+      "line": 29,
+      "function": "safeParse",
+      "prefix": "bitfrost:",
+      "operation": "READ",
+      "payloadShape": [],
+      "ttlEvidence": [
+        "export const GET: RequestHandler = async ({ url"
+      ],
+      "canonicalBuilderImported": false,
+      "lane": "RUNTIME",
+      "historicalOrFixture": false,
+      "activeCandidate": true
+    },
+    {
       "file": "sveltekit-frontend/src/routes/api/synthesis/evaluation/[id]/+server.ts",
       "line": 8,
       "function": "evaluation",
@@ -33125,6 +34896,6 @@
     }
   ],
   "nextGate": "REVIEW_RUNTIME_WRITERS_WITHOUT_CANONICAL_BUILDER",
-  "semanticChecksum": "sha256:c3ea017a500bd3403cb434cfca7c49bed58f1b2d3ac0193284373b02f637f733",
+  "semanticChecksum": "sha256:15582870e19c9912e519ce92a4ef7a52d7f0d53da6d6887ffc04a38278ab3bf0",
   "writesPerformed": false
 }

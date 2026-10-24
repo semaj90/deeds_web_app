@@ -1,6 +1,6 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-10-17T09:39:41.835Z
+Generated: 2026-10-24T01:45:22.871Z
 
 ## Summary
 
@@ -20,15 +20,15 @@ Generated: 2026-10-17T09:39:41.835Z
 
 - classification: LIVE_DB_ALIGNED
 - repair_class: ADD_DRIZZLE_MIRROR
-- static: INDEX_MISMATCH
+- static: COLUMN_MISMATCH
 - live: LIVE_DB_ALIGNED
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts
-- manual sources: sveltekit-frontend/drizzle/manual/kanban_task_lifecycle_baseline.sql
-- static columns: assignee, attempt_count, claim_expires_at, claim_token, completed_at, created_at, current_run_id, failure_count, feature_id, feature_label, idempotency_key, lane, last_heartbeat_at, max_retries, priority, source_refs, started_at, status, task_id, updated_at, validation_command
-- static indexes: kanban_ready_idx, kanban_running_heartbeat_idx
-- live columns: task_id, feature_id, feature_label, source_refs, lane, status, validation_command, assignee, priority, claim_token, claim_expires_at, last_heartbeat_at, current_run_id, attempt_count, failure_count, max_retries, started_at, completed_at, idempotency_key, created_at, updated_at
-- live indexes: kanban_ready_idx, kanban_running_heartbeat_idx, kanban_tasks_pkey
-- live rows: 166
+- manual sources: sveltekit-frontend/drizzle/manual/20261017_work_item_source_provenance.sql, sveltekit-frontend/drizzle/manual/kanban_task_lifecycle_baseline.sql
+- static columns: assignee, attempt_count, claim_expires_at, claim_token, completed_at, created_at, current_run_id, failure_count, feature_id, feature_label, idempotency_key, lane, last_heartbeat_at, max_retries, priority, source_refs, source_revision, source_url, started_at, status, task_id, updated_at, validation_command, workspace_id
+- static indexes: idx_kanban_tasks_workspace_id, kanban_ready_idx, kanban_running_heartbeat_idx
+- live columns: task_id, feature_id, feature_label, source_refs, lane, status, validation_command, assignee, priority, claim_token, claim_expires_at, last_heartbeat_at, current_run_id, attempt_count, failure_count, max_retries, started_at, completed_at, idempotency_key, created_at, updated_at, workspace_id, source_url, source_revision
+- live indexes: idx_kanban_tasks_workspace_id, kanban_ready_idx, kanban_running_heartbeat_idx, kanban_tasks_pkey
+- live rows: 167
 
 ## feature_registry
 
@@ -172,7 +172,7 @@ Generated: 2026-10-17T09:39:41.835Z
 
 ## Blockers
 
-- kanban_tasks: static INDEX_MISMATCH
+- kanban_tasks: static COLUMN_MISMATCH
 - feature_registry: live LIVE_TABLE_MISSING
 - atlas_workspace_events: static COLUMN_MISMATCH
 - atlas_workspace_events: live LIVE_TABLE_MISSING

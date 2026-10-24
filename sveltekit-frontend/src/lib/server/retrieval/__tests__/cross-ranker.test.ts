@@ -497,7 +497,10 @@ describe('Cross-Ranker: Error Handling', () => {
       qdrant_top_k: [{ packet_key: 'p1', qdrant_score: 0.8 }]
     };
 
-    await expect(executeUnifiedCrossRanking(input, mockDependencies)).rejects.toThrow();
+    // BM25 stage degrades to zero scores; the ranking still completes with the semantic candidate.
+    const result = await executeUnifiedCrossRanking(input, mockDependencies);
+    expect(result.ranked_results).toHaveLength(1);
+    expect(result.ranked_results[0].packet_key).toBe('p1');
   });
 
   it('should include generated query_id if not provided', async () => {

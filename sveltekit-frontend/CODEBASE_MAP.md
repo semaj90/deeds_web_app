@@ -166,7 +166,7 @@ This quick-sort table mirrors the root-level triage view, but for the noisiest `
 | LangGraph sidecar | `src/lib/server/ai/langgraph-client.ts`, `src/routes/api/synthesis/generate/+server.ts`, `src/mcp/server.ts` | This is a real optional integration layer, not just a planning concept. It is live code behind env gating and Docker wiring. |
 
 ### Gemma-Family Model Lanes (May 3, 2026)
-The current repo already follows the clean split: EmbeddingGemma is the vector backbone, Gemma 4-family models handle reasoning/synthesis, and smaller local models exist for client-side fallback. This pass found no repo-local `FunctionGemma` or `functiongemma` anchors, so treat that lane as optional future work rather than current wiring.
+The current repo already follows the clean split: EmbeddingGemma is the vector backbone, ornith 1.5 llama-server 8090, Gemma 4-family models handle reasoning/synthesis, and smaller local models exist for client-side fallback. This pass found no repo-local `FunctionGemma` or `functiongemma` anchors, so treat that lane as optional future work rather than current wiring.
 
 | Lane | Primary anchors | Current status | Notes |
 |------|-----------------|----------------|-------|
@@ -178,7 +178,7 @@ The current repo already follows the clean split: EmbeddingGemma is the vector b
 ### Gemma PLE vs Retrieval Embeddings
 Some smaller Gemma-family edge models use Per-Layer Embeddings (PLE) and MatFormer-style parameter-efficient execution. PLE is an internal inference/runtime optimization that helps smaller effective-parameter models run efficiently on local devices. It is not the same thing as the semantic embeddings used for vector search.
 
-For retrieval, semantic caching, clustering, pg vector,  Qdrant indexing, this codebase uses EmbeddingGemma. For planning, synthesis, tool-call generation, and multimodal reasoning, it uses Gemma 4-family reasoning models. PLE-capable edge models may eventually be used as cheaper local routers or planners, but their per-layer embeddings are not the authoritative vector representation in Qdrant.
+For retrieval, semantic caching, clustering, pg vector,  Qdrant indexing, this codebase uses EmbeddingGemma. For planning, synthesis, tool-call generation, and multimodal reasoning, it uses ornith 1.5 llama-server Gemma 4-family reasoning models. PLE-capable edge models may eventually be used as cheaper local routers or planners, but their per-layer embeddings are not the authoritative vector representation in Qdrant.
 
 ### Capability Routing Reality Check (May 3, 2026)
 - `src/lib/ai/model-ids.ts` now carries a central `MODEL_CAPABILITIES` registry plus `pickModelForRole`, `getModelCapabilities`, and embedding-model validation helpers.

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Tabs from '$lib/components/ui/tabs';
+	import AgentBattleExpWidget from '$lib/components/agent/AgentBattleExpWidget.svelte';
 	import type { BitsUI } from '$lib/types/enhanced-svelte5-types';
 	// Migrated to $effect
 
@@ -143,6 +144,9 @@
 			</h1>
 			<p class="text-black/60">GPU Clustering • Graph Analysis • Vector Search</p>
 		</div>
+
+		<!-- Pokémon-Style Agentic RPG EXP & Battle Tracker -->
+		<AgentBattleExpWidget class="mb-8" />
 
 		<!-- Stats Cards -->
 		<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

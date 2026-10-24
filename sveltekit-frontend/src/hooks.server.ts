@@ -34,6 +34,7 @@ import { logError, categorizeError, categorizeSeverity } from '$lib/server/error
 import { sql } from 'drizzle-orm';
 import fs from 'node:fs';
 import path from 'node:path';
+import { verifiedContextRuntimeV1 } from '$lib/server/atlas/execution/verified-context-runtime-v1.js';
 
 // ── Vite API JSONL log (feeds repair-loop agent) ─────────────────────────
 const VITE_API_LOG = path.resolve(process.cwd(), '..', 'logs', 'vite-api.jsonl');
@@ -678,6 +679,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   // Add request ID for tracing
   const requestId = crypto.randomUUID();
   event.locals.requestId = requestId;
+  (event.locals as typeof event.locals & { verifiedContextService?: typeof verifiedContextRuntimeV1 }).verifiedContextService = verifiedContextRuntimeV1;
 
   // Add timing information
   const startTime = Date.now();

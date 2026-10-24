@@ -61,7 +61,7 @@ class AstChunkSequenceLinkV1(BaseModel):
 
 
 class AstChunkTensorFeaturesV1(BaseModel):
-    schema: Literal["atlas.ast-chunk.tensor-features.v1"] = "atlas.ast-chunk.tensor-features.v1"
+    schema_: Literal["atlas.ast-chunk.tensor-features.v1"] = Field(default="atlas.ast-chunk.tensor-features.v1", alias="schema")
     dtype: Literal["float32"] = "float32"
     shape: tuple[int, int]
     featureNames: tuple[str, ...]
@@ -71,7 +71,7 @@ class AstChunkTensorFeaturesV1(BaseModel):
 
 
 class AstChunkDomainRoutingProposalV1(BaseModel):
-    schema: Literal["atlas.ast-chunk.domain-routing-proposal.v1"] = "atlas.ast-chunk.domain-routing-proposal.v1"
+    schema_: Literal["atlas.ast-chunk.domain-routing-proposal.v1"] = Field(default="atlas.ast-chunk.domain-routing-proposal.v1", alias="schema")
     status: Literal["PROPOSAL_ONLY", "BLOCKED_SOURCE_REF_MISSING", "BLOCKED_SOURCE_REVISION_MISMATCH"]
     domainLabel: str
     ontologyLabelCandidates: tuple[str, ...]
@@ -88,7 +88,7 @@ class AstChunkDomainRoutingProposalV1(BaseModel):
 
 
 class AstChunkHelperAnalysisV1(BaseModel):
-    schema: Literal["atlas.ast-chunk-helper-analysis.v1"] = "atlas.ast-chunk-helper-analysis.v1"
+    schema_: Literal["atlas.ast-chunk-helper-analysis.v1"] = Field(default="atlas.ast-chunk-helper-analysis.v1", alias="schema")
     sourceRef: str | None = None
     sourceRevision: str
     workspaceRevision: str | None = None
@@ -307,7 +307,7 @@ def build_ast_chunk_helper_analysis_v1(
 
 def ast_chunk_tensor_features_to_torch_cpu_v1(features: AstChunkTensorFeaturesV1) -> tuple[Any, tuple[str, ...]]:
     payload = {
-        "schema": features.schema,
+        "schema": features.schema_,
         "dtype": features.dtype,
         "featureNames": features.featureNames,
         "rowChunkKeys": features.rowChunkKeys,

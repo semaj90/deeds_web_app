@@ -142,3 +142,11 @@ def test_ast_chunk_endpoint_helpers_are_opt_in(monkeypatch):
     )
     assert enriched.helper_analysis is not None
     assert enriched.helper_analysis.tensorFeatures is not None
+
+
+def test_helper_schema_fields_serialize_as_schema_key_and_read_as_schema_attribute():
+    from atlas_ast_chunk_helpers_v1 import AstChunkTensorFeaturesV1
+
+    props = AstChunkTensorFeaturesV1.model_json_schema(by_alias=True)["properties"]
+    assert "schema" in props and "schema_" not in props
+    assert AstChunkTensorFeaturesV1.model_fields["schema_"].alias == "schema"

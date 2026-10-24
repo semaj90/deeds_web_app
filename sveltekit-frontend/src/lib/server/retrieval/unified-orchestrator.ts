@@ -43,6 +43,7 @@ import {
   type QueryExecutionModeV1,
   type ReadOnlySideEffectReceiptV1,
 } from '$lib/server/execution/query-execution-policy-v1.js';
+import { resolveTrustedWorkspaceAuthorityV1 } from './trusted-workspace-authority-v1.js';
 import { selectDiverseCandidates } from './latent256-dedup.js';
 import type { Latent256CandidateProviderV1 } from './latent256-candidate-provider.js';
 
@@ -560,25 +561,9 @@ async function turboVecPrefilter(
 const PGVECTOR_EXECUTOR_CAVEAT =
   'SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged';
 
-let admittedWorkspaceRevisionCache: string | null | undefined;
-/** The admitted workspace revision, from ATLAS_ADMITTED_WORKSPACE_REVISION or the committed admission report; null (never a guess) when neither proves it. */
+/** The trusted workspace revision from the single resolver owner; null (never a guess) when no operator pin is set. */
 async function readAdmittedWorkspaceRevision(): Promise<string | null> {
-  const fromEnv = process.env.ATLAS_ADMITTED_WORKSPACE_REVISION?.trim();
-  if (fromEnv) return fromEnv; // an explicit override always wins and is never cached
-  if (admittedWorkspaceRevisionCache !== undefined) return admittedWorkspaceRevisionCache;
-  try {
-    const fsp = await import('node:fs/promises');
-    const path = await import('node:path');
-    let dir = process.cwd();
-    for (let i = 0; i < 6; i++, dir = path.dirname(dir)) {
-      const text = await fsp.readFile(path.join(dir, 'docs', 'reports', 'workspace-revision-tournament-admission-v1.json'), 'utf8').catch(() => null);
-      if (text) {
-        const j = JSON.parse(text);
-        return (admittedWorkspaceRevisionCache = j.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' && j.authority === true && typeof j.workspaceRevision === 'string' ? j.workspaceRevision : null);
-      }
-    }
-  } catch { /* unreadable report: no admitted revision */ }
-  return (admittedWorkspaceRevisionCache = null);
+  return (await resolveTrustedWorkspaceAuthorityV1()).workspaceRevision;
 }
 
 /** Bridge and binding must agree on source_revision; a disagreement attaches no revision rather than choosing one. */
@@ -604,7 +589,7 @@ async function postgresPgvectorSearch(
   const client = await pool.connect();
   let merged: any[] = [];
   try {
-    await client.query('BEGIN');
+    await client.query('BEGIN READ ONLY');
     await client.query('SET LOCAL hnsw.ef_search = 40');
     const res = await client.query(
       `WITH top AS (

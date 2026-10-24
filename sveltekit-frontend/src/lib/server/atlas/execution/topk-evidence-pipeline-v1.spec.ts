@@ -77,7 +77,7 @@ function buildWorld(count: number, opts: { salt?: string; degraded?: number[]; b
     candidates: Array.from({ length: count }, (_, i) => {
       const id = String(i).padStart(5, '0');
       return {
-        canonicalId: `canon:${id}`, packetKey: `packet:${id}`, treeNodeId: `tree:${id}`, symbolVersionId: `symbol:${id}`,
+        canonicalId: `canon:${id}`, packetKey: `packet:${id}`, sourceRef: `src/f${id}.ts`, treeNodeId: `tree:${id}`, symbolVersionId: `symbol:${id}`,
         workspaceRevision: WS,
         sourceRevision: opts.badRevisionFor?.includes(i) ? `source:${id}` : (revisions[i] as string),
         graphRevision: GRAPH, semanticRevision: 'semantic:topk:v1',
@@ -90,7 +90,7 @@ function buildWorld(count: number, opts: { salt?: string; degraded?: number[]; b
     CANDIDATE_SCALAR_FEATURES.forEach((name, index) => { scalar[name] = name === 'crossEncoderRawScore' ? null : featureValue(ordinal, index); });
     return {
       schema: 'atlas.candidate-feature-row.v1' as const, candidateOrdinal: ordinal, canonicalId: candidate.canonicalId,
-      packetKey: candidate.packetKey, treeNodeId: candidate.treeNodeId, symbolVersionId: candidate.symbolVersionId,
+      packetKey: candidate.packetKey, sourceRef: candidate.sourceRef, treeNodeId: candidate.treeNodeId, symbolVersionId: candidate.symbolVersionId,
       workspaceRevision: candidate.workspaceRevision, sourceRevision: candidate.sourceRevision, graphRevision: candidate.graphRevision,
       semanticRevision: candidate.semanticRevision, featureRevision: FEATURE_REV, ...scalar, crossEncoderAvailable: false,
       laneMask: ['semantic' as const], degradedIdentity: candidate.degradedIdentity, evidenceRefs: candidate.evidenceRefs,
@@ -321,6 +321,23 @@ describe('Top-10 exact source-span fetch', () => {
     expect(reasonFor({ spans: new Map(world.spans).set(target.ordinal, { sourceRef: ref, unit: 'lines', start: 50, end: 60 }) })).toBe('SPAN_OUT_OF_RANGE');
     expect(reasonFor({ spans: new Map(world.spans).set(target.ordinal, { sourceRef: '../outside.ts', unit: 'lines', start: 1, end: 1 }) })).toBe('SPAN_UNSAFE_PATH');
     expect(reasonFor({ spans: new Map(world.spans).set(target.ordinal, { sourceRef: 'C:/secret.ts', unit: 'lines', start: 1, end: 1 }) })).toBe('SPAN_UNSAFE_PATH');
+  });
+
+  it('rejects a same-byte alias path that does not match the ordinal-map sourceRef', () => {
+    const target = execution.selected[0]!;
+    const candidate = world.map.candidates[target.ordinal]!;
+    const original = world.files.get(candidate.sourceRef!)!;
+    const aliasRef = 'src/copy-of-candidate.ts';
+    const result = resolveTopKEvidenceV1({
+      ordinalMap: world.map,
+      selected: [target],
+      port: port(world, {
+        bytes: new Map(world.files).set(aliasRef, original),
+        spans: new Map(world.spans).set(target.ordinal, { sourceRef: aliasRef, unit: 'lines', start: 2, end: 2 }),
+      }),
+    });
+    expect(result.qualified).toHaveLength(0);
+    expect(result.rejected[0]?.reason).toBe('SPAN_SOURCE_REF_MISMATCH');
   });
 
   it('rejects degraded identities and non-sha256 source revisions, and refuses a selection that is not in the map', () => {

@@ -29,14 +29,30 @@ An artifact SHALL be an Arrow IPC file with:
 ### Requirement: CPU reader is the oracle
 Every GPU consumer of an artifact SHALL have a CPU reader that produces the same values within a stated tolerance. A GPU result is promotable only after that parity check passes.
 
+#### Scenario: GPU parity fails
+- **WHEN** a GPU result differs from the CPU oracle beyond the declared tolerance
+- **THEN** the result SHALL remain diagnostic and SHALL NOT be promoted
+
 ### Requirement: Prompt budget
 Prompts SHALL receive only the descriptor and the ContextManifest summary. A prompt that carries a bulk array is a failure of this chain.
+
+#### Scenario: Bulk tensor excluded from prompt
+- **WHEN** a prompt is assembled for an artifact-backed task
+- **THEN** it SHALL include the bounded descriptor and manifest summary without embedding numeric arrays
 
 ### Requirement: No bulk writes outside the offline job
 Bulk artifacts are written only by the offline job. Request paths SHALL read descriptors only. Writing to PostgreSQL, Valkey, Qdrant or Neo4j from the chain is a separate gated step, and CouchDB view pushes are gated the same way.
 
+#### Scenario: Request path attempts a bulk write
+- **WHEN** a request-path consumer encounters an artifact descriptor
+- **THEN** it SHALL read the descriptor only and SHALL NOT write bulk data to a persistent store
+
 ### Requirement: Receipt per stage
 Each stage SHALL write a receipt that names its input receipt, its output checksum and its producer revision. The four receipts together SHALL form one chain that a reviewer can replay.
+
+#### Scenario: Stage receipt chain is incomplete
+- **WHEN** a stage receipt is missing an input receipt, output checksum, or producer revision
+- **THEN** replay SHALL refuse to report the artifact chain as complete
 
 ## Existing owners (reuse, do not duplicate)
 

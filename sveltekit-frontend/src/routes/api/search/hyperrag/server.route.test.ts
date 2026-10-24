@@ -6,6 +6,9 @@ const mocks = vi.hoisted(() => ({
   search: vi.fn(),
   bifrostChat: vi.fn(),
   runtimeConfigs: [] as Array<Record<string, unknown>>,
+  oakEnrichment: vi.fn(),
+  ontologyResolution: vi.fn(),
+  workspaceAuthority: vi.fn(),
   env: {
     ATLAS_FUNCTION_REGISTRY_RETRIEVAL_ENABLED: false,
     ATLAS_FUNCTION_REGISTRY_REPO_ROOT: undefined as string | undefined,
@@ -20,14 +23,17 @@ vi.mock('$lib/server/retrieval/search-runtime.js', () => ({
 }));
 
 vi.mock('$lib/server/env.server.js', () => ({ ENV: mocks.env }));
+vi.mock('$lib/server/retrieval/trusted-workspace-authority-v1.js', () => ({
+  resolveTrustedWorkspaceAuthorityV1: () => mocks.workspaceAuthority(),
+}));
 
 vi.mock('$lib/server/db/client.js', () => ({ pool: { connect: vi.fn() } }));
 vi.mock('@deeds/parent-atlas', () => ({ createFeatureIntelligenceRepository: vi.fn() }));
 vi.mock('$lib/server/atlas/agentic/oak-query-enrichment-v1.js', () => ({
-  enrichQueryClassificationWithOakV1: vi.fn(async (classification: { requestId: string }) => ({
-    requestId: classification.requestId,
-    evidence: [],
-  })),
+  enrichQueryClassificationWithOakV1: (classification: { requestId: string }) => mocks.oakEnrichment(classification),
+}));
+vi.mock('$lib/server/atlas/ontology-resolution-boundary-postgres.js', () => ({
+  resolveOntologyLabelV1: (request: { label: string }) => mocks.ontologyResolution(request),
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
@@ -74,11 +80,33 @@ describe('/api/search/hyperrag', () => {
   beforeEach(() => {
     mocks.search.mockReset();
     mocks.bifrostChat.mockReset();
+    mocks.oakEnrichment.mockReset();
+    mocks.ontologyResolution.mockReset();
+    mocks.workspaceAuthority.mockReset();
+    mocks.workspaceAuthority.mockResolvedValue({
+      status: 'UNAVAILABLE',
+      workspaceRevision: null,
+      reason: 'NO_OPERATOR_PIN',
+      resolverRevision: 'atlas.trusted-workspace-resolver.v1',
+    });
     mocks.runtimeConfigs.length = 0;
     mocks.env.ATLAS_FUNCTION_REGISTRY_RETRIEVAL_ENABLED = false;
     mocks.env.ATLAS_FUNCTION_REGISTRY_REPO_ROOT = undefined;
 
     mocks.search.mockResolvedValue(baseResult);
+    mocks.oakEnrichment.mockImplementation(async (classification: { requestId: string }) => ({
+      requestId: classification.requestId,
+      evidence: [],
+    }));
+    mocks.ontologyResolution.mockImplementation(async (request: { label: string }) => ({
+      schemaVersion: 'atlas.ontology-resolution-result.v1',
+      label: request.label,
+      resolutionState: 'UNRESOLVED',
+      conceptId: null,
+      candidateConceptIds: [],
+      matchMethod: 'none',
+      ontologyRevision: 'atlas-domain-ontology:v1:test',
+    }));
     mocks.bifrostChat.mockResolvedValue('Synthesized summary');
   });
 
@@ -173,23 +201,106 @@ describe('/api/search/hyperrag', () => {
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.retrievalPlan).toBeNull();
+    // No operator pin in the test environment: the resolver fails closed, and the forged request workspace is ignored.
     expect(body.workspaceAuthority).toEqual({
       status: 'UNAVAILABLE',
-      reason: 'TRUSTED_WORKSPACE_AUTHORITY_RESOLVER_NOT_WIRED',
+      workspaceRevision: null,
+      reason: 'NO_OPERATOR_PIN',
+      resolverRevision: 'atlas.trusted-workspace-resolver.v1',
       callerSuppliedWorkspaceContextIgnored: true,
     });
     expect(body.hypergraph.reason).toBe('TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE');
+    expect(body.graphExpansionStatus).toBe('BLOCKED_TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE');
     expect(body.graphPaths).toEqual([]);
+    expect(mocks.ontologyResolution.mock.calls.map(([request]) => request.label)).toEqual(['Drizzle ORM', 'SvelteKit']);
+    expect(mocks.search.mock.calls[0]?.[0].lexicalExpansion).not.toContain('Drizzle ORM');
+    expect(mocks.search.mock.calls[0]?.[0].lexicalExpansion).not.toContain('SvelteKit');
     expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({
       text: 'Find SvelteKit 2 route functions that use Drizzle ORM',
       topK: 7,
       lexicalExpansion: expect.arrayContaining(['drizzle-orm', '@sveltejs/kit']),
+    }));
+    expect(mocks.oakEnrichment).toHaveBeenCalledWith(expect.objectContaining({
+      packageCandidates: expect.arrayContaining(['drizzle-orm', '@sveltejs/kit']),
     }));
     expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('workspaceId');
     expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('workspaceRevision');
     expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('sourceRevision');
     expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('representationId');
     expect(mocks.search.mock.calls[0]?.[0]).not.toHaveProperty('representationRevision');
+  });
+
+  it('passes only the server-resolved revision to SearchRuntime for requested graph expansion', async () => {
+    const trustedRevision = `sha256:${'a'.repeat(64)}`;
+    mocks.workspaceAuthority.mockResolvedValue({
+      status: 'TRUSTED',
+      workspaceRevision: trustedRevision,
+      source: 'OPERATOR_PIN',
+      receiptCrossCheck: 'MATCHES_ADMISSION_RECEIPT',
+      resolverRevision: 'atlas.trusted-workspace-resolver.v1',
+    });
+
+    const { POST } = await import('./+server.js');
+    const request = new Request('http://localhost/api/search/hyperrag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: 'Find SvelteKit route helpers using Drizzle ORM',
+        useGraph: true,
+        workspaceRevision: `sha256:${'f'.repeat(64)}`,
+      }),
+    });
+
+    const response = await POST({ request, url: new URL(request.url), locals: { user: { id: 'u1' } } } as any);
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({
+      workspaceRevision: trustedRevision,
+    }));
+    expect(mocks.search.mock.calls[0]?.[0].workspaceRevision).not.toBe(`sha256:${'f'.repeat(64)}`);
+    expect(body.workspaceAuthority).toEqual(expect.objectContaining({
+      status: 'TRUSTED',
+      workspaceRevision: trustedRevision,
+      callerSuppliedWorkspaceContextIgnored: true,
+    }));
+    expect(body.graphExpansionStatus).toBe('DELEGATED_TO_SEARCH_RUNTIME');
+    expect(body.hypergraph.reason).toBe('SEARCH_RUNTIME_GRAPH_EXPANSION_DELEGATED');
+  });
+
+  it('uses only resolved ontology package labels as lexical hints and returns non-authoritative evidence', async () => {
+    mocks.ontologyResolution.mockImplementation(async (request: { label: string }) => ({
+      schemaVersion: 'atlas.ontology-resolution-result.v1',
+      label: request.label,
+      resolutionState: request.label === 'Drizzle ORM' ? 'RESOLVED' : 'AMBIGUOUS',
+      conceptId: request.label === 'Drizzle ORM' ? 'concept:database' : null,
+      candidateConceptIds: request.label === 'Drizzle ORM'
+        ? ['concept:database']
+        : ['concept:frontend', 'concept:frontend.sveltekit'],
+      matchMethod: request.label === 'Drizzle ORM' ? 'alias' : null,
+      ontologyRevision: 'atlas-domain-ontology:v1:test',
+    }));
+
+    const { POST } = await import('./+server.js');
+    const request = new Request('http://localhost/api/search/hyperrag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'Find SvelteKit 2 route functions that use Drizzle ORM', topK: 7 }),
+    });
+
+    const response = await POST({ request, url: new URL(request.url), locals: { user: { id: 'u1' } } } as any);
+    const body = await response.json();
+
+    expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({
+      text: 'Find SvelteKit 2 route functions that use Drizzle ORM',
+      topK: 7,
+      lexicalExpansion: expect.arrayContaining(['Drizzle ORM']),
+    }));
+    expect(mocks.search.mock.calls[0]?.[0].lexicalExpansion).not.toContain('SvelteKit');
+    expect(body.ontologyQueryEvidence).toEqual(expect.arrayContaining([
+      expect.objectContaining({ label: 'Drizzle ORM', conceptId: 'concept:database', canonicalAuthority: false }),
+      expect.objectContaining({ label: 'SvelteKit', resolutionState: 'AMBIGUOUS', candidateConceptIds: ['concept:frontend', 'concept:frontend.sveltekit'], canonicalAuthority: false }),
+    ]));
   });
 
   it('does not enable the function registry from a caller-supplied revision', async () => {

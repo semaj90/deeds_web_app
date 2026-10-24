@@ -59,6 +59,7 @@ describe('LiveSourceFetchPortV1', () => {
         {
           canonicalId: 'canon:live-app-d-ts',
           packetKey: 'packet:live-1',
+          sourceRef: 'src/app.d.ts',
           treeNodeId: 'tree:live-1',
           symbolVersionId: 'symbol:live-1',
           workspaceRevision: 'workspace:live:v1',
@@ -107,6 +108,7 @@ describe('LiveSourceFetchPortV1', () => {
         {
           canonicalId: 'canon:stale-app-d-ts',
           packetKey: 'packet:stale-1',
+          sourceRef: 'src/app.d.ts',
           treeNodeId: 'tree:stale-1',
           symbolVersionId: 'symbol:stale-1',
           workspaceRevision: 'workspace:stale:v1',

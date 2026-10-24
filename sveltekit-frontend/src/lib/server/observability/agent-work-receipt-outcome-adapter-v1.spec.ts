@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { mapAgentWorkReceiptToOutcomeLedgerV1 } from './agent-work-receipt-outcome-adapter-v1.js';
-import type { AgentWorkReceiptV1 } from './agent-work-receipt-v1.js';
+import { AgentWorkReceiptV1Schema, agentWorkReceiptChecksumV1, validateAgentWorkReceiptV1, type AgentWorkReceiptV1 } from './agent-work-receipt-v1.js';
 
 const receipt: AgentWorkReceiptV1 = {
   schema: 'atlas.agent-work-receipt.v1',
@@ -45,11 +45,25 @@ describe('AgentWorkReceipt -> outcome_ledger adapter', () => {
     expect(mapped.metadata).toMatchObject({
       receiptId: 'receipt-1',
       runId: 'run-1',
+      taskId: 'not-a-uuid',
       workspaceRevision: 'workspace-r1',
       sourceRevision: null,
       graphRevision: null,
       writesPerformed: false,
     });
+  });
+
+  it('preserves non-UUID task identity so a stored receipt can reproduce its checksum', () => {
+    const completionChecksum = agentWorkReceiptChecksumV1(receipt);
+    const mapped = mapAgentWorkReceiptToOutcomeLedgerV1(receipt);
+    const reconstructed = {
+      ...mapped.metadata,
+      taskId: mapped.metadata.taskId,
+      completionChecksum,
+    };
+
+    expect(mapped.taskId).toBeNull();
+    expect(validateAgentWorkReceiptV1(AgentWorkReceiptV1Schema.parse(reconstructed)).taskId).toBe('not-a-uuid');
   });
 
   it('accepts only a real UUID for the existing task_id column', () => {
@@ -58,5 +72,35 @@ describe('AgentWorkReceipt -> outcome_ledger adapter', () => {
       taskId: '550e8400-e29b-41d4-a716-446655440000',
     });
     expect(mapped.taskId).toBe('550e8400-e29b-41d4-a716-446655440000');
+  });
+
+  it('maps traceId from correlation only when it is a valid UUID', () => {
+    const nonUuid = mapAgentWorkReceiptToOutcomeLedgerV1({
+      ...receipt,
+      correlation: {
+        schema: 'atlas.agent-correlation.v1',
+        requestId: 'req-1',
+        runId: 'run-1',
+        traceId: 'non-uuid-trace-1234',
+        contextManifestDigest: null,
+        packetReceiptDigest: 'sha256:' + 'b'.repeat(64),
+        correlationStatus: 'VERIFIED',
+      },
+    });
+    expect(nonUuid.traceId).toBeNull();
+
+    const validUuid = mapAgentWorkReceiptToOutcomeLedgerV1({
+      ...receipt,
+      correlation: {
+        schema: 'atlas.agent-correlation.v1',
+        requestId: 'req-1',
+        runId: 'run-1',
+        traceId: '550e8400-e29b-41d4-a716-446655440001',
+        contextManifestDigest: null,
+        packetReceiptDigest: 'sha256:' + 'b'.repeat(64),
+        correlationStatus: 'VERIFIED',
+      },
+    });
+    expect(validUuid.traceId).toBe('550e8400-e29b-41d4-a716-446655440001');
   });
 });

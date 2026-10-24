@@ -18,9 +18,10 @@ Operating context (Windows 10 Home, Docker Desktop, WSL2):
       completeness receipt). Extend the existing owners: `packages/parent-atlas` `buildAcePacketV3` and
       `sveltekit-frontend/src/lib/server/ace/ace-packet-writer.ts`. Do not add a second packet builder.
       Evidence: contract spec test passes; no new packet builder file.
-- [ ] **P0-02** Single NES palette owner. Canonical candidate: `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs`
+- [x] **P0-02** Single NES palette owner. Definition owner: `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs`
       (`NES_LUT_DOMAIN_PALETTE`). Align or retire `python/parent_atlas_learning/ace_compiler.py` `NES_LUT_PALETTES`
-      (its `nes_hex` disagrees for 8 of 10 domains). Evidence: decision recorded here; drift check fails on mismatch.
+      (its previous NES color values disagreed for 8 of 10 domains). Consumers now load the generated checksummed artifact;
+      focused Node and Python output tests pass. No persistent cache migration/write was run.
 - [ ] **P0-03** Fail-closed rule for every stage: a stage that cannot prove completeness emits a typed PARTIAL or BLOCKED
       receipt, never a silent empty result. Evidence: one negative test per stage.
 - [ ] **P0-04** Hidden-thought guard: no stage persists reasoning or chain-of-thought text. Reuse the marker set from
@@ -45,15 +46,83 @@ Operating context (Windows 10 Home, Docker Desktop, WSL2):
 
 ## Phase 2 — NES LUT table build
 
-- [ ] **P2-01** Build the palette table from the P0-02 owner. Keep `lutByte` (0x00–0x09) and `nesHex` as separate fields,
+- [x] **P2-01** Build the palette table from the P0-02 owner. Keep `lutByte` (0x00–0x0A) and `nesHex` as separate fields,
       never substituted for each other. Evidence: row count and a field-level check.
-- [ ] **P2-02** Routing helper alignment: `python/atlas_compute/ast_chunk_routing_helpers.py` (`AstChunkDomainRouter`) uses
-      the same `lutByte` values. Decide whether `svelte5_runes` (`0x2A`) becomes a palette entry. Evidence: decision recorded;
-      router test passes.
+- [x] **P2-02** Routing helper alignment: `python/atlas_compute/ast_chunk_routing_helpers.py` (`AstChunkDomainRouter`) uses
+      the shared artifact's `lutByte` values. `svelte5_runes` (`nesHex=0x2A`) is a UI sub-label, not a domain ordinal.
+      Evidence: both router versions now emit UI `lutByte=0x02` and separate NES color metadata.
 - [ ] **P2-03** Exact crosswalk resolution only (`resolve_domain_76`). No fuzzy or alias matching. Unresolved is a
       first-class result (`UNRESOLVED`, `0x00`). Evidence: negative tests for near-miss labels.
 - [ ] **P2-04** Trace where the ACE palette reaches prompt text. `ace_compiler.py` line 52 only selects it. Record the
       injection site. Evidence: file:line of each prompt write.
+- [x] **P2-05 NES-LUT-GENERAL-COLLISION-01** The Node palette gives `general` `lutByte 0x00`, the same byte the AST router
+      used for `UNRESOLVED`. Decision: reserve `0x00` for unresolved and move `general` to `0x0A`. Evidence: ACE fallback
+      returns `general=0x0A`; router unknown labels retain `0x00`.
+- [x] **P2-06 NES-LUT-DRIFT-GATE-01** Parity check across `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs`,
+      `python/atlas_compute/ast_chunk_routing_helpers.py`, and `python/parent_atlas_learning/ace_compiler.py`
+      (`NES_LUT_PALETTES`). Historical audit found 2/10 `nesHex` values aligned. Consumers now load one checksummed artifact;
+      Node source/artifact parity and Python ACE/router parameter tests pass. Seeded-drift injection is not implemented.
+- [x] **P2-07 NES-LUT-DOMAIN-SET-01** Confirm the 10-domain set is the same in every owner. `ast_chunk_routing_helpers.py`
+      previously named `svelte5_runes` (0x2A) as a separate value. It is now a UI sub-label; the 10 domain ordinals are unique
+      and nonzero, with unresolved reserved at zero. Evidence: artifact and cross-language focused tests.
+
+## Phase 11 — Encoding, transport, and tournament linkage (2026-10-23)
+
+Scope: the bitset, msgpack, and gRPC ideas raised for this path. Existing owners stay in charge. Nothing here authorizes
+QLoRA or adapter ingestion.
+
+- [ ] **P11-01 WIRE-BULK-01** msgpack and JSON carry descriptors only. Bulk vectors and matrices go through Arrow IPC or raw
+      F32 mmap (wire-format rule in the project CLAUDE.md). Evidence: serialized prefill and tournament packets contain no
+      768-float arrays; a size and shape test fails on an inlined vector.
+- [ ] **P11-02 BITSET-SELECT-01** A bitset selects CandidateOrdinals only. It records bit width, endianness, layout revision,
+      and checksum. No bitset-over-gRPC path exists in the repo; any new gRPC route needs a proto and an owner entry first.
+      gRPC clients default to disabled. Evidence: layout receipt round-trips with the same checksum.
+- [ ] **P11-03 PREFILL-TOURNAMENT-DAG-01** Tournament DAG state transitions (`TOUR13`, in
+      `parent-atlas-gpu-sidecar-patch-tournament/tasks.md`) reuse the Phase 5 prefill node IDs. Evidence: one tournament packet
+      and one prefill packet reference the same node IDs. Blocked until Phase 5 reaches APPLY_PROVEN or an explicit waiver.
+- [ ] **P11-04 PALETTE-TOURNAMENT-01** The tournament ACE comparison packet carries the domain `lutByte` from P2-01. Blocked
+      until the admitted ContextManifest/prefill and tournament packet owners are wired and independently read back; P2-05
+      and P2-06 are now locally proven.
+- [ ] **P11-05 QLORA-HOLD-01** No QLoRA or adapter ingestion. Required before any adapter: `TOUR20` PASS, one palette owner,
+      an adapter revision, held-out evaluation, and a promotion receipt. Status: NOT_STARTED.
+
+## Track B alignment — query to prefill DAG (2026-10-23)
+
+Chain under this track: query → domain `lutByte` (from the single NES owner, see `parent-atlas-nes-lut-single-owner/tasks.md`) → `:8095` AST chunks with `scan_completeness` → PageRank Top-K and golden-breadth multi-hop → ContextManifest → prefill DAG.
+
+- [ ] **TB-01 Wire order.** Each step produces a typed receipt, and each step fails closed to `PARTIAL` or `BLOCKED`. Evidence: one negative test per step (P0-03).
+- [ ] **TB-02 Bulk payloads stay out of descriptors.** Vectors and matrices move as Arrow IPC or raw F32 mmap, or as PyTorch tensors. MsgPack and JSON carry descriptors and references only (P11-01).
+- [ ] **TB-03 Bitmap header.** A CandidateOrdinal bitmap records bit width, endianness, layout revision, and checksum (P11-02). A reader rejects a mismatch on any of the four.
+- [ ] **TB-04 Residency descriptor.** Storage tier (NESCHR97 cold, NVMe mmap, RAM Arrow buffer, CPU cache) is a descriptor attached to the ROM-bank LOD frame. It is not a wire protocol and not an admission signal (P12-01).
+- [ ] **TB-05 Multi-hop bounded.** PageRank Top-K traversal uses existing graph owners with a bounded k-hop limit. Evidence: fan-out cap test (P11-03).
+- [ ] **TB-06 Hyperrag route.** `api/search/hyperrag/+server.ts` synthesis stays blocked until a ContextManifest is admitted (route gate already in place, 2026-10-23 commit `c591bf4a3a`).
+- [ ] **TB-07 Redis namespace.** The `hg:edge:idx` / `hg:built_at` collision between `run-hypergraph.ts` and `cases/hypergraph-4d.ts` is resolved before any hyperedge boost is used here (P10). Blocked on the namespace decision.
+
+## Phase 12 — Challenger proposals from the 2026-10-23 spec review (all NOT_STARTED)
+
+Review of the pasted "NES LUT byte-synthesis, 7-bit LOD bitset, and multi-hop DAG" spec. Accepted as challengers only.
+The spec's conflicts are recorded in the table below so nothing is implemented from it by accident.
+
+| Proposal | Accepted as | Owner / existing piece | Blocker |
+|---|---|---|---|
+| 7-tier residency bitmask (descriptor) | Challenger, descriptor only, never authority | `nes-memory-architecture.ts` and `N64TextureLODSystem.ts` are rendering precedents; no residency-mask code exists | P2-05, P2-06 |
+| Bit 7 "write-guard lock" | Reject as a residency bit. Admission stays in the admission receipt | Oct 22 admission gate and write guard | none; keep separate |
+| Per-chunk 64-bit header (`AtlasPacketHeaderV1`) | Challenger, after P11-01 | Wire-format rule: descriptors only, bulk vectors via Arrow/mmap | P11-01 |
+| Move/skill slots (4 x 2-bit traversal opcodes) | Reuse `atlas_procedural_sequences_v1` (DRAFT, unapplied) instead of a new registry | `docs/reports/atlas-procedural-sequence-catalog-v1.md` | sequence DDL review and operator authorization |
+| Tricubic cross-ranker fusion | Challenger only. Compare against RRF on a frozen golden set. SearchRuntime keeps the single fusion owner | Tricubic exists in SOM adjacency (`compute-som-tricubic-adjacency.mjs`, `interpolation.py`), not in cross-ranker | golden set with reviewed labels |
+| Multi-hop PageRank Top-K traversal | Existing graph owners only. Bounded k-hop, no unbounded fanout | `graph-analysis-runner.ts` and GDS/NetworkX owners | P11-03 |
+| QLoRA adapter activated per query | Rejected for now | QLORA-HOLD-01, TOUR-QLORA-HOLD-01 | TOUR20, reward monitoring |
+| gRPC bitset flags into `:8090` | Rejected. `:8090` is llama-server HTTP | llama-server contract | none |
+| UUID or ULID as packet identity inside the header | Rejected. Identity is `packet_key` plus revisions | `makePacketUlid` is ordering lineage only; `randomUUIDv7` / v8 helper in `utils/uuid.ts` | UUID v8 freeze decision |
+| "$1–$20" budget band | Not defined anywhere. Needs a written definition before use | none | definition from the operator |
+
+- [ ] **P12-01 LOD-DESCRIPTOR-CHALLENGER-01** Define a 7-tier residency descriptor for the packet header with no
+      authority and no admission effect. Evidence: round-trip test; a test that a set residency bit never changes ranking.
+- [ ] **P12-02 TRICUBIC-CHALLENGER-01** Score a tricubic fusion as a challenger against RRF on the frozen golden set.
+      Evidence: recall@k, ordering, and latency receipt. Not promoted without reviewed labels.
+- [ ] **P12-03 PROCEDURAL-REGISTRY-REUSE-01** Map move/skill slots onto `atlas_procedural_sequences_v1` instead of creating a
+      second registry. Evidence: the mapping is reviewed; the DDL is still DRAFT until the operator approves it.
+- [ ] **P12-04 BUDGET-BAND-DEFINITION-01** Operator to define "$1–$20" in measurable terms, or drop it. Evidence: written definition.
 
 ## Phase 3 — NLP pass and structural evidence (partly done)
 
@@ -318,7 +387,11 @@ qualification → P10 contract → namespace migration → Phase 5 DAG-prefill p
 
 These items are deferred architecture questions, not acceptance criteria for the current phases. No PostgreSQL, Redis, Qdrant, GPU, transport, or admission changes are authorized by listing them here.
 
-### Read-only owner audit (2026-10-21)
+### Read-only owner audit (2026-10-21; historical baseline, superseded by NLUT-01–05)
+
+The duplicate-table findings below describe the pre-consolidation state. The current runtime routing and ACE compiler consume
+the checksummed shared palette artifact; see `openspec/changes/parent-atlas-nes-lut-single-owner/tasks.md` for current parity
+evidence. Prompt injection tracing (P2-04), exact domain crosswalk (P2-03), and tournament packet linkage (P11-04) remain open.
 
 - `python/parent_atlas_learning/ace_compiler.py` contains a duplicate `NES_LUT_PALETTES` table. Its `byte` field is a
   color-like NES hex value, not the AST router's `lutByte`; it also differs from the Node palette's `nesHex` for 8 of

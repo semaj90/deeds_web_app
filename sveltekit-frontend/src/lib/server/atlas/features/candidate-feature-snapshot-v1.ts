@@ -9,6 +9,7 @@ import {
   CandidateFeatureRowV1Schema,
   type CandidateFeatureRowV1,
 } from './candidate-feature-row-v1.js';
+import { resolveTrustedWorkspaceAuthorityV1 } from '$lib/server/retrieval/trusted-workspace-authority-v1.js';
 
 export type { CandidateFeatureRowV1 } from './candidate-feature-row-v1.js';
 
@@ -33,7 +34,7 @@ export type CandidateFeatureSnapshotV1 = z.infer<typeof candidateFeatureSnapshot
 
 export const currentCandidateFeatureAdmissionV1Schema = z.object({
   schema: z.literal('atlas.current-candidate-feature-admission.v1'),
-  status: z.enum(['ADMITTED', 'BLOCKED_LINEAGE', 'BLOCKED_SEMANTIC', 'BLOCKED_GRAPH']),
+  status: z.enum(['ADMITTED', 'BLOCKED_LINEAGE', 'BLOCKED_SEMANTIC', 'BLOCKED_GRAPH', 'BLOCKED_CURRENTNESS']),
   candidateSnapshotRevision: revision,
   workspaceRevision: revision,
   featureRevision: revision,
@@ -82,6 +83,7 @@ function assertRowMatchesCandidate(row: CandidateFeatureRowV1, map: CandidateOrd
   const identityPairs: Array<[string, unknown, unknown]> = [
     ['canonicalId', row.canonicalId, candidate.canonicalId],
     ['packetKey', row.packetKey, candidate.packetKey],
+    ['sourceRef', row.sourceRef, candidate.sourceRef],
     ['treeNodeId', row.treeNodeId, candidate.treeNodeId],
     ['symbolVersionId', row.symbolVersionId, candidate.symbolVersionId],
     ['workspaceRevision', row.workspaceRevision, candidate.workspaceRevision],
@@ -234,4 +236,36 @@ export function selectCandidateFeatureRows(
     }
     return row;
   });
+}
+
+/**
+ * Currentness-gated admission. Workspace authority is resolved internally and never accepted from
+ * the request or caller. A missing or mismatched authority is refused before cohort fields are read.
+ */
+export async function admitCurrentCandidateFeatureSnapshotFromReadbackV1(
+  input: Parameters<typeof admitCurrentCandidateFeatureSnapshotV1>[0],
+): Promise<CurrentCandidateFeatureAdmissionV1> {
+  const authority = await resolveTrustedWorkspaceAuthorityV1();
+  const ordinalMap = candidateOrdinalMapV1Schema.parse(input.ordinalMap);
+  if (authority.status !== 'TRUSTED' || authority.workspaceRevision !== ordinalMap.workspaceRevision) {
+    const reason = authority.status === 'TRUSTED'
+      ? 'TRUSTED_WORKSPACE_REVISION_MISMATCH'
+      : authority.reason;
+    return currentCandidateFeatureAdmissionV1Schema.parse({
+      schema: 'atlas.current-candidate-feature-admission.v1',
+      status: 'BLOCKED_CURRENTNESS',
+      candidateSnapshotRevision: ordinalMap.candidateSnapshotRevision,
+      workspaceRevision: ordinalMap.workspaceRevision,
+      featureRevision: input.featureRevision,
+      ordinalMapChecksum: ordinalMap.ordinalMapChecksum,
+      sourceRevisionSetChecksum: input.sourceRevisionSetChecksum,
+      candidateSetChecksum: input.candidateSetChecksum,
+      rowCount: 0,
+      snapshot: null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+      reason: `BLOCKED_CURRENTNESS:${reason}`,
+    });
+  }
+  return admitCurrentCandidateFeatureSnapshotV1(input);
 }

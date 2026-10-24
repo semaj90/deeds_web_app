@@ -327,9 +327,9 @@ ONNX is client-side only (browser). Server uses Ollama's .gguf quantized models.
 ### Model Serving Map
 | Model | Format | Where | How Served | Hardware |
 |-------|--------|-------|-----------|----------|
-| gemma3-legal 12B | GGUF (Q4_K_M) | Ollama | HTTP/gRPC proxy | RTX 3060 Ti CUDA |
+| ornith 1.5 llama-server 8090 | GGUF (Q4_K_M) | Ollama | HTTP/gRPC proxy | RTX 3060 Ti CUDA |
 | embeddinggemma 307M | GGUF (BF16) | Ollama | HTTP/gRPC proxy | RTX 3060 Ti CUDA |
-| gemma3 270M | ONNX (W8A16) | Browser | Static file fetch | WebGPU / WASM SIMD |
+| webgpu gemma4 assistant mtp| ONNX (W8A16) | Browser | Static file fetch | WebGPU / WASM SIMD |
 | embeddinggemma 300M | ONNX (QInt8) | Browser | Static file fetch | WebGPU / WASM SIMD |
 ---
 ## The No-GPU Scenario (Intel i5 / UHD 630)
@@ -341,7 +341,7 @@ ONNX is client-side only (browser). Server uses Ollama's .gguf quantized models.
 ### The ELIZA Architecture (NES-Style Low-End)
 ```
 TIER 1 — Cached Knowledge (instant, no compute):
-  Glyph cache: pre-compressed legal answers from prior GPU sessions
+  Glyph cache: pre-compressed code domain classification such as, legal answers from prior GPU sessions
   IndexedDB: 7-day persistent cache of embeddings + responses
   LokiJS: session-scoped hot cache
   → 80-90% of repeat queries resolve here
@@ -354,7 +354,7 @@ TIER 2 — Pattern Matching (JS, <1ms):
   → Handles formulaic legal queries without any model
 TIER 3 — WASM SIMD (slow but works, 15-50ms):
   ONNX embeddinggemma → vector search → nearest cached match
-  Tiny gemma 270M → 1-2 tok/s → short answers only
+  Tiny gemma4  → 1-2 tok/s → short answers only
   → Cache result immediately for Tier 1 next time
 TIER 4 — Server Fallback (when local exhausted):
   SSE stream from server Ollama (12B on GPU, or CPU if no GPU)
@@ -452,7 +452,7 @@ Everything else is **moving bytes between caches** to avoid re-running that math
                     └───────────────┬───────────────┘
                                     │ MISS
                     ┌───────────────▼───────────────┐
-                    │  L3: Redis (server)            │  1-5ms
+                    │  L3: Redis-valkey (server)            │  1-5ms
                     │  Cross-request, configurable   │
                     └───────────────┬───────────────┘
                                     │ MISS
@@ -523,7 +523,7 @@ After a few conversations, **90%+ of queries resolve at L0-L1** without hitting 
 | `src/lib/server/agent/autonomous-agent.ts` | LangChain ReAct agent + 15 tools (wired via /api/agent/investigate) |
 | `src/lib/server/agent/tools/web-search-searxng.ts` | SearXNG → DuckDuckGo → curated search |
 | `src/routes/api/agents/chat/+server.ts` | Agent chat with 4 Ollama native tools (web, ripgrep, RAG, glossary) |
-| `src/routes/api/contextual/chat/+server.ts` | Contextual chat with HMM + 3 Ollama tools (glossary, RAG, web) |
+| `src/routes/api/contextual/chat/+server.ts` | Contextual chat with HMM + 3 Ollama UPDATE TO ornith 1.5 llama-server 8090! tools (glossary, RAG, web) |
 | `src/routes/api/agent/investigate/+server.ts` | Autonomous investigation endpoint (15 tools) |
 | `src/routes/api/glossary/search/+server.ts` | 3-strategy glossary search (semantic + FTS + prefix) |
 | `src/routes/api/sse/chat/+server.ts` | Rich SSE chat (RAG + ACE + corrective RAG + glossary + DAG) |

@@ -2,8 +2,8 @@
   "schema": "atlas.toc-oversized-source-skips.v1",
   "configuredMaxBytes": 16777216,
   "summary": {
-    "totalCandidates": 8135,
-    "includedCount": 8031,
+    "totalCandidates": 8519,
+    "includedCount": 8415,
     "skippedCount": 104
   },
   "skips": [

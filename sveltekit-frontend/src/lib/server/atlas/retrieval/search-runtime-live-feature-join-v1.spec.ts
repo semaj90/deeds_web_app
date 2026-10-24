@@ -153,6 +153,29 @@ describe('SearchRuntime live feature join v1', () => {
     ]);
   });
 
+  it('requires runtime identity and revisions instead of deriving them from the chunk profile', () => {
+    const input = baseInput();
+    const cases = [
+      ['packet_key', undefined, 'RUNTIME_PACKET_IDENTITY_MISSING'],
+      ['source_ref', undefined, 'RUNTIME_SOURCE_REF_MISSING'],
+      ['workspace_revision', undefined, 'RUNTIME_WORKSPACE_REVISION_MISSING'],
+      ['source_revision', undefined, 'RUNTIME_SOURCE_REVISION_MISSING'],
+    ] as const;
+
+    for (const [field, value, code] of cases) {
+      const result = compileSearchRuntimeLiveFeatureJoinV1({
+        ...input,
+        response: {
+          ...input.response,
+          packets: [packet({ [field]: value })],
+        },
+      });
+      expect(result.status, field).toBe('BLOCKED');
+      expect(result.snapshot, field).toBeNull();
+      expect(result.rejections.map((rejection) => rejection.code), field).toContain(code);
+    }
+  });
+
   it('fails closed when SearchRuntime did not prove read-only execution', () => {
     const input = baseInput();
     const result = compileSearchRuntimeLiveFeatureJoinV1({
@@ -166,6 +189,25 @@ describe('SearchRuntime live feature join v1', () => {
     expect(result.status).toBe('BLOCKED');
     expect(result.rejections[0]?.code).toBe('SEARCH_RUNTIME_NOT_READ_ONLY');
     expect(result.snapshot).toBeNull();
+  });
+
+  it('rejects duplicate profile and supplement keys instead of selecting by array order', () => {
+    const input = baseInput();
+    const duplicateProfile = compileSearchRuntimeLiveFeatureJoinV1({
+      ...input,
+      profiles: [profile(), profile()],
+    });
+    expect(duplicateProfile.status).toBe('BLOCKED');
+    expect(duplicateProfile.snapshot).toBeNull();
+    expect(duplicateProfile.rejections.map((rejection) => rejection.code)).toContain('DUPLICATE_PROFILE_FOR_CHUNK');
+
+    const duplicateSupplement = compileSearchRuntimeLiveFeatureJoinV1({
+      ...input,
+      supplements: [supplement, { ...supplement, executionUtility: 0.99 }],
+    });
+    expect(duplicateSupplement.status).toBe('BLOCKED');
+    expect(duplicateSupplement.snapshot).toBeNull();
+    expect(duplicateSupplement.rejections.map((rejection) => rejection.code)).toContain('DUPLICATE_SUPPLEMENT_FOR_PACKET');
   });
 
   it('does not zero-fill missing query-time feature evidence', () => {
