@@ -95,4 +95,13 @@ describe('FeatureRow and feature description join', () => {
 			sourceBytesByEvidenceRef: new Map([['evidence:source', bytes]]),
 		})).toThrow(`FEATURE_DESCRIPTION_JOIN_${expected}_MISMATCH`);
 	});
+
+	it('refuses a caller-asserted reviewed label without the reviewed-label owner', () => {
+		const forgedReviewed = { ...description, status: 'REVIEWED' as const, producer: 'HUMAN_REVIEW' as const };
+		expect(() => joinFeatureRowAndDescriptionV1({
+			featureRow: row,
+			description: forgedReviewed,
+			sourceBytesByEvidenceRef: new Map([['evidence:source', bytes]]),
+		})).toThrow('FEATURE_DESCRIPTION_REVIEWED_OWNER_REQUIRED');
+	});
 });
