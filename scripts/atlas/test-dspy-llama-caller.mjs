@@ -146,3 +146,76 @@ test('executeDspyLlamaServerRepair handles offline llama-server cleanly', async 
   assert.equal(result.proposal, null);
   assert.equal(result.kvCachePersisted, false);
 });
+
+test('executeDspyLlamaServerRepair dispatches to workerUrl and validates output', async () => {
+  const server = http.createServer((req, res) => {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      assert.equal(req.url, '/v1/repair');
+      assert.equal(req.method, 'POST');
+      const reqJson = JSON.parse(body);
+      assert.equal(reqJson.schema, 'atlas.dspy-repair-request.v1');
+      assert.equal(reqJson.contextManifestChecksum, `sha256:${manifest.identityChecksum}`);
+      assert.equal(reqJson.authority, 'PROPOSAL_ONLY');
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        schema: 'atlas.dspy-repair-output.v1',
+        contextManifestChecksum: `sha256:${manifest.identityChecksum}`,
+        diagnosis: 'Worker diagnosis of authentication credential type mismatch.',
+        targetCandidates: ['symbol:auth_login'],
+        patchPlan: 'Worker patch plan.',
+        validationPlan: 'npm test',
+        evidenceRefs: ['src:auth.ts'],
+      }));
+    });
+  });
+
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const port = server.address().port;
+  const workerUrl = `http://127.0.0.1:${port}`;
+
+  try {
+    const result = await executeDspyLlamaServerRepair({
+      manifest,
+      options: { workerUrl },
+    });
+
+    assert.equal(result.status, 'ADMITTED');
+    assert.equal(result.endpoint, workerUrl);
+    assert.equal(result.kvCachePersisted, false);
+    assert.equal(result.canonicalAuthority, false);
+    assert.deepEqual(result.proposal.targetCandidates, ['symbol:auth_login']);
+    assert.deepEqual(result.proposal.evidenceRefs, ['src:auth.ts']);
+  } finally {
+    server.close();
+  }
+});
+
+test('executeDspyLlamaServerRepair handles worker 422 validation failure', async () => {
+  const server = http.createServer((req, res) => {
+    res.writeHead(422, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      error: 'VALIDATION_FAILED',
+      detail: 'UNAUTHORIZED_TARGET_ID',
+    }));
+  });
+
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  const port = server.address().port;
+  const workerUrl = `http://127.0.0.1:${port}`;
+
+  try {
+    const result = await executeDspyLlamaServerRepair({
+      manifest,
+      options: { workerUrl },
+    });
+
+    assert.equal(result.status, 'REJECTED_VALIDATION_FAILED');
+    assert.equal(result.proposal, null);
+    assert.equal(result.endpoint, workerUrl);
+  } finally {
+    server.close();
+  }
+});

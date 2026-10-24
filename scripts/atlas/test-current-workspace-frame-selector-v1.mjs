@@ -194,15 +194,21 @@ test('diagnostic CURRENT_SNAPSHOT_PROVEN without canonical graph authority canno
   assert.equal(result.authorityConflict, false);
 });
 
-test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: a clean admission receipt with no conflict and no blockers IS canonically authoritative', () => {
+test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: a clean admission receipt is frame-authoritative, but canonical only after a live currentness readback', () => {
   const root = fixture({
     'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:admitted'),
   });
   const result = resolveCurrentWorkspaceFrameV1({ root, argv: [], env: {} });
   assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
   assert.equal(result.selectedAuthority, true);
-  const authority = computeWorkspaceFrameAuthorityV1(result);
-  assert.equal(authority.frameAuthoritative, true);
-  assert.equal(authority.canonicalAuthority, true);
-  assert.equal(authority.promotionEligible, true);
+  // Without a live currentness readback the frame is authoritative but never canonical (fail closed).
+  const withoutReadback = computeWorkspaceFrameAuthorityV1(result);
+  assert.equal(withoutReadback.frameAuthoritative, true);
+  assert.equal(withoutReadback.currentAtEvaluation, null);
+  assert.equal(withoutReadback.canonicalAuthority, false);
+  assert.equal(withoutReadback.promotionEligible, false);
+  // With an explicit live readback that confirms currentness, canonical follows.
+  const withReadback = computeWorkspaceFrameAuthorityV1(result, { currentAtEvaluation: true });
+  assert.equal(withReadback.canonicalAuthority, true);
+  assert.equal(withReadback.promotionEligible, true);
 });

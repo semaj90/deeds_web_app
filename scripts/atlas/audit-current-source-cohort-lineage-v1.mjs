@@ -72,7 +72,9 @@ if (workspaceFrame.status !== 'CURRENT_WORKSPACE_FRAME_SELECTED') {
   earlyStatus = 'CURRENT_WORKSPACE_FRAME_NON_AUTHORITATIVE';
 }
 
-const currentWorkspaceRevision = workspaceFrame.selectedWorkspaceRevision;
+// No live workspace readback is wired into this audit. The previous value was the selected frame's own revision,
+// which made every 'current' comparison self-referential. Until a readback supplies it, currentness is unknown and fails closed.
+const currentWorkspaceRevision = null;
 const rows = cohort.cohort ?? [];
 const refs = rows.map((row) => String(row.relativePath ?? '').trim()).filter(Boolean);
 const prefixedRefs = refs.map((ref) => ref.startsWith('sveltekit-frontend/') ? ref : `sveltekit-frontend/${ref}`);

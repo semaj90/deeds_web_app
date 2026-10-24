@@ -1,9 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   CANONICAL_DOMAINS,
+  NES_LUT_DOMAIN_PALETTE,
   FEATURE_MATRIX_COLS_25,
   GEMM_OUT_DIM_64,
   classifyTextWithNesLutSubHelper,
@@ -16,7 +19,20 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../../..');
 
-test('classifyTextWithNesLutSubHelper maps Svelte 5 runes to ui domain and NES LUT 0x2A', () => {
+test('shared palette reserves zero for unresolved and matches the generated artifact', () => {
+  const artifact = JSON.parse(readFileSync(resolve(ROOT, 'scripts/atlas/data/nes-domain-palette-v1.json'), 'utf8'));
+  assert.equal(artifact.schema, 'atlas.nes-domain-palette.v1');
+  const { checksum, ...unsignedArtifact } = artifact;
+  assert.equal(checksum, `sha256:${createHash('sha256').update(JSON.stringify(unsignedArtifact)).digest('hex')}`);
+  assert.equal(artifact.unresolved.lutByte, 0x00);
+  assert.deepEqual(artifact.domains, NES_LUT_DOMAIN_PALETTE);
+  assert.equal(artifact.domains.general.lutByte, 0x0A);
+  assert.equal(artifact.subLabels.svelte5_runes.domain, 'ui');
+  assert.equal(artifact.subLabels.svelte5_runes.nesHex, '0x2A');
+  assert.equal(new Set(Object.values(artifact.domains).map(({ lutByte }) => lutByte)).size, 10);
+});
+
+test('classifyTextWithNesLutSubHelper maps Svelte 5 runes to ui and keeps 0x2A as NES color', () => {
   const rec = classifyTextWithNesLutSubHelper({
     chunk_id: 'doc:svelte5:1',
     source_url: 'https://svelte.dev/docs/svelte/$state',

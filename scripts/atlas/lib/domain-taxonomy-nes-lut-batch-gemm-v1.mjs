@@ -42,7 +42,7 @@ export const NES_LUT_DOMAIN_PALETTE = Object.freeze({
   agent: { lutByte: 0x07, nesHex: '0x24', label: 'DOM_AGENT_OAK_RLM_DSPY', priorWeight: 0.92 },
   graph: { lutByte: 0x08, nesHex: '0x1A', label: 'DOM_GRAPH_CUGRAPH_PAGERANK', priorWeight: 0.9 },
   ml: { lutByte: 0x09, nesHex: '0x14', label: 'DOM_ML_ATEN_TENSORRT_GEMM', priorWeight: 0.94 },
-  general: { lutByte: 0x00, nesHex: '0x0F', label: 'DOM_GENERAL_FALLBACK', priorWeight: 0.4 },
+  general: { lutByte: 0x0A, nesHex: '0x0F', label: 'DOM_GENERAL_FALLBACK', priorWeight: 0.4 },
 });
 
 export const DOMAIN_KEYWORD_LEXICON = Object.freeze({

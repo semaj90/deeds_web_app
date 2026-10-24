@@ -306,6 +306,20 @@ test('snapshot readback rejects a tampered snapshot revision', () => {
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('snapshot byte drift readback records expected and observed source revisions', () => {
+  const root = makeRepo();
+  try {
+    const snapshot = captureStableSnapshot(root, 'ws-test');
+    writeFileSync(path.join(root, 'a.ts'), 'export const a = 22;\n');
+    const readback = validateSnapshot(snapshot);
+    const drift = readback.violationDetails.find((row) => row.sourceRef === 'a.ts');
+    assert.equal(drift?.code, 'SOURCE_BYTES_CHANGED');
+    assert.notEqual(drift?.observedSourceRevision, drift?.expectedSourceRevision);
+    assert.equal(drift?.observedByteLength, Buffer.byteLength('export const a = 22;\n'));
+    assert.equal(drift?.repositoryId, 'repo:root');
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('uncached byte oracle invalidates persisted cache after same-size same-mtime drift', () => {
   const root = makeRepo();
   try {

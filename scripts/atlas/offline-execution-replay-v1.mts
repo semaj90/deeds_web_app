@@ -16,12 +16,21 @@
  *   --corrupt  writes a one-byte-altered copy of the artifact and reads that copy, to prove fail-closed behaviour.
  */
 import { createHash, randomUUID } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tableFromArrays, tableToIPC } from 'apache-arrow';
 import { admitArrowArtifact } from './lib/arrow-artifact-admission-v1.mjs';
+import {
+  applyCouchDbOfflineBatchV1,
+  createCouchDbOfflineBatchV1,
+  createCouchDbReplayStateV1,
+  readBackCouchDbOfflineBatchArtifactV1,
+  summarizeCouchDbReplayV1,
+  writeCouchDbOfflineBatchArtifactV1,
+} from './lib/couchdb-offline-batch-v1.mjs';
+import { reduceCouchDbReplaySummaryWithDuckDbV1, verifyCouchDbDuckDbSourceRollupV1 } from './lib/couchdb-duckdb-source-rollup-v1.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 // msgpack is installed under sveltekit-frontend only; resolve it from there.
@@ -55,8 +64,20 @@ const fixture = {
     summary: `Fixture summary for candidate ${i + 1}: source-grounded text used for context.`,
   })),
 };
-const expected = fixture.candidates.length;
-const inputSnapshotSha = sha(canonical(fixture));
+const couchDbBatch = createCouchDbOfflineBatchV1({
+  sourceDatabase: 'fixture_parent_atlas',
+  lastSequence: { fixture_sequence: fixture.candidates.length },
+  changes: fixture.candidates.map((candidate, index) => ({
+    id: `fixture-candidate-${index + 1}`,
+    changes: [{ rev: `1-fixture-${index + 1}` }],
+    doc: { _id: `fixture-candidate-${index + 1}`, _rev: `1-fixture-${index + 1}`, payload: candidate },
+  })),
+});
+const initialReplay = applyCouchDbOfflineBatchV1(createCouchDbReplayStateV1(), couchDbBatch);
+const replaySummary = summarizeCouchDbReplayV1(initialReplay.state);
+const candidates = replaySummary.documents.filter((document) => !document.deleted).map((document) => document.document.payload);
+const expected = candidates.length;
+const inputSnapshotSha = sha(canonical({ fixture, couchdb_batch_sha256: couchDbBatch.batchDigest }));
 
 type StageReceipt = {
   stage: string;
@@ -76,35 +97,51 @@ const record = (receipt: StageReceipt, payload: unknown) => {
 };
 
 mkdirSync(receiptsDir, { recursive: true });
-writeOnce(path.join(runDir, 'input-manifest.json'), canonical({ run_id: runId, fixture: true, input_snapshot_sha256: inputSnapshotSha, workspace_revision: fixture.workspace_revision, source_revision: fixture.source_revision, graph_revision: fixture.graph_revision, expected_count: expected }));
+writeOnce(path.join(runDir, 'input-manifest.json'), canonical({ run_id: runId, fixture: true, input_snapshot_sha256: inputSnapshotSha, couchdb_batch_sha256: couchDbBatch.batchDigest, workspace_revision: fixture.workspace_revision, source_revision: fixture.source_revision, graph_revision: fixture.graph_revision, expected_count: expected }));
 
-// ---- stage 1: frozen index fixture (validate ids and finite values) -------------------------
-const indexValid = fixture.candidates.filter((c) =>
-  /^cand:\d+$/.test(c.candidate_id) && [c.lex, c.sem, c.struct].every((v) => Number.isFinite(v)));
-record({ stage: 'INDEX', status: indexValid.length === expected ? 'PASS' : 'FAIL', expected, processed: indexValid.length, failed: expected - indexValid.length, reason: indexValid.length === expected ? undefined : 'INDEX_ROW_INVALID' }, fixture.candidates);
-
-// ---- stage 2: MapReduce-style local aggregate (group by source directory; deterministic) ------
-let aggregate: Record<string, number> = {};
+// ---- stage 1: fixture CouchDB batch envelope and immutable artifact readback ----------------
+let couchDbBatchReadbackValid = false;
 if (!halted) {
-  for (const c of fixture.candidates) {
-    const dir = c.source_ref.split('/').slice(0, 2).join('/');
-    aggregate[dir] = (aggregate[dir] ?? 0) + 1;
-  }
-  aggregate = Object.fromEntries(Object.entries(aggregate).sort(([a], [b]) => a.localeCompare(b)));
-  const total = Object.values(aggregate).reduce((s, n) => s + n, 0);
-  record({ stage: 'MAPREDUCE', status: total === expected ? 'PASS' : 'FAIL', expected, processed: total, failed: expected - total, reason: total === expected ? undefined : 'AGGREGATE_TOTAL_MISMATCH' }, aggregate);
+  const batchDirectory = path.join(runDir, 'couchdb-batch');
+  writeCouchDbOfflineBatchArtifactV1(couchDbBatch, batchDirectory);
+  const readback = readBackCouchDbOfflineBatchArtifactV1(batchDirectory);
+  couchDbBatchReadbackValid = readback.batch.batchDigest === couchDbBatch.batchDigest
+    && readback.receipt.recordCount === expected
+    && replaySummary.documentCount === expected;
+  record({ stage: 'COUCHDB_BATCH', status: couchDbBatchReadbackValid ? 'PASS' : 'FAIL', expected, processed: readback.receipt.recordCount, failed: couchDbBatchReadbackValid ? 0 : expected, outputSha256: readback.receipt.receiptChecksum, reason: couchDbBatchReadbackValid ? undefined : 'COUCHDB_BATCH_READBACK_MISMATCH' }, readback.receipt);
 }
 
-// ---- stage 3: Arrow IPC feature artifact -----------------------------------------------------
+// ---- stage 2: frozen index fixture (validate ids and finite values) -------------------------
+const indexValid = candidates.filter((c) =>
+  /^cand:\d+$/.test(c.candidate_id) && [c.lex, c.sem, c.struct].every((v) => Number.isFinite(v)));
+record({ stage: 'INDEX', status: indexValid.length === expected ? 'PASS' : 'FAIL', expected, processed: indexValid.length, failed: expected - indexValid.length, reason: indexValid.length === expected ? undefined : 'INDEX_ROW_INVALID' }, candidates);
+
+// ---- stage 3: DuckDB MapReduce aggregate (group by source directory; deterministic) ------------
+let aggregate: Awaited<ReturnType<typeof reduceCouchDbReplaySummaryWithDuckDbV1>> | null = null;
+let mapReduceArtifactSha: string | null = null;
+if (!halted) {
+  aggregate = await reduceCouchDbReplaySummaryWithDuckDbV1(replaySummary);
+  const rollupPath = path.join(runDir, 'mapreduce-rollup.json');
+  writeOnce(rollupPath, canonical(aggregate));
+  const rollupBytes = readFileSync(rollupPath);
+  const rollupReadback = JSON.parse(rollupBytes.toString('utf8'));
+  const rollupVerification = verifyCouchDbDuckDbSourceRollupV1(rollupReadback);
+  mapReduceArtifactSha = sha(rollupBytes);
+  const total = rollupVerification.valid ? rollupReadback.aggregatedDocumentCount : 0;
+  const mapReduceOk = rollupVerification.valid && rollupReadback.aggregateDigest === aggregate.aggregateDigest && total === expected;
+  record({ stage: 'MAPREDUCE', status: mapReduceOk ? 'PASS' : 'FAIL', expected, processed: mapReduceOk ? total : 0, failed: mapReduceOk ? 0 : expected, outputSha256: mapReduceArtifactSha, reason: mapReduceOk ? undefined : (rollupVerification.reason ?? 'AGGREGATE_READBACK_MISMATCH') }, rollupReadback);
+}
+
+// ---- stage 4: Arrow IPC feature artifact -----------------------------------------------------
 let artifactSha = '';
 let artifactFile = path.join(runDir, 'feature-matrix.arrow');
 const featureSchema = { fields: ['candidate_id:utf8', 'lex:f32', 'sem:f32', 'struct:f32'], row_count: expected, source_revision: fixture.source_revision };
 if (!halted) {
   const table = tableFromArrays({
-    candidate_id: fixture.candidates.map((c) => c.candidate_id),
-    lex: Float32Array.from(fixture.candidates.map((c) => c.lex)),
-    sem: Float32Array.from(fixture.candidates.map((c) => c.sem)),
-    struct: Float32Array.from(fixture.candidates.map((c) => c.struct)),
+    candidate_id: candidates.map((c) => c.candidate_id),
+    lex: Float32Array.from(candidates.map((c) => c.lex)),
+    sem: Float32Array.from(candidates.map((c) => c.sem)),
+    struct: Float32Array.from(candidates.map((c) => c.struct)),
   });
   const bytes = tableToIPC(table, 'file');
   artifactSha = sha(bytes);
@@ -120,7 +157,7 @@ if (!halted) {
   record({ stage: 'ARROW', status: 'PASS', expected, processed: expected, failed: 0, outputSha256: sha(bytes) }, featureSchema);
 }
 
-// ---- stage 4: admitted read-back (checksum, schema, dtype, row range, revision, finite) ------
+// ---- stage 5: admitted read-back (checksum, schema, dtype, row range, revision, finite) ------
 const descriptorForAdmission = {
   artifact_sha256: artifactSha,
   schema: featureSchema.fields,
@@ -153,7 +190,7 @@ if (!halted) {
   }, null);
 }
 
-// ---- stage 5: msgpack RPC descriptor (reference only, no values) -----------------------------
+// ---- stage 6: msgpack RPC descriptor (reference only, no values) -----------------------------
 let descriptorBytes: Uint8Array = new Uint8Array();
 if (!halted) {
   const descriptor = {
@@ -173,7 +210,7 @@ if (!halted) {
   record({ stage: 'RPC', status: ok ? 'PASS' : 'FAIL', expected, processed: ok ? expected : 0, failed: ok ? 0 : expected, outputSha256: rpcSha, reason: ok ? undefined : 'DESCRIPTOR_ROUNDTRIP_FAILED' }, descriptor);
 }
 
-// ---- stage 6: token-budgeted ContextManifest, selected evidence only ------------------------
+// ---- stage 7: token-budgeted ContextManifest, selected evidence only ------------------------
 let selected: Array<{ candidate_id: string; source_ref: string; source_revision: string; est_tokens: number }> = [];
 if (!halted) {
   const ranked = [...fixture.candidates].sort((a, b) => b.sem - a.sem || a.candidate_id.localeCompare(b.candidate_id));
@@ -193,7 +230,7 @@ if (!halted) {
 }
 
 // ---- execution manifest: joins every stage receipt --------------------------------------------
-const allPass = stages.length === 6 && stages.every((r) => r.status === 'PASS');
+const allPass = stages.length === 7 && stages.every((r) => r.status === 'PASS');
 const processed = allPass ? expected : 0;
 const execution = {
   schema: 'atlas.offline-pipeline-execution-manifest.v1',
@@ -204,6 +241,9 @@ const execution = {
   source_revision: fixture.source_revision,
   graph_revision: fixture.graph_revision,
   input_snapshot_sha256: inputSnapshotSha,
+  couchdb_batch_sha256: couchDbBatch.batchDigest,
+  couchdb_replay_summary_sha256: replaySummary.summaryDigest,
+  mapreduce_rollup_artifact_sha256: mapReduceArtifactSha,
   stage_receipts: stages,
   artifact_sha256: artifactSha || null,
   rpc_descriptor_sha256: rpcSha || null,

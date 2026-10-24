@@ -306,7 +306,17 @@ export function captureStableSnapshot(
 export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, options?: { sourceReadRoot?: string; digestCachePath?: string }) {
   const { schema, snapshotRevision, workspaceRevision, status, canonicalAuthority, datastoreWritesPerformed, ...body } = snapshot;
   const violations: string[] = [];
-  const violationDetails: Array<{ sourceRef: string; code: string }> = [];
+  const violationDetails: Array<{
+    sourceRef: string;
+    code: string;
+    repositoryId: string;
+    repositoryPath: string;
+    repositoryRelativePath: string;
+    expectedSourceRevision: string;
+    expectedByteLength: number;
+    observedSourceRevision: string | null;
+    observedByteLength: number | null;
+  }> = [];
   if (schema !== 'atlas.workspace-source-snapshot-capture.v1' || hash(body) !== snapshotRevision) violations.push('MANIFEST_CHECKSUM_MISMATCH');
   if (workspaceRevision !== null || canonicalAuthority !== false || datastoreWritesPerformed !== false) violations.push('UNEXPECTED_AUTHORITY_CLAIM');
   if (status !== 'CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK' || body.violations.length) violations.push('CAPTURE_NOT_VERIFIED');
@@ -328,6 +338,8 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
       ? source.sourceRef
       : source.repositoryRelativePath ?? source.sourceRef;
     const file = path.resolve(repositoryRoot, relativeSource);
+    let observedSourceRevision: string | null = null;
+    let observedByteLength: number | null = null;
     try {
       const resolvedRepositoryRoot = realpathSync(repositoryRoot);
       if (!file.startsWith(resolvedRepositoryRoot + path.sep)
@@ -335,6 +347,8 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
         || lstatSync(file).isSymbolicLink()) throw new Error('UNSAFE_PATH');
       const bytes = readFileSync(file);
       const digest = createHash('sha256').update(bytes).digest('hex');
+      observedSourceRevision = `sha256:${digest}`;
+      observedByteLength = bytes.length;
       if (digest !== source.contentDigest || source.sourceRevision !== `sha256:${digest}` || bytes.length !== source.byteLength) throw new Error('SOURCE_BYTES_CHANGED');
       exactMatches++;
     } catch (error) {
@@ -350,7 +364,17 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
             ? 'SOURCE_FILE_MISSING'
             : 'SOURCE_READBACK_ERROR';
       violations.push(`SOURCE_READBACK_FAILED:${source.sourceRef}`);
-      violationDetails.push({ sourceRef: source.sourceRef, code });
+      violationDetails.push({
+        sourceRef: source.sourceRef,
+        code,
+        repositoryId: source.repositoryId,
+        repositoryPath: source.repositoryPath ?? '',
+        repositoryRelativePath: source.repositoryRelativePath ?? source.sourceRef,
+        expectedSourceRevision: source.sourceRevision,
+        expectedByteLength: source.byteLength,
+        observedSourceRevision,
+        observedByteLength,
+      });
       if (code === 'SOURCE_BYTES_CHANGED' && options?.digestCachePath) {
         rmSync(options.digestCachePath, { force: true });
         digestCacheInvalidated = true;

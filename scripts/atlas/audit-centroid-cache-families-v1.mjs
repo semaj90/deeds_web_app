@@ -4,11 +4,12 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
+import { CENTROID_NAMESPACE_V1 } from './lib/centroid-cache-key-contract-v1.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const reportPath = resolve(root, 'docs/reports/centroid-cache-families-v1.json');
 const redisUrl = process.env.REDIS_URL ?? process.env.VALKEY_URL ?? 'redis://:redis@127.0.0.1:6379';
-const patterns = ['centroid:*', 'ace:cluster:*', 'som:*', 'gpu:autoencoder:*'];
+const patterns = [`${CENTROID_NAMESPACE_V1}:*`, 'atlas:centroid:*', 'centroid:*', 'ace:cluster:*', 'som:*', 'gpu:autoencoder:*'];
 const redis = new Redis(redisUrl, { lazyConnect: true, connectTimeout: 3000, maxRetriesPerRequest: 1 });
 const report = {
   schema: 'atlas.centroid-cache-families.v1',
