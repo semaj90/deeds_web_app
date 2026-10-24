@@ -253,6 +253,31 @@ function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
  * Runtime behavior is correct; only TypeScript type checking is broken.
  * This will be fixed when the SDK ships Zod 4 support.
  */
+export type ToolArgsValidationV1 =
+	| { status: 'VALID' }
+	| { status: 'INVALID'; reasons: string[] }
+	| { status: 'NO_CACHED_SCHEMA' };
+
+/**
+ * Validate tool-call arguments against the tool's cached tools/list inputSchema.
+ * Returns NO_CACHED_SCHEMA when the tool list is unavailable, so the caller can warn and allow.
+ */
+export async function validateToolArgsAgainstSchemaV1(
+	toolName: string,
+	args: Record<string, unknown>,
+): Promise<ToolArgsValidationV1> {
+	const toolList = await fetchMcpToolList();
+	const tool = toolList.find((t) => t.name === toolName);
+	if (!tool) return { status: 'NO_CACHED_SCHEMA' };
+
+	const parsed = jsonSchemaToZod(tool.inputSchema as Record<string, unknown>).safeParse(args);
+	if (parsed.success) return { status: 'VALID' };
+	return {
+		status: 'INVALID',
+		reasons: parsed.error.issues.map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`),
+	};
+}
+
 export async function buildMcpToolMap(allowlist?: string[]) {
 	const toolList = await fetchMcpToolList();
 	const result: Record<string, ReturnType<typeof tool>> = {};
