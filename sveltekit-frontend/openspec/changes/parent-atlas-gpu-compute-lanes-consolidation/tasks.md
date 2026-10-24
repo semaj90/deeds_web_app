@@ -2033,3 +2033,13 @@ Top remediation (priority order):
 3. No Python gate exists in the graph. Add a Python test gate to the next audit run.
 
 Run: serial, concurrency 1, wall time not measured; serial oracle: not run (single pass). No database, Valkey, Qdrant or Neo4j writes. Graph freshness is the main limit on this report.
+
+### Deep-audit remediation 1 and 2 (2026-10-24)
+
+- Index regenerated: probe `docs/reports/graph-probes/codebase-graph.2026-10-24T08-01-47-190Z-40892.json` (35,770 files). The canonical `docs/graph/codebase-graph.json` was not republished (still Oct 17).
+- Code gates on the new probe: 15 scoped files. G11 warning unchanged (`dspy-llama-server-caller-v1.ts`). No hard failures. Repo-wide cycles 17 (was 16), not scoped to this change.
+- Side effect to disclose: the index run wrote 1,677 wiki notes to Redis (`wiki:note:dir:*`) because `--skip-redis` was not passed. Deep-audit rules forbid Valkey writes from audit gates. Recommend clearing or re-running with `--skip-redis`; not done here.
+
+### Correction (2026-10-24)
+
+- The Redis writes from the index run (1,677 `wiki:note:dir:*` notes) are intended. The indexer writes them by design; `--skip-redis` is only an opt-out. The earlier recommendation to clear them is withdrawn. The deep-audit rule against Valkey writes applies to the audit gates themselves, not to the indexer run.

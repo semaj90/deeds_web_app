@@ -121,3 +121,10 @@ Not done / open:
 - Canonical default unchanged; the challenger is not wired into any route.
 
 Next steps (need decisions): choose labeled query set; decide backfill scope; verify prompt format; compare GGUF to official safetensors on a fixed sample.
+
+### Embedding dtype and transport boundary recheck (2026-10-24)
+
+- The active runtime contract in `src/lib/server/atlas/embedding/embedding-runtime-v1.ts` validates normalized 768-element `Float32Array` output and digests its raw bytes. Dimension, dtype, model/recipe revision, normalization, and source lineage remain separate compatibility predicates.
+- EmbeddingGemma MRL prefix projections are derived 512/256/128 representations with truncation/renormalization under their own representation contract; they are not a 384-to-768 conversion. A missing canonical 768 vector must be re-embedded from eligible original text, never padded, sliced, or relabeled from a 384 vector.
+- The inspected Python feature helper creates CPU `torch.float32` tensors. This proves a local tensor-building implementation only, not a live PyTorch embedding/query path or canonical corpus write. FP16/BF16/INT8 may be benchmarked as separately versioned storage/execution challengers; none is interchangeable with the canonical F32 digest without an explicit quantization/dequantization and recall/error contract.
+- MessagePack's `Uint8Array` is the encoded descriptor envelope, not evidence that bulk vectors are transported inside it. Existing packet transport rules keep vectors/matrices in Arrow IPC, raw F32 mmap, or tensor paths. No `xformers` implementation was found in the searched active Atlas embedding/transport owners; it is not a dtype or serialization format and is not a prerequisite to the canonical embedding contract.
