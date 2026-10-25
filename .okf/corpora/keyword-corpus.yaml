@@ -352,3 +352,80 @@ entries:
       - sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.ts
       - sveltekit-frontend/src/lib/server/atlas/retrieval/orf-feature-row-reader-v1.ts
     retrieval_policy: reference_only; evidence is admitted only after exact namespace and parent-identity match; unqualified rows are excluded and reported, never repaired in place
+
+  - id: parent-atlas-python-nlp-sidecar-patterns
+    terms: [Python, Python 3, FastAPI, Uvicorn, NLP sidecar, "8095", LangExtract, grounded extraction, OAKLIB, OaKLIB, Tree-sitter, tree-sitter, AST-grep, spaCy, LSP, Language Server Protocol, tsserver, documentation facts, ontology candidate search, miniforge_nlp_sidecar_v2.py, /extract/documentation-facts, /ontology/oaklib/search]
+    definition: >-
+      Lexical discovery vocabulary for the Python NLP/OAKLIB sidecar and its
+      structural-analysis interfaces. A match helps locate relevant code or docs;
+      it does not establish that a package, route, model, or service is live or
+      that extracted facts have canonical authority.
+    evidence_status: SOURCE_TERMS_PRESENT_LIVE_ROUTE_AND_AUTHORITY_REQUIRE_SEPARATE_PROOF
+    source_refs:
+      - python/miniforge_nlp_sidecar_v2.py
+      - python/atlas_langextract_runtime.py
+      - python/parent_atlas_ontology/oaklib_external_adapter.py
+      - docs/architecture/langextract-atlas-integrations.md
+    retrieval_policy: lexical_discovery_only; verify deployed route, pinned runtime, exact source spans, and admission independently
+
+  - id: parent-atlas-native-interop-patterns
+    terms: [C programming, C++, CUDA C++, N-API, napi, node-addon-api, Node native addon, simdjson, SIMD JSON, JSONL, NDJSON, Arrow IPC, gRPC, Protocol Buffers, Protobuf, AVX2, AVX-512, SIMD, radix sort, CUB DeviceRadixSort, key-value sort pairs]
+    definition: >-
+      Lexical discovery vocabulary for native parsing, transport, SIMD, and
+      key/value sorting boundaries. Parsing or sorting results must still be
+      schema-validated and joined back through canonical identity; the terms do
+      not imply a compiled addon or production GPU execution.
+    evidence_status: SOURCE_TERMS_PRESENT_NATIVE_RUNTIME_CALLER_AND_GPU_RECEIPT_UNPROVEN
+    source_refs:
+      - simd-bridge/cpp/binding.cc
+      - simd-bridge/cpp/simdjson_bridge.cc
+      - native/ace-radix-01/radix_bench.cu
+      - sveltekit-frontend/src/lib/server/atlas/indexing/simdjson-typed-evidence-bridge.ts
+    retrieval_policy: lexical_discovery_only; preserve ordinal-to-key association and validate typed payloads after parsing
+
+  - id: parent-atlas-nvidia-gpu-ml-patterns
+    terms: [NVIDIA, RTX, GPU, CUDA, CUB, RAPIDS, cuDF, cuML, cuVS, CAGRA, cuGraph, PyTorch, LibTorch, Triton, TensorRT, ONNX Runtime, EmbeddingGemma, EmbeddingGemma 2, XGBoost GPU, KMeans, SOM 20x20, tensor, Arrow mmap, CUDA stream]
+    definition: >-
+      Lexical discovery vocabulary for NVIDIA hardware, CUDA/native execution,
+      GPU dataframe and graph libraries, tensor runtimes, and model experiments.
+      Repository presence or a keyword match is not evidence that the component
+      is installed, compatible, active, trained, or promoted.
+    evidence_status: SOURCE_TERMS_PRESENT_DEVICE_AND_PRODUCTION_EXECUTION_STATUS_MUST_BE_VERIFIED
+    source_refs:
+      - python/atlas_graph_runtime/cuvs_executor.py
+      - python/atlas_compute/cudf_ace_packet_builder.py
+      - python/atlas_compute/torch_kernel_experiment.py
+      - simd-bridge/cpp/cuvs_bridge.cc
+      - simd-bridge/cpp/libtorch_graph_impl.cpp
+    retrieval_policy: lexical_discovery_only; distinguish source scaffolding, runtime availability, fixture parity, and live execution receipts
+
+  - id: parent-atlas-retrieval-storage-patterns
+    terms: [PostgreSQL 18, PostgreSQL 18.4, pgvector, full-text search, FTS, GIN, B-tree, bitmap scan, HNSW, IVFFlat, Qdrant, Redis, Valkey, Graphify, SearchRuntime, PageRank, PPR, Top-K, BM25, CandidateOrdinalMapV1, semantic_768, ACE, ContextManifest]
+    definition: >-
+      Lexical discovery vocabulary for canonical PostgreSQL retrieval and its
+      rebuildable vector/cache/graph projections. PostgreSQL owns canonical
+      identity and evidence; planner choices such as bitmap scans are not
+      application-level admission contracts.
+    evidence_status: SOURCE_TERMS_PRESENT_CURRENT_LINEAGE_AND_PRODUCTION_CALLERS_REQUIRE_READBACK
+    source_refs:
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+      - sveltekit-frontend/src/lib/server/retrieval/bm25-search.ts
+      - sveltekit-frontend/src/lib/server/embedding/canonical-embed.ts
+      - sveltekit-frontend/src/lib/server/search/qdrant-search.ts
+      - docs/reports/parent-atlas-live-fts-lineage-audit-20261024.json
+    retrieval_policy: lexical_discovery_only; do not create a parallel index or infer current admission from table/index presence
+
+  - id: parent-atlas-agentic-optimization-patterns
+    terms: [MCP, agentic search, ACE packet, context engineering, ContextManifest, DAG synthesis, DSPy, GEPA, RLM, OaK, repair evaluation, frozen evaluation, XGBoost grouped ranking, learned reranker, tool calling, Headroom, BitFrost, token cache]
+    definition: >-
+      Lexical discovery vocabulary for agent orchestration, bounded context
+      assembly, evaluation, optimization, and derived-cache work. Tool selection,
+      model scores, cache hits, and optimizer output do not authorize writes or
+      promote evidence; only admitted context may drive protected actions.
+    evidence_status: SOURCE_TERMS_PRESENT_EVALUATION_AND_PRODUCTION_ADMISSION_GATES_REMAIN
+    source_refs:
+      - sveltekit-frontend/src/mcp/trace-mcp-server.ts
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+      - python/atlas_xgboost_grouped_ranking_v1.py
+      - openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md
+    retrieval_policy: lexical_discovery_only; preserve frozen splits, one fusion owner, authorization, and independent readback

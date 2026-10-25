@@ -1,14 +1,14 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-10-24T01:45:22.871Z
+Generated: 2026-10-25T08:30:36.509Z
 
 ## Summary
 
 - tables checked: 11
-- static aligned: 6
-- live aligned: 4
+- static aligned: 5
+- live aligned: 6
 - live unavailable: 0
-- blockers: 12
+- blockers: 11
 
 ## Packet Spine
 
@@ -46,45 +46,45 @@ Generated: 2026-10-24T01:45:22.871Z
 
 ## atlas_workspace_events
 
-- classification: LIVE_TABLE_MISSING
+- classification: COLUMN_MISMATCH
 - repair_class: ADD_DRIZZLE_MIRROR
 - static: COLUMN_MISMATCH
-- live: LIVE_TABLE_MISSING
+- live: COLUMN_MISMATCH
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts
 - manual sources: sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql, sveltekit-frontend/drizzle/manual/20261017_workspace_event_provenance_v1_DRAFT.sql
 - static columns: after_state_checksum, base_snapshot_revision, before_state_checksum, causation_id, correlation_id, created_at, delta_root_checksum, event_checksum, event_id, event_type, occurred_at, previous_head_revision, producer_revision, sequence, task_id, workspace_head_revision, workspace_id
 - static indexes: atlas_workspace_events_idempotency_uidx, atlas_workspace_events_task_idx, atlas_workspace_events_workspace_sequence_idx
-- live columns: none
-- live indexes: none
-- live rows: n/a
+- live columns: event_id, workspace_id, sequence, base_snapshot_revision, previous_head_revision, workspace_head_revision, delta_root_checksum, event_type, occurred_at, correlation_id, causation_id, producer_revision, before_state_checksum, after_state_checksum, event_checksum, created_at, task_id, execution_run_id, lease_id, lease_fence_token, lease_fence_epoch, worktree_id, branch, base_commit, actor, idempotency_key, supersedes_event_id
+- live indexes: atlas_workspace_events_event_checksum_key, atlas_workspace_events_idempotency_uidx, atlas_workspace_events_pkey, atlas_workspace_events_task_idx, atlas_workspace_events_workspace_id_base_snapshot_revision__key, atlas_workspace_events_workspace_sequence_idx
+- live rows: 0
 
 ## atlas_workspace_event_participants
 
-- classification: LIVE_TABLE_MISSING
-- repair_class: APPLY_EXISTING_SQL
+- classification: LIVE_DB_ALIGNED
+- repair_class: null
 - static: SQL_AND_DRIZZLE_ALIGNED
-- live: LIVE_TABLE_MISSING
+- live: LIVE_DB_ALIGNED
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts
 - manual sources: sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql
 - static columns: canonical_id, event_id, participant_ordinal, relation, revision, role
 - static indexes: atlas_workspace_event_participants_canonical_idx
-- live columns: none
-- live indexes: none
-- live rows: n/a
+- live columns: event_id, participant_ordinal, role, canonical_id, revision, relation
+- live indexes: atlas_workspace_event_participants_canonical_idx, atlas_workspace_event_participants_pkey
+- live rows: 0
 
 ## atlas_workspace_heads
 
-- classification: LIVE_TABLE_MISSING
-- repair_class: APPLY_EXISTING_SQL
+- classification: LIVE_DB_ALIGNED
+- repair_class: null
 - static: SQL_AND_DRIZZLE_ALIGNED
-- live: LIVE_TABLE_MISSING
+- live: LIVE_DB_ALIGNED
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts
 - manual sources: sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql
 - static columns: base_snapshot_revision, changed_source_count, delta_root_checksum, event_count_since_snapshot, last_event_checksum, last_event_id, last_event_sequence, updated_at, workspace_head_revision, workspace_id
 - static indexes: none
-- live columns: none
-- live indexes: none
-- live rows: n/a
+- live columns: workspace_id, base_snapshot_revision, last_event_sequence, last_event_id, last_event_checksum, delta_root_checksum, event_count_since_snapshot, changed_source_count, workspace_head_revision, updated_at
+- live indexes: atlas_workspace_heads_pkey
+- live rows: 0
 
 ## task_semantic_packets
 
@@ -159,15 +159,15 @@ Generated: 2026-10-24T01:45:22.871Z
 ## route_runtime_packets
 
 - classification: COLUMN_MISMATCH
-- repair_class: ADD_MISSING_COLUMNS_VERIFY_WRITERS
-- static: SQL_AND_DRIZZLE_ALIGNED
+- repair_class: ADD_DRIZZLE_MIRROR
+- static: INDEX_MISMATCH
 - live: COLUMN_MISMATCH
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/route_runtime_packets.ts
-- manual sources: sveltekit-frontend/drizzle/manual/0024_feature_id_metadata_gin_indexes.sql, sveltekit-frontend/drizzle/manual/0999_fix-grpc-proto-alignment.sql, sveltekit-frontend/drizzle/manual/20260603_atlas_synthesis_tables.sql, sveltekit-frontend/drizzle/manual/20260606_route_packet_tables.sql
+- manual sources: sveltekit-frontend/drizzle/manual/0024_feature_id_metadata_gin_indexes.sql, sveltekit-frontend/drizzle/manual/0999_fix-grpc-proto-alignment.sql, sveltekit-frontend/drizzle/manual/20260603_atlas_synthesis_tables.sql, sveltekit-frontend/drizzle/manual/20260606_route_packet_tables.sql, sveltekit-frontend/drizzle/manual/20261025_route_runtime_packets_packet_uuid_v1.sql
 - static columns: cache_hit, cache_tier, canonical, captured_at, cluster_id, community_confidence, community_id, community_source, domain_class, feature_id, feature_ids, feature_label, git_diff_rank, git_sha, id, kmeans_cluster, lane_ids, latency_ms, ledger_type, lineage_version, metadata, packet_key, packet_uuid, packet_version, payload_backfilled_at, prompt_hash, qdrant_hits, query_hash, query_preview, raw, redis_hot_keys, repair_method, repair_reason, response_tokens, reward, route, route_state, session_id, som_cluster, som_col, som_index, som_row, source_ref, source_ref_quality, source_refs, summary, superseded_by, supersedes_packet_uuid, tags, tree_node_id, user_id
-- static indexes: idx_route_runtime_packets_community_confidence_idx, idx_route_runtime_packets_community_id_idx, idx_route_runtime_packets_community_source_idx, idx_route_runtime_packets_domain_class_idx, idx_route_runtime_packets_feature_id, idx_route_runtime_packets_feature_id_idx, idx_route_runtime_packets_feature_ids_gin, idx_route_runtime_packets_feature_label_idx, idx_route_runtime_packets_kmeans_cluster_idx, idx_route_runtime_packets_ledger_type_idx, idx_route_runtime_packets_lineage_version_idx, idx_route_runtime_packets_metadata_gin, idx_route_runtime_packets_packet_key_idx, idx_route_runtime_packets_raw_gin, idx_route_runtime_packets_som_col_idx, idx_route_runtime_packets_som_index_idx, idx_route_runtime_packets_som_row_idx, idx_route_runtime_packets_source_ref, idx_route_runtime_packets_source_ref_idx, idx_route_runtime_packets_source_refs_gin, idx_route_runtime_packets_tags_gin, idx_route_runtime_packets_tree_node_id, idx_rrp_captured_at, idx_rrp_cluster_id, idx_rrp_feature_cluster, idx_rrp_feature_ids_gin, idx_rrp_git_sha, idx_rrp_packet_version, idx_rrp_raw_domain, idx_rrp_raw_feature_id, idx_rrp_raw_gin, idx_rrp_route, idx_rrp_source_ref_quality, idx_rrp_source_refs_gin, idx_rrp_superseded_by, rrp_feature_idx, rrp_packet_uuid_uidx, rrp_raw_gin, rrp_state_idx
-- live columns: id, captured_at, route, query_hash, query_preview, packet_key, source_ref, feature_label, community_id, community_confidence, community_source, domain_class, ledger_type, lineage_version, metadata, tags, canonical, payload_backfilled_at, som_row, som_col, som_index, kmeans_cluster, summary, source_refs, feature_ids, lane_ids, cluster_id, som_cluster, qdrant_hits, redis_hot_keys, latency_ms, cache_hit, cache_tier, user_id, session_id, response_tokens, raw, packet_version, source_ref_quality
-- live indexes: idx_route_runtime_packets_community_confidence_idx, idx_route_runtime_packets_community_id_idx, idx_route_runtime_packets_community_source_idx, idx_route_runtime_packets_domain_class_idx, idx_route_runtime_packets_feature_label_idx, idx_route_runtime_packets_kmeans_cluster_idx, idx_route_runtime_packets_ledger_type_idx, idx_route_runtime_packets_lineage_version_idx, idx_route_runtime_packets_metadata_gin, idx_route_runtime_packets_packet_key_idx, idx_route_runtime_packets_som_col_idx, idx_route_runtime_packets_som_index_idx, idx_route_runtime_packets_som_row_idx, idx_route_runtime_packets_source_ref, idx_route_runtime_packets_source_ref_idx, idx_route_runtime_packets_tags_gin, idx_rrp_captured_at, idx_rrp_cluster_id, idx_rrp_feature_ids_gin, idx_rrp_packet_version, idx_rrp_raw_gin, idx_rrp_route, idx_rrp_source_ref_quality, idx_rrp_source_refs_gin, route_runtime_packets_pkey
+- static indexes: idx_route_runtime_packets_community_confidence_idx, idx_route_runtime_packets_community_id_idx, idx_route_runtime_packets_community_source_idx, idx_route_runtime_packets_domain_class_idx, idx_route_runtime_packets_feature_id, idx_route_runtime_packets_feature_id_idx, idx_route_runtime_packets_feature_ids_gin, idx_route_runtime_packets_feature_label_idx, idx_route_runtime_packets_kmeans_cluster_idx, idx_route_runtime_packets_ledger_type_idx, idx_route_runtime_packets_lineage_version_idx, idx_route_runtime_packets_metadata_gin, idx_route_runtime_packets_packet_key_idx, idx_route_runtime_packets_raw_gin, idx_route_runtime_packets_som_col_idx, idx_route_runtime_packets_som_index_idx, idx_route_runtime_packets_som_row_idx, idx_route_runtime_packets_source_ref, idx_route_runtime_packets_source_ref_idx, idx_route_runtime_packets_source_refs_gin, idx_route_runtime_packets_tags_gin, idx_route_runtime_packets_tree_node_id, idx_rrp_captured_at, idx_rrp_cluster_id, idx_rrp_feature_cluster, idx_rrp_feature_ids_gin, idx_rrp_git_sha, idx_rrp_packet_version, idx_rrp_raw_domain, idx_rrp_raw_feature_id, idx_rrp_raw_gin, idx_rrp_route, idx_rrp_source_ref_quality, idx_rrp_source_refs_gin, idx_rrp_superseded_by, route_runtime_packets_packet_uuid_uq, rrp_feature_idx, rrp_packet_uuid_uidx, rrp_raw_gin, rrp_state_idx
+- live columns: id, captured_at, route, query_hash, query_preview, packet_key, source_ref, feature_label, community_id, community_confidence, community_source, domain_class, ledger_type, lineage_version, metadata, tags, canonical, payload_backfilled_at, som_row, som_col, som_index, kmeans_cluster, summary, source_refs, feature_ids, lane_ids, cluster_id, som_cluster, qdrant_hits, redis_hot_keys, latency_ms, cache_hit, cache_tier, user_id, session_id, response_tokens, raw, packet_version, source_ref_quality, packet_uuid
+- live indexes: idx_route_runtime_packets_community_confidence_idx, idx_route_runtime_packets_community_id_idx, idx_route_runtime_packets_community_source_idx, idx_route_runtime_packets_domain_class_idx, idx_route_runtime_packets_feature_label_idx, idx_route_runtime_packets_kmeans_cluster_idx, idx_route_runtime_packets_ledger_type_idx, idx_route_runtime_packets_lineage_version_idx, idx_route_runtime_packets_metadata_gin, idx_route_runtime_packets_packet_key_idx, idx_route_runtime_packets_som_col_idx, idx_route_runtime_packets_som_index_idx, idx_route_runtime_packets_som_row_idx, idx_route_runtime_packets_source_ref, idx_route_runtime_packets_source_ref_idx, idx_route_runtime_packets_tags_gin, idx_rrp_captured_at, idx_rrp_cluster_id, idx_rrp_feature_ids_gin, idx_rrp_packet_version, idx_rrp_raw_gin, idx_rrp_route, idx_rrp_source_ref_quality, idx_rrp_source_refs_gin, route_runtime_packets_packet_uuid_uq, route_runtime_packets_pkey
 - live rows: 11
 
 ## Blockers
@@ -175,12 +175,11 @@ Generated: 2026-10-24T01:45:22.871Z
 - kanban_tasks: static COLUMN_MISMATCH
 - feature_registry: live LIVE_TABLE_MISSING
 - atlas_workspace_events: static COLUMN_MISMATCH
-- atlas_workspace_events: live LIVE_TABLE_MISSING
-- atlas_workspace_event_participants: live LIVE_TABLE_MISSING
-- atlas_workspace_heads: live LIVE_TABLE_MISSING
+- atlas_workspace_events: live COLUMN_MISMATCH
 - task_semantic_packets: static COLUMN_MISMATCH
 - task_semantic_packets: live COLUMN_MISMATCH
 - atlas_packets: static COLUMN_MISMATCH
 - atlas_packets: live COLUMN_MISMATCH
 - nes_chrom_packets: static INDEX_MISMATCH
+- route_runtime_packets: static INDEX_MISMATCH
 - route_runtime_packets: live COLUMN_MISMATCH

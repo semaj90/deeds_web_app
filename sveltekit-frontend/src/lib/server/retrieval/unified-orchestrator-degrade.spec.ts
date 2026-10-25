@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   rgSearch: vi.fn(),
   fetch: vi.fn(),
   pgQuery: vi.fn(),
+  resolveWorkspaceAuthority: vi.fn(),
 }));
 
 vi.mock('$lib/server/llm/runtime-contract.js', () => { throw new Error('contract not loaded in retrieval'); });
@@ -13,6 +14,9 @@ vi.mock('./embedding-service.js', () => ({ embedQueryForLane: mocks.embed }));
 vi.mock('$lib/server/search/rg-pool.js', () => ({ getRgPool: () => ({ search: mocks.rgSearch }) }));
 vi.mock('$lib/server/search/create-codebase-search-backend.js', () => ({ createCodebaseSearchBackendFromEnv: () => ({ kind: 'qdrant' }) }));
 vi.mock('node-fetch', () => ({ default: mocks.fetch }));
+vi.mock('./trusted-workspace-authority-v1.js', () => ({
+  resolveTrustedWorkspaceAuthorityV1: mocks.resolveWorkspaceAuthority,
+}));
 vi.mock('$lib/server/db/client', () => ({
   pool: {
     query: (...args: unknown[]) => mocks.pgQuery(...args),
@@ -48,6 +52,7 @@ beforeEach(() => {
   Object.values(mocks).forEach((m) => m.mockReset());
   mocks.embed.mockResolvedValue(okVector());
   mocks.rgSearch.mockResolvedValue([rgHit]);
+  mocks.resolveWorkspaceAuthority.mockResolvedValue({ status: 'UNAVAILABLE', workspaceRevision: null, reason: 'NO_OPERATOR_PIN', resolverRevision: 'atlas.trusted-workspace-resolver.v1' });
   mocks.pgQuery.mockResolvedValue({ rows: [{ id: 'c1', qdrant_id: 'p1', relative_path: 'src/a.ts', symbol: 'a', kind: 'function' }] });
   mocks.fetch.mockImplementation(async (url: string) => {
     if (String(url).includes('/points/query')) {
@@ -182,16 +187,15 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
   });
 
   it('attaches workspaceRevision only through an exact binding at the admitted workspace; the query binds the admitted revision as a parameter', async () => {
-    process.env.ATLAS_ADMITTED_WORKSPACE_REVISION = 'sha256:abababababababababababababababababababababababababababababababab';
-    try {
-      wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:srcrev', lineage_evidence_refs: ['chunk:c1'], binding_workspace_revision: 'sha256:abababababababababababababababababababababababababababababababab', binding_source_revision: 'sha256:srcrev' }] });
-      const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
-      expect(r.candidates[0].identity).toMatchObject({ workspaceRevision: 'sha256:abababababababababababababababababababababababababababababababab', sourceRevision: 'sha256:srcrev', revisionBinding: 'EXACT_BINDING' });
-      expect(r.candidates[0].identity.missingFields).toEqual([]);
-      const call = mocks.pgQuery.mock.calls.find((c) => /atlas_workspace_source_bindings/.test(String(c[0])))!;
-      expect(String(call[0])).toMatch(/b.content_digest = t.file_content_hash/);
-      expect(call[1][3]).toBe('sha256:abababababababababababababababababababababababababababababababab');
-    } finally { delete process.env.ATLAS_ADMITTED_WORKSPACE_REVISION; }
+    const admittedRevision = 'sha256:abababababababababababababababababababababababababababababababab';
+    mocks.resolveWorkspaceAuthority.mockResolvedValue({ status: 'TRUSTED', workspaceRevision: admittedRevision, source: 'OPERATOR_PIN', receiptCrossCheck: 'MATCHES_ADMISSION_RECEIPT', resolverRevision: 'atlas.trusted-workspace-resolver.v1' });
+    wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:srcrev', lineage_evidence_refs: ['chunk:c1'], binding_workspace_revision: admittedRevision, binding_source_revision: 'sha256:srcrev' }] });
+    const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+    expect(r.candidates[0].identity).toMatchObject({ workspaceRevision: admittedRevision, sourceRevision: 'sha256:srcrev', revisionBinding: 'EXACT_BINDING' });
+    expect(r.candidates[0].identity.missingFields).toEqual([]);
+    const call = mocks.pgQuery.mock.calls.find((c) => /atlas_workspace_source_bindings/.test(String(c[0])))!;
+    expect(String(call[0])).toMatch(/b.content_digest = t.file_content_hash/);
+    expect(call[1][3]).toBe(admittedRevision);
   });
 
   it('attaches NO revision when the bridge and the binding disagree on source_revision (conflict, never a pick)', async () => {

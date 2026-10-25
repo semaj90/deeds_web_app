@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.kanban-control-panel-ticket-wiring-receipt.v1",
+  "generatedAt": "2026-10-25T05:30:45.000Z",
+  "admittedWorkspaceRevisionRef": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+  "canonicalAuthority": false,
+  "authorityNote": "Kanban taskboard and human-review ticket projections are non-canonical operator workboards; OpenSpec tasks.md and PostgreSQL 18 canonical source/symbol/packet tables remain authoritative.",
+  "gapsIdentifiedAndResolved": [
+    {
+      "gapId": "GAP_1_TOP_LEVEL_TICKET_CREATE",
+      "status": "RESOLVED",
+      "description": "kanban-task-board.ts had createChildKanbanTask but no top-level createKanbanTask() or ticket_created event.",
+      "resolvedBy": "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts#createKanbanTask"
+    },
+    {
+      "gapId": "GAP_2_WORKSPACE_REVISION_CORRELATION_PAYLOAD",
+      "status": "RESOLVED",
+      "description": "KanbanTaskEventCorrelationPayloadSchema lacked explicit workspaceRevision, graphifyRevision, featureRevision, and permissionMode fields.",
+      "resolvedBy": "sveltekit-frontend/src/lib/server/atlas/kanban-task-event-contracts.ts"
+    },
+    {
+      "gapId": "GAP_3_HUMAN_REVIEW_PROJECTION_UNWIRED",
+      "status": "RESOLVED",
+      "description": "projectRecommendationToKanbanV1 and recordReviewDecisionV1 in human-review-projection-v1.ts had zero server route or UI callers.",
+      "resolvedBy": "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts"
+    },
+    {
+      "gapId": "GAP_4_MISSING_ADMIN_KANBAN_API_ROUTE",
+      "status": "RESOLVED",
+      "description": "No SvelteKit API endpoint existed to list or mutate kanban_tasks / kanban_task_events with stable GET JSON and Zod-validated POST actions.",
+      "resolvedBy": "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts"
+    },
+    {
+      "gapId": "GAP_5_CONTROL_PANEL_KANBAN_UI_AND_ETA_BAR",
+      "status": "RESOLVED",
+      "description": "/dashboard/atlas-control-panel now renders the 3-lane board, ticket creation form, recent audit events, and the reactive Agentic Job Throughput & ETA Progress Bar.",
+      "resolvedBy": [
+        "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.server.ts",
+        "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte"
+      ]
+    },
+    {
+      "gapId": "GAP_6_AGENTIC_DISPATCHER_HERMES_CALLER",
+      "status": "RESOLVED",
+      "description": "audit-kanban-runtime-ownership-v1.mjs reported dispatcherCallerProven=false (hermesCallers=0); wired executeHermesAgentStepV1 into agent_dispatch action in +server.ts and ⚡ Auto-Run (Hermes) in +page.svelte.",
+      "auditResult": "dispatcherCallerProven flipped to TRUE (hermesCallers: 1)"
+    }
+  ],
+  "verification": {
+    "vitestSingleWorker": {
+      "command": "cd sveltekit-frontend && npx vitest run --pool=forks --maxWorkers=1 src/lib/server/atlas/kanban-task-board.test.ts src/lib/server/atlas/kanban-ticket-creation.spec.ts src/lib/server/atlas/recommendations/human-review-projection-v1.spec.ts src/routes/api/admin/atlas/kanban-tickets/kanban-tickets.spec.ts",
+      "testFilesPassed": 4,
+      "testsPassed": 22,
+      "exitCode": 0
+    },
+    "runtimeOwnershipAudit": {
+      "command": "node --env-file=.env scripts/atlas/audit-kanban-runtime-ownership-v1.mjs",
+      "contractImporters": 12,
+      "hermesCallers": 1,
+      "dispatcherCallerProven": true,
+      "taskContractResolved": true,
+      "uiReadModelProven": true
+    }
+  }
+}

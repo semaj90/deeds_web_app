@@ -5,7 +5,33 @@ import { sourceRevisionOfBytes } from './topk-evidence-fetch-v1.js';
 import { materializeCandidateOrdinalMap } from '../features/canonical-candidate-v1.js';
 import { materializeCandidateFeatureSnapshot } from '../features/candidate-feature-snapshot-v1.js';
 import { materializeCandidateFeatureColumnar, CANDIDATE_SCALAR_FEATURES } from '../features/candidate-feature-columnar-v1.js';
+import { buildCandidateOrdinalBitsetSelectionV1 } from '../features/candidate-ordinal-bitset-selection-v1.js';
 import { TILE_CHANNEL_CANONICAL_INDEX } from './atlas-feature-matrix-4x6-v1.js';
+import { executeSearchRuntimeWithComputeBridgeV1 } from './search-runtime-compute-bridge-v1.js';
+
+function fixtureFeatureArtifact(ordinalMap: SearchRuntimeTopKCallerInputV1['ordinalMap'], snapshot: SearchRuntimeTopKCallerInputV1['snapshot']) {
+  return {
+    schema: 'atlas.tensor-artifact-manifest.v1' as const,
+    artifactId: 'fixture:candidate-feature-matrix',
+    artifactKind: 'CANDIDATE_FEATURE_MATRIX' as const,
+    artifactFormat: 'ARROW_IPC' as const,
+    artifactUri: 'atlas-artifact://fixtures/search-runtime-features.arrow',
+    artifactChecksum: `sha256:${'9'.repeat(64)}`,
+    candidateSnapshotRevision: ordinalMap.candidateSnapshotRevision,
+    ordinalMapChecksum: ordinalMap.ordinalMapChecksum,
+    representationId: null,
+    representationRevision: null,
+    featureSchemaRevision: snapshot.featureRevision,
+    rowCount: ordinalMap.rowCount,
+    columnCount: CANDIDATE_SCALAR_FEATURES.length,
+    shape: [ordinalMap.rowCount, CANDIDATE_SCALAR_FEATURES.length],
+    dtype: 'float32' as const,
+    byteLength: ordinalMap.rowCount * CANDIDATE_SCALAR_FEATURES.length * 4,
+    producerId: 'search-runtime-test',
+    producerRevision: 'search-runtime-test:v1',
+    canonicalAuthority: false as const,
+  };
+}
 
 describe('SearchRuntime Top-K Caller (v1)', () => {
   it('executes end-to-end CPU Top-K with independent verification and live source qualification', () => {
@@ -102,7 +128,7 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
     });
 
     // Run the SearchRuntime Top-K caller
-    const result = executeSearchRuntimeTopKV1({
+    const searchInput: SearchRuntimeTopKCallerInputV1 = {
       requestId: 'req:sr-topk:test-1',
       queryDigest: 'query:test-1',
       graphRevision: 'graph:v1',
@@ -121,7 +147,8 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
       k: 2,
       sourceFetchPort: port,
       graphifyLifecycle: 'COMPLETED',
-    });
+    };
+    const result = executeSearchRuntimeTopKV1(searchInput);
 
     // Assertions
     expect(result.schema).toBe('atlas.search-runtime-topk-execution-result.v1');
@@ -135,6 +162,24 @@ describe('SearchRuntime Top-K Caller (v1)', () => {
     expect(result.receiptRow.execution_id).toMatch(/^topk:[a-f0-9]{64}$/);
     expect(result.receiptRow.algorithm).toBe('cpu_exact_stable_topk');
     expect(result.execution.algorithm).toBe('cpu_exact');
+
+    const bridged = executeSearchRuntimeWithComputeBridgeV1({
+      search: searchInput,
+      selection: buildCandidateOrdinalBitsetSelectionV1({ ordinalMap, selectedOrdinals: [0] }),
+      inputArtifactManifest: fixtureFeatureArtifact(ordinalMap, snapshot),
+      operation: 'EXACT_TOPK',
+      executorHint: 'CPU',
+    });
+    expect(bridged.status).toBe('DESCRIPTOR_VALIDATED');
+    expect(bridged.executionResult.execution.candidateOrdinals).toEqual([0]);
+    expect(bridged.descriptors).toHaveLength(1);
+    expect(bridged.descriptors[0]).toMatchObject({
+      packetKey: ordinalMap.candidates[0]?.packetKey,
+      candidateOrdinal: 0,
+      operation: 'EXACT_TOPK',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    });
   });
 
   it('fails closed when candidate source revision does not match disk bytes', () => {

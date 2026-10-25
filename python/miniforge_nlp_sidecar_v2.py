@@ -33,7 +33,7 @@ from typing import Annotated, Any, Literal, Optional
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 import miniforge_nlp_sidecar as legacy
 import atlas_external_docs as external_docs
@@ -51,6 +51,30 @@ from atlas_domain_candidate_helper_v1 import bind_candidate_record
 _RUNTIME_MODULE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 _LEGACY_MODULE_SHA256 = hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest()
 _PROCESS_STARTED_MONOTONIC_NS = str(time.monotonic_ns())
+CUSTOM_ATTRIBUTES_SCHEMA = "atlas.langextract-custom-attributes.v1"
+MAX_CUSTOM_ATTRIBUTES = 32
+MAX_CUSTOM_ATTRIBUTE_KEY_CHARS = 80
+MAX_CUSTOM_ATTRIBUTE_VALUE_CHARS = 2048
+MAX_CUSTOM_ATTRIBUTES_BYTES = 8192
+
+
+def _validate_custom_attributes(value: Any) -> dict[str, str | int | float | bool | None]:
+    if not isinstance(value, dict) or len(value) > MAX_CUSTOM_ATTRIBUTES:
+        raise ValueError("CUSTOM_ATTRIBUTES_INVALID_SHAPE")
+    for key, item in value.items():
+        if not isinstance(key, str) or not key or len(key) > MAX_CUSTOM_ATTRIBUTE_KEY_CHARS:
+            raise ValueError("CUSTOM_ATTRIBUTES_INVALID_KEY")
+        if item is not None and not isinstance(item, (str, int, float, bool)):
+            raise ValueError("CUSTOM_ATTRIBUTES_VALUES_MUST_BE_SCALARS")
+        if isinstance(item, str) and len(item) > MAX_CUSTOM_ATTRIBUTE_VALUE_CHARS:
+            raise ValueError("CUSTOM_ATTRIBUTES_VALUE_TOO_LONG")
+    try:
+        encoded = json.dumps(value, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    except (TypeError, ValueError) as error:
+        raise ValueError("CUSTOM_ATTRIBUTES_NOT_JSON_SAFE") from error
+    if len(encoded) > MAX_CUSTOM_ATTRIBUTES_BYTES:
+        raise ValueError("CUSTOM_ATTRIBUTES_TOO_LARGE")
+    return value
 
 
 class AstEvidenceChunkV2(BaseModel):
@@ -546,6 +570,10 @@ def _documentation_fact_output_schema() -> dict[str, Any]:
             "object": {"type": "string"},
             "statement": {"type": "string"},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -563,6 +591,10 @@ def _documentation_output_schema() -> dict[str, Any]:
             "object": {"type": "string"},
             "statement": {"type": "string"},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -576,6 +608,10 @@ def _documentation_output_schema() -> dict[str, Any]:
             "parameterName": {"type": ["string", "null"]},
             "expectedValue": {"type": ["string", "null"]},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -725,6 +761,10 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
         except (TypeError, ValueError):
             confidence = 0.0
         confidence = max(0.0, min(1.0, confidence))
+        try:
+            custom_attributes = _validate_custom_attributes(attributes.get("customAttributes") or {})
+        except ValueError:
+            continue
         extracted.append({
             "extraction_class": extraction_class,
             "subject": subject,
@@ -737,6 +777,7 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
             "start_byte": len(text[:start_pos].encode("utf-8")),
             "end_byte": len(text[:end_pos].encode("utf-8")),
             "confidence": confidence,
+            "custom_attributes": custom_attributes,
             "api_symbol": api_symbol,
             "version_range": str(attributes.get("versionRange") or attributes.get("version_range") or "").strip(),
             "condition": str(attributes.get("condition") or "").strip(),
@@ -781,7 +822,18 @@ class DocumentationFactV1(BaseModel):
     product_version: str = Field(alias="productVersion")
     confidence: float = Field(ge=0.0, le=1.0)
     extraction_method: str = Field(default="LANGEXTRACT_ORNITH", alias="extractionMethod")
+    custom_attributes_version: Literal["atlas.langextract-custom-attributes.v1"] = Field(
+        default=CUSTOM_ATTRIBUTES_SCHEMA, alias="customAttributesVersion"
+    )
+    custom_attributes: dict[str, str | int | float | bool | None] = Field(
+        default_factory=dict, alias="customAttributes"
+    )
     canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
+
+    @field_validator("custom_attributes")
+    @classmethod
+    def validate_custom_attributes(cls, value: Any) -> dict[str, str | int | float | bool | None]:
+        return _validate_custom_attributes(value)
 
     model_config = {"populate_by_name": True}
 
@@ -798,6 +850,14 @@ class ApiRuleV1(BaseModel):
     expected_value: Optional[str] = Field(default=None, alias="expectedValue")
     evidence_span: dict[str, Any] = Field(alias="evidenceSpan")
     confidence: float = Field(ge=0.0, le=1.0)
+    custom_attributes_version: Literal["atlas.langextract-custom-attributes.v1"] = Field(default=CUSTOM_ATTRIBUTES_SCHEMA, alias="customAttributesVersion")
+    custom_attributes: dict[str, str | int | float | bool | None] = Field(default_factory=dict, alias="customAttributes")
+
+    @field_validator("custom_attributes")
+    @classmethod
+    def validate_custom_attributes(cls, value: Any) -> dict[str, str | int | float | bool | None]:
+        return _validate_custom_attributes(value)
+
     canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
 
     model_config = {"populate_by_name": True}
@@ -1794,6 +1854,7 @@ def extract_documentation_facts(req: DocumentationFactRequestV1) -> Documentatio
                     "alignmentStatus": "MATCH_EXACT",
                 },
                 confidence=item["confidence"],
+                customAttributes=item.get("custom_attributes", {}),
             ))
             continue
         alignment_summary["MATCH_EXACT"] = alignment_summary.get("MATCH_EXACT", 0) + 1
@@ -1811,6 +1872,7 @@ def extract_documentation_facts(req: DocumentationFactRequestV1) -> Documentatio
             endByte=item["end_byte"],
             productVersion=req.product_version,
             confidence=item["confidence"],
+            customAttributes=item.get("custom_attributes", {}),
         ))
     selected_model = req.model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
     normalized_output = {"facts": [fact.model_dump(by_alias=True) for fact in facts], "apiRules": [rule.model_dump(by_alias=True) for rule in api_rules]}

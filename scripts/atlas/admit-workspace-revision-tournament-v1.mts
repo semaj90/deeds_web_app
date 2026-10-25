@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateCanonicalGraphifySnapshotBindingV1 } from './lib/canonical-graphify-snapshot-binding-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const argValue = (name: string) => process.argv.slice(2).find((value) => value.startsWith(`${name}=`))?.slice(name.length + 1);
@@ -37,6 +38,16 @@ const snapshotBindingValid = snapshotBindingError === null
   && Array.isArray(snapshot?.sources)
   && snapshot.sources.length === preflight.snapshotSourceCount
   && snapshot?.sourceMembershipChecksum === preflight.snapshotMembershipChecksum;
+let snapshotAuthorityBinding = { valid: false, reason: 'SNAPSHOT_MANIFEST_UNREADABLE', workspaceId: null };
+if (snapshotBindingError === null) {
+  const dailyConfig = JSON.parse(await readFile(resolve(ROOT, 'scripts/atlas/daily-graphify-config.json'), 'utf8'));
+  snapshotAuthorityBinding = validateCanonicalGraphifySnapshotBindingV1({
+    snapshot,
+    expectedWorkspaceId: dailyConfig.workspace_uuid,
+    manifestPath,
+    root: ROOT,
+  });
+}
 const sourceInventoryBindingValid = typeof preflight.sourceInventoryRevision === 'string'
   && typeof preflight.sourceInventoryChecksum === 'string'
   && /^sha256:[0-9a-f]{64}$/i.test(preflight.sourceInventoryChecksum)
@@ -61,6 +72,7 @@ const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMI
   && /^sha256:[0-9a-f]{64}$/i.test(workspaceRevision)
   && workspaceRevision === preflight.workspaceRevisionCandidate
   && snapshotBindingValid
+  && snapshotAuthorityBinding.valid
   && sourceInventoryBindingValid
   && preflight.approvalRequired === true
   && manifestBindingValid
@@ -75,6 +87,7 @@ async function atomicWriteJson(path: string, value: unknown): Promise<void> {
 
 if (!ready) {
   const blocker = snapshotBindingError
+    ?? (!snapshotAuthorityBinding.valid ? snapshotAuthorityBinding.reason : null)
     ?? (!manifestBindingValid ? 'MANIFEST_SHA256_NOT_BOUND_OR_MISMATCH' : null)
     ?? (!operatorBindingValid ? 'OPERATOR_BINDING_NOT_PROVIDED_OR_MISMATCH' : null)
     ?? (!sourceInventoryBindingValid
@@ -87,6 +100,7 @@ if (!ready) {
     mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT', status: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_BLOCKED',
     proofLevel: 'BLOCKED', authority: false, workspaceRevision: null,
     snapshotRevision: preflight.snapshotRevision ?? null,
+    workspaceId: snapshotAuthorityBinding.workspaceId,
     workspaceRevisionCandidate: null, approvalRequired: true, autoApply: false, training: false,
     writesPerformed: false, datastoreWritesPerformed: false, preflightPath: PREFLIGHT,
     blocker,
@@ -111,6 +125,7 @@ if (!ready) {
     authority: true,
     workspaceRevision,
     snapshotRevision: preflight.snapshotRevision,
+    workspaceId: snapshotAuthorityBinding.workspaceId,
     snapshotSourceCount: preflight.snapshotSourceCount,
     sourceCount: preflight.sourceCount,
     sourceSelectionChecksum: preflight.sourceSelectionChecksum,

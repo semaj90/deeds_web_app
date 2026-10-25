@@ -579,7 +579,7 @@ export async function getCommunityContext(
         FROM community_reports
         WHERE community_id = ANY($2::int[])
           AND embedding IS NOT NULL
-        ORDER BY embedding <=> $1::vector
+        ORDER BY embedding <=> $1::vector ASC, community_id ASC
         LIMIT $3
       `, [JSON.stringify(Array.from(queryVec)), communityIds, limit]).catch(() => ({ rows: [] as Record<string, unknown>[] }));
 
@@ -611,7 +611,7 @@ export async function getCommunityContext(
       FROM community_reports
       WHERE community_id = ANY($2::int[])
         AND embedding IS NOT NULL
-      ORDER BY embedding <=> $1::vector
+      ORDER BY embedding <=> $1::vector ASC, community_id ASC
       LIMIT $3
     `, [JSON.stringify(Array.from(queryVec)), communityIds, limit]).catch(() => ({ rows: [] as Record<string, unknown>[] }));
 

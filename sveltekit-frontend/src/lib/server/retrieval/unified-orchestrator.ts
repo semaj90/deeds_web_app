@@ -596,7 +596,7 @@ async function postgresPgvectorSearch(
          SELECT id, relative_path, symbol, kind, source_ref, file_content_hash, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
            FROM codebase_chunk_index
           WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\\')
-          ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2)
+          ORDER BY content_embedding_768 <=> $1::vector(768), id LIMIT $2)
        SELECT t.*, l.packet_key AS lineage_packet_key, l.source_revision AS lineage_source_revision, l.evidence_refs AS lineage_evidence_refs,
               b.workspace_revision AS binding_workspace_revision, b.source_revision AS binding_source_revision
          FROM top t LEFT JOIN atlas_packet_chunk_lineage l ON l.chunk_row_id = t.id AND l.revision_status = 'PROVEN'

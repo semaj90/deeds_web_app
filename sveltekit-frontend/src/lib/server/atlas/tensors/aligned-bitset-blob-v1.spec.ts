@@ -115,12 +115,12 @@ describe('AlignedBitsetBlobV1 (Parent Atlas 64-Byte-Padded ATLASBIT BLOB Contrac
     expect(jaccardSimilarity(a, b)).toBeCloseTo(0.2, 5);
   });
 
-  it('handles PostgreSQL bytea serialization, deserialization, and varlena 4-byte offset shift', () => {
+  it('decodes bytea payload and raw varlena only with explicit framing', () => {
     const original = createAlignedBitsetBlob(200, [10, 42, 99, 150]);
     const byteaBuffer = toPostgresBytea(original);
 
     // Standard roundtrip
-    const restored = fromPostgresBytea(byteaBuffer);
+    const restored = fromPostgresBytea(byteaBuffer, 'BYTEA_PAYLOAD');
     expect(restored.bitCount).toBe(original.bitCount);
     expect(restored.wordCount).toBe(original.wordCount);
     expect(restored.sha256Hex).toBe(original.sha256Hex);
@@ -132,9 +132,11 @@ describe('AlignedBitsetBlobV1 (Parent Atlas 64-Byte-Padded ATLASBIT BLOB Contrac
     varlenaPrefix.writeUInt32LE(byteaBuffer.length + 4, 0); // simulated vl_len_
     const rawDiskBytes = Buffer.concat([varlenaPrefix, byteaBuffer]);
 
-    const restoredFromVarlena = fromPostgresBytea(rawDiskBytes);
+    const restoredFromVarlena = fromPostgresBytea(rawDiskBytes, 'RAW_VARLENA_4_BYTE_HEADER');
     expect(restoredFromVarlena.bitCount).toBe(200);
     expect(getSetBits(restoredFromVarlena)).toEqual([10, 42, 99, 150]);
+    expect(() => fromPostgresBytea(rawDiskBytes, 'BYTEA_PAYLOAD')).toThrow(/ALIGNED_BITSET_INVALID_MAGIC/);
+    expect(() => fromPostgresBytea(byteaBuffer, 'RAW_VARLENA_4_BYTE_HEADER')).toThrow(/ALIGNED_BITSET_INVALID_MAGIC/);
   });
 
   it('detects SHA256 checksum corruption and rejects tampered buffers', () => {
@@ -144,7 +146,7 @@ describe('AlignedBitsetBlobV1 (Parent Atlas 64-Byte-Padded ATLASBIT BLOB Contrac
     // Tamper with a payload byte (at offset 64 + 2)
     bytea[HEADER_BYTES + 2] ^= 0xff;
 
-    expect(() => fromPostgresBytea(bytea)).toThrow(/ALIGNED_BITSET_CHECKSUM_MISMATCH/);
+    expect(() => fromPostgresBytea(bytea, 'BYTEA_PAYLOAD')).toThrow(/ALIGNED_BITSET_CHECKSUM_MISMATCH/);
   });
 
   it('respects the exact byte window of a Uint8Array view', () => {
@@ -152,7 +154,7 @@ describe('AlignedBitsetBlobV1 (Parent Atlas 64-Byte-Padded ATLASBIT BLOB Contrac
     const backing = Buffer.concat([valid, Buffer.from([0, 0, 0, 0])]);
     const truncatedView = backing.subarray(0, valid.byteLength - 1);
 
-    expect(() => fromPostgresBytea(truncatedView)).toThrow();
+    expect(() => fromPostgresBytea(truncatedView, 'BYTEA_PAYLOAD')).toThrow();
   });
 
   it('provides a WebGPU cache-line aligned buffer', () => {

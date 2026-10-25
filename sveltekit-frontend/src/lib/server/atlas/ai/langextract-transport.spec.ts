@@ -56,6 +56,8 @@ const VALID_DOCUMENTATION_FACTS_RESPONSE = {
     productVersion: 'PostgreSQL 18',
     confidence: 0.9,
     extractionMethod: 'LANGEXTRACT_ORNITH',
+    customAttributesVersion: 'atlas.langextract-custom-attributes.v1',
+    customAttributes: { category: 'indexing', confidenceBand: 2, reviewed: false, optional: null },
     canonicalAuthority: false,
   }],
   apiRules: [],
@@ -151,6 +153,7 @@ describe('CHUNK0: langextract-transport response validation', () => {
     }, { baseUrl: 'http://sidecar.test' });
 
     expect(result.facts[0].evidenceText).toBe('Creates a GIN (Generalized Inverted Index)-based index.');
+    expect(result.facts[0].customAttributes).toEqual({ category: 'indexing', confidenceBand: 2, reviewed: false, optional: null });
     expect(result.canonicalAuthority).toBe(false);
     expect(fetch).toHaveBeenCalledWith('http://sidecar.test/extract/documentation-facts', expect.objectContaining({
       method: 'POST',
@@ -189,6 +192,16 @@ describe('CHUNK0: langextract-transport response validation', () => {
       sourceUrl: VALID_DOCUMENTATION_FACTS_RESPONSE.facts[0].sourceUrl,
       sourceRevision: `sha256:${FACT_INPUT_HASH}`,
     }, { baseUrl: 'http://sidecar.test' })).rejects.toThrow(/source binding mismatch/);
+  });
+
+  it('rejects unversioned, oversized, or non-scalar custom attributes', async () => {
+    const fact = VALID_DOCUMENTATION_FACTS_RESPONSE.facts[0];
+    mockFetchOnce({ ...VALID_DOCUMENTATION_FACTS_RESPONSE, facts: [{ ...fact, customAttributesVersion: 'v0' }] });
+    await expect(requestLangExtractDocumentationFacts({ text: FACT_TEXT, sourceUrl: fact.sourceUrl, sourceRevision: fact.sourceRevision }, { baseUrl: 'http://sidecar.test' })).rejects.toThrow(/schema validation/);
+    mockFetchOnce({ ...VALID_DOCUMENTATION_FACTS_RESPONSE, facts: [{ ...fact, customAttributes: { tooMuch: 'x'.repeat(2049) } }] });
+    await expect(requestLangExtractDocumentationFacts({ text: FACT_TEXT, sourceUrl: fact.sourceUrl, sourceRevision: fact.sourceRevision }, { baseUrl: 'http://sidecar.test' })).rejects.toThrow(/schema validation/);
+    mockFetchOnce({ ...VALID_DOCUMENTATION_FACTS_RESPONSE, facts: [{ ...fact, customAttributes: { nested: { lost: true } } }] });
+    await expect(requestLangExtractDocumentationFacts({ text: FACT_TEXT, sourceUrl: fact.sourceUrl, sourceRevision: fact.sourceRevision }, { baseUrl: 'http://sidecar.test' })).rejects.toThrow(/schema validation/);
   });
 
   it('rejects byte offsets that do not point to the exact UTF-8 evidence bytes', async () => {

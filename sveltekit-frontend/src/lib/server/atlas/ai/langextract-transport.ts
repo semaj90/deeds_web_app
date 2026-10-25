@@ -107,6 +107,8 @@ export interface LangExtractDocumentationFact {
   productVersion: string;
   confidence: number;
   extractionMethod: string;
+  customAttributesVersion: 'atlas.langextract-custom-attributes.v1';
+  customAttributes: Record<string, string | number | boolean | null>;
   canonicalAuthority: false;
 }
 
@@ -192,6 +194,18 @@ const langExtractAnalyzeResponseSchema = z.looseObject({
   processing_time_ms: z.number(),
 });
 
+const customAttributesSchema = z.record(
+  z.string().min(1).max(80),
+  z.union([z.string().max(2048), z.number().finite(), z.boolean(), z.null()])
+).superRefine((value, ctx) => {
+  if (Object.keys(value).length > 32) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'customAttributes exceeds 32 keys' });
+  }
+  if (Buffer.byteLength(JSON.stringify(value), 'utf8') > 8192) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'customAttributes exceeds 8192 UTF-8 bytes' });
+  }
+});
+
 const documentationFactSchema = z.looseObject({
   schema: z.literal('atlas.documentation-fact.v1'),
   subject: z.string(),
@@ -209,6 +223,8 @@ const documentationFactSchema = z.looseObject({
   productVersion: z.string(),
   confidence: z.number().min(0).max(1),
   extractionMethod: z.string(),
+  customAttributesVersion: z.literal('atlas.langextract-custom-attributes.v1'),
+  customAttributes: customAttributesSchema,
   canonicalAuthority: z.literal(false),
 });
 

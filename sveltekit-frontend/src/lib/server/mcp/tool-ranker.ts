@@ -16,6 +16,7 @@
  */
 
 import type { GlyphSection } from '$lib/server/types/glyph.js';
+import { logger } from '$lib/server/production-logger.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -286,7 +287,9 @@ export function updateToolStats(
     ? tool.avgGainScore  * (1 - α) + gainScore * α
     : gainScore;
   if (hmmSection) {
-    persistToolStatsToDb(toolName, hmmSection, latencyMs, gainScore, succeeded).catch(() => {});
+    persistToolStatsToDb(toolName, hmmSection, latencyMs, gainScore, succeeded).catch((error) =>
+      logger.warn(`[tool-ranker] tool_call_stats persist failed for ${toolName}/${hmmSection}:`, error),
+    );
   }
 }
 
@@ -311,8 +314,8 @@ export async function persistToolStatsToDb(
      ON CONFLICT (tool_name, hmm_section) DO UPDATE SET
        success_count   = tool_call_stats.success_count + EXCLUDED.success_count,
        failure_count   = tool_call_stats.failure_count + EXCLUDED.failure_count,
-       avg_latency_ms  = tool_call_stats.avg_latency_ms  * 0.8 + EXCLUDED.avg_latency_ms  * 0.2,
-       avg_gain_score  = tool_call_stats.avg_gain_score  * 0.8 + EXCLUDED.avg_gain_score  * 0.2,
+       avg_latency_ms  = COALESCE(tool_call_stats.avg_latency_ms, EXCLUDED.avg_latency_ms) * 0.8 + EXCLUDED.avg_latency_ms * 0.2,
+       avg_gain_score  = COALESCE(tool_call_stats.avg_gain_score, EXCLUDED.avg_gain_score) * 0.8 + EXCLUDED.avg_gain_score * 0.2,
        last_used_at    = now()`,
     [toolName, hmmSection, succeeded ? 1 : 0, succeeded ? 0 : 1, latencyMs, gainScore],
   );

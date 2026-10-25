@@ -30,7 +30,7 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 - **WAVE-09** Projections and executors — PLANNED_NOT_SELECTED; depends on none; gates: EXECUTOR_PARITY_PROVEN; leaves: 350
 - **WAVE-10** Learning and challengers — PLANNED_NOT_SELECTED; depends on none; gates: FROZEN_EVAL_AND_EXPLICIT_PROMOTION; leaves: 336
 - **UNCLASSIFIED_REVIEW** Unclassified task mapping review — REVIEW_REQUIRED; leaves: 448.
-- Provisional bounded work packages: 856; assigned open leaf tasks: 4975; unclassified leaves are review-only.
+- Provisional bounded work packages: 1619; assigned open leaf tasks: 4975; unclassified leaves are review-only.
 
 ## Promotion-critical dependency rank
 
@@ -150,7 +150,7 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 
 ## Parallel proof frontiers
 
-- [ ] **P10** [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L385) OAK-HGR-01 — `CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION` blocker: investigate missing canonical packet/chunk linkage across a full frozen cohort, preserving exact source_ref/source_revision/workspace_revision/content digest. The operator-reported 52/52 revision/content matches, 24/52 packet identity matches and 5/52 proven packet/chunk lineage are bounded observations, **not** full-cohort proof. Legacy packet content_hash is diagnostic, never substitute identity. Read-only until coverage/owner resolved. — lane RETRIEVAL_ACE; last updated 2026-10-24T10:24:21.616Z (FILESYSTEM_MTIME); ETA UNKNOWN
+- [ ] **P10** [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L397) OAK-HGR-01 — `CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION` blocker: investigate missing canonical packet/chunk linkage across a full frozen cohort, preserving exact source_ref/source_revision/workspace_revision/content digest. The operator-reported 52/52 revision/content matches, 24/52 packet identity matches and 5/52 proven packet/chunk lineage are bounded observations, **not** full-cohort proof. Legacy packet content_hash is diagnostic, never substitute identity. Read-only until coverage/owner resolved. — lane RETRIEVAL_ACE; last updated 2026-10-25T03:58:48.014Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-workstation-domain-classifier](openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md#L62) **TAXONOMY-CROSSWALK-01.2** Emit a reviewable mapping proposal with exact-match, case-only, proposed mapping, unresolved, and ambiguous statuses; preserve original label, source table/row identity where available, evidence, and taxonomy revision. Normalize case-only matches only in the derived proposal; do not update canonical source records. — lane GENERAL; last updated 2026-10-24T02:43:59.210Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-gpu-sidecar-patch-tournament](openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md#L293) CAGRA endpoint (`POST /v1/knn/cagra`) with the same bounded identity manifest — tiny-fixture runtime and exact-oracle Recall@3 are proven, but production remains **quarantined** because larger-corpus recall, filter parity, revision swaps, fallback, and promotion approval are open. `RAPIDS_CAGRA_ENDPOINT: RUNTIME_PROVEN_ON_TINY_FIXTURE; PRODUCTION_QUARANTINED`. — lane GENERAL; last updated 2026-10-23T18:24:21.872Z (FILESYSTEM_MTIME); ETA UNKNOWN
 - [ ] **P10** [parent-atlas-ml-graph-retrieval-convergence](openspec/changes/parent-atlas-ml-graph-retrieval-convergence/tasks.md#L16) ML-DATA-01 Trace the actual feature/label producer from `ranking-features.ts`, existing policy reranker and XGBoost grouped ranking inputs. Record schema, label origin, query group identity, snapshot/checksum, and train-only statistics. No labels inferred from production RRF scores as independent ground truth. — lane RETRIEVAL_ACE; last updated 2026-10-23T18:01:51.547Z (FILESYSTEM_MTIME); ETA UNKNOWN
@@ -334,13 +334,13 @@ ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.
 ## Daily Graphify Kanban reference
 
 - Status: **STALE_SNAPSHOT**; source: docs/graph/kanban-board.json
-- Snapshot age: 111.7 days; tasks: 123; sourceRefs: 246
+- Snapshot age: 112.4 days; tasks: 123; sourceRefs: 246
 - This snapshot is a reference/input surface only; it is not canonical identity or task authority.
 
 ## Historical and consolidation task sources
 
-- **HISTORICAL_TASK_RANKING_REFERENCE** HISTORICAL_OR_STALE: memory/exports/kanban-ranking-report.json; task/board records 858; age 135.3 days
-- **CURRENT_CONSOLIDATION_INPUT_REFERENCE** CURRENT_BOUNDED: docs/reports/kanban-turbovec-consolidation-latest.json; task/board records 123; age 7.8 days
+- **HISTORICAL_TASK_RANKING_REFERENCE** HISTORICAL_OR_STALE: memory/exports/kanban-ranking-report.json; task/board records 858; age 136 days
+- **CURRENT_CONSOLIDATION_INPUT_REFERENCE** CURRENT_BOUNDED: docs/reports/kanban-turbovec-consolidation-latest.json; task/board records 123; age 8.5 days
 - Historical ranking reports and consolidation inputs are evidence sources only; they are not merged into the OpenSpec task count automatically.
 
 ## Current consolidation reference

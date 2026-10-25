@@ -15,6 +15,7 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
@@ -106,6 +107,10 @@ function structuredAnalysisToFacts(structured: {
 
 export async function POST({ request, locals }) {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  const actorUserId = Number(locals.user.id);
+  if (!Number.isSafeInteger(actorUserId) || actorUserId <= 0) {
+    return json({ error: 'Packet ownership cannot be established for this actor' }, { status: 403 });
+  }
 
   let body: unknown;
   try {
@@ -120,27 +125,6 @@ export async function POST({ request, locals }) {
   }
 
   const packet = parsed.data;
-
-  // 1. Insert base packet row
-  const inserted = await db.execute(sql`
-    INSERT INTO route_runtime_packets
-      (query_hash, prompt_hash, raw, reward)
-    VALUES (
-      ${packet.query_hash ?? null},
-      ${packet.prompt_hash ?? null},
-      ${JSON.stringify(packet)}::jsonb,
-      ${packet.reward ?? null}
-    )
-    RETURNING id, packet_uuid, feature_id, som_cluster
-  `);
-
-  const row = inserted.rows[0] as {
-    id: number;
-    packet_uuid: string;
-    feature_id: string | null;
-    som_cluster: string | null;
-  };
-  const packetUuid = row.packet_uuid;
 
   // 2. Compile with Gemma4 (non-blocking errors degrade gracefully)
   let compiled = { facts: [] as ReturnType<typeof Object.values>, edges: [] as ReturnType<typeof Object.values>, state: {} as Record<string, unknown> };
@@ -159,9 +143,32 @@ export async function POST({ request, locals }) {
     } | undefined,
   );
 
-  // 3. Insert facts
-  for (const fact of [...structuredFacts, ...(compiled.facts as Array<Record<string, unknown>>)]) {
-    await db.execute(sql`
+  const packetUuid = randomUUID();
+  const stored = await db.transaction(async (tx) => {
+    const inserted = await tx.execute(sql`
+      INSERT INTO route_runtime_packets
+        (packet_uuid, user_id, route, query_hash, feature_ids, som_cluster, raw)
+      VALUES (
+        ${packetUuid}::uuid,
+        ${actorUserId},
+        '/api/ace/packets',
+        ${packet.query_hash ?? null},
+        ${JSON.stringify(packet.feature_id ? [packet.feature_id] : [])}::jsonb,
+        ${packet.som_cluster ?? null},
+        ${JSON.stringify(packet)}::jsonb
+      )
+      RETURNING id
+    `);
+    const rowId = Number((inserted.rows[0] as { id?: unknown } | undefined)?.id);
+    if (!Number.isSafeInteger(rowId)) throw new Error('ACE_PACKET_INSERT_RETURNED_NO_ID');
+
+    await tx.execute(sql`
+      INSERT INTO route_packets (packet_uuid, feature_id, som_cluster)
+      VALUES (${packetUuid}::uuid, ${packet.feature_id ?? null}, ${packet.som_cluster ?? null})
+    `);
+
+    for (const fact of [...structuredFacts, ...(compiled.facts as Array<Record<string, unknown>>)]) {
+      await tx.execute(sql`
       INSERT INTO route_packet_facts
         (packet_uuid, fact_type, fact_key, fact_value, score, metadata)
       VALUES (
@@ -172,12 +179,11 @@ export async function POST({ request, locals }) {
         ${fact.score != null ? Number(fact.score) : null},
         ${JSON.stringify(fact.metadata ?? {})}::jsonb
       )
-    `);
-  }
+      `);
+    }
 
-  // 4. Insert edges
-  for (const edge of (compiled.edges as Array<Record<string, unknown>>)) {
-    await db.execute(sql`
+    for (const edge of (compiled.edges as Array<Record<string, unknown>>)) {
+      await tx.execute(sql`
       INSERT INTO route_packet_edges
         (packet_uuid, src, dst, edge_type, weight, metadata)
       VALUES (
@@ -188,16 +194,15 @@ export async function POST({ request, locals }) {
         ${edge.weight != null ? Number(edge.weight) : 1},
         ${JSON.stringify(edge.metadata ?? {})}::jsonb
       )
-    `);
-  }
+      `);
+    }
 
-  // 5. Insert state snapshot
-  const state = {
-    ...(compiled.state ?? {}),
-    structured_analysis: packet.structured_analysis ?? null,
-    structured_analysis_fact_count: structuredFacts.length,
-  } as Record<string, unknown>;
-  await db.execute(sql`
+    const state = {
+      ...(compiled.state ?? {}),
+      structured_analysis: packet.structured_analysis ?? null,
+      structured_analysis_fact_count: structuredFacts.length,
+    } as Record<string, unknown>;
+    await tx.execute(sql`
     INSERT INTO route_state_snapshots
       (packet_uuid, state_key, compressed_state, token_map)
     VALUES (
@@ -213,13 +218,15 @@ export async function POST({ request, locals }) {
         structured_feature_revision: packet.structured_analysis?.experiment_feature_matrix?.featureRevision ?? null,
       })}::jsonb
     )
-  `);
+    `);
+    return { rowId, state };
+  });
 
   return json({
     ok: true,
     packetUuid,
-    rowId: row.id,
-    featureId: row.feature_id,
+    rowId: stored.rowId,
+    featureId: packet.feature_id ?? null,
     factsWritten: structuredFacts.length + (compiled.facts as unknown[]).length,
     structuredFactsWritten: structuredFacts.length,
     edgesWritten: (compiled.edges as unknown[]).length,
@@ -229,6 +236,10 @@ export async function POST({ request, locals }) {
 
 export async function GET({ url, locals }) {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
+  const actorUserId = Number(locals.user.id);
+  if (!Number.isSafeInteger(actorUserId) || actorUserId <= 0) {
+    return json({ error: 'Packet ownership cannot be established for this actor' }, { status: 403 });
+  }
 
   const featureId = url.searchParams.get('feature_id');
   const packetUuid = url.searchParams.get('packet_uuid');
@@ -245,14 +256,15 @@ export async function GET({ url, locals }) {
           p.id,
           p.packet_uuid,
           p.captured_at,
-          p.feature_id,
-          p.som_cluster,
+          rp.feature_id,
+          rp.som_cluster,
           s.state_key,
           s.compressed_state,
           s.token_map
         FROM route_runtime_packets p
+        JOIN route_packets rp ON rp.packet_uuid = p.packet_uuid
         JOIN route_state_snapshots s ON s.packet_uuid = p.packet_uuid
-        WHERE p.feature_id = ${featureId}
+        WHERE p.user_id = ${actorUserId} AND rp.feature_id = ${featureId}
         ORDER BY p.captured_at DESC
         LIMIT ${limit}
       `)
@@ -261,8 +273,8 @@ export async function GET({ url, locals }) {
           p.id,
           p.packet_uuid,
           p.captured_at,
-          p.feature_id,
-          p.som_cluster,
+          rp.feature_id,
+          rp.som_cluster,
           s.state_key,
           s.compressed_state,
           s.token_map,
@@ -283,11 +295,12 @@ export async function GET({ url, locals }) {
             )
           ) FILTER (WHERE e.id IS NOT NULL) AS edges
         FROM route_runtime_packets p
+        JOIN route_packets rp ON rp.packet_uuid = p.packet_uuid
         JOIN route_state_snapshots s ON s.packet_uuid = p.packet_uuid
         LEFT JOIN route_packet_facts f ON f.packet_uuid = p.packet_uuid
         LEFT JOIN route_packet_edges e ON e.packet_uuid = p.packet_uuid
-        WHERE p.packet_uuid = ${packetUuid}::uuid
-        GROUP BY p.id, p.packet_uuid, p.captured_at, p.feature_id, p.som_cluster,
+        WHERE p.user_id = ${actorUserId} AND p.packet_uuid = ${packetUuid}::uuid
+        GROUP BY p.id, p.packet_uuid, p.captured_at, rp.feature_id, rp.som_cluster,
                  s.state_key, s.compressed_state, s.token_map
         LIMIT 1
       `);
