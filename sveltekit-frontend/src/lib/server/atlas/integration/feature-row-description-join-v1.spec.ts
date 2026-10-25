@@ -84,9 +84,7 @@ describe('FeatureRow and feature description join', () => {
 	});
 
 	it.each([
-		['canonicalId', { canonicalId: 'symbol:other' }, 'CANONICAL_ID'],
 		['sourceRevision', { evidence: description.evidence.map((item) => ({ ...item, sourceRevision: `sha256:${'f'.repeat(64)}` })) }, 'SOURCE_REVISION'],
-		['workspaceRevision', { workspaceRevision: `sha256:${'e'.repeat(64)}` }, 'WORKSPACE_REVISION'],
 	] as const)('refuses an identity/revision mismatch (%s)', (_name, override, expected) => {
 		const changed = { ...description, ...override };
 		expect(() => joinFeatureRowAndDescriptionV1({
@@ -94,6 +92,24 @@ describe('FeatureRow and feature description join', () => {
 			description: changed,
 			sourceBytesByEvidenceRef: new Map([['evidence:source', bytes]]),
 		})).toThrow(`FEATURE_DESCRIPTION_JOIN_${expected}_MISMATCH`);
+	});
+
+	it('rejects a description whose evidence does not identify its declared feature', () => {
+		const changed = { ...description, canonicalId: 'symbol:other' };
+		expect(() => joinFeatureRowAndDescriptionV1({
+			featureRow: row,
+			description: changed,
+			sourceBytesByEvidenceRef: new Map([['evidence:source', bytes]]),
+		})).toThrow('DESCRIPTION_PRIMARY_EVIDENCE_MISSING');
+	});
+
+	it('rejects a description whose evidence belongs to another workspace revision', () => {
+		const changed = { ...description, workspaceRevision: `sha256:${'e'.repeat(64)}` };
+		expect(() => joinFeatureRowAndDescriptionV1({
+			featureRow: row,
+			description: changed,
+			sourceBytesByEvidenceRef: new Map([['evidence:source', bytes]]),
+		})).toThrow('DESCRIPTION_EVIDENCE_WORKSPACE_REVISION_MISMATCH');
 	});
 
 	it('refuses a caller-asserted reviewed label without the reviewed-label owner', () => {

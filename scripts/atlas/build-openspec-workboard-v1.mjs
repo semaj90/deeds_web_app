@@ -206,7 +206,9 @@ const frontierTasks = [...byPriority.reduce((frontier, task) => {
   .sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const invariants = tasks.filter((task) => task.kind === 'INVARIANT').map((task) => ({ taskKey: task.taskKey, change: task.change, source: task.source, line: task.line, text: task.text, state: task.state, lastUpdatedAt: task.lastUpdatedAt, timestampMethod: task.timestampMethod, eta: task.eta }));
 const waveWorkPackages = PROGRAM_WAVES.map((wave) => {
-  const members = tasks.filter((task) => task.state === 'OPEN' && task.program.wave === wave.id);
+  const members = tasks.filter((task) => task.state === 'OPEN'
+    && task.program.wave === wave.id
+    && task.program.architecture.programId);
   return {
     id: `WAVE-${String(wave.id).padStart(2, '0')}`,
     gateId: `GATE-WAVE-${String(wave.id).padStart(2, '0')}`,

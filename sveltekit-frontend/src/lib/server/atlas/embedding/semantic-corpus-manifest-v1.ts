@@ -76,7 +76,7 @@ export const semanticCorpusManifestV1Schema = z.object({
   vectorSetChecksum: sha256,
   observedEmbeddingModels: z.array(z.string().min(1)),
   observedEmbeddingVersions: z.array(z.string().min(1)),
-  modelProvenanceStatus: z.enum(['RESOLVED', 'UNRESOLVED']),
+  modelProvenanceStatus: z.literal('UNRESOLVED'),
   qualityJudgmentsRequired: z.literal(false),
   qualityPromotionEligible: z.literal(false),
   canonicalAuthority: z.literal(false),
@@ -109,7 +109,6 @@ function assertMemberMatchesOrdinalMap(member: SemanticCorpusMemberV1, map: Cand
 export function buildSemanticCorpusManifestV1(input: {
   ordinalMap: CandidateOrdinalMapV1;
   members: readonly SemanticCorpusMemberV1[];
-  modelProvenanceStatus?: 'RESOLVED' | 'UNRESOLVED';
 }): SemanticCorpusManifestV1 {
   const map = candidateOrdinalMapV1Schema.parse(input.ordinalMap);
   assertCandidateOrdinalMapIntegrityV1(map);
@@ -195,7 +194,7 @@ export function buildSemanticCorpusManifestV1(input: {
     vectorSetChecksum,
     observedEmbeddingModels,
     observedEmbeddingVersions,
-    modelProvenanceStatus: input.modelProvenanceStatus ?? 'UNRESOLVED' as const,
+    modelProvenanceStatus: 'UNRESOLVED' as const,
     qualityJudgmentsRequired: false as const,
     qualityPromotionEligible: false as const,
     canonicalAuthority: false as const,
@@ -217,7 +216,6 @@ export function verifySemanticCorpusManifestV1(input: {
   const rebuilt = buildSemanticCorpusManifestV1({
     ordinalMap: input.ordinalMap,
     members: input.members,
-    modelProvenanceStatus: manifest.modelProvenanceStatus,
   });
   if (rebuilt.corpusChecksum !== manifest.corpusChecksum) {
     throw new Error(`SEMANTIC_CORPUS_CHECKSUM_MISMATCH:${rebuilt.corpusChecksum}:${manifest.corpusChecksum}`);

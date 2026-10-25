@@ -2072,3 +2072,50 @@ Next steps
 2. Review and commit the 239 paths by area, starting with the smallest.
 3. Restore Ornith on `:8090`, then run one bounded live procedural candidate and record the receipt.
 4. Confirm the loader owner and the authorization owner.
+
+### HANDOFF UPDATE (2026-10-24, late session)
+
+State
+- Branch `chore/parent-atlas-session-2026-10-17` is pushed to origin through `ebb40b2db5`, including tool-call argument validation (`1abcbc2487`).
+- Four test-only fixture commits are local and not pushed: `872d1c862c`, `97c7c32fdf`, `1fe375c0ba`, `1d6900584f`.
+- `origin/main` has PR #123 merge `237fe580bc`. A dry-run merge of the branch into `origin/main` is conflict-free. Not merged. Not pushed to `main`.
+- Excluded from every commit: `docs/reports/document-governance-registry-v1.json` (11.4 MB) and four submodule gitlinks (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec`).
+
+Tool-call validation (`1abcbc2487`)
+- `dispatchToolCall` checks arguments against the cached tools/list schema. Invalid arguments are refused with `INVALID_TOOL_ARGUMENTS`.
+- No cached schema: the call proceeds with a printed warning. This is the chosen policy, not a fail-closed one.
+- Not exercised against a live TRACE server.
+
+Test status (atlas and AI suites, run on the committed batches)
+- 786 files: 765 passed, 4 skipped, 17 reported failed. The log names only 8 failing files, so the count of 17 is unreconciled.
+- Fixed and committed: bundle-provider (4/4), both temporal recorders (3/3, 4/4), projection registry (4/4), policy extractor (5/5).
+- Open:
+  - `openspec-board/workboard-contract-v1.spec.ts` (9 tests): 121 architecture-tagged WAVE-00 tasks have no work package. The gap is in program-plan packaging (`scripts/atlas/lib/openspec-program-plan-v1.mjs`), not the artifact. A builder-side filter on wave membership reduced the count to 121 but did not pass the spec, and was reverted.
+  - `cached-packet-candidate-resolution-v1.spec.ts` (1 test): spec expects `CACHED_PACKET_SOURCE_BINDING_RECEIPT_…`; source throws `SOURCE_BINDING_RECEIPT_MISMATCH`. Canonical code needs a decision.
+  - `polyglot-dag-oak-rlm-prefill.spec.ts` (1 test): LUT hash for `src/routes/api/ace/ask/+server.ts` is stale. Needs LUT regeneration.
+
+Unresolved
+- `scripts/atlas/build-openspec-workboard-v1.mjs` may have had an uncommitted change from outside this session. A `git checkout` during revert may have discarded it. Recovery not found; editor history search timed out.
+- `docs/reports/openspec-workboard-v1.json` matches HEAD (55,603,833 bytes).
+
+NES lineage (`NES-ATLAS-LINEAGE-PRODUCER-01`, read-only)
+- Producer `scripts/atlas/materialize-addressable-packets.mjs` writes `.tmp/addressable-packets.ndjson` (61,718 rows). No row carries `source_revision` or `workspace_revision`.
+- Stop rule applied: NES rows are legacy projection data (`LEGACY_NES_PROJECTION` / `NES_LEGACY_LINEAGE_BLOCKED`). No crosswalk built. Verified 1,992/1,992 `atlas_feature_map.packet_id` matches against `nes_chrom_packets.packet_key` (`0` canonical `atlas_packets.packet_key` matches).
+- Security: `ingest-nes-chrom.mjs` hardcodes a database password in its connection string. Move it to `.env` and rotate.
+
+Operations & L2 Authorization / Headroom Update (2026-10-24)
+- llama-server `:8090` (`ornith-1.5-9b`) is running on Windows host loopback (`127.0.0.1:8090`). Headroom v0.41.0 is running on WSL2 Ubuntu loopback (`127.0.0.1:8787`); `scripts/launch-turboquant.ps1` (`Test-HeadroomProxyHealth`) checks Windows loopback and falls back to WSL2 loopback while reporting namespace isolation.
+- Headroom CCR smoke test (`scripts/test-headroom-ccr-smoke.py`) verified `"config": {"mode": "ccr"}` on `:8787`: `11,736 -> 3,136` tokens (`8,600` saved), `code_aware` exact SHA-256 recovery, and `smart_crusher` semantic JSON array recovery (compact re-serialization changes raw byte length, confirming CCR text is never canonical source evidence).
+- `ACTOR-WORKSPACE-GRANT-02` (`actor-workspace-grant-v1.ts` + `candidate-feature-to-feature-row-v1.ts`): Added `AuthoritativeCachedGrantProvider` (`STALE_GRANT_CACHE`, `GRANT_REVOKED`), symlink/alias `sourceNormalizer`, segment-boundary prefix checks, and `promoteAuthorizedCandidateFeatureRowV1` L2 gate (`34/34` focused tests passing; `15/15` `:8095` PyTorch NLP sidecar tests passing).
+- Port `:5434` PostgreSQL session query and `http://localhost:5173/` verified healthy (`HTTP 200 OK`, zero console errors) after resolving `wslrelay.exe` port conflict.
+- Procedural sequence steps 1–2 (table DDL, Drizzle entry) are not started. Steps 3–4 are built with fixtures only.
+
+Next steps
+1. Decide whether to merge the branch into `main` and push the four fixture commits.
+2. Packaging gap in `openspec-program-plan-v1.mjs` for the workboard spec.
+3. Decide the canonical error code for `cached-packet-candidate-resolution`.
+4. Regenerate the polyglot LUT.
+5. Reconcile the 17-vs-8 failing-file count.
+6. Confirm whether the workboard builder had an uncommitted change that was lost.
+7. Move the NES ingest password to `.env` and rotate it.
+8. Connect a production server-owned RBAC grant provider before enabling live workspace-authorized L2 promotion.

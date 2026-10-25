@@ -74,6 +74,23 @@ describe('EMBED-PROVIDER-CONVERGENCE-01', () => {
     expect(resolved.baseUrl).toBe('http://127.0.0.1:8081');
   });
 
+  it('does not misclassify an Ollama embedding URL as llama_cpp_gguf', () => {
+    const resolved = resolveEmbeddingProviderFromEnvV1({
+      EMBEDDING_PROVIDER: 'ollama',
+      EMBEDDING_BACKEND: 'ollama',
+      EMBEDDING_BASE_URL: 'http://127.0.0.1:11434/',
+      OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
+    }, 'win32');
+
+    expect(resolved).toMatchObject({
+      provider: 'ollama',
+      baseUrl: 'http://127.0.0.1:11434',
+      modelId: 'embeddinggemma:latest',
+      dimensions: 768,
+      representationId: 'semantic_768',
+    });
+  });
+
   it('falls back to Ollama when no in-process or dedicated provider is selected', () => {
     expect(resolveEmbeddingProviderFromEnvV1({}, 'win32')).toEqual({
       provider: 'ollama',

@@ -33,7 +33,7 @@ from typing import Annotated, Any, Literal, Optional
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 import miniforge_nlp_sidecar as legacy
 import atlas_external_docs as external_docs
@@ -46,10 +46,35 @@ from atlas_structural_provenance import (
 )
 from atlas_treesitter_span_compat import resolve_chunk_byte_span
 from atlas_ast_chunk_helpers_v1 import AstChunkHelperAnalysisV1, build_ast_chunk_helper_analysis_v1
+from atlas_domain_candidate_helper_v1 import bind_candidate_record
 
 _RUNTIME_MODULE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 _LEGACY_MODULE_SHA256 = hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest()
 _PROCESS_STARTED_MONOTONIC_NS = str(time.monotonic_ns())
+CUSTOM_ATTRIBUTES_SCHEMA = "atlas.langextract-custom-attributes.v1"
+MAX_CUSTOM_ATTRIBUTES = 32
+MAX_CUSTOM_ATTRIBUTE_KEY_CHARS = 80
+MAX_CUSTOM_ATTRIBUTE_VALUE_CHARS = 2048
+MAX_CUSTOM_ATTRIBUTES_BYTES = 8192
+
+
+def _validate_custom_attributes(value: Any) -> dict[str, str | int | float | bool | None]:
+    if not isinstance(value, dict) or len(value) > MAX_CUSTOM_ATTRIBUTES:
+        raise ValueError("CUSTOM_ATTRIBUTES_INVALID_SHAPE")
+    for key, item in value.items():
+        if not isinstance(key, str) or not key or len(key) > MAX_CUSTOM_ATTRIBUTE_KEY_CHARS:
+            raise ValueError("CUSTOM_ATTRIBUTES_INVALID_KEY")
+        if item is not None and not isinstance(item, (str, int, float, bool)):
+            raise ValueError("CUSTOM_ATTRIBUTES_VALUES_MUST_BE_SCALARS")
+        if isinstance(item, str) and len(item) > MAX_CUSTOM_ATTRIBUTE_VALUE_CHARS:
+            raise ValueError("CUSTOM_ATTRIBUTES_VALUE_TOO_LONG")
+    try:
+        encoded = json.dumps(value, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    except (TypeError, ValueError) as error:
+        raise ValueError("CUSTOM_ATTRIBUTES_NOT_JSON_SAFE") from error
+    if len(encoded) > MAX_CUSTOM_ATTRIBUTES_BYTES:
+        raise ValueError("CUSTOM_ATTRIBUTES_TOO_LARGE")
+    return value
 
 
 class AstEvidenceChunkV2(BaseModel):
@@ -141,6 +166,44 @@ class WebEvidenceResponseV1(BaseModel):
     writes_performed: Literal[False] = False
 
 
+class OaklibCandidateRequestV1(BaseModel):
+    external_ids: list[str] = Field(..., min_length=1, max_length=32)
+
+    model_config = {"extra": "forbid"}
+
+
+class OaklibCandidateResponseV1(BaseModel):
+    schema_: Literal["atlas.oaklib-candidate-response.v1"] = Field(alias="schema")
+    status: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
+    ontology_revision: str = Field(alias="ontologyRevision")
+    producer_revision: str = Field(alias="producerRevision")
+    candidates: dict[str, Any]
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
+class OaklibLabelSearchRequestV1(BaseModel):
+    terms: list[str] = Field(..., min_length=1, max_length=16)
+    max_candidates_per_term: int = Field(default=8, alias="maxCandidatesPerTerm", ge=1, le=16)
+
+    model_config = {"extra": "forbid", "populate_by_name": True}
+
+
+class OaklibLabelSearchResponseV1(BaseModel):
+    schema_: Literal["atlas.oaklib-label-search-response.v1"] = Field(alias="schema")
+    status: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
+    ontology_revision: str = Field(alias="ontologyRevision")
+    producer_revision: str = Field(alias="producerRevision")
+    matches: list[dict[str, Any]]
+    candidate_bundle: dict[str, Any] = Field(alias="candidateBundle")
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
 @asynccontextmanager
 async def lifespan(_app):
     try:
@@ -174,6 +237,66 @@ async def request_timer(request: Request, call_next):
     response.headers["x-nlp-sidecar-request-id"] = request.headers.get("x-request-id", "")
     response.headers["x-atlas-sidecar-contract"] = "provenance-v2"
     return response
+
+
+def _configured_oaklib_resource() -> tuple[Path, str]:
+    root_value = os.environ.get("ATLAS_OAKLIB_ONTOLOGY_ROOT", "").strip()
+    file_value = os.environ.get("ATLAS_OAKLIB_ONTOLOGY_FILE", "").strip()
+    if not root_value or not file_value:
+        raise HTTPException(status_code=503, detail="OAKLIB_SOURCE_NOT_CONFIGURED")
+
+    try:
+        root = Path(root_value).resolve(strict=True)
+        relative = Path(file_value)
+        if relative.is_absolute():
+            raise ValueError("ontology file must be relative to its configured root")
+        resource = (root / relative).resolve(strict=True)
+        if not root.is_dir() or not resource.is_relative_to(root) or not resource.is_file():
+            raise ValueError("ontology file is outside the configured root")
+        if resource.suffix.lower() not in {".obo", ".owl", ".rdf", ".ttl", ".ofn"}:
+            raise ValueError("unsupported ontology file type")
+        if resource.stat().st_size > 64 * 1024 * 1024:
+            raise ValueError("ontology file exceeds the 64 MiB limit")
+        source_bytes = resource.read_bytes()
+        source_text = source_bytes.decode("utf-8", errors="strict")
+        if re.search(r"(?im)^\s*import\s*:|owl:imports|<[^>]*imports?\b", source_text):
+            raise ValueError("ontology imports are not allowed")
+        digest = hashlib.sha256(source_bytes).hexdigest()
+    except (OSError, ValueError) as exc:
+        logging.getLogger(__name__).warning("Configured OAKLIB source refused: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_SOURCE_INVALID") from None
+
+    return resource, f"sha256:{digest}"
+
+
+def _load_oaklib_candidates(
+    *, resource_selector: str, subjects: list[str], ontology_revision: str, producer_revision: str
+) -> dict[str, Any]:
+    from parent_atlas_ontology.oaklib_external_adapter import load_oaklib_candidate_bundle_v1
+
+    return load_oaklib_candidate_bundle_v1(
+        resource_selector=resource_selector,
+        source_selector="atlas-local-ontology",
+        subjects=subjects,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+    ).to_dict()
+
+
+def _search_oaklib_labels(
+    *, resource_selector: str, terms: list[str], ontology_revision: str,
+    producer_revision: str, max_candidates_per_term: int
+) -> dict[str, Any]:
+    from parent_atlas_ontology.oaklib_external_adapter import load_oaklib_label_candidates_v1
+
+    return load_oaklib_label_candidates_v1(
+        resource_selector=resource_selector,
+        source_selector="atlas-local-ontology",
+        terms=terms,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        max_candidates_per_term=max_candidates_per_term,
+    )
 
 
 def _native_grounded_extractions(
@@ -447,6 +570,10 @@ def _documentation_fact_output_schema() -> dict[str, Any]:
             "object": {"type": "string"},
             "statement": {"type": "string"},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -464,6 +591,10 @@ def _documentation_output_schema() -> dict[str, Any]:
             "object": {"type": "string"},
             "statement": {"type": "string"},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -477,6 +608,10 @@ def _documentation_output_schema() -> dict[str, Any]:
             "parameterName": {"type": ["string", "null"]},
             "expectedValue": {"type": ["string", "null"]},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -626,6 +761,10 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
         except (TypeError, ValueError):
             confidence = 0.0
         confidence = max(0.0, min(1.0, confidence))
+        try:
+            custom_attributes = _validate_custom_attributes(attributes.get("customAttributes") or {})
+        except ValueError:
+            continue
         extracted.append({
             "extraction_class": extraction_class,
             "subject": subject,
@@ -638,6 +777,7 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
             "start_byte": len(text[:start_pos].encode("utf-8")),
             "end_byte": len(text[:end_pos].encode("utf-8")),
             "confidence": confidence,
+            "custom_attributes": custom_attributes,
             "api_symbol": api_symbol,
             "version_range": str(attributes.get("versionRange") or attributes.get("version_range") or "").strip(),
             "condition": str(attributes.get("condition") or "").strip(),
@@ -682,7 +822,18 @@ class DocumentationFactV1(BaseModel):
     product_version: str = Field(alias="productVersion")
     confidence: float = Field(ge=0.0, le=1.0)
     extraction_method: str = Field(default="LANGEXTRACT_ORNITH", alias="extractionMethod")
+    custom_attributes_version: Literal["atlas.langextract-custom-attributes.v1"] = Field(
+        default=CUSTOM_ATTRIBUTES_SCHEMA, alias="customAttributesVersion"
+    )
+    custom_attributes: dict[str, str | int | float | bool | None] = Field(
+        default_factory=dict, alias="customAttributes"
+    )
     canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
+
+    @field_validator("custom_attributes")
+    @classmethod
+    def validate_custom_attributes(cls, value: Any) -> dict[str, str | int | float | bool | None]:
+        return _validate_custom_attributes(value)
 
     model_config = {"populate_by_name": True}
 
@@ -699,6 +850,14 @@ class ApiRuleV1(BaseModel):
     expected_value: Optional[str] = Field(default=None, alias="expectedValue")
     evidence_span: dict[str, Any] = Field(alias="evidenceSpan")
     confidence: float = Field(ge=0.0, le=1.0)
+    custom_attributes_version: Literal["atlas.langextract-custom-attributes.v1"] = Field(default=CUSTOM_ATTRIBUTES_SCHEMA, alias="customAttributesVersion")
+    custom_attributes: dict[str, str | int | float | bool | None] = Field(default_factory=dict, alias="customAttributes")
+
+    @field_validator("custom_attributes")
+    @classmethod
+    def validate_custom_attributes(cls, value: Any) -> dict[str, str | int | float | bool | None]:
+        return _validate_custom_attributes(value)
+
     canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
 
     model_config = {"populate_by_name": True}
@@ -1477,6 +1636,109 @@ def health() -> dict[str, Any]:
     return result
 
 
+@app.post("/ontology/oaklib/candidates", response_model=OaklibCandidateResponseV1)
+def oaklib_candidates(req: OaklibCandidateRequestV1) -> OaklibCandidateResponseV1:
+    subjects = [value.strip() for value in req.external_ids]
+    if any(not value or len(value) > 256 or any(ord(char) < 32 for char in value) for value in subjects):
+        raise HTTPException(status_code=422, detail="OAKLIB_EXTERNAL_ID_INVALID")
+    if len(set(subjects)) != len(subjects):
+        raise HTTPException(status_code=422, detail="OAKLIB_EXTERNAL_IDS_DUPLICATED")
+
+    resource, ontology_revision = _configured_oaklib_resource()
+    producer_revision = f"miniforge-nlp-sidecar-v2:sha256:{_RUNTIME_MODULE_SHA256}"
+    try:
+        candidates = _load_oaklib_candidates(
+            resource_selector=str(resource),
+            subjects=subjects,
+            ontology_revision=ontology_revision,
+            producer_revision=producer_revision,
+        )
+    except ImportError:
+        raise HTTPException(status_code=503, detail="OAKLIB_DEPENDENCY_UNAVAILABLE") from None
+    except Exception as exc:
+        logging.getLogger(__name__).warning("OAKLIB candidate read failed: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_CANDIDATE_READ_UNAVAILABLE") from None
+
+    return OaklibCandidateResponseV1(
+        schema="atlas.oaklib-candidate-response.v1",
+        status="PROPOSAL_ONLY",
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        candidates=candidates,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
+@app.post("/ontology/oaklib/search", response_model=OaklibLabelSearchResponseV1)
+def oaklib_label_search(req: OaklibLabelSearchRequestV1) -> OaklibLabelSearchResponseV1:
+    terms = [value.strip() for value in req.terms]
+    if any(not value or len(value) > 256 or any(ord(char) < 32 for char in value) for value in terms):
+        raise HTTPException(status_code=422, detail="OAKLIB_SEARCH_TERM_INVALID")
+
+    resource, ontology_revision = _configured_oaklib_resource()
+    producer_revision = f"miniforge-nlp-sidecar-v2:sha256:{_RUNTIME_MODULE_SHA256}"
+    try:
+        result = _search_oaklib_labels(
+            resource_selector=str(resource),
+            terms=terms,
+            ontology_revision=ontology_revision,
+            producer_revision=producer_revision,
+            max_candidates_per_term=req.max_candidates_per_term,
+        )
+    except ImportError:
+        raise HTTPException(status_code=503, detail="OAKLIB_DEPENDENCY_UNAVAILABLE") from None
+    except Exception as exc:
+        logging.getLogger(__name__).warning("OAKLIB label search refused: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_LABEL_SEARCH_UNAVAILABLE") from None
+
+    matches = result.pop("matches", [])
+    return OaklibLabelSearchResponseV1(
+        schema="atlas.oaklib-label-search-response.v1",
+        status="PROPOSAL_ONLY",
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        matches=matches,
+        candidate_bundle=result,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
+class DomainCandidateBindRequestV1(BaseModel):
+    schema_: Optional[str] = Field(default=None, alias="schema")
+    packetKey: Optional[str] = None
+    sourceRef: str = Field(min_length=1)
+    sourceRevision: Optional[str] = None
+    featureLabel: Optional[str] = None
+    textEvidence: str = ""
+    selectionSignalDomain: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
+
+
+class DomainCandidateBindResponseV1(BaseModel):
+    schema_: Literal["atlas.domain-calibration-bound-candidate.v1"] = Field(
+        alias="schema", default="atlas.domain-calibration-bound-candidate.v1"
+    )
+    candidate: dict[str, Any]
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
+@app.post("/domain/candidate/bind", response_model=DomainCandidateBindResponseV1)
+def bind_domain_candidate(req: DomainCandidateBindRequestV1) -> DomainCandidateBindResponseV1:
+    workspace_root = Path(os.getenv("WORKSPACE_ROOT", "."))
+    bound = bind_candidate_record(req.model_dump(by_alias=True), workspace_root)
+    return DomainCandidateBindResponseV1(
+        candidate=bound,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
 @app.get("/capabilities")
 def capabilities() -> dict[str, Any]:
     result = dict(legacy.capabilities())
@@ -1486,6 +1748,33 @@ def capabilities() -> dict[str, Any]:
         "langextractCharInterval": True,
         "langextractAlignmentStatus": True,
         "canonicalIdentityAuthority": False,
+    }
+    result["domainCandidateBinding"] = {
+        "endpoint": "/domain/candidate/bind",
+        "helper": "atlas_domain_candidate_helper_v1",
+        "status": "AVAILABLE",
+        "schema": "atlas.domain-calibration-example.v1",
+        "sourceRevisionRequired": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    result["ontologyCandidateResolution"] = {
+        "endpoint": "/ontology/oaklib/candidates",
+        "status": "OPTIONAL_LOCAL_SOURCE_REQUIRED",
+        "requestSchema": "atlas.oaklib-candidate-request.v1",
+        "responseSchema": "atlas.oaklib-candidate-response.v1",
+        "proposalOnly": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    result["ontologyLabelSearch"] = {
+        "endpoint": "/ontology/oaklib/search",
+        "status": "OPTIONAL_LOCAL_SOURCE_REQUIRED",
+        "requestSchema": "atlas.oaklib-label-search-request.v1",
+        "responseSchema": "atlas.oaklib-label-search-response.v1",
+        "proposalOnly": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
     }
     return result
 
@@ -1565,6 +1854,7 @@ def extract_documentation_facts(req: DocumentationFactRequestV1) -> Documentatio
                     "alignmentStatus": "MATCH_EXACT",
                 },
                 confidence=item["confidence"],
+                customAttributes=item.get("custom_attributes", {}),
             ))
             continue
         alignment_summary["MATCH_EXACT"] = alignment_summary.get("MATCH_EXACT", 0) + 1
@@ -1582,6 +1872,7 @@ def extract_documentation_facts(req: DocumentationFactRequestV1) -> Documentatio
             endByte=item["end_byte"],
             productVersion=req.product_version,
             confidence=item["confidence"],
+            customAttributes=item.get("custom_attributes", {}),
         ))
     selected_model = req.model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
     normalized_output = {"facts": [fact.model_dump(by_alias=True) for fact in facts], "apiRules": [rule.model_dump(by_alias=True) for rule in api_rules]}

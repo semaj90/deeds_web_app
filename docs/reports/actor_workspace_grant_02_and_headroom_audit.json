@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.audit.actor_workspace_grant_02_and_headroom.v1",
+  "generatedAt": "2026-10-24T18:58:00.000Z",
+  "invariants": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "summaryUpsertAllowed": false,
+    "replacementCanonicalEvidence": false,
+    "nesLegacyLineageStatus": "NES_LEGACY_LINEAGE_BLOCKED",
+    "summaryUpsertStatus": "SUMMARY_UPSERT_BLOCKED",
+    "workspaceAdmissionProductionStatus": "WORKSPACE_ADMISSION_UNPROVEN"
+  },
+  "networkBoundaryAudit": {
+    "headroomV0410": {
+      "port": 8787,
+      "owner": "WSL2 Ubuntu loopback (miniforge atlas-rapids-cu13 bin/headroom)",
+      "version": "0.41.0",
+      "activeSubsystems": {
+        "tree_sitter": "loaded (8 languages)",
+        "code_aware": "loaded & enabled",
+        "smart_crusher": "loaded & ready",
+        "magika": "loaded & enabled",
+        "kompress": "unavailable (passthrough)"
+      }
+    },
+    "legacyHeadroomProxyMjs": {
+      "port": 8795,
+      "role": "Historical Atlas memory/compression proxy (distinct from :8787)"
+    },
+    "ornithLlamaServer": {
+      "port": 8090,
+      "owner": "Windows host loopback (llama-server.exe)",
+      "model": "ornith-1.5-9b",
+      "wslDirectLoopbackReachable": false,
+      "reboundTo0000": false
+    }
+  },
+  "headroomCcrFixtureSmoke": {
+    "endpoint": "POST http://127.0.0.1:8787/v1/compress",
+    "requiredConfig": { "mode": "ccr" },
+    "tokensBefore": 11736,
+    "tokensAfter": 3136,
+    "tokensSaved": 8600,
+    "compressionRatio": 0.267211997273347,
+    "transformsApplied": [
+      "router:protected:system_message",
+      "router:code_aware:0.53",
+      "router:smart_crusher:0.03"
+    ],
+    "ccrRetrievalVerification": [
+      {
+        "hash": "b3df3352432ed4f38c765afe",
+        "kind": "code_aware_ast",
+        "originalBytes": 18250,
+        "recoveredBytes": 18250,
+        "originalSha256": "b3df3352432ed4f38c765afe331c436ee8f6a4c47a1a5b0adc22e63293b4bf49",
+        "recoveredSha256": "b3df3352432ed4f38c765afe331c436ee8f6a4c47a1a5b0adc22e63293b4bf49",
+        "exactByteChecksumMatch": true
+      },
+      {
+        "hash": "839c4bd65713",
+        "kind": "smart_crusher_json_array",
+        "originalBytes": 20493,
+        "recoveredBytes": 20296,
+        "originalSha256": "bcb9098a8be274a513d2aa5f9a508cd3fbbd0e57b3bdfc19c0d6726324edb7ec",
+        "recoveredSha256": "839c4bd657132f9b98a6ce8f482ae4dfee77d95652924790224399230e59ddf4",
+        "exactByteChecksumMatch": false,
+        "jsonSemanticArrayEqual": true,
+        "note": "Rust SmartCrusher re-serializes JSON without whitespace after commas; parsed array equality holds (99/99 items), but raw byte SHA-256 changes. Compressed or CCR-reserialized JSON must never replace canonical source evidence."
+      }
+    ]
+  },
+  "actorWorkspaceGrant02": {
+    "authorizationSpecTests": "10/10 passed",
+    "featureRowIntegrationTests": "19/19 passed",
+    "nlpSidecarTests": "15/15 passed"
+  }
+}

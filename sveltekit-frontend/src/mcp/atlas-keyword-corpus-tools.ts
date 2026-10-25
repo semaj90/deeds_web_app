@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { searchKeywordCorpusV1 } from '$lib/server/atlas/keyword-corpus-search-v1.js';
@@ -12,7 +13,8 @@ export function registerAtlasKeywordCorpusTools(server: McpServer): void {
       cursor: z.string().max(2048).nullable().optional(),
     }).strict(),
   }, async ({ query, limit, cursor }) => {
-    const corpusDirectory = path.resolve(process.cwd(), '..', '.okf', 'corpora');
+    const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+    const corpusDirectory = path.join(repositoryRoot, '.okf', 'corpora');
     const result = searchKeywordCorpusV1({
       query,
       corpusPath: path.join(corpusDirectory, 'keyword-corpus.yaml'),

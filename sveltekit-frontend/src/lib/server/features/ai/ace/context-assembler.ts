@@ -558,7 +558,7 @@ async function fetchWebResearchRows(
       SELECT url, title, snippet, relevance_score,
              1 - (embedding <=> ${JSON.stringify(Array.from(vec))}::vector) AS score
       FROM web_search_index
-      ORDER BY embedding <=> ${JSON.stringify(Array.from(vec))}::vector
+      ORDER BY embedding <=> ${JSON.stringify(Array.from(vec))}::vector ASC, url ASC
       LIMIT ${limit}
     `);
     const data = Array.isArray((rows as unknown as { rows?: unknown[] }).rows)
@@ -5390,7 +5390,7 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
                FROM legal_glossary
                WHERE embedding IS NOT NULL
                  AND 1 - (embedding <=> $1::vector) > 0.4
-               ORDER BY embedding <=> $1::vector
+               ORDER BY embedding <=> $1::vector ASC, id ASC
                LIMIT 4`,
               [vecStr]
             );

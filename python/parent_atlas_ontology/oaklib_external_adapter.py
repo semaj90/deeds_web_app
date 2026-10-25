@@ -15,6 +15,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from hashlib import sha256
 from typing import Iterable, Protocol, Sequence
+import unicodedata
 
 
 class OakOntologyAdapterProtocol(Protocol):
@@ -30,6 +31,8 @@ class OakOntologyAdapterProtocol(Protocol):
     def definition(self, entity_id: str) -> str | None: ...
 
     def relationships(self, subjects: Sequence[str]) -> Iterable[tuple[str, str, str]]: ...
+
+    def basic_search(self, search_term: str) -> Iterable[str]: ...
 
 
 @dataclass(frozen=True, slots=True)
@@ -230,6 +233,81 @@ def build_oaklib_candidate_bundle_v1(
     )
 
 
+def search_oaklib_label_candidates_v1(
+    adapter: OakOntologyAdapterProtocol,
+    *,
+    terms: Sequence[str],
+    source_selector: str,
+    ontology_revision: str,
+    producer_revision: str,
+    namespace: str = "external-oaklib",
+    max_candidates_per_term: int = 8,
+) -> dict[str, object]:
+    """Return bounded lexical OAK search candidates without creating tuples."""
+
+    if not 1 <= len(terms) <= 16:
+        raise ValueError("OAKLIB_SEARCH_TERM_COUNT_OUT_OF_RANGE")
+    if not 1 <= max_candidates_per_term <= 16:
+        raise ValueError("OAKLIB_SEARCH_RESULT_LIMIT_OUT_OF_RANGE")
+    if not source_selector.strip() or not ontology_revision.strip() or not producer_revision.strip():
+        raise ValueError("OAKLIB_SEARCH_REVISION_OR_SOURCE_MISSING")
+
+    normalized_terms: list[str] = []
+    seen_terms: set[str] = set()
+    for raw_term in terms:
+        term = unicodedata.normalize("NFC", raw_term).strip()
+        if not term or len(term) > 256 or any(ord(char) < 32 for char in term):
+            raise ValueError("OAKLIB_SEARCH_TERM_INVALID")
+        if term.casefold() not in seen_terms:
+            normalized_terms.append(term)
+            seen_terms.add(term.casefold())
+
+    if not normalized_terms:
+        raise ValueError("OAKLIB_SEARCH_REQUIRES_TERMS")
+
+    basic_search = getattr(adapter, "basic_search", None)
+    if not callable(basic_search):
+        raise RuntimeError("OAKLIB_SEARCH_INTERFACE_UNAVAILABLE")
+
+    matches: list[dict[str, object]] = []
+    candidate_ids: set[str] = set()
+    for term in normalized_terms:
+        found: set[str] = set()
+        inspected = 0
+        for result in basic_search(term):
+            inspected += 1
+            if inspected > max_candidates_per_term * 8:
+                break
+            external_id = str(result).strip()
+            if external_id and len(external_id) <= 256 and not any(ord(char) < 32 for char in external_id):
+                found.add(external_id)
+        selected = sorted(found)[:max_candidates_per_term]
+        candidate_ids.update(selected)
+        matches.append({"searchText": term, "externalIds": selected})
+
+    concepts = [
+        asdict(_concept_candidate(
+            adapter,
+            external_id=external_id,
+            source_selector=source_selector,
+            namespace=namespace,
+            ontology_revision=ontology_revision,
+            producer_revision=producer_revision,
+        ))
+        for external_id in sorted(candidate_ids)
+    ]
+    return {
+        "schema": "atlas.oaklib-candidate-bundle.v1",
+        "sourceSelector": source_selector,
+        "ontologyRevision": ontology_revision,
+        "producerRevision": producer_revision,
+        "concepts": concepts,
+        "relations": [],
+        "canonicalAuthority": False,
+        "matches": matches,
+    }
+
+
 def load_oaklib_candidate_bundle_v1(
     *,
     resource_selector: str,
@@ -237,6 +315,7 @@ def load_oaklib_candidate_bundle_v1(
     ontology_revision: str,
     producer_revision: str = "oaklib-adapter-v1",
     namespace: str = "external-oaklib",
+    source_selector: str | None = None,
 ) -> OaklibCandidateBundleV1:
     """Load a real oaklib adapter lazily and return reviewable candidates.
 
@@ -256,8 +335,39 @@ def load_oaklib_candidate_bundle_v1(
     return build_oaklib_candidate_bundle_v1(
         adapter,
         subjects=subjects,
-        source_selector=resource_selector,
+        source_selector=source_selector or resource_selector,
         ontology_revision=ontology_revision,
         producer_revision=producer_revision,
         namespace=namespace,
+    )
+
+
+def load_oaklib_label_candidates_v1(
+    *,
+    resource_selector: str,
+    terms: Sequence[str],
+    ontology_revision: str,
+    producer_revision: str,
+    source_selector: str = "atlas-local-ontology",
+    namespace: str = "external-oaklib",
+    max_candidates_per_term: int = 8,
+) -> dict[str, object]:
+    """Run bounded lexical search against a server-pinned OAK resource."""
+
+    try:
+        from oaklib import get_adapter
+    except ImportError as exc:  # pragma: no cover - exercised on workstation
+        raise RuntimeError(
+            "OAKLIB_NOT_INSTALLED: install the pinned optional dependency "
+            "from python/requirements-oaklib-adapter.txt"
+        ) from exc
+
+    return search_oaklib_label_candidates_v1(
+        get_adapter(resource_selector),
+        terms=terms,
+        source_selector=source_selector,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        namespace=namespace,
+        max_candidates_per_term=max_candidates_per_term,
     )

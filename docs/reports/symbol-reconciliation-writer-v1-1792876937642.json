@@ -1,0 +1,423 @@
+{
+  "schema": "atlas.symbol-reconciliation-writer-receipt.v1",
+  "generatedAt": "2026-10-24T21:21:30.356Z",
+  "targetWorkspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+  "sourceRefsFilter": null,
+  "allowCreate": false,
+  "apply": false,
+  "gate": {
+    "status": "GROUNDED",
+    "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+    "boundSourceRefCount": 21311,
+    "symbolRowCount": 65456
+  },
+  "symbolKindAdmission": {
+    "allowedKinds": [
+      "class",
+      "constant",
+      "enum",
+      "enum_variant",
+      "field",
+      "function",
+      "implementation",
+      "interface",
+      "macro",
+      "method",
+      "module",
+      "namespace",
+      "property",
+      "type",
+      "variable"
+    ],
+    "admittedCount": 33553,
+    "excludedUnsupportedKindCount": 31903,
+    "excludedByKind": {
+      "export": 1269,
+      "import": 26757,
+      "type_alias": 3877
+    },
+    "excludedSample": [
+      {
+        "symbolId": "e67c31d9-9b0b-4681-ae69-de43efbb1d03",
+        "symbolKind": "type_alias"
+      },
+      {
+        "symbolId": "8d890755-cb05-408a-9d44-75624a5b0b42",
+        "symbolKind": "type_alias"
+      },
+      {
+        "symbolId": "f9253958-b6dc-435d-aa5a-de7b2b03e812",
+        "symbolKind": "type_alias"
+      },
+      {
+        "symbolId": "1a34ab22-e045-4b43-a3c2-ec92d96e9f3b",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "de21f2c1-9c64-471e-b944-a2e21ada1f9b",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "6ad24d22-57c4-456f-ad9d-448d468342e1",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "a434f39c-f95c-4a6d-8089-2e8b77165db0",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "d68a92d4-31c1-4980-84dd-1c768f780408",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "796629d6-171c-4fe6-9670-0ac6497d0ea0",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "d92da8ca-f02e-429f-880e-4b2b70cec6ba",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "6f0bfb37-82d2-4f0a-91dc-df764b28feee",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "b0c210d5-ea79-482d-a425-55ba8ddc6302",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "c85d8d8f-2d73-45ed-b4c9-d6fcb4abc85b",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "22655bfb-aafb-4970-9a53-c009a3a2d2f5",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "57ebb8b5-a938-4675-82ad-a22cee2c1e19",
+        "symbolKind": "type_alias"
+      },
+      {
+        "symbolId": "c4ca615e-bc91-4be2-8123-d8c915131579",
+        "symbolKind": "type_alias"
+      },
+      {
+        "symbolId": "2de9047a-192e-4693-91a1-7d02b6f74fd3",
+        "symbolKind": "type_alias"
+      },
+      {
+        "symbolId": "b4bab742-0320-4ae1-a89a-5395509ecd5c",
+        "symbolKind": "type_alias"
+      },
+      {
+        "symbolId": "fda8ae0f-1c6c-41a3-8c9a-5be03b6aac4d",
+        "symbolKind": "import"
+      },
+      {
+        "symbolId": "1f2a471f-c633-4ff7-aa1f-33cdfbd93cb3",
+        "symbolKind": "import"
+      }
+    ],
+    "authority": "PARENT_ATLAS_STRUCTURAL_SYMBOL_KIND_VALUES"
+  },
+  "sourceRevisionBindingSummary": {
+    "symbolRowCount": 65456,
+    "distinctSourceRefCount": 9945,
+    "distinctSourceRevisionCount": 9709,
+    "distinctWorkspaceRevisionCount": 1,
+    "sourceRevisionSamples": [
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "sourceRevision": "sha256:740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+        "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5"
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "sourceRevision": "sha256:740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+        "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5"
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "sourceRevision": "sha256:740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+        "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5"
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "sourceRevision": "sha256:740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+        "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5"
+      },
+      {
+        "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+        "sourceRevision": "sha256:740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+        "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5"
+      }
+    ],
+    "authority": "EXACT_WORKSPACE_SOURCE_BINDING_JOIN"
+  },
+  "exactIdentityCandidateAudit": {
+    "comparedCount": 33553,
+    "uniqueCandidateCount": 0,
+    "ambiguousCandidateCount": 0,
+    "noCandidateCount": 33553,
+    "sample": [
+      {
+        "nominationId": "nom:15754fd5-17c8-4ba6-9298-6d3ed19733e9",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:8f275129-1e92-41ae-8cf5-9eb450c9dd83",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:53698061-1e50-4341-947a-60e139986939",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:c4adb281-ed80-4dff-b2e0-935f9f0aeaf3",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:ac3464d5-2ef2-4889-b28d-bdef4d66a007",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:e188c314-d428-418c-90f7-e48338f039dd",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:e626ca37-f383-4682-8e66-fba3e9014c61",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:b1bd6b11-8954-4b82-8e0b-039101a09c83",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:9ef79fdc-8317-4e5c-b4af-d4c981f6ba8f",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:023efdce-f4a6-4a5d-8a76-e84a5a8834e9",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:216e6ca6-27e1-42b8-ae37-974c24343268",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:c60fc25e-e925-4660-b723-f417640e4476",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:1058c149-8889-42bb-98f2-ae4562ce5f2f",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:19aa6c52-f101-43f4-b47e-76f4bb822122",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:c16f3f37-6b9f-47ff-9b69-9b055316c2db",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:980cbc57-83e5-4724-b66f-898b23d77e79",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:c34d48e6-269e-41f4-9971-92dc65906f05",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:20781410-0299-4638-8b5b-e784e077587a",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:fe7ceb81-c130-4be4-8a38-474c6e51397e",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      },
+      {
+        "nominationId": "nom:02c125db-2305-443c-9881-eccc034562a6",
+        "status": "NO_EXACT_CANDIDATE",
+        "stableSymbolIds": [],
+        "symbolVersionIds": []
+      }
+    ],
+    "authority": "DIAGNOSTIC_EXACT_SOURCE_REVISION_NAME_KIND_SPAN_HASH_ONLY",
+    "identityResolutionApplied": false
+  },
+  "revisionRejectedCount": 0,
+  "revisionRejectionSample": [],
+  "action": "DRY_RUN_RESOLUTION_ONLY",
+  "symbolResolutionSummary": {
+    "canonical": 99,
+    "unresolved": 33454,
+    "ambiguous": 0,
+    "sample": [
+      {
+        "nominationId": "nom:15754fd5-17c8-4ba6-9298-6d3ed19733e9",
+        "symbolKey": "upstream-symbol:15754fd5-17c8-4ba6-9298-6d3ed19733e9",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:8a2d9f6459776b5f5093a2e977919b79589be41e"
+        ]
+      },
+      {
+        "nominationId": "nom:8f275129-1e92-41ae-8cf5-9eb450c9dd83",
+        "symbolKey": "upstream-symbol:8f275129-1e92-41ae-8cf5-9eb450c9dd83",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:5b531884b497c24d000411317a4c924546662de1"
+        ]
+      },
+      {
+        "nominationId": "nom:53698061-1e50-4341-947a-60e139986939",
+        "symbolKey": "upstream-symbol:53698061-1e50-4341-947a-60e139986939",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:d2fd32a75194372bbe8daf3936bae2183ec66b75"
+        ]
+      },
+      {
+        "nominationId": "nom:c4adb281-ed80-4dff-b2e0-935f9f0aeaf3",
+        "symbolKey": "upstream-symbol:c4adb281-ed80-4dff-b2e0-935f9f0aeaf3",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:7094678f33b68531861fcbde92707ad0e10579eb"
+        ]
+      },
+      {
+        "nominationId": "nom:ac3464d5-2ef2-4889-b28d-bdef4d66a007",
+        "symbolKey": "upstream-symbol:ac3464d5-2ef2-4889-b28d-bdef4d66a007",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:5fd2a4737552761b476a7e6d6768fc89c8251922"
+        ]
+      },
+      {
+        "nominationId": "nom:e188c314-d428-418c-90f7-e48338f039dd",
+        "symbolKey": "upstream-symbol:e188c314-d428-418c-90f7-e48338f039dd",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:c7a7993cdf082aa4afe4356c1331f3db001b14a8"
+        ]
+      },
+      {
+        "nominationId": "nom:e626ca37-f383-4682-8e66-fba3e9014c61",
+        "symbolKey": "upstream-symbol:e626ca37-f383-4682-8e66-fba3e9014c61",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:d037ad4f68aa730ff8ac5a0d1614e3272135b7a2"
+        ]
+      },
+      {
+        "nominationId": "nom:b1bd6b11-8954-4b82-8e0b-039101a09c83",
+        "symbolKey": "upstream-symbol:b1bd6b11-8954-4b82-8e0b-039101a09c83",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:381e13440b1fd478e16cb97b9bd67667fd240f92"
+        ]
+      },
+      {
+        "nominationId": "nom:9ef79fdc-8317-4e5c-b4af-d4c981f6ba8f",
+        "symbolKey": "upstream-symbol:9ef79fdc-8317-4e5c-b4af-d4c981f6ba8f",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:8a493f7797a1cb0b37a25da410b1d35374f1ce53"
+        ]
+      },
+      {
+        "nominationId": "nom:023efdce-f4a6-4a5d-8a76-e84a5a8834e9",
+        "symbolKey": "upstream-symbol:023efdce-f4a6-4a5d-8a76-e84a5a8834e9",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:e7c63a0450c920e42ff80ede300bd1382a2960a5"
+        ]
+      },
+      {
+        "nominationId": "nom:216e6ca6-27e1-42b8-ae37-974c24343268",
+        "symbolKey": "upstream-symbol:216e6ca6-27e1-42b8-ae37-974c24343268",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:10481e09ea0597ba13795419ae71094811991ac9"
+        ]
+      },
+      {
+        "nominationId": "nom:c60fc25e-e925-4660-b723-f417640e4476",
+        "symbolKey": "upstream-symbol:c60fc25e-e925-4660-b723-f417640e4476",
+        "status": "canonical",
+        "resolutionBasis": "exact_symbol_key",
+        "candidateSymbolIds": [
+          "symbol:eef5350b44f7291c7a0872ede26b3e84fc9d6fdd"
+        ]
+      }
+    ]
+  },
+  "receipt": {
+    "schema": "atlas.gis-canonicalization-receipt.v1",
+    "source_ref": "multi",
+    "source_revision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+    "workspace_revision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+    "nomination_count": 33553,
+    "canonical_symbol_count": 99,
+    "unresolved_symbol_count": 33454,
+    "ambiguous_symbol_count": 0,
+    "symbol_version_count": 0,
+    "reference_fact_count": 0,
+    "canonical_reference_count": 0,
+    "degraded_reference_count": 0,
+    "unresolved_reference_count": 0,
+    "evidence_entity_fact_count": 99,
+    "canonical_identity_created": false,
+    "producer_revision": "symbol-reconciliation-writer-v1"
+  }
+}

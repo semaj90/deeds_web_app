@@ -7,6 +7,13 @@ import { buildSemanticSignalPacket } from './semantic-signal-routing.js';
 import { createAtlasSearchAdapter } from './retrieval/search-runtime-adapter.js';
 import { AtlasState, createAtlasRuntimeContext, type AtlasRuntimeContext, type RuntimeObservation } from './atlas-runtime-context.js';
 import { estimateExecutionState, isTransitionAllowed } from './atlas-fsm-policy.js';
+import {
+  createHeadroomCcrClientV1,
+  type HeadroomCcrClientOptionsV1,
+  type HeadroomCcrCompressReceiptV1,
+  type HeadroomCcrRetrieveReceiptV1,
+  type HeadroomMessageV1,
+} from './context/headroom-ccr-client-v1.js';
 
 export type AtlasSemanticToolName =
   | 'atlas.discover'
@@ -132,7 +139,7 @@ const observationSchema = z.object({
 });
 
 const retrieveInputSchema = z.object({
-  query: z.string().min(1),
+  query: z.string().trim().min(1),
   topK: z.number().int().min(1).max(50).default(12),
   lanes: z.array(z.enum(['dense', 'sparse', 'graph', 'symbol', 'temporal', 'centroid'])).default(['dense', 'sparse', 'graph']),
   runtime: runtimeSchema.optional(),
@@ -169,7 +176,7 @@ export const ATLAS_SEMANTIC_TOOL_DEFINITIONS: AtlasSemanticToolDefinition[] = [
   },
   {
     name: 'atlas.retrieve',
-    description: 'Run retrieval with caller-owned workspace, packet, and revision identity.',
+    description: 'Return unresolved retrieval candidates. Runtime identity is caller-supplied and unverified; this tool does not admit evidence.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -282,8 +289,8 @@ function normalizeRuntimeContext(runtime?: AtlasSemanticRuntimeInput): AtlasRunt
       remainingInput: seed.tokenBudget?.remainingInput ?? seed.tokenBudget?.maximumInput ?? 8192,
     },
     authority: {
-      mutationAllowed: seed.authority?.mutationAllowed ?? false,
-      postgresCanonical: seed.authority?.postgresCanonical ?? true,
+      mutationAllowed: false,
+      postgresCanonical: true,
     },
     parentSpanId: seed.parentSpanId,
     correlationId: seed.correlationId,
@@ -307,7 +314,13 @@ function makeResult(
     confidence,
     mock,
     backend,
-    data,
+    data: {
+      ...data,
+      workspaceAuthorityStatus: 'UNVERIFIED_CALLER_INPUT',
+      canonicalEvidenceValidity: 'NOT_ADMITTED',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
   };
 }
 
@@ -324,7 +337,14 @@ function makeBlockedResult(
     confidence: 0,
     mock: false,
     backend: 'fsm',
-    data: { error: reason, evidence: [], canonicalAuthority: false, writesPerformed: false },
+    data: {
+      error: reason,
+      evidence: [],
+      workspaceAuthorityStatus: 'UNVERIFIED_CALLER_INPUT',
+      canonicalEvidenceValidity: 'NOT_ADMITTED',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
   };
 }
 
@@ -342,16 +362,12 @@ async function inspectRuntime(runtime?: AtlasSemanticRuntimeInput, observation?:
 
 async function discover(runtime?: AtlasSemanticRuntimeInput) {
   const ctx = normalizeRuntimeContext(runtime);
-  const [retrievalHealth, preamble] = await Promise.all([
-    import('$lib/server/grpc/retrieval-client.js')
-      .then((mod) => mod.checkRetrievalHealth())
-      .catch(() => ({ available: false, enabled: false, url: 'unavailable', service: 'retrieval-service' })),
-    buildStreamPreamble('atlas discover', 5).catch(() => null),
-  ]);
+  const retrievalHealth = await import('$lib/server/grpc/retrieval-client.js')
+    .then((mod) => mod.checkRetrievalHealth())
+    .catch(() => ({ available: false, enabled: false, url: 'unavailable', service: 'retrieval-service' }));
 
   return makeResult('atlas.discover', ctx, ctx.state, ctx.confidence, 'grpc', {
     retrievalHealth,
-    preamble,
     allowedTools: estimateExecutionState(ctx.state, observationSchema.parse({})).allowedTools,
   });
 }
@@ -388,7 +404,7 @@ async function retrieve(input: AtlasSemanticRetrieveInput) {
   }
 
   if (params.mock) {
-    return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, runtime.confidence, 'mock', {
+    return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, 0, 'mock', {
       query,
       topK: params.topK,
       lanes: params.lanes,
@@ -399,19 +415,26 @@ async function retrieve(input: AtlasSemanticRetrieveInput) {
     }, true);
   }
 
-  const grpcHit = await searchEvidenceViaGrpc({ query, limit: params.topK }).catch(() => null);
+  let grpcHit: Awaited<ReturnType<typeof searchEvidenceViaGrpc>> | null = null;
+  let grpcFallbackStatus: 'NO_RESULT' | 'REQUEST_FAILED' | null = null;
+  try {
+    grpcHit = await searchEvidenceViaGrpc({ query, limit: params.topK });
+    if (!grpcHit) grpcFallbackStatus = 'NO_RESULT';
+  } catch {
+    grpcFallbackStatus = 'REQUEST_FAILED';
+  }
   if (grpcHit) {
-    return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, 0.75, 'grpc', {
+    return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, 0, 'grpc', {
       query,
       topK: params.topK,
       lanes: params.lanes,
       semanticSignal: semanticSignal.compactSummary,
       proofManifest: semanticSignal.proofManifest,
-      evidence: grpcHit.results.map((result) => ({
-        sourceRef: result.metadata?.fileName ?? '',
-        content: result.content,
-        packetKey: result.evidenceId,
+      candidateRefs: grpcHit.results.map((result) => ({
+        evidenceId: result.evidenceId,
+        sourceLocator: result.metadata?.fileName ?? null,
         score: result.score,
+        identityStatus: 'UNRESOLVED',
       })),
       timing: grpcHit.timing,
       cacheSource: grpcHit.cacheSource ?? null,
@@ -423,29 +446,42 @@ async function retrieve(input: AtlasSemanticRetrieveInput) {
     caseId: runtime.workspaceId,
   });
 
-  const result = await search.search({
-    query,
-    topK: params.topK,
-    withGraphExpansion: params.withGraphExpansion,
-  });
+  let result: Awaited<ReturnType<ReturnType<typeof createAtlasSearchAdapter>['search']>>;
+  try {
+    result = await search.search({
+      query,
+      topK: params.topK,
+      withGraphExpansion: params.withGraphExpansion,
+    });
+  } catch {
+    return makeBlockedResult('atlas.retrieve', runtime, 'SEARCH_RUNTIME_UNAVAILABLE');
+  }
 
-  return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, 0.6, 'search-runtime', {
+  return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, 0, 'search-runtime', {
     query,
     topK: params.topK,
     lanes: params.lanes,
     semanticSignal: semanticSignal.compactSummary,
     proofManifest: semanticSignal.proofManifest,
-    packets: result.packets,
+    candidateRefs: result.topPacketKeys.map((candidateRef) => ({
+      candidateRef,
+      identityStatus: 'UNRESOLVED',
+    })),
+    candidateCount: result.packets.length,
     metadata: result.metadata,
     provenance: result.provenance,
-    topPacketKeys: result.topPacketKeys,
-    graphExpanded: result.graphExpanded ?? [],
+    graphExpansionStatus: result.graphExpansionStatus,
+    grpcFallbackStatus,
   }, false);
 }
 
 async function buildContext(input: AtlasSemanticBuildContextInput) {
   const params = buildContextInputSchema.parse(input);
   const runtime = normalizeRuntimeContext(params.runtime);
+  if (!params.mock) {
+    return makeBlockedResult('atlas.build_context', runtime, 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED');
+  }
+
   const retrieval = await retrieve({
     query: params.query,
     topK: params.topK,
@@ -454,6 +490,14 @@ async function buildContext(input: AtlasSemanticBuildContextInput) {
     withGraphExpansion: params.withGraphExpansion,
     mock: params.mock,
   });
+  if (!retrieval.ok) {
+    const error = (retrieval.data as { error?: unknown }).error;
+    return makeBlockedResult(
+      'atlas.build_context',
+      runtime,
+      typeof error === 'string' ? error : 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED',
+    );
+  }
 
   const preamble = params.includePreamble
     ? await buildStreamPreamble(params.query, Math.min(params.topK, 12)).catch(() => null)
@@ -543,4 +587,69 @@ export async function handleAtlasSemanticToolCall(
     default:
       throw new Error(`Unsupported atlas semantic tool: ${name}`);
   }
+}
+
+export async function compressHeadroomCcrPromptForRuntimeV1(
+  input: {
+    runtime?: AtlasSemanticRuntimeInput;
+    model?: string;
+    messages: HeadroomMessageV1[];
+  },
+  clientOptions?: HeadroomCcrClientOptionsV1,
+): Promise<{
+  runtime: AtlasRuntimeContext;
+  receipt: HeadroomCcrCompressReceiptV1;
+  canonicalAuthority: false;
+  replacementCanonicalEvidence: false;
+  canonicalEvidenceValidity: 'NOT_ADMITTED';
+  writesPerformed: false;
+}> {
+  const runtime = normalizeRuntimeContext(input.runtime);
+  const client = createHeadroomCcrClientV1(clientOptions);
+  const receipt = await client.compress({
+    model: input.model ?? 'ornith-1.5-9b',
+    messages: input.messages,
+    config: { mode: 'ccr', compress_user_messages: true, keep_turns: 1 },
+  });
+
+  return {
+    runtime,
+    receipt,
+    canonicalAuthority: false,
+    replacementCanonicalEvidence: false,
+    canonicalEvidenceValidity: 'NOT_ADMITTED',
+    writesPerformed: false,
+  };
+}
+
+export async function retrieveHeadroomCcrHashForRuntimeV1(
+  input: {
+    runtime?: AtlasSemanticRuntimeInput;
+    hash: string;
+    expectedOriginalText?: string;
+  },
+  clientOptions?: HeadroomCcrClientOptionsV1,
+): Promise<{
+  runtime: AtlasRuntimeContext;
+  receipt: HeadroomCcrRetrieveReceiptV1;
+  canonicalAuthority: false;
+  replacementCanonicalEvidence: false;
+  canonicalEvidenceValidity: 'NOT_ADMITTED';
+  writesPerformed: false;
+}> {
+  const runtime = normalizeRuntimeContext(input.runtime);
+  const client = createHeadroomCcrClientV1(clientOptions);
+  const receipt = await client.retrieve({
+    hash: input.hash,
+    expectedOriginalText: input.expectedOriginalText,
+  });
+
+  return {
+    runtime,
+    receipt,
+    canonicalAuthority: false,
+    replacementCanonicalEvidence: false,
+    canonicalEvidenceValidity: 'NOT_ADMITTED',
+    writesPerformed: false,
+  };
 }

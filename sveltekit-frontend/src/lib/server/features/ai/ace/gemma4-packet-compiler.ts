@@ -1,20 +1,15 @@
 /**
- * gemma4-packet-compiler.ts
+ * Packet compiler using the currently admitted llama-server model.
  *
- * Sends a raw NES/CHROM packet to Gemma4 (llama-server :8090) and extracts:
+ * Sends a raw NES/CHROM packet to the active Ornith llama-server model and extracts:
  *   - facts  → route_packet_facts rows
  *   - edges  → route_packet_edges rows
  *   - state  → route_state_snapshots row
  *
- * Uses stream:true per hard rule (Gemma4 thinking block can exhaust max_tokens
+ * Uses stream:true per hard rule (reasoning output can exhaust max_tokens
  * on non-streaming calls before any content tokens arrive).
  */
 
-const LLAMA_URL = (process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090').replace(
-  /^0\.0\.0\.0/,
-  '127.0.0.1'
-);
-const MODEL = process.env.HERMES_MODEL ?? 'gemma4-hermes-64k:latest';
 const TIMEOUT_MS = 90_000;
 const MAX_PACKET_CHARS = 24_000;
 
@@ -62,13 +57,22 @@ Return strict JSON with no markdown fences:
 Packet:
 ${packetStr}`;
 
+  let target: { baseUrl: string; model: string };
+  try {
+    const runtime = await import('$lib/server/llm/runtime-contract.js');
+    target = await runtime.resolveLlamaInferenceTarget(TIMEOUT_MS);
+  } catch (e) {
+    console.error('[packet-compiler] model resolution failed:', e);
+    return EMPTY;
+  }
+
   let res: Response;
   try {
-    res = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
+    res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: MODEL,
+        model: target.model,
         temperature: 0,
         max_tokens: 2048,
         stream: true,
@@ -77,12 +81,12 @@ ${packetStr}`;
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
   } catch (e) {
-    console.error('[gemma4-packet-compiler] fetch error:', e);
+    console.error('[packet-compiler] fetch error:', e);
     return EMPTY;
   }
 
   if (!res.ok) {
-    console.error('[gemma4-packet-compiler] Gemma4 error:', res.status);
+    console.error('[packet-compiler] llama-server error:', res.status);
     return EMPTY;
   }
 
@@ -109,7 +113,7 @@ ${packetStr}`;
       }
     }
   } catch (e) {
-    console.error('[gemma4-packet-compiler] stream error:', e);
+    console.error('[packet-compiler] stream error:', e);
     if (!assembled) return EMPTY;
   }
 
@@ -125,7 +129,7 @@ ${packetStr}`;
       state: parsed.state ?? {},
     };
   } catch {
-    console.error('[gemma4-packet-compiler] JSON parse failed, raw:', jsonStr.slice(0, 300));
+    console.error('[packet-compiler] JSON parse failed, raw:', jsonStr.slice(0, 300));
     return EMPTY;
   }
 }

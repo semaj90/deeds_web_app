@@ -344,41 +344,30 @@ export function toPostgresBytea(blob: AlignedBitsetBlobV1): Buffer {
   return Buffer.from(blob.rawBuffer);
 }
 
+export type AlignedBitsetByteFramingV1 = 'BYTEA_PAYLOAD' | 'RAW_VARLENA_4_BYTE_HEADER';
+
 /**
- * Deserializes an aligned bitset blob from a binary buffer (PostgreSQL bytea or network buffer).
- * Handles:
- * 1. Postgres varlena header detection: VARDATA begins at offset 4. If byte 0 is not 'ATLASBIT'
- *    but byte 4 is 'ATLASBIT', skips the 4-byte vl_len_ header.
- * 2. Exact Uint8Array view bounds (copies only the supplied bytes).
- * 3. Header verification (Magic: 'ATLASBIT', Version: 1, SHA256 checksum).
+ * Decodes a driver-returned bytea payload or explicitly identified raw varlena bytes.
+ * PostgreSQL drivers return the bytea value, not its internal varlena header.
  */
-export function fromPostgresBytea(input: Buffer | Uint8Array | ArrayBuffer): AlignedBitsetBlobV1 {
+export function fromPostgresBytea(
+  input: Buffer | Uint8Array | ArrayBuffer,
+  framing: AlignedBitsetByteFramingV1,
+): AlignedBitsetBlobV1 {
   const inputLength = input instanceof ArrayBuffer ? input.byteLength : input.byteLength;
   const rawBuffer = new ArrayBuffer(inputLength);
-  let bytesView = new Uint8Array(rawBuffer);
+  const bytesView = new Uint8Array(rawBuffer);
   if (input instanceof ArrayBuffer) {
     bytesView.set(new Uint8Array(input));
   } else {
     bytesView.set(new Uint8Array(input.buffer, input.byteOffset, input.byteLength));
   }
-  let effectiveOffset = 0;
-
-  // Check magic 'ATLASBIT' at offset 0
-  let isAtlasBitAt0 = bytesView.length >= 8 &&
-    String.fromCharCode(...bytesView.slice(0, 8)) === MAGIC_ATLASBIT_STRING;
-
-  // Check PostgreSQL varlena header: if byte 0 is not ATLASBIT, check byte 4
-  if (!isAtlasBitAt0 && bytesView.length >= HEADER_BYTES + 4) {
-    const isAtlasBitAt4 = String.fromCharCode(...bytesView.slice(4, 12)) === MAGIC_ATLASBIT_STRING;
-    if (isAtlasBitAt4) {
-      effectiveOffset += 4;
-      bytesView = new Uint8Array(rawBuffer, effectiveOffset);
-      isAtlasBitAt0 = true;
-    }
+  const effectiveOffset = framing === 'RAW_VARLENA_4_BYTE_HEADER' ? 4 : 0;
+  if (bytesView.byteLength < effectiveOffset + HEADER_BYTES) {
+    throw new Error('ALIGNED_BITSET_TRUNCATED_HEADER');
   }
-
-  if (!isAtlasBitAt0) {
-    const foundMagic = String.fromCharCode(...bytesView.slice(0, Math.min(8, bytesView.length)));
+  const foundMagic = String.fromCharCode(...bytesView.slice(effectiveOffset, effectiveOffset + 8));
+  if (foundMagic !== MAGIC_ATLASBIT_STRING) {
     throw new Error(`ALIGNED_BITSET_INVALID_MAGIC: expected '${MAGIC_ATLASBIT_STRING}', got '${foundMagic}'`);
   }
 

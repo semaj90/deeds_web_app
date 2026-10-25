@@ -9,7 +9,7 @@ import { captureStableSnapshot, validateSnapshot } from './lib/workspace-snapsho
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, 'Z');
 const runId = `scratch-snapshot-${stamp}`;
-const workspaceId = `scratch-ns7-${stamp}`;
+const workspaceId = process.env.ATLAS_WORKSPACE_ID ?? '625743d2-092b-4fa8-abe0-9dc094920c80';
 const outDir = path.join(root, '.tmp/atlas/workspace-snapshot-scratch-v1', runId);
 mkdirSync(outDir, { recursive: true });
 const digestCachePath = path.join(outDir, 'digest-cache.json');

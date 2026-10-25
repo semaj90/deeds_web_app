@@ -2,6 +2,63 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261025_route_packet_stub_tables_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit approval: STUB tables route_packets, route_state_snapshots, route_packet_facts, route_packet_edges (packet_uuid key, columns limited to what ace/packets/+server.ts uses). Created empty; nothing backfilled. Rehearsed first in a ROLLBACK transaction. route_packet_source_refs and route_token_map were already present and were not touched by this step.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "manual/20261025_route_token_map_and_source_refs_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25: creates route_token_map and route_packet_source_refs tables with indexes and unique constraints for packet-reward-writer.ts. Rehearsed in a ROLLBACK transaction first.",
+      "appliedBy": "operator-approved, session 2026-10-25",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT table_name FROM information_schema.tables WHERE table_schema=public AND table_name IN (route_token_map, route_packet_source_refs);"
+    },
+    {
+      "file": "manual/20261025_route_runtime_packets_packet_uuid_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: nullable route_runtime_packets.packet_uuid with partial unique index route_runtime_packets_packet_uuid_uq (unique, valid, ready). 11 rows, all packet_uuid NULL; nothing backfilled. Code that writes the UUID and the reward writer's read of it are NOT yet changed.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "manual/20261025_route_packet_rewards_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: route_packet_rewards with unique packet_uuid (indisunique=t, indisvalid=t, 0 rows). Does not reference route_runtime_packets (its id is bigint; packet_uuid is uuid). Rehearsed first in a ROLLBACK transaction. route_packet_source_refs deliberately not created (use route_runtime_packets.source_refs). route_token_map still deferred.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261025_ace_chunks_upsert_unique_v1.sql",
+      "status": "applied",
+      "reason": "Live unique index ace_chunks_case_content_type_uq on (case_id, content_hash, chunk_type): verified indisunique=t, indisvalid=t, indisready=t on 2026-10-25. Created outside the session that wrote this entry; this session only rehearsed it (ROLLBACK). ace_chunks has 0 rows.",
+      "appliedBy": "created by another session; verified live 2026-10-25",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT indisunique, indisvalid FROM pg_index WHERE indexrelid = 'ace_chunks_case_content_type_uq'::regclass;"
+    },
+    {
+      "file": "../../drizzle/manual/20260507_retrieval_spine.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: creates retrieval_rank_cache, llm_summaries, tool_call_stats and their indexes. Rehearsed first in a ROLLBACK transaction (passed, 0 leftover tables). Previously never applied; tool-ranker.ts writes tool_call_stats.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261025_retrieval_ranking_index_enhancements_v1.sql",
+      "status": "applied",
+      "reason": "Cohort complete 2026-10-25 (indisvalid=t, indisready=t for all four). First applied: atlas_nes_lut_v1_inverse_idx and kag_dag_runs_query_hash_created_idx. Then, after 20260507_retrieval_spine.sql was admitted, re-run to create retrieval_rank_cache_created_at_idx and retrieval_rank_cache_chunk_id_idx. The first two were applied before the base-table dependency was resolved, against the advice in the 2026-10-25 review; the re-run made the cohort complete.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261024_pgvector_hnsw_ivfflat_remediation_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Remediates duplicate HNSW index on agent_observations (idx_agent_observations_hnsw), redundant IVFFlat index on cluster_summaries (idx_cluster_summaries_embedding_ivfflat), and builds concurrent HNSW index on chat_embeddings (idx_chat_embeddings_embedding_hnsw) per docs/reports/pgvector-hnsw-ivfflat-diskann-audit-v1.json. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "py -3.13 scripts/atlas/audit_pgvector_hnsw_ivfflat_diskann_v1.py"
+    },
+    {
       "file": "../../drizzle/manual/20261017_reconcile_summary_768_and_vector_io_cleanup.sql",
       "status": "planned_sidecar",
       "reason": "DRAFT, NOT APPLIED. Drops obsolete idx_codebase_chunk_summary_embedding_384_hnsw (10 rows) and redundant IVFFlat summary index; stages partial HNSW indexes for summary_embedding halfvec(768) and error_embedding halfvec(768) to eliminate DataFileRead I/O bottlenecks during non-HOT updates. Requires approval.",
@@ -148,12 +205,21 @@
     },
     {
       "file": "manual/20260916_workspace_event_head_v1.sql",
-      "status": "planned_sidecar",
-      "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Unapplied until migration-owner review, disposable readback canary, and explicit authorization.",
-      "appliedBy": null,
-      "appliedAt": null,
+      "status": "applied",
+      "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Applied inside transactional block with canary readback verification.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-25",
       "requiresJournalEntry": false,
       "validationCommand": "node scripts/atlas/audit-workspace-event-head-schema-v1.mjs"
+    },
+    {
+      "file": "manual/20261017_workspace_event_provenance_v1_DRAFT.sql",
+      "status": "applied",
+      "reason": "Additive workspace event provenance, append-only observations, and worktree leases with monotonic fence_epoch and stream idempotency unique index. Applied inside transactional block with canary readback verification.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "node --env-file=sveltekit-frontend/.env -e \"const postgres = require('./sveltekit-frontend/node_modules/postgres'); const sql = postgres(process.env.DATABASE_URL); sql.unsafe('SELECT table_name FROM information_schema.tables WHERE table_schema = \\'public\\' AND table_name IN (\\'atlas_workspace_events\\', \\'worktree_leases\\', \\'atlas_workspace_heads\\', \\'atlas_workspace_event_observations\\')').then(r => console.log('Tables:', r));\""
     },
     {
       "file": "manual/20260909_router_feature_revision_indexes.sql",

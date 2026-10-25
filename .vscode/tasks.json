@@ -10928,14 +10928,30 @@
       "problemMatcher": []
     },
     {
-      "label": "🗺️ Graphify: Daily Map (fast AST + smoke)",
+      "label": "🗺️ Graphify Daily: Startup apply chain (Ornith 1.5 + projections)",
       "type": "shell",
       "command": "npm run graphify:daily",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Fast AST → docs/graph/codebase-graph.json + codebase-map.md → deep import graph (cycles/orphans/hotspots) → Redis cache → smoke. ~15s, no LLM, no GPU.",
+      "detail": "APPLY/side effects: runs the daily startup chain, including the graphify:audit:ornith alias (Ornith 1.5 at llama-server :8090; proposal output), directory JSONL stream, cluster-card generation/validation/PostgreSQL load, BM25 planning, and packet→Qdrant link repair. Writes local logs/cache/stamp; Qdrant repair and directory stream are enabled by default. Does not invoke LangExtract or the separate Graphify domain-evidence helper. Semantic refresh and embedding refresh are opt-in environment settings.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Graphify: Domain evidence helper (proposal-only tests)",
+      "type": "shell",
+      "command": ".\\node_modules\\.bin\\vitest.cmd run src/lib/server/atlas/classification/graphify-domain-evidence-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Offline contract test for the Graphify domain-evidence helper and LangExtract character-to-UTF-8 span adapter. Emits proposal-only classification. Does not call the live LangExtract/Ornith services, run daily Graphify, access stores, or authorize indexing.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -11238,14 +11254,14 @@
       "problemMatcher": []
     },
     {
-      "label": "🤖 Graphify: Analyze × Gemma4 → AI next_steps plan",
+      "label": "🤖 Graphify: Analyze × Ornith 1.5 (:8090) → AI next_steps plan",
       "type": "shell",
       "command": "npm run analyze:graph:ai",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "detail": "Same as Graphify:Analyze but queries Gemma4 (TurboQuant :8090) for LLM-written root-cause analysis, cluster recommendations, FF1 routing plan, and production blockers. Requires TurboQuant running. Writes next_steps/active/<date>-graph-analysis-ai.md.",
+      "detail": "Same as Graphify:Analyze but queries the configured llama-server model (default ornith-1.5-9b) at :8090 for root-cause analysis, cluster recommendations, FF1 routing plan, and production blockers. Requires llama-server running. Writes next_steps/active/<date>-graph-analysis-ai.md.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -11691,14 +11707,14 @@
       "problemMatcher": []
     },
     {
-      "label": "🤖 Graphify: Synthesize Next Actions (tsgo + gates + Gemma4)",
+      "label": "🤖 Graphify: Synthesize Next Actions (tsgo + gates + configured LLM)",
       "type": "shell",
       "command": "mkdir -p logs/task-output && npm run graph:synthesize 2>&1 | Tee-Object -FilePath logs/task-output/synthesize-next-actions-latest.log; $latest = Get-ChildItem memory/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name; if ($latest) { Write-Host \"✅ next_actions.md → memory/runs/$latest/next_actions.md\" -ForegroundColor Green; Get-Content \"memory/runs/$latest/next_actions.md\" | Select-Object -First 40 } else { Write-Host '⚠️ No run found' -ForegroundColor Yellow }",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Run synthesize-next-actions.mjs: tsgo diagnostics + G17-G25 audit gates + risk scoring + TurboQuant synthesis → memory/runs/<ts>/next_actions.md. Prints P0/P1 summary on completion. ~30-60s.",
+      "detail": "Run synthesize-next-actions.mjs: tsgo diagnostics + G17-G25 audit gates + risk scoring + configured LLM synthesis (direct llama-server defaults to ornith-1.5-9b on :8090; other configured agent/Ollama backends may be selected) → memory/runs/<ts>/next_actions.md. Prints P0/P1 summary on completion. ~30-60s.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -11914,7 +11930,7 @@
         "showReuseMessage": true,
         "clear": true
       },
-      "detail": "Runs Phase 85 P8 semantic diff generator with LangExtract feature extraction and Gemma4 reasoning. Submits high-impact diffs as ACP subagent jobs. REQUIRES: --approve-archive-deletion for cleanup."
+      "detail": "Runs Phase 85 P8 semantic diff generator with LangExtract feature extraction and llama-server reasoning (LLAMA_SERVER_MODEL defaults to ornith-1.5-9b on :8090). Submits high-impact diffs as ACP subagent jobs. REQUIRES: --approve-archive-deletion for cleanup."
     },
     {
       "label": "🤖 ACP Subagent: Semantic Diff (P8) Dry-Run",
@@ -11983,7 +11999,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Phase 85 P6: bounded dry-run Gemma4 summary generation over 25 codebase chunks. Requires Gemma4 llama-server (:8090), Ollama embeddinggemma, and Qdrant online. Zero writes."
+      "detail": "Phase 85 P6: bounded dry-run summary generation over 25 codebase chunks using the configured llama-server model (LLAMA_SERVER_MODEL defaults to ornith-1.5-9b on :8090). Requires llama-server, Ollama EmbeddingGemma, and Qdrant online. Zero writes."
     },
     {
       "label": "🚀 Phase 85 P8: Semantic Diff Analyzer (Startup Dry-Run)",

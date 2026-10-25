@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db/client';
-import { cases } from '$lib/server/db/schema';
-import { verifySSRDatabaseConnection } from '$lib/server/db/ssr-health-check';
+import { db } from '$lib/server/db/client.js';
+import { cases } from '$lib/server/db/schema.js';
+import { verifySSRDatabaseConnection } from '$lib/server/db/ssr-health-check.js';
 import { invalidateCaseCache } from '$lib/server/cache/invalidation.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';

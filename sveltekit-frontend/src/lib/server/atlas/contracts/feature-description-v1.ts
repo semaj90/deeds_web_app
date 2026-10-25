@@ -43,6 +43,32 @@ export const FeatureDescriptionV1Schema = z.object({
 		ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['producer'], message: 'REVIEWED_DESCRIPTION_REQUIRES_HUMAN_REVIEW' });
 	}
 	const evidenceRefs = new Set(description.evidence.map((item) => item.evidenceRef));
+	if (evidenceRefs.size !== description.evidence.length) {
+		ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence'], message: 'DUPLICATE_DESCRIPTION_EVIDENCE_REF' });
+	}
+	const primaryEvidence = description.evidence.filter((item) =>
+		item.canonicalId === description.canonicalId &&
+		item.packetKey === description.packetKey &&
+		item.sourceRef === description.sourceRef
+	);
+	if (primaryEvidence.length === 0) {
+		ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence'], message: 'DESCRIPTION_PRIMARY_EVIDENCE_MISSING' });
+	}
+	for (const [index, evidence] of description.evidence.entries()) {
+		if (evidence.workspaceRevision !== description.workspaceRevision) {
+			ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', index, 'workspaceRevision'], message: 'DESCRIPTION_EVIDENCE_WORKSPACE_REVISION_MISMATCH' });
+		}
+		const isPrimary = primaryEvidence.includes(evidence);
+		if (!isPrimary && !description.relatedFiles.some((file) => file.evidenceRefs.includes(evidence.evidenceRef))) {
+			ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', index], message: 'DESCRIPTION_EVIDENCE_NOT_LINKED_TO_RELATED_FILE' });
+		}
+		if (isPrimary && primaryEvidence.some((candidate) =>
+			candidate.sourceRevision !== evidence.sourceRevision ||
+			candidate.contentHash.toLowerCase() !== evidence.contentHash.toLowerCase()
+		)) {
+			ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['evidence', index], message: 'DESCRIPTION_PRIMARY_EVIDENCE_REVISION_MISMATCH' });
+		}
+	}
 	for (const [index, file] of description.relatedFiles.entries()) {
 		if (file.workspaceRevision !== description.workspaceRevision) {
 			ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['relatedFiles', index, 'workspaceRevision'], message: 'RELATED_FILE_WORKSPACE_REVISION_MISMATCH' });

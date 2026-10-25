@@ -1,8 +1,8 @@
 {
   "schema": "atlas.kanban-runtime-proof.v1",
-  "generated": "2026-10-17T19:32:10.853Z",
+  "generated": "2026-10-25T05:30:30.839Z",
   "taskContractResolved": true,
-  "dispatcherCallerProven": false,
+  "dispatcherCallerProven": true,
   "durableWriterProven": false,
   "claimHeartbeatReclaimProven": false,
   "timelineRevisionLinkProven": false,
@@ -42,25 +42,30 @@
         "prodImporters": [
           "sveltekit-frontend/src/lib/server/atlas/atlas-index.ts",
           "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
+          "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-task-priority.ts",
           "sveltekit-frontend/src/lib/server/atlas/board/fabric-gpu-benchmark.ts",
           "sveltekit-frontend/src/lib/server/atlas/board/graphify-task-candidates.ts",
           "sveltekit-frontend/src/lib/server/atlas/board/phase89-workflow.ts",
           "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts",
           "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
           "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
-          "sveltekit-frontend/src/routes/api/phase89/workflow/+server.ts"
+          "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts",
+          "sveltekit-frontend/src/routes/api/phase89/workflow/+server.ts",
+          "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.server.ts"
         ]
       },
       "familiesSplit": false,
       "note": "workflow-action-event-v1/task-run-contract-v1 vs the live board kanban-task-board/kanban-task-event-contracts: count production importers of each."
     },
     "dispatchers": {
-      "executeHermesAgentStepV1_prodCallers": [],
+      "executeHermesAgentStepV1_prodCallers": [
+        "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts"
+      ],
       "kanbanErrorFixingAgent_prodCallers": []
     },
     "liveStore": {
       "tableRows": {
-        "kanban_tasks": 166,
+        "kanban_tasks": 167,
         "kanban_task_events": 160,
         "kanban_task_attempts": 0,
         "kanban_task_dependencies": 0,
@@ -73,7 +78,7 @@
       "kanbanTaskStatus": [
         {
           "status": "pending",
-          "n": 160
+          "n": 161
         },
         {
           "status": "done",
@@ -113,21 +118,29 @@
         "sveltekit-frontend/src/lib/server/atlas/kanban-task-board.ts",
         "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-head-postgres-adapter-v1.ts",
         "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts",
-        "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts"
+        "sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts",
+        "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts"
       ]
     },
     "uiReaders": [
       "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
-      "sveltekit-frontend/src/routes/api/phase89/workflow/+server.ts"
+      "sveltekit-frontend/src/routes/(app)/admin/error-brain/+page.svelte",
+      "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts",
+      "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/kanban-tickets.spec.ts",
+      "sveltekit-frontend/src/routes/api/error-brain/search/+server.ts",
+      "sveltekit-frontend/src/routes/api/error-brain/search/search-route.spec.ts",
+      "sveltekit-frontend/src/routes/api/phase89/workflow/+server.ts",
+      "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.server.ts",
+      "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte"
     ],
     "graphify": {
-      "file": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-17.json",
+      "file": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-25.json",
       "verdict": "NOT_SAFE_TO_PROJECT"
     },
     "fabricatedEvidenceRisk": {
       "file": "sveltekit-frontend/src/lib/server/atlas/agentic/hermes-adaptive-pipeline-v1.ts",
-      "hardcodedStagePassLiterals": 3,
-      "hardcodedToolVersions": true,
+      "hardcodedStagePassLiterals": 0,
+      "hardcodedToolVersions": false,
       "feedsAdaptiveBackprop": true,
       "note": "Tournament stage results are literals, not tool output; adaptive backprop labels come from outcomeSuccess."
     }

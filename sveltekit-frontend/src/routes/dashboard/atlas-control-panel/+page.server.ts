@@ -2,6 +2,12 @@ import type { PageServerLoad } from './$types';
 import { sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import { loadWorkspaceAdmissionPanelV1 } from '$lib/server/atlas/admission/workspace-admission-panel-v1.js';
+import {
+	listKanbanTaskEvents,
+	listKanbanTasks,
+	type KanbanTask,
+	type KanbanTaskEvent,
+} from '$lib/server/atlas/kanban-task-board.js';
 
 export const load: PageServerLoad = async ({ fetch, locals }) => {
 	let operations: {
@@ -9,12 +15,18 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 		tables: Array<{ tableName: string; exists: boolean; indexNames: string[] }>;
 		errorCounts: { total: number; unresolved: number } | null;
 		graphifyAdmission: Awaited<ReturnType<typeof loadWorkspaceAdmissionPanelV1>> | null;
+		kanbanBoard: {
+			tasks: KanbanTask[];
+			total: number;
+			recentEvents: KanbanTaskEvent[];
+		} | null;
 		error?: string;
 	} = {
 		catalogStatus: locals.user?.role === 'admin' ? 'UNAVAILABLE' : 'ADMIN_ONLY',
 		tables: [],
 		errorCounts: null,
 		graphifyAdmission: null,
+		kanbanBoard: null,
 	};
 
 	if (locals.user?.role === 'admin') {
@@ -62,6 +74,22 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 
 		try {
 			operations.graphifyAdmission = await loadWorkspaceAdmissionPanelV1();
+		} catch (error) {
+			operations.error = [operations.error, error instanceof Error ? error.message : String(error)]
+				.filter(Boolean)
+				.join('; ');
+		}
+
+		try {
+			const [board, recentEvents] = await Promise.all([
+				listKanbanTasks({ limit: 30 }),
+				listKanbanTaskEvents({ limit: 15 }),
+			]);
+			operations.kanbanBoard = {
+				tasks: board.tasks,
+				total: board.total,
+				recentEvents,
+			};
 		} catch (error) {
 			operations.error = [operations.error, error instanceof Error ? error.message : String(error)]
 				.filter(Boolean)

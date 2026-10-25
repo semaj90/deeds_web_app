@@ -4,12 +4,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   execute: vi.fn(),
+  transaction: vi.fn(),
   compilePacketWithGemma4: vi.fn(),
 }));
 
 vi.mock('$lib/server/db/client', () => ({
   db: {
     execute: (...args: unknown[]) => mocks.execute(...args),
+    transaction: (callback: (tx: { execute: (...args: unknown[]) => unknown }) => unknown) =>
+      mocks.transaction(callback),
   },
 }));
 
@@ -17,19 +20,25 @@ vi.mock('$lib/server/features/ai/ace/gemma4-packet-compiler.js', () => ({
   compilePacketWithGemma4: (...args: unknown[]) => mocks.compilePacketWithGemma4(...args),
 }));
 
+vi.mock('drizzle-orm', () => ({
+  sql: (strings: TemplateStringsArray, ...values: unknown[]) => ({
+    text: Array.from(strings).join('?'),
+    values,
+  }),
+}));
+
 describe('/api/ace/packets', () => {
   beforeEach(() => {
     mocks.execute.mockReset();
+    mocks.transaction.mockReset();
     mocks.compilePacketWithGemma4.mockReset();
 
+    mocks.transaction.mockImplementation((callback) => callback({ execute: mocks.execute }));
     mocks.execute
       .mockResolvedValueOnce({
         rows: [
           {
             id: 42,
-            packet_uuid: '11111111-1111-1111-1111-111111111111',
-            feature_id: 'feature-1',
-            som_cluster: '7',
           },
         ],
       })
@@ -70,7 +79,7 @@ describe('/api/ace/packets', () => {
       }),
     });
 
-    const response = await POST({ request, locals: { user: { id: 'u1' } } } as any);
+    const response = await POST({ request, locals: { user: { id: '7' } } } as any);
     expect(response.status).toBe(200);
     expect(mocks.compilePacketWithGemma4).toHaveBeenCalledTimes(1);
     expect(mocks.compilePacketWithGemma4).toHaveBeenCalledWith(
@@ -83,7 +92,14 @@ describe('/api/ace/packets', () => {
 
     const body = await response.json();
     expect(body.ok).toBe(true);
+    expect(body.packetUuid).toMatch(/^[0-9a-f-]{36}$/i);
     expect(body.factsWritten).toBe(5);
-    expect(mocks.execute).toHaveBeenCalledTimes(7);
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(mocks.execute).toHaveBeenCalledTimes(8);
+    const runtimeInsert = (mocks.execute.mock.calls[0][0] as { text: string }).text;
+    expect(runtimeInsert).toContain('INSERT INTO route_runtime_packets');
+    expect(runtimeInsert).not.toContain('prompt_hash');
+    expect(runtimeInsert).not.toContain('reward');
+    expect((mocks.execute.mock.calls[1][0] as { text: string }).text).toContain('INSERT INTO route_packets');
   });
 });

@@ -34,7 +34,7 @@ describe('ProjectionRegistryV1', () => {
     if (result.ok) {
       expect(result.ref).toEqual({
         executor: 'qdrant',
-        collection: 'codebase_chunks_768',
+        collection: 'codebase_chunks_768_v2',
         vectorName: 'content',
         physicalPointId: '0417b9e4-621b-45d5-b623-f814513440ad',
         projectionRevision: 'v2_uuid_clean',

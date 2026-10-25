@@ -112,7 +112,7 @@ export function selectCandidateFeatureRowsWithOrdinalBitsetV1(input: {
 
   const bytea = input.selection.bytea;
   assertSelectionBytes(bytea, manifest);
-  const blob = fromPostgresBytea(bytea);
+  const blob = fromPostgresBytea(bytea, 'BYTEA_PAYLOAD');
   if (blob.bitCount !== ordinalMap.rowCount) throw new Error('ORDINAL_BITSET_SELECTION_BIT_COUNT_MISMATCH');
   const selectedOrdinals = getSetBits(blob);
   if (selectedOrdinals.length !== manifest.selectedCount) {
@@ -141,7 +141,7 @@ export function compileCandidateOrdinalBitsetGateV1(input: {
   }
   const bytea = input.selection.bytea;
   assertSelectionBytes(bytea, manifest);
-  const blob = fromPostgresBytea(bytea);
+  const blob = fromPostgresBytea(bytea, 'BYTEA_PAYLOAD');
   if (blob.bitCount !== ordinalMap.rowCount) throw new Error('ORDINAL_BITSET_SELECTION_BIT_COUNT_MISMATCH');
   const eligible = new Set(getSetBits(blob));
   if (eligible.size !== manifest.selectedCount) throw new Error('ORDINAL_BITSET_SELECTION_COUNT_MISMATCH');

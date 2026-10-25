@@ -115,6 +115,23 @@ export const KanbanTaskClaimResultSchema = z.object({
   claimExpiresAt: z.string(),
 });
 
+export const KanbanTaskCreateInputSchema = z.object({
+  taskId: z.string().min(1),
+  featureId: z.string().min(1),
+  featureLabel: z.string().min(1),
+  sourceRefs: z.array(z.string().min(1)).default([]),
+  lane: KanbanTaskLaneSchema.default('todo'),
+  priority: z.number().int().min(0).max(100).default(0),
+  validationCommand: z.string().min(1).optional(),
+  idempotencyKey: z.string().min(1).optional(),
+  workspaceRevision: z.string().min(1).nullable().optional(),
+  graphifyRevision: z.string().min(1).nullable().optional(),
+  featureRevision: z.string().min(1).nullable().optional(),
+  permissionMode: z.enum(['read_only', 'proposal_only', 'patch_allowed']).optional(),
+});
+
+export type KanbanTaskCreateInput = z.infer<typeof KanbanTaskCreateInputSchema>;
+
 export const KanbanTaskCreateChildInputSchema = z.object({
   parentTaskId: z.string().min(1),
   taskId: z.string().min(1),
@@ -174,6 +191,7 @@ export const KanbanTaskAttemptsInputSchema = z.object({
 });
 
 export const KanbanTaskEventTypeSchema = z.enum([
+  'ticket_created',
   'claimed',
   'heartbeat',
   'blocked',
@@ -687,6 +705,50 @@ export async function heartbeatKanbanTask(input: z.infer<typeof KanbanTaskHeartb
       heartbeatAt: heartbeatAt.toISOString(),
       claimExpiresAt: claimExpiresAt.toISOString(),
     };
+  });
+}
+
+export async function createKanbanTask(input: z.infer<typeof KanbanTaskCreateInputSchema>): Promise<KanbanTask> {
+  const parsed = KanbanTaskCreateInputSchema.parse(input);
+  return withKanbanTransaction(async (tx) => {
+    const now = new Date();
+    const [created] = await tx
+      .insert(kanbanTasks)
+      .values({
+        taskId: parsed.taskId,
+        featureId: parsed.featureId,
+        featureLabel: parsed.featureLabel,
+        sourceRefs: parsed.sourceRefs,
+        lane: parsed.lane,
+        status: 'pending',
+        priority: parsed.priority,
+        validationCommand: parsed.validationCommand ?? null,
+        idempotencyKey: parsed.idempotencyKey ?? null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    if (!created) {
+      throw new Error(`Failed to create kanban task: ${parsed.taskId}`);
+    }
+
+    await appendKanbanTaskEvent(tx, {
+      taskId: parsed.taskId,
+      eventType: 'ticket_created',
+      payload: {
+        featureId: parsed.featureId,
+        featureLabel: parsed.featureLabel,
+        sourceRefs: parsed.sourceRefs,
+        priority: parsed.priority,
+        workspaceRevision: parsed.workspaceRevision ?? null,
+        graphifyRevision: parsed.graphifyRevision ?? null,
+        featureRevision: parsed.featureRevision ?? null,
+        permissionMode: parsed.permissionMode ?? 'proposal_only',
+      },
+    });
+
+    return normalizeRow(created as Record<string, unknown>);
   });
 }
 

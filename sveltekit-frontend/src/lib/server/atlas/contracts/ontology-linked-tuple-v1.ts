@@ -496,7 +496,7 @@ export function buildOntologyLinkedTuplesFromFeatureRow(input: {
       },
       signals: {
         laneStatus: 'ACTIVE',
-        evidenceState: input.featureRow.evidence_state ?? 'ACTIVE_VERIFIED',
+        evidenceState: 'GATED',
         knowledgeResolution: 'RESOLVED',
         domainClass: input.featureRow.domain_class ?? null,
         secondaryDomains: input.featureRow.secondary_domains ?? [],

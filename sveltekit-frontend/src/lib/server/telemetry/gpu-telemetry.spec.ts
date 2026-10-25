@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { record } = vi.hoisted(() => ({ record: vi.fn() }));
 vi.mock('./packet-centric-telemetry.js', () => ({ recordPacketCentricTelemetry: record }));
-import { emitTelemetry, observeStoreRequest, recordResourceOperation, ResourceOperationObservationSchema } from './gpu-telemetry.js';
+import { emitTelemetry, observeComputeOperation, observeStoreRequest, recordResourceOperation, ResourceOperationObservationSchema, SupportedComputeKernelOperations } from './gpu-telemetry.js';
 
 beforeEach(() => record.mockReset().mockResolvedValue(undefined));
 
@@ -77,5 +77,61 @@ describe('independent store request observations', () => {
     expect(ResourceOperationObservationSchema.safeParse({ ...base, service: 'neo4j', operation: 'get' }).success).toBe(false);
     expect(ResourceOperationObservationSchema.safeParse({ ...base, wall_ms: Infinity }).success).toBe(false);
     expect(ResourceOperationObservationSchema.safeParse({ ...base, response: [1, 2] }).success).toBe(false);
+  });
+});
+
+describe('compute kernel operation observations', () => {
+  it.each([
+    'embedding',
+    'gemm',
+    'cosine_similarity',
+    'topk',
+    'cross_encoder',
+    'autoencoder',
+    'som_lookup',
+  ] as const)('times and tracks compute operation %s with packet context', async (op) => {
+    const action = vi.fn().mockResolvedValue({ status: 'computed' });
+    const context = {
+      packet_id: 'nes:feat_deeds:0123456789ab',
+      feature_id: 'real_estate.deeds',
+      som_cell: '12,7',
+      schema_version: 2,
+      embedding_version: 'embeddinggemma:2.0',
+      gpu_kernel_version: 'cuvs_cagra_v1',
+    };
+
+    const result = await observeComputeOperation(
+      op,
+      {
+        requestedKernel: `kernel_${op}_cuda`,
+        reportedBackend: 'cuda',
+        candidateCount: 128,
+        inputDim: 768,
+        outputDim: 256,
+      },
+      action,
+      context
+    );
+
+    expect(result).toEqual({ status: 'computed' });
+    expect(action).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(record).toHaveBeenCalledTimes(1));
+
+    const event = record.mock.calls[0][0];
+    expect(event.packet_context).toEqual(context);
+    expect(event.resource_observation).toMatchObject({
+      schema: 'atlas.resource-operation.v1',
+      operation: op,
+      requested_kernel: `kernel_${op}_cuda`,
+      reported_backend: 'cuda',
+      candidate_count: 128,
+      input_dim: 768,
+      output_dim: 256,
+      kernel_name: null,
+      kernel_ms: null,
+      canonicalAuthority: false,
+    });
+    expect(event.resource_observation.wall_ms).toBeGreaterThanOrEqual(0);
+    expect(ResourceOperationObservationSchema.safeParse(event.resource_observation).success).toBe(true);
   });
 });

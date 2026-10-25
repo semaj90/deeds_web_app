@@ -22,6 +22,9 @@ const require = createRequire(import.meta.url);
 const REDIS = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const REDIS_PASS = process.env.REDIS_PASSWORD || 'redis';
 const PREFIX = process.env.HG_PREFIX || 'hypergraph:v1';
+if (PREFIX === 'hg' || PREFIX.startsWith('hg:')) {
+  throw new Error('CI_HYPERGRAPH_PREFIX_MUST_NOT_OVERLAP_PRODUCTION_NAMESPACE');
+}
 
 async function checkRedis() {
   let Redis;
@@ -40,32 +43,28 @@ async function checkRedis() {
     const n = await client.exists(neighborsKey);
     console.log('Redis CI keys:', centroidsKey, 'exists=', c, neighborsKey, 'exists=', n);
 
-    // Production namespace (hg:*) — written by run-hypergraph.ts / read by topological-search.ts
-    // CI writes a sentinel edge to prove the key shape ACE actually reads is reachable.
-    const ciEdgeId = 'ci-smoke-sentinel';
-    const ciMember = 'ci-chunk-sentinel';
-    await client.zadd('hg:edge:idx', 0.5, ciEdgeId);
-    await client.setex(`hg:edge:${ciEdgeId}`, 300, JSON.stringify({
-      hash: ciEdgeId,
-      memberIds: [ciMember],
-      gradeLabel: 'B',
-      gradeScore: 0.5,
-      label: 'ci-smoke',
-    }));
-
-    const edgeIdx = await client.zcard('hg:edge:idx');
-    const edgeBlob = await client.get(`hg:edge:${ciEdgeId}`);
-    const edgeParsed = edgeBlob ? JSON.parse(edgeBlob) : null;
-    const edgeOk = edgeParsed?.memberIds?.includes(ciMember) && edgeParsed?.gradeLabel === 'B';
+    // Production namespace is inspected only; CI must not manufacture production edges.
+    const edgeCount = await client.zcard('hg:edge:idx');
+    const edgeIds = await client.zrevrange('hg:edge:idx', 0, 49);
+    const edgeBlobs = await Promise.all(edgeIds.map((id) => client.get(`hg:edge:${id}`)));
+    const edgeOk = edgeBlobs.some((blob) => {
+      if (!blob) return false;
+      try {
+        const edge = JSON.parse(blob);
+        return Array.isArray(edge?.memberIds) && typeof edge?.gradeLabel === 'string';
+      } catch {
+        return false;
+      }
+    });
 
     const builtAt = await client.get('hg:built_at');
-    console.log('Redis prod keys: hg:edge:idx size=', edgeIdx, 'hg:built_at=', builtAt ?? '(standalone pipeline not run yet)');
-    console.log('Redis prod key shape (ACE readable):', edgeOk ? 'OK ✓' : 'FAIL — memberIds/gradeLabel missing');
+    console.log('Redis prod keys: hg:edge:idx size=', edgeCount, 'hg:built_at=', builtAt ?? '(standalone pipeline not run yet)');
+    console.log('Redis prod key shape (ACE readable):', edgeOk ? 'OK ✓' : 'FAIL — no valid production edge found');
 
     await client.disconnect();
     if (c && n && edgeOk) return 0;
     if (!edgeOk) {
-      console.error('CI smoke: hg:edge:* key shape invalid — topological-search.ts would silently miss all hyperedge boosts');
+      console.error('CI smoke: hg:edge:* has no valid production edge — topological-search.ts has no real hyperedge data to read');
       return 5;
     }
     return 3;

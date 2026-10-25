@@ -27,10 +27,13 @@ export interface RewardSignal {
   cited?: boolean;
 }
 
+export function rewardBooleanFeature(value: boolean | null): number | null {
+  return value === null ? null : Number(value);
+}
+
 interface PacketRow {
   packet_uuid: string;
   query_hash: string | null;
-  prompt_hash: string | null;
   feature_id: string | null;
   source_refs: unknown;
   som_cluster: string | null;
@@ -38,7 +41,6 @@ interface PacketRow {
   latency_ms: number | null;
   response_tokens: number | null;
   captured_at: Date | null;
-  reward: string | null;
 }
 
 // ── Token hint derivation ─────────────────────────────────────────────────────
@@ -60,7 +62,7 @@ async function extractXgbFeatures(packet: PacketRow): Promise<{
   priorReward: number | null;
 }> {
   let priorReward: number | null = null;
-  let cacheAgeMs: number | null = null;
+  const cacheAgeMs: number | null = null;
   let sourceRefOverlap: number | null = null;
   let somClusterMatch: boolean | null = null;
   let featureIdMatch: boolean | null = null;
@@ -73,16 +75,6 @@ async function extractXgbFeatures(packet: PacketRow): Promise<{
       const priorKey = `rl:prior_reward:${packet.feature_id}`;
       const raw = await redis.get(priorKey);
       if (raw) priorReward = parseFloat(raw);
-    }
-
-    // Cache age: how stale is this prompt_hash in Redis
-    if (packet.prompt_hash) {
-      const cacheKey = `llm:cache:${packet.prompt_hash}`;
-      const ttl = await redis.pttl(cacheKey); // ms remaining
-      if (ttl > 0) {
-        // TTL 3600s total; age = total - remaining
-        cacheAgeMs = 3_600_000 - ttl;
-      }
     }
 
     // Prior packet for same feature_id to compute source_ref overlap
@@ -130,25 +122,24 @@ async function extractXgbFeatures(packet: PacketRow): Promise<{
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
- * Record a user reward signal for a packet. Fire-and-forget.
+ * Record a user reward signal for a packet.
  */
-export function recordReward(signal: RewardSignal): void {
-  void _recordReward(signal).catch(err =>
-    console.error('[packet-reward-writer] recordReward error:', err)
-  );
+export function recordReward(signal: RewardSignal): Promise<void> {
+  return _recordReward(signal);
 }
 
 async function _recordReward(signal: RewardSignal): Promise<void> {
   // Fetch the originating packet
+  // route_runtime_packets is the persisted packet owner for this route.
   const { rows } = await db.execute(sql`
-    SELECT packet_uuid, query_hash, prompt_hash, feature_id,
-           source_refs, som_cluster, qdrant_hits, latency_ms,
-           response_tokens, captured_at, reward
+    SELECT packet_uuid, query_hash, feature_ids ->> 0 AS feature_id,
+           source_refs::jsonb, som_cluster::text, qdrant_hits::int, latency_ms::double precision,
+           response_tokens::int, captured_at
     FROM route_runtime_packets
     WHERE packet_uuid = ${signal.packetUuid}::uuid
     LIMIT 1
   `);
-  if (!rows.length) return;
+  if (!rows.length) throw new Error('PACKET_REWARD_SOURCE_NOT_FOUND');
 
   const packet = rows[0] as unknown as PacketRow;
   const xgb = await extractXgbFeatures(packet);
@@ -171,11 +162,11 @@ async function _recordReward(signal: RewardSignal): Promise<void> {
       ${xgb.sourceRefOverlap},
       ${xgb.qdrantScoreAvg},
       ${xgb.neo4jDepth},
-      ${xgb.somClusterMatch},
-      ${xgb.featureIdMatch},
+      ${rewardBooleanFeature(xgb.somClusterMatch)},
+      ${rewardBooleanFeature(xgb.featureIdMatch)},
       ${xgb.priorReward}
     )
-    ON CONFLICT DO NOTHING
+    ON CONFLICT (packet_uuid) DO NOTHING
   `);
 
   // Update Redis prior_reward for this feature

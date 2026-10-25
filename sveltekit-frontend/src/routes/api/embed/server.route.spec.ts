@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-  embedText: vi.fn(),
+	embedTextWithResult: vi.fn(),
   acquireGpuLease: vi.fn(),
   rateCheck: vi.fn(),
 }));
 
-vi.mock('$lib/server/embedding/embed.js', () => ({ embedText: mocks.embedText }));
+vi.mock('$lib/server/embedding/embed.js', () => ({ embedTextWithResult: mocks.embedTextWithResult }));
 vi.mock('$lib/server/inference/gpu-arbiter.js', () => ({ acquireGpuLease: mocks.acquireGpuLease }));
 vi.mock('$lib/server/middleware/rate-limiter.js', () => ({
   embedRateLimiter: { check: mocks.rateCheck },
@@ -39,24 +39,43 @@ async function post(body: unknown): Promise<Response> {
 
 describe('/api/embed task recipes', () => {
   beforeEach(() => {
-    mocks.embedText.mockReset().mockResolvedValue(vector);
+		mocks.embedTextWithResult.mockReset().mockResolvedValue({
+			vectors: [vector],
+			model: 'embeddinggemma:observed-test',
+			dimension: 768,
+			source: 'http-ollama',
+			totalMs: 5,
+			cacheHit: false,
+		});
     mocks.acquireGpuLease.mockReset().mockResolvedValue(undefined);
     mocks.rateCheck.mockReset().mockReturnValue({ allowed: true });
   });
 
   it('keeps legacy requests raw and omits task recipe metadata', async () => {
     const response = await post({ text: ' find writer ' });
+		const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(mocks.embedText).toHaveBeenCalledWith(' find writer ');
-    expect(await response.json()).not.toHaveProperty('inputRecipe');
+		expect(mocks.embedTextWithResult).toHaveBeenCalledWith(' find writer ');
+		expect(payload).not.toHaveProperty('inputRecipe');
+		expect(payload).toMatchObject({
+			executionObservation: {
+				schema: 'atlas.embedding-execution-observation.v1',
+				status: 'OBSERVED_NOT_VERIFIED',
+				source: 'http-ollama',
+				reportedModel: 'embeddinggemma:observed-test',
+				cacheHit: false,
+				inputChecksum: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
+				vectorChecksum: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
+			},
+		});
   });
 
   it('labels an explicitly selected unprompted legacy recipe', async () => {
     const response = await post({ text: ' raw corpus text ', taskMode: 'unprompted_legacy' });
     const payload = await response.json();
 
-    expect(mocks.embedText).toHaveBeenCalledWith(' raw corpus text ');
+		expect(mocks.embedTextWithResult).toHaveBeenCalledWith(' raw corpus text ');
     expect(payload.inputRecipe).toMatchObject({
       mode: 'unprompted_legacy',
       promptRevision: 'unprompted-v0',
@@ -68,13 +87,32 @@ describe('/api/embed task recipes', () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(mocks.embedText).toHaveBeenCalledWith('task: search result | query: find writer');
+		expect(mocks.embedTextWithResult).toHaveBeenCalledWith('task: search result | query: find writer');
     expect(payload.inputRecipe).toMatchObject({
       mode: 'retrieval_query',
       promptRevision: 'embeddinggemma.task-prompts.google-v1',
     });
     expect(payload.inputRecipe.formattedInputChecksum).toMatch(/^[a-f0-9]{64}$/);
   });
+
+	it('reports cache as the observed source without claiming verification', async () => {
+		mocks.embedTextWithResult.mockResolvedValueOnce({
+			vectors: [vector],
+			model: 'embeddinggemma:cached-test',
+			dimension: 768,
+			source: 'http-ollama',
+			totalMs: 1,
+			cacheHit: true,
+		});
+		const response = await post({ text: 'cached query' });
+		const payload = await response.json();
+
+		expect(payload.executionObservation).toMatchObject({
+			status: 'OBSERVED_NOT_VERIFIED',
+			source: 'cache',
+			cacheHit: true,
+		});
+	});
 
   it('rejects task modes for mock embeddings and non-native dimensions', async () => {
     const mockResponse = await post({ text: 'test', model: 'mock', taskMode: 'retrieval_query' });
@@ -86,6 +124,6 @@ describe('/api/embed task recipes', () => {
     expect(projectedResponse.status).toBe(400);
     expect(unprompted384Response.status).toBe(400);
     expect(mrlRequestResponse.status).toBe(400);
-    expect(mocks.embedText).not.toHaveBeenCalled();
+		expect(mocks.embedTextWithResult).not.toHaveBeenCalled();
   });
 });

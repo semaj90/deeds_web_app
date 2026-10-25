@@ -1,0 +1,198 @@
+{
+  "schema": "atlas.domain-calibration-v3-networkx-poincare-receipt.v1",
+  "generatedAt": "2026-10-24T22:51:47Z",
+  "status": "SHADOW_CANDIDATE_SIGNAL_AND_ADVISORY_GEOMETRY_PROVEN",
+  "canonicalAuthority": false,
+  "productionAdmission": false,
+  "writesPerformed": false,
+  "taxonomy": {
+    "path": ".okf/domains/atlas-domain-taxonomy.yaml",
+    "schemaPath": ".okf/schemas/domain-taxonomy-v1.schema.json",
+    "validationStatus": "VALID",
+    "documentSha256": "sha256:6f464aa21eb43d9ac63318cf8a4b3b577e6810cd657a7f902ae8e181d64463e9",
+    "schemaSha256": "sha256:30919d444e045324fff7f91ea3d2c07200dc5c270e7c38317bf5da37f00768e4",
+    "domainCount": 17,
+    "subclassEdgeCount": 4,
+    "domains": [
+      "api",
+      "auth",
+      "cache",
+      "compiler",
+      "database",
+      "database.postgresql",
+      "devops",
+      "devops.env-config",
+      "devops.process-mgmt",
+      "error-handling",
+      "frontend",
+      "frontend.sveltekit",
+      "gpu",
+      "graph",
+      "machine-learning",
+      "retrieval",
+      "test"
+    ],
+    "subclassEdges": [
+      {
+        "child": "database.postgresql",
+        "parent": "database"
+      },
+      {
+        "child": "devops.env-config",
+        "parent": "devops"
+      },
+      {
+        "child": "devops.process-mgmt",
+        "parent": "devops"
+      },
+      {
+        "child": "frontend.sveltekit",
+        "parent": "frontend"
+      }
+    ]
+  },
+  "networkxCandidateGraph": {
+    "didConverge": true,
+    "nodeCount": 253,
+    "edgeCount": 704,
+    "boundCandidateCount": 149,
+    "l1Sum": 1.0,
+    "l1Normalized": true,
+    "variance": 2.037067507392959e-05,
+    "varianceAboveEpsilon": true,
+    "distinctScoreCount": 141,
+    "nonDegenerate": true,
+    "graphOrdinalMapChecksum": "sha256:9f8c431ca5299f4e4d0c21b55c179e96f534ebc1748631a2631847d20d54d7b9",
+    "scoresChecksum": "sha256:c34347775891a9ab2532ee24f09ca103634be834eaac00c365fa56fa5d5b5aeb",
+    "topDomains": [
+      {
+        "nodeId": "domain:devops",
+        "score": 0.01751024
+      },
+      {
+        "nodeId": "domain:database",
+        "score": 0.01650819
+      },
+      {
+        "nodeId": "domain:frontend.sveltekit",
+        "score": 0.01578224
+      },
+      {
+        "nodeId": "domain:api",
+        "score": 0.01572692
+      },
+      {
+        "nodeId": "domain:error-handling",
+        "score": 0.01540261
+      },
+      {
+        "nodeId": "domain:machine-learning",
+        "score": 0.01480065
+      },
+      {
+        "nodeId": "domain:test",
+        "score": 0.01463838
+      },
+      {
+        "nodeId": "domain:auth",
+        "score": 0.01450584
+      }
+    ],
+    "topCandidates": [
+      {
+        "nodeId": "candidate:scripts/error-resolution/README.md",
+        "score": 0.00527517
+      },
+      {
+        "nodeId": "candidate:sveltekit-frontend/scripts/seed-docker-pg.mjs",
+        "score": 0.00454272
+      },
+      {
+        "nodeId": "candidate:sveltekit-frontend/src/lib/db/queries/route-health-queries.ts",
+        "score": 0.00452998
+      },
+      {
+        "nodeId": "candidate:sveltekit-frontend/src/lib/db/schema/evidence.ts",
+        "score": 0.00452998
+      },
+      {
+        "nodeId": "candidate:sveltekit-frontend/src/lib/server/db/schema-pgvector-512.ts",
+        "score": 0.00452998
+      },
+      {
+        "nodeId": "candidate:scripts/agent/startup-review.mjs",
+        "score": 0.00452612
+      },
+      {
+        "nodeId": "candidate:scripts/ai/cache_startup_prompt.mjs",
+        "score": 0.00452612
+      },
+      {
+        "nodeId": "candidate:scripts/startup/graphify-complete-startup.mjs",
+        "score": 0.00447794
+      }
+    ],
+    "samplePacketKeyV2Derivations": [
+      {
+        "sourceRef": "sveltekit-frontend/tests/e2e/route-forensic/login.diagnostic.spec.ts",
+        "sourceRevision": "sha256:77e2e17f1f1d532771bd2e3db00eee942eb204b7ad7c6af953e84354e399d545",
+        "derivedPacketKeyV2": "packet:2a5b5f91-1f2b-5477-8bba-2010bb313f1a",
+        "dbPacketKey": "packet:d249971c2b85"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/scratch/find-no-auth-routes.mjs",
+        "sourceRevision": "sha256:692ad233cbbb7aef6923959f7f2dd486460325cd750cd5b1d75282b6651ad79e",
+        "derivedPacketKeyV2": "packet:b411b343-7c1e-5291-8703-0c9bfe906780",
+        "dbPacketKey": null
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/authority-chain.ts",
+        "sourceRevision": "sha256:aaa941409e3ab1d38ec1b7f81211e863026c191ce014a2608db91ec25a7a4af7",
+        "derivedPacketKeyV2": "packet:399fcca5-e6ba-52e6-9ed6-eff4d32c4ecf",
+        "dbPacketKey": "packet:4fce6179bf70"
+      },
+      {
+        "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/me/+server.ts",
+        "sourceRevision": "sha256:136dbc2bb90f102daccd9fb85804bdad5a20df1818f4e73d3f07ada67048be51",
+        "derivedPacketKeyV2": "packet:cd80e75e-55ef-560c-a4ab-5c2a475b61b0",
+        "dbPacketKey": null
+      },
+      {
+        "sourceRef": "sveltekit-frontend/tests/routes/auto/api/dev/login-demo.test.ts",
+        "sourceRevision": "sha256:06af7c0d9712914be3b9000b4f90983df813b63592fab4f97f09a731fc0ea90c",
+        "derivedPacketKeyV2": "packet:4b64cb99-4eaf-5c24-89ba-0372fe921aa8",
+        "dbPacketKey": "packet:a1483132ab24"
+      }
+    ]
+  },
+  "poincarePartialDerivativeSmoke": {
+    "status": "ADVISORY_SMOKE_ONLY",
+    "offlineSmoke": true,
+    "geometryDim": 64,
+    "bestEpoch": 1,
+    "validationMrr": 0.117218,
+    "testPoincareMetrics": {
+      "examples": 6,
+      "mrr": 0.082364,
+      "hitsAt1": 0.0,
+      "hitsAt5": 0.0,
+      "medianRank": 14.5
+    },
+    "testFrozenCosineBaseline": {
+      "examples": 6,
+      "mrr": 0.040464,
+      "hitsAt1": 0.0,
+      "hitsAt5": 0.0,
+      "medianRank": 26.5
+    },
+    "partialDerivativeSensitivity": {
+      "heldOutEdge": "Receipt -> Entity",
+      "subsumptionScore": -1.563785,
+      "dScore_dChild768_L2Norm": 2.315665,
+      "dScore_dParent768_L2Norm": 1.596229,
+      "gradientsFiniteAndNonZero": true
+    },
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  }
+}

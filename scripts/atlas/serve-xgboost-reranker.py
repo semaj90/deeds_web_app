@@ -58,6 +58,12 @@ MODEL_SCORE_SEMANTICS = None  # 'REGRESSION_SCORE' | 'RANKING_SCORE' | 'UNKNOWN_
 MODEL_CALIBRATED = False    # never true here — this sidecar performs no probability calibration
 
 
+def validate_model_feature_schema(model_feature_names, model_type: str) -> None:
+    actual = list(model_feature_names) if model_feature_names is not None else None
+    if actual != FEATURE_COLS:
+        raise ValueError(f'MODEL_FEATURE_SCHEMA_MISMATCH:{model_type}')
+
+
 def compute_model_revision(path: Path) -> str:
     """Content-addressed model identity — lets a caller detect a swapped model file even if the
     filename/CLI args didn't change (XGBOOST-SCORE-CONTRACT-01)."""
@@ -85,6 +91,7 @@ def load_xgboost(path: Path):
 
     booster = xgb.Booster()
     booster.load_model(str(path))
+    validate_model_feature_schema(booster.feature_names, 'xgboost')
 
     objective = 'unknown'
     try:
@@ -112,6 +119,7 @@ def load_lightgbm(path: Path):
         sys.exit(1)
 
     model = lgb.Booster(model_file=str(path))
+    validate_model_feature_schema(model.feature_name(), 'lightgbm')
 
     objective = 'unknown'
     try:

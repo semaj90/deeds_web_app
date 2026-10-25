@@ -95,6 +95,7 @@ function makeHarness() {
         schema: 'atlas.workflow-action.v1',
         workflowId: 'workflow:parent-atlas-proof',
         workflowRevision: 3,
+        runId: 'run:parent-atlas-proof',
         sequence,
         actionId: 'action:rg-search',
         dagNodeId: 'dag:rg-search',

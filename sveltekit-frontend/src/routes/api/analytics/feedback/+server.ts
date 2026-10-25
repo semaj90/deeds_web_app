@@ -1,7 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { db } from '$lib/server/db/client';
-import { contextTimeline } from '$lib/server/db/schema/context-timeline';
+import { db } from '$lib/server/db/client.js';
+import { contextTimeline } from '$lib/server/db/schema/context-timeline.js';
+import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { recordReward } from '$lib/server/features/ai/ace/packet-reward-writer.js';
 
@@ -24,7 +25,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	// context_timeline.user_id is integer; locals.user.id is a Lucia string. Coerce.
 	const userIdRaw  = locals.user?.id;
 	const userIdNum  = userIdRaw !== undefined ? Number(userIdRaw) : undefined;
-	const userId     = Number.isFinite(userIdNum) ? userIdNum : undefined;
+	const userId     = userIdNum !== undefined && Number.isSafeInteger(userIdNum) && userIdNum > 0 ? userIdNum : undefined;
 
 	try {
 		const body = await request.json();
@@ -35,6 +36,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { eventType, signal, pipeline, summaryId, packetUuid, payload, sessionId } = parsed.data;
+		if (packetUuid && userId === undefined) {
+			return json({ error: 'Authenticated packet owner is required for reward feedback' }, { status: 401 });
+		}
+		if (packetUuid && userId !== undefined) {
+			const ownedPacket = await db.execute(sql`
+				SELECT packet_uuid
+				FROM route_runtime_packets
+				WHERE packet_uuid = ${packetUuid}::uuid AND user_id = ${userId}
+				LIMIT 1
+			`);
+			if (!ownedPacket.rows.length) {
+				return json({ error: 'Packet not found' }, { status: 404 });
+			}
+		}
 
 		// 1. Record event in context_timeline (Audit trail & RL seed)
 		await db.insert(contextTimeline).values({
@@ -51,7 +66,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// 2. Record packet reward if a packetUuid was provided
 		if (packetUuid) {
-			recordReward({
+			await recordReward({
 				packetUuid,
 				accepted: signal === 'thumbs_up',
 				rejected: signal === 'thumbs_down',

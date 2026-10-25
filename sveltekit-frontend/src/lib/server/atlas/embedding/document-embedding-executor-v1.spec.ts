@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
 import { createHttpDocumentEmbeddingExecutorV1, type AtlasSemanticDocumentV1 } from './document-embedding-executor-v1.js';
 
@@ -30,6 +31,25 @@ describe('document embedding executor v1', () => {
     expect(result.vectors[0]).toHaveLength(768);
     expect(result.receipt.representationId).toBe('semantic_768');
     expect(result.receipt.role).toBe('DOCUMENT');
+    expect(result.receipt).toMatchObject({
+      inputPolicyRevision: 'title-newline-text-v1',
+      inputQualification: 'EXECUTION_INPUTS_HASHED',
+      canonicalAuthority: false,
+      inputs: [{
+        packetKey: document.packetKey,
+        sourceRef: document.sourceRef,
+        sourceRevision: document.sourceRevision,
+        contentHash: document.contentHash,
+        inputChecksum: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
+      }],
+    });
+    expect(result.receipt.inputs[0]?.inputChecksum).toBe(
+      `sha256:${createHash('sha256').update(`${document.title}\n${document.documentText}`, 'utf8').digest('hex')}`,
+    );
+    const outputBytes = new Uint8Array(vector.length * Float32Array.BYTES_PER_ELEMENT);
+    const outputView = new DataView(outputBytes.buffer);
+    vector.forEach((value, index) => outputView.setFloat32(index * Float32Array.BYTES_PER_ELEMENT, value, true));
+    expect(result.receipt.outputChecksum).toBe(`sha256:${createHash('sha256').update(outputBytes).digest('hex')}`);
   });
 
   it('rejects mixed query/document batches', async () => {

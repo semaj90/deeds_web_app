@@ -1,6 +1,8 @@
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { db } from '$lib/server/db/client.js';
+import { sql } from 'drizzle-orm';
 import { routeQuery } from '$lib/server/ace/query-router.js';
 import { traceRouterDecision } from '$lib/server/observability/langfuse.js';
 import type { RequestHandler } from './$types.js';
@@ -43,6 +45,41 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   };
   const cacheTier = cacheTierMap[result.packet?.cache_hit ?? 'none'] ??
     ((hitLane?.lane as string | undefined)?.includes('qdrant') ? 'qdrant-fallback' : 'none');
+  const parsedUserId = Number(locals.user.id);
+  const packetOwnerUserId = Number.isSafeInteger(parsedUserId) && parsedUserId > 0 ? parsedUserId : null;
+
+  let packetUuid: string | null = null;
+  try {
+    const requestedPacketUuid = randomUUID();
+    const persisted = await db.execute(sql`
+      INSERT INTO route_runtime_packets (
+        packet_uuid, user_id, route, query_hash, query_preview, source_refs,
+        feature_ids, lane_ids, cluster_id, som_cluster, qdrant_hits,
+        latency_ms, cache_hit, cache_tier, raw
+      ) VALUES (
+        ${requestedPacketUuid}::uuid,
+        ${packetOwnerUserId},
+        '/api/ace/route',
+        ${queryHash},
+        ${parsed.data.query.slice(0, 120)},
+        ${JSON.stringify(result.packet.source_refs)}::jsonb,
+        ${JSON.stringify(result.packet.feature_ids)}::jsonb,
+        ${JSON.stringify(result.packet.lane_ids)}::jsonb,
+        ${result.packet.cluster_id},
+        ${result.packet.som_cluster},
+        ${result.packet.qdrant_point_ids.length},
+        ${durationMs},
+        ${cacheHit},
+        ${cacheTier},
+        ${JSON.stringify({ schema: 'atlas.ace-route-telemetry.v1' })}::jsonb
+      )
+      RETURNING packet_uuid
+    `);
+    const storedPacketUuid = (persisted.rows[0] as { packet_uuid?: unknown } | undefined)?.packet_uuid;
+    packetUuid = typeof storedPacketUuid === 'string' ? storedPacketUuid : null;
+  } catch (cause) {
+    console.error('[ace-route] packet feedback anchor persistence failed:', cause);
+  }
 
   // Fire-and-forget Langfuse trace — never blocks response
   traceRouterDecision({
@@ -59,7 +96,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     cacheHit,
     cacheTier,
     sourceRefCount: result.packet?.source_refs?.length,
-    packetUuid: result.packet?.packet_id,
+    packetUuid: packetUuid ?? undefined,
     durationMs,
     routeLanes: result.trace.map((t) => ({
       name: t.lane,
@@ -70,6 +107,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   return json({
     packet: result.packet,
+    packetUuid,
     trace: result.trace,
   });
 };

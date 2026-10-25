@@ -144,6 +144,7 @@ export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
 export * from './core/multiview-rerank.js';
+export * from './core/xgboost-trace-label-bridge.js';
 export * from './core/qlora-dataset-export.js';
 export * from './core/ace-hypergraph-payload.js';
 export * from './core/ace-packet-v2.js';

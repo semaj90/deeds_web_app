@@ -46,10 +46,145 @@
   let cacheError = $state<string | null>(null);
   let refreshing = $state(false);
 
+  // --- Kanban Ticket Board & Ticket Creation State (Runes) ---
+  let kanbanTasksList = $state<NonNullable<NonNullable<PageData['operations']>['kanbanBoard']>['tasks']>([]);
+  let kanbanTotal = $state(0);
+  let kanbanEventsList = $state<NonNullable<NonNullable<PageData['operations']>['kanbanBoard']>['recentEvents']>([]);
+  let newTicketFeatureId = $state('feature:graphify-source-bridge');
+  let newTicketLabel = $state('');
+  let newTicketSourceRefs = $state('scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts');
+  let newTicketValidationCmd = $state('npx tsx scripts/atlas/audit-graphify-workspace-snapshot-binding-v1.mts');
+  let newTicketPriority = $state<'low' | 'medium' | 'high' | 'critical'>('high');
+  let newTicketPermissionMode = $state<'read_only' | 'proposal_only' | 'patch_allowed'>('proposal_only');
+  let kanbanBusy = $state(false);
+  let kanbanStatusMsg = $state('');
+  let kanbanErrorMsg = $state('');
+
   $effect(() => {
     cacheStats = data?.cacheStats ?? null;
     cacheError = data?.error ?? null;
+    kanbanTasksList = data?.operations?.kanbanBoard?.tasks ?? [];
+    kanbanTotal = data?.operations?.kanbanBoard?.total ?? 0;
+    kanbanEventsList = data?.operations?.kanbanBoard?.recentEvents ?? [];
   });
+
+  const todoTasks = $derived(kanbanTasksList.filter((t) => t.lane === 'todo'));
+  const inProgressTasks = $derived(kanbanTasksList.filter((t) => t.lane === 'in_progress'));
+  const doneTasks = $derived(kanbanTasksList.filter((t) => t.lane === 'done'));
+
+  // Derived Progress Bar & ETA calculation using Svelte 5 runes
+  const completedCount = $derived(doneTasks.length);
+  const activeCount = $derived(inProgressTasks.length);
+  const pendingCount = $derived(todoTasks.length);
+  const totalCount = $derived(kanbanTasksList.length);
+  const progressPercent = $derived(
+    totalCount === 0 ? 0 : Math.min(100, Math.round((completedCount / totalCount) * 100))
+  );
+  const formattedETA = $derived.by(() => {
+    if (totalCount === 0) return 'No tasks';
+    if (pendingCount + activeCount === 0) return 'Complete';
+    return 'Estimating…';
+  });
+
+  async function refreshKanbanBoard() {
+    kanbanBusy = true;
+    kanbanErrorMsg = '';
+    try {
+      const res = await fetch('/api/admin/atlas/kanban-tickets?limit=30');
+      const body = await res.json();
+      if (!res.ok || !body.ok) {
+        kanbanErrorMsg = body.error ?? `Failed to load Kanban board (${res.status})`;
+      } else {
+        kanbanTasksList = body.tasks ?? [];
+        kanbanTotal = body.total ?? 0;
+        kanbanEventsList = body.events ?? [];
+      }
+    } catch (err) {
+      kanbanErrorMsg = err instanceof Error ? err.message : String(err);
+    } finally {
+      kanbanBusy = false;
+    }
+  }
+
+  async function handleCreateTicket() {
+    if (!newTicketLabel.trim() || !newTicketFeatureId.trim() || !newTicketValidationCmd.trim()) {
+      kanbanErrorMsg = 'Feature ID, Ticket Title, and Validation Command are required.';
+      return;
+    }
+    kanbanBusy = true;
+    kanbanErrorMsg = '';
+    kanbanStatusMsg = '';
+    try {
+      const refs = newTicketSourceRefs
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const workspaceRevision =
+        data?.operations?.graphifyAdmission?.admitted?.workspaceRevision ?? null;
+      const res = await fetch('/api/admin/atlas/kanban-tickets', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          action: 'create_ticket',
+          featureId: newTicketFeatureId.trim(),
+          featureLabel: newTicketLabel.trim(),
+          priority: newTicketPriority,
+          sourceRefs: refs.length > 0 ? refs : ['openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md'],
+          validationCommand: newTicketValidationCmd.trim(),
+          permissionMode: newTicketPermissionMode,
+          workspaceRevision,
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok || !body.ok) {
+        kanbanErrorMsg = body.error ?? `Create ticket failed (${res.status})`;
+      } else {
+        kanbanStatusMsg = `Created ticket ${body.task.taskId} (${body.recommendationProjection?.status ?? 'proposed'})`;
+        newTicketLabel = '';
+        await refreshKanbanBoard();
+      }
+    } catch (err) {
+      kanbanErrorMsg = err instanceof Error ? err.message : String(err);
+    } finally {
+      kanbanBusy = false;
+    }
+  }
+
+  async function handleTicketAction(
+    action: 'claim' | 'heartbeat' | 'complete' | 'block' | 'retry' | 'reclaim_stale',
+    task: NonNullable<NonNullable<PageData['operations']>['kanbanBoard']>['tasks'][number],
+  ) {
+    kanbanBusy = true;
+    kanbanErrorMsg = '';
+    kanbanStatusMsg = '';
+    try {
+      const payload: Record<string, unknown> = {
+        action,
+        taskId: task.taskId,
+      };
+      if (action === 'heartbeat') {
+        payload.claimToken = task.claimToken ?? '';
+        payload.runId = task.currentRunId ?? '';
+        payload.note = 'Operator control-panel heartbeat';
+      }
+      const res = await fetch('/api/admin/atlas/kanban-tickets', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const body = await res.json();
+      if (!res.ok || !body.ok) {
+        kanbanErrorMsg = body.error ?? `Action ${action} failed (${res.status})`;
+      } else {
+        kanbanStatusMsg = `Action '${action}' succeeded on ${task.taskId}`;
+        await refreshKanbanBoard();
+      }
+    } catch (err) {
+      kanbanErrorMsg = err instanceof Error ? err.message : String(err);
+    } finally {
+      kanbanBusy = false;
+    }
+  }
 
   // --- Derived State ---
   const hasSources = $derived(results.length > 0);
@@ -130,7 +265,7 @@
     <div class="text-right text-sm text-muted-foreground">
       {#if cacheStats}
         <p>Last updated: {new Date(cacheStats.timestamp).toLocaleTimeString()}</p>
-        <p>Uptime: {(cacheStats.uptime / 3600).toFixed(1)}h</p>
+        <p>Uptime: {((cacheStats.uptime ?? 0) / 3600).toFixed(1)}h</p>
       {/if}
     </div>
   </div>
@@ -252,6 +387,283 @@
         </div>
       {:else}<p class="text-sm text-muted-foreground">Catalog was not read; migration files alone are not live-deployment proof.</p>{/if}
       <p class="mt-4 text-sm text-muted-foreground">GPU execution is not probed here; no benchmark or workload was started. OpenSpec tasks are authoritative; workboards are generated views.</p>
+    </section>
+
+    <!-- Kanban Taskboard & Agent Control Panel Section -->
+    <section class="mb-8 rounded-lg border bg-card p-5" aria-label="Parent Atlas Kanban Taskboard">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-semibold">Parent Atlas Kanban Taskboard &amp; Agent Ticket Control</h2>
+          <p class="text-sm text-muted-foreground">
+            Non-authoritative human review and agent ticket queue backed by <code>kanban_tasks</code> + <code>kanban_task_events</code> ({kanbanTotal} total tasks). OpenSpec tasks remain authoritative.
+          </p>
+        </div>
+        <Button onclick={refreshKanbanBoard} disabled={kanbanBusy} class="w-auto text-xs">
+          {kanbanBusy ? 'Syncing...' : 'Refresh Board'}
+        </Button>
+      </div>
+
+      {#if kanbanStatusMsg}
+        <div class="mb-4 rounded border border-emerald-500/40 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-300">
+          {kanbanStatusMsg}
+        </div>
+      {/if}
+      {#if kanbanErrorMsg}
+        <div class="mb-4 rounded border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-700 dark:text-red-300">
+          {kanbanErrorMsg}
+        </div>
+      {/if}
+
+      <!-- Create Revision-Bound Ticket Form -->
+      <div class="mb-6 rounded border bg-background/50 p-4">
+        <h3 class="mb-3 text-sm font-semibold">
+          Create Revision-Bound Kanban Ticket (<code>projectRecommendationToKanbanV1</code> → <code>kanban_tasks</code>)
+        </h3>
+        <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          <input
+            type="text"
+            bind:value={newTicketFeatureId}
+            placeholder="Feature ID (e.g. feat:oaklib-tuple-gate)"
+            aria-label="Feature ID"
+            class="rounded border bg-background p-2 text-xs"
+          />
+          <input
+            type="text"
+            bind:value={newTicketLabel}
+            placeholder="Ticket Title / Summary"
+            aria-label="Ticket Title"
+            class="rounded border bg-background p-2 text-xs lg:col-span-2"
+          />
+          <input
+            type="text"
+            bind:value={newTicketSourceRefs}
+            placeholder="Source Refs (comma-separated paths)"
+            aria-label="Source Refs"
+            class="rounded border bg-background p-2 text-xs"
+          />
+          <input
+            type="text"
+            bind:value={newTicketValidationCmd}
+            placeholder="Validation Command"
+            aria-label="Validation Command"
+            class="rounded border bg-background p-2 text-xs font-mono"
+          />
+          <div class="flex gap-2">
+            <select
+              bind:value={newTicketPriority}
+              aria-label="Ticket Priority"
+              class="rounded border bg-background p-2 text-xs"
+            >
+              <option value="critical">critical</option>
+              <option value="high">high</option>
+              <option value="medium">medium</option>
+              <option value="low">low</option>
+            </select>
+            <select
+              bind:value={newTicketPermissionMode}
+              aria-label="Permission Mode"
+              class="rounded border bg-background p-2 text-xs"
+            >
+              <option value="read_only">read_only</option>
+              <option value="proposal_only">proposal_only</option>
+              <option value="patch_allowed">patch_allowed</option>
+            </select>
+            <Button onclick={handleCreateTicket} disabled={kanbanBusy} class="w-auto text-xs">
+              Create Ticket
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agentic Throughput & ETA Progress Bar -->
+      <div class="mb-6 rounded-lg border bg-gradient-to-r from-muted/20 to-muted/40 p-4">
+        <div class="mb-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-primary">Agentic Job Throughput</span>
+            <span class="rounded bg-primary/10 px-2 py-0.5 font-mono text-[11px] text-primary">
+              {progressPercent}% Complete
+            </span>
+            {#if activeCount > 0}
+              <span class="inline-flex items-center gap-1 text-amber-500 text-[11px]">
+                <span class="inline-block h-2 w-2 animate-ping rounded-full bg-amber-400"></span>
+                {activeCount} active job{activeCount > 1 ? 's' : ''} in flight
+              </span>
+            {/if}
+          </div>
+          <div class="font-mono text-[11px] text-muted-foreground">
+            <span>ETA: <strong class="text-foreground">{formattedETA}</strong></span>
+            <span class="mx-1.5">·</span>
+            <span>{completedCount}/{kanbanTasksList.length} tasks</span>
+          </div>
+        </div>
+
+        <div class="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            class="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+            style="width: {progressPercent}%"
+          ></div>
+        </div>
+
+        <div class="mt-2 flex justify-between text-[10px] text-muted-foreground">
+          <span>Queued: {pendingCount}</span>
+          <span>Claimed / Active: {activeCount}</span>
+          <span>Verified / Done: {completedCount}</span>
+        </div>
+      </div>
+
+      <!-- 3-Lane Kanban Board -->
+      <div class="grid gap-4 lg:grid-cols-3">
+        <!-- TODO LANE -->
+        <div class="rounded border bg-background/40 p-3">
+          <div class="mb-3 flex items-center justify-between border-b pb-2">
+            <h3 class="text-sm font-semibold">To Do / Queued</h3>
+            <span class="rounded bg-muted px-2 py-0.5 text-xs font-mono">{todoTasks.length}</span>
+          </div>
+          <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+            {#each todoTasks as task (task.taskId)}
+              <article class="rounded border bg-card p-3 text-xs shadow-sm">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="font-semibold">{task.featureLabel}</span>
+                  <span class="rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase">{task.status}</span>
+                </div>
+                <p class="mt-1 font-mono text-[11px] text-muted-foreground">{task.taskId} · {task.featureId}</p>
+                {#if task.sourceRefs.length > 0}
+                  <p class="mt-1 truncate text-[11px] text-muted-foreground" title={task.sourceRefs.join(', ')}>
+                    Refs: {task.sourceRefs.slice(0, 2).join(', ')}{task.sourceRefs.length > 2 ? ` +${task.sourceRefs.length - 2}` : ''}
+                  </p>
+                {/if}
+                <div class="mt-2.5 flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    disabled={kanbanBusy}
+                    onclick={() => handleTicketAction('claim', task)}
+                    class="rounded border px-2 py-1 text-[11px] font-medium hover:bg-muted"
+                  >
+                    Claim
+                  </button>
+                  <button
+                    type="button"
+                    disabled={kanbanBusy}
+                    onclick={() => handleTicketAction('block', task)}
+                    class="rounded border px-2 py-1 text-[11px] hover:bg-muted"
+                  >
+                    Block
+                  </button>
+                </div>
+              </article>
+            {:else}
+              <p class="text-xs text-muted-foreground">No queued tasks in To Do lane.</p>
+            {/each}
+          </div>
+        </div>
+
+        <!-- IN PROGRESS LANE -->
+        <div class="rounded border bg-background/40 p-3">
+          <div class="mb-3 flex items-center justify-between border-b pb-2">
+            <h3 class="text-sm font-semibold">In Progress / Claimed</h3>
+            <span class="rounded bg-muted px-2 py-0.5 text-xs font-mono">{inProgressTasks.length}</span>
+          </div>
+          <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+            {#each inProgressTasks as task (task.taskId)}
+              <article class="rounded border bg-card p-3 text-xs shadow-sm">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="font-semibold">{task.featureLabel}</span>
+                  <span class="rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase">{task.status}</span>
+                </div>
+                <p class="mt-1 font-mono text-[11px] text-muted-foreground">{task.taskId} · {task.featureId}</p>
+                {#if task.currentRunId}
+                  <p class="mt-1 font-mono text-[10px] text-muted-foreground">Run: {task.currentRunId}</p>
+                {/if}
+                <div class="mt-2.5 flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    disabled={kanbanBusy}
+                    onclick={() => handleTicketAction('heartbeat', task)}
+                    class="rounded border px-2 py-1 text-[11px] hover:bg-muted"
+                  >
+                    Heartbeat
+                  </button>
+                  <button
+                    type="button"
+                    disabled={kanbanBusy}
+                    onclick={() => handleTicketAction('complete', task)}
+                    class="rounded border px-2 py-1 text-[11px] font-medium hover:bg-muted"
+                  >
+                    Complete
+                  </button>
+                  <button
+                    type="button"
+                    disabled={kanbanBusy}
+                    onclick={() => handleTicketAction('retry', task)}
+                    class="rounded border px-2 py-1 text-[11px] hover:bg-muted"
+                  >
+                    Return to Queue
+                  </button>
+                </div>
+              </article>
+            {:else}
+              <p class="text-xs text-muted-foreground">No active tasks in progress.</p>
+            {/each}
+          </div>
+        </div>
+
+        <!-- DONE LANE -->
+        <div class="rounded border bg-background/40 p-3">
+          <div class="mb-3 flex items-center justify-between border-b pb-2">
+            <h3 class="text-sm font-semibold">Done / Verified</h3>
+            <span class="rounded bg-muted px-2 py-0.5 text-xs font-mono">{doneTasks.length}</span>
+          </div>
+          <div class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+            {#each doneTasks as task (task.taskId)}
+              <article class="rounded border bg-card p-3 text-xs shadow-sm">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="font-semibold">{task.featureLabel}</span>
+                  <span class="rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase">{task.status}</span>
+                </div>
+                <p class="mt-1 font-mono text-[11px] text-muted-foreground">{task.taskId} · {task.featureId}</p>
+                {#if task.validationCommand}
+                  <p class="mt-1 truncate font-mono text-[10px] text-muted-foreground">{task.validationCommand}</p>
+                {/if}
+                <div class="mt-2 flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    disabled={kanbanBusy}
+                    onclick={() => handleTicketAction('retry', task)}
+                    class="rounded border px-2 py-1 text-[11px] hover:bg-muted"
+                  >
+                    Reopen
+                  </button>
+                </div>
+              </article>
+            {:else}
+              <p class="text-xs text-muted-foreground">No completed tasks in current window.</p>
+            {/each}
+          </div>
+        </div>
+      </div>
+
+      {#if kanbanEventsList.length > 0}
+        <div class="mt-5 border-t pt-4">
+          <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Recent Kanban Audit Events (<code>kanban_task_events</code>)
+          </h3>
+          <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {#each kanbanEventsList.slice(0, 6) as ev, idx (`${ev.taskId}-${ev.eventType}-${idx}`)}
+              <div class="rounded border bg-background/60 p-2.5 text-xs">
+                <div class="flex justify-between gap-2">
+                  <code class="font-semibold">{ev.eventType}</code>
+                  <span class="font-mono text-[10px] text-muted-foreground">{ev.taskId}</span>
+                </div>
+                {#if ev.payload?.workspaceRevision}
+                  <p class="mt-1 truncate font-mono text-[10px] text-muted-foreground">
+                    rev: {String(ev.payload.workspaceRevision).slice(0, 23)}…
+                  </p>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
     </section>
   {/if}
 

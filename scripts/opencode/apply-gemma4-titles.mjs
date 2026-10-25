@@ -10,9 +10,10 @@
  */
 
 import { readFileSync, writeFileSync } from 'fs';
-import http from 'http';
 
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
+import { streamChatCompletion } from '../atlas/lib/workstation-ornith-adapter.mjs';
+
+const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const INPUT_FILE = '.opencode/recommendations/tasks.ndjson';
 const OUTPUT_FILE = '.opencode/recommendations/tasks-with-improved-titles.ndjson';
@@ -21,45 +22,21 @@ const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const SAMPLE_ONLY = args.includes('--sample');
 
-function callGemma4(prompt) {
-  return new Promise((resolve, reject) => {
-    const payload = JSON.stringify({
-      model: MODEL,
-      prompt: prompt,
-      stream: false,
-      temperature: 0.3,
-      top_p: 0.9,
-      num_predict: 100,
-    });
+// Ornith title call via llama-server (:8090), streamed per the repo's canonical rule.
+// The system turn carries the instructions; the user turn carries only the task data.
+const ORNITH_TITLE_SYSTEM = 'You write concise, imperative task titles. Reply with the title text only: at most 80 characters, no quotes, no explanation.';
 
-    const options = {
-      hostname: 'localhost',
-      port: 11434,
-      path: '/api/generate',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': payload.length,
-      },
-    };
-
-    const req = http.request(options, (res) => {
-      let data = '';
-      res.on('data', (chunk) => (data += chunk));
-      res.on('end', () => {
-        try {
-          const parsed = JSON.parse(data);
-          resolve(parsed.response?.trim() || '');
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
-
-    req.on('error', reject);
-    req.write(payload);
-    req.end();
-  });
+async function callOrnith(userPrompt) {
+  const { assembled } = await streamChatCompletion(
+    LLAMA_URL,
+    MODEL,
+    [
+      { role: 'system', content: ORNITH_TITLE_SYSTEM },
+      { role: 'user', content: userPrompt },
+    ],
+    { maxTokens: 100, temperature: 0.3, topP: 0.9 },
+  );
+  return assembled;
 }
 
 async function main() {
@@ -83,18 +60,14 @@ async function main() {
   for (const task of toProcess) {
     const { description, title: originalTitle, cluster, type } = task;
 
-    // Create a prompt for Gemma4
-    const prompt = `Given this task description and context, generate a concise, imperative title (max 80 chars):
-
-Description: ${description.substring(0, 300)}
+    // Ornith user turn: task data only (instructions are in the system turn).
+    const userPrompt = `Description: ${description.substring(0, 300)}
 Cluster: ${cluster}
-Type: ${type}
-
-Generate ONLY the title text, no quotes or explanation:`;
+Type: ${type}`;
 
     try {
       if (APPLY) {
-        const improvedTitle = await callGemma4(prompt);
+        const improvedTitle = await callOrnith(userPrompt);
         task.title_improved = improvedTitle;
         task.title_original = originalTitle;
         results.push(task);

@@ -144,4 +144,21 @@ describe('FeatureDescriptionV1', () => {
 			relatedFiles: [{ ...base.relatedFiles[0], filePath: 'src/different.ts' }],
 		}).success).toBe(false);
 	});
+
+	it('rejects directly supplied evidence from a different workspace revision', () => {
+		const description = buildFeatureDescriptionV1({ locator, featureRevision: 'feature-r1', summary: 'Searches.', evidence: [evidence] });
+		const forged = {
+			...description,
+			evidence: [evidence, { ...relatedEvidence, workspaceRevision: `sha256:${'f'.repeat(64)}` }],
+		};
+		expect(FeatureDescriptionV1Schema.safeParse(forged).success).toBe(false);
+	});
+
+	it('requires primary evidence and explicit related-file bindings for all other evidence', () => {
+		const description = buildFeatureDescriptionV1({ locator, featureRevision: 'feature-r1', summary: 'Searches.', evidence: [evidence] });
+		const withoutPrimary = { ...description, canonicalId: 'symbol:other', sourceRef: 'src/other.ts', packetKey: null };
+		const orphanRelated = { ...description, evidence: [evidence, relatedEvidence] };
+		expect(FeatureDescriptionV1Schema.safeParse(withoutPrimary).success).toBe(false);
+		expect(FeatureDescriptionV1Schema.safeParse(orphanRelated).success).toBe(false);
+	});
 });

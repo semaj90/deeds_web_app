@@ -1,0 +1,174 @@
+{
+  "schema": "atlas.single-candidate-owner-attribution-chain-receipt.v1",
+  "generatedAt": "2026-10-25T00:06:54.457653+00:00",
+  "forgedCallerCurrentBooleanRejected": true,
+  "stage1_workspaceAuthorization": {
+    "admitted": true,
+    "actorId": "actor:operator-verified-01",
+    "workspaceId": "0199b410-7c00-7000-8000-000000000100",
+    "repositoryScope": "repo:root",
+    "trustedWorkspaceRevision": "sha256:c142c418932879f1e3c5b859eebca540dee739234ccc4479004f6d9a0b1a15c9",
+    "verifiedBy": "verify_workspace_admission_grant_v1"
+  },
+  "stage2_dailyGraphifyStageReceipt": {
+    "schema": "graphify.daily.stage-receipt.v1",
+    "owner": "graphify-daily-pipeline",
+    "packetKeyV2": "packet:31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+    "legacyPacketKeyAlias": "packet:ff52d2ee5f78",
+    "sourceRef": "sveltekit-frontend/src/routes/api/codebase-index/directory-summaries/+server.ts",
+    "sourceRevision": "sha256:fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+    "workspaceRevision": "sha256:c142c418932879f1e3c5b859eebca540dee739234ccc4479004f6d9a0b1a15c9",
+    "astObservation": {
+      "symbolClass": "SVELTEKIT_ROUTE_HANDLER",
+      "symbolName": "POST:RequestHandler",
+      "verifiedCharSpan": [
+        1355,
+        1375
+      ]
+    },
+    "topologyFeatures": {
+      "pagerankL1": 0.004091,
+      "pagerankQuantizedU16": 268,
+      "graphRevision": "sha256:38b13d2df6a0781450c50f19fb939a0038831797e7f93a830240024998b44108"
+    },
+    "boundaryAssertions": {
+      "searchesRetrievalCandidates": false,
+      "indexesIntoDuplicatePostgresTable": false,
+      "mintsRetrievalVote": false
+    }
+  },
+  "stage3_oaklibTaxonomyCrosswalk": {
+    "schema": "atlas.oaklib-taxonomy-crosswalk-stage.v1",
+    "owner": "python-8095-oaklib-bridge",
+    "groundedMention": "ingestDirectorySummaries",
+    "oaklibCandidateCurie": "ATLAS-DOMAIN:api",
+    "okfGroupId": "api",
+    "lutCode": 0,
+    "tupleStatus": "GATED_PROPOSAL_ONLY",
+    "canonicalAuthority": false
+  },
+  "stage4_featureRowSortPairsLowRank": {
+    "featureRowV1": {
+      "schema": "atlas.feature-row.v1",
+      "owner": "atlas-ranking-feature-row-v1",
+      "candidateOrdinal": 0,
+      "packetKeyV2": "packet:31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+      "sourceRevision": "sha256:fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+      "numericFeatures10": {
+        "semanticCosine": 0.8842,
+        "bm25Normalized": 0.7615,
+        "pagerankL1": 0.004091,
+        "crossEncoderProb": 0.841,
+        "astExactMatch": 1.0,
+        "poincareSubsumptionScore": -0.4125,
+        "jacobianSensitivityNorm": 2.3157,
+        "nbConfidence": 0.712,
+        "logregMargin": 0.9051,
+        "xgbCalibrationProb": 0.864
+      },
+      "featureLabelInNumericArray": false
+    },
+    "descriptiveLabelEnvelope": {
+      "schema": "atlas.feature-label-descriptor.v1",
+      "packetKeyV2": "packet:31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+      "sourceRevision": "sha256:fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+      "featureLabel": "+server.ts",
+      "summaryText": "POST /api/codebase-index/directory-summaries route handler delegating to ingestDirectorySummaries.",
+      "canonicalAuthority": false
+    },
+    "sortPairsTieSafeOrder": [
+      {
+        "keyHex": "0x010001ff00000000",
+        "candidateOrdinal": 0
+      },
+      {
+        "keyHex": "0x010001ff00000000",
+        "candidateOrdinal": 2
+      },
+      {
+        "keyHex": "0x020001ff00000000",
+        "candidateOrdinal": 1
+      }
+    ],
+    "lowRankPrefillDescriptor": {
+      "schema": "atlas.low-rank-prefill-descriptor.v1",
+      "inputDim": 768,
+      "lowRankDim": 64,
+      "compressionRatio": 12.0,
+      "lowRankByteDigest": "sha256:d4e9af094dae6ad6c706194655ff061f0b095f2d8b951863e23fb2d9c12d4616",
+      "l2Normalized": true,
+      "replacesCanonicalSemantic768": false,
+      "tensorBytesInDescriptor": false
+    },
+    "rpcPacketEnvelope": {
+      "schema": "atlas.rpc.packet.v1",
+      "registry": {
+        "packetKey": "packet:31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+        "titleId": "title:c36f358a",
+        "title": "POST /api/codebase-index/directory-summaries route handler delegating to ingestDirectorySummaries.",
+        "packetClass": "AST_COORDINATE_CONVERTER",
+        "lutEncodingRevision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "lutCode": 0
+      },
+      "lineage": {
+        "sourceRef": "sveltekit-frontend/src/routes/api/codebase-index/directory-summaries/+server.ts",
+        "sourceRevision": "sha256:fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+        "workspaceRevision": "sha256:c142c418932879f1e3c5b859eebca540dee739234ccc4479004f6d9a0b1a15c9"
+      },
+      "callerId": "atlas-radix-simdjson-assembler-v1",
+      "rpcCallId": "019a1897-e880-7001-8c03-2fc1e5f6a2e5",
+      "executionId": "019a1897-e880-7002-ae5a-a50a642826da",
+      "idempotencyKey": "calibration-v3:0000",
+      "requestDigest": "cfa5d6e547296916d5564009b3a6a3b21727d788bcd6e846632e33ff17b6a160",
+      "operation": "ANALYZE",
+      "analysis": {
+        "algorithm": "PCA_LOW_RANK",
+        "inputArtifactRef": "artifact://.tmp/atlas/nb_logreg_xgb_symbol_features_v1.arrow",
+        "inputManifestChecksum": "0a0ba18ab863ddacb342ad8e49b9fb502d0dd50a714fdd61920f38448f75c55d",
+        "parametersChecksum": "83dbde82f5a7baf93195af4cdfd8aa2bda041ae9d96805b8318d635aaa6c804f",
+        "writePolicy": "PROPOSAL_ONLY"
+      }
+    }
+  },
+  "stage5_searchRuntimeFusion": {
+    "schema": "atlas.search-runtime-single-vote-fusion.v1",
+    "owner": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+    "packetKeyV2": "packet:31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+    "logicalLanesFused": [
+      "dense_semantic_768",
+      "lexical_postgres_fts"
+    ],
+    "duplicateExecutorVotesDeduplicated": true,
+    "pagerankExtraVoteMinted": false,
+    "oaklibExtraVoteMinted": false,
+    "rrfScoreK60": 0.032787,
+    "linearFusionScore": 0.756874
+  },
+  "stage6_contextManifestV1": {
+    "schema": "atlas.context-manifest.v1",
+    "owner": "ace-context-manifest-gate",
+    "admitted": true,
+    "workspaceGrantVerified": true,
+    "independentSourceByteReadbackVerified": true,
+    "candidateCount": 1,
+    "admittedCandidates": [
+      {
+        "candidateOrdinal": 0,
+        "packetKeyV2": "packet:31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+        "legacyPacketKeyAlias": "packet:ff52d2ee5f78",
+        "sourceRef": "sveltekit-frontend/src/routes/api/codebase-index/directory-summaries/+server.ts",
+        "sourceRevision": "sha256:fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+        "workspaceRevision": "sha256:c142c418932879f1e3c5b859eebca540dee739234ccc4479004f6d9a0b1a15c9",
+        "verifiedCharSpan": [
+          1355,
+          1375
+        ],
+        "descriptiveDescriptorRef": "+server.ts",
+        "lowRankPrefillDigest": "sha256:d4e9af094dae6ad6c706194655ff061f0b095f2d8b951863e23fb2d9c12d4616",
+        "fusedScore": 0.756874
+      }
+    ]
+  },
+  "writesPerformed": false,
+  "receiptChecksum": "sha256:6754dac6bb9069c6aeb3136a96aad3f1b308bd21a7bba90e4c6698862ff6df4b"
+}

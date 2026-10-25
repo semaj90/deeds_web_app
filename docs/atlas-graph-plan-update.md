@@ -101,7 +101,7 @@ Once these edges exist, Atlas becomes **reasoning-capable**. Example:
    - Store in Redis for ACE context reranking
 
 10. **MCP tool routing** (1-2h)
-    - Use graph to suggest which tools Gemma4 should call
+    - Use graph to suggest which tools ornith 1.5 llama-server 8090 updated from Gemma4 should call
     - Cache routing decisions in Redis
 
 ## Why This Order?

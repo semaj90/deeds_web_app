@@ -1,13 +1,13 @@
 {
   "schema": "atlas.graphify-execution-source.v2",
   "sourceKind": "ADMITTED_WORKSPACE_SNAPSHOT",
-  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-  "materializedRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-  "sourceCount": 25542,
+  "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+  "snapshotRevision": "sha256:a3cc5ccd142d7ce6f7bacc7adb6befbb0240322b8b60e7c1055ec0fe39b3efa5",
+  "materializedRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\a3cc5ccd142d7ce6f7bacc7adb6befbb0240322b8b60e7c1055ec0fe39b3efa5",
+  "sourceCount": 30247,
   "repositoryCount": 7,
-  "sourceCohortChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
-  "selectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "sourceCohortChecksum": "sha256:d74d350689ebc8d5539eba9ae8b3ebf3d805a3191721697eb15608f615934c7e",
+  "selectionChecksum": "sha256:0111f6791094a675f174e3ad9ab6896c5fafad3599b2075323323662acd74cc8",
   "repositories": [
     {
       "repositoryId": "repo:claude-mem",
@@ -31,8 +31,8 @@
     },
     {
       "repositoryId": "repo:root",
-      "sourceCount": 24456,
-      "membershipChecksum": "sha256:ba705de976f848b778bd62e4131a42883726e1d1d383883c24d2ad059da5a698"
+      "sourceCount": 29161,
+      "membershipChecksum": "sha256:5f52430151717087404d357106b933ac9ad7995645ac93deec87a7f96bbaae30"
     },
     {
       "repositoryId": "repo:sites/parent-atlas-gateboard",

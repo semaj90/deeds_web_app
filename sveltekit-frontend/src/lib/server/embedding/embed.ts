@@ -17,7 +17,7 @@
  *   - Vector math: embedding/knn-helper.ts (cosine, dot, topK)
  */
 
-import { generateEmbeddings, generateSingleEmbedding, checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
+import { generateEmbeddings, generateSingleEmbedding, checkGrpcHealth, type EmbeddingResult } from '$lib/server/grpc/embedding-client.js';
 import { ollamaBreaker } from '$lib/server/circuit-breaker.js';
 import { retry, retryPredicates } from '$lib/server/utils/retry.js';
 import { formatEmbeddingGemmaInput, type EmbeddingGemmaInputMode } from '$lib/server/embedding/embedding-contract-768.js';
@@ -71,6 +71,22 @@ export async function embedText(text: string): Promise<number[]> {
 		return await ollamaBreaker.call(
 			() => retry(
 				() => generateSingleEmbedding(trimmed),
+				{ maxAttempts: 2, baseDelayMs: 200, isRetryable: retryPredicates.networkOrServer }
+			)
+		);
+	} finally {
+		activeEmbeddingCalls -= 1;
+	}
+}
+
+export async function embedTextWithResult(text: string): Promise<EmbeddingResult> {
+	const trimmed = text.trim();
+	if (!trimmed) throw new Error('embedText: empty text');
+	activeEmbeddingCalls += 1;
+	try {
+		return await ollamaBreaker.call(
+			() => retry(
+				() => generateEmbeddings([trimmed]),
 				{ maxAttempts: 2, baseDelayMs: 200, isRetryable: retryPredicates.networkOrServer }
 			)
 		);

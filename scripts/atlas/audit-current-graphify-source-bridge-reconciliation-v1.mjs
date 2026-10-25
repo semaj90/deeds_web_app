@@ -13,9 +13,12 @@ import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
+import { reconcileSelectedSourceManifestV1 } from './lib/source-selection-manifest-reconciliation-v1.mjs';
+import { deriveSourceBridgeNextGateV1, listSourceBridgeBlockingGatesV1 } from './lib/source-bridge-next-gate-v1.mjs';
 
 const root = REPO_ROOT;
 const admissionPath = path.join(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const selectionPlanPath = path.join(root, 'docs/reports/graphify-source-selection-plan-v1.json');
 const ownerPlanPath = path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
 const args = process.argv.slice(2);
 const valueFor = (name) => {
@@ -38,26 +41,23 @@ const countBy = (rows, key) => rows.reduce((counts, row) => {
 }, {});
 
 const admission = JSON.parse(fs.readFileSync(admissionPath, 'utf8'));
-const workspaceRevision = valueFor('--workspace-revision') ?? admission.workspaceRevision ?? null;
+const selectionPlan = JSON.parse(fs.readFileSync(selectionPlanPath, 'utf8'));
+const explicitWorkspaceRevision = valueFor('--workspace-revision');
+const workspaceRevision = explicitWorkspaceRevision ?? admission.workspaceRevision ?? null;
 const executionId = valueFor('--execution-id');
 if (!executionId) throw new Error('CURRENT_GRAPHIFY_SOURCE_BRIDGE_EXECUTION_ID_REQUIRED');
 if (!/^sha256:[0-9a-f]{64}$/i.test(String(workspaceRevision ?? ''))) {
   throw new Error('CURRENT_GRAPHIFY_SOURCE_BRIDGE_WORKSPACE_REVISION_INVALID');
 }
+if (explicitWorkspaceRevision && explicitWorkspaceRevision !== admission.workspaceRevision) {
+  throw new Error('CURRENT_GRAPHIFY_SOURCE_BRIDGE_REVISION_DOES_NOT_MATCH_ADMITTED_SNAPSHOT');
+}
 
 const snapshotPath = path.join(root, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
 const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
-const manifestRows = (snapshot.sources ?? [])
-  .filter((row) => row.repositoryId === 'repo:root')
-  .map((row) => ({
-    sourceRef: normalizeRef(row.sourceRef),
-    relativePath: normalizeRef(row.repositoryRelativePath),
-    sourceRevision: text(row.sourceRevision),
-    contentDigest: normalizeDigest(row.contentDigest),
-    byteLength: Number(row.byteLength),
-  }))
-  .filter((row) => row.sourceRef || row.relativePath);
-const manifestByRef = new Map(manifestRows.map((row) => [row.sourceRef || row.relativePath, row]));
+const selectedManifest = reconcileSelectedSourceManifestV1({ admission, selectionPlan, snapshot });
+const manifestRows = selectedManifest.rows;
+const manifestByRef = new Map(manifestRows.map((row) => [row.sourceRef || row.repositoryRelativePath, row]));
 const preferredExecution = (() => {
   try {
     const plan = JSON.parse(fs.readFileSync(ownerPlanPath, 'utf8'));
@@ -158,8 +158,11 @@ try {
     report.execution = execution;
     report.sourceSelection = sourceSelection;
     report.stages.sourceManifest = {
-      source: 'workspace-source-snapshot',
+      source: 'admitted-selected-source-manifest',
       available: true,
+      selectionPlanStatus: selectionPlan.status,
+      selectionPlanChecks: selectedManifest.checks,
+      selectionPlanValid: selectedManifest.valid,
       rowCount: manifestRows.length,
       qualifiedCount: manifestRows.filter((row) => row.sourceRevision && row.contentDigest && Number.isFinite(row.byteLength)).length,
       checksum: digest(manifestRows.map((row) => `${row.sourceRef}\0${row.sourceRevision}\0${row.contentDigest}\0${row.byteLength}`).join('\n')),
@@ -170,6 +173,7 @@ try {
     report.stages.workspaceBindings ??= { source: 'atlas_workspace_source_bindings', available: true, rowCount: bindingRows.length, rows: bindingRows.slice(0, 100) };
 
     const membershipRoot = membershipRows.filter((row) => row.repository_id === 'repo:root');
+    const selectedRootManifestRows = manifestRows.filter((row) => row.repositoryId === 'repo:root');
     const compare = (rows, refField = 'source_ref') => rows.map((row) => {
       const ref = normalizeRef(row[refField]);
       const expected = manifestByRef.get(ref);
@@ -185,9 +189,11 @@ try {
         qualified: Boolean(expected && text(row.workspace_revision) === workspaceRevision && sourceRevision === expected.sourceRevision && contentDigest === expected.contentDigest && Number(row.byte_length) === expected.byteLength),
       };
     });
-    const membershipComparison = compare(membershipRoot, 'source_ref');
+    const membershipComparison = compare(membershipRows, 'source_ref');
     const graphifyComparison = compare(graphifyRows, 'source_ref');
     const bindingComparison = compare(bindingRows, 'source_ref');
+    const boundSourceRefs = new Set(bindingRows.map((row) => normalizeRef(row.source_ref)));
+    const missingSelectedRootBindings = selectedRootManifestRows.filter((row) => !boundSourceRefs.has(row.sourceRef));
     report.comparisons = {
       executionMembershipV2: membershipComparison.slice(0, 100),
       graphifyFiles: graphifyComparison.slice(0, 100),
@@ -201,12 +207,15 @@ try {
       legacyExecutionFileRows: legacyRows.length,
       graphifyFileRows: graphifyRows.length,
       workspaceBindingRows: bindingRows.length,
-      executionWorkspaceRevisionMatches: membershipRoot.filter((row) => text(row.workspace_revision) === workspaceRevision).length,
+      executionWorkspaceRevisionMatches: membershipRows.filter((row) => text(row.workspace_revision) === workspaceRevision).length,
       executionSourceRevisionQualified: membershipComparison.filter((row) => row.sourceRevisionMatch).length,
       executionContentDigestQualified: membershipComparison.filter((row) => row.contentDigestMatch).length,
       executionExactManifestMatches: membershipComparison.filter((row) => row.qualified).length,
       graphifyExactManifestMatches: graphifyComparison.filter((row) => row.qualified).length,
       workspaceBindingExactManifestMatches: bindingComparison.filter((row) => row.qualified).length,
+      workspaceBindingSelectedManifestMatches: bindingComparison.filter((row) => row.existsInManifest).length,
+      selectedRootManifestRows: selectedRootManifestRows.length,
+      selectedRootSourcesMissingWorkspaceBinding: missingSelectedRootBindings.length,
     };
     report.mismatches = {
       membershipWorkspaceRevision: countBy(membershipComparison.filter((row) => !row.workspaceRevisionMatch), 'sourceRef'),
@@ -215,7 +224,13 @@ try {
       membershipContentDigest: countBy(membershipComparison.filter((row) => !row.contentDigestMatch), 'sourceRef'),
       graphifyMissingManifest: countBy(graphifyComparison.filter((row) => !row.existsInManifest), 'sourceRef'),
       bindingMissingManifest: countBy(bindingComparison.filter((row) => !row.existsInManifest), 'sourceRef'),
+      bindingWorkspaceRevision: countBy(bindingComparison.filter((row) => !row.workspaceRevisionMatch), 'sourceRef'),
+      bindingSourceRevision: countBy(bindingComparison.filter((row) => !row.sourceRevisionMatch), 'sourceRef'),
+      bindingContentDigest: countBy(bindingComparison.filter((row) => !row.contentDigestMatch), 'sourceRef'),
+      bindingByteLength: countBy(bindingComparison.filter((row) => !row.byteLengthMatch), 'sourceRef'),
     };
+    report.bindingMismatchSamples = bindingComparison.filter((row) => !row.qualified).slice(0, 50);
+    report.missingWorkspaceBindingSamples = missingSelectedRootBindings.slice(0, 50).map((row) => row.sourceRef);
     // Shadow observation via the ONE shared owner (savepoint keeps a failed read from poisoning this read-only transaction).
     // Diagnostic only: identityChecks / decisions below still use the legacy boolean.
     report.authorityShadow = { runtimeOwner: 'LEGACY_CANONICAL_AUTHORITY', error: null, observation: null };
@@ -235,22 +250,23 @@ try {
       executionCompleted: ['COMPLETED', 'COMPLETED_REUSED'].includes(execution?.status),
       executionCanonicalAuthority: execution?.canonical_authority === true,
       sourceSelectionCompleted: sourceSelection?.status === 'COMPLETED',
-      membershipUsesCurrentRevision: membershipRoot.length > 0 && membershipRoot.every((row) => text(row.workspace_revision) === workspaceRevision),
-      manifestMembershipCountMatches: membershipRoot.length === manifestRows.length,
-      exactCurrentSourceBridge: membershipRoot.length === manifestRows.length
+      selectedManifestMatchesAdmission: selectedManifest.valid,
+      membershipUsesCurrentRevision: membershipRows.length > 0 && membershipRows.every((row) => text(row.workspace_revision) === workspaceRevision),
+      manifestMembershipCountMatches: membershipRows.length === manifestRows.length,
+      exactCurrentSourceBridge: membershipRows.length === manifestRows.length
         && membershipComparison.length > 0
         && membershipComparison.every((row) => row.qualified),
+      workspaceBindingsCoverSelectedRoot: missingSelectedRootBindings.length === 0,
       bindingRowsAreCurrent: bindingRows.length > 0 && bindingComparison.every((row) => row.qualified),
     };
     const checks = report.identityChecks;
+    report.blockingGates = listSourceBridgeBlockingGatesV1(checks);
     report.status = checks.executionFound && checks.executionRevisionMatchesAdmission && checks.executionCompleted
-      && checks.sourceSelectionCompleted && checks.membershipUsesCurrentRevision && checks.manifestMembershipCountMatches
-      && checks.exactCurrentSourceBridge && checks.bindingRowsAreCurrent
+      && checks.sourceSelectionCompleted && checks.selectedManifestMatchesAdmission && checks.membershipUsesCurrentRevision && checks.manifestMembershipCountMatches
+      && checks.exactCurrentSourceBridge && checks.workspaceBindingsCoverSelectedRoot && checks.bindingRowsAreCurrent
       ? 'CURRENT_SOURCE_BRIDGE_EXACT_READ_ONLY'
       : 'CURRENT_SOURCE_BRIDGE_BLOCKED';
-    report.nextGate = report.status === 'CURRENT_SOURCE_BRIDGE_EXACT_READ_ONLY'
-      ? 'INDEPENDENT_SOURCE_BINDING_READBACK_AND_PACKET_MATERIALIZATION_AUDIT'
-      : 'RESOLVE_EXECUTION_SOURCE_MEMBERSHIP_AND_WORKSPACE_BINDING_MISMATCHES';
+    report.nextGate = deriveSourceBridgeNextGateV1(checks);
     await client.query('ROLLBACK');
   } finally {
     client.release();

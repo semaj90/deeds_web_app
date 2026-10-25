@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+const normalizedEmbedding = () => new Array(768).fill(1 / Math.sqrt(768));
+
 describe('tryEmbedCanonical', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -10,7 +12,7 @@ describe('tryEmbedCanonical', () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       expect(String(input)).toBe('http://127.0.0.1:5173/api/embed');
       return new Response(JSON.stringify({
-        embedding: new Array(768).fill(0.25),
+        embedding: normalizedEmbedding(),
         model: 'embeddinggemma:latest',
       }), { status: 200, headers: { 'content-type': 'application/json' } });
     });
@@ -34,7 +36,7 @@ describe('tryEmbedCanonical', () => {
     let sentBody: Record<string, unknown> = {};
     const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       sentBody = JSON.parse(String(init?.body));
-      return new Response(JSON.stringify({ embedding: new Array(768).fill(0.25) }), {
+      return new Response(JSON.stringify({ embedding: normalizedEmbedding() }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
       });
@@ -63,6 +65,16 @@ describe('tryEmbedCanonical', () => {
 
   it('rejects the route\'s unauthenticated 200 all-zero vector', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ embedding: new Array(768).fill(0) }), { status: 200 })));
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    expect(await tryEmbedCanonical('x', { baseUrl: 'http://127.0.0.1:5173' })).toBeNull();
+  });
+
+  it.each([
+    ['wrong dimension', new Array(767).fill(1 / Math.sqrt(767))],
+    ['non-finite values', Object.assign(normalizedEmbedding(), { 12: Number.NaN })],
+    ['unnormalized vector', new Array(768).fill(0.25)],
+  ])('rejects %s from the local embedding route', async (_label, embedding) => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ embedding }), { status: 200 })));
     const { tryEmbedCanonical } = await import('./canonical-embed.js');
     expect(await tryEmbedCanonical('x', { baseUrl: 'http://127.0.0.1:5173' })).toBeNull();
   });

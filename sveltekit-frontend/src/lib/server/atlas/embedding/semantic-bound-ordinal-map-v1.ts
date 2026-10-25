@@ -7,6 +7,7 @@ import {
 import {
   semanticCorpusManifestV1Schema,
   semanticCorpusMemberV1Schema,
+  verifySemanticCorpusManifestV1,
   type SemanticCorpusManifestV1,
   type SemanticCorpusMemberV1,
 } from './semantic-corpus-manifest-v1.js';
@@ -25,6 +26,14 @@ export function bindSemanticCorpusToOrdinalMapV1(input: {
 }): CandidateOrdinalMapV1 {
   assertCandidateOrdinalMapIntegrityV1(input.ordinalMap);
   const manifest = semanticCorpusManifestV1Schema.parse(input.manifest);
+  verifySemanticCorpusManifestV1({
+    ordinalMap: input.ordinalMap,
+    members: input.members,
+    manifest,
+  });
+  if (manifest.modelProvenanceStatus === 'UNRESOLVED') {
+    throw new Error('SEMANTIC_BOUND_MAP_MODEL_PROVENANCE_UNRESOLVED');
+  }
   if (manifest.workspaceRevision !== input.ordinalMap.workspaceRevision) {
     throw new Error('SEMANTIC_BOUND_MAP_WORKSPACE_MISMATCH');
   }
