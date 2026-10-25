@@ -663,5 +663,101 @@
     "sha256": "e416365eaf7224cd490c508ea3b42f10855332dd8317015d2344577f73788772",
     "archived": "2026-10-24T06:45:32Z",
     "reason": "Byte-identical duplicate of sveltekit-frontend/static/embeddinggemma_300m_onnx/model.onnx (same size 304859643 and sha256). No code or script references the models/ copy; the static copy is the one the app loads. Archived by move, not delete; recover with mv back to models/embeddinggemma_300m_onnx/model.onnx."
+  },
+  {
+    "path": ".tmp/merge-validation-20260912",
+    "archive_path": "deeds_labs/archive/2026-10-25/merge-validation-20260912",
+    "type": "directory",
+    "file_count": 29410,
+    "file_manifest": "docs/reports/merge-validation-20260912-archive-manifest-v1.json",
+    "manifest_checksum": "sha256:a904b6f07a87500103eebc16689a702be18782e8ea0d912f12dc54c989d1f7b1",
+    "verified_after_move": {
+      "matched": 29410,
+      "mismatched": 0
+    },
+    "archived": "2026-10-25T17:09:52.394Z",
+    "reason": "Scratch merge-validation copy; every file hash verified against its archive manifest before and after move (.tmp offload 2026-10-25)."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots",
+    "archive_path": "deeds_labs/archive/2026-10-25/workspace-source-snapshots",
+    "type": "directory-group",
+    "revisions": [
+      "06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36",
+      "2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320",
+      "5a1dcf9e9a73c2b2d6b010c8e5993d2daf9d20d3092868ae1112583042a4510a"
+    ],
+    "file_count": 76203,
+    "archived": "2026-10-25T18:18:15.418Z",
+    "reason": "Unprotected materialized workspace snapshots (not admitted, not newest). The initial 6288726b... move failed with EPERM; its subsequent archive verification is recorded in the following entry. This entry covers only the three revisions listed above."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots",
+    "archive_path": "deeds_labs/archive/2026-10-25/workspace-source-snapshots",
+    "type": "directory-group",
+    "revisions": [
+      "6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+    ],
+    "file_count": 25544,
+    "file_count_basis": "25,542 sealed source files + 1 unmanifested file + 1 .materialization.json marker",
+    "revision_archive_path": "deeds_labs/archive/2026-10-25/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "source_manifest": "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+    "source_manifest_sha256": "sha256:4b2455785d5827a2991626316c4000eb024f7642fe4d2b56a60349d138d517e8",
+    "verified_after_move": {
+      "expected_source_files": 25542,
+      "hashed": 25542,
+      "missing": 0,
+      "byte_length_mismatch": 0,
+      "sha256_mismatch": 0,
+      "read_errors": 0,
+      "unmanifested_extra_files": ["sveltekit-frontend/.svelte-kit/env.d.ts"],
+      "materialization_marker_sha256": "sha256:4f2a3294a2e1a9e128cb3b48738437e97201c71670a41a65aa2ec00805793656",
+      "exact_path_set_parity": false,
+      "canonical_authority": false,
+      "writes_performed": false
+    },
+    "archived": "2026-10-25T18:25:38.351Z",
+    "reason": "The earlier archive attempt recorded EPERM while find.exe scans were active. Current readback confirms the revision is absent from .tmp and present at the archive path. All 25,542 sealed source records match archive path, byte length, and SHA-256. One extra unmanifested generated file (sveltekit-frontend/.svelte-kit/env.d.ts) is preserved and makes exact path-set parity false; it was not deleted or promoted. Historical source bytes remain readable by setting ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT to the revision archive path; Graphify execution and projection writes remain separately gated."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots",
+    "archive_path": "deeds_labs/archive/2026-10-25/workspace-source-snapshots/a3cc5ccd142d7ce6f7bacc7adb6befbb0240322b8b60e7c1055ec0fe39b3efa5",
+    "type": "directory",
+    "revisions": [
+      "a3cc5ccd142d7ce6f7bacc7adb6befbb0240322b8b60e7c1055ec0fe39b3efa5"
+    ],
+    "file_count": 30248,
+    "archived": "2026-10-25T18:25:51.622Z",
+    "reason": "Unprotected materialized workspace snapshot (not admitted, not newest). Moved under the 2026-10-25 snapshot retention plan. Restore by moving the folder back under .tmp/workspace-source-snapshots/."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots",
+    "archive_path": "deeds_labs/archive/2026-10-25/workspace-source-snapshots/c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34",
+    "type": "directory",
+    "revisions": [
+      "c403cd790a1d15bed30f3a5f90c50e41a7cd62bffb23587e31b117ff508d2d34"
+    ],
+    "file_count": 25471,
+    "archived": "2026-10-25T18:25:53.082Z",
+    "reason": "Unprotected materialized workspace snapshot (not admitted, not newest). Moved under the 2026-10-25 snapshot retention plan. Restore by moving the folder back under .tmp/workspace-source-snapshots/."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots",
+    "archive_path": "deeds_labs/archive/2026-10-25/workspace-source-snapshots/d8f9a782395d86f17b2e22907f031cace8facd5d06d6a2a36d2bda3a9adc49ed",
+    "type": "directory",
+    "revisions": [
+      "d8f9a782395d86f17b2e22907f031cace8facd5d06d6a2a36d2bda3a9adc49ed"
+    ],
+    "file_count": 30314,
+    "archived": "2026-10-25T18:25:54.553Z",
+    "reason": "Unprotected materialized workspace snapshot (not admitted, not newest). Moved under the 2026-10-25 snapshot retention plan. Restore by moving the folder back under .tmp/workspace-source-snapshots/."
+  },
+  {
+    "path": "target",
+    "archive_path": "deeds_labs/archive/2026-10-25/target",
+    "type": "directory",
+    "file_count": 2267,
+    "archived": "2026-10-25T18:54:33.788Z",
+    "reason": "Root Cargo workspace build output (root Cargo.toml defines the workspace; target/ is regenerable via cargo build). Moved before the manifest entry was written; entry added after verification. Docker sveltekit build copies simd_bridge_rs.node from target/release and regenerates it. Restore by moving back to target/."
   }
 ]

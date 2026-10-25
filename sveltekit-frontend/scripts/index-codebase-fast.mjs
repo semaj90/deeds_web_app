@@ -671,6 +671,7 @@ for (const filePath of walk(scanRoot)) {
       if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
       if (Array.isArray(meta.importedSymbols)) meta.importedSymbols = new Set(meta.importedSymbols);
       cacheHits++;
+      meta.contentHash = contentHash;
       files.push(meta);
     }
     continue;
@@ -699,6 +700,7 @@ for (const filePath of walk(scanRoot)) {
     };
     await rset(cacheKey, metaForCache);
   }
+  meta.contentHash = contentHash;
   files.push(meta);
 
   // Gradient checkpoint: flush batch every CHECKPOINT_EVERY files so interrupted runs can resume.
@@ -772,6 +774,7 @@ if (!NO_EXTRA_INDEX_DIRS) {
     };
         await rset(cacheKey, metaForCache);
       }
+      meta.contentHash = contentHash;
       files.push(meta);
       extraIndexed++;
       if (meta.routeHandlers.length) apiCount++;
@@ -791,6 +794,18 @@ if (extraIndexed > 0 && !process.argv.includes('--quiet')) {
 // per the graph-refresh-recovery addendum if this instrumentation proves useful
 // long-term.
 const __stageT0 = Date.now();
+// Exact-content duplicates: every file keeps its own entry (path = identity, per the
+// Parent Atlas contract); later copies are only marked with the first path holding the same bytes.
+const firstPathByContentHash = new Map();
+let contentDuplicateCount = 0;
+for (const f of files) {
+  if (!f.contentHash) continue;
+  const first = firstPathByContentHash.get(f.contentHash);
+  if (first) { f.contentDuplicateOf = first; contentDuplicateCount++; }
+  else firstPathByContentHash.set(f.contentHash, f.rel);
+}
+console.log(`   Content duplicates: ${contentDuplicateCount} (entries kept, marked contentDuplicateOf)`);
+
 console.log(`\n⏱  Cross-file passes starting — ${files.length} files loaded (${((__stageT0 - t0) / 1000).toFixed(1)}s elapsed)`);
 
 // G13 — Dead export detection: build one global set of imported symbol names,
@@ -1194,6 +1209,7 @@ const graphJson = {
     routeParams: f.routeParams, routeDepth: f.routeDepth,
     localhostRefs: f.localhostRefs,
     localhostBreaks: f.localhostBreaks ?? false,
+    contentDuplicateOf: f.contentDuplicateOf ?? null,
   })),
   directories: dirRows,
   tags: tagMap,
