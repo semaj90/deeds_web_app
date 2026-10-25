@@ -1202,7 +1202,7 @@ const graphJson = {
     routeHandlers: f.routeHandlers, drizzleRefs: f.drizzleRefs,
     todos: f.todos, components: f.components.slice(0, 20),
     isRoute: f.isRoute, isSvelteComp: f.isSvelteComp, isTest: f.isTest, lineCount: f.lineCount,
-    hasAuth: f.hasAuth, hasZod: f.hasZod, ssrUnsafe: f.ssrUnsafe,
+    hasAuth: f.hasAuth, hasZod: f.hasZod, parsesBody: f.parsesBody, ssrUnsafe: f.ssrUnsafe,
     sv4Legacy: f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch,
     runeInTs: f.runeInTs ?? false,
     hasPairedTest: f.hasPairedTest, fanIn: f.fanIn ?? 0,

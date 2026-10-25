@@ -1,8 +1,9 @@
+import asyncio
 import hashlib
 
+import httpx
 import pytest
 from fastapi import HTTPException
-from fastapi.testclient import TestClient
 
 from miniforge_nlp_sidecar import AnalyzeRequest, AstChunkRequest, MAX_AST_SOURCE_CHARS
 from miniforge_nlp_sidecar_v2 import AstEvidenceResponseV2, app, ast_chunk, _native_ast_evidence
@@ -93,18 +94,23 @@ def test_analyze_request_accepts_large_bounded_input_and_rejects_above_cap():
         AnalyzeRequest(text="x", max_chars=1_000_001)
 
 
-def test_ast_chunk_http_route_accepts_large_source():
+def test_ast_chunk_http_route_accepts_large_source(monkeypatch):
+    monkeypatch.setattr(sidecar_v2, '_native_ast_evidence', _response)
     source = ("// x\n" * (239_212 // 5)) + "  "
     revision = "sha256:" + hashlib.sha256(source.encode("utf-8")).hexdigest()
-    response = TestClient(app).post(
-        "/ast/chunk",
-        json={
-            "source": source,
-            "language": "typescript",
-            "filePath": "src/large-source.ts",
-            "sourceRevision": revision,
-        },
-    )
+    async def post_request():
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://testserver") as client:
+            return await client.post(
+                "/ast/chunk",
+                json={
+                    "source": source,
+                    "language": "typescript",
+                    "filePath": "src/large-source.ts",
+                    "sourceRevision": revision,
+                },
+            )
+
+    response = asyncio.run(post_request())
 
     assert response.status_code == 200
     assert response.json()["source_revision"] == revision

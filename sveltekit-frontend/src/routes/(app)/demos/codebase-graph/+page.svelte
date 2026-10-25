@@ -39,13 +39,27 @@
 	let limit = $state(500); // Start with smaller subset for performance
 	let includeImports = $state(true);
 	let filterType = $state<'all' | 'imports' | 'contains'>('all');
+	let searchQuery = $state('');
+	let selectedDomain = $state('all');
+
+	// Real-time AST topology & node filtering via Svelte 5 Runes
+	let filteredNodes = $derived.by(() => {
+		if (!graphData) return [];
+		return graphData.nodes.filter(n => {
+			const matchesDomain = selectedDomain === 'all' || n.domain === selectedDomain;
+			const matchesSearch = !searchQuery || n.label.toLowerCase().includes(searchQuery.toLowerCase()) || n.path.toLowerCase().includes(searchQuery.toLowerCase());
+			return matchesDomain && matchesSearch;
+		});
+	});
+
+	let allowedNodeIds = $derived(new Set(filteredNodes.map(n => n.id)));
 
 	// Convert graph data to ProvenanceGraph format
-	let entities = $derived(graphData?.nodes.map(n => n.label) || []);
+	let entities = $derived(filteredNodes.map(n => n.label));
 	let relationships = $derived.by(() => {
 		if (!graphData) return [];
 
-		const edges = graphData.edges;
+		const edges = graphData.edges.filter(e => allowedNodeIds.has(e.source) && allowedNodeIds.has(e.target));
 		const filtered = filterType === 'all'
 			? edges
 			: edges.filter(e => e.type === filterType);
@@ -123,6 +137,33 @@
 					class="w-4 h-4"
 				/>
 				<label for="includeImports" class="text-sm">Include Import Edges</label>
+			</div>
+
+			<div class="flex flex-col">
+				<label for="search" class="text-xs font-semibold mb-1">Search Nodes</label>
+				<input
+					id="search"
+					type="text"
+					placeholder="Filter symbol or path..."
+					bind:value={searchQuery}
+					class="px-3 py-1.5 bg-sand/5 border border-sand/20 rounded text-sm w-44"
+				/>
+			</div>
+
+			<div class="flex flex-col">
+				<label for="domain" class="text-xs font-semibold mb-1">Domain</label>
+				<select
+					id="domain"
+					bind:value={selectedDomain}
+					class="px-3 py-1.5 bg-sand/5 border border-sand/20 rounded text-sm"
+				>
+					<option value="all">All Domains</option>
+					{#if graphData}
+						{#each Object.keys(graphData.stats.domainBreakdown || {}) as d}
+							<option value={d}>{d}</option>
+						{/each}
+					{/if}
+				</select>
 			</div>
 
 			<div class="flex flex-col">

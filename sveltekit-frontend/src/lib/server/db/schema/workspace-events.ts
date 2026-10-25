@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { bigint, foreignKey, index, integer, pgTable, primaryKey, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import { bigint, foreignKey, index, integer, pgTable, primaryKey, text, timestamp, unique, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 /**
  * Drizzle mirror for drizzle/manual/20260916_workspace_event_head_v1.sql.
@@ -25,6 +25,17 @@ export const atlasWorkspaceEvents = pgTable('atlas_workspace_events', {
   afterStateChecksum: text('after_state_checksum').notNull(),
   eventChecksum: text('event_checksum').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  taskId: text('task_id'),
+  executionRunId: text('execution_run_id'),
+  leaseId: uuid('lease_id'),
+  leaseFenceToken: text('lease_fence_token'),
+  leaseFenceEpoch: bigint('lease_fence_epoch', { mode: 'bigint' }),
+  worktreeId: text('worktree_id'),
+  branch: text('branch'),
+  baseCommit: text('base_commit'),
+  actor: text('actor'),
+  idempotencyKey: text('idempotency_key'),
+  supersedesEventId: uuid('supersedes_event_id'),
 }, (table) => ({
   workspaceSequenceUnique: unique('atlas_workspace_events_workspace_snapshot_sequence_key').on(
     table.workspaceId,
@@ -36,6 +47,15 @@ export const atlasWorkspaceEvents = pgTable('atlas_workspace_events', {
     table.workspaceId,
     table.baseSnapshotRevision,
     table.sequence,
+  ),
+  taskIdx: index('atlas_workspace_events_task_idx').on(
+    table.taskId,
+    table.workspaceId,
+    table.sequence,
+  ),
+  idempotencyUidx: uniqueIndex('atlas_workspace_events_idempotency_uidx').on(
+    table.workspaceId,
+    table.idempotencyKey,
   ),
 }));
 

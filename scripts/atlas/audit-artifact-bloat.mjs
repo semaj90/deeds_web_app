@@ -8,11 +8,16 @@
 
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, open, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectFiles, REPO_ROOT, toPosixPath } from './_atlas-utils.mjs';
 import { resolveAtlasPaths } from './lib/repo-paths.mjs';
+import {
+  groupDuplicateCandidatesByFingerprint,
+  groupDuplicateCandidatesBySize,
+  mapWithConcurrency,
+} from './lib/artifact-duplicate-candidates-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
@@ -23,6 +28,9 @@ const JSON_OUT = process.argv.includes('--json');
 const DRY_RUN = process.argv.includes('--dry-run');
 const LARGE_BYTES = 10 * 1024 * 1024;
 const EVIDENCE_HASH_BYTES = 200 * 1024 * 1024;
+const FILE_STAT_CONCURRENCY = 16;
+const SAMPLE_READ_CONCURRENCY = 16;
+const FULL_HASH_CONCURRENCY = 8;
 
 const IGNORE_DIRS = new Set([
   'node_modules',
@@ -109,6 +117,31 @@ async function fileSha256(filePath) {
   return hash.digest('hex');
 }
 
+async function fileSampleFingerprint(filePath, sizeBytes) {
+  const sampleSize = Math.min(sizeBytes, 4096);
+  const handle = await open(filePath, 'r');
+  try {
+    const first = Buffer.alloc(sampleSize);
+    const firstRead = await handle.read(first, 0, sampleSize, 0);
+    const tailSize = Math.min(sampleSize, Math.max(0, sizeBytes - firstRead.bytesRead));
+    const tail = Buffer.alloc(tailSize);
+    const tailRead = tailSize
+      ? await handle.read(tail, 0, tailSize, Math.max(firstRead.bytesRead, sizeBytes - tailSize))
+      : { bytesRead: 0 };
+    const hash = createHash('sha256');
+    hash.update(String(sizeBytes));
+    hash.update(first.subarray(0, firstRead.bytesRead));
+    hash.update(tail.subarray(0, tailRead.bytesRead));
+    return {
+      fingerprint: hash.digest('hex'),
+      bytesRead: firstRead.bytesRead + tailRead.bytesRead,
+      complete: firstRead.bytesRead === sampleSize && tailRead.bytesRead === tailSize,
+    };
+  } finally {
+    await handle.close();
+  }
+}
+
 async function main() {
   const startedAt = new Date().toISOString();
   const scanRoots = [
@@ -128,34 +161,75 @@ async function main() {
     const absRoot = path.join(REPO_ROOT, root);
     collectFiles(absRoot, IGNORE_DIRS, () => true, files);
   }
-  const artifactPaths = [];
-
-  for (const filePath of files) {
+  const artifactPaths = await mapWithConcurrency(files, FILE_STAT_CONCURRENCY, async (filePath) => {
     const relPath = toPosixPath(path.relative(REPO_ROOT, filePath));
     const statInfo = await stat(filePath);
-    artifactPaths.push({
+    return {
       absPath: filePath,
       relPath,
       sizeBytes: statInfo.size,
       kind: classifyKind(relPath, statInfo.size),
-    });
-  }
+    };
+  });
 
   artifactPaths.sort((a, b) => b.sizeBytes - a.sizeBytes || a.relPath.localeCompare(b.relPath));
 
-  const withHashes = [];
-  const hashGroups = new Map();
-  const maxHashBytes = 50 * 1024 * 1024;
-
-  for (const entry of artifactPaths) {
+  const sizeCandidateEntries = groupDuplicateCandidatesBySize(artifactPaths.map((entry) => ({
+    ...entry,
+    maxHashBytes: entry.kind === 'evidence_run' ? EVIDENCE_HASH_BYTES : 50 * 1024 * 1024,
+  })));
+  const sizeCandidatePaths = new Set(sizeCandidateEntries.map((entry) => entry.relPath));
+  const sampleResults = await mapWithConcurrency(sizeCandidateEntries, SAMPLE_READ_CONCURRENCY, async (entry) => {
+    try {
+      return { entry, sample: await fileSampleFingerprint(entry.absPath, entry.sizeBytes), status: null };
+    } catch {
+      return { entry, sample: null, status: 'SAMPLE_FAILED' };
+    }
+  });
+  const sampledCandidates = [];
+  const sampleStatusByPath = new Map();
+  let duplicateSampleBytesRead = 0;
+  for (const { entry, sample, status } of sampleResults) {
+    if (!sample) {
+      sampleStatusByPath.set(entry.relPath, status);
+      continue;
+    }
+    duplicateSampleBytesRead += sample.bytesRead;
+    sampleStatusByPath.set(entry.relPath, sample.complete ? 'SAMPLED' : 'SAMPLE_INCOMPLETE');
+    if (sample.complete) sampledCandidates.push({ ...entry, sampleFingerprint: sample.fingerprint });
+  }
+  const fullHashCandidatePaths = new Set(
+    groupDuplicateCandidatesByFingerprint(sampledCandidates, (entry) => entry.sampleFingerprint)
+      .map((entry) => entry.relPath),
+  );
+  const hashableEntries = artifactPaths.filter((entry) =>
+    entry.sizeBytes <= (entry.kind === 'evidence_run' ? EVIDENCE_HASH_BYTES : 50 * 1024 * 1024));
+  const duplicateHashCandidateBytes = artifactPaths
+    .filter((entry) => fullHashCandidatePaths.has(entry.relPath))
+    .reduce((sum, entry) => sum + entry.sizeBytes, 0);
+  const hashResults = await mapWithConcurrency(artifactPaths, FULL_HASH_CONCURRENCY, async (entry) => {
     let sha256 = null;
-    if (entry.sizeBytes <= (entry.kind === 'evidence_run' ? EVIDENCE_HASH_BYTES : maxHashBytes)) {
+    let duplicateCheckStatus = 'NOT_HASHED_NO_ELIGIBLE_SIZE_PEER';
+    const maxHashBytes = entry.kind === 'evidence_run' ? EVIDENCE_HASH_BYTES : 50 * 1024 * 1024;
+    if (entry.sizeBytes > maxHashBytes) duplicateCheckStatus = 'SKIPPED_SIZE_LIMIT';
+    if (sizeCandidatePaths.has(entry.relPath)) {
+      duplicateCheckStatus = sampleStatusByPath.get(entry.relPath) ?? 'SAMPLE_FAILED';
+    }
+    if (fullHashCandidatePaths.has(entry.relPath)) {
       try {
         sha256 = await fileSha256(entry.absPath);
+        duplicateCheckStatus = 'HASHED';
       } catch {
-        sha256 = null;
+        duplicateCheckStatus = 'HASH_FAILED';
       }
     }
+    return { ...entry, sha256, duplicateCheckStatus };
+  });
+  const withHashes = [];
+  const hashGroups = new Map();
+
+  for (const entry of hashResults) {
+    const { sha256, duplicateCheckStatus } = entry;
     const duplicate = sha256 ? hashGroups.has(sha256) : false;
     if (sha256 && !hashGroups.has(sha256)) hashGroups.set(sha256, []);
     if (sha256) hashGroups.get(sha256).push(entry.relPath);
@@ -164,6 +238,7 @@ async function main() {
       ...entry,
       sha256,
       duplicate,
+      duplicateCheckStatus,
       recommendation: recommendAction(kind, entry.sizeBytes, entry.relPath, duplicate),
       kind: duplicate ? 'duplicate' : kind,
     });
@@ -172,6 +247,17 @@ async function main() {
   const summary = {
     totalFiles: withHashes.length,
     totalSizeMB: Number((withHashes.reduce((sum, item) => sum + item.sizeBytes, 0) / 1048576).toFixed(2)),
+    duplicateLogicalBytesPotential: withHashes
+      .filter((item) => item.duplicate)
+      .reduce((sum, item) => sum + item.sizeBytes, 0),
+    scannedRoots: scanRoots,
+    duplicateSampleCandidateFiles: sizeCandidatePaths.size,
+    duplicateSampleBytesRead,
+    duplicateHashCandidateFiles: fullHashCandidatePaths.size,
+    duplicateHashCandidateBytes: duplicateHashCandidateBytes,
+    duplicateHashSkippedUniqueSizeFiles: hashableEntries.length - sizeCandidatePaths.size,
+    duplicateHashSkippedBySampleFiles: sizeCandidatePaths.size - fullHashCandidatePaths.size,
+    duplicateHashSkippedSizeLimitFiles: artifactPaths.length - hashableEntries.length,
     byKind: Object.fromEntries(KIND_ORDER.map((kind) => [kind, withHashes.filter((item) => item.kind === kind).length])),
     duplicateFiles: withHashes.filter((item) => item.duplicate).length,
     largestFiles: withHashes.slice(0, 25).map((item) => ({

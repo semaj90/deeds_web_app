@@ -154,6 +154,9 @@ export function evaluateWorkflowSuccess(
       (report.stages.semantic.embeddedFiles ?? 0) > 0 &&
       (report.stages.semantic.heuristicFiles ?? 0) === 0;
   }
+  if (profile === 'production-projection') {
+    success = success && report.stages.projection.status === 'PROVEN';
+  }
   return success;
 }
 

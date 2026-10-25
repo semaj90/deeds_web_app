@@ -2,7 +2,7 @@
 /** Read-only adapter from WorkspaceSnapshotV1 to Graphify source bindings. */
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { dirname, extname, resolve, sep } from 'node:path';
+import { dirname, extname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 import { normalizeInventoryPath, sourceIdentityKey } from './lib/canonical-source-inventory-hygiene-v1.mts';
@@ -37,9 +37,20 @@ async function latestManifest() {
 
 const manifestPath = resolve(ROOT, argument('--manifest') ?? process.argv[2] ?? await latestManifest());
 const hygienePath = resolve(ROOT, argument('--hygiene') ?? HYGIENE);
+const sourceReadRootArgument = argument('--source-read-root');
+let sourceReadRoot: string | undefined;
+if (sourceReadRootArgument) {
+  const materializedRoot = resolve(ROOT, sourceReadRootArgument);
+  const materializedBase = resolve(ROOT, '.tmp/workspace-source-snapshots');
+  const materializedRelative = relative(materializedBase, materializedRoot);
+  if (!materializedRelative || materializedRelative.startsWith('..') || resolve(materializedRoot) === materializedBase) {
+    throw new Error('SOURCE_READ_ROOT_MUST_BE_MATERIALIZED_SNAPSHOT');
+  }
+  sourceReadRoot = materializedRoot;
+}
 const snapshot = JSON.parse(await readFile(manifestPath, 'utf8'));
 const hygiene = JSON.parse(await readFile(hygienePath, 'utf8'));
-const snapshotReadback = validateSnapshot(snapshot);
+const snapshotReadback = validateSnapshot(snapshot, sourceReadRoot ? { sourceReadRoot } : undefined);
 const sources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
 const canonicalKeys = new Set(
   Array.isArray(hygiene.canonicalSources)

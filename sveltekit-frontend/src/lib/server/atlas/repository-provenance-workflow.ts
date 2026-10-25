@@ -184,6 +184,7 @@ export type RepositoryProvenanceWorkflowReport = {
       embeddingProbeCount: number;
       embeddingProbeHits: number;
       analysisMode: 'embedded' | 'heuristic' | 'unavailable';
+      reason: 'GPU_EXECUTOR_NOT_INVOKED';
     };
     projection: {
       status: WorkflowStageStatus;
@@ -191,6 +192,13 @@ export type RepositoryProvenanceWorkflowReport = {
       qdrantProjectionRecords: number;
       neo4jProjectionRecords: number;
       redisProjectionRecords: number;
+      candidateCounts: {
+        sources: number;
+        semanticVectors: number;
+        relationships: number;
+        lexicalEntries: number;
+      };
+      reason: 'PROJECTION_WRITERS_NOT_INVOKED';
       representationName: typeof SEMANTIC_REPRESENTATION_ID;
       denseVectorName: 'content';
       collectionName: string;
@@ -695,7 +703,22 @@ async function extractStructuralFactsForFile(
     }
   }
 
-  return facts;
+  const uniqueFacts = new Map<string, StructuralFact>();
+  for (const fact of facts) {
+    const key = JSON.stringify([
+      fact.filePath,
+      fact.sourceRef,
+      fact.kind,
+      fact.name,
+      fact.lineStart,
+      fact.lineEnd,
+      fact.stableId,
+      fact.source,
+    ]);
+    if (!uniqueFacts.has(key)) uniqueFacts.set(key, fact);
+  }
+
+  return [...uniqueFacts.values()];
 }
 
 function computeDomainLabels(file: RepositoryFileEntry, symbols: StructuralFact[]) {
@@ -1214,17 +1237,25 @@ export async function runRepositoryProvenanceWorkflow(
         sampleLabels: labelEntries.slice(0, 12),
       },
       gpu: {
-        status: semanticProbeHits > 0 ? 'PARTIAL' : 'SKIPPED',
-        embeddingProbeCount: semanticProbes,
-        embeddingProbeHits: semanticProbeHits,
-        analysisMode: semanticProbeHits > 0 ? 'embedded' : semanticProbes > 0 ? 'heuristic' : 'unavailable',
+        status: 'SKIPPED',
+        embeddingProbeCount: 0,
+        embeddingProbeHits: 0,
+        analysisMode: 'unavailable',
+        reason: 'GPU_EXECUTOR_NOT_INVOKED',
       },
       projection: {
-        status: 'PROVEN',
-        postgresCanonicalRecords: fileEntries.length,
-        qdrantProjectionRecords: semanticEntries.filter((entry) => entry.status === 'EMBEDDED').length,
-        neo4jProjectionRecords: relationshipEntries.length,
-        redisProjectionRecords: lexicalEntries.length,
+        status: 'SKIPPED',
+        postgresCanonicalRecords: 0,
+        qdrantProjectionRecords: 0,
+        neo4jProjectionRecords: 0,
+        redisProjectionRecords: 0,
+        candidateCounts: {
+          sources: fileEntries.length,
+          semanticVectors: semanticEntries.filter((entry) => entry.status === 'EMBEDDED').length,
+          relationships: relationshipEntries.length,
+          lexicalEntries: lexicalEntries.length,
+        },
+        reason: 'PROJECTION_WRITERS_NOT_INVOKED',
         representationName: SEMANTIC_REPRESENTATION_ID,
         denseVectorName: 'content',
         collectionName: CANONICAL_QDRANT_COLLECTION,

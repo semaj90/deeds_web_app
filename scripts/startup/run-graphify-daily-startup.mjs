@@ -14,6 +14,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { acquireStartupLock, releaseStartupLock } from './lib/graphify-startup-lock.mjs';
+import { resolveCompletedGraphifyRunV1 } from '../atlas/lib/graphify-run-source-readback-v1.mjs';
+import { assertGraphifyWorkflowRevisionMatchesAdmissionV1 } from './lib/graphify-workflow-revision-guard-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -267,6 +269,10 @@ try {
 
   const workflowReceiptPath = path.resolve(ROOT, 'docs/reports/graphify-daily-workflow-receipt.json');
   const workflowReceipt = JSON.parse(readFileSync(workflowReceiptPath, 'utf8'));
+  assertGraphifyWorkflowRevisionMatchesAdmissionV1(
+    workflowReceipt,
+    admittedSnapshotBinding.admission.workspaceRevision,
+  );
   const observedSourceCount = Number(
     workflowReceipt.sourceBindingObservation?.sourceCount
       ?? workflowReceipt.stages?.snapshot?.totalFiles
@@ -601,6 +607,13 @@ try {
       'npx tsx scripts/atlas/native-structural-materializer.mts',
       `--limit=${nativeStructuralLimit}`,
     ];
+    const lifecycleReceiptPath = path.resolve(ROOT, 'docs/reports/graphify-daily-lifecycle-v1.json');
+    const lifecycleReceipt = JSON.parse(readFileSync(lifecycleReceiptPath, 'utf8'));
+    const currentGraphifyRunId = resolveCompletedGraphifyRunV1(
+      lifecycleReceipt,
+      admittedSnapshotBinding.admission.workspaceRevision,
+    );
+    nativeArgs.push(`--run-id=${currentGraphifyRunId}`);
     if (nativeStructuralInclude) nativeArgs.push(`--include=${nativeStructuralInclude}`);
     if (nativeStructuralApply) nativeArgs.push('--apply');
     if (nativeStructuralAllowCreateSymbols) nativeArgs.push('--allow-create-symbols');

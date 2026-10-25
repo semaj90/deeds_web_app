@@ -102,7 +102,11 @@ export const routeRuntimePackets = pgTable('route_runtime_packets', {
     index('rrp_raw_gin').using('gin', t.raw),
     index('rrp_state_idx').on(t.routeState, t.capturedAt.desc()),
     index('rrp_feature_idx').on(t.featureId, t.capturedAt.desc()),
-    uniqueIndex('rrp_packet_uuid_uidx').on(t.packetUuid),
+    uniqueIndex('route_runtime_packets_packet_uuid_uq')
+      .on(t.packetUuid)
+      .where(sql`${t.packetUuid} IS NOT NULL`),
+    uniqueIndex('rrp_packet_uuid_uidx')
+      .on(t.packetUuid),
   ]
 );
 

@@ -5,6 +5,13 @@ import { execFileSync } from 'node:child_process';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  normalizeGraphifyDirectoryScopeV1,
+  resolveGraphifyRunSnapshotBindingV1,
+  resolveGraphifySnapshotSourcePath,
+  selectGraphifySourcesByDirectoryV1,
+  verifyGraphifyRunSourceReadbackV1,
+} from '../../../scripts/atlas/lib/graphify-run-source-readback-v1.mjs';
 
 import { pool } from '$lib/server/db/client.js';
 import { loadBindingProvenanceV1, provenanceForV1, qualifyPromotionNominationV1 } from '$lib/server/atlas/identity/symbol-revision-qualification-v1.js';
@@ -28,9 +35,15 @@ const VERBOSE = process.argv.includes('--verbose');
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
 const LIMIT = Math.max(1, Number(limitArg?.split('=')[1] ?? process.env.ATLAS_NATIVE_STRUCTURAL_LIMIT ?? (APPLY ? 1000 : 50)));
 const includeArg = process.argv.find((arg) => arg.startsWith('--include='));
-const INCLUDE_PREFIX = includeArg?.slice('--include='.length).replaceAll('\\', '/').replace(/^\.\//, '') ?? '';
+const INCLUDE_PREFIX = normalizeGraphifyDirectoryScopeV1(includeArg?.slice('--include='.length));
 const runIdArg = process.argv.find((arg) => arg.startsWith('--run-id='));
 const RUN_ID = runIdArg?.slice('--run-id='.length).trim() || '';
+const RUN_SNAPSHOT_BINDING = RUN_ID
+  ? resolveGraphifyRunSnapshotBindingV1({
+      snapshotRoot: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT,
+      expectedWorkspaceRevision: process.env.ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION,
+    })
+  : null;
 const nominationOutputArg = process.argv.find((arg) => arg.startsWith('--output-nominations='));
 const NOMINATION_OUTPUT = nominationOutputArg?.slice('--output-nominations='.length).trim() || '';
 const PRODUCER_REVISION = 'atlas.native-structural-materializer.v1';
@@ -67,6 +80,9 @@ function sha256(value: unknown): string {
 }
 
 function workspaceRevision(): string {
+  if (process.env.ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION?.trim()) {
+    return process.env.ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION.trim();
+  }
   if (process.env.ATLAS_WORKSPACE_REVISION?.trim()) return process.env.ATLAS_WORKSPACE_REVISION.trim();
   try {
     return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim();
@@ -79,8 +95,8 @@ function sourceRef(absolutePath: string): string {
   return path.relative(REPO_ROOT, absolutePath).replaceAll('\\', '/');
 }
 
-async function discoverSources(): Promise<string[]> {
-  const files: string[] = [];
+async function discoverSources(): Promise<Array<{ absolutePath: string; sourceRef: string }>> {
+  const files: Array<{ absolutePath: string; sourceRef: string }> = [];
   async function walk(dir: string): Promise<void> {
     if (files.length >= LIMIT) return;
     const entries = await readdir(dir, { withFileTypes: true });
@@ -91,36 +107,46 @@ async function discoverSources(): Promise<string[]> {
       if (entry.isDirectory()) await walk(absolute);
       else if (entry.isFile() && SUPPORTED[path.extname(entry.name).toLowerCase()]) {
         const ref = sourceRef(absolute);
-        if (!INCLUDE_PREFIX || ref.startsWith(INCLUDE_PREFIX)) files.push(absolute);
+        if (!INCLUDE_PREFIX || ref === INCLUDE_PREFIX || ref.startsWith(`${INCLUDE_PREFIX}/`)) {
+          files.push({ absolutePath: absolute, sourceRef: ref });
+        }
       }
     }
   }
   await walk(REPO_ROOT);
-  return files.sort((a, b) => sourceRef(a).localeCompare(sourceRef(b))).slice(0, LIMIT);
+  return files.sort((a, b) => a.sourceRef.localeCompare(b.sourceRef)).slice(0, LIMIT);
 }
 
 const runSourceMetadata = new Map<string, { sourceRevision: string | null; contentHash: string | null; workspaceRevision: string | null }>();
 
-async function discoverRunSources(runId: string): Promise<string[]> {
+async function discoverRunSources(runId: string): Promise<Array<{ absolutePath: string; sourceRef: string }>> {
   const result = await pool.query<{ source_ref: string; source_revision: string | null; content_hash: string | null; workspace_revision: string | null }>(
     `SELECT source_ref, source_revision, content_hash, workspace_revision
        FROM public.graphify_files
-      WHERE last_seen_run_id = $1
-      ORDER BY source_ref
-      LIMIT $2`,
-    [runId, LIMIT],
+       WHERE last_seen_run_id = $1
+         AND ($2 = '' OR source_ref = $2 OR left(source_ref, length($2) + 1) = $2 || '/')
+      ORDER BY source_ref`,
+    [runId, INCLUDE_PREFIX],
   );
-  const files: string[] = [];
-  for (const row of result.rows) {
-    const absolute = path.resolve(REPO_ROOT, row.source_ref);
-    if (absolute.startsWith(`${REPO_ROOT}${path.sep}`)) {
-      files.push(absolute);
-      runSourceMetadata.set(row.source_ref, {
-        sourceRevision: row.source_revision,
-        contentHash: row.content_hash,
-        workspaceRevision: row.workspace_revision,
-      });
+  const files: Array<{ absolutePath: string; sourceRef: string }> = [];
+  const snapshotRoot = RUN_SNAPSHOT_BINDING!.snapshotRoot;
+  const expectedWorkspaceRevision = RUN_SNAPSHOT_BINDING!.workspaceRevision;
+  const selectedRows = selectGraphifySourcesByDirectoryV1(result.rows, LIMIT);
+  for (const row of selectedRows) {
+    const ref = row.source_ref.replaceAll('\\', '/');
+    const absolutePath = resolveGraphifySnapshotSourcePath(snapshotRoot, ref);
+    if (!row.content_hash || !row.workspace_revision) {
+      throw new Error(`GRAPHIFY_RUN_SOURCE_LINEAGE_INCOMPLETE:${ref}`);
     }
+    if (row.workspace_revision !== expectedWorkspaceRevision) {
+      throw new Error(`GRAPHIFY_RUN_SOURCE_WORKSPACE_REVISION_MISMATCH:${ref}`);
+    }
+    files.push({ absolutePath, sourceRef: ref });
+    runSourceMetadata.set(ref, {
+      sourceRevision: row.source_revision,
+      contentHash: row.content_hash,
+      workspaceRevision: row.workspace_revision,
+    });
   }
   return files;
 }
@@ -143,6 +169,9 @@ const report = {
   include_prefix: INCLUDE_PREFIX || null,
   run_id: RUN_ID || null,
   source_selection: RUN_ID ? 'GRAPHIFY_FILES_LAST_SEEN_RUN' : 'FILESYSTEM_DISCOVERY',
+  include_prefix: INCLUDE_PREFIX || null,
+  ast_provider: 'treesitter-chunker-8095',
+  source_snapshot_root: RUN_SNAPSHOT_BINDING?.snapshotRoot ?? null,
   nomination_output: NOMINATION_OUTPUT || null,
   discovered_files: files.length,
   processed_files: 0,
@@ -160,16 +189,30 @@ const report = {
   symbols_created_or_versioned: 0,
   evidence_entity_facts_written: 0,
   diagnostics: [] as Array<{ source_ref: string; messages: string[] }>,
+  directory_counts: {} as Record<string, { discovered: number; processed: number; failed: number }>,
   no_symbols_refs: [] as string[],
   unsupported_refs: [] as string[],
   failures: [] as Array<{ source_ref: string; error: string }>,
 };
 const dryRunNominations: unknown[] = [];
 
-for (const absolutePath of files) {
-  const ref = sourceRef(absolutePath);
+for (const file of files) {
+  const { absolutePath, sourceRef: ref } = file;
+  const directory = path.posix.dirname(ref);
+  const directoryCounts = report.directory_counts[directory] ??= { discovered: 0, processed: 0, failed: 0 };
+  directoryCounts.discovered += 1;
   try {
-    const source = await readFile(absolutePath, 'utf8');
+    const sourceBytes = await readFile(absolutePath);
+    const runMetadata = runSourceMetadata.get(ref);
+    if (RUN_ID) {
+      verifyGraphifyRunSourceReadbackV1({
+        bytes: sourceBytes,
+        expectedContentHash: runMetadata?.contentHash,
+        rowWorkspaceRevision: runMetadata?.workspaceRevision,
+        expectedWorkspaceRevision: RUN_SNAPSHOT_BINDING?.workspaceRevision,
+      });
+    }
+    const source = sourceBytes.toString('utf8');
     if (!source.trim()) continue;
     const language = SUPPORTED[path.extname(absolutePath).toLowerCase()];
     if (!language) {
@@ -180,13 +223,14 @@ for (const absolutePath of files) {
     const sourceVersionAnchor = `content:${sha256(source)}`;
     const structural = await materializer.materialize({
       sourceRef: ref,
-      sourceRevision: null,
+      sourceRevision: runMetadata?.sourceRevision ?? null,
       sourceVersionAnchor,
       sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
       language,
       source,
     });
     report.processed_files += 1;
+    directoryCounts.processed += 1;
 
     // NOTE: NO_EVIDENCE means "zero extractable symbols" (e.g. a pure
     // re-export barrel, type-only file, or constants file), not a pipeline
@@ -226,7 +270,6 @@ for (const absolutePath of files) {
     if (compiled.relationGraph?.status === 'COMPILED') report.relation_graph_compiled += 1;
     else report.relation_graph_deferred += 1;
     if (!APPLY && NOMINATION_OUTPUT) {
-      const runMetadata = runSourceMetadata.get(ref);
       for (const nomination of compiled.fabric.symbol_nominations) {
         dryRunNominations.push({
           ...nomination,
@@ -356,6 +399,7 @@ for (const absolutePath of files) {
     }
   } catch (error) {
     report.failed_files += 1;
+    directoryCounts.failed += 1;
     report.failures.push({ source_ref: ref, error: error instanceof Error ? error.message : String(error) });
   }
 }

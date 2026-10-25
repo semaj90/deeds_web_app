@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { createHash } from 'node:crypto';
 
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
@@ -388,6 +389,65 @@ describe('miniforge-nlp-sidecar', () => {
 
     await expect(client.astChunk(request)).rejects.toThrow(/source_revision does not match/);
     await expect(client.astChunk(request)).rejects.toThrow(/file_path does not match/);
+  });
+
+  it('preserves byte-bound parser observations and treats ERROR or MISSING nodes as recovered syntax', async () => {
+    const source = 'const λ = "😀";\r\n';
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    for (const counts of [{ root_has_error: true, error_node_count: 1, missing_node_count: 0 },
+      { root_has_error: false, error_node_count: 0, missing_node_count: 1 }]) {
+      const observation = {
+        schema: 'atlas.ast.parser-observation.v1',
+        source_sha256: createHash('sha256').update(source).digest('hex'),
+        utf8_byte_length: new TextEncoder().encode(source).byteLength,
+        ...counts,
+      };
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+        schema: 'atlas.ast.evidence.v1', scan_completeness: 'COMPLETE',
+        file_path: 'src/example.ts', source_revision: 'rev-1', syntax_status: 'CLEAN',
+        chunks: [], edges: [], diagnostics: [], parser_observation: observation,
+      }), { status: 200 }));
+      const result = await createMiniforgeNlpSidecarClient().astChunk({
+        source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+      });
+      expect(result.parser_observation).toEqual(observation);
+      expect(result.syntax_status).toBe('RECOVERED_WITH_ERRORS');
+      expect(result.scan_completeness).toBe('COMPLETE');
+    }
+  });
+
+  it('rejects malformed or source-mismatched parser observations', async () => {
+    const source = 'const λ = "😀";\r\n';
+    const observation = {
+      schema: 'atlas.ast.parser-observation.v1',
+      source_sha256: createHash('sha256').update(source).digest('hex'),
+      utf8_byte_length: new TextEncoder().encode(source).byteLength,
+      root_has_error: false, error_node_count: 0, missing_node_count: 0,
+    };
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    for (const change of [{ source_sha256: '0'.repeat(64) }, { utf8_byte_length: source.length },
+      { error_node_count: -1 }, { missing_node_count: 0.5 }, { root_has_error: 'false' }]) {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+        schema: 'atlas.ast.evidence.v1', scan_completeness: 'COMPLETE',
+        file_path: 'src/example.ts', source_revision: 'rev-1', chunks: [],
+        parser_observation: { ...observation, ...change },
+      }), { status: 200 }));
+      await expect(createMiniforgeNlpSidecarClient().astChunk({
+        source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+      })).rejects.toThrow();
+    }
+  });
+
+  it('does not invent parser counters when an older response lacks the observation', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1', scan_completeness: 'COMPLETE',
+      file_path: 'src/example.ts', source_revision: 'rev-1', chunks: [],
+    }), { status: 200 }));
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const result = await createMiniforgeNlpSidecarClient().astChunk({
+      source: '', language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+    });
+    expect(result.parser_observation).toBeUndefined();
   });
 
   it('preserves native declarator signature and ancestry evidence when the sidecar provides it', async () => {

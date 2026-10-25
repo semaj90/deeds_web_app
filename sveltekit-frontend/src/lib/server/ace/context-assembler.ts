@@ -93,6 +93,7 @@ export function estimateContentTokensV1(content: string): number {
 }
 
 export class ACEContextAssembler {
+
   private pgPool: pg.Pool;
   private redis: ReturnType<typeof getValkeyClient>;
   // Whether `this.redis` is a connection this instance owns (and must `.quit()`
@@ -435,3 +436,6 @@ export async function closeACEContextAssembler(): Promise<void> {
     assembler = null;
   }
 }
+
+// Canonical alias export to eliminate split-brain casing
+export { ACEContextAssembler as AceContextAssembler };

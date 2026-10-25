@@ -100,6 +100,15 @@ class AstEvidenceChunkV2(BaseModel):
     exports: list[str] = Field(default_factory=list)
 
 
+class AstParserObservationV1(BaseModel):
+    schema_: Literal["atlas.ast.parser-observation.v1"] = Field(alias="schema")
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    utf8_byte_length: int = Field(ge=0)
+    root_has_error: bool
+    error_node_count: int = Field(ge=0)
+    missing_node_count: int = Field(ge=0)
+
+
 class AstEvidenceResponseV2(BaseModel):
     schema_: Literal["atlas.ast.evidence.v1"] = Field(alias="schema")
     engine: str
@@ -118,6 +127,7 @@ class AstEvidenceResponseV2(BaseModel):
     # partial (see syntax_status). This route runs no NLP, so no NLP skip is reported here.
     scan_completeness: Literal["COMPLETE", "PARTIAL_AST_FAILED"] = "COMPLETE"
     scan_failure: Optional[str] = None
+    parser_observation: Optional[AstParserObservationV1] = None
 
 
 def validate_ast_evidence_byte_spans(chunks: list[AstEvidenceChunkV2], source_bytes: bytes) -> list[dict[str, Any]]:
@@ -1022,6 +1032,26 @@ def _index_syntax_nodes(root: Any) -> dict[str, tuple[list[int], list[Any]]]:
     return indexed
 
 
+def _parser_observation(root: Any, indexed: dict[str, tuple[list[int], list[Any]]], source_bytes: bytes) -> Optional[AstParserObservationV1]:
+    if root is None or not isinstance(getattr(root, "has_error", None), bool) or not indexed:
+        return None
+    missing_count = 0
+    for _, nodes in indexed.values():
+        for node in nodes:
+            missing = getattr(node, "is_missing", None)
+            if not isinstance(missing, bool):
+                return None
+            missing_count += int(missing)
+    return AstParserObservationV1(
+        schema="atlas.ast.parser-observation.v1",
+        source_sha256=hashlib.sha256(source_bytes).hexdigest(),
+        utf8_byte_length=len(source_bytes),
+        root_has_error=root.has_error,
+        error_node_count=len(indexed.get("ERROR", ([], []))[1]),
+        missing_node_count=missing_count,
+    )
+
+
 def _byte_offset_line_column(source_bytes: bytes, line_starts: list[int], offset: int) -> tuple[int, int]:
     bounded = max(0, min(int(offset), len(source_bytes)))
     line_index = bisect_right(line_starts, bounded) - 1
@@ -1613,6 +1643,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         syntax_status="RECOVERED_WITH_ERRORS" if fatal_diagnostics else "CLEAN",
         scan_completeness="PARTIAL_AST_FAILED" if scan_failure else "COMPLETE",
         scan_failure=scan_failure,
+        parser_observation=_parser_observation(syntax_root, syntax_node_index, source_bytes),
     )
 
 

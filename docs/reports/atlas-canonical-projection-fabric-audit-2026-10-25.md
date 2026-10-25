@@ -1,19 +1,19 @@
 # ATLAS-CANONICAL-PROJECTION-FABRIC-01 Admission Gate — 2026-10-25
 
-**Read-only. Zero production mutations.** Repository commit: `d16b6da484d16c948e45818d01b7d98db52962fb`. Database: `127.0.0.1:5434`.
+**Read-only. Zero production mutations.** Repository commit: `3f803daf5e4ef383f1f76cc5002c33865485386f`. Database: `127.0.0.1:5434`.
 
 Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture review, recorded 2026-09-08)
 
 ## Overall verdict: **NOT_SAFE_TO_PROJECT**
 
-10/11 predicates below PASS: IDENTITY_ALIGNED=NOT_PROVEN, REVISION_QUALIFIED=NOT_PROVEN, SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, GRAPH_MANIFEST_SEALED=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=NOT_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN
+10/11 predicates below PASS: IDENTITY_ALIGNED=NOT_PROVEN, REVISION_QUALIFIED=NOT_PROVEN, SYMBOLS_RESOLVED=NOT_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, GRAPH_MANIFEST_SEALED=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=NOT_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN
 
 ## Predicates
 
 ### `IDENTITY_ALIGNED`: **NOT_PROVEN**
 > Identity is not proven because the sealed admitted repo:root source snapshot or exact packet cohort is unavailable.
 - `scope`: "EXACT_ADMITTED_REPO_ROOT_SOURCE_REVISION_COHORT"
-- `admitted_workspace_revision`: "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5"
+- `admitted_workspace_revision`: "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c"
 - `admitted_root_snapshot_verified`: true
 - `admitted_root_exact_revision_packet_count`: 0
 - `missing_packet_key_count`: 0
@@ -25,7 +25,7 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 
 ### `REVISION_QUALIFIED`: **NOT_PROVEN**
 > Revision coverage is evaluated against the sealed admitted repo:root snapshot, not the entire historical atlas_packets table. Exact admitted matches=0; mismatched or missing=0; snapshot_verified=true.
-- `admitted_workspace_revision`: "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5"
+- `admitted_workspace_revision`: "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c"
 - `source_ref_count`: 1000
 - `sample_packets_revision_qualified`: 0
 - `sample_packets`: 1000
@@ -33,22 +33,22 @@ Source proposal: ATLAS-CANONICAL-PROJECTION-FABRIC-01 (external architecture rev
 - `table_packets_total`: 61718
 - `ast_node_join_count_secondary`: 0
 - `admitted_root_snapshot_verified`: true
-- `admitted_root_snapshot_source_count`: 29161
+- `admitted_root_snapshot_source_count`: 29241
 - `admitted_root_packet_rows`: 0
 - `admitted_root_packet_revision_matches`: 0
 - `admitted_root_packet_revision_mismatch_or_missing`: 0
 
-### `SYMBOLS_RESOLVED`: **PARTIAL_PROVEN**
-> Nomination resolution is clean (32514/32514 resolved, 0 unresolved, 0 ambiguous), but extractor population coverage is incomplete: 18018/18023 supported admitted source refs are processed (100.0%); 2 exact-revision rows remain UNPROCESSED; 0 refs lack an exact Graphify source-revision row (0 have no Graphify source-ref row, 0 have only nonmatching revision rows); 0 have duplicate exact rows. 9945 exact-revision source refs currently have 65456 symbol rows. This is extraction coverage, not a requirement for one symbol per file -- see scripts/atlas/graphify-symbol-extractor-v1.mts.
+### `SYMBOLS_RESOLVED`: **NOT_PROVEN**
+> Nomination resolution is not clean or no matching receipt exists for the current admitted revision (sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c). Run scripts/atlas/symbol-reconciliation-writer-v1.mts --workspace-revision sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c to produce a fresh receipt before re-auditing.
 - `graphify_symbols_exists`: true
 - `graphify_symbols_row_count`: 73309
 - `atlas_symbol_registry_exists`: true
 - `atlas_symbol_registry_row_count`: 42922
 - `atlas_symbol_versions_exists`: true
 - `atlas_symbol_versions_row_count`: 32897
-- `reconciliation_gate`: {"status":"GROUNDED","bound_source_ref_count":21311,"supported_source_ref_count":18023,"excluded_generated_artifact_count":835,"graphify_source_ref_present_count":18023,"graphify_source_ref_absent_count":0,"revision_mismatch_only_source_ref_count":0,"exact_graphify_source_ref_count":18023,"processed_source_ref_count":18018,"unprocessed_source_ref_count":2,"parse_failed_source_ref_count":3,"source_refs_with_symbols":9945,"exact_revision_symbol_row_count":65456,"duplicate_exact_graphify_source_ref_count":0,"missing_exact_graphify_source_ref_count":0}
-- `nomination_resolution`: {"source_receipt":"symbol-reconciliation-writer-v1-1792880184447.json","nomination_count":32514,"canonical_symbol_count":32514,"unresolved_symbol_count":0,"ambiguous_symbol_count":0,"clean":true}
-- `coverage`: {"bound_source_ref_count":21311,"supported_source_ref_count":18023,"excluded_generated_artifact_count":835,"exact_graphify_source_ref_count":18023,"processed_source_ref_count":18018,"unprocessed_source_ref_count":2,"parse_failed_source_ref_count":3,"missing_exact_graphify_source_ref_count":0,"duplicate_exact_graphify_source_ref_count":0,"source_refs_with_symbols":9945,"symbol_row_count":65456,"coverage_ratio":0.9997225767075404,"full_coverage":false}
+- `reconciliation_gate`: {"status":"BLOCKED_ON_UNGROUNDED_REVISION","bound_source_ref_count":0,"supported_source_ref_count":0,"excluded_generated_artifact_count":0,"graphify_source_ref_present_count":0,"graphify_source_ref_absent_count":0,"revision_mismatch_only_source_ref_count":0,"exact_graphify_source_ref_count":0,"processed_source_ref_count":0,"unprocessed_source_ref_count":0,"parse_failed_source_ref_count":0,"source_refs_with_symbols":0,"exact_revision_symbol_row_count":0,"duplicate_exact_graphify_source_ref_count":0,"missing_exact_graphify_source_ref_count":0}
+- `nomination_resolution`: {"source_receipt":null,"nomination_count":0,"canonical_symbol_count":0,"unresolved_symbol_count":null,"ambiguous_symbol_count":null,"clean":false}
+- `coverage`: {"bound_source_ref_count":0,"supported_source_ref_count":0,"excluded_generated_artifact_count":0,"exact_graphify_source_ref_count":0,"processed_source_ref_count":0,"unprocessed_source_ref_count":0,"parse_failed_source_ref_count":0,"missing_exact_graphify_source_ref_count":0,"duplicate_exact_graphify_source_ref_count":0,"source_refs_with_symbols":0,"symbol_row_count":0,"coverage_ratio":0,"full_coverage":false}
 
 ### `SEMANTIC_OWNER_PROVEN`: **PARTIAL_PROVEN**
 > The declared semantic_768 contract target codebase_chunk_index.content_embedding_768 is present. Column presence does not prove a unique writer, revision-qualified reads, per-row representation provenance, or projection readback; content_embedding and atlas_packets.embedding remain historical/unresolved surfaces.

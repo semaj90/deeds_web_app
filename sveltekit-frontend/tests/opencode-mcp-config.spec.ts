@@ -53,8 +53,8 @@ describe('opencode MCP wiring', () => {
   it('keeps required frontend MCP servers enabled with expected endpoints', () => {
     const cfg = readJson(frontendConfigPath);
     expect(cfg.mcp).toBeTruthy();
-    expect(cfg.model).toBe('hforf.gguf');
-    expect(cfg.small_model).toBe('hforf.gguf');
+    expect(cfg.model).toBe('turboquant/ornith-1.5-9b');
+    expect(cfg.small_model).toBe('turboquant/ornith-1.5-9b');
 
     expect(cfg.mcp.trace).toMatchObject({
       type: 'remote',
@@ -88,17 +88,15 @@ describe('opencode MCP wiring', () => {
     expect(cfg.skills?.paths).toContain('../.opencode/skills');
   });
 
-  it('keeps the HForF model schema aligned with the local gguf path', () => {
+  it('keeps the Ornith model schema aligned with the local llama-server endpoint', () => {
     const cfg = readJson(frontendConfigPath);
-    const modelPath = path.join(repoRoot, 'models', 'hfor', 'hforf.gguf');
-
-    expect(fs.existsSync(modelPath)).toBe(true);
-    expect(cfg.model).toBe('hforf.gguf');
-    expect(cfg.small_model).toBe('hforf.gguf');
+    expect(cfg.model).toBe('turboquant/ornith-1.5-9b');
+    expect(cfg.small_model).toBe('turboquant/ornith-1.5-9b');
 
     const turboquant = cfg.provider?.turboquant as Record<string, unknown>;
     expect(turboquant.npm).toBe('@ai-sdk/openai-compatible');
     expect((turboquant.options as Record<string, unknown>).baseURL).toBe('http://127.0.0.1:8090/v1');
+    expect((turboquant.models as Record<string, unknown>)['ornith-1.5-9b']).toBeTruthy();
   });
 
   it('contains resource labels for docs and datastore lanes', () => {
@@ -122,23 +120,18 @@ describe('opencode MCP wiring', () => {
     }
   });
 
-  it('keeps root opencode jsonc aligned with bifrost provider and MCP endpoints', () => {
+  it('keeps root opencode jsonc aligned with the active llama-server and MCP endpoints', () => {
     const cfg = readJson(rootConfigPath);
-    expect(cfg.model).toBe('ollama/ornith-1.5-9b');
-    expect(cfg.provider?.['ollama']).toBeTruthy();
-    expect(cfg.permission).toMatchObject({
-      skill: 'allow',
-      'trace_*': 'allow',
-      'turbovec_*': 'allow',
-      'engram_*': 'allow',
-      'langextract_*': 'allow',
-    });
+    expect(cfg.model).toBe('llama-server/ornith-1.5-9b');
+    expect(cfg.provider?.['llama-server']).toBeTruthy();
+    const defaultAgent = cfg.agent?.[cfg.default_agent];
+    expect(defaultAgent?.model).toBe(cfg.model);
+    expect(defaultAgent?.permission).toMatchObject({ 'trace.*': 'allow', edit: 'deny' });
     if (cfg.skills?.paths) {
       expect(cfg.skills.paths).toContain('./.opencode/skills');
     }
     expect(cfg.mcp?.trace?.url).toBe('http://127.0.0.1:8788/mcp');
-    expect(cfg.mcp?.turbovec?.url).toBe('http://127.0.0.1:8791/mcp');
-    expect(cfg.mcp?.['engram-embed']).toBeTruthy();
+    expect(cfg.mcp?.openwiki?.enabled).toBe(true);
   });
 
   it('ships the required OpenCode docs and command prompt', () => {

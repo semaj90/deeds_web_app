@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-run-owner.v1",
-  "generatedAt": "2026-10-25T06:59:02.546Z",
+  "generatedAt": "2026-10-25T08:37:06.977Z",
   "mode": "READ_ONLY_RUN_OWNER_AUDIT",
   "readOnly": true,
   "writes": {
@@ -9,9 +9,9 @@
     "neo4j": false,
     "valkey": false
   },
-  "expectedWorkspaceRevision": "sha256:cbd3ced9e6926059987163c0beb7f3f9a54fe1346e7ae0f7963302bc09dab37f",
-  "expectedWorkspaceRevisionSource": "ATLAS_EXPECTED_GRAPHIFY_WORKSPACE_REVISION",
-  "currentWorkspaceRevisionCandidate": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+  "expectedWorkspaceRevision": "sha256:ed23a8a77541a0c137903814319c36984fd7b5f0728f6106999b7f5d263896e0",
+  "expectedWorkspaceRevisionSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
+  "currentWorkspaceRevisionCandidate": "sha256:ed23a8a77541a0c137903814319c36984fd7b5f0728f6106999b7f5d263896e0",
   "databaseError": null,
   "currentRun": null,
   "runCount": 0,

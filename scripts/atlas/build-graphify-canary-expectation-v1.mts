@@ -1,13 +1,20 @@
 #!/usr/bin/env tsx
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildGraphifyCanaryExpectationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/graph/graphify-canary-expectation-v1.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
-const REPORT = resolve(ROOT, 'docs/reports/graphify-canary-expectation-v1.json');
+const reportArgument = process.argv.find((value) => value.startsWith('--report='))?.slice('--report='.length);
+const REPORT = resolve(ROOT, reportArgument ?? 'docs/reports/graphify-canary-expectation-v1.json');
+if (reportArgument) {
+  const relativeReport = relative(resolve(ROOT, '.tmp'), REPORT);
+  if (!relativeReport || relativeReport.startsWith('..') || isAbsolute(relativeReport)) {
+    throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+  }
+}
 
 const admission = JSON.parse(readFileSync(ADMISSION, 'utf8')) as Record<string, unknown>;
 if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {

@@ -1,14 +1,10 @@
--- DRAFT, NOT APPLIED. Creates route_packet_rewards for packet-reward-writer.ts.
+-- APPLIED 2026-10-25. Creates route_packet_rewards for packet-reward-writer.ts.
 --
--- Pre-image (read-only, 2026-10-25):
---   * route_packet_rewards does not exist; no migration defines it.
---   * The writer inserts with ON CONFLICT DO NOTHING and no target, so duplicates are allowed.
---   * route_runtime_packets.id is bigint and is NOT the writer's packet_uuid (uuid), so this
---     table does not reference route_runtime_packets. The link is packet_uuid alone.
+-- Live readback after application: the table is empty and has a valid unique index on
+-- packet_uuid. It deliberately has no foreign key to the partial-unique runtime UUID index.
+-- The writer verifies the source packet exists before writing its per-packet reward snapshot.
 --
--- Rehearsal (ends in ROLLBACK):
---   BEGIN; \i <this file>; ROLLBACK;
--- Post-check after an approved apply:
+-- Read-only verification:
 --   SELECT indisunique FROM pg_index WHERE indexrelid = 'route_packet_rewards_packet_uuid_uq'::regclass;
 
 CREATE TABLE IF NOT EXISTS route_packet_rewards (
