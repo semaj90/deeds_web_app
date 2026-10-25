@@ -67,7 +67,7 @@ export interface EmbeddingOptions {
 // `onnx-local` remains a legacy receipt/cache label only. This canonical
 // generator no longer emits it; ONNX is available through the explicit
 // non-canonical challenger API in canonical-embed.ts.
-type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'onnx-local' | 'cache';
+type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'http-openai-compatible' | 'onnx-local' | 'cache';
 
 export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
 
@@ -920,19 +920,19 @@ export async function generateEmbeddings(
       const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
       if (llamaVecs) {
         newVectors = llamaVecs;
-        source = 'http-ollama';
+        source = 'http-openai-compatible';
         model = 'embeddinggemma-openai-compatible';
         attempts.push({
-          transport: 'http-ollama',
+          transport: 'http-openai-compatible',
           status: 'success',
-          detail: `llama-embed ${providerV1.baseUrl}`,
+          detail: 'dedicated OpenAI-compatible embedding endpoint',
           durationMs: Math.round(performance.now() - llamaStart),
         });
       } else {
         attempts.push({
-          transport: 'http-ollama',
+          transport: 'http-openai-compatible',
           status: 'failed',
-          detail: `llama-embed ${providerV1.baseUrl} unavailable`,
+          detail: 'dedicated OpenAI-compatible embedding endpoint unavailable',
           durationMs: Math.round(performance.now() - llamaStart),
         });
       }

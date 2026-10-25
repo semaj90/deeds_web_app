@@ -60,6 +60,17 @@ function enabled(value: unknown): boolean {
   return ['1', 'true', 'yes', 'on'].includes(String(value ?? '').trim().toLowerCase());
 }
 
+function targetsOllama(candidateUrl: string | null, configuredOllamaUrl: string): boolean {
+  if (!candidateUrl) return false;
+  try {
+    const candidate = new URL(candidateUrl);
+    const ollama = new URL(configuredOllamaUrl);
+    return candidate.origin === ollama.origin || candidate.port === '11434';
+  } catch {
+    return false;
+  }
+}
+
 /** Pure resolver used by tests and by the ENV-backed production wrapper. */
 export function resolveEmbeddingProviderFromEnvV1(
   input: EmbeddingProviderEnvV1,
@@ -73,9 +84,12 @@ export function resolveEmbeddingProviderFromEnvV1(
     clean(input.OLLAMA_EMBED_BASE_URL) ||
     clean(input.EMBED_SERVER_URL) ||
     null;
+  const ollamaBaseUrl = stripTrailingSlash(clean(input.OLLAMA_BASE_URL) || 'http://127.0.0.1:11434');
+  const candidateTargetsOllama = targetsOllama(candidateUrl, ollamaBaseUrl);
+  const explicitlyDedicatedLlama = explicitProvider === 'llama_cpp_gguf' || backendHint === 'llama_cpp_gguf';
 
   const explicitOnnx = explicitProvider === 'onnx_directml' || backendHint === 'onnx_directml';
-  const dedicatedLlamaCpp = backendHint === 'llama_cpp_gguf' || Boolean(candidateUrl);
+  const dedicatedLlamaCpp = explicitlyDedicatedLlama || (Boolean(candidateUrl) && !candidateTargetsOllama);
   const devGpuAutoOnnx =
     platform === 'win32'
     && enabled(input.GPU_ENABLED)
@@ -97,7 +111,7 @@ export function resolveEmbeddingProviderFromEnvV1(
     };
   }
 
-  if (candidateUrl) {
+  if (candidateUrl && (!candidateTargetsOllama || explicitlyDedicatedLlama)) {
     return {
       provider: 'llama_cpp_gguf',
       baseUrl: stripTrailingSlash(candidateUrl),
@@ -109,7 +123,7 @@ export function resolveEmbeddingProviderFromEnvV1(
 
   return {
     provider: 'ollama',
-    baseUrl: stripTrailingSlash(clean(input.OLLAMA_BASE_URL) || 'http://127.0.0.1:11434'),
+    baseUrl: stripTrailingSlash(candidateUrl || ollamaBaseUrl),
     modelId,
     dimensions: 768,
     representationId: 'semantic_768',

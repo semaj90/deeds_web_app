@@ -62,24 +62,21 @@ describe('SemanticCorpusManifestV1', () => {
     expect(() => verifySemanticCorpusManifestV1({ ordinalMap, members, manifest })).not.toThrow();
   });
 
-  it('binds semantic revision only to admitted member ordinals while preserving ordinal identity', () => {
+  it('does not let caller-supplied provenance status qualify a corpus or bind semantic revisions', () => {
     const ordinalMap = map();
     const members = [member(1, 'chunk:b', 'packet:b', 'src/b.ts', sourceB, '22222222-2222-4222-8222-222222222222')];
-    const manifest = buildSemanticCorpusManifestV1({ ordinalMap, members });
-    const bound = bindSemanticCorpusToOrdinalMapV1({
+    const manifest = buildSemanticCorpusManifestV1({
+      ordinalMap,
+      members,
+      modelProvenanceStatus: 'RESOLVED',
+    } as Parameters<typeof buildSemanticCorpusManifestV1>[0]);
+    expect(manifest.modelProvenanceStatus).toBe('UNRESOLVED');
+    expect(() => bindSemanticCorpusToOrdinalMapV1({
       ordinalMap,
       members,
       manifest,
       producerRevision: 'fixture:semantic-bound-map:v1',
-    });
-
-    expect(bound.candidates.map((candidate) => candidate.canonicalId)).toEqual(
-      ordinalMap.candidates.map((candidate) => candidate.canonicalId),
-    );
-    expect(bound.candidates.map((candidate) => candidate.candidateOrdinal)).toEqual([0, 1]);
-    expect(bound.candidates[0]?.semanticRevision).toBeNull();
-    expect(bound.candidates[1]?.semanticRevision).toBe(manifest.representationRevision);
-    expect(bound.ordinalMapChecksum).not.toBe(ordinalMap.ordinalMapChecksum);
+    })).toThrow('SEMANTIC_BOUND_MAP_MODEL_PROVENANCE_UNRESOLVED');
   });
 
   it('rejects a corpus member that does not match the source ordinal identity', () => {

@@ -89,12 +89,12 @@ function runCensus() {
       });
     } else if (c.candidateId === 'cand:svelte-check-waituntil-20261021') {
       const parsed = JSON.parse(content);
-      const hasWorkspace = Boolean(parsed.source?.workspaceRevision);
       classified.push({
         ...c,
         classification: 'INCOMPLETE',
-        reason: 'Clean source/AST match verified, but lacks admitted workspaceRevision in PostgreSQL binding ledger',
-        admittedWorkspace: hasWorkspace,
+        reason: 'A declared workspaceRevision is not an independent admission readback; no authoritative workspace-admission receipt is connected to this census',
+        declaredWorkspaceRevisionPresent: Boolean(parsed.source?.workspaceRevision),
+        admittedWorkspace: false,
       });
     } else if (c.candidateId.startsWith('cand:r04-rc')) {
       classified.push({
@@ -111,11 +111,11 @@ function runCensus() {
   const oakOperatorCrosswalk = [
     {
       operator: 'extract_runtime_slots',
-      status: 'MISSING',
-      ownerPath: null,
-      testPath: null,
-      revisionRequirements: [],
-      description: 'No exact runtime-slot extraction owner or test was found; do not treat free-text parsing as authoritative identity.',
+      status: 'REUSE',
+      ownerPath: 'sveltekit-frontend/src/lib/server/atlas/operations/runtime-slot-extraction-v1.ts',
+      testPath: 'sveltekit-frontend/src/lib/server/atlas/operations/runtime-slot-extraction-v1.spec.ts',
+      revisionRequirements: ['workspaceRevision', 'sourceRevision'],
+      description: 'Typed extraction from structured fields and payload patterns; outputs remain UNVERIFIED_INPUT until an independent authority/source owner validates them.',
     },
     {
       operator: 'lookup_entities',
@@ -167,13 +167,11 @@ function runCensus() {
     },
     {
       operator: 'filter_set_overlap',
-      status: 'MISSING',
-      ownerPath: null,
-      relatedOwnerPath: 'sveltekit-frontend/src/lib/server/atlas/evals/repair-eval-contract.ts',
-      testPath: null,
-      relatedTestPath: 'sveltekit-frontend/src/lib/server/atlas/evals/repair-eval-contract.test.ts',
-      revisionRequirements: [],
-      description: 'Eval contract checks split/group leakage; that is not a set-overlap filtering operator. No exact owner was found.',
+      status: 'REUSE',
+      ownerPath: 'sveltekit-frontend/src/lib/server/atlas/evals/candidate-set-overlap-filter-v1.ts',
+      testPath: 'sveltekit-frontend/src/lib/server/atlas/evals/candidate-set-overlap-filter-v1.spec.ts',
+      revisionRequirements: ['setRevisionA', 'setRevisionB'],
+      description: 'Deterministic candidate-set overlap filtering under DISJOINT, INTERSECTION, UNION_DISTINCT, and DIFFERENCE criteria.',
     },
     {
       operator: 'aggregate_values',

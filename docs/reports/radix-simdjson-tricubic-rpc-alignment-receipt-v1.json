@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.radix-simdjson-tricubic-rpc-alignment-receipt.v1",
+  "generatedAt": "2026-10-25T00:04:10.121379+00:00",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "radixSort64BitProof": {
+    "candidateCount": 149,
+    "keyWidthBits": 64,
+    "passes": 8,
+    "bitsPerPass": 8,
+    "matchesReferenceSortExact": true,
+    "top3AscendingRadixKeysHex": [
+      "0x0100037200000023",
+      "0x010005090000008c",
+      "0x010005870000000e"
+    ],
+    "top3ProjectionOrdinals": [
+      35,
+      140,
+      14
+    ]
+  },
+  "simdjsonTypedEvidenceAlignment": {
+    "totalNdjsonRecordsValidated": 149,
+    "featureLabelDescriptiveIsolated": true,
+    "sampleEnvelope": {
+      "schema": "atlas.simdjson-typed-evidence-envelope.v1",
+      "recordIndex": 0,
+      "packetKeyV2": "packet:2a5b5f91-1f2b-5477-8bba-2010bb313f1a",
+      "sourceRef": "sveltekit-frontend/tests/e2e/route-forensic/login.diagnostic.spec.ts",
+      "sourceRevision": "sha256:77e2e17f1f1d532771bd2e3db00eee942eb204b7ad7c6af953e84354e399d545",
+      "lineByteLength": 1225,
+      "lineSha256": "sha256:a95787c9c9b862f6add0280ec8a7bd2af084e0997dea02b8cba4958799ebe468",
+      "descriptiveFeatureLabel": "login.diagnostic.spec.ts",
+      "featureLabelInNumericTensor": false
+    }
+  },
+  "tricubicVsTrilinearPyTorchAlignment": {
+    "tricubicReceipt": {
+      "schema": "atlas.tensor-interpolation-receipt.v1",
+      "spatial_dimensions": 3,
+      "method": "catmull_rom_tensor_product_cubic",
+      "coordinate_count": 149,
+      "maximum_samples_per_coordinate": 64,
+      "boundary_mode": "clamp",
+      "device": "cpu",
+      "output_shape": [
+        149,
+        4
+      ],
+      "output_checksum": "070fb9b1ac30201a787fb5785edc5ad852229a95e304ad4da5c5ee977577b867",
+      "canonical_authority": false
+    },
+    "trilinearSamplesPerCoordinate": 8,
+    "tricubicSamplesPerCoordinate": 64,
+    "outputShape": [
+      149,
+      4
+    ],
+    "tricubicVsTrilinearRmsDiff": 0.218926,
+    "finiteOutputs": true
+  },
+  "rpcPacketAssemblerValidatorMaterializer": {
+    "totalPacketsAssembled": 149,
+    "allUuidV7Valid": true,
+    "allProposalOnly": true,
+    "lutEncodingRevision": "sha256:7fa7f61de23825e7d9c7b09e9bfc74b63f850e13828a788fba69064d6978ba24",
+    "sampleRpcPacket": {
+      "schema": "atlas.rpc.packet.v1",
+      "registry": {
+        "packetKey": "packet:2a5b5f91-1f2b-5477-8bba-2010bb313f1a",
+        "titleId": "title:f5663d0e",
+        "title": "login.diagnostic.spec.ts",
+        "packetClass": "AST_COORDINATE_CONVERTER",
+        "lutEncodingRevision": "sha256:7fa7f61de23825e7d9c7b09e9bfc74b63f850e13828a788fba69064d6978ba24",
+        "lutCode": 1
+      },
+      "lineage": {
+        "sourceRef": "sveltekit-frontend/tests/e2e/route-forensic/login.diagnostic.spec.ts",
+        "sourceRevision": "sha256:77e2e17f1f1d532771bd2e3db00eee942eb204b7ad7c6af953e84354e399d545",
+        "workspaceRevision": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "callerId": "atlas-radix-simdjson-assembler-v1",
+      "rpcCallId": "019a1897-e880-7001-8c03-2fc1e5f6a2e5",
+      "executionId": "019a1897-e880-7002-ae5a-a50a642826da",
+      "idempotencyKey": "calibration-v3:0000",
+      "requestDigest": "033a7bb6f2b4262ada3731c2bc6b7cad08fade3805f5ebe18351be451fefeb9e",
+      "operation": "ANALYZE",
+      "analysis": {
+        "algorithm": "PCA_LOW_RANK",
+        "inputArtifactRef": "artifact://.tmp/atlas/nb_logreg_xgb_symbol_features_v1.arrow",
+        "inputManifestChecksum": "0a0ba18ab863ddacb342ad8e49b9fb502d0dd50a714fdd61920f38448f75c55d",
+        "parametersChecksum": "a5d8df6c92c72c40b1c2cb4300e276bc70ed2574092bf74c8dbd81277dfe5f01",
+        "writePolicy": "PROPOSAL_ONLY"
+      }
+    }
+  },
+  "postgres18AioTempStagingRehearsal": {
+    "rehearsedAndRolledBack": true,
+    "serverVersion": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "ioMethod": "worker",
+    "effectiveIoConcurrency": "16",
+    "tempTableName": "temp_atlas_daily_calibration_stage_v1",
+    "tempIndexCountVerifiedInTx": 4,
+    "durableWritesPerformed": false,
+    "v2ReceiptPresent": true,
+    "v2Server": {
+      "version": "18.4 (Debian 18.4-1.pgdg12+1)",
+      "versionNum": "180004",
+      "ioMethod": "worker",
+      "effectiveIoConcurrency": "16"
+    },
+    "v2ReceiptChecksum": "sha256:6bc87dbbd900297d5d66f1fe592df70a1e36f8e618ddf5c443ae4128811550da"
+  },
+  "receiptChecksum": "sha256:d58a01481d38a09c7f70a94e4048f383e168aec56bb35af6f50b9ce030c096d4"
+}

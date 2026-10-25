@@ -1,0 +1,179 @@
+{
+  "schema": "atlas.arrow-mmap-nb-logreg-xgboost-pytorch-symbol-receipt.v1",
+  "generatedAt": "2026-10-25T00:04:10.917468+00:00",
+  "authority": "SHADOW_DIAGNOSTIC_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "symbolAndRecommendationSummary": {
+    "totalBoundEvaluated": 149,
+    "missingSymbolDeclarationsDetected": 74,
+    "symbolClassDistribution": {
+      "DOCUMENT_OR_MANIFEST_ARTIFACT": 20,
+      "FUNCTION_DECLARATION": 14,
+      "INLINE_SQL_QUERY_FRAGMENT": 25,
+      "MISSING_SYMBOL_SIGNATURE": 49,
+      "SVELTEKIT_ROUTE_HANDLER": 20,
+      "TEST_SPECIFICATION_BLOCK": 19,
+      "TYPE_OR_CLASS_DECLARATION": 2
+    },
+    "derivedRecommendationDistribution": {
+      "ESCALATE_CHALLENGER_HUMAN_CALIBRATION": 17,
+      "REEXTRACT_AST_ENCLOSING_SYMBOL_SPAN": 108,
+      "RETAIN_VERIFIED_BOUND_CANDIDATE": 1,
+      "STAGE_PACKETKEY_V2_INGESTION_CANDIDATE": 23
+    }
+  },
+  "naiveBayesToLogRegToXgboostStat": {
+    "xgboostVersion": "3.2.0",
+    "cudaBuiltInBinary": true,
+    "requestedDevice": "cuda:0",
+    "actualExecutedDevice": "cuda:0",
+    "treeMethod": "hist",
+    "boostRounds": 16,
+    "nbLogOddsMean": -0.384275,
+    "lrBaseMarginMean": -1.183552,
+    "initialLogisticLossMean": 0.616802,
+    "initialGradientL2Norm": 5.56414,
+    "initialHessianMean": 0.176879,
+    "xgbMarginMean": -1.436946,
+    "xgbProbMean": 0.262102,
+    "finitePredictions": true
+  },
+  "arrowMmapToPyTorchProof": {
+    "arrowFilePath": ".tmp/atlas/nb_logreg_xgb_symbol_features_v1.arrow",
+    "arrowFileSha256": "sha256:0a0ba18ab863ddacb342ad8e49b9fb502d0dd50a714fdd61920f38448f75c55d",
+    "rowCount": 149,
+    "zeroCopyOnlySucceeded": true,
+    "mmapReadOnlyBufferVerified": true,
+    "mmapToPyTorchDataPtrShared": true,
+    "pytorchTensorShape": [
+      149,
+      7
+    ],
+    "pytorchTensorDtype": "torch.float32",
+    "pytorchLinearProjectionL2Norm": 25.307598
+  },
+  "sampleCandidates": [
+    {
+      "candidateOrdinal": 0,
+      "packetKeyV2": "packet:2a5b5f91-1f2b-5477-8bba-2010bb313f1a",
+      "sourceRef": "sveltekit-frontend/tests/e2e/route-forensic/login.diagnostic.spec.ts",
+      "symbolClass": "TEST_SPECIFICATION_BLOCK",
+      "extractedSymbolName": "login.diagnostic.spec.ts",
+      "symbolDeclarationMissing": false,
+      "derivedRecommendation": "ESCALATE_CHALLENGER_HUMAN_CALIBRATION",
+      "nbLogOdds": -1.28254,
+      "lrMargin": -1.57165,
+      "xgbProb": 0.70057
+    },
+    {
+      "candidateOrdinal": 1,
+      "packetKeyV2": "packet:b411b343-7c1e-5291-8703-0c9bfe906780",
+      "sourceRef": "sveltekit-frontend/scratch/find-no-auth-routes.mjs",
+      "symbolClass": "FUNCTION_DECLARATION",
+      "extractedSymbolName": "main",
+      "symbolDeclarationMissing": false,
+      "derivedRecommendation": "STAGE_PACKETKEY_V2_INGESTION_CANDIDATE",
+      "nbLogOdds": -0.53884,
+      "lrMargin": -1.40592,
+      "xgbProb": 0.67532
+    },
+    {
+      "candidateOrdinal": 2,
+      "packetKeyV2": "packet:399fcca5-e6ba-52e6-9ed6-eff4d32c4ecf",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/authority-chain.ts",
+      "symbolClass": "FUNCTION_DECLARATION",
+      "extractedSymbolName": "extractNewAuthorities",
+      "symbolDeclarationMissing": false,
+      "derivedRecommendation": "REEXTRACT_AST_ENCLOSING_SYMBOL_SPAN",
+      "nbLogOdds": -0.97299,
+      "lrMargin": -1.35166,
+      "xgbProb": 0.04735
+    },
+    {
+      "candidateOrdinal": 3,
+      "packetKeyV2": "packet:cd80e75e-55ef-560c-a4ab-5c2a475b61b0",
+      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/auth/me/+server.ts",
+      "symbolClass": "SVELTEKIT_ROUTE_HANDLER",
+      "extractedSymbolName": "RequestHandler",
+      "symbolDeclarationMissing": false,
+      "derivedRecommendation": "STAGE_PACKETKEY_V2_INGESTION_CANDIDATE",
+      "nbLogOdds": -0.32816,
+      "lrMargin": -1.0804,
+      "xgbProb": 0.41874
+    },
+    {
+      "candidateOrdinal": 4,
+      "packetKeyV2": "packet:4b64cb99-4eaf-5c24-89ba-0372fe921aa8",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/dev/login-demo.test.ts",
+      "symbolClass": "TEST_SPECIFICATION_BLOCK",
+      "extractedSymbolName": "login-demo.test.ts",
+      "symbolDeclarationMissing": false,
+      "derivedRecommendation": "REEXTRACT_AST_ENCLOSING_SYMBOL_SPAN",
+      "nbLogOdds": -0.51855,
+      "lrMargin": -1.21796,
+      "xgbProb": 0.05376
+    },
+    {
+      "candidateOrdinal": 5,
+      "packetKeyV2": "packet:d97fa6bb-0584-5b02-a2a4-6e3abc857f3f",
+      "sourceRef": "sveltekit-frontend/memory/runs/2026-05-07T18-56-43/gds_authority_coverage_trace.json",
+      "symbolClass": "DOCUMENT_OR_MANIFEST_ARTIFACT",
+      "extractedSymbolName": "gds_authority_coverage_trace.json",
+      "symbolDeclarationMissing": false,
+      "derivedRecommendation": "ESCALATE_CHALLENGER_HUMAN_CALIBRATION",
+      "nbLogOdds": -1.14297,
+      "lrMargin": -1.56035,
+      "xgbProb": 0.70294
+    },
+    {
+      "candidateOrdinal": 6,
+      "packetKeyV2": "packet:a2c5e11d-e732-5a58-b729-6d77c3c0ec00",
+      "sourceRef": "scripts/atlas/promote-pagerank-authority-from-neo4j.mjs",
+      "symbolClass": "INLINE_SQL_QUERY_FRAGMENT",
+      "extractedSymbolName": null,
+      "symbolDeclarationMissing": true,
+      "derivedRecommendation": "REEXTRACT_AST_ENCLOSING_SYMBOL_SPAN",
+      "nbLogOdds": -0.7446,
+      "lrMargin": -1.30014,
+      "xgbProb": 0.21215
+    },
+    {
+      "candidateOrdinal": 7,
+      "packetKeyV2": "packet:3e230c41-80a3-5005-af9b-f32cfe3ed346",
+      "sourceRef": "sveltekit-frontend/src/lib/server/auth/tool-authorization-audit.ts",
+      "symbolClass": "INLINE_SQL_QUERY_FRAGMENT",
+      "extractedSymbolName": null,
+      "symbolDeclarationMissing": true,
+      "derivedRecommendation": "REEXTRACT_AST_ENCLOSING_SYMBOL_SPAN",
+      "nbLogOdds": -0.88084,
+      "lrMargin": -1.58197,
+      "xgbProb": 0.03798
+    },
+    {
+      "candidateOrdinal": 8,
+      "packetKeyV2": "packet:7fd0fc72-fb16-50be-b44a-5aa0da6d86d9",
+      "sourceRef": "scripts/atlas/audit-auth-surface-v1.mjs",
+      "symbolClass": "INLINE_SQL_QUERY_FRAGMENT",
+      "extractedSymbolName": null,
+      "symbolDeclarationMissing": true,
+      "derivedRecommendation": "REEXTRACT_AST_ENCLOSING_SYMBOL_SPAN",
+      "nbLogOdds": -0.87905,
+      "lrMargin": -1.36607,
+      "xgbProb": 0.23483
+    },
+    {
+      "candidateOrdinal": 9,
+      "packetKeyV2": "packet:69b53352-c16a-5e2e-966f-b5516f5cc0c6",
+      "sourceRef": "scripts/atlas/fixtures/mutation_proposal_unauthorized.json",
+      "symbolClass": "DOCUMENT_OR_MANIFEST_ARTIFACT",
+      "extractedSymbolName": "mutation_proposal_unauthorized.json",
+      "symbolDeclarationMissing": false,
+      "derivedRecommendation": "REEXTRACT_AST_ENCLOSING_SYMBOL_SPAN",
+      "nbLogOdds": -0.82936,
+      "lrMargin": -1.63391,
+      "xgbProb": 0.03612
+    }
+  ],
+  "receiptChecksum": "sha256:58db698e08f4eceae7bbd26e25959d7ee05c0f0dac29a6f1d240a455cfe48a30"
+}

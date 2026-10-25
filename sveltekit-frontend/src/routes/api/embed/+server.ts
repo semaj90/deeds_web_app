@@ -1,16 +1,18 @@
 import { json } from '@sveltejs/kit';
 
 import type { RequestHandler } from './$types.js';
+import { createHash } from 'node:crypto';
 import { apiResponses } from '$lib/server/api/response-helper.js';
 import { embedRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
-import { embedText } from '$lib/server/embedding/embed.js';
+import { embedTextWithResult } from '$lib/server/embedding/embed.js';
 import { runEmbedding as runOnnxDirectMLEmbedding } from '$lib/server/ai/onnx-server.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
 import { classifyEmbeddingError } from '$lib/server/embedding/embedding-backend-resolution.js';
+import { digestSemanticEmbedding } from '$lib/server/embedding/semantic-lineage.js';
 import { resolveEmbeddingProviderV1, checkVectorShapeV1 } from '$lib/server/embedding/embedding-provider-v1.js';
 import { EMBEDDINGGEMMA_TASK_MODES_V1 } from '$lib/server/embedding/embedding-contract-768.js';
 import {
@@ -48,12 +50,26 @@ interface EmbedResponse {
 	model: string;
 	dimensions: number;
 	tokens?: number;
+	executionObservation?: {
+		schema: 'atlas.embedding-execution-observation.v1';
+		status: 'OBSERVED_NOT_VERIFIED';
+		source: string;
+		reportedModel: string;
+		dimensions: number;
+		cacheHit: boolean;
+		inputChecksum: string;
+		vectorChecksum: string;
+	};
 	inputRecipe?: {
 		mode: EmbeddingInputModeV1;
 		promptRevision: string;
 		sourceTextDigest: string;
 		formattedInputChecksum: string;
 	};
+}
+
+function sha256Text(value: string): string {
+	return `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -87,6 +103,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		switch (model) {
 			case 'embeddinggemma': {
+				let executionObservation: EmbedResponse['executionObservation'];
 				// EMBED-PROVIDER-CONVERGENCE-01: whether this branch even runs comes
 				// from the one resolver (EMBEDDING_PROVIDER_V1.provider, driven by
 				// EMBEDDING_PROVIDER), not an independent process.env.EMBEDDING_BACKEND
@@ -116,9 +133,32 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					executor: async (embeddingInput) => {
 						if (EMBEDDING_PROVIDER_V1.provider === 'onnx_directml') {
 							const onnxEmbedding = await runOnnxDirectMLEmbedding(embeddingInput);
-						if (onnxEmbedding) return onnxEmbedding;
+							if (onnxEmbedding) {
+								executionObservation = {
+									schema: 'atlas.embedding-execution-observation.v1',
+									status: 'OBSERVED_NOT_VERIFIED',
+									source: 'onnx-local',
+									reportedModel: 'embeddinggemma-onnx-local',
+									dimensions: onnxEmbedding.length,
+									cacheHit: false,
+									inputChecksum: sha256Text(embeddingInput),
+									vectorChecksum: `sha256:${digestSemanticEmbedding(onnxEmbedding)}`,
+								};
+								return onnxEmbedding;
+							}
 						}
-						return embedText(embeddingInput);
+						const generated = await embedTextWithResult(embeddingInput);
+						executionObservation = {
+							schema: 'atlas.embedding-execution-observation.v1',
+							status: 'OBSERVED_NOT_VERIFIED',
+							source: generated.cacheHit ? 'cache' : generated.source,
+							reportedModel: generated.model,
+							dimensions: generated.dimension,
+							cacheHit: generated.cacheHit === true,
+							inputChecksum: sha256Text(embeddingInput),
+							vectorChecksum: `sha256:${digestSemanticEmbedding(generated.vectors[0])}`,
+						};
+						return generated.vectors[0];
 					},
 				});
 				const embedding = execution.embedding;
@@ -132,6 +172,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					embedding,
 					model: 'embeddinggemma:latest',
 					dimensions: embedding.length,
+					...(executionObservation && { executionObservation }),
 					...(taskMode && {
 						inputRecipe: execution.inputRecipe,
 					}),

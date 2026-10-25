@@ -57,6 +57,34 @@ export type MambaStateProvider = ResidencyProvider<'MAMBA_STATE'>;
 export type SambaWindowProvider = ResidencyProvider<'SAMBA_WINDOW'>;
 export type TitansMemoryProvider = ResidencyProvider<'TITANS_MEMORY'>;
 
+export interface TitansMemoryProviderOptions {
+  /**
+   * Optional buffer resolver for TITANS_MEMORY descriptors.
+   * Resolves against BitFrost memory cache, Headroom CCR token tables,
+   * or pre-allocated surprise buffers.
+   */
+  resolveBuffer?: (descriptor: UnifiedResidencyDescriptor) => Promise<ArrayBufferView | null> | ArrayBufferView | null;
+}
+
+export class TitansMemoryProviderImpl implements ResidencyProvider<'TITANS_MEMORY'> {
+  readonly kind = 'TITANS_MEMORY' as const;
+
+  constructor(private readonly options: TitansMemoryProviderOptions = {}) {}
+
+  async load(descriptor: UnifiedResidencyDescriptor): Promise<ResidencyBuffer | null> {
+    if (descriptor.kind !== 'TITANS_MEMORY') return null;
+    assertNoPersistedGpuState(descriptor);
+    if (!this.options.resolveBuffer) return null;
+    const view = await this.options.resolveBuffer(descriptor);
+    if (!view) return null;
+    return { byteLength: view.byteLength, buffer: view };
+  }
+}
+
+export function createTitansMemoryProviderV1(options?: TitansMemoryProviderOptions): TitansMemoryProvider {
+  return new TitansMemoryProviderImpl(options);
+}
+
 export function requireProvider<K extends ResidencyKind>(provider: ResidencyProvider<K> | null | undefined, kind: K): ResidencyProvider<K> {
   if (!provider || provider.kind !== kind) throw new Error(`${kind}_PROVIDER_UNAVAILABLE`);
   return provider;
@@ -245,4 +273,56 @@ export class UnifiedResidencyAdapter {
 export function assertNoPersistedGpuState(value: unknown): void {
   const text = JSON.stringify(value);
   if (/cuda|device.?pointer|gpu.?pointer|tensor|hidden.?state|kv.?cache|cutile/i.test(text)) throw new Error('GPU_STATE_MUST_NOT_BE_PERSISTED');
+}
+
+export interface BuildTitansMemoryDescriptorInput {
+  residencyKey: string;
+  workspaceRevision: string;
+  sourceRevision: string;
+  representationRevision: string;
+  featureRevision: string;
+  modelRevision: string;
+  tokenizerRevision: string;
+  ropeRevision: string;
+  candidateOrdinal: number;
+  surpriseArtifactChecksum: string;
+  buffer: ArrayBufferView;
+  shape: readonly number[];
+  dtype: ResidencyDType;
+  contextWindow?: number;
+  positionBase?: number;
+  leaseUntil?: number;
+}
+
+export function buildTitansMemoryDescriptorV1(input: BuildTitansMemoryDescriptorInput): {
+  descriptor: UnifiedResidencyDescriptor;
+  buffer: ArrayBufferView;
+} {
+  const bytes = new Uint8Array(input.buffer.buffer, input.buffer.byteOffset, input.buffer.byteLength);
+  const payloadChecksum = createHash('sha256').update(bytes).digest('hex');
+  const descriptor: UnifiedResidencyDescriptor = {
+    schema: UNIFIED_RESIDENCY_SCHEMA,
+    residencyKey: input.residencyKey,
+    kind: 'TITANS_MEMORY',
+    workspaceRevision: input.workspaceRevision,
+    sourceRevision: input.sourceRevision,
+    representationRevision: input.representationRevision,
+    featureRevision: input.featureRevision,
+    modelRevision: input.modelRevision,
+    tokenizerRevision: input.tokenizerRevision,
+    ropeRevision: input.ropeRevision,
+    candidateOrdinal: input.candidateOrdinal,
+    artifactChecksum: input.surpriseArtifactChecksum,
+    payloadChecksum,
+    shape: input.shape,
+    dtype: input.dtype,
+    byteLength: input.buffer.byteLength,
+    state: 'EMPTY',
+    contextWindow: input.contextWindow,
+    positionBase: input.positionBase,
+    leaseUntil: input.leaseUntil,
+  };
+  validateUnifiedDescriptor(descriptor);
+  assertNoPersistedGpuState(descriptor);
+  return { descriptor, buffer: input.buffer };
 }

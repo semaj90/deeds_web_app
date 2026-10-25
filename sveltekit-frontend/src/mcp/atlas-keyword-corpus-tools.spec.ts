@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerAtlasKeywordCorpusTools } from './atlas-keyword-corpus-tools.js';
 
@@ -23,5 +26,29 @@ describe('atlas.keyword_corpus_search MCP tool', () => {
     expect(result.status).toBe('OK');
     expect(result.items[0]?.entryId).toBe('viterbi-mcp-tool-routing');
     expect(result.writesPerformed).toBe(false);
+  });
+
+  it('loads the corpus independently of the process working directory', async () => {
+    let handler: ((input: { query: string }) => Promise<{
+      content: Array<{ type: string; text: string }>;
+    }>) | null = null;
+    const server = {
+      registerTool: (_name: string, _config: unknown, run: typeof handler) => {
+        handler = run;
+      },
+    } as unknown as McpServer;
+    const originalCwd = process.cwd();
+    const temporaryDirectory = mkdtempSync(path.join(os.tmpdir(), 'atlas-keyword-corpus-'));
+    try {
+      process.chdir(temporaryDirectory);
+      registerAtlasKeywordCorpusTools(server);
+      const response = await handler!({ query: 'MCP tool selection' });
+      const result = JSON.parse(response.content[0]!.text) as { status: string; items: unknown[] };
+      expect(result.status).toBe('OK');
+      expect(result.items.length).toBeGreaterThan(0);
+    } finally {
+      process.chdir(originalCwd);
+      rmSync(temporaryDirectory, { recursive: true, force: true });
+    }
   });
 });

@@ -1,7 +1,7 @@
 {
   "schema": "atlas.historical-repair-receipt-census.v1",
-  "timestamp": "2026-10-24T04:46:29.281Z",
-  "crosswalkReviewedAt": "2026-10-24T05:59:14Z",
+  "timestamp": "2026-10-24T22:31:04.642Z",
+  "crosswalkReviewedAt": "2026-10-24T22:31:04.648Z",
   "totalSurveyed": 5,
   "classifiedBreakdown": {
     "VERIFIED_ADMITTED": 0,
@@ -24,7 +24,8 @@
       "diagnosticCode": "TS2339",
       "failureFingerprint": "sha256:3b3641cae13dacfbf574998278f8ea4db31e23bf9093af4709b67bc86846f534",
       "classification": "INCOMPLETE",
-      "reason": "Clean source/AST match verified, but lacks admitted workspaceRevision in PostgreSQL binding ledger",
+      "reason": "A declared workspaceRevision is not an independent admission readback; no authoritative workspace-admission receipt is connected to this census",
+      "declaredWorkspaceRevisionPresent": false,
       "admittedWorkspace": false
     },
     {
@@ -95,18 +96,24 @@
   "oakOperatorCrosswalk": [
     {
       "operator": "extract_runtime_slots",
-      "status": "MISSING",
-      "ownerPath": null,
-      "testPath": null,
-      "revisionRequirements": [],
-      "description": "No exact runtime-slot extraction owner or test was found; do not treat free-text parsing as authoritative identity."
+      "status": "REUSE",
+      "ownerPath": "sveltekit-frontend/src/lib/server/atlas/operations/runtime-slot-extraction-v1.ts",
+      "testPath": "sveltekit-frontend/src/lib/server/atlas/operations/runtime-slot-extraction-v1.spec.ts",
+      "revisionRequirements": [
+        "workspaceRevision",
+        "sourceRevision"
+      ],
+      "description": "Typed extraction from structured fields and payload patterns; outputs remain UNVERIFIED_INPUT until an independent authority/source owner validates them."
     },
     {
       "operator": "lookup_entities",
       "status": "REUSE",
       "ownerPath": "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.ts",
       "testPath": "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.spec.ts",
-      "revisionRequirements": ["workspaceRevision", "sourceRevision"],
+      "revisionRequirements": [
+        "workspaceRevision",
+        "sourceRevision"
+      ],
       "description": "Existing typed symbol, packet, source-reference, and AST lookup operators; catalog composition is fixture-verified, not runtime admission."
     },
     {
@@ -114,7 +121,10 @@
       "status": "REUSE",
       "ownerPath": "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.ts",
       "testPath": "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.spec.ts",
-      "revisionRequirements": ["graphRevision", "sourceRevision"],
+      "revisionRequirements": [
+        "graphRevision",
+        "sourceRevision"
+      ],
       "description": "Existing caller/callee/graph/BFS operators require declared revisions; no admitted live OaK composition is proven."
     },
     {
@@ -122,7 +132,13 @@
       "status": "REUSE",
       "ownerPath": "sveltekit-frontend/src/lib/server/atlas/ranking/feature-row-v1.ts",
       "testPath": "sveltekit-frontend/src/lib/server/atlas/ranking/feature-row-v1.test.ts",
-      "revisionRequirements": ["workspaceRevision", "sourceRevision", "graphRevision", "featureRevision", "semanticRevision"],
+      "revisionRequirements": [
+        "workspaceRevision",
+        "sourceRevision",
+        "graphRevision",
+        "featureRevision",
+        "semanticRevision"
+      ],
       "description": "Builds the existing revision-bearing FeatureRowV1; this does not admit its evidence or create a separate OaK property store."
     },
     {
@@ -130,7 +146,14 @@
       "status": "EXTEND_EXISTING",
       "ownerPath": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-selection-snapshot-v1.ts",
       "testPath": null,
-      "revisionRequirements": ["workspaceRevision", "sourceRevision", "graphRevision", "semanticRevision", "candidateSnapshotRevision", "featureRevision"],
+      "revisionRequirements": [
+        "workspaceRevision",
+        "sourceRevision",
+        "graphRevision",
+        "semanticRevision",
+        "candidateSnapshotRevision",
+        "featureRevision"
+      ],
       "description": "Snapshot owner validates candidate membership and row lineage; no categorical predicate operator or paired test was found."
     },
     {
@@ -138,7 +161,9 @@
       "status": "EXTEND_EXISTING",
       "ownerPath": "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.ts",
       "testPath": "packages/parent-atlas/src/core/kernel-operator-library-symbol-repair-v0.spec.ts",
-      "revisionRequirements": ["graphRevision"],
+      "revisionRequirements": [
+        "graphRevision"
+      ],
       "description": "Graph relation operators exist, but a candidate-set connectedness filter is not composed; oak-judge-feedback is not that filter."
     },
     {
@@ -146,25 +171,33 @@
       "status": "EXTEND_EXISTING",
       "ownerPath": "sveltekit-frontend/src/lib/server/atlas/features/candidate-ordinal-bitset-selection-v1.ts",
       "testPath": "sveltekit-frontend/src/lib/server/atlas/features/candidate-ordinal-bitset-selection-v1.spec.ts",
-      "revisionRequirements": ["workspaceRevision", "candidateSnapshotRevision", "ordinalMapChecksum"],
+      "revisionRequirements": [
+        "workspaceRevision",
+        "candidateSnapshotRevision",
+        "ordinalMapChecksum"
+      ],
       "description": "Ordinal selection and bitmap lineage exist, but this owner does not implement general numeric thresholds."
     },
     {
       "operator": "filter_set_overlap",
-      "status": "MISSING",
-      "ownerPath": null,
-      "relatedOwnerPath": "sveltekit-frontend/src/lib/server/atlas/evals/repair-eval-contract.ts",
-      "testPath": null,
-      "relatedTestPath": "sveltekit-frontend/src/lib/server/atlas/evals/repair-eval-contract.test.ts",
-      "revisionRequirements": [],
-      "description": "Eval contract checks split/group leakage; that is not a set-overlap filtering operator. No exact owner was found."
+      "status": "REUSE",
+      "ownerPath": "sveltekit-frontend/src/lib/server/atlas/evals/candidate-set-overlap-filter-v1.ts",
+      "testPath": "sveltekit-frontend/src/lib/server/atlas/evals/candidate-set-overlap-filter-v1.spec.ts",
+      "revisionRequirements": [
+        "setRevisionA",
+        "setRevisionB"
+      ],
+      "description": "Deterministic candidate-set overlap filtering under DISJOINT, INTERSECTION, UNION_DISTINCT, and DIFFERENCE criteria."
     },
     {
       "operator": "aggregate_values",
       "status": "EXTEND_EXISTING",
       "ownerPath": "sveltekit-frontend/src/lib/server/atlas/evals/repair-eval-contract.ts",
       "testPath": "sveltekit-frontend/src/lib/server/atlas/evals/repair-eval-contract.test.ts",
-      "revisionRequirements": ["datasetRevision", "exampleId"],
+      "revisionRequirements": [
+        "datasetRevision",
+        "exampleId"
+      ],
       "description": "Aggregates repair metrics, but does not currently bind observations to example IDs or a frozen dataset revision."
     }
   ],

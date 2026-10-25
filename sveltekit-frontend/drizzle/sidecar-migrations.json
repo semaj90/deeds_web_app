@@ -2,6 +2,15 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "../../drizzle/manual/20261024_pgvector_hnsw_ivfflat_remediation_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Remediates duplicate HNSW index on agent_observations (idx_agent_observations_hnsw), redundant IVFFlat index on cluster_summaries (idx_cluster_summaries_embedding_ivfflat), and builds concurrent HNSW index on chat_embeddings (idx_chat_embeddings_embedding_hnsw) per docs/reports/pgvector-hnsw-ivfflat-diskann-audit-v1.json. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "py -3.13 scripts/atlas/audit_pgvector_hnsw_ivfflat_diskann_v1.py"
+    },
+    {
       "file": "../../drizzle/manual/20261017_reconcile_summary_768_and_vector_io_cleanup.sql",
       "status": "planned_sidecar",
       "reason": "DRAFT, NOT APPLIED. Drops obsolete idx_codebase_chunk_summary_embedding_384_hnsw (10 rows) and redundant IVFFlat summary index; stages partial HNSW indexes for summary_embedding halfvec(768) and error_embedding halfvec(768) to eliminate DataFileRead I/O bottlenecks during non-HOT updates. Requires approval.",

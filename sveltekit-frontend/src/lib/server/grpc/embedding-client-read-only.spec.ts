@@ -16,6 +16,7 @@ const envMock = vi.hoisted(() => ({
   EMBEDDING_INPUT_POLICY_REVISION: 'semantic-input-test-v1',
 }));
 const liveDigest = vi.hoisted(() => ({ value: 'a'.repeat(64) }));
+const providerMock = vi.hoisted(() => ({ value: 'ollama' as 'ollama' | 'llama_cpp_gguf' }));
 const embeddingFetchMock = vi.hoisted(() => vi.fn(async (url: string) => url.endsWith('/api/tags')
   ? { ok: true, json: async () => ({ models: [{ name: 'embeddinggemma:latest', digest: liveDigest.value }] }) }
   : { ok: true, json: async () => ({ embeddings: [Array(768).fill(0.03608439182435161)] }) }));
@@ -27,10 +28,15 @@ vi.mock('../env.server.js', () => ({
 vi.mock('../ollama.js', () => ({ embedOrChatFetch: embeddingFetchMock }));
 vi.mock('../embedding/embedding-provider-v1.js', async (importOriginal) => ({
   ...await importOriginal<typeof import('../embedding/embedding-provider-v1.js')>(),
-  resolveEmbeddingProviderV1: () => ({
-    provider: 'ollama', baseUrl: 'http://embedding-test.invalid', modelId: 'embeddinggemma:latest',
-    dimensions: 768, representationId: 'semantic_768',
-  }),
+  resolveEmbeddingProviderV1: () => providerMock.value === 'ollama'
+    ? ({
+      provider: 'ollama', baseUrl: 'http://embedding-test.invalid', modelId: 'embeddinggemma:latest',
+      dimensions: 768, representationId: 'semantic_768',
+    })
+    : ({
+      provider: 'llama_cpp_gguf', baseUrl: 'http://llama-test.invalid', modelId: 'embeddinggemma:latest',
+      dimensions: 768, representationId: 'semantic_768',
+    }),
 }));
 
 import { generateEmbeddings } from './embedding-client.js';
@@ -38,6 +44,7 @@ import { generateEmbeddings } from './embedding-client.js';
 describe('embedding client strict read-only cache policy', () => {
   beforeEach(() => {
     envMock.EMBEDDING_MODEL_ARTIFACT_REVISION = `sha256:${'a'.repeat(64)}`;
+    providerMock.value = 'ollama';
     liveDigest.value = 'a'.repeat(64);
     redisMock.get.mockClear();
     redisMock.set.mockClear();
@@ -109,5 +116,24 @@ describe('embedding client strict read-only cache policy', () => {
     const entry = JSON.parse(serialized);
     expect(entry.cacheIdentity.modelArtifactRevision).toBe(`sha256:${'b'.repeat(64)}`);
     expect(entry.cacheIdentity.modelArtifactRevision).not.toBe(envMock.EMBEDDING_MODEL_ARTIFACT_REVISION);
+  });
+
+  it('reports the dedicated OpenAI-compatible executor accurately', async () => {
+    providerMock.value = 'llama_cpp_gguf';
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      data: [{ embedding: Array(768).fill(0.03608439182435161) }],
+    }), { status: 200, headers: { 'content-type': 'application/json' } })));
+
+    try {
+      const result = await generateEmbeddings(['query requiring an embedding'], { executionMode: 'READ_ONLY' });
+      expect(result.source).toBe('http-openai-compatible');
+      expect(result.model).toBe('embeddinggemma-openai-compatible');
+      expect(result.attempts).toContainEqual(expect.objectContaining({
+        transport: 'http-openai-compatible',
+        status: 'success',
+      }));
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

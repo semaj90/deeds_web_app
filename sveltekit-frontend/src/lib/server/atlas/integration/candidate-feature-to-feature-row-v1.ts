@@ -21,6 +21,17 @@ import {
   isGenuineQualifiedEvidenceV1,
   type QualifiedEvidenceV1,
 } from '../execution/topk-evidence-fetch-v1.js';
+import {
+  defaultNormalizeRelativeSourceRef,
+  verifyActorWorkspaceAccessV1,
+  verifyCandidateEvidenceAdmissionV1,
+  type AccessVerificationRequest,
+  type AccessVerificationResult,
+  type ActorWorkspaceGrantProvider,
+  type CandidateEvidenceAdmissionResult,
+  type CandidateLineage,
+  type VerifyAccessOptions,
+} from '../authorization/actor-workspace-grant-v1.js';
 
 export interface PromotedPageRankAuthorityV1 extends PageRankAuthorityLike {
   runId?: string | null;
@@ -28,7 +39,6 @@ export interface PromotedPageRankAuthorityV1 extends PageRankAuthorityLike {
   status?: string | null;
   didConverge?: boolean | null;
 }
-
 export interface PromoteCandidateFeatureRowV1Input {
   candidate: CandidateFeatureRowV1;
   locator: EvidenceLocatorV1;
@@ -45,13 +55,9 @@ export interface PromoteCandidateFeatureRowV1Input {
     queryRecipe: SemanticEmbeddingRecipeV1;
     documentRecipe: SemanticEmbeddingRecipeV1;
   };
+  workspaceAdmission?: CandidateEvidenceAdmissionResult;
   rrf: number;
   freshness: number;
-  /**
-   * When true (default), strictly verifies that the PageRank data originates
-   * from a converged, promoted run matching the candidate's graphRevision.
-   */
-  requirePromoted?: boolean;
 }
 
 function normalizeSha256(value: string): string {
@@ -65,8 +71,19 @@ function normalizeSha256(value: string): string {
  * unpromoted, unconverged, corrupt, or revision-mismatched data.
  */
 export function promoteCandidateFeatureRowV1(input: PromoteCandidateFeatureRowV1Input): FeatureRowV1 {
-  const { candidate, locator, pagerank } = input;
-  const requirePromoted = input.requirePromoted ?? true;
+  const { candidate, locator, pagerank, workspaceAdmission } = input;
+
+  if (workspaceAdmission) {
+    if (!workspaceAdmission.admitted || workspaceAdmission.admissionStatus !== 'ADMITTED') {
+      throw new Error(`CANDIDATE_FEATURE_ADMISSION_BLOCKED:${workspaceAdmission.admissionStatus}:${workspaceAdmission.rejectionReason ?? 'DENIED'}`);
+    }
+    if (workspaceAdmission.sourceRef !== locator.sourceRef || workspaceAdmission.sourceRef !== candidate.sourceRef) {
+      throw new Error(`CANDIDATE_FEATURE_ADMISSION_SOURCE_REF_MISMATCH:${workspaceAdmission.sourceRef}:${locator.sourceRef}`);
+    }
+    if (workspaceAdmission.summaryUpsertAllowed !== false) {
+      throw new Error('CANDIDATE_FEATURE_SUMMARY_UPSERT_MUST_REMAIN_BLOCKED');
+    }
+  }
 
   if (candidate.canonicalId !== locator.canonicalId) {
     throw new Error(`CANDIDATE_FEATURE_CANONICAL_ID_MISMATCH:${candidate.canonicalId}:${locator.canonicalId}`);
@@ -156,6 +173,9 @@ export function promoteCandidateFeatureRowV1(input: PromoteCandidateFeatureRowV1
       throw new Error('CANDIDATE_FEATURE_AST_SPAN_OUTSIDE_VERIFIED_SOURCE_EVIDENCE');
     }
   }
+  const astEvidenceRefs = candidate.laneMask.includes('ast') || candidate.astAffinity !== null
+    ? input.astEvidence?.sourceEvidence.evidenceRefs ?? []
+    : [];
   const ontologyEvidence = (input.ontologyEvidence ?? []).map(verifyOntologyObservationTupleV1);
   for (const tuple of ontologyEvidence) {
     if (tuple.subjectCanonicalId !== candidate.canonicalId || tuple.subjectCanonicalId !== locator.canonicalId) {
@@ -219,10 +239,8 @@ export function promoteCandidateFeatureRowV1(input: PromoteCandidateFeatureRowV1
   if (pagerank.didConverge !== true) {
     throw new Error('PAGERANK_CONVERGENCE_UNVERIFIED');
   }
-  if (requirePromoted) {
-    if (pagerank.status !== 'promoted') {
-      throw new Error(`UNPROMOTED_PAGERANK_DATA_REJECTED:${pagerank.status}`);
-    }
+  if (pagerank.status !== 'promoted') {
+    throw new Error(`UNPROMOTED_PAGERANK_DATA_REJECTED:${pagerank.status}`);
   }
 
   // Resolve score via pickPageRankAuthorityScore (fails closed with PAGERANK_L1_CORRUPT_FAIL_CLOSED if corrupt)
@@ -246,6 +264,95 @@ export function promoteCandidateFeatureRowV1(input: PromoteCandidateFeatureRowV1
     freshness: input.freshness,
     crossEncoder: candidate.crossEncoderAvailable ? candidate.crossEncoderCalibratedScore : null,
     executionUtility: candidate.executionUtility ?? 0,
-    evidenceRefs: [...new Set([...candidate.evidenceRefs, ...ontologyEvidence.flatMap((tuple) => tuple.evidenceRefs)])].sort(),
+    evidenceRefs: [...new Set([
+      ...candidate.evidenceRefs,
+      ...astEvidenceRefs,
+      ...ontologyEvidence.flatMap((tuple) => tuple.evidenceRefs),
+    ])].sort(),
   });
+}
+
+export interface PromoteAuthorizedCandidateFeatureRowV1Input extends Omit<PromoteCandidateFeatureRowV1Input, 'workspaceAdmission'> {
+  accessRequest: AccessVerificationRequest;
+  grantProvider: ActorWorkspaceGrantProvider | null | undefined;
+  lineage: CandidateLineage;
+  accessOptions?: VerifyAccessOptions;
+}
+
+export interface PromoteAuthorizedCandidateFeatureRowV1Result {
+  featureRow: FeatureRowV1;
+  accessResult: AccessVerificationResult;
+  admission: CandidateEvidenceAdmissionResult;
+  summaryUpsertStatus: 'SUMMARY_UPSERT_BLOCKED';
+  canonicalAuthority: false;
+  writesPerformed: false;
+}
+
+/**
+ * ACTOR-WORKSPACE-GRANT-02: Trusted provider composition + canonical FeatureRow promotion.
+ *
+ * Enforces:
+ * 1. Independently sourced grant verification via ActorWorkspaceGrantProvider.
+ * 2. Canonical lineage gate (NES_LEGACY_LINEAGE_BLOCKED overrides even a valid grant).
+ * 3. Exact source identity, revision, and packetKey reconciliation against EvidenceLocatorV1.
+ * 4. SUMMARY_UPSERT_BLOCKED invariant (summaryUpsertAllowed=false).
+ */
+export async function promoteAuthorizedCandidateFeatureRowV1(
+  input: PromoteAuthorizedCandidateFeatureRowV1Input
+): Promise<PromoteAuthorizedCandidateFeatureRowV1Result> {
+  const normalizer = input.accessOptions?.sourceNormalizer ?? defaultNormalizeRelativeSourceRef;
+  const normalizedRequestedRef = normalizer(input.accessRequest.sourceRef);
+  const normalizedLocatorRef = normalizer(input.locator.sourceRef);
+  const normalizedLineageRef = normalizer(input.lineage.sourceRef);
+
+  const accessResult = await verifyActorWorkspaceAccessV1(
+    input.accessRequest,
+    input.grantProvider,
+    input.accessOptions
+  );
+
+  // Reconcile lineage identity and revisions against canonical locator before admitting
+  let effectiveLineage: CandidateLineage = input.lineage;
+  if (effectiveLineage.lineageType === 'CANONICAL_ATLAS_V2') {
+    if (
+      !normalizedRequestedRef ||
+      !normalizedLocatorRef ||
+      !normalizedLineageRef ||
+      normalizedRequestedRef !== normalizedLocatorRef ||
+      normalizedLineageRef !== normalizedLocatorRef ||
+      effectiveLineage.sourceRevision !== input.locator.sourceRevision ||
+      effectiveLineage.workspaceRevision !== input.locator.workspaceRevision ||
+      effectiveLineage.canonicalPacketKey !== input.locator.packetKey
+    ) {
+      effectiveLineage = {
+        ...effectiveLineage,
+        lineageType: 'UNRESOLVED',
+      };
+    }
+  }
+
+  const admission = verifyCandidateEvidenceAdmissionV1(
+    {
+      ...accessResult,
+      sourceRef: input.locator.sourceRef,
+    },
+    {
+      ...effectiveLineage,
+      sourceRef: input.locator.sourceRef,
+    }
+  );
+
+  const featureRow = promoteCandidateFeatureRowV1({
+    ...input,
+    workspaceAdmission: admission,
+  });
+
+  return {
+    featureRow,
+    accessResult,
+    admission,
+    summaryUpsertStatus: 'SUMMARY_UPSERT_BLOCKED',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
 }

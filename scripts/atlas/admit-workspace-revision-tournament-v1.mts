@@ -11,6 +11,10 @@ const argValue = (name: string) => process.argv.slice(2).find((value) => value.s
 const PREFLIGHT = resolve(ROOT, argValue('--preflight') ?? 'docs/reports/workspace-revision-tournament-source-authority-v1.json');
 const REPORT = resolve(ROOT, argValue('--report') ?? 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const REQUIRED = 'AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1';
+// Approval scope is explicit: source authority only (default) or the canonical binding write scope.
+const APPROVAL_SCOPES = ['TOURNAMENT_SOURCE_AUTHORITY_ONLY', 'CANONICAL_SOURCE_BINDING_WRITE'];
+const approvalScope = argValue('--approval-scope') ?? 'TOURNAMENT_SOURCE_AUTHORITY_ONLY';
+if (!APPROVAL_SCOPES.includes(approvalScope)) throw new Error(`APPROVAL_SCOPE_NOT_ALLOWED:${approvalScope}`);
 const confirm = process.argv.slice(2).find((value) => value.startsWith('--confirm='))?.slice('--confirm='.length)
   ?? (process.argv.includes('--confirm') ? process.argv[process.argv.indexOf('--confirm') + 1] : null);
 if (confirm !== REQUIRED) throw new Error(`EXPLICIT_CONFIRMATION_REQUIRED:${REQUIRED}`);
@@ -117,7 +121,7 @@ if (!ready) {
     manifestPath,
     manifestSha256,
     validationReceiptSha256,
-    approval: { confirmation: REQUIRED, scope: 'TOURNAMENT_SOURCE_AUTHORITY_ONLY' },
+    approval: { confirmation: REQUIRED, scope: approvalScope },
     graphifyExecutionAuthorized: false,
     projectionWritesAuthorized: false,
     autoApply: false,

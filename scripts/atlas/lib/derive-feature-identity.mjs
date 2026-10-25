@@ -238,3 +238,33 @@ export function classifyFeatureLabelStatus(identity) {
   if (identity.featureLabelConfidence >= 0.5) return 'DERIVED_PATH_FALLBACK';
   return 'GENERIC_REPLACEMENT_RECOMMENDED';
 }
+
+export function classifyFeatureLabelRevisionJoinV1({
+  packetSourceRevision,
+  packetWorkspaceRevision,
+  summaryMetadata,
+}) {
+  if (!summaryMetadata || typeof summaryMetadata !== 'object' || Array.isArray(summaryMetadata)) {
+    return 'SUMMARY_REVISION_METADATA_MISSING';
+  }
+
+  const hasRevision = (value) => typeof value === 'string' && value.trim().length > 0;
+  if (!hasRevision(packetSourceRevision) || !hasRevision(packetWorkspaceRevision)) {
+    return 'PACKET_REVISION_BINDING_MISSING';
+  }
+
+  const summarySourceRevision = summaryMetadata.source_revision;
+  const summaryWorkspaceRevision = summaryMetadata.workspace_revision;
+  if (!hasRevision(summarySourceRevision) || !hasRevision(summaryWorkspaceRevision)) {
+    return 'SUMMARY_REVISION_METADATA_INCOMPLETE';
+  }
+
+  if (
+    summarySourceRevision.trim() !== packetSourceRevision.trim() ||
+    summaryWorkspaceRevision.trim() !== packetWorkspaceRevision.trim()
+  ) {
+    return 'REVISION_METADATA_MISMATCH';
+  }
+
+  return 'REVISION_METADATA_MATCH_UNVERIFIED';
+}

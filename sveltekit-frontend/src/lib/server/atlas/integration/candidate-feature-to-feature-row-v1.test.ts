@@ -6,9 +6,11 @@ import { materializeOntologyObservationTupleV1 } from '../evidence/ontology-obse
 import { spanChecksumOf } from '../execution/topk-evidence-fetch-v1.js';
 import type { CandidateFeatureRowV1 } from '../features/candidate-feature-row-v1.js';
 import {
+  promoteAuthorizedCandidateFeatureRowV1,
   promoteCandidateFeatureRowV1 as promoteCandidateFeatureRowV1Actual,
   type PromotedPageRankAuthorityV1,
 } from './candidate-feature-to-feature-row-v1.js';
+import type { ActorWorkspaceGrantProvider, ActorWorkspaceGrantV1 } from '../authorization/actor-workspace-grant-v1.js';
 
 describe('candidate-feature-to-feature-row-v1', () => {
   const locator: EvidenceLocatorV1 = {
@@ -349,6 +351,41 @@ describe('candidate-feature-to-feature-row-v1', () => {
     })).toThrow('ONTOLOGY_OBSERVATION_TUPLE_CHECKSUM_MISMATCH');
   });
 
+  it('keeps AST source and ontology evidence aligned without changing feature scores', () => {
+    const candidate = makeCandidate();
+    const ontologyTuple = materializeOntologyObservationTupleV1({
+      subjectCanonicalId: candidate.canonicalId,
+      predicate: 'implements',
+      objectCanonicalIdOrClass: 'concept:retrieval',
+      confidence: 0.9,
+      evidenceRefs: ['ontology-evidence:retrieval'],
+      sourceRef: candidate.sourceRef!,
+      workspaceRevision: candidate.workspaceRevision,
+      sourceRevision: candidate.sourceRevision,
+      classifierRevision: 'classifier:fixture-v1',
+      ontologyRevision: 'ontology:fixture-v1',
+      producerRevision: 'producer:fixture-v1',
+      evaluationStatus: 'NOT_APPLICABLE',
+    });
+
+    const joined = promoteCandidateFeatureRowV1({
+      candidate,
+      locator,
+      pagerank: validPromotedPageRank,
+      ontologyEvidence: [ontologyTuple],
+      rrf: 0.75,
+      freshness: 0.9,
+    });
+
+    expect(joined.evidenceRefs).toEqual([
+      'evidence:chunk:01',
+      'ontology-evidence:retrieval',
+      'source-evidence:verified-fixture',
+    ]);
+    expect(joined).toMatchObject({ dense: 0.85, sparse: 0.7, ast: 0.6 });
+    expect(joined).not.toHaveProperty('feature_label');
+  });
+
   it('refuses mismatched semantic identity or incompatible query/document recipes', () => {
     const candidate = makeCandidate();
     const semanticEvidence = semanticEvidenceFor(candidate);
@@ -390,6 +427,28 @@ describe('candidate-feature-to-feature-row-v1', () => {
         freshness: 0.5,
       }),
     ).toThrow('UNPROMOTED_PAGERANK_DATA_REJECTED:passed');
+  });
+
+  it('does not allow a runtime requirePromoted=false property to bypass PageRank promotion', () => {
+    const candidate = makeCandidate();
+    const unpromotedPR: PromotedPageRankAuthorityV1 = {
+      ...validPromotedPageRank,
+      status: 'computed',
+    };
+    const input = {
+      candidate,
+      locator,
+      pagerank: unpromotedPR,
+      lexicalEvidence: lexicalEvidenceFor(candidate),
+      astEvidence: astEvidenceFor(candidate),
+      semanticEvidence: semanticEvidenceFor(candidate),
+      rrf: 0.5,
+      freshness: 0.5,
+      requirePromoted: false,
+    };
+
+    expect(() => promoteCandidateFeatureRowV1Actual(input as Parameters<typeof promoteCandidateFeatureRowV1Actual>[0]))
+      .toThrow('UNPROMOTED_PAGERANK_DATA_REJECTED:computed');
   });
 
   it('rejects PageRank runs that failed to converge', () => {
@@ -546,5 +605,167 @@ describe('candidate-feature-to-feature-row-v1', () => {
       rrf: 0.5,
       freshness: 0.5,
     })).toThrow('CANDIDATE_FEATURE_PACKET_KEY_MISMATCH::pkt:src/lib/demo.ts');
+  });
+
+  describe('ACTOR-WORKSPACE-GRANT-02: promoteAuthorizedCandidateFeatureRowV1', () => {
+    const trustedGrant: ActorWorkspaceGrantV1 = {
+      schema: 'atlas.actor-workspace-grant.v1',
+      actorId: 'usr_prosecutor_01',
+      actorType: 'USER',
+      workspaceId: 'ws_deeds_main',
+      repositoryId: 'repo_deeds_web_app',
+      permittedSourceRefs: ['src/lib/demo.ts'],
+      permittedPrefixes: ['src/lib/'],
+      grantRevision: 'grant-rev-authoritative-01',
+      status: 'GRANTED',
+      authoritativeOwner: 'rbac_ledger_v1',
+      issuedAt: '2026-10-24T00:00:00.000Z',
+      expiresAt: '2026-10-25T00:00:00.000Z',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    };
+
+    const trustedProvider: ActorWorkspaceGrantProvider = {
+      name: 'rbac_ledger_v1',
+      async getGrant(actorId, workspaceId, repositoryId) {
+        if (
+          actorId === 'usr_prosecutor_01' &&
+          workspaceId === 'ws_deeds_main' &&
+          repositoryId === 'repo_deeds_web_app'
+        ) {
+          return trustedGrant;
+        }
+        return null;
+      },
+    };
+
+    it('accepts FeatureRow promotion when both independent grant and canonical lineage match locator', async () => {
+      const candidate = makeCandidate();
+      const result = await promoteAuthorizedCandidateFeatureRowV1({
+        candidate,
+        locator,
+        pagerank: validPromotedPageRank,
+        semanticEvidence: semanticEvidenceFor(candidate),
+        lexicalEvidence: lexicalEvidenceFor(candidate),
+        astEvidence: astEvidenceFor(candidate),
+        rrf: 0.8,
+        freshness: 0.9,
+        accessRequest: {
+          actorId: 'usr_prosecutor_01',
+          workspaceId: 'ws_deeds_main',
+          repositoryId: 'repo_deeds_web_app',
+          sourceRef: 'src/lib/demo.ts',
+        },
+        grantProvider: trustedProvider,
+        lineage: {
+          candidateId: candidate.canonicalId,
+          sourceRef: locator.sourceRef,
+          lineageType: 'CANONICAL_ATLAS_V2',
+          sourceRevision: locator.sourceRevision,
+          workspaceRevision: locator.workspaceRevision,
+          canonicalPacketKey: locator.packetKey!,
+        },
+      });
+
+      expect(result.featureRow.canonicalId).toBe(locator.canonicalId);
+      expect(result.accessResult.authorized).toBe(true);
+      expect(result.accessResult.grantRevision).toBe('grant-rev-authoritative-01');
+      expect(result.admission.admitted).toBe(true);
+      expect(result.admission.admissionStatus).toBe('ADMITTED');
+      expect(result.admission.summaryUpsertAllowed).toBe(false);
+      expect(result.summaryUpsertStatus).toBe('SUMMARY_UPSERT_BLOCKED');
+      expect(result.canonicalAuthority).toBe(false);
+      expect(result.writesPerformed).toBe(false);
+    });
+
+    it('denies canonical promotion with NES_LEGACY_LINEAGE_BLOCKED even when actor grant is valid', async () => {
+      const candidate = makeCandidate();
+      await expect(
+        promoteAuthorizedCandidateFeatureRowV1({
+          candidate,
+          locator,
+          pagerank: validPromotedPageRank,
+          semanticEvidence: semanticEvidenceFor(candidate),
+          lexicalEvidence: lexicalEvidenceFor(candidate),
+          astEvidence: astEvidenceFor(candidate),
+          rrf: 0.8,
+          freshness: 0.9,
+          accessRequest: {
+            actorId: 'usr_prosecutor_01',
+            workspaceId: 'ws_deeds_main',
+            repositoryId: 'repo_deeds_web_app',
+            sourceRef: 'src/lib/demo.ts',
+          },
+          grantProvider: trustedProvider,
+          lineage: {
+            candidateId: 'nes:demo:12345678',
+            sourceRef: locator.sourceRef,
+            lineageType: 'LEGACY_NES_PROJECTION',
+          },
+        })
+      ).rejects.toThrow('CANDIDATE_FEATURE_ADMISSION_BLOCKED:NES_LEGACY_LINEAGE_BLOCKED');
+    });
+
+    it('denies canonical promotion with WORKSPACE_ADMISSION_UNPROVEN when actor or repo is unauthorized', async () => {
+      const candidate = makeCandidate();
+      await expect(
+        promoteAuthorizedCandidateFeatureRowV1({
+          candidate,
+          locator,
+          pagerank: validPromotedPageRank,
+          semanticEvidence: semanticEvidenceFor(candidate),
+          lexicalEvidence: lexicalEvidenceFor(candidate),
+          astEvidence: astEvidenceFor(candidate),
+          rrf: 0.8,
+          freshness: 0.9,
+          accessRequest: {
+            actorId: 'usr_other_actor',
+            workspaceId: 'ws_deeds_main',
+            repositoryId: 'repo_deeds_web_app',
+            sourceRef: 'src/lib/demo.ts',
+          },
+          grantProvider: trustedProvider,
+          lineage: {
+            candidateId: candidate.canonicalId,
+            sourceRef: locator.sourceRef,
+            lineageType: 'CANONICAL_ATLAS_V2',
+            sourceRevision: locator.sourceRevision,
+            workspaceRevision: locator.workspaceRevision,
+            canonicalPacketKey: locator.packetKey!,
+          },
+        })
+      ).rejects.toThrow('CANDIDATE_FEATURE_ADMISSION_BLOCKED:WORKSPACE_ADMISSION_UNPROVEN');
+    });
+
+    it('denies FeatureRow promotion when no authoritative grant provider is configured', async () => {
+      const candidate = makeCandidate();
+      await expect(
+        promoteAuthorizedCandidateFeatureRowV1({
+          candidate,
+          locator,
+          pagerank: validPromotedPageRank,
+          semanticEvidence: semanticEvidenceFor(candidate),
+          lexicalEvidence: lexicalEvidenceFor(candidate),
+          astEvidence: astEvidenceFor(candidate),
+          rrf: 0.8,
+          freshness: 0.9,
+          accessRequest: {
+            actorId: 'usr_prosecutor_01',
+            workspaceId: 'ws_deeds_main',
+            repositoryId: 'repo_deeds_web_app',
+            sourceRef: 'src/lib/demo.ts',
+          },
+          grantProvider: null,
+          lineage: {
+            candidateId: candidate.canonicalId,
+            sourceRef: locator.sourceRef,
+            lineageType: 'CANONICAL_ATLAS_V2',
+            sourceRevision: locator.sourceRevision,
+            workspaceRevision: locator.workspaceRevision,
+            canonicalPacketKey: locator.packetKey!,
+          },
+        })
+      ).rejects.toThrow('CANDIDATE_FEATURE_ADMISSION_BLOCKED:WORKSPACE_ADMISSION_UNPROVEN');
+    });
   });
 });

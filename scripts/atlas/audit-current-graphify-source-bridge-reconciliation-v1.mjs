@@ -38,11 +38,15 @@ const countBy = (rows, key) => rows.reduce((counts, row) => {
 }, {});
 
 const admission = JSON.parse(fs.readFileSync(admissionPath, 'utf8'));
-const workspaceRevision = valueFor('--workspace-revision') ?? admission.workspaceRevision ?? null;
+const explicitWorkspaceRevision = valueFor('--workspace-revision');
+const workspaceRevision = explicitWorkspaceRevision ?? admission.workspaceRevision ?? null;
 const executionId = valueFor('--execution-id');
 if (!executionId) throw new Error('CURRENT_GRAPHIFY_SOURCE_BRIDGE_EXECUTION_ID_REQUIRED');
 if (!/^sha256:[0-9a-f]{64}$/i.test(String(workspaceRevision ?? ''))) {
   throw new Error('CURRENT_GRAPHIFY_SOURCE_BRIDGE_WORKSPACE_REVISION_INVALID');
+}
+if (explicitWorkspaceRevision && explicitWorkspaceRevision !== admission.workspaceRevision) {
+  throw new Error('CURRENT_GRAPHIFY_SOURCE_BRIDGE_REVISION_DOES_NOT_MATCH_ADMITTED_SNAPSHOT');
 }
 
 const snapshotPath = path.join(root, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);

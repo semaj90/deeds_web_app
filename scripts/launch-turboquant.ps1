@@ -111,7 +111,45 @@ function Test-LlamaServerHealth {
   }
 }
 
-if ((Test-LlamaServerHealth) -and -not $PSBoundParameters.ContainsKey('StartupProfile') -and -not $env:TURBO_STARTUP_PROFILE) {
+function Test-HeadroomProxyHealth {
+  $headroomPort = $env:HEADROOM_PORT ?? 8787
+  $url = "http://127.0.0.1:${headroomPort}/livez"
+  # 1. Probe Windows host loopback first
+  try {
+    $response = Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 2 -ErrorAction Stop
+    if ($response.alive -eq $true -or $response.status -eq 'healthy') {
+      return [PSCustomObject]@{
+        Healthy = $true
+        Version = $response.version
+        Namespace = 'Windows-Host-Loopback'
+        Url = "http://127.0.0.1:${headroomPort}"
+      }
+    }
+  } catch { }
+  # 2. Probe WSL2 Ubuntu loopback (:8787 is official Headroom v0.41.0; :8795 is historical headroom-proxy.mjs)
+  try {
+    $wslRaw = & wsl.exe -d Ubuntu -u james -- curl -4 -s --connect-timeout 2 $url 2>$null
+    if ($wslRaw) {
+      $wslJson = $wslRaw | ConvertFrom-Json -ErrorAction Stop
+      if ($wslJson.alive -eq $true -or $wslJson.status -eq 'healthy') {
+        return [PSCustomObject]@{
+          Healthy = $true
+          Version = $wslJson.version
+          Namespace = 'WSL2-Ubuntu-Loopback'
+          Url = "wsl://127.0.0.1:${headroomPort}"
+        }
+      }
+    }
+  } catch { }
+  return [PSCustomObject]@{
+    Healthy = $false
+    Version = $null
+    Namespace = 'Offline'
+    Url = "http://127.0.0.1:${headroomPort}"
+  }
+}
+
+if ((Test-LlamaServerHealth) -and -not $StatusOnly -and -not $PSBoundParameters.ContainsKey('StartupProfile') -and -not $env:TURBO_STARTUP_PROFILE) {
   Write-Host "✅ llama-server is already running on :8090" -ForegroundColor Green
   Write-Host "   URL: http://127.0.0.1:8090"
   Write-Host "   Skipping launch" -ForegroundColor Cyan
@@ -898,6 +936,13 @@ Write-Host "  Batch size:       $(if ($batchSize) { $batchSize } else { 'default
 Write-Host "  UBatch size:      $(if ($ubatchSize) { $ubatchSize } else { 'default' })"
 Write-Host "  Tokens/sec:       $MeasuredTokensPerSecDisplay"
 Write-Host "  VRAM:             $MeasuredVramDisplay"
+$headroomInfo = Test-HeadroomProxyHealth
+$headroomDisplay = if ($headroomInfo.Healthy) {
+  "$($headroomInfo.Url) (ACTIVE: CCR & AST compression, v$($headroomInfo.Version))"
+} else {
+  "$($headroomInfo.Url) (INACTIVE: CCR proxy offline; start via 'headroom proxy')"
+}
+Write-Host "  Headroom Proxy:   $headroomDisplay"
 
 # Diagnostic Warnings
 if ([string]::IsNullOrWhiteSpace($ngl) -or $ngl -eq "0") {
@@ -1040,12 +1085,20 @@ if (-not $StatusOnly) {
 
 if ($StatusOnly) {
     Write-Host "--- Status Check ---" -ForegroundColor Gray
+    $headroomInfo = Test-HeadroomProxyHealth
+    if ($headroomInfo.Healthy) {
+        Write-Host "Headroom: OK (v$($headroomInfo.Version) on $($headroomInfo.Url) — CCR/AST optimization active)" -ForegroundColor Green
+    } else {
+        Write-Host "Headroom: INACTIVE (proxy offline on $($headroomInfo.Url); start via 'headroom proxy')" -ForegroundColor Yellow
+    }
     try {
         $health = Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 2
         Write-Host "Health: OK (status: $($health.status))" -ForegroundColor Green
         $null = Write-TurboLaunchStatus ([ordered]@{
             status = 'ok'
             port = $port
+            headroom_url = $headroomInfo.Url
+            headroom_healthy = [bool]$headroomInfo.Healthy
             model = $model
             draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
             speculative = [bool]$TurboSpeculative

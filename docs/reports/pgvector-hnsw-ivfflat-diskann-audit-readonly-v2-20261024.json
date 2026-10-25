@@ -1,0 +1,1480 @@
+{
+  "schema": "atlas.pgvector-hnsw-ivfflat-diskann-audit.v1",
+  "generatedAt": "2026-10-24T23:27:06.951963+00:00",
+  "readOnlyTransaction": true,
+  "server": {
+    "version": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "versionNum": "180004",
+    "ioMethod": "worker",
+    "effectiveIoConcurrency": "16"
+  },
+  "relevantColumns": [
+    {
+      "table": "atlas_domain_ontology",
+      "column": "id",
+      "dataType": "uuid",
+      "udtName": "uuid"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "group_id",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "group_label",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "parent_group_id",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "description",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "taxonomy_level",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "confidence",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "examples",
+      "dataType": "ARRAY",
+      "udtName": "_text"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "created_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "column": "updated_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "normalized_path",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "source_ref",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "feature_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "related_feature_ids",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "cluster_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "centroid_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "som_cluster",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "qdrant_point_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "lane_ids",
+      "dataType": "ARRAY",
+      "udtName": "_text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "packet_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "indexed_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "id",
+      "dataType": "uuid",
+      "udtName": "uuid"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "qdrant_id",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "relative_path",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "symbol",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kind",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "line_start",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "line_end",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content_embedding",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "gpu_cluster",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "som_cluster",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "page_rank_score",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "community_id",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "tags",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "neo4j_meta",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "indexed_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "enriched_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "updated_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "cluster_summary",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "summary_embedding",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "signature_embedding",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "domain",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "language",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "extension",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_model",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "summary_model",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "summary",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "metadata",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "semantic_tags",
+      "dataType": "ARRAY",
+      "udtName": "_text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "som_bmu_row",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "som_bmu_col",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "manifold4",
+      "dataType": "ARRAY",
+      "udtName": "_float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "chunk_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "repo_id",
+      "dataType": "uuid",
+      "udtName": "uuid"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content_hash",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "token_count",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "neo4j_gpu_cluster",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "output_meta",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "summary_embedding_384",
+      "dataType": "USER-DEFINED",
+      "udtName": "vector"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_dimension",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_normalized",
+      "dataType": "boolean",
+      "udtName": "bool"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "source_ref",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent_64",
+      "dataType": "USER-DEFINED",
+      "udtName": "vector"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent64_model",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent64_meta",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent64_validated_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent64_msgpack",
+      "dataType": "bytea",
+      "udtName": "bytea"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_eligible",
+      "dataType": "boolean",
+      "udtName": "bool"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "summary_hash",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_version",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_dtype",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_created_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "encoder_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent_embedding_valid",
+      "dataType": "boolean",
+      "udtName": "bool"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent_embedding_validated_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "search_vector",
+      "dataType": "tsvector",
+      "udtName": "tsvector"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_symbols",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_imports",
+      "dataType": "ARRAY",
+      "udtName": "_text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_exports",
+      "dataType": "ARRAY",
+      "udtName": "_text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_facts_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_cluster",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "centroid_distance",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "second_cluster_id",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "second_distance",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "cluster_margin",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_model_version",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_assigned_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_vector_contract",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_cluster",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_distance",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_second_id",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_second_dist",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_margin",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_model_version",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_assigned_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_distance",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content_embedding_768",
+      "dataType": "USER-DEFINED",
+      "udtName": "vector"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "centroid_id",
+      "dataType": "uuid",
+      "udtName": "uuid"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "reconstruction_error",
+      "dataType": "real",
+      "udtName": "float4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "routing_tier",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent_256",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent_256_checkpoint_revision",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_256",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_256_checkpoint_revision",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_64",
+      "dataType": "USER-DEFINED",
+      "udtName": "vector"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent64_model",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_valid",
+      "dataType": "boolean",
+      "udtName": "bool"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_validated_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "latent_128",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_128",
+      "dataType": "USER-DEFINED",
+      "udtName": "halfvec"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "file_content_hash",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content_hash_scope",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content_hash_algorithm",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content_hash_length",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "content_hash_version",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "workspace_revision",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "source_revision",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "representation_revision",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "lineage_binding_checksum",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "lineage_producer_revision",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "summary_provenance",
+      "dataType": "jsonb",
+      "udtName": "jsonb"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "summary_text",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "domain_id",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "id",
+      "dataType": "uuid",
+      "udtName": "uuid"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "label",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "domain_id",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "version",
+      "dataType": "integer",
+      "udtName": "int4"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "is_active",
+      "dataType": "boolean",
+      "udtName": "bool"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "description",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "parent_domain_id",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "deprecated_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "deprecation_reason",
+      "dataType": "text",
+      "udtName": "text"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "replaced_by",
+      "dataType": "character varying",
+      "udtName": "varchar"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "created_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    },
+    {
+      "table": "domain_taxonomy_v1",
+      "column": "updated_at",
+      "dataType": "timestamp with time zone",
+      "udtName": "timestamptz"
+    }
+  ],
+  "representativePlans": [
+    {
+      "name": "codebase_source_ref_bounded_read",
+      "sql": "SELECT source_ref FROM public.codebase_chunk_index WHERE source_ref IS NOT NULL LIMIT 10",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 0.42,
+            "Total Cost": 1.13,
+            "Plan Rows": 10,
+            "Plan Width": 61,
+            "Disabled": false,
+            "Plans": [
+              {
+                "Node Type": "Index Only Scan",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Scan Direction": "Forward",
+                "Index Name": "idx_codebase_chunk_source_ref",
+                "Relation Name": "codebase_chunk_index",
+                "Alias": "codebase_chunk_index",
+                "Startup Cost": 0.42,
+                "Total Cost": 19093.81,
+                "Plan Rows": 268217,
+                "Plan Width": 61,
+                "Disabled": false,
+                "Index Cond": "(source_ref IS NOT NULL)"
+              }
+            ]
+          },
+          "Settings": {}
+        }
+      ]
+    },
+    {
+      "name": "codebase_semantic_768_topk",
+      "sql": "SELECT id FROM public.codebase_chunk_index WHERE content_embedding_768 IS NOT NULL ORDER BY content_embedding_768 <=> $query_vector::vector LIMIT 10",
+      "plan": [
+        {
+          "Plan": {
+            "Node Type": "Limit",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Startup Cost": 1372.2,
+            "Total Cost": 1404.76,
+            "Plan Rows": 10,
+            "Plan Width": 24,
+            "Disabled": false,
+            "Plans": [
+              {
+                "Node Type": "Index Scan",
+                "Parent Relationship": "Outer",
+                "Parallel Aware": false,
+                "Async Capable": false,
+                "Scan Direction": "Forward",
+                "Index Name": "idx_codebase_chunk_content_embedding_768_hnsw",
+                "Relation Name": "codebase_chunk_index",
+                "Alias": "codebase_chunk_index",
+                "Startup Cost": 1372.2,
+                "Total Cost": 796742.5,
+                "Plan Rows": 244278,
+                "Plan Width": 24,
+                "Disabled": false,
+                "Order By": "(content_embedding_768 <=> '[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]'::vector)",
+                "Filter": "(content_embedding_768 IS NOT NULL)"
+              }
+            ]
+          },
+          "Settings": {}
+        }
+      ]
+    }
+  ],
+  "authorityNote": "Diagnostic read-only catalog receipt; does not mutate indexes or promote retrieval lanes.",
+  "installedExtensions": [
+    {
+      "extname": "pg_search",
+      "extversion": "0.25.1"
+    },
+    {
+      "extname": "pg_trgm",
+      "extversion": "1.6"
+    },
+    {
+      "extname": "pgcrypto",
+      "extversion": "1.4"
+    },
+    {
+      "extname": "plpgsql",
+      "extversion": "1.0"
+    },
+    {
+      "extname": "uuid-ossp",
+      "extversion": "1.1"
+    },
+    {
+      "extname": "vector",
+      "extversion": "0.8.3"
+    }
+  ],
+  "availableVectorExtensions": [
+    {
+      "name": "pg_search",
+      "defaultVersion": "0.25.1",
+      "installedVersion": "0.25.1",
+      "comment": "pg_search: Full text search for PostgreSQL using BM25"
+    },
+    {
+      "name": "vector",
+      "defaultVersion": "0.8.3",
+      "installedVersion": "0.8.3",
+      "comment": "vector data type and ivfflat and hnsw access methods"
+    }
+  ],
+  "diskannAndVamanaStatus": {
+    "pgvectorscale_installed": false,
+    "pg_diskann_installed": false,
+    "pgvectorscale_available_in_image": false,
+    "pg_diskann_available_in_image": false,
+    "pgvector_version": "0.8.3"
+  },
+  "summaryCounts": {
+    "totalVectorIndexes": 36,
+    "hnswCount": 34,
+    "ivfflatCount": 2,
+    "fp32VectorCount": 27,
+    "fp16HalfvecCount": 9,
+    "findingsCount": 5
+  },
+  "findings": [
+    {
+      "findingCode": "HNSW_EF_CONSTRUCTION_DRIFT",
+      "severity": "MEDIUM",
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "columnName": "content_embedding_768",
+      "observedOptions": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "targetOptions": {
+        "m": "16",
+        "ef_construction": "200"
+      },
+      "detail": "idx_codebase_chunk_content_embedding_768_hnsw on canonical content_embedding_768 has ef_construction=64 (target specification is ef_construction=200)."
+    },
+    {
+      "findingCode": "DUPLICATE_HNSW_INDEX",
+      "severity": "MEDIUM",
+      "tablename": "agent_observations",
+      "columnName": "hnsw_embedding",
+      "indexes": [
+        "idx_agent_observations_hnsw",
+        "idx_agent_observations_hnsw_768"
+      ],
+      "detail": "agent_observations.hnsw_embedding has 2 duplicate HNSW indexes: idx_agent_observations_hnsw, idx_agent_observations_hnsw_768"
+    },
+    {
+      "findingCode": "LEGACY_IVFFLAT_ONLY",
+      "severity": "LOW",
+      "tablename": "chat_embeddings",
+      "columnName": "embedding",
+      "indexes": [
+        "idx_chat_embeddings_embedding"
+      ],
+      "observedOptions": {
+        "lists": "50"
+      },
+      "detail": "chat_embeddings.embedding uses legacy IVFFlat ({'lists': '50'}) without an HNSW index."
+    },
+    {
+      "findingCode": "REDUNDANT_IVFFLAT_AND_HNSW_COEXISTENCE",
+      "severity": "MEDIUM",
+      "tablename": "cluster_summaries",
+      "columnName": "summary_embedding",
+      "indexes": [
+        "cluster_summaries_embedding_hnsw",
+        "idx_cluster_summaries_embedding_ivfflat"
+      ],
+      "detail": "cluster_summaries.summary_embedding maintains both a legacy IVFFlat index and an HNSW index, doubling write amplification without recall benefit."
+    },
+    {
+      "findingCode": "MIXED_FP32_VECTOR_AND_FP16_HALFVEC_INDEXES",
+      "severity": "INFO",
+      "tablename": "codebase_chunk_index",
+      "fp32VectorColumns": [
+        "content_embedding_768",
+        "error_embedding_latent_64",
+        "latent_64"
+      ],
+      "fp16HalfvecColumns": [
+        "content_embedding",
+        "error_embedding",
+        "error_embedding_latent_128",
+        "error_embedding_latent_256",
+        "latent_128",
+        "latent_256",
+        "summary_embedding"
+      ],
+      "detail": "codebase_chunk_index mixes fp32 vector_cosine_ops (canonical content_embedding_768, latent_64) and fp16 halfvec_cosine_ops (content_embedding, summary_embedding, error_embedding, latent_128, latent_256). Canonical semantic_768 remains fp32 vector_cosine_ops."
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "agent_observations",
+      "indexname": "idx_agent_observations_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "hnsw_embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX idx_agent_observations_hnsw ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "agent_observations",
+      "indexname": "idx_agent_observations_hnsw_768",
+      "accessMethod": "hnsw",
+      "columnName": "hnsw_embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX idx_agent_observations_hnsw_768 ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "atlas_class_search_index_v1",
+      "indexname": "atlas_class_search_index_v1_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX atlas_class_search_index_v1_embedding_hnsw ON public.atlas_class_search_index_v1 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64') WHERE (embedding IS NOT NULL)"
+    },
+    {
+      "tablename": "atlas_embeddings_384",
+      "indexname": "idx_ae384_content_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "128"
+      },
+      "indexdef": "CREATE INDEX idx_ae384_content_hnsw ON public.atlas_embeddings_384 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='128') WHERE ((vector_role = 'content'::text) AND (normalized = true))"
+    },
+    {
+      "tablename": "atlas_external_doc_chunks",
+      "indexname": "aedc_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "content_embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX aedc_embedding_hnsw ON public.atlas_external_doc_chunks USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "atlas_feature_embeddings",
+      "indexname": "atlas_feature_embeddings_hnsw_cosine_idx",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {},
+      "indexdef": "CREATE INDEX atlas_feature_embeddings_hnsw_cosine_idx ON public.atlas_feature_embeddings USING hnsw (embedding vector_cosine_ops)"
+    },
+    {
+      "tablename": "atlas_packet_registry",
+      "indexname": "idx_packet_embedding_cosine",
+      "accessMethod": "hnsw",
+      "columnName": "embedding_768d",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {},
+      "indexdef": "CREATE INDEX idx_packet_embedding_cosine ON public.atlas_packet_registry USING hnsw (embedding_768d vector_cosine_ops)"
+    },
+    {
+      "tablename": "atlas_relationship_embeddings",
+      "indexname": "atlas_relationship_embeddings_hnsw_cosine_idx",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {},
+      "indexdef": "CREATE INDEX atlas_relationship_embeddings_hnsw_cosine_idx ON public.atlas_relationship_embeddings USING hnsw (embedding vector_cosine_ops)"
+    },
+    {
+      "tablename": "chat_embeddings",
+      "indexname": "idx_chat_embeddings_embedding",
+      "accessMethod": "ivfflat",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "lists": "50"
+      },
+      "indexdef": "CREATE INDEX idx_chat_embeddings_embedding ON public.chat_embeddings USING ivfflat (embedding vector_cosine_ops) WITH (lists='50')"
+    },
+    {
+      "tablename": "cluster_summaries",
+      "indexname": "cluster_summaries_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "summary_embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX cluster_summaries_embedding_hnsw ON public.cluster_summaries USING hnsw (summary_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "cluster_summaries",
+      "indexname": "idx_cluster_summaries_embedding_ivfflat",
+      "accessMethod": "ivfflat",
+      "columnName": "summary_embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "lists": "5"
+      },
+      "indexdef": "CREATE INDEX idx_cluster_summaries_embedding_ivfflat ON public.cluster_summaries USING ivfflat (summary_embedding vector_cosine_ops) WITH (lists='5')"
+    },
+    {
+      "tablename": "code_retrieval_chunks",
+      "indexname": "crc_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX crc_embedding_hnsw ON public.code_retrieval_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "codebase_chunk_eg2_embeddings",
+      "indexname": "codebase_chunk_eg2_embeddings_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {
+        "m": "16",
+        "ef_construction": "200"
+      },
+      "indexdef": "CREATE INDEX codebase_chunk_eg2_embeddings_hnsw ON public.codebase_chunk_eg2_embeddings USING hnsw (embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "codebase_chunk_index_content_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "content_embedding",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {
+        "m": "16",
+        "ef_construction": "200"
+      },
+      "indexdef": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "content_embedding_768",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_error_embedding_768_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "error_embedding",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64') WHERE (error_embedding IS NOT NULL)"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "error_embedding_latent_64",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {},
+      "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "error_embedding_latent_128",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {},
+      "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_128 halfvec_cosine_ops) WHERE (error_embedding_latent_128 IS NOT NULL)"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "error_embedding_latent_256",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {},
+      "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_256 halfvec_cosine_ops) WHERE (error_embedding_latent_256 IS NOT NULL)"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_latent64_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "latent_64",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {},
+      "indexdef": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_latent_128_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "latent_128",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {},
+      "indexdef": "CREATE INDEX idx_codebase_chunk_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (latent_128 halfvec_cosine_ops) WHERE (latent_128 IS NOT NULL)"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_latent_256_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "latent_256",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {},
+      "indexdef": "CREATE INDEX idx_codebase_chunk_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (latent_256 halfvec_cosine_ops) WHERE (latent_256 IS NOT NULL)"
+    },
+    {
+      "tablename": "codebase_chunk_index",
+      "indexname": "idx_codebase_chunk_summary_embedding_768_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "summary_embedding",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {
+        "m": "16",
+        "ef_construction": "200"
+      },
+      "indexdef": "CREATE INDEX idx_codebase_chunk_summary_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200') WHERE (summary_embedding IS NOT NULL)"
+    },
+    {
+      "tablename": "document_embeddings",
+      "indexname": "document_embeddings_hnsw_idx",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX document_embeddings_hnsw_idx ON public.document_embeddings USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "embedded_summaries",
+      "indexname": "idx_embedded_summaries_vector_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX idx_embedded_summaries_vector_hnsw ON public.embedded_summaries USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "embedding_cache",
+      "indexname": "embedding_cache_hnsw_idx",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX embedding_cache_hnsw_idx ON public.embedding_cache USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "evidence_vectors",
+      "indexname": "evidence_vectors_hnsw_idx",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX evidence_vectors_hnsw_idx ON public.evidence_vectors USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "fixer_patterns",
+      "indexname": "fp_embedding_hnsw_idx",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX fp_embedding_hnsw_idx ON public.fixer_patterns USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "legal_chunks",
+      "indexname": "legal_chunks_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "200"
+      },
+      "indexdef": "CREATE INDEX legal_chunks_embedding_hnsw ON public.legal_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "tablename": "legal_documents",
+      "indexname": "legal_documents_hnsw_idx",
+      "accessMethod": "hnsw",
+      "columnName": "content_embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX legal_documents_hnsw_idx ON public.legal_documents USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "nes_chrom_packets",
+      "indexname": "nes_chrom_packets_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {},
+      "indexdef": "CREATE INDEX nes_chrom_packets_embedding_hnsw ON public.nes_chrom_packets USING hnsw (embedding vector_cosine_ops)"
+    },
+    {
+      "tablename": "rag_query_log",
+      "indexname": "rag_query_log_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "query_embedding",
+      "operatorClass": "halfvec_cosine_ops",
+      "precisionLane": "fp16_halfvec",
+      "options": {
+        "m": "16",
+        "ef_construction": "200"
+      },
+      "indexdef": "CREATE INDEX rag_query_log_embedding_hnsw ON public.rag_query_log USING hnsw (query_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "tablename": "research_summaries",
+      "indexname": "rs_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX rs_embedding_hnsw ON public.research_summaries USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "screenshot_artifacts",
+      "indexname": "screenshot_artifacts_caption_embedding_hnsw_idx",
+      "accessMethod": "hnsw",
+      "columnName": "caption_embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX screenshot_artifacts_caption_embedding_hnsw_idx ON public.screenshot_artifacts USING hnsw (caption_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "tool_registry",
+      "indexname": "tool_registry_embedding_hnsw",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX tool_registry_embedding_hnsw ON public.tool_registry USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "tablename": "warden_chunks",
+      "indexname": "warden_chunks_hnsw_idx",
+      "accessMethod": "hnsw",
+      "columnName": "embedding",
+      "operatorClass": "vector_cosine_ops",
+      "precisionLane": "fp32_vector",
+      "options": {
+        "m": "16",
+        "ef_construction": "64"
+      },
+      "indexdef": "CREATE INDEX warden_chunks_hnsw_idx ON public.warden_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    }
+  ],
+  "receiptChecksum": "sha256:6bc87dbbd900297d5d66f1fe592df70a1e36f8e618ddf5c443ae4128811550da"
+}

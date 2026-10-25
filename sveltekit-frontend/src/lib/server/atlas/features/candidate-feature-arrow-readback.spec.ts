@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
+import { resolve } from 'node:path';
 
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
@@ -171,6 +173,66 @@ describe('candidate feature Arrow file readback', () => {
     expect(readback.rows[1]?.features.lexicalRelevance).toEqual({ value: 0, present: false });
     // Row 0 memory utility is a real zero: physical zero plus presence=true.
     expect(readback.rows[1]?.features.memoryUtility).toEqual({ value: 0, present: true });
+  });
+
+  it('proves read-only Python OS-mmap Arrow parity against the same frozen fixture', async () => {
+    const { dir, arrowPath, columnar, serialized } = await writeFixture();
+    const artifactPath = path.join(dir, 'artifact.json');
+    const expectedPath = path.join(dir, 'expected-columnar.json');
+    await fs.writeFile(artifactPath, JSON.stringify({ ...serialized.artifact, locator: { storage: 'ARROW_IPC', path: arrowPath } }));
+    await fs.writeFile(expectedPath, JSON.stringify(columnar));
+
+    const repoRoot = resolve(process.cwd(), '..');
+    const scriptPath = resolve(repoRoot, 'scripts/atlas/prove-candidate-feature-arrow-mmap.py');
+    const configuredPython = process.env.ATLAS_PYTHON_EXECUTABLE;
+    const python = configuredPython ?? (process.platform === 'win32' ? 'py' : 'python3');
+    const args = configuredPython
+      ? [scriptPath, `--artifact=${artifactPath}`, `--expected=${expectedPath}`, '--features=semanticRelevance,lexicalRelevance,memoryUtility', '--ordinals=1,0']
+      : process.platform === 'win32'
+        ? ['-3.13', scriptPath, `--artifact=${artifactPath}`, `--expected=${expectedPath}`, '--features=semanticRelevance,lexicalRelevance,memoryUtility', '--ordinals=1,0']
+        : [scriptPath, `--artifact=${artifactPath}`, `--expected=${expectedPath}`, '--features=semanticRelevance,lexicalRelevance,memoryUtility', '--ordinals=1,0'];
+    const result = spawnSync(python, args, { cwd: repoRoot, encoding: 'utf8', timeout: 30000 });
+
+    expect(result.error?.message).toBeUndefined();
+    expect(result.status, result.stderr).toBe(0);
+    const receipt = JSON.parse(result.stdout) as {
+      status: string;
+      osMmap: boolean;
+      mmapAccess: string;
+      arrowReadbackProven: boolean;
+      expectedColumnarVerified: boolean;
+      ordinalMapChecksum: string;
+      selectedRows: Array<{ candidateOrdinal: number; canonicalId: string; features: Record<string, { value: number; present: boolean }> }>;
+    };
+    expect(receipt).toMatchObject({
+      status: 'CANDIDATE_FEATURE_ARROW_MMAP_PROVEN',
+      osMmap: true,
+      mmapAccess: 'READ_ONLY',
+      arrowReadbackProven: true,
+      arrowReadMode: 'PYARROW_READ_ONLY_MMAP',
+      expectedColumnarVerified: true,
+      ordinalMapChecksum: columnar.ordinalMapChecksum,
+    });
+    expect(receipt.selectedRows).toEqual([
+      {
+        candidateOrdinal: 1,
+        canonicalId: 'candidate:b',
+        features: {
+          semanticRelevance: { value: 0.25, present: true },
+          lexicalRelevance: { value: 0, present: true },
+          memoryUtility: { value: 0, present: false },
+        },
+      },
+      {
+        candidateOrdinal: 0,
+        canonicalId: 'candidate:a',
+        features: {
+          semanticRelevance: { value: 1, present: true },
+          lexicalRelevance: { value: 0, present: false },
+          memoryUtility: { value: 0, present: true },
+        },
+      },
+    ]);
   });
 
   it('fails closed when immutable artifact bytes are corrupted after materialization', async () => {

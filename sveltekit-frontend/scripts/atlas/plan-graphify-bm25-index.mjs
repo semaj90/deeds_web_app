@@ -12,6 +12,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
+import { buildGraphifyBm25CandidatePlanV1, parseGraphifyBm25PlanLimitV1 } from './lib/graphify-bm25-candidate-plan-v1.mjs';
 
 await loadAtlasEnv();
 
@@ -21,8 +22,7 @@ const output = path.resolve(
   REPO_ROOT,
   process.env.ATLAS_BM25_INDEX_PLAN_OUT ?? 'docs/reports/graphify-bm25-index-plan.json',
 );
-const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
-const limit = Math.max(1, Math.min(100, Number(limitArg?.split('=')[1] ?? 10)));
+const limit = parseGraphifyBm25PlanLimitV1(process.argv.slice(2));
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) throw new Error('DATABASE_URL_REQUIRED');
@@ -63,18 +63,7 @@ try {
       [limit],
     );
     report.status = 'BM25_INDEX_PLAN_READY';
-    report.candidates = result.rows.map((row) => ({
-      graphifyRunId: row.graphify_run_id,
-      workflowId: row.workflow_id,
-      workspaceRevision: row.workspace_revision,
-      sourceManifestDigest: row.source_manifest_digest,
-      sourceManifestSourceCount: row.source_manifest_source_count,
-      repositoryRevision: row.repository_revision,
-      parameters: row.parameters,
-      graphifyCompletedAt: row.graphify_completed_at,
-      idempotencyKey: row.workflow_id + ':postgres_tsvector_english:' + row.source_manifest_digest,
-      nextAction: 'CREATE_INDEX_RUN_ULID_THEN_CLAIM_LEASE',
-    }));
+    report.candidates = result.rows.map(buildGraphifyBm25CandidatePlanV1);
     if (report.candidates.length === 0) report.blockers.push('no_completed_graphify_candidates');
   }
   await pool.query('ROLLBACK');

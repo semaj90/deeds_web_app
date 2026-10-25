@@ -46,6 +46,7 @@ from atlas_structural_provenance import (
 )
 from atlas_treesitter_span_compat import resolve_chunk_byte_span
 from atlas_ast_chunk_helpers_v1 import AstChunkHelperAnalysisV1, build_ast_chunk_helper_analysis_v1
+from atlas_domain_candidate_helper_v1 import bind_candidate_record
 
 _RUNTIME_MODULE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 _LEGACY_MODULE_SHA256 = hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest()
@@ -141,6 +142,44 @@ class WebEvidenceResponseV1(BaseModel):
     writes_performed: Literal[False] = False
 
 
+class OaklibCandidateRequestV1(BaseModel):
+    external_ids: list[str] = Field(..., min_length=1, max_length=32)
+
+    model_config = {"extra": "forbid"}
+
+
+class OaklibCandidateResponseV1(BaseModel):
+    schema_: Literal["atlas.oaklib-candidate-response.v1"] = Field(alias="schema")
+    status: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
+    ontology_revision: str = Field(alias="ontologyRevision")
+    producer_revision: str = Field(alias="producerRevision")
+    candidates: dict[str, Any]
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
+class OaklibLabelSearchRequestV1(BaseModel):
+    terms: list[str] = Field(..., min_length=1, max_length=16)
+    max_candidates_per_term: int = Field(default=8, alias="maxCandidatesPerTerm", ge=1, le=16)
+
+    model_config = {"extra": "forbid", "populate_by_name": True}
+
+
+class OaklibLabelSearchResponseV1(BaseModel):
+    schema_: Literal["atlas.oaklib-label-search-response.v1"] = Field(alias="schema")
+    status: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
+    ontology_revision: str = Field(alias="ontologyRevision")
+    producer_revision: str = Field(alias="producerRevision")
+    matches: list[dict[str, Any]]
+    candidate_bundle: dict[str, Any] = Field(alias="candidateBundle")
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
 @asynccontextmanager
 async def lifespan(_app):
     try:
@@ -174,6 +213,66 @@ async def request_timer(request: Request, call_next):
     response.headers["x-nlp-sidecar-request-id"] = request.headers.get("x-request-id", "")
     response.headers["x-atlas-sidecar-contract"] = "provenance-v2"
     return response
+
+
+def _configured_oaklib_resource() -> tuple[Path, str]:
+    root_value = os.environ.get("ATLAS_OAKLIB_ONTOLOGY_ROOT", "").strip()
+    file_value = os.environ.get("ATLAS_OAKLIB_ONTOLOGY_FILE", "").strip()
+    if not root_value or not file_value:
+        raise HTTPException(status_code=503, detail="OAKLIB_SOURCE_NOT_CONFIGURED")
+
+    try:
+        root = Path(root_value).resolve(strict=True)
+        relative = Path(file_value)
+        if relative.is_absolute():
+            raise ValueError("ontology file must be relative to its configured root")
+        resource = (root / relative).resolve(strict=True)
+        if not root.is_dir() or not resource.is_relative_to(root) or not resource.is_file():
+            raise ValueError("ontology file is outside the configured root")
+        if resource.suffix.lower() not in {".obo", ".owl", ".rdf", ".ttl", ".ofn"}:
+            raise ValueError("unsupported ontology file type")
+        if resource.stat().st_size > 64 * 1024 * 1024:
+            raise ValueError("ontology file exceeds the 64 MiB limit")
+        source_bytes = resource.read_bytes()
+        source_text = source_bytes.decode("utf-8", errors="strict")
+        if re.search(r"(?im)^\s*import\s*:|owl:imports|<[^>]*imports?\b", source_text):
+            raise ValueError("ontology imports are not allowed")
+        digest = hashlib.sha256(source_bytes).hexdigest()
+    except (OSError, ValueError) as exc:
+        logging.getLogger(__name__).warning("Configured OAKLIB source refused: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_SOURCE_INVALID") from None
+
+    return resource, f"sha256:{digest}"
+
+
+def _load_oaklib_candidates(
+    *, resource_selector: str, subjects: list[str], ontology_revision: str, producer_revision: str
+) -> dict[str, Any]:
+    from parent_atlas_ontology.oaklib_external_adapter import load_oaklib_candidate_bundle_v1
+
+    return load_oaklib_candidate_bundle_v1(
+        resource_selector=resource_selector,
+        source_selector="atlas-local-ontology",
+        subjects=subjects,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+    ).to_dict()
+
+
+def _search_oaklib_labels(
+    *, resource_selector: str, terms: list[str], ontology_revision: str,
+    producer_revision: str, max_candidates_per_term: int
+) -> dict[str, Any]:
+    from parent_atlas_ontology.oaklib_external_adapter import load_oaklib_label_candidates_v1
+
+    return load_oaklib_label_candidates_v1(
+        resource_selector=resource_selector,
+        source_selector="atlas-local-ontology",
+        terms=terms,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        max_candidates_per_term=max_candidates_per_term,
+    )
 
 
 def _native_grounded_extractions(
@@ -1477,6 +1576,109 @@ def health() -> dict[str, Any]:
     return result
 
 
+@app.post("/ontology/oaklib/candidates", response_model=OaklibCandidateResponseV1)
+def oaklib_candidates(req: OaklibCandidateRequestV1) -> OaklibCandidateResponseV1:
+    subjects = [value.strip() for value in req.external_ids]
+    if any(not value or len(value) > 256 or any(ord(char) < 32 for char in value) for value in subjects):
+        raise HTTPException(status_code=422, detail="OAKLIB_EXTERNAL_ID_INVALID")
+    if len(set(subjects)) != len(subjects):
+        raise HTTPException(status_code=422, detail="OAKLIB_EXTERNAL_IDS_DUPLICATED")
+
+    resource, ontology_revision = _configured_oaklib_resource()
+    producer_revision = f"miniforge-nlp-sidecar-v2:sha256:{_RUNTIME_MODULE_SHA256}"
+    try:
+        candidates = _load_oaklib_candidates(
+            resource_selector=str(resource),
+            subjects=subjects,
+            ontology_revision=ontology_revision,
+            producer_revision=producer_revision,
+        )
+    except ImportError:
+        raise HTTPException(status_code=503, detail="OAKLIB_DEPENDENCY_UNAVAILABLE") from None
+    except Exception as exc:
+        logging.getLogger(__name__).warning("OAKLIB candidate read failed: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_CANDIDATE_READ_UNAVAILABLE") from None
+
+    return OaklibCandidateResponseV1(
+        schema="atlas.oaklib-candidate-response.v1",
+        status="PROPOSAL_ONLY",
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        candidates=candidates,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
+@app.post("/ontology/oaklib/search", response_model=OaklibLabelSearchResponseV1)
+def oaklib_label_search(req: OaklibLabelSearchRequestV1) -> OaklibLabelSearchResponseV1:
+    terms = [value.strip() for value in req.terms]
+    if any(not value or len(value) > 256 or any(ord(char) < 32 for char in value) for value in terms):
+        raise HTTPException(status_code=422, detail="OAKLIB_SEARCH_TERM_INVALID")
+
+    resource, ontology_revision = _configured_oaklib_resource()
+    producer_revision = f"miniforge-nlp-sidecar-v2:sha256:{_RUNTIME_MODULE_SHA256}"
+    try:
+        result = _search_oaklib_labels(
+            resource_selector=str(resource),
+            terms=terms,
+            ontology_revision=ontology_revision,
+            producer_revision=producer_revision,
+            max_candidates_per_term=req.max_candidates_per_term,
+        )
+    except ImportError:
+        raise HTTPException(status_code=503, detail="OAKLIB_DEPENDENCY_UNAVAILABLE") from None
+    except Exception as exc:
+        logging.getLogger(__name__).warning("OAKLIB label search refused: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_LABEL_SEARCH_UNAVAILABLE") from None
+
+    matches = result.pop("matches", [])
+    return OaklibLabelSearchResponseV1(
+        schema="atlas.oaklib-label-search-response.v1",
+        status="PROPOSAL_ONLY",
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        matches=matches,
+        candidate_bundle=result,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
+class DomainCandidateBindRequestV1(BaseModel):
+    schema_: Optional[str] = Field(default=None, alias="schema")
+    packetKey: Optional[str] = None
+    sourceRef: str = Field(min_length=1)
+    sourceRevision: Optional[str] = None
+    featureLabel: Optional[str] = None
+    textEvidence: str = ""
+    selectionSignalDomain: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
+
+
+class DomainCandidateBindResponseV1(BaseModel):
+    schema_: Literal["atlas.domain-calibration-bound-candidate.v1"] = Field(
+        alias="schema", default="atlas.domain-calibration-bound-candidate.v1"
+    )
+    candidate: dict[str, Any]
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
+@app.post("/domain/candidate/bind", response_model=DomainCandidateBindResponseV1)
+def bind_domain_candidate(req: DomainCandidateBindRequestV1) -> DomainCandidateBindResponseV1:
+    workspace_root = Path(os.getenv("WORKSPACE_ROOT", "."))
+    bound = bind_candidate_record(req.model_dump(by_alias=True), workspace_root)
+    return DomainCandidateBindResponseV1(
+        candidate=bound,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
 @app.get("/capabilities")
 def capabilities() -> dict[str, Any]:
     result = dict(legacy.capabilities())
@@ -1486,6 +1688,33 @@ def capabilities() -> dict[str, Any]:
         "langextractCharInterval": True,
         "langextractAlignmentStatus": True,
         "canonicalIdentityAuthority": False,
+    }
+    result["domainCandidateBinding"] = {
+        "endpoint": "/domain/candidate/bind",
+        "helper": "atlas_domain_candidate_helper_v1",
+        "status": "AVAILABLE",
+        "schema": "atlas.domain-calibration-example.v1",
+        "sourceRevisionRequired": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    result["ontologyCandidateResolution"] = {
+        "endpoint": "/ontology/oaklib/candidates",
+        "status": "OPTIONAL_LOCAL_SOURCE_REQUIRED",
+        "requestSchema": "atlas.oaklib-candidate-request.v1",
+        "responseSchema": "atlas.oaklib-candidate-response.v1",
+        "proposalOnly": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    result["ontologyLabelSearch"] = {
+        "endpoint": "/ontology/oaklib/search",
+        "status": "OPTIONAL_LOCAL_SOURCE_REQUIRED",
+        "requestSchema": "atlas.oaklib-label-search-request.v1",
+        "responseSchema": "atlas.oaklib-label-search-response.v1",
+        "proposalOnly": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
     }
     return result
 

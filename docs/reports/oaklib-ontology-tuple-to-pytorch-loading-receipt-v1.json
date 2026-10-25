@@ -1,0 +1,261 @@
+{
+  "schema": "atlas.oaklib-ontology-tuple-to-pytorch-loading-receipt.v1",
+  "generatedAt": "2026-10-24T17:12:00Z",
+  "durationMs": 2800.74,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "pipelineStatus": {
+    "pythonModelsAndStrictValidation": "COMPLETE_VERIFIED",
+    "symbolicArrowIpcNestedStructRoundTrip": "COMPLETE_VERIFIED",
+    "networkxProjectionOrdinalMapV1": "COMPLETE_VERIFIED",
+    "okfDomainClassificationBridge": "COMPLETE_VERIFIED",
+    "numericArrowMmapToPyTorchTensorLoading": "COMPLETE_VERIFIED",
+    "oaklibProposalToVerifiedConceptGate": "GATED_BY_DESIGN_UNTIL_HUMAN_REVIEW"
+  },
+  "symbolicArrowArtifact": {
+    "path": ".tmp/atlas/ontology_linked_tuples_symbolic_v1.arrow",
+    "sha256": "sha256:794e34438c7e6fb82d413d8d040ddc6720c4c10d6d49d5d59b5746c12a6ab5f6",
+    "numRows": 3,
+    "numColumns": 23,
+    "losslessRoundTripVerified": true
+  },
+  "numericArrowMmapArtifact": {
+    "path": ".tmp/atlas/ontology_tuple_pytorch_features_v1.arrow",
+    "sha256": "sha256:04d120d694a34d1a9df84ed0da06f25488f9538d6d07080998973dab82086994",
+    "numRows": 3,
+    "featureColumns": [
+      "confidence",
+      "lutCodeNormalized",
+      "spanLengthNormalized",
+      "participantCountNormalized",
+      "verifiedConceptFlag",
+      "projectionOrdinalNormalized"
+    ],
+    "zeroCopyReadOnlyMmapVerified": true,
+    "pytorchNonWritableWarningsCount": 0
+  },
+  "projectionOrdinalMapSummary": {
+    "schema": "atlas.projection-ordinal-map.v1",
+    "projectionOrdinalMapChecksum": "d195707f69a8df8780cfc25903f9709a7e27c0bdcde4d962d21be7a5fc1a011c",
+    "totalDenseNodes": 11,
+    "entityNodeCount": 8,
+    "tupleNodeCount": 3,
+    "rows": [
+      {
+        "projectionOrdinal": 0,
+        "projectionNodeKey": "entity:concept:atlas:ApiDomain",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 1,
+        "projectionNodeKey": "entity:concept:atlas:GraphDomain",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 2,
+        "projectionNodeKey": "entity:concept:atlas:RetrievalDomain",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 3,
+        "projectionNodeKey": "entity:source:sveltekit-frontend/src/lib/server/retrieval/authority-chain.ts",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 4,
+        "projectionNodeKey": "entity:symbol:adapter.py#to_graph_projection",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 5,
+        "projectionNodeKey": "entity:symbol:authority-chain.ts#buildAuthorityChain",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 6,
+        "projectionNodeKey": "entity:symbol:directory-summaries/+server.ts#GET",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 7,
+        "projectionNodeKey": "entity:topology:projection-ordinal-map-v1",
+        "nodeClass": "ENTITY"
+      },
+      {
+        "projectionOrdinal": 8,
+        "projectionNodeKey": "tuple:relation:b6ff33d86ef1d421de9bcfd655d6a31e360e821491549774e3264e6aeadfbd7f",
+        "nodeClass": "TUPLE",
+        "tupleId": "b6ff33d86ef1d421de9bcfd655d6a31e360e821491549774e3264e6aeadfbd7f"
+      },
+      {
+        "projectionOrdinal": 9,
+        "projectionNodeKey": "tuple:relation:e3702fc4532e01970e5b92b9ae34c24ee447ca4fec7436a8c327e73d099aa316",
+        "nodeClass": "TUPLE",
+        "tupleId": "e3702fc4532e01970e5b92b9ae34c24ee447ca4fec7436a8c327e73d099aa316"
+      },
+      {
+        "projectionOrdinal": 10,
+        "projectionNodeKey": "tuple:relation:ef9eed09d71deacd14d770f9ff43460d98f25c4a39d23b7512d33f5f1089352a",
+        "nodeClass": "TUPLE",
+        "tupleId": "ef9eed09d71deacd14d770f9ff43460d98f25c4a39d23b7512d33f5f1089352a"
+      }
+    ]
+  },
+  "pytorchLoadingSummary": {
+    "tensorShape": [
+      3,
+      6
+    ],
+    "tensorDtype": "torch.float32",
+    "cudaAvailable": true,
+    "cudaCpuMaxAbsDiff": 0.0,
+    "allPoincareNormsInsideUnitBall": true
+  },
+  "alignedTuples": [
+    {
+      "tupleRowIndex": 0,
+      "tupleId": "b6ff33d86ef1d421de9bcfd655d6a31e360e821491549774e3264e6aeadfbd7f",
+      "packetKey": "packet:31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/authority-chain.ts",
+      "sourceRevision": "sha256:0f8b67b14d26a9be0c888fb243716f715d00a985c6b03431c3ca27181931b90e",
+      "domainLabel": "retrieval",
+      "okfOntologyClassId": "atlas:RetrievalDomain",
+      "okfLutCode": 6,
+      "ontologyIds": [
+        "atlas:RetrievalDomain",
+        "ATLAS-DOMAIN:retrieval",
+        "RO:0002502"
+      ],
+      "conceptIds": [
+        "concept:retrieval-authority-chain",
+        "concept:single-vote-rrf-fusion"
+      ],
+      "evidenceState": "ACTIVE_VERIFIED",
+      "lifecycle": "OBSERVED",
+      "participants": [
+        {
+          "entityId": "symbol:authority-chain.ts#buildAuthorityChain",
+          "entityKind": "ast_symbol",
+          "role": "symbol",
+          "label": "buildAuthorityChain"
+        },
+        {
+          "entityId": "source:sveltekit-frontend/src/lib/server/retrieval/authority-chain.ts",
+          "entityKind": "source_ref",
+          "role": "source",
+          "label": "authority-chain.ts"
+        },
+        {
+          "entityId": "concept:atlas:RetrievalDomain",
+          "entityKind": "semantic_concept",
+          "role": "context",
+          "label": "Parent Atlas Retrieval Domain (.okf lutCode=6)"
+        }
+      ],
+      "tupleProjectionOrdinal": 8,
+      "pytorchFeatureRow": [
+        0.96,
+        0.352941,
+        0.42,
+        0.1875,
+        1.0,
+        0.8
+      ],
+      "poincareNorm": 0.436334,
+      "advisoryOntologyScore": 0.481967
+    },
+    {
+      "tupleRowIndex": 1,
+      "tupleId": "e3702fc4532e01970e5b92b9ae34c24ee447ca4fec7436a8c327e73d099aa316",
+      "packetKey": "packet:df4ec982-9a3a-53ca-a664-c1c1e1685a20",
+      "sourceRef": "sveltekit-frontend/src/routes/api/codebase-index/directory-summaries/+server.ts",
+      "sourceRevision": "sha256:6b2009b9ff2ca56f4eb1dc5221647206c5925b91a831a51c333997d65dc2d2b5",
+      "domainLabel": "api",
+      "okfOntologyClassId": "atlas:ApiDomain",
+      "okfLutCode": 1,
+      "ontologyIds": [
+        "atlas:ApiDomain",
+        "ATLAS-DOMAIN:api"
+      ],
+      "conceptIds": [],
+      "evidenceState": "GATED",
+      "lifecycle": "DERIVED",
+      "participants": [
+        {
+          "entityId": "symbol:directory-summaries/+server.ts#GET",
+          "entityKind": "ast_symbol",
+          "role": "actor",
+          "label": "GET RequestHandler"
+        },
+        {
+          "entityId": "concept:atlas:ApiDomain",
+          "entityKind": "concept",
+          "role": "target",
+          "label": "Parent Atlas API Domain (.okf lutCode=1)"
+        }
+      ],
+      "tupleProjectionOrdinal": 9,
+      "pytorchFeatureRow": [
+        0.88,
+        0.058824,
+        0.4,
+        0.125,
+        0.0,
+        0.9
+      ],
+      "poincareNorm": 0.365019,
+      "advisoryOntologyScore": 0.471317
+    },
+    {
+      "tupleRowIndex": 2,
+      "tupleId": "ef9eed09d71deacd14d770f9ff43460d98f25c4a39d23b7512d33f5f1089352a",
+      "packetKey": "packet:5b0b6940-8b2f-5c9b-95e2-37e5888a9d1c",
+      "sourceRef": "python/parent_atlas_ontology/adapter.py",
+      "sourceRevision": "sha256:9f71c4a3531f3a6d85a97f5c592021a70cb70b1817b8443d69b8d47b96b04d81",
+      "domainLabel": "graph",
+      "okfOntologyClassId": "atlas:GraphDomain",
+      "okfLutCode": 8,
+      "ontologyIds": [
+        "atlas:GraphDomain",
+        "ATLAS-DOMAIN:graph",
+        "BFO:0000015"
+      ],
+      "conceptIds": [
+        "concept:projection-ordinal-map-v1"
+      ],
+      "evidenceState": "ACTIVE_VERIFIED",
+      "lifecycle": "OBSERVED",
+      "participants": [
+        {
+          "entityId": "symbol:adapter.py#to_graph_projection",
+          "entityKind": "ast_symbol",
+          "role": "cause",
+          "label": "OntologyLinkedTupleAdapter.to_graph_projection"
+        },
+        {
+          "entityId": "topology:projection-ordinal-map-v1",
+          "entityKind": "topology_node",
+          "role": "effect",
+          "label": "ProjectionOrdinalMapV1 dense coordinate space"
+        },
+        {
+          "entityId": "concept:atlas:GraphDomain",
+          "entityKind": "semantic_concept",
+          "role": "topology",
+          "label": "Parent Atlas Graph Domain (.okf lutCode=8)"
+        }
+      ],
+      "tupleProjectionOrdinal": 10,
+      "pytorchFeatureRow": [
+        0.91,
+        0.470588,
+        0.37,
+        0.1875,
+        1.0,
+        1.0
+      ],
+      "poincareNorm": 0.455398,
+      "advisoryOntologyScore": 0.485901
+    }
+  ]
+}

@@ -154,7 +154,7 @@ async function main() {
   const symbolRows = await pool.query(
     `SELECT gs.symbol_id, gs.stable_symbol_key, gs.symbol_kind, gs.qualified_name,
             gs.start_byte, gs.end_byte, gs.signature_text, gs.ast_fingerprint,
-            gf.source_ref AS source_ref, b.source_revision, b.workspace_revision, gf.language
+            gf.source_ref AS source_ref, gf.file_id AS upstream_file_id, b.source_revision, b.workspace_revision, gf.language
      FROM atlas_workspace_source_bindings b
      JOIN graphify_files gf
        ON gf.source_ref = b.canonical_source_ref
@@ -167,7 +167,14 @@ async function main() {
   );
 
   const unsupportedKinds: Array<{ symbolId: string; symbolKind: string }> = [];
+  // Code-only registry: Markdown, JSON, YAML, CSV and text sections/keys are document artifacts, not code identities.
+  const NON_CODE_SOURCE = /\.(md|mdx|txt|json|ya?ml|csv)$/i;
+  const nonCodeExcluded: Array<{ symbolId: string; sourceRef: string }> = [];
   const nominations = symbolRows.rows.flatMap((row: any) => {
+    if (NON_CODE_SOURCE.test(String(row.source_ref))) {
+      nonCodeExcluded.push({ symbolId: String(row.symbol_id), sourceRef: String(row.source_ref) });
+      return [];
+    }
     const classification = classifyStructuralSymbolKindV1(row.symbol_kind);
     if (!classification.admitted) {
       unsupportedKinds.push({ symbolId: String(row.symbol_id), symbolKind: String(row.symbol_kind) });
@@ -191,6 +198,7 @@ async function main() {
       source_ref: row.source_ref,
       source_revision: row.source_revision,
       workspace_revision: row.workspace_revision,
+      upstream_file_id: row.upstream_file_id,
       upstream_node_id: row.symbol_id,
       upstream_symbol_id: row.symbol_id,
       upstream_chunk_id: row.symbol_id,
@@ -293,11 +301,17 @@ async function main() {
   if (promoting) {
     const provenanceMap = await loadBindingProvenanceV1(pool, nominations.map((n) => ({ sourceRef: n.source_ref, sourceRevision: n.source_revision })));
     admittedNominations = nominations.filter((n) => {
+      // Fail closed before the package writes: a nomination with no upstream file id (e.g. a Markdown source) cannot form a version row.
+      if (!n.upstream_file_id) {
+        revisionRejections.push({ nomination_id: n.nomination_id, reasons: ['UPSTREAM_FILE_ID_MISSING'] });
+        return false;
+      }
       const v = qualifyPromotionNominationV1(n, targetWorkspaceRevision, provenanceForV1(provenanceMap, n.source_ref, n.source_revision));
       if (!v.admitted) revisionRejections.push({ nomination_id: n.nomination_id, reasons: v.reasons });
       return v.admitted;
     });
   }
+  report.nonCodeExcludedCount = nonCodeExcluded.length;
   report.revisionRejectedCount = revisionRejections.length;
   report.revisionRejectionSample = revisionRejections.slice(0, 20);
 

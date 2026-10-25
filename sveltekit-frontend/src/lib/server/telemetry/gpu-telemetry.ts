@@ -80,6 +80,63 @@ export async function recordResourceOperation(observation: ResourceOperationObse
   } catch { }
 }
 
+export const SupportedComputeKernelOperations = [
+  'embedding',
+  'gemm',
+  'cosine_similarity',
+  'topk',
+  'cross_encoder',
+  'autoencoder',
+  'som_lookup',
+] as const;
+export type ComputeKernelOperation = typeof SupportedComputeKernelOperations[number] | (string & {});
+
+export interface ComputeKernelIdentity {
+  requestedKernel?: string | null;
+  executionBackend?: 'CPU_REFERENCE' | 'NATIVE_EXPORT_UNVERIFIED' | 'REMOTE_UNVERIFIED' | 'CACHE';
+  reportedBackend?: string | null;
+  candidateCount?: number | null;
+  inputDim?: number | null;
+  outputDim?: number | null;
+}
+
+/**
+ * Measure wall-clock execution time and kernel identity for a compute operation.
+ * Telemetry never fabricates GPU kernel time if kernel_ms was not observed directly by a CUDA driver/profiler.
+ */
+export async function observeComputeOperation<Result>(
+  operation: ComputeKernelOperation,
+  identity: ComputeKernelIdentity,
+  action: () => Promise<Result> | Result,
+  context?: PacketCentricContext
+): Promise<Result> {
+  const started = performance.now();
+  try {
+    return await action();
+  } finally {
+    const wallMs = performance.now() - started;
+    void recordResourceOperation(
+      {
+        schema: 'atlas.resource-operation.v1',
+        operation,
+        native_export: null,
+        requested_kernel: identity.requestedKernel ?? null,
+        kernel_name: null,
+        kernel_ms: null,
+        wall_ms: wallMs,
+        duration_scope: 'CALLER_WALL_TIME',
+        execution_backend: identity.executionBackend ?? 'REMOTE_UNVERIFIED',
+        reported_backend: identity.reportedBackend ?? null,
+        candidate_count: identity.candidateCount ?? null,
+        input_dim: identity.inputDim ?? null,
+        output_dim: identity.outputDim ?? null,
+        canonicalAuthority: false,
+      },
+      context
+    );
+  }
+}
+
 export interface GpuTelemetryEvent {
   kernel_name: string;
   gpu_backend: string;

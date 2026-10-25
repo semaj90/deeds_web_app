@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
 import {
   UnifiedResidencyAdapter, admitResidency, admitWithSharedGpuResidencyLeaseV1, assertNoPersistedGpuState, descriptorCacheKey,
-  domainRoutingCacheKey, packFloat32Tile, requireProvider, routeDomainWithLut, serializeResidencyControl, transitionResidency, unpackFloat32Tile, validateUnifiedDescriptor, type UnifiedResidencyDescriptor
+  domainRoutingCacheKey, packFloat32Tile, requireProvider, routeDomainWithLut, serializeResidencyControl, transitionResidency, unpackFloat32Tile, validateUnifiedDescriptor,
+  createTitansMemoryProviderV1, buildTitansMemoryDescriptorV1, type UnifiedResidencyDescriptor
 } from './unified-residency-adapter-v1';
 
 const base: UnifiedResidencyDescriptor = {
@@ -127,5 +128,57 @@ describe('unified residency adapter v1', () => {
     };
     expect(() => admitWithSharedGpuResidencyLeaseV1({ adapter, descriptor: base, budget, budgetRevision: 'budget-1', leaseId: 'lease:test:reject', leaseEpoch: 1, executor: 'tensorrt_rtx' })).toThrow('GPU_EXECUTOR_RESIDENCY_ADMISSION_GPU_RESIDENCY_BUDGET_EXCEEDED');
     expect(adapter.usedBytes()).toBe(0);
+  });
+
+  it('builds and loads TITANS_MEMORY descriptors through createTitansMemoryProviderV1', async () => {
+    const rawBuffer = new Float32Array([0.1, 0.4, 0.9, 0.2]);
+    const { descriptor, buffer } = buildTitansMemoryDescriptorV1({
+      residencyKey: 'titans:surprise:slot-1',
+      workspaceRevision: 'wr-1',
+      sourceRevision: 'sr-1',
+      representationRevision: 'rep-1',
+      featureRevision: 'feat-1',
+      modelRevision: 'ornith-1.5-9b',
+      tokenizerRevision: 'tok-1',
+      ropeRevision: 'rope-1',
+      candidateOrdinal: 1,
+      surpriseArtifactChecksum: 'sha256:surprise-ccr-receipt',
+      buffer: rawBuffer,
+      shape: [4],
+      dtype: 'float32',
+      contextWindow: 2048,
+    });
+
+    expect(descriptor.kind).toBe('TITANS_MEMORY');
+    expect(descriptor.byteLength).toBe(16);
+
+    const provider = createTitansMemoryProviderV1({
+      resolveBuffer: (d) => {
+        if (d.residencyKey === 'titans:surprise:slot-1') return buffer;
+        return null;
+      },
+    });
+
+    expect(requireProvider(provider, 'TITANS_MEMORY')).toBe(provider);
+
+    const adapter = new UnifiedResidencyAdapter(500000);
+    const loaded = await adapter.load(descriptor, provider);
+
+    expect(loaded.state).toBe('RESIDENT');
+    expect(adapter.usedBytes()).toBe(16);
+
+    const acquired = adapter.acquire('titans:surprise:slot-1');
+    expect(acquired.state).toBe('IN_USE');
+
+    adapter.release('titans:surprise:slot-1');
+    expect(adapter.usedBytes()).toBe(16);
+
+    // Verify rejection when buffer cannot be resolved
+    const unresolvableProvider = createTitansMemoryProviderV1({
+      resolveBuffer: () => null,
+    });
+    await expect(
+      adapter.load({ ...descriptor, residencyKey: 'titans:surprise:slot-2' }, unresolvableProvider)
+    ).rejects.toThrow('RESIDENCY_BUFFER_LENGTH_MISMATCH');
   });
 });

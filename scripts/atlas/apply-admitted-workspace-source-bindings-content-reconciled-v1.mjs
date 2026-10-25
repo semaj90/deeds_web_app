@@ -26,9 +26,9 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 import { assertCanonicalWriteAuthorized } from './lib/admission-write-guard-v1.mjs';
 const ADMISSION_PATH = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
-const REPORT_PATH = resolve(ROOT, 'docs/reports/apply-admitted-workspace-source-bindings-content-reconciled-v1.json');
 const REPO_ID = 'deeds-web-app';
-const OWNER_RUN_WORKSPACE_REVISION = 'sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb';
+const ownerArg = process.argv.find((v) => v.startsWith('--owner-run-revision='))?.slice('--owner-run-revision='.length);
+const OWNER_RUN_WORKSPACE_REVISION = ownerArg ?? 'sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb';
 const APPLY = process.argv.includes('--apply');
 
 const admission = JSON.parse(readFileSync(ADMISSION_PATH, 'utf8'));
@@ -36,6 +36,7 @@ if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.a
   throw new Error('ADMITTED_WORKSPACE_REVISION_RECEIPT_NOT_AUTHORITATIVE');
 }
 const admittedWorkspaceRevision = admission.workspaceRevision;
+const REPORT_PATH = resolve(ROOT, `docs/reports/apply-admitted-workspace-source-bindings-content-reconciled-${admittedWorkspaceRevision.slice(7, 19)}-v1.json`);
 const { manifest: snapshot } = assertCanonicalWriteAuthorized({ root: ROOT, admission, apply: APPLY, argv: process.argv.slice(2),
   confirmToken: '--confirm-canonical-source-bindings-v1=AUTHORIZE_CANONICAL_SOURCE_BINDING_WRITE_V1' });
 if (snapshot.snapshotRevision !== admission.snapshotRevision) throw new Error('SEALED_SNAPSHOT_MISMATCH');
@@ -88,7 +89,7 @@ try {
   }
   candidates.sort((a, b) => a.sourceRef.localeCompare(b.sourceRef));
 
-  const producerRevision = 'workspace-revision-content-reconciliation.v1:e0dc2711-vs-322ed1a6';
+  const producerRevision = `workspace-revision-content-reconciliation.v1:${OWNER_RUN_WORKSPACE_REVISION.slice(7, 15)}-vs-${admittedWorkspaceRevision.slice(7, 15)}`;
   const bindingRows = candidates.map((c, index) => {
     const row = {
       repoId: REPO_ID,

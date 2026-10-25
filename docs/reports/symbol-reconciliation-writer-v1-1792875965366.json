@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.symbol-reconciliation-writer-receipt.v1",
+  "generatedAt": "2026-10-24T21:06:05.365Z",
+  "targetWorkspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+  "sourceRefsFilter": null,
+  "allowCreate": false,
+  "apply": false,
+  "gate": {
+    "status": "BLOCKED_ON_UNGROUNDED_REVISION",
+    "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+    "boundSourceRefCount": 0
+  },
+  "action": "NO_WRITES_PERFORMED",
+  "reason": "workspace_revision sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5 has zero rows in atlas_workspace_source_bindings -- this is exactly the ungrounded-revision failure mode flagged repeatedly this session; refusing to synthesize symbol identity against it."
+}

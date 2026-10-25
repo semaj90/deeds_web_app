@@ -60,7 +60,8 @@ Stop thinking of the graph, vectors, and memory as separate, siloed systems. Ins
                          │
       ┌──────────────────┼──────────────────┬──────────────────┐
       ▼                  ▼                  ▼                  ▼
-   [Neo4j]            [Qdrant]          [Postgres]          [Redis]
+   [Neo4j]
+   [networx nlp 8095]          [Qdrant]          [Postgres]          [Redis-valkey]
 Topology Index    Semantic Index      JSONB Records       Hot Cache
       │                                                        │
       ▼                                                        ▼
@@ -72,7 +73,7 @@ Every piece of information revolves around the `SourceRef` identifier. The backe
 - **Neo4j**: Relationships and topological connections between `SourceRefs`.
 - **Qdrant**: High-dimensional semantic embeddings (768-dim content/signature vectors).
 - **Postgres**: Raw metadata, structured columns, and raw JSONB payloads.
-- **Redis**: Low-latency hot caching of transient states, intent targets, and active ACE packets.
+- **Redis-valkey centroids**: Low-latency hot caching of transient states, intent targets, and active ACE packets.
 - **DuckDB**: Fast, read-heavy analytical auditing of the indexes.
 - **Glyph**: Performance history and execution reward tracking.
 
@@ -159,7 +160,7 @@ To keep terminology aligned, here are the distinctions between our formats, prot
 | **JSON** | Raw, stateless data serialization. | `{"query": "find dependencies"}` |
 | **JSONB** | PostgreSQL binary JSON storage allowing deep querying and indexing. | `record_json->>'intent'` |
 | **JSON-RPC 2.0** | Stateless, light remote procedure call transport format. | `{"jsonrpc": "2.0", "method": "tools/call", "params": {}}` |
-| **MCP** | Model Context Protocol. A standardized client-server protocol built over JSON-RPC. | Gemma4 ──► OpenCode ──► MCP Client ──► atlas-tools-mcp |
+| **MCP** | Model Context Protocol. A standardized client-server protocol built over JSON-RPC. | ornith 1.5 llama-server 8090 updating Gemma4 ──► OpenCode ──► MCP Client ──► atlas-tools-mcp |
 | **Gemma4 Tool Calling** | LLM-driven intent matching where Gemma selects tools, which are executed by the local client runtime. | `{"tool": "find_dependencies", "args": {"sourceRef": "server.ts"}}` |
 
 *Note: The model never runs code itself; it produces structured arguments that the local client runtime intercepts and executes.*
@@ -271,3 +272,26 @@ Rather than focusing on building UI changes or generating more embeddings, the n
 | `src/lib/server/retrieval/orchestrator.ts` | Main RAG orchestrator (w/ LangExtract GRPO reranker) |
 | `src/lib/server/retrieval/langextract-reranker.ts` | 3-pass entity + section + retrieval fusion |
 | `scripts/summarize-clusters-pg.ts` | Standalone summarizer w/ TurboQuant-first inference |
+
+---
+
+## Current State (2026-10-24)
+
+Dated snapshot from a read-only review. Counts are live as of this date and go stale; re-query before relying on them.
+
+| Area | Status | Evidence |
+|------|--------|----------|
+| Embedding columns | `content_embedding_768` (vector 768) is canonical: 274,428 of 274,465 chunks. `content_embedding` (halfvec) is older with mixed recipes: 57,243 rows. Both have HNSW indexes. | `codebase_chunk_index` |
+| Admitted workspace revision | `sha256:23413763…492e5` admitted with canonical binding scope. 21,311 source bindings written (exact content-hash match to graphify run `e0dc2711`). | `atlas_workspace_source_bindings` |
+| Symbol registry | 32,514 canonical identities created from code symbols only. 1,976 non-code symbols excluded. Five legacy non-code rows (`ACE-BITFROST-WORKER-INTEGRATION.md`, 2026-09-13) remain and need a separate decision. | `atlas_symbol_registry` |
+| Projection admission | `NOT_SAFE_TO_PROJECT`, 10 of 11 predicates below PASS. Blockers: packet revision binding, ordinal map, BitFrost canary, ACE grounding. | `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-24.json` |
+| Canonical graph | `docs/graph/codebase-graph.json` is from 2026-10-17 (stale). The fast indexer writes probes only. | `docs/graph/` |
+| Duplicate source groups | 61 byte-identical groups across `sveltekit-frontend/src`, `scripts`, `packages`. Most are route entry points. Real duplicates: `bifrost-trace.ts` (3 copies), `memory-bridge.ts` and `langgraph-bridge.ts` (3 locations each), about 15 YoRHa component pairs. | `.tmp/dup-hashes.txt` |
+| Packages vs `scripts/atlas` | `@deeds/parent-atlas` has 82 importers and is live. Most other packages have no importers outside themselves. `hypergraph-retrieval.ts` was packages-only and is now mirrored in `scripts/atlas`. `libtorch-bridge.ts` diverges from the app copy (1,829 vs 1,871 lines) and is not mirrored. | `packages/`, `scripts/atlas/` |
+| Disk | C: about 2.2 GB free. `docker_data.vhdx` 137 GB, `models/` 20.6 GB, `docs/` 6.1 GB, `simd-bridge/` 1.15 GB. Other directories are still being measured. | disk survey |
+
+**Rules that apply**
+- Identity: `source_ref` plus revision, never `feature_id` alone. `title_id` is not a semantic key.
+- Embeddings: reuse existing `content_embedding_768` vectors. Don't embed the same chunks again.
+- Generated maps (`codebase-map.md`, `CODEBASE_DIRECTORY_MAP.md`) are regenerated, not hand-edited.
+- New Atlas work goes in `scripts/atlas/` first. `packages/` mirrors it after validation.

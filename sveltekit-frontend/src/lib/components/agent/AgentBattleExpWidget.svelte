@@ -26,17 +26,17 @@
     class: className = '',
   }: Props = $props();
 
-  let state = $state<AgentExpState>(getInitialAgentExpState());
+  let agentState = $state<AgentExpState>(getInitialAgentExpState());
   let soundEnabled = $state(true);
   let actionLogRef = $state<HTMLDivElement | null>(null);
 
   // Derived rank and EXP metrics
-  let rankInfo = $derived(state.rankInfo);
+  let rankInfo = $derived(agentState.rankInfo);
   let xpInLevel = $derived(Math.max(0, rankInfo.totalExp - rankInfo.currentLevelBaseExp));
   let xpRequiredForLevel = $derived(Math.max(1, rankInfo.nextLevelRequiredExp - rankInfo.currentLevelBaseExp));
 
   // Svelte motion tweened 0-100% progress for silky smooth Pokémon-style bar filling
-  const progressTween = tweened(state.rankInfo.progressPercent, {
+  const progressTween = tweened(0, {
     duration: 450,
     easing: cubicOut,
   });
@@ -52,7 +52,7 @@
     description: string,
     superEffective = false
   ) {
-    state = recordAgentBattleAction(state, {
+    agentState = recordAgentBattleAction(agentState, {
       agentName: 'Mastra Triage Agent',
       actionType: type,
       toolName,
@@ -161,7 +161,7 @@
 
     <div class="flex justify-between items-center text-[10px] font-mono text-black/50 mt-1.5">
       <span>Total EXP: {rankInfo.totalExp.toLocaleString()}</span>
-      <span>Bugs Slain: {state.totalBugsSlain} | Action Streak: {state.streak}</span>
+      <span>Bugs Slain: {agentState.totalBugsSlain} | Action Streak: {agentState.streak}</span>
     </div>
   </div>
 
@@ -207,7 +207,7 @@
       bind:this={actionLogRef}
       class="space-y-1.5 max-h-48 overflow-y-auto pr-1 font-mono text-xs"
     >
-      {#each state.recentActions as action (action.id)}
+      {#each agentState.recentActions as action (action.id)}
         <div
           animate:flip={{ duration: 250 }}
           transition:slide={{ duration: 200 }}

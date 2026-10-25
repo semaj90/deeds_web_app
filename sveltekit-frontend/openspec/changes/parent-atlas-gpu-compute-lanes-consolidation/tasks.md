@@ -2100,12 +2100,15 @@ Unresolved
 
 NES lineage (`NES-ATLAS-LINEAGE-PRODUCER-01`, read-only)
 - Producer `scripts/atlas/materialize-addressable-packets.mjs` writes `.tmp/addressable-packets.ndjson` (61,718 rows). No row carries `source_revision` or `workspace_revision`.
-- Stop rule applied: NES rows are legacy projection data. No crosswalk built. The 1,992-row match in the paste is unverified here.
+- Stop rule applied: NES rows are legacy projection data (`LEGACY_NES_PROJECTION` / `NES_LEGACY_LINEAGE_BLOCKED`). No crosswalk built. Verified 1,992/1,992 `atlas_feature_map.packet_id` matches against `nes_chrom_packets.packet_key` (`0` canonical `atlas_packets.packet_key` matches).
 - Security: `ingest-nes-chrom.mjs` hardcodes a database password in its connection string. Move it to `.env` and rotate.
 
-Operations
-- llama-server `:8090` refused connections in the last check. Ornith is down. Restart with the TurboQuant start task before any live procedural run.
-- Procedural sequence steps 1–2 (table DDL, Drizzle entry) are not started. Steps 3–4 are built with fixtures only; no live generation has run.
+Operations & L2 Authorization / Headroom Update (2026-10-24)
+- llama-server `:8090` (`ornith-1.5-9b`) is running on Windows host loopback (`127.0.0.1:8090`). Headroom v0.41.0 is running on WSL2 Ubuntu loopback (`127.0.0.1:8787`); `scripts/launch-turboquant.ps1` (`Test-HeadroomProxyHealth`) checks Windows loopback and falls back to WSL2 loopback while reporting namespace isolation.
+- Headroom CCR smoke test (`scripts/test-headroom-ccr-smoke.py`) verified `"config": {"mode": "ccr"}` on `:8787`: `11,736 -> 3,136` tokens (`8,600` saved), `code_aware` exact SHA-256 recovery, and `smart_crusher` semantic JSON array recovery (compact re-serialization changes raw byte length, confirming CCR text is never canonical source evidence).
+- `ACTOR-WORKSPACE-GRANT-02` (`actor-workspace-grant-v1.ts` + `candidate-feature-to-feature-row-v1.ts`): Added `AuthoritativeCachedGrantProvider` (`STALE_GRANT_CACHE`, `GRANT_REVOKED`), symlink/alias `sourceNormalizer`, segment-boundary prefix checks, and `promoteAuthorizedCandidateFeatureRowV1` L2 gate (`34/34` focused tests passing; `15/15` `:8095` PyTorch NLP sidecar tests passing).
+- Port `:5434` PostgreSQL session query and `http://localhost:5173/` verified healthy (`HTTP 200 OK`, zero console errors) after resolving `wslrelay.exe` port conflict.
+- Procedural sequence steps 1–2 (table DDL, Drizzle entry) are not started. Steps 3–4 are built with fixtures only.
 
 Next steps
 1. Decide whether to merge the branch into `main` and push the four fixture commits.
@@ -2115,3 +2118,4 @@ Next steps
 5. Reconcile the 17-vs-8 failing-file count.
 6. Confirm whether the workboard builder had an uncommitted change that was lost.
 7. Move the NES ingest password to `.env` and rotate it.
+8. Connect a production server-owned RBAC grant provider before enabling live workspace-authorized L2 promotion.
