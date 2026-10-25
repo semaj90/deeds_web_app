@@ -2,6 +2,8 @@
 
 ## HANDOFF — 2026-10-25 (review of agent work; read this first)
 
+**Audit 2026-10-25 (this pass, on commit `5a2d380948`):** the handoff below was checked against the tree, not only the reports. Re-run: `tests/tool-ranker.spec.ts`, `deterministic-topk-and-keyset.spec.ts`, `feature-record.keyset.spec.ts` → 3 files / 55 tests pass. `openspec validate parent-atlas-compute-rank-cache-eval-dspy-gepa --strict` → valid. Corrections: the uncommitted-work items are now committed (`5a2d380948`: top-k tie-breakers, keyset, tool-ranker hardening, sidecar registry, packet/reward migration files; 3 reports over 10 MB and `.claude/settings.local.json` were excluded; `claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec` remain modified gitlinks, not committed). Still open, unchanged: the keyset spec and top-k spec use an in-memory emulation (no disposable-PostgreSQL proof); EXPLAIN check; decisions 1 and 2 below; Graphify gates.
+
 **Review verdicts (checked on the current tree, not taken from reports)**
 - **Keyset export subagent:** spec present and reported 10/10. Limit: it emulates the SQL in memory, so it is NOT proof against PostgreSQL. Spec imports `$lib/server/retrieval/feature-record.js`, which TypeScript can't resolve (type-only diagnostic); its types are unchecked.
 - **Ollama chat sweep subagent:** migrated nothing (classifier outage). Its inventory was correct. Its guard finding stands: `ollama-chat-callers.guard.spec.ts` matches same-line only, so it can miss callers. Its `KNOWN` list was not read.
@@ -24,12 +26,12 @@
 - Remaining raw Ollama chat callers: `scripts/diagnostics/log-ollama-response.ts`; five `scripts/atlas/*.mts` with `:11434/api/chat` constants (unverified); shell and PowerShell scripts (operator decision). `scripts/opencode/apply-gemma4-titles.mjs` is migrated to llama-server with an Ornith prompt (not yet run live).
 - Guard spec: make it catch multi-line and `fetch(\`${endpoint}/api/generate\`)` callers.
 - Keyset: add a real PostgreSQL test (disposable DB) for the same-timestamp, three-batch case; the in-memory emulation is not proof.
-- Cosine top-k tie order: `ORDER BY ... , id` edits are uncommitted and untested (plus an EXPLAIN check).
+- Cosine top-k tie order: `ORDER BY ... , id` edits are committed (`5a2d380948`) and covered by `deterministic-topk-and-keyset.spec.ts` (in-memory). EXPLAIN check still open.
 - June draft `drizzle/manual/20260607_route_packet_rewards.sql` conflicts with the applied reward table: mark superseded through migration governance; it must not be runnable.
 - `ace_chunks` upsert: now live; still needs a real upsert test.
 - Hard-coded PostgreSQL passwords in repo scripts: separate security cleanup; rotate if still active.
 - Protobuf: active contracts listed under `proto/`, `docker/cuvs-grpc/`, `scripts/atlas/proto/active/`; `atlas_tensor.proto` duplicated in two copied folders (archive the copies). Generated stubs not verified.
-- ~109 uncommitted files on `chore/parent-atlas-session-2026-10-17`. Commit by owned hunks only; another session owns some of the packet-path files.
+- ~~~109 uncommitted files~~~ **Resolved 2026-10-25:** committed as `5a2d380948` (108 files, under 10 MB each). Remaining modified entries are excluded on purpose (see audit note above).
 
 **Next session starts with:** decision 1 (chat-path UUID) and decision 2 (reward source). Everything else waits on those.
 
@@ -70,11 +72,11 @@
   - **Autocomplete (FIM): REJECTED as written.** The proposed `.continue/config.json` sets `tabAutocompleteModel` to Codestral on Ollama `:11434`, which breaks the embeddings-only rule. It also names `gemma-4-e4b-golden-qlora` on `:8090`, but `:8090` serves `ornith-1.5-9b`, and no Golden QLoRA adapter is loaded or proven in this project's notes. Autocomplete stays OPEN until one option is chosen: (1) none; (2) a FIM-capable model on llama-server, with a VRAM check against Ornith on the 8 GiB card; (3) a separately approved non-chat FIM service. No config is written until then.
 - **2026-10-25 alignment (this session's completed work; receipts below):**
   - Commits: `f29f2c04d7` (XGBoost ABI, PageRank source, tuple evidence gates; Vitest 24/24, Node 3/3, unittest 3/3), `d16b6da484` (PageRank fallback reads top-level `page_rank_score` because no producer populates `authority.page_rank`; spec assertion added; 46/46 retrieval specs), `44b9465eed` (revision drift record).
-  - Retrieval top-k (uncommitted): cosine top-k tie-breakers `, id` on `retrieval/unified-orchestrator.ts` and `db/unified-client.ts`; `streamFeatureRecords` moved from OFFSET to keyset on `(created_at, feature_id)`. Typecheck clean for these files. Keyset is NOT_PROVEN (no test covers it).
+  - Retrieval top-k (committed `5a2d380948` on 2026-10-25): cosine top-k tie-breakers `, id` on `retrieval/unified-orchestrator.ts` and `db/unified-client.ts`; `streamFeatureRecords` moved from OFFSET to keyset on `(created_at, feature_id)`. Typecheck clean for these files. Keyset is NOT_PROVEN (no test covers it).
   - Database (live `legal_ai_db`, PostgreSQL 18.4): `20260507_retrieval_spine.sql` applied (`retrieval_rank_cache`, `llm_summaries`, `tool_call_stats`). `20261025_retrieval_ranking_index_enhancements_v1.sql` applied; all four indexes `indisvalid=t, indisready=t`. Both were rehearsed in a ROLLBACK transaction first. Note: the index draft's first two indexes were applied before the spine, and the re-run completed the cohort. Registry: `drizzle/sidecar-migrations.json` (both `applied`). `audit-contract-map.mjs` exit 0, 0 high, 63 medium (pre-existing count, not compared to a pre-change baseline).
   - Not in this entry: the ATLAS-PACKET-EXECUTION-BRIDGE-01 section below has uncommitted edits from another session, which this entry does not change.
-  - Open: the cosine tie-breaker and keyset edits are uncommitted; Graphify daily stays fail-closed (`SNAPSHOT_NATIVE_EXECUTION_FAILED`).
-  - `tool_call_stats` (2026-10-25, uncommitted, `sveltekit-frontend/src/lib/server/mcp/tool-ranker.ts`): persist failures are now logged via `production-logger` (non-fatal); the EMA upsert uses `COALESCE` on the prior average so a NULL prior no longer poisons the row. `tests/tool-ranker.spec.ts` 40/40 pass (two new persistence tests). Live check: the exact upsert ran twice inside a ROLLBACK transaction, including a NULL prior, and returned non-NULL averages with 0 rows left. The module stays unwired (no production caller).
+  - Open: the cosine tie-breaker and keyset edits are now committed (`5a2d380948`) but still lack a disposable-PostgreSQL test; Graphify daily stays fail-closed (`SNAPSHOT_NATIVE_EXECUTION_FAILED`).
+  - `tool_call_stats` (2026-10-25, committed `5a2d380948`, `sveltekit-frontend/src/lib/server/mcp/tool-ranker.ts`): persist failures are now logged via `production-logger` (non-fatal); the EMA upsert uses `COALESCE` on the prior average so a NULL prior no longer poisons the row. `tests/tool-ranker.spec.ts` 40/40 pass (two new persistence tests). Live check: the exact upsert ran twice inside a ROLLBACK transaction, including a NULL prior, and returned non-NULL averages with 0 rows left. The module stays unwired (no production caller).
   - Open-task to-do list: claude-mem work-state list `atlas-open-tasks-2026-10-25` (P0–P3). This file holds the evidence, not a duplicate of the list.
 - **2026-10-25 Graphify daily gate table (read-only; no run, no writes to canonical state):**
 
