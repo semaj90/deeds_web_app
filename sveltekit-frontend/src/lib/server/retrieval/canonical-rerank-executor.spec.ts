@@ -454,6 +454,7 @@ describe('canonical rerank executor', () => {
 
       const candidates = [...envelopes];
       candidates[1] = { ...candidates[1]!, authority: { name: 'authority', score: 0.72 } };
+      candidates[0] = { ...candidates[0]!, page_rank_score: 0.41 };
       const ranked = await rerankCanonicalFeatureEnvelopes('find canonical rerank', candidates, {
         authScope: 'scope-a',
         rendererVersion: 'renderer-v1',
@@ -468,6 +469,7 @@ describe('canonical rerank executor', () => {
       expect(ranked.provenance.fallbackReason).toBe('crossencoder_unavailable');
       expect(scoredRows[1]?.community_conf).toBe(0.72);
       expect(scoredRows[1]?.pagerank_score).toBe(0.5);
+      expect(scoredRows[0]?.pagerank_score).toBe(0.41);
       // Sidecar's real model identity is retained so reports can distinguish true
       // learned-reranker scores from the local weighted fallback. It is NOT stored
       // as a crossEncoderScore (FINDING-XGB-01) — only in the dedicated

@@ -1540,7 +1540,7 @@ export class SearchRuntime {
         denseScore: envelope.dense?.score ?? null,
         lexicalScore: envelope.lexical?.score ?? null,
         astScore: envelope.ast?.score ?? null,
-        pageRankScore: envelope.authority?.page_rank ?? null,
+        pageRankScore: envelope.authority?.page_rank ?? envelope.page_rank_score ?? null,
         communityScore: envelope.authority?.score ?? null,
         exactPathScore: envelope.ast?.score ?? envelope.metadata?.score ?? null,
       })),

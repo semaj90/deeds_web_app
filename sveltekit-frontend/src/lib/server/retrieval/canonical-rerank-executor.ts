@@ -674,7 +674,7 @@ export function canonicalEnvelopeToRerankCandidate(
     bm25Score: envelope.lexical?.score,
     astScore: envelope.ast?.score,
     graphScore: envelope.metadata?.score ?? envelope.authority?.score,
-    pagerankScore: envelope.authority?.page_rank,
+    pagerankScore: envelope.authority?.page_rank ?? envelope.page_rank_score ?? undefined,
     domainScore: envelope.metadata?.score,
   };
 }
