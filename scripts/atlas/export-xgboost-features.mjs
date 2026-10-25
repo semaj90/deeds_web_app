@@ -82,12 +82,12 @@ async function loadBridgeForApply() {
     throw new Error(`XGBOOST_TRACE_LABEL_BRIDGE_READ_FAILED: ${error instanceof Error ? error.message : String(error)}`);
   }
   const modulePath = pathToFileURL(path.resolve(ROOT, 'packages/parent-atlas/dist/core/xgboost-trace-label-bridge.js')).href;
-  const { validateXgboostTraceLabelBridge } = await import(modulePath);
+  const { validateXgboostTraceLabelBridge, buildXgboostTraceLabelPacketLookup } = await import(modulePath);
   const bridge = validateXgboostTraceLabelBridge(raw);
   if (bridge.entries.length === 0) {
     throw new Error('XGBOOST_TRACE_LABEL_BRIDGE_EMPTY');
   }
-  return bridge;
+  return { bridge, buildXgboostTraceLabelPacketLookup };
 }
 
 function writeJsonAtomic(filePath, value) {
@@ -182,7 +182,8 @@ async function main() {
 
   // Apply is intentionally impossible without an explicit, checksummed bridge.
   // Dry-run remains useful for measuring the current mismatch without creating data.
-  const bridge = await loadBridgeForApply();
+  const bridgeBundle = await loadBridgeForApply();
+  const bridge = bridgeBundle?.bridge ?? null;
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
 
@@ -232,7 +233,23 @@ async function main() {
       }
     }
 
-    const { rows: packets } = await pool.query(`
+    const bridgePacketKeys = bridge
+      ? [...new Set(bridge.entries.flatMap((entry) => entry.packet_keys))]
+      : [];
+    const { rows: packets } = bridge
+      ? await pool.query(`
+      SELECT
+        packet_key, source_ref, feature_id, concept_ids,
+        community_confidence, reward_prior, created_at,
+        payload->>'domain_class'       AS domain_class,
+        payload->>'cosine_score'       AS cosine_score_raw,
+        payload->>'som_cell_id'        AS som_cell_id,
+        payload->>'som_cache_hit'      AS som_cache_hit,
+        payload->>'ann_turbovec_score' AS ann_turbovec_score
+      FROM atlas_packets
+      WHERE packet_key = ANY($1::text[])
+    `, [bridgePacketKeys])
+      : await pool.query(`
       SELECT
         packet_key, source_ref, feature_id, concept_ids,
         community_confidence, reward_prior, created_at,
@@ -254,11 +271,22 @@ async function main() {
       if (!packetsByFeature.has(p.feature_id)) packetsByFeature.set(p.feature_id, []);
       packetsByFeature.get(p.feature_id).push(p);
     }
-    const unmatchedFeatureLabels = [...allLabels].filter((label) => !packetsByFeature.has(label));
+    const packetsByTraceLabel = bridge
+      ? bridgeBundle.buildXgboostTraceLabelPacketLookup(bridge, [...allLabels], packets)
+      : null;
+    const packetsForTraceLabel = (label) => bridge
+      ? (packetsByTraceLabel.get(label) ?? [])
+      : (packetsByFeature.get(label) ?? []);
+    const unmatchedFeatureLabels = bridge
+      ? []
+      : [...allLabels].filter((label) => !packetsByFeature.has(label));
     console.log(`Packets indexed: ${packets.length} across ${packetsByFeature.size} feature labels`);
     if (unmatchedFeatureLabels.length > 0) {
       console.log(`Unmatched trace packet labels: ${unmatchedFeatureLabels.length}/${allLabels.size}`);
       console.log('Refusing to infer packet identity from label text; an explicit bridge is required.');
+    }
+    if (APPLY && unmatchedFeatureLabels.length > 0) {
+      throw new Error('XGBOOST_TRACE_LABEL_BRIDGE_INCOMPLETE_OR_UNRESOLVED');
     }
 
     // ── 3. Load Karpathy blend scores from Redis ───────────────────────────────
@@ -286,7 +314,7 @@ async function main() {
       for (const ref of (t.retrieved_packets ?? [])) {
         const label = labelFromRef(ref);
         if (!label) continue;
-        const pkts = packetsByFeature.get(label) ?? [];
+        const pkts = packetsForTraceLabel(label);
         for (const p of pkts) {
           packetHitCount.set(p.packet_key, (packetHitCount.get(p.packet_key) ?? 0) + 1);
         }
@@ -321,7 +349,7 @@ async function main() {
       for (const ref of refs) {
         const label = labelFromRef(ref);
         if (!label) continue;
-        const pkts = packetsByFeature.get(label) ?? [];
+        const pkts = packetsForTraceLabel(label);
         for (const p of pkts) {
           if (seenInTrace.has(p.packet_key)) continue;
           seenInTrace.add(p.packet_key);

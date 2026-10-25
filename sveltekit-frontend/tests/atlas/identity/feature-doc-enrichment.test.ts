@@ -64,6 +64,10 @@ vi.mock('../../../src/lib/server/atlas/feature-document-evidence.js', async () =
         }),
       }).optional(),
     }),
+    readFeatureDocumentManifestFile: (manifestPath: string) => {
+      const raw = mockReadFileSync(manifestPath, 'utf8') as string;
+      return { raw, manifest: JSON.parse(raw) };
+    },
     getFeatureDocumentEvidence: mockGetFeatureDocumentEvidence,
   };
 });
@@ -195,12 +199,12 @@ describe('buildFeatureDocumentEnrichmentPlan', () => {
     });
   });
 
-  it('builds a bounded, deterministic enrichment plan from feature evidence', async () => {
+  it('keeps documentation inventory gated without revision-qualified admission proof', async () => {
     const mod = await import('../../../src/lib/server/atlas/feature-doc-enrichment.js');
     const result = await mod.buildFeatureDocumentEnrichmentPlan('trace-mcp');
 
     expect(result.plan.schemaVersion).toBe('feature-doc-enrichment.v1');
-    expect(result.plan.evidenceState).toBe('ACTIVE_VERIFIED');
+    expect(result.plan.evidenceState).toBe('GATED');
     expect(result.plan.manifestContentHash).toHaveLength(64);
     expect(result.plan.sourceCandidates).toEqual(
       expect.arrayContaining([

@@ -188,8 +188,7 @@ function toEvidenceState(evidence: FeatureDocumentEvidence): z.infer<typeof Feat
   if (evidence.status === 'MANIFEST_INVALID') return 'FAILED';
   if (evidence.status === 'DOCS_PENDING') return 'GATED';
   if (evidence.status === 'NOTE_ONLY') return 'REFERENCE_ONLY';
-  if (evidence.warnings.length > 0) return 'ACTIVE_DEGRADED';
-  return 'ACTIVE_VERIFIED';
+  return 'GATED';
 }
 
 function mapArtifactCandidate(

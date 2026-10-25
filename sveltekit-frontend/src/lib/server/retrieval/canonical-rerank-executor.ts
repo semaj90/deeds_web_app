@@ -14,6 +14,10 @@
 
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import {
+  XGBOOST_SIDECAR_FEATURES,
+  xgboostSidecarFeatureSchemaRevision,
+} from '../atlas/classification/xgboost-sidecar-feature-admission-v1.js';
 import { getRedis } from '$lib/server/redis.js';
 import { isRetiredDenseSignal, type FeatureEnvelope } from './feature-envelope.js';
 import {
@@ -103,6 +107,7 @@ const XgboostHealthSchema = z.object({
   modelRevision: z.string().optional(),
   objective: z.string().optional(),
   featureSchemaRevision: z.string().optional(),
+  features: z.array(z.string()).optional(),
   scoreSemantics: z.enum(['REGRESSION_SCORE', 'RANKING_SCORE']).optional(),
   calibrated: z.boolean().optional(),
 }).passthrough();
@@ -147,6 +152,10 @@ async function computeLearnedRerankerOrder(
     const healthParsed = XgboostHealthSchema.safeParse(await healthRes.json());
     if (!healthParsed.success || healthParsed.data.model_loaded === false) return null;
     const health = healthParsed.data;
+    const expectedFeatureSchemaRevision = xgboostSidecarFeatureSchemaRevision();
+    if (health.featureSchemaRevision !== expectedFeatureSchemaRevision) return null;
+    if (!health.features || health.features.length !== XGBOOST_SIDECAR_FEATURES.length
+      || health.features.some((feature, index) => feature !== XGBOOST_SIDECAR_FEATURES[index])) return null;
 
     const rows = candidates.map((candidate, index) => {
       const ageDays = 180;
@@ -160,7 +169,7 @@ async function computeLearnedRerankerOrder(
         reward_prior: candidate.domainScore ?? 0.5,
         domain_class_match: candidate.domainScore ?? 0.5,
         freshness_score: 0.5,
-        pagerank_score: candidate.pagerankScore ?? candidate.graphScore ?? 0.5,
+        pagerank_score: candidate.pagerankScore ?? 0.5,
         som_cache_hit: 0,
         provenance_git_age: Math.min(1.0, ageDays / 365),
         packet_hit_count: 0,
@@ -192,10 +201,10 @@ async function computeLearnedRerankerOrder(
 
     const modelKindRaw = data.modelType ?? data.model ?? health.modelType ?? health.model_type ?? 'xgboost';
     const modelKind: LearnedRerankerKind = modelKindRaw === 'lightgbm' ? 'lightgbm' : 'xgboost';
-    const modelRevision = data.modelRevision ?? health.modelRevision;
-    if (!modelRevision?.trim()) return null;
-    const featureSchemaRevision = data.featureSchemaRevision ?? health.featureSchemaRevision;
-    if (!featureSchemaRevision?.trim()) return null;
+    const modelRevision = health.modelRevision;
+    if (!modelRevision?.trim() || data.modelRevision !== modelRevision) return null;
+    if (data.featureSchemaRevision !== expectedFeatureSchemaRevision) return null;
+    const featureSchemaRevision = expectedFeatureSchemaRevision;
     const calibrated = data.calibrated ?? health.calibrated ?? false;
 
     // Rank directly by the raw learned-reranker score — descending, tie-broken by prior
@@ -665,7 +674,7 @@ export function canonicalEnvelopeToRerankCandidate(
     bm25Score: envelope.lexical?.score,
     astScore: envelope.ast?.score,
     graphScore: envelope.metadata?.score ?? envelope.authority?.score,
-    pagerankScore: envelope.authority?.page_rank ?? envelope.authority?.score,
+    pagerankScore: envelope.authority?.page_rank,
     domainScore: envelope.metadata?.score,
   };
 }
