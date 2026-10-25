@@ -1,50 +1,50 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "5507987c-6578-4c0f-8ef3-570706088621",
-  "repositoryRevision": "867dca776e288cbe53f1aa577576d065e4e85597",
-  "generatedAt": "2026-10-25T03:21:20.138Z",
+  "runId": "31d6f979-c57b-46dd-bf38-a0728c1f51f9",
+  "repositoryRevision": "3f803daf5e4ef383f1f76cc5002c33865485386f",
+  "generatedAt": "2026-10-25T15:47:04.039Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
     "snapshot": {
       "status": "PROVEN",
-      "totalFiles": 30247,
-      "totalBytes": 528068521,
-      "currentRevision": "867dca776e288cbe53f1aa577576d065e4e85597",
+      "totalFiles": 30327,
+      "totalBytes": 528720368,
+      "currentRevision": "3f803daf5e4ef383f1f76cc5002c33865485386f",
       "priorRevision": "867dca776e288cbe53f1aa577576d065e4e85597"
     },
     "inventory": {
       "status": "PROVEN",
-      "totalFiles": 30247,
-      "codeFiles": 18214,
-      "documentationFiles": 9092,
-      "configFiles": 2369,
+      "totalFiles": 30327,
+      "codeFiles": 18290,
+      "documentationFiles": 9094,
+      "configFiles": 2371,
       "otherFiles": 572,
       "topExtensions": [
         {
           "extension": ".ts",
-          "count": 9216
+          "count": 9244
         },
         {
           "extension": ".md",
-          "count": 9092
+          "count": 9094
         },
         {
           "extension": ".mjs",
-          "count": 5167
+          "count": 5185
         },
         {
           "extension": ".json",
-          "count": 2182
+          "count": 2184
         },
         {
           "extension": ".py",
-          "count": 1004
+          "count": 1026
         },
         {
           "extension": ".svelte",
-          "count": 950
+          "count": 951
         },
         {
           "extension": ".mts",
@@ -52,7 +52,7 @@
         },
         {
           "extension": ".sql",
-          "count": 736
+          "count": 743
         },
         {
           "extension": ".ps1",
@@ -74,16 +74,16 @@
     },
     "structural": {
       "status": "PROVEN",
-      "filesProcessed": 30247,
-      "filesWithStructure": 14817,
-      "factCount": 151357,
-      "functionCount": 53665,
-      "classCount": 1302,
+      "filesProcessed": 30327,
+      "filesWithStructure": 14863,
+      "factCount": 151750,
+      "functionCount": 53769,
+      "classCount": 1303,
       "interfaceCount": 1636,
-      "methodCount": 4319,
-      "importCount": 46328,
-      "constCount": 8903,
-      "arrowCount": 35204,
+      "methodCount": 4320,
+      "importCount": 46481,
+      "constCount": 8936,
+      "arrowCount": 35305,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -289,33 +289,33 @@
     },
     "identity": {
       "status": "PARTIAL",
-      "uniqueIds": 151352,
+      "uniqueIds": 151745,
       "duplicateIds": 5,
-      "reusedIds": 151352,
+      "reusedIds": 151409,
       "supersededIds": 5
     },
     "lexical": {
       "status": "PROVEN",
-      "filesProcessed": 30247,
-      "entries": 30247,
-      "totalTokens": 47128391,
-      "totalUniqueTokens": 10208144,
+      "filesProcessed": 30327,
+      "entries": 30327,
+      "totalTokens": 47195900,
+      "totalUniqueTokens": 10229615,
       "topGlobalTerms": [
         {
           "term": "count",
-          "weight": 682194
+          "weight": 682275
         },
         {
           "term": "tag",
-          "weight": 624739
+          "weight": 624748
         },
         {
           "term": "routes",
-          "weight": 598454
+          "weight": 598486
         },
         {
           "term": "api",
-          "weight": 514881
+          "weight": 514962
         },
         {
           "term": "filepath",
@@ -327,7 +327,7 @@
         },
         {
           "term": "id",
-          "weight": 474544
+          "weight": 474937
         },
         {
           "term": "unclassified",
@@ -335,7 +335,7 @@
         },
         {
           "term": "pagerank",
-          "weight": 394850
+          "weight": 394879
         },
         {
           "term": "graphauthorityscore",
@@ -347,23 +347,23 @@
         },
         {
           "term": "gpu",
-          "weight": 359506
+          "weight": 359567
         },
         {
           "term": "community",
-          "weight": 340097
+          "weight": 340103
         },
         {
           "term": "app",
-          "weight": 315346
+          "weight": 315355
         },
         {
           "term": "cluster",
-          "weight": 310715
+          "weight": 310777
         },
         {
           "term": "components",
-          "weight": 252556
+          "weight": 252559
         },
         {
           "term": "clusterkey",
@@ -371,7 +371,7 @@
         },
         {
           "term": "kind",
-          "weight": 233390
+          "weight": 233427
         },
         {
           "term": "clustersrc",
@@ -379,7 +379,7 @@
         },
         {
           "term": "sveltekit",
-          "weight": 215462
+          "weight": 215561
         }
       ],
       "samples": [
@@ -2231,10 +2231,10 @@
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 349042,
-      "containsEdges": 151357,
-      "importEdges": 46328,
-      "declaresEdges": 151357,
+      "entries": 349981,
+      "containsEdges": 151750,
+      "importEdges": 46481,
+      "declaresEdges": 151750,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2440,36 +2440,36 @@
     },
     "labeling": {
       "status": "PROVEN",
-      "filesProcessed": 30247,
+      "filesProcessed": 30327,
       "domainCounts": {
-        "test": 1525,
-        "feature": 3581,
-        "config": 1190,
-        "gpu": 1442,
-        "graph": 1093,
-        "api": 3682,
-        "ai": 184,
-        "ui": 8258,
-        "auth": 1476,
-        "retrieval": 4218,
-        "indexer": 1907,
+        "test": 1542,
+        "feature": 3592,
+        "config": 1195,
+        "gpu": 1443,
+        "graph": 1097,
+        "api": 3695,
+        "ai": 185,
+        "ui": 8269,
+        "auth": 1477,
+        "retrieval": 4229,
+        "indexer": 1912,
         "vector": 81,
         "cache": 1610
       },
       "ontologyCounts": {
-        "utility": 21451,
-        "adapter": 1397,
-        "model": 4307,
+        "utility": 21509,
+        "adapter": 1405,
+        "model": 4317,
         "service": 1384,
         "handler": 448,
         "bridge": 83,
-        "manager": 1144,
+        "manager": 1148,
         "client": 33
       },
       "tierCounts": {
-        "test": 3490,
-        "feature": 23480,
-        "middleware": 2986,
+        "test": 3516,
+        "feature": 23530,
+        "middleware": 2990,
         "core": 291
       },
       "sampleLabels": [
@@ -2585,10 +2585,10 @@
     },
     "projection": {
       "status": "PROVEN",
-      "postgresCanonicalRecords": 30247,
+      "postgresCanonicalRecords": 30327,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 349042,
-      "redisProjectionRecords": 30247,
+      "neo4jProjectionRecords": 349981,
+      "redisProjectionRecords": 30327,
       "representationName": "semantic_768",
       "denseVectorName": "content",
       "collectionName": "codebase_chunks_768_v2"
@@ -2597,7 +2597,7 @@
       "status": "PROVEN",
       "missingHashes": 0,
       "malformedHashes": 0,
-      "duplicateFileHashes": 901,
+      "duplicateFileHashes": 902,
       "missingStructuralIds": 0,
       "semanticDimensionMismatches": 0,
       "pass": true
@@ -2624,9 +2624,9 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 30247,
-      "invalidatedFiles": 0,
-      "reusedRatio": 1
+      "reusedFiles": 30155,
+      "invalidatedFiles": 172,
+      "reusedRatio": 0.9943284861674415
     }
   },
   "outputs": {
@@ -2653,7 +2653,7 @@
     "path": "docs/reports/workspace-source-binding-observation.json",
     "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
     "sourceManifestDigest": "927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-    "sourceCount": 30247,
+    "sourceCount": 30327,
     "boundSources": 25361,
     "skippedSources": 107
   },

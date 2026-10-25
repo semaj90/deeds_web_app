@@ -1,24 +1,19 @@
 {
-  "generatedAt": "2026-10-25T08:30:36.509Z",
+  "generatedAt": "2026-10-25T16:24:33.865Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
     "tablesChecked": 11,
-    "staticAligned": 5,
-    "liveAligned": 6,
+    "staticAligned": 9,
+    "liveAligned": 7,
     "liveMissing": 1,
     "liveUnavailable": 0,
     "blockers": [
-      "kanban_tasks: static COLUMN_MISMATCH",
       "feature_registry: live LIVE_TABLE_MISSING",
-      "atlas_workspace_events: static COLUMN_MISMATCH",
-      "atlas_workspace_events: live COLUMN_MISMATCH",
       "task_semantic_packets: static COLUMN_MISMATCH",
       "task_semantic_packets: live COLUMN_MISMATCH",
       "atlas_packets: static COLUMN_MISMATCH",
       "atlas_packets: live COLUMN_MISMATCH",
-      "nes_chrom_packets: static INDEX_MISMATCH",
-      "route_runtime_packets: static INDEX_MISMATCH",
       "route_runtime_packets: live COLUMN_MISMATCH"
     ]
   },
@@ -33,7 +28,7 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\kanban_task_lifecycle_baseline.sql"
       ],
       "static": {
-        "classification": "COLUMN_MISMATCH",
+        "classification": "SQL_AND_DRIZZLE_ALIGNED",
         "columns": [
           "assignee",
           "attempt_count",
@@ -82,11 +77,14 @@
           "max_retries",
           "priority",
           "source_refs",
+          "source_revision",
+          "source_url",
           "started_at",
           "status",
           "task_id",
           "updated_at",
-          "validation_command"
+          "validation_command",
+          "workspace_id"
         ],
         "manualColumns": [
           "assignee",
@@ -114,7 +112,11 @@
           "validation_command",
           "workspace_id"
         ],
-        "schemaIndexes": [],
+        "schemaIndexes": [
+          "idx_kanban_tasks_workspace_id",
+          "kanban_ready_idx",
+          "kanban_running_heartbeat_idx"
+        ],
         "manualIndexes": [
           "idx_kanban_tasks_workspace_id",
           "kanban_ready_idx",
@@ -122,19 +124,11 @@
         ],
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "source_revision",
-            "source_url",
-            "workspace_id"
-          ]
+          "onlyInB": []
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "idx_kanban_tasks_workspace_id",
-            "kanban_ready_idx",
-            "kanban_running_heartbeat_idx"
-          ]
+          "onlyInB": []
         }
       },
       "live": {
@@ -185,7 +179,7 @@
         }
       },
       "classification": "LIVE_DB_ALIGNED",
-      "repairClass": "ADD_DRIZZLE_MIRROR",
+      "repairClass": null,
       "identityFields": [
         "task_id",
         "feature_id",
@@ -323,11 +317,14 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261017_workspace_event_provenance_v1_DRAFT.sql"
       ],
       "static": {
-        "classification": "COLUMN_MISMATCH",
+        "classification": "SQL_AND_DRIZZLE_ALIGNED",
         "columns": [
+          "actor",
           "after_state_checksum",
+          "base_commit",
           "base_snapshot_revision",
           "before_state_checksum",
+          "branch",
           "causation_id",
           "correlation_id",
           "created_at",
@@ -335,13 +332,20 @@
           "event_checksum",
           "event_id",
           "event_type",
+          "execution_run_id",
+          "idempotency_key",
+          "lease_fence_epoch",
+          "lease_fence_token",
+          "lease_id",
           "occurred_at",
           "previous_head_revision",
           "producer_revision",
           "sequence",
+          "supersedes_event_id",
           "task_id",
           "workspace_head_revision",
-          "workspace_id"
+          "workspace_id",
+          "worktree_id"
         ],
         "indexes": [
           "atlas_workspace_events_idempotency_uidx",
@@ -349,9 +353,12 @@
           "atlas_workspace_events_workspace_sequence_idx"
         ],
         "schemaColumns": [
+          "actor",
           "after_state_checksum",
+          "base_commit",
           "base_snapshot_revision",
           "before_state_checksum",
+          "branch",
           "causation_id",
           "correlation_id",
           "created_at",
@@ -359,33 +366,53 @@
           "event_checksum",
           "event_id",
           "event_type",
+          "execution_run_id",
+          "idempotency_key",
+          "lease_fence_epoch",
+          "lease_fence_token",
+          "lease_id",
           "occurred_at",
           "previous_head_revision",
           "producer_revision",
           "sequence",
-          "workspace_head_revision",
-          "workspace_id"
-        ],
-        "manualColumns": [
-          "after_state_checksum",
-          "base_snapshot_revision",
-          "before_state_checksum",
-          "causation_id",
-          "correlation_id",
-          "created_at",
-          "delta_root_checksum",
-          "event_checksum",
-          "event_id",
-          "event_type",
-          "occurred_at",
-          "previous_head_revision",
-          "producer_revision",
-          "sequence",
+          "supersedes_event_id",
           "task_id",
           "workspace_head_revision",
-          "workspace_id"
+          "workspace_id",
+          "worktree_id"
+        ],
+        "manualColumns": [
+          "actor",
+          "after_state_checksum",
+          "base_commit",
+          "base_snapshot_revision",
+          "before_state_checksum",
+          "branch",
+          "causation_id",
+          "correlation_id",
+          "created_at",
+          "delta_root_checksum",
+          "event_checksum",
+          "event_id",
+          "event_type",
+          "execution_run_id",
+          "idempotency_key",
+          "lease_fence_epoch",
+          "lease_fence_token",
+          "lease_id",
+          "occurred_at",
+          "previous_head_revision",
+          "producer_revision",
+          "sequence",
+          "supersedes_event_id",
+          "task_id",
+          "workspace_head_revision",
+          "workspace_id",
+          "worktree_id"
         ],
         "schemaIndexes": [
+          "atlas_workspace_events_idempotency_uidx",
+          "atlas_workspace_events_task_idx",
           "atlas_workspace_events_workspace_sequence_idx"
         ],
         "manualIndexes": [
@@ -395,22 +422,17 @@
         ],
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "task_id"
-          ]
+          "onlyInB": []
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "atlas_workspace_events_idempotency_uidx",
-            "atlas_workspace_events_task_idx"
-          ]
+          "onlyInB": []
         }
       },
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "COLUMN_MISMATCH",
+        "classification": "LIVE_DB_ALIGNED",
         "error": null,
         "columns": [
           "event_id",
@@ -452,26 +474,15 @@
         "rowCount": 0,
         "columnDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "actor",
-            "base_commit",
-            "branch",
-            "execution_run_id",
-            "idempotency_key",
-            "lease_fence_epoch",
-            "lease_fence_token",
-            "lease_id",
-            "supersedes_event_id",
-            "worktree_id"
-          ]
+          "onlyInB": []
         },
         "indexDiffs": {
           "onlyInA": [],
           "onlyInB": []
         }
       },
-      "classification": "COLUMN_MISMATCH",
-      "repairClass": "ADD_DRIZZLE_MIRROR",
+      "classification": "LIVE_DB_ALIGNED",
+      "repairClass": null,
       "identityFields": [
         "event_id",
         "event_checksum",
@@ -1204,6 +1215,7 @@
           "qdrant_collection",
           "qdrant_point_id",
           "qdrant_vector_dim",
+          "recovery_lane",
           "redis_centroid_key",
           "representation_revision",
           "reward_prior",
@@ -1220,7 +1232,11 @@
           "source_representation_id",
           "source_revision",
           "summary",
+          "summary_backend",
+          "summary_generated_at",
+          "summary_metadata",
           "summary_model",
+          "summary_version",
           "tags",
           "taxonomy_level",
           "test_coverage_pct",
@@ -1397,6 +1413,7 @@
         "manualColumns": [
           "app_criticality",
           "artifact_id",
+          "betweenness",
           "bm25_indexed_at",
           "bm25_score",
           "bm25_terms",
@@ -1409,6 +1426,7 @@
           "concept_ids",
           "created_at",
           "domain_class",
+          "eigenvector",
           "embedding",
           "error_pattern",
           "extracted_entities",
@@ -1417,13 +1435,21 @@
           "file_purpose",
           "file_understanding_computed_at",
           "file_understanding_method",
+          "identity_confidence",
           "identity_lane",
           "keywords",
           "metadata",
+          "neo4j_node_id",
           "packet_id",
           "packet_key",
+          "pagerank",
           "payload",
           "permissions",
+          "qdrant_collection",
+          "qdrant_point_id",
+          "qdrant_vector_dim",
+          "recovery_lane",
+          "redis_centroid_key",
           "reward_prior",
           "sha256",
           "source_kind",
@@ -1432,12 +1458,18 @@
           "source_ref_key",
           "source_revision",
           "summary",
+          "summary_backend",
+          "summary_generated_at",
+          "summary_metadata",
           "summary_model",
+          "summary_version",
           "taxonomy_level",
           "test_coverage_pct",
           "thoroughness",
+          "topology",
           "tree_node_id",
-          "updated_at"
+          "updated_at",
+          "vectors"
         ],
         "schemaIndexes": [
           "idx_atlas_packets_betweenness",
@@ -1542,36 +1574,27 @@
         ],
         "columnDiffs": {
           "onlyInA": [
-            "betweenness",
             "canonical",
             "canonical_source_ref",
             "content_hash",
             "directory_path",
             "domain_memberships",
-            "eigenvector",
             "embedding_digest",
             "encoder_revision",
             "feature_label",
             "file_path",
             "function_symbol",
-            "identity_confidence",
             "kmeans_cluster",
             "latent_64",
             "ledger_type",
             "lineage_binding_checksum",
             "lineage_producer_revision",
             "lineage_version",
-            "neo4j_node_id",
             "packet_ulid",
-            "pagerank",
             "payload_backfilled_at",
             "primary_domain",
             "projection_dimension",
             "projection_representation_id",
-            "qdrant_collection",
-            "qdrant_point_id",
-            "qdrant_vector_dim",
-            "redis_centroid_key",
             "representation_revision",
             "som_col",
             "som_index",
@@ -1581,8 +1604,6 @@
             "source_representation_id",
             "tags",
             "title_id",
-            "topology",
-            "vectors",
             "workspace_id",
             "workspace_revision",
             "workspace_revision_key"
@@ -1599,7 +1620,12 @@
             "file_understanding_computed_at",
             "file_understanding_method",
             "keywords",
+            "recovery_lane",
+            "summary_backend",
+            "summary_generated_at",
+            "summary_metadata",
             "summary_model",
+            "summary_version",
             "taxonomy_level",
             "test_coverage_pct",
             "thoroughness"
@@ -1933,7 +1959,11 @@
         "rowCount": 61718,
         "columnDiffs": {
           "onlyInA": [
-            "summary_model"
+            "summary_backend",
+            "summary_generated_at",
+            "summary_metadata",
+            "summary_model",
+            "summary_version"
           ],
           "onlyInB": [
             "ast_score",
@@ -1973,7 +2003,6 @@
             "pagerank_score",
             "parent_packet_key",
             "predicted_domain",
-            "recovery_lane",
             "related_packets",
             "repository_id",
             "rerank_features",
@@ -2119,7 +2148,7 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\atlas_dict_tables.sql"
       ],
       "static": {
-        "classification": "INDEX_MISMATCH",
+        "classification": "SQL_AND_DRIZZLE_ALIGNED",
         "columns": [
           "betweenness",
           "canonical",
@@ -2370,7 +2399,11 @@
           "nes_chrom_packets_embedding_hnsw",
           "nes_chrom_packets_feature_code_idx",
           "nes_chrom_packets_feature_id_idx",
+          "nes_chrom_packets_feature_ids_gin",
           "nes_chrom_packets_kag_run_idx",
+          "nes_chrom_packets_kmeans_cluster_idx",
+          "nes_chrom_packets_lane_ids_gin",
+          "nes_chrom_packets_metadata_gin",
           "nes_chrom_packets_norm_source_ref_trgm_idx",
           "nes_chrom_packets_packet_key_key",
           "nes_chrom_packets_packet_zstd_idx",
@@ -2378,11 +2411,13 @@
           "nes_chrom_packets_qdrant_point_idx",
           "nes_chrom_packets_query_hash_idx",
           "nes_chrom_packets_som_code_idx",
+          "nes_chrom_packets_som_index_idx",
           "nes_chrom_packets_source_ref_id_idx",
           "nes_chrom_packets_source_ref_idx",
           "nes_chrom_packets_source_ref_trgm_idx",
           "nes_chrom_packets_source_refs_gin",
-          "nes_chrom_packets_summary_trgm_idx"
+          "nes_chrom_packets_summary_trgm_idx",
+          "nes_chrom_packets_tags_gin"
         ],
         "manualIndexes": [
           "idx_nes_chrom_packets_betweenness",
@@ -2444,14 +2479,7 @@
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "nes_chrom_packets_feature_ids_gin",
-            "nes_chrom_packets_kmeans_cluster_idx",
-            "nes_chrom_packets_lane_ids_gin",
-            "nes_chrom_packets_metadata_gin",
-            "nes_chrom_packets_som_index_idx",
-            "nes_chrom_packets_tags_gin"
-          ]
+          "onlyInB": []
         }
       },
       "live": {
@@ -2579,7 +2607,7 @@
         }
       },
       "classification": "LIVE_DB_ALIGNED",
-      "repairClass": "ADD_DRIZZLE_MIRROR",
+      "repairClass": null,
       "identityFields": [
         "packet_key",
         "source_ref",
@@ -2727,6 +2755,7 @@
       ],
       "manualSource": [
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260601_add_alias_and_parent_atlas_indexes.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260602_superseded_score_candidate.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261013_parent_atlas_documents_align_declared_columns.sql"
       ],
       "static": {
@@ -2784,6 +2813,8 @@
         ],
         "manualColumns": [
           "alias_id",
+          "archive_decision",
+          "archive_eligible",
           "centroid_id",
           "cluster_id",
           "created_at",
@@ -2813,6 +2844,7 @@
           "summary_lod0",
           "summary_lod1",
           "summary_lod2",
+          "superseded_score",
           "tags",
           "tree_node_id",
           "updated_at",
@@ -2908,7 +2940,7 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261025_route_runtime_packets_packet_uuid_v1.sql"
       ],
       "static": {
-        "classification": "INDEX_MISMATCH",
+        "classification": "SQL_AND_DRIZZLE_ALIGNED",
         "columns": [
           "cache_hit",
           "cache_tier",
@@ -3146,6 +3178,7 @@
           "idx_rrp_source_ref_quality",
           "idx_rrp_source_refs_gin",
           "idx_rrp_superseded_by",
+          "route_runtime_packets_packet_uuid_uq",
           "rrp_feature_idx",
           "rrp_packet_uuid_uidx",
           "rrp_raw_gin",
@@ -3199,9 +3232,7 @@
         },
         "indexDiffs": {
           "onlyInA": [],
-          "onlyInB": [
-            "route_runtime_packets_packet_uuid_uq"
-          ]
+          "onlyInB": []
         }
       },
       "live": {
@@ -3318,7 +3349,7 @@
         }
       },
       "classification": "COLUMN_MISMATCH",
-      "repairClass": "ADD_DRIZZLE_MIRROR",
+      "repairClass": "ADD_MISSING_COLUMNS_VERIFY_WRITERS",
       "identityFields": [
         "packet_uuid",
         "source_ref",

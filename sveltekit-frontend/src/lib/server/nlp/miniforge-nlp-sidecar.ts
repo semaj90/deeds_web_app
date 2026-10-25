@@ -11,6 +11,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
+import { createHash } from 'node:crypto';
 import {
   AnalysisPassResultSchema,
   compileExperimentFeatureMatrix,
@@ -136,6 +137,15 @@ function parseOccurrenceByteSpans(value: unknown, source: string): Array<[number
   });
 }
 
+const AstParserObservationSchema = z.object({
+  schema: z.literal('atlas.ast.parser-observation.v1'),
+  source_sha256: z.string().regex(/^[a-f0-9]{64}$/),
+  utf8_byte_length: z.number().int().nonnegative().safe(),
+  root_has_error: z.boolean(),
+  error_node_count: z.number().int().nonnegative().safe(),
+  missing_node_count: z.number().int().nonnegative().safe(),
+}).strict();
+
 export interface AtlasStructuralEvidence {
   schema: 'atlas.ast.evidence.v1';
   engine: string;
@@ -148,6 +158,8 @@ export interface AtlasStructuralEvidence {
   diagnostics: string[];
   error_tag?: 'ChunkingError' | 'UnsupportedLanguageError' | null;
   syntax_status?: 'CLEAN' | 'RECOVERED_WITH_ERRORS';
+  scan_completeness?: 'COMPLETE' | 'PARTIAL_AST_FAILED';
+  parser_observation?: z.infer<typeof AstParserObservationSchema>;
 }
 
 export interface NlpFeature {
@@ -738,6 +750,14 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           `[miniforge-nlp] ast/chunk scan incomplete: ${scanCompleteness ?? 'MISSING_RECEIPT'}${scanFailure ? ` — ${scanFailure}` : ''}`,
         );
       }
+      const parserObservation = raw.parser_observation == null
+        ? undefined : AstParserObservationSchema.parse(raw.parser_observation);
+      if (parserObservation && (
+        parserObservation.utf8_byte_length !== new TextEncoder().encode(req.source).byteLength
+        || parserObservation.source_sha256 !== createHash('sha256').update(req.source, 'utf8').digest('hex')
+      )) {
+        throw new Error('[miniforge-nlp] ast/chunk parser observation source bytes mismatch');
+      }
       return {
         schema: raw.schema,
         engine: String(raw.engine ?? 'unknown'),
@@ -786,7 +806,11 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
         })) : [],
         diagnostics: Array.isArray(raw.diagnostics) ? raw.diagnostics.map(String) : [],
         error_tag: raw.error_tag === 'ChunkingError' || raw.error_tag === 'UnsupportedLanguageError' ? raw.error_tag : null,
-        syntax_status: raw.syntax_status === 'RECOVERED_WITH_ERRORS' ? 'RECOVERED_WITH_ERRORS' : 'CLEAN',
+        syntax_status: raw.syntax_status === 'RECOVERED_WITH_ERRORS'
+          || parserObservation?.root_has_error || (parserObservation?.error_node_count ?? 0) > 0
+          || (parserObservation?.missing_node_count ?? 0) > 0 ? 'RECOVERED_WITH_ERRORS' : 'CLEAN',
+        scan_completeness: 'COMPLETE',
+        ...(parserObservation ? { parser_observation: parserObservation } : {}),
       };
     },
   };

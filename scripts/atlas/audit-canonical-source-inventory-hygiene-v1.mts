@@ -2,7 +2,7 @@
 
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, resolve, sep } from 'node:path';
+import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 import {
@@ -42,8 +42,19 @@ if (!manifestArgument) {
   throw new Error('EXPLICIT_WORKSPACE_SNAPSHOT_MANIFEST_REQUIRED');
 }
 const snapshotPath = resolve(ROOT, manifestArgument);
+const sourceReadRootArgument = argument('--source-read-root');
+let sourceReadRoot: string | undefined;
+if (sourceReadRootArgument) {
+  const materializedRoot = resolve(ROOT, sourceReadRootArgument);
+  const materializedBase = resolve(ROOT, '.tmp/workspace-source-snapshots');
+  const materializedRelative = relative(materializedBase, materializedRoot);
+  if (!materializedRelative || materializedRelative.startsWith('..') || resolve(materializedRoot) === materializedBase) {
+    throw new Error('SOURCE_READ_ROOT_MUST_BE_MATERIALIZED_SNAPSHOT');
+  }
+  sourceReadRoot = materializedRoot;
+}
 const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8'));
-const readback = validateSnapshot(snapshot);
+const readback = validateSnapshot(snapshot, sourceReadRoot ? { sourceReadRoot } : undefined);
 const sources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
 const classified = classifySnapshotSources(sources);
 const canonicalRecords = canonicalInventoryRecords(classified);

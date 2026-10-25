@@ -25,6 +25,7 @@ function makeTempRepo() {
       '',
     ].join('\n'),
   );
+  fs.copyFileSync(path.join(root, 'src', 'example.ts'), path.join(root, 'src', 'example-copy.ts'));
 
   fs.writeFileSync(
     path.join(root, 'docs', 'README.md'),
@@ -54,10 +55,29 @@ describe('repository provenance workflow', () => {
       embedder,
     });
 
-    expect(first.stages.snapshot.totalFiles).toBeGreaterThanOrEqual(2);
+    expect(first.stages.snapshot.totalFiles).toBeGreaterThanOrEqual(3);
     expect(first.stages.inventory.codeFiles).toBeGreaterThanOrEqual(1);
     expect(first.stages.structural.factCount).toBeGreaterThan(0);
+    expect(first.stages.identity.duplicateIds).toBe(0);
+    expect(first.stages.validation.duplicateFileHashes).toBeGreaterThan(0);
+    expect(first.stages.validation.pass).toBe(true);
     expect(first.stages.semantic.embeddedFiles).toBeGreaterThan(0);
+    expect(first.stages.gpu).toMatchObject({
+      status: 'SKIPPED',
+      embeddingProbeCount: 0,
+      embeddingProbeHits: 0,
+      analysisMode: 'unavailable',
+      reason: 'GPU_EXECUTOR_NOT_INVOKED',
+    });
+    expect(first.stages.projection).toMatchObject({
+      status: 'SKIPPED',
+      postgresCanonicalRecords: 0,
+      qdrantProjectionRecords: 0,
+      neo4jProjectionRecords: 0,
+      redisProjectionRecords: 0,
+      candidateCounts: { sources: first.stages.snapshot.totalFiles },
+      reason: 'PROJECTION_WRITERS_NOT_INVOKED',
+    });
     expect(first.stages.relationships.entries).toBeGreaterThan(0);
     expect(first.stages.validation.pass).toBe(true);
     expect(first.stages.evaluation.totalQueries).toBeGreaterThan(0);

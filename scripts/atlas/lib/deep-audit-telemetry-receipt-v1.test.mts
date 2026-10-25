@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { buildReceipt } from '../deep-audit-hll-telemetry-v1.mts';
@@ -17,6 +17,13 @@ const graph = {
   ],
 };
 const graphRaw = JSON.stringify(graph);
+
+test('codebase graph serializer preserves parsesBody for G5', () => {
+  const source = readFileSync(path.resolve('sveltekit-frontend/scripts/index-codebase-fast.mjs'), 'utf8');
+  assert.match(source, /hasAuth:\s*f\.hasAuth,\s*hasZod:\s*f\.hasZod,\s*parsesBody:\s*f\.parsesBody/);
+  const serialized = JSON.parse(graphRaw) as typeof graph;
+  assert.equal(serialized.files[1].parsesBody, true);
+});
 
 /** Write a receipt built by the real writer function into the temp dir, optionally mutated. */
 async function writerReceipt(mutate?: (r: Record<string, unknown>) => void, name = 'telemetry-2026-10-21-aaaaaaaaaa.json') {

@@ -203,10 +203,10 @@ describe('OpenCode Configuration', () => {
 
     it('root permission should allow MCP tool namespaces', () => {
       const perm = projectConfig.permission as Record<string, unknown>;
-      expect(perm.trace_*).toBe('allow');
-      expect(perm.turbovec_*).toBe('allow');
-      expect(perm.engram_*).toBe('allow');
-      expect(perm.atlas_*).toBe('allow');
+      expect(perm['trace_*']).toBe('allow');
+      expect(perm['turbovec_*']).toBe('allow');
+      expect(perm['engram_*']).toBe('allow');
+      expect(perm['atlas_*']).toBe('allow');
     });
 
     it('root permission bash should allow npm and rg commands', () => {

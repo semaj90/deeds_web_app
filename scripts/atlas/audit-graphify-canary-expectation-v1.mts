@@ -7,7 +7,8 @@ import { verifyGraphifyCanaryExpectationV1 } from '../../sveltekit-frontend/src/
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
-const EXPECTATION = resolve(ROOT, 'docs/reports/graphify-canary-expectation-v1.json');
+const expectationArgument = process.argv.find((value) => value.startsWith('--expectation='))?.slice('--expectation='.length);
+const EXPECTATION = resolve(ROOT, expectationArgument ?? 'docs/reports/graphify-canary-expectation-v1.json');
 
 const admission = JSON.parse(readFileSync(ADMISSION, 'utf8')) as Record<string, unknown>;
 const expectation = JSON.parse(readFileSync(EXPECTATION, 'utf8')) as Record<string, unknown>;
@@ -19,6 +20,8 @@ const expectationContract = {
   schema: expectation.schema,
   workspaceRevision: expectation.workspaceRevision,
   snapshotRevision: expectation.snapshotRevision,
+  sourceInventoryRevision: expectation.sourceInventoryRevision,
+  sourceInventoryChecksum: expectation.sourceInventoryChecksum,
   sourceSelectionChecksum: expectation.sourceSelectionChecksum,
   sourceCount: expectation.sourceCount,
   identityChecksum: expectation.identityChecksum,

@@ -302,10 +302,14 @@ function parseSqlText(text, tableName) {
     }
   }
 
-  const alterAddColumnRe = new RegExp(`ALTER\\s+TABLE(?:\\s+ONLY)?\\s+(?:public\\.)?"?${escaped}"?\\s+ADD\\s+COLUMN(?:\\s+IF\\s+NOT\\s+EXISTS)?\\s+"?([A-Za-z0-9_]+)"?`, 'ig');
-  for (const match of text.matchAll(alterAddColumnRe)) {
-    matched = true;
-    columns.add(match[1].toLowerCase());
+  const alterTableBlockRe = new RegExp(`ALTER\\s+TABLE(?:\\s+ONLY)?\\s+(?:public\\.)?"?${escaped}"?\\s*([^;]+);`, 'ig');
+  for (const match of text.matchAll(alterTableBlockRe)) {
+    const block = match[1];
+    const addColRe = /ADD\s+COLUMN(?:\s+IF\s+NOT\s+EXISTS)?\s+"?([A-Za-z0-9_]+)"?/ig;
+    for (const colMatch of block.matchAll(addColRe)) {
+      matched = true;
+      columns.add(colMatch[1].toLowerCase());
+    }
   }
 
   const indexRe = new RegExp(`CREATE(?:\\s+UNIQUE)?\\s+INDEX(?:\\s+IF\\s+NOT\\s+EXISTS)?\\s+"?([A-Za-z0-9_]+)"?\\s+ON\\s+(?:public\\.)?"?${escaped}"?(?=\\s|\\()`, 'ig');

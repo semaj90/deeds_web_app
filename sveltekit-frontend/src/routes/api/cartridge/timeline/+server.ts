@@ -14,22 +14,21 @@ import { z } from 'zod';
 
 const querySchema = z.object({
 	caseId: z.string().min(1).max(500),
-	userId: z.string().max(200).optional(),
 });
 
 export const GET: RequestHandler = async ({ url, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const params = { caseId: url.searchParams.get('caseId') ?? '', userId: url.searchParams.get('userId') ?? '' };
+	const params = { caseId: url.searchParams.get('caseId') ?? '' };
 	const parsed = querySchema.safeParse(params);
 	if (!parsed.success) {
 		return json({ events: [], aiSummary: '', error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
 
-	const { caseId, userId } = parsed.data;
+	const { caseId } = parsed.data;
 
 	try {
-		const result = await getChr97Timeline(caseId, userId ?? locals.user.id ?? '');
+		const result = await getChr97Timeline(caseId, locals.user.id);
 
 		if (!result) {
 			// gRPC disabled or unavailable — degraded contract

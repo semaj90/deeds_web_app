@@ -1,12 +1,22 @@
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
-import { relative, resolve, sep } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const ADMISSION_PATH = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
-const PLAN_PATH = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
-const REPORT_PATH = resolve(ROOT, 'docs/reports/graphify-snapshot-consumer-preflight-v1.json');
+const planArgument = process.argv.find((value) => value.startsWith('--plan='))?.slice('--plan='.length);
+const PLAN_PATH = resolve(ROOT, planArgument ?? 'docs/reports/graphify-source-selection-plan-v1.json');
+const reportArgument = process.argv.find((value) => value.startsWith('--report='))?.slice('--report='.length);
+const REPORT_PATH = resolve(ROOT, reportArgument ?? 'docs/reports/graphify-snapshot-consumer-preflight-v1.json');
+for (const [argumentName, pathValue] of [['report', reportArgument], ['plan', planArgument]] as const) {
+  if (!pathValue) continue;
+  const scratchRoot = resolve(ROOT, '.tmp');
+  const relativePath = relative(scratchRoot, argumentName === 'report' ? REPORT_PATH : PLAN_PATH);
+  if (!relativePath || relativePath.startsWith('..') || isAbsolute(relativePath)) {
+    throw new Error(`EXPLICIT_${argumentName.toUpperCase()}_PATH_MUST_BE_UNDER_REPOSITORY_TMP`);
+  }
+}
 
 type Source = {
   repositoryId?: string;

@@ -640,7 +640,11 @@
       "PowerShell(Get-PSDrive -PSProvider FileSystem | Select-Object Name, @{n='UsedGB';e={[math]::Round\\($_.Used/1GB,1\\)}}, @{n='FreeGB';e={[math]::Round\\($_.Free/1GB,1\\)}} | Format-Table -AutoSize | Out-String; Set-Location C:\\\\Users\\\\james\\\\Videos\\\\deeds-web-app; \\(Get-ChildItem -Directory openspec\\\\changes -ErrorAction SilentlyContinue\\).Count; \\(Get-ChildItem -Directory sveltekit-frontend\\\\openspec\\\\changes -ErrorAction SilentlyContinue\\).Count; \\(Get-ChildItem -Directory sveltekit-frontend\\\\openspec\\\\changes\\\\archive -ErrorAction SilentlyContinue\\).Count)",
       "PowerShell(try { Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/graphify/status' -TimeoutSec 15 | ConvertTo-Json -Depth 8 } catch { Write-Warning $_.Exception.Message })",
       "PowerShell(docker exec legal-ai-postgres *)",
-      "PowerShell(Start-Sleep 3; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/graphify/status' -TimeoutSec 15; $r.status | ConvertTo-Json; $r.pipeline.stages | ForEach-Object { \"$\\($_.name\\) ready=$\\($_.ready\\) $\\($_.message\\)\" } } catch { Write-Warning $_.Exception.Message })"
+      "PowerShell(Start-Sleep 3; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:5173/api/graphify/status' -TimeoutSec 15; $r.status | ConvertTo-Json; $r.pipeline.stages | ForEach-Object { \"$\\($_.name\\) ready=$\\($_.ready\\) $\\($_.message\\)\" } } catch { Write-Warning $_.Exception.Message })",
+      "Bash(wc -l tests/tool-ranker.spec.ts)",
+      "Bash(sed -n '1,30p' tests/tool-ranker.spec.ts)",
+      "Bash(grep -n \"describe\\(\\\\|it\\(\\\\|vi.mock\" tests/tool-ranker.spec.ts)",
+      "Bash(cat *)"
     ],
     "deny": [],
     "ask": []

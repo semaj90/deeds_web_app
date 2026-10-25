@@ -1,6 +1,6 @@
 {
   "schema": "atlas.canonical-source-inventory-hygiene.v1",
-  "generatedAt": "2026-10-25T08:29:16.005Z",
+  "generatedAt": "2026-10-25T08:59:01.203Z",
   "mode": "READ_ONLY",
   "status": "SOURCE_INVENTORY_HYGIENE_PASS",
   "proofLevel": "BOUNDED_LIVE_PROVEN",
@@ -8,14 +8,14 @@
   "canonicalAuthority": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
-  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\d8f9a782395d86f17b2e22907f031cace8facd5d06d6a2a36d2bda3a9adc49ed.json",
-  "snapshotRevision": "sha256:d8f9a782395d86f17b2e22907f031cace8facd5d06d6a2a36d2bda3a9adc49ed",
+  "snapshotPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\4a550ae5b5cec9db0e1986972df05977d854a96d8c6a03de0457324059d51f7f.json",
+  "snapshotRevision": "sha256:4a550ae5b5cec9db0e1986972df05977d854a96d8c6a03de0457324059d51f7f",
   "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
   "workspaceRevision": null,
-  "snapshotMembershipChecksum": "sha256:c0f364f7a3655e6781602754a6c3a0af28debcaf1018fef8ef0a7d77b0d90410",
+  "snapshotMembershipChecksum": "sha256:bcc668c392b8505c01408d489f3d36305916cc5be1bb569265b4dbd16ab3e4ce",
   "inventoryRevision": "atlas.canonical-source-inventory-hygiene-policy.2026-10-12.v2",
-  "sourceInventoryChecksum": "sha256:d66f13805d31589f19b6b6941875ee81e70b62ca70b75def0d2708e844b63737",
-  "sourceSelectionChecksum": "sha256:2488332cd2b070d58abc0fea4f713dd4e6e6e3ecbc6d999db29fb94a39847ffc",
+  "sourceInventoryChecksum": "sha256:68f84c6b561d1cc5317d32e771d63668d9bc3dc4ade2b5e84595a55945d13959",
+  "sourceSelectionChecksum": "sha256:3fd42b6847b4191902c4ad6ad6a24c13b103e19821548bbaca0dddb03aa27ae5",
   "writerPath": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
   "writerRevisionChecksum": "sha256:961de84e84d2576810b0c974a665af82be9b7f92ffd76b69f00d40ab6281006a",
   "writerExclusionPolicyRevision": "atlas.whole-codebase-source-exclusions.2026-09-16.v4",
@@ -33,8 +33,8 @@
       "liveServiceStorage": true
     }
   },
-  "candidatePathCount": 30313,
-  "canonicalSourceCount": 30091,
+  "candidatePathCount": 30314,
+  "canonicalSourceCount": 30092,
   "excludedCountsByReason": {
     "GENERATED_DERIVED_ARTIFACT": 29,
     "BUILD_OUTPUT": 10,
@@ -26811,9 +26811,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
-      "sourceRevision": "sha256:336ff4027240f2e840f7abf29a2db905b2c9bf2425e5b1c22f22b26eeb7c9076",
-      "contentDigest": "336ff4027240f2e840f7abf29a2db905b2c9bf2425e5b1c22f22b26eeb7c9076",
-      "byteLength": 409841
+      "sourceRevision": "sha256:96e20874602c64646f5b7a25c99fd4da2f688992e289fc08d66cc0d24c2399eb",
+      "contentDigest": "96e20874602c64646f5b7a25c99fd4da2f688992e289fc08d66cc0d24c2399eb",
+      "byteLength": 410935
     },
     {
       "sourceIdentityKey": "repo:root:openspec/changes/parent-atlas-deep-research-ingestion/.openspec.yaml",
@@ -42255,9 +42255,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-graphify-canary-expectation-v1.mts",
-      "sourceRevision": "sha256:b1536d2b7c823c4bb1ca978ac6c364a639c66e607672d7fb7fdcb954b7064dbd",
-      "contentDigest": "b1536d2b7c823c4bb1ca978ac6c364a639c66e607672d7fb7fdcb954b7064dbd",
-      "byteLength": 3793
+      "sourceRevision": "sha256:38c47aa8da9e4fb867d4ef151ff17011130ac061fe2de29eaa4bb8a24de2c8ba",
+      "contentDigest": "38c47aa8da9e4fb867d4ef151ff17011130ac061fe2de29eaa4bb8a24de2c8ba",
+      "byteLength": 3923
     },
     {
       "sourceIdentityKey": "repo:root:scripts/atlas/audit-graphify-completed-differential-replay-v1.mjs",
@@ -148839,9 +148839,9 @@
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/db/schema/kanban-tasks.ts",
-      "sourceRevision": "sha256:17b46e7a8973d14cc341f964eaee4d145e8d7cb6997ce02831bec664434eaeb3",
-      "contentDigest": "17b46e7a8973d14cc341f964eaee4d145e8d7cb6997ce02831bec664434eaeb3",
-      "byteLength": 3130
+      "sourceRevision": "sha256:44c0eb6f9616e4a123ab736b765d9900b05ff34ca2bd3c913d5338fd5a00c870",
+      "contentDigest": "44c0eb6f9616e4a123ab736b765d9900b05ff34ca2bd3c913d5338fd5a00c870",
+      "byteLength": 3523
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/db/schema/legal-cases.ts",
@@ -161790,6 +161790,12 @@
       "sourceRevision": "sha256:e5cfc9e8efdf622e4a3b58ed40c919884be06d2e819f3dec9e45460ea4a804cc",
       "contentDigest": "e5cfc9e8efdf622e4a3b58ed40c919884be06d2e819f3dec9e45460ea4a804cc",
       "byteLength": 11843
+    },
+    {
+      "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/(app)/demos/+layout.ts",
+      "sourceRevision": "sha256:bac9c346cc299dab39351737be958d33a1cc87e87834668b07325ec033df4c23",
+      "contentDigest": "bac9c346cc299dab39351737be958d33a1cc87e87834668b07325ec033df4c23",
+      "byteLength": 120
     },
     {
       "sourceIdentityKey": "repo:root:sveltekit-frontend/src/routes/(app)/demos/+page.svelte",

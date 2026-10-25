@@ -19,13 +19,13 @@
     {
       "file": "manual/20261025_route_runtime_packets_packet_uuid_v1.sql",
       "status": "applied",
-      "reason": "Applied 2026-10-25 after explicit operator approval: nullable route_runtime_packets.packet_uuid with partial unique index route_runtime_packets_packet_uuid_uq (unique, valid, ready). 11 rows, all packet_uuid NULL; nothing backfilled. Code that writes the UUID and the reward writer's read of it are NOT yet changed.",
+      "reason": "Applied 2026-10-25 after explicit operator approval: nullable route_runtime_packets.packet_uuid with partial unique index route_runtime_packets_packet_uuid_uq (unique, valid, ready). Live readback confirms 11 legacy rows remain NULL; no backfill. The ACE route now persists and returns its generated UUID, and packet-reward-writer reads route_runtime_packets columns.",
       "appliedBy": "operator-approved, session 2026-10-25"
     },
     {
       "file": "manual/20261025_route_packet_rewards_v1.sql",
       "status": "applied",
-      "reason": "Applied 2026-10-25 after explicit operator approval: route_packet_rewards with unique packet_uuid (indisunique=t, indisvalid=t, 0 rows). Does not reference route_runtime_packets (its id is bigint; packet_uuid is uuid). Rehearsed first in a ROLLBACK transaction. route_packet_source_refs deliberately not created (use route_runtime_packets.source_refs). route_token_map still deferred.",
+      "reason": "Applied 2026-10-25 after explicit operator approval: route_packet_rewards with unique packet_uuid (indisunique=t, indisvalid=t, 0 rows). No foreign key to route_runtime_packets because its UUID index is partial; the writer checks packet existence before insertion. Live readback confirms the source-ref and token-map tables also exist and are empty.",
       "appliedBy": "operator-approved, session 2026-10-25"
     },
     {

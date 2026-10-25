@@ -1,7 +1,7 @@
 {
   "schema": "atlas.historical-repair-receipt-census.v1",
-  "timestamp": "2026-10-24T22:31:04.642Z",
-  "crosswalkReviewedAt": "2026-10-24T22:31:04.648Z",
+  "timestamp": "2026-10-25T09:10:08.692Z",
+  "crosswalkReviewedAt": "2026-10-25T09:10:08.695Z",
   "totalSurveyed": 5,
   "classifiedBreakdown": {
     "VERIFIED_ADMITTED": 0,

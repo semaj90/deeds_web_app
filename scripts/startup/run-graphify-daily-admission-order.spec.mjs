@@ -26,6 +26,15 @@ test('lifecycle failures are not converted into degraded-success continuation', 
   assert.doesNotMatch(source, /Lifecycle completion degraded; daily chain already succeeded/);
 });
 
+test('source-binding revision mismatch is checked before downstream daily stages', () => {
+  const revisionGuard = source.indexOf('assertGraphifyWorkflowRevisionMatchesAdmissionV1(');
+  const derivedContext = source.indexOf('if (derivedContext)', revisionGuard);
+  const dailyChain = source.indexOf('execSync(dailyChainScript', revisionGuard);
+  assert.ok(revisionGuard >= 0);
+  assert.ok(derivedContext > revisionGuard);
+  assert.ok(dailyChain > revisionGuard);
+});
+
 test('daily gate uses verdict-enforcing wrapper, not the zero-exit audit directly', () => {
   assert.match(source, /require-canonical-projection-admission-v1\.mjs/);
   assert.doesNotMatch(source, /PROMOTION_ADMISSION_SCRIPT\s*=\s*['"]node scripts\/atlas\/audit-canonical-projection-fabric\.mjs/);
