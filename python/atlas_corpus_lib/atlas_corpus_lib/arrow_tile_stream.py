@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import Literal
+import math
+import re
+import struct
+from typing import Literal, Mapping, Sequence
 
 from pydantic import Field, model_validator
 
@@ -88,6 +91,8 @@ class LodTileArrowRecordV1(StrictModel):
     candidate_ordinal: int = Field(strict=True, ge=0, le=0xFFFFFFFF)
     som_bmu_id: int = Field(strict=True, ge=0, le=0xFFFF)
     kmeans_cluster_id: int = Field(strict=True, ge=0, le=0xFFFF)
+    som_assignment_revision: str | None = Field(default=None, pattern=r"^sha256:[a-f0-9]{64}$")
+    kmeans_assignment_revision: str | None = Field(default=None, pattern=r"^sha256:[a-f0-9]{64}$")
     tile_block: bytes
     tile_sha256: str = Field(pattern=r"^sha256:[a-f0-9]{64}$")
     authority: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
@@ -96,6 +101,8 @@ class LodTileArrowRecordV1(StrictModel):
     def validate_lineage_and_payload(self) -> "LodTileArrowRecordV1":
         if not all((self.ast_payload.feature_id, self.ast_payload.feature_label, self.ast_payload.taxonomy_revision)):
             raise ValueError("FEATURE_BINDING_REQUIRED_FOR_LOD_ARROW_EXPORT")
+        if (self.som_assignment_revision is None) != (self.kmeans_assignment_revision is None):
+            raise ValueError("LOD_TILE_ASSIGNMENT_REVISIONS_MUST_BE_PAIRED")
         if len(self.tile_block) != 128:
             raise ValueError("LOD_TILE_BLOCK_MUST_BE_128_BYTES")
         actual_digest = f"sha256:{hashlib.sha256(self.tile_block).hexdigest()}"
@@ -128,6 +135,289 @@ def build_lod_tile_arrow_record_v1(
         tile_block=block,
         tile_sha256=f"sha256:{hashlib.sha256(block).hexdigest()}",
     )
+
+
+def _validated_assignment_artifact_v1(artifact: dict, schema: str, ordinal: int) -> tuple[dict, dict, str, str, str]:
+    if not isinstance(artifact, dict) or artifact.get("schema") != schema:
+        raise ValueError("LOD_TILE_ASSIGNMENT_SCHEMA_INVALID")
+    if artifact.get("authority") != "PROPOSAL_ONLY" or artifact.get("canonicalAuthority") is not False or artifact.get("promotionEligible") is not False:
+        raise ValueError("LOD_TILE_ASSIGNMENT_AUTHORITY_INVALID")
+    identity_rows = artifact.get("candidateIdentityBindings")
+    assignments = artifact.get("assignments")
+    ordinals = artifact.get("inputCandidateOrdinals")
+    if not isinstance(identity_rows, list) or not isinstance(assignments, list) or not isinstance(ordinals, list):
+        raise ValueError("LOD_TILE_ASSIGNMENT_ROWS_INVALID")
+    if (
+        any(isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 0xFFFFFFFF for value in ordinals)
+        or len(ordinals) != len(set(ordinals))
+        or len(identity_rows) != len(ordinals)
+        or len(assignments) != len(ordinals)
+    ):
+        raise ValueError("LOD_TILE_ASSIGNMENT_COHORT_INVALID")
+    if {row.get("candidateOrdinal") for row in identity_rows if isinstance(row, dict)} != set(ordinals):
+        raise ValueError("LOD_TILE_ASSIGNMENT_IDENTITY_COHORT_MISMATCH")
+    if {row.get("candidateOrdinal") for row in assignments if isinstance(row, dict)} != set(ordinals):
+        raise ValueError("LOD_TILE_ASSIGNMENT_RESULT_COHORT_MISMATCH")
+    identities = [row for row in identity_rows if isinstance(row, dict) and row.get("candidateOrdinal") == ordinal]
+    assigned = [row for row in assignments if isinstance(row, dict) and row.get("candidateOrdinal") == ordinal]
+    if len(identities) != 1 or len(assigned) != 1:
+        raise ValueError("LOD_TILE_ASSIGNMENT_ORDINAL_NOT_UNIQUE")
+    canonical_keys = (
+        "schema", "workspaceRevision", "representationRevision", "receipt",
+        "inputCandidateOrdinals", "candidateIdentityBindings", "assignments",
+    )
+    if any(key not in artifact for key in canonical_keys):
+        raise ValueError("LOD_TILE_ASSIGNMENT_CANONICAL_FIELDS_MISSING")
+    canonical = {key: artifact[key] for key in canonical_keys}
+    encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
+    expected_revision = "sha256:" + hashlib.sha256(encoded).hexdigest()
+    if artifact.get("assignmentRevision") != expected_revision:
+        raise ValueError("LOD_TILE_ASSIGNMENT_REVISION_MISMATCH")
+    if not all(
+        isinstance(artifact.get(field), str) and re.fullmatch(r"sha256:[a-f0-9]{64}", artifact[field])
+        for field in ("workspaceRevision", "representationRevision")
+    ):
+        raise ValueError("LOD_TILE_ASSIGNMENT_REVISION_BINDING_INVALID")
+    if not isinstance(identities[0].get("vectorSha256"), str) or not re.fullmatch(r"[a-f0-9]{64}", identities[0]["vectorSha256"]):
+        raise ValueError("LOD_TILE_ASSIGNMENT_VECTOR_DIGEST_INVALID")
+    return identities[0], assigned[0], artifact["workspaceRevision"], artifact["representationRevision"], expected_revision
+
+
+def build_revision_bound_lod_tile_arrow_record_v1(
+    ast_payload: AstIndexPayloadV1,
+    *,
+    mrl128_values: list[float],
+    candidate_ordinal: int,
+    kmeans_assignment_artifact: dict,
+    som_assignment_artifact: dict,
+) -> LodTileArrowRecordV1:
+    if not all((ast_payload.feature_id, ast_payload.feature_label, ast_payload.taxonomy_revision)):
+        raise ValueError("FEATURE_BINDING_REQUIRED_FOR_LOD_ARROW_EXPORT")
+    k_identity, k_assignment, k_workspace, k_representation, k_revision = _validated_assignment_artifact_v1(
+        kmeans_assignment_artifact, "atlas.kmeans-ordinal-assignments.v1", candidate_ordinal
+    )
+    s_identity, s_assignment, s_workspace, s_representation, s_revision = _validated_assignment_artifact_v1(
+        som_assignment_artifact, "atlas.som-ordinal-assignments.v1", candidate_ordinal
+    )
+    if k_workspace != s_workspace or k_workspace != ast_payload.workspace_revision or k_representation != s_representation:
+        raise ValueError("LOD_TILE_ASSIGNMENT_REVISION_BINDING_MISMATCH")
+    expected_identity = {
+        "packetKey": ast_payload.packet_key,
+        "sourceRef": ast_payload.source_ref,
+        "sourceRevision": ast_payload.source_revision,
+        "featureId": ast_payload.feature_id,
+        "featureLabel": ast_payload.feature_label,
+        "taxonomyRevision": ast_payload.taxonomy_revision,
+    }
+    for identity in (k_identity, s_identity):
+        if any(identity.get(key) != value for key, value in expected_identity.items()):
+            raise ValueError("LOD_TILE_ASSIGNMENT_SOURCE_FEATURE_BINDING_MISMATCH")
+    vector_bytes = struct.pack("<128f", *mrl128_values)
+    vector_digest = hashlib.sha256(vector_bytes).hexdigest()
+    if k_identity.get("vectorSha256") != vector_digest or s_identity.get("vectorSha256") != vector_digest:
+        raise ValueError("LOD_TILE_ASSIGNMENT_VECTOR_DIGEST_MISMATCH")
+    kmeans_cluster_id = k_assignment.get("kmeansClusterId")
+    som_bmu_id = s_assignment.get("somBmuId")
+    if isinstance(kmeans_cluster_id, bool) or not isinstance(kmeans_cluster_id, int) or not 0 <= kmeans_cluster_id <= 0xFFFF:
+        raise ValueError("LOD_TILE_KMEANS_CLUSTER_ID_INVALID")
+    cluster_count = kmeans_assignment_artifact["receipt"].get("n_clusters")
+    if isinstance(cluster_count, bool) or not isinstance(cluster_count, int) or not 1 <= cluster_count <= 0x10000 or kmeans_cluster_id >= cluster_count:
+        raise ValueError("LOD_TILE_KMEANS_CLUSTER_RECEIPT_MISMATCH")
+    if isinstance(som_bmu_id, bool) or not isinstance(som_bmu_id, int) or not 0 <= som_bmu_id < 400:
+        raise ValueError("LOD_TILE_SOM_BMU_ID_INVALID")
+    som_receipt = som_assignment_artifact["receipt"]
+    grid_rows = som_receipt.get("grid_rows")
+    grid_columns = som_receipt.get("grid_columns")
+    som_row = s_assignment.get("somRow")
+    som_column = s_assignment.get("somColumn")
+    if (
+        isinstance(grid_rows, bool) or not isinstance(grid_rows, int)
+        or isinstance(grid_columns, bool) or not isinstance(grid_columns, int)
+        or grid_rows <= 0 or grid_columns <= 0 or grid_rows * grid_columns > 400
+        or isinstance(som_row, bool) or not isinstance(som_row, int)
+        or isinstance(som_column, bool) or not isinstance(som_column, int)
+        or not 0 <= som_row < grid_rows or not 0 <= som_column < grid_columns
+        or som_row * grid_columns + som_column != som_bmu_id
+    ):
+        raise ValueError("LOD_TILE_SOM_BMU_RECEIPT_MISMATCH")
+    record = build_lod_tile_arrow_record_v1(
+        ast_payload,
+        mrl128_values=mrl128_values,
+        candidate_ordinal=candidate_ordinal,
+        som_bmu_id=som_bmu_id,
+        kmeans_cluster_id=kmeans_cluster_id,
+    )
+    return record.model_copy(update={
+        "som_assignment_revision": s_revision,
+        "kmeans_assignment_revision": k_revision,
+    })
+
+
+def verify_native_batch_tile_parity_v1(
+    records: list[LodTileArrowRecordV1],
+    vectors_by_candidate_ordinal: Mapping[int, Sequence[float]],
+    *,
+    worker_count: int = 0,
+) -> dict:
+    if not records or len(records) > MAX_LOD_ARROW_RECORDS_V1:
+        raise ValueError("NATIVE_TILE_PARITY_RECORD_COUNT_INVALID")
+    if type(worker_count) is not int or not 0 <= worker_count <= 32:
+        raise ValueError("NATIVE_TILE_PARITY_WORKER_COUNT_INVALID")
+    ordinals = [record.candidate_ordinal for record in records]
+    if len(ordinals) != len(set(ordinals)) or set(vectors_by_candidate_ordinal) != set(ordinals):
+        raise ValueError("NATIVE_TILE_PARITY_ORDINAL_COHORT_MISMATCH")
+    workspace_revisions = {record.ast_payload.workspace_revision for record in records}
+    if len(workspace_revisions) != 1:
+        raise ValueError("NATIVE_TILE_PARITY_WORKSPACE_REVISION_MISMATCH")
+
+    ordered_vectors = []
+    for ordinal in ordinals:
+        values = [float(value) for value in vectors_by_candidate_ordinal[ordinal]]
+        if len(values) != 128 or not all(math.isfinite(value) for value in values):
+            raise ValueError("NATIVE_TILE_PARITY_VECTOR_INVALID")
+        ordered_vectors.extend(values)
+
+    try:
+        from . import _atlas_native_core as native_core
+    except ImportError:
+        try:
+            import _atlas_native_core as native_core
+        except ImportError as error:
+            raise RuntimeError("ATLAS_NATIVE_CORE_REQUIRED_FOR_BATCH_PARITY") from error
+
+    native_bytes = native_core.assemble_lod_texture_blocks_v1(
+        ordered_vectors,
+        len(records),
+        128,
+        [record.candidate_ordinal for record in records],
+        [record.som_bmu_id for record in records],
+        [record.kmeans_cluster_id for record in records],
+        worker_count,
+    )
+    expected_length = len(records) * 128
+    if len(native_bytes) != expected_length:
+        raise ValueError("NATIVE_TILE_PARITY_OUTPUT_LENGTH_MISMATCH")
+    native_blocks = [native_bytes[index * 128:(index + 1) * 128] for index in range(len(records))]
+    if native_blocks != [record.tile_block for record in records]:
+        raise ValueError("NATIVE_TILE_PARITY_BLOCK_MISMATCH")
+
+    ordinal_map = build_candidate_ordinal_map_v1(records)
+    workspace_revision = next(iter(workspace_revisions))
+    return {
+        "schema": "atlas.native-batch-tile-parity-receipt.v1",
+        "authority": "PROPOSAL_ONLY",
+        "canonicalAuthority": False,
+        "promotionEligible": False,
+        "workspaceRevision": workspace_revision,
+        "ordinalMapDigest": ordinal_map.digest,
+        "rowCount": len(records),
+        "workerCountRequested": worker_count,
+        "nativeBatchSha256": f"sha256:{hashlib.sha256(native_bytes).hexdigest()}",
+        "arrowBlockSetSha256": f"sha256:{hashlib.sha256(b''.join(record.tile_block for record in records)).hexdigest()}",
+        "byteForByteParity": True,
+        "writesPerformed": False,
+    }
+
+
+def bind_hnsw_hits_to_lod_tile_records_v1(
+    hits: list[dict],
+    records: list[LodTileArrowRecordV1],
+    *,
+    workspace_revision: str,
+) -> dict:
+    if not hits or len(hits) > MAX_LOD_ARROW_RECORDS_V1:
+        raise ValueError("HNSW_TILE_HIT_COUNT_INVALID")
+    if not records or len(records) > MAX_LOD_ARROW_RECORDS_V1:
+        raise ValueError("HNSW_TILE_RECORD_COUNT_INVALID")
+    if not re.fullmatch(r"sha256:[a-f0-9]{64}", workspace_revision):
+        raise ValueError("HNSW_TILE_WORKSPACE_REVISION_INVALID")
+    if any(record.ast_payload.workspace_revision != workspace_revision for record in records):
+        raise ValueError("HNSW_TILE_RECORD_WORKSPACE_REVISION_MISMATCH")
+
+    ordinal_map = build_candidate_ordinal_map_v1(records)
+    bound = []
+    seen_ordinals: set[int] = set()
+    for rank, hit in enumerate(hits, start=1):
+        if not isinstance(hit, dict) or not isinstance(hit.get("payload"), dict):
+            raise ValueError("HNSW_TILE_HIT_SHAPE_INVALID")
+        payload = hit["payload"]
+        required = ("packet_key", "source_ref", "source_revision", "workspace_revision", "feature_id", "feature_label", "representation_id")
+        if any(not isinstance(payload.get(key), str) or not payload[key].strip() for key in required):
+            raise ValueError("HNSW_TILE_HIT_CANONICAL_PAYLOAD_INCOMPLETE")
+        if payload["workspace_revision"] != workspace_revision:
+            raise ValueError("HNSW_TILE_HIT_WORKSPACE_REVISION_MISMATCH")
+        if payload["representation_id"] != "semantic_768":
+            raise ValueError("HNSW_TILE_HIT_REPRESENTATION_NOT_CANONICAL")
+        score = hit.get("score")
+        if isinstance(score, bool) or not isinstance(score, (int, float)) or not math.isfinite(float(score)):
+            raise ValueError("HNSW_TILE_HIT_SCORE_INVALID")
+        point_id = hit.get("id")
+        if not isinstance(point_id, (str, int)) or isinstance(point_id, bool):
+            raise ValueError("HNSW_TILE_HIT_PROJECTION_ID_INVALID")
+
+        candidates = [
+            record for record in records
+            if record.ast_payload.packet_key == payload["packet_key"]
+            and record.ast_payload.source_ref == payload["source_ref"]
+            and record.ast_payload.source_revision == payload["source_revision"]
+            and record.ast_payload.workspace_revision == workspace_revision
+            and record.ast_payload.feature_id == payload["feature_id"]
+            and record.ast_payload.feature_label == payload["feature_label"]
+        ]
+        span_fields = ("start_byte", "end_byte")
+        has_start, has_end = (key in payload for key in span_fields)
+        if has_start != has_end:
+            raise ValueError("HNSW_TILE_HIT_SPAN_PARTIAL")
+        if has_start:
+            candidates = [
+                record for record in candidates
+                if record.ast_payload.start_byte == payload["start_byte"]
+                and record.ast_payload.end_byte == payload["end_byte"]
+            ]
+        symbol = payload.get("symbol")
+        if isinstance(symbol, str) and symbol.strip():
+            candidates = [record for record in candidates if record.ast_payload.symbol_name == symbol.strip()]
+        if not candidates:
+            raise ValueError("HNSW_TILE_HIT_NOT_IN_QUALIFIED_TILE_SET")
+        if len(candidates) != 1:
+            raise ValueError("HNSW_TILE_HIT_TO_ORDINAL_AMBIGUOUS")
+
+        record = candidates[0]
+        if record.candidate_ordinal in seen_ordinals:
+            raise ValueError("HNSW_TILE_DUPLICATE_CANDIDATE_ORDINAL")
+        seen_ordinals.add(record.candidate_ordinal)
+        bound.append({
+            "rank": rank,
+            "projectionPointId": str(point_id),
+            "score": float(score),
+            "candidateOrdinal": record.candidate_ordinal,
+            "packetKey": record.ast_payload.packet_key,
+            "sourceRef": record.ast_payload.source_ref,
+            "sourceRevision": record.ast_payload.source_revision,
+            "workspaceRevision": record.ast_payload.workspace_revision,
+            "featureId": record.ast_payload.feature_id,
+            "featureLabel": record.ast_payload.feature_label,
+            "taxonomyRevision": record.ast_payload.taxonomy_revision,
+            "retrievalRepresentationId": payload["representation_id"],
+            "tileRepresentationId": "semantic_mrl_128",
+            "tileQuantization": "mixed_lod_int2_int4",
+            "somBmuId": record.som_bmu_id,
+            "kmeansClusterId": record.kmeans_cluster_id,
+            "tileBlock": record.tile_block,
+            "tileSha256": record.tile_sha256,
+        })
+
+    return {
+        "schema": "atlas.hnsw-lod-candidate-binding.v1",
+        "authority": "PROPOSAL_ONLY",
+        "canonicalAuthority": False,
+        "promotionEligible": False,
+        "workspaceRevision": workspace_revision,
+        "candidateOrdinalMapDigest": ordinal_map.digest,
+        "rankingScoresRemainQdrantProjectionScores": True,
+        "bindings": bound,
+        "writesPerformed": False,
+    }
 
 
 def _pyarrow():
@@ -202,6 +492,8 @@ def encode_lod_tiles_arrow_ipc(records: list[LodTileArrowRecordV1]) -> bytes:
         pa.field("candidate_ordinal", pa.uint32(), nullable=False),
         pa.field("som_bmu_id", pa.uint16(), nullable=False),
         pa.field("kmeans_cluster_id", pa.uint16(), nullable=False),
+        pa.field("som_assignment_revision", pa.string(), nullable=True),
+        pa.field("kmeans_assignment_revision", pa.string(), nullable=True),
         pa.field("tile_block", pa.binary(128), nullable=False),
         pa.field("tile_sha256", pa.string(), nullable=False),
         pa.field("authority", pa.string(), nullable=False),
@@ -221,6 +513,8 @@ def encode_lod_tiles_arrow_ipc(records: list[LodTileArrowRecordV1]) -> bytes:
         pa.array([record.candidate_ordinal for record in ordered], type=pa.uint32()),
         pa.array([record.som_bmu_id for record in ordered], type=pa.uint16()),
         pa.array([record.kmeans_cluster_id for record in ordered], type=pa.uint16()),
+        pa.array([record.som_assignment_revision for record in ordered], type=pa.string()),
+        pa.array([record.kmeans_assignment_revision for record in ordered], type=pa.string()),
         pa.array([record.tile_block for record in ordered], type=pa.binary(128)),
         pa.array([record.tile_sha256 for record in ordered], type=pa.string()),
         pa.array([record.authority for record in ordered], type=pa.string()),
@@ -272,6 +566,8 @@ def decode_lod_tiles_arrow_ipc(data: bytes) -> list[LodTileArrowRecordV1]:
                 candidate_ordinal=row["candidate_ordinal"],
                 som_bmu_id=row["som_bmu_id"],
                 kmeans_cluster_id=row["kmeans_cluster_id"],
+                som_assignment_revision=row["som_assignment_revision"],
+                kmeans_assignment_revision=row["kmeans_assignment_revision"],
                 tile_block=row["tile_block"],
                 tile_sha256=row["tile_sha256"],
                 authority=row["authority"],
@@ -305,4 +601,38 @@ def decode_lod_tiles_arrow_to_cpu_tensor_v1(data: bytes):
     device = getattr(tensor, "device", None)
     if device is not None and str(device) != "cpu":
         raise ValueError("LOD_ARROW_TENSOR_MUST_REMAIN_ON_CPU")
+    return records, ordinal_map, tensor
+
+
+def decode_lod_tiles_arrow_to_cpu_tensor_view_v1(data: bytes):
+    """Return a CPU uint8 tensor viewing Arrow IPC tile bytes; callers must not mutate it."""
+    records = decode_lod_tiles_arrow_ipc(data)
+    ordinal_map = build_candidate_ordinal_map_v1(records)
+    pa = _pyarrow()
+    try:
+        source_buffer = pa.py_buffer(data)
+        table = pa.ipc.open_file(pa.BufferReader(source_buffer)).read_all()
+        tile_column = table.column("tile_block")
+        if tile_column.num_chunks != 1:
+            raise ValueError("LOD_ARROW_TILE_BUFFER_MUST_BE_CONTIGUOUS")
+        values_buffer = tile_column.chunk(0).buffers()[1]
+        expected_size = len(records) * 128
+        if values_buffer.size != expected_size:
+            raise ValueError("LOD_ARROW_TILE_BUFFER_SIZE_MISMATCH")
+        source_start = source_buffer.address
+        if not source_start <= values_buffer.address or values_buffer.address + values_buffer.size > source_start + source_buffer.size:
+            raise ValueError("LOD_ARROW_TILE_BUFFER_OUTSIDE_IPC_SOURCE")
+        import torch  # type: ignore
+
+        values_view = memoryview(values_buffer)
+        tensor = torch.frombuffer(values_view, dtype=torch.uint8).reshape(len(records), 128)
+    except ImportError as error:
+        raise RuntimeError("TORCH_REQUIRED_FOR_ARROW_TILE_BUFFER_VIEW") from error
+    except ValueError:
+        raise
+    except Exception as error:
+        raise ValueError("LOD_ARROW_TILE_BUFFER_VIEW_FAILED") from error
+    if tensor.data_ptr() != values_buffer.address:
+        raise ValueError("LOD_ARROW_TENSOR_BUFFER_ADDRESS_MISMATCH")
+    tensor._atlas_arrow_owner = (data, source_buffer, table, values_buffer, values_view)
     return records, ordinal_map, tensor

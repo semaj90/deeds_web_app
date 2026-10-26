@@ -6,7 +6,11 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from atlas_compute.rapids_matrix import RapidsKMeansArtifact, RapidsKMeansReceipt
+from atlas_compute.rapids_matrix import (
+    RapidsKMeansArtifact,
+    RapidsKMeansReceipt,
+    build_kmeans_ordinal_assignments_v1,
+)
 from atlas_compute.som import train_deterministic_som
 
 
@@ -179,6 +183,58 @@ def test_som_rejects_centroid_checksum_or_input_revision_mismatch() -> None:
             device="cpu",
             kmeans_artifact=artifact,
         )
+
+
+def test_kmeans_labels_bind_to_stable_candidate_ordinals_and_revision() -> None:
+    training_vectors = np.asarray([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], dtype=np.float32)
+    labels = np.asarray([1, 0, 1], dtype=np.int64)
+    centroids = np.asarray([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
+    receipt = RapidsKMeansReceipt(
+        schema="atlas.rapids-kmeans-receipt.v2",
+        rows=3,
+        dimensions=2,
+        n_clusters=2,
+        metric="sqeuclidean",
+        init_method="deterministic_farthest_first_array",
+        initialization_ordinals=[0, 1],
+        iterations=3,
+        inertia=0.25,
+        labels_checksum=_checksum(labels),
+        input_checksum=_checksum(training_vectors),
+        centroids_checksum=_checksum(centroids),
+        canonical_authority=False,
+    )
+    artifact = RapidsKMeansArtifact(receipt=receipt, centroids=centroids, labels=labels)
+    kwargs = {
+        "candidate_vectors": training_vectors,
+        "candidate_identity_bindings": [
+            {
+                "candidateOrdinal": ordinal,
+                "packetKey": f"packet:{ordinal}",
+                "sourceRef": f"src/{ordinal}.ts",
+                "sourceRevision": "sha256:" + "a" * 64,
+                "domainId": "domain:test",
+                "featureId": "feature:test",
+                "featureLabel": "Test Feature",
+                "taxonomyRevision": "sha256:" + "d" * 64,
+            }
+            for ordinal in (10, 5, 7)
+        ],
+        "workspace_revision": "sha256:" + "b" * 64,
+        "representation_revision": "sha256:" + "c" * 64,
+    }
+    assignments = build_kmeans_ordinal_assignments_v1(artifact, [10, 5, 7], **kwargs)
+    assert assignments["assignments"] == [
+        {"candidateOrdinal": 5, "kmeansClusterId": 0},
+        {"candidateOrdinal": 7, "kmeansClusterId": 1},
+        {"candidateOrdinal": 10, "kmeansClusterId": 1},
+    ]
+    assert assignments["assignmentRevision"].startswith("sha256:")
+    assert assignments["authority"] == "PROPOSAL_ONLY"
+    assert assignments["promotionEligible"] is False
+    assert artifact.labels is not None and not artifact.labels.flags.writeable
+    with pytest.raises(ValueError, match="ORDINALS_MUST_BE_UNIQUE"):
+        build_kmeans_ordinal_assignments_v1(artifact, [5, 5, 7], **kwargs)
 
 
 def test_som_rejects_bad_centroid_shape_and_unpaired_metadata() -> None:

@@ -17,6 +17,9 @@ from atlas_corpus_lib import (
     build_ast_index_payload_v1,
     build_canonical_ast_chunk_record,
     build_lod_tile_arrow_record_v1,
+    build_revision_bound_lod_tile_arrow_record_v1,
+    verify_native_batch_tile_parity_v1,
+    bind_hnsw_hits_to_lod_tile_records_v1,
     TensorTileDescriptorV1,
     encode_tensor_tile_v1,
     LodTexturePacketEnvelopeV1,
@@ -26,6 +29,7 @@ from atlas_corpus_lib import (
     build_candidate_ordinal_map_from_entries_v1,
     decode_lod_tiles_arrow_ipc,
     decode_lod_tiles_arrow_to_cpu_tensor_v1,
+    decode_lod_tiles_arrow_to_cpu_tensor_view_v1,
     encode_lod_tiles_arrow_ipc,
     KernelSwapDescriptorV1,
     RfcDomainRouteV1,
@@ -512,6 +516,136 @@ class CorpusHelpersTests(unittest.TestCase):
         self.assertEqual(decoded[0].ast_payload.taxonomy_revision, REVISION_A)
         self.assertEqual(len(decoded[0].tile_block), 128)
         self.assertEqual(decoded[0].authority, "PROPOSAL_ONLY")
+        bound_payload = payload.model_copy(update={"packet_key": "packet:arrow-bound"})
+        bound_values = [float(index) for index in range(128)]
+        vector_sha = hashlib.sha256(struct.pack("<128f", *bound_values)).hexdigest()
+        identity = {
+            "candidateOrdinal": 12,
+            "packetKey": bound_payload.packet_key,
+            "sourceRef": bound_payload.source_ref,
+            "sourceRevision": bound_payload.source_revision,
+            "domainId": "domain:retrieval",
+            "featureId": bound_payload.feature_id,
+            "featureLabel": bound_payload.feature_label,
+            "taxonomyRevision": bound_payload.taxonomy_revision,
+            "vectorSha256": vector_sha,
+        }
+
+        def assignment_artifact(schema, assignment, receipt):
+            body = {
+                "schema": schema,
+                "workspaceRevision": bound_payload.workspace_revision,
+                "representationRevision": REVISION_A,
+                "receipt": receipt,
+                "inputCandidateOrdinals": [12],
+                "candidateIdentityBindings": [identity],
+                "assignments": [{"candidateOrdinal": 12, **assignment}],
+            }
+            digest = hashlib.sha256(json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode()).hexdigest()
+            return {
+                **body,
+                "assignmentRevision": f"sha256:{digest}",
+                "authority": "PROPOSAL_ONLY",
+                "canonicalAuthority": False,
+                "promotionEligible": False,
+            }
+
+        kmeans_artifact = assignment_artifact("atlas.kmeans-ordinal-assignments.v1", {"kmeansClusterId": 5}, {"n_clusters": 8})
+        som_artifact = assignment_artifact("atlas.som-ordinal-assignments.v1", {"somRow": 2, "somColumn": 3, "somBmuId": 23}, {"grid_rows": 5, "grid_columns": 10})
+        bound_record = build_revision_bound_lod_tile_arrow_record_v1(
+            bound_payload,
+            mrl128_values=bound_values,
+            candidate_ordinal=12,
+            kmeans_assignment_artifact=kmeans_artifact,
+            som_assignment_artifact=som_artifact,
+        )
+        self.assertEqual(bound_record.kmeans_cluster_id, 5)
+        self.assertEqual(bound_record.som_bmu_id, 23)
+        hnsw_hit = {
+            "id": "qdrant-projection-point-99",
+            "score": 0.91,
+            "payload": {
+                "packet_key": bound_payload.packet_key,
+                "source_ref": bound_payload.source_ref,
+                "source_revision": bound_payload.source_revision,
+                "workspace_revision": bound_payload.workspace_revision,
+                "feature_id": bound_payload.feature_id,
+                "feature_label": bound_payload.feature_label,
+                "representation_id": "semantic_768",
+                "start_byte": bound_payload.start_byte,
+                "end_byte": bound_payload.end_byte,
+                "symbol": bound_payload.symbol_name,
+            },
+        }
+        hnsw_binding = bind_hnsw_hits_to_lod_tile_records_v1(
+            [hnsw_hit], [bound_record], workspace_revision=bound_payload.workspace_revision
+        )
+        self.assertEqual(hnsw_binding["bindings"][0]["candidateOrdinal"], 12)
+        self.assertEqual(hnsw_binding["bindings"][0]["featureLabel"], "Retrieval Ranking")
+        self.assertEqual(hnsw_binding["bindings"][0]["projectionPointId"], "qdrant-projection-point-99")
+        self.assertEqual(len(hnsw_binding["bindings"][0]["tileBlock"]), 128)
+        self.assertEqual(hnsw_binding["bindings"][0]["tileQuantization"], "mixed_lod_int2_int4")
+        self.assertFalse(hnsw_binding["canonicalAuthority"])
+        ambiguous_record = build_lod_tile_arrow_record_v1(
+            bound_payload,
+            mrl128_values=bound_values,
+            candidate_ordinal=13,
+            som_bmu_id=23,
+            kmeans_cluster_id=5,
+        )
+        ambiguous_hit = {**hnsw_hit, "payload": {key: value for key, value in hnsw_hit["payload"].items() if key not in {"start_byte", "end_byte", "symbol"}}}
+        with self.assertRaisesRegex(ValueError, "HNSW_TILE_HIT_TO_ORDINAL_AMBIGUOUS"):
+            bind_hnsw_hits_to_lod_tile_records_v1(
+                [ambiguous_hit], [bound_record, ambiguous_record], workspace_revision=bound_payload.workspace_revision
+            )
+        with self.assertRaisesRegex(ValueError, "HNSW_TILE_HIT_CANONICAL_PAYLOAD_INCOMPLETE"):
+            bind_hnsw_hits_to_lod_tile_records_v1(
+                [{**hnsw_hit, "payload": {key: value for key, value in hnsw_hit["payload"].items() if key != "feature_label"}}],
+                [bound_record],
+                workspace_revision=bound_payload.workspace_revision,
+            )
+        with self.assertRaisesRegex(ValueError, "HNSW_TILE_HIT_WORKSPACE_REVISION_MISMATCH"):
+            bind_hnsw_hits_to_lod_tile_records_v1(
+                [{**hnsw_hit, "payload": {**hnsw_hit["payload"], "workspace_revision": REVISION_A}}],
+                [bound_record],
+                workspace_revision=bound_payload.workspace_revision,
+            )
+        with self.assertRaisesRegex(ValueError, "HNSW_TILE_HIT_REPRESENTATION_NOT_CANONICAL"):
+            bind_hnsw_hits_to_lod_tile_records_v1(
+                [{**hnsw_hit, "payload": {**hnsw_hit["payload"], "representation_id": "latent_256"}}],
+                [bound_record],
+                workspace_revision=bound_payload.workspace_revision,
+            )
+        if NATIVE_CORE_AVAILABLE:
+            parity_receipt = verify_native_batch_tile_parity_v1(
+                [bound_record], {12: bound_values}, worker_count=1
+            )
+            self.assertTrue(parity_receipt["byteForByteParity"])
+            self.assertFalse(parity_receipt["canonicalAuthority"])
+            self.assertFalse(parity_receipt["writesPerformed"])
+            self.assertEqual(parity_receipt["rowCount"], 1)
+        else:
+            with self.assertRaisesRegex(RuntimeError, "ATLAS_NATIVE_CORE_REQUIRED_FOR_BATCH_PARITY"):
+                verify_native_batch_tile_parity_v1([bound_record], {12: bound_values})
+        with self.assertRaisesRegex(ValueError, "NATIVE_TILE_PARITY_ORDINAL_COHORT_MISMATCH"):
+            verify_native_batch_tile_parity_v1([bound_record], {99: bound_values})
+        with self.assertRaisesRegex(ValidationError, "LOD_TILE_ASSIGNMENT_REVISIONS_MUST_BE_PAIRED"):
+            type(bound_record).model_validate({
+                **bound_record.model_dump(),
+                "kmeans_assignment_revision": None,
+            })
+        bound_decoded = decode_lod_tiles_arrow_ipc(encode_lod_tiles_arrow_ipc([bound_record]))[0]
+        self.assertEqual(bound_decoded.kmeans_assignment_revision, kmeans_artifact["assignmentRevision"])
+        self.assertEqual(bound_decoded.som_assignment_revision, som_artifact["assignmentRevision"])
+        tampered_kmeans = {**kmeans_artifact, "assignments": [{"candidateOrdinal": 12, "kmeansClusterId": 6}]}
+        with self.assertRaisesRegex(ValueError, "LOD_TILE_ASSIGNMENT_REVISION_MISMATCH"):
+            build_revision_bound_lod_tile_arrow_record_v1(
+                bound_payload,
+                mrl128_values=bound_values,
+                candidate_ordinal=12,
+                kmeans_assignment_artifact=tampered_kmeans,
+                som_assignment_artifact=som_artifact,
+            )
         tensor_records, tensor_ordinal_map, tensor = decode_lod_tiles_arrow_to_cpu_tensor_v1(encoded)
         self.assertEqual([row.candidate_ordinal for row in tensor_records], [2, 9])
         self.assertEqual(tensor_ordinal_map.digest, ordinal_map.digest)
@@ -522,6 +656,16 @@ class CorpusHelpersTests(unittest.TestCase):
         self.assertEqual(
             bytes(value for row in tensor.tolist() for value in row),
             b"".join(row.tile_block for row in tensor_records),
+        )
+        with self.assertWarnsRegex(UserWarning, "buffer is not writable"):
+            view_records, view_ordinal_map, tile_view = decode_lod_tiles_arrow_to_cpu_tensor_view_v1(encoded)
+        self.assertEqual(view_ordinal_map.digest, ordinal_map.digest)
+        self.assertEqual([row.candidate_ordinal for row in view_records], [2, 9])
+        self.assertEqual(tuple(tile_view.shape), (2, 128))
+        self.assertEqual(tile_view.data_ptr(), tile_view._atlas_arrow_owner[3].address)
+        self.assertEqual(
+            bytes(value for row in tile_view.tolist() for value in row),
+            b"".join(row.tile_block for row in view_records),
         )
         with self.assertRaisesRegex(ValueError, "CANDIDATE_ORDINAL_MAP_ORDER_OR_UNIQUENESS_INVALID"):
             encode_lod_tiles_arrow_ipc([first, first])

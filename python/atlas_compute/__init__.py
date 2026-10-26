@@ -53,6 +53,7 @@ from .rapids_matrix import (
     RapidsKMeansArtifact,
     RapidsKMeansReceipt,
     RapidsPcaReceipt,
+    build_kmeans_ordinal_assignments_v1,
     deterministic_farthest_first_ordinals,
     run_cuvs_kmeans,
     run_cuvs_kmeans_artifact,
@@ -65,7 +66,13 @@ from .semantic_snapshot_freeze import (
     freeze_semantic_snapshot,
     load_and_verify_frozen_snapshot,
 )
-from .som import SomLatticeReceipt, SomReceipt, aggregate_som_lattice, train_deterministic_som
+from .som import (
+    SomLatticeReceipt,
+    SomReceipt,
+    aggregate_som_lattice,
+    build_som_ordinal_assignments_v1,
+    train_deterministic_som,
+)
 from .sparse_relations import (
     SparseComputePolicyReceipt,
     SparseRelationReceipt,

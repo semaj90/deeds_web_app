@@ -20,6 +20,7 @@ from atlas_compute.ast_chunk_routing_helpers_v2 import (
     HAVE_NUMPY,
 )
 from atlas_compute.cutile_kv_block_swap import (
+    CUTILE_AVAILABLE,
     KvSwapState,
     KvFsmContext,
     launch_kv_block_insert,
@@ -177,6 +178,31 @@ class TestAvx2CuTileMirasFsm(unittest.TestCase):
         # LoD 20: capped at 20 * 4 = 80 blocks
         copied_lod20 = launch_kv_block_insert(host_kv, device_kv, page_map, lod_tier=20)
         self.assertEqual(copied_lod20, 80)
+
+        short_page_map = torch.arange(3, dtype=torch.int64)
+        copied_short_map = launch_kv_block_insert(host_kv, device_kv, short_page_map, lod_tier=5)
+        self.assertEqual(copied_short_map, 3)
+
+        wrong_shape = torch.zeros(2, 8, 4, 64, dtype=torch.float32)
+        with self.assertRaisesRegex(ValueError, "KV_BLOCK_SHAPE_MISMATCH"):
+            launch_kv_block_insert(host_kv, wrong_shape, page_map, lod_tier=1)
+
+    def test_cutile_path_requires_explicitly_available_runtime(self):
+        if not HAVE_TORCH:
+            self.skipTest("PyTorch not installed")
+
+        import torch
+
+        host_kv = torch.zeros(1, 1, 1, 1, dtype=torch.float32)
+        device_kv = torch.zeros(1, 1, 1, 1, dtype=torch.float32)
+        page_map = torch.zeros(1, dtype=torch.int64)
+
+        if CUTILE_AVAILABLE:
+            with self.assertRaisesRegex(ValueError, "CUTILE_KV_INSERT_REQUIRES_CUDA_DESTINATION"):
+                launch_kv_block_insert(host_kv, device_kv, page_map, use_cutile=True)
+        else:
+            with self.assertRaisesRegex(RuntimeError, "CUTILE_KV_INSERT_REQUESTED_BUT_CUDA_TILE_UNAVAILABLE"):
+                launch_kv_block_insert(host_kv, device_kv, page_map, use_cutile=True)
 
 
 if __name__ == "__main__":
