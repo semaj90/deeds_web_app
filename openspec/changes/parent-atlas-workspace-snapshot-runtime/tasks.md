@@ -113,3 +113,58 @@ REFUSAL-STATUS-LABEL (2026-10-23): the admission gate refusal status is now the 
 FRAME-FLAG-CORRECTION (2026-10-23): computeWorkspaceFrameAuthorityV1 now sets canonicalAuthority and promotionEligible to frameAuthoritative AND currentAtEvaluation===true. The caller supplies currentAtEvaluation from a live readback; absent or false keeps both flags false. frameAuthoritative is unchanged. Spec test added (7/7 pass). The live frame still reports frameAuthoritative true, while its canonical and promotion flags are now false unless a current evaluation is passed.
 
 HANDOFF (2026-10-23, end of session): pushed branch chore/parent-atlas-session-2026-10-17 to origin (main not touched); commits 098abc79a1..56614dfce5 plus earlier. Verified: admission write guard 7/7; frame authority spec 7/7; okf taxonomy tie 4/4; admission manifest-path and related libs pass; NS-7 source-class 15/15; retrieval specs 15/15 (4 files); sidecar pytest 18/18 in running miniforge-nlp-sidecar. Current-workspace authority: NOT current; last live readback of admitted snapshot 8a27e034 failed on 7 changed sources. Live receipt replaced locally (workspace sha256:2ecdd4ff…); NOT committed or pushed, pending operator decision. Canonical writers blocked by the write guard (no CANONICAL_SOURCE_BINDING_WRITE scope granted). Open: push target confirmed as branch, not main; receipt commit decision; reseal mismatch 6288726b vs 8cc50d57; WSR-08 and WSR-10 to WSR-13c not built. Progress index: docs/atlas-progress/README.md; to-do: docs/atlas-progress/TODO.md.
+
+## 9. Next steps after 2026-10-25 handoff (dated; ledger, not evidence)
+
+Status at handoff: handoff branch merged to `origin/main` via PR #125 (`135ea840ba6`). Snapshot archive partly applied; admitted revision `891a8d9c…` remains in `.tmp/workspace-source-snapshots/`. Sealed JSONs for all eight revisions remain under `docs/reports/workspace-source-snapshots/`.
+
+- [ ] WSR-RET-04 Decide N for the materialized-snapshot retention rule. Keep the admitted and newest revision in `.tmp`; archive the rest to `deeds_labs/archive/` with a manifest entry. Source bytes for older revisions exist only in those copies (sampled 4–16% changed or missing from the current repo), so archive and never delete. Dry-run owner: `scripts/atlas/prune-workspace-source-snapshots-v1.mjs`. Revision `6288726b…` moved on retry after stopping two stuck `find.exe` scans.
+- [ ] WSR-RET-05 Dedupe owner: reuse `artifact-duplicate-candidates-v1` and the archive manifest before adding a scanner. Proposal-only clone detection stays a challenger. Phase A (byte duplicates) is the next step; Phase B (AST clones) follows the ownership audit. No automatic archive or deletion.
+- [ ] WSR-RET-06 Root `target/` (Cargo workspace build output, about 0.9 GiB) is archived to `deeds_labs/archive/2026-10-25/target/`. Restore by moving it back; the next cargo build regenerates it. The Docker sveltekit build needs `simd_bridge_rs.node` rebuilt first.
+- [ ] WSR-RET-07 Git store: `git gc --no-prune` and `git prune-packed` removed loose objects already in packs. About 68k unpacked loose objects remain. Removing them needs separate review, since they may include unreachable commits.
+- [ ] WSR-RET-08 Operator-owned (not started): restart Docker Desktop. The daemon stopped responding after C: fell to 2.3 GB free; npm cache was cleared (C: now 8.2 GB free). Until Docker answers, `:8097` (go-embedding) times out on `/health` and `go-retrieval :8100` returns 503 with `embedding_service` disconnected.
+- [ ] WSR-RET-09 Not committed: four report files over 10 MB (`document-governance-registry-v1.json`, `graphify-source-selection-plan-v1.json`, `graphify-workspace-snapshot-binding-v1.json`, `openspec-workboard-v1.json`), four submodule pointers (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec`), and an uncommitted deletion of `docs/reports/graphify-canary-expectation-v1.json` (origin not verified). Decide each separately.
+- [ ] WSR-RET-10 Deep-audit follow-ups (code tier, probe-based): G4 42 routes without `hasAuth` (defer to production-hardening pass, per the DEV_BYPASS_AUTH rule); G16 420 routes without paired tests (`npm run audit:test-stubs`); G11 47 localhost refs; G5 not evaluable because the graph export omits `parsesBody`. Canonical graph is stale (2026-10-17); regenerate only after admission passes.
+
+## 10. Handoff 2026-10-26: admitted-revision binding, admission state (ledger, not evidence)
+
+Authority: operator Option 1 (key bindings by the admitted derivation revision `sha256:c63620c4…`). Dry-run and read-only checks first; each persistent write had its own phrase.
+
+| Item | Status | Evidence |
+|---|---|---|
+| Selection (hygiene) | PASS: 30,105 canonical sources, checksum `7c0c36d0…`, matches admission | `.tmp/atlas/graphify-daily-selection-hygiene-v1.json`, `.tmp/atlas/review-hygiene-rerun.json` |
+| Derivation recomputation | READY_FOR_ADMISSION, reproduces `c63620c4…` from materialized bytes (`--source-read-root`) | `.tmp/atlas/review-derivation-rerun2.json` |
+| Binding contract | Additive `workspaceRevisionBasis` (`SOURCE_MANIFEST_DIGEST` default, `ADMITTED_DERIVATION` opt-in); builder remains the single checksum owner | `workspace-source-binding-v1.ts`; spec `workspace-source-binding-revision-basis.spec.ts` (4/4); existing spec 9/9 |
+| Binding owner (dry run) | `scripts/atlas/bind-admitted-workspace-sources-v1.mts`; write gate refuses `--apply` without `--confirm CANONICAL_SOURCE_BINDING_WRITE`; write path not enabled | `.tmp/atlas/workspace-source-binding-dryrun-c636.json` (+ `-rows.jsonl`) |
+| Canary (5 rows) | Committed under `AUTHORIZE_CANONICAL_SOURCE_BINDING_WRITE_ROOT_V1`; readback matches plan | `.tmp/atlas/source-binding-canary-plan-c636.json` |
+| Root cohort (24,253 rows) | Committed under `AUTHORIZE_CANONICAL_SOURCE_BINDING_WRITE_ROOT_FULL_24253_V1`; 24,248 inserted, 5 idempotent; 0 checksum mismatches | `.tmp/atlas/workspace-source-binding-root-24253-receipt-c636.json` |
+| Remaining selected sources without `atlas_source_refs` | 5,829 (root 4,773; other repos 1,056); not bound; needs a separate source-ref write | dry-run plan `deferredMissingSourceRefs` |
+| Symbol gate | GROUNDED for 24,253 bound sources; 32,184 canonical nominations, 0 unresolved, 0 ambiguous; reference facts 0 | `.tmp/atlas/symbol-reconciliation-dryrun-24253-c636.json` |
+| Reference facts (`CALLS`, `USES_DB`, `USES_TOOL`) | NOT_PROVEN: `graphify_edges` has 0 rows; producer `graphify-structural-reference-facts-v1.mjs` and resolver changes are an uncommitted parallel session | `git status` (untracked producer; modified resolver/structural-symbol/writer) |
+| Snapshot-bound CALLS dry run | 47 of 50 sampled bound files extracted; 0 digest mismatches; 54 CALLS, all `syntax_only` (0 resolved) | `.tmp/atlas/snapshot-bound-calls-sample-c636.json` |
+| Fresh AST symbol nominations | Live 8095 `/ast/chunk` readback for one admitted source matched its sealed SHA-256 and byte length; parser status `CLEAN`; existing nomination compiler emitted 182 snapshot-bound proposals, 0 invalid/unbound/stale, 0 canonical symbols or DB writes | `.tmp/atlas/ast-symbol-nominations-8095-c636-normalize-cards-receipt.json` |
+| Five-file edge extraction canary | Four code files parsed by live 8095; the Markdown file was skipped (no regex fallback); 465 raw CALLS observations yielded 375 unique UTF-8-span-verified `CALLS` proposals after removing one exact duplicate; 0 invalid spans, 0 sidecar failures, all proposals review-required; this canary emitted no `USES_DB`/`USES_TOOL` relations. The first artifact's bytes later changed, so the rerun uses versioned v2 artifacts | `.tmp/atlas/snapshot-bound-edge-canary-receipt-c636-v2.json` |
+| Standalone canary runner alignment | Replaced regex-generated observations with live 8095 AST extraction; receipt binds extractor/helper code digests, reports 89 rejected spans and 375 review-only `CALLS` proposals, skips Markdown, and refuses persistence without terminal linkage; focused tests 3/3 | `.tmp/atlas/snapshot-bound-edge-canary-receipt-c636-aligned-provenance-20261025.json`; tests `scripts/atlas/run-edge-extraction-canary-v1.test.mjs` |
+| Recomposed graph from aligned runner | Strict verifier returned `VERIFIED_PROPOSAL_GRAPH`: 1,121 edges, 903 nodes, 8 inputs; proposal graph remains non-canonical and write-free | `.tmp/atlas/snapshot-bound-five-file-multilane-canary-aligned-provenance-20261025.json` |
+| Integrated proposal graph | Reused the qualified DB/Qdrant/tool artifacts plus the five-file CALLS canary; strict verifier returned `VERIFIED_PROPOSAL_GRAPH`, 1,121 edges (375 `CALLS`, 103 `USES_DB`, 93 `USES_QDRANT`, 11 `USES_TOOL`, plus other proposal relations), 903 nodes, 8 input artifacts; `canonicalAuthority=false`, `writesPerformed=false` | `.tmp/atlas/snapshot-bound-five-file-multilane-canary-c636-20261026-v2.json` |
+| Five-packet identity canary candidates | Read-only exact join found all 5 source bindings, but 0 matching `atlas_packets` rows; rehearsal correctly remains blocked | `.tmp/atlas/c636-five-packet-identity-candidate-audit.json` (`CANARY_REHEARSAL_BLOCKED`) |
+| Identity (`IDENTITY_ALIGNED`) | NOT_PROVEN: 0 `atlas_packets` tagged `c636…`; 15,352 packets match by source revision; 743 differ | `.tmp/atlas/packet-identity-canary-receipt-c636.json` (CANARY_REHEARSAL_BLOCKED) |
+| Packet owner | `scripts/atlas/produce-current-packet-digest-bridge-v1.mjs` only fills `workspace_revision_key IS NULL`; no packet with NULL key matches the `c636` binding | same receipt, `owners` |
+| Graphify execution for `c636…` | None: 0 `graphify_runs` bound to `c636…`; terminal authorization not granted | `current-graphify-execution-owner-decision-v1.json` covers September `e24bb…` only |
+| Projection admission | NOT_SAFE_TO_PROJECT, 10 of 11 predicates below PASS | `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-25.json` |
+
+### Rejected inputs (do not reuse)
+- Pasted canary plans that used non-existent packet keys (`packet:*-0N`), the legacy `workspace_revision` column, the snapshot revision `891a…` as a source revision, and a path under `sveltekit-frontend/src/lib/server/retrieval/`. Not executed.
+- Pasted claims that the 24,248 root rows were still awaiting authorization: they are committed (see table above).
+
+### Open decisions
+1. **Packet identity.** Options: (a) overwrite the `e24bb…` tags for a bounded canary, which changes the canonical writer's NULL-only rule; (b) insert new `c636…` packet rows, which needs a schema change with its own approval; (c) pause until a producer issues a `c636…` packet identity receipt. Phase 20 defers full legacy packet backfill.
+2. **Reference facts.** Option 1A: take ownership of the uncommitted reference-fact and resolver work. Option 1B: wait for its owner to commit it. Option 2: populate `graphify_edges` from revision-bound extraction (its own write phrase).
+3. **Terminal Graphify run for `c636…`.** Requires `ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION=AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1`. The runner's terminal path skips projection admission and runs the apply chain, so it is a broader write than the canaries above.
+
+### Not done (by design)
+- No full packet tagging, no `graphify_edges` population, no Graphify projection, no source-ref creation, no DDL.
+- Storage cleanup (TurboQuant logs, `target/`, Docker VHDX) is separate and untouched by this change.
+
+### Next gate
+`PRODUCER_ISSUED_PACKET_IDENTITY_RECEIPT_FOR_c636`, which needs a terminal execution for `c636…`, which needs decision 3.

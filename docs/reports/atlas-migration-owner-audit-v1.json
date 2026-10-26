@@ -1,6 +1,6 @@
 {
   "schema": "atlas_migration_owner_audit_v1",
-  "generatedAt": "2026-10-02T17:01:44.185Z",
+  "generatedAt": "2026-10-25T23:30:12.786Z",
   "writes": false,
   "live": {
     "reachable": true,
@@ -100,7 +100,9 @@
           "producer_revision",
           "input_digest",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "source_revision",
+          "registry_revision"
         ],
         "rowCount": 0
       },
@@ -427,7 +429,8 @@
       "expectedStatus": "active_candidate",
       "sql": {
         "files": [
-          "drizzle/manual/20260819_atlas_observation_feature_rows.sql"
+          "drizzle/manual/20260819_atlas_observation_feature_rows.sql",
+          "drizzle/manual/20261008_atlas_observation_feature_lineage_v1.sql"
         ],
         "columns": [
           "ast_observation_kinds",
@@ -451,13 +454,16 @@
           "som_col",
           "som_row",
           "source_ref",
+          "source_revision",
           "source_version_receipt_id",
           "structural_flags",
           "tree_node_id",
           "updated_at",
           "workspace_revision"
         ],
-        "expectedMissing": []
+        "expectedMissing": [
+          "registry_revision"
+        ]
       },
       "competingDefinitions": {
         "files": [],
@@ -478,6 +484,13 @@
             "entry": {
               "status": "applied",
               "reason": "Active ORF packet_key + feature_revision metadata/filter contract. Aligned with Drizzle schema, observation repository, materializer, and spectral exporter; semantic ANN remains owned by the 768 vector lane."
+            }
+          },
+          {
+            "file": "drizzle/manual/20261008_atlas_observation_feature_lineage_v1.sql",
+            "entry": {
+              "status": "planned_sidecar",
+              "reason": "Proposed nullable source_revision and registry_revision on the active ORF table. Not applied; no backfill. Requires migration-owner review and explicit operator authorization."
             }
           }
         ]
@@ -510,7 +523,9 @@
           "producer_revision",
           "input_digest",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "source_revision",
+          "registry_revision"
         ],
         "rowCount": 0,
         "expectedMissing": []
@@ -606,7 +621,9 @@
           "producer_revision",
           "input_digest",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "source_revision",
+          "registry_revision"
         ],
         "rowCount": 0,
         "expectedMissing": [
@@ -748,11 +765,14 @@
         "present": true
       },
       "manifest": {
-        "allRegistered": false,
+        "allRegistered": true,
         "entries": [
           {
             "file": "drizzle/0024_nebulous_mongoose.sql",
-            "entry": null
+            "entry": {
+              "status": "active_candidate",
+              "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply."
+            }
           }
         ]
       },
@@ -768,15 +788,14 @@
           "source_refs"
         ]
       },
-      "classification": "MISSING_MANIFEST_REGISTRATION"
+      "classification": "SIDEcar_UNAPPLIED"
     }
   ],
   "summary": {
-    "missingManifestRegistration": [
-      "feature_registry"
-    ],
+    "missingManifestRegistration": [],
     "sidecarUnapplied": [
-      "graphify_file_search_projection"
+      "graphify_file_search_projection",
+      "feature_registry"
     ],
     "liveShapeAligned": [
       "graphify_source_inventory",

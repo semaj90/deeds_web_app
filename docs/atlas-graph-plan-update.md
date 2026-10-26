@@ -47,9 +47,9 @@ Atlas Memory Graph (connected reasoning layer)
 Once these edges exist, Atlas becomes **reasoning-capable**. Example:
 
 - Question: "Where do we handle authentication?"
-- Gemma4 calls: `atlas-tools.find_dependencies` → returns auth-related functions
-- Gemma4 calls: `atlas-tools.find_tool_usage` → returns which endpoints use auth
-- Gemma4 calls: `atlas-tools.classify_intent` → groups by security domain
+- ornith 1.5 llama-server 8090 update from Gemma4 calls Gemma4 calls: `atlas-tools.find_dependencies` → returns auth-related functions
+- ornith 1.5 llama-server 8090 update from Gemma4 calls Gemma4 calls: `atlas-tools.find_tool_usage` → returns which endpoints use auth
+- ornith 1.5 llama-server 8090 update from Gemma4 calls Gemma4 calls: `atlas-tools.classify_intent` → groups by security domain
 - Result: **Grounded context** instead of vibes-based retrieval
 
 ## High-ROI Next Step (10-phase roadmap)
@@ -137,7 +137,7 @@ Once these edges exist, Atlas becomes **reasoning-capable**. Example:
 - Spend 3-4h building CALLS extractor
 - Net result: cleaner graph + semantic edges in <5h
 
----
+---ornith 1.5 llama-server 8090 update from Gemma4 calls
 
 ## Related Documents
 
