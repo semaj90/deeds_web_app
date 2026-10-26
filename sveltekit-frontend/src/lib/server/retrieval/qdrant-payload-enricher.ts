@@ -228,7 +228,9 @@ export class QdrantPayloadEnricher {
 
     const packetRows = sourceRef
       ? await (await getDb()).execute(sql`
-      SELECT packet_key, tree_node_id, feature_label, sha256, metadata, workspace_revision, representation_revision, qdrant_point_id
+      SELECT packet_key, tree_node_id, feature_label, function_symbol, byte_start, byte_end,
+             sha256, metadata, workspace_revision, workspace_revision_key, source_revision,
+             representation_revision, qdrant_point_id
       FROM atlas_packets
       WHERE source_ref = ${sourceRef}
          OR canonical_source_ref = ${sourceRef}
@@ -405,8 +407,12 @@ export function buildEnrichedPayload(
     ) ?? 'atlas.qdrant.payload.v1';
   const workspaceRevision =
     pickTextOrNumber(
+      packet?.workspace_revision_key,
+      packet?.workspaceRevisionKey,
       packet?.workspace_revision,
       packet?.workspaceRevision,
+      packetMetadata.workspace_revision_key,
+      packetMetadata.workspaceRevisionKey,
       packetMetadata.workspace_revision,
       packetMetadata.workspaceRevision,
       chunkMetadata.workspace_revision,
@@ -417,6 +423,8 @@ export function buildEnrichedPayload(
     );
   const sourceRevision =
     pickString(
+      packet?.source_revision,
+      packet?.sourceRevision,
       packetMetadata.source_revision,
       packetMetadata.sourceRevision,
       packetMetadata.source_revision_id,
