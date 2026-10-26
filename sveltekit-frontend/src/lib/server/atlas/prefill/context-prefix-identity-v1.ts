@@ -32,6 +32,16 @@ export interface ContextPrefixIdentityInputV1 {
   stablePrefix: string;
 }
 
+export function effectiveModelRevisionV1(modelRevision: string, adapterRevision: string | null): string {
+  if (adapterRevision === null) return modelRevision;
+  if (!adapterRevision.trim()) throw new Error('effective model adapter revision must be non-empty');
+  return `sha256:${canonicalSha256V1({
+    schema: 'atlas.effective-model-revision.v1',
+    modelRevision,
+    adapterRevision,
+  })}`;
+}
+
 export function buildContextPrefixIdentityV1(input: ContextPrefixIdentityInputV1): ContextPrefixIdentityV1 {
   const body = {
     schema: CONTEXT_PREFIX_IDENTITY_V1_SCHEMA,

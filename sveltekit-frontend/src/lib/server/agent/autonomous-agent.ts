@@ -20,6 +20,7 @@ import { z } from 'zod';
 import { createHash } from 'crypto';
 import { assembleACEContext } from '$lib/server/ace/context-assembler.js';
 import { buildContextCacheKey, getContextCache } from '$lib/server/ace/llm-context-cache.js';
+import { resolveModelCacheIdentityV1 } from '$lib/server/models/model-registry.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
@@ -1204,9 +1205,12 @@ export class AutonomousAgent {
         func: async ({ query, topK }) => {
           try {
             const queryHash = createHash('sha256').update(query).digest('hex').slice(0, 16);
-            const cacheKey = buildContextCacheKey({
+            const modelCacheIdentity = resolveModelCacheIdentityV1({ modelId: SERVER_CHAT_MODEL });
+            const cacheKey = modelCacheIdentity ? buildContextCacheKey({
               queryHash,
               modelName: SERVER_CHAT_MODEL,
+              modelRevision: modelCacheIdentity.modelRevision,
+              adapterRevision: modelCacheIdentity.adapterRevision,
               modelQuant: 'iq4_xs',
               kvQuant: 'q8_0/q8_0',
               draftModel: false,
@@ -1233,8 +1237,8 @@ export class AutonomousAgent {
               caseId: 'auto',
               conversationId: 'agent-context',
               filePath: undefined,
-            });
-            const cached = await getContextCache(cacheKey);
+            }) : null;
+            const cached = cacheKey ? await getContextCache(cacheKey) : null;
             if (cached) return JSON.stringify(cached);
 
             // Fallback to full ACE context assembly if not cached
@@ -1243,6 +1247,8 @@ export class AutonomousAgent {
               userId: 'agent',
               caseId: 'auto',
               modelName: SERVER_CHAT_MODEL,
+              modelRevision: modelCacheIdentity?.modelRevision,
+              adapterRevision: modelCacheIdentity?.adapterRevision,
               modelQuant: 'iq4_xs',
               kvQuant: 'q8_0/q8_0',
               draftModel: false,

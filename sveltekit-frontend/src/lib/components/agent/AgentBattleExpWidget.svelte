@@ -13,7 +13,7 @@
     recordAgentBattleAction,
     type AgentExpState,
     type AgentBattleAction,
-  } from '$lib/server/agent/agent-exp-tracker.js';
+  } from '$lib/agent/agent-exp-tracker.js';
   import { retroAudio } from '$lib/components/ui/gaming/effects/audio-effects.js';
 
   interface Props {

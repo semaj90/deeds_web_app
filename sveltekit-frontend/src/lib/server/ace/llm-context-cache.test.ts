@@ -95,6 +95,8 @@ function makeIdentity(overrides: Partial<ContextCacheIdentity> = {}): ContextCac
   return {
     queryHash: 'query-hash',
     modelName: 'ornith-1.5-9b',
+    modelRevision: 'sha256:base-model',
+    adapterRevision: null,
     modelQuant: 'rotorquant',
     kvQuant: 'q8_0/q8_0',
     draftModel: true,
@@ -185,6 +187,15 @@ describe('buildContextCacheKey', () => {
     expect(modelQuantChanged).not.toBe(same);
     expect(backendChanged).not.toBe(same);
     expect(repoChanged).not.toBe(same);
+  });
+
+  it('separates context cache entries by model and adapter revision', () => {
+    const base = makeIdentity();
+    expect(buildContextCacheKey({ ...base, modelRevision: 'sha256:model-next' })).not.toBe(buildContextCacheKey(base));
+    expect(buildContextCacheKey({ ...base, adapterRevision: 'sha256:adapter-next' })).not.toBe(buildContextCacheKey(base));
+    expect(buildContextCacheKey({ ...base, adapterRevision: 'sha256:adapter-next' })).not.toBe(
+      buildContextCacheKey({ ...base, adapterRevision: null }),
+    );
   });
 
   it('separates context entries by the admitted revisioned retrieval identity', () => {

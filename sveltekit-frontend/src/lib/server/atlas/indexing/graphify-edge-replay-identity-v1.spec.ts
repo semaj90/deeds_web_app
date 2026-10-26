@@ -80,6 +80,7 @@ describe('graphify_edges replay identity (GSP-5 groundwork)', () => {
     expect(plan.admitted).toHaveLength(1);
     expect(plan.admitted[0].evidence).toHaveLength(2);
     expect(plan.admitted[0]).toMatchObject({
+      workspaceId: '11111111-1111-4111-8111-111111111111',
       sourceRef: 'src/a.ts',
       workspaceRevision: WS,
       graphRevision: ctx.graphRevision,

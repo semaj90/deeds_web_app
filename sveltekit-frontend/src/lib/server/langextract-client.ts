@@ -113,8 +113,8 @@ async function getBaseUrl(): Promise<string> {
     return resolvedUrl;
   }
 
-  // Priority 2: Loopback health probe (127.0.0.1:8095)
-  const loopbackUrl = 'http://127.0.0.1:8095';
+  // Priority 2: Loopback health probe (127.0.0.1:8095).
+  const loopbackUrl = ENV.LANGEXTRACT_URL ?? 'http://127.0.0.1:8095';
   try {
     const healthRes = await fetch(`${loopbackUrl}/health`, { signal: AbortSignal.timeout(2000) });
     if (healthRes.ok) {

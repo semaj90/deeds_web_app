@@ -40,6 +40,10 @@ export type WorkspaceSourceManifestEntryV1 = z.infer<typeof workspaceSourceManif
 export const workspaceRevisionRecordV1Schema = z.object({
   schema: z.literal('atlas.workspace-revision.v1'),
   workspaceRevision: sourceRevision,
+  // SOURCE_MANIFEST_DIGEST (default): workspaceRevision must equal the sorted-manifest digest.
+  // ADMITTED_DERIVATION: workspaceRevision is an admitted derivation key; the manifest digest is
+  // still recorded and still checked against the entries by the binding builder.
+  workspaceRevisionBasis: z.enum(['SOURCE_MANIFEST_DIGEST', 'ADMITTED_DERIVATION']).default('SOURCE_MANIFEST_DIGEST'),
   repositoryId: z.string().min(1),
   gitObjectFormat: gitObjectFormatSchema,
   baseCommitOid: z.string().min(1),
@@ -62,7 +66,7 @@ export const workspaceRevisionRecordV1Schema = z.object({
   if (!oid.safeParse(value.baseTreeOid).success) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['baseTreeOid'], message: `baseTreeOid must match ${value.gitObjectFormat}` });
   }
-  if (value.workspaceRevision !== `sha256:${value.sourceManifestDigest}`) {
+  if (value.workspaceRevisionBasis === 'SOURCE_MANIFEST_DIGEST' && value.workspaceRevision !== `sha256:${value.sourceManifestDigest}`) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['workspaceRevision'], message: 'workspaceRevision must bind the sorted source manifest digest' });
   }
 });

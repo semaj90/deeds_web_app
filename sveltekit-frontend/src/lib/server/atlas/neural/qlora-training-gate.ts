@@ -23,6 +23,17 @@ export const QloraTrainingGateV1Schema = z.object({
   policyRevision: z.string().min(1),
   evidenceReceiptCount: z.number().int().nonnegative(),
   minimumEvidenceReceipts: z.number().int().positive(),
+  reviewedLabelCount: z.number().int().nonnegative(),
+  minimumReviewedLabelCount: z.number().int().positive(),
+  reviewedLabelGradeCounts: z.object({
+    0: z.number().int().nonnegative(),
+    1: z.number().int().nonnegative(),
+    2: z.number().int().nonnegative(),
+    3: z.number().int().nonnegative(),
+  }).strict(),
+  minimumReviewedLabelsPerGrade: z.number().int().positive(),
+  reviewedLabelCorpusChecksum: z.string().regex(/^sha256:[0-9a-f]{64}$/).nullable(),
+  reviewedLabelsRevisionBound: z.boolean(),
   validatedExecutionRate: z.number().min(0).max(1),
   minimumValidatedExecutionRate: z.number().min(0).max(1),
   exactPromotionCoverage: z.number().min(0).max(1),
@@ -43,6 +54,10 @@ export type QloraTrainingGateV1 = z.infer<typeof QloraTrainingGateV1Schema>;
 export interface QloraTrainingEvidenceSummary {
   datasetRevision?: string | null;
   evidenceReceiptCount: number;
+  reviewedLabelCount: number;
+  reviewedLabelGradeCounts: Record<0 | 1 | 2 | 3, number>;
+  reviewedLabelCorpusChecksum?: string | null;
+  reviewedLabelsRevisionBound: boolean;
   validatedExecutionRate: number;
   exactPromotionCoverage: number;
   baselineRevision?: string | null;
@@ -64,12 +79,23 @@ export function evaluateQloraTrainingGate(input: {
   producerRevision: string;
 }): QloraTrainingGateV1 {
   const minimumEvidenceReceipts = input.minimumEvidenceReceipts ?? 1000;
+  const minimumReviewedLabelCount = 200;
+  const minimumReviewedLabelsPerGrade = 30;
   const minimumValidatedExecutionRate = input.minimumValidatedExecutionRate ?? 0.95;
   const minimumExactPromotionCoverage = input.minimumExactPromotionCoverage ?? 0.99;
   const reasonCodes: string[] = [];
 
   let state: QloraTrainingState = 'DEFERRED';
-  if (!input.evidence.datasetRevision || input.evidence.evidenceReceiptCount < minimumEvidenceReceipts) {
+  const gradeFloorMet = [0, 1, 2, 3].every((grade) =>
+    input.evidence.reviewedLabelGradeCounts[grade as 0 | 1 | 2 | 3] >= minimumReviewedLabelsPerGrade);
+  if (input.evidence.reviewedLabelCount < minimumReviewedLabelCount || !gradeFloorMet) {
+    state = 'DATASET_INSUFFICIENT';
+    reasonCodes.push('REVIEWED_LABEL_TRUST_FLOOR_NOT_MET');
+  } else if (!input.evidence.reviewedLabelCorpusChecksum || !input.evidence.reviewedLabelsRevisionBound) {
+    state = 'DATASET_INSUFFICIENT';
+    reasonCodes.push(!input.evidence.reviewedLabelCorpusChecksum
+      ? 'REVIEWED_LABEL_CORPUS_CHECKSUM_REQUIRED' : 'REVIEWED_LABELS_REVISION_UNQUALIFIED');
+  } else if (!input.evidence.datasetRevision || input.evidence.evidenceReceiptCount < minimumEvidenceReceipts) {
     state = 'DATASET_INSUFFICIENT';
     reasonCodes.push('INSUFFICIENT_VALIDATED_RECEIPTS');
   } else if (!input.evidence.baselineRevision) {
@@ -98,6 +124,12 @@ export function evaluateQloraTrainingGate(input: {
     policyRevision: input.policyRevision,
     evidenceReceiptCount: input.evidence.evidenceReceiptCount,
     minimumEvidenceReceipts,
+    reviewedLabelCount: input.evidence.reviewedLabelCount,
+    minimumReviewedLabelCount,
+    reviewedLabelGradeCounts: input.evidence.reviewedLabelGradeCounts,
+    minimumReviewedLabelsPerGrade,
+    reviewedLabelCorpusChecksum: input.evidence.reviewedLabelCorpusChecksum ?? null,
+    reviewedLabelsRevisionBound: input.evidence.reviewedLabelsRevisionBound,
     validatedExecutionRate: input.evidence.validatedExecutionRate,
     minimumValidatedExecutionRate,
     exactPromotionCoverage: input.evidence.exactPromotionCoverage,

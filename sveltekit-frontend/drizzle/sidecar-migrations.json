@@ -2,6 +2,14 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "drizzle/0024_nebulous_mongoose.sql",
+      "status": "active_candidate",
+      "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply.",
+      "appliedBy": "drizzle-journal",
+      "appliedAt": null,
+      "requiresJournalEntry": true
+    },
+    {
       "file": "manual/20261025_route_packet_stub_tables_v1.sql",
       "status": "applied",
       "reason": "Applied 2026-10-25 after explicit approval: STUB tables route_packets, route_state_snapshots, route_packet_facts, route_packet_edges (packet_uuid key, columns limited to what ace/packets/+server.ts uses). Created empty; nothing backfilled. Rehearsed first in a ROLLBACK transaction. route_packet_source_refs and route_token_map were already present and were not touched by this step.",
@@ -599,6 +607,15 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "npx tsx scripts/atlas/audit-graphify-revision-migration-safety.mts"
+    },
+    {
+      "file": "manual/20261025_atlas_structural_reference_lineage_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive lineage columns for structural reference resolutions. Unapplied; preserves legacy rows with NULL lineage and does not backfill or admit structural facts.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only catalog check for new lineage columns and workspace/source index."
     },
     {
       "file": "manual/20260818_atlas_symbol_registry_v1.sql",

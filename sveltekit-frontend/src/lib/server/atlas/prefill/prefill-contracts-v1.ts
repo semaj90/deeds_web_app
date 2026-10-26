@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { canonicalEncodeV1, sha256HexSchema } from './canonical-hash-v1.js';
 import {
   buildContextPrefixIdentityV1,
+  effectiveModelRevisionV1,
   ContextPrefixIdentityV1Schema,
   ContextPrefixReuseObservationV1Schema,
   type ContextPrefixIdentityV1,
@@ -164,7 +165,7 @@ export function buildContextPrefixIdentityFromPrefillContentV1(input: {
   systemPolicyRevision: string;
 }): ContextPrefixIdentityV1 {
   return buildContextPrefixIdentityV1({
-    modelRevision: input.contentIdentity.modelRevision,
+    modelRevision: effectiveModelRevisionV1(input.contentIdentity.modelRevision, input.contentIdentity.adapterRevision),
     templateRevision: input.contentIdentity.promptTemplateRevision,
     toolSchemaRevision: input.toolSchemaRevision,
     systemPolicyRevision: input.systemPolicyRevision,
@@ -185,7 +186,10 @@ export function buildPrefillArtifactIdentityV1(input: Omit<PrefillArtifactIdenti
 
 export function buildPrefillReceiptV1(input: Omit<PrefillReceiptV1, 'schema' | 'checksumSha256'>): PrefillReceiptV1 {
   if (input.contextPrefixIdentity) {
-    if (input.contextPrefixIdentity.modelRevision !== input.contentIdentity.modelRevision) {
+    if (input.contextPrefixIdentity.modelRevision !== effectiveModelRevisionV1(
+      input.contentIdentity.modelRevision,
+      input.contentIdentity.adapterRevision,
+    )) {
       throw new Error('prefill context prefix model revision does not match content identity');
     }
     if (input.contextPrefixIdentity.templateRevision !== input.contentIdentity.promptTemplateRevision) {
