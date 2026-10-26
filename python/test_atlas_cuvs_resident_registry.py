@@ -148,6 +148,7 @@ def test_turbovec_cagra_hnsw_roundtrip_keeps_source_taxonomy_and_ordinals():
             taxonomy_revision=taxonomy_revision,
             kmeans_cluster_id=2,
             som_bmu_id=3,
+            cluster_assignment_revision="sha256:" + "9" * 64,
         ),
         TurboVecIndexCandidateV1(
             candidate_ordinal=7,
@@ -169,6 +170,7 @@ def test_turbovec_cagra_hnsw_roundtrip_keeps_source_taxonomy_and_ordinals():
             taxonomy_revision=taxonomy_revision,
             kmeans_cluster_id=1,
             som_bmu_id=9,
+            cluster_assignment_revision="sha256:" + "9" * 64,
         ),
     ]
     representation_revision = turbovec_index_representation_revision_v1(
@@ -211,7 +213,22 @@ def test_turbovec_cagra_hnsw_roundtrip_keeps_source_taxonomy_and_ordinals():
     assert first["taxonomyRevision"] == taxonomy_revision
     assert first["kmeansClusterId"] == 1
     assert first["somBmuId"] == 9
+    assert first["clusterAssignmentRevision"] == "sha256:" + "9" * 64
     assert first["classificationAuthority"] == "PROPOSAL_ONLY"
+    with pytest.raises(ValueError, match="resident index domain mismatch"):
+        registry.search(
+            replace(
+                ResidentIndexSearchSpec(
+                    index_id="turbovec-hnsw-fixture",
+                    representation_revision=representation_revision,
+                    dataset_checksum_sha256=spec.dataset_checksum_sha256,
+                    top_k=1,
+                    domain_id="domain:retrieval",
+                ),
+                domain_id="domain:other",
+            ),
+            np.zeros((1, 128), dtype=np.float32),
+        )
 
 
 def test_turbovec_index_checksum_binds_cluster_assignment_and_requires_pair():
@@ -239,6 +256,7 @@ def test_turbovec_index_checksum_binds_cluster_assignment_and_requires_pair():
         taxonomy_revision=taxonomy,
         kmeans_cluster_id=1,
         som_bmu_id=0,
+        cluster_assignment_revision="sha256:" + "e" * 64,
     )
     representation_revision = turbovec_index_representation_revision_v1(
         "ae.latent256", revision, 4, quantizer
@@ -257,8 +275,10 @@ def test_turbovec_index_checksum_binds_cluster_assignment_and_requires_pair():
     assigned_checksum = turbovec_index_dataset_checksum_v1(spec, [candidate])
     reassigned = replace(candidate, kmeans_cluster_id=2)
     assert turbovec_index_dataset_checksum_v1(spec, [reassigned]) != assigned_checksum
+    revised_assignment = replace(candidate, cluster_assignment_revision="sha256:" + "f" * 64)
+    assert turbovec_index_dataset_checksum_v1(spec, [revised_assignment]) != assigned_checksum
 
-    incomplete = replace(candidate, som_bmu_id=None)
+    incomplete = replace(candidate, cluster_assignment_revision=None)
     invalid_spec = replace(
         spec,
         dataset_checksum_sha256=turbovec_index_dataset_checksum_v1(spec, [incomplete]),
@@ -266,6 +286,25 @@ def test_turbovec_index_checksum_binds_cluster_assignment_and_requires_pair():
     with pytest.raises(ValueError, match="CLUSTER_ASSIGNMENT_INCOMPLETE"):
         ResidentCuvsIndexRegistry(FakeBackend()).build_turbovec_candidates_v1(
             invalid_spec, [incomplete]
+        )
+
+    unclustered = replace(
+        candidate,
+        candidate_ordinal=6,
+        packet_key="packet:unclustered",
+        source_ref="src/unclustered.ts",
+        kmeans_cluster_id=None,
+        som_bmu_id=None,
+        cluster_assignment_revision=None,
+    )
+    mixed = [candidate, unclustered]
+    mixed_spec = replace(
+        spec,
+        dataset_checksum_sha256=turbovec_index_dataset_checksum_v1(spec, mixed),
+    )
+    with pytest.raises(ValueError, match="CLUSTER_ASSIGNMENT_COHORT_MISMATCH"):
+        ResidentCuvsIndexRegistry(FakeBackend()).build_turbovec_candidates_v1(
+            mixed_spec, mixed
         )
 
 

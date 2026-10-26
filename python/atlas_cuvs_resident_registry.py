@@ -33,6 +33,7 @@ class CorpusIdentity:
     taxonomy_revision: str | None = None
     kmeans_cluster_id: int | None = None
     som_bmu_id: int | None = None
+    cluster_assignment_revision: str | None = None
     classification_authority: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
 
     def key(self) -> tuple[str, str]:
@@ -60,6 +61,7 @@ class TurboVecIndexCandidateV1:
     taxonomy_revision: str
     kmeans_cluster_id: int | None = None
     som_bmu_id: int | None = None
+    cluster_assignment_revision: str | None = None
 
 
 @dataclass(frozen=True)
@@ -166,6 +168,7 @@ def turbovec_index_dataset_checksum_v1(
             "taxonomyRevision": row.taxonomy_revision,
             "kmeansClusterId": row.kmeans_cluster_id,
             "somBmuId": row.som_bmu_id,
+            "clusterAssignmentRevision": row.cluster_assignment_revision,
         })
     canonical = json.dumps({
         "schema": "atlas.turbovec-index-dataset.v1",
@@ -186,6 +189,10 @@ def _prepare_turbovec_index_candidates_v1(
     rows = sorted(candidates, key=lambda row: row.candidate_ordinal)
     if not rows:
         raise ValueError("TURBOVEC_INDEX_CANDIDATES_MUST_NOT_BE_EMPTY")
+    assignment_revisions = {row.cluster_assignment_revision for row in rows}
+    assignment_presence = {row.kmeans_cluster_id is not None for row in rows}
+    if len(assignment_revisions) != 1 or len(assignment_presence) != 1:
+        raise ValueError("TURBOVEC_INDEX_CLUSTER_ASSIGNMENT_COHORT_MISMATCH")
     if not _SHA256_REVISION_RE.fullmatch(spec.workspace_revision):
         raise ValueError("TURBOVEC_INDEX_WORKSPACE_REVISION_INVALID")
     bit_width = rows[0].bits_per_value
@@ -232,8 +239,19 @@ def _prepare_turbovec_index_candidates_v1(
             raise ValueError(f"TURBOVEC_INDEX_TAXONOMY_REVISION_INVALID:{row_number}")
         if not all((row.packet_key, row.domain_id, row.feature_id, row.feature_label)):
             raise ValueError(f"TURBOVEC_INDEX_FEATURE_BINDING_INCOMPLETE:{row_number}")
-        if (row.kmeans_cluster_id is None) != (row.som_bmu_id is None):
+        assignment_fields = (
+            row.kmeans_cluster_id,
+            row.som_bmu_id,
+            row.cluster_assignment_revision,
+        )
+        if any(value is not None for value in assignment_fields) and not all(
+            value is not None for value in assignment_fields
+        ):
             raise ValueError(f"TURBOVEC_INDEX_CLUSTER_ASSIGNMENT_INCOMPLETE:{row_number}")
+        if row.cluster_assignment_revision is not None and not _SHA256_REVISION_RE.fullmatch(
+            row.cluster_assignment_revision
+        ):
+            raise ValueError(f"TURBOVEC_INDEX_CLUSTER_ASSIGNMENT_REVISION_INVALID:{row_number}")
         if row.kmeans_cluster_id is not None and (
             isinstance(row.kmeans_cluster_id, bool)
             or not isinstance(row.kmeans_cluster_id, int)
@@ -273,6 +291,7 @@ def _prepare_turbovec_index_candidates_v1(
             taxonomy_revision=row.taxonomy_revision,
             kmeans_cluster_id=row.kmeans_cluster_id,
             som_bmu_id=row.som_bmu_id,
+            cluster_assignment_revision=row.cluster_assignment_revision,
             classification_authority="PROPOSAL_ONLY",
         ))
         vectors.append(values)
@@ -595,6 +614,7 @@ class ResidentCuvsIndexRegistry:
                     "taxonomyRevision": identity.taxonomy_revision,
                     "kmeansClusterId": identity.kmeans_cluster_id,
                     "somBmuId": identity.som_bmu_id,
+                    "clusterAssignmentRevision": identity.cluster_assignment_revision,
                     "classificationAuthority": identity.classification_authority,
                     "distance": float(distance),
                 })
