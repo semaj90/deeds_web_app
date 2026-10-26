@@ -51,7 +51,7 @@
 			const res = await fetch('/api/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: prompt, model: 'gemma4-legal' })
+				body: JSON.stringify({ message: prompt, model: 'ornith-1.5-9b' })
 			});
 			if (res.ok) {
 				const data = await res.json();
@@ -542,12 +542,17 @@
 				</div>
 
 				{#if showTimelineDrawer}
-					<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-					<div class="drawer-overlay" onclick={() => { showTimelineDrawer = false; }}></div>
+					<div
+						class="drawer-overlay"
+						role="button"
+						tabindex="0"
+						onclick={() => { showTimelineDrawer = false; }}
+						onkeydown={(e) => { if (e.key === 'Escape') showTimelineDrawer = false; }}
+					></div>
 					<div class="drawer-panel">
 						<div class="drawer-header">
 							<h3>Add Timeline Event</h3>
-							<button class="drawer-close" onclick={() => { showTimelineDrawer = false; }}>
+							<button type="button" class="drawer-close" onclick={() => { showTimelineDrawer = false; }} aria-label="Close drawer">
 								<span class="i-lucide-x w-5 h-5 inline-block"></span>
 							</button>
 						</div>
@@ -790,11 +795,17 @@
 </div>
 
 {#if aiReportOpen}
-	<div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;" onclick={() => (aiReportOpen = false)}>
-		<div style="background:#1a1a2e;border:1px solid #333;border-radius:8px;padding:2rem;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;" onclick={(e) => e.stopPropagation()}>
+	<div
+		style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;"
+		role="button"
+		tabindex="0"
+		onclick={(e) => { if (e.target === e.currentTarget) aiReportOpen = false; }}
+		onkeydown={(e) => { if (e.key === 'Escape') aiReportOpen = false; }}
+	>
+		<div style="background:#1a1a2e;border:1px solid #333;border-radius:8px;padding:2rem;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;">
 			<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
 				<h3 style="color:#fff;margin:0;">AI Intelligence Report</h3>
-				<button style="background:none;border:none;color:#888;font-size:1.5rem;cursor:pointer;" onclick={() => (aiReportOpen = false)}>×</button>
+				<button type="button" style="background:none;border:none;color:#888;font-size:1.5rem;cursor:pointer;" onclick={() => (aiReportOpen = false)} aria-label="Close AI report">×</button>
 			</div>
 			{#if aiReportLoading}
 				<p style="color:#888;">Generating report...</p>

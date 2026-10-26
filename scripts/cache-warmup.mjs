@@ -13,7 +13,7 @@
  * Options:
  *   --batch-size <n>     Number of queries to process in parallel (default: 5)
  *   --delay <ms>         Delay between batches in milliseconds (default: 1000)
- *   --model <name>       LLM model to use (default: gemma4-legal-iq4xs-direct.gguf)
+ *   --model <name>       LLM model to use (default: ornith-1.5-9b)
  *   --domain <name>      Warm up specific domain only (evidence, civil-procedure, torts, contracts, criminal)
  *   --dry-run            Log queries without calling LLM
  *   --url <url>          API base URL (default: http://localhost:5173)
@@ -55,7 +55,7 @@ Usage:
 Options:
   --batch-size <n>     Number of queries to process in parallel (default: 5)
   --delay <ms>         Delay between batches in milliseconds (default: 1000)
-  --model <name>       LLM model to use (default: gemma4-legal-iq4xs-direct.gguf)
+  --model <name>       LLM model to use (default: ornith-1.5-9b)
   --domain <name>      Warm up specific domain only:
                        - evidence
                        - civil-procedure

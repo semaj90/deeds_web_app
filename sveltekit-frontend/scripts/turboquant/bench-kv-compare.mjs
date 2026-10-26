@@ -24,7 +24,7 @@ const BASE_PORT = Number(process.env.TURBO_BENCH_BASE_PORT ?? '8090');
 const F16_PORT = Number(process.env.TURBO_BENCH_F16_PORT ?? '8094');
 const BASE_URL = `http://${DEFAULT_HOST}:${BASE_PORT}`;
 const F16_URL = `http://${DEFAULT_HOST}:${F16_PORT}`;
-const MODEL = process.env.TURBO_MODEL_NAME ?? 'gemma4-rotorquant:latest';
+const MODEL = process.env.TURBO_MODEL_NAME ?? 'ornith-1.5-9b';
 const CHAT_TIMEOUT_MS = Number(process.env.TURBO_BENCH_CHAT_TIMEOUT_MS ?? '120000');
 const PROMPT =
   process.env.TURBO_BENCH_PROMPT ??

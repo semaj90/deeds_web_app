@@ -17,30 +17,32 @@ registries:
     path: languages/
     description: Language-specific AST rules, extensions, exclusions
     schemas:
+      - go.yaml
+      - python.yaml
+      - rust.yaml
       - typescript.yaml
+    candidateCatalogs:
+      - path: languages/tree-sitter-language-pack-catalog-v1.json
+        schema: ../schemas/tree-sitter-language-catalog-v1.schema.json
+        namespace: PARSER_GRAMMAR_ID
+        authority: candidate-only
+        lspBindings: none
 
   domains:
     path: domains/
     description: Domain classifications with feature evidence paths
     schemas:
-      - retrieval.yaml
-      - cache.yaml
-      - database.yaml
       - feature-intelligence.yaml
       - parent-atlas-execution.yaml
+      - structured-value.yaml
+      - atlas-domain-taxonomy.yaml   # validates against ../schemas/domain-taxonomy-v1.schema.json
 
   corpora:
     path: corpora/
     description: Keyword corpus, semantic ontology, and NLP-derived feature snapshots
+    schema_file: keyword-corpus.schema.json
     schemas:
       - keyword-corpus.yaml
-
-  symbols:
-    path: symbols/
-    description: Symbol kinds, weights, and evidence patterns
-    schemas:
-      - functions.yaml
-      - routes.yaml
 
   concepts:
     path: concepts/
@@ -59,15 +61,28 @@ registries:
   tools:
     path: tools/
     description: External tool integrations (ast-grep, qdrant, etc.)
-    schemas:
-      - ast-grep.yaml
+    schemas: []
 
   predicates:
     path: predicates/
     description: Ontology and relationship classification rules
     schemas:
-      - ontology.yaml
       - feature-relationships.yaml
+
+  schemas:
+    path: schemas/
+    description: Structural contracts; semantic and canonical owner checks remain runtime gates
+    schemas:
+      - nary-fact-proposal-v1.schema.json
+      - feature-relationships-v1.schema.json
+      - language-profile-v1.schema.json
+      - pca-projection-experiment-v1.schema.json
+
+  pipelines:
+    path: pipelines/
+    description: Bounded, evidence-qualified data and execution pipelines
+    schemas:
+      - ast-entity-prefill.yaml
 
   indexes:
     path: indexes/
@@ -76,6 +91,7 @@ registries:
       - feature-intelligence.yaml
       - code-exploration.yaml
       - code-capability-knowledge-v1.yaml
+      - parent-atlas-code-explore.yaml
 
 # Extractor versions (bump on breaking changes)
 extractors:

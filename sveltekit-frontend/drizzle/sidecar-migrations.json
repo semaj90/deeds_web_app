@@ -2,6 +2,152 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "drizzle/0024_nebulous_mongoose.sql",
+      "status": "active_candidate",
+      "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply.",
+      "appliedBy": "drizzle-journal",
+      "appliedAt": null,
+      "requiresJournalEntry": true
+    },
+    {
+      "file": "manual/20261025_route_packet_stub_tables_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit approval: STUB tables route_packets, route_state_snapshots, route_packet_facts, route_packet_edges (packet_uuid key, columns limited to what ace/packets/+server.ts uses). Created empty; nothing backfilled. Rehearsed first in a ROLLBACK transaction. route_packet_source_refs and route_token_map were already present and were not touched by this step.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "manual/20261025_route_token_map_and_source_refs_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25: creates route_token_map and route_packet_source_refs tables with indexes and unique constraints for packet-reward-writer.ts. Rehearsed in a ROLLBACK transaction first.",
+      "appliedBy": "operator-approved, session 2026-10-25",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT table_name FROM information_schema.tables WHERE table_schema=public AND table_name IN (route_token_map, route_packet_source_refs);"
+    },
+    {
+      "file": "manual/20261025_route_runtime_packets_packet_uuid_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: nullable route_runtime_packets.packet_uuid with partial unique index route_runtime_packets_packet_uuid_uq (unique, valid, ready). Live readback confirms 11 legacy rows remain NULL; no backfill. The ACE route now persists and returns its generated UUID, and packet-reward-writer reads route_runtime_packets columns.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "manual/20261025_route_packet_rewards_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: route_packet_rewards with unique packet_uuid (indisunique=t, indisvalid=t, 0 rows). No foreign key to route_runtime_packets because its UUID index is partial; the writer checks packet existence before insertion. Live readback confirms the source-ref and token-map tables also exist and are empty.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261025_ace_chunks_upsert_unique_v1.sql",
+      "status": "applied",
+      "reason": "Live unique index ace_chunks_case_content_type_uq on (case_id, content_hash, chunk_type): verified indisunique=t, indisvalid=t, indisready=t on 2026-10-25. Created outside the session that wrote this entry; this session only rehearsed it (ROLLBACK). ace_chunks has 0 rows.",
+      "appliedBy": "created by another session; verified live 2026-10-25",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT indisunique, indisvalid FROM pg_index WHERE indexrelid = 'ace_chunks_case_content_type_uq'::regclass;"
+    },
+    {
+      "file": "../../drizzle/manual/20260507_retrieval_spine.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-25 after explicit operator approval: creates retrieval_rank_cache, llm_summaries, tool_call_stats and their indexes. Rehearsed first in a ROLLBACK transaction (passed, 0 leftover tables). Previously never applied; tool-ranker.ts writes tool_call_stats.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261025_retrieval_ranking_index_enhancements_v1.sql",
+      "status": "applied",
+      "reason": "Cohort complete 2026-10-25 (indisvalid=t, indisready=t for all four). First applied: atlas_nes_lut_v1_inverse_idx and kag_dag_runs_query_hash_created_idx. Then, after 20260507_retrieval_spine.sql was admitted, re-run to create retrieval_rank_cache_created_at_idx and retrieval_rank_cache_chunk_id_idx. The first two were applied before the base-table dependency was resolved, against the advice in the 2026-10-25 review; the re-run made the cohort complete.",
+      "appliedBy": "operator-approved, session 2026-10-25"
+    },
+    {
+      "file": "../../drizzle/manual/20261024_pgvector_hnsw_ivfflat_remediation_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Remediates duplicate HNSW index on agent_observations (idx_agent_observations_hnsw), redundant IVFFlat index on cluster_summaries (idx_cluster_summaries_embedding_ivfflat), and builds concurrent HNSW index on chat_embeddings (idx_chat_embeddings_embedding_hnsw) per docs/reports/pgvector-hnsw-ivfflat-diskann-audit-v1.json. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "py -3.13 scripts/atlas/audit_pgvector_hnsw_ivfflat_diskann_v1.py"
+    },
+    {
+      "file": "../../drizzle/manual/20261017_reconcile_summary_768_and_vector_io_cleanup.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Drops obsolete idx_codebase_chunk_summary_embedding_384_hnsw (10 rows) and redundant IVFFlat summary index; stages partial HNSW indexes for summary_embedding halfvec(768) and error_embedding halfvec(768) to eliminate DataFileRead I/O bottlenecks during non-HOT updates. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-vector-indexes-io-bottleneck-v1.mjs"
+    },
+    {
+      "file": "../../drizzle/manual/20261017_codebase_chunk_index_hnsw.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Builds a distinct ef_construction=200 HNSW candidate concurrently for codebase_chunk_index.content_embedding_768. Existing ef_construction=64 index must remain until independent catalog validity, planner, storage, and exact-recall checks pass; any old-index drop is a separate authorized operation.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL catalog check for indisvalid and pg_get_indexdef; compare exact-search and HNSW Recall@10 with ef_search 40, 64, and 80 before any replacement/drop."
+    },
+    {
+      "file": "manual/20261013_feature_registry_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Creates public.feature_registry (declared in feature-registry.ts, missing live per the 2026-10-14 contract audit). Rehearsed in a rolled-back transaction (15 columns in-transaction; table absent afterward). Does not include the workspace-event tables, which are owned by 20260916_workspace_event_head_v1.sql (requires disposable canary). Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT replaced by ROLLBACK and a column count; confirm 0 tables afterward."
+    },
+    {
+      "file": "manual/20261013_atlas_packets_duplicate_indexes_DROP_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Drops 10 exact-duplicate indexes on atlas_packets (one per group; keeps the index with more scans). Archive: .tmp/atlas-packets-duplicate-indexes-manifest.json (20 definitions with sha256). Rehearsed in a rolled-back transaction: 94 indexes to 84 inside the transaction; 94 after rollback. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT replaced by ROLLBACK and a count query; confirm 94 after."
+    },
+    {
+      "file": "manual/20261013_atlas_packets_source_ref_pattern_indexes_DRAFT.sql",
+      "status": "applied",
+      "reason": "Two text_pattern_ops indexes on atlas_packets (lower(source_ref), source_ref) created with CREATE INDEX CONCURRENTLY (no write lock). Both indisvalid=true. Live planner uses bitmap index scans. Fixes atlas.packet_search statement-timeout errors.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: pg_index indisvalid for both indexes; EXPLAIN shows Bitmap Index Scan on them."
+    },
+    {
+      "file": "manual/20261013_diagnostic_analysis_tables_DRAFT.sql",
+      "status": "applied",
+      "reason": "Three analysis tables (diagnostic_ast_facts, diagnostic_dag_runs, diagnostic_recommendations) applied in one transaction to PostgreSQL 18.4 legal_ai_db after a rolled-back rehearsal. All tables empty; no writers exist yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: three diagnostic_* tables exist; row counts 0."
+    },
+    {
+      "file": "manual/20261018_atlas_receipt_verification_v1.sql",
+      "status": "applied",
+      "reason": "View atlas_receipt_verification_v1 over canonical atlas_test_execution_receipts for verified pass/fail verdicts and trainable outcomes.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: view atlas_receipt_verification_v1 exists and selects from atlas_test_execution_receipts."
+    },
+    {
+      "file": "manual/20261018_atlas_receipt_verifier_results_v1.sql",
+      "status": "applied",
+      "reason": "Additive verifier-written table atlas_receipt_verifier_results_v1 (canonical=false by CHECK; VERIFIED_PASS requires evidence_resolved) over atlas_test_execution_receipts. Applied after a rolled-back rehearsal that exercised all three CHECK/UNIQUE guards. 0 rows; no writer yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: to_regclass('atlas_receipt_verifier_results_v1') is not null; row count 0."
+    },
+    {
+      "file": "manual/20261018_atlas_learned_artifact_admission_v1.sql",
+      "status": "applied",
+      "reason": "Additive registry atlas_learned_artifact_admission_v1 (canonical=false by CHECK): admission state, evaluation evidence, stored-weights reference and verified-receipt-set digest for learned artifacts (logistic head, low-rank basis, policy/value net, PPO policy, GEPA prompt set, procedural-memory snapshot, XGBoost model). References only. Applied after a rolled-back rehearsal covering 3 valid and 8 rejected rows. 0 rows; no writer yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: to_regclass('atlas_learned_artifact_admission_v1') is not null; row count 0."
+    },
+    {
       "file": "manual/20261001_openspec_task_identity_history_v1.sql",
       "status": "design_unapplied",
       "reason": "EVF stable identity/history companion: immutable canonical task keys, internal surrogate IDs, claim revision snapshots, and alias preservation. No rows are imported or source files mutated; apply only after deterministic identity parity and schema-owner authorization.",
@@ -48,13 +194,40 @@
       "validationCommand": "Read-only PostgreSQL 18.4 information_schema and row-null census; summary_provenance is nullable JSONB and populated=0."
     },
     {
+      "file": "manual/20261013_error_logs_diagnostic_provenance_DRAFT.sql",
+      "status": "applied",
+      "reason": "Additive diagnostic provenance columns, a stored tsvector, and indexes on the existing error_logs table. Applied in one transaction to PostgreSQL 18.4 legal_ai_db after a rolled-back rehearsal. Row count 1 before and after; both views still return rows.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: sed the final COMMIT to ROLLBACK and run with psql ON_ERROR_STOP=1; then confirm error_logs has 19 columns."
+    },
+    {
+      "file": "manual/model_analysis_runs.sql",
+      "status": "applied",
+      "reason": "Additive model analysis run and result tables (model_analysis_runs, model_analysis_results) with indexes. Applied in one transaction to PostgreSQL 18.4 legal_ai_db; both tables created empty.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only information_schema check: model_analysis_results has sequence_id text and PK (run_id, sequence_id); row counts 0."
+    },
+    {
       "file": "manual/20260916_workspace_event_head_v1.sql",
-      "status": "planned_sidecar",
-      "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Unapplied until migration-owner review, disposable readback canary, and explicit authorization.",
-      "appliedBy": null,
-      "appliedAt": null,
+      "status": "applied",
+      "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Applied inside transactional block with canary readback verification.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-25",
       "requiresJournalEntry": false,
       "validationCommand": "node scripts/atlas/audit-workspace-event-head-schema-v1.mjs"
+    },
+    {
+      "file": "manual/20261017_workspace_event_provenance_v1_DRAFT.sql",
+      "status": "applied",
+      "reason": "Additive workspace event provenance, append-only observations, and worktree leases with monotonic fence_epoch and stream idempotency unique index. Applied inside transactional block with canary readback verification.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "node --env-file=sveltekit-frontend/.env -e \"const postgres = require('./sveltekit-frontend/node_modules/postgres'); const sql = postgres(process.env.DATABASE_URL); sql.unsafe('SELECT table_name FROM information_schema.tables WHERE table_schema = \\'public\\' AND table_name IN (\\'atlas_workspace_events\\', \\'worktree_leases\\', \\'atlas_workspace_heads\\', \\'atlas_workspace_event_observations\\')').then(r => console.log('Tables:', r));\""
     },
     {
       "file": "manual/20260909_router_feature_revision_indexes.sql",
@@ -418,6 +591,15 @@
       "validationCommand": "npx tsx scripts/atlas/audit-graph-snapshot-revision-migration-safety.mts"
     },
     {
+      "file": "20260819_atlas_graph_traversal_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Unapplied snapshot-scoped graph traversal indexes. Read-only PostgreSQL catalog inspection found only base indexes; verify representative plans and obtain schema-owner approval before applying.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL catalog check for atlas_graph_edges_v2_forward_typed_idx, atlas_graph_edges_v2_reverse_typed_idx, atlas_graph_nodes_v2_snapshot_type_node_idx, atlas_graph_nodes_v2_snapshot_source_ref_idx, and atlas_graph_relation_participants_v2_node_role_idx."
+    },
+    {
       "file": "manual/20260822_graphify_revision_authority_v2.sql",
       "status": "manual_sidecar",
       "reason": "Additive Graphify workspace and code-source revision columns. Unapplied; preserves legacy repository/source revisions and does not backfill or promote rows.",
@@ -425,6 +607,15 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "npx tsx scripts/atlas/audit-graphify-revision-migration-safety.mts"
+    },
+    {
+      "file": "manual/20261025_atlas_structural_reference_lineage_v1.sql",
+      "status": "manual_sidecar",
+      "reason": "Additive lineage columns for structural reference resolutions. Unapplied; preserves legacy rows with NULL lineage and does not backfill or admit structural facts.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only catalog check for new lineage columns and workspace/source index."
     },
     {
       "file": "manual/20260818_atlas_symbol_registry_v1.sql",
@@ -655,6 +846,65 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "SELECT to_regclass('public.atlas_packet_incidence') AS table_name;"
+    },
+    {
+      "file": "manual/20261012_atlas_context_manifest_v2_readbacks.sql",
+      "status": "design_unapplied",
+      "reason": "Append-only persistence/readback for the existing ContextManifestV2 builder output. Does not create a builder, admit evidence, or authorize synthesis. Apply only after schema-owner review and explicit operator approval; no rows are written by this design entry.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only schema census for atlas_context_manifest_v2_readbacks after separately authorized migration application."
+    },
+    {
+      "file": "manual/20261012_atlas_directories.sql",
+      "status": "applied_additive",
+      "reason": "atlas_directories directory tree table with unique (repo_id, directory_path) and parent index; additive IF NOT EXISTS; mirrors atlasDirectories in schema/atlas-ast-nodes.ts"
+    },
+    {
+      "file": "manual/20261015_atlas_packet_class_lut_validation_receipts_v1.sql",
+      "status": "applied_additive",
+      "reason": "Append-only validation evidence for derived PacketClassLutV1 artifacts. Includes source/workspace revision and outcome B-tree indexes plus GIN search indexes for repository-analysis text and bounded JSON evidence. Applied additively after rollback rehearsal; no receipts backfilled.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-15",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT current_setting('server_version_num'), to_regclass('public.atlas_packet_class_lut_validation_receipts');"
+    },
+    {
+      "file": "manual/20261016_atlas_source_locations_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Creates public.atlas_source_locations (UNIQUE (source_namespace, source_ref), case-preserving, repo-namespace path-safety CHECK, sha256 revision shape CHECK, uuidv7 surrogate) and the append-only public.atlas_source_location_conflicts ledger, for SRCREF-UNIQUE-01 in parent-atlas-graphify-recovery-proof-ladder. Rehearsed in a rolled-back transaction on PostgreSQL 18.4: 2 tables and 10 columns in-transaction, 12/12 invalid rows rejected (duplicate, traversal, absolute, backslash, URL, drive, ./, //, blank, padded, upper-case namespace, bad revision), case-only twin and proto: id in its own namespace accepted, 0 tables afterward. Does NOT alter atlas_packets and does NOT decide namespaces or case folding (owner decisions).",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT removed, exercise the constraints, ROLLBACK, and confirm 0 tables afterward (script kept in the session scratchpad); production apply needs explicit operator approval, a backup, and CREATE ... IF NOT EXISTS re-run to prove idempotence."
+    },
+    {
+      "file": "manual/20261018_atlas_procedural_sequences_v1_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Versioned, non-executable procedure catalog keyed by (sequence_id, sequence_revision), searchable by feature_id and feature_label, with admission gated on source/workspace revisions and evidence references. No procedures seeded and MCP lookup is read-only.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Review DDL and test read-only MCP filter contract; apply only after explicit operator authorization, rollback rehearsal, and ownership review."
+    },
+    {
+      "file": "manual/20261018_openspec_task_source_index_v1.sql",
+      "status": "applied",
+      "reason": "Additive immutable source locator/search projection for 5,640 OpenSpec task lines in the latest post-commit readback. Source files remain authoritative; identity status is retained, source revisions remain deferred, and no executable Kanban or canonical task identity is written. Exact post-commit readback checksum recorded in .tmp/openspec-task-source-index-v1/receipt.json.",
+      "appliedBy": "operator-authorized-goal-run",
+      "appliedAt": "2026-10-18",
+      "requiresJournalEntry": false,
+      "validationCommand": "Recorded post-commit readback in .tmp/openspec-task-source-index-v1/receipt.json: 5,640 rows; 5,640 unique source refs; 0 invalid rows; 204 ambiguous identities retained; canonicalTaskPromotionCount=0; executableKanbanWrites=0; workspace snapshot sha256:72bf1846a8827d8ab0f6a128c550de2e4021f9a6f09ecdea30ed427070320536; row-manifest checksum sha256:aacb5bd18e6007449d10a76202335239202437707a38b4f21822d344e41a1cea."
+    },
+    {
+      "file": "manual/20261020_atlas_packet_identity_registry_v1_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Separates canonical PacketKeyV2 logical identities and evidence-backed legacy aliases from physical atlas_packets rows and projection/cache metadata. No identities or aliases are seeded. Repository-scope mapping, source/workspace revision qualification, and identity writes remain separately gated.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Run the packet-identity-registry-v1 Vitest suite and a disposable PostgreSQL 18 rollback rehearsal; do not apply to the live database without explicit operator authorization."
     }
   ]
 }

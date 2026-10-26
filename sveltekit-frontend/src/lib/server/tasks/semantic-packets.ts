@@ -18,7 +18,7 @@ import {
 import { qdrant as qdrantManager, sha256ToUuid } from '$lib/server/vector/qdrant-manager';
 import { getRedis } from '$lib/server/redis';
 import { getJson, setJsonWithTtl } from '$lib/server/redis';
-import { callOllamaChat } from '$lib/server/ollama';
+import { callLlamaServerChat } from '$lib/server/ollama';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client';
 import { traceSpan } from '$lib/server/observability/langfuse';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
@@ -230,7 +230,7 @@ async function generateTaskSummary(task: Record<string, unknown>): Promise<TaskS
     ),
   ].join('\n');
 
-  const raw = await callOllamaChat(
+  const raw = await callLlamaServerChat(
     'You convert Kanban tasks into compact semantic packets for agent pickup.',
     prompt,
     { format: 'json', temperature: 0.1, num_predict: 512 }

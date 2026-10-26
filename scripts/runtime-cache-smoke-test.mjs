@@ -409,7 +409,7 @@ async function testEndToEnd() {
 
   await test('Stable cache key (same input → same hash)', async () => {
     const input1 = {
-      model: 'gemma4-legal-iq4xs',
+      model: 'ornith-1.5-9b',
       messages: [{ role: 'user', content: 'What is hearsay?' }],
       temperature: 0.3,
       maxTokens: 200,

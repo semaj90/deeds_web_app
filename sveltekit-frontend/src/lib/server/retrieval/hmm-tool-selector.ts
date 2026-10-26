@@ -194,7 +194,7 @@ export async function selectTool(
   pool?: PoolClient,
   signals?: RoutingSignals
 ): Promise<ToolCandidateResult> {
-  const hasEmbedding = Array.isArray(queryEmbedding) && queryEmbedding.length === 384;
+  const hasEmbedding = hasSemantic768QueryEmbedding(queryEmbedding);
 
   try {
     // Compute observation features
@@ -261,6 +261,12 @@ export async function selectTool(
       domains: ['lexical', 'search']
     };
   }
+}
+
+export function hasSemantic768QueryEmbedding(value: unknown): value is number[] {
+  return Array.isArray(value)
+    && value.length === 768
+    && value.every((component) => typeof component === 'number' && Number.isFinite(component));
 }
 
 /**

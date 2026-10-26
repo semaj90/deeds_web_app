@@ -1,89 +1,89 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "990730be-ac9c-46e4-aa1b-2393ef4cccfe",
-  "repositoryRevision": "acecc0ea7f641675f6349dc0bbca8a39d2ac9259",
-  "generatedAt": "2026-10-04T15:13:08.471Z",
+  "runId": "e6fcee87-b885-4151-91ea-5b1cc8a7b7be",
+  "repositoryRevision": "fb35394b149272c8d87549ca6fdfdd63fc7bde6f",
+  "generatedAt": "2026-10-26T02:52:42.079Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
     "snapshot": {
       "status": "PROVEN",
-      "totalFiles": 25542,
-      "totalBytes": 473214249,
-      "currentRevision": "acecc0ea7f641675f6349dc0bbca8a39d2ac9259",
-      "priorRevision": "88ae5c7d56c59d724962d5654eea7dcc775ace62"
+      "totalFiles": 30327,
+      "totalBytes": 528720368,
+      "currentRevision": "fb35394b149272c8d87549ca6fdfdd63fc7bde6f",
+      "priorRevision": "fb35394b149272c8d87549ca6fdfdd63fc7bde6f"
     },
     "inventory": {
       "status": "PROVEN",
-      "totalFiles": 25542,
-      "codeFiles": 14987,
-      "documentationFiles": 8134,
-      "configFiles": 1869,
-      "otherFiles": 552,
+      "totalFiles": 30327,
+      "codeFiles": 18290,
+      "documentationFiles": 9094,
+      "configFiles": 2371,
+      "otherFiles": 572,
       "topExtensions": [
         {
-          "extension": ".md",
-          "count": 8134
+          "extension": ".ts",
+          "count": 9244
         },
         {
-          "extension": ".ts",
-          "count": 8062
+          "extension": ".md",
+          "count": 9094
         },
         {
           "extension": ".mjs",
-          "count": 3817
+          "count": 5185
         },
         {
           "extension": ".json",
-          "count": 1727
-        },
-        {
-          "extension": ".svelte",
-          "count": 934
-        },
-        {
-          "extension": ".sql",
-          "count": 656
+          "count": 2184
         },
         {
           "extension": ".py",
-          "count": 614
+          "count": 1026
+        },
+        {
+          "extension": ".svelte",
+          "count": 951
         },
         {
           "extension": ".mts",
-          "count": 539
+          "count": 744
+        },
+        {
+          "extension": ".sql",
+          "count": 743
         },
         {
           "extension": ".ps1",
-          "count": 301
+          "count": 310
         },
         {
           "extension": ".js",
-          "count": 141
+          "count": 142
+        },
+        {
+          "extension": ".yaml",
+          "count": 121
         },
         {
           "extension": ".sh",
-          "count": 114
-        },
-        {
-          "extension": ".proto",
-          "count": 101
+          "count": 115
         }
       ]
     },
     "structural": {
       "status": "PROVEN",
-      "filesProcessed": 25542,
-      "filesWithStructure": 12143,
-      "factCount": 129011,
-      "functionCount": 48401,
-      "classCount": 1884,
-      "interfaceCount": 1583,
-      "methodCount": 6421,
-      "importCount": 36489,
-      "constCount": 7576,
-      "arrowCount": 26657,
+      "filesProcessed": 30327,
+      "filesWithStructure": 14863,
+      "factCount": 151745,
+      "functionCount": 53767,
+      "classCount": 1303,
+      "interfaceCount": 1636,
+      "methodCount": 4318,
+      "importCount": 46481,
+      "constCount": 8936,
+      "arrowCount": 35304,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -176,210 +176,210 @@
           "source": "ast-grep"
         },
         {
-          "filePath": ".claude/hooks/posttooluse-audit.mjs",
-          "sourceRef": ".claude/hooks/posttooluse-audit.mjs",
-          "kind": "import",
-          "name": "node:fs",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "kind": "function",
+          "name": "createValidInput",
           "lineStart": 11,
-          "lineEnd": 11,
-          "stableId": "0537275529cb73d78bfdd787e5611a96c69876722d7802a0ddc45dd16b5371da",
-          "source": "ast-grep"
+          "lineEnd": 21,
+          "stableId": "80f6a61c50a51aed",
+          "source": "tree-node"
         },
         {
-          "filePath": ".claude/hooks/posttooluse-audit.mjs",
-          "sourceRef": ".claude/hooks/posttooluse-audit.mjs",
-          "kind": "import",
-          "name": "node:path",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "kind": "function",
+          "name": "createValidInput",
           "lineStart": 12,
           "lineEnd": 12,
-          "stableId": "984736bc24faf5414257647edc777e5c102a9f28bf79341d7400aca3c877e954",
+          "stableId": "7923ee42ae7add79fcace06e3ee24b7c1a091891a981a656bf95dd9791e52e7c",
           "source": "ast-grep"
         },
         {
-          "filePath": ".claude/hooks/pretooluse-deny.mjs",
-          "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
-          "kind": "function",
-          "name": "matchesTool",
-          "lineStart": 78,
-          "lineEnd": 78,
-          "stableId": "617daced9335c935a074ecf3be20521fcdd5eb242029fef04ebf2d4376d455f1",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "kind": "arrow",
+          "name": "ordinals",
+          "lineStart": 13,
+          "lineEnd": 13,
+          "stableId": "605d787ad18db70b1e05087a85dc909b268f1c67a77236868f89b0658e8874a9",
           "source": "ast-grep"
         },
         {
-          "filePath": ".claude/hooks/pretooluse-deny.mjs",
-          "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
-          "kind": "import",
-          "name": "node:fs",
-          "lineStart": 19,
-          "lineEnd": 19,
-          "stableId": "53e7d95e175efd2077a762817b7720440f3a05affadba6b0d44dd1cf58e9067e",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "kind": "arrow",
+          "name": "evidenceRefs",
+          "lineStart": 17,
+          "lineEnd": 17,
+          "stableId": "808a146ecd578c1554feaa4cf81eb1c784f17f9a988ea5033d0a270fab060852",
           "source": "ast-grep"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "kind": "arrow",
+          "name": "oversizedOrdinals",
+          "lineStart": 75,
+          "lineEnd": 75,
+          "stableId": "39a1a7ed1ed624d04e99c2a6d8ad40b25516701e2e8ae9dabc717f494754444d",
+          "source": "ast-grep"
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "kind": "arrow",
+          "name": "oversizedInput",
+          "lineStart": 76,
+          "lineEnd": 76,
+          "stableId": "0ed69ecfe76a1a6cd18e6a5b5354d75e2aee9404e0c1a6ed38bc5e96fc05cf7e",
+          "source": "ast-grep"
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
           "kind": "import",
           "name": "vitest",
           "lineStart": 1,
           "lineEnd": 1,
-          "stableId": "fa0c51dc661441e1af9589f692548f6e7c30b9d6df3d972516bf4577eadfcf89",
+          "stableId": "202597ef38ea995776bd1ae186a62b2cf01bb4031a12964dd64fab359c482259",
           "source": "ast-grep"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
           "kind": "import",
-          "name": "./packet-feature-matrix",
+          "name": "./atlas-rank-input-adapter-v1.js",
           "lineStart": 2,
           "lineEnd": 2,
-          "stableId": "0ba0055c943038905bfc5bdd78b1b66c7983e2b27d3716d2ed15939267c6f535",
+          "stableId": "0d8dba8c481be0dcecbd9dc1770b582daf158a274d9bda6b7fd1712c708b96f5",
           "source": "ast-grep"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "kind": "function",
-          "name": "clamp01",
-          "lineStart": 38,
-          "lineEnd": 48,
-          "stableId": "a666ecb50721ba98",
-          "source": "tree-node"
-        },
-        {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
           "kind": "const",
-          "name": "PACKET_FEATURE_NAMES",
-          "lineStart": 1,
-          "lineEnd": 1,
-          "stableId": "05ddfa353c63f88b",
+          "name": "ATLAS_RANK_INPUT_SCHEMA_V1",
+          "lineStart": 3,
+          "lineEnd": 3,
+          "stableId": "3092d6ffb461e4a7",
           "source": "tree-node"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
           "kind": "const",
-          "name": "PACKET_FEATURE_COUNT",
-          "lineStart": 15,
-          "lineEnd": 15,
-          "stableId": "ae4f7c62f9c842ff",
+          "name": "ATLAS_RANK_RECEIPT_SCHEMA_V1",
+          "lineStart": 5,
+          "lineEnd": 5,
+          "stableId": "0f7887f29230b37d",
           "source": "tree-node"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "kind": "function",
-          "name": "clamp01",
-          "lineStart": 39,
-          "lineEnd": 39,
-          "stableId": "78a8065e2fbb0a2bd776886b708de27ab410d0b1e5684b15253c09785a40a3c9",
-          "source": "ast-grep"
-        },
-        {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "kind": "function",
-          "name": "normalizeDemandUtility",
-          "lineStart": 44,
-          "lineEnd": 44,
-          "stableId": "16ad97dfa457739afccc642c783691d8c79448a6554ee142ee790e84ddabcd44",
-          "source": "ast-grep"
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "kind": "const",
+          "name": "INVESTIGATION_STATES",
+          "lineStart": 6,
+          "lineEnd": 6,
+          "stableId": "e876ed59ca44bf78",
+          "source": "tree-node"
         }
       ]
     },
     "identity": {
-      "status": "PARTIAL",
-      "uniqueIds": 128535,
-      "duplicateIds": 476,
-      "reusedIds": 128535,
-      "supersededIds": 476
+      "status": "PROVEN",
+      "uniqueIds": 151745,
+      "duplicateIds": 0,
+      "reusedIds": 151745,
+      "supersededIds": 0
     },
     "lexical": {
       "status": "PROVEN",
-      "filesProcessed": 25542,
-      "entries": 25542,
-      "totalTokens": 41137549,
-      "totalUniqueTokens": 8478000,
+      "filesProcessed": 30327,
+      "entries": 30327,
+      "totalTokens": 47195900,
+      "totalUniqueTokens": 10229615,
       "topGlobalTerms": [
         {
           "term": "count",
-          "weight": 675718
+          "weight": 682275
         },
         {
           "term": "tag",
-          "weight": 623188
+          "weight": 624748
         },
         {
           "term": "routes",
-          "weight": 596700
+          "weight": 598486
         },
         {
           "term": "api",
-          "weight": 500915
+          "weight": 514962
         },
         {
           "term": "filepath",
-          "weight": 488463
+          "weight": 489214
         },
         {
           "term": "topoclass",
-          "weight": 478537
+          "weight": 478538
         },
         {
           "term": "id",
-          "weight": 451902
+          "weight": 474937
         },
         {
           "term": "unclassified",
-          "weight": 428073
+          "weight": 428544
         },
         {
           "term": "pagerank",
-          "weight": 393456
+          "weight": 394879
         },
         {
           "term": "graphauthorityscore",
-          "weight": 387964
+          "weight": 387965
         },
         {
           "term": "communityid",
-          "weight": 376497
+          "weight": 376533
         },
         {
           "term": "gpu",
-          "weight": 354335
+          "weight": 359567
         },
         {
           "term": "community",
-          "weight": 338571
+          "weight": 340103
         },
         {
           "term": "app",
-          "weight": 311851
+          "weight": 315355
         },
         {
           "term": "cluster",
-          "weight": 309647
+          "weight": 310777
         },
         {
           "term": "components",
-          "weight": 250776
+          "weight": 252559
         },
         {
           "term": "clusterkey",
-          "weight": 234368
+          "weight": 234375
+        },
+        {
+          "term": "kind",
+          "weight": 233427
         },
         {
           "term": "clustersrc",
           "weight": 232792
         },
         {
-          "term": "kind",
-          "weight": 229599
-        },
-        {
-          "term": "server.ts",
-          "weight": 211462
+          "term": "sveltekit",
+          "weight": 215561
         }
       ],
       "samples": [
@@ -520,312 +520,1032 @@
           "hash": "87fc37c742a2265c6cd13e4b7cd5f475680dca40641839e071ea97717de2c349"
         },
         {
-          "filePath": ".clarity/ff1-plan.md",
-          "tokenCount": 250,
-          "uniqueTokenCount": 146,
+          "filePath": ".archive/2026-10-06-workboard-backup/OPENSPEC-WORKBOARD.md",
+          "tokenCount": 11492,
+          "uniqueTokenCount": 2262,
           "topTerms": [
             {
-              "term": "to",
+              "term": "atlas",
+              "weight": 532
+            },
+            {
+              "term": "parent",
+              "weight": 472
+            },
+            {
+              "term": "openspec",
+              "weight": 312
+            },
+            {
+              "term": "changes",
+              "weight": 295
+            },
+            {
+              "term": "waiting",
+              "weight": 150
+            },
+            {
+              "term": "actionable",
+              "weight": 142
+            },
+            {
+              "term": "ace",
+              "weight": 132
+            },
+            {
+              "term": "open",
+              "weight": 123
+            },
+            {
+              "term": "complete",
+              "weight": 122
+            },
+            {
+              "term": "feature",
+              "weight": 115
+            },
+            {
+              "term": "tasks.md",
+              "weight": 112
+            },
+            {
+              "term": "retrieval",
+              "weight": 105
+            },
+            {
+              "term": "not",
+              "weight": 100
+            },
+            {
+              "term": "historical",
+              "weight": 95
+            },
+            {
+              "term": "progress",
+              "weight": 91
+            },
+            {
+              "term": "raw",
+              "weight": 89
+            },
+            {
+              "term": "superseded",
+              "weight": 89
+            },
+            {
+              "term": "superseded/historical",
+              "weight": 89
+            },
+            {
+              "term": "fabric",
+              "weight": 76
+            },
+            {
+              "term": "2026",
+              "weight": 72
+            },
+            {
+              "term": "selected",
+              "weight": 72
+            },
+            {
+              "term": "integration",
+              "weight": 61
+            },
+            {
+              "term": "09",
+              "weight": 60
+            },
+            {
+              "term": "general",
+              "weight": 60
+            },
+            {
+              "term": "lane",
+              "weight": 60
+            },
+            {
+              "term": "canonical",
+              "weight": 57
+            },
+            {
+              "term": "eta",
+              "weight": 57
+            },
+            {
+              "term": "intelligence",
+              "weight": 57
+            },
+            {
+              "term": "unknown",
+              "weight": 57
+            },
+            {
+              "term": "filesystem",
+              "weight": 56
+            },
+            {
+              "term": "filesystem_mtime",
+              "weight": 56
+            },
+            {
+              "term": "last",
+              "weight": 56
+            }
+          ],
+          "hash": "c2e4adafbbf9fabe937cf78bfa3f4415187f4d0bd61872985fe8a94b2af88f99"
+        },
+        {
+          "filePath": ".archive/2026-10-06-workspace-reseal-historical/workspace-snapshot-reseal-v1.2026-09-18.json",
+          "tokenCount": 59,
+          "uniqueTokenCount": 48,
+          "topTerms": [
+            {
+              "term": "reseal",
+              "weight": 3
+            },
+            {
+              "term": "snapshot",
+              "weight": 3
+            },
+            {
+              "term": "workspace",
+              "weight": 3
+            },
+            {
+              "term": "09",
+              "weight": 2
+            },
+            {
+              "term": "2026",
+              "weight": 2
+            },
+            {
+              "term": "25775",
+              "weight": 2
+            },
+            {
+              "term": "proven",
+              "weight": 2
+            },
+            {
+              "term": "readback",
+              "weight": 2
+            },
+            {
+              "term": ".archive",
+              "weight": 1
+            },
+            {
+              "term": ".archive/2026-10-06-workspace-reseal-historical/workspace-snapshot-reseal-v1.2026-09-18.json",
+              "weight": 1
+            },
+            {
+              "term": "06",
+              "weight": 1
+            },
+            {
+              "term": "07",
+              "weight": 1
+            },
+            {
+              "term": "10",
+              "weight": 1
+            },
+            {
+              "term": "18.json",
+              "weight": 1
+            },
+            {
+              "term": "18t02",
+              "weight": 1
+            },
+            {
+              "term": "2026-09-18t02",
+              "weight": 1
+            },
+            {
+              "term": "47.906z",
+              "weight": 1
+            },
+            {
+              "term": "74e0ce22a50d4f09446250579ae5415a418ce81268ed29f9add20fa086ed95db",
+              "weight": 1
+            },
+            {
+              "term": "74e0ce22a50d4f09446250579ae5415a418ce81268ed29f9add20fa086ed95db.json",
+              "weight": 1
+            },
+            {
+              "term": "atlas.workspace",
+              "weight": 1
+            },
+            {
+              "term": "atlas.workspace-snapshot-reseal.v1",
+              "weight": 1
+            },
+            {
+              "term": "bytes",
+              "weight": 1
+            },
+            {
+              "term": "docs",
+              "weight": 1
+            },
+            {
+              "term": "docs/reports/workspace-source-snapshots/74e0ce22a50d4f09446250579ae5415a418ce81268ed29f9add20fa086ed95db.json",
+              "weight": 1
+            },
+            {
+              "term": "exactmatches",
+              "weight": 1
+            },
+            {
+              "term": "generatedat",
+              "weight": 1
+            },
+            {
+              "term": "historical",
+              "weight": 1
+            },
+            {
+              "term": "mode",
+              "weight": 1
+            },
+            {
+              "term": "only",
+              "weight": 1
+            },
+            {
+              "term": "read",
+              "weight": 1
+            },
+            {
+              "term": "read_only",
+              "weight": 1
+            },
+            {
+              "term": "readbackstatus",
+              "weight": 1
+            }
+          ],
+          "hash": "1dadc0ffbd775b76a1d849352ccbfee2675e6f3e82e410e0d6ee0a7e77e682a3"
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "tokenCount": 584,
+          "uniqueTokenCount": 197,
+          "topTerms": [
+            {
+              "term": "expect",
+              "weight": 22
+            },
+            {
+              "term": "input",
+              "weight": 17
+            },
+            {
+              "term": ".tothrow",
+              "weight": 14
+            },
+            {
+              "term": "validateatlasrankinputv1",
+              "weight": 14
+            },
+            {
+              "term": "atlasrankinputv1",
+              "weight": 11
+            },
+            {
+              "term": "it",
+              "weight": 11
+            },
+            {
+              "term": "candidateordinal",
+              "weight": 10
+            },
+            {
+              "term": "evidencerevision",
+              "weight": 10
+            },
+            {
+              "term": "featureprojectionrevision",
+              "weight": 10
+            },
+            {
+              "term": "features",
+              "weight": 10
+            },
+            {
+              "term": "new",
+              "weight": 10
+            },
+            {
+              "term": "rank",
+              "weight": 10
+            },
+            {
+              "term": "schema",
+              "weight": 10
+            },
+            {
+              "term": "...base",
               "weight": 9
             },
             {
-              "term": "check",
+              "term": "createvalidinput",
+              "weight": 9
+            },
+            {
+              "term": "evidencerefs",
               "weight": 8
             },
             {
-              "term": "oom",
+              "term": "length",
               "weight": 8
             },
             {
-              "term": "svelte",
+              "term": "rejects",
               "weight": 8
             },
             {
-              "term": "ff1",
+              "term": "rev",
+              "weight": 8
+            },
+            {
+              "term": "atlas",
+              "weight": 7
+            },
+            {
+              "term": "candidate",
+              "weight": 7
+            },
+            {
+              "term": "candidateset",
+              "weight": 7
+            },
+            {
+              "term": "mismatch",
+              "weight": 7
+            },
+            {
+              "term": "ordinals",
+              "weight": 7
+            },
+            {
+              "term": "sealed",
+              "weight": 7
+            },
+            {
+              "term": "10",
               "weight": 6
             },
             {
-              "term": "svelte-check",
+              "term": "non",
               "weight": 6
             },
             {
-              "term": ".clarity",
+              "term": "presencemask",
+              "weight": 6
+            },
+            {
+              "term": "v1",
+              "weight": 6
+            },
+            {
+              "term": "as",
               "weight": 5
             },
             {
-              "term": "allowlist",
+              "term": "base",
               "weight": 5
             },
             {
-              "term": "tier",
+              "term": "batch",
               "weight": 5
+            }
+          ],
+          "hash": "e295c37a36a3eb01c38bd351df36dc9adfce4fd63a249d155457f077c1798a72"
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "tokenCount": 560,
+          "uniqueTokenCount": 219,
+          "topTerms": [
+            {
+              "term": "readonly",
+              "weight": 26
+            },
+            {
+              "term": "rank",
+              "weight": 16
+            },
+            {
+              "term": "new",
+              "weight": 15
             },
             {
               "term": "error",
-              "weight": 4
+              "weight": 14
             },
             {
-              "term": "is",
-              "weight": 4
+              "term": "if",
+              "weight": 14
             },
             {
-              "term": "of",
-              "weight": 4
+              "term": "throw",
+              "weight": 14
             },
             {
-              "term": "oom-safe",
-              "weight": 4
+              "term": "schema",
+              "weight": 12
             },
             {
-              "term": "safe",
-              "weight": 4
+              "term": "atlas",
+              "weight": 11
             },
             {
-              "term": "tsgo",
-              "weight": 4
+              "term": "input",
+              "weight": 10
             },
             {
-              "term": "1.",
-              "weight": 3
+              "term": "string",
+              "weight": 10
             },
             {
-              "term": "2.",
-              "weight": 3
+              "term": "batch",
+              "weight": 9
             },
             {
-              "term": "3.",
-              "weight": 3
+              "term": "v1",
+              "weight": 9
             },
             {
-              "term": "fast",
-              "weight": 3
+              "term": "ordinal",
+              "weight": 8
             },
             {
-              "term": "full",
-              "weight": 3
+              "term": "size",
+              "weight": 8
             },
             {
-              "term": "locations",
-              "weight": 3
+              "term": "candidate",
+              "weight": 7
             },
             {
-              "term": "phase",
-              "weight": 3
+              "term": "ord",
+              "weight": 7
             },
             {
-              "term": "report",
-              "weight": 3
+              "term": "scores",
+              "weight": 7
             },
             {
-              "term": "run",
-              "weight": 3
+              "term": "as",
+              "weight": 6
             },
             {
-              "term": "subset",
-              "weight": 3
+              "term": "at",
+              "weight": 6
             },
             {
-              "term": "an",
-              "weight": 2
+              "term": "expectedelements",
+              "weight": 6
             },
             {
-              "term": "authoritative",
-              "weight": 2
+              "term": "number",
+              "weight": 6
             },
             {
-              "term": "baseline",
-              "weight": 2
+              "term": "got",
+              "weight": 5
             },
             {
-              "term": "baseline.",
-              "weight": 2
-            },
-            {
-              "term": "compare",
-              "weight": 2
-            },
-            {
-              "term": "current",
-              "weight": 2
-            },
-            {
-              "term": "errors",
-              "weight": 2
-            }
-          ],
-          "hash": "625c90a88cad26f13068301773b5116be66a7154f77369b30a5a52ad99ef5309"
-        },
-        {
-          "filePath": ".claude/AGENT_CONSTITUTION.md",
-          "tokenCount": 36,
-          "uniqueTokenCount": 35,
-          "topTerms": [
-            {
-              "term": "agent",
-              "weight": 2
-            },
-            {
-              "term": ".claude",
-              "weight": 1
-            },
-            {
-              "term": ".claude/agent_constitution.md",
-              "weight": 1
-            },
-            {
-              "term": "1.",
-              "weight": 1
-            },
-            {
-              "term": "2.",
-              "weight": 1
-            },
-            {
-              "term": "3.",
-              "weight": 1
-            },
-            {
-              "term": "4.",
-              "weight": 1
-            },
-            {
-              "term": "5.",
-              "weight": 1
-            },
-            {
-              "term": "6.",
-              "weight": 1
-            },
-            {
-              "term": "agent_constitution",
-              "weight": 1
-            },
-            {
-              "term": "agents",
-              "weight": 1
-            },
-            {
-              "term": "architecture",
-              "weight": 1
-            },
-            {
-              "term": "broad",
-              "weight": 1
-            },
-            {
-              "term": "constitution",
-              "weight": 1
-            },
-            {
-              "term": "constitution.md",
-              "weight": 1
-            },
-            {
-              "term": "deleting",
-              "weight": 1
-            },
-            {
-              "term": "evidence",
-              "weight": 1
-            },
-            {
-              "term": "first",
-              "weight": 1
-            },
-            {
-              "term": "forbidden",
-              "weight": 1
-            },
-            {
-              "term": "hallucinated",
-              "weight": 1
+              "term": "index",
+              "weight": 5
             },
             {
               "term": "must",
-              "weight": 1
+              "weight": 5
             },
             {
-              "term": "narrowly",
-              "weight": 1
+              "term": "receipt",
+              "weight": 5
             },
             {
-              "term": "patch",
-              "weight": 1
+              "term": "//",
+              "weight": 4
             },
             {
-              "term": "produce",
-              "weight": 1
+              "term": "atlas_rank_input_schema_v1",
+              "weight": 4
             },
             {
-              "term": "proof",
-              "weight": 1
+              "term": "computebackend",
+              "weight": 4
             },
             {
-              "term": "replay",
-              "weight": 1
+              "term": "expected",
+              "weight": 4
             },
             {
-              "term": "retrieve",
-              "weight": 1
+              "term": "expectedordinal",
+              "weight": 4
             },
             {
-              "term": "rewrites",
-              "weight": 1
+              "term": "features",
+              "weight": 4
             },
             {
-              "term": "run",
-              "weight": 1
-            },
-            {
-              "term": "schemas",
-              "weight": 1
-            },
-            {
-              "term": "search",
-              "weight": 1
-            },
-            {
-              "term": "smoke",
-              "weight": 1
+              "term": "maskval",
+              "weight": 4
             }
           ],
-          "hash": "396d0740dc60f43769593500dabd78ef815142a606442c30586ca956e2348e4d"
+          "hash": "84b1d8c01bbd02f0fcdbedbf12042cb44f39bd87eaea0b99b9faafe744baf8d0"
         },
         {
-          "filePath": ".claude/AGENT_RECOMMENDATIONS.md",
-          "tokenCount": 69,
-          "uniqueTokenCount": 52,
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-feature-matrix-4x6-v1.ts",
+          "tokenCount": 268,
+          "uniqueTokenCount": 138,
           "topTerms": [
             {
-              "term": "confidence",
+              "term": ".min",
+              "weight": 11
+            },
+            {
+              "term": "number",
+              "weight": 9
+            },
+            {
+              "term": "flat",
+              "weight": 8
+            },
+            {
+              "term": "matrix",
+              "weight": 7
+            },
+            {
+              "term": "offset",
+              "weight": 7
+            },
+            {
+              "term": "z.number",
+              "weight": 7
+            },
+            {
+              "term": ".max",
+              "weight": 6
+            },
+            {
+              "term": "z.string",
+              "weight": 6
+            },
+            {
+              "term": "4x6",
+              "weight": 5
+            },
+            {
+              "term": "feature",
+              "weight": 5
+            },
+            {
+              "term": "0.15",
+              "weight": 4
+            },
+            {
+              "term": "advisory",
+              "weight": 4
+            },
+            {
+              "term": "ast",
+              "weight": 4
+            },
+            {
+              "term": "graphppr",
+              "weight": 4
+            },
+            {
+              "term": "nary",
+              "weight": 4
+            },
+            {
+              "term": "provenance",
+              "weight": 4
+            },
+            {
+              "term": "semantic",
+              "weight": 4
+            },
+            {
+              "term": "toolevidence",
+              "weight": 4
+            },
+            {
+              "term": "typeof",
+              "weight": 4
+            },
+            {
+              "term": "advisoryweights",
               "weight": 3
             },
             {
-              "term": "retrieve",
+              "term": "candidateinvestigationstateschema",
               "weight": 3
             },
             {
-              "term": "0.60",
+              "term": "candidatestate",
+              "weight": 3
+            },
+            {
+              "term": "canonicalid",
+              "weight": 3
+            },
+            {
+              "term": "featurematrix4x6",
+              "weight": 3
+            },
+            {
+              "term": "investigationcandidatefeaturerowschema",
+              "weight": 3
+            },
+            {
+              "term": "schema",
+              "weight": 3
+            },
+            {
+              "term": "weights",
+              "weight": 3
+            },
+            {
+              "term": "z.infer",
+              "weight": 3
+            },
+            {
+              "term": ".object",
               "weight": 2
             },
             {
-              "term": "0.85",
+              "term": ".strict",
               "weight": 2
             },
             {
-              "term": "agent",
+              "term": "0.20",
               "weight": 2
             },
             {
-              "term": "answer",
+              "term": "24",
+              "weight": 2
+            }
+          ],
+          "hash": "adcc6b99ebd14ff7857258f4c853191751419247c3646375000711874f39678b"
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.spec.ts",
+          "tokenCount": 779,
+          "uniqueTokenCount": 276,
+          "topTerms": [
+            {
+              "term": "expect",
+              "weight": 28
+            },
+            {
+              "term": "ws",
+              "weight": 18
+            },
+            {
+              "term": ".tobe",
+              "weight": 17
+            },
+            {
+              "term": "makemockcandidate",
+              "weight": 17
+            },
+            {
+              "term": "rankinput",
+              "weight": 15
+            },
+            {
+              "term": "v1",
+              "weight": 13
+            },
+            {
+              "term": "makeordinalmap",
+              "weight": 11
+            },
+            {
+              "term": "workspacerevision",
+              "weight": 11
+            },
+            {
+              "term": "0.6",
+              "weight": 10
+            },
+            {
+              "term": "110",
+              "weight": 10
+            },
+            {
+              "term": "candidates",
+              "weight": 10
+            },
+            {
+              "term": "//",
+              "weight": 9
+            },
+            {
+              "term": "101",
+              "weight": 9
+            },
+            {
+              "term": "g-1",
+              "weight": 9
+            },
+            {
+              "term": "graphrevision",
+              "weight": 9
+            },
+            {
+              "term": "it",
+              "weight": 9
+            },
+            {
+              "term": "ordinalmap",
+              "weight": 9
+            },
+            {
+              "term": "0.9",
+              "weight": 8
+            },
+            {
+              "term": "atlas",
+              "weight": 8
+            },
+            {
+              "term": "buildatlasrankinputv1",
+              "weight": 8
+            },
+            {
+              "term": "evidencerevision",
+              "weight": 8
+            },
+            {
+              "term": "featureschemarevision",
+              "weight": 8
+            },
+            {
+              "term": "querydigest",
+              "weight": 8
+            },
+            {
+              "term": "rank",
+              "weight": 8
+            },
+            {
+              "term": "sha256",
+              "weight": 8
+            },
+            {
+              "term": "taxonomyrevision",
+              "weight": 8
+            },
+            {
+              "term": "ws-1",
+              "weight": 8
+            },
+            {
+              "term": "103",
+              "weight": 7
+            },
+            {
+              "term": "20261018",
+              "weight": 7
+            },
+            {
+              "term": "active",
+              "weight": 7
+            },
+            {
+              "term": "basescore",
+              "weight": 7
+            },
+            {
+              "term": "input",
+              "weight": 7
+            }
+          ],
+          "hash": "c2362571c9f8c0dededa0665e3e1c4e45845c3b7877e7cb6e8098211fee9a9c1"
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.ts",
+          "tokenCount": 988,
+          "uniqueTokenCount": 328,
+          "topTerms": [
+            {
+              "term": "string",
+              "weight": 38
+            },
+            {
+              "term": "error",
+              "weight": 34
+            },
+            {
+              "term": "if",
+              "weight": 30
+            },
+            {
+              "term": "valid",
+              "weight": 22
+            },
+            {
+              "term": "ordinal",
+              "weight": 21
+            },
+            {
+              "term": "candidate",
+              "weight": 20
+            },
+            {
+              "term": "new",
+              "weight": 19
+            },
+            {
+              "term": "features",
+              "weight": 17
+            },
+            {
+              "term": "schema",
+              "weight": 14
+            },
+            {
+              "term": "input",
+              "weight": 12
+            },
+            {
+              "term": "number",
+              "weight": 12
+            },
+            {
+              "term": "revision",
+              "weight": 12
+            },
+            {
+              "term": "row",
+              "weight": 12
+            },
+            {
+              "term": "mismatch",
+              "weight": 11
+            },
+            {
+              "term": "rank",
+              "weight": 11
+            },
+            {
+              "term": "throw",
+              "weight": 11
+            },
+            {
+              "term": "item.candidateordinal",
+              "weight": 10
+            },
+            {
+              "term": "map",
+              "weight": 10
+            },
+            {
+              "term": "atlas",
+              "weight": 9
+            },
+            {
+              "term": "candidateordinals",
+              "weight": 9
+            },
+            {
+              "term": "evidencerevision",
+              "weight": 8
+            },
+            {
+              "term": "features_per_candidate",
+              "weight": 8
+            },
+            {
+              "term": "featureschemarevision",
+              "weight": 8
+            },
+            {
+              "term": "graphrevision",
+              "weight": 8
+            },
+            {
+              "term": "per",
+              "weight": 8
+            },
+            {
+              "term": "taxonomyrevision",
+              "weight": 8
+            },
+            {
+              "term": "workspacerevision",
+              "weight": 8
+            },
+            {
+              "term": ".trim",
+              "weight": 7
+            },
+            {
+              "term": "batch",
+              "weight": 7
+            },
+            {
+              "term": "feature",
+              "weight": 7
+            },
+            {
+              "term": "input.workspacerevision",
+              "weight": 7
+            },
+            {
+              "term": "ord",
+              "weight": 7
+            }
+          ],
+          "hash": "c653d281d64ce30b9484d9fc49ed638ae1f1c2996054cb733bbda9e11940fa0e"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/manifest.json",
+          "tokenCount": 109,
+          "uniqueTokenCount": 40,
+          "topTerms": [
+            {
+              "term": "10",
+              "weight": 6
+            },
+            {
+              "term": "13",
+              "weight": 6
+            },
+            {
+              "term": "2026",
+              "weight": 6
+            },
+            {
+              "term": "2026-10-13",
+              "weight": 5
+            },
+            {
+              "term": "archivedat",
+              "weight": 5
+            },
+            {
+              "term": "committed",
+              "weight": 5
+            },
+            {
+              "term": "duplicate",
+              "weight": 5
+            },
+            {
+              "term": "existing",
+              "weight": 5
+            },
+            {
+              "term": "never",
+              "weight": 5
+            },
+            {
+              "term": "of",
+              "weight": 5
+            },
+            {
+              "term": "owner",
+              "weight": 5
+            },
+            {
+              "term": "reason",
+              "weight": 5
+            },
+            {
+              "term": "sha256",
+              "weight": 5
+            },
+            {
+              "term": "v1.py",
+              "weight": 5
+            },
+            {
+              "term": "atlas",
+              "weight": 4
+            },
+            {
+              "term": "python",
+              "weight": 3
+            },
+            {
+              "term": "batch",
               "weight": 2
             },
             {
-              "term": "check",
-              "weight": 2
-            },
-            {
-              "term": "deep",
+              "term": "features",
               "weight": 2
             },
             {
@@ -833,399 +1553,239 @@
               "weight": 2
             },
             {
-              "term": "local",
+              "term": "rff",
               "weight": 2
             },
             {
-              "term": "neighbors",
+              "term": "stream",
               "weight": 2
             },
             {
-              "term": "recommendations.md",
-              "weight": 2
-            },
-            {
-              "term": "required",
-              "weight": 2
-            },
-            {
-              "term": "research",
-              "weight": 2
-            },
-            {
-              "term": "telemetry",
-              "weight": 2
-            },
-            {
-              "term": ".claude",
+              "term": ".archive",
               "weight": 1
             },
             {
-              "term": ".claude/agent_recommendations.md",
+              "term": ".archive/duplicates-2026-10-13/manifest.json",
               "weight": 1
             },
             {
-              "term": "0.60-0.85",
+              "term": "2df6c70a9ea94f2f040882c9f07e6a9cd5c2509731332d7db690fa0108916986",
               "weight": 1
             },
             {
-              "term": "1.",
+              "term": "38d892e4c24f9966063f9f53f3ca2817ab23a3328f293207e4d394bbed5de7e8",
               "weight": 1
             },
             {
-              "term": "2.",
+              "term": "4c117ff1171e3a51b1d9e39379e256340d4e40e3c57bde5241c3d74d80a1a12c",
               "weight": 1
             },
             {
-              "term": "3.",
+              "term": "4c9a0de1f664c07467b265ca28a5790c35bade57f3d495b5cb8492aa9ebfbb8e",
               "weight": 1
             },
             {
-              "term": "4.",
+              "term": "cdc08eb115a40ef3b3cad3e125de4289769b5fcb7426cecb65f70076c6c751d1",
               "weight": 1
             },
             {
-              "term": "5.",
+              "term": "cuda",
               "weight": 1
             },
             {
-              "term": "6.",
+              "term": "cutile",
               "weight": 1
             },
             {
-              "term": "7.",
+              "term": "duplicates",
               "weight": 1
             },
             {
-              "term": "agent_recommendations.md",
-              "weight": 1
-            },
-            {
-              "term": "aliases",
-              "weight": 1
-            },
-            {
-              "term": "bitfrost",
-              "weight": 1
-            },
-            {
-              "term": "cache",
-              "weight": 1
-            },
-            {
-              "term": "decide",
-              "weight": 1
-            },
-            {
-              "term": "episodic",
-              "weight": 1
-            },
-            {
-              "term": "evidence",
+              "term": "manifest.json",
               "weight": 1
             }
           ],
-          "hash": "d491422a5ba28f3925d640fcfc9cba418adfb721c2bf8d55a98a05e3d3ba1753"
+          "hash": "fe68364b93ea15e2b37f418aaf398049e1afacd1b94c9d0074fd682bac104127"
         },
         {
-          "filePath": ".claude/agents/drizzle-inspector.md",
-          "tokenCount": 507,
-          "uniqueTokenCount": 286,
+          "filePath": ".archive/duplicates-2026-10-13/python_atlas_cuda_cutile_vecadd_smoke_v1.py",
+          "tokenCount": 394,
+          "uniqueTokenCount": 213,
           "topTerms": [
             {
-              "term": "db",
-              "weight": 14
-            },
-            {
-              "term": "mcp",
+              "term": "tile",
               "weight": 11
             },
             {
-              "term": "not",
-              "weight": 11
+              "term": "cutile",
+              "weight": 10
             },
             {
-              "term": "what",
-              "weight": 9
+              "term": "report",
+              "weight": 10
             },
             {
-              "term": "drizzle",
+              "term": "cuda",
               "weight": 8
             },
             {
-              "term": "jsonb",
-              "weight": 8
-            },
-            {
-              "term": "schema",
-              "weight": 8
-            },
-            {
-              "term": "trace",
-              "weight": 8
-            },
-            {
-              "term": "you",
-              "weight": 8
-            },
-            {
-              "term": "do",
+              "term": "smoke",
               "weight": 7
             },
             {
-              "term": "if",
+              "term": "atlas",
               "weight": 6
             },
             {
-              "term": "read",
+              "term": "gpu",
               "weight": 6
-            },
-            {
-              "term": "in",
-              "weight": 5
-            },
-            {
-              "term": "indexes",
-              "weight": 5
-            },
-            {
-              "term": "it",
-              "weight": 5
-            },
-            {
-              "term": "sample",
-              "weight": 5
-            },
-            {
-              "term": "status",
-              "weight": 5
-            },
-            {
-              "term": "table",
-              "weight": 5
-            },
-            {
-              "term": "use",
-              "weight": 5
-            },
-            {
-              "term": "any",
-              "weight": 4
-            },
-            {
-              "term": "are",
-              "weight": 4
-            },
-            {
-              "term": "columns",
-              "weight": 4
-            },
-            {
-              "term": "inspect",
-              "weight": 4
-            },
-            {
-              "term": "keys",
-              "weight": 4
-            },
-            {
-              "term": "migration",
-              "weight": 4
-            },
-            {
-              "term": "never",
-              "weight": 4
-            },
-            {
-              "term": "or",
-              "weight": 4
-            },
-            {
-              "term": "postgres.ts",
-              "weight": 4
-            },
-            {
-              "term": "src/lib/server/db/schema-postgres.ts",
-              "weight": 4
-            },
-            {
-              "term": "tool",
-              "weight": 4
-            },
-            {
-              "term": "tools",
-              "weight": 4
-            },
-            {
-              "term": "column",
-              "weight": 3
-            }
-          ],
-          "hash": "947fc0c04ee81d9e917d543e510506b863b43345ff858afc2f3aa45a715727ed"
-        },
-        {
-          "filePath": ".claude/agents/obsidian-cartographer.md",
-          "tokenCount": 568,
-          "uniqueTokenCount": 304,
-          "topTerms": [
-            {
-              "term": "vault",
-              "weight": 22
-            },
-            {
-              "term": "agents.md",
-              "weight": 11
-            },
-            {
-              "term": "dir",
-              "weight": 9
-            },
-            {
-              "term": "pathway",
-              "weight": 9
-            },
-            {
-              "term": "wiki",
-              "weight": 9
-            },
-            {
-              "term": "card",
-              "weight": 8
-            },
-            {
-              "term": "feature",
-              "weight": 8
-            },
-            {
-              "term": "not",
-              "weight": 8
-            },
-            {
-              "term": "note",
-              "weight": 8
-            },
-            {
-              "term": "timeline",
-              "weight": 8
-            },
-            {
-              "term": "to",
-              "weight": 8
-            },
-            {
-              "term": "context",
-              "weight": 7
-            },
-            {
-              "term": "notes",
-              "weight": 7
-            },
-            {
-              "term": "postgres",
-              "weight": 7
-            },
-            {
-              "term": "cards",
-              "weight": 6
-            },
-            {
-              "term": "hand",
-              "weight": 6
-            },
-            {
-              "term": "n/a",
-              "weight": 6
-            },
-            {
-              "term": "what",
-              "weight": 6
-            },
-            {
-              "term": ".md",
-              "weight": 5
-            },
-            {
-              "term": "agent",
-              "weight": 5
             },
             {
               "term": "run",
-              "weight": 5
-            },
-            {
-              "term": "agent_context_files",
-              "weight": 4
-            },
-            {
-              "term": "edit",
-              "weight": 4
-            },
-            {
-              "term": "edited",
-              "weight": 4
-            },
-            {
-              "term": "hand-edited",
-              "weight": 4
-            },
-            {
-              "term": "in",
-              "weight": 4
-            },
-            {
-              "term": "is",
-              "weight": 4
-            },
-            {
-              "term": "obsidian",
-              "weight": 4
-            },
-            {
-              "term": "regenerator",
-              "weight": 4
-            },
-            {
-              "term": "been",
-              "weight": 3
-            },
-            {
-              "term": "cache",
-              "weight": 3
-            },
-            {
-              "term": "check",
-              "weight": 3
-            }
-          ],
-          "hash": "7e56c3edebfb6a144167293148c964b5e77980adfe828b4eac095bf2ddd29036"
-        },
-        {
-          "filePath": ".claude/agents/sveltekit-route-auditor.md",
-          "tokenCount": 447,
-          "uniqueTokenCount": 270,
-          "topTerms": [
-            {
-              "term": "routes",
-              "weight": 14
-            },
-            {
-              "term": "api",
-              "weight": 10
-            },
-            {
-              "term": "in",
-              "weight": 10
-            },
-            {
-              "term": "auth",
-              "weight": 8
-            },
-            {
-              "term": "error",
               "weight": 6
             },
             {
-              "term": "server.ts",
+              "term": "str",
+              "weight": 6
+            },
+            {
+              "term": "as",
+              "weight": 5
+            },
+            {
+              "term": "out",
+              "weight": 5
+            },
+            {
+              "term": "python",
+              "weight": 5
+            },
+            {
+              "term": "a_h",
+              "weight": 4
+            },
+            {
+              "term": "b_h",
+              "weight": 4
+            },
+            {
+              "term": "bid",
+              "weight": 4
+            },
+            {
+              "term": "def",
+              "weight": 4
+            },
+            {
+              "term": "dict",
+              "weight": 4
+            },
+            {
+              "term": "dist",
+              "weight": 4
+            },
+            {
+              "term": "if",
+              "weight": 4
+            },
+            {
+              "term": "pass",
+              "weight": 4
+            },
+            {
+              "term": "result",
+              "weight": 4
+            },
+            {
+              "term": "v1.py",
+              "weight": 4
+            },
+            {
+              "term": "vecadd",
+              "weight": 4
+            },
+            {
+              "term": "--run",
+              "weight": 3
+            },
+            {
+              "term": "20",
+              "weight": 3
+            },
+            {
+              "term": "abs",
+              "weight": 3
+            },
+            {
+              "term": "add",
+              "weight": 3
+            },
+            {
+              "term": "exc",
+              "weight": 3
+            },
+            {
+              "term": "free",
+              "weight": 3
+            },
+            {
+              "term": "got",
+              "weight": 3
+            },
+            {
+              "term": "kernel",
+              "weight": 3
+            },
+            {
+              "term": "main",
+              "weight": 3
+            }
+          ],
+          "hash": "7a99be8f01b3bc546a64f8d94f82f4ac83c77276116e2bb52c9b888060f63f71"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/python_atlas_rff_features_v1.py",
+          "tokenCount": 307,
+          "uniqueTokenCount": 146,
+          "topTerms": [
+            {
+              "term": "dim",
+              "weight": 14
+            },
+            {
+              "term": "hat",
+              "weight": 9
+            },
+            {
+              "term": "sigma",
+              "weight": 9
+            },
+            {
+              "term": "torch.tensor",
+              "weight": 8
+            },
+            {
+              "term": "x_hat",
+              "weight": 8
+            },
+            {
+              "term": "device",
+              "weight": 7
+            },
+            {
+              "term": "dtype",
+              "weight": 7
+            },
+            {
+              "term": "output",
+              "weight": 7
+            },
+            {
+              "term": "output_dim",
+              "weight": 7
+            },
+            {
+              "term": "of",
               "weight": 6
             },
             {
@@ -1233,207 +1793,43 @@
               "weight": 6
             },
             {
-              "term": "coverage",
+              "term": "input",
               "weight": 5
             },
             {
-              "term": "grep",
+              "term": "input_dim",
               "weight": 5
             },
             {
-              "term": "not",
-              "weight": 5
-            },
-            {
-              "term": "sveltekit",
-              "weight": 5
-            },
-            {
-              "term": "386",
+              "term": "eps",
               "weight": 4
             },
             {
-              "term": "500",
+              "term": "float",
               "weight": 4
             },
             {
-              "term": "audit",
+              "term": "int",
               "weight": 4
             },
             {
-              "term": "catch",
+              "term": "norms",
               "weight": 4
             },
             {
-              "term": "do",
+              "term": "rff",
               "weight": 4
             },
             {
-              "term": "instead",
+              "term": "seed",
               "weight": 4
             },
             {
-              "term": "or",
-              "weight": 4
-            },
-            {
-              "term": "route",
-              "weight": 4
-            },
-            {
-              "term": "same",
-              "weight": 4
-            },
-            {
-              "term": "use",
-              "weight": 4
-            },
-            {
-              "term": "when",
-              "weight": 4
-            },
-            {
-              "term": "you",
-              "weight": 4
-            },
-            {
-              "term": "zod",
-              "weight": 4
-            },
-            {
-              "term": "are",
+              "term": "_eps",
               "weight": 3
             },
             {
-              "term": "degraded",
-              "weight": 3
-            },
-            {
-              "term": "empty",
-              "weight": 3
-            },
-            {
-              "term": "get",
-              "weight": 3
-            },
-            {
-              "term": "glob",
-              "weight": 3
-            },
-            {
-              "term": "line",
-              "weight": 3
-            },
-            {
-              "term": "load",
-              "weight": 3
-            },
-            {
-              "term": "of",
-              "weight": 3
-            }
-          ],
-          "hash": "640d52fb1113c847ddd464d51c95e74a744dc225feb04b66e450b6fcf06764b3"
-        },
-        {
-          "filePath": ".claude/agents/topology-medic.md",
-          "tokenCount": 533,
-          "uniqueTokenCount": 316,
-          "topTerms": [
-            {
-              "term": "gpu",
-              "weight": 12
-            },
-            {
-              "term": "karpathy",
-              "weight": 12
-            },
-            {
-              "term": "run",
-              "weight": 12
-            },
-            {
-              "term": "ace",
-              "weight": 10
-            },
-            {
-              "term": "graphify",
-              "weight": 8
-            },
-            {
-              "term": "pagerank",
-              "weight": 8
-            },
-            {
-              "term": "mcp",
-              "weight": 7
-            },
-            {
-              "term": "top",
-              "weight": 7
-            },
-            {
-              "term": "not",
-              "weight": 6
-            },
-            {
-              "term": "to",
-              "weight": 6
-            },
-            {
-              "term": "trace",
-              "weight": 6
-            },
-            {
-              "term": "authority",
-              "weight": 5
-            },
-            {
-              "term": "graph",
-              "weight": 5
-            },
-            {
-              "term": "npm",
-              "weight": 5
-            },
-            {
-              "term": "one",
-              "weight": 5
-            },
-            {
-              "term": "topology",
-              "weight": 5
-            },
-            {
-              "term": "cache",
-              "weight": 4
-            },
-            {
-              "term": "cluster",
-              "weight": 4
-            },
-            {
-              "term": "do",
-              "weight": 4
-            },
-            {
-              "term": "is",
-              "weight": 4
-            },
-            {
-              "term": "scores",
-              "weight": 4
-            },
-            {
-              "term": "what",
-              "weight": 4
-            },
-            {
-              "term": "------",
-              "weight": 3
-            },
-            {
-              "term": "4d",
+              "term": "2.0",
               "weight": 3
             },
             {
@@ -1441,507 +1837,183 @@
               "weight": 3
             },
             {
-              "term": "check",
+              "term": "cpu",
               "weight": 3
             },
             {
-              "term": "couchdb",
+              "term": "def",
               "weight": 3
             },
             {
-              "term": "did",
+              "term": "features",
               "weight": 3
             },
             {
-              "term": "don",
+              "term": "gen",
               "weight": 3
             },
             {
-              "term": "health",
+              "term": "generator",
               "weight": 3
             },
             {
-              "term": "lane",
+              "term": "if",
               "weight": 3
-            },
-            {
-              "term": "last",
-              "weight": 3
-            }
-          ],
-          "hash": "eb8de94976361e54b29d88cdf06aa7b6cc84d4042a6b9900289281037dd10384"
-        },
-        {
-          "filePath": ".claude/ATLAS-ENGINEERING-PROMPT.md",
-          "tokenCount": 3467,
-          "uniqueTokenCount": 1442,
-          "topTerms": [
-            {
-              "term": "atlas",
-              "weight": 50
-            },
-            {
-              "term": "string",
-              "weight": 46
-            },
-            {
-              "term": "ae",
-              "weight": 42
-            },
-            {
-              "term": "not",
-              "weight": 41
-            },
-            {
-              "term": "feature",
-              "weight": 30
-            },
-            {
-              "term": "---",
-              "weight": 27
-            },
-            {
-              "term": "id",
-              "weight": 27
-            },
-            {
-              "term": "run",
-              "weight": 26
-            },
-            {
-              "term": "in",
-              "weight": 25
-            },
-            {
-              "term": "qdrant",
-              "weight": 24
-            },
-            {
-              "term": "to",
-              "weight": 23
-            },
-            {
-              "term": "use",
-              "weight": 23
-            },
-            {
-              "term": "status",
-              "weight": 22
-            },
-            {
-              "term": ".notnull",
-              "weight": 20
-            },
-            {
-              "term": "or",
-              "weight": 20
-            },
-            {
-              "term": "postgres",
-              "weight": 17
-            },
-            {
-              "term": "contract",
-              "weight": 16
             },
             {
               "term": "is",
-              "weight": 16
+              "weight": 3
             },
             {
-              "term": "train",
-              "weight": 16
+              "term": "l2",
+              "weight": 3
             },
             {
-              "term": "agent",
+              "term": "must",
+              "weight": 3
+            },
+            {
+              "term": "normalized",
+              "weight": 3
+            }
+          ],
+          "hash": "e37d933f151e69cbd9cdd34cd5a9b846912c73cf7ba59c123074cfd564b351ad"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/python_test_atlas_rff_features_v1.py",
+          "tokenCount": 311,
+          "uniqueTokenCount": 140,
+          "topTerms": [
+            {
+              "term": "rff",
+              "weight": 20
+            },
+            {
+              "term": "seed",
               "weight": 15
             },
             {
-              "term": "canonical",
-              "weight": 15
+              "term": "build",
+              "weight": 9
+            },
+            {
+              "term": "build_rff",
+              "weight": 9
+            },
+            {
+              "term": "sigma",
+              "weight": 8
             },
             {
               "term": "dim",
-              "weight": 15
-            },
-            {
-              "term": "packet",
-              "weight": 15
-            },
-            {
-              "term": "plane",
-              "weight": 15
-            },
-            {
-              "term": "//",
-              "weight": 14
-            },
-            {
-              "term": "redis",
-              "weight": 14
-            },
-            {
-              "term": "dry",
-              "weight": 13
-            },
-            {
-              "term": "gsd",
-              "weight": 13
-            },
-            {
-              "term": "retrieval",
-              "weight": 13
-            },
-            {
-              "term": "text",
-              "weight": 13
-            },
-            {
-              "term": "work",
-              "weight": 13
-            },
-            {
-              "term": "768",
-              "weight": 12
-            }
-          ],
-          "hash": "897b7ab2374dccd41973bd5e775bc234de0b022ff12706ee517743737a82d3f9"
-        },
-        {
-          "filePath": ".claude/CLAUDE.md",
-          "tokenCount": 15,
-          "uniqueTokenCount": 14,
-          "topTerms": [
-            {
-              "term": "project",
-              "weight": 2
-            },
-            {
-              "term": ".claude",
-              "weight": 1
-            },
-            {
-              "term": ".claude/claude.md",
-              "weight": 1
-            },
-            {
-              "term": "apply",
-              "weight": 1
-            },
-            {
-              "term": "are",
-              "weight": 1
-            },
-            {
-              "term": "claude.md",
-              "weight": 1
-            },
-            {
-              "term": "context",
-              "weight": 1
-            },
-            {
-              "term": "here",
-              "weight": 1
-            },
-            {
-              "term": "instructions",
-              "weight": 1
-            },
-            {
-              "term": "members.",
-              "weight": 1
-            },
-            {
-              "term": "memory",
-              "weight": 1
-            },
-            {
-              "term": "shared",
-              "weight": 1
-            },
-            {
-              "term": "team",
-              "weight": 1
-            },
-            {
-              "term": "to",
-              "weight": 1
-            }
-          ],
-          "hash": "2083b2651fe1a0cd477aaf7222dc5d5f0453430108ee84c1c5146bbdd444cd01"
-        },
-        {
-          "filePath": ".claude/commands/audit-components.md",
-          "tokenCount": 2240,
-          "uniqueTokenCount": 905,
-          "topTerms": [
-            {
-              "term": "is",
-              "weight": 34
-            },
-            {
-              "term": "if",
-              "weight": 31
-            },
-            {
-              "term": "to",
-              "weight": 28
-            },
-            {
-              "term": "or",
-              "weight": 27
-            },
-            {
-              "term": "api",
-              "weight": 22
-            },
-            {
-              "term": "in",
-              "weight": 22
-            },
-            {
-              "term": "it",
-              "weight": 21
-            },
-            {
-              "term": "no",
-              "weight": 20
-            },
-            {
-              "term": "not",
-              "weight": 20
-            },
-            {
-              "term": "route",
-              "weight": 20
-            },
-            {
-              "term": "check",
-              "weight": 19
-            },
-            {
-              "term": "imported",
-              "weight": 19
-            },
-            {
-              "term": "by",
-              "weight": 18
-            },
-            {
-              "term": "imports",
-              "weight": 18
-            },
-            {
-              "term": "archive",
-              "weight": 17
-            },
-            {
-              "term": "but",
-              "weight": 16
-            },
-            {
-              "term": "component",
-              "weight": 16
-            },
-            {
-              "term": "dynamic",
-              "weight": 15
-            },
-            {
-              "term": "error",
-              "weight": 14
-            },
-            {
-              "term": "rewrite",
-              "weight": 14
-            },
-            {
-              "term": "1.",
-              "weight": 13
-            },
-            {
-              "term": "2.",
-              "weight": 13
-            },
-            {
-              "term": "any",
-              "weight": 13
-            },
-            {
-              "term": "does",
-              "weight": 12
-            },
-            {
-              "term": "all",
-              "weight": 11
-            },
-            {
-              "term": "gate",
-              "weight": 11
-            },
-            {
-              "term": "grep",
-              "weight": 11
-            },
-            {
-              "term": "routes",
-              "weight": 11
-            },
-            {
-              "term": "scripts",
-              "weight": 11
-            },
-            {
-              "term": "-r",
-              "weight": 10
-            },
-            {
-              "term": "3.",
-              "weight": 10
-            },
-            {
-              "term": "never",
-              "weight": 10
-            }
-          ],
-          "hash": "0d4f1dc47223ab8e4fc5c09784b3b3c0f09f58234cacbeeffd5987f7e65a3f52"
-        },
-        {
-          "filePath": ".claude/commands/audit-duplication.md",
-          "tokenCount": 754,
-          "uniqueTokenCount": 428,
-          "topTerms": [
-            {
-              "term": "one",
-              "weight": 13
-            },
-            {
-              "term": "canonical",
-              "weight": 11
-            },
-            {
-              "term": "not",
-              "weight": 11
-            },
-            {
-              "term": "owner",
-              "weight": 11
-            },
-            {
-              "term": "capability",
-              "weight": 9
-            },
-            {
-              "term": "of",
-              "weight": 9
-            },
-            {
-              "term": "or",
-              "weight": 9
-            },
-            {
-              "term": "sweep",
-              "weight": 8
-            },
-            {
-              "term": "to",
-              "weight": 8
-            },
-            {
-              "term": "---",
               "weight": 7
             },
             {
-              "term": "an",
-              "weight": 7
-            },
-            {
-              "term": "if",
-              "weight": 7
-            },
-            {
-              "term": "in",
-              "weight": 7
-            },
-            {
-              "term": "vs",
-              "weight": 7
-            },
-            {
-              "term": "callers",
+              "term": "transform",
               "weight": 6
             },
             {
-              "term": "it",
-              "weight": 6
-            },
-            {
-              "term": "outbox",
-              "weight": 6
-            },
-            {
-              "term": "table",
-              "weight": 6
-            },
-            {
-              "term": "each",
+              "term": "32",
               "weight": 5
             },
             {
-              "term": "found",
+              "term": "64",
               "weight": 5
             },
             {
-              "term": "implementation",
+              "term": "def",
               "weight": 5
+            },
+            {
+              "term": "rff_transform",
+              "weight": 5
+            },
+            {
+              "term": "big",
+              "weight": 4
+            },
+            {
+              "term": "big_d",
+              "weight": 4
+            },
+            {
+              "term": "cosine",
+              "weight": 4
+            },
+            {
+              "term": "exact",
+              "weight": 4
+            },
+            {
+              "term": "rbf",
+              "weight": 4
+            },
+            {
+              "term": "self",
+              "weight": 4
+            },
+            {
+              "term": "_unit_rows",
+              "weight": 3
+            },
+            {
+              "term": ".float",
+              "weight": 3
+            },
+            {
+              "term": "0.7",
+              "weight": 3
+            },
+            {
+              "term": "1.0",
+              "weight": 3
+            },
+            {
+              "term": "16",
+              "weight": 3
+            },
+            {
+              "term": "abs",
+              "weight": 3
+            },
+            {
+              "term": "err",
+              "weight": 3
+            },
+            {
+              "term": "input",
+              "weight": 3
+            },
+            {
+              "term": "input_dim",
+              "weight": 3
+            },
+            {
+              "term": "int",
+              "weight": 3
             },
             {
               "term": "is",
-              "weight": 5
+              "weight": 3
             },
             {
-              "term": "tool",
-              "weight": 5
+              "term": "mean",
+              "weight": 3
             },
             {
-              "term": "adapter",
-              "weight": 4
+              "term": "mean_abs_err",
+              "weight": 3
             },
             {
-              "term": "as",
-              "weight": 4
+              "term": "normalized",
+              "weight": 3
             },
             {
-              "term": "audit",
-              "weight": 4
-            },
-            {
-              "term": "backend",
-              "weight": 4
-            },
-            {
-              "term": "canonical_owner",
-              "weight": 4
-            },
-            {
-              "term": "claude.md",
-              "weight": 4
-            },
-            {
-              "term": "don",
-              "weight": 4
-            },
-            {
-              "term": "http",
-              "weight": 4
-            },
-            {
-              "term": "implementations",
-              "weight": 4
+              "term": "on",
+              "weight": 3
             }
           ],
-          "hash": "627b51b151de669a3c25ef15d29ae03acdbfe79381041f627c34854eb00fe6c1"
+          "hash": "940f90631cfb351b5f40f0c4678e5f039ddc9eee2eb7c50a970c23ace812566b"
         }
       ]
     },
@@ -1955,6 +2027,7 @@
       "modelNames": [
         "deterministic-hash-embedder"
       ],
+      "evidenceClass": "HASH_SMOKE",
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -1974,197 +2047,194 @@
           "status": "EMBEDDED"
         },
         {
-          "filePath": ".claude/hooks/posttooluse-audit.mjs",
-          "sourceRef": ".claude/hooks/posttooluse-audit.mjs",
-          "contentHash": "4397bb89877c25b89203b3fa8e5999894202b331b9babc5c5dba0cfca44e839e",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "contentHash": "ee400f842bcc37235a1f1fe3665b9c7c15f7443888ac3dc3cba5645ad6587a6a",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "063850042588aa5e724073474fdf4063125e20ae258586bd47d490b1ca8d3c56",
-          "labels": [],
-          "domain": "graph",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
-          "filePath": ".claude/hooks/pretooluse-deny.mjs",
-          "sourceRef": ".claude/hooks/pretooluse-deny.mjs",
-          "contentHash": "09f8a67945e52bfa12c82a0b4a90016cfee4680863c9ffcd5ff0358b0bcd399c",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "f3ebc88c233ac50150cc216fffed58c58749316a32811fdbf45919b6da99f77d",
-          "labels": [],
-          "domain": "graph",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
-          "filePath": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "sourceRef": ".parent-atlas/skills/claim-verifier/src/claim_verifier/__init__.py",
-          "contentHash": "20b5781b5278ca476450243da8846525d5606c0f614a561e76da6f02c5cd3685",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "d3b07a6fbbb977530c3a0720278211c3a8225e6f42540004d887955db558d87b",
-          "labels": [],
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
-          "filePath": ".parent-atlas/skills/file-repair/src/file_repair/__init__.py",
-          "sourceRef": ".parent-atlas/skills/file-repair/src/file_repair/__init__.py",
-          "contentHash": "9b6ab5562b42204a7dc7947c8b53b58b65a4ca5db4065d23f2d7615bcb6d1c12",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "b2f5ea374dde566b0ad8e6a1ee0041e03dc074d07efe3a495d11e0c0ad2aa17e",
-          "labels": [],
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
-          "filePath": ".parent-atlas/skills/graph-evidence/src/graph_evidence/__init__.py",
-          "sourceRef": ".parent-atlas/skills/graph-evidence/src/graph_evidence/__init__.py",
-          "contentHash": "1269c1d2cc201f66d724367f4cd5902f4b35712e384ce2320db00b9e1b3a8949",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "1ba465d93ce33f932dbc6cee546a4c4e1d6ff80ea80a6b3958b2b2381a4a7d72",
-          "labels": [],
-          "domain": "graph",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
-          "filePath": ".parent-atlas/skills/semantic-search/src/semantic_search/__init__.py",
-          "sourceRef": ".parent-atlas/skills/semantic-search/src/semantic_search/__init__.py",
-          "contentHash": "0bcc9f56e00caac1cb43d3053414a2f7dbc2472711cf2935b0364b9bbbbf5a7f",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "afe2e900f005b3946f5a8ace69c5946f413886b0e4b260df1dd79ff73bd91e74",
-          "labels": [],
-          "domain": "retrieval",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
-          "filePath": "ace-pipeline-audit.mjs",
-          "sourceRef": "ace-pipeline-audit.mjs",
-          "contentHash": "5cc3b8a9898183caf6737e76db62e752825c61b4a9cf6787da790753f8b29aae",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "78f494e9fa7a7439a53ce33d53b25496666e73dd7730e835287ccadf4138c907",
-          "labels": [],
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
-          "contentHash": "c0fc88df8ae64ca10552f7ed9c7fe092b628d54094e9bb94b030c7099d4fe206",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "9c963d63deb214ab05c73f751130edb0a722bd8537a8e172f8325db1feb6ce97",
+          "embeddingHash": "11a05cb42ecf2eebec15bea034612bbb777c3ed163799c1d02d916d3ca25db95",
           "labels": [
-            "vectors",
-            "testing",
-            "server-side",
-            "library"
+            "testing"
           ],
-          "domain": "retrieval",
-          "ontology": "utility",
+          "domain": "test",
+          "ontology": "adapter",
           "tier": "test",
           "status": "EMBEDDED"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
-          "contentHash": "baf50b8d924093f5c49093bd0e80510fad09c4375c62d64940050c7b557d9a8b",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "contentHash": "86ce87ab6d0ad49c8ae7b8abfd7800ada57cb919fb2a8c057b8a270dde384b53",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "d7427b232a99b9fc85326aa1279db9a56dcbcd9b19ed9aaa4fcc08b221734769",
+          "embeddingHash": "faa885c053498317e0066cb9d38c3ffacd2a564ecd7eeabf703a607ec96430e5",
           "labels": [
-            "database",
-            "vectors",
-            "server-side",
-            "library"
+            "database"
           ],
-          "domain": "retrieval",
-          "ontology": "utility",
-          "tier": "middleware",
+          "domain": "config",
+          "ontology": "model",
+          "tier": "feature",
           "status": "EMBEDDED"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
-          "contentHash": "6a53014b0921708bef346d5ddf8e95e8a63625d65aa14fdcf7f2ddb0eecfb0b2",
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-feature-matrix-4x6-v1.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/execution.atlas-feature-matrix-4x6-v1.ts",
+          "contentHash": "0d472e86506e81b6d831aa2264265af28db799b10167f2b08522444752163306",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "08af6b739bbf4ce4d1855df00b32844d0d59c003df1f0ce162520a5eb89bba60",
+          "embeddingHash": "239a0d82b38c2cd958125b9269805dc1c278d78829a83880c2a650d74cd60098",
           "labels": [
-            "vectors",
-            "testing",
-            "server-side",
-            "library"
+            "database"
           ],
-          "domain": "retrieval",
-          "ontology": "utility",
+          "domain": "config",
+          "ontology": "model",
+          "tier": "feature",
+          "status": "EMBEDDED"
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.spec.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.spec.ts",
+          "contentHash": "82aaead2c761c5b2394e3df174daa49bf4930e811913aa450501d109bf7122ca",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "dc3596215692a6e27ceb65f04afb52e6fb5df66d3afc2a8e757199494c003f36",
+          "labels": [
+            "testing"
+          ],
+          "domain": "test",
+          "ontology": "adapter",
           "tier": "test",
           "status": "EMBEDDED"
         },
         {
-          "filePath": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
-          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
-          "contentHash": "740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.ts",
+          "sourceRef": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.ts",
+          "contentHash": "90405730ba5dda88e170431f1142d462b214c822d6e2a7664b1adea6ff4e9612",
           "representationName": "semantic_768",
           "dimension": 768,
           "model": "deterministic-hash-embedder",
           "source": "deterministic",
-          "embeddingHash": "dd763d6a7b10968121142cc41cbd91498d854508e0f06e2e9d3d0e00ebb7203e",
+          "embeddingHash": "1d88a13d47f8be127f5b8363224b7d54093c99cbeef6875923c4885d12cab668",
           "labels": [
-            "vectors",
-            "server-side",
-            "library"
+            "database"
           ],
-          "domain": "retrieval",
+          "domain": "config",
+          "ontology": "model",
+          "tier": "feature",
+          "status": "EMBEDDED"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/python_atlas_cuda_cutile_vecadd_smoke_v1.py",
+          "sourceRef": ".archive/duplicates-2026-10-13/python_atlas_cuda_cutile_vecadd_smoke_v1.py",
+          "contentHash": "38d892e4c24f9966063f9f53f3ca2817ab23a3328f293207e4d394bbed5de7e8",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "e2083433a1811b31d5d454a3725a7a68cd2a1cd53a52c4cca59df07b9ecbce32",
+          "labels": [
+            "gpu"
+          ],
+          "domain": "gpu",
           "ontology": "utility",
-          "tier": "middleware",
+          "tier": "feature",
+          "status": "EMBEDDED"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/python_atlas_rff_features_v1.py",
+          "sourceRef": ".archive/duplicates-2026-10-13/python_atlas_rff_features_v1.py",
+          "contentHash": "2df6c70a9ea94f2f040882c9f07e6a9cd5c2509731332d7db690fa0108916986",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "da90f316060477d8bb538cbf062d9d928e07270a707a0ffbc34e83508fc17c1f",
+          "labels": [],
+          "domain": "feature",
+          "ontology": "utility",
+          "tier": "feature",
+          "status": "EMBEDDED"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/python_test_atlas_rff_features_v1.py",
+          "sourceRef": ".archive/duplicates-2026-10-13/python_test_atlas_rff_features_v1.py",
+          "contentHash": "4c117ff1171e3a51b1d9e39379e256340d4e40e3c57bde5241c3d74d80a1a12c",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "f62d9ad24eed86ff24f670d77c55f5eafc05b4ed0c9a162712dfebaa1d0efcaf",
+          "labels": [
+            "testing"
+          ],
+          "domain": "test",
+          "ontology": "utility",
+          "tier": "feature",
+          "status": "EMBEDDED"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/scripts_atlas_graph_stream_batch_v1.py",
+          "sourceRef": ".archive/duplicates-2026-10-13/scripts_atlas_graph_stream_batch_v1.py",
+          "contentHash": "4c9a0de1f664c07467b265ca28a5790c35bade57f3d495b5cb8492aa9ebfbb8e",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "01a4ba9a0e3f1d866df3603708114d79922309e6e3961b7f1b89694f5f9b2489",
+          "labels": [],
+          "domain": "graph",
+          "ontology": "utility",
+          "tier": "feature",
+          "status": "EMBEDDED"
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/tests_test_graph_stream_batch_v1.py",
+          "sourceRef": ".archive/duplicates-2026-10-13/tests_test_graph_stream_batch_v1.py",
+          "contentHash": "cdc08eb115a40ef3b3cad3e125de4289769b5fcb7426cecb65f70076c6c751d1",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "d9ce9aa91a8167367ceef3df677fcf30160f78db37f5f359c597d2237d5e1dd8",
+          "labels": [
+            "testing"
+          ],
+          "domain": "test",
+          "ontology": "utility",
+          "tier": "feature",
+          "status": "EMBEDDED"
+        },
+        {
+          "filePath": ".archive/knn-contract-move-2026-10-12/knn_contract.py",
+          "sourceRef": ".archive/knn-contract-move-2026-10-12/knn_contract.py",
+          "contentHash": "75f220eb409163b685d660e5ca0d11b400ebfb939fcd52993cb5b77266293892",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "c387443e883217c5d2a374ea48b75bce59a2f9b4f34a8a98996b1be11be6912b",
+          "labels": [],
+          "domain": "feature",
+          "ontology": "utility",
+          "tier": "feature",
           "status": "EMBEDDED"
         }
       ]
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 294511,
-      "containsEdges": 129011,
-      "importEdges": 36489,
-      "declaresEdges": 129011,
+      "entries": 349971,
+      "containsEdges": 151745,
+      "importEdges": 46481,
+      "declaresEdges": 151745,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2370,37 +2440,37 @@
     },
     "labeling": {
       "status": "PROVEN",
-      "filesProcessed": 25542,
+      "filesProcessed": 30327,
       "domainCounts": {
-        "test": 822,
-        "feature": 2469,
-        "config": 956,
-        "graph": 785,
-        "api": 3508,
-        "ai": 180,
-        "ui": 7538,
-        "gpu": 1233,
-        "auth": 1315,
-        "retrieval": 3707,
-        "indexer": 1474,
-        "cache": 1501,
-        "vector": 54
+        "test": 1542,
+        "feature": 3592,
+        "config": 1195,
+        "gpu": 1443,
+        "graph": 1097,
+        "api": 3695,
+        "ai": 185,
+        "ui": 8269,
+        "auth": 1477,
+        "retrieval": 4229,
+        "indexer": 1912,
+        "vector": 81,
+        "cache": 1610
       },
       "ontologyCounts": {
-        "utility": 17929,
-        "model": 3634,
-        "adapter": 1174,
-        "handler": 362,
-        "bridge": 80,
-        "manager": 999,
-        "client": 33,
-        "service": 1331
+        "utility": 21509,
+        "adapter": 1405,
+        "model": 4317,
+        "service": 1384,
+        "handler": 448,
+        "bridge": 83,
+        "manager": 1148,
+        "client": 33
       },
       "tierCounts": {
-        "test": 2780,
-        "feature": 19935,
-        "middleware": 2550,
-        "core": 277
+        "test": 3516,
+        "feature": 23530,
+        "middleware": 2990,
+        "core": 291
       },
       "sampleLabels": [
         {
@@ -2413,110 +2483,129 @@
           ]
         },
         {
-          "filePath": ".clarity/ff1-plan.md",
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "labels": []
-        },
-        {
-          "filePath": ".claude/AGENT_CONSTITUTION.md",
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "labels": []
-        },
-        {
-          "filePath": ".claude/AGENT_RECOMMENDATIONS.md",
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "labels": []
-        },
-        {
-          "filePath": ".claude/agents/drizzle-inspector.md",
-          "domain": "config",
+          "filePath": ".archive/2026-10-06-workboard-backup/OPENSPEC-WORKBOARD.md",
+          "domain": "test",
           "ontology": "utility",
           "tier": "feature",
           "labels": [
-            "database",
             "testing"
           ]
         },
         {
-          "filePath": ".claude/agents/obsidian-cartographer.md",
-          "domain": "graph",
+          "filePath": ".archive/2026-10-06-workspace-reseal-historical/workspace-snapshot-reseal-v1.2026-09-18.json",
+          "domain": "feature",
           "ontology": "utility",
           "tier": "feature",
           "labels": []
         },
         {
-          "filePath": ".claude/agents/sveltekit-route-auditor.md",
-          "domain": "api",
-          "ontology": "utility",
-          "tier": "feature",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.spec.ts",
+          "domain": "test",
+          "ontology": "adapter",
+          "tier": "test",
           "labels": [
-            "public-api"
+            "testing"
           ]
         },
         {
-          "filePath": ".claude/agents/topology-medic.md",
-          "domain": "graph",
-          "ontology": "utility",
+          "filePath": ".archive/2026-10-18-4x6-tile/agent.atlas-rank-input-adapter-v1.ts",
+          "domain": "config",
+          "ontology": "model",
           "tier": "feature",
-          "labels": []
+          "labels": [
+            "database"
+          ]
         },
         {
-          "filePath": ".claude/ATLAS-ENGINEERING-PROMPT.md",
-          "domain": "ai",
-          "ontology": "utility",
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-feature-matrix-4x6-v1.ts",
+          "domain": "config",
+          "ontology": "model",
           "tier": "feature",
-          "labels": []
+          "labels": [
+            "database"
+          ]
         },
         {
-          "filePath": ".claude/CLAUDE.md",
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.spec.ts",
+          "domain": "test",
+          "ontology": "adapter",
+          "tier": "test",
+          "labels": [
+            "testing"
+          ]
+        },
+        {
+          "filePath": ".archive/2026-10-18-4x6-tile/execution.atlas-rank-input-adapter-v1.ts",
+          "domain": "config",
+          "ontology": "model",
+          "tier": "feature",
+          "labels": [
+            "database"
+          ]
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/manifest.json",
           "domain": "feature",
           "ontology": "utility",
           "tier": "feature",
           "labels": []
         },
         {
-          "filePath": ".claude/commands/audit-components.md",
-          "domain": "ui",
+          "filePath": ".archive/duplicates-2026-10-13/python_atlas_cuda_cutile_vecadd_smoke_v1.py",
+          "domain": "gpu",
+          "ontology": "utility",
+          "tier": "feature",
+          "labels": [
+            "gpu"
+          ]
+        },
+        {
+          "filePath": ".archive/duplicates-2026-10-13/python_atlas_rff_features_v1.py",
+          "domain": "feature",
           "ontology": "utility",
           "tier": "feature",
           "labels": []
         },
         {
-          "filePath": ".claude/commands/audit-duplication.md",
-          "domain": "feature",
+          "filePath": ".archive/duplicates-2026-10-13/python_test_atlas_rff_features_v1.py",
+          "domain": "test",
           "ontology": "utility",
           "tier": "feature",
-          "labels": []
+          "labels": [
+            "testing"
+          ]
         }
       ]
     },
     "gpu": {
-      "status": "PARTIAL",
-      "embeddingProbeCount": 24,
-      "embeddingProbeHits": 24,
-      "analysisMode": "embedded"
+      "status": "SKIPPED",
+      "embeddingProbeCount": 0,
+      "embeddingProbeHits": 0,
+      "analysisMode": "unavailable",
+      "reason": "GPU_EXECUTOR_NOT_INVOKED"
     },
     "projection": {
-      "status": "PROVEN",
-      "postgresCanonicalRecords": 25542,
-      "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 294511,
-      "redisProjectionRecords": 25542,
+      "status": "SKIPPED",
+      "postgresCanonicalRecords": 0,
+      "qdrantProjectionRecords": 0,
+      "neo4jProjectionRecords": 0,
+      "redisProjectionRecords": 0,
+      "candidateCounts": {
+        "sources": 30327,
+        "semanticVectors": 24,
+        "relationships": 349971,
+        "lexicalEntries": 30327
+      },
+      "reason": "PROJECTION_WRITERS_NOT_INVOKED",
       "representationName": "semantic_768",
       "denseVectorName": "content",
-      "collectionName": "codebase_chunks_768"
+      "collectionName": "codebase_chunks_768_v2"
     },
     "validation": {
       "status": "PROVEN",
       "missingHashes": 0,
       "malformedHashes": 0,
-      "duplicateFileHashes": 868,
+      "duplicateFileHashes": 902,
       "missingStructuralIds": 0,
       "semanticDimensionMismatches": 0,
       "pass": true
@@ -2543,7 +2632,7 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 25542,
+      "reusedFiles": 30327,
       "invalidatedFiles": 0,
       "reusedRatio": 1
     }
@@ -2572,7 +2661,7 @@
     "path": "docs/reports/workspace-source-binding-observation.json",
     "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
     "sourceManifestDigest": "927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-    "sourceCount": 25542,
+    "sourceCount": 30327,
     "boundSources": 25361,
     "skippedSources": 107
   },

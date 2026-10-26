@@ -76,3 +76,43 @@ export const HELPER_REGISTRY_V1: HelperRegistryV1 = HelperRegistryV1Schema.parse
 	...registryBody,
 	checksum: sha256Stable(registryBody),
 });
+
+// Per-extension AST language vocabulary. Authority: python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS,
+// exposed live through the sidecar's /capabilities languageBindings. Each row is checked against that
+// authority by the caller, not trusted as a copy. astGrepLanguage is null where ast-grep cannot parse the
+// language (svelte): such files must use the tree-sitter path only.
+export const AST_LANGUAGE_VOCABULARY_SCHEMA_V1 = 'atlas.ast-language-vocabulary.v1' as const;
+
+export const AstLanguageBindingSchemaV1 = z.object({
+	extension: z.string().regex(/^\.[a-z]{1,8}$/),
+	sidecarLanguage: z.enum(['typescript', 'tsx', 'javascript', 'python', 'rust', 'go', 'java', 'svelte']),
+	astGrepLanguage: z.enum(['typescript', 'tsx', 'javascript', 'python', 'rust', 'go', 'java']).nullable(),
+	offsetConvention: z.literal('UTF8_BYTE_SIDECAR'),
+});
+export type AstLanguageBindingV1 = z.infer<typeof AstLanguageBindingSchemaV1>;
+
+const AST_LANGUAGE_BINDINGS_V1: readonly AstLanguageBindingV1[] = [
+	{ extension: '.ts', sidecarLanguage: 'typescript', astGrepLanguage: 'typescript', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.mts', sidecarLanguage: 'typescript', astGrepLanguage: 'typescript', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.cts', sidecarLanguage: 'typescript', astGrepLanguage: 'typescript', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.tsx', sidecarLanguage: 'tsx', astGrepLanguage: 'tsx', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.js', sidecarLanguage: 'javascript', astGrepLanguage: 'javascript', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.jsx', sidecarLanguage: 'javascript', astGrepLanguage: 'javascript', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.mjs', sidecarLanguage: 'javascript', astGrepLanguage: 'javascript', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.cjs', sidecarLanguage: 'javascript', astGrepLanguage: 'javascript', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.py', sidecarLanguage: 'python', astGrepLanguage: 'python', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.pyi', sidecarLanguage: 'python', astGrepLanguage: 'python', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.rs', sidecarLanguage: 'rust', astGrepLanguage: 'rust', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.go', sidecarLanguage: 'go', astGrepLanguage: 'go', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.java', sidecarLanguage: 'java', astGrepLanguage: 'java', offsetConvention: 'UTF8_BYTE_SIDECAR' },
+	{ extension: '.svelte', sidecarLanguage: 'svelte', astGrepLanguage: null, offsetConvention: 'UTF8_BYTE_SIDECAR' },
+];
+
+/** Resolve a file path to its AST language binding. Returns null for unknown extensions (fail closed). */
+export function resolveAstLanguageBindingV1(filePath: string): AstLanguageBindingV1 | null {
+	const match = /\.[A-Za-z]{1,8}$/.exec(filePath);
+	if (!match) return null;
+	const ext = match[0].toLowerCase();
+	const hit = AST_LANGUAGE_BINDINGS_V1.find((row) => row.extension === ext);
+	return hit ? AstLanguageBindingSchemaV1.parse(hit) : null;
+}

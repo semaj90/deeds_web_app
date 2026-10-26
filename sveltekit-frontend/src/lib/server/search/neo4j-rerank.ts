@@ -119,3 +119,56 @@ export async function expandNeighbours(
   );
   return rows.map((r) => String(r.sk ?? '')).filter(Boolean);
 }
+
+export interface NeighbourPathEdge {
+  from: string;
+  to: string;
+  relation: string;
+  hop: number;
+}
+
+function stableKeyFromNode(node: unknown): string | null {
+  if (!node || typeof node !== 'object' || !('properties' in node)) return null;
+  const properties = (node as { properties?: Record<string, unknown> }).properties;
+  if (!properties) return null;
+  const value = properties.stable_key ?? properties.filePath ?? properties.file_path ??
+    properties.sourceRef ?? properties.source_ref ?? properties.packet_key ??
+    properties.source_ref_key ?? properties.path ?? properties.normalized_path ?? properties.id;
+  return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+/** Return actual relationship segments from a bounded Neo4j path query. */
+export async function expandNeighbourPathEdges(
+  stableKey: string,
+  hops: 1 | 2 = 1,
+  limit = 120
+): Promise<NeighbourPathEdge[]> {
+  const depthCond = hops === 2 ? '1..2' : '1';
+  const rows = await neo4jQuery(
+    `MATCH p=(src)-[:IMPORTS|CALLS|USED_CONCEPT|SIMILAR_TOPOLOGY|BELONGS_TO_FEATURE|HAS_CENTROID*${depthCond}]-(dep)
+     WHERE (
+       ${GRAPH_NODE_LABELS.map((label) => `src:${label}`).join(' OR ')}
+     )
+     AND ${nodeKeyExpr('src')} = $k
+     AND (
+       ${GRAPH_NODE_LABELS.map((label) => `dep:${label}`).join(' OR ')}
+     )
+     RETURN p
+     LIMIT $limit`,
+    { k: stableKey, limit: Math.min(Math.max(Math.floor(limit), 1), 120) }
+  );
+
+  const edges: NeighbourPathEdge[] = [];
+  for (const row of rows) {
+    const path = row.p as { segments?: Array<{ start?: unknown; end?: unknown; relationship?: { type?: string } }> } | undefined;
+    for (const [index, segment] of (path?.segments ?? []).entries()) {
+      const from = stableKeyFromNode(segment.start);
+      const to = stableKeyFromNode(segment.end);
+      const relation = segment.relationship?.type;
+      if (from && to && typeof relation === 'string' && relation.length > 0) {
+        edges.push({ from, to, relation, hop: index + 1 });
+      }
+    }
+  }
+  return edges;
+}

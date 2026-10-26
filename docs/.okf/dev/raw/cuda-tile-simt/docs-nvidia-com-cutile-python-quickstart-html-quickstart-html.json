@@ -1,0 +1,56 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "cuda-tile-simt",
+  "source_ref": "cuda-tile-simt:docs-nvidia-com-cutile-python-quickstart-html-quickstart-html",
+  "url": "https://docs.nvidia.com/cuda/cutile-python/quickstart.html",
+  "title": "Quickstart &#8212; cuTile Python",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "cuda",
+    "cutile",
+    "tile-ir",
+    "simt",
+    "kernel-parity",
+    "llm_output",
+    "agentic_error_fixing"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "Quickstart &#8212; cuTile Python",
+    "markdown_excerpt": "Quickstart &#8212; cuTile Python Skip to main content Back to top Ctrl + K cuTile Python Search Ctrl + K Search Ctrl + K cuTile Python NVIDIA CORPORATION & AFFILIATES. All rights reserved. SPDX-License-Identifier: Apache-2.0 --> Table of Contents Release Notes 1.6.0 (2026-09-09) 1.5.0 (2026-07-08) 1.4.0 (2026-05-26) 1.3.0 (2026-04-20) 1.2.0 (2026-03-05) 1.1.0 (2026-01-30) 1.0.1 (2025-12-18) 1.0.0 (2025-12-02) Quickstart Prerequisites Installing cuTile Python Other Packages Example Code Developer Tools Execution Model Abstract Machine Execution Spaces Tile Functions Tile Kernels Python Subset Tile Parallelism Constantness Type Annotations Data Model Global Arrays Tiles and Scalars Element &amp; Tile Space Tiled Views Shape Broadcasting Data Types Numeric &amp; Arithmetic Data Types Arithmetic Promotion Tuples Rounding Modes Padding Modes Memory Model Memory Order Memory Scope Interoperability Machine Representation Interoperability with SIMT JAX FFI Performance Tuning Architecture-specific configuration Load/store performance hints Divisibility hints Autotuning Operations Load/Store Factory Shape &amp; DType Reduction Scan Matmul Selection Math Bitwise Comparison Atomic Utility Meta",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:cuda-tile-simt:docs-nvidia-com-cutile-python-quickstart-html-quickstart-html",
+    "title": "Quickstart &#8212; cuTile Python",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh NVIDIA CUDA Tile and SIMT Programming Guide from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "705f612b544a9b41da6f1f8bde731f2b4490922e0e5262b8fad5240b9cb7bb02",
+  "markdown_path": "docs/.okf/dev/raw/cuda-tile-simt/docs-nvidia-com-cutile-python-quickstart-html-quickstart-html.md",
+  "fetched_at": "2026-10-11T17:24:31.745Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "cuda-tile-simt",
+    "source_title": "NVIDIA CUDA Tile and SIMT Programming Guide",
+    "source_revision": null,
+    "source_manifest": null,
+    "preferred_fetcher": "BEAUTIFULSOUP_HTTP",
+    "fetched_via": "fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/cuda-tile-simt/docs-nvidia-com-cutile-python-quickstart-html-quickstart-html.md"
+}

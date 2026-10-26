@@ -2,12 +2,9 @@ import { z } from 'zod';
 import { redisGetAcePacket, redisSetAcePacket, hashQuery, type AcePacket } from '$lib/server/cache/ace-packet-cache.js';
 import { buildVarianceRecoveryContext } from '$lib/server/ace/variance-recovery.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs';
-
-const execAsync = promisify(exec);
+import { runAceScriptV1 } from '$lib/server/ace/ace-script-runner-v1.js';
 
 const postSchema = z.object({
   messages: z.array(z.any()).optional().default([]),
@@ -25,10 +22,8 @@ function makeRequestFromUrl(url: URL) {
 
 async function buildAcePacket(query: string): Promise<AcePacket> {
   // Use the OpenCode CLI script to build the packet
-  const scriptPath = path.join(process.cwd(), 'scripts', 'ace', 'build-packet.mjs');
-  
   // We execute it and read the result from the tmp dir
-  await execAsync(`node ${scriptPath} "${query}"`);
+  await runAceScriptV1('build-packet.mjs', query);
   
   const queryHash = hashQuery(query).split(':').pop();
   const packetPath = path.join(process.cwd(), '.tmp', 'ace', `packet-${queryHash}.json`);

@@ -1,0 +1,524 @@
+{
+ "schema": "atlas.lowrank-norm-stage3-report.v1",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "gpuExecuted": false,
+ "fixtureOrdinalMapChecksum": "b9b06a5d13329851b37c073084993b37ad5ea30416c5b5df3f57308a9793b9bc",
+ "candidateCount": 11,
+ "fullyPresentRows": 2,
+ "baselineVsTsMaxAbsDiff": 2.551823852225965e-08,
+ "baselineTopK": [
+  10,
+  2,
+  5,
+  8,
+  4
+ ],
+ "curves": {
+  "raw_zero": {
+   "fitSynthetic": {
+    "fitSetDigest": "sha256:806ced966aa7270c026a067ee411df77456c1fb5fdab587f56ec3dcd3f1284f9",
+    "fitSetParams": {
+     "generator": "synthetic-correlated-6ch",
+     "rows": 240,
+     "seed": 7,
+     "present_rate": 0.85
+    },
+    "rankCurve": [
+     {
+      "rank": 6,
+      "projectionChecksum": "47b57db28c567aec061e79bd303430f9b64bed2bc855ac8242250bbd69f4dca9",
+      "top5Overlap": 1.0,
+      "top10Overlap": 1.0,
+      "kendallTauB": 1.0,
+      "discordantPairs": 0,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       8,
+       4
+      ],
+      "reconstructionError": 1.7316079901120738e-31,
+      "identityMaxAbsError": 4.440892098500626e-16,
+      "presenceConstantRange": [
+       -1.1607995045932655,
+       -1.1607995045932655
+      ]
+     },
+     {
+      "rank": 5,
+      "projectionChecksum": "f7d550828b3720c520b753ab88625401821130cd5da7c89086fe3752f0e2d6a8",
+      "top5Overlap": 0.6,
+      "top10Overlap": 0.9,
+      "kendallTauB": 0.5185185185185185,
+      "discordantPairs": 13,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       8,
+       1,
+       7,
+       4
+      ],
+      "reconstructionError": 0.02499975155741785
+     },
+     {
+      "rank": 4,
+      "projectionChecksum": "7c3218e0d940521d293d79c4fef9df1e70245ac4dec5789f0379c944aa76008a",
+      "top5Overlap": 0.6,
+      "top10Overlap": 0.9,
+      "kendallTauB": 0.2222222222222222,
+      "discordantPairs": 21,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       8,
+       10,
+       4,
+       1,
+       0
+      ],
+      "reconstructionError": 0.038234791296341754
+     },
+     {
+      "rank": 3,
+      "projectionChecksum": "dfd488d96264aaa282e10f3298351fcd12654f80604e65bbf842892ce1d63ab2",
+      "top5Overlap": 0.4,
+      "top10Overlap": 0.9,
+      "kendallTauB": -0.07407407407407407,
+      "discordantPairs": 29,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       4,
+       3,
+       10,
+       1,
+       11
+      ],
+      "reconstructionError": 0.453933717925882
+     },
+     {
+      "rank": 2,
+      "projectionChecksum": "d88ee77376b75b20edde1e998cf3a47692244fe911f697f208e1aec9532a41e8",
+      "top5Overlap": 0.2,
+      "top10Overlap": 0.9,
+      "kendallTauB": -0.2222222222222222,
+      "discordantPairs": 33,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       4,
+       11,
+       3,
+       1,
+       9
+      ],
+      "reconstructionError": 0.6970462153542488
+     },
+     {
+      "rank": 1,
+      "projectionChecksum": "74f3192dfc441595db0787330950d5b83fd04a3cd98fb61f85608fe28e190007",
+      "top5Overlap": 0.4,
+      "top10Overlap": 0.9,
+      "kendallTauB": -0.2962962962962963,
+      "discordantPairs": 35,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       11,
+       3,
+       4,
+       1,
+       8
+      ],
+      "reconstructionError": 0.7373974346810572
+     }
+    ]
+   },
+   "fitOnFixtureRows": {
+    "fitSetDigest": "sha256:defcc293ed29eae1378d314d59c919c15fe40c5eaba2db195de7a6525db47d4d",
+    "fitSetParams": {
+     "generator": "fixture-rows",
+     "rows": 11
+    },
+    "rankCurve": [
+     {
+      "rank": 6,
+      "projectionChecksum": "de3fcd250196b6ae9f137fb6d95505816a811369ce9870e899f4bae48546b8ba",
+      "top5Overlap": 1.0,
+      "top10Overlap": 1.0,
+      "kendallTauB": 1.0,
+      "discordantPairs": 0,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       8,
+       4
+      ],
+      "reconstructionError": 7.91999295607661e-31,
+      "identityMaxAbsError": 2.7755575615628914e-16,
+      "presenceConstantRange": [
+       -0.4614188767060627,
+       -0.4614188767060627
+      ]
+     },
+     {
+      "rank": 5,
+      "projectionChecksum": "2df6d442f086ec1d661bf6f8cb6af2c6cfd7aec650172a601b65591c8edff6b8",
+      "top5Overlap": 1.0,
+      "top10Overlap": 1.0,
+      "kendallTauB": 1.0,
+      "discordantPairs": 0,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       8,
+       4
+      ],
+      "reconstructionError": 0.022764868230111618
+     },
+     {
+      "rank": 4,
+      "projectionChecksum": "5b4ef68def9b209cc8a9cbe0724c9a57bc223de07ae34af0e55bc8f91d93e7bd",
+      "top5Overlap": 1.0,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.9629629629629629,
+      "discordantPairs": 1,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       8,
+       4
+      ],
+      "reconstructionError": 0.09825127997733672
+     },
+     {
+      "rank": 3,
+      "projectionChecksum": "17fc750066d4c2a3492f435eb69e938ea9748397bf6bb6a79627ac5dbb4bf40d",
+      "top5Overlap": 0.6,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.6666666666666666,
+      "discordantPairs": 9,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       2,
+       5,
+       10,
+       7,
+       1
+      ],
+      "reconstructionError": 0.21071798178148962
+     },
+     {
+      "rank": 2,
+      "projectionChecksum": "7580e53ccf36eed7aebe588eff087d422460e4f995d974af7b3a01bf8727b033",
+      "top5Overlap": 0.6,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.7037037037037037,
+      "discordantPairs": 8,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       7,
+       1
+      ],
+      "reconstructionError": 0.27662459471166717
+     },
+     {
+      "rank": 1,
+      "projectionChecksum": "1ab45639e441760516a79b9042287c4748868a09433f21cc2987728631927a47",
+      "top5Overlap": 0.8,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.5925925925925926,
+      "discordantPairs": 11,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       2,
+       5,
+       10,
+       7,
+       8
+      ],
+      "reconstructionError": 0.572117259735025
+     }
+    ]
+   }
+  },
+  "zero_after_norm": {
+   "fitSynthetic": {
+    "fitSetDigest": "sha256:806ced966aa7270c026a067ee411df77456c1fb5fdab587f56ec3dcd3f1284f9",
+    "fitSetParams": {
+     "generator": "synthetic-correlated-6ch",
+     "rows": 240,
+     "seed": 7,
+     "present_rate": 0.85
+    },
+    "rankCurve": [
+     {
+      "rank": 6,
+      "projectionChecksum": "1a7965bc451d8cfe863f68b92560487743bf116c1c0934cb47ec3eb08c5ef830",
+      "top5Overlap": 0.6,
+      "top10Overlap": 0.9,
+      "kendallTauB": 0.4074074074074074,
+      "discordantPairs": 16,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       2,
+       5,
+       7,
+       9,
+       10
+      ],
+      "reconstructionError": 9.559572134641544e-32,
+      "identityMaxAbsError": 5.551115123125783e-16,
+      "presenceConstantRange": [
+       -1.1607995045932655,
+       -0.6224909820378285
+      ]
+     },
+     {
+      "rank": 5,
+      "projectionChecksum": "292329039114c71b1cc7a0d21bedfc80ccb4c852b0c6441ae8686b5dfe65e6c4",
+      "top5Overlap": 0.6,
+      "top10Overlap": 0.9,
+      "kendallTauB": 0.3333333333333333,
+      "discordantPairs": 18,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       2,
+       5,
+       9,
+       4,
+       7
+      ],
+      "reconstructionError": 0.2799176080355673
+     },
+     {
+      "rank": 4,
+      "projectionChecksum": "ebe250cecf61c822da302831b1464342436ed1dc0f9c97837043cc7d1c87e118",
+      "top5Overlap": 0.6,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.4074074074074074,
+      "discordantPairs": 16,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       2,
+       5,
+       9,
+       7,
+       10
+      ],
+      "reconstructionError": 0.5256665857880096
+     },
+     {
+      "rank": 3,
+      "projectionChecksum": "17aea71b4b51f354e20299cb9fb87aa77ef2c36cde81c31f04762a99f73481c1",
+      "top5Overlap": 0.4,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.18518518518518517,
+      "discordantPairs": 22,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       9,
+       2,
+       5,
+       3,
+       7
+      ],
+      "reconstructionError": 0.6189426186941179
+     },
+     {
+      "rank": 2,
+      "projectionChecksum": "368045fb2adf366618be75fde84eaf1947023f29463062f105fc12430ad6798a",
+      "top5Overlap": 0.2,
+      "top10Overlap": 1.0,
+      "kendallTauB": -0.2222222222222222,
+      "discordantPairs": 33,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       9,
+       3,
+       7,
+       8,
+       1
+      ],
+      "reconstructionError": 0.7015828105956511
+     },
+     {
+      "rank": 1,
+      "projectionChecksum": "a09f8a9d2076e55031a436a76d73f0d27dc0634760f09bf083f442d0a6f3e6d4",
+      "top5Overlap": 0.2,
+      "top10Overlap": 0.9,
+      "kendallTauB": -0.037037037037037035,
+      "discordantPairs": 28,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       8,
+       7,
+       3,
+       1,
+       0
+      ],
+      "reconstructionError": 0.7753791231940094
+     }
+    ]
+   },
+   "fitOnFixtureRows": {
+    "fitSetDigest": "sha256:defcc293ed29eae1378d314d59c919c15fe40c5eaba2db195de7a6525db47d4d",
+    "fitSetParams": {
+     "generator": "fixture-rows",
+     "rows": 11
+    },
+    "rankCurve": [
+     {
+      "rank": 6,
+      "projectionChecksum": "006477ceb2ab906e1427292ddc1a063234af1f799ca2ca28446398e71d430b92",
+      "top5Overlap": 1.0,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.9259259259259259,
+      "discordantPairs": 2,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       8,
+       4
+      ],
+      "reconstructionError": 4.7057822092076925e-31,
+      "identityMaxAbsError": 3.3306690738754696e-16,
+      "presenceConstantRange": [
+       -0.461418876706063,
+       -0.21919665172298672
+      ]
+     },
+     {
+      "rank": 5,
+      "projectionChecksum": "f83794528168d857c778021289814ce6bd74bcff48e08faca74bfe7e95604bdb",
+      "top5Overlap": 0.8,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.7777777777777778,
+      "discordantPairs": 6,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       7,
+       4
+      ],
+      "reconstructionError": 0.0032214194637679773
+     },
+     {
+      "rank": 4,
+      "projectionChecksum": "e426bd2fea9bae94d61e295391be9dc485f8e8e8c8b5781a0fd9c29c4598ce05",
+      "top5Overlap": 0.8,
+      "top10Overlap": 1.0,
+      "kendallTauB": 0.7777777777777778,
+      "discordantPairs": 6,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       7,
+       4
+      ],
+      "reconstructionError": 0.03205372032358231
+     },
+     {
+      "rank": 3,
+      "projectionChecksum": "e67307840fc643c8599aaa5e96bc793151264b68c8dee43c88e9bf3694223675",
+      "top5Overlap": 0.8,
+      "top10Overlap": 0.9,
+      "kendallTauB": 0.6666666666666666,
+      "discordantPairs": 9,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       2,
+       5,
+       10,
+       4,
+       7
+      ],
+      "reconstructionError": 0.05816425316102337
+     },
+     {
+      "rank": 2,
+      "projectionChecksum": "e002774e6cb91677bcba8627efb49a7d64aa0219c968d8e41d2a99dd4f502639",
+      "top5Overlap": 0.8,
+      "top10Overlap": 0.9,
+      "kendallTauB": 0.5925925925925926,
+      "discordantPairs": 11,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       2,
+       5,
+       10,
+       7,
+       8
+      ],
+      "reconstructionError": 0.14735326516959663
+     },
+     {
+      "rank": 1,
+      "projectionChecksum": "5dd3e0f5b5342cff4b244ee59a04b1883fd5b5c0fd4acfbb0702540ac124d6f4",
+      "top5Overlap": 0.6,
+      "top10Overlap": 0.9,
+      "kendallTauB": 0.5925925925925926,
+      "discordantPairs": 11,
+      "tieStatusChangedPairs": 0,
+      "topKOrdinals": [
+       10,
+       2,
+       5,
+       7,
+       1
+      ],
+      "reconstructionError": 0.42619629278677124
+     }
+    ]
+   }
+  }
+ },
+ "decidedMissingPolicy": "raw_zero",
+ "nonlinearChallenger": {
+  "trainedWeights": false,
+  "weightInit": "deterministic Xavier-like (not fitted)",
+  "scoreRounding": "6 decimals",
+  "channelMap": {
+   "semanticRelevance": "dense_similarity",
+   "lexicalRelevance": "lexical_rank",
+   "personalizedPageRank": "pagerank",
+   "domainAffinity": "domain_confidence"
+  },
+  "channelsUsed": 4,
+  "unmappedChallengerInputs": [
+   "ast_distance",
+   "freshness",
+   "retrieval_uncertainty",
+   "cache_residency"
+  ],
+  "top5Overlap": 1.0,
+  "top10Overlap": 1.0,
+  "kendallTauB": 0.7407407407407407,
+  "discordantPairs": 7,
+  "tieStatusChangedPairs": 0,
+  "topKOrdinals": [
+   10,
+   4,
+   8,
+   2,
+   5
+  ],
+  "note": "Untrained challenger: this measures how a fixed-init nonlinear scorer reorders the baseline, NOT quality."
+ },
+ "note": "Descriptive only. No reviewed golden labels exist, so no quality pass/fail is claimed."
+}

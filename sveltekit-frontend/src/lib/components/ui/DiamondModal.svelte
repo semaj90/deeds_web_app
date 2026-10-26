@@ -3,7 +3,6 @@
 	// Migrated to $effect
 	import { backOut } from 'svelte/easing';
 	import { fade, scale } from 'svelte/transition';
-	import Portal from './Portal.svelte';
 
 	interface Props {
   onclose?: (...args: any[]) => void;
@@ -129,28 +128,22 @@ let modalElement: HTMLDivElement | null = $state(null);
 </script>
 
 {#if open}
-	<Portal>
+	<div
+		class="modal-overlay"
+		transition:fade={{ duration: 200 }}
+		onclick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
+		role="presentation"
+	>
 		<div
-			class="modal-overlay"
-			transition:fade={{
-	duration: 200 }}
-			onclick={closeModal}
-			onkeydown={handleKeydown}
-			role="button"
+			bind:this={modalElement}
+			class="modal-container {sizeClasses[size]}"
+			class:glass-effect={glassEffect}
+			transition:scale={{ duration: 300, easing: backOut }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="modal-title"
 			tabindex="-1"
 		>
-			<div
-				bind:this={modalElement}
-				class="modal-container {sizeClasses[size]}"
-				class:glass-effect={glassEffect}
-				onclick={(e) => e.stopPropagation()}
-				onkeydown={(e) => e.stopPropagation()}
-				transition:scale={{ duration: 300, easing: backOut }}
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="modal-title"
-				tabindex="-1"
-			>
 				{#if diamondPattern}
 					<canvas bind:this={canvasElement} class="diamond-canvas"></canvas>
 				{/if}
@@ -195,7 +188,6 @@ let modalElement: HTMLDivElement | null = $state(null);
 				<button class="modal-close" onclick={closeModal} aria-label="Close modal">✕</button>
 			</div>
 		</div>
-	</Portal>
 {/if}
 
 <style>

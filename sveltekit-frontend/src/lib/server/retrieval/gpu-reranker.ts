@@ -16,7 +16,7 @@
  */
 
 import {
-	batchCosineSimilarity,
+	batchCosineSimilarityChunked,
 	isCudaAvailable,
 	getCudaMemoryInfo,
 } from '$lib/server/gpu/libtorch-bridge.js';
@@ -146,7 +146,7 @@ export async function gpuRerank<T extends RerankableDoc>(
 	const corpus = withEmbed.slice(0, batchSize).map((e) => e.embedding);
 
 	try {
-		const result = await batchCosineSimilarity(queryVector, corpus);
+		const result = await batchCosineSimilarityChunked(queryVector, corpus);
 
 		// Blend GPU score with original score
 		for (let i = 0; i < batchSize; i++) {
@@ -175,17 +175,17 @@ export async function gpuRerank<T extends RerankableDoc>(
 					embedding_version: 'embeddinggemma:latest',
 					tool_version: 'mcp:1.0',
 					gpu_kernel_version: 'tensorrt_bridge:1.0',
-					rpc_transport: 'cuda',
+					rpc_transport: 'direct',
 				},
 				// Phase 3 GPU kernel metadata
 				gpu_metadata: {
 					kernel_name: 'batchCosineSimilarity',
-					gpu_backend: result.source === 'gpu' ? 'cuda' : 'webgpu',
+					gpu_backend: result.source === 'gpu' ? 'cuda' : 'cpu_fallback',
 					operation: 'cosine',
 					candidate_count: batchSize,
 					input_dim: queryVector.length,
 					output_dim: 1,
-					fallback_used: false,
+					fallback_used: result.source !== 'gpu',
 					error_code: null,
 				},
 			}).catch((err) => {
@@ -276,7 +276,7 @@ export async function gpuRerankQdrantResults(
 	const batchSize = Math.min(corpus.length, cfg.maxBatchSize);
 
 	try {
-		const batchResult = await batchCosineSimilarity(queryVector, corpus.slice(0, batchSize));
+		const batchResult = await batchCosineSimilarityChunked(queryVector, corpus.slice(0, batchSize));
 
 		for (let i = 0; i < batchSize; i++) {
 			const gpuScore = batchResult.scores[i];
@@ -300,7 +300,7 @@ export async function gpuRerankQdrantResults(
 					embedding_version: 'embeddinggemma:latest',
 					tool_version: 'mcp:1.0',
 					gpu_kernel_version: 'tensorrt_bridge:1.0',
-					rpc_transport: 'cuda',
+					rpc_transport: 'direct',
 				},
 			}).catch((err) => {
 				console.debug('[gpu-reranker] Qdrant telemetry failed (non-blocking):', err);

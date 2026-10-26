@@ -40,6 +40,13 @@ describe('classifyPostgresError', () => {
     expect(classifyPostgresError(error)).toMatchObject({ state: 'unavailable', reason: 'CONNECTION_REFUSED', retryable: true });
   });
 
+  it('classifies terminated connection timeouts as retryable', () => {
+    const error = Object.assign(new Error('Connection terminated due to connection timeout'), { code: 'ETIMEDOUT' });
+    expect(classifyPostgresError(error)).toMatchObject({
+      state: 'unavailable', reason: 'TIMEOUT', retryable: true,
+    });
+  });
+
   it('classifies auth/config failures as non-retryable UNAVAILABLE', () => {
     const error = Object.assign(new Error('password authentication failed'), { code: '28P01' });
     expect(classifyPostgresError(error)).toMatchObject({ state: 'unavailable', reason: 'AUTH_OR_CONFIG', retryable: false });

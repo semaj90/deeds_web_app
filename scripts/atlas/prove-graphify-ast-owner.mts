@@ -15,12 +15,16 @@ const dailyCommand = scripts['graphify:daily'] ?? null;
 const dailyChain = scripts['graphify:daily:chain'] ?? null;
 const astFactsCommand = scripts['atlas:ast:facts:apply'] ?? null;
 const graphifyChainText = [dailyCommand, dailyChain].filter(Boolean).join(' ');
-const astFactsInDailyChain = graphifyChainText.includes('ast-treesitter-facts');
+const astFactsInDailyChain =
+  graphifyChainText.includes('ast-treesitter-facts') ||
+  graphifyChainText.includes('atlas:ast:facts:apply') ||
+  graphifyChainText.includes('index-8095-ast-graph');
 const ownerCandidates = {
   webTreeSitterFacts: await exists(resolve(frontendRoot, 'scripts/atlas/ast-treesitter-facts.mjs')),
   analysisBridge: await exists(resolve(frontendRoot, 'src/lib/server/analysis/ast-langextract-bridge.ts')),
   sidecarClient: await exists(resolve(frontendRoot, 'src/lib/server/nlp/miniforge-nlp-sidecar.ts')),
   legacyExtractor: await exists(resolve(repoRoot, 'scripts/atlas/knowledge-layer/ast-extractor.ts')),
+  sidecar8095GraphIndexer: await exists(resolve(repoRoot, 'scripts/atlas/index-8095-ast-graph.mjs')),
 };
 
 const report = {

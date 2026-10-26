@@ -67,10 +67,10 @@ $ModelPath = Resolve-FirstExisting @(
     $env:ROTORQUANT_MODEL_PATH,
     (Join-Path $WorkspaceRoot 'models\hfor\hforf.gguf'),
     (Join-Path $WorkspaceRoot 'models\hforf.gguf'),
-    (Join-Path $WorkspaceRoot 'models\gemma4-legal-iq4xs-direct.gguf'),
-    (Join-Path $WorkspaceRoot 'models\gemma4-rotorquant:latest-iq4xs-direct.gguf'),
-    (Join-Path $RepoRoot 'models\gemma4-legal-iq4xs-direct.gguf'),
-    (Join-Path $RepoRoot 'models\gemma4-rotorquant:latest-iq4xs-direct.gguf')
+    (Join-Path $WorkspaceRoot 'models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
+    (Join-Path $WorkspaceRoot 'models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
+    (Join-Path $RepoRoot 'models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
+    (Join-Path $RepoRoot 'models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf')
 )
 
 $ChatTemplateFile = if (Test-Path $DefaultTemplate) { $DefaultTemplate } else { $null }

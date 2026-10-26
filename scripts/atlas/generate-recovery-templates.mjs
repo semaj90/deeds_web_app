@@ -21,6 +21,25 @@ const DRY_RUN = process.argv.includes('--dry-run');
 const VERBOSE = process.argv.includes('--verbose');
 const CACHE_TTL = 300; // seconds
 
+const targetModelArg = process.argv.find((a) => a.startsWith('--target-model='))?.split('=')[1] ?? null;
+const llamaServerUrl = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+
+async function discoverActiveLlamaModel(baseUrl) {
+  try {
+    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/v1/models`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    if (!res.ok) return null;
+    const body = await res.json();
+    if (Array.isArray(body?.data) && body.data.length > 0 && body.data[0]?.id) {
+      return body.data[0].id;
+    }
+  } catch {
+    // Graceful fallback if llama-server is unreachable
+  }
+  return null;
+}
+
 const env = loadRepoEnv();
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), max: 3 });
 
@@ -35,9 +54,13 @@ const redis = new Redis({
 redis.on('error', () => {});
 
 async function run() {
+  const discoveredModel = await discoverActiveLlamaModel(llamaServerUrl);
+  const activeModel = targetModelArg || discoveredModel || 'ornith-1.5-9b';
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  BitFrost Self-Healing Template Generator                      ║');
   console.log(`║  Mode: ${DRY_RUN ? 'DRY-RUN (no writes)' : 'APPLY'}${' '.repeat(DRY_RUN ? 38 : 43)}║`);
+  console.log(`║  Target Model: ${activeModel.padEnd(46)}║`);
   console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
   if (!DRY_RUN) await redis.connect();
@@ -127,6 +150,22 @@ async function run() {
         warmed++;
       } else {
         skipped++;
+      }
+
+      if (activeModel && activeModel !== row.model_name) {
+        const activeKey = `bifrost:repair:${row.error_class}:${activeModel}`;
+        const activePayload = { ...payload, model_name: activeModel };
+        if (VERBOSE) {
+          console.log(`   + aliased to active model: ${activeKey}`);
+        } else {
+          console.log(`  ✓ ${activeKey} → ${fileTarget} (active :8090 model)`);
+        }
+        if (!DRY_RUN) {
+          await redis.set(activeKey, JSON.stringify(activePayload), 'EX', CACHE_TTL);
+          warmed++;
+        } else {
+          skipped++;
+        }
       }
     }
 

@@ -1,6 +1,6 @@
 # Karpathy GPU Authority Blend
 
-Generated: 2026-10-04T15:24:36.433Z
+Generated: 2026-10-25T15:53:41.690Z
 
 - FP16 mode: auto (default)
 - FP32 compare: false
@@ -25,7 +25,7 @@ Generated: 2026-10-04T15:24:36.433Z
 | sveltekit-frontend/src/lib/server/adapters/service-integrations.ts | 0.150 | 0.450 | 0.005 | 0.627 | 0.005 | -0.622 | 0.005 | 0.005 | 0.302 |
 | sveltekit-frontend/src/lib/server/adapters/service-integrations.ts | 0.150 | 0.450 | 0.005 | 0.627 | 0.005 | -0.622 | 0.005 | 0.005 | 0.302 |
 | sveltekit-frontend/src/lib/server/adapters/service-integrations.ts | 0.150 | 0.450 | 0.005 | 0.627 | 0.005 | -0.622 | 0.005 | 0.005 | 0.302 |
-| sveltekit-frontend/src/lib/server/agent/supervisor.ts | 0.150 | 0.450 | 0.005 | 0.624 | 0.005 | -0.619 | 0.005 | 0.005 | 0.302 |
+| sveltekit-frontend/src/lib/server/agent/supervisor.ts | 0.150 | 0.450 | 0.005 | 0.623 | 0.005 | -0.618 | 0.005 | 0.005 | 0.302 |
 | sveltekit-frontend/src/lib/server/agent/tools/analyze-file.ts | 0.150 | 0.450 | 0.005 | 0.621 | 0.005 | -0.616 | 0.005 | 0.005 | 0.302 |
 | sveltekit-frontend/src/lib/server/agents-md/parse-agents-md.ts | 0.150 | 0.450 | 0.005 | 0.623 | 0.005 | -0.618 | 0.005 | 0.005 | 0.302 |
 | sveltekit-frontend/src/lib/server/agents/agents-card-store.ts | 0.150 | 0.450 | 0.005 | 0.623 | 0.005 | -0.618 | 0.005 | 0.005 | 0.302 |

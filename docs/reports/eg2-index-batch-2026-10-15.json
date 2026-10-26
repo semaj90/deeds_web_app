@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.eg2-challenger-index-batch.v1",
+  "generatedAt": "2026-10-15T05:33:09.005Z",
+  "table": "codebase_chunk_eg2_embeddings",
+  "representationId": "embeddinggemma2-q8-challenger",
+  "modelRevision": "unsloth/embeddinggemma-2-GGUF:embeddinggemma-2-Q8_0.gguf@sha256:6f1bd4ac6c5df7444f9cca7ca36cafe6cfa34cd6f49fefb1e0b4be8143aed8bc",
+  "canonicalDefaultChanged": false,
+  "requested": 1000,
+  "selected": 1000,
+  "inserted": 1000,
+  "failures": 0,
+  "failureSamples": [],
+  "elapsedMs": 133570,
+  "readback": {
+    "total": 1000,
+    "joined": 1000,
+    "dim768": 1000
+  }
+}

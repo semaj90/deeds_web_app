@@ -50,6 +50,12 @@ export function materializeCandidateFeatureSnapshotFromRetrievalRowsV1(input: {
     if (row.canonicalId !== candidate.canonicalId || row.packetKey !== candidate.packetKey) {
       throw new Error(`ACE_FEATURE_ROW_IDENTITY_MISMATCH:${row.candidateOrdinal}`);
     }
+    if (row.sourceRef !== candidate.sourceRef) {
+      throw new Error(`ACE_FEATURE_ROW_SOURCE_REF_MISMATCH:${row.candidateOrdinal}`);
+    }
+    if (row.sourceRevision === null || row.sourceRevision !== candidate.sourceRevision) {
+      throw new Error(`ACE_FEATURE_ROW_SOURCE_REVISION_MISMATCH:${row.candidateOrdinal}`);
+    }
     if (row.treeNodeId !== null && row.treeNodeId !== candidate.treeNodeId) {
       throw new Error(`ACE_FEATURE_ROW_TREE_IDENTITY_MISMATCH:${row.candidateOrdinal}`);
     }
@@ -58,6 +64,9 @@ export function materializeCandidateFeatureSnapshotFromRetrievalRowsV1(input: {
     }
     if (row.graphRevision !== candidate.graphRevision) {
       throw new Error(`ACE_FEATURE_ROW_GRAPH_REVISION_MISMATCH:${row.candidateOrdinal}`);
+    }
+    if (row.semantic.representationRevision !== candidate.semanticRevision) {
+      throw new Error(`ACE_FEATURE_ROW_SEMANTIC_REVISION_MISMATCH:${row.candidateOrdinal}`);
     }
 
     const laneMask = lane.array().parse(input.laneMaskByOrdinal[String(row.candidateOrdinal)] ?? []);
@@ -159,6 +168,7 @@ export function materializeCandidateFeatureSnapshotWithOrdinalMapFromQasRowsV1(i
       candidateOrdinal: candidate.candidateOrdinal,
       canonicalId: candidate.canonicalId,
       packetKey: candidate.packetKey,
+      sourceRef: candidate.sourceRef,
       treeNodeId: candidate.treeNodeId,
       symbolVersionId: candidate.symbolVersionId,
       workspaceRevision: candidate.workspaceRevision,

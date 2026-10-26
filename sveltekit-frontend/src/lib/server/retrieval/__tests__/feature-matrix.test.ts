@@ -1,6 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 const executeMock = vi.fn();
+const workspaceRevision = `sha256:${'a'.repeat(64)}`;
+const graphRevision = 'b'.repeat(64);
+const sourceRevisionOne = `sha256:${'1'.repeat(64)}`;
+const sourceRevisionTwo = `sha256:${'2'.repeat(64)}`;
+
+function authorityInput(identities: Array<{ packetKey: string; sourceRef: string; sourceRevision: string }> = []) {
+  return { identities, workspaceRevision, graphRevision };
+}
 
 vi.mock('$lib/server/db/client.js', () => ({
   db: {
@@ -16,7 +24,17 @@ describe('fetchAuthorityScores', () => {
 
   it('returns an empty map when no packet keys or source refs are given', async () => {
     const { fetchAuthorityScores } = await import('../feature-matrix.js');
-    const result = await fetchAuthorityScores({ packetKeys: [], sourceRefs: [] });
+    const result = await fetchAuthorityScores(authorityInput());
+    expect(result.size).toBe(0);
+    expect(executeMock).not.toHaveBeenCalled();
+  });
+
+  it('fails closed without exact workspace and graph snapshot revisions', async () => {
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores({
+      ...authorityInput([{ packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne }]),
+      graphRevision: '',
+    });
     expect(result.size).toBe(0);
     expect(executeMock).not.toHaveBeenCalled();
   });
@@ -24,41 +42,149 @@ describe('fetchAuthorityScores', () => {
   it('keys the map by packet_key when present, falling back to source_ref', async () => {
     executeMock.mockResolvedValueOnce({
       rows: [
-        { packet_key: 'pkt:1', source_ref: null, authority_percentile: 0.8 },
-        { packet_key: null, source_ref: 'src/foo.ts', authority_percentile: 0.4 },
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.8 },
+        { matched_packet_key: 'pkt:2', matched_source_ref: 'src/bar.ts', matched_source_revision: sourceRevisionTwo, authority_percentile: 0.4 },
       ],
     });
 
     const { fetchAuthorityScores } = await import('../feature-matrix.js');
-    const result = await fetchAuthorityScores({
-      packetKeys: ['pkt:1'],
-      sourceRefs: ['src/foo.ts'],
-    });
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+      { packetKey: 'pkt:2', sourceRef: 'src/bar.ts', sourceRevision: sourceRevisionTwo },
+    ]));
+
+    const { PgDialect } = await import('drizzle-orm/pg-core');
+    const query = executeMock.mock.calls[0]?.[0] as Parameters<InstanceType<typeof PgDialect>['sqlToQuery']>[0];
+    const queryText = new PgDialect().sqlToQuery(query).sql;
+    expect(queryText).toContain('atlas_graph_authority_scores_v2');
+    expect(queryText).toContain('atlas_graph_authority_runs_v2');
+    expect(queryText).toContain('atlas_graph_nodes_v2');
+    expect(queryText).not.toContain('FROM atlas_graph_authority_scores ');
+    expect(queryText).toContain("source_manifest->>'workspaceRevision'");
+    expect(queryText).toContain('topology_hash');
 
     expect(result.get('pkt:1')).toBe(0.8);
-    expect(result.get('src/foo.ts')).toBe(0.4);
+    expect(result.get('src/foo.ts')).toBe(0.8);
+    expect(result.get('pkt:2')).toBe(0.4);
+    expect(result.get('src/bar.ts')).toBe(0.4);
+  });
+
+  it('rejects rows whose packet source revision differs from the request snapshot', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [{
+        matched_packet_key: 'pkt:1',
+        matched_source_ref: 'src/foo.ts',
+        matched_source_revision: sourceRevisionTwo,
+        authority_percentile: 0.99,
+      }],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.size).toBe(0);
+  });
+
+  it('does not select an arbitrary source fallback when same-source packet scores disagree', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.8 },
+        { matched_packet_key: 'pkt:2', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.4 },
+      ],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+      { packetKey: 'pkt:2', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.get('pkt:1')).toBe(0.8);
+    expect(result.get('pkt:2')).toBe(0.4);
+    expect(result.has('src/foo.ts')).toBe(false);
+  });
+
+  it('rejects an ambiguous packet score when qualified runs disagree', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.8 },
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.4 },
+      ],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.has('pkt:1')).toBe(false);
+    expect(result.has('src/foo.ts')).toBe(false);
+  });
+
+  it('accepts duplicate identical packet scores from qualified runs', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.8 },
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: '0.8' },
+      ],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.get('pkt:1')).toBe(0.8);
   });
 
   it('degrades to an empty map (does not throw) when the db call fails', async () => {
     executeMock.mockRejectedValueOnce(new Error('connection refused'));
     const { fetchAuthorityScores } = await import('../feature-matrix.js');
-    const result = await fetchAuthorityScores({ packetKeys: ['pkt:1'], sourceRefs: [] });
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+    ]));
     expect(result.size).toBe(0);
   });
 
   it('ignores non-finite authority_percentile values instead of poisoning the map', async () => {
     executeMock.mockResolvedValueOnce({
       rows: [
-        { packet_key: 'pkt:bad', source_ref: null, authority_percentile: 'not-a-number' },
-        { packet_key: 'pkt:good', source_ref: null, authority_percentile: 0.55 },
+        { matched_packet_key: 'pkt:bad', matched_source_ref: 'src/bad.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 'not-a-number' },
+        { matched_packet_key: 'pkt:good', matched_source_ref: 'src/good.ts', matched_source_revision: sourceRevisionTwo, authority_percentile: 0.55 },
       ],
     });
 
     const { fetchAuthorityScores } = await import('../feature-matrix.js');
-    const result = await fetchAuthorityScores({ packetKeys: ['pkt:bad', 'pkt:good'], sourceRefs: [] });
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:bad', sourceRef: 'src/bad.ts', sourceRevision: sourceRevisionOne },
+      { packetKey: 'pkt:good', sourceRef: 'src/good.ts', sourceRevision: sourceRevisionTwo },
+    ]));
 
     expect(result.has('pkt:bad')).toBe(false);
     expect(result.get('pkt:good')).toBe(0.55);
+  });
+
+  it('rejects authority percentiles outside the normalized range', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [
+        { matched_packet_key: 'pkt:low', matched_source_ref: 'src/low.ts', matched_source_revision: sourceRevisionOne, authority_percentile: -0.01 },
+        { matched_packet_key: 'pkt:high', matched_source_ref: 'src/high.ts', matched_source_revision: sourceRevisionTwo, authority_percentile: 1.01 },
+        { matched_packet_key: 'pkt:edge', matched_source_ref: 'src/edge.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 1 },
+      ],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:low', sourceRef: 'src/low.ts', sourceRevision: sourceRevisionOne },
+      { packetKey: 'pkt:high', sourceRef: 'src/high.ts', sourceRevision: sourceRevisionTwo },
+      { packetKey: 'pkt:edge', sourceRef: 'src/edge.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.has('pkt:low')).toBe(false);
+    expect(result.has('pkt:high')).toBe(false);
+    expect(result.get('pkt:edge')).toBe(1);
   });
 });
 

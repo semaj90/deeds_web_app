@@ -147,7 +147,7 @@ async function promoteSummariesToAtlas(
         LENGTH(COALESCE(cci.summary, '')),
         cci.keywords,
         NOW(),
-        'gemma4-rotorquant:latest',
+        'ornith-1.5-9b',
         0.85
       FROM codebase_chunk_index cci
       WHERE cci.packet_key = ANY($1::text[])

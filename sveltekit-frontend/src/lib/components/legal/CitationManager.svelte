@@ -148,9 +148,9 @@
 		citationData.stats = stats;
 	});
 
-	// Filtered and sorted citations
+	// Filtered and sorted citations (clone array first so .sort() never mutates $state in $derived)
 	let filteredCitations = $derived.by(() => {
-		let filtered = citationData.citations;
+		let filtered = [...citationData.citations];
 
 		if (searchTerm) {
 			filtered = filtered.filter(

@@ -21,6 +21,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as ts from 'typescript';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO = join(__dirname, '..');
@@ -41,11 +42,6 @@ function walk(dir) {
   return out;
 }
 
-// Match: server.registerTool(\n? 'name',\n? { ... },\n? handler)
-// Capture: tool name + an approximate handler signature (first ~80 chars after the schema closes)
-const TOOL_RE = /server\.registerTool\(\s*['"]([^'"]+)['"]\s*,\s*\{[\s\S]*?\}\s*,\s*([\s\S]*?)\)\s*;?/g;
-const GATE_RE = /if\s*\(\s*enableLegacy\s*\)\s*\{/g;
-
 const tools = []; // { name, file, line, handlerHint, gated }
 
 const scanRoots = [ROOT];
@@ -56,32 +52,45 @@ if (withFixtures) {
 for (const file of scanRoots.flatMap(walk)) {
   const src = readFileSync(file, 'utf8');
   const rel = relative(REPO, file).replace(/\\/g, '/');
+  const sourceFile = ts.createSourceFile(file, src, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 
-  // Build a list of [start, end] offsets of `if (enableLegacy) { ... }` blocks
-  const gates = [];
-  for (const m of src.matchAll(GATE_RE)) {
-    const start = m.index + m[0].length;
-    let depth = 1;
-    let i = start;
-    while (i < src.length && depth > 0) {
-      if (src[i] === '{') depth++;
-      else if (src[i] === '}') depth--;
-      i++;
+  function visit(node) {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      node.expression.expression.getText(sourceFile) === 'server' &&
+      node.expression.name.text === 'registerTool' &&
+      ts.isStringLiteralLike(node.arguments[0]) &&
+      node.arguments.length >= 3 &&
+      ts.isObjectLiteralExpression(node.arguments[1])
+    ) {
+      const name = node.arguments[0].text;
+      const handler = node.arguments[2];
+      const isDirectReference = ts.isIdentifier(handler) || ts.isPropertyAccessExpression(handler);
+      const handlerHint = isDirectReference ? handler.getText(sourceFile) : `<inline:${name}>`;
+      const position = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+      let gated = false;
+
+      for (let ancestor = node.parent; ancestor; ancestor = ancestor.parent) {
+        if (
+          ts.isIfStatement(ancestor) &&
+          ts.isIdentifier(ancestor.expression) &&
+          ancestor.expression.text === 'enableLegacy' &&
+          node.getStart(sourceFile) >= ancestor.thenStatement.getStart(sourceFile) &&
+          node.getEnd() <= ancestor.thenStatement.getEnd()
+        ) {
+          gated = true;
+          break;
+        }
+      }
+
+      tools.push({ name, file: rel, line: position.line + 1, handlerHint, gated });
     }
-    gates.push([m.index, i]);
-  }
-  const isGated = (offset) => gates.some(([s, e]) => offset >= s && offset <= e);
 
-  for (const m of src.matchAll(TOOL_RE)) {
-    const name = m[1];
-    const raw = m[2].trim();
-    // Inline handlers (`async (...) =>` or `function ...`) are unique by definition.
-    // Only a bare identifier as the third arg is a real shared-handler alias.
-    const isInline = /^(async\s*\(|async\s+function|function\b|\()/.test(raw);
-    const handlerHint = isInline ? `<inline:${name}>` : raw.split(/[\s)(]/, 1)[0];
-    const line = src.slice(0, m.index).split('\n').length;
-    tools.push({ name, file: rel, line, handlerHint, gated: isGated(m.index) });
+    ts.forEachChild(node, visit);
   }
+
+  visit(sourceFile);
 }
 
 // Group: collisions (same name in 2+ files)

@@ -102,13 +102,38 @@ function sha256(value: string): string {
 }
 
 export function normalizeGitSourceRefV1(value: string): string {
-  let normalized = value.trim().replaceAll('\\', '/').replace(/^\.\/+/, '').replace(/\/{2,}/g, '/');
-  if (!normalized) throw new Error('GIT_SOURCE_REF_REQUIRED');
-  if (normalized.startsWith('/') || /^[A-Za-z]:\//.test(normalized)) {
+  const trimmed = value.trim();
+  if (!trimmed) throw new Error('GIT_SOURCE_REF_REQUIRED');
+  if (/[\u0000-\u001f\u007f]/.test(trimmed) || trimmed.includes('?') || trimmed.includes('#')) {
+    throw new Error(`GIT_SOURCE_REF_INVALID_CHARACTER:${value}`);
+  }
+  if (/^(?:[\\/]{2}|[\\/])/.test(trimmed) || /^[A-Za-z]:/.test(trimmed)) {
     throw new Error(`GIT_SOURCE_REF_MUST_BE_REPOSITORY_RELATIVE:${value}`);
   }
+  if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(trimmed)) {
+    throw new Error(`GIT_SOURCE_REF_URL_OR_SCHEME_FORBIDDEN:${value}`);
+  }
+
+  let normalized = trimmed.replaceAll('\\', '/').replace(/^\.\/+/, '').replace(/\/{2,}/g, '/');
+  if (!normalized) throw new Error('GIT_SOURCE_REF_REQUIRED');
   const parts = normalized.split('/').filter((part) => part !== '' && part !== '.');
-  if (parts.some((part) => part === '..')) throw new Error(`GIT_SOURCE_REF_PARENT_TRAVERSAL:${value}`);
+  for (const part of parts) {
+    let decoded: string;
+    try {
+      decoded = part;
+      for (let attempt = 0; attempt < 4; attempt += 1) {
+        const next = decodeURIComponent(decoded);
+        if (next === decoded) break;
+        decoded = next;
+      }
+    } catch {
+      throw new Error(`GIT_SOURCE_REF_INVALID_ESCAPE:${value}`);
+    }
+    if (decoded === '..') throw new Error(`GIT_SOURCE_REF_PARENT_TRAVERSAL:${value}`);
+    if (decoded.includes('/') || decoded.includes('\\')) {
+      throw new Error(`GIT_SOURCE_REF_ENCODED_SEPARATOR:${value}`);
+    }
+  }
   normalized = parts.join('/');
   if (!normalized) throw new Error('GIT_SOURCE_REF_REQUIRED');
   return normalized;

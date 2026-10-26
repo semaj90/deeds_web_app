@@ -12,15 +12,16 @@
  *   node scripts/turboquant/bench-model.mjs
  *   node scripts/turboquant/bench-model.mjs --label rotorquant --n 10
  *   node scripts/turboquant/bench-model.mjs --port 8091 --label my-run
- *   node scripts/turboquant/bench-model.mjs --model gemma4-rotorquant:latest --mode vlm --label vlm
+ *   node scripts/turboquant/bench-model.mjs --model ornith-1.5-9b --mode vlm --label vlm
  *   node scripts/turboquant/bench-model.mjs --mode text --label text-only
- *   node scripts/turboquant/bench-model.mjs --auto-compare --baseline-model gemma4-rotorquant:latest.gguf --candidate-model gemma4-rotorquant:latest-iq4xs.gguf --port 8090 --n 5
+ *   node scripts/turboquant/bench-model.mjs --auto-compare --baseline-model ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf --candidate-model ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf --port 8090 --n 5
  *   node scripts/turboquant/bench-model.mjs --compare   (reads saved runs, prints table)
  *
  * Saves results to logs/turboquant/bench-<label>-<timestamp>.json
  */
 
-import { writeFileSync, mkdirSync, readdirSync, readFileSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync, readdirSync, readFileSync, existsSync, statSync } from 'fs';
+import { createHash } from 'crypto';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { performance } from 'perf_hooks';
@@ -48,8 +49,8 @@ const IMAGE = flag(
 );
 const N = parseInt(flag('--n', '5'), 10);
 const AUTO_COMPARE = hasFlag('--auto-compare');
-const BASELINE_MODEL = flag('--baseline-model', 'gemma4-rotorquant:latest.gguf');
-const CANDIDATE_MODEL = flag('--candidate-model', 'gemma4-rotorquant:latest-iq4xs.gguf');
+const BASELINE_MODEL = flag('--baseline-model', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf');
+const CANDIDATE_MODEL = flag('--candidate-model', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf');
 const COMPARE = hasFlag('--compare');
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
@@ -349,9 +350,28 @@ async function runAutoCompare() {
   compareSaved();
 }
 
+// Identity guard: refuse to benchmark two names that resolve to the same weights.
+function resolveArtifact(p) {
+  const candidates = [p, join('..', 'models', p), join('models', p)];
+  return candidates.find((c) => existsSync(c)) ?? null;
+}
+function sha256File(file) {
+  return createHash('sha256').update(readFileSync(file)).digest('hex');
+}
+function assertDistinctArtifacts(baseline, candidate) {
+  const a = resolveArtifact(baseline);
+  const b = resolveArtifact(candidate);
+  if (!a || !b) throw new Error(`BENCH_ARTIFACT_MISSING: baseline=${baseline} candidate=${candidate}`);
+  if (a === b) throw new Error(`BENCH_IDENTICAL_ARTIFACT: baseline and candidate both resolve to ${a}`);
+  if (statSync(a).size === statSync(b).size && sha256File(a) === sha256File(b)) {
+    throw new Error(`BENCH_IDENTICAL_ARTIFACT: ${a} and ${b} have the same SHA-256`);
+  }
+}
+
 if (COMPARE) {
   compareSaved();
 } else if (AUTO_COMPARE) {
+  assertDistinctArtifacts(BASELINE_MODEL, CANDIDATE_MODEL);
   runAutoCompare().catch((e) => { console.error(e); process.exit(1); });
 } else {
   runBench().catch((e) => {

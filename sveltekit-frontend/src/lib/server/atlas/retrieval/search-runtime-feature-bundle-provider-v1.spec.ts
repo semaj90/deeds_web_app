@@ -74,6 +74,7 @@ function fixture(requestId = 'req-a') {
       candidateOrdinal: 0,
       canonicalId: 'candidate:value',
       packetKey: 'packet:value',
+      sourceRef: 'src/value.ts',
       treeNodeId: null,
       symbolVersionId: null,
       workspaceRevision: record.workspaceRevision,

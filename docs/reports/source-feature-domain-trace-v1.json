@@ -1,0 +1,169 @@
+{
+  "schema": "atlas.source-feature-domain-trace-receipt.v1",
+  "task": "SOURCE-FEATURE-DOMAIN-TRACE-01",
+  "milestone": "MILESTONE_1_SINGLE_SOURCE_PROVEN",
+  "generatedAt": "2026-10-18T00:59:50.288Z",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "targetFile": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+  "sourceDigest": "sha256:377afffe0579bab8ee0068898e905013bc720d2effba1d70cb1591f43aa4b39a",
+  "fileBytes": 27646,
+  "pipelineStages": {
+    "stage1_astFacts": {
+      "status": "PROVEN",
+      "functionCount": 12,
+      "classCount": 0
+    },
+    "stage2_docReferences": {
+      "status": "PROVEN",
+      "count": 2
+    },
+    "stage3_threeBranchFeatures": {
+      "status": "PROVEN",
+      "branches": [
+        "lexical",
+        "structural",
+        "semantic_768"
+      ]
+    },
+    "stage4_reviewedDomain": {
+      "status": "PROVEN",
+      "domain": "retrieval"
+    },
+    "stage5_classifierPrediction": {
+      "status": "PROVEN",
+      "predictedDomain": "retrieval",
+      "confidence": 0.99,
+      "baselineModel": "MultinomialNB-LexicalStructural-v1",
+      "calibration": "PLATT_SCALED",
+      "reviewAgreement": true
+    },
+    "stage6_featureEnvelope": {
+      "status": "PROVEN",
+      "schema": "atlas.ace-feature-envelope.v1"
+    },
+    "stage7_manifestBridge": {
+      "status": "PROVEN",
+      "schema": "atlas.context-manifest-evidence.v1"
+    }
+  },
+  "envelope": {
+    "schema": "atlas.ace-feature-envelope.v1",
+    "packetKey": "packet:0e10b53fbc34",
+    "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+    "sourceRevision": "sha256:377afffe0579bab8ee0068898e905013bc720d2effba1d70cb1591f43aa4b39a",
+    "featureRevision": "feat:sha256:cbcb38ff8bda7b1a1375ca920637914ea83357b5ae8acee08d9e9e1edc2d0cdf",
+    "evidenceRefs": [
+      "source:sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts#L1-L730",
+      "ast:symbols:fetchEngramCache,fetchGlyphRewardScores,embedQuery,compatible,searchCollection,pointToContextDoc,correctiveRetrieval,dagOrder,searchLegalCollections,searchCodebaseCollections,orchestrateRetrieval,emptyResult",
+      "doc:orchestrator.retrieve",
+      "doc:qdrant.search"
+    ],
+    "features": {
+      "lexical": {
+        "tokenCount": 2353,
+        "topTokens": [
+          {
+            "word": "const",
+            "count": 109
+          },
+          {
+            "word": "string",
+            "count": 58
+          },
+          {
+            "word": "chunks",
+            "count": 51
+          },
+          {
+            "word": "length",
+            "count": 42
+          },
+          {
+            "word": "return",
+            "count": 40
+          },
+          {
+            "word": "number",
+            "count": 38
+          },
+          {
+            "word": "map",
+            "count": 38
+          },
+          {
+            "word": "req",
+            "count": 31
+          },
+          {
+            "word": "content",
+            "count": 30
+          },
+          {
+            "word": "performance",
+            "count": 30
+          }
+        ]
+      },
+      "structural": {
+        "loc": 730,
+        "imports": 21,
+        "exports": 5,
+        "symbols": [
+          "fetchEngramCache",
+          "fetchGlyphRewardScores",
+          "embedQuery",
+          "compatible",
+          "searchCollection",
+          "pointToContextDoc",
+          "correctiveRetrieval",
+          "dagOrder",
+          "searchLegalCollections",
+          "searchCodebaseCollections",
+          "orchestrateRetrieval",
+          "emptyResult",
+          "RankedChunk",
+          "GraphNeighbor",
+          "ContextDoc",
+          "EmbedFn",
+          "RerankableChunk",
+          "CudaRnnChunkLike",
+          "RetrievalRequest",
+          "RetrievalResult"
+        ]
+      },
+      "semantic": {
+        "dimensions": 768,
+        "representation": "semantic_768",
+        "metric": "cosine"
+      },
+      "clustering": {
+        "modelRevision": "mbk-spherical-content768-k256-v1",
+        "clusterId": 42,
+        "qualification": "COHORT_EXPERIMENTAL"
+      },
+      "classification": {
+        "taxonomyRevision": "v1-crosswalk-2026-10",
+        "reviewedDomain": "retrieval",
+        "predictedDomain": "retrieval",
+        "confidence": 0.99,
+        "reviewStatus": "REVIEWED"
+      }
+    }
+  },
+  "manifestCohort": {
+    "schema": "atlas.context-manifest-evidence.v1",
+    "packetKey": "packet:0e10b53fbc34",
+    "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+    "domain": "retrieval",
+    "clusterId": 42,
+    "confidence": 0.99,
+    "evidenceRefs": [
+      "source:sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts#L1-L730",
+      "ast:symbols:fetchEngramCache,fetchGlyphRewardScores,embedQuery,compatible,searchCollection,pointToContextDoc,correctiveRetrieval,dagOrder,searchLegalCollections,searchCodebaseCollections,orchestrateRetrieval,emptyResult",
+      "doc:orchestrator.retrieve",
+      "doc:qdrant.search"
+    ]
+  },
+  "verdict": "SOURCE_TO_FEATURE_TO_LABEL_PIPELINE_PROVEN"
+}

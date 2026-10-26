@@ -27,6 +27,13 @@ const { mockAppendSearchRuntimeTrainingRow } = vi.hoisted(() => ({
 const { mockReadKagHypergraphNeighborsV1 } = vi.hoisted(() => ({
   mockReadKagHypergraphNeighborsV1: vi.fn(),
 }));
+const { mockReadKagCodeHyperedgesV1, mockResolveKagPacketBindingsV1 } = vi.hoisted(() => ({
+  mockReadKagCodeHyperedgesV1: vi.fn(),
+  mockResolveKagPacketBindingsV1: vi.fn(),
+}));
+const { mockExecuteGraphV2BoundedTraversalV1 } = vi.hoisted(() => ({
+  mockExecuteGraphV2BoundedTraversalV1: vi.fn(),
+}));
 
 vi.mock('./retrieve-candidates.js', () => ({
   retrieveAllCandidates: mockRetrieveAllCandidates,
@@ -55,6 +62,12 @@ vi.mock('../atlas/policy/policy-training.js', async (importOriginal) => {
 
 vi.mock('../atlas/integration/kag-hypergraph-reader-v1.js', () => ({
   readKagHypergraphNeighborsStrictV1: mockReadKagHypergraphNeighborsV1,
+  readKagCodeHyperedgesStrictV1: mockReadKagCodeHyperedgesV1,
+  resolveKagPacketCandidateBindingsStrictV1: mockResolveKagPacketBindingsV1,
+}));
+
+vi.mock('../atlas/integration/graph-v2-bounded-traversal-v1.js', () => ({
+  executeGraphV2BoundedTraversalV1: mockExecuteGraphV2BoundedTraversalV1,
 }));
 
 vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
@@ -62,6 +75,7 @@ vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
     const identities: Record<string, string> = {
       'packet-1': 'packet:00000000-0000-5000-8000-000000000001',
       'packet-2': 'packet:00000000-0000-5000-8000-000000000002',
+      'packet-3': 'packet:00000000-0000-5000-8000-000000000003',
     };
     const canonicalPacketKey = identities[key];
     if (!canonicalPacketKey) throw new Error('unresolved');
@@ -69,13 +83,32 @@ vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
   },
 }));
 
-import { createSearchRuntime } from './search-runtime.js';
+import { buildFunctionRegistryRetrievalProofV1, buildGraphCandidateEvidenceV1, createSearchRuntime, SearchRuntime } from './search-runtime.js';
 import type { SearchResult } from './search-runtime.js';
 import { classifyAtlasQuery } from '../atlas/agentic-file-compiler/query-classifier.js';
 import { compileTaxonomyScopeV1 } from '../atlas/agentic-file-compiler/taxonomy-scope-v1.js';
 import { buildQueryExpansionBundleV1 } from '../atlas/agentic-file-compiler/query-expansion-v1.js';
 
 describe('search runtime bridge', () => {
+  it('carries graph edge evidence to final packets only when packet and revisions match', () => {
+    const candidate = {
+      id: 'packet-a', packetKey: 'packet-a', sourceRef: 'src/a.ts', summary: '', content: '', score: 0.8,
+      scoreSource: 'ast_tree' as const, sourceRevision: `sha256:${'a'.repeat(64)}`,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`, graphRevision: 'c'.repeat(64),
+      graphEvidenceRefs: ['kag:edge-2', 'kag:edge-1'],
+    };
+    const packet = {
+      packet_key: 'packet-a', source_ref: 'src/a.ts', source_revision: candidate.sourceRevision,
+      workspace_revision: candidate.workspaceRevision, graph_revision: candidate.graphRevision,
+    } as any;
+    expect(buildGraphCandidateEvidenceV1([candidate], [packet])).toEqual([{
+      packetKey: 'packet-a', sourceRef: 'src/a.ts', sourceRevision: candidate.sourceRevision,
+      workspaceRevision: candidate.workspaceRevision, graphRevision: candidate.graphRevision,
+      evidenceRefs: ['kag:edge-1', 'kag:edge-2'],
+    }]);
+    expect(buildGraphCandidateEvidenceV1([candidate], [{ ...packet, source_revision: `sha256:${'d'.repeat(64)}` }])).toEqual([]);
+  });
+
   beforeEach(() => {
     vi.stubGlobal(
       'fetch',
@@ -89,12 +122,114 @@ describe('search runtime bridge', () => {
     mockAppendSearchRuntimeTrainingRow.mockReset();
     mockAppendSearchRuntimeTrainingRow.mockResolvedValue({});
     mockReadKagHypergraphNeighborsV1.mockReset();
+    mockExecuteGraphV2BoundedTraversalV1.mockReset();
+    mockExecuteGraphV2BoundedTraversalV1.mockResolvedValue([]);
+    mockReadKagCodeHyperedgesV1.mockReset();
+    mockResolveKagPacketBindingsV1.mockReset();
+    mockReadKagCodeHyperedgesV1.mockResolvedValue([]);
+    mockResolveKagPacketBindingsV1.mockResolvedValue([]);
     mockReadKagHypergraphNeighborsV1.mockResolvedValue({
       requestedCanonicalIds: 0,
       matchedTuples: 0,
       matchedHyperedges: 0,
       neighbors: [],
     });
+  });
+
+  it('uses the injected reranker order without allowing candidate identity or revision changes', async () => {
+    const sourceRevision = `sha256:${'a'.repeat(64)}`;
+    const workspaceRevision = `sha256:${'b'.repeat(64)}`;
+    const candidates = [
+      { packetKey: 'packet-1', sourceRef: 'src/a/route.ts', sourceRevision, workspaceRevision, rank: 1, score: 0.9, lane: 'ast' as const },
+      { packetKey: 'packet-2', sourceRef: 'src/b/helper.ts', sourceRevision, workspaceRevision, rank: 2, score: 0.8, lane: 'ast' as const },
+    ];
+    const envelopes = candidates.map((candidate, index) => ({
+      chunk_id: candidate.packetKey,
+      packet_key: candidate.packetKey,
+      source_ref: candidate.sourceRef,
+      source_revision: candidate.sourceRevision,
+      workspace_revision: candidate.workspaceRevision,
+      retrieved_rank: index + 1,
+      retrieval_source: 'ast',
+      fusion_score: 0.5 - index / 10,
+    }));
+    mockHydrateCandidatesWithProof.mockResolvedValue({
+      envelopes,
+      proof: {
+        canonicalJoinedCount: 2, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0, representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0, graphScoreMissingCount: 2, summaryResolvedCount: 2,
+        summaryStaleRejectedCount: 0, validationReasons: {},
+      },
+    });
+    const reranker = {
+      modelVersion: 'test-context-ranker-v1',
+      rerank: vi.fn(async ({ candidates: input }: { candidates: typeof candidates }) => ({
+        ranked: [...input].reverse(),
+        modelVersion: 'test-context-ranker-v1',
+      })),
+    };
+    const runtime = createSearchRuntime({
+      readOnly: true,
+      reranker,
+      postProcessConfig: { dedupPrefixDepth: 0 },
+      retrievers: [{ lane: 'ast', retrieve: async () => candidates }],
+    });
+
+    const result = await runtime.search({ text: 'drizzle route helper', topK: 2, workspaceRevision });
+
+    expect(reranker.rerank).toHaveBeenCalledWith(expect.objectContaining({
+      query: 'drizzle route helper',
+      candidates: expect.arrayContaining([
+        expect.objectContaining({ packetKey: 'packet-1', sourceRef: 'src/a/route.ts', sourceRevision, workspaceRevision }),
+        expect.objectContaining({ packetKey: 'packet-2', sourceRef: 'src/b/helper.ts', sourceRevision, workspaceRevision }),
+      ]),
+    }));
+    expect(mockRerankCanonicalFeatureEnvelopes).not.toHaveBeenCalled();
+    expect(result.packets.map((packet) => packet.packet_key)).toEqual(['packet-2', 'packet-1']);
+    expect(result.provenance.rerankModel).toBe('test-context-ranker-v1');
+  });
+
+  it('rejects injected reranker output that mutates a source binding', async () => {
+    const sourceRevision = `sha256:${'c'.repeat(64)}`;
+    const workspaceRevision = `sha256:${'d'.repeat(64)}`;
+    const candidate = {
+      packetKey: 'packet-1', sourceRef: 'src/a/route.ts', sourceRevision,
+      workspaceRevision, rank: 1, score: 0.9, lane: 'ast' as const,
+    };
+    mockHydrateCandidatesWithProof.mockResolvedValue({
+      envelopes: [{
+        chunk_id: candidate.packetKey, packet_key: candidate.packetKey, source_ref: candidate.sourceRef,
+        source_revision: sourceRevision, workspace_revision: workspaceRevision, retrieved_rank: 1,
+        retrieval_source: 'ast', fusion_score: 0.9,
+      }],
+      proof: {
+        canonicalJoinedCount: 1, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0, representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0, graphScoreMissingCount: 1, summaryResolvedCount: 1,
+        summaryStaleRejectedCount: 0, validationReasons: {},
+      },
+    });
+    const runtime = new SearchRuntime({
+      readOnly: true,
+      reranker: {
+        modelVersion: 'malicious-ranker',
+        rerank: async ({ candidates: input }) => ({
+          ranked: [{ ...input[0]!, sourceRef: 'src/forged.ts' }],
+          modelVersion: 'malicious-ranker',
+        }),
+      },
+      postProcessConfig: { dedupPrefixDepth: 0 },
+      retrievers: [{ lane: 'ast', retrieve: async () => [candidate] }],
+    });
+
+    const result = await runtime.search({ text: 'drizzle route helper', topK: 1, workspaceRevision });
+
+    expect(result.packets.map((packet) => packet.source_ref)).toEqual(['src/a/route.ts']);
+    expect(result.provenance.rerankModel).toBe('injected-reranker-invalid-output');
+    expect(result.provenance.rerankerUsed).toBe(false);
   });
 
   it('retrieves from multiple lanes, reranks canonically, and returns feature envelopes', async () => {
@@ -375,6 +510,7 @@ describe('search runtime bridge', () => {
     expect(result.provenance.hypergraphNeighbors).toEqual([
       { canonicalId: 'packet:00000000-0000-5000-8000-000000000001', hyperedgeIds: ['hyperedge:abc123'] },
     ]);
+    expect(result.provenance.hypergraphGraphRevision).toBe('graph:r1');
 
     mockReadKagHypergraphNeighborsV1.mockClear();
     mockRerankCanonicalFeatureEnvelopes.mockResolvedValueOnce({
@@ -392,6 +528,226 @@ describe('search runtime bridge', () => {
     const unqualifiedResult = await runtime.search({ text: 'unqualified graph packet', topK: 2 });
     expect(mockReadKagHypergraphNeighborsV1).not.toHaveBeenCalled();
     expect(unqualifiedResult.provenance.hypergraphNeighbors).toBeUndefined();
+  });
+
+  it('fans out only exact graph-bound packet neighbors into hydration and final Top-K', async () => {
+    const workspaceRevision = `sha256:${'1'.repeat(64)}`;
+    const graphRevision = `sha256:${'2'.repeat(64)}`;
+    const sourceRevision = `sha256:${'3'.repeat(64)}`;
+    mockReadKagHypergraphNeighborsV1.mockResolvedValue({
+      requestedCanonicalIds: 1,
+      matchedTuples: 0,
+      matchedHyperedges: 1,
+      neighbors: [{
+        canonicalId: 'packet:00000000-0000-5000-8000-000000000001',
+        hyperedgeIds: ['packet-incidence:sha256:edge'],
+        candidateBindings: [{
+          canonicalId: 'packet:00000000-0000-5000-8000-000000000002',
+          packetKey: 'packet-2',
+          sourceRef: 'src/server/other.ts',
+          sourceRevision,
+          workspaceRevision,
+          graphRevision,
+          hyperedgeId: 'packet-incidence:sha256:edge',
+        }],
+      }],
+    });
+    mockHydrateCandidatesWithProof.mockImplementation(async (candidates: Array<Record<string, unknown>>) => ({
+      envelopes: candidates.map((candidate, index) => ({
+        chunk_id: String(candidate.packetKey),
+        packet_key: String(candidate.packetKey),
+        source_ref: String(candidate.sourceRef),
+        relative_path: String(candidate.sourceRef),
+        workspace_revision: String(candidate.workspaceRevision),
+        graph_revision: graphRevision,
+        source_revision: String(candidate.sourceRevision),
+        summary: `hydrated ${String(candidate.packetKey)}`,
+        content: `content ${String(candidate.packetKey)}`,
+        retrieved_rank: index + 1,
+      })),
+      proof: {
+        canonicalJoinedCount: candidates.length,
+        canonicalJoinMissingCount: 0,
+        workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0,
+        sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0,
+        graphScoreMissingCount: candidates.length,
+        summaryResolvedCount: candidates.length,
+        summaryStaleRejectedCount: 0,
+        validationReasons: {},
+      },
+    }));
+    mockRerankCanonicalFeatureEnvelopes.mockImplementation(async (_query: string, envelopes: Array<Record<string, unknown>>) => ({
+      results: envelopes.map((envelope, index) => ({
+        ...envelope,
+        retrieved_rank: index + 1,
+        rank_after: index + 1,
+      })),
+      provenance: {
+        cacheStatus: 'miss', cacheKey: 'test', modelVersion: 'none', rendererVersion: 'search-runtime-v1',
+        authScope: 'public', topK: 2, maxLength: 1024, crossEncoderAttempted: false,
+        crossEncoderUsed: false, fallbackUsed: false, latencyMs: 0,
+      },
+    }));
+
+    const runtime = new SearchRuntime({
+      readOnly: true,
+      retrievers: [{
+        lane: 'ast',
+        retrieve: async () => [{
+          packetKey: 'packet-1',
+          sourceRef: 'src/lib/example.ts',
+          sourceRevision,
+          workspaceRevision,
+          rank: 1,
+          score: 0.9,
+          lane: 'ast',
+          metadata: { graph_revision: graphRevision },
+        }],
+      }],
+    });
+    const result = await runtime.search({ text: 'follow graph reference', topK: 2, workspaceRevision });
+
+    expect(mockHydrateCandidatesWithProof.mock.calls[0]?.[0].map((candidate: { packetKey: string }) => candidate.packetKey))
+      .toContain('packet-2');
+    expect(result.packets.map((packet) => packet.packet_key)).toContain('packet-2');
+    expect(result.provenance.retrievalSources).toContain('ast_tree');
+  });
+
+  it('carries a bounded GraphV2 multi-hop path through hydration, final Top-K, and graph evidence provenance', async () => {
+    const workspaceRevision = `sha256:${'5'.repeat(64)}`;
+    const graphRevision = '6'.repeat(64);
+    const sourceRevision = `sha256:${'7'.repeat(64)}`;
+    mockExecuteGraphV2BoundedTraversalV1.mockResolvedValue([{
+      packetKey: 'packet-2',
+      sourceRef: 'src/server/neighbor.ts',
+      sourceRevision,
+      workspaceRevision,
+      graphRevision,
+      relationId: 'edge:last',
+      relationKind: 'CALLS',
+      relationConfidence: 0.72,
+      traversalDepth: 2,
+      relationPathIds: ['edge:first', 'edge:last'],
+    }]);
+    mockHydrateCandidatesWithProof.mockImplementation(async (items: Array<Record<string, unknown>>) => ({
+      envelopes: items.map((candidate, index) => ({
+        chunk_id: String(candidate.packetKey),
+        packet_key: String(candidate.packetKey),
+        source_ref: String(candidate.sourceRef),
+        relative_path: String(candidate.sourceRef),
+        source_revision: String(candidate.sourceRevision),
+        workspace_revision: String(candidate.workspaceRevision),
+        graph_revision: graphRevision,
+        summary: 'qualified graph candidate',
+        content: 'qualified graph candidate content',
+        retrieved_rank: index + 1,
+      })),
+      proof: {
+        canonicalJoinedCount: items.length, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0, representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0, graphScoreAttachedCount: 0, graphScoreMissingCount: items.length,
+        summaryResolvedCount: items.length, summaryStaleRejectedCount: 0, validationReasons: {},
+      },
+    }));
+    mockRerankCanonicalFeatureEnvelopes.mockImplementation(async (_query: string, items: Array<Record<string, unknown>>) => ({
+      results: items.map((item, index) => ({ ...item, retrieved_rank: index + 1, rank_after: index + 1 })),
+      provenance: {
+        cacheStatus: 'miss', cacheKey: 'test', modelVersion: 'none', rendererVersion: 'search-runtime-v1',
+        authScope: 'public', topK: 2, maxLength: 1024, crossEncoderAttempted: false,
+        crossEncoderUsed: false, fallbackUsed: false, latencyMs: 0,
+      },
+    }));
+    const runtime = new SearchRuntime({ readOnly: true, retrievers: [{
+      lane: 'ast',
+      retrieve: async () => [{
+        packetKey: 'packet-1', sourceRef: 'src/client/seed.ts', sourceRevision,
+        workspaceRevision, rank: 1, score: 0.9, lane: 'ast', metadata: { graph_revision: graphRevision },
+      }],
+    }] });
+
+    const result = await runtime.search({ text: 'follow graph path', topK: 2, workspaceRevision });
+
+    expect(mockExecuteGraphV2BoundedTraversalV1).toHaveBeenCalledWith(expect.objectContaining({
+      workspaceRevision, graphRevision, maxDepth: 3,
+      seeds: [{ packetKey: 'packet-1', sourceRef: 'src/client/seed.ts', sourceRevision }],
+    }));
+    expect(mockHydrateCandidatesWithProof.mock.calls[0]?.[0].map((item: { packetKey: string }) => item.packetKey))
+      .toContain('packet-2');
+    expect(result.packets.map((packet) => packet.packet_key)).toContain('packet-2');
+    expect(result.provenance.graphCandidateEvidence).toContainEqual(expect.objectContaining({
+      packetKey: 'packet-2',
+      evidenceRefs: ['graph-v2:edge:first', 'graph-v2:edge:last'],
+    }));
+  });
+
+  it('routes a bounded n-ary code fact through packet binding, hydration, and final Top-K', async () => {
+    const workspaceRevision = `sha256:${'1'.repeat(64)}`;
+    const graphRevision = `sha256:${'2'.repeat(64)}`;
+    const sourceRevision = `sha256:${'3'.repeat(64)}`;
+    const seedId = 'packet:00000000-0000-5000-8000-000000000001';
+    const relatedId = 'packet:00000000-0000-5000-8000-000000000003';
+    mockReadKagCodeHyperedgesV1.mockResolvedValue([{
+      schemaVersion: 'atlas.hyperedge.v1',
+      hyperedgeId: 'hyperedge:test-nary',
+      predicate: 'CALLS',
+      participants: [
+        { canonicalId: seedId, role: 'caller', ordinal: 0 },
+        { canonicalId: relatedId, role: 'callee', ordinal: 1 },
+        { canonicalId: 'concept:service', role: 'context', ordinal: 2 },
+      ],
+      evidenceRefs: ['source-span:src/lib/example.ts:0-10'],
+      workspaceRevision, graphRevision, sourceRevision,
+      producerRevision: `sha256:${'4'.repeat(64)}`,
+      checksum: 'a'.repeat(64),
+    }]);
+    mockResolveKagPacketBindingsV1.mockResolvedValue([{
+      canonicalId: relatedId,
+      packetKey: 'packet-3',
+      sourceRef: 'src/server/callee.ts',
+      sourceRevision,
+      workspaceRevision,
+      graphRevision,
+    }]);
+    mockHydrateCandidatesWithProof.mockImplementation(async (items: Array<Record<string, unknown>>) => ({
+      envelopes: items.map((candidate, index) => ({
+        chunk_id: String(candidate.packetKey), packet_key: String(candidate.packetKey),
+        source_ref: String(candidate.sourceRef), relative_path: String(candidate.sourceRef),
+        workspace_revision: String(candidate.workspaceRevision), graph_revision: graphRevision,
+        source_revision: String(candidate.sourceRevision), summary: 'qualified', content: 'qualified',
+        retrieved_rank: index + 1,
+      })),
+      proof: {
+        canonicalJoinedCount: items.length, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0, representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0, graphScoreAttachedCount: 0, graphScoreMissingCount: items.length,
+        summaryResolvedCount: items.length, summaryStaleRejectedCount: 0, validationReasons: {},
+      },
+    }));
+    mockRerankCanonicalFeatureEnvelopes.mockImplementation(async (_query: string, items: Array<Record<string, unknown>>) => ({
+      results: items.map((item, index) => ({ ...item, retrieved_rank: index + 1, rank_after: index + 1 })),
+      provenance: {
+        cacheStatus: 'miss', cacheKey: 'test', modelVersion: 'none', rendererVersion: 'search-runtime-v1',
+        authScope: 'public', topK: 2, maxLength: 1024, crossEncoderAttempted: false,
+        crossEncoderUsed: false, fallbackUsed: false, latencyMs: 0,
+      },
+    }));
+    const runtime = new SearchRuntime({ readOnly: true, retrievers: [{
+      lane: 'ast',
+      retrieve: async () => [{
+        packetKey: 'packet-1', sourceRef: 'src/lib/example.ts', sourceRevision, workspaceRevision,
+        rank: 1, score: 0.9, lane: 'ast', metadata: { graph_revision: graphRevision },
+      }],
+    }] });
+
+    const result = await runtime.search({ text: 'follow a call graph', topK: 2, workspaceRevision });
+    expect(mockReadKagCodeHyperedgesV1).toHaveBeenCalledWith([seedId], { workspaceRevision, graphRevision });
+    expect(mockResolveKagPacketBindingsV1).toHaveBeenCalledWith([relatedId], { workspaceRevision, graphRevision });
+    expect(mockHydrateCandidatesWithProof.mock.calls[0]?.[0].map((candidate: { packetKey: string }) => candidate.packetKey)).toContain('packet-3');
+    expect(result.packets.map((packet) => packet.packet_key)).toContain('packet-3');
   });
 
   it('accepts hostile query strings as data and preserves the search contract', async () => {
@@ -521,6 +877,7 @@ describe('search runtime bridge', () => {
     });
     const expandedQuery = [query, ...expansion.expansions.map((term) => term.term)].join(' ');
     const observedQueries: string[] = [];
+    const observedWorkspaceRevisions: Array<string | undefined> = [];
 
     mockRecordPromotionIntent.mockReset();
     mockAppendSearchRuntimeTrainingRow.mockReset();
@@ -583,8 +940,9 @@ describe('search runtime bridge', () => {
 
     const makeRetriever = (lane: 'sparse' | 'dense') => ({
       lane,
-      async retrieve(input: { query: string; limit: number; filters?: Record<string, unknown> }) {
+      async retrieve(input: { query: string; limit: number; filters?: Record<string, unknown>; workspaceRevision?: string }) {
         observedQueries.push(`${lane}:${input.query}`);
+        observedWorkspaceRevisions.push(input.workspaceRevision);
         const candidates = [{
           packetKey: `${lane}-shared`,
           sourceRef: `src/${lane}-shared.ts`,
@@ -626,8 +984,16 @@ describe('search runtime bridge', () => {
     expect(observedQueries.filter((value) => value.startsWith('dense:'))).toHaveLength(2);
     expect(observedQueries.some((value) => value === `sparse:${query}`)).toBe(true);
     expect(observedQueries.some((value) => value === `dense:${expandedQuery}`)).toBe(true);
+    expect(observedWorkspaceRevisions).toEqual(Array(4).fill(baseRequest.workspaceRevision));
     expect(literalResult.provenance.readOnly).toBe(true);
     expect(expandedResult.provenance.readOnly).toBe(true);
+    const hydratedCandidates = mockHydrateCandidatesWithProof.mock.calls[0]?.[0] as Array<{
+      packetKey: string;
+      symbolVersionId: string | null;
+    }>;
+    expect(hydratedCandidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ packetKey: 'sparse-shared', symbolVersionId: null }),
+    ]));
     expect(literalResult.provenance.promotionAttempted).toBe(false);
     expect(expandedResult.provenance.promotionAttempted).toBe(false);
     expect(mockRecordPromotionIntent).not.toHaveBeenCalled();
@@ -816,5 +1182,127 @@ describe('SearchResult.provenance.hypergraphNeighbors — KAG-01/02 additive int
       hypergraphNeighbors: [{ canonicalId: 'packet:a', hyperedgeIds: ['hyperedge:1', 'hyperedge:2'] }],
     };
     expect(provenance.hypergraphNeighbors?.[0].canonicalId).toBe('packet:a');
+  });
+});
+
+describe('Function Registry final Top-K proof identity', () => {
+  it('matches the exact symbol, AST node, source, and revisions when packet keys differ', () => {
+    const candidate = {
+      packetKey: 'packet:registry-key',
+      sourceRef: 'src/example.ts',
+      sourceRevision: 'sha256:source',
+      workspaceRevision: 'sha256:workspace',
+      functionRegistryEvidence: {
+        snapshotChecksum: 'a'.repeat(64),
+        canonicalId: 'function:example',
+        symbolVersionId: 'symbol-version:example',
+        treeNodeId: 'tree-node:example',
+        sourceContentHash: 'b'.repeat(64),
+        startByte: 1,
+        endByte: 10,
+        evidenceChecksum: 'c'.repeat(64),
+      },
+    };
+    const matchingFinalPacket = {
+      packet_key: 'canonical-chunk-key',
+      symbol_version_id: 'symbol-version:example',
+      tree_node_id: 'tree-node:example',
+      source_revision: 'sha256:source',
+      workspace_revision: 'sha256:workspace',
+      source_ref: 'src/example.ts',
+    };
+
+    const proof = buildFunctionRegistryRetrievalProofV1({
+      enabled: true,
+      readOnly: true,
+      candidates: [candidate] as any,
+      hydratedPackets: [matchingFinalPacket] as any,
+      rerankedPackets: [matchingFinalPacket] as any,
+      postProcessedPacketKeys: ['canonical-chunk-key'],
+      postProcessDecisions: [{
+        packetKey: 'canonical-chunk-key',
+        decision: 'KEEP',
+        reason: 'TOP_K',
+        detail: 'kept',
+      }] as any,
+      finalPackets: [matchingFinalPacket] as any,
+    });
+
+    expect(proof.qualifiedFinalCandidateCount).toBe(1);
+    expect(proof.candidates[0].presentInFinalTopK).toBe(true);
+    expect(proof.candidates[0]).toMatchObject({
+      presentAfterHydration: true,
+      presentAfterRerank: true,
+      presentAfterPostProcess: true,
+      dropStage: 'NONE',
+      postProcessDecision: { decision: 'KEEP', reason: 'TOP_K', detail: 'kept' },
+    });
+
+    const diversityDroppedProof = buildFunctionRegistryRetrievalProofV1({
+      enabled: true,
+      readOnly: true,
+      candidates: [candidate] as any,
+      hydratedPackets: [matchingFinalPacket] as any,
+      rerankedPackets: [matchingFinalPacket] as any,
+      postProcessedPacketKeys: [],
+      postProcessDecisions: [{
+        packetKey: 'canonical-chunk-key',
+        decision: 'DROP',
+        reason: 'SOURCE_DIVERSITY',
+        detail: 'dedupPrefixDepth=2 prefix=sveltekit-frontend/src',
+      }] as any,
+      finalPackets: [] as any,
+    });
+
+    expect(diversityDroppedProof.candidates[0]).toMatchObject({
+      presentAfterHydration: true,
+      presentAfterRerank: true,
+      presentAfterPostProcess: false,
+      presentInFinalTopK: false,
+      dropStage: 'POST_PROCESS',
+      postProcessDecision: {
+        decision: 'DROP',
+        reason: 'SOURCE_DIVERSITY',
+        detail: 'dedupPrefixDepth=2 prefix=sveltekit-frontend/src',
+      },
+    });
+  });
+
+  it('does not match symbol identity when any source qualification differs', () => {
+    const candidate = {
+      packetKey: 'packet:registry-key',
+      sourceRef: 'src/example.ts',
+      sourceRevision: 'sha256:source',
+      workspaceRevision: 'sha256:workspace',
+      functionRegistryEvidence: {
+        snapshotChecksum: 'a'.repeat(64),
+        canonicalId: 'function:example',
+        symbolVersionId: 'symbol-version:example',
+        treeNodeId: 'tree-node:example',
+        sourceContentHash: 'b'.repeat(64),
+        startByte: 1,
+        endByte: 10,
+        evidenceChecksum: 'c'.repeat(64),
+      },
+    };
+    const staleFinalPacket = {
+      packet_key: 'canonical-chunk-key',
+      symbol_version_id: 'symbol-version:example',
+      tree_node_id: 'tree-node:example',
+      source_revision: 'sha256:stale',
+      workspace_revision: 'sha256:workspace',
+      source_ref: 'src/example.ts',
+    };
+
+    const proof = buildFunctionRegistryRetrievalProofV1({
+      enabled: true,
+      readOnly: true,
+      candidates: [candidate] as any,
+      finalPackets: [staleFinalPacket] as any,
+    });
+
+    expect(proof.qualifiedFinalCandidateCount).toBe(0);
+    expect(proof.candidates[0].presentInFinalTopK).toBe(false);
+    expect(proof.candidates[0].dropStage).toBe('HYDRATION');
   });
 });

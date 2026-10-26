@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.centroid-nes-alignment.v1",
+  "generatedAt": "2026-10-23T23:48:00.000Z",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "centroidAlignment": {
+    "keyPattern": "atlas:centroid:som:<row>:<col>",
+    "defaultTtlSeconds": 86400,
+    "legacyPatternDeprecated": "centroid:som_cell:*",
+    "bugFixed": "embeddingToFloat32 silently failed on Buffer from postgres bytea; now parses Buffer / Array / JSON text into Float32Array",
+    "activeCells": 325,
+    "computedCentroids": 325
+  },
+  "nesPaletteAlignment": {
+    "sharedArtifact": "scripts/atlas/data/nes-domain-palette-v1.json",
+    "nodePalette": "scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs",
+    "pythonAceCompiler": "python/parent_atlas_learning/ace_compiler.py",
+    "pythonBridge": "python/atlas_compute/nes_lut_palette.py",
+    "status": "EXACT_PARITY",
+    "domains": [
+      { "domain": "auth", "lutByte": 1, "nesHex": "0x16" },
+      { "domain": "ui", "lutByte": 2, "nesHex": "0x2A" },
+      { "domain": "retrieval", "lutByte": 3, "nesHex": "0x21" },
+      { "domain": "network", "lutByte": 4, "nesHex": "0x2C" },
+      { "domain": "database", "lutByte": 5, "nesHex": "0x12" },
+      { "domain": "cache", "lutByte": 6, "nesHex": "0x27" },
+      { "domain": "agent", "lutByte": 7, "nesHex": "0x24" },
+      { "domain": "graph", "lutByte": 8, "nesHex": "0x1A" },
+      { "domain": "ml", "lutByte": 9, "nesHex": "0x14" },
+      { "domain": "general", "lutByte": 10, "nesHex": "0x0F" }
+    ],
+    "unresolvedByte": 0
+  },
+  "radixTopK": {
+    "glyphScoreOracle": "scripts/atlas/ace-radix-01/glyph-score-v1.mjs",
+    "cutileLevel2": "scripts/atlas/ace-radix-01/run-cutile-level2-bench.mjs",
+    "hllRegisters": 1024,
+    "suitePassed": true
+  }
+}

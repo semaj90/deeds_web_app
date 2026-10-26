@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.domain-calibration-bound-draft.v3",
+  "generatedAt": "2026-10-24T22:39:40Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "sourceInput": ".tmp\\atlas\\domain-review-v3\\candidates.jsonl",
+  "sourceInputChecksum": "sha256:c72722fa81d18dc26b848b29445a6550f8be7ef998132008ab56f5f84ec1d290",
+  "outputFile": "docs\\reports\\domain-calibration-draft-v3.jsonl",
+  "outputChecksum": "sha256:f58f1b0052fac964ae2d878a80ff3d3baa7baa5f1418155c9030f32bce64d010",
+  "stats": {
+    "total": 150,
+    "sourceRevisionBound": 149,
+    "packetKeyJoined": 79,
+    "sourceFileNotFound": 1,
+    "evidenceSpanVerified": 84
+  }
+}

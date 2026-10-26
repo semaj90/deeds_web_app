@@ -18,10 +18,14 @@ const OUT_PATH = path.join(REPORT_DIR, 'workstation-progress-receipt-v1.json');
 const sources = {
   graphifyAuthority: 'current-graphify-snapshot-authority-v1.json',
   executionOwner: 'current-graphify-execution-owner-resolution-v1.json',
+  packetDigestBridge: 'packet-digest-bridge-proposal-v1.json',
   packetChunk: 'current-packet-chunk-identity-reconciliation-v1.json',
   graphReadiness: 'current-graph-artifact-readiness-v1.json',
   packetWriters: 'packet-writer-lineage-v1.json',
   eventContract: 'packet-write-revision-contract-v1.json',
+  historicalChunk: 'historical-chunk-resolver-receipt-v2.json',
+  producerProvenance: 'chunk-producer-provenance-v1.json',
+  stubScanner: 'incomplete-code-stubs-scan-v1.json',
 };
 
 function readReceipt(fileName) {
@@ -39,12 +43,16 @@ function check(id, label, proven, detail) {
   return { id, label, proven: Boolean(proven), detail };
 }
 
-function gate(id, owner, checks, blockers) {
+function gate(id, canonicalTaskId, owner, proofKind, evidenceReceiptRefs, checks, blockers, sourceRevision = null) {
   const passed = checks.filter((item) => item.proven).length;
   const total = checks.length;
   return {
     id,
+    canonicalTaskId,
     owner,
+    sourceRevision,
+    proofKind,
+    evidenceReceiptRefs: Array.isArray(evidenceReceiptRefs) ? evidenceReceiptRefs : [],
     state: passed === total ? 'PROVEN' : passed > 0 ? 'PARTIAL' : 'BLOCKED',
     proofScore: total === 0 ? 0 : Number((passed / total * 100).toFixed(2)),
     proof: { passed, total, checks },
@@ -55,10 +63,13 @@ function gate(id, owner, checks, blockers) {
 const loaded = Object.fromEntries(Object.entries(sources).map(([key, fileName]) => [key, readReceipt(fileName)]));
 const authority = loaded.graphifyAuthority.data;
 const executionOwner = loaded.executionOwner.data;
+const packetDigestBridge = loaded.packetDigestBridge.data;
 const packetChunk = loaded.packetChunk.data;
 const graph = loaded.graphReadiness.data;
 const packetWriters = loaded.packetWriters.data;
 const eventContract = loaded.eventContract.data;
+
+const currentWorkspaceRevision = authority?.sourceSnapshot?.workspaceRevision ?? null;
 
 const authorityCandidates = Array.isArray(authority?.candidates) ? authority.candidates : [];
 const authorityChecks = [
@@ -74,6 +85,14 @@ const packetChecks = [
   check('canonical_digests', 'canonical content digests match', Number(packetCounts.packet_digest_matches ?? 0) > 0, packetCounts.packet_digest_matches ?? 0),
   check('chunk_lineage', 'packet/chunk lineage matches', Number(packetCounts.packet_lineage_matches ?? 0) > 0, packetCounts.packet_lineage_matches ?? 0),
   check('no_missing_packets', 'no current sources are missing packets', Number(packetCounts.missing_packet_rows ?? 1) === 0, packetCounts.missing_packet_rows ?? null),
+];
+
+const bridgeCounts = packetDigestBridge?.counts ?? {};
+const bridgeChecks = [
+  check('bridge_schema', 'packet digest bridge proposal audit schema valid', packetDigestBridge?.schema === 'atlas.packet-digest-bridge-proposal-audit.v1', packetDigestBridge?.schema ?? null),
+  check('source_authority_linked', 'source authority receipt linked', Boolean(packetDigestBridge?.receiptReferences?.sourceAuthorityReceiptRef), packetDigestBridge?.receiptReferences?.sourceAuthorityReceiptRef ?? null),
+  check('packet_lineage_linked', 'packet lineage receipt linked', Boolean(packetDigestBridge?.receiptReferences?.packetLineageReceiptRef), packetDigestBridge?.receiptReferences?.packetLineageReceiptRef ?? null),
+  check('admission_strictly_non_promotional', 'admission authorized is strictly false', packetDigestBridge?.admissionAuthorized === false, 'admissionAuthorized=false'),
 ];
 
 const graphChecks = [
@@ -94,12 +113,39 @@ const eventChecks = [
   check('caller_adoption', 'all packet callers are revision qualified', eventContract?.acceptance?.allLiveCallersRevisionQualified === true, eventContract?.acceptance?.allLiveCallersRevisionQualified ?? null),
 ];
 
+const historicalChunk = loaded.historicalChunk.data;
+const producerProvenance = loaded.producerProvenance.data;
+const stubScanner = loaded.stubScanner.data;
+
+const historicalChunkChecks = [
+  check('resolver_schema', 'historical chunk resolver schema valid', historicalChunk?.schema === 'atlas.historical-chunk-resolver.v2', historicalChunk?.schema ?? null),
+  check('read_only_invariants', 'resolver strictly read-only with no database writes', historicalChunk?.readOnly === true && historicalChunk?.writesPerformed === false, 'readOnly=true,writesPerformed=false'),
+  check('current_source_qualification', 'chunks verified against current worktree source text', Number(historicalChunk?.summary?.currentSourceVerified ?? 0) > 0, `verified=${historicalChunk?.summary?.currentSourceVerified ?? 0}`),
+  check('rebuild_cohort_isolated', 'stale/historical chunks isolated to rebuild cohort', Array.isArray(historicalChunk?.recommendedRebuildCohort), `rebuildCohort=${historicalChunk?.recommendedRebuildCohort?.length ?? 0}`),
+];
+
+const producerChecks = [
+  check('provenance_schema', 'chunk producer provenance schema valid', producerProvenance?.schema === 'atlas.chunk-producer-provenance-report.v1', producerProvenance?.schema ?? null),
+  check('producers_inventoried', 'content and lineage writers catalogued', Array.isArray(producerProvenance?.producerCensus?.knownContentProducers) && Array.isArray(producerProvenance?.producerCensus?.knownLineageProducers), 'producers catalogued'),
+  check('unproven_claims_prevented', 'producerIdentified remains strictly false without cryptographic proof', producerProvenance?.counts?.producerIdentified === 0, 'producerIdentified=0'),
+];
+
+const stubChecks = [
+  check('stub_scanner_schema', 'stub scanner schema valid', stubScanner?.schema === 'atlas.incomplete-code-stubs-scan.v1', stubScanner?.schema ?? null),
+  check('reachability_classified', 'production reachability explicitly distinguished from test fixtures', Number(stubScanner?.summary?.byReachability?.PROVEN ?? 0) >= 0 && Number(stubScanner?.summary?.byReachability?.TEST_ONLY ?? 0) >= 0, `proven=${stubScanner?.summary?.byReachability?.PROVEN},testOnly=${stubScanner?.summary?.byReachability?.TEST_ONLY}`),
+  check('mutation_strictly_disallowed', 'findings enforce mutationAllowed: false', stubScanner?.findings?.every((f) => f.mutationAllowed === false) === true, 'mutationAllowed=false'),
+];
+
 const gates = [
-  gate('GRAPHIFY_EXECUTION_SNAPSHOT_OWNER', 'Graphify snapshot authority', authorityChecks, [authority?.status ?? 'AUTHORITY_RECEIPT_MISSING']),
-  gate('CURRENT_PACKET_CHUNK_LINEAGE', 'Source to packet to chunk', packetChecks, [packetChunk?.status ?? 'PACKET_RECEIPT_MISSING']),
-  gate('CURRENT_GRAPH_ORDINAL', 'Graph edges and ordinal map', graphChecks, [graph?.status ?? 'GRAPH_RECEIPT_MISSING']),
-  gate('PACKET_WRITER_LINEAGE', 'Packet writer adoption', packetWriterChecks, [packetWriters?.verdict ?? 'WRITER_RECEIPT_MISSING']),
-  gate('CANONICAL_EVENT_ADOPTION', 'Canonical durable event', eventChecks, [eventContract?.nextGate ?? 'EVENT_RECEIPT_MISSING']),
+  gate('GRAPHIFY_EXECUTION_SNAPSHOT_OWNER', 'GRAPHIFY-SNAPSHOT-AUTHORITY-01', 'Graphify snapshot authority', 'LIVE_ADMISSION_PROOF', [loaded.graphifyAuthority.path, loaded.executionOwner.path], authorityChecks, [authority?.status ?? 'AUTHORITY_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('PACKET_DIGEST_BRIDGE_ADMISSION', 'PACKET-DIGEST-BRIDGE-ADMISSION-01', 'Packet digest bridge proposal', 'LIVE_ADMISSION_PROOF', [loaded.packetDigestBridge.path], bridgeChecks, [packetDigestBridge ? 'ADMISSION_PROPOSAL_ONLY' : 'BRIDGE_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('CURRENT_PACKET_CHUNK_LINEAGE', 'CURRENT-PACKET-CHUNK-LINEAGE-01', 'Source to packet to chunk', 'LIVE_ADMISSION_PROOF', [loaded.packetChunk.path], packetChecks, [packetChunk?.status ?? 'PACKET_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('HISTORICAL_CHUNK_01', 'HISTORICAL-CHUNK-01', 'Historical chunk resolver', 'LIVE_ADMISSION_PROOF', [loaded.historicalChunk.path], historicalChunkChecks, [historicalChunk ? 'DIAGNOSTIC_RECOVERY_ONLY' : 'HISTORICAL_CHUNK_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('CHUNK_PRODUCER_01', 'CHUNK-PRODUCER-01', 'Chunk producer provenance', 'LIVE_ADMISSION_PROOF', [loaded.producerProvenance.path], producerChecks, [producerProvenance ? 'PRODUCER_INVESTIGATION_DIAGNOSTIC' : 'PRODUCER_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('STUB_SCAN_01', 'STUB-SCAN-01', 'Incomplete code and stub scanner', 'LIVE_ADMISSION_PROOF', [loaded.stubScanner.path], stubChecks, [stubScanner ? 'STATIC_SCAN_DIAGNOSTIC' : 'STUB_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('CURRENT_GRAPH_ORDINAL', 'CURRENT-GRAPH-ORDINAL-01', 'Graph edges and ordinal map', 'FIXTURE_PROOF', [loaded.graphReadiness.path], graphChecks, [graph?.status ?? 'GRAPH_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('PACKET_WRITER_LINEAGE', 'PACKET-WRITER-LINEAGE-01', 'Packet writer adoption', 'DERIVED_PROJECTION', [loaded.packetWriters.path], packetWriterChecks, [packetWriters?.verdict ?? 'WRITER_RECEIPT_MISSING'], currentWorkspaceRevision),
+  gate('CANONICAL_EVENT_ADOPTION', 'PACKET-WRITE-REVISION-CONTRACT-01', 'Canonical durable event', 'LIVE_ADMISSION_PROOF', [loaded.eventContract.path], eventChecks, [eventContract?.nextGate ?? 'EVENT_RECEIPT_MISSING'], currentWorkspaceRevision),
 ];
 
 const passed = gates.reduce((sum, item) => sum + item.proof.passed, 0);

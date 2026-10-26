@@ -1,3 +1,4 @@
+import { appendRuntimeEvent, buildRuntimeEvent, runtimeEventsEnabled } from './observability/runtime-event-jsonl.js';
 // LoggingConfig inlined from archived config/unified-config.ts
 interface LoggingConfig {
     level: 'debug' | 'info' | 'warn' | 'error';
@@ -404,6 +405,16 @@ export class ProductionLogger {
 
         if (this.config.outputs.includes('syslog')) {
             this.outputToSyslog(entry);
+        }
+        if (runtimeEventsEnabled()) {
+            const ctx = entry.context as { requestId?: string; duration?: number } | undefined;
+            void appendRuntimeEvent(buildRuntimeEvent({
+                stage: 'log',
+                outcome: entry.level,
+                requestId: ctx?.requestId ?? null,
+                durationMs: ctx?.duration ?? null,
+                eventCode: entry.level,
+            }));
         }
     }
 

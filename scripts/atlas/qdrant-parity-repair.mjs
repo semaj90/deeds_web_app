@@ -53,6 +53,11 @@ function resolveCollection() {
 }
 
 const collectionName = resolveCollection();
+if (APPLY && collectionName && /^codebase_chunks_384(?:_|$)/.test(collectionName)) {
+  console.error('LEGACY_384_QDRANT_REPAIR_DISABLED: retired 384-D collections are read-only');
+  process.exit(78);
+}
+
 const sampleResolved = resolveSample();
 const BATCH_SIZE     = 25;
 const QDRANT_URL     = process.env.QDRANT_URL || 'http://127.0.0.1:6333';

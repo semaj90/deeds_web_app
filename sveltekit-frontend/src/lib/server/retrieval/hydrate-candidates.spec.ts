@@ -19,7 +19,7 @@ function baseCandidate(overrides: Partial<FusedCandidate> = {}): FusedCandidate 
     summary: 'a summary',
     content: 'content',
     score: 0.75,
-    scoreSource: 'postgres_trigram',
+    scoreSource: 'postgres_fts',
     fusionScore: 0.5,
     rankBefore: 1,
     sourceCount: 1,
@@ -29,7 +29,7 @@ function baseCandidate(overrides: Partial<FusedCandidate> = {}): FusedCandidate 
 
 function mockRow(overrides: Record<string, unknown> = {}) {
   return {
-    id: 'row-a',
+    id: 'packet-a',
     qdrant_id: null,
     relative_path: 'src/foo.ts',
     source_ref: 'src/foo.ts',
@@ -52,12 +52,88 @@ function mockRow(overrides: Record<string, unknown> = {}) {
 }
 
 describe('hydrateCandidatesWithProof — BM25/lexical signal wiring', () => {
+  it('preserves qualified candidate identities over null metadata fields', async () => {
+    mockExecute.mockResolvedValueOnce({ rows: [mockRow({
+      metadata: { packet_key: null, symbol_version_id: null, tree_node_id: null },
+    })] });
+    mockExecute.mockResolvedValueOnce({ rows: [] });
+
+    const { envelopes, proof } = await hydrateCandidatesWithProof([
+      baseCandidate({
+        scoreSource: 'ast_tree',
+        symbolVersionId: 'symbol-version:qualified',
+        treeNodeId: 'tree-node:qualified',
+        workspaceRevision: 'sha256:workspace',
+        sourceRevision: 'sha256:source',
+      }),
+    ]);
+
+    expect(envelopes).toHaveLength(1);
+    expect(envelopes[0]).toMatchObject({
+      packet_key: 'packet-a',
+      symbol_version_id: 'symbol-version:qualified',
+      tree_node_id: 'tree-node:qualified',
+      workspace_revision: 'sha256:workspace',
+      source_revision: 'sha256:source',
+    });
+    expect(proof.validationReasons).toEqual({});
+  });
+
+  it('does not invent a symbol-version identity from a packet key', async () => {
+    mockExecute.mockResolvedValueOnce({ rows: [mockRow({
+      metadata: { packet_key: 'packet-a', symbol_version_id: null },
+    })] });
+    mockExecute.mockResolvedValueOnce({ rows: [] });
+
+    const { envelopes } = await hydrateCandidatesWithProof([baseCandidate()]);
+
+    expect(envelopes).toHaveLength(1);
+    expect(envelopes[0]?.packet_key).toBe('packet-a');
+    expect(envelopes[0]?.symbol_version_id).toBeUndefined();
+  });
+
+  it('prefers exact identity and rejects another candidate through an ambiguous source path', async () => {
+    mockExecute.mockResolvedValueOnce({ rows: [mockRow({
+      id: 'row-exact',
+      source_ref: 'src/shared.ts',
+      relative_path: 'src/shared.ts',
+      metadata: { packet_key: 'packet-exact' },
+    })] });
+    mockExecute.mockResolvedValueOnce({ rows: [mockRow({
+      id: 'row-newest-but-ambiguous',
+      source_ref: 'src/shared.ts',
+      relative_path: 'src/shared.ts',
+      match_count: 2,
+    })] });
+
+    const { envelopes, proof } = await hydrateCandidatesWithProof([
+      baseCandidate({ packetKey: 'packet-exact', sourceRef: 'src/shared.ts' }),
+      baseCandidate({ packetKey: 'packet-other', sourceRef: 'src/shared.ts' }),
+    ]);
+
+    expect(envelopes).toHaveLength(1);
+    expect(envelopes[0]?.packet_key).toBe('packet-exact');
+    expect(proof.candidateResolutions).toEqual([
+      expect.objectContaining({
+        packetKey: 'packet-exact',
+        status: 'HYDRATED',
+        matchedBy: 'EXACT_IDENTITY',
+        rowId: 'row-exact',
+      }),
+      expect.objectContaining({
+        packetKey: 'packet-other',
+        status: 'AMBIGUOUS_SOURCE_REF',
+        reason: 'SOURCE_REF_MATCHES_MULTIPLE_ROWS',
+      }),
+    ]);
+  });
+
   it('populates envelope.lexical from a postgres_trigram (real ts_rank BM25) candidate', async () => {
     mockExecute.mockResolvedValueOnce({ rows: [mockRow()] }); // exact-match query
     mockExecute.mockResolvedValueOnce({ rows: [] }); // source_ref fallback query (unused here)
 
     const { envelopes } = await hydrateCandidatesWithProof([
-      baseCandidate({ score: 0.82, scoreSource: 'postgres_trigram' }),
+      baseCandidate({ score: 0.82, scoreSource: 'postgres_fts' }),
     ]);
 
     expect(envelopes).toHaveLength(1);
@@ -88,7 +164,7 @@ describe('hydrateCandidatesWithProof — BM25/lexical signal wiring', () => {
     mockExecute.mockResolvedValueOnce({ rows: [] });
 
     const { envelopes } = await hydrateCandidatesWithProof([
-      baseCandidate({ score: 1.4, scoreSource: 'postgres_trigram' }),
+      baseCandidate({ score: 1.4, scoreSource: 'postgres_fts' }),
     ]);
 
     expect(envelopes[0].lexical?.score).toBe(1);

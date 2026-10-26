@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.deep-audit-telemetry.v1",
+  "adapter": "EXACT_SET_ADAPTER (in-memory, not HLL, not persisted)",
+  "namespace": "deep-audit",
+  "windowId": "2026-10-21",
+  "graphFile": "docs/reports/graph-probes/codebase-graph.2026-10-21T23-13-07-056Z-66436.json",
+  "graphSha256": "18a98f5a4d9874ea7623fc04f6cc52b95717d30921ab98eda4ec6d9470a1a5c2",
+  "distinctCounts": {
+    "files_scanned": 6339,
+    "server_routes": 962,
+    "routes_without_auth": 43,
+    "routes_without_test": 152,
+    "body_parsers_without_zod": 0
+  },
+  "writesPerformed": {
+    "valkey": false,
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "files": "receipt only"
+  },
+  "canonicalAuthority": false
+}

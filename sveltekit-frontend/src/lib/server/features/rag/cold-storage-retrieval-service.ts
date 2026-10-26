@@ -30,7 +30,7 @@ export class ColdStorageRetrievalService {
           gpu_cluster as gpuCluster,
           1 - (embedding <=> $1::vector) as score
         FROM embedded_summaries
-        ORDER BY embedding <=> $1::vector
+        ORDER BY embedding <=> $1::vector ASC, id ASC
         LIMIT $2
       `, [vectorStr, limit]);
 

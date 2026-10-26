@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { sections, keyInsights, sourceRefs, featureIds, intent, promptVersion, model } = parsed.data;
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { embedOrChatFetch } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
@@ -57,7 +57,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					model
 				},
 				async (ctx): Promise<Phase101SummaryGeneration> => {
-					const res = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
+					const res = await embedOrChatFetch(`${ollamaBaseUrl}/api/generate`, {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({

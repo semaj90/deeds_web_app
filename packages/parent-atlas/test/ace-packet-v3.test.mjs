@@ -5,7 +5,8 @@ import { buildFeatureRelationship } from '../dist/core/feature-intelligence.js';
 import { aceHypergraphPayloadSchema } from '../dist/core/ace-hypergraph-payload.js';
 import { buildAcePacketV2 } from '../dist/core/ace-packet-v2.js';
 import { runHypergraphFusionFacade } from '../dist/core/hypergraph-fusion-facade.js';
-import { attachHypergraphEvidenceToAcePacketV3, buildAcePacketV3, verifyAcePacketV3 } from '../dist/core/ace-packet-v3.js';
+import { attachDomainClassificationHintToAcePacketV3, attachHypergraphEvidenceToAcePacketV3, buildAcePacketV3, verifyAcePacketV3 } from '../dist/core/ace-packet-v3.js';
+import { buildDomainClassificationV1 } from '../dist/core/domain-classification-v1.js';
 import { buildAcePacketV4, verifyAcePacketV4 } from '../dist/core/ace-packet-v4.js';
 
 const sha = (c) => `sha256:${c.repeat(64)}`;
@@ -77,6 +78,55 @@ test('builds a sealed v3 packet with a deterministic checksum that verifies', as
   assert.match(a.integrity.packet_checksum, /^sha256:[0-9a-f]{64}$/);
   assert.equal(a.integrity.packet_checksum, b.integrity.packet_checksum);
   assert.equal(verifyAcePacketV3(JSON.parse(JSON.stringify(a))).integrity.packet_checksum, a.integrity.packet_checksum);
+});
+
+test('attaches revision-matched domain classification as a non-authoritative ACE hint', async () => {
+  const packet = buildAcePacketV3(body(await baseV2()));
+  const classification = buildDomainClassificationV1({
+    canonicalId: packet.identity.packet_key,
+    sourceRevision: packet.identity.source_revision,
+    classifierFamily: 'RULES',
+    classifierRevision: 'parent-atlas-domain-taxonomy-v1',
+    probabilities: { retrieval: 0.91 },
+    predictedDomain: 'retrieval',
+    confidence: 0.91,
+    evidenceRefs: ['evidence:route-ast'],
+  });
+
+  const enriched = attachDomainClassificationHintToAcePacketV3(packet, classification);
+  assert.equal(enriched.classification.status, 'HINT');
+  assert.equal(enriched.classification.data.canonicalAuthority, false);
+  assert.deepEqual(enriched.classification.evidence_refs, ['evidence:route-ast']);
+  assert.notEqual(enriched.integrity.packet_checksum, packet.integrity.packet_checksum);
+  assert.equal(verifyAcePacketV3(enriched).classification.data.predictedDomain, 'retrieval');
+  assert.equal(packet.classification, undefined);
+});
+
+test('rejects classification hints with mismatched source identity or no evidence', async () => {
+  const packet = buildAcePacketV3(body(await baseV2()));
+  const classification = buildDomainClassificationV1({
+    canonicalId: packet.identity.packet_key,
+    sourceRevision: packet.identity.source_revision,
+    classifierFamily: 'RULES',
+    classifierRevision: 'parent-atlas-domain-taxonomy-v1',
+    probabilities: { retrieval: 0.91 },
+    predictedDomain: 'retrieval',
+    confidence: 0.91,
+    evidenceRefs: ['evidence:route-ast'],
+  });
+
+  assert.throws(() => attachDomainClassificationHintToAcePacketV3(packet, {
+    ...classification,
+    sourceRevision: 'different-source-revision',
+  }), /SOURCE_REVISION_MISMATCH/);
+  assert.throws(() => attachDomainClassificationHintToAcePacketV3(packet, {
+    ...classification,
+    canonicalId: 'packet:other',
+  }), /PACKET_KEY_MISMATCH/);
+  assert.throws(() => attachDomainClassificationHintToAcePacketV3(packet, {
+    ...classification,
+    evidenceRefs: [],
+  }), /EVIDENCE_REQUIRED/);
 });
 
 test('preserves an explicit AST state when the current pass did not join AST evidence', async () => {

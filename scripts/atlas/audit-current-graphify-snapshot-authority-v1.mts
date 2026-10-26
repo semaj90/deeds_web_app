@@ -1,14 +1,30 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { isAbsolute, relative, resolve } from 'node:path';
 import { Client } from 'pg';
 import { loadAuthorityShadowV1, type AuthorityShadowObservationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = process.cwd();
-const databaseUrl = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const databaseUrl = resolveDatabaseUrl(loadRepoEnv(process.env));
 const producerRevision = 'atlas.current-graphify-snapshot-authority.v1';
-const authorityPath = resolve(root, 'docs/reports/current-graphify-snapshot-authority-v1.json');
-const selectionPath = resolve(root, 'docs/reports/current-source-selection-input-v1.json');
+const reportDirArgIndex = process.argv.findIndex((arg) => arg === '--report-dir' || arg.startsWith('--report-dir='));
+const reportDirArg = reportDirArgIndex < 0
+  ? undefined
+  : process.argv[reportDirArgIndex] === '--report-dir'
+    ? process.argv[reportDirArgIndex + 1]?.trim()
+    : process.argv[reportDirArgIndex].slice('--report-dir='.length).trim();
+if (reportDirArgIndex >= 0 && !reportDirArg) throw new Error('REPORT_DIR_REQUIRED');
+const reportDir = resolve(root, reportDirArg || 'docs/reports');
+const scratchReportRoot = resolve(root, '.tmp/atlas');
+if (reportDirArg) {
+  const relativeReportDir = relative(scratchReportRoot, reportDir);
+  if (relativeReportDir === '..' || relativeReportDir.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) || isAbsolute(relativeReportDir)) {
+    throw new Error('REPORT_DIR_MUST_BE_UNDER_TMP_ATLAS');
+  }
+}
+const authorityPath = resolve(reportDir, 'current-graphify-snapshot-authority-v1.json');
+const selectionPath = resolve(reportDir, 'current-source-selection-input-v1.json');
 const admissionPath = resolve(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const ownerPlanPath = resolve(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
 const ownerPreflightPath = resolve(root, 'docs/reports/selected-graphify-execution-owner-v1.json');
@@ -137,6 +153,7 @@ let workspaceId: string | null = process.env.ATLAS_WORKSPACE_ID?.trim() || null;
 
 try {
   await client.connect();
+  await client.query('BEGIN READ ONLY');
   if (!workspaceId) {
     const workspaceResult = await client.query('SELECT id::text AS id FROM public.workspaces ORDER BY id LIMIT 1');
     workspaceId = (workspaceResult.rows[0]?.id as string | undefined) ?? null;
@@ -254,6 +271,7 @@ try {
     }
   }
 } finally {
+  await client.query('ROLLBACK').catch(() => undefined);
   await client.end().catch(() => undefined);
 }
 
@@ -325,7 +343,7 @@ const selectionReport = {
   downstreamPlannerInput: selected ? 'existing source registry reconciliation planner' : null,
 };
 
-await mkdir(resolve(root, 'docs/reports'), { recursive: true });
+await mkdir(reportDir, { recursive: true });
 const authorityTempPath = `${authorityPath}.${process.pid}.tmp`;
 const selectionTempPath = `${selectionPath}.${process.pid}.tmp`;
 await writeFile(authorityTempPath, `${JSON.stringify(authorityReport, null, 2)}\n`, 'utf8');

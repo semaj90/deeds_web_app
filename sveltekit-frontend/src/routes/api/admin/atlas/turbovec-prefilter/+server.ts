@@ -1,13 +1,25 @@
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
-import { turbovecPrefilter } from '$lib/server/retrieval/turbovec-prefilter.js';
+import { turbovecHealth, turbovecPrefilter } from '$lib/server/retrieval/turbovec-prefilter.js';
 import { ENV } from '$lib/server/env.server.js';
 
 const schema = z.object({
 	query:       z.string().min(1).max(2000),
 	topClusters: z.number().int().min(1).max(20).default(5),
 });
+
+export const GET: RequestHandler = async ({ locals }) => {
+	const headers = { 'Cache-Control': 'no-store' };
+	if (!locals.user) {
+		return json({ ok: false, health: null, error: 'UNAUTHORIZED' }, { status: 401, headers });
+	}
+	const health = await turbovecHealth();
+	return json(
+		{ ok: health !== null, health, error: health === null ? 'TURBOVEC_UNAVAILABLE' : null },
+		{ status: health === null ? 503 : 200, headers },
+	);
+};
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');

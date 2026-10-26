@@ -8,13 +8,12 @@
  * legacy writer is migrated to 768 or archived, remove it from KNOWN_LEGACY_WRITERS.
  */
 import { describe, it, expect } from 'vitest';
-import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { relative, resolve } from 'node:path';
 
 const REPO_ROOT = resolve(__dirname, '../../../../..');
 const SCAN_ROOTS = ['scripts', 'sveltekit-frontend/src', 'sveltekit-frontend/scripts', 'python', 'packages'];
-const SKIP_DIRS = new Set(['node_modules', '.git', 'archive', 'dist', '.svelte-kit', '__pycache__']);
-
 /** A statement that INSERTs into / UPDATEs one of the 384-dim vector surfaces. */
 const WRITE_RE =
 	/(INSERT\s+INTO|UPDATE)[^;]{0,600}?(content_embedding_384|summary_embedding_384|latent_384d|packet_vector_bundles)/is;
@@ -26,28 +25,43 @@ const KNOWN_LEGACY_WRITERS: string[] = [
 	'scripts/atlas/restore-qdrant-384-from-postgres.mjs',
 ];
 
-function walk(dir: string, out: string[]): void {
-	for (const entry of readdirSync(dir, { withFileTypes: true })) {
-		if (SKIP_DIRS.has(entry.name)) continue;
-		const full = join(dir, entry.name);
-		if (entry.isDirectory()) walk(full, out);
-		else if (/\.(mjs|mts|ts|js|py)$/.test(entry.name) && !/\.(test|spec)\./.test(entry.name)) out.push(full);
-	}
-}
-
 function findWriters(): string[] {
-	const files: string[] = [];
-	for (const root of SCAN_ROOTS) {
-		try {
-			walk(join(REPO_ROOT, root), files);
-		} catch {
-			/* root absent in this checkout */
-		}
+	const trackedSearch = spawnSync(
+		'git',
+		[
+			'grep',
+			'-z',
+			'-l',
+			'-I',
+			'-E',
+			'content_embedding_384|summary_embedding_384|latent_384d|packet_vector_bundles',
+			'--',
+			...SCAN_ROOTS,
+		],
+		{ cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 },
+	);
+	if (trackedSearch.error) throw trackedSearch.error;
+	if (trackedSearch.status !== 0 && trackedSearch.status !== 1) {
+		throw new Error(`git grep writer scan failed (${trackedSearch.status}): ${trackedSearch.stderr}`);
 	}
+	const untrackedSearch = spawnSync(
+		'git',
+		['ls-files', '-z', '--others', '--exclude-standard', '--', ...SCAN_ROOTS],
+		{ cwd: REPO_ROOT, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 },
+	);
+	if (untrackedSearch.error) throw untrackedSearch.error;
+	if (untrackedSearch.status !== 0) {
+		throw new Error(`git untracked-file scan failed (${untrackedSearch.status}): ${untrackedSearch.stderr}`);
+	}
+	const codeFile = /\.(mjs|mts|ts|js|py)$/;
+	const files = [
+		...trackedSearch.stdout.split('\0').filter((file) => codeFile.test(file)),
+		...untrackedSearch.stdout.split('\0').filter((file) => codeFile.test(file)),
+	].map((file) => resolve(REPO_ROOT, file));
 	const hits: string[] = [];
 	for (const file of files) {
 		try {
-			if (WRITE_RE.test(readFileSync(file, 'utf8'))) {
+			if (!/\.(test|spec)\./.test(file) && WRITE_RE.test(readFileSync(file, 'utf8'))) {
 				hits.push(relative(REPO_ROOT, file).replace(/\\/g, '/'));
 			}
 		} catch {
@@ -60,7 +74,7 @@ function findWriters(): string[] {
 describe('384-dim embedding writers are frozen', () => {
 	it('has no writer outside the known legacy list', () => {
 		expect(findWriters()).toEqual([...KNOWN_LEGACY_WRITERS].sort());
-	});
+	}, 90_000);
 
 	it('blocks legacy bundle and summary writes before environment or database setup', () => {
 		const bundle = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/populate-packet-vector-bundles.mjs'), 'utf8');
@@ -86,5 +100,32 @@ describe('384-dim embedding writers are frozen', () => {
 		expect(source).toContain('vector.length !== DIM');
 		expect(source).toContain('provenance unverified');
 		expect(source).toContain('--allow-unqualified-experimental-write');
+	});
+
+	it('blocks legacy 384 collection writers and the synthetic evaluator before setup', () => {
+		const disabledEntrypoints: Array<[string, string, string]> = [
+			['sveltekit-frontend/scripts/atlas/backfill-hybrid-collection.mjs', 'LEGACY_384_HYBRID_BACKFILL_DISABLED', 'const PG_CONFIG'],
+			['sveltekit-frontend/scripts/atlas/backfill-qdrant-kmeans-payload.mjs', 'LEGACY_384_KMEANS_PAYLOAD_DISABLED', 'const pool ='],
+			['sveltekit-frontend/scripts/atlas/backfill-qdrant-som-payload.mjs', 'LEGACY_384_SOM_PAYLOAD_DISABLED', 'const pool ='],
+			['sveltekit-frontend/scripts/atlas/backfill-qdrant-packet-key.mjs', 'LEGACY_384_PACKET_KEY_BACKFILL_DISABLED', 'const pool ='],
+			['sveltekit-frontend/scripts/atlas/ensure-qdrant-payload-indexes.mjs', 'LEGACY_384_PAYLOAD_INDEX_DISABLED', 'fetch('],
+			['scripts/atlas/build-qdrant-384-hnsw.mts', 'LEGACY_384_HNSW_BUILD_DISABLED', 'const __dirname'],
+			['scripts/atlas/qdrant-provision-384v2.mjs', 'LEGACY_384_COLLECTION_PROVISION_DISABLED', 'const APPLY'],
+			['scripts/atlas/populate-karpathy-scores.mjs', 'LEGACY_384_KARPATHY_SOURCE_DISABLED', 'dotenv.config'],
+			['sveltekit-frontend/scripts/phase2f/phase2f-evaluation-runner.mts', 'LEGACY_PHASE2F_384_STUB_DISABLED', 'const sql = postgres'],
+		];
+
+		for (const [relativePath, guard, setup] of disabledEntrypoints) {
+			const source = readFileSync(resolve(REPO_ROOT, relativePath), 'utf8');
+			expect(source).toContain(guard);
+			expect(source.indexOf(guard)).toBeLessThan(source.indexOf(setup));
+		}
+	});
+
+	it('uses the 768 packet embedding for envelope presence diagnostics', () => {
+		const source = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/task-2-materialize-envelope-fields.mjs'), 'utf8');
+		expect(source).toContain('SELECT packet_key, feature_id, source_ref, embedding');
+		expect(source).toContain('has_embedding=${row.embedding !== null}');
+		expect(source).not.toContain('content_embedding_384');
 	});
 });

@@ -1,0 +1,64 @@
+{
+  "receipt_id": "DETERMINISTIC-TOPK-AND-KEYSET-01",
+  "timestamp": "2026-10-25T05:59:00.000Z",
+  "workspace_root": "c:/Users/james/Videos/deeds-web-app",
+  "status": "VERIFIED",
+  "outcomes": {
+    "COSINE_TOPK_TIE_ORDER_VERIFIED": "PASSED",
+    "FEATURE_EXPORT_KEYSET_PARITY": "PASSED",
+    "RANKED_RESULT_CURSOR_AUDIT": "VERIFIED",
+    "PGVECTOR_QUERY_PLAN_VERDICT": "COMPATIBLE",
+    "FOCUSED_TESTS": {
+      "retrieval_and_keyset_suite": "51/51 passing (deterministic-topk-and-keyset.spec.ts: 5/5, canonical-rerank-executor.spec.ts: 21/21, search-runtime.spec.ts: 25/25)",
+      "kanban_and_control_panel_suite": "22/22 passing (kanban-tickets.spec.ts: 5/5, kanban-task-board.test.ts: 11/11, kanban-ticket-creation.spec.ts: 1/1, human-review-projection-v1.spec.ts: 5/5)",
+      "total_focused_tests_passing": 73
+    },
+    "FIRST_FAILING_BOUNDARY": "None in deterministic Top-K or keyset pagination scope; external Graphify service preflight (:8090/:8791) remains workstation runtime prerequisite"
+  },
+  "implementation_details": {
+    "keyset_pagination": {
+      "target_file": "sveltekit-frontend/src/lib/server/retrieval/feature-record.ts",
+      "cursor_contract": "FeatureRecordCursor { createdAt: string; featureId: string }",
+      "sql_predicate": "AND (created_at, feature_id) > (${cursorCreatedAt}::timestamptz, ${cursor.featureId}::uuid)",
+      "order_clause": "ORDER BY created_at ASC, feature_id ASC",
+      "page_size_handling": "Terminates early when batch.length < batchSize without redundant roundtrip query; emits lastCursor for resuming"
+    },
+    "deterministic_cosine_topk": {
+      "ordering_pattern": "ORDER BY embedding <=> $1::vector ASC, id ASC",
+      "modified_sites": [
+        "sveltekit-frontend/src/lib/server/db/vector-operations.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/cold-storage-retrieval-service.ts",
+        "sveltekit-frontend/src/lib/server/vector/PgVectorService.ts",
+        "sveltekit-frontend/src/lib/server/graph/community-graph.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+      ],
+      "hnsw_compatibility": "HNSW index distance scan remains primary selector; scalar id ASC tie-breaking guarantees deterministic ordering among identical distances"
+    },
+    "ranked_result_cursor_audit": {
+      "target_file": "sveltekit-frontend/src/lib/server/retrieval/candidate-manifest-v1.ts",
+      "cursor_type": "CandidateCursorV1 { candidateSetChecksum: string; lastScore: number; lastCanonicalChunkId: string }",
+      "verdict": "CandidateCursorV1 provides tamper-proof, base64url checksum validation against the candidate manifest; prevents drift across page slices without inventing a second cursor abstraction"
+    }
+  },
+  "skill_contract": {
+    "likely_cause": "Database retrieval lacked stable secondary tie-breaker on pgvector distance ties, and streamFeatureRecords relied on non-frozen OFFSET paging prone to drift during concurrent inserts.",
+    "evidence": [
+      "file:sveltekit-frontend/src/lib/server/retrieval/feature-record.ts",
+      "file:sveltekit-frontend/src/lib/server/db/vector-operations.ts",
+      "file:sveltekit-frontend/src/lib/server/retrieval/candidate-manifest-v1.ts",
+      "file:sveltekit-frontend/src/lib/server/retrieval/deterministic-topk-and-keyset.spec.ts"
+    ],
+    "patch_targets": [
+      "sveltekit-frontend/src/lib/server/retrieval/feature-record.ts",
+      "sveltekit-frontend/src/lib/server/db/vector-operations.ts",
+      "sveltekit-frontend/src/lib/server/features/rag/cold-storage-retrieval-service.ts",
+      "sveltekit-frontend/src/lib/server/vector/PgVectorService.ts",
+      "sveltekit-frontend/src/lib/server/graph/community-graph.ts",
+      "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/deterministic-topk-and-keyset.spec.ts"
+    ],
+    "safe_next_command": "npx vitest run --pool=forks --maxWorkers=1 src/lib/server/retrieval/deterministic-topk-and-keyset.spec.ts",
+    "smoke_command": "npx vitest run --pool=forks --maxWorkers=1 src/lib/server/retrieval/deterministic-topk-and-keyset.spec.ts src/lib/server/retrieval/canonical-rerank-executor.spec.ts src/lib/server/retrieval/search-runtime.spec.ts",
+    "report_path": "docs/reports/deterministic-topk-keyset-audit-receipt-20261025.json"
+  }
+}

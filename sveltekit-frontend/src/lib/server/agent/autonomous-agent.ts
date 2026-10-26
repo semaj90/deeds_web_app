@@ -20,6 +20,7 @@ import { z } from 'zod';
 import { createHash } from 'crypto';
 import { assembleACEContext } from '$lib/server/ace/context-assembler.js';
 import { buildContextCacheKey, getContextCache } from '$lib/server/ace/llm-context-cache.js';
+import { resolveModelCacheIdentityV1 } from '$lib/server/models/model-registry.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
@@ -57,6 +58,7 @@ import {
   analyzeImports,
   formatAnalyzeImportsResults,
   fetchPageContent,
+  createOakResolveTool,
 } from './tools/index.js';
 
 // FastMCP Tool Wrapper
@@ -83,6 +85,7 @@ interface AgentConfig {
 	maxIterations?: number;
 	temperature?: number;
 	verbose?: boolean;
+	proposalOnly?: boolean;
 }
 
 // Investigation Result
@@ -109,6 +112,7 @@ export class AutonomousAgent {
       maxIterations: 10,
       temperature: 0.7,
       verbose: true,
+      proposalOnly: config.proposalOnly ?? true,
       ...config,
     };
 
@@ -642,6 +646,15 @@ export class AutonomousAgent {
         }),
         func: async ({ title, description, status, priority }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'cases_create',
+                proposal: { title, description, status, priority },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const response = await fetchWithTimeout(`${AGENT_API_BASE()}/cases`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -669,6 +682,15 @@ export class AutonomousAgent {
         }),
         func: async ({ caseId, ...updates }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'cases_update',
+                proposal: { caseId, updates },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const response = await fetchWithTimeout(`${AGENT_API_BASE()}/cases/${caseId}`, {
               method: 'PATCH',
               headers: { 'Content-Type': 'application/json' },
@@ -724,6 +746,15 @@ export class AutonomousAgent {
         }),
         func: async ({ caseId, citationText, sourceTitle, pageNumber }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'citations_add',
+                proposal: { caseId, citationText, sourceTitle, pageNumber },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const response = await fetchWithTimeout(
               `${AGENT_API_BASE()}/cases/${caseId}/citations`,
               {
@@ -957,6 +988,15 @@ export class AutonomousAgent {
         }),
         func: async ({ filePath, caseId }) => {
           try {
+            if (this.config.proposalOnly) {
+              return JSON.stringify({
+                status: 'PROPOSED_MUTATION',
+                tool: 'evidence_upload',
+                proposal: { filePath, caseId },
+                admitted: false,
+                reason: 'LangGraph Boundary: direct storage/database mutations prohibited. Proposed action queued for review.',
+              });
+            }
             const safePath = validateAgentFilePath(filePath);
             const fs = await import('fs');
             const path = await import('path');
@@ -1054,6 +1094,15 @@ export class AutonomousAgent {
               );
               return JSON.stringify(await response.json());
             } else {
+              if (this.config.proposalOnly) {
+                return JSON.stringify({
+                  status: 'PROPOSED_MUTATION',
+                  tool: 'case_notes_add',
+                  proposal: { caseId, content },
+                  admitted: false,
+                  reason: 'LangGraph Boundary: direct database mutations prohibited. Proposed action queued for review.',
+                });
+              }
               const response = await fetchWithTimeout(
                 `${AGENT_API_BASE()}/cases/${caseId}/notes`,
                 {
@@ -1156,9 +1205,12 @@ export class AutonomousAgent {
         func: async ({ query, topK }) => {
           try {
             const queryHash = createHash('sha256').update(query).digest('hex').slice(0, 16);
-            const cacheKey = buildContextCacheKey({
+            const modelCacheIdentity = resolveModelCacheIdentityV1({ modelId: SERVER_CHAT_MODEL });
+            const cacheKey = modelCacheIdentity ? buildContextCacheKey({
               queryHash,
               modelName: SERVER_CHAT_MODEL,
+              modelRevision: modelCacheIdentity.modelRevision,
+              adapterRevision: modelCacheIdentity.adapterRevision,
               modelQuant: 'iq4_xs',
               kvQuant: 'q8_0/q8_0',
               draftModel: false,
@@ -1185,8 +1237,8 @@ export class AutonomousAgent {
               caseId: 'auto',
               conversationId: 'agent-context',
               filePath: undefined,
-            });
-            const cached = await getContextCache(cacheKey);
+            }) : null;
+            const cached = cacheKey ? await getContextCache(cacheKey) : null;
             if (cached) return JSON.stringify(cached);
 
             // Fallback to full ACE context assembly if not cached
@@ -1195,6 +1247,8 @@ export class AutonomousAgent {
               userId: 'agent',
               caseId: 'auto',
               modelName: SERVER_CHAT_MODEL,
+              modelRevision: modelCacheIdentity?.modelRevision,
+              adapterRevision: modelCacheIdentity?.adapterRevision,
               modelQuant: 'iq4_xs',
               kvQuant: 'q8_0/q8_0',
               draftModel: false,
@@ -1214,6 +1268,9 @@ export class AutonomousAgent {
         },
       })
     );
+
+    // 33. OAK Domain & Concept Resolution Tool (Read-only ontology grounding)
+    tools.push(createOakResolveTool());
 
     return tools;
   }
@@ -1331,9 +1388,13 @@ export class AutonomousAgent {
       'terminology',
       'concept of',
       'refers to',
+      'ontology',
+      'oak',
+      'curie',
+      'taxonomy',
     ];
     if (DEFINITION_KEYWORDS.some((kw) => q.includes(kw))) {
-      selected.unshift('glossary_search');
+      selected.unshift('glossary_search', 'oak_resolve_concept');
     }
 
     // Fallback: general investigation tools

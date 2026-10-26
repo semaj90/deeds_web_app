@@ -64,4 +64,25 @@ describe('FeatureRowV1', () => {
 			evidenceRefs: ['evidence:1'],
 		})).toThrow(/PageRank authority/);
 	});
+
+	it('rejects non-finite feature signals instead of converting them to zero', () => {
+		const build = (overrides: { dense?: number; freshness?: number }) => buildFeatureRowV1({
+			locator,
+			featureRevision: 'feature:1',
+			graphRevision: 'graph:1',
+			semanticRevision: 'semantic:1',
+			dense: overrides.dense ?? 0.9,
+			sparse: 0.7,
+			rrf: 0.8,
+			ast: 0.6,
+			pagerank: { pagerank_l1: 0.4 },
+			domainAffinity: 1,
+			freshness: overrides.freshness ?? 0.75,
+			executionUtility: 0.5,
+			evidenceRefs: ['evidence:1'],
+		});
+
+		expect(() => build({ dense: Number.NaN })).toThrow('FEATURE_ROW_NON_FINITE_SCORE');
+		expect(() => build({ freshness: Number.POSITIVE_INFINITY })).toThrow('FEATURE_ROW_NON_FINITE_SCORE');
+	});
 });

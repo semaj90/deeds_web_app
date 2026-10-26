@@ -136,9 +136,9 @@ describe('executor tree HTTP route integration', () => {
       return;
     }
 
-    expect(status).toBe(200);
-    expect(data.result.status).toBe('failure');
-    expect(data.result.error.message).toContain('Unknown executor mode');
+    // The route validates mode against its enum before dispatch, so unknown modes fail as 400 input errors.
+    expect(status).toBe(400);
+    expect(data.error).toBeTruthy();
   });
 
   it('rejects invalid request schema', async () => {

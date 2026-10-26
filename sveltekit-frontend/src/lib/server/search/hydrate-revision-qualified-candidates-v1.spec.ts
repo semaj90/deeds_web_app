@@ -1,8 +1,12 @@
 // @vitest-environment node
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { PgDialect } from 'drizzle-orm/pg-core';
+const mocks = vi.hoisted(() => ({ execute: vi.fn() }));
+vi.mock('$lib/server/db/client.js', () => ({ db: { execute: mocks.execute }, pgRows: (result: { rows: unknown[] }) => result.rows }));
 import {
   joinRevisionQualifiedCandidatesV1,
+  hydrateRevisionQualifiedCandidatesV1,
   type RevisionQualifiedHydrationDbRowV1,
 } from './hydrate-revision-qualified-candidates-v1.js';
 import type { StrictSemanticProjectionCandidateV1 } from './strict-semantic-projection-candidate-v1.js';
@@ -29,6 +33,8 @@ const candidate: StrictSemanticProjectionCandidateV1 = {
 
 const row: RevisionQualifiedHydrationDbRowV1 = {
   chunk_row_id: postgresId,
+  chunk_source_revision: sourceRevision,
+  chunk_workspace_revision: workspaceRevision,
   canonical_chunk_id: 'chunk:one',
   chunk_id: 'chunk:one',
   packet_key: 'packet:one',
@@ -43,6 +49,41 @@ const row: RevisionQualifiedHydrationDbRowV1 = {
 };
 
 describe('joinRevisionQualifiedCandidatesV1', () => {
+  it('queries chunk row revisions without silently choosing the newest binding', async () => {
+    mocks.execute.mockResolvedValue({ rows: [row] });
+    const result = await hydrateRevisionQualifiedCandidatesV1({ candidates: [candidate], workspaceRevision });
+    expect(result.hydrated).toHaveLength(1);
+    const query = new PgDialect().sqlToQuery(mocks.execute.mock.calls[0][0]);
+    expect(query.sql).toContain('c.source_revision::text AS chunk_source_revision');
+    expect(query.sql).toContain('c.workspace_revision::text AS chunk_workspace_revision');
+    expect(query.sql).not.toContain('DISTINCT ON');
+    expect(query.params).toContain(workspaceRevision);
+    expect(query.params).toContain(postgresId);
+  });
+
+  it('does not fabricate content for a qualified-looking empty readback', () => {
+    const result = joinRevisionQualifiedCandidatesV1({ candidates: [candidate], rows: [{ ...row, content: null }], workspaceRevision });
+    expect(result.hydrated).toEqual([]);
+    expect(result.failures[0]?.reason).toBe('CONTENT_MISSING');
+  });
+  it.each([
+    ['chunk_source_revision', null, 'CHUNK_SOURCE_REVISION_MISMATCH'],
+    ['chunk_source_revision', `sha256:${'9'.repeat(64)}`, 'CHUNK_SOURCE_REVISION_MISMATCH'],
+    ['chunk_workspace_revision', null, 'CHUNK_WORKSPACE_REVISION_MISMATCH'],
+    ['chunk_workspace_revision', `sha256:${'9'.repeat(64)}`, 'CHUNK_WORKSPACE_REVISION_MISMATCH'],
+  ])('does not borrow lineage qualification for an unqualified %s', (field, value, reason) => {
+    const result = joinRevisionQualifiedCandidatesV1({ candidates: [candidate], rows: [{ ...row, [field]: value }], workspaceRevision });
+    expect(result.hydrated).toEqual([]);
+    expect(result.failures[0]?.reason).toBe(reason);
+  });
+
+  it('requires both projection and canonical content hashes', () => {
+    for (const [projection, canonical] of [[{ ...candidate, contentHash: null }, row], [candidate, { ...row, content_hash: null }]] as const) {
+      const result = joinRevisionQualifiedCandidatesV1({ candidates: [projection], rows: [canonical], workspaceRevision });
+      expect(result.hydrated).toEqual([]);
+      expect(result.failures[0]?.reason).toBe('CONTENT_HASH_MISSING');
+    }
+  });
   it('hydrates exact current lineage and preserves semantic rank order', () => {
     const result = joinRevisionQualifiedCandidatesV1({
       candidates: [candidate],

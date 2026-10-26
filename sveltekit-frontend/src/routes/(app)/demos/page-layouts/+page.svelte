@@ -10,7 +10,7 @@
 		language: 'en',
 		autoSave: true,
 		notifications: true,
-		model: 'gemma4-legal',
+		model: 'ornith-1.5-9b',
 		temperature: 0.7,
 		maxTokens: 2048,
 		enableGPU: true,
@@ -77,16 +77,16 @@
 						<h2 class="dark-heading">GENERAL_SETTINGS</h2>
 						<div class="dark-form-grid">
 							<div class="dark-field">
-								<label>Theme System</label>
-								<select bind:value={config.theme}>
+								<label for="dark-theme">Theme System</label>
+								<select id="dark-theme" bind:value={config.theme}>
 									<option value="yorha">YoRHa (Dark)</option>
 									<option value="light">Resistance (Light)</option>
 									<option value="hc">Machine (High Contrast)</option>
 								</select>
 							</div>
 							<div class="dark-field">
-								<label>System Language</label>
-								<select bind:value={config.language}>
+								<label for="dark-language">System Language</label>
+								<select id="dark-language" bind:value={config.language}>
 									<option value="en">English (US)</option>
 									<option value="ja">Japanese</option>
 									<option value="es">Spanish</option>
@@ -103,20 +103,20 @@
 						<h2 class="dark-heading">AI_MODEL_CONFIGURATION</h2>
 						<div class="dark-form-grid">
 							<div class="dark-field">
-								<label>Active Model</label>
-								<select bind:value={config.model}>
-									<option value="gemma4-legal">gemma4-legal:latest</option>
+								<label for="dark-model">Active Model</label>
+								<select id="dark-model" bind:value={config.model}>
+									<option value="ornith-1.5-9b">ornith-1.5-9b</option>
 									<option value="llama3">llama3:8b</option>
 								</select>
 							</div>
 							<div class="dark-field">
-								<label>Temperature</label>
-								<input type="range" min="0" max="1" step="0.1" bind:value={config.temperature}>
+								<label for="dark-temperature">Temperature</label>
+								<input id="dark-temperature" type="range" min="0" max="1" step="0.1" bind:value={config.temperature}>
 								<span class="dark-range-val">{config.temperature}</span>
 							</div>
 							<div class="dark-field">
-								<label>Max Tokens</label>
-								<select bind:value={config.maxTokens}>
+								<label for="dark-max-tokens">Max Tokens</label>
+								<select id="dark-max-tokens" bind:value={config.maxTokens}>
 									<option value={1024}>1024</option>
 									<option value={2048}>2048</option>
 									<option value={4096}>4096</option>
@@ -133,8 +133,8 @@
 								<label><input type="checkbox" bind:checked={config.enableCUDA}> Enable CUDA</label>
 							</div>
 							<div class="dark-field">
-								<label>Precision</label>
-								<select bind:value={config.precision}>
+								<label for="dark-precision">Precision</label>
+								<select id="dark-precision" bind:value={config.precision}>
 									<option value="fp16">FP16 (Half)</option>
 									<option value="fp32">FP32 (Full)</option>
 									<option value="int8">INT8 (Quantized)</option>
@@ -145,8 +145,8 @@
 						<h2 class="dark-heading">SECURITY_SETTINGS</h2>
 						<div class="dark-form-grid">
 							<div class="dark-field">
-								<label>Encryption</label>
-								<select bind:value={config.encryption}>
+								<label for="dark-encryption">Encryption</label>
+								<select id="dark-encryption" bind:value={config.encryption}>
 									<option value="AES256">AES-256</option>
 									<option value="AES128">AES-128</option>
 								</select>
@@ -207,16 +207,16 @@
 						<h2 class="warm-heading">GENERAL_SETTINGS</h2>
 						<div class="warm-form-grid">
 							<div class="warm-field">
-								<label>Theme System</label>
-								<select bind:value={config.theme}>
+								<label for="warm-theme">Theme System</label>
+								<select id="warm-theme" bind:value={config.theme}>
 									<option value="yorha">YoRHa (Dark)</option>
 									<option value="light">Resistance (Light)</option>
 									<option value="hc">Machine (High Contrast)</option>
 								</select>
 							</div>
 							<div class="warm-field">
-								<label>System Language</label>
-								<select bind:value={config.language}>
+								<label for="warm-language">System Language</label>
+								<select id="warm-language" bind:value={config.language}>
 									<option value="en">English (US)</option>
 									<option value="ja">Japanese</option>
 									<option value="es">Spanish</option>
@@ -233,20 +233,20 @@
 						<h2 class="warm-heading">AI_MODEL_CONFIGURATION</h2>
 						<div class="warm-form-grid">
 							<div class="warm-field">
-								<label>Active Model</label>
-								<select bind:value={config.model}>
-									<option value="gemma4-legal">gemma4-legal:latest</option>
+								<label for="warm-model">Active Model</label>
+								<select id="warm-model" bind:value={config.model}>
+									<option value="ornith-1.5-9b">ornith-1.5-9b</option>
 									<option value="llama3">llama3:8b</option>
 								</select>
 							</div>
 							<div class="warm-field">
-								<label>Temperature</label>
-								<input type="range" min="0" max="1" step="0.1" bind:value={config.temperature}>
+								<label for="warm-temperature">Temperature</label>
+								<input id="warm-temperature" type="range" min="0" max="1" step="0.1" bind:value={config.temperature}>
 								<span class="warm-range-val">{config.temperature}</span>
 							</div>
 							<div class="warm-field">
-								<label>Max Tokens</label>
-								<select bind:value={config.maxTokens}>
+								<label for="warm-max-tokens">Max Tokens</label>
+								<select id="warm-max-tokens" bind:value={config.maxTokens}>
 									<option value={1024}>1024</option>
 									<option value={2048}>2048</option>
 									<option value={4096}>4096</option>
@@ -263,8 +263,8 @@
 								<label><input type="checkbox" bind:checked={config.enableCUDA}> Enable CUDA</label>
 							</div>
 							<div class="warm-field">
-								<label>Precision</label>
-								<select bind:value={config.precision}>
+								<label for="warm-precision">Precision</label>
+								<select id="warm-precision" bind:value={config.precision}>
 									<option value="fp16">FP16 (Half)</option>
 									<option value="fp32">FP32 (Full)</option>
 									<option value="int8">INT8 (Quantized)</option>
@@ -275,8 +275,8 @@
 						<h2 class="warm-heading">SECURITY_SETTINGS</h2>
 						<div class="warm-form-grid">
 							<div class="warm-field">
-								<label>Encryption</label>
-								<select bind:value={config.encryption}>
+								<label for="warm-encryption">Encryption</label>
+								<select id="warm-encryption" bind:value={config.encryption}>
 									<option value="AES256">AES-256</option>
 									<option value="AES128">AES-128</option>
 								</select>
@@ -496,7 +496,7 @@
 		font-size: 0.75rem;
 		color: #cbd5e1;
 	}
-	.dark-field select, .dark-field input[type="text"] {
+	.dark-field select {
 		background: #0f172a;
 		border: 1px solid #475569;
 		color: white;
@@ -658,7 +658,7 @@
 		font-size: 0.75rem;
 		color: #4a4238;
 	}
-	.warm-field select, .warm-field input[type="text"] {
+	.warm-field select {
 		background: white;
 		border: 1px solid rgba(42, 37, 32, 0.2);
 		color: #2a2520;
@@ -667,7 +667,7 @@
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.8rem;
 	}
-	.warm-field select:focus, .warm-field input[type="text"]:focus {
+	.warm-field select:focus {
 		border-color: #c4752b;
 		outline: none;
 		box-shadow: 0 0 0 2px rgba(196, 117, 43, 0.15);

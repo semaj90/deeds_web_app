@@ -31,13 +31,13 @@ function payload(response: any) {
 }
 
 describe('native acceleration TRACE tools', () => {
-  it('registers only the three bounded diagnostics and receipts backend metadata', async () => {
+  it('registers four bounded diagnostics and receipts backend metadata', async () => {
     const handlers = register({
       backendInfo: () => ({ per_export_backend: { batchCosineTopK: { backend: 'libtorch_cuda' } } }),
       executionCounters: () => counters,
       exactTopK: () => ({ indices: new Int32Array([1, 2]), scores: new Float32Array([1, 0.8]), backend: 'cuda_cublas' }),
     });
-    expect([...handlers.keys()]).toEqual(['atlas.backend_info', 'atlas.exact_topk_oracle', 'atlas.parity_report']);
+    expect([...handlers.keys()]).toEqual(['atlas.backend_info', 'atlas.exact_topk_oracle', 'atlas.parity_report', 'atlas.simdjson_tensor_metrics']);
 
     const result = payload(await handlers.get('atlas.backend_info')!());
     expect(result.result.backendInfo.per_export_backend.batchCosineTopK.backend).toBe('libtorch_cuda');
@@ -89,7 +89,7 @@ describe('native acceleration TRACE tools', () => {
     expect(payload(unavailable).executionReceipt.writesPerformed).toBe(false);
   });
 
-  it('serves the three tools through an in-memory MCP tools/list and tools/call exchange', async () => {
+  it('serves four tools through an in-memory MCP tools/list and tools/call exchange', async () => {
     const server = new McpServer({ name: 'native-acceleration-fixture', version: '1.0.0' });
     registerNativeAccelerationTools(server, () => ({
       backendInfo: () => ({ per_export_backend: { batchCosineTopK: { backend: 'cpu_fallback' } } }),
@@ -102,12 +102,34 @@ describe('native acceleration TRACE tools', () => {
       await server.connect(serverTransport);
       await client.connect(clientTransport);
       const listed = await client.listTools();
-      expect(listed.tools.map(({ name }) => name)).toEqual(['atlas.backend_info', 'atlas.exact_topk_oracle', 'atlas.parity_report']);
+      expect(listed.tools.map(({ name }) => name)).toEqual(['atlas.backend_info', 'atlas.exact_topk_oracle', 'atlas.parity_report', 'atlas.simdjson_tensor_metrics']);
       const called = await client.callTool({ name: 'atlas.parity_report', arguments: {} });
       expect(JSON.parse((called.content[0] as { text: string }).text).result.status).toBe('PARITY_MATCH');
     } finally {
       await client.close();
       await server.close();
     }
+  });
+  it('fails closed when the simdjson analysis adapter is absent or reports a GPU run', async () => {
+    for (const simdjsonTensorMetrics of [undefined, () => ({ status: 'CPU_CUDA_FIXTURE_PARITY_PASSED' })]) {
+      const handlers = register({ backendInfo: () => ({}), executionCounters: () => counters,
+        exactTopK: () => ({ indices: [], scores: [], backend: 'cpu' }), simdjsonTensorMetrics });
+      const result = await handlers.get('atlas.simdjson_tensor_metrics')!();
+      expect(result.isError).toBe(true);
+      expect(payload(result).result.code).toBe('SIMDJSON_TENSOR_ANALYSIS_FAILED');
+    }
+  });
+
+  it('returns CPU fixture metrics with a checksum receipt and no evidence promotion', async () => {
+    const handlers = register({ backendInfo: () => ({}), executionCounters: () => counters,
+      exactTopK: () => ({ indices: [], scores: [], backend: 'cpu' }),
+      simdjsonTensorMetrics: () => ({ schema: 'atlas.simdjson-graph-gather.v1', status: 'CPU_NATIVE_PARITY_PASSED',
+        inputKind: 'NUMERICAL_FIXTURE', parserBackend: 'TEST_ADAPTER', canonicalAuthority: false,
+        promotionAuthorized: false, sourceWritesPerformed: false, datastoreWritesPerformed: false,
+        gpu: { status: 'NOT_REQUESTED' }, arrayMetrics: { embeddings: { shape: [4, 768], byteLength: 12288, dtype: 'float32' } } }),
+    });
+    const result = payload(await handlers.get('atlas.simdjson_tensor_metrics')!());
+    expect(result.result.arrayMetrics.embeddings.shape).toEqual([4, 768]);
+    expect(result.executionReceipt).toMatchObject({ toolName: 'atlas.simdjson_tensor_metrics', writesPerformed: false, canonicalAuthority: false });
   });
 });

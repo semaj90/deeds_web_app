@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.golden-breadth-plan.v1",
+  "runId": "gb-2026-10-21T22-51-36-131Z-29941797",
+  "mode": "LIVE",
+  "queryCount": 2,
+  "queriesSha256": "a001ebe2ab7cef986333f88f54569698193aa5005dd4de194fbc930b04dbc98b",
+  "queries": [
+    {
+      "id": "GB-001",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "category": "sveltekit2"
+    },
+    {
+      "id": "GB-002",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "SvelteKit 2 form actions with use:enhance and superforms",
+      "category": "sveltekit2"
+    }
+  ]
+}

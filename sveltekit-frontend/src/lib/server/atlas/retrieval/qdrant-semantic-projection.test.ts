@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CANONICAL_QDRANT_COLLECTION } from '../../embedding/embedding-contract-768.js';
 import {
   buildBm42ChallengerProjectionV1,
   buildQdrantSemanticProjectionV1,
@@ -37,7 +38,7 @@ function payload(): AtlasQdrantSemanticPayloadV1 {
 describe('Qdrant semantic_768 projection', () => {
   it('keeps canonical 768 representation and native model dimension explicit', () => {
     const projection = buildQdrantSemanticProjectionV1(payload(), 'cold');
-    expect(projection.collection).toBe('codebase_chunks_768_v2');
+    expect(projection.collection).toBe(CANONICAL_QDRANT_COLLECTION);
     expect(projection.vectorName).toBe('content');
     expect(projection.representationId).toBe('semantic_768');
     expect(projection.dimension).toBe(768);

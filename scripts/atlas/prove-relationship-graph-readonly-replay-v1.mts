@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, relative, resolve, sep } from 'node:path';
 import pg, { type PoolClient, type QueryResultRow } from 'pg';
 import { REPO_ROOT, loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
@@ -13,8 +13,10 @@ const { featureRelationshipToKernel } = await import('../../packages/parent-atla
 const { buildIncidenceProjectionFromRelationshipKernelsV1 } = await import('../../sveltekit-frontend/src/lib/server/atlas/graph/incidence-projection-v1.ts');
 const { serializeIncidenceEdgesToArrowIpc, checksumArrowIpc } = await import('../../sveltekit-frontend/src/lib/server/atlas/graph/incidence-edge-arrow-artifact-v1.ts');
 const { buildGraphRevisionV1, canonicalJson } = await import('./lib/graph-revision-v1.mjs');
+const { verifyGraphReplayOrdinalMapV1, mapGraphEntitiesToCandidateOrdinalsV1, resolveGraphReplayReportPathV1 } = await import('./lib/graph-replay-ordinal-map-v1.mjs');
 
 const { Pool } = pg;
+const MAX_ORDINAL_MAP_BYTES = 64 * 1024 * 1024;
 
 function requiredArg(name: string): string {
   const prefix = `--${name}=`;
@@ -260,6 +262,7 @@ async function buildPass(pool: pg.Pool, args: {
       kernelsExcludedWorkspaceMismatch: mismatchedWorkspace.length,
       graphIdentity,
       projection: deterministicPayload.projection,
+      entityCanonicalIds: [...entityMap.keys()],
       edgeArtifactChecksum,
       deterministicPassChecksum: sha256Canonical(deterministicPayload),
       writesPerformed: false,
@@ -277,7 +280,29 @@ async function main() {
   const workspaceRevision = requiredArg('workspace-revision');
   const candidateSnapshotRevision = requiredArg('candidate-snapshot-revision');
   const ordinalMapChecksum = requiredArg('ordinal-map-checksum');
+  const ordinalMapPath = resolve(REPO_ROOT, requiredArg('ordinal-map'));
   const maxRelationships = integerArg('max-relationships', 100000, 1000000);
+  const outputArgument = process.argv.find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
+  const reportPath = resolveGraphReplayReportPathV1(REPO_ROOT, outputArgument);
+
+  const mapRelative = relative(REPO_ROOT, ordinalMapPath);
+  if (!mapRelative || mapRelative === '..' || mapRelative.startsWith(`..${sep}`)) {
+    throw new Error('GRAPH_RO_REPLAY_ORDINAL_MAP_PATH_OUTSIDE_REPOSITORY');
+  }
+  const ordinalMapStat = statSync(ordinalMapPath);
+  if (!ordinalMapStat.isFile() || ordinalMapStat.size > MAX_ORDINAL_MAP_BYTES) {
+    throw new Error('GRAPH_RO_REPLAY_ORDINAL_MAP_FILE_INVALID_OR_OVERSIZED');
+  }
+  const ordinalMapBytes = readFileSync(ordinalMapPath);
+  const ordinalMap = verifyGraphReplayOrdinalMapV1({
+    candidateMap: JSON.parse(ordinalMapBytes.toString('utf8')),
+    workspaceRevision,
+    candidateSnapshotRevision,
+    ordinalMapChecksum,
+  });
+  if (outputArgument !== undefined && existsSync(reportPath)) {
+    throw new Error('GRAPH_RO_REPLAY_SCRATCH_OUTPUT_ALREADY_EXISTS');
+  }
 
   if (!/^sha256:[0-9a-f]{64}$/i.test(ordinalMapChecksum)) {
     throw new Error('GRAPH_RO_REPLAY_ORDINAL_MAP_CHECKSUM_INVALID');
@@ -302,9 +327,16 @@ async function main() {
       workspaceRevision,
       candidateSnapshotRevision,
       ordinalMapChecksum,
+      candidateOrdinalMap: {
+        path: mapRelative.split(sep).join('/'),
+        fileChecksum: `sha256:${createHash('sha256').update(ordinalMapBytes).digest('hex')}`,
+        rowCount: ordinalMap.rowCount,
+        identityAuthority: ordinalMap.identityAuthority,
+        integrityVerifiedBy: 'assertCandidateOrdinalMapIntegrityV1',
+      },
       maxRelationships,
-      passA,
-      passB,
+      passA: { ...passA, entityCanonicalIds: undefined },
+      passB: { ...passB, entityCanonicalIds: undefined },
       replay: {
         separateDatabaseSnapshots: passA.pgSnapshot !== passB.pgSnapshot,
         deterministicExecutionChecksumEqual: deterministic,
@@ -329,6 +361,11 @@ async function main() {
       claims: {
         sourceRevisionAuthorityProven: false,
         candidateOrdinalAuthorityChanged: false,
+        candidateGraphCrosswalkVerified: false,
+        relationshipEntityCandidateCrosswalk: mapGraphEntitiesToCandidateOrdinalsV1({
+          candidateMap: ordinalMap,
+          entityCanonicalIds: passA.entityCanonicalIds,
+        }),
         semanticProjectionIdentityProven: false,
         graphRevisionDerivedOnlyFromIncludedRelationshipKernels: true,
       },
@@ -348,9 +385,10 @@ async function main() {
       canonicalAuthority: false,
     });
 
-    const reportPath = resolve(REPO_ROOT, 'docs/reports/relationship-graph-readonly-replay-v1.json');
     mkdirSync(dirname(reportPath), { recursive: true });
-    writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+    const serializedReport = `${JSON.stringify(report, null, 2)}\n`;
+    if (outputArgument === undefined) writeFileSync(reportPath, serializedReport, 'utf8');
+    else writeFileSync(reportPath, serializedReport, { encoding: 'utf8', flag: 'wx' });
     console.log(JSON.stringify({
       status: report.status,
       graphRevision: report.receipt.graphRevision,

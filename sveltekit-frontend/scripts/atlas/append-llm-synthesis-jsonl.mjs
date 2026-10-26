@@ -7,7 +7,7 @@
  *
  * Usage:
  *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --dry-run
- *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --runId synth_abc --query "test" --profile code_debug --model gemma4-rotorquant:latest
+ *   node scripts/atlas/append-llm-synthesis-jsonl.mjs --runId synth_abc --query "test" --profile code_debug --model ornith-1.5-9b
  */
 
 import { appendFileSync, mkdirSync, existsSync } from 'node:fs';

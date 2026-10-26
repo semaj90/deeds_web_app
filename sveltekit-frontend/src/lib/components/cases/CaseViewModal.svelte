@@ -87,12 +87,16 @@
 	<!-- Backdrop -->
 	<div
 		class="case-modal-backdrop"
-		role="dialog"
-		aria-modal="true"
-		aria-label="Case details"
+		role="presentation"
 		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
 	>
-		<div class="case-modal-panel">
+		<div
+			class="case-modal-panel"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Case details"
+			tabindex="-1"
+		>
 			<!-- Header -->
 			<div class="case-modal-header">
 				<div class="case-modal-title-row">

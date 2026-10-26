@@ -1,0 +1,615 @@
+{
+  "schema": "atlas.graphrag-multihop-analysis.v1",
+  "generatedAt": "2026-10-13",
+  "database": "PostgreSQL 18.4 legal_ai_db (public)",
+  "purpose": "Inventory of populated graph, edge and relation tables that a bounded multi-hop traversal could use. Descriptive only; no traversal has been run.",
+  "identityRules": {
+    "canonicalPacketKey": "packet_key",
+    "sourceReference": "source_ref",
+    "titleId": "title_id is unique per packet (61,660 non-null, all distinct) and has the form title:<source-slug>:<hash>. It is a title identity, not a semantic key. Do not use it for dense or AST matching.",
+    "semanticVector": "semantic_768 (EmbeddingGemma) is the dense representation. Qdrant point IDs and PostgreSQL identities are not interchangeable."
+  },
+  "existingOwners": {
+    "traceGraphExpansion": "mcp graph.expand_neighborhood (registered; hangs past 120 s in this session)",
+    "pagerankGpu": "python/atlas_compute/cugraph_ppr.py (cuGraph PageRank)",
+    "networkxParityOracle": "python/graph_snapshot_parity_networkx_oracle.py (per CLAUDE.md)",
+    "topKPaginator": "python/atlas_compute/topk_paginator.py (tests: python/tests/test_topk_paginator.py)"
+  },
+  "populatedEdgeTables": 32,
+  "tables": [
+    {
+      "table": "graph_community_assignments",
+      "rows": 1049522,
+      "columns": [
+        "run_id",
+        "packet_key",
+        "algorithm",
+        "community_id",
+        "level",
+        "graph_revision",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "graph_communities",
+      "rows": 790088,
+      "columns": [
+        "run_id",
+        "algorithm",
+        "community_id",
+        "parent_community_id",
+        "member_count",
+        "representative_packet_keys",
+        "representative_symbols",
+        "label",
+        "purity",
+        "modularity_contribution",
+        "metadata",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_graph_nodes_v2",
+      "rows": 483801,
+      "columns": [
+        "snapshot_id",
+        "node_key",
+        "node_type",
+        "packet_key",
+        "tree_node_id",
+        "source_ref",
+        "content_hash",
+        "properties"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "graph_node_metrics",
+      "rows": 351276,
+      "columns": [
+        "run_id",
+        "packet_key",
+        "symbol_version_id",
+        "metric_name",
+        "metric_value",
+        "graph_revision",
+        "algorithm_revision",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "ontology_edges",
+      "rows": 252102,
+      "columns": [
+        "id",
+        "source_packet_key",
+        "target_packet_key",
+        "edge_type",
+        "confidence",
+        "extracted_at",
+        "created_at"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "atlas_graph_edges_v2",
+      "rows": 224764,
+      "columns": [
+        "snapshot_id",
+        "edge_key",
+        "source_node_key",
+        "target_node_key",
+        "edge_type",
+        "weight",
+        "confidence",
+        "provenance",
+        "properties"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "atlas_graph_authority_scores",
+      "rows": 212398,
+      "columns": [
+        "graph_snapshot_id",
+        "run_id",
+        "node_key",
+        "packet_key",
+        "source_ref",
+        "pagerank_raw",
+        "pagerank_l1",
+        "authority_percentile",
+        "authority_band",
+        "normalization_method",
+        "normalization_applied_by",
+        "damping_factor",
+        "max_iterations",
+        "tolerance",
+        "did_converge",
+        "ran_iterations",
+        "contract_version",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_graph_authority_scores_v2",
+      "rows": 162234,
+      "columns": [
+        "run_id",
+        "snapshot_id",
+        "node_key",
+        "packet_key",
+        "pagerank_raw",
+        "pagerank_l1",
+        "authority_percentile",
+        "authority_band",
+        "normalization_applied_by",
+        "topology_hash",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_hyperedge_members",
+      "rows": 125604,
+      "columns": [
+        "hyperedge_id",
+        "member_id",
+        "member_type",
+        "member_role",
+        "ordinal"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_chunk_packet_identity_links",
+      "rows": 105762,
+      "columns": [
+        "id",
+        "qdrant_collection",
+        "qdrant_point_id",
+        "chunk_index_id",
+        "canonical_packet_key",
+        "source_ref",
+        "source_revision",
+        "match_method",
+        "candidate_packet_keys",
+        "confidence",
+        "evidence_refs",
+        "canonical_packet_minted",
+        "canonical_writes_allowed",
+        "algorithm_revision",
+        "postgres_snapshot",
+        "observed_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "feature_file_edges",
+      "rows": 95995,
+      "columns": [
+        "id",
+        "feature_key",
+        "file_path",
+        "entry_export",
+        "role",
+        "line_start",
+        "line_end",
+        "stable_key",
+        "created_at",
+        "packet_key",
+        "source_ref",
+        "content_hash"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "taxonomy_edges",
+      "rows": 62802,
+      "columns": [
+        "id",
+        "source_key",
+        "target_key",
+        "relation",
+        "weight",
+        "evidence",
+        "created_at"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "atlas_hyperedges",
+      "rows": 62802,
+      "columns": [
+        "hyperedge_id",
+        "relation_type",
+        "schema_id",
+        "schema_version",
+        "source_ref_key",
+        "evidence_hash",
+        "properties",
+        "extractor_version",
+        "confidence",
+        "created_at",
+        "contract_hyperedge_id",
+        "packet_key",
+        "workspace_revision",
+        "source_revision",
+        "graph_revision",
+        "producer_revision",
+        "evidence_refs",
+        "checksum",
+        "lifecycle",
+        "provenance"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "hypergraph_edge_members",
+      "rows": 20709,
+      "columns": [
+        "id",
+        "edge_id",
+        "member_kind",
+        "member_key",
+        "role",
+        "score",
+        "payload"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "code_relations",
+      "rows": 12975,
+      "columns": [
+        "id",
+        "source_file",
+        "target_key",
+        "relation_type",
+        "confidence",
+        "evidence",
+        "run_id",
+        "created_at",
+        "updated_at"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "agent_context_relations",
+      "rows": 10521,
+      "columns": [
+        "id",
+        "source_key",
+        "target_key",
+        "relation",
+        "weight",
+        "evidence",
+        "created_at"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "code_feature_edges",
+      "rows": 6558,
+      "columns": [
+        "from_feature_id",
+        "to_feature_id",
+        "relation",
+        "evidence_ref",
+        "confidence",
+        "created_at"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "taxonomy_nodes",
+      "rows": 5527,
+      "columns": [
+        "id",
+        "node_key",
+        "level",
+        "parent_key",
+        "display_name",
+        "metadata",
+        "member_count",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "enhanced_graph_mappings",
+      "rows": 4979,
+      "columns": [
+        "id",
+        "kind",
+        "label",
+        "path",
+        "summary",
+        "edges",
+        "scores",
+        "flags",
+        "vectors",
+        "manifold4",
+        "metadata",
+        "created_at",
+        "updated_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_feature_relationships",
+      "rows": 4097,
+      "columns": [
+        "id",
+        "source_feature_id",
+        "target_feature_id",
+        "relationship_type",
+        "strength",
+        "reasoning",
+        "created_at",
+        "updated_at"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "atlas_graph_snapshot_exclusions_v2",
+      "rows": 3355,
+      "columns": [
+        "exclusion_id",
+        "snapshot_id",
+        "candidate_key",
+        "packet_key",
+        "source_ref",
+        "exclusion_stage",
+        "exclusion_reason",
+        "evidence",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_relationship_members",
+      "rows": 1206,
+      "columns": [
+        "relationship_id",
+        "member_ordinal",
+        "role",
+        "entity_type",
+        "entity_id",
+        "entity_revision",
+        "source_ref",
+        "metadata"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_relationships",
+      "rows": 603,
+      "columns": [
+        "relationship_id",
+        "relationship_key",
+        "relationship_type",
+        "participant_count",
+        "relationship_degree",
+        "relationship_degree_kind",
+        "source_ref",
+        "source_revision",
+        "relationship_revision",
+        "producer_revision",
+        "confidence",
+        "canonical_text",
+        "metadata",
+        "created_at",
+        "updated_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_relationship_evidence",
+      "rows": 603,
+      "columns": [
+        "relationship_id",
+        "evidence_id",
+        "confidence"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "hypergraph_edges",
+      "rows": 282,
+      "columns": [
+        "id",
+        "edge_hash",
+        "edge_id",
+        "edge_type",
+        "member_ids",
+        "title",
+        "summary",
+        "grade_label",
+        "grade_score",
+        "confidence",
+        "source",
+        "gpu_cluster",
+        "community_id",
+        "topo_class",
+        "som_cluster",
+        "glyph_cluster",
+        "som_cell",
+        "manifold4",
+        "metadata",
+        "created_at",
+        "updated_at",
+        "label",
+        "query_hash",
+        "run_id",
+        "weight"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "graph_community_resolution_seeds",
+      "rows": 71,
+      "columns": [
+        "run_id",
+        "algorithm",
+        "graph_node_key",
+        "raw_path",
+        "normalized_path",
+        "community_id",
+        "graph_revision",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "graph_analysis_runs",
+      "rows": 24,
+      "columns": [
+        "run_id",
+        "algorithm",
+        "algorithm_revision",
+        "parameter_revision",
+        "workspace_revision",
+        "source_revision",
+        "graph_revision",
+        "projection_revision",
+        "projection_name",
+        "node_count",
+        "relationship_count",
+        "started_at",
+        "completed_at",
+        "status",
+        "parameters",
+        "metrics",
+        "backend_preference",
+        "backend_actual",
+        "gpu_accelerated",
+        "sidecar_url",
+        "input_hash",
+        "output_hash"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "outcome_ledger",
+      "rows": 3,
+      "columns": [
+        "id",
+        "task_id",
+        "trace_id",
+        "tool_call_id",
+        "outcome_type",
+        "score",
+        "reward",
+        "feedback",
+        "metadata",
+        "recorded_at",
+        "receipt_id",
+        "run_id",
+        "receipt_schema",
+        "receipt_status",
+        "writes_performed",
+        "completion_checksum",
+        "previous_state",
+        "next_state",
+        "tool_name",
+        "execution_id",
+        "result_class",
+        "recovery_attempted",
+        "final_state",
+        "final_outcome",
+        "total_duration_ms",
+        "created_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_graph_snapshots_v2",
+      "rows": 2,
+      "columns": [
+        "snapshot_id",
+        "schema_version",
+        "status",
+        "source_manifest",
+        "projection_policy",
+        "node_count",
+        "edge_count",
+        "relation_event_count",
+        "excluded_count",
+        "unresolved_count",
+        "source_hash",
+        "topology_hash",
+        "policy_hash",
+        "eligibility_predicate",
+        "created_at",
+        "finalized_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "atlas_graph_authority_runs",
+      "rows": 2,
+      "columns": [
+        "run_id",
+        "graph_snapshot_id",
+        "algorithm",
+        "normalization_method",
+        "expected_l1_sum",
+        "observed_l1_sum",
+        "normalization_tolerance",
+        "did_converge",
+        "ran_iterations",
+        "node_count",
+        "status",
+        "created_at",
+        "promoted_at"
+      ],
+      "hasEndpointPair": false
+    },
+    {
+      "table": "codebase_relationship_reports",
+      "rows": 1,
+      "columns": [
+        "src_community",
+        "dst_community",
+        "summary",
+        "purpose",
+        "weight",
+        "built_at"
+      ],
+      "hasEndpointPair": true
+    },
+    {
+      "table": "atlas_graph_authority_runs_v2",
+      "rows": 1,
+      "columns": [
+        "run_id",
+        "snapshot_id",
+        "engine",
+        "algorithm",
+        "algorithm_version",
+        "configuration",
+        "topology_hash",
+        "node_count",
+        "edge_count",
+        "result_hash",
+        "status",
+        "did_converge",
+        "ran_iterations",
+        "started_at",
+        "completed_at"
+      ],
+      "hasEndpointPair": false
+    }
+  ],
+  "notProven": [
+    "Bounded multi-hop traversal from a seed packet has not been executed or timed.",
+    "NetworkX PageRank over these tables has not been run.",
+    "Edge endpoint identity (packet_key vs source_ref vs node id) is not verified per table."
+  ],
+  "checksum": "sha256:26a554cd507f7e8fa5dcf6bba58e842cccc43330e8a23bebb4fe39475e08b589"
+}

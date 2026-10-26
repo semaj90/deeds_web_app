@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.okf.ldr.capture.v1",
+  "runId": "76839544-4775-496e-9102-846ff58d3368",
+  "sourceId": "ldr-mcp-server",
+  "requestedUrl": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/mcp-server.md",
+  "resolvedUrl": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/mcp-server.md",
+  "title": "local-deep-research/docs/mcp-server.md at 8239c688206976926752ddfda8a76d9362a3e021 · LearningCircuit/local-deep-research · GitHub",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "rawChecksum": "4df83883319a37f50840d159f1fdf717752e54760bd32e435be544f1807bacf3",
+  "normalizedChecksum": "5cb35d04fa39d881ce9d777dfc96aecf7332250fdcb2e83cece130ea31df1965",
+  "capturedMarkdownSha256": "5cb35d04fa39d881ce9d777dfc96aecf7332250fdcb2e83cece130ea31df1965",
+  "capturedAt": "2026-10-18T00:51:36.097Z",
+  "parser": "html.parser",
+  "parserVersion": "4.15.0",
+  "canonicalAuthority": false
+}

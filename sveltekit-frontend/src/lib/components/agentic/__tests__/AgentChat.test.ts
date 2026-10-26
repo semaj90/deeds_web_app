@@ -380,7 +380,8 @@ describe('AgentChat Component', () => {
  id: '1',
  role: 'assistant',
  content: 'Searching for documents...',
- timestamp: new Date( toolCalls: [
+  timestamp: new Date(),
+  toolCalls: [
  {
  toolName: 'rag_lookup',
  arguments: {
@@ -530,7 +531,7 @@ describe('AgentChat Component', () => {
 
  const errorWithRetry = {
  message: 'Failed to send message',
- retryable: true, retryCount: 0 0,
+  retryable: true, retryCount: 0,
  };
 
  expect(errorWithRetry.retryable).toBe(true);
@@ -650,7 +651,7 @@ describe('AgentChat Component', () => {
  id: String(i),
  role,
  content: `Message ${i}`,
- timestamp, new Date(),
+  timestamp: new Date(),
  });
  }
 
@@ -668,7 +669,8 @@ describe('AgentChat Component', () => {
  id: '1',
  role: 'assistant',
  content: 'Searching and summarizing...',
- timestamp: new Date( toolCalls: [
+  timestamp: new Date(),
+  toolCalls: [
  { toolName: 'rag_lookup', arguments: {
 	query: 'contract' } },
 	{ toolName: 'web_doc_summary', arguments: {

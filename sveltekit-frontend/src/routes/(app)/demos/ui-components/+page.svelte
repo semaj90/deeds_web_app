@@ -185,8 +185,8 @@
 
 		<div class="demo-row">
 			<div class="progress-control">
-				<label>Value: {progressValue}%</label>
-				<input type="range" min="0" max="100" bind:value={progressValue} class="range-input" />
+				<label for="ui-progress-value">Value: {progressValue}%</label>
+				<input id="ui-progress-value" type="range" min="0" max="100" bind:value={progressValue} class="range-input" />
 			</div>
 		</div>
 
@@ -355,7 +355,7 @@
 				<div class="chat-msg">
 					<p class="chat-text">The statute of limitations for fraud under 18 U.S.C. § 1341 is 5 years from the date of the offense.</p>
 					<div class="chat-meta">
-						<span class="chat-source">gemma4-legal</span>
+						<span class="chat-source">ornith-1.5-9b</span>
 						<ChatFeedback messageIndex={0} source="demo" onfeedback={handleFeedback} />
 					</div>
 				</div>
@@ -578,7 +578,7 @@
 		margin-bottom: 0.25rem;
 	}
 	.section-head h2 { font-size: 1.15rem; font-weight: 600; margin: 0; }
-	.section-icon { color: #c4b5fd; }
+	:global(.section-icon) { color: #c4b5fd; }
 	.component-path {
 		font-size: 0.65rem;
 		color: #475569;

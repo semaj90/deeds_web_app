@@ -2,14 +2,21 @@
 
 /** Read-only audit of the current Graphify run owner and completion state. */
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const REPORT = resolve(ROOT, 'docs/reports/current-graphify-run-owner-v1.json');
+const reportArgument = process.argv.find((value) => value.startsWith('--report='))?.slice('--report='.length);
+const REPORT = resolve(ROOT, reportArgument ?? 'docs/reports/current-graphify-run-owner-v1.json');
+if (reportArgument) {
+  const relativeReport = relative(resolve(ROOT, '.tmp'), REPORT);
+  if (!relativeReport || relativeReport.startsWith('..') || isAbsolute(relativeReport)) {
+    throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+  }
+}
 const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const DERIVATION = resolve(ROOT, 'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
 const SELECTION_PLAN = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');

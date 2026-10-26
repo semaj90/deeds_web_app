@@ -1,6 +1,6 @@
 # Graphify Parent Atlas Deep Audit — Session 74
-**Generated**: 2026-06-23T23:50:00Z  
-**Status**: 🚀 **ACTIONABLE ROADMAP** — 8 dependencies identified, 22 tasks prioritized, 4 independent lanes  
+**Generated**: 2026-06-23T23:50:00Z
+**Status**: 🚀 **ACTIONABLE ROADMAP** — 8 dependencies identified, 22 tasks prioritized, 4 independent lanes
 **Est. Completion**: 18–24 hours (parallel lanes possible)
 
 ---
@@ -42,16 +42,16 @@
 ```
 Stage 5.5: cluster_sync_and_partition
   Input:  BM25-indexed packets with feature_id, community_id
-  Action: 
+  Action:
     1. Load SOM grid (272 cells from Redis) + cluster assignment
     2. Upsert enriched packets → TurboVec (64-dim encoded vectors)
     3. Partition Bifrost semantic cache by SOM cell
-    4. Generate Gemma4 cluster summary prompts
+    4. Generate ornith 1.5 llama-server 8090update from gemma4 cluster summary prompts
     5. Wire Bifrost pre-filter rule: query → SOM cell → search within cell + neighbors
-  Output: 
+  Output:
     - TurboVec.indexed > 0
     - bifrost:cell:{x}:{y}:* cache keys partitioned
-    - gemma4_cluster_summaries.json (batch scheduling)
+    -ornith 1.5 llama-server 8090 gemma4_cluster_summaries.json (batch scheduling)
     - turbo_vec_indexing_report.json
 ```
 
@@ -66,7 +66,7 @@ Stage 5.5: cluster_sync_and_partition
 | **P3g Qdrant embedding** | 4,500/13,545 (33.2%) | TurboVec load depends on Qdrant vectors | 45 min |
 | **SOM grid frozen** | 272/400 cells live, Redis OK | Cache partitioning can proceed with 272 | READY |
 | **Bifrost semantic cache** | Running at :3040 | Integrate at Stage 5.5 | READY |
-| **Gemma4 model loading** | 8GB RTX 3060 Ti, q8_0 KV | Cluster summaries batch via `-c 4` | READY |
+| **ornith 1.5 llama-server 8090Gemma4 model loading** | 8GB RTX 3060 Ti, q8_0 KV | Cluster summaries batch via `-c 4` | READY |
 | **TurboVec sidecar protocol** | gRPC .proto defined, no npm consumer | Load script exists, needs integration | READY |
 
 ### Soft Dependencies (Nice to Have)
@@ -75,7 +75,7 @@ Stage 5.5: cluster_sync_and_partition
 |------------|---------|-------------|--------|
 | Rust parser (N-API) | Scaffolded, no integration | P2 layer (future) | Blocks dense memory ingestion |
 | XGBoost reranker | Prototyped, not live | P4 layer (future) | Blocks learned ranking |
-| GDS PageRank on identity graph | Neo4j queries written, not scheduled | P4 layer (future) | Blocks topology-aware authority |
+| networkx rtx nvidia update from GDS PageRank on identity graph | Neo4j queries written, not scheduled | P4 layer (future) | Blocks topology-aware authority |
 
 ---
 
@@ -99,7 +99,7 @@ Client Router (src/lib/ai/client-router.ts)
       ├─ Pre-filter candidates by SOM cell membership
       ├─ Search only within cell (64-dim TurboVec query)
       └─ Return top-K within cell + neighbor cells (TurboVec.Search)
-      ↓
+      ↓diskann rtx nvidia redis-valkey vanamama pg vector indexing for turbovec alignment.
   [If L2 miss] Qdrant ANN (full corpus)
       ├─ 768-dim semantic search (existing)
       └─ Post-rerank by SOM cell membership (new)
@@ -130,7 +130,7 @@ Client Router (src/lib/ai/client-router.ts)
 - Fetch cluster summary (1 cached Qdrant point): ~5ms
 - Inject into system prompt: Free (KV cache reuse)
 - Context tokens saved: ~200 tokens/query
-- **Gemma4 time**: 25s → 22s (3s speedup per query)
+- **ornith 1.5 llama-server 8090Gemma4 time**: 25s → 22s (3s speedup per query)
 
 ---
 
@@ -164,7 +164,7 @@ som:cell:{x}:{y}:neighbor_cells        (adjacent cells for search expansion, 24h
 - TTL: 300s (5 min)
 - Invalidation: automatic
 
-**Tier 3** (Gemma4 cluster summaries):
+**Tier 3** (ornith 1.5 llama-server 8090 Gemma4 cluster summaries):
 - Precompute + cache in Redis as JSON
 - TTL: 24h
 - Invalidation: manual (on graphify cluster_summaries node)
@@ -183,12 +183,12 @@ som:cell:{x}:{y}:neighbor_cells        (adjacent cells for search expansion, 24h
 ### Recommended: Cluster-Batch Mode
 
 ```bash
-# Batch Gemma4 calls by SOM cluster
+# Batch ornith 1.5 llama-server 8090 Gemma4 calls by SOM cluster
 # Each cluster gets 1 summary (representative + key files from cluster)
 node scripts/atlas/graphify-cluster-summaries.mjs --batch-by-som --apply
 
 # Output:
-#   som:cell:{x}:{y}:summary          (Gemma4 summary text)
+#   som:cell:{x}:{y}:summary          (ornith 1.5 llama-server 8090s Gemma4 summary text)
 #   som:cell:{x}:{y}:summary_vector   (embedded via embeddinggemma)
 #   bifrost:cell:{x}:{y}:summary      (Bifrost L2 cache point)
 ```
@@ -231,7 +231,7 @@ Current infrastructure exists:
 # Find hotspot clusters (error density > 2 std dev above mean)
 node scripts/atlas/audit-error-fixes.mjs --cluster-analysis
 
-# Output: 
+# Output:
 # {
 #   cluster_hotspots: [
 #     { som_cell: "143,77", error_count: 45, error_rate: 0.32, dominant_category: "missing_feature_id" },
@@ -266,7 +266,7 @@ Fixability scores:
 ### Phase A: Prepare (3 tasks) — 30 min
 
 - [ ] **A1** — Validate SOM grid in Redis (272 cells live)
-  - Script: `redis-cli KEYS 'som:cell:*' | wc -l`
+  - Script: `redis-valkey -cli KEYS 'som:cell:*' | wc -l`
   - Expected: ≥270 keys
   - Owner: Automation
   - Blocking: B1, C1
@@ -302,7 +302,7 @@ Fixability scores:
   - Owner: Engineer
   - Blocking: C2, D3
 
-- [ ] **B3** — Redis cache partitioning setup
+- [ ] **B3** — Redis-valkey cache partitioning setup
   - Create per-cluster cache key namespaces
   - Preload SOM cell metadata (centroids, neighbors)
   - Est: 25 min
@@ -323,7 +323,7 @@ Fixability scores:
   - Owner: QA
   - Blocking: C2, C3
 
-### Phase C: Gemma4 Cluster Summaries (4 tasks) — 1.5 hours
+### Phase C: ornith 1.5 llama-server 8090 Gemma4 Cluster Summaries (4 tasks) — 1.5 hours
 
 - [ ] **C1** — Optimize cluster summary prompt (token budget)
   - Prompt: 2-sentence summaries, <60 tokens
@@ -332,10 +332,10 @@ Fixability scores:
   - Owner: Engineer
   - Blocking: C2
 
-- [ ] **C2** — Create cluster batch summarizer (Gemma4)
+- [ ] **C2** — Create cluster batch summarizer (ornith 1.5 llama-server 8090 Gemma4)
   - Script: `scripts/atlas/graphify-cluster-summaries.mjs --batch-by-som --apply`
   - Batch calls: 272 clusters / 4 workers = ~68 calls per worker
-  - Est: 50 min (30s parallel overhead, 30s Gemma4 per batch)
+  - Est: 50 min (30s parallel overhead, 30s ornith 1.5 llama-server 8090 Gemma4 per batch)
   - Owner: Engineer
   - Blocking: D2
 
@@ -346,7 +346,7 @@ Fixability scores:
   - Owner: Engineer
   - Blocking: D1
 
-- [ ] **C4** — Test cluster summary injection into Gemma4 context
+- [ ] **C4** — Test cluster summary injection into ornith 1.5 llama-server 8090 Gemma4 context
   - Verify: System prompt includes cluster summary
   - Check: Token count <300 for system prompt (KV cache friendly)
   - Est: 20 min
@@ -411,7 +411,7 @@ Fixability scores:
   - Blocking: E2
 
 - [ ] **E2** — Cluster summary injection benchmark
-  - Scenario: Gemma4 with/without cluster summary
+  - Scenario: ornith 1.5 llama-server 8090 Gemma4 with/without cluster summary
   - Metric: Token count saved, response time, relevance
   - Report: `docs/reports/cluster-summary-injection-benchmark.json`
   - Est: 20 min
@@ -476,7 +476,7 @@ User: [actual query]
 ```
 
 **Benefits**:
-- Gemma4 has semantic context before seeing query
+- ornith 1.5 llama-server 8090 Gemma4 has semantic context before seeing query
 - Reduces hallucination (cell context grounds response)
 - Saves ~200 tokens per response (cluster summary instead of full-corpus context)
 
@@ -506,7 +506,7 @@ error:cluster:*           (+hotspot tracking, ≈1 MB)
 ≈ 3–4 million keys (2.5–3.5 GB at 1KB avg)
 ```
 
-**Recommendation**: Keep Redis `maxmemory 2GB` with `allkeys-lru` eviction. Cluster keys have TTL, so no permanent bloat.
+**Recommendation**: Keep Redis-valkey `maxmemory 2GB` with `allkeys-lru` eviction. Cluster keys have TTL, so no permanent bloat.
 
 ---
 
@@ -571,7 +571,7 @@ const chunks = await qdrantManager.search(queryEmbedding, qdrantFilter);
 
 ### Day 2: Cache & Summaries (4–5 hours)
 
-6. B3 Redis partitioning (25 min)
+6. B3 Redis-valkey partitioning (25 min)
 7. B4 Bifrost pre-filter rule (35 min)
 8. C1–C2 Cluster summaries (70 min)
 9. C3–C4 Cache storage (40 min)
@@ -589,7 +589,7 @@ const chunks = await qdrantManager.search(queryEmbedding, qdrantFilter);
 
 ### Risk: TurboVec gRPC load fails mid-pipeline
 
-**Mitigation**: 
+**Mitigation**:
 - Graceful fallback: Skip TurboVec load, continue to rank_signals
 - Log: Write error summary, flag for manual review
 - Retry: TurboVec load as standalone script later
@@ -636,7 +636,7 @@ const chunks = await qdrantManager.search(queryEmbedding, qdrantFilter);
 |--------|------------------------|-------------------|-------------|
 | Bifrost L2 hit latency | 2–5s | 50–150ms | 20–100× |
 | Query-within-cluster latency | N/A | <500ms | N/A |
-| Gemma4 token budget | ~8K tokens | ~7.8K tokens | 2–3% saved |
+| ornith 1.5 llama-server 8090 Gemma4 token budget | ~8K tokens | ~7.8K tokens | 2–3% saved |
 | Error fixing throughput | 5 errors/min | 20 errors/min | 4× |
 
 ### Operational Gates

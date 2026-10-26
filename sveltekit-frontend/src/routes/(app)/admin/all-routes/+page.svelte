@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import RouteOperationsDashboard from '$lib/components/RouteOperationsDashboard.svelte';
 	import RouteInspectorModal from '$lib/components/RouteInspectorModal.svelte';
 	import RouteDecisionModal from '$lib/components/RouteDecisionModal.svelte';
@@ -22,7 +22,7 @@
 	let showDecisionModal = $state(false);
 	let decisionRoute = $state<{ path: string; reason: string; decision: 'keep' | 'archive' | 'remove' | null; notes?: string } | null>(null);
 
-	let routes = $state<any[]>([]);
+	let routes = $state<any[]>(untrack(() => Array.isArray(data?.routes) ? data.routes : []));
 	let searchQuery = $state('');
 	let filterHealth = $state<'all' | 'healthy' | 'flaky' | 'broken'>('all');
 	let filterKind = $state<'all' | 'page' | 'layout' | 'server' | 'endpoint'>('all');
@@ -837,7 +837,7 @@
 	<!-- Route Card Grid -->
 	{#if filteredRoutes.length > 0}
 		<div class="route-card-grid">
-			{#each filteredRoutes as route (route.id ?? route.path)}
+			{#each filteredRoutes as route, idx ((route.id ?? route.path) + ':' + (route.file ?? '') + ':' + idx)}
 				<button
 					class="route-card"
 					class:card-broken={route.errorState === 'broken'}

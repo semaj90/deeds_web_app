@@ -1,6 +1,6 @@
 {
   "schema": "atlas.library-api-doc-catalog.v1",
-  "catalogRevision": "library-api-doc-catalog-v1-2026-10-09",
+  "catalogRevision": "library-api-doc-catalog-v1-2026-10-11",
   "canonicalAuthority": false,
   "selectionPolicy": "official-publisher-docs-first; installed-version-match-required-before-versioned-admission",
   "versionPolicy": {
@@ -52,6 +52,11 @@
     { "id": "oaklib", "priority": "P2", "ecosystems": ["python"], "packages": ["oaklib"], "apiSurfaces": ["ontology adapters, ontology traversal and mappings"], "urls": ["https://oaklib.readthedocs.io/en/latest/"], "qualification": "CURRENT_UPSTREAM" },
     { "id": "rust-workspace", "priority": "P2", "ecosystems": ["rust"], "packages": ["tokio", "rayon", "serde", "napi"], "apiSurfaces": ["Rust language/API", "N-API Rust bindings", "async/runtime/serialization"], "urls": ["https://doc.rust-lang.org/book/", "https://napi.rs/", "https://docs.rs/tokio/latest/tokio/", "https://docs.rs/rayon/latest/rayon/", "https://serde.rs/"], "qualification": "LOCK_VERSION_WHERE_AVAILABLE" },
     { "id": "simdjson-cpp", "priority": "P2", "ecosystems": ["cpp"], "packages": ["simdjson"], "apiSurfaces": ["C++ DOM/On-Demand API", "ABI/build options"], "urls": ["https://simdjson.org/", "https://github.com/simdjson/simdjson"], "qualification": "CURRENT_UPSTREAM" },
+    { "id": "cuda-tile-simt", "priority": "P1", "ecosystems": ["python", "cpp", "cuda"], "packages": ["cuda-tile", "CUDA Toolkit"], "apiSurfaces": ["cuTile Python/TileIR quickstart", "CUDA Tile kernels", "CUDA SIMT kernels"], "urls": ["https://docs.nvidia.com/cuda/cutile-python/quickstart.html", "https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-tile-kernels.html", "https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html"], "qualification": "CAPTURE_VERSION_FROM_PAGE_METADATA" },
+    { "id": "mastra-workflows", "priority": "P1", "ecosystems": ["npm", "typescript", "agent"], "packages": ["@mastra/core"], "apiSurfaces": ["workflow and step schemas", "control flow", "suspend/resume and tool handoffs"], "urls": ["https://mastra.ai/docs/workflows/overview", "https://mastra.ai/docs/workflows/control-flow"], "qualification": "CURRENT_UPSTREAM" },
+    { "id": "agent-client-protocol", "priority": "P1", "ecosystems": ["typescript", "protocol", "agent"], "packages": ["@agentclientprotocol/sdk"], "apiSurfaces": ["editor-agent protocol overview", "JSON-RPC request and event model"], "urls": ["https://agentclientprotocol.com/get-started/introduction"], "qualification": "CURRENT_UPSTREAM" },
+    { "id": "a2a-protocol", "priority": "P1", "ecosystems": ["protocol", "python", "agent"], "packages": ["a2a-sdk"], "apiSurfaces": ["agent interoperability", "protocol specification", "tasks and messages"], "urls": ["https://a2a-protocol.org/latest/", "https://a2a-protocol.org/latest/specification/"], "qualification": "LATEST_SPECIFICATION_CAPTURED_AT_FETCH" },
+    { "id": "opencode-tools-mcp", "priority": "P1", "ecosystems": ["typescript", "protocol", "agent"], "packages": ["opencode", "@opencode-ai/plugin", "@opencode-ai/sdk"], "apiSurfaces": ["tool permissions", "custom tools", "MCP server configuration", "ACP integration"], "urls": ["https://docs.opencode.ai/docs/tools/", "https://docs.opencode.ai/docs/custom-tools/", "https://docs.opencode.ai/docs/mcp-servers/", "https://docs.opencode.ai/docs/acp/"], "qualification": "CURRENT_UPSTREAM" },
     { "id": "beautifulsoup-firecrawl", "priority": "P2", "ecosystems": ["python", "http"], "packages": ["beautifulsoup4", "firecrawl-py"], "apiSurfaces": ["HTML parsing", "Firecrawl crawl/scrape API"], "urls": ["https://www.crummy.com/software/BeautifulSoup/bs4/doc/", "https://docs.firecrawl.dev/"], "qualification": "CURRENT_UPSTREAM" }
   ],
   "indexingContract": {

@@ -142,7 +142,7 @@ if (!redisGate.ok) {
 }
 
 const steps = [
-  ['graphify:audit:gemma4', { required: true, name: 'Graphify Audit (Gemma4)' }],
+  ['graphify:audit:ornith', { required: true, name: 'Graphify Audit (Ornith 1.5)' }],
   ...(INCLUDE_DIRECTORY_STREAM ? [[DIRECTORY_STREAM_SCRIPT, { required: false, name: 'Directory Graph JSONL stream' }]] : []),
   ['graphify:cluster-cards:generate', { required: false, name: 'Generate cluster-cards.jsonl' }],
   ['graphify:cluster-cards:validate', { required: false, name: 'Validate schema' }],

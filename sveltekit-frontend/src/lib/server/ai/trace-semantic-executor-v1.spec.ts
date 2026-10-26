@@ -30,11 +30,11 @@ describe('TRACE semantic executor', () => {
       loadCohort: async (requested) => requested === revision ? cohort : [],
       cuvsExact: async (input) => ({
         schema: 'atlas.semantic768-exact-knn-receipt.v1', operation: 'knn.exact', backend: 'cuvs.brute_force',
-        metric: 'sqeuclidean_rank_equivalent_to_cosine_for_l2_normalized_vectors', representationId: 'semantic_768',
+        metric: 'cosine_distance', representationId: 'semantic_768',
         representationRevision: 'semantic-768-test-v1', dimension: 768, corpusRows: input.corpus.length, topK: 1, durationMs: 1, truncated: false,
         identityManifestChecksum: 'a'.repeat(64), matrixChecksum: 'b'.repeat(64),
         gpuMemoryBeforeMb: null, gpuMemoryAfterMb: null,
-        results: [{ rank: 0, packetKey: 'packet:one', sourceRevision: cohort[0].sourceRevision, symbolVersionId: null, sqeuclideanDistance: 0, cosineSimilarity: 1 }],
+        results: [{ rank: 0, packetKey: 'packet:one', sourceRevision: cohort[0].sourceRevision, symbolVersionId: null, cosineDistance: 0, cosineSimilarity: 1 }],
       }),
     });
     expect(result).toMatchObject({ status: 'READY', logicalLane: 'semantic', voteKey: 'semantic', voteCount: 1, executor: 'CUVS_EXACT', fallbackUsed: true, writesPerformed: false });

@@ -196,51 +196,51 @@
               <div class="space-y-4">
                 <h4 class="text-nes-accent border-b-2 border-nes-accent pb-2">PIPELINE CONFIGURATION</h4>
 
-                <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="flex items-center gap-3 cursor-pointer group">
                   <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">ENABLE DOCLING-258M (OCR/VLM)</span>
-                </label>
+                </div>
 
-                <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="flex items-center gap-3 cursor-pointer group">
                   <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">LANGEXTRACT + TRANSLATION</span>
-                </label>
+                </div>
 
-                <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="flex items-center gap-3 cursor-pointer group">
                   <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">WHISPER AUDIO TRANSCRIPTION</span>
-                </label>
+                </div>
               </div>
 
               <div class="space-y-4">
                 <h4 class="text-nes-accent border-b-2 border-nes-accent pb-2">INDEXING STRATEGY</h4>
 
-                <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="flex items-center gap-3 cursor-pointer group">
                   <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">COSINE RANKING + DEDUPLICATION</span>
-                </label>
+                </div>
 
-                <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="flex items-center gap-3 cursor-pointer group">
                   <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">TOPOLOGICAL TOPIC MAPPING</span>
-                </label>
+                </div>
 
-                <label class="flex items-center gap-3 cursor-pointer group">
+                <div class="flex items-center gap-3 cursor-pointer group">
                   <div class="w-6 h-6 border-2 border-nes-text flex items-center justify-center group-hover:border-nes-accent">
                     <div class="w-3 h-3 bg-nes-accent"></div>
                   </div>
                   <span class="text-nes-text">ACE CONTEXTUAL RETRIEVAL</span>
-                </label>
+                </div>
               </div>
             </div>
 

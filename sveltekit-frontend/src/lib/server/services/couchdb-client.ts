@@ -1,49 +1,20 @@
-import { ENV } from '$lib/server/env.server.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 /**
  * CouchDB Client - Lightweight wrapper for ACE knowledge base
  */
 
-function stripCredentials(url?: string | null): string {
-  if (!url) return '';
-  try {
-    const parsed = new URL(url);
-    parsed.username = '';
-    parsed.password = '';
-    return parsed.toString().replace(/\/$/, '');
-  } catch {
-    return url.replace(/\/$/, '');
-  }
-}
-
-const COUCHDB_URL = stripCredentials(ENV.COUCHDB_URL);
-
-function authHeader(): string {
-  // Extract from original URL if present, otherwise fallback to basic defaults
-  try {
-    const url = new URL(ENV.COUCHDB_URL);
-    if (url.username && url.password) {
-      return 'Basic ' + Buffer.from(url.username + ':' + url.password).toString('base64');
-    }
-  } catch { /* ignore */ }
-  return '';
-}
-
 async function couchFetch(path: string, init?: RequestInit): Promise<Response> {
-  if (!COUCHDB_URL) {
-    throw new Error('CouchDB URL is not configured');
-  }
-
-  const url = COUCHDB_URL + '/' + path.replace(/^\//, '');
+  const couchDb = resolveCouchDbConfigV1(process.env);
+  const url = couchDb.baseUrl + '/' + path.replace(/^\//, '');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(init?.headers as Record<string, string> ?? {})
   };
 
-  const auth = authHeader();
-  if (auth && !headers['Authorization']) {
-    headers['Authorization'] = auth;
+  if (!headers['Authorization']) {
+    headers['Authorization'] = couchDb.authorization;
   }
 
   return fetch(url, { ...init, headers });

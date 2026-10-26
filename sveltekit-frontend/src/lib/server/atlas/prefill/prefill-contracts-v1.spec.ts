@@ -199,6 +199,20 @@ describe('compiled prefill identity', () => {
     expect(composedContextPrefixIdentity.modelRevision).toBe(logical.modelRevision);
     expect(composedContextPrefixIdentity.templateRevision).toBe(logical.promptTemplateRevision);
     expect(composedContextPrefixIdentity.stableEvidenceRevision).toBe(logical.evidenceRevisionSetHash);
+
+    const { schema: _schema, checksumSha256: _checksum, ...logicalInput } = logical;
+    const adaptedLogical = buildPrefillContentIdentityV1({
+      ...logicalInput,
+      adapterRevision: `sha256:${'a'.repeat(64)}`,
+    });
+    const adaptedPrefixIdentity = buildContextPrefixIdentityFromPrefillContentV1({
+      contentIdentity: adaptedLogical,
+      stablePrefix: 'stable system policy and tool contract',
+      toolSchemaRevision: 'tools:r1',
+      systemPolicyRevision: 'policy:r1',
+    });
+    expect(adaptedPrefixIdentity.modelRevision).not.toBe(composedContextPrefixIdentity.modelRevision);
+    expect(adaptedPrefixIdentity.checksum).not.toBe(composedContextPrefixIdentity.checksum);
     expect(receipt.contextPrefixReuseObservation?.prefixReuseRatio).toBe(0.8);
 
     const mismatchedPrefixIdentity = buildContextPrefixIdentityV1({

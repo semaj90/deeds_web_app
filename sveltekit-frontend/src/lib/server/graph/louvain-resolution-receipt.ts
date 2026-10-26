@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import type { Pool } from 'pg';
 import { z } from 'zod';
 import { classifyGraphPacketPath } from './graph-packet-key-resolver.js';
+import { buildLouvainPersistenceReceipt } from './graph-dispatcher-proof.js';
 
 export interface LouvainResolutionSeedRow {
 	graphNodeKey: string;
@@ -369,7 +370,7 @@ export async function buildLouvainResolutionReceipt(
 }
 
 export async function buildLatestLouvainResolutionReceipt(db: Pool): Promise<LouvainResolutionReceipt | null> {
-	const persistenceReceipt = await (await import('./graph-dispatcher-proof.js')).buildLouvainPersistenceReceipt(db);
+	const persistenceReceipt = await buildLouvainPersistenceReceipt(db);
 	if (!persistenceReceipt) return null;
 
 	let runRows: Array<{

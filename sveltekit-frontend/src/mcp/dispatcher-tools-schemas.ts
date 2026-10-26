@@ -148,36 +148,104 @@ export const DISPATCHER_TOOLS_SCHEMAS = [
     },
   },
 
-  // 6. graph:expand — Neo4j K-hop neighbors
+  // 6. graph:expand — bounded read-only source neighborhood
   {
     name: 'graph:expand',
     description:
-      'Query Neo4j for K-hop neighbors of feature nodes. Returns topology context for ranking.',
+      'Expand a bounded read-only graph neighborhood around source references. Results are advisory until canonical source admission.',
     inputSchema: {
       type: 'object',
       properties: {
-        feature_ids: {
+        sourceRefs: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Feature IDs to expand around',
+          minItems: 1,
+          maxItems: 8,
+          description: 'Canonical source references or stable file keys used as neighborhood seeds.',
         },
-        hops: {
-          type: 'number',
-          description: 'Traversal depth (1-3)',
-          default: 2,
+        maxHops: {
+          type: 'integer',
+          enum: [1, 2],
+          description: 'Maximum graph traversal depth.',
         },
-        limit_per_hop: {
-          type: 'number',
-          description: 'Max results per hop',
-          default: 10,
-        },
-        relationship_types: {
-          type: 'array',
-          items: { type: 'string' },
-          description: 'Edge types to traverse',
+        limit: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
+          default: 40,
+          description: 'Maximum neighbors returned.',
         },
       },
-      required: ['feature_ids'],
+      required: ['sourceRefs'],
+    },
+  },
+
+  {
+    name: 'graph:resident_bfs',
+    description:
+      'Read a bounded neighborhood from an already resident, checksum-qualified RTX graph. Does not load or alter graph residency; results are advisory and noncanonical.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        graphRevision: { type: 'string', minLength: 1 },
+        projectionRevision: { type: 'string', minLength: 1 },
+        projectionChecksum: { type: 'string', minLength: 1 },
+        startNodeKey: { type: 'string', minLength: 1 },
+        depthLimit: { type: 'integer', minimum: 0, maximum: 2 },
+        expectedArtifactChecksum: { type: 'string', minLength: 1 },
+        expectedGraphOrdinalMapChecksum: { type: 'string', minLength: 1 },
+      },
+      required: [
+        'graphRevision', 'projectionRevision', 'projectionChecksum', 'startNodeKey', 'depthLimit',
+        'expectedArtifactChecksum', 'expectedGraphOrdinalMapChecksum',
+      ],
+    },
+  },
+
+  {
+    name: 'graph:resident_source_ref_bfs',
+    description:
+      'Resolve an exact sourceRef in an already resident graph using caller-pinned source/workspace revisions, then return bounded noncanonical BFS receipts for every matching graph node. Never loads a graph.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        graphRevision: { type: 'string', minLength: 1 },
+        projectionRevision: { type: 'string', minLength: 1 },
+        projectionChecksum: { type: 'string', minLength: 1 },
+        sourceRef: { type: 'string', minLength: 1 },
+        expectedSourceRevision: { type: 'string', minLength: 1 },
+        expectedWorkspaceRevision: { type: 'string', minLength: 1 },
+        depthLimit: { type: 'integer', minimum: 0, maximum: 2 },
+        matchLimit: { type: 'integer', minimum: 1, maximum: 16, default: 16 },
+        expectedArtifactChecksum: { type: 'string', minLength: 1 },
+        expectedGraphOrdinalMapChecksum: { type: 'string', minLength: 1 },
+      },
+      required: [
+        'graphRevision', 'projectionRevision', 'projectionChecksum', 'sourceRef',
+        'expectedSourceRevision', 'expectedWorkspaceRevision', 'depthLimit',
+        'expectedArtifactChecksum', 'expectedGraphOrdinalMapChecksum',
+      ],
+    },
+  },
+
+  {
+    name: 'graph:community_leiden',
+    description:
+      'Run diagnostic-only cuGraph Leiden on a caller-supplied, revision-labelled small undirected projection. The receipt hashes the exact input; this tool does not load canonical graph data, write state, or promote communities.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        graphRevision: { type: 'string', minLength: 1 },
+        topologyHash: { type: 'string', minLength: 1 },
+        projectionRevision: { type: 'string', minLength: 1 },
+        nodes: { type: 'array', minItems: 1, maxItems: 512, items: { type: 'object', properties: { nodeId: { type: 'string', minLength: 1 } }, required: ['nodeId'], additionalProperties: false } },
+        edges: { type: 'array', maxItems: 4096, items: { type: 'object', properties: { source: { type: 'string', minLength: 1 }, target: { type: 'string', minLength: 1 }, weight: { type: 'number', exclusiveMinimum: 0 } }, required: ['source', 'target', 'weight'], additionalProperties: false } },
+        resolution: { type: 'number', exclusiveMinimum: 0, maximum: 10 },
+        maxIterations: { type: 'integer', minimum: 1, maximum: 100 },
+        randomState: { type: 'integer', minimum: 0, maximum: 2147483647 },
+      },
+      required: ['graphRevision', 'topologyHash', 'projectionRevision', 'nodes', 'edges'],
+      additionalProperties: false,
     },
   },
 

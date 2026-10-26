@@ -97,9 +97,13 @@ export function normalizeOkfDevSourceManifestV1(manifest) {
   return normalized;
 }
 
-export function orderOkfDevFetchersV1(preferredFetcher) {
+export function orderOkfDevFetchersV1(preferredFetcher, { allowFirecrawl = true } = {}) {
   const fallbackOrder = ['FIRECRAWL', 'BEAUTIFULSOUP_HTTP', 'HTTP_FALLBACK'];
   if (!preferredFetcher) return fallbackOrder;
   if (!SUPPORTED_FETCHERS.has(preferredFetcher)) throw new Error(`SOURCE_MANIFEST_UNSUPPORTED_FETCHER:${preferredFetcher}`);
-  return [preferredFetcher, ...fallbackOrder.filter((fetcher) => fetcher !== preferredFetcher)];
+  if (!allowFirecrawl && preferredFetcher === 'FIRECRAWL') {
+    throw new Error('SOURCE_MANIFEST_FIRECRAWL_DISABLED');
+  }
+  const ordered = [preferredFetcher, ...fallbackOrder.filter((fetcher) => fetcher !== preferredFetcher)];
+  return allowFirecrawl ? ordered : ordered.filter((fetcher) => fetcher !== 'FIRECRAWL');
 }

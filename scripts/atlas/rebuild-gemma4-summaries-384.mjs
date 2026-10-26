@@ -10,14 +10,14 @@
  * Flow:
  * 1. Select chunks missing summary_text or summary_embedding_384
  * 2. Group by som_cluster / feature_id / relative_path for context
- * 3. Call Gemma4 llama-server for summarization
+ * 3. Call Ornith 1.5 via llama-server for summarization
  * 4. Store summary_text to codebase_chunk_index
  * 5. Call the configured embedder for the legacy summary_embedding_384 projection
  * 6. Store to Postgres + upsert to Qdrant (via restore script)
  * 7. Warm Redis/Bifrost summary cache
  *
  * Concurrency:
- * - Gemma4: --concurrency=2 (single model, sequential by default)
+ * - Ornith: --concurrency=2 (single model, sequential by default)
  * - Embedding: --embed-concurrency=4 (parallel embedding batches)
  * - Batch size: 50
  *
@@ -81,57 +81,16 @@ const report = {
   }
 };
 
-async function probeJson(url, timeoutMs = 4000) {
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
-    return { ok: res.ok, status: res.status };
-  } catch (err) {
-    return { ok: false, status: 0, error: err.message };
-  }
-}
-
 console.log('\n🔨 LEGACY-ONLY: REBUILD SUMMARIES + 384-DIM PROJECTIONS\n');
-if (!dryRun) console.warn('WARNING: explicit legacy 384-D write opt-in; this is not semantic_768 authority.');
-console.log(`Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);
-console.log(`Concurrency: Gemma4=${concurrencyArg}, Embed=${embedConcurrencyArg}`);
+console.log('Mode: READ-ONLY CANDIDATE INSPECTION');
+console.log(`Concurrency: Ornith=${concurrencyArg}, Embed=${embedConcurrencyArg}`);
 if (sampleSize > 0) console.log(`Sample size: ${sampleSize}`);
 if (limitArg > 0) console.log(`Limit: ${limitArg}`);
 if (offsetArg > 0) console.log(`Offset: ${offsetArg}`);
 console.log('');
 
-// ── Step 0: Service preflight ───────────────────────────────────────────
-console.log('Step 0: Service preflight...');
-const llamaProbe = await probeJson(`${LLAMA_URL.replace(/\/$/, '')}/health`);
-const ollamaProbe = await probeJson(`${OLLAMA_URL.replace(/\/$/, '')}/api/tags`);
-const qdrantProbe = await probeJson(`${QDRANT_URL.replace(/\/$/, '')}/collections`);
-
-report.steps.push({
-  name: 'service_preflight',
-  status: llamaProbe.ok && ollamaProbe.ok && qdrantProbe.ok ? 'OK' : 'FAILED',
-  llama_server: llamaProbe,
-  ollama_embedding: ollamaProbe,
-  qdrant: qdrantProbe,
-  redis: { host: REDIS_CONFIG.host, port: REDIS_CONFIG.port, password_configured: Boolean(REDIS_CONFIG.password) }
-});
-
-console.log(`   llama-server: ${llamaProbe.ok ? 'OK' : `FAIL ${llamaProbe.error || llamaProbe.status}`}`);
-console.log(`   ollama embedding: ${ollamaProbe.ok ? 'OK' : `FAIL ${ollamaProbe.error || ollamaProbe.status}`}`);
-console.log(`   qdrant: ${qdrantProbe.ok ? 'OK' : `FAIL ${qdrantProbe.error || qdrantProbe.status}`}\n`);
-
-if (!llamaProbe.ok || !ollamaProbe.ok || !qdrantProbe.ok) {
-  report.status = 'FAILED_PREFLIGHT';
-  fs.mkdirSync(TMP_DIR, { recursive: true });
-  fs.writeFileSync(
-    path.resolve(TMP_DIR, 'rebuild-summaries-384-report.json'),
-    JSON.stringify(report, null, 2)
-  );
-  console.error('❌ Preflight failed. Start llama-server with npm run turbo:start:detached before P6.');
-  await pool.end();
-  process.exit(1);
-}
-
 // ── Step 1: Count and fetch chunks needing summaries ─────────────────────
-console.log('Step 1: Fetching chunks needing summaries...');
+console.log('Step 1: Inspecting candidate rows (no source content loaded)...');
 
 let chunksNeedingSummary = [];
 
@@ -164,12 +123,7 @@ try {
   const fetchQuery = `
     SELECT
       id,
-      relative_path,
-      content,
-      summary,
-      som_cluster,
-      symbol,
-      community_id
+      relative_path
     FROM codebase_chunk_index
     WHERE (summary IS NULL OR summary = '')
        OR (summary_embedding_384 IS NULL)
@@ -198,8 +152,23 @@ try {
   process.exit(1);
 }
 
-// ── Step 2: Batch summaries via Gemma4 ──────────────────────────────────
-console.log(`Step 2: Generating summaries via Gemma4 (concurrency=${concurrencyArg})...`);
+report.status = 'DRY_RUN_CANDIDATES_ONLY';
+report.steps.push({
+  name: 'model_generation_and_projection',
+  status: 'SKIPPED_READ_ONLY_INSPECTION'
+});
+report.candidates = chunksNeedingSummary.map(({ id, relative_path }) => ({ id, relative_path }));
+const inspectionReportPath = path.resolve(TMP_DIR, 'rebuild-summaries-384-report.json');
+fs.mkdirSync(TMP_DIR, { recursive: true });
+fs.writeFileSync(inspectionReportPath, JSON.stringify(report, null, 2));
+console.log(`Candidates inspected: ${chunksNeedingSummary.length}`);
+console.log('Model, embedding, Qdrant, and cache operations skipped.');
+console.log(`Report: ${inspectionReportPath}`);
+await pool.end();
+process.exit(0);
+
+// ── Step 2: Batch summaries via Ornith ──────────────────────────────────
+console.log(`Step 2: Generating summaries via Ornith (concurrency=${concurrencyArg})...`);
 
 const batchSize = 50;
 const numBatches = Math.ceil(chunksNeedingSummary.length / batchSize);
@@ -218,7 +187,7 @@ try {
     }
 
     const results = await mapLimit(batch, concurrencyArg, chunk =>
-      generateSummaryGemma4(chunk).catch(err => ({
+      generateSummaryOrnith(chunk).catch(err => ({
         ...chunk,
         summary: null,
         error: err.message
@@ -254,7 +223,7 @@ try {
   console.log(`   ✓ Summaries generated: ${generatedSummaries}/${chunksNeedingSummary.length}\n`);
 
   report.steps.push({
-    name: 'generate_summaries_gemma4',
+    name: 'generate_summaries_ornith',
     status: generatedSummaries > 0 ? 'OK' : 'PARTIAL',
     batches: numBatches,
     summaries_generated: generatedSummaries,
@@ -265,7 +234,7 @@ try {
 } catch (err) {
   console.error(`   ❌ Step 2 failed: ${err.message}`);
   report.steps.push({
-    name: 'generate_summaries_gemma4',
+    name: 'generate_summaries_ornith',
     status: 'FAILED',
     error: err.message
   });
@@ -521,7 +490,7 @@ await pool.end();
 
 // ── Helper functions ───────────────────────────────────────────────────
 
-async function generateSummaryGemma4(chunk) {
+async function generateSummaryOrnith(chunk) {
   const prompt = `Summarize this code chunk in 2-3 sentences (max 150 words):
 
 \`\`\`

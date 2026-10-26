@@ -143,3 +143,37 @@ down its own `:AtlasContextNode` fixture nodes scoped to a random
 `fixture_run_id`, per its existing design). No commit was made for these
 files yet — they are uncommitted local changes on `main` at the time of this
 handoff.
+
+## 2026-10-13 — Canonical Top-K Contract, Deterministic Parity & TRACE Audit
+
+### Canonical Top-K Contract Gates (TOPK-04..09)
+
+- [x] **TOPK-04 CPU/CUDA Deterministic Tie Parity**:
+  - Implemented tlas.topk.v1 contract with canonical ordering SCORE_DESC_ORDINAL_ASC_ID_ASC (Score DESC -> CandidateOrdinal ASC -> CanonicalId ASC).
+  - Fixed PyTorch 	orch.topk tie instability in python/atlas_compute/topk_paginator.py with boundary tie expansion and deterministic ordering via ordinals and canonical IDs.
+  - Implemented stable_topk CPU reference using bounded min-heap with strict comparator eviction of worse candidates on ties.
+  - Rejection policy enforced: non-finite scores (NaN, Infinity, -Infinity) are rejected before ranking in both TypeScript and Python.
+  - Validation: 9/9 Vitest tests passed in 	opk-paginator.spec.ts; 7/7 Python unittest tests passed in 	est_topk_paginator.py.
+- [x] **TOPK-05 Pagination Consistency**:
+  - Validated boundary offset pagination: no missing or repeated IDs across contiguous slices [offset : offset + k].
+  - Schema alignment: CanonicalTopKResultV1 emitted by both canonicalTopKPaginate() in TypeScript and stable_topk() in Python.
+- [ ] **TOPK-06 Memory Ceiling**:
+  - Bounded retention test for 162K candidate snapshots: enforce O(offset + k) heap/slice memory envelope instead of full-array sorting.
+- [ ] **TOPK-07 Revision/Canonical ID Readback**:
+  - Verify selected candidates resolve cleanly against PostgreSQL 18 (sourceRef, sourceRevision, CandidateOrdinal) state.
+- [ ] **TOPK-08 N-API/Sidecar Boundary Audit**:
+  - Python computation adapter re-exports tested helpers cleanly under tlas_compute without premature custom CUDA/N-API bindings.
+  - Defer custom GEMM kernels; PyTorch and cuBLASLt own tensor operations until a measured latency or memory gap is proven.
+- [ ] **TOPK-09 Agentic Search Integration**:
+  - Guarantee identical admitted ContextManifest cold and warm across BitFrost token FSM swaps and local llama-server:8090 (ornith-1.5-9b).
+
+### TRACE Live Diagnostic Audit (2026-10-13; Read-Only)
+
+- **System Health Review**:
+  - Healthy: PostgreSQL 18, Valkey/Redis :6379, Qdrant :6333, Neo4j, Bifrost, llama-server:8090 (ornith-1.5-9b), Go retrieval, TRACE MCP.
+  - Degraded: Topology service on :8101 and rerank service on :8099 are DOWN. Health check port labeling discrepancy noted (:8090 vs :8080).
+- **Native Acceleration**:
+  - Reported NATIVE_BACKEND_UNAVAILABLE for native simdjson backend, confirming active fallback to JSON.parse (supports KAFKA-19).
+- **ACE Packet Quality Defect**:
+  - tlas_packet_search inspection revealed a stored canonical packet summary (graph-ml-client.ts) containing raw drafting scratch text ('The summary needs to be 1-2 sentences... Drafting the summary').
+  - Remediation flagged: add schema validator rejecting model drafting text before packet admission into Valkey or PostgreSQL.

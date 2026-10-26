@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.golden-breadth-reconciled-manifest.v1",
+  "status": "READ_ONLY_CANDIDATE_CORPUS_COMPLETE_NOT_GOLD",
+  "queryCount": 50,
+  "sourceRuns": [
+    {
+      "runId": "gb-2026-10-21T22-57-21-432Z-21473405",
+      "manifestSha256": "01101a039c3c0e8e1d1119ccf62bbd0af1473e9cfe7866ea31cdb9dfae05168f"
+    },
+    {
+      "runId": "gb-2026-10-21T23-06-01-878Z-0ca9b371",
+      "manifestSha256": "ff98593536c93a8ae6b6924e8f2f30ef794afebfc31cc5b851b686c49fa4d8a7"
+    },
+    {
+      "runId": "gb-2026-10-21T23-06-17-731Z-cff90028",
+      "manifestSha256": "d0cdf8d49cc52b523468cd7ff2be69b129cc68fbb6e42b7b7c0ef6fd670ed518"
+    },
+    {
+      "runId": "gb-2026-10-21T23-06-24-439Z-057e17d7",
+      "manifestSha256": "1672beaed4f0959220f2ba63d5990a499c5662a1aa0fe36da2ff089e3da1b339"
+    },
+    {
+      "runId": "gb-2026-10-21T23-06-31-471Z-0ebe7bba",
+      "manifestSha256": "e044fb0d2c00fdc87c37e2500574ea8d9007d964e148674343c09bee38d5eb55"
+    }
+  ],
+  "files": {
+    "merged-results.json": "785b0ccb0da3524ffa07af9e18d5c109f87f0ebb7bda399161815082669a48c9",
+    "retrieval-index.json": "1058f2e5833320c40ea6c9828204557cd587f1ddb4b394b62b5a40c5b3c9f0f0",
+    "cache-plan.json": "fa0bf332c6f6c7fde5292cf93b5c7113df6ae59d3ad54f9cb927b6ee8017d969"
+  }
+}

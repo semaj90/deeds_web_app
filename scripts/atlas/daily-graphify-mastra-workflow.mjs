@@ -284,7 +284,7 @@ async function phaseB_agentAnalysis() {
   // 6. Emit clusters + strategies to Redis for Phase C
 
   const result = await pool.query(
-    `SELECT COUNT(DISTINCT category) as cluster_count FROM error_logs WHERE created_at > NOW() - INTERVAL '24 hours'`
+    `SELECT COUNT(DISTINCT error_category) as cluster_count FROM error_logs WHERE created_at > NOW() - INTERVAL '24 hours'`
   );
 
   const clusterCount = parseInt(result.rows[0]?.cluster_count || 0, 10);

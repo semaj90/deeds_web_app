@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.pytorch-domain-fusion-spec.v1",
+  "generatedAt": "2026-10-18T01:26:02.736Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "architecture": {
+    "modelType": "PyTorch Multimodal Dense Fusion MLP",
+    "branches": [
+      {
+        "name": "semantic_768",
+        "dimension": 768,
+        "source": "codebase_chunk_index.content_embedding_768 (canonical)"
+      },
+      {
+        "name": "lexical_projection",
+        "dimension": 64,
+        "source": "Bag-of-Words / n-gram vocabulary projection"
+      },
+      {
+        "name": "structural_projection",
+        "dimension": 16,
+        "source": "AST facts (Tree-sitter/ast-grep LOC, depth, imports, exports)"
+      }
+    ],
+    "fusedDimension": 848,
+    "layers": [
+      "Linear(848, 256)",
+      "LayerNorm(256)",
+      "GELU",
+      "Dropout(p=0.10)",
+      "Linear(256, 64)",
+      "LayerNorm(64)",
+      "GELU",
+      "Linear(64, 10)",
+      "Softmax(dim=-1)"
+    ],
+    "parameterCount": {
+      "layer1": 217344,
+      "layer2": 16448,
+      "classifier": 650,
+      "total": 234442
+    }
+  },
+  "sampleEvaluation": {
+    "sourceRef": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+    "expectedDomain": "frontend",
+    "fusedInputShape": [
+      1,
+      848
+    ],
+    "outputProbabilities": {
+      "frontend": 0.25,
+      "retrieval": 0.083,
+      "agent": 0.083,
+      "devops": 0.083,
+      "machine-learning": 0.083,
+      "documentation": 0.083,
+      "auth": 0.083,
+      "error-handling": 0.083,
+      "cache": 0.083,
+      "graph": 0.083
+    },
+    "topPredictedDomain": "frontend",
+    "confidenceMargin": 0.15
+  },
+  "trainingPolicy": {
+    "lossFunction": "CrossEntropyLoss(label_smoothing=0.05)",
+    "optimizer": "AdamW(lr=1e-4, weight_decay=1e-2)",
+    "scheduler": "CosineAnnealingLR(T_max=10)",
+    "gpuExecutionGate": "Deferred to separate GPU window when :8090 is idle or scheduled"
+  }
+}

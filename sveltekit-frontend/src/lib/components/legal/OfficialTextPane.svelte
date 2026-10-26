@@ -72,13 +72,17 @@
 	let hasMore = $state(initialNormalizedChunks.length === 20);
 	let error = $state<string | null>(null);
 
-	// Reload when nodeId changes
+	// Reload when nodeId changes. loadChunks() reads `loading` synchronously, so it must run untracked:
+	// otherwise `loading` becomes an effect dependency and every completed fetch re-runs the effect,
+	// clears the chunks and refetches forever (observed: ~60 requests/s, text never rendered).
 	$effect(() => {
 		if (nodeId !== undefined) {
-			chunks = [];
-			page = 1;
-			hasMore = true;
-			loadChunks(1, true);
+			untrack(() => {
+				chunks = [];
+				page = 1;
+				hasMore = true;
+				loadChunks(1, true);
+			});
 		}
 	});
 
@@ -115,6 +119,20 @@
 		// Very simple highlight: wrap § references
 		return text.replace(/(§{1,2}\s*[\d.]+[a-z]?)/g, '<mark class="bg-accent/15 text-accent px-0.5 rounded text-[0.85em]">$1</mark>');
 	}
+
+	function stripLeadingCitation(content: string, nodeCitation?: string | null, nodeHeading?: string | null): string {
+		const trimmed = content.trimStart();
+		const firstNl = trimmed.indexOf('\n');
+		if (firstNl === -1) return content;
+		const firstLine = trimmed.slice(0, firstNl).trim();
+		if (
+			(nodeCitation && firstLine === nodeCitation.trim()) ||
+			(nodeHeading && firstLine === nodeHeading.trim())
+		) {
+			return trimmed.slice(firstNl + 1).trimStart();
+		}
+		return content;
+	}
 </script>
 
 <div class="flex flex-col gap-3">
@@ -129,7 +147,13 @@
 				<div class="flex items-center gap-2 mb-3 pb-2 border-b border-sand/8">
 					<span class="text-xs font-medium text-sand/50">{chunk.nodeHeading}</span>
 					{#if chunk.nodeCitation}
-						<span class="text-[10px] font-mono text-accent/50">{chunk.nodeCitation}</span>
+						<button
+							type="button"
+							onclick={() => chunk.nodeCitation && onCitationClick?.(chunk.nodeCitation)}
+							class="text-[10px] font-mono text-accent/70 hover:text-accent transition-colors"
+						>
+							{chunk.nodeCitation}
+						</button>
 					{/if}
 					{#if chunk.pageStart}
 						<span class="ml-auto text-[10px] text-sand/25">p. {chunk.pageStart}</span>
@@ -142,13 +166,13 @@
 				class="text-sm text-sand/80 leading-relaxed whitespace-pre-wrap font-serif"
 			>
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				{@html highlightCitations(chunk.content)}
+				{@html highlightCitations(stripLeadingCitation(chunk.content, chunk.nodeCitation, chunk.nodeHeading))}
 			</div>
 
-			<!-- Citations -->
-			{#if chunk.citations?.length}
+			<!-- Citations (only render extra citations distinct from nodeCitation) -->
+			{#if chunk.citations?.filter((c) => c !== chunk.nodeCitation).length}
 				<div class="mt-3 pt-2 border-t border-sand/8 flex flex-wrap gap-1.5">
-					{#each chunk.citations as cite}
+					{#each chunk.citations.filter((c) => c !== chunk.nodeCitation) as cite}
 						<button
 							onclick={() => onCitationClick?.(cite)}
 							class="text-[10px] px-2 py-0.5 rounded-full bg-accent/10 text-accent/70 hover:bg-accent/20 hover:text-accent transition-colors"

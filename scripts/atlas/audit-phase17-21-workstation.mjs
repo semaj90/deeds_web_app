@@ -16,12 +16,13 @@ import fs from 'node:fs';
 import fsPromises from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
-const REPORT_JSON = path.join(ROOT, 'docs', 'reports', 'phase17-21-workstation-audit.json');
-const REPORT_MD = path.join(ROOT, 'docs', 'reports', 'phase17-21-workstation-audit.md');
+const REPORT_JSON = path.resolve(ROOT, process.argv.find((arg) => arg.startsWith('--output='))?.slice(9)
+  ?? `docs/reports/phase17-21-workstation-audit-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
+const REPORT_MD = `${REPORT_JSON}.md`;
 
 function rel(filePath) {
   return path.relative(ROOT, filePath).replace(/\\/g, '/');
@@ -155,14 +156,39 @@ function inspectSummaryCoverage() {
   };
 }
 
-function phase(id, status, completion_pct, have, need, evidence = []) {
-  return { id, status, completion_pct, have, need, evidence };
+// Receipts mapped to each phase by its owner. A receipt counts toward receipt_backed_pct only
+// when its status is in PASSING_RECEIPT_STATUSES. Blocked, partial, and sanity-only receipts are
+// listed but never counted. Mappings are empty until an owner maps them; no receipt is mapped
+// by default. Hand-set historical estimates are not measured completion.
+const PASSING_RECEIPT_STATUSES = new Set(['VERIFIED', 'PROVEN', 'APPLIED_AND_VERIFIED']);
+const PHASE_RECEIPTS = { 17: [], 18: [], 19: [], 20: [], 21: [] };
+
+function receiptBacked(id) {
+  const receipts = PHASE_RECEIPTS[id] ?? [];
+  if (receipts.length === 0) return { receipt_backed_pct: null, mapped_receipts: 0, passing_receipts: 0 };
+  const passing = receipts.filter(({ status }) => PASSING_RECEIPT_STATUSES.has(status)).length;
+  return {
+    receipt_backed_pct: Number(((passing / receipts.length) * 100).toFixed(1)),
+    mapped_receipts: receipts.length,
+    passing_receipts: passing,
+  };
+}
+
+export function phase(id, status, completion_pct, have, need, evidence = []) {
+  const receipts = receiptBacked(id);
+  return {
+    id, status: receipts.passing_receipts > 0 ? 'COMPONENT_RECEIPTS_REVIEW_REQUIRED' : 'NOT_PROVEN',
+    recorded_status: status, historical_estimate_pct: completion_pct, completion_pct: null,
+    qualification: 'LIVE_ACCEPTANCE_AND_PROVENANCE_NOT_ESTABLISHED',
+    promotionEligible: false, have, need, evidence, ...receipts,
+  };
 }
 
 async function main() {
   const validation = readJson('docs/reports/addressable-packets-validation.json');
-  const summarySchema = inspectSummarySchema();
-  const summaryCoverage = inspectSummaryCoverage();
+  const offline = process.argv.includes('--offline');
+  const summarySchema = offline ? { status: 'NOT_PROBED' } : inspectSummarySchema();
+  const summaryCoverage = offline ? { status: 'NOT_PROBED' } : inspectSummaryCoverage();
   const packageJson = readJson('package.json') ?? {};
   const frontendPackage = readJson('sveltekit-frontend/package.json') ?? {};
   const scripts = { ...(packageJson.scripts ?? {}), ...(frontendPackage.scripts ?? {}) };
@@ -253,7 +279,7 @@ async function main() {
     ),
     phase(
       19,
-      artifacts.phase19.rows > 50 ? 'OPERATIONAL' : 'PARTIAL',
+      'ARTIFACT_ROWS_OBSERVED_OUTCOME_PROOF_REQUIRED',
       90,
       [
         `Append-only retrieval loop contains ${artifacts.phase19.rows} rows.`,
@@ -270,7 +296,7 @@ async function main() {
     ),
     phase(
       20,
-      validation?.validation_pass ? 'OPERATIONAL' : 'PARTIAL',
+      validation?.validation_pass ? 'HISTORICAL_SCHEMA_FIXTURE_PASS' : 'PARTIAL',
       95,
       [
         `Zod validation: ${validation?.total_valid ?? 0}/${validation?.total_checked ?? 0} addressable packets valid.`,
@@ -315,19 +341,20 @@ async function main() {
   const report = {
     schema: 'phase17_21_workstation_audit.v1',
     generated_at: new Date().toISOString(),
-    overall: phases.every((item) => ['OPERATIONAL', 'EVAL_GATED'].includes(item.status))
-      ? 'READY'
-      : 'PARTIAL',
-    completion_pct: Number(
-      (phases.reduce((sum, item) => sum + item.completion_pct, 0) / phases.length).toFixed(1),
-    ),
+    overall: 'PARTIAL',
+    completion_pct: null,
+    completion_percentage_reason: 'Current phase-wide acceptance and source-bound runtime proofs are not mapped; historical estimates are not measured completion.',
+    operational_probes_performed: !offline,
+    canonicalAuthority: false,
+    promotionEligible: false,
     canonical_truth: 'Postgres',
     summary_lane: {
-      status: summarySchema.status === 'READY' ? 'READY' : 'MIGRATION_PENDING',
+      status: summarySchema.status === 'NOT_PROBED' ? 'NOT_PROBED' : summarySchema.status === 'READY' ? 'SCHEMA_PRESENT_RUNTIME_UNPROVEN' : 'MIGRATION_PENDING',
       batch_size: 500,
       concurrency: 1,
       chat_backend: 'llama-server',
-      chat_model: 'gemma4-legal-iq4xs-direct.gguf',
+      chat_model: null,
+      expected_chat_model: 'ornith-1.5-9b',
       embedding_backend: 'Ollama/EmbeddingGemma',
       dry_command: 'npm run atlas:summaries:gemma4:500:dry',
       apply_command: 'npm run atlas:summaries:gemma4:500:apply',
@@ -343,7 +370,8 @@ async function main() {
       duckdb_materialized: artifacts.mapreduce.duckdb.exists,
     },
     accelerator_boundary: {
-      operational: [
+      operational: [],
+      present_or_claimed_unverified: [
         'LibTorch/CUDA bridge for feature extraction and reranking',
         'TurboVec quantized ANN prefilter',
         'SOM/KMeans/AE topology metadata',
@@ -373,7 +401,7 @@ async function main() {
   };
 
   await fsPromises.mkdir(path.dirname(REPORT_JSON), { recursive: true });
-  await fsPromises.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  await fsPromises.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
 
   const lines = [
     '# Phase 17-21 Workstation Audit',
@@ -383,10 +411,10 @@ async function main() {
     '',
     '## Phase Matrix',
     '',
-    '| Phase | Status | Complete | What exists | What remains |',
-    '|---:|---|---:|---|---|',
+    '| Phase | Status | Complete | Receipt-backed | What exists | What remains |',
+    '|---:|---|---:|---:|---|---|',
     ...phases.map((item) =>
-      `| ${item.id} | ${item.status} | ${item.completion_pct}% | ${item.have.join(' ')} | ${item.need.join(' ')} |`
+      `| ${item.id} | ${item.status} | not established | ${item.receipt_backed_pct === null ? 'no mapped receipts' : `${item.receipt_backed_pct}% (${item.passing_receipts}/${item.mapped_receipts})`} | ${item.have.join(' ')} | ${item.need.join(' ')} |`
     ),
     '',
     '## NDJSON And Storage',
@@ -414,7 +442,7 @@ async function main() {
     '- ElectricSQL is not present and is not a tokenizer-remapping engine.',
     '',
   ];
-  await fsPromises.writeFile(REPORT_MD, `${lines.join('\n')}\n`, 'utf8');
+  await fsPromises.writeFile(REPORT_MD, `${lines.join('\n')}\n`, { encoding: 'utf8', flag: 'wx' });
 
   console.log(JSON.stringify({
     status: report.overall,
@@ -429,7 +457,9 @@ async function main() {
   }, null, 2));
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.stack : String(error));
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.stack : String(error));
+    process.exitCode = 1;
+  });
+}

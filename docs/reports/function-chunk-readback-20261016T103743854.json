@@ -1,0 +1,155 @@
+{
+  "schema": "atlas.function-source-readback-audit.v1",
+  "status": "EXACT_SOURCE_BYTES_FOUND",
+  "transactionReadOnly": true,
+  "auditImplementationChecksum": "sha256:9bb315b8d1ee0a0775a9f24830e62e60adcc939e2414898b7a9363c44d69fe22",
+  "canonical": {
+    "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+    "packetKey": "packet:804cec79a65c",
+    "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+    "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "byteStart": "979",
+    "byteEnd": "1154"
+  },
+  "binding": {
+    "rowCount": 1,
+    "uniqueExactBinding": true,
+    "byteLength": "1156",
+    "gitBlobOidPresent": false,
+    "contentDigestMatchesSourceRevision": true,
+    "bindingValid": true
+  },
+  "packetRows": 1,
+  "exactPacketRows": 1,
+  "packetPayloadKeys": [
+    "hash",
+    "path",
+    "mtime",
+    "file_url",
+    "repo_url",
+    "domain_id",
+    "indexed_at",
+    "source_url",
+    "domain_class",
+    "domain_parent",
+    "ontology_tags",
+    "directory_path",
+    "lexical_features",
+    "domain_confidence",
+    "topology_materialized"
+  ],
+  "packetRegistry": [
+    {
+      "packetKey": "packet:804cec79a65c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "canonicalSourceRef": null,
+      "filePathPresent": true,
+      "seaweedfsFilerPathPresent": false,
+      "totalSizeBytes": null,
+      "titleIdPresent": false,
+      "treeNodeIdPresent": false,
+      "status": "active"
+    }
+  ],
+  "rpcPackets": [],
+  "artifacts": [
+    {
+      "artifact_id": "98c4139a-29cb-45e6-8f10-e07c4b6b6c46",
+      "artifact_type": "feature_labels",
+      "storage_backend": "postgres_jsonb",
+      "has_storage_location": false,
+      "content_hash": "2cf111a82961d562191bd4bbfc4186d8b60c04a10bdff7a22a1eba3d85c77d7e",
+      "status": "generated"
+    }
+  ],
+  "sourceRefProjection": [
+    {
+      "source_ref_key": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "content_hash": "efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "fragment_count": 0,
+      "fragments_json_bytes": 2
+    }
+  ],
+  "chunkProjection": {
+    "rowCount": 2,
+    "totalMatchingRows": 2,
+    "truncated": false,
+    "rows": [
+      {
+        "chunkRowId": "9f70b91b-ead5-466b-abbf-e2027207ceda",
+        "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+        "lineStart": 1,
+        "lineEnd": 30,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "metadataPacketKey": "9944b400-3c15-4900-9688-8263ecb224cb",
+        "outputPacketKey": null,
+        "metadataSymbolVersionId": null,
+        "outputSymbolVersionId": null,
+        "sourceRevisionMatches": false,
+        "workspaceRevisionMatches": false
+      },
+      {
+        "chunkRowId": "751464de-b878-45d1-a123-b416bdca780b",
+        "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+        "lineStart": 25,
+        "lineEnd": 49,
+        "sourceRevision": null,
+        "workspaceRevision": null,
+        "metadataPacketKey": "8c9328db-7b66-4eb9-8761-e2817b77ce5d",
+        "outputPacketKey": null,
+        "metadataSymbolVersionId": null,
+        "outputSymbolVersionId": null,
+        "sourceRevisionMatches": false,
+        "workspaceRevisionMatches": false
+      }
+    ],
+    "maxLine": 49,
+    "coveredLines": 30,
+    "missingLineCount": 19,
+    "conflictingLineCount": 0,
+    "malformedChunkRows": 1,
+    "reconstructedDigestMatches": false,
+    "matchingVariants": []
+  },
+  "packetChunkLineage": {
+    "rows": [
+      {
+        "lineage_id": "72a5d796-e359-4418-bf01-a71c91fa167d",
+        "canonical_chunk_id": "fullrepo:sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts:0",
+        "chunk_row_id": "9f70b91b-ead5-466b-abbf-e2027207ceda",
+        "source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+        "membership_status": "EXACT_MULTI_MEMBER",
+        "revision_status": "PROVEN"
+      },
+      {
+        "lineage_id": "7b7ee3aa-0b27-451c-b39d-064174b0432d",
+        "canonical_chunk_id": "fullrepo:sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts:1",
+        "chunk_row_id": "751464de-b878-45d1-a123-b416bdca780b",
+        "source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+        "membership_status": "EXACT_MULTI_MEMBER",
+        "revision_status": "PROVEN"
+      }
+    ],
+    "truncated": false,
+    "canonicalAdmissionProven": false
+  },
+  "workingTree": {
+    "available": true,
+    "digestMatches": true,
+    "byteLength": 1156
+  },
+  "gitHistory": {
+    "commitsExamined": 2,
+    "matchingBlobs": []
+  },
+  "exactSourceBytesVerified": true,
+  "nativeAst": {
+    "status": "NOT_REQUESTED",
+    "reason": null
+  },
+  "contextManifestAdmitted": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

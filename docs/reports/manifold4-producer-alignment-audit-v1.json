@@ -1,7 +1,7 @@
 {
   "schema": "atlas.manifold4-producer-alignment-audit.v1",
   "status": "MAN4_PRODUCER_ALIGNMENT_BLOCKED",
-  "observedAt": "2026-09-06T06:15:20.648Z",
+  "observedAt": "2026-10-19T07:37:49.290Z",
   "owner": "parent-atlas-candidate-feature-execution-fabric",
   "contract": "sveltekit-frontend/src/lib/server/atlas/features/manifold4-orientation-v1.ts",
   "sourceArtifact": {

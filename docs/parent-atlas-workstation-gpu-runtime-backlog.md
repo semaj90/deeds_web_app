@@ -1,6 +1,6 @@
 # Parent Atlas workstation GPU/runtime integration backlog
 
-Updated: 2026-08-14
+Updated: 2026-10-11 (runtime probe); GPU-09 evidence dated 2026-08-14
 
 This backlog is intentionally separate from AST supersession. It does not change GPH-13 through GPH-22 acceptance, and it does not authorize deleting or promoting `ast-extractor.ts`.
 
@@ -21,11 +21,13 @@ The GPU sidecar must not own canonical identity, RRF, Qdrant truth, or graph tru
 
 **GPU/runtime integration: 58% planned/integrated.** This is a roadmap estimate, not a production gate.
 
-Current read-only runtime check: TRACE MCP `:8788` healthy with Postgres and Redis
-dependencies; llama-server `:8090` healthy; the lightweight AST sidecar `:8095`
-healthy with treesitter-chunker but without optional GPU packages. No TRACE MCP
-tool connector was exposed in this Codex session, so no MCP mutation or promotion
-was attempted.
+Runtime check, 2026-10-11 (read-only health GETs): `:8788` TRACE HTTP returns 200,
+but the TRACE MCP connector failed to connect in the Claude Code session, so no
+TRACE tool was callable. `:8098` returns `ok`, `cudaAvailable: true`, RTX 3060 Ti,
+`torchAvailable: false`, and writes disabled. It has no `/capabilities` route, so
+cuVS availability is not verified. The 2026-08-27 ownership receipt recorded 8098
+as unreachable. Earlier notes (lines 24–28, 2026-08-14) are superseded. No MCP
+mutation or promotion was attempted.
 
 Ownership receipt: `docs/reports/gpu-runtime-ownership-proof.json` and
 `docs/reports/gpu-runtime-ownership-proof.md`. The receipt is `PROVEN` for the
@@ -50,7 +52,7 @@ control-plane owners and records `RAPIDS_RUNTIME_8098_REACHABLE: false` separate
 
 ### P0 — correctness before optimization
 
-- [ ] GPU-01 Confirm AST owner sequence: `CHUNK0 → GPH-13 → GPH-14 → GPH-15 → GPH-16 → LX0`.
+- [ ] GPU-01 Confirm AST owner sequence: `CHUNK0 → GPH-13 → GPH-14 → GPH-15 → GPH-16 → LX0`. Open. The AST baseline is the 2026-10-12 read-only census (eligible 10,121; 9,161 with symbols; 8,261 with tree IDs; stored `content_hash` NULL on 9,866). The July P2A report is historical and its hash-verification and ast-grep claims are unsupported (see `docs/P2A-CANONICAL-AST-COMPLETE.md`). Close only after the current AST producer, source-hash comparison and write readback are reconciled.
 - [x] GPU-02 Record a runtime ownership receipt distinguishing the active 8095 AST container from the dedicated RAPIDS/cuVS runtime (`scripts/atlas/prove-gpu-runtime-ownership.mjs`).
 - [x] GPU-03 Prove the `semantic_768` contract read-only: Qdrant `content/error/signature` named vectors are 768-d cosine, chat is llama-server `:8090`, and embeddings are Ollama `:11434` (`docs/reports/semantic-768-contract-proof.{json,md}`). GPU experiments remain outside canonical identity and RRF.
 - [ ] GPU-04 Preserve BM42 as `DEGRADED/NOT_RUN` until a sparse collection exists.
@@ -64,13 +66,23 @@ control-plane owners and records `RAPIDS_RUNTIME_8098_REACHABLE: false` separate
 
 ### P2 — GPU retrieval and graph compute
 
-- [x] GPU-09 Prove cuVS exact `semantic_768` KNN against the CPU/PyTorch oracle. Live fixture proof passed on 2026-08-14 through `127.0.0.1:8098` with cuVS `26.06.00`, RTX 3060 Ti, stable identity-qualified ordering across three runs. See `docs/reports/gpu-knn-exact-runtime-proof.{json,md}`.
+- [ ] GPU-09 Prove cuVS exact `semantic_768` KNN against the CPU/PyTorch oracle. A fixture proof passed on 2026-08-14 through `127.0.0.1:8098` (cuVS `26.06.00`, RTX 3060 Ti, stable ordering across three runs; `docs/reports/gpu-knn-exact-runtime-proof.{json,md}`). Left open: this is fixture evidence, not corpus proof, and the 2026-08-27 receipt recorded 8098 unreachable. Import re-check on 2026-10-11: Docker `atlas-gpu-8098` imports cuVS `26.08.00` (Python 3.13.14); WSL `atlas-rapids-cu13` imports cuVS `26.06.00` with cupy `14.1.1`. Imports are not parity. Real-corpus run on 2026-10-11 (`.tmp/atlas/gpu09/gpu09-oracle-receipt.json`): 10,000 `codebase_chunk_index.content_embedding_768` rows vs 50 disjoint queries, CPU cosine oracle vs cuVS `brute_force` (cuVS `26.08.00`, in-container, read-only Postgres). Top-1 agreement 1.0; distance error ≤ 2.2e-7; repeat runs return identical ordinals; 44/50 queries ordered-identical. Four queries differ by swaps between neighbours with identical float64 similarity, and cuVS does not apply the ordinal tie-break. The remaining two are order-only differences, not yet inspected. Recall@10 is 0.99 strict, 1.0 tie-aware. Left open because (a) GPU-09A's tie-break rule is not frozen, (b) the service route `/v1/tile-artifact/cuvs-exact-scan` cannot run in this image (`torch` missing), so the run called cuVS directly, and (c) the 2026-08-14 `/v1/knn/exact` route is absent from the running build.
+  Status by evidence (2026-10-12; plan GPU-09B–G):
+  - Docker cuVS 26.08.00 import: `IMPORT_PROVEN`
+  - WSL cuVS 26.06.00 import: `IMPORT_PROVEN`
+  - Historical three-vector test (2026-08-14): `TINY_FIXTURE_ONLY`
+  - Current 8098 numerical parity: `NOT_YET_PROVEN`. Direct in-container cuVS 26.08.00 on 10,000 real rows, 3 repeats, identical ordinals, max distance error 1.8e-7 (`gateOutcomes.GPU_NUMERIC_PARITY: PROVEN_WITHIN_TOLERANCE`), but not through the :8098 endpoint.
+  - Strict top-K order with tie-break: `FAIL_TIE_ORDER` (44/50 ordered-identical; the 4 set swaps are exact float64 ties).
+  - Endpoint parity (`POST /v1/knn/exact`): `NOT_RUN_ROUTE_ABSENT`. The repo sidecar (`python/atlas_rapids_sidecar.py`) defines the contract; the running container serves tile-artifact routes only.
+  - Canonical corpus/source admission: `BLOCKED_ON_LINEAGE`. 0 of 219,998 embedded chunks carry `source_revision`; 0 chunks join a packet on (source_ref, source_revision); 16,151 packets carry a source revision but no 768 vector.
+  - CAGRA production use: `QUARANTINED_BY_OPENSPEC`.
+  - Receipts: `.tmp/atlas/gpu09/gpu09-oracle-receipt-v2.json` (input sha256 `667899cb…`).
 - [ ] GPU-09A Freeze the exact metric contract before scale comparisons: `semantic_768`, float32, cosine, explicit L2-normalization policy, higher-is-better score direction, and workspace/source/ordinal-map revisions. Tied distances must use a deterministic secondary identity order.
 - [ ] GPU-10 Prove Arrow/mmap immutable snapshot transport only if profiling shows a copy/serialization bottleneck.
 - [ ] GPU-11 Evaluate CAGRA recall/latency against the exact oracle; tiny live fixture passed Recall@3 = 1.0 with identity parity, but larger-corpus recall and production performance remain open. Keep production disabled until separately approved. See `docs/reports/gpu-knn-cagra-runtime-proof.{json,md}`.
 - [ ] GPU-11A Run CAGRA evaluation progressively on frozen 10K, 50K, and current-corpus snapshots. Record Recall@5/@10/@50, top-1 agreement, distance error, p50/p95 latency, build time, VRAM, filter parity, revision parity, and fallback behavior. Defer nDCG until relevance labels exist; the three-row proof is transport evidence only, not ANN-quality proof.
 - [ ] GPU-12 Prove cuGraph CPU/GPU parity on the same graph revision.
-- [ ] GPU-13 Reconcile RF6/EV1 promotion gates before any GPU result influences ranking.
+- [ ] GPU-13 Resolve the RF6 canonical-RRF-owner decision (`parent-atlas-agentic-repair-bundle-integration`, Phase 4) before any GPU result influences ranking. "EV1" removed: no definition found in the repo.
 - [ ] GPU-14 Promote CAGRA only after explicit architecture revision, identity parity, recall, latency, and rollback proofs.
 
 ### CAGRA semantic_768 parity gate
@@ -84,6 +96,16 @@ parity evidence.
 
 - [ ] **CAGRA-00** Runtime/import/device proof: installed, reachable, RTX and cuVS detected.
 - [ ] **CAGRA-01** Snapshot contract: workspace/source/representation/ordinal-map revisions, checksum, 768 dimensions, float32, cosine, and `content` vector slot.
+- [ ] **CAGRA-01A** Precision and graph compression ladder:
+  - Phase A (Evaluation Oracle): CPU `float64` strictly for mathematical tie detection in testing. Never resident in GPU VRAM.
+  - Phase B (Canonical Float Baseline): `float32` cosine similarity / distance parity with PostgreSQL (`codebase_chunk_index.content_embedding_768`) and Qdrant (`codebase_chunks_768`).
+  - Phase C (SIMT Accelerated Precision): `fp16` half-precision cuVS brute force and CAGRA graph exploration to halve VRAM allocation on 8 GiB RTX 3060 Ti.
+  - Phase D (Scalar Quantized Graph): `int8` (SQ8) compressed graph representation for candidate pre-filtering and daily Graphify snapshots with $<0.5\%$ recall degradation.
+  - Phase E (Compressed CAGRA / Product Quantization): `int4` / PQ compression params evaluated with an exact `fp32` top-K rescore step, preserving the One Semantic Lane Rule.
+- [ ] **CAGRA-01B** CPU Multi-Threaded & PostgreSQL Constant Baseline:
+  - PostgreSQL 18 owns canonical packet identity, bitmap scans, FTS, and durable embeddings (`const PostgreSQL`).
+  - Host CPU multi-threaded workers (Node.js worker_threads / Python ProcessPoolExecutor / Go Retrieval) provide the baseline for AST semantic search, parameter indexing, LUT generation, DAG prefill, and repair candidate validation before any GPU offload.
+  - MCP tool calling and agentic error-fixing workflows consume pre-computed LUT caches and DAG plans without direct GPU dependency.
 - [ ] **CAGRA-02** 10K real Parent Atlas rows: exact cuVS versus CAGRA Recall@5/@10/@50, identity parity, and latency.
 - [ ] **CAGRA-03** 50K real Parent Atlas rows: repeat the same proof.
 - [ ] **CAGRA-04** Full frozen semantic snapshot: recall, latency, build cost, resident index size, and peak VRAM.
@@ -113,16 +135,17 @@ duplicate_canonical_ids = 0
 - `GPU-KNN-05` exact-vs-CAGRA Recall@3: **1.0_ON_TINY_FIXTURE**; larger-corpus evaluation remains open.
 - `GPU-KNN-07` latency measurement: **PASS_ON_TINY_FIXTURE**; graph-build-per-request latency is not a production benchmark.
 
-The sidecar now reports CAGRA on separate axes: `available=true`,
-`authorized_for_experiment=true`, `proof_status=RUNTIME_PROVEN_ON_TINY_FIXTURE`,
-and `production_status=QUARANTINED`. Importability/capability is therefore not
-treated as production authorization.
+- `GPU-KNN-06` extra RRF vote: **DESIGN_GUARD_PASS**; executor choice remains inside one semantic lane.
+
+CAGRA status has one authority: production is `QUARANTINED` and `PROHIBITED_BY_OPENSPEC`
+for production use. The sidecar's `available=true` and `authorized_for_experiment=true`
+are experiment-only metadata; `proof_status=RUNTIME_PROVEN_ON_TINY_FIXTURE` is not
+production authorization. Importability/capability is not production authorization.
 
 Graph expansion remains a separate bounded evidence gate: seed cap, explicit
 depth, per-seed neighbor limit, canonical visited dedupe, final candidate cap,
 and fail-open behavior. It is not a second fusion owner or a custom replacement
 for CAGRA/HNSW graph ANN.
-- `GPU-KNN-06` extra RRF vote: **DESIGN_GUARD_PASS**; executor choice remains inside one semantic lane.
 
 The exact proof did not modify Qdrant, Valkey, Neo4j, RRF, or canonical data.
 
@@ -160,9 +183,7 @@ AST supersession gates.
   insufficient.
 - [ ] GPU-25 Benchmark host-to-device transfer variants: JSON/HTTP baseline,
   Arrow/mmap CPU load, ordinary H2D, and pinned `non_blocking` H2D.
-- [ ] GPU-26 Prove metric equivalence for `semantic_768`: float32, cosine
-  normalization, score direction, CPU exact, cuVS exact, Qdrant `content`, and
-  future CAGRA.
+- [ ] GPU-26 Verify executor equivalence against the GPU-09A metric contract (GPU-09A owns the contract; this item does not redefine it): CPU exact, cuVS exact, Qdrant `content`, and future CAGRA.
 - [ ] GPU-27 Define typed GPU degradation reasons and safe fallbacks for OOM,
   device loss, timeout, stale index, stale filter, and checksum mismatch.
 - [ ] GPU-28 Prove the NVIDIA container boundary: host driver, NVIDIA
@@ -232,6 +253,23 @@ These remain outside GPH acceptance:
 
 The AST lane can prove structural evidence while this backlog remains deferred.
 
+## Per-directory LUT tree (design only, not implemented)
+
+Status: design. Not started. Derived and rebuildable; never canonical identity.
+
+| Element | Definition | Source and owner |
+|---|---|---|
+| Tree | One node per directory path, built from `source_ref` paths. 5,520 directories, 28,207 files, max depth 13 (`codebase_chunk_index`, 2026-10-12). No `atlas_directories` table exists; `atlas_source_refs` does. | Canonical identity chain: `directory_path` → `source_ref` |
+| Node LUT | Child list, file count, chunk count, symbol names, and per-file `sourceRevision` | AST owner (GPH-13) and binding owner |
+| Contextual inheritance | A query walks root → leaf. Each ancestor gives a bounded prior, not a vote. | SearchRuntime owns fusion (one lane vote) |
+| Fanout | CPU worker pool, one top-level subtree per worker. Deterministic sorted order. Parent nodes reduce from children. | CAGRA-01B CPU-first baseline; no GPU |
+| Admission | An entry is valid only if its `sourceRevision` matches the current binding. Mismatch is stale and excluded from prompts. | Binding owner |
+| Storage | JSONL under `.tmp/` until admitted. A Postgres table needs its own schema approval. | Derived projection |
+
+Per-tree LUT families, all derived: lexical score sources (`.okf/index.md`), MCP tool calling (`.okf/index.md`), symbol/AST, and this directory tree. Each is keyed by its owner's identity, never by a path string alone.
+
+Gate: GPH-13 AST parity comes first. No LUT build runs before that gate.
+
 ## Safe next task
 
-Complete GPH-13 AST parity first. In parallel, the first GPU backlog task is GPU-02: produce an ownership/runtime receipt without rebuilding or mutating the active GPU environment.
+Complete GPH-13 AST parity first. GPU-02 is done. Next GPU task: re-verify cuVS import on `:8098` (GPU-09 blocker) through a read-only probe, without rebuilding or mutating the GPU environment.

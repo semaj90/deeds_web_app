@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 LangExtract Ollama Service — Direct Ollama API for structured extraction
-Uses gemma4-legal for legal entity extraction with few-shot prompting
+Uses ornith-1.5-9b for legal entity extraction with few-shot prompting
 """
 
 import os
@@ -16,12 +16,14 @@ from pydantic import BaseModel, Field
 import uvicorn
 
 # Configuration
-OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL", "gemma4-legal:latest")
+# Chat/extraction runs on llama-server :8090 (Ornith 1.5). Ollama is embeddings-only in this stack.
+LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://127.0.0.1:8090/v1").rstrip("/")
+OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")  # kept for any non-chat callers
+DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL", "ornith-1.5-9b")
 
 app = FastAPI(
     title="LangExtract Ollama Service",
-    description="Structured extraction using Ollama + gemma4-legal",
+    description="Structured extraction using Ollama + ornith-1.5-9b",
     version="2.1.0"
 )
 
@@ -125,7 +127,7 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     model: str
-    ollama_url: str
+    llama_server_url: str  # chat backend (llama-server :8090, Ornith 1.5)
     cache_size: int
     flash_attention: bool = True  # Ollama uses FlashAttention2 on supported GPUs
 
@@ -135,35 +137,44 @@ class HealthResponse(BaseModel):
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def call_ollama(prompt: str, model: str = DEFAULT_MODEL, temperature: float = 0.2) -> str:
-    """Call Ollama API with the given prompt (async via httpx)."""
+    """Call the chat model on llama-server :8090 (Ornith 1.5) via OpenAI-compatible chat completions.
+
+    Name kept for import compatibility. Ollama is not a chat backend in this stack.
+    The JSON array is enforced by parse_json_response, not by a server-side schema.
+    """
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.post(
-            f"{OLLAMA_URL}/api/generate",
+            f"{LLAMA_SERVER_URL}/chat/completions",
             json={
                 "model": model,
-                "prompt": prompt,
+                "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
-                "keep_alive": "24h",
-                "options": {
-                    "temperature": temperature,
-                    "num_predict": 2048,
-                },
-                "format": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "type": {"type": "string"},
-                            "text": {"type": "string"},
-                            "attributes": {"type": "object"}
+                "temperature": temperature,
+                "max_tokens": 2048,
+                # Server-side schema: array of {type, text, attributes}; replaces the Ollama "format" field.
+                "response_format": {
+                    "type": "json_schema",
+                    "json_schema": {
+                        "name": "extractions",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {"type": "string"},
+                                    "text": {"type": "string"},
+                                    "attributes": {"type": "object"},
+                                },
+                                "required": ["type", "text"],
+                            },
                         },
-                        "required": ["type", "text"]
-                    }
-                }
+                    },
+                },
             }
         )
         response.raise_for_status()
-        return response.json().get("response", "")
+        choices = response.json().get("choices") or [{}]
+        return (choices[0].get("message") or {}).get("content", "") or ""
 
 
 def parse_json_response(response: str) -> list[dict]:
@@ -256,7 +267,7 @@ async def health():
         status="healthy",
         service="langextract-ollama",
         model=DEFAULT_MODEL,
-        ollama_url=OLLAMA_URL,
+        llama_server_url=LLAMA_SERVER_URL,
         cache_size=len(_cache),
         flash_attention=True  # Ollama uses FA2 on RTX 3060+
     )
@@ -355,4 +366,6 @@ async def cache_stats():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8095)
+    # 8095 is the miniforge NLP sidecar; default here is 8101 to avoid the collision. Override with LANGEXTRACT_PORT.
+    # Bind all container interfaces; the host publish is restricted to 127.0.0.1.
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("LANGEXTRACT_PORT", "8101")))

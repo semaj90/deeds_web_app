@@ -47,10 +47,15 @@ const LIMIT = (() => {
 })();
 const BATCH_SIZE = 500;
 
+const RE_SHA256 = /^sha256:[0-9a-f]{64}$/;
+
 function requiredRevision(name: string): string {
   const idx = process.argv.indexOf(`--${name}`);
   const value = idx >= 0 ? process.argv[idx + 1] : undefined;
   if (!value || value.startsWith('--')) throw new Error(`TAXONOMY_BRIDGE_${name.toUpperCase()}_REQUIRED`);
+  if (!RE_SHA256.test(value)) {
+    throw new Error(`TAXONOMY_BRIDGE_${name.toUpperCase()}_INVALID_FORMAT: expected sha256:<64hex>, got ${value}`);
+  }
   return value;
 }
 
@@ -60,6 +65,9 @@ function hasFlag(name: string): boolean {
 
 async function main() {
   if (!hasFlag('historical-bridge')) throw new Error('TAXONOMY_BRIDGE_HISTORICAL_MODE_REQUIRED');
+  const isApply = hasFlag('apply');
+  const isDryRun = hasFlag('dry-run') || !isApply;
+
   // This bridge is intentionally historical. Revisions must be supplied by
   // the operator from evidence; never derive source/workspace identity from
   // Git HEAD and never reuse a fixed graph revision as current authority.
@@ -72,8 +80,9 @@ async function main() {
 
   const report: Record<string, unknown> = {
     schema: 'atlas.populate-hyperedges-from-taxonomy-edges.v1',
-    mode: 'HISTORICAL_BRIDGE',
+    mode: isApply ? 'HISTORICAL_BRIDGE_APPLY' : 'HISTORICAL_BRIDGE_DRY_RUN',
     canonicalAuthority: false,
+    writesPerformed: isApply,
     limit: LIMIT,
   };
 
@@ -137,10 +146,15 @@ async function main() {
         }
       }
 
-      const result = await persistHyperedges(edges);
-      attempted += result.attempted;
-      written += result.written;
-      for (const e of result.errors) errors.push({ id: e.hyperedgeId, message: e.message });
+      if (!isApply) {
+        attempted += edges.length;
+        written += 0;
+      } else {
+        const result = await persistHyperedges(edges);
+        attempted += result.attempted;
+        written += result.written;
+        for (const e of result.errors) errors.push({ id: e.hyperedgeId, message: e.message });
+      }
 
       if ((i / BATCH_SIZE) % 10 === 0) {
         console.error(`[progress] ${Math.min(i + BATCH_SIZE, rowsRes.rows.length)}/${rowsRes.rows.length} rows processed, ${written} written`);

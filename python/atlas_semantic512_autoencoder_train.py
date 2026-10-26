@@ -37,6 +37,12 @@ REPRESENTATION_ID = "semantic_512"
 LATENT_REPRESENTATION_ID = "latent_64"
 COLLECTION = "codebase_chunks_512"
 ALGORITHM_REVISION = "atlas.semantic512-autoencoder.512-256-64.v2-reconciled"
+TRAINING_PRECISION = {
+    "parameterDtype": "float32",
+    "inputDtype": "float32",
+    "autocast": "disabled",
+    "quantization": "none",
+}
 
 
 @dataclass(frozen=True)
@@ -374,6 +380,7 @@ def main() -> int:
             "sourceDimension": SEMANTIC_DIM,
             "latentRepresentationId": LATENT_REPRESENTATION_ID,
             "latentDimension": LATENT_DIM,
+            "trainingPrecision": TRAINING_PRECISION,
             "reconciliationReceiptId": reconciliation_receipt["receiptId"],
             "reconciliationManifestChecksum": reconciliation_receipt["manifestChecksum"],
             "seed": args.seed,
@@ -421,6 +428,7 @@ def main() -> int:
         "hiddenDimension": HIDDEN_DIM,
         "latentRepresentationId": LATENT_REPRESENTATION_ID,
         "latentDimension": LATENT_DIM,
+        "trainingPrecision": TRAINING_PRECISION,
         "rowCount": len(identities),
         "identityManifestChecksum": identity_checksum(identities),
         "reconciliationReceiptId": reconciliation_receipt["receiptId"],

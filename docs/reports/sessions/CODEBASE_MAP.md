@@ -247,7 +247,7 @@ Three workflows exist under `.github/workflows/`. `sveltekit-ci.yml` is the cano
 
 The script degrades through three modes:
 
-1. **Full agent mode** — uses `/api/ai/agent`, Gemma4, ACE retrieval, and `codebase_chunks_768`.
+1. **Full agent mode** — uses `/api/ai/agent`, ornith 1.5, ACE retrieval, and `codebase_chunks_768`.
 2. **RAG-only mode** — uses direct Qdrant access against `codebase_chunks_768` when no LLM is available.
 3. **Static-scan mode** — uses filesystem scans for TODOs, hardcoded localhost URLs, Zod coverage, and other production risks.
 
@@ -264,10 +264,10 @@ node sveltekit-frontend/scripts/tests/test-production-readiness.mjs --turbo --sk
 
 ## Analysis Path Mapping
 
-This repository already has a live codebase-intelligence pipeline; the main work is in extending and stabilizing that path, not inventing a second one from scratch. The most important split is: `codebase-index/*` builds and enriches graph/search artifacts, `ace/*` assembles those artifacts into synthesis context, and `ACPToolRegistry` is a separate tool-execution plane.
+This repository already has a live codebase-intelligence pipeline; the main work is in extending and stabilizing that path, not inventing a second one from scratch. The most important split is: `codebase-index/*` builds and enriches graph/search artifacts, `ace/*` assembles those artifacts into synthesis context, and `ACPToolRegistry` 'a2a' is a separate tool-execution plane.
 
 - `sveltekit-frontend/src/routes/api/codebase-index/orchestrate/+server.ts`
-  This is the top-level orchestration route for codebase analysis. In sync mode it can run AST embedding, cluster assignment, SOM topology, Neo4j sync, PageRank, cluster summarization, GPU tagging, wiki export, 4D hypergraph tagging, community detection, and deep-research indexing in one staged SSE pipeline with Redis checkpoints.
+  This is the top-level orchestration route for codebase analysis. In sync mode it can run AST embedding, cluster assignment, SOM topology, Neo4j sync, CouchDB PageRank (power iteration, `lib/server/graph/couchdb-pagerank.ts`), cluster summarization, GPU tagging, wiki export, 4D hypergraph tagging, community detection, and deep-research indexing in one staged SSE pipeline with Valkey checkpoints. The PageRank stage does not call the 8095 NLP sidecar or NetworkX.
 
 - `sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts`
   This is the per-cluster summarization and mirroring path. It scrolls Qdrant chunks, generates cluster summaries, embeds them, writes vectors back to Qdrant, mirrors summary state into PostgreSQL, and optionally runs GPU semantic tagging.
@@ -276,7 +276,7 @@ This repository already has a live codebase-intelligence pipeline; the main work
   This is the core codebase-index implementation surface. `ast-chunker.ts`, `dual-embedder.ts`, `workspace-metadata-extractor.ts`, `cluster-summary.ts`, `gpu-karpathy-tagger.ts`, `karpathy-wiki.ts`, and `run-cluster-assign.ts` are the main files to inspect before changing indexing behavior.
 
 - `sveltekit-frontend/scripts/run-hypergraph.ts`
-  This is the standalone production writer for hyperedges, `hg:4d:{id}` coordinates, `hg:edge:{hash}` blobs, `hg:edge:idx`, and `hg:built_at`. It is the main entry point when investigating 4D topology state, Redis-backed graph artifacts, or hypergraph-to-Neo4j sync.
+  Standalone writer for hyperedges, `hg:4d:{id}` coordinates, `hg:edge:{hash}` blobs, `hg:edge:idx`, and `hg:built_at`. Not the only producer: `src/lib/server/features/cases/hypergraph-4d.ts` (legal-case / Parent Atlas path, used by orchestrator Stage 9) writes the same key names. The two producers have different logic and are not duplicates; the shared key names are the collision. Key namespacing needs reader changes (`topological-search.ts`, `ci-smoke-hypergraph.mjs`) and is still open; see `openspec/changes/parent-atlas-gpu-compute-lanes-consolidation/tasks.md` (CODEBASE-INDEX-OPTIMIZE-01).
 
 - `sveltekit-frontend/scripts/ci-smoke-hypergraph.mjs`
   This is the namespace drift guard for the hypergraph pipeline. It writes a sentinel `hg:edge:*` record, validates `memberIds` and `gradeLabel`, and fails with exit code `5` if the production key shape ACE and topological retrieval expect is no longer readable.
@@ -291,7 +291,7 @@ This repository already has a live codebase-intelligence pipeline; the main work
   `queryBmuCached(embedding, gridW, gridH)` maps a live query embedding to its SOM Best Matching Unit via the `somCache` CUDA kernel, caches the result in Redis under `som:bmu:{fp_hash}` for 30 minutes, and falls back to CPU argmin over `som:weights` when the GPU path is unavailable. Returns `{ bmuRow, bmuCol, source: 'gpu'|'cpu'|'cache' }`. This makes SOM a live query-time ranking signal rather than only an offline clustering artifact. `attentionScoreChunks(queryEmbedding, chunkEmbeddings[])` exposes `attentionScoreGPU` for n-ary GPU attention scoring across a candidate set; falls back to CPU cosine. The `NativeAddon` interface now types all previously invisible exports: `trainSOM`, `kmeansWithCentroids`, `attentionScoreGPU`, `rewardScoreGPU`, `pageRankGPU`, `softmaxGPU`, `topKIndicesGPU`.
 
 - `sveltekit-frontend/src/lib/server/graph/community-graph.ts`
-  This adds a GraphRAG-style community layer over the existing codebase graph. It groups GPU/SOM clusters into higher-level communities, summarizes them with LLM help, stores them in Redis/Postgres, and exposes context back to retrieval and ACE.
+  This adds a GraphRAG-style community layer over the existing codebase graph. It groups GPU/SOM clusters into higher-level communities, summarizes them with LLM help, stores them in Valkey/Postgres 18, and exposes context back to retrieval and ACE.
 
 - `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
   This is where codebase intelligence flows back into synthesis. ACE pulls RAG chunks, KAG neighbors, web research, chat memory, optional codebase context, and GraphRAG community summaries into one promptable context bundle. Phase 8 now runs `queryBmuCached()` against the query embedding before calling `applyTopologicalBoostAsync`, passing the query's BMU grid coordinates so chunks near the query's own SOM position receive an extra ranking signal. ACE scoring spine: `semantic×0.60 + tag×0.12 + ast_graph×0.10 + som_chunk_proximity×0.05 + query_bmu_proximity×0.03 + hyperedge×0.10` (caps: MAX_QUERY_BMU_BOOST=0.03, MAX_ATTENTION_BOOST=0.04).

@@ -183,7 +183,7 @@ console.log('\nTEST 5: Result Aggregation');
 const mockResults = [
   {
     testCaseId: 'streaming-basic',
-    model: 'gemma4-legal',
+    model: 'ornith-1.5-9b',
     passed: true,
     latencyMs: 1200,
     evidence: {
@@ -192,7 +192,7 @@ const mockResults = [
   },
   {
     testCaseId: 'tool-call-basic',
-    model: 'gemma4-legal',
+    model: 'ornith-1.5-9b',
     passed: false,
     latencyMs: 2800,
     evidence: {

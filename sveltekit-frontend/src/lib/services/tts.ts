@@ -81,10 +81,8 @@ class TTSService {
 				const loadTime = performance.now() - startTime;
 				console.log(`[TTS] Piper model loaded in ${loadTime.toFixed(0)}ms`);
 
-				// Initialize AudioContext
-				this.audioContext = new AudioContext();
 			} catch (error) {
-				console.error('[TTS] Failed to initialize Piper:', error);
+				console.warn('[TTS] Failed to initialize Piper (optional dependency not installed):', error);
 				this.piper = null;
 				throw error;
 			} finally {

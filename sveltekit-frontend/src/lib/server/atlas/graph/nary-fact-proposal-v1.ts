@@ -18,6 +18,12 @@ export const NaryFactProposalParticipantV1Schema = z.object({
   sourceRef: z.string().min(1).optional(),
 }).strict();
 
+export const NaryFactPredicatePolicyRefV1Schema = z.object({
+  schema: z.literal('atlas.okf.predicate-policy-ref.v1'),
+  registryDocumentSha256: z.string().regex(/^[a-f0-9]{64}$/),
+  registrySchemaSha256: z.string().regex(/^[a-f0-9]{64}$/),
+}).strict();
+
 export const NaryFactProposalV1Schema = z.object({
   schema: z.literal('atlas.nary-fact-proposal.v1'),
   sourceRef: z.string().min(1),
@@ -28,6 +34,7 @@ export const NaryFactProposalV1Schema = z.object({
   producerRevision: z.string().min(1),
   ontologyRevision: z.string().min(1).nullable().optional(),
   predicate: z.string().min(1),
+  predicatePolicy: NaryFactPredicatePolicyRefV1Schema.optional(),
   participants: z.array(NaryFactProposalParticipantV1Schema).min(3).max(64),
   evidenceRefs: z.array(z.string().min(1)).min(1).max(128),
   proposalChecksum: z.string().regex(/^[a-f0-9]{64}$/),
@@ -86,6 +93,7 @@ export function createNaryFactProposalV1(input: Omit<NaryFactProposalV1, 'schema
     producerRevision: input.producerRevision,
     ontologyRevision: input.ontologyRevision ?? null,
     predicate: input.predicate,
+    ...(input.predicatePolicy ? { predicatePolicy: input.predicatePolicy } : {}),
     participants: normalizeParticipants(input.participants),
     evidenceRefs: normalizeStrings(input.evidenceRefs),
     canonicalAuthority: false as const,

@@ -42,7 +42,7 @@ datastore/model state was changed.
   request, compiles a retrieval plan only for revision-qualified requests, and applies its
   bounded candidate budget to SearchRuntime; `server.route.test.ts` proves both the control
   metadata and budget propagation. Exact promotion remains AFC-11.
-- [x] AFC-10-01 Wire deterministic `QueryClassificationV1` observation into `/api/search/hyperrag` after request validation; return it as control metadata while preserving SearchRuntime as the retrieval/fusion owner. Route proof asserts the stable classification contract; full classification-to-retrieval-plan execution remains open.
+- [x] AFC-10-01 Wire deterministic `QueryClassificationV1` observation into `/api/search/hyperrag` after request validation; return it as control metadata while preserving SearchRuntime as the retrieval/fusion owner. Route proof asserts the stable classification contract; full classification-to-retrieval-plan execution remains open. 2026-10-22 additive shadow hints now expose ordered exact terms, bounded bigrams, recognized package candidates, and only explicitly written `repo:` scope candidates through the existing classifier/workflow metadata. They are checksummed diagnostic hints and are not yet consumed as retrieval filters, ontology matches, clustering input, or ranking features; this does not close the execution gate.
 - [x] AFC-10-02 Compile the existing `RetrievalPlanV1` only for revision-qualified HyperRAG requests, apply its bounded candidate budget to the SearchRuntime call, and return the plan as control metadata; unqualified requests remain plan-less rather than receiving a synthetic workspace revision.
 - [ ] AFC-11 Wire exact promotion to the live retrieval owner.
 - [ ] AFC-12 Extend existing context manifest persistence with revision/evidence refs through a migration only after compatibility proof.
@@ -817,3 +817,13 @@ changed.
   The source-level outcome is therefore **DISCONNECTED_IN_CURRENT_PATH**, not
   producer-to-row lineage proven. Historical JSONB population/readback remains
   a separate owner question. No live database query or write was run.
+
+## Orchestration and prompt-input follow-up
+
+- [ ] AFC-ORCHESTRATION-01 Inventory installed and invoked Deep Agents/LangChain/Mastra/ACP/A2A/tRPC/MCP surfaces; assign each to existing routing, delegation, transport, or tool-registry owners, and add no parallel orchestrator. Pydantic validates bounded sidecar contracts; it does not confer source or ontology authority.
+- [ ] AFC-PROMPT-01 Build ACE JSON/prompt inputs only from the existing admitted ContextManifest and PromptPlan owners; bind template, model, tool-schema and evidence revisions and test rejection of raw retrieval hits, cache-only hints, unadmitted summaries, and hidden-state persistence.
+- [ ] AFC-TOOL-ROUTING-01 Verify MCP/Viterbi selection remains advisory and dispatch uses the existing allowlisted tool registry with schema/permission validation; ACP/A2A delegation and tRPC transport must preserve request, workspace, and evidence identities.
+
+### 2026-10-11 read-only DAG structural refinement check
+
+The existing `context-dag-handlers-v1.spec.ts` exercises lexical-dependent ast-grep refinement through the shared read-only DAG. Focused Vitest passed **30/30**. This proves the handler/DAG fixture path only; it does not prove a production caller, current Graphify evidence persistence/readback, ontology admission, or ranking promotion. Keep `AFC-ORCHESTRATION-01`, `AFC-PROMPT-01`, and `AFC-TOOL-ROUTING-01` open pending their own owner-level evidence.

@@ -34,7 +34,7 @@ for (let i=0;i<args.length;i++){
 }
 
 if (!fs.existsSync(acePacketPath)) {
-  console.error('ERROR: ACE packet not found at .opencode/ace-packet.json');
+  console.error('ACE_PACKET_UNAVAILABLE: .opencode/ace-packet.json not found; ingest not run.');
   process.exit(1);
 }
 

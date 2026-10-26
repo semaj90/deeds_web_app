@@ -1,7 +1,7 @@
 # Go Retrieval Facade Wiring — Complete Integration
 
-**Date**: July 1, 2026  
-**Status**: ✅ **WIRED & READY FOR TESTING**  
+**Date**: July 1, 2026
+**Status**: ✅ **WIRED & READY FOR TESTING**
 **Components**: 5 services orchestrated into 1 HTTP API facade
 
 ---
@@ -60,7 +60,7 @@ Response: { results[], summary?, timing, stages_completed }
 | **Qdrant** | GPU ANN search on named-vector "content" | 6333 | /collections/.../search | ✅ Wired |
 | **TurboVec** | CUDA prefilter (768→64 transform) | 8791 | /search | ✅ Wired |
 | **Postgres** | Canonical truth joins | 5434 | (pool query) | ✅ Wired |
-| **Gemma4** | Bounded summarization | 8090 | /v1/chat/completions | ✅ Wired |
+| **ornit 1.5** | Bounded summarization | 8090 | /v1/chat/completions | ✅ Wired |
 
 ---
 
@@ -111,7 +111,7 @@ Response: { results[], summary?, timing, stages_completed }
     "postgres_join_ms": 294,
     "total_ms": 25043
   },
-  "stages_completed": ["embedding", "qdrant_search", "turbovec_prefilter", "postgres_join", "ranking", "gemma4_summary"],
+  "stages_completed": ["embedding", "qdrant_search", "turbovec_prefilter", "postgres_join", "ranking", update thise to ornith 1 .5 "gemma4_summary"],
   "fallback_used": false,
   "metadata": {
     "query": "authentication session validation",
@@ -134,14 +134,14 @@ Response: { results[], summary?, timing, stages_completed }
     "qdrant": true,
     "turbovec": true,
     "postgres": true,
-    "gemma4": true
+    "ornith 1.5": true
   },
   "details": {
     "ollama": "OK",
     "qdrant": "OK",
     "turbovec": "OK",
     "postgres": "OK",
-    "gemma4": "OK"
+    "ornith 1.5": "OK"
   }
 }
 ```
@@ -173,10 +173,10 @@ Go Retrieval requests support both snake_case and camelCase:
 {
   useRRF: true,        // camelCase
   use_rrf: true,       // snake_case
-  
+
   includeSummary: true,
   include_summary: true,
-  
+
   summaryMaxTokens: 128,
   summary_max_tokens: 128
 }
@@ -237,7 +237,7 @@ The facade validates all 5 services in parallel:
 2. **Qdrant** — `/collections` HTTP 200
 3. **TurboVec** — `/health` HTTP 200
 4. **Postgres** — Pool query `SELECT 1`
-5. **Gemma4** — `/v1/models` HTTP 200
+5. *ornith 1.5* — `/v1/models` HTTP 200
 
 Timeout per service: 2 seconds (total ~10 seconds for full health check).
 
@@ -250,14 +250,14 @@ Response:
     "qdrant": true,
     "turbovec": true,
     "postgres": true,
-    "gemma4": true
+    "ornith 1.5": true
   },
   "details": {
     "ollama": "OK",
     "qdrant": "OK",
     "turbovec": "OK",
     "postgres": "OK",
-    "gemma4": "OK"
+    "ornith 1.5": "OK"
   }
 }
 ```
@@ -442,7 +442,7 @@ curl -X POST 'http://localhost:5173/api/retrieval/go' ...
    │ │ ↓                                       │ │
    │ │ STAGE 5: Unified ranking (6 signals)    │ │
    │ │ ↓                                       │ │
-   │ │ STAGE 6: Gemma4 summary (optional)      │ │
+   │ │ STAGE 6: ornith15 llama-server 8090 summary (optional)      │ │
    │ └─────────────────────────────────────────┘ │
    └──────────────────────────────────────────────┘
                          ↓
@@ -470,7 +470,7 @@ const SERVICES = {
   OLLAMA: 'http://127.0.0.1:11434',
   QDRANT: 'http://127.0.0.1:6333',
   TURBOVEC: 'http://127.0.0.1:8791',
-  GEMMA4: 'http://127.0.0.1:8090',
+  ornith15: 'http://127.0.0.1:8090',
   POSTGRES: { host: '127.0.0.1', port: 5434, ... }
 };
 ```
@@ -491,15 +491,15 @@ To change ports, edit `unified-orchestrator.ts` line 34-50.
 
 ## Critical Rules Enforced
 
-✅ **Postgres is truth** — all Qdrant/TurboVec results verified in Postgres  
-✅ **Named-vector "content"** — not unnamed/generic vectors  
-✅ **Bounded Gemma4** — temperature=0.3, max_tokens=128  
-✅ **Graceful fallback** — `fallback_used: true` signals degradation  
-✅ **Clear service boundaries** — each service has one clear job  
-✅ **Timing transparency** — clients see per-stage milliseconds  
+✅ **Postgres is truth** — all Qdrant/TurboVec results verified in Postgres
+✅ **Named-vector "content"** — not unnamed/generic vectors
+✅ **Bounded Gemma4** — temperature=0.3, max_tokens=128
+✅ **Graceful fallback** — `fallback_used: true` signals degradation
+✅ **Clear service boundaries** — each service has one clear job
+✅ **Timing transparency** — clients see per-stage milliseconds
 
 ---
 
-**Status**: Ready for testing  
-**Date**: July 1, 2026  
+**Status**: Ready for testing
+**Date**: July 1, 2026
 **Owner**: TurboVec + Go Retrieval integration

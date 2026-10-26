@@ -16,7 +16,7 @@ import type { RequestHandler } from './$types';
 import { resolve, relative } from 'path';
 import { readFileSync, statSync } from 'fs';
 import { createHash } from 'crypto';
-import { callOllamaChat, bifrostChat } from '$lib/server/ollama.js';
+import { callLlamaServerChat, bifrostChat } from '$lib/server/ollama.js';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
 import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
 import { z } from 'zod';
@@ -144,7 +144,7 @@ ${contentForLLM}
 					);
 				} else {
 					// Direct Ollama fallback
-					content = await callOllamaChat(systemPrompt, userPrompt);
+					content = await callLlamaServerChat(systemPrompt, userPrompt);
 				}
 
 				gen.end({ output: content.slice(0, 1000), usage: { completionTokens: Math.ceil(content.length / 4) } });

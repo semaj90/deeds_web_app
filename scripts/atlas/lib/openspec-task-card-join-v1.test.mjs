@@ -75,6 +75,7 @@ test('admits task-claim proof only with checksummed card and exact receipt linea
   });
   assert.equal(admission.admitted, true);
   assert.equal(admission.admissionScope, 'TASK_CLAIM_PROOF_ONLY');
+  assert.equal(admission.taskRef, taskRef);
   assert.equal(admission.canonicalAuthority, false);
   assert.equal(admission.writesPerformed, false);
 });

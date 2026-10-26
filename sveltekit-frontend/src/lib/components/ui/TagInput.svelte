@@ -44,8 +44,7 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="tag-input-container" onclick={() => inputEl?.focus()}>
+<div class="tag-input-container" onclick={() => inputEl?.focus()} role="presentation">
 	<div class="tag-list">
 		{#each tags as tag}
 			<span class="tag-chip">

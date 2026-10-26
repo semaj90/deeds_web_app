@@ -1,0 +1,9 @@
+# SQL Language Profile for OKF
+
+version: 1
+language: sql
+name: SQL
+grammar: sql
+
+extensions:
+  - .sql

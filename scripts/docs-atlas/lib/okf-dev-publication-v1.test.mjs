@@ -7,6 +7,7 @@ import path from 'node:path';
 import {
   publishOkfDevCorpusGenerationV1,
   resolveOkfDevPublishedCorpusV1,
+  verifyOkfDevPageArtifactReadbackV1,
   writeOkfCrawlFailureReceiptV1,
 } from './okf-dev-publication-v1.mjs';
 
@@ -70,6 +71,19 @@ test('publishes and independently reads back a complete multi-page generation', 
   const corpus = (await readFile(current.corpusPath, 'utf8')).trim().split(/\r?\n/).map(JSON.parse);
   assert.equal(corpus.length, 2);
   assert.equal(current.generation.page_readbacks.length, 2);
+  assert.deepEqual(current.generation.page_readbacks.map((page) => verifyOkfDevPageArtifactReadbackV1(root, page).status), ['VERIFIED', 'VERIFIED']);
+}));
+
+test('independent page readback rejects changed source markdown and sidecar bytes', async () => withRoot(async (root) => {
+  const page = await fixturePage(root, 'zod', 'api', 'https://zod.dev/api');
+  await publishOkfDevCorpusGenerationV1(publicationInput(root, 'run-page-readback-tamper', [page]));
+  const published = resolveOkfDevPublishedCorpusV1(root);
+  const readback = published.generation.page_readbacks[0];
+  await writeFile(path.join(root, readback.entry.markdown_path), '# changed after publication');
+  assert.throws(() => verifyOkfDevPageArtifactReadbackV1(root, readback), /PUBLICATION_PAGE_MARKDOWN_READBACK_CHECKSUM_MISMATCH/);
+  await writeFile(path.join(root, readback.entry.markdown_path), '# api');
+  await writeFile(path.join(root, readback.entry.markdown_path.replace(/\.md$/i, '.json')), JSON.stringify({ ...page.entry, title: 'changed' }));
+  assert.throws(() => verifyOkfDevPageArtifactReadbackV1(root, readback), /PUBLICATION_PAGE_SIDECAR_READBACK_CHECKSUM_MISMATCH/);
 }));
 
 test('requires readback for every row, including retained rows outside the current fetch allowlist', async () => withRoot(async (root) => {
@@ -123,6 +137,7 @@ test('normalizes contained legacy absolute artifact paths in the published gener
   const [publishedEntry] = (await readFile(current.corpusPath, 'utf8')).trim().split(/\r?\n/).map(JSON.parse);
   assert.equal(receipt.publication_status, 'PUBLISHED_READBACK_VERIFIED');
   assert.equal(publishedEntry.markdown_path, 'raw/firecrawl/intro.md');
+  assert.equal(verifyOkfDevPageArtifactReadbackV1(root, current.generation.page_readbacks[0]).status, 'VERIFIED');
 }));
 
 test('rejects wrong identity, changed URL, stale hash, duplicate page, and malformed sidecar before pointer publication', async (t) => {

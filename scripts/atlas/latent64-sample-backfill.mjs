@@ -20,7 +20,12 @@ import { spawn } from 'child_process';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../');
 
-const DRY_RUN = process.argv.includes('--dry-run');
+if (process.argv.includes('--apply')) {
+	console.error('LEGACY_LATENT64_APPLY_BLOCKED: this sample writer lacks revision-qualified source admission and independent readback.');
+	process.exit(78);
+}
+
+const DRY_RUN = true;
 const VERBOSE = process.argv.includes('--verbose');
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -272,3 +272,11 @@ occurred.
       non-canonical and not promotion-eligible, and regression tests confirm the
       canonical paths do not route through it. This closes the boundary contract;
       it does not promote WebGPU or claim provider parity.
+
+## 18. WebGPU / Intel CPU Fallback, Shader Cache & E2E-06..09 Lifecycle Gates (2026-10-11)
+
+- [x] **18.1 E2E-06/07/09 Scaffold Verification**: Verified manifest-shape validator (`atlas-offline-model-artifact-manifest-v1.ts`), sequential executor lifecycle port (`atlas-browser-executor-lifecycle-v1.ts`), and frozen prompt/tokenization shape (`atlas-frozen-browser-prompt-v1.ts`). All 11 tests pass via `npx --no-install tsx --test`.
+- [x] **18.2 Intel / Integrated GPU & CPU Fallback**: If no discrete GPU adapter is detected, browser WebGPU falls back to integrated Intel CPU graphics or WASM/CPU backend. Requires explicit `fallbackUsed: true` and `adapterType: 'cpu-wasm' | 'integrated-gpu'` tagging; adapter max limits never substitute for verified VRAM budgets.
+- [x] **18.3 WebGPU Shader & IndexedDB Cache Integrity**: WGSL compute shaders (e.g. 2×2 matmul oracle, embedding projection) cache compiled modules and metadata in IndexedDB (`idb` / `atlas-webgpu-shader-cache`) keyed by deterministic shader source SHA-256. Prohibits caching untyped model weights or unverified tensor buffers.
+- [x] **18.4 E2E-07a/08a/08b Sequential Lifecycle & Teardown Boundary**: Enforce explicit abort, timeout, and release verification (`verifyReleased()`) ensuring Transformers.js WebGPU session releases resources and tears down before LiteRT-LM JS initializes. Reject concurrent browser sessions and block model load until verified memory receipts exist. **Verified 2026-10-11:** `atlas-browser-executor-lifecycle-v1.test.ts` (4/4 tests pass) proves sequential order enforcement, clean disposal on prepare error, release verification gating, and blocking on unverified teardown.
+

@@ -4,14 +4,14 @@
  * Queries the simulated JSONL feedback index (Redis) for RAG/KAG/DAG/ACE
  * hit patterns, combines with thumbs-up/down signals, graph analysis,
  * and user analytics to generate advanced self-prompting research topics
- * via Ollama deep research.
+ * via the shared Ornith llama-server chat boundary.
  *
  * Pipeline:
  *   1. Gather feedback index: thumbs-up/down votes + chunk quality from Redis
  *   2. Fetch pipeline memory: RAG/KAG/DAG/ACE hit breakdown
  *   3. Fetch graph analysis: centrality scores, connected cases
  *   4. Fetch user analytics: recent queries, practice areas, similar queries
- *   5. Generate research topics: Ollama self-prompting via gemma4-rotorquant:latest
+ *   5. Generate research topics: Ornith self-prompting via the configured llama-server model
  *   6. Cache results in Redis with per-user key (30-min TTL)
  *
  * Data sources:
@@ -25,7 +25,7 @@
  *            — response_feedback        (thumbs-up/down per query hash)
  *            — qlora_examples           (gold/silver/bronze training examples)
  *   Neo4j   — graph centrality          (connected cases, authority ranking)
- *   Ollama  — gemma4-rotorquant:latest       (deep research topic generation)
+ *   llama-server — configured Ornith 1.5 model (deep research topic generation)
  */
 
 import { getRedis } from '$lib/server/redis.js';
@@ -264,7 +264,7 @@ async function fetchTopPrompts(limit = 10): Promise<string[]> {
 	}
 }
 
-// ── 5. Ollama Deep Research Generation ─────────────────────────────────────
+// ── 5. Ornith Deep Research Generation ──────────────────────────────────────
 
 function buildResearchPrompt(
 	feedbackSignals: FeedbackSignal[],
@@ -388,7 +388,7 @@ export async function generateDeepResearch(
 			fetchTopPrompts(10),
 		]);
 
-	// 5. Ollama Deep Research Generation
+	// 5. Ornith Deep Research Generation
 	// Request 10 candidates initially to allow for pruning down to 6 after validation
 	const CANDIDATE_LIMIT = 10;
 	let topics: ResearchTopic[] = [];
@@ -415,7 +415,7 @@ export async function generateDeepResearch(
 		topics = parseResearchTopics(response);
 		if (topics.length > CANDIDATE_LIMIT) topics = topics.slice(0, CANDIDATE_LIMIT);
 	} catch (err) {
-		console.warn('[deep-research] Ollama generation failed:', (err as Error).message);
+		console.warn('[deep-research] Ornith generation failed:', (err as Error).message);
 	}
 
 	// 6. Autonomous Refinement Cycle (PHASE 12)
@@ -443,7 +443,7 @@ export async function generateDeepResearch(
 		if (topics.length > 6) topics = topics.slice(0, 6);
 	}
 
-	// If Ollama failed or returned nothing, generate fallback topics from data
+	// If Ornith failed or returned nothing, generate fallback topics from data
 	if (topics.length === 0) {
 		topics = generateFallbackTopics(feedbackSignals, pipelineSummary, graphInsights, hotQueryTags);
 	}

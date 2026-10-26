@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.ldr.report.v1",
+  "executionId": "0ff22f6c-4c30-4299-92f9-9397e0e7ef5d",
+  "createdAt": "2026-10-18T00:27:35.212Z",
+  "status": "BLOCKED",
+  "taskId": null,
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "researchStartAttempted": true,
+  "sourceRevisionDeferred": true,
+  "reportSha256": "08f789fb1db95126cc11c335c0641c44d7b5808240a64be437c81bfdb98d529b",
+  "tools": [
+    "ldr.start_research",
+    "ldr.get_report",
+    "ldr.poll_status",
+    "ldr.search_history",
+    "ldr.quick_summary"
+  ],
+  "error": "LDR_AUTH_REQUIRED_OR_FORBIDDEN (HTTP 401); supply an authorized LDR_SESSION_COOKIE and LDR_CSRF_TOKEN for POST requests"
+}

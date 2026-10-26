@@ -55,6 +55,7 @@ export type QueryAdaptiveFeatureRowV1 = z.infer<typeof QueryAdaptiveFeatureRowV1
 export interface SearchRuntimeQasCandidate {
   packetKey: string;
   sourceRef: string;
+  graphEvidenceRefs?: string[];
   stableSymbolId?: string | null;
   symbolVersionId?: string | null;
   workspaceRevision?: string | null;
@@ -160,7 +161,7 @@ export function adaptSearchRuntimeCandidatesToQasRows(input: {
       logicalLanes: [],
       fusedRank: candidate.rankBefore ?? null,
       rerankScore: candidate.fusionScore ?? candidate.score ?? null,
-      evidenceRefs: context.evidenceRefs ?? [candidate.sourceRef],
+      evidenceRefs: [...new Set([...(context.evidenceRefs ?? [candidate.sourceRef]), ...(candidate.graphEvidenceRefs ?? [])])].sort(),
     }));
   }
 

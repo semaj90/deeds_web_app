@@ -16,7 +16,7 @@
 
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
@@ -24,7 +24,14 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 const { Client } = pg;
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..', '..');
-const reportPath = resolve(repoRoot, 'docs', 'reports', 'qdrant-projection-id-owner-v2.json');
+const outputArg = process.argv.find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
+const reportPath = outputArg
+  ? resolve(repoRoot, outputArg)
+  : resolve(repoRoot, 'docs', 'reports', 'qdrant-projection-id-owner-v2.json');
+const outputRelativePath = relative(repoRoot, reportPath);
+if (outputArg && (outputRelativePath === '..' || outputRelativePath.startsWith(`..${sep}`) || isAbsolute(outputRelativePath))) {
+  throw new Error('--output must resolve inside the repository root');
+}
 
 const env = loadRepoEnv(process.env);
 const databaseUrl = resolveDatabaseUrl(env);
@@ -126,20 +133,27 @@ async function main() {
 
     const [apResult, cciResult] = await Promise.all([
       client.query(`
-        SELECT packet_key, source_ref, qdrant_point_id, qdrant_collection
+        SELECT packet_key, source_ref, qdrant_point_id, qdrant_collection, sha256, content_hash
         FROM atlas_packets
         WHERE packet_key IS NOT NULL OR source_ref IS NOT NULL OR qdrant_point_id IS NOT NULL
       `),
       client.query(`
-        SELECT id::text AS id, relative_path, qdrant_id
+        SELECT id::text AS id, relative_path, qdrant_id, chunk_id, content_hash,
+               source_revision, workspace_revision, representation_revision
         FROM codebase_chunk_index
       `),
     ]);
 
     const apByPacket = new Map();
+    const apRowsByPacket = new Map();
     const apBySource = new Map();
     for (const row of apResult.rows) {
-      if (row.packet_key) apByPacket.set(String(row.packet_key), row);
+      if (row.packet_key) {
+        apByPacket.set(String(row.packet_key), row);
+        const packetRows = apRowsByPacket.get(String(row.packet_key)) ?? [];
+        packetRows.push(row);
+        apRowsByPacket.set(String(row.packet_key), packetRows);
+      }
       if (row.source_ref) {
         const list = apBySource.get(String(row.source_ref)) ?? [];
         list.push(row);
@@ -148,6 +162,9 @@ async function main() {
     }
 
     const cciById = new Map(cciResult.rows.map((row) => [String(row.id), row]));
+    const cciByQdrantId = new Map(cciResult.rows
+      .filter((row) => row.qdrant_id)
+      .map((row) => [String(row.qdrant_id), row]));
     const cciByPath = new Map();
     for (const row of cciResult.rows) {
       if (!row.relative_path) continue;
@@ -169,6 +186,34 @@ async function main() {
     let cciBridgeExactMatches = 0;
     let atlasPacketBridgePresentButDifferent = 0;
     let cciBridgePresentButDifferent = 0;
+    const directQdrantIdCrosswalk = {
+      exactIdMatches: 0,
+      exactRelativePathMatches: 0,
+      contentHashComparable: 0,
+      contentHashMatches: 0,
+      sourceRevisionComparable: 0,
+      sourceRevisionMatches: 0,
+      workspaceRevisionComparable: 0,
+      workspaceRevisionMatches: 0,
+      representationRevisionComparable: 0,
+      representationRevisionMatches: 0,
+      packetKeyMatches: 0,
+      packetRowUniqueMatches: 0,
+      packetPointIdComparable: 0,
+      packetPointIdMatchesActual: 0,
+      packetPointIdConflicts: 0,
+      packetSourceRefComparableToPayload: 0,
+      packetSourceRefMatchesPayload: 0,
+      packetSourceRefComparableToChunk: 0,
+      packetSourceRefMatchesChunk: 0,
+      packetShaComparable: 0,
+      packetShaMatchesPayload: 0,
+      packetShaMatchesChunk: 0,
+      packetContentHashComparable: 0,
+      packetContentHashMatchesPayload: 0,
+      packetContentHashMatchesChunk: 0,
+      samples: [],
+    };
 
     for (const point of qdrantPoints) {
       const actualId = idString(point.id);
@@ -192,6 +237,105 @@ async function main() {
 
       const directCci = actualId ? cciById.get(actualId) : null;
       if (directCci) cciIdExactMatches += 1;
+
+      const directQdrantCci = actualId ? cciByQdrantId.get(actualId) : null;
+      if (directQdrantCci) {
+        directQdrantIdCrosswalk.exactIdMatches += 1;
+        const normalizedPointSource = sourceRef?.replace(/^sveltekit-frontend\//, '') ?? null;
+        const normalizedChunkPath = directQdrantCci.relative_path
+          ? String(directQdrantCci.relative_path).replace(/^sveltekit-frontend\//, '')
+          : null;
+        const sourceRefMatches = Boolean(normalizedPointSource && normalizedChunkPath && normalizedPointSource === normalizedChunkPath);
+        if (sourceRefMatches) directQdrantIdCrosswalk.exactRelativePathMatches += 1;
+
+        const payloadHash = payload.content_hash ? String(payload.content_hash) : null;
+        const chunkHash = directQdrantCci.content_hash ? String(directQdrantCci.content_hash) : null;
+        if (payloadHash && chunkHash) {
+          directQdrantIdCrosswalk.contentHashComparable += 1;
+          if (payloadHash === chunkHash) directQdrantIdCrosswalk.contentHashMatches += 1;
+        }
+
+        const packetRows = packetKey ? (apRowsByPacket.get(packetKey) ?? []) : [];
+        if (packetRows.length > 0) directQdrantIdCrosswalk.packetKeyMatches += 1;
+        if (packetRows.length === 1) {
+          directQdrantIdCrosswalk.packetRowUniqueMatches += 1;
+          const packetPointId = idString(packetRows[0].qdrant_point_id);
+          const packetSourceRef = packetRows[0].source_ref
+            ? String(packetRows[0].source_ref).replace(/^sveltekit-frontend\//, '')
+            : null;
+          const payloadSourceRef = sourceRef?.replace(/^sveltekit-frontend\//, '') ?? null;
+          const chunkSourceRef = directQdrantCci.relative_path
+            ? String(directQdrantCci.relative_path).replace(/^sveltekit-frontend\//, '')
+            : null;
+          if (packetPointId) {
+            directQdrantIdCrosswalk.packetPointIdComparable += 1;
+            if (packetPointId === actualId) directQdrantIdCrosswalk.packetPointIdMatchesActual += 1;
+            else directQdrantIdCrosswalk.packetPointIdConflicts += 1;
+          }
+          if (packetSourceRef && payloadSourceRef) {
+            directQdrantIdCrosswalk.packetSourceRefComparableToPayload += 1;
+            if (packetSourceRef === payloadSourceRef) directQdrantIdCrosswalk.packetSourceRefMatchesPayload += 1;
+          }
+          if (packetSourceRef && chunkSourceRef) {
+            directQdrantIdCrosswalk.packetSourceRefComparableToChunk += 1;
+            if (packetSourceRef === chunkSourceRef) directQdrantIdCrosswalk.packetSourceRefMatchesChunk += 1;
+          }
+          const packetSha = packetRows[0].sha256 ? String(packetRows[0].sha256) : null;
+          const packetContentHash = packetRows[0].content_hash ? String(packetRows[0].content_hash) : null;
+          if (packetSha && payloadHash) {
+            directQdrantIdCrosswalk.packetShaComparable += 1;
+            if (packetSha === payloadHash) directQdrantIdCrosswalk.packetShaMatchesPayload += 1;
+          }
+          if (packetSha && chunkHash) {
+            if (packetSha === chunkHash) directQdrantIdCrosswalk.packetShaMatchesChunk += 1;
+          }
+          if (packetContentHash && payloadHash) {
+            directQdrantIdCrosswalk.packetContentHashComparable += 1;
+            if (packetContentHash === payloadHash) directQdrantIdCrosswalk.packetContentHashMatchesPayload += 1;
+          }
+          if (packetContentHash && chunkHash && packetContentHash === chunkHash) {
+            directQdrantIdCrosswalk.packetContentHashMatchesChunk += 1;
+          }
+        }
+
+        for (const [payloadKey, rowKey, comparableKey, matchesKey] of [
+          ['source_revision', 'source_revision', 'sourceRevisionComparable', 'sourceRevisionMatches'],
+          ['workspace_revision', 'workspace_revision', 'workspaceRevisionComparable', 'workspaceRevisionMatches'],
+          ['representation_revision', 'representation_revision', 'representationRevisionComparable', 'representationRevisionMatches'],
+        ]) {
+          const payloadValue = payload[payloadKey] === null || payload[payloadKey] === undefined
+            ? null
+            : String(payload[payloadKey]);
+          const rowValue = directQdrantCci[rowKey] === null || directQdrantCci[rowKey] === undefined
+            ? null
+            : String(directQdrantCci[rowKey]);
+          if (payloadValue && rowValue) {
+            directQdrantIdCrosswalk[comparableKey] += 1;
+            if (payloadValue === rowValue) directQdrantIdCrosswalk[matchesKey] += 1;
+          }
+        }
+
+        if (directQdrantIdCrosswalk.samples.length < 50 &&
+            (!sourceRefMatches || (payloadHash && chunkHash && payloadHash !== chunkHash))) {
+          directQdrantIdCrosswalk.samples.push({
+            actualPointId: actualId,
+            chunkRowId: String(directQdrantCci.id),
+            chunkId: directQdrantCci.chunk_id ?? null,
+            sourceRef,
+            relativePath: directQdrantCci.relative_path ?? null,
+            sourceRefMatches,
+            payloadContentHash: payloadHash,
+            chunkContentHash: chunkHash,
+            packetSha256: packetRows.length === 1 ? packetRows[0].sha256 ?? null : null,
+            packetContentHash: packetRows.length === 1 ? packetRows[0].content_hash ?? null : null,
+            packetKeyCardinality: packetRows.length,
+            payloadSourceRevision: payload.source_revision ?? null,
+            chunkSourceRevision: directQdrantCci.source_revision ?? null,
+            payloadWorkspaceRevision: payload.workspace_revision ?? null,
+            chunkWorkspaceRevision: directQdrantCci.workspace_revision ?? null,
+          });
+        }
+      }
 
       if (sourceRef) {
         const normalizedSource = sourceRef.replace(/^sveltekit-frontend\//, '');
@@ -281,6 +425,7 @@ async function main() {
         codebaseChunkIndexQdrantIdEqualsActualPointId: cciBridgeExactMatches,
         codebaseChunkIndexQdrantIdPresentButDifferent: cciBridgePresentButDifferent,
       },
+      directQdrantIdCrosswalk,
       duplicates: {
         packetKeyGroupCount: duplicatePacketGroups.length,
         packetKeyPointCount: duplicatePacketGroups.reduce((sum, group) => sum + group.count, 0),
@@ -320,6 +465,29 @@ async function main() {
       collection,
       pointIdGenerations: report.pointIdGenerations,
       duplicatePacketGroups: report.duplicates.packetKeyGroupCount,
+      directQdrantIdCrosswalk: {
+        exactIdMatches: report.directQdrantIdCrosswalk.exactIdMatches,
+        exactRelativePathMatches: report.directQdrantIdCrosswalk.exactRelativePathMatches,
+        contentHashComparable: report.directQdrantIdCrosswalk.contentHashComparable,
+        contentHashMatches: report.directQdrantIdCrosswalk.contentHashMatches,
+        packetKeyMatches: report.directQdrantIdCrosswalk.packetKeyMatches,
+        packetRowUniqueMatches: report.directQdrantIdCrosswalk.packetRowUniqueMatches,
+        packetPointIdComparable: report.directQdrantIdCrosswalk.packetPointIdComparable,
+        packetPointIdMatchesActual: report.directQdrantIdCrosswalk.packetPointIdMatchesActual,
+        packetPointIdConflicts: report.directQdrantIdCrosswalk.packetPointIdConflicts,
+        packetSourceRefComparableToPayload: report.directQdrantIdCrosswalk.packetSourceRefComparableToPayload,
+        packetSourceRefMatchesPayload: report.directQdrantIdCrosswalk.packetSourceRefMatchesPayload,
+        packetSourceRefComparableToChunk: report.directQdrantIdCrosswalk.packetSourceRefComparableToChunk,
+        packetSourceRefMatchesChunk: report.directQdrantIdCrosswalk.packetSourceRefMatchesChunk,
+        packetShaComparable: report.directQdrantIdCrosswalk.packetShaComparable,
+        packetShaMatchesPayload: report.directQdrantIdCrosswalk.packetShaMatchesPayload,
+        packetShaMatchesChunk: report.directQdrantIdCrosswalk.packetShaMatchesChunk,
+        packetContentHashComparable: report.directQdrantIdCrosswalk.packetContentHashComparable,
+        packetContentHashMatchesPayload: report.directQdrantIdCrosswalk.packetContentHashMatchesPayload,
+        packetContentHashMatchesChunk: report.directQdrantIdCrosswalk.packetContentHashMatchesChunk,
+        sourceRevisionComparable: report.directQdrantIdCrosswalk.sourceRevisionComparable,
+        workspaceRevisionComparable: report.directQdrantIdCrosswalk.workspaceRevisionComparable,
+      },
       pointSetChecksum,
       reportPath,
     }, null, 2));

@@ -141,6 +141,7 @@
       </div>
       <button 
         onclick={() => isOpen = false}
+        aria-label="Close copilot"
         class="text-zinc-500 hover:text-zinc-100 transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -217,7 +218,8 @@
                  resize-none transition-all group-hover:border-zinc-700"
           rows="2"
         ></textarea>
-        <button 
+        <button
+          aria-label="Send message"
           onclick={sendMessage}
           disabled={isThinking || !input.trim()}
           class="absolute right-2 bottom-3 p-1.5 text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all disabled:opacity-0"

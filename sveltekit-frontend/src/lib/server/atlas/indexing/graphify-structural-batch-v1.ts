@@ -5,6 +5,7 @@ import type {
   StructuralMaterializationResult,
   StructuralSourceInputV1,
 } from './graphify-structural-materializer.js';
+import { resolveStructuralLanguageV1 } from './structural-language-dispatch-v1.js';
 
 export type GraphifyStructuralDeltaActionV1 = 'UPSERT' | 'DELETE';
 
@@ -14,6 +15,7 @@ export interface GraphifyStructuralDeltaInputV1 {
   /** Required for UPSERT. DELETE intentionally carries no source body. */
   source?: string | null;
   language?: string | null;
+  languageId?: string | null;
   priorContentHash?: string | null;
   currentContentHash?: string | null;
 }
@@ -117,18 +119,12 @@ function inferSourceVersionAnchor(sourceRef: string, contentHash: string): strin
   return `content:${contentHash}:${graphifyStructuralSha256(sourceRef).slice(0, 12)}`;
 }
 
-function inferLanguage(sourceRef: string, explicit?: string | null): string {
-  if (explicit?.trim()) return explicit.trim();
-  const lower = sourceRef.toLowerCase();
-  if (lower.endsWith('.ts') || lower.endsWith('.mts') || lower.endsWith('.cts')) return 'typescript';
-  if (lower.endsWith('.tsx')) return 'tsx';
-  if (lower.endsWith('.js') || lower.endsWith('.mjs') || lower.endsWith('.cjs')) return 'javascript';
-  if (lower.endsWith('.jsx')) return 'javascript';
-  if (lower.endsWith('.py')) return 'python';
-  if (lower.endsWith('.rs')) return 'rust';
-  if (lower.endsWith('.go')) return 'go';
-  if (lower.endsWith('.java')) return 'java';
-  throw new Error(`UNSUPPORTED_SOURCE_LANGUAGE:${sourceRef}`);
+function inferLanguage(sourceRef: string, explicit?: string | null, languageId?: string | null): string {
+  const resolution = resolveStructuralLanguageV1({ sourceRef, language: explicit, languageId });
+  if (resolution.status === 'REJECTED') {
+    throw new Error(`${resolution.reason}:${sourceRef}`);
+  }
+  return resolution.language;
 }
 
 function fileReceiptDigest(receipt: Omit<GraphifyStructuralBatchFileReceiptV1, 'outputDigest'>): string {
@@ -240,7 +236,7 @@ export async function runGraphifyStructuralBatchV1(
         sourceRevision: null,
         sourceVersionAnchor,
         sourceRevisionAuthority: 'CONTENT_ANCHOR_ONLY',
-        language: inferLanguage(sourceRef, raw.language),
+        language: inferLanguage(sourceRef, raw.language, raw.languageId),
         source,
       });
       const partial = {

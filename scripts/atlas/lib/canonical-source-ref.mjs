@@ -23,6 +23,35 @@ const GENERATED_PATTERNS = [
 ];
 
 export function normalizeSourceRef(value) {
+  const raw = String(value ?? '').trim();
+  if (!raw) return '';
+  if (/[\u0000-\u001f\u007f]/u.test(raw) || raw.includes('?') || raw.includes('#')) {
+    throw new Error('SOURCE_REF_INVALID_CHARACTER');
+  }
+  if (/^(?:[\\/]{2}|[\\/])|^[A-Za-z]:/u.test(raw)) {
+    throw new Error('SOURCE_REF_MUST_BE_REPOSITORY_RELATIVE');
+  }
+  if (/^[A-Za-z][A-Za-z0-9+.-]*:/u.test(raw)) {
+    throw new Error('SOURCE_REF_URL_OR_SCHEME_FORBIDDEN');
+  }
+
+  const pathParts = raw.replaceAll('\\', '/').split('/').filter(Boolean);
+  for (const pathPart of pathParts) {
+    let decoded = pathPart;
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      try {
+        const next = decodeURIComponent(decoded);
+        if (next === decoded) break;
+        decoded = next;
+      } catch {
+        throw new Error('SOURCE_REF_INVALID_ESCAPE');
+      }
+    }
+    if (decoded === '..') throw new Error('SOURCE_REF_PARENT_TRAVERSAL');
+    if (decoded.includes('/') || decoded.includes('\\')) {
+      throw new Error('SOURCE_REF_ENCODED_SEPARATOR');
+    }
+  }
   return baseNormalizeSourceRef(value);
 }
 

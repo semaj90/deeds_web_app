@@ -115,13 +115,18 @@ export class LangGraphBridge {
           };
         }
       } else {
-        try {
-          const truncated = JSON.parse(
-            JSON.stringify(toolInput).slice(0, this.config.maxToolResultChars)
-          );
-          result = truncated;
-        } catch {
-          result = { _error: 'Result too large or malformed' };
+        const serialized = JSON.stringify(resultEnvelope);
+        if (serialized.length <= this.config.maxToolResultChars) {
+          result = resultEnvelope;
+        } else {
+          result = {
+            ...asRecord,
+            _headroom: {
+              truncated: true,
+              originalBytes: serialized.length,
+              maxBytes: this.config.maxToolResultChars,
+            },
+          };
         }
       }
     }

@@ -15,6 +15,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 dotenv.config({ path: path.resolve(root, '.env') });
@@ -40,7 +41,7 @@ if (!Number.isInteger(limit) || limit < 1 || limit > 10000) {
 const workspaceRevision = String(args.get('workspace-revision') ?? '').trim() || null;
 const outputPath = path.resolve(root, String(args.get('out') ?? '.tmp/atlas/current-source-chunk-cohort-v1.ndjson'));
 const reportPath = path.resolve(root, String(args.get('report') ?? 'docs/reports/current-source-chunk-cohort-v1.json'));
-const connectionString = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const connectionString = resolveDatabaseUrl(loadRepoEnv(process.env));
 
 const sha256 = (value) => createHash('sha256').update(value, 'utf8').digest('hex');
 const digest = (value) => `sha256:${sha256(value)}`;
@@ -132,14 +133,18 @@ const pool = new pg.Pool({
   max: 1,
   statement_timeout: 120000,
   application_name: 'atlas-current-source-chunk-cohort-export',
+  options: '-c default_transaction_read_only=on',
 });
 
 let client;
 let rows = [];
 let total = { qualified_rows: 0, qualified_sources: 0 };
+let transactionReadOnly = false;
 try {
   client = await pool.connect();
   await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+  transactionReadOnly = (await client.query('SHOW transaction_read_only')).rows[0]?.transaction_read_only === 'on';
+  if (!transactionReadOnly) throw new Error('SOURCE_CHUNK_EXPORT_READ_ONLY_NOT_CONFIRMED');
   await client.query('SET LOCAL statement_timeout = 120000');
   const params = [workspaceRevision, sourceRefs.length ? sourceRefs : null, limit];
   total = (await client.query(countSql, params.slice(0, 2))).rows[0] ?? total;
@@ -235,6 +240,7 @@ const report = {
   generatedAt: new Date().toISOString(),
   status,
   readOnly: true,
+  transactionReadOnly,
   canonicalAuthority: false,
   writesPerformed: false,
   databaseWrites: 0,

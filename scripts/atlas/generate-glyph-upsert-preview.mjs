@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 const acePacketPath = path.join(process.cwd(), '.opencode/ace-packet.json');
-if (!fs.existsSync(acePacketPath)) { console.error('ACE packet missing'); process.exit(1); }
+if (!fs.existsSync(acePacketPath)) { console.error('ACE_PACKET_UNAVAILABLE: .opencode/ace-packet.json not found; preview not generated.'); process.exit(1); }
 const packet = JSON.parse(fs.readFileSync(acePacketPath,'utf8'));
 const cards = packet.cards || packet.entries || [];
 function inferSection(card){

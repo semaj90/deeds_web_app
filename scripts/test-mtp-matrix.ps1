@@ -16,9 +16,9 @@ Winner: highest chunks/min with stable summaries
 #>
 
 param(
-  [string]$BinaryPath = "C:\Users\james\Videos\deeds-web-app\.tmp\atomic-mtp\bin\build\bin\llama-server.exe",
-  [string]$ModelPath = "C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf",
-  [string]$DraftModelPath = "C:\Users\james\Videos\deeds-web-app\.tmp\atomic-mtp\gemma-4-E4B-it-assistant.Q4_K_M.gguf",
+  [string]$BinaryPath = (Join-Path $PSScriptRoot "..\.tmp\atomic-mtp\bin\build\bin\llama-server.exe"),
+  [string]$ModelPath = (Join-Path $PSScriptRoot "..\models\ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf"),
+  [string]$DraftModelPath = (Join-Path $PSScriptRoot "..\models\atlas-gemma4-e4b-assistant\mtp-f16\atlas-gemma4-e4b-assistant-mtp-f16.gguf"),
   [string]$Port = "8091",
   [int]$TestDurationSec = 120
 )
@@ -76,6 +76,10 @@ function Start-LlamaServer {
   }
 
   if ($UseMTP) {
+    if ($Model -match 'ornith|hforf|qwen' -and $DraftModel -match 'gemma') {
+      Write-Host "⚠️  MTP benchmark skipped: Model ($Model) is Qwen/Ornith and Draft ($DraftModel) is Gemma. Dimension/architecture mismatch." -ForegroundColor Yellow
+      return $null
+    }
     $serverArgs += @(
       "--model-draft", $DraftModel,
       "--spec-type", "draft-mtp",
@@ -127,7 +131,7 @@ function Test-Throughput {
         -H "Content-Type: application/json" `
         -d @"
 {
-  "model":"gemma4-legal-iq4xs-direct.gguf",
+  "model":"ornith-1.5-9b",
   "messages":[{"role":"user","content":"$prompt"}],
   "max_tokens":150,
   "temperature":0.3

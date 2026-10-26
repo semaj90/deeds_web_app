@@ -26,13 +26,25 @@ test('lifecycle failures are not converted into degraded-success continuation', 
   assert.doesNotMatch(source, /Lifecycle completion degraded; daily chain already succeeded/);
 });
 
+test('source-binding revision mismatch is checked before downstream daily stages', () => {
+  const revisionGuard = source.indexOf('assertGraphifyWorkflowRevisionMatchesAdmissionV1(');
+  const derivedContext = source.indexOf('if (derivedContext)', revisionGuard);
+  const dailyChain = source.indexOf('execSync(dailyChainScript', revisionGuard);
+  assert.ok(revisionGuard >= 0);
+  assert.ok(derivedContext > revisionGuard);
+  assert.ok(dailyChain > revisionGuard);
+});
+
 test('daily gate uses verdict-enforcing wrapper, not the zero-exit audit directly', () => {
   assert.match(source, /require-canonical-projection-admission-v1\.mjs/);
   assert.doesNotMatch(source, /PROMOTION_ADMISSION_SCRIPT\s*=\s*['"]node scripts\/atlas\/audit-canonical-projection-fabric\.mjs/);
 });
 
-test('terminal authorization cannot enter the fallback mutation path', () => {
-  assert.match(source, /!allowFallback\s*\|\|\s*process\.env\.ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION === TERMINAL_RUN_AUTHORIZATION/);
+test('a failed daily run fails closed: no legacy fallback mutation path exists', () => {
+  // Invariant, independent of any variable name: the failure handler must not start a fallback
+  // pipeline (that path could mutate stores outside the admission gate) and must exit non-zero.
+  assert.doesNotMatch(source, /FALLBACK_SCRIPT|startup:graphify-complete|Falling back to startup pipeline|GRAPHIFY_ALLOW_FALLBACK/);
+  assert.match(source, /Fallback disabled; exiting with failure\.[\s\S]{0,200}process\.exit\(1\)/);
 });
 
 test('service readiness does not recommend projection without admission', () => {

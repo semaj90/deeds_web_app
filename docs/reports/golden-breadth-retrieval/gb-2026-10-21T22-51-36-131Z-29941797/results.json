@@ -1,0 +1,30 @@
+{
+  "runId": "gb-2026-10-21T22-51-36-131Z-29941797",
+  "mode": "LIVE",
+  "results": [
+    {
+      "id": "GB-001",
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "lanes": {
+        "svelte": {
+          "status": "TIMEOUT",
+          "error": "no response in 20000ms",
+          "stderr": "",
+          "latencyMs": 20023
+        }
+      }
+    },
+    {
+      "id": "GB-002",
+      "query": "SvelteKit 2 form actions with use:enhance and superforms",
+      "lanes": {
+        "svelte": {
+          "status": "TIMEOUT",
+          "error": "no response in 20000ms",
+          "stderr": "",
+          "latencyMs": 20019
+        }
+      }
+    }
+  ]
+}

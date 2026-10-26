@@ -223,7 +223,7 @@ async function main() {
       projection = buildObservationFeatureProjectionV1({
         packetKey: planRow.packetKey,
         sourceRef: planRow.sourceRef,
-        treeNodeId: planRow.treeNodeId ?? null,
+        treeNodeId: planRow.packetTreeNodeId ?? null,
         sourceVersionReceiptId: null,
         representationId: null,
         representationRevision: null,

@@ -69,6 +69,7 @@ Current state:
 - `scripts/atlas/run-taskboard-parent-atlas-sync.mjs`
   - orchestrates the taskboard sync and optional semantic / graphify refresh
   - keeps the parent atlas validation gate in the same execution path
+  - `--source-ref-first-only` dry runs export local packet artifacts and validate, but skip PostgreSQL job enqueue; enqueue requires explicit `--write`
   - single-command alias: `atlas:unified:sync`
   - optional limit via `ATLAS_SYNC_LIMIT=10` to avoid npm CLI arg warnings
   - optional `--with-turbovec` lane runs `npm --prefix sveltekit-frontend run atlas:kanban:turbovec-consolidation`

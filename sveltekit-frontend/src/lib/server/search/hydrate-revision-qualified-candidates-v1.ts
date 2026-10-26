@@ -35,6 +35,10 @@ export type RevisionQualifiedHydrationFailureReasonV1 =
   | 'CHUNK_ID_MISMATCH'
   | 'SOURCE_REF_MISMATCH'
   | 'CONTENT_HASH_MISMATCH'
+  | 'CONTENT_HASH_MISSING'
+  | 'CONTENT_MISSING'
+  | 'CHUNK_SOURCE_REVISION_MISMATCH'
+  | 'CHUNK_WORKSPACE_REVISION_MISMATCH'
   | 'WORKSPACE_REVISION_MISMATCH'
   | 'SOURCE_REVISION_INVALID'
   | 'REPRESENTATION_NAME_MISMATCH'
@@ -50,7 +54,10 @@ export interface RevisionQualifiedHydrationFailureV1 {
 }
 
 export interface RevisionQualifiedHydrationDbRowV1 {
+  [key: string]: unknown;
   chunk_row_id: string;
+  chunk_source_revision: string | null;
+  chunk_workspace_revision: string | null;
   canonical_chunk_id: string;
   chunk_id: string | null;
   packet_key: string;
@@ -132,6 +139,14 @@ export function joinRevisionQualifiedCandidatesV1(input: {
       failures.push(fail(candidate, 'SOURCE_REVISION_INVALID', row.source_revision));
       continue;
     }
+    if (row.chunk_source_revision !== row.source_revision) {
+      failures.push(fail(candidate, 'CHUNK_SOURCE_REVISION_MISMATCH'));
+      continue;
+    }
+    if (row.chunk_workspace_revision !== row.workspace_revision) {
+      failures.push(fail(candidate, 'CHUNK_WORKSPACE_REVISION_MISMATCH'));
+      continue;
+    }
     if (candidate.chunkId && row.chunk_id && candidate.chunkId !== row.chunk_id) {
       failures.push(fail(candidate, 'CHUNK_ID_MISMATCH', `${candidate.chunkId}:${row.chunk_id}`));
       continue;
@@ -140,8 +155,16 @@ export function joinRevisionQualifiedCandidatesV1(input: {
       failures.push(fail(candidate, 'SOURCE_REF_MISMATCH', `${candidate.sourceRef}:${row.source_ref}`));
       continue;
     }
-    if (candidate.contentHash && row.content_hash && candidate.contentHash !== row.content_hash) {
+    if (!candidate.contentHash?.trim() || !row.content_hash?.trim()) {
+      failures.push(fail(candidate, 'CONTENT_HASH_MISSING'));
+      continue;
+    }
+    if (candidate.contentHash !== row.content_hash) {
       failures.push(fail(candidate, 'CONTENT_HASH_MISMATCH'));
+      continue;
+    }
+    if (row.content == null) {
+      failures.push(fail(candidate, 'CONTENT_MISSING'));
       continue;
     }
     if (candidate.representationName !== 'semantic_768') {
@@ -205,7 +228,7 @@ export async function hydrateRevisionQualifiedCandidatesV1(input: {
 
   const result = await db.execute(sql`
     WITH bound_sources AS (
-      SELECT DISTINCT ON (b.canonical_source_ref, b.workspace_revision)
+      SELECT
         b.workspace_revision::text AS workspace_revision,
         b.canonical_source_ref::text AS source_ref,
         b.source_revision::text AS source_revision,
@@ -218,6 +241,8 @@ export async function hydrateRevisionQualifiedCandidatesV1(input: {
     )
     SELECT
       c.id::text AS chunk_row_id,
+      c.source_revision::text AS chunk_source_revision,
+      c.workspace_revision::text AS chunk_workspace_revision,
       l.canonical_chunk_id::text AS canonical_chunk_id,
       c.chunk_id::text AS chunk_id,
       l.packet_key::text AS packet_key,

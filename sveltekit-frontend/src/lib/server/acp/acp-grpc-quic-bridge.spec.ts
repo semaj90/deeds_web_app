@@ -1,5 +1,7 @@
+import { connectivityState } from '@grpc/grpc-js';
 import { describe, expect, it } from 'vitest';
 import {
+  acpChannelPool,
   ACPServiceRegistry,
   ACPToolRegistry,
   buildA2AAgentDescriptor,
@@ -54,5 +56,37 @@ describe('A2A peer discovery write boundary', () => {
     expect(descriptor.tools).toEqual([]);
     expect(descriptor.servicePorts).toEqual([]);
     expect(descriptor.capabilities).toEqual([]);
+  });
+});
+
+describe('ACP gRPC channel pool', () => {
+  it('creates and reuses a lazy channel without claiming an HTTP fallback', async () => {
+    const config = { host: '127.0.0.1', port: 59991 };
+    try {
+      const first = await acpChannelPool.getChannel('retrieval-test', config);
+      const repeated = await acpChannelPool.getChannel('retrieval-test', config);
+
+      expect(first).toBeDefined();
+      expect(repeated).toBe(first);
+      expect(first.getConnectivityState(false)).not.toBe(connectivityState.SHUTDOWN);
+    } finally {
+      acpChannelPool.close('retrieval-test');
+    }
+  });
+
+  it('closes only the requested service channel', async () => {
+    const config = { host: '127.0.0.1', port: 59992 };
+    const selected = await acpChannelPool.getChannel('selected-test', config);
+    const retained = await acpChannelPool.getChannel('retained-test', config);
+
+    try {
+      acpChannelPool.close('selected-test');
+
+      expect(selected.getConnectivityState(false)).toBe(connectivityState.SHUTDOWN);
+      expect(retained.getConnectivityState(false)).not.toBe(connectivityState.SHUTDOWN);
+    } finally {
+      acpChannelPool.close('retained-test');
+      acpChannelPool.close('selected-test');
+    }
   });
 });

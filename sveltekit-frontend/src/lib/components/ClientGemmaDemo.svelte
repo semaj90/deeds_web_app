@@ -17,7 +17,7 @@
 
 	// No initialization needed
 	$effect(() => {
-		console.log('✅ Ollama service ready');
+		console.log('✅ Configured inference router ready');
 	});
 
 	async function generateText() {
@@ -26,9 +26,7 @@
 		isGenerating = true;
 		response = '';
 		try {
-			// 5-tier unified cascade: Bifrost L2 → E2B → LiteRT → ONNX → server.
-			// Single call replaces the prior raw `fetch(/api/generate)` so the demo
-			// shows the actual production routing path.
+			// Use the configured inference router so the demo reflects the active backend.
 			const result = await unifiedGenerate({
 				prompt,
 				maxTokens:       200,
@@ -65,21 +63,21 @@
 </script>
 
 <div class="client-gemma-demo">
-	<h2>🧠 Client-Side Gemma Inference Demo</h2>
+	<h2>🧠 Configured Inference Demo</h2>
 
 	{#if isInitializing}
 		<div class="status initializing">
-			🚀 Initializing ONNX models... This may take a few minutes on first load.
+			Checking inference readiness…
 		</div>
 	{:else if initializationError}
 		<div class="status error">❌ Initialization failed: {initializationError}</div>
 	{:else if isInitialized}
-		<div class="status success">✅ Models loaded successfully! Ready for inference.</div>
+		<div class="status success">✅ Ready to generate through the configured inference router.</div>
 	{/if}
 
 	{#if isInitialized}
 		<div class="inference-section">
-			<h3>📝 Text Generation (Gemma3)</h3>
+			<h3>📝 Text Generation (Configured Model)</h3>
 			<textarea bind:value={prompt} placeholder="Enter your prompt..." rows="3" class="prompt-input"
 			></textarea>
 

@@ -1,0 +1,106 @@
+{
+  "schema": "atlas.cudf-pylibcudf-dlpack-msgpack-bitset-nibble-receipt.v1",
+  "generatedAt": "2026-10-25T06:09:01.258975Z",
+  "durationMs": 1418.04,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "msgpackByteaProof": {
+    "jsonBytes": 1786,
+    "msgpackBytes": 432,
+    "compressionRatio": 0.2419,
+    "pgByteaWirePrefix": "\\x8c00d92b7061636b65743a...",
+    "varlenaTotalBytes": 436,
+    "latent64Fp16Bytes": 128,
+    "manifold4dFp32Bytes": 16,
+    "latent64Fp16MaxRoundTripError": 6e-05,
+    "identityFieldsPreserved": true
+  },
+  "alignedBitsetAndSparseRoutingProof": {
+    "schema": "atlas.aligned-bitset-blob.v1",
+    "magic": "ATLASBIT",
+    "headerBytes": 64,
+    "totalByteLength": 128,
+    "totalByteLengthDivisibleBy64": true,
+    "sha256Hex": "2dce0276872949cd9da6d84d85ad1daf8826c16ca726a38260f7d6e28ed15c86",
+    "activeBits": [
+      0,
+      5,
+      8,
+      9,
+      10,
+      64,
+      127
+    ],
+    "varlena4ByteOffsetHandled": true,
+    "jaccardSimilarityAB": 0.5,
+    "sparseRoutingBufferBytes": 64,
+    "sparseRoutingSha256": "d7b82b2d95719f2369ef29f20b32e00f22b27c5b57db7a924766fc7581b11775"
+  },
+  "nibbleEncodingProof": {
+    "packedHex": "6b148f",
+    "nibblePairs": [
+      {
+        "okfLutCode4Bit": 6,
+        "mbvh4ChildMask4Bit": "0b1011",
+        "packedByteHex": "0x6b"
+      },
+      {
+        "okfLutCode4Bit": 1,
+        "mbvh4ChildMask4Bit": "0b100",
+        "packedByteHex": "0x14"
+      },
+      {
+        "okfLutCode4Bit": 8,
+        "mbvh4ChildMask4Bit": "0b1111",
+        "packedByteHex": "0x8f"
+      }
+    ],
+    "roundTripVerified": true,
+    "uuidV5VersionNibbleCheck": {
+      "uuid": "31f41cb2-1cbc-5ca2-bee9-857b82b9f77a",
+      "versionNibbleHex": "5",
+      "versionNibbleInt": 5,
+      "variantNibbleHex": "b",
+      "variantRFC4122": true
+    }
+  },
+  "gapACudfPylibcudfDlpackProof": {
+    "cudfAvailable": true,
+    "cudfVersion": "26.06.01",
+    "pylibcudfVersion": "26.6.1",
+    "torchImportedBeforeCudf": true,
+    "pythonVersion": "3.14.6",
+    "torchVersion": "2.13.0+cu130",
+    "xgboostVersion": "3.3.0",
+    "torchCudaVersion": "13.0",
+    "cudaDeviceName": "NVIDIA GeForce RTX 3060 Ti",
+    "executionBackend": "WSL2_RAPIDS_CUDF_PYLIBCUDF_DLPACK_CUDA0",
+    "symbolicFlatRowsLoadedInCudf": 3,
+    "pylibcudfSortedRows": 3,
+    "pylibcudfSortedCols": 7,
+    "verifiedOnlyRowCount": 2,
+    "dlpackTensorDevice": "cuda:0",
+    "dlpackTensorShape": [
+      3,
+      6
+    ],
+    "dlpackTensorStrides": [
+      1,
+      3
+    ],
+    "cudfFirstColDevicePtr": "0x608227800",
+    "torchDlpackDevicePtr": "0x608227800",
+    "zeroCopyGpuPointerShared": true,
+    "pytorchCudaScores": [
+      0.481967,
+      0.471317,
+      0.485901
+    ],
+    "xgboostCudaPreds": [
+      0.666667,
+      0.666667,
+      0.666667
+    ]
+  },
+  "baseTupleReceiptRef": "atlas.oaklib-ontology-tuple-to-pytorch-loading-receipt.v1"
+}

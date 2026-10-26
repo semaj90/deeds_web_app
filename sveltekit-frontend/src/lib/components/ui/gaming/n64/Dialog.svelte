@@ -152,6 +152,7 @@
       class="n64-dialog {materialType} mesh-{meshComplexity} entrance-{entranceAnimation} {className}"
       class:fullscreen
       role="dialog"
+      tabindex="-1"
       aria-modal="true"
       aria-labelledby="dialog-title"
       style="
@@ -162,6 +163,7 @@
         --glow-intensity: {glowIntensity};
       "
       onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.stopPropagation()}
     >
       {#if title || header}
         <div class="dialog-header">

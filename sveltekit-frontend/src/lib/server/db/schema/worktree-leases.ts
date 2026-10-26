@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  bigint,
   index,
   jsonb,
   pgTable,
@@ -39,6 +40,8 @@ export const worktreeLeases = pgTable(
     heartbeatAt: timestamp('heartbeat_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
     expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }),
     releasedAt: timestamp('released_at', { withTimezone: true, mode: 'string' }),
+    /** Monotonic; incremented on every grant/reclaim so a stale holder is provably older. */
+    fenceEpoch: bigint('fence_epoch', { mode: 'number' }).notNull().default(1),
     metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),

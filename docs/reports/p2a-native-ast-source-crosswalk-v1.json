@@ -1,0 +1,159 @@
+{
+  "schema": "atlas.p2a-native-ast-source-crosswalk.v1",
+  "generatedAt": "2026-10-12T07:28:35.709Z",
+  "gate": "P2A-NATIVE-AST-SOURCE-CROSSWALK-01",
+  "status": "PROVENANCE_AUDIT_PROVEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "census": {
+    "totalPackets": 61718,
+    "packetsWithAstSymbols": 38302,
+    "packetsWithTreeNodeIds": 11684,
+    "packetsMissingContentHash": 61365,
+    "missingContentHashPct": 99.43
+  },
+  "sampleEvaluation": {
+    "sampledCount": 100,
+    "classifiedHistoricalRegex": 11,
+    "classifiedNativeTreeSitter": 89,
+    "fileNotFoundOnDisk": 5,
+    "symbolCollisionRiskCount": 8,
+    "pointCoordinateCount": 100,
+    "liveByteHashMatches": 0,
+    "liveByteHashMismatches": 0
+  },
+  "auditFindings": [
+    {
+      "finding": "REGEX_PATTERN_EXTRACTION_CONFIRMED",
+      "description": "Sampled features exhibit signature of regex pattern extraction (symbols keyed by name, point coordinates, max <= 100 symbols).",
+      "impact": "Does not establish Tree-sitter CST node hierarchy or lexical scope boundaries."
+    },
+    {
+      "finding": "UNENFORCED_STORED_CONTENT_HASH",
+      "description": "Stored content_hash is NULL on 61365 of 61718 packets (99.4%).",
+      "impact": "Version guard claim was unenforced at ingestion time."
+    },
+    {
+      "finding": "SYMBOL_COLLISION_VULNERABILITY",
+      "description": "tree_node_ids keyed by symbol name alone collapses overloaded or duplicate identifier declarations into a single key.",
+      "impact": "Symbol occurrences cannot be uniquely distinguished without byte span coordinates."
+    }
+  ],
+  "recommendations": {
+    "proceedWithHistoricalBackfillReRun": false,
+    "authoritativeAstOwner": "port :8095 Tree-sitter CST / AST-grep provider surface",
+    "nextStep": "Enforce sourceByteStart/sourceByteEnd spans and frozen workspace revision binding before promoting AST facts to ContextManifest."
+  },
+  "sampleRecordsSnippet": [
+    {
+      "packet_key": "packet:eadf221b3101",
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/f2py/tests/test_data.py",
+      "symbolCount": 6,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "NULL",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    },
+    {
+      "packet_key": "packet:eae3e775d82e",
+      "source_ref": "docs/reports/sessions/IMPLEMENTATION-ROADMAP-QUICK-REFERENCE.md",
+      "symbolCount": 17,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "NULL",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    },
+    {
+      "packet_key": "packet:eae4f8de6c69",
+      "source_ref": "neschrom97/cards/133259abab6508d5.json",
+      "symbolCount": 11,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "NULL",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    },
+    {
+      "packet_key": "packet:eae3e16ba718",
+      "source_ref": "scripts/agentic/release-task-claim.mjs",
+      "symbolCount": 11,
+      "treeNodeIdCount": 9,
+      "isKeyedByName": true,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "PRESENT",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "HISTORICAL_REGEX_BACKFILL"
+    },
+    {
+      "packet_key": "packet:eaee8a6eb794",
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/gaming/core/LLMS.md",
+      "symbolCount": 10,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "NULL",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    },
+    {
+      "packet_key": "packet:eaf2a767643b",
+      "source_ref": "neschrom97/cards/9e17383f173d554c.json",
+      "symbolCount": 11,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "NULL",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    },
+    {
+      "packet_key": "packet:cb63072e74b5",
+      "source_ref": "sveltekit-frontend/drizzle/manual/20260322_poi_relationships.sql",
+      "symbolCount": 3,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "PRESENT",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    },
+    {
+      "packet_key": "packet:970c685237d6",
+      "source_ref": "sveltekit-frontend/tests/routes/auto/api/code-intel/retrieval-runs/__id.test.ts",
+      "symbolCount": 7,
+      "treeNodeIdCount": 6,
+      "isKeyedByName": true,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "PRESENT",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "HISTORICAL_REGEX_BACKFILL"
+    },
+    {
+      "packet_key": "packet:cb64328e25ba",
+      "source_ref": "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/debug/.fingerprint/serde_core-a6074df77a562158/LLMS.md",
+      "symbolCount": 7,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "NULL",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    },
+    {
+      "packet_key": "packet:cb6525f26191",
+      "source_ref": "neschrom97/cards/6e641a99a5008310.json",
+      "symbolCount": 11,
+      "treeNodeIdCount": 0,
+      "isKeyedByName": false,
+      "storedContentHash": "NULL",
+      "storedSourceRevision": "NULL",
+      "hashComparison": "STORED_HASH_NULL",
+      "provenanceClassification": "NATIVE_TREESITTER_CST"
+    }
+  ]
+}

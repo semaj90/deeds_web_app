@@ -50,7 +50,7 @@ console.log("  base model:  google/gemma-2-2b-it (Colab proxy)");
 console.log("  dataset:     99 contrastive pairs (33 correct + 33 wrong_tool + 33 degraded)");
 console.log("  method:      GRPO, 7 reward functions");
 console.log("  epochs:      3, batch 4, 6 generations/prompt");
-console.log("  output:      ./lora-output/adapter (push to Ollama as gemma4-legal-routing)");
+console.log("  output:      ./lora-output/adapter (push to Ollama as ornith-1.5-9b)");
 
 if (!allGood) {
   console.log("\n⚠  Some files missing — run: npm run packets:sync && npm run packets:traces:simulate && npm run packets:lora:build:contrastive\n");

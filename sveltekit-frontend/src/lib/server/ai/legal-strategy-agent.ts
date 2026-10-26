@@ -1,7 +1,7 @@
 import { AgenticSearchService } from '$lib/server/vector/agentic-search';
 import { CitationAuthorityService } from '$lib/server/legal/authority-service';
 import { bifrostChat } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
+import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 export interface LegalStrategy {
 	claim: string;
@@ -49,7 +49,7 @@ Return ONLY a JSON object:
 		try {
 			const response = await bifrostChat(
 				[{ role: 'user', content: prompt }],
-				ENV.GEMMA4_MODEL,
+				BIFROST_CHAT_MODEL,
 				{ temperature: 0.2, maxTokens: 1000 }
 			);
 

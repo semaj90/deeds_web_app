@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.mcp-enabled-surface-consolidation.v1",
+  "observedAt": "2026-10-15T22:43:21Z",
+  "status": "PARTIAL",
+  "staticRegistrationAudit": {
+    "command": "node scripts/audit-mcp-tool-surface.mjs --json",
+    "scope": "sveltekit-frontend/src/mcp/**/*.ts; direct server.registerTool pattern",
+    "registrations": 192,
+    "uniqueNames": 190,
+    "gatedRegistrations": 2,
+    "collisions": [
+      { "name": "trace.kag_search", "locations": ["src/mcp/dispatcher-tool-integration.ts:25", "src/mcp/trace-mcp-server.ts:3435"] },
+      { "name": "context.prefetch_feature_context", "locations": ["src/mcp/new_tools.ts:487", "src/mcp/trace-mcp-server.ts:7892"] }
+    ],
+    "auditOk": false,
+    "limitations": ["This source scanner does not cover every registration API such as server.tool().", "A shared dispatcher helper name is not proof that handlers have identical behavior."]
+  },
+  "liveSurfaces": {
+    "trace-http": { "status": "SCHEMA_COMPILE_PASS", "tools": 193, "schemasCompiled": 193, "schemaErrors": 0, "toolsetSha256": "5024992e6d512be7d6c9355f95ad0e3452c6733f2f21914cdc55bc9aa0ea4199", "receipt": "docs/reports/mcp-tool-surface-schema-validation-v1-20261015.json" },
+    "atlas-tools-stdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 10, "schemasCompiled": 10, "schemaErrors": 0, "toolsetSha256": "9d9f6e8209a5a507555b2c187beb13eb0670fb5fe44edcbc4dd89ec0ef9f3bc5" },
+    "atlas-task-kernel-stdio": { "status": "LIST_ONLY_SCHEMA_COMPILE_PASS_INITIALIZE_UNVERIFIED", "tools": 6, "schemasCompiled": 6, "schemaErrors": 0, "toolsetSha256": "2d12425b2d56c782578f637506557ecc1e4054bbc6d3e9203f12a18b680d3b12" },
+    "gemma4-offload-stdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 9, "schemasCompiled": 9, "schemaErrors": 0, "toolsetSha256": "de3e25fb5be7e107c121baa5773b56ab7bf45eb5a43484bc4b9cd7f7a2d52fba" },
+    "engram-embed-stdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 11, "schemasCompiled": 11, "schemaErrors": 0, "toolsetSha256": "aa36aecc19eeabf7aff0d4bd3b2c30cfc8c7475a397be5327644098287a2b901" },
+    "ldr-mcp-stdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 4, "schemasCompiled": 4, "schemaErrors": 0, "toolsetSha256": "99f01b19f2dd3f470fbf9eadd22afeda5c479b5476c084dbd94a8f4ab963ee2" },
+    "turbovec-http": { "status": "INITIALIZE_404", "url": "http://127.0.0.1:8791/mcp", "toolCalls": 0, "response": "{\"error\": \"not found\"}" }
+  },
+  "confirmedLiveDuplicates": {
+    "trace.kag_search": 1,
+    "context.prefetch_feature_context": 1,
+    "sourceBuildIdentityVerified": false
+  },
+  "notProbed": ["root .mcp.json playwright server", "root .mcp.json socraticode server", "disabled frontend turbovec-sidecar at :8099"],
+  "configurationDrift": "Root .mcp.json, root .opencode/opencode.jsonc, and sveltekit-frontend/opencode.json advertise different MCP server sets.",
+  "toolCalls": 0,
+  "canonicalAuthority": false,
+  "persistentWritesPerformed": false,
+  "conclusion": "Advertised schemas compile for six surfaces, but static collisions, one failed TurboVec initialize, task-kernel initialization uncertainty, unprobed root servers, and source/runtime/config parity gaps prevent a PASS."
+}

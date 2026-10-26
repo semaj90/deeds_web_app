@@ -223,8 +223,19 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if isOpen}
-	<div class="upload-modal-overlay" transition:fade={{ duration: 150 }} onclick={handleCancel}>
-		<div class="upload-modal-card" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="upload-modal-overlay"
+		transition:fade={{ duration: 150 }}
+		onclick={(e) => { if (e.target === e.currentTarget) handleCancel(); }}
+		role="presentation"
+	>
+		<div
+			class="upload-modal-card"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Evidence Upload Pipeline"
+			tabindex="-1"
+		>
 			<!-- Header -->
 			<div class="upload-modal-header">
 				<div>

@@ -595,7 +595,7 @@ Keep response to 3-4 sentences. Focus on actionable diagnosis, not general expla
     const analysis = data.choices?.[0]?.message?.content || '';
 
     auditResults.orchestration = {
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: 'ornith-1.5-9b',
       llama_server_url: LLAMA_SERVER_URL,
       prompt_summary: 'Metadata parity gap analysis',
       analysis,

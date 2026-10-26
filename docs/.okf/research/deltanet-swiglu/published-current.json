@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.okf-crawl-publication-receipt.v1",
+  "run_id": "20261013T233704715Z-74d9f3efe960ad8c",
+  "generation_manifest": ".publications/20261013T233704715Z-74d9f3efe960ad8c/manifest.json",
+  "generation_manifest_checksum": "sha256:88a126f9b8844a6912a108992df4fd46f7efb3a54b4e76bcd22f2dfd9d7ee69a",
+  "counts": {
+    "selected": 2,
+    "staged": 2,
+    "validated": 2,
+    "published": 2,
+    "corpus_total": 2,
+    "failed": 0
+  },
+  "checks": {
+    "source_identity": "PASS",
+    "official_url": "PASS",
+    "markdown_checksum": "PASS",
+    "sidecar_checksum": "PASS",
+    "generation_readback": "PASS",
+    "pointer_readback": "PASS"
+  },
+  "publication_status": "PUBLISHED_READBACK_VERIFIED",
+  "canonical_authority": false,
+  "writes_performed": true,
+  "persistent_store_writes_performed": false
+}

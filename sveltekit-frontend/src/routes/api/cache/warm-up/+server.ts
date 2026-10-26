@@ -10,7 +10,7 @@
  *   {
  *     "batchSize": 5,          // Queries per batch (default: 5)
  *     "delayMs": 1000,         // Delay between batches (default: 1000ms)
- *     "model": "gemma4-rotorquant:latest", // LLM model to use
+ *     "model": "ornith-1.5-9b", // LLM model to use
  *     "domain": "evidence",    // Specific domain (evidence, civil-procedure, torts, contracts, criminal)
  *     "dryRun": false          // If true, only log queries without calling LLM
  *   }
@@ -22,7 +22,7 @@
  *     "config": {
  *       "batchSize": 5,
  *       "delayMs": 1000,
- *       "model": "gemma4-rotorquant:latest",
+ *       "model": "ornith-1.5-9b",
  *       "domain": "evidence",
  *       "totalQueries": 20
  *     }

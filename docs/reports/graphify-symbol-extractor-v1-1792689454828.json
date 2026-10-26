@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:ee7e5f1b15852409441b97bc88ba38f7f6230d499471ef0bc8d7daa4eaf0f954",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-ee7e5f1b1585-0415",
+    "manifestChecksum": "sha256:ee7e5f1b15852409441b97bc88ba38f7f6230d499471ef0bc8d7daa4eaf0f954",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:06c78f04394668786c057275bfff22d5f1291f456d79181c7296a5495d70a8cd",
+    "offset": 414,
+    "maxFiles": 1,
+    "shardChecksum": "sha256:dc7d16cdbe974b3787969094ae9b2be44c6b4f9838bd160597b818bd41989b1c",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "a8420e17-fbf2-4ceb-a2b7-b735d5afc434",
+      "sourceRef": "scripts/atlas/audit-phase17-21-workstation.mjs",
+      "sourceRevision": "sha256:ed44fe1457b274cb3b146ce5672b0f5c6dfb5be88718b3e041872328d1bc3eb8",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WOULD_EXTRACT",
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "SHARD_INCOMPLETE",
+  "fatalError": null,
+  "availableBytes": null,
+  "maxFilesPerRun": 250,
+  "shardSize": 1,
+  "readbacks": [],
+  "generatedAt": "2026-10-22T17:17:34.826Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "sourceReadMode": "MATERIALIZED_ADMITTED_SNAPSHOT",
+  "sourceReadSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 1,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 1,
+  "supportedCandidatePoolRows": 1,
+  "precheckRowsExamined": 1,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "ts_js": 1
+  },
+  "filesProcessed": 0,
+  "filesAttempted": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 14,
+  "totalSymbolsInserted": null,
+  "datastoreWriteAttempted": false,
+  "plan": [
+    {
+      "fileId": "a8420e17-fbf2-4ceb-a2b7-b735d5afc434",
+      "sourceRef": "scripts/atlas/audit-phase17-21-workstation.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:ed44fe1457b274cb3b146ce5672b0f5c6dfb5be88718b3e041872328d1bc3eb8",
+      "sourceDigest": "sha256:ed44fe1457b274cb3b146ce5672b0f5c6dfb5be88718b3e041872328d1bc3eb8",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    }
+  ]
+}

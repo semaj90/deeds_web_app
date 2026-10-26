@@ -191,7 +191,7 @@ vi.mock('$lib/server/env.server.js', () => ({
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: (...a: unknown[]) => mockOllamaFetch(...a),
+	embedOrChatFetch: (...a: unknown[]) => mockOllamaFetch(...a),
 }));
 
 vi.mock('$lib/server/grpc/embedding-client.js', () => ({

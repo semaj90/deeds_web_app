@@ -13,6 +13,9 @@
 
 import pg from 'pg';
 
+console.error('LEGACY_384_HYBRID_BACKFILL_DISABLED: this path targets the retired collection and truncates 768-D vectors to 384 dimensions');
+process.exit(2);
+
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------

@@ -1,0 +1,150 @@
+{
+  "schema": "atlas.candidate-lineage-backfill-plan.v1",
+  "generatedAt": "2026-10-20T18:01:30.473Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "diagnosticOnly": true,
+  "status": "PLAN_PROVEN_READY_FOR_OPERATOR_REVIEW",
+  "metrics": {
+    "totalCodebaseChunks": 274465,
+    "unpopulatedSourceRevisions": 274465,
+    "matchedFilesCount": 21747,
+    "matchedChunksCount": 525252,
+    "matchedChunksWith768Embedding": 473139,
+    "matchedChunksWithout768Embedding": 52113,
+    "workspaceRevisions": [
+      {
+        "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "file_count": 23758
+      },
+      {
+        "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+        "file_count": 2180
+      },
+      {
+        "workspace_revision": null,
+        "file_count": 44
+      },
+      {
+        "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+        "file_count": 13
+      },
+      {
+        "workspace_revision": "sha256:db4d688bf34a4207ad9ba9cadf4dcc64b3b27d8809472bf51007d32bfa9e122c",
+        "file_count": 12
+      },
+      {
+        "workspace_revision": "sha256:3097d43973a39310034724c60036120e9877816ff6833259cd5b97277fe442e1",
+        "file_count": 5
+      },
+      {
+        "workspace_revision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+        "file_count": 2
+      }
+    ]
+  },
+  "cohortSamples": [
+    {
+      "chunkId": "0000136c-8cbb-4188-a860-28dce80d3b87",
+      "sourceRef": "sveltekit-frontend/openspec/changes/parent-atlas-gpu-mini-fabric-01/design.md",
+      "fileContentHash": "c2807716ecbae08197f5171610ccc633347e4bb57cc9614143618799e5f64bc6",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": "semantic_768:canonical:v1",
+      "hasCanonicalEmbedding": true
+    },
+    {
+      "chunkId": "00004c2a-200b-4d4a-b422-25f4496df250",
+      "sourceRef": "scripts/fetch_court_datasets.py",
+      "fileContentHash": "21dec05c45a20c22142a7b64682f67bca4180fc18fdc968e1833947ca564f4bd",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": "semantic_768:canonical:v1",
+      "hasCanonicalEmbedding": true
+    },
+    {
+      "chunkId": "00008fb6-9ecd-4aa3-9cc4-5f9c740dc0f8",
+      "sourceRef": "sveltekit-frontend/scripts/wiki/backfill-qdrant-cluster-keys.mjs",
+      "fileContentHash": "57c3d475369fa0ab6f82b03889d26512c557198d986cde20285081ec8b6014ac",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": "semantic_768:canonical:v1",
+      "hasCanonicalEmbedding": true
+    },
+    {
+      "chunkId": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+      "sourceRef": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "fileContentHash": "0b4305d10e936470f5a3116ec12cd8b7bdcb9a8dbb97f7f743f430199d52051c",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": null,
+      "hasCanonicalEmbedding": false
+    },
+    {
+      "chunkId": "00010d7f-af00-47b9-b590-334b54c873ea",
+      "sourceRef": "packages/parent-atlas/src/core/adaptive-dag-plan-v1.ts",
+      "fileContentHash": "61a24fd575c731db464cb803c08973f027f7d08dc121a35aacfeb76b9343c241",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": "semantic_768:canonical:v1",
+      "hasCanonicalEmbedding": true
+    },
+    {
+      "chunkId": "0001981c-da69-4b0e-9acb-ad29544029c8",
+      "sourceRef": "src/routes/(app)/demos/+page.svelte",
+      "fileContentHash": "15ca3bcc373c6bb7384c0a8239a9d9e49b8a1788a3ad7a392f4b3c760f7a60f9",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": null,
+      "hasCanonicalEmbedding": false
+    },
+    {
+      "chunkId": "000201aa-dc36-4bb4-9d4a-200957bc6aeb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/rust-napi-search-backend.ts",
+      "fileContentHash": "ffc7ad8aa9c60f384f2ed8f833f3ff73354a7d3b78b7e0c582ad42f228960c78",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": "semantic_768:canonical:v1",
+      "hasCanonicalEmbedding": true
+    },
+    {
+      "chunkId": "0002c4d4-3f96-4a8f-934d-61d8c6985340",
+      "sourceRef": "src/routes/(app)/demos/notifications/+page.svelte",
+      "fileContentHash": "0b283cfd930a64b13cb1fb15b57945738c3b1ee39e5c51c12e60035062055cd7",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": null,
+      "hasCanonicalEmbedding": false
+    },
+    {
+      "chunkId": "00031d10-0723-4ec7-b8af-74b1cf622e50",
+      "sourceRef": "scripts/redis-semantic-packet-manager.ts",
+      "fileContentHash": "19e5d38650c28cf4df964c47799acf9f4df8a557a59457ff84156c6a5facfbc8",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": "semantic_768:canonical:v1",
+      "hasCanonicalEmbedding": true
+    },
+    {
+      "chunkId": "00032904-551c-4030-a45d-2331d77980ce",
+      "sourceRef": "scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs",
+      "fileContentHash": "6180c6823cd67a74ead697752f570fb1535188e78408919a81685fea1a6f34fc",
+      "proposedSourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+      "proposedWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "proposedRepresentationRevision": "semantic_768:canonical:v1",
+      "hasCanonicalEmbedding": true
+    }
+  ],
+  "proposedSqlPlan": {
+    "strategy": "BATCHED_TEMPORARY_STAGING_JOIN",
+    "batchSize": 25000,
+    "producerRevision": "producer:graphify-lineage-join:v1",
+    "sqlTemplate": "UPDATE codebase_chunk_index c\nSET \n  source_revision = g.source_revision,\n  workspace_revision = g.workspace_revision,\n  representation_revision = CASE WHEN c.content_embedding_768 IS NOT NULL THEN 'semantic_768:canonical:v1' ELSE NULL END,\n  lineage_producer_revision = 'producer:graphify-lineage-join:v1',\n  lineage_binding_checksum = encode(sha256(concat_ws(':', c.source_ref, c.file_content_hash, g.source_revision, g.workspace_revision)::bytea), 'hex')\nFROM graphify_files g\nWHERE c.file_content_hash = g.content_hash\n  AND c.source_revision IS NULL;"
+  },
+  "rollbackRecipe": {
+    "command": "UPDATE codebase_chunk_index\nSET \n  source_revision = NULL,\n  workspace_revision = NULL,\n  representation_revision = NULL,\n  lineage_producer_revision = NULL,\n  lineage_binding_checksum = NULL\nWHERE lineage_producer_revision = 'producer:graphify-lineage-join:v1';",
+    "verification": "SELECT count(*) FROM codebase_chunk_index WHERE lineage_producer_revision = 'producer:graphify-lineage-join:v1'; -- Expected: 0"
+  },
+  "nextGate": "OPERATOR_REVIEW"
+}

@@ -12,11 +12,12 @@ import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 import { tieredLLMQuery, getTieredCacheStats } from '$lib/server/ai/tiered-llm-cache.js';
 import { z } from 'zod';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 const tieredCacheSchema = z.object({
   query: z.string().max(1000).default('What is hearsay evidence in criminal law?'),
   runs: z.number().int().min(1).max(10).default(3),
-  model: z.string().max(100).default('gemma3:270m'),
+  model: z.literal(SERVER_CHAT_MODEL).default(SERVER_CHAT_MODEL),
   temperature: z.number().min(0).max(2).default(0.3),
   maxTokens: z.number().int().min(1).max(4096).default(200),
   context: z.string().max(200).default('test'),
@@ -118,7 +119,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       description: {
         l1_redis: 'Exact-match cache (SHA-256 hash, 3ms avg)',
         l2_qdrant: 'Semantic similarity cache (vector search, 100ms avg, threshold 0.88)',
-        l3_ollama: 'Cold inference (GPU, 3.2s avg for gemma3:270m)',
+        l3_ollama: `Cold inference using ${SERVER_CHAT_MODEL}`,
       },
     });
   } catch (err) {

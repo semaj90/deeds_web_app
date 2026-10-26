@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 
 export const SOURCE_INVENTORY_HYGIENE_POLICY_REVISION =
-  'atlas.canonical-source-inventory-hygiene-policy.2026-09-13.v1' as const;
+  'atlas.canonical-source-inventory-hygiene-policy.2026-10-12.v2' as const;
 
 export type SourceInventoryClassification =
   | 'CANONICAL_SOURCE'
@@ -60,7 +60,8 @@ function hasSegment(path: string, names: readonly string[]): boolean {
 function looksLikeBackup(path: string): boolean {
   const parts = segments(path);
   return parts.some((segment) =>
-    segment === 'backup'
+    segment === '.archive'
+    || segment === 'backup'
     || segment === 'backups'
     || segment === 'archive-copy'
     || segment === 'archive-copy-old'

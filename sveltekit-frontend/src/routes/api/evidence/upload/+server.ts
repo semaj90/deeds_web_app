@@ -40,7 +40,7 @@ import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
 import { createYOLOService } from '$lib/server/yolo.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { createUploadedFile } from '$lib/server/files/upload-file-service.js';
 
@@ -841,7 +841,7 @@ async function extractText(
       return { text: ocrResult.text, method: `ocr-${ocrResult.method}` };
     }
 
-    // VLM fallback: when OCR fails or returns too little text, use Gemma3-vision to describe the image
+    // VLM fallback: when OCR fails or returns too little text, use the Ornith 1.5 VLM on llama-server :8090 to describe the image
     console.log(
       `[Upload] OCR text too short (${ocrResult.text.trim().length} chars), trying VLM for ${fileName}`
     );
@@ -2454,7 +2454,7 @@ async function embedText(text: string): Promise<number[] | null> {
 	if (!embedding) {
 		try {
 			embedding = await traceEmbedding(text, model, async () => {
-				const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+				const res = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ model, prompt: text }),

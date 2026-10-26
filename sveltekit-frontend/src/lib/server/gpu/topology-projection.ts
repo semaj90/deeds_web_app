@@ -1,3 +1,5 @@
+import { fastJsonExtractNumbers, fastJsonParseWithBackend } from './simdjson-bridge.js';
+
 /**
  * Topology Projection Bridge — GPU-accelerated PCA and autoencoder projection.
  *
@@ -206,6 +208,74 @@ export async function pcaProject(
     durationMs: Math.round(durationMs * 10) / 10,
     outputMeta: { op: 'pcaProjectGPU', gpuUsed: false, inputRows: effectiveN, inputDim: dim, outputDim: k },
   };
+}
+
+function resolveJsonPointer(root: unknown, pointer: string): unknown {
+  if (pointer === '') return root;
+  if (!pointer.startsWith('/')) throw new TypeError('JSON Pointer must be empty or start with /');
+
+  let current = root;
+  for (const encodedSegment of pointer.slice(1).split('/')) {
+    const segment = encodedSegment.replace(/~1/g, '/').replace(/~0/g, '~');
+    if (Array.isArray(current)) {
+      if (!/^(0|[1-9]\d*)$/.test(segment)) return undefined;
+      current = current[Number(segment)];
+    } else if (current !== null && typeof current === 'object') {
+      current = (current as Record<string, unknown>)[segment];
+    } else {
+      return undefined;
+    }
+  }
+  return current;
+}
+
+/** Parse a JSON numeric matrix and pass it to the existing PCA tensor executor. */
+export async function pcaProjectJson(
+  input: string,
+  pointer: string,
+  mean: Float32Array,
+  components: Float32Array,
+  opts: ProjectionOptions
+): Promise<ProjectionResult> {
+  const { n, dim, maxN = 32_768 } = opts;
+  if (!Number.isSafeInteger(n) || n <= 0 || !Number.isSafeInteger(dim) || dim <= 0) {
+    throw new RangeError('JSON matrix dimensions must be positive safe integers');
+  }
+  if (!Number.isSafeInteger(maxN) || maxN <= 0) {
+    throw new RangeError('maxN must be a positive safe integer');
+  }
+
+  const requiredValues = n * dim;
+  if (!Number.isSafeInteger(requiredValues)) throw new RangeError('JSON matrix dimensions overflow');
+  if (mean.length !== dim || components.length !== dim * opts.outDim) {
+    throw new RangeError('PCA mean/components do not match the declared matrix dimensions');
+  }
+
+  let numericValues = fastJsonExtractNumbers(input, pointer);
+  if (!numericValues) {
+    const parsed = fastJsonParseWithBackend<unknown>(input).value;
+    const selected = resolveJsonPointer(parsed, pointer);
+    if (!Array.isArray(selected)) throw new TypeError('JSON Pointer must select a numeric array');
+    if (selected.length !== requiredValues || selected.some((value) => typeof value !== 'number')) {
+      throw new TypeError('JSON Pointer array length or values do not match the declared matrix');
+    }
+    numericValues = Float64Array.from(selected as number[]);
+  }
+  if (numericValues.length !== requiredValues) {
+    throw new TypeError('JSON Pointer array length does not match the declared matrix');
+  }
+
+  const effectiveN = Math.min(n, maxN);
+  const data = new Float32Array(effectiveN * dim);
+  for (let index = 0; index < data.length; index++) {
+    const value = numericValues[index];
+    if (!Number.isFinite(value)) throw new TypeError('JSON matrix contains a non-finite value');
+    const converted = Math.fround(value);
+    if (!Number.isFinite(converted)) throw new RangeError('JSON matrix value exceeds Float32 range');
+    data[index] = converted;
+  }
+
+  return pcaProject(data, mean, components, { ...opts, n: effectiveN, maxN: effectiveN });
 }
 
 /**

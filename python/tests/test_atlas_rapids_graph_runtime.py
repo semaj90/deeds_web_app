@@ -1,6 +1,9 @@
 import importlib.util
 import sys
+import tempfile
+import threading
 from pathlib import Path
+from types import SimpleNamespace
 
 import pandas as pd
 import networkx as nx
@@ -48,6 +51,156 @@ def test_seed_normalization_rejects_non_positive_weights():
             assert 'must be finite and > 0' in str(exc)
         else:
             raise AssertionError('expected invalid seed weight rejection')
+
+
+def test_graph_parity_row_hash_matches_typescript_exporter_contract():
+    node_rows = [{
+        'gpu_node_id': 0,
+        'graph_node_key': 'node:a',
+        'node_kind': 'packet',
+        'source_ref': 'src/a.ts',
+        'source_revision': 'sha256:a',
+        'workspace_revision': 'workspace:w1',
+        'packet_key': 'packet:a',
+        'symbol_id': None,
+        'symbol_version_id': None,
+    }]
+    edge_rows = [{
+        'src_gpu_node_id': 0,
+        'dst_gpu_node_id': 1,
+        'edge_type': 'CALLS',
+        'weight': 1.0,
+    }]
+    assert module.hash_graph_snapshot_parity_rows_v1(node_rows) == (
+        '0b6033cb835decb9d2544484f74d93b44f1e3f89d5ab1ede9f5e5f5c304b7978'
+    )
+    assert module.hash_graph_snapshot_parity_rows_v1(edge_rows) == (
+        '931e03cec8e4060b4f24724ca83b29d0ead9c37ad03c50798d2b196abb9a8836'
+    )
+
+
+def test_resident_graph_rejects_table_content_drift_before_backend_init():
+    node_frame = pd.DataFrame([{
+        'gpu_node_id': 0,
+        'graph_node_key': 'node:a',
+        'node_kind': 'packet',
+        'source_ref': 'src/a.ts',
+        'source_revision': 'sha256:a',
+        'workspace_revision': 'workspace:w1',
+        'packet_key': 'packet:a',
+        'symbol_id': None,
+        'symbol_version_id': None,
+    }])
+    edge_frame = pd.DataFrame([{
+        'src_gpu_node_id': 0,
+        'dst_gpu_node_id': 0,
+        'edge_type': 'SELF_TEST',
+        'weight': 1.0,
+    }])
+    original = (
+        module.cudf,
+        module.cugraph,
+        module.graph_ordinal_checksum_from_manifest_v1,
+    )
+
+    class FrameProxy:
+        def __init__(self, frame):
+            self.frame = frame
+            self.columns = frame.columns
+
+        def to_pandas(self):
+            return self.frame
+
+    module.cudf = SimpleNamespace(read_parquet=lambda path: FrameProxy(node_frame if Path(path).name == 'nodes.parquet' else edge_frame))
+    module.cugraph = SimpleNamespace(Graph=lambda **kwargs: (_ for _ in ()).throw(AssertionError('backend must not initialize')))
+    module.graph_ordinal_checksum_from_manifest_v1 = lambda manifest: 'ordinal-checksum'
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            artifact_dir = Path(temp_dir)
+            (artifact_dir / 'nodes.parquet').touch()
+            (artifact_dir / 'edges.parquet').touch()
+            manifest = {
+                'graphRevision': 'graph:r1',
+                'projectionRevision': 'projection:r1',
+                'nodeTableHash': 'incorrect-node-hash',
+                'edgeTableHash': module.hash_graph_snapshot_parity_rows_v1(edge_frame.to_dict(orient='records')),
+                'nodeCount': 1,
+                'edgeCount': 1,
+            }
+            try:
+                module.ResidentGraph(artifact_dir, manifest)
+            except ValueError as exc:
+                assert str(exc) == 'GRAPH_NODE_TABLE_CONTENT_HASH_MISMATCH'
+            else:
+                raise AssertionError('expected table-content hash rejection')
+    finally:
+        module.cudf, module.cugraph, module.graph_ordinal_checksum_from_manifest_v1 = original
+
+
+def test_resident_source_ref_bfs_preserves_all_exact_revision_matches():
+    calls = []
+
+    class Resident:
+        graph_revision = 'graph:r1'
+        projection_revision = 'projection:r1'
+        projection_checksum = 'projection-checksum'
+        artifact_checksum = 'artifact-checksum'
+        graph_ordinal_map_checksum = 'ordinal-checksum'
+        workspace_revision = 'workspace:r1'
+        gpu_id_to_identity = {
+            3: {
+                'nodeKey': 'packet:a', 'packetKey': 'packet:a', 'sourceRef': 'src/a.ts',
+                'sourceRevision': 'source:r1', 'workspaceRevision': 'workspace:r1',
+            },
+            4: {
+                'nodeKey': 'symbol:a', 'packetKey': 'packet:a', 'sourceRef': 'src/a.ts',
+                'sourceRevision': 'source:r1', 'workspaceRevision': 'workspace:r1',
+            },
+            5: {
+                'nodeKey': 'packet:b', 'packetKey': 'packet:b', 'sourceRef': 'src/b.ts',
+                'sourceRevision': 'source:r1', 'workspaceRevision': 'workspace:r1',
+            },
+        }
+
+        @staticmethod
+        def bfs(req):
+            calls.append(req.startNodeKey)
+            ordinal = 3 if req.startNodeKey == 'packet:a' else 4
+            return {
+                'startNodeKey': req.startNodeKey,
+                'results': [{'gpuNodeId': ordinal, 'nodeKey': req.startNodeKey}],
+                'writesPerformed': False,
+                'canonicalAuthority': False,
+            }
+
+    manager = module.GraphRuntimeManager.__new__(module.GraphRuntimeManager)
+    manager._lock = threading.RLock()
+    manager._resident = Resident()
+    request = module.SourceRefBFSRequest(
+        graphRevision='graph:r1',
+        projectionRevision='projection:r1',
+        projectionChecksum='projection-checksum',
+        sourceRef='src/a.ts',
+        expectedSourceRevision='source:r1',
+        expectedWorkspaceRevision='workspace:r1',
+        depthLimit=1,
+        expectedArtifactChecksum='artifact-checksum',
+        expectedGraphOrdinalMapChecksum='ordinal-checksum',
+    )
+    receipt = manager.source_ref_bfs(request)
+    assert [match['graphOrdinal'] for match in receipt['matches']] == [3, 4]
+    assert calls == ['packet:a', 'symbol:a']
+    assert receipt['matches'][0]['traversal']['results'][0]['sourceRevision'] == 'source:r1'
+    assert receipt['writesPerformed'] is False
+    assert receipt['canonicalAuthority'] is False
+
+    try:
+        manager.source_ref_bfs(request.model_copy(update={'expectedSourceRevision': 'source:stale'}))
+    except module.HTTPException as exc:
+        assert exc.detail['code'] == 'GRAPH_SOURCE_REVISION_MISMATCH'
+    else:
+        raise AssertionError('expected stale source revision rejection')
+    assert calls == ['packet:a', 'symbol:a']
 
 
 def test_bfs_depth_modes_apply_default_expanded_and_hard_bounds():

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { buildAceAdmissionV1, buildBlockedBitFrostResidencyPlanV1, buildBlockedPacketFabricCanaryV1, buildBlockedSemanticCohortAdmissionV1, buildCandidateFeatureCellsV1, buildCandidateFeatureMatrixArtifactV1, buildCandidateMatrixRowCrosswalkV1, buildCandidateOrdinalAdmissionV1, buildPacketSummaryV1, candidateFeatureCellV1Schema, candidateFeatureMatrixV1Schema, candidateFeatureMatrixRevisionV1, candidateFeatureSchemaChecksumV1, CANDIDATE_FEATURE_NAMES_V1, candidateMatrixRowCrosswalkV1Schema, candidateFeatureMatrixReceiptV1Schema, readbackCandidateFeatureMatrixArtifactV1, serializeCandidateFeatureMatrixArtifactV1, domainClassificationEvidenceV1Schema, graphOrdinalManifestV1Schema, graphSnapshotV1Schema, offlineTransportArtifactV1Schema, packetAdmissionCandidateV1Schema, packetFabricCanaryV1Schema, packetSummaryV1Schema, parsePacketSummaryV1, planPacketFabricCanaryV1, qloraTrainingSnapshotV1Schema, resolveFeaturePolicyLutEntryV1, selectSemanticExecutorV1, topologyCoordinate4V1Schema } from './atlas-pipeline-stage-contracts-v1.js';
+import { buildAceAdmissionV1, buildBlockedBitFrostResidencyPlanV1, buildBlockedPacketFabricCanaryV1, buildBlockedSemanticCohortAdmissionV1, buildCandidateFeatureCellsV1, buildCandidateFeatureMatrixArtifactV1, buildCandidateMatrixRowCrosswalkV1, buildCandidateOrdinalAdmissionV1, buildPacketSummaryV1, candidateFeatureCellV1Schema, candidateFeatureMatrixV1Schema, candidateFeatureMatrixRevisionV1, candidateFeatureSchemaChecksumV1, CANDIDATE_FEATURE_NAMES_V1, candidateMatrixRowCrosswalkV1Schema, candidateFeatureMatrixReceiptV1Schema, produceCandidateFeatureMatrixFromSnapshotV1, readbackCandidateFeatureMatrixArtifactV1, serializeCandidateFeatureMatrixArtifactV1, domainClassificationEvidenceV1Schema, graphOrdinalManifestV1Schema, graphSnapshotV1Schema, offlineTransportArtifactV1Schema, packetAdmissionCandidateV1Schema, packetFabricCanaryV1Schema, packetSummaryV1Schema, parsePacketSummaryV1, planPacketFabricCanaryV1, qloraTrainingSnapshotV1Schema, resolveFeaturePolicyLutEntryV1, selectSemanticExecutorV1, topologyCoordinate4V1Schema } from './atlas-pipeline-stage-contracts-v1.js';
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import { assertCandidateOrdinalMapIntegrityV1, candidateOrdinalMapV1Schema, materializeCandidateOrdinalMap, materializeRevisionQualifiedSourceChunkOrdinalMapV1 } from '../features/canonical-candidate-v1.js';
+import { materializeCandidateFeatureSnapshot } from '../features/candidate-feature-snapshot-v1.js';
 
 describe('Atlas pipeline stage contracts', () => {
   it('blocks ordinal admission without a revision-qualified cohort', () => {
@@ -261,6 +262,68 @@ describe('Atlas pipeline stage contracts', () => {
       cells,
       producerRevision: 'fixture-producer:1',
     })).toThrow('MATRIX_RECEIPT_CANDIDATE_SET_CHECKSUM_MISMATCH');
+  });
+
+  it('produces and independently re-reads a frozen matrix from an ordinal map and feature snapshot', () => {
+    const workspaceRevision = 'workspace:matrix-fixture:1';
+    const ordinalMap = materializeCandidateOrdinalMap({
+      candidateSnapshotRevision: 'snapshot:matrix-fixture:1',
+      workspaceRevision,
+      producerRevision: 'fixture-candidates:1',
+      candidates: [
+        { canonicalId: 'candidate:b', packetKey: 'packet:b', sourceRef: 'b.ts', treeNodeId: null, symbolVersionId: 'symbol:b@1', workspaceRevision, sourceRevision: 'source:b', graphRevision: null, semanticRevision: null, degradedIdentity: false, evidenceRefs: [], representationBindings: [] },
+        { canonicalId: 'candidate:a', packetKey: 'packet:a', sourceRef: 'a.ts', treeNodeId: null, symbolVersionId: 'symbol:a@1', workspaceRevision, sourceRevision: 'source:a', graphRevision: null, semanticRevision: null, degradedIdentity: false, evidenceRefs: [], representationBindings: [] },
+      ],
+    });
+    const featureRevision = 'feature-snapshot:fixture:1';
+    const snapshot = materializeCandidateFeatureSnapshot({
+      ordinalMap,
+      featureRevision,
+      producerRevision: 'fixture-features:1',
+      rows: ordinalMap.candidates.map((candidate) => ({
+        schema: 'atlas.candidate-feature-row.v1',
+        candidateOrdinal: candidate.candidateOrdinal,
+        canonicalId: candidate.canonicalId,
+        packetKey: candidate.packetKey,
+        sourceRef: candidate.sourceRef,
+        treeNodeId: candidate.treeNodeId,
+        symbolVersionId: candidate.symbolVersionId,
+        workspaceRevision: candidate.workspaceRevision,
+        sourceRevision: candidate.sourceRevision,
+        graphRevision: null,
+        semanticRevision: null,
+        featureRevision,
+        representationBindings: [],
+        lexicalRelevance: candidate.canonicalId === 'candidate:a' ? 0.75 : null,
+        laneMask: candidate.canonicalId === 'candidate:a' ? ['lexical' as const] : [],
+        evidenceRefs: [],
+      })),
+    });
+
+    const artifact = produceCandidateFeatureMatrixFromSnapshotV1({
+      requestId: 'request:matrix-fixture:1', ordinalMap, snapshot, producerRevision: 'matrix-producer:fixture:1',
+    });
+    const independentlyRead = readbackCandidateFeatureMatrixArtifactV1(serializeCandidateFeatureMatrixArtifactV1(artifact));
+
+    expect(independentlyRead).toEqual(artifact);
+    expect(independentlyRead.crosswalk.bindings.map(({ candidateOrdinal, rowOrdinal, canonicalId }) => [candidateOrdinal, rowOrdinal, canonicalId])).toEqual([
+      [0, 0, 'candidate:a'], [1, 1, 'candidate:b'],
+    ]);
+    expect(independentlyRead.receipt.rowBindingChecksum).toBe(independentlyRead.matrix.rowBindingChecksum);
+    expect(independentlyRead.receipt.rowCount).toBe(2);
+    expect(independentlyRead.receipt.columnCount).toBe(CANDIDATE_FEATURE_NAMES_V1.length);
+    expect(independentlyRead.cells.find((cell) => cell.candidateOrdinal === 0 && cell.featureName === 'lexical_score')).toMatchObject({
+      value: 0.75, available: true, reason: null,
+    });
+    expect(independentlyRead.matrix.graphRevision).toBeNull();
+    expect(independentlyRead.cells.filter((cell) => cell.featureName === 'hyper_fact_hits').every((cell) => !cell.available && cell.value === null && cell.reason === 'HYPERRAG_NOT_ADMITTED')).toBe(true);
+    expect(artifact.receipt.canonicalAuthority).toBe(false);
+    expect(artifact.receipt.writesPerformed).toBe(false);
+    expect(() => produceCandidateFeatureMatrixFromSnapshotV1({
+      requestId: 'request:matrix-fixture:1', ordinalMap,
+      snapshot: { ...snapshot, snapshotChecksum: '0'.repeat(64) },
+      producerRevision: 'matrix-producer:fixture:1',
+    })).toThrow('CFM_SOURCE_SNAPSHOT_CHECKSUM_MISMATCH');
   });
 
   it('keeps ACE and BitFrost non-authoritative when identity is unavailable', () => {

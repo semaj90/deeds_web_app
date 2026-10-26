@@ -1,20 +1,43 @@
 {
   "schema": "atlas.agentic-error-fixing.v1",
-  "inputChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  "candidates": [],
-  "validation": {
-    "command": "npm --prefix sveltekit-frontend run check",
-    "exitCode": 1,
-    "timedOut": false,
-    "outputChecksum": "sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  "inputChecksum": "sha256:44cd7df511dd30e1bc682cd4582465ed9ec1d3a3a586a1e012a5b9a9c68ff9ae",
+  "candidates": [
+    {
+      "fingerprint": "sha256:7997d1ca170a23af",
+      "errorCode": "TS2307",
+      "kind": "TYPECHECK_OR_SCHEMA",
+      "file": "src/mcp/openspec-evidence-tools.spec.ts",
+      "owner": "Owning TypeScript contract/module",
+      "proposedAction": "Inspect the smallest owning contract and run a scoped typecheck.",
+      "recommendedMcpTools": [
+        "find_source_refs",
+        "read_file"
+      ],
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ],
+  "validation": null,
+  "modelResolution": {
+    "status": "PROVEN_RUNTIME",
+    "configuredModel": "ornith-1.5-9b",
+    "runtimeModelId": "ornith-1.5-9b",
+    "endpoint": "http://127.0.0.1:8090",
+    "resolutionSource": "LLAMA_V1_MODELS"
   },
-  "generatedAt": "2026-09-01T23:46:36.047Z",
-  "status": "NO_DIAGNOSTICS",
+  "generatedAt": "2026-10-11T22:32:58.859Z",
+  "status": "PLAN_READY",
   "mode": "READ_ONLY_PROPOSAL",
   "mutationAllowed": false,
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "deterministicPlanChecksum": "sha256:d0cd4238c7b6b56aeebabd609dbf651ea61edc76bbb96865e0511bc0008ed5e1",
-  "candidateCount": 0,
-  "nextGate": "SUPPLY_DIAGNOSTICS"
+  "validationDetails": null,
+  "synthesis": {
+    "status": "SYNTHESIS_COMPLETE",
+    "modelUsed": "ornith-1.5-9b",
+    "synthesis": "# Parent Atlas Diagnostic Plan\n\n## Diagnosis\n\nThe candidate correctly identifies this as a **TypeScript contract error** (`TS2307: Cannot find module or its type declarations`). The error originates in `src/mcp/openspec-evidence-tools.spec.ts`, and the owning contract is the TypeScript module itself.\n\nThe proposed action is sound: **inspect the smallest owning contract and run a scoped typecheck**. This is the correct minimal-scope approach—do not attempt to fix the error by editing unrelated files or guessing at module paths.\n\n## Repair Advice Sequence\n\n**Step 1 — Read the failing file**\nUse `read_file` on `src/mcp/openspec-evidence-tools.spec.ts` to observe the exact import statement flagged by the typechecker. Note the module specifier, the expected export, and any surrounding context (e.g., a relative path that may be incorrect, a misspelled module name, or an import of a non-existent type).\n\n**Step 2 — Resolve the module reference**\nUse `find_source_refs` scoped to the import specifier from Step 1 to determine whether the target module exists and where it is declared. This confirms whether the failure is due to a genuinely missing module, a mislocated file, or a contract that has not been created/updated.\n\n**Step 3 — Run a scoped typecheck**\nExecute a typecheck limited to the owning contract (`src/mcp/openspec-evidence-tools.spec.ts`) and its immediate dependencies. Do not run a full-project typecheck, which would mask the true scope of the failure.\n\n## Constraints\n\n- **No mutation.** Do not edit any file. This is a read-only diagnostic sequence.\n- **No new files.** Do not propose creating modules, types, or fixtures.\n- **Preserve interfaces.** If the missing module exists, the fix must reconcile the import to the canonical export—never alter the public interface of an existing contract to accommodate the error.\n- **Preserve canonical rules.** Do not introduce ad-hoc module aliases or path overrides that would diverge from the project's established resolution conventions.\n\n## Expected Outcome\n\nThe scoped typecheck will surface the precise contract violation (missing module, unresolved type, or broken import path). The repair then follows from that finding by aligning the import to the existing canonical contract—no invention required."
+  },
+  "deterministicPlanChecksum": "sha256:2cd2b53ec4a7102d810738c64714c56b92cf06493b488894445b02502fa97656",
+  "candidateCount": 1,
+  "nextGate": "OPERATOR_REVIEW_THEN_SCOPED_VALIDATION"
 }

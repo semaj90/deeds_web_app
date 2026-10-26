@@ -1,54 +1,36 @@
 {
   "schema": "atlas.turbovec-cuvs-readiness.v2",
-  "run": "2026-09-10T20:42:23.883Z",
+  "run": "2026-10-19T08:06:06.336Z",
   "dry_run": false,
   "canonicalAuthority": false,
   "writesPerformed": false,
   "dependencies": {
     "turbovec": {
-      "status": "OK",
-      "ready_for_use": true,
+      "status": "UNAVAILABLE",
+      "ready_for_use": false,
       "endpoint": "http://127.0.0.1:8791/health",
-      "latencyMs": 90,
-      "observed": {
-        "ok": true,
-        "indexed": 0,
-        "dim": 64,
-        "bits": 4,
-        "turbovec": true,
-        "collection": "codebase_chunks_768"
-      },
-      "error": null,
+      "latencyMs": 41,
+      "observed": null,
+      "error": "fetch failed",
       "canonicalAuthority": false
     },
     "cuvs": {
-      "status": "DEGRADED",
+      "status": "UNAVAILABLE",
       "ready_for_use": false,
       "endpoint": "http://127.0.0.1:8098/health",
-      "latencyMs": 2163,
-      "observed": {
-        "ok": true,
-        "service": "atlas-gpu-8098",
-        "executionOnly": true,
-        "cudaAvailable": true,
-        "device": "NVIDIA GeForce RTX 3060 Ti",
-        "torchAvailable": false,
-        "writes": {
-          "postgres": false,
-          "qdrant": false,
-          "valkey": false
-        }
-      },
-      "error": null,
+      "latencyMs": 2510,
+      "observed": {},
+      "error": "The operation was aborted due to timeout",
       "owner": "services/atlas-gpu-8098",
-      "executionOnly": true,
-      "cudaAvailable": true,
-      "torchAvailable": false,
+      "executionOnly": null,
+      "cudaAvailable": null,
+      "torchAvailable": null,
       "canonicalAuthority": false
     }
   },
   "blockers": [
-    "RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN"
+    "TURBOVEC_HEALTH_UNREACHABLE",
+    "RAPIDS_8098_HEALTH_UNREACHABLE"
   ],
   "status": "LIVE_ACCELERATOR_CHAIN_BLOCKED"
 }

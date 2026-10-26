@@ -49,8 +49,8 @@ const LOCAL_ENV = {
 	REDIS_URL: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
 	BIFROST_OPENAI_BASE_URL: process.env.BIFROST_OPENAI_BASE_URL || 'http://127.0.0.1:3040/v1',
 	TURBOQUANT_BASE_URL: process.env.TURBOQUANT_BASE_URL || 'http://127.0.0.1:8090',
-	FUNCTION_GEMMA_MODEL: process.env.FUNCTION_GEMMA_MODEL || process.env.GEMMA4_MODEL || 'gemma4-rotorquant:latest',
-	GEMMA4_MODEL: process.env.GEMMA4_MODEL || 'gemma4-rotorquant:latest',
+	FUNCTION_GEMMA_MODEL: process.env.FUNCTION_GEMMA_MODEL || process.env.GEMMA4_MODEL || 'ornith-1.5-9b',
+	GEMMA4_MODEL: process.env.GEMMA4_MODEL || 'ornith-1.5-9b',
 };
 
 function nowIso() {
@@ -366,7 +366,7 @@ function resolveProviderConfig() {
 		process.env.LOCAL_GEMMA_MODEL?.trim() ||
 		LOCAL_ENV.FUNCTION_GEMMA_MODEL?.trim() ||
 		LOCAL_ENV.GEMMA4_MODEL?.trim() ||
-		'gemma4-rotorquant:latest';
+		'ornith-1.5-9b';
 
 	if (!process.env.LOCAL_OPENAI_BASE_URL) missingEnvVars.push('LOCAL_OPENAI_BASE_URL');
 	if (!process.env.LOCAL_OPENAI_API_KEY) missingEnvVars.push('LOCAL_OPENAI_API_KEY');

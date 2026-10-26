@@ -94,7 +94,9 @@ import {
 function makeIdentity(overrides: Partial<ContextCacheIdentity> = {}): ContextCacheIdentity {
   return {
     queryHash: 'query-hash',
-    modelName: 'gemma4-rotorquant:latest',
+    modelName: 'ornith-1.5-9b',
+    modelRevision: 'sha256:base-model',
+    adapterRevision: null,
     modelQuant: 'rotorquant',
     kvQuant: 'q8_0/q8_0',
     draftModel: true,
@@ -125,7 +127,7 @@ function makePacket(overrides: Partial<CachedContextPacket> = {}): CachedContext
     cacheHit: true,
     retrievalSkipped: true,
     backend: 'turboquant',
-    modelName: 'gemma4-rotorquant:latest',
+    modelName: 'ornith-1.5-9b',
     modelQuant: 'rotorquant',
     kvQuant: 'q8_0/q8_0',
     draftModel: true,
@@ -185,6 +187,30 @@ describe('buildContextCacheKey', () => {
     expect(modelQuantChanged).not.toBe(same);
     expect(backendChanged).not.toBe(same);
     expect(repoChanged).not.toBe(same);
+  });
+
+  it('separates context cache entries by model and adapter revision', () => {
+    const base = makeIdentity();
+    expect(buildContextCacheKey({ ...base, modelRevision: 'sha256:model-next' })).not.toBe(buildContextCacheKey(base));
+    expect(buildContextCacheKey({ ...base, adapterRevision: 'sha256:adapter-next' })).not.toBe(buildContextCacheKey(base));
+    expect(buildContextCacheKey({ ...base, adapterRevision: 'sha256:adapter-next' })).not.toBe(
+      buildContextCacheKey({ ...base, adapterRevision: null }),
+    );
+  });
+
+  it('separates context entries by the admitted revisioned retrieval identity', () => {
+    const base = makeIdentity();
+    const first = buildContextCacheKey({
+      ...base,
+      retrievalCacheIdentityKey: `ace:topk:v1:${'a'.repeat(64)}`,
+    });
+    const second = buildContextCacheKey({
+      ...base,
+      retrievalCacheIdentityKey: `ace:topk:v1:${'b'.repeat(64)}`,
+    });
+
+    expect(first).not.toBe(second);
+    expect(buildContextCacheKey(base)).not.toBe(first);
   });
 });
 

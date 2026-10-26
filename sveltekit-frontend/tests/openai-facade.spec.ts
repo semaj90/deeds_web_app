@@ -7,7 +7,7 @@ import type { AceHmmMeta, RetrievalTrace } from '$lib/server/ai/openai-types.js'
 // if set, else basename(ROTORQUANT_MODEL_PATH). 'yorha-legal'/'yorha-*'
 // requests resolve to this same value via resolveInternalModel() in
 // openai-facade.ts. Compute it the same way rather than hardcoding the old
-// Ollama-era 'gemma4-rotorquant:latest' string, which goes stale whenever
+// Ollama-era 'ornith-1.5-9b' string, which goes stale whenever
 // the configured model changes (as it already has — this repo is on Ornith
 // 1.5 now, not Gemma4, per CLAUDE.md's Ollama Phase-Out section).
 const EXPECTED_INTERNAL_MODEL = (() => {
@@ -98,8 +98,8 @@ vi.mock('$lib/server/ai/inference-configs.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat:    mocks.bifrostChat,
   turboQuantChat: mocks.turboQuantChat,
-  ollamaFetch:    vi.fn().mockResolvedValue({ embedding: new Array(384).fill(0) }),
-  VLM_MODELS:     { legal: 'gemma4-rotorquant:latest', tool: 'gemma4-rotorquant:latest' },
+  embedOrChatFetch:    vi.fn().mockResolvedValue({ embedding: new Array(384).fill(0) }),
+  VLM_MODELS:     { legal: 'ornith-1.5-9b', tool: 'ornith-1.5-9b' },
   getOllamaEmbeddingEndpoint: () => 'http://127.0.0.1:11434',
 }));
 
@@ -338,7 +338,7 @@ describe('openai-facade — runChatCompletion', () => {
     });
     mocks.getExactMatchCache.mockResolvedValueOnce({
       content: 'Cached prompt answer',
-      model: 'gemma4-rotorquant:latest',
+      model: 'ornith-1.5-9b',
       backend: 'openai-facade',
       cachedAt: new Date().toISOString(),
     });
@@ -669,7 +669,7 @@ describe('openai-facade — runChatCompletion', () => {
 
     const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
     const res = await runChatCompletion({
-      model:    'gemma4-rotorquant:latest',
+      model:    'ornith-1.5-9b',
       messages: [{ role: 'user', content: 'q' }],
       file_path: 'src/foo.ts',
       raw:      false,

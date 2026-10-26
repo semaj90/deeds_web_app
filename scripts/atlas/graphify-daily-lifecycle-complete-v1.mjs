@@ -13,14 +13,17 @@ import pg from 'pg';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
 const RECEIPT_PATH = path.resolve(ROOT, 'docs/reports/graphify-daily-lifecycle-v1.json');
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = resolveDatabaseUrl(loadRepoEnv(process.env));
 const TERMINAL_AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
+const SNAPSHOT_TERMINAL_STATUS = process.env.ATLAS_GRAPHIFY_SNAPSHOT_TERMINAL_STATUS ?? 'COMPLETED';
+const SNAPSHOT_TERMINAL_ERROR_CODE = process.env.ATLAS_GRAPHIFY_SNAPSHOT_TERMINAL_ERROR_CODE;
 
 async function main() {
   const receipt = JSON.parse(readFileSync(RECEIPT_PATH, 'utf8'));
@@ -35,21 +38,37 @@ async function main() {
     if (receipt.status !== 'SNAPSHOT_NATIVE_EXECUTION_OPENED' || !receipt.executionId) {
       throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_RECEIPT_NOT_COMPLETABLE:${JSON.stringify({ status: receipt.status, executionId: receipt.executionId })}`);
     }
+    if (!['COMPLETED', 'FAILED'].includes(SNAPSHOT_TERMINAL_STATUS)) {
+      throw new Error(`GRAPHIFY_SNAPSHOT_NATIVE_TERMINAL_STATUS_INVALID:${SNAPSHOT_TERMINAL_STATUS}`);
+    }
+    if (SNAPSHOT_TERMINAL_STATUS === 'FAILED' && !SNAPSHOT_TERMINAL_ERROR_CODE) {
+      throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_FAILED_REQUIRES_ERROR_CODE');
+    }
+    if (SNAPSHOT_TERMINAL_STATUS === 'COMPLETED' && SNAPSHOT_TERMINAL_ERROR_CODE) {
+      throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_COMPLETED_FORBIDS_ERROR_CODE');
+    }
     const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2 });
     const client = await pool.connect();
     try {
       const { completeExecution } = await import(
         'file:///' + path.resolve(FRONTEND, 'src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts').replace(/\\/g, '/')
       );
-      await completeExecution({ query: (text, values) => client.query(text, values) }, receipt.executionId, { status: 'COMPLETED' });
+      await completeExecution({ query: (text, values) => client.query(text, values) }, receipt.executionId, {
+        status: SNAPSHOT_TERMINAL_STATUS,
+        ...(SNAPSHOT_TERMINAL_ERROR_CODE ? { errorCode: SNAPSHOT_TERMINAL_ERROR_CODE } : {}),
+      });
       const completedAt = new Date().toISOString();
+      const receiptStatus = SNAPSHOT_TERMINAL_STATUS === 'FAILED'
+        ? 'SNAPSHOT_NATIVE_EXECUTION_FAILED'
+        : 'SNAPSHOT_NATIVE_EXECUTION_COMPLETED';
       writeFileSync(RECEIPT_PATH, JSON.stringify({
         ...receipt,
-        status: 'SNAPSHOT_NATIVE_EXECUTION_COMPLETED',
-        terminalStatus: 'COMPLETED',
+        status: receiptStatus,
+        terminalStatus: SNAPSHOT_TERMINAL_STATUS,
+        ...(SNAPSHOT_TERMINAL_ERROR_CODE ? { errorCode: SNAPSHOT_TERMINAL_ERROR_CODE } : {}),
         completedAt,
       }, null, 2) + '\n');
-      console.log(JSON.stringify({ status: 'SNAPSHOT_NATIVE_LIFECYCLE_COMPLETE', executionId: receipt.executionId, completedAt, receiptPath: RECEIPT_PATH }));
+      console.log(JSON.stringify({ status: receiptStatus, executionId: receipt.executionId, terminalStatus: SNAPSHOT_TERMINAL_STATUS, completedAt, receiptPath: RECEIPT_PATH }));
       return;
     } finally {
       client.release();

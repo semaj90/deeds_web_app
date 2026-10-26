@@ -1,0 +1,122 @@
+{
+  "$schema": "atlas.agent-retrieval-readiness.receipt.v1",
+  "receiptVersion": "1.0.0",
+  "timestamp": "2026-10-14T23:09:00Z",
+  "status": "STAGE_1_VERIFIED",
+  "wiringAudit": {
+    "timestamp": "2026-10-14T23:12:38Z",
+    "status": "PARTIAL",
+    "scope": "source inspection and focused local contract tests; no service or datastore probes",
+    "historicalReadinessFieldsRefreshed": false,
+    "layers": [
+      {
+        "name": "canonical_store",
+        "status": "OWNER_PRESENT_LIVE_SCOPE_NOT_REFRESHED",
+        "evidence": ["PostgreSQL/pgvector are documented canonical owners in repository guidance"],
+        "gaps": ["No database query or current source-to-packet readback was performed in this audit"]
+      },
+      {
+        "name": "parsing_and_transport",
+        "status": "NATIVE_ADDON_LOADED_IN_TEST_ZERO_COPY_UNPROVEN",
+        "evidence": ["sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts", "sveltekit-frontend/src/lib/server/atlas/transport/messagepack-transport-v1.ts"],
+        "gaps": ["SIMDJSON bridge accepts JSON strings and may fall back to JSON.parse; zero-copy is not established", "No MsgPack-to-live-owner IPC path was demonstrated"]
+      },
+      {
+        "name": "packet_class_lut",
+        "status": "CONTRACT_TESTED_NOT_WIRED",
+        "evidence": ["sveltekit-frontend/src/lib/server/atlas/residency/packet-class-lut-v1.ts explicitly defines a derived presentation/compression view"],
+        "gaps": ["Module documentation says packet/cache wiring is not present here"]
+      },
+      {
+        "name": "multi_lane_retrieval",
+        "status": "SEARCH_RUNTIME_OWNER_PRESENT_FUNCTION_REGISTRY_NOT_REGISTERED",
+        "evidence": ["sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts owns fusion and invokes the canonical rerank executor"],
+        "gaps": ["The reported function-registry retriever is not registered in a production SearchRuntime caller", "A current end-to-end FTS/BM42/Qdrant/RRF/rerank replay was not run"]
+      },
+      {
+        "name": "classifier_and_routing",
+        "status": "COMPONENTS_PRESENT_PIPELINE_WIRING_UNPROVEN",
+        "evidence": ["sveltekit-frontend/src/lib/server/analysis/hmm-error-classifier.ts", "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"],
+        "gaps": ["No evidence in this audit that the HMM owns SearchRuntime budget routing", "Logistic-regression production reranking was not established"]
+      },
+      {
+        "name": "graph_traversal",
+        "status": "INDEX_DDL_AND_GRAPH_OWNERS_PRESENT_LIVE_TRAVERSAL_UNPROVEN",
+        "evidence": ["sveltekit-frontend/drizzle/20260819_atlas_graph_traversal_indexes.sql", "sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-postgres.ts"],
+        "gaps": ["The cited 0.043 ms scan was not independently reproduced", "No revision-qualified 1-hop/2-hop function traversal was run"]
+      },
+      {
+        "name": "cache_warming",
+        "status": "FSM_CONTRACT_TESTED_WARM_WRITE_NOT_PROVEN",
+        "evidence": ["sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-token-fsm-v1.ts", "sveltekit-frontend/src/lib/server/atlas/function-registry/ace-function-warm-plan-v1.ts"],
+        "gaps": ["The warm plan is proposal-only and adds no cache write or retrieval vote", "No Redis/Valkey readback or cold/warm parity was tested"]
+      },
+      {
+        "name": "orchestration_and_tools",
+        "status": "ACP_TOOL_LOOP_PRESENT_PIPELINE_LINK_UNPROVEN",
+        "evidence": ["sveltekit-frontend/src/lib/server/ai/acp-rpc-loop.ts", "sveltekit-frontend/src/lib/server/atlas/pipeline/unified-context-pipeline-v1.ts"],
+        "gaps": ["The pipeline descriptor is a read-only contract and no production caller to ACP was found in the scoped source review", "No MCP function-registry or cache.warm_plan registration was proven"]
+      }
+    ],
+    "focusedTests": {
+      "command": "cd sveltekit-frontend && npx vitest run --config vitest.lane-contracts.config.ts --pool=threads --maxWorkers=1 src/lib/server/atlas/pipeline/unified-context-pipeline-v1.spec.ts src/lib/server/atlas/transport/messagepack-transport-v1.spec.ts src/lib/server/atlas/residency/packet-class-lut-v1.spec.ts src/lib/server/atlas/cache/bitfrost-token-fsm-v1.spec.ts src/lib/server/gpu/simdjson-bridge.spec.ts src/lib/server/ai/acp-rpc-loop.spec.ts",
+      "exitCode": 0,
+      "testsPassed": 40,
+      "testFilesExecuted": ["unified-context-pipeline-v1.spec.ts", "packet-class-lut-v1.spec.ts", "bitfrost-token-fsm-v1.spec.ts"],
+      "testFilesNotExecutedByThisConfig": ["simdjson-bridge.spec.ts", "acp-rpc-loop.spec.ts"],
+      "requestedDedicatedSpecNotFound": "messagepack-transport-v1.spec.ts; transport behavior is exercised by multi-plane-execution.spec.ts"
+    },
+    "additionalFocusedTests": {
+      "command": "cd sveltekit-frontend && npx vitest run --config vitest.config.ts --pool=threads --maxWorkers=1 src/lib/server/atlas/residency/multi-plane-execution.spec.ts src/lib/server/gpu/simdjson-bridge.spec.ts src/lib/server/ai/acp-rpc-loop.spec.ts",
+      "exitCode": 0,
+      "testsPassed": 20,
+      "testFilesExecuted": ["multi-plane-execution.spec.ts", "simdjson-bridge.spec.ts", "acp-rpc-loop.spec.ts"],
+      "simdjsonAddonLoadedDuringTest": true
+    },
+    "promotion": "Do not treat source presence or fixture tests as proof of end-to-end pipeline wiring."
+  },
+  "openwiki": {
+    "status": "INTERRUPTED",
+    "runJsonExists": true,
+    "lastUpdateStatus": "interrupted",
+    "lastUpdateModel": "gemini-3.1-flash-lite",
+    "lastUpdateCommand": "init",
+    "indexMdExists": false,
+    "quickstartMdExists": true,
+    "markdownFilesCount": 12,
+    "claimsCount": 11,
+    "reconciliationRecommended": "openwiki --update (do NOT rerun --init)"
+  },
+  "services": {
+    "postgres_5432": { "port": 5432, "reachable": true },
+    "postgres_5434": { "port": 5434, "reachable": false, "note": "Docker daemon reconnecting after restart" },
+    "ornith_llm": { "port": 8090, "reachable": true, "model": "ornith-1.5-9b" },
+    "mcp_standard": { "port": 8788, "reachable": true },
+    "redis_valkey": { "port": 6379, "reachable": false, "note": "Docker daemon reconnecting after restart" },
+    "qdrant": { "port": 6333, "reachable": false, "note": "Docker daemon reconnecting after restart" }
+  },
+  "readinessGates": {
+    "AGENT_COMPILED": "PROVEN",
+    "MODEL_READY": "PROVEN",
+    "TOOLS_DISCOVERED": "PROVEN",
+    "BACKEND_READY": "PARTIAL",
+    "CHECKPOINT_READY": "PROPOSED",
+    "OPENWIKI_FINISHED": "BLOCKED_INTERRUPTED",
+    "ATLAS_READ_READY": "PROVEN",
+    "RETRIEVAL_READY": "PROVEN",
+    "CACHE_READY": "PROVEN_TEST_NAMESPACE"
+  },
+  "verifiedReceipts": {
+    "functionRegistryLiveProof": "docs/reports/function-registry-live-proof-v1.json",
+    "candidateExpansionReceipt": "docs/reports/candidate-expansion-receipt-v1.json",
+    "aceWarmPlanReceipt": "docs/reports/ace-warm-plan-receipt-v1.json"
+  },
+  "liveSampleVerified": {
+    "symbolName": "computePacketKeyV2",
+    "symbolVersionId": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+    "sourceRevision": "sha256:805b339b4374f53f568b166ea7115bbf25d2cdbb28f7f7fcc9e68c1b618b55b4",
+    "packetKey": "packet:9aec19d8-8e0a-5470-bef2-9b8fca6c313a",
+    "valkeyCacheKey": "atlas:bitfrost:v1:centroid_lookup:5203f8dd218c3b3bb9670c7daca6969f"
+  }
+}

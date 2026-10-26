@@ -6,7 +6,7 @@
  *
  * Example:
  *   node scripts/atlas/generate-task-summaries.mjs --limit 2
- *   node scripts/atlas/generate-task-summaries.mjs --commit --limit 10 --llama-url http://127.0.0.1:8090/v1 --model gemma4-rotorquant
+ *   node scripts/atlas/generate-task-summaries.mjs --commit --limit 10 --llama-url http://127.0.0.1:8090/v1 --model ornith-1.5-9b
  */
 
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -52,7 +52,7 @@ const MODEL =
   getFlag('model') ??
   process.env.LOCAL_GEMMA_MODEL ??
   process.env.LLAMA_MODEL ??
-  'gemma4-rotorquant';
+  'ornith-1.5-9b';
 
 const LLAMA_BASE_URL = normalizeBaseUrl(
   getFlag('llama-url') ??

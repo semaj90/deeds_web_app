@@ -10,6 +10,13 @@ export type ResolvedGraphifyPacketEndpointV1 = EndpointResolutionV1 & {
 	graphRevision: string;
 };
 
+export type ResolvedGraphifyPacketIncidenceEndpointsV1 = {
+	packets: ResolvedGraphifyPacketEndpointV1[];
+	neighbors: ResolvedGraphifyPacketEndpointV1[];
+};
+
+export const MAX_PACKETS_PER_GRAPHIFY_SYMBOL_V1 = 64;
+
 interface GraphifySymbolPacketJoinRowV1 extends AtlasPacketRowV1 {
 	stable_symbol_key: string;
 	workspace_revision: string;
@@ -17,15 +24,20 @@ interface GraphifySymbolPacketJoinRowV1 extends AtlasPacketRowV1 {
 	workspace_revision_key: string | null;
 }
 
+export interface GraphifyPacketIncidenceQueryV1 {
+	query<T = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<{ rows: T[] }>;
+}
+
 export async function resolveGraphifyPacketIncidenceEndpointsV1(
 	edge: GraphifyEdgeProjectionCandidateV1,
 	snapshot: GraphRevisionSnapshotV1,
-): Promise<{ packet: ResolvedGraphifyPacketEndpointV1; neighbor: ResolvedGraphifyPacketEndpointV1 }> {
+	source: GraphifyPacketIncidenceQueryV1 = pool,
+): Promise<ResolvedGraphifyPacketIncidenceEndpointsV1> {
 	if (!verifyGraphRevisionSnapshotV1(snapshot)) throw new Error('GRAPHIFY_PACKET_INCIDENCE_SNAPSHOT_INVALID');
 	if (edge.workspaceRevision !== snapshot.workspaceRevisionKey) throw new Error('GRAPHIFY_PACKET_INCIDENCE_WORKSPACE_SNAPSHOT_MISMATCH');
 	if (!edge.objectStableSymbolKey || edge.unresolvedTarget) throw new Error('GRAPHIFY_PACKET_INCIDENCE_TARGET_UNRESOLVED');
 	const symbolKeys = [...new Set([edge.subjectStableSymbolKey, edge.objectStableSymbolKey])];
-	const result = await pool.query<GraphifySymbolPacketJoinRowV1>(
+	const result = await source.query<GraphifySymbolPacketJoinRowV1>(
 		`SELECT symbol.stable_symbol_key, file.workspace_revision, file.code_source_revision,
 	        packet.packet_key, packet.source_ref, packet.source_revision,
 	        packet.workspace_revision_key
@@ -46,32 +58,51 @@ export async function resolveGraphifyPacketIncidenceEndpointsV1(
 	);
 	const grouped = new Map<string, GraphifySymbolPacketJoinRowV1[]>();
 	for (const row of result.rows) grouped.set(row.stable_symbol_key, [...(grouped.get(row.stable_symbol_key) ?? []), row]);
-	const subjectRows = grouped.get(edge.subjectStableSymbolKey) ?? [];
-	const neighborRows = grouped.get(edge.objectStableSymbolKey) ?? [];
-	if (subjectRows.length !== 1) throw new Error(`GRAPHIFY_PACKET_SUBJECT_JOIN_NOT_UNIQUE:${subjectRows.length}`);
-	if (neighborRows.length !== 1) throw new Error(`GRAPHIFY_PACKET_NEIGHBOR_JOIN_NOT_UNIQUE:${neighborRows.length}`);
-	const subject = subjectRows[0]!;
-	const neighbor = neighborRows[0]!;
-	if (subject.source_ref !== edge.sourceRef || subject.source_revision !== edge.sourceRevision
-		|| subject.code_source_revision !== edge.sourceRevision || subject.workspace_revision !== edge.workspaceRevision) {
-		throw new Error('GRAPHIFY_PACKET_SUBJECT_REVISION_BINDING_MISMATCH');
+	const subjectRowsRaw = grouped.get(edge.subjectStableSymbolKey) ?? [];
+	const neighborRowsRaw = grouped.get(edge.objectStableSymbolKey) ?? [];
+	const subjectByPacket = new Map(subjectRowsRaw.map((row) => [row.packet_key, row]));
+	const neighborByPacket = new Map(neighborRowsRaw.map((row) => [row.packet_key, row]));
+	if (subjectByPacket.size !== subjectRowsRaw.length) throw new Error('GRAPHIFY_PACKET_SUBJECT_DUPLICATE_PACKET_BINDING');
+	if (neighborByPacket.size !== neighborRowsRaw.length) throw new Error('GRAPHIFY_PACKET_NEIGHBOR_DUPLICATE_PACKET_BINDING');
+	const subjectRows = [...subjectByPacket.values()]
+		.sort((left, right) => left.packet_key.localeCompare(right.packet_key));
+	const neighborRows = [...neighborByPacket.values()]
+		.sort((left, right) => left.packet_key.localeCompare(right.packet_key));
+	if (subjectRows.length === 0) throw new Error('GRAPHIFY_PACKET_SUBJECT_JOIN_MISSING');
+	if (neighborRows.length === 0) throw new Error('GRAPHIFY_PACKET_NEIGHBOR_JOIN_MISSING');
+	if (subjectRows.length > MAX_PACKETS_PER_GRAPHIFY_SYMBOL_V1) {
+		throw new Error(`GRAPHIFY_PACKET_SUBJECT_BINDING_LIMIT_EXCEEDED:${subjectRows.length}`);
 	}
-	if (subject.workspace_revision_key !== edge.workspaceRevision) {
-		throw new Error('GRAPHIFY_PACKET_SUBJECT_WORKSPACE_REVISION_BINDING_MISMATCH');
+	if (neighborRows.length > MAX_PACKETS_PER_GRAPHIFY_SYMBOL_V1) {
+		throw new Error(`GRAPHIFY_PACKET_NEIGHBOR_BINDING_LIMIT_EXCEEDED:${neighborRows.length}`);
 	}
-	if (neighbor.workspace_revision !== edge.workspaceRevision
-		|| !neighbor.code_source_revision || neighbor.source_revision !== neighbor.code_source_revision) {
-		throw new Error('GRAPHIFY_PACKET_NEIGHBOR_REVISION_BINDING_MISMATCH');
+	for (const subject of subjectRows) {
+		if (subject.source_ref !== edge.sourceRef || subject.source_revision !== edge.sourceRevision
+			|| subject.code_source_revision !== edge.sourceRevision || subject.workspace_revision !== edge.workspaceRevision) {
+			throw new Error('GRAPHIFY_PACKET_SUBJECT_REVISION_BINDING_MISMATCH');
+		}
+		if (subject.workspace_revision_key !== edge.workspaceRevision) {
+			throw new Error('GRAPHIFY_PACKET_SUBJECT_WORKSPACE_REVISION_BINDING_MISMATCH');
+		}
 	}
-	if (neighbor.workspace_revision_key !== edge.workspaceRevision) {
-		throw new Error('GRAPHIFY_PACKET_NEIGHBOR_WORKSPACE_REVISION_BINDING_MISMATCH');
+	for (const neighbor of neighborRows) {
+		if (neighbor.source_ref !== edge.objectSourceRef || neighbor.source_revision !== edge.objectSourceRevision) {
+			throw new Error('GRAPHIFY_PACKET_NEIGHBOR_DECLARED_BINDING_MISMATCH');
+		}
+		if (neighbor.workspace_revision !== edge.workspaceRevision
+			|| !neighbor.code_source_revision || neighbor.source_revision !== neighbor.code_source_revision) {
+			throw new Error('GRAPHIFY_PACKET_NEIGHBOR_REVISION_BINDING_MISMATCH');
+		}
+		if (neighbor.workspace_revision_key !== edge.workspaceRevision) {
+			throw new Error('GRAPHIFY_PACKET_NEIGHBOR_WORKSPACE_REVISION_BINDING_MISMATCH');
+		}
 	}
-	const packetRows = [subject, neighbor];
+	const packetRows = [...subjectRows, ...neighborRows];
 	const { resolvePacketKeyResolutionV2 } = await import('../identity/packet-identity-resolver.js');
 	const resolutions = await resolveIncidenceEndpointsV1(
 		packetRows.map((row) => row.packet_key),
 		async (keys) => {
-			const readback = await pool.query<AtlasPacketRowV1 & { workspace_revision_key: string | null }>(
+			const readback = await source.query<AtlasPacketRowV1 & { workspace_revision_key: string | null }>(
 				'SELECT packet_key, source_ref, source_revision, workspace_revision_key FROM atlas_packets WHERE packet_key = ANY($1::text[])',
 				[keys],
 			);
@@ -89,18 +120,21 @@ export async function resolveGraphifyPacketIncidenceEndpointsV1(
 			}
 		},
 	);
-	const toEndpoint = (row: GraphifySymbolPacketJoinRowV1): ResolvedGraphifyPacketEndpointV1 => {
+	const toEndpoint = (row: GraphifySymbolPacketJoinRowV1, graphEndpointKey: string): ResolvedGraphifyPacketEndpointV1 => {
 		const resolution = resolutions.get(row.packet_key);
 		if (resolution?.status !== 'RESOLVED' || resolution.sourceRevision !== row.source_revision) {
 			throw new Error(`GRAPHIFY_PACKET_ENDPOINT_REVISION_UNPROVEN:${row.packet_key}`);
 		}
 		return {
 			...resolution,
-			graphEndpointKey: row.stable_symbol_key,
+			graphEndpointKey,
 			sourceRef: row.source_ref!,
 			workspaceRevision: row.workspace_revision,
 			graphRevision: snapshot.graphRevision,
 		};
 	};
-	return { packet: toEndpoint(subject), neighbor: toEndpoint(neighbor) };
+	return {
+		packets: subjectRows.map((row) => toEndpoint(row, edge.subjectStableSymbolKey)),
+		neighbors: neighborRows.map((row) => toEndpoint(row, edge.objectStableSymbolKey)),
+	};
 }

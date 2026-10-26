@@ -52,7 +52,7 @@ const REDIS_HOST     = process.env.REDIS_HOST || '127.0.0.1';
 const REDIS_PORT     = parseInt(process.env.REDIS_PORT || '6379', 10);
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis';
 const GLYPH_ATLAS = 'glyph_atlas';
-const FALLBACK_COLLECTIONS = ['codebase_chunks_384_hybrid', 'codebase_chunks_768'];
+const FALLBACK_COLLECTIONS = ['codebase_chunks_768'];
 const REDIS_TTL   = 24 * 3600;
 const SCROLL_BATCH = 250;
 

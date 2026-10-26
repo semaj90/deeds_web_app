@@ -9,6 +9,29 @@
 - [ ] Capture a real RTX 3060 Ti cuTile or LibTorch receipt.
 - [ ] Prove CPU/GPU spectral parity using the same frozen ordinal map.
 
+## Cross-runtime capability smoke (2026-10-19)
+
+- Added `scripts/atlas/cross-runtime-abi-v1.spec.mjs` and
+  `npm run atlas:test:cross-runtime-abi` to check the native Node N-API SIMDJSON
+  parse path, independently import WSL RAPIDS/PyTorch packages, and read the
+  existing neural-decoder health contract.
+- Current workstation result: 3/3 tests pass. Native SIMDJSON round-tripped a
+  UTF-8 JSON payload; WSL imports succeeded for cuDF 26.6.1, cuGraph 26.6.0,
+  cuVS 26.6.0, and PyTorch 2.13.0 using CUDA runtime 13.0. The `:8121`
+  health endpoint answered, but reports `degraded` and no loaded checkpoint.
+- This is capability/ABI-boundary evidence only. The test launches no CUDA
+  kernels, does not prove TensorRT or LibTorch runtime execution, and makes no
+  parity, performance, graph-residency, or production-promotion claim. The
+  Python PyTorch runtime remains distinct from the native addon's N-API and
+  LibTorch ABI.
+- **Interop contract recheck (2026-10-19):** Extended the native test to call
+  `simdJsonToCSR` on a three-node JSON edge list and assert the `Int32Array`
+  row-pointer/column-index layout and counts. First run exposed a 45-second
+  WSL cold-import timeout; the read-only RAPIDS/PyTorch import then completed
+  in about 35 seconds, so the probe timeout is now 90 seconds. Re-run passed
+  3/3 (native addon, WSL package imports, `:8121` health; total 36.4 seconds).
+  No CUDA kernel, database/cache write, or model promotion was performed.
+
 ## Re-verification pass (2026-09-05, read-only)
 
 - **Item 1 (native C ABI/N-API spectral/GEMM bridge) — still not implemented.** No file anywhere

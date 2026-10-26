@@ -590,3 +590,69 @@ export function assertExecutorIdIsNotCanonicalIdentity(input: {
     }
   }
 }
+
+export type CandidateReverseLookupKeyV1 = 'canonicalId' | 'packetKey' | 'sourceRef';
+
+export type CandidateReverseLookupResultV1 =
+  | { status: 'UNIQUE'; candidateOrdinal: number }
+  | { status: 'AMBIGUOUS'; candidateOrdinals: readonly number[] }
+  | { status: 'NOT_FOUND' };
+
+export interface CandidateReverseIndexV1 {
+  readonly ordinalMapChecksum: string;
+  readonly workspaceRevision: string;
+  readonly canonicalAuthority: false;
+  lookup(key: CandidateReverseLookupKeyV1, value: string): CandidateReverseLookupResultV1;
+  /** Exact identity tuple; every field must match (no fuzzy or partial resolution). */
+  lookupExact(input: { packetKey: string; sourceRef: string; sourceRevision: string }): CandidateReverseLookupResultV1;
+}
+
+/**
+ * Derived, rebuildable reverse index over a verified CandidateOrdinalMapV1
+ * (O(1) instead of per-consumer linear filters). Never identity: it only
+ * returns ordinals of the map it was built from. Duplicate keys are reported
+ * AMBIGUOUS (fail closed); titleId is deliberately not indexed here because
+ * candidates do not carry it -- resolve title_id -> packet_key in Postgres
+ * first, then look up by packetKey.
+ */
+export function buildCandidateReverseIndexV1(mapInput: CandidateOrdinalMapV1): CandidateReverseIndexV1 {
+  const map = candidateOrdinalMapV1Schema.parse(mapInput);
+  assertCandidateOrdinalMapIntegrityV1(map);
+
+  const tables: Record<CandidateReverseLookupKeyV1, Map<string, number[]>> = {
+    canonicalId: new Map(),
+    packetKey: new Map(),
+    sourceRef: new Map(),
+  };
+  const exact = new Map<string, number[]>();
+  const push = (table: Map<string, number[]>, key: string, ordinal: number) => {
+    const list = table.get(key);
+    if (list) list.push(ordinal);
+    else table.set(key, [ordinal]);
+  };
+  const tupleKey = (packetKey: string, sourceRef: string, sourceRevision: string) =>
+    JSON.stringify([packetKey, sourceRef, sourceRevision]);
+
+  for (const candidate of map.candidates) {
+    push(tables.canonicalId, candidate.canonicalId, candidate.candidateOrdinal);
+    if (candidate.packetKey !== null) push(tables.packetKey, candidate.packetKey, candidate.candidateOrdinal);
+    if (candidate.sourceRef !== null) push(tables.sourceRef, candidate.sourceRef, candidate.candidateOrdinal);
+    if (candidate.packetKey !== null && candidate.sourceRef !== null) {
+      push(exact, tupleKey(candidate.packetKey, candidate.sourceRef, candidate.sourceRevision), candidate.candidateOrdinal);
+    }
+  }
+
+  const resolve = (list: readonly number[] | undefined): CandidateReverseLookupResultV1 => {
+    if (!list || list.length === 0) return { status: 'NOT_FOUND' };
+    if (list.length === 1) return { status: 'UNIQUE', candidateOrdinal: list[0]! };
+    return { status: 'AMBIGUOUS', candidateOrdinals: [...list] };
+  };
+
+  return {
+    ordinalMapChecksum: map.ordinalMapChecksum,
+    workspaceRevision: map.workspaceRevision,
+    canonicalAuthority: false,
+    lookup: (key, value) => resolve(tables[key].get(value)),
+    lookupExact: (input) => resolve(exact.get(tupleKey(input.packetKey, input.sourceRef, input.sourceRevision))),
+  };
+}

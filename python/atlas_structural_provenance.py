@@ -257,6 +257,46 @@ def find_occurrence_positions(
     return result
 
 
+def find_call_expression_byte_spans(
+    source_text: str,
+    language: str,
+    names: list[str],
+) -> dict[str, list[tuple[int, int]]]:
+    """Return exact local UTF-8 byte spans for matched call expressions only."""
+    result: dict[str, list[tuple[int, int]]] = {name: [] for name in names}
+    if not names or not source_text.strip():
+        return result
+    try:
+        from tree_sitter_language_pack import get_parser  # type: ignore
+
+        source_bytes = source_text.encode("utf-8")
+        root = get_parser(language).parse(source_bytes).root_node
+    except Exception:
+        return result
+
+    name_set = set(names)
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        if str(getattr(node, "type", "")) in ("call_expression", "call"):
+            function_node = None
+            for field_name in ("function", "callee"):
+                function_node = node.child_by_field_name(field_name) if hasattr(node, "child_by_field_name") else None
+                if function_node is not None:
+                    break
+            if function_node is not None:
+                callee_text = _dotted_call_text(function_node, source_bytes)
+                start = getattr(node, "start_byte", None)
+                end = getattr(node, "end_byte", None)
+                if callee_text in name_set and isinstance(start, int) and isinstance(end, int) and 0 <= start < end <= len(source_bytes):
+                    result[callee_text].append((start, end))
+        stack.extend(reversed(list(getattr(node, "children", []))))
+
+    for name in result:
+        result[name] = sorted(set(result[name]))
+    return result
+
+
 def occurrence_to_absolute_position(
     chunk_start_line: int,
     chunk_start_column: int,

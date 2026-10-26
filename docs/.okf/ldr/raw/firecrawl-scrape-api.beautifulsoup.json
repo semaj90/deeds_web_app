@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.okf.ldr.capture.v1",
+  "runId": "76839544-4775-496e-9102-846ff58d3368",
+  "sourceId": "firecrawl-scrape-api",
+  "requestedUrl": "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+  "resolvedUrl": "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+  "title": "Scrape - Firecrawl Docs",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "rawChecksum": "2280821003379861afb70656fa786ca439dbab444ff5040c6547dfa95ceef745",
+  "normalizedChecksum": "55851fecc6b3e82b318b7546032bfc96a4709f6191b7f77899a91ba8782d3cad",
+  "capturedMarkdownSha256": "55851fecc6b3e82b318b7546032bfc96a4709f6191b7f77899a91ba8782d3cad",
+  "capturedAt": "2026-10-18T00:51:37.825Z",
+  "parser": "html.parser",
+  "parserVersion": "4.15.0",
+  "canonicalAuthority": false
+}

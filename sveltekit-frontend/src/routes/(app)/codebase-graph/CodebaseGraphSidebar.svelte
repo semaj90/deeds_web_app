@@ -129,10 +129,11 @@ function handleExtensionClick(ext: string) {
 			</div>
 
 			<div class="space-y-2">
-				<label class="block text-sm text-[var(--t-text-muted)]">
+				<label for="graph-sample-limit" class="block text-sm text-[var(--t-text-muted)]">
 					Sample: {limit.toLocaleString()}
 				</label>
 				<input
+					id="graph-sample-limit"
 					type="range"
 					bind:value={limit}
 					min="100"

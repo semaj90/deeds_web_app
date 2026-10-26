@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.jsonl-simd-stream-benchmark.v1",
+  "generatedAt": "2026-10-17T17:12:05.278Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "stagesCovered": [
+    "PARSE-01",
+    "PERF-01"
+  ],
+  "fixture": {
+    "recordCount": 25000,
+    "totalBytes": 8585210,
+    "totalMB": 8.187,
+    "chunkCount": 131,
+    "batchRecords": 512
+  },
+  "parity": {
+    "recordCountMatches": true,
+    "packetKeySequenceDigestMatches": true,
+    "packetKeySequenceDigest": "b298895001f5bc74dcbd5c2cb13983b8bb46b6a18d1c91f3ce0c42d6d1280780"
+  },
+  "baselineWholeBufferJsonParse": {
+    "elapsedMs": 161.69,
+    "recordsPerSec": 154621,
+    "mbPerSec": 50.64,
+    "rssDeltaMB": 14.14
+  },
+  "boundedStreamJsonlBatchesV1": {
+    "elapsedMs": 284.41,
+    "batchCount": 49,
+    "recordsPerSec": 87902,
+    "mbPerSec": 28.79,
+    "p50BatchLatencyMs": 4.7271,
+    "p95BatchLatencyMs": 8.7797,
+    "p99BatchLatencyMs": 25.0564,
+    "rssDeltaMB": -0.27,
+    "domainPartitionCounts": {
+      "ast": 8334,
+      "graph": 8333,
+      "retrieval": 8333
+    },
+    "partitionSkewRatio": 1.0001
+  }
+}

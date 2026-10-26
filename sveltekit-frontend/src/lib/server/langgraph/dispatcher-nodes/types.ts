@@ -3,7 +3,11 @@
  * Shared types for all 9 LangGraph dispatcher nodes
  */
 
+import type { PacketCentricContext } from '../../telemetry/packet-centric-telemetry.js';
+
 export interface DispatcherState {
+  trace_id?: string | null;
+  packet_context?: PacketCentricContext;
   // Input from retrieval orchestrator
   query: string;
   candidates: CandidatePacket[];

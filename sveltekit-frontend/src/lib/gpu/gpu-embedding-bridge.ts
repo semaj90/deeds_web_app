@@ -16,7 +16,7 @@ import type {
 	QLoRAProtobufMetrics
 } from '$lib/types/qlora-protobuf.js';
 import { QLoRABinaryCodec } from '$lib/types/qlora-protobuf.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 
 /** Embedding dimensions for our models */
@@ -131,7 +131,7 @@ async function generateEmbeddings(texts: string[]): Promise<Float32Array[]> {
 
 	for (const text of texts) {
 		try {
-			const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+			const res = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

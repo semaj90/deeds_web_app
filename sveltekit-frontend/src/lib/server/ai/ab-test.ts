@@ -13,7 +13,7 @@
  *
  * Usage:
  *   const variant = await getVariant('legal-model-test', userId);
- *   // variant.model → 'gemma4-rotorquant:latest' or 'gemma3:270m'
+ *   // variant.model → SERVER_CHAT_MODEL (Ornith 1.5)
  *   await recordImpression('legal-model-test', variant.variantId);
  *   // ... run inference ...
  *   await recordWin('legal-model-test', variant.variantId, { durationMs, feedbackScore });
@@ -77,11 +77,10 @@ const EXPERIMENTS: Map<string, AbExperiment> = new Map([
     'legal-model-test',
     {
       experimentId: 'legal-model-test',
-      description: 'Compare the local llama-server chat model (full) vs gemma3:270m (fast) for legal Q&A',
-      active: true,
+      description: 'Retired: model comparisons are disabled until an approved Ornith-only evaluation is defined.',
+      active: false,
       variants: [
-        { variantId: 'control', label: 'Legal VLM (full)', model: SERVER_CHAT_MODEL, pct: 70 },
-        { variantId: 'fast',    label: 'Gemma3 270M (fast)', model: 'gemma3:270m', pct: 30 },
+        { variantId: 'ornith', label: 'Ornith 1.5 via llama-server', model: SERVER_CHAT_MODEL, pct: 100 },
       ],
     },
   ],
@@ -89,17 +88,19 @@ const EXPERIMENTS: Map<string, AbExperiment> = new Map([
     'turbo-vs-ollama',
     {
       experimentId: 'turbo-vs-ollama',
-      description: 'TurboQuant (:8090) vs Ollama (:11434) latency comparison',
-      active: true,
+      description: 'Retired: alternate chat backends are disabled by the Ornith-only model authority policy.',
+      active: false,
       variants: [
-        { variantId: 'turboquant', label: 'TurboQuant', model: SERVER_CHAT_MODEL, pct: 50, backendHint: 'turboquant' },
-        { variantId: 'ollama',     label: 'Ollama',     model: 'gemma4-rotorquant:latest', pct: 50, backendHint: 'ollama' },
+        { variantId: 'ornith', label: 'Ornith 1.5 via llama-server', model: SERVER_CHAT_MODEL, pct: 100 },
       ],
     },
   ],
 ]);
 
 export function registerExperiment(exp: AbExperiment): void {
+  if (exp.variants.some((variant) => variant.model !== SERVER_CHAT_MODEL || variant.backendHint !== undefined)) {
+    throw new Error('AB_EXPERIMENT_MODEL_AUTHORITY_VIOLATION');
+  }
   const total = exp.variants.reduce((s, v) => s + v.pct, 0);
   if (Math.abs(total - 100) > 0.01) {
     throw new Error(`Experiment ${exp.experimentId}: variant percentages must sum to 100 (got ${total})`);

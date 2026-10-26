@@ -33,14 +33,14 @@
 > repo's documented pre-commit hook rejecting files >10MB. This is expected, not a mistake; the
 > file is still on disk and still usable for task 2.x next session. Do not try to force-add it.
 
-- [ ] 2.1 Present the fresh snapshot's readback-proven receipt to the operator and request
+- [x] 2.1 (2026-10-23: operator gave explicit authorization) Present the fresh snapshot's readback-proven receipt to the operator and request
       explicit authorization (matching the existing `approval.confirmation:
       "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1"` contract) before writing a new
       `workspace-revision-tournament-admission-v1.json`.
-- [ ] 2.2 On authorization, write the new admission receipt with `authority: true`, referencing
+- [x] 2.2 (2026-10-23: archived prior live receipt to .tmp/atlas/tournament-admission-archive/, installed admission3.json as live receipt; new receipt authority true, workspaceRevision sha256:6ea386a1…, snapshotRevision sha256:8a27e034…) On authorization, write the new admission receipt with `authority: true`, referencing
       the fresh `snapshotRevision`. On refusal or no response, stop — leave the prior admission
       receipt as the live one, unchanged.
-- [ ] 2.3 Re-run `resolveCurrentWorkspaceFrameV1()` + `computeWorkspaceFrameAuthorityV1()`
+- [x] 2.3 (2026-10-23: resolveCurrentWorkspaceFrameV1 selected sha256:6ea386a1…, computeWorkspaceFrameAuthorityV1 frameAuthoritative=true, authorityConflict=false, blockers=[]; graph expansion and projection remain unauthorized) Re-run `resolveCurrentWorkspaceFrameV1()` + `computeWorkspaceFrameAuthorityV1()`
       against the new admission and confirm `frameAuthoritative: true`, `authorityConflict:
       false`, zero blockers — the same bar Gate 1 already proved for the prior admission.
 
@@ -148,10 +148,12 @@ docs/reports/graphify-workspace-snapshot-binding-v1-rerun-20260914.json 43,680,2
 docs/reports/graphify-workspace-snapshot-binding-v1.json         44,883,450 bytes
 ```
 
-- [ ] 7.1 Determine whether `feature-ontology-current-cohort-v1-codex.json` and
-      `feature-ontology-current-cohort-v1.json.tmp-3904` are genuinely stale duplicates of
-      `feature-ontology-current-cohort-v1.json` (byte-identical size strongly suggests yes) — if
-      confirmed, archive per this repo's archive-not-delete convention rather than deleting.
+- [x] 7.1 Compared full SHA-256 values for `feature-ontology-current-cohort-v1-codex.json`,
+      `feature-ontology-current-cohort-v1.json.tmp-3904`, and `feature-ontology-current-cohort-v1.json`.
+      Although all three are 332,702,851 bytes, their digests differ (`7e474cb0…d3ba6`,
+      `07ac4b04…d04a3`, and `79416feb…3f2ae` respectively); they are not byte-identical duplicates.
+      All three remain at their original paths and were NTFS-compressed with unchanged hashes;
+      no archival or deletion was performed.
 - [ ] 7.2 Investigate why `feature-ontology-current-cohort-v1.json` / `-packet-lineage-v1.json`
       are ~330MB — almost certainly a producer bug (e.g. writing a full corpus dump instead of a
       bounded cohort, matching this same session's earlier discovery that "current cohort" work

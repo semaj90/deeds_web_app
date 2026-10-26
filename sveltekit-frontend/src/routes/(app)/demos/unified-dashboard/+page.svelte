@@ -336,12 +336,12 @@
 						<div class="card-header"><h2>General</h2></div>
 						<div class="settings-form">
 							<div class="form-field">
-								<label>Organization Name</label>
-								<input type="text" value="DEEDS Legal AI Division" readonly />
+								<label for="unified-org-name">Organization Name</label>
+								<input id="unified-org-name" type="text" value="DEEDS Legal AI Division" readonly />
 							</div>
 							<div class="form-field">
-								<label>System Language</label>
-								<select><option>English (US)</option><option>Japanese</option><option>Spanish</option></select>
+								<label for="unified-sys-lang">System Language</label>
+								<select id="unified-sys-lang"><option>English (US)</option><option>Japanese</option><option>Spanish</option></select>
 							</div>
 							<div class="form-toggle">
 								<div class="toggle-info">
@@ -363,13 +363,13 @@
 						<div class="card-header"><h2>AI Engine</h2></div>
 						<div class="settings-form">
 							<div class="form-field">
-								<label>Active Model</label>
-								<select><option>gemma4-legal:latest (11.8B)</option><option>llama3:8b</option></select>
+								<label for="unified-active-model">Active Model</label>
+								<select id="unified-active-model"><option>ornith-1.5-9b (11.8B)</option><option>llama3:8b</option></select>
 							</div>
 							<div class="form-field">
-								<label>Temperature</label>
+								<label for="unified-temperature">Temperature</label>
 								<div class="range-row">
-									<input type="range" min="0" max="1" step="0.1" value="0.7" />
+									<input id="unified-temperature" type="range" min="0" max="1" step="0.1" value="0.7" />
 									<span class="range-value">0.7</span>
 								</div>
 							</div>

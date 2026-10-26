@@ -3,7 +3,7 @@ import { assertEmbeddingModel } from '$lib/ai/model-ids.js';
 import { traceLLM, traceEmbedding } from '$lib/server/observability/langfuse.js';
 import {
   getEmbeddingModelKeepAlive,
-  ollamaFetch,
+  embedOrChatFetch,
 } from '$lib/server/ollama.js';
 import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { LLAMA_SERVER_BASE_URL } from './local-llama-provider.js';
@@ -60,7 +60,7 @@ export async function fetchFromOllama<T>(
   const url = `${getOllamaBaseUrl()}${path.startsWith('/') ? path : `/${path}`}`;
 
   try {
-    const response = await ollamaFetch(url, {
+    const response = await embedOrChatFetch(url, {
       ...init,
       signal: controller.signal,
     });

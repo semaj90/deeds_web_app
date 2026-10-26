@@ -38,6 +38,31 @@ export const DomainClassificationV1Schema = z.object({
 
 export type DomainClassificationV1 = z.infer<typeof DomainClassificationV1Schema>;
 
+const OkfDomainClassificationBatchBaseV1Schema = z.object({
+  schema: z.literal('atlas.okf.domain-classification-batch.v1'),
+  taxonomyRevision: z.string().min(1),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict();
+
+export const OkfDomainClassificationBatchV1Schema = z.discriminatedUnion('status', [
+  OkfDomainClassificationBatchBaseV1Schema.extend({
+    status: z.literal('PROPOSAL_ONLY'),
+    rows: z.array(DomainClassificationV1Schema).min(1),
+    reason: z.null(),
+  }),
+  OkfDomainClassificationBatchBaseV1Schema.extend({
+    status: z.literal('UNAVAILABLE'),
+    rows: z.array(DomainClassificationV1Schema).length(0),
+    reason: z.enum([
+      'CLASSIFICATION_EVIDENCE_REFS_MISSING',
+      'NO_CANONICAL_DOMAIN_LABELS',
+    ]),
+  }),
+]);
+
+export type OkfDomainClassificationBatchV1 = z.infer<typeof OkfDomainClassificationBatchV1Schema>;
+
 export const OkfFeatureValueV1Schema = z.object({
   featureId: z.string().min(1),
   featureRevision: z.string().min(1),

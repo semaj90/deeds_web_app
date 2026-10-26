@@ -1,4 +1,6 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import type { RepairEvalExampleV1 } from '../evals/repair-eval-contract.js';
 import { TaskPromotionGateSchema } from '../contracts/recommendation.js';
 
 export const KanbanRecommendationProjectionV1Schema = z.object({
@@ -20,6 +22,19 @@ export const KanbanRecommendationProjectionV1Schema = z.object({
 }).strict();
 
 export type KanbanRecommendationProjectionV1 = z.infer<typeof KanbanRecommendationProjectionV1Schema>;
+
+export const KanbanReviewEventV1Schema = z.object({
+	schema: z.literal('atlas.kanban-review-event.v1'),
+	eventId: z.string().min(1),
+	recommendationId: z.string().min(1),
+	decision: z.enum(['approve', 'reject', 'request_changes']),
+	reviewerId: z.string().min(1),
+	notes: z.string().optional(),
+	timestamp: z.string().datetime(),
+	appliedToEval: z.boolean(),
+}).strict();
+
+export type KanbanReviewEventV1 = z.infer<typeof KanbanReviewEventV1Schema>;
 
 export function projectRecommendationToKanbanV1(input: {
 	recommendationId: string;
@@ -55,4 +70,96 @@ export function projectRecommendationToKanbanV1(input: {
 		featureRevision: input.featureRevision,
 		createdAt: input.createdAt ?? new Date().toISOString(),
 	});
+}
+
+export interface RecordReviewDecisionResultV1 {
+	updatedRecommendation: KanbanRecommendationProjectionV1;
+	reviewEvent: KanbanReviewEventV1;
+	evalTrainingCandidate?: RepairEvalExampleV1;
+}
+
+export function recordReviewDecisionV1(
+	recommendation: KanbanRecommendationProjectionV1,
+	decision: 'approve' | 'reject' | 'request_changes',
+	options: {
+		reviewerId: string;
+		notes?: string;
+		timestamp?: string;
+	},
+): RecordReviewDecisionResultV1 {
+	const parsedRec = KanbanRecommendationProjectionV1Schema.parse(recommendation);
+	const timestamp = options.timestamp ?? new Date().toISOString();
+	const eventId = `rev-${createHash('sha256').update(`${parsedRec.recommendationId}:${decision}:${timestamp}`).digest('hex').slice(0, 16)}`;
+
+	let newStatus: KanbanRecommendationProjectionV1['status'];
+	if (decision === 'approve') {
+		newStatus = 'approved';
+	} else if (decision === 'reject') {
+		newStatus = 'rejected';
+	} else {
+		newStatus = 'review_required';
+	}
+
+	const updatedRecommendation: KanbanRecommendationProjectionV1 = {
+		...parsedRec,
+		status: newStatus,
+		humanDecision: decision,
+	};
+
+	const reviewEvent: KanbanReviewEventV1 = {
+		schema: 'atlas.kanban-review-event.v1',
+		eventId,
+		recommendationId: parsedRec.recommendationId,
+		decision,
+		reviewerId: options.reviewerId,
+		notes: options.notes,
+		timestamp,
+		appliedToEval: false,
+	};
+
+	return {
+		updatedRecommendation,
+		reviewEvent,
+	};
+}
+
+export function deduplicateKanbanRecommendationsV1(
+	recommendations: readonly KanbanRecommendationProjectionV1[],
+): KanbanRecommendationProjectionV1[] {
+	const priorityRank: Record<KanbanRecommendationProjectionV1['priority'], number> = {
+		critical: 4,
+		high: 3,
+		medium: 2,
+		low: 1,
+	};
+
+	const seenByFingerprint = new Map<string, KanbanRecommendationProjectionV1>();
+
+	for (const rec of recommendations) {
+		const parsed = KanbanRecommendationProjectionV1Schema.parse(rec);
+		const fingerprint = createHash('sha256')
+			.update(`${parsed.graphifyRevision}::${parsed.evidenceRefs.slice().sort().join(',')}`)
+			.digest('hex');
+
+		const existing = seenByFingerprint.get(fingerprint);
+		if (!existing) {
+			seenByFingerprint.set(fingerprint, parsed);
+		} else {
+			const higherPriority = priorityRank[parsed.priority] > priorityRank[existing.priority] ? parsed.priority : existing.priority;
+			const mergedTargets = [...new Set([...existing.targetFiles, ...parsed.targetFiles])].sort();
+			const mergedCriteria = [...new Set([...existing.acceptanceCriteria, ...parsed.acceptanceCriteria])];
+			const mergedCommands = [...new Set([...existing.validationCommands, ...parsed.validationCommands])];
+
+			const merged: KanbanRecommendationProjectionV1 = {
+				...existing,
+				priority: higherPriority,
+				targetFiles: mergedTargets,
+				acceptanceCriteria: mergedCriteria,
+				validationCommands: mergedCommands,
+			};
+			seenByFingerprint.set(fingerprint, merged);
+		}
+	}
+
+	return Array.from(seenByFingerprint.values());
 }

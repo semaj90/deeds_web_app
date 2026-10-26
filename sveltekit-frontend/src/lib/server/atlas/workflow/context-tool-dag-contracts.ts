@@ -221,7 +221,14 @@ export function buildContextToolDagFromPreAgentStages(input: {
  * them), except the EXACT_PROMOTION join, which degrades onto the lookups that succeeded. Refuses any DAG with a non-read-only node or canonicalWritesAllowed=true. The receipt is
  * transport evidence only (canonicalAuthority:false); it does not replace KagDagRunner or its persisted runs.
  */
-export type ContextDagNodeHandlerV1 = (input: { nodeId: string; inputs: Record<string, unknown> }) => Promise<unknown>;
+export type ContextDagExecutionContextV1 = Pick<ContextToolDagV1,
+  'workflowId' | 'workflowRevision' | 'requestId' | 'workspaceRevision' | 'graphRevision' | 'producerRevision'>;
+
+export type ContextDagNodeHandlerV1 = (input: {
+  nodeId: string;
+  inputs: Record<string, unknown>;
+  context?: ContextDagExecutionContextV1;
+}) => Promise<unknown>;
 
 export interface ContextDagNodeReceiptV1 {
   nodeId: string;
@@ -313,7 +320,18 @@ export async function executeContextToolDagV1(
         const inputs: Record<string, unknown> = {};
         for (const d of okDeps) inputs[d] = outputs[d];
         // Promise.resolve: a handler that returns a plain value (not a Promise) is still a success.
-        outputs[nodeId] = await withTimeout(Promise.resolve(handler({ nodeId, inputs })));
+        outputs[nodeId] = await withTimeout(Promise.resolve(handler({
+          nodeId,
+          inputs,
+          context: {
+            workflowId: dag.workflowId,
+            workflowRevision: dag.workflowRevision,
+            requestId: dag.requestId,
+            workspaceRevision: dag.workspaceRevision,
+            graphRevision: dag.graphRevision,
+            producerRevision: dag.producerRevision,
+          },
+        })));
         receipts.set(nodeId, { ...base, status: 'OK', durationMs: Date.now() - started, error: null });
       } catch (err) {
         receipts.set(nodeId, { ...base, status: 'FAILED', durationMs: Date.now() - started, error: err instanceof Error ? err.message : String(err) });
@@ -434,7 +452,7 @@ export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): Ca
   });
   return {
     ...canonical,
-    transport: local.transport,
+    transport: local.transport ?? undefined,
     canonicalIds: local.canonicalIds,
     toolName: local.toolName ?? undefined,
     mutationRequested: local.mutationRequested,

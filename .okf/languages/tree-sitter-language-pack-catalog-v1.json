@@ -1,0 +1,1502 @@
+{
+  "schema": "atlas.okf-tree-sitter-language-catalog.v1",
+  "catalogId": "tree-sitter-language-pack",
+  "source": {
+    "packageName": "tree-sitter-language-pack",
+    "packageVersion": "1.14.0",
+    "sourceRef": "wsl://Ubuntu/home/james/.cache/tree-sitter-language-pack/v1.14.0/manifest.json",
+    "manifestSha256": "fb850b3a616018ebb22f3727383ead8058751ff50351c355db9e69654871f70e",
+    "observedPythonVersion": "3.14.6"
+  },
+  "namespace": "PARSER_GRAMMAR_ID",
+  "entries": [
+    {
+      "grammarId": "abl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "abnf",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "actionscript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ada",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "agda",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "aiken",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "al",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "angular",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "apache_avro",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "apex",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "applescript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "arduino",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "asciidoc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "asm",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "astro",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "awk",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ballerina",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "bash",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "bass",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "batch",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "beancount",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "bibtex",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "bicep",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "bitbake",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "blade",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "bpftrace",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "brightscript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "bsl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "c",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "c3",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "caddy",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cairo",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "capnp",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cedar",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cedarschema",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cel",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cfml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "chatito",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "chuck",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "circom",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "clarity",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "clojure",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cmake",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cobol",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "comment",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "commonlisp",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cooklang",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "corn",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cpon",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cpp",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "crystal",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "csharp",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "css",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cst",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "csv",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cuda",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cue",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cylc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cypher",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "cython",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "d",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "d2",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "dart",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "desktop",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "devicetree",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "dhall",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "diff",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "djot",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "dockerfile",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "dot",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "dotenv",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "doxygen",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "dtd",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "earthfile",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ebnf",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "editorconfig",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "edoc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "eds",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "eex",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "eiffel",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "elisp",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "elixir",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "elm",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "elsa",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "elvish",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "embeddedtemplate",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "enforce",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "erlang",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "facility",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "faust",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fennel",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fidl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "firrtl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fish",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "flatbuffers",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fluent",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "foam",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "forth",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fortran",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fsharp",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fsharp_signature",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "func",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "fusion",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gap",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gcode",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gdscript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gdshader",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gherkin",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "git_config",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "git_rebase",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gitattributes",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gitcommit",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gitignore",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gleam",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "glimmer",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "glsl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gn",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gnuplot",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "go",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "godot_resource",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gomod",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gosum",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gotmpl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gowork",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gpg",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "graphql",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gren",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "groovy",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "gstlaunch",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hack",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "haml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hare",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "haskell",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "haskell_persistent",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "haxe",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hcl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "heex",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hjson",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hlsl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hocon",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hoon",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "html",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "htmldjango",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "http",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hurl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "hyprlang",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "idl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "idris",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ini",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ispc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "jai",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "janet",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "java",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "javadoc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "javascript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "jinja2",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "jjdescription",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "jq",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "jsdoc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "json",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "json5",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "jsonnet",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "julia",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "just",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "kcl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "kconfig",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "kdl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "kitty",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "koka",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "kotlin",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "koto",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "kusto",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "lalrpop",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "latex",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "lean",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ledger",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "leo",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "less",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "linkerscript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "liquid",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "llvm",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "llvm_mir",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "lua",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "luadoc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "luap",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "luau",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "m68k",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "magik",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "make",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "markdown",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "markdown_inline",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "matlab",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "menhir",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "mermaid",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "meson",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "mlir",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "mojo",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "moonbit",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "motoko",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "move",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "nasm",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "netlinx",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "nginx",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "nickel",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "nim",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ninja",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "nix",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "norg",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "norg_meta",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "nqc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "nushell",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "objc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ocaml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ocaml_interface",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ocamllex",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "odin",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "openscad",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "org",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "pascal",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "pem",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "penrose",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "perl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "pgn",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "php",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "phpdoc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "picat",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "pkl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "plantuml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "po",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "poe_filter",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "pony",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "postgres",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "postscript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "powershell",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "printf",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "prisma",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "prolog",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "promela",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "promql",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "properties",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "proto",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "prql",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "psv",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "pug",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "puppet",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "purescript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "pymanifest",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "python",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ql",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "qmldir",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "qmljs",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "query",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "r",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "racket",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rasi",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "razor",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rbs",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "re2c",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "readline",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "reason",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "regex",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rego",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "requirements",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rescript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "robot",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "roc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ron",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rshtml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rst",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rtf",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ruby",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "rust",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sas",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "scala",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "scfg",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "scheme",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "scss",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sflog",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "slang",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "slim",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "slint",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "smali",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "smalltalk",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "smithy",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "snakemake",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "snl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "solidity",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "soql",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sosl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "souffle",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sourcepawn",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sparql",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "spicedb",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sql",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sql_bigquery",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "squirrel",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ssh_config",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "stan",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "starlark",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "strace",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "styled",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "superhtml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "svelte",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sway",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "swift",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sxhkdrc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "sysml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "systemtap",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "systemverilog",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "t32",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tablegen",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tact",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "task",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tcl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "teal",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "templ",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tera",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "terraform",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "test",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "textproto",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "thrift",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tlaplus",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tmux",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "todotxt",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "toml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "TSQL",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tsv",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "tsx",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "turtle",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "twig",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "typescript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "typespec",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "typoscript",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "typst",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "udev",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ungrammar",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "unison",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "uxntal",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "v",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vala",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vb",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vento",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "verilog",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vhdl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vhs",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vim",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vimdoc",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vrl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "vue",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "wast",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "wat",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "wdl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "wgsl",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "wgsl_bevy",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "wit",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "wolfram",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "x86asm",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "xcompose",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "xit",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "xml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "xquery",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "xresources",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "yaml",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "yang",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "yuck",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "yul",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "zig",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ziggy",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "ziggy_schema",
+      "qualification": "CANDIDATE"
+    },
+    {
+      "grammarId": "zsh",
+      "qualification": "CANDIDATE"
+    }
+  ],
+  "lspServerBindings": [],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "catalogSha256": "40fbd90e480e71d571d9f06000a905e2edd6f74cd507316a4f5887924c902171"
+}

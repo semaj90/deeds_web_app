@@ -191,7 +191,7 @@ function resolveProviderConfig() {
     String(process.env.GEMMA4_MODEL ?? '').trim() ||
     String(process.env.ROTORQUANT_CHAT_MODEL ?? '').trim() ||
     String(process.env.MODEL ?? '').trim() ||
-    'gemma4-rotorquant:latest';
+    'ornith-1.5-9b';
 
   return {
     providerName: 'phase101-local-openai',

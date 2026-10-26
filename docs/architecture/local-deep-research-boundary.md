@@ -7,7 +7,7 @@ Date: 2026-06-01
 This note applies to the current Windows 10 Home + WSL2 deployment used in this repo, including:
 
 - the `local-deep-research` compose project in `C:\Users\james\Downloads\Hermes-Ollama\local-deep-research-docker-desktop`
-- the host-side OpenCode / Gemma4 runtime
+- the host-side OpenCode / Ornith 1.5 runtime
 - the backend stores and GPU addons in `C:\Users\james\Videos\deeds-web-app`
 
 It does not define a new runtime by itself. It documents the boundary that the repo should follow while the Phase 101C lane is implemented.
@@ -25,7 +25,7 @@ The goal is to keep research execution flexible while preserving a single source
 ## Core rule
 
 - `local-deep-research` is a research backend.
-- OpenCode + Gemma4 remains the user-facing assistant path.
+- OpenCode remains the user-facing assistant path; Ornith 1.5 is the active synthesis/tool-use runtime, resolved from the live runtime configuration.
 - SQLite on the research side is operational state, not canonical memory.
 - Canonical memory and indexing live in the backend stores.
 
@@ -40,7 +40,7 @@ The goal is to keep research execution flexible while preserving a single source
 
 | Layer | Role | What lives here | What does not live here |
 | --- | --- | --- | --- |
-| Windows host | OpenCode, Gemma4, native addons, host model server | assistant orchestration, N-API addons, local model runtime, user-facing tools | canonical research truth, long-lived research state |
+| Windows host | OpenCode, Ornith 1.5 runtime, native addons, host model server | assistant orchestration, N-API addons, local model runtime, user-facing tools | canonical research truth, long-lived research state |
 | WSL2 / Docker Linux | optional GPU containers, research workers, model servers | CUDA containers, cuDNN-enabled workers, cuVS experiments, local-deep-research GPU override | browser state, UI caches, canonical DB truth |
 | Browser / Service Worker | client cache and offline UX | request cache, IndexedDB, ephemeral UI state | Postgres indexing, canonical vectors, graph truth |
 | Research sidecar SQLite | transient LDR state | task status, local history, research scratch state | durable atlas rows, ACE canonical packets, vector truth |
@@ -187,7 +187,7 @@ Use the Windows host for:
 - `tensorrt_bridge.node`
 - cuBLAS / cuBLASLt-backed tensor ops
 - fast JSON parsing
-- host-side OpenCode + Gemma4 orchestration
+- host-side OpenCode + Ornith 1.5 orchestration
 
 ### WSL2 / Docker
 
@@ -217,7 +217,7 @@ The WSL2 GPU override is optional. Do not assume the research UI container itsel
 6. Persist structured rows and indexed metadata in Postgres 18.
 7. Persist vectors in pgvector or Qdrant depending on retrieval role.
 8. Warm Redis / Bitfrost for prompt-facing packets.
-9. Emit ACE packets for OpenCode / Gemma4.
+9. Emit ACE packets for OpenCode / the active Ornith 1.5 runtime.
 
 ## Implementation checklist
 
@@ -231,9 +231,9 @@ The WSL2 GPU override is optional. Do not assume the research UI container itsel
 8. Recreate the research container with the WSL2 GPU override only if GPU execution must move into the container.
 9. Re-run the assistant-path comparison after each boundary change.
 
-## Gemini / Gemma4 / research split
+## Ornith / research split
 
-- **Gemma4**: synthesis, summarization, tool-calling assistant
+- **Ornith 1.5**: active synthesis and tool-calling runtime; resolve the served model ID at runtime rather than inferring it from this document
 - **local-deep-research**: research backend, search, crawl, summarize, report
 - **Hermes**: archived to the deeds_labs legacy surface; test-only unless a specific lane proves useful
 

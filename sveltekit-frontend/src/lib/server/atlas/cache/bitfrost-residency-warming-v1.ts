@@ -310,6 +310,128 @@ export function buildHotnessSnapshotV1(
   };
 }
 
+export type ResidencyTierV1 = 'HOT' | 'WARM' | 'COLD';
+
+export interface ResidencyBudgetCandidateV1 extends HotArtifactV1 {
+  eligibility: 'QUALIFIED' | 'INELIGIBLE';
+  sourceRevision: string | null;
+  representationRevision: string | null;
+}
+
+export interface ResidencyBudgetPlanInputV1 {
+  hotBudgetBytes: number;
+  warmBudgetBytes: number;
+  candidates: readonly ResidencyBudgetCandidateV1[];
+}
+
+export interface ResidencyBudgetPlanEntryV1 {
+  key: string;
+  kind: BitfrostArtifactKindV1;
+  tier: ResidencyTierV1;
+  byteCost: number;
+  utilityScore: number;
+  sourceRevision: string | null;
+  representationRevision: string | null;
+  reason: 'ADVISORY_BUDGET_SELECTION' | 'INELIGIBLE' | 'REVISION_MISSING' | 'NO_POSITIVE_UTILITY' | 'BUDGET_EXCEEDED';
+}
+
+export interface ResidencyBudgetPlanV1 {
+  schema: 'atlas.bitfrost-residency-budget-plan.v1';
+  policy: 'UTILITY_PER_BYTE_GREEDY_V1';
+  hotBudgetBytes: number;
+  warmBudgetBytes: number;
+  hotBytes: number;
+  warmBytes: number;
+  entries: readonly ResidencyBudgetPlanEntryV1[];
+  writesPerformed: false;
+  eligibleForAuthority: false;
+}
+
+function isNonNegativeFinite(value: number): boolean {
+  return Number.isFinite(value) && value >= 0;
+}
+
+/**
+ * Builds a deterministic, advisory-only HOT/WARM/COLD plan under byte caps.
+ * It performs no cache I/O; eligibility and revision evidence must come from
+ * the caller's existing qualification boundary.
+ */
+export function buildResidencyBudgetPlanV1(
+  input: ResidencyBudgetPlanInputV1,
+): ResidencyBudgetPlanV1 {
+  if (!isNonNegativeFinite(input.hotBudgetBytes) || !isNonNegativeFinite(input.warmBudgetBytes)) {
+    throw new Error('RESIDENCY_BUDGET_INVALID');
+  }
+
+  const seen = new Set<string>();
+  for (const candidate of input.candidates) {
+    if (!candidate.key || seen.has(candidate.key)) throw new Error('RESIDENCY_CANDIDATE_KEY_INVALID_OR_DUPLICATE');
+    seen.add(candidate.key);
+    if (!isNonNegativeFinite(candidate.residencyScore.score) || !isNonNegativeFinite(candidate.residencyScore.components.byteCost)) {
+      throw new Error('RESIDENCY_CANDIDATE_COST_OR_SCORE_INVALID');
+    }
+  }
+
+  const entries = new Map<string, ResidencyBudgetPlanEntryV1>();
+  for (const candidate of input.candidates) {
+    const byteCost = candidate.residencyScore.components.byteCost;
+    const revisionsPresent = Boolean(candidate.sourceRevision?.trim() && candidate.representationRevision?.trim());
+    const initialReason = candidate.eligibility !== 'QUALIFIED'
+      ? 'INELIGIBLE'
+      : !revisionsPresent
+        ? 'REVISION_MISSING'
+        : candidate.residencyScore.score <= 0 || byteCost <= 0
+          ? 'NO_POSITIVE_UTILITY'
+          : 'BUDGET_EXCEEDED';
+    entries.set(candidate.key, {
+      key: candidate.key,
+      kind: candidate.kind,
+      tier: 'COLD',
+      byteCost,
+      utilityScore: candidate.residencyScore.score,
+      sourceRevision: candidate.sourceRevision,
+      representationRevision: candidate.representationRevision,
+      reason: initialReason,
+    });
+  }
+
+  const eligible = input.candidates
+    .filter((candidate) => candidate.eligibility === 'QUALIFIED' && Boolean(candidate.sourceRevision?.trim() && candidate.representationRevision?.trim()))
+    .filter((candidate) => candidate.residencyScore.score > 0 && candidate.residencyScore.components.byteCost > 0)
+    .sort((a, b) => {
+      const aDensity = a.residencyScore.score / a.residencyScore.components.byteCost;
+      const bDensity = b.residencyScore.score / b.residencyScore.components.byteCost;
+      return bDensity - aDensity || b.residencyScore.score - a.residencyScore.score || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
+    });
+
+  let hotBytes = 0;
+  let warmBytes = 0;
+  for (const candidate of eligible) {
+    const entry = entries.get(candidate.key)!;
+    if (hotBytes + entry.byteCost <= input.hotBudgetBytes) {
+      entry.tier = 'HOT';
+      entry.reason = 'ADVISORY_BUDGET_SELECTION';
+      hotBytes += entry.byteCost;
+    } else if (warmBytes + entry.byteCost <= input.warmBudgetBytes) {
+      entry.tier = 'WARM';
+      entry.reason = 'ADVISORY_BUDGET_SELECTION';
+      warmBytes += entry.byteCost;
+    }
+  }
+
+  return {
+    schema: 'atlas.bitfrost-residency-budget-plan.v1',
+    policy: 'UTILITY_PER_BYTE_GREEDY_V1',
+    hotBudgetBytes: input.hotBudgetBytes,
+    warmBudgetBytes: input.warmBudgetBytes,
+    hotBytes,
+    warmBytes,
+    entries: [...entries.values()].sort((a, b) => a.key < b.key ? -1 : a.key > b.key ? 1 : 0),
+    writesPerformed: false,
+    eligibleForAuthority: false,
+  };
+}
+
 // ── Bounded warm plan ─────────────────────────────────────────────────────
 
 export interface WarmPlanEntryV1 {

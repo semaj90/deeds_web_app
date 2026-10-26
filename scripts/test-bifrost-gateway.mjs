@@ -5,7 +5,7 @@ async function test() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'ollama/gemma4-rotorquant:latest',
+      model: 'ollama/ornith-1.5-9b',
       messages: [{ role: 'user', content: 'Hello' }],
       temperature: 0.7
     })

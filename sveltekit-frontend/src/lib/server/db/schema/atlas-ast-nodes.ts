@@ -1,4 +1,4 @@
-import { pgTable, text, integer, bigint, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, bigint, timestamp, index, uniqueIndex } from 'drizzle-orm/pg-core';
 
 /**
  * atlas_ast_nodes
@@ -128,3 +128,23 @@ export const atlasSourceRefs = pgTable('atlas_source_refs', {
 
 export type AtlasSourceRef    = typeof atlasSourceRefs.$inferSelect;
 export type NewAtlasSourceRef = typeof atlasSourceRefs.$inferInsert;
+
+/**
+ * atlas_directories
+ *
+ * Directory tree nodes for per-directory LUT and contextual retrieval.
+ * Identity: (repo_id, directory_path). Counts are derived and intentionally not stored here.
+ * Manual migration: drizzle/manual/20261012_atlas_directories.sql (sidecar, not in _journal.json)
+ */
+export const atlasDirectories = pgTable('atlas_directories', {
+  id:                  text('id').primaryKey(),
+  repoId:              text('repo_id').notNull().default('deeds-web-app'),
+  directoryPath:       text('directory_path').notNull(),                  // "src/lib/server"
+  parentDirectoryPath: text('parent_directory_path'),                     // null for root
+  depth:               integer('depth').notNull(),
+  createdAt:           timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:           timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex('atlas_directories_repo_path_uq').on(t.repoId, t.directoryPath),
+  index('atlas_directories_parent_idx').on(t.repoId, t.parentDirectoryPath),
+]);

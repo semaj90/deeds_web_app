@@ -9,7 +9,7 @@
  *   const embedding = new Float32Array(DIMENSIONS.DENSE_CANONICAL.size);
  */
 
-import type { Simplify } from 'type-fest';
+type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
 /**
  * Dimension definitions.

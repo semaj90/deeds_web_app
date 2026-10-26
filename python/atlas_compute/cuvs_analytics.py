@@ -91,6 +91,59 @@ def _matrix(value: Sequence[Sequence[float]] | np.ndarray, *, name: str) -> np.n
     return np.ascontiguousarray(out)
 
 
+def validate_cuvs_cosine_knn_result(
+    corpus: Sequence[Sequence[float]] | np.ndarray,
+    queries: Sequence[Sequence[float]] | np.ndarray,
+    neighbors: Sequence[Sequence[int]] | np.ndarray,
+    distances: Sequence[Sequence[float]] | np.ndarray,
+    *,
+    atol: float = 1e-5,
+    rtol: float = 1e-5,
+) -> dict[str, Any]:
+    """Check exact-search output shape, indices, ordering, and paired cosine distances."""
+
+    x = _matrix(corpus, name="corpus")
+    q = _matrix(queries, name="queries")
+    indices = np.asarray(neighbors)
+    observed = np.asarray(distances, dtype=np.float32)
+
+    def invalid(code: str) -> dict[str, Any]:
+        return {"valid": False, "errorCode": code, "maxAbsDistanceError": None}
+
+    if x.shape[1] != q.shape[1]:
+        return invalid("QUERY_CORPUS_DIMENSION_MISMATCH")
+    if indices.ndim != 2 or indices.shape[0] != q.shape[0] or indices.shape[1] == 0:
+        return invalid("NEIGHBOR_SHAPE_INVALID")
+    if not np.issubdtype(indices.dtype, np.integer):
+        return invalid("NEIGHBOR_DTYPE_INVALID")
+    if observed.shape != indices.shape:
+        return invalid("DISTANCE_SHAPE_MISMATCH")
+    if indices.min() < 0 or indices.max() >= x.shape[0]:
+        return invalid("NEIGHBOR_INDEX_OUT_OF_RANGE")
+    if any(np.unique(row).size != row.size for row in indices):
+        return invalid("DUPLICATE_NEIGHBOR_INDEX")
+    if not np.isfinite(observed).all():
+        return invalid("NONFINITE_DISTANCE")
+    if np.any(observed[:, :-1] > observed[:, 1:] + atol):
+        return invalid("DISTANCES_NOT_ASCENDING")
+
+    corpus_norms = np.linalg.norm(x, axis=1)
+    query_norms = np.linalg.norm(q, axis=1)
+    if np.any(corpus_norms == 0) or np.any(query_norms == 0):
+        return invalid("ZERO_NORM_VECTOR")
+    normalized_corpus = x / corpus_norms[:, None]
+    normalized_queries = q / query_norms[:, None]
+    expected = 1.0 - np.einsum("qd,qkd->qk", normalized_queries, normalized_corpus[indices])
+    max_error = float(np.max(np.abs(observed - expected)))
+    if not np.allclose(observed, expected, atol=atol, rtol=rtol):
+        return {
+            "valid": False,
+            "errorCode": "DISTANCE_INDEX_PAIR_MISMATCH",
+            "maxAbsDistanceError": max_error,
+        }
+    return {"valid": True, "errorCode": None, "maxAbsDistanceError": max_error}
+
+
 def run_cuvs_exact_knn(
     corpus: Sequence[Sequence[float]] | np.ndarray,
     queries: Sequence[Sequence[float]] | np.ndarray,

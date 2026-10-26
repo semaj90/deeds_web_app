@@ -13,6 +13,7 @@ export interface ObservationFeatureMaterializationReceiptV1 {
   registryRevision: string;
   featureRevision: string;
   inputDigest: string;
+  workspaceRevision: string;
   operation: 'inserted-or-updated';
   clusterAttached: boolean;
   materializerRevision: 'atlas.observation-feature-materializer.v1';
@@ -25,9 +26,9 @@ export interface ObservationFeatureMaterializationReceiptV1 {
 export async function materializeObservationFeatureProjectionV1(
   projectionInput: ObservationFeatureProjectionV1,
   options: {
-    workspaceRevision?: string | null;
+    workspaceRevision: string;
     cluster?: ClusterFeatureProjectionV1 | null;
-  } = {},
+  },
 ): Promise<ObservationFeatureMaterializationReceiptV1> {
   const projection = ObservationFeatureProjectionV1Schema.parse(projectionInput);
   const cluster = options.cluster ?? null;
@@ -36,6 +37,7 @@ export async function materializeObservationFeatureProjectionV1(
     throw new Error('ORF_SOURCE_REVISION_NOT_QUALIFIED');
   }
   if (!projection.registryRevision.trim()) throw new Error('ORF_REGISTRY_REVISION_REQUIRED');
+  if (!options.workspaceRevision?.trim()) throw new Error('ORF_WORKSPACE_REVISION_REQUIRED');
   if (projection.evidenceRefs.length === 0 || projection.evidenceRefs.includes(projection.packetKey)) {
     throw new Error('ORF_SOURCE_EVIDENCE_REFS_REQUIRED');
   }
@@ -118,7 +120,7 @@ export async function materializeObservationFeatureProjectionV1(
       projection.sourceRevision,
       projection.registryRevision,
       projection.sourceVersionReceiptId,
-      options.workspaceRevision ?? null,
+      options.workspaceRevision,
       projection.representationId,
       projection.representationRevision,
       projection.treeNodeId,
@@ -147,6 +149,7 @@ export async function materializeObservationFeatureProjectionV1(
     registryRevision: projection.registryRevision,
     featureRevision: projection.featureRevision,
     inputDigest: projection.inputDigest,
+    workspaceRevision: options.workspaceRevision,
     operation: 'inserted-or-updated',
     clusterAttached: Boolean(cluster),
     materializerRevision: 'atlas.observation-feature-materializer.v1',

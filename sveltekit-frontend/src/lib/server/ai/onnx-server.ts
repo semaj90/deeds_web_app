@@ -31,10 +31,6 @@ const MODEL_PATHS: Record<string, string[]> = {
 		// metadata may remain tracked/discoverable.
 		'models/embeddinggemma_300m_onnx/model.onnx',
 	],
-	gemma270m: [
-		'static/gemma3_270m_onnx/gemma3_270m_w8a16.onnx',
-		'static/gemma3_270m_onnx/gemma3_client_quantized.onnx',
-	],
 	yolov8: [
 		'models/yolov8n.onnx',
 	],

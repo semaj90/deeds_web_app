@@ -14,6 +14,7 @@
 import { createHash } from 'node:crypto';
 import { ENV } from '../env.server.js';
 import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtime-v1.js';
+import type { EmbeddingGemmaTaskModeV1 } from './embedding-contract-768.js';
 
 export type CanonicalEmbeddingResult = {
   model: string;
@@ -121,6 +122,7 @@ export async function tryEmbedCanonical(
   opts?: {
     model?: string;
     baseUrl?: string;
+    taskMode?: EmbeddingGemmaTaskModeV1;
     signal?: AbortSignal;
     timeoutMs?: number;
   },
@@ -128,25 +130,29 @@ export async function tryEmbedCanonical(
   try {
     const baseUrl = (opts?.baseUrl ?? ENV.SELF_URL ?? '').replace(/\/+$/, '');
     if (baseUrl) {
+      const isMock = opts?.model === 'mock';
+      const taskMode = opts?.taskMode ?? (isMock ? undefined : 'code_retrieval_query');
+      const payload: Record<string, unknown> = {
+        text,
+        model: isMock ? 'mock' : 'embeddinggemma',
+        ...(taskMode ? { taskMode } : {}),
+      };
       const response = await fetch(`${baseUrl}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // The route's schema only accepts 'embeddinggemma' | 'mock'; a tagged name such as
         // 'embeddinggemma:latest' is rejected with 400.
-        body: JSON.stringify({
-          text,
-          model: opts?.model === 'mock' ? 'mock' : 'embeddinggemma',
-        }),
+        body: JSON.stringify(payload),
         signal: opts?.signal ?? AbortSignal.timeout(opts?.timeoutMs ?? 10_000),
       });
 
       if (response.ok) {
         const data = await response.json() as { embedding?: number[]; model?: string };
-        // The route answers an unauthenticated call with 200 + an all-zero vector; never accept it.
-        if (Array.isArray(data.embedding) && data.embedding.length > 0 && data.embedding.some((v) => v !== 0)) {
+        if (Array.isArray(data.embedding)) {
+          const embedding = validateSemantic768OutputV1(data.embedding);
           return {
             model: data.model ?? opts?.model ?? 'embeddinggemma:latest',
-            embedding: data.embedding,
+            embedding: Array.from(embedding),
             source: 'api-embed',
           };
         }

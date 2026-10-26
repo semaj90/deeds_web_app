@@ -13,6 +13,10 @@ export interface QueryClassificationV1 {
   artifactKinds: string[];
   targetHints: string[];
   symbols: string[];
+  exactTerms: string[];
+  ngrams: string[];
+  packageCandidates: string[];
+  repositoryScopeCandidates: string[];
   retrievalNeeds: { lexical: boolean; ast: boolean; semantic: boolean; graph: boolean };
   exactPromotionRequired: boolean;
   requiresMutation: boolean;
@@ -25,6 +29,33 @@ const FILE_HINT = /(?:^|\s)([\w./\\-]+\.(?:ts|tsx|js|mjs|mts|svelte|sql|okf|json
 const SYMBOL_HINT = /(?:method|function|class|type|interface|variable|symbol)s?\s+[`"']?([A-Za-z_$][\w$]*)/gi;
 
 function uniq(values: string[]): string[] { return [...new Set(values.filter(Boolean))].sort(); }
+function orderedUnique(values: string[]): string[] { return [...new Set(values.filter(Boolean))]; }
+
+const PACKAGE_ALIASES: ReadonlyArray<[RegExp, string, string]> = [
+  [/\bdrizzle(?:\s+orm|-orm)\b/i, 'drizzle-orm', 'Drizzle ORM'],
+  [/\bsveltekit(?:\s+2)?\b/i, '@sveltejs/kit', 'SvelteKit'],
+  [/\bvitest\b/i, 'vitest', 'Vitest'],
+  [/\bneo4j(?:\s+driver|-driver)\b/i, 'neo4j-driver', 'Neo4j Driver'],
+  [/\bpostgres(?:ql)?\b/i, 'postgres', 'Postgres'],
+];
+
+export function packageOntologyLabelCandidatesV1(packageCandidates: readonly string[]): string[] {
+  const selectedPackages = new Set(packageCandidates);
+  return uniq(PACKAGE_ALIASES
+    .filter(([, packageName]) => selectedPackages.has(packageName))
+    .map(([, , ontologyLabel]) => ontologyLabel));
+}
+
+function queryTerms(query: string): string[] {
+  return orderedUnique(query.match(/[A-Za-z_$][\w$-]*|\d+/g) ?? []).slice(0, 64);
+}
+
+function queryNgrams(terms: string[]): string[] {
+  const normalized = terms.map((term) => term.toLocaleLowerCase());
+  return orderedUnique(Array.from({ length: Math.max(0, normalized.length - 1) }, (_, index) =>
+    `${normalized[index]} ${normalized[index + 1]}`,
+  )).slice(0, 32);
+}
 
 export function classifyAtlasQuery(input: { requestId: string; query: string; producerRevision?: string }): QueryClassificationV1 {
   const rawQuery = input.query.trim();
@@ -41,6 +72,15 @@ export function classifyAtlasQuery(input: { requestId: string; query: string; pr
   const crossComponentRelation = /\b(connect(?:s|ed|ing)?|call(?:s|ed|ing)?|invok(?:e|es|ed|ing)|integrat(?:e|es|ed|ion)|handoff|relationship|between)\b/.test(lower);
   const targetHints = uniq([...rawQuery.matchAll(FILE_HINT)].map((m) => m[1]!.replaceAll('\\', '/')));
   const symbols = uniq([...rawQuery.matchAll(SYMBOL_HINT)].map((m) => m[1]!));
+  const exactTerms = queryTerms(rawQuery);
+  const ngrams = queryNgrams(exactTerms);
+  const packageCandidates = uniq([
+    ...PACKAGE_ALIASES.filter(([pattern]) => pattern.test(rawQuery)).map(([, packageName]) => packageName),
+    ...[...rawQuery.matchAll(/\bpackage:((?:@[a-z0-9._-]+\/)?[a-z0-9._-]+(?:-[a-z0-9._-]+)*)\b/gi)].map((match) => match[1]!),
+  ]);
+  const repositoryScopeCandidates = uniq(
+    [...rawQuery.matchAll(/\brepo:([A-Za-z0-9._/-]+)\b/gi)].map((match) => match[1]!.replaceAll('\\', '/')),
+  );
   const artifactKinds = uniq(targetHints.map((p) => p.endsWith('.sql') ? 'migration_script' : p.endsWith('.okf') ? 'okf_schema' : /\.(ts|tsx|js|mjs|mts|svelte)$/.test(p) ? 'source_module' : 'UNKNOWN'));
   const domains = uniq([
     lower.includes('parent atlas') || lower.includes('atlas') ? 'parent-atlas' : '',
@@ -58,7 +98,8 @@ export function classifyAtlasQuery(input: { requestId: string; query: string; pr
   };
   const base = {
     schema: 'atlas.query-classification.v1' as const, requestId: input.requestId, rawQuery, operation,
-    mutationKind, domains, artifactKinds, targetHints, symbols, retrievalNeeds,
+    mutationKind, domains, artifactKinds, targetHints, symbols, exactTerms, ngrams,
+    packageCandidates, repositoryScopeCandidates, retrievalNeeds,
     exactPromotionRequired: requiresMutation, requiresMutation, requiresValidation: requiresMutation || operation === 'VALIDATE',
     producerRevision: input.producerRevision ?? 'query-classifier-v1',
   };

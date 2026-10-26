@@ -2,11 +2,12 @@
 /**
  * ldr-mcp.mjs — Local Deep Research MCP Server (stdio)
  *
- * Exposes 4 tools to OpenCode agents via the MCP stdio protocol:
+ * Exposes 5 tools to OpenCode agents via the MCP stdio protocol:
  *   ldr.start_research   — start a new async LDR research task
  *   ldr.poll_status      — poll a running task by taskId
- *   ldr.search_history   — Redis-first cache lookup, then LDR /api/history
- *   ldr.quick_summary    — synchronous 5s one-shot summary
+ *   ldr.get_report       — read the final Markdown report and sources
+ *   ldr.search_history   — authenticated LDR /api/history lookup
+ *   ldr.quick_summary    — legacy compatibility tool; explicitly unsupported
  *
  * Config (env vars, also read from sveltekit-frontend/.env):
  *   LDR_BASE_URL   default http://127.0.0.1:5000
@@ -25,11 +26,12 @@ import { createInterface } from 'readline';
 import { readFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { createLdrSessionV1 } from './ldr-session-v1.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // ── Load .env.local first, then .env from sveltekit-frontend ────────────────
-for (const envPath of [resolve(__dirname, '../../.env.local'), resolve(__dirname, '../../.env')]) {
+for (const envPath of [resolve(__dirname, '../../.env.ldr.local'), resolve(__dirname, '../../.env.local'), resolve(__dirname, '../../.env')]) {
   if (!existsSync(envPath)) continue;
   const raw = readFileSync(envPath, 'utf8');
   for (const line of raw.split('\n')) {
@@ -56,22 +58,21 @@ function fnv1a8(s) {
 }
 
 // ── HTTP helper ───────────────────────────────────────────────────────────────
-async function ldrFetch(path, init = {}) {
-  return fetch(`${LDR_BASE}${path}`, {
-    ...init,
-    signal: AbortSignal.timeout(TIMEOUT),
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...(init.headers ?? {}) },
-  });
-}
+const ldrFetch = createLdrSessionV1({ baseUrl: LDR_BASE });
 
 // ── Tool implementations ───────────────────────────────────────────────────────
 
-async function startResearch({ query, max_iterations = 3, search_engines = ['searxng', 'wikipedia'] }) {
+async function startResearch({ query, max_iterations = 3, search_engines = ['searxng'] }) {
   if (!ENABLED) return { error: 'LDR_ENABLED=false', taskId: null };
   try {
-    const res = await ldrFetch('/api/research/start', {
+    if (!query || typeof query !== 'string' || query.length < 3 || query.length > 2000 || !Number.isInteger(max_iterations) || max_iterations < 1 || max_iterations > 10 || !Array.isArray(search_engines) || search_engines.length !== 1 || !/^[a-z0-9_-]{1,64}$/i.test(search_engines[0])) {
+      return { error: 'INVALID_RESEARCH_INPUT: select exactly one supported search engine', taskId: null };
+    }
+    const auth = await ldrFetch('/auth/check');
+    if (!auth.ok || (await auth.json()).authenticated !== true) return { error: 'LDR_AUTH_REQUIRED', taskId: null };
+    const res = await ldrFetch('/api/start_research', {
       method: 'POST',
-      body: JSON.stringify({ query, max_iterations, search_engines }),
+      body: JSON.stringify({ query, iterations: max_iterations, search_engine: search_engines[0], mode: 'detailed' }),
     });
     if (!res.ok) return { error: `LDR returned ${res.status}`, taskId: null };
     const data = await res.json();
@@ -82,7 +83,7 @@ async function startResearch({ query, max_iterations = 3, search_engines = ['sea
       queryHash: fnv1a8(query),
       startedAt: new Date().toISOString(),
       status: 'started',
-      pollUrl: `/api/research/status/${taskId}`,
+      pollUrl: `/api/research/${encodeURIComponent(taskId)}/status`,
       hint: `Call ldr.poll_status with taskId "${taskId}" to check progress`,
     };
   } catch (e) {
@@ -93,7 +94,7 @@ async function startResearch({ query, max_iterations = 3, search_engines = ['sea
 async function pollStatus({ taskId }) {
   if (!ENABLED) return { error: 'LDR_ENABLED=false', status: 'disabled' };
   try {
-    const res = await ldrFetch(`/api/research/status/${taskId}`);
+    const res = await ldrFetch(`/api/research/${encodeURIComponent(taskId)}/status`);
     if (!res.ok) return { error: `LDR returned ${res.status}`, status: 'error', taskId };
     const data = await res.json();
     return {
@@ -120,10 +121,13 @@ async function searchHistory({ query, limit = 10 }) {
     const res = await ldrFetch(`/api/history?limit=${limit}`);
     if (res.ok) {
       const data = await res.json();
+      const items = Array.isArray(data) ? data : data.items;
+      if (!Array.isArray(items)) return { found: false, cached: false, error: 'INVALID_LDR_HISTORY_RESPONSE' };
       const ql = query.toLowerCase();
-      const match = data.find(r =>
+      const match = items.find(r =>
         r.status === 'completed' &&
-        (r.query?.toLowerCase().includes(ql) || ql.includes(r.query?.toLowerCase() ?? ''))
+        typeof r.query === 'string' && r.query.length > 0 &&
+        (r.query.toLowerCase().includes(ql) || ql.includes(r.query.toLowerCase()))
       );
       if (match) {
         return {
@@ -138,28 +142,28 @@ async function searchHistory({ query, limit = 10 }) {
         };
       }
     }
-  } catch { /* ignore */ }
+    else return { found: false, cached: false, error: `LDR returned ${res.status}` };
+  } catch (error) {
+    return { found: false, cached: false, error: error.message };
+  }
 
   return { found: false, cached: false, queryHash: qHash, query };
 }
 
 async function quickSummary({ query, max_results = 5 }) {
-  if (!ENABLED) return { summary: null, error: 'LDR_ENABLED=false' };
-  try {
-    const res = await ldrFetch('/api/research/quick-summary', {
-      method: 'POST',
-      body: JSON.stringify({ query, max_results }),
-    });
-    if (!res.ok) return { summary: null, error: `LDR returned ${res.status}` };
-    const data = await res.json();
-    return {
-      query,
-      summary: data.summary?.trim() ?? null,
-      sources: Array.isArray(data.sources) ? data.sources.slice(0, 5) : [],
-    };
-  } catch (e) {
-    return { summary: null, error: e.message };
+  return { summary: null, error: 'UNSUPPORTED_BY_PINNED_LDR_API: use ldr.start_research, ldr.poll_status, then ldr.get_report' };
+}
+
+async function getReport({ taskId }) {
+  if (!ENABLED) return { error: 'LDR_ENABLED=false', content: null };
+  const response = await ldrFetch(`/api/report/${encodeURIComponent(taskId)}`);
+  if (!response.ok) return { error: `LDR returned ${response.status}`, content: null };
+  const data = await response.json();
+  const content = data.content ?? data.summary;
+  if (typeof content !== 'string' || !content.trim() || Buffer.byteLength(content) > 2 * 1024 * 1024) {
+    return { error: 'INVALID_OR_OVERSIZED_LDR_REPORT', content: null };
   }
+  return { taskId, content, sources: Array.isArray(data.sources) ? data.sources : [], canonicalAuthority: false, qualification: 'UNREVIEWED_RESEARCH' };
 }
 
 // ── Tool definitions (JSON Schema) ────────────────────────────────────────────
@@ -167,7 +171,7 @@ const TOOLS = [
   {
     name: 'ldr.start_research',
     description:
-      'Start an async Local Deep Research task using Gemma4 + SearXNG + Wikipedia. Returns a taskId immediately — poll with ldr.poll_status. Best for comprehensive multi-source research that takes 30-120 seconds.',
+      'Start an async task in the configured Local Deep Research container. Writes LDR-local research history only. Requires an authorized session; poll status then retrieve the report. Does not publish Atlas evidence.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -176,13 +180,21 @@ const TOOLS = [
         search_engines: {
           type: 'array',
           items: { type: 'string' },
-          default: ['searxng', 'wikipedia'],
-          description: 'Search engines to use',
+          minItems: 1,
+          maxItems: 1,
+          default: ['searxng'],
+          description: 'Exactly one engine supported by the pinned LDR API',
         },
       },
       required: ['query'],
     },
     handler: startResearch,
+  },
+  {
+    name: 'ldr.get_report',
+    description: 'Read an existing LDR Markdown report and sources. Unreviewed research, not canonical Atlas evidence.',
+    inputSchema: { type: 'object', properties: { taskId: { type: 'string', minLength: 1, maxLength: 200 } }, required: ['taskId'] },
+    handler: getReport,
   },
   {
     name: 'ldr.poll_status',
@@ -214,7 +226,7 @@ const TOOLS = [
   {
     name: 'ldr.quick_summary',
     description:
-      'Synchronous quick-summary mode (~5-15s). Runs a single research round and returns a summary with sources. Use for fast background research when you need results immediately without polling.',
+      'Legacy compatibility tool. Unsupported by the pinned container; returns an explicit error without launching research. Use start_research, poll_status, get_report.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -289,7 +301,7 @@ rl.on('line', async (line) => {
       const result = await tool.handler(args);
       send({
         jsonrpc: '2.0', id,
-        result: { content: [{ type: 'text', text: JSON.stringify(result) }] },
+        result: { content: [{ type: 'text', text: JSON.stringify(result) }], ...(result.error ? { isError: true } : {}) },
       });
     } catch (e) {
       send({

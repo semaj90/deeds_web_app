@@ -186,7 +186,7 @@ class OntologyLinkedTupleV1:
         )
 
     def to_dict(self) -> dict:
-        return {
+        result = {
             "tupleId": self.tupleId,
             "schemaVersion": self.schemaVersion,
             "packetKey": self.packetKey,
@@ -211,3 +211,7 @@ class OntologyLinkedTupleV1:
             "lifecycle": self.lifecycle,
             "provenance": self.provenance.to_dict(),
         }
+        for field_name in ("packetKey", "treeNodeId", "documentId", "titleId", "relationRevision", "evidenceSpan"):
+            if result[field_name] is None:
+                del result[field_name]
+        return result

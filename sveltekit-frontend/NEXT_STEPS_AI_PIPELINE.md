@@ -46,7 +46,7 @@ The event logging and prompt-feedback infrastructure exists. The loop back into 
 ### P1-B `rag_query_log` → QLoRA distillation pipeline closure
 - **Problem:** `POST /api/analytics/qlora-dataset` distills high-quality interactions (rerank ≥ 0.80, self-eval ≥ 0.80) into `qlora_examples` with Alpaca format export. No scheduled trigger runs it.
 - **Change:** Add a RabbitMQ consumer on a new `qlora.distill` queue (or a cron-style idle task) that calls the distillation endpoint nightly when `rag_query_log` has ≥ 50 new qualifying rows
-- **Downstream:** `GET /api/analytics/qlora-dataset?export=jsonl` → feed to Colab QLoRA training notebook → updated `gemma4-rotorquant:latest` checkpoint
+- **Downstream:** `GET /api/analytics/qlora-dataset?export=jsonl` → feed to Colab QLoRA training notebook → updated 'ornith 1.5 llama-server 8090' checkpoint
 - **Effort:** 2 hrs
 
 ### P1-C `chunk_hit_log` → retrieval quality signal

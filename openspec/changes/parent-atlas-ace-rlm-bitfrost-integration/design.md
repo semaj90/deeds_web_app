@@ -77,3 +77,26 @@ runtime contexts may also derive wall-clock revisions when callers omit them.
   candidate snapshot revision and ordinal map?
 - Which existing feature owner can provide the resolver output without deriving
   revisions from generic runtime context?
+
+## Canonical packet identity registry (2026-10-20)
+
+Use a dedicated, narrow logical registry rather than repurposing
+`atlas_packet_registry` (projection/cache) or `atlas_stable_file_identity`
+(file identity without packet kind). Keep `atlas_packets.packet_key` as a
+physical storage locator. The new registry records the existing PacketKeyV2
+key recipe, canonical repository UUID, the membership scope used by that
+recipe, canonical source reference, and supported packet kind. It does not
+contain embeddings, features, graph scores, cache state, or revisions.
+
+Legacy-to-logical aliases live in a separate table, require explicit evidence
+reference and digest, and point to both the registered logical identity and a
+physical storage key. Existing prefix-only aliases are not backfilled or
+reinterpreted. The read resolver verifies that the stored key recomputes from
+the registered tuple and returns `identityRevisionQualified: false`; source
+and workspace revision admission remains a separate gate.
+
+The schema and resolver are code-only until an operator separately authorizes
+the manual migration. No writer or automatic mint is included. Repository-scope
+mapping evidence, alias review, source/workspace revision binding, and ACE
+manifest/cache wiring remain open; this registry alone cannot enable cache
+admission.

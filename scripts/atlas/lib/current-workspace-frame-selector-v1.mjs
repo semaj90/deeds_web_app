@@ -47,7 +47,10 @@ function admissionCandidate(value, explicitSnapshotRevision) {
 }
 
 function snapshotAuthorityCandidate(value, explicitSnapshotRevision) {
-  if (!value || value.status !== 'CURRENT_SNAPSHOT_PROVEN') return null;
+  if (!value
+    || value.status !== 'CURRENT_SNAPSHOT_PROVEN'
+    || value.canonicalAuthority !== true
+    || value.graphSnapshot?.status !== 'GRAPH_CANONICAL_AUTHORITY_PROVEN') return null;
   const workspaceRevision = clean(value.sourceSnapshot?.workspaceRevision);
   if (!workspaceRevision) return null;
   const snapshotRevision = snapshotRevisionFrom(value);
@@ -156,12 +159,11 @@ export function resolveCurrentWorkspaceFrameV1({
  * winning candidate itself carries `authority: true` (i.e. it came from
  * `WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT` or `CURRENT_GRAPHIFY_SNAPSHOT_AUTHORITY_RECEIPT`,
  * never CLI/env/derived), there is no unresolved authority conflict, and there are zero blockers.
- * `canonicalAuthority` / `promotionEligible` currently mirror `frameAuthoritative` one-for-one --
- * kept as separate named fields because Gate 2+ may need to add conditions that make a frame
- * authoritative-but-not-yet-promotion-eligible (e.g. pending a downstream cohort recheck) without
- * relaxing what "authoritative" itself means.
+ * `canonicalAuthority` / `promotionEligible` are true only when `frameAuthoritative` is true AND the
+ * caller supplies `currentAtEvaluation: true` from a live readback. Without that evaluation they stay
+ * false, so a historical admission is never reported as current-workspace canonical authority.
  */
-export function computeWorkspaceFrameAuthorityV1(frame) {
+export function computeWorkspaceFrameAuthorityV1(frame, { currentAtEvaluation = null } = {}) {
   // WSR-08b: a deliberately admitted PRIOR_IMMUTABLE_SNAPSHOT is not current-workspace authority.
   const frameAuthoritative = frame.status === 'CURRENT_WORKSPACE_FRAME_SELECTED'
     && frame.selectedAuthority === true
@@ -169,11 +171,15 @@ export function computeWorkspaceFrameAuthorityV1(frame) {
     && frame.authorityConflict === false
     && Array.isArray(frame.blockers)
     && frame.blockers.length === 0;
+  // Currentness is a separate predicate supplied by the caller after a live readback. Canonical and
+  // promotion flags require it; absent or false evaluation keeps them false (fail closed).
+  const currentWorkspace = currentAtEvaluation === true;
   return {
     schema: 'atlas.current-workspace-frame-authority.v1',
     frameAuthoritative,
-    canonicalAuthority: frameAuthoritative,
-    promotionEligible: frameAuthoritative,
+    currentAtEvaluation,
+    canonicalAuthority: frameAuthoritative && currentWorkspace,
+    promotionEligible: frameAuthoritative && currentWorkspace,
   };
 }
 

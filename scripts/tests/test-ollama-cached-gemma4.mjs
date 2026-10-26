@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Test ollamaCachedChat() with gemma4-rotorquant:latest-fast
+ * Test ollamaCachedChat() with ornith-1.5-9b
  *
  * Expected results:
  * - Run 1: ~3s (cold, direct Ollama)
@@ -12,7 +12,7 @@
 const query = 'What is hearsay evidence in California criminal law?';
 
 async function test() {
-  console.log('Testing ollamaCachedChat with gemma4-rotorquant:latest-fast\n');
+  console.log('Testing ollamaCachedChat with ornith-1.5-9b\n');
 
   // Call via API endpoint that uses ollamaCachedChat
   async function makeRequest() {
@@ -22,7 +22,7 @@ async function test() {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         query,
-        model: 'gemma4-rotorquant:latest-fast',
+        model: 'ornith-1.5-9b',
         temperature: 0.3,
         maxTokens: 200
       })

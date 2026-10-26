@@ -1,0 +1,14 @@
+# C++ Language Profile for OKF
+
+version: 1
+language: cpp
+name: C++
+grammar: cpp
+
+extensions:
+  - .cc
+  - .cpp
+  - .cxx
+  - .hh
+  - .hpp
+  - .cu

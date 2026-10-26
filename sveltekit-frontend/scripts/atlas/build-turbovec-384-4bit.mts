@@ -13,6 +13,12 @@ import {
   uploadTurboVecIndex,
 } from './lib/turbovec-4bit.mjs';
 
+console.error(
+  'LEGACY_384_TURBOVEC_BUILD_DISABLED: 384-dimensional indexing is retired; '
+  + 'no Qdrant scan or TurboVec upload is permitted.',
+);
+process.exit(78);
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = path.resolve(__dirname, '../..');
 const TMP_DIR = path.join(APP_ROOT, '.tmp', 'turbovec');

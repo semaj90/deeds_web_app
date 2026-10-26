@@ -32,6 +32,10 @@ function normalizeSourceRef(sourceRef) {
 }
 
 async function main() {
+  if (APPLY && !DRY_RUN) {
+    throw new Error('UNSAFE_RELATIVE_PATH_PACKET_BACKFILL_DISABLED: use a revision-qualified packet-chunk lineage owner');
+  }
+
   const client = await pool.connect();
   try {
     console.log('P0 Task 2: Identify Recoverable Packets');

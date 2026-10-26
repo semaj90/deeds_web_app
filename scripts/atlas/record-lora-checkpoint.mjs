@@ -9,7 +9,7 @@
  * Usage (called from Python via subprocess):
  *   node scripts/atlas/record-lora-checkpoint.mjs \
  *     --run-id glyphs-2026-06-03 \
- *     --model-id gemma4-rotorquant:latest \
+ *     --model-id ornith-1.5-9b \
  *     --status done \
  *     --mean-reward 0.72 \
  *     --glyph-count 28 \
@@ -18,7 +18,7 @@
  *
  * Or directly for a training start record:
  *   node scripts/atlas/record-lora-checkpoint.mjs \
- *     --run-id glyphs-2026-06-03 --model-id gemma4-rotorquant:latest --status training
+ *     --run-id glyphs-2026-06-03 --model-id ornith-1.5-9b --status training
  */
 
 import fs from 'node:fs';
@@ -50,7 +50,7 @@ const env = loadEnv();
 const argv = process.argv.slice(2);
 
 const RUN_ID      = flagVal(argv, '--run-id');
-const MODEL_ID    = flagVal(argv, '--model-id', 'gemma4-rotorquant:latest');
+const MODEL_ID    = flagVal(argv, '--model-id', 'ornith-1.5-9b');
 const BASE_MODEL  = flagVal(argv, '--base-model', MODEL_ID);
 const STATUS      = flagVal(argv, '--status', 'done');
 const MEAN_REWARD = parseFloat(flagVal(argv, '--mean-reward', '0') || '0');

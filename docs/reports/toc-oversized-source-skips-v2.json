@@ -1,0 +1,635 @@
+{
+  "schema": "atlas.toc-oversized-source-skips.v1",
+  "configuredMaxBytes": 16777216,
+  "summary": {
+    "totalCandidates": 8224,
+    "includedCount": 8120,
+    "skippedCount": 104
+  },
+  "skips": [
+    {
+      "sourcePath": "docs/documents-atlas-index.json",
+      "byteSize": 64035068,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/graph/codebase-graph.json",
+      "byteSize": 25803530,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/graph/repo-root-atlas.json",
+      "byteSize": 29859649,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/atlas-vector-manifest-v1-2026-08-04.json",
+      "byteSize": 21122162,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/current-graphify-snapshot-binding-recheck-v1.json",
+      "byteSize": 43696635,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/current-source-authority-repair-plan-v1.json",
+      "byteSize": 24095617,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/feature-ontology-current-cohort-v1-codex.json",
+      "byteSize": 332702851,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/feature-ontology-current-cohort-v1.json",
+      "byteSize": 332702851,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/feature-ontology-packet-lineage-v1.json",
+      "byteSize": 328426665,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/fixtures/vector-parity-fixture-2026-08-04.json",
+      "byteSize": 19394693,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/git-tree-source-delta-v1.json",
+      "byteSize": 18671932,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/graphify-current-candidate-binding-v1.json",
+      "byteSize": 44518241,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/graphify-delta-plan-v1.json",
+      "byteSize": 22734695,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+      "byteSize": 23973940,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/graphify-workspace-snapshot-binding-v1-rerun-20260914.json",
+      "byteSize": 43680228,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/graphify-workspace-snapshot-binding-v1.json",
+      "byteSize": 45411856,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/ignored-directory-audit.json",
+      "byteSize": 160030795,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/ignored-directory-audit.min.json",
+      "byteSize": 139932740,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-directory-graph-v1.json",
+      "byteSize": 178717122,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json",
+      "byteSize": 123734066,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/20261015193714990-cd8858b116da/parser-diagnostics-v1.json",
+      "byteSize": 17882845,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003000036157-47868/census-v1.json",
+      "byteSize": 100664071,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003000036157-47868/evidence-cards-v1.json",
+      "byteSize": 31405185,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003000036157-47868/predicate-resolution-v1.json",
+      "byteSize": 23772544,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003002738225-54844/census-v1.json",
+      "byteSize": 100712911,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003002738225-54844/evidence-cards-v1.json",
+      "byteSize": 31405310,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003002738225-54844/predicate-resolution-v1.json",
+      "byteSize": 23772762,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003004045185-40612/census-v1.json",
+      "byteSize": 100743186,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003004045185-40612/evidence-cards-v1.json",
+      "byteSize": 31405417,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003004045185-40612/predicate-resolution-v1.json",
+      "byteSize": 23772976,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003013051018-30232/census-v1.json",
+      "byteSize": 100801332,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003013051018-30232/evidence-cards-v1.json",
+      "byteSize": 31415038,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003013051018-30232/predicate-resolution-v1.json",
+      "byteSize": 23780137,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003014918714-3344/census-v1.json",
+      "byteSize": 100830210,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003014918714-3344/evidence-cards-v1.json",
+      "byteSize": 31415139,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003014918714-3344/predicate-resolution-v1.json",
+      "byteSize": 23780345,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003020401049-13256/census-v1.json",
+      "byteSize": 100860000,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003020401049-13256/evidence-cards-v1.json",
+      "byteSize": 31415252,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003020401049-13256/predicate-resolution-v1.json",
+      "byteSize": 23780565,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003020840635-41136/census-v1.json",
+      "byteSize": 100502586,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003020840635-41136/evidence-cards-v1.json",
+      "byteSize": 31415359,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003020840635-41136/predicate-resolution-v1.json",
+      "byteSize": 23780779,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003021055537-29096/census-v1.json",
+      "byteSize": 100518021,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003021055537-29096/evidence-cards-v1.json",
+      "byteSize": 31415466,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003021055537-29096/predicate-resolution-v1.json",
+      "byteSize": 23780993,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022429579-61740/census-v1.json",
+      "byteSize": 100533456,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022429579-61740/dependency-graph-v1.json",
+      "byteSize": 22362176,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022429579-61740/evidence-cards-v1.json",
+      "byteSize": 31415573,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022429579-61740/predicate-resolution-v1.json",
+      "byteSize": 23781207,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022758395-22872/census-v1.json",
+      "byteSize": 100548891,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022758395-22872/dependency-graph-v1.json",
+      "byteSize": 22362176,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022758395-22872/evidence-cards-v1.json",
+      "byteSize": 31415680,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003022758395-22872/predicate-resolution-v1.json",
+      "byteSize": 23781421,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003025714297-46572/census-v1.json",
+      "byteSize": 100629012,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003025714297-46572/dependency-graph-v1.json",
+      "byteSize": 22369073,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003025714297-46572/evidence-cards-v1.json",
+      "byteSize": 31442259,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003025714297-46572/predicate-resolution-v1.json",
+      "byteSize": 23801588,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003030938485-58344/census-v1.json",
+      "byteSize": 100646747,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003030938485-58344/dependency-graph-v1.json",
+      "byteSize": 22369072,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003030938485-58344/evidence-cards-v1.json",
+      "byteSize": 31442366,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003030938485-58344/predicate-resolution-v1.json",
+      "byteSize": 23801802,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032303421-52364/census-v1.json",
+      "byteSize": 100663174,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032303421-52364/dependency-graph-v1.json",
+      "byteSize": 22369072,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032303421-52364/evidence-cards-v1.json",
+      "byteSize": 31442473,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032303421-52364/predicate-resolution-v1.json",
+      "byteSize": 23802016,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032721079-55200/census-v1.json",
+      "byteSize": 100678613,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032721079-55200/dependency-graph-v1.json",
+      "byteSize": 22369072,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032721079-55200/evidence-cards-v1.json",
+      "byteSize": 31442580,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003032721079-55200/predicate-resolution-v1.json",
+      "byteSize": 23802230,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003035756399-19156/census-v1.json",
+      "byteSize": 100695624,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003035756399-19156/dependency-graph-v1.json",
+      "byteSize": 22369071,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003035756399-19156/evidence-cards-v1.json",
+      "byteSize": 31442687,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003035756399-19156/predicate-resolution-v1.json",
+      "byteSize": 23802444,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003040356046-47360/census-v1.json",
+      "byteSize": 100711701,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003040356046-47360/dependency-graph-v1.json",
+      "byteSize": 22369071,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003040356046-47360/evidence-cards-v1.json",
+      "byteSize": 31442794,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003040356046-47360/predicate-resolution-v1.json",
+      "byteSize": 23802658,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/census-v1.json",
+      "byteSize": 100729138,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/dependency-graph-v1.json",
+      "byteSize": 22369070,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/evidence-cards-v1.json",
+      "byteSize": 31443130,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/predicate-resolution-v1.json",
+      "byteSize": 23802929,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045614698-40368/census-v1.json",
+      "byteSize": 100745865,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045614698-40368/dependency-graph-v1.json",
+      "byteSize": 22369070,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045614698-40368/evidence-cards-v1.json",
+      "byteSize": 31443237,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045614698-40368/predicate-resolution-v1.json",
+      "byteSize": 23803143,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045919683-49160/census-v1.json",
+      "byteSize": 100761300,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045919683-49160/dependency-graph-v1.json",
+      "byteSize": 22369070,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045919683-49160/evidence-cards-v1.json",
+      "byteSize": 31443344,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-evidence/pipeline-20261003045919683-49160/predicate-resolution-v1.json",
+      "byteSize": 23803357,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-file-kmeans-v1.json",
+      "byteSize": 36174816,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/openspec-file-labels-v1.json",
+      "byteSize": 120452672,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/packet-chunk-lineage-backfill-dry-01-results.json",
+      "byteSize": 20924023,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/source-ref-binding-v1.json",
+      "byteSize": 47734261,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/staging/.execution-controller-35036-1790442393160/openspec-execution-controller-v1.json",
+      "byteSize": 47120497,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/staging/.execution-controller-46652-1790442517192/openspec-execution-controller-v1.json",
+      "byteSize": 47122488,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/staging/.execution-controller-58364-1790441829402/openspec-execution-controller-v1.json",
+      "byteSize": 47096140,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/staging/.execution-controller-60540-1789952754791/openspec-execution-controller-v1.json",
+      "byteSize": 18662574,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/staging/.execution-controller-62176-1790294934806/openspec-execution-controller-v1.json",
+      "byteSize": 19065600,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/staging/.execution-controller-8068-1790441553437/openspec-execution-controller-v1.json",
+      "byteSize": 47096140,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/staging/openspec-pivot-20260926T1656Z/openspec-execution-controller-v1.json",
+      "byteSize": 47095197,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/structured-lexical-fanout.json",
+      "byteSize": 27704149,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/temporal-event-candidates-v1.json",
+      "byteSize": 33922805,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-binding-cas-plan-v1.json",
+      "byteSize": 33562804,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-binding-observation.json",
+      "byteSize": 25220468,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    }
+  ]
+}

@@ -4,7 +4,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const outputPath = path.join(root, 'docs', 'reports', 'graph-identity-contracts-audit-v1.json');
+const outputDirectory = path.join(root, 'docs', 'reports');
+const baseOutputPath = path.join(outputDirectory, 'graph-identity-contracts-audit-v1.json');
+const outputPath = fs.existsSync(baseOutputPath)
+  ? path.join(outputDirectory, `graph-identity-contracts-audit-v1-${new Date().toISOString().replace(/[:.]/g, '-')}.json`)
+  : baseOutputPath;
+const reportPath = path.relative(root, outputPath).replace(/\\/g, '/');
 const owners = [
   { id: 'parse_node_id', source: 'sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts', marker: 'type ParseNodeId', role: 'AST parse occurrence', revisionBound: true, forbidden: ['symbol_id', 'symbol_version_id'] },
   { id: 'symbol_id', source: 'sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts', marker: 'type SymbolId', role: 'logical symbol identity', revisionBound: false, forbidden: ['symbol_version_id', 'parse_node_id'] },
@@ -58,7 +63,7 @@ const report = {
   patch_targets: ['scripts/atlas/audit-graph-identity-contracts-v1.mjs', 'sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts'],
   safe_next_command: 'node scripts/atlas/audit-graph-identity-contracts-v1.mjs',
   smoke_command: 'node scripts/atlas/audit-graph-identity-contracts-v1.mjs && node -e "const r=require(\'docs/reports/graph-identity-contracts-audit-v1.json\'); if(r.status!==\'DEFINITION_CONTRACTS_PROVEN_POPULATION_UNPROVEN\') process.exit(1)"',
-  report_path: 'docs/reports/graph-identity-contracts-audit-v1.json',
+  report_path: reportPath,
 };
 report.checksum = sha256(JSON.stringify(report));
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });

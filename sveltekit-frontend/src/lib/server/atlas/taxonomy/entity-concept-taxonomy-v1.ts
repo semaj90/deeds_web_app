@@ -268,6 +268,9 @@ export function promoteTaxonomyAssignmentV1(input: {
 	if (candidate.status !== 'promoted') {
 		throw new Error(`TAXONOMY_PROMOTION_REQUIRES_PROMOTED_STATUS:${candidate.candidateId}:${candidate.status}`);
 	}
+	if (candidate.graphRevision !== input.graphRevision) {
+		throw new Error(`TAXONOMY_PROMOTION_GRAPH_REVISION_MISMATCH:${candidate.candidateId}`);
+	}
 	const evidenceRefs = stableUnique([...candidate.evidenceRefs, ...input.promotionEvidenceRefs]);
 	if (evidenceRefs.length === 0) throw new Error(`TAXONOMY_PROMOTION_REQUIRES_EVIDENCE:${candidate.candidateId}`);
 	return createHyperedgeV1({

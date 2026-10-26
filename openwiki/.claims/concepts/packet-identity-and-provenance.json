@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:60eaacb9654cfe43a3edde2bb773b4ca9001a3215c3ccc871dc56a9afee0cd7e",
+  "pageVersion": "sha256:08269e865afa4bd887b0041d2f12d13f5d9d6c5d21179c616a65d172ee349993",
   "claims": [
     {
       "id": "claim_9e421445d1bd4dd3905bfaee5915dcff",
@@ -118,23 +118,19 @@
     },
     {
       "id": "claim_e0d40f767f8d43609b41275ab1882c25",
-      "statement": "Graph revision snapshots must pair workspace and graph revisions from one immutable snapshot receipt, are checksum-sealed, and admit edges only when endpoints, source revisions, workspace and graph revisions, and evidence references all prove consistently; failures are named and there is no partial promotion.",
+      "statement": "The graph-revision snapshot contract pairs workspace and graph revisions with source-revision coverage from one owner-derived snapshot receipt and seals that pair with a checksum; its edge classifier returns ADMISSIBLE only when endpoints, source revisions, workspace and graph revisions, and evidence references all prove consistently, otherwise it returns named failures and batch summaries do not imply partial promotion.",
       "evidence": [
         {
-          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L129-L152",
-          "version": "repo-lines-v1:sha256:60fc9044cf95a6de32ff6b0caac49850a07a2ab4439693b1a228baf6f7deb8b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MDFiZTNmNjdjZjFhYTVlMTRmMWM2OGNhOGM1OTQyMWEzODM1NmJmZGI2MGVmYmY4YTNmOTMyMGQ4ZDFmZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjODM4MzJhM2JlNDQ5NzAwNGYyMDE2MzQxNjZjZDRmNzM2Mzg0MmE2MjA5ODViYjFjNzcyZGVmZThjZTJmZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzMmQ0YzJiMjQ4MmU4MDQ5MTQ5NWZjN2NmZGUzYzY1NzhlZjg0OTcwNzllY2ZkODVlODI3YmQ1ZmEwMGMxYmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyOTI1NDJlZWI2MDg4MTg1OTFlNTQyZmVhYjY2MjljMmRhMGJhZjIwOGEzZDRiMTVlNDI1ZjA3ZWM1NzliNWIifQ"
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.spec.ts#L22-L92",
+          "version": "repo-lines-v1:sha256:9a77fdb90897653be130df2feafb6186cfe7daff9ccacc597b3aa0b202a79643:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MDY1MDA1OTNiNjZhOGM4Y2Y1Zjg3MjVjMDQ4NDkxMWNjMjFmNzZjNDc1Y2I2ZjFmNjJmMDM5MTI2MzM1N2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzZGRlZjcyNDc4NmI0YWY0NWFiN2NhZDgxZDM3N2FlNTQzYmI3ODQxMjk2NTY4ZmI1MjI2OTk4YWVjMjE2MzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3NmNmOTk4MjNlOTFiYzI2NDIzNGZhY2QzYzA0OWQzNzA3NjhmMzEyZTRkMjgxNDM0YTRjNTU0MjQxMmZiMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L2-L12",
-          "version": "repo-lines-v1:sha256:983db152b83ffb02d054ab91e366eab256a6b02a6c00255edbfc38d6d644f94a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYzI1NzNhZTU5NjYzZGI2NmUwZTcyODU2NTg4YWRhNmQ0ZGQ3MjZiYzI5ZDAwODU3YzQzYzIzMzA0MGU1NDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyNmUzYTc1YTlhNDVkNmVjOTY1NzUwMTczMzkxYWY3Zjg0ZmE2MDA2N2MyNTFmNWRjN2I2M2UzNWQzODdjYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyOTQ1ODk0MTgwMWJkNDc3NGVlNTU0YWFhODdhYTMzZDc2YjVlY2IwOTZlODc5M2M5NGIxZDQ1MjBjNGI2MGMifQ"
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L129-L163",
+          "version": "repo-lines-v1:sha256:160f80b852250eded69f13d8cfe71b3f4ade7723fddb0933e6000e3d782580f0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwODJlOWRkMzJkMTQ1OGQ3MDMyMDdiYTJmNGNmMTg4N2YyNTJiMjMwODYwMDY2ZTlhNDI3OTcyN2E5YjU3YTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlNmU5MTU2OTBjNGM4ZjRlYjFlOTc2ZGU3ZDI5YjQzNWJhMTFhZjZhNDQyNjczY2MxMWY4OWZiOWI1ZTVkNmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
           "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L49-L84",
-          "version": "repo-lines-v1:sha256:28bf9f590233882d591d2db6da6dc390e1edcde24939b4a5a2812452780ef7eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5OTZhODVjOWQ4M2I3NmEwNzJmNWZkZGRhY2Y0NWI2MGU3ZjUzZjk2MmE3MGMzNmE4MTE2NTM5Yjc0YTIzM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ODQ3OTdkMTQ3MGE4YmZmN2JkNWE2YTAyMTRlOTViOWYzMzMwNzg4MWU2NmMzNWZmNzAwNTgxYzcyMDhiZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxYzNlY2ZiMDJiMzY4MDFiMzBiYTQ0MzU5YTYzNTczZDdmZTE2YjcyMDEzODgzYTA0OTg1YzI0OTgxNTE5NzQifQ"
-        },
-        {
-          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L94-L101",
-          "version": "repo-lines-v1:sha256:7ac700b46e6c7ee6c2431793c45d986f01186d48b3513cae580f07497a235dd6:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODFlNmEyYTRjMTc0NDA2ZmY4NjMyYWNiNzZmMGFkMzNkMGQ3YzE2M2E3NDQxNTFkYjRmMDAzODUwOGQxNGRiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjUwNTBjYmNhMGYwZjE0ZjIwZjE3NjI3NzY5MjQwOWIwNzBmN2U0Mjk4NzcwNDQ0NDM1MTFmZDQ2MDVmOTI3ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI1ODBlOTY0ZjgzYTQ3M2Y0M2Q0NDM4NDYyOTQ5ZDY4YjU2MDBmZGE3ODdmMTYzNzQ1ZDAwZGU4OWNiZjM2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJmOTkyZGNhNDc2ODY2NzFlN2IwMWEwNTFjMWU0ZTI0ZWEzOTJjNDI5NGJkOGRlNjg0YzFlNjg5ZTk2N2IxYSJ9"
+          "version": "repo-lines-v1:sha256:ac7f4e20267930cd7ca0daf5c121553f59a2d040ca8fe532be6151d5a551fefe:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1MjJkNzllNjZkNDczZjgzYjNkYTM1OTIzNzNmOWE1MjQ2ZWNkZDBjNGU1MDRiMzJmOThlNTZmYTc0NmI0MWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA5YWUxYTBlM2NmMTJiYWUxYjgzNmY1NDNkMjEwMzdhYWE2MjI4ZGM4MGUwYmQ3NzgxYzkyYzFkODc2NjllZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhmYzYwNDI4YmRiMGFhZGZjYzA2NzgwNTcxMmM3ZDgzZTkwZDlkN2Q4YjQ0MWQ4MzdmZmRjNDVhZWM1ZTM2ZmMifQ"
         }
       ]
     },
@@ -154,23 +150,151 @@
     },
     {
       "id": "claim_55f61821addc491780c471544a36cdb7",
-      "statement": "The implementation contracts establish PostgreSQL atlas_packets as the canonical packet/source authority while chunk lineage and external retrieval stores are distinct relations or projections; a proposed atlas_packet_registry design in older documentation must not be treated as current authority without migration evidence.",
+      "statement": "Current implementation contracts place canonical packet/source state in PostgreSQL atlas_packets, while chunk memberships and packet-incidence readback are distinct lineage relations or observations; the older atlas_packet_registry design proposes a different all-service authority and must not be treated as current authority without migration and writer-ownership evidence.",
       "evidence": [
         {
-          "resource": "repo://docs/PACKET-CENTRIC-ARCHITECTURE.md#L11-L20",
-          "version": "repo-lines-v1:sha256:2fb5194b16d2e93b2a2131c59765f228d1a13fe4e24e0ff48f91aa9994827a94:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzM2FhYzFhNzJkNDk5ZWUwNGIwYmJlNjljYzljMDI0OWMzNzIyYjk0MzBhYTM4N2Y5ZmMxMWRhNWNhMTZmM2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwNDA5Y2E2ZTBjZTEyMzMwYTc4ZmNhMmRkZDdkNzBkYmU5YTE5YzUyN2FjYmE5OTk4OGYxNTBmNTAwYWIzMzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYzEyZmJmMmJjYzBmNzc2YzBkNTRmZjE2NTE4YjBlMTk3Nzc2Y2UxNDhkMTc2YTBkNTA2OGM0ZjA3MTFmYjgifQ"
+          "resource": "repo://docs/PACKET-CENTRIC-ARCHITECTURE.md#L3-L20",
+          "version": "repo-lines-v1:sha256:cb7e938410b41f0d29fc1179589d4ed24149b85e584a31bb603f75aa60db6ede:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmOTY5ZmFmMzE0MjUwMGQ2MTQ5YzY0Y2U2ZjBiMGQ5YjFmZDZkZTgyZDJmMjE4ODY2OWU1YjkwNTA0NGUxYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwNDA5Y2E2ZTBjZTEyMzMwYTc4ZmNhMmRkZDdkNzBkYmU5YTE5YzUyN2FjYmE5OTk4OGYxNTBmNTAwYWIzMzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyZDQzZGFhNjRlZDQzMDhhMmJiZWQ4YjJlNzY2ODEzYzY1ZDhiYmY3MGNlOTcxZDBhMDY2ZjQ0NmRkZDYxYTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYzEyZmJmMmJjYzBmNzc2YzBkNTRmZjE2NTE4YjBlMTk3Nzc2Y2UxNDhkMTc2YTBkNTA2OGM0ZjA3MTFmYjgifQ"
         },
         {
-          "resource": "repo://docs/PACKET-CENTRIC-ARCHITECTURE.md#L3-L8",
-          "version": "repo-lines-v1:sha256:dbc2d5a5e3381e47cf15df3cbbd23f0d86827bd25f63b0b9bd5b585405ce73e9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY5NjlmYWYzMTQyNTAwZDYxNDljNjRjZTZmMGIwZDliMWZkNmRlODJkMmYyMTg4NjY5ZTViOTA1MDQ0ZTFhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2ViNzAyNTc1OTNkYTA2ZjY4MmEzZGRkYTU0YTlkMjYwZDRmYzUxNGY2NDUyMzdmNWNhNzRiMDhmOGRhNjFhNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjJkNDNkYWE2NGVkNDMwOGEyYmJlZDhiMmU3NjY4MTNjNjVkOGJiZjcwY2U5NzFkMGEwNjZmNDQ2ZGRkNjFhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmRiMmRjNmIxOTViNTJjMTgxMDJiOTY1ZDI3NTEzMzY0MmVmYmI4ODM4YjY1MmYzODY4N2U3ZGViZTk0Yzc2ZSJ9"
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts#L3-L18",
+          "version": "repo-lines-v1:sha256:5578ae48e21e7fd157d6c4faf4d835fb37c0a5bda40c48865f5fb036dafb5db4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjZTAxM2IxMTc2NmNiYTBkMDUzNGNhOWJmZjY0Zjg4MzgwOWE5ZTcwZWRiOWUzMWQwNmRmNTUxZmFiMmEzZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwMGZkZjRiZjYxNmMwNTdmYmQ5MjhkZDJmYzczNDUxNjU0YTcwNTg1MDMzMzFmZWNmZTZmMjBmMzk1MDBhNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxYTY2OWZkZDc2YjNjODBlNzYyZWI4Y2VjMWU3MDY2MDVhMjE3YjBiZDNhYmQzYjY2ZmUxYzFiZWI1YTdhZjMifQ"
         },
         {
-          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts#L3-L11",
-          "version": "repo-lines-v1:sha256:5369204895fc91ba054dfc6a67b014e1651321fb6a7f98da07cd60b0a59a4ec1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIwOGZiMDRiYzNjOWFhYTg0YmNhNDQ2Y2NlMDBkMTc3NWM3MDkzODQzMGJkNGJmYWE4NTQ1OGY5YzFiY2RmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTAwZmRmNGJmNjE2YzA1N2ZiZDkyOGRkMmZjNzM0NTE2NTRhNzA1ODUwMzMzMWZlY2ZlNmYyMGYzOTUwMGE1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDdmNTAzNTRlOGUyMThmYTNmZTUyZTIzNzhkYTIyZGU1ZmQ4NWYwNTM0NWE3ODBlZDJhOWEwMzE1ZTBmOGMwOCJ9"
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-postgres-readback-v1.ts#L19-L46",
+          "version": "repo-lines-v1:sha256:5fe5132e48c9d86bb72f3b0bb7f59157a926ea52e39059d297a7e8bfdce0de18:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhY2JiNDkxMTMxMzNhMzlhMWU3ZDZlNjk4ZTVlY2Q5NzA5ZjdlOWNlOWFhOGU2NWRmODRiZDg2OWYwNDAzZWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzMTk1ZjQ5NzQwZmQyMDU4YjNiYWM5ZGM2NDNjNmJiN2E3ZjA1ZDc3OWU4MmI5MTUwYmVlYmUzNWUxYTAzYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-postgres-readback-v1.ts#L1-L30",
-          "version": "repo-lines-v1:sha256:11ae8708738a39688b2041e698981d04a976c727b1713f568cad7a6eb0bb613f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4MzU5YjFiNzU4OTM3ODZiOTA3NTdmMTVlMjg3NzI3OTNiNjQwZmZkMGIwNTE5NjE5OGM4NTY5NjZjNmNkZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyM2QwOTRjZWZhNTMzNTQ0MGMyZTJkMDg4ZWQyNGU5MzJkZGQxMDRjNGQ1Y2QwM2U1ZGJmZjhkNmM0MGI0YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmMTZmMGYxZWM5Njc2YzJjZTk3MTkyN2FiYWY0ZGM3NDI5MWRhNzljOWY3NjcwYjhmNTlmODYxNTg3YmRiNWIifQ"
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L30-L43",
+          "version": "repo-lines-v1:sha256:ae5d7e9b73285d88ae482c529cea78546abd458afacf13ca59ec20448db153c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzMzNjU4NTE5ODZjNjIyNGFlNGMwMThhYTYzMzZiZGE1ODI5YTBlMDI2NTcwOGE4NWRiZmQ5NmY0ODMyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3Nzk3ZTRjZTI4ZjlkYzVhZDY2Y2U0ZjM5ZGQ5ZTJjZjMzMDhhOWFlNzBjY2QyOTI5MzIyN2UzNTcxNGI3ZTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYjU2YzcwZmJiYjMzNGZkYmY4MjJmNGEyODIxNWJmYzg5ODk4YWQ4OGM0NDExY2RkYjZlZjA5ZjkxNzFjZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5OWNmMjgwNmYzYjRhYzRiOTBlMDZhOGVmNWJiNGQxMDUxY2JmOWQ1MmM4MGUwYjU5MTQ4ODIwZmFlMmZmNGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a289a8f9838b4cb9bebe9451bd58a5f3",
+      "statement": "Workspace event sourcing records an ordered, checksummed workspace head transition with explicit participants and rejects stale or inconsistent appends; invalidation artifacts are derived only from participants marked INVALIDATES and are explicitly write-free, so event and invalidation receipts describe state changes without becoming packet authority.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.spec.ts#L42-L69",
+          "version": "repo-lines-v1:sha256:39a55769c22c85f5952b821812735cf93ffff3f94a8dc9f3b32c22dca5842a48:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyZDVmN2VmMDUwYjg3YTg5NjM0NGUyZjNhZDI4OWI0NTk3OWU1ZDhjNzM1Y2I3MzFjMTMyM2EwYTBiNDZjZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts#L129-L151",
+          "version": "repo-lines-v1:sha256:923cb5268b1e3bb0664616ae5d1225f451568b00809173fa164c4adcfccd8ccc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2NTNjYmYwODdiY2IyMzI4ZGUyN2Q4OTllMDhhZWZmZmUwNjIwYjE0MzEyMDZhNDI1YTc4YjlhYzMyYzRmMTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxYjUxZDYyN2QwNDJlNjlhZDdkZGIwYzMxM2FjMzJmOTFhZmU3ODRhMWFiNmQ0MmNiMjQ4ZmIzY2NkNjlhMDcifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts#L173-L229",
+          "version": "repo-lines-v1:sha256:382569c8ec66c0eac7ad36519e173c34e606c7d7498b290c788c6c7b97a3415d:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4NmMwYTk0M2E4ZTgxZDY1NjNhMjA2NmQ2NDU2OTYwYTQ5ODUyOTMwODVmMjA1ZjgyNjM4Y2VjNmFkYWM4MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjMDQwMDQ2NGNlMzEyNjg0MDMxZWYxMmU2M2FiZTZiMWFmNGM0YzM2ZjcwMjYwY2FmZmM2YTQ0MDhjYzVlNWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMGYyZDNhM2FhZGEyNzU4NjQ1NzhkMGE0MzkxNTYzOGQ1NDNmZWNhMmM5NDg1OGRiOTQxMjExZTg2Y2VmMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts#L56-L77",
+          "version": "repo-lines-v1:sha256:23d7a5dfeeffcad3a3c9789ea03155e1fa9381e24dded41fe5a84f35cffe73d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyZDYwYWQyMTUzZDkyYzBiMGI0Y2EwNGIxYmI4ZTE0NmU5YTVkYzJkZmE5NDUzMTEyZTAxYjk2M2ZkZGE4N2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2ZmYxYTQzNGI5NWRjOWVmODJlZGY0Yjg1NGJiYTM3YWI3ODZjYzExNzJjMDU4ODBiNDllN2ViNDQ4MmRmMWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZDA5N2Q4ZmM2N2I5YTM0MWQ0ZTAyMmYwMDYzZDQxNjZjYTgyOTk4NDgwMjJjMTE1NzdkMGMzOTg2YWYwNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzMzFhNmMyYTU5ZmUxOWQzODVkMzY4NDNiZmYxYzgyMjBlNWJiZTJkYzg2NWExN2E1MjA5NzhkM2ZkMDFiODYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f0421433e92041a6b34d808d1f072e5c",
+      "statement": "Representation lineage is independent of physical vector storage: semantic representation admission can reach REVISION_QUALIFIED only with canonical chunk and packet bindings, source/workspace and representation/model/tokenizer revisions, a qualified input digest, and a vector checksum; schema checks keep canonicalAuthority false when those proofs are incomplete, and cohort admission remains non-authoritative and write-free.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.spec.ts#L14-L35",
+          "version": "repo-lines-v1:sha256:287a4ec38e342a8966510f9ead1c70d50caead34cc6395d616e5bad7337dd7dd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5NTY1ZTM2MGFkNzVlMzMxY2MyMmQzODhlYTM5NGUzYTE4ZTAyNmY1YWE1NmEzZWFlMWYzYWEyMmIyZmM3M2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlYjE1YWQyNjk5OWNjNmE0NDVjNWQ4OTM4MzNmMTIzMWNkYTkzZGE3OWM2ZGE4ZGZlMjJhODFjMWFmYThmNjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlNmVkZjM1ZWRkMDA4ODJmNWUyZTliOWZkZDNkOTYxM2VjY2FmZTBlNjMzODc5NmEyMmQ5ZjdmYjM3OWQyMzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkYjk0YTUxODE0ZTIxOGUxNzlkYTI2OTY3YjZlMzRlYzUzYjRhNjdlNDg2YmQ2MThlNjJhNGY2NTgyNDcxMDAifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.spec.ts#L62-L145",
+          "version": "repo-lines-v1:sha256:12dd04ff60df25549b150a7f25bb182cf8a439dfea41919a45939cb141975f67:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5M2I4NGVhMDhmMDcyNmQ2ZTMzOGQ5MjkzNjE0YWMxNjAyZDUyMDEyYTQ3MDZmMDc3ZjBjNmQwYmRmNTY4YWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNiZTRlMmQyZmM0ZjhjZGIzZWU0MzI2NzBkMzNkM2Y0YmRlNjVlNDAwNzg1YWM2YTQ3YWZlNDRkOTNjZjRiZTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.ts#L14-L34",
+          "version": "repo-lines-v1:sha256:9b58cd9dbc48a9c81112361bc803bf72944fe26eb786d7761ba5c11164c0e642:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiZTAyOGE0NDJiOTNkMTIxZTEzMmVmM2RkOTZiYzI2NTQ1NTU5ZTE5YzNhMDZhZDc2N2FhNDYwNGMyY2MxZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3ZWM5NmQ1YjBjZjYyYjRmMTI4ODNlNzMxOGFhZjMxMjQ5Y2E0ZTY0NWIyYzdiYWQ1OTNmZDY1NGVlZTcwMDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZGE5YzZkZTQ4OWI1YjQzNDcwZjY1YjZmMGM0MGI5MjU4YWZjOGE3ZjhhZDYwMTJlNGNhODg4NTIwYmQzYWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0NDJmZTA3MjkzMmQyNjY3OWEzM2RhNzJkZjg4MjAyNzE5NzQyOTczYWM5ZGQwOGIyNTEwZGYxODI5YzVjY2YifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.ts#L164-L207",
+          "version": "repo-lines-v1:sha256:48336b9947842c9852875980ff69623839b9bfee98bc0886af0d163fcabd2d72:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjYmE5N2M2MzVlMGQwZGUzZmI0ZDIwNWNhNGMzYTk3NmI2ZTYyYTI0MDY4N2Y4ODI0YzU5NDAyM2NhYzI4YjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwOGI2OWIxMjMxZTc1MDMzNWQ5ZGQxZjc5ZDc4NmVjOGQzMjEzZTQ2MDRmMzRhMGExMmRjZTRjMDM0ZTBlYTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkNjgzYmZjNTI1ZGQzZDAxZTFkYWMyMjFkYmZmNjdhMGRjYTA0MTViNTc5NmUxYmM2MDljNWRiYWNlNDkzZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1MzNhMzg4MzMxOWVhMzU5YjdlNjE1YzgzYWZhNjgzYTI1ZmRhYTdjMWQ5NGQ5MjZmNmFhMzUwZGU0MTViNGUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.ts#L211-L254",
+          "version": "repo-lines-v1:sha256:d48bf34158213ea02106a04b2225fa283a3571e3d9265c56b288db1f198cc0c5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0OTk2NjFmYTI2NzhhMmViNmNiNjQwNGUwMTFlNDI5YjU5YTZiYjI4OTRmY2JkNjg3YjdmZGRiYjA5YTk4NzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwOGI2OWIxMjMxZTc1MDMzNWQ5ZGQxZjc5ZDc4NmVjOGQzMjEzZTQ2MDRmMzRhMGExMmRjZTRjMDM0ZTBlYTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1MzNhMzg4MzMxOWVhMzU5YjdlNjE1YzgzYWZhNjgzYTI1ZmRhYTdjMWQ5NGQ5MjZmNmFhMzUwZGU0MTViNGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzYmNkNmRlNTY0MmY3ZmI3ZTRmNTZkNzk4YjczZDQyNDkxODFkNzIxMWE3OTBiMDdlN2MxZjdjMDFmNDE4YTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c17987d8cced447e8f91dfefecb77a58",
+      "statement": "The packet-write transaction wrapper defines a read-decide-mutate boundary in PostgreSQL: it reads canonical state, applies only a guarded mutation for an advancing revision or a qualified insert, writes a projection outbox event only when a mutation occurs, and writes a receipt for every decision while leaving external projection work to a later consumer; the wrapper is explicitly scaffolding rather than proof that every live writer routes through it.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts#L1-L31",
+          "version": "repo-lines-v1:sha256:7a069dbb569e8c1dc31e4726281c2eb582d1470960948fd1dd6e8037f9df08dc:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5Yzc4MDlmNzJlNWNmZGY1NWRjOTFiODc4MjE4OGQ4ZjNjMDJlY2JkYzFmMjU2ODI1NzdmNGIyYWFhNGIxMTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE0YzEzOTRiMjU4OTdjOTA3ZGU5ZjVkZTk1MzYyNzgyMTA1Njg0MjBmOTQyZGU4NzEyOWY0MTYzYzExMGM3ZGUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts#L129-L189",
+          "version": "repo-lines-v1:sha256:a296d1d07a36912cfdd5abe149484619b1cc765926ea3fff9192e83f97b00608:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmZjFkYWFhZGZjM2ZjMWI1MmNiZTA1NzRlYTc0NDYwZTYwNjlhNDdkYTM1OTYzYjMzZGQxZGQ4OTA4NzI5MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlM2U3ZmJlMjFkNWM5M2RiY2ExYWFiY2YzNjI3ZTc3YmQ5Y2U0YTU4MDUzMTVkN2ZiNWExNjFhZmM1ZDczODciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZTI2NjQwYjRhYWJhMzI4ODFmNzExZTY0OTExYTQ2M2ZhOThkMDcwOTIzNTkwZWM0NjNlNjg1NmI0N2Y2NTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcyNjM2NTMzOTkzNmQ5ZTUwZmZkMjM3NmEzZWZkNWQxY2UxYTVmNGU4N2QyYjRjM2I1ZTI1N2QwOGZiYjE4NTUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts#L191-L268",
+          "version": "repo-lines-v1:sha256:19aa0279d0a30ee82fcd2029770c42f36bce9eec63b34986edb349df60a7941e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1OWQ3OTkxOWU5ZGEyMWFhNjFiZTZiNDdhZDM0MTc2MzIyZWU1NmQyMDkzNDJmOTc1NzIzODQwNmU4N2Y0OTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMTJmNjNjZGIyZDY0YWQzNmY2OWMxMjQ3MjEwNTg3NWVkMzI3ZmRmMzkwNzM3MjRjOTAyMGEwMjRmMmYyNjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiYTQwMzJlMWU1ZWUzY2ZmOTBkZmY0Yjk3NjMzYTliZjI2YzdlMTBiMzM3Y2M5OGM3YTQ2MTQ4NzhkN2UyMzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts#L81-L127",
+          "version": "repo-lines-v1:sha256:4b71df8638ac6d6f6fbc0f70cc3524a1f9fce68af05c7ef80b24fb2028e257a8:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkZDhjMDVhMzIzMGQzZTRlN2UwNmYyYTQyZWZlMDJmMmJjY2E5YTk0ZjAxNDhjNzc3ODI5ZGI0ZDJmNGYzMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYjAyOTQ2MzFkZTVhMWEzZmZmN2ZhOTQ0YzlkMzlhOTE2YTk0Zjg5Mjc2NzEwNTAwNzZhY2JjMTI3YTk5NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmNDE3MmIyODhjZWExMWEzOWIxZDJlMTcyOTc0NDRhNTQ0MDBlOTRkYmIzYmFlODQxMDI2ZWRiYTc0MTJiNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzJmMTAzODQ2YjI4MjcwYTVlZWFjNWJlYjFlNjgyMjdlODJhMDJhMTc3ZDU5NTViZTJjZGJmZDNmM2U2YjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_740a636e89974bd2ab7702ab3e26d29f",
+      "statement": "The live atlas_packets schema is a mixed legacy/additive storage surface rather than proof that every row is fully qualified: packet_key and source_revision are nullable, workspace_revision and representation_revision have legacy integer defaults, and external IDs coexist with separate content and representation lineage fields; the guarded transaction therefore rejects checksum-shaped workspace revisions that the legacy integer storage cannot represent instead of truncating them.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts#L154-L187",
+          "version": "repo-lines-v1:sha256:982ea8eea09840666dd482356d5edce02e8b9bf31d8427f99a0311d8c1cdc553:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0YmNlYmIzNmU3NzNiY2FhZWQ1NDFkZDk4NDc3M2Q1YTZjOWViNjA4NTBlNDhjZmE1MGQ0MDQ4MDZmNTNmYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0ZWZjNDk0MThkMjZkY2YxMjliMjJhNmFhMjExMDhjZWVjMzc2NzdhMzJkMDhlOWQ1ZmVlMzVkZGE2NmJiOWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4ZGJmYjMzOGVhNGVkYTVkMTUwMTk0YmI3ZjhjNzUxNGJlNmE2MzQ2OTQ3NTk1ZTQxZTU2ZTM5NTRjODhlY2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiYTQwMzJlMWU1ZWUzY2ZmOTBkZmY0Yjk3NjMzYTliZjI2YzdlMTBiMzM3Y2M5OGM3YTQ2MTQ4NzhkN2UyMzgifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L102-L140",
+          "version": "repo-lines-v1:sha256:e5775b7dc03a193b8857682b774d7146c0ac0fbbf1a09dfed0153c090e5e62ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYjg5YzBjNjljOWZhMTFhZWZhNmQ4OWU2YzZjNDk2MjcxYjU0ZGNjZmU4ZTk2NzE2YjRjYjQzZmZlM2VhMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNjdiY2NjZjI4ZDUzMjc3YjAyYjdlMTdmZWZhZjQyYzg3ZTQ3ODc1MzFkZWQ3YjY3Zjc1NmE3ZTI2NzgyMmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhMTM0OWU5MGE2MWE5OGY0ODBkNmEyZWQ5NzMwNjY3N2IzYTFmZjNiOWE1ZWM0MDZjMjc5YTg0ZWFkNTIwZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwNWQ4Y2RkNzI5MjE5NTBhZDQ1YTVkMWE3NzE3ZWFmN2Y5MGZhYmJhZDAyM2RiMjYzY2ViZTZkNmFjOGVkMGQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L30-L43",
+          "version": "repo-lines-v1:sha256:ae5d7e9b73285d88ae482c529cea78546abd458afacf13ca59ec20448db153c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzMzNjU4NTE5ODZjNjIyNGFlNGMwMThhYTYzMzZiZGE1ODI5YTBlMDI2NTcwOGE4NWRiZmQ5NmY0ODMyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3Nzk3ZTRjZTI4ZjlkYzVhZDY2Y2U0ZjM5ZGQ5ZTJjZjMzMDhhOWFlNzBjY2QyOTI5MzIyN2UzNTcxNGI3ZTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYjU2YzcwZmJiYjMzNGZkYmY4MjJmNGEyODIxNWJmYzg5ODk4YWQ4OGM0NDExY2RkYjZlZjA5ZjkxNzFjZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5OWNmMjgwNmYzYjRhYzRiOTBlMDZhOGVmNWJiNGQxMDUxY2JmOWQ1MmM4MGUwYjU5MTQ4ODIwZmFlMmZmNGUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L65-L76",
+          "version": "repo-lines-v1:sha256:2fe9e1a9d2471b33556b656ea5eaa2adaa1b0d91aa8e0ffe23ddd4b040e9b3d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZjU2MzI5ZDRkYjJhNzg2N2VhYmI2ZTlkNmVhNjQ2OTJhOWI2ZGU2YzRmMWEzOWRmNzBkYmE1YWZmNzQ3NGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjYjBhN2RmYzdkYmE2MTNjOWRlZjI3NTY3OWY2YzlhYzNhZjJhMDk2ZjhiYWViOWMxZGE2YThiMTA1YjgxYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI0ZWRlNjVkZGYyNWEwMjcwMjEwY2M5OGI5MGU3YWUwNDRiMTgzNGY1ZDNmZDJkMjg2YTYzNzg1ZDNjYWUzYjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmMWZkYmVhYWM4YTM3Y2JlM2IwNWEyZjk2YTc4NzMzNzg0ODJhNWI4ZjUxMGI3NmZjNWJjYTMyYmVmNzkwOTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c1ff4cdc56704dfe9a1fcbe63064565b",
+      "statement": "The parent-atlas canonical packet bridge treats packet_key, source_ref, and feature_id as a consistency triple at the PostgreSQL integration boundary: extraction hard-fails on missing required fields, validation reports mismatches, and memory envelopes are created only after identity extraction rather than deriving identity from a projection.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas/src/core/canonical-packet-bridge.ts#L29-L43",
+          "version": "repo-lines-v1:sha256:a748ea0e43fcf664bbc7c166da9dcc497c0f94a980ec041ae26ba8489ca418d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwNjE2MDhlM2Q0MzFlYTVmNzllYzJmMGQ0ZGU4ZTAxOWU5MGM2ZTM3MjEwMjlhMzk0Yjk0ZWE0YzA1Y2U0MGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4NWM3YjcyOWFkNTI2ZWUzNjA2YjI3MDVhZWRmMTlkMDdkYjA1YTg4ZGRhM2M1ODFmMWFiMDk5ZDhkZTJkYzMifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas/src/core/canonical-packet-bridge.ts#L45-L86",
+          "version": "repo-lines-v1:sha256:79ca5aba2280ab7c63c089a2ef70f757a1117cc8dbc24c28c8d71fd07c13eb45:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmI5M2VjY2ZhYzExNmZjN2Q4OGQ3OTk1ZGRkOTJiOTdiMmEyZDQ5YjMxZDM5NmU2ZWEyYjFhZmFlOGQ4MGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwMDAyYjUyNGM1ZWJiMzhmYWVlNTBkNDRiYmM4YTU3NTU2NDM3YTYwZDY4MjZlMGUzM2U4Y2MxNzg4ODhiZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MzYzYjkzODlkNGM2OTQ1NTU2YjdjMGU0Y2YxNjljN2ZhYjFlZGU5OTNlZmJlMTZlMjNiZGM5ZTExY2NhODYifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas/src/core/canonical-packet-bridge.ts#L89-L110",
+          "version": "repo-lines-v1:sha256:f0507120b46d3879cfca4804e7d90720315928bc98bec166c5e3a71b6e83be22:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhM2EyMDUxNDc4ZjQwYTkwMDM4MmY0ZjU2MzM5NTlhMjgzZmQzMzJmMWQ1ZGEyYjBjZGY3MjZmZjYwMDk2ODYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmZDE0NjE4MTZjM2M0MjcwNjNlM2Y4YWRjZjM0ODdiOWMzMzc4ZjdmNTU0MTc1YmIzNDMzYzliMmQyYTVhMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MzYzYjkzODlkNGM2OTQ1NTU2YjdjMGU0Y2YxNjljN2ZhYjFlZGU5OTNlZmJlMTZlMjNiZGM5ZTExY2NhODYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8e78e1efa9354586a20827e019294b51",
+      "statement": "Packet incidence consumption is exact-revision filtering rather than fuzzy graph fallback: PostgreSQL readback resolves packet keys and checks the requested workspace snapshot, while lineage verification requires both packet endpoints, exact source revisions, exact workspace and graph revisions, nonempty evidence, and valid checksums; rows that fail proof are rejected and zero survivors is a valid empty result.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-lineage-v1.ts#L144-L169",
+          "version": "repo-lines-v1:sha256:0d5e9ae46289cbb09192a30ae7b4a27de383b366343f15ca3457ce35b33e6bff:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzYzlhZTJjMmE1NzY4NGJkN2Q4ZDNmNTIxYzIxNGJkY2FlNjkyNDhiYzg0MGViMmFiNGJiZmIwODYxZTBkODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiMmMxZWUzMjJjZTMzNzJjZjljMDFmZmQyYzBjMGJlYTgxNjM0ZDg0Yzc4NTc1YThiMDk0YjYxODFjMzY2YWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjYjEzYWYyZWZkNjVmNDlmYTFmMGJlNDcyMzQ3ZDgxNDg4Y2IzZTk5MTIxZTE2ZDYzNGQ2ZDExYzNlMzEyNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2ZjUwZDY3MGQxMTk1ODJhYTBiMTFjZDU1M2QyZjE1MTQyMGI2ODJkZTBhMzE0NzZjZTcxYjVlNDliMGJjMGIifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-lineage-v1.ts#L178-L196",
+          "version": "repo-lines-v1:sha256:7efd93fa5fb4b8ff4fe64532666109db1255500c9a6f7c8541da79afac431751:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMyMjIzMjlkMTdkZTE3ZGMzZWFkMWM2NmZlOTMwZmRkYzhiMWU2YTY1NzNkN2U5MGY2NWQ5N2RhZWMxZGVlYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-postgres-readback-v1.ts#L13-L45",
+          "version": "repo-lines-v1:sha256:19fb320be913de21cc870d92443da0e47b319696775f34f27cccbe0c780a8e6d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMDJkM2U5YWQyNDUwY2U5OTk1YjYwOGU2ZjM2MDUyNzNiNjJhZjMxNDVhYjc1NTYzYmQ5MTE1MmNmZTU1YjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZDE0YWIwYWE1MWYxMzBmMWU3NmUyMGJhMjBlNGQ3MzdkYjA2MjZlNTY2ZjhiNTBhOGIwYzk0MGExNjk3OTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5NTNlMzY2N2QzNGUyOGQxNGNmMmQyNjAxMjdmNzgxN2MwNzAyMWVkN2FkODkyOWQ1OThhY2MzYjY4OGVmMzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUifQ"
         }
       ]
     }

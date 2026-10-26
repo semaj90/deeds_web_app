@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 
 const SCHEMA = 'atlas.graphify-symbol-batch-plan.v1';
 const SHA256 = /^sha256:[0-9a-f]{64}$/;
-const KINDS = ['ts_js', 'markdown', 'text', 'json'];
+const KINDS = ['ts_js', 'markdown', 'text', 'json', 'sidecar_code'];
 const digest = value => `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 
@@ -60,6 +60,27 @@ export function buildSymbolBaselineShards(plan, size = 250) {
     });
   }
   return { schema: 'atlas.graphify-symbol-shards.v1', manifestChecksum: plan.planChecksum, sourceCount: plan.rowCount, shardSize: size, shards };
+}
+
+export function admitFrozenSymbolRunFileV1(parseStatus, attemptedFiles, maxFilesPerRun) {
+  if (!Number.isSafeInteger(attemptedFiles) || attemptedFiles < 0
+    || !Number.isSafeInteger(maxFilesPerRun) || maxFilesPerRun < 1 || maxFilesPerRun > 250) {
+    throw new Error('SYMBOL_RUN_FILE_LIMIT_INVALID');
+  }
+  if (parseStatus === 'PROCESSED') return { admitted: true, attemptedFiles };
+  if (attemptedFiles >= maxFilesPerRun) return { admitted: false, attemptedFiles };
+  return { admitted: true, attemptedFiles: attemptedFiles + 1 };
+}
+
+export function requireWorkspaceAlignedGraphifyFileApplyV1({ apply, workspaceRevisionMismatchCount }) {
+  if (typeof apply !== 'boolean' || !Number.isSafeInteger(workspaceRevisionMismatchCount)
+    || workspaceRevisionMismatchCount < 0) {
+    throw new Error('SYMBOL_APPLY_WORKSPACE_ALIGNMENT_INPUT_INVALID');
+  }
+  if (apply && workspaceRevisionMismatchCount > 0) {
+    throw new Error('SYMBOL_APPLY_GRAPHIFY_WORKSPACE_REVISION_MISMATCH');
+  }
+  return { applyAllowed: apply };
 }
 
 export function selectLiveSymbolPlanRows(plannedRows, liveRows, workspaceRevision, verifyProcessed = false) {

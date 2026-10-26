@@ -46,6 +46,9 @@ export function spawnLspServer({ command, args = [], cwd, useShellWrapper = proc
   let stderr = '';
   let openedFiles = 0;
   const pending = new Map();
+  const observedServerRequests = [];
+  const observedNotifications = [];
+  let initialization = null;
 
   processHandle.stderr.on('data', (data) => { stderr += data.toString(); });
   processHandle.stdout.on('data', (data) => {
@@ -61,7 +64,43 @@ export function spawnLspServer({ command, args = [], cwd, useShellWrapper = proc
       if (buffer.length < start + length) break;
       const message = JSON.parse(buffer.subarray(start, start + length).toString('utf8'));
       buffer = buffer.subarray(start + length);
-      if (message.id !== undefined) pending.get(message.id)?.(message);
+      if (typeof message.method === 'string' && message.id !== undefined) {
+        observedServerRequests.push({ method: message.method });
+        if (observedServerRequests.length > 64) observedServerRequests.shift();
+        let result;
+        if (message.method === 'workspace/configuration') {
+          result = (message.params?.items ?? []).map(item => {
+            let value = initialization?.initializationOptions?.configuration ?? {};
+            for (const segment of String(item.section ?? '').split('.').filter(Boolean)) value = value?.[segment];
+            return value ?? null;
+          });
+        } else if (message.method === 'workspace/workspaceFolders') {
+          result = initialization?.workspaceFolders ?? null;
+        } else if (message.method === 'window/workDoneProgress/create') {
+          result = null;
+        } else if (message.method === 'workspace/applyEdit') {
+          result = { applied: false, failureReason: 'Atlas source-analysis client is read-only' };
+        } else {
+          send({ jsonrpc: '2.0', id: message.id, error: { code: -32601, message: `Unsupported server request: ${message.method}` } });
+          continue;
+        }
+        send({ jsonrpc: '2.0', id: message.id, result });
+      } else if (message.id !== undefined) pending.get(message.id)?.(message);
+      else if (typeof message.method === 'string') {
+        const observation = { method: message.method };
+        if (['window/logMessage', 'window/showMessage'].includes(message.method)) {
+          observation.type = message.params?.type;
+          observation.message = String(message.params?.message ?? '').slice(0, 1600);
+        } else if (message.method === 'textDocument/publishDiagnostics') {
+          observation.uri = message.params?.uri;
+          observation.diagnostics = (message.params?.diagnostics ?? []).slice(0, 8).map(diagnostic => ({
+            range: diagnostic.range, severity: diagnostic.severity,
+            message: String(diagnostic.message ?? '').slice(0, 800),
+          }));
+        }
+        observedNotifications.push(observation);
+        if (observedNotifications.length > 64) observedNotifications.shift();
+      }
     }
   });
 
@@ -84,6 +123,7 @@ export function spawnLspServer({ command, args = [], cwd, useShellWrapper = proc
 
   // Thin lifecycle convenience wrappers — still generic LSP, not Atlas-specific.
   async function initialize(params, timeoutMs = 15000) {
+    initialization = params;
     const result = await request('initialize', params, timeoutMs);
     notify('initialized', {});
     return result;
@@ -112,6 +152,8 @@ export function spawnLspServer({ command, args = [], cwd, useShellWrapper = proc
   return {
     request, notify, initialize, didOpen, didClose, shutdown, dispose,
     getStderr: () => stderr,
+    getObservedServerRequests: () => [...observedServerRequests],
+    getObservedNotifications: () => [...observedNotifications],
     getOpenedFileCount: () => openedFiles,
     processHandle,
   };
@@ -168,4 +210,32 @@ export function byteOffsetToPosition(sourceBuffer, byteOffset) {
     line: (prefix.match(/\n/g) ?? []).length,
     character: lastNewline < 0 ? prefix.length : prefix.length - lastNewline - 1,
   };
+}
+
+export function positionToByteOffset(sourceBuffer, position) {
+  if (!Number.isInteger(position?.line) || position.line < 0 ||
+      !Number.isInteger(position?.character) || position.character < 0) {
+    throw new Error('LSP_POSITION_INVALID');
+  }
+  const text = decodeUtf8Strict(sourceBuffer, 'LSP_SOURCE_INVALID_UTF8');
+  let lineStart = 0;
+  for (let line = 0; line < position.line; line += 1) {
+    const newline = text.indexOf('\n', lineStart);
+    if (newline < 0) throw new Error(`LSP_LINE_OUT_OF_RANGE:${position.line}`);
+    lineStart = newline + 1;
+  }
+  const newline = text.indexOf('\n', lineStart);
+  let lineEnd = newline < 0 ? text.length : newline;
+  if (lineEnd > lineStart && text.charCodeAt(lineEnd - 1) === 13) lineEnd -= 1;
+  const lineText = text.slice(lineStart, lineEnd);
+  if (position.character > lineText.length) {
+    throw new Error(`LSP_CHARACTER_OUT_OF_RANGE:${position.line}:${position.character}`);
+  }
+  const absoluteOffset = lineStart + position.character;
+  if (absoluteOffset > lineStart && absoluteOffset < lineEnd &&
+      text.charCodeAt(absoluteOffset - 1) >= 0xd800 && text.charCodeAt(absoluteOffset - 1) <= 0xdbff &&
+      text.charCodeAt(absoluteOffset) >= 0xdc00 && text.charCodeAt(absoluteOffset) <= 0xdfff) {
+    throw new Error(`LSP_POSITION_SPLITS_UTF16_SURROGATE:${position.line}:${position.character}`);
+  }
+  return Buffer.byteLength(text.slice(0, absoluteOffset), 'utf8');
 }

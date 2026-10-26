@@ -2,12 +2,98 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
+import { db } from '$lib/server/db/client.js';
+import {
+  openspecTaskSourceIndexV1,
+  openspecTaskSourceSnapshotsV1,
+} from '$lib/server/db/schema/openspec-task-source-index.js';
+import { loadLatestOpenSpecCensus } from './openspec-census-selector-v1.mjs';
+import { searchOpenSpecClaims } from '../../../scripts/atlas/openspec-task-fts-index-v1.mjs';
 
 type JsonRecord = Record<string, any>;
 
 const ROOT = path.resolve(process.cwd(), '..');
 const REPORTS = path.join(ROOT, 'docs', 'reports');
 const MAX_ITEMS = 32;
+
+type SourceIndexSearchInput = {
+  query: string;
+  identity: 'ALL' | 'DECLARED_ID' | 'DERIVED_ID' | 'AMBIGUOUS';
+  limit: number;
+};
+
+type SourceIndexSearch = (input: SourceIndexSearchInput) => Promise<unknown>;
+
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (character) => `\\${character}`);
+}
+
+async function searchPostgresTaskSources(input: SourceIndexSearchInput) {
+  const [snapshot] = await db
+    .select({ snapshotId: openspecTaskSourceSnapshotsV1.snapshotId })
+    .from(openspecTaskSourceSnapshotsV1)
+    .orderBy(desc(openspecTaskSourceSnapshotsV1.createdAt))
+    .limit(1);
+
+  if (!snapshot) {
+    return {
+      schema: 'atlas.openspec-task-source-index-search.v1',
+      status: 'NO_SNAPSHOT',
+      snapshotId: null,
+      rows: [],
+      total: 0,
+      canonicalAuthority: false,
+      taskIdentityPromotion: false,
+      executableKanban: false,
+      writesPerformed: false,
+    };
+  }
+
+  const pattern = `%${escapeLike(input.query)}%`;
+  const where = and(
+    eq(openspecTaskSourceIndexV1.snapshotId, snapshot.snapshotId),
+    eq(openspecTaskSourceIndexV1.archived, false),
+    input.identity === 'ALL'
+      ? undefined
+      : eq(openspecTaskSourceIndexV1.identityStatus, input.identity),
+    or(
+      ilike(openspecTaskSourceIndexV1.sourceRef, pattern),
+      ilike(openspecTaskSourceIndexV1.changeId, pattern),
+      ilike(openspecTaskSourceIndexV1.taskText, pattern),
+    ),
+  );
+  const [countRow] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(openspecTaskSourceIndexV1)
+    .where(where);
+  const rows = await db
+    .select({
+      sourceRef: openspecTaskSourceIndexV1.sourceRef,
+      changeId: openspecTaskSourceIndexV1.changeId,
+      sourceLine: openspecTaskSourceIndexV1.sourceLine,
+      taskText: openspecTaskSourceIndexV1.taskText,
+      taskHash: openspecTaskSourceIndexV1.taskHash,
+      identityStatus: openspecTaskSourceIndexV1.identityStatus,
+      canonicalTaskKeyCandidate: openspecTaskSourceIndexV1.canonicalTaskKeyCandidate,
+    })
+    .from(openspecTaskSourceIndexV1)
+    .where(where)
+    .orderBy(openspecTaskSourceIndexV1.sourceRef)
+    .limit(input.limit);
+
+  return {
+    schema: 'atlas.openspec-task-source-index-search.v1',
+    status: 'SOURCE_LOCATORS_ONLY',
+    snapshotId: snapshot.snapshotId,
+    rows,
+    total: countRow?.count ?? 0,
+    canonicalAuthority: false,
+    taskIdentityPromotion: false,
+    executableKanban: false,
+    writesPerformed: false,
+  };
+}
 
 function readJson(filePath: string): JsonRecord | null {
   try {
@@ -17,17 +103,9 @@ function readJson(filePath: string): JsonRecord | null {
   }
 }
 
-function latestCensus(): JsonRecord | null {
-  const runRoot = path.join(REPORTS, 'openspec-evidence');
-  const runs = fs.existsSync(runRoot)
-    ? fs.readdirSync(runRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()
-    : [];
-  return readJson(runs.length ? path.join(runRoot, runs.at(-1)!, 'census-v1.json') : path.join(REPORTS, 'openspec-evidence-portfolio-census-v2.json'));
-}
-
 function loadFabric() {
   return {
-    census: latestCensus(),
+    census: loadLatestOpenSpecCensus(REPORTS),
     graph: readJson(path.join(REPORTS, 'openspec-dependency-graph-v1.json')),
     bindings: readJson(path.join(REPORTS, 'openspec-task-evidence-bindings-v1.json')),
     receipts: readJson(path.join(REPORTS, 'openspec-receipt-binding-v1.json')),
@@ -60,7 +138,10 @@ function cardView(card: JsonRecord) {
   };
 }
 
-export function registerOpenSpecEvidenceTools(server: McpServer) {
+export function registerOpenSpecEvidenceTools(
+  server: McpServer,
+  sourceIndexSearch: SourceIndexSearch = searchPostgresTaskSources,
+) {
   server.registerTool('openspec.census', {
     description: 'Read the latest revision-bound OpenSpec census summary without changing claims or evidence.',
     inputSchema: z.object({}),
@@ -86,6 +167,20 @@ export function registerOpenSpecEvidenceTools(server: McpServer) {
     const task = fabric.census?.tasks?.find((item: JsonRecord) => item.canonicalTaskRef === taskId || item.taskId === taskId || item.taskKey === taskId);
     return result({ schema: 'atlas.openspec-mcp-task.v1', task: task ? { taskRef: task.taskRef, taskId: task.canonicalTaskRef ?? task.taskId, claim: task.taskText, declaredChecked: task.declaredChecked, taskIdStatus: task.taskIdStatus } : null, card: card ? cardView(card) : null, writesPerformed: false });
   });
+
+  server.registerTool('openspec.search', {
+    description: 'Search current OpenSpec task ledgers and proposals with the existing BM25 preview index. Results are claims only, not evidence admission.',
+    inputSchema: z.object({ query: z.string().trim().min(1).max(512), limit: z.number().int().min(1).max(20).optional() }),
+  }, async ({ query, limit }) => result(searchOpenSpecClaims(query, { limit: limit ?? 10 })));
+
+  server.registerTool('openspec.source_index.search', {
+    description: 'Search the latest immutable PostgreSQL OpenSpec source-index snapshot. Returns source locators only; derived task keys are advisory and this tool never queues work.',
+    inputSchema: z.object({
+      query: z.string().trim().min(1).max(120),
+      identity: z.enum(['ALL', 'DECLARED_ID', 'DERIVED_ID', 'AMBIGUOUS']).default('ALL'),
+      limit: z.number().int().min(1).max(20).default(10),
+    }).strict(),
+  }, async ({ query, identity, limit }) => result(await sourceIndexSearch({ query, identity, limit })));
 
   server.registerTool('openspec.frontier', {
     description: 'Read a bounded frontier of unresolved OpenSpec claims; no task state is changed.',

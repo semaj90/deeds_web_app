@@ -1,5 +1,6 @@
 export function parseMcpResponseV1(body) {
   const text = String(body ?? '').trim();
+  if (!text) throw new Error('MCP_RESPONSE_EMPTY');
   const dataLines = text.split(/\r?\n/).filter((line) => line.startsWith('data:'));
   const candidates = dataLines.length > 0
     ? dataLines.map((line) => line.slice(5).trim()).filter(Boolean)
@@ -60,5 +61,57 @@ export function assertNoCommittedMcpWritesV1(result) {
   return {
     attemptedWrites: Number.isInteger(receipt.attemptedWrites) ? receipt.attemptedWrites : null,
     committedWrites: receipt.committedWrites,
+  };
+}
+
+export function classifyAgenticRuntimeStatusV1(input = {}) {
+  if (input.failed === true) return 'FAIL';
+  if (input.blocked === true) return 'BLOCKED';
+  if (input.liveVerified === true) return 'LIVE_VERIFIED';
+  if (input.mockOnly === true) return 'MOCK_ONLY';
+  if (input.configured === true) return 'CONFIGURED';
+  return 'NOT_RUN';
+}
+
+export function buildAgenticValidationReceiptV1(input) {
+  const traceUrl = new URL(input.traceUrl);
+  if (traceUrl.port !== '8788') throw new Error('TRACE_MCP_PORT_MISMATCH');
+  if (!Number.isInteger(input.retrievalHits) || input.retrievalHits < 0) {
+    throw new Error('TRACE_RETRIEVAL_HIT_COUNT_INVALID');
+  }
+  if (input.readOnlyEffects?.committedWrites !== 0) throw new Error('MCP_COMMITTED_WRITES_DETECTED');
+  let sidecarUrl;
+  try { sidecarUrl = new URL(input.health?.sidecarUrl); } catch { throw new Error('MINIFORGE_SIDECAR_URL_INVALID'); }
+  if (sidecarUrl.port !== '8095') throw new Error('MINIFORGE_SIDECAR_PORT_MISMATCH');
+
+  return {
+    schema: 'atlas.agentic-validation-runtime.v1',
+    verificationScope: 'HEALTH_AND_READ_ONLY_TOOL_ROUTING',
+    traceMcp: {
+      status: classifyAgenticRuntimeStatusV1({ configured: true, liveVerified: true }),
+      endpoint: traceUrl.origin,
+      toolCalls: ['atlas.query', 'miniforge.health'],
+      retrievalHits: input.retrievalHits,
+    },
+    nlpSidecar: {
+      status: classifyAgenticRuntimeStatusV1({ configured: true, liveVerified: true }),
+      endpoint: sidecarUrl.origin,
+      model: input.health.model,
+      capabilities: input.health.capabilities,
+      capabilitiesStatus: input.health.capabilities
+        ? classifyAgenticRuntimeStatusV1({ configured: true, liveVerified: true })
+        : classifyAgenticRuntimeStatusV1({ blocked: true }),
+      capabilitiesBlocker: input.health.capabilities ? null : 'CAPABILITIES_NOT_RETURNED',
+    },
+    effects: {
+      executionMode: 'READ_ONLY',
+      attemptedWrites: input.readOnlyEffects.attemptedWrites,
+      committedWrites: 0,
+    },
+    review: {
+      status: 'ADVISORY_ONLY',
+      humanApproval: 'NOT_GRANTED',
+    },
+    canonicalAuthority: false,
   };
 }

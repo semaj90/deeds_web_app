@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.okf.ldr.capture.v1",
+  "runId": "76839544-4775-496e-9102-846ff58d3368",
+  "sourceId": "beautifulsoup-docs",
+  "requestedUrl": "https://beautiful-soup-4.readthedocs.io/en/latest/",
+  "resolvedUrl": "https://beautiful-soup-4.readthedocs.io/en/latest/",
+  "title": "Beautiful Soup Documentation — Beautiful Soup 4.4.0 documentation",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "rawChecksum": "93b4b078540aa2da1b889d8a22bf6239a0c3317abc871aa428c39dfe668d30e5",
+  "normalizedChecksum": "3afe34c5ceca336d4c1b6821afb1043070c7a8b52c474ff25a9da2084e697e84",
+  "capturedMarkdownSha256": "3afe34c5ceca336d4c1b6821afb1043070c7a8b52c474ff25a9da2084e697e84",
+  "capturedAt": "2026-10-18T00:51:40.137Z",
+  "parser": "html.parser",
+  "parserVersion": "4.15.0",
+  "canonicalAuthority": false
+}

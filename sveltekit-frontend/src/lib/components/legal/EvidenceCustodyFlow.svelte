@@ -487,20 +487,4 @@
   .evidence-custody-flow {
     min-height: 100vh;
   }
-
-  /* Custom animations for state transitions */
-  .workflow-transition {
-    animation: fadeInUp 0.3s ease-out;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 </style>

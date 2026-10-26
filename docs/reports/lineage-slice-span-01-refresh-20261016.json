@@ -1,0 +1,145 @@
+{
+  "schema": "atlas.parent-atlas-lineage-slice-span-refresh.v1",
+  "status": "PRODUCER_MISMATCH",
+  "canonicalAuthority": false,
+  "productionGateClosed": false,
+  "subject": {
+    "qualifiedName": "validatePacket",
+    "sourceRef": "packages/atlas-core/src/packet-reader.ts",
+    "symbolVersionId": "symbol-version:30a12af2b96b0b4450d045f4b8900d55175b690bf17b9879da806ac63b2aa7df",
+    "packetKey": "ace:packet:bf0f0228d6c8"
+  },
+  "source": {
+    "sha256": "d4083d3c5b3fa768657b4d7122200ba726ef7abcfbc418b6c9c28d80964b0024",
+    "storedSourceRevisionMatchesBytes": true,
+    "byteLength": 5216,
+    "crlfSequences": 179,
+    "lfNormalizedByteLength": 5037
+  },
+  "storedSymbol": {
+    "sourceRevision": "sha256:d4083d3c5b3fa768657b4d7122200ba726ef7abcfbc418b6c9c28d80964b0024",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "language": "ts",
+    "extractor": "ast_grep",
+    "producerRevision": "atlas-ast-symbol-version-materializer-v1",
+    "upstreamNodeId": "b0ade807-62c9-49ca-9816-4849b1d9243c",
+    "span": {
+      "coordinateSystemClaimed": "utf8-byte",
+      "startByte": 4433,
+      "endByte": 4911,
+      "startLine": 150,
+      "startByteColumn": 1,
+      "endLine": 165,
+      "endByteColumn": 35,
+      "startUtf16Offset": 4431,
+      "endUtf16Offset": 4909
+    }
+  },
+  "nativeParserProbe": {
+    "endpoint": "http://127.0.0.1:8095/ast/chunk",
+    "writesPerformed": false,
+    "requestWithStoredLanguage": {
+      "language": "ts",
+      "httpStatus": 200,
+      "errorTag": "UnsupportedLanguageError",
+      "diagnostic": "UnsupportedLanguageError: unsupported language 'ts' for 'packages/atlas-core/src/packet-reader.ts'",
+      "chunkCount": 0
+    },
+    "requestWithCanonicalLanguage": {
+      "language": "typescript",
+      "httpStatus": 200,
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "chunkCount": 30,
+      "crlfSpanRemapsReported": 30,
+      "matchingMethod": {
+        "name": "validatePacket",
+        "nodeType": "method_definition",
+        "signature": "validatePacket(packet: Packet): { valid: boolean; errors: string[] } ",
+        "startByte": 4620,
+        "endByte": 5110,
+        "startLine": 160,
+        "endLine": 172,
+        "upstreamNodeId": "8e6bda088cdf6b9583dc3d83de2cc12f479865d1"
+      }
+    }
+  },
+  "artifactCrosswalk": {
+    "astEntities": {
+      "path": ".tmp/atlas/graphify-file-index-v1/ast-entities.jsonl",
+      "sha256": "871da2010430f44b62012d42d6bb0bffa594579a94417d8d3fefb701f1aeb1b1",
+      "validatePacketSpan": [4620, 5110]
+    },
+    "astEntityIdentity": {
+      "path": ".tmp/atlas/graphify-file-index-v1/ast-entity-identity.jsonl",
+      "sha256": "5fe2456b72dc8a8a19e32e4045ed328533c4fcbb4dcd6d8623f1e903b1e2c184",
+      "validatePacketSpan": [4433, 4911],
+      "treeNodeId": "b0ade807-62c9-49ca-9816-4849b1d9243c"
+    },
+    "currentNominations": {
+      "path": ".tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl",
+      "sha256": "69a38803ae442e677009e2b3b4e123f296d31b52f21c245384cbd051c811d5dc",
+      "validatePacketSpan": [4620, 5110],
+      "language": "ts",
+      "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57"
+    },
+    "interpretation": "The current AST entity and nomination artifacts agree with the live parser, while the identity artifact matches the stored database span. Their differing contents establish an artifact/producer inconsistency; the historical exact artifact consumed for the database insert is not retained by this inspection."
+  },
+  "writerTrace": {
+    "nominationProducer": "scripts/atlas/nominate-ast-symbols-dry-run.mjs",
+    "identityEnricher": "scripts/atlas/enrich-ast-entity-prefill-identity.mjs",
+    "databaseMaterializer": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+    "databaseSpanBehavior": "The materializer inserts row.byte_start and row.byte_end from its nomination input without recomputing parser coordinates.",
+    "legacyMaterializerStatus": "apply path is retired/guarded except deliberate reviewed override",
+    "firstHistoricalArtifactThatIntroducedStoredSpan": "NOT_ESTABLISHED"
+  },
+  "coordinateChecks": {
+    "storedByteRangeIsNativeMethodRange": false,
+    "storedRangeStartsBeforeNativeMethodBytes": 187,
+    "storedRangeEndsBeforeNativeMethodBytes": 199,
+    "storedRangeBeginsInPriorMethodBody": true,
+    "lfNormalizationOrUtf16ConversionExplainsExactNativeRange": false,
+    "producerOffsetBaseAndHistoricalInput": "NOT_ESTABLISHED"
+  },
+  "auditCorrection": {
+    "readbackAuditPath": "scripts/atlas/audit-function-source-readback-v1.mjs",
+    "storedLanguagePreflightAllowsTs": false,
+    "priorLocalRejectionProvesSidecarWasCalled": false,
+    "directSidecarProbePerformed": true
+  },
+  "lineageBoundaries": {
+    "packetChunkIdentityQualified": false,
+    "chunkSourceAndWorkspaceRevisionsQualified": false,
+    "semantic768Present": false,
+    "candidateOrdinalPresent": false,
+    "searchRuntimeFinalTopKProven": false,
+    "contextManifestAdmissionProven": false,
+    "overallE2E": "PARTIAL"
+  },
+  "execution": {
+    "databaseReadOnlyTransaction": true,
+    "databaseWrites": false,
+    "cacheOrProjectionWrites": false,
+    "sourceFilesModified": false,
+    "serviceRestarted": false,
+    "modelLoaded": false
+  },
+  "unresolved": [
+    "The precise historical producer/input artifact that first changed the stored coordinates from [4620,5110) to [4433,4911) is not retained.",
+    "The current nomination workspace revision differs from the stored symbol-version workspace revision; source bytes match, but this pass does not qualify the workspace-binding lineage.",
+    "The stored upstream_node_id resolves to a file-level atlas_packets tree_node_id shared across symbols, not the method node returned by the live sidecar.",
+    "Packet/chunk key namespace and null chunk revisions remain independent blockers."
+  ],
+  "evidence": [
+    "docs/reports/lineage-vertical-slice-01-2026-10-16.json",
+    "scripts/atlas/audit-function-source-readback-v1.mjs",
+    "scripts/atlas/nominate-ast-symbols-dry-run.mjs",
+    "scripts/atlas/enrich-ast-entity-prefill-identity.mjs",
+    "scripts/atlas/materialize-ast-symbol-versions.mjs",
+    "python/miniforge_nlp_sidecar.py",
+    ".tmp/atlas/graphify-file-index-v1/ast-entities.jsonl",
+    ".tmp/atlas/graphify-file-index-v1/ast-entity-identity.jsonl",
+    ".tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl"
+  ],
+  "receiptChecksum": "sha256:ab06540ca53c7860f28b12873ba1c06d989145921742d596b20053ff53d66fbd"
+}

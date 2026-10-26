@@ -38,7 +38,7 @@ function Invoke-LlamaCppInstrumented {
     )
 
     $body = @{
-        model = "gemma4-legal-iq4xs-direct.gguf"
+        model = "ornith-1.5-9b"
         temperature = 0
         max_tokens = 96
         stream = $false

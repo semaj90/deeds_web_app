@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "generatedAt": "2026-10-18T19:41:20.615Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_CENSUS_BACKED_OPERATOR_TASK",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "candidates": [
+    {
+      "fingerprint": "sha256:031ebb21b6291192",
+      "kind": "LINEAGE_ADMISSION",
+      "gateId": "QDRANT_ORDINAL_REVISION_BRIDGE",
+      "owner": "PostgreSQL canonical identity and Qdrant projection reconciliation",
+      "file": "scripts/atlas/audit-qdrant-payload-canonical-bridge-v1.mjs",
+      "diagnostic": "Full payload-only census of codebase_chunks_768 found 328348 points, 88028 missing and 925 ambiguous chunk_id joins, and zero strictly qualified joins. A separate read-only PostgreSQL census found workspace_revision=0/274465 and representation_revision=0/274465; source_revision is also empty but intentionally deferred and is not the blocker for this gate. Exact source_ref plus content_hash matched 220673 Qdrant candidates but does not supply the missing workspace/representation binding.",
+      "proposedAction": "Trace the canonical Qdrant point producer and establish a collision-free point-to-canonical-chunk/ordinal crosswalk with workspace and representation qualification; keep source_revision deferred and independently read back before enabling semantic fanout.",
+      "recommendedMcpTools": [],
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ]
+}

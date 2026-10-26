@@ -133,7 +133,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			? `\n\nContext: This analysis pertains to case ID ${caseId}. Consider case-specific evidence and relationships.`
 			: '';
 
-		// Call llama-server /v1/chat/completions directly (gemma4-legal-iq4xs-direct.gguf with TurboQuant)
+		// Call llama-server /v1/chat/completions directly (ornith-1.5-9b with TurboQuant)
 		const llmUrl = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 		const llmResponse = await fetch(`${llmUrl}/v1/chat/completions`, {
 			method: 'POST',

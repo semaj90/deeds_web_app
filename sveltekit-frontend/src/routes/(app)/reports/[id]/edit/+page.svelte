@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import TiptapWithAIAssistant from '$lib/components/editor/TiptapWithAIAssistant.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 
@@ -20,6 +20,9 @@
 	let isDirty = $state(false);
 
 	let editorContent = $state('');
+	let autosaveTimer: ReturnType<typeof setTimeout> | undefined;
+	let editRevision = 0;
+	let saveQueue: Promise<void> = Promise.resolve();
 
 	$effect(() => {
 		if (serverReport && !report) {
@@ -59,26 +62,65 @@
 		}
 	}
 
-	async function saveReport() {
+	type ReportSaveSnapshot = { contentHtml: string; title: string; revision: number };
+
+	async function persistReport(snapshot: ReportSaveSnapshot): Promise<boolean> {
+		const saveOperation = saveQueue.then(async () => {
+			if (!report || snapshot.revision !== editRevision) return false;
+			isSaving = true;
+			error = null;
+			try {
+				const res = await fetch('/api/reports/save', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({ reportId, title: snapshot.title, contentHtml: snapshot.contentHtml }),
+					signal: AbortSignal.timeout(30_000)
+				});
+				const result = await res.json();
+				if (!res.ok || result.success !== true) {
+					throw new Error(result.error || 'Failed to save report');
+				}
+				lastSaved = new Date();
+				if (snapshot.revision === editRevision) isDirty = false;
+				return true;
+			} catch (err) {
+				error = err instanceof Error ? err.message : 'Failed to save report';
+				return false;
+			} finally {
+				isSaving = false;
+			}
+		});
+		saveQueue = saveOperation.then(() => undefined, () => undefined);
+		return saveOperation;
+	}
+
+	function scheduleAutosave(contentHtml = editorContent) {
 		if (!report) return;
-		isSaving = true;
-		error = null;
-		try {
-			const res = await fetch(`/api/reports`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({ ids: [reportId], contentHtml: editorContent, title: report.title }),
-				signal: AbortSignal.timeout(30_000)
-			});
-			if (!res.ok) throw new Error('Failed to save report');
-			lastSaved = new Date();
-			isDirty = false;
-		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to save report';
-		} finally {
-			isSaving = false;
+		if (autosaveTimer) clearTimeout(autosaveTimer);
+		const snapshot: ReportSaveSnapshot = {
+			contentHtml,
+			title: report.title ?? '',
+			revision: editRevision,
+		};
+		autosaveTimer = setTimeout(() => {
+			autosaveTimer = undefined;
+			void persistReport(snapshot);
+		}, 900);
+	}
+
+	async function saveReport(content = editorContent): Promise<boolean> {
+		if (!report) return false;
+		if (autosaveTimer) {
+			clearTimeout(autosaveTimer);
+			autosaveTimer = undefined;
 		}
+		if (content !== editorContent) {
+			editorContent = content;
+			editRevision += 1;
+			isDirty = true;
+		}
+		return persistReport({ contentHtml: editorContent, title: report.title ?? '', revision: editRevision });
 	}
 
 	async function publishReport() {
@@ -86,7 +128,7 @@
 		isPublishing = true;
 		error = null;
 		try {
-			await saveReport();
+			if (!(await saveReport())) return;
 			const res = await fetch(`/api/reports/${reportId}/publish`, { method: 'POST', credentials: 'include', signal: AbortSignal.timeout(30_000) });
 			if (!res.ok) throw new Error('Failed to publish report');
 			report.status = 'published';
@@ -97,8 +139,28 @@
 		}
 	}
 
-	function handleUpdate(content: string) { editorContent = content; isDirty = true; }
-	function handleAutoSave(content: string) { editorContent = content; }
+	function handleUpdate(content: string) {
+		editorContent = content;
+		editRevision += 1;
+		isDirty = true;
+	}
+
+	function handleAutoSave(content: string) {
+		editorContent = content;
+		scheduleAutosave(content);
+	}
+
+	function handleTitleInput(event: Event) {
+		if (!report) return;
+		report.title = (event.currentTarget as HTMLInputElement).value;
+		editRevision += 1;
+		isDirty = true;
+		scheduleAutosave();
+	}
+
+	onDestroy(() => {
+		if (autosaveTimer) clearTimeout(autosaveTimer);
+	});
 
 	function formatTime(d: Date) {
 		return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -134,18 +196,23 @@
 					<div class="er-divider"></div>
 
 					<div class="er-title-area">
-						<h1 class="er-title">{report.title}</h1>
+						<label class="er-title-field">
+							<span class="sr-only">Report title</span>
+							<input class="er-title-input" type="text" maxlength="500" value={report.title ?? ''} oninput={handleTitleInput} aria-label="Report title" />
+						</label>
 						<div class="er-meta">
 							<span class="er-type-badge">
 								{(report.type ?? report.metadata?.reportType ?? 'custom').replace('_', ' ')}
 							</span>
-							{#if lastSaved}
+							{#if isSaving}
+								<span class="er-saving">Saving changes...</span>
+							{:else if isDirty}
+								<span class="er-unsaved">Unsaved changes · autosaving</span>
+							{:else if lastSaved}
 								<span class="er-saved">
 									<Icon name="check" />
 									Saved {formatTime(lastSaved)}
 								</span>
-							{:else if isDirty}
-								<span class="er-unsaved">Unsaved changes</span>
 							{/if}
 							{#if report.status === 'published'}
 								<span class="er-published">
@@ -167,7 +234,7 @@
 					</button>
 
 					<button
-						onclick={saveReport}
+						onclick={() => saveReport()}
 						disabled={isSaving || !isDirty}
 						class="er-btn secondary"
 					>
@@ -213,6 +280,7 @@
 				onSave={saveReport}
 				onAutoSave={handleAutoSave}
 				onUpdate={handleUpdate}
+				glass
 			/>
 		</div>
 	{/if}
@@ -304,15 +372,24 @@
 
 	/* ── Title area ── */
 	.er-title-area { min-width: 0; }
-	.er-title {
+	.er-title-field { display: block; min-width: 12rem; }
+	.er-title-input {
+		width: min(32rem, 48vw);
+		max-width: 100%;
+		padding: 0.4rem 0.65rem;
+		border: 1px solid rgba(255, 255, 255, 0.14);
+		border-radius: 0.6rem;
+		background: rgba(255, 255, 255, 0.055);
+		backdrop-filter: blur(16px);
+		box-shadow: inset 0 1px rgba(255, 255, 255, 0.08);
 		font-size: 1rem;
 		font-weight: 600;
 		color: rgba(212, 199, 163, 0.95);
-		margin: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+		outline: none;
+		transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 	}
+	.er-title-input:focus { border-color: rgba(96, 165, 250, 0.55); background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12); }
+	.er-title-input::placeholder { color: rgba(212, 199, 163, 0.38); }
 	.er-meta {
 		display: flex;
 		align-items: center;
@@ -336,6 +413,7 @@
 		gap: 0.25rem;
 		color: #34d399;
 	}
+	.er-saving { color: rgba(96, 165, 250, 0.9); }
 	.er-unsaved { color: rgba(251, 191, 36, 0.7); }
 	.er-published {
 		display: inline-flex;

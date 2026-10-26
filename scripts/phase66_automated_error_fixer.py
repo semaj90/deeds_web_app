@@ -354,7 +354,7 @@ def analyzer_node(state: AgentState) -> AgentState:
     already_applied = state.get("fixes_applied", [])
     qdrant_context = state.get("qdrant_context", [])
 
-    # Auto-select gemma4-legal for Svelte 5 violation analysis (G21-G25 patterns)
+    # Auto-select ornith-1.5-9b for Svelte 5 violation analysis (G21-G25 patterns)
     import re as _re
     svelte5_score = sum(1 for p in SVELTE5_ERROR_PATTERNS if _re.search(p, snippet))
     use_svelte5_model = svelte5_score >= 2

@@ -36,6 +36,7 @@ export const HypergraphRetrievalResultV1Schema = z.object({
 	schema: z.literal('atlas.hypergraph-retrieval-result.v1'),
 	workspaceRevision: z.string().min(1),
 	sourceRevision: z.string().min(1),
+	graphRevision: z.string().min(1).optional(),
 	queryRevision: z.string().min(1),
 	mode: HypergraphQueryModeV1Schema,
 	seedIds: z.array(z.string().min(1)),
@@ -56,6 +57,7 @@ export interface HypergraphFusionEvidenceV1 {
 	candidateId: string;
 	workspaceRevision: string;
 	sourceRevision: string;
+	graphRevision?: string;
 	queryRevision: string;
 	relationCount: number;
 	entityCount: number;
@@ -89,6 +91,7 @@ function relationParticipantIds(relation: HyperRelationV1): string[] {
 export function retrieveHypergraphContextV1(input: {
 	workspaceRevision: string;
 	sourceRevision: string;
+	graphRevision?: string | null;
 	queryRevision: string;
 	mode: HypergraphQueryModeV1;
 	seeds: readonly HypergraphSeedV1[];
@@ -105,6 +108,7 @@ export function retrieveHypergraphContextV1(input: {
 	for (const relation of input.relations) {
 		if (relation.workspaceRevision !== input.workspaceRevision) continue;
 		if (relation.sourceRevision !== input.sourceRevision) continue;
+		if (input.graphRevision !== undefined && relation.graphRevision !== input.graphRevision) continue;
 		for (const participant of relation.participants) {
 			const bucket = relationByParticipant.get(participant.canonicalId) ?? [];
 			bucket.push(relation);
@@ -182,6 +186,7 @@ export function retrieveHypergraphContextV1(input: {
 	const payload = {
 		workspaceRevision: input.workspaceRevision,
 		sourceRevision: input.sourceRevision,
+		graphRevision: input.graphRevision ?? null,
 		queryRevision: input.queryRevision,
 		mode: input.mode,
 		seedIds: seeds.map((seed) => seed.canonicalId),
@@ -194,6 +199,7 @@ export function retrieveHypergraphContextV1(input: {
 		schema: 'atlas.hypergraph-retrieval-result.v1',
 		workspaceRevision: input.workspaceRevision,
 		sourceRevision: input.sourceRevision,
+		...(input.graphRevision !== undefined ? { graphRevision: input.graphRevision } : {}),
 		queryRevision: input.queryRevision,
 		mode: input.mode,
 		seedIds: payload.seedIds,
@@ -229,6 +235,7 @@ export function buildHypergraphFusionEvidenceV1(
 				candidateId,
 				workspaceRevision: result.workspaceRevision,
 				sourceRevision: result.sourceRevision,
+				...(result.graphRevision !== undefined ? { graphRevision: result.graphRevision } : {}),
 				queryRevision: result.queryRevision,
 				relationCount: relations.length,
 				entityCount: new Set(relations.flatMap((relation) => relation.participantIds)).size,

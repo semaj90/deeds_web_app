@@ -31,7 +31,7 @@ echo ""
 START=$(date +%s%3N)
 OLLAMA_RESPONSE=$(curl -s -X POST http://localhost:11434/api/chat \
   -d '{
-    "model": "gemma4-legal",
+    "model": "ornith-1.5-9b",
     "messages": [{"role": "user", "content": "What is the definition of hearsay evidence in criminal law?"}],
     "stream": false,
     "options": {"num_predict": 200, "temperature": 0.3}

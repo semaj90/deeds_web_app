@@ -25,6 +25,7 @@ import { spawn } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveEmbedServerConfig } from './embed-server-config.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDir, '..');
@@ -65,22 +66,13 @@ const LLAMA_EXE_CANDIDATES = [
 const MODEL_CANDIDATES = [
   process.env.ROTORQUANT_MODEL_PATH,
   process.env.TURBO_MODEL_PATH,
-  path.join(workspaceRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
-  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-iq4xs-direct.gguf'),
-  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-iq4xs.gguf'),
-  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-q4_k_m.gguf'),
-  path.join(workspaceRoot, 'vendor', 'models', 'gemma4-legal.gguf'),
-  path.join(workspaceRoot, 'vendor', 'models', 'gemma4-rotorquant:latest.gguf'),
-  path.join(projectRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
+  path.join(workspaceRoot, 'models', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
+  path.join(workspaceRoot, 'vendor', 'models', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
+  path.join(projectRoot, 'models', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
 ].filter(Boolean);
 
-const MMPROJ_CANDIDATES = [
-  process.env.MMPROJ_PATH,
-  path.join(workspaceRoot, 'models', 'mmproj-F16.gguf'),
-  path.join(workspaceRoot, 'models', 'mmproj-BF16.gguf'),
-  path.join(workspaceRoot, 'vendor', 'models', 'mmproj-gemma4.gguf'),
-  path.join(projectRoot, 'models', 'mmproj-F16.gguf'),
-].filter(Boolean);
+// Vision is OFF by default. Only an explicit MMPROJ_PATH enables a projector; Gemma4 projectors are never auto-selected.
+const MMPROJ_CANDIDATES = [process.env.MMPROJ_PATH].filter(Boolean);
 
 function firstExisting(candidates) {
   return candidates.find((candidate) => typeof candidate === 'string' && existsSync(candidate));
@@ -311,9 +303,9 @@ const EMBED_MODEL_CANDIDATES = [
 
 const EMBED_MODEL = firstExisting(EMBED_MODEL_CANDIDATES);
 // EMBED_THREADS intentionally unused — llama-server manages threading internally for embedding workloads
-const EMBED_CTX = parseInt(process.env.EMBED_SERVER_CTX ?? '2048', 10);
-// GPU layers for embed model — default 99 (full GPU), set 0 for CPU-only
-const EMBED_NGL = parseInt(process.env.EMBED_SERVER_NGL ?? '99', 10);
+const EMBED_CONFIG = resolveEmbedServerConfig(process.env);
+const EMBED_CTX = EMBED_CONFIG.context;
+const EMBED_NGL = EMBED_CONFIG.gpuLayers;
 
 export async function isEmbedServerHealthy() {
   try {
@@ -349,8 +341,8 @@ export async function ensureEmbedServer() {
   console.log(`[ensure-embed-server] Using model:  ${EMBED_MODEL}`);
   console.log(`[ensure-embed-server] Port: ${EMBED_PORT}  NGL: ${EMBED_NGL}  CTX: ${EMBED_CTX}`);
 
-  const EMBED_BATCH  = parseInt(process.env.EMBED_BATCH_SIZE  ?? '512', 10);
-  const EMBED_UBATCH = parseInt(process.env.EMBED_UBATCH_SIZE ?? '512', 10);
+  const EMBED_BATCH  = EMBED_CONFIG.batch;
+  const EMBED_UBATCH = EMBED_CONFIG.microBatch;
 
   const args = [
     '-m', EMBED_MODEL,

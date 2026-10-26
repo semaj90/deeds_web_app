@@ -546,4 +546,31 @@ describe('RF6-SEMANTIC-VOTE-01 — one vote per revision-qualified dense candida
     ];
     expect(fuseSearchRuntimeCandidates(hits)).toEqual(fuseSearchRuntimeCandidates([...hits].reverse()));
   });
+
+  it('counts registry-backed and parser-backed results as one AST lane vote', () => {
+    const fused = fuseSearchRuntimeCandidates([
+      candidate({
+        id: 'ast-parser', packetKey: 'pkt:function', symbolVersionId: 'symbol:v1',
+        sourceRef: 'src/function.ts', score: 0.9, scoreSource: 'ast_tree',
+        retrievalExecutor: 'tree-sitter', ...revision,
+      }),
+      candidate({
+        id: 'ast-registry', packetKey: 'pkt:function', symbolVersionId: 'symbol:v1',
+        sourceRef: 'src/function.ts', score: 0.8, scoreSource: 'ast_tree',
+        retrievalExecutor: 'function_registry_verified_snapshot', ...revision,
+      }),
+    ]);
+
+    expect(fused).toHaveLength(1);
+    expect(fused[0]?.laneEvidence).toHaveLength(1);
+    expect(fused[0]?.laneEvidence?.[0]).toMatchObject({
+      lane: 'ast',
+      contributionCount: 1,
+      supportingHitCount: 2,
+    });
+    expect(fused[0]?.laneEvidence?.[0]?.executorIds).toEqual([
+      'function_registry_verified_snapshot',
+      'tree-sitter',
+    ]);
+  });
 });

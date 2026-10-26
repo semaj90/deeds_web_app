@@ -8,11 +8,25 @@
 
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectFiles, REPO_ROOT, toPosixPath } from './_atlas-utils.mjs';
 import { resolveAtlasPaths } from './lib/repo-paths.mjs';
+import {
+  duplicateHashLimitBytes,
+  groupDuplicateCandidatesByFingerprint,
+  groupDuplicateCandidatesBySize,
+  mapWithConcurrency,
+} from './lib/artifact-duplicate-candidates-v1.mjs';
+import {
+  emptyArtifactFingerprintCacheV1,
+  getReusableArtifactFingerprintV1,
+  parseArtifactFingerprintCacheV1,
+  serializeArtifactFingerprintCacheV1,
+  setArtifactFingerprintV1,
+} from './lib/artifact-fingerprint-cache-v1.mjs';
+import { fileSampleFingerprintV1 } from './lib/artifact-sample-fingerprint-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
@@ -22,7 +36,15 @@ const OUT_MD = path.join(REPORTS_DIR, 'artifact-bloat-report.md');
 const JSON_OUT = process.argv.includes('--json');
 const DRY_RUN = process.argv.includes('--dry-run');
 const LARGE_BYTES = 10 * 1024 * 1024;
-const EVIDENCE_HASH_BYTES = 200 * 1024 * 1024;
+const FILE_STAT_CONCURRENCY = 16;
+const SAMPLE_READ_CONCURRENCY = 16;
+const FULL_HASH_CONCURRENCY = 8;
+const fingerprintCacheArg = process.argv.find((arg) => arg.startsWith('--fingerprint-cache='));
+const FINGERPRINT_CACHE_PATH = fingerprintCacheArg ? path.resolve(fingerprintCacheArg.slice('--fingerprint-cache='.length)) : null;
+const REFRESH_FINGERPRINT_CACHE = process.argv.includes('--refresh-fingerprint-cache');
+const PERSIST_DRY_RUN_CACHE = process.argv.includes('--persist-fingerprint-cache');
+const scanRootArgs = process.argv.filter((arg) => arg.startsWith('--scan-root='))
+  .map((arg) => arg.slice('--scan-root='.length));
 
 const IGNORE_DIRS = new Set([
   'node_modules',
@@ -50,6 +72,7 @@ const KIND_ORDER = [
   'report',
   'report_large',
   'evidence_run',
+  'arrow_artifact',
   'tensor_bin',
   'model_binary',
   'tmp_artifact',
@@ -71,6 +94,7 @@ function classifyKind(relPath, sizeBytes) {
   if (/\.(onnx|onnx\.data|gguf|safetensors|pt|pth)$/.test(lower)) return 'model_binary';
   if (ext === '.duckdb') return 'duckdb';
   if (ext === '.parquet') return 'parquet';
+  if (ext === '.arrow' || ext === '.feather' || ext === '.ipc') return 'arrow_artifact';
   if (ext === '.msgpack' || ext === '.mpack' || ext === '.mspack') return 'msgpack';
   if (ext === '.ndjson' || ext === '.jsonl') return 'ndjson';
   if (ext === '.json') return 'raw_json';
@@ -111,7 +135,15 @@ async function fileSha256(filePath) {
 
 async function main() {
   const startedAt = new Date().toISOString();
-  const scanRoots = [
+  let fingerprintCache = emptyArtifactFingerprintCacheV1();
+  if (FINGERPRINT_CACHE_PATH) {
+    try {
+      fingerprintCache = parseArtifactFingerprintCacheV1(JSON.parse(await readFile(FINGERPRINT_CACHE_PATH, 'utf8')));
+    } catch (error) {
+      if (error?.code !== 'ENOENT') throw error;
+    }
+  }
+  const defaultScanRoots = [
     'docs',
     'reports',
     '.tmp',
@@ -122,40 +154,106 @@ async function main() {
     path.relative(REPO_ROOT, path.join(FRONTEND_ROOT, '.tmp')).replace(/\\/g, '/'),
     path.relative(REPO_ROOT, path.join(FRONTEND_ROOT, 'tmp')).replace(/\\/g, '/'),
   ];
+  const scanRoots = scanRootArgs.length ? scanRootArgs : defaultScanRoots;
 
   const files = [];
   for (const root of scanRoots) {
-    const absRoot = path.join(REPO_ROOT, root);
-    collectFiles(absRoot, IGNORE_DIRS, () => true, files);
+    const absRoot = path.resolve(REPO_ROOT, root);
+    if (absRoot !== REPO_ROOT && !absRoot.startsWith(`${REPO_ROOT}${path.sep}`)) {
+      throw new Error('SCAN_ROOT_OUTSIDE_REPOSITORY');
+    }
+    collectFiles(absRoot, IGNORE_DIRS, (filePath) => !FINGERPRINT_CACHE_PATH
+      || (path.resolve(filePath) !== FINGERPRINT_CACHE_PATH
+        && !path.resolve(filePath).startsWith(`${FINGERPRINT_CACHE_PATH}.tmp-`)), files);
   }
-  const artifactPaths = [];
-
-  for (const filePath of files) {
+  const uniqueFiles = [...new Set(files)];
+  const artifactPaths = await mapWithConcurrency(uniqueFiles, FILE_STAT_CONCURRENCY, async (filePath) => {
     const relPath = toPosixPath(path.relative(REPO_ROOT, filePath));
-    const statInfo = await stat(filePath);
-    artifactPaths.push({
+    const statInfo = await stat(filePath, { bigint: true });
+    const sizeBytes = Number(statInfo.size);
+    if (!Number.isSafeInteger(sizeBytes) || sizeBytes < 0) throw new Error('ARTIFACT_SIZE_NOT_SAFE_INTEGER');
+    return {
       absPath: filePath,
       relPath,
-      sizeBytes: statInfo.size,
-      kind: classifyKind(relPath, statInfo.size),
-    });
-  }
+      sizeBytes,
+      dev: statInfo.dev.toString(),
+      ino: statInfo.ino.toString(),
+      mtimeNs: statInfo.mtimeNs.toString(),
+      ctimeNs: statInfo.ctimeNs.toString(),
+      kind: classifyKind(relPath, sizeBytes),
+    };
+  });
 
   artifactPaths.sort((a, b) => b.sizeBytes - a.sizeBytes || a.relPath.localeCompare(b.relPath));
 
-  const withHashes = [];
-  const hashGroups = new Map();
-  const maxHashBytes = 50 * 1024 * 1024;
-
-  for (const entry of artifactPaths) {
-    let sha256 = null;
-    if (entry.sizeBytes <= (entry.kind === 'evidence_run' ? EVIDENCE_HASH_BYTES : maxHashBytes)) {
-      try {
-        sha256 = await fileSha256(entry.absPath);
-      } catch {
-        sha256 = null;
+  const sizeCandidateEntries = groupDuplicateCandidatesBySize(artifactPaths.map((entry) => ({
+    ...entry,
+    maxHashBytes: duplicateHashLimitBytes(entry.kind),
+  })));
+  const sizeCandidatePaths = new Set(sizeCandidateEntries.map((entry) => entry.relPath));
+  const sampleCacheNext = emptyArtifactFingerprintCacheV1();
+  let reusedFingerprintCount = 0;
+  const sampleResults = await mapWithConcurrency(sizeCandidateEntries, SAMPLE_READ_CONCURRENCY, async (entry) => {
+    if (FINGERPRINT_CACHE_PATH && !REFRESH_FINGERPRINT_CACHE) {
+      const reusable = getReusableArtifactFingerprintV1(fingerprintCache, entry);
+      if (reusable) {
+        setArtifactFingerprintV1(sampleCacheNext, entry, reusable);
+        return { entry, sample: { fingerprint: reusable, bytesRead: 0, complete: true }, status: null, cacheReused: true };
       }
     }
+    try {
+      const sample = await fileSampleFingerprintV1(entry.absPath, entry);
+      if (sample.complete) setArtifactFingerprintV1(sampleCacheNext, entry, sample.fingerprint);
+      return { entry, sample, status: null, cacheReused: false };
+    } catch {
+      return { entry, sample: null, status: 'SAMPLE_FAILED', cacheReused: false };
+    }
+  });
+  const sampledCandidates = [];
+  const sampleStatusByPath = new Map();
+  let duplicateSampleBytesRead = 0;
+  for (const { entry, sample, status, cacheReused } of sampleResults) {
+    if (!sample) {
+      sampleStatusByPath.set(entry.relPath, status);
+      continue;
+    }
+    duplicateSampleBytesRead += sample.bytesRead;
+    if (cacheReused) reusedFingerprintCount++;
+    sampleStatusByPath.set(entry.relPath, cacheReused ? 'CACHE_REUSED' : sample.complete ? 'SAMPLED' : 'SAMPLE_INCOMPLETE');
+    if (sample.complete) sampledCandidates.push({ ...entry, sampleFingerprint: sample.fingerprint });
+  }
+  const fullHashCandidatePaths = new Set(
+    groupDuplicateCandidatesByFingerprint(sampledCandidates, (entry) => entry.sampleFingerprint)
+      .map((entry) => entry.relPath),
+  );
+  const hashableEntries = artifactPaths.filter((entry) =>
+    entry.sizeBytes <= duplicateHashLimitBytes(entry.kind));
+  const duplicateHashCandidateBytes = artifactPaths
+    .filter((entry) => fullHashCandidatePaths.has(entry.relPath))
+    .reduce((sum, entry) => sum + entry.sizeBytes, 0);
+  const hashResults = await mapWithConcurrency(artifactPaths, FULL_HASH_CONCURRENCY, async (entry) => {
+    let sha256 = null;
+    let duplicateCheckStatus = 'NOT_HASHED_NO_ELIGIBLE_SIZE_PEER';
+    const maxHashBytes = duplicateHashLimitBytes(entry.kind);
+    if (entry.sizeBytes > maxHashBytes) duplicateCheckStatus = 'SKIPPED_SIZE_LIMIT';
+    if (sizeCandidatePaths.has(entry.relPath)) {
+      duplicateCheckStatus = sampleStatusByPath.get(entry.relPath) ?? 'SAMPLE_FAILED';
+    }
+    if (fullHashCandidatePaths.has(entry.relPath)) {
+      try {
+        sha256 = await fileSha256(entry.absPath);
+        duplicateCheckStatus = 'HASHED';
+      } catch {
+        duplicateCheckStatus = 'HASH_FAILED';
+      }
+    }
+    return { ...entry, sha256, duplicateCheckStatus };
+  });
+  const withHashes = [];
+  const hashGroups = new Map();
+
+  for (const entry of hashResults) {
+    const { sha256, duplicateCheckStatus } = entry;
     const duplicate = sha256 ? hashGroups.has(sha256) : false;
     if (sha256 && !hashGroups.has(sha256)) hashGroups.set(sha256, []);
     if (sha256) hashGroups.get(sha256).push(entry.relPath);
@@ -164,6 +262,7 @@ async function main() {
       ...entry,
       sha256,
       duplicate,
+      duplicateCheckStatus,
       recommendation: recommendAction(kind, entry.sizeBytes, entry.relPath, duplicate),
       kind: duplicate ? 'duplicate' : kind,
     });
@@ -172,6 +271,19 @@ async function main() {
   const summary = {
     totalFiles: withHashes.length,
     totalSizeMB: Number((withHashes.reduce((sum, item) => sum + item.sizeBytes, 0) / 1048576).toFixed(2)),
+    duplicateLogicalBytesPotential: withHashes
+      .filter((item) => item.duplicate)
+      .reduce((sum, item) => sum + item.sizeBytes, 0),
+    scannedRoots: scanRoots,
+    duplicateSampleCandidateFiles: sizeCandidatePaths.size,
+    duplicateSampleBytesRead,
+    duplicateHashCandidateFiles: fullHashCandidatePaths.size,
+    duplicateHashCandidateBytes: duplicateHashCandidateBytes,
+    duplicateHashSkippedUniqueSizeFiles: hashableEntries.length - sizeCandidatePaths.size,
+    duplicateHashSkippedBySampleFiles: sizeCandidatePaths.size - fullHashCandidatePaths.size,
+    duplicateHashSkippedSizeLimitFiles: artifactPaths.length - hashableEntries.length,
+    fingerprintCacheEnabled: Boolean(FINGERPRINT_CACHE_PATH),
+    fingerprintCacheReused: reusedFingerprintCount,
     byKind: Object.fromEntries(KIND_ORDER.map((kind) => [kind, withHashes.filter((item) => item.kind === kind).length])),
     duplicateFiles: withHashes.filter((item) => item.duplicate).length,
     largestFiles: withHashes.slice(0, 25).map((item) => ({
@@ -185,12 +297,18 @@ async function main() {
   const report = {
     generatedAt: startedAt,
     summary,
-    artifacts: withHashes.map(({ absPath, ...rest }) => rest),
+    artifacts: withHashes.map(({ absPath, dev, ino, mtimeNs, ctimeNs, ...rest }) => rest),
     duplicateGroups: [...hashGroups.entries()]
       .filter(([, paths]) => paths.length > 1)
       .map(([sha256, paths]) => ({ sha256, paths })),
   };
 
+  if (FINGERPRINT_CACHE_PATH && (!DRY_RUN || PERSIST_DRY_RUN_CACHE)) {
+    await mkdir(path.dirname(FINGERPRINT_CACHE_PATH), { recursive: true });
+    const temporaryCachePath = `${FINGERPRINT_CACHE_PATH}.tmp-${process.pid}`;
+    await writeFile(temporaryCachePath, serializeArtifactFingerprintCacheV1(sampleCacheNext), { flag: 'wx' });
+    await rename(temporaryCachePath, FINGERPRINT_CACHE_PATH);
+  }
   if (DRY_RUN) {
     console.log(JSON.stringify(summary, null, 2));
     return;

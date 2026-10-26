@@ -305,7 +305,7 @@ class DatabaseManager {
                     FROM document_metadata
                     WHERE (1 - (content_embedding <=> ${embeddingStr}::vector)) >= ${threshold}
                     AND deleted_at IS NULL AND processing_status = 'completed'
-                    ORDER BY content_embedding <=> ${embeddingStr}::vector
+                    ORDER BY content_embedding <=> ${embeddingStr}::vector, id
                     LIMIT ${limit}
                 `);
 

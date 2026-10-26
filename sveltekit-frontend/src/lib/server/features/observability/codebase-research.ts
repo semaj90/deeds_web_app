@@ -129,7 +129,7 @@ async function analyzeCodePatterns(): Promise<PatternAnalysis[]> {
 		{ pattern: 'locals\\.user', category: 'security', label: 'Auth guards' },
 		{ pattern: 'z\\.object|safeParse', category: 'security', label: 'Zod validation' },
 		{ pattern: '\\$state|\\$derived|\\$effect', category: 'architecture', label: 'Svelte 5 runes' },
-		{ pattern: 'bifrostChat|ollamaFetch', category: 'architecture', label: 'LLM calls' },
+		{ pattern: 'bifrostChat|embedOrChatFetch', category: 'architecture', label: 'LLM calls' },
 		{ pattern: 'getRedis|redis\\.', category: 'performance', label: 'Redis cache usage' },
 		{ pattern: 'pool\\.query', category: 'architecture', label: 'Direct SQL queries' },
 		{ pattern: 'vitest|describe\\(|it\\(|test\\(', category: 'testing', label: 'Test coverage' },

@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.golden-breadth-plan.v1",
+  "runId": "gb-2026-10-21T22-56-52-821Z-8f397ee9",
+  "mode": "LIVE",
+  "queryCount": 1,
+  "startIndex": 0,
+  "queriesSha256": "a001ebe2ab7cef986333f88f54569698193aa5005dd4de194fbc930b04dbc98b",
+  "queries": [
+    {
+      "id": "GB-001",
+      "lanes": [
+        "svelte"
+      ],
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "category": "sveltekit2"
+    }
+  ]
+}

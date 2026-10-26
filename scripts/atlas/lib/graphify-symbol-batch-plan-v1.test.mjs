@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSymbolBatchPlan, validateSymbolBatchPlan, buildSymbolBaselineShards, selectLiveSymbolPlanRows, verifySymbolObservationReadback, requireSymbolBatchHeadroom, findSymbolIdentityConflicts, disambiguateSymbolOccurrenceKeysV1, disambiguateAstOccurrenceNamesV1 } from './graphify-symbol-batch-plan-v1.mjs';
+import { admitFrozenSymbolRunFileV1, buildSymbolBatchPlan, validateSymbolBatchPlan, buildSymbolBaselineShards, selectLiveSymbolPlanRows, verifySymbolObservationReadback, requireSymbolBatchHeadroom, findSymbolIdentityConflicts, disambiguateSymbolOccurrenceKeysV1, disambiguateAstOccurrenceNamesV1, requireWorkspaceAlignedGraphifyFileApplyV1 } from './graphify-symbol-batch-plan-v1.mjs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -47,6 +47,43 @@ test('deterministic shards cover the complete frozen manifest exactly once', () 
   assert.equal(new Set(result.shards.map(s => s.shardId)).size, 3);
   assert.deepEqual(result, buildSymbolBaselineShards(plan));
   assert.equal(result.shards.every(s => s.queueStatus === 'PLANNED_NOT_ENQUEUED'), true);
+
+  const bounded = buildSymbolBaselineShards(plan, 25);
+  assert.deepEqual(bounded.shards.map(s => [s.offset, s.maxFiles]), [
+    ...Array.from({ length: 20 }, (_, i) => [i * 25, 25]),
+    [500, 1],
+  ]);
+  assert.equal(bounded.shards.flatMap(s => plan.rows.slice(s.offset, s.offset + s.maxFiles)).length, plan.rowCount);
+  assert.equal(new Set(bounded.shards.flatMap(s => plan.rows.slice(s.offset, s.offset + s.maxFiles).map(r => r.fileId))).size, plan.rowCount);
+  assert.equal(bounded.shards.every(s => s.manifestChecksum === plan.planChecksum), true);
+});
+
+test('frozen run file limit bounds dry-run candidates while preserving processed readback', () => {
+  const first = admitFrozenSymbolRunFileV1('UNPROCESSED', 0, 2);
+  const second = admitFrozenSymbolRunFileV1('UNPROCESSED', first.attemptedFiles, 2);
+  const deferred = admitFrozenSymbolRunFileV1('UNPROCESSED', second.attemptedFiles, 2);
+  const processed = admitFrozenSymbolRunFileV1('PROCESSED', deferred.attemptedFiles, 2);
+
+  assert.deepEqual(first, { admitted: true, attemptedFiles: 1 });
+  assert.deepEqual(second, { admitted: true, attemptedFiles: 2 });
+  assert.deepEqual(deferred, { admitted: false, attemptedFiles: 2 });
+  assert.deepEqual(processed, { admitted: true, attemptedFiles: 2 });
+  assert.throws(() => admitFrozenSymbolRunFileV1('UNPROCESSED', 0, 0), /LIMIT_INVALID/);
+});
+
+test('symbol apply requires graphify file workspace revision to match admission', () => {
+  assert.deepEqual(requireWorkspaceAlignedGraphifyFileApplyV1({ apply: false, workspaceRevisionMismatchCount: 17 }), {
+    applyAllowed: false,
+  });
+  assert.deepEqual(requireWorkspaceAlignedGraphifyFileApplyV1({ apply: true, workspaceRevisionMismatchCount: 0 }), {
+    applyAllowed: true,
+  });
+  assert.throws(() => requireWorkspaceAlignedGraphifyFileApplyV1({
+    apply: true,
+    workspaceRevisionMismatchCount: 1,
+  }), /SYMBOL_APPLY_GRAPHIFY_WORKSPACE_REVISION_MISMATCH/);
+  assert.throws(() => requireWorkspaceAlignedGraphifyFileApplyV1({ apply: true, workspaceRevisionMismatchCount: -1 }),
+    /SYMBOL_APPLY_WORKSPACE_ALIGNMENT_INPUT_INVALID/);
 });
 
 test('duplicate identities and escaping source paths are rejected', () => {

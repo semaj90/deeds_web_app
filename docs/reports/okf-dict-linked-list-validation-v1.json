@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.okf-dict-linked-list-validation.v1",
+  "generatedAt": "2026-10-18T01:33:24.740Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "patternsApplied": {
+    "nodeId": "^[a-z0-9_-]+:[a-z0-9_.-]+$",
+    "pointerRef": "^(?:nil|[a-z0-9_-]+:[a-z0-9_.-]+)$",
+    "sourceSpan": "^[a-zA-Z0-9_./\\\\-]+#(?:L\\d+(-L\\d+)?|bytes=\\d+-\\d+)$",
+    "predicateKind": "^(?:unary|binary|ternary|nary)$",
+    "confidenceFloat": "^(?:0(?:\\.\\d+)?|1(?:\\.0+)?)$",
+    "checksumSha256": "^sha256:[0-9a-f]{64}$"
+  },
+  "validationSummary": {
+    "status": "PASSED",
+    "totalNodesValidated": 3,
+    "errorCount": 0,
+    "errors": []
+  },
+  "sampleVerifiedHead": {
+    "node_id": "concept:sveltekit2_runes_a11y_hardening",
+    "prev_node": "nil",
+    "next_node": "concept:retrieval_fusion_rrf_v1",
+    "predicate": "implements",
+    "degree_kind": "binary",
+    "source_span": "sveltekit-frontend/src/lib/components/ui/Portal.svelte#L1-L45",
+    "confidence": "0.98",
+    "payload_checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data": {
+      "domain": "frontend",
+      "target_warning": "a11y_no_static_element_interactions"
+    }
+  }
+}

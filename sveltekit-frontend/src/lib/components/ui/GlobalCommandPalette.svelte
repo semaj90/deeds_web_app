@@ -63,7 +63,7 @@
 		3: [
 			{ label: 'Global Search', desc: 'Search across all data sources', icon: 'scan-search', href: '/global-search' },
 			{ label: 'Legal Corpus Search', desc: 'Search statutes and law', icon: 'book-open', href: '/legal-corpus' },
-			{ label: 'Codebase Index', desc: 'Search the codebase', icon: 'database', href: '/codebase-index' },
+			{ label: 'Codebase Index', desc: 'Search the codebase', icon: 'database', href: '/admin/codebase-index' },
 			{ label: 'Analysis Center', desc: 'Advanced search and analysis', icon: 'search', href: '/analysis-center' },
 		],
 		4: [
@@ -172,15 +172,20 @@
 	<div
 		class="intel-backdrop"
 		onkeydown={handleKeydown}
-		role="dialog"
-		aria-modal="true"
-		aria-label="Command palette"
+		role="presentation"
 		transition:fade={{ duration: 200 }}
 	>
 		<!-- Subtle grid pattern (evidence board style) -->
 		<div class="grid-overlay"></div>
 
-		<div class="intel-frame" transition:scale={{ duration: 280, start: 0.94, easing: cubicOut }}>
+		<div
+			class="intel-frame"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Command palette"
+			tabindex="-1"
+			transition:scale={{ duration: 280, start: 0.94, easing: cubicOut }}
+		>
 
 			<!-- ═══ TOP: Tab Bar ═══ -->
 			<nav class="intel-tabs">

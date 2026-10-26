@@ -88,7 +88,7 @@
     try {
       // Route through SvelteKit API — never call Ollama directly from browser
       const payload = {
-        model: 'gemma4-legal:latest',
+        model: 'ornith-1.5-9b',
         messages: messages.map(m => ({
           role: m.role === 'assistant' ? 'assistant' : 'user',
           content: m.content

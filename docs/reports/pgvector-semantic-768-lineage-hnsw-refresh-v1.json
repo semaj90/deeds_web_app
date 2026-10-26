@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.pgvector-semantic-768-lineage-hnsw-refresh.v1",
+  "generatedAt": "2026-10-18T19:45:35.388Z",
+  "sourceReceipt": ".tmp/atlas/semantic768-lineage-exact-hnsw-20261018-8x10.json",
+  "sourceReceiptSha256": "ccfe4ad97b8874f90872054610ab03bc49ca3ad6fb2d814b1f3a89a54c41825c",
+  "evidenceChecksum": "sha256:397ba5731057b355a5c87dbd174fa7efb68fea575115c5674f7815bc5eb82519",
+  "qualificationMode": "SOURCE_LINEAGE_JOIN",
+  "status": "PGVECTOR_LINEAGE_DIAGNOSTIC",
+  "physicalOwner": "public.codebase_chunk_index.content_embedding_768",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "cohort": {
+    "sourceLineageQualifiedVectorRows": 116657,
+    "rowRevisionQualifiedVectorRows": 0
+  },
+  "replay": {
+    "queries": 8,
+    "topK": 10,
+    "meanRecallAt10": 1.0,
+    "minimumRecallAt10": 1.0,
+    "exactUsedSequentialScan": true,
+    "hnswUsedIndex": true,
+    "sameFilteredCohort": true
+  },
+  "blockers": ["SEMANTIC_REPRESENTATION_PROVENANCE_UNAVAILABLE"],
+  "sourceRevisionPolicy": "No codebase_chunk_index source_revision backfill; source revision was read from existing exact lineage bindings for this diagnostic.",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "productionRetrievalQualityClaim": false
+}

@@ -7,7 +7,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { searchTagsBySemantic } from '$lib/server/ace/tag-sync.js';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { executeEmbeddingInputV1 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 
 const querySchema = z.object({
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			text: query,
 			mode: 'unprompted_legacy',
 			executor: async (prompt) => {
-				const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+				const embedRes = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ model: 'embeddinggemma:latest', input: prompt }),

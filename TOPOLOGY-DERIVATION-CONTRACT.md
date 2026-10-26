@@ -1,5 +1,7 @@
 # Topology Derivation Contract — Canonical Reference
 
+> **Historical / non-executable plan (2026-10-12):** This document's 384-D input assumptions and the referenced `sveltekit-frontend/scripts/topology/derive-topology.mjs` orchestrator are superseded. The orchestrator now fails closed before environment loading or database/GPU work. The canonical dense representation is `semantic_768`; `latent_256/128/64` require their own qualified producer/model revisions and must not be inferred from this document. No topology training, assignment, or promotion is authorized by this historical plan.
+
 **Date**: July 2, 2026
 **Status**: ✅ **SCHEMA DEFINED, PIPELINE SEQUENCED**
 

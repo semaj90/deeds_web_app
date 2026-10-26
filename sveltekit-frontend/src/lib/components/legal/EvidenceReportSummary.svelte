@@ -231,22 +231,22 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 			</h3>
 			<div class="detail-fields">
 				<div>
-					<label class="field-label">Item Number</label>
+					<span class="field-label">Item Number</span>
 					<p class="field-value">{reportData.evidence.itemNumber}</p>
 				</div>
 				<div>
-					<label class="field-label">Description</label>
+					<span class="field-label">Description</span>
 					<p class="field-value">{reportData.evidence.description}</p>
 				</div>
 				<div>
-					<label class="field-label">Collection Details</label>
+					<span class="field-label">Collection Details</span>
 					<div class="field-value text-sm">
 						<p><strong>Date:</strong> {new Date(reportData.evidence.dateCollected).toLocaleString()}</p>
 						<p><strong>Location:</strong> {reportData.evidence.location}</p>
 					</div>
 				</div>
 				<div>
-					<label class="field-label">Chain of Custody</label>
+					<span class="field-label">Chain of Custody</span>
 					<div class="chain-list">
 						{#each reportData.evidence.chainOfCustody as custodian, index}
 							<div class="chain-item">
@@ -266,7 +266,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 			</h3>
 			<div class="detail-fields">
 				<div>
-					<label class="field-label">Analyst</label>
+					<span class="field-label">Analyst</span>
 					<div>
 						<p class="field-value font-medium">{reportData.analyst.name}</p>
 						<p class="field-value text-sm">{reportData.analyst.credentials}</p>
@@ -274,7 +274,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					</div>
 				</div>
 				<div>
-					<label class="field-label">Procedures</label>
+					<span class="field-label">Procedures</span>
 					<ul class="field-list">
 						{#each reportData.methodology.procedures as procedure}
 							<li>{procedure}</li>
@@ -282,7 +282,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					</ul>
 				</div>
 				<div>
-					<label class="field-label">Tools</label>
+					<span class="field-label">Tools</span>
 					<div class="tag-list">
 						{#each reportData.methodology.tools as tool}
 							<span class="tag">{tool}</span>
@@ -299,7 +299,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 			</h3>
 			<div class="detail-fields">
 				<div>
-					<label class="field-label">Potential Charges</label>
+					<span class="field-label">Potential Charges</span>
 					<div class="item-list">
 						{#each reportData.legalImplications.charges as charge}
 							<div class="item-row">
@@ -310,7 +310,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					</div>
 				</div>
 				<div>
-					<label class="field-label">Challenge Points</label>
+					<span class="field-label">Challenge Points</span>
 					<div class="item-list">
 						{#each reportData.legalImplications.challengePoints as challenge}
 							<div class="item-row">
@@ -321,7 +321,7 @@ ${reportData.attachments.map((a) => `- ${a.name} (${a.type})`).join('\n')}
 					</div>
 				</div>
 				<div>
-					<label class="field-label">Relevant Precedents</label>
+					<span class="field-label">Relevant Precedents</span>
 					<div class="item-list">
 						{#each reportData.legalImplications.precedents as precedent}
 							<div class="precedent-link">{precedent}</div>

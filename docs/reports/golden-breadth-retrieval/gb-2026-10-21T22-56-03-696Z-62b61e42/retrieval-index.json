@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.golden-breadth-retrieval-index.v1",
+  "runId": "gb-2026-10-21T22-56-03-696Z-62b61e42",
+  "note": "Retrieval index is derived from live MCP results. Results are candidates, not proof of correctness.",
+  "entries": [
+    {
+      "id": "GB-016",
+      "query": "Zod schema validating request.json in a SvelteKit route",
+      "okLanes": [
+        "trace",
+        "atlas"
+      ],
+      "failedLanes": []
+    }
+  ]
+}

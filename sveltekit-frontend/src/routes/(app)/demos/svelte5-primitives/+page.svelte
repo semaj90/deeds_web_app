@@ -13,6 +13,7 @@
 	import AIButton from '$lib/components/ai/AIButton.svelte';
 	import StatsCard from '$lib/components/ui/StatsCard.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 	let dialogOpen = $state(false);
 	let inputValue = $state('');
@@ -100,7 +101,7 @@
 			<h2 class="text-sm font-bold mb-3 opacity-70">StatsCard (44L) + QuickAction (77L) + AIButton (215L)</h2>
 			<div class="flex items-center gap-4 flex-wrap">
 				<StatsCard title="Active Cases" value="42" />
-				<QuickActionButton label="Analyze" model="gemma3-legal:latest" prompt="Summarize the current case status" />
+				<QuickActionButton label="Analyze" model={SERVER_CHAT_MODEL} prompt="Summarize the current case status" />
 				<AIButton tooltip="Ask AI" onclick={() => console.log('AI!')} />
 			</div>
 		</section>

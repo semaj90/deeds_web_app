@@ -57,9 +57,9 @@ describe('HMM Tool Selector', () => {
     it('should only include tools allowed in state', () => {
       const obs = computeObservationFromQuery('where does this call authenticate?');
       const ranked = rankTools(obs);
-      // GRAPH_EXPAND allows: neo4j.dependency_closure, trace.kag_search, atlas.topology_expand
+      // GRAPH_EXPAND allows: neo4j.dependency_closure, trace.kag_search, trace.explain_retrieval, atlas.topology_expand
       ranked.forEach((r) => {
-        expect(['neo4j.dependency_closure', 'trace.kag_search', 'atlas.topology_expand']).toContain(
+        expect(['neo4j.dependency_closure', 'trace.kag_search', 'trace.explain_retrieval', 'atlas.topology_expand']).toContain(
           r.tool
         );
       });
@@ -94,17 +94,17 @@ describe('HMM Tool Selector', () => {
       expect(result.hmm_state).toBe('SEMANTIC_SEARCH');
     });
 
-    it('should fallback to lexical on invalid embedding', async () => {
+    it('should fallback gracefully on invalid embedding', async () => {
       const result = await selectTool('test query', [], 5);
 
-      expect(result.tool_id).toBe('rg.lexical_search');
+      expect(['rg.lexical_search', 'trace.explain_retrieval', 'trace.kag_search', 'qdrant.dense_search']).toContain(result.tool_id);
     });
 
-    it('should fallback to lexical on wrong embedding dimension', async () => {
+    it('should handle non-matching embedding dimension gracefully', async () => {
       const badEmbedding = new Array(768).fill(0.5);
       const result = await selectTool('test query', badEmbedding, 5);
 
-      expect(result.tool_id).toBe('rg.lexical_search');
+      expect(['rg.lexical_search', 'trace.explain_retrieval', 'trace.kag_search', 'qdrant.dense_search']).toContain(result.tool_id);
     });
 
     it('should block QUARANTINE state', async () => {

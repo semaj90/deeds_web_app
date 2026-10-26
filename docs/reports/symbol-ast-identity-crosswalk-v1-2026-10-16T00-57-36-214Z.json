@@ -1,0 +1,254 @@
+{
+  "schema": "atlas.symbol-ast-identity-crosswalk.v1",
+  "generatedAt": "2026-10-16T00:57:36.214Z",
+  "mode": "POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "status": "CROSSWALK_PARTIAL",
+  "databaseError": null,
+  "counts": {
+    "symbol_version_rows": 479,
+    "stable_symbol_ids": 479,
+    "sha256_source_revisions": 479,
+    "upstream_id_equals_tree_node_id_rows": 0,
+    "source_path_matched_versions": 64,
+    "path_and_source_revision_matched_versions": 38,
+    "exact_path_revision_span_matched_versions": 38,
+    "exact_path_revision_span_match_rows": 38,
+    "versions_with_packet_key": 285,
+    "packet_key_joined_versions": 285,
+    "packet_key_and_source_ref_matched_versions": 285,
+    "packet_source_revision_matched_versions": 144,
+    "tree_packet_joined_versions": 285,
+    "tree_packet_and_source_ref_matched_versions": 285
+  },
+  "identitySemantics": {
+    "treeNodeId": "AST database projection-row key; producer formula does not include source revision or byte span",
+    "upstreamNodeId": "symbol-version provenance field; equality with tree_node_id is tested, not assumed",
+    "treeNodeOccurrenceId": "separate revision/span observation identity; not a column in the two audited table schemas",
+    "symbolVersionId": "versioned registry key; direct producer join to AST rows remains unproven"
+  },
+  "schemaColumns": [
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "tree_node_id"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "structural_key"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "repo_id"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "relative_path"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "node_kind"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "qualified_symbol"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "start_byte"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "end_byte"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "line_start"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "line_end"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "normalized_node_hash"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "source_content_hash"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "parser_name"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "parser_version"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "created_at"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "superseded_by"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "parser_language"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "normalized_signature"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "parent_tree_node_id"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "source_ref_key"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "updated_at"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "workspace_id"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "source_revision"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "grammar_version"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "symbol_version_id"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "stable_symbol_id"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "source_ref"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "source_revision"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "workspace_revision"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_node_id"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_file_id"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_symbol_id"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_chunk_id"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "qualified_name"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "declaration_hash"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "signature_normalized"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "byte_start"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "byte_end"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "parent_route"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "producer_revision"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "created_at"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "packet_key"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "candidate_ordinal"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "parameter_names"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "parameter_types"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "return_types"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "imports"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "calls"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "callable_metadata"
+    }
+  ],
+  "authority": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "caveats": [
+    "The path join uses only exact atlas_symbol_versions.source_ref = atlas_ast_nodes.relative_path; alternate path normalization is not inferred.",
+    "Counts are live row crosswalk observations, not proof that unmatched rows should be repaired or promoted.",
+    "No identity, source revision, parser output, or canonical row was changed."
+  ],
+  "likely_cause": "Symbol-version upstream node identifiers and AST projection tree_node_id values represent different identity axes, and most rows lack an exact source-revision-span crosswalk under the tested path key.",
+  "evidence": [
+    "public.atlas_symbol_versions",
+    "public.atlas_ast_nodes",
+    "scripts/atlas/lib/atlas-ast-nodes-writer.mjs",
+    "sveltekit-frontend/src/lib/server/atlas/identity/tree-node-occurrence-v1.ts"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-symbol-ast-identity-crosswalk-v1.mjs",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-symbol-ast-identity-crosswalk-v1.mjs",
+  "smoke_command": "node scripts/atlas/audit-symbol-ast-identity-crosswalk-v1.mjs",
+  "reportPath": "docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T00-57-36-214Z.json",
+  "checksum": "sha256:a2014bff1f6c823f3c2d4787ca177562db502e98a98ac40e86949b2a98417916"
+}

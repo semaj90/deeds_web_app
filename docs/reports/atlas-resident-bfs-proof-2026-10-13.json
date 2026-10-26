@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.resident-bfs-proof.v1",
+  "status": "FIXTURE_ONLY",
+  "mcpTool": "graph.resident_bfs",
+  "liveBfsRequestPerformed": false,
+  "gpuExecutionPerformed": false,
+  "graphRevision": "graph:fixture-r1",
+  "snapshotSha256": "9c12c5c6e9c389e6f33d468b899b43ea03ec30a240469338b6357cef5c37b648",
+  "ordinalMapSha256": "74a64c302a4092e178fe15b0c7d741bb08456ae1c4aa6484bc8c7d252610f22e",
+  "sourceCanonicalId": "node:a",
+  "tests": {
+    "toolRegistration": "SOURCE_TEXT_ASSERTION_ONLY",
+    "snapshotQualification": "FIXTURE_METADATA_ONLY",
+    "noImplicitGraphLoad": "LOCAL_UNIT_NEGATIVE_CONTROL",
+    "networkxParity": "FAKE_CUGRAPH_ROWS_VS_NETWORKX_FIXTURE",
+    "boundedTraversal": "FAKE_BACKEND_FIXTURE",
+    "negativeControls": "LOCAL_UNIT_TESTS",
+    "graphRagEvidence": "NOT_EXERCISED",
+    "contextAdmission": "NOT_EXERCISED"
+  },
+  "canonicalStoreWritesPerformed": false,
+  "localReceiptWritten": true,
+  "firstUnprovenGate": "LIVE_RESIDENT_GRAPH_AND_GPU_EXECUTION"
+}

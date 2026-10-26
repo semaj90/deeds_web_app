@@ -60,14 +60,14 @@ vi.mock('$lib/config/env.server.js', () => ({
   getDatabaseUrl: () => 'postgresql://test:test@localhost:5432/test',
 }));
 
-// ── ollamaFetch mock ──
+// ── embedOrChatFetch mock ──
 const mockOllamaFetch = vi.fn(async () => {
   return new Response(
     JSON.stringify({
       response:
         '{"type":"document","icon":"file-text","color":"#6b7280","label":"test","confidence":0.8}',
       message: { content: 'Analysis result' },
-      model: 'gemma4-rotorquant:latest',
+      model: 'ornith-1.5-9b',
       embedding: new Array(768).fill(0.01),
     }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -76,10 +76,10 @@ const mockOllamaFetch = vi.fn(async () => {
 vi.mock('$lib/server/ollama.js', () => ({
   getChatModelKeepAlive: () => '2m',
   getEmbeddingModelKeepAlive: () => '24h',
-  getChatModel: () => 'gemma4-rotorquant:latest',
+  getChatModel: () => 'ornith-1.5-9b',
   getEmbedModel: () => 'embeddinggemma:latest',
-  getOllamaGenerationEndpoint: () => 'http://ollama.test',
-  ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+  getLlamaGenerationEndpoint: () => 'http://ollama.test',
+  embedOrChatFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── DB mock ──

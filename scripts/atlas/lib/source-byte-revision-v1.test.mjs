@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isSha256SourceRevisionV1, sourceByteRevisionV1, sourceBytesMatchRevisionV1 } from './source-byte-revision-v1.mjs';
+import { decodeSourceUtf8V1, isSha256SourceRevisionV1, sourceByteRevisionV1, sourceBytesMatchRevisionV1 } from './source-byte-revision-v1.mjs';
 
 test('computes an exact SHA-256 revision over UTF-8 source bytes', () => {
   const bytes = Buffer.from('const café = 1;\r\n', 'utf8');
@@ -22,4 +22,11 @@ test('hashes raw bytes rather than normalized line endings', () => {
   const lf = Buffer.from('line\n', 'utf8');
   const crlf = Buffer.from('line\r\n', 'utf8');
   assert.notEqual(sourceByteRevisionV1(lf), sourceByteRevisionV1(crlf));
+});
+
+test('preserves a UTF-8 BOM when decoding source bytes', () => {
+  const bytes = Buffer.from([0xef, 0xbb, 0xbf, ...Buffer.from('export const value = 1;')]);
+  const text = decodeSourceUtf8V1(bytes);
+  assert.equal(text.charCodeAt(0), 0xfeff);
+  assert.equal(Buffer.byteLength(text, 'utf8'), bytes.length);
 });

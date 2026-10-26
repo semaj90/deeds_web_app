@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.candidate-hydration-proof.v1",
+  "generated_at": "2026-10-15T20:18:03.851Z",
+  "mode": "READ_ONLY_REPLAY",
+  "request_id": "function-registry-seed-replay-2026-10-15",
+  "candidate_id": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+  "canonical_packet_key": "packet:804cec79a65c",
+  "source_ref": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+  "source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+  "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "qualification": {
+    "outcome": "QUALIFIED",
+    "loader": "loadFunctionRegistrySnapshotFromPostgresV1",
+    "receipt_checksum": "a4446d0853377ccf22f2df639b948e0ff82a3d4bc963066ba428bf4f5682be02",
+    "snapshot_checksum": "242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091",
+    "ast_provider": "miniforge-nlp-sidecar astChunk (live parse; atlas_ast_nodes has no row for this tree node)"
+  },
+  "hydration": {
+    "terminal_status": "AMBIGUOUS_SOURCE_REF",
+    "reason": "SOURCE_REF_MATCHES_MULTIPLE_ROWS",
+    "matched_by": null,
+    "envelopes": 0,
+    "live_chunk_rows_for_source_ref": 2,
+    "live_rows_with_source_revision": 0,
+    "live_rows_with_seed_symbol_version_id": 0
+  },
+  "final_topk_present": false,
+  "context_manifest_admitted": false,
+  "canonical_authority": false,
+  "writes_performed": false,
+  "interpretation": "Strict hydration refuses to choose between two chunk rows that carry no source_revision and no symbol identity. This is the correct terminal disposition; it is not a bug to override. Closing it needs revision-qualified chunk rows (source revision propagation), not a looser matcher."
+}

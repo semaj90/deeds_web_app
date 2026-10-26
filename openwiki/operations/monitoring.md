@@ -3,9 +3,6 @@ type: operational-guide
 title: Operations and Monitoring
 description: Operational guide for maintaining system state, including database management and worker observability.
 tags: [operations, monitoring, postgres, rabbitmq, maintenance]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-07T02:11:06.802Z
 ---
 
 # Operations and Monitoring

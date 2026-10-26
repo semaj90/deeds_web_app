@@ -95,81 +95,7 @@ export async function createMultiVectorCollection(
   qdrantUrl: string,
   collectionName: string = 'codebase_chunks_384_hybrid'
 ): Promise<void> {
-  if (collectionName === 'codebase_chunks_768') {
-    throw new Error('Legacy 384 multi-vector schema cannot create the canonical codebase_chunks_768 collection');
-  }
-  const createRes = await fetch(`${qdrantUrl}/collections/${collectionName}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      vectors: {
-        // Each named vector is 384-dim
-        content_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        summary_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        title_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        signature_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        feature_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        latent64: {
-          size: 64,
-          distance: 'Cosine'
-          // NOTE: latent64 is for clustering/SOM only, NOT retrieval
-        }
-      },
-      optimizers_config: {
-        default_optimizer_config: {
-          type: 'default'
-        }
-      },
-      hnsw_config: {
-        m: 16,
-        ef_construction: 200,
-        ef_runtime: 200
-      }
-    })
-  });
-
-  if (!createRes.ok) {
-    throw new Error(`Failed to create collection: ${await createRes.text()}`);
-  }
-
-  // Create indexes on named vectors
-  for (const vectorName of [
-    'content_embedding',
-    'summary_embedding',
-    'title_embedding',
-    'signature_embedding'
-  ]) {
-    const indexRes = await fetch(`${qdrantUrl}/collections/${collectionName}/index`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vectors: [vectorName],
-        hnsw_config: {
-          m: 16,
-          ef_construction: 200
-        }
-      })
-    });
-
-    if (!indexRes.ok) {
-      console.warn(`Index creation skipped for ${vectorName}: ${indexRes.status}`);
-    }
-  }
+  throw new Error('LEGACY_384_MULTIVECTOR_WRITE_DISABLED: historical multi-vector schema cannot create collections');
 }
 
 /**
@@ -182,26 +108,7 @@ export async function searchByContentEmbedding(
   topK: number = 20,
   filter?: Record<string, unknown>
 ): Promise<QdrantPoint[]> {
-  const searchRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/query`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: queryEmbedding,
-        using: 'content_embedding',
-        limit: topK,
-        filter
-      })
-    }
-  );
-
-  if (!searchRes.ok) {
-    throw new Error(`Search failed: ${await searchRes.text()}`);
-  }
-
-  const { points, result } = await searchRes.json();
-  return points ?? result ?? [];
+  throw new Error('LEGACY_384_MULTIVECTOR_SEARCH_DISABLED: use the admitted semantic_768 retrieval owner');
 }
 
 /**
@@ -222,113 +129,7 @@ export async function hybridSearch(
   topK: number = 20,
   filter?: Record<string, unknown>
 ): Promise<QdrantPoint[]> {
-  // Normalize weights to sum to 1
-  const total =
-    (weights.content || 0) +
-    (weights.summary || 0) +
-    (weights.title || 0) +
-    (weights.signature || 0) +
-    (weights.feature || 0);
-
-  const normalized = {
-    content: weights.content ? weights.content / total : 0,
-    summary: weights.summary ? weights.summary / total : 0,
-    title: weights.title ? weights.title / total : 0,
-    signature: weights.signature ? weights.signature / total : 0,
-    feature: weights.feature ? weights.feature / total : 0
-  };
-
-  // Execute searches in parallel
-  const searches = [];
-
-  if (normalized.content > 0) {
-    searches.push(
-      searchByContentEmbedding(qdrantUrl, collectionName, queryEmbedding, topK * 3, filter)
-    );
-  }
-  if (normalized.summary > 0) {
-    searches.push(
-      searchByEmbedding(
-        qdrantUrl,
-        collectionName,
-        'summary_embedding',
-        queryEmbedding,
-        topK * 3,
-        filter
-      )
-    );
-  }
-  if (normalized.signature > 0) {
-    searches.push(
-      searchByEmbedding(
-        qdrantUrl,
-        collectionName,
-        'signature_embedding',
-        queryEmbedding,
-        topK * 3,
-        filter
-      )
-    );
-  }
-
-  const results = await Promise.all(searches);
-
-  // RRF fusion of multiple vector results
-  const scoreMap: Map<string, number> = new Map();
-  const pointMap: Map<string, QdrantPoint> = new Map();
-
-  results.forEach((result, idx) => {
-    const vectorType = ['content', 'summary', 'signature'][idx];
-    const weight = normalized[vectorType as keyof typeof normalized];
-
-    result.forEach((point, rank) => {
-      const key = String(point.id);
-      const rrfScore = weight / (rank + 60); // Reciprocal rank fusion
-      scoreMap.set(key, (scoreMap.get(key) || 0) + rrfScore);
-      pointMap.set(key, point);
-    });
-  });
-
-  // Sort by RRF score and return top-K
-  const sorted = Array.from(scoreMap.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, topK)
-    .map(([key]) => pointMap.get(key)!);
-
-  return sorted;
-}
-
-/**
- * Generic search by named vector
- */
-async function searchByEmbedding(
-  qdrantUrl: string,
-  collectionName: string,
-  vectorName: string,
-  queryEmbedding: number[],
-  topK: number,
-  filter?: Record<string, unknown>
-): Promise<QdrantPoint[]> {
-  const searchRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/query`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: queryEmbedding,
-        using: vectorName,
-        limit: topK,
-        filter
-      })
-    }
-  );
-
-  if (!searchRes.ok) {
-    throw new Error(`Search (${vectorName}) failed: ${await searchRes.text()}`);
-  }
-
-  const { points, result } = await searchRes.json();
-  return points ?? result ?? [];
+  throw new Error('LEGACY_384_MULTIVECTOR_SEARCH_DISABLED: use the admitted semantic_768 retrieval owner');
 }
 
 /**
@@ -347,23 +148,5 @@ export async function updateMultiVectors(
     latent64?: number[];
   }
 ): Promise<void> {
-  const updateRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/${pointId}`,
-    {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vectors: Object.entries(vectors)
-          .filter(([, v]) => v !== undefined)
-          .reduce((acc, [k, v]) => {
-            acc[k] = { data: v };
-            return acc;
-          }, {} as Record<string, { data: number[] }>)
-      })
-    }
-  );
-
-  if (!updateRes.ok) {
-    throw new Error(`Update failed: ${await updateRes.text()}`);
-  }
+  throw new Error('LEGACY_384_MULTIVECTOR_WRITE_DISABLED: historical 384-D vectors cannot be written');
 }

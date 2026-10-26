@@ -17,10 +17,10 @@ export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
  *   2. Triton (:8000)
  *   3. TurboQuant llama-server (turbo3 KV cache, :8090)
  *   4. Bifrost/LiteLLM (semantic cache)
- *   5. Local RotorQuant GGUF (models/gemma4-rotorquant:latest-iq4xs-direct.gguf)
+ *   5. Local RotorQuant GGUF (models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf)
  *
  * Server models:
- *   - gemma4-rotorquant:latest for LLM (CUDA RTX, local /models lane)
+ *   - ornith-1.5-9b for LLM (CUDA RTX, local /models lane)
  *   - embeddinggemma:latest for embeddings (768-dim)
  */
 
@@ -143,7 +143,7 @@ export function resolveOrnithRequestModelV1(
   }
 }
 
-	/** Legacy Gemma4 compatibility identifier; not the active chat owner. */
+/** Legacy Gemma4 Ollama tag, kept as a historical identity. Disabled in the model registry; never an active chat route. */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 
 /** embeddinggemma:latest — 768-dim server embeddings via the embedding lane */
@@ -160,12 +160,12 @@ export const SERVER_EMBEDDING_FALLBACK = SERVER_EMBEDDING_MODEL;
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
 
 /**
- * gemma4-rotorquant:latest — merged Gemma 4 legal VLM served by the SEPARATE FastAPI/HF
+ * ornith-1.5-9b — merged Gemma 4 legal VLM served by the SEPARATE FastAPI/HF
  * Transformers VLM server on :8085 (see VLM_BASE_URL below), not llama-server :8090. Not touched
  * by the Ornith 1.5 switch confirmed only for :8090 — do not assume this changed too without
  * separately confirming what's actually loaded on :8085.
  */
-export const SERVER_VLM_MODEL = 'gemma4-rotorquant:latest';
+export const SERVER_VLM_MODEL = 'ornith-1.5-9b';
 
 export type ModelRole =
 	| 'planner'
@@ -323,7 +323,7 @@ export function assertEmbeddingModel(modelId: string): string {
 // Uses bitsandbytes NF4 quantization (~4 GB VRAM on RTX 3060 Ti).
 // This is the ONLY backend that supports vision (image analysis).
 // Text + GGUF runners (TurboQuant, Ollama) are text-only.
-// Run: python scripts/vlm-server/app.py --model gemma4-rotorquant:latest-merged --port 8085
+// Run: python scripts/vlm-server/app.py --model ornith-1.5-9b --port 8085
 
 /** VLM server endpoint (FastAPI + HF Transformers + NF4) */
 export const VLM_BASE_URL = 

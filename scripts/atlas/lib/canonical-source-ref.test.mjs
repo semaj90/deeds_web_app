@@ -2,7 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { assertLegacyPacketKeyCorpusV1, assertLegacyPacketKeySourceRefMatch, assertPacketKeySourceRefPairsUniqueV1, legacyPacketKeyFromSourceRef } from './canonical-source-ref.mjs';
+import { assertLegacyPacketKeyCorpusV1, assertLegacyPacketKeySourceRefMatch, assertPacketKeySourceRefPairsUniqueV1, legacyPacketKeyFromSourceRef, normalizeSourceRef } from './canonical-source-ref.mjs';
+
+test('canonical source-ref boundary rejects unsafe identities before compatibility normalization', () => {
+  assert.equal(normalizeSourceRef('./sveltekit-frontend\\src\\a.ts'), 'src/a.ts');
+  for (const unsafe of [
+    '../private.ts',
+    'src/%2e%2e/private.ts',
+    'src/%252e%252e/private.ts',
+    'src/%2fprivate.ts',
+    'https://example.test/src/a.ts',
+    'file:///repo/src/a.ts',
+    'C:\\repo\\src\\a.ts',
+    '\\\\server\\share\\a.ts',
+    'src/a.ts?raw=1',
+  ]) {
+    assert.throws(() => normalizeSourceRef(unsafe), undefined, unsafe);
+  }
+});
 
 test('legacy packet key preserves the exact source_ref 12-hex formula', () => {
   const sourceRef = 'src/lib/Example.ts';

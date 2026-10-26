@@ -23,7 +23,10 @@ import { traceWorker } from '$lib/server/observability/langfuse.js';
 
 export type TaskType =
   | 'kmeans' | 'som' | 'forensics' | 'silhouette' | 'similarity'
-  | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract';
+  | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract'
+  | 'graph.bfs' | 'graph.bfs_extended' | 'graph.astar' | 'graph.greedy'
+  | 'graph.ast_traverse' | 'tree.predict' | 'manifold.slerp' | 'manifold.interpolate4d'
+  | 'schema.encode';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).
@@ -31,6 +34,119 @@ export interface RunOptions {
 	 *  Collision is harmless — falls back to idle-first dispatch. */
 	routingKey?: string;
 	timeoutMs?: number;
+}
+
+export const DEFAULT_MAX_QUEUED_COMPUTE_TASKS = 64;
+export const DEFAULT_MAX_QUEUED_COMPUTE_BYTES = 64 * 1024 * 1024;
+export const MAX_SIMILARITY_CANDIDATES_PER_BATCH = 500;
+export const MAX_SIMILARITY_BATCH_BYTES = 64 * 1024 * 1024;
+export const MAX_GPU_SIMILARITY_VALUES_PER_BATCH = 250_000;
+
+export function computeSimilarityChunkSize(candidateCount: number, dimensions: number): number {
+	if (!Number.isSafeInteger(candidateCount) || candidateCount < 0
+		|| !Number.isSafeInteger(dimensions) || dimensions <= 0) {
+		throw new Error('SIMILARITY_SHAPE_INVALID');
+	}
+	if (candidateCount === 0) return 0;
+	const queryBytes = dimensions * Float32Array.BYTES_PER_ELEMENT;
+	const bytesPerCandidate = queryBytes + Float32Array.BYTES_PER_ELEMENT;
+	const maxByBytes = Math.floor((MAX_SIMILARITY_BATCH_BYTES - queryBytes) / bytesPerCandidate);
+	if (maxByBytes < 1) throw new Error('SIMILARITY_ROW_EXCEEDS_BATCH_BYTE_LIMIT');
+	return Math.min(candidateCount, MAX_SIMILARITY_CANDIDATES_PER_BATCH, maxByBytes);
+}
+
+export function computeGpuSimilarityChunkSize(candidateCount: number, dimensions: number): number {
+	const boundedSize = computeSimilarityChunkSize(candidateCount, dimensions);
+	if (boundedSize === 0) return 0;
+	const maxByJsArrayValues = Math.floor(MAX_GPU_SIMILARITY_VALUES_PER_BATCH / dimensions) - 1;
+	if (maxByJsArrayValues < 1) throw new Error('SIMILARITY_GPU_ROW_EXCEEDS_BATCH_VALUE_LIMIT');
+	return Math.min(boundedSize, maxByJsArrayValues);
+}
+
+export function estimateComputePayloadBytes(value: unknown, maxBytes = DEFAULT_MAX_QUEUED_COMPUTE_BYTES): number {
+	const seen = new WeakSet<object>();
+	let total = 0;
+	let nodes = 0;
+	let exceeded = false;
+	const add = (bytes: number): void => {
+		total += bytes;
+		if (total > maxBytes) exceeded = true;
+	};
+	const visit = (item: unknown): void => {
+		if (exceeded) return;
+		nodes += 1;
+		if (nodes > 250_000) {
+			exceeded = true;
+			return;
+		}
+		if (item === null || item === undefined || typeof item === 'boolean' || typeof item === 'number') {
+			add(8);
+			return;
+		}
+		if (typeof item === 'string') {
+			add(8 + Buffer.byteLength(item, 'utf8'));
+			return;
+		}
+		if (typeof item === 'bigint') {
+			add(16);
+			return;
+		}
+		if (typeof item !== 'object') {
+			exceeded = true;
+			return;
+		}
+		if (seen.has(item)) return;
+		seen.add(item);
+		if (item instanceof ArrayBuffer) {
+			add(16 + item.byteLength);
+			return;
+		}
+		if (typeof SharedArrayBuffer !== 'undefined' && item instanceof SharedArrayBuffer) {
+			add(16 + item.byteLength);
+			return;
+		}
+		if (ArrayBuffer.isView(item)) {
+			add(16 + item.byteLength);
+			return;
+		}
+		if (item instanceof Map) {
+			add(32);
+			for (const [key, entry] of item) {
+				visit(key);
+				visit(entry);
+				if (exceeded) return;
+			}
+			return;
+		}
+		if (item instanceof Set || Array.isArray(item)) {
+			add(24);
+			for (const entry of item) {
+				visit(entry);
+				if (exceeded) return;
+			}
+			return;
+		}
+		try {
+			const entries = Object.entries(item);
+			add(32);
+			for (const [key, entry] of entries) {
+				add(Buffer.byteLength(key, 'utf8') + 8);
+				visit(entry);
+				if (exceeded) return;
+			}
+		} catch {
+			exceeded = true;
+		}
+	};
+	if (!Number.isFinite(maxBytes) || maxBytes < 0) return Number.POSITIVE_INFINITY;
+	visit(value);
+	return exceeded ? Number.POSITIVE_INFINITY : total;
+}
+
+export function canQueueComputeTask(queueSize: number, maxQueuedTasks: number): boolean {
+	return Number.isInteger(queueSize) && queueSize >= 0
+		&& Number.isInteger(maxQueuedTasks) && maxQueuedTasks >= 0
+		&& queueSize < maxQueuedTasks;
 }
 
 interface PendingTask {
@@ -42,6 +158,15 @@ interface PendingTask {
 interface WorkerEntry {
 	worker: Worker;
 	busy: boolean;
+}
+
+interface QueuedTask {
+	taskId: number;
+	type: TaskType;
+	payload: unknown;
+	deadlineAt: number;
+	payloadBytes: number;
+	task: PendingTask;
 }
 
 /**
@@ -70,12 +195,21 @@ function fnv1aWorkerIndex(key: string, numWorkers: number): number {
 
 export class ComputePool {
 	private workers: WorkerEntry[] = [];
-	private taskQueue: Array<{ type: TaskType; payload: unknown; task: PendingTask }> = [];
+	private taskQueue: QueuedTask[] = [];
+	private queuedPayloadBytes = 0;
 	private taskIdCounter = 0;
 	private pendingTasks = new Map<number, PendingTask>();
 	private disposed = false;
 
-	constructor(private poolSize?: number) {
+	constructor(
+		private poolSize?: number,
+		private maxQueuedTasks = DEFAULT_MAX_QUEUED_COMPUTE_TASKS,
+		private maxQueuedBytes = DEFAULT_MAX_QUEUED_COMPUTE_BYTES
+	) {
+		if (!Number.isInteger(maxQueuedTasks) || maxQueuedTasks < 0
+			|| !Number.isInteger(maxQueuedBytes) || maxQueuedBytes < 0) {
+			throw new Error('ComputePool queue limits must be nonnegative integers');
+		}
 		// In cluster mode, reduce pool size to avoid thread explosion (N workers * M threads)
 		const isClusterWorker = process.env.CLUSTER_WORKERS && parseInt(process.env.CLUSTER_WORKERS) > 1;
 		this.poolSize = poolSize ?? computeDefaultComputePoolSize(os.cpus().length, Boolean(isClusterWorker));
@@ -192,8 +326,14 @@ export class ComputePool {
 			const taskId = this.taskIdCounter++;
 
 			return new Promise<T>((resolve, reject) => {
+				const deadlineAt = Date.now() + timeoutMs;
 				const timer = setTimeout(() => {
 					this.pendingTasks.delete(taskId);
+					const queuedIndex = this.taskQueue.findIndex((queued) => queued.taskId === taskId);
+					if (queuedIndex >= 0) {
+						const [queued] = this.taskQueue.splice(queuedIndex, 1);
+						this.queuedPayloadBytes -= queued.payloadBytes;
+					}
 					reject(new Error(`[ComputePool] Task ${type} timed out after ${timeoutMs}ms`));
 				}, timeoutMs);
 
@@ -231,8 +371,16 @@ export class ComputePool {
 				if (target) {
 					this.dispatch(target, taskId, type, payload, pending);
 				} else {
-					// All workers busy — queue; drainQueue will pick it up with sticky hint
-					this.taskQueue.push({ type, payload, task: pending });
+					const payloadBytes = estimateComputePayloadBytes(payload, this.maxQueuedBytes);
+					if (!canQueueComputeTask(this.taskQueue.length, this.maxQueuedTasks)
+						|| !Number.isFinite(payloadBytes)
+						|| this.queuedPayloadBytes + payloadBytes > this.maxQueuedBytes) {
+						clearTimeout(timer);
+						reject(new Error('[ComputePool] Queue capacity exceeded'));
+						return;
+					}
+					this.taskQueue.push({ taskId, type, payload, deadlineAt, payloadBytes, task: pending });
+					this.queuedPayloadBytes += payloadBytes;
 				}
 			});
 		});
@@ -251,10 +399,18 @@ export class ComputePool {
 	}
 
 	private drainQueue(entry: WorkerEntry): void {
-		if (entry.busy || this.taskQueue.length === 0) return;
-		const next = this.taskQueue.shift()!;
-		const taskId = this.taskIdCounter++;
-		this.dispatch(entry, taskId, next.type, next.payload, next.task);
+		if (entry.busy) return;
+		while (this.taskQueue.length > 0) {
+			const next = this.taskQueue.shift()!;
+			this.queuedPayloadBytes -= next.payloadBytes;
+			if (next.deadlineAt <= Date.now()) {
+				clearTimeout(next.task.timer);
+				next.task.reject(new Error(`[ComputePool] Task ${next.type} timed out before dispatch`));
+				continue;
+			}
+			this.dispatch(entry, next.taskId, next.type, next.payload, next.task);
+			return;
+		}
 	}
 
 	/** Number of idle workers */
@@ -292,19 +448,29 @@ export class ComputePool {
 		n: number,
 		dim = 768
 	): Promise<{ scores: number[]; source: 'gpu' | 'cpu-worker' }> {
-		// GPU fast-path (100× speedup for n > 100)
-		// libtorch-bridge expects number[] query and number[][] corpus.
-		// Slice from the flat Float32Array inputs (zero-copy views where possible).
+		const chunkSize = computeSimilarityChunkSize(n, dim);
+		if (query.length < dim || corpus.length < n * dim) throw new Error('SIMILARITY_INPUT_LENGTH_MISMATCH');
+		if (n === 0) return { scores: [], source: 'cpu-worker' };
+
+		// Keep each executor request bounded; GPU conversion to nested JS arrays is
+		// also limited to one chunk rather than the entire corpus.
 		try {
 			const { batchCosineSimilarity, isCudaAvailable } = await import('$lib/server/gpu/libtorch-bridge.js');
 			if (isCudaAvailable()) {
 				const queryArr = Array.from(query.subarray(0, dim));
-				const corpusArr: number[][] = [];
-				for (let i = 0; i < n; i++) {
-					corpusArr.push(Array.from(corpus.subarray(i * dim, (i + 1) * dim)));
+				const scores: number[] = [];
+				const gpuChunkSize = computeGpuSimilarityChunkSize(n, dim);
+				for (let offset = 0; offset < n; offset += gpuChunkSize) {
+					const count = Math.min(gpuChunkSize, n - offset);
+					const corpusArr: number[][] = [];
+					for (let row = offset; row < offset + count; row++) {
+						corpusArr.push(Array.from(corpus.subarray(row * dim, (row + 1) * dim)));
+					}
+					const result = await batchCosineSimilarity(queryArr, corpusArr);
+					if (result.scores.length !== count) throw new Error('SIMILARITY_GPU_RESULT_LENGTH_MISMATCH');
+					scores.push(...result.scores);
 				}
-				const result = await batchCosineSimilarity(queryArr, corpusArr);
-				return { scores: result.scores, source: 'gpu' };
+				return { scores, source: 'gpu' };
 			}
 		} catch {
 			// Fall through to worker thread
@@ -313,25 +479,48 @@ export class ComputePool {
 		// Worker thread fallback with SharedArrayBuffer zero-copy
 		// SharedArrayBuffer is always available in Node.js worker_threads context
 		// (no COOP/COEP headers needed — that restriction is browser-only)
-		const sharedQuery  = new SharedArrayBuffer(dim * 4);          // query floats
-		const sharedCorpus = new SharedArrayBuffer(n * dim * 4);      // corpus floats
-		const sharedScores = new SharedArrayBuffer(n * 4);            // output scores
-
-		// Write data into shared regions (single contiguous copy, cache-line-aligned)
+		const sharedQuery = new SharedArrayBuffer(dim * Float32Array.BYTES_PER_ELEMENT);
 		new Float32Array(sharedQuery).set(query.subarray(0, dim));
-		new Float32Array(sharedCorpus).set(corpus.subarray(0, n * dim));
+		const scores: number[] = [];
+		for (let offset = 0; offset < n; offset += chunkSize) {
+			const count = Math.min(chunkSize, n - offset);
+			const sharedCorpus = new SharedArrayBuffer(count * dim * Float32Array.BYTES_PER_ELEMENT);
+			const sharedScores = new SharedArrayBuffer(count * Float32Array.BYTES_PER_ELEMENT);
+			new Float32Array(sharedCorpus).set(corpus.subarray(offset * dim, (offset + count) * dim));
+			await this.run<{ n: number; dim: number; shared: boolean }>(
+				'similarity',
+				{ sharedQuery, sharedCorpus, sharedScores, n: count, dim },
+				{ timeoutMs: 60_000 }
+			);
+			scores.push(...new Float32Array(sharedScores));
+		}
+		return { scores, source: 'cpu-worker' };
+	}
 
-		await this.run<{ n: number; dim: number; shared: boolean }>(
-			'similarity',
-			{ sharedQuery, sharedCorpus, sharedScores, n, dim },
-			{ timeoutMs: 60_000 }
+	/**
+	 * Compute document relevance scores in worker thread using SharedArrayBuffer zero-copy.
+	 * Formula: score = (trustTier * 0.3) + (karpathyBlend * 0.5) + ((1.0 - riskScore) * 0.2)
+	 */
+	async encodeDocumentScores(
+		features: Float32Array | SharedArrayBuffer,
+		count: number,
+		options?: RunOptions
+	): Promise<Float32Array> {
+		if (count <= 0) return new Float32Array(0);
+		let sharedFeatures: SharedArrayBuffer;
+		if (features instanceof SharedArrayBuffer) {
+			sharedFeatures = features;
+		} else {
+			sharedFeatures = new SharedArrayBuffer(count * 5 * Float32Array.BYTES_PER_ELEMENT);
+			new Float32Array(sharedFeatures).set(features.subarray(0, count * 5));
+		}
+		const sharedScores = new SharedArrayBuffer(count * Float32Array.BYTES_PER_ELEMENT);
+		await this.run<{ n: number; shared: boolean }>(
+			'schema.encode',
+			{ sharedFeatures, sharedScores, n: count },
+			options
 		);
-
-		// Read scores back (zero-copy — same shared memory)
-		return {
-			scores: Array.from(new Float32Array(sharedScores)),
-			source: 'cpu-worker',
-		};
+		return new Float32Array(sharedScores);
 	}
 
 	/**
@@ -363,13 +552,18 @@ export class ComputePool {
 	/** Shutdown all workers */
 	async dispose(): Promise<void> {
 		this.disposed = true;
+		for (const queued of this.taskQueue) {
+			clearTimeout(queued.task.timer);
+			queued.task.reject(new Error('ComputePool disposed'));
+		}
+		this.taskQueue = [];
+		this.queuedPayloadBytes = 0;
 		// Reject all pending
 		for (const [, pending] of this.pendingTasks) {
 			clearTimeout(pending.timer);
 			pending.reject(new Error('ComputePool disposed'));
 		}
 		this.pendingTasks.clear();
-		this.taskQueue = [];
 
 		await Promise.allSettled(
 			this.workers.map((w) => w.worker.terminate())

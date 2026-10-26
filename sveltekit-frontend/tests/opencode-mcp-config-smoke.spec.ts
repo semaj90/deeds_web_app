@@ -203,10 +203,10 @@ describe('OpenCode Configuration', () => {
 
     it('root permission should allow MCP tool namespaces', () => {
       const perm = projectConfig.permission as Record<string, unknown>;
-      expect(perm.trace_*).toBe('allow');
-      expect(perm.turbovec_*).toBe('allow');
-      expect(perm.engram_*).toBe('allow');
-      expect(perm.atlas_*).toBe('allow');
+      expect(perm['trace_*']).toBe('allow');
+      expect(perm['turbovec_*']).toBe('allow');
+      expect(perm['engram_*']).toBe('allow');
+      expect(perm['atlas_*']).toBe('allow');
     });
 
     it('root permission bash should allow npm and rg commands', () => {
@@ -296,7 +296,7 @@ describe('OpenCode Configuration', () => {
   describe('Tool Calling Support', () => {
     it('model config should have tools:true for Gemma4', () => {
       const model = projectConfig.model as string;
-      const providerName = model.split('/')[0]; // Extract provider from "turboquant/gemma4-legal.gguf"
+      const providerName = model.split('/')[0]; // Extract provider from "turboquant/ornith-1.5-9b"
 
       const provider = (projectConfig.provider as Record<string, Record<string, unknown>>)[providerName];
       const models = provider.models as Record<string, Record<string, unknown>>;

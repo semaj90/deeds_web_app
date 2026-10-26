@@ -1,0 +1,524 @@
+{
+  "schema": "atlas.pgvector-hnsw-unqualified-diagnostic.v1",
+  "generatedAt": "2026-10-18T10:07:03.927Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "semanticQualityClaim": false,
+  "lineageQualification": "BLOCKED_MISSING_SOURCE_AND_WORKSPACE_REVISIONS",
+  "sampleLimit": 10,
+  "topK": 10,
+  "queryMode": "DETERMINISTIC_CORPUS_ROWS_EXCLUDED_FROM_CANDIDATES",
+  "cohorts": [
+    {
+      "key": "halfvec_content",
+      "column": "public.codebase_chunk_index.content_embedding",
+      "vectorCast": "halfvec",
+      "rowCount": "57243",
+      "sourceRevisionCount": "0",
+      "workspaceRevisionCount": "0",
+      "indexes": [
+        {
+          "indexname": "codebase_chunk_index_content_hnsw",
+          "indexdef": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')",
+          "size_bytes": "115523584"
+        },
+        {
+          "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')",
+          "size_bytes": "805158912"
+        }
+      ],
+      "queryIdsChecksum": "sha256:968be3ea741b6c3fb91e551851e393df6c0e8741cff60ebb2d8676494d80f588",
+      "queryCount": 10,
+      "queries": [
+        {
+          "queryId": "a3a26d79-c8cf-406b-865a-3c6351557cb0",
+          "exactIdsChecksum": "sha256:5a61a0250c18f74ff2343995390ab643778a3a0d5922fda35e5ae32b43060dbd",
+          "hnswIdsChecksum": "sha256:5a61a0250c18f74ff2343995390ab643778a3a0d5922fda35e5ae32b43060dbd",
+          "recallAtK": 1,
+          "exactMs": 621.176,
+          "hnswMs": 3.976,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "5c085c83-a7ea-4bb2-b118-65c5ed733b4a",
+          "exactIdsChecksum": "sha256:96b04ef9965daebb30e519ac66076384a361e44df24ccd87397c1305dbe65b02",
+          "hnswIdsChecksum": "sha256:96b04ef9965daebb30e519ac66076384a361e44df24ccd87397c1305dbe65b02",
+          "recallAtK": 1,
+          "exactMs": 702.757,
+          "hnswMs": 5.6,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "e8cf4417-22f3-4220-a9ad-ccc9301a8fc3",
+          "exactIdsChecksum": "sha256:c0f62dee34354cdb7bc7e91bc1072e853df7e1e60eaf52daca042d429f0f40eb",
+          "hnswIdsChecksum": "sha256:c0f62dee34354cdb7bc7e91bc1072e853df7e1e60eaf52daca042d429f0f40eb",
+          "recallAtK": 1,
+          "exactMs": 544.994,
+          "hnswMs": 4.945,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "0e8e58a8-5d7f-4cc7-8645-939a67a283ab",
+          "exactIdsChecksum": "sha256:30297036980afe727d004ddea62f674180d1a36bd27c6e27c69358b927d502b2",
+          "hnswIdsChecksum": "sha256:30297036980afe727d004ddea62f674180d1a36bd27c6e27c69358b927d502b2",
+          "recallAtK": 1,
+          "exactMs": 702.441,
+          "hnswMs": 2.843,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "662b363a-f2c5-465e-b106-2dc0243e02c5",
+          "exactIdsChecksum": "sha256:2e4290ad98f68cb16ff8d53300714ae51435c525636bd9f421f91a9367445dec",
+          "hnswIdsChecksum": "sha256:2e4290ad98f68cb16ff8d53300714ae51435c525636bd9f421f91a9367445dec",
+          "recallAtK": 1,
+          "exactMs": 946.917,
+          "hnswMs": 7.115,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "30342d0a-a7f1-418d-951e-f20ab8b38283",
+          "exactIdsChecksum": "sha256:224f8c6882362b259fd432ec8a383af17fa32746e67f8d527a8a95c033f6cd48",
+          "hnswIdsChecksum": "sha256:224f8c6882362b259fd432ec8a383af17fa32746e67f8d527a8a95c033f6cd48",
+          "recallAtK": 1,
+          "exactMs": 801.105,
+          "hnswMs": 5.783,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "ca1f325c-3d04-4990-b0ab-5c904976bd81",
+          "exactIdsChecksum": "sha256:128fd85519c829891cca3395ec9e973f1977b4d975fac3014cd9f74a3da7c868",
+          "hnswIdsChecksum": "sha256:128fd85519c829891cca3395ec9e973f1977b4d975fac3014cd9f74a3da7c868",
+          "recallAtK": 1,
+          "exactMs": 725.914,
+          "hnswMs": 6.359,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "36a26b87-6d28-4c14-99f8-ccb3c1c1cc33",
+          "exactIdsChecksum": "sha256:6f99bde26d0b4349cc413ce2c41d952cfdbe964e3ba53c2e9bc81cc97ac594f6",
+          "hnswIdsChecksum": "sha256:6f99bde26d0b4349cc413ce2c41d952cfdbe964e3ba53c2e9bc81cc97ac594f6",
+          "recallAtK": 1,
+          "exactMs": 934.067,
+          "hnswMs": 6.058,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "d9934eae-285a-4dd0-835b-fcf2886b78da",
+          "exactIdsChecksum": "sha256:20754eb48ba269f840f7daf333b47a672c0071cd1e0fc0d42407c0c941f91691",
+          "hnswIdsChecksum": "sha256:20754eb48ba269f840f7daf333b47a672c0071cd1e0fc0d42407c0c941f91691",
+          "recallAtK": 1,
+          "exactMs": 826.038,
+          "hnswMs": 5.083,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "be37b827-3277-41b2-940a-e9d0a5ee0de3",
+          "exactIdsChecksum": "sha256:6e13a766ab450a512dfce5bd14ebcfeafeecbc2acfb4912b353e10cd211623e9",
+          "hnswIdsChecksum": "sha256:6e13a766ab450a512dfce5bd14ebcfeafeecbc2acfb4912b353e10cd211623e9",
+          "recallAtK": 1,
+          "exactMs": 721.686,
+          "hnswMs": 4.452,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        }
+      ],
+      "meanRecallAtK": 1,
+      "meanExactMs": 752.7094999999999,
+      "meanHnswMs": 5.2214
+    },
+    {
+      "key": "vector_content_768",
+      "column": "public.codebase_chunk_index.content_embedding_768",
+      "vectorCast": "vector",
+      "rowCount": "219998",
+      "sourceRevisionCount": "0",
+      "workspaceRevisionCount": "0",
+      "indexes": [
+        {
+          "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')",
+          "size_bytes": "805158912"
+        }
+      ],
+      "queryIdsChecksum": "sha256:4f1f674edb1f6a183d21a0ff37e73096dea3f5743193028afa76ffd6a621252c",
+      "queryCount": 10,
+      "queries": [
+        {
+          "queryId": "0b66cb46-8a59-4f50-afdb-8e2fa5541a83",
+          "exactIdsChecksum": "sha256:095da76dff4cafd9b9a2e0ade5908b3d2e9e086a369e25d4056895044c57fd0e",
+          "hnswIdsChecksum": "sha256:095da76dff4cafd9b9a2e0ade5908b3d2e9e086a369e25d4056895044c57fd0e",
+          "recallAtK": 1,
+          "exactMs": 2788.964,
+          "hnswMs": 4.874,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "46a48574-fca5-4196-861f-66d4e5aba9e3",
+          "exactIdsChecksum": "sha256:6fb938e85f354da2e06cac9a6bf77b9f20983024594cfa9307420ddd8c18b71b",
+          "hnswIdsChecksum": "sha256:6fb938e85f354da2e06cac9a6bf77b9f20983024594cfa9307420ddd8c18b71b",
+          "recallAtK": 1,
+          "exactMs": 1509.169,
+          "hnswMs": 4.267,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "0bfbb5eb-f124-4635-8c17-83281154ea4a",
+          "exactIdsChecksum": "sha256:7a38b6f0c26fea35b96ed93fef00bcd424adf29bb9cf6446823e1236139d78a7",
+          "hnswIdsChecksum": "sha256:7a38b6f0c26fea35b96ed93fef00bcd424adf29bb9cf6446823e1236139d78a7",
+          "recallAtK": 1,
+          "exactMs": 1508.493,
+          "hnswMs": 3.849,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "5561f5fb-b733-47cc-a558-8f5fb3a2a27e",
+          "exactIdsChecksum": "sha256:0bd2826597561309c14cbe1a653401e85b7ed25d1911f76af9d7a03da9c21997",
+          "hnswIdsChecksum": "sha256:0bd2826597561309c14cbe1a653401e85b7ed25d1911f76af9d7a03da9c21997",
+          "recallAtK": 1,
+          "exactMs": 1878.311,
+          "hnswMs": 1.815,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "7c002903-2e26-4af8-abf9-072871d0e69d",
+          "exactIdsChecksum": "sha256:0b3534f4c4b3b29aedd4fb4dac37b55ebee80a1764ba1b18f66d78783bf63523",
+          "hnswIdsChecksum": "sha256:0b3534f4c4b3b29aedd4fb4dac37b55ebee80a1764ba1b18f66d78783bf63523",
+          "recallAtK": 1,
+          "exactMs": 1352.282,
+          "hnswMs": 2.799,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "c44eff7c-8000-4e0a-86f9-280c4d8975e1",
+          "exactIdsChecksum": "sha256:534188f883e0244303429e5ca7abdd62e5dabf2edad15699038e6929a3efe4be",
+          "hnswIdsChecksum": "sha256:534188f883e0244303429e5ca7abdd62e5dabf2edad15699038e6929a3efe4be",
+          "recallAtK": 1,
+          "exactMs": 1274.009,
+          "hnswMs": 2.933,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "e40c9451-7851-412c-bbaf-e5aef05c0248",
+          "exactIdsChecksum": "sha256:2563e195d3ae37e683f5a14dcd99a59581860ea39ff354a84d4ae8d9d730815c",
+          "hnswIdsChecksum": "sha256:2563e195d3ae37e683f5a14dcd99a59581860ea39ff354a84d4ae8d9d730815c",
+          "recallAtK": 1,
+          "exactMs": 1167.574,
+          "hnswMs": 1.671,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "48b2cd33-102b-4239-99a7-3b249cfb7917",
+          "exactIdsChecksum": "sha256:c785458d228ec4ab3a3d66735125d79fc802a81d2460eae8e1b1c5ca3e5d32ba",
+          "hnswIdsChecksum": "sha256:c785458d228ec4ab3a3d66735125d79fc802a81d2460eae8e1b1c5ca3e5d32ba",
+          "recallAtK": 1,
+          "exactMs": 1151.127,
+          "hnswMs": 1.721,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "d4fa230c-a7c4-4a35-8241-05438bc53dc9",
+          "exactIdsChecksum": "sha256:5a35668ff8028525299aca70b2c4e5dac9e4746757ac52f112bcf15fe8e072b0",
+          "hnswIdsChecksum": "sha256:5a35668ff8028525299aca70b2c4e5dac9e4746757ac52f112bcf15fe8e072b0",
+          "recallAtK": 1,
+          "exactMs": 1193.15,
+          "hnswMs": 3.096,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "921f029e-27d7-43a8-92cb-da80f980dd9f",
+          "exactIdsChecksum": "sha256:366106fbeb05efc48fa9a0aa03c580d13e77654df3ab15f418210e501707f02c",
+          "hnswIdsChecksum": "sha256:366106fbeb05efc48fa9a0aa03c580d13e77654df3ab15f418210e501707f02c",
+          "recallAtK": 1,
+          "exactMs": 1424.98,
+          "hnswMs": 2.742,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        }
+      ],
+      "meanRecallAtK": 1,
+      "meanExactMs": 1524.8058999999998,
+      "meanHnswMs": 2.9767
+    }
+  ],
+  "status": "DIAGNOSTIC_COMPLETE_UNQUALIFIED_LINEAGE"
+}

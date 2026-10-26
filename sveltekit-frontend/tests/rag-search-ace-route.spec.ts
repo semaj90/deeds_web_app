@@ -122,9 +122,9 @@ vi.stubGlobal('fetch', mockGlobalFetch);
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-  ollamaFetch: vi.fn(),
+  embedOrChatFetch: vi.fn(),
 }));
 
 vi.mock('$lib/server/env.server.js', () => ({

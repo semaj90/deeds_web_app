@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 import {
   listPendingTaxonomyAssignmentCandidates,
@@ -7,6 +8,22 @@ import {
 } from '$lib/server/atlas/kag-taxonomy-candidate-postgres.js';
 
 const DEFAULT_LIMIT = 50;
+
+const taxonomyCandidateDecisionRequestSchema = z.object({
+  candidateId: z.string().trim().min(1).max(512),
+  decision: z.enum(['promoted', 'rejected']),
+  reviewedBy: z.string().trim().min(1).max(255).optional(),
+  workspaceRevision: z.string().trim().min(1).max(512).optional(),
+  sourceRevision: z.string().trim().min(1).max(512).optional(),
+  graphRevision: z.string().trim().min(1).max(512).optional(),
+  promotionEvidenceRefs: z.array(z.string().trim().min(1).max(512)).max(64).optional(),
+  producerRevision: z.string().trim().min(1).max(512).optional(),
+}).strict().superRefine((body, context) => {
+  if (body.decision !== 'promoted') return;
+  for (const field of ['workspaceRevision', 'sourceRevision', 'graphRevision', 'producerRevision'] as const) {
+    if (!body[field]) context.addIssue({ code: z.ZodIssueCode.custom, path: [field], message: 'required for promotion' });
+  }
+});
 
 /**
  * KAG taxonomy-assignment review surface (roadmap step 2).
@@ -26,37 +43,26 @@ export const GET: RequestHandler = async (event) => {
   }
 };
 
-interface DecisionRequestBody {
-  candidateId?: string;
-  decision?: 'promoted' | 'rejected';
-  reviewedBy?: string;
-  workspaceRevision?: string;
-  sourceRevision?: string;
-  graphRevision?: string;
-  promotionEvidenceRefs?: string[];
-  producerRevision?: string;
-}
-
 export const POST: RequestHandler = async (event) => {
-  requireAdmin(event);
+  const admin = requireAdmin(event);
   try {
-    const body = (await event.request.json()) as DecisionRequestBody;
-
-    if (!body.candidateId?.trim()) return json({ ok: false, error: 'candidateId is required' }, { status: 400 });
-    if (body.decision !== 'promoted' && body.decision !== 'rejected') {
-      return json({ ok: false, error: "decision must be 'promoted' or 'rejected'" }, { status: 400 });
+    let rawBody: unknown;
+    try {
+      rawBody = await event.request.json();
+    } catch {
+      return json({ ok: false, error: 'invalid JSON request body' }, { status: 400 });
     }
-    if (!body.reviewedBy?.trim()) return json({ ok: false, error: 'reviewedBy is required' }, { status: 400 });
-    if (body.decision === 'promoted') {
-      if (!body.workspaceRevision?.trim() || !body.sourceRevision?.trim() || !body.graphRevision?.trim() || !body.producerRevision?.trim()) {
-        return json({ ok: false, error: 'workspaceRevision, sourceRevision, graphRevision, and producerRevision are required to promote' }, { status: 400 });
-      }
+    const parsed = taxonomyCandidateDecisionRequestSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return json({ ok: false, error: 'invalid taxonomy candidate decision', issues: parsed.error.issues }, { status: 400 });
     }
+    const body = parsed.data;
+    if (!admin.id.trim()) return json({ ok: false, error: 'authenticated admin identity is unavailable' }, { status: 401 });
 
     const result = await decideTaxonomyAssignmentCandidateV1({
       candidateId: body.candidateId,
       decision: body.decision,
-      reviewedBy: body.reviewedBy,
+      reviewedBy: admin.id,
       workspaceRevision: body.workspaceRevision ?? '',
       sourceRevision: body.sourceRevision ?? '',
       graphRevision: body.graphRevision ?? '',

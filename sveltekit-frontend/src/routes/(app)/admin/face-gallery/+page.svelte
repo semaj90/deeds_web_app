@@ -2,8 +2,6 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 
-	export const ssr = false;
-
 	// ── Types ────────────────────────────────────────────────────────────────
 
 	interface PoiPhoto {
@@ -419,8 +417,8 @@
 					Writes to <code>qlora_examples</code>.
 				</p>
 
-				<label class="field-label">Mode</label>
-				<div class="mode-selector">
+				<span id="synth-mode-label" class="field-label">Mode</span>
+				<div class="mode-selector" role="group" aria-labelledby="synth-mode-label">
 					{#each (['description', 'compare', 'adversarial'] as const) as m}
 						<button
 							class="mode-btn {synthMode === m ? 'active' : ''}"

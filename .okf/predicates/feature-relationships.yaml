@@ -60,6 +60,10 @@ predicates:
     allowed_degree: [binary, ternary, nary]
     pagerank_eligible: true
     traversal_eligible: true
+  uses_concept:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: false
+    traversal_eligible: true
   auth_guards:
     allowed_degree: [binary, ternary, nary]
     pagerank_eligible: true

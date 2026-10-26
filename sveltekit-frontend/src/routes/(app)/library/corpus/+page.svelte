@@ -321,8 +321,8 @@
 
 <!-- Upload PDF modal -->
 {#if uploadModal}
-	<div class="co-modal-backdrop" onclick={closeUpload} role="presentation">
-		<div class="co-modal" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Upload PDF for {uploadModal.stateName}">
+	<div class="co-modal-backdrop" onclick={(e) => { if (e.target === e.currentTarget) closeUpload(); }} role="presentation">
+		<div class="co-modal" role="dialog" aria-modal="true" aria-label="Upload PDF for {uploadModal.stateName}" tabindex="-1">
 			<div class="co-modal-header">
 				<h2 class="co-modal-title">Upload PDF — {uploadModal.stateName}</h2>
 				<button onclick={closeUpload} class="co-modal-close" disabled={uploadRunning} aria-label="Close">

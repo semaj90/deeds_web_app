@@ -31,6 +31,8 @@ CUGRAPH_LOUVAIN_26_06 = "cugraph.louvain.26.06"
 CUGRAPH_LEIDEN_26_06 = "cugraph.leiden.26.06"
 CUGRAPH_SPECTRAL_MODULARITY_26_06 = "cugraph.spectralModularityMaximizationClustering.26.06"
 UNDIRECTED_WEIGHTED_PROJECTION_V1 = "atlas.undirected-weighted-projection.v1"
+MAX_COMMUNITY_NODES_V1 = 200_000
+MAX_COMMUNITY_EDGES_V1 = 1_000_000
 
 
 class CommunityNodeV1(BaseModel):
@@ -50,8 +52,8 @@ class CommunityPartitionRequestV1(BaseModel):
     topologyHash: str = Field(min_length=1)
     projectionRevision: str = Field(min_length=1)
     projectionSemantics: Literal["atlas.undirected-weighted-projection.v1"]
-    nodes: list[CommunityNodeV1] = Field(min_length=1)
-    edges: list[CommunityEdgeV1]
+    nodes: list[CommunityNodeV1] = Field(min_length=1, max_length=MAX_COMMUNITY_NODES_V1)
+    edges: list[CommunityEdgeV1] = Field(max_length=MAX_COMMUNITY_EDGES_V1)
     resolution: float = Field(default=1.0, gt=0.0)
     maxIterations: int = Field(default=100, ge=1, le=500)
     threshold: float = Field(default=1e-7, gt=0.0)

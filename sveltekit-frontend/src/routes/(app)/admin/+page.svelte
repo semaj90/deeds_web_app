@@ -240,26 +240,98 @@
 		}
 	}
 
-	// --- admin nav links ---
-	const adminLinks = [
-		{ href: '/admin/ai-dashboard', label: 'AI Dashboard', icon: 'brain', desc: 'Operator + Lab consoles' },
-		{ href: '/admin/codebase-index', label: 'Codebase Index', icon: 'database', desc: 'Qdrant/Postgres browser' },
-		{ href: '/admin/codebase-graph', label: 'Codebase Graph', icon: 'git-branch', desc: 'Import dependency graph' },
-		{ href: '/admin/case-graph', label: 'Case Graph', icon: 'git-fork', desc: 'D3 case/evidence/person relationships' },
-		{ href: '/admin/error-brain', label: 'Error Brain', icon: 'bug', desc: 'AI error diagnosis' },
-		{ href: '/admin/cache', label: 'Cache Monitor', icon: 'hard-drive', desc: 'Redis + GPU buffers' },
-		{ href: '/admin/topology', label: 'Topology', icon: 'network', desc: 'Interactive dependency view' },
-		{ href: '/admin/dev-tools', label: 'Dev Tools', icon: 'wrench', desc: '13+ tool tabs' },
-		{ href: '/admin/knowledge-search', label: 'Knowledge Search', icon: 'search', desc: 'Semantic search + tags' },
-		{ href: '/admin/library', label: 'Legal Library', icon: 'book-open', desc: 'Document ingestion' },
-		{ href: '/admin/phase89', label: 'Phase 89', icon: 'flask-conical', desc: 'Cluster analysis' },
-		{ href: '/admin/kag-notebook', label: 'KAG Notebook', icon: 'notebook-pen', desc: 'Knowledge notebook' },
-		{ href: '/admin/search-intelligence', label: 'Contextual Assistant', icon: 'bot', desc: 'GraphRAG + DenseRAG chat' },
-		{ href: '/admin/atlas', label: 'Atlas Studio', icon: 'radar', desc: 'CHR97 + Qdrant + Redis telemetry' },
-		{ href: '/admin/all-routes', label: 'All Routes', icon: 'route', desc: 'Route health ops' },
-		{ href: '/admin/face-gallery', label: 'Face Gallery', icon: 'scan-face', desc: 'POI face matching + GRPO reranker + QLoRA synths' },
-		{ href: '/admin/observability', label: 'Observability', icon: 'activity', desc: 'Graph/search/ACE spine health' },
+	type AdminCategory = 'ai' | 'atlas' | 'codebase' | 'diagnostics' | 'ops';
+
+	interface AdminLink {
+		href: string;
+		label: string;
+		icon: string;
+		desc: string;
+		category: AdminCategory;
+	}
+
+	const adminCategoryMeta: Record<AdminCategory, { label: string; color: string }> = {
+		ai: { label: 'AI & Research', color: '#60a5fa' },
+		atlas: { label: 'Atlas & Graph', color: '#a78bfa' },
+		codebase: { label: 'Codebase & Indexing', color: '#34d399' },
+		diagnostics: { label: 'Error Brain & QA', color: '#f59e0b' },
+		ops: { label: 'Infra & DevOps', color: '#f87171' },
+	};
+
+	let selectedCategory = $state<AdminCategory | 'all'>('all');
+	let adminSearch = $state('');
+
+	// --- admin nav links (all 46 static /admin/* routes) ---
+	const adminLinks: AdminLink[] = [
+		// AI & Research (10)
+		{ href: '/admin/ai-dashboard', label: 'AI Dashboard', icon: 'brain', desc: 'Operator + Lab consoles', category: 'ai' },
+		{ href: '/admin/ai-dashboard/operator', label: 'AI Operator Console', icon: 'terminal', desc: 'Live inference & slot controls', category: 'ai' },
+		{ href: '/admin/ai-dashboard/lab', label: 'AI Experiment Lab', icon: 'flask-conical', desc: 'Model & prompt evaluation lab', category: 'ai' },
+		{ href: '/admin/search-intelligence', label: 'Contextual Assistant', icon: 'bot', desc: 'GraphRAG + DenseRAG chat', category: 'ai' },
+		{ href: '/admin/deep-research', label: 'Deep Research Studio', icon: 'compass', desc: 'Iterative LDR + Ornith synthesis', category: 'ai' },
+		{ href: '/admin/kag-notebook', label: 'KAG Notebook', icon: 'notebook-pen', desc: 'Knowledge-augmented notebook', category: 'ai' },
+		{ href: '/admin/chat-memory', label: 'Chat Memory', icon: 'message-square', desc: 'Session & context memory store', category: 'ai' },
+		{ href: '/admin/qlora-training', label: 'QLoRA Training', icon: 'sparkles', desc: 'Adapter training & evaluation', category: 'ai' },
+		{ href: '/admin/onnx-gpu-test', label: 'ONNX GPU Lab', icon: 'cpu', desc: 'ONNX Runtime & WebGPU bench', category: 'ai' },
+		{ href: '/admin/face-gallery', label: 'Face Gallery', icon: 'scan-face', desc: 'POI face matching + GRPO reranker', category: 'ai' },
+
+		// Atlas & Graph (9)
+		{ href: '/admin/atlas', label: 'Atlas Studio', icon: 'radar', desc: 'CHR97 + Qdrant + Redis telemetry', category: 'atlas' },
+		{ href: '/admin/parents-atlas', label: 'Parent Atlas', icon: 'layers', desc: 'Canonical retrieval & authority plane', category: 'atlas' },
+		{ href: '/admin/atlas/ontology', label: 'Domain Ontology', icon: 'git-merge', desc: 'Legal concepts & tuple relations', category: 'atlas' },
+		{ href: '/admin/atlas/graph-explorer', label: 'Atlas Graph Explorer', icon: 'network', desc: 'Interactive hypergraph traversal', category: 'atlas' },
+		{ href: '/admin/graphify-readiness', label: 'Graphify Readiness', icon: 'check-circle', desc: 'Snapshot & lifecycle gate status', category: 'atlas' },
+		{ href: '/admin/ast-topology', label: 'AST Topology', icon: 'git-branch', desc: 'Tree-sitter CST/AST structure map', category: 'atlas' },
+		{ href: '/admin/topology', label: 'System Topology', icon: 'share-2', desc: 'Interactive service dependency view', category: 'atlas' },
+		{ href: '/admin/case-graph', label: 'Case Graph', icon: 'git-fork', desc: 'D3 case/evidence/person relationships', category: 'atlas' },
+		{ href: '/admin/gpu-evidence-graph', label: 'GPU Evidence Graph', icon: 'box', desc: 'WebGPU-accelerated evidence graph', category: 'atlas' },
+
+		// Codebase & Indexing (12)
+		{ href: '/admin/unified-indexing-studio', label: 'Unified Indexing Studio', icon: 'database', desc: 'Corpus + codebase indexing control', category: 'codebase' },
+		{ href: '/admin/codebase-index', label: 'Codebase Index', icon: 'folder-search', desc: 'Qdrant/Postgres chunk browser', category: 'codebase' },
+		{ href: '/admin/codebase-graph', label: 'Codebase Graph', icon: 'git-branch', desc: 'Import dependency graph', category: 'codebase' },
+		{ href: '/admin/codebase-viewer', label: 'Codebase Viewer', icon: 'file-code', desc: 'Source file & symbol inspector', category: 'codebase' },
+		{ href: '/admin/explorer', label: 'Repo Explorer', icon: 'folder', desc: 'Workspace directory browser', category: 'codebase' },
+		{ href: '/admin/component-analysis', label: 'Component Analysis', icon: 'layout', desc: 'Svelte 5 runes & component audit', category: 'codebase' },
+		{ href: '/admin/batch-embeddings', label: 'Batch Embeddings', icon: 'zap', desc: 'EmbeddingGemma worker queue', category: 'codebase' },
+		{ href: '/admin/batch-summaries', label: 'Batch Summaries', icon: 'file-text', desc: 'Bulk chunk & node summarization', category: 'codebase' },
+		{ href: '/admin/library', label: 'Legal Library', icon: 'book-open', desc: 'Statute & document ingestion', category: 'codebase' },
+		{ href: '/admin/knowledge-search', label: 'Knowledge Search', icon: 'search', desc: 'Semantic search + tag filtering', category: 'codebase' },
+		{ href: '/admin/knowledge-base', label: 'Knowledge Base', icon: 'library', desc: 'Glossary, statutes & precedents', category: 'codebase' },
+		{ href: '/admin/document-search', label: 'Document Search', icon: 'file-search', desc: 'Full-text & vector corpus search', category: 'codebase' },
+
+		// Error Brain & QA (8)
+		{ href: '/admin/all-routes', label: 'All Routes', icon: 'route', desc: 'Route health ops & API explorer', category: 'diagnostics' },
+		{ href: '/admin/error-brain', label: 'Error Brain', icon: 'bug', desc: 'AI error diagnosis & triage', category: 'diagnostics' },
+		{ href: '/admin/error-brain/runs', label: 'Error Brain Runs', icon: 'history', desc: 'Historical diagnosis & patch runs', category: 'diagnostics' },
+		{ href: '/admin/error-analysis', label: 'Error Analysis', icon: 'alert-triangle', desc: 'Compiler & runtime error clusters', category: 'diagnostics' },
+		{ href: '/admin/phase78/monitor', label: 'Phase 78 Monitor', icon: 'activity', desc: 'Route error cluster monitor', category: 'diagnostics' },
+		{ href: '/admin/phase78/patches', label: 'Phase 78 Patches', icon: 'wrench', desc: 'Automated patch candidate queue', category: 'diagnostics' },
+		{ href: '/admin/phase89', label: 'Phase 89 Clusters', icon: 'flask-conical', desc: 'Error embedding cluster analysis', category: 'diagnostics' },
+		{ href: '/admin/phase7-monitor', label: 'Phase 7 Monitor', icon: 'gauge', desc: 'Pipeline & ingestion health monitor', category: 'diagnostics' },
+
+		// Infra & DevOps (7)
+		{ href: '/admin/observability', label: 'Observability', icon: 'activity', desc: 'Graph/search/ACE spine health', category: 'ops' },
+		{ href: '/admin/telemetry', label: 'Telemetry', icon: 'bar-chart-2', desc: 'Runtime latency & throughput metrics', category: 'ops' },
+		{ href: '/admin/cache', label: 'Cache Monitor', icon: 'hard-drive', desc: 'Redis + Valkey + GPU buffers', category: 'ops' },
+		{ href: '/admin/memory-inspector', label: 'Memory Inspector', icon: 'cpu', desc: 'VRAM, heap & residency inspector', category: 'ops' },
+		{ href: '/admin/workflows', label: 'Workflows', icon: 'play', desc: 'Background jobs & RabbitMQ queues', category: 'ops' },
+		{ href: '/admin/dev-tools', label: 'Dev Tools', icon: 'wrench', desc: '13+ developer utility tabs', category: 'ops' },
+		{ href: '/admin/dev-tools/component-showcase', label: 'Component Showcase', icon: 'component', desc: 'Admin UI component sandbox', category: 'ops' },
 	];
+
+	const filteredAdminLinks = $derived.by(() => {
+		const q = adminSearch.trim().toLowerCase();
+		return adminLinks.filter((item) => {
+			if (selectedCategory !== 'all' && item.category !== selectedCategory) return false;
+			if (!q) return true;
+			return (
+				item.label.toLowerCase().includes(q) ||
+				item.desc.toLowerCase().includes(q) ||
+				item.href.toLowerCase().includes(q)
+			);
+		});
+	});
 </script>
 
 <div class="admin-overview">
@@ -361,31 +433,59 @@
 				</div>
 			{/if}
 		</section>
+	{/if}
 
-		<!-- Admin navigation grid -->
-		<section class="nav-section">
-			<h2>Admin Tools</h2>
-			<div class="nav-grid">
-				{#each adminLinks as link}
-					<a class="nav-card" href={link.href}>
-						<div class="nav-icon"><Icon name={link.icon} class="w-5 h-5" /></div>
-						<div class="nav-body">
-							<span class="nav-label">{link.label}</span>
-							<span class="nav-desc">{link.desc}</span>
-						</div>
-						<Icon name="chevron-right" class="w-4 h-4 nav-arrow" />
-					</a>
-				{/each}
-			</div>
-		</section>
+	<!-- Admin navigation grid (always visible immediately, never blocked on slow analytics APIs) -->
+	<section class="nav-section">
+		<div class="nav-header-bar">
+			<h2>Admin Tools ({filteredAdminLinks.length} / {adminLinks.length})</h2>
+			<input
+				type="search"
+				class="admin-search-input"
+				placeholder="Filter admin tools..."
+				bind:value={adminSearch}
+			/>
+		</div>
+		<div class="admin-category-pills">
+			<button
+				type="button"
+				class="cat-pill"
+				class:active={selectedCategory === 'all'}
+				onclick={() => (selectedCategory = 'all')}
+			>
+				All ({adminLinks.length})
+			</button>
+			{#each Object.entries(adminCategoryMeta) as [catKey, meta]}
+				<button
+					type="button"
+					class="cat-pill"
+					class:active={selectedCategory === catKey}
+					onclick={() => (selectedCategory = catKey as AdminCategory)}
+				>
+					{meta.label} ({adminLinks.filter((l) => l.category === catKey).length})
+				</button>
+			{/each}
+		</div>
+		<div class="nav-grid">
+			{#each filteredAdminLinks as link}
+				<a class="nav-card" href={link.href}>
+					<div class="nav-icon"><Icon name={link.icon} class="w-5 h-5" /></div>
+					<div class="nav-body">
+						<span class="nav-label">{link.label}</span>
+						<span class="nav-desc">{link.desc}</span>
+					</div>
+					<Icon name="chevron-right" class="w-4 h-4 nav-arrow" />
+				</a>
+			{/each}
+		</div>
+	</section>
 
-		{#if errors.length > 0}
-			<div class="error-banner">
-				{#each errors as err}
-					<p>{err}</p>
-				{/each}
-			</div>
-		{/if}
+	{#if errors.length > 0}
+		<div class="error-banner">
+			{#each errors as err}
+				<p>{err}</p>
+			{/each}
+		</div>
 	{/if}
 </div>
 
@@ -648,11 +748,55 @@
 		margin-top: 0.5rem;
 	}
 
+	.nav-header-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 0.75rem;
+	}
+
 	.nav-section h2 {
 		font-size: 1rem;
 		color: rgba(212, 199, 163, 0.7);
-		margin: 0 0 1rem;
+		margin: 0;
 		font-weight: 600;
+	}
+
+	.admin-search-input {
+		padding: 0.45rem 0.75rem;
+		border-radius: 8px;
+		border: 1px solid rgba(82, 80, 69, 0.35);
+		background: rgba(20, 19, 16, 0.85);
+		color: rgb(245 240 223);
+		font-size: 0.78rem;
+		min-width: 220px;
+	}
+
+	.admin-category-pills {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.cat-pill {
+		padding: 0.35rem 0.75rem;
+		border-radius: 999px;
+		border: 1px solid rgba(82, 80, 69, 0.35);
+		background: rgba(30, 29, 25, 0.5);
+		color: rgba(212, 199, 163, 0.75);
+		font-size: 0.72rem;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.cat-pill.active,
+	.cat-pill:hover {
+		border-color: rgba(96, 165, 250, 0.5);
+		background: rgba(96, 165, 250, 0.15);
+		color: #93c5fd;
 	}
 
 	.nav-grid {

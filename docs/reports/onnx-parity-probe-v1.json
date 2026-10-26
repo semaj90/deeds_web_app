@@ -1,0 +1,31 @@
+{
+ "schema": "atlas.onnx-parity-probe.v1",
+ "generatedAt": "2026-10-18T08:07:59.599Z",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuUsed": false,
+ "canonicalAuthority": false,
+ "modelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\embeddinggemma_300m_onnx\\model.onnx",
+ "onnxAvailable": true,
+ "sample": 100,
+ "embedded": 100,
+ "failed": 0,
+ "seconds": 13.5,
+ "cosineVsStoredOllama": {
+  "mean": -0.0114,
+  "min": -0.093,
+  "p10": -0.0496,
+  "median": -0.0111,
+  "max": 0.0773,
+  "atLeast0_99": 0,
+  "atLeast0_95": 0,
+  "below0_90": 100
+ },
+ "caveats": [
+  "sample of short legal chunks only",
+  "agreement with stored Ollama BF16 vectors, not a retrieval-quality result",
+  "task-prefix recipe NOT tested here",
+  "high mean cosine does not make ONNX canonical; promotion needs its own gate"
+ ],
+ "checksum": "sha256:71d4b3eeb5d5c8587085faba6cb878992186e79ad1d7030cb0773c01e849cef0"
+}

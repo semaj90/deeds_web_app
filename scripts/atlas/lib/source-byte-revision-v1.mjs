@@ -15,3 +15,8 @@ export function sourceBytesMatchRevisionV1(bytes, sourceRevision) {
   return isSha256SourceRevisionV1(sourceRevision)
     && sourceByteRevisionV1(bytes) === sourceRevision;
 }
+
+export function decodeSourceUtf8V1(bytes) {
+  if (!(bytes instanceof Uint8Array)) throw new TypeError('SOURCE_BYTES_REQUIRED');
+  return new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
+}

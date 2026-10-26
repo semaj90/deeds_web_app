@@ -43,9 +43,9 @@ vi.mock('$lib/server/gpu/simdjson-bridge.js', () => ({
 	isSimdJsonAvailable: () => false,
 }));
 
-// ollamaFetch is only used by the POST handler — mock to prevent import errors
+// embedOrChatFetch is only used by the POST handler — mock to prevent import errors
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: vi.fn(),
+	embedOrChatFetch: vi.fn(),
 }));
 
 // ── response factories ────────────────────────────────────────────────────────

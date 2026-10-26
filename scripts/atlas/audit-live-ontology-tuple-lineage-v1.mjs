@@ -17,7 +17,7 @@ export const TABLES = Object.freeze([
   'evidence_receipts', 'task_evidence', 'evidence_assertion',
   'openspec_task_predicate', 'atlas_symbol_versions',
 ]);
-export function buildCatalogReport(columns, relations, constraints, tupleLineageCensus = null, databaseScope = null) {
+export function buildCatalogReport(columns, relations, constraints, tupleLineageCensus = null, databaseScope = null, tupleSurfaceCounts = null) {
   const byTable = Object.fromEntries(TABLES.map(name => [name, {
     exists: false, columns: [], constraints: [],
   }]));
@@ -38,6 +38,7 @@ export function buildCatalogReport(columns, relations, constraints, tupleLineage
     verdict: present.length === 0 ? 'TUPLE_RELATION_NOT_FOUND' :
       present.length === 2 ? 'DUAL_TUPLE_SURFACES_REQUIRE_OWNER_REVIEW' : 'TUPLE_SURFACE_DISCOVERED_REVIEW_REQUIRED',
     relations: byTable, tupleSurfaces: present,
+    tupleSurfaceCounts: tupleSurfaceCounts ?? { status: 'NOT_RUN', rows: [] },
     tupleLineageCensus: tupleLineageCensus ?? { status: 'NOT_RUN', reason: 'CENSUS_INPUTS_UNAVAILABLE' },
     databaseScope: databaseScope ?? { status: 'NOT_RECORDED' },
     storageOwnerProven: false, evidenceAdmissionProven: false,
@@ -74,6 +75,14 @@ async function main() {
       SELECT table_name FROM information_schema.tables
       WHERE table_schema='public' AND table_name = ANY($1::text[])
       ORDER BY table_name`, [TABLES])).rows;
+    const tupleTables = ['atlas_ontology_tuples', 'atlas_ontology_linked_tuples'];
+    const availableTupleTables = new Set(relations.map(row => row.table_name));
+    const tupleCountRows = [];
+    for (const table of tupleTables) {
+      if (!availableTupleTables.has(table)) continue;
+      const count = (await client.query(`SELECT count(*)::text AS row_count FROM public.${table}`)).rows[0];
+      tupleCountRows.push({ table, rowCount: count.row_count });
+    }
     const columns = (await client.query(`
       SELECT table_name,column_name,data_type,is_nullable FROM information_schema.columns
       WHERE table_schema='public' AND table_name = ANY($1::text[])
@@ -113,7 +122,14 @@ async function main() {
       `)).rows[0];
       tupleLineageCensus = { status: 'READ_ONLY_CENSUS', ...census };
     }
-    report = sealReport(buildCatalogReport(columns,relations,constraints,tupleLineageCensus,databaseScope));
+    report = sealReport(buildCatalogReport(
+      columns,
+      relations,
+      constraints,
+      tupleLineageCensus,
+      databaseScope,
+      { status: 'READ_ONLY_EXACT_COUNTS', rows: tupleCountRows },
+    ));
     await client.query('ROLLBACK');
   } catch (e) { await client.query('ROLLBACK').catch(()=>{}); throw e; }
   finally { client.release(); await pool.end(); }

@@ -139,6 +139,8 @@ async function main(): Promise<void> {
         snapshotId,
         nodeCount: materialization.graphSnapshotManifest.nodeCount,
         edgeCount: materialization.graphSnapshotManifest.edgeCount,
+        relationEventCount: materialization.graphSnapshotManifest.relationEventCount,
+        relationParticipantCount: materialization.graphSnapshotRelationParticipants.length,
         topologyHash: materialization.graphSnapshotManifest.topologyHash,
         materializerStatus: materialization.graphSnapshotManifest.status,
         replayMatches: materialization.graphSnapshotProof.replayMatches,
@@ -161,10 +163,12 @@ async function main(): Promise<void> {
         memberCount,
         nodeCount: shardManifest.nodeCount,
         edgeCount: shardManifest.edgeCount,
+        relationEventCount: shardManifest.relationEventCount,
+        relationParticipantCount: shardManifest.relationParticipantCount,
         topologyHash: shardManifest.topologyHash,
         sealed
       });
-      console.log(JSON.stringify({ status: 'SHARD_SEALED', repositoryId, repositoryKind, nodeCount: shardManifest.nodeCount, edgeCount: shardManifest.edgeCount, sealed }));
+    console.log(JSON.stringify({ status: 'SHARD_SEALED', repositoryId, repositoryKind, nodeCount: shardManifest.nodeCount, edgeCount: shardManifest.edgeCount, relationEventCount: shardManifest.relationEventCount, relationParticipantCount: shardManifest.relationParticipantCount, sealed }));
     }
 
     // "sealed" (unqualified) = every real repository partition, submodules included -- the raw

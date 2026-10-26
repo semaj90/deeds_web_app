@@ -1,0 +1,110 @@
+{
+  "schema": "atlas.codebase-embedding-latent-coverage.v1",
+  "generatedAt": "2026-10-13T11:05:00Z",
+  "databaseReadOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "codebaseChunkIndex": {
+    "totalRows": 274465,
+    "denseEmbeddings": {
+      "legacyHalfvec768": 55169,
+      "canonicalVector768": 219998,
+      "bothPopulated": 739,
+      "halfvecOnly": 54430,
+      "vector768Only": 219259,
+      "neitherPopulated": 37,
+      "reconciliationChecksum": "274465 == 739 + 54430 + 219259 + 37"
+    },
+    "latentColumns": {
+      "latent_128": {
+        "dataType": "halfvec(128)",
+        "populatedRows": 55169,
+        "nullRows": 219296
+      },
+      "latent_256": {
+        "dataType": "halfvec(256)",
+        "populatedRows": 55169,
+        "nullRows": 219296
+      },
+      "latent_64": {
+        "dataType": "vector(64)",
+        "populatedRows": 1703,
+        "nullRows": 272762
+      },
+      "error_embedding_latent_128": {
+        "dataType": "halfvec",
+        "populatedRows": 20,
+        "nullRows": 274445
+      }
+    },
+    "latentCohortLineage": {
+      "totalLatentRows": 55169,
+      "checkpointRevisionPopulated": 55169,
+      "checkpointRevisionDigest": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "sourceRevisionPopulated": 0,
+      "workspaceRevisionPopulated": 0,
+      "representationRevisionPopulated": 0,
+      "lineageBindingChecksumPopulated": 0,
+      "lineageVerdict": "STORAGE_EXISTS_BUT_LINEAGE_UNPROVEN"
+    }
+  },
+  "atlasAstNodesCoverage": {
+    "totalRows": 523271,
+    "validByteSpans": 512208,
+    "validByteSpansPercent": 97.89,
+    "workspaceBound": 512204,
+    "workspaceBoundPercent": 97.89,
+    "sourceRevisionBound": 512096,
+    "sourceRevisionBoundPercent": 97.86,
+    "sourceHashBound": 523271,
+    "sourceHashBoundPercent": 100.0,
+    "notMarkedSuperseded": 523271,
+    "notMarkedSupersededPercent": 100.0,
+    "structurallyQualifiedCandidates": 512096,
+    "structurallyQualifiedPercent": 97.86,
+    "schemaSeparation": {
+      "atlas_ast_nodes": ["relative_path", "source_ref_key", "tree_node_id", "start_byte", "end_byte", "source_revision", "source_content_hash", "workspace_id", "superseded_by"],
+      "phase89_ast_signatures": ["file_path", "signature", "node_type"],
+      "contract": "atlas_ast_nodes uses relative_path from repository root; phase89_ast_signatures is a separate historical table using file_path"
+    }
+  },
+  "gateAndExecutionLocks": {
+    "gate4Status": "FAILED_AS_EXECUTED",
+    "gate4Metrics": {
+      "measuredSpearman100": 0.5336,
+      "requiredSpearman": 0.85,
+      "measuredReconstructionCosine": 0.5706,
+      "requiredReconstructionCosine": 0.95
+    },
+    "latent128ApplyWriter": {
+      "path": "scripts/atlas/backfill-latent-128-slice.mjs",
+      "status": "BLOCKED_EXIT_78",
+      "signal": "LATENT_128_APPLY_BLOCKED"
+    },
+    "latent64ApplyWriter": {
+      "path": "scripts/atlas/latent64-sample-backfill.mjs",
+      "status": "BLOCKED_EXIT_78",
+      "signal": "LATENT64_APPLY_BLOCKED"
+    },
+    "sourceByteLineageRescue": {
+      "status": "STOPPED",
+      "provenSourceByteCandidatesFromV4": 0,
+      "reason": "1-to-many AST syntax fanout and NULL packet byte spans prevent unambiguous chunk text equivalence; upstream fresh export required"
+    }
+  },
+  "activeInferenceModelAlignment": {
+    "liveEndpoint": "http://127.0.0.1:8090/v1/models",
+    "activeModel": "ornith-1.5-9b",
+    "runtimeContext": 65536,
+    "internalHiddenDim": 4096,
+    "errorTablesAligned": {
+      "error_cluster_groups": "Updated 3 rows from gemma4-legal to ornith-1.5-9b",
+      "error_signal_stream": "Updated 6 rows from gemma4-legal to ornith-1.5-9b"
+    },
+    "bitfrostRepairKeysWarmed": [
+      "bifrost:repair:audit_recommendation:ornith-1.5-9b",
+      "bifrost:repair:retrieval_miss:ornith-1.5-9b",
+      "bifrost:repair:schema_mismatch:ornith-1.5-9b"
+    ]
+  }
+}

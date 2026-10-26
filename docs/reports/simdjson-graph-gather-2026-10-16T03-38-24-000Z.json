@@ -1,0 +1,50 @@
+{
+  "observedAt": "2026-10-16T03:38:23.530Z",
+  "schema": "atlas.simdjson-graph-gather.v1",
+  "status": "CPU_NATIVE_PARITY_PASSED",
+  "inputKind": "NUMERICAL_FIXTURE",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "sourceWritesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "inputChecksums": {
+    "graph": "sha256:773a006e56e96aa1083a37929dbd10a3b7b7d0df588308a35e89a75c2433e31c",
+    "embeddings": "sha256:1c52d3fd16fbfd2ae4ac8aa73ce699355966676d712124cd73d13df2741607ee",
+    "query": "sha256:e61a2e3c81d6733c0f44e35ebb53f04f82a640202c6657e4fdeadd95a28857ff"
+  },
+  "parserBackend": "icelake (Intel/AMD AVX512)",
+  "cpu": {
+    "csrParity": true,
+    "bfsParity": true,
+    "queryExtractionParity": true,
+    "utf8BoundaryFixtureParity": true,
+    "candidateOrdinals": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "topK": [
+      {
+        "ordinal": 0,
+        "score": 1
+      },
+      {
+        "ordinal": 1,
+        "score": 0.7999999928474427
+      },
+      {
+        "ordinal": 2,
+        "score": 0
+      }
+    ]
+  },
+  "gpu": {
+    "status": "NOT_REQUESTED",
+    "preflightFreeBytes": null,
+    "reserveBytes": 2147483648,
+    "estimatedWorkingBytes": 268496896
+  },
+  "evidenceAdmission": "NOT_EXERCISED",
+  "preflightError": null
+}

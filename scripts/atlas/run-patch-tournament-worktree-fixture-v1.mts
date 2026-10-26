@@ -5,7 +5,9 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { buildPatchTournamentPlan } from '../../sveltekit-frontend/src/lib/server/agent/patch-tournament.ts';
+import { buildPatchOutcomesV1, persistPatchOutcomeReceiptV1, toPatchOutcomeReceiptRowV1 } from '../../sveltekit-frontend/src/lib/server/atlas/execution/patch-tournament-outcome-receipt-v1.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const reportPath = resolve(ROOT, process.env.ATLAS_TOURNAMENT_WORKTREE_REPORT ?? 'docs/reports/patch-tournament-worktree-fixture-v1.json');
@@ -49,7 +51,7 @@ try {
   const baseRevision = git(['rev-parse', 'HEAD']);
   const sourceRevision = `git:${baseRevision}`;
   const compileError = 'fixture-syntax-error';
-  const executedCandidates = [];
+  const executedCandidates: any[] = [];
 
   for (const candidate of candidates) {
     const branchName = `fixture/${candidate.candidateId}`;
@@ -59,7 +61,11 @@ try {
     const beforeSourceHash = sha256(readFileSync(join(worktreePath, 'fixture.cjs'), 'utf8'));
     candidate.write(worktreePath);
     const afterRevision = git(['rev-parse', 'HEAD'], worktreePath);
-    const changedFiles = git(['diff', '--name-only', '--'], worktreePath).split(/\r?\n/).filter(Boolean);
+    // tracked edits against HEAD PLUS untracked new files (plain `git diff --name-only` is blind to files a candidate adds)
+    const changedFiles = [
+      ...git(['diff', '--name-only', 'HEAD', '--'], worktreePath).split(/\r?\n/).filter(Boolean),
+      ...git(['ls-files', '--others', '--exclude-standard'], worktreePath).split(/\r?\n/).filter(Boolean),
+    ];
     const staticResult = run('node', ['--check', 'fixture.cjs'], worktreePath);
     const focusedResult = run('node', ['fixture-test.cjs'], worktreePath);
     const patchMaterial = candidate.touchedFiles.map((file) => `${file}\n${readFileSync(join(worktreePath, file), 'utf8')}`).join('\n');
@@ -77,7 +83,7 @@ try {
       focusedTests: [{ name: 'fixture-test.cjs', passed: focusedResult.passed, command: 'node fixture-test.cjs', evidenceRef: `fixture:${candidate.candidateId}:focused` }],
       evidenceRefs: [`fixture:${candidate.candidateId}:source-readback`, `fixture:${candidate.candidateId}:static`, `fixture:${candidate.candidateId}:focused`].filter((reference) => candidate.candidateId !== 'candidate-c' || !reference.endsWith(':focused')),
       riskSignals: candidate.riskSignals,
-      readback: { beforeRevision, afterRevision, baseRevisionMatch: beforeRevision === baseRevision && afterRevision === baseRevision, beforeSourceHash, changedFiles, changedFilesMatch: JSON.stringify(changedFiles.sort()) === JSON.stringify([...candidate.touchedFiles].sort()) },
+      readback: { beforeRevision, afterRevision, baseRevisionMatch: beforeRevision === baseRevision && afterRevision === baseRevision, beforeSourceHash, changedFiles, changedFilesMatch: JSON.stringify(changedFiles.sort()) === JSON.stringify([...candidate.touchedFiles].sort()), noOp: changedFiles.length === 0 },
       diagnostics: { static: staticResult.output, focused: focusedResult.output },
     });
   }
@@ -90,6 +96,43 @@ try {
     compileError,
     candidates: executedCandidates as any,
   });
+  // Outcome receipts (PATCH-OUTCOME-RECEIPT-01). The fixture's evidence refs are NOT in the independent verifier table, so
+  // passes are honestly PASSED_UNVERIFIED. `--rehearse-db` writes them inside BEGIN ... ROLLBACK only; there is no commit path here.
+  const outcomes = buildPatchOutcomesV1({ plan, verifiedEvidenceRefs: new Set<string>() });
+  const byId = Object.fromEntries(outcomes.map((o) => [o.candidateId, o]));
+  const expectations = {
+    candidateCLastAndBlocked: plan.rankedCandidates[plan.rankedCandidates.length - 1]?.candidateId === 'candidate-c' && plan.rankedCandidates[plan.rankedCandidates.length - 1]?.reviewStatus === 'blocked',
+    candidateCFailedItsCheck: byId['candidate-c']?.outcome === 'CHECK_FAILED',
+    candidatesABPassedUnverified: byId['candidate-a']?.outcome === 'PASSED_UNVERIFIED' && byId['candidate-b']?.outcome === 'PASSED_UNVERIFIED',
+    narrowerPatchOutranksBroader: plan.rankedCandidates.findIndex((c) => c.candidateId === 'candidate-a') < plan.rankedCandidates.findIndex((c) => c.candidateId === 'candidate-b'),
+    // candidates that change files must read back exactly what they declared (including newly added files)
+    changingCandidatesReadBackExactly: executedCandidates.filter((c) => !c.readback.noOp).every((c) => c.readback.baseRevisionMatch && c.readback.changedFilesMatch),
+    // candidate-c writes the base bytes again: a declared-but-unchanged patch must be detected as a no-op
+    candidateCDetectedAsNoOp: executedCandidates.find((c) => c.candidateId === 'candidate-c')?.readback.noOp === true,
+  };
+  let dbRehearsal: Record<string, unknown> | null = null;
+  if (process.argv.includes('--rehearse-db')) {
+    let dsn = '';
+    for (const file of ['sveltekit-frontend/.env.local', 'sveltekit-frontend/.env', '.env']) {
+      try { const m = /^DATABASE_URL=(.*)$/m.exec(readFileSync(resolve(ROOT, file), 'utf8')); if (m) { dsn = m[1].trim().replace(/^["']|["']$/g, ''); break; } } catch { /* next */ }
+    }
+    const pg = createRequire(resolve(ROOT, 'sveltekit-frontend/package.json'))('pg');
+    const client = new pg.Client({ connectionString: dsn });
+    await client.connect();
+    const lane = async () => Number((await client.query("select count(*)::int n from atlas_algorithm_execution_receipts where logical_lane = 'agentic_repair'")).rows[0].n);
+    const before = await lane();
+    const rows = outcomes.map(toPatchOutcomeReceiptRowV1);
+    const inserted: string[] = []; const again: string[] = []; let insideTx = -1;
+    try {
+      await client.query('BEGIN');
+      for (const r of rows) inserted.push((await persistPatchOutcomeReceiptV1(client, r)).status);
+      for (const r of rows) again.push((await persistPatchOutcomeReceiptV1(client, r)).status);
+      insideTx = await lane();
+    } finally { await client.query('ROLLBACK'); }
+    const after = await lane();
+    await client.end();
+    dbRehearsal = { mode: 'BEGIN_ROLLBACK_ONLY', before, firstPass: inserted, secondPass: again, insideTx, afterRollback: after, leftBehind: after - before };
+  }
   const report = {
     schema: 'atlas.patch-tournament-worktree-fixture.v1',
     generatedAt: new Date().toISOString(),
@@ -105,6 +148,10 @@ try {
     candidateCount: executedCandidates.length,
     candidateExecution: executedCandidates,
     tournament: plan,
+    outcomeReceipts: outcomes.map((o) => ({ executionId: o.executionId, candidateId: o.candidateId, outcome: o.outcome, rank: o.rank, reviewStatus: o.reviewStatus, checks: o.checks.map((c) => ({ name: c.name, passed: c.passed, evidenceVerified: c.evidenceVerified })) })),
+    expectations,
+    expectationsMet: Object.values(expectations).every(Boolean),
+    dbRehearsal,
     cleanup: { keepWorktrees, fixtureRoot, cleanedUp: !keepWorktrees },
     nextGate: 'ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION',
     likely_cause: 'The existing tournament planner had deterministic fixture replay but no isolated candidate worker seam.',
@@ -116,7 +163,8 @@ try {
   };
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-  console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, candidateCount: report.candidateCount, rankedCandidateIds: plan.rankedCandidates.map((candidate) => candidate.candidateId), noAutoApply: plan.noAutoApply, reportPath }, null, 2));
+  console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, candidateCount: report.candidateCount, rankedCandidateIds: plan.rankedCandidates.map((candidate) => candidate.candidateId), noAutoApply: plan.noAutoApply, outcomes: outcomes.map((o) => `${o.candidateId}:${o.outcome}`), expectations, dbRehearsal, reportPath }, null, 2));
+  if (!report.expectationsMet) process.exitCode = 1;
 } finally {
   cleanup();
 }

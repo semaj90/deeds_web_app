@@ -2,13 +2,20 @@
 
 import { describe, expect, it } from 'vitest';
 import { selectLaneNamesForTier, mergeDuplicateIdentityScores } from './service.js';
+import { SearchLaneRegistry } from './search-lanes.js';
 import type { SearchResult } from './types.js';
 
 describe('retrieval service lane defaults', () => {
-  it('keeps 384 out of the automatic tier defaults', () => {
-    expect(selectLaneNamesForTier('hot')).toEqual(['lexical', 'qdrant-768', 'gpu-cuvs', 'bm25']);
-    expect(selectLaneNamesForTier('warm')).toEqual(['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs']);
-    expect(selectLaneNamesForTier('cold')).toEqual(['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs']);
+  it('uses the 768 semantic lane and never promotes the TurboVec prefilter as a separate lane vote', () => {
+    expect(selectLaneNamesForTier('hot')).toEqual(['lexical', 'qdrant-768', 'bm25']);
+    expect(selectLaneNamesForTier('warm')).toEqual(['lexical', 'qdrant-768', 'bm25']);
+    expect(selectLaneNamesForTier('cold')).toEqual(['lexical', 'qdrant-768', 'bm25']);
+  });
+
+  it('does not register the CPU TurboVec sidecar as a GPU cuVS result lane', () => {
+    const registry = new SearchLaneRegistry();
+    expect(registry.get('gpu-cuvs')).toBeUndefined();
+    expect(registry.getFallbackChain()).not.toContain('gpu-cuvs');
   });
 });
 

@@ -359,6 +359,329 @@ canonical promotion is authorized.
 - [x] PROMOTE-01 `WRITTEN` means artifact/code existence only. Evidence: `scripts/atlas/prove-prefill-promotion-governance-v1.mjs` emits the explicit four-state maturity model and keeps artifact existence separate from runtime proof.
 - [ ] PROMOTE-02 `WIRED` requires a real runtime call path.
 - [ ] PROMOTE-03 `PROVEN` requires fixture/live replay plus receipt.
+
+## Handoff (2026-10-11): state, gaps, and where to resume
+
+Pipeline status: **not finished.** Components pass their own tests. The corpus, glossary, and `.okf` schema are not fully indexed, so no end-to-end retrieval or routing claim is made. Master status file: `docs/master_feature_todo_1011.md`.
+
+### Done and tested (as of this handoff)
+
+- Viterbi decoder (offline, unwired): 12/12. Mid-turn variance test: 7/7 for the token-routing pipeline.
+- Per-tool telemetry loader: 5/5, read-only on live data. Not state-conditioned.
+- Operator token gate: 10/10. Operator CLI: 6/6. Not wired into the server. No token issued.
+- Repair contract invariants: 7/7. KernelDag chain: 5 pass, 2 `todo` (the approval link is not built).
+- L7 recommendation decision extracted: 9/9.
+- Label-taxonomy characterization: 8 pass, 3 `todo`. Pins the current disagreement between the two label sets, and the query-level split.
+- Chunk containment receipt (`scripts/atlas/historical-chunk-receipt-v1.mjs`): 1,682 of 2,000 sampled chunks found in their current window, 317 not found, 1 source missing. Containment is not revision attribution.
+
+### Blocked, and why
+
+| Item | Blocker |
+|---|---|
+| Git-history attribution of the 317 unmatched chunks | The in-session run never finishes within tool limits. Run it yourself: `! node scripts/atlas/historical-chunk-attribution-v1.mjs` (five commits per file). Output: `.tmp/atlas/historical-chunk-attribution-v1.json`. |
+| Operator token wiring | Decision: approve wiring `requireToken` to the gate, or disable model-facing write tools. |
+| Approval record for `ask_permission` | Decision: `workflow_approvals` (recommended) or a file proposal. |
+| Router emissions | Decision: which token kind drives emissions (recommended: keyword token). |
+| Phase 23 edge model | Artifact `static/models/gemma4-e2b/model.litertlm` missing. Obtain and verify before any run. |
+| HyperGraph in Neo4j | No hyper-labelled nodes exist. Neo4j itself works (authenticates with `.env`). |
+| Live NetworkX-to-GPU parity | Zero admitted `graphify_edges`. |
+| Live RTX/TensorRT work | TensorRT-RTX not proven. CUDA 13.0 and LibTorch cu130 are the proven path. |
+| Index duplicates on `atlas_packets` | 13 duplicate column groups. Removal needs approval (archive, do not delete). |
+| Disk on C: | About 12 GB free. Docker prune and cache clean need approval. |
+
+### Missing (not started)
+
+- Phases 20 and 22: no definition or tracking. Phase 19's 443 rows have no status.
+- Phase 24 definition: IS quant method not defined; Titans is research only; DPO is eval-only.
+- Encoding registry, licence manifest, source-level dataset split, and a reconciled label taxonomy (two disagreeing owners).
+- Symbol TOC live join, AST patch proposal contract, and patch validation in a scratch worktree.
+- Batch change-impact analyzer (`CodebaseChangeImpactV1`).
+- Shadow search comparison (identity, recall, MRR, latency).
+- Per-language rewrite capability statuses.
+- CPU worker and simdjson decisions (both need measured baselines first).
+
+### Infrastructure notes
+
+- RabbitMQ: healthy. The memory alarm (`system_memory_high_watermark`) has fired repeatedly; the cause is host memory pressure. `atlas.q.code.events` holds 2 messages with no consumer. Do not purge or replay without the owner's decision.
+- Background tasks from this session were stopped. Several earlier monitors expired without output.
+- Working tree is dirty (118 tracked, 140 untracked as of 2026-10-11). Do not reset or clean it.
+
+### Resume here
+
+1. Run the attribution script (above). Then read its receipt and record the counts.
+2. Answer the four decisions in the blocked table, at minimum: token wiring, approval owner, router token kind, and disk cleanup.
+3. Only then start a queued item. The next one in order is `HIST-ATTR-REVIEW-01` (below).
+
+## Next steps after the Git-history attribution (2026-10-11)
+
+Status (2026-10-11 18:29): the attribution run completed after a fix that caches `git show` per file and commit (the first run was killed by a 500 s timeout). Receipt: `.tmp/atlas/historical-chunk-attribution-v1.json`, `rowsInspected` 2000, `commitCapPerFile` 5.
+
+- [x] **HIST-ATTR-REVIEW-01** Counts: `CURRENT_CONTAINED` 1,682; `ATTRIBUTED_TO_HISTORY` 93 across 49 distinct commits (top: `11263b5391`, 9 rows); `UNATTRIBUTED_IN_LAST_20_COMMITS` 224 (key renamed to `UNATTRIBUTED_IN_COMMIT_WINDOW`; receipt regenerated 2026-10-12T02:12Z with the same counts); `SOURCE_MISSING` 1. `UNATTRIBUTED` means "not found in the 5-commit window" (`COMMIT_CAP=5`, not 20), not "current". 224 rows (11%) are unexplained.
+- [x] **HIST-ATTR-DECIDE-01** Decide whether the window is enough. Done 2026-10-12 with a 50-commit V2 pass (`.tmp/atlas/historical-chunk-attribution-v2.json`): 64 rows are moved within the current file, 33 are attributed to history, 220 remain unattributed (1 file hit the cap). Whitespace-normalized check (`.tmp/atlas/historical-chunk-verbatim-check-v1.json`): 1,746 current and 33 history matches; 220 still unmatched. Classification by git status (`.tmp/atlas/historical-chunk-unresolved-classification-v1.json`): 203 gitignored (180 under `sveltekit-frontend/memory/runs`), 17 tracked. Conclusion: the gitignored rows are generated run artifacts that git history cannot contain. The 17 tracked rows still need review before being classed as artifacts. Review (2026-10-12, `.tmp/atlas/tracked-ts-review-v1.json`): the 13 tracked files split into 2 TypeScript sources and 11 committed JSON or report outputs. Both TypeScript files are clean in git. `packages/parent-atlas/src/core/workflow-action-event.ts` has 15 stored rows, 10 not matching HEAD (last commit 2026-09-15). `packages/parent-atlas/src/adapters/neo4j.ts` has 14 stored rows, 4 not matching HEAD (last commit 2026-07-23). These are stale chunk rows for tracked source, not artifacts. The sidecar `/ast/chunk` (advisory) returned 30 and 43 AST chunks for those files. Git facts decide, not the sidecar.
+
+**Register (2026-10-12, `.tmp/atlas/unresolved-chunk-register-v1.json`):** 220 rows; 17 `TRACKED_REVIEW_REQUIRED`; 203 `GITIGNORED_SOURCE_NOT_GIT_ATTRIBUTABLE` (policy label; not called artifacts until a producer confirms it). Stored `file_content_hash` compared with the current file: 11 JSON files MATCH, so they are unchanged since indexing and their unmatched chunk bodies are transformed text (not stale). 2 TypeScript files are `CHANGED_SINCE_INDEX`, so their rows are stale. No tracked row has a `source_revision`.
+
+**Workspace owner trace (2026-10-12, read-only):** the latest COMPLETED Graphify run (`01a8d8fc`, 2026-09-15) uses workspace `e24bb97…` and has zero `graphify_files` rows under that revision. Existing `graphify_files` rows were last seen in runs from 2026-09-03 (`7a95c0…`) and 2026-09-05 (`e0dc27…`, 23,758 rows). So the latest run did not persist its file set. Decision needed before any backfill or re-run (writes).
+
+**Current-revision binding preflight (2026-10-11, read-only):** recomputed a diagnostic workspace candidate from the current working tree with `materializeWorkspaceRevisionOriginV1`: `sha256:679ef520f063b695490fa20de670a619fe8ada85320ebe9f7fe824e9d415d826`, 27,749 indexed source files and 85 skipped. In one `REPEATABLE READ READ ONLY` transaction, exact lookup in `atlas_workspace_source_bindings` returned 0 rows for that candidate (0 source refs/repo IDs/source revisions). This candidate is not an admitted workspace revision, and skipped files limit coverage; it only establishes that no binding set currently matches this producer's candidate. The approved historical revision `e24bb97…` cannot be reconstructed by the current daily coordinator, and a fresh daily run would use a different tree/revision; do not run a backfill or daily Graphify execution as a substitute. Next gate is a reviewed binding producer/admission path for an explicitly selected current source cohort, followed by approval before any Graphify write. No persistent writes or Graphify run occurred.
+
+**P12 packet/chunk promotion preflight (canonical owner, 2026-10-15, read-only negative proof):** `node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --execution-id=74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision=sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --limit=10 --report-path=.tmp/atlas/phase-closure-p12-promotion-preflight-20261015.json` completed successfully as a diagnostic command; receipt verdict is `BLOCKED_NO_QUALIFIED_CANDIDATE`, `eligibleCandidateCount=0`, and `databaseError=null`. The preflight opened one `REPEATABLE READ READ ONLY` transaction and explicitly rolled it back; `writesPerformed=false`, `canonicalAuthority=false`, and `promotionAuthorized=false`. The first 10 bounded diagnostic candidates are not promotion candidates. Receipt checksum: `sha256:2a1c42436c076d8bad0ee84895b0c1aee0c73af5cbbc672f41daab85ba4f3c6f`; receipt: `.tmp/atlas/phase-closure-p12-promotion-preflight-20261015.json`. This confirms the current packet/chunk bridge is not ready for promotion; next action remains source-scope/lineage diagnosis, not applying planned writes.
+
+**P12 packet/chunk bridge recheck (canonical owner, 2026-10-15, read-only):** `node scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --report-path .tmp/atlas/phase-closure-p12-packet-chunk-canonical-20261015.json` exited **1**, status `CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PARTIAL`, first blocker `CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_INCOMPLETE`. Of 25,542 selected membership rows across 7 repositories, 14,628 have an exact current packet/chunk bridge; 10,914 do not (9,827 root sources missing proven lineage, 1 revision mismatch, 1,086 nested-repository namespace gaps). Within the 9,827 root sources, 5,503 have physical chunks at the exact source ref but no proven lineage; 4,324 have no physical chunks at that ref. The 1,086 namespace gaps are `claude-mem` 763, `mcp-server-mcp` 192, `turbovec` 86, `sites/parent-atlas-gateboard` 22, `models/embeddinggemma_300m` 13, and `granite-docling-258M` 10; these have no exact binding or physical chunks in this audit. There were 0 duplicate membership identities and 0 workspace-revision mismatches. The admitted membership checksum is `sha256:e4c2fd1240cc06b0d86caf3038e91fc884be6afe1fa752960ac8ff6d0721c96d`; proven-lineage candidate checksum is `sha256:68249e7df0084e444a99940ec12c983536f8b38de308df742559e2e19b9a5a15`; canonical-owner receipt checksum is `sha256:b9261390cb583883ef24acbf76a967d400c05632c494b441cf1dca59a17bfaf8`. A preliminary run used noncanonical execution `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`; it is retained only as a comparison and is superseded by this canonical-owner run. Both runs had matching membership and proven-lineage candidate checksums, but this status is grounded in the canonical owner `74d50c86-8194-45ea-8c3d-61aab737ef83`. PostgreSQL ran in `REPEATABLE READ READ ONLY` and rolled back; only the diagnostic receipt under `.tmp/atlas` was written. This narrows P12's next gate to `CURRENT-PACKET-CHUNK-EXPECTED-SOURCE-SCOPE-01`; it does not authorize Graphify, lineage backfill, or promotion.
+
+**P12 stratified source-scope proof (2026-10-15; read-only):** Added `buildStratifiedPacketChunkSamplesV1` to the existing packet/chunk audit output. It SHA-256-ranks candidates within failure strata (physical chunks present but lineage missing; no physical chunks; lineage only at another revision; repository namespace missing), emits at most 10 evidence-metadata rows per stratum, and leaves the original `unresolvedSamples` intact. The helper tests pass **2/2**, including order-independent replay, stratum counts, exact per-stratum bounds, and required revision scope. Full audit command `node scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --report-path .tmp/atlas/p12-stratified-lineage-refresh-20261015.json` exited **1** with expected status `CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PARTIAL`; receipt observed at `2026-10-15T19:55:25Z`, SHA-256 `7da53f4633ba5a6c7a5734b7ee69f8b79edeb5f277c5598b06f1935832e45222`, internal report checksum `sha256:28ba150f5d15ed8fdf68396a18c24138f2c67a1097f29b699c8ab72390868f71`. It covers 25,542 memberships / 7 repositories, with 14,628 exact bridges and 10,914 unresolved; stratified populations are 5,503 physical-chunk-present/lineage-missing, 4,324 without physical chunks, 1 lineage at another revision, and 1,086 repository-namespace gaps. The 31 sampled rows are evidence locators, not promotion candidates or a population estimate. Database mode is `READ_ONLY_REPEATABLE_READ_RECONCILIATION`; Postgres/Qdrant/Neo4j/Valkey/projection writes are all false. P12 remains partial; next diagnose per-stratum producer/namespace ownership, with no identity inference or bulk refresh.
+
+**P12 preflight run-ID correction (2026-10-15, read-only):** reran `scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs` with the PostgreSQL-observed linked legacy run ID `01a8d8fc-2507-4f39-868e-039039237b98` explicitly supplied (rather than relying on the missing owner-plan field). The run is registered `COMPLETED` at the admitted workspace revision with manifest source count 25,542, but `graphify_files` has 0 rows for that run and 0 matching run-source rows; matching source evidence is present only under other legacy runs. Result remains `BLOCKED_NO_QUALIFIED_CANDIDATE`, 0 eligible, exit **0** (diagnostic completed, qualification blocked), no database error, transaction explicitly rolled back, and all write/authority/promotion flags false. Receipt checksum `sha256:a1237754cf0059b023f0587e20d361849daccbd0076bdcc173a769c7bcd95b27`; receipt `.tmp/atlas/phase-closure-p12-promotion-preflight-canonical-run-20261015.json`. This closes the null-run-ID ambiguity but confirms the actual blocker is missing legacy `graphify_files` for the linked run; do not infer source membership from other runs or weaken revision/digest joins.
+
+**PGVECTOR-PLAN-01 (2026-10-12, EXPLAIN only, no ANALYZE):** `idx_codebase_chunk_content_embedding_768_hnsw` (`vector_cosine_ops`, m=16, ef_construction=64) IS used by `ORDER BY content_embedding_768 <=> (scalar subquery) LIMIT 10` (Index Scan). The earlier slow query was a join-shaped `FROM c, q` form that forces Seq Scan plus Sort and never touches the index. Fix the caller's query shape, not the index.
+
+**TRACE-DENSE-ERROR-01 (2026-10-12, implemented, not live-tested):** `sveltekit-frontend/src/mcp/trace-mcp-server.ts` now tags dense-search failures with `DENSE_SEARCH_STAGE_FAILED:<EMBED_QUERY|QDRANT_QUERY|QDRANT_RESPONSE>:cause=<error code>`. Only the stage and an uppercase error code are kept (no URLs or messages). Syntax parse passes (0 diagnostics). Not type-checked in full and not run live: TRACE must be restarted to load it.
+- [ ] **CHUNK-REFRESH-PLAN-01** Produce a rebuild cohort from the attributed rows. Plan only; no writes. Use the existing exact-file dry-run owner.
+
+Parallel items (independent of the attribution run):
+
+- [ ] **CPU-WORKERS-01** Measure before deciding. The CPU worker pool is only justified for the chunking, hashing, and metadata steps, and only if a sequential baseline is measured on the same bounded input first. Do not move AST parsing or JSON validation to the GPU.
+- [ ] **SIMDJSON-NAPI-01** Benchmark the existing native parse path against `JSON.parse` on identical bounded inputs, including Unicode, integers, nulls, and malformed records. The earlier synthetic result (native path about 1.7 times slower than V8) stands. No routing change without a measured win. Do not add a second parser service.
+- [ ] **RABBIT-MEM-01** Investigate the RabbitMQ memory alarm. The RabbitMQ container itself uses about 0.04 GB; the alarm is `system_memory_high_watermark`, which reflects host memory pressure. It has fired on 2026-10-10 (00:42 and 17:58) and 2026-10-11 (07:47 and 16:42). Find what is holding host memory (Docker, llama-server, WSL, models) before changing RabbitMQ settings. No alarm-clear entries appear in the log tail, so confirm whether the alarm is still active.
+- [ ] **RABBIT-CONSUMER-01** `atlas.q.code.events` holds 2 messages with 0 consumers. Consumers are defined in `src/lib/server/queue/topology.ts` and exercised by `code-evidence-outbox.spec.ts`. Confirm which process should consume it, whether that process is running, and whether the 2 messages are safe to replay. Do not purge or ack them without the owner's decision.
+- [ ] **RABBIT-DLQ-01** Dead-letter queues are empty (checked 2026-10-11). Keep it that way by not replaying anything without a recorded decision.
+
+## Read-only change-impact preflight (2026-10-11): WORKTREE 01 and DB AIO 01 evidence
+
+Read-only only. No REINDEX, no writes, no working-tree changes.
+
+- **WORKTREE 01:** branch `main` at `14f0cc86fa`. 118 tracked modifications and 140 untracked files, so the checkout is dirty. `git diff --check` reports whitespace issues. Any experiment must use `git worktree add`, not the live checkout.
+- **Owners named in the review:** `plan-` and `produce-current-packet-digest-bridge-v1.mjs` exist locally (the review's single file name does not). The local search-runtime file is `agentic-file-compiler/search-runtime-policy.ts`, not `search-runtime.ts`. Check the review's paths against this worktree before extending any owner.
+- **DB AIO 01 settings:** PostgreSQL 18.4, `io_method = worker`, `effective_io_concurrency = 16`, `work_mem = 4MB`.
+- **Index census:** `atlas_packets` has 92 indexes (964 MB total), all valid and ready. `codebase_chunk_index` has 51 and `atlas_packet_features` has 12, all valid and ready. 13 index groups on `atlas_packets` cover identical column sets, for example `community_id` and `community_id_idx`, and `kmeans_cluster_id` and `kmeans_cluster_idx`. These are candidates for review, not for dropping: removal needs approval, and the archive-not-delete rule applies.
+- **Not done:** the planner check (EXPLAIN on the real retrieval queries) and any benchmark are still open. The review's note that bitmap scans are planner-managed holds, so no new index is recommended from this census.
+
+## Workstation phase comparison, 11–24 (2026-10-11, read-only survey)
+
+There is no single authoritative master to-do for phases 11 to 24. The sources disagree, and the authoritative board is stale and blocked.
+
+| Phase | Current label | Source | Evidence date | Note |
+|---|---|---|---|---|
+| 11 | PARTIAL | `docs/parent-atlas-workstation-todo.md` projection | 2026-09-05 | Historical table kept in `reports/` |
+| 12 | BLOCKED_IDENTITY_AUTHORITY | same | 2026-09-05 | |
+| 13 | PARTIAL | same | 2026-09-05 | |
+| 14 | IMPLEMENTED_BOUNDED | same | 2026-09-05 | Bounded only |
+| 15 | BLOCKED_CURRENT_COHORT | same | 2026-09-05 | Depends on the current source cohort |
+| 16 | BLOCKED_CURRENT_GRAPH_BINDING | same | 2026-09-05 | Phase 16-H identity spine is marked CLOSED in `reports/parent-atlas-open-lanes-todo.md`; that closure predates the current cohort |
+| 17 | DOWNSTREAM_OF_SEMANTIC_ADMISSION | same | 2026-09-05 | Feature extraction is diagnostic only |
+| 17–21 audit | PARTIAL, 67% | `docs/reports/phase17-21-workstation-audit.json` | 2026-09-09 | Machinery exists; live supersession and training authority are not shown |
+| 18 | Partial XGBoost evaluation surface | `parent-atlas-workstation-todo.md` | 2026-09-05 | Needs `FeatureRowV1`, temporal labels, held-out evaluation, promotion receipt |
+| 19 | 443 rows in the 17–21 audit | same audit | 2026-09-09 | Row count only; no status |
+| 20 | No dedicated phase tracking found | two `openspec` mentions only (`parent-atlas-graph-retrieval-proof`, `parent-atlas-tensor-residency-integration`) | — | Not comparable |
+| 21 | Covered by the 17–21 audit | same audit | 2026-09-09 | |
+| 22 | No tracking found | none | — | Not comparable |
+| 23 | No tracking found | none | — | Not comparable |
+| 24 | No tracking found | none | — | Not comparable |
+
+Authoritative board: `docs/reports/parent-atlas-workstation-openspec-workboard-v2.json`. It is dated 2026-09-25, lists 249 tasks, has 0 actionable, and is blocked by `WORKSPACE_REVISION_SOURCE_MISMATCH` (0 of 52 cohort rows match the current workspace, and 0 of 111 packet/chunk joins match). It cannot be used as a current completion view until it is regenerated against the current workspace revision.
+
+Gaps for the master list:
+
+- Phases 20, 22, 23, and 24 have no tracking document. Adding them needs a decision on what each phase means.
+- The 17–21 audit is three weeks old and was produced before the workspace revision changed.
+- The open-lanes to-do is marked `STALE_REQUIRES_REPLAY` in most sections.
+- Phase 16-H is "CLOSED" in one file and blocked by current graph binding in another. The later label should govern.
+
+## Integration plan — TRACE, prefill, and MCP tool surface (2026-10-11)
+
+Scope: the 27 open items above plus the TRACE/MCP-facing open items in `parent-atlas-neural-prefill-encoder/tasks.md` (683 open lines, classified by keyword: 95 `NE-*`, 31 `G-*`, 40 Qdrant, 33 GPU/CUDA/TensorRT, 24 Postgres/migration, 19 TRACE/MCP, 15 operator-decision, 5 Redis/BitFrost, 1 ONNX). Overlapping lines are counted in more than one bucket, so the totals exceed 683.
+
+### Evidence gathered (read-only, 2026-10-11)
+
+| Item | Result |
+|---|---|
+| Static TRACE MCP inventory (`scripts/atlas/audit-trace-mcp-tool-inventory-v1.mjs`) | 120 registrations, 120 unique, 0 duplicates, 4 operator-gated (`ops.propose_patch`, `ops.record_fix_attempt`, `ops.run_quality_gate`, `ops.run_targeted_test`). Static only: `runtimeVerified:false`. |
+| Live TRACE `:8788` | Refused connections; no live `tools/list` possible in this session. |
+| `tool_call_events` completion | Historical pending rows (see `parent-atlas-agentic-repair-bundle-integration`, T15.0-PENDING-ROWS); current recorder completes on both paths. |
+| Disabled or gated surfaces | Research tools disabled in the live registry; persistence-backed TRACE search tools disabled pending an application-level gate; `trace.kag_search` not promoted. These are recorded in `neural-prefill-encoder/tasks.md`, not in code. |
+
+### Phases (dependency order)
+
+1. **Runtime truth (partly done 2026-10-11).** TRACE on `:8788` is up. Live `tools/list` (188) is captured and diffed against the static inventory (0 source names missing live; 68 live-only from other registries). Receipt: `.tmp/atlas/trace-live-tools-receipt-v1.json`. Still open: the `ops.*` gate. Probe 2026-10-11 (`.tmp/atlas/trace-ops-gate-probe-v1.json`): `requireToken` accepts any non-empty string, so a fake token reached execution on `ops.propose_patch`. This is a finding, not a pass. Gate needs real verification (secret or signed approval) before any `ops.*` tool is treated as operator-approved.
+2. **Read-side telemetry (done for the per-tool slice).** `telemetry-ranking-bridge.ts` reads `tool_call_events` per tool; state-conditioning is not possible from the current schema. Next gate: a reviewed decision on whether `agent_traces` gets an `initial_state` column (a schema change; needs approval).
+3. **Routing decoder (offline only).** `viterbi-decoder-v1.ts` is implemented and hardened, with no caller. It stays unwired until the 160-trace checkpoint clears on real, non-pending outcomes.
+4. **Prefill integration.** Blocked on the GPU and promotion lanes (TRT-01 through TRT-18, MEM-04/05, NAPI-05/06). These need the GPU runtime and operator decisions; none is runnable without them.
+5. **Stub and gated tools.** The four `ops.*` tools are operator-gated by design and stay that way. Research and persistence-backed search families stay disabled until their own gates pass.
+
+### What is implemented now (end to end, with tests or receipts)
+
+- Viterbi decoder: implemented, 12/12 tests, unwired.
+- Telemetry loader (per-tool): implemented, 5/5 tests with a mocked client; live SQL checked read-only.
+- Static MCP inventory: implemented, receipt written to `.tmp/atlas/trace-mcp-tool-inventory-v1.json`.
+
+### Not done, and why
+
+- Live MCP handshake and tool invocation: TRACE is down. Not claimed.
+- Baum-Welch fitting, decoder-versus-ranker comparison: insufficient completed outcomes.
+- TensorRT, ANN, and NAPI parity lanes: need GPU runs and operator approval.
+- The remaining ~650 open `neural-prefill-encoder` lines: outside what can be closed in one pass; they need per-item triage in their own change.
+
+### Decisions needed from the operator
+
+1. Restart TRACE on `:8788` (and say whether it should run unattended).
+2. Approve or reject an `initial_state` column on `agent_traces` (enables state-conditioned routing).
+3. Confirm the GPU-lane order: TensorRT-RTX challenger first, or CPU parity completion first.
+
+### Ops gate behavior: recommendation (not implemented; needs approval)
+
+Current state (probe 2026-10-11, `.tmp/atlas/trace-ops-gate-probe-v1.json`): `requireToken` in `src/mcp/trace-mcp-server.ts` accepts any non-empty string. There is no token registry in the repo; the only "token registry" mention is in `scripts/atlas/sparse/00-discover-existing-sparse.mjs`, which is unrelated.
+
+Recommended behavior:
+
+- **Deny by default.** Read-only tools stay open. Every `ops.*` tool requires a token that passes verification; a missing, blank, unknown, expired, replayed, or wrong-scope token is refused before any file, process, or database access.
+- **Registry shape.** One file or table outside the repo (env-configured path). Each entry: `tokenHash` (SHA-256 of the secret, never the secret itself), `scopes` (explicit tool names), `expiresAt`, `issuedBy`, `revoked`, and a single-use nonce for write tools.
+- **Comparison.** Hash the presented token, compare with `crypto.timingSafeEqual`, then check scope and expiry.
+- **Issuance is out of band.** A local operator CLI creates and revokes tokens. Nothing in MCP can issue, list, or modify them, and the model never sees a token value.
+- **Audit.** Every attempt, allowed or refused, writes a receipt with tool name, outcome, reason code, and timestamp. Raw tokens are never logged.
+- **Acceptance tests:** empty, unknown, expired, out-of-scope, replayed-write, and revoked tokens are refused; a valid scoped token reaches execution and produces a receipt; refused calls produce no side effects.
+- **Until this lands:** treat every `ops.*` tool as unauthenticated. Do not expose the write-capable tools to model-driven calls.
+- **Open question (operator decision, not yet answered):** where do token hashes live, and who holds the secret? Options: (a) a file outside the repo, path from an env var, hashes only; (b) a Postgres table with an operator-only role; (c) a signed approval artifact that a local CLI produces. **Decision 2026-10-11: option (a) approved.** Implemented as an operator CLI (`scripts/atlas/operator-token-cli-v1.mts`, logic in `sveltekit-frontend/src/lib/server/mcp/operator-token-cli-logic-v1.ts`): `issue`, `revoke`, `list`. The registry path comes from `OPS_OPERATOR_REGISTRY_PATH` and is refused if it resolves inside the repository. Writes are atomic and never delete. Tests: `operator-token-cli-v1.spec.ts`, 6/6, plus the gate's 10/10. Still open: no operator token has been issued and no registry file exists; nonce durability needs its own store before any write tool is wired; wiring into `trace-mcp-server.ts` is not approved.
+- **Scaffold implemented (2026-10-11, not wired):** `sveltekit-frontend/src/lib/server/mcp/operator-token-gate-v1.ts` is a deny-by-default verifier. It takes the registry as an argument, stores only SHA-256 hashes, compares them with `timingSafeEqual`, and checks revocation, expiry, tool scope, and single-use nonces. `loadOperatorTokenRegistryV1(path)` reads option (a) but is only a loader. Tests: `operator-token-gate-v1.spec.ts`, 10/10 passing. It is not yet called from `trace-mcp-server.ts`, so the live `ops.*` tools still accept any non-empty string until that wiring is approved.
+- **Where it fits:** the gate is the authorization step between a verified repair claim and a write in the agentic error-fixing loop (`verified claim → KernelDagCandidate → schema/lineage/authorization admission → bounded execution → independent readback`, per `AGENTS.md`). The `ops.*` write tools are that loop's write side. GPU/Karpathy scoring, AST extraction, and semantic indexing are read-side lanes; the gate does not gate them.
+
+### Operator token: definition (2026-10-11, proposed; pending approval)
+
+- **What it is.** A short-lived, revocable capability that one operator issues for one or more named `ops.*` tools. It authorizes a single write-capable call, or a bounded number of them, within its scope and expiry.
+- **What it is not.** Not a login session, not a user identity, not a database credential, and not something a model can hold or request.
+- **Lifecycle.** Issue (operator-run local CLI) → store (SHA-256 hash in the registry; the secret is shown once and never stored) → present (the operator passes it in the arguments of one write call) → verify (`evaluateOperatorTokenV1`) → consume (single-use nonce recorded after an allowed call) → expire or revoke.
+- **Registry fields.** `id`, `tokenHash`, `scopes`, `expiresAt`, `revoked`, `issuedBy`. The scaffold already validates these.
+- **Recommended source (option a).** A registry file outside the repository. Its path comes from an environment variable (for example `OPS_OPERATOR_REGISTRY_PATH`), and the file is readable only by the operator account. Reasons: it adds no database role and no signing infrastructure, and it can later be upgraded to option (c) without changing the verifier. This is a recommendation; the operator has not approved it.
+- **Hard rules.** The model never receives a token and never emits one. Tokens never appear in prompts, logs, receipts, or `result_summary`. Read-only tools take no token.
+
+### Operator token: scope mapping (tool → scope)
+
+Each token names its scopes explicitly, so the mapping below is the alignment contract:
+
+| Tool | Effect | Token | Scope string |
+|---|---|---|---|
+| `ops.propose_patch` | Read-only preview of a file | Required (until a read-only exemption is decided) | `ops.propose_patch` |
+| `ops.run_targeted_test` | Executes one test file | Required | `ops.run_targeted_test` |
+| `ops.record_fix_attempt` | Writes a fix-attempt record | Required, single-use nonce | `ops.record_fix_attempt` |
+| `ops.run_quality_gate` | Runs a type-check gate | Required | `ops.run_quality_gate` |
+
+### Pipeline steps: what each is for, and what the token touches
+
+| # | Step | Used for | Code | Token | Status (2026-10-11) |
+|---|---|---|---|---|---|
+| 1 | MCP tool calling | Model-facing and client-facing tool invocation over Streamable HTTP | `sveltekit-frontend/src/mcp/trace-mcp-server.ts` (`:8788`) | Read-only: none. `ops.*` writes: operator token | Live: 188 tools listed; one read-only call verified; `ops.*` gate not enforced |
+| 2 | Dispatch | Routes an agent tool request to a handler | `sveltekit-frontend/src/routes/api/agent/execute/+server.ts` | Must never accept a token from model output | Exists; not exercised in this session |
+| 3 | Tool selection (routing) | Ranks candidate tools for a query | `sveltekit-frontend/src/lib/server/router/deterministic-tool-ranker.ts` (production); `viterbi-decoder-v1.ts` (offline) | None: advisory only | Ranker in use; Viterbi unwired, `CHALLENGER_ONLY` |
+| 4 | DAG and context assembly | Builds the bounded context for a step | `sveltekit-frontend/src/lib/server/atlas/workflow/context-dag-handlers-v1.ts` | None | Fixture-proven; ContextManifest not yet built from admitted tuples |
+| 5 | Prefill | Decoder-side prefix state and prompt-cache reuse | `sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-adapter.ts`; `atlas/prefill/` | None. Hidden state never persisted | Shadow and proof lanes; no production promotion |
+| 6 | Synthesis | Model reasoning over the admitted context, with tool loop | `sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts` (`runOrnithToolLoop`); `ace/context-chunk-synthesizer.ts`; Ornith on `:8090` | None. Model never sees a token | Loop exists; no confirmed production caller |
+| 7 | Agentic error fixing (write path) | Propose, test, record, and gate a repair | The four `ops.*` tools above | Required, per scope | Gate scaffold built and tested; not wired into the server |
+
+### Remapping and alignment notes
+
+- Steps 1, 3, 4, 5, and 6 are read-side. None of them requires a token, and none may gain write authority by using one.
+- Only step 7 writes. Its authorization path is the token gate, which runs before any file, process, or database access.
+- If a step is ever given write capability, it must be added to this table with its own scope before it is wired, so the mapping stays complete.
+
+### Operator token: decision tree (matches `evaluateOperatorTokenV1`)
+
+```
+call arrives for tool T with presentedToken P and optional nonce N
+├─ registry R absent?                         → DENY  REGISTRY_UNAVAILABLE
+├─ P missing, not a string, or blank?         → DENY  MISSING_TOKEN
+├─ hash(P) matches no record in R?            → DENY  UNKNOWN_TOKEN
+│     (match uses timing-safe comparison of SHA-256 digests)
+├─ matched record r.revoked?                  → DENY  REVOKED
+├─ now >= r.expiresAt?                        → DENY  EXPIRED
+├─ T not in r.scopes?                         → DENY  SCOPE_DENIED
+├─ N given and N already used?                → DENY  REPLAYED_NONCE
+└─ otherwise                                  → ALLOW (record N as used; log decision receipt)
+```
+
+Every branch returns the same decision shape with `canonicalAuthority:false`. Only `ALLOW` reaches the tool body.
+
+### Operator token: feature matrix (feature × pipeline step)
+
+Features are the per-token and per-call properties the gate reads. `✓` means the step depends on the feature; `—` means it does not.
+
+| Feature | Read tools (steps 1–6) | Write tools (step 7) |
+|---|---|---|
+| Presented token | — (never required) | ✓ required |
+| Registry hash lookup | — | ✓ |
+| Revocation flag | — | ✓ |
+| Expiry time | — | ✓ |
+| Tool scope (tool name → scope) | — | ✓ one scope per tool |
+| Single-use nonce | — | ✓ for `ops.record_fix_attempt` and any write the operator marks single-use |
+| Issuer identity (`issuedBy`) | — | ✓ recorded in the receipt, not checked |
+| Decision receipt (reason code, token id) | ✓ for any write-capable call | ✓ every attempt, allowed or refused |
+
+### Token register (2026-10-11): every existing "token" kind, its owner, and its use
+
+"Token" currently names at least eight different things. They must not be merged. Each row names the single owner found by search; a new token kind needs a row here before code is written.
+
+| Token kind | Owner (file) | Used for | Retrieve / index / rank / migrate / fetch / DAG / cache role |
+|---|---|---|---|
+| Lexical token (`normalizeAndSplitTokenV1`) | `atlas/agentic-file-compiler/token-normalization-v1.ts` | Splits a term into word fragments (AFC-KW-02) | Input to the radix index and to routing observations |
+| Exact keyword token (`normalizeQueryToken`) | `atlas/agentic-file-compiler/keyword-recognition-v2.ts` | Exact-match keyword normalization for the radix compiler (kept separate from the split policy) | **Index:** exact prefix lookup in `radix-index-v1.ts` |
+| Keyword review token (`normalizeKeywordTokenReviewV2`) | `atlas/agentic-file-compiler/routing-review-v2/keyword-recognition-v2-review.ts` | Review-time keyword normalization | Review only, not retrieval |
+| Observed feature token (`normalizeObservedFeatureToken`) | `scripts/atlas/lib/observation-feature-registry-census-v1.mjs` | Normalizes feature labels from observations | Census and registry matching |
+| Lexical stats token (`LexicalTokenStatsV1`) | `analysis/lexical-feature-registry-v1.ts` | Per-token statistics for the lexical feature registry | **Rank** input (statistics, not identity) |
+| Feature token binding (`FeatureTokenBindingV1`) | `atlas/embedding/feature-token-binding-v1.ts` | Binds tokens to features with a checksum | **DAG / KAG:** links labelled tokens to feature nodes |
+| Token map card and cartridge (`TokenMapCard`, `TokenMapCartridgePayload`) | `db/schema/token-map.ts`, `db/schema-postgres.ts` (`TokenArtifact`) | Persisted token map from ACE packets | **Migrate / cache:** a stored artifact; schema changes need approval |
+| Late-interaction token matrix (`LateInteractionTokenMatrixV1`) | `atlas/retrieval/late-interaction-maxsim-v1.ts` | Token-level MaxSim scoring | **Rank:** the only token-level ranker found |
+| Parameter token budget (`oakDagTokenBudgetParameterSchema`) | OAK DAG parameter schema (search `oakDagTokenBudgetParameterSchema`) | Token budget for DAG parameter fetching | **Fetch / DAG:** bounds the parameters a DAG step may pull |
+| Context token budget (`TokenBudget`, `enforceTokenBudget`) | `ace/token-aware-packer.ts` | Packs ACE context within a token limit | **Cache / ACE:** bounds the context packet |
+| Embedding token budget and tensor digest (`estimateEmbeddingTokensV1`, `digestTokenTensorV1`) | `atlas/embedding/embedding-context-plan-v1.ts` | Plans embedding input size and digests tensors | **RTX / CPU / RAM:** sizes and identifies tensor batches |
+| KV-cache token event (`KVCacheTokenEvent`) | `features/ai/ai/token-tracker.ts` | Records KV-cache token usage | **Cache:** runtime telemetry for the model KV cache |
+| LLM tokenizer (`LlamaTokenizerClient`, `countTokens`) | LLM client code (search `LlamaTokenizerClient`) | Model-side token counting | Budgeting only |
+| Operator token (ours) | `mcp/operator-token-gate-v1.ts` | Authorization for `ops.*` writes | **Not** a retrieval token; never used in ranking or caching |
+
+Findings:
+
+- **Yes, a retrieve, index, rank, and fetch path exists for tokens,** but each stage uses a different token kind. No single token flows through all of them.
+- **No token kind is linked to the router's state emissions.** The Viterbi decoder's token-to-state dictionary is a fixture (`token-routing-pipeline.spec.ts`), not derived from any row above.
+- **Migrate:** only the token-map table is persisted, and its schema change is unapproved.
+- **Cache:** three separate token caches exist (ACE packing budget, embedding tensor digests, KV-cache telemetry). They must keep separate keys.
+- **Auth tokens** (`passwordResetTokens`) and revision tokens (`parserSourceRevisionToken`) are unrelated and excluded from the register.
+
+### Token enhancements: deferred to-do (not started; revisit after the trace checkpoint)
+
+- [ ] **TOK-ROUTE-01** Decide which token kind drives router emissions. Recommended candidate: exact keyword token (`normalizeQueryToken`), because the radix index already consumes it. Record the decision here before any code changes.
+- [ ] **TOK-ROUTE-02** Replace the fixture token-to-state dictionary in `token-routing-pipeline.spec.ts` with emissions derived from the chosen owner. Keep the fixture only as a labelled regression case. **Interim (2026-10-11):** `token-routing-pipeline.spec.ts` now runs seeded variance (100 seeds, noise ±1.0 below the 4-unit fixture margin): every decoded path stays legal and START-first, and the intended token path is recovered for every seed. This is regression coverage under noise, not evidence of routing accuracy.
+- [ ] **TOK-ROUTE-03** Score emissions against real `tool_call_events` outcomes once the completed-trace count clears the 160-trace checkpoint. Do not tune weights on the current 27 completed rows.
+- [ ] **TOK-REG-01** Add a single register check that fails when a new `export` named `*Token*` appears without a row in the register above.
+- [ ] **TOK-CACHE-01** Confirm the three token caches (ACE packing budget, embedding tensor digests, KV-cache telemetry) use distinct key namespaces, with a test that a key from one cannot be read as another.
+- [ ] **TOK-RANK-01** Compare late-interaction MaxSim ranking against the lexical stats ranker on the same frozen query set before either is promoted.
+- [ ] **TOK-MIGRATE-01** Decide whether the token-map table is needed in the live schema. Any schema change goes through approval first.
+
+### Error-fixing contract test (2026-10-11): cross-field invariants, not just structure
+
+- Contract under test: `sveltekit-frontend/src/lib/server/atlas/agentic/contracts/governed-repair-v1.ts` (approval, plan checksum, preconditions, mutation receipt). It is the TypeScript error-fixing contract. Correction (2026-10-11): an earlier note said `KernelDagCandidate` does not exist in the atlas code. That was wrong: my search covered only `sveltekit-frontend/src/lib/server/atlas`. The admission owner is in `scripts/atlas/lib/kernel-dag-v1.mjs` (`buildKernelDagCandidate`, `validateKernelDagCandidate`), with `grounded-kernel-dag-admission-v1.mjs` and `prove-kernel-dag-validator-v1.mjs`. The test above does not yet exercise that admission path, so the candidate-to-execution link is still untested.
+- **Chain test (2026-10-11):** `scripts/atlas/kernel-dag-to-repair-chain-v1.test.mjs` runs an accepted read-only candidate through validation and into a typed DAG (5 passing). It rejects a stale workspace and refuses a typed DAG from a rejected receipt. It rejects a WRITE node unless policy allows WRITE. Two `todo` items record what is missing: an accepted typed DAG cannot reach a repair execution without a matching recorded approval, and the approved mutation plan is not yet derived from the DAG. Node's `todo` marks them as pending, not passing.
+- **Existing human-in-the-loop pieces (2026-10-11 survey, not yet wired together):**
+  - Recommendation engine: `scripts/atlas/agentic-recommendation-workflow.mjs`, stages L0 intent, L1 local rg search, L2 identity, L3 memory, L4 hybrid retrieval, L5 rerank, L6 synthesis, L7 decision. L7 returns `ask_permission` when there is no `packet_key`, when the model reports high risk, or when the top rerank score is below 0.4. This is the human gate. Its only test covers evidence blocks; L7 has no test.
+  - rg search: L1 inside the workflow, `build-rg-search-matrix.mjs` (chunk enrichment), and `audit-rg-search-integrity.mjs`.
+  - "Inverse search": no dedicated tool. The only match is a comment in `graphify-cluster-summaries.mjs` describing a chunk-to-cluster inverse join.
+  - Duplication rule: copying the recommendation engine would create a second owner. Extend the existing L7 gate in place, or move the approval proposal into the approval owner, rather than copying it.
+  - **Step 1 done (2026-10-11):** the L7 decision is extracted, unchanged, to `scripts/atlas/lib/recommendation-l7-decision-v1.mjs` (`decideRecommendationActionV1`). The workflow imports it. `recommendation-l7-decision-v1.test.mjs` passes 9/9, covering every branch, the threshold boundaries, and the check order. The workflow itself is not exercised end to end, because it calls the live model and TRACE.
+  - **Step 2 open:** route `ask_permission` into the approval owner as a proposal a human can approve or reject. Needs approval before any write.
+- **Autoresearch status (honest):** `openspec/changes/parent-atlas-autoresearch-fabric` implements only AUTORESEARCH-01 (`ExperimentHypothesisV1`) and -02 (`HardwareProfileV1`) as pure schemas. Gates 03 to 18 are proposal-only. The workboard's "8/8 COMPLETE" counts the two implemented items, not the fabric. It is not a kernel-DAG autoresearch loop and is not wired to the KernelDag validator.
+- Test: `governed-repair-invariants-v1.spec.ts`, 7/7 passing. It checks that an approval matches its plan and checksum, that a run is executing, that the workspace revision and each file checksum still match, that a receipt stays inside the approved plan, and that a receipt cannot claim canonical authority.
+- Not covered: the `.okf` schema at `docs/.okf/schema.yaml` is a code-intelligence convention. It defines no error-fix record, so it is not the test oracle. The workstation v2 workboard proof checks workboard output, not repair execution.
+
+### Operator token: data structures (what the code should use)
+
+- **Registry: a dictionary keyed by token hash, plus a scope index.** Verification is a hash lookup, which is O(1). A scope index maps each tool name to the registry ids that grant it, so the scope check is a dictionary read rather than a scan. At the expected size (tens of operator tokens), the current linear scan is also fine, so the index is an optimization, not a requirement.
+- **Decision: an immutable tuple** of `(allowed, reasonCode, tokenId, tool)`. Tuples are the right shape because a decision is a fixed record, not something that grows.
+- **Linked list: not used.** Nothing in the gate needs insertion in the middle or ordered traversal, and a list would only add pointer chasing.
+- **Symbol parameter: the tool name is the lookup key.** `ops.propose_patch` is both the symbol the caller passes and the scope the token must contain, so the mapping has one spelling, not two.
+- **Nonce set: a set of used nonces,** checked before ALLOW and written after it. It needs durable storage before any write tool is wired, otherwise a restart would reopen replay.
+
+### Answers to the open questions (2026-10-11)
+
+- **Do the LUT, dense-search, top-k, and k-means files need a token registry?** No. They are compute and ranking code, not operations. The token registry is only for the `ops.*` write tools. No file is named for a LUT, so I can't say what "LUT" refers to; the nearest match is lookup-table logic inside the unknown-resolution and tuple scripts.
+- **What is this cluster?** The ML and analysis group: k-means clustering (`cluster-summaries-topk.mjs`, `kmeans-multi-k-experiment.mjs`, `persist-kmeans-centroids.mjs`, `kmeans-latent-progression.ts`), top-k semantic fanout (`refresh-semantic-fanout-topk.mjs`, `lib/semantic-topk-storage.mjs`), and ontology-linked tuple parity and persistence (`prove-ontology-linked-tuple-*`, `generate-ontology-linked-tuple-fixture-v1.mts`). Most are experiments or receipts, not live admitted paths.
+- **Do we have MCP tool calling?** Yes. TRACE is live: 188 tools listed, one read-only invocation verified. Routing through the registry is not verified: the Viterbi selector has no registry call yet.
+- **How far are we from concepts, entities, and ontology-linked tuples?** Far, and the gap is lineage, not ML. `feature_ontology_tuples` has 539,124 rows, but the table has no admission, authority, lineage, or revision columns, so none of those rows can be shown admitted. `graphify_edges` has 0 rows, so no admitted graph exists for cuGraph parity to compare against. The one traced feature row is `PROPOSAL_ONLY`, and registry approval is `REQUIRED_NOT_PRESENT`. Remaining gates: registry reviewer approval, a lineage-qualified feature row, one admitted ontology tuple, and a ContextManifest built from it. `atlas_packets` has 61,718 rows, so the packet side has data.
 - [x] PROMOTE-04 `PROMOTED` requires an explicit promotion decision. Evidence: `prefill-promotion-governance-v1.json` requires an explicit decision and reports `promotionAuthorized=false`.
 - [x] PROMOTE-05 Prohibit executor promotion while packet/source lineage is unresolved. Evidence: the governance receipt records `executorPromotionBlockedUntilLineage=true` and `lineageRequiredForPromotion=true`.
 - [x] PROMOTE-06 Prohibit canonical vector/cache/database writes in planning/proof tasks. Evidence: the governance receipt records `canonicalVectorCacheDatabaseWritesBlocked=true`, `canonicalAuthority=false`, and `writesPerformed=false`.
@@ -392,3 +715,33 @@ WEBGPU_QINT8_512               BOUNDED_CHALLENGER
 QLORA_SFT                      DOWNSTREAM
 CANONICAL_WRITES               NOT_AUTHORIZED
 ```
+
+## AE precision and residency alignment reference (2026-10-12)
+
+The AE precision experiment and source-cohort gates are owned by `parent-atlas-neural-prefill-encoder/tasks.md` under `AE-PRECISION-*`; do not create a second trainer or duplicate training task here. This ledger remains the owner for residency leases, hot/warm/cold cache policy, model prefill identity, and ephemeral KV/recurrent state. A recommendation may select a revision-qualified materialization tier only after freshness, lease, capacity, model/context identity, and authorization checks; it cannot persist model KV/tensors or promote evidence. GPU execution remains single-owner and budget-admitted. PyTorch/ATen computation, cuVS search, cuGraph traversal, cuML clustering, and TensorRT-RTX are distinct executor capabilities, not interchangeable installed/runtime claims. No precision change, WSL/Docker package install, GPU job, cache write, or model-server restart is authorized by this planning entry.
+
+## Evaluation-sequence alignment review (2026-10-13)
+
+- [ ] SEQ-EVAL-01 Reconcile an ordered, reproducible prefill/decode/synthesis evaluation sequence with existing evaluation-run and receipt owners before proposing PostgreSQL DDL. Source inspection found `model_analysis_results.sequence_id` is scoped to model-analysis output; `evaluation_runs` already exists in the manual evaluation infrastructure; `llm_synthesis_events` records synthesis events; and `PrefillDecodePhaseReceiptV1` records separate PREFILL/DECODE receipts. None of these findings alone proves a unified generation/evaluation sequence table is absent from the live database or authorizes a new table.
+- [ ] SEQ-EVAL-02 Define run/step identity, frozen corpus and query checksums, immutable model/tokenizer/prompt/code revisions, ordered phase/status/timing, artifact references/checksums, tensor shape/dtype/device metadata, and scalar evaluation metrics. Keep tensor/KV/hidden-state payloads out of PostgreSQL and Valkey; preserve model-owned state as ephemeral. Resolve whether existing `evaluation_runs` can own the parent run and use existing receipt/artifact contracts for steps before adding tables.
+- [ ] SEQ-EVAL-03 Qualify future mmap/PyTorch evaluation on one immutable FP32 artifact with checksum-verified dimensions, ordinal-map alignment, CPU reference output, deterministic metric receipt, and an explicitly admitted accelerator challenger. `export_frozen_semantic768_snapshot.py` documents `torch.from_file`/`numpy.memmap` access, but this audit did not execute mmap loading or PyTorch parity.
+- [ ] SEQ-EVAL-04 Keep ranking and graph algorithms as separately versioned diagnostic features: XGBoost requires its existing held-out/source-revision lineage contract; Hilbert/Hamming remain locality/prefilter helpers; NetworkX is the CPU graph reference and PageRank is a graph-derived feature, not a semantic retrieval vote. No algorithm is authorized to create identity, bypass source admission, or promote a candidate.
+
+Evidence note (source-only review, 2026-10-13): relevant owners include `sveltekit-frontend/src/lib/server/db/schema/model-analysis-runs.ts`, `sveltekit-frontend/drizzle/manual/evaluation_infrastructure.sql`, `sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.ts`, `sveltekit-frontend/src/lib/server/atlas/classification/xgboost-ranking-lineage-v1.ts`, `python/export_frozen_semantic768_snapshot.py`, `python/atlas_compute/graph_tensor_metrics_v1.py`, `python/atlas_compute/typed_graph_runtime.py`, and `sveltekit-frontend/src/lib/server/atlas/locality-key-v1.ts`. This is repository contract discovery, not live PostgreSQL schema verification, runtime caller proof, mmap/PyTorch execution, or production evaluation. No migration, backfill, database/cache write, or GPU job was run.
+## P12 stratified-sample source readback (2026-10-15)
+
+- Selected one deterministic member of `LINEAGE_MISSING_WITH_PHYSICAL_CHUNKS`: `sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts` (4 physical chunk rows observed at the exact source ref). `node scripts/atlas/prove-current-packet-chunk-seed-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --source-ref sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts --report-path .tmp/atlas/p12-stratified-seed-ace-lod-promoter-20261015.json` exited **1**, expected `P12_SINGLE_SOURCE_REJECTED`. It independently verified canonical execution, workspace revision, unique membership, exact source binding, repository-contained source-byte readback, and source bytes matching the binding. It rejected the source because `uniquePacketIdentity=false`, `packetSourceRevisionAndLineageProvenance=false`, and `exactProvenPacketChunkRows=false`; `packetKey=null`. Receipt `.tmp/atlas/p12-stratified-seed-ace-lod-promoter-20261015.json`, SHA-256 `bbe4531707c7976a2bd6a2b6019385300391bcbce44d715bf21ffab72c942261`, internal checksum `sha256:abdf2259eb2530ef13dce0052f590e2254174c8fbc497a7ecde1d03cf54239ed`; transaction `REPEATABLE READ READ ONLY`, writes false, `canonicalAuthority=false`. This confirms a concrete first failure boundary for one sampled row, not a general status for the other 5,502 physical-chunk-present rows.
+
+## P12 stratified seed disposition (2026-10-15)
+
+- Ran the same read-only single-source verifier on four unique SHA-256-ranked `LINEAGE_MISSING_WITH_PHYSICAL_CHUNKS` sample paths. All four exited **1** with expected `P12_SINGLE_SOURCE_REJECTED`; all four confirmed execution, workspace revision, unique membership, exact source binding, and in-repository source-byte read; none had `packetSourceRevisionAndLineageProvenance` or exact proven packet/chunk rows. Three had no unique packet identity and matched the source-binding digest; the fourth (`sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts`) had one packet key but failed the source-byte digest check. That file is not working-tree modified; its current SHA-256 is `F377F95DA2F620001FAA0742051BBFBA4BA29B7EDA7A8D7CB25B75D496D2934C`, last touched by commit `29f27d4a7237e9516780e8d6321e9475b024d5ce`. Do not assign the mismatch to uncommitted work or infer why the selected workspace binding differs. The four unique paths and receipt SHA-256 values are recorded in `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json` under `p12SeedSampleDisposition`; all four probes used `REPEATABLE READ READ ONLY`, `writesPerformed=false`, `canonicalAuthority=false`. This reveals multiple first-failure shapes within one bounded stratum, not the distribution of all 5,503 rows. Keep P12 partial; next reconcile source digest currentness and canonical packet producer evidence for these classes before any backfill/promotion.
+
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.
+- **P12 bounded current-join refresh (2026-10-15; read-only):** `node scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --limit 100 --output=.tmp/atlas/p12-phase-proof-refresh-20261015.json` exited **0** at `2026-10-15T19:52:16Z`, status `CURRENT_PACKET_CHUNK_JOIN_MISSING`, scope `BOUNDED_SAMPLE` (not a population estimate). This exact sorted sample had 100 binding rows and 100 exact Graphify members, 0 packet/chunk exact sources, 0 proven-lineage sources, and 0 chunk matches by `source_ref`, `relative_path`, whole-source digest, source/workspace revision, lineage envelope, or proven packet/chunk identity. It classified 85 `NO_PACKET_REFERENCE`, 14 `CANONICAL_PACKET_IDENTITY_ONLY`, and 1 `PACKET_PRESENT_NO_CHUNK_BINDING`; 14 packet source-revision/workspace matches existed, but no packet/chunk identity matches. The sample is not representative: the broader bridge census independently reports 5,503 unbridged root sources with physical chunks at exact refs. Treat this as evidence that sorted sampling scope matters, not evidence those chunks are absent corpus-wide. Receipt `.tmp/atlas/p12-phase-proof-refresh-20261015.json`, SHA-256 `5d7b1e91b4563218e6fda5bed92ed873b5041180944754d5cf22227d09ec0c08`; classification checksum `sha256:5a2f8a94fca8fa36ff10f7aa12bad44757b8c02581058cb7b5e48c7c4dcc6fd6`; all store writes false, `canonicalAuthority=false`. P12 remains partial. Next proof: stratified, bounded diagnostics over physical-chunk-present/lineage-missing, no-physical-chunk, and namespace-missing classes using existing read-only owners; no inferred identity or bulk refresh.
+- P12 refreshed bounded crosswalk audit (2026-10-15; SELECT-only): `node scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --limit 100 --output=.tmp/atlas/phase-closure-p12-crosswalk-sample-100-v2-20261015.json` exited 0; 8/8 identity-classification tests passed. The sorted exact-Graphify cohort classified 85 `NO_PACKET_REFERENCE`, 14 `CANONICAL_PACKET_IDENTITY_ONLY`, 1 `PACKET_PRESENT_NO_CHUNK_BINDING`, 0 `EXACT_LINEAGE`. The same rows have 0 exact source-ref, relative-path, whole-source digest, source/workspace revision, lineage-envelope, or proven packet/chunk matches. The v2 audit no longer claims lineage columns are unavailable; live `information_schema` confirms them present. `pathCoverage=78` is from a different unordered sample. Writes false. Classification checksum `sha256:5a2f8a94fca8fa36ff10f7aa12bad44757b8c02581058cb7b5e48c7c4dcc6fd6`; report checksum `sha256:c1092e0410bdef2ec5a855af41769810663408e63357ba45d2d8ce66227f3d79`. Diagnostic sample only, not a population estimate.
+- P12 proof correction (2026-10-15): strict canonical audit found 14,564 packet-revision/provenance-qualified packet+lineage sources out of 24,456 source bindings; the earlier 14,628 count was a weaker source/lineage-only measure (64 lack canonical packet revision/provenance). Packet `content_hash` is legacy diagnostic, not the source digest; do not use that equality as a gate. Full receipt `.tmp/atlas/phase-closure-p12-strict-packet-chunk-20261015.json`. Exact seed `crates/atlas_packet_parser/index.js` qualified with 14 physical chunk rows, exit 0, receipt `.tmp/atlas/phase-closure-p12-single-source-index-js-20261015.json`, checksum `sha256:dce55a7fafc726f69f7f535810d6d254a647d14638ac320e67b5d543f830d98d`. Follow-up bounded source-byte readback hashes the actual repository file, checks repository-root containment (including symlink resolution), and matches the workspace binding digest: 9,875 bytes, digest `sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769`, all nine checks true, receipt checksum `sha256:03a807d8c28de9723a9b7f5740650a78064cfff52eea1a4a829be1bd3c6ee772`; receipt `.tmp/atlas/phase-closure-p12-single-source-index-js-byte-readback-20261015.json`. A separate function seed later qualified through current source/AST evidence and reached SearchRuntime's AST RRF lane, but did not survive final Top-K; ContextManifest remains unadmitted (legacy phase-24 evidence is recorded separately). Negative `build.rs` control rejected missing packet revision/provenance, exit 1, receipt `.tmp/atlas/phase-closure-p12-single-source-build-rs-negative-20261015.json`, checksum `sha256:c7520df95cf35cf8ca7f763f136edb46546d79613d39c53cc0b031ea5691363e`. All DB probes rolled back read-only and wrote no canonical state. P12 remains PARTIAL: broad packet/chunk/source-byte coverage, SearchRuntime final selection, and ContextManifest admission remain open. The earlier 100-source generic preflight is only a bounded diagnostic, not population proof.

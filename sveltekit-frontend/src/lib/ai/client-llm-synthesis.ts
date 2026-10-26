@@ -4,7 +4,7 @@
  * Flow:
  *   1. Hash query + RAG context → check IndexedDB synthesis cache
  *   2. If cache hit → return instantly (source: 'cache-hit')
- *   3. If miss → run E2B generation (or fall back to 270M ONNX)
+	 *   3. If miss → run the approved E2B helper when available
  *   4. Store result in synthesis cache (1hr TTL)
  *
  * Used by ChatSession to serve cached RAG/KAG/DAG responses before
@@ -18,7 +18,7 @@ import { isE2BReady, generateE2B, type E2BGenerateOptions } from './gemma4-e2b-c
 
 export interface SynthesisResult {
 	text: string;
-	source: 'cache-hit' | 'local-e2b' | 'local-onnx';
+	source: 'cache-hit' | 'local-e2b' | 'server-required';
 	durationMs: number;
 	cached: boolean;
 }
@@ -94,11 +94,11 @@ export async function synthesize(
 		}
 	}
 
-	// 4. Fallback: return empty result — caller should escalate to server or 270M ONNX
+	// Fallback: caller must use the configured server generation path.
 	const durationMs = Math.round(performance.now() - startMs);
 	return {
 		text: '',
-		source: 'local-onnx',
+		source: 'server-required',
 		durationMs,
 		cached: false
 	};

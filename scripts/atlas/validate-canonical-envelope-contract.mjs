@@ -17,7 +17,8 @@ import { loadRepoEnv } from './connection-config.mjs';
 const ENV = loadRepoEnv(process.env);
 Object.assign(process.env, ENV);
 
-const LIMIT = Number(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] ?? 100);
+const ALL = process.argv.includes('--all');
+const LIMIT = ALL ? null : Number(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] ?? 100);
 const VERBOSE = process.argv.includes('--verbose');
 
 const { Pool } = pg;
@@ -36,10 +37,33 @@ async function main() {
   });
 
   try {
-    // Fetch sample packets
-    console.log(`Loading ${LIMIT} packets from Postgres...\n`);
-    const result = await pool.query(
-      `
+    // Fetch packets
+    console.log(`Loading ${ALL ? 'ALL' : LIMIT} packets from Postgres...\n`);
+    const query = ALL
+      ? `
+      SELECT
+        packet_id,
+        packet_key,
+        source_ref,
+        source_ref_key,
+        feature_id,
+        title_id,
+        tree_node_id,
+        domain_class,
+        community_id,
+        som_cluster,
+        som_row,
+        som_col,
+        metadata,
+        payload,
+        summary,
+        created_at,
+        updated_at
+      FROM atlas_packets
+      WHERE packet_key IS NOT NULL
+      ORDER BY created_at DESC
+    `
+      : `
       SELECT
         packet_id,
         packet_key,
@@ -62,9 +86,8 @@ async function main() {
       WHERE packet_key IS NOT NULL
       ORDER BY created_at DESC
       LIMIT $1
-    `,
-      [LIMIT]
-    );
+    `;
+    const result = await pool.query(query, ALL ? [] : [LIMIT]);
 
     console.log(`Loaded ${result.rows.length} packets\n`);
 

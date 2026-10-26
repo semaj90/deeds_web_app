@@ -21,29 +21,60 @@ import os
 import hashlib
 import inspect
 import json
+import logging
 import re
 import tempfile
 import time
+from bisect import bisect_left, bisect_right
+from contextlib import asynccontextmanager
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 import miniforge_nlp_sidecar as legacy
 import atlas_external_docs as external_docs
 from atlas_structural_provenance import (
+    find_call_expression_byte_spans,
     find_occurrence_positions,
     normalize_langextract_extraction,
     normalize_treesitter_chunker_chunk,
     occurrence_to_absolute_position,
 )
 from atlas_treesitter_span_compat import resolve_chunk_byte_span
+from atlas_ast_chunk_helpers_v1 import AstChunkHelperAnalysisV1, build_ast_chunk_helper_analysis_v1
+from atlas_domain_candidate_helper_v1 import bind_candidate_record
 
 _RUNTIME_MODULE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 _LEGACY_MODULE_SHA256 = hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest()
+_PROCESS_STARTED_MONOTONIC_NS = str(time.monotonic_ns())
+CUSTOM_ATTRIBUTES_SCHEMA = "atlas.langextract-custom-attributes.v1"
+MAX_CUSTOM_ATTRIBUTES = 32
+MAX_CUSTOM_ATTRIBUTE_KEY_CHARS = 80
+MAX_CUSTOM_ATTRIBUTE_VALUE_CHARS = 2048
+MAX_CUSTOM_ATTRIBUTES_BYTES = 8192
+
+
+def _validate_custom_attributes(value: Any) -> dict[str, str | int | float | bool | None]:
+    if not isinstance(value, dict) or len(value) > MAX_CUSTOM_ATTRIBUTES:
+        raise ValueError("CUSTOM_ATTRIBUTES_INVALID_SHAPE")
+    for key, item in value.items():
+        if not isinstance(key, str) or not key or len(key) > MAX_CUSTOM_ATTRIBUTE_KEY_CHARS:
+            raise ValueError("CUSTOM_ATTRIBUTES_INVALID_KEY")
+        if item is not None and not isinstance(item, (str, int, float, bool)):
+            raise ValueError("CUSTOM_ATTRIBUTES_VALUES_MUST_BE_SCALARS")
+        if isinstance(item, str) and len(item) > MAX_CUSTOM_ATTRIBUTE_VALUE_CHARS:
+            raise ValueError("CUSTOM_ATTRIBUTES_VALUE_TOO_LONG")
+    try:
+        encoded = json.dumps(value, ensure_ascii=False, allow_nan=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    except (TypeError, ValueError) as error:
+        raise ValueError("CUSTOM_ATTRIBUTES_NOT_JSON_SAFE") from error
+    if len(encoded) > MAX_CUSTOM_ATTRIBUTES_BYTES:
+        raise ValueError("CUSTOM_ATTRIBUTES_TOO_LARGE")
+    return value
 
 
 class AstEvidenceChunkV2(BaseModel):
@@ -56,6 +87,8 @@ class AstEvidenceChunkV2(BaseModel):
     name: Optional[str] = None
     parent_route: list[str] = Field(default_factory=list)
     parent_context: Optional[str] = None
+    signature_text: Optional[str] = None
+    syntax_ancestry: list[dict[str, Any]] = Field(default_factory=list)
     start_byte: int
     end_byte: int
     start_line: int
@@ -67,18 +100,58 @@ class AstEvidenceChunkV2(BaseModel):
     exports: list[str] = Field(default_factory=list)
 
 
+class AstParserObservationV1(BaseModel):
+    schema_: Literal["atlas.ast.parser-observation.v1"] = Field(alias="schema")
+    source_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    utf8_byte_length: int = Field(ge=0)
+    root_has_error: bool
+    error_node_count: int = Field(ge=0)
+    missing_node_count: int = Field(ge=0)
+
+
 class AstEvidenceResponseV2(BaseModel):
-    schema: Literal["atlas.ast.evidence.v1"]
+    schema_: Literal["atlas.ast.evidence.v1"] = Field(alias="schema")
     engine: str
     engine_version: str
     language: str
     file_path: str
     source_revision: str
+    workspace_revision: Optional[str] = None
     chunks: list[AstEvidenceChunkV2]
     edges: list[legacy.AstEvidenceEdge] = Field(default_factory=list)
     diagnostics: list[str] = Field(default_factory=list)
     error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
     syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
+    helper_analysis: Optional[AstChunkHelperAnalysisV1] = Field(default=None, alias="helperAnalysis")
+    # Additive receipt (2026-10-21). PARTIAL_AST_FAILED = the AST extractor raised or was unavailable,
+    # so chunks/edges are not a complete structural scan of this source. Source syntax errors are NOT
+    # partial (see syntax_status). This route runs no NLP, so no NLP skip is reported here.
+    scan_completeness: Literal["COMPLETE", "PARTIAL_AST_FAILED"] = "COMPLETE"
+    scan_failure: Optional[str] = None
+    parser_observation: Optional[AstParserObservationV1] = None
+
+
+def validate_ast_evidence_byte_spans(chunks: list[AstEvidenceChunkV2], source_bytes: bytes) -> list[dict[str, Any]]:
+    issues: list[dict[str, Any]] = []
+    seen: set[tuple[str | None, int, int]] = set()
+    for index, chunk in enumerate(chunks):
+        start, end = chunk.start_byte, chunk.end_byte
+        if start < 0 or end <= start:
+            issues.append({"index": index, "code": "SPAN_INVALID"})
+            continue
+        if end > len(source_bytes):
+            issues.append({"index": index, "code": "SPAN_OUT_OF_BOUNDS"})
+            continue
+        try:
+            source_bytes[start:end].decode("utf-8", errors="strict")
+        except UnicodeDecodeError:
+            issues.append({"index": index, "code": "SPAN_NOT_UTF8_BOUNDARY"})
+            continue
+        key = (chunk.upstream_node_id, start, end)
+        if key in seen:
+            issues.append({"index": index, "code": "DUPLICATE_SPAN"})
+        seen.add(key)
+    return issues
 
 
 class WebEvidenceRequestV1(BaseModel):
@@ -92,7 +165,7 @@ class WebEvidenceRequestV1(BaseModel):
 
 
 class WebEvidenceResponseV1(BaseModel):
-    schema: Literal["atlas.external-web-evidence.v1"]
+    schema_: Literal["atlas.external-web-evidence.v1"] = Field(alias="schema")
     fetcher: str
     source_id: str
     source_revision: str
@@ -104,10 +177,59 @@ class WebEvidenceResponseV1(BaseModel):
     writes_performed: Literal[False] = False
 
 
+class OaklibCandidateRequestV1(BaseModel):
+    external_ids: list[str] = Field(..., min_length=1, max_length=32)
+
+    model_config = {"extra": "forbid"}
+
+
+class OaklibCandidateResponseV1(BaseModel):
+    schema_: Literal["atlas.oaklib-candidate-response.v1"] = Field(alias="schema")
+    status: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
+    ontology_revision: str = Field(alias="ontologyRevision")
+    producer_revision: str = Field(alias="producerRevision")
+    candidates: dict[str, Any]
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
+class OaklibLabelSearchRequestV1(BaseModel):
+    terms: list[str] = Field(..., min_length=1, max_length=16)
+    max_candidates_per_term: int = Field(default=8, alias="maxCandidatesPerTerm", ge=1, le=16)
+
+    model_config = {"extra": "forbid", "populate_by_name": True}
+
+
+class OaklibLabelSearchResponseV1(BaseModel):
+    schema_: Literal["atlas.oaklib-label-search-response.v1"] = Field(alias="schema")
+    status: Literal["PROPOSAL_ONLY"] = "PROPOSAL_ONLY"
+    ontology_revision: str = Field(alias="ontologyRevision")
+    producer_revision: str = Field(alias="producerRevision")
+    matches: list[dict[str, Any]]
+    candidate_bundle: dict[str, Any] = Field(alias="candidateBundle")
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    try:
+        if legacy._capabilities()["spacy_pos"]:
+            legacy._spacy_pos_tags("Parent Atlas NLP sidecar startup warmup.")
+    except Exception:
+        logging.getLogger(__name__).exception("NLP sidecar spaCy warmup failed")
+    yield
+
+
 app = FastAPI(
     title="Parent Atlas NLP Sidecar",
     version="2.0.0",
     description="Provenance-preserving Consiliency + LangExtract facade over the Atlas NLP sidecar",
+    lifespan=lifespan,
 )
 app.add_middleware(
     CORSMiddleware,
@@ -126,6 +248,66 @@ async def request_timer(request: Request, call_next):
     response.headers["x-nlp-sidecar-request-id"] = request.headers.get("x-request-id", "")
     response.headers["x-atlas-sidecar-contract"] = "provenance-v2"
     return response
+
+
+def _configured_oaklib_resource() -> tuple[Path, str]:
+    root_value = os.environ.get("ATLAS_OAKLIB_ONTOLOGY_ROOT", "").strip()
+    file_value = os.environ.get("ATLAS_OAKLIB_ONTOLOGY_FILE", "").strip()
+    if not root_value or not file_value:
+        raise HTTPException(status_code=503, detail="OAKLIB_SOURCE_NOT_CONFIGURED")
+
+    try:
+        root = Path(root_value).resolve(strict=True)
+        relative = Path(file_value)
+        if relative.is_absolute():
+            raise ValueError("ontology file must be relative to its configured root")
+        resource = (root / relative).resolve(strict=True)
+        if not root.is_dir() or not resource.is_relative_to(root) or not resource.is_file():
+            raise ValueError("ontology file is outside the configured root")
+        if resource.suffix.lower() not in {".obo", ".owl", ".rdf", ".ttl", ".ofn"}:
+            raise ValueError("unsupported ontology file type")
+        if resource.stat().st_size > 64 * 1024 * 1024:
+            raise ValueError("ontology file exceeds the 64 MiB limit")
+        source_bytes = resource.read_bytes()
+        source_text = source_bytes.decode("utf-8", errors="strict")
+        if re.search(r"(?im)^\s*import\s*:|owl:imports|<[^>]*imports?\b", source_text):
+            raise ValueError("ontology imports are not allowed")
+        digest = hashlib.sha256(source_bytes).hexdigest()
+    except (OSError, ValueError) as exc:
+        logging.getLogger(__name__).warning("Configured OAKLIB source refused: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_SOURCE_INVALID") from None
+
+    return resource, f"sha256:{digest}"
+
+
+def _load_oaklib_candidates(
+    *, resource_selector: str, subjects: list[str], ontology_revision: str, producer_revision: str
+) -> dict[str, Any]:
+    from parent_atlas_ontology.oaklib_external_adapter import load_oaklib_candidate_bundle_v1
+
+    return load_oaklib_candidate_bundle_v1(
+        resource_selector=resource_selector,
+        source_selector="atlas-local-ontology",
+        subjects=subjects,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+    ).to_dict()
+
+
+def _search_oaklib_labels(
+    *, resource_selector: str, terms: list[str], ontology_revision: str,
+    producer_revision: str, max_candidates_per_term: int
+) -> dict[str, Any]:
+    from parent_atlas_ontology.oaklib_external_adapter import load_oaklib_label_candidates_v1
+
+    return load_oaklib_label_candidates_v1(
+        resource_selector=resource_selector,
+        source_selector="atlas-local-ontology",
+        terms=terms,
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        max_candidates_per_term=max_candidates_per_term,
+    )
 
 
 def _native_grounded_extractions(
@@ -399,6 +581,10 @@ def _documentation_fact_output_schema() -> dict[str, Any]:
             "object": {"type": "string"},
             "statement": {"type": "string"},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -416,6 +602,10 @@ def _documentation_output_schema() -> dict[str, Any]:
             "object": {"type": "string"},
             "statement": {"type": "string"},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -429,6 +619,10 @@ def _documentation_output_schema() -> dict[str, Any]:
             "parameterName": {"type": ["string", "null"]},
             "expectedValue": {"type": ["string", "null"]},
             "confidence": {"type": "number"},
+            "customAttributes": {
+                "type": "object",
+                "additionalProperties": {"type": ["string", "number", "boolean", "null"]},
+            },
         },
         additional_properties=False,
     )
@@ -578,6 +772,10 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
         except (TypeError, ValueError):
             confidence = 0.0
         confidence = max(0.0, min(1.0, confidence))
+        try:
+            custom_attributes = _validate_custom_attributes(attributes.get("customAttributes") or {})
+        except ValueError:
+            continue
         extracted.append({
             "extraction_class": extraction_class,
             "subject": subject,
@@ -590,6 +788,7 @@ def _native_documentation_facts(text: str, model_id: Optional[str] = None) -> li
             "start_byte": len(text[:start_pos].encode("utf-8")),
             "end_byte": len(text[:end_pos].encode("utf-8")),
             "confidence": confidence,
+            "custom_attributes": custom_attributes,
             "api_symbol": api_symbol,
             "version_range": str(attributes.get("versionRange") or attributes.get("version_range") or "").strip(),
             "condition": str(attributes.get("condition") or "").strip(),
@@ -634,7 +833,18 @@ class DocumentationFactV1(BaseModel):
     product_version: str = Field(alias="productVersion")
     confidence: float = Field(ge=0.0, le=1.0)
     extraction_method: str = Field(default="LANGEXTRACT_ORNITH", alias="extractionMethod")
+    custom_attributes_version: Literal["atlas.langextract-custom-attributes.v1"] = Field(
+        default=CUSTOM_ATTRIBUTES_SCHEMA, alias="customAttributesVersion"
+    )
+    custom_attributes: dict[str, str | int | float | bool | None] = Field(
+        default_factory=dict, alias="customAttributes"
+    )
     canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
+
+    @field_validator("custom_attributes")
+    @classmethod
+    def validate_custom_attributes(cls, value: Any) -> dict[str, str | int | float | bool | None]:
+        return _validate_custom_attributes(value)
 
     model_config = {"populate_by_name": True}
 
@@ -651,6 +861,14 @@ class ApiRuleV1(BaseModel):
     expected_value: Optional[str] = Field(default=None, alias="expectedValue")
     evidence_span: dict[str, Any] = Field(alias="evidenceSpan")
     confidence: float = Field(ge=0.0, le=1.0)
+    custom_attributes_version: Literal["atlas.langextract-custom-attributes.v1"] = Field(default=CUSTOM_ATTRIBUTES_SCHEMA, alias="customAttributesVersion")
+    custom_attributes: dict[str, str | int | float | bool | None] = Field(default_factory=dict, alias="customAttributes")
+
+    @field_validator("custom_attributes")
+    @classmethod
+    def validate_custom_attributes(cls, value: Any) -> dict[str, str | int | float | bool | None]:
+        return _validate_custom_attributes(value)
+
     canonical_authority: bool = Field(default=False, alias="canonicalAuthority")
 
     model_config = {"populate_by_name": True}
@@ -748,6 +966,98 @@ def _declarator_kind_override(node_type: str, span_text: str) -> str | None:
     if _FUNCTION_INITIALIZER_RE.search(span_text):
         return "function_declarator"
     return None
+
+
+def _syntax_signature_and_ancestry(
+    source_bytes: bytes,
+    node_index: dict[str, tuple[list[int], list[Any]]],
+    node_type: str,
+    start_byte: int,
+    end_byte: int,
+    name: str | None,
+) -> tuple[str | None, list[dict[str, Any]]]:
+    indexed = node_index.get(node_type)
+    if indexed is None:
+        return None, []
+    starts, candidates = indexed
+    matches = []
+    candidate_index = bisect_left(starts, start_byte)
+    while candidate_index < len(candidates) and starts[candidate_index] <= end_byte:
+        node = candidates[candidate_index]
+        if int(getattr(node, "end_byte", -1)) <= end_byte:
+            name_node = node.child_by_field_name("name") if hasattr(node, "child_by_field_name") else None
+            observed_name = source_bytes[name_node.start_byte:name_node.end_byte].decode("utf-8") if name_node else None
+            if name is None or observed_name == name:
+                matches.append(node)
+        candidate_index += 1
+    if len(matches) != 1:
+        return None, []
+
+    node = matches[0]
+    body = node.child_by_field_name("body") if hasattr(node, "child_by_field_name") else None
+    if body is None and node_type in _DECLARATOR_NODE_TYPES:
+        descendants = list(getattr(node, "children", []))
+        while descendants and body is None:
+            child = descendants.pop()
+            if str(getattr(child, "type", "")) in {"arrow_function", "function_expression", "function"}:
+                body = child.child_by_field_name("body") if hasattr(child, "child_by_field_name") else None
+            descendants.extend(reversed(list(getattr(child, "children", []))))
+    signature_text = None
+    if body is not None and node.start_byte <= body.start_byte <= node.end_byte:
+        signature_text = source_bytes[node.start_byte:body.start_byte].decode("utf-8")
+
+    ancestors = []
+    ancestor = getattr(node, "parent", None)
+    while ancestor is not None and getattr(ancestor, "parent", None) is not None:
+        ancestors.append({
+            "node_type": str(ancestor.type),
+            "start_byte": int(ancestor.start_byte),
+            "end_byte": int(ancestor.end_byte),
+        })
+        ancestor = ancestor.parent
+    ancestors.reverse()
+    return signature_text, ancestors
+
+
+def _index_syntax_nodes(root: Any) -> dict[str, tuple[list[int], list[Any]]]:
+    nodes_by_type: dict[str, list[Any]] = {}
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        nodes_by_type.setdefault(str(getattr(node, "type", "")), []).append(node)
+        stack.extend(reversed(list(getattr(node, "children", []))))
+    indexed: dict[str, tuple[list[int], list[Any]]] = {}
+    for node_type, nodes in nodes_by_type.items():
+        nodes.sort(key=lambda node: (int(getattr(node, "start_byte", -1)), int(getattr(node, "end_byte", -1))))
+        indexed[node_type] = ([int(node.start_byte) for node in nodes], nodes)
+    return indexed
+
+
+def _parser_observation(root: Any, indexed: dict[str, tuple[list[int], list[Any]]], source_bytes: bytes) -> Optional[AstParserObservationV1]:
+    if root is None or not isinstance(getattr(root, "has_error", None), bool) or not indexed:
+        return None
+    missing_count = 0
+    for _, nodes in indexed.values():
+        for node in nodes:
+            missing = getattr(node, "is_missing", None)
+            if not isinstance(missing, bool):
+                return None
+            missing_count += int(missing)
+    return AstParserObservationV1(
+        schema="atlas.ast.parser-observation.v1",
+        source_sha256=hashlib.sha256(source_bytes).hexdigest(),
+        utf8_byte_length=len(source_bytes),
+        root_has_error=root.has_error,
+        error_node_count=len(indexed.get("ERROR", ([], []))[1]),
+        missing_node_count=missing_count,
+    )
+
+
+def _byte_offset_line_column(source_bytes: bytes, line_starts: list[int], offset: int) -> tuple[int, int]:
+    bounded = max(0, min(int(offset), len(source_bytes)))
+    line_index = bisect_right(line_starts, bounded) - 1
+    column = len(source_bytes[line_starts[line_index]:bounded].decode("utf-8", errors="ignore"))
+    return line_index + 1, column
 
 
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
@@ -853,7 +1163,15 @@ def _span_matches_original(
         if reported_start_line is not None and actual_start_line != reported_start_line:
             return False
         if reported_end_line is not None and actual_end_line != reported_end_line:
-            return False
+            terminal_newline_line_convention = (
+                reported_end_line == actual_end_line + 1
+                and end == len(source_bytes)
+                and source_bytes[start:end].endswith(b"\n")
+                and content_bytes is not None
+                and source_bytes[start:end] == content_bytes
+            )
+            if not terminal_newline_line_convention:
+                return False
     return True
 
 
@@ -935,6 +1253,50 @@ def _diagnostics_have_errors(diagnostics: list[str]) -> bool:
     return bool(legacy._fatal_structural_diagnostics(diagnostics))
 
 
+def _cpp_include_chunks(source: str) -> list[dict[str, Any]]:
+    if not legacy.TREE_SITTER_AVAILABLE or legacy.get_parser is None:
+        return []
+    try:
+        source_bytes = source.encode("utf-8")
+        root = legacy.get_parser("cpp").parse(source_bytes).root_node
+    except Exception:
+        return []
+
+    chunks: list[dict[str, Any]] = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        stack.extend(reversed(list(getattr(node, "named_children", []))))
+        if getattr(node, "type", None) != "preproc_include":
+            continue
+        path_node = node.child_by_field_name("path")
+        if path_node is None:
+            continue
+        start = int(node.start_byte)
+        end = int(node.end_byte)
+        try:
+            path_value = source_bytes[int(path_node.start_byte):int(path_node.end_byte)].decode("utf-8")
+            content = source_bytes[start:end]
+        except (UnicodeDecodeError, ValueError):
+            continue
+        if path_node.type == "string_literal" and len(path_value) >= 2 and path_value[0] == '"' and path_value[-1] == '"':
+            specifier = path_value[1:-1]
+        elif path_node.type == "system_lib_string" and len(path_value) >= 2 and path_value[0] == "<" and path_value[-1] == ">":
+            specifier = path_value[1:-1]
+        else:
+            continue
+        if not specifier or end <= start:
+            continue
+        chunks.append({
+            "node_type": "preproc_include",
+            "byte_start": start,
+            "byte_end": end,
+            "content": content,
+            "metadata": {"imports": [specifier]},
+        })
+    return chunks
+
+
 def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
     diagnostics: list[str] = []
     language, language_error = legacy._resolve_ast_language(req.language, req.file_path)
@@ -944,6 +1306,9 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         "tree_sitter_chunker",
         "chunker",
     ) or "unknown"
+    response_engine = "treesitter-chunker"
+    response_engine_version = engine_version
+    used_tree_sitter_fallback = False
 
     if language_error:
         return AstEvidenceResponseV2(
@@ -953,10 +1318,14 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             language=language,
             file_path=req.file_path,
             source_revision=req.source_revision,
+            workspace_revision=req.workspace_revision,
             chunks=[],
             diagnostics=[language_error],
             error_tag="UnsupportedLanguageError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            # Fail closed: an unsupported language is an incomplete scan, never a complete empty one.
+            scan_completeness="PARTIAL_AST_FAILED",
+            scan_failure=language_error,
         )
 
     if not legacy.TREESITTER_CHUNKER_AVAILABLE:
@@ -967,25 +1336,104 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             language=language,
             file_path=req.file_path,
             source_revision=req.source_revision,
+            workspace_revision=req.workspace_revision,
             chunks=[],
             diagnostics=["treesitter-chunker is unavailable; no replacement evidence was produced"],
             error_tag="ChunkingError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            scan_completeness="PARTIAL_AST_FAILED",
+            scan_failure="treesitter-chunker unavailable",
         )
 
     identity_path_preserved = False
+    scan_failure: Optional[str] = None
     try:
         raw_chunks, identity_path_preserved = _raw_chunk_file(req.source, language, req.file_path)
     except Exception as exc:
         raw_chunks = []
+        scan_failure = f"{type(exc).__name__}: {exc}"
         diagnostics.append(f"ChunkingError: treesitter-chunker extraction failed: {exc}")
+
+    if language == "cpp":
+        existing_include_spans = {
+            (normalized.get("byte_start"), normalized.get("byte_end"), specifier)
+            for raw in raw_chunks
+            for normalized in [normalize_treesitter_chunker_chunk(raw)]
+            for specifier in normalized.get("imports", [])
+        }
+        for include_chunk in _cpp_include_chunks(req.source):
+            normalized = normalize_treesitter_chunker_chunk(include_chunk)
+            for specifier in normalized.get("imports", []):
+                key = (normalized.get("byte_start"), normalized.get("byte_end"), specifier)
+                if key not in existing_include_spans:
+                    raw_chunks.append(include_chunk)
+                    existing_include_spans.add(key)
+
+    if language == "cpp":
+        existing_spans = {
+            (int(normalized.get("byte_start")), int(normalized.get("byte_end")), normalized.get("name"))
+            for raw in raw_chunks
+            for normalized in [normalize_treesitter_chunker_chunk(raw)]
+            if normalized.get("byte_start") is not None
+            and normalized.get("byte_end") is not None
+        }
+        for declaration in legacy._cpp_function_declaration_chunks(req.source):
+            key = (int(declaration.start), int(declaration.end), declaration.symbol)
+            if key in existing_spans:
+                continue
+            raw_chunks.append({
+                "node_type": "function_declaration",
+                "name": declaration.symbol,
+                "byte_start": int(declaration.start),
+                "byte_end": int(declaration.end),
+                "content": req.source.encode("utf-8")[declaration.start:declaration.end],
+                "calls": [],
+                "imports": [],
+                "exports": [],
+                "dependencies": [],
+            })
+            existing_spans.add(key)
 
     if raw_chunks and not identity_path_preserved:
         diagnostics.append(
             "CONSILIENCY_IDENTITY_PATH_UNPROVEN: chunker API rejected identity_path; upstream IDs may be tempfile-affine and are not promotable"
         )
 
+    source_bytes = req.source.encode("utf-8")
+    line_starts = [0]
+    line_starts.extend(index + 1 for index, byte in enumerate(source_bytes) if byte == 0x0A)
     diagnostics.extend(legacy._syntax_diagnostics(req.source, language))
+    syntax_root = None
+    syntax_node_index: dict[str, tuple[list[int], list[Any]]] = {}
+    if legacy.TREE_SITTER_AVAILABLE and legacy.get_parser is not None:
+        try:
+            syntax_root = legacy.get_parser(language).parse(source_bytes).root_node
+            syntax_node_index = _index_syntax_nodes(syntax_root)
+        except Exception:
+            diagnostics.append("Tree-sitter signature and ancestry extraction unavailable")
+    if not raw_chunks and syntax_root is not None and not legacy._fatal_structural_diagnostics(diagnostics):
+        used_tree_sitter_fallback = True
+        response_engine = "tree-sitter-language-pack"
+        response_engine_version = legacy._package_version(
+            "tree-sitter-language-pack",
+            "tree_sitter_language_pack",
+        ) or "unknown"
+        for node in getattr(syntax_root, "children", []):
+            if not getattr(node, "is_named", True):
+                continue
+            start = int(getattr(node, "start_byte", -1))
+            end = int(getattr(node, "end_byte", -1))
+            if start < 0 or end <= start or end > len(source_bytes):
+                continue
+            raw_chunks.append({
+                "node_type": str(getattr(node, "type", "node")),
+                "byte_start": start,
+                "byte_end": end,
+                "content": source_bytes[start:end],
+            })
+        if used_tree_sitter_fallback and not raw_chunks:
+            diagnostics.append("Tree-sitter fallback produced no named root nodes")
+            scan_failure = scan_failure or "NO_STRUCTURAL_CHUNKS"
     evidence_chunks: list[AstEvidenceChunkV2] = []
     dependencies_by_chunk: list[list[str]] = []
 
@@ -1033,11 +1481,23 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
 
         start = max(0, int(start))
         end = max(start, int(end))
-        start_row, start_column = legacy._offset_line_column(req.source, start)
-        end_row, end_column = legacy._offset_line_column(req.source, end)
+        start_row, start_column = _byte_offset_line_column(source_bytes, line_starts, start)
+        end_row, end_column = _byte_offset_line_column(source_bytes, line_starts, end)
         node_type = str(normalized.get("node_type") or "fragment")
-        span_text = req.source.encode("utf-8")[start:end].decode("utf-8", errors="ignore")
+        span_text = source_bytes[start:end].decode("utf-8", errors="ignore")
         kind_node_type = _declarator_kind_override(node_type, span_text) or node_type
+        if node_type == "preproc_include":
+            kind_node_type = "import_directive"
+        signature_text, syntax_ancestry = (None, [])
+        if syntax_root is not None:
+            signature_text, syntax_ancestry = _syntax_signature_and_ancestry(
+                source_bytes,
+                syntax_node_index,
+                node_type,
+                start,
+                end,
+                _structural_symbol_name(normalized.get("name")),
+            )
 
         evidence_chunks.append(
             AstEvidenceChunkV2(
@@ -1050,6 +1510,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 name=_structural_symbol_name(normalized.get("name")),
                 parent_route=list(normalized.get("parent_route") or []),
                 parent_context=normalized.get("parent_context"),
+                signature_text=signature_text,
+                syntax_ancestry=syntax_ancestry,
                 start_byte=start,
                 end_byte=end,
                 start_line=start_row,
@@ -1064,7 +1526,9 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         dependencies_by_chunk.append(list(normalized.get("dependencies") or []))
 
     if not evidence_chunks:
-        diagnostics.append("treesitter-chunker returned no structural chunks")
+        if not used_tree_sitter_fallback:
+            diagnostics.append("treesitter-chunker returned no structural chunks")
+            scan_failure = scan_failure or "NO_STRUCTURAL_CHUNKS"
 
     edges: list[legacy.AstEvidenceEdge] = []
     seen_edges: set[tuple[str, str, str, int]] = set()
@@ -1081,6 +1545,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         resolved: bool,
         resolution: str,
         occurrence_map: dict[str, list[tuple[int, int]]] | None = None,
+        occurrence_byte_spans: dict[str, list[tuple[int, int]]] | None = None,
     ) -> None:
         candidate = (source_key, target_key, edge_type, chunk.start_line)
         if candidate in seen_edges:
@@ -1112,6 +1577,11 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 resolved=resolved,
                 resolution=resolution,
                 occurrence_positions=occurrence_positions,
+                occurrence_byte_spans=(
+                    [[chunk.start_byte + start, chunk.start_byte + end] for start, end in occurrence_byte_spans.get(target_key, [])]
+                    if occurrence_byte_spans is not None and edge_type == "CALLS"
+                    else None
+                ),
             )
         )
 
@@ -1128,18 +1598,27 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         # occurrence_positions=None exactly as it did before this change.
         chunk_names = [*chunk.imports, *chunk.exports, *chunk.calls, *chunk_deps]
         occurrence_map: dict[str, list[tuple[int, int]]] = {}
+        call_span_map: dict[str, list[tuple[int, int]]] = {}
         if chunk_names:
             try:
-                chunk_text = source_utf8_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8", errors="ignore")
+                chunk_text = source_utf8_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8")
                 occurrence_map = find_occurrence_positions(chunk_text, language, chunk_names)
+                call_span_map = find_call_expression_byte_spans(chunk_text, language, chunk.calls)
             except Exception:
                 occurrence_map = {}
+                call_span_map = {}
         for value in chunk.imports:
             add_edge(file_key, value, "IMPORTS", chunk, resolved=False, resolution="syntax_only", occurrence_map=occurrence_map)
         for value in chunk.exports:
             add_edge(file_key, value, "EXPORTS", chunk, resolved=False, resolution="syntax_only", occurrence_map=occurrence_map)
         for value in chunk.calls:
-            add_edge(source_key, value, "CALLS", chunk, resolved=False, resolution="unresolved_target", occurrence_map=occurrence_map)
+            add_edge(
+                source_key, value, "CALLS", chunk,
+                resolved=False,
+                resolution="unresolved_target",
+                occurrence_map=occurrence_map,
+                occurrence_byte_spans=call_span_map,
+            )
         for value in chunk_deps:
             add_edge(source_key, value, "REFERENCES", chunk, resolved=False, resolution="unresolved_target", occurrence_map=occurrence_map)
 
@@ -1148,19 +1627,27 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         edges.extend(fallback_edges)
         diagnostics.extend(edge_diagnostics)
 
+    span_issues = validate_ast_evidence_byte_spans(evidence_chunks, req.source.encode("utf-8"))
+    if span_issues:
+        diagnostics.append(f"ChunkingError: AST_SPAN_VALIDATION_FAILED:{span_issues[:8]}")
+
     fatal_diagnostics = legacy._fatal_structural_diagnostics(diagnostics)
     return AstEvidenceResponseV2(
         schema="atlas.ast.evidence.v1",
-        engine="treesitter-chunker",
-        engine_version=engine_version,
+        engine=response_engine,
+        engine_version=response_engine_version,
         language=language,
         file_path=req.file_path,
         source_revision=req.source_revision,
+        workspace_revision=req.workspace_revision,
         chunks=evidence_chunks,
         edges=edges,
         diagnostics=diagnostics,
         error_tag="ChunkingError" if fatal_diagnostics else None,
         syntax_status="RECOVERED_WITH_ERRORS" if fatal_diagnostics else "CLEAN",
+        scan_completeness="PARTIAL_AST_FAILED" if scan_failure else "COMPLETE",
+        scan_failure=scan_failure,
+        parser_observation=_parser_observation(syntax_root, syntax_node_index, source_bytes),
     )
 
 
@@ -1168,6 +1655,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
 def health() -> dict[str, Any]:
     result = dict(legacy.health())
     result["contract"] = "provenance-v2"
+    result["processId"] = os.getpid()
+    result["processStartedMonotonicNs"] = _PROCESS_STARTED_MONOTONIC_NS
     grounded_parameters = inspect.signature(_native_grounded_extractions).parameters
     result["runtimeSourceBindings"] = {
         "modules": {
@@ -1182,6 +1671,109 @@ def health() -> dict[str, Any]:
     return result
 
 
+@app.post("/ontology/oaklib/candidates", response_model=OaklibCandidateResponseV1)
+def oaklib_candidates(req: OaklibCandidateRequestV1) -> OaklibCandidateResponseV1:
+    subjects = [value.strip() for value in req.external_ids]
+    if any(not value or len(value) > 256 or any(ord(char) < 32 for char in value) for value in subjects):
+        raise HTTPException(status_code=422, detail="OAKLIB_EXTERNAL_ID_INVALID")
+    if len(set(subjects)) != len(subjects):
+        raise HTTPException(status_code=422, detail="OAKLIB_EXTERNAL_IDS_DUPLICATED")
+
+    resource, ontology_revision = _configured_oaklib_resource()
+    producer_revision = f"miniforge-nlp-sidecar-v2:sha256:{_RUNTIME_MODULE_SHA256}"
+    try:
+        candidates = _load_oaklib_candidates(
+            resource_selector=str(resource),
+            subjects=subjects,
+            ontology_revision=ontology_revision,
+            producer_revision=producer_revision,
+        )
+    except ImportError:
+        raise HTTPException(status_code=503, detail="OAKLIB_DEPENDENCY_UNAVAILABLE") from None
+    except Exception as exc:
+        logging.getLogger(__name__).warning("OAKLIB candidate read failed: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_CANDIDATE_READ_UNAVAILABLE") from None
+
+    return OaklibCandidateResponseV1(
+        schema="atlas.oaklib-candidate-response.v1",
+        status="PROPOSAL_ONLY",
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        candidates=candidates,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
+@app.post("/ontology/oaklib/search", response_model=OaklibLabelSearchResponseV1)
+def oaklib_label_search(req: OaklibLabelSearchRequestV1) -> OaklibLabelSearchResponseV1:
+    terms = [value.strip() for value in req.terms]
+    if any(not value or len(value) > 256 or any(ord(char) < 32 for char in value) for value in terms):
+        raise HTTPException(status_code=422, detail="OAKLIB_SEARCH_TERM_INVALID")
+
+    resource, ontology_revision = _configured_oaklib_resource()
+    producer_revision = f"miniforge-nlp-sidecar-v2:sha256:{_RUNTIME_MODULE_SHA256}"
+    try:
+        result = _search_oaklib_labels(
+            resource_selector=str(resource),
+            terms=terms,
+            ontology_revision=ontology_revision,
+            producer_revision=producer_revision,
+            max_candidates_per_term=req.max_candidates_per_term,
+        )
+    except ImportError:
+        raise HTTPException(status_code=503, detail="OAKLIB_DEPENDENCY_UNAVAILABLE") from None
+    except Exception as exc:
+        logging.getLogger(__name__).warning("OAKLIB label search refused: %s", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="OAKLIB_LABEL_SEARCH_UNAVAILABLE") from None
+
+    matches = result.pop("matches", [])
+    return OaklibLabelSearchResponseV1(
+        schema="atlas.oaklib-label-search-response.v1",
+        status="PROPOSAL_ONLY",
+        ontology_revision=ontology_revision,
+        producer_revision=producer_revision,
+        matches=matches,
+        candidate_bundle=result,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
+class DomainCandidateBindRequestV1(BaseModel):
+    schema_: Optional[str] = Field(default=None, alias="schema")
+    packetKey: Optional[str] = None
+    sourceRef: str = Field(min_length=1)
+    sourceRevision: Optional[str] = None
+    featureLabel: Optional[str] = None
+    textEvidence: str = ""
+    selectionSignalDomain: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
+
+
+class DomainCandidateBindResponseV1(BaseModel):
+    schema_: Literal["atlas.domain-calibration-bound-candidate.v1"] = Field(
+        alias="schema", default="atlas.domain-calibration-bound-candidate.v1"
+    )
+    candidate: dict[str, Any]
+    canonical_authority: Literal[False] = Field(default=False, alias="canonicalAuthority")
+    writes_performed: Literal[False] = Field(default=False, alias="writesPerformed")
+
+    model_config = {"populate_by_name": True}
+
+
+@app.post("/domain/candidate/bind", response_model=DomainCandidateBindResponseV1)
+def bind_domain_candidate(req: DomainCandidateBindRequestV1) -> DomainCandidateBindResponseV1:
+    workspace_root = Path(os.getenv("WORKSPACE_ROOT", "."))
+    bound = bind_candidate_record(req.model_dump(by_alias=True), workspace_root)
+    return DomainCandidateBindResponseV1(
+        candidate=bound,
+        canonical_authority=False,
+        writes_performed=False,
+    )
+
+
 @app.get("/capabilities")
 def capabilities() -> dict[str, Any]:
     result = dict(legacy.capabilities())
@@ -1192,12 +1784,59 @@ def capabilities() -> dict[str, Any]:
         "langextractAlignmentStatus": True,
         "canonicalIdentityAuthority": False,
     }
+    result["domainCandidateBinding"] = {
+        "endpoint": "/domain/candidate/bind",
+        "helper": "atlas_domain_candidate_helper_v1",
+        "status": "AVAILABLE",
+        "schema": "atlas.domain-calibration-example.v1",
+        "sourceRevisionRequired": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    result["ontologyCandidateResolution"] = {
+        "endpoint": "/ontology/oaklib/candidates",
+        "status": "OPTIONAL_LOCAL_SOURCE_REQUIRED",
+        "requestSchema": "atlas.oaklib-candidate-request.v1",
+        "responseSchema": "atlas.oaklib-candidate-response.v1",
+        "proposalOnly": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
+    result["ontologyLabelSearch"] = {
+        "endpoint": "/ontology/oaklib/search",
+        "status": "OPTIONAL_LOCAL_SOURCE_REQUIRED",
+        "requestSchema": "atlas.oaklib-label-search-request.v1",
+        "responseSchema": "atlas.oaklib-label-search-response.v1",
+        "proposalOnly": True,
+        "canonicalAuthority": False,
+        "writesPerformed": False,
+    }
     return result
 
 
 @app.post("/ast/chunk", response_model=AstEvidenceResponseV2)
-def ast_chunk(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
-    return _native_ast_evidence(req)
+def ast_chunk(
+    req: legacy.AstChunkRequest,
+    include_helpers: Annotated[bool, Query(alias="includeHelpers")] = False,
+    include_tensor_features: Annotated[bool, Query(alias="includeTensorFeatures")] = False,
+    max_helper_chunks: Annotated[int, Query(alias="maxHelperChunks", ge=1, le=512)] = 256,
+) -> AstEvidenceResponseV2:
+    if not _source_revision_is_consistent(req.source, req.source_revision):
+        raise HTTPException(status_code=422, detail="SOURCE_REVISION_MISMATCH")
+    response = _native_ast_evidence(req)
+    if include_helpers or include_tensor_features:
+        response.helper_analysis = build_ast_chunk_helper_analysis_v1(
+            source=req.source,
+            file_path=req.file_path,
+            language=req.language,
+            source_ref=req.source_ref,
+            source_revision=req.source_revision,
+            workspace_revision=req.workspace_revision,
+            chunks=response.chunks,
+            include_tensor_features=include_tensor_features,
+            max_chunks=max_helper_chunks,
+        )
+    return response
 
 
 @app.post("/analyze", response_model=legacy.AnalyzeResponse)
@@ -1250,6 +1889,7 @@ def extract_documentation_facts(req: DocumentationFactRequestV1) -> Documentatio
                     "alignmentStatus": "MATCH_EXACT",
                 },
                 confidence=item["confidence"],
+                customAttributes=item.get("custom_attributes", {}),
             ))
             continue
         alignment_summary["MATCH_EXACT"] = alignment_summary.get("MATCH_EXACT", 0) + 1
@@ -1267,6 +1907,7 @@ def extract_documentation_facts(req: DocumentationFactRequestV1) -> Documentatio
             endByte=item["end_byte"],
             productVersion=req.product_version,
             confidence=item["confidence"],
+            customAttributes=item.get("custom_attributes", {}),
         ))
     selected_model = req.model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
     normalized_output = {"facts": [fact.model_dump(by_alias=True) for fact in facts], "apiRules": [rule.model_dump(by_alias=True) for rule in api_rules]}

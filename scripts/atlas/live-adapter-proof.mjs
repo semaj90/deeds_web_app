@@ -288,7 +288,7 @@ class LiveAdapterProof {
         [
           scenario_hash,
           pipeline_key,
-          'gemma4-legal-iq4xs',
+          'ornith-1.5-9b',
           'v1.0',
           'v1.0',
           crypto.createHash('sha256').update('').digest('hex'),

@@ -30,7 +30,6 @@ const WASM_BINARIES = [
 ] as const;
 
 const MODEL_DIRS = {
-	gemma270m: resolve('static/gemma3_270m_onnx'),
 	embeddinggemma: resolve('static/embeddinggemma_300m_onnx')
 } as const;
 

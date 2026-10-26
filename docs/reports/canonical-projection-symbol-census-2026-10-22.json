@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.canonical-projection-symbol-census.v1",
+  "generatedAt": "2026-10-22T17:27:18.312Z",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "readOnly": true,
+  "datastoreWritesPerformed": false,
+  "supportedAdmittedSourceRefs": 20744,
+  "classes": {
+    "EXACT_PROCESSED": 18881,
+    "EXACT_UNPROCESSED": 704,
+    "EXACT_PARSE_FAILED": 4,
+    "NO_EXACT_REVISION_ROW": 539,
+    "NO_GRAPHIFY_ROW": 616
+  },
+  "disjointnessCheck": "each supported ref falls into exactly one class; 704 pending and 1155 missing are disjoint",
+  "missingReferenceCount": 1155,
+  "graphifyFiles": {
+    "rows": 26014,
+    "distinctSourceRefs": 25643,
+    "distinctCodeSourceRevisions": 25177
+  },
+  "graphifyWorkspaceRevisionsTop": [
+    {
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "rows": 23758
+    },
+    {
+      "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+      "rows": 2180
+    }
+  ],
+  "pendingByExtension": {
+    "ts": 403,
+    "mjs": 180,
+    "md": 72,
+    "mts": 30,
+    "json": 15,
+    "js": 4
+  },
+  "missingNoRowByExtension": {
+    "ts": 283,
+    "mjs": 169,
+    "md": 113,
+    "mts": 35,
+    "json": 16
+  },
+  "parseFailedExact": [
+    {
+      "sourceRef": "packages/atlas-duckdb/src/redis-centroid-config.json",
+      "reason": "JSON_PARSE_FAILED",
+      "cause": "malformed JSON (Expected , or })"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/.vscode/tasks.json",
+      "reason": "JSON_PARSE_FAILED",
+      "cause": "JSONC comments not accepted by strict JSON parser"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/PACKAGE_SCRIPTS_SNIPPET.json",
+      "reason": "SOURCE_TEXT_ENVELOPE_OFFSET_SPLITS_SURROGATE",
+      "cause": "extractor defect in source-text-envelope offset handling, not bad content"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/tsconfig.frontend.json",
+      "reason": "JSON_PARSE_FAILED",
+      "cause": "JSONC comments not accepted by strict JSON parser"
+    }
+  ],
+  "rootCauses": {
+    "pending704": "exact-revision rows exist but were never extracted (parse_status UNPROCESSED); extraction needs --apply, which is gated",
+    "missing1155": "no graphify_files row at the admitted workspace revision; stored rows come from older Graphify workspace revisions; needs a Graphify run at the admitted revision, which the continuation plan forbids"
+  },
+  "queryFile": ".tmp/atlas/symbol-census.sql",
+  "correctionNote": "v1 listed parseFailedExact from a global PARSE_FAILED sample; corrected from the supported cohort query (see .tmp/atlas/pf.sql)",
+  "receiptChecksum": "sha256:6da714d2896159687010c96c35bccd39fd1fbe05a730669f26dc148a9f3facc7"
+}

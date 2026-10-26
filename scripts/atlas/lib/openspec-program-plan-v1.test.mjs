@@ -100,14 +100,17 @@ test('work packages never mix mutation class or readiness gate and retain wave m
     { taskKey: 'x:3', change: 'x', line: 3, mutationClass: 'CODE_ONLY', gateState: 'READY', ...base, program: { ...base.program, wave: 3 } },
   ];
   const packages = buildProgramWorkPackages(rows);
-  assert.equal(packages.length, 2);
+  assert.equal(packages.length, 3);
   assert.ok(packages.every((item) => item.taskKeys.length > 0 && item.taskCount <= 10));
   assert.ok(packages.every((item) => item.taskKeys.every((key) => rows.find((row) => row.taskKey === key).mutationClass === item.mutationClass)));
   assert.ok(packages.every((item) => item.taskKeys.every((key) => rows.find((row) => row.taskKey === key).gateState === item.gateState)));
-  const codePackage = packages.find((item) => item.mutationClass === 'CODE_ONLY');
-  assert.deepEqual(codePackage.waveIds, [2, 3]);
-  assert.equal(codePackage.wave, null);
-  assert.equal(codePackage.dependsOn.length, 0);
+  const waveTwoPackage = packages.find((item) => item.taskKeys.includes('x:1'));
+  const waveThreePackage = packages.find((item) => item.taskKeys.includes('x:3'));
+  assert.deepEqual(waveTwoPackage.waveIds, [2]);
+  assert.deepEqual(waveThreePackage.waveIds, [3]);
+  assert.equal(waveTwoPackage.wave, 2);
+  assert.equal(waveThreePackage.wave, 3);
+  assert.equal(waveThreePackage.dependsOn.length, 0);
 });
 
 test('package feasibility reports lower bound without relaxing boundaries or selecting tasks', () => {

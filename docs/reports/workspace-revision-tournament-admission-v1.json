@@ -1,16 +1,23 @@
 {
   "schema": "atlas.workspace-revision-tournament-admission.v1",
-  "generatedAt": "2026-09-15T01:04:38.272Z",
+  "generatedAt": "2026-10-25T15:40:26.793Z",
   "mode": "EXPLICIT_BOUNDED_ADMISSION_RECEIPT",
   "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
   "proofLevel": "BOUNDED_LIVE_PROVEN",
   "authority": true,
-  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-  "sourceCount": 25542,
-  "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
-  "snapshotMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
-  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+  "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+  "snapshotRevision": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
+  "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+  "snapshotSourceCount": 30327,
+  "sourceCount": 30105,
+  "sourceSelectionChecksum": "sha256:7c0c36d079a4a115e0157d2db53d1429f2a5805301bc1d35998bbb1773643131",
+  "sourceInventoryRevision": "atlas.canonical-source-inventory-hygiene-policy.2026-10-12.v2",
+  "sourceInventoryChecksum": "sha256:f29251a2737d492973b16e959b539b910743f85689ee87f49f352baf8ad88264",
+  "sourceInventoryWriterRevisionChecksum": "sha256:961de84e84d2576810b0c974a665af82be9b7f92ffd76b69f00d40ab6281006a",
+  "snapshotMembershipChecksum": "sha256:5dd39938beddee3908f0dd06fe338ea07c98980a27c750a9cb7e01a555697889",
+  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258.json",
+  "manifestSha256": "sha256:7f4658089c22b07218e0abcd2bae67d0b98e4b6b384d73242530d54fc3cff867",
+  "validationReceiptSha256": "sha256:f364f0a19aca06930e7b92ab9db0fafd818b6b4b72d58df2ea46e2ea04e60d15",
   "approval": {
     "confirmation": "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1",
     "scope": "TOURNAMENT_SOURCE_AUTHORITY_ONLY"
@@ -21,6 +28,6 @@
   "training": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
-  "preflightPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-tournament-source-authority-recheck-v4.json",
+  "preflightPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\workspace-snapshot-scratch-v1\\scratch-snapshot-20261025T102126Z\\source-authority-preflight.json",
   "nextGate": "GRAPHIFY-BOUNDED-TOURNAMENT-CANARY-01"
 }

@@ -75,6 +75,9 @@ export const POST: RequestHandler = async (event) => {
 			const rabbitmqUrl = ENV.RABBITMQ_URL;
 
 			const connection = await amqp.connect(rabbitmqUrl);
+			connection.on('error', (error: unknown) => {
+				console.error('[autotag-trigger] RabbitMQ connection error (handled):', error instanceof Error ? error.message : error);
+			});
 			const channel = await connection.createChannel();
 
 			const exchangeName = 'deeds.evidence';

@@ -78,12 +78,18 @@ type FeatureCore = Omit<
 	| 'lineageQualified'
 >;
 
-function detectLang(hint?: string): SgLang {
-	const h = (hint ?? '').toLowerCase();
-	if (h.includes('tsx')) return 'Tsx';
-	if (h.includes('jsx')) return 'Jsx';
-	if (h.includes('js') && !h.includes('ts')) return 'JavaScript';
-	return 'TypeScript';
+function detectLang(hint?: string): SgLang | null {
+	const value = (hint ?? '').trim().toLowerCase();
+	const extension = value.match(/\.[^./\\]+$/)?.[0];
+	if (['tsx', 'typescriptreact'].includes(value) || extension === '.tsx') return 'Tsx';
+	if (['jsx', 'javascriptreact'].includes(value) || extension === '.jsx') return 'Jsx';
+	if (['javascript', 'js', '.js', '.mjs', '.cjs'].includes(value) || ['.js', '.mjs', '.cjs'].includes(extension ?? '')) {
+		return 'JavaScript';
+	}
+	if (['typescript', 'ts', '.ts', '.mts', '.cts'].includes(value) || ['.ts', '.mts', '.cts'].includes(extension ?? '')) {
+		return 'TypeScript';
+	}
+	return null;
 }
 
 function nodeRange(node: SgNode, sourceText: string): { lineNumber: number; byteStart: number; byteEnd: number } {
@@ -167,17 +173,14 @@ export async function extractAstFeatures(
 	langHint?: string,
 	context?: AstObservationInputV1,
 ): Promise<ExtractedFeature[]> {
-	const { parse } = await import('@ast-grep/napi');
 	const lang = detectLang(langHint);
+	if (lang === null) return [];
+	const { parse } = await import('@ast-grep/napi');
 	let root: ReturnType<typeof parse>;
 	try {
 		root = parse(lang, code);
 	} catch {
-		try {
-			root = parse('TypeScript', code);
-		} catch {
-			return [];
-		}
+		return [];
 	}
 
 	const features: ExtractedFeature[] = [];

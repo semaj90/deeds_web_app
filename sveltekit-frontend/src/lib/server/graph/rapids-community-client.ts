@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 import {
 	CUGRAPH_LEIDEN_26_06,
 	CUGRAPH_LOUVAIN_26_06,
@@ -7,6 +8,8 @@ import {
 } from './community-snapshot-v1.js';
 
 const finitePositive = z.number().finite().positive();
+export const RAPIDS_COMMUNITY_MAX_NODES = 200_000;
+export const RAPIDS_COMMUNITY_MAX_EDGES = 1_000_000;
 
 const CommunityPartitionResponseSchema = z.object({
 	schema: z.literal('atlas.community-partition-response.v1'),
@@ -57,7 +60,33 @@ export interface RunRapidsCommunityInputV1 {
 }
 
 export async function runRapidsCommunityV1(input: RunRapidsCommunityInputV1): Promise<RapidsCommunityPartitionResponseV1> {
-	const baseUrl = (input.baseUrl ?? process.env.ATLAS_RAPIDS_COMMUNITY_URL ?? 'http://127.0.0.1:8099').replace(/\/$/, '');
+	if (input.nodes.length === 0 || input.nodes.length > RAPIDS_COMMUNITY_MAX_NODES) {
+		throw new Error('RAPIDS_COMMUNITY_NODE_COUNT_OUT_OF_BOUNDS');
+	}
+	if (input.edges.length > RAPIDS_COMMUNITY_MAX_EDGES) {
+		throw new Error('RAPIDS_COMMUNITY_EDGE_COUNT_OUT_OF_BOUNDS');
+	}
+	const nodeIds = input.nodes.map(({ nodeId }) => nodeId);
+	const nodeIdSet = new Set(nodeIds);
+	if (nodeIds.some((nodeId) => !nodeId.trim() || nodeId !== nodeId.trim()) || nodeIdSet.size !== nodeIds.length) {
+		throw new Error('RAPIDS_COMMUNITY_NODE_IDS_INVALID');
+	}
+	for (const edge of input.edges) {
+		if (!nodeIdSet.has(edge.source) || !nodeIdSet.has(edge.target) || edge.source === edge.target) {
+			throw new Error('RAPIDS_COMMUNITY_EDGE_IDENTITY_INVALID');
+		}
+		finitePositive.parse(edge.weight);
+	}
+	if (![input.graphRevision, input.topologyHash, input.projectionRevision].every((value) => value.trim())) {
+		throw new Error('RAPIDS_COMMUNITY_REVISION_REQUIRED');
+	}
+	const configuredBaseUrl = input.baseUrl ?? ENV.ATLAS_RAPIDS_COMMUNITY_URL;
+	if (!configuredBaseUrl?.trim()) throw new Error('ATLAS_RAPIDS_COMMUNITY_URL_REQUIRED');
+	const parsedBaseUrl = new URL(configuredBaseUrl);
+	if (parsedBaseUrl.protocol !== 'http:' && parsedBaseUrl.protocol !== 'https:') {
+		throw new Error('ATLAS_RAPIDS_COMMUNITY_URL_INVALID_PROTOCOL');
+	}
+	const baseUrl = parsedBaseUrl.toString().replace(/\/$/, '');
 	const endpoint = input.algorithm === 'leiden' ? 'leiden' : 'louvain';
 	const payload = {
 		schema: 'atlas.community-partition-request.v1',
@@ -82,7 +111,39 @@ export async function runRapidsCommunityV1(input: RunRapidsCommunityInputV1): Pr
 		signal: AbortSignal.timeout(input.timeoutMs ?? 120_000),
 	});
 	if (!response.ok) throw new Error(`RAPIDS community sidecar ${response.status}: ${await response.text()}`);
-	return CommunityPartitionResponseSchema.parse(await response.json());
+	const result = CommunityPartitionResponseSchema.parse(await response.json());
+	const expectedAlgorithmId = input.algorithm === 'leiden' ? CUGRAPH_LEIDEN_26_06 : CUGRAPH_LOUVAIN_26_06;
+	if (
+		result.graphRevision !== input.graphRevision ||
+		result.topologyHash !== input.topologyHash ||
+		result.projectionRevision !== input.projectionRevision ||
+		result.algorithmId !== expectedAlgorithmId
+	) {
+		throw new Error('RAPIDS_COMMUNITY_RESPONSE_SNAPSHOT_MISMATCH');
+	}
+	const assignedNodeIds = result.assignments.map(({ nodeId }) => nodeId);
+	const partitionMemberIds = result.communities.flatMap(({ memberNodeIds }) => memberNodeIds);
+	const assignmentByNodeId = new Map(result.assignments.map((assignment) => [assignment.nodeId, assignment]));
+	const communityOrdinals = result.communities.map(({ communityOrdinal }) => communityOrdinal);
+	const membershipMismatch = result.communities.some((community) => community.memberNodeIds.some((nodeId) => {
+		const assignment = assignmentByNodeId.get(nodeId);
+		return !assignment || assignment.communityOrdinal !== community.communityOrdinal ||
+			assignment.communityFingerprint !== community.communityFingerprint;
+	}));
+	if (
+		result.algorithm !== input.algorithm ||
+		assignedNodeIds.length !== nodeIds.length ||
+		new Set(assignedNodeIds).size !== assignedNodeIds.length ||
+		assignedNodeIds.some((nodeId) => !nodeIdSet.has(nodeId)) ||
+		partitionMemberIds.length !== nodeIds.length ||
+		new Set(partitionMemberIds).size !== partitionMemberIds.length ||
+		partitionMemberIds.some((nodeId) => !nodeIdSet.has(nodeId)) ||
+		membershipMismatch ||
+		new Set(communityOrdinals).size !== communityOrdinals.length
+	) {
+		throw new Error('RAPIDS_COMMUNITY_RESPONSE_MEMBERSHIP_MISMATCH');
+	}
+	return result;
 }
 
 export function rapidsCommunityResponseToSnapshotV1(input: {

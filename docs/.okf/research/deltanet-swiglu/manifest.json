@@ -1,0 +1,24 @@
+{
+  "schema_version": "okf.dev.manifest.v1",
+  "description": "Bounded primary-paper corpus distinguishing DeltaNet attention from SwiGLU feed-forward activation.",
+  "sources": [
+    {
+      "source_id": "deltanet-swiglu-primary-papers",
+      "title": "DeltaNet and SwiGLU Primary Papers",
+      "kind": "research_papers",
+      "domain_class": "documentation",
+      "focus_tags": ["deltanet", "swiglu", "attention_architecture", "feed_forward_activation", "model_boundary"],
+      "preferred_fetcher": "FIRECRAWL",
+      "pages": [
+        "https://arxiv.org/abs/2412.06464",
+        "https://arxiv.org/abs/2002.05202"
+      ],
+      "source_metadata": {
+        "authority": "primary_paper_landing_pages",
+        "admission": "REFERENCE_ONLY",
+        "license_review": "REQUIRED_BEFORE_REPUBLICATION",
+        "purpose": "Verify architecture terminology and keep model-internal mechanisms separate from Parent Atlas retrieval contracts."
+      }
+    }
+  ]
+}

@@ -9,7 +9,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -230,7 +230,7 @@ export async function* streamRAGResponse(
 
 		let embedding: number[] = [];
 		try {
-			const embeddingResponse = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+			const embeddingResponse = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 	body: JSON.stringify({

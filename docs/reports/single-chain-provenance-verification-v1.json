@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.single-chain-provenance-verification.v1",
+  "verifiedAt": "2026-10-20T22:18:45.020Z",
+  "chain": {
+    "step1_sourceContent": {
+      "path": "src/routes/api/admin/knowledge/+server.ts",
+      "bytes": 3837,
+      "sha256": "sha256:bb7658b7e7cb30d009eaf43e6c6b71ef234388b4797a689c66efc108458a4d81"
+    },
+    "step2_sourceRevision": {
+      "diskMatchesOrf": true,
+      "diskMatchesGraphify": true,
+      "sourceRevision": "sha256:bb7658b7e7cb30d009eaf43e6c6b71ef234388b4797a689c66efc108458a4d81"
+    },
+    "step3_canonicalChunk": {
+      "id": "04db8e47-0c29-4211-830d-d7c7ff0bfe18",
+      "chunkId": "card:src/routes/api/admin/knowledge/+server.ts:47ed45bf5b8f0420",
+      "qdrantId": "2ab9035f-7a8f-2328-9ae0-17d1b44e8eda"
+    },
+    "step4_embeddingRecipe": {
+      "model": "embeddinggemma:latest:eg-task-prefix-v1",
+      "version": "e1058505985ae5dba56dc72b5794e424bf64f23fb1d877c7795884191236459f",
+      "dim": 768,
+      "l2Norm": 1.0
+    },
+    "step5_packetKey": "ace:packet:47172f2a06fc",
+    "step6_orfLineage": {
+      "sourceRevision": "sha256:bb7658b7e7cb30d009eaf43e6c6b71ef234388b4797a689c66efc108458a4d81",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "representationRevision": "semantic_768:canonical:v1",
+      "registryRevision": "proposal:sha256:0aecb825dbc194976c3e3ec261457863f92e05250e1ce3c0c6e3039aec26c73f"
+    },
+    "step7_qdrantIdentity": {
+      "pointId": "2ab9035f-7a8f-2328-9ae0-17d1b44e8eda",
+      "foundInCollection": false,
+      "payloadSourceRef": null
+    },
+    "step8_admittedWorkspaceRevisionKey": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb"
+  },
+  "chainIntact": false,
+  "blockingReasons": [
+    "QDRANT_POINT_MISSING"
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -26,7 +26,7 @@
  *   --no-graph          Skip 4D hyperedge topology lookup
  *   --no-agent          Skip Gemma4 agent summarization pass
  *   --dry-run           Print plan to stdout, skip writing file
- *   --turbo             Route Gemma4 inference through TurboQuant :8090
+ *   --turbo             Route inference through llama-server :8090 (Ornith 1.5)
  *   --require-inference Abort if no LLM backend is reachable
  *   --limit N           Max directories to audit in detail (default: 30)
  *   --write-map         After audit, regenerate docs/CODEBASE_DIRECTORY_MAP.md
@@ -110,22 +110,15 @@ async function postJson(url, body, extra = {}) {
 }
 
 // ── Direct LLM call (no dev server, no /api/ai/agent) ────────────────────────
-// Tries TurboQuant (:8090 OpenAI-compat) then Ollama (:11434) directly.
+// Calls llama-server (:8090 OpenAI-compat) directly. Ollama is embeddings-only; no chat fallback.
 async function directLLMCall(prompt, { timeoutMs = 60_000 } = {}) {
   const backends = [
     {
       name: 'turboquant',
       healthUrl: `${TURBO_URL}/health`,
       url: `${TURBO_URL}/v1/chat/completions`,
-      body: (p) => ({ model: 'gemma4-rotorquant:latest', messages: [{ role: 'user', content: p }], max_tokens: 1024, temperature: 0.3 }),
+      body: (p) => ({ model: 'ornith-1.5-9b', messages: [{ role: 'user', content: p }], max_tokens: 1024, temperature: 0.3 }),
       extract: (d) => d?.choices?.[0]?.message?.content,
-    },
-    {
-      name: 'ollama',
-      healthUrl: `http://localhost:11434/api/tags`,
-      url: `http://localhost:11434/api/chat`,
-      body: (p) => ({ model: 'gemma4-rotorquant:latest', messages: [{ role: 'user', content: p }], stream: false }),
-      extract: (d) => d?.message?.content,
     },
   ];
   for (const b of backends) {
@@ -450,7 +443,7 @@ async function agentSummarize(dirs) {
   let answer = null;
 
   if (USE_DIRECT) {
-    // --direct: call TurboQuant or Ollama directly — no /api/ai/agent, no dev server, no SvelteKit 120s timeout
+    // --direct: call llama-server (:8090) directly — no /api/ai/agent, no dev server, no SvelteKit 120s timeout
     const result = await directLLMCall(prompt, { timeoutMs: 60_000 });
     answer = result?.answer ?? null;
     const ms2 = Date.now() - t0;
@@ -608,7 +601,7 @@ npm run check:ts7 && npm run check
 
 ## Gemma4 Agent Recommendations
 
-${agentSummary ?? '_Agent not available — run with Ollama :11434 or --turbo for AI recommendations_'}
+${agentSummary ?? '_Agent not available — run with llama-server :8090 (--turbo) for AI recommendations_'}
 
 ## Semantic Context (ACE / Qdrant)
 

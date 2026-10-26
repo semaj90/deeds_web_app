@@ -19,7 +19,7 @@
 import { z } from 'zod';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint, ollamaFetch, VLM_MODELS } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, embedOrChatFetch, VLM_MODELS } from '$lib/server/ollama.js';
 
 // ── Tool Definitions (OpenAI-compatible format for llama-server) ─────
 
@@ -285,7 +285,7 @@ export async function executeAuditTool(
         const limit = Number(args.limit ?? 10);
 
         // embed the query
-        const embedRes = await ollamaFetch(`${getOllamaEndpoint()}/api/embed`, {
+        const embedRes = await embedOrChatFetch(`${getOllamaEndpoint()}/api/embed`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ model: VLM_MODELS.embedding, input: query }),

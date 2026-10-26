@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.goal-progress.v1",
+  "goalStatus": "ACTIVE_PARTIAL",
+  "previousGoalTurnClassification": "PROGRESS",
+  "likely_cause": "Codec boundaries were unmeasured in the real retrieval client, and its retrieval proto could not resolve the existing shared_ids.proto import without the repository proto include directory.",
+  "evidence": [
+    { "command": "npx vitest run src/lib/server/grpc/transport-telemetry.spec.ts src/lib/server/grpc/retrieval-client.transport.spec.ts src/lib/server/grpc/retrieval-client.test.ts src/lib/server/telemetry/packet-centric-telemetry.spec.ts src/lib/server/telemetry/ace-telemetry-emitter.spec.ts --environment node --maxWorkers=1 --minWorkers=1", "cwd": "sveltekit-frontend", "result": "5 files / 15 tests passed", "log": "docs/reports/retrieval-transport-final-20261015T205906.txt" },
+    { "receipt": "docs/reports/retrieval-transport-loopback-2026-10-16T04-00-01-535Z.json", "result": "LOOPBACK_TRANSPORT_PROVEN", "operations": ["searchChunks", "searchChunks", "/search/codebase"], "scope": "Actual grpc-js/protobuf and HTTP JSON against temporary loopback fixtures through the existing retrieval client; not deployed production endpoint proof" },
+    { "result": "Focused strict TypeScript check of transport-telemetry.ts and its unit spec passed; full application typecheck was not run" }
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/grpc/transport-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/grpc/transport-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.transport.spec.ts",
+    "docs/architecture/retrieval-transport-codec-telemetry-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "preservedExistingChanges": "The pre-existing uncommitted Ornith model-label change in retrieval-client.ts was inspected and preserved.",
+  "safe_next_command": "Review deployed retrieval service configuration and source-qualified candidate prerequisites before a production endpoint replay; do not enable source-revision writes.",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/grpc/transport-telemetry.spec.ts src/lib/server/grpc/retrieval-client.transport.spec.ts src/lib/server/grpc/retrieval-client.test.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-transport-progress-20261016T0402Z.json",
+  "remaining": [
+    "Production service/candidate replay and durable packet-qualified telemetry readback",
+    "Failed-attempt trace retention, cache-hit versus origin measurement distinction, and negotiated HTTP version where observable",
+    "Per-operation GPU, Redis, Qdrant and Neo4j measurements through existing owners",
+    "Original objective identity/parser/packet-symbol lineage and semantic/KMeans/SOM/PageRank qualification gates"
+  ],
+  "limits": {
+    "canonicalAuthority": false,
+    "datastoreWritesPerformed": false,
+    "sourceRevisionWritesPerformed": false,
+    "sharedServicesRestarted": false,
+    "gpuJobRun": false,
+    "svelteCheckRun": false,
+    "productionServiceProof": false,
+    "goalComplete": false
+  }
+}

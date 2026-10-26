@@ -50,9 +50,9 @@ export class EdgeModelHarness {
     try {
       await operation;
       if (controller.signal.aborted) throw new Error('load cancelled');
-      if (this.state !== 'disposed') this.state = 'ready';
+      if ((this.state as EdgeModelStatus) !== 'disposed') this.state = 'ready';
     } catch (e) {
-      if (this.state !== 'disposed') this.state = 'failed';
+      if ((this.state as EdgeModelStatus) !== 'disposed') this.state = 'failed';
       throw e;
     } finally {
       if (this.controller === controller) this.controller = undefined;
@@ -84,7 +84,7 @@ export class EdgeModelHarness {
     } finally {
       if (this.controller === controller) this.controller = undefined;
       if (this.inFlight === operation) this.inFlight = undefined;
-      if (this.state !== 'disposed') this.state = 'ready';
+      if ((this.state as EdgeModelStatus) !== 'disposed') this.state = 'ready';
     }
   }
   cancel(): void { this.controller?.abort(); }

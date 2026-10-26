@@ -3,9 +3,6 @@ type: concept
 title: Testing and Validation
 description: Documentation for testing strategies, smoke tests, and integration verification procedures for the ACE and Graphify pipelines.
 tags: [testing, validation, ace, graphify, integration]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-07T02:11:06.802Z
 ---
 
 # Testing and Validation

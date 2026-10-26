@@ -37,6 +37,25 @@ import {
   type QueryExecutionContextV1,
   type QueryExecutionModeV1,
 } from '$lib/server/execution/query-execution-policy-v1.js';
+import {
+  evaluateOperatorTokenV1,
+  type OperatorTokenRecordV1,
+} from '$lib/server/mcp/operator-token-gate-v1.js';
+
+/**
+ * Forbidden direct process/shell invocation tools that must never be exposed
+ * or executed via model-facing dispatcher tool calls.
+ */
+export const FORBIDDEN_MODEL_TOOLS: ReadonlySet<string> = new Set([
+  'shell.run',
+  'shell.exec',
+  'cmd.run',
+  'cmd.exec',
+  'bash.run',
+  'bash.exec',
+  'terminal.exec',
+  'process.spawn',
+]);
 
 /**
  * No-op LangGraph bridge for when LangGraph is disabled.
@@ -94,18 +113,21 @@ export class DispatcherMiddleware {
   private engramBridge: EngramMemoryBridge | null;
   private langgraphBridge: LangGraphBridge | NoOpLangGraphBridge;
   private langgraphEnabled: boolean;
+  private operatorTokenRegistry: OperatorTokenRecordV1[] | null = null;
   private callCounter = 0;
 
   constructor(
     pool: Pool | null,
     engramBridge: EngramMemoryBridge | null,
     langgraphBridge: LangGraphBridge | NoOpLangGraphBridge | null,
-    langgraphEnabled: boolean = true
+    langgraphEnabled: boolean = true,
+    operatorTokenRegistry?: OperatorTokenRecordV1[] | null
   ) {
     this.pool = pool;
     this.engramBridge = engramBridge;
     this.langgraphBridge = langgraphBridge || new NoOpLangGraphBridge();
     this.langgraphEnabled = langgraphEnabled && langgraphBridge !== null;
+    this.operatorTokenRegistry = operatorTokenRegistry ?? null;
   }
 
   /**
@@ -130,9 +152,59 @@ export class DispatcherMiddleware {
     handler: (input: unknown, context: QueryExecutionContextV1) => Promise<unknown>,
     toolName: string,
     sessionId: string,
-    executionMode: QueryExecutionModeV1 = 'MUTATING'
+    executionMode: QueryExecutionModeV1 = 'MUTATING',
+    options?: {
+      operatorGated?: boolean;
+    }
   ): (input: unknown) => Promise<unknown> {
+    if (
+      FORBIDDEN_MODEL_TOOLS.has(toolName) ||
+      /^shell\./i.test(toolName) ||
+      /^cmd\./i.test(toolName) ||
+      /^bash\./i.test(toolName)
+    ) {
+      throw new Error(
+        `SECURITY_VIOLATION: Direct shell/process execution tool '${toolName}' is forbidden from model-facing dispatcher invocation without authorized operator delegation.`
+      );
+    }
+
     return async (input: unknown) => {
+      if (
+        FORBIDDEN_MODEL_TOOLS.has(toolName) ||
+        /^shell\./i.test(toolName) ||
+        /^cmd\./i.test(toolName) ||
+        /^bash\./i.test(toolName)
+      ) {
+        throw new Error(
+          `SECURITY_VIOLATION: Direct shell/process execution tool '${toolName}' is forbidden from model-facing dispatcher invocation without authorized operator delegation.`
+        );
+      }
+
+      const isOperatorGated = options?.operatorGated ?? toolName.startsWith('ops.');
+      // Fail closed: an operator-gated tool with no provisioned token registry is denied, never allowed.
+      if (isOperatorGated && (this.operatorTokenRegistry === null || this.operatorTokenRegistry.length === 0)) {
+        throw new Error(
+          `SECURITY_VIOLATION: Operator token gate denied execution of '${toolName}': NO_OPERATOR_TOKEN_REGISTRY`
+        );
+      }
+      if (isOperatorGated && this.operatorTokenRegistry !== null) {
+        const presentedToken =
+          typeof input === 'object' && input !== null
+            ? (input as Record<string, unknown>).operator_token ?? (input as Record<string, unknown>).operatorToken
+            : undefined;
+        const gateDecision = evaluateOperatorTokenV1({
+          presentedToken,
+          tool: toolName,
+          now: new Date(),
+          registry: this.operatorTokenRegistry,
+        });
+        if (!gateDecision.allowed) {
+          throw new Error(
+            `SECURITY_VIOLATION: Operator token gate denied execution of '${toolName}': ${gateDecision.reasonCode}`
+          );
+        }
+      }
+
       const useLangGraph = executionMode !== 'READ_ONLY' && this.langgraphEnabled;
       const executionContext: QueryExecutionContextV1 = {
         policy: createQueryExecutionPolicyV1(executionMode),

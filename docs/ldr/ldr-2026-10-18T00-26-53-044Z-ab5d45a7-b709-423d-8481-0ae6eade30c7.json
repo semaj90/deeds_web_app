@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.ldr.report.v1",
+  "executionId": "ab5d45a7-b709-423d-8481-0ae6eade30c7",
+  "createdAt": "2026-10-18T00:26:53.044Z",
+  "status": "BLOCKED",
+  "taskId": null,
+  "canonicalAuthority": false,
+  "canonicalWrites": false,
+  "researchStartAttempted": true,
+  "sourceRevisionDeferred": true,
+  "reportSha256": "8e778f81e2e26c5dfbe89f925a017f475760e286bff8c6ebeff61dd6910b272a",
+  "tools": [
+    "ldr.start_research",
+    "ldr.get_report",
+    "ldr.poll_status",
+    "ldr.search_history",
+    "ldr.quick_summary"
+  ],
+  "error": "LDR returned 400"
+}

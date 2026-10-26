@@ -68,7 +68,7 @@ const packet = {
     retrieval_order: 'rg -> ast/regex structure -> docs map -> semantic recall -> ACE packet -> Gemma4',
   },
   cache: {
-    key: `deeds:v1:gemma4-rotorquant:ace-prefix:${featureSummary.digest ?? 'no-index'}`,
+    key: `deeds:v1:ornith-1.5-9b:ace-prefix:${featureSummary.digest ?? 'no-index'}`,
     digest: featureSummary.digest ?? 'no-index',
   },
   lanes: {

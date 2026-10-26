@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.ast-writer-guard-audit.v1",
+  "date": "2026-10-15",
+  "status": "PARTIAL_FAIL_CLOSED",
+  "scope": "Legacy chunk-derived AST materializer and read-only PostgreSQL schema census",
+  "findings": {
+    "chunkRows": 274465,
+    "chunkRowsWithSourceRevision": 0,
+    "chunkRowsWithWorkspaceRevision": 0,
+    "astRepoIdType": "uuid",
+    "repositoryIdentity": {
+      "sourceAuthorityRepoId": "deeds-web-app",
+      "repositoryId": "01a13137-1378-7df9-9968-53738dbf0e48"
+    },
+    "workspaceSourceBindingRows": 47936,
+    "legacyMaterializer": {
+      "usesChunkSymbolsInsteadOfNativeAst": true,
+      "nativeTreeNodeProvenance": false,
+      "exactByteSpans": false,
+      "revisionQualifiedInsert": false,
+      "placeholderRepoUuid": "00000000-0000-0000-0000-000000000000"
+    }
+  },
+  "change": {
+    "path": "sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs",
+    "behavior": "APPLY now aborts before any AST or source-ref write; dry-run remains diagnostic",
+    "packageScripts": "dry/apply/verify aliases now resolve to the existing sveltekit-frontend/scripts implementation",
+    "reason": "The legacy producer cannot establish native AST identity, exact source spans, canonical repository mapping, and source/workspace revision lineage."
+  },
+  "validation": {
+    "nodeCheck": "PASS",
+    "applyGuard": "PASS: npm apply alias reached the guard and exited before database connection",
+    "focusedTests": {
+      "command": "npx vitest run src/lib/server/retrieval/hydrate-candidates.spec.ts src/lib/server/retrieval/function-registry-retrieval-proof-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+      "filesPassed": 2,
+      "testsPassed": 8
+    },
+    "databaseWrites": false,
+    "projectionWrites": false,
+    "serviceRestarts": false
+  },
+  "remaining": [
+    "Implement a native Tree-sitter writer that consumes the existing parser/chunker observations and exact source bytes.",
+    "Bind each AST node to an exact canonical repository identity, source revision, workspace binding, packet/source reference, and UTF-8 byte span.",
+    "Add writer fixture and live readback tests before enabling any apply path.",
+    "Replay one Function Registry candidate through the existing hydrator, SearchRuntime, and ContextManifest using a currently qualified source."
+  ],
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "writesPerformed": false
+}

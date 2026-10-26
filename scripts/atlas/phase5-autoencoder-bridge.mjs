@@ -34,6 +34,11 @@ const CONFIG = {
   AE_WEIGHTS_PATH: path.join(__dirname, '../../models/ae_768_to_64_v0.pt'),
 };
 
+if (!CONFIG.dry_run) {
+  console.error('PHASE5_LATENT_APPLY_BLOCKED: packet latent writer lacks revision-qualified source admission and independent readback.');
+  process.exit(78);
+}
+
 class AutoencoderError extends Error {
   constructor(message, packet_key) {
     super(message);
@@ -50,19 +55,6 @@ async function initDatabase() {
     password: process.env.POSTGRES_PASSWORD || '123456',
     database: process.env.POSTGRES_DB || 'legal_ai_db',
   });
-
-  // Ensure latent_64 column exists
-  try {
-    await pool.query(`ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS latent_64 vector(64)`);
-  } catch (err) {
-    // Column might already exist
-  }
-
-  try {
-    await pool.query(`CREATE INDEX IF NOT EXISTS idx_latent_64_not_null ON atlas_packets USING HASH (packet_id) WHERE latent_64 IS NOT NULL`);
-  } catch (err) {
-    // Index might already exist
-  }
 
   return pool;
 }
@@ -302,7 +294,7 @@ async function main() {
     if (!CONFIG.dry_run && gatePass) {
       console.log('\n✅ Stage 5 COMPLETE — Latent compression ready');
     } else if (CONFIG.dry_run) {
-      console.log('\n✅ Dry-run PASS — Run with --apply to persist');
+      console.log('\n✅ Dry-run PASS — persistence is blocked pending source lineage and independent readback');
     } else {
       console.log('\n❌ Verification gate FAIL — Review errors above');
     }

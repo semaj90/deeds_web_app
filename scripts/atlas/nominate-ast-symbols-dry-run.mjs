@@ -9,12 +9,16 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { validateAstSymbolNominationShapeV1 } from './lib/ast-symbol-nomination-shape-v1.mjs';
+import { resolveAstSymbolNominationLineageV1 } from './lib/ast-symbol-nomination-lineage-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const input = path.resolve(root, process.argv.find((arg) => arg.startsWith('--input='))?.slice(8)
   ?? '.tmp/atlas/graphify-file-index-v1/ast-entities.jsonl');
 const output = path.resolve(root, process.argv.find((arg) => arg.startsWith('--output='))?.slice(9)
   ?? '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
+const reportPath = path.resolve(root, process.argv.find((arg) => arg.startsWith('--report-output='))?.slice(16)
+  ?? 'docs/reports/ast-symbol-nomination-dry-run-v1.json');
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 const normalize = (value) => String(value ?? '').replaceAll('\\', '/').normalize('NFC');
 const bindAdmittedSnapshot = process.argv.includes('--bind-admitted-snapshot');
@@ -39,6 +43,7 @@ const nominations = [];
 const seen = new Set();
 let invalid = 0;
 let unbound = 0;
+let staleSourceRevision = 0;
 let snapshotBound = 0;
 
 for (const line of lines) {
@@ -50,7 +55,12 @@ for (const line of lines) {
     continue;
   }
   const sourceRef = normalize(candidate.source_ref);
-  const name = String(candidate.symbol_name ?? candidate.name ?? '').normalize('NFC');
+  const shape = validateAstSymbolNominationShapeV1(candidate);
+  if (!shape.valid) {
+    invalid += 1;
+    continue;
+  }
+  const { name, language, startByte, endByte } = shape;
   const kind = String(candidate.symbol_kind ?? candidate.entity_kind ?? '').toLowerCase();
   const observedSourceRevision = String(candidate.source_revision ?? '').trim();
   const snapshotSource = bindAdmittedSnapshot ? snapshotBindings.get(sourceRef) : null;
@@ -58,14 +68,22 @@ for (const line of lines) {
     unbound += 1;
     continue;
   }
-  if (snapshotSource) snapshotBound += 1;
-  const sourceRevision = String(snapshotSource?.sourceRevision ?? observedSourceRevision).trim();
-  const startByte = Number(candidate.start_byte);
-  const endByte = Number(candidate.end_byte);
-  if (!sourceRef || !name || !kind || !sourceRevision || !Number.isInteger(startByte) || !Number.isInteger(endByte) || endByte < startByte) {
+  const lineage = resolveAstSymbolNominationLineageV1({
+    sourceRevision: observedSourceRevision,
+    workspaceRevision: admittedWorkspaceRevision,
+    snapshotSource,
+    bindAdmittedSnapshot,
+  });
+  if (lineage.status === 'SOURCE_REVISION_MISMATCH') {
+    staleSourceRevision += 1;
+    continue;
+  }
+  if (!sourceRef || !kind || !lineage.sourceRevision || (bindAdmittedSnapshot && lineage.status !== 'SNAPSHOT_BOUND')) {
     invalid += 1;
     continue;
   }
+  if (lineage.status === 'SNAPSHOT_BOUND') snapshotBound += 1;
+  const sourceRevision = lineage.sourceRevision;
   const keyMaterial = JSON.stringify({ sourceRef, sourceRevision, kind, name, startByte, endByte });
   const digest = hash(keyMaterial);
   if (seen.has(digest)) continue;
@@ -78,16 +96,18 @@ for (const line of lines) {
     identity_status: 'nominated',
     role: 'definition',
     kind,
-    language: String(candidate.language ?? 'unknown'),
+    language,
     name,
     qualified_name: name,
     container_qualified_name: null,
     source_ref: sourceRef,
     source_revision: sourceRevision,
-    workspace_revision: admittedWorkspaceRevision ?? sourceRevision,
+    workspace_revision: lineage.workspaceRevision,
     source_revision_observed: observedSourceRevision,
     source_content_hash: snapshotSource?.contentDigest ?? null,
-    upstream_node_id: String(candidate.tree_node_id ?? `ast-span:${digest.slice(0, 32)}`),
+    upstream_node_id: candidate.native_upstream_node_id ?? candidate.upstream_node_id ?? null,
+    tree_node_occurrence_id: candidate.tree_node_occurrence_id ?? null,
+    packet_tree_node_id: candidate.packet_tree_node_id ?? null,
     upstream_symbol_id: null,
     upstream_chunk_id: String(candidate.packet_key ?? `packet:${digest.slice(0, 32)}`),
     byte_start: startByte,
@@ -120,6 +140,7 @@ const report = {
   duplicates_removed: lines.length - invalid - nominations.length,
   invalid_candidates: invalid,
   unbound_candidates: unbound,
+  stale_source_revision_candidates: staleSourceRevision,
   snapshot_bound: snapshotBound,
   snapshot_binding: bindAdmittedSnapshot ? 'ADMITTED_WORKSPACE_SNAPSHOT' : 'NONE',
   workspace_revision: admittedWorkspaceRevision,
@@ -128,6 +149,5 @@ const report = {
   database_writes: false,
   canonical_writes: false,
 };
-const reportPath = path.join(root, 'docs/reports/ast-symbol-nomination-dry-run-v1.json');
 await fs.writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify(report, null, 2));

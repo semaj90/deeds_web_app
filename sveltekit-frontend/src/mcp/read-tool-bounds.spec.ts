@@ -9,6 +9,7 @@ import {
   atlasPacketDenseSearchAdvertisedSchema,
   atlasPacketDenseSearchInputSchema,
   atlasPacketSearchInputSchema,
+  atlasProceduralSequenceSearchInputSchema,
   featureDocumentReadInputSchema,
   FEATURE_DOCUMENT_READ_STATEMENT_TIMEOUT_MS,
   FEATURE_DOCUMENT_MANIFEST_MAX_BYTES,
@@ -19,6 +20,8 @@ import {
   graphAnalysisNeighborhoodInputSchema,
   graphCommunityForNodeInputSchema,
   graphExpandNeighborhoodInputSchema,
+  resolveGraphExpandHops,
+  graphNeighborhoodNeedsFallback,
   graphPageRankTopInputSchema,
   graphSemanticPathInputSchema,
   graphShortestPathInputSchema,
@@ -261,6 +264,18 @@ describe('ORF-7 read-tool input bounds', () => {
     }).success).toBe(false);
   });
 
+  it('gives explicit maxHops precedence over the legacy depth default', () => {
+    expect(resolveGraphExpandHops({ maxHops: 1, depth: 2 })).toBe(1);
+    expect(resolveGraphExpandHops({ maxHops: 2, depth: 1 })).toBe(2);
+    expect(resolveGraphExpandHops({ depth: 1 })).toBe(1);
+    expect(resolveGraphExpandHops({})).toBe(2);
+  });
+
+  it('falls back when a graph traversal response has no edges', () => {
+    expect(graphNeighborhoodNeedsFallback([])).toBe(true);
+    expect(graphNeighborhoodNeedsFallback([{ from: 'a', to: 'b' }])).toBe(false);
+  });
+
   it('rejects oversized graph identifiers and descriptive text', () => {
     expect(graphExpandNeighborhoodInputSchema.safeParse({ sourceRefs: ['x'.repeat(GRAPH_EXPAND_REF_MAX_CHARS + 1)] }).success).toBe(false);
     expect(graphExpandNeighborhoodInputSchema.safeParse({ query: 'x'.repeat(GRAPH_EXPAND_TEXT_MAX_CHARS + 1) }).success).toBe(false);
@@ -398,6 +413,14 @@ describe('ORF-7 read-tool input bounds', () => {
     expect(atlasPacketSearchInputSchema.safeParse({ summary_query: '   ' }).success).toBe(false);
     expect(atlasPacketSearchInputSchema.safeParse({ feature_id: '' }).success).toBe(false);
     expect(atlasPacketSearchInputSchema.parse({ feature_id: '  feature-a  ' }).feature_id).toBe('feature-a');
+  });
+
+  it('requires a selective procedural sequence filter and bounds the result count', () => {
+    expect(atlasProceduralSequenceSearchInputSchema.safeParse({}).success).toBe(false);
+    expect(atlasProceduralSequenceSearchInputSchema.safeParse({ feature_label: '   ' }).success).toBe(false);
+    expect(atlasProceduralSequenceSearchInputSchema.safeParse({ feature_label: 'Graph traversal' }).success).toBe(true);
+    expect(atlasProceduralSequenceSearchInputSchema.safeParse({ sequence_id: 'x'.repeat(257) }).success).toBe(false);
+    expect(atlasProceduralSequenceSearchInputSchema.safeParse({ feature_id: 'f', limit: 51 }).success).toBe(false);
   });
 
   it('bounds dense packet search filters, query payloads, and requires a selective filter plus one 768-d query form', () => {

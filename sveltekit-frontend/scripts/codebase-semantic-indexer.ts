@@ -4,7 +4,7 @@
  *
  * Indexes the entire codebase into Qdrant `codebase_chunks_768` with:
  * - embeddinggemma:latest for 768-dim vectors
- * - gemma4-rotorquant:latest for agentic tag extraction (function purpose, domain, complexity)
+ * - ornith-1.5-9b for agentic tag extraction (function purpose, domain, complexity)
  * - Redis bifrost cache for deduplication (SHA-256 content hashing)
  * - Concurrent parallelism (configurable worker count)
  * - RTX GPU acceleration via Ollama GPU layers

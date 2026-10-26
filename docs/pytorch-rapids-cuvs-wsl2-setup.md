@@ -582,3 +582,44 @@ Then: `venv && python consumer_topology_kmeans.py`
 
 **Next Phase:** After P2E completes (35-45 min), proceed to P2F (XGBoost domain classification) and P2G+ (ontology/synthesis).
 
+
+---
+
+## PyTorch version inventory (reviewed 2026-10-24)
+
+Live values are read-only import probes. Repo pins are declarations, not proof of what runs. Historical pins are listed so nobody cites them as current.
+
+### Live environments
+
+| Environment | torch | CUDA | Use | Evidence |
+|---|---|---|---|---|
+| Windows `py -3.13` | 2.8.0+cu128 | 12.8 (CUDA available) | Classifier training lane | Live probe 2026-10-24 |
+| WSL `atlas-rapids-cu13` (`/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python`) | 2.13.0+cu130 | 13.0 (CUDA available) | RAPIDS/cuVS lane | Live probe 2026-10-24 |
+| WSL `atlas-dspy-exp` (`/home/james/.venvs/atlas-dspy-exp`) | not installed | — | DSPy/GEPA only | Live probe 2026-10-24 |
+| Docker `atlas-neural-decoder` (`:8121`) | 2.13.0 (image tag `torch2.13.0-cu132`) | 13.2 | Neural decoder | Image tag probe 2026-10-24; Dockerfile base `pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime` pinned by digest |
+| Docker `langgraph-synthesis` | none | — | LangGraph synthesis | Dockerfile states no PyTorch; `torch==2.7.0+cu128` removed in commit `29f27d4a72` (2026-09-20) |
+
+### Repo pins (declared, not probed)
+
+| File | Pin | Note |
+|---|---|---|
+| `docker/atlas-gemma-rank/Dockerfile` | base `pytorch/pytorch:2.13.0-cuda13.2-cudnn9-runtime` | Same base as the decoder |
+| `docker/docling-vlm/requirements.txt` | `torch==2.12.1` | Comment: observed CUDA 13.0 runtime |
+| `docker/image-synthesis/requirements.txt` | `torch==2.12.1` | Not probed |
+| `docker/Dockerfile.cuda` | base `pytorch/pytorch:2.11.0-cuda12.6`; PyG `torch-2.11.0+cu126` | Older lane; not probed |
+| `docker/omni-worker/Dockerfile` | `pytorch=2.3` (conda) | Old; not probed |
+
+### Benchmark reports
+
+Several `docs/reports/atlas-*cuda132*` and `atlas-gemma-rank-*` JSON files record `torch 2.14.0+cu132`. The environment that produced them is not recorded in this doc and no live env above matches it. Treat these as historical measurements, not the current runtime.
+
+### Historical (do not cite as current)
+
+- `torch==2.6.0+cu121` (removed from the LibTorch requirements in commit `10049b1336`, 2026-04-16).
+- `torch==2.7.0+cu128` (removed from the LangGraph container in commit `29f27d4a72`, 2026-09-20).
+- `torch==2.1.1` (in `docs/documents-atlas-index.json`, a legacy summary) and `torch>=2.4.0` (in `docs/atlas/feature-registry.json`).
+
+### Open items
+
+- Compose comment `docker-compose.yml` (langgraph-synthesis, around line 1091) still says "LibTorch". The Dockerfile says no PyTorch. The comment is stale; not changed in this pass.
+- The `:8095` NLP sidecar has `torch: false` by design; PyTorch stays out of it.

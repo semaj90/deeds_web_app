@@ -998,6 +998,15 @@
 						}}
 						role="button"
 						tabindex="0"
+						onkeydown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								trackClick({
+									documentId: result.id,
+									recommendationId: `case-${result.id}`,
+									searchContext: searchQuery,
+								});
+							}
+						}}
 					>
 						<div class="bundle-header">
 							<div class="bundle-rank">#{i + 1}</div>
@@ -1049,6 +1058,18 @@
 					}}
 						role="button"
 						tabindex="0"
+						onkeydown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								selectedBundle = bundle;
+								selectedResult = null;
+								trackClick({
+									documentId: bundle.hit.evidenceId,
+									recommendationId: `evidence-${bundle.hit.chunkIndex}`,
+									caseId: caseIdFilter || undefined,
+									searchContext: searchQuery
+								});
+							}
+						}}
 					>
 						<div class="bundle-header">
 							<div class="bundle-rank">#{i + 1}</div>
@@ -1130,6 +1151,18 @@
 					}}
 						role="button"
 						tabindex="0"
+						onkeydown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								selectedResult = result;
+								selectedBundle = null;
+								trackClick({
+									documentId: result.source_id || result.chunk_id,
+									recommendationId: `rag-${result.chunk_id}`,
+									caseId: caseIdFilter || undefined,
+									searchContext: searchQuery
+								});
+							}
+						}}
 					>
 						<div class="bundle-header">
 							<div class="bundle-rank">#{i + 1}</div>
@@ -1548,8 +1581,18 @@
 	/>
 {/if}
 {#if activeAnalysisContext}
-	<div class="analysis-modal-backdrop" onclick={() => activeAnalysisContext = null}>
-		<div class="analysis-modal" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="analysis-modal-backdrop"
+		onclick={(e) => { if (e.target === e.currentTarget) activeAnalysisContext = null; }}
+		role="presentation"
+	>
+		<div
+			class="analysis-modal"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Analysis Context"
+			tabindex="-1"
+		>
 			<div class="modal-header">
 				<button class="close-btn" onclick={() => activeAnalysisContext = null}>&times;</button>
 			</div>

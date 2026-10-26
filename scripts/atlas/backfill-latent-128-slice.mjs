@@ -10,6 +10,10 @@ const env = loadRepoEnv(process.env);
 const flags = new Set(process.argv.slice(2).filter((arg) => arg.startsWith('--') && !arg.includes('=')));
 const arg = (name, fallback) => process.argv.find((value) => value.startsWith(`--${name}=`))?.split('=').slice(1).join('=') ?? fallback;
 const APPLY = flags.has('--apply');
+if (APPLY) {
+  console.error('LATENT_128_APPLY_BLOCKED: no revision-qualified source compare-and-swap or independent vector readback is configured.');
+  process.exit(78);
+}
 const LANE = String(arg('lane', 'content')); // 'content' or 'error'
 const BATCH = Math.max(1, Math.min(2000, Number(arg('batch-size', 500))));
 const LIMIT = Math.max(1, Number(arg('limit', 1_000_000)));

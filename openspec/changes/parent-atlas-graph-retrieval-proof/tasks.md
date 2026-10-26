@@ -1878,3 +1878,9 @@ unblocked.
 ### GS1-10-IDENTITY-CONTRACTS-01 — `concept_id` owner check (2026-10-06, read-only; no schema/data/code change)
 
 Live `legal-ai-postgres` (exact `count(*)`): `atlas_ontology_concepts` 0 rows (PK `concept_id` text), `concept_records` 0 (PK `concept_id` text), `atlas_concepts` 0 (PK `concept_id` **integer**, UNIQUE `name`), `atlas_ontology_tuples` 0; only `feature_ontology_tuples` is populated (539,124). Three empty tables use two different `concept_id` types, so no populated table can prove a `concept_id` key. Status: `concept_id` owner NOT_PROVEN; the other six ids keep the 2026-09-24 reconciliation. The parent box stays unticked. Closing it needs the operator ontology-population decision (`audit-ontology-population-decision-v1.mjs`) to pick the key type first; no new contract file should be written.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

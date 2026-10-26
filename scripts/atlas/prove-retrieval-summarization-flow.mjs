@@ -4,11 +4,12 @@
  *
  *   EmbeddingGemma -> Qdrant content shortlist -> TurboVec gRPC transform/prefilter
  *   -> Go Retrieval codebase search -> Postgres truth join -> LangExtract
- *   -> Gemma4 bounded JSON summary
+ *   -> Ornith 1.5 (llama-server :8090) bounded JSON summary
  *
  * This is proof-only. It does not mutate Postgres, Qdrant, Redis, or packet identity.
  */
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import pg from 'pg';
 import { createRequire } from 'node:module';
@@ -24,7 +25,7 @@ for (const arg of process.argv.slice(2)) {
 }
 
 const env = loadRepoEnv();
-const QUERY = String(args.get('query') ?? 'Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow');
+const QUERY = String(args.get('query') ?? 'Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Ornith summarization flow');
 const TOP_K = Number(args.get('top-k') ?? 8);
 const OUT_JSON = path.resolve(REPO_ROOT, String(args.get('out-json') ?? 'docs/reports/retrieval-summarization-flow-proof.json'));
 const OUT_MD = path.resolve(REPO_ROOT, String(args.get('out-md') ?? 'docs/reports/retrieval-summarization-flow-proof.md'));
@@ -45,17 +46,32 @@ const QDRANT_VECTOR_NAME = String(args.get('vector-name') ?? env.QDRANT_CODE_VEC
 const TURBOVEC_GRPC_URL = String(args.get('turbovec-grpc') ?? env.TURBOVEC_SIDECAR_GRPC_URL ?? '127.0.0.1:50062');
 const GO_RETRIEVAL_URL = String(args.get('go-retrieval-url') ?? env.GO_RETRIEVAL_HTTP_URL ?? env.RETRIEVAL_HTTP_URL ?? 'http://127.0.0.1:8100').replace(/\/+$/, '');
 const LANGEXTRACT_URL = String(args.get('langextract-url') ?? env.LANGEXTRACT_URL ?? 'http://127.0.0.1:8095').replace(/\/+$/, '');
-const GEMMA4_URL = String(args.get('gemma4-url') ?? env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1').replace(/\/+$/, '');
-const GEMMA4_MODEL = String(args.get('gemma4-model') ?? env.LOCAL_GEMMA_MODEL ?? env.LANGEXTRACT_MODEL ?? env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b');
+const SYNTHESIS_URL = String(args.get('synthesis-url') ?? env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1').replace(/\/+$/, '');
+const SYNTHESIS_MODEL = String(args.get('synthesis-model') ?? env.LLAMA_SERVER_MODEL ?? env.LANGEXTRACT_MODEL ?? 'ornith-1.5-9b');
 
 function lane(status, detail = {}) {
   return { status, ...detail };
 }
 
+function evidenceIdFor(row) {
+  return `ev_${createHash('sha256').update(`${row.packet_key}|${row.source_ref_key ?? ''}|${row.source_ref}`).digest('hex').slice(0, 16)}`;
+}
+
+function liveSourceByteLength(sourceRef) {
+  for (const root of SOURCE_REF_ROOTS) {
+    try {
+      const abs = path.resolve(root, sourceRef);
+      if (!abs.startsWith(path.resolve(root) + path.sep)) continue;
+      if (fs.statSync(abs).isFile()) return fs.statSync(abs).size;
+    } catch { /* try next root */ }
+  }
+  return null;
+}
+
 function statusFromLanes(lanes) {
   const statuses = Object.values(lanes).map((value) => value.status);
   if (statuses.includes('FAIL')) return 'FAIL';
-  if (statuses.includes('FALLBACK_PASS') || statuses.includes('WARN')) return 'WARN';
+  if (statuses.includes('FALLBACK_PASS') || statuses.includes('WARN') || statuses.includes('DIAGNOSTIC_PASS')) return 'WARN';
   return 'LIVE_PASS';
 }
 
@@ -200,6 +216,95 @@ async function qdrantShortlist(vector) {
   }
 }
 
+export async function postgresPgVectorShortlist(vector) {
+  const started = Date.now();
+  const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), max: 1 });
+  try {
+    const vectorStr = `[${vector.join(',')}]`;
+    const limit = Math.max(TOP_K * 2, 10);
+    const query = `
+      SELECT id, qdrant_id, relative_path, symbol, kind, line_start, line_end,
+             1 - (content_embedding_768 <=> $1::vector) AS score
+      FROM codebase_chunk_index
+      WHERE content_embedding_768 IS NOT NULL
+      ORDER BY content_embedding_768 <=> $1::vector
+      LIMIT $2;
+    `;
+    const result = await pool.query(query, [vectorStr, limit]);
+    const hits = result.rows.map((row) => ({
+      id: String(row.id),
+      qdrant_id: row.qdrant_id ? String(row.qdrant_id) : null,
+      score: Number(row.score ?? 0),
+      source_ref: row.relative_path,
+      symbol: row.symbol ?? null,
+      kind: row.kind ?? null,
+      line_start: row.line_start ?? null,
+      line_end: row.line_end ?? null,
+    }));
+    return {
+      hits,
+      lane: lane(hits.length > 0 ? 'LIVE_PASS' : 'FAIL', {
+        table: 'codebase_chunk_index',
+        column: 'content_embedding_768',
+        index: 'idx_codebase_chunk_content_embedding_768_hnsw',
+        hits: hits.length,
+        duration_ms: Date.now() - started,
+      }),
+    };
+  } catch (error) {
+    return {
+      hits: [],
+      lane: lane('FAIL', {
+        table: 'codebase_chunk_index',
+        column: 'content_embedding_768',
+        error: error.message,
+        duration_ms: Date.now() - started,
+      }),
+    };
+  } finally {
+    await pool.end();
+  }
+}
+
+export function measurePgVectorQdrantParity(pgHits, qdrantHits, topK = TOP_K) {
+  const pgTop = pgHits.slice(0, topK);
+  const qdrantTop = qdrantHits.slice(0, topK);
+
+  const pgQdrantIds = new Set(pgTop.map((h) => h.qdrant_id).filter(Boolean));
+  const pgSourceRefs = new Set(pgTop.map((h) => h.source_ref).filter(Boolean));
+
+  let idOverlapCount = 0;
+  let sourceRefOverlapCount = 0;
+  const overlaps = [];
+
+  for (const qHit of qdrantTop) {
+    const matchById = qHit.id && pgQdrantIds.has(qHit.id);
+    const matchByPath = qHit.source_ref && pgSourceRefs.has(qHit.source_ref);
+    if (matchById) idOverlapCount++;
+    if (matchByPath) sourceRefOverlapCount++;
+    if (matchById || matchByPath) {
+      overlaps.push({
+        qdrant_id: qHit.id,
+        source_ref: qHit.source_ref,
+        qdrant_score: qHit.score,
+        pg_score: pgTop.find((p) => p.qdrant_id === qHit.id || p.source_ref === qHit.source_ref)?.score ?? null,
+      });
+    }
+  }
+
+  const overlapRatio = topK > 0 ? idOverlapCount / topK : 0;
+  return {
+    top_k_evaluated: topK,
+    pgvector_hits: pgHits.length,
+    qdrant_hits: qdrantHits.length,
+    id_overlap_count: idOverlapCount,
+    source_ref_overlap_count: sourceRefOverlapCount,
+    id_overlap_ratio: Number(overlapRatio.toFixed(3)),
+    parity_status: overlapRatio >= 0.7 ? 'HIGH_PARITY' : (overlapRatio > 0 ? 'PARTIAL_PARITY' : 'DIVERGENT'),
+    overlap_samples: overlaps,
+  };
+}
+
 function makeRequire(root) {
   return createRequire(pathToFileURL(path.join(root, '_dummy.js')).href);
 }
@@ -334,17 +439,19 @@ async function goRetrievalSearch() {
   }
 }
 
-async function postgresTruthJoin(qdrantHits, goResults) {
+async function postgresTruthJoin(qdrantHits, goResults, pgHits = []) {
   const started = Date.now();
   const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), max: 1 });
   try {
     const packetKeys = [
       ...qdrantHits.map((hit) => hit.packet_key),
       ...goResults.map((hit) => hit?.sourceMetadata?.packetKey ?? hit?.source_metadata?.packet_key ?? hit?.packet_key ?? hit?.id ?? hit?.chunkId ?? hit?.chunk_id),
+      ...pgHits.map((hit) => hit.packet_key ?? hit.qdrant_id),
     ].filter(Boolean).map(String);
     const sourceRefs = [
       ...qdrantHits.map((hit) => hit.source_ref),
       ...goResults.map((hit) => hit?.filePath ?? hit?.file_path ?? hit?.sourceMetadata?.sourceRef ?? hit?.source_metadata?.source_ref),
+      ...pgHits.map((hit) => hit.source_ref),
     ].filter(Boolean).map(String);
     const query = `
       SELECT packet_key, source_ref, source_ref_key, feature_id, feature_label,
@@ -394,15 +501,15 @@ async function langextract(rows) {
     `summary: ${row.summary ?? ''}`,
   ].join('\n')).join('\n\n---\n\n').slice(0, 12_000);
 
-  async function gemma4InlineExtraction(reason) {
-    const body = await fetchJson(`${GEMMA4_URL}/chat/completions`, {
+  async function ornithInlineExtraction(reason) {
+    const body = await fetchJson(`${SYNTHESIS_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${env.LOCAL_OPENAI_API_KEY ?? 'local'}`,
       },
       body: JSON.stringify({
-        model: GEMMA4_MODEL,
+        model: SYNTHESIS_MODEL,
         messages: [
           {
             role: 'system',
@@ -447,7 +554,7 @@ async function langextract(rows) {
       body: parsed,
       lane: lane('FALLBACK_PASS', {
         url: LANGEXTRACT_URL,
-        fallback_url: GEMMA4_URL,
+        fallback_url: SYNTHESIS_URL,
         fallback_used: true,
         reason,
         entities: parsed.entities.length,
@@ -462,7 +569,8 @@ async function langextract(rows) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        content,
+        text: content,
+        source_type: 'plain_text',
         document_type: 'codebase_feature_envelope',
         extract_entities: true,
         extract_structure: true,
@@ -481,13 +589,13 @@ async function langextract(rows) {
     };
   } catch (error) {
     try {
-      return await gemma4InlineExtraction(`LangExtract unavailable: ${error.message}`);
+      return await ornithInlineExtraction(`LangExtract unavailable: ${error.message}`);
     } catch (fallbackError) {
       return {
         body: null,
         lane: lane('FAIL', {
           url: LANGEXTRACT_URL,
-          fallback_url: GEMMA4_URL,
+          fallback_url: SYNTHESIS_URL,
           error: error.message,
           fallback_error: fallbackError.message,
           duration_ms: Date.now() - started,
@@ -497,7 +605,72 @@ async function langextract(rows) {
   }
 }
 
-async function gemma4Summary(rows, extraction) {
+// Live byte-level source identity (canonical sourceRevision = sha256 of exact file bytes).
+// Computed from the worktree at proof time; it is NOT compared with the indexed chunk revision,
+// which is still NULL for most rows (see GAP-P5), so the packet stays index-unqualified.
+// source_ref values are relative to either the repo root or sveltekit-frontend/ (both exist in this corpus),
+// so try each root in order and accept only a regular file that lies inside that root.
+const SOURCE_REF_ROOTS = [REPO_ROOT, path.join(REPO_ROOT, 'sveltekit-frontend')];
+function liveSourceRevision(sourceRef) {
+  for (const root of SOURCE_REF_ROOTS) {
+    try {
+      const abs = path.resolve(root, sourceRef);
+      if (!abs.startsWith(path.resolve(root) + path.sep)) continue;
+      if (!fs.statSync(abs).isFile()) continue;
+      return `sha256:${createHash('sha256').update(fs.readFileSync(abs)).digest('hex')}`;
+    } catch {
+      // try the next root
+    }
+  }
+  return null;
+}
+
+// Fail-closed citation verifier (identity, revision, span membership only; not semantic support).
+// Citations must name an admitted evidence_id. Missing, ambiguous, stale, or out-of-span citations are rejected.
+export function verifyCitations(citations, evidence) {
+  const byId = new Map();
+  for (const item of evidence) {
+    const group = byId.get(item.evidence_id) ?? [];
+    group.push(item);
+    byId.set(item.evidence_id, group);
+  }
+  const raw = Array.isArray(citations) ? citations : [];
+  const accepted = [];
+  const rejected = [];
+  for (const citation of raw) {
+    const matches = byId.get(citation?.evidence_id) ?? [];
+    let reason = null;
+    if (matches.length === 0) reason = 'UNKNOWN_EVIDENCE_ID';
+    else if (matches.length !== 1) reason = 'AMBIGUOUS_EVIDENCE';
+    else if (matches[0].live_source_revision == null) reason = 'SOURCE_UNAVAILABLE';
+    else if (!citation.source_revision) reason = 'MISSING_SOURCE_REVISION';
+    else if (citation.source_revision !== matches[0].live_source_revision) reason = 'REVISION_MISMATCH';
+    else if (
+      !Number.isSafeInteger(citation.start_byte) ||
+      !Number.isSafeInteger(citation.end_byte) ||
+      citation.start_byte < matches[0].start_byte ||
+      citation.end_byte > matches[0].end_byte ||
+      citation.start_byte >= citation.end_byte
+    ) reason = 'SPAN_OUT_OF_BOUNDS';
+    if (reason) rejected.push({ citation, reason });
+    else accepted.push({
+      evidence_id: matches[0].evidence_id,
+      source_ref: matches[0].source_ref,
+      source_revision: matches[0].live_source_revision,
+      start_byte: citation.start_byte,
+      end_byte: citation.end_byte,
+    });
+  }
+  return {
+    status: rejected.length ? 'PARTIAL_UNGROUNDED' : accepted.length ? 'CITATION_MEMBERSHIP_PASS' : 'NO_CITATIONS_RETURNED',
+    admittedCount: evidence.length,
+    raw_citations: raw,
+    accepted,
+    rejected,
+  };
+}
+
+async function ornithSynthesis(rows, extraction) {
   const started = Date.now();
   const envelope = {
     task_id: 'proof.retrieval_summarization_flow',
@@ -508,7 +681,17 @@ async function gemma4Summary(rows, extraction) {
       source_ref_key: row.source_ref_key,
       feature_id: row.feature_id,
       feature_label: row.feature_label,
+      evidence_id: evidenceIdFor(row),
+      live_source_revision: liveSourceRevision(row.source_ref),
+      start_byte: 0,
+      end_byte: liveSourceByteLength(row.source_ref),
+      authority: 'DIAGNOSTIC_ONLY',
     })),
+    packet_status: {
+      canonical_authority: false,
+      index_revision_qualified: false,
+      note: 'live_source_revision is computed from the worktree bytes; indexed source_revision is NULL for most chunk rows (GAP-P5).',
+    },
     extraction: {
       entity_count: Array.isArray(extraction?.entities) ? extraction.entities.length : 0,
       entities: Array.isArray(extraction?.entities) ? extraction.entities.slice(0, 12) : [],
@@ -516,28 +699,31 @@ async function gemma4Summary(rows, extraction) {
     },
     rules: [
       'Use only provided source_refs and extracted structure.',
+      'Cite only evidence_id values listed in source_refs. Never cite a path or invent an ID.',
+      'Each citation must copy source_revision exactly and give start_byte and end_byte within that evidence span.',
       'Do not invent files, tools, services, ports, or graph edges.',
-      'Return JSON only.',
+      'Return compact JSON only.',
+      'Limit citations array to at most 6 most relevant items.',
     ],
   };
   try {
-    const body = await fetchJson(`${GEMMA4_URL}/chat/completions`, {
+    const body = await fetchJson(`${SYNTHESIS_URL}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${env.LOCAL_OPENAI_API_KEY ?? 'local'}`,
       },
       body: JSON.stringify({
-        model: GEMMA4_MODEL,
+        model: SYNTHESIS_MODEL,
         messages: [
           {
             role: 'system',
-            content: 'You summarize bounded Parent Atlas feature envelopes. Return compact JSON only with summary, domain_class, ontology_label, topology_label, source_refs, missing_evidence, confidence.',
+            content: 'You summarize bounded Parent Atlas feature envelopes. Return compact JSON only with summary, domain_class, ontology_label, topology_label, citations (at most 6 items, each {evidence_id, source_revision, start_byte, end_byte}), missing_evidence, confidence.',
           },
           { role: 'user', content: JSON.stringify(envelope) },
         ],
         temperature: 0.1,
-        max_tokens: 700,
+        max_tokens: 2500,
         stream: false,
         cache_prompt: true,
         chat_template_kwargs: { enable_thinking: false },
@@ -554,14 +740,36 @@ async function gemma4Summary(rows, extraction) {
     } catch {
       parsed = null;
     }
+
+    const cited = Array.isArray(parsed?.citations) ? parsed.citations : [];
+    const citationVerification = verifyCitations(cited, envelope.source_refs);
+
+    // Maintain true model output without silent truncation; supply sanitized display separately
+    const displaySanitizedSummary = parsed ? {
+      ...parsed,
+      display_sanitized_source_refs: citationVerification.accepted.map((item) => item.source_ref),
+      rejected_citations: citationVerification.rejected,
+      raw_citations: citationVerification.raw_citations,
+    } : { summary: sanitized.summary };
+
+    // Unsealed diagnostic run: a clean citation pass is DIAGNOSTIC_PASS, never production-admitted LIVE_PASS.
+    const synthesisLaneStatus = sanitized.safe && citationVerification.status === 'CITATION_MEMBERSHIP_PASS'
+      ? 'DIAGNOSTIC_PASS'
+      : (sanitized.safe && citationVerification.accepted.length > 0 ? 'WARN' : 'FAIL');
+
     return {
       summary: parsed ?? { summary: sanitized.summary },
-      lane: lane(sanitized.safe ? 'LIVE_PASS' : 'FAIL', {
-        url: GEMMA4_URL,
-        model: GEMMA4_MODEL,
+      display_summary: displaySanitizedSummary,
+      lane: lane(synthesisLaneStatus, {
+        url: SYNTHESIS_URL,
+        model: SYNTHESIS_MODEL,
         reasoning_leak_stripped: sanitized.changed,
         json_parsed: Boolean(parsed),
         output_chars: sanitized.summary.length,
+        citation_verification: citationVerification,
+        cited_source_refs: cited.length,
+        accepted_source_refs: citationVerification.accepted.length,
+        rejected_source_refs: citationVerification.rejected,
         duration_ms: Date.now() - started,
       }),
     };
@@ -569,8 +777,8 @@ async function gemma4Summary(rows, extraction) {
     return {
       summary: null,
       lane: lane('FAIL', {
-        url: GEMMA4_URL,
-        model: GEMMA4_MODEL,
+        url: SYNTHESIS_URL,
+        model: SYNTHESIS_MODEL,
         error: error.message,
         duration_ms: Date.now() - started,
       }),
@@ -578,7 +786,39 @@ async function gemma4Summary(rows, extraction) {
   }
 }
 
+// Windows can hold the report open (AV, editor, indexer); fall back to versioned timestamp file if locked.
+function safeWriteFileSync(filePath, content) {
+  try {
+    fs.writeFileSync(filePath, content, 'utf8');
+    return filePath;
+  } catch (error) {
+    if (['EBUSY', 'EPERM', 'UNKNOWN'].includes(error.code)) {
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const ext = path.extname(filePath);
+      const base = filePath.slice(0, -ext.length);
+      const fallbackPath = `${base}-${ts}${ext}`;
+      try {
+        fs.writeFileSync(fallbackPath, content, 'utf8');
+        console.warn(`[safeWriteFileSync] Note: ${filePath} is held by another process; preserved and wrote to ${fallbackPath}`);
+        return fallbackPath;
+      } catch (fallbackError) {
+        console.error(`[safeWriteFileSync] Fallback write also failed:`, fallbackError);
+      }
+    }
+    throw error;
+  }
+}
+
 function markdown(report) {
+  const parityLines = report.parity_pgvector_qdrant ? [
+    '## Canonical pgvector ↔ Qdrant Parity',
+    '',
+    `Status: ${report.parity_pgvector_qdrant.parity_status}`,
+    `ID Overlap: ${report.parity_pgvector_qdrant.id_overlap_count} / ${report.parity_pgvector_qdrant.top_k_evaluated} (${(report.parity_pgvector_qdrant.id_overlap_ratio * 100).toFixed(1)}%)`,
+    `Path Overlap: ${report.parity_pgvector_qdrant.source_ref_overlap_count} / ${report.parity_pgvector_qdrant.top_k_evaluated}`,
+    '',
+  ] : [];
+
   return [
     '# Retrieval Summarization Flow Proof',
     '',
@@ -588,12 +828,13 @@ function markdown(report) {
     '',
     '## Contract',
     '',
-    'EmbeddingGemma -> Qdrant content shortlist -> TurboVec gRPC transform/prefilter -> Go Retrieval -> Postgres truth join -> LangExtract -> Gemma4 bounded summary.',
+    'EmbeddingGemma -> Qdrant content shortlist + Postgres pgvector shortlist -> TurboVec gRPC transform/prefilter -> Go Retrieval -> Postgres truth join -> LangExtract -> Ornith 1.5 bounded summary.',
     '',
     '| lane | status | detail |',
     '|---|---:|---|',
-    ...Object.entries(report.lanes).map(([name, value]) => `| ${name} | ${value.status} | ${String(value.error ?? value.reason ?? value.url ?? value.grpc_url ?? '').replace(/\|/g, '/')} |`),
+    ...Object.entries(report.lanes).map(([name, value]) => `| ${name} | ${value.status} | ${String(value.error ?? value.reason ?? value.url ?? value.grpc_url ?? value.table ?? '').replace(/\|/g, '/')} |`),
     '',
+    ...parityLines,
     '## Summary Preview',
     '',
     '```json',
@@ -601,6 +842,44 @@ function markdown(report) {
     '```',
     '',
   ].join('\n');
+}
+
+// DAG alignment receipt: maps each layer of the provenance spine to a status read from live data.
+// Nothing here is typed in; a blocked layer reports the exact live reason. It does not override any gate.
+async function dagAlignment(rows, report) {
+  const sourceRefs = rows.map((r) => r.source_ref).filter(Boolean);
+  const digested = sourceRefs.filter((ref) => liveSourceRevision(ref) !== null).length;
+  let chunkRowsWithRevision = null;
+  let chunkRowsTotal = null;
+  let admissionVerdict = null;
+  let admissionReason = null;
+  const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), max: 1 });
+  try {
+    const r = await pool.query('select count(*) filter (where source_revision is not null)::int as with_rev, count(*)::int as total from codebase_chunk_index');
+    chunkRowsWithRevision = r.rows[0].with_rev;
+    chunkRowsTotal = r.rows[0].total;
+  } catch (error) {
+    chunkRowsWithRevision = `QUERY_FAILED:${error.message}`;
+  } finally {
+    await pool.end();
+  }
+  try {
+    const audit = JSON.parse(fs.readFileSync(path.resolve(REPO_ROOT, 'docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json'), 'utf8'));
+    admissionVerdict = audit.overall_verdict ?? null;
+    admissionReason = audit.overall_verdict_reason ?? null;
+  } catch (error) {
+    admissionVerdict = `UNREADABLE:${error.message}`;
+  }
+  const layers = [
+    { layer: 1, name: 'source_bytes_sha256', status: digested === sourceRefs.length && sourceRefs.length > 0 ? 'LIVE_PASS' : 'PARTIAL', evidence: { digested, of: sourceRefs.length } },
+    { layer: 2, name: 'candidate_ordinal_map', status: 'NOT_BUILT', evidence: { reason: 'proof does not seal a CandidateOrdinalMapV1' } },
+    { layer: 3, name: 'ace_packet_v3_sealed', status: 'BLOCKED', evidence: { chunk_rows_with_source_revision: chunkRowsWithRevision, chunk_rows_total: chunkRowsTotal, reason: 'source_revision NULL for most rows; workspace_revision is an integer default 0 in atlas_packets' } },
+    { layer: 4, name: 'context_manifest_admission', status: admissionVerdict === 'NOT_SAFE_TO_PROJECT' || admissionVerdict === null || String(admissionVerdict).startsWith('UNREADABLE') ? 'BLOCKED' : 'ADMITTED_CHECK_REQUIRED', evidence: { projection_admission: admissionVerdict, reason: admissionReason } },
+    { layer: 5, name: 'context_compression_headroom', status: 'NOT_BUILT', evidence: { canonicalAuthority: false, note: 'downstream of ContextManifest only' } },
+    { layer: 6, name: 'bitfrost_key', status: 'NOT_PROVEN', evidence: { note: 'no manifest-keyed cache key built for this run' } },
+    { layer: 7, name: 'ornith_synthesis', status: report.lanes.ornith_synthesis?.status ?? 'MISSING', evidence: { model: report.lanes.ornith_synthesis?.model ?? null, ungrounded: report.lanes.ornith_synthesis?.ungrounded_source_refs ?? null } },
+  ];
+  return layers;
 }
 
 async function main() {
@@ -619,9 +898,15 @@ async function main() {
   report.lanes.embeddinggemma = embedding.lane;
   if (!embedding.vector) throw new Error('EmbeddingGemma failed; cannot continue flow proof.');
 
-  const qdrant = await qdrantShortlist(embedding.vector);
+  const [qdrant, pgvector] = await Promise.all([
+    qdrantShortlist(embedding.vector),
+    postgresPgVectorShortlist(embedding.vector),
+  ]);
   report.lanes.qdrant = qdrant.lane;
+  report.lanes.postgres_pgvector = pgvector.lane;
   report.candidates.qdrant = qdrant.hits.slice(0, TOP_K);
+  report.candidates.postgres_pgvector = pgvector.hits.slice(0, TOP_K);
+  report.parity_pgvector_qdrant = measurePgVectorQdrantParity(pgvector.hits, qdrant.hits, TOP_K);
 
   const turbo = await turbovecTransform(embedding.vector);
   report.lanes.turbovec_grpc = turbo.lane;
@@ -630,41 +915,51 @@ async function main() {
   report.lanes.go_retrieval = go.lane;
   report.candidates.go_retrieval_count = go.results.length;
 
-  const truth = await postgresTruthJoin(qdrant.hits, go.results);
+  const truth = await postgresTruthJoin(qdrant.hits, go.results, pgvector.hits);
   report.lanes.postgres_truth_join = truth.lane;
 
   const extraction = await langextract(truth.rows);
   report.lanes.langextract = extraction.lane;
 
-  const summary = await gemma4Summary(truth.rows, extraction.body);
-  report.lanes.gemma4_summary = summary.lane;
+  const summary = await ornithSynthesis(truth.rows, extraction.body);
+  report.lanes.ornith_synthesis = summary.lane;
   report.summary = summary.summary;
 
+  report.dag_alignment = await dagAlignment(truth.rows, report);
+
+  report.chain_status = report.dag_alignment.every((l) => l.status === "LIVE_PASS") ? "ALIGNED" : "NOT_ALIGNED";
   report.status = statusFromLanes(report.lanes);
   report.elapsed_ms = Date.now() - started;
 
   fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
-  fs.writeFileSync(OUT_JSON, JSON.stringify(report, null, 2) + '\n', 'utf8');
-  fs.writeFileSync(OUT_MD, markdown(report), 'utf8');
+  safeWriteFileSync(OUT_JSON, JSON.stringify(report, null, 2) + '\n');
+  safeWriteFileSync(OUT_MD, markdown(report));
   console.log(JSON.stringify({
     status: report.status,
     lanes: Object.fromEntries(Object.entries(report.lanes).map(([key, value]) => [key, value.status])),
+    parity: report.parity_pgvector_qdrant?.parity_status ?? null,
     out_json: OUT_JSON,
     out_md: OUT_MD,
   }, null, 2));
   process.exit(report.status === 'FAIL' ? 1 : 0);
 }
 
-main().catch((error) => {
-  const report = {
-    generated_at: new Date().toISOString(),
-    status: 'FAIL',
-    query: QUERY,
-    error: error.message,
-  };
-  fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
-  fs.writeFileSync(OUT_JSON, JSON.stringify(report, null, 2) + '\n', 'utf8');
-  fs.writeFileSync(OUT_MD, markdown({ ...report, lanes: {}, summary: null }), 'utf8');
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error('Error in flow proof main():', error);
+    const report = {
+      generated_at: new Date().toISOString(),
+      status: 'FAIL',
+      query: QUERY,
+      error: error.message,
+    };
+    try {
+      fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
+      safeWriteFileSync(OUT_JSON, JSON.stringify(report, null, 2) + '\n');
+      safeWriteFileSync(OUT_MD, markdown({ ...report, lanes: {}, summary: null }));
+    } catch (writeErr) {
+      console.error('Failed to write failure report files:', writeErr);
+    }
+    process.exit(1);
+  });
+}

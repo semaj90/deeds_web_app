@@ -29,6 +29,6 @@ Rules:
 - rg = exact recall.
 - LangExtract = compact structure.
 - RotorQuant = rerank if available.
-- Gemma4 may synthesize only from sourceRefs returned by tools.
+- Ornith 1.5 via llama-server may synthesize only from sourceRefs returned by tools.
 - RabbitMQ stays backend-only.
 - Browser updates flow through SSE/WebSocket to the UI.

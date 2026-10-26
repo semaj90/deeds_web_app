@@ -7,7 +7,7 @@
 [CmdletBinding()]
 param(
     [string] $SourcePath,
-    [string] $OutputPath = "gemma4-legal-iq4xs.gguf",
+    [string] $OutputPath = "ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf",
     [switch] $OllamaBlob,
     [string] $LlamaQuantizePath
 )

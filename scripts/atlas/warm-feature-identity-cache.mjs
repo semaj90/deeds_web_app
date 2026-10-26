@@ -27,6 +27,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const _helperPath = resolve(__dirname, '../lib/canonical-source-ref.mjs');
 const { normalizeSourceRef, sourceRefHash: computeHash } =
   await import(pathToFileURL(_helperPath).href);
+const { tsImport } = await import('tsx/esm/api');
+const { AtlasHllTelemetryClient, buildDailyHllWindowId } = await tsImport(
+  '../../sveltekit-frontend/src/lib/server/atlas/telemetry/atlas-hll-telemetry.ts',
+  import.meta.url,
+);
 
 const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
@@ -36,7 +41,10 @@ const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const TTL = 24 * 3600; // 24h
 const REPO_ROOT = resolve(__dirname, '../..');
-const HLL_PREFIX = 'feature-identity:hll';
+// One HyperLogLog register per kind (shared client key scheme). `sources` counts canonical-source-ref
+// HASHES (not raw paths), so it must not be merged with registers counting raw source_ref values.
+const HLL_NAMESPACE = 'feature-identity-warm';
+const HLL_KINDS = ['features', 'sources'];
 
 console.log(`[identity-warm] mode=${APPLY ? 'APPLY' : 'DRY-RUN'} limit=${SCROLL_LIMIT || 'none'}`);
 
@@ -68,6 +76,7 @@ try {
         async pfadd(key, ...members) {
           const result = runRedisCli(container, ['PFADD', key, ...members], password);
           if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFADD failed');
+          return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
         },
         async pfcount(key) {
           const result = runRedisCli(container, ['PFCOUNT', key], password);
@@ -193,19 +202,19 @@ if (!APPLY) {
   console.log(`  feature:{id}:qdrantPoints — ${featureToPoints.size} keys`);
   console.log(`  sourceRef:{hash}:featureIds — ${hashToFeatures.size} keys`);
   console.log(`  sourceRef:{hash}:qdrantPoints — ${hashToPoints.size} keys`);
-  console.log(`  ${HLL_PREFIX}:featureIds`);
-  console.log(`  ${HLL_PREFIX}:sourceRefs`);
+  for (const kind of HLL_KINDS) console.log(`  atlas:hll:${HLL_NAMESPACE}:${buildDailyHllWindowId()}:${kind}`);
   console.log('[identity-warm] Re-run with --apply to populate Valkey.');
   await redis.quit().catch(() => {});
   process.exit(0);
 }
 
 let written = 0;
+const hllBatch = { features: [], sources: [] };
 
 for (const [featureId, refs] of featureToRefs) {
   const key = `feature:${featureId}:sourceRefs`;
   await redis.setex(key, TTL, JSON.stringify([...refs]));
-  if (typeof redis.pfadd === 'function') await redis.pfadd(`${HLL_PREFIX}:featureIds`, featureId);
+  hllBatch.features.push(String(featureId));
   written++;
 }
 
@@ -218,7 +227,7 @@ for (const [featureId, points] of featureToPoints) {
 for (const [hash, featureIds] of hashToFeatures) {
   const key = `sourceRef:${hash}:featureIds`;
   await redis.setex(key, TTL, JSON.stringify([...featureIds]));
-  if (typeof redis.pfadd === 'function') await redis.pfadd(`${HLL_PREFIX}:sourceRefs`, hash);
+  hllBatch.sources.push(String(hash));
   written++;
 }
 
@@ -228,9 +237,12 @@ for (const [hash, points] of hashToPoints) {
   written++;
 }
 
-if (typeof redis.pfcount === 'function') {
-  console.log(`[identity-warm] HLL feature count: ${await redis.pfcount(`${HLL_PREFIX}:featureIds`)}`);
-  console.log(`[identity-warm] HLL sourceRef count: ${await redis.pfcount(`${HLL_PREFIX}:sourceRefs`)}`);
+if (typeof redis.pfadd === 'function' && typeof redis.pfcount === 'function') {
+  const hll = new AtlasHllTelemetryClient(redis);
+  const windowId = buildDailyHllWindowId();
+  await hll.recordEntityBatch(HLL_NAMESPACE, windowId, hllBatch);
+  const estimates = await hll.queryEntityEstimates(HLL_NAMESPACE, windowId, HLL_KINDS);
+  console.log(`[identity-warm] HLL (atlas:hll:${HLL_NAMESPACE}:${windowId}:<kind>): ${JSON.stringify(estimates)}`);
 }
 await redis.quit().catch(() => {});
 

@@ -55,9 +55,39 @@ export interface GPUResult {
 	duration?: number;
 }
 
+export type QueuedTask = {
+	task: GPUTask;
+	resolve: (result: GPUResult) => void;
+	reject: (error: Error) => void;
+};
+
+export function removeQueuedTask(queue: QueuedTask[], taskId: string): boolean {
+	const index = queue.findIndex((entry) => entry.task.taskId === taskId);
+	if (index < 0) return false;
+	queue.splice(index, 1);
+	return true;
+}
+
+export function getNextAvailableWorkerIndex(
+	workerCount: number,
+	busyWorkers: ReadonlySet<number>,
+	startIndex = 0,
+): number | null {
+	if (!Number.isInteger(workerCount) || workerCount <= 0) return null;
+	const requestedStart = Number.isInteger(startIndex) ? startIndex : 0;
+	const start = ((requestedStart % workerCount) + workerCount) % workerCount;
+	for (let offset = 0; offset < workerCount; offset++) {
+		const index = (start + offset) % workerCount;
+		if (!busyWorkers.has(index)) return index;
+	}
+	return null;
+}
+
 class TensorRTWorkerPool {
 	private workers: Worker[] = [];
-	private taskQueue: Array<{ task: GPUTask; resolve: (r: GPUResult) => void; reject: (e: Error) => void }> = [];
+	private busyWorkers = new Set<number>();
+	private nextWorkerIndex = 0;
+	private taskQueue: QueuedTask[] = [];
 	private taskMap = new Map<string, { resolve: (r: GPUResult) => void; reject: (e: Error) => void }>();
 	private poolSize: number;
 	private maxQueueSize = 256;
@@ -77,12 +107,12 @@ class TensorRTWorkerPool {
 			});
 
 			worker.on('message', (result: GPUResult) => {
-				this.handleWorkerResult(result);
+				this.handleWorkerResult(result, worker);
 			});
 
 			worker.on('error', (err) => {
 				console.error(`[TensorRT Worker ${i}] Error:`, err);
-				this.handleWorkerError(err);
+				this.handleWorkerError(err, worker);
 			});
 
 			worker.on('exit', (code) => {
@@ -97,7 +127,10 @@ class TensorRTWorkerPool {
 		console.log(`[TensorRT Pool] Initialized ${this.poolSize} worker threads`);
 	}
 
-	private handleWorkerResult(result: GPUResult) {
+	private handleWorkerResult(result: GPUResult, worker: Worker) {
+		const workerIndex = this.workers.indexOf(worker);
+		if (workerIndex < 0) return;
+		this.busyWorkers.delete(workerIndex);
 		const handler = this.taskMap.get(result.taskId);
 		if (handler) {
 			this.taskMap.delete(result.taskId);
@@ -108,14 +141,11 @@ class TensorRTWorkerPool {
 			}
 		}
 
-		// Process next queued task
-		if (this.taskQueue.length > 0) {
-			const { task, resolve, reject } = this.taskQueue.shift()!;
-			this.executeTask(task, resolve, reject);
-		}
+		this.drainQueue();
 	}
 
-	private handleWorkerError(err: Error) {
+	private handleWorkerError(err: Error, failedWorker: Worker) {
+		if (!this.workers.includes(failedWorker)) return;
 		// Reject all pending tasks on worker death
 		const entries = Array.from(this.taskMap.values());
 		for (const { reject } of entries) {
@@ -123,9 +153,20 @@ class TensorRTWorkerPool {
 		}
 		this.taskMap.clear();
 
-		// Reinitialize pool (one worker crashed)
+		// Restart the pool so old in-flight work cannot report into replacement workers.
+		const failedWorkers = this.workers;
 		this.workers = [];
+		this.busyWorkers.clear();
+		void Promise.all(failedWorkers.map((worker) => worker.terminate()));
 		this.initializeWorkers();
+		this.drainQueue();
+	}
+
+	private drainQueue() {
+		while (this.taskQueue.length > 0 && this.busyWorkers.size < this.poolSize) {
+			const { task, resolve, reject } = this.taskQueue.shift()!;
+			this.executeTask(task, resolve, reject);
+		}
 	}
 
 	private executeTask(
@@ -133,11 +174,21 @@ class TensorRTWorkerPool {
 		resolve: (r: GPUResult) => void,
 		reject: (e: Error) => void
 	) {
-		// Pick a worker (round-robin)
-		const workerIdx = this.taskMap.size % this.poolSize;
+		const workerIdx = getNextAvailableWorkerIndex(
+			this.poolSize,
+			this.busyWorkers,
+			this.nextWorkerIndex,
+		);
+		if (workerIdx === null) {
+			reject(new Error('No available worker threads'));
+			return;
+		}
+		this.busyWorkers.add(workerIdx);
+		this.nextWorkerIndex = (workerIdx + 1) % this.poolSize;
 		const worker = this.workers[workerIdx];
 
 		if (!worker || worker.threadId === undefined) {
+			this.busyWorkers.delete(workerIdx);
 			reject(new Error('No available worker threads'));
 			return;
 		}
@@ -176,44 +227,61 @@ class TensorRTWorkerPool {
 			worker.postMessage(taskData, transfer);
 		} catch (err) {
 			this.taskMap.delete(task.taskId);
+			this.busyWorkers.delete(workerIdx);
 			reject(err as Error);
 		}
 	}
 
 	async submit(task: GPUTask): Promise<GPUResult> {
 		return new Promise((resolve, reject) => {
-			// Queue or execute immediately
-			if (this.taskMap.size >= this.poolSize) {
-				// All workers busy
-				if (this.taskQueue.length >= this.maxQueueSize) {
-					reject(new Error(`TensorRT task queue full (${this.maxQueueSize} pending)`));
-					return;
-				}
-				this.taskQueue.push({ task, resolve, reject });
-			} else {
-				this.executeTask(task, resolve, reject);
+			if (!task.taskId.trim()) {
+				reject(new Error('TensorRT taskId must not be empty'));
+				return;
+			}
+			if (this.taskMap.has(task.taskId) || this.taskQueue.some((entry) => entry.task.taskId === task.taskId)) {
+				reject(new Error(`Duplicate TensorRT taskId: ${task.taskId}`));
+				return;
+			}
+			if (this.busyWorkers.size >= this.poolSize && this.taskQueue.length >= this.maxQueueSize) {
+				reject(new Error(`TensorRT task queue full (${this.maxQueueSize} pending)`));
+				return;
 			}
 
-			// Timeout safety (default 30s)
-			const timeout = task.timeout || 30000;
+			let settled = false;
+			const timeout = Math.max(1, task.timeout ?? 30000);
 			const timeoutId = setTimeout(() => {
+				if (settled) return;
+				settled = true;
+				removeQueuedTask(this.taskQueue, task.taskId);
 				this.taskMap.delete(task.taskId);
 				reject(new Error(`TensorRT task timeout after ${timeout}ms`));
 			}, timeout);
 
-			// Clear timeout on completion
-			const originalResolve = resolve;
 			const wrappedResolve = (result: GPUResult) => {
+				if (settled) return;
+				settled = true;
 				clearTimeout(timeoutId);
-				originalResolve(result);
+				resolve(result);
 			};
-			this.taskMap.set(task.taskId, { resolve: wrappedResolve, reject });
+			const wrappedReject = (error: Error) => {
+				if (settled) return;
+				settled = true;
+				clearTimeout(timeoutId);
+				reject(error);
+			};
+
+			if (this.busyWorkers.size >= this.poolSize) {
+				this.taskQueue.push({ task, resolve: wrappedResolve, reject: wrappedReject });
+			} else {
+				this.executeTask(task, wrappedResolve, wrappedReject);
+			}
 		});
 	}
 
 	async terminate() {
 		await Promise.all(this.workers.map((w) => w.terminate()));
 		this.workers = [];
+		this.busyWorkers.clear();
 		this.taskMap.clear();
 		this.taskQueue = [];
 		console.log('[TensorRT Pool] Terminated all worker threads');
@@ -222,7 +290,7 @@ class TensorRTWorkerPool {
 	getStats() {
 		return {
 			poolSize: this.poolSize,
-			activeTasks: this.taskMap.size,
+			activeTasks: this.busyWorkers.size,
 			queuedTasks: this.taskQueue.length,
 			workers: this.workers.length,
 			workerStates: this.workers.map((w, i) => ({

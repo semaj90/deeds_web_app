@@ -12,7 +12,7 @@ import { REPO_ROOT, loadRepoEnv, resolveDatabaseUrl } from './connection-config.
 
 export const TABLE = 'atlas_ontology_linked_tuples';
 export const PACKET_TABLE = 'atlas_packets';
-export const REQUIRED = ['tuple_id','provenance','evidence_span','evidence_state','source_ref','packet_key','evidence_refs'];
+export const REQUIRED = ['tuple_id','provenance','evidence_span','evidence_state','source_ref','packet_key','evidence_refs','label','label_kind','participants','lifecycle'];
 export const REQUIRED_PACKET = ['packet_key','source_ref','source_revision','workspace_revision_key'];
 const hash = v => 'sha256:' + createHash('sha256').update(JSON.stringify(v)).digest('hex');
 const LINEAGE = ['sourceRevision','workspaceRevision','taskRevision','evidenceCardChecksum','evidenceSpanChecksum'];
@@ -24,6 +24,26 @@ export function assessTuple(row, expected = {}) {
   if (typeof row.tuple_id !== 'string' || !row.tuple_id ||
       typeof row.source_ref !== 'string' || !row.source_ref)
     return { verdict:'BLOCKED',reason:'TUPLE_IDENTITY_MISSING',admitted:false };
+  if (row.evidence_state !== 'ACTIVE_VERIFIED')
+    return { verdict:'BLOCKED',reason:'TUPLE_EVIDENCE_STATE_NOT_ACTIVE_VERIFIED',admitted:false };
+  if (row.lifecycle === 'SUPERSEDED')
+    return { verdict:'BLOCKED',reason:'TUPLE_SUPERSEDED',admitted:false };
+  if (row.label_kind !== 'ontology' || typeof row.label !== 'string' || !row.label.trim())
+    return { verdict:'BLOCKED',reason:'TYPED_ONTOLOGY_RELATION_REQUIRED',admitted:false };
+  if (!Array.isArray(row.participants) || row.participants.length < 2 || row.participants.some(participant =>
+    !participant || typeof participant !== 'object' || typeof participant.entityId !== 'string' || !participant.entityId.trim()
+    || typeof participant.entityKind !== 'string' || !participant.entityKind.trim()
+    || typeof participant.role !== 'string' || !participant.role.trim()))
+    return { verdict:'BLOCKED',reason:'TYPED_RELATION_PARTICIPANTS_INCOMPLETE',admitted:false };
+  if (!Array.isArray(row.evidence_refs) || row.evidence_refs.length === 0
+    || row.evidence_refs.some(reference => typeof reference !== 'string' || !reference.trim()))
+    return { verdict:'BLOCKED',reason:'EVIDENCE_REFERENCES_MISSING',admitted:false };
+  const span = row.evidence_span;
+  if (!span || typeof span !== 'object' || Array.isArray(span)
+    || span.sourceRef !== row.source_ref
+    || !Number.isInteger(span.start) || !Number.isInteger(span.end)
+    || span.start < 0 || span.end <= span.start)
+    return { verdict:'BLOCKED',reason:'GROUNDED_SOURCE_SPAN_SHAPE_INVALID',admitted:false };
   const missing=LINEAGE.filter(k=>typeof row.provenance[k]!=='string' || !row.provenance[k].trim());
   if(missing.length) return {verdict:'BLOCKED',reason:'PROVENANCE_INCOMPLETE',missing,admitted:false};
   if (typeof row.packet_key !== 'string' || !row.packet_key || row.packet_key !== row.canonical_packet_key)
@@ -35,6 +55,11 @@ export function assessTuple(row, expected = {}) {
   if (typeof row.packet_workspace_revision !== 'string' || row.provenance.workspaceRevision !== row.packet_workspace_revision)
     return { verdict:'BLOCKED',reason:'CANONICAL_PACKET_WORKSPACE_REVISION_MISMATCH',admitted:false };
   for(const [key,value] of Object.entries(expected)) {
+    if(key === 'evidenceRef') {
+      if(typeof value !== 'string' || !row.evidence_refs.includes(value))
+        return {verdict:'BLOCKED',reason:'EXPECTED_EVIDENCE_REFERENCE_MISMATCH',field:key,admitted:false};
+      continue;
+    }
     if(!LINEAGE.includes(key)) throw new Error('UNKNOWN_EXPECTED_FIELD');
     if(row.provenance[key]!==value) return {verdict:'BLOCKED',reason:'EXPECTED_PROVENANCE_MISMATCH',field:key,admitted:false};
   }
@@ -82,6 +107,7 @@ async function main() {
     else {
       const rows=(await client.query(
         `SELECT t.tuple_id,t.provenance,t.evidence_span,t.evidence_state,t.source_ref,t.packet_key,t.evidence_refs,
+                t.label,t.label_kind,t.participants,t.lifecycle,
                 p.packet_key AS canonical_packet_key,p.source_ref AS packet_source_ref,
                 p.source_revision AS packet_source_revision,p.workspace_revision_key AS packet_workspace_revision
            FROM public.atlas_ontology_linked_tuples t

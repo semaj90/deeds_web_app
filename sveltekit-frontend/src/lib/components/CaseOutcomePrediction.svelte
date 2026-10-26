@@ -94,6 +94,7 @@
 
 	// Handle form submission
 	async function handleSubmit(event: SubmitEvent) { // Explicitly type event
+		event.preventDefault();
 		isLoading = true;
 		error = null;
 		prediction = null;
@@ -303,7 +304,7 @@ Factors Considered: ${pred.metadata.factors_considered.join(', ')}
 	</div>
 
 	<div class="prediction-form">
-		<form onsubmit={handleSubmit} use:enhance>
+		<form onsubmit={handleSubmit}>
 			<div class="form-section">
 				<h3>Case Information</h3>
 

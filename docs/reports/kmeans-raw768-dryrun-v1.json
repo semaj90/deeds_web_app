@@ -1,0 +1,52 @@
+{
+ "schema": "atlas.kmeans-raw768-dryrun.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuUsed": false,
+ "canonicalAuthority": false,
+ "recipe": "RAW content_embedding_768 (L2-normalised)",
+ "k": 256,
+ "rows": 219998,
+ "train": 197987,
+ "holdout": 22011,
+ "models": [
+  {
+   "seed": 42,
+   "fitSeconds": 67.3,
+   "inertia": 75140.93,
+   "replayFitLabelsVsEuclidPredict": 1.0,
+   "replayFitLabelsVsCosinePredict": 0.98403,
+   "emptyClusters": 0,
+   "sizeMin": 94,
+   "sizeMedian": 714,
+   "sizeMax": 3456
+  },
+  {
+   "seed": 43,
+   "fitSeconds": 60.7,
+   "inertia": 75021.234,
+   "replayFitLabelsVsEuclidPredict": 1.0,
+   "replayFitLabelsVsCosinePredict": 0.98404,
+   "emptyClusters": 0,
+   "sizeMin": 27,
+   "sizeMedian": 732,
+   "sizeMax": 3193
+  }
+ ],
+ "stability": {
+  "trainARI_seed42_vs_43_cosine": 0.4491,
+  "holdoutARI_seed42_vs_43": 0.4516
+ },
+ "replayGate": {
+  "threshold": 0.99,
+  "note": "fit-label vs cosine/euclid predict on the same centroids; a determinism check, not quality"
+ },
+ "caveats": [
+  "MiniBatchKMeans on a 90% split; centroids NOT stored anywhere",
+  "high ARI between seeds shows stability, not semantic quality",
+  "no domain/label purity measured here",
+  "raw recipe chosen per EMB-RECIPE-DECISION-01 (recorded as reply to a recommendation)"
+ ],
+ "checksum": "sha256:255eb8cebc69ce2514021760519d37a272d0aaff4c4fe0958debf885f55814c6"
+}

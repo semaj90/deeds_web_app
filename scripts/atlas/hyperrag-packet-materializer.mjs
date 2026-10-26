@@ -241,7 +241,6 @@ async function fetchRows(limit) {
     ];
 
     if (packetCols.has('embedding')) select.push('ap.embedding');
-    if (packetCols.has('content_embedding_384')) select.push('ap.content_embedding_384');
     if (packetCols.has('cheirank_score')) select.push('ap.cheirank_score');
     if (featureExists) {
       pushColumn(select, 'apf', 'used_concepts', 'features_used_concepts', featureCols);

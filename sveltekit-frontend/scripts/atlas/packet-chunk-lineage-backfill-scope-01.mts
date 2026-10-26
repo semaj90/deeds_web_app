@@ -65,6 +65,7 @@ async function main() {
     SELECT source_ref, workspace_id, source_revision, code_source_revision
     FROM graphify_files
     WHERE NULLIF(btrim(source_ref), '') IS NOT NULL
+      AND workspace_revision = 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc'
   `);
   const gfBySourceRef = new Map(gfRows.map((r) => [r.source_ref, r]));
 

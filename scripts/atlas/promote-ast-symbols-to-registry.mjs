@@ -33,6 +33,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadSymbolRevisionQualificationV1 } from './lib/load-symbol-revision-qualification-v1.mjs';
+import { validateAstSymbolNominationShapeV1 } from './lib/ast-symbol-nomination-shape-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DATABASE_URL = process.env.DATABASE_URL
@@ -47,6 +48,8 @@ const LIMIT = Number((args.find((a) => a.startsWith('--limit=')) || '').split('=
 const OFFSET = Math.max(0, Number((args.find((a) => a.startsWith('--offset=')) || '').split('=')[1] || 0) || 0);
 const INPUT = path.resolve(ROOT, (args.find((a) => a.startsWith('--input=')) || '').slice(8)
   || '.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl');
+const REPORT_OUTPUT = path.resolve(ROOT, (args.find((a) => a.startsWith('--report-output=')) || '').slice(16)
+  || 'docs/reports/ast-symbol-registry-promotion.json');
 
 function canonicalKeyFor(row) {
   // MUST equal the nomination's own `symbol_key` verbatim — that's what
@@ -88,8 +91,18 @@ async function main() {
   const raw = await fs.readFile(INPUT, 'utf8');
   const rows = raw.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
 
-  const eligible = rows.filter((row) => PROMOTABLE_KINDS.has(row.kind));
-  const excludedVariables = rows.length - eligible.length;
+  const eligible = [];
+  let excludedInvalidShape = 0;
+  for (const row of rows) {
+    if (!PROMOTABLE_KINDS.has(row.kind)) continue;
+    const shape = validateAstSymbolNominationShapeV1(row);
+    if (!shape.valid) {
+      excludedInvalidShape += 1;
+      continue;
+    }
+    eligible.push({ ...row, qualified_name: shape.name, language: shape.language });
+  }
+  const excludedVariables = rows.length - eligible.length - excludedInvalidShape;
 
   // Dedupe by canonical_key within this run's input (distinct from the live
   // DB dedupe ON CONFLICT provides across runs).
@@ -108,6 +121,7 @@ async function main() {
     limit: LIMIT,
     inputNominations: rows.length,
     excludedVariables,
+    excludedInvalidShape,
     eligibleDeclarationLike: eligible.length,
     uniqueCandidatesAfterDedup: uniqueCandidates.length,
     offset: OFFSET,
@@ -196,9 +210,9 @@ async function main() {
 }
 
 async function writeReport(report) {
-  const outDir = path.resolve(ROOT, 'docs/reports');
+  const outPath = REPORT_OUTPUT;
+  const outDir = path.dirname(outPath);
   await fs.mkdir(outDir, { recursive: true });
-  const outPath = path.resolve(outDir, 'ast-symbol-registry-promotion.json');
   await fs.writeFile(outPath, JSON.stringify(report, null, 2));
   console.log(`[SYMBOL-PROMOTE] report written to ${outPath}`);
 }

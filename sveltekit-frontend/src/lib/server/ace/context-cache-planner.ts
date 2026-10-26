@@ -1,5 +1,7 @@
 import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { resolveModelCacheIdentityV1 } from '$lib/server/models/model-registry.js';
 import { generateContextHash } from '$lib/server/cache-keys.js';
+import { aceTopkRevisionedKeyV1, type RetrievalCacheIdentityV1 } from './cache-keys.js';
 import type { FeatureWikiPacket } from './token-aware-context-packer.js';
 import {
   buildContextCacheKey,
@@ -13,8 +15,10 @@ import {
 export type AceContextPlannerState = {
   query: string;
   queryHash: string;
-  cacheKey: string;
+  cacheKey: string | null;
   modelName: string;
+  modelRevision: string;
+  adapterRevision: string | null;
   modelQuant: string;
   kvQuant: string;
   draftModel: boolean;
@@ -27,6 +31,7 @@ export type AceContextPlannerState = {
   evidenceBundleHash: string;
   ragBundleHash: string;
   graphSnapshotHash: string;
+  retrievalCacheIdentityKey: string | null;
   retrievalModeHash: string;
   sectionTypesHash: string;
   personaKey: string;
@@ -55,6 +60,8 @@ export type AceContextPlannerHit = {
 const PLANNER_STATE_KEYS: Array<keyof AceContextPlannerState> = [
   'queryHash',
   'modelName',
+  'modelRevision',
+  'adapterRevision',
   'modelQuant',
   'kvQuant',
   'draftModel',
@@ -67,6 +74,7 @@ const PLANNER_STATE_KEYS: Array<keyof AceContextPlannerState> = [
   'evidenceBundleHash',
   'ragBundleHash',
   'graphSnapshotHash',
+  'retrievalCacheIdentityKey',
   'retrievalModeHash',
   'sectionTypesHash',
   'personaKey',
@@ -78,7 +86,7 @@ const PLANNER_STATE_KEYS: Array<keyof AceContextPlannerState> = [
 ];
 
 function diffPlannerState(current: AceContextPlannerState, cached?: Partial<AceContextPlannerState>): string[] {
-  if (!cached) return [];
+  if (!cached) return [...PLANNER_STATE_KEYS];
   return PLANNER_STATE_KEYS.filter((key) => current[key] !== cached[key]);
 }
 
@@ -92,6 +100,28 @@ function stableStringify(value: unknown): string {
 
 function estimateTokens(text: string): number {
   return Math.ceil(Math.max(0, text.length) / 4);
+}
+
+const UNQUALIFIED_CONTEXT_IDENTITIES = new Set([
+  'unknown',
+  'codebase-graph:unknown',
+  'evidence:none',
+  'rag:none',
+  'graph:none',
+]);
+
+function hasNonPlaceholderContextIdentity(
+  state: AceContextPlannerState,
+): state is AceContextPlannerState & { cacheKey: string; modelRevision: string; adapterRevision: string | null } {
+  if (!state.cacheKey || !state.modelRevision.trim()) return false;
+  if (/^ace:topk:v1:[a-f0-9]{64}$/.test(state.retrievalCacheIdentityKey ?? '')) return true;
+  return [
+    state.repoGitSha,
+    state.corpusHash,
+    state.evidenceBundleHash,
+    state.ragBundleHash,
+    state.graphSnapshotHash,
+  ].every((value) => value.trim().length > 0 && !UNQUALIFIED_CONTEXT_IDENTITIES.has(value.trim().toLowerCase()));
 }
 
 function normalizePacket(packet: FeatureWikiPacket): FeatureWikiPacket {
@@ -150,6 +180,8 @@ function toContextPack(
     plannerState: {
       queryHash: state.queryHash,
       modelName: state.modelName,
+      modelRevision: state.modelRevision,
+      adapterRevision: state.adapterRevision,
       modelQuant: state.modelQuant,
       kvQuant: state.kvQuant,
       draftModel: state.draftModel,
@@ -162,6 +194,7 @@ function toContextPack(
       evidenceBundleHash: state.evidenceBundleHash,
       ragBundleHash: state.ragBundleHash,
       graphSnapshotHash: state.graphSnapshotHash,
+      retrievalCacheIdentityKey: state.retrievalCacheIdentityKey,
       retrievalModeHash: state.retrievalModeHash,
       sectionTypesHash: state.sectionTypesHash,
       personaKey: state.personaKey,
@@ -196,6 +229,8 @@ export function buildAceContextPlannerState(input: {
   conversationId?: string;
   filePath?: string;
   modelName?: string;
+  modelRevision?: string | null;
+  adapterRevision?: string | null;
   modelQuant?: string;
   kvQuant?: string;
   draftModel?: boolean;
@@ -208,6 +243,7 @@ export function buildAceContextPlannerState(input: {
   evidenceBundleHash?: string;
   ragBundleHash?: string;
   graphSnapshotHash?: string;
+  retrievalCacheIdentity?: RetrievalCacheIdentityV1;
   enableWebSearch?: boolean;
   enableWikipedia?: boolean;
   enableCodebaseContext?: boolean;
@@ -226,10 +262,18 @@ export function buildAceContextPlannerState(input: {
       tokenAwarePacking: Boolean(input.tokenAwarePacking),
     })
   );
+  const modelName = input.modelName ?? SERVER_CHAT_MODEL;
+  const modelIdentity = resolveModelCacheIdentityV1({
+    modelId: modelName,
+    modelRevision: input.modelRevision,
+    adapterRevision: input.adapterRevision,
+  });
   const state = {
     query: input.query.trim(),
     queryHash: generateContextHash(input.query.trim()),
-    modelName: input.modelName ?? SERVER_CHAT_MODEL,
+    modelName,
+    modelRevision: modelIdentity?.modelRevision ?? '',
+    adapterRevision: modelIdentity?.adapterRevision ?? null,
     modelQuant: input.modelQuant ?? 'iq4_xs',
     kvQuant: input.kvQuant ?? 'q8_0/q8_0',
     draftModel: input.draftModel ?? false,
@@ -242,6 +286,9 @@ export function buildAceContextPlannerState(input: {
     evidenceBundleHash: input.evidenceBundleHash ?? 'evidence:none',
     ragBundleHash: input.ragBundleHash ?? 'rag:none',
     graphSnapshotHash: input.graphSnapshotHash ?? 'graph:none',
+    retrievalCacheIdentityKey: input.retrievalCacheIdentity
+      ? aceTopkRevisionedKeyV1(input.retrievalCacheIdentity)
+      : null,
     retrievalModeHash,
     sectionTypesHash,
     personaKey: input.persona ?? 'default',
@@ -252,9 +299,11 @@ export function buildAceContextPlannerState(input: {
     filePath: input.filePath,
   };
 
-  const cacheKey = buildContextCacheKey({
+  const cacheKey = modelIdentity ? buildContextCacheKey({
     queryHash: state.queryHash,
     modelName: state.modelName,
+    modelRevision: modelIdentity.modelRevision,
+    adapterRevision: modelIdentity.adapterRevision,
     modelQuant: state.modelQuant,
     kvQuant: state.kvQuant,
     draftModel: state.draftModel,
@@ -267,6 +316,7 @@ export function buildAceContextPlannerState(input: {
     evidenceBundleHash: state.evidenceBundleHash,
     ragBundleHash: state.ragBundleHash,
     graphSnapshotHash: state.graphSnapshotHash,
+    retrievalCacheIdentityKey: state.retrievalCacheIdentityKey ?? undefined,
     retrievalModeHash: state.retrievalModeHash,
     sectionTypesHash: state.sectionTypesHash,
     personaKey: state.personaKey,
@@ -275,7 +325,7 @@ export function buildAceContextPlannerState(input: {
     caseId: state.caseId,
     conversationId: state.conversationId,
     filePath: state.filePath,
-  });
+  }) : null;
   return {
     ...state,
     cacheKey,
@@ -283,14 +333,16 @@ export function buildAceContextPlannerState(input: {
 }
 
 export async function loadAceContextPlannerHit(state: AceContextPlannerState): Promise<AceContextPlannerHit | null> {
+  if (!hasNonPlaceholderContextIdentity(state)) return null;
   const retrievedAt = new Date().toISOString();
 
   try {
     const { source, pack } = await getContextCacheWithSource(state.cacheKey);
     if (pack) {
+      const deltaFields = diffPlannerState(state, pack.plannerState as Partial<AceContextPlannerState> | undefined);
+      if (deltaFields.length > 0) return null;
       const packet = toFeatureWikiPacket(pack);
       void bumpContextCacheHit(state.cacheKey).catch(() => {});
-      const deltaFields = diffPlannerState(state, pack.plannerState as Partial<AceContextPlannerState> | undefined);
       return {
         cacheKey: state.cacheKey,
         contextHash: state.cacheKey,
@@ -316,6 +368,7 @@ export async function storeAceContextPlannerHit(
   packet: FeatureWikiPacket,
   meta: Partial<AceContextPlannerMeta> = {}
 ): Promise<void> {
+  if (!hasNonPlaceholderContextIdentity(state)) return;
   const normalizedPacket = normalizePacket(packet);
   const contextPack = toContextPack(state, normalizedPacket, {
     source: meta.source ?? 'miss',

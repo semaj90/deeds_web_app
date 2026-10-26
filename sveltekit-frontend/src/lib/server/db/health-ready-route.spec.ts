@@ -12,7 +12,7 @@ vi.mock('$lib/server/redis.js', () => ({ getRedis: () => ({ ping: async () => 'P
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: { OLLAMA_BASE_URL: 'http://ollama.test', QDRANT_URL: 'http://qdrant.test', TURBOVEC_SIDECAR: 'http://tv.test' },
 }));
-vi.mock('$lib/server/ollama.js', () => ({ ollamaFetch: vi.fn(async () => ({ ok: true })) }));
+vi.mock('$lib/server/ollama.js', () => ({ embedOrChatFetch: vi.fn(async () => ({ ok: true })) }));
 vi.mock('$lib/server/runtime-profile.js', () => {
   const svc = (state: string) => ({ state, rationale: 'test' });
   return {

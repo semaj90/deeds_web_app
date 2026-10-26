@@ -1,6 +1,6 @@
 {
   "schema": "atlas.mcp-tool-surface-live.v1",
-  "generatedAt": "2026-09-03T03:54:38.546Z",
+  "generatedAt": "2026-10-12T23:42:13.843Z",
   "servers": {
     "atlas-tools": {
       "status": "REACHABLE",
@@ -16,8 +16,8 @@
               "toolName": "build_agentic_rag_context"
             },
             "title": null,
-            "description": "Build a compact RAG context packet from the ACE cache. Reads .opencode/ace-packet.json, scores cards against the query by keyword overlap, and returns the top-K cards with sourceRefs and a ready-to-inject prompt snippet. Use before sending a codebase question to Gemma4.",
-            "inputSchemaDigest": "74799b1d1eac9141dcb1af0716d59fde64e0cfe866e2bd5b8e126039ded362b0",
+            "description": "Build query-specific context using live Atlas retrieval. If live retrieval is unavailable, returns an empty diagnostic result and no fallback evidence.",
+            "inputSchemaDigest": "907cc98df79b18f597949e14676062609e84a9ffafe15f663ad2c9c56cda7aee",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -82,8 +82,8 @@
               "toolName": "find_source_refs"
             },
             "title": null,
-            "description": "Query SourceRef or CodebaseFile nodes in the knowledge graph.",
-            "inputSchemaDigest": "a66e463e04f6db7cf8dd342d73423277502a5a6841537d82292e1061a3bac510",
+            "description": "Resolve file paths to Atlas packet identity (packet key, feature, revision when known); plain names search SourceRef names in the knowledge graph.",
+            "inputSchemaDigest": "9b378a790b91e83712c8dc8e2aef4d9aa240915c471fcab75a2e132f5e936338",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -124,8 +124,8 @@
         "toolCount": 10,
         "listChangedSupported": false,
         "discoveredAtRevision": "c372c8454bcf646ef3ad7031e48c7f54a2e5e240efc60018719484e9a7f90c5f",
-        "discoveredAt": "2026-09-03T03:54:38.429Z",
-        "toolSurfaceRevision": "14ff8f5fb513deb24c4fbdadccc58a6d4e2250c0cef859d1cb3336c370e76b5e",
+        "discoveredAt": "2026-10-12T23:42:13.567Z",
+        "toolSurfaceRevision": "9f7e3db94d93a310f75294cb11a0b71d3ec2621d9a9c66639102d30dd9a8e137",
         "canonicalAuthority": false,
         "authorityScope": "MCP_TOOL_SURFACE_DISCOVERY"
       }
@@ -174,6 +174,17 @@
           {
             "ref": {
               "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "atlas.backend_info"
+            },
+            "title": null,
+            "description": "Read native acceleration backend/build metadata and cumulative execution counters. Does not access data stores or invoke a model.",
+            "inputSchemaDigest": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
               "toolName": "atlas.build_taxonomy_topology_packet"
             },
             "title": null,
@@ -189,7 +200,7 @@
             },
             "title": null,
             "description": "Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path.",
-            "inputSchemaDigest": "c1686833deda9f8b7d4cf2af58335e1a25004ac33b38c8d04010046f4988e00e",
+            "inputSchemaDigest": "7d3755b42c73270338e1c6dee483b786c6f84706e86348d8fb183e846c30df20",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -199,8 +210,8 @@
               "toolName": "atlas.coverage"
             },
             "title": null,
-            "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.",
-            "inputSchemaDigest": "9d0b803e4bf7f83159a14bdbe361c28329f62ca195a55bcd1e67a84758664414",
+            "description": "Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, summary coverage %, embedding coverage %, and duplicate sha256 count. Gate: source_ref >= 90% is the ONLY value that gates phase4a_ready. feature_id and summary coverage/gate fields are reported for visibility only and do not block phase4a_ready.",
+            "inputSchemaDigest": "021ae3b4961e699379d395998501bec61475cd8f3a39a2db107c3b60018d1d2c",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -251,11 +262,22 @@
           {
             "ref": {
               "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "atlas.exact_topk_oracle"
+            },
+            "title": null,
+            "description": "Run the fixed four-vector exact top-K fixture through the native adapter; no caller-supplied corpus or store access.",
+            "inputSchemaDigest": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
               "toolName": "atlas.explain_trace"
             },
             "title": null,
             "description": "Return the compact summary and retrieval path for the current Atlas packet.",
-            "inputSchemaDigest": "c1686833deda9f8b7d4cf2af58335e1a25004ac33b38c8d04010046f4988e00e",
+            "inputSchemaDigest": "7d3755b42c73270338e1c6dee483b786c6f84706e86348d8fb183e846c30df20",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -266,7 +288,7 @@
             },
             "title": null,
             "description": "Build a deterministic, non-mutating Parent Atlas feature-document enrichment plan. Validates feature-doc sources, folds in linked Atlas source_refs, and returns bounded extraction, retrieval, storage, and model intents.",
-            "inputSchemaDigest": "8546d279078980352df6533646030fa6ed5f5696614f3ed5d05f609c812054e5",
+            "inputSchemaDigest": "c06d8a48b3c5c596fd19e4dcf152deb2d7c29915793d133599789935b2742169",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -277,7 +299,7 @@
             },
             "title": null,
             "description": "Return the validated ingestion plan for a feature docs bundle. Reads docs/<feature>/manifest.json, filters officialDocs through SSRF-safe URL validation, and reports the exact URLs that can be sent through the existing library crawl pipeline.",
-            "inputSchemaDigest": "3961c3e4e167a0c982e886da8a18cf7258bd41cd1269b79191ff6c9ca741b925",
+            "inputSchemaDigest": "c06d8a48b3c5c596fd19e4dcf152deb2d7c29915793d133599789935b2742169",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -288,7 +310,7 @@
             },
             "title": null,
             "description": "Return feature-scoped document evidence readiness for Parent Atlas. Checks docs/features notes, docs/<feature_id> bundles, manifest validity, official docs coverage, and Atlas canonical spine counts before ingestion/ranking promotion.",
-            "inputSchemaDigest": "bfec9d28cd0438439b0d8898c67d1570274443a5013f91f608691b0700f8ff9b",
+            "inputSchemaDigest": "c06d8a48b3c5c596fd19e4dcf152deb2d7c29915793d133599789935b2742169",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -299,7 +321,7 @@
             },
             "title": null,
             "description": "Return a chunk from the compact Atlas chunk index, optionally prioritizing a chunkId, chunkIndex, or sourceRef.",
-            "inputSchemaDigest": "dfa07f171da72ee7272d46e6f4641b5142ffa91047bf6e5e4a00be244c24f477",
+            "inputSchemaDigest": "c26a7119eaf78c4e082fb983e6992fb41a0e9373d4f8d030a02260958d073adb",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -310,7 +332,7 @@
             },
             "title": null,
             "description": "List the top authoritative nodes in the codebase by PageRank score (computed by Neo4j GDS). Returns paginated results with packet_key, pageRank score, and rank. Used by agents to identify high-authority code areas for focus.",
-            "inputSchemaDigest": "3f4d99ba973990728ebce6695f3ce901aebc44271a892cc8149b6f8a749eb07f",
+            "inputSchemaDigest": "d0d93c8fafb58689933f80d6375b2c2c8d79431af51cd82115341bc633eafd64",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -321,7 +343,18 @@
             },
             "title": null,
             "description": "Read-only tuple materializer for Parent Atlas feature-document evidence. Links feature docs to canonical packet_key, source_ref, tree_node_id, and fact-table provenance without writing any new rows.",
-            "inputSchemaDigest": "376b3e4a2e5d29f9b7a249ad5375168d90397c6f63b2d4f87213bb4493cc163e",
+            "inputSchemaDigest": "dadab5e2345df3dbe6cec0efa24a4fc0f6b7dd0b8fdd4717698fa83485b54eb2",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "atlas.packet_dense_search"
+            },
+            "title": null,
+            "description": "CODE scope: bitmap-prefiltered structural narrowing over atlas_packets (using existing GIN/btree indexes, PG18 AIO-accelerated) followed by a Qdrant dense-ANN rerank restricted to the prefiltered candidate set, joined back to atlas_packets by packet_key. Requires at least one of feature_id, source_ref, concept_id, or tags (domain_class/workspace_revision alone are rejected — not selective enough). Requires an explicit target Qdrant collection — codebase_chunks_768 (older, richer payload) or codebase_chunks_768_v2 (leaner, EMB3A target); this tool does not default to either. DOCS scope instead requires a 768-D query_vector and delegates to searchDocCorpusDense over canonical PostgreSQL document chunks; representation parity is reported as unproven.",
+            "inputSchemaDigest": "dcc3dac3678d73d9a10992cb072b3efdb1f30a95bf619e85c6701c7c9deabd3e",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -332,7 +365,18 @@
             },
             "title": null,
             "description": "Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), feature_id, concept_id membership, or free-text summary match. Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. Use this to find which packets are associated with a file or feature before querying Qdrant.",
-            "inputSchemaDigest": "f23dcacd7d70a3f5ec69fea89a7cd042eb6bb480f80e3b35ea17e0d12ac7dd95",
+            "inputSchemaDigest": "4d485f494df31b2e2060b10d1112490e462173c9416e803904ab58a7ed17e273",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "atlas.parity_report"
+            },
+            "title": null,
+            "description": "Compare the native adapter against the frozen scalar exact top-K fixture and return a checksum-bound parity receipt.",
+            "inputSchemaDigest": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -354,7 +398,7 @@
             },
             "title": null,
             "description": "Build a deterministic POS/concept tagging packet from AST, semantic, topology, ranking, citation, screenshot, and MCP tool-call evidence. Returns versioned ontology-linked tuples and the packet envelope without writing canonical truth.",
-            "inputSchemaDigest": "776896a98cc7808a05ecd3a5037e2c62c250fd86f2ccf4562e2570e75e8ae055",
+            "inputSchemaDigest": "64a6509b0f248e6d4e11da0da9efc244c1044eb03d71785bedc72462af076823",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -376,7 +420,7 @@
             },
             "title": null,
             "description": "Atlas alias for ranked technical search. Returns the same compact hit list as kb.trace_search for a query.",
-            "inputSchemaDigest": "d2aaaab8c40c9fd45e02b4b0fa786fcbfd51dc3c1676eae6562712d55ce8b0cc",
+            "inputSchemaDigest": "0c498dfdc4ee08fb173618680084c36cd9183ab180f9bb34e16b8cedecb51de7",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -387,7 +431,7 @@
             },
             "title": null,
             "description": "Return the top sourceRefs from the compact Atlas packet.",
-            "inputSchemaDigest": "c1686833deda9f8b7d4cf2af58335e1a25004ac33b38c8d04010046f4988e00e",
+            "inputSchemaDigest": "7d3755b42c73270338e1c6dee483b786c6f84706e86348d8fb183e846c30df20",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -398,7 +442,7 @@
             },
             "title": null,
             "description": "Return the top suggested files from the compact Atlas packet.",
-            "inputSchemaDigest": "c1686833deda9f8b7d4cf2af58335e1a25004ac33b38c8d04010046f4988e00e",
+            "inputSchemaDigest": "7d3755b42c73270338e1c6dee483b786c6f84706e86348d8fb183e846c30df20",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -420,7 +464,7 @@
             },
             "title": null,
             "description": "Returns the member nodes for a specific cluster.",
-            "inputSchemaDigest": "975e91224190096e2ea8ab79b3bf55025c0489452c88c9e7f7f6df4dec0bcca7",
+            "inputSchemaDigest": "a5e04e6792c803876e883b1d754f7fb21a978dd3f86f8b114d2725bf5b8de038",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -465,6 +509,17 @@
             "title": null,
             "description": "Returns the full atlas context packet for a specific file.",
             "inputSchemaDigest": "ea7f45d11435ae2685fb5e172709f19c538783f1eeceebca314cd913a335e37a",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "context.build"
+            },
+            "title": null,
+            "description": "Build a bounded EvidenceCard context selection only when the retrieval gate is proven; never writes Redis.",
+            "inputSchemaDigest": "216548c604c952efdf87e3a7ec03dbdca809b9a8b0eb65d82d16f8ba62f4df88",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -570,6 +625,17 @@
           {
             "ref": {
               "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "domain.classify"
+            },
+            "title": null,
+            "description": "Classify text into the canonical domain taxonomy via the Miniforge sidecar's classify pass (sklearn NB/LR over KMeans word-cluster features once a trained checkpoint exists; reports backend 'unavailable' otherwise — never a hard failure). Closes the confirmed 2026-09-03 TRACE audit gap: graph/cluster/topK/hypergraph/taxonomy tools all existed, domain classification did not.",
+            "inputSchemaDigest": "e7847ea15f83ee8932e22f739dbbfbcffc4af31170cc59e849cb6272e2c59b05",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
               "toolName": "engram.ace_packet_inject"
             },
             "title": null,
@@ -585,7 +651,7 @@
             },
             "title": null,
             "description": "Read-only recent chat memory lookup from engram_cards.",
-            "inputSchemaDigest": "b7651ea3f64b3f560862572f9d7c0f6bf5d3ae890db6a901e9b174612155b2d2",
+            "inputSchemaDigest": "c40b6957b162585c4fc942b6ffeda89742d621892a5ab933024a2658dd311573",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -614,6 +680,28 @@
           {
             "ref": {
               "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "evidence.card"
+            },
+            "title": null,
+            "description": "Read one compact EvidenceCard by canonical task identity.",
+            "inputSchemaDigest": "ee53dd93e37027a619807a0ac27a1a461680b2ea6278b7356fab2c54f3f6be87",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "evidence.contradictions"
+            },
+            "title": null,
+            "description": "Read bounded task contradictions from predicate resolution.",
+            "inputSchemaDigest": "2a541b325ab1db66dfd895d315f42483f4921924629c320d86d05b5ecb4ea3f5",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
               "toolName": "evidence.image_feedback"
             },
             "title": null,
@@ -630,6 +718,17 @@
             "title": null,
             "description": "Create IMAGE_FOR edges in Neo4j from an evidence image node to CodebaseFile nodes. Normally fires automatically after search-by-image, but can be called manually to repair or backfill graph links for existing evidence. Returns { ok, edgesCreated }.",
             "inputSchemaDigest": "03818450ef63aa615f8f81974cd9bc70b041d3a0e3e13d25976dbf9062b1b331",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "evidence.receipt"
+            },
+            "title": null,
+            "description": "Read bounded receipt-binding evidence for one evidence ID.",
+            "inputSchemaDigest": "6908086e0ab943593eb1d6f7b83a0100dd47b0680df49d8c6828e6adae9114f2",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -662,7 +761,18 @@
             },
             "title": null,
             "description": "Returns the community/cluster membership for a specific node.",
-            "inputSchemaDigest": "ead552c0dc4b33b80628eda6c1b7470ef65e1edc9d8721d68b99faa198c5368a",
+            "inputSchemaDigest": "0cd09e8aff9edc5d56c19437f7882917bf235776555b43c1a174caa05a6cdd3c",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "graph.dependencies"
+            },
+            "title": null,
+            "description": "Read bounded dependency edges for one canonical OpenSpec task.",
+            "inputSchemaDigest": "4ee3d7d9963ae3dafa62cd9d6f0bfaadb81be9547613acd6f6473ba2bfdbc588",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -673,7 +783,7 @@
             },
             "title": null,
             "description": "Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.",
-            "inputSchemaDigest": "14aac86e5d9c9f8dd0bcdcf2c108bcfae5bc094df763bdb41e582e844d2ba28d",
+            "inputSchemaDigest": "5652328eb1aa9b6a7a875eb1f7090fb68fa978215c4f9cabd982cd9f9271ece0",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -695,7 +805,7 @@
             },
             "title": null,
             "description": "Lists the top authoritative nodes in the graph by PageRank score.",
-            "inputSchemaDigest": "cea38fa6aefd49c76e630fc45ba8ed348b6903ae899ca98310b70f161eb4354d",
+            "inputSchemaDigest": "5e41b7e6fac867e4aac107be6b7c71be800706cb83aa06c5d5e3489c02d8ed69",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -706,7 +816,7 @@
             },
             "title": null,
             "description": "Synthesizes a semantic narrative along the shortest structural path between nodes.",
-            "inputSchemaDigest": "071dadf7fadd6e2b2af75a63eae7d5a4513b3740cb9f742fe60699568c5b7669",
+            "inputSchemaDigest": "da824b6046a849d83521525f7b15a75a01557e347c548f59112a21214096e2aa",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -717,7 +827,7 @@
             },
             "title": null,
             "description": "Finds the shortest path between two graph nodes.",
-            "inputSchemaDigest": "a3b4aab1e992e24ca95ff1cb174732cc319681dc5e46961b231d96a5bd0665fa",
+            "inputSchemaDigest": "19ba61fac53298f6b2d9ff3c7112939aa4cc49c48ca5745f6fe067fa8fc77da4",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -761,7 +871,7 @@
             },
             "title": null,
             "description": "Semantic search across the hypergraph edges.",
-            "inputSchemaDigest": "d109ba6db34e6e21d545282c2f5f3a66ce7257d89c637bf9ca271b568fd59d7a",
+            "inputSchemaDigest": "af44df3c224f447a3559072e92cf2b81f67939d0e6ebf3f9d58e37728ce65a40",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -981,7 +1091,7 @@
             },
             "title": null,
             "description": "Searches for identity-spine notecards matching a query.",
-            "inputSchemaDigest": "974cea870b9535aeb69c18792bfd06ac5a19b15397b558f7026158e89ef7301d",
+            "inputSchemaDigest": "3a5db5b0cea857361797f8e95a6f500361eeba078adf925b82fa32d036e325c9",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -1014,7 +1124,7 @@
             },
             "title": null,
             "description": "Search the hypergraph/KAG context for documents, cards, and relations matching a query.",
-            "inputSchemaDigest": "d2aaaab8c40c9fd45e02b4b0fa786fcbfd51dc3c1676eae6562712d55ce8b0cc",
+            "inputSchemaDigest": "0c498dfdc4ee08fb173618680084c36cd9183ab180f9bb34e16b8cedecb51de7",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -1036,7 +1146,7 @@
             },
             "title": null,
             "description": "Returns a minified architectural map for a specific directory.",
-            "inputSchemaDigest": "0a9644cc101db0993b8542353d8ca4925d5b49201d0a91715b93247d35af7c92",
+            "inputSchemaDigest": "7b15e4b7e8b825c0b82bca017b560b00f35ec31d7e83acbfd3d5bed575124389",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -1373,6 +1483,50 @@
           {
             "ref": {
               "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "openspec.census"
+            },
+            "title": null,
+            "description": "Read the latest revision-bound OpenSpec census summary without changing claims or evidence.",
+            "inputSchemaDigest": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "openspec.frontier"
+            },
+            "title": null,
+            "description": "Read a bounded frontier of unresolved OpenSpec claims; no task state is changed.",
+            "inputSchemaDigest": "2a541b325ab1db66dfd895d315f42483f4921924629c320d86d05b5ecb4ea3f5",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "openspec.search"
+            },
+            "title": null,
+            "description": "Search current OpenSpec task ledgers and proposals with the existing BM25 preview index. Results are claims only, not evidence admission.",
+            "inputSchemaDigest": "8d2b4c09bb9f765d6cf30cdefa36a7394177a84607f60617040d1f97e5db6fe7",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "openspec.task"
+            },
+            "title": null,
+            "description": "Read one bounded OpenSpec task identity and its compiled evidence card.",
+            "inputSchemaDigest": "ee53dd93e37027a619807a0ac27a1a461680b2ea6278b7356fab2c54f3f6be87",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
               "toolName": "ops.audit_tool_result"
             },
             "title": null,
@@ -1703,6 +1857,17 @@
           {
             "ref": {
               "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "search.evidence"
+            },
+            "title": null,
+            "description": "Search compact EvidenceCards by bounded lexical matching; raw hits are not returned.",
+            "inputSchemaDigest": "ccc7ab1f4f46fbaf57d298bc2783d9fb9b6af4c722df05ea97f4ac0ad9a7aa5c",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
               "toolName": "search.go_hybrid"
             },
             "title": null,
@@ -1729,7 +1894,7 @@
             },
             "title": null,
             "description": "Code search using PostgreSQL Full Text Search.",
-            "inputSchemaDigest": "c1711858e44e07dffcc120dc6de30da963a12bf58566a20b825394d22676cc5d",
+            "inputSchemaDigest": "d7ecfcd7716080da609a8598e46b0e2e74f90081c7cd8e62a61be43ac8bae779",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -1763,17 +1928,6 @@
             "title": null,
             "description": "Return the current local trace service worker queue status and recent job summaries.",
             "inputSchemaDigest": "efddc7bd8bbcef73a14eb1ace1ffdaec81e518ef1e13c1e9271d0b8acb694a49",
-            "outputSchemaDigest": null,
-            "executionMetadataDigest": null
-          },
-          {
-            "ref": {
-              "serverAuthorityId": "parent-atlas:mcp:trace",
-              "toolName": "shell.run"
-            },
-            "title": null,
-            "description": "Run a bash command and return output. Used by Gemma4 to safely invoke shell operations. Output is truncated to 10KB to stay within context limits.",
-            "inputSchemaDigest": "004e24249de896a93bf94ed833a7727f24a97d1cbaf0374205f4f5df87045bd6",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -1927,7 +2081,7 @@
             },
             "title": null,
             "description": "DEPRECATED bare-name alias for kb.trace_search. Gated by MCP_LEGACY_ALIASES.",
-            "inputSchemaDigest": "8eeb7976caa75693050782bf24a2872a5cf49b72d2aff4006283530ffbcf3489",
+            "inputSchemaDigest": "0c498dfdc4ee08fb173618680084c36cd9183ab180f9bb34e16b8cedecb51de7",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -1937,8 +2091,8 @@
               "toolName": "trace.explain_retrieval"
             },
             "title": null,
-            "description": "Explains the retrieval trace for a specific query.",
-            "inputSchemaDigest": "097ac88f6560aee21d368105daac9af12a1e33c9a90a6cbd15134abc3c5ff716",
+            "description": "Explains a bounded, read-only cached retrieval trace for a specific query.",
+            "inputSchemaDigest": "ff22c09afb84a48c024af2b11c7b868e0429294fc6d5b2602f5b22893f1266b3",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -1993,7 +2147,7 @@
             },
             "title": null,
             "description": "Read-only RotorQuant blended rerank for sourceRefs. No writes.",
-            "inputSchemaDigest": "fccbef83de194b86f5a58d2670134d35f1560c617bc2c8907edc057b129595c2",
+            "inputSchemaDigest": "ae0f6f1bb406038202ec9bf1b27d329477a49688590aeee3292ccd4c373bb847",
             "outputSchemaDigest": null,
             "executionMetadataDigest": null
           },
@@ -2064,11 +2218,11 @@
             "executionMetadataDigest": null
           }
         ],
-        "toolCount": 175,
+        "toolCount": 189,
         "listChangedSupported": true,
-        "discoveredAtRevision": "01fad4067bd27d060ea6987a0487b7720924d25cd8ee53e1048a8682a2ef36fd",
-        "discoveredAt": "2026-09-03T03:54:38.541Z",
-        "toolSurfaceRevision": "ef13f47e1ad3bba8fb2bf9f08a493742dd68fe1b5719b457e1e6afbbb224188a",
+        "discoveredAtRevision": "2d6d1cb8a9a177954802a639978f4d634f288f54c1712a30f1063dd3c2202ff1",
+        "discoveredAt": "2026-10-12T23:42:13.834Z",
+        "toolSurfaceRevision": "eb1fdd78f89306972ee50c68f1985f3cb02ec1f85018029b2bab8ec67639ab60",
         "canonicalAuthority": false,
         "authorityScope": "MCP_TOOL_SURFACE_DISCOVERY"
       }

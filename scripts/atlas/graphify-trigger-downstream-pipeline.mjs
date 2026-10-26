@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { summarizePipelineStages } from './graphify-downstream-summary.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -400,11 +401,12 @@ async function writeKanbanTasksToDB() {
             const lane = task.lane || task.target_lane || (task.kind === 'recommendation_review' ? 'review' : 'todo');
             const status = task.status || task.task_status || 'pending';
             await client.query(
-              `INSERT INTO kanban_tasks (task_id, feature_id, feature_label, source_refs, lane, status)
-               VALUES ($1, $2, $3, $4, $5, $6)
+              `INSERT INTO kanban_tasks (task_id, feature_id, feature_label, source_refs, lane, status, workspace_id)
+               VALUES ($1, $2, $3, $4, $5, $6, $7)
                ON CONFLICT (task_id) DO UPDATE SET
                  lane = EXCLUDED.lane,
                  status = EXCLUDED.status,
+                 workspace_id = COALESCE(kanban_tasks.workspace_id, EXCLUDED.workspace_id),
                  updated_at = NOW()`,
               [
                 taskId,
@@ -412,7 +414,8 @@ async function writeKanbanTasksToDB() {
                 featureLabel,
                 JSON.stringify(sourceRefs),
                 lane,
-                status
+                status,
+                process.env.ATLAS_WORKSPACE_ID || 'deeds-web-app'
               ]
             );
           }
@@ -594,12 +597,19 @@ async function main() {
       }
     }
 
-    // Success
-    report.summary.success = true;
-    report.summary.message = 'Pipeline complete';
+    const stageSummary = summarizePipelineStages(report.stages);
+    report.summary.success = stageSummary.success;
+    report.summary.message = stageSummary.success
+      ? 'Pipeline complete'
+      : `Pipeline incomplete; unsuccessful stages: ${stageSummary.failedStages.join(', ')}`;
     report.summary.elapsed_ms = Date.now() - startTime;
 
-    log(`✅ Pipeline complete (${report.summary.elapsed_ms}ms)`);
+    if (stageSummary.success) {
+      log(`✅ Pipeline complete (${report.summary.elapsed_ms}ms)`);
+    } else {
+      process.exitCode = 1;
+      err(report.summary.message);
+    }
 
   } catch (e) {
     report.errors.push(e.message);

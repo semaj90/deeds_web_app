@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.ldr.vector-corpus-stage-receipt.v1",
+  "runId": "45cca121-d018-4bd6-8043-21dfdbb86885",
+  "createdAt": "2026-10-18T01:10:00.480802+00:00",
+  "fetcher": "FIRECRAWL_V2",
+  "sourceCount": 4,
+  "chunkCount": 217,
+  "sourceChecksums": {
+    "beautifulsoup-docs": "efe14ef69c770b412534619d8c3b645848ac204cb1a20e97358669f6198a9627",
+    "firecrawl-scrape-api": "9ffa7406ddad3b2c9fe8c8f0a394d831387dc85332ab0f1a3896644b22f74354",
+    "ldr-api-quickstart": "09d1ac4684da84b290f8664a781c4d4601decd8ba3d198f81692814407e40399",
+    "ldr-mcp-server": "e0fbeacddb90e34b2327678d31f1b18ff265a5f589c01360af8cc1ca1ca5369f"
+  },
+  "embedding": {
+    "status": "NOT_REQUESTED",
+    "count": 0
+  },
+  "canonicalAuthority": false,
+  "localArtifactsWritten": true,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "acePacketsCreated": false,
+  "chunksJsonl": "docs/.okf/ldr/derived/45cca121-d018-4bd6-8043-21dfdbb86885/chunks.jsonl",
+  "chunksJsonlSha256": "587ab720d6234d0ab489233750a2bcc51a2a685470b95ab09c73e475228884ac",
+  "receiptPath": "docs/.okf/ldr/derived/45cca121-d018-4bd6-8043-21dfdbb86885/receipt.json",
+  "receiptChecksum": "sha256:1c358675507d7fd364edcdaf12a59e14e95d3ac2b79a2dd146c4b2d90a44f547"
+}

@@ -221,6 +221,8 @@
             class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:border-accent/40 transition-all placeholder:opacity-30 shadow-2xl"
           />
           <button
+            type="button"
+            aria-label="Search"
             onclick={performSearch}
             class="absolute right-3 top-3 p-2 rounded-xl bg-accent text-black hover:bg-accent/80 transition-all active:scale-90"
           >

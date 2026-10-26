@@ -1,0 +1,261 @@
+{
+  "schema": "atlas.taxonomy-crosswalk-proposal.v2",
+  "status": "PROPOSAL_ONLY",
+  "writesPerformed": false,
+  "snapshotChecksum": "sha256:6a7b71393d25ffb56fd1c697beb0cd6e29b789583fb8a3372d3ba0d53b9161a5",
+  "classes": [
+    "EXACT",
+    "PARENT_CHILD_PROPOSED",
+    "ALIAS_PROPOSED",
+    "AMBIGUOUS",
+    "UNMAPPED"
+  ],
+  "counts": {
+    "UNMAPPED": 28,
+    "ALIAS_PROPOSED": 4,
+    "EXACT": 8
+  },
+  "rows": [
+    {
+      "liveKey": "agent",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "agent_orchestration",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "API",
+      "classification": "ALIAS_PROPOSED",
+      "candidateGroupId": "api",
+      "basis": "case/punctuation-only alias; awaiting review"
+    },
+    {
+      "liveKey": "Authentication",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "auth_login_register",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "backend",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "cache",
+      "classification": "EXACT",
+      "ownerGroupId": "cache",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "cache_layer",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "case_management",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "citation_engine",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "Classification failed",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "cluster_analysis",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "compiler",
+      "classification": "EXACT",
+      "ownerGroupId": "compiler",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "database",
+      "classification": "EXACT",
+      "ownerGroupId": "database",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "Database",
+      "classification": "ALIAS_PROPOSED",
+      "candidateGroupId": "database",
+      "basis": "case/punctuation-only alias; awaiting review"
+    },
+    {
+      "liveKey": "documentation",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "document_processing",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "Embedding",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "embedding_indexing",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "evidence_upload_storage",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "frontend",
+      "classification": "EXACT",
+      "ownerGroupId": "frontend",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "gpu",
+      "classification": "EXACT",
+      "ownerGroupId": "gpu",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "graph",
+      "classification": "EXACT",
+      "ownerGroupId": "graph",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "Graph",
+      "classification": "ALIAS_PROPOSED",
+      "candidateGroupId": "graph",
+      "basis": "case/punctuation-only alias; awaiting review"
+    },
+    {
+      "liveKey": "graph_topology",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "infrastructure",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "legal_reports",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "Library",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "MachineLearning",
+      "classification": "ALIAS_PROPOSED",
+      "candidateGroupId": "machine-learning",
+      "basis": "case/punctuation-only alias; awaiting review"
+    },
+    {
+      "liveKey": "mcp_agents",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "memory_optimization",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "Other",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "rag_retrieval",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "repair_workflow",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "retrieval",
+      "classification": "EXACT",
+      "ownerGroupId": "retrieval",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "test",
+      "classification": "EXACT",
+      "ownerGroupId": "test",
+      "basis": "identical group_id"
+    },
+    {
+      "liveKey": "tool",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "trace_mcp",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "UI",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    },
+    {
+      "liveKey": "Utility",
+      "classification": "UNMAPPED",
+      "candidateGroupId": null,
+      "basis": "no verified relationship"
+    }
+  ],
+  "checksum": "sha256:1d7ed4c6685d9534d347ce3a260f8766cb219270c792e1e7680fca7b1e8a5be1"
+}

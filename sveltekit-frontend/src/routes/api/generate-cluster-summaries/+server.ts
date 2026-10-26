@@ -16,7 +16,7 @@ import { exec } from 'child_process';
 import { sql } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
 import { promisify } from 'util';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const execAsync = promisify(exec);
@@ -165,7 +165,7 @@ Provide:
 
 Be concise and actionable.`;
 
-  const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+  const response = await embedOrChatFetch(`${OLLAMA_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -235,7 +235,7 @@ async function getClusterTags(): Promise<string[]> {
 async function updateQdrantTags(summaries: ClusterSummary[]) {
   for (const summary of summaries) {
     // Generate embedding for summary
-    const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+    const embedRes = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

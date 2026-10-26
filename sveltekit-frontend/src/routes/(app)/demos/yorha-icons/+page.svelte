@@ -73,7 +73,7 @@
 	<!-- Controls bar -->
 	<section class="controls">
 		<div class="control-group">
-			<label>Size</label>
+			<span class="control-label">Size</span>
 			<div class="pill-row">
 				{#each sizes as s}
 					<button
@@ -85,7 +85,7 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label>Stroke</label>
+			<span class="control-label">Stroke</span>
 			<div class="pill-row">
 				{#each strokes as sw}
 					<button
@@ -97,7 +97,7 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label>Glow</label>
+			<span class="control-label">Glow</span>
 			<div class="pill-row">
 				{#each colors as c}
 					<button
@@ -267,7 +267,7 @@
 		flex-direction: column;
 		gap: 0.5rem;
 	}
-	.control-group label {
+	.control-group .control-label {
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.1em;

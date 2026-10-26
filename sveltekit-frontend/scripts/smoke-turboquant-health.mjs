@@ -5,7 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const baseUrl = (process.env.TURBO_BASE ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
-const expectedModel = process.env.TURBO_MODEL_NAME ?? 'gemma4-legal.gguf';
+const expectedModel = process.env.TURBO_MODEL_NAME ?? 'ornith-1.5-9b';
 const chatTimeoutMs = Number(process.env.TURBO_SMOKE_CHAT_TIMEOUT_MS ?? '30000');
 const healthTimeoutMs = Number(process.env.TURBO_SMOKE_HEALTH_TIMEOUT_MS ?? '5000');
 const modelsTimeoutMs = Number(process.env.TURBO_SMOKE_MODELS_TIMEOUT_MS ?? '10000');

@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.source-revision-backfill-disposition.v1",
+  "generated_at": "2026-10-15T18:44:22.034Z",
+  "mode": "READ_ONLY",
+  "paths": 28207,
+  "counts": {
+    "MATCH_REPO_ROOT": 23355,
+    "NO_ROOT_MATCHES_STORED_HASH": 1928,
+    "MATCH_FRONTEND_ROOT": 2555,
+    "SOURCE_MISSING": 366,
+    "MATCH_BOTH_ROOTS_AMBIGUOUS": 3
+  },
+  "canonical_authority": false,
+  "note": "Classification only. No revision is written. MATCH_* means the stored whole-file hash equals sha256 of decoded text of that root copy; it still does not prove the chunks were built from those bytes."
+}

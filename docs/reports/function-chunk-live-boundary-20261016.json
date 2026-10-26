@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.function-chunk-live-boundary.v1",
+  "status": "QUALIFIED_FUNCTION_CHUNK_HANDOFF_BLOCKED",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "identity": {
+    "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+    "packetKey": "packet:804cec79a65c",
+    "treeNodeId": "3561bb301bdf5dcab4a7134afd843fb78da32acb",
+    "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+    "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "byteStart": 979,
+    "byteEnd": 1154,
+    "snapshotChecksum": "242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091"
+  },
+  "observed": {
+    "registrySnapshotQualified": true,
+    "candidateCount": 1,
+    "projectionRevisionDifferenceCount": 0,
+    "exactSourceBytesVerified": true,
+    "sourceByteLength": 1156,
+    "exactPacketRows": 1,
+    "exactSourceBindingRows": 1,
+    "lineageLinkedChunkRows": 2,
+    "chunksMissingSourceRevision": 2,
+    "chunksMissingWorkspaceRevision": 2,
+    "chunksWithCanonicalMetadataPacketKey": 0,
+    "chunksWithMetadataSymbolVersionId": 0,
+    "lineageMembershipStatus": "EXACT_MULTI_MEMBER",
+    "lineageRevisionStatus": "PROVEN",
+    "independentDatabaseReadback": true,
+    "databaseEnforcedReadOnly": true,
+    "fullFileReconstructionFromHistoricalChunks": false,
+    "interpretation": "Exact source availability and lineage links do not repair unqualified chunk rows. Multiple chunks per packet are valid; namespace and row revision reconciliation are required."
+  },
+  "firstBlockingBoundary": "QUALIFIED_FUNCTION_TO_REVISION_QUALIFIED_CHUNK",
+  "downstream": {
+    "searchRuntimeExecuted": false,
+    "finalTopKProven": false,
+    "contextManifestAdmitted": false,
+    "bitfrostReadbackProven": false
+  },
+  "evidence": [
+    {
+      "path": "docs/reports/function-discovery-attempt-20261016T103545235.json",
+      "sha256": "4da60e71c1203b16890c08f220843362b232a92718f1e6fa8c4266f27e25058c"
+    },
+    {
+      "path": "docs/reports/function-chunk-readback-20261016T103743854.json",
+      "sha256": "5c0aee5e484152a49ba978eade00647a4cc88f881e4fe4c4190cd1be24dcd46e"
+    },
+    {
+      "path": "docs/reports/function-chunk-independent-20261016T103815570.json",
+      "sha256": "06bce7b29c6d121770c9f106e00e92031a3f8ced81a27dcdbd37d39da4a4242a"
+    }
+  ],
+  "validation": {
+    "nativeSourceContractTestsPassed": 5,
+    "testLog": "docs/reports/function-native-source-tests-20261016T103815570.txt",
+    "auditJavaScriptSyntax": "PASS",
+    "scopedWhitespace": "PASS"
+  },
+  "writes": {
+    "localDiagnosticArtifacts": true,
+    "database": false,
+    "cache": false,
+    "projections": false,
+    "sourceRevisionBackfill": false,
+    "telemetryInsert": false
+  },
+  "nextRepair": [
+    "Reconcile chunk metadata packet keys against the existing canonical packet/chunk lineage owner; do not overwrite aliases blindly",
+    "Use the existing source-qualified chunk writer to derive and verify exact chunk content/spans in a bounded dry-run",
+    "Only after post-P20 write gates and bounded apply authorization, persist verified row revisions and independently read them back",
+    "Then retry the same candidate through actual SearchRuntime and ContextManifest before cache admission"
+  ],
+  "likely_cause": "The function and original source qualify, but linked historical chunk rows lack revision bindings and carry an unreconciled packet-key namespace.",
+  "patch_targets": [
+    "scripts/atlas/audit-function-source-readback-v1.mjs",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-function-source-readback-v1.mjs --symbol-version-id=symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+  "smoke_command": "node --test scripts/atlas/lib/function-native-source-alignment-v1.test.mjs",
+  "report_path": "docs/reports/function-chunk-live-boundary-20261016.json"
+}

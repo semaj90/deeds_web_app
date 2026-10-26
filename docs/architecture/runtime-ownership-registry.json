@@ -184,9 +184,11 @@
     },
     "semantic_768": {
       "owner": {
-        "classification": "UNKNOWN",
+        "classification": "CANONICAL_STORAGE_AND_QUALIFICATION",
+        "path": "PostgreSQL 18 public.codebase_chunk_index.content_embedding_768",
+        "writer_status": "UNRESOLVED_NOT_PROVEN",
         "unproven": true,
-        "note": "Which service actually generates semantic_768 in production was not independently confirmed this session — openspec/changes/parent-atlas-semantic-768-canonical-contract/ should be read before recording an owner here. Do not guess."
+        "note": "PostgreSQL owns canonical semantic_768 storage and row eligibility at codebase_chunk_index.content_embedding_768. This does not establish a unique production embedding writer, complete representation provenance, or Qdrant projection parity. Qdrant/cuVS and graph projections may nominate candidates but must be requalified against PostgreSQL before SearchRuntime fusion. See docs/architecture/parent-atlas-workstation-compute-fabric.md and openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md."
       }
     },
     "lexical_exact": {
@@ -508,6 +510,38 @@
         "evidence": "Fully live production route: 401 guard, Zod validation, Redis 30min cache, paginated Qdrant evidence_items scroll by case_id, buildCartridge(), Langfuse trace. Genuinely disjoint domain from codebase-intelligence graphify -- consumes case-scoped evidence Qdrant embeddings from the evidence-ingestion pipeline, NOT graphify output. Also has real callers at api/cartridge/{search,timeline} and api/glyph/search. Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
         "status": "RUNTIME_SMOKE_PROVEN"
       }
+    },
+    "error_signal_evidence": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "scripts/atlas/validate-error-signal-evidence-v1.mjs",
+        "evidence": "Read-only validator for error_signal_stream rows: provenance (single-batch detection), live re-check of relation/column claims, verdicts, sealed receipt with writesPerformed=0 and repairEligible=false on every row. Live run 2026-10-13 over 6 rows (1 NOT_REPRODUCED_NOW, 1 PARTIALLY_REPRODUCED, 1 UNVERIFIED, 3 PROPOSAL_ONLY). Spec: error-signal-evidence-v1.spec.mjs (7/7).",
+        "status": "RUNTIME_SMOKE_PROVEN"
+      },
+      "backends": [
+        {
+          "name": "error-signal-repair-proposal-bridge",
+          "path": "scripts/atlas/bridge-error-signal-to-repair-proposal-v1.mjs",
+          "classification": "BACKEND",
+          "status": "FIXTURE_PROVEN",
+          "evidence": "Dry-run only. Consumes the validator receipt after digest verification; admits PARTIALLY_REPRODUCED/REPRODUCES_NOW for schema_mismatch only; maps reviews to registry action AWAIT_OPERATOR (agentic-action-registry-v1.ts). No registry consumer exists (Phase 66 fixer not found), so executable=0. Not revision-qualified: validator receipt carries no source revision."
+        }
+      ],
+      "note": "Added 2026-10-13. Repair execution is not owned here; proposals are human-review only."
+    },
+    "random_fourier_features": {
+      "owner": {
+        "classification": "OPTIONAL_CHALLENGER",
+        "path": "python/atlas_compute/rff_transform.py",
+        "evidence": "Random Fourier Features challenger (Gaussian RBF approximation, z(x)=sqrt(2/D)cos(xW+b)). Not a retrieval owner and not a replacement for content_embedding_768. Tests: python/tests/test_rff_transform.py 5/5 OK in atlas-rapids-cu13 (CPU). File is untracked working-tree WIP at registration time."
+      },
+      "status": "DEFERRED_OPTIONAL_CHALLENGER",
+      "required_preconditions": [
+        "frozen seed and parameters shared by corpus and query",
+        "RBF-vs-cosine parity on a reviewed cohort",
+        "no promotion to Qdrant without an admission receipt"
+      ],
+      "note": "Added 2026-10-13. A duplicate RFF module created this session was archived to .archive/duplicates-2026-10-13/."
     }
   }
 }

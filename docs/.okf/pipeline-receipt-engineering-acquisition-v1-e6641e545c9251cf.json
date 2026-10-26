@@ -1,0 +1,45 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 109,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "engineering-acquisition-v1-e6641e545c9251cf",
+  "page_count": 4,
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "e436c4491ce2121a9556e9748793385b3716fcccee3569f07d2502ae24b0a967",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 27,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\langfuse-opentelemetry\\chunks.jsonl",
+      "page_receipt_checksum": "a3e9d1d1265d215c21ffc7bf8770def356ae485be4b6eb06974f4f2893244dbf",
+      "pages": 1,
+      "source_id": "langfuse-opentelemetry",
+      "source_namespace": null
+    },
+    {
+      "chunks": 59,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\mastra-tracing-agents\\chunks.jsonl",
+      "page_receipt_checksum": "18fcdf1576faf370a00732945a4f0207b688043e39189d8bc187d342c9d8ce73",
+      "pages": 2,
+      "source_id": "mastra-tracing-agents",
+      "source_namespace": null
+    },
+    {
+      "chunks": 23,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\opentelemetry-javascript\\chunks.jsonl",
+      "page_receipt_checksum": "688c8ab499c040b050cd55cdc5f18aa94479543d1e86966c4a63f70ad4ec1a26",
+      "pages": 1,
+      "source_id": "opentelemetry-javascript",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

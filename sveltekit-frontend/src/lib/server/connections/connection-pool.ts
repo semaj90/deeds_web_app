@@ -21,7 +21,11 @@ import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 // Local amqplib types (named imports fail with moduleResolution: "bundler")
-type AmqpConnection = { createChannel(): Promise<AmqpChannel>; close(): Promise<void> };
+type AmqpConnection = {
+	createChannel(): Promise<AmqpChannel>;
+	close(): Promise<void>;
+	on(event: string, listener: (...args: any[]) => void): void;
+};
 type AmqpChannel = {
 	on(event: string, listener: (...args: any[]) => void): void;
 	close(): Promise<void>;
@@ -200,13 +204,28 @@ export async function ensureRabbitConnection(): Promise<AmqpConnection> {
 		rabbitConnectionAttempts++;
 		const url = ENV.RABBITMQ_URL;
 		const amqplib = await import('amqplib');
-		rabbitConnectionInstance = await (amqplib as any).default.connect(url, {
+		const connected = await (amqplib as any).default.connect(url, {
 			heartbeat: 60,
 			timeout: 10000
 		});
+		rabbitConnectionInstance = connected;
+		rabbitConnectionAttempts = 0;
+		connected.on('error', (err: unknown) => {
+			console.error('RabbitMQ connection error', err);
+			if (rabbitConnectionInstance === connected) {
+				rabbitConnectionInstance = null;
+				rabbitChannelInstance = null;
+			}
+		});
+		connected.on('close', () => {
+			if (rabbitConnectionInstance === connected) {
+				rabbitConnectionInstance = null;
+				rabbitChannelInstance = null;
+			}
+		});
 
 		console.log('RabbitMQ connection established');
-		return rabbitConnectionInstance!;
+		return connected;
 	} catch (e) {
 		console.error('RabbitMQ connection failed', e);
 		throw e;

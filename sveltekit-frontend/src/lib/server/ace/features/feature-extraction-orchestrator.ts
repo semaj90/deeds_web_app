@@ -54,8 +54,7 @@ export class FeatureExtractionOrchestrator {
     this.featureGen = new FeatureVectorGenerator({
       maxVocabulary: 5000,
       embedding: {
-        model: 'embeddinggemma',
-        dimension: 384,
+        model: 'handcrafted-feature-v1',
       },
     });
     this.treeExtractor = new TreeNodeExtractor();
@@ -182,7 +181,7 @@ export class FeatureExtractionOrchestrator {
       }
 
       // Step 4: Materialize to Postgres (dry-run or apply)
-      if (options.dryRun) {
+      if (options.dryRun !== false) {
         if (options.verbose) {
           console.log(`[ORCHESTRATOR] DRY RUN: Would materialize ${result.clustered} cluster assignments`);
           console.log(`  Sample assignments:`);
@@ -222,7 +221,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const orchestrator = new FeatureExtractionOrchestrator();
 
   const options: OrchestrationOptions = {
-    dryRun: process.argv.includes('--dry-run'),
+    dryRun: !process.argv.includes('--apply') || process.argv.includes('--dry-run'),
     limit: parseInt(process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1] || '0'),
     verbose: process.argv.includes('--verbose'),
     skipDomainClassification: process.argv.includes('--skip-domain'),

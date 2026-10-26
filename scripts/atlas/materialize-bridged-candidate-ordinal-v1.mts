@@ -19,8 +19,15 @@ import {
   type CanonicalCandidateIdentityInput,
 } from '../../sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.js';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import {
+  assertCurrentSourceAuthorityReceiptV1,
+  assertOneSourceRevisionPerRefV1,
+  assertRootSourceBindingCensusV1,
+  resolveSourceBatchLimitsV1,
+} from './lib/candidate-ordinal-source-census-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+async function main() {
 const PREVIEW_PATH = path.join(ROOT, 'docs/reports/stable-file-population-preview-v1.json');
 const AUTHORITY_PATH = path.join(ROOT, 'docs/reports/current-source-authority-cohort-v1.json');
 const args = process.argv.slice(2);
@@ -28,6 +35,9 @@ const getArg = (name: string) => {
   const index = args.indexOf(name);
   return index >= 0 ? args[index + 1] ?? null : null;
 };
+const { maxSourceFiles, maxSourceBytes } = resolveSourceBatchLimitsV1(
+  getArg('--max-source-files'), getArg('--max-source-bytes'),
+);
 const digest = (value: string | Buffer) => `sha256:${crypto.createHash('sha256').update(value).digest('hex')}`;
 const stableJson = (value: unknown): string => {
   if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
@@ -40,6 +50,14 @@ const stableJson = (value: unknown): string => {
 
 const preview = JSON.parse(fs.readFileSync(PREVIEW_PATH, 'utf8'));
 const authority = JSON.parse(fs.readFileSync(AUTHORITY_PATH, 'utf8'));
+const versionedAuthorityPath = authority.versionedReceipt
+  ? path.resolve(ROOT, authority.versionedReceipt)
+  : null;
+if (!versionedAuthorityPath || !versionedAuthorityPath.startsWith(path.resolve(ROOT, 'docs/reports') + path.sep)) {
+  throw new Error('VERSIONED_SOURCE_AUTHORITY_RECEIPT_PATH_INVALID');
+}
+const versionedAuthority = JSON.parse(fs.readFileSync(versionedAuthorityPath, 'utf8'));
+const verifiedAuthority = assertCurrentSourceAuthorityReceiptV1(authority, versionedAuthority);
 const bridgeProof = JSON.parse(fs.readFileSync(path.join(ROOT, '.tmp/atlas/repository-namespace-bridge-v1/bridge-root-proof-20260926.json'), 'utf8'));
 const workspaceRevision = authority.workspaceRevision as string;
 const executionId = bridgeProof.selectedExecutionId as string;
@@ -73,7 +91,7 @@ const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env), max: 1, st
 let sourceCounts: { membershipRows: number; mappedBindingRows: number; mismatchedWorkspaceRows: number };
 let rawRows: Array<{
   packet_key: string; canonical_chunk_id: string; chunk_row_id: string; source_ref: string;
-  source_revision: string; workspace_revision: string; packet_id: string;
+  source_revision: string; workspace_revision: string; packet_id: string; source_byte_length: string;
 }>;
 try {
   const client = await pool.connect();
@@ -116,14 +134,12 @@ try {
       mappedBindingRows: Number(census.mapped_binding_rows),
       mismatchedWorkspaceRows: Number(census.mismatched_workspace_rows),
     };
-    if (sourceCounts.membershipRows !== 24_456 || sourceCounts.mappedBindingRows !== 24_456 || sourceCounts.mismatchedWorkspaceRows !== 0) {
-      throw new Error(`ROOT_SOURCE_BINDING_CENSUS_MISMATCH:${JSON.stringify(sourceCounts)}`);
-    }
+    assertRootSourceBindingCensusV1(sourceCounts, verifiedAuthority.rootSourceCount);
 
     rawRows = (await client.query(`
       WITH exact_root AS (
         SELECT m.source_ref, m.repository_relative_path, m.code_source_revision,
-               m.workspace_revision
+               m.workspace_revision, b.byte_length::bigint AS source_byte_length
         FROM public.graphify_execution_file_membership_v2 m
         JOIN public.atlas_workspace_source_bindings b
           ON b.repo_id = $2
@@ -135,12 +151,40 @@ try {
         WHERE m.execution_id = $1::uuid
           AND m.repository_id = 'repo:root'
           AND m.workspace_revision::text = $3
+      ), eligible_files AS (
+        SELECT DISTINCT source_ref, code_source_revision, workspace_revision, source_byte_length
+        FROM exact_root
+        WHERE source_byte_length BETWEEN 0 AND $5::bigint
+          AND EXISTS (
+            SELECT 1
+            FROM public.atlas_packet_chunk_lineage l
+            JOIN public.codebase_chunk_index c
+              ON c.id = l.chunk_row_id
+             AND c.chunk_id::text = l.canonical_chunk_id::text
+            JOIN public.atlas_packets p
+              ON p.packet_key::text = l.packet_key::text
+             AND p.source_ref::text = l.source_ref::text
+            WHERE l.source_ref::text = exact_root.source_ref
+              AND l.source_revision::text = exact_root.code_source_revision
+              AND l.revision_status = 'PROVEN'
+          )
+      ), bounded_files AS (
+        SELECT *,
+               row_number() OVER (ORDER BY convert_to(source_ref, 'UTF8'), code_source_revision) AS source_ordinal,
+               sum(source_byte_length) OVER (
+                 ORDER BY convert_to(source_ref, 'UTF8'), code_source_revision
+                 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+               ) AS cumulative_bytes
+        FROM eligible_files
+      ), selected_files AS (
+        SELECT * FROM bounded_files
+        WHERE source_ordinal <= $4::int AND cumulative_bytes <= $5::bigint
       )
       SELECT p.packet_id::text, p.packet_key::text,
              l.canonical_chunk_id::text, l.chunk_row_id::text,
              l.source_ref::text, l.source_revision::text,
-             $3::text AS workspace_revision
-      FROM exact_root m
+             $3::text AS workspace_revision, m.source_byte_length::text AS source_byte_length
+      FROM selected_files m
       JOIN public.atlas_packet_chunk_lineage l
         ON l.source_ref::text = m.source_ref
        AND l.source_revision::text = m.code_source_revision
@@ -152,7 +196,7 @@ try {
         ON p.packet_key::text = l.packet_key::text
        AND p.source_ref::text = m.source_ref
       ORDER BY l.canonical_chunk_id::text, l.chunk_row_id::text
-    `, [executionId, sourceAuthorityRepoId, workspaceRevision])).rows;
+    `, [executionId, sourceAuthorityRepoId, workspaceRevision, maxSourceFiles, maxSourceBytes])).rows;
     await client.query('ROLLBACK');
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
@@ -171,6 +215,12 @@ if (sourceRefs.size > sourceCounts.mappedBindingRows) {
 }
 const uniqueChunks = new Set(rawRows.map((row) => row.canonical_chunk_id));
 if (uniqueChunks.size !== rawRows.length) throw new Error('CANONICAL_CHUNK_ID_NOT_UNIQUE_IN_EXACT_COHORT');
+const selectedSourceBytes = [...new Map(rawRows.map((row) => [row.source_ref, Number(row.source_byte_length)])).values()]
+  .reduce((total, byteLength) => total + byteLength, 0);
+if (sourceRefs.size > maxSourceFiles || selectedSourceBytes > maxSourceBytes) {
+  throw new Error(`SOURCE_BATCH_LIMIT_EXCEEDED:${sourceRefs.size}:${selectedSourceBytes}`);
+}
+assertOneSourceRevisionPerRefV1(rawRows);
 
 const rawCandidates: CanonicalCandidateIdentityInput[] = rawRows.map((row) => ({
   canonicalId: row.canonical_chunk_id,
@@ -201,6 +251,13 @@ const cohortIdentity = {
   exactSourceBindingRows: sourceCounts.mappedBindingRows,
   exactBridgeSourceRefs: sourceRefs.size,
   exactCanonicalChunkCount: rawRows.length,
+  selectionPolicy: {
+    maxSourceFiles,
+    maxSourceBytes,
+    selectedSourceFiles: sourceRefs.size,
+    selectedSourceBytes,
+    order: 'source_ref_utf8_ascending',
+  },
   sourceRevisionSetChecksum,
   candidates: rawCandidates,
 };
@@ -236,6 +293,13 @@ const receiptBody = {
   exactBridgeSourceCount: sourceRefs.size,
   exactChunkCandidateCount: rawRows.length,
   revisionQualifiedChunkCount: rawRows.length,
+  sourceBatch: {
+    maxSourceFiles,
+    maxSourceBytes,
+    selectedSourceFiles: sourceRefs.size,
+    selectedSourceBytes,
+    order: 'source_ref_utf8_ascending',
+  },
   ordinalMap: {
     path: 'candidate-ordinal-map-v1.json',
     sha256: digest(mapBody),
@@ -268,9 +332,34 @@ console.log(JSON.stringify({
   sourceCounts,
   exactBridgeSourceCount: sourceRefs.size,
   exactChunkCandidateCount: rawRows.length,
+  selectedSourceFiles: sourceRefs.size,
+  selectedSourceBytes,
   ordinalMapChecksum: ordinalMap.ordinalMapChecksum,
   candidateSnapshotRevision,
   canonicalAuthority: false,
   writesPerformed: false,
   outDir: path.relative(ROOT, outDir).replaceAll('\\', '/'),
 }, null, 2));
+}
+
+main().catch((error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error);
+  const recommendations = message.includes('SOURCE_AUTHORITY')
+    ? ['Refresh and independently verify both current and versioned source-authority receipts; do not bypass their checksum or scope checks.']
+    : message.includes('ROOT_SOURCE_BINDING') || message.includes('EXACT_PACKET_CHUNK')
+      ? ['Inspect exact workspace/source-revision packet and chunk-lineage joins; keep unmatched or ambiguous rows excluded.']
+      : message.includes('SOURCE_BATCH_LIMIT')
+        ? ['Reduce the requested bounded batch; never exceed 500 files or 64 MiB.']
+        : message.includes('DATABASE') || message.includes('ECONN') || message.includes('timeout')
+          ? ['Check the configured read-only database endpoint and service health, then retry into a fresh scratch directory.']
+          : ['Inspect the failing owner and its revision-qualified inputs; do not infer packet identity or promote diagnostic output.'];
+  console.error(JSON.stringify({
+    schema: 'atlas.candidate-ordinal-materialization-failure.v1',
+    status: 'BLOCKED',
+    error: message,
+    recommendations,
+    writesPerformed: false,
+    canonicalAuthority: false,
+  }, null, 2));
+  process.exitCode = 1;
+});

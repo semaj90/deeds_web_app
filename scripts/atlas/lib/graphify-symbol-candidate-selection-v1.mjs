@@ -10,6 +10,18 @@ export function isGraphifySymbolExcludedArtifactV1(sourceRef) {
   return new RegExp(GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1, 'i').test(normalized);
 }
 
+/**
+ * V2 adds generated/tool-output JSON files that are stored with a .json extension but are not strict JSON
+ * (build logs, audit dumps). V1 stays frozen because the admission audit imports it; switching the audit to
+ * V2 changes its denominator and must be a deliberate, separate decision.
+ */
+export const GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2 = String.raw`(?:^|/)(?:memory/.*\.json$|drizzle/meta/[0-9]+_snapshot\.json$|vectors/content_768_f32_row_map\.json$|phase110_ground_truth/.*\.json$|static/phase72/route-ast-graph\.json$|scripts/atlas/\.stage1-prior-snapshot\.json$|unreachable-classified\.json$|svelte-errors(?:-utf8)?\.json$|docs/reports/drizzle-audit-current-utf8\.json$|drizzle/sidecar-audit-(?:validated|report)\.json$|^mcp_(?:tools|init)\.json$)`;
+
+export function isGraphifySymbolExcludedArtifactV2(sourceRef) {
+  const normalized = String(sourceRef ?? '').replace(/\\/g, '/').replace(/^\.\//, '').toLowerCase();
+  return new RegExp(GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2, 'i').test(normalized);
+}
+
 /** Select a bounded extractor batch without letting unsupported refs consume its limit. */
 export function selectBoundedSupportedExtractorCandidates(rows, classifySourceRef, limit, checkSourceRevision = null) {
   if (!Number.isSafeInteger(limit) || limit < 1) {
@@ -18,7 +30,7 @@ export function selectBoundedSupportedExtractorCandidates(rows, classifySourceRe
 
   const supportedPool = rows
     .map((row) => ({ row, kind: classifySourceRef(row.source_ref) }))
-    .filter((entry) => entry.kind !== 'unsupported' && !isGraphifySymbolExcludedArtifactV1(entry.row.source_ref));
+    .filter((entry) => entry.kind !== 'unsupported' && !isGraphifySymbolExcludedArtifactV2(entry.row.source_ref));
 
   const candidates = [];
   let precheckRowsExamined = 0;

@@ -103,6 +103,23 @@ describe('phase109b repository provenance workflow wrapper', () => {
               embeddedFiles: 1,
               heuristicFiles: 0,
             },
+            projection: { status: 'SKIPPED' },
+          },
+        }),
+        'production-projection',
+      ),
+    ).toBe(false);
+    expect(
+      mod.evaluateWorkflowSuccess(
+        makeReport({
+          stages: {
+            validation: { pass: true },
+            semantic: {
+              status: 'PARTIAL',
+              embeddedFiles: 1,
+              heuristicFiles: 0,
+            },
+            projection: { status: 'PROVEN' },
           },
         }),
         'production-projection',
@@ -118,6 +135,33 @@ describe('phase109b repository provenance workflow wrapper', () => {
               embeddedFiles: 1,
               heuristicFiles: 1,
             },
+            projection: { status: 'PROVEN' },
+          },
+        }),
+        'production-projection',
+      ),
+    ).toBe(false);
+    // A real live-embedder run still needs independently proven projection readback.
+    expect(
+      mod.evaluateWorkflowSuccess(
+        makeReport({
+          stages: {
+            validation: { pass: true },
+            semantic: { status: 'PROVEN', embeddedFiles: 24, heuristicFiles: 0 },
+            projection: { status: 'PROVEN' },
+          },
+        }),
+        'production-projection',
+      ),
+    ).toBe(true);
+    // Nothing sampled is still a failure.
+    expect(
+      mod.evaluateWorkflowSuccess(
+        makeReport({
+          stages: {
+            validation: { pass: true },
+            semantic: { status: 'SKIPPED', embeddedFiles: 0, heuristicFiles: 0 },
+            projection: { status: 'PROVEN' },
           },
         }),
         'production-projection',

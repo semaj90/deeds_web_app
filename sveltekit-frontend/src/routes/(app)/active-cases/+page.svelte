@@ -301,14 +301,20 @@
 
 	<!-- AI Analysis Modal -->
 	{#if analysisResult || analysisError}
-		<div class="analysis-modal-overlay" onclick={closeAnalysis}>
-			<div class="analysis-modal" onclick={(e) => e.stopPropagation()}>
+		<div
+			class="analysis-modal-overlay"
+			role="button"
+			tabindex="0"
+			onclick={(e) => { if (e.target === e.currentTarget) closeAnalysis(); }}
+			onkeydown={(e) => { if (e.key === 'Escape') closeAnalysis(); }}
+		>
+			<div class="analysis-modal">
 				<div class="modal-header">
 					<div class="modal-title">
 						<Icon name="brain" />
 						LEGAL AI ANALYSIS
 					</div>
-					<button onclick={closeAnalysis} class="close-btn">
+					<button type="button" onclick={closeAnalysis} class="close-btn" aria-label="Close analysis">
 						<Icon name="x" />
 					</button>
 				</div>
@@ -324,7 +330,7 @@
 						</div>
 						<div class="service-info">
 							<strong>Service:</strong> Legal AI Orchestrator (Port 8102)<br/>
-							<strong>Backend:</strong> Ollama gemma4-legal:latest
+							<strong>Backend:</strong> Ollama ornith-1.5-9b
 						</div>
 						<button
 							class="retry-btn"

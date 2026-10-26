@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { validateSemantic768OutputV1 } from './embedding-runtime-v1.js';
 
@@ -26,6 +27,16 @@ export type AtlasEmbeddingBatchReceiptV1 = {
   representationId: 'semantic_768';
   representationRevision: string;
   modelRevision: string;
+  inputPolicyRevision: 'title-newline-text-v1';
+  inputQualification: 'EXECUTION_INPUTS_HASHED';
+  canonicalAuthority: false;
+  inputs: Array<{
+    packetKey: string;
+    sourceRef: string;
+    sourceRevision: string | null;
+    contentHash: string | null;
+    inputChecksum: string;
+  }>;
   role: AtlasEmbeddingRoleV1;
   documentCount: number;
   dimension: 768;
@@ -64,6 +75,10 @@ function formatDocument(document: AtlasSemanticDocumentV1): string {
   return `${document.title}\n${document.documentText}`;
 }
 
+function digestInput(text: string): string {
+  return `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
+}
+
 function assertDocumentBatch(documents: readonly AtlasSemanticDocumentV1[], policy: EmbeddingBatchPolicyV1): void {
   assertPolicy(policy);
   if (documents.length === 0) throw new Error('EMPTY_EMBEDDING_DOCUMENT_BATCH');
@@ -92,14 +107,17 @@ function validateVector(value: unknown): Float32Array {
 }
 
 function checksum(vectors: readonly Float32Array[]): string {
-  let hash = 2166136261;
+  const values = vectors.reduce((sum, vector) => sum + vector.length, 0);
+  const bytes = new Uint8Array(values * Float32Array.BYTES_PER_ELEMENT);
+  const view = new DataView(bytes.buffer);
+  let offset = 0;
   for (const vector of vectors) {
     for (const value of vector) {
-      const bytes = new Uint8Array(new Float32Array([value]).buffer);
-      for (const byte of bytes) hash = Math.imul(hash ^ byte, 16777619);
+      view.setFloat32(offset, value, true);
+      offset += Float32Array.BYTES_PER_ELEMENT;
     }
   }
-  return (hash >>> 0).toString(16).padStart(8, '0');
+  return `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 }
 
 export function createHttpDocumentEmbeddingExecutorV1(input: {
@@ -118,6 +136,7 @@ export function createHttpDocumentEmbeddingExecutorV1(input: {
     async embedDocuments(documents, policy) {
       assertDocumentBatch(documents, policy);
       const role = documents[0]!.embeddingRole;
+      const renderedInputs = documents.map(formatDocument);
       const started = performance.now();
       const response = await fetchImpl(
         input.executorId === 'LLAMA_CPP_CUDA' ? `${endpoint}/v1/embeddings` : `${endpoint}/api/embed`,
@@ -125,8 +144,8 @@ export function createHttpDocumentEmbeddingExecutorV1(input: {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify(input.executorId === 'LLAMA_CPP_CUDA'
-            ? { model: input.model, input: documents.map(formatDocument) }
-            : { model: input.model, input: documents.map(formatDocument) }),
+            ? { model: input.model, input: renderedInputs }
+            : { model: input.model, input: renderedInputs }),
         },
       );
       if (!response.ok) throw new Error(`EMBEDDING_EXECUTOR_HTTP_${response.status}`);
@@ -143,6 +162,16 @@ export function createHttpDocumentEmbeddingExecutorV1(input: {
           representationId: 'semantic_768',
           representationRevision: input.representationRevision,
           modelRevision: input.modelRevision,
+          inputPolicyRevision: 'title-newline-text-v1',
+          inputQualification: 'EXECUTION_INPUTS_HASHED',
+          canonicalAuthority: false,
+          inputs: documents.map((document, index) => ({
+            packetKey: document.packetKey,
+            sourceRef: document.sourceRef,
+            sourceRevision: document.sourceRevision,
+            contentHash: document.contentHash,
+            inputChecksum: digestInput(renderedInputs[index]!),
+          })),
           role,
           documentCount: documents.length,
           dimension: 768,

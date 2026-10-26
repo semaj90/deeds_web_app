@@ -6,7 +6,7 @@
 set -e
 
 TURBO_URL="http://127.0.0.1:8090"
-MODEL="gemma4-legal-iq4xs-direct.gguf"
+MODEL="ornith-1.5-9b"
 
 echo "🧪 Testing Legal GGUF via TurboQuant..."
 echo ""
@@ -25,7 +25,7 @@ fi
 echo ""
 echo "2️⃣  Checking loaded model..."
 MODEL_LIST=$(curl -s "$TURBO_URL/v1/models")
-if echo "$MODEL_LIST" | grep -q "gemma4-legal"; then
+if echo "$MODEL_LIST" | grep -q "ornith-1.5-9b"; then
   echo "   ✅ Legal GGUF model is loaded"
 else
   echo "   ❌ Legal GGUF not found in model list"

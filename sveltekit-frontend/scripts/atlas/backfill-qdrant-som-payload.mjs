@@ -23,6 +23,11 @@ const BATCH_SIZE = parseInt(
 const COLLECTION = process.env.QDRANT_COLLECTION || 'codebase_chunks_384_hybrid';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 
+if (COLLECTION.startsWith('codebase_chunks_384')) {
+  console.error('LEGACY_384_SOM_PAYLOAD_DISABLED: the target collection is retired; do not recreate or enrich it');
+  process.exit(2);
+}
+
 const pool = new pg.Pool({
   host:     process.env.DB_HOST     || '127.0.0.1',
   port:     parseInt(process.env.DB_PORT || '5434'),

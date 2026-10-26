@@ -2,8 +2,8 @@ import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { QDRANT_SOURCE_COLLECTION } from '$lib/server/vector/retrieval-semantics.js';
 
 export const CANONICAL_CODEBASE_QDRANT_COLLECTIONS = [
-  QDRANT_SOURCE_COLLECTION,
   'codebase_chunks_768_v2',
+  QDRANT_SOURCE_COLLECTION,
 ] as const;
 
 export interface QdrantSummarySyncInput {

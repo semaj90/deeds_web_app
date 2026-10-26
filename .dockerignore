@@ -9,6 +9,15 @@
 !docker/atlas-gpu-8098/
 !docker/atlas-gpu-8098/Dockerfile
 !docker/atlas-gpu-8098/requirements.txt
+!docker/
+!docker/atlas-cuda134-simt/
+!docker/atlas-cuda134-simt/Dockerfile
+!docker/atlas-cuda134-simt/run-fixtures.sh
+!native/
+!native/cutile-ace-level2/
+!native/cutile-ace-level2/glyph_kernels_bench.cu
+!native/cutile-ace-level3/
+!native/cutile-ace-level3/glyph_fused_tile.cu
 !tensor_services/**
 !engine-builder/**
 !training/**

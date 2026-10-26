@@ -21,6 +21,7 @@ import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 
 const librarySearchSchema = z.object({
   q: z.string().min(2).max(1000),
+  documentId: z.string().uuid().nullish(),
   jurisdiction: z.string().max(50).nullish(),
   corpusType: z.string().max(50).nullish(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
@@ -29,6 +30,7 @@ const librarySearchSchema = z.object({
 // POST body accepts `query` instead of `q`
 const postBodySchema = z.object({
   query: z.string().min(2).max(1000),
+  documentId: z.string().uuid().nullish(),
   jurisdiction: z.string().max(50).nullish(),
   corpusType: z.string().max(50).nullish(),
   limit: z.coerce.number().int().min(1).max(50).default(20),
@@ -38,6 +40,7 @@ const GO_SEARCH_URL = ENV.GO_SEARCH_URL || '';
 
 interface SearchParams {
   q: string;
+  documentId?: string | null;
   jurisdiction?: string | null;
   corpusType?: string | null;
   limit: number;
@@ -45,12 +48,12 @@ interface SearchParams {
 }
 
 async function doSearch(p: SearchParams) {
-  const { q, jurisdiction, corpusType, limit, userId } = p;
+  const { q, documentId, jurisdiction, corpusType, limit, userId } = p;
 
   recordSearchQuery({ query: q, pipeline: 'kag', cacheHit: false, userId });
 
   // Fast-path: Go search service (parallel fan-out: citation + FTS + pgvector + Qdrant)
-  if (GO_SEARCH_URL) {
+  if (GO_SEARCH_URL && !documentId) {
     try {
       const goResp = await fetch(`${GO_SEARCH_URL}/search`, {
         method: 'POST',
@@ -87,6 +90,10 @@ async function doSearch(p: SearchParams) {
   const params: unknown[] = [q];
   let paramIdx = 2;
 
+  if (documentId) {
+    params.push(documentId);
+    filters.push(`ld.id = $${paramIdx++}::uuid`);
+  }
   if (jurisdiction) {
     params.push(jurisdiction);
     filters.push(`j.code = $${paramIdx++}`);
@@ -135,6 +142,7 @@ async function doSearch(p: SearchParams) {
 			  JOIN library_documents ld ON ld.id = ln.document_id
 			  LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
 			  WHERE lc.embedding IS NOT NULL
+			    AND (1 - (lc.embedding <=> $${embeddingParam}::vector)) >= 0.45
 			  ${whereClause}
 			  ORDER BY lc.embedding <=> $${embeddingParam}::vector LIMIT $${fetchParam}
 			),
@@ -206,12 +214,13 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     q: url.searchParams.get('q')?.trim() ?? '',
     jurisdiction: url.searchParams.get('jurisdiction'),
     corpusType: url.searchParams.get('corpusType'),
+    documentId: url.searchParams.get('documentId'),
     limit: url.searchParams.get('limit') ?? undefined,
   });
   if (!parsed.success) return json({ hits: [], results: [], total: 0 });
 
-  const { q, jurisdiction, corpusType, limit } = parsed.data;
-  const result = await doSearch({ q, jurisdiction, corpusType, limit, userId: locals.user.id });
+  const { q, jurisdiction, corpusType, documentId, limit } = parsed.data;
+  const result = await doSearch({ q, jurisdiction, corpusType, documentId, limit, userId: locals.user.id });
   return json(result, { headers: cacheControl.short });
 };
 
@@ -224,8 +233,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const parsed = postBodySchema.safeParse(body);
   if (!parsed.success) return json({ hits: [], results: [], total: 0 });
 
-  const { query: q, jurisdiction, corpusType, limit } = parsed.data;
-  const result = await doSearch({ q, jurisdiction, corpusType, limit, userId: locals.user.id });
+  const { query: q, jurisdiction, corpusType, documentId, limit } = parsed.data;
+  const result = await doSearch({ q, jurisdiction, corpusType, documentId, limit, userId: locals.user.id });
   return json(result, { headers: cacheControl.short });
 };
 

@@ -148,9 +148,9 @@
       <h2 class="mb-4 text-lg font-medium text-sand">Select Component</h2>
 
       <div class="max-w-xs space-y-3">
-        <label class="mb-2 block text-sm font-medium text-sand/70">
+        <span class="mb-2 block text-sm font-medium text-sand/70">
           Choose a fruit
-        </label>
+        </span>
         <div class="flex flex-wrap gap-2">
           {#each fruits as fruit}
             <button

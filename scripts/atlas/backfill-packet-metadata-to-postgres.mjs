@@ -210,6 +210,11 @@ async function scrollQdrant(url, collection, limit) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (APPLY && !DRY_RUN) {
+    console.error('LATENT_PACKET_METADATA_APPLY_BLOCKED: this writer persists derived latents without revision-qualified source CAS and independent vector readback.');
+    process.exit(78);
+  }
+
   console.log('\n╔══════════════════════════════════════════════════════════════════╗');
   console.log('║  backfill-latent-vectors.mjs — AE Encode: 768 → 128 → 64        ║');
   console.log(`╚══════════════════════════════════════════════════════════════════╝\n`);
@@ -363,7 +368,7 @@ async function main() {
     console.log(
       `  🔍 DRY-RUN — would write ${Object.keys(latentIndex).length} entries to ${LATENT_FILE}`
     );
-    console.log('   Skipping artifact, Postgres, and Redis writes. Use --apply to persist.');
+    console.log('   Skipping artifact, Postgres, and Redis writes. Persistence remains blocked pending lineage gates.');
     return;
   }
 

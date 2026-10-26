@@ -91,6 +91,7 @@ function exactMutationForTarget(source, target) {
 
 function classify(relative, source, target) {
   if (relative.endsWith('audit-semantic-768-writer-ownership-v1.mjs')) return null;
+  if (/(?:^|[\\/])test[-_]/i.test(relative)) return null;
   if (/\.(?:test|spec)\.(?:mjs|mts|ts|sql)$/i.test(relative)) return null;
   const applies = target.patterns.some((pattern) => pattern.test(source));
   if (!applies) return null;
@@ -110,6 +111,7 @@ function classify(relative, source, target) {
   const dryRun = /dry[-_ ]?run|read[-_ ]only|DRY_RUN/i.test(source);
   const entrypoint = /package\.json$|startup|route|worker|daemon|index-stream/i.test(relative);
   const explicitApply = /--apply|\bAPPLY\b|ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL|EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED/i.test(source);
+  const applyQuarantined = /if\s*\(\s*APPLY\s*\)\s*\{\s*throw\s+new\s+Error\(\s*['\"]SEMANTIC_768_LINEAGE_GATE_BLOCKED/i.test(source);
 
   return {
     path: relative,
@@ -121,6 +123,7 @@ function classify(relative, source, target) {
     canonicalLineageQualified,
     independentReadback,
     explicitApply,
+    applyQuarantined,
     dryRun,
     productionReachableCandidate: entrypoint,
   };
@@ -216,7 +219,15 @@ async function main() {
     surface,
     mutationWriters.filter((writer) => writer.surface === surface).map((writer) => writer.path),
   ]));
-  const canonicalTargetWriterPaths = writersBySurface['codebase_chunk_index.content_embedding_768'];
+  const canonicalTargetWriterRecords = mutationWriters.filter((writer) =>
+    writer.surface === 'codebase_chunk_index.content_embedding_768');
+  const canonicalTargetWriterPaths = canonicalTargetWriterRecords.map((writer) => writer.path);
+  const canonicalTargetApplyEnabledWriterPaths = canonicalTargetWriterRecords
+    .filter((writer) => !writer.applyQuarantined)
+    .map((writer) => writer.path);
+  const quarantinedCanonicalTargetWriterPaths = canonicalTargetWriterRecords
+    .filter((writer) => writer.applyQuarantined)
+    .map((writer) => writer.path);
   const legacySurfaceWriterPaths = [
     ...writersBySurface['codebase_chunk_index.content_embedding'],
     ...writersBySurface['atlas_packets.embedding'],
@@ -232,21 +243,19 @@ async function main() {
     writersBySurface,
     ownershipComparison: {
       canonicalTargetWriterCandidates: canonicalTargetWriterPaths,
+      canonicalTargetApplyEnabledWriterCandidates: canonicalTargetApplyEnabledWriterPaths,
+      quarantinedCanonicalTargetWriterCandidates: quarantinedCanonicalTargetWriterPaths,
       legacySurfaceWriterCandidates: [...new Set(legacySurfaceWriterPaths)].sort(),
       historicalEvidence: 'scripts/atlas/sem768-corpus-bundle-01.mts',
-      decision: canonicalTargetWriterPaths.length === 1
-        ? 'SINGLE_STATIC_CANONICAL_TARGET_CANDIDATE_NOT_PROMOTED'
-        : canonicalTargetWriterPaths.length === 0
-          ? 'NO_STATIC_CANONICAL_TARGET_WRITER_FOUND'
-          : 'MULTIPLE_STATIC_CANONICAL_TARGET_WRITERS_UNRESOLVED',
-      reason: canonicalTargetWriterPaths.length === 1
-        ? 'The daily operator path and historical corpus producer target the legacy content_embedding surface, not content_embedding_768. One bounded writer statically targets the canonical column, but its 15-row scope and incomplete per-row provenance/readback do not establish it as the general canonical owner.'
-        : 'Classify writers by exact physical column. Legacy content_embedding and atlas_packets.embedding writers do not establish ownership of content_embedding_768; canonical-target candidates require revision-qualified provenance and independent readback.',
+      decision: canonicalTargetApplyEnabledWriterPaths.length === 1
+        ? 'ONE_APPLY_ENABLED_COHORT_WRITER_NOT_PROMOTED'
+        : canonicalTargetApplyEnabledWriterPaths.length === 0
+          ? 'NO_APPLY_ENABLED_CANONICAL_TARGET_WRITER'
+          : 'MULTIPLE_APPLY_ENABLED_CANONICAL_TARGET_WRITERS_UNRESOLVED',
+      reason: 'The legacy full-corpus backfill is explicitly quarantined before its apply path reaches embedding or persistence. One separate guarded writer remains apply-enabled but is limited to a 15-row cohort; incomplete per-row provenance, general-writer coverage, and projection readback prevent it from establishing the canonical semantic owner. Legacy content_embedding and atlas_packets.embedding writers remain separate physical surfaces.',
     },
     writers,
     mutationWriters,
-    physicalOwnerMutationWriters,
-    fullyQualifiedPhysicalWriters,
     operatorEntrypoints: [
       { command: 'npm run atlas:graphify:embedding:daily:apply', target: 'codebase_chunk_index.content_embedding', status: 'HISTORICAL_SURFACE_REQUIRES_OWNER_REVIEW' },
     ],
@@ -263,7 +272,7 @@ async function main() {
     verdict: 'OWNER_NOT_PROVEN',
     admissionBlockers: [
       'multiple 768 surfaces remain populated or referenced',
-      'the guarded backfill is cohort-specific and does not prove a general revision-qualified semantic owner',
+      'the only apply-enabled canonical-target writer is cohort-specific and does not prove a general revision-qualified semantic owner',
       'representation ledger and independent Qdrant readback remain open',
     ],
     writesPerformed: false,
@@ -274,8 +283,6 @@ async function main() {
     reportPath: REPORT_PATH,
     verdict: report.verdict,
     writerCount: writers.length,
-    physicalOwnerMutationWriterCount: physicalOwnerMutationWriters.length,
-    fullyQualifiedPhysicalWriterCount: fullyQualifiedPhysicalWriters.length,
     live,
   }, null, 2));
   const reportTempPath = `${REPORT_PATH}.${process.pid}.tmp`;

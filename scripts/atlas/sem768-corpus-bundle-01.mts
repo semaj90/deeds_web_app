@@ -212,7 +212,9 @@ async function main(): Promise<void> {
         'the separate, still-open authority for the canonical source/world binding.',
     };
 
-    fs.writeFileSync(OUT, JSON.stringify(report, null, 2));
+    const tmpOut = `${OUT}.${process.pid}.tmp`;
+    fs.writeFileSync(tmpOut, JSON.stringify(report, null, 2));
+    fs.renameSync(tmpOut, OUT);
     console.log(JSON.stringify({
       event: 'sem768_corpus_bundle_01_complete',
       status: report.status,

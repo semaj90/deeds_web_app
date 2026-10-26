@@ -133,13 +133,26 @@ const crosswalk = matchPacketAstObservationsToCanonicalSymbolsV1({
   sourceRevision,
   workspaceRevision,
 });
-if (symbolRows.length === 0 || crosswalk.matches.length === 0 || crosswalk.ambiguous.length > 0 || !crosswalk.exactOneToOne) {
-  throw new Error('CANONICAL_SYMBOL_OBSERVATION_ALIGNMENT_NOT_PROVEN');
-}
+const activeCanonicalSymbolVersionCount = symbolRows.filter((row) => row.registryStatus === 'active').length;
+const alignmentBlockers = [
+  ...(symbolRows.length === 0 ? ['NO_CANONICAL_SYMBOL_ROWS'] : []),
+  ...(crosswalk.matches.length === 0 ? ['NO_EXACT_SYMBOL_MATCHES'] : []),
+  ...(crosswalk.ambiguous.length > 0 ? ['AMBIGUOUS_SYMBOL_MATCHES'] : []),
+  ...(crosswalk.invalid.length > 0 ? ['INVALID_AST_OBSERVATIONS'] : []),
+  ...(crosswalk.invalidSymbols.length > 0 ? ['INVALID_CANONICAL_SYMBOL_ROWS'] : []),
+  ...(!crosswalk.exactCanonicalSymbolCoverage ? ['ACTIVE_SYMBOL_COVERAGE_INCOMPLETE'] : []),
+];
+const exactAlignment = alignmentBlockers.length === 0;
+const alignmentWarnings = [
+  ...(crosswalk.unmatched.length > 0 ? ['UNMATCHED_AST_OBSERVATIONS_NOT_IN_CANONICAL_SYMBOL_REGISTRY'] : []),
+  ...(!crosswalk.exactOneToOne ? ['FULL_AST_OBSERVATION_ONE_TO_ONE_NOT_ESTABLISHED'] : []),
+];
 
 const payload = {
   schema: 'atlas.packet-ast-canonical-symbol-alignment-receipt.v1',
-  status: crosswalk.allStoredVersionsMatched ? 'EXACT_PACKET_CANONICAL_SYMBOL_AST_ALIGNMENT' : 'PARTIAL_PACKET_CANONICAL_SYMBOL_AST_ALIGNMENT',
+  status: exactAlignment ? 'EXACT_PACKET_CANONICAL_SYMBOL_AST_ALIGNMENT' : 'BLOCKED_CANONICAL_SYMBOL_OBSERVATION_ALIGNMENT',
+  alignmentBlockers,
+  alignmentWarnings,
   packetKey,
   sourceRef,
   sourceRevision,
@@ -151,11 +164,14 @@ const payload = {
   bridgeReceipt: path.relative(ROOT, bridgeReceiptPath).replaceAll('\\', '/'),
   observationArtifactChecksum: observationChecksum,
   observationCount: observations.length,
-  activeCanonicalSymbolVersionCount: symbolRows.filter((row) => row.registryStatus === 'active').length,
+  activeCanonicalSymbolVersionCount,
   exactMatches: crosswalk.matches,
   unmatchedObservations: crosswalk.unmatched,
   ambiguousObservations: crosswalk.ambiguous,
+  invalidObservations: crosswalk.invalid,
+  invalidCanonicalSymbols: crosswalk.invalidSymbols,
   allStoredVersionsMatched: crosswalk.allStoredVersionsMatched,
+  exactCanonicalSymbolCoverage: crosswalk.exactCanonicalSymbolCoverage,
   exactOneToOne: crosswalk.exactOneToOne,
   canonicalAuthority: false,
   persistentStoreWritesPerformed: false,
@@ -166,4 +182,5 @@ fs.writeFileSync(outputPath, `${JSON.stringify(receipt, null, 2)}\n`, { encoding
 const readback = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
 const { checksum, ...readbackPayload } = readback;
 if (checksum !== sha256(Buffer.from(JSON.stringify(readbackPayload), 'utf8'))) throw new Error('RECEIPT_READBACK_CHECKSUM_MISMATCH');
-process.stdout.write(`${JSON.stringify({ status: readback.status, packetKey, observationCount: readback.observationCount, canonicalSymbolVersions: readback.activeCanonicalSymbolVersionCount, exactMatches: readback.exactMatches.length, unmatched: readback.unmatchedObservations.length, readback: 'MATCH', writes: false, output: path.relative(ROOT, outputPath) }, null, 2)}\n`);
+process.stdout.write(`${JSON.stringify({ status: readback.status, alignmentBlockers: readback.alignmentBlockers, alignmentWarnings: readback.alignmentWarnings, packetKey, observationCount: readback.observationCount, canonicalSymbolVersions: readback.activeCanonicalSymbolVersionCount, exactMatches: readback.exactMatches.length, unmatched: readback.unmatchedObservations.length, invalidObservations: readback.invalidObservations.length, invalidSymbols: readback.invalidCanonicalSymbols.length, exactCanonicalSymbolCoverage: readback.exactCanonicalSymbolCoverage, fullAstOneToOne: readback.exactOneToOne, readback: 'MATCH', writes: false, output: path.relative(ROOT, outputPath) }, null, 2)}\n`);
+if (!exactAlignment) process.exitCode = 1;

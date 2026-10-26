@@ -10,7 +10,22 @@
 import { createHash } from 'node:crypto';
 
 const REPO_ID = 'deeds-web-app';
-const REPO_UUID = '00000000-0000-0000-0000-000000000000';
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+async function resolveCanonicalRepoUuid(client) {
+  const { rows } = await client.query(
+    `SELECT repository_id::text AS repository_id
+       FROM public.atlas_repository_identity
+      WHERE source_authority_repo_id = $1`,
+    [REPO_ID],
+  );
+  if (rows.length !== 1) throw new Error(`REPOSITORY_IDENTITY_CARDINALITY:${rows.length}`);
+  const repoUuid = String(rows[0].repository_id ?? '');
+  if (!UUID_PATTERN.test(repoUuid) || repoUuid === '00000000-0000-0000-0000-000000000000') {
+    throw new Error('REPOSITORY_IDENTITY_INVALID');
+  }
+  return repoUuid;
+}
 
 function normalizePath(p) {
   return (p || '').replace(/\\/g, '/').replace(/^\//, '').toLowerCase();
@@ -48,8 +63,8 @@ export function indexSafeQualifiedSymbolV1(qualifiedSymbol) {
  * in `normalized_node_hash` or a receipt-level representation checksum and must
  * not be passed as the source content digest.
  *
- * @param {{ sourceRef: string, parserLanguage: string, parserName: string, parserVersion: string, sourceRevision?: string,
- *   workspaceId?: string, nodes: Array<{ kind: string, qualifiedSymbol: string, startByte: number,
+ * @param {{ sourceRef: string, parserLanguage: string, parserName: string, parserVersion: string, sourceRevision: string,
+ *   workspaceId: string, nodes: Array<{ kind: string, qualifiedSymbol: string, startByte: number,
  *   endByte: number, startLine: number, endLine: number, sourceContentDigest: string, parentIndex: number|null }> }} input
  * @returns {Promise<{ inserted: number, treeNodeIds: string[], insertedFlags: boolean[] }>}
  */
@@ -60,6 +75,13 @@ export async function writeAtlasAstNodes(client, input) {
   if (input.astGeneration !== undefined && !/^[a-z0-9_]+$/.test(String(input.astGeneration))) {
     throw new Error(`AST_GENERATION_INVALID:${String(input.astGeneration)}`);
   }
+  if (input.nodes.length > 0 && (typeof input.workspaceId !== 'string' || input.workspaceId.trim().length === 0)) {
+    throw new Error('WORKSPACE_ID_REQUIRED');
+  }
+  if (input.nodes.length > 0 && (typeof input.sourceRevision !== 'string' || input.sourceRevision.trim().length === 0)) {
+    throw new Error('SOURCE_REVISION_REQUIRED');
+  }
+  const repoUuid = input.nodes.length > 0 ? await resolveCanonicalRepoUuid(client) : null;
   const np = normalizePath(input.sourceRef);
   const treeNodeIds = new Array(input.nodes.length).fill(null);
   // `treeNodeIds` is the COMPUTED id for every node; `insertedFlags[i]` is true only if the INSERT really happened
@@ -80,7 +102,7 @@ export async function writeAtlasAstNodes(client, input) {
     const sk = structuralKey(np, node.kind, node.qualifiedSymbol);
 
     const params = [
-      tid, sk, REPO_UUID, np,
+      tid, sk, repoUuid, np,
       node.kind, indexSafeQualifiedSymbolV1(node.qualifiedSymbol), input.parserLanguage,
       parentTreeNodeId, node.startByte, node.endByte, node.startLine, node.endLine,
       createHash('sha256').update(sk).digest('hex'), node.sourceContentDigest,

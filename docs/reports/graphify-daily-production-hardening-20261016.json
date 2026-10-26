@@ -1,0 +1,121 @@
+{
+  "schema": "atlas.graphify-daily-production-hardening.v1",
+  "status": "TEST_GATES_PASS_PROJECTION_BLOCKED",
+  "generatedAt": "2026-10-16T22:17:10Z",
+  "scope": "Eight-gate hardening review with deterministic admission, read-only audit guard, and daily fallback tests; no live Graphify workflow rerun",
+  "sourceAudit": {
+    "path": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-16.json",
+    "sha256": "12325e399caf50bc4f95b80663ecf86b4a6b61a0a483a8198ec897d21944c175",
+    "generatedAt": "2026-10-16T18:37:37.273Z",
+    "repositoryCommit": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d",
+    "overallVerdict": "NOT_SAFE_TO_PROJECT",
+    "predicateCount": 11,
+    "passCount": 4,
+    "blockingPredicateCount": 7,
+    "blockingPredicates": [
+      "SYMBOLS_RESOLVED",
+      "SEMANTIC_OWNER_PROVEN",
+      "LATENT_FAMILY_PROVEN",
+      "ORDINAL_MAP_SEALED",
+      "PROJECTIONS_CHECKSUM_ALIGNED",
+      "BITFROST_KEYS_DERIVABLE",
+      "ACE_EVIDENCE_GROUNDED"
+    ]
+  },
+  "tests": {
+    "command": "node --test scripts/atlas/canonical-projection-admission-summary-v1.test.mjs scripts/atlas/graphify-daily-failure-guard-v1.test.mjs",
+    "passed": 12,
+    "failed": 0,
+    "cases": [
+      "Current audit preserves all seven non-PASS blockers",
+      "Fabric audit guards database reads and rolls back while keeping report output repo-local",
+      "Missing required predicate blocks even when overall verdict says safe",
+      "Non-PASS predicate blocks even when overall verdict says safe",
+      "All required predicates and SAFE_TO_PROJECT verdict are required",
+      "Missing or malformed predicate collections fail closed",
+      "Daily aliases gate before child stages",
+      "Admission requirements match the fabric audit producer",
+      "Projection admission failure cannot use fallback",
+      "Snapshot binding failure cannot use fallback",
+      "Open lifecycle failure cannot use fallback",
+      "Apply child failure cannot use fallback"
+    ]
+  },
+  "hardeningGates": [
+    {
+      "step": 1,
+      "name": "Preflight and side-effect boundary",
+      "status": "PARTIAL_PASS",
+      "evidence": "Static test verifies guarded read-only SQL, READ ONLY transaction, rollback, repo-local report output, and apply aliases gated before child stages.",
+      "notProven": "No live environment/dependency/permission probe was run; Graphify daily was intentionally not rerun."
+    },
+    {
+      "step": 2,
+      "name": "Frozen input and provenance",
+      "status": "PARTIAL_PASS",
+      "evidence": "Audit digest, generated timestamp, repository commit, and source-manifest digest from the supplied dry-run are recorded.",
+      "notProven": "No second live audit replay was performed to establish run-to-run determinism."
+    },
+    {
+      "step": 3,
+      "name": "Identity and contract checks",
+      "status": "BLOCKED_BY_AUDIT",
+      "evidence": "The current frozen audit reports partial symbol/semantic/latent qualification and an unsealed ordinal map; the guard tests preserve these blockers.",
+      "notProven": "No source-to-symbol-to-packet/chunk-to-projection contract replay was executed."
+    },
+    {
+      "step": 4,
+      "name": "Projection admission",
+      "status": "PASS_FAIL_CLOSED_TESTS; DATA_ADMISSION_BLOCKED",
+      "evidence": "Tests prove missing or non-PASS predicates prevent admission; the frozen audit has 4/11 PASS and 7 blockers.",
+      "notProven": "The live admission command was not rerun."
+    },
+    {
+      "step": 5,
+      "name": "Independent write readback",
+      "status": "NOT_RUN",
+      "evidence": "No apply/write was authorized or attempted; the supplied audit reports a read-only transaction and rollback.",
+      "notProven": "Independent datastore readback after an authorized test write."
+    },
+    {
+      "step": 6,
+      "name": "Failure and recovery",
+      "status": "PARTIAL_PASS",
+      "evidence": "Tests cover admission, snapshot-binding, lifecycle, and child-stage failures; fallback is not reached even when enabled.",
+      "notProven": "Apply idempotency, interrupted-write recovery, and cleanup require an authorized isolated write test."
+    },
+    {
+      "step": 7,
+      "name": "Operational bounds and observability",
+      "status": "NOT_RUN",
+      "evidence": "Local focused test suite completed in 389.6 ms.",
+      "notProven": "Live service health, database latency, resource ceilings, GPU use, and production alerting."
+    },
+    {
+      "step": 8,
+      "name": "Release and promotion gate",
+      "status": "BLOCKED",
+      "evidence": "Seven admission predicates remain below PASS; release requires all mandatory proof gates plus approved write/readback and operations checks.",
+      "notProven": "Production promotion, rollback drill, and monitoring acceptance."
+    }
+  ],
+  "sideEffects": {
+    "thisRunDatabaseAccess": false,
+    "thisRunCanonicalWrites": false,
+    "thisRunCacheWrites": false,
+    "thisRunServiceOrModelExecution": false,
+    "workflowRerun": false,
+    "sourceAuditReportedCanonicalWriteAttempted": false,
+    "sourceAuditReportedTransaction": "READ ONLY / ROLLED BACK"
+  },
+  "verdict": {
+    "admissionGuardTests": "PASS 12/12",
+    "projectionAdmission": "BLOCKED",
+    "productionReadiness": "NOT_ESTABLISHED"
+  },
+  "limitations": [
+    "Tests exercise the pure admission summary and static daily failure guards, not PostgreSQL connectivity or live table contents.",
+    "The audit source digest identifies the report present when this receipt was prepared; it does not independently verify the database assertions in that report.",
+    "No source extraction, embedding, ordinal-map rebuild, projection alignment, BitFrost warmup, ACE admission, or ContextManifest readback was attempted."
+  ]
+}

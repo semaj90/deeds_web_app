@@ -32,12 +32,63 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 | WSL `atlas-rapids-cu13` | Proven direct cuGraph/cuVS diagnostic and parity executor | Reuse; no second RAPIDS environment |
 | `atlas-gpu-8098 :8098` | Containerized RAPIDS 26.08 HTTP graph executor | Keep `rapidsai/base:26.08-cuda12-py3.13-amd64` for now |
 | Windows `C:\Python313` | Offline/reference model environment | Not a production owner |
-| cuTile | Optional Ampere kernel challenger | Not installed; pilot only after a measured kernel gap |
+| cuTile / CUDA C++ Tile | Optional Ampere tile-kernel challenger; a CUDA 13.2 WSL Python environment is present, and a CUDA 13.4 one-shot Docker package is now defined | Package created; build and GPU parity remain pending; [container runbook](../architecture/cuda134-simt-container-v1.md) |
 | TensorRT-RTX | Optional decoder challenger | Separate compatibility gate; not part of RAPIDS |
 
 RAPIDS CUDA-13 convergence is a future measured migration, not a current
 repair. Any future change must compare graph, Jaccard, PageRank, KNN, startup,
 VRAM, and latency receipts before changing the `:8098` owner.
+
+## Evaluation and Prefill Phase Gates 17–24
+
+Use the [workstation TODO](../parent-atlas-workstation-todo.md) as a projection and the [prefill/residency OpenSpec ledger](../../openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md) as the task-claim owner. The phase status below reflects those existing records; this TOC does not define new phase contracts.
+
+| Phase | Existing scope / recorded status | Owner and next gate |
+|---|---|---|
+| 17 | Feature extraction is diagnostic; source-qualified feature-row admission remains open. | [Phase 17 implementation review](../architecture/phase17-feature-extractor-upgrade-v2.md); `PHASE17-FEATURE-ROW-ADMISSION-01` in the [workstation TODO](../parent-atlas-workstation-todo.md). |
+| 18 | Partial XGBoost evaluation surface; held-out evaluation and promotion evidence remain open. | [XGBoost ranking lineage contract](../../sveltekit-frontend/src/lib/server/atlas/classification/xgboost-ranking-lineage-v1.ts); `PHASE18-RERANKER-EVALUATION-01` in the [workstation TODO](../parent-atlas-workstation-todo.md). |
+| 19 | Existing rows are recorded, but their phase status is unresolved. | Reconcile the phase owner and row provenance in the [prefill/residency ledger](../../openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md) before scheduling work. |
+| 20 | No phase definition or tracking is recorded. | Definition/owner decision required in the [prefill/residency ledger](../../openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md). |
+| 21 | Included in a partial 17–21 audit; this review did not establish a distinct current gate. | Keep unclassified until its owner and acceptance evidence are identified in the [workstation TODO](../parent-atlas-workstation-todo.md). |
+| 22 | No phase definition or tracking is recorded. | Definition/owner decision required in the [prefill/residency ledger](../../openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md). |
+| 23 | Edge-model artifact is recorded as missing; do not claim runtime evaluation. | Artifact and phase gate are tracked in the [prefill/residency ledger](../../openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md). |
+| 24 | Quantization method is undefined; Titans is research-only and DPO is evaluation-only in the current ledger. | Define the method and acceptance gate in the [prefill/residency ledger](../../openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md). |
+
+### Shared evaluation-sequence gate
+
+Before adding a PostgreSQL sequence table, reconcile existing `evaluation_runs`, `model_analysis_results.sequence_id`, `llm_synthesis_events`, and the separate prefill/decode receipts. The open `SEQ-EVAL-01`–`SEQ-EVAL-04` items in the [prefill/residency ledger](../../openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md) define the ordered run/step, tuple/artifact, metric, and later mmap/PyTorch parity review. Tensor payloads remain outside PostgreSQL; this TOC change does not authorize a migration, backfill, or runtime write.
+
+### Diagnostic tuples, OAKlib, PostgreSQL, and RTX evaluation
+
+This is a staged lane under the Phase 17–24 crosswalk—not a claim that the end-to-end workflow is wired:
+
+1. **Create diagnostic tuples from logs** with the existing Node capture/replay owners ([Svelte-check ingestion](../../scripts/atlas/ingest-svelte-check-errors.mjs), [TypeScript evidence capture](../../scripts/atlas/capture-typescript-error-evidence-v1.mjs)). Preserve log digest, run ID, exact line, fingerprint, and source locator. A diagnostic tuple is not an ontology tuple or canonical source identity.
+2. **Enrich, don’t mint identity, with OAKlib.** The [OAKlib adapter](../../python/parent_atlas_ontology/oaklib_external_adapter.py) emits noncanonical concept/relation candidates. Reuse the existing [ontology tuple contract](../../sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts), [PostgreSQL persistence owner](../../sveltekit-frontend/src/lib/server/atlas/ontology-linked-tuple-postgres.ts), and [manual table DDL](../../sveltekit-frontend/drizzle/manual/20260825_atlas_ontology_linked_tuples.sql); reconcile the separate `feature_ontology_tuples` family rather than merging table meanings. Candidate tuples require source/workspace revisions and evidence admission before promotion.
+3. **Use existing PostgreSQL access paths.** B-tree supports exact IDs/fingerprints; FTS uses its existing text-search owner and GIN where registered. Verified 2026-10-13 (read-only catalog and `EXPLAIN ANALYZE`, PostgreSQL 18.4): `error_logs` has a btree on `packet_key` (partial, non-null) and `error_signal_stream` has a composite btree on `(packet_key, task_id, error_class)`. Neither has a full-text index. Plans run on 1 and 6 rows, so they show access paths only, not index value at volume. `atlas_packets` carries 10 exact-duplicate index groups (20 indexes). Dropping them needs approval and matching `schema.ts` edits, because Drizzle declares several of them (for example `idx_atlas_packets_source_ref_idx`, first declared 2026-07-29). Pending decisions are listed in the [log tasks file](../../openspec/changes/parent-atlas-runtime-log-remediation/tasks.md#decisions-pending-collected-2026-10-13). PostgreSQL 18 AIO and bitmap scans are planner behavior, not a table, LUT, or required execution plan. Do not add DDL from this TOC review.
+4. **Keep vector search conditional.** pgvector HNSW is only eligible after the indexed column, model/representation, cohort, and filtered-search parity are proven. The [neural-prefill ledger](../../openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md) records the current HNSW representation-policy block; the separate `halfvec` column must not be relabeled canonical `semantic_768`.
+5. **Treat RTX interpolation as a challenger.** Run only against a frozen, revision-qualified tuple/feature cohort after a deterministic CPU reference and output checksums exist. PyTorch/ATen, cuVS/cuGraph, and any interpolation method are derived analysis executors; they cannot establish tuple identity, create a canonical lookup, or promote results. No GPU job is authorized here.
+
+The detailed parameter-plan, locator, PostgreSQL schema/index, and DAG synthesis gates are `NE-23O1`–`NE-23O5` in the [neural-prefill ledger](../../openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md). Keep diagnostic log tuples, ontology relation tuples, training tuples, and tensor artifacts as distinct typed records.
+
+Step 1 also has a second owner: the [svelte-check capture and replay script](../../sveltekit-frontend/scripts/svelte-check-capture.mjs) (pretty and machine formats, checker-summary cross-check, fail-closed `INCOMPLETE` status without a capture receipt).
+
+### Pipeline sequence and ordering keys
+
+No new `sequence_id` is introduced by this section. The existing ordering key is `model_analysis_results.sequence_id` (text, btree `model_analysis_results_sequence_idx`). Each pipeline stage keeps its own ordering key, and the mapping below is the alignment contract.
+
+| Stage | Ordering key | Owner | Persistence |
+|---|---|---|---|
+| Diagnostic capture | `runId` plus `logLine` | svelte-check capture script | `.tmp` replay files; not in PostgreSQL |
+| Diagnostic observation | `fingerprint` plus `logLine` | same script | candidate `error_logs` reuse (not approved) |
+| Ontology candidate | tuple identity under the ontology contract | OAKlib adapter and tuple contract | `atlas_ontology_linked_tuples` (manual DDL) |
+| Model analysis run | `sequence_id` (text), PK `(run_id, sequence_id)`, btree | `model_analysis_results` | LIVE and empty (applied 2026-10-13 from `drizzle/manual/model_analysis_runs.sql`; registered in `sidecar-migrations.json`); no runtime writer yet |
+| Agent action ledger | live sequence `atlas_agent_action_ledger_sequence_seq`; owning column not identified | `packages/parent-atlas` temporal action sequence reservation | live sequence exists; column owner not verified |
+| Evaluation run | `SEQ-EVAL-01`–`04` gate | prefill/residency ledger | pending reconciliation |
+
+Rules:
+- Do not add a PostgreSQL sequence table until `model_analysis_results.sequence_id`, `evaluation_runs`, and `llm_synthesis_events` are reconciled (see the shared gate above).
+- A `runId` or `fingerprint` is not a `sequence_id`. Ordering across stages uses the stage's own key plus its evidence checksum, never a shared counter.
+- This table is a contract only. It authorizes no migration, backfill, or runtime write.
 
 ## Active Todo Spine
 
@@ -158,6 +209,7 @@ The next derived surfaces are compare-only until the live contract exists:
 - kanban task spec board consolidation from grouped stale-document hits
 
 ### Graphify / Structural Discovery
+- Routine inspection and focused owner/source lookup: [Daily Graphify discovery helpers](../architecture/graphify-daily-discovery-helpers-v1.md). Commands: `graphify:daily:inspect`, `graphify:daily:search`, `graphify:daily:helpers:test`; use the existing ownership registry and task ledgers, with explicit ignored-graph inspection and bounded lexical results.
 - Graphify is the structural discovery lane: file, import, call, and topology scanning for codebase shape.
 - Parent Atlas is the canonical join lane: `source_ref`, `feature_id`, `feature_label`, `packet_key`, and provenance contracts.
 - Graphify may classify and surface gaps, but it must not replace the canonical storage spine.
@@ -167,6 +219,9 @@ The next derived surfaces are compare-only until the live contract exists:
 - Historical local structural artifact census: `docs/reports/current-structural-graph-artifact-v2/manifest.json` and the HyperRAG artifact-follow-up section in the linked tasks ledger. It contains 1,334 `DEFINES` edges with internal GPU-node endpoint matches, but zero packet-keyed nodes and a superseded workspace revision; diagnostic only, not an incidence source.
 - Domain classification: `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` supplies derived classification/routing features only; it cannot establish packet identity or incidence endpoints.
 - Hyperedge persistence owner: `sveltekit-frontend/src/lib/server/atlas/kag-hyperedge-postgres.ts`; taxonomy bridge: `scripts/atlas/populate-hyperedges-from-taxonomy-edges-v1.mts`. Do not repurpose either as a packet-identity repair path.
+- **Current AST-to-symbol lineage slice (diagnostic, not closed):** The admitted-snapshot JSONL replay parsed `packages/atlas-core/src/packet-reader.ts` from exact source bytes and resolved one exact packet (`ace:packet:bf0f0228d6c8`). It emitted 20 AST observations; comparison with the existing `atlas_symbol_versions` owner found 8 same-name span mismatches, 12 observations without an exact name match, and zero exact symbol-version matches. The output is non-authoritative; no canonical, projection, or cache writes occurred. See the [checksummed replay receipt](../../.tmp/atlas/admitted-snapshot-ast-prefill-20261016/packet-reader-symbol-audit.jsonl.receipt.json) and the [ACE/Atlas OpenSpec ledger](../../openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md).
+- **Next safe gate:** Trace the existing `atlas_symbol_versions` producer and independently compare its coordinate convention with the same admitted source bytes. Resolve whether the mismatch is producer, parser/node-kind, coordinate, or revision drift; do not fuzzy-join by name, adjust offsets, or use ML to mint identity. The matcher deliberately attaches `symbol_version_id` only when packet, source ref, source/workspace revisions, qualified name, and byte span all match exactly.
+- **Master TODO crosswalk:** This is not completion of Phase 101C. The [master Phase 101C checklist](../reports/sessions/MASTER-FEATURE-TODO-2026-05-20.md) asks for a Local Deep Research → canonical ACE packet bridge that preserves `sourceRefs` and supports approved cache reuse. The present AST slice establishes neither that bridge nor ContextManifest admission; retain both as separate, open proofs under their existing owners.
 - Integration order: structural-edge producer and current revisions → exact two-endpoint resolution → diagnostic mapping/readback → separately authorized incidence materialization → strict-reader wiring → bounded multihop proof. No Graphify refresh or datastore write is implied by these links.
 
 ### HyperRAG Dense Search
@@ -252,3 +307,22 @@ Durable mutations must go through: promotion queue, schema gates, validation rep
 - This TOC is intentionally short and stable.
 - Use the linked docs for lane details, and the master todo for execution state.
 - The canonical join spine remains `sourceRef + feature_id`.
+
+## Proposed frontier: LOD, glyph streaming, tensor analysis (2026-10-15, not started)
+
+Ideas from the operator list, mapped to existing owners. Nothing here is started or promoted. Each row needs its gate before work begins.
+
+| Idea | Owner / existing item | Status and boundary |
+|---|---|---|
+| Frozen baked LOD textures, hot/warm/cold streaming | `parent-atlas-retrieval-lod-algorithm-taxonomy` LOD-01 to LOD-08 | Owned. Tier decisions must trace to a receipt (LOD-08). |
+| Folded-polynomial score-to-tier mapping on cosine similarity (input transform s = (cos+1)/2, since raw cosine is in [-1, 1]) | Proposed PX-04 (adaptive-backprop change) | Proposed. Baked table with checksum; CPU reference parity; never changes retrieval ranking. |
+| NES glyph streaming, ROM-bank style packet frames | Existing "Pokémon ROM-bank / LOD frame" memory reference | Analogy for packet framing only. No NES data path exists in the repo. |
+| "Camera" as viewpoint for LOD | No owner | Not a retrieval input. Proposed mapping: the query and bounded user context act as the viewpoint, not a camera. Needs a definition before work. |
+| Shader-like or renderman-style tensor compilation | No owner | Deferred. No compilation target is defined. The GPU candidate checklist (FT-08) covers alignment only. |
+| GRPO training, gRPC buffers | GRPO: PX-03 and Phase 8. gRPC: existing port map | GRPO is challenger training behind the reviewed-label gate. gRPC buffers stay transport only; no tensor payloads inline. |
+| DLSS-style upscaling or low-rank reconstruction | Ewin Tang low-rank sampling (`TANG-BRANCH-DECISION-01`) | Analogy only. DLSS is a graphics upscaler; Tang sampling is challenger evidence, not reconstruction for retrieval. |
+| Tensor analysis from SOM / 4D topology manifold | SOM and manifold as experimental routing; `parent-atlas-graph-analysis-contract` | Routing only. SOM and manifold coordinates never replace the 768-dim `semantic_768` contract without measured gains. |
+| Indexed corpus of JSON packets as tensor source | Canonical packet persistence (Postgres); JSON as control envelope only | Bulk numeric arrays go through Arrow or mmap, never JSON (wire-format rule). |
+| BitFrost token matrix cache on GPU | BitFrost residency owners (`parent-atlas-ace-bitfrost-cache-correctness`) | Refused for token or KV state: AGENTS.md forbids persisting `kv_cache` or token state. Revision-keyed descriptors only. |
+
+Open questions before any row moves: define the viewpoint for LOD (query or user context), name an owner for shader-style compilation or drop it, and confirm the Tang branch decision before any low-rank reconstruction work.

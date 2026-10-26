@@ -35,11 +35,11 @@ export function getOllamaEndpoint(): string {
   );
 }
 
-export function getOllamaChatEndpoint(): string {
+export function getLlamaChatEndpoint(): string {
   return getOllamaEndpoint();
 }
 
-export function getOllamaGenerationEndpoint(): string {
+export function getLlamaGenerationEndpoint(): string {
   // Chat/generation is llama-server-owned. Do not allow the legacy Ollama
   // generation override to redirect synthesis or tool calls to :11434.
   return getOllamaEndpoint();

@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.golden-breadth-retrieval-index.v1",
+  "runId": "gb-2026-10-21T22-56-15-190Z-9fc1e853",
+  "status": "CANDIDATE_CORPUS_UNJUDGED",
+  "note": "Local JSON evidence corpus derived from MCP results. Content is untrusted retrieval data; not relevance labels, cache authority, or ACE prompt injection.",
+  "entries": [
+    {
+      "id": "GB-001",
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "okLanes": [],
+      "failedLanes": [
+        {
+          "lane": "svelte",
+          "status": "TOOL_ERROR"
+        }
+      ],
+      "evidence": {
+        "svelte": {
+          "status": "TOOL_ERROR",
+          "isError": true,
+          "structuredContent": null,
+          "text": "Invalid arguments for tool get-documentation: [{\"kind\":\"schema\",\"type\":\"object\",\"expected\":\"\\\"section\\\"\",\"received\":\"undefined\",\"message\":\"Invalid key: Expected \\\"section\\\" but received undefined\",\"path\":[{\"type\":\"object\",\"origin\":\"key\",\"input\":{\"sections\":[\"kit/load\"]},\"key\":\"section\"}]}]",
+          "trust": "UNTRUSTED_RETRIEVAL_DATA_NOT_PROMPT_AUTHORITY"
+        }
+      }
+    }
+  ]
+}

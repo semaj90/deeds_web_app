@@ -45,6 +45,23 @@ function run(command: string, args: string[]): string {
 	}).trim();
 }
 
+// NetworkX is the CPU parity oracle. It lives in the WSL RAPIDS env, not in Windows Python
+// (no pip install: see runtime-capability-registry graph.oracle.cpu). Set, for example:
+//   ATLAS_NETWORKX_PYTHON=wsl:/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python
+// Unset, the oracle runs with the default `python` exactly as before.
+const networkxPython = process.env.ATLAS_NETWORKX_PYTHON;
+
+function toWslPath(windowsPath: string): string {
+	return windowsPath.replace(/^([A-Za-z]):[\\/]/, (_match, drive: string) => `/mnt/${drive.toLowerCase()}/`).replace(/\\/g, '/');
+}
+
+function runNetworkxOracle(): string {
+	if (networkxPython?.startsWith('wsl:')) {
+		return run('wsl', ['-e', networkxPython.slice('wsl:'.length), toWslPath(pythonOracle), '--fixture', toWslPath(pagerankFixture)]);
+	}
+	return run(networkxPython ?? 'python', [pythonOracle, '--fixture', pagerankFixture]);
+}
+
 function readWitness(): Witness {
 	const postgres = JSON.parse(run('docker', [
 		'exec', 'legal-ai-postgres', 'psql', '-U', 'legal_admin', '-d', 'legal_ai_db', '-Atc',
@@ -94,7 +111,7 @@ function spearman(left: readonly Score[], right: readonly Score[]): number {
 describe('Parent Atlas NetworkX and Neo4j GDS fixture parity', () => {
 	it('proves parity without modifying production score surfaces', async () => {
 		const before = readWitness();
-		const networkx = JSON.parse(run('python', [pythonOracle, '--fixture', pagerankFixture]));
+		const networkx = JSON.parse(runNetworkxOracle());
 		expect(networkx.status).toBe('NETWORKX_REFERENCE_PROVEN');
 
 		const gds = JSON.parse(run('node', [gdsRunner, '--fixture', pagerankFixture, '--json']));

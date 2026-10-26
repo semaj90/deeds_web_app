@@ -3,7 +3,7 @@
  * karpathy-tag-parallel.mjs — Parallel LLM semantic tagging for codebase chunks.
  *
  * Scrolls codebase_chunks_768 filtering for content-bearing points,
- * classifies each via Ollama gemma4-rotorquant:latest, writes tags to Qdrant + Postgres.
+ * classifies each via Ollama ornith-1.5-9b, writes tags to Qdrant + Postgres.
  *
  * Concurrency: 4 parallel Ollama requests (configurable via --concurrency).
  * Speed: ~4x faster than sequential SSE endpoint (~60 chunks/min).

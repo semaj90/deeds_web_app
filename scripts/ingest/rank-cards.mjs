@@ -24,37 +24,16 @@
 import fs from 'fs/promises';
 import { existsSync, statSync, readdirSync } from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { createRequire } from 'module';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { CARDS_DIR as NESCHROM_CARDS_DIR, LEGACY_CARDS_DIR } from '../atlas/_neschrom-paths.mjs';
 
 const _require = createRequire(import.meta.url);
-
-// Real Ollama embed — falls back to pseudo if server unavailable
-async function ollamaEmbed(text, host = 'http://localhost:11434') {
-  try {
-    const res = await fetch(`${host}/api/embed`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'embeddinggemma:latest', input: text }),
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!res.ok) return null;
-    const j = await res.json();
-    const vec = j.embeddings?.[0] ?? j.embedding;
-    return Array.isArray(vec) && vec.length === 768 ? vec : null;
-  } catch {
-    return null;
-  }
-}
 
 const ROOT = process.cwd();
 const CARDS_DIR = existsSync(NESCHROM_CARDS_DIR) && readdirSync(NESCHROM_CARDS_DIR).filter(f => f.endsWith('.json')).length > 0
   ? NESCHROM_CARDS_DIR : LEGACY_CARDS_DIR;
 const EMB_DIR     = path.join(ROOT, '.opencode', 'embeddings');
-const TMP_DIR     = path.join(ROOT, '.tmp');
-const OUT_REPORT  = path.join(TMP_DIR, 'retrieval-ranking-report.json');
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
@@ -79,28 +58,6 @@ const PRIORITY_TERMS = [
   'OpenCode', 'Gemma4', 'sourceRef', 'build', 'smoke',
 ];
 
-// ── Cosine similarity ──────────────────────────────────────────────────────────
-function cosine(a, b) {
-  let dot = 0, na = 0, nb = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    na  += a[i] * a[i];
-    nb  += b[i] * b[i];
-  }
-  return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-12);
-}
-
-// ── Deterministic pseudo-embed (same algo as embed-cards.mjs) ─────────────────
-// Used as fallback when no real embedding exists for a card/query.
-function pseudoEmbed(text, dim = 768) {
-  let seed = crypto.createHash('sha256').update(text).digest();
-  const out = new Float32Array(dim);
-  for (let i = 0; i < dim; i++) {
-    seed   = crypto.createHash('sha256').update(seed).digest();
-    out[i] = (seed.readUInt32BE(0) / 0xffffffff) * 2 - 1;
-  }
-  return Array.from(out);
-}
 
 // ── Cluster + area assignment ──────────────────────────────────────────────────
 const CLUSTER_MAP = [
@@ -231,6 +188,8 @@ async function loadEmbeddingCache() {
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 async function main() {
+  if (!DRY_RUN || args.includes('--apply')) throw new Error('LEGACY_CARD_RANKING_APPLY_BLOCKED_USE_DRY_RUN');
+  if (!Number.isInteger(TOP) || TOP < 1 || TOP > 5000) throw new Error('INVALID_CARD_RANKING_BATCH_LIMIT');
   console.log(`\n── Rank Cards ────────────────────────────────────────────`);
   console.log(`  query : "${query}"`);
   console.log(`  top   : ${TOP}${DRY_RUN ? '  [dry-run]' : ''}`);
@@ -238,10 +197,7 @@ async function main() {
   const embCache = await loadEmbeddingCache();
   console.log(`  embeddings loaded: ${embCache.size}`);
 
-  // Embed the query: real Ollama embed → pseudo-embed fallback
-  const ollamaVec = await ollamaEmbed(query);
-  const queryVec = ollamaVec ?? pseudoEmbed(query);
-  console.log(`  query embed  : ${ollamaVec ? 'ollama (real)' : 'pseudo (fallback)'}`);
+  console.log('  semantic lane: unavailable; legacy cached vectors lack qualified producer/source lineage');
 
   const cardFiles = await fs.readdir(CARDS_DIR).catch(() => []);
   const jsonFiles = cardFiles.filter(f => /\.json$/.test(f));
@@ -256,8 +212,7 @@ async function main() {
     } catch { continue; }
 
     // Semantic score
-    const cardVec = embCache.get(card.id) ?? pseudoEmbed(card.text || '');
-    const semantic = (cosine(queryVec, cardVec) + 1) / 2; // normalise -1..1 → 0..1
+    const semantic = null;
 
     // Keyword boost: fraction of priority terms found in title+text
     const cardText = ((card.title || '') + ' ' + (card.text || '')).toLowerCase();
@@ -274,7 +229,7 @@ async function main() {
     };
 
     const score =
-      W.semantic       * signals.semantic      +
+      W.semantic       * (signals.semantic ?? 0) +
       W.sourceRef      * signals.sourceRef     +
       W.errorBoost     * signals.errorBoost    +
       W.recency        * signals.recency       +
@@ -288,7 +243,9 @@ async function main() {
     const summary = sentences.slice(0, 2).join(' ').slice(0, 280);
 
     const roundedSignals = {
-      semantic:              Math.round(signals.semantic      * 1000) / 1000,
+      semantic:              null,
+      semanticPresence:      false,
+      semanticStatus:        embCache.has(card.id) ? 'UNQUALIFIED_LEGACY_CACHE' : 'MISSING_VECTOR',
       recency:               Math.round(signals.recency       * 1000) / 1000,
       errorBoost:            Math.round(signals.errorBoost    * 1000) / 1000,
       todoBoost:             Math.round(signals.todoBoost     * 1000) / 1000,
@@ -297,6 +254,10 @@ async function main() {
 
     ranked.push({
       id:            card.id,
+      canonicalAuthority: false,
+      trainingEligible: false,
+      promotionEligible: false,
+      scoreQualification: 'NONSEMANTIC_HEURISTIC_PREVIEW_ONLY',
       title:         card.title,
       sourceRef:     card.source,
       area:          deriveArea(card.source),
@@ -311,7 +272,7 @@ async function main() {
     });
   }
 
-  ranked.sort((a, b) => b.score - a.score);
+  ranked.sort((a, b) => b.score - a.score || String(a.id).localeCompare(String(b.id)));
   const top = ranked.slice(0, TOP);
 
   console.log(`\n  Top 5 results:`);
@@ -320,6 +281,13 @@ async function main() {
   }
 
   const report = {
+    schema: 'atlas.legacy-card-ranking-preview.v1',
+    canonicalAuthority: false,
+    trainingEligible: false,
+    promotionEligible: false,
+    writesPerformed: false,
+    semanticStatus: 'UNQUALIFIED_LEGACY_CACHE_NOT_SCORED',
+    modelRequestsPerformed: false,
     generatedAt: new Date().toISOString(),
     query,
     totalCards: jsonFiles.length,
@@ -328,15 +296,11 @@ async function main() {
     ranked: top,
   };
 
-  if (!DRY_RUN) {
-    await fs.mkdir(TMP_DIR, { recursive: true });
-    await fs.writeFile(OUT_REPORT, JSON.stringify(report, null, 2), 'utf8');
-    console.log(`\n  ✅ wrote ${OUT_REPORT}`);
-  } else {
-    console.log(`\n  dry-run: would write ${top.length} ranked entries to ${OUT_REPORT}`);
-  }
+  console.log(`ATLAS_RANKING_PREVIEW=${JSON.stringify(report)}`);
 
   console.log(`──────────────────────────────────────────────────────────\n`);
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch(e => { console.error(e); process.exitCode = 1; });
+}

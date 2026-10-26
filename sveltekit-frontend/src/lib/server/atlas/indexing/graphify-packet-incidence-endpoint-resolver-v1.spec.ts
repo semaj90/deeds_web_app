@@ -23,6 +23,8 @@ const edge = {
 	subjectStableSymbolKey: 'symbol:src/a.ts#source',
 	predicate: 'IMPORTS',
 	objectStableSymbolKey: 'symbol:src/b.ts#target',
+	objectSourceRef: 'src/b.ts',
+	objectSourceRevision: 'source-b-r1',
 	unresolvedTarget: null,
 	evidenceKind: 'AST_REFERENCE',
 	evidenceSpan: { startByte: 10, endByte: 20, startRow: 1, endRow: 1 },
@@ -78,14 +80,14 @@ describe('Graphify packet-incidence endpoint resolver', () => {
 		const { resolveGraphifyPacketIncidenceEndpointsV1 } = await import('./graphify-packet-incidence-endpoint-resolver-v1.js');
 		const result = await resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot);
 
-		expect(result.packet).toMatchObject({
+		expect(result.packets[0]).toMatchObject({
 			status: 'RESOLVED',
 			canonicalId: 'packet:00000000-0000-5000-8000-000000000001',
 			sourceRevision: 'source-a-r1',
 			graphEndpointKey: edge.subjectStableSymbolKey,
 			graphRevision: snapshot.graphRevision,
 		});
-		expect(result.neighbor).toMatchObject({
+		expect(result.neighbors[0]).toMatchObject({
 			status: 'RESOLVED',
 			canonicalId: 'packet:00000000-0000-5000-8000-000000000002',
 			sourceRevision: 'source-b-r1',
@@ -100,13 +102,19 @@ describe('Graphify packet-incidence endpoint resolver', () => {
 	it('rejects missing, ambiguous, and revision-mismatched Graphify joins', async () => {
 		const { resolveGraphifyPacketIncidenceEndpointsV1 } = await import('./graphify-packet-incidence-endpoint-resolver-v1.js');
 		queryMock.mockResolvedValueOnce({ rows: joinRows().slice(0, 1) });
-		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_NEIGHBOR_JOIN_NOT_UNIQUE:0');
+		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_NEIGHBOR_JOIN_MISSING');
 
 		queryMock.mockReset().mockResolvedValueOnce({ rows: [...joinRows(), joinRows()[0]] });
-		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_SUBJECT_JOIN_NOT_UNIQUE:2');
+		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_SUBJECT_DUPLICATE_PACKET_BINDING');
 
 		queryMock.mockReset().mockResolvedValueOnce({ rows: joinRows({ source_revision: 'stale-source' }) });
 		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_SUBJECT_REVISION_BINDING_MISMATCH');
+	});
+
+	it('rejects a readback that disagrees with the declared target file binding', async () => {
+		const { resolveGraphifyPacketIncidenceEndpointsV1 } = await import('./graphify-packet-incidence-endpoint-resolver-v1.js');
+		queryMock.mockResolvedValueOnce({ rows: joinRows({}, { source_ref: 'src/renamed.ts' }) });
+		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_NEIGHBOR_DECLARED_BINDING_MISMATCH');
 	});
 
 	it('rejects packet rows bound to another workspace revision', async () => {

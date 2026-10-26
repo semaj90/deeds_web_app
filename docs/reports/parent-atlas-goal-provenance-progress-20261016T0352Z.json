@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.goal-progress.v1",
+  "goalStatus": "ACTIVE_PARTIAL",
+  "previousGoalTurnClassification": "PROGRESS",
+  "objectiveFile": "C:/Users/james/.codex/attachments/2713ae01-8727-48ea-93d1-3addb3aeec7a/goal-objective.md",
+  "objectiveFileSha256": "sha256:c96c52cd9d0dbe8cbe29092d0a136d0dad7dd49b0a77a0b9b67e7559aad27c9b",
+  "likely_cause": "Existing packet telemetry normalization discarded caller-provided nested context, synthesized unobserved runtime versions/protocols, and could associate one packet with another candidate's feature or SOM cell.",
+  "evidence": [
+    "packet-centric-telemetry.ts normalization now preserves known nested fields including source_ref and explicitly null unknowns",
+    "Candidate event builder binds primary packet source/feature/SOM metadata to the same candidate rather than separate first-nonempty aggregates",
+    "ACE emitter no longer defaults unobserved embedding/tool/GPU/protocol versions",
+    "docs/reports/packet-telemetry-provenance-final-20261015T205121.txt: 3 files / 11 tests passed, including mocked existing-writer parameter/readback assertions",
+    "go-retrieval-grpc-client.ts still has an unimplemented globalClient/proto stub and a wired HTTP fallback; a gRPC name is not evidence of gRPC execution",
+    "messagepack-transport-v1.ts has an existing codec and a fixture caller, but the scoped source search found no production codec caller"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-telemetry-emitter.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-telemetry-emitter.spec.ts",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "rg -n 'requestSerialize|responseDeserialize|loadPackageDefinition' sveltekit-frontend/src/lib/server/grpc",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/telemetry/packet-centric-telemetry.spec.ts src/lib/server/telemetry/ace-telemetry-emitter.spec.ts src/lib/server/telemetry/retrieval-event-schema.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-goal-provenance-progress-20261016T0352Z.json",
+  "remaining": [
+    "Measure actual protobuf encode/decode and JSON stringify/parse boundaries in the existing real transport owner, retaining observed protocol/version rather than inferring it",
+    "Existing database telemetry fallback omits enriched packet payload: durable source_ref preservation remains unproven; review existing schema before any persistence changes",
+    "Per-operation GPU and independent Redis/Qdrant/Neo4j timings remain separate measurement gates",
+    "Complete identity inventory, parser/runtime manifest alignment, symbol/packet lineage, semantic retrieval, KMeans/SOM/PageRank and source-to-ContextManifest proofs from the original objective",
+    "Keep all source-revision writes/backfills deferred per the post-P20 operator rule"
+  ],
+  "limits": {
+    "canonicalAuthority": false,
+    "datastoreWritesPerformed": false,
+    "sourceRevisionWritesPerformed": false,
+    "servicesRestarted": false,
+    "gpuJobRun": false,
+    "svelteCheckRun": false,
+    "liveWriterReadbackProven": false,
+    "transportTimingsProven": false,
+    "goalComplete": false
+  }
+}

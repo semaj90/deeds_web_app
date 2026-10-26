@@ -60,9 +60,24 @@ function parseArgs(argv: readonly string[]): CliArgs {
 	};
 }
 
-type FrozenSnapshotNode = { nodeKey: string; nodeType: string; sourceRef: string | null; packetKey: string | null };
+type FrozenSnapshotNode = {
+	nodeKey: string;
+	nodeType: string;
+	sourceRef: string | null;
+	packetKey: string | null;
+	sourceRevision?: string | null;
+	workspaceRevision?: string | null;
+	properties?: { sourceRevision?: string | null; workspaceRevision?: string | null };
+};
 type FrozenSnapshotEdge = { sourceNodeKey: string; targetNodeKey: string; edgeType: string; weight: number };
-type FrozenSnapshotManifest = { identityContractVersion: string; parserContractVersion: string; topologyHash: string; excludedNodeCount: number; excludedEdgeCount: number };
+type FrozenSnapshotManifest = {
+	identityContractVersion: string;
+	parserContractVersion: string;
+	topologyHash: string;
+	excludedNodeCount: number;
+	excludedEdgeCount: number;
+	workspaceRevision?: string | null;
+};
 type FrozenSnapshotPayload = {
 	snapshotId: string;
 	nodes: FrozenSnapshotNode[];
@@ -91,7 +106,14 @@ async function queryRows(connection: DuckDBConnection, sql: string): Promise<Arr
 
 async function exportSmallFile(inputJson: string): Promise<ExportOutcome> {
 	const payload = JSON.parse(await readFile(inputJson, 'utf8')) as FrozenSnapshotPayload;
-	const tables = buildGraphSnapshotParityTables({ nodes: payload.nodes, edges: payload.edges });
+	const tables = buildGraphSnapshotParityTables({
+		nodes: payload.nodes.map((node) => ({
+			...node,
+			sourceRevision: node.sourceRevision ?? node.properties?.sourceRevision ?? null,
+			workspaceRevision: node.workspaceRevision ?? node.properties?.workspaceRevision ?? payload.manifest.workspaceRevision ?? null
+		})),
+		edges: payload.edges
+	});
 	return {
 		snapshotId: payload.snapshotId,
 		nodeRows: tables.nodeRows,
@@ -122,7 +144,8 @@ async function exportLargeFile(inputJson: string): Promise<ExportOutcome> {
 				key AS graph_node_key,
 				kind AS node_kind,
 				sref AS source_ref,
-				NULL::VARCHAR AS source_revision,
+				source_revision,
+				COALESCE(workspace_revision, manifest_workspace_revision) AS workspace_revision,
 				pkey AS packet_key,
 				NULL::VARCHAR AS symbol_id,
 				NULL::VARCHAR AS symbol_version_id
@@ -131,6 +154,9 @@ async function exportLargeFile(inputJson: string): Promise<ExportOutcome> {
 					UNNEST(CAST(json_extract_string(nodes, '$[*].nodeKey') AS VARCHAR[])) AS key,
 					UNNEST(CAST(json_extract_string(nodes, '$[*].nodeType') AS VARCHAR[])) AS kind,
 					UNNEST(CAST(json_extract_string(nodes, '$[*].sourceRef') AS VARCHAR[])) AS sref,
+					UNNEST(CAST(json_extract_string(nodes, '$[*].properties.sourceRevision') AS VARCHAR[])) AS source_revision,
+					UNNEST(CAST(json_extract_string(nodes, '$[*].properties.workspaceRevision') AS VARCHAR[])) AS workspace_revision,
+					json_extract_string(manifest, '$.workspaceRevision') AS manifest_workspace_revision,
 					UNNEST(CAST(json_extract_string(nodes, '$[*].packetKey') AS VARCHAR[])) AS pkey
 				FROM doc
 			);
@@ -183,6 +209,7 @@ async function exportLargeFile(inputJson: string): Promise<ExportOutcome> {
 			node_kind: String(row.node_kind),
 			source_ref: row.source_ref === null ? null : String(row.source_ref),
 			source_revision: row.source_revision === null ? null : String(row.source_revision),
+			workspace_revision: row.workspace_revision === null ? null : String(row.workspace_revision),
 			packet_key: row.packet_key === null ? null : String(row.packet_key),
 			symbol_id: row.symbol_id === null ? null : String(row.symbol_id),
 			symbol_version_id: row.symbol_version_id === null ? null : String(row.symbol_version_id)
@@ -250,6 +277,7 @@ async function main(): Promise<void> {
 
 	const manifest = GraphSnapshotParityManifestSchema.parse({
 		graphRevision: outcome.manifest.topologyHash,
+		...(outcome.manifest.workspaceRevision ? { workspaceRevision: outcome.manifest.workspaceRevision } : {}),
 		nodeCount: outcome.nodeRows.length,
 		edgeCount: outcome.edgeRows.length,
 		producerRevision: `${outcome.manifest.identityContractVersion}+${outcome.manifest.parserContractVersion}`,

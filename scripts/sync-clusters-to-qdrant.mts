@@ -1,8 +1,10 @@
+console.error('LEGACY_ERROR_CLUSTER_QDRANT_SYNC_DISABLED: unmigrated 384-D cluster sync lacks canonical revision qualification.');
+process.exit(78);
+
 import 'dotenv/config';
 import postgres from 'postgres';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { upsertValidated } from './lib/upsert-validated.mjs';
-import { generateCachedEmbedding } from '../src/lib/ai/ollama-config';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
@@ -112,4 +114,5 @@ async function sync() {
     }
 }
 
-sync().catch(console.error);
+console.error('LEGACY_ERROR_CLUSTER_QDRANT_SYNC_DISABLED: error_cluster.embedding is a legacy vector(384) column; this script can write both PostgreSQL and Qdrant and has no qualified semantic_768 migration contract.');
+process.exitCode = 78;

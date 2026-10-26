@@ -16,7 +16,7 @@ $containers = @(
     "phase66-redis",
     "phase66-rabbitmq",
     "phase66-qdrant",
-    "phase66-minio",
+    "legal-ai-seaweed-s3",
     "phase66-couchdb",
     "deeds-neo4j"
 )

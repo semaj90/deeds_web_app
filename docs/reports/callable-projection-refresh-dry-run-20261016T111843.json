@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.callable-projection-refresh-dry-run-proof.v1",
+  "status": "LIVE_PLAN_REQUIRES_AST_REVIEW",
+  "canonicalAuthority": false,
+  "eligibleForApply": false,
+  "applyImplemented": false,
+  "owner": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+  "planPath": ".tmp/atlas/callable-refresh-plan-20261016T111843361.json",
+  "planChecksum": "sha256:f58dc83c1c68260ad1d5b7896a67913e9fef10c7d034ee0ee5d28e6b1ef5be62",
+  "proposedFields": ["source_revision", "workspace_revision", "tree_node_id"],
+  "sourceQualificationReceiptChecksum": "a4446d0853377ccf22f2df639b948e0ff82a3d4bc963066ba428bf4f5682be02",
+  "snapshotChecksum": "242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091",
+  "additionalFindings": {
+    "canonicalSignatureColumnNull": true,
+    "projectionSignatureColumnNull": true,
+    "signatureInvented": false,
+    "storedAstRowsForObservedAndProposedIds": 0,
+    "callableTableForeignKeyConstraintsObserved": 0,
+    "astEvidenceSource": "Live sidecar-backed qualification, not persisted AST row",
+    "astStorageReviewReceipt": "docs/reports/callable-ast-bridge-review-20261016T111931224.json"
+  },
+  "validation": {
+    "testsPassed": 13,
+    "testsFailed": 0,
+    "testLog": "docs/reports/callable-refresh-plan-verified-tests-20261016T111843361.txt",
+    "livePlanExitCode": 3,
+    "livePlanLog": "docs/reports/callable-refresh-plan-verified-20261016T111843361.txt",
+    "applyFlagRefusalExitCode": 1,
+    "applyFlagRefusalLog": "docs/reports/callable-refresh-apply-refusal-20261016T111843361.txt",
+    "independentPlanReplayChecksumMatches": true,
+    "postgresEnforcedReadOnly": true,
+    "existingOutputRefusedWithExitCode": 1,
+    "existingOutputSha256Unchanged": true,
+    "existingOutputRefusalLog": "docs/reports/callable-refresh-plan-existing-output-refusal-20261016T112208838.txt",
+    "strictOpenSpecValidation": "PASS",
+    "scopedWhitespace": "PASS",
+    "fullApplicationTypecheckRun": false
+  },
+  "remainingGates": [
+    "Post-P20 revision-write gate and bounded write authorization",
+    "Typed AST identity bridge and storage contract review",
+    "Canonical signature enrichment handled separately",
+    "Approved producer implementation with source/AST requalification",
+    "Compare-and-swap against observed projection state",
+    "Independent applied readback and outcome receipt"
+  ],
+  "sideEffects": {
+    "codeAndLocalReports": true,
+    "databaseWrites": false,
+    "sourceRevisionPropagation": false,
+    "qdrantNeo4jOrCacheWrites": false,
+    "retiredWriterOverride": false,
+    "modelGeneration": false
+  },
+  "likely_cause": "The callable projection retains older source/workspace revisions and a different AST node ID; both signature columns are null and neither ID has a stored AST row.",
+  "evidence": [
+    ".tmp/atlas/callable-refresh-plan-20261016T111843361.json",
+    "docs/reports/callable-ast-bridge-review-20261016T111931224.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+    "scripts/atlas/lib/callable-projection-refresh-plan-v1.mjs",
+    "scripts/atlas/lib/callable-projection-refresh-plan-v1.test.mjs",
+    "scripts/atlas/lib/plan-callable-projection-refresh-v1.mts",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "node --test scripts/atlas/lib/callable-projection-refresh-plan-v1.test.mjs scripts/atlas/lib/symbol-reconciliation-writer-lineage-v1.test.mjs",
+  "smoke_command": "npx --no-install openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict",
+  "report_path": "docs/reports/callable-projection-refresh-dry-run-20261016T111843.json"
+}

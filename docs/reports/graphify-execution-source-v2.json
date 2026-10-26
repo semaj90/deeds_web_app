@@ -1,18 +1,20 @@
 {
   "schema": "atlas.graphify-execution-source.v2",
   "sourceKind": "ADMITTED_WORKSPACE_SNAPSHOT",
-  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
-  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-  "materializedRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
-  "sourceCount": 25542,
+  "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+  "snapshotRevision": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
+  "materializedRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
+  "snapshotSourceCount": 30327,
+  "sourceCount": 30105,
   "repositoryCount": 7,
-  "sourceCohortChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
-  "selectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "sourceCohortChecksum": "sha256:5dd39938beddee3908f0dd06fe338ea07c98980a27c750a9cb7e01a555697889",
+  "selectionChecksum": "sha256:7c0c36d079a4a115e0157d2db53d1429f2a5805301bc1d35998bbb1773643131",
+  "selectionReportRef": ".tmp/atlas/graphify-daily-selection-hygiene-v1.json",
   "repositories": [
     {
       "repositoryId": "repo:claude-mem",
-      "sourceCount": 763,
-      "membershipChecksum": "sha256:8734a06fe39cbe4b532edc05f5f0c880aa23c52a41799dc1a81d0a44609395ae"
+      "sourceCount": 761,
+      "membershipChecksum": "sha256:fe8b9ebcfd258f489f4de2f280131e287ad302198c0a3e01bf231fbd369f21d5"
     },
     {
       "repositoryId": "repo:granite-docling-258M",
@@ -21,8 +23,8 @@
     },
     {
       "repositoryId": "repo:mcp-server-mcp",
-      "sourceCount": 192,
-      "membershipChecksum": "sha256:d08cd1499472c8908e1bb8a69b3f3caa06209219d9c4fda7aa51cdaedbb36730"
+      "sourceCount": 188,
+      "membershipChecksum": "sha256:a5ef50c67bfca368125d4c6fa49c5c104fd74dda9fc9ec13cf39de1641e07817"
     },
     {
       "repositoryId": "repo:models/embeddinggemma_300m",
@@ -31,13 +33,13 @@
     },
     {
       "repositoryId": "repo:root",
-      "sourceCount": 24456,
-      "membershipChecksum": "sha256:ba705de976f848b778bd62e4131a42883726e1d1d383883c24d2ad059da5a698"
+      "sourceCount": 29026,
+      "membershipChecksum": "sha256:7bb414d4def3f72d6e4c9598b448f0713f8c2e010a8a242b2d7f25f11c7943cf"
     },
     {
       "repositoryId": "repo:sites/parent-atlas-gateboard",
-      "sourceCount": 22,
-      "membershipChecksum": "sha256:bdfe967eb0e3aa11b6157f19db0b79b1de0c417cf3877bdad3ef6b40ac512a89"
+      "sourceCount": 21,
+      "membershipChecksum": "sha256:13bbd4c16df3a5f313437efe3ac6821b6c4d5d2659e98c98385881fc5baf3a30"
     },
     {
       "repositoryId": "repo:turbovec",

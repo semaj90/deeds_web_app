@@ -18,7 +18,7 @@ import pg from 'pg';
 import crypto from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 
@@ -29,6 +29,11 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:12345
 const QDRANT_URL = (process.env.QDRANT_URL || 'http://127.0.0.1:6333').replace(/\/$/, '');
 const SAMPLE_LIMIT = 1000;
 const REPORT_DATE = new Date().toISOString().slice(0, 10);
+const REPORT_DIR = resolve(REPO_ROOT, process.env.ATLAS_LATENT_AUDIT_REPORT_DIR || 'docs/reports');
+const REPORT_DIR_RELATIVE = relative(REPO_ROOT, REPORT_DIR);
+if (REPORT_DIR_RELATIVE === '..' || REPORT_DIR_RELATIVE.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) || resolve(REPORT_DIR) === resolve(REPO_ROOT, '..')) {
+  throw new Error('ATLAS_LATENT_AUDIT_REPORT_DIR_MUST_REMAIN_WITHIN_REPOSITORY');
+}
 
 const MUTATING_KEYWORDS = /\b(UPDATE|INSERT|DELETE|CREATE|ALTER|DROP|TRUNCATE|REFRESH|MERGE|CALL)\b/i;
 
@@ -85,6 +90,14 @@ async function main() {
   try {
     await client.query('BEGIN TRANSACTION READ ONLY');
     console.log('[audit] transaction opened READ ONLY — nothing written to any canonical table this run');
+    const databaseContext = await q(
+      `SELECT current_database() AS database_name,
+              current_schema() AS current_schema,
+              current_setting('search_path') AS search_path,
+              inet_server_addr()::text AS server_address,
+              inet_server_port() AS server_port;`,
+    );
+    report.database_context = databaseContext.rows[0];
 
     // ── 1. Schema inventory ────────────────────────────────────────────────
     console.log('[audit] 1/10 schema inventory');
@@ -167,7 +180,9 @@ async function main() {
     // ── 3. Deterministic sample ─────────────────────────────────────────────
     console.log('[audit] 3/10 deterministic sample (<=1000 rows, latent_64 IS NOT NULL)');
     const { rows: sample } = await q(
-      `SELECT packet_id, packet_key, source_ref, qdrant_point_id, tree_node_id, latent_64
+      `SELECT packet_id, packet_key, source_ref, canonical_source_ref,
+              source_revision, workspace_revision_key,
+              qdrant_point_id, tree_node_id, latent_64
        FROM atlas_packets
        WHERE latent_64 IS NOT NULL
        ORDER BY packet_id
@@ -247,49 +262,62 @@ async function main() {
 
     // ── 6. Source lineage ───────────────────────────────────────────────────
     console.log('[audit] 6/10 source lineage');
-    const sourceRefKeys = [...new Set(sample.map((r) => r.source_ref).filter(Boolean))];
+    const packetSourceRefs = sample.map((r) => ({
+      packetId: r.packet_id,
+      refs: [...new Set([r.source_ref, r.canonical_source_ref].filter(Boolean))],
+      sourceRevision: r.source_revision,
+      workspaceRevisionKey: r.workspace_revision_key,
+    }));
+    const sourceRefKeys = [...new Set(packetSourceRefs.flatMap((r) => r.refs))];
     let sourceLineage = {
-      source_ref_joined_count: 0,
-      source_version_joined_count: 0,
-      source_join_missing_count: sourceRefKeys.length,
-      source_join_ambiguous_count: 0,
-      workspace_revision_aligned_count: 0,
-      workspace_revision_mismatch_count: 0,
+      packet_file_binding_joined_count: 0,
+      packet_source_revision_binding_joined_count: 0,
+      packet_workspace_and_source_revision_binding_joined_count: 0,
+      packet_file_binding_missing_count: sample.length,
+      packet_source_revision_binding_missing_or_mismatch_count: sample.length,
+      packet_workspace_and_source_revision_binding_missing_or_mismatch_count: sample.length,
+      source_version_id_joined_count: 0,
     };
+    const sourceRefKeyShape = await q(
+      `SELECT COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE source_ref_key LIKE '%#%')::int AS fragment_locator_rows,
+              COUNT(*) FILTER (WHERE source_ref_key NOT LIKE '%#%')::int AS plain_path_rows
+       FROM atlas_ast_nodes
+       WHERE source_ref_key IS NOT NULL;`,
+    );
+    sourceLineage.ast_node_source_ref_key_shape = sourceRefKeyShape.rows[0];
     if (sourceRefKeys.length > 0) {
-      const { rows: astRows } = await q(
-        `SELECT source_ref_key, source_revision, workspace_id
-         FROM atlas_ast_nodes
-         WHERE source_ref_key = ANY($1::text[]);`,
+      const { rows: bindingRows } = await q(
+        `SELECT canonical_source_ref, source_revision, workspace_revision
+         FROM atlas_workspace_source_bindings
+         WHERE canonical_source_ref = ANY($1::text[]);`,
         [sourceRefKeys],
       );
-      const bySource = new Map();
-      for (const r of astRows) {
-        if (!bySource.has(r.source_ref_key)) bySource.set(r.source_ref_key, []);
-        bySource.get(r.source_ref_key).push(r);
+      const bindingsByRef = new Map();
+      for (const row of bindingRows) {
+        if (!bindingsByRef.has(row.canonical_source_ref)) bindingsByRef.set(row.canonical_source_ref, []);
+        bindingsByRef.get(row.canonical_source_ref).push(row);
       }
-      let joined = 0;
-      let versionJoined = 0;
-      let ambiguous = 0;
-      for (const sr of sourceRefKeys) {
-        const matches = bySource.get(sr) ?? [];
-        if (matches.length === 1) {
-          joined++;
-          if (matches[0].source_revision) versionJoined++;
-        } else if (matches.length > 1) {
-          ambiguous++;
-        }
-      }
+      const pathJoined = packetSourceRefs.filter((packet) => packet.refs.some((ref) => (bindingsByRef.get(ref) ?? []).length > 0));
+      const revisionJoined = packetSourceRefs.filter((packet) => packet.refs.some((ref) =>
+        (bindingsByRef.get(ref) ?? []).some((binding) => binding.source_revision && binding.source_revision === packet.sourceRevision)));
+      const workspaceRevisionJoined = packetSourceRefs.filter((packet) => packet.refs.some((ref) =>
+        (bindingsByRef.get(ref) ?? []).some((binding) => binding.source_revision === packet.sourceRevision &&
+          binding.workspace_revision === packet.workspaceRevisionKey)));
       sourceLineage = {
-        source_ref_joined_count: joined,
-        source_version_joined_count: versionJoined,
-        source_join_missing_count: sourceRefKeys.length - joined - ambiguous,
-        source_join_ambiguous_count: ambiguous,
-        workspace_revision_aligned_count: 0,
-        workspace_revision_mismatch_count: 0,
-        note: 'atlas_ast_nodes.source_revision (joined via source_ref_key) is the only live revision-bearing proxy found — NOT a canonical source_version_id join, which does not exist yet (GS1.10 NOT_PROVEN). workspace_revision alignment not computed: no live packet-side workspace_revision column found on atlas_packets.',
+        packet_file_binding_joined_count: pathJoined.length,
+        packet_source_revision_binding_joined_count: revisionJoined.length,
+        packet_workspace_and_source_revision_binding_joined_count: workspaceRevisionJoined.length,
+        packet_file_binding_missing_count: sample.length - pathJoined.length,
+        packet_source_revision_binding_missing_or_mismatch_count: sample.length - revisionJoined.length,
+        packet_workspace_and_source_revision_binding_missing_or_mismatch_count: sample.length - workspaceRevisionJoined.length,
+        source_version_id_joined_count: 0,
+        ast_node_source_ref_key_shape: sourceRefKeyShape.rows[0],
+        note: 'File-level packet refs are compared against atlas_workspace_source_bindings. Counts prove only exact path/source_revision/workspace_revision equality for this bounded sample, not a canonical source_version_id object or broader cohort admission. atlas_ast_nodes.source_ref_key is node-grain and is reported separately; its fragment locators are not file-level source refs.',
       };
-      if (versionJoined === 0) report.limitations.push('SOURCE_VERSION_JOIN = NOT_PROVEN in this sample — 0 matches (do not synthesize one)');
+      if (revisionJoined.length === 0) {
+        report.limitations.push('No sampled packet has a matching file-level source binding revision; do not synthesize one');
+      }
     } else {
       report.limitations.push('No source_ref values present in sample — section 6 skipped');
     }
@@ -302,10 +330,9 @@ async function main() {
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (treeNodeIds.length > 0) {
       treeNodeIdFormatMismatch = treeNodeIds.filter((id) => !UUID_RE.test(id)).length;
-      // atlas_packets.tree_node_id is `text`; atlas_tree_nodes.node_id is `uuid`. Cast the
-      // uuid side to text rather than assuming every text value is UUID-parseable — a hard
-      // cast the other way (::uuid[]) throws 22P02 on non-UUID values, which is itself the
-      // finding (see treeNodeIdFormatMismatch below), not something to paper over.
+      // atlas_packets.tree_node_id is text while atlas_tree_nodes.node_id is uuid. Compare as
+      // text and report the observed format separately. These are document-hierarchy locators;
+      // they are distinct from atlas_ast_nodes.tree_node_id, the code-AST hash identity.
       const { rows: treeRows } = await q(
         `SELECT node_id::text AS node_id FROM atlas_tree_nodes WHERE node_id::text = ANY($1::text[]);`,
         [treeNodeIds],
@@ -323,7 +350,7 @@ async function main() {
       stable_symbol_key_present_count: 0,
       symbol_version_id_present_count: 0,
       note:
-        `graphify_symbols does not exist live (confirmed via schema inventory) — all symbol-join metrics are structurally 0/ABSENT, not a bug in this audit. atlas_ast_nodes is the only live AST-adjacent table; atlas_tree_nodes is a separate, provisional structural-inventory table (GS1.10: "provisional structural inventory, not canonical graph identity"). REAL FINDING this pass: atlas_packets.tree_node_id is declared \`text\` but ${treeNodeIdFormatMismatch}/${treeNodeIds.length} sampled non-null values are NOT UUID-formatted (they look like content-hash strings, e.g. sha1/sha256-length hex) — while atlas_tree_nodes.node_id is declared \`uuid\`. A naive \`::uuid\` cast join throws 22P02; this audit casts the uuid side to text instead so the join can even be attempted. This is itself evidence of an unreconciled tree_node_id identity scheme, separate from GS1.10's already-known provisional-identity finding. Production writer/retrieval-path consumption of atlas_ast_nodes vs atlas_tree_nodes was not independently re-verified in this pass — see GS1.10-GS1.12 for prior findings.`,
+        `atlas_tree_nodes is a separate, provisional document-hierarchy table, not canonical code-AST identity (GS1.10). In this sample, ${treeNodeIds.length - treeNodeIdFormatMismatch}/${treeNodeIds.length} non-null atlas_packets.tree_node_id strings are UUID-formatted and ${treeJoined}/${treeNodeIds.length} match atlas_tree_nodes.node_id by exact text comparison; ${treeNodeIdFormatMismatch} malformed values were observed. This supports sample-level document-hierarchy joinability only, not source revision, byte-span, or canonical AST provenance. atlas_ast_nodes.tree_node_id is a distinct code-AST hash namespace; do not equate or cast between the two identity domains. Exact file-source-to-symbol-version results are computed separately below using the existing writer's revision, upstream symbol, declaration hash, name, and byte-span contract.`,
     };
 
     // ── 8. BYTEA contract ────────────────────────────────────────────────────
@@ -357,52 +384,250 @@ async function main() {
           producer_revision_values: [],
           input_digest_present_count: 0,
           parameters_digest_present_count: 0,
-          note: 'atlas_representation_records DOES NOT EXIST live (confirmed via schema inventory) — this is a real, total absence, not a query bug. atlas_packets does carry source_representation_id/projection_representation_id/representation_revision columns (confirmed live), but generic packet metadata is not a complete representation ledger per this audit\'s own definition (producer identity, input digest, parameters digest all absent).',
+          note: 'atlas_representation_records is not a table in the current schema; the existing atlas_representations registry is the representation owner, but this audit does not join packet rows to that registry. Packet representation columns alone do not establish producer identity, input digest, or parameters digest.',
         };
 
     // ── 10. Lineage classification ──────────────────────────────────────────
     console.log('[audit] 10/10 lineage classification');
-    const astBySource = new Map();
-    if (sourceRefKeys.length > 0) {
-      const { rows: astRows2 } = await q(
-        `SELECT source_ref_key, source_revision FROM atlas_ast_nodes WHERE source_ref_key = ANY($1::text[]);`,
-        [sourceRefKeys],
-      );
-      for (const r of astRows2) {
-        if (!astBySource.has(r.source_ref_key)) astBySource.set(r.source_ref_key, []);
-        astBySource.get(r.source_ref_key).push(r);
-      }
-    }
+    const packetCrosswalkInput = sample.map((row) => ({
+      packet_id: String(row.packet_id),
+      packet_key: row.packet_key,
+      refs: [...new Set([row.source_ref, row.canonical_source_ref].filter(Boolean))],
+      source_revision: row.source_revision,
+      workspace_revision: row.workspace_revision_key,
+    }));
+    const { rows: crosswalkRows } = await q(
+      `WITH packet_sample AS (
+         SELECT *
+         FROM jsonb_to_recordset($1::jsonb) AS p(
+           packet_id text, packet_key text, refs text[], source_revision text, workspace_revision text
+         )
+       ), bound_sources AS (
+         SELECT DISTINCT p.packet_id, p.packet_key, p.source_revision, p.workspace_revision,
+                b.canonical_source_ref
+         FROM packet_sample p
+         CROSS JOIN LATERAL unnest(p.refs) AS refs(source_ref)
+         JOIN atlas_workspace_source_bindings b
+           ON b.canonical_source_ref = refs.source_ref
+          AND b.source_revision = p.source_revision
+          AND b.workspace_revision = p.workspace_revision
+       ), source_symbols AS (
+         SELECT b.packet_id, b.packet_key, b.source_revision, b.workspace_revision,
+                b.canonical_source_ref, gf.file_id, gs.symbol_id::text AS upstream_symbol_id,
+                gs.qualified_name, gs.stable_symbol_key, gs.ast_fingerprint,
+                gs.start_byte, gs.end_byte
+         FROM bound_sources b
+         JOIN graphify_files gf
+           ON gf.source_ref = b.canonical_source_ref
+          AND gf.code_source_revision = b.source_revision
+         JOIN graphify_symbols gs ON gs.file_id = gf.file_id
+       ), exact_symbol_versions AS (
+         SELECT s.packet_id, s.packet_key, v.symbol_version_id, v.packet_key AS version_packet_key
+         FROM source_symbols s
+         JOIN atlas_symbol_versions v
+           ON v.source_ref = s.canonical_source_ref
+          AND v.source_revision = s.source_revision
+          AND v.workspace_revision = s.workspace_revision
+          AND v.upstream_symbol_id = s.upstream_symbol_id
+          AND v.qualified_name = COALESCE(s.qualified_name, s.stable_symbol_key)
+          AND v.declaration_hash = s.ast_fingerprint
+          AND v.byte_start = s.start_byte
+          AND v.byte_end = s.end_byte
+         JOIN atlas_symbol_registry r
+           ON r.stable_symbol_id = v.stable_symbol_id
+          AND r.status = 'active'
+       )
+       SELECT p.packet_id, p.packet_key,
+              COUNT(DISTINCT b.canonical_source_ref)::int AS exact_source_binding_count,
+              COUNT(DISTINCT s.upstream_symbol_id)::int AS exact_graphify_symbol_count,
+              COUNT(DISTINCT s.upstream_symbol_id) FILTER (WHERE s.stable_symbol_key IS NOT NULL)::int
+                AS stable_symbol_key_count,
+              COUNT(DISTINCT e.symbol_version_id)::int AS exact_symbol_version_count,
+              COUNT(DISTINCT e.symbol_version_id) FILTER (WHERE e.version_packet_key = p.packet_key)::int
+                AS exact_packet_key_symbol_version_count
+       FROM packet_sample p
+       LEFT JOIN bound_sources b ON b.packet_id = p.packet_id
+       LEFT JOIN source_symbols s ON s.packet_id = p.packet_id
+       LEFT JOIN exact_symbol_versions e ON e.packet_id = p.packet_id
+       GROUP BY p.packet_id, p.packet_key;`,
+      [JSON.stringify(packetCrosswalkInput)],
+    );
+    const exactSourceBindingPacketCount = crosswalkRows.filter((row) => Number(row.exact_source_binding_count) > 0).length;
+    const exactGraphifySymbolPacketCount = crosswalkRows.filter((row) => Number(row.exact_graphify_symbol_count) > 0).length;
+    const stableSymbolKeyPacketCount = crosswalkRows.filter((row) => Number(row.stable_symbol_key_count) > 0).length;
+    const exactSymbolVersionPacketCount = crosswalkRows.filter((row) => Number(row.exact_symbol_version_count) > 0).length;
+    const exactSymbolVersionRowCount = crosswalkRows.reduce((sum, row) => sum + Number(row.exact_symbol_version_count), 0);
+    const exactPacketKeySymbolVersionPacketCount = crosswalkRows.filter((row) => Number(row.exact_packet_key_symbol_version_count) > 0).length;
+    const exactPacketKeySymbolVersionRowCount = crosswalkRows.reduce((sum, row) => sum + Number(row.exact_packet_key_symbol_version_count), 0);
+    const { rows: symbolVersionOwnerRows } = await q(
+      `WITH versions AS (
+         SELECT v.symbol_version_id, v.stable_symbol_id, v.source_ref, v.source_revision,
+                v.workspace_revision, v.upstream_symbol_id, v.upstream_file_id, v.packet_key,
+                v.qualified_name, v.declaration_hash, v.byte_start, v.byte_end
+         FROM atlas_symbol_versions v
+       ), qualified AS (
+         SELECT v.*, b.canonical_source_ref AS bound_source_ref,
+                gf.file_id
+         FROM versions v
+         LEFT JOIN atlas_workspace_source_bindings b
+           ON b.canonical_source_ref = v.source_ref
+          AND b.source_revision = v.source_revision
+          AND b.workspace_revision = v.workspace_revision
+         LEFT JOIN graphify_files gf
+           ON gf.source_ref = b.canonical_source_ref
+          AND gf.code_source_revision = b.source_revision
+       )
+       SELECT COUNT(*)::int AS symbol_version_row_count,
+              COUNT(*) FILTER (WHERE source_revision ~ '^sha256:[0-9a-f]{64}$')::int AS source_sha256_row_count,
+              COUNT(*) FILTER (WHERE workspace_revision ~ '^sha256:[0-9a-f]{64}$')::int AS workspace_sha256_row_count,
+              COUNT(*) FILTER (WHERE packet_key IS NOT NULL)::int AS packet_key_present_row_count,
+              COUNT(*) FILTER (WHERE bound_source_ref IS NOT NULL)::int AS exact_source_workspace_binding_row_count,
+              COUNT(*) FILTER (WHERE file_id IS NOT NULL)::int AS exact_graphify_file_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND gs.symbol_id::text = qualified.upstream_symbol_id
+              ))::int AS upstream_symbol_id_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND COALESCE(gs.qualified_name, gs.stable_symbol_key) = qualified.qualified_name
+              ))::int AS same_file_name_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND COALESCE(gs.qualified_name, gs.stable_symbol_key) = qualified.qualified_name
+                  AND gs.start_byte = qualified.byte_start
+                  AND gs.end_byte = qualified.byte_end
+              ))::int AS same_file_name_and_span_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND COALESCE(gs.qualified_name, gs.stable_symbol_key) = qualified.qualified_name
+                  AND gs.ast_fingerprint = qualified.declaration_hash
+              ))::int AS same_file_name_and_hash_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND COALESCE(gs.qualified_name, gs.stable_symbol_key) = qualified.qualified_name
+                  AND gs.start_byte = qualified.byte_start
+                  AND gs.end_byte = qualified.byte_end
+                  AND gs.ast_fingerprint = qualified.declaration_hash
+              ))::int AS same_file_name_span_and_hash_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND gs.symbol_id::text = qualified.upstream_symbol_id
+                  AND COALESCE(gs.qualified_name, gs.stable_symbol_key) = qualified.qualified_name
+              ))::int AS upstream_symbol_and_name_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND gs.symbol_id::text = qualified.upstream_symbol_id
+                  AND gs.start_byte = qualified.byte_start
+                  AND gs.end_byte = qualified.byte_end
+              ))::int AS upstream_symbol_and_span_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND gs.symbol_id::text = qualified.upstream_symbol_id
+                  AND gs.ast_fingerprint = qualified.declaration_hash
+              ))::int AS upstream_symbol_and_hash_match_row_count,
+              COUNT(*) FILTER (WHERE EXISTS (
+                SELECT 1 FROM graphify_symbols gs
+                WHERE gs.file_id = qualified.file_id
+                  AND gs.symbol_id::text = qualified.upstream_symbol_id
+                  AND COALESCE(gs.qualified_name, gs.stable_symbol_key) = qualified.qualified_name
+                  AND gs.ast_fingerprint = qualified.declaration_hash
+                  AND gs.start_byte = qualified.byte_start
+                  AND gs.end_byte = qualified.byte_end
+              ))::int AS exact_graphify_symbol_tuple_match_row_count,
+              COUNT(*) FILTER (WHERE stable_symbol_id IS NOT NULL AND EXISTS (
+                SELECT 1 FROM atlas_symbol_registry r WHERE r.stable_symbol_id = qualified.stable_symbol_id AND r.status = 'active'
+              ))::int AS active_registry_row_count,
+              COUNT(*) FILTER (WHERE packet_key IS NOT NULL AND EXISTS (
+                SELECT 1 FROM atlas_packets p
+                WHERE p.packet_key = qualified.packet_key
+                  AND (p.source_ref = qualified.source_ref OR p.canonical_source_ref = qualified.source_ref)
+                  AND p.source_revision = qualified.source_revision
+                  AND p.workspace_revision_key = qualified.workspace_revision
+              ))::int AS exact_packet_identity_row_count
+         FROM qualified;`,
+    );
+    const symbolVersionOwnerCensus = symbolVersionOwnerRows[0] ?? {};
+    const { rows: symbolNameMismatchRows } = await q(
+      `SELECT v.symbol_version_id, v.source_ref, v.source_revision, v.workspace_revision,
+              v.packet_key, v.producer_revision, v.upstream_node_id,
+              v.upstream_file_id, v.upstream_symbol_id AS stored_upstream_symbol_id,
+              gs.symbol_id::text AS current_graphify_symbol_id,
+              v.qualified_name, gs.qualified_name AS current_qualified_name,
+              v.declaration_hash AS stored_declaration_hash,
+              gs.ast_fingerprint AS current_ast_fingerprint,
+              v.byte_start AS stored_byte_start, v.byte_end AS stored_byte_end,
+              gs.start_byte AS current_start_byte, gs.end_byte AS current_end_byte,
+              (v.declaration_hash = gs.ast_fingerprint) AS declaration_hash_equal,
+              (v.byte_start = gs.start_byte AND v.byte_end = gs.end_byte) AS byte_span_equal
+       FROM atlas_symbol_versions v
+       JOIN atlas_workspace_source_bindings b
+         ON b.canonical_source_ref = v.source_ref
+        AND b.source_revision = v.source_revision
+        AND b.workspace_revision = v.workspace_revision
+       JOIN graphify_files gf
+         ON gf.source_ref = b.canonical_source_ref
+        AND gf.code_source_revision = b.source_revision
+       JOIN graphify_symbols gs
+         ON gs.file_id = gf.file_id
+        AND COALESCE(gs.qualified_name, gs.stable_symbol_key) = v.qualified_name
+       ORDER BY v.source_ref, v.qualified_name, v.symbol_version_id
+       LIMIT 12;`,
+    );
+    treeAndSymbolLineage.graphify_symbol_joined_count = exactGraphifySymbolPacketCount;
+    treeAndSymbolLineage.graphify_symbol_missing_count = sample.length - exactGraphifySymbolPacketCount;
+    treeAndSymbolLineage.symbol_version_id_present_count = exactSymbolVersionPacketCount;
+    treeAndSymbolLineage.symbol_join_ambiguous_count = 0;
+    treeAndSymbolLineage.stable_symbol_key_present_count = stableSymbolKeyPacketCount;
     const lineageCounts = {
       NUMERIC_BYTES_PRESENT: 0,
       REPRESENTATION_RECORD_PRESENT: 0,
+      SOURCE_BINDING_REVISION_JOINED: exactSourceBindingPacketCount,
+      GRAPHIFY_SYMBOL_REVISION_JOINED: exactGraphifySymbolPacketCount,
+      EXACT_SYMBOL_VERSION_JOINED: exactSymbolVersionPacketCount,
+      EXACT_PACKET_KEY_SYMBOL_VERSION_JOINED: exactPacketKeySymbolVersionPacketCount,
       SOURCE_VERSION_JOINED: 0,
-      SYMBOL_VERSION_JOINED: 0,
+      SYMBOL_VERSION_JOINED: exactSymbolVersionPacketCount,
       FULL_LINEAGE_PROVEN: 0,
       PARTIAL_LINEAGE: 0,
       LINEAGE_MISSING: 0,
       AMBIGUOUS_JOIN: 0,
     };
+    const crosswalkByPacket = new Map(crosswalkRows.map((row) => [String(row.packet_id), row]));
     for (const row of sample) {
       const hasBytes = Boolean(row.latent_64);
       if (hasBytes) lineageCounts.NUMERIC_BYTES_PRESENT++;
-      const srcMatches = row.source_ref ? astBySource.get(row.source_ref) ?? [] : [];
-      const sourceVersionJoined = srcMatches.length === 1 && Boolean(srcMatches[0].source_revision);
-      if (sourceVersionJoined) lineageCounts.SOURCE_VERSION_JOINED++;
-      if (srcMatches.length > 1) {
-        lineageCounts.AMBIGUOUS_JOIN++;
-        continue;
-      }
-      // symbol_version_joined is structurally always false (graphify_symbols absent)
-      const hasRepresentationRecord = false; // table absent
-      if (hasBytes && hasRepresentationRecord && sourceVersionJoined) {
-        lineageCounts.FULL_LINEAGE_PROVEN++;
-      } else if (hasBytes && (hasRepresentationRecord || sourceVersionJoined)) {
+      const crosswalk = crosswalkByPacket.get(String(row.packet_id));
+      const sourceBound = Number(crosswalk?.exact_source_binding_count ?? 0) > 0;
+      const exactSymbolVersion = Number(crosswalk?.exact_symbol_version_count ?? 0) > 0;
+      if (hasBytes && (sourceBound || exactSymbolVersion)) {
         lineageCounts.PARTIAL_LINEAGE++;
       } else {
         lineageCounts.LINEAGE_MISSING++;
       }
     }
+    report.packet_symbol_version_crosswalk = {
+      packet_sample_count: crosswalkRows.length,
+      exact_source_binding_packet_count: exactSourceBindingPacketCount,
+      exact_graphify_symbol_packet_count: exactGraphifySymbolPacketCount,
+      exact_symbol_version_packet_count: exactSymbolVersionPacketCount,
+      exact_symbol_version_row_count: exactSymbolVersionRowCount,
+      exact_packet_key_symbol_version_packet_count: exactPacketKeySymbolVersionPacketCount,
+      exact_packet_key_symbol_version_row_count: exactPacketKeySymbolVersionRowCount,
+      packet_sample: crosswalkRows.slice(0, 20),
+      symbol_version_owner_census: symbolVersionOwnerCensus,
+      same_name_mismatch_sample: symbolNameMismatchRows,
+      canonicalSourceVersionIdPresent: false,
+      qualification: 'EXACT_SOURCE_WORKSPACE_UPSTREAM_SYMBOL_NAME_DECLARATION_HASH_AND_BYTE_SPAN',
+      note: 'This bounded crosswalk uses the canonical symbol writer identity tuple. A source binding is not a source_version_id object; exact AST symbol-version matches do not by themselves admit latent vectors or prove representation input provenance.',
+    };
 
     await client.query('ROLLBACK');
     console.log('[audit] transaction rolled back — confirmed zero production mutations');
@@ -414,11 +639,11 @@ async function main() {
       LAT_AUDIT3_VECTOR_STORE_CLASSIFICATION: 'PARTIAL_PROVEN', // most columns UNKNOWN by design, not inferred
       LAT_AUDIT4_PACKET_IDENTITY: 'PASS',
       LAT_AUDIT5_QDRANT_JOIN_CLASSIFIED: qdrantIdentity.error ? 'BLOCKED' : 'PASS',
-      LAT_AUDIT6_SOURCE_VERSION_JOIN: sourceLineage.source_version_joined_count > 0 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
+      LAT_AUDIT6_SOURCE_VERSION_JOIN: 'NOT_PROVEN', // File-level revision bindings do not establish a canonical source_version_id join.
       LAT_AUDIT7_TREE_JOIN: 'PARTIAL_PROVEN',
-      LAT_AUDIT8_SYMBOL_JOIN: 'NOT_PROVEN', // graphify_symbols absent
+      LAT_AUDIT8_SYMBOL_JOIN: 'NOT_PROVEN', // graphify_symbols is present but this audit has no packet-to-symbol-version join.
       LAT_AUDIT9_BYTEA_ENCODING_CONTRACT: byteaContract.uniform_byte_length ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',
-      LAT_AUDIT10_REPRESENTATION_LEDGER: 'NOT_PROVEN', // table absent
+      LAT_AUDIT10_REPRESENTATION_LEDGER: 'NOT_PROVEN', // atlas_representations exists but this audit has no packet-to-registry join.
       LAT_AUDIT11_LINEAGE_CLASSIFICATION: 'PASS',
       LAT_AUDIT12_JSON_REPORT: 'PASS', // set true once written below
       LAT_AUDIT13_MARKDOWN_REPORT: 'PASS', // set true once written below
@@ -438,7 +663,7 @@ async function main() {
     report.lineage_classification_counts = lineageCounts;
 
     // ── Write reports ────────────────────────────────────────────────────────
-    const reportsDir = resolve(REPO_ROOT, 'docs', 'reports');
+    const reportsDir = REPORT_DIR;
     mkdirSync(reportsDir, { recursive: true });
     const jsonPath = resolve(reportsDir, `latent-representation-identity-audit-${REPORT_DATE}.json`);
     const mdPath = resolve(reportsDir, `latent-representation-identity-audit-${REPORT_DATE}.md`);

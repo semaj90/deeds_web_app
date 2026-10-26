@@ -65,6 +65,102 @@ def test_som_seeds_from_checksum_bound_kmeans_centroids_deterministically() -> N
     assert som_receipt_a.canonical_authority is False
 
 
+def test_som_pca_lattice_initialization_is_deterministic_and_explicit() -> None:
+    matrix = np.asarray(
+        [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, -1.0]],
+        dtype=np.float32,
+    )
+
+    coords_a, codebook_a, receipt_a = train_deterministic_som(
+        matrix, grid_rows=2, grid_columns=2, epochs=2, device="cpu", initialization="pca_lattice_v1"
+    )
+    coords_b, codebook_b, receipt_b = train_deterministic_som(
+        matrix, grid_rows=2, grid_columns=2, epochs=2, device="cpu", initialization="pca_lattice_v1"
+    )
+
+    assert torch.equal(coords_a, coords_b)
+    assert torch.equal(codebook_a, codebook_b)
+    assert receipt_a.to_dict() == receipt_b.to_dict()
+    assert receipt_a.initialization_method == "pca_lattice_v1"
+    assert receipt_a.canonical_authority is False
+
+
+def test_som_pca_perturbation_is_seeded_and_receipt_bound() -> None:
+    matrix = np.asarray(
+        [[0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [1.0, 1.0, -1.0]],
+        dtype=np.float32,
+    )
+    options = {
+        "grid_rows": 2,
+        "grid_columns": 2,
+        "epochs": 2,
+        "device": "cpu",
+        "initialization": "pca_lattice_v1",
+        "initialization_perturbation": 0.05,
+    }
+
+    _, codebook_a, receipt_a = train_deterministic_som(matrix, seed=11, **options)
+    _, codebook_replay, receipt_replay = train_deterministic_som(matrix, seed=11, **options)
+    _, codebook_b, receipt_b = train_deterministic_som(matrix, seed=12, **options)
+
+    assert torch.equal(codebook_a, codebook_replay)
+    assert receipt_a.to_dict() == receipt_replay.to_dict()
+    assert not torch.equal(codebook_a, codebook_b)
+    assert receipt_a.seed == 11
+    assert receipt_a.initialization_perturbation == 0.05
+    assert receipt_a.initial_centroids_checksum != receipt_b.initial_centroids_checksum
+
+
+def test_som_batch_neighborhood_update_is_deterministic_and_receipted() -> None:
+    matrix = np.asarray(
+        [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [0.5, 0.5]],
+        dtype=np.float32,
+    )
+    options = {
+        "grid_rows": 2,
+        "grid_columns": 2,
+        "epochs": 3,
+        "device": "cpu",
+        "initialization": "pca_lattice_v1",
+        "update_rule": "batch_neighborhood_v1",
+        "assignment_batch_rows": 2,
+    }
+
+    coords_a, codebook_a, receipt_a = train_deterministic_som(matrix, **options)
+    coords_b, codebook_b, receipt_b = train_deterministic_som(matrix, **options)
+
+    assert torch.equal(coords_a, coords_b)
+    assert torch.equal(codebook_a, codebook_b)
+    assert receipt_a.to_dict() == receipt_b.to_dict()
+    assert receipt_a.update_rule == "batch_neighborhood_v1"
+    assert receipt_a.quantization_error >= 0
+
+
+def test_som_rejects_invalid_batch_training_options() -> None:
+    matrix = np.asarray([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
+
+    with pytest.raises(ValueError, match="UNSUPPORTED_SOM_UPDATE_RULE"):
+        train_deterministic_som(matrix, grid_rows=1, grid_columns=2, epochs=1, device="cpu", update_rule="unknown")
+    with pytest.raises(ValueError, match="assignment_batch_rows must be positive"):
+        train_deterministic_som(matrix, grid_rows=1, grid_columns=2, epochs=1, device="cpu", assignment_batch_rows=0)
+
+
+def test_som_pca_lattice_rejects_conflicting_kmeans_artifact() -> None:
+    matrix = np.asarray([[0, 0], [1, 0], [0, 1], [1, 1]], dtype=np.float32)
+    artifact = _kmeans_artifact(matrix, np.asarray([[0.1, 0.1], [0.9, 0.9]], dtype=np.float32))
+
+    with pytest.raises(ValueError, match="SOM_INITIALIZATION_CONFLICT"):
+        train_deterministic_som(
+            matrix,
+            grid_rows=1,
+            grid_columns=2,
+            epochs=1,
+            device="cpu",
+            kmeans_artifact=artifact,
+            initialization="pca_lattice_v1",
+        )
+
+
 def test_som_rejects_centroid_checksum_or_input_revision_mismatch() -> None:
     matrix = np.asarray([[0, 0], [1, 0], [0, 1], [1, 1]], dtype=np.float32)
     centroids = np.asarray([[0.1, 0.1], [0.9, 0.9]], dtype=np.float32)

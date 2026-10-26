@@ -56,6 +56,17 @@ writesPerformed=false.
 First blocker: `LIVE_CLASSIFIER_PRODUCER_NOT_WIRED`.
 Next gate: current source-bound query/label producer proof.
 
+## TAXONOMY-CROSSWALK-01 — reviewed legacy vocabulary reconciliation (2026-10-17)
+
+- [ ] **TAXONOMY-CROSSWALK-01.1** Produce a deterministic, read-only inventory of observed legacy labels against the frozen 17-entry `domain_taxonomy_v1` snapshot. Keep the 13 top-level groups and four child IDs distinct; do not mix in the separate 43-class byte taxonomy, cluster IDs, file counts, or incomplete chunk-index values.
+- [ ] **TAXONOMY-CROSSWALK-01.2** Emit a reviewable mapping proposal with exact-match, case-only, proposed mapping, unresolved, and ambiguous statuses; preserve original label, source table/row identity where available, evidence, and taxonomy revision. Normalize case-only matches only in the derived proposal; do not update canonical source records.
+- [ ] **TAXONOMY-CROSSWALK-01.3** Keep legacy labels such as `documentation`, `tool`, `agent`, and `Other` `UNRESOLVED` unless a reviewer accepts a specific mapping supported by examples. Never map unknown labels to `Other` by default.
+- [ ] **TAXONOMY-CROSSWALK-01.4** Validate proposed mappings against reviewed examples and existing domain-classification owners; report exact/case-only/unresolved/ambiguous counts with conservation checks and a checksummed receipt. No LLM or classifier score alone may establish a mapping.
+- [ ] **TAXONOMY-CROSSWALK-01.5** Freeze and checksum the approved taxonomy snapshot before assigning versioned NES LUT ordinals. Generate ordinals from that immutable snapshot and explicit registry order, never alphabetical order or mutable group position; attach labels to feature evidence/ACE only through existing qualification owners.
+- [ ] **TAXONOMY-CROSSWALK-01.6** Add focused tests for deterministic replay, case-only normalization, unresolved legacy labels, ambiguous mappings, taxonomy-revision mismatch, and ordinal stability. No database migration, canonical packet update, taxonomy-row remap, or production routing change is authorized by this task.
+
+Status: **OPEN / REVIEW REQUIRED**. The audit counts (including 61,659 assessed packet rows and reported exact/case-only/unmatched proportions) are prior-reported inputs and must be revalidated by the read-only producer before they are treated as current evidence. NES LUT ordinal minting remains blocked until mapping review and taxonomy freeze pass.
+
 ## Built this session (2026-08-12)
 
 - [x] New module: `sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts`
@@ -270,6 +281,23 @@ Evidence: `docs/reports/domain-classifier-cohort-admission-v1.json`.
 
 Evidence: `docs/reports/domain-classifier-parity-v1.json`,
 `sveltekit-frontend/src/lib/server/ace/features/domain-classifier-parity-v1.ts`.
+
+## P13 current-cohort and contract recheck (2026-10-15)
+
+- [x] Re-ran the bounded admission planner against the already selected
+  Graphify execution `74d50c86-8194-45ea-8c3d-61aab737ef83` and workspace
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`:
+  `node scripts/atlas/plan-domain-classifier-cohort-admission-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --limit 35`; exit `0`, actual selected row count `13`, `6 PACKET_MISSING`, `4 CONTENT_DIGEST_MISMATCH`, `3 PACKET_AMBIGUOUS`, `promotionEligible=false`, `writesPerformed=false`.
+- [x] Re-ran focused tests:
+  `npx vitest run src/lib/server/atlas/domain-classification-adapter-v1.spec.ts src/lib/server/atlas/domain-taxonomy.spec.ts src/lib/server/atlas/classifier-feature-manifest.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=verbose`; exit `0`, 3 files / 15 tests passed.
+- [ ] Do not train, export, promote, or wire classifier output as canonical labels. Fixture/contract tests pass, but the selected real cohort still has zero eligible rows; resolve packet lineage, source digest mismatches, and ambiguous identities before a new frozen training/evaluation cohort is admitted.
+
+Evidence: `docs/reports/domain-classifier-cohort-admission-v1.json`
+(generated `2026-10-15T20:12:49.105Z`, SHA-256
+`A9EB9AFEC7CE5756610EC40D4F7D9C925FCE13B46E7982031881E40BA88F9EC9`). The
+planner used a repeatable-read, read-only PostgreSQL transaction and writes
+only its local diagnostic report; it did not modify PostgreSQL or classifier
+state. Status remains `PARTIAL / TRAINING BLOCKED`.
 
 - [x] Hardened the admission planner so it no longer derives an expected `packet_key` from
   `source_ref`. Packet identity must come from the canonical PostgreSQL packet row; UUIDv5
@@ -1180,3 +1208,258 @@ not establish a newly promoted model, admitted source classification, or an Open
   `NEURAL_DECODER_PREFILL_SHADOW_ENABLED` with default `false`; shadow output is documented not to
   affect ranking or canonical state. This is distinct from the learned domain-classifier bridge,
   for which no production call site was found.
+
+### Domain classification, documentation, and agentic retrieval implementation gates (2026-10-12)
+
+The implementation plan is `docs/.okf/architecture/domain-classification-indexing-implementation-v1.md`.
+It reuses existing owners and is non-authoritative. Do not add a parallel feature table, packet
+registry, vector index, or ranking/fusion owner.
+
+The proposal envelope JSON Schema is `docs/.okf/schemas/domain-classification-batch-v1.schema.json`;
+the runtime row/batch authority is the strict Zod contract in
+`sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.ts`, and the proposal
+adapter now validates emitted envelopes against it. JSON Schema/Zod parity is still unverified.
+This does not make proposal rows persistable.
+
+- [ ] CLASS-INDEX-01 Reconcile the bounded `.okf` `rows[]` proposal schema with the existing
+  `feature_domain_facts` Drizzle owner. The current unique key is
+  `(packet_key, classifier_version, content_hash)`; proposal identity also carries subject kind,
+  source/workspace, taxonomy, producer, and classifier revisions. Define a lossless key/revision
+  mapping and digest representation before proposing any upsert. Keep rows proposal-only until
+  canonical packet/source resolution and authorized readback exist.
+- [ ] CLASS-INDEX-01A Wire `resolveDomainClassificationPacketCrosswalkV1()` to a read-only exact
+  packet-row provider and the existing PacketKeyResolutionV2 owner. A repeatable-read, read-only
+  PostgreSQL provider now exists; its focused tests are authored but not run. Independently verify
+  the packet row scope and live caller; keep multiple source refs, stale workspace/source revisions,
+  duplicate packet matches, and unresolved aliases blocked. The provider's
+  `MATCHED_NOT_ADMITTED` is not a persistence or evidence-admission receipt.
+- [ ] CLASS-INDEX-02 Reconcile `.okf` publication envelopes to exact fetched document identity,
+  license/scope, extractor revision, and same-grain raw/normalized content digests. Preserve
+  missing, orphaned, and changed-content records as reason-coded cases; do not auto-publish or
+  embed unmatched pages.
+- [ ] CLASS-INDEX-03 After source/packet/chunk eligibility, use the existing EmbeddingGemma
+  `semantic_768` owner and PostgreSQL vector rows; reconcile the existing Qdrant `content`
+  projection. Keep FTS/trigram, AST/symbol, semantic, and graph retrieval as distinct lanes with
+  SearchRuntime as sole normalization/fusion owner.
+- [ ] CLASS-INDEX-04 Build a read-only symbol/document LUT from the integrity-checked candidate
+  ordinal map and canonical symbol/version rows. Bind exact UTF-8 spans, code/document revisions,
+  taxonomy revision, and checksums. Preserve one-to-many reverse lookup and reject ambiguous
+  names; do not publish a production TOC without authorized source and document owners.
+- [ ] CLASS-INDEX-05 Keep LangExtract/FastAPI and Ornith summaries grounded in qualified source
+  bytes. Record extractor/model/prompt revisions and exact evidence refs. NLP extraction and
+  summarization remain proposals; neither may mint byte spans, ontology tuples, or admission.
+- [ ] CLASS-INDEX-06 Evaluate the existing deterministic SearchRuntime ranking first on a frozen
+  query/candidate snapshot. HMM/Viterbi, feature labels, PCA/SVD/low-rank heads, centroids, radix
+  sort, and 4D coordinates may only recommend bounded routes/context after held-out evaluation;
+  none may add a retrieval vote or override tool permissions.
+- [ ] CLASS-INDEX-07 Keep DuckDB, worker pools, SIMDJSON/N-API, RAPIDS/cuGraph/cuVS, and GPU
+  batching as measured execution options over frozen qualified inputs. Retain current CPU/V8
+  fallbacks; no new Redis/Valkey keys, Qdrant collection, PostgreSQL index, or GPU work until
+  profiling and resource admission justify it.
+- [ ] CLASS-INDEX-08 Assemble only independently verified source evidence through the existing
+  ACE/ContextManifest owners, then bind synthesis to the exact verified manifest receipt. Keep
+  ontology-backed claims blocked without a grounded, admitted tuple and independent readback.
+- [ ] CLASS-INDEX-09 Propose any PostgreSQL 18 migration/index only after CLASS-INDEX-01 defines
+  a lossless conflict key and source lineage contract. Reuse Drizzle/migration ownership and
+  existing GIN/BTREE/pgvector indexes where appropriate; AIO/bitmap scans are planner behavior,
+  not a separate table or correctness contract. No migration, upsert, crawl, embedding, or store
+  write was performed for this ledger update.
+
+**2026-10-12 source-owner reconciliation:** The existing CPU CandidateFeatureMatrix adapter already
+owns the strict matrix receipt, row/matrix checksums, serialization, and independent serialized
+readback helper; reuse it rather than adding another receipt format. The default DAG AST-grep
+refinement handler already delegates to `extractAstGrepStructuralCandidates`; do not create a
+parallel extractor. These are source-owner findings, not fresh test or live-runtime evidence.
+The read-only PostgreSQL proposal crosswalk/provider remains `MATCHED_NOT_ADMITTED` and is not an
+upsert gate. Tests and live checks remain paused at the operator's request.
+
+**2026-10-12 matrix identity hardening (authored, not executed):** Serialized matrix readback now
+requires the original `CandidateOrdinalMapV1`, independently revalidates its schema and checksum,
+and compares each row's canonical ID, packet key, symbol version, source/workspace revisions, and
+ordinal. A self-consistent serialized payload can no longer self-assert its candidate map. Focused
+regressions now cover tampered rows and a valid-but-different frozen map; they were intentionally
+not run. This remains fixture-level code until an authorized live snapshot provider and independent
+readback are wired.
+
+**2026-10-12 diagnostic symbol LUT (authored, not executed):** The existing bounded symbol TOC
+diagnostic projection now emits deterministic key/value reverse lookups for candidate ordinal,
+symbol version, qualified name, source reference, and exact matched documentation revision. Values
+remain one-to-many arrays so ambiguous names are not silently collapsed. The LUT is included in the
+diagnostic checksum and remains unpublished, non-authoritative, and non-admissive. Focused fixtures
+were updated but not run; no canonical index or database/cache write was introduced.
+
+`lookupSymbolTocDiagnosticV1()` now performs bounded exact-key lookup against the projection,
+recomputes its checksum, and returns candidate ordinals with the frozen snapshot revisions only.
+Lookup results remain `NOT_ADMITTED`; missing, ambiguous, malformed, or oversized results fail
+closed. Fixtures were authored but not executed, and the helper does not call SearchRuntime.
+
+`resolveSymbolTocCandidatesV1()` additionally accepts the independently supplied
+`CandidateOrdinalMapV1`, verifies its checksum and snapshot/workspace identity against the projection,
+then checks each candidate's packet/source/revision identity against the source-readback-matched
+symbol row. It returns candidate-only records, never ranks or admits them. Its regressions are
+authored but not run; a live authorized map/source provider and SearchRuntime caller remain open.
+
+**2026-10-12 `.okf` vocabulary/LUT alignment (documentation only):** The reference corpus now
+distinguishes MCP Viterbi tool-selection proposals from the diagnostic symbol/document LUT and the
+proposed per-directory source-context LUT. The MCP surface entry is tied to its captured registry
+revision and schema digests; discovery does not prove tool invocation. The directory LUT remains
+design-only and gated on GPH-13 AST parity plus revision-qualified source bindings. CLASS-INDEX-04
+remains open: no production symbol TOC, searchable directory index, SearchRuntime caller, or Qdrant
+population was created or proven. No datastore writes or index builds were performed.
+
+**2026-10-12 agentic search code review:** The legacy
+`scripts/atlas/agentic-recommendation-workflow.mjs` has intent, ACE, retrieval, reranking,
+synthesis, and recommendation stages, but it must not be described as the production search-to-DAG
+prefill path. Its L4 issues lexical, dense, and graph calls independently rather than delegating
+normalization/fusion to SearchRuntime, and workflow report writes occur despite the documented
+`--dry-run` flag. Source-level model binding was updated to load the SvelteKit `.env.local`/`.env`
+files without overriding shell variables, require the configured Ornith 1.5 alias, and verify that
+exact ID via `GET /v1/models` before synthesis. This is not live runtime proof. The read-only
+parameter-artifact resolver has contract/fixture coverage but no production caller and does not
+fetch artifacts. Keep synthesis, parameter use, and task/tool execution blocked on qualified
+retrieval evidence, independent ContextManifest readback, explicit parameter revision matching,
+SearchRuntime integration, and the existing authorization gates. The focused model-binding tests
+are authored and pending execution.
+
+Validation was intentionally not run at the operator's request. These entries are open work,
+not test results or production proof.
+
+**2026-10-12 indexing layout decision (documentation only):** The CPU-first index is separated
+into reviewed documentation, canonical packet/chunk candidates, domain/feature facts, canonical
+`semantic_768` with Qdrant `content` as a rebuildable mirror, symbol/document reverse LUT, admitted
+graph projection, and revision-qualified cache hints. The strict `.okf` `rows[]` schema remains a
+proposal/interchange envelope, not a SQL table. `feature_label`, summary, domain class, taxonomy
+identity, three-part display `title_id`, packet identity, and ontology admission remain separate.
+Existing `feature_domain_facts` has `(packet_key, classifier_version, content_hash)` uniqueness but
+does not declare the proposal's full independent source/workspace/taxonomy/producer revision set.
+Therefore no new table, `ALTER`, upsert, index DDL, crawl, embedding, cache write, GPU run, or test is
+authorized by this implementation pass. Use existing PostgreSQL indexes and let its planner choose
+bitmap/AIO execution. Continue with source-cohort reconciliation and CPU/read-only owner wiring;
+performance challengers and low-rank/manifold routing remain later advisory work. This note is
+design direction only; no gate is complete and validation remains paused by the operator.
+
+**Proof-chain owner gap (source/DDL review only):** `createDrizzleContextManifestPersistence()`
+persists the legacy ACE `ContextManifest`, while `buildContextManifestV2()` is a separate builder;
+`atlas_context_manifests` stores legacy selection/token metrics, not the serialized V2 identity
+input, canonical checksum, selected evidence revisions, or independent readback receipt. The inspected
+`atlas_ontology_linked_tuples` receives `source_revision` and `workspace_revision` in the existing
+manual additive migration; those fields still require exact authoritative row readback and
+comparison with the evidence receipt. Therefore the existing fixture-only proof verifier cannot be promoted to `LIVE_PROVEN` from these persistence
+rows. Keep this gate open until an authorized owner supplies complete, immutable readback contracts;
+no migration, table, write, or status promotion was made by this review.
+
+The actual `POST /api/atlas/mastra-agent` caller recomputes the supplied V2 identity and checks
+PromptPlan/evidence-segment consistency, but all those values arrive in the same request; there is
+no independent manifest/source/task/tuple readback in that route. Its output remains
+`canonicalAuthority: false`. A checksum-consistent caller payload is not a readback receipt; keep
+the synthesis proof gate open until the route resolves each identity through its owning provider.
+
+The V2-aware Redis context-pack read validates a cached manifest checksum but has no caller outside
+its own module and is not canonical readback. `atlas_feature_snapshots.manifest_json` belongs to the
+graph-snapshot projection, not ContextManifestV2. No existing durable V2 readback owner was found
+in source; this is not a live-store census. Do not treat either as proof or add a second manifest
+authority to work around the missing owner.
+
+**ContextManifestV2 readback implementation (authored, unexecuted):** Added a design-unapplied
+Postgres readback table keyed by the existing V2 `identityChecksum`, a read/immutable-insert owner
+that validates the V2 identity and complete payload checksum, and a Mastra route gate that refuses
+model execution when the stored row is absent or differs from the request. The owner returns only
+`READBACK_MATCH_NOT_ADMITTED`; it never claims evidence admission or canonical authority. The
+migration remains unapplied, the V2 admission producer is not connected to the store, and source
+bytes/task receipts/ontology tuple are not yet independently read by this route. Focused regressions
+were authored but intentionally not run at the operator's request. Keep the production proof gate
+open.
+
+- [ ] CLASS-INDEX-00 Validate the new `.okf` batch JSON Schema against the runtime Zod contract
+  and representative proposal/unavailable envelopes; keep this validation separate from database
+  admission and do not run it until validation is resumed.
+
+**2026-10-12 live-shadow provider owner audit (source declarations only):**
+`ChunkRetrievalProfileV2` has a strict schema/checksum verifier and a pure hydration adapter, but
+the inspected application callers do not establish a persisted, request-scoped profile producer.
+`atlas_observation_feature_rows` contains `feature_revision`, `producer_revision`, source/workspace
+lineage, and evidence refs; it does not declare the three supplement values
+`retrieval_frequency`, `execution_utility`, and `process_fit`, nor distinct revisions for those
+producers. A repository source/schema search found those metrics in contracts and fixture/compiler
+logic, but not as persisted columns or a live request-scoped producer. `atlas_feature_profiles` is a
+label-keyed catalog and cannot substitute for chunk profiles. Do not invent a SQL join, default
+score, or `featureRevision` to manufacture a provider. Keep `contextManifestShadow.resolveFeatureSources`
+and the production route unwired until the actual profile producer and three independently
+revision-qualified supplement owners are identified and independently read back. Do not infer
+`featureRevision` or `ontologyRevision` from `producerRevision`. This was a source review only;
+tests, typechecks, DB queries, and live services remain paused at the operator's request.
+
+**2026-10-12 shadow source-binding boundary (authored, not executed):** The shadow preflight now
+requires a `GroundedExtractionSourceBindingReceiptV1` for the reopened UTF-8 source and reuses
+`assertGroundedExtractionSourceBindingReceiptV1()` to validate packet/source/workspace revisions,
+byte count, submitted-byte digest, source-binding digest, and receipt checksum. It also requires the
+declared source revision to match the reopened bytes and retains exact UTF-8 span checks. This
+prevents byte matching alone from being reported as canonical source authority. The callback is
+optional for production: the bridge now defaults to the existing read-only
+`resolveGroundedExtractionSourceBindingV1()` owner; fixture injection remains available. The
+existing AST-grep owner now exports `readConfinedRepositorySourceBytesV1()` and
+`createCandidateOrdinalSourceReaderV1()`. The shadow provider uses the latter by default, bound to
+its validated request ordinal map and trusted repository root; the injectable byte reader remains
+only as a fixture seam. The production route still does not supply its live SearchRuntime map/root.
+Profile/supplement owners also remain unresolved. Fixture receipts and negative regressions are
+unrun; the route remains unwired.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.
+
+## `.okf` keyword corpus / taxonomy alignment checkpoint — 2026-10-14
+
+- [x] Added `scripts/atlas/taxonomy/build-okf-keyword-taxonomy-crosswalk-v1.mjs` to schema-validate the existing reference corpus, read the existing Python domain-alias mapper, preserve topic membership, check referenced repository paths, and emit a checksummed candidate report. It does not change corpus admission or write canonical stores.
+- [x] Generated `docs/reports/atlas-taxonomy-glossary-alignment-v1.json`: 17 corpus entries, 81 term occurrences, 81 unique normalized terms, 0 exact domain-alias candidates, 0 missing referenced paths. Report checksum: `sha256:2ff9c34eaa15e7027a02954adf5b0d82da58a76eee5afaf9a5f9422ca712efae`.
+- [x] Focused Node tests pass 2/2; the report is `PARTIAL`, `canonicalResolutionStatus: NOT_RUN`, `canonicalEntityResolutionStatus: NOT_RUN`, and `repositoryDataWritesPerformed: false`.
+- [ ] Review/author a governed mapping from topic terms to taxonomy concepts. Do not infer one from string similarity; the current corpus schema has no canonical concept/domain/entity IDs.
+- [ ] Reconcile mapped concepts with the current PostgreSQL/OAK owner and independently read back revisions before any corpus promotion, graph incidence, semantic indexing, or retrieval use.
+
+## Parent Atlas workstation navigation and token-budget shortlist — 2026-10-14
+
+- [x] Documented the Atlas-map model and existing ownership path: ACP/A2A control projection → existing SearchRuntime/RRF → advisory recommendation → exact source qualification → ACE/ContextManifestV2 → existing DAG gate. No parallel identity, fusion, packet, or injection owner was introduced.
+- [x] Hardened `low-rank-helper-recommender-v1.ts`: artifact schema now enforces finite factors, exact declared rank, bounded rates/costs, and unique task/helper keys; added a deterministic hard-token-budget shortlist receipt marked advisory and write-disabled.
+- [x] Added focused regression cases for dimension rejection, allowed-helper filtering, deterministic budget selection, and advisory/write-disabled boundaries.
+- [x] Clarified that estimated token counts are not measured savings, low-rank routing cannot replace `semantic_768`, and ACE remains the exact selector/admission owner. Ewin Tang's quantum-inspired recommendation is research-only here because its required \(\ell^2\)-sampling input structure and assumptions are not proven for Atlas.
+- [x] Focused proof passed: `low-rank-helper-recommender-v1.spec.ts` 3/3, `unified-context-pipeline-v1.spec.ts` 6/6, and `ace-packet-v3-context-manifest-bridge-v1.spec.ts` 8/8 (17 tests total). Direct local Vitest invocation used one worker; startup was slow but completed.
+- [ ] Live ACP→A2A→SearchRuntime→ACE/DAG request trace, tokenizer-measured savings, independently labeled recommendation evaluation, and live GPU/GraphRAG execution remain unproven.
+
+## `.okf` corpus keyword MCP lookup — 2026-10-14
+
+- [x] Added `searchKeywordCorpusV1()` to parse the bounded YAML corpus with unique-key checking and validate against the adjacent `.okf/corpora/keyword-corpus.schema.json`; the corpus remains reference-only and canonical authority remains false.
+- [x] Added deterministic keyword-overlap Top-K, bounded page size, and a stateless cursor bound to corpus and normalized-query SHA-256 checksums. Corpus changes or query reuse reject the cursor.
+- [x] Reused `PacketClassLutV1` over corpus entry IDs; results carry both `lutCode` and `lutEncodingRevision`, never use the LUT as entity identity.
+- [x] Registered the read-only `atlas.keyword_corpus_search` MCP tool. It searches only `.okf/corpora/keyword-corpus.yaml`; it does not search canonical source packets, mutate corpus indexing flags, query Postgres/OAK, add a SearchRuntime lane, or write Qdrant.
+- [x] Added a strict `KeywordCorpusSearchResultV1Schema`; both success and stable error results are runtime-validated before return. MCP responses expose the same result as `structuredContent` and JSON text for client compatibility.
+- [x] Earlier focused fixture run passed 4/4 before the structured-output change: corpus/schema, Top-K/LUT mapping, cursor pagination/stale query, and MCP registration/call. Command: `npx vitest run --pool=threads --maxWorkers=1 --minWorkers=1 src/lib/server/atlas/keyword-corpus-search-v1.spec.ts src/mcp/atlas-keyword-corpus-tools.spec.ts` (exit 0).
+- [ ] Re-run focused tests after structured-output change. Latest run did not complete or emit assertions; it was interrupted after Node/Vitest memory usage rose substantially. Do not treat earlier 4/4 as proof of the new response contract.
+- [ ] `npm run check` remains unverified: the full Svelte check was interrupted after several minutes at approximately 3 GB working set with no diagnostics, to avoid further workstation memory pressure. `git diff --check` passed.
+- [ ] Live MCP `tools/list` and `tools/call` against the running Atlas server are not verified. The current output remains a reference-vocabulary result, not canonical taxonomy resolution or evidence admission.
+
+## OKF-DOMAIN-KEYWORD-BITMAP-ALIGNMENT-01 implementation audit (2026-10-24)
+
+Status: **BLOCKED / SHADOW RUNNER NOT PROOF-READY**. The new `scripts/atlas/okf-domain-keyword-bitmap-alignment-v1.mjs` and companion test are present in the working tree, but source inspection found that their current verdicts overstate what they establish. Do not use the emitted `PROVEN` labels to claim reviewed mappings, model compatibility, a sealed production ordinal map, bitmap parity, or a real BM25/FTS baseline.
+
+- [x] **ALIGN-01 Owner inventory (source review).** Reuse the existing `.okf` acquisition/catalog and chunk receipts; PostgreSQL owns ontology and canonical identity; `domain-taxonomy.ts` / `domain_taxonomy_v1` and the 17-group ontology remain distinct vocabularies; existing candidate ordinal-map and feature-snapshot contracts are the only eligible ordinal/admission owners; `embeddinggemma-contracts.ts` and the PyTorch/ONNX parity script own representation facts; SearchRuntime remains the sole fusion owner. The current alignment runner is a shadow artifact generator, not a new authority.
+- [ ] **ALIGN-02 Taxonomy crosswalk.** Replace the runner's hand-authored 12-row `TAXONOMY_CROSSWALK` and unconditional `ONTOLOGY_CROSSWALK_REVIEWED: PROVEN` with a provenance-preserving inventory of observed labels from all three vocabularies. Every label must receive exactly one reviewed outcome (`EXACT`, `BROADER`, `NARROWER`, `AMBIGUOUS`, or `UNMAPPED`), with source table/row, taxonomy revision, evidence and reviewer. Existing PostgreSQL counts and slug matches are historical diagnostics until refreshed through a read-only query; no mappings are applied.
+- [ ] **ALIGN-03 Grounded `.okf` keyword corpus.** Validate each selected acquisition manifest, page/chunk receipt, source digest, document/chunk identity and parent-child relation. Resolve each keyword against the original UTF-8 bytes; emit byte offsets (not JavaScript UTF-16 string indexes), exact matched text, immutable source/chunk refs and digest, and candidate concepts marked proposal-only. Reject missing digests, malformed rows, absent chunks and invented fallback identities. OAKLIB is not called by the current runner; if used, it may propose normalization only and must preserve unresolved/ambiguous outcomes.
+- [ ] **ALIGN-04 Ordinal and bitmap integrity.** Do not call input-order chunk numbering a sealed ordinal map. Reuse a checksum-verified frozen `CandidateOrdinalMapV1` with canonical candidate IDs and source/workspace/representation revisions; reject duplicate or unmapped chunk refs and require exact equality with the vector cohort map. Emit bitmap bytes as a versioned scratch artifact with bit numbering, byte order, cardinality, padding rules, taxonomy/map revisions and digest; independently decode/read back and compare membership against source rows. The current script reports bitmap digests but does not publish or verify bitmap bytes and unconditionally labels parity `PROVEN`.
+- [ ] **ALIGN-05 Embedding and numerical formats.** Derive model artifact/revision, query/document task prefixes, tokenizer/input policy, pooling, normalization, dimension and dtype from the existing EmbeddingGemma/PyTorch producer receipts. The canonical dense lane remains `semantic_768`; existing parity evidence uses normalized Float32 output. Float16, INT8, xFormers and packed-vector formats are not established as compatible canonical representations; any quantized/packed form requires a separately versioned derived representation, measured error/recall parity, and explicit receipt. Keep vector/tensor bytes outside JSON/MessagePack descriptors; do not claim that the current hard-coded recipe audit ran PyTorch inference.
+- [ ] **ALIGN-06 Lexical/query baseline.** The current `executeFrozenQuery()` is a local substring/token-frequency approximation with a fixed average document length, not PostgreSQL FTS/GIN, production BM25, configured BM42, or SearchRuntime fusion. Compare those existing owners on one frozen query/cohort only after input lineage is qualified; deduplicate within lanes and preserve SearchRuntime as the sole fusion owner. Report candidate IDs, exact terms, score components, mapping ambiguity and exclusions without introducing an independent vote.
+- [ ] **ALIGN-07 PostgreSQL census and safe outputs.** Require environment-provided database configuration; remove the embedded credential fallback. Run inspection in an explicitly read-only transaction and report exact schema/index definitions and taxonomy row revisions, not only a global GIN count. Write generated reports/corpus/bitmaps under a unique `.tmp/atlas/...` run directory, with canonical checksums and independent readback; do not overwrite a tracked `docs/reports` path or describe scratch output as canonical corpus population. No DDL/DML is authorized.
+- [ ] **ALIGN-08 Adversarial deterministic tests.** Replace tests that assert current hard-coded report values (including `keyword_corpus` absence, a minimum global GIN count, and `PROVEN` statuses) with fixture-driven producer/readback tests. Cover invalid/missing source digests, UTF-8 multibyte spans, duplicate ordinals, map/vector cohort mismatch, bitmap bit order/padding/tampering, taxonomy ambiguity/unmapped conservation, wrong model recipe/dimension/dtype, and deterministic replay. Test report verdicts against independent evidence, not the report's own declarations.
+- [ ] **ALIGN-09 Frozen query and admission boundary.** A CPU shadow query may return grounded `.okf` document/chunk candidates and proposal concepts only. Report `WORKSPACE_ADMISSION=BLOCKED` while trusted current-workspace and current feature-snapshot admission are absent; `READBACK_MATCH_NOT_ADMITTED` remains a hard synthesis refusal. Do not query or populate production indexes, refresh Graphify, write Valkey/Qdrant, or invoke synthesis to make the fixture pass.
+
+Current inspection verdicts: `.okf` keyword shadow **NOT_VERIFIED**; semantic taxonomy crosswalk **REVIEW_REQUIRED**; OAKLIB execution **NOT_WIRED**; ordinal-map sealing **NOT_PROVEN**; bitmap parity **NOT_PROVEN**; EmbeddingGemma dimension contract **768-D code/fixture evidence, query-document recipe execution NOT_PROVEN by this runner**; FTS/BM25/BM42/SearchRuntime comparison **NOT_RUN**; PostgreSQL `keyword_corpus` presence **NOT_RECHECKED in this pass**; workspace and feature admission **BLOCKED**. The script's embedded fallback credential, source-digest fallback `sha256:unknown`, UTF-16 span offsets, invented `chunk:<ordinal>` identity, and tracked report destination must be corrected before executing it. No runner execution, database query/write, corpus build, bitmap publication, or retrieval/index operation was performed in this audit.
+
+### Embedding representation spot-check (2026-10-24)
+
+- [x] Focused runtime/representation/384-writer guards passed 14/14; `semantic-768-vector.test.mjs` passed 3/3. These establish code contracts only, not live model or corpus parity.
+- [x] Confirmed `validateSemantic768OutputV1()` accepts a normalized 768-value vector, materializes a `Float32Array`, and hashes its raw bytes. EmbeddingGemma task representations permit native 768 and normalized MRL widths 512/256/128; 384 is not an allowed MRL width.
+- [x] Distinguished model artifact quantization from vector-output dtype: the executor receipt can describe F32/F16/BF16/Q8_0/Q4_0 model artifacts, while the runtime output contract remains `Float32Array`. The EmbeddingGemma 2 Q8_0 challenger also dequantizes/returns Float32 vectors and does not establish an int8 canonical vector format. xFormers and packed/int8 vector transport are not wired or parity-proven here.
+- [x] Confirmed `phase108d-embeddings-backfill-full.mts` is retired and exits before setup; the existing guard test protects the retired writer surface. No verified script converts legacy 384-D embeddings into canonical EmbeddingGemma `semantic_768`; regeneration requires original qualified text and the canonical embedding producer, not padding or coordinate conversion.
+- [ ] Replace the alignment test's reliance on pre-existing `docs/reports/okf-domain-keyword-bitmap-alignment-v1.json` and `.tmp` output as proof. It currently trusts report-declared `PROVEN` values and global inventory fields rather than independently exercising builder logic/readback; its pass is not an alignment verdict.
+- [ ] Keep ALIGN-05 open until producer receipts and a same-input query/document replay independently verify model/artifact revision, task prefixes, tokenizer/input policy, pooling, normalization, dimension, output dtype, and vector digest. No embedding inference or store writes were run in this spot-check.

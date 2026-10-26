@@ -21,12 +21,12 @@
   Number of consecutive requests. Default: 5.
 
 .PARAMETER Model
-  Model ID to pass in the request. Default: gemma4-legal-iq4xs-direct.gguf.
+  Model ID to pass in the request. Default: ornith-1.5-9b
 #>
 param(
   [int]    $Port  = 8090,
   [int]    $Turns = 5,
-  [string] $Model = 'gemma4-legal-iq4xs-direct.gguf'
+  [string] $Model = 'ornith-1.5-9b'
 )
 
 $base = "http://127.0.0.1:$Port"

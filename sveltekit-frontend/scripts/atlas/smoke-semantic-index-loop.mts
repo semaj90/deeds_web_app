@@ -64,7 +64,7 @@ const redisConfig: SemanticLoopConfig['redis'] = {
 
 const gemma4Config: SemanticLoopConfig['gemma4'] = {
 	url: process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090',
-	model: 'models/gemma4-legal-iq4xs-direct.gguf',
+	model: 'models/ornith-1.5-9b',
 	temperature: 0.3,
 	maxTokens: 1024,
 };

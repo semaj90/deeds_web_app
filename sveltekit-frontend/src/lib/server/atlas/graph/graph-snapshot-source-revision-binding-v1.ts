@@ -80,8 +80,9 @@ export function bindGraphSnapshotNodeSourceRevisionsV1<T extends GraphSnapshotSo
   let boundNodeCount = 0;
   const seenRefs = new Set<string>();
   const nodes = input.nodes.map((node) => {
+    const withBinding = (revision: string | null) => ({ ...node, sourceRevision: revision });
     const rawRef = typeof node.sourceRef === 'string' ? node.sourceRef.trim() : '';
-    if (!rawRef) return { ...node, sourceRevision: null };
+    if (!rawRef) return withBinding(null);
 
     sourceBackedNodeCount += 1;
     const ref = normalizeSourceRef(rawRef);
@@ -89,10 +90,10 @@ export function bindGraphSnapshotNodeSourceRevisionsV1<T extends GraphSnapshotSo
     const binding = bindingMap.get(ref);
     if (!binding) {
       missing.add(ref);
-      return { ...node, sourceRevision: null };
+      return withBinding(null);
     }
     boundNodeCount += 1;
-    return { ...node, sourceRevision: binding.sourceRevision };
+    return withBinding(binding.sourceRevision);
   });
 
   const missingSourceRefs = [...missing].sort();

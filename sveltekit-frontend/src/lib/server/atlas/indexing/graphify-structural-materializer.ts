@@ -56,6 +56,22 @@ export function create8095AstProvider(baseUrl?: string): AstProvider {
           filePath: input.sourceRef,
           sourceRevision: input.sourceRevision,
         });
+        if (evidence.source_revision !== input.sourceRevision) {
+          return {
+            provider: 'treesitter-chunker-8095',
+            status: 'FAILED',
+            diagnostics: ['AST_SOURCE_REVISION_TOKEN_MISMATCH'],
+            errorTag: 'AST_SOURCE_REVISION_TOKEN_MISMATCH',
+          };
+        }
+        if (evidence.file_path !== input.sourceRef) {
+          return {
+            provider: 'treesitter-chunker-8095',
+            status: 'FAILED',
+            diagnostics: ['AST_SOURCE_REF_MISMATCH'],
+            errorTag: 'AST_SOURCE_REF_MISMATCH',
+          };
+        }
         const diagnostics = evidence.diagnostics ?? [];
         const fatalDiagnostics = diagnostics.filter(
           (diagnostic) => !diagnostic.startsWith('CONSILIENCY_LF_BYTE_SPAN_REMAPPED'),

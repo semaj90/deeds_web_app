@@ -1,0 +1,227 @@
+{
+  "schema": "atlas.corpus-reembed-document-prefix.v1",
+  "generatedAt": "2026-10-18T09:33:37.505Z",
+  "dryRun": false,
+  "writesPerformed": false,
+  "newEmbeddingModelTag": "embeddinggemma:latest:eg-task-prefix-v1",
+  "limit": 50,
+  "batchSize": 25,
+  "processed": 50,
+  "updated": 0,
+  "overwrittenPreimages": 2,
+  "skippedAlreadyDone": 0,
+  "errors": [
+    {
+      "id": "014eef2a-c0bc-46f1-a488-2003887deb9b",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "014f3501-2fee-471c-a2a0-575027acbb9f",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "014f9524-b2df-4d72-85a3-1abb5c49fde0",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "014ff9f0-475c-4036-89d6-fcced7dc67aa",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01503add-d67b-48bf-bc29-8ff087c23445",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01509948-04f6-4286-a0c2-2668a105beb3",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0150c857-59b5-4b97-992c-b1250a573b93",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0150f4c0-62e2-429e-91bd-31eb3382dbd6",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015125c9-a884-43c9-906a-ffdf8b6e7dcd",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01514988-9d04-49ab-9d3d-91ced394abce",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01517267-acec-4d26-b521-fc660d02f817",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015186bd-6146-4e54-8705-ca32659c1e36",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01518b6a-4fba-4ae5-a9c2-c74e206170d3",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0151a540-0a5f-46bd-b63c-f2540c7edc59",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0151ee6b-d651-4952-93ea-609cfe7db9b9",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0151eeff-06ce-4cfe-b3b2-4d7cc50845b2",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015207ec-7ae5-4d99-ac59-02ebb7bfc32b",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01523412-8e02-4644-81c2-ffd09b4740f5",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0152774e-992b-4257-9473-6e759fd9c34a",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0153b6ef-7674-4ca6-b0c2-95de8092a1d7",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0153eb4c-d7ec-4b39-8b36-b8f8ae3f1bce",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015403e1-4002-42d9-8e00-502b3b889766",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015428ae-6c59-4543-b999-7835d7bdeef9",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0154391a-1274-4311-801b-f6c9183c0756",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01546759-f072-4859-a4b7-17e3d0602aec",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01547ff8-2063-4234-afd4-ceb218501036",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0154d942-fbc8-4386-888b-f38c4900d797",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01550132-2477-4cf5-b785-7bf3beed5ff5",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0155094c-b714-4bf0-9dc2-4123f63a5717",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01550c47-95c4-41c0-b836-ec932fd9668c",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01551f05-3e98-4ae0-a0da-62c37c3bab26",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01558cad-5bad-45f3-8a67-e5286b70c533",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0155a7df-f149-4813-88ed-77c4018bc86a",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0155ad45-c527-49f0-8d91-1d033c2a8988",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01565f4a-d350-4f04-9368-25238945f10d",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015666db-c2e6-44bb-89a0-6abfed0007ae",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01569b99-a571-4ca0-a3e6-38b510470494",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0156e225-aa73-42f9-a1f5-cf563f04f4eb",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0156f3a1-765f-4b99-ac57-c372a4cd0a35",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015754d9-ae78-4fbe-920d-bde994b4c90f",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0157598b-886e-43f1-8eeb-85a174450b8a",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0157b51a-4e96-4ea2-8ccd-ced844ece8e2",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0157f7ff-f910-457a-a490-5781b2f46537",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01583d34-dc8a-4e8c-95d4-39b2a3360f30",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0158406c-aab5-49be-8d2b-441e1ce0b521",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "015844f0-a69e-430e-8cf4-553e5a921c10",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01587d16-6b94-4ef8-8024-1581d3f13982",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "0158812d-bfe2-483a-9458-f35dab248662",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01589511-3a92-4fad-a1f2-1a888eabe16f",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    },
+    {
+      "id": "01592182-cc66-4680-9af7-f93063671753",
+      "message": "PAGE_UPDATE_FAILED: cannot execute UPDATE in a read-only transaction"
+    }
+  ],
+  "sampleDimensionCheck": {
+    "id": "014eef2a-c0bc-46f1-a488-2003887deb9b",
+    "dimension": 768,
+    "first3": [
+      -0.06591019,
+      -0.028364047,
+      -0.021233989
+    ]
+  },
+  "throughputRowsPerSec": 0,
+  "startedAt": "2026-10-18T09:33:37.505Z",
+  "finishedAt": "2026-10-18T09:33:38.938Z"
+}

@@ -26,10 +26,17 @@
 | Fusion (RRF) | `retrieval/search-runtime.ts` | CANONICAL_OWNER |
 | Graph algorithms | `graph/graph-analysis-runner.ts` | CANONICAL_OWNER |
 | ACE assembly / validation | `ace/context-assembler.ts`, `atlas/envelope-validator.ts`, `db/packet-topology-envelope.ts` | CANONICAL_OWNER |
+| Error-signal evidence → repair proposal | `scripts/atlas/validate-error-signal-evidence-v1.mjs` (validator, read-only); `scripts/atlas/bridge-error-signal-to-repair-proposal-v1.mjs` (dry-run proposals → registry action `AWAIT_OPERATOR`) | CANONICAL_OWNER (validator) / BACKEND (bridge); never executes, never edits source |
 | RPC packets | `routes/api/hyperrag/packet-rpc/+server.ts` | CANONICAL_OWNER |
 | Glyph / cartridge (NES, CHR97) | `routes/api/cartridge/export/+server.ts` | CANONICAL_OWNER |
 | Neural prefill | `ai/neural-decoder-prefill-caller-v1.ts` | CANONICAL_OWNER |
 | Low-rank / Tang sampling | `python/atlas_compute/low_rank.py`, `sample-query-matrix-v1.ts` | EXPERIMENT (non-canonical) |
+| Candidate feature matrix / ranking | `retrieval/retrieval-candidate-feature-matrix-v1.ts`; Python learning package | Derived/advisory; requires frozen identity-aligned rows and reviewed labels for learned promotion |
+| Valkey / HLL telemetry | `atlas/telemetry/atlas-hll-telemetry.ts`; Valkey cache adapters | Transient cache and approximate cardinality telemetry; neither owns identity or relevance |
+| MessagePack packet encoding | `@msgpack/msgpack`; `scripts/atlas/msgpack-envelope-materialize.mjs` | Serialization/export only; schema, identity, revisions, and checksums remain explicit |
+| RPC transport | `atlas/go-retrieval-grpc-client.ts`; active `.proto` contracts | gRPC transports typed requests; it is separate from MessagePack encoding, N-API, and tensor execution |
+| ACE / query-context boundary | `ace/context-assembler.ts`; ContextManifest bridge | Qualifies and budgets evidence before prompt compilation; raw retrieval must not go directly to synthesis |
+| NES LUT / glyph mapping | `python/parent_atlas_learning/ace_compiler.py`; cartridge export route | Palette/action mapping is derived metadata; no native C-pointer LUT authority is established |
 | cuTile / TensorRT challengers | registry: `OPTIONAL_CHALLENGER_*` | not production |
 | N-ary relationship synthesis | none in registry | **UNOWNED** |
 | Ghidra, QUIC, Titans/OaK, LSP feature matrix | no owner searched or found | **UNOWNED / unverified** |
@@ -44,12 +51,22 @@
 
 ### Markdown
 
+- [_bitfrost_fsm_index](./_bitfrost_fsm_index.md)
+- [_cuda_rtx_toc](./_cuda_rtx_toc.md)
+- [_qdrant_ann_pipeline_toc](./_qdrant_ann_pipeline_toc.md)
+- [_taxonomy_oak_graphrag_index](./_taxonomy_oak_graphrag_index.md)
+- [_topology_classifier_index](./_topology_classifier_index.md)
 - [ACP-GEMMA4-MEMORY-HIERARCHY](./ACP-GEMMA4-MEMORY-HIERARCHY.md)
 - [ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW](./ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW.md)
 - [AGENTIC-ERROR-FIXING-ARCHITECTURE](./AGENTIC-ERROR-FIXING-ARCHITECTURE.md)
 - [AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL](./AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL.md)
 - [agentic-error-proposal-flow](./agentic-error-proposal-flow.md)
 - [agentic-openspec-tasks-error-fixing-playbook](./agentic-openspec-tasks-error-fixing-playbook.md)
+- [ARCH-TOC-v2](./ARCH-TOC-v2.md)
+- [atlas-feature-taxonomy-sveltekit-draft](./atlas-feature-taxonomy-sveltekit-draft.md)
+- [atlas-python-environment-routing](./atlas-python-environment-routing.md)
+- [atlas-retrieval-parity-admission-gates-v1](./atlas-retrieval-parity-admission-gates-v1.md)
+- [atlas-store-ownership-and-derived-representations-v1](./atlas-store-ownership-and-derived-representations-v1.md)
 - [atlas-topic-identity-read-model-v1](./atlas-topic-identity-read-model-v1.md)
 - [atlas-work-items-design-v1](./atlas-work-items-design-v1.md)
 - [README](./autoencoder/README.md)
@@ -64,6 +81,7 @@
 - [consolidation-and-schema-migration-checklist](./consolidation-and-schema-migration-checklist.md)
 - [CORRECTED-embedding-dimension-policy](./CORRECTED-embedding-dimension-policy.md)
 - [couchdb-mapreduce-atlas-ingestion](./couchdb-mapreduce-atlas-ingestion.md)
+- [cuda134-simt-container-v1](./cuda134-simt-container-v1.md)
 - [CUVS-DOCKER-IMPLEMENTATION-CHECKLIST](./CUVS-DOCKER-IMPLEMENTATION-CHECKLIST.md)
 - [CUVS-INSTALLATION-WINDOWS-RESEARCH](./CUVS-INSTALLATION-WINDOWS-RESEARCH.md)
 - [CUVS-QUICK-REFERENCE](./CUVS-QUICK-REFERENCE.md)
@@ -75,35 +93,48 @@
 - [dual-lane-hot-brain-cold-queue](./dual-lane-hot-brain-cold-queue.md)
 - [engram-plugin-memory-support](./engram-plugin-memory-support.md)
 - [feature-consolidation-review-queue](./feature-consolidation-review-queue.md)
+- [feature-to-source-next-gates-v1](./feature-to-source-next-gates-v1.md)
 - [gemma4-bounded-tool-system-prompt](./gemma4-bounded-tool-system-prompt.md)
 - [gemma4-retrieval-loop-hook](./gemma4-retrieval-loop-hook.md)
 - [GPU-CUDA-NAPI-MEMORY-LAYOUT](./GPU-CUDA-NAPI-MEMORY-LAYOUT.md)
+- [gpu-resource-observations-and-cache-boundary-v1](./gpu-resource-observations-and-cache-boundary-v1.md)
+- [graphify-daily-discovery-helpers-v1](./graphify-daily-discovery-helpers-v1.md)
 - [grpc-binary-memory-registry-master-todo](./grpc-binary-memory-registry-master-todo.md)
 - [grpc-binary-memory-registry-plan](./grpc-binary-memory-registry-plan.md)
 - [HEADROOM-COMPRESSION-CRYPTO-PROVENANCE-ALIGNMENT](./HEADROOM-COMPRESSION-CRYPTO-PROVENANCE-ALIGNMENT.md)
 - [kanban-parent-atlas-alignment](./kanban-parent-atlas-alignment.md)
 - [langextract-atlas-integrations](./langextract-atlas-integrations.md)
 - [legal-ai-parent-atlas-product-integration](./legal-ai-parent-atlas-product-integration.md)
+- [llama-runtime-mcp-controls](./llama-runtime-mcp-controls.md)
 - [llm-synthesis-memory-policy](./llm-synthesis-memory-policy.md)
 - [local-deep-research-boundary](./local-deep-research-boundary.md)
 - [MCP-TOOL-AUDIT-AND-ACE-PACKET-FLOW](./MCP-TOOL-AUDIT-AND-ACE-PACKET-FLOW.md)
 - [neo4j-graphrag-parent-atlas](./neo4j-graphrag-parent-atlas.md)
 - [NES-CHROM97-GLYPH-BITENCODING-ALIGNED](./NES-CHROM97-GLYPH-BITENCODING-ALIGNED.md)
 - [oaklib-external-ontology-adapter-v1](./oaklib-external-ontology-adapter-v1.md)
+- [observation-feature-row-lineage-proposal-v1](./observation-feature-row-lineage-proposal-v1.md)
 - [offline-synthesis-parent-atlas](./offline-synthesis-parent-atlas.md)
 - [okf-v02-validation-profile-v1](./okf-v02-validation-profile-v1.md)
 - [opencode-claude-mem-bridge](./opencode-claude-mem-bridge.md)
+- [orf-domain-nlp-oak-topology-alignment-v1](./orf-domain-nlp-oak-topology-alignment-v1.md)
 - [PACKET-COMPILER-STAGES](./PACKET-COMPILER-STAGES.md)
+- [packet-telemetry-existing-writer-v1](./packet-telemetry-existing-writer-v1.md)
 - [packet-truth-flow-canonical-pattern](./packet-truth-flow-canonical-pattern.md)
 - [PARENT_ATLAS_INSTRUCTION_AUTHORITY](./PARENT_ATLAS_INSTRUCTION_AUTHORITY.md)
 - [PARENT_ATLAS_PACKAGE_BOUNDARIES](./PARENT_ATLAS_PACKAGE_BOUNDARIES.md)
 - [PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY](./PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md)
+- [parent-atlas-batch-execution-gates-v1](./parent-atlas-batch-execution-gates-v1.md)
+- [parent-atlas-event-driven-bulk-data-flow-v1](./parent-atlas-event-driven-bulk-data-flow-v1.md)
+- [parent-atlas-function-topology-search-index](./parent-atlas-function-topology-search-index.md)
 - [parent-atlas-karpathy-pipeline](./parent-atlas-karpathy-pipeline.md)
 - [parent-atlas-native-dawn-viewer-contract-v1](./parent-atlas-native-dawn-viewer-contract-v1.md)
 - [parent-atlas-policy-routing](./parent-atlas-policy-routing.md)
+- [parent-atlas-query-intelligence-owner-map-v1](./parent-atlas-query-intelligence-owner-map-v1.md)
 - [parent-atlas-representation-structural-contract](./parent-atlas-representation-structural-contract.md)
+- [parent-atlas-selection-receipt-and-model-boundaries-v1](./parent-atlas-selection-receipt-and-model-boundaries-v1.md)
 - [PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT](./PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT.md)
 - [parent-atlas-unreal-client-contract-v1](./parent-atlas-unreal-client-contract-v1.md)
+- [parent-atlas-workstation-compute-fabric](./parent-atlas-workstation-compute-fabric.md)
 - [pathway-cards-spec](./pathway-cards-spec.md)
 - [phase-101-completion-plan](./phase-101-completion-plan.md)
 - [phase-17g-gpu-json-tensor-mapping](./phase-17g-gpu-json-tensor-mapping.md)
@@ -111,27 +142,34 @@
 - [phase-3d-telemetry-instrumentation](./phase-3d-telemetry-instrumentation.md)
 - [PHASE-85-ARTIFACT-REGISTRY-SPEC](./PHASE-85-ARTIFACT-REGISTRY-SPEC.md)
 - [PHASE-C-OPTION-B-ARCHITECTURE-DECISION](./PHASE-C-OPTION-B-ARCHITECTURE-DECISION.md)
+- [phase17-feature-extractor-upgrade-v2](./phase17-feature-extractor-upgrade-v2.md)
 - [phase8-query-optimization-taxonomy](./phase8-query-optimization-taxonomy.md)
 - [POSTGRESQL-TOC](./POSTGRESQL-TOC.md)
+- [product-feature-decomposition-integration-v1](./product-feature-decomposition-integration-v1.md)
+- [product-feature-decomposition-tasks-v1](./product-feature-decomposition-tasks-v1.md)
 - [qdrant-search-contract](./qdrant-search-contract.md)
 - [rabbitmq-workflow-fabric](./rabbitmq-workflow-fabric.md)
 - [residency-scheduler-boundary-v1](./residency-scheduler-boundary-v1.md)
 - [retrieval-architecture](./retrieval-architecture.md)
 - [retrieval-boundary-and-langgraph](./retrieval-boundary-and-langgraph.md)
 - [retrieval-layer-separation](./retrieval-layer-separation.md)
+- [retrieval-transport-codec-telemetry-v1](./retrieval-transport-codec-telemetry-v1.md)
 - [rtx-visual-enhancement-boundary-v1](./rtx-visual-enhancement-boundary-v1.md)
 - [runtime-owner-deduplication](./runtime-owner-deduplication.md)
 - [RUST-BACKEND-DECISION-TREE](./RUST-BACKEND-DECISION-TREE.md)
 - [scheduler-gpu-bridge-roadmap](./scheduler-gpu-bridge-roadmap.md)
 - [SESSION-84-MISSING-LAYERS-ANALYSIS](./SESSION-84-MISSING-LAYERS-ANALYSIS.md)
+- [simdjson-tensor-array-analysis-v1](./simdjson-tensor-array-analysis-v1.md)
 - [storage-tier-schema](./storage-tier-schema.md)
 - [subgraph-instruction-programming-kag-ace-topology](./subgraph-instruction-programming-kag-ace-topology.md)
+- [sveltekit-frontend-toc](./sveltekit-frontend-toc.md)
 - [trace-kag-web-development-guide](./trace-kag-web-development-guide.md)
 - [trace-runtime-split](./trace-runtime-split.md)
 - [TRANSPORT-WORKER-CHROM97-ALIGNMENT](./TRANSPORT-WORKER-CHROM97-ALIGNMENT.md)
 - [unified-ace-engram-pipeline](./unified-ace-engram-pipeline.md)
 - [UNIFIED-ID-HIERARCHY-AND-RETRIEVAL](./UNIFIED-ID-HIERARCHY-AND-RETRIEVAL.md)
 - [UNIFIED-RETRIEVAL-HMM-POLICY-ARCHITECTURE](./UNIFIED-RETRIEVAL-HMM-POLICY-ARCHITECTURE.md)
+- [valkey-ace-context-input-derivation-v1](./valkey-ace-context-input-derivation-v1.md)
 - [vram-hygiene-policy](./vram-hygiene-policy.md)
 
 ### JSON registries and baselines

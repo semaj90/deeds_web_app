@@ -23,6 +23,9 @@ import Redis from 'ioredis';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 
+console.error('LEGACY_384_KARPATHY_SOURCE_DISABLED: the score pipeline depends on the retired 384-D Qdrant collection');
+process.exit(2);
+
 dotenv.config({ path: new URL('../../sveltekit-frontend/.env', import.meta.url).pathname });
 
 // ── Config ────────────────────────────────────────────────────────────────────

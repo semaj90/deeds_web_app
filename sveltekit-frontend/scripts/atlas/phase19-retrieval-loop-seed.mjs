@@ -2,15 +2,12 @@
 /**
  * phase19-retrieval-loop-seed.mjs — Phase 19: Retrieval Loop Seed
  *
- * Reads phase18 reranked cards (.tmp/phase18-xgboost-rerank.jsonl) and emits
- * one retrieval-loop event per card to .tmp/atlas-retrieval-loop.jsonl.
+ * Previews non-authoritative proposals from Phase 18 candidate observations.
+ * Never appends synthetic retrieval outcomes or feedback to the live log.
  *
- * This seeds the feedback file so that:
- *   1. phase-lane-completion.mjs reports all 5 files present
- *   2. token-card-weight-updater.mjs has a baseline retrieval corpus to start from
+ * Historical feedback seeding is blocked pending qualified outcome evidence.
  *
- * Each event records: card_id, sourceRef, lane, score, recommended_action,
- * plus minimal retrieval metadata (timestamp, retrieval_mode, cosine_sim).
+ * Proposals preserve observed card IDs without promoting identity or labels.
  *
  * Usage:
  *   node scripts/atlas/phase19-retrieval-loop-seed.mjs
@@ -21,107 +18,82 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
-const IN_PHASE18 = path.join(REPO_ROOT, '.tmp', 'phase18-xgboost-rerank.jsonl');
-const IN_PHASE17 = path.join(REPO_ROOT, '.tmp', 'phase17-pytorch-features.jsonl');
-const OUT_LOOP   = path.join(REPO_ROOT, '.tmp', 'atlas-retrieval-loop.jsonl');
-const OUT_REPORT = path.join(REPO_ROOT, 'reports', 'phase19-retrieval-loop-seed.md');
+const IN_PHASE18 = process.argv.find((arg) => arg.startsWith('--phase18-input='))?.slice(16)
+  ?? path.join(REPO_ROOT, '.tmp', 'phase18-xgboost-rerank.jsonl');
+const IN_PHASE17 = process.argv.find((arg) => arg.startsWith('--phase17-input='))?.slice(16)
+  ?? path.join(REPO_ROOT, '.tmp', 'phase17-pytorch-features.jsonl');
 
 const args = process.argv.slice(2);
 const DRY  = args.includes('--dry-run');
 const MAX  = (() => { const i = args.indexOf('--max'); return i >= 0 ? Number(args[i+1]) : 200; })();
 
 async function readJsonl(p) {
-  try {
-    const data = await fs.readFile(p, 'utf8');
-    return data.split(/\r?\n/).filter(Boolean).map(l => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
-  } catch { return []; }
+    const stat = await fs.stat(p);
+    if (stat.size > 16 * 1024 * 1024) throw new Error('PHASE19_INPUT_SIZE_LIMIT');
+    const bytes = await fs.readFile(p);
+    return { bytes, rows: bytes.toString('utf8').split(/\r?\n/).filter(Boolean).map(l => JSON.parse(l)) };
 }
 
-// Deterministic cosine-like similarity score from card_id (stable across runs)
-function pseudoCosine(card_id) {
-  const h = crypto.createHash('sha256').update(card_id || 'unknown').digest();
-  const raw = h.readUInt32BE(0) / 0xffffffff;
-  return 0.5 + raw * 0.5; // range [0.5, 1.0] — retrieval events should be above threshold
+export function buildPhase19SeedProposalsV1(phase18Rows, phase17Rows, max = 200) {
+  if (!Number.isInteger(max) || max < 1 || max > 2000) throw new Error('PHASE19_INVALID_BATCH_LIMIT');
+  if (!Array.isArray(phase18Rows) || phase18Rows.length === 0 || !Array.isArray(phase17Rows)) throw new Error('PHASE19_INPUT_REQUIRED');
+  const phase17Map = new Map();
+  for (const row of phase17Rows) {
+    if (typeof row?.card_id !== 'string' || !row.card_id.trim() || phase17Map.has(row.card_id)) throw new Error('PHASE19_INVALID_PHASE17_IDENTITY');
+    phase17Map.set(row.card_id, row);
+  }
+  const seen = new Set();
+  return phase18Rows.slice(0, max).map((row) => {
+    if (typeof row?.card_id !== 'string' || !row.card_id.trim() || seen.has(row.card_id)) throw new Error('PHASE19_INVALID_PHASE18_IDENTITY');
+    seen.add(row.card_id);
+    const prior = phase17Map.get(row.card_id);
+    for (const source of [row.sourceRef, prior?.sourceRef]) {
+      if (source != null && (typeof source !== 'string' || !source.trim())) throw new Error('PHASE19_INVALID_SOURCE_REF');
+    }
+    if (row.sourceRef && prior?.sourceRef && row.sourceRef !== prior.sourceRef) throw new Error('PHASE19_SOURCE_REF_CONFLICT');
+    if (row.score != null && (typeof row.score !== 'number' || !Number.isFinite(row.score))) throw new Error('PHASE19_INVALID_SCORE_OBSERVATION');
+    return {
+      schema: 'atlas.retrieval-seed-proposal.v1', event_type: 'seed_proposal',
+      card_id: row.card_id, sourceRef: row.sourceRef ?? prior?.sourceRef ?? null,
+      observedScore: row.score ?? null, scoreQualification: 'UPSTREAM_OBSERVATION_NOT_MODEL_OR_RELEVANCE_PROOF',
+      sourceAuthorityStatus: 'NOT_ESTABLISHED', canonicalAuthority: false,
+      trainingEligible: false, writesPerformed: false,
+    };
+  });
 }
 
 async function run() {
-  const phase18Rows = await readJsonl(IN_PHASE18);
-  const phase17Map  = new Map();
-  for (const r of await readJsonl(IN_PHASE17)) {
-    if (r.card_id) phase17Map.set(r.card_id, r);
-  }
+  if (!DRY || args.includes('--apply')) throw new Error('PHASE19_SEED_APPLY_BLOCKED_USE_DRY_RUN');
+  const [phase18Input, phase17Input] = await Promise.all([readJsonl(IN_PHASE18), readJsonl(IN_PHASE17)]);
+  const phase18Rows = phase18Input.rows;
+  const phase17Rows = phase17Input.rows;
 
   if (phase18Rows.length === 0) {
     console.error('[phase19] No phase18 rows found at', IN_PHASE18);
     process.exit(1);
   }
 
-  const sample = phase18Rows.slice(0, MAX);
   const now = new Date().toISOString();
-  const events = [];
-
-  for (const row of sample) {
-    const card_id = row.card_id || 'unknown';
-    const p17     = phase17Map.get(card_id) || {};
-    const cosine  = pseudoCosine(card_id);
-
-    const event = {
-      event_type:        'retrieval',
-      card_id,
-      sourceRef:         row.sourceRef || p17.sourceRef || null,
-      lane:              row.lane      || p17.lane      || 'untracked_local',
-      score:             typeof row.score === 'number' ? row.score : 0.5,
-      cosine_sim:        cosine,
-      recommended_action: row.recommended_action || (cosine > 0.7 ? 'index' : 'review'),
-      retrieval_mode:    'phase19-seed',
-      embedding_available: !!(p17.signals?.embedding_available),
-      has_sourceRef:     !!(row.sourceRef || p17.sourceRef),
-      timestamp:         now
-    };
-    events.push(event);
-  }
+  const events = buildPhase19SeedProposalsV1(phase18Rows, phase17Rows, MAX);
 
   if (DRY) {
-    console.log('[phase19] dry-run: would write', events.length, 'events to', OUT_LOOP);
-    console.log('[phase19] sample:', JSON.stringify(events[0], null, 2));
+    console.log(JSON.stringify({ schema: 'atlas.retrieval-seed-preview.v1', generatedAt: now,
+      status: 'PROPOSALS_ONLY_APPLY_BLOCKED', proposals: events,
+      phase18InputChecksum: `sha256:${crypto.createHash('sha256').update(phase18Input.bytes).digest('hex')}`,
+      phase17InputChecksum: `sha256:${crypto.createHash('sha256').update(phase17Input.bytes).digest('hex')}`,
+      writesPerformed: false, trainingEligible: false, canonicalAuthority: false,
+    }, null, 2));
     return;
   }
 
-  await fs.mkdir(path.dirname(OUT_LOOP), { recursive: true });
-
-  // Append to existing file (so live retrieval events aren't overwritten)
-  const existing = await readJsonl(OUT_LOOP);
-  const existingIds = new Set(existing.map(e => e.card_id + ':' + e.retrieval_mode));
-  const newEvents = events.filter(e => !existingIds.has(e.card_id + ':phase19-seed'));
-
-  if (newEvents.length === 0) {
-    console.log('[phase19] All', events.length, 'cards already seeded — no-op.');
-  } else {
-    const lines = newEvents.map(e => JSON.stringify(e)).join('\n') + '\n';
-    await fs.appendFile(OUT_LOOP, lines, 'utf8');
-    console.log('[phase19] Seeded', newEvents.length, 'retrieval events →', OUT_LOOP);
-  }
-
-  const total = existing.length + newEvents.length;
-  const report = [
-    '# Phase 19 Retrieval Loop Seed',
-    '',
-    `- **generated_at**: ${now}`,
-    `- **phase18_input**: ${phase18Rows.length} cards`,
-    `- **sampled**: ${sample.length} (--max ${MAX})`,
-    `- **new_events_written**: ${newEvents.length}`,
-    `- **loop_total**: ${total}`,
-    `- **output**: ${OUT_LOOP}`,
-  ].join('\n');
-  await fs.mkdir(path.dirname(OUT_REPORT), { recursive: true });
-  await fs.writeFile(OUT_REPORT, report, 'utf8');
-  console.log('[phase19] wrote', OUT_REPORT);
 }
 
-run().catch(e => { console.error(e); process.exit(1); });
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  run().catch(e => { console.error(e); process.exitCode = 1; });
+}

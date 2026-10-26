@@ -17,7 +17,7 @@ export interface GoServiceConfig {
 
 export interface GoQueryRequest {
   query: string;
-  query_embedding: number[]; // 384-dim
+  query_embedding: number[]; // canonical semantic_768
   top_k: number; // Default: 100 for RRF
   filters?: {
     repository_id?: string;
@@ -82,6 +82,13 @@ export async function queryGoService(
   config: GoServiceConfig,
   request: GoQueryRequest
 ): Promise<GoQueryResult> {
+  if (
+    request.query_embedding.length !== 768
+    || !request.query_embedding.every((component) => Number.isFinite(component))
+  ) {
+    throw new Error('GO_RETRIEVAL_QUERY_VECTOR_INVALID: expected finite semantic_768 values');
+  }
+
   const url = config.httpUrl || `http://${config.grpcUrl.replace(':50053', ':8100')}`;
   const timeout = config.timeoutMs || 30000;
 

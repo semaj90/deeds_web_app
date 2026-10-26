@@ -28,7 +28,8 @@ function readText(relativePath) {
 
 async function fetchJson(url, options = {}) {
   try {
-    const response = await fetch(url, { ...options, signal: AbortSignal.timeout(5000) });
+    const timeoutMs = options.timeout ?? 15000;
+    const response = await fetch(url, { ...options, signal: AbortSignal.timeout(timeoutMs) });
     const body = await response.json().catch(() => null);
     return { ok: response.ok, status: response.status, body };
   } catch (error) {

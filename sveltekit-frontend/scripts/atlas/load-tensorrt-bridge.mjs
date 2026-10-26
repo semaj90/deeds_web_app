@@ -18,9 +18,12 @@ const require = createRequire(import.meta.url);
 export function loadTensorRTBridge() {
   const candidates = [
     // From scripts/atlas/ location
+    path.resolve(__dirname, '../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
     path.resolve(__dirname, '../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
     // Fallback paths
+    path.resolve(__dirname, '../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
     path.resolve(__dirname, '../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+    path.resolve('simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
     path.resolve('simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
     path.resolve('build/Release/tensorrt_bridge.node')
   ];
@@ -46,10 +49,14 @@ export function getBridgeInfo(addon) {
   }
 
   try {
-    const cudaAvailable = typeof addon.isCudaAvailable === 'function' ? addon.isCudaAvailable() : false;
+    const backendInfo = typeof addon.getBackendInfo === 'function' ? addon.getBackendInfo() : null;
+    const cudaAvailable = backendInfo
+      ? Boolean(backendInfo.cuda_available)
+      : (typeof addon.checkCudaAvailable === 'function' ? Boolean(addon.checkCudaAvailable()) : false);
     return {
       available: true,
       cudaAvailable,
+      backendInfo,
       exports: Object.keys(addon)
     };
   } catch (e) {

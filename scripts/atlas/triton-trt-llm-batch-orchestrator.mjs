@@ -263,7 +263,7 @@ class BatchOrchestrator extends EventEmitter {
       try {
         // Prepare inference payload
         const payload = {
-          model_name: 'gemma4-rotorquant',
+          model_name: 'ornith-1.5-9b',
           inputs: [
             {
               name: 'input_ids',
@@ -279,7 +279,7 @@ class BatchOrchestrator extends EventEmitter {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma4-rotorquant',
+            model: 'ornith-1.5-9b',
             prompt: `Analyze packet ${item.packet_key}`,
             max_tokens: 256,
             temperature: 0.3,
@@ -329,7 +329,7 @@ class BatchOrchestrator extends EventEmitter {
         // Publish error event for recovery
         await redis.publish('slm:error:recovery', JSON.stringify({
           packet_key: item.packet_key,
-          model: 'gemma4-rotorquant',
+          model: 'ornith-1.5-9b',
           error: err.message,
           fallback_model: 'native',
         }));
@@ -441,9 +441,15 @@ class BatchOrchestrator extends EventEmitter {
 }
 
 async function main() {
-  const orchestrator = new BatchOrchestrator();
+  const legacyExecutionMode = ['--start-daemon', '--submit-batch'].find((flag) => process.argv.includes(flag));
+  if (legacyExecutionMode) {
+    console.error('LEGACY_GEMMA4_TRT_EXECUTION_DISABLED: this path consumes unqualified 384-D inputs and targets the retired TensorRT/Gemma4 model; migrate through the qualified Ornith evidence path before enabling execution.');
+    process.exitCode = 2;
+    return;
+  }
 
   if (process.argv.includes('--dry-run')) {
+    const orchestrator = new BatchOrchestrator();
     console.log('📋 DRY-RUN: Adapter Registry\n');
     Object.entries(adapterRegistry).forEach(([name, config]) => {
       console.log(`${name}:`);
@@ -463,6 +469,7 @@ async function main() {
     }
 
   } else if (process.argv.includes('--start-daemon')) {
+    const orchestrator = new BatchOrchestrator();
     console.log('🚀 Starting daemon...\n');
     await orchestrator.initialize();
 
@@ -474,6 +481,7 @@ async function main() {
     console.log('✅ Daemon running. Listening for events...\n');
 
   } else if (process.argv.includes('--submit-batch')) {
+    const orchestrator = new BatchOrchestrator();
     const packetsArg = process.argv.find(arg => arg.startsWith('--packets='));
     const adapterArg = process.argv.find(arg => arg.startsWith('--adapter='));
 

@@ -75,7 +75,7 @@ vi.mock('$lib/config/env.server.js', () => ({
 	getDatabaseUrl: () => 'postgresql://test:test@localhost:5432/test',
 }));
 
-// ── ollamaFetch mock ──
+// ── embedOrChatFetch mock ──
 const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
 	const body = opts?.body ? JSON.parse(opts.body) : {};
 	// Embedding requests
@@ -88,15 +88,15 @@ const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
 	return new Response(JSON.stringify({
 		message: { content: 'Legal AI response here.' },
 		response: 'Legal AI response here.',
-		model: 'gemma4-rotorquant:latest',
+		model: 'ornith-1.5-9b',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } });
 });
 vi.mock('$lib/server/ollama.js', () => ({
   getChatModelKeepAlive: () => '2m',
   getEmbeddingModelKeepAlive: () => '24h',
-  getChatModel: () => 'gemma4-rotorquant:latest',
+  getChatModel: () => 'ornith-1.5-9b',
   getEmbedModel: () => 'embeddinggemma:latest',
-  ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+  embedOrChatFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── DB mock ──
@@ -292,7 +292,7 @@ describe('/api/contextual/chat (POST)', () => {
 
 	it('returns 502 when Ollama is unavailable', async () => {
 		// contextual/chat calls fetch() directly against LLAMA_SERVER_BASE_URL
-		// (post-Ollama phase-out), not ollamaFetch — mock the layer it actually
+		// (post-Ollama phase-out), not embedOrChatFetch — mock the layer it actually
 		// uses. mockGlobalFetch's default branch delegates to the real fetch for
 		// unmatched URLs, so without this override the test would silently hit
 		// the actually-running local llama-server instead of exercising the

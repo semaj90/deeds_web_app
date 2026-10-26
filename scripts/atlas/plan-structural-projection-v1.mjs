@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { REPO_ROOT } from './connection-config.mjs';
+import { astScanCompleteness } from './lib/source-observation-http-v1.mjs';
 import { deriveGraphNodeKeyV1 } from '../../packages/parent-atlas/dist/index.js';
 
 const root = REPO_ROOT;
@@ -47,6 +48,11 @@ async function main() {
       continue;
     }
     const evidence = await response.json();
+    const scan = astScanCompleteness(evidence);
+    if (!scan.complete) {
+      errors.push({ sourceRef: candidate.sourceRef, error: `AST_SCAN_INCOMPLETE:${scan.scanCompleteness}` });
+      continue;
+    }
     for (const [index, chunk] of (Array.isArray(evidence.chunks) ? evidence.chunks : []).entries()) {
       const startByte = Number(chunk.start_byte ?? 0);
       const endByte = Math.max(Number(chunk.end_byte ?? startByte), startByte + 1);

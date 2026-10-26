@@ -1,0 +1,82 @@
+{
+  "schema": "atlas.graph-fanout-strict-read-hardening.v1",
+  "date": "2026-10-16",
+  "status": "SEARCHRUNTIME_PACKET_AND_NARY_FANOUT_WIRED_LIVE_SOURCE_QUALIFIED_GRAPH_AND_CONTEXTMANIFEST_PROOF_OPEN",
+  "likely_cause": "Graph evidence previously only annotated results after ranking; the reusable bounded N-ary coordinator also lacked a SearchRuntime caller and the strict reader trusted stored checksums without recomputing them.",
+  "changes": [
+    "SearchRuntime now uses readKagHypergraphNeighborsStrictV1.",
+    "Graph evidence is skipped unless all final packets agree on one non-empty workspace revision and graph revision.",
+    "A caller-supplied workspace revision must match the hydrated packet revision.",
+    "PageRank lookup now requires a promoted converged run, a VALIDATED exact workspace/graph snapshot, and exact PostgreSQL packet/source/source-revision identity.",
+    "Source-level PageRank fallback is omitted when matching packet scores conflict; packet-specific scores remain available.",
+    "PageRank remains an optional score signal and is separate from graph-candidate fanout.",
+    "Strict incidence readback now returns endpoint bindings only after exact packet identity and source-revision verification against PostgreSQL.",
+    "SearchRuntime expands at most min(topK * 4, 64) qualified one-hop neighbors before fusion; candidates retain exact source, workspace, and graph revisions and are hydrated through the existing pipeline.",
+    "SearchRuntime now invokes the existing bounded KAG quick-hop coordinator independently of packet-incidence fanout; absent incidence storage does not suppress the N-ary lane.",
+    "N-ary traversal accepts only code-relation predicates and facts with at least three participants, requires a canonical PacketKeyV2 participant, and re-resolves traversed packets to exact current PostgreSQL packet rows before candidate creation.",
+    "Strict hyperedge hydration now recomputes the contract hyperedge ID and SHA-256 checksum and rejects inconsistent member headers, duplicate members, malformed source revisions, and checksum mismatches."
+  ],
+  "validation": {
+    "searchRuntimeCommand": "npx vitest run src/lib/server/retrieval/search-runtime.spec.ts -t \"fans out only exact graph-bound\"",
+    "searchRuntimeResult": "PASS",
+    "searchRuntimePassed": 1,
+    "searchRuntimeSkipped": 19,
+    "searchRuntimeProof": "Mocked exact-revision incidence neighbor reached hydration and survived SearchRuntime final Top-K.",
+    "readerCommand": "npx vitest run src/lib/server/atlas/integration/kag-hypergraph-reader-v1.spec.ts -t \"strict traversal expands only\"",
+    "readerResult": "PASS",
+    "readerPassed": 1,
+    "authorityAdapterCommand": "npx vitest run src/lib/server/retrieval/__tests__/feature-matrix.test.ts --maxWorkers=1 --minWorkers=1",
+    "authorityAdapterResult": "PASS",
+    "authorityAdapterPassed": 11,
+    "naryReaderAndRuntimeTestsAttempted": true,
+    "naryReaderAndRuntimeTestResult": "BLOCKED_NO_OUTPUT_BEFORE_MANUAL_STOP",
+    "concurrentVitestProcessesObserved": true,
+    "retrievalTypecheckAttempted": true,
+    "retrievalTypecheckResult": "BLOCKED_NO_OUTPUT_BEFORE_MANUAL_STOP",
+    "scopedDiffCheck": "PASS"
+  },
+  "sideEffects": {
+    "databaseWrites": 0,
+    "cacheWrites": 0,
+    "projectionWrites": 0,
+    "candidateRankingChanged": "Only when a strict reader returns independently verified candidateBindings; no live incidence rows currently qualify."
+  },
+  "notProven": [
+    "Current qualified code-edge coverage or production fanout candidates",
+    "Live PostgreSQL PageRank query and independent readback for a current candidate snapshot",
+    "N-ary code-fact population and participant-level source evidence",
+    "The existing Svelte N-ary dry-run emits provisional span identifiers and has no demonstrated packet-bound production caller; it cannot currently seed canonical packet traversal.",
+    "Live PostgreSQL incidence source and current source-qualified graph edges; the observed atlas_packet_incidence table is absent and the audited N-ary cohort had zero SHA-256 source revisions.",
+    "New N-ary reader and SearchRuntime fixture tests could not complete because Vitest and the targeted TypeScript check produced no output and were stopped; code is not marked test-proven.",
+    "ContextManifest admission and Ornith synthesis for graph-expanded evidence"
+  ],
+  "canonicalAuthority": false,
+  "liveReadOnlyCensus": {
+    "database": "legal_ai_db via legal-ai-postgres",
+    "transaction": "READ ONLY",
+    "atlas_hyperedges": 62802,
+    "atlas_ontology_tuples": 0,
+    "binary_hyperedges": 62802,
+    "nary_hyperedges": 0,
+    "sourceQualifiedNaryHyperedgesWithEvidence": 0,
+    "recognizedCodeNaryHyperedges": 0,
+    "promotedConvergedPageRankRuns": 1,
+    "validatedGraphSnapshotsV2": 0,
+    "pageRankEligibleSnapshotReadback": false,
+    "writes": 0
+  },
+  "patchTargets": [
+    "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+    "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/integration/kag-hypergraph-reader-v1.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/integration/kag-quick-hop-v1.ts",
+    "sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-postgres-readback-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-endpoint-resolver-v1.ts"
+  ],
+  "requiredNextEvidence": [
+    "A current graph revision owner/readback for the admitted workspace",
+    "Source-qualified code relationships or N-ary facts with exact packet identities",
+    "A source-qualified incidence producer and live PostgreSQL readback, followed by a frozen seed replay through SearchRuntime final Top-K and ContextManifest with independent readback"
+  ]
+}

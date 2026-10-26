@@ -18,6 +18,7 @@
  *   }
  */
 
+import net from 'node:net';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
@@ -95,6 +96,20 @@ async function probeService(url: string, timeoutMs = 3000): Promise<boolean> {
   }
 }
 
+// Postgres speaks its own wire protocol, not HTTP: an HTTP fetch can never return ok.
+function probeTcp(host: string, port: number, timeoutMs = 2000): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = net.connect({ host, port });
+    const done = (ok: boolean) => {
+      socket.destroy();
+      resolve(ok);
+    };
+    socket.setTimeout(timeoutMs, () => done(false));
+    socket.once('connect', () => done(true));
+    socket.once('error', () => done(false));
+  });
+}
+
 function aggregateStatus(
   lanes: Record<string, { state: EvidenceState }>,
   mode: 'structural' | 'production'
@@ -124,10 +139,11 @@ async function checkGraphifyStages(): Promise<GraphifyPipelineStage[]> {
   const gemma4Ok = await probeService(`${ENV.LOCAL_OPENAI_BASE_URL}/health`, 2000);
   const ollamaOk = await probeService(`${ENV.OLLAMA_BASE_URL}/api/tags`, 2000);
   const qdrantOk = await probeService(`${ENV.QDRANT_URL}`, 2000);
-  const postgresOk = await probeService(
-    `http://${ENV.POSTGRES_HOST ?? '127.0.0.1'}:${ENV.POSTGRES_PORT ?? '5434'}`,
+  const postgresOk = await probeTcp(
+    ENV.POSTGRES_HOST ?? '127.0.0.1',
+    Number(ENV.POSTGRES_PORT ?? 5434),
     2000
-  ).catch(() => false);
+  );
 
   return [
     {

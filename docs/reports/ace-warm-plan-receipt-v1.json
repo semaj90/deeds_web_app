@@ -1,0 +1,30 @@
+{
+  "$schema": "atlas.ace-warm-plan.receipt.v1",
+  "receiptVersion": "1.0.0",
+  "timestamp": "2026-10-14T23:09:06.048Z",
+  "status": "PROVEN_DRYRUN",
+  "cachePlan": {
+    "tier": "BitFrost_L1",
+    "cacheKey": "atlas:bitfrost:v1:centroid_lookup:5203f8dd218c3b3bb9670c7daca6969f",
+    "canonicalIdentityEnvelope": {
+      "packetKey": "packet:9aec19d8-8e0a-5470-bef2-9b8fca6c313a",
+      "symbolVersionId": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+      "workspaceRevision": "sha256:69e37be3a985552b9195b07fb8848ba42f5f137ebfe688a209b5eb02446f25cb",
+      "sourceRevision": "sha256:805b339b4374f53f568b166ea7115bbf25d2cdbb28f7f7fcc9e68c1b618b55b4"
+    },
+    "admission": {
+      "policy": "POLICY_DERIVED",
+      "fsmInitialState": "ADMITTED",
+      "targetState": "RESIDENT",
+      "ttlSeconds": 900,
+      "memoryBudgetBytes": 4096,
+      "readbackParityVerified": true
+    },
+    "projectionsWarmed": [
+      "compact_view",
+      "centroid_descriptor"
+    ],
+    "writesPerformed": false
+  }
+}

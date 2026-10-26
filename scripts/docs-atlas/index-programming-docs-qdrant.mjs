@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import { resolve, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import crypto from 'node:crypto';
@@ -13,9 +14,22 @@ const RUN_ID = args.find(a => a.startsWith('--runId='))?.split('=')[1];
 const CHUNK_DIR = resolve(process.cwd(), 'data/external-docs/chunks');
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 
-// Get 768d embedding from local Ollama
+// Validate a 768D vector: finite values, correct length, nonzero norm. Never accept a placeholder.
+function assertValidVector(vector) {
+  if (!Array.isArray(vector) || vector.length !== 768) throw new Error(`EMBEDDING_DIMENSION_MISMATCH:${vector?.length}`);
+  let norm = 0;
+  for (const v of vector) {
+    if (!Number.isFinite(v)) throw new Error('EMBEDDING_NON_FINITE_VALUE');
+    norm += v * v;
+  }
+  if (!(norm > 0)) throw new Error('EMBEDDING_ZERO_NORM');
+  return vector;
+}
+
+// Get 768d embedding from local Ollama. Fails closed: no zero-vector fallback.
 async function getEmbedding(text, model = 'embeddinggemma:latest') {
   const OLLAMA_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+  const errors = [];
   try {
     const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
       method: 'POST',
@@ -25,10 +39,10 @@ async function getEmbedding(text, model = 'embeddinggemma:latest') {
     });
     if (res.ok) {
       const data = await res.json();
-      if (data.embedding) return data.embedding;
-    }
+      if (data.embedding) return assertValidVector(data.embedding);
+    } else errors.push(`/api/embeddings HTTP ${res.status}`);
   } catch (e) {
-    // fallback
+    errors.push(`/api/embeddings ${e.message}`);
   }
 
   try {
@@ -40,18 +54,39 @@ async function getEmbedding(text, model = 'embeddinggemma:latest') {
     });
     if (res.ok) {
       const data = await res.json();
-      if (data.embeddings && data.embeddings[0]) return data.embeddings[0];
-      if (data.embedding) return data.embedding;
-    }
+      if (data.embeddings && data.embeddings[0]) return assertValidVector(data.embeddings[0]);
+      if (data.embedding) return assertValidVector(data.embedding);
+    } else errors.push(`/api/embed HTTP ${res.status}`);
   } catch (e) {
-    // fallback
+    errors.push(`/api/embed ${e.message}`);
   }
 
-  // Zero-vector fallback for workstation robustness
-  return new Array(768).fill(0);
+  throw new Error(`EMBEDDING_UNAVAILABLE: ${errors.join('; ')}`);
 }
 
-// Generate stable deterministic integer point ID for Qdrant
+// Frozen v5 namespace for docs point IDs (proposal, not yet migrated). Changing it changes every ID.
+export const DOCS_POINT_NAMESPACE_V1 = '5b7a0f3e-8c1d-5e2a-9f64-2d0c7e4b1a93';
+export const DOCS_POINT_NAME_VERSION = 'atlas.docs.point.v1';
+
+// UUIDv5 (RFC 9562) over length-framed identity fields. Deterministic: re-running an upsert
+// replaces the same point. A lookup key only; it never authorizes an upsert.
+export function documentPointIdV5(identity, namespace = DOCS_POINT_NAMESPACE_V1) {
+  const fields = ['packetKey', 'chunkId', 'sourceRevision', 'representationRevision', 'embeddingModelRevision'];
+  if (fields.some((k) => typeof identity?.[k] !== 'string' || !identity[k].trim())) {
+    throw new Error('PROJECTION_IDENTITY_INCOMPLETE');
+  }
+  const framed = [DOCS_POINT_NAME_VERSION, ...fields.map((k) => identity[k])]
+    .map((v) => `${Buffer.byteLength(v, 'utf8')}:${v}`).join('|');
+  const nsBytes = Buffer.from(namespace.replace(/-/g, ''), 'hex');
+  const bytes = crypto.createHash('sha1').update(nsBytes).update(framed, 'utf8').digest().subarray(0, 16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x50; // version 5
+  bytes[8] = (bytes[8] & 0x3f) | 0x80; // RFC 4122 variant
+  const h = bytes.toString('hex');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
+// Legacy point ID (unchanged). Existing Qdrant points use this scheme; switching it without a
+// controlled migration would create duplicate points. The V2 ID scheme needs an approved migration.
 function deterministicPointId(key) {
   const hash = crypto.createHash('md5').update(key).digest();
   return hash.readUInt32BE(0) % 2147483648;
@@ -76,7 +111,15 @@ async function index() {
 
       for (const chunk of chunks) {
         const pointId = deterministicPointId(chunk.chunkId);
-        const vector = await getEmbedding(chunk.text); 
+        let vector;
+        try {
+          vector = await getEmbedding(chunk.text);
+        } catch (err) {
+          // Fail closed: a chunk without a valid embedding is never written.
+          failures += 1;
+          console.error(`  ❌ ${chunk.chunkId} skipped: ${err.message}`);
+          continue;
+        }
 
         const res = await fetch(`${QDRANT_URL}/collections/external_programming_docs_768/points`, {
           method: 'PUT',
@@ -91,10 +134,25 @@ async function index() {
         });
 
         if (res.ok) console.log(`  ✅ ${chunk.chunkId} indexed.`);
-        else console.error(`  ❌ ${chunk.chunkId} failed: ${await res.text()}`);
+        else {
+          failures += 1;
+          console.error(`  ❌ ${chunk.chunkId} failed: ${await res.text()}`);
+        }
       }
     }
   }
+  if (failures > 0) {
+    console.error(`[qdrant] ${failures} chunk(s) not indexed; exiting non-zero.`);
+    process.exitCode = 1;
+  }
 }
 
-index().catch(console.error);
+let failures = 0;
+export { assertValidVector, deterministicPointId };
+// Note: the V2 safety helper (Downloads/atlas-docs-indexer-safety-v2) is not wired here.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  index().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}

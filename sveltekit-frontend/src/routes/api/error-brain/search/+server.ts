@@ -31,9 +31,73 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const filePath = parsed.data.filePath;
 	const limit = parsed.data.limit;
 	const searchQuery = errorMessage.trim() || filePath.trim();
+	const escapedSearchQuery = searchQuery.slice(0, 100).replace(/[\\%_]/g, '\\$&');
+	const searchPattern = `%${escapedSearchQuery}%`;
 	recordSearchQuery({ query: searchQuery, pipeline: 'codebase', cacheHit: false, userId: locals.user.id });
 
 	const sources: Array<{ type: string; id: string; content: string; relevance: number; metadata: Record<string, unknown> }> = [];
+	let errorLogSearchStatus: 'searched' | 'unavailable' = 'searched';
+
+	// Source 0: PostgreSQL error observations. This is distinct from phase72_error
+	// historical fixes and remains a candidate source, not an admission decision.
+	try {
+		const errorLogResults = await db.execute(sql`
+			SELECT e.id::text, e.error_category, e.diagnostic_code, e.diagnostic_run_id,
+			       e.diagnostic_log_sha256, e.diagnostic_log_line,
+			       e.severity, e.message, e.route_path, e.file_path,
+			       e.line_number, e.packet_key, e.source_ref, e.resolved, e.created_at,
+			       (
+			         SELECT jsonb_agg(jsonb_build_object(
+			           'taskId', kt.task_id,
+			           'featureLabel', kt.feature_label,
+			           'lane', kt.lane,
+			           'status', kt.status
+			         ) ORDER BY kt.created_at DESC)
+			         FROM public.kanban_tasks kt
+			         WHERE kt.source_refs @> jsonb_build_array('error_log:' || e.id::text)
+			       ) AS kanban_tasks
+			FROM public.error_logs e
+			WHERE e.message ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.diagnostic_code, '') ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.diagnostic_run_id, '') ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.file_path, '') ILIKE ${searchPattern} ESCAPE '\\'
+			   OR COALESCE(e.route_path, '') ILIKE ${searchPattern} ESCAPE '\\'
+			ORDER BY e.created_at DESC
+			LIMIT ${limit}
+		`).catch(() => {
+			errorLogSearchStatus = 'unavailable';
+			return { rows: [] };
+		});
+
+		for (const row of errorLogResults.rows as Record<string, any>[]) {
+			sources.push({
+				type: 'error_log',
+				id: String(row.id),
+				content: `[${row.severity}]${row.diagnostic_code ? ` [${row.diagnostic_code}]` : ''} ${row.message}`,
+				relevance: 0.5,
+				metadata: {
+					category: row.error_category,
+					diagnosticCode: row.diagnostic_code,
+					diagnosticRunId: row.diagnostic_run_id,
+					diagnosticLogSha256: row.diagnostic_log_sha256,
+					diagnosticLogLine: row.diagnostic_log_line,
+					severity: row.severity,
+					filePath: row.file_path,
+					routePath: row.route_path,
+					lineNumber: row.line_number,
+					packetKey: row.packet_key,
+					sourceRef: row.source_ref,
+					resolved: row.resolved,
+					createdAt: row.created_at,
+					kanbanTasks: Array.isArray(row.kanban_tasks) ? row.kanban_tasks : [],
+					rankKind: 'lexical_candidate',
+				},
+			});
+		}
+	} catch (e) {
+		errorLogSearchStatus = 'unavailable';
+		console.warn('[error-brain/search] error_logs search failed:', (e as Error).message);
+	}
 
 	// Source 1: phase72_error — historical fixes from the DB
 	try {
@@ -41,8 +105,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			SELECT id, file_path, error_code, message, suggestion, status, created_at
 			FROM phase72_error
 			WHERE (
-				message ILIKE ${'%' + errorMessage.slice(0, 100) + '%'}
-				OR file_path ILIKE ${'%' + filePath.split('/').pop() + '%'}
+				message ILIKE ${searchPattern} ESCAPE '\\'
+				OR COALESCE(file_path, '') ILIKE ${searchPattern} ESCAPE '\\'
 			)
 			AND suggestion IS NOT NULL
 			AND suggestion != ''
@@ -130,6 +194,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		query: { errorMessage, filePath },
 		sources: sources.slice(0, limit),
 		totalFound: sources.length,
-		searchedDatabases: ['phase72_error', 'qdrant:codebase_chunks_768', 'couchdb:ace_synthesis'],
+		errorLogSearchStatus,
+		searchedDatabases: ['error_logs', 'phase72_error', 'qdrant:codebase_chunks_768', 'couchdb:ace_synthesis'],
 	});
 };

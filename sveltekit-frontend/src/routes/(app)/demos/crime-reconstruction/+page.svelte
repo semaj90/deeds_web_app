@@ -516,33 +516,39 @@
       { label: 'Location', bind: 'location', placeholder: 'abandoned warehouse, rooftop…', val: location, set: (v:string) => location = v },
     ] as f}
       <div>
-        <label class="text-[10px] text-[#888] uppercase tracking-widest">{f.label}</label>
-        <input
-          class="w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs focus:border-[#c4a35a] outline-none"
-          placeholder={f.placeholder}
-          value={f.val}
-          oninput={(e) => f.set((e.target as HTMLInputElement).value)}
-        />
+        <label class="block text-[10px] text-[#888] uppercase tracking-widest">
+          {f.label}
+          <input
+            class="w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs focus:border-[#c4a35a] outline-none"
+            placeholder={f.placeholder}
+            value={f.val}
+            oninput={(e) => f.set((e.target as HTMLInputElement).value)}
+          />
+        </label>
       </div>
     {/each}
 
     <div class="flex gap-2">
       <div class="flex-1">
-        <label class="text-[10px] text-[#888] uppercase tracking-widest">Time</label>
-        <select class="w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs"
-          bind:value={timeOfDay}>
-          {#each ['dawn','morning','midday','dusk','night','overcast'] as t}
-            <option>{t}</option>
-          {/each}
-        </select>
+        <label class="block text-[10px] text-[#888] uppercase tracking-widest">
+          Time
+          <select class="w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs"
+            bind:value={timeOfDay}>
+            {#each ['dawn','morning','midday','dusk','night','overcast'] as t}
+              <option>{t}</option>
+            {/each}
+          </select>
+        </label>
       </div>
       <div class="flex-1">
-        <label class="text-[10px] text-[#888] uppercase tracking-widest">Mode</label>
-        <select class="w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs"
-          bind:value={genMode}>
-          <option value="i2v">FLUX→Wan (i2v)</option>
-          <option value="t2v">Wan only (t2v)</option>
-        </select>
+        <label class="block text-[10px] text-[#888] uppercase tracking-widest">
+          Mode
+          <select class="w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs"
+            bind:value={genMode}>
+            <option value="i2v">FLUX→Wan (i2v)</option>
+            <option value="t2v">Wan only (t2v)</option>
+          </select>
+        </label>
       </div>
     </div>
 
@@ -620,6 +626,8 @@
   <main class="flex-1 flex flex-col">
     <!-- Viewport -->
     <div class="flex-1 relative"
+      role="region"
+      aria-label="3D Viewport Drop Zone"
       ondragover={(e) => e.preventDefault()}
       ondrop={onOBJDrop}
     >

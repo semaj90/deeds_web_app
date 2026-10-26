@@ -152,6 +152,7 @@
             <button
               class="w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all"
               onclick={() => open = false}
+              aria-label="Close assistant"
             >
               <span class="i-carbon-close text-xl"></span>
             </button>
@@ -256,6 +257,7 @@
                   <button
                     class="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover/file:opacity-100 transition-opacity"
                     onclick={() => attachments = attachments.filter((_, i) => i !== idx)}
+                    aria-label="Remove attachment"
                   >
                     <span class="i-carbon-close text-xs"></span>
                   </button>
@@ -296,6 +298,7 @@
 
             <button
               type="submit"
+              aria-label="Send message"
               class="absolute right-4 bottom-4 w-12 h-12 rounded-[1rem] bg-accent text-black flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:scale-100 shadow-[0_0_30px_rgba(138,223,255,0.3)]"
               disabled={(!inputVal.trim() && attachments.length === 0) || snapshot.matches('thinking')}
             >

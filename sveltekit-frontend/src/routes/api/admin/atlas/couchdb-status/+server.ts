@@ -1,25 +1,24 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-
-const COUCHDB_URL  = (process.env.COUCHDB_URL ?? 'http://localhost:5984').replace(/\/+$/, '');
-const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = (process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass');
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 const DB_NAME      = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
-
-function authHeader(): string {
-	return 'Basic ' + Buffer.from(`${COUCHDB_USER}:${COUCHDB_PASS}`).toString('base64');
-}
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) throw error(401, 'Unauthorized');
 
-	const headers = { 'Content-Type': 'application/json', Authorization: authHeader() };
+	let couchDb: ReturnType<typeof resolveCouchDbConfigV1>;
+	try {
+		couchDb = resolveCouchDbConfigV1(process.env);
+	} catch {
+		return json({ ok: false, dbName: DB_NAME, docCount: 0, indexes: [], lastRunId: undefined });
+	}
+	const headers = { 'Content-Type': 'application/json', Authorization: couchDb.authorization };
 
 	// DB info
 	let docCount = 0;
 	let ok = false;
 	try {
-		const infoRes = await fetch(`${COUCHDB_URL}/${DB_NAME}`, {
+		const infoRes = await fetch(`${couchDb.baseUrl}/${DB_NAME}`, {
 			headers, signal: AbortSignal.timeout(3_000),
 		});
 		if (infoRes.ok) {
@@ -33,7 +32,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const indexes: string[] = [];
 	if (ok) {
 		try {
-			const idxRes = await fetch(`${COUCHDB_URL}/${DB_NAME}/_index`, {
+			const idxRes = await fetch(`${couchDb.baseUrl}/${DB_NAME}/_index`, {
 				headers, signal: AbortSignal.timeout(3_000),
 			});
 			if (idxRes.ok) {
@@ -49,7 +48,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	let lastRunId: string | undefined;
 	if (ok) {
 		try {
-			const findRes = await fetch(`${COUCHDB_URL}/${DB_NAME}/_find`, {
+			const findRes = await fetch(`${couchDb.baseUrl}/${DB_NAME}/_find`, {
 				method:  'POST',
 				headers,
 				body:    JSON.stringify({

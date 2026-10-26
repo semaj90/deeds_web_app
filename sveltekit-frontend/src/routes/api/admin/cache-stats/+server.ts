@@ -72,7 +72,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			performance: {
 				expectedHitRate: '70-90% (production steady-state)',
 				avgCacheLatency: '2-5ms',
-				avgColdLatency: '3.2s (gemma3:270m)',
+				avgColdLatency: 'Current configured server model',
 				speedup: '157-1,084×',
 			},
 			recommendations: getRecommendations(parseFloat(hitRate), llmKeys.length),

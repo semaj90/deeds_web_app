@@ -168,8 +168,9 @@
 		class="spotlight-overlay"
 		transition:fade={{ duration: 200 }}
 		onclick={spotlightOff}
+		onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') spotlightOff(); }}
 		role="button"
-		tabindex="-1"
+		tabindex="0"
 		aria-label="Click to dismiss spotlight"
 	>
 		<div

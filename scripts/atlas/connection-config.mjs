@@ -7,13 +7,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '../..');
 export const FRONTEND_ROOT = path.join(REPO_ROOT, 'sveltekit-frontend');
 
+// No password default: credentials come from DATABASE_URL or DB_PASSWORD in the
+// environment or .env/.env.local. A missing password fails closed.
 const DEFAULT_POSTGRES = {
   host: '127.0.0.1',
   port: '5434',
   user: 'legal_admin',
-  password: '123456',
+  password: '',
   database: 'legal_ai_db',
 };
+
+function requirePostgresPassword(password) {
+  if (!password) {
+    throw new Error('Postgres password not configured: set DATABASE_URL or DB_PASSWORD in .env / .env.local');
+  }
+  return password;
+}
 
 const DEFAULT_REDIS = {
   host: '127.0.0.1',
@@ -139,14 +148,14 @@ export function resolveDatabaseUrl(env = process.env, defaults = DEFAULT_POSTGRE
     if (/^[^:/?#]+:\d+(?:\/[^/]+)?$/.test(raw)) {
       const [hostPort, dbPart] = raw.split('/', 2);
       const [host, port] = hostPort.split(':', 2);
-      return `postgresql://${encodeURIComponent(String(env.DB_USER ?? env.POSTGRES_USER ?? defaults.user))}:${encodeURIComponent(String(env.DB_PASSWORD ?? env.POSTGRES_PASSWORD ?? defaults.password))}@${normalizeConnectionHost(host, defaults.host)}:${port || defaults.port}/${dbPart || defaults.database}`;
+      return `postgresql://${encodeURIComponent(String(env.DB_USER ?? env.POSTGRES_USER ?? defaults.user))}:${encodeURIComponent(requirePostgresPassword(String(env.DB_PASSWORD ?? env.POSTGRES_PASSWORD ?? defaults.password)))}@${normalizeConnectionHost(host, defaults.host)}:${port || defaults.port}/${dbPart || defaults.database}`;
     }
   }
 
   const host = normalizeConnectionHost(env.DB_HOST ?? env.POSTGRES_HOST ?? defaults.host, defaults.host);
   const port = String(env.DB_PORT ?? env.POSTGRES_PORT ?? defaults.port).trim() || defaults.port;
   const user = String(env.DB_USER ?? env.POSTGRES_USER ?? defaults.user).trim() || defaults.user;
-  const password = String(env.DB_PASSWORD ?? env.POSTGRES_PASSWORD ?? defaults.password).trim() || defaults.password;
+  const password = requirePostgresPassword(String(env.DB_PASSWORD ?? env.POSTGRES_PASSWORD ?? defaults.password).trim() || defaults.password);
   const database = String(env.DB_NAME ?? env.POSTGRES_DB ?? defaults.database).trim() || defaults.database;
   return `postgresql://${encodeURIComponent(user)}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
 }

@@ -92,6 +92,20 @@ describe('context tool DAG contracts', () => {
 });
 
 describe('context tool DAG contracts -- canonical workflow-action adapter (WORKFLOW-ACTION-SCHEMA-OWNER-01)', () => {
+  it('omits a null local transport instead of returning an invalid canonical transport value', () => {
+    const local = workflowActionFromDagNode({
+      dag: baseDag(),
+      nodeId: 'retrieve',
+      sequence: 1,
+      actionId: 'a-1',
+      kind: 'scheduled',
+      lane: 'tool',
+      producerRevision: 'test',
+    });
+
+    expect(toCanonicalWorkflowActionEvent({ ...local, transport: null }).transport).toBeUndefined();
+  });
+
   it('round-trips every field the DAG-execution layer actually reads', () => {
     const local = workflowActionFromDagNode({
       dag: baseDag(),

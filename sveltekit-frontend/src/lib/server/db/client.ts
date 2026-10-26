@@ -66,7 +66,7 @@ export function resetPoolHealth(): void {
 const POOL_CONFIG = {
 	max: 10, // Default for node-postgres
 	idleTimeoutMillis: 30000,
-	connectionTimeoutMillis: 5000,
+	connectionTimeoutMillis: 15000,
 };
 
 // Log canonical DB on boot (Sprint 3.6 G17). console.error (stderr), not
@@ -87,6 +87,10 @@ export const pool = new Pool({
 	connectionString: getDatabaseUrl(),
 	...POOL_CONFIG,
 	statement_timeout: 60000, // 60s max per query
+	// pgvector iterative scan for filtered HNSW queries. Startup parameter, not an un-awaited
+	// SET in pool.on('connect'): that overlapped the caller's first query on the same client
+	// and triggered pg's "client is already executing a query" warning.
+	options: '-c hnsw.iterative_scan=relaxed_order',
 });
 
 pool.on('error', (err) => {
@@ -94,11 +98,6 @@ pool.on('error', (err) => {
 	lastPoolError = err.message;
 	lastPoolErrorAt = new Date();
 	console.error('Database pool error:', err.message);
-});
-
-// Enable pgvector iterative scanning for filtered HNSW queries (9x faster)
-pool.on('connect', (client) => {
-  client.query('SET hnsw.iterative_scan = relaxed_order').catch(() => {});
 });
 
 const canonicalReadOnlyQueryScope = createReadOnlyQueryScope(pool);

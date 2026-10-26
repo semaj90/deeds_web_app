@@ -160,3 +160,42 @@ distribution has been reviewed for false positives (`AMBIGUOUS` rate especially)
 | FEATURE_LABEL_ENVELOPE_CARRY | PASS (Phase 3 — wired into `build-summary-envelopes-from-tuples.mjs` via `envelope.metadata`, verified live against Postgres at `--limit=8000`: 4386 envelopes, distribution `{DERIVED_HIGH_CONFIDENCE: 428, DERIVED_PATH_FALLBACK: 3736, CANONICAL: 222, GENERIC_REPLACEMENT_RECOMMENDED: 0}`. Note: `GENERIC_REPLACEMENT_RECOMMENDED` did not occur in 4386 real rows — real files almost always have a meaningful parent directory, so `deriveLabelFromPath` succeeds before the basename-only (confidence 0.3) fallback is reached. That tier is proven correct at the unit level (Phase 1 test 6, confidence 0.3 → `classifyFeatureLabelStatus` returns `GENERIC_REPLACEMENT_RECOMMENDED` deterministically) but not observed live in this run — reporting this honestly rather than claiming an unobserved match.) |
 | FEATURE_LABEL_IN_OPENSPEC_DRAFTS | PASS (Phase 4 — `graphify-report-to-openspec-draft.mjs` extracts a `findKnownFunctionalLabel()` hint from any report row carrying `feature_label_derived`/`feature_label_status` (duck-typed, not tied to one report filename) and injects it into the LLM prompt as "known functional label" context. Verified live against `docs/reports/summary-index-ranker.json`: log line confirmed `known functional label: "card"` was extracted and passed to llama-server (model `hforf.gguf`). The model chose `topic_slug: "summary-index-ranker"` over the single noisy per-row hint "card" — correct judgment, since the prompt says "prefer" not "force" and a whole-report topic shouldn't be hijacked by one row's label. Confirms the hint reaches the model without corrupting draft quality; does not touch canonical `feature_label`/`feature_id`.) |
 | FEATURE_LABEL_CANONICAL_APPLY | NOT_STARTED, separate change (Phase 5) |
+
+## 2026-10-20 — Feature identity and label-registry contract alignment
+
+Read-only catalog and repository review found that `atlas_features.feature_id` is the existing
+text primary key for source-local AST-derived feature facts (defined in
+`drizzle/manual/20260716_atlas_knowledge_layer.sql` and `drizzle/schema.ts`). The table exists in
+the live catalog and currently has zero rows. The feature-label admin reader and its contract test
+also use `atlas_features` as the identity owner. `canonical_feature_concepts` is a separate,
+proposed global concept registry; `atlas_feature_crosswalk` maps source-local feature IDs to those
+reviewed global concepts. It must not replace the local `feature_id` owner in the label registry.
+
+The existing label SQL draft had a contradictory foreign key to `canonical_feature_concepts`,
+despite the Drizzle comment and test description naming `atlas_features`. The SQL foreign key now
+references `atlas_features(feature_id)`, and the Drizzle draft documents that SQL-owned constraint
+without importing the malformed generated schema at runtime. `concept_id` remains a separate
+ontology link; domain, capability, and concept vocabularies remain distinct. This corrects draft
+contracts only: no migration was applied and no rows were inserted.
+
+- [x] Confirm the live `atlas_features.feature_id` type and zero-row state using a read-only catalog
+      query.
+- [x] Align the label migration FK, Drizzle declaration note, and contract assertion on
+      `atlas_features(feature_id)`; keep canonical concepts/crosswalk separate.
+- [x] Run the focused static contract suite: 12/12 passed.
+- [ ] Migration owner reviews the source-local identity semantics and the future evidence needed to
+      link a label to a reviewed global concept.
+- [ ] Validate the draft in a disposable PostgreSQL database, then perform rollback/readback
+      rehearsal; do not apply to the live database without separate authorization.
+- [ ] Define an authorized label producer and independent readback before any label rows are
+      admitted. Keep unresolved mappings proposal-only.
+
+Current state: `DRAFT_CONTRACT_ALIGNED_NOT_APPLIED`. The zero-row `atlas_features` catalog means
+the schema can be reviewed now, but it does not provide populated feature identities for an
+end-to-end label-write proof.
+
+### 2026-10-20 operator-approved V2 correction
+
+The source-local FK interpretation above is superseded. Labels are versioned decisions on approved canonical concepts; `atlas_features` remains AST-derived structural evidence. The operator approved the existing V2 local/canonical/crosswalk design for drafting and disposable validation. `20261021_feature_identity_v2.sql` owns this draft using `atlas_feature_concepts`, `atlas_feature_source_identities`, and `atlas_feature_concept_crosswalk`. The older `canonical_feature_concepts` and local-label drafts remain unapplied and superseded.
+
+The label Drizzle declaration now uses the actual V2 canonical foreign key, SQL-equivalent check/index declarations, and canonical-ID columns. The admin query uses the V2 view through an explicit canonical-ID output alias. Feature-label/assembler tests pass 24/24; disposable PostgreSQL 18.4 lifecycle/concurrency/rollback checks pass 19/19. All 319 multi-source IDs, including 94 dotted IDs, and seven product candidates are represented in a fresh checksummed review manifest with complete occurrences and independent local readback. Nothing is automatically mapped or minted. See `docs/reports/parent-atlas-corpus-admission-acceptance-20261020.md` and the coordinating change's `tasks.md`. Production migration, identity population, authenticated browser acceptance, and end-to-end admission remain open.

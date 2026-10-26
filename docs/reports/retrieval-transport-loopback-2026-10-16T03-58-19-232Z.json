@@ -1,0 +1,75 @@
+{
+  "schema": "atlas.retrieval-transport-loopback.v1",
+  "status": "LOOPBACK_TRANSPORT_PROVEN",
+  "observations": [
+    {
+      "schema": "atlas.transport-codec-telemetry.v1",
+      "rpc_transport": "grpc",
+      "http_version": "2",
+      "measurements": {
+        "protobuf_encode": {
+          "calls": 1,
+          "failedCalls": 0,
+          "milliseconds": 1.6044000000001688,
+          "bytes": 30
+        },
+        "protobuf_decode": {
+          "calls": 1,
+          "failedCalls": 0,
+          "milliseconds": 0.6616999999996551,
+          "bytes": 5
+        },
+        "json_stringify": null,
+        "json_parse": null
+      },
+      "canonicalAuthority": false
+    },
+    {
+      "schema": "atlas.transport-codec-telemetry.v1",
+      "rpc_transport": "grpc",
+      "http_version": "2",
+      "measurements": {
+        "protobuf_encode": {
+          "calls": 1,
+          "failedCalls": 0,
+          "milliseconds": 0.6598999999996522,
+          "bytes": 37
+        },
+        "protobuf_decode": {
+          "calls": 1,
+          "failedCalls": 0,
+          "milliseconds": 0.3831000000000131,
+          "bytes": 5
+        },
+        "json_stringify": null,
+        "json_parse": null
+      },
+      "canonicalAuthority": false
+    },
+    {
+      "schema": "atlas.transport-codec-telemetry.v1",
+      "rpc_transport": "http",
+      "http_version": null,
+      "measurements": {
+        "protobuf_encode": null,
+        "protobuf_decode": null,
+        "json_stringify": {
+          "calls": 1,
+          "failedCalls": 0,
+          "milliseconds": 0.03169999999954598,
+          "bytes": 29
+        },
+        "json_parse": {
+          "calls": 1,
+          "failedCalls": 0,
+          "milliseconds": 0.027299999999740976,
+          "bytes": 27
+        }
+      },
+      "canonicalAuthority": false
+    }
+  ],
+  "canonicalAuthority": false,
+  "datastoreWritesPerformed": false,
+  "scope": "Real grpc-js/HTTP loopback fixtures through existing retrieval client; not production service proof"
+}

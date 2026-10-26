@@ -107,16 +107,23 @@ export async function consumeFromQueue(queueName, processor) {
     console.log(`[RabbitMQ] Starting consumer for queue: ${queueName}`);
     await ch.consume(queueName, async (msg) => {
       if (!msg) return;
+      let settled = false;
+      const ack = () => {
+        if (settled) return;
+        settled = true;
+        ch.ack(msg);
+      };
+      const nack = () => {
+        if (settled) return;
+        settled = true;
+        ch.nack(msg, false, false);
+      };
       try {
         const payload = JSON.parse(msg.content.toString());
-        await processor(
-          payload,
-          () => ch.ack(msg),
-          () => ch.nack(msg, false, false)
-        );
+        await processor(payload, ack, nack);
       } catch (error) {
         console.error(`[RabbitMQ] Error processing message from ${queueName}:`, error);
-        ch.nack(msg, false, false);
+        nack();
       }
     });
   } catch (error) {

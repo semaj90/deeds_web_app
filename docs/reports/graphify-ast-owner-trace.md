@@ -1,10 +1,10 @@
 # Graphify AST owner trace
 
-- status: **OWNER_SELECTION_BLOCKED**
-- graphify:daily invokes existing AST facts materializer: **FAIL**
-- canonical owner status: **UNRESOLVED**
+- status: **OWNER_TRACE_PASS**
+- graphify:daily invokes existing AST facts materializer: **PASS**
+- canonical owner status: **IDENTIFIED**
 - replacement wiring: **NOT_WIRED**
 - fallback policy: **NOT_DEFINED**
 - production receipt: **NOT_WIRED**
 
-graphify:daily does not invoke the existing AST facts materializer or the 8095 replacement; select one canonical owner before wiring a replacement.
+The existing AST facts materializer is reachable from graphify:daily; replacement insertion can be evaluated at that boundary.

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { compileStructuralExtractionFabric } from '@deeds/parent-atlas';
 import {
+  buildGraphifyImportResolutionContextsV1,
   graphifyEdgeProjectionCandidateV1Schema,
   mapStructuralFabricToGraphifyProjectionV1,
 } from './graphify-symbol-projection-v1.js';
@@ -12,12 +13,20 @@ const workspaceRevision = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 const sourceRevision = 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 const declarationHash = 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
 
-function makeFabric(overrides: { sourceRevision?: string; workspaceRevision?: string; targetText?: string } = {}) {
+function makeFabric(overrides: {
+  sourceRef?: string;
+  sourceRevision?: string;
+  workspaceRevision?: string;
+  targetText?: string;
+  additionalXrefs?: Array<{ src: string; dst: string; type: string; weight: number }>;
+  exportParent?: boolean;
+} = {}) {
   const srcRev = overrides.sourceRevision ?? sourceRevision;
   const wsRev = overrides.workspaceRevision ?? workspaceRevision;
+  const ref = overrides.sourceRef ?? sourceRef;
   return compileStructuralExtractionFabric({
     schema: 'atlas.structural-extraction-input.v1',
-    source_ref: sourceRef,
+    source_ref: ref,
     source_revision: srcRev,
     workspace_revision: wsRev,
     language: 'typescript',
@@ -30,12 +39,12 @@ function makeFabric(overrides: { sourceRevision?: string; workspaceRevision?: st
         upstream_file_id: 'file-native',
         upstream_symbol_id: 'symbol-parent',
         upstream_chunk_id: 'chunk-parent',
-        source_ref: sourceRef,
+        source_ref: ref,
         language: 'typescript',
         node_type: 'class_declaration',
         kind: 'class',
         symbol_name: 'Example',
-        parent_route: ['module'],
+        parent_route: overrides.exportParent ? ['export_statement', 'function_declaration'] : ['module'],
         parent_context: 'module',
         byte_start: 0,
         byte_end: 90,
@@ -51,7 +60,7 @@ function makeFabric(overrides: { sourceRevision?: string; workspaceRevision?: st
         upstream_file_id: 'file-native',
         upstream_symbol_id: 'symbol-method',
         upstream_chunk_id: 'chunk-method',
-        source_ref: sourceRef,
+        source_ref: ref,
         language: 'typescript',
         node_type: 'method_definition',
         kind: 'method',
@@ -75,6 +84,7 @@ function makeFabric(overrides: { sourceRevision?: string; workspaceRevision?: st
         type: 'CALLS',
         weight: 1,
       },
+      ...(overrides.additionalXrefs ?? []),
     ],
     lsp_observations: [],
     ast_grep_observations: [],
@@ -181,6 +191,7 @@ describe('Graphify symbol projection mapper v1', () => {
       exportsBySourceRef: new Map([
         ['src/lib/helper.ts', new Map([['runHelper', ['upstream-symbol:helper']]])],
       ]),
+      sourceRevisionBySourceRef: new Map([['src/lib/helper.ts', `sha256:${'c'.repeat(64)}`]]),
     };
     const batch = mapFixture({
       importResolutionContextBySourceRef: new Map([[sourceRef, context]]),
@@ -190,6 +201,8 @@ describe('Graphify symbol projection mapper v1', () => {
 
     expect(batch.edges[0]).toMatchObject({
       objectStableSymbolKey: 'upstream-symbol:helper',
+      objectSourceRef: 'src/lib/helper.ts',
+      objectSourceRevision: `sha256:${'c'.repeat(64)}`,
       unresolvedTarget: null,
     });
 
@@ -208,6 +221,102 @@ describe('Graphify symbol projection mapper v1', () => {
       objectStableSymbolKey: null,
       unresolvedTarget: 'helper',
     });
+  });
+
+  it('builds import/export context from one exact multi-file extraction revision and wires it into edge projection', () => {
+    const targetSourceRef = 'src/lib/helper.ts';
+    const targetRevision = 'sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
+    const importerFabric = makeFabric({
+      targetText: 'helper',
+      additionalXrefs: [{
+        src: 'node-parent',
+        dst: "import { Example as helper } from './helper.js';",
+        type: 'IMPORTS',
+        weight: 1,
+      }],
+    });
+    const targetFabric = makeFabric({
+      sourceRef: targetSourceRef,
+      sourceRevision: targetRevision,
+      exportParent: true,
+    });
+    const contexts = buildGraphifyImportResolutionContextsV1([
+      { sourceRef, sourceRevision, workspaceRevision, fabric: importerFabric },
+      { sourceRef: targetSourceRef, sourceRevision: targetRevision, workspaceRevision, fabric: targetFabric },
+    ]);
+    const evidenceByReferenceId = Object.fromEntries(importerFabric.reference_facts.map((fact) => [fact.reference_id, {
+      referenceId: fact.reference_id,
+      evidenceKind: 'treesitter_chunker_xref' as const,
+      startByte: 48,
+      endByte: 56,
+      startRow: 2,
+      endRow: 2,
+      confidence: 1,
+      evidenceRefs: [`fixture:${fact.reference_kind}`],
+    }]));
+
+    const batch = mapFixture({
+      fabric: importerFabric,
+      referenceEvidenceByReferenceId: evidenceByReferenceId,
+      importResolutionContextBySourceRef: contexts.contextsBySourceRef,
+    });
+
+    expect(contexts.canonicalAuthority).toBe(false);
+    expect(contexts.writesPerformed).toBe(false);
+    expect(contexts.checksum).toMatch(/^[a-f0-9]{64}$/);
+    expect(batch.edges.find((candidate) => candidate.referenceId.includes(':helper:'))).toMatchObject({
+      objectStableSymbolKey: targetFabric.symbol_nominations[0]?.symbol_key,
+      objectSourceRef: targetSourceRef,
+      objectSourceRevision: targetRevision,
+      unresolvedTarget: null,
+    });
+  });
+
+  it('rejects import contexts that mix source workspaces or revisions', () => {
+    expect(() => buildGraphifyImportResolutionContextsV1([
+      { sourceRef, sourceRevision, workspaceRevision, fabric: makeFabric() },
+      { sourceRef: 'src/lib/helper.ts', sourceRevision, workspaceRevision: `sha256:${'9'.repeat(64)}`, fabric: makeFabric({
+        sourceRef: 'src/lib/helper.ts',
+        workspaceRevision: `sha256:${'9'.repeat(64)}`,
+      }) },
+    ])).toThrow('GRAPHIFY_IMPORT_CONTEXT_WORKSPACE_REVISION_MISMATCH');
+  });
+
+  it('rejects encoded traversal in import-context source references', () => {
+    const unsafeSourceRef = 'src/%252e%252e/private.ts';
+    expect(() => buildGraphifyImportResolutionContextsV1([
+      {
+        sourceRef: unsafeSourceRef,
+        sourceRevision,
+        workspaceRevision,
+        fabric: makeFabric({ sourceRef: unsafeSourceRef }),
+      },
+    ])).toThrow('GRAPHIFY_IMPORT_CONTEXT_SOURCE_REF_INVALID');
+  });
+
+  it('binds every source revision into the import-context checksum', () => {
+    const targetSourceRef = 'src/lib/helper.ts';
+    const nextTargetRevision = `sha256:${'d'.repeat(64)}`;
+    const original = buildGraphifyImportResolutionContextsV1([
+      { sourceRef, sourceRevision, workspaceRevision, fabric: makeFabric() },
+      {
+        sourceRef: targetSourceRef,
+        sourceRevision: `sha256:${'c'.repeat(64)}`,
+        workspaceRevision,
+        fabric: makeFabric({ sourceRef: targetSourceRef, sourceRevision: `sha256:${'c'.repeat(64)}` }),
+      },
+    ]);
+    const changed = buildGraphifyImportResolutionContextsV1([
+      { sourceRef, sourceRevision, workspaceRevision, fabric: makeFabric() },
+      {
+        sourceRef: targetSourceRef,
+        sourceRevision: nextTargetRevision,
+        workspaceRevision,
+        fabric: makeFabric({ sourceRef: targetSourceRef, sourceRevision: nextTargetRevision }),
+      },
+    ]);
+
+    expect(changed.checksum).not.toBe(original.checksum);
   });
 
   it('keeps the logical symbol key stable when source revision changes', () => {

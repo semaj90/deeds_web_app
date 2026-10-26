@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// Direct llama-server smoke test — hits :8090 with gemma4-legal-iq4xs-direct.gguf
+// Direct llama-server smoke test — hits :8090 with ornith-1.5-9b
 // Usage: node scripts/tests/test-cache-simple.mjs
 //
 // Requirements: llama-server running at :8090 with the canonical Gemma4 GGUF.

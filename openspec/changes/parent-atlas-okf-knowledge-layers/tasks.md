@@ -116,6 +116,24 @@ Duplication Prevention rule ("record what you found, even when you don't fix it"
   than inventing from nothing) — needs an explicit decision before a real
   validator can be built; reconciling the manifest/filesystem drift found
   above (5 declared vs. 3 present domain schemas).
+
+  **2026-10-14 follow-up**: all four current language profiles validate
+  against `.okf/schemas/language-profile-v1.schema.json` (4/4, 31 total
+  symbol kinds; TypeScript has 8 feature rules). Registered the previously
+  omitted Go, Python, and Rust profiles in `.okf/manifest.yaml` and added a
+  regression asserting registry/profile parity. The broader manifest audit
+  now resolves 20/27 references; 7 declared domain/symbol/tool/predicate
+  targets remain missing, plus 2 additional structured files and 1
+  unregistered pipeline file. The blanket `audit-okf-v02-bundle-v1.mjs`
+  result (364 files, 0 meeting its three-field profile) is not whole-corpus
+  conformance proof: the internal v0.2 contract is unratified, the scan
+  applies fields to arbitrary Markdown/YAML, and its parser suppresses YAML
+  syntax errors. Do not bulk-edit metadata or equate it to Google OKF
+  conformance. A path-scoped `git log --all` found no reachable history for
+  any of the seven missing references, so there is no tracked artifact to
+  restore; the owner still needs to choose retirement versus source-backed
+  schemas. Details and commands:
+  `docs/reports/okf-schema-registry-alignment-2026-10-14.md`.
 - [x] Write 6 OKF gap concept files, one per known repo gap (domain lineage, concept edge ledger, representation fragmentation, topology schema drift, cluster run lineage, SOM run lineage), each evidence-linked to a real file/table/line, `status: NOT_PROVEN`, no fabricated claims.
 
   **Unblocked and done, 2026-08-24**: added a minimal `concepts` registry
@@ -494,3 +512,73 @@ taxonomy owner.
 - [ ] **OKF-TOPIC-04** After focused exact-span tests pass, wire the extractor as an
   optional post-normalization stage that writes only run-local JSON/JSONL receipts under
   the existing `docs/.okf/dev` convention. Admission/indexing remains a separate gate.
+
+## 2026-10-13 — OKF, agent, graph, and GPU analysis alignment
+
+This tranche is a plan, not a completion claim. It reuses the existing `.okf`,
+Python sidecar, graph snapshot, semantic retrieval, and GPU executor owners. No
+new canonical store, semantic lane, graph identity, or agent authority is created.
+
+- [ ] **OKF-ALIGN-01 — Separate Google OKF conformance from Atlas metadata policy.**
+  Add tests proving Google OKF v0.2 core conformance (Markdown concept with
+  non-empty `type`; optional metadata families remain optional) independently
+  from the stricter Atlas provenance/trust/lifecycle profile. Label validator
+  outputs with the exact profile. Never report an Atlas-profile failure as
+  Google-format invalidity.
+- [ ] **OKF-ALIGN-02 — Reconcile the root manifest without fabricating schemas.**
+  Inventory each declared domain file against `.okf/domains/`; classify missing
+  declarations as intentionally deferred, stale, or required-but-unimplemented.
+  Update the manifest only after owner review. Do not generate placeholder
+  retrieval/cache/database domains to make the audit green.
+- [ ] **AGENT-ALIGN-01 — Choose one bounded agent runtime owner.** Reconcile the
+  existing TypeScript orchestrator dependencies/import smoke with the Python
+  sidecar boundary. If Python Deep Agents/LangChain is selected, require a
+  reproducible environment/import receipt and explicit model/tool configuration;
+  do not duplicate the workboard, MCP dispatcher, or durable task ledger. Agent
+  execution remains proposal-only until approval and independent proof.
+- [ ] **GRAPH-ALIGN-01 — Freeze a qualified graph-analysis input.** Reuse the
+  existing graph snapshot and canonical node/edge owners. Bind the snapshot ID,
+  graph/source/workspace revisions, typed edge semantics, ordinal-map checksum,
+  and source-evidence references. Reject unresolved, ambiguous, or stale nodes
+  rather than deriving identity from labels, paths, ordinals, or similarity.
+- [ ] **GRAPH-ALIGN-02 — Establish NetworkX CPU reference behavior.** Build a
+  deterministic directed, typed multigraph from the admitted frozen snapshot;
+  preserve parallel relations and edge evidence. Test bounded traversal and
+  graph metrics against exact expected results. Mark fixture-only tests as
+  fixture proof, not live graph proof.
+- [ ] **DATA-ALIGN-01 — Select an offline columnar analysis path by benchmark.**
+  Use the existing Arrow/Parquet and DuckDB owners for a bounded SQL/scan/join
+  baseline; compare Polars lazy/streaming only on a representative frozen input.
+  Record peak memory, elapsed time, rows and checksums. Do not add both engines
+  to production merely because both are available.
+- [ ] **GPU-ALIGN-01 — Separate GPU executor roles and prove shared ordering.**
+  Keep cuGraph for graph algorithms, cuVS/CAGRA for ANN over qualified vectors,
+  cuML for feature clustering, and cuBLAS/PyTorch for dense matrix operations.
+  All inputs and outputs must bind to the same frozen snapshot/ordinal map; GPU
+  results remain advisory and resolve through PostgreSQL before admission.
+- [ ] **GPU-ALIGN-02 — Verify the actual WSL runtime before execution.** Record
+  interpreter path, package versions, driver/toolkit, GPU capability, available
+  memory, and live sidecar health. Package import or `/health` alone does not
+  prove a kernel ran. Do not stop or compete with the active inference service;
+  use the documented GPU lease/idle gate.
+- [ ] **GPU-ALIGN-03 — Treat cuTile as an optional measured challenger.** First
+  verify the supported driver/compiler and device prerequisites, then run a
+  correctness smoke kernel and compare against a CPU reference. Keep ordinary
+  SIMT kernels, cuTile kernels, cuGraph, cuVS, and cuBLAS as separate execution
+  paths; do not mix tile and SIMT functions inside one kernel or replace a
+  working library call without benchmark evidence.
+- [ ] **ALIGN-ACCEPT-01 — Require replayable cross-backend receipts.** For every
+  promoted graph or numeric analysis, store snapshot and ordinal checksums,
+  algorithm/version/parameters, deterministic seed where applicable, output
+  checksum, parity metrics, resource use, and exact validation command. Promotion
+  requires the owning source/revision and candidate-readback gates; no hidden
+  states, KV cache, or raw tensors may be persisted.
+
+### Current status
+
+The OKF contract validator passed, but the strict Atlas v0.2 profile audit and
+domain-manifest reconciliation remain review-required. The Deep Agents/LangChain
+TypeScript import smoke proves imports only, not agent execution. The available
+resident-BFS receipt is fixture-only; current WSL/cuTile live execution and
+corpus-wide semantic indexing are not established. Keep every task above open
+until its owner-specific receipt is independently reviewed.

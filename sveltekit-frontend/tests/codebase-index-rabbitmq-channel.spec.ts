@@ -98,7 +98,7 @@ vi.mock('$lib/server/observability/langfuse.js', () => ({
 vi.mock('$lib/server/env.server.js', () => ({
 	ENV: {
 		OLLAMA_BASE_URL: 'http://localhost:11434',
-		OLLAMA_CHAT_MODEL: 'gemma4-rotorquant:latest',
+		OLLAMA_CHAT_MODEL: 'ornith-1.5-9b',
 		QDRANT_URL: 'http://localhost:6333',
 	},
 }));
@@ -126,7 +126,7 @@ vi.mock('$lib/server/retrieval/document-dag.js', () => ({
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: vi.fn(async () => ({
+	embedOrChatFetch: vi.fn(async () => ({
 		ok: true,
 		json: async () => ({
 			message: { content: 'Legal analysis result.' },

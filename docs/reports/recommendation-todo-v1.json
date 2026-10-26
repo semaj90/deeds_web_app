@@ -1,0 +1,299 @@
+{
+ "schema": "atlas.recommendation-todo.v1",
+ "generatedAt": "2026-10-17",
+ "derivedFrom": {
+  "workboard": "docs/reports/openspec-workboard-v1.json",
+  "workboardGeneratedAt": "2026-10-17T20:04:22.876Z",
+  "summary": {
+   "completedTasks": 7616,
+   "openTasks": 5108,
+   "actionableTasks": 3960,
+   "waitingTasks": 1078,
+   "supersededTasks": 0,
+   "reviewRequiredTasks": 104,
+   "totalTasks": 12724,
+   "progressFraction": 0.5985539138635649,
+   "progressBar": "[######----]",
+   "eta": {
+    "status": "UNKNOWN",
+    "method": "NO_RECEIPT_LINKED_THROUGHPUT"
+   }
+  }
+ },
+ "policy": "ADVISORY: recommended never implies selected; no kanban/DB writes; ordering is the workboard's promotion-critical chain first, then session items.",
+ "items": [
+  {
+   "rank": 1,
+   "source": "openspec-workboard",
+   "title": "parent-atlas-retrieval-lineage-dag-convergence (865/1187)",
+   "why": "Promotion-critical rank 1. Gate: Admitted workspace/source/packet identity and canonical packet revision ownership",
+   "ref": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+   "lane": "GENERAL",
+   "blockedBy": "Execution/source producer authority and PacketRevisionOwnerV1 remain unresolved.",
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 2,
+   "source": "openspec-workboard",
+   "title": "parent-atlas-gate2-chunk-lineage-convergence (3/20)",
+   "why": "Promotion-critical rank 2. Gate: Revision-qualified packet to chunk closure",
+   "ref": "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md",
+   "lane": "GENERAL",
+   "blockedBy": "Current workspace to packet to chunk qualification is not proven; historical bridge is not current authority.",
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 3,
+   "source": "openspec-workboard",
+   "title": "parent-atlas-graph-retrieval-proof (165/293)",
+   "why": "Promotion-critical rank 3. Gate: Revision-qualified packet to AST/span closure",
+   "ref": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+   "lane": "GENERAL",
+   "blockedBy": "AST/tree identity and source-span ownership remain provisional.",
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 4,
+   "source": "openspec-workboard",
+   "title": "parent-atlas-prefill-routing-residency-convergence (127/171)",
+   "why": "Promotion-critical rank 4. Gate: Planning and executor proofs over an admitted candidate cohort",
+   "ref": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md",
+   "lane": "GENERAL",
+   "blockedBy": "Prefill, routing, residency, Qdrant/cuVS, and GPU work are downstream consumers.",
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 5,
+   "source": "openspec-workboard",
+   "title": "parent-atlas-rpc-packet-registry-fabric (30/41)",
+   "why": "Promotion-critical rank 5. Gate: Downstream read surface; no new authority",
+   "ref": "openspec/changes/parent-atlas-rpc-packet-registry-fabric/tasks.md",
+   "lane": "GENERAL",
+   "blockedBy": "Transport is complete but must remain fail-closed until lineage supplies qualified rows.",
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 6,
+   "source": "openspec-workboard:recommendedTasks",
+   "title": "PROMOTION-01 — Keep source lineage, graph identity, feature layout,",
+   "why": "Workboard recommended next task for its change (advisory).",
+   "ref": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md:1624",
+   "lane": "RETRIEVAL_ACE",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 7,
+   "source": "openspec-workboard:recommendedTasks",
+   "title": "2.1 Present the fresh snapshot's readback-proven receipt to the operator and request",
+   "why": "Workboard recommended next task for its change (advisory).",
+   "ref": "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md:36",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 8,
+   "source": "openspec-workboard:recommendedTasks",
+   "title": "**GS1-10-IDENTITY-CONTRACTS-01** Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.",
+   "why": "Workboard recommended next task for its change (advisory).",
+   "ref": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md:39",
+   "lane": "RETRIEVAL_ACE",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 9,
+   "source": "openspec-workboard:recommendedTasks",
+   "title": "ANN-03 Require the same semantic_768 matrix and identity manifest across Qdrant/cuVS.",
+   "why": "Workboard recommended next task for its change (advisory).",
+   "ref": "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md:307",
+   "lane": "RETRIEVAL_ACE",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 10,
+   "source": "openspec-workboard:recommendedTasks",
+   "title": "7.5 Promote only after artifact checksum/shape/dtype readback, canonical identity/revision resolution, replay parity, and an independently validated metric receipt. No database, cache, or tensor-payload writes are author",
+   "why": "Workboard recommended next task for its change (advisory).",
+   "ref": "openspec/changes/parent-atlas-rpc-packet-registry-fabric/tasks.md:65",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 11,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "PF4B-EMBED-02 — freeze representation identity on new canonical",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-pass-fabric/tasks.md:766",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 12,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "Firecrawl capture identity, content hash, evidence revision, and `.okf`",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-ontology-kernel/tasks.md:2703",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 13,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "EVENT-QUEUE-01 Treat Kafka as an optional transport/queue only if a current producer-consumer need is demonstrated; document event identity, ordering, replay, backpressure, and idempotency against canonical packet IDs be",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md:2350",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 14,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "Production daily admission remains **NOT_PROVEN**. The explicitly reviewed existing fabric receipt (`2026-10-16T06:10:29.961Z`, not refreshed here) reports seven open predicates: symbol extraction coverage, semantic owne",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md:605",
+   "lane": "RETRIEVAL_ACE",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 15,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "ORNITH-CACHE-02 measure only server-managed prefix reuse against PrefixIdentityV1:",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md:8",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 16,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "**SOURCE-SYMBOL-AUTHORITY-01** — Close current-source → symbol-version ownership. Foundation",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-code-intel-e2e/tasks.md:8",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 17,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "CAGRA endpoint (`POST /v1/knn/cagra`) with the same bounded identity manifest — tiny-fixture runtime and exact-oracle Recall@3 are proven, but production remains **quarantined** because larger-corpus recall, filter parit",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md:246",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 18,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "Add a revision-qualified centroid manifest/pointer and pass identity before enabling",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md:2931",
+   "lane": "RETRIEVAL_ACE",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 19,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "2.3 Define adapter conformance checks for request identity, source/workspace revisions, authorization result, bounded execution, evidence references, and replay metadata.",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md:11",
+   "lane": "RETRIEVAL_ACE",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 20,
+   "source": "openspec-workboard:parallelFrontier",
+   "title": "Record domain classification as a lineage-linked navigation surface, not canonical identity.",
+   "why": "In the parallel frontier: no unmet declared dependency.",
+   "ref": "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md:84",
+   "lane": "RESEARCH_CHALLENGER_EWIN_TANG",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 21,
+   "source": "session-2026-10-17",
+   "title": "LIN-01 semantic_768 coverage + lineage",
+   "why": "content_embedding_768 is 219,998/274,428 (80%); 54,430 chunks hold a task-prefix vector only in halfvec content_embedding; 0 vectors carry revisions. Decide canonical recipe before any --apply.",
+   "ref": "openspec/changes/legal-corpus-california-codes/tasks.md",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 22,
+   "source": "session-2026-10-17",
+   "title": "Domain crosswalk review",
+   "why": "61,659 feature_domain rows: 23,616 exact, 8,060 case-normalized, 9,068 proposed, 2,408 ambiguous, 13,045 need a group decision. Approve docs/reports/domain-crosswalk-proposal-v1.json before assigning NES LUT ordinals.",
+   "ref": "docs/reports/domain-crosswalk-proposal-v1.json",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 23,
+   "source": "session-2026-10-17",
+   "title": "QUERY-LIFECYCLE-01 repair loop",
+   "why": "Fixture has 0 passing repairs; add a repair loop and the PromptPlan/ContextManifest stages (all currently NOT_RUN).",
+   "ref": "scripts/atlas/query-lifecycle-fixture-v1.mts",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 24,
+   "source": "session-2026-10-17",
+   "title": "Soft daily chain adoption",
+   "why": "Decide whether run-graphify-daily-startup.mjs should call graphify:daily:chain:soft (guard tests lock current wiring).",
+   "ref": "scripts/atlas/graphify-daily-chain-soft-v1.mjs",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 25,
+   "source": "session-2026-10-17",
+   "title": "Drizzle schema sync for new columns/view",
+   "why": "error_logs and kanban_tasks gained workspace_id/source_url/source_revision; chunk_provenance_v1 view exists; Drizzle schema files not updated (direction decision pending).",
+   "ref": "sveltekit-frontend/drizzle/manual/20261017_work_item_source_provenance.sql",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 26,
+   "source": "session-2026-10-17",
+   "title": "Route defects RH-01..03 + Hermes stage evidence",
+   "why": "Three open route defects from the hardening crawl; HERMES-STAGE-EVIDENCE-01 risk recorded.",
+   "ref": "openspec/changes/legal-corpus-california-codes/tasks.md",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  },
+  {
+   "rank": 27,
+   "source": "session-2026-10-17",
+   "title": "Commit scope",
+   "why": "Nothing from this session is committed; many unrelated modified files from other sessions share the tree.",
+   "ref": "git status",
+   "lane": "GENERAL",
+   "blockedBy": null,
+   "state": "RECOMMENDED_NOT_SELECTED"
+  }
+ ],
+ "writesPerformed": false,
+ "canonicalAuthority": false,
+ "checksum": "sha256:4f9bfdbbca027482966cb7b208a7a38eacbca1b947c4fca2096c750452e2df26"
+}

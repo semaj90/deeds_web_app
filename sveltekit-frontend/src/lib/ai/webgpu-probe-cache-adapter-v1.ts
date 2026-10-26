@@ -15,9 +15,10 @@ export async function cacheWebGpuProbeDiagnosticV1({receipt,identity,consent}){
  // Existing cache owner uses its existing short-lived GPU TTL.
  await clientCache.putGPUResult(key,{receipt,checksum,identity:keyData},'webgpu-diagnostic');
  const back=await clientCache.getGPUResult(key);
- if(back?.backend!=='webgpu-diagnostic'||back?.result?.checksum!==checksum)
+ const backResult = back?.result as { checksum?: string; receipt?: unknown } | undefined;
+ if(back?.backend!=='webgpu-diagnostic'||backResult?.checksum!==checksum)
    return {status:'CACHE_READBACK_UNAVAILABLE'};
- const backReceipt=back.result.receipt;
+ const backReceipt=backResult?.receipt;
  const backHash='sha256:'+hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(backReceipt))));
  if(backHash!==checksum)return {status:'CACHE_CHECKSUM_MISMATCH'};
  return {status:'DIAGNOSTIC_CACHED_READBACK_MATCH',checksum,canonicalAuthority:false,admitted:false};

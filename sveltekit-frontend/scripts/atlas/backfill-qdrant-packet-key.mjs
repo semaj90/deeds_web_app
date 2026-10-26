@@ -12,6 +12,9 @@
 
 import pg from 'pg';
 
+console.error('LEGACY_384_PACKET_KEY_BACKFILL_DISABLED: the target collection is retired; do not recreate or enrich it');
+process.exit(2);
+
 const DRY_RUN    = process.argv.includes('--dry-run');
 const APPLY      = process.argv.includes('--apply');
 const COLLECTION = 'codebase_chunks_384_hybrid';

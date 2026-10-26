@@ -24,6 +24,42 @@ export type GroundedExtractionSourceBindingReceiptV1 = {
   writesPerformed: false;
 };
 
+export function assertGroundedExtractionSourceBindingReceiptV1(
+  receipt: GroundedExtractionSourceBindingReceiptV1,
+  expected: { packetKey: string; sourceRef: string; sourceRevision: string; workspaceRevision: string; byteLength: number },
+): void {
+  const payload = {
+    schema: receipt.schema,
+    status: receipt.status,
+    canonicalPacketKey: receipt.canonicalPacketKey,
+    storagePacketKey: receipt.storagePacketKey,
+    packetResolutionSource: receipt.packetResolutionSource,
+    sourceRef: receipt.sourceRef,
+    sourceRevision: receipt.sourceRevision,
+    workspaceRevision: receipt.workspaceRevision,
+    sourceBindingChecksum: receipt.sourceBindingChecksum,
+    submittedTextChecksum: receipt.submittedTextChecksum,
+    byteLength: receipt.byteLength,
+    canonicalAuthority: receipt.canonicalAuthority,
+    writesPerformed: receipt.writesPerformed,
+  };
+  const expectedChecksum = `sha256:${createHash('sha256').update(JSON.stringify(payload), 'utf8').digest('hex')}`;
+  if (receipt.schema !== 'atlas.grounded-extraction-source-binding-receipt.v1'
+    || receipt.status !== 'VERIFIED_SOURCE_BINDING'
+    || receipt.canonicalAuthority !== false
+    || receipt.writesPerformed !== false
+    || receipt.checksum !== expectedChecksum
+    || !/^sha256:[a-f0-9]{64}$/.test(receipt.sourceBindingChecksum)
+    || (receipt.canonicalPacketKey !== expected.packetKey && receipt.storagePacketKey !== expected.packetKey)
+    || receipt.sourceRef !== expected.sourceRef
+    || receipt.sourceRevision !== expected.sourceRevision
+    || receipt.workspaceRevision !== expected.workspaceRevision
+    || receipt.submittedTextChecksum !== expected.sourceRevision
+    || receipt.byteLength !== expected.byteLength) {
+    throw new GroundedExtractionSourceBindingError('SOURCE_BINDING_RECEIPT_MISMATCH');
+  }
+}
+
 export class GroundedExtractionSourceBindingError extends Error {
   constructor(readonly code: string) {
     super(code);

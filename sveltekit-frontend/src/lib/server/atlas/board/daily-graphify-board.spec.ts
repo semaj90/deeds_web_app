@@ -2,6 +2,27 @@ import { describe, expect, it } from 'vitest';
 import { summarizeDailyGraphifyBoard } from './daily-graphify-board.js';
 
 describe('daily graphify board', () => {
+	it('preserves error-fixing reason codes and diagnostic evidence for board cards', () => {
+    const diagnostic = 'SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN row-level provenance is missing.';
+    const summary = summarizeDailyGraphifyBoard({
+      generated: '2026-10-18T00:00:00.000Z',
+      tasks: [{
+        id: 'err-fix:fixture',
+        priority: 'P1',
+        label: 'Semantic owner needs evidence',
+        origin: 'agentic_error_fixing_v1',
+        status: 'PROPOSED',
+        evidence_refs: [diagnostic],
+        reason_codes: ['RETRIEVAL_OR_PROJECTION', 'SEMANTIC_OWNER_PROVEN'],
+      }],
+    }, null);
+
+    const task = summary.columns.flatMap((column) => column.tasks).find((candidate) => candidate.id === 'err-fix:fixture');
+
+    expect(task?.reason_codes).toEqual(['RETRIEVAL_OR_PROJECTION', 'SEMANTIC_OWNER_PROVEN']);
+    expect(task?.evidence_refs).toEqual([diagnostic]);
+  });
+
 	it('separates promoted tasks from review-required intake', () => {
     const board = {
       generated: '2026-07-23T00:00:00.000Z',

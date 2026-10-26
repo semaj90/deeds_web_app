@@ -27,6 +27,19 @@ Audit and safety:
 
 If a feature exists in another lane, carry the logic forward only if it maps cleanly to this stack and does not break canonical feature IDs, labels, or storage ownership.
 
+## Local Deep Research MCP (2026-10-17)
+
+- When asked to use "LDR" or create a deep-research report, reuse the existing `ldr-research` stdio server: `sveltekit-frontend/scripts/mcp/ldr-mcp.mjs`, registered in `.opencode/opencode.jsonc`. Do not create a second research engine or expose generic Docker/shell control to a model. Registration in OpenCode does not prove a tool is available in another agent session.
+- The vendored upstream is LearningCircuit's `local-deep-research` project (`tools/agentic-research/src/local-deep-research`; GitHub `LearningCircuit/local-deep-research`). “LearningCircuit” here names the upstream project; it is not a separate learning-circuit training subsystem.
+- Tool sequence: `ldr.search_history` (authenticated lookup) → `ldr.start_research` (explicitly authorized LDR-local job) → `ldr.poll_status` → `ldr.get_report` (final Markdown/sources). Select one supported search engine and a bounded iteration count. `ldr.quick_summary` is retained only for compatibility and returns an unsupported-operation error.
+- Keep the other research paths distinct: `atlas-ldr-mcp.mjs` exposes `atlas_deep_research` and `atlas_research_health` for repository retrieval through AtlasTaskKernel; TRACE's `ldr_research` tool runs the SvelteKit application orchestrator. Neither is the LearningCircuit Docker MCP, and the Docker MCP does not qualify results into ACE automatically.
+- Credentials load from gitignored `sveltekit-frontend/.env.ldr.local` using `LDR_USERNAME` / `LDR_PASSWORD`; process environment takes precedence. Never print, commit, or include credentials/session tokens in reports. The existing session helper logs in on loopback only, retains cookies in memory, refreshes CSRF after login, and attempts login at most once per MCP process. Restart the MCP process after session expiry; do not bypass authentication.
+- If direct MCP tools are unavailable, use the existing client from the repo root: `node scripts/atlas/ldr-report-v1.mjs --probe`; start an authorized job with `--start --query="RESEARCH QUESTION"`, or resume/export with `--task-id="EXISTING_ID"`. No implicit research launch on probe.
+- Reports and checksummed JSON receipts go to `docs/ldr/`. A pending or blocked receipt is not completed research; jobs may continue in LDR after bounded polling ends. Preserve the task ID for resumption. Treat final research and citations as unreviewed derived proposals, not canonical code evidence or ContextManifest admission.
+- Verified October 17: authenticated MCP history access passed; eight focused tests passed. Completed live research/report generation remains a separate gate. Ornith readiness/model identity must be checked live; an LDR HTTP 401 is authentication failure, not evidence that llama-server is down.
+- Research authorization permits the requested LDR-local history/report artifacts, not canonical PostgreSQL writes, Graphify publication, Qdrant/Neo4j projection, Valkey warming, model/service lifecycle changes, or training. Source-revision backfill stays deferred. No hidden reasoning, KV cache, or tensors may be persisted.
+- Validation: `node --test scripts/atlas/ldr-report-v1.test.mjs scripts/atlas/ldr-session-v1.test.mjs`. Details and closeout fields: `docs/ldr/README.md`.
+
 ## OpenSpec audit execution
 
 ## Main repository and package ownership
@@ -73,6 +86,23 @@ Object storage rule:
 - SeaweedFS is the canonical object store. Do not add new MinIO-first architecture, docs, or feature names.
 - Legacy names such as `minio_key`, `MINIO_*`, or `minio-client.ts` may remain only where the live schema or compatibility layer still requires them.
 - New ingestion paths should describe and generate SeaweedFS or generic S3 object keys, while preserving legacy column names until a deliberate schema rename lands.
+
+## sourceRevision and workspaceRevision (canonical definitions, 2026-10-11)
+
+Use these terms exactly. Agentic workflows must not infer a revision from a filename, mtime, git HEAD alone, or a chunk hash.
+
+| Term | Definition | Owner |
+|---|---|---|
+| `sourceRevision` | `sha256:<64 lowercase hex>` over the exact UTF-8 bytes of one source file. Empty, non-UTF-8, or unreadable files have no `sourceRevision`. | `identity/code-source-revision-v1.ts` (`deriveCodeSourceRevisionV1`) |
+| `workspaceRevision` | `sha256:` over a sorted manifest of `(sourceRef, sourceRevision, contentDigest, byteLength, gitBlobOid)` for the indexed source set. Git commit/tree and `dirty` are provenance only. Non-authoritative. | `identity/workspace-source-binding-v1.ts`, `indexing/workspace-revision-origin-runtime-v1.ts` |
+
+Rules:
+
+- A `sourceRevision` is valid only when the exact bytes were read. Never recompute it from a re-encoded or normalized string.
+- `workspaceRevision` is not a substitute for `sourceRevision`. Compare the two only through a recorded binding.
+- Known gap: files skipped for size (over 5 MB), encoding, or read error are absent from the digest, so two trees differing only in a skipped file share a `workspaceRevision`. Do not cite a `workspaceRevision` as complete coverage until the `v2` hardening lands (skipped-set, extension-set, and excluded-prefix digests).
+- Git blob OIDs (`gitBlobOid`) are provenance anchors, never identity.
+- Each revision is a separate namespace from `packet_key`, `chunk_content_hash`, `representation_revision`, and `feature_revision`.
 
 ## Binary bytes, SHA-256, and Parent Atlas revision lineage (2026-09-16)
 
@@ -130,6 +160,13 @@ DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU identifiers remain projection
 
 RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
 
+### Qdrant document point IDs
+
+- `deterministicPointId()` remains the legacy integer helper; do not silently change its return type or existing callers.
+- New document-index experiments may use `deterministicQdrantDocumentPointIdV1()` with the separately derived, frozen `QDRANT_DOCUMENT_POINT_NAMESPACE_V1` and the length-framed tuple `(packetKey, chunkId, sourceRevision, representationRevision, embeddingModelRevision)`.
+- Record `uuidAlgorithm`, `uuidNamespace`, `uuidName`, and `canonicalIdentity: false` in any derived-index manifest. The UUID is a projection key, not packet identity or upsert authorization.
+- Do not switch an indexer or migrate persisted IDs until the exact canonical input fields, existing integer-ID compatibility, collection state, and independent readback are reviewed and the migration is explicitly authorized.
+
 ## Embedding executor fallback
 
 - For read-only retrieval diagnostics, first health-check the configured approved embedding executors (including strict `:8081` and other configured services). If they are unavailable, retry with Ollama `embeddinggemma:latest` at `:11434` rather than abandoning the diagnostic immediately.
@@ -144,6 +181,11 @@ RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
 - A successful TRACE/MCP call or FastAPI NLP health response does not establish ACP/A2A protocol conformance, Mastra/OpenCode MCP integration, a trusted non-human reviewer, source/module digest parity, evidence admission, or human authorization. Report each as unverified unless its owning protocol and evidence checks pass.
 - Model, agent, HMM, or Viterbi review/routing may produce advisory proposals only. Tool invocation remains governed by the existing allowlisted registry, input/output schema validation, permissions, execution policy, and independent readback. Never infer authorization from a score, tool name, or successful health check.
 - Ontology tuples must come from grounded typed relations and the existing tuple admission owner; Oaklib term resolution, cosine/centroid similarity, summaries, cache hints, and TaskCard admission do not create relation evidence. ContextManifest synthesis must consume independently admitted evidence and bind its receipt to the exact manifest, model, and prompt revisions.
+- Cross-runtime serialization and transport tiers:
+  - `simdjson` N-API threshold: use native V8 `JSON.parse()` for $< 1\text{ KB}$; dispatch to native N-API addon (`simd_bridge_rs.node` / `tensorrt_bridge.node`) via `parseNdjsonTypedEvidence` for $\ge 1\text{ KB}$ (NDJSON, bulk batches). Validate via Zod before promoting to `TypedEvidenceEnvelopeV1`.
+  - Python OakLib `Tuple[str, str, str, float]` serializes over HTTP JSON as arrays `[s, p, o, conf]`. TypeScript maps them as `RawOaklibTuple = readonly [string, string, string, number?]` and adapts into structured `OntologyLinkedTupleV1`.
+  - Tuples must be committed to PostgreSQL `atlas_ontology_linked_tuples` before writing to Valkey cache via `buildOntologyLinkedTupleCachePlan`. Valkey cache plans are partitioned by centroid keys (`atlas:centroid:domain:...`, `atlas:centroid:kmeans:...`, `atlas:centroid:som:...`). Review candidates are derived via `deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1` fail-open only from verified persisted tuples.
+  - Transport Matrix: Browser $\leftrightarrow$ SvelteKit uses `tRPC`; SvelteKit $\leftrightarrow$ Python NLP/OakLib uses `FastAPI` (HTTP/NDJSON); SvelteKit $\leftrightarrow$ Go Retrieval uses `gRPC`; SvelteKit $\leftrightarrow$ Valkey uses `RESP3` (`ioredis` with credentials and error handlers).
 
 ## GPU lane switch: WSL2 miniforge/conda work vs the Ornith :8090 server (2026-10-04)
 
@@ -161,3 +203,25 @@ VS Code tasks (Terminal > Run Task; defined in `.vscode/tasks.json`; lifecycle i
 | bring it back | `TurboQuant: Start (vision, CPU projector, :8090)` then Status | expect `vision=True`; never leave `:8090` down silently |
 
 Rules: check `:8090/slots` is idle and ask the operator before stopping; never `taskkill /IM llama-server.exe` (Ollama's embedding runner shares the image name); never force-kill. While `:8090` is down, chat, tool loop, synthesis, captioning and the `:8085` proxy fail (Ollama embeddings, Postgres, Qdrant and the app keep running). Known: `run_cuvs_soft_kmeans` fails on cuvs 26.6.0 until `pairwise_distance` output is wrapped with `cp.asarray` (see the lane-consolidation `tasks.md`, 2026-10-04).
+
+## Parallelism optimization policy (2026-10-21)
+
+- **Measure first.** Time the serial run and record the baseline before adding concurrency. Keep the serial path as the replay mode and the oracle for results.
+- **Bounded pools only.** Default concurrency 2–4 with a hard cap; record the concurrency used in the receipt. Do not raise it without checking peak memory and repeat-run stability.
+- **Independent work only.** Parallelise independent readers of one frozen input. Keep dependent stages (binding, reconciliation, authority, final writes) ordered. Any failed unit blocks downstream stages.
+- **Run-scoped outputs.** Pooled units write unique, run-scoped outputs that share one run and input identity. Never let two units write the same file or key.
+- **Stdio MCP servers are expensive.** Each lane call may spawn a process (a cold `npx` start takes about 10 s). Cap concurrent calls per server at 1 for `npx`-spawned servers, and reuse a session where the server supports it.
+- **CPU pools for CPU work.** Parsing, chunking, AST, JSON and joins use CPU worker pools. GPU is for measured tensor kernels only, with CPU-oracle parity.
+- **Side effects stay serial.** No parallel writes to PostgreSQL, Valkey, Qdrant or Neo4j. Writes follow the existing gates, one owner at a time.
+- **Caching is not proof.** A cache hit never substitutes for evidence. Cache only rebuildable intermediates keyed by revision and checksum.
+
+### MCP query-batch profile
+
+- The 50-query golden-breadth runner is currently sequential. Its serial receipt is the baseline; do not claim a speedup until a repeatable comparison exists.
+- A future query-level pool may use at most four independent queries, preserving the frozen query-set hash and output order. Keep provider calls as distinct lanes with separate per-server semaphores; start at one in-flight call per MCP server. In particular, serialize Svelte `npx` stdio calls because each currently starts a process and has a costly cold start. Raise a lane cap only after a bounded concurrency/replay test.
+- Each query gets an isolated result; one lane failure is recorded, never silently dropped. Merge results and write the single run manifest serially after all workers settle. A partial run is not complete.
+- Keep retrieval results marked untrusted candidate evidence. Do not inject raw MCP text into Ornith/ACE, create “gold” relevance labels, or warm Valkey centroid/query keys from unreviewed results. Cache writes remain a separate authorized, revision-qualified step with independent readback.
+- CPU parsing, JSON normalization, checksumming, and source enrichment use measured bounded CPU pools. A larger system RAM budget or Node heap flag is not evidence that concurrency is safe; record RSS/heap, latency, timeout, and repeat-run behavior first.
+- **GPU batch work is deferred.** Do not use a GPU for JSON, AST parsing, or MCP fanout. A later GPU batch enhancement must use an existing numerical executor/owner, frozen revisioned inputs, bounded batch/memory limits, CPU-oracle parity, operator resource approval, and its own OpenSpec/receipt. Do not stop or replace `:8090` without the existing GPU-window approval path.
+
+The `.okf/indexes/feature-intelligence.yaml` policy defines PostgreSQL authority, logical lanes, rebuildable projections, executor roles, and projection receipts. It does **not** define Valkey/BitFrost cache policy, model KV state, or thread/concurrency limits; use the runtime rules in `AGENTS.md`/`CLAUDE.md` for those concerns.

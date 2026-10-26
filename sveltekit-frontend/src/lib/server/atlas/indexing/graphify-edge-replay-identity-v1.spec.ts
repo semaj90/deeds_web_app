@@ -16,6 +16,8 @@ const edge = (over: Record<string, unknown> = {}): GraphifyEdgeProjectionCandida
   subjectStableSymbolKey: 'sym:a.ts#fnA',
   predicate: 'CALLS',
   objectStableSymbolKey: 'sym:b.ts#fnB',
+  objectSourceRef: 'src/b.ts',
+  objectSourceRevision: REV_B,
   unresolvedTarget: null,
   evidenceKind: 'AST_REFERENCE',
   evidenceSpan: { startByte: 10, endByte: 20, startRow: 1, endRow: 1 },
@@ -46,11 +48,14 @@ describe('graphify_edges replay identity (GSP-5 groundwork)', () => {
   it('every identity input changes the key', () => {
     const base = deriveGraphifyEdgeReplayVerdictV1(edge(), ctx).edgeKey;
     const variants: [string, GraphifyEdgeProjectionCandidateV1, GraphifyEdgeReplayContextV1][] = [
+      ['workspaceId', edge({ workspaceId: '22222222-2222-4222-8222-222222222222' }), ctx],
       ['predicate', edge({ predicate: 'IMPORTS' }), ctx],
       ['subject', edge({ subjectStableSymbolKey: 'sym:a.ts#other' }), ctx],
-      ['object', edge({ objectStableSymbolKey: 'sym:a.ts#fnC' }), ctx],
+      ['object', edge({ objectStableSymbolKey: 'sym:a.ts#fnC', objectSourceRef: 'src/a.ts', objectSourceRevision: REV_A }), ctx],
+      ['targetSourceRef', edge({ objectSourceRef: 'src/c.ts' }), ctx],
+      ['sourceRef', edge({ sourceRef: 'src/other.ts' }), ctx],
       ['sourceRevision', edge({ sourceRevision: REV_B }), ctx],
-      ['targetSourceRevision', edge(), { ...ctx, targetSourceRevisionOf: () => REV_A }],
+      ['targetSourceRevision', edge({ objectSourceRevision: REV_A }), { ...ctx, targetSourceRevisionOf: () => REV_A }],
       ['graphRevision', edge(), { ...ctx, graphRevision: 'sha256:graph2' }],
       ['producerRevision', edge(), { ...ctx, producerRevision: 'p2' }],
     ];
@@ -63,6 +68,7 @@ describe('graphify_edges replay identity (GSP-5 groundwork)', () => {
     expect(code(edge({ subjectStableSymbolKey: ' ' }))).toBe('UNRESOLVED_SOURCE');
     expect(code(edge({ sourceRevision: 'HEAD' }))).toBe('SOURCE_REVISION_UNBOUND');
     expect(code(edge({ objectStableSymbolKey: 'sym:zzz.ts#x' }))).toBe('TARGET_REVISION_UNBOUND');
+    expect(code(edge({ objectSourceRevision: REV_A }))).toBe('TARGET_BINDING_MISMATCH');
     expect(code(edge(), { workspaceRevisionKey: WS, graphRevision: 'g', producerRevision: 'p' })).toBe('TARGET_REVISION_UNBOUND');
     expect(code(edge({ workspaceRevision: `sha256:${'d'.repeat(64)}` }))).toBe('WORKSPACE_REVISION_MISMATCH');
     expect(code(edge({ evidenceRefs: [], evidenceSpan: { startByte: 5, endByte: 5, startRow: 1, endRow: 1 } }))).toBe('EVIDENCE_UNBOUND');
@@ -73,6 +79,13 @@ describe('graphify_edges replay identity (GSP-5 groundwork)', () => {
     const plan = planGraphifyEdgeReplayV1([edge(), site2, edge()], ctx);
     expect(plan.admitted).toHaveLength(1);
     expect(plan.admitted[0].evidence).toHaveLength(2);
+    expect(plan.admitted[0]).toMatchObject({
+      workspaceId: '11111111-1111-4111-8111-111111111111',
+      sourceRef: 'src/a.ts',
+      workspaceRevision: WS,
+      graphRevision: ctx.graphRevision,
+      producerRevision: ctx.producerRevision,
+    });
     expect(plan.counts).toMatchObject({ total: 3, ADMITTED: 3, mergedEvidenceEntries: 2, collisions: 0 });
     expect(plan.collisions).toEqual([]);
   });

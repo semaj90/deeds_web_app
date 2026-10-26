@@ -1,9 +1,9 @@
 import { ENV } from '$lib/server/env.server.js';
 import {
   getOllamaEndpoint,
-  getOllamaChatEndpoint,
+  getLlamaChatEndpoint,
   getOllamaEmbeddingEndpoint,
-  getOllamaGenerationEndpoint,
+  getLlamaGenerationEndpoint,
 } from '$lib/server/utils/ollama-endpoint.js';
 
 export function getLegalGatewayUrl(): string {
@@ -19,7 +19,7 @@ export function getOllamaUrl(): string {
 }
 
 export function getOllamaChatUrl(): string {
-  return getOllamaChatEndpoint();
+  return getLlamaChatEndpoint();
 }
 
 export function getOllamaEmbeddingUrl(): string {
@@ -27,7 +27,7 @@ export function getOllamaEmbeddingUrl(): string {
 }
 
 export function getOllamaGenerationUrl(): string {
-  return getOllamaGenerationEndpoint();
+  return getLlamaGenerationEndpoint();
 }
 
 export function getDatabaseUrl(): string {

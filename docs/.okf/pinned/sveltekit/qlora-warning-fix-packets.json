@@ -1,0 +1,70 @@
+{
+  "$schema": "https://deeds-web-app.internal/schemas/ace-packet.v1.json",
+  "packet_id": "ace:packet:qlora-sveltekit-warnings-v1",
+  "created_at": "2026-10-17T21:47:30Z",
+  "ttl_seconds": 604800,
+  "concept_id": "concept:sveltekit2:runes_a11y_hardening:v1",
+  "source_ref": "docs/.okf/pinned/sveltekit/DIAGNOSTIC_WARNINGS_FIXES.md",
+  "confidence_score": 0.98,
+  "canonical_authority": false,
+  "writes_performed": false,
+  "nes_lut": {
+    "domain": "ui",
+    "palette_byte": "0x2A",
+    "palette_name": "NES_2C02_CYAN_LIGHT",
+    "prior_weight": 0.95,
+    "predicate": "implements"
+  },
+  "oak_python_tuple": "(\"docs/.okf/pinned/sveltekit/DIAGNOSTIC_WARNINGS_FIXES.md\", \"concept:sveltekit2:runes_a11y_hardening:v1\", \"0x2A\", \"OPTION[RESOLVE_SVELTE_A11Y_WARNINGS]\", 0.98, 64, \"implements\")",
+  "prompt_injection_guard": {
+    "hidden_thoughts_persisted": false,
+    "forbidden_payloads": [
+      "hiddenThoughts",
+      "chainOfThought",
+      "kv_cache",
+      "raw_tensor"
+    ],
+    "max_context_bytes": 16384
+  },
+  "warning_distribution": {
+    "total_warnings": 186,
+    "total_files": 72,
+    "breakdown": {
+      "a11y_label_has_associated_control": 68,
+      "css_unused_selector": 46,
+      "a11y_click_events_have_key_events": 36,
+      "a11y_no_static_element_interactions": 22,
+      "a11y_interactive_supports_focus": 9,
+      "state_referenced_locally": 5
+    }
+  },
+  "qlora_training_samples": [
+    {
+      "id": "qlora-warn-001",
+      "instruction": "Resolve Svelte warning a11y_label_has_associated_control in a legal form field.",
+      "input": "<label class=\"block text-xs font-mono uppercase text-muted-foreground\">Evidence Type</label>\n<select bind:value={selectedType} class=\"w-full bg-background border px-3 py-2\">\n  <option value=\"document\">Document</option>\n</select>",
+      "output": "<label class=\"block text-xs font-mono uppercase text-muted-foreground\" for=\"evidence-type-select\">Evidence Type</label>\n<select id=\"evidence-type-select\" bind:value={selectedType} class=\"w-full bg-background border px-3 py-2\">\n  <option value=\"document\">Document</option>\n</select>",
+      "rationale": "Associates the label element with the input via matching for and id attributes to satisfy WCAG 2.1 accessibility criteria."
+    },
+    {
+      "id": "qlora-warn-002",
+      "instruction": "Resolve Svelte warning a11y_click_events_have_key_events and a11y_no_static_element_interactions for a modal backdrop.",
+      "input": "<div class=\"modal-backdrop\" onclick={closeModal}>\n  <div class=\"modal-content\" onclick={(e) => e.stopPropagation()}>\n    <h2>Case Analysis</h2>\n  </div>\n</div>",
+      "output": "<div class=\"modal-backdrop\" onclick={closeModal} onkeydown={(e) => { if (e.key === 'Escape') closeModal(); }} role=\"presentation\">\n  <div class=\"modal-content\" onclick={(e) => e.stopPropagation()} role=\"dialog\" aria-modal=\"true\" tabindex=\"-1\">\n    <h2>Case Analysis</h2>\n  </div>\n</div>",
+      "rationale": "Adds role='presentation' to the clickable backdrop and turns the inner card into an accessible dialog with keyboard Escape dismissal and tabindex='-1'."
+    },
+    {
+      "id": "qlora-warn-003",
+      "instruction": "Resolve Svelte warning state_referenced_locally when capturing props in superForm initialization.",
+      "input": "let { initialData }: Props = $props();\nconst { form } = superForm(getInitialData(), {\n  SPA: !initialData ? true : undefined\n});",
+      "output": "let { initialData }: Props = $props();\nlet isSpaMode = $derived(!initialData);\nconst { form } = superForm(getInitialData(), {\n  SPA: isSpaMode ? true : undefined\n});",
+      "rationale": "Wraps prop-derived state in $derived rune to ensure reactivity is tracked across prop updates instead of being captured statically at mount time."
+    }
+  ],
+  "feature_matrix_spec": {
+    "batch_size": 3,
+    "feature_columns": 25,
+    "dma_alignment_bytes": 4,
+    "tensorrt_rtx_output_shape": [3, 64]
+  }
+}

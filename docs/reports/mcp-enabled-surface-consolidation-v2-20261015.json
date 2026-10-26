@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.mcp-enabled-surface-consolidation.v2",
+  "observedAt": "2026-10-15T22:47:19Z",
+  "supersedes": "docs/reports/mcp-enabled-surface-consolidation-v1-20261015.json",
+  "status": "PARTIAL",
+  "staticRegistrationAudit": {
+    "command": "node scripts/audit-mcp-tool-surface.mjs --json",
+    "scanner": "TypeScript AST; comments and strings are not treated as executable calls",
+    "scope": "sveltekit-frontend/src/mcp/**/*.ts direct server.registerTool calls with literal names and object schemas",
+    "registrations": 191,
+    "uniqueNames": 190,
+    "gatedRegistrations": 2,
+    "collisions": [
+      { "name": "context.prefetch_feature_context", "locations": ["src/mcp/new_tools.ts:487", "src/mcp/trace-mcp-server.ts:7892"] }
+    ],
+    "commentFalsePositiveRemoved": {
+      "name": "trace.kag_search",
+      "location": "src/mcp/dispatcher-tool-integration.ts:25",
+      "reason": "Example registration appears only in a block comment."
+    },
+    "factoryAliasFalsePositivesRemoved": "Calls to createToolWithDispatcher(...) create per-registration wrappers and are not shared handler references; alias detection now considers direct identifier/property references only.",
+    "auditOk": false,
+    "fixtureValidation": {
+      "command": "node scripts/audit-mcp-tool-surface.mjs --json --with-fixtures",
+      "registrations": 194,
+      "uniqueNames": 192,
+      "expectedFixtureCollision": "kb.trace_search",
+      "expectedSharedHandlerAlias": ["fake.canonical", "fake.alias"],
+      "exitCode": 1,
+      "interpretation": "Expected: adversarial fixture defects are detected."
+    }
+  },
+  "runtimeEvidence": {
+    "traceHttp": { "status": "SCHEMA_COMPILE_PASS", "tools": 193, "schemasCompiled": 193, "schemaErrors": 0, "toolsetSha256": "5024992e6d512be7d6c9355f95ad0e3452c6733f2f21914cdc55bc9aa0ea4199", "receipt": "docs/reports/mcp-tool-surface-schema-validation-v1-20261015.json" },
+    "atlasToolsStdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 10, "schemasCompiled": 10, "schemaErrors": 0, "toolsetSha256": "9d9f6e8209a5a507555b2c187beb13eb0670fb5fe44edcbc4dd89ec0ef9f3bc5" },
+    "atlasTaskKernelStdio": { "status": "LIST_ONLY_SCHEMA_COMPILE_PASS_INITIALIZE_UNVERIFIED", "tools": 6, "schemasCompiled": 6, "schemaErrors": 0, "toolsetSha256": "2d12425b2d56c782578f637506557ecc1e4054bbc6d3e9203f12a18b680d3b12" },
+    "gemma4OffloadStdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 9, "schemasCompiled": 9, "schemaErrors": 0, "toolsetSha256": "de3e25fb5be7e107c121baa5773b56ab7bf45eb5a43484bc4b9cd7f7a2d52fba" },
+    "engramEmbedStdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 11, "schemasCompiled": 11, "schemaErrors": 0, "toolsetSha256": "aa36aecc19eeabf7aff0d4bd3b2c30cfc8c7475a397be5327644098287a2b901" },
+    "ldrMcpStdio": { "status": "SCHEMA_COMPILE_PASS", "tools": 4, "schemasCompiled": 4, "schemaErrors": 0, "toolsetSha256": "99f01b19f2dd3f470fbf9eadd22afeda5c479b5476c084dbd94a8f4ab963ee2" },
+    "turbovecHttp": { "status": "INITIALIZE_404", "url": "http://127.0.0.1:8791/mcp", "toolCalls": 0, "response": "{\"error\": \"not found\"}" }
+  },
+  "runtimeDuplicateObservation": {
+    "context.prefetch_feature_context": 1,
+    "trace.kag_search": 1,
+    "sourceBuildIdentityVerified": false
+  },
+  "notProbed": ["root .mcp.json playwright server", "root .mcp.json socraticode server", "disabled frontend turbovec-sidecar at :8099"],
+  "configurationDrift": "Root .mcp.json, root .opencode/opencode.jsonc, and sveltekit-frontend/opencode.json advertise different MCP server sets.",
+  "toolCalls": 0,
+  "canonicalAuthority": false,
+  "persistentWritesPerformed": false,
+  "conclusion": "Schema compilation passes for the six tested live surfaces, but one source-level duplicate, task-kernel lifecycle uncertainty, a TurboVec 404, unprobed root servers, and source/runtime/config parity gaps keep readiness PARTIAL."
+}

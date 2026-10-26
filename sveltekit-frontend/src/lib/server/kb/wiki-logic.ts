@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { count, eq, ilike, or } from 'drizzle-orm';
-import { ENV } from '../env.server.js';
+import { resolveCouchDbConfigV1 } from '../config/couchdb-config.js';
 import { getRedis } from '../redis.js';
 import { db } from '../db/client.js';
 import { enhancedGraphMappings } from '../db/schema/graph-mappings.js';
@@ -510,13 +510,12 @@ async function scanRedisKeys(redis: any, pattern: string): Promise<string[]> {
 }
 
 async function couchFetch(pathname: string, init: RequestInit = {}) {
-  const user = process.env.COUCHDB_USER ?? 'admin';
-  const pass = process.env.COUCHDB_PASS ?? 'password';
-  return fetch(`${ENV.COUCHDB_URL}${pathname}`, {
+  const couchDb = resolveCouchDbConfigV1(process.env);
+  return fetch(`${couchDb.baseUrl}${pathname}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`,
+      Authorization: couchDb.authorization,
       ...(init.headers as Record<string, string> | undefined),
     },
   });

@@ -1,0 +1,2190 @@
+{
+ "schema": "atlas.unknowns-enrichment-real.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuUsed": false,
+ "canonicalAuthority": false,
+ "inputs": {
+  "chunksSampled": 9000,
+  "labeledChunks": 8979,
+  "unknownChunks": 21,
+  "train": 6798,
+  "test": 2181,
+  "classes": 29,
+  "split": "GroupShuffleSplit by first 4 path components, seed 17",
+  "labels": "LEGACY feature_domain.domain_class (weak); unknown = Other/Classification failed"
+ },
+ "centroidModel": {
+  "table": "atlas_cluster_models",
+  "id": 3,
+  "modelVersion": "mbk-spherical-content768-k256-v1",
+  "k": 256,
+  "dim": 768,
+  "fittedAt": "2026-07-16 20:02:13.840545+00",
+  "sourceColumn": "codebase_chunk_index.content_embedding",
+  "centroidBytesSha256": "sha256:59ea04d6d07f3d3b8fb9643a422e1d86653b0ea21bb041fb8a9c149cd1d0b9a1",
+  "stale": true,
+  "staleEvidence": "KMEANS-REPLAY-01: 81.25 percent of stored assignments reproduce; on this sample nearest-centroid equals stored cluster for 81.52 percent"
+ },
+ "atenDescriptor": {
+  "library": "torch",
+  "version": "2.8.0+cu128",
+  "device": "cpu",
+  "chunkTensor": {
+   "dtype": "float32",
+   "shape": [
+    9000,
+    768
+   ]
+  },
+  "centroidTensor": {
+   "dtype": "float32",
+   "shape": [
+    256,
+    768
+   ]
+  },
+  "zeroCopyFromNumpy": true,
+  "rawTensorsPersisted": false
+ },
+ "results": {
+  "majority": {
+   "accuracy": 0.4952,
+   "macroF1": 0.0245
+  },
+  "complement_nb_path_tfidf": {
+   "accuracy": 0.7469,
+   "macroF1": 0.476
+  },
+  "xgboost_path_svd48": {
+   "accuracy": 0.7996,
+   "macroF1": 0.5259,
+   "seconds": 9.1,
+   "training": {
+    "resumeStatus": "TRAINED",
+    "completedRounds": 120,
+    "checkpoint": ".tmp\\atlas\\enrich-real-v1\\models\\xgboost_path_svd48.json",
+    "inputFingerprint": "sha256:043b71a70eafa8b36304c9bc1eace6b1508612e332d99b694eb79e40ae39d9df"
+   }
+  },
+  "xgboost_path_svd48_plus_centroid_features": {
+   "accuracy": 0.7923,
+   "macroF1": 0.5124,
+   "seconds": 15.1,
+   "training": {
+    "resumeStatus": "TRAINED",
+    "completedRounds": 120,
+    "checkpoint": ".tmp\\atlas\\enrich-real-v1\\models\\xgboost_path_svd48_plus_centroid_features.json",
+    "inputFingerprint": "sha256:2e680c6395323629b708d2f64f0413702f017c6e3a1a69337bc8dfde9b77d50c"
+   }
+  },
+  "xgboost_centroid_features_only": {
+   "accuracy": 0.6414,
+   "macroF1": 0.2461,
+   "seconds": 11.9,
+   "training": {
+    "resumeStatus": "TRAINED",
+    "completedRounds": 120,
+    "checkpoint": ".tmp\\atlas\\enrich-real-v1\\models\\xgboost_centroid_features_only.json",
+    "inputFingerprint": "sha256:ba2ee79901f74f326cffe2de4ca198ed8f50ecfecb9ec7dfb4d658893105e4fc"
+   }
+  }
+ },
+ "pos": {
+  "status": "COMPLETED",
+  "endpoint": "http://127.0.0.1:8095/pos",
+  "spacyModel": "en_core_web_sm",
+  "taggedCount": 21,
+  "totalQueried": 21
+ },
+ "records": [
+  {
+   "chunkId": "b795acfa-4a8f-4f47-93d7-353c0b9144c1",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9983
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0002
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.8061,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.8061
+    },
+    {
+     "rank": 2,
+     "centroidId": 227,
+     "cosine": 0.7794,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4917
+    },
+    {
+     "rank": 3,
+     "centroidId": 251,
+     "cosine": 0.765,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3825
+    },
+    {
+     "rank": 4,
+     "centroidId": 149,
+     "cosine": 0.7374,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.3176
+    },
+    {
+     "rank": 5,
+     "centroidId": 54,
+     "cosine": 0.7367,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.285
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "982148a1-5f24-4020-b9ad-ba8ebacc3fa7",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 188,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9981
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0009
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0004
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 188,
+     "cosine": 0.7222,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7222
+    },
+    {
+     "rank": 2,
+     "centroidId": 183,
+     "cosine": 0.6777,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4276
+    },
+    {
+     "rank": 3,
+     "centroidId": 81,
+     "cosine": 0.6584,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3292
+    },
+    {
+     "rank": 4,
+     "centroidId": 146,
+     "cosine": 0.6543,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2818
+    },
+    {
+     "rank": 5,
+     "centroidId": 173,
+     "cosine": 0.6014,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2327
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "3fa73a4d-3edd-401c-bdc6-079b35960b58",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 188,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9987
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0006
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 188,
+     "cosine": 0.7499,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7499
+    },
+    {
+     "rank": 2,
+     "centroidId": 183,
+     "cosine": 0.7253,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4576
+    },
+    {
+     "rank": 3,
+     "centroidId": 146,
+     "cosine": 0.6433,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3217
+    },
+    {
+     "rank": 4,
+     "centroidId": 81,
+     "cosine": 0.6419,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2764
+    },
+    {
+     "rank": 5,
+     "centroidId": 173,
+     "cosine": 0.627,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2425
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "57560b30-074d-4f23-9cec-5c01f37710c9",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9984
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0007
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.7989,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7989
+    },
+    {
+     "rank": 2,
+     "centroidId": 251,
+     "cosine": 0.7147,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4509
+    },
+    {
+     "rank": 3,
+     "centroidId": 41,
+     "cosine": 0.7111,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3556
+    },
+    {
+     "rank": 4,
+     "centroidId": 149,
+     "cosine": 0.703,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.3028
+    },
+    {
+     "rank": 5,
+     "centroidId": 188,
+     "cosine": 0.6927,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.268
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "405d9016-e6cf-4402-a849-22dcca7f5d02",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 188,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9984
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0007
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 188,
+     "cosine": 0.7278,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7278
+    },
+    {
+     "rank": 2,
+     "centroidId": 183,
+     "cosine": 0.6872,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4336
+    },
+    {
+     "rank": 3,
+     "centroidId": 146,
+     "cosine": 0.6546,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3273
+    },
+    {
+     "rank": 4,
+     "centroidId": 47,
+     "cosine": 0.6417,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2764
+    },
+    {
+     "rank": 5,
+     "centroidId": 81,
+     "cosine": 0.6332,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.245
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "962acaca-b091-47b7-abb1-041976e747cc",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9984
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0007
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0002
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.8142,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.8142
+    },
+    {
+     "rank": 2,
+     "centroidId": 149,
+     "cosine": 0.7627,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4812
+    },
+    {
+     "rank": 3,
+     "centroidId": 251,
+     "cosine": 0.7594,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3797
+    },
+    {
+     "rank": 4,
+     "centroidId": 204,
+     "cosine": 0.7097,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.3056
+    },
+    {
+     "rank": 5,
+     "centroidId": 188,
+     "cosine": 0.7049,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2727
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "b833a977-60ad-4185-9263-09927ac17976",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 188,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9981
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0007
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0006
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 188,
+     "cosine": 0.7283,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7283
+    },
+    {
+     "rank": 2,
+     "centroidId": 146,
+     "cosine": 0.6973,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4399
+    },
+    {
+     "rank": 3,
+     "centroidId": 183,
+     "cosine": 0.6851,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3425
+    },
+    {
+     "rank": 4,
+     "centroidId": 47,
+     "cosine": 0.6758,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2911
+    },
+    {
+     "rank": 5,
+     "centroidId": 81,
+     "cosine": 0.6577,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2544
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "01c6caaa-1cbd-4b92-a488-e6b6c17385de",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9984
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0007
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.8027,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.8027
+    },
+    {
+     "rank": 2,
+     "centroidId": 173,
+     "cosine": 0.7136,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4503
+    },
+    {
+     "rank": 3,
+     "centroidId": 188,
+     "cosine": 0.7127,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3563
+    },
+    {
+     "rank": 4,
+     "centroidId": 81,
+     "cosine": 0.7031,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.3028
+    },
+    {
+     "rank": 5,
+     "centroidId": 146,
+     "cosine": 0.6889,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2665
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "68f38d7f-8fe3-4317-af54-ef49df95eec2",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9984
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0007
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.7946,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7946
+    },
+    {
+     "rank": 2,
+     "centroidId": 149,
+     "cosine": 0.7112,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4487
+    },
+    {
+     "rank": 3,
+     "centroidId": 205,
+     "cosine": 0.7024,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3512
+    },
+    {
+     "rank": 4,
+     "centroidId": 251,
+     "cosine": 0.6831,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2942
+    },
+    {
+     "rank": 5,
+     "centroidId": 188,
+     "cosine": 0.676,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2615
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "b22dfc7b-f84e-4cbb-bd5b-fd455331be62",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9986
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0005
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.7123,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7123
+    },
+    {
+     "rank": 2,
+     "centroidId": 126,
+     "cosine": 0.624,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.3937
+    },
+    {
+     "rank": 3,
+     "centroidId": 205,
+     "cosine": 0.6159,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.308
+    },
+    {
+     "rank": 4,
+     "centroidId": 61,
+     "cosine": 0.609,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2623
+    },
+    {
+     "rank": 5,
+     "centroidId": 78,
+     "cosine": 0.6059,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2344
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "f98e49a7-b33b-40ff-b0ce-dee52f00fddd",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9981
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0004
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 251,
+     "cosine": 0.7194,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7194
+    },
+    {
+     "rank": 2,
+     "centroidId": 183,
+     "cosine": 0.7186,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4534
+    },
+    {
+     "rank": 3,
+     "centroidId": 134,
+     "cosine": 0.7054,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3527
+    },
+    {
+     "rank": 4,
+     "centroidId": 227,
+     "cosine": 0.688,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2963
+    },
+    {
+     "rank": 5,
+     "centroidId": 22,
+     "cosine": 0.6602,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2554
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": false,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "2a0b88fb-ac2e-415c-86f2-c7aa9ac4dfd3",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9982
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0009
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0002
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.8095,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.8095
+    },
+    {
+     "rank": 2,
+     "centroidId": 251,
+     "cosine": 0.7914,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4993
+    },
+    {
+     "rank": 3,
+     "centroidId": 149,
+     "cosine": 0.7622,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3811
+    },
+    {
+     "rank": 4,
+     "centroidId": 140,
+     "cosine": 0.7514,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.3236
+    },
+    {
+     "rank": 5,
+     "centroidId": 227,
+     "cosine": 0.7497,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.29
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "2e733456-2e05-4423-8e55-321431bae290",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 47,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9982
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0009
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0002
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 188,
+     "cosine": 0.8036,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.8036
+    },
+    {
+     "rank": 2,
+     "centroidId": 183,
+     "cosine": 0.764,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.482
+    },
+    {
+     "rank": 3,
+     "centroidId": 146,
+     "cosine": 0.7635,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3817
+    },
+    {
+     "rank": 4,
+     "centroidId": 47,
+     "cosine": 0.7571,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.326
+    },
+    {
+     "rank": 5,
+     "centroidId": 81,
+     "cosine": 0.7436,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2876
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": false,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "478c3c61-a7e0-4e70-bd26-10d0d31aa85c",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9984
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0007
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.8288,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.8288
+    },
+    {
+     "rank": 2,
+     "centroidId": 161,
+     "cosine": 0.7499,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4731
+    },
+    {
+     "rank": 3,
+     "centroidId": 135,
+     "cosine": 0.7464,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3732
+    },
+    {
+     "rank": 4,
+     "centroidId": 177,
+     "cosine": 0.7278,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.3134
+    },
+    {
+     "rank": 5,
+     "centroidId": 251,
+     "cosine": 0.6955,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2691
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "a3483bc2-748e-406a-a8e2-78f825b2af63",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 34,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9983
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 34,
+     "cosine": 0.8516,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.8516
+    },
+    {
+     "rank": 2,
+     "centroidId": 183,
+     "cosine": 0.7901,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4985
+    },
+    {
+     "rank": 3,
+     "centroidId": 107,
+     "cosine": 0.7835,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3918
+    },
+    {
+     "rank": 4,
+     "centroidId": 134,
+     "cosine": 0.7189,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.3096
+    },
+    {
+     "rank": 5,
+     "centroidId": 6,
+     "cosine": 0.7173,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2775
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "7275eea4-5fe3-45d8-bc88-7aaadc008d25",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.998
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0007
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.7782,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7782
+    },
+    {
+     "rank": 2,
+     "centroidId": 251,
+     "cosine": 0.6805,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4293
+    },
+    {
+     "rank": 3,
+     "centroidId": 207,
+     "cosine": 0.6749,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3375
+    },
+    {
+     "rank": 4,
+     "centroidId": 61,
+     "cosine": 0.6729,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2898
+    },
+    {
+     "rank": 5,
+     "centroidId": 161,
+     "cosine": 0.6698,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2591
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "7a4d0d3e-34f5-4d8f-80e3-77591ad4ac31",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 39,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9981
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0005
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.6997,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.6997
+    },
+    {
+     "rank": 2,
+     "centroidId": 39,
+     "cosine": 0.6843,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4317
+    },
+    {
+     "rank": 3,
+     "centroidId": 161,
+     "cosine": 0.663,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3315
+    },
+    {
+     "rank": 4,
+     "centroidId": 144,
+     "cosine": 0.6626,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2854
+    },
+    {
+     "rank": 5,
+     "centroidId": 81,
+     "cosine": 0.6491,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2511
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": false,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "e13a3d14-7f8a-429c-9920-c801acefaaa8",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9979
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0008
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.7628,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7628
+    },
+    {
+     "rank": 2,
+     "centroidId": 188,
+     "cosine": 0.6973,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4399
+    },
+    {
+     "rank": 3,
+     "centroidId": 146,
+     "cosine": 0.6666,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3333
+    },
+    {
+     "rank": 4,
+     "centroidId": 173,
+     "cosine": 0.6663,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.287
+    },
+    {
+     "rank": 5,
+     "centroidId": 247,
+     "cosine": 0.6571,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2542
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "cfc8e908-83f8-4575-802e-83a612b5ae4f",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9985
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0006
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.6776,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.6776
+    },
+    {
+     "rank": 2,
+     "centroidId": 81,
+     "cosine": 0.6562,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.414
+    },
+    {
+     "rank": 3,
+     "centroidId": 251,
+     "cosine": 0.6532,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3266
+    },
+    {
+     "rank": 4,
+     "centroidId": 149,
+     "cosine": 0.6489,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2795
+    },
+    {
+     "rank": 5,
+     "centroidId": 144,
+     "cosine": 0.6261,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2422
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "efe383fd-0b60-4846-b83d-2e6edcc49f49",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.998
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0007
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.7426,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7426
+    },
+    {
+     "rank": 2,
+     "centroidId": 149,
+     "cosine": 0.7167,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4522
+    },
+    {
+     "rank": 3,
+     "centroidId": 251,
+     "cosine": 0.6911,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3455
+    },
+    {
+     "rank": 4,
+     "centroidId": 41,
+     "cosine": 0.6748,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2906
+    },
+    {
+     "rank": 5,
+     "centroidId": 117,
+     "cosine": 0.67,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2592
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  },
+  {
+   "chunkId": "20fa014a-48a2-49ab-92ea-7ff00815c77a",
+   "sourceRef": "src/lib/server/ace/context-assembler.ts",
+   "legacyDomain": "Other",
+   "storedKmeansCluster": 183,
+   "naiveBayesTop3": [
+    {
+     "domain": "rag_retrieval",
+     "logProb": -2.004
+    },
+    {
+     "domain": "legal_reports",
+     "logProb": -3.393
+    },
+    {
+     "domain": "repair_workflow",
+     "logProb": -3.412
+    }
+   ],
+   "xgboostTop3": [
+    {
+     "domain": "rag_retrieval",
+     "prob": 0.9983
+    },
+    {
+     "domain": "agent_orchestration",
+     "prob": 0.0008
+    },
+    {
+     "domain": "auth_login_register",
+     "prob": 0.0003
+    }
+   ],
+   "centroidTop5": [
+    {
+     "rank": 1,
+     "centroidId": 183,
+     "cosine": 0.7975,
+     "inversePaginationWeight": 1.0,
+     "rankScore": 0.7975
+    },
+    {
+     "rank": 2,
+     "centroidId": 251,
+     "cosine": 0.7389,
+     "inversePaginationWeight": 0.6309,
+     "rankScore": 0.4662
+    },
+    {
+     "rank": 3,
+     "centroidId": 140,
+     "cosine": 0.7042,
+     "inversePaginationWeight": 0.5,
+     "rankScore": 0.3521
+    },
+    {
+     "rank": 4,
+     "centroidId": 149,
+     "cosine": 0.6891,
+     "inversePaginationWeight": 0.4307,
+     "rankScore": 0.2968
+    },
+    {
+     "rank": 5,
+     "centroidId": 227,
+     "cosine": 0.67,
+     "inversePaginationWeight": 0.3869,
+     "rankScore": 0.2592
+    }
+   ],
+   "nearestCentroidMatchesStoredCluster": true,
+   "posTags": {
+    "nouns": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "proper_nouns": [
+     "ext_ts",
+     "lib"
+    ],
+    "adjectives": [],
+    "verbs": [],
+    "lemmas": [
+     "ace",
+     "assembler",
+     "context",
+     "server",
+     "src"
+    ],
+    "noun_phrases": [
+     "ace context assembler",
+     "src lib server"
+    ]
+   },
+   "predictionIsLabel": false
+  }
+ ],
+ "totalSeconds": 37.7,
+ "caveats": [
+  "legacy labels are weak and partly path-derived; accuracy shows predictability, not correctness",
+  "centroids are stale for current vectors",
+  "unknown-chunk predictions are advisory, not labels",
+  "no reviewed labels, so no external truth is measured"
+ ],
+ "checksum": "sha256:e2edd63798357ddef7b8f5f05c948b5d00ffc810a442e1407ad56404e8d80daa"
+}

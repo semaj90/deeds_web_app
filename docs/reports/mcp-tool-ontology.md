@@ -1,8 +1,8 @@
 # MCP Tool Ontology
 
-**Generated**: 2026-09-03T18:40:40.865Z  
-**Source**: http://127.0.0.1:8788/mcp  
-**Total tools**: 173  
+**Generated**: 2026-09-03T18:40:40.865Z
+**Source**: http://127.0.0.1:8788/mcp
+**Total tools**: 173
 
 ## Retrieval Layer Routing Table
 
@@ -450,7 +450,7 @@ This is the canonical routing table for OpenCode. Use the layer that matches the
 
 ## Agent Decision Matrix
 
-Use this matrix to route a query to the right tools without asking Gemma4 to decide.
+Use this matrix to route a query to the right tools without asking ornith 1.5 to decide.
 
 | Query Shape | Start With | Then |
 |-------------|-----------|------|

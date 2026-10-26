@@ -123,5 +123,7 @@ export interface GraphIdentityAuditReceiptV1 {
     canonicalGraphSnapshotProven: boolean;
   };
 
+  proofLimitations: string[];
+
   evidenceRefs: string[];
 }

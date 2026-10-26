@@ -56,7 +56,7 @@ for (const { file, text } of files) {
   if (file === path.resolve(repoRoot, 'scripts/atlas/audit-chat-model-ownership-v1.mjs')
     || file === path.resolve(repoRoot, 'scripts/atlas/audit-ollama-generation-callers-v2.mjs')) continue;
   const directChat = /(?:ChatOllama|new\s+Ollama\s*\(|(?:fetch|postJson)\([^\n]*(?:getOllamaEndpoint|OLLAMA(?:_BASE_URL|_URL|_HOST))[^\n]*(?:chat\/completions|api\/(?:generate|chat)))/i;
-  const legacy = /gemma4-rotorquant|Gemma4|GEMMA4/i;
+  const legacy = /ornith-1.5-9b/i;
   const embedding = /embeddinggemma|ollama-embed|OLLAMA_EMBED/i;
   const llama = /llama-server|LLAMA_SERVER_URL|ornith-1\.5/i;
   for (const match of executableLineMatches(text, directChat)) directOllamaChat.push({ file: rel(file), ...match });

@@ -1,0 +1,1120 @@
+{
+  "schema": "atlas.graphify-daily-discovery.v1",
+  "observedAt": "2026-10-16T02:30:28.419Z",
+  "mode": "inspect",
+  "status": "DIAGNOSTIC_COMPLETE",
+  "canonicalAuthority": false,
+  "sourceWritesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "localArtifactWritesPerformed": true,
+  "promotionAuthorized": false,
+  "inventory": {
+    "physicalRootDirectoryCount": 139,
+    "trackedPathCount": 34731,
+    "trackedDirectoryCount": 4696,
+    "trackedBytes": 3768569944,
+    "missingFiles": 6,
+    "gitlinks": [
+      "claude-mem",
+      "granite-docling-258M",
+      "mcp-server-mcp",
+      "models/embeddinggemma_300m",
+      "sites/parent-atlas-gateboard",
+      "turbovec"
+    ],
+    "membershipChecksum": "sha256:c8de83d4985111f1ed838fdc9479a5f930635a82ec0486e1de026447f4638c6b",
+    "measurement": "WORKTREE_FILE_METADATA_ONLY; installed and ignored contents are not traversed",
+    "directories": [
+      {
+        "path": ".archive",
+        "trackedFiles": 21,
+        "trackedBytes": 10289045,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".cache",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".clarity",
+        "trackedFiles": 1,
+        "trackedBytes": 1722,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".claude",
+        "trackedFiles": 68,
+        "trackedBytes": 407169,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".cline",
+        "trackedFiles": 11,
+        "trackedBytes": 44404,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".clinerules",
+        "trackedFiles": 10,
+        "trackedBytes": 39887,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".codex",
+        "trackedFiles": 8,
+        "trackedBytes": 66832,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".error-brain",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".gemini",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".git",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".githooks",
+        "trackedFiles": 5,
+        "trackedBytes": 2397,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".github",
+        "trackedFiles": 18,
+        "trackedBytes": 53806,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".okf",
+        "trackedFiles": 712,
+        "trackedBytes": 46255983,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".opencode",
+        "trackedFiles": 42,
+        "trackedBytes": 335591,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".parent-atlas",
+        "trackedFiles": 12,
+        "trackedBytes": 9532,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".proofs",
+        "trackedFiles": 6,
+        "trackedBytes": 6499,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".pytest_cache",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".python311",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".rag-metrics",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".scripts",
+        "trackedFiles": 8,
+        "trackedBytes": 679,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".svelte-error-fixes-backup",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".svelte-kit",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".tmp",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".venv",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".venv-cu130",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".venv-gemma4",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".vs",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".vscode",
+        "trackedFiles": 5,
+        "trackedBytes": 532675,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": ".woodpecker",
+        "trackedFiles": 3,
+        "trackedBytes": 2115,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "__pycache__",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "__tests__",
+        "trackedFiles": 1,
+        "trackedBytes": 4781,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "ace-vector-selection-slice",
+        "trackedFiles": 7,
+        "trackedBytes": 15421,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "archive",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "artifacts",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "atlas-openspec-awareness-v2",
+        "trackedFiles": 40,
+        "trackedBytes": 161872,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "audit",
+        "trackedFiles": 1,
+        "trackedBytes": 273,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "backups",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "benchmarks",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "build",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "classifier-datasets",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "claude-mem",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "cmd",
+        "trackedFiles": 2,
+        "trackedBytes": 8003,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "config",
+        "trackedFiles": 2,
+        "trackedBytes": 5283,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "configs",
+        "trackedFiles": 6,
+        "trackedBytes": 40729,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "crates",
+        "trackedFiles": 30,
+        "trackedBytes": 1536114,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "cypress",
+        "trackedFiles": 1,
+        "trackedBytes": 2758,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "data",
+        "trackedFiles": 28,
+        "trackedBytes": 44334,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "datasets",
+        "trackedFiles": 4,
+        "trackedBytes": 22588,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "deeds-web-app",
+        "trackedFiles": 1,
+        "trackedBytes": 4000,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "deeds_lab",
+        "trackedFiles": 1,
+        "trackedBytes": 4082,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "deeds_labs",
+        "trackedFiles": 19,
+        "trackedBytes": 35399,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "docker",
+        "trackedFiles": 61,
+        "trackedBytes": 738198,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "docs",
+        "trackedFiles": 6645,
+        "trackedBytes": 2433434064,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "drizzle",
+        "trackedFiles": 90,
+        "trackedBytes": 374824,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "duckdb",
+        "trackedFiles": 3,
+        "trackedBytes": 9010762,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "examples",
+        "trackedFiles": 3,
+        "trackedBytes": 2760,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "experiments",
+        "trackedFiles": 73,
+        "trackedBytes": 169241,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "exports",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "go-retrieval-classifier",
+        "trackedFiles": 6,
+        "trackedBytes": 35386,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "granite-docling-258M",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "graphify",
+        "trackedFiles": 1,
+        "trackedBytes": 937,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "gsd_archives",
+        "trackedFiles": 116,
+        "trackedBytes": 318075,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "infra",
+        "trackedFiles": 2,
+        "trackedBytes": 1237,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "karpathy-wiki",
+        "trackedFiles": 5,
+        "trackedBytes": 15549,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "lawpdfs",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "llama-cpp-turboquant-gemma4",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "llm",
+        "trackedFiles": 13,
+        "trackedBytes": 63297,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "log",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "logs",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "mcp-server-mcp",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "memory",
+        "trackedFiles": 176,
+        "trackedBytes": 119121079,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "migrations",
+        "trackedFiles": 2,
+        "trackedBytes": 2952,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "minio",
+        "trackedFiles": 1,
+        "trackedBytes": 8110,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "minio-data",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "models",
+        "trackedFiles": 47,
+        "trackedBytes": 109034341,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "native",
+        "trackedFiles": 19,
+        "trackedBytes": 165088,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "neo4j",
+        "trackedFiles": 5,
+        "trackedBytes": 6988,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "neschrom97",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "next_steps",
+        "trackedFiles": 216,
+        "trackedBytes": 36126184,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "nginx",
+        "trackedFiles": 2,
+        "trackedBytes": 15474,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "node_modules",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "offline-data",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "onnx",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "openspec",
+        "trackedFiles": 567,
+        "trackedBytes": 13594587,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "openspec-changes",
+        "trackedFiles": 2,
+        "trackedBytes": 2869,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "openwiki",
+        "trackedFiles": 26,
+        "trackedBytes": 500499,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "packages",
+        "trackedFiles": 712,
+        "trackedBytes": 3972813,
+        "discoveryEligibleFiles": 636
+      },
+      {
+        "path": "parent-atlas-ampere-quantization-proof-kit",
+        "trackedFiles": 3,
+        "trackedBytes": 18491,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-capability-census-v5",
+        "trackedFiles": 7,
+        "trackedBytes": 20084,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-gpu-context-tranche",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-gpu-math-bundle",
+        "trackedFiles": 22,
+        "trackedBytes": 44779,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-graph-revision-fix-v1",
+        "trackedFiles": 11,
+        "trackedBytes": 43856,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-graph-runtime-enhancement",
+        "trackedFiles": 24,
+        "trackedBytes": 29512,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-qas-bundle",
+        "trackedFiles": 10,
+        "trackedBytes": 25333,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-rel-01a-current-ontology-cohort",
+        "trackedFiles": 4,
+        "trackedBytes": 23566,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-rel-01a3-explicit-alias-review",
+        "trackedFiles": 5,
+        "trackedBytes": 15639,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-rtx-gpu-lab",
+        "trackedFiles": 14,
+        "trackedBytes": 16203,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent-atlas-tensor-residency-integration",
+        "trackedFiles": 63,
+        "trackedBytes": 75127,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "parent_atlas_tensor_residency_integration_v2",
+        "trackedFiles": 88,
+        "trackedBytes": 106382,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "pgvector-precompiled",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "phase13graph_exportgenerator",
+        "trackedFiles": 10,
+        "trackedBytes": 107955,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "plans",
+        "trackedFiles": 1,
+        "trackedBytes": 18667,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "proto",
+        "trackedFiles": 55,
+        "trackedBytes": 280015,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "python",
+        "trackedFiles": 459,
+        "trackedBytes": 5613802,
+        "discoveryEligibleFiles": 439
+      },
+      {
+        "path": "python-workers",
+        "trackedFiles": 4,
+        "trackedBytes": 20537,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "qdrant",
+        "trackedFiles": 1,
+        "trackedBytes": 2859,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "qdrant-windows",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "redis",
+        "trackedFiles": 1,
+        "trackedBytes": 1398,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "reports",
+        "trackedFiles": 33,
+        "trackedBytes": 235758,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "scratch",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "scripts",
+        "trackedFiles": 4523,
+        "trackedBytes": 48882416,
+        "discoveryEligibleFiles": 3093
+      },
+      {
+        "path": "scripts-data",
+        "trackedFiles": 7,
+        "trackedBytes": 34053,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "services",
+        "trackedFiles": 48,
+        "trackedBytes": 679366,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "simd-bridge",
+        "trackedFiles": 578,
+        "trackedBytes": 8254603,
+        "discoveryEligibleFiles": 30
+      },
+      {
+        "path": "sites",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "skills",
+        "trackedFiles": 1,
+        "trackedBytes": 4658,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "souffle",
+        "trackedFiles": 1,
+        "trackedBytes": 2582,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "specify",
+        "trackedFiles": 13,
+        "trackedBytes": 50546,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "specs",
+        "trackedFiles": 2,
+        "trackedBytes": 74857,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "sql",
+        "trackedFiles": 4,
+        "trackedBytes": 5514,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "src",
+        "trackedFiles": 196,
+        "trackedBytes": 675247,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "ssl",
+        "trackedFiles": 1,
+        "trackedBytes": 4706,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "static",
+        "trackedFiles": 1,
+        "trackedBytes": 6134,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "storage",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "sveltekit-frontend",
+        "trackedFiles": 18080,
+        "trackedBytes": 862565042,
+        "discoveryEligibleFiles": 6403
+      },
+      {
+        "path": "target",
+        "trackedFiles": 2,
+        "trackedBytes": 1292,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "test",
+        "trackedFiles": 2,
+        "trackedBytes": 16908,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "test-results",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "tests",
+        "trackedFiles": 47,
+        "trackedBytes": 264362,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "tmp",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "tools",
+        "trackedFiles": 11,
+        "trackedBytes": 16916,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "training-datasets",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "triton-model-repository",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "triton-trt-llm",
+        "trackedFiles": 17,
+        "trackedBytes": 109896,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "turbovec",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "vectors",
+        "trackedFiles": 1,
+        "trackedBytes": 1575841,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "vendor",
+        "trackedFiles": 0,
+        "trackedBytes": 0,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "vscode-extension",
+        "trackedFiles": 14,
+        "trackedBytes": 57556,
+        "discoveryEligibleFiles": 0
+      },
+      {
+        "path": "workers",
+        "trackedFiles": 1,
+        "trackedBytes": 10525,
+        "discoveryEligibleFiles": 0
+      }
+    ]
+  },
+  "ownership": {
+    "path": "docs/architecture/runtime-ownership-registry.json",
+    "checksum": "sha256:fae1b52462b65245012ac0777b65ef1ea6aa2bb68c1d492afd0399ea4c88292a",
+    "declaredGeneratedAt": "2026-08-09",
+    "totalMatchingRecords": 64,
+    "records": [
+      {
+        "registryPointer": "/capabilities/ace_context_assembler/backends/0",
+        "declaredPath": "sveltekit-frontend/src/lib/server/atlas/tensors/packet-assembler.ts",
+        "matchedTerms": [],
+        "declaredStatus": "RUNTIME_SMOKE_PROVEN",
+        "classification": "BACKEND",
+        "declaredUnproven": null,
+        "evidence": "Real callers: src/lib/server/ace/indexed-source-packet.ts, src/lib/server/features/ai/ace/context-assembler.ts. Corrects an earlier verification forks incorrect DISCONNECTED finding (too narrow a grep). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/ace_context_assembler/owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "matchedTerms": [],
+        "declaredStatus": "RUNTIME_SMOKE_PROVEN",
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "Reads docs/graph/codebase-graph.json via sveltekit-frontend/src/lib/server/graph/graph-intel.ts (GRAPH_PATH). Confirmed live 2026-08-12; path corrected 2026-09-05 (proposal.md named a nonexistent atlas/graph-intel.ts, real file is server/graph/graph-intel.ts). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/ace_packet_validator/owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/atlas/envelope-validator.ts",
+        "matchedTerms": [],
+        "declaredStatus": "RUNTIME_SMOKE_PROVEN",
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "Validates against atlas_packets (Postgres canonical identity table, populated by graphify). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3 (bookkeeping of a 2026-08-12 audit, no new investigation).",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/acp_sidecar_tools/owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "Confirmed live 2026-08-09: zero existing references to 'miniforge', 'rg_search', or 'ripgrep' — the NLP sidecar's capabilities are not yet registered here at all (a gap, not a duplication — tracked in parent-atlas-nlp-sidecar-feature-compiler).",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/ast_structural_extraction/owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/analysis/worker.ts -> ast-grep-extractor.ts -> code_features table",
+        "matchedTerms": [],
+        "declaredStatus": "PROVEN",
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "docs/reports/phase2a-ast-grep-caller-chain-receipt.json, status PROVEN. Backfilled into feature_structural_facts by scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs. Disjoint pipeline from ace_context_assembler -- not consumed by it (see that capability known_gap). Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/atlas_envelope_validation/known_existing_duplication/0",
+        "declaredPath": "python/atlas_subgraph_cugraph.py",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "DEAD",
+        "declaredUnproven": null,
+        "evidence": "Read-only cuGraph induced-subgraph proof CLI. Fresh repository-wide reference search (python, services, scripts, docker, packages, sveltekit-frontend/src) found no caller or deployment reference beyond this file; it has a standalone __main__ entrypoint and consumes explicit fixture files. Retain as historical proof code; no deletion or runtime change authorized.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/atlas_envelope_validation/known_existing_duplication/1",
+        "declaredPath": "python/atlas_rapids_community_sidecar.py",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "EXPERIMENT",
+        "declaredUnproven": null,
+        "evidence": "Standalone bounded FastAPI challenger exposing non-mutating Louvain/Leiden/spectral routes on default port 8099. Fresh reference/deployment search found no Compose/service/deployment caller. It calls python/atlas_rapids_community.py but is not the deployed atlas-gpu-8098 graph runtime; keep noncanonical and do not infer live service availability.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/atlas_envelope_validation/known_existing_duplication/2",
+        "declaredPath": "python/atlas_compute/cugraph_ppr.py",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "DEAD",
+        "declaredUnproven": null,
+        "evidence": "run_cugraph_ppr_parity and CuGraphPprParityReceipt are re-exported by atlas_compute/__init__.py, making the module import-reachable, but a fresh repository-wide search found no functional call or receipt use outside its definition/re-export. No fixture test invokes it. This is unused API, not a live executor; no removal performed.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/atlas_envelope_validation/known_existing_duplication/3",
+        "declaredPath": "python/atlas_compute/graph_programs.py",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "FIXTURE_ONLY",
+        "declaredUnproven": null,
+        "evidence": "deterministic_bfs and condense_and_lexicographically_sort are exercised by python/test_atlas_compute_graph_representation.py (4 tests pass). No production/deployment caller found. This test-proven Python reference is not the GR10 owner: parent-atlas-graph-runtime-enhancement defines GR10 as semantic best-first in TypeScript. Retain as fixture/reference implementation; no canonical graph ownership.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/atlas_envelope_validation/owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/atlas/envelope-validator.ts",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "CREATED + unit-proven in isolation 2026-08-09 (7/7 tests, tests/atlas/envelope-validator.spec.ts, incl. shuffled-delivery replay proof). NOT yet wired into any live producer — see openspec/changes/parent-atlas-unordered-execution-contract/tasks.md Phase 10. Distinct capability from packet_envelope_validation below (pass-result validation vs. at-rest packet-shape validation) — do not merge.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/chr97_cartridge_glyph/owner",
+        "declaredPath": "sveltekit-frontend/src/routes/api/cartridge/export/+server.ts (chr97-builder.ts, glyph-record.ts)",
+        "matchedTerms": [],
+        "declaredStatus": "RUNTIME_SMOKE_PROVEN",
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "Fully live production route: 401 guard, Zod validation, Redis 30min cache, paginated Qdrant evidence_items scroll by case_id, buildCartridge(), Langfuse trace. Genuinely disjoint domain from codebase-intelligence graphify -- consumes case-scoped evidence Qdrant embeddings from the evidence-ingestion pipeline, NOT graphify output. Also has real callers at api/cartridge/{search,timeline} and api/glyph/search. Registered 2026-09-05 per ace-hyperrag-chr97-graphify-audit/tasks.md item 3.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/cutile_kernel_challenger/owner",
+        "declaredPath": "wsl::/home/james/miniforge3/envs/atlas-rapids-cu13",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "OPTIONAL_CHALLENGER_NOT_INSTALLED",
+        "declaredUnproven": null,
+        "evidence": "The existing WSL environment has PyTorch/CUDA and RAPIDS/cuVS/cuGraph GPU capability, but importlib reports that cuda.tile is not installed. cuTile is a future fused-kernel pilot, not a current retrieval or decoder owner.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/domain_classification/backends/0",
+        "declaredPath": "sveltekit-frontend/src/lib/server/atlas/okf-fit.ts::classifyOkfFit",
+        "matchedTerms": [],
+        "declaredStatus": "RUNTIME_SMOKE_PROVEN",
+        "classification": "BACKEND",
+        "declaredUnproven": null,
+        "evidence": "Real, live -- the actual path api/ldr/research/+server.ts exercises via okf-topic-ingestion.ts::buildOkfTopicAnalysis. Correctly wraps classifyDomainTaxonomy() (the canonical owner above), then adds naive_bayes_score/logistic_regression_score/fit_margin/fit_decision fields -- but these are hand-tuned linear/sigmoid formulas with hardcoded coefficients, not trained NB/LR models. classifier_version = OKF_FIT_VERSION = 'okf-fit-v1'.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/domain_classification/backends/1",
+        "declaredPath": "sveltekit-frontend/src/lib/server/ace/features/domain-classifier.ts::DomainClassifier",
+        "matchedTerms": [],
+        "declaredStatus": "RUNTIME_SMOKE_PROVEN",
+        "classification": "BACKEND",
+        "declaredUnproven": null,
+        "evidence": "Exactly one live call site (feature-extraction-orchestrator.ts:130, classifyByPath(pkt.sourceRef) only -- classifyByContent() and the DB-querying classifyPacket() are never called live). Independent 14-domain regex taxonomy, does not build on domain-taxonomy.ts. A parity test comparing its output against classifyDomainTaxonomy() on a real path corpus is needed before any consolidation is attempted -- not done as of this entry.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/domain_classification/owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "8 real callers confirmed live 2026-09-03; self-identifies in its own docstring as 'the authority module for domain_class handling inside the workstation control plane'. Has an unused labels[].source: 'learned' slot -- the intended ML extension point, not yet fed by anything.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/domain_classification/second_owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "Genuinely distinct scope from source-code domain classification above -- 10 workstation lanes (IDENTITY, EXPORT_STORAGE, GRAPH, TELEMETRY, EMBEDDING, OKF_ONTOLOGY, TRANSPORT, COMPILER, RUNTIME_TRAINING, SHARED), not source-code domains. Built, type-checked, not wired into any live route (see openspec/changes/parent-atlas-workstation-domain-classifier/proposal.md for that gap -- tracked there, not here). Mirrors this registry's existing n_ary_relationship_synthesis dual-owner shape: two CANONICAL_OWNERs, domain-scoped, not competing.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/domain_classification/unwired_scaffolds/0",
+        "declaredPath": "sveltekit-frontend/src/lib/server/classifier/domain-classifier.ts::classifyDomainFromText",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "UNWIRED_SCAFFOLD",
+        "declaredUnproven": null,
+        "evidence": "Already correctly wraps the canonical classifyDomainTaxonomy() -- not a competing taxonomy. Zero live callers of classifyDomainFromText anywhere in src/. Part of a coherent 4-file XGBoost feature-vector scaffold (ast-keyword-types.ts types -> this producer -> packet-feature-validator.ts validator -> classifier-feature-vector.ts::toXgboostVector, feature slot ast_domain_confidence) -- checked for duplication against the live XGBoost/reranker pipeline (xgboost-ranking-lineage-v1.ts, phase18-reranker.ts, packet-feature-matrix.ts, retrieval-candidate-feature-matrix-v1.ts) and found NOT a duplicate, just never connected. Left in place; do not archive or delete without a deliberate decision from whoever owns the XGBoost/reranker roadmap.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/domain_classification/unwired_scaffolds/1",
+        "declaredPath": "sveltekit-frontend/src/lib/server/enrichment/domain-classifier.ts::classifyDomain/extractPathEvidence",
+        "matchedTerms": [],
+        "declaredStatus": null,
+        "classification": "UNWIRED_SCAFFOLD",
+        "declaredUnproven": null,
+        "evidence": "The algorithm itself (18-domain independent taxonomy, evidence-precedence scoring) has zero live callers. Its only live reference anywhere is feature-doc-enrichment.ts importing just the CLASSIFIER_VERSION string constant into an unrelated classifierPlan.classifierVersion JSON field -- not the algorithm. Left in place, not touched.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/error_signal_evidence/backends/0",
+        "declaredPath": "scripts/atlas/bridge-error-signal-to-repair-proposal-v1.mjs",
+        "matchedTerms": [],
+        "declaredStatus": "FIXTURE_PROVEN",
+        "classification": "BACKEND",
+        "declaredUnproven": null,
+        "evidence": "Dry-run only. Consumes the validator receipt after digest verification; admits PARTIALLY_REPRODUCED/REPRODUCES_NOW for schema_mismatch only; maps reviews to registry action AWAIT_OPERATOR (agentic-action-registry-v1.ts). No registry consumer exists (Phase 66 fixer not found), so executable=0. Not revision-qualified: validator receipt carries no source revision.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      },
+      {
+        "registryPointer": "/capabilities/error_signal_evidence/owner",
+        "declaredPath": "scripts/atlas/validate-error-signal-evidence-v1.mjs",
+        "matchedTerms": [],
+        "declaredStatus": "RUNTIME_SMOKE_PROVEN",
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "Read-only validator for error_signal_stream rows: provenance (single-batch detection), live re-check of relation/column claims, verdicts, sealed receipt with writesPerformed=0 and repairEligible=false on every row. Live run 2026-10-13 over 6 rows (1 NOT_REPRODUCED_NOW, 1 PARTIALLY_REPRODUCED, 1 UNVERIFIED, 3 PROPOSAL_ONLY). Spec: error-signal-evidence-v1.spec.mjs (7/7).",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      }
+    ],
+    "truncated": true,
+    "promotionAuthorized": false
+  },
+  "graphs": {
+    "artifacts": [
+      {
+        "path": "sveltekit-frontend/docs/graph/codebase-graph.json",
+        "bytes": 25803530,
+        "modifiedAt": "2026-08-30T18:47:18.281Z",
+        "ageHours": 1111.72,
+        "status": "STALE_BY_MTIME",
+        "tracked": false,
+        "ignoreRule": ".gitignore:955:sveltekit-frontend/docs/graph/codebase-graph.json\tsveltekit-frontend/docs/graph/codebase-graph.json",
+        "digest": "sha256:05147bf7a7423932322ed76e38241ee8a861b92a77bb64082b9f9f66f9f85760",
+        "digestStatus": "HASHED_CONTENT_ONLY",
+        "sourceLineageVerified": false
+      },
+      {
+        "path": "docs/graph/codebase-graph.json",
+        "bytes": 25803530,
+        "modifiedAt": "2026-08-30T18:47:18.281Z",
+        "ageHours": 1111.72,
+        "status": "STALE_BY_MTIME",
+        "tracked": true,
+        "ignoreRule": null,
+        "digest": "sha256:05147bf7a7423932322ed76e38241ee8a861b92a77bb64082b9f9f66f9f85760",
+        "digestStatus": "HASHED_CONTENT_ONLY",
+        "sourceLineageVerified": false
+      },
+      {
+        "path": "graphify/frozen-graph-snapshot-v2.json",
+        "bytes": 486654818,
+        "modifiedAt": "2026-08-09T03:13:22.337Z",
+        "ageHours": 1631.28,
+        "status": "STALE_BY_MTIME",
+        "tracked": false,
+        "ignoreRule": ".gitignore:986:/graphify/*\tgraphify/frozen-graph-snapshot-v2.json",
+        "digest": null,
+        "digestStatus": "SKIPPED_SIZE_LIMIT",
+        "sourceLineageVerified": false
+      }
+    ],
+    "compatibilityCopiesEqual": true,
+    "maxHashBytes": 67108864,
+    "maxAgeHours": 24,
+    "producer": "sveltekit-frontend/scripts/index-codebase-fast.mjs",
+    "consumer": "sveltekit-frontend/src/lib/server/graph/graph-intel.ts",
+    "lineageGate": "NOT_EVALUATED; matching content or recent mtime cannot qualify graph lineage"
+  }
+}

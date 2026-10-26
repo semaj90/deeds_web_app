@@ -74,7 +74,7 @@ export function resolveCentroidCardCandidatesV1(input: {
 	assertCandidateOrdinalMapIntegrityV1(ordinalMap);
 
 	const cardBinding = verifyCentroidCardAgainstManifestV1(card, manifest);
-	if (!cardBinding.matches) throw new Error(cardBinding.reason);
+	if (cardBinding.matches === false) throw new Error(cardBinding.reason);
 	if (ordinalMap.workspaceRevision !== manifest.workspaceRevision) throw new Error('CENTROID_CANDIDATE_WORKSPACE_REVISION_MISMATCH');
 	if (ordinalMap.candidateSnapshotRevision !== manifest.candidateSnapshotRevision) throw new Error('CENTROID_CANDIDATE_SNAPSHOT_REVISION_MISMATCH');
 	if (ordinalMap.ordinalMapChecksum !== manifest.ordinalMapChecksum) throw new Error('CENTROID_CANDIDATE_ORDINAL_MAP_CHECKSUM_MISMATCH');

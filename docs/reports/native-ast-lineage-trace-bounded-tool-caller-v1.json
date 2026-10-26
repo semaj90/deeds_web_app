@@ -1,0 +1,52 @@
+{
+ "schema": "atlas.native-ast-lineage-trace.v1",
+ "generated_at": "2026-10-15T20:49:27.093Z",
+ "mode": "READ_ONLY",
+ "source": {
+  "path": "sveltekit-frontend/src/lib/agent/bounded-tool-caller.ts",
+  "disk_sha256": "sha256:3bc25fa29003ce6a138ec76a226f569fab784155a393fdde03b13b71c4a592b2",
+  "disk_bytes": 3348
+ },
+ "links": [
+  {
+   "link": "native AST node -> source bytes",
+   "status": "PASS",
+   "evidence": "6 atlas_ast_nodes rows (function/method spans) with source_revision equal to disk sha256; node spans include callToolSafely 892-1416",
+   "path_namespace": "src/lib/agent/bounded-tool-caller.ts (frontend-relative)"
+  },
+  {
+   "link": "packet -> source revision",
+   "status": "PASS",
+   "evidence": "packet:92d8192054c9 source_ref sveltekit-frontend/src/lib/agent/bounded-tool-caller.ts, source_revision equal to disk sha256",
+   "path_namespace": "sveltekit-frontend/src/... (repo-relative)"
+  },
+  {
+   "link": "packet -> chunk",
+   "status": "PASS_VIA_LINEAGE",
+   "evidence": "5 atlas_packet_chunk_lineage rows for packet:92d8192054c9 (EXACT_MULTI_MEMBER, revision_status PROVEN, source_revision equal to disk sha256); each chunk_row_id resolves to codebase_chunk_index.",
+   "caveat": "chunk rows have source_revision NULL; the lineage table is the only place the revision is recorded"
+  },
+  {
+   "link": "chunk row revision",
+   "status": "FAIL",
+   "evidence": "codebase_chunk_index.source_revision is NULL on all 5 linked chunk rows"
+  },
+  {
+   "link": "qualified retrieval candidate",
+   "status": "NOT_RUN",
+   "evidence": "blocked by chunk-row revision NULL and the ambiguity rule in hydration"
+  }
+ ],
+ "overall": "PARTIAL: AST, packet, and packet-to-chunk lineage bound to current bytes; chunk rows carry no source_revision",
+ "canonical_authority": false,
+ "writes_performed": false,
+ "diagnostic_only": true,
+ "deferred": [
+  {
+   "item": "workspace revision",
+   "status": "DEFERRED",
+   "decision": "Removed from this trace by operator decision (2026-10-15). atlas_packets.workspace_revision is the integer 0 default; no real workspace hash is bound here."
+  }
+ ],
+ "correction": "Earlier version reported 0 chunk rows. That was a path-namespace error: the query used src/... instead of sveltekit-frontend/src/.... Corrected 2026-10-15."
+}

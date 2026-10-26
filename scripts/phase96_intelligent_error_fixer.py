@@ -191,16 +191,9 @@ class ErrorFixerAgent:
         }
 
     def query_llm(self, prompt: str) -> str:
-        """Query Ollama LLM with RAG context"""
-        response = requests.post(
-            f"{OLLAMA_URL}/api/generate",
-            json={
-                "model": LLM_MODEL,
-                "prompt": prompt,
-                "stream": False
-            }
-        )
-        return response.json()["response"]
+        """Query llama-server (Ornith 1.5, :8090) with RAG context. Ollama is embeddings-only."""
+        from config.llama_chat import llama_chat
+        return llama_chat([{"role": "user", "content": prompt}], max_tokens=600, temperature=0.2)
 
     def generate_fix_with_rag(self, error_description: str) -> Dict:
         """Generate fix using RAG - search similar patterns first"""

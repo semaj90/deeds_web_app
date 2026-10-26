@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.qdrant-payload-canonical-bridge-audit-summary.v1",
+  "generatedAt": "2026-10-18T19:41:20.615Z",
+  "sourceReceipt": ".tmp/atlas/qdrant-payload-canonical-bridge-20261018.json",
+  "sourceReceiptSha256": "7b4009df9f159e05165321f5be5d01ecc8dce76890a432e4ed0c622dc0b8e260",
+  "mode": "QDRANT_PAYLOAD_ONLY_PLUS_POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "collection": "codebase_chunks_768",
+  "collectionStatusBeforeAndAfter": "green",
+  "pointsBeforeAndAfter": 328348,
+  "vectorConfiguration": {
+    "content": { "dimension": 768, "distance": "Cosine" },
+    "error": { "dimension": 768, "distance": "Cosine" },
+    "signature": { "dimension": 768, "distance": "Cosine" }
+  },
+  "canonicalPostgresReconciliation": {
+    "qdrantPoints": 328348,
+    "uniqueChunkIdCandidates": 239395,
+    "ambiguousChunkIdCandidates": 925,
+    "missingChunkIdCandidates": 88028,
+    "uniqueCandidatesExactSourceRef": 236495,
+    "uniqueCandidatesExactContentHash": 220802,
+    "uniqueCandidatesExactSourceRefAndHash": 220673,
+    "uniqueCandidatesWithAllRequiredRevisions": 0,
+    "strictlyRevisionQualifiedCandidates": 0,
+    "packetKeyMatches": 106337,
+    "packetKeyUnmatched": 222011
+  },
+  "revisionColumnCoverage": {
+    "canonicalChunkRows": 274465,
+    "workspaceRevisionPresent": 0,
+    "sourceRevisionPresent": 0,
+    "representationRevisionPresent": 0,
+    "sourceRevisionPolicy": "DEFERRED_BY_OPERATOR; not used as the blocker for this gate",
+    "activeMissingBindings": ["workspace_revision", "representation_revision"]
+  },
+  "decision": "PAYLOAD_LOCATORS_ARE_NOT_FULLY_REVISION_QUALIFIED",
+  "safeguards": {
+    "postgresTransaction": "REPEATABLE READ READ ONLY; ROLLBACK",
+    "qdrantWrites": 0,
+    "postgresWrites": 0,
+    "valkeyWrites": 0,
+    "vectorsFetched": false,
+    "inferenceCalls": 0
+  },
+  "limitations": [
+    "Qdrant scroll is not transactionally pinned; collection count was unchanged before and after.",
+    "This audit evaluates payload locators and available revision columns; it does not establish embedding model lineage or retrieval quality.",
+    "Packet-key matches are not unique point-to-chunk identity and cannot be used to fill ordinal mappings."
+  ]
+}

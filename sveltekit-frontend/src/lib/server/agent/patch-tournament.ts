@@ -63,6 +63,7 @@ export interface PatchTournamentPlan {
       score: number;
       reviewStatus: RankedPatchTournamentCandidate['reviewStatus'];
       rationale: string;
+      patchSummary: string;
       worktreePath: string;
       branchName: string;
       evidenceRefs: string[];
@@ -82,8 +83,114 @@ export interface PatchTournamentPlan {
   safeNextCommand: string;
 }
 
-function countPassed(checks: PatchTournamentCheck[]): number {
-  return checks.reduce((total, check) => total + (check.passed ? 1 : 0), 0);
+export interface PatchTournamentResolutionContext {
+  /**
+   * Set or list of verified evidence references from database verification
+   * from the independent atlas_receipt_verifier_results_v1 table.
+   */
+  verifiedEvidenceRefs?: Set<string> | readonly string[];
+  /**
+   * Custom evidence verification predicate.
+   */
+  evidenceResolver?: (evidenceRef: string, check: PatchTournamentCheck) => boolean;
+}
+
+/**
+ * Resolves evidence references only when the independent verifier table and the
+ * canonical test receipt agree. The relabel view is not an independent verdict.
+ * Accepts a pg pool or client. Zero mutations performed (strictly read-only).
+ */
+export async function resolveVerifiedEvidenceRefsFromVerifierResults(
+  pgClientOrPool: { query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[] }> },
+  candidateRefs: string[]
+): Promise<Set<string>> {
+  if (candidateRefs.length === 0) return new Set();
+  const sql = `
+    SELECT DISTINCT r.execution_receipt_id, r.report_checksum, r.source_ref
+    FROM atlas_test_execution_receipts r
+    JOIN atlas_receipt_verifier_results_v1 v
+      ON v.execution_receipt_id = r.execution_receipt_id
+    WHERE v.verification_status = 'VERIFIED_PASS'
+      AND v.evidence_resolved = true
+      AND v.canonical = false
+      AND v.computed_digest = ('sha256:' || r.report_checksum)
+      AND r.status = 'passed'
+      AND (r.failure_messages IS NULL OR r.failure_messages = '[]'::jsonb)
+      AND (
+        r.execution_receipt_id = ANY($1::text[])
+        OR ('sha256:' || r.report_checksum) = ANY($1::text[])
+        OR r.report_checksum = ANY($1::text[])
+        OR r.source_ref = ANY($1::text[])
+      )
+  `;
+  const result = await pgClientOrPool.query(sql, [candidateRefs]);
+  const verified = new Set<string>();
+  for (const row of result.rows as Array<{ execution_receipt_id?: string; report_checksum?: string; source_ref?: string }>) {
+    if (row.execution_receipt_id) verified.add(row.execution_receipt_id);
+    if (row.report_checksum) {
+      verified.add(row.report_checksum);
+      verified.add(`sha256:${row.report_checksum}`);
+    }
+    if (row.source_ref) verified.add(row.source_ref);
+  }
+  return verified;
+}
+
+export async function buildPatchTournamentPlanWithVerifiedEvidence(
+  pgClientOrPool: { query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[] }> },
+  request: PatchTournamentRequest,
+): Promise<PatchTournamentPlan> {
+  const candidateRefs = request.candidates.flatMap((candidate) =>
+    [...candidate.staticChecks, ...candidate.focusedTests]
+      .map((check) => check.evidenceRef?.trim())
+      .filter((ref): ref is string => Boolean(ref)),
+  );
+  const verifiedEvidenceRefs = await resolveVerifiedEvidenceRefsFromVerifierResults(pgClientOrPool, candidateRefs);
+  return buildPatchTournamentPlan(request, { verifiedEvidenceRefs });
+}
+
+/**
+ * A pass is only eligible for scoring when it names a command and an evidence reference.
+ * When resolutionContext is provided, the reference must resolve to a verified record.
+ */
+export function hasRequiredPassEvidence(
+  check: PatchTournamentCheck,
+  resolutionContext?: PatchTournamentResolutionContext
+): boolean {
+  if (!check.passed || !check.command?.trim() || !check.evidenceRef?.trim()) {
+    return false;
+  }
+  const ref = check.evidenceRef.trim();
+  if (resolutionContext?.evidenceResolver) {
+    return resolutionContext.evidenceResolver(ref, check);
+  }
+  if (resolutionContext?.verifiedEvidenceRefs) {
+    const verifiedSet = resolutionContext.verifiedEvidenceRefs instanceof Set
+      ? resolutionContext.verifiedEvidenceRefs
+      : new Set(resolutionContext.verifiedEvidenceRefs);
+    return verifiedSet.has(ref);
+  }
+  return true;
+}
+
+function countPassed(checks: PatchTournamentCheck[], resolutionContext?: PatchTournamentResolutionContext): number {
+  return checks.reduce((total, check) => total + (hasRequiredPassEvidence(check, resolutionContext) ? 1 : 0), 0);
+}
+
+function countUnverifiedPassed(checks: PatchTournamentCheck[], resolutionContext?: PatchTournamentResolutionContext): number {
+  return checks.reduce((total, check) => total + (check.passed && !hasRequiredPassEvidence(check, resolutionContext) ? 1 : 0), 0);
+}
+
+function countFailed(checks: PatchTournamentCheck[]): number {
+  return checks.reduce((total, check) => total + (check.passed ? 0 : 1), 0);
+}
+
+function countCheckEvidenceRefs(checks: PatchTournamentCheck[], resolutionContext?: PatchTournamentResolutionContext): number {
+  return new Set(
+    checks
+      .filter((check) => hasRequiredPassEvidence(check, resolutionContext))
+      .map((check) => check.evidenceRef!.trim()),
+  ).size;
 }
 
 function stableDigest(value: string): string {
@@ -104,12 +211,21 @@ function validateRequest(request: PatchTournamentRequest): void {
   }
 }
 
-function scoreCandidate(candidate: PatchTournamentCandidateInput): RankedPatchTournamentCandidate {
-  const staticPassed = countPassed(candidate.staticChecks);
-  const staticFailed = candidate.staticChecks.length - staticPassed;
-  const testsPassed = countPassed(candidate.focusedTests);
-  const testsFailed = candidate.focusedTests.length - testsPassed;
-  const evidenceCount = candidate.evidenceRefs.filter(Boolean).length;
+function scoreCandidate(
+  candidate: PatchTournamentCandidateInput,
+  resolutionContext?: PatchTournamentResolutionContext
+): RankedPatchTournamentCandidate {
+  const staticPassed = countPassed(candidate.staticChecks, resolutionContext);
+  const staticFailed = countFailed(candidate.staticChecks);
+  const testsPassed = countPassed(candidate.focusedTests, resolutionContext);
+  const testsFailed = countFailed(candidate.focusedTests);
+  const unverifiedPassed =
+    countUnverifiedPassed(candidate.staticChecks, resolutionContext) +
+    countUnverifiedPassed(candidate.focusedTests, resolutionContext);
+  const evidenceCount = countCheckEvidenceRefs(
+    [...candidate.staticChecks, ...candidate.focusedTests],
+    resolutionContext
+  );
   const worktreeBonus = candidate.worktreePath.trim() ? 8 : 0;
   const branchBonus = candidate.branchName.trim() ? 4 : 0;
   const isolationBonus = candidate.worktreePath.trim() ? 6 : 0;
@@ -128,16 +244,32 @@ function scoreCandidate(candidate: PatchTournamentCandidateInput): RankedPatchTo
     filePenalty -
     failurePenalty;
 
+  // A patch that fails any static check (apply / compile / type check) is never presented as "review first", even if other
+  // checks passed: it is blocked. A failed focused test (with all static checks passing) caps it at review_later.
   let reviewStatus: RankedPatchTournamentCandidate['reviewStatus'] = 'review_later';
   if (staticPassed === 0 && testsPassed === 0) reviewStatus = 'blocked';
+  else if (staticFailed > 0) reviewStatus = 'blocked';
+  else if (testsFailed > 0) reviewStatus = 'review_later';
   else if (staticPassed > 0 && testsPassed > 0 && evidenceCount > 0) reviewStatus = 'review_first';
 
+  const isIndependentlyVerified = Boolean(
+    resolutionContext?.verifiedEvidenceRefs || resolutionContext?.evidenceResolver
+  );
+  const evidenceDescriptor = isIndependentlyVerified
+    ? `${evidenceCount} check evidence refs verified against receipt database`
+    : `${evidenceCount} check evidence refs pass the evidence-field gate (not independently verified)`;
+
   const rationaleParts = [
-    `${staticPassed}/${candidate.staticChecks.length} static checks passed`,
-    `${testsPassed}/${candidate.focusedTests.length} focused tests passed`,
-    `${evidenceCount} evidence refs`,
+    `${staticPassed}/${candidate.staticChecks.length} static checks pass the evidence-field gate`,
+    `${testsPassed}/${candidate.focusedTests.length} focused tests pass the evidence-field gate`,
+    evidenceDescriptor,
     candidate.worktreePath.trim() ? 'isolated worktree provided' : 'no isolated worktree',
   ];
+  if (unverifiedPassed > 0) {
+    rationaleParts.push(
+      `${unverifiedPassed} unverified passes not scored (${isIndependentlyVerified ? 'unverified evidence' : 'missing command or evidenceRef'})`
+    );
+  }
   if (candidate.riskSignals?.length) rationaleParts.push(`${candidate.riskSignals.length} risk signals`);
 
   return {
@@ -149,15 +281,19 @@ function scoreCandidate(candidate: PatchTournamentCandidateInput): RankedPatchTo
   };
 }
 
-function compareRanked(a: RankedPatchTournamentCandidate, b: RankedPatchTournamentCandidate): number {
+function compareRanked(
+  a: RankedPatchTournamentCandidate,
+  b: RankedPatchTournamentCandidate,
+  resolutionContext?: PatchTournamentResolutionContext
+): number {
   if (b.score !== a.score) return b.score - a.score;
 
-  const aStatic = countPassed(a.staticChecks);
-  const bStatic = countPassed(b.staticChecks);
+  const aStatic = countPassed(a.staticChecks, resolutionContext);
+  const bStatic = countPassed(b.staticChecks, resolutionContext);
   if (bStatic !== aStatic) return bStatic - aStatic;
 
-  const aTests = countPassed(a.focusedTests);
-  const bTests = countPassed(b.focusedTests);
+  const aTests = countPassed(a.focusedTests, resolutionContext);
+  const bTests = countPassed(b.focusedTests, resolutionContext);
   if (bTests !== aTests) return bTests - aTests;
 
   const aEvidence = a.evidenceRefs.filter(Boolean).length;
@@ -168,9 +304,14 @@ function compareRanked(a: RankedPatchTournamentCandidate, b: RankedPatchTourname
   return a.candidateId.localeCompare(b.candidateId);
 }
 
-export function buildPatchTournamentPlan(request: PatchTournamentRequest): PatchTournamentPlan {
+export function buildPatchTournamentPlan(
+  request: PatchTournamentRequest,
+  resolutionContext?: PatchTournamentResolutionContext
+): PatchTournamentPlan {
   validateRequest(request);
-  const ranked = request.candidates.map(scoreCandidate).sort(compareRanked);
+  const ranked = request.candidates
+    .map((candidate) => scoreCandidate(candidate, resolutionContext))
+    .sort((a, b) => compareRanked(a, b, resolutionContext));
   const normalized = ranked.map((candidate, index) => ({
     ...candidate,
     rank: index + 1,

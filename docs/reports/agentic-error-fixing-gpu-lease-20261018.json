@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "generatedAt": "2026-10-18T00:00:00.000Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_RUNTIME_BLOCKER",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "candidates": [
+    {
+      "fingerprint": "sha256:GPU_CAGRA_LEASE_20261018",
+      "kind": "GRAPH_OR_GPU",
+      "gateId": "GPU_CAGRA_LEASE",
+      "owner": "GPU executor lease and CAGRA parity",
+      "file": "scripts/atlas/prove-cagra-postgres-parity-v1.py",
+      "diagnostic": "Live RTX 3060 Ti check: 7,807/8,192 MiB used, 218 MiB free, 2% utilization. llama-server.exe PID 13076 owns :8090; GET /slots reports is_processing=false. An idle inference slot does not release VRAM, and the server process was not stopped.",
+      "proposedAction": "Run the existing CAGRA parity proof only after the operator authorizes the documented graceful GPU lease transition and nvidia-smi confirms sufficient free VRAM; restore the existing Ornith runtime afterward. Do not kill llama-server.exe or relax CPU parity/provenance gates.",
+      "recommendedMcpTools": [],
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ]
+}

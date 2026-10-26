@@ -2,9 +2,49 @@
 
 **Date**: July 11, 2026  
 **Session**: Session 136+ (Continuation)  
-**Status**: ✅ **INFRASTRUCTURE COMPLETE & VERIFIED**
+**Status**: **HISTORICAL SNAPSHOT (July 11, 2026)** — Infrastructure implemented for heuristic regex backfill, but **canonical admission is NOT proven**.
 
-## Executive Summary
+---
+
+## ⚠️ Current Status Addendum & Architecture Governance (October 2026 Audit)
+
+The July 11, 2026 baseline establishes a valuable historical milestone for heuristic symbol backfill, but **"Infrastructure Complete & Verified" overstates what its evidence establishes for Parent Atlas**. Stored AST symbols do not establish native AST provenance, accurate syntax tree boundaries, current workspace identity, or downstream evidence admission.
+
+### Gate Assessment Matrix
+| Gate | Status | Assessment |
+| :--- | :---: | :--- |
+| **P2A-HISTORICAL-BACKFILL** | ✅ Completed | Historical July 11 baseline recorded (5,697/7,273 eligible packets). |
+| **P2A-REGEX-SYMBOL-COVERAGE** | ℹ️ Reported | 78.33% reported on July 11; current DB reports 38,302/61,718 packets with non-empty `ast_symbols`. |
+| **P2A-NATIVE-AST-PROVENANCE** | ❌ NOT ESTABLISHED | Regex pattern matching only (`funcPattern`, `classPattern`); not Tree-sitter CST or AST-grep. |
+| **P2A-SOURCE-REVISION-VERIFY** | ❌ OPEN | Query selects only `packet_key, source_ref`; stored `content_hash` is not checked. Version guards un-enforced. |
+| **P2A-WORKSPACE-REVISION-VERIFY** | ❌ OPEN | Rows not qualified against frozen workspace revisions. |
+| **P2A-DUPLICATE-SYMBOL-IDENTITY** | ❌ OPEN | `tree_node_ids` keyed by symbol name alone, collapsing overloaded/duplicate identifiers. |
+| **P2A-INDEPENDENT-READBACK** | ❌ OPEN | No post-write readback verification; row errors logged but skipped without attempt ledger. |
+| **P2A-CONTEXTMANIFEST-ADMISSION** | ❌ OPEN | Reusing real packet keys is necessary, but insufficient to admit extracted features to ContextManifest. |
+
+### Source-Level Discrepancies in Historical Script (`phase2a-ast-grep-synthetic-key-fix.mjs`)
+1. **Regex, Not AST**: Uses regex text pattern matching rather than a syntax parser. Cannot identify AST node spans, lexical scopes, or syntax hierarchies.
+2. **Missing Version Guard**: Computes local file SHA-256 for `tree_node_id` generation, but never compares it against stored `content_hash` in `atlas_packets`. The stated "skip on mismatch" guard is not implemented.
+3. **Symbol Name Collisions**: `tree_node_ids` JSONB dictionary is keyed by symbol name alone (`{ [symbolName]: id }`), collapsing overloads and identical identifiers.
+4. **Point Coordinates, Not Spans**: `startLine` and `endLine` are set to identical line numbers rather than full node byte spans (`sourceByteStart` / `sourceByteEnd`).
+5. **Arbitrary 100-Symbol Cap**: Silently truncates symbol discovery on complex modules.
+6. **Hardcoded Fallbacks**: Contains machine-specific filesystem path fallback (`C:\Users\james\Videos\deeds-web-app`) and PostgreSQL password fallbacks (`123456`).
+
+---
+
+### Recommended Next Implementation Gate: `P2A-NATIVE-AST-SOURCE-CROSSWALK-01`
+Do **not** re-run the historical backfill script or deploy another heuristic regex extractor. Proceed strictly through:
+1. **Authoritative Owner Identification**: Bind AST extraction to port `8095` (Tree-sitter CST / AST-grep provider) owning node types, byte spans, and syntax facts.
+2. **Provenance Classification**: Sample existing `atlas_packet_features` rows and classify provenance (`HISTORICAL_REGEX_BACKFILL` vs `NATIVE_TREESITTER_CST`).
+3. **5-Point Identity Resolution**: Resolve sampled records to `(packet_key, source_ref, source_revision, workspace_revision, exact UTF-8 byte spans)`.
+4. **Source Byte Readback**: Independently open current source files, verify byte digests against frozen revisions, and confirm AST node boundaries.
+5. **Non-Canonical Preservation**: Treat historical features as non-canonical derived data (`canonicalAuthority: false`) until crosswalk passes.
+6. **Defect Audit**: Record exact matches, stale revisions, ambiguous symbols, missing sources, and invalid coordinates in a structured JSON receipt.
+7. **Governed Additive Repair**: Only plan additive repairs after `P2A-NATIVE-AST-SOURCE-CROSSWALK-01` verification is proven.
+
+---
+
+## Historical Executive Summary (Archived July 11, 2026 Baseline)
 
 Phase 2A canonical AST extraction infrastructure is fully wired and operational:
 
@@ -353,7 +393,8 @@ Expected: 5,697 with_ast, 78.33% coverage
 
 ---
 
-**Status**: 🟢 **READY FOR P2C+ WORK**  
-**Blocker**: None — infrastructure fully wired and tested  
-**Session**: Session 136+ Continuation  
-**Last Updated**: July 11, 2026
+**Status**: ⚠️ **HISTORICAL BASELINE ARCHIVED — P2A-NATIVE-AST-SOURCE-CROSSWALK-01 REQUIRED BEFORE CANONICAL ADMISSION**  
+**Next Gate**: `P2A-NATIVE-AST-SOURCE-CROSSWALK-01` (resolve exact UTF-8 byte spans, Tree-sitter CST provenance, and frozen workspace revisions)  
+**Session**: Audit & Architecture Governance  
+**Last Updated**: October 12, 2026
+

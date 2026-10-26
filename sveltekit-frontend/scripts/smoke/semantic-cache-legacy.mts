@@ -20,7 +20,7 @@ async function main(): Promise<void> {
 		const suffix = crypto.randomUUID().slice(0, 12);
 		const prompt = `Legacy semantic cache smoke ${suffix}`;
 		const response = `Cached response ${suffix}`;
-		const model = 'gemma4-rotorquant:latest';
+		const model = 'ornith-1.5-9b';
 		const queryHash = crypto.createHash('sha256').update(prompt).digest('hex');
 		const semanticCacheKey = buildSemanticCacheKey(queryHash, model, 'bifrost/ollama');
 

@@ -1,0 +1,6107 @@
+{
+  "schema": "atlas.p13-p17-stratified-feature-cohort-receipt.v1",
+  "generatedAt": "2026-10-16T01:01:14.924Z",
+  "writesPerformed": false,
+  "cohortSize": 50,
+  "strataCounts": {
+    "UI_SVELTE5": 10,
+    "API_ROUTES": 10,
+    "RETRIEVAL_SEARCH": 10,
+    "DB_SCHEMA_VECTOR": 10,
+    "MCP_ATLAS_TOOLS": 10
+  },
+  "totalRevisionQualifiedTreeNodesMinted": 525,
+  "utf8SpanValidationFailures": 0,
+  "ordinalMapChecksum": "sha256:5d00f097941fd064238b9f5c445cbf2c13efd9a0edb7c82b83dd56dac60facbf",
+  "featureMatrixShape": [
+    50,
+    8
+  ],
+  "featureColumns": [
+    "normalizedByteLength",
+    "symbolDensity",
+    "importDensity",
+    "callEdgeDensity",
+    "runeDensity",
+    "handlerDensity",
+    "elementDensity",
+    "stratumWeight"
+  ],
+  "featureMatrixChecksum": "sha256:69c3891c13fade1a35e157f20e411277646bbaa5a17ababb2c4a964cd3987bcf",
+  "typedEdgeSummary": {
+    "totalEdgesExtracted": 882,
+    "byType": {
+      "IMPORTS": 165,
+      "CALLS": 603,
+      "RUNE_DEPENDENCY": 56,
+      "EVENT_DISPATCH": 58
+    }
+  },
+  "candidateOrdinals": [
+    {
+      "ordinal": 0,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "sourceRevision": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32",
+      "rootTreeNodeId": "tn_v1_5c25c1b9152277105e2ec9e65b8480a5",
+      "bytes": 1543,
+      "counts": {
+        "symbols": 6,
+        "imports": 0,
+        "calls": 7,
+        "runes": 1,
+        "handlers": 3,
+        "elements": 8
+      },
+      "presenceMask": 251,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 1,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "sourceRevision": "sha256:34f4b2e15c2217aab06becb9943538b38ccd7731717ae5f4468b5b7914b14389",
+      "rootTreeNodeId": "tn_v1_a15d201c6d8519ec57a9fcd4ff41850e",
+      "bytes": 5731,
+      "counts": {
+        "symbols": 13,
+        "imports": 5,
+        "calls": 30,
+        "runes": 4,
+        "handlers": 3,
+        "elements": 30
+      },
+      "presenceMask": 255,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 2,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "sourceRevision": "sha256:ae37bb669f79805745ee57cfed637d7b63cfdc8c9b2bf5253983244e2813bd1e",
+      "rootTreeNodeId": "tn_v1_dc61756c0c87ab7aa12a2a0308d2a653",
+      "bytes": 24407,
+      "counts": {
+        "symbols": 33,
+        "imports": 3,
+        "calls": 89,
+        "runes": 13,
+        "handlers": 7,
+        "elements": 157
+      },
+      "presenceMask": 255,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 3,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "sourceRevision": "sha256:6a83c8f8c3c5b93b7ec369b72fd42d3567d77d698585e8f8c4346e47c3786bb6",
+      "rootTreeNodeId": "tn_v1_9bb60fa8092303a39d5c98e88d95dcd1",
+      "bytes": 6679,
+      "counts": {
+        "symbols": 21,
+        "imports": 4,
+        "calls": 23,
+        "runes": 3,
+        "handlers": 9,
+        "elements": 27
+      },
+      "presenceMask": 255,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 4,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "sourceRevision": "sha256:8f1fab0a99ae60c8dd00e695365c64f1875c347ee70bf13b45d960a439e5d2f9",
+      "rootTreeNodeId": "tn_v1_4f9013df758ec1f86ae0da8f8d05c860",
+      "bytes": 6488,
+      "counts": {
+        "symbols": 14,
+        "imports": 2,
+        "calls": 32,
+        "runes": 7,
+        "handlers": 1,
+        "elements": 42
+      },
+      "presenceMask": 255,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 5,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "sourceRevision": "sha256:145b64aa0da55a3073bdf8d206b8ab9f91aa4b26eb1e252c0d1cbbacec36618b",
+      "rootTreeNodeId": "tn_v1_77e9c6267b1a821596edaae0712210c8",
+      "bytes": 9734,
+      "counts": {
+        "symbols": 21,
+        "imports": 0,
+        "calls": 49,
+        "runes": 9,
+        "handlers": 3,
+        "elements": 62
+      },
+      "presenceMask": 251,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 6,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "sourceRevision": "sha256:884f8ffc6e2f04b52c640592440c2f2f1a47fe86fd2eac879878b4a642cc1ee1",
+      "rootTreeNodeId": "tn_v1_bf38316381c0e24387d6f49154a49f94",
+      "bytes": 1745,
+      "counts": {
+        "symbols": 4,
+        "imports": 1,
+        "calls": 5,
+        "runes": 1,
+        "handlers": 1,
+        "elements": 13
+      },
+      "presenceMask": 255,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 7,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "sourceRevision": "sha256:55042a26b619a6c00b8241cf90873f56f86551c9cc2717449f4cbf63638a5a7c",
+      "rootTreeNodeId": "tn_v1_b2cbb044efa16a0c5b10baf47102c249",
+      "bytes": 15313,
+      "counts": {
+        "symbols": 28,
+        "imports": 10,
+        "calls": 55,
+        "runes": 6,
+        "handlers": 6,
+        "elements": 80
+      },
+      "presenceMask": 255,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 8,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "sourceRevision": "sha256:257947744b111ac340514e85d7dd6e00c9906409bd60bf5eacf568d39cf592d2",
+      "rootTreeNodeId": "tn_v1_32ec01a0c6f5800c4afe771b49bbc0cb",
+      "bytes": 11879,
+      "counts": {
+        "symbols": 25,
+        "imports": 0,
+        "calls": 48,
+        "runes": 6,
+        "handlers": 11,
+        "elements": 54
+      },
+      "presenceMask": 251,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 9,
+      "stratum": "UI_SVELTE5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "sourceRevision": "sha256:5395d73e0783157ebe883586d1f50be79be2f6e62a690c8dda29d9b05466d525",
+      "rootTreeNodeId": "tn_v1_7d205820d8abf8a24d3243f2b6072abd",
+      "bytes": 14632,
+      "counts": {
+        "symbols": 27,
+        "imports": 0,
+        "calls": 57,
+        "runes": 6,
+        "handlers": 14,
+        "elements": 78
+      },
+      "presenceMask": 251,
+      "missingnessReason": "NONE"
+    },
+    {
+      "ordinal": 10,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "sourceRevision": "sha256:72c5d6042fd4c59b2203cc582cf4fc5b8262b7d24ad988b081688bbf5c955fae",
+      "rootTreeNodeId": "tn_v1_658a5fa33870e49393dbbac98ca75032",
+      "bytes": 1129,
+      "counts": {
+        "symbols": 4,
+        "imports": 4,
+        "calls": 23,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 11,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "sourceRevision": "sha256:b8361513a8434b616c2fe9e064a4e55490ebf9a6e4ec4cb461bd6937574cc8db",
+      "rootTreeNodeId": "tn_v1_218df5dc4b20bd423cb68f556a4d1809",
+      "bytes": 1204,
+      "counts": {
+        "symbols": 7,
+        "imports": 7,
+        "calls": 25,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 12,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "sourceRevision": "sha256:2fd171509a7bd7668812fa17b8df81c475b0023922d1ef50472d603e49d95ebe",
+      "rootTreeNodeId": "tn_v1_d19b0a51cc088d81cb685af4f370548f",
+      "bytes": 5036,
+      "counts": {
+        "symbols": 7,
+        "imports": 7,
+        "calls": 46,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 13,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "sourceRevision": "sha256:ef645a05258aca24074ecbe4a36489091f04960028bf92d8ffbcab6908f6ec76",
+      "rootTreeNodeId": "tn_v1_c20868ea34d27dbd04e698838fd0479c",
+      "bytes": 1319,
+      "counts": {
+        "symbols": 4,
+        "imports": 4,
+        "calls": 18,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 14,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "sourceRevision": "sha256:a9f896b9dcc35486ccb4e66bc4540f18623d261973b6f81f7969a2d7fe9c31f3",
+      "rootTreeNodeId": "tn_v1_5dd24a97947c6d3b33ef67e0dc6e6c99",
+      "bytes": 6638,
+      "counts": {
+        "symbols": 4,
+        "imports": 4,
+        "calls": 46,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 15,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "sourceRevision": "sha256:d93dfdb97a6ef515b3fe6314162178560e8bb12e1c1023478cdcbc79c829c801",
+      "rootTreeNodeId": "tn_v1_68d4a2a1148b0012677ce780c7d65d15",
+      "bytes": 31707,
+      "counts": {
+        "symbols": 43,
+        "imports": 14,
+        "calls": 263,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 16,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "sourceRevision": "sha256:0e9b081e1ac3fd637fc94efe0a1c522013bcc9296e6798b1d605677cabc33a40",
+      "rootTreeNodeId": "tn_v1_b5fd5a4b0d4269a336466f9f9b4c075f",
+      "bytes": 5207,
+      "counts": {
+        "symbols": 12,
+        "imports": 8,
+        "calls": 66,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 17,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "sourceRevision": "sha256:c8766ce6bf8c3e18d63887945587325a241e8cdf92bc1296dc81b25d8d727143",
+      "rootTreeNodeId": "tn_v1_8d6fc18c75c1b388c843840052fb5283",
+      "bytes": 9425,
+      "counts": {
+        "symbols": 8,
+        "imports": 5,
+        "calls": 95,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 18,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "sourceRevision": "sha256:40925e319b63422635726ea80db02838bddb2484712f054330174fbdd5a44f70",
+      "rootTreeNodeId": "tn_v1_8a6cbca9860b3d2b34bef8b79312f93c",
+      "bytes": 5339,
+      "counts": {
+        "symbols": 6,
+        "imports": 4,
+        "calls": 42,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 19,
+      "stratum": "API_ROUTES",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "sourceRevision": "sha256:f476743324dd1d63a58753288dc90c02761f04efac74ebcc50b3e1b64564ceb4",
+      "rootTreeNodeId": "tn_v1_8a865cbc891d9d83d908c4a631def280",
+      "bytes": 4376,
+      "counts": {
+        "symbols": 6,
+        "imports": 6,
+        "calls": 69,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 20,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/ace-retrieval-logger.ts",
+      "sourceRevision": "sha256:65a7b0db503120a63f25dece681b138455fb9a928146119f0afbcf6ee0f20499",
+      "rootTreeNodeId": "tn_v1_b42778b266efb6b448f20c1ec00685d6",
+      "bytes": 66,
+      "counts": {
+        "symbols": 1,
+        "imports": 0,
+        "calls": 0,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 131,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 21,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/bm42-sparse-retriever.ts",
+      "sourceRevision": "sha256:0812d955b7f7d156a4a5368d4cf420906c075a8ff0530a690adbefebe5ca77f2",
+      "rootTreeNodeId": "tn_v1_065ee25d0ce78e4ec9d120fd4b6bfcd0",
+      "bytes": 504,
+      "counts": {
+        "symbols": 2,
+        "imports": 1,
+        "calls": 2,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 22,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/disabled-retriever.ts",
+      "sourceRevision": "sha256:aff87a2b80fab62deb57fdf88a47d5e11b1f52cb5dfdb0361757da36b11de889",
+      "rootTreeNodeId": "tn_v1_c9c233dd36f3377f8c1c58149c38ccb4",
+      "bytes": 573,
+      "counts": {
+        "symbols": 2,
+        "imports": 1,
+        "calls": 3,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 23,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "sourceRevision": "sha256:97fc94285ed95d9c8ea46fdeabbefde572cbe3bb611f8d6de3e6f2732b5e3dd1",
+      "rootTreeNodeId": "tn_v1_cfa50a6a36c363b410ae91643358259b",
+      "bytes": 8125,
+      "counts": {
+        "symbols": 15,
+        "imports": 7,
+        "calls": 64,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 24,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "sourceRevision": "sha256:3186286609077d0f4658546557fa5da826160274070af94ccd56228ef7be71b4",
+      "rootTreeNodeId": "tn_v1_60cda8c4924bd4930fe9eba4e511ff79",
+      "bytes": 3976,
+      "counts": {
+        "symbols": 8,
+        "imports": 4,
+        "calls": 22,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 25,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "sourceRevision": "sha256:fcf37e9e044724494f13cf3e6ab28449eded7ce939a07affcce64f0511caa573",
+      "rootTreeNodeId": "tn_v1_f779fe7f248e39bbeb8636699f78795b",
+      "bytes": 5288,
+      "counts": {
+        "symbols": 9,
+        "imports": 3,
+        "calls": 32,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 26,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/qdrant-bm42-retriever.ts",
+      "sourceRevision": "sha256:ceeadfadb6e5b31371c3af5c65ead580c9949481352464104113418fbf219bd2",
+      "rootTreeNodeId": "tn_v1_32c7475306948294d16ec9ccd12d5686",
+      "bytes": 1079,
+      "counts": {
+        "symbols": 3,
+        "imports": 1,
+        "calls": 2,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 27,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "sourceRevision": "sha256:905f09a7070d2555d54ee02459876c300f587a30c14e7f71d3f30502c4505626",
+      "rootTreeNodeId": "tn_v1_2fa46c25779b38a75953a72b9f63015d",
+      "bytes": 1508,
+      "counts": {
+        "symbols": 3,
+        "imports": 0,
+        "calls": 19,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 139,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 28,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/codebase-ann-backend.ts",
+      "sourceRevision": "sha256:d943498c945a0d932440b0150a3305705f34a7d4f119549046736c65d5b609de",
+      "rootTreeNodeId": "tn_v1_c4ec3585602cf1fce0654dfc10f4524c",
+      "bytes": 296,
+      "counts": {
+        "symbols": 2,
+        "imports": 0,
+        "calls": 2,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 139,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 29,
+      "stratum": "RETRIEVAL_SEARCH",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "sourceRevision": "sha256:361877c019ea7a989f0f8d6c681401d075792bb17da30c2b307117f70c0da2f8",
+      "rootTreeNodeId": "tn_v1_9513a2c43d03066a7c10ac86ca545b41",
+      "bytes": 3497,
+      "counts": {
+        "symbols": 8,
+        "imports": 3,
+        "calls": 20,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 30,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "sourceRevision": "sha256:06410ea7efb5f7c39fe842a6b3b11e7f5fc5dec01a7beb43825fa0e6c36121e9",
+      "rootTreeNodeId": "tn_v1_19703f97f24453cf855cf50924366232",
+      "bytes": 7402,
+      "counts": {
+        "symbols": 3,
+        "imports": 3,
+        "calls": 236,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 31,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/enhanced-legal-schema.ts",
+      "sourceRevision": "sha256:c717e906db89f355c5bc72ef07b81d6669a27fed0fc0291031aaf84dafba014a",
+      "rootTreeNodeId": "tn_v1_05c152094b39093e364f266e1898501f",
+      "bytes": 272,
+      "counts": {
+        "symbols": 0,
+        "imports": 2,
+        "calls": 1,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 141,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 32,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/legal-schema.ts",
+      "sourceRevision": "sha256:7ce9c4b0279cebd0e9db609118b5da91776c1ec18b5622f00a8cf11727aecd24",
+      "rootTreeNodeId": "tn_v1_7aab586d9e127bc11af4f3d2b7571f78",
+      "bytes": 117,
+      "counts": {
+        "symbols": 0,
+        "imports": 1,
+        "calls": 0,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 133,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 33,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "sourceRevision": "sha256:e8334a788f46e63720df2a2d68819cef3bc7237df8b7f18cfbef4ce89e139b21",
+      "rootTreeNodeId": "tn_v1_76db4fc1b98c87f88e05181cdf836efd",
+      "bytes": 687,
+      "counts": {
+        "symbols": 1,
+        "imports": 1,
+        "calls": 16,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 34,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "sourceRevision": "sha256:93f243042c0c5a5b29816f5ab77ac1522d84be0a4292fc9a6829078920c726c2",
+      "rootTreeNodeId": "tn_v1_4a31c65e0a77c5b044986a170da7735a",
+      "bytes": 2611,
+      "counts": {
+        "symbols": 3,
+        "imports": 3,
+        "calls": 76,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 35,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-old.ts",
+      "sourceRevision": "sha256:818c16794b39e5e6c930045bc5bd6558b66a7ee5a20fd08a5e8c1e050d5ec4b5",
+      "rootTreeNodeId": "tn_v1_ca2d3cec691ba3d520005ba5b2db833f",
+      "bytes": 724,
+      "counts": {
+        "symbols": 3,
+        "imports": 1,
+        "calls": 0,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 135,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 36,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-postgres-enhanced.ts",
+      "sourceRevision": "sha256:277ddc1f289f5228efb7d6a0da31a39a8290085b10dd8e9d4a86488e8a89d99d",
+      "rootTreeNodeId": "tn_v1_6be271ee35db0c9ef042338fbd782feb",
+      "bytes": 265,
+      "counts": {
+        "symbols": 1,
+        "imports": 0,
+        "calls": 0,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 131,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 37,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "sourceRevision": "sha256:c94ebb1fe9c74adc62ce2131f0762927f402b6e17a673978958bc8b907e0d49f",
+      "rootTreeNodeId": "tn_v1_4970d07c030280da776ccde1b0a6cb28",
+      "bytes": 2717,
+      "counts": {
+        "symbols": 5,
+        "imports": 3,
+        "calls": 30,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 38,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "sourceRevision": "sha256:720d5e657b9a2c9df9466ef1556471766ae5df3cac21743f249bb109708bce82",
+      "rootTreeNodeId": "tn_v1_fea8803c15df0506ea3ec9137b6e046b",
+      "bytes": 3296,
+      "counts": {
+        "symbols": 4,
+        "imports": 0,
+        "calls": 28,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 139,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 39,
+      "stratum": "DB_SCHEMA_VECTOR",
+      "sourceRef": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "sourceRevision": "sha256:8d6883aed6d86cba1f55864aad73b1a0d46338ebba50560d0773fc51a3569979",
+      "rootTreeNodeId": "tn_v1_f9798cc49900b5d62611ca8194721f2c",
+      "bytes": 3593,
+      "counts": {
+        "symbols": 4,
+        "imports": 2,
+        "calls": 26,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 40,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "sourceRevision": "sha256:9d61bdff7812c81772d838cb6591dece0e3240d5ea115ea2574a52786d54b96d",
+      "rootTreeNodeId": "tn_v1_d98d42fc1af0d064fce8ea35586d413c",
+      "bytes": 4786,
+      "counts": {
+        "symbols": 5,
+        "imports": 4,
+        "calls": 42,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 41,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "sourceRevision": "sha256:0f4e8c91587764110d50a34757f11b9c8049cdba7a4cf1b0430b82cfe1638eef",
+      "rootTreeNodeId": "tn_v1_b387210727f32c878f12e1f12c3405b3",
+      "bytes": 18559,
+      "counts": {
+        "symbols": 10,
+        "imports": 6,
+        "calls": 189,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 42,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "sourceRevision": "sha256:2c7d822790065f1223ce4cb83d14b888046aa2dc255e7f3a407519cb599d0e6b",
+      "rootTreeNodeId": "tn_v1_4a0245ac14ffaa0519efc8eb60d7b9b1",
+      "bytes": 11979,
+      "counts": {
+        "symbols": 11,
+        "imports": 4,
+        "calls": 67,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 43,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "sourceRevision": "sha256:bca4248634a0fde65486ae7fcb5aa8f1d96ab0c125643305083ed2e8528c2ab7",
+      "rootTreeNodeId": "tn_v1_788170e194ff2082b323d8f185fd2bd3",
+      "bytes": 1075,
+      "counts": {
+        "symbols": 4,
+        "imports": 3,
+        "calls": 12,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 44,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "scripts/atlas/_atlas-utils.mjs",
+      "sourceRevision": "sha256:905f6eb7252daf5b0d6e28ddd3695008529b2eeaea24a86d1c99bdbde089a12e",
+      "rootTreeNodeId": "tn_v1_47e463cd032d50fd8efcb6c472aed719",
+      "bytes": 10885,
+      "counts": {
+        "symbols": 33,
+        "imports": 5,
+        "calls": 181,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 45,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "sourceRevision": "sha256:97653c909b695b962fc39532b6d2d729562838320545a0d2ee763f539d9514c7",
+      "rootTreeNodeId": "tn_v1_29fdc5b5dc09b1c5668b777620b29131",
+      "bytes": 1101,
+      "counts": {
+        "symbols": 1,
+        "imports": 1,
+        "calls": 21,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 46,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "scripts/atlas/_neschrom-paths.mjs",
+      "sourceRevision": "sha256:acbcef7f5f5e25b4564cd238f8052ec46610084f320dd5e2bcb5037c4886b41b",
+      "rootTreeNodeId": "tn_v1_44092c4b8dc8fe9a548b7abc79c65b02",
+      "bytes": 1374,
+      "counts": {
+        "symbols": 4,
+        "imports": 4,
+        "calls": 14,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 47,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "sourceRevision": "sha256:df1dc962aeaad67b0c38c584ec79432a9b2de7d454f1bc1e45bfae4cac2b439f",
+      "rootTreeNodeId": "tn_v1_64abbae60da1be7a29b83c9cb730e725",
+      "bytes": 19995,
+      "counts": {
+        "symbols": 16,
+        "imports": 1,
+        "calls": 161,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 48,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "scripts/atlas/ace-packet-assembly.mjs",
+      "sourceRevision": "sha256:b372f84c955605adc0052b693968257f2bbfc6e50ff54fcef9799b73b1815ca1",
+      "rootTreeNodeId": "tn_v1_216826d30ebf8700b56081ef8bc22d0c",
+      "bytes": 14448,
+      "counts": {
+        "symbols": 14,
+        "imports": 8,
+        "calls": 138,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    },
+    {
+      "ordinal": 49,
+      "stratum": "MCP_ATLAS_TOOLS",
+      "sourceRef": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "sourceRevision": "sha256:7be4a98c485e5efc02d4905c58baa66428c2af4f92858cbb5d5f66ee5b415757",
+      "rootTreeNodeId": "tn_v1_3f9eee75a597c6f3aa6d1b94c047570f",
+      "bytes": 5453,
+      "counts": {
+        "symbols": 7,
+        "imports": 5,
+        "calls": 50,
+        "runes": 0,
+        "handlers": 0,
+        "elements": 0
+      },
+      "presenceMask": 143,
+      "missingnessReason": "NOT_APPLICABLE_NON_SVELTE_TEMPLATE_LANES"
+    }
+  ],
+  "featureMatrixRows": [
+    {
+      "ordinal": 0,
+      "rootTreeNodeId": "tn_v1_5c25c1b9152277105e2ec9e65b8480a5",
+      "presenceMask": 251,
+      "features": [
+        0.023544,
+        0.24,
+        0,
+        0.14,
+        0.066667,
+        0.2,
+        0.1,
+        1
+      ]
+    },
+    {
+      "ordinal": 1,
+      "rootTreeNodeId": "tn_v1_a15d201c6d8519ec57a9fcd4ff41850e",
+      "presenceMask": 255,
+      "features": [
+        0.087448,
+        0.52,
+        0.25,
+        0.6,
+        0.266667,
+        0.2,
+        0.375,
+        1
+      ]
+    },
+    {
+      "ordinal": 2,
+      "rootTreeNodeId": "tn_v1_dc61756c0c87ab7aa12a2a0308d2a653",
+      "presenceMask": 255,
+      "features": [
+        0.372421,
+        1,
+        0.15,
+        1,
+        0.866667,
+        0.466667,
+        1,
+        1
+      ]
+    },
+    {
+      "ordinal": 3,
+      "rootTreeNodeId": "tn_v1_9bb60fa8092303a39d5c98e88d95dcd1",
+      "presenceMask": 255,
+      "features": [
+        0.101913,
+        0.84,
+        0.2,
+        0.46,
+        0.2,
+        0.6,
+        0.3375,
+        1
+      ]
+    },
+    {
+      "ordinal": 4,
+      "rootTreeNodeId": "tn_v1_4f9013df758ec1f86ae0da8f8d05c860",
+      "presenceMask": 255,
+      "features": [
+        0.098999,
+        0.56,
+        0.1,
+        0.64,
+        0.466667,
+        0.066667,
+        0.525,
+        1
+      ]
+    },
+    {
+      "ordinal": 5,
+      "rootTreeNodeId": "tn_v1_77e9c6267b1a821596edaae0712210c8",
+      "presenceMask": 251,
+      "features": [
+        0.148529,
+        0.84,
+        0,
+        0.98,
+        0.6,
+        0.2,
+        0.775,
+        1
+      ]
+    },
+    {
+      "ordinal": 6,
+      "rootTreeNodeId": "tn_v1_bf38316381c0e24387d6f49154a49f94",
+      "presenceMask": 255,
+      "features": [
+        0.026627,
+        0.16,
+        0.05,
+        0.1,
+        0.066667,
+        0.066667,
+        0.1625,
+        1
+      ]
+    },
+    {
+      "ordinal": 7,
+      "rootTreeNodeId": "tn_v1_b2cbb044efa16a0c5b10baf47102c249",
+      "presenceMask": 255,
+      "features": [
+        0.233658,
+        1,
+        0.5,
+        1,
+        0.4,
+        0.4,
+        1,
+        1
+      ]
+    },
+    {
+      "ordinal": 8,
+      "rootTreeNodeId": "tn_v1_32ec01a0c6f5800c4afe771b49bbc0cb",
+      "presenceMask": 251,
+      "features": [
+        0.181259,
+        1,
+        0,
+        0.96,
+        0.4,
+        0.733333,
+        0.675,
+        1
+      ]
+    },
+    {
+      "ordinal": 9,
+      "rootTreeNodeId": "tn_v1_7d205820d8abf8a24d3243f2b6072abd",
+      "presenceMask": 251,
+      "features": [
+        0.223267,
+        1,
+        0,
+        1,
+        0.4,
+        0.933333,
+        0.975,
+        1
+      ]
+    },
+    {
+      "ordinal": 10,
+      "rootTreeNodeId": "tn_v1_658a5fa33870e49393dbbac98ca75032",
+      "presenceMask": 143,
+      "features": [
+        0.017227,
+        0.16,
+        0.2,
+        0.46,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 11,
+      "rootTreeNodeId": "tn_v1_218df5dc4b20bd423cb68f556a4d1809",
+      "presenceMask": 143,
+      "features": [
+        0.018372,
+        0.28,
+        0.35,
+        0.5,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 12,
+      "rootTreeNodeId": "tn_v1_d19b0a51cc088d81cb685af4f370548f",
+      "presenceMask": 143,
+      "features": [
+        0.076843,
+        0.28,
+        0.35,
+        0.92,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 13,
+      "rootTreeNodeId": "tn_v1_c20868ea34d27dbd04e698838fd0479c",
+      "presenceMask": 143,
+      "features": [
+        0.020126,
+        0.16,
+        0.2,
+        0.36,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 14,
+      "rootTreeNodeId": "tn_v1_5dd24a97947c6d3b33ef67e0dc6e6c99",
+      "presenceMask": 143,
+      "features": [
+        0.101288,
+        0.16,
+        0.2,
+        0.92,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 15,
+      "rootTreeNodeId": "tn_v1_68d4a2a1148b0012677ce780c7d65d15",
+      "presenceMask": 143,
+      "features": [
+        0.48381,
+        1,
+        0.7,
+        1,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 16,
+      "rootTreeNodeId": "tn_v1_b5fd5a4b0d4269a336466f9f9b4c075f",
+      "presenceMask": 143,
+      "features": [
+        0.079453,
+        0.48,
+        0.4,
+        1,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 17,
+      "rootTreeNodeId": "tn_v1_8d6fc18c75c1b388c843840052fb5283",
+      "presenceMask": 143,
+      "features": [
+        0.143814,
+        0.32,
+        0.25,
+        1,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 18,
+      "rootTreeNodeId": "tn_v1_8a6cbca9860b3d2b34bef8b79312f93c",
+      "presenceMask": 143,
+      "features": [
+        0.081467,
+        0.24,
+        0.2,
+        0.84,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 19,
+      "rootTreeNodeId": "tn_v1_8a865cbc891d9d83d908c4a631def280",
+      "presenceMask": 143,
+      "features": [
+        0.066772,
+        0.24,
+        0.3,
+        1,
+        0,
+        0,
+        0,
+        0.9
+      ]
+    },
+    {
+      "ordinal": 20,
+      "rootTreeNodeId": "tn_v1_b42778b266efb6b448f20c1ec00685d6",
+      "presenceMask": 131,
+      "features": [
+        0.001563,
+        0.04,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 21,
+      "rootTreeNodeId": "tn_v1_065ee25d0ce78e4ec9d120fd4b6bfcd0",
+      "presenceMask": 143,
+      "features": [
+        0.00769,
+        0.08,
+        0.05,
+        0.04,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 22,
+      "rootTreeNodeId": "tn_v1_c9c233dd36f3377f8c1c58149c38ccb4",
+      "presenceMask": 143,
+      "features": [
+        0.008743,
+        0.08,
+        0.05,
+        0.06,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 23,
+      "rootTreeNodeId": "tn_v1_cfa50a6a36c363b410ae91643358259b",
+      "presenceMask": 143,
+      "features": [
+        0.123978,
+        0.6,
+        0.35,
+        1,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 24,
+      "rootTreeNodeId": "tn_v1_60cda8c4924bd4930fe9eba4e511ff79",
+      "presenceMask": 143,
+      "features": [
+        0.060669,
+        0.32,
+        0.2,
+        0.44,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 25,
+      "rootTreeNodeId": "tn_v1_f779fe7f248e39bbeb8636699f78795b",
+      "presenceMask": 143,
+      "features": [
+        0.080688,
+        0.36,
+        0.15,
+        0.64,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 26,
+      "rootTreeNodeId": "tn_v1_32c7475306948294d16ec9ccd12d5686",
+      "presenceMask": 143,
+      "features": [
+        0.016464,
+        0.12,
+        0.05,
+        0.04,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 27,
+      "rootTreeNodeId": "tn_v1_2fa46c25779b38a75953a72b9f63015d",
+      "presenceMask": 139,
+      "features": [
+        0.02301,
+        0.12,
+        0,
+        0.38,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 28,
+      "rootTreeNodeId": "tn_v1_c4ec3585602cf1fce0654dfc10f4524c",
+      "presenceMask": 139,
+      "features": [
+        0.004517,
+        0.08,
+        0,
+        0.04,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 29,
+      "rootTreeNodeId": "tn_v1_9513a2c43d03066a7c10ac86ca545b41",
+      "presenceMask": 143,
+      "features": [
+        0.05336,
+        0.32,
+        0.15,
+        0.4,
+        0,
+        0,
+        0,
+        0.95
+      ]
+    },
+    {
+      "ordinal": 30,
+      "rootTreeNodeId": "tn_v1_19703f97f24453cf855cf50924366232",
+      "presenceMask": 143,
+      "features": [
+        0.112946,
+        0.12,
+        0.15,
+        1,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 31,
+      "rootTreeNodeId": "tn_v1_05c152094b39093e364f266e1898501f",
+      "presenceMask": 141,
+      "features": [
+        0.00415,
+        0,
+        0.1,
+        0.02,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 32,
+      "rootTreeNodeId": "tn_v1_7aab586d9e127bc11af4f3d2b7571f78",
+      "presenceMask": 133,
+      "features": [
+        0.001785,
+        0,
+        0.05,
+        0,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 33,
+      "rootTreeNodeId": "tn_v1_76db4fc1b98c87f88e05181cdf836efd",
+      "presenceMask": 143,
+      "features": [
+        0.010483,
+        0.04,
+        0.05,
+        0.32,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 34,
+      "rootTreeNodeId": "tn_v1_4a31c65e0a77c5b044986a170da7735a",
+      "presenceMask": 143,
+      "features": [
+        0.039841,
+        0.12,
+        0.15,
+        1,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 35,
+      "rootTreeNodeId": "tn_v1_ca2d3cec691ba3d520005ba5b2db833f",
+      "presenceMask": 135,
+      "features": [
+        0.011047,
+        0.12,
+        0.05,
+        0,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 36,
+      "rootTreeNodeId": "tn_v1_6be271ee35db0c9ef042338fbd782feb",
+      "presenceMask": 131,
+      "features": [
+        0.004044,
+        0.04,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 37,
+      "rootTreeNodeId": "tn_v1_4970d07c030280da776ccde1b0a6cb28",
+      "presenceMask": 143,
+      "features": [
+        0.041458,
+        0.2,
+        0.15,
+        0.6,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 38,
+      "rootTreeNodeId": "tn_v1_fea8803c15df0506ea3ec9137b6e046b",
+      "presenceMask": 139,
+      "features": [
+        0.050293,
+        0.16,
+        0,
+        0.56,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 39,
+      "rootTreeNodeId": "tn_v1_f9798cc49900b5d62611ca8194721f2c",
+      "presenceMask": 143,
+      "features": [
+        0.054825,
+        0.16,
+        0.1,
+        0.52,
+        0,
+        0,
+        0,
+        0.85
+      ]
+    },
+    {
+      "ordinal": 40,
+      "rootTreeNodeId": "tn_v1_d98d42fc1af0d064fce8ea35586d413c",
+      "presenceMask": 143,
+      "features": [
+        0.073029,
+        0.2,
+        0.2,
+        0.84,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 41,
+      "rootTreeNodeId": "tn_v1_b387210727f32c878f12e1f12c3405b3",
+      "presenceMask": 143,
+      "features": [
+        0.283188,
+        0.4,
+        0.3,
+        1,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 42,
+      "rootTreeNodeId": "tn_v1_4a0245ac14ffaa0519efc8eb60d7b9b1",
+      "presenceMask": 143,
+      "features": [
+        0.182785,
+        0.44,
+        0.2,
+        1,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 43,
+      "rootTreeNodeId": "tn_v1_788170e194ff2082b323d8f185fd2bd3",
+      "presenceMask": 143,
+      "features": [
+        0.016403,
+        0.16,
+        0.15,
+        0.24,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 44,
+      "rootTreeNodeId": "tn_v1_47e463cd032d50fd8efcb6c472aed719",
+      "presenceMask": 143,
+      "features": [
+        0.166092,
+        1,
+        0.25,
+        1,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 45,
+      "rootTreeNodeId": "tn_v1_29fdc5b5dc09b1c5668b777620b29131",
+      "presenceMask": 143,
+      "features": [
+        0.0168,
+        0.04,
+        0.05,
+        0.42,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 46,
+      "rootTreeNodeId": "tn_v1_44092c4b8dc8fe9a548b7abc79c65b02",
+      "presenceMask": 143,
+      "features": [
+        0.020966,
+        0.16,
+        0.2,
+        0.28,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 47,
+      "rootTreeNodeId": "tn_v1_64abbae60da1be7a29b83c9cb730e725",
+      "presenceMask": 143,
+      "features": [
+        0.305099,
+        0.64,
+        0.05,
+        1,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 48,
+      "rootTreeNodeId": "tn_v1_216826d30ebf8700b56081ef8bc22d0c",
+      "presenceMask": 143,
+      "features": [
+        0.220459,
+        0.56,
+        0.4,
+        1,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    },
+    {
+      "ordinal": 49,
+      "rootTreeNodeId": "tn_v1_3f9eee75a597c6f3aa6d1b94c047570f",
+      "presenceMask": 143,
+      "features": [
+        0.083206,
+        0.28,
+        0.25,
+        1,
+        0,
+        0,
+        0,
+        0.8
+      ]
+    }
+  ],
+  "admittedEdges": [
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "rune:$props",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "call:props",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "call:choose",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "call:choose",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "call:choose",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "call:choose",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "call:translateY",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "targetSpec": "call:translateY",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "rune:$props",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "rune:$effect",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "event:onsubmit",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "$lib/utils/xstate-svelte5.svelte.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "xstate",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "$lib/stores/admin-chat-machine.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "svelte/transition",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:props",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:useMachine",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:provide",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:fromPromise",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:fetch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:stringify",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:Error",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:untrack",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:handleSubmit",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:trim",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:matches",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "targetSpec": "call:send",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "svelte/transition",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "$lib/components/ui/Icon.svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:fetchStats",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "targetSpec": "call:all",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "rune:$derived",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "rune:$derived",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onkeydown",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onkeydown",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "$lib/components/admin/AiAnalysisPopup.svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "$lib/stores/admin-chat-assistant.svelte.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "svelte/transition",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "$lib/stores/admin-chat-assistant.svelte.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:Pattern",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:summarizePanel",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:swap",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:derived",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:derived",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:handleCopy",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:writeText",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:setTimeout",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:handleStyleChange",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:summarizePanel",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:handleReanalyze",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:summarizePanel",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:handlePushToChat",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "targetSpec": "call:summarizePanel",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "$lib/client/batch-summarizer",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:onMount",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:loadJobs",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:loadJobs",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:fetch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:slice",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:map",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:processAllJobs",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:now",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "targetSpec": "call:initialize",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$derived",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$derived",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$derived",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$derived.by",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "rune:$derived",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:derived",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:derived",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:derived",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:by",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:set",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:get",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:entries",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:sort",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:derived",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:sort",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:slice",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:fetchBundle",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "targetSpec": "call:fetch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "rune:$props",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "svelte/transition",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "call:props",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "call:executeCommand",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "call:alert",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "call:n",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "targetSpec": "call:executeCommand",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "rune:$props",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "rune:$effect",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "event:onsubmit",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "event:onkeydown",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "event:onchange",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "$lib/utils/xstate-svelte5.svelte.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "xstate",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "$lib/stores/admin-chat-machine.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "svelte/transition",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "bits-ui",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "$lib/utils/ui-recon.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "$lib/components/ui/badge/Badge.svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "$lib/components/ui/Icon.svelte",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "$lib/utils.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:bindable",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:props",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:useMachine",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:provide",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:fromPromise",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:captureUISnapshot",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:fetch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:stringify",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:Error",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:handleFileUpload",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "targetSpec": "call:FormData",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "rune:$props",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "rune:$derived",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onchange",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onchange",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onchange",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onchange",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:props",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:derived",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:ceil",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:handleSearch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:onSearch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:handleFilterChange",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:onFilterChange",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:handleSort",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:formatFileSize",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:floor",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "rune:$props",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "rune:$state",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "rune:$effect",
+      "edgeType": "RUNE_DEPENDENCY"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onkeydown",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onkeydown",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onkeydown",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onkeydown",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "event:onclick",
+      "edgeType": "EVENT_DISPATCH"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:props",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:state",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:effect",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:stringify",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:validateForm",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:trim",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:parse",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:keys",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:handleSave",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:validateForm",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:parse",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "targetSpec": "call:onSave",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "./$types",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "$lib/server/ace/ace-agent.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:int",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "child_process",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "util",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "path",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "$lib/server/utils/validateRequest",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "$lib/server/auth-utils.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:promisify",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:array",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:unknown",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:boolean",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "targetSpec": "call:requireUser",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "./$types",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "$lib/server/grpc/embedding-client.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "$lib/server/types/ace.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "$lib/server/types/ace.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "$lib/server/search/qdrant-search.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:enum",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:uuid",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:now",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:safeParse",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "./$types",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "$lib/server/ace/ace-error-kag.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:array",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:enum",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:safeParse",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "./$types",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "$lib/server/env.server.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "$lib/server/llm/runtime-contract.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:reachability",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:timeout",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:now",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:fetch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:T",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:map",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:includes",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:includes",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:fetch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:join",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:T",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "./$types",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/indexer/legal-chunker.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/grpc/embedding-client.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/vector/qdrant-manager.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "crypto",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/db/client",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/db/schema-postgres.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/ocr/hybrid.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/yolo.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/ace-ingest-progress.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "drizzle-orm",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "$lib/server/env.server.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:Number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:createAceJobId",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:now",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:randomBytes",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "targetSpec": "call:toString",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "child_process",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "path",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "fs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "$lib/server/cache/ace-packet-cache.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "$lib/server/ace/variance-recovery.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "$lib/server/token-map/token-map-service.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:runPacketBuilder",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:Promise",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:spawn",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:cwd",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:setEncoding",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:on",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:setTimeout",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:kill",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:reject",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:Error",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:once",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:clearTimeout",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:reject",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:once",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "targetSpec": "call:clearTimeout",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "$lib/server/db/client",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "drizzle-orm",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "$lib/server/features/ai/ace/gemma4-packet-compiler.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:route_runtime_packets",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "$lib/gpu/gemma4-policy-orchestrator",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "$lib/gpu/gemma4-policy-orchestrator",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:passthrough",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:array",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:orchestrator",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:getOrchestrator",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "targetSpec": "call:Gemma4PolicyOrchestrator",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "@sveltejs/kit",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "./$types",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "$lib/server/grpc/embedding-client.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "$lib/server/grpc/graph-ml-client.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "$lib/server/types/ace.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:enum",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:array",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:nullable",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "targetSpec": "call:number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/bm42-sparse-retriever.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/bm42-sparse-retriever.ts",
+      "targetSpec": "call:createBm42SparseRetriever",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/bm42-sparse-retriever.ts",
+      "targetSpec": "call:retrieve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/disabled-retriever.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/disabled-retriever.ts",
+      "targetSpec": "call:createDisabledRetriever",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/disabled-retriever.ts",
+      "targetSpec": "call:retrieve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/disabled-retriever.ts",
+      "targetSpec": "call:info",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "node:crypto",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "@deeds/parent-atlas",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "@deeds/parent-atlas/core/structural-symbol",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "$lib/server/analysis/ast-grep-extractor.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "$lib/server/nlp/miniforge-nlp-sidecar.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "./structural-lane-retriever.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:sha256",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:createHash",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:update",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:digest",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:sourceRevisionMatchesUtf8SourceV1",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:from",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:toString",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:replace",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:toLowerCase",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:test",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:sha256",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:sha256Utf8ByteSpanV1",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:isInteger",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:isInteger",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "targetSpec": "call:from",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "drizzle-orm",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "./postgres-exact-retriever.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:tree_node_id",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:inferKindsFromQuery",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:toLowerCase",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:filter",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:includes",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:getDb",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:createPostgresAstRetriever",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:retrieve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:match",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:slice",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:inferKindsFromQuery",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:map",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:escapeLike",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:ANY",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "targetSpec": "call:getDb",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "drizzle-orm",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:escapeLike",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:replace",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:replace",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:replace",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:getDb",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:extractQuerySignals",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:replace",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:tokens",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:match",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:slice",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:match",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:b",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:slice",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "targetSpec": "call:from",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/qdrant-bm42-retriever.ts",
+      "targetSpec": "../lane-contracts.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/qdrant-bm42-retriever.ts",
+      "targetSpec": "call:createQdrantBM42Retriever",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/retrieval/adapters/qdrant-bm42-retriever.ts",
+      "targetSpec": "call:retrieve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:BoW",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:terms",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:separators",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:tokenizeBowQuery",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:Set",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:toLowerCase",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:split",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:map",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:trim",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:filter",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:matched",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:weightedBowOverlapScore",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:entries",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:has",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "targetSpec": "call:Number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/codebase-ann-backend.ts",
+      "targetSpec": "call:getCodebaseAnnBackend",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/codebase-ann-backend.ts",
+      "targetSpec": "call:toLowerCase",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "./search-backend.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "./search-backend.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "./rust-napi-search-backend.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:backend",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:TurboVec",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:constructor",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:health",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:search",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:close",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:constructor",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:health",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:search",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:close",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:createCodebaseSearchBackend",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:Error",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:QdrantSearchBackend",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:Error",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "targetSpec": "call:TurboVecSearchBackend",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "drizzle-orm/pg-core",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "drizzle-orm/pg-core",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "./schema-postgres.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:pgTable",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:uuid",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:primaryKey",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:defaultRandom",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:uuid",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:references",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:notNull",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:uuid",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:references",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:notNull",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:varchar",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:notNull",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:timestamp",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:defaultNow",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "targetSpec": "call:notNull",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/enhanced-legal-schema.ts",
+      "targetSpec": "drizzle-orm",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/enhanced-legal-schema.ts",
+      "targetSpec": "drizzle-orm/pg-core",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/enhanced-legal-schema.ts",
+      "targetSpec": "call:Storage",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/legal-schema.ts",
+      "targetSpec": "drizzle-orm/pg-core",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "drizzle-orm/pg-core",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:pgTable",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:uuid",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:primaryKey",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:defaultRandom",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:varchar",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:notNull",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:unique",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:varchar",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:pgTable",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:varchar",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:primaryKey",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:uuid",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:notNull",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:references",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "targetSpec": "call:timestamp",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "drizzle-orm",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "drizzle-orm/pg-core",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "drizzle-orm/pg-core",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:pgTable",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:integer",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:primaryKey",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:varchar",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:notNull",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:unique",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:varchar",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:varchar",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:timestamp",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:defaultNow",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:timestamp",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:defaultNow",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:pgTable",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:uuid",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "targetSpec": "call:default",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-old.ts",
+      "targetSpec": "$lib/server/db/schema-postgres",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "$lib/server/ai/multi-query-generator",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "$lib/server/vector/qdrant-manager.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "$lib/server/grpc/embedding-client",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:QdrantManager",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:search",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:generate",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:includes",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:unshift",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:map",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:generateEmbedding",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:hybridSearch",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:keys",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:all",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:Fusion",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:mergeResults",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:map",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "targetSpec": "call:slice",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:codec",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:generateSparseVector",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:generateLegacyHashedSparseVector",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:Set",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:index",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:tokenToIndex",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:charCodeAt",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:imul",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:generateLegacyHashedSparseVector",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:toLowerCase",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:replace",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:split",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:filter",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "targetSpec": "call:has",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "./qdrant-manager.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "$lib/server/gpu/pytorch-graph.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:clustering",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:clusterCollection",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:now",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:scroll",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:isArray",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:now",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:Float32Array",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:flat",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "targetSpec": "call:kmeansWithCentroids",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "@modelcontextprotocol/sdk/server/mcp.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "./dispatcher-middleware.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "./dispatcher-tool-integration.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:registerAdminTools",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:generateSessionId",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:registerTool",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:record",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:any",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:describe",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:optional",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:describe",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:createToolWithDispatcher",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:keys",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "targetSpec": "call:generateSessionId",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "@modelcontextprotocol/sdk/server/mcp.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "../lib/server/embedding/embedding-contract.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "../lib/server/vector/qdrant-manager.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "./dispatcher-middleware.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "./dispatcher-tool-integration.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:resolveRedisOverrides",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:URL",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:Number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:isFinite",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:parsePacketIdentity",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:centroids",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:centroids",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:derivation",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:registerAtlasEmbeddingTools",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:resolveRedisOverrides",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:generateSessionId",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:registerTool",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:string",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "zod",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "$lib/server/db/client.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "$lib/server/db/schema-postgres.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "drizzle-orm",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:object",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:number",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:int",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:min",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:max",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:default",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:describe",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:boolean",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:default",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:describe",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:payloads",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:boolean",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:default",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:describe",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "targetSpec": "call:resolution",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "$lib/server/atlas/atlas-semantic-tools.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "./domain-server-core.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "./atlas-semantic-domain-registry.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:createDomainServer",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:getAtlasSemanticDomainTools",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:async",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:handleAtlasSemanticToolCall",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:stringify",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:main",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:serveDomainServer",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:endsWith",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:endsWith",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:main",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:error",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "targetSpec": "call:exit",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "node:fs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "node:readline",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "node:path",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "node:url",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "dotenv",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:dirname",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:fileURLToPath",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:resolve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:config",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:resolve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:resolve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:loadConfig",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:findIndex",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:resolve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:cwd",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:readJson",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:resolveRepoPath",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:resolve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:readJson",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_atlas-utils.mjs",
+      "targetSpec": "call:parse",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "pg",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:Pool",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:query",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:forEach",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:padEnd",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:query",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:forEach",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:query",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:pg_get_constraintdef",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:IN",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:forEach",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "targetSpec": "call:log",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "./_neschrom-paths.mjs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "node:path",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "node:fs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "node:url",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:Default",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:dirname",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:fileURLToPath",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:resolve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:resolve",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:join",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:join",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:join",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:join",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:join",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:path",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:join",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:ensureDirs",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/_neschrom-paths.mjs",
+      "targetSpec": "call:mkdirSync",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "$lib/server/db/client.js",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:Extractor",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:outcome_ledger",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:extractor",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:agent_playbook_entries",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:signals",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:collectSemanticEvidence",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:matching",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:prefiltered",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:similarity",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:IMPLEMENTED",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:collectValidatedEvidence",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:COLLECTION",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:normalizeKeywordSurface",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:replace",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "targetSpec": "call:toLowerCase",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "node:fs/promises",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "node:fs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "node:path",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "node:crypto",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "node:url",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "pg",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "ioredis",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "./connection-config.mjs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:rows",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:JSONB",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:ndjson",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:json",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:live",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:live",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:DEPRECATED",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:v3",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:includes",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:error",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:deprecated",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:exit",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:dirname",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:fileURLToPath",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-packet-assembly.mjs",
+      "targetSpec": "call:loadRepoEnv",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "node:fs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "node:path",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "node:url",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "./fixture-v1.mjs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "./glyph-score-v1.mjs",
+      "edgeType": "IMPORTS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:fixture",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:floordiv",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:dividing",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:uint16",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:boundary",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:row",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:generateCutileAceBoundaryFixtureV1",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:sweep",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:sweep",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:extremes",
+      "edgeType": "CALLS"
+    },
+    {
+      "sourceFile": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "targetSpec": "call:push",
+      "edgeType": "CALLS"
+    }
+  ],
+  "status": "PASS"
+}

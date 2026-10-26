@@ -6,7 +6,10 @@ import {
   type CandidateOrdinalMapV1,
 } from '../features/canonical-candidate-v1.js';
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
-import type { GroundedExtractionSourceBindingReceiptV1 } from '../identity/grounded-extraction-source-binding-v1.js';
+import {
+  assertGroundedExtractionSourceBindingReceiptV1,
+  type GroundedExtractionSourceBindingReceiptV1,
+} from '../identity/grounded-extraction-source-binding-v1.js';
 
 export interface CachedPacketHintV1 {
   hintId: string;
@@ -151,35 +154,13 @@ export function verifyCachedPacketCandidateSourceBindingSpanV1(
   receipt: GroundedExtractionSourceBindingReceiptV1,
 ): CachedPacketSourceBindingSpanVerificationV1 {
   const spanVerification = verifyCachedPacketCandidateSourceSpanV1(match, evidence);
-  const receiptPayload = {
-    schema: receipt.schema,
-    status: receipt.status,
-    canonicalPacketKey: receipt.canonicalPacketKey,
-    storagePacketKey: receipt.storagePacketKey,
-    packetResolutionSource: receipt.packetResolutionSource,
-    sourceRef: receipt.sourceRef,
-    sourceRevision: receipt.sourceRevision,
-    workspaceRevision: receipt.workspaceRevision,
-    sourceBindingChecksum: receipt.sourceBindingChecksum,
-    submittedTextChecksum: receipt.submittedTextChecksum,
-    byteLength: receipt.byteLength,
-    canonicalAuthority: receipt.canonicalAuthority,
-    writesPerformed: receipt.writesPerformed,
-  };
-  const expectedReceiptChecksum = `sha256:${createHash('sha256').update(JSON.stringify(receiptPayload), 'utf8').digest('hex')}`;
-  if (receipt.status !== 'VERIFIED_SOURCE_BINDING'
-    || receipt.canonicalAuthority !== false
-    || receipt.writesPerformed !== false
-    || receipt.checksum !== expectedReceiptChecksum
-    || !/^sha256:[a-f0-9]{64}$/.test(receipt.sourceBindingChecksum)
-    || (receipt.canonicalPacketKey !== match.packetKey && receipt.storagePacketKey !== match.packetKey)
-    || receipt.sourceRef !== match.sourceRef
-    || receipt.sourceRevision !== match.sourceRevision
-    || receipt.workspaceRevision !== match.workspaceRevision
-    || receipt.submittedTextChecksum !== spanVerification.sourceRevision
-    || receipt.byteLength !== evidence.sourceBytes.byteLength) {
-    throw new Error('CACHED_PACKET_SOURCE_BINDING_RECEIPT_MISMATCH');
-  }
+  assertGroundedExtractionSourceBindingReceiptV1(receipt, {
+    packetKey: match.packetKey ?? '',
+    sourceRef: match.sourceRef,
+    sourceRevision: spanVerification.sourceRevision,
+    workspaceRevision: match.workspaceRevision,
+    byteLength: evidence.sourceBytes.byteLength,
+  });
   const payload = {
     ...spanVerification,
     canonicalPacketKey: receipt.canonicalPacketKey,

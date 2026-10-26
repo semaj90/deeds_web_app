@@ -220,7 +220,7 @@
 			<!-- ═══ CONTEXT TAB ═══ -->
 			{#if analysisPanel.activeTab === 'context'}
 				<div class="section">
-					<label class="section-label">Current Route</label>
+					<span class="section-label">Current Route</span>
 					<div class="route-display">{analysisPanel.currentRoute || '/'}</div>
 					{#if analysisPanel.currentCaseId}
 						<div class="case-id-display">
@@ -233,7 +233,7 @@
 				<!-- Page Components -->
 				<div class="section">
 					<div class="section-header-row">
-						<label class="section-label">Page Components</label>
+						<span class="section-label">Page Components</span>
 						{#if analysisPanel.pageContextLoading}
 							<div class="spinner-sm"></div>
 						{:else if analysisPanel.pageComponents}
@@ -306,7 +306,7 @@
 				<!-- Runtime Issues -->
 				{#if analysisPanel.runtimeErrors.length > 0 || analysisPanel.networkFailures.length > 0}
 					<div class="section">
-						<label class="section-label">Runtime Issues</label>
+						<span class="section-label">Runtime Issues</span>
 						{#if analysisPanel.runtimeErrors.length > 0}
 							<div class="issues-list">
 								{#each analysisPanel.runtimeErrors.slice(0, 5) as err}
@@ -506,7 +506,7 @@
 
 				<!-- File Analysis -->
 				<div class="section">
-					<label class="section-label">Analyze File</label>
+					<span class="section-label">Analyze File</span>
 					<div class="input-row">
 						<input
 							class="file-input"
@@ -609,7 +609,7 @@
 
 				{#if analysisPanel.relatedFiles.length > 0}
 					<div class="section">
-						<label class="section-label">Related Files</label>
+						<span class="section-label">Related Files</span>
 						<div class="related-list">
 							{#each analysisPanel.relatedFiles as rf}
 								<div class="related-item" title={rf.filePath}>
@@ -650,7 +650,7 @@
 				<!-- Page Errors (filtered to current route) -->
 				{#if analysisPanel.runtimeErrors.length > 0}
 					<div class="section">
-						<label class="section-label">Page Errors ({analysisPanel.runtimeErrors.length})</label>
+						<span class="section-label">Page Errors ({analysisPanel.runtimeErrors.length})</span>
 						<div class="issues-list">
 							{#each analysisPanel.runtimeErrors.slice(0, 8) as err}
 								<div class="issue-item" style="--sev-color: {severityColor(err.severity)}">
@@ -697,7 +697,7 @@
 
 				<!-- Error Clusters -->
 				<div class="section">
-					<label class="section-label">Error Clusters</label>
+					<span class="section-label">Error Clusters</span>
 					{#if analysisPanel.clustersLoading}
 						<div class="loading-row"><div class="spinner-sm"></div><span>Loading clusters...</span></div>
 					{:else if analysisPanel.clustersError}
@@ -728,7 +728,7 @@
 				<!-- Top Error Codes -->
 				{#if analysisPanel.codebaseStats?.topErrorCodes?.length}
 					<div class="section">
-						<label class="section-label">Top Error Codes</label>
+						<span class="section-label">Top Error Codes</span>
 						<div class="code-list">
 							{#each analysisPanel.codebaseStats.topErrorCodes.slice(0, 5) as ec}
 								<div class="code-row">
@@ -757,7 +757,7 @@
 			<!-- ═══ GPU TAB ═══ -->
 			{:else if analysisPanel.activeTab === 'gpu'}
 				<div class="section">
-					<label class="section-label">CUDA Status</label>
+					<span class="section-label">CUDA Status</span>
 					{#if analysisPanel.gpuLoading}
 						<div class="loading-row"><div class="spinner-sm"></div><span>Checking GPU...</span></div>
 					{:else}
@@ -777,7 +777,7 @@
 				<!-- Device Info -->
 				{#if analysisPanel.gpuDeviceInfo}
 					<div class="section">
-						<label class="section-label">Device</label>
+						<span class="section-label">Device</span>
 						<div class="device-info">
 							<div class="device-row">
 								<Icon name="cpu" size={12} />
@@ -796,7 +796,7 @@
 
 				<!-- GPU Compute -->
 				<div class="section">
-					<label class="section-label">Compute Operations</label>
+					<span class="section-label">Compute Operations</span>
 					<div class="compute-btns">
 						<button
 							class="action-btn"
@@ -829,7 +829,7 @@
 				{#if analysisPanel.gpuComputeResult}
 					{@const r = analysisPanel.gpuComputeResult}
 					<div class="section">
-						<label class="section-label">Last Compute Result</label>
+						<span class="section-label">Last Compute Result</span>
 						<div class="compute-result">
 							<div class="compute-row">
 								<span class="compute-label">Operation</span>
@@ -854,7 +854,7 @@
 				{/if}
 
 				<div class="section">
-					<label class="section-label">Actions</label>
+					<span class="section-label">Actions</span>
 					<button
 						class="action-btn"
 						onclick={() => { analysisPanel.invalidateCaches(); analysisPanel.checkGpu(); }}
@@ -895,7 +895,7 @@
 			<!-- ═══ RECS TAB ═══ -->
 			{:else if analysisPanel.activeTab === 'recs'}
 				<div class="section">
-					<label class="section-label">ACE Recommendations</label>
+					<span class="section-label">ACE Recommendations</span>
 					<p class="recs-hint">
 						Context-aware suggestions based on your current page ({analysisPanel.contextLabel}).
 					</p>

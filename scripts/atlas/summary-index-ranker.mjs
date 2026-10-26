@@ -31,7 +31,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl, resolveRedisUrl } from './connection-config.mjs';
-import { deriveFeatureIdentity, classifyFeatureLabelStatus } from './lib/derive-feature-identity.mjs';
+import { deriveFeatureIdentity, classifyFeatureLabelStatus, classifyFeatureLabelRevisionJoinV1 } from './lib/derive-feature-identity.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dir, '../..');
@@ -289,6 +289,11 @@ function rankRows(rows) {
         feature_label_source: identity.featureLabelSource,
         feature_label_confidence: identity.featureLabelConfidence,
         feature_label_status: classifyFeatureLabelStatus(identity),
+        feature_label_revision_join_status: classifyFeatureLabelRevisionJoinV1({
+          packetSourceRevision: row.packet_source_revision,
+          packetWorkspaceRevision: row.packet_workspace_revision,
+          summaryMetadata: row.metadata,
+        }),
         title_id: titleId,
         title_id_source: scored.title_id_source,
         domain_class: cleanText(row.domain_class),
@@ -319,6 +324,20 @@ function rankRows(rows) {
 }
 
 async function loadSummaries(pool, limit) {
+  const revisionColumns = await pool.query(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_name = 'atlas_packets'
+      AND column_name IN ('source_revision', 'workspace_revision_key')
+  `);
+  const availableRevisionColumns = new Set(revisionColumns.rows.map((row) => row.column_name));
+  const packetSourceRevisionSelect = availableRevisionColumns.has('source_revision')
+    ? 'ap.source_revision AS packet_source_revision,'
+    : 'NULL::text AS packet_source_revision,';
+  const packetWorkspaceRevisionSelect = availableRevisionColumns.has('workspace_revision_key')
+    ? 'ap.workspace_revision_key AS packet_workspace_revision,'
+    : 'NULL::text AS packet_workspace_revision,';
+
   const hasUsedConcepts = await pool.query(`
     SELECT EXISTS (
       SELECT 1
@@ -349,6 +368,8 @@ async function loadSummaries(pool, limit) {
         ap.canonical_source_ref,
         ap.feature_id,
         ap.feature_label,
+        ${packetSourceRevisionSelect}
+        ${packetWorkspaceRevisionSelect}
         ap.domain_class,
         ap.community_id,
         ap.som_cluster,

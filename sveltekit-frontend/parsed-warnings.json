@@ -1,0 +1,2251 @@
+[
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\ContextualEvidenceChatModal.svelte\u001b[39m",
+    "line": 428,
+    "col": 2,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": []
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\SystemStatus.svelte\u001b[39m",
+    "line": 280,
+    "col": 2,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "\t\u001b[35m.alert-info .alert-icon\u001b[36m {",
+      "\t\tcolor: #3b82f6;\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\SystemStatus.svelte\u001b[39m",
+    "line": 289,
+    "col": 2,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "\t\u001b[35m.alert-warning .alert-icon\u001b[36m {",
+      "\t\tcolor: #f59e0b;\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\SystemStatus.svelte\u001b[39m",
+    "line": 298,
+    "col": 2,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "\t\u001b[35m.alert-error .alert-icon\u001b[36m {",
+      "\t\tcolor: #ef4444;\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\SystemStatus.svelte\u001b[39m",
+    "line": 307,
+    "col": 2,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "\t\u001b[35m.alert-success .alert-icon\u001b[36m {",
+      "\t\tcolor: #22c55e;\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\QuickActions.svelte\u001b[39m",
+    "line": 89,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.quick-actions-panel {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\QuickActions.svelte\u001b[39m",
+    "line": 89,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.quick-actions-panel {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\QuickActions.svelte\u001b[39m",
+    "line": 89,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.quick-actions-panel {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\QuickActions.svelte\u001b[39m",
+    "line": 89,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.quick-actions-panel {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\QuickActions.svelte\u001b[39m",
+    "line": 89,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.quick-actions-panel {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\gaming\\n64\\Dialog.svelte\u001b[39m",
+    "line": 150,
+    "col": 5,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "    \u001b[35m<div",
+      "      bind:this={dialogElement}",
+      "      class=\"n64-dialog {materialType} mesh-{meshComplexity} entrance-{entranceAnimation} {className}\"",
+      "      class:fullscreen",
+      "      role=\"dialog\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\gaming\\n64\\Dialog.svelte\u001b[39m",
+    "line": 150,
+    "col": 5,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "    \u001b[35m<div",
+      "      bind:this={dialogElement}",
+      "      class=\"n64-dialog {materialType} mesh-{meshComplexity} entrance-{entranceAnimation} {className}\"",
+      "      class:fullscreen",
+      "      role=\"dialog\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\gaming\\n64\\Select.svelte\u001b[39m",
+    "line": 173,
+    "col": 13,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "            \u001b[35m<span class=\"clear-icon\" onclick={clearSelection} role=\"button\" tabindex=\"0\">├ù</span>\u001b[36m",
+      "        {/if}\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\gaming\\n64\\Switch.svelte\u001b[39m",
+    "line": 193,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "  \u001b[35m<div",
+      "    bind:this={switchElement}",
+      "    class=\"n64-switch {materialType} mesh-{meshComplexity}\"",
+      "    class:checked",
+      "    class:focused={isFocused}"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\APITesterModal.svelte\u001b[39m",
+    "line": 132,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"form-label\">METHOD</label>\u001b[36m",
+      "\t\t\t\t\t<select bind:value={selectedMethod} class=\"method-select\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\APITesterModal.svelte\u001b[39m",
+    "line": 142,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"form-label\">HEADERS (JSON)</label>\u001b[36m",
+      "\t\t\t\t\t<textarea\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\APITesterModal.svelte\u001b[39m",
+    "line": 154,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">BODY (JSON)</label>\u001b[36m",
+      "\t\t\t\t\t\t<textarea\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\KeyboardShortcutsPanel.svelte\u001b[39m",
+    "line": 69,
+    "col": 2,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"shortcut-backdrop\"",
+      "\t\tonclick={handleBackdropClick}",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\KeyboardShortcutsPanel.svelte\u001b[39m",
+    "line": 69,
+    "col": 2,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"shortcut-backdrop\"",
+      "\t\tonclick={handleBackdropClick}",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\KeyboardShortcutsPanel.svelte\u001b[39m",
+    "line": 76,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"shortcut-dialog\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<!-- Header -->",
+      "\t\t\t<div class=\"shortcut-header\">",
+      "\t\t\t\t<div class=\"shortcut-header-left\">",
+      "\t\t\t\t\t<Icon name=\"keyboard\" size={18} />"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\KeyboardShortcutsPanel.svelte\u001b[39m",
+    "line": 76,
+    "col": 3,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"shortcut-dialog\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<!-- Header -->",
+      "\t\t\t<div class=\"shortcut-header\">",
+      "\t\t\t\t<div class=\"shortcut-header-left\">",
+      "\t\t\t\t\t<Icon name=\"keyboard\" size={18} />"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\EnhancedDocumentUploader.svelte\u001b[39m",
+    "line": 617,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">AI Processing Options</label>\u001b[36m",
+      "\t\t\t\t\t\t<div class=\"checkbox-group\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\EnhancedLegalAIChatWithSynthesis.svelte\u001b[39m",
+    "line": 1050,
+    "col": 15,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "              \u001b[35m<label class=\"text-sm font-medium\">Typewriter Speed</label>\u001b[36m",
+      "              <div class=\"flex items-center gap-2\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\Gemma270MWebAssembly.svelte\u001b[39m",
+    "line": 374,
+    "col": 5,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\t\t\u001b[35m<div",
+      "\t\t\t\t\tclass=\"drop-zone {isDragging ? 'dragging' : ''}\"",
+      "\t\t\t\t\tondragover={handleDragOver}",
+      "\t\t\t\t\tondragleave={handleDragLeave}",
+      "\t\t\t\t\tondrop={handleDrop}"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\LLMSelector.svelte\u001b[39m",
+    "line": 143,
+    "col": 2,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\u001b[35m<label class=\"block text-sm font-medium mb-1.5 opacity-80\">AI Model Selection</label>\u001b[36m\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\LocalImageGenerator.svelte\u001b[39m",
+    "line": 131,
+    "col": 3,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\u001b[35m<label class=\"block text-xs font-medium mb-1.5 opacity-70\">Legal Templates</label>\u001b[36m",
+      "\t\t<div class=\"flex flex-wrap gap-1.5\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\ThinkingStyleToggle.svelte\u001b[39m",
+    "line": 165,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"text-sm font-medium\">Focus Areas</label>\u001b[36m",
+      "\t\t\t\t\t<div class=\"flex flex-col gap-1.5\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ai\\CaseScoringDashboard\\CaseScoringDashboard.svelte\u001b[39m",
+    "line": 23,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 223,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"section-label\">Current Route</label>\u001b[36m",
+      "\t\t\t\t\t<div class=\"route-display\">{analysisPanel.currentRoute || '/'}</div>\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 236,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">Page Components</label>\u001b[36m",
+      "\t\t\t\t\t\t{#if analysisPanel.pageContextLoading}\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 309,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">Runtime Issues</label>\u001b[36m",
+      "\t\t\t\t\t\t{#if analysisPanel.runtimeErrors.length > 0}\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 509,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"section-label\">Analyze File</label>\u001b[36m",
+      "\t\t\t\t\t<div class=\"input-row\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 612,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">Related Files</label>\u001b[36m",
+      "\t\t\t\t\t\t<div class=\"related-list\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 653,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">Page Errors ({analysisPanel.runtimeErrors.length})</label>\u001b[36m",
+      "\t\t\t\t\t\t<div class=\"issues-list\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 700,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"section-label\">Error Clusters</label>\u001b[36m",
+      "\t\t\t\t\t{#if analysisPanel.clustersLoading}\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 731,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">Top Error Codes</label>\u001b[36m",
+      "\t\t\t\t\t\t<div class=\"code-list\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 760,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"section-label\">CUDA Status</label>\u001b[36m",
+      "\t\t\t\t\t{#if analysisPanel.gpuLoading}\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 780,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">Device</label>\u001b[36m",
+      "\t\t\t\t\t\t<div class=\"device-info\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 799,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"section-label\">Compute Operations</label>\u001b[36m",
+      "\t\t\t\t\t<div class=\"compute-btns\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 832,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\u001b[35m<label class=\"section-label\">Last Compute Result</label>\u001b[36m",
+      "\t\t\t\t\t\t<div class=\"compute-result\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 857,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"section-label\">Actions</label>\u001b[36m",
+      "\t\t\t\t\t<button\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\analysis\\AnalysisPanel.svelte\u001b[39m",
+    "line": 898,
+    "col": 6,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<label class=\"section-label\">ACE Recommendations</label>\u001b[36m",
+      "\t\t\t\t\t<p class=\"recs-hint\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\atlas\\AtlasGraphCanvas.svelte\u001b[39m",
+    "line": 90,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<svg",
+      "\t\t\tclass=\"w-full h-full\"",
+      "\t\t\tstyle=\"cursor:{dragging ? 'grabbing' : 'grab'}\"",
+      "\t\t\tviewBox=\"0 0 920 640\"",
+      "\t\t\tpreserveAspectRatio=\"xMidYMid meet\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\atlas\\FileDetailModal.svelte\u001b[39m",
+    "line": 122,
+    "col": 21,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                    \u001b[35m<label class=\"block text-sm font-medium mb-2\">File Purpose</label>\u001b[36m",
+      "                    <select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\atlas\\FileDetailModal.svelte\u001b[39m",
+    "line": 135,
+    "col": 21,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                    \u001b[35m<label class=\"block text-sm font-medium mb-2\">Thoroughness (1-5)</label>\u001b[36m",
+      "                    <div class=\"flex gap-2\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\atlas\\FileDetailModal.svelte\u001b[39m",
+    "line": 158,
+    "col": 21,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                    \u001b[35m<label class=\"block text-sm font-medium mb-2\">App Criticality</label>\u001b[36m",
+      "                    <select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\atlas\\FileDetailModal.svelte\u001b[39m",
+    "line": 171,
+    "col": 21,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                    \u001b[35m<label class=\"block text-sm font-medium mb-2\">Test Coverage %</label>\u001b[36m",
+      "                    <div class=\"flex gap-2\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\cases\\CaseViewModal.svelte\u001b[39m",
+    "line": 88,
+    "col": 2,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"case-modal-backdrop\"",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\"",
+      "\t\taria-label=\"Case details\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\cases\\CaseViewModal.svelte\u001b[39m",
+    "line": 88,
+    "col": 2,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"case-modal-backdrop\"",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\"",
+      "\t\taria-label=\"Case details\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\citations\\CitationViewModal.svelte\u001b[39m",
+    "line": 74,
+    "col": 2,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"cvm-backdrop\"",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\"",
+      "\t\taria-label=\"Citation preview\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\citations\\CitationViewModal.svelte\u001b[39m",
+    "line": 74,
+    "col": 2,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"cvm-backdrop\"",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\"",
+      "\t\taria-label=\"Citation preview\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\DocumentThumbnailTray.svelte\u001b[39m",
+    "line": 48,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"error-modal\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<div class=\"error-modal-header\">",
+      "\t\t\t\t<h3 id=\"error-modal-title\" class=\"error-modal-title\">Page {selectedPageError.pageNumber} Error</h3>",
+      "\t\t\t\t<button class=\"error-modal-close\" onclick={closeErrorModal} aria-label=\"Close modal\">Γ£ò</button>",
+      "\t\t\t</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\dashboard\\DocumentThumbnailTray.svelte\u001b[39m",
+    "line": 48,
+    "col": 3,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"error-modal\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<div class=\"error-modal-header\">",
+      "\t\t\t\t<h3 id=\"error-modal-title\" class=\"error-modal-title\">Page {selectedPageError.pageNumber} Error</h3>",
+      "\t\t\t\t<button class=\"error-modal-close\" onclick={closeErrorModal} aria-label=\"Close modal\">Γ£ò</button>",
+      "\t\t\t</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\demos\\TTSDemo.svelte\u001b[39m",
+    "line": 86,
+    "col": 4,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\u001b[35m<label>Sample Legal Texts</label>\u001b[36m",
+      "\t\t\t<div class=\"samples-grid\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\CaseEvidenceOrganizer.svelte\u001b[39m",
+    "line": 559,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.ceo-root { font-family: system-ui, sans-serif; }\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\EvidenceCustodyFlow.svelte\u001b[39m",
+    "line": 492,
+    "col": 3,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "  \u001b[35m.workflow-transition\u001b[36m {",
+      "    animation: fadeInUp 0.3s ease-out;\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\RelationshipInspector.svelte\u001b[39m",
+    "line": 237,
+    "col": 2,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": []
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceAssistant.svelte\u001b[39m",
+    "line": 212,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceAssistant.svelte\u001b[39m",
+    "line": 212,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceBoard.svelte\u001b[39m",
+    "line": 1286,
+    "col": 4,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\t\u001b[35m<div class=\"upload-overlay\"",
+      "\t\t\t\tondragleave={(e) => {",
+      "\t\t\t\t\t// Only close if we're leaving the overlay, not entering a child",
+      "\t\t\t\t\tif (e.currentTarget === e.target) isDraggingFiles = false;",
+      "\t\t\t\t}}"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\forms\\EnhancedFileUpload.svelte\u001b[39m",
+    "line": 406,
+    "col": 13,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "            \u001b[35m<label class=\"block text-sm font-medium\">Tags</label>\u001b[36m",
+      "            <div class=\"flex gap-2\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\forms\\EnhancedFileUpload.svelte\u001b[39m",
+    "line": 429,
+    "col": 13,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "            \u001b[35m<label class=\"block text-sm font-medium\">AI Processing Options</label>\u001b[36m",
+      "            <div class=\"grid grid-cols-2 gap-3\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceImageSearch.svelte\u001b[39m",
+    "line": 306,
+    "col": 6,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<div class=\"shrink-0 flex gap-1\" onclick={(e) => e.stopPropagation()} role=\"group\" aria-label=\"Feedback\">",
+      "\t\t\t\t\t\t<button",
+      "\t\t\t\t\t\t\tclass=\"p-1.5 rounded hover:bg-green-500/20 transition-colors {fb === true ? 'text-green-400' : 'text-gray-500'}\"",
+      "\t\t\t\t\t\t\ttitle=\"Relevant result\"",
+      "\t\t\t\t\t\t\tonclick={() => sendFeedback(hit, true)}"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceUploadModal.svelte\u001b[39m",
+    "line": 226,
+    "col": 2,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\u001b[35m<div class=\"upload-modal-overlay\" transition:fade={{ duration: 150 }} onclick={handleCancel}>",
+      "\t\t<div class=\"upload-modal-card\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<!-- Header -->",
+      "\t\t\t<div class=\"upload-modal-header\">",
+      "\t\t\t\t<div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceUploadModal.svelte\u001b[39m",
+    "line": 226,
+    "col": 2,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\u001b[35m<div class=\"upload-modal-overlay\" transition:fade={{ duration: 150 }} onclick={handleCancel}>",
+      "\t\t<div class=\"upload-modal-card\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<!-- Header -->",
+      "\t\t\t<div class=\"upload-modal-header\">",
+      "\t\t\t\t<div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceUploadModal.svelte\u001b[39m",
+    "line": 227,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"upload-modal-card\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<!-- Header -->",
+      "\t\t\t<div class=\"upload-modal-header\">",
+      "\t\t\t\t<div>",
+      "\t\t\t\t\t<h2 class=\"text-lg font-semibold text-sand\">Evidence Upload Pipeline</h2>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceUploadModal.svelte\u001b[39m",
+    "line": 227,
+    "col": 3,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"upload-modal-card\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<!-- Header -->",
+      "\t\t\t<div class=\"upload-modal-header\">",
+      "\t\t\t\t<div>",
+      "\t\t\t\t\t<h2 class=\"text-lg font-semibold text-sand\">Evidence Upload Pipeline</h2>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\TagInput.svelte\u001b[39m",
+    "line": 48,
+    "col": 1,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t<div class=\"tag-list\">",
+      "\t\t{#each tags as tag}",
+      "\t\t\t<span class=\"tag-chip\">",
+      "\t\t\t\t<span class=\"tag-text\">#{tag}</span>",
+      "\t\t\t\t<button"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceViewModal.svelte\u001b[39m",
+    "line": 571,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"lightbox-toolbar\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<button type=\"button\" class=\"lb-btn\" onclick={zoomOut} title=\"Zoom out (-)\">",
+      "\t\t\t\t<Icon name=\"zoom-out\" class=\"w-4 h-4\" />",
+      "\t\t\t</button>",
+      "\t\t\t<span class=\"lb-zoom-label\">{Math.round(lightboxScale * 100)}%</span>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceViewModal.svelte\u001b[39m",
+    "line": 571,
+    "col": 3,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"lightbox-toolbar\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<button type=\"button\" class=\"lb-btn\" onclick={zoomOut} title=\"Zoom out (-)\">",
+      "\t\t\t\t<Icon name=\"zoom-out\" class=\"w-4 h-4\" />",
+      "\t\t\t</button>",
+      "\t\t\t<span class=\"lb-zoom-label\">{Math.round(lightboxScale * 100)}%</span>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceViewModal.svelte\u001b[39m",
+    "line": 586,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"lightbox-img-wrap\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<img",
+      "\t\t\t\tsrc={fileUrl}",
+      "\t\t\t\talt={doc?.title ?? 'Evidence'}",
+      "\t\t\t\tclass=\"lightbox-img\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\evidence\\EvidenceViewModal.svelte\u001b[39m",
+    "line": 586,
+    "col": 3,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"lightbox-img-wrap\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<img",
+      "\t\t\t\tsrc={fileUrl}",
+      "\t\t\t\talt={doc?.title ?? 'Evidence'}",
+      "\t\t\t\tclass=\"lightbox-img\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\forms\\CaseForm.svelte\u001b[39m",
+    "line": 61,
+    "col": 13,
+    "message": "",
+    "code": "state_referenced_locally",
+    "snippet": [
+      "      SPA: !\u001b[35minitialData\u001b[36m ? true : undefined,",
+      "      validators: zodClient(caseFormSchema),\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\graph\\GraphifyViewer.svelte\u001b[39m",
+    "line": 1044,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .graphify-viewer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\ContractAnalyzer.svelte\u001b[39m",
+    "line": 334,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .contract-analyzer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\ContractAnalyzer.svelte\u001b[39m",
+    "line": 334,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .contract-analyzer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\ContractAnalyzer.svelte\u001b[39m",
+    "line": 334,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .contract-analyzer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\ContractAnalyzer.svelte\u001b[39m",
+    "line": 334,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .contract-analyzer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\ContractAnalyzer.svelte\u001b[39m",
+    "line": 334,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .contract-analyzer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\ContractAnalyzer.svelte\u001b[39m",
+    "line": 334,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .contract-analyzer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\ContractAnalyzer.svelte\u001b[39m",
+    "line": 334,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "  .contract-analyzer {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal\\PDFViewer.svelte\u001b[39m",
+    "line": 111,
+    "col": 1,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\tclass=\"pv-root\"",
+      "\tbind:this={container}",
+      "\ttabindex=\"0\"",
+      "\tonkeydown={handleKeydown}",
+      "\t<!-- Toolbar -->"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\legal-ai\\CaseChatPanel.svelte\u001b[39m",
+    "line": 332,
+    "col": 2,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"messages-container\"",
+      "\t\tclass:drop-highlight={dropActive}",
+      "\t\tbind:this={messagesContainer}",
+      "\t\tondragenter={(e) => { e.preventDefault(); dropActive = true; }}"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\modals\\EvidenceCRUDModal.svelte\u001b[39m",
+    "line": 435,
+    "col": 17,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                \u001b[35m<label class=\"block text-sm font-medium text-sand/80\">Tags</label>\u001b[36m",
+      "                <div class=\"space-y-2\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\modals\\EvidenceCRUDModal.svelte\u001b[39m",
+    "line": 482,
+    "col": 19,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                  \u001b[35m<label class=\"block text-sm font-medium text-sand/80\">File Upload</label>\u001b[36m",
+      "                  <div\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\modals\\EvidenceCRUDModal.svelte\u001b[39m",
+    "line": 532,
+    "col": 19,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                  \u001b[35m<label class=\"block text-sm font-medium text-sand/80\">AI Analysis</label>\u001b[36m",
+      "                  {#if !isReadonly}\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\modals\\EvidenceCRUDModal.svelte\u001b[39m",
+    "line": 590,
+    "col": 19,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "                  \u001b[35m<label class=\"block text-sm font-medium text-sand/80\">Metadata</label>\u001b[36m",
+      "                  <div class=\"p-3 bg-sand/5 rounded-md border border-sand/20 overflow-auto max-h-40\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\monitoring\\CacheWarmUpControl.svelte\u001b[39m",
+    "line": 106,
+    "col": 5,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\u001b[35m<label class=\"text-xs font-medium text-sand-11 block mb-1\">Domain</label>\u001b[36m",
+      "\t\t\t\t<select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\monitoring\\CacheWarmUpControl.svelte\u001b[39m",
+    "line": 126,
+    "col": 8,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\u001b[35m<label class=\"text-xs text-sand-11\">Batch Size</label>\u001b[36m",
+      "\t\t\t\t\t\t\t<input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\monitoring\\CacheWarmUpControl.svelte\u001b[39m",
+    "line": 137,
+    "col": 8,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\u001b[35m<label class=\"text-xs text-sand-11\">Delay (ms)</label>\u001b[36m",
+      "\t\t\t\t\t\t\t<input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\monitoring\\CacheWarmUpControl.svelte\u001b[39m",
+    "line": 289,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.warm-up-control {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\monitoring\\CacheWarmUpSimple.svelte\u001b[39m",
+    "line": 49,
+    "col": 3,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\u001b[35m<label style=\"display: block; font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem;\">",
+      "\t\t\tDomain:",
+      "\t\t</label>\u001b[36m",
+      "\t\t<select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\poi\\AddPoiModal.svelte\u001b[39m",
+    "line": 126,
+    "col": 11,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">Full Name <span class=\"required\">*</span></label>\u001b[36m",
+      "\t\t\t\t\t\t\t\t\t\t<input type=\"text\" bind:value={formData.name} required class=\"form-input\" placeholder=\"e.g. John Doe\" />\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\poi\\AddPoiModal.svelte\u001b[39m",
+    "line": 130,
+    "col": 11,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">Alias / Known As</label>\u001b[36m",
+      "\t\t\t\t\t\t\t\t\t\t<input type=\"text\" bind:value={formData.alias} class=\"form-input\" placeholder=\"e.g. JD, Johnny\" />\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\poi\\AddPoiModal.svelte\u001b[39m",
+    "line": 138,
+    "col": 11,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">Classification</label>\u001b[36m",
+      "\t\t\t\t\t\t\t\t\t\t<div class=\"chip-group\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\poi\\AddPoiModal.svelte\u001b[39m",
+    "line": 152,
+    "col": 11,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">Threat Assessment</label>\u001b[36m",
+      "\t\t\t\t\t\t\t\t\t\t<div class=\"threat-selector\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\poi\\AddPoiModal.svelte\u001b[39m",
+    "line": 162,
+    "col": 11,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">Date of Birth</label>\u001b[36m",
+      "\t\t\t\t\t\t\t\t\t\t<input type=\"date\" bind:value={formData.dateOfBirth} class=\"form-input\" />\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\poi\\AddPoiModal.svelte\u001b[39m",
+    "line": 169,
+    "col": 10,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">Description / Notes</label>\u001b[36m",
+      "\t\t\t\t\t\t\t\t\t<textarea bind:value={formData.description} rows={3} class=\"form-input form-textarea\" placeholder=\"Physical description, known associates, notes...\"></textarea>\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\poi\\AddPoiModal.svelte\u001b[39m",
+    "line": 175,
+    "col": 10,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\u001b[35m<label class=\"form-label\">Last Known Address</label>\u001b[36m",
+      "\t\t\t\t\t\t\t\t\t<input type=\"text\" bind:value={formData.address} class=\"form-input\" placeholder=\"123 Main St, City, State\" />\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\rag\\AnswerWithCitations.svelte\u001b[39m",
+    "line": 208,
+    "col": 3,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "  \u001b[35m<div",
+      "    class=\"fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4\"",
+      "    onclick={closeCitation}",
+      "    role=\"dialog\"",
+      "    aria-modal=\"true\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\rag\\AnswerWithCitations.svelte\u001b[39m",
+    "line": 208,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "  \u001b[35m<div",
+      "    class=\"fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4\"",
+      "    onclick={closeCitation}",
+      "    role=\"dialog\"",
+      "    aria-modal=\"true\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\rag\\AnswerWithCitations.svelte\u001b[39m",
+    "line": 214,
+    "col": 5,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "    \u001b[35m<div",
+      "      class=\"bg-base-100 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto\"",
+      "      onclick={(e) => e.stopPropagation()}",
+      "    >",
+      "      <div class=\"p-6\">"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\rag\\AnswerWithCitations.svelte\u001b[39m",
+    "line": 214,
+    "col": 5,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "    \u001b[35m<div",
+      "      class=\"bg-base-100 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto\"",
+      "      onclick={(e) => e.stopPropagation()}",
+      "    >",
+      "      <div class=\"p-6\">"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\rag\\RagDocumentGrid.svelte\u001b[39m",
+    "line": 178,
+    "col": 4,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "\t\t\t\u001b[35m<div class=\"doc-detail\" onclick={(e) => e.stopPropagation()} role=\"dialog\" aria-modal=\"true\">",
+      "\t\t\t\t<div class=\"detail-header\">",
+      "\t\t\t\t\t<h3>{selectedDocument.filename}</h3>",
+      "\t\t\t\t\t<button class=\"close-btn\" onclick={() => (selectedDocument = null)}>",
+      "\t\t\t\t\t\t<Icon name=\"x\" size={16} />"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\rag\\RagDocumentGrid.svelte\u001b[39m",
+    "line": 178,
+    "col": 4,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\t\u001b[35m<div class=\"doc-detail\" onclick={(e) => e.stopPropagation()} role=\"dialog\" aria-modal=\"true\">",
+      "\t\t\t\t<div class=\"detail-header\">",
+      "\t\t\t\t\t<h3>{selectedDocument.filename}</h3>",
+      "\t\t\t\t\t<button class=\"close-btn\" onclick={() => (selectedDocument = null)}>",
+      "\t\t\t\t\t\t<Icon name=\"x\" size={16} />"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\reports\\ReportViewModal.svelte\u001b[39m",
+    "line": 66,
+    "col": 2,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"rvm-backdrop\"",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\"",
+      "\t\taria-label=\"Report preview\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\reports\\ReportViewModal.svelte\u001b[39m",
+    "line": 66,
+    "col": 2,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"rvm-backdrop\"",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\"",
+      "\t\taria-label=\"Report preview\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\BitsUIDemo.svelte\u001b[39m",
+    "line": 59,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"block text-sm font-medium text-yorha-text-primary mb-1\">Global Search</label>\u001b[36m",
+      "      <div class=\"relative\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\BitsUIDemo.svelte\u001b[39m",
+    "line": 80,
+    "col": 9,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "        \u001b[35m<label class=\"block text-sm font-medium text-yorha-text-primary\">",
+      "          Case Name <span class=\"text-yorha-accent\">*</span>",
+      "        </label>\u001b[36m",
+      "        <div class=\"relative\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\BitsUIDemo.svelte\u001b[39m",
+    "line": 95,
+    "col": 9,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "        \u001b[35m<label class=\"block text-sm font-medium text-yorha-text-primary\">",
+      "          Case Type <span class=\"text-yorha-accent\">*</span>",
+      "        </label>\u001b[36m",
+      "        <Select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\BitsUIDemo.svelte\u001b[39m",
+    "line": 142,
+    "col": 13,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "            \u001b[35m<label class=\"block text-sm font-medium text-yorha-text-primary\">Case Name</label>\u001b[36m",
+      "            <div class=\"relative\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\BitsUIDemo.svelte\u001b[39m",
+    "line": 154,
+    "col": 13,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "            \u001b[35m<label class=\"block text-sm font-medium text-yorha-text-primary\">Client Name</label>\u001b[36m",
+      "            <div class=\"relative\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\BitsUIDemo.svelte\u001b[39m",
+    "line": 166,
+    "col": 13,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "            \u001b[35m<label class=\"block text-sm font-medium text-yorha-text-primary\">",
+      "              Case Type <span class=\"text-yorha-accent\">*</span>",
+      "            </label>\u001b[36m",
+      "            <Select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\CommandPalette.svelte\u001b[39m",
+    "line": 175,
+    "col": 7,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "      \u001b[35m<div",
+      "        class=\"bg-nier-surface border border-nier-gray rounded-lg shadow-2xl\"",
+      "        onclick={(e) => e.stopPropagation()}",
+      "        role=\"dialog\"",
+      "        tabindex=\"0\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\GlobalCommandPalette.svelte\u001b[39m",
+    "line": 172,
+    "col": 2,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"intel-backdrop\"",
+      "\t\tonkeydown={handleKeydown}",
+      "\t\trole=\"dialog\"",
+      "\t\taria-modal=\"true\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\StyleSettings.svelte\u001b[39m",
+    "line": 40,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"setting-label\">TYPEFACE_SCALE</label>\u001b[36m",
+      "      <div class=\"toggle-group\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\StyleSettings.svelte\u001b[39m",
+    "line": 56,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"setting-label\">DENSITY</label>\u001b[36m",
+      "      <div class=\"toggle-group\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\StyleSettings.svelte\u001b[39m",
+    "line": 74,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"setting-label\">PANEL_SHARPNESS</label>\u001b[36m",
+      "      <div class=\"toggle-group\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\StyleSettings.svelte\u001b[39m",
+    "line": 91,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"setting-label\">",
+      "        GLOW_INTENSITY",
+      "        <span class=\"setting-value\">{Math.round(themeStore.settings.glowIntensity * 100)}%</span>",
+      "      </label>\u001b[36m",
+      "      <input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\StyleSettings.svelte\u001b[39m",
+    "line": 108,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"setting-label\">",
+      "        SCANLINE_STRENGTH",
+      "        <span class=\"setting-value\">{Math.round(themeStore.settings.scanlineOpacity * 100)}%</span>",
+      "      </label>\u001b[36m",
+      "      <input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\StyleSettings.svelte\u001b[39m",
+    "line": 125,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"setting-label\">",
+      "        PAPER_GRAIN",
+      "        <span class=\"setting-value\">{Math.round(themeStore.settings.panelNoise * 100)}%</span>",
+      "      </label>\u001b[36m",
+      "      <input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\lib\\components\\ui\\StyleSettings.svelte\u001b[39m",
+    "line": 142,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"setting-label\">ACCENT_PROFILE</label>\u001b[36m",
+      "      <div class=\"accent-swatches\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\+page.svelte\u001b[39m",
+    "line": 639,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(analysis)\\video-analysis\\[evidenceId]\\+page.svelte\u001b[39m",
+    "line": 372,
+    "col": 10,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\u001b[35m<div class=\"frame-card\" class:selected={currentFrame === idx} onclick={() => (currentFrame = idx)}>",
+      "\t\t\t\t\t\t\t\t\t\t{#if frame.framePath}",
+      "\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-thumbnail\">",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<img src={frame.framePath} alt=\"Frame at {formatTimestamp(frame.timestamp)}\" />",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-time\">{formatTimestamp(frame.timestamp)}</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(analysis)\\video-analysis\\[evidenceId]\\+page.svelte\u001b[39m",
+    "line": 372,
+    "col": 10,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\u001b[35m<div class=\"frame-card\" class:selected={currentFrame === idx} onclick={() => (currentFrame = idx)}>",
+      "\t\t\t\t\t\t\t\t\t\t{#if frame.framePath}",
+      "\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-thumbnail\">",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<img src={frame.framePath} alt=\"Frame at {formatTimestamp(frame.timestamp)}\" />",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-time\">{formatTimestamp(frame.timestamp)}</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(analysis)@\\video-analysis\\[evidenceId]\\+page.svelte\u001b[39m",
+    "line": 346,
+    "col": 10,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\u001b[35m<div class=\"frame-card\" class:selected={currentFrame === idx} onclick={() => (currentFrame = idx)}>",
+      "\t\t\t\t\t\t\t\t\t\t{#if frame.framePath}",
+      "\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-thumbnail\">",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<img src={frame.framePath} alt=\"Frame at {formatTimestamp(frame.timestamp)}\" />",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-time\">{formatTimestamp(frame.timestamp)}</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(analysis)@\\video-analysis\\[evidenceId]\\+page.svelte\u001b[39m",
+    "line": 346,
+    "col": 10,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\t\t\t\t\t\t\t\u001b[35m<div class=\"frame-card\" class:selected={currentFrame === idx} onclick={() => (currentFrame = idx)}>",
+      "\t\t\t\t\t\t\t\t\t\t{#if frame.framePath}",
+      "\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-thumbnail\">",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<img src={frame.framePath} alt=\"Frame at {formatTimestamp(frame.timestamp)}\" />",
+      "\t\t\t\t\t\t\t\t\t\t\t\t<div class=\"frame-time\">{formatTimestamp(frame.timestamp)}</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\admin\\all-routes\\+page.svelte\u001b[39m",
+    "line": 25,
+    "col": 43,
+    "message": "",
+    "code": "state_referenced_locally",
+    "snippet": [
+      "\tlet routes = $state<any[]>(Array.isArray(\u001b[35mdata\u001b[36m?.routes) ? data.routes : []);",
+      "\tlet searchQuery = $state('');\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\admin\\all-routes\\+page.svelte\u001b[39m",
+    "line": 25,
+    "col": 59,
+    "message": "",
+    "code": "state_referenced_locally",
+    "snippet": [
+      "\tlet routes = $state<any[]>(Array.isArray(data?.routes) ? \u001b[35mdata\u001b[36m.routes : []);",
+      "\tlet searchQuery = $state('');\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\analysis-center\\+page.svelte\u001b[39m",
+    "line": 746,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.analysis-center {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\analytics\\+page.svelte\u001b[39m",
+    "line": 1492,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t/* ΓöÇΓöÇ Page layout ΓöÇΓöÇ */\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\analytics\\+page.svelte\u001b[39m",
+    "line": 1492,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t/* ΓöÇΓöÇ Page layout ΓöÇΓöÇ */\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\analytics\\+page.svelte\u001b[39m",
+    "line": 1492,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t/* ΓöÇΓöÇ Page layout ΓöÇΓöÇ */\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\analytics\\+page.svelte\u001b[39m",
+    "line": 1492,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t/* ΓöÇΓöÇ Page layout ΓöÇΓöÇ */\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\analytics\\+page.svelte\u001b[39m",
+    "line": 1492,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t/* ΓöÇΓöÇ Page layout ΓöÇΓöÇ */\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 692,
+    "col": 9,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "        \u001b[35m<div",
+      "          class=\"cit-card\"",
+      "          onclick={() => (selectedCitation = selectedCitation?.id === citation.id ? null : { id: citation.id, statute_code: citation.formattedCitation, statute_title: citation.legalPrinciple, jurisdiction: citation.documentTitle, severity: citation.citationType, source_type: 'auto_extracted' as const, highlighted_text: citation.quotedText, notes: '', created_at: new Date().toISOString(), updated_at: new Date().toISOString() })}",
+      "          role=\"button\"",
+      "          tabindex=\"0\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 712,
+    "col": 15,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "              \u001b[35m<div class=\"cit-collection-wrap\" onclick={(e) => e.stopPropagation()}>",
+      "                <button",
+      "                  class=\"cit-mini-btn\"",
+      "                  onclick={() => { addingToCollectionFor = addingToCollectionFor === citation.id ? null : citation.id; loadUserCollections(); }}",
+      "                >+ collection</button>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 712,
+    "col": 15,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "              \u001b[35m<div class=\"cit-collection-wrap\" onclick={(e) => e.stopPropagation()}>",
+      "                <button",
+      "                  class=\"cit-mini-btn\"",
+      "                  onclick={() => { addingToCollectionFor = addingToCollectionFor === citation.id ? null : citation.id; loadUserCollections(); }}",
+      "                >+ collection</button>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 783,
+    "col": 11,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "          \u001b[35m<div class=\"cit-card-workflow\" onclick={(e) => e.stopPropagation()}>",
+      "            {#if citation.sourceUrl}",
+      "              <a",
+      "                href={citation.sourceUrl}",
+      "                target=\"_blank\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 783,
+    "col": 11,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "          \u001b[35m<div class=\"cit-card-workflow\" onclick={(e) => e.stopPropagation()}>",
+      "            {#if citation.sourceUrl}",
+      "              <a",
+      "                href={citation.sourceUrl}",
+      "                target=\"_blank\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 809,
+    "col": 15,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "              \u001b[35m<span",
+      "                class=\"cit-tag-pill\"",
+      "                style=\"background-color: {t.color}\"",
+      "                onclick={(e) => { e.stopPropagation(); removeTagFromCitation(citation.id, t.tag); }}",
+      "                title=\"Click to remove\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 821,
+    "col": 15,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "              \u001b[35m<div class=\"cit-tag-adder\" onclick={(e) => e.stopPropagation()}>",
+      "                {#each TAG_PRESETS as preset}",
+      "                  <button",
+      "                    class=\"cit-tag-preset\"",
+      "                    style=\"background-color: {preset.color}\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\citations\\+page.svelte\u001b[39m",
+    "line": 821,
+    "col": 15,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "              \u001b[35m<div class=\"cit-tag-adder\" onclick={(e) => e.stopPropagation()}>",
+      "                {#each TAG_PRESETS as preset}",
+      "                  <button",
+      "                    class=\"cit-tag-preset\"",
+      "                    style=\"background-color: {preset.color}\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\code-intel\\+page.svelte\u001b[39m",
+    "line": 170,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.intel-dashboard {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\code-intel\\+page.svelte\u001b[39m",
+    "line": 170,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.intel-dashboard {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\code-intel\\+page.svelte\u001b[39m",
+    "line": 170,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.intel-dashboard {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\code-intel\\+page.svelte\u001b[39m",
+    "line": 170,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.intel-dashboard {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\code-intel\\+page.svelte\u001b[39m",
+    "line": 170,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.intel-dashboard {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\codebase-graph\\CodebaseGraphSidebar.svelte\u001b[39m",
+    "line": 132,
+    "col": 5,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\u001b[35m<label class=\"block text-sm text-[var(--t-text-muted)]\">",
+      "\t\t\t\t\tSample: {limit.toLocaleString()}",
+      "\t\t\t\t</label>\u001b[36m",
+      "\t\t\t\t<input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\command-center\\retrieval\\+page.svelte\u001b[39m",
+    "line": 80,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"text-sm font-medium text-gray-700\">Sort</label>\u001b[36m",
+      "      <select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\command-center\\retrieval\\+page.svelte\u001b[39m",
+    "line": 94,
+    "col": 7,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "      \u001b[35m<label class=\"text-sm font-medium text-gray-700\">Order</label>\u001b[36m",
+      "      <select\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\celestial-icons\\+page.svelte\u001b[39m",
+    "line": 120,
+    "col": 4,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\u001b[35m<label>Size</label>\u001b[36m",
+      "\t\t\t<div class=\"pill-row\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\celestial-icons\\+page.svelte\u001b[39m",
+    "line": 128,
+    "col": 4,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\u001b[35m<label>Glow</label>\u001b[36m",
+      "\t\t\t<div class=\"pill-row\">\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\celestial-icons\\+page.svelte\u001b[39m",
+    "line": 142,
+    "col": 4,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\u001b[35m<label>Filter</label>\u001b[36m",
+      "\t\t\t<input type=\"text\" class=\"search-input\" placeholder=\"Search icons...\" bind:value={searchQuery} />\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte\u001b[39m",
+    "line": 519,
+    "col": 9,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "        \u001b[35m<label class=\"text-[10px] text-[#888] uppercase tracking-widest\">{f.label}</label>\u001b[36m",
+      "        <input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte\u001b[39m",
+    "line": 531,
+    "col": 9,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "        \u001b[35m<label class=\"text-[10px] text-[#888] uppercase tracking-widest\">Time</label>\u001b[36m",
+      "        <select class=\"w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs\"\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte\u001b[39m",
+    "line": 540,
+    "col": 9,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "        \u001b[35m<label class=\"text-[10px] text-[#888] uppercase tracking-widest\">Mode</label>\u001b[36m",
+      "        <select class=\"w-full mt-1 bg-[#181a1c] border border-[#2e2e2e] rounded px-2 py-1.5 text-xs\"\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\crime-reconstruction\\+page.svelte\u001b[39m",
+    "line": 622,
+    "col": 5,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "    \u001b[35m<div class=\"flex-1 relative\"",
+      "      ondragover={(e) => e.preventDefault()}",
+      "      ondrop={onOBJDrop}",
+      "    >",
+      "      <canvas"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\nes-graph\\ElizaNode.svelte\u001b[39m",
+    "line": 56,
+    "col": 1,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\tclass=\"absolute z-10 w-64 select-none outline-none group",
+      "\t\t{isDragging ? 'cursor-grabbing opacity-90' : 'cursor-grab'}",
+      "\t\t{selected ? 'z-20 scale-[1.02]' : 'scale-100'} transition-transform duration-75\"",
+      "\tstyle=\"transform: translate({x}px, {y}px);\"",
+      "\tonpointerdown={handlePointerDown}"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\nes-graph\\+page.svelte\u001b[39m",
+    "line": 141,
+    "col": 1,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\tbind:this={canvasRef}",
+      "\tclass=\"absolute inset-0 z-0 h-screen w-screen overflow-hidden bg-[#050905] {isPanning ? 'cursor-grabbing' : 'cursor-default'}\"",
+      "\tonpointerdown={handlePointerDown}",
+      "\tonpointermove={handlePointerMove}",
+      "\tonpointerup={handlePointerUp}"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\nes-routes\\+page.svelte\u001b[39m",
+    "line": 7,
+    "col": 43,
+    "message": "",
+    "code": "state_referenced_locally",
+    "snippet": [
+      "\tlet routes = $state<any[]>(Array.isArray(\u001b[35mdata\u001b[36m?.routes) ? data.routes : []);",
+      "\tlet searchQuery = $state('');\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\nes-routes\\+page.svelte\u001b[39m",
+    "line": 7,
+    "col": 59,
+    "message": "",
+    "code": "state_referenced_locally",
+    "snippet": [
+      "\tlet routes = $state<any[]>(Array.isArray(data?.routes) ? \u001b[35mdata\u001b[36m.routes : []);",
+      "\tlet searchQuery = $state('');\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\spotlight\\+page.svelte\u001b[39m",
+    "line": 167,
+    "col": 2,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\u001b[35m<div",
+      "\t\tclass=\"spotlight-overlay\"",
+      "\t\ttransition:fade={{ duration: 200 }}",
+      "\t\tonclick={spotlightOff}",
+      "\t\trole=\"button\""
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\svelte5-components\\+page.svelte\u001b[39m",
+    "line": 93,
+    "col": 8,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\t\t\t\u001b[35m<label class=\"block text-sm font-medium text-slate-300 mb-1\">Document Name</label>\u001b[36m",
+      "\t\t\t\t\t\t\t<Svelte5Input\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\ui-components\\+page.svelte\u001b[39m",
+    "line": 188,
+    "col": 5,
+    "message": "",
+    "code": "a11y_label_has_associated_control",
+    "snippet": [
+      "\t\t\t\t\u001b[35m<label>Value: {progressValue}%</label>\u001b[36m",
+      "\t\t\t\t<input type=\"range\" min=\"0\" max=\"100\" bind:value={progressValue} class=\"range-input\" />\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\ui-components\\+page.svelte\u001b[39m",
+    "line": 528,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t/* ΓöÇΓöÇΓöÇ Base ΓöÇΓöÇΓöÇ */\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\yorha\\components\\EnhancedYoRHaAIAssistant.svelte\u001b[39m",
+    "line": 216,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "  \u001b[35m<div class=\"ai-assistant-overlay\" transition:fade={{ duration: 200 }} onclick={onClose} role=\"button\" tabindex=\"-1\">",
+      "    <div class=\"ai-assistant-container {gamingConfigProps.enableScanlines ? 'crt-scanlines' : ''}\"",
+      "      style=\"width: {containerWidth}px; height: {containerHeight}px;\"",
+      "      onclick={(e) => e.stopPropagation()} role=\"dialog\" aria-modal=\"true\" tabindex=\"0\">",
+      "      <!-- Gamified CRT Overlay -->"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\yorha\\components\\EnhancedYoRHaAIAssistant.svelte\u001b[39m",
+    "line": 217,
+    "col": 5,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "    \u001b[35m<div class=\"ai-assistant-container {gamingConfigProps.enableScanlines ? 'crt-scanlines' : ''}\"",
+      "      style=\"width: {containerWidth}px; height: {containerHeight}px;\"",
+      "      onclick={(e) => e.stopPropagation()} role=\"dialog\" aria-modal=\"true\" tabindex=\"0\">",
+      "      <!-- Gamified CRT Overlay -->",
+      "      <div class=\"crt-overlay pointer-events-none absolute inset-0 z-50 mix-blend-overlay\"></div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\demos\\yorha-icons\\+page.svelte\u001b[39m",
+    "line": 164,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t/* === Base === */\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\global-search\\+page.svelte\u001b[39m",
+    "line": 990,
+    "col": 6,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<div",
+      "\t\t\t\t\t\tclass=\"result-card\"",
+      "\t\t\t\t\t\tonclick={() => {",
+      "\t\t\t\t\t\t\ttrackClick({",
+      "\t\t\t\t\t\t\t\tdocumentId: result.id,"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\global-search\\+page.svelte\u001b[39m",
+    "line": 1036,
+    "col": 6,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<div",
+      "\t\t\t\t\t\tclass=\"bundle-card\"",
+      "\t\t\t\t\t\tclass:selected={selectedBundle === bundle}",
+      "\t\t\t\t\t\tonclick={() => {",
+      "\t\t\t\t\t\tselectedBundle = bundle;"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\global-search\\+page.svelte\u001b[39m",
+    "line": 1117,
+    "col": 6,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\t\t\t\u001b[35m<div",
+      "\t\t\t\t\t\tclass=\"result-card\"",
+      "\t\t\t\t\t\tclass:selected={selectedResult === result}",
+      "\t\t\t\t\t\tonclick={() => {",
+      "\t\t\t\t\t\tselectedResult = result;"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\global-search\\+page.svelte\u001b[39m",
+    "line": 1551,
+    "col": 2,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\u001b[35m<div class=\"analysis-modal-backdrop\" onclick={() => activeAnalysisContext = null}>",
+      "\t\t<div class=\"analysis-modal\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<div class=\"modal-header\">",
+      "\t\t\t\t<button class=\"close-btn\" onclick={() => activeAnalysisContext = null}>&times;</button>",
+      "\t\t\t</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\global-search\\+page.svelte\u001b[39m",
+    "line": 1551,
+    "col": 2,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\u001b[35m<div class=\"analysis-modal-backdrop\" onclick={() => activeAnalysisContext = null}>",
+      "\t\t<div class=\"analysis-modal\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<div class=\"modal-header\">",
+      "\t\t\t\t<button class=\"close-btn\" onclick={() => activeAnalysisContext = null}>&times;</button>",
+      "\t\t\t</div>"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\global-search\\+page.svelte\u001b[39m",
+    "line": 1552,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"analysis-modal\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<div class=\"modal-header\">",
+      "\t\t\t\t<button class=\"close-btn\" onclick={() => activeAnalysisContext = null}>&times;</button>",
+      "\t\t\t</div>",
+      "\t\t\t<AIChatAssistant caseId={activeAnalysisContext.caseId} initialContext={activeAnalysisContext.text} />"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\global-search\\+page.svelte\u001b[39m",
+    "line": 1552,
+    "col": 3,
+    "message": "",
+    "code": "a11y_no_static_element_interactions",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"analysis-modal\" onclick={(e) => e.stopPropagation()}>",
+      "\t\t\t<div class=\"modal-header\">",
+      "\t\t\t\t<button class=\"close-btn\" onclick={() => activeAnalysisContext = null}>&times;</button>",
+      "\t\t\t</div>",
+      "\t\t\t<AIChatAssistant caseId={activeAnalysisContext.caseId} initialContext={activeAnalysisContext.text} />"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\knowledge\\+page.svelte\u001b[39m",
+    "line": 209,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.knowledge-search-container {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\knowledge\\+page.svelte\u001b[39m",
+    "line": 209,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.knowledge-search-container {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\knowledge\\+page.svelte\u001b[39m",
+    "line": 209,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.knowledge-search-container {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte\u001b[39m",
+    "line": 991,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.highlight-hint {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte\u001b[39m",
+    "line": 991,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.highlight-hint {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte\u001b[39m",
+    "line": 991,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.highlight-hint {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte\u001b[39m",
+    "line": 991,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.highlight-hint {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\legal-corpus\\[id]\\+page.svelte\u001b[39m",
+    "line": 991,
+    "col": 8,
+    "message": "",
+    "code": "css_unused_selector",
+    "snippet": [
+      "<style>\u001b[35m\u001b[36m",
+      "\t.highlight-hint {\u001b[39m"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\library\\corpus\\+page.svelte\u001b[39m",
+    "line": 325,
+    "col": 3,
+    "message": "",
+    "code": "a11y_interactive_supports_focus",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"co-modal\" onclick={(e) => e.stopPropagation()} role=\"dialog\" aria-modal=\"true\" aria-label=\"Upload PDF for {uploadModal.stateName}\">",
+      "\t\t\t<div class=\"co-modal-header\">",
+      "\t\t\t\t<h2 class=\"co-modal-title\">Upload PDF ΓÇö {uploadModal.stateName}</h2>",
+      "\t\t\t\t<button onclick={closeUpload} class=\"co-modal-close\" disabled={uploadRunning} aria-label=\"Close\">",
+      "\t\t\t\t\t<Icon name=\"x\" />"
+    ]
+  },
+  {
+    "file": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\\u001b[32msrc\\routes\\(app)\\library\\corpus\\+page.svelte\u001b[39m",
+    "line": 325,
+    "col": 3,
+    "message": "",
+    "code": "a11y_click_events_have_key_events",
+    "snippet": [
+      "\t\t\u001b[35m<div class=\"co-modal\" onclick={(e) => e.stopPropagation()} role=\"dialog\" aria-modal=\"true\" aria-label=\"Upload PDF for {uploadModal.stateName}\">",
+      "\t\t\t<div class=\"co-modal-header\">",
+      "\t\t\t\t<h2 class=\"co-modal-title\">Upload PDF ΓÇö {uploadModal.stateName}</h2>",
+      "\t\t\t\t<button onclick={closeUpload} class=\"co-modal-close\" disabled={uploadRunning} aria-label=\"Close\">",
+      "\t\t\t\t\t<Icon name=\"x\" />"
+    ]
+  }
+]

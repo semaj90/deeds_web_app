@@ -25,7 +25,13 @@ describe('graph authority v2 schema', () => {
 
   it('keeps the canonical graph columns visible to the app schema', () => {
     expect(graphSnapshotsV2.snapshotId.name).toBe('snapshot_id');
+    expect(graphSnapshotsV2.workspaceRevision.name).toBe('workspace_revision');
+    expect(graphSnapshotsV2.sourceInventoryRevision.name).toBe('source_inventory_revision');
+    expect(graphSnapshotsV2.graphRevision.name).toBe('graph_revision');
+    expect(graphSnapshotsV2.revisionChecksum.name).toBe('revision_checksum');
     expect(graphNodesV2.packetKey.name).toBe('packet_key');
+    expect(graphNodesV2.treeNodeId.name).toBe('tree_node_id');
+    expect(graphNodesV2.sourceRevision.name).toBe('source_revision');
     expect(graphEdgesV2.provenance.name).toBe('provenance');
     expect(graphResolutionIssuesV2.issueFingerprint.name).toBe('issue_fingerprint');
     expect(graphAuthorityRunsV2.algorithmVersion.name).toBe('algorithm_version');

@@ -18,7 +18,7 @@ export const EDGE_EXPERIMENTAL_MANIFESTS: readonly EdgeManifest[] = [
     runtime: 'onnx-web',
     revision: 'UNPINNED',
     assets: [
-      { id: 'model', localUrl: '/gemma4_e2b_onnx/model.onnx', sourceUrl: 'https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX', mediaType: 'onnx' },
+      { id: 'model', localUrl: '/gemma4_e2b_onnx/onnx/decoder_model_merged_q4f16.onnx', sourceUrl: 'https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX', mediaType: 'onnx' },
       { id: 'tokenizer', localUrl: '/gemma4_e2b_onnx/tokenizer.json', sourceUrl: 'https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX', mediaType: 'tokenizer' },
     ],
   },

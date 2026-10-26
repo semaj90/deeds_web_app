@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.graph-cpu-worker-qualification.v1",
+  "generatedAt": "2026-10-14T04:47:31.672Z",
+  "benchmarkParameters": {
+    "numNodes": 50000,
+    "numEdges": 150000,
+    "graphRevision": "graph:qual-fixture-v1"
+  },
+  "referenceSingleThread": {
+    "elapsedMs": 10.11,
+    "rowOffsetsChecksum": "7ac197b372d3d459635b193a93dc4d959537814832908e89805d8604019f22de",
+    "colIndicesChecksum": "baabc53a1976281df773ba3c6686d207be7a64ec5a1b326217d8614697db899d"
+  },
+  "workerResults": [
+    {
+      "workerCount": 1,
+      "elapsedMs": 150.87,
+      "speedup": 0.07,
+      "peakHeapMb": 0.15,
+      "checksum": "7ac197b372d3d459635b193a93dc4d959537814832908e89805d8604019f22de",
+      "parityWithReference": true
+    },
+    {
+      "workerCount": 2,
+      "elapsedMs": 125.05,
+      "speedup": 0.08,
+      "peakHeapMb": 0.2,
+      "checksum": "7ac197b372d3d459635b193a93dc4d959537814832908e89805d8604019f22de",
+      "parityWithReference": true
+    },
+    {
+      "workerCount": 4,
+      "elapsedMs": 176.93,
+      "speedup": 0.06,
+      "peakHeapMb": 0.31,
+      "checksum": "7ac197b372d3d459635b193a93dc4d959537814832908e89805d8604019f22de",
+      "parityWithReference": true
+    }
+  ],
+  "verdict": {
+    "parityConfirmed": true,
+    "status": "PARITY_OK_NO_SPEEDUP",
+    "recommendation": "Do not enable workers: they matched the reference checksum but were slower than single-thread on this synthetic 50k/150k graph (thread start-up dominates). Re-test only with a persistent pool on a much larger real snapshot.",
+    "scope": "SYNTHETIC_GRAPH_DEGREE_COUNT_ONLY (row offsets; column indices not parallelised or compared)",
+    "firstFailedGate": null
+  }
+}

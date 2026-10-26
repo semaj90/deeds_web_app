@@ -18,31 +18,61 @@
  */
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import {
+  planWorkspaceSourceBindingsV1,
+  verifyWorkspaceSourceBindingReadbackV1,
+} from './lib/workspace-source-binding-reconciliation-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+import { assertCanonicalWriteAuthorized } from './lib/admission-write-guard-v1.mjs';
 const ADMISSION_PATH = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
-const REPORT_PATH = resolve(ROOT, 'docs/reports/apply-admitted-workspace-source-bindings-content-reconciled-v1.json');
 const REPO_ID = 'deeds-web-app';
-const OWNER_RUN_WORKSPACE_REVISION = 'sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb';
+const ownerArg = process.argv.find((v) => v.startsWith('--owner-run-revision='))?.slice('--owner-run-revision='.length);
+const OWNER_RUN_WORKSPACE_REVISION = ownerArg ?? 'sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb';
 const APPLY = process.argv.includes('--apply');
+const expectedCandidateSetSha256 = process.argv.find((v) => v.startsWith('--expected-candidate-set-sha256='))?.slice('--expected-candidate-set-sha256='.length) ?? null;
+const expectedCandidateCountText = process.argv.find((v) => v.startsWith('--expected-candidate-count='))?.slice('--expected-candidate-count='.length) ?? null;
 
 const admission = JSON.parse(readFileSync(ADMISSION_PATH, 'utf8'));
-if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
-  throw new Error('ADMITTED_WORKSPACE_REVISION_RECEIPT_NOT_AUTHORITATIVE');
-}
 const admittedWorkspaceRevision = admission.workspaceRevision;
-const snapshotPath = resolve(ROOT, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
-const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'));
+const confirmToken = '--confirm-canonical-source-bindings-v1=AUTHORIZE_CANONICAL_SOURCE_BINDING_WRITE_V1';
+const reportArg = process.argv.find((v) => v.startsWith('--report='))?.slice('--report='.length);
+const defaultReportPath = `docs/reports/apply-admitted-workspace-source-bindings-content-reconciled-${admittedWorkspaceRevision.slice(7, 19)}-v1.json`;
+const REPORT_PATH = resolve(ROOT, reportArg ?? defaultReportPath);
+if (reportArg) {
+  const scratchRoot = resolve(ROOT, '.tmp/atlas');
+  const relativeReport = relative(scratchRoot, REPORT_PATH);
+  if (!relativeReport || relativeReport.startsWith('..') || isAbsolute(relativeReport)) {
+    throw new Error('SCRATCH_REPORT_PATH_REQUIRED');
+  }
+}
+let snapshot;
+if (APPLY) {
+  ({ manifest: snapshot } = assertCanonicalWriteAuthorized({ root: ROOT, admission, apply: true, argv: process.argv.slice(2), confirmToken }));
+  if (!/^sha256:[0-9a-f]{64}$/i.test(expectedCandidateSetSha256 ?? '')
+    || !Number.isInteger(Number(expectedCandidateCountText)) || Number(expectedCandidateCountText) < 1) {
+    throw new Error('EXACT_CANDIDATE_SET_APPROVAL_REQUIRED');
+  }
+} else {
+  if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
+    throw new Error('ADMITTED_WORKSPACE_REVISION_RECEIPT_NOT_AUTHORITATIVE');
+  }
+  if (typeof admission.manifestPath !== 'string' || !/^sha256:[0-9a-f]{64}$/i.test(String(admission.manifestSha256 ?? ''))) {
+    throw new Error('ADMISSION_MANIFEST_BINDING_MISSING');
+  }
+  const manifestPath = resolve(ROOT, admission.manifestPath);
+  const manifestBytes = readFileSync(manifestPath);
+  const actualManifestSha256 = `sha256:${createHash('sha256').update(manifestBytes).digest('hex')}`;
+  if (actualManifestSha256 !== admission.manifestSha256) throw new Error('ADMISSION_MANIFEST_SHA256_MISMATCH');
+  snapshot = JSON.parse(manifestBytes.toString('utf8'));
+  if (snapshot.snapshotRevision !== admission.snapshotRevision) throw new Error('ADMISSION_SNAPSHOT_REVISION_MISMATCH');
+}
 if (snapshot.snapshotRevision !== admission.snapshotRevision) throw new Error('SEALED_SNAPSHOT_MISMATCH');
 const rootSources = snapshot.sources.filter((s) => s.repositoryId === 'repo:root');
-
-const digest = (row) => createHash('sha256')
-  .update(`${REPO_ID}:${row.workspaceRevision}:${row.sourceRef}:${row.sourceRevision}:${row.contentDigest}:${row.byteLength}:${row.producerRevision}`, 'utf8')
-  .digest('hex');
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
 let report;
@@ -51,56 +81,34 @@ try {
     `SELECT source_ref, content_hash, byte_length FROM public.graphify_files WHERE workspace_revision = $1`,
     [OWNER_RUN_WORKSPACE_REVISION],
   );
-  const graphByRef = new Map();
-  for (const row of graphRowsResult.rows) {
-    if (!graphByRef.has(row.source_ref)) graphByRef.set(row.source_ref, row);
-  }
-
   const registryResult = await pool.query(
-    `SELECT source_ref_key FROM public.atlas_source_refs WHERE repo_id = $1`,
-    [REPO_ID],
+    `SELECT source_ref_key, source_type::text, content_hash FROM public.atlas_source_refs
+      WHERE repo_id = $1 AND source_ref_key = ANY($2::text[])`,
+    [REPO_ID, rootSources.map((source) => source.sourceRef)],
   );
-  const registrySet = new Set(registryResult.rows.map((r) => r.source_ref_key));
-
   const existingResult = await pool.query(
-    `SELECT canonical_source_ref FROM public.atlas_workspace_source_bindings WHERE repo_id = $1 AND workspace_revision = $2`,
-    [REPO_ID, admittedWorkspaceRevision],
+    `SELECT canonical_source_ref, source_revision, content_digest, byte_length,
+            source_manifest_ordinal, producer_revision, binding_checksum
+       FROM public.atlas_workspace_source_bindings
+      WHERE repo_id = $1 AND workspace_revision = $2 AND canonical_source_ref = ANY($3::text[])`,
+    [REPO_ID, admittedWorkspaceRevision, rootSources.map((source) => source.sourceRef)],
   );
-  const alreadyBound = new Set(existingResult.rows.map((r) => r.canonical_source_ref));
-
-  let notInGraph = 0;
-  let contentMismatch = 0;
-  let notInRegistry = 0;
-  let alreadyBoundCount = 0;
-  const candidates = [];
-  for (const s of rootSources) {
-    const graphRow = graphByRef.get(s.sourceRef);
-    if (!graphRow) { notInGraph += 1; continue; }
-    if (graphRow.content_hash !== s.contentDigest) { contentMismatch += 1; continue; }
-    if (!registrySet.has(s.sourceRef)) { notInRegistry += 1; continue; }
-    if (alreadyBound.has(s.sourceRef)) { alreadyBoundCount += 1; continue; }
-    candidates.push({
-      sourceRef: s.sourceRef,
-      contentDigest: s.contentDigest,
-      byteLength: Number(graphRow.byte_length),
-    });
-  }
-  candidates.sort((a, b) => a.sourceRef.localeCompare(b.sourceRef));
-
-  const producerRevision = 'workspace-revision-content-reconciliation.v1:e0dc2711-vs-322ed1a6';
-  const bindingRows = candidates.map((c, index) => {
-    const row = {
-      repoId: REPO_ID,
-      workspaceRevision: admittedWorkspaceRevision,
-      sourceRef: c.sourceRef,
-      sourceRevision: `sha256:${c.contentDigest}`,
-      contentDigest: c.contentDigest,
-      byteLength: c.byteLength,
-      sourceManifestOrdinal: index,
-      producerRevision,
-    };
-    return { ...row, bindingChecksum: digest(row) };
+  const producerRevision = `workspace-revision-content-reconciliation.v1:${OWNER_RUN_WORKSPACE_REVISION.slice(7, 15)}-vs-${admittedWorkspaceRevision.slice(7, 15)}`;
+  const plan = planWorkspaceSourceBindingsV1({
+    snapshotSources: snapshot.sources,
+    graphRows: graphRowsResult.rows,
+    registryRows: registryResult.rows,
+    existingBindings: existingResult.rows,
+    repoId: REPO_ID,
+    workspaceRevision: admittedWorkspaceRevision,
+    producerRevision,
   });
+  const bindingRows = plan.rows;
+
+  if (APPLY && (expectedCandidateSetSha256 !== plan.candidateBindingSetSha256
+    || Number(expectedCandidateCountText) !== bindingRows.length)) {
+    throw new Error('APPROVED_CANDIDATE_SET_MISMATCH');
+  }
 
   report = {
     schema: 'atlas.apply-admitted-workspace-source-bindings-content-reconciled.v1',
@@ -110,12 +118,21 @@ try {
     ownerRunWorkspaceRevision: OWNER_RUN_WORKSPACE_REVISION,
     admittedRootSources: rootSources.length,
     counts: {
-      notInGraph,
-      contentMismatch,
-      notInRegistry,
-      alreadyBound: alreadyBoundCount,
+      ...plan.counts,
       candidateBindings: bindingRows.length,
     },
+    candidateBindingSetSha256: plan.candidateBindingSetSha256,
+    candidateBindingSamples: bindingRows.slice(0, 5).map((row) => ({
+      repoId: row.repoId,
+      workspaceRevision: row.workspaceRevision,
+      sourceRef: row.sourceRef,
+      sourceRevision: row.sourceRevision,
+      contentDigest: row.contentDigest,
+      byteLength: row.byteLength,
+      sourceManifestOrdinal: row.sourceManifestOrdinal,
+      producerRevision: row.producerRevision,
+      bindingChecksum: row.bindingChecksum,
+    })),
     committed: false,
     insertedCount: 0,
     readbackCount: 0,
@@ -125,27 +142,34 @@ try {
   if (APPLY && bindingRows.length > 0) {
     await pool.query('BEGIN');
     try {
-      for (const row of bindingRows) {
-        await pool.query(
-          `INSERT INTO public.atlas_workspace_source_bindings
-             (repo_id, workspace_revision, canonical_source_ref, source_revision,
-              content_digest, byte_length, source_manifest_ordinal, producer_revision,
-              binding_checksum)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-           ON CONFLICT (repo_id, workspace_revision, canonical_source_ref) DO NOTHING`,
-          [row.repoId, row.workspaceRevision, row.sourceRef, row.sourceRevision, row.contentDigest,
-            row.byteLength, row.sourceManifestOrdinal, row.producerRevision, row.bindingChecksum],
-        );
-      }
-      const readback = await pool.query(
-        `SELECT count(*)::int AS n FROM public.atlas_workspace_source_bindings WHERE repo_id = $1 AND workspace_revision = $2`,
-        [REPO_ID, admittedWorkspaceRevision],
+      const insertResult = await pool.query(
+        `INSERT INTO public.atlas_workspace_source_bindings
+           (repo_id, workspace_revision, canonical_source_ref, source_revision,
+            content_digest, byte_length, source_manifest_ordinal, producer_revision,
+            binding_checksum)
+         SELECT * FROM unnest($1::text[], $2::text[], $3::text[], $4::text[], $5::text[],
+                              $6::bigint[], $7::integer[], $8::text[], $9::text[])
+         ON CONFLICT (repo_id, workspace_revision, canonical_source_ref) DO NOTHING`,
+        [bindingRows.map((row) => row.repoId), bindingRows.map((row) => row.workspaceRevision),
+          bindingRows.map((row) => row.sourceRef), bindingRows.map((row) => row.sourceRevision),
+          bindingRows.map((row) => row.contentDigest), bindingRows.map((row) => row.byteLength),
+          bindingRows.map((row) => row.sourceManifestOrdinal), bindingRows.map((row) => row.producerRevision),
+          bindingRows.map((row) => row.bindingChecksum)],
       );
+      const readback = await pool.query(
+        `SELECT canonical_source_ref, source_revision, content_digest, byte_length,
+                source_manifest_ordinal, producer_revision, binding_checksum
+           FROM public.atlas_workspace_source_bindings
+          WHERE repo_id = $1 AND workspace_revision = $2 AND canonical_source_ref = ANY($3::text[])
+          ORDER BY canonical_source_ref`,
+        [REPO_ID, admittedWorkspaceRevision, bindingRows.map((row) => row.sourceRef)],
+      );
+      const verified = verifyWorkspaceSourceBindingReadbackV1(bindingRows, readback.rows);
       await pool.query('COMMIT');
       report.committed = true;
-      report.insertedCount = bindingRows.length;
-      report.readbackCount = readback.rows[0].n;
-      report.status = report.readbackCount >= bindingRows.length ? 'BINDINGS_INSERT_AND_READBACK_PROVEN' : 'READBACK_MISMATCH';
+      report.insertedCount = insertResult.rowCount;
+      report.readbackCount = verified.verifiedCount;
+      report.status = 'BINDINGS_INSERT_AND_ROW_READBACK_PROVEN';
     } catch (error) {
       await pool.query('ROLLBACK').catch(() => {});
       report.status = 'APPLY_FAILED';

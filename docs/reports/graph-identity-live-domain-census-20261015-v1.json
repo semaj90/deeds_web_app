@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.graph-identity-live-domain-census.v1",
+  "capturedOn": "2026-10-15",
+  "status": "LIVE_READ_ONLY_CENSUS_NOT_CANONICAL_E2E_PROOF",
+  "database": {
+    "engine": "PostgreSQL",
+    "version": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "transaction": "REPEATABLE READ READ ONLY",
+    "committedWrites": 0,
+    "rolledBack": true
+  },
+  "packetIdentityJoins": {
+    "packetRows": 61718,
+    "packetsWithTreeNodeId": 61659,
+    "exactMatchesToAtlasAstNodesTreeNodeId": 0,
+    "exactMatchesToAtlasTreeNodesNodeIdText": 61659,
+    "atlasPacketsTreeNodeIdType": "text",
+    "atlasAstNodesTreeNodeIdType": "text",
+    "atlasTreeNodesNodeIdType": "uuid"
+  },
+  "symbolIdentityJoins": {
+    "packetsWithSymbolId": 58365,
+    "exactMatchesToAtlasSymbolRegistryStableSymbolId": 0,
+    "atlasPacketsSymbolIdType": "uuid",
+    "atlasSymbolRegistryStableSymbolIdType": "text",
+    "graphifySymbolsSymbolIdType": "uuid",
+    "graphifyEdgeEndpointsReferenceGraphifySymbols": true
+  },
+  "packetToSymbolVersionCandidate": {
+    "symbolVersionRows": 479,
+    "rowsWithPacketKey": 285,
+    "distinctPacketKeys": 30,
+    "packetKeyJoinRows": 285,
+    "packetSourceRefEqualsVersionSourceRef": 285,
+    "packetSourceRevisionEqualsVersionSourceRevision": 144,
+    "revisionEqualPacketVersionsWithAstPathRevisionMatch": 0,
+    "astPathComparison": "slash-normalized, strips sveltekit-frontend/ prefix, preserves case, and requires exact source_revision",
+    "interpretation": "A candidate packet-to-symbol-version crosswalk exists for a bounded subset, but only 144/285 joined rows match the packet source revision. No AST-node identity or ContextManifest admission is proven."
+  },
+  "schemaConstraints": {
+    "atlasAstNodes": [
+      "PRIMARY KEY (tree_node_id)",
+      "UNIQUE (repo_id, relative_path, node_kind, qualified_symbol, normalized_node_hash)",
+      "parent_tree_node_id and superseded_by self-reference tree_node_id"
+    ],
+    "atlasSymbolRegistry": [
+      "PRIMARY KEY (stable_symbol_id)",
+      "UNIQUE (canonical_key)"
+    ],
+    "atlasSymbolVersions": [
+      "PRIMARY KEY (symbol_version_id)",
+      "UNIQUE (stable_symbol_id, source_revision, declaration_hash, upstream_node_id)",
+      "FOREIGN KEY stable_symbol_id references atlas_symbol_registry.stable_symbol_id"
+    ],
+    "graphifySymbolsAndEdges": [
+      "graphify_symbols.symbol_id is projection-local UUID identity",
+      "graphify_edges subject/object symbol IDs reference graphify_symbols.symbol_id"
+    ]
+  },
+  "interpretation": [
+    "atlas_packets.tree_node_id links to atlas_tree_nodes.node_id in the observed snapshot; it does not join atlas_ast_nodes.tree_node_id.",
+    "atlas_packets.symbol_id did not exactly join atlas_symbol_registry.stable_symbol_id in the observed snapshot.",
+    "Equal-looking field names and casts do not establish identity equivalence.",
+    "Packet-to-AST and packet-to-stable-symbol joins remain unresolved pending an explicit evidence-backed crosswalk.",
+    "atlas_symbol_versions.packet_key is a potential crosswalk; revision mismatches must remain rejected, and matching rows still require AST/source-span qualification."
+  ],
+  "safety": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "schemaChanged": false,
+    "sourceRevisionWrites": false,
+    "backfillPerformed": false,
+    "graphProjectionPerformed": false
+  },
+  "queryHistory": {
+    "initialAttempt": "READ_ONLY_QUERY_FAILED_AMBIGUOUS_COLUMN; no state change",
+    "successfulAttempt": "qualified identity joins and schema/constraint reads; transaction rolled back",
+    "additionalAttempt": "an index-expensive read-only registry-to-AST expansion was canceled after exceeding the bounded wait; no result and no state change"
+  },
+  "nextGate": "identify producer-owned crosswalks for packet tree/symbol IDs and prove one exact source-revision-qualified AST candidate join before retrieval or graph admission"
+}

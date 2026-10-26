@@ -1,0 +1,87 @@
+{
+  "schema": "atlas.function-registry-live-ast-contract-receipt.v1",
+  "status": "PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "contextManifestAdmitted": false,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "seed": {
+    "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+    "packetKey": "packet:804cec79a65c",
+    "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+    "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+    "sourceBytes": 1156,
+    "treeNodeId": "3561bb301bdf5dcab4a7134afd843fb78da32acb",
+    "upstreamSymbolId": "ee5e3f54660008459366d5d190ee4c81ec83bfcc",
+    "byteSpan": [979, 1154],
+    "spanSha256": "50482567aa4be4ceb1551b4543f3a4cce9e9fcb48a1a6e6128c39e7be7e44700"
+  },
+  "liveAstHttp": {
+    "endpoint": "http://127.0.0.1:8095/ast/chunk",
+    "httpStatus": 200,
+    "syntaxStatus": "CLEAN",
+    "sourcePathAndRevisionMatched": true,
+    "nativeNodeAndSymbolIdsMatched": true,
+    "signatureTextPresent": true,
+    "syntaxAncestryPresent": true,
+    "registryAstObservationQualified": true
+  },
+  "liveSnapshotReadback": {
+    "command": "npx --no-install tsx scripts/atlas/audit-function-discovery-readback-v1.mts --query=getErrorClustering --workspace-revision=sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --limit=1 --qualify",
+    "exitCode": 0,
+    "status": "QUALIFIED_SNAPSHOT_READBACK_PROVEN",
+    "candidateCount": 1,
+    "canonicalReadbackVerified": true,
+    "projectionRevisionDifferenceCount": 1,
+    "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+    "packetKey": "packet:804cec79a65c",
+    "treeNodeId": "3561bb301bdf5dcab4a7134afd843fb78da32acb",
+    "sourceContentHash": "efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+    "snapshotChecksum": "242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091",
+    "loadReceiptChecksum": "a4446d0853377ccf22f2df639b948e0ff82a3d4bc963066ba428bf4f5682be02",
+    "contextManifestAdmitted": false,
+    "rawHitSynthesisBlocked": true,
+    "writesPerformed": false
+  },
+  "persistedAstCensus": {
+    "transaction": "REPEATABLE READ READ ONLY",
+    "eligibleCanonicalSymbols": 144,
+    "uniqueExactAstMatches": 0,
+    "ambiguousExactAstMatches": 0,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  },
+  "validation": {
+    "focusedVitest": {
+      "command": "npx vitest run src/routes/api/search/hyperrag/server.route.test.ts src/lib/server/atlas/function-registry/function-registry-postgres-snapshot-loader-v1.spec.ts src/lib/server/atlas/function-registry/function-registry-read-adapter-v1.spec.ts src/lib/server/atlas/function-registry/function-registry-snapshot-loader-v1.spec.ts",
+      "exitCode": 0,
+      "testsPassed": 25
+    },
+    "fullSvelteCheck": {
+      "command": "npm run check",
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 181
+    }
+  },
+  "remainingGate": "One live FunctionRegistrySnapshotV1 now qualifies after the operator-authorized 8095 restart. The callable-search projection is stale (one revision difference) but canonical readback and exact source/AST qualification succeeded. HyperRAG raw-hit synthesis is now fail-closed. No SearchRuntime request-to-ContextManifest admission was executed; keep the route feature flag disabled until the existing feature-evidence admission contract is wired and verified.",
+  "retrievalStorageBoundary": {
+    "route": "/api/search/hyperrag",
+    "denseExecutor": "qdrant",
+    "postgresPgvectorInThisRoute": false,
+    "separatePgvectorOwner": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+    "semanticExecutorsMustShareOneLaneVote": true,
+    "searchRuntimeReadOnly": true,
+    "valkeyCacheAccess": "DISABLED_BY_READ_ONLY_RUNTIME",
+    "valkeyConnectionVerified": false,
+    "cacheHitVerified": false,
+    "databaseWritesPerformed": false,
+    "cacheWritesPerformed": false,
+    "contextManifestAdmitted": false
+  },
+  "runtimeMutations": {
+    "database": false,
+    "cache": false,
+    "serviceRestart": true,
+    "gpu": false
+  }
+}

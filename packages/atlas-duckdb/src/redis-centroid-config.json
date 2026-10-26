@@ -12,11 +12,12 @@
   },
   "key_patterns": {
     "centroid_vector": {
-      "pattern": "centroid:som:{cluster_id}",
-      "type": "string (base64-encoded float32 array)",
+      "pattern": "atlas:centroid:som:{cluster_id}",
+      "legacy_alias_pattern": "centroid:som:{cluster_id}",
+      "type": "string (base64-encoded float32 array or JSON float array)",
       "ttl_seconds": 86400,
       "size_bytes": 3140,
-      "example": "centroid:som:0x0f42",
+      "example": "atlas:centroid:som:15:66",
       "contents": "SOM BMU centroid at grid (15, 66), 768-dim embedding"
     },
     "cluster_members": {
@@ -162,7 +163,7 @@
         "SMEMBERS cluster:members:{cluster_id} → load candidates",
         "GET centroid:som:{neighbor_1..K} → load neighbor centroids"
       ],
-      "total_keys_accessed": 1 + 1 + 2 + 5 + 5,
+      "total_keys_accessed": 14,
       "cache_hit_rate": 0.95,
       "latency_ms": 8
     },
@@ -183,7 +184,7 @@
         "GET cache:metadata:{query_hash} → check if cached",
         "HGETALL rerank:scores:{query_hash}:* → fetch cached scores"
       ],
-      "total_keys_accessed": 1 + 5,
+      "total_keys_accessed": 6,
       "cache_hit_rate": 0.15,
       "latency_ms": 3
     }

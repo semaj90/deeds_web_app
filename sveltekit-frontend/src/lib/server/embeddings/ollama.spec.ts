@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-  ollamaFetch: vi.fn(),
+  embedOrChatFetch: vi.fn(),
   isOnnxEmbedAvailable: vi.fn(),
   tryEmbedOnnx: vi.fn(),
 }));
 
-vi.mock('$lib/server/ollama.js', () => ({ ollamaFetch: mocks.ollamaFetch }));
+vi.mock('$lib/server/ollama.js', () => ({ embedOrChatFetch: mocks.embedOrChatFetch }));
 vi.mock('$lib/server/observability/langfuse.js', () => ({
   traceEmbedding: (_text: string, _model: string, run: () => Promise<unknown>) => run(),
 }));
@@ -23,7 +23,7 @@ describe('server canonical embedding compatibility entrypoint', () => {
 
   it('uses Ollama and never promotes the local ONNX challenger', async () => {
     const expected = new Array(768).fill(0.25);
-    mocks.ollamaFetch.mockResolvedValue(new Response(JSON.stringify({
+    mocks.embedOrChatFetch.mockResolvedValue(new Response(JSON.stringify({
       model: 'embeddinggemma:latest',
       embedding: expected,
     }), { status: 200, headers: { 'content-type': 'application/json' } }));
@@ -42,7 +42,7 @@ describe('server canonical embedding compatibility entrypoint', () => {
   });
 
   it('fails closed when Ollama is unavailable instead of returning an off-space ONNX vector', async () => {
-    mocks.ollamaFetch.mockResolvedValue(new Response('{}', { status: 503 }));
+    mocks.embedOrChatFetch.mockResolvedValue(new Response('{}', { status: 503 }));
     mocks.isOnnxEmbedAvailable.mockResolvedValue(true);
     mocks.tryEmbedOnnx.mockResolvedValue(new Array(768).fill(0.5));
 

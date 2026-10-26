@@ -126,6 +126,7 @@ export function evaluateTaskEvidenceAdmissionV1({ taskCard, evidenceTask, eviden
     taskCardId: taskCard.stableKey ?? null,
     evidenceCardChecksum: evidenceCard.checksum ?? null,
     canonicalTaskRef: evidenceTask.canonicalTaskRef ?? null,
+    taskRef: expectedTaskRef,
     taskRevision: taskCard.taskRevision ?? null,
     receiptTaskRevision: matchedBindings.find((binding) => binding.taskRevision === evidenceTask.taskHash)?.taskRevision ?? null,
     evidenceRevision: evidenceCard.checksum ?? null,

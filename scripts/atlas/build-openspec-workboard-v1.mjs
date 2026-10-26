@@ -6,7 +6,7 @@
  * ETA is emitted only when a receipt-linked duration is available; otherwise
  * it remains UNKNOWN.
  */
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, readdirSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { blockHash, parseWfu, requiresSupersessionReview, resolveDeclarations, sectionSlug, sha256, stripWfuComment, summarizeDeclared, taskBlock } from './lib/wfu-metadata.mjs';
@@ -206,7 +206,9 @@ const frontierTasks = [...byPriority.reduce((frontier, task) => {
   .sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const invariants = tasks.filter((task) => task.kind === 'INVARIANT').map((task) => ({ taskKey: task.taskKey, change: task.change, source: task.source, line: task.line, text: task.text, state: task.state, lastUpdatedAt: task.lastUpdatedAt, timestampMethod: task.timestampMethod, eta: task.eta }));
 const waveWorkPackages = PROGRAM_WAVES.map((wave) => {
-  const members = tasks.filter((task) => task.state === 'OPEN' && task.program.wave === wave.id);
+  const members = tasks.filter((task) => task.state === 'OPEN'
+    && task.program.wave === wave.id
+    && task.program.architecture.programId);
   return {
     id: `WAVE-${String(wave.id).padStart(2, '0')}`,
     gateId: `GATE-WAVE-${String(wave.id).padStart(2, '0')}`,
@@ -695,8 +697,40 @@ if (taskSnapshotMode) {
   };
   process.stdout.write(JSON.stringify(snapshot));
 } else {
-  writeFileSync(reportPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-  writeFileSync(markdownPath, `${markdown}\n`, 'utf8');
+  function safeWriteReportFile(targetPath, textContent) {
+    const stagingPath = `${targetPath}.staging.${Date.now()}`;
+    const backupPath = `${targetPath}.bak`;
+    writeFileSync(stagingPath, textContent, 'utf8');
+    const staged = readFileSync(stagingPath, 'utf8');
+    if (staged.length !== textContent.length) {
+      throw new Error(`STAGING_VALIDATION_FAILED: length mismatch ${staged.length} vs ${textContent.length}`);
+    }
+    if (targetPath.endsWith('.json')) {
+      const parsed = JSON.parse(staged);
+      if (!parsed || typeof parsed !== 'object') {
+        throw new Error('STAGING_VALIDATION_FAILED: invalid JSON object');
+      }
+    }
+    if (existsSync(targetPath)) {
+      try {
+        copyFileSync(targetPath, backupPath);
+      } catch (err) {
+        console.warn(`[WARN] Failed to create backup of ${targetPath}:`, err.message);
+      }
+    }
+    try {
+      renameSync(stagingPath, targetPath);
+    } catch (renameErr) {
+      console.warn(`[WARN] Atomic rename failed (${renameErr.message}), falling back to guarded in-place write`);
+      writeFileSync(targetPath, textContent, 'utf8');
+      if (existsSync(stagingPath)) {
+        try { unlinkSync(stagingPath); } catch {}
+      }
+    }
+  }
+
+  safeWriteReportFile(reportPath, `${JSON.stringify(result, null, 2)}\n`);
+  safeWriteReportFile(markdownPath, `${markdown}\n`);
   console.log(`OPENSPEC_WORKBOARD_BUILT changes=${changes.length} tasks=${tasks.length} open=${openTasks.length}`);
   console.log(`report=${reportPath}`);
 }

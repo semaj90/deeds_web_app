@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-10-12T05:48:24.210Z",
+  "query": "ACE context retrieval",
+  "tokenBudget": 6000,
+  "tokenEstimate": 0,
+  "totalCards": 0,
+  "droppedCards": 500,
+  "sourceRefs": {},
+  "cards": []
+}

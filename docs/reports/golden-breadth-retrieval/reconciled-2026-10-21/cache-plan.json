@@ -1,0 +1,7 @@
+{
+  "schema": "atlas.golden-breadth-cache-plan.v1",
+  "status": "NOT_WRITTEN",
+  "writes": 0,
+  "plannedKeys": [],
+  "note": "No cache population. Requires judged relevance, revision-qualified descriptors, authorization, and independent readback."
+}

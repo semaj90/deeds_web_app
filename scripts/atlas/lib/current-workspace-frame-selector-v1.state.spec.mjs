@@ -84,6 +84,21 @@ test('validity needs a matching, clean readback receipt (wrong snapshot, violati
   }
 });
 
+test('canonical and promotion flags require an evaluated current workspace; frameAuthoritative is unchanged', () => {
+  const frame = admittedFrame();
+  const unevaluated = computeWorkspaceFrameAuthorityV1(frame);
+  assert.equal(unevaluated.frameAuthoritative, true);
+  assert.equal(unevaluated.canonicalAuthority, false);
+  assert.equal(unevaluated.promotionEligible, false);
+  const stale = computeWorkspaceFrameAuthorityV1(frame, { currentAtEvaluation: false });
+  assert.equal(stale.canonicalAuthority, false);
+  assert.equal(stale.promotionEligible, false);
+  const current = computeWorkspaceFrameAuthorityV1(frame, { currentAtEvaluation: true });
+  assert.equal(current.canonicalAuthority, true);
+  assert.equal(current.promotionEligible, true);
+  assert.equal(current.frameAuthoritative, true);
+});
+
 test('existing frame authority contract is unchanged and does not look at currentness', () => {
   const frame = admittedFrame();
   assert.equal(computeWorkspaceFrameAuthorityV1(frame).frameAuthoritative, true);

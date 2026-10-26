@@ -11,6 +11,7 @@ import { db } from '$lib/server/db/client';
 import { traceGraph } from '$lib/server/observability/langfuse.js';
 import { setCache, getFromMemoryCache, getFromRedisCache } from '$lib/server/cache.js';
 import { topKIndices } from '$lib/server/gpu/pytorch-graph.js';
+import { observeStoreRequest } from '../telemetry/gpu-telemetry.js';
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -367,7 +368,7 @@ export async function getNeo4jMultiHopNeighbors(caseId: string): Promise<GraphNe
       const session = driver.session({ database: 'neo4j' });
 
       try {
-        const result = await session.run(
+        const result = await observeStoreRequest('neo4j', 'read_query', () => session.run(
           `MATCH path = (c:Case {id: $caseId})-[*1..3]-(related)
 					 WHERE related <> c
 					 WITH DISTINCT related, min(length(path)) AS hops, labels(related) AS lbls
@@ -380,7 +381,7 @@ export async function getNeo4jMultiHopNeighbors(caseId: string): Promise<GraphNe
 					 ORDER BY hops ASC
 					 LIMIT 25`,
           { caseId }
-        );
+        ));
 
         const neighbors: GraphNeighbor[] = result.records.map((rec) => {
           const hops = (rec.get('hops') as number) ?? 1;

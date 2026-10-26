@@ -1,0 +1,996 @@
+{
+  "schema": "atlas.cagra-postgres-parity-receipt.v1",
+  "generatedAt": "2026-10-18T10:03:30.328858+00:00",
+  "status": "CAGRA_POSTGRES_EXACT_PARITY_DIAGNOSTIC",
+  "canonicalAuthority": false,
+  "productionRoutingChanged": false,
+  "databaseWritesPerformed": false,
+  "gpuLease": {
+    "backend": "cuvs",
+    "leaseId": "d839d2d0-731e-4be9-b565-ba77b64d48f7",
+    "status": "EXTERNALLY_VALIDATED"
+  },
+  "representation": {
+    "column": "public.codebase_chunk_index.content_embedding_768",
+    "dimensions": 768,
+    "metric": "cosine",
+    "lineageQualification": "PARTIAL_OR_UNQUALIFIED",
+    "rowsWithSourceRevision": 0,
+    "rowsWithWorkspaceRevision": 0
+  },
+  "cohort": {
+    "rows": 8192,
+    "queryRows": 32,
+    "topK": 10,
+    "selection": "ORDER BY md5(id::text), id; frozen in memory for both exact PG and cuVS/CAGRA",
+    "seed": 20261018,
+    "vectorSha256": "31bb4e71706b44a34a36fbb0e769be49067a824413a1e2c8f48b343c1803d62c",
+    "identityOrderSha256": "2a5a602cc970fb83e0502b9906f0b694974012e14914e3a04154332194c8e1d8",
+    "queryOrdinalSha256": "9198941687e2b1300f1991f40fcc3f9181a40d1d554ad017621f7517fd920443"
+  },
+  "executors": {
+    "postgresExact": "pgvector cosine sort over exact frozen cohort IDs; self excluded; id tie-break",
+    "challenger": "cuVS CAGRA on CUDA using the same FP32 vector/query arrays",
+    "cuvsVersion": "26.06.00",
+    "cagraBuildMs": 3185.3114460100187,
+    "cagraSearchMs": 58.79468000784982,
+    "cuvsExactSearchMs": 203.24359700316563,
+    "totalElapsedMs": 5151.250720999087,
+    "gpuMemoryTelemetry": {
+      "source": "rapids-sidecar-cupy",
+      "admissionGrade": false,
+      "note": "CUDA runtime memory info is diagnostic only on this WDDM host; use NVML or nvidia-smi for admission."
+    },
+    "gpuFreeMiBBefore": 7100.0,
+    "gpuFreeMiBAfter": 7088.0,
+    "parameters": {
+      "graphDegree": 64,
+      "intermediateGraphDegree": 128,
+      "buildAlgorithm": "ivf_pq",
+      "searchWidth": 1,
+      "itopkSize": 64
+    }
+  },
+  "parity": {
+    "meanRecallAtKAgainstPostgres": 0.996875,
+    "minimumRecallAtKAgainstPostgres": 0.9,
+    "meanCagraRecallAgainstCuVSExact": 0.99375,
+    "perQuery": [
+      {
+        "queryChunkId": "878f2265-e7e4-4787-91ea-3e280b3d0faa",
+        "queryOrdinal": 19,
+        "postgresExactTopK": [
+          "9ad4993f-5a6d-4ae5-b862-7a20b063b91b",
+          "8e28b239-9a2d-436c-bf0f-7ee2bc8d6951",
+          "7c791bf1-545a-4aab-b954-4686b30c520f",
+          "af13bd61-0ae0-4eb1-a4f9-b9a42ac1d38f",
+          "c471df57-6c7b-42ad-b683-6fed95b249b0",
+          "e5ffe1f7-cc37-4aaf-be4f-ea6c1e14394d",
+          "27da1488-acbb-468d-bed7-992ad034dfb4",
+          "a2884a4c-5c5f-4be1-9988-4487357aae81",
+          "db9133dd-18bd-4c04-be1c-38e387073e81",
+          "fcf4e446-3945-421d-aadc-cdaf7c1b25d0"
+        ],
+        "cagraTopK": [
+          "9ad4993f-5a6d-4ae5-b862-7a20b063b91b",
+          "8e28b239-9a2d-436c-bf0f-7ee2bc8d6951",
+          "7c791bf1-545a-4aab-b954-4686b30c520f",
+          "af13bd61-0ae0-4eb1-a4f9-b9a42ac1d38f",
+          "c471df57-6c7b-42ad-b683-6fed95b249b0",
+          "e5ffe1f7-cc37-4aaf-be4f-ea6c1e14394d",
+          "27da1488-acbb-468d-bed7-992ad034dfb4",
+          "a2884a4c-5c5f-4be1-9988-4487357aae81",
+          "db9133dd-18bd-4c04-be1c-38e387073e81",
+          "fcf4e446-3945-421d-aadc-cdaf7c1b25d0"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "1ed71cc3-50d5-4043-8c08-82713547664b",
+        "queryOrdinal": 151,
+        "postgresExactTopK": [
+          "901d4c35-6a8c-41c7-a171-4585fbb3c64f",
+          "651783de-17fa-4b57-80c4-afba4854e2ad",
+          "2fae0ae2-30e2-4d5e-8d73-c2b6813f9713",
+          "89b3d2c7-fa55-4e07-913e-d25ade19d693",
+          "4b25aa47-d3d1-43b0-a319-135f3c2954e9",
+          "25dd0b28-3714-4087-b52b-b4d5744eb014",
+          "15bc62d3-78f5-402c-87cb-43834a7d7bab",
+          "6c1f9508-c735-40f8-a9b1-12e9ad5a2c88",
+          "83eed413-b37a-43d7-a730-8ff691548046",
+          "06d0c37d-4328-456c-91b8-520c2b25b8d1"
+        ],
+        "cagraTopK": [
+          "901d4c35-6a8c-41c7-a171-4585fbb3c64f",
+          "651783de-17fa-4b57-80c4-afba4854e2ad",
+          "2fae0ae2-30e2-4d5e-8d73-c2b6813f9713",
+          "89b3d2c7-fa55-4e07-913e-d25ade19d693",
+          "4b25aa47-d3d1-43b0-a319-135f3c2954e9",
+          "25dd0b28-3714-4087-b52b-b4d5744eb014",
+          "15bc62d3-78f5-402c-87cb-43834a7d7bab",
+          "6c1f9508-c735-40f8-a9b1-12e9ad5a2c88",
+          "83eed413-b37a-43d7-a730-8ff691548046",
+          "06d0c37d-4328-456c-91b8-520c2b25b8d1"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "2013be9e-0a19-4b33-9a9c-9d41748fe6a8",
+        "queryOrdinal": 248,
+        "postgresExactTopK": [
+          "20b5c232-204e-43bb-96f5-1a21dd3771ac",
+          "0f28525c-5197-4952-a69e-98cd587319d5",
+          "61423619-7427-4a17-8d5f-fd645e8f3b0c",
+          "7ccdf9f3-a8dc-4812-846f-848f26412d9e",
+          "612099a6-818b-4c72-9b5e-434482045da7",
+          "eae82925-c2fe-4b42-815e-b247cd5b73ec",
+          "4168f839-f75a-45c2-9883-2b6eeec6fbe9",
+          "c0d74544-2529-42ff-94ae-0bb5521d132c",
+          "322df9a6-3c12-4454-82af-e8644c72a19a",
+          "1171fcec-2cbf-45a0-8ad2-a37c7a462338"
+        ],
+        "cagraTopK": [
+          "20b5c232-204e-43bb-96f5-1a21dd3771ac",
+          "0f28525c-5197-4952-a69e-98cd587319d5",
+          "61423619-7427-4a17-8d5f-fd645e8f3b0c",
+          "7ccdf9f3-a8dc-4812-846f-848f26412d9e",
+          "612099a6-818b-4c72-9b5e-434482045da7",
+          "eae82925-c2fe-4b42-815e-b247cd5b73ec",
+          "4168f839-f75a-45c2-9883-2b6eeec6fbe9",
+          "c0d74544-2529-42ff-94ae-0bb5521d132c",
+          "322df9a6-3c12-4454-82af-e8644c72a19a",
+          "1171fcec-2cbf-45a0-8ad2-a37c7a462338"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "1b35838c-b173-4be6-9307-ad923eaf3b68",
+        "queryOrdinal": 278,
+        "postgresExactTopK": [
+          "5900b1e1-3e3d-4f0d-a155-0d603fe334af",
+          "956a64f6-cc0e-4c88-aa8a-73d5c7812c8e",
+          "3ec3b000-3895-453d-a2c8-b06e7e41a593",
+          "a9d48b93-f6ef-401a-8390-7dedb2b4fc5d",
+          "d236fbba-a3f9-4cec-b28e-1665fbe754de",
+          "b5aa2941-9625-4251-b279-1ccfae8fb625",
+          "28136cfd-9259-4205-b6f9-c843d22280ca",
+          "837469d3-6b06-4fad-8cfe-cc64f26ea1e4",
+          "5d44b801-1c56-433c-bba7-d0e236525c69",
+          "4c405764-bd2b-4103-a169-1d8b2922394d"
+        ],
+        "cagraTopK": [
+          "5900b1e1-3e3d-4f0d-a155-0d603fe334af",
+          "956a64f6-cc0e-4c88-aa8a-73d5c7812c8e",
+          "3ec3b000-3895-453d-a2c8-b06e7e41a593",
+          "a9d48b93-f6ef-401a-8390-7dedb2b4fc5d",
+          "d236fbba-a3f9-4cec-b28e-1665fbe754de",
+          "b5aa2941-9625-4251-b279-1ccfae8fb625",
+          "28136cfd-9259-4205-b6f9-c843d22280ca",
+          "837469d3-6b06-4fad-8cfe-cc64f26ea1e4",
+          "5d44b801-1c56-433c-bba7-d0e236525c69",
+          "4c405764-bd2b-4103-a169-1d8b2922394d"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "dbb9600d-0330-4f50-97bc-00c5ea63c21f",
+        "queryOrdinal": 511,
+        "postgresExactTopK": [
+          "0c68b801-13e0-4a8e-bb32-c23412006771",
+          "3cac87a8-ba47-4ce7-8cc1-59ac5738aa57",
+          "544c1c21-06ee-48d2-8e1f-5bebaa8ff441",
+          "88f0427d-c6a2-4cb6-a143-a93a9a77b8ed",
+          "f670de54-fc34-4587-af45-9552527e03bd",
+          "58994aa7-bd9c-4f71-9dc7-9aa27e150bc5",
+          "3babf46d-d8d0-4787-8269-fad6a681372a",
+          "21d00d30-3ba0-4e23-9873-94d87f261413",
+          "a8183f90-2cd6-421d-9ac4-f9f0299139e5",
+          "de307061-1830-46a6-8792-561979929cd8"
+        ],
+        "cagraTopK": [
+          "544c1c21-06ee-48d2-8e1f-5bebaa8ff441",
+          "88f0427d-c6a2-4cb6-a143-a93a9a77b8ed",
+          "3cac87a8-ba47-4ce7-8cc1-59ac5738aa57",
+          "0c68b801-13e0-4a8e-bb32-c23412006771",
+          "f670de54-fc34-4587-af45-9552527e03bd",
+          "58994aa7-bd9c-4f71-9dc7-9aa27e150bc5",
+          "3babf46d-d8d0-4787-8269-fad6a681372a",
+          "21d00d30-3ba0-4e23-9873-94d87f261413",
+          "a8183f90-2cd6-421d-9ac4-f9f0299139e5",
+          "de307061-1830-46a6-8792-561979929cd8"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "adc9ade8-1488-47fe-b831-9fdc4bf83a79",
+        "queryOrdinal": 965,
+        "postgresExactTopK": [
+          "e1b78310-a523-49d4-a948-7f9c8e37d254",
+          "50a98443-7378-4325-b9ba-89b419eb39f8",
+          "09125523-51cc-47f5-abda-30baceb5296d",
+          "ca535dea-68cc-4444-9543-a723a0958285",
+          "0a6f19dd-9014-439c-acf3-f9c4bfbdb845",
+          "2c65ae3b-d0e9-43d8-b8fa-147f6a3efba4",
+          "615aac42-459a-4cd5-a885-20bdbe58f926",
+          "463535e1-bce8-4ebb-860d-2f542851df17",
+          "fd6006ae-72d4-4bf0-bd69-17e4fd35a2d2",
+          "17da9113-e97c-49e3-aa94-228ee84d5d86"
+        ],
+        "cagraTopK": [
+          "e1b78310-a523-49d4-a948-7f9c8e37d254",
+          "50a98443-7378-4325-b9ba-89b419eb39f8",
+          "ca535dea-68cc-4444-9543-a723a0958285",
+          "09125523-51cc-47f5-abda-30baceb5296d",
+          "0a6f19dd-9014-439c-acf3-f9c4bfbdb845",
+          "2c65ae3b-d0e9-43d8-b8fa-147f6a3efba4",
+          "615aac42-459a-4cd5-a885-20bdbe58f926",
+          "463535e1-bce8-4ebb-860d-2f542851df17",
+          "fd6006ae-72d4-4bf0-bd69-17e4fd35a2d2",
+          "17da9113-e97c-49e3-aa94-228ee84d5d86"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "26a42f51-b693-4378-8cda-d5d324450fed",
+        "queryOrdinal": 1255,
+        "postgresExactTopK": [
+          "74bd9190-897e-4cb0-a7a1-561c43442aa6",
+          "97c922c8-77c0-4f06-9bd4-df5054d30af6",
+          "b2fd5676-7aa2-47b8-9cff-e2b0fb60f45c",
+          "f0897c12-3f54-4d69-bacb-d45a2fe3ffca",
+          "bfc33699-5d28-42e5-894a-ab5528d8e60c",
+          "03df50b4-3b79-4ded-901c-bbb0d55c2232",
+          "34b9746e-84b3-4916-9a91-e188251c9651",
+          "d1ae9516-0655-4f96-81f1-c326c3e0d37b",
+          "ee33ded6-c4ea-4ecd-9a14-ee3813010ddd",
+          "44d553fd-7f8b-4baa-85a6-0bf33ada1fe9"
+        ],
+        "cagraTopK": [
+          "74bd9190-897e-4cb0-a7a1-561c43442aa6",
+          "97c922c8-77c0-4f06-9bd4-df5054d30af6",
+          "b2fd5676-7aa2-47b8-9cff-e2b0fb60f45c",
+          "f0897c12-3f54-4d69-bacb-d45a2fe3ffca",
+          "bfc33699-5d28-42e5-894a-ab5528d8e60c",
+          "03df50b4-3b79-4ded-901c-bbb0d55c2232",
+          "d1ae9516-0655-4f96-81f1-c326c3e0d37b",
+          "ee33ded6-c4ea-4ecd-9a14-ee3813010ddd",
+          "34b9746e-84b3-4916-9a91-e188251c9651",
+          "44d553fd-7f8b-4baa-85a6-0bf33ada1fe9"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "7766c6ed-b746-499c-b449-5312597a622a",
+        "queryOrdinal": 1274,
+        "postgresExactTopK": [
+          "10e44d8a-df6d-4401-88f9-6344d8580c3d",
+          "ea9f9033-262b-45c0-8e2b-557e27f48456",
+          "b409bbf6-198f-4679-b3a7-eee9a5273f4a",
+          "507027d8-0fb7-4021-8cc8-d012a8112ef6",
+          "7304f261-c3e1-487c-9802-31ec26fc38c6",
+          "b2e509ca-bdba-43f1-bfdb-dc2ff3bf0cd3",
+          "7337c78a-9583-4e8e-9d2f-7cf0529c4108",
+          "d8e79b8c-d790-45db-9b0a-5daeed4c9087",
+          "18bdd6c5-3c1e-4d0c-995f-946655b4a142",
+          "6ae8d21b-2646-4d6a-863c-dc6c70be2d49"
+        ],
+        "cagraTopK": [
+          "10e44d8a-df6d-4401-88f9-6344d8580c3d",
+          "ea9f9033-262b-45c0-8e2b-557e27f48456",
+          "b409bbf6-198f-4679-b3a7-eee9a5273f4a",
+          "507027d8-0fb7-4021-8cc8-d012a8112ef6",
+          "7304f261-c3e1-487c-9802-31ec26fc38c6",
+          "b2e509ca-bdba-43f1-bfdb-dc2ff3bf0cd3",
+          "7337c78a-9583-4e8e-9d2f-7cf0529c4108",
+          "d8e79b8c-d790-45db-9b0a-5daeed4c9087",
+          "18bdd6c5-3c1e-4d0c-995f-946655b4a142",
+          "6ae8d21b-2646-4d6a-863c-dc6c70be2d49"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "d4f88751-152c-47fc-ae93-365f06e835ae",
+        "queryOrdinal": 2014,
+        "postgresExactTopK": [
+          "a3a42024-ceb6-4699-a7c8-08e0fd022dcb",
+          "3909a2b1-7ad1-44ed-85bc-7e929d729139",
+          "93a44ad2-3f88-491f-93f0-2d400fd5ff33",
+          "a71836d8-42e7-47cd-9479-6ff44527ea92",
+          "aa485f13-629a-4a60-b393-c223c717b962",
+          "9fffc82b-3870-4287-8097-b310a8cb409a",
+          "9f2ac11c-a033-48a5-b98a-44f12a3bfd91",
+          "6b4a60f4-f60e-4472-bed0-ca0073989612",
+          "ee839e64-7d8e-422c-a445-285aae4f3584",
+          "f070d502-39d8-4efc-a9e4-d15edb6ae0d2"
+        ],
+        "cagraTopK": [
+          "a3a42024-ceb6-4699-a7c8-08e0fd022dcb",
+          "3909a2b1-7ad1-44ed-85bc-7e929d729139",
+          "93a44ad2-3f88-491f-93f0-2d400fd5ff33",
+          "a71836d8-42e7-47cd-9479-6ff44527ea92",
+          "aa485f13-629a-4a60-b393-c223c717b962",
+          "9fffc82b-3870-4287-8097-b310a8cb409a",
+          "9f2ac11c-a033-48a5-b98a-44f12a3bfd91",
+          "6b4a60f4-f60e-4472-bed0-ca0073989612",
+          "ee839e64-7d8e-422c-a445-285aae4f3584",
+          "f070d502-39d8-4efc-a9e4-d15edb6ae0d2"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "97c922c8-77c0-4f06-9bd4-df5054d30af6",
+        "queryOrdinal": 2805,
+        "postgresExactTopK": [
+          "b2fd5676-7aa2-47b8-9cff-e2b0fb60f45c",
+          "08322121-3aad-4c59-a5c9-9f60d4d40c58",
+          "b8c2f7db-c002-4ff4-a038-b0c26a33ad39",
+          "5137e938-db37-4cda-bdb0-d33b36931b7a",
+          "50f1aadf-f77a-44b8-8372-80c648f09162",
+          "47a18a8d-9b29-4cb8-a104-f71032a7e0e4",
+          "3c2e2310-7256-491c-8c1b-85cb08839e7a",
+          "45efae47-18df-4858-a752-b751735d768e",
+          "a02069f3-1047-4079-9da9-ff186bc607c7",
+          "a3aaf53a-b947-48d6-998f-ec55edb28298"
+        ],
+        "cagraTopK": [
+          "b2fd5676-7aa2-47b8-9cff-e2b0fb60f45c",
+          "08322121-3aad-4c59-a5c9-9f60d4d40c58",
+          "b8c2f7db-c002-4ff4-a038-b0c26a33ad39",
+          "5137e938-db37-4cda-bdb0-d33b36931b7a",
+          "50f1aadf-f77a-44b8-8372-80c648f09162",
+          "47a18a8d-9b29-4cb8-a104-f71032a7e0e4",
+          "3c2e2310-7256-491c-8c1b-85cb08839e7a",
+          "45efae47-18df-4858-a752-b751735d768e",
+          "a02069f3-1047-4079-9da9-ff186bc607c7",
+          "a3aaf53a-b947-48d6-998f-ec55edb28298"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "02c8b214-e7a8-4297-a9cb-2d7ba86665aa",
+        "queryOrdinal": 3152,
+        "postgresExactTopK": [
+          "be089f08-2b91-42fb-8e67-65e4b66ca066",
+          "5173a53c-8c81-4864-bbb9-6af893ad8cd3",
+          "b8e859e7-6a02-4884-a847-7d0c2d1a7867",
+          "11e335c8-5b6b-4630-8037-1f67ab7b230b",
+          "4022e7e4-c67c-42b2-959b-03452ddf33a7",
+          "081d89d0-6ae2-4d5c-ad4a-cd269dadb2de",
+          "ed6b281e-0f07-4076-b470-145396595f7e",
+          "7f70ff7f-2708-4512-9f6d-11685148dd2b",
+          "14513954-7391-42ea-97a1-169c7db3e66b",
+          "0a0f1f1f-199b-4fda-ac35-d6e269d51cac"
+        ],
+        "cagraTopK": [
+          "be089f08-2b91-42fb-8e67-65e4b66ca066",
+          "5173a53c-8c81-4864-bbb9-6af893ad8cd3",
+          "b8e859e7-6a02-4884-a847-7d0c2d1a7867",
+          "11e335c8-5b6b-4630-8037-1f67ab7b230b",
+          "4022e7e4-c67c-42b2-959b-03452ddf33a7",
+          "081d89d0-6ae2-4d5c-ad4a-cd269dadb2de",
+          "ed6b281e-0f07-4076-b470-145396595f7e",
+          "7f70ff7f-2708-4512-9f6d-11685148dd2b",
+          "14513954-7391-42ea-97a1-169c7db3e66b",
+          "0a0f1f1f-199b-4fda-ac35-d6e269d51cac"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "e46e618b-d26a-4888-976f-80c35f58b3c3",
+        "queryOrdinal": 3315,
+        "postgresExactTopK": [
+          "48d897a8-583b-4cdf-b8b7-611bfacde575",
+          "cb713a72-60c2-4b6d-8fa3-db443aab67b7",
+          "4b6df7d3-9ef6-438e-abe9-9350aea1976c",
+          "683c90b0-f56b-4e26-8ae3-5517dc36e9d6",
+          "1df03b8c-93f3-46af-ae5c-476d8fe1205f",
+          "7fff5ab2-966e-4cbe-a626-f720bdfd6228",
+          "4693d45f-e4a6-4e24-b84a-3558e5d2f105",
+          "6c1f9508-c735-40f8-a9b1-12e9ad5a2c88",
+          "fc5942e1-7ff8-4ac0-a491-ff0a7c83b7c0",
+          "2fae0ae2-30e2-4d5e-8d73-c2b6813f9713"
+        ],
+        "cagraTopK": [
+          "48d897a8-583b-4cdf-b8b7-611bfacde575",
+          "cb713a72-60c2-4b6d-8fa3-db443aab67b7",
+          "4b6df7d3-9ef6-438e-abe9-9350aea1976c",
+          "683c90b0-f56b-4e26-8ae3-5517dc36e9d6",
+          "1df03b8c-93f3-46af-ae5c-476d8fe1205f",
+          "7fff5ab2-966e-4cbe-a626-f720bdfd6228",
+          "4693d45f-e4a6-4e24-b84a-3558e5d2f105",
+          "6c1f9508-c735-40f8-a9b1-12e9ad5a2c88",
+          "fc5942e1-7ff8-4ac0-a491-ff0a7c83b7c0",
+          "2fae0ae2-30e2-4d5e-8d73-c2b6813f9713"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "58b86d8f-096a-4ff9-be03-a10fa2b58daf",
+        "queryOrdinal": 3702,
+        "postgresExactTopK": [
+          "5312bd57-8d30-4ce7-a133-c8ea38ec8031",
+          "81929ad0-034c-47ba-b828-4a82f21045ad",
+          "e3942b1e-514b-4386-882f-224790e0a3fb",
+          "2a86341e-6a48-456f-b415-d0fdb5687bb5",
+          "de2dcdc2-6b18-41bd-917e-601e6fa744ec",
+          "d9f63fa1-d0b5-4eb5-8e27-25c24fc2d860",
+          "d70dd714-dbbf-454c-983e-90bbe9d5174a",
+          "7cccb397-6647-45c2-8daa-69344ab6e94f",
+          "b90cc5ed-8970-47a8-a50c-f0e74e324e54",
+          "2344034c-a1b2-408f-8c4e-04a19d413e9e"
+        ],
+        "cagraTopK": [
+          "5312bd57-8d30-4ce7-a133-c8ea38ec8031",
+          "81929ad0-034c-47ba-b828-4a82f21045ad",
+          "e3942b1e-514b-4386-882f-224790e0a3fb",
+          "2a86341e-6a48-456f-b415-d0fdb5687bb5",
+          "de2dcdc2-6b18-41bd-917e-601e6fa744ec",
+          "d9f63fa1-d0b5-4eb5-8e27-25c24fc2d860",
+          "d70dd714-dbbf-454c-983e-90bbe9d5174a",
+          "7cccb397-6647-45c2-8daa-69344ab6e94f",
+          "b90cc5ed-8970-47a8-a50c-f0e74e324e54",
+          "2344034c-a1b2-408f-8c4e-04a19d413e9e"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "ad774965-74d9-4e29-aea7-e3c14402a325",
+        "queryOrdinal": 3745,
+        "postgresExactTopK": [
+          "c1b87bb9-096a-4c7a-ba6f-9e8f3ee79bee",
+          "36c53a87-4c35-4238-96a5-27b4b5d4de43",
+          "831ce4f5-9557-46e8-b238-ebf3fef98092",
+          "8591a54f-c477-49f1-bcb5-38a4dcb7c892",
+          "555a65d9-3fe8-4861-94f4-0fa80bb5ce25",
+          "24a83351-9f03-4b22-b34f-ece3d54f5cd5",
+          "60bab86a-cabd-46cd-a7e4-3d9f8a5e7260",
+          "83e2b72e-9ea4-473f-9da7-bc3389b8627e",
+          "95818d80-7483-4a53-8e48-eebe8e8657cc",
+          "284f626c-367d-4d7f-a207-aa72ca354df7"
+        ],
+        "cagraTopK": [
+          "c1b87bb9-096a-4c7a-ba6f-9e8f3ee79bee",
+          "36c53a87-4c35-4238-96a5-27b4b5d4de43",
+          "831ce4f5-9557-46e8-b238-ebf3fef98092",
+          "8591a54f-c477-49f1-bcb5-38a4dcb7c892",
+          "555a65d9-3fe8-4861-94f4-0fa80bb5ce25",
+          "24a83351-9f03-4b22-b34f-ece3d54f5cd5",
+          "60bab86a-cabd-46cd-a7e4-3d9f8a5e7260",
+          "83e2b72e-9ea4-473f-9da7-bc3389b8627e",
+          "95818d80-7483-4a53-8e48-eebe8e8657cc",
+          "284f626c-367d-4d7f-a207-aa72ca354df7"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "babbf69a-12c3-4741-bfc2-635427682cd8",
+        "queryOrdinal": 3783,
+        "postgresExactTopK": [
+          "5233d926-9a3e-4301-9382-409e557794ad",
+          "4bdd17cb-5b69-4978-ac7b-a3eba9392b44",
+          "1694e7a0-05ec-48c9-aad1-245171c0cb94",
+          "e90f4d4d-b6be-4b44-aa43-515e271857b9",
+          "999ecce8-3b53-4f46-8dbc-c7a135cf855c",
+          "95636a02-9dc7-4e5e-ba8a-ce4db9d42427",
+          "678f3d32-ac0b-4382-ad36-98579ca587ad",
+          "583fbf2a-1ec0-4160-a88e-59939b6d6acb",
+          "45efae47-18df-4858-a752-b751735d768e",
+          "f6aaf9d2-e755-40bd-a4a9-bb6fbe32cce4"
+        ],
+        "cagraTopK": [
+          "5233d926-9a3e-4301-9382-409e557794ad",
+          "4bdd17cb-5b69-4978-ac7b-a3eba9392b44",
+          "1694e7a0-05ec-48c9-aad1-245171c0cb94",
+          "e90f4d4d-b6be-4b44-aa43-515e271857b9",
+          "999ecce8-3b53-4f46-8dbc-c7a135cf855c",
+          "95636a02-9dc7-4e5e-ba8a-ce4db9d42427",
+          "678f3d32-ac0b-4382-ad36-98579ca587ad",
+          "583fbf2a-1ec0-4160-a88e-59939b6d6acb",
+          "45efae47-18df-4858-a752-b751735d768e",
+          "f6aaf9d2-e755-40bd-a4a9-bb6fbe32cce4"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "39c74187-b867-4841-abbb-47e317488a86",
+        "queryOrdinal": 4762,
+        "postgresExactTopK": [
+          "c18ac711-e3fe-4868-8a38-b46652cb73c2",
+          "69cfd110-be86-498f-acd5-22c15ceb0c77",
+          "59872f86-e6b4-478a-9b09-8c986b33e3a9",
+          "e13ff661-8691-44b5-880c-8987b1da4699",
+          "83cb25dd-b277-4b29-b91a-05c0e33d901d",
+          "9c0e939d-13a3-425e-87c3-1c57aa6122b8",
+          "2d590ee6-00c8-495f-a588-c1f13ce91307",
+          "0ca8175b-f282-4151-910c-40cb75fb40aa",
+          "6f023d5e-b42e-41b6-8daf-8ef0ad791a48",
+          "fe1631b3-cbf8-4549-b03d-d6678af48c2a"
+        ],
+        "cagraTopK": [
+          "c18ac711-e3fe-4868-8a38-b46652cb73c2",
+          "69cfd110-be86-498f-acd5-22c15ceb0c77",
+          "59872f86-e6b4-478a-9b09-8c986b33e3a9",
+          "e13ff661-8691-44b5-880c-8987b1da4699",
+          "83cb25dd-b277-4b29-b91a-05c0e33d901d",
+          "9c0e939d-13a3-425e-87c3-1c57aa6122b8",
+          "2d590ee6-00c8-495f-a588-c1f13ce91307",
+          "0ca8175b-f282-4151-910c-40cb75fb40aa",
+          "6f023d5e-b42e-41b6-8daf-8ef0ad791a48",
+          "fe1631b3-cbf8-4549-b03d-d6678af48c2a"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "0e6f804f-b3d2-47b4-a1a5-8e68150cc540",
+        "queryOrdinal": 5108,
+        "postgresExactTopK": [
+          "5c675002-48a2-4236-aed6-d1979aecf93d",
+          "faf19e0a-de23-4d93-9461-b4f5658fad51",
+          "a4dc32e9-8703-4d64-82dc-5ec7f622927d",
+          "0a04bd10-ce19-4005-b620-d12fa72c61a0",
+          "b68df36a-2b2c-4397-9673-bae4bfe126bc",
+          "bf6d6fdd-c0a9-40f5-976f-52fbdc3bbf25",
+          "ff2c2c12-e4d7-491f-a8b1-f6a0ae241911",
+          "0ebb2f98-b5fe-41d5-838e-29c5b12ba2b8",
+          "22478797-2b79-41f1-a92f-37d5aabcc385",
+          "25106640-58cc-45e6-ae74-0396bec76f3d"
+        ],
+        "cagraTopK": [
+          "5c675002-48a2-4236-aed6-d1979aecf93d",
+          "faf19e0a-de23-4d93-9461-b4f5658fad51",
+          "a4dc32e9-8703-4d64-82dc-5ec7f622927d",
+          "0a04bd10-ce19-4005-b620-d12fa72c61a0",
+          "b68df36a-2b2c-4397-9673-bae4bfe126bc",
+          "bf6d6fdd-c0a9-40f5-976f-52fbdc3bbf25",
+          "ff2c2c12-e4d7-491f-a8b1-f6a0ae241911",
+          "0ebb2f98-b5fe-41d5-838e-29c5b12ba2b8",
+          "22478797-2b79-41f1-a92f-37d5aabcc385",
+          "25106640-58cc-45e6-ae74-0396bec76f3d"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "ebd75b39-9842-457a-bfc9-c890c6ee792c",
+        "queryOrdinal": 5446,
+        "postgresExactTopK": [
+          "e204f84a-c833-47f1-8fe8-216f5240b17d",
+          "e4b13d12-0373-4aa1-8ecb-4685a839c946",
+          "72dd8b47-0898-4b68-9152-764529dfd332",
+          "c5fc9c9d-1af6-4b2b-9e2d-3847223888c1",
+          "e15b2cc2-a44e-42cb-b465-1469d8489584",
+          "ddc45a8f-2c28-4ce7-b9f9-9b14d800ea78",
+          "a06821e5-d3d3-451b-838c-d928e4ea5bdb",
+          "e0cf8765-51d6-45f8-a53d-6536f57bf714",
+          "a41dfbce-3769-4536-bb8e-20ee2ed85f0c",
+          "373c5059-5a0b-42f6-a90a-827dedf3dcfb"
+        ],
+        "cagraTopK": [
+          "e204f84a-c833-47f1-8fe8-216f5240b17d",
+          "e4b13d12-0373-4aa1-8ecb-4685a839c946",
+          "72dd8b47-0898-4b68-9152-764529dfd332",
+          "c5fc9c9d-1af6-4b2b-9e2d-3847223888c1",
+          "e15b2cc2-a44e-42cb-b465-1469d8489584",
+          "ddc45a8f-2c28-4ce7-b9f9-9b14d800ea78",
+          "a06821e5-d3d3-451b-838c-d928e4ea5bdb",
+          "e0cf8765-51d6-45f8-a53d-6536f57bf714",
+          "a41dfbce-3769-4536-bb8e-20ee2ed85f0c",
+          "373c5059-5a0b-42f6-a90a-827dedf3dcfb"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "e40968ed-58df-4bf9-9ed6-f139614b0100",
+        "queryOrdinal": 5660,
+        "postgresExactTopK": [
+          "0902978e-dc4f-462b-9542-defc10e6bb2d",
+          "03e3b53b-ca5e-4599-93a8-20cb08a70931",
+          "b9e59750-1ed6-49d0-bf27-8811d680f781",
+          "e7a93fce-804a-420b-81dd-f02e4fbaa8bd",
+          "dc20ec5a-19b4-47e3-90f6-96915af8087e",
+          "065781c9-b745-4437-95ba-05a79b26f27f",
+          "f9d0bcd5-7e08-4b1e-9d2d-fccc59456f61",
+          "51905c52-cfb8-4a42-b270-361dc3fc2a15",
+          "aa842f4f-8758-4ea9-b3c6-03df1e64367d",
+          "eca5651e-34b5-43a4-861d-08a698b83635"
+        ],
+        "cagraTopK": [
+          "0902978e-dc4f-462b-9542-defc10e6bb2d",
+          "b9e59750-1ed6-49d0-bf27-8811d680f781",
+          "e7a93fce-804a-420b-81dd-f02e4fbaa8bd",
+          "03e3b53b-ca5e-4599-93a8-20cb08a70931",
+          "dc20ec5a-19b4-47e3-90f6-96915af8087e",
+          "065781c9-b745-4437-95ba-05a79b26f27f",
+          "f9d0bcd5-7e08-4b1e-9d2d-fccc59456f61",
+          "51905c52-cfb8-4a42-b270-361dc3fc2a15",
+          "aa842f4f-8758-4ea9-b3c6-03df1e64367d",
+          "eca5651e-34b5-43a4-861d-08a698b83635"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "7b207a3c-d7bf-40f3-813a-e9ad9fc3af81",
+        "queryOrdinal": 5666,
+        "postgresExactTopK": [
+          "e10790d5-5fa4-4064-b4c4-91caf851e347",
+          "25dd0b28-3714-4087-b52b-b4d5744eb014",
+          "18facf06-567d-4ea8-b21e-f17fe8ec9023",
+          "3eb6dada-b9f5-43f2-9487-71a6c9698d8c",
+          "ede7e5e7-7c1e-42d9-97c9-67f6d61c7052",
+          "3a1aa802-dbe9-402d-b212-5cdc0a17ed02",
+          "5583a9af-058b-4ae8-bda8-1d79f69cb123",
+          "55ebe15a-2737-4db2-be1e-89241a20b9fc",
+          "901d4c35-6a8c-41c7-a171-4585fbb3c64f",
+          "13f67245-b9e0-4d7b-b095-4648bf8e9bf0"
+        ],
+        "cagraTopK": [
+          "e10790d5-5fa4-4064-b4c4-91caf851e347",
+          "25dd0b28-3714-4087-b52b-b4d5744eb014",
+          "18facf06-567d-4ea8-b21e-f17fe8ec9023",
+          "3eb6dada-b9f5-43f2-9487-71a6c9698d8c",
+          "ede7e5e7-7c1e-42d9-97c9-67f6d61c7052",
+          "3a1aa802-dbe9-402d-b212-5cdc0a17ed02",
+          "5583a9af-058b-4ae8-bda8-1d79f69cb123",
+          "55ebe15a-2737-4db2-be1e-89241a20b9fc",
+          "901d4c35-6a8c-41c7-a171-4585fbb3c64f",
+          "13f67245-b9e0-4d7b-b095-4648bf8e9bf0"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "243c770b-de27-42fe-a582-50a9e81581ee",
+        "queryOrdinal": 5739,
+        "postgresExactTopK": [
+          "c488888d-9470-4735-ac47-676e269d31d7",
+          "bc799a4c-d27c-4d93-8391-93065d1123a0",
+          "d7e7f129-05bd-4268-a9f5-2027d102a2e0",
+          "6b54c7eb-1554-4355-8299-59da782b8dd6",
+          "961a38db-36ab-46c5-a2f8-95ad02c32e87",
+          "851c267c-6d53-489e-94e5-680d9be72a77",
+          "8c18d381-7598-4105-a9cc-76f55bb5fc04",
+          "3405a82b-e339-4dbc-afc9-675aeacb08b8",
+          "3df05286-0f6e-4450-b50f-94b6c2caf776",
+          "b3118057-0cfb-4445-8c4b-aa1e740d2c89"
+        ],
+        "cagraTopK": [
+          "c488888d-9470-4735-ac47-676e269d31d7",
+          "bc799a4c-d27c-4d93-8391-93065d1123a0",
+          "d7e7f129-05bd-4268-a9f5-2027d102a2e0",
+          "6b54c7eb-1554-4355-8299-59da782b8dd6",
+          "961a38db-36ab-46c5-a2f8-95ad02c32e87",
+          "851c267c-6d53-489e-94e5-680d9be72a77",
+          "8c18d381-7598-4105-a9cc-76f55bb5fc04",
+          "3405a82b-e339-4dbc-afc9-675aeacb08b8",
+          "3df05286-0f6e-4450-b50f-94b6c2caf776",
+          "b3118057-0cfb-4445-8c4b-aa1e740d2c89"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "3656b672-3924-4692-a365-9503c7530ed8",
+        "queryOrdinal": 5940,
+        "postgresExactTopK": [
+          "62ad765e-342c-4165-8b53-3a8d0242adfb",
+          "86467b3b-0cf0-4b30-aa3d-343929b4e443",
+          "7884fd34-a1d3-49f5-b726-847ac4de3a55",
+          "cbdcae0c-5e86-45a8-a832-117567eb5c55",
+          "e05056da-b475-4185-8c88-88a5df31422c",
+          "7d1150db-7c72-487d-9714-b724debfebbc",
+          "da1f2c7e-098e-4740-a2f1-01278defabe5",
+          "04ddad3a-7267-40e0-9dd9-fbe6652a8534",
+          "2901ab6f-798e-403b-9dcc-c5a6c805d8c4",
+          "4f44f820-e958-4f34-8c86-1bc1d8378d05"
+        ],
+        "cagraTopK": [
+          "62ad765e-342c-4165-8b53-3a8d0242adfb",
+          "86467b3b-0cf0-4b30-aa3d-343929b4e443",
+          "7884fd34-a1d3-49f5-b726-847ac4de3a55",
+          "e05056da-b475-4185-8c88-88a5df31422c",
+          "cbdcae0c-5e86-45a8-a832-117567eb5c55",
+          "7d1150db-7c72-487d-9714-b724debfebbc",
+          "da1f2c7e-098e-4740-a2f1-01278defabe5",
+          "04ddad3a-7267-40e0-9dd9-fbe6652a8534",
+          "2901ab6f-798e-403b-9dcc-c5a6c805d8c4",
+          "6d8c75d8-b230-4087-b135-8dfe3474ea58"
+        ],
+        "recallAtK": 0.9
+      },
+      {
+        "queryChunkId": "7f007a8c-c2af-4b80-b8a8-56ba418ea01d",
+        "queryOrdinal": 5996,
+        "postgresExactTopK": [
+          "322df9a6-3c12-4454-82af-e8644c72a19a",
+          "8a299e98-16a3-48ae-874e-42a6dc5cd992",
+          "78b02532-93e4-4711-b302-c3bbcd2b1cf2",
+          "f56bfe9d-b22a-409c-b8a2-66d0fb5de737",
+          "fbbab16d-a598-4e84-a0d6-8916cc6de00c",
+          "6e2f035d-654c-47e9-972c-0b7cca813cd5",
+          "7ee505a7-338d-47b2-910f-2e8f26896279",
+          "a8c65756-581c-4c83-9587-a1f07208334f",
+          "eae82925-c2fe-4b42-815e-b247cd5b73ec",
+          "d0d8c0fa-f7e1-4acc-9d22-639bafbf59ba"
+        ],
+        "cagraTopK": [
+          "322df9a6-3c12-4454-82af-e8644c72a19a",
+          "8a299e98-16a3-48ae-874e-42a6dc5cd992",
+          "78b02532-93e4-4711-b302-c3bbcd2b1cf2",
+          "f56bfe9d-b22a-409c-b8a2-66d0fb5de737",
+          "fbbab16d-a598-4e84-a0d6-8916cc6de00c",
+          "6e2f035d-654c-47e9-972c-0b7cca813cd5",
+          "7ee505a7-338d-47b2-910f-2e8f26896279",
+          "a8c65756-581c-4c83-9587-a1f07208334f",
+          "eae82925-c2fe-4b42-815e-b247cd5b73ec",
+          "d0d8c0fa-f7e1-4acc-9d22-639bafbf59ba"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "9e454d0b-7107-4a35-9b1a-09897068a850",
+        "queryOrdinal": 6292,
+        "postgresExactTopK": [
+          "5b8b2756-31c9-454b-9492-dcdb24bc726d",
+          "815ac7e9-e3ad-4d2f-9383-c6de76a1a930",
+          "747bdd4f-cf65-4580-b229-f5146afaa7df",
+          "5a14e115-8e17-47f0-bc68-94b1bad77246",
+          "55995572-3d95-4480-b369-6545c30e25cc",
+          "6f997f4e-79cf-4a8b-a334-ed13f042988e",
+          "4df80deb-5ca9-4788-8101-aa37b1f15087",
+          "e208b393-1c7c-4dec-8105-15613780c839",
+          "6f077762-ac72-4b71-a7e7-0c13a9277d47",
+          "c48c08cf-f64f-49ef-915e-52b0905ff755"
+        ],
+        "cagraTopK": [
+          "5b8b2756-31c9-454b-9492-dcdb24bc726d",
+          "815ac7e9-e3ad-4d2f-9383-c6de76a1a930",
+          "747bdd4f-cf65-4580-b229-f5146afaa7df",
+          "5a14e115-8e17-47f0-bc68-94b1bad77246",
+          "55995572-3d95-4480-b369-6545c30e25cc",
+          "6f997f4e-79cf-4a8b-a334-ed13f042988e",
+          "4df80deb-5ca9-4788-8101-aa37b1f15087",
+          "e208b393-1c7c-4dec-8105-15613780c839",
+          "6f077762-ac72-4b71-a7e7-0c13a9277d47",
+          "c48c08cf-f64f-49ef-915e-52b0905ff755"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "81954e17-497c-4956-b8b9-694217b47679",
+        "queryOrdinal": 6392,
+        "postgresExactTopK": [
+          "a1a01821-0e22-4608-9a55-f9ca3751bf11",
+          "d69f4744-93ab-4fa6-9ec9-24c77d980c39",
+          "58576894-3fc8-4a15-9525-f778bd7c32fa",
+          "fc1522aa-3b87-4fa6-8a47-f26e66a8c152",
+          "02280e14-d8ca-4895-925b-e77155c021ee",
+          "085acb1c-f66a-4574-b584-cd28fc9b67c6",
+          "285cfa00-fe61-4b7f-873d-322664fa62f7",
+          "69f1f72a-8ec4-46cc-b385-e724e3a9741c",
+          "878ce93d-40d8-4cd9-aaad-4f14e9654638",
+          "d675caaa-c9fb-4d50-9292-204b75030789"
+        ],
+        "cagraTopK": [
+          "d69f4744-93ab-4fa6-9ec9-24c77d980c39",
+          "a1a01821-0e22-4608-9a55-f9ca3751bf11",
+          "58576894-3fc8-4a15-9525-f778bd7c32fa",
+          "fc1522aa-3b87-4fa6-8a47-f26e66a8c152",
+          "d675caaa-c9fb-4d50-9292-204b75030789",
+          "285cfa00-fe61-4b7f-873d-322664fa62f7",
+          "085acb1c-f66a-4574-b584-cd28fc9b67c6",
+          "878ce93d-40d8-4cd9-aaad-4f14e9654638",
+          "69f1f72a-8ec4-46cc-b385-e724e3a9741c",
+          "02280e14-d8ca-4895-925b-e77155c021ee"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "c73af80c-5c5a-448c-9664-3960f06ea2fb",
+        "queryOrdinal": 6853,
+        "postgresExactTopK": [
+          "d6f8b353-47b4-4b02-a516-b92c197880f1",
+          "900a5f4d-fd89-434d-8966-fff5d2879d51",
+          "ce53cbfa-1770-4b90-9a9f-7aa85dc278c7",
+          "02cfe3ad-94b3-4947-bdbf-0ba2ced91fbc",
+          "b27d3a23-eab8-4c02-a716-8360eedecd32",
+          "189f42e9-bda3-4383-8aef-727f02ad824c",
+          "4e8c5889-e196-44ec-930a-a72062c367c9",
+          "c9b2fbd0-9cc0-4d58-bf3e-407f7203bc10",
+          "18bc7983-bfc8-4a0a-aa97-13b0101fa4a1",
+          "78b529c1-1a56-4bae-86d7-306d002b92a4"
+        ],
+        "cagraTopK": [
+          "d6f8b353-47b4-4b02-a516-b92c197880f1",
+          "900a5f4d-fd89-434d-8966-fff5d2879d51",
+          "ce53cbfa-1770-4b90-9a9f-7aa85dc278c7",
+          "02cfe3ad-94b3-4947-bdbf-0ba2ced91fbc",
+          "b27d3a23-eab8-4c02-a716-8360eedecd32",
+          "189f42e9-bda3-4383-8aef-727f02ad824c",
+          "4e8c5889-e196-44ec-930a-a72062c367c9",
+          "c9b2fbd0-9cc0-4d58-bf3e-407f7203bc10",
+          "18bc7983-bfc8-4a0a-aa97-13b0101fa4a1",
+          "78b529c1-1a56-4bae-86d7-306d002b92a4"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "59e6e581-35b8-462a-9900-661a8c91eeec",
+        "queryOrdinal": 7018,
+        "postgresExactTopK": [
+          "e2b17ac4-0225-4942-9725-bf0a28c05381",
+          "5fe78811-ae77-4ebd-9d15-a4d4eb38c223",
+          "02cfe3ad-94b3-4947-bdbf-0ba2ced91fbc",
+          "709b060c-26c0-4fd5-b611-01f01578cb9a",
+          "336061a8-7a9d-4b34-a155-b7d7476b5867",
+          "ab19c0ba-7dc1-4232-b878-530c0516ecc2",
+          "373c5059-5a0b-42f6-a90a-827dedf3dcfb",
+          "53261e93-992f-496b-8c34-a2e4d284ba77",
+          "3c4b488b-3bfa-46ff-8528-635b54165940",
+          "3dd84123-861b-4f9c-afa6-8b39564deb31"
+        ],
+        "cagraTopK": [
+          "e2b17ac4-0225-4942-9725-bf0a28c05381",
+          "5fe78811-ae77-4ebd-9d15-a4d4eb38c223",
+          "02cfe3ad-94b3-4947-bdbf-0ba2ced91fbc",
+          "709b060c-26c0-4fd5-b611-01f01578cb9a",
+          "336061a8-7a9d-4b34-a155-b7d7476b5867",
+          "ab19c0ba-7dc1-4232-b878-530c0516ecc2",
+          "373c5059-5a0b-42f6-a90a-827dedf3dcfb",
+          "53261e93-992f-496b-8c34-a2e4d284ba77",
+          "3c4b488b-3bfa-46ff-8528-635b54165940",
+          "3dd84123-861b-4f9c-afa6-8b39564deb31"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "ca58d121-80f6-438d-942c-f391d0f3a462",
+        "queryOrdinal": 7078,
+        "postgresExactTopK": [
+          "41e56dc8-d95c-4b5c-a2de-86f3e2887578",
+          "f027dbb6-f1e6-4ddd-9861-1febbf14f6a9",
+          "4e97a22c-4f64-40d6-b217-88e2b5d8809a",
+          "b5313be6-133f-410c-9185-bdc4bf4e715a",
+          "b036622d-e547-4bf3-9df4-96caada634b3",
+          "e854755e-844b-45dd-995b-544314cf6de6",
+          "8d72f8f1-7cfb-42c0-9e6a-fb024732f771",
+          "621e5aee-f1d8-43f0-bd69-545a6192c935",
+          "c9a07f0d-ef28-445d-94c4-b0d898589dce",
+          "f980842e-71b5-440a-8a71-a7e626f0c360"
+        ],
+        "cagraTopK": [
+          "41e56dc8-d95c-4b5c-a2de-86f3e2887578",
+          "f027dbb6-f1e6-4ddd-9861-1febbf14f6a9",
+          "4e97a22c-4f64-40d6-b217-88e2b5d8809a",
+          "b5313be6-133f-410c-9185-bdc4bf4e715a",
+          "b036622d-e547-4bf3-9df4-96caada634b3",
+          "e854755e-844b-45dd-995b-544314cf6de6",
+          "8d72f8f1-7cfb-42c0-9e6a-fb024732f771",
+          "621e5aee-f1d8-43f0-bd69-545a6192c935",
+          "c9a07f0d-ef28-445d-94c4-b0d898589dce",
+          "f980842e-71b5-440a-8a71-a7e626f0c360"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "a286b736-6e1d-4618-a48d-8afa6beaf9ad",
+        "queryOrdinal": 7106,
+        "postgresExactTopK": [
+          "3ac85f23-d312-41b2-bd67-1b7385d2f200",
+          "2996d575-2d7e-454d-91de-dfdc307a1455",
+          "67cbf69a-1988-4678-8277-582672643366",
+          "aa03dcd4-6777-4e97-b8f7-c39920ede8e6",
+          "a27ae2d6-7a81-40ed-b00d-d3f8606bb6a4",
+          "3093d539-1ef1-4548-be20-f98784758e5f",
+          "419a0a02-ea5e-40be-a7d3-e372d5fe59a4",
+          "044181f4-a1e9-4e5f-a78f-02e79786a0c4",
+          "afbe90b1-4407-4b8e-8df0-b9dcb6c6afaa",
+          "5c187926-208d-4404-8d61-d2be80f01198"
+        ],
+        "cagraTopK": [
+          "3ac85f23-d312-41b2-bd67-1b7385d2f200",
+          "2996d575-2d7e-454d-91de-dfdc307a1455",
+          "67cbf69a-1988-4678-8277-582672643366",
+          "aa03dcd4-6777-4e97-b8f7-c39920ede8e6",
+          "a27ae2d6-7a81-40ed-b00d-d3f8606bb6a4",
+          "3093d539-1ef1-4548-be20-f98784758e5f",
+          "419a0a02-ea5e-40be-a7d3-e372d5fe59a4",
+          "044181f4-a1e9-4e5f-a78f-02e79786a0c4",
+          "afbe90b1-4407-4b8e-8df0-b9dcb6c6afaa",
+          "5c187926-208d-4404-8d61-d2be80f01198"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "6959e2e6-2f2d-464c-ad98-aaf67d308b5a",
+        "queryOrdinal": 7138,
+        "postgresExactTopK": [
+          "6aa1f4fa-f0a1-48c1-a060-693a373b88e0",
+          "e2f3f2c8-b2b4-44fc-b766-29affa348908",
+          "9c54adce-46bd-49fc-93ab-47d6222eb0d0",
+          "189f42e9-bda3-4383-8aef-727f02ad824c",
+          "447a3349-8c8f-44ad-b208-95a1c6d35af3",
+          "55a90b0a-c052-4a66-b333-6d6db541c5c0",
+          "a15aa6e8-90d1-4f80-a201-a23ceb21f25d",
+          "aec74bcd-001e-4f06-b641-08e5933a0103",
+          "53dbf57f-7351-45b6-a7f8-06bdfead1666",
+          "5e797644-2187-4d16-a89f-f33016b08d16"
+        ],
+        "cagraTopK": [
+          "6aa1f4fa-f0a1-48c1-a060-693a373b88e0",
+          "e2f3f2c8-b2b4-44fc-b766-29affa348908",
+          "9c54adce-46bd-49fc-93ab-47d6222eb0d0",
+          "189f42e9-bda3-4383-8aef-727f02ad824c",
+          "447a3349-8c8f-44ad-b208-95a1c6d35af3",
+          "55a90b0a-c052-4a66-b333-6d6db541c5c0",
+          "a15aa6e8-90d1-4f80-a201-a23ceb21f25d",
+          "aec74bcd-001e-4f06-b641-08e5933a0103",
+          "53dbf57f-7351-45b6-a7f8-06bdfead1666",
+          "5e797644-2187-4d16-a89f-f33016b08d16"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "85ab2c71-390d-49ab-b68b-3fd4f95b0d9f",
+        "queryOrdinal": 7568,
+        "postgresExactTopK": [
+          "406cdee7-beac-490b-bf5f-24717890ab8a",
+          "f9f04a78-47c0-448a-ab50-4221d749aa47",
+          "fc0c93a7-f27e-4884-8cab-72da0409a3cc",
+          "bed03636-4317-48a8-ad7b-09eb21e63abd",
+          "db561a34-f724-45af-96cc-3e87d3313a3c",
+          "70b2361e-7c92-4390-965b-afe27d3603a3",
+          "c27205d4-2ece-47a7-9fdf-fe5a95a4ae82",
+          "566ca27b-b515-481b-92b7-341edf53b35d",
+          "a7d9d79f-9d10-4d9d-a8b0-225e11689164",
+          "0a738081-ed1a-4353-a609-2aa569ab6a6d"
+        ],
+        "cagraTopK": [
+          "406cdee7-beac-490b-bf5f-24717890ab8a",
+          "f9f04a78-47c0-448a-ab50-4221d749aa47",
+          "fc0c93a7-f27e-4884-8cab-72da0409a3cc",
+          "bed03636-4317-48a8-ad7b-09eb21e63abd",
+          "db561a34-f724-45af-96cc-3e87d3313a3c",
+          "70b2361e-7c92-4390-965b-afe27d3603a3",
+          "c27205d4-2ece-47a7-9fdf-fe5a95a4ae82",
+          "566ca27b-b515-481b-92b7-341edf53b35d",
+          "a7d9d79f-9d10-4d9d-a8b0-225e11689164",
+          "0a738081-ed1a-4353-a609-2aa569ab6a6d"
+        ],
+        "recallAtK": 1.0
+      },
+      {
+        "queryChunkId": "8a0d5699-7d55-4370-9cf7-799843680646",
+        "queryOrdinal": 7928,
+        "postgresExactTopK": [
+          "7161b60d-56c4-4040-9d88-97cc92c8ddea",
+          "70d2dba2-c4d6-4c3b-a148-7989165ead8d",
+          "3928f992-8ad2-4e3a-b4a9-93607ec4dd48",
+          "81763904-3d23-48e9-b59c-d2ee19995457",
+          "a3d06a68-3f66-498b-9034-0e622d1a3db0",
+          "e10790d5-5fa4-4064-b4c4-91caf851e347",
+          "4cef8e81-9416-427c-bb90-d2331e927aa0",
+          "4b6df7d3-9ef6-438e-abe9-9350aea1976c",
+          "3bbcb015-2b1b-4dcb-a5e1-93beba6541c2",
+          "b5459702-f6d6-4180-94f0-8399ec1ad172"
+        ],
+        "cagraTopK": [
+          "7161b60d-56c4-4040-9d88-97cc92c8ddea",
+          "70d2dba2-c4d6-4c3b-a148-7989165ead8d",
+          "3928f992-8ad2-4e3a-b4a9-93607ec4dd48",
+          "81763904-3d23-48e9-b59c-d2ee19995457",
+          "a3d06a68-3f66-498b-9034-0e622d1a3db0",
+          "e10790d5-5fa4-4064-b4c4-91caf851e347",
+          "4cef8e81-9416-427c-bb90-d2331e927aa0",
+          "4b6df7d3-9ef6-438e-abe9-9350aea1976c",
+          "3bbcb015-2b1b-4dcb-a5e1-93beba6541c2",
+          "b5459702-f6d6-4180-94f0-8399ec1ad172"
+        ],
+        "recallAtK": 1.0
+      }
+    ]
+  },
+  "limitations": [
+    "Bounded 16K-row maximum diagnostic cohort; not full-corpus retrieval evaluation.",
+    "No reviewed relevance judgments; nearest-neighbor parity is not semantic quality.",
+    "Missing source/workspace revisions prevent production evidence qualification.",
+    "A supplied lease ID is only receipt metadata; the caller must independently confirm it is active before and after execution.",
+    "CuPy memory samples are diagnostic only and are not admission-grade."
+  ]
+}

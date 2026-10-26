@@ -2,7 +2,7 @@
  * Server-Side Service Integration Adapters
  *
  * Production-ready helpers for:
- * - Ollama embeddings & chat (gemma4-rotorquant:latest, embeddinggemma:latest)
+ * - Ollama embeddings & chat (ornith-1.5-9b, embeddinggemma:latest)
  * - Redis caching (IORedis)
  * - Qdrant vector indexing (@qdrant/js-client-rest)
  * - PostgreSQL + pgvector (pg + drizzle-orm)
@@ -17,7 +17,7 @@ const privateEnv: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';

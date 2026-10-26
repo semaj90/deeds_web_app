@@ -36,7 +36,7 @@ export interface RpcProvenance {
  * `payload` is the raw result; all other fields are cache/audit metadata.
  */
 export interface RpcCacheEnvelope<T> {
-  schemaVersion: 1;
+  schemaVersion: 3;
   transport: RpcTransport;
   method: string;
   argsHash: string;
@@ -45,6 +45,7 @@ export interface RpcCacheEnvelope<T> {
   createdAt: string;        // ISO-8601
   expiresAt: string;        // ISO-8601
   hitLevel: RpcHitLevel;
+  payloadChecksum: `sha256:${string}`;
   payload: T;
   provenance?: RpcProvenance;
 }

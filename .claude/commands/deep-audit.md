@@ -71,6 +71,34 @@ Run the Bash gates from CLAUDE.md verbatim. These need filesystem checks (e.g., 
 ### Tier H (G48–G55) — search analytics + ACE feedback
 Same — run the bash gates from CLAUDE.md.
 
+### Tier ADV (G56–G58) — adversarial fixture validation, read-only (added 2026-10-21; not a GAN)
+Run from the repo root. Follow the `validating-parent-atlas` rules: a lane reports the level it actually reached (`STATIC` < `WIRED` < `LIVE_READ_ONLY` < `LIVE_MUTATING` < `PROVEN`, or `BLOCKED`). Never report PROVEN from these gates. The overall status is the worst lane, not the average.
+- **G56 adversarial fixtures (no DB):** `npx tsx scripts/atlas/prove-gan-adversarial-v1.mts --output=.tmp/atlas/gan-adversarial-proof-v1-<run-id>.json`. Use a unique explicit output path (without it, the script writes under `docs/reports`). Passes only if every malicious fixture is rejected with the expected code, every control is accepted, and the self-tests detect deliberately broken probes. Record the receipt path.
+- **G57 live read-only census:** `npx tsx scripts/atlas/prove-gan-audit-readonly-v1.mts --adversarial-receipt <G56 receipt> --inventory-receipt <inventory receipt> --lineage-readiness <lineage receipt>`. It runs one `REPEATABLE READ READ ONLY` transaction and always rolls back. A DB failure or zero rows exits 2 with `GAN_LIVE_PACKET_PROOF_BLOCKED`, which counts as `BLOCKED`. Give each receipt an explicit named path. Never pick the latest receipt by timestamp.
+- **G58 contract parity:** Choose one exact registered contract ID from `CONTRACT_PARITY_REGISTRY`; the exporter requires `--contract` and writes an immutable bundle. Run `npx tsx scripts/atlas/export-contract-parity-v1.mts --contract <registered-schema-id> --out .tmp/atlas/contract-parity-v1/<run-id>`. Record the emitted manifest path, schema ID, version, and checksum. Then run `python python/atlas_contract_parity/run_parity.py --manifest .tmp/atlas/contract-parity-v1/<run-id>/manifest.json --schema-id <emitted-schema-id> --schema-version <emitted-version> --schema-checksum <emitted-sha256> --out .tmp/atlas/contract-parity-v1/<run-id>/python-parity-receipt.json`. The Python runner requires all five arguments and refuses to overwrite a receipt. Never resolve a bundle or contract as "latest"; compare only the exact same contract and sealed manifest.
+- **Runs serially.** G57 uses the database, so it never runs in the parallel pool.
+
+### Tier ORG (G59–G62) — indexing, Redis/Valkey, centroids, DAG prefill/decode (added 2026-10-21)
+Read-only organisation checks. Nothing here deletes, moves, or writes. Any cleanup is a separate, reviewed change that archives first (see CLAUDE.md archival rules).
+- **G59 index freshness:** compare the canonical `docs/graph/codebase-graph.json` mtime with the newest file under `docs/reports/graph-probes/`. Flag the canonical graph as STALE if it is older than 24h. A probe is never canonical, so report probes as candidates only.
+- **G60 Redis/Valkey key namespaces:** use `SCAN` with a count limit (never `KEYS`) to count keys per prefix: `code:index:*`, `code:ts:*`, `bitfrost:*`, `gpu:*`, `atlas:centroid:*`, `wiki:note:dir:*`. Flag any prefix that is not in the registry, and any key without a TTL. Read only.
+- **G61 centroid caches:** check that `atlas:centroid:{domain,kmeans,som}:*` keys have TTLs and that each cache has a canonical owner. Cache content is never evidence. Confirm the authority for each centroid family in PostgreSQL (for example `atlas_ontology_linked_tuples`).
+- **G62 DAG prefill and decode:** confirm the owners exist and each one's OpenSpec status. Check the prefill and decode files, then count checked and open tasks in `sveltekit-frontend/openspec/changes/parent-atlas-ace-json-dag-prefill-pipeline/tasks.md`. Report counts by status. Do not treat a checked task as proof.
+- **Archive rule:** if a gate finds an unused file, record it as a candidate with its path and `git log` entry. Never remove it in this audit.
+
+## Parallel execution (policy, 2026-10-21; mirrors CLAUDE.md and codex.md)
+
+For Parent Atlas production-readiness work, also follow `.codex/skills/parent-atlas-production-hardening-audit/SKILL.md` and the existing `graphify-pipeline-gap-audit` skill. That audit skill augments these gate instructions; it does not authorize mutations or replace the owning OpenSpec ledger.
+
+- **Measure first.** Run one serial pass (`DEEP_AUDIT_CONCURRENCY=1`) and record its wall time before enabling concurrency. The serial run is the replay oracle; the parallel result must match it gate for gate.
+- **Read the graph once.** Load `docs/graph/codebase-graph.json` once, hash it (sha256), and give every worker the same in-memory snapshot. Never re-scan per gate.
+- **Pool by tier, bounded.** The code tier (G1–G26) and the data tier (G10–G12) are pure reads over the snapshot and may run in a pool of `DEEP_AUDIT_CONCURRENCY` (default 3, hard cap 4). Infra (G27–G47) and Tier H (G48–G55) run bash checks against services and the filesystem, so run them serially to avoid hammering services.
+- **Run-scoped outputs.** Each gate writes `reports/deep-audit/<runId>/gate-<id>.json` with the run ID and graph hash. No two workers write the same file.
+- **Ordering.** The report, recap and remediation list are built serially after every gate finishes. Any gate that fails or times out marks the run `INCOMPLETE`. Never drop a failed gate silently.
+- **Fix mode stays serial.** Group fixes by file, and apply `Edit` one file at a time. Two workers must never edit the same file.
+- **No side-effecting writes.** Audit gates never write to PostgreSQL, Valkey, Qdrant or Neo4j. The `wire` mode only emits a checklist.
+- **Recap records the run.** Add `Concurrency: N · wall time: Xs · serial oracle: <match|not run>` to the recap.
+
 ## Output format (mode=report)
 
 Print a **single concise table** plus an action list. Do NOT dump the full file lists unless the user asks; cap each gate's bullet to top 5 with `(+N more)` suffix.
@@ -93,6 +121,7 @@ Print a **single concise table** plus an action list. Do NOT dump the full file 
 3. _(no other gates fail)_
 
 ### Recap
+- Telemetry: `npx tsx scripts/atlas/deep-audit-hll-telemetry-v1.mts --graph=<graph json>` writes one exact distinct-count receipt to `reports/deep-audit/telemetry/` (EXACT_SET_ADAPTER, read-only, no Valkey writes). The writer validates the receipt it just created, through the shared contract in `scripts/atlas/lib/deep-audit-telemetry-receipt-v1.mts`, and exits 1 with `TELEMETRY_RECEIPT_INVALID` on failure. To validate named receipts later, run `npx tsx ../scripts/atlas/deep-audit-telemetry-consumer-v1.mts <receipt.json>`. Neither path picks the latest receipt. Add the validated receipt path and its SHA-256 here.
 - Files audited: 47
 - Gates run: 23 (Tier code)
 - Hard fails: 0  ·  Warnings: 8  ·  Pass: 15

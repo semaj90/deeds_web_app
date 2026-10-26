@@ -158,7 +158,7 @@ Write-Host -NoNewline "G8: Required models... "
 try {
   $models = Invoke-JsonGet "$ollamaBase/api/tags" 4
   $names = @($models.models | ForEach-Object { $_.name })
-  $hasRotor = @($names | Where-Object { $_ -match 'gemma4-rotorquant|gemma4-legal|gemma4-legal\.gguf' }).Count -gt 0
+  $hasRotor = @($names | Where-Object { $_ -match 'ornith-1.5-9b\.gguf' }).Count -gt 0
   $hasEmbed = @($names | Where-Object { $_ -match 'embeddinggemma' }).Count -gt 0
   if ($hasRotor -and $hasEmbed) {
     MarkPass 'G8' '(rotorquant + embedding models present)'
@@ -172,7 +172,7 @@ try {
 Write-Host -NoNewline "G9: Inference latency... "
 try {
   $start = Get-Date
-  $null = & ollama run 'gemma4-rotorquant:latest' 'say ok' 2>$null
+  $null = & ollama run 'ornith-1.5-9b' 'say ok' 2>$null
   $latency = [int]((Get-Date) - $start).TotalMilliseconds
   if ($latency -lt 60000) {
     MarkPass 'G9' "(${latency}ms)"

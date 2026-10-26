@@ -98,6 +98,13 @@ describe('Parent Atlas query router v2 integration contracts', () => {
     expect(plan.oneVotePerLogicalLane).toBe(true);
   });
 
+  it('does not claim the historical halfvec HNSW executor supports canonical semantic_768', () => {
+    const capability = DEFAULT_RETRIEVAL_EXECUTOR_CAPABILITIES_V2.find((cap) => cap.id === 'pgvector_hnsw');
+    expect(capability?.supportedRepresentations).not.toContain('semantic_768');
+    expect(capability?.notes).toContain('content_embedding_768');
+    expect(capability?.notes).toContain('distinct, unqualified representation');
+  });
+
   it('uses the same executor identity for 512 and 768 when capability proof supports both', () => {
     const classification = QueryClassificationV2Schema.parse({
       schema: 'atlas.query-classification.v2',

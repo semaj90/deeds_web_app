@@ -97,6 +97,10 @@ export const DELETE: RequestHandler = async ({ locals }) => {
   if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
-  await invalidateHypergraph();
+  try {
+    await invalidateHypergraph();
+  } catch (err) {
+    return json({ invalidated: false, error: (err as Error)?.message ?? 'invalidation failed' }, { status: 503 });
+  }
   return json({ invalidated: true });
 };

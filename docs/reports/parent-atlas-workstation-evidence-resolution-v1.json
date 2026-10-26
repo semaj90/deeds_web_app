@@ -2,13 +2,2577 @@
   "schema": "atlas.parent-atlas-workstation-evidence-resolution.v1",
   "status": "PROVEN",
   "sourceReport": "docs/reports/parent-atlas-workstation-openspec-workboard-v2.json",
-  "taskCount": 59,
-  "evidenceRefCount": 130,
-  "resolvedCount": 130,
+  "taskCount": 1075,
+  "evidenceRefCount": 1587,
+  "resolvedCount": 1587,
   "missingCount": 0,
   "refs": [
     {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
       "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
       "exists": true
     },
     {
@@ -176,6 +2740,626 @@
       "exists": true
     },
     {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
       "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
       "exists": true
     },
@@ -341,6 +3525,1210 @@
     },
     {
       "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
       "exists": true
     },
     {
@@ -384,6 +4772,630 @@
       "exists": true
     },
     {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/graphify-daily-coordinator-canary-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
       "ref": "docs/reports/openspec-portfolio-v1.json",
       "exists": true
     },
@@ -428,6 +5440,98 @@
       "exists": true
     },
     {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
       "ref": "docs/reports/openspec-portfolio-v1.json",
       "exists": true
     },
@@ -448,6 +5552,170 @@
       "exists": true
     },
     {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
       "ref": "docs/reports/current-source-cohort-lineage-v1.json",
       "exists": true
     },
@@ -500,6 +5768,410 @@
       "exists": true
     },
     {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
       "ref": "docs/reports/openspec-portfolio-v1.json",
       "exists": true
     },
@@ -525,6 +6197,162 @@
     },
     {
       "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-source-cohort-lineage-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
+      "exists": true
+    },
+    {
+      "ref": "docs/reports/openspec-portfolio-v1.json",
       "exists": true
     }
   ],

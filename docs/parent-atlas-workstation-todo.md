@@ -1,6 +1,347 @@
 # Parent Atlas workstation status and deferred integration queue
 
-Updated: 2026-09-05
+Updated: 2026-10-15 (phase evidence audit, LUT readback, and evidence-fabric census)
+
+## Phase implementation audit (2026-10-15)
+
+This audit separates implementation presence from evidence-backed completion.
+There is no single authoritative phase ledger with shared acceptance criteria
+for Phases 1–24. The phase-by-phase diagnostic receipt is
+`docs/reports/parent-atlas-phases-01-24-evidence-review-v1.json`; unknown and
+stale phases are not counted as complete. Do not derive a portfolio percentage.
+Important: the 1–24 table below is a legacy summary ordinal list, not the
+canonical workstation phase namespace. Use stable IDs
+`workstation-p11`–`workstation-p25` from the dated canonical index and the
+crosswalk in `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json`.
+There is no verified ordinal crosswalk between that index and the legacy rows;
+in particular, canonical P22 is learned-policy research, P23 is transport
+validation, and P24 is GPU/vector residency. Do not transfer status by number.
+
+The LUT validation-receipt sidecar was applied to PostgreSQL 18.4 on
+2026-10-15 after rollback rehearsal: `atlas_packet_class_lut_validation_receipts`
+has revision/outcome B-tree and repository-analysis FTS/JSONB GIN indexes,
+append-only triggers, and zero seeded rows. No receipt writer or search
+consumer is wired. A read-only `GET /v1/models` at `:8090` returned
+`ornith-1.5-9b`; Ornith is the synthesis/tool-use runtime, separate from the
+EmbeddingGemma `semantic_768` contract. PostgreSQL/pgvector remains canonical
+only when the specific owning row and revision lineage are proven.
+
+| Legacy row (not a stable phase ID) | Current implementation evidence | Audit status / remaining proof |
+|---|---|---|
+| 1–10 | No phase-specific authoritative acceptance ledger and current proof receipts were located in this scoped review. | `NOT_VERIFIED`; locate each owning phase change and required receipts before scoring. |
+| 11 | Older workstation projection records partial capability. | `PARTIAL / STALE PROJECTION`; revalidate against its owning OpenSpec before claiming closure. |
+| 12 | Older projection records blocked identity authority. | `BLOCKED_IDENTITY_AUTHORITY`; current source/repository namespace authority remains unresolved. |
+| 13 | Older projection records partial capability. | `PARTIAL / STALE PROJECTION`; implementation presence does not establish current-cohort proof. |
+| 14 | Older projection records bounded implementation. | `IMPLEMENTED_BOUNDED`; full current-workspace lineage and promotion remain open. |
+| 15 | Older projection records current-cohort blockage. | `BLOCKED_CURRENT_COHORT`; no promotion from the old phase table. |
+| 16 | Older projection records graph-binding blockage. | `BLOCKED_CURRENT_GRAPH_BINDING`; current graph snapshot and endpoint identity are not proven by fixture parity. |
+| 17 | Feature extraction and LibTorch/CUDA surfaces exist; latest `phase17-21-workstation-audit.json` has one artifact row. | `SCAFFOLD_ONLY`; reported 35% is not receipt-backed (`mapped_receipts=0`, `passing_receipts=0`). Need revision-qualified feature rows and a meaningful frozen cohort. |
+| 18 | XGBoost reranker/training scripts exist; latest audit has one compatibility row. | `SCAFFOLD_ONLY`; reported 40% is not receipt-backed. Need reviewed labels, grouped held-out evaluation and measured improvement over the deterministic baseline. |
+| 19 | Append-only retrieval-loop artifact has 443 rows; mirror lanes exist. | `OPERATIONAL / OUTCOME PROOF OPEN`; reported 90% is not receipt-backed. Bind events to replay, canonical packet/source identity and verified outcomes; pseudo-cosine events are not labels. |
+| 20 | Packet validation, Rust SIMD parser, MapReduce/NDJSON and DuckDB artifacts are present. | `OPERATIONAL / HARDENING OPEN`; reported 95% is not receipt-backed. Preserve streaming, parser snapshots and current canonical identity/revision readback; do not deserialize the 805 MB artifact wholesale. |
+| 21 | Replay, cache namespace and degradation proof artifacts exist; policy/PPO scripts are research surfaces. | `EVAL_GATED`; reported 75% is not receipt-backed. Require adversarial/tensor evaluation data and baseline-vs-candidate evidence before adapter/PPO work. |
+| 22 | No definition exists for legacy summary row 22. | `UNSPECIFIED`; canonical workstation P22 is a separate learned-policy research lane, with no crosswalk to this row. |
+| 23 | No definition exists for legacy summary row 23. | `UNSPECIFIED`; canonical workstation P23 is a separate transport-validation lane, with no crosswalk to this row. |
+| 24 | One live `getErrorClustering` Function Registry candidate resolves to exact PostgreSQL packet/chunk lineage and survives read-only SearchRuntime hydration, reranking, post-processing and final Top-K in the existing AST lane. The bounded 16-row profile readback still has no row-level `feature_revision`. | `PARTIAL / TEST LOCKED` for this local retrieval-LOD workstream only: ContextManifest admission is still blocked because no revision-qualified live feature-source provider supplies row-level feature revision and admitted semantic/graph supplements. Historical “dropped before Top-K” note is superseded by the 2026-10-15 live replay. Reviewed labels/trained recommender and lineage-qualified PCA retrieval evaluation remain open. Existing N64 texture paging, shader cache and low-rank code are precedents only; LOD-RESOURCE-BRIDGE-01 waits for admitted frozen candidates. This is not canonical workstation P24 (GPU/vector residency). Keep symbol-editor/document-edit integration test blocked. |
+
+The Phase 17–21 source report was generated at `2026-10-15T07:04:06Z` and
+reports overall 67%, but every row has `receipt_backed_pct=null`,
+`mapped_receipts=0`, and `passing_receipts=0`; treat its percentages as
+planning indicators only. Phase 11–17 values above are copied from the older
+2026-09-05 projection and are explicitly stale until rechecked. The later P24
+live snapshot supersedes the old “missing 8095 signature/ancestry” blocker for
+one seed only. A newer read-only replay resolves exact packet/chunk lineage
+and proves the same candidate survives SearchRuntime through final Top-K
+(`qualifiedFinalCandidateCount=1`); it supersedes older candidate-drop
+receipts for that seed. `contextManifestAdmitted=false` remains current: the
+feature-source provider lacks row-level `feature_revision` and admitted
+semantic/graph supplements. The live ORF feature table also has zero rows for
+this seed and lacks `source_revision`/`registry_revision` required by the
+declared Drizzle and reader contracts; treat this as schema/producer drift,
+not evidence to synthesize a profile or apply a migration. The P24 v2 PCA/SVD run uses 2,000
+database rows but marks source lineage unverified, so it does not close the
+low-rank gate. See `openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md`
+and `openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md` for
+the evidence and exact remaining gates.
+
+## Proof-based phase closure loop
+
+Close phases by stable roadmap ID, not by matching ordinal alone. For each
+phase, keep its owner `tasks.md` as the acceptance ledger and attach an
+independently reproducible receipt containing the exact command/exit code,
+input and source/workspace revisions, relevant checksums, row/candidate counts,
+readback result, write accounting, and explicit exclusions. Track gates as
+`CREATED`, `WIRED`, `PROVEN`, `BLOCKED`, `NOT_VERIFIED`, or `DONE`; `DONE`
+requires wired behavior, current proof, and accepted criteria. A fixture test,
+file-presence check, stale receipt, or task checkbox alone is not proof.
+
+Recommended order is dependency-driven: first close packet/source/chunk
+lineage (workstation P12), then feature identity/classification (P13),
+semantic retrieval/fusion (P15), graph/ontology expansion (P16), and only then
+context residency (P14) and learned ranking (P18). Keep function-editor,
+low-rank/Tang, transport, and GPU-residency experiments in their own ledgers;
+do not use them to bypass the live source-to-ContextManifest gate. Unknown
+legacy rows 1–10 and 22–23 remain `UNSPECIFIED` until an owner and denominator
+are established. Publish completion totals only for a named scope whose gates
+have all been reviewed; otherwise report statuses and blockers, not a single
+portfolio percentage.
+
+**Revision-work sequencing (operator decision, 2026-10-15):** Defer all
+implementation that creates, persists, propagates, changes writer policy for,
+invalidates from, or backfills `source_revision`, `workspace_revision`, or
+related `*_revision` fields—including legacy Phases 1–2/10—until the workstation
+gates through P20 are complete and the GPU-sidecar patch tournament is closed.
+This defers implementation sequencing, not safety: retain current
+source/workspace/revision checks, fail closed on missing or mismatched
+evidence, and continue bounded read-only audits needed to prove individual
+retrieval requests. Any earlier phase result that lacks revisions remains
+diagnostic-only and cannot be promoted or used for ContextManifest admission.
+
+### Fresh portfolio evidence census (2026-10-15)
+
+The full census `npx --no-install tsx scripts/atlas/audit-openspec-evidence-fabric-v1.mjs`
+completed with exit code 0, run `20261015193714990-cd8858b116da`, workspace
+revision `sha256:cd8858b116dacb444a49dffff2d263a642ff1fb9c79e8e46d26d24d3646318bf`.
+It found 13,106 task boxes across 130 changes (120 active, 10 archived), 7,910
+checked and 5,196 unchecked; zero checked tasks bind to qualifying task evidence.
+Among 1,250 receipt candidates, 256 matched, 946 were orphan/missing-task,
+1,156 lacked revisions, and 404 task identities were ambiguous; 51 stale
+evidence candidates and 327 missing referenced tests were also reported. Status
+is `DIAGNOSTIC_ONLY_NOT_PROMOTABLE`, not a phase-completion percentage and not
+proof that implementation is absent. The generated census is
+`docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json`
+(SHA-256 `781F9F255965E0A786DEC3CA5FFA513C33B3649E121E046931C623AA54EA345C`).
+Its recorded workspace revision predates this documentation update.
+
+Execution method: first reconcile stable phase IDs to their owning OpenSpec
+changes and acceptance gates; then run the narrowest prerequisite proof in the
+documented dependency order. For each gate, inspect the command's side effects,
+run it against one bounded revision-qualified seed, capture actual output and
+checksum, and independently read back the result. Update only the owning
+`tasks.md` when its criteria pass; otherwise record the first failed boundary
+and keep downstream work blocked. Reconcile legacy rows 1–10 with their owner
+before assigning them canonical phase IDs. The current P24 replay is a
+concrete example: source and chunk hydration pass, but source-diversity
+post-processing removes the candidate, so ContextManifest admission remains
+unproven and must not be bypassed.
+
+### Phase-to-OpenSpec crosswalk audit (2026-10-15)
+
+The root `parent-atlas-workstation-todo.md` has the canonical P11–P25 owner
+index and the post-P20 sequence; the reconciliation report corroborates its
+stable IDs and selected evidence. Workstation P1–P10 remain unmapped. The
+initial search found no canonical phase IDs in OpenSpec `tasks.md`; the
+subsequent crosswalk now has five explicit task links covering P11, P12, P20,
+and P21. Other task membership remains unresolved. The workboard snapshot
+`docs/reports/parent-atlas-workstation-openspec-workboard-v2.json` contains
+1,075 task records but no per-task `workstationPhaseId` or `roadmapId` field.
+Therefore the root index supplies the human-curated phase-to-owner crosswalk,
+but the generated task board cannot join phases mechanically. Resolve each
+owner to exact `tasks.md` task IDs and acceptance receipts; leave absent links
+`PHASE_MAPPING_UNRESOLVED`. Local labels such as `P24-LINEAGE-*` are not
+canonical workstation P24. Do not infer links from matching numbers, filenames,
+or task-text keywords. “Trilinear mapping” is only mentioned as an unverified
+research topic in `docs/master_feature_todo_1011.md`, not a phase crosswalk.
+The workboard is a dated planning projection, not current completion evidence.
+See the procedure in
+`.codex/skills/parent-atlas-openspec-progress/SKILL.md`.
+The phase 1–20 execution checklist, including the Prime/RLM/DSPy/GEPA handoff,
+is summarized in `docs/parent-atlas-workstation-phase-01-20-master-todo.md`.
+
+The read-only phase/task crosswalk (`node
+scripts/atlas/build-parent-atlas-phase-task-crosswalk-v1.mjs --summary`,
+2026-10-15) censused 16 canonical index rows and reports 20 explicit task
+links across P11–P21. Links include Prime/RLM route ownership and handoff, deferred P12 writer
+gates, P13–P19 owner gates, DSPy P20, and GEPA P21; they are navigation links,
+not phase-completion evidence. P23 and grouped P27–P30 lack declared owner
+slugs. Do not allocate every task in a shared owner ledger to every phase.
+The v2 workboard snapshot is timestamped 2026-10-15T00:25:54.667Z and its
+1,075 selected records cover only a subset of owner changes. Revision-producing
+work remains deferred until after P20 and the required GPU-sidecar tournament
+closure.
+
+### P12 current join recheck (2026-10-15)
+
+The read-only full-scope join audit completed with `CURRENT_PACKET_CHUNK_JOIN_PARTIAL`
+(exit 0): 24,456 source bindings, 14,564 exact packet/chunk lineage sources,
+and 0 workspace/source/content mismatches across the binding rows. The
+remaining gap is exact proven packet/chunk lineage coverage, not a demonstrated
+revision mismatch. The report's `packet_full_identity_matches=0` compares the
+legacy packet content hash to a whole-source digest and is not an acceptance
+criterion; chunk hashes and whole-source hashes have different grains. Do not
+use that metric to invent or repair identities. Receipt
+`.tmp/atlas/phase-closure-p12-strict-packet-chunk-refresh-20261015.json`,
+SHA-256 `59c2a715fc4aac85d9288aa6fd52c0df5b38432a94ea481318b85405ad90c399`;
+all listed store writes were false. The next proof should classify the
+unbridged sources by missing physical chunk versus missing proven lineage, then
+close only via the existing source/chunk evidence owners.
+
+A deterministic first-100-source diagnostic sample (same execution/revision)
+classified 85 as `NO_PACKET_REFERENCE`, 14 as `CANONICAL_PACKET_IDENTITY_ONLY`,
+and 1 as `PACKET_PRESENT_NO_CHUNK_BINDING`; it found no exact lineage or exact
+`source_ref` chunk match. The refreshed auditor also checked the same sorted
+cohort against the live chunk table's `relative_path`, whole-source digest,
+source/workspace revisions, lineage envelope, and proven packet/chunk rows:
+all six counts were 0 for all 100 rows. The required chunk revision and
+lineage-envelope columns were confirmed present via read-only catalog query;
+the old “column unavailable” assumption was stale. The separate
+`pathCoverage=78` count came from an unordered selection and does not describe
+this cohort. This sample is not representative of the population. Refreshed
+receipt `.tmp/atlas/phase-closure-p12-crosswalk-sample-100-v2-20261015.json`,
+classification checksum `sha256:5a2f8a94fca8fa36ff10f7aa12bad44757b8c02581058cb7b5e48c7c4dcc6fd6`,
+receipt SHA-256 `c1092e0410bdef2ec5a855af41769810663408e63357ba45d2d8ce66227f3d79`.
+Use exact recorded revisions, digest, binding checksum, producer revision,
+and proven lineage to diagnose the missing rows; do not infer lineage from
+basename or path similarity.
+
+The 2026-10-15 19:52Z bounded join refresh uses the same admitted workspace
+revision and execution, with a different owner/query cohort. It again returns
+100 exact Graphify members but zero packet/chunk exact joins; 85 have no packet
+reference, 14 have packet identity without chunk binding, and 1 has a packet
+but no chunk binding. The receipt is `.tmp/atlas/p12-phase-proof-refresh-20261015.json`
+(SHA-256 `5d7b1e91b4563218e6fda5bed92ed873b5041180944754d5cf22227d09ec0c08`).
+This is a bounded sorted sample and must not be generalized: the separate full
+bridge audit found 5,503 root sources with exact-ref physical chunks but no
+proven lineage. P12 remains `PARTIAL`; next use a stratified read-only audit
+across the existing source classes, then repair only through the canonical
+source/chunk producer after explicit approval.
+
+The follow-up audit now emits deterministic SHA-256-ranked samples per failure
+class instead of only the first lexicographic rows. The refreshed full
+read-only census still finds 14,628/25,542 exact packet/chunk bridges; the
+remaining classes are 5,503 physical-chunk-present but lineage-missing,
+4,324 without exact-ref chunks, 1 revision-only mismatch, and 1,086 repository
+namespace gaps. Receipt `.tmp/atlas/p12-stratified-lineage-refresh-20261015.json`
+(SHA-256 `7da53f4633ba5a6c7a5734b7ee69f8b79edeb5f277c5598b06f1935832e45222`)
+contains 31 bounded sample rows. This improves diagnosis only; no row was
+qualified or promoted. Stratifier tests pass 2/2. P12 remains `PARTIAL` pending
+the existing lineage/source producer and repository namespace-owner gates.
+
+One deterministic sample from the physical-chunk-present stratum was checked
+through the existing single-source verifier:
+`node scripts/atlas/prove-current-packet-chunk-seed-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --source-ref sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts --report-path .tmp/atlas/p12-stratified-seed-ace-lod-promoter-20261015.json`
+exited 1 with expected `P12_SINGLE_SOURCE_REJECTED`. Execution, membership,
+source binding, and exact source-byte digest matched; packet key, packet
+provenance, and proven packet/chunk rows were missing. Receipt SHA-256
+`bbe4531707c7976a2bd6a2b6019385300391bcbce44d715bf21ffab72c942261`;
+transaction read-only, writes false. This identifies one actual owner boundary
+for a sampled file but does not imply the same cause for the whole stratum.
+
+Four unique samples from that stratum were checked. All four failed closed:
+three lacked unique packet identity; one had a packet key but its repository
+file digest did not match the admitted source binding. The mismatching file is
+not locally modified (`workflow-loop.ts`, current SHA-256
+`F377F95DA2F620001FAA0742051BBFBA4BA29B7EDA7A8D7CB25B75D496D2934C`), so
+the discrepancy must be treated as revision/currentness evidence—not attributed
+to local uncommitted edits. All four had no proven packet/chunk lineage, with
+read-only transactions and no writes. Per-sample receipts and hashes are in
+`docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json` under
+`p12SeedSampleDisposition`. Four rejects are diagnostic, not a population
+estimate. Next reconcile current file/source-binding revisions and identify the
+existing packet producer for each failure class.
+
+**Source-byte storage boundary recheck (2026-10-15; schema/source audit only):**
+The declared `codebase_chunk_index` shape stores `line_start`, `line_end`,
+`content`, and hashes, but no original byte offsets or raw whole-file payload.
+`atlas_source_refs` stores span hashes, byte coordinates, and fragment metadata;
+that is not by itself a whole-file immutable byte source. The acquired-document
+`atlas_source_revisions.storage_uri` owner is not evidence that a code
+`source_ref` resolves there. Therefore line-based chunk concatenation or
+fragment metadata cannot be promoted as exact historical source readback
+without a byte-preserving owner and a digest-verified fetch. This explains why
+the stale `workflow-loop.ts` source binding cannot be repaired from the current
+chunk schema alone; it does not prove that no external source artifact exists.
+No live store was queried and no data was changed in this schema inspection.
+P12 remains `PARTIAL`; next inspect existing source-artifact resolvers and
+binding semantics for the sampled source classes, then stop if no exact-byte
+owner is found rather than synthesizing bytes or lineage.
+
+**P12 artifact-registry readback (2026-10-15; PostgreSQL `REPEATABLE READ READ ONLY`):**
+A bounded metadata-only query across the same four source refs and the one
+known packet key returned one `atlas_artifacts` row. It belongs to
+`workflow-loop.ts`, has `artifact_type=feature_labels`,
+`storage_backend=postgres_jsonb`, and `storage_location IS NULL`; its artifact
+`content_hash` is not proof of the source-file digest. The other three refs had
+no artifact row. Result: 1 row / 4 refs, `writesPerformed=false`,
+`canonicalAuthority=false`, command exit 0. Thus the existing artifact-registry
+rows for this bounded sample do not expose a retrievable whole-source object;
+this does not rule out a separate owner or other source classes. Do not pass the
+feature-label JSONB artifact to the Seaweed byte reader or treat `storage_uri`
+from acquired web-document revisions as a code-source binding. P12 remains
+`PARTIAL`; the next eligible action is to inventory a source-specific immutable
+artifact owner and prove its key/digest join, or leave this failure class
+blocked and continue with independent phase gates.
+
+A second read-only lookup queried `atlas_source_revisions` by the four exact
+whole-file SHA-256 digests from the sample receipts: 4 requested, 0 matched,
+exit 0, `REPEATABLE READ READ ONLY`, no writes. Therefore the acquired-document
+revision table also has no digest-addressed object pointer for this bounded
+sample; it does not establish absence of a separate source store.
+
+### Canonical P23 transport health refresh (2026-10-15)
+
+The bounded gRPC Health-only recheck is recorded in
+`docs/reports/workstation-p23-health-recheck-20261015.json`:
+`retrieval` on `127.0.0.1:50053` is healthy (exit 0), `embedding` on
+`127.0.0.1:50051` is healthy (exit 0, reports CPU), and `search` on
+`127.0.0.1:50055` is unavailable (`ECONNREFUSED`, exit 1). All probes were
+read-only with zero writes. This is service-health evidence only; gRPC business
+method parity, QUIC/HTTP3 negotiation, production caller wiring, and the
+agent-to-DAG workflow remain unproven. The same receipt records the isolated
+ACP gRPC/QUIC contract suite: 2 files / 6 tests passed, exit 0; this verifies
+channel-pool and advertisement guards, not a live transport. Canonical P23
+remains `PARTIAL`.
+
+### P24 fixture-proof refresh (2026-10-15)
+
+Re-ran the hydration and Function Registry retrieval-proof specs after the
+strict final-Top-K identity matcher/fixture correction:
+
+```text
+cd sveltekit-frontend
+npx vitest run src/lib/server/retrieval/hydrate-candidates.spec.ts src/lib/server/retrieval/function-registry-retrieval-proof-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=verbose
+exit 0; 2 files / 8 tests passed
+```
+
+This validates fixture behavior only. A packet-key-only result cannot satisfy
+the function identity proof; the full symbol-version, native tree-node,
+source/workspace revision, and source-ref tuple is required. No live replay,
+ContextManifest admission, service/database/cache/GPU writes, or source
+mutation occurred in this run. P24 stays `PARTIAL`; the latest live receipt
+still records zero qualified final candidates and no ContextManifest. See the
+owning ledger `openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md`.
+
+### P12 current-source drift refresh (2026-10-15)
+
+The read-only source-authority repair planner found current divergence from the
+sealed Graphify cohort: 25,542 membership rows; 22,532 exact current bindings;
+1,909 content/source-revision mismatches; 1,086 nested-repository exclusions;
+15 unavailable sources. Of the mismatches, 1,511 files are tracked-clean and
+398 tracked-dirty. This is not a newly admitted source set: candidate workspace
+revision `sha256:a99c44e3ff5ea03393c2bff88be3c3da1a88d3f18c5a2745f38871fa097e108c`
+is explicitly non-authoritative and the planner requires authorization.
+PostgreSQL queries were SELECT-only; only a new `.tmp/atlas` diagnostic was
+written. Receipt: `.tmp/atlas/current-source-authority-live-recheck-20261015.json`
+(SHA-256 `A80D61B15A76C4E1EC94D1C76F85C565E19E6CBD9A5824DEBD30DEAD4E15E3D8`).
+P12 remains `PARTIAL / SOURCE SET NOT PROMOTED`; do not backfill or run Graphify
+from this planner output. Details and ownership remain in
+`openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`.
+
+## Status projection (2026-10-11)
+
+Projection only. The OpenSpec ledger `openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md` is the authority for these items.
+
+| Gate | Status | Evidence / next step |
+|---|---|---|
+| HIST-ATTR-REVIEW-01 / DECIDE-01 | Done | V2 receipt `.tmp/atlas/historical-chunk-attribution-v2.json`; 220 unmatched |
+| HIST-ATTR-TRACKED-17 | Done (review) | Register `.tmp/atlas/unresolved-chunk-register-v1.json`: 11 JSON unchanged since index (transformed text); 2 TypeScript rows stale |
+| HIST-ATTR-IGNORED-203 | Labelled | `GITIGNORED_SOURCE_NOT_GIT_ATTRIBUTABLE`; artifact status needs producer confirmation |
+| WORKSPACE-REVISION-OWNER-01 | Backfill blocked | Latest COMPLETED Graphify run (`01a8d8fc`, workspace `e24bb97…`) has zero `graphify_files` rows. Current diagnostic workspace candidate `sha256:679ef520…` (27,749 source files; 85 skipped) has 0 exact `atlas_workspace_source_bindings` rows. A fresh daily run would use the current candidate, not recreate `e24bb97…`; requires a reviewed binding producer/admission path before Graphify writes. Read-only receipt/details: `openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md`. |
+| PGVECTOR-PLAN-01 | Done | HNSW index used by scalar-subquery shape; earlier slow query was a join shape (Seq Scan + Sort) |
+| TRACE-DENSE-ERROR-01 | Implemented, not live | `DENSE_SEARCH_STAGE_FAILED:<stage>:cause=<code>` in `sveltekit-frontend/src/mcp/trace-mcp-server.ts`. Needs TRACE restart and a live call |
+| CHUNK-REFRESH-PLAN-01 | Not started | Needs a decision on the 2 stale TypeScript rows (writes) |
+| SEARCH-AST-DAG-BRIDGE-01 | Not started | Shadow-only; needs scope approval |
+| GRAPH-CSR-LIVE-01 | Blocked | `graphify_edges` has zero rows in total |
 
 ## Current OpenSpec reconciliation (2026-09-05)
 
@@ -1934,8 +2275,7 @@ quality, Valkey MISS/HIT behavior, or decoder readiness.
 
 ### REL-01A current-workspace ontology cohort census
 
-`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs` now provides a
-read-only exact-source census against the observed workspace revision
+`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs` now provides a read-only exact-source census against the observed workspace revision
 `sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc`.
 The live result examined 90,600 tuples across 27,863 distinct source refs and
 found 144 unique current Graphify sources with 447 current-workspace tuples.
@@ -2378,6 +2718,84 @@ crosswalk.
 
 **Not a code-index stage:** YaRN is an Ornith/llama.cpp generation-context setting. Quaternion/SO(4), Hilbert, SVD/UMAP, and topology coordinates are derived routing/analysis features. Titans/SSM references are not, by themselves, a Parent Atlas indexing owner. Hidden thoughts, raw hidden-state tensors, and KV cache remain non-persistable under repository policy.
 
+### Unified phase and data contract (2026-10-26)
+
+These two phase namespaces are intentionally not interchangeable. The legacy
+Adaptive Workstream phases P1-P10 belong only to
+`parent-atlas-adaptive-backprop-hll-monitoring`: P1 change detection, P2
+invalidation/reprocessing, P3 HLL telemetry, P4 adaptive backprop, P5
+monitoring, P6 optional GPU rerank wiring, P7 Top-K/PageRank, P8 reviewed-label
+QLoRA, P9 diagnostic recommendations, and P10 source-revision propagation
+(deferred). They do not define workstation P1-P10. The canonical workstation
+roadmap maps P11-P25: P11 experience/memory; P12 source/revision/chunk
+authority; P13 feature registry/classification; P14 context/cache residency;
+P15 semantic retrieval/fusion; P16 graph/ontology; P17 NLP/structural/numeric
+features; P18 learned-reranking evaluation; P19 deterministic policy baseline;
+P20 program/workflow contracts; P21 reflective optimization; P22 RL policy
+experiments; P23 transport validation; P24 GPU/vector residency; P25
+evaluation-only model-policy training. P1-P10 remain unmapped in the
+workstation namespace. Phase 8 QLoRA and workstation P18 are related but
+distinct gates; neither inherits the other's completion claim.
+
+The ordered implementation contract is: (1) the sealed source inventory owns
+canonical repository-relative `sourceRef` and source/workspace revisions; a
+`file_path` compatibility field must resolve to that same normalized path;
+(2) Tree-sitter chooses only a grammar supported by the pinned language map
+(currently the structural adapter maps TS/TSX/JS, Python, Rust, Go, and Java
+from the `sourceRef` extension); LSP adds symbol/type/reference evidence but
+does not establish language or source identity; (3) CST/AST function chunks
+preserve exact UTF-8 byte spans and parser revision, and the existing index
+writer must explicitly join symbols/chunks to `feature_id` and a versioned,
+descriptive `feature_label`. That production enrichment handoff is not yet
+proven end-to-end; unresolved labels remain unknown/proposal-only, never
+fabricated as identity; (4) validate and admit canonical packet/chunk identity
+and metadata through the existing PostgreSQL owners before building vector or
+graph projections; (5) store canonical `semantic_768` vectors before the
+PostgreSQL HNSW index, then independently reconcile Qdrant/TurboVec projections
+to packet keys and revisions. SearchRuntime remains the single fusion owner.
+
+SVD/PCA, KMeans, the 20x20 SOM, PageRank, and graph features are derived from a
+frozen canonical vector cohort and sealed ordinal map; they do not alter the
+canonical vector, create identity, or add retrieval votes. The reported
+342/400 SOM-cell occupancy is a historical diagnostic, not current
+revision-qualified proof. TurboVec 4-bit/2-bit compression is an executor
+projection and must be measured against an exact CPU reference on the same
+candidate IDs. For persisted binary masks, use the existing versioned `bytea`
+codec owner with logical bit length, bit order, checksum, and ordinal-map
+digest; base64 is a transport encoding and base32 is for textual token needs,
+not the canonical stored representation. PostgreSQL UUIDs are correlation/event
+IDs where the owning schema calls for them; they do not replace `PacketKeyV2`,
+source identity, or CandidateOrdinal.
+
+Runtime/build boundary: keep CPU reference helpers and schemas in the existing
+Parent Atlas package; use Python 8095 for bounded Tree-sitter/LangExtract and a
+separately pinned Python environment for PyTorch-side analysis, with parity
+against the shared contract. Do not assume the sidecar and GPU analysis share
+an ABI or environment. Use the existing Rust/Node-API TurboVec owner for measured
+in-process native operations; add C++/N-API only when the existing native owner
+cannot provide a measured benefit. The pinned
+`docker/atlas-cuda134-simt` lane compiles CUDA 13.4.1 / SM86 C++ and CUDA Tile
+fixtures; it is not the PyTorch/CUDA 13.2 RAPIDS environment. Pin and report
+Python, PyTorch, CUDA, compiler, Node-API and native-artifact versions per lane;
+never assume their ABIs interoperate. The Windows `.venv-cu130` and WSL
+`atlas-rapids-cu13` are separate environments, not a single install target.
+
+For user-query routing, keep the existing `atlas.query-classification.v2`
+contract as the intent/domain/operation/retrieval-budget owner and compose it
+with the existing concept-extraction and ontology-lookup owners. A typed,
+versioned query plan may carry domain, topic/concept IDs, grounded entity
+mentions, confidence, taxonomy/ontology revision, and evidence refs; topic or
+entity guesses without grounded evidence must remain proposals. The actual
+topic/entity-to-evidence handoff is not yet proven end-to-end. Do not add a
+second classifier, let an LLM choose arbitrary tables/tools, or turn taxonomy
+labels into packet identity or an extra retrieval vote.
+
+AWM-08 exit remains blocked on the owning ledger's 200 reviewer-authored,
+query-grouped, revision-qualified judgments (at least 30 per grade 0-3),
+including hard negatives and independent corpus validation. The October 26
+read-only census found zero human judgments; the prior 49/200 count is not
+reconciled. Do not train or promote a QLoRA/ranker from the stale review pool.
+
 ### Structural-index use in lineage, extraction, and context work
 
 An external structural index such as Codebase-Memory may help locate the
@@ -2597,3 +3015,93 @@ The dependency order is: `DIR-INDEX-01/02` source and chunk proof → canonical 
   frozen packet/ordinal snapshot round-trip through a revisioned LUT to exact
   canonical packet/source/workspace identity. See
   `openspec/changes/atlas-feature-intelligence/tasks.md`.
+
+### P13 classifier cohort recheck (2026-10-15)
+
+The current-cohort planner was rerun against the already selected Graphify
+execution `74d50c86-8194-45ea-8c3d-61aab737ef83` and its exact workspace
+revision. It selected 13 rows: 6 had no canonical packet, 4 had source-content
+digest mismatches, and 3 had ambiguous packet identity. `promotionEligible`
+remains false. PostgreSQL was queried in a read-only transaction; only the
+planner-owned local diagnostic report was refreshed. The focused domain
+adapter, taxonomy and feature-manifest tests passed 15/15, which proves
+contract behavior—not cohort lineage or production classifier readiness.
+P13 remains `PARTIAL / TRAINING BLOCKED`; do not train or promote from this
+cohort. The owning ledger is
+`openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md`.
+
+### AST writer containment (2026-10-15)
+
+The legacy chunk-to-AST materializer was found to write a placeholder UUID and
+has no native Tree-sitter node ID, exact byte spans, or source/workspace
+revision binding. The live chunk index has 274,465 rows and zero populated
+source/workspace revisions. Its canonical `--apply` path now fails closed
+before any writes; dry-run is diagnostic only. Focused retrieval/hydration
+contracts pass 8/8, but this does not prove live Function Registry retrieval.
+See `docs/reports/parent-atlas-ast-writer-guard-20261015.json` and the owning
+ledger `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`.
+
+### Retrieval-to-summary live proof refresh (2026-10-15)
+
+The timestamped run `docs/reports/retrieval-summarization-flow-proof-2026-10-15T20-07-08-610Z.json`
+and its companion Markdown report `FAIL / NOT_ALIGNED`; they are not an
+end-to-end pass. EmbeddingGemma, Qdrant, PostgreSQL pgvector/HNSW, TurboVec
+gRPC, Go Retrieval, PostgreSQL truth join, and the 8095 extraction endpoint
+each report `LIVE_PASS`. These are per-lane observations, not proof of aligned
+candidate identity. The recorded run took 57,995 ms; extraction took 8,347 ms
+and Ornith synthesis took 48,109 ms.
+- pgvector and Qdrant each returned 16 hits, but only 1 of 8 compared IDs and
+  source references overlapped (12.5%): `PARTIAL_PARITY`.
+- No `CandidateOrdinalMapV1` was sealed. ACE packet sealing, ContextManifest
+  admission, and manifest-keyed BitFrost residency are blocked in the receipt.
+- Ornith 1.5 (`ornith-1.5-9b`) returned 3,259 characters, failed JSON parsing,
+  and supplied no citations; citation verification admitted 0/8. The generated
+  summary is diagnostic, not grounded ACE evidence. Preserve the failed output.
+- The default report is only `WARN`; timestamped `.tmp.*` artifacts remain
+  preserved and do not supersede the timestamped `FAIL` receipt.
+
+Do not derive or mint `title_id` from cross-lane fusion, extracted nouns,
+`-ly` tokens, summaries, CST nodes, or candidate order. `title_id` remains a
+semantic grouping field with unreconciled writers/consumers; canonical
+identity remains with `packet_key` and `symbol_version_id`. CST/AST symbols and
+lexical/semantic terms may feed revision-bound `feature_label` or search
+features as advisory projections with evidence and producer revisions. They
+must not change packet identity or bypass the existing title owner. Keep
+`FI-TITLE-ADDRESS-01` open; this run closes neither title ownership nor
+source-to-ContextManifest lineage.
+
+### Function Registry live recheck (2026-10-15)
+
+The exact `getErrorClustering` seed was reloaded through the current
+PostgreSQL snapshot loader with the live 8095 AST provider. It returned
+`QUALIFIED`; the source digest, symbol version, packet key, native Tree-sitter
+node ID and byte span match the existing loader receipt checksum. The fresh
+readback is preserved in
+`docs/reports/parent-atlas-function-registry-live-recheck-20261015.json`.
+This closes repeatability for one snapshot only. The separate read-only
+hydration receipt still rejects the seed as `AMBIGUOUS_SOURCE_REF` (two chunk
+rows without source revision or symbol-version identity); final Top-K and
+ContextManifest remain false. The same pass also confirmed that a different
+`validatePacket` symbol row has a stored span/node ID that does not match the
+live parser observation, so it remains rejected rather than being repaired by
+name or path. No database or projection writes occurred.
+
+**ACE handoff contract audit:** the current candidate-feature admission is
+chunk-cohort-specific (`sourceChunkCohortStatus=REVISION_QUALIFIED`) and also
+requires explicit semantic and graph cohort statuses. The qualified function
+span is not a chunk row and does not supply a feature revision, so it cannot
+truthfully satisfy that gate. Next: either prove exact packet/chunk lineage
+with a row-level feature revision, or implement a separately typed
+read-only Function Registry source-span adapter at the existing ACE boundary.
+Keep missing semantic/graph evidence explicit; do not synthesize ordinals,
+chunks, scores, or `ADMITTED` statuses. Final Top-K/ContextManifest remain
+unproven for this seed.
+
+The existing chunk-index writer patch now supplies a concrete producer-side
+path: `scripts/atlas/index-full-repo-for-search.mjs` computes the source digest
+from exact file bytes and persists it on insert/conflict. Its one-file dry run
+is recorded under `ATLAS-SOURCE-REVISION-01` in
+`openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md`; apply and
+readback remain blocked by the explicit authorization guard. Do not use that
+patch to claim historical rows are repaired. Only after authorization and
+bounded reindex/readback should the exact packet/chunk/feature join be retried.

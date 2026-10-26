@@ -4,6 +4,7 @@ import { aceHypergraphPayloadSchema, type AceHypergraphPayloadV1 } from './ace-h
 import { lspResolvedStructuralReferenceSchema } from './lsp-semantic-observation.js';
 import { structuralReferenceFactSchema, structuralSymbolNominationSchema } from './structural-symbol.js';
 import { sha256HexV1 } from './knowledge/stable-json-v1.js';
+import { domainClassificationV1Schema } from './domain-classification-v1.js';
 
 /**
  * atlas.ace-packet.v3 — an immutable, revision-qualified COMPOSITION artifact.
@@ -170,6 +171,7 @@ const acePacketV3Body = z.object({
   topology: section(topologyData),
   residency: section(residencyData),
   evidence: section(evidenceData),
+  classification: section(domainClassificationV1Schema).optional(),
   structural: section(structuralData).optional(),
 }).strict();
 
@@ -245,6 +247,35 @@ export function attachHypergraphEvidenceToAcePacketV3(
   return buildAcePacketV3({
     ...body,
     base: { ...body.base, hypergraph },
+  });
+}
+
+/** Attach revision-matched classifier output as a hint, never as canonical taxonomy authority. */
+export function attachDomainClassificationHintToAcePacketV3(
+  packetInput: unknown,
+  classificationInput: unknown,
+): AcePacketV3 {
+  const packet = verifyAcePacketV3(packetInput);
+  const classification = domainClassificationV1Schema.parse(classificationInput);
+  if (classification.canonicalId !== packet.identity.packet_key) {
+    throw new Error('ACE3_CLASSIFICATION_PACKET_KEY_MISMATCH');
+  }
+  if (classification.sourceRevision !== packet.identity.source_revision) {
+    throw new Error('ACE3_CLASSIFICATION_SOURCE_REVISION_MISMATCH');
+  }
+  if (classification.evidenceRefs.length === 0) {
+    throw new Error('ACE3_CLASSIFICATION_EVIDENCE_REQUIRED');
+  }
+
+  const { integrity: _integrity, ...body } = packet;
+  return buildAcePacketV3({
+    ...body,
+    classification: {
+      status: 'HINT',
+      revision: classification.classifierRevision,
+      evidence_refs: [...new Set(classification.evidenceRefs)].sort(),
+      data: classification,
+    },
   });
 }
 

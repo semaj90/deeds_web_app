@@ -1037,7 +1037,7 @@
     {
       "label": "RTX Pipeline: TurboVec Python ANN Sidecar :8791 (detached)",
       "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8791 -State Listen -ErrorAction SilentlyContinue; if ($p) { $proc = Get-CimInstance Win32_Process -Filter \\\"ProcessId=$($p.OwningProcess)\\\" -ErrorAction SilentlyContinue; if ($proc.Name -like '*python*') { Write-Host 'TurboVec Python ANN sidecar already listening on :8791'; exit 0 } else { Write-Host \\\"Port :8791 is held by $($proc.Name); not killing from startup task\\\"; exit 1 } }; New-Item -ItemType Directory -Force -Path logs/sidecars | Out-Null; Start-Process python -ArgumentList @('sveltekit-frontend/scripts/turbovec-sidecar.py','--port','8791','--collection','codebase_chunks_768','--dim','64','--bits','4','--vector-name','content') -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden -RedirectStandardOutput 'logs/sidecars/turbovec-python-8791.out.log' -RedirectStandardError 'logs/sidecars/turbovec-python-8791.err.log'; Start-Sleep 3; $h = Invoke-RestMethod http://127.0.0.1:8791/health -ErrorAction SilentlyContinue; if ($h.ok) { Write-Host \\\"TurboVec Python ANN :8791 started; indexed=$($h.indexed); indexing may continue in background\\\" } else { Write-Host 'TurboVec Python ANN did not respond — see logs/sidecars/turbovec-python-8791.err.log' }\"",
+      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8791 -State Listen -ErrorAction SilentlyContinue; if ($p) { $proc = Get-CimInstance Win32_Process -Filter \\\"ProcessId=$($p.OwningProcess)\\\" -ErrorAction SilentlyContinue; if ($proc.Name -like '*python*') { Write-Host 'TurboVec Python ANN sidecar already listening on :8791'; exit 0 } else { Write-Host \\\"Port :8791 is held by $($proc.Name); not killing from startup task\\\"; exit 1 } }; New-Item -ItemType Directory -Force -Path logs/sidecars | Out-Null; Start-Process python3.13 -ArgumentList @('sveltekit-frontend/scripts/turbovec-sidecar.py','--port','8791','--source','postgres','--projection','mrl','--collection','codebase_chunks_768_v2','--dim','128','--bits','4','--vector-name','content') -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden -RedirectStandardOutput 'logs/sidecars/turbovec-python-8791.out.log' -RedirectStandardError 'logs/sidecars/turbovec-python-8791.err.log'; Start-Sleep 3; $h = Invoke-RestMethod http://127.0.0.1:8791/health -ErrorAction SilentlyContinue; if ($h.ok) { Write-Host \\\"TurboVec Python ANN :8791 started; indexed=$($h.indexed); indexing may continue in background\\\" } else { Write-Host 'TurboVec Python ANN did not respond — see logs/sidecars/turbovec-python-8791.err.log' }\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -1051,7 +1051,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Start the real TurboVec Python ANN sidecar on :8791. It scrolls codebase_chunks_768 from Qdrant, projects 768d vectors to 64d, and builds the 4-bit TurboVec index consumed by the gRPC bridge on :50062. Logs -> logs/sidecars/turbovec-python-8791.{out,err}.log.",
+      "detail": "Start the TurboVec Python ANN challenger on :8791. It loads the PostgreSQL-backed codebase_chunks_768_v2 projection, indexes the normalized 128d EmbeddingGemma MRL prefix with 4-bit TurboVec, and exposes /health and /search to the optional gRPC bridge on :50062. Prefilter/challenger only; not canonical storage or an additional retrieval vote. Logs -> logs/sidecars/turbovec-python-8791.{out,err}.log.",
       "runOptions": {
         "runOn": "folderOpen"
       }
@@ -3699,9 +3699,15 @@
       "command": "pwsh",
       "args": [
         "-NoProfile",
-        "-Command",
-        "$p = Get-CimInstance Win32_Process -Filter \"Name='llama-server.exe'\" | Where-Object { $_.CommandLine -match '--port 8090( |$)' }; if (-not $p) { Write-Host 'No llama-server on :8090 - nothing to stop' } else { $p | ForEach-Object { Write-Host ('Stopping PID ' + $_.ProcessId + ' (port 8090) gracefully; the Ollama runner and other llama-server processes are not touched'); Stop-Process -Id $_.ProcessId }; Start-Sleep -Seconds 4; if (Get-Process -Id ($p | Select-Object -First 1).ProcessId -ErrorAction SilentlyContinue) { Write-Host 'Still running after graceful stop - not forcing. Re-run Status or stop it manually.' } else { Write-Host 'Stopped.' } }; nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader"
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/atlas/llama-server-control.ps1",
+        "-Action",
+        "unload",
+        "-ConfirmControl"
       ],
+      "options": { "cwd": "${workspaceFolder}" },
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -3709,7 +3715,7 @@
         "clear": false
       },
       "problemMatcher": [],
-      "detail": "Graceful stop of ONLY the :8090 llama-server by PID (frees ~6.4 GiB for cuVS KMeans or other GPU jobs). Anything calling :8090 fails until it is started again. Never use taskkill /IM llama-server.exe: Ollama's embedding runner shares the image name."
+      "detail": "Shared TRACE MCP controller: stop ONLY an idle, ownership-checked :8090 llama-server by PID; verify shutdown and report measured used/free VRAM. Refuses busy or unavailable slots. Does not stop Ollama or force-kill other servers."
     },
     {
       "label": "⚡ TurboQuant: Start (vision, CPU projector, :8090)",
@@ -10922,14 +10928,30 @@
       "problemMatcher": []
     },
     {
-      "label": "🗺️ Graphify: Daily Map (fast AST + smoke)",
+      "label": "🗺️ Graphify Daily: Startup apply chain (Ornith 1.5 + projections)",
       "type": "shell",
       "command": "npm run graphify:daily",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Fast AST → docs/graph/codebase-graph.json + codebase-map.md → deep import graph (cycles/orphans/hotspots) → Redis cache → smoke. ~15s, no LLM, no GPU.",
+      "detail": "APPLY/side effects: runs the daily startup chain, including the graphify:audit:ornith alias (Ornith 1.5 at llama-server :8090; proposal output), directory JSONL stream, cluster-card generation/validation/PostgreSQL load, BM25 planning, and packet→Qdrant link repair. Writes local logs/cache/stamp; Qdrant repair and directory stream are enabled by default. Does not invoke LangExtract or the separate Graphify domain-evidence helper. Semantic refresh and embedding refresh are opt-in environment settings.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 Graphify: Domain evidence helper (proposal-only tests)",
+      "type": "shell",
+      "command": ".\\node_modules\\.bin\\vitest.cmd run src/lib/server/atlas/classification/graphify-domain-evidence-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Offline contract test for the Graphify domain-evidence helper and LangExtract character-to-UTF-8 span adapter. Emits proposal-only classification. Does not call the live LangExtract/Ornith services, run daily Graphify, access stores, or authorize indexing.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -11232,14 +11254,14 @@
       "problemMatcher": []
     },
     {
-      "label": "🤖 Graphify: Analyze × Gemma4 → AI next_steps plan",
+      "label": "🤖 Graphify: Analyze × Ornith 1.5 (:8090) → AI next_steps plan",
       "type": "shell",
       "command": "npm run analyze:graph:ai",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "test",
-      "detail": "Same as Graphify:Analyze but queries Gemma4 (TurboQuant :8090) for LLM-written root-cause analysis, cluster recommendations, FF1 routing plan, and production blockers. Requires TurboQuant running. Writes next_steps/active/<date>-graph-analysis-ai.md.",
+      "detail": "Same as Graphify:Analyze but queries the configured llama-server model (default ornith-1.5-9b) at :8090 for root-cause analysis, cluster recommendations, FF1 routing plan, and production blockers. Requires llama-server running. Writes next_steps/active/<date>-graph-analysis-ai.md.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -11685,14 +11707,14 @@
       "problemMatcher": []
     },
     {
-      "label": "🤖 Graphify: Synthesize Next Actions (tsgo + gates + Gemma4)",
+      "label": "🤖 Graphify: Synthesize Next Actions (tsgo + gates + configured LLM)",
       "type": "shell",
       "command": "mkdir -p logs/task-output && npm run graph:synthesize 2>&1 | Tee-Object -FilePath logs/task-output/synthesize-next-actions-latest.log; $latest = Get-ChildItem memory/runs -Directory -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty Name; if ($latest) { Write-Host \"✅ next_actions.md → memory/runs/$latest/next_actions.md\" -ForegroundColor Green; Get-Content \"memory/runs/$latest/next_actions.md\" | Select-Object -First 40 } else { Write-Host '⚠️ No run found' -ForegroundColor Yellow }",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "group": "build",
-      "detail": "Run synthesize-next-actions.mjs: tsgo diagnostics + G17-G25 audit gates + risk scoring + TurboQuant synthesis → memory/runs/<ts>/next_actions.md. Prints P0/P1 summary on completion. ~30-60s.",
+      "detail": "Run synthesize-next-actions.mjs: tsgo diagnostics + G17-G25 audit gates + risk scoring + configured LLM synthesis (direct llama-server defaults to ornith-1.5-9b on :8090; other configured agent/Ollama backends may be selected) → memory/runs/<ts>/next_actions.md. Prints P0/P1 summary on completion. ~30-60s.",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
@@ -11908,7 +11930,7 @@
         "showReuseMessage": true,
         "clear": true
       },
-      "detail": "Runs Phase 85 P8 semantic diff generator with LangExtract feature extraction and Gemma4 reasoning. Submits high-impact diffs as ACP subagent jobs. REQUIRES: --approve-archive-deletion for cleanup."
+      "detail": "Runs Phase 85 P8 semantic diff generator with LangExtract feature extraction and llama-server reasoning (LLAMA_SERVER_MODEL defaults to ornith-1.5-9b on :8090). Submits high-impact diffs as ACP subagent jobs. REQUIRES: --approve-archive-deletion for cleanup."
     },
     {
       "label": "🤖 ACP Subagent: Semantic Diff (P8) Dry-Run",
@@ -11977,7 +11999,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Phase 85 P6: bounded dry-run Gemma4 summary generation over 25 codebase chunks. Requires Gemma4 llama-server (:8090), Ollama embeddinggemma, and Qdrant online. Zero writes."
+      "detail": "Phase 85 P6: bounded dry-run summary generation over 25 codebase chunks using the configured llama-server model (LLAMA_SERVER_MODEL defaults to ornith-1.5-9b on :8090). Requires llama-server, Ollama EmbeddingGemma, and Qdrant online. Zero writes."
     },
     {
       "label": "🚀 Phase 85 P8: Semantic Diff Analyzer (Startup Dry-Run)",
@@ -12110,6 +12132,32 @@
         "clear": false
       },
       "detail": "Runs the existing OpenCode agent against the bounded unified-residency proof. The command is read-only and does not use --auto; no migration, datastore, projection, cleanup, or GPU-state mutation is authorized."
+    },
+    {
+      "label": "Atlas: Graph Tests",
+      "type": "process",
+      "command": "npm",
+      "args": [
+        "exec",
+        "--",
+        "vitest",
+        "run",
+        "src/lib/server/atlas/graph-query.spec.ts"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "problemMatcher": [],
+      "detail": "Runs the Vitest suite for the unified atlas.graph.query boundary and OAKLIB ontology helper."
+    },
+    {
+      "label": "Atlas: Graph Proof",
+      "dependsOn": [
+        "Atlas: Graph Tests"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "detail": "Validates the unified graph Top-K, OAKLIB ontology sidecar, and SearchRuntime integration."
     }
   ]
 }

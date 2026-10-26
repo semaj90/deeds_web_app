@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-atomic-publication-preflight.v1",
-  "generatedAt": "2026-09-10T19:11:03.063Z",
+  "generatedAt": "2026-10-16T02:28:10.191Z",
   "mode": "READ_ONLY",
   "status": "PUBLICATION_PREFLIGHT_READY_CANDIDATE_ONLY",
   "proofLevel": "PARTIAL_PROVEN",

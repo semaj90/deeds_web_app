@@ -5,8 +5,8 @@
  * Parent Atlas Gate v2 — multi-stage identity-gated retrieval pipeline.
  *
  * Replaces the single checkParentAtlasRegistry() stub with a real 3-call
- * identity chain against the live TRACE MCP server, followed by hybrid
- * retrieval (BM25 + dense + graph) and bounded Gemma4 synthesis.
+ * identity chain against the live TRACE MCP server, followed by candidate
+ * retrieval and bounded Ornith 1.5 synthesis.
  *
  * Pipeline stages:
  *   L0  Intent classification
@@ -15,7 +15,7 @@
  *   L3  Memory: engram.chat_memory_recent + kag.recall_similar_fix
  *   L4  Hybrid retrieval: kag.multi_lane_search + ace.compact_search + graph.expand_neighborhood
  *   L5  Rerank: turbovec.rank_chunks
- *   L6  Synthesis: Gemma4 (bounded by evidence — no identity invention)
+ *   L6  Synthesis: Ornith 1.5 via the loaded llama-server model
  *   L7  Decision: patch_existing | merge_card | create_card | ask_permission
  *
  * Usage:
@@ -30,39 +30,50 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { createInterface } from 'node:readline';
+import dotenv from 'dotenv';
 import { evaluateTaskPromotion } from './lib/task-promotion-gate.mjs';
+import { decideRecommendationActionV1 } from './lib/recommendation-l7-decision-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '../..');
 
+dotenv.config({ path: path.join(REPO_ROOT, 'sveltekit-frontend', '.env.local'), quiet: true });
+dotenv.config({ path: path.join(REPO_ROOT, 'sveltekit-frontend', '.env'), quiet: true });
+
 const TRACE_MCP_URL = (process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '');
-const TURBOQUANT_URL = (process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+const LLAMA_SERVER_BASE_URL = (process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090')
+  .replace(/\/$/, '')
+  .replace(/\/v1$/i, '');
+const LLAMA_SERVER_MODEL = (process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b').trim();
 const ATLAS_TOOLS_MCP_SERVER = path.join(REPO_ROOT, 'sveltekit-frontend', 'scripts', 'mcp', 'atlas-tools-mcp.mjs');
 const WORKFLOW_REPORT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'agentic-recommendation-workflow.json');
 const WORKFLOW_REPORT_PATH_ALT = path.join(REPO_ROOT, 'docs', 'reports', 'atlas', 'agentic-recommendation-workflow.json');
 
-function resolveLlamaServerModelId() {
-  const explicit = String(process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
-  if (explicit) return explicit;
-
-  const modelPath = String(
-    process.env.ROTORQUANT_MODEL_PATH ??
-    process.env.TURBO_MODEL_PATH ??
-    process.env.TURBOQUANT_MODEL_PATH ??
-    '',
-  ).trim();
-  if (modelPath) {
-    const base = path.basename(modelPath).trim();
-    if (base) return base;
+export async function resolveAgenticWorkflowModel({ fetchImpl = fetch, baseUrl = LLAMA_SERVER_BASE_URL, expectedModel = LLAMA_SERVER_MODEL } = {}) {
+  if (!/^ornith[-_.]?1[-_.]5(?:[-_.]9b)?$/i.test(expectedModel)) {
+    throw new Error(`AGENTIC_WORKFLOW_MODEL_NOT_ORNITH_1_5:${expectedModel}`);
   }
 
-  const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
-  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+  let response;
+  try {
+    response = await fetchImpl(`${baseUrl.replace(/\/+$/, '').replace(/\/v1$/i, '')}/v1/models`, {
+      signal: AbortSignal.timeout(3_000),
+    });
+  } catch (error) {
+    throw new Error(`AGENTIC_WORKFLOW_LLAMA_SERVER_UNREACHABLE:${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (!response.ok) throw new Error(`AGENTIC_WORKFLOW_LLAMA_SERVER_MODELS_HTTP_${response.status}`);
 
-  return 'hforf.gguf';
+  const body = await response.json();
+  const loadedModels = Array.isArray(body?.data)
+    ? body.data.map((item) => typeof item?.id === 'string' ? item.id : null).filter(Boolean)
+    : [];
+  const loadedModel = loadedModels.find((id) => id === expectedModel);
+  if (!loadedModel) {
+    throw new Error(`AGENTIC_WORKFLOW_EXPECTED_MODEL_NOT_LOADED:${expectedModel}`);
+  }
+  return loadedModel;
 }
-
-const TURBOQUANT_MODEL = resolveLlamaServerModelId();
 
 let VERBOSE = false;
 
@@ -237,6 +248,7 @@ function createWorkflowRun(query, normalizedQuery) {
     intent: null,
     active_context: null,
     ace_context: null,
+    dag_synthesis_packet: null,
     recommendation: null,
     outcome: null,
   };
@@ -566,7 +578,78 @@ export function buildAceEvidenceBlocks(aceContext) {
   return { acePacket, aceCards, admittedCards };
 }
 
-// ── L6: Gemma4 synthesis (bounded) ───────────────────────────────────────────
+export function buildAceDagSynthesisPacket({
+  workflow,
+  tocContext = [{ ref: 'docs/atlas/parent-atlas-table-of-contents.md', title: 'Parent Atlas architecture TOC' }],
+} = {}) {
+  const aceContext = workflow?.ace_context ?? workflow?.workflow_report?.ace_context;
+  const { admittedCards } = buildAceEvidenceBlocks(aceContext);
+  const reasons = [];
+
+  if (aceContext?.status !== 'ADMITTED') reasons.push('ACE_CONTEXT_NOT_ADMITTED');
+  if (!aceContext?.contextManifest || typeof aceContext.contextManifest !== 'object') {
+    reasons.push('CONTEXT_MANIFEST_MISSING');
+  }
+
+  const manifest = aceContext?.contextManifest;
+  const manifestPacketKeys = Array.isArray(manifest?.selected_packet_keys)
+    ? new Set(manifest.selected_packet_keys.filter((key) => typeof key === 'string' && key.length > 0))
+    : new Set();
+  if (manifestPacketKeys.size === 0) reasons.push('NO_MANIFEST_SELECTED_PACKET_KEYS');
+
+  const evidence = admittedCards.flatMap((card) => {
+    const packetKey = card.packetKey ?? card.packet_key;
+    const sourceRef = card.sourceRef ?? card.source_ref;
+    const treeNodeId = card.treeNodeId ?? card.tree_node_id;
+    const sourceRevision = card.sourceRevision ?? card.source_revision;
+    const workspaceRevision = card.workspaceRevision ?? card.workspace_revision;
+    const revisionPattern = /^sha256:[a-f0-9]{64}$/i;
+    if (!packetKey || !manifestPacketKeys.has(packetKey) || !sourceRef || !treeNodeId
+      || !revisionPattern.test(String(sourceRevision ?? ''))
+      || !revisionPattern.test(String(workspaceRevision ?? ''))) return [];
+    return [{
+      packet_key: packetKey,
+      source_ref: sourceRef,
+      tree_node_id: treeNodeId,
+      source_revision: sourceRevision,
+      workspace_revision: workspaceRevision,
+      evidence_id: card.evidenceId ?? card.evidence_id ?? null,
+      title: card.title ?? null,
+      content: typeof card.content === 'string' ? card.content : null,
+    }];
+  }).slice(0, 12);
+
+  if (evidence.length === 0) reasons.push('NO_EVIDENCE_BOUND_TO_MANIFEST');
+
+  const tocEntries = Array.isArray(tocContext)
+    ? tocContext.filter((entry) => entry && typeof entry.ref === 'string' && typeof entry.title === 'string')
+      .slice(0, 12)
+      .map(({ ref, title }) => ({ ref, title }))
+    : [];
+
+  return {
+    contract: 'atlas.ace-dag-synthesis-packet.v1',
+    status: reasons.length === 0 ? 'READY_FOR_DAG_SCAFFOLD' : 'BLOCKED',
+    evidence_qualification: 'SHAPE_ONLY_NOT_LIVE_READBACK',
+    synthesis_ready: false,
+    reasons,
+    request_id: manifest?.request_id ?? workflow?.run_id ?? null,
+    manifest_id: manifest?.manifest_id ?? null,
+    query: typeof workflow?.query === 'string' ? workflow.query : null,
+    ace_packet: reasons.length === 0 && typeof aceContext.promptPacket === 'string'
+      ? aceContext.promptPacket.slice(0, 16000)
+      : null,
+    toc_context: tocEntries,
+    evidence,
+    rejected_card_count: admittedCards.length - evidence.length,
+    dag: Array.isArray(workflow?.dag) ? workflow.dag.slice(0, 32) : [],
+    writes_performed: false,
+    model_invoked: false,
+    canonical_authority: false,
+  };
+}
+
+// ── L6: Ornith 1.5 synthesis (bounded) ────────────────────────────────────────
 
 async function l6Synthesis(query, identity, memory, aceContext = null) {
   const { acePacket, aceCards } = buildAceEvidenceBlocks(aceContext);
@@ -592,11 +675,12 @@ async function l6Synthesis(query, identity, memory, aceContext = null) {
   ].join('\n');
 
   try {
-    const res = await fetch(`${TURBOQUANT_URL}/v1/chat/completions`, {
+    const model = await resolveAgenticWorkflowModel();
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: TURBOQUANT_MODEL,
+        model,
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 256,
         temperature: 0.1,
@@ -631,7 +715,7 @@ async function l6Synthesis(query, identity, memory, aceContext = null) {
     const jsonMatch = assembled.match(/\{[\s\S]*\}/);
     if (jsonMatch) return JSON.parse(jsonMatch[0]);
   } catch (e) {
-    console.warn(`  [L6] Gemma4 synthesis: ${e.message}`);
+    console.warn(`  [L6] Ornith 1.5 synthesis: ${e.message}`);
   }
 
   return { summary: '(synthesis unavailable)', risk: 'unknown', rationale: '(no evidence synthesized)', priority: 'medium' };
@@ -639,13 +723,9 @@ async function l6Synthesis(query, identity, memory, aceContext = null) {
 
 // ── L7: Decision ─────────────────────────────────────────────────────────────
 
+// Pure decision lives in lib/recommendation-l7-decision-v1.mjs (see its header for check order).
 function l7Decision(identity, rerankResult, gemma4, memory) {
-  if (!identity.packet_key) return 'ask_permission';
-  if (gemma4.risk === 'high') return 'ask_permission';
-  if (rerankResult.top_score < 0.4) return 'ask_permission';
-  if (memory.prior_fix) return 'merge_card';
-  if (rerankResult.top_score >= 0.65) return 'patch_existing';
-  return 'create_card';
+  return decideRecommendationActionV1({ identity, rerankResult, gemma4, memory });
 }
 
 // ── Main export: checkParentAtlasRegistry (v2) ────────────────────────────────
@@ -762,7 +842,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
   console.log(`top_score: ${rerankResult.top_score.toFixed(3)}, ${rerankResult.ranked.length} hits`);
 
   // L6 — Synthesis
-  process.stdout.write('  [L6] Gemma4 synthesis (bounded)... ');
+  process.stdout.write('  [L6] Ornith 1.5 synthesis (bounded)... ');
   const gemma4 = await l6Synthesis(userQuery, identity, memory, aceContext);
   appendWorkflowStage(workflow, 'synthesize', 'SYNTHESIZE', {
     dependsOn: ['rerank'],
@@ -917,6 +997,8 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     evidenceRefs: recommendation.evidence.rg_matches.slice(0, 10),
   });
 
+  workflow.dag_synthesis_packet = buildAceDagSynthesisPacket({ workflow });
+
   await writeWorkflowReport(workflow, recommendation, workflow.outcome);
 
   return {
@@ -929,6 +1011,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     ace_context: aceContext,
     structured_recommendation: structuredRecommendation,
     workflow_report: workflow,
+    dag_synthesis_packet: workflow.dag_synthesis_packet,
   };
 }
 

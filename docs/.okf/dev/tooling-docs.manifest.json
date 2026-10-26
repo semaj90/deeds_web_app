@@ -1,7 +1,7 @@
 {
-  "manifest_revision": "okf-tooling-docs-r2",
+  "manifest_revision": "okf-tooling-docs-r3",
   "workspace_revision": "workspace-current",
-  "source_snapshot_revision": "tooling-docs-2026-10-05",
+  "source_snapshot_revision": "tooling-docs-2026-10-11",
   "producer_revision": "parent-atlas-okf-pipeline-r1",
   "output_root": ".",
   "embedding": {
@@ -169,6 +169,89 @@
       "version_qualification": "CURRENT_UPSTREAM",
       "language": "typescript",
       "publisher": "tRPC"
+    },
+    {
+      "source_id": "mastra-workflows",
+      "source_revision": "mastra-workflows-docs-2026-10-11",
+      "title": "Mastra Workflows Documentation",
+      "base_urls": ["https://mastra.ai/docs/workflows/overview"],
+      "allowed_domains": ["mastra.ai"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "HTTP_FALLBACK",
+      "output_namespace": "docs/.okf/mastra-workflows",
+      "maximum_pages": 2,
+      "maximum_depth": 0,
+      "pages": [
+        "https://mastra.ai/docs/workflows/overview",
+        "https://mastra.ai/docs/workflows/control-flow"
+      ],
+      "provider": "mastra",
+      "product": "mastra-workflows",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Mastra"
+    },
+    {
+      "source_id": "agent-client-protocol",
+      "source_revision": "acp-v1-docs-2026-10-11",
+      "title": "Agent Client Protocol Documentation",
+      "base_urls": ["https://agentclientprotocol.com/get-started/introduction"],
+      "allowed_domains": ["agentclientprotocol.com"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "HTTP_FALLBACK",
+      "output_namespace": "docs/.okf/agent-client-protocol",
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "pages": ["https://agentclientprotocol.com/get-started/introduction"],
+      "provider": "agentclientprotocol",
+      "product": "acp-v1",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "protocol",
+      "publisher": "Agent Client Protocol"
+    },
+    {
+      "source_id": "a2a-protocol",
+      "source_revision": "a2a-latest-spec-2026-10-11",
+      "title": "Agent2Agent Protocol Documentation",
+      "base_urls": ["https://a2a-protocol.org/latest/"],
+      "allowed_domains": ["a2a-protocol.org"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "HTTP_FALLBACK",
+      "output_namespace": "docs/.okf/a2a-protocol",
+      "maximum_pages": 2,
+      "maximum_depth": 0,
+      "pages": [
+        "https://a2a-protocol.org/latest/",
+        "https://a2a-protocol.org/latest/specification/"
+      ],
+      "provider": "a2a-protocol",
+      "product": "a2a-latest",
+      "version_qualification": "LATEST_SPECIFICATION_CAPTURED_AT_FETCH",
+      "language": "protocol",
+      "publisher": "A2A Protocol"
+    },
+    {
+      "source_id": "opencode-tools-mcp",
+      "source_revision": "opencode-tools-mcp-docs-2026-10-11",
+      "title": "OpenCode Tools and MCP Documentation",
+      "base_urls": ["https://docs.opencode.ai/docs/tools/"],
+      "allowed_domains": ["docs.opencode.ai"],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "HTTP_FALLBACK",
+      "output_namespace": "docs/.okf/opencode-tools-mcp",
+      "maximum_pages": 4,
+      "maximum_depth": 0,
+      "pages": [
+        "https://docs.opencode.ai/docs/tools/",
+        "https://docs.opencode.ai/docs/custom-tools/",
+        "https://docs.opencode.ai/docs/mcp-servers/",
+        "https://docs.opencode.ai/docs/acp/"
+      ],
+      "provider": "opencode",
+      "product": "opencode-tools-mcp",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "OpenCode"
     }
   ]
 }

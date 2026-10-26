@@ -73,12 +73,16 @@
 {#if open && citation}
 	<div
 		class="cvm-backdrop"
-		role="dialog"
-		aria-modal="true"
-		aria-label="Citation preview"
+		role="presentation"
 		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
 	>
-		<div class="cvm-panel">
+		<div
+			class="cvm-panel"
+			role="dialog"
+			aria-modal="true"
+			aria-label="Citation preview"
+			tabindex="-1"
+		>
 			<!-- Header -->
 			<div class="cvm-header">
 				<div class="cvm-title-row">

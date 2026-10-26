@@ -1,0 +1,431 @@
+schema: atlas.parent-atlas-agentic-retrieval-corpus.v1
+version: 1
+id: parent-atlas-agentic-retrieval-vocabulary
+type: corpus
+title: Parent Atlas agentic retrieval vocabulary
+status: reference_only
+authority: derived_reference
+canonical_authority: false
+source_refs:
+  - .okf/indexes/parent-atlas-code-explore.yaml
+  - .okf/domains/structured-value.yaml
+generated:
+  by: human-reviewed-repository-sources
+  at: "2026-10-13"
+verified:
+  by: repository-source-review
+  at: "2026-10-13"
+indexing:
+  populated: false
+  searchable: false
+  qdrant_written: false
+  admission_required: true
+entries:
+  - id: openwiki
+    terms: [OpenWiki, generated repository wiki, grounded claims, OKF]
+    definition: >-
+      OpenWiki is a generated documentation surface whose claims must be grounded
+      in repository evidence. Local downloaded OpenWiki documentation is reference
+      material; it is not proof that a current local wiki or live search integration
+      exists.
+    evidence_status: local_reference_docs_only
+    source_refs:
+      - docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md
+      - docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md
+      - docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md
+    retrieval_policy: reference_only_until_source_revision_and_claim_receipts_are_verified
+
+  - id: deep-agents
+    terms: [Deep Agents, deepagents, agent harness, subagents, context management]
+    definition: >-
+      Deep Agents is documented as an agent harness built on LangGraph. The local
+      downloaded vendor documentation is a research source and does not establish
+      an installed package or production caller in Parent Atlas.
+    evidence_status: vendor_docs_only_runtime_unproven
+    source_refs:
+      - docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md
+      - docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md
+      - docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md
+      - docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md
+    retrieval_policy: reference_only_until_package_and_caller_are_independently_verified
+
+  - id: language-server-protocol
+    terms: [LSP, Language Server Protocol, tsserver, UTF-16 positions]
+    definition: >-
+      LSP/tsserver may provide optional incremental semantic observations. Protocol
+      positions are UTF-16 transport coordinates; canonical source spans remain
+      UTF-8 byte offsets owned by the structural/source evidence path.
+    evidence_status: contract_documented_runtime_caller_unproven
+    source_refs:
+      - .okf/domains/structured-value.yaml
+      - .okf/indexes/parent-atlas-code-explore.yaml
+      - sveltekit-frontend/src/lib/server/atlas/contracts/code-exploration-index-v1.ts
+    retrieval_policy: observations_only_convert_and_verify_before_source_span_matching
+
+  - id: viterbi-mcp-tool-routing
+    terms: [Viterbi, LUT, MCP tool selection, tool routing]
+    definition: >-
+      Existing Viterbi code proposes a tool from a supplied revisioned MCP registry.
+      It is not a symbol/content lookup table and does not itself retrieve indexed
+      source evidence or authorize tool execution.
+    evidence_status: proposal_logic_present_end_to_end_retrieval_unproven
+    source_refs:
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-frame-compiler-v1.ts
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-registry-types-v1.ts
+      - docs/reports/mcp-tool-surface-live-v1.json
+    mcp_surface:
+      server_authority_id: parent-atlas:mcp:atlas-tools
+      tool_surface_revision: 9f7e3db94d93a310f75294cb11a0b71d3ec2621d9a9c66639102d30dd9a8e137
+      discovery_status: ALL_SERVERS_REACHABLE
+      captured_at: "2026-10-12T23:42:13.843Z"
+      tools:
+        - tool_name: classify_intent
+          input_schema_digest: 14836a42ad0c9adde8d9f888eb6e0bcdc39b7f7a5fc804ffbdd8da080026b95b
+          output_schema_digest: null
+          execution_metadata_digest: null
+          invocation_verified: false
+        - tool_name: find_dependencies
+          input_schema_digest: 3bd2492f5f15e70a796a2ecd205ab48d390f1e2e771e27abc211b997b676ddbc
+          output_schema_digest: null
+          execution_metadata_digest: null
+          invocation_verified: false
+    retrieval_policy: registry_revision_and_permission_schema_checks_remain_required
+
+  - id: http-query-quic-context
+    terms: [HTTP QUERY, RFC 10008, request-body search, Accept-Query, HTTP/3, RFC 9114, QUIC, RFC 9000, query cache key]
+    definition: >-
+      RFC 10008 defines a safe, idempotent HTTP query method with request content;
+      RFC 9114 maps HTTP semantics onto QUIC for HTTP/3. These are separate method
+      and transport layers. This entry is a local reference lookup only: it does
+      not establish Atlas route, HTTP/3, QUIC-RPC, cache, or agent-workflow support.
+    evidence_status: external_protocol_reference_firecrawl_retrieved_beautifulsoup_validation_blocked
+    source_refs:
+      - docs/.okf/rfc-http-query/README.md
+      - https://www.rfc-editor.org/rfc/rfc10008.html
+      - https://www.rfc-editor.org/rfc/rfc9114.html
+      - https://www.rfc-editor.org/rfc/rfc9000.html
+    retrieval_policy: reference_only; require route_server_client_and_cache_key_proof_before_runtime_use
+
+  - id: symbol-document-diagnostic-lut
+    terms: [symbol TOC, symbol LUT, reverse lookup, qualified symbol lookup, document crosswalk]
+    definition: >-
+      A bounded diagnostic projection provides exact-key, one-to-many symbol/document
+      candidate lookups against a supplied integrity-checked ordinal map. Its results
+      remain NOT_ADMITTED and are not wired to SearchRuntime; it is distinct from both
+      MCP tool selection and the proposed per-directory context LUT.
+    evidence_status: IMPLEMENTATION_AND_FIXTURES_PRESENT_LIVE_PROVIDER_AND_SEARCH_RUNTIME_UNPROVEN
+    source_refs:
+      - scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.mts
+      - scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.test.mts
+      - scripts/atlas/lib/symbol-toc-row-qualification-v1.mjs
+      - scripts/atlas/lib/symbol-toc-owner-readback-v1.mts
+      - openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md
+    retrieval_policy: require_independent_ordinal_map_source_readback_and_search_runtime_owner; never_admit_or_rank_from_lut_alone
+
+  - id: directory-source-lut
+    terms: [directory LUT, source tree lookup, directory fanout, per-directory retrieval]
+    definition: >-
+      A proposed rebuildable directory-context lookup derived from qualified source
+      bindings. It may group file and symbol candidates by directory, but directory
+      paths are not canonical identities, inherited context is not an extra ranking
+      vote, and stale or ambiguous source revisions must be excluded. The design
+      remains blocked until GPH-13 AST parity and source-binding qualification pass.
+    evidence_status: DESIGN_ONLY_GPH13_AND_SOURCE_BINDING_GATED
+    source_refs:
+      - docs/parent-atlas-workstation-gpu-runtime-backlog.md
+      - .okf/indexes/parent-atlas-code-explore.yaml
+      - sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts
+      - openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md
+    retrieval_policy: no_build_or_search_until_ast_parity_and_revision_qualified_source_bindings_pass
+
+  - id: qdrant-projection
+    terms: [Qdrant, vector projection, semantic retrieval, collection alias]
+    definition: >-
+      Qdrant is a rebuildable vector projection. Point IDs and vector hits are not
+      canonical packet, source, chunk, or symbol identities; results require an
+      exact revision-qualified PostgreSQL/source readback before evidence use.
+    evidence_status: implementation_present_lineage_not_fully_proven
+    source_refs:
+      - .okf/indexes/parent-atlas-code-explore.yaml
+      - sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts
+      - sveltekit-frontend/src/lib/server/search/qdrant-search.ts
+      - .tmp/atlas/production-hardening-seed-20261012/lineage-01-qdrant-payload-integrity-sample-v1.json
+    retrieval_policy: projection_hits_require_canonical_identity_revision_and_source_span_join
+
+  - id: agentic-query-to-prefill-workflow
+    terms: [agentic error fixing, query routing, DAG prefill, MCP tool call, ACE context, synthesis]
+    definition: >-
+      The repository has a CLI recommendation workflow with intent classification, local search,
+      identity lookup, ACE context assembly, retrieval, reranking, synthesis, and recommendation
+      stages. This is not yet a proven production search-to-prefill pipeline: its L4 code calls
+      lexical, dense, and graph tools separately instead of delegating fusion to SearchRuntime;
+      source now loads the existing SvelteKit env files and requires the configured Ornith 1.5
+      alias to appear in llama-server GET /v1/models, but no live call has verified that binding;
+      and the workflow writes diagnostic reports even when invoked with its documented --dry-run
+      flag. Tool recommendations and model output do not authorize execution or evidence admission.
+    evidence_status: CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN
+    source_refs:
+      - scripts/atlas/agentic-recommendation-workflow.mjs
+      - scripts/atlas/run-agentic-error-fixing-v1.mjs
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts
+      - sveltekit-frontend/src/lib/server/llm/runtime-contract.ts
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+    retrieval_policy: qualify_evidence_through_existing_identity_and_contextmanifest_owners_then_use_searchruntime_single_fusion; verify_side_effects_before_dry_run
+
+  - id: parameter-artifact-lookup
+    terms: [parameter fetching, parameter artifact, model revision, representation revision, DAG parameters]
+    definition: >-
+      The existing parameter resolver matches supplied revision-qualified artifact receipts and
+      returns RESOLVED, UNAVAILABLE, or AMBIGUOUS without writes. It does not fetch artifacts or
+      choose among multiple matches, and source inspection found no production caller beyond tests.
+      Retrieval must bind parameters to the requested producer, model, adapter, and representation
+      revisions rather than query intent or dimensions alone.
+    evidence_status: CONTRACT_AND_FIXTURES_PRESENT_PRODUCTION_CALLER_UNPROVEN
+    source_refs:
+      - sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts
+      - sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts
+    retrieval_policy: exact_revision_compatibility_only; ambiguous_or_unavailable_parameters_fail_closed
+
+  - id: web-search-research-dag
+    terms: [web search, SearXNG, DuckDuckGo, web-search fallback, research DAG, T4 external evidence]
+    definition: >-
+      Web search exists through multiple callers, not one unified DAG: research.web_search and
+      kag.web_search use the shared SearXNG/DuckDuckGo adapter; the agent tool-loop has an explicit
+      opt-in web_search path with cache, SearXNG, and Qdrant research_summaries fallback; ACE also
+      exposes a web-search fallback. A separate citation dependency DAG topologically orders
+      documents in retrieval/synthesis callers; it is not the agent tool-execution DAG. External
+      snippets are observations, not admitted source evidence. Search discovery, document
+      fetch/capture (Firecrawl), source/license review, corpus admission, and ContextManifest
+      inclusion are separate stages and are not proven by a successful search response.
+    evidence_status: MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN
+    source_refs:
+      - sveltekit-frontend/src/lib/server/retrieval/web-search.ts
+      - sveltekit-frontend/src/mcp/research_tools.ts
+      - sveltekit-frontend/src/mcp/trace-mcp-server.ts
+      - sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts
+      - sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts
+      - sveltekit-frontend/src/lib/server/ace/ace-agent.ts
+      - sveltekit-frontend/src/lib/server/retrieval/document-dag.ts
+      - sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts
+      - sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts
+    retrieval_policy: external_results_are_untrusted_observations; require_source_capture_license_scope_revision_and_admission_before_corpus_or_prompt_authority
+
+  - id: query-router-mlp-tournament
+    terms: [query router, classifier MLP, retrieval plan, MLP tournament, XGBoost baseline, shadow routing]
+    definition: >-
+      The query-router contract plans domain, operation, retrieval needs, and bounded budgets;
+      it is not a candidate ranker, evidence authority, or tool-execution permission. OpenSpec
+      records a 154-wide v1 tensor contract, while the v2 PyTorch trainer and v2 manifest declare
+      a separate 234-wide tensor. Their crosswalk and dataset-owner relationship are unresolved.
+      Non-toy revision-qualified training data, calibration, same-split XGBoost comparison,
+      held-out evaluation, shadow runtime, and promotion remain open. Do not use MLP output to
+      override SearchRuntime, MCP permission checks, or source/evidence admission.
+    evidence_status: V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN
+    source_refs:
+      - openspec/changes/parent-atlas-query-routing-classifier/tasks.md
+      - sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts
+      - sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts
+      - sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+    retrieval_policy: classifier_outputs_are_shadow_route_recommendations_only_until_revisioned_dataset_calibration_held_out_comparison_and_promotion_gates_pass
+
+  - id: swiglu-transformer-activation
+    terms: [SwiGLU, SiLU gate, transformer feed-forward activation, gated MLP]
+    definition: >-
+      SwiGLU is a gated feed-forward activation inside a transformer architecture. It is not a
+      post-hoc transform for EmbeddingGemma vectors, MiniLM vectors, or autoencoder latents, and
+      it does not establish that the active Ornith model uses SwiGLU. The supplied llama-server
+      model listing reports ornith-1.5-9b, n_embd 4096, n_ctx_train 262144, and completion
+      capability; those fields do not expose the activation implementation or prove the
+      effective runtime context window.
+    evidence_status: REFERENCE_DEFINITION_PRESENT_ACTIVE_MODEL_ACTIVATION_UNVERIFIED
+    source_refs:
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+      - .okf/systems/parent-atlas-compute-ownership.md
+      - docs/.okf/research/deltanet-swiglu/manifest.json
+      - docs/.okf/research/deltanet-swiglu/published-current.json
+    retrieval_policy: architecture_reference_only; verify_exact_model_artifact_or_config_before_claiming_activation; never_use_as_embedding_conversion
+
+  - id: deltanet-attention-architecture
+    terms: [DeltaNet, Gated DeltaNet, delta-rule attention, recurrent linear attention]
+    definition: >-
+      DeltaNet refers to a delta-rule attention/memory architecture family; gated variants
+      combine state-update mechanisms with gating and may be hybridized with other attention
+      layers. It is model-internal, not a Parent Atlas retrieval lane, routing algorithm,
+      packet identity, embedding conversion, or evidence source. See the reference-only
+      primary-paper corpus under docs/.okf/research/deltanet-swiglu/.
+    evidence_status: PRIMARY_PAPER_REFERENCE_CAPTURED_MODEL_SPECIFIC_USE_REQUIRES_ARTIFACT_EVIDENCE
+    source_refs:
+      - docs/.okf/research/deltanet-swiglu/manifest.json
+      - docs/.okf/research/deltanet-swiglu/published-current.json
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+    retrieval_policy: architecture_reference_only; never_treat_as_retrieval_representation_or_packet_routing_contract
+
+  - id: atlas-topk-selection-receipt
+    terms: [selection receipt, TopK selection receipt, routing manifest binding, candidate selection provenance]
+    definition: >-
+      A proposed checksum- and revision-bound record linking a query/run, candidate feature
+      snapshot and ordinal map, optional routing manifest, ordered Top-K canonical candidates,
+      source/evidence and ontology tuple references, execution phase/gate, and ContextManifest
+      identity/admission. Routing IDs identify routing decisions/artifacts, not canonical
+      packets. Candidate lane masks record provenance and do not create extra logical-lane votes.
+      This is a design term; production end-to-end wiring is not proven.
+    evidence_status: DESIGN_ONLY_BINDING_AND_INTEGRATION_TESTS_OPEN
+    source_refs:
+      - docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md
+      - sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts
+      - sveltekit-frontend/src/lib/server/atlas/retrieval/topk-algorithm-tournament.ts
+      - sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts
+    retrieval_policy: design_reference_only; preserve_canonical_identity_and_one_vote_per_logical_lane
+
+  - id: transformer-hidden-state-boundary
+    terms: [transformer hidden state, intermediate activation, hidden-state feature, activation extraction]
+    definition: >-
+      Intermediate model activations are distinct from canonical semantic embeddings and
+      source-derived AST/NLP features. They may be considered only through an explicitly
+      supported, revision-qualified experimental interface; do not persist hidden states,
+      tensors, KV cache, or hidden reasoning, and do not use activations as identity or evidence.
+    evidence_status: POLICY_BOUNDARY_DOCUMENTED_EXPORT_INTERFACE_UNVERIFIED
+    source_refs:
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+      - .okf/systems/parent-atlas-compute-ownership.md
+    retrieval_policy: ephemeral_experiment_only; model_layer_token_mapping_and_revision_required; no_persistent_state_or_evidence_authority
+
+  - id: synthesis-dag-kag-hypergraph
+    terms: [synthesis DAG, KAG, HyperGraphRAG, knowledge hypergraph, ContextManifest, PromptPlan]
+    definition: >-
+      The synthesis DAG plans bounded, ordered work and dependencies; KAG/HyperGraphRAG represent
+      typed, evidence-backed relations, including role-preserving n-ary relations. Keep these
+      structures separate. Similarity or cluster membership cannot create ontology facts.
+      Synthesis consumes verified ContextManifest evidence and may propose actions, but does not
+      authorize persistent mutations. Existing OpenSpec owners define the integration gates;
+      a complete live retrieval-to-synthesis proof remains open.
+    evidence_status: EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN
+    source_refs:
+      - .okf/systems/hyperrag.md
+      - openspec/changes/parent-atlas-agentic-completion/proposal.md
+      - openspec/changes/parent-atlas-agentic-completion/design.md
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+    retrieval_policy: require_admitted_revision_qualified_evidence_and_contextmanifest; dag_is_not_write_authority; preserve_hyperedge_roles
+
+  - id: topology-som-kmeans-advisory-features
+    terms: [TopologyFeature4, 4D topology coordinates, four-dimensional topology, 4D manifold, manifold mapping, topology mapping, data analytics, SOM 20x20, self-organizing map, K-means, K-means clustering, cluster assignment, centroid, feature remapping, latent feature]
+    definition: >-
+      Four-dimensional topology and manifold mappings are derived data-analytics views whose
+      component axes retain distinct meanings and revision lineage. K-means cluster assignments,
+      centroids, latent features, and SOM cells are separate derived outputs; future clustering
+      may be evaluated for exploratory analysis or advisory routing on a frozen,
+      source-qualified cohort. None creates canonical identity, ontology edges, prompt evidence,
+      reviewed labels, or additional semantic retrieval votes. The 20x20 SOM grid is an existing
+      experiment parameter, not a universal requirement or proof of production value.
+    evidence_status: IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN
+    source_refs:
+      - openspec/changes/parent-atlas-topology-representation-admission/proposal.md
+      - openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+      - python/atlas_compute/som.py
+      - python/atlas_compute/aligned_snapshot_experiment.py
+      - .okf/systems/parent-atlas-compute-ownership.md
+    retrieval_policy: advisory_only_until_frozen_cohort_revision_feature_schema_and_held_out_ablation_pass; no_identity_or_evidence_promotion
+
+  - id: revision-qualification
+    terms: [revision, revision-qualified, sourceRevision, workspaceRevision, source revision, workspace revision, representation revision, feature revision, producer revision, registry revision]
+    definition: >-
+      A revision is a checksummed identifier for exactly one version of one input or derived artifact.
+      Revision namespaces are separate and never interchangeable. sourceRevision is sha256 of the exact
+      UTF-8 bytes of one source file. workspaceRevision is a sha256 over an admitted, sorted manifest of
+      source revisions. Representation, feature, producer, and registry revisions name derived artifacts
+      and must trace to a source or workspace revision. A value is revision-qualified only when its
+      namespace, algorithm, and parent identity all match. Null, 0, "unknown", and placeholder strings
+      such as "codebase-graph:unknown" are unqualified: reject them, never coerce or default them, and
+      never backfill a historical revision from current worktree bytes without independently verified
+      producer evidence.
+    evidence_status: CONTRACT_DEFINED_LIVE_COVERAGE_UNQUALIFIED_ORF_0_OF_1808_ROWS_WORKSPACE_QUALIFIED_2026-10-20
+    source_refs:
+      - docs/MASTER-TOC-v2.md
+      - sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/retrieval/orf-feature-row-reader-v1.ts
+    retrieval_policy: reference_only; evidence is admitted only after exact namespace and parent-identity match; unqualified rows are excluded and reported, never repaired in place
+
+  - id: parent-atlas-python-nlp-sidecar-patterns
+    terms: [Python, Python 3, FastAPI, Uvicorn, NLP sidecar, "8095", LangExtract, grounded extraction, OAKLIB, OaKLIB, Tree-sitter, tree-sitter, AST-grep, spaCy, LSP, Language Server Protocol, tsserver, documentation facts, ontology candidate search, miniforge_nlp_sidecar_v2.py, /extract/documentation-facts, /ontology/oaklib/search]
+    definition: >-
+      Lexical discovery vocabulary for the Python NLP/OAKLIB sidecar and its
+      structural-analysis interfaces. A match helps locate relevant code or docs;
+      it does not establish that a package, route, model, or service is live or
+      that extracted facts have canonical authority.
+    evidence_status: SOURCE_TERMS_PRESENT_LIVE_ROUTE_AND_AUTHORITY_REQUIRE_SEPARATE_PROOF
+    source_refs:
+      - python/miniforge_nlp_sidecar_v2.py
+      - python/atlas_langextract_runtime.py
+      - python/parent_atlas_ontology/oaklib_external_adapter.py
+      - docs/architecture/langextract-atlas-integrations.md
+    retrieval_policy: lexical_discovery_only; verify deployed route, pinned runtime, exact source spans, and admission independently
+
+  - id: parent-atlas-native-interop-patterns
+    terms: [C programming, C++, CUDA C++, N-API, napi, node-addon-api, Node native addon, simdjson, SIMD JSON, JSONL, NDJSON, Arrow IPC, gRPC, Protocol Buffers, Protobuf, AVX2, AVX-512, SIMD, radix sort, CUB DeviceRadixSort, key-value sort pairs]
+    definition: >-
+      Lexical discovery vocabulary for native parsing, transport, SIMD, and
+      key/value sorting boundaries. Parsing or sorting results must still be
+      schema-validated and joined back through canonical identity; the terms do
+      not imply a compiled addon or production GPU execution.
+    evidence_status: SOURCE_TERMS_PRESENT_NATIVE_RUNTIME_CALLER_AND_GPU_RECEIPT_UNPROVEN
+    source_refs:
+      - simd-bridge/cpp/binding.cc
+      - simd-bridge/cpp/simdjson_bridge.cc
+      - native/ace-radix-01/radix_bench.cu
+      - sveltekit-frontend/src/lib/server/atlas/indexing/simdjson-typed-evidence-bridge.ts
+    retrieval_policy: lexical_discovery_only; preserve ordinal-to-key association and validate typed payloads after parsing
+
+  - id: parent-atlas-nvidia-gpu-ml-patterns
+    terms: [NVIDIA, RTX, GPU, CUDA, CUB, RAPIDS, cuDF, cuML, cuVS, CAGRA, cuGraph, PyTorch, LibTorch, Triton, TensorRT, ONNX Runtime, EmbeddingGemma, EmbeddingGemma 2, XGBoost GPU, KMeans, SOM 20x20, tensor, Arrow mmap, CUDA stream]
+    definition: >-
+      Lexical discovery vocabulary for NVIDIA hardware, CUDA/native execution,
+      GPU dataframe and graph libraries, tensor runtimes, and model experiments.
+      Repository presence or a keyword match is not evidence that the component
+      is installed, compatible, active, trained, or promoted.
+    evidence_status: SOURCE_TERMS_PRESENT_DEVICE_AND_PRODUCTION_EXECUTION_STATUS_MUST_BE_VERIFIED
+    source_refs:
+      - python/atlas_graph_runtime/cuvs_executor.py
+      - python/atlas_compute/cudf_ace_packet_builder.py
+      - python/atlas_compute/torch_kernel_experiment.py
+      - simd-bridge/cpp/cuvs_bridge.cc
+      - simd-bridge/cpp/libtorch_graph_impl.cpp
+    retrieval_policy: lexical_discovery_only; distinguish source scaffolding, runtime availability, fixture parity, and live execution receipts
+
+  - id: parent-atlas-retrieval-storage-patterns
+    terms: [PostgreSQL 18, PostgreSQL 18.4, pgvector, full-text search, FTS, GIN, B-tree, bitmap scan, HNSW, IVFFlat, Qdrant, Redis, Valkey, Graphify, SearchRuntime, PageRank, PPR, Top-K, BM25, CandidateOrdinalMapV1, semantic_768, ACE, ContextManifest]
+    definition: >-
+      Lexical discovery vocabulary for canonical PostgreSQL retrieval and its
+      rebuildable vector/cache/graph projections. PostgreSQL owns canonical
+      identity and evidence; planner choices such as bitmap scans are not
+      application-level admission contracts.
+    evidence_status: SOURCE_TERMS_PRESENT_CURRENT_LINEAGE_AND_PRODUCTION_CALLERS_REQUIRE_READBACK
+    source_refs:
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+      - sveltekit-frontend/src/lib/server/retrieval/bm25-search.ts
+      - sveltekit-frontend/src/lib/server/embedding/canonical-embed.ts
+      - sveltekit-frontend/src/lib/server/search/qdrant-search.ts
+      - docs/reports/parent-atlas-live-fts-lineage-audit-20261024.json
+    retrieval_policy: lexical_discovery_only; do not create a parallel index or infer current admission from table/index presence
+
+  - id: parent-atlas-agentic-optimization-patterns
+    terms: [MCP, agentic search, ACE packet, context engineering, ContextManifest, DAG synthesis, DSPy, GEPA, RLM, OaK, repair evaluation, frozen evaluation, XGBoost grouped ranking, learned reranker, tool calling, Headroom, BitFrost, token cache]
+    definition: >-
+      Lexical discovery vocabulary for agent orchestration, bounded context
+      assembly, evaluation, optimization, and derived-cache work. Tool selection,
+      model scores, cache hits, and optimizer output do not authorize writes or
+      promote evidence; only admitted context may drive protected actions.
+    evidence_status: SOURCE_TERMS_PRESENT_EVALUATION_AND_PRODUCTION_ADMISSION_GATES_REMAIN
+    source_refs:
+      - sveltekit-frontend/src/mcp/trace-mcp-server.ts
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+      - python/atlas_xgboost_grouped_ranking_v1.py
+      - openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md
+    retrieval_policy: lexical_discovery_only; preserve frozen splits, one fusion owner, authorization, and independent readback

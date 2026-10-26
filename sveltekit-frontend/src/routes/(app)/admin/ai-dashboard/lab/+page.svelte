@@ -6,7 +6,7 @@
 	import CardTitle from '$lib/components/ui/card/CardTitle.svelte';
 	import ProactiveAIAssistant from '$lib/components/ai/ProactiveAIAssistant.svelte';
 	import IntelligentModelOrchestrator from '$lib/components/ai/IntelligentModelOrchestrator.svelte';
-	import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
+	import WebGPUGemma4MtpAssistant from '$lib/components/ai/WebGPUGemma4MtpAssistant.svelte';
 	import RAGPipelineChart from '$lib/components/ai/RAGPipelineChart.svelte';
 	import ACEContextBubble from '$lib/components/ai/ACEContextBubble.svelte';
 	import RecommendationEngine from '$lib/components/ai/RecommendationEngine.svelte';
@@ -38,7 +38,7 @@
 		casesProcessed: 0,
 		assistantSessions: 0,
 		embeddingModel: 'embeddinggemma:latest',
-		llmModel: 'gemma4-legal:latest',
+		llmModel: 'ornith-1.5-9b',
 		ollamaStatus: 'unknown',
 	});
 	let loading = $state(true);
@@ -142,7 +142,7 @@
 			<button class="panel-toggle" onclick={() => (showVlm = !showVlm)}>
 				{showVlm ? 'Hide VLM Analyzer' : 'VLM Image Analysis (Client ONNX + YOLO + Gemma4 Vision)'}
 			</button>
-			{#if showVlm}<div class="panel-body"><Gemma270MWebAssembly /></div>{/if}
+			{#if showVlm}<div class="panel-body"><WebGPUGemma4MtpAssistant /></div>{/if}
 		</div>
 
 		<div class="panel-block">

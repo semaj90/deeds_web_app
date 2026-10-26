@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.function-registry-live-recheck.v1",
+  "generatedAt": "2026-10-15",
+  "requestId": "function-registry-live-recheck-2026-10-15",
+  "qualificationStatus": "QUALIFIED",
+  "request": {
+    "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444"
+  },
+  "qualifiedFunction": {
+    "canonicalId": "stable-symbol:c6fa0d307e69fc83c67d77ced1e91b3db37ccfac6eb9eafd9956d64a71e91e74",
+    "packetKey": "packet:804cec79a65c",
+    "treeNodeId": "3561bb301bdf5dcab4a7134afd843fb78da32acb",
+    "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+    "sourceContentHash": "efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+    "startByte": 979,
+    "endByte": 1154,
+    "qualifiedName": "export_statement::function_declaration::getErrorClustering",
+    "signature": "function getErrorClustering(config?: Partial<ErrorClusteringConfig>): ErrorClustering "
+  },
+  "snapshotChecksum": "242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091",
+  "loaderReceipt": {
+    "schema": "atlas.function-registry-load-receipt.v1",
+    "receiptChecksum": "a4446d0853377ccf22f2df639b948e0ff82a3d4bc963066ba428bf4f5682be02",
+    "evidenceRefs": [
+      "atlas_symbol_versions:symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "atlas_ast_nodes:3561bb301bdf5dcab4a7134afd843fb78da32acb",
+      "atlas_packets:packet:804cec79a65c",
+      "atlas_workspace_source_bindings:sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts:sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444:sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    ]
+  },
+  "retrievalHandoff": {
+    "searchRuntimeFinalTopK": false,
+    "contextManifestAdmitted": false,
+    "blockingEvidence": "docs/reports/candidate-hydration-proof-v1-function-registry-seed.json",
+    "blockingReason": "AMBIGUOUS_SOURCE_REF: two chunk rows, neither with source_revision nor the seed symbol_version_id"
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "interpretation": "Current live PostgreSQL and 8095 Tree-sitter evidence reproducibly qualify one function snapshot. This does not prove final Top-K or ContextManifest admission; the source-to-chunk handoff remains ambiguous."
+}

@@ -23,7 +23,7 @@ Query: "${query}"
     try {
         const response = await llamaServerCachedChat(
             [{ role: 'user', content: prompt }],
-            'gemma4-rotorquant:latest-fast',
+            'ornith-1.5-9b',
             { temperature: 0.1, maxTokens: 512 }
         );
 

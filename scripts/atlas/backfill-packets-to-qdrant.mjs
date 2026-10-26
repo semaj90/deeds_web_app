@@ -242,6 +242,10 @@ async function verify(client) {
 }
 
 async function main() {
+  if (APPLY) {
+    throw new Error('UNQUALIFIED_PACKET_TO_CHUNK_COLLECTION_BACKFILL_DISABLED');
+  }
+
   try {
     const result = await backfill(pool);
     if (APPLY && result.succeeded > 0) {

@@ -52,7 +52,7 @@ Provide your verdict in JSON:
 }
 `.trim()
 			}
-		], 'gemma4-rotorquant:latest');
+		], 'ornith-1.5-9b');
 
 		const content = response.trim();
 		const jsonMatch = content.match(/\{[\s\S]*\}/);

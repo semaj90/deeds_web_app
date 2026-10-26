@@ -41,6 +41,25 @@ const GENERATED_ROOTS = [
   'coverage/',
 ];
 
+// Top-level repo directories that are NOT part of sveltekit-frontend/. A path
+// under any of these must never be re-rooted into sveltekit-frontend/.
+export const NON_FRONTEND_ROOTS = new Set([
+  'python', 'packages', 'crates', 'services', 'scripts', 'simd-bridge',
+  'docs', 'openspec', 'native', 'proto', 'drizzle', 'docker', 'memory',
+  'turbovec', 'deeds_labs', 'neschrom97', 'tests',
+]);
+
+/**
+ * True when any directory segment in `prefix` (the text before a `src/`
+ * match) is a known non-frontend repo root. Used as a guard so normalisation
+ * cannot change which repo directory a path belongs to.
+ */
+export function precedesNonFrontendRoot(prefix) {
+  return String(prefix ?? '')
+    .split('/')
+    .some((segment) => NON_FRONTEND_ROOTS.has(segment));
+}
+
 /**
  * normalizeSourceRef(input) → string
  *
@@ -80,6 +99,12 @@ export function normalizeSourceRef(input) {
 
   const srcIdx = cleanPath.indexOf('src/');
   if (srcIdx >= 0) {
+    // Safeguard: never change a path's repo directory. If a non-frontend repo
+    // root (python/, packages/, crates/, ...) precedes `src/`, the path already
+    // lives elsewhere and must not be re-rooted under sveltekit-frontend/.
+    if (precedesNonFrontendRoot(cleanPath.slice(0, srcIdx))) {
+      return cleanPath;
+    }
     return `sveltekit-frontend/${cleanPath.slice(srcIdx)}`;
   }
   const frontendIdx = cleanPath.indexOf('sveltekit-frontend/');

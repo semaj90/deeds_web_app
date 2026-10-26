@@ -197,3 +197,35 @@ extern "C" int kmeansWithCentroids(const float*, int, int, int, int,
                                     int*, int, float*, int, int*) { return recordStubInvocation(); }
 extern "C" int trainSOM(const float*, int, int, int, int, int,
                          float, float, float, float, float*, int, int*, int) { return recordStubInvocation(); }
+
+extern "C" int graphCandidateGatherGPU(
+    const int32_t* candidate_indices, int32_t candidate_count,
+    const float* embeddings, int32_t num_nodes, int32_t dim,
+    const float* query,
+    int32_t top_k,
+    float* out_gathered_embeddings,
+    float* out_scores,
+    int32_t* out_topk_indices,
+    double* out_transfer_ms,
+    double* out_kernel_ms,
+    int32_t* out_backend
+) {
+  if (!candidate_indices || !embeddings || candidate_count <= 0 || num_nodes <= 0 || dim <= 0) return -1;
+  for (int32_t i = 0; i < candidate_count; ++i) {
+    if (candidate_indices[i] < 0 || candidate_indices[i] >= num_nodes) return -2;
+  }
+  if (out_transfer_ms) *out_transfer_ms = 0.0;
+  if (out_kernel_ms) *out_kernel_ms = 0.05;
+  if (out_backend) *out_backend = 2; // CPU fallback
+  if (out_gathered_embeddings) {
+    for (int32_t i = 0; i < candidate_count; ++i) {
+      int32_t idx = candidate_indices[i];
+      std::memcpy(out_gathered_embeddings + (size_t)i * dim,
+                  embeddings + (size_t)idx * dim,
+                  dim * sizeof(float));
+    }
+  }
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
+  return 0;
+}
+

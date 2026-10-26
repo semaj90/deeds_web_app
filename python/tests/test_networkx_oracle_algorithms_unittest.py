@@ -12,6 +12,8 @@ from atlas_graph_runtime.networkx_executor import (
 )
 from atlas_graph_runtime.graph_projection_manifest import (
     graph_ordinal_map_checksum_v1,
+    lookup_networkx_source_ref_v1,
+    resolve_graph_source_ref_v1,
     validate_graph_projection_artifact_v1,
 )
 
@@ -202,6 +204,130 @@ class NetworkxOracleAlgorithmTests(unittest.TestCase):
             validate_graph_projection_artifact_v1(manifest, [{**nodes[0], "source_revision": "sha256:changed"}], edges)
         with self.assertRaisesRegex(ValueError, "GRAPH_PROJECTION_AUTHORITY_FLAGS_INVALID"):
             validate_graph_projection_artifact_v1({**manifest, "canonicalAuthority": True}, nodes, edges)
+
+    def test_source_ref_resolution_uses_exact_revision_bound_artifact_rows(self) -> None:
+        workspace_revision = "workspace:source-ref-v1"
+        source_revision = "sha256:source-v1"
+        nodes = [
+            {"gpu_node_id": 0, "graph_node_key": "packet:a", "packet_key": "packet:a", "source_ref": "src/a.ts", "source_revision": source_revision, "workspace_revision": workspace_revision},
+            {"gpu_node_id": 1, "graph_node_key": "symbol:a", "packet_key": "packet:a", "source_ref": "src/a.ts", "source_revision": source_revision, "workspace_revision": workspace_revision},
+            {"gpu_node_id": 2, "graph_node_key": "packet:b", "packet_key": "packet:b", "source_ref": "src/b.ts", "source_revision": "sha256:source-b", "workspace_revision": workspace_revision},
+        ]
+        edges = []
+        node_text = "\n".join(
+            f"{row['gpu_node_id']}|{row['graph_node_key']}|{row['packet_key'] or ''}|{row['source_ref'] or ''}|{row['source_revision'] or ''}|{row['workspace_revision'] or ''}"
+            for row in nodes
+        )
+        node_checksum = f"sha256:{hashlib.sha256(node_text.encode()).hexdigest()}"
+        edge_checksum = f"sha256:{hashlib.sha256(b'').hexdigest()}"
+        graph_revision = f"sha256:{hashlib.sha256(f'{workspace_revision}|{node_checksum}|{edge_checksum}'.encode()).hexdigest()}"
+        manifest = {
+            "schema": "atlas.graph-projection-artifact.v1",
+            "mode": "NON_PRODUCTION_DERIVED_ARTIFACT",
+            "workspaceRevision": workspace_revision,
+            "graphRevision": graph_revision,
+            "projectionRevision": f"sha256:{hashlib.sha256(f'{graph_revision}|projection-v1'.encode()).hexdigest()}",
+            "graphOrdinalMapChecksum": graph_ordinal_map_checksum_v1(
+                graph_revision,
+                workspace_revision,
+                [{"graphOrdinal": row["gpu_node_id"], "graphNodeKey": row["graph_node_key"]} for row in nodes],
+            ),
+            "nodeCount": len(nodes), "edgeCount": 0,
+            "nodeChecksum": node_checksum, "edgeChecksum": edge_checksum,
+            "nodeTableHash": node_checksum, "edgeTableHash": edge_checksum,
+            "canonicalAuthority": False, "writesPerformed": False,
+        }
+
+        resolved = resolve_graph_source_ref_v1(
+            manifest, nodes, edges,
+            source_ref="src/a.ts",
+            expected_source_revision=source_revision,
+            expected_workspace_revision=workspace_revision,
+        )
+        self.assertEqual([row["graphOrdinal"] for row in resolved], [0, 1])
+        self.assertEqual([row["graphNodeKey"] for row in resolved], ["packet:a", "symbol:a"])
+        with self.assertRaisesRegex(ValueError, "GRAPH_SOURCE_REVISION_MISMATCH"):
+            resolve_graph_source_ref_v1(
+                manifest, nodes, edges,
+                source_ref="src/a.ts",
+                expected_source_revision="sha256:stale",
+                expected_workspace_revision=workspace_revision,
+            )
+        with self.assertRaisesRegex(ValueError, "GRAPH_SOURCE_REF_NOT_FOUND"):
+            resolve_graph_source_ref_v1(
+                manifest, nodes, edges,
+                source_ref="src/missing.ts",
+                expected_source_revision=source_revision,
+                expected_workspace_revision=workspace_revision,
+            )
+        with self.assertRaisesRegex(ValueError, "GRAPH_SOURCE_WORKSPACE_REVISION_MISMATCH"):
+            resolve_graph_source_ref_v1(
+                manifest, nodes, edges,
+                source_ref="src/a.ts",
+                expected_source_revision=source_revision,
+                expected_workspace_revision="workspace:stale",
+            )
+
+    def test_source_ref_networkx_lookup_returns_bounded_revision_bound_paths(self) -> None:
+        workspace_revision = "workspace:lookup-v1"
+        source_revision = "sha256:source-v1"
+        nodes = [
+            {"gpu_node_id": 0, "graph_node_key": "packet:a", "packet_key": "packet:a", "source_ref": "src/a.ts", "source_revision": source_revision, "workspace_revision": workspace_revision},
+            {"gpu_node_id": 1, "graph_node_key": "symbol:a", "packet_key": "packet:a", "source_ref": "src/a.ts", "source_revision": source_revision, "workspace_revision": workspace_revision},
+            {"gpu_node_id": 2, "graph_node_key": "symbol:b", "packet_key": "packet:b", "source_ref": "src/b.ts", "source_revision": "sha256:source-b", "workspace_revision": workspace_revision},
+        ]
+        edges = [
+            {"src_gpu_node_id": 0, "dst_gpu_node_id": 2, "edge_type": "CALLS", "weight": 1.0},
+            {"src_gpu_node_id": 1, "dst_gpu_node_id": 2, "edge_type": "REFERENCES", "weight": 1.0},
+        ]
+        node_text = "\n".join(
+            f"{row['gpu_node_id']}|{row['graph_node_key']}|{row['packet_key'] or ''}|{row['source_ref'] or ''}|{row['source_revision'] or ''}|{row['workspace_revision'] or ''}"
+            for row in nodes
+        )
+        edge_text = "\n".join(
+            f"{row['src_gpu_node_id']}|{row['dst_gpu_node_id']}|{row['edge_type']}|{row['weight']}"
+            for row in edges
+        )
+        node_checksum = f"sha256:{hashlib.sha256(node_text.encode()).hexdigest()}"
+        edge_checksum = f"sha256:{hashlib.sha256(edge_text.encode()).hexdigest()}"
+        graph_revision = f"sha256:{hashlib.sha256(f'{workspace_revision}|{node_checksum}|{edge_checksum}'.encode()).hexdigest()}"
+        manifest = {
+            "schema": "atlas.graph-projection-artifact.v1",
+            "mode": "NON_PRODUCTION_DERIVED_ARTIFACT",
+            "workspaceRevision": workspace_revision,
+            "graphRevision": graph_revision,
+            "projectionRevision": f"sha256:{hashlib.sha256(f'{graph_revision}|projection-v1'.encode()).hexdigest()}",
+            "graphOrdinalMapChecksum": graph_ordinal_map_checksum_v1(
+                graph_revision,
+                workspace_revision,
+                [{"graphOrdinal": row["gpu_node_id"], "graphNodeKey": row["graph_node_key"]} for row in nodes],
+            ),
+            "nodeCount": len(nodes), "edgeCount": len(edges),
+            "nodeChecksum": node_checksum, "edgeChecksum": edge_checksum,
+            "nodeTableHash": node_checksum, "edgeTableHash": edge_checksum,
+            "canonicalAuthority": False, "writesPerformed": False,
+        }
+
+        results = lookup_networkx_source_ref_v1(
+            manifest, nodes, edges,
+            source_ref="src/a.ts",
+            expected_source_revision=source_revision,
+            expected_workspace_revision=workspace_revision,
+            max_depth=1,
+        )
+        self.assertEqual([row["graphOrdinal"] for row in results], [0, 1])
+        self.assertEqual(results[0]["neighbors"][1]["graphNodeKey"], "symbol:b")
+        self.assertEqual(results[0]["neighbors"][1]["depth"], 1)
+        self.assertFalse(results[0]["canonicalAuthority"])
+        self.assertFalse(results[0]["writesPerformed"])
+        with self.assertRaisesRegex(ValueError, "GRAPH_SOURCE_LOOKUP_DEPTH_OUT_OF_BOUNDS"):
+            lookup_networkx_source_ref_v1(
+                manifest, nodes, edges,
+                source_ref="src/a.ts",
+                expected_source_revision=source_revision,
+                expected_workspace_revision=workspace_revision,
+                max_depth=5,
+            )
 
 
 if __name__ == "__main__":

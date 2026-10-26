@@ -9,6 +9,8 @@ const {
   readFileMock,
   existsSyncMock,
   searchMock,
+  createAtlasSearchAdapterMock,
+  persistKagDagRunFromStepsMock,
 } = vi.hoisted(() => {
   const memoryStore = new Map<string, string>();
 
@@ -56,7 +58,10 @@ const {
     topPacketKeys: ['pkt-1'],
   }));
 
-  return { memoryStore, mkdirMock, writeFileMock, readFileMock, existsSyncMock, searchMock };
+  const createAtlasSearchAdapterMock = vi.fn(() => ({ search: searchMock }));
+  const persistKagDagRunFromStepsMock = vi.fn(async () => null);
+
+  return { memoryStore, mkdirMock, writeFileMock, readFileMock, existsSyncMock, searchMock, createAtlasSearchAdapterMock, persistKagDagRunFromStepsMock };
 });
 
 vi.mock('node:fs', () => ({
@@ -73,9 +78,7 @@ vi.mock('$lib/server/mcp/atlas-tools-client.js', () => ({
 }));
 
 vi.mock('$lib/server/atlas/retrieval/search-runtime-adapter.js', () => ({
-  createAtlasSearchAdapter: vi.fn(() => ({
-    search: searchMock,
-  })),
+  createAtlasSearchAdapter: createAtlasSearchAdapterMock,
 }));
 
 vi.mock('$lib/server/search/rust-napi-search-backend.js', () => ({
@@ -83,7 +86,7 @@ vi.mock('$lib/server/search/rust-napi-search-backend.js', () => ({
 }));
 
 vi.mock('$lib/server/features/ai/ace/kag-dag-runner.js', () => ({
-  persistKagDagRunFromSteps: vi.fn(async () => null),
+  persistKagDagRunFromSteps: persistKagDagRunFromStepsMock,
 }));
 
 vi.mock('./embedding-service.js', () => ({
@@ -101,6 +104,8 @@ describe('semantic search workflow', () => {
     readFileMock.mockClear();
     existsSyncMock.mockClear();
     searchMock.mockClear();
+    createAtlasSearchAdapterMock.mockClear();
+    persistKagDagRunFromStepsMock.mockClear();
   });
 
   it('persists a workflow report and makes it readable by the daily board loader', async () => {
@@ -144,7 +149,7 @@ describe('semantic search workflow', () => {
 
   it('carries bounded query classification through the real workflow caller', async () => {
     const result = await runSemanticSearchWorkflow({
-      query: 'Find the code that connects Valkey caching to the ACE assembler and explain its behavior',
+      query: 'Find the code that connects Valkey caching to the ACE assembler using Drizzle ORM repo:sveltekit-frontend and explain its behavior',
       topK: 5,
       includeWorkflowPreamble: false,
       includeAcePacket: true,
@@ -157,6 +162,8 @@ describe('semantic search workflow', () => {
       schema: 'atlas.query-classification.v1',
       producerRevision: 'semantic-search-workflow-v1',
       domains: ['ace', 'cache'],
+      packageCandidates: ['@sveltejs/kit', 'drizzle-orm'],
+      repositoryScopeCandidates: ['sveltekit-frontend'],
       retrievalNeeds: { lexical: true, ast: true, semantic: true, graph: true },
       operation: 'INSPECT',
     });
@@ -167,7 +174,52 @@ describe('semantic search workflow', () => {
     }));
     expect(searchMock).toHaveBeenCalledWith(expect.objectContaining({
       withGraphExpansion: true,
+      lexicalExpansion: expect.arrayContaining(['drizzle-orm', '@sveltejs/kit']),
     }));
+    expect(searchMock.mock.calls[0]?.[0]).not.toHaveProperty('workspaceRevision');
+    expect(result.graphExpansionStatus).toBe('BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING');
     expect(result.metadata.queryClassification).not.toHaveProperty('canonicalAuthority');
+  });
+
+  it('rejects caller-supplied workspace authority instead of forwarding it to SearchRuntime', async () => {
+    await expect(runSemanticSearchWorkflow({
+      query: 'Find route helpers repo:sveltekit-frontend',
+      workspaceRevision: `sha256:${'a'.repeat(64)}`,
+      topK: 2,
+      withGraphExpansion: true,
+    } as never)).rejects.toThrow();
+
+    expect(searchMock).not.toHaveBeenCalled();
+  });
+
+  it('suppresses SearchRuntime, KAG audit, and report writes in diagnostic read-only mode', async () => {
+    await runSemanticSearchWorkflow({
+      query: 'read-only search workflow',
+      topK: 1,
+      includeWorkflowPreamble: false,
+      includeAcePacket: false,
+      compareRustShadow: false,
+      withGraphExpansion: false,
+      persistReport: true,
+    }, { diagnosticReadOnly: true });
+
+    expect(createAtlasSearchAdapterMock).toHaveBeenCalledWith(expect.objectContaining({ readOnly: true }));
+    expect(persistKagDagRunFromStepsMock).not.toHaveBeenCalled();
+    expect(writeFileMock).not.toHaveBeenCalled();
+  });
+
+  it('does not opt into diagnostic mode unless explicitly requested', async () => {
+    await runSemanticSearchWorkflow({
+      query: 'default search workflow',
+      topK: 1,
+      includeWorkflowPreamble: false,
+      includeAcePacket: false,
+      compareRustShadow: false,
+      withGraphExpansion: false,
+      persistReport: false,
+    });
+
+    expect(createAtlasSearchAdapterMock).toHaveBeenCalledWith(expect.not.objectContaining({ readOnly: true }));
+    expect(persistKagDagRunFromStepsMock).toHaveBeenCalledTimes(1);
   });
 });

@@ -25,7 +25,7 @@ import hashlib
 import importlib
 import json
 from importlib import metadata as importlib_metadata
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import re
 import sys
@@ -213,7 +213,7 @@ class AnalyzeRequest(BaseModel):
     source_type: SOURCE_TYPES = "plain_text"
     extraction_mode: EXTRACTION_MODES = "full"
     document_id: Optional[str] = None
-    source_ref: Optional[str] = None
+    source_ref: Optional[str] = Field(default=None, alias="sourceRef")
     source_revision: Optional[str] = Field(default=None, alias="sourceRevision")
     workspace_revision: Optional[str] = Field(default=None, alias="workspaceRevision")
     source_namespace: Optional[str] = Field(default=None, alias="sourceNamespace")
@@ -221,18 +221,23 @@ class AnalyzeRequest(BaseModel):
     packet_key: Optional[str] = None
     language: Optional[str] = None
     model_id: Optional[str] = None
-    max_chars: int = Field(default=50_000, ge=1, le=200_000)
+    max_chars: int = Field(default=50_000, ge=1, le=1_000_000)
     passes: list[Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]] = Field(default_factory=list)
     grounded_extraction_required: bool = False
 
     model_config = {"populate_by_name": True}
 
 
+MAX_AST_SOURCE_CHARS = 1_000_000
+
+
 class AstChunkRequest(BaseModel):
-    source: str = Field(..., min_length=1, max_length=200_000)
+    source: str = Field(..., min_length=1, max_length=MAX_AST_SOURCE_CHARS)
     language: str = Field(..., min_length=1, max_length=64)
     file_path: str = Field(..., alias="filePath", min_length=1, max_length=2_000)
     source_revision: str = Field(..., alias="sourceRevision", min_length=1, max_length=256)
+    source_ref: Optional[str] = Field(default=None, alias="sourceRef", max_length=2_000)
+    workspace_revision: Optional[str] = Field(default=None, alias="workspaceRevision", max_length=256)
 
     model_config = {"populate_by_name": True}
 
@@ -267,10 +272,11 @@ class AstEvidenceEdge(BaseModel):
     # enclosing CHUNK's boundary, unchanged, for backward compatibility with existing consumers.
     # Absolute source positions as [1-based line, 0-based UTF-8 byte column].
     occurrence_positions: Optional[list[list[int]]] = None
+    occurrence_byte_spans: Optional[list[list[int]]] = None
 
 
 class AstEvidenceResponse(BaseModel):
-    schema: Literal["atlas.ast.evidence.v1"]
+    schema_: Literal["atlas.ast.evidence.v1"] = Field(alias="schema")
     engine: str
     engine_version: str
     language: str
@@ -281,6 +287,8 @@ class AstEvidenceResponse(BaseModel):
     diagnostics: list[str] = Field(default_factory=list)
     error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
     syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
+    scan_completeness: Literal["COMPLETE", "INCOMPLETE"]
+    scan_failure: Optional[str] = None
 
 
 class Chunk(BaseModel):
@@ -362,11 +370,13 @@ class AstUnit(BaseModel):
     packet_key: Optional[str] = None
     tree_node_id: str
     symbol_version_id: Optional[str] = None
-    # tree_node_id/symbol_version_id are sidecar-local digests (digest(source_ref, symbol,
-    # start, end, idx) / digest(source_ref, symbol, structural_revision)) — proposal
-    # coordinates, never authoritative Atlas identity. Consumers must not write these into
-    # atlas_symbol_versions, CandidateOrdinal, GraphNodeKey, or structural edges without an
-    # independent reviewed resolution. Literal[False] so this can never be silently flipped.
+    # These are sidecar-local proposal coordinates, never authoritative Atlas identity.
+    # _build_ast_units uses a revision-qualified SHA-256 tree_node_id when source_revision
+    # is known, and a legacy fallback digest otherwise. symbol_version_id is also a local
+    # digest, not the canonical registry's revision-bound identity. Consumers must not
+    # promote either value into atlas_symbol_versions, CandidateOrdinal, GraphNodeKey, or
+    # structural edges without independent reviewed resolution. Literal[False] prevents
+    # this claim from being silently flipped.
     canonical_authority: Literal[False] = False
     language: str
     node_kind: str
@@ -759,6 +769,14 @@ def _runtime_info() -> dict[str, Any]:
 def _module_proof() -> dict[str, Any]:
     langextract_module_path = _module_path(langextract) if LANGEXTRACT_AVAILABLE else None
     langextract_version = getattr(langextract, "__atlas_runtime_version__", None) or _package_version("langextract")
+    requested_langextract_runtime = os.getenv("LANGEXTRACT_RUNTIME", "shim").strip().lower()
+    active_langextract_runtime = (
+        "unavailable"
+        if not LANGEXTRACT_AVAILABLE or langextract is None
+        else "official"
+        if getattr(langextract, "__atlas_runtime_version__", None)
+        else "shim"
+    )
     tree_sitter_pack_version = _package_version("tree-sitter-language-pack", "tree_sitter_language_pack")
     ast_grep_version = _package_version("ast-grep-py", "ast_grep_py")
     treesitter_chunker_version = _package_version("treesitter-chunker", "treesitter_chunker", "tree_sitter_chunker", "chunker")
@@ -766,6 +784,10 @@ def _module_proof() -> dict[str, Any]:
     return {
         "langextract": {
             "available": LANGEXTRACT_AVAILABLE,
+            "requestedRuntime": requested_langextract_runtime,
+            "activeRuntime": active_langextract_runtime,
+            "runtimeMismatch": requested_langextract_runtime not in {"shim", "official"}
+            or active_langextract_runtime != requested_langextract_runtime,
             "version": langextract_version,
             "modulePath": langextract_module_path,
             "importVerified": LANGEXTRACT_AVAILABLE and bool(langextract_module_path),
@@ -889,6 +911,18 @@ class PosTagResponse(BaseModel):
 
 def _utf8_byte_offset(text: str, character_offset: int) -> int:
     return len(text[:character_offset].encode("utf-8"))
+
+
+def _strict_utf8_to_utf16_offset(source_bytes: bytes, utf8_offset: int) -> int:
+    """CANDIDATE, unwired, review-only. Map a UTF-8 byte offset to a UTF-16 code-unit offset.
+    Fails closed: an out-of-range offset, or one that cuts a multi-byte sequence, raises ValueError."""
+    if utf8_offset < 0 or utf8_offset > len(source_bytes):
+        raise ValueError(f"FAIL_CLOSED: UTF-8 offset {utf8_offset} outside 0..{len(source_bytes)}")
+    try:
+        prefix = source_bytes[:utf8_offset].decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"FAIL_CLOSED: UTF-8 offset {utf8_offset} cuts a code point") from exc
+    return len(prefix.encode("utf-16-le")) // 2
 
 
 def _spacy_pos_tags(text: str) -> PosTagResponse:
@@ -1541,9 +1575,11 @@ def _provider_revision() -> str:
     """Stable per-call provenance for the analysis provider and parser stack."""
     explicit = os.getenv("NLP_SIDECAR_PROVIDER_REVISION", "parent-atlas-nlp-sidecar:analysis-v1").strip()
     parser = _package_version("ast-grep-py", "ast-grep") or "unavailable"
-    tree_sitter = _package_version("tree-sitter-language-pack", "tree-sitter") or "unavailable"
+    # Report the tree-sitter runtime itself, not the language-pack version (the pack is reported separately).
+    tree_sitter = _package_version("tree-sitter", "tree_sitter") or "unavailable"
+    pack = _package_version("tree-sitter-language-pack", "tree_sitter_language_pack") or "unavailable"
     chunker = _package_version("treesitter-chunker", "tree-sitter-chunker", "chunker") or "unavailable"
-    return f"{explicit}|ast-grep={parser}|tree-sitter={tree_sitter}|chunker={chunker}"
+    return f"{explicit}|ast-grep={parser}|tree-sitter={tree_sitter}|tree-sitter-language-pack={pack}|chunker={chunker}"
 
 
 def _line_span_to_offsets(text: str, start_line: int, end_line: int) -> tuple[int, int]:
@@ -1581,6 +1617,73 @@ def _slice_utf8_bytes(text: str, start_byte: int, end_byte: int) -> str:
         raise ValueError("UTF-8 byte span splits a code point") from exc
 
 
+def _suffix_for_language(language: str) -> str:
+    lang = language.lower()
+    if lang == "svelte":
+        return ".svelte"
+    if lang in {"tsx", "typescriptreact"}:
+        return ".tsx"
+    if lang in {"javascript", "js", "mjs", "cjs"}:
+        return ".js"
+    if lang in {"python", "py"}:
+        return ".py"
+    if lang in {"rust", "rs"}:
+        return ".rs"
+    if lang in {"go"}:
+        return ".go"
+    if lang in {"html"}:
+        return ".html"
+    return ".ts"
+
+
+def _cpp_function_declaration_chunks(text: str) -> list[Chunk]:
+    if not TREE_SITTER_AVAILABLE or get_parser is None:
+        return []
+    try:
+        source_bytes = text.encode("utf-8")
+        root = get_parser("cpp").parse(source_bytes).root_node
+    except Exception:
+        return []
+
+    chunks: list[Chunk] = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        stack.extend(reversed(list(getattr(node, "named_children", []))))
+        if node.type not in {"declaration", "field_declaration"}:
+            continue
+        declarator = node.child_by_field_name("declarator")
+        if declarator is None or declarator.type != "function_declarator":
+            continue
+        name_node = declarator.child_by_field_name("declarator")
+        while name_node is not None and name_node.type in {
+            "function_declarator", "pointer_declarator", "reference_declarator", "parenthesized_declarator",
+        }:
+            name_node = name_node.child_by_field_name("declarator")
+        if name_node is None:
+            continue
+        start = int(node.start_byte)
+        end = int(node.end_byte)
+        if end <= start:
+            continue
+        try:
+            snippet = source_bytes[start:end].decode("utf-8").strip()
+            symbol = name_node.text.decode("utf-8")
+        except (UnicodeDecodeError, AttributeError):
+            continue
+        if not snippet or not symbol:
+            continue
+        chunks.append(Chunk(
+            kind="function_declaration",
+            text=snippet[:10_000],
+            start=start,
+            end=end,
+            symbol=symbol,
+            language="cpp",
+        ))
+    return chunks
+
+
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
     # Canonical structural chunking prefers the installed treesitter-chunker package in the
     # Python sidecar. The local tree-sitter parser remains a compatibility fallback only.
@@ -1589,7 +1692,7 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
         if callable(chunk_file):
             temp_path: Optional[str] = None
             try:
-                suffix = ".tsx" if language.lower() in {"tsx", "typescriptreact"} else ".ts"
+                suffix = _suffix_for_language(language)
                 with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, encoding="utf-8", delete=False) as handle:
                     handle.write(text)
                     temp_path = handle.name
@@ -1650,6 +1753,13 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
                 )
 
             if chunks:
+                if language.lower() == "cpp":
+                    existing_spans = {(chunk.start, chunk.end) for chunk in chunks}
+                    chunks.extend(
+                        declaration
+                        for declaration in _cpp_function_declaration_chunks(text)
+                        if (declaration.start, declaration.end) not in existing_spans
+                    )
                 return chunks
 
     if not TREE_SITTER_AVAILABLE:
@@ -1684,6 +1794,13 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
                 symbol=None,
                 language=language,
             )
+        )
+    if language.lower() == "cpp":
+        existing_spans = {(chunk.start, chunk.end) for chunk in chunks}
+        chunks.extend(
+            declaration
+            for declaration in _cpp_function_declaration_chunks(text)
+            if (declaration.start, declaration.end) not in existing_spans
         )
     return chunks
 
@@ -1780,11 +1897,32 @@ def _code_chunks_regex(text: str, language: str) -> list[Chunk]:
     return chunks
 
 
+# ast-grep has its own grammar registry. Only these languages are admitted to it; anything else
+# (for example "svelte", which the chunker accepts) is skipped before SgRoot is called, because a
+# Rust-side panic in ast-grep-py is a BaseException and is not caught by `except Exception`.
+_AST_GREP_GRAMMARS: dict[str, str] = {
+    "typescript": "typescript",
+    "ts": "typescript",
+    "javascript": "javascript",
+    "js": "javascript",
+    "tsx": "tsx",
+    "python": "python",
+    "py": "python",
+}
+
+
+def _ast_grep_grammar_for(language: str) -> str | None:
+    return _AST_GREP_GRAMMARS.get((language or "").strip().lower())
+
+
 def _code_features_ast_grep(text: str, language: str) -> list[Feature]:
     if not AST_GREP_AVAILABLE:
         return []
+    grammar = _ast_grep_grammar_for(language)
+    if grammar is None:
+        return []
     try:
-        root = SgRoot(text, language).root()  # type: ignore[call-arg]
+        root = SgRoot(text, grammar).root()  # type: ignore[call-arg]
     except Exception:
         return []
 
@@ -1910,6 +2048,48 @@ def _digest_parts(*parts: Any) -> str:
     return hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
 
+def _mint_revision_qualified_tree_node_id(
+    file_path: str,
+    source_revision: str,
+    ast_kind: str,
+    symbol_fqn: str,
+    utf8_start: int,
+    utf8_end: int,
+) -> str:
+    """Single-owner sidecar coordinate digest (canonical_authority=False)."""
+    if not source_revision or source_revision == "unknown":
+        raise ValueError("FAIL_CLOSED: source_revision is required for revision-qualified tree_node_id")
+    raw = f"tn_v1|{file_path}|{source_revision}|{ast_kind}|{symbol_fqn}|{utf8_start}:{utf8_end}".encode("utf-8")
+    return f"tn_v1_{hashlib.sha256(raw).hexdigest()[:32]}"
+
+
+def strict_utf8_to_utf16_offset(source_bytes: bytes, utf8_offset: int) -> int:
+    """Fails closed if utf8_offset slices inside a multi-byte UTF-8 sequence."""
+    if utf8_offset < 0 or utf8_offset > len(source_bytes):
+        raise ValueError(f"UTF-8 offset {utf8_offset} out of bounds (len={len(source_bytes)})")
+    try:
+        prefix = source_bytes[:utf8_offset].decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"UTF-8 offset {utf8_offset} cuts mid-codepoint: {exc}") from exc
+    return len(prefix.encode("utf-16-le")) // 2
+
+
+def mint_sorted_hyperedge_id(
+    source_file: str,
+    source_revision: str,
+    relation_kind: str,
+    member_tree_node_ids: list[str],
+) -> tuple[str, list[str]]:
+    """Sorts member_tree_node_ids first so set membership is order-independent."""
+    if not source_revision or source_revision == "unknown":
+        raise ValueError("FAIL_CLOSED: source_revision is required for revision-qualified hyperedge_id")
+    sorted_members = sorted(set(member_tree_node_ids))
+    if len(sorted_members) < 2:
+        raise ValueError("Hyperedge requires at least 2 distinct member_tree_node_ids")
+    raw = f"he_v1|{source_file}|{source_revision}|{relation_kind}|{'|'.join(sorted_members)}".encode("utf-8")
+    return f"he_v1_{hashlib.sha256(raw).hexdigest()[:32]}", sorted_members
+
+
 def _unique_nonempty(values: list[Any]) -> list[str]:
     return list(dict.fromkeys(str(value).strip() for value in values if str(value).strip()))
 
@@ -1939,13 +2119,18 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
         end = max(start, int(chunk.end))
         line_start = text.encode("utf-8")[:start].count(b"\n") + 1
         line_end = line_start + max(0, chunk.text.count("\n"))
+        tree_node_id = (
+            _mint_revision_qualified_tree_node_id(source_ref, source_revision, chunk.kind, symbol, start, end)
+            if source_revision != "unknown"
+            else _digest_parts(source_ref, source_revision, symbol, start, end, idx)[:24]
+        )
         ast_units.append(
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
                 packet_key=req.packet_key,
-                tree_node_id=_digest_parts(source_ref, symbol, start, end, idx)[:24],
-                symbol_version_id=_digest_parts(source_ref, symbol, structural_revision)[:24],
+                tree_node_id=tree_node_id,
+                symbol_version_id=_digest_parts(source_ref, source_revision, symbol, structural_revision)[:24],
                 language=language or "unknown",
                 node_kind=chunk.kind,
                 qualified_symbol=symbol,
@@ -1972,12 +2157,18 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
         )
 
     if not ast_units:
+        fallback_end = len(text.encode("utf-8"))
+        fallback_tree_node_id = (
+            _mint_revision_qualified_tree_node_id(source_ref, source_revision, "module", "fallback", 0, fallback_end)
+            if source_revision != "unknown"
+            else _digest_parts(source_ref, source_revision, "fallback", language)[:24]
+        )
         ast_units.append(
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
                 packet_key=req.packet_key,
-                tree_node_id=_digest_parts(source_ref, "fallback", language)[:24],
+                tree_node_id=fallback_tree_node_id,
                 symbol_version_id=None,
                 language=language or "unknown",
                 node_kind="module",
@@ -2072,7 +2263,7 @@ def _build_hmm_observations(
     observations: list[HMMObservation] = []
     source_ref = req.source_ref or req.document_id or "unknown"
     source_revision = req.source_revision or "unknown"
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
 
     tokens: list[tuple[str, float, str]] = []
     if chunks:
@@ -2133,7 +2324,7 @@ def _build_event_hypergraph(
     source_ref = req.source_ref
     source_revision = req.source_revision
     workspace_revision = req.workspace_revision
-    observed_at = datetime.utcnow().isoformat() + "Z"
+    observed_at = datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
     packet_key = req.packet_key
 
     events: list[dict[str, Any]] = []
@@ -2597,7 +2788,7 @@ def _build_pass_results(
 
     source_ref = req.source_ref
     source_revision = req.source_revision
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).replace(tzinfo=None).isoformat() + "Z"
     ast_units = _build_ast_units(req, text, chunks, req.language or "unknown") if "structural" in requested else []
     semantic_cards = _build_semantic_cards(req, text, ast_units, entities, features) if "semantic" in requested else []
     observations = _build_hmm_observations(req, text, entities, relationships, chunks, semantic_cards) if "sequence" in requested else []
@@ -3052,7 +3243,7 @@ def _symbol_graph_evidence(source: str, language: str, file_path: str) -> tuple[
     if not callable(extractor):
         return [], ["treesitter-chunker symbol_graph API unavailable; edge evidence omitted"]
 
-    suffix = ".tsx" if language.lower() in {"tsx", "typescriptreact"} else ".ts"
+    suffix = _suffix_for_language(language)
     temp_path: Optional[str] = None
     try:
         with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, encoding="utf-8", delete=False) as handle:
@@ -3099,6 +3290,18 @@ _AST_LANGUAGE_EXTENSIONS: dict[str, str] = {
     ".ts": "typescript", ".tsx": "tsx", ".mts": "typescript", ".cts": "typescript",
     ".js": "javascript", ".jsx": "javascript", ".mjs": "javascript", ".cjs": "javascript",
     ".py": "python", ".pyi": "python", ".rs": "rust", ".go": "go", ".java": "java",
+    ".svelte": "svelte",
+    ".sql": "sql",
+    ".ps1": "powershell", ".psm1": "powershell", ".psd1": "powershell",
+    ".proto": "proto",
+    ".sh": "bash", ".bash": "bash",
+    ".yaml": "yaml", ".yml": "yaml",
+    ".cmake": "cmake",
+    ".lua": "lua",
+    ".comp": "glsl", ".glsl": "glsl",
+    ".c": "c",
+    ".cc": "cpp", ".cpp": "cpp", ".cxx": "cpp", ".hh": "cpp", ".hpp": "cpp", ".cu": "cpp",
+    ".toml": "toml",
 }
 
 
@@ -3109,9 +3312,10 @@ def _resolve_ast_language(language: str, file_path: str) -> tuple[str, Optional[
     if requested not in supported and requested not in {"typescriptreact", "javascriptreact"}:
         return requested, f"UnsupportedLanguageError: unsupported language '{language}' for '{file_path}'"
     extension_language = _AST_LANGUAGE_EXTENSIONS.get(suffix)
+    ambiguous_c_header = suffix == ".h" and requested in {"c", "cpp"}
     if extension_language and requested not in {extension_language, "typescriptreact", "javascriptreact"}:
         return requested, f"UnsupportedLanguageError: extension '{suffix}' does not match language '{language}'"
-    if suffix and suffix not in _AST_LANGUAGE_EXTENSIONS:
+    if suffix and suffix not in _AST_LANGUAGE_EXTENSIONS and not ambiguous_c_header:
         return requested, f"UnsupportedLanguageError: unsupported file extension '{suffix}'"
     return requested, None
 
@@ -3132,6 +3336,8 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
             diagnostics=[language_error],
             error_tag="UnsupportedLanguageError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            scan_completeness="INCOMPLETE",
+            scan_failure="UNSUPPORTED_LANGUAGE",
         )
     if not TREESITTER_CHUNKER_AVAILABLE:
         diagnostics.append("treesitter-chunker is unavailable; no replacement evidence was produced")
@@ -3147,13 +3353,19 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
             diagnostics=diagnostics,
             error_tag="ChunkingError",
             syntax_status="RECOVERED_WITH_ERRORS",
+            scan_completeness="INCOMPLETE",
+            scan_failure="PARSER_UNAVAILABLE",
         )
 
+    scan_completeness: Literal["COMPLETE", "INCOMPLETE"] = "COMPLETE"
+    scan_failure: Optional[str] = None
     try:
         chunks = _code_chunks_tree_sitter(req.source, language)
     except Exception as exc:
         diagnostics.append(f"ChunkingError: treesitter-chunker extraction failed: {exc}")
         chunks = []
+        scan_completeness = "INCOMPLETE"
+        scan_failure = "CHUNK_EXTRACTION_FAILED"
 
     diagnostics.extend(_syntax_diagnostics(req.source, language))
 
@@ -3317,6 +3529,8 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
         diagnostics=diagnostics,
         error_tag="ChunkingError" if fatal_diagnostics else None,
         syntax_status="RECOVERED_WITH_ERRORS" if fatal_diagnostics else "CLEAN",
+        scan_completeness=scan_completeness,
+        scan_failure=scan_failure,
     )
 
 

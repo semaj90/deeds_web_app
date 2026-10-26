@@ -15,14 +15,14 @@ Options:
   --limit N          Max packets to process (default: 50)
   --batch-size N     Packets per commit batch (default: 10)
   --passes N         LangExtract extraction passes per packet (default: 1)
-  --model MODEL      Ollama model to use (default: gemma4-rotorquant:latest)
+  --model MODEL      Ollama model to use (default: ornith-1.5-9b)
   --skip-empty       Skip packets with no summary (default: True)
   --verbose          Log each entity as it is extracted
 
 Requirements:
   - Python 3.12+ in Miniforge WSL2 sidecar (pip install langextract psycopg2-binary python-dotenv tqdm)
   - Postgres running on port 5434 (docker start legal-ai-postgres)
-  - llama-server (TurboQuant) running on port 8090 with gemma4-legal-iq4xs-direct.gguf
+  - llama-server (TurboQuant) running on port 8090 with ornith-1.5-9b
   - (.tmp directory for JSON progress events)
 
 Progress Reporting (Level 1 — Python tqdm):
@@ -100,7 +100,7 @@ PG_PASS     = os.getenv('PGPASSWORD', os.getenv('DB_PASSWORD', '123456'))
 # Override only with LANGEXTRACT_GEMMA4_URL so shared GEMMA4_URL envs do not
 # accidentally redirect this step to the benchmark lane.
 LLAMA_URL   = os.getenv('LANGEXTRACT_GEMMA4_URL', 'http://127.0.0.1:8090').rstrip('/')
-DEFAULT_MODEL = os.getenv('LANGEXTRACT_MODEL', 'gemma4-legal-iq4xs-direct.gguf')
+DEFAULT_MODEL = os.getenv('LANGEXTRACT_MODEL', 'ornith-1.5-9b')
 
 # ── Legal extraction prompt ────────────────────────────────────────────────────
 LEGAL_PROMPT = textwrap.dedent("""\

@@ -8,9 +8,9 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	// Check Ollama
 	try {
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const { embedOrChatFetch } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
-		const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
+		const res = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
 			signal: AbortSignal.timeout(3000)
 		});
 		services.ollama = { status: res.ok ? 'connected' : 'error' };

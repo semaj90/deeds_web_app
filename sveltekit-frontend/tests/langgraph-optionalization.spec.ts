@@ -86,7 +86,8 @@ describe('DispatcherMiddleware LangGraph Optionalization', () => {
       const result = await wrapped({ query: 'test' });
 
       expect(result).toEqual({ success: true, data: 'test result' });
-      expect(toolHandler).toHaveBeenCalledWith({ query: 'test' });
+      // Handler receives (input, executionContext); the input is the first argument.
+      expect(toolHandler.mock.calls[0][0]).toEqual({ query: 'test' });
     });
 
     it('should create a NoOpLangGraphBridge when langgraphBridge is null', () => {

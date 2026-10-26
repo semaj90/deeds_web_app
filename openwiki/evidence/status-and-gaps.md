@@ -3,9 +3,6 @@ type: evidence ledger
 title: Evidence Status and Known Gaps
 description: Repository-specific ledger separating proven packet and retrieval behavior from experimental lanes, blocked migrations, proposed registry contracts, and unknown live-state questions. It records contradictions without treating plans or generated reports as implementation proof.
 tags: [evidence, packet-registry, provenance, architecture, operations, gaps]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-07T02:11:06.802Z
 ---
 
 # Evidence Status and Known Gaps

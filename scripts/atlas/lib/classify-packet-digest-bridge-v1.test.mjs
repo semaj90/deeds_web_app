@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   classifyPacketDigestBridgeRow,
+  classifyPacketDigestBridgeRows,
   resolveCanonicalPacketIdentity,
 } from './classify-packet-digest-bridge-v1.mjs';
 
@@ -58,4 +59,59 @@ test('packet identity comes from the canonical row', () => {
     packetKey: 'packet:canonical',
     candidates: ['packet:canonical'],
   });
+});
+
+test('repeated joined rows for one packet remain a unique packet identity', () => {
+  const rows = [
+    { source_ref: 'src/a.ts', workspace_revision: 'sha256:workspace', member_content_hash: digest,
+      packet_key: 'packet:a', packet_content_hash: digest, packet_source_revision: digest },
+    { source_ref: 'src/a.ts', workspace_revision: 'sha256:workspace', member_content_hash: digest,
+      packet_key: 'packet:a', packet_content_hash: digest, packet_source_revision: digest },
+  ];
+  const [result] = classifyPacketDigestBridgeRows(rows);
+  assert.equal(result.classification, 'CANONICAL_CONTENT_DIGEST_MATCH');
+  assert.equal(result.packetKey, 'packet:a');
+});
+
+test('conflicting canonical packet rows fail closed independent of row order', () => {
+  const rows = [digest, 'sha256:' + 'b'.repeat(64)].map((packetContentHash) => ({
+    source_ref: 'src/a.ts', workspace_revision: 'sha256:workspace', member_content_hash: digest,
+    packet_key: 'packet:a', packet_content_hash: packetContentHash, packet_source_revision: digest,
+  }));
+  for (const candidates of [rows, [...rows].reverse()]) {
+    const [result] = classifyPacketDigestBridgeRows(candidates);
+    assert.equal(result.classification, 'PACKET_CANONICAL_ROW_CONFLICT');
+    assert.equal(result.promotionEligible, false);
+  }
+});
+
+test('multiple canonical packet keys for one source are ambiguous and non-promotable', () => {
+  const rows = ['packet:a', 'packet:b'].map((packetKey) => ({
+    source_ref: 'src/a.ts', workspace_revision: 'sha256:workspace', member_content_hash: digest,
+    packet_key: packetKey, packet_content_hash: digest, packet_source_revision: digest,
+  }));
+  const [result] = classifyPacketDigestBridgeRows(rows);
+  assert.equal(result.classification, 'PACKET_IDENTITY_AMBIGUOUS');
+  assert.equal(result.packetKey, null);
+  assert.deepEqual(result.packetCandidates, ['packet:a', 'packet:b']);
+  assert.equal(result.promotionEligible, false);
+});
+
+test('source/workspace cohorts are never collapsed into one digest result', () => {
+  const rows = ['sha256:workspace-a', 'sha256:workspace-b'].map((workspaceRevision) => ({
+    source_ref: 'src/a.ts', workspace_revision: workspaceRevision, member_content_hash: digest,
+    packet_key: 'packet:a', packet_content_hash: digest, packet_source_revision: digest,
+  }));
+  assert.equal(classifyPacketDigestBridgeRows(rows).length, 2);
+});
+
+test('different source revisions remain separate even for the same source bytes', () => {
+  const rows = ['sha256:revision-a', 'sha256:revision-b'].map((codeSourceRevision) => ({
+    source_ref: 'src/a.ts', workspace_revision: 'sha256:workspace', code_source_revision: codeSourceRevision,
+    member_content_hash: digest, packet_key: 'packet:a', packet_content_hash: digest,
+    packet_source_revision: digest,
+  }));
+  const results = classifyPacketDigestBridgeRows(rows);
+  assert.equal(results.length, 2);
+  assert.deepEqual(results.map((result) => result.codeSourceRevision), ['sha256:revision-a', 'sha256:revision-b']);
 });

@@ -134,7 +134,8 @@ import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js
 import { eq, desc, sql as drizzleSql } from 'drizzle-orm';
 import { getLlmOutputHitsBulk, recordLlmOutputHit } from '$lib/server/cache/code-llm-index.js';
 import { getRedis } from '$lib/server/redis.js';
-import { aceTopkKey, type BifrostRetrievalCacheIdentityV3, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
+import { acePromptBundleKeyV2, aceTopkKey, type BifrostRetrievalCacheIdentityV3, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
+import { canonicalSha256V1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
 import { persistRevisionedAceTopRetrievalCache } from '$lib/server/cache/ace-top-retrieval-cache.js';
 import {
   normalizeTelemetrySourceRefs,
@@ -405,10 +406,43 @@ async function buildTopologicalKagPromptBlock(query: string, context: ACEContext
     return '';
   }
 
-  const scope = JSON.stringify({
-    files: topFiles.map((f) => f.stableKey ?? f.filePath).slice(0, 6),
-    clusters: clusters.map((c) => c.clusterKey ?? c.clusterId).slice(0, 3),
+  const fileLines = topFiles.map((f, i) => {
+    const topo = [
+      f.topoClass ? `topo=${f.topoClass}` : '',
+      f.gpuCluster != null ? `cluster=${f.gpuCluster}` : '',
+      f.somBmuRow != null && f.somBmuCol != null ? `SOM(${f.somBmuRow},${f.somBmuCol})` : '',
+      f.pageRankScore != null ? `PR=${f.pageRankScore.toFixed(2)}` : '',
+      f.graphAuthorityScore != null ? `auth=${f.graphAuthorityScore.toFixed(2)}` : '',
+    ]
+      .filter(Boolean)
+      .join(', ');
+    return `${i + 1}. ${f.filePath}${topo ? ` [${topo}]` : ''}`;
+  });
+
+  const clusterLines = clusters.map((c) => {
+    const domains = c.topoClasses?.slice(0, 3).join(', ') || c.topoClass || 'unknown';
+    const tags = c.topTags?.slice(0, 6).join(', ') || 'none';
+    return `- ${c.clusterKey ?? `cluster:gpu:${c.clusterId}`} [${domains}] tags=${tags}`;
+  });
+
+  const laneLine = context.multiLane
+    ? `Lanes hit: ${lanes.length ? lanes.join(', ') : 'none'}; top files: ${context.multiLane.topFiles.slice(0, 5).join(', ') || 'none'}`
+    : '';
+  const scope = buildTopologicalKagCacheScopeV1({
+    files: fileLines,
+    fileGraphBindings: topFiles.map((f) => ({
+      key: f.stableKey ?? f.filePath,
+      packetKey: f.packetKey ?? null,
+      sourceRef: f.sourceRef ?? null,
+      sourceRevision: f.sourceRevision ?? null,
+      workspaceRevision: f.workspaceRevision ?? null,
+      graphRevision: f.graphRevision ?? null,
+      projectionRevision: f.projectionRevision ?? null,
+      neighborhoodHash: f.neighborhoodHash ?? null,
+    })),
+    clusters: clusterLines,
     lanes,
+    laneTopFiles: context.multiLane?.topFiles.slice(0, 5) ?? [],
     agentsScope,
   });
   const cacheKey = aceTopologicalKagKey.forPrompt(query, scope);
@@ -419,29 +453,6 @@ async function buildTopologicalKagPromptBlock(query: string, context: ACEContext
     if (cached) {
       return `${cached}\n_Source: Redis KV cache \`${cacheKey}\`_`;
     }
-
-    const fileLines = topFiles.map((f, i) => {
-      const topo = [
-        f.topoClass ? `topo=${f.topoClass}` : '',
-        f.gpuCluster != null ? `cluster=${f.gpuCluster}` : '',
-        f.somBmuRow != null && f.somBmuCol != null ? `SOM(${f.somBmuRow},${f.somBmuCol})` : '',
-        f.pageRankScore != null ? `PR=${f.pageRankScore.toFixed(2)}` : '',
-        f.graphAuthorityScore != null ? `auth=${f.graphAuthorityScore.toFixed(2)}` : '',
-      ]
-        .filter(Boolean)
-        .join(', ');
-      return `${i + 1}. ${f.filePath}${topo ? ` [${topo}]` : ''}`;
-    });
-
-    const clusterLines = clusters.map((c) => {
-      const domains = c.topoClasses?.slice(0, 3).join(', ') || c.topoClass || 'unknown';
-      const tags = c.topTags?.slice(0, 6).join(', ') || 'none';
-      return `- ${c.clusterKey ?? `cluster:gpu:${c.clusterId}`} [${domains}] tags=${tags}`;
-    });
-
-    const laneLine = context.multiLane
-      ? `Lanes hit: ${lanes.length ? lanes.join(', ') : 'none'}; top files: ${context.multiLane.topFiles.slice(0, 5).join(', ') || 'none'}`
-      : '';
 
     const block = [
       '## Topological KAG Prompt Injection',
@@ -459,6 +470,45 @@ async function buildTopologicalKagPromptBlock(query: string, context: ACEContext
   } catch {
     return '';
   }
+}
+
+export function buildTopologicalKagCacheScopeV1(input: {
+  files: string[];
+  fileGraphBindings: Array<{
+    key: string;
+    packetKey: string | null;
+    sourceRef: string | null;
+    sourceRevision: string | null;
+    workspaceRevision: string | null;
+    graphRevision: string | null;
+    projectionRevision: string | null;
+    neighborhoodHash: string | null;
+  }>;
+  clusters: string[];
+  lanes: string[];
+  laneTopFiles: string[];
+  agentsScope: string;
+}): string {
+  return JSON.stringify(input);
+}
+
+export function readAceCacheProjectionIdentityV1(input: Record<string, unknown>): {
+  packetKey: string | null;
+  sourceRef: string | null;
+  sourceRevision: string | null;
+  workspaceRevision: string | null;
+} {
+  const readString = (snakeCase: string, camelCase: string): string | null => {
+    const value = input[snakeCase] ?? input[camelCase];
+    return typeof value === 'string' ? value : null;
+  };
+
+  return {
+    packetKey: readString('packet_key', 'packetKey'),
+    sourceRef: readString('source_ref', 'sourceRef'),
+    sourceRevision: readString('source_revision', 'sourceRevision'),
+    workspaceRevision: readString('workspace_revision', 'workspaceRevision'),
+  };
 }
 
 /**
@@ -508,7 +558,7 @@ async function fetchWebResearchRows(
       SELECT url, title, snippet, relevance_score,
              1 - (embedding <=> ${JSON.stringify(Array.from(vec))}::vector) AS score
       FROM web_search_index
-      ORDER BY embedding <=> ${JSON.stringify(Array.from(vec))}::vector
+      ORDER BY embedding <=> ${JSON.stringify(Array.from(vec))}::vector ASC, url ASC
       LIMIT ${limit}
     `);
     const data = Array.isArray((rows as unknown as { rows?: unknown[] }).rows)
@@ -1526,6 +1576,8 @@ export async function assembleACEContext(opts: {
   includeResearch?: boolean;
   sectionTypes?: string[];
   modelName?: string;
+  modelRevision?: string | null;
+  adapterRevision?: string | null;
   modelQuant?: string;
   kvQuant?: string;
   draftModel?: boolean;
@@ -1575,7 +1627,6 @@ export async function assembleACEContext(opts: {
   if (opts.mode === 'parent_atlas' || (opts.enableCodebaseContext && /\b(redis|valkey|qdrant|som|ace|bifrost|query router|codebase|indexing|nes|chrom|parent atlas|mapping|card)\b/i.test(opts.query))) {
     try {
       const { routeQuery } = await import('../../../ace/query-router.js');
-      const { BifrostCacheManager } = await import('$lib/server/ai/bifrost-cache-manager.js');
 
       // Identity path: caller knows the specific file — try NES card lookup first (O(1) Redis).
       // Falls through to freetext routeQuery on miss.
@@ -1612,6 +1663,7 @@ export async function assembleACEContext(opts: {
         filePath: String(c.source_ref ?? ''),
         content: String(c.snippet ?? ''),
         score: Number(c.score ?? 0),
+        ...readAceCacheProjectionIdentityV1(c),
         gpuCluster: packet.cluster_id ? parseInt(packet.cluster_id.split(':')[0], 10) : null,
         tags: [] as string[],
         featureId: String(c.feature_id ?? ''),
@@ -1793,26 +1845,26 @@ export async function assembleACEContext(opts: {
         };
         const resolveSomClusterFromSourceRefs = async (refs: string[]) => {
           if (!refs.length) return '';
-          const somRows = await pgPool.query<{ som_cluster: number | null }>(
-            `SELECT som_cluster
+          const somRows = await pgPool.query<{ centroid_id: string | null }>(
+            `SELECT centroid_id
                FROM parent_atlas_documents
               WHERE source_ref = ANY($1::text[])
-                AND som_cluster IS NOT NULL
+                AND centroid_id IS NOT NULL
               ORDER BY source_ref
               LIMIT 1`,
             [refs]
-          ).catch(() => ({ rows: [] as Array<{ som_cluster: number | null }> }));
-          const som = somRows.rows[0]?.som_cluster;
+          );
+          const som = somRows.rows[0]?.centroid_id;
           if (som != null) return String(som);
           const atlasRows = await pgPool.query<{ som_cluster: string | number | null }>(
             `SELECT som_cluster
-               FROM atlas_feature_map
+               FROM atlas_packets
               WHERE source_ref = ANY($1::text[])
                 AND som_cluster IS NOT NULL
               ORDER BY source_ref
               LIMIT 1`,
             [refs]
-          ).catch(() => ({ rows: [] as Array<{ som_cluster: string | number | null }> }));
+          );
           const atlasSom = atlasRows.rows[0]?.som_cluster;
           return atlasSom != null ? String(atlasSom) : '';
         };
@@ -1986,6 +2038,8 @@ export async function assembleACEContext(opts: {
         persona: opts.persona,
         tokenAwarePacking: opts.tokenAwarePacking,
         modelName: opts.modelName,
+        modelRevision: opts.modelRevision,
+        adapterRevision: opts.adapterRevision,
         modelQuant: opts.modelQuant,
         kvQuant: opts.kvQuant,
         draftModel: opts.draftModel,
@@ -1997,6 +2051,7 @@ export async function assembleACEContext(opts: {
         corpusHash: opts.corpusHash,
         ragBundleHash: opts.ragBundleHash,
         graphSnapshotHash: opts.graphSnapshotHash,
+        retrievalCacheIdentity: opts.retrievalCacheIdentity,
       });
       const acePlannerHit = await loadAceContextPlannerHit(acePlannerState).catch(() => null);
 
@@ -2630,7 +2685,7 @@ export async function assembleACEContext(opts: {
         hit: Boolean(acePlannerHit),
         source: acePlannerHit?.meta.source ?? 'miss',
         cacheKey: acePlannerState.cacheKey,
-        contextHash: acePlannerState.cacheKey.replace(/^ace:context:/, ''),
+        contextHash: acePlannerState.cacheKey?.replace(/^ace:context:/, '') ?? null,
         deltaFields: acePlannerHit?.meta.deltaFields ?? [],
         retrievalModeHash: acePlannerState.retrievalModeHash,
         sectionTypesHash: acePlannerState.sectionTypesHash,
@@ -3893,9 +3948,6 @@ export async function assembleACEContext(opts: {
           // the most up-to-date aggregate (fallback to global Karpathy aggregate
           // when file-level links are missing).
           try {
-            const { getAuthorityForContext } = await import(
-              '$lib/server/graph/karpathy-authority.js'
-            );
             const authority = await getAuthorityForContext(finalContext).catch(() => ({
               score: 0,
               source: 'gpu',
@@ -3908,7 +3960,7 @@ export async function assembleACEContext(opts: {
           const packId = `pack:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
           const acePack = buildAceContextPack({
             id: packId,
-            contextId: acePlannerState.cacheKey,
+            contextId: acePlannerState.cacheKey ?? packId,
             createdAt: new Date().toISOString(),
             summary: (finalContext as any).summary ?? packet.contextMarkdown?.slice(0, 200) ?? '',
             chunkIds: (codebaseContext ?? []).map((c) => c.filePath).filter(Boolean),
@@ -3920,7 +3972,9 @@ export async function assembleACEContext(opts: {
             },
             authority: (finalContext as any).authority ?? undefined,
           });
-          void setAceContextPackPointer(acePlannerState.cacheKey, acePack).catch(() => {});
+          if (acePlannerState.cacheKey) {
+            void setAceContextPackPointer(acePlannerState.cacheKey, acePack).catch(() => {});
+          }
           // Revisioned BitFrost admission is deliberately opt-in and strict.
           // The legacy pointer remains for compatibility, but it is not used
           // as a substitute when a complete ContextManifestV2 is unavailable.
@@ -3942,7 +3996,7 @@ export async function assembleACEContext(opts: {
             const { intentSynthesis } = await import('$lib/server/db/schema-postgres.js');
             const synthRow = {
               queryHash: qHash,
-              contextPackKey: acePlannerState.cacheKey,
+              contextPackKey: acePlannerState.cacheKey ?? packId,
               authority: (finalContext as any).authority ?? null,
               sourceRefs: ((finalContext as any).sourceRefs ?? []) as string[],
               chunkIds: (codebaseContext ?? []).map((c: any) => c.filePath).filter(Boolean),
@@ -4061,7 +4115,7 @@ export async function assembleACEContext(opts: {
                   directoryKagCount: (directoryKagContext ?? []).length,
                 },
                 lane: 'ace_context',
-                model: (packet as any).model ?? 'gemma4-rotorquant:latest',
+                model: (packet as any).model ?? 'ornith-1.5-9b',
                 tokenBudget: packet.tokenBudget?.estimatedInputTokens ?? null,
               },
               packetHits
@@ -4077,7 +4131,7 @@ export async function assembleACEContext(opts: {
           hit: Boolean(acePlannerHit),
           source: acePlannerHit?.meta.source ?? 'miss',
           cacheKey: acePlannerState.cacheKey,
-          contextHash: acePlannerState.cacheKey.replace(/^ace:context:/, ''),
+          contextHash: acePlannerState.cacheKey?.replace(/^ace:context:/, '') ?? null,
           deltaFields: acePlannerHit?.meta.deltaFields ?? [],
           retrievalModeHash: acePlannerState.retrievalModeHash,
           sectionTypesHash: acePlannerState.sectionTypesHash,
@@ -4171,26 +4225,26 @@ export async function assembleACEContext(opts: {
         let telemetrySomCluster = String(_p.som_cluster ?? '');
         if (!telemetrySomCluster && telemetrySourceRefs.length > 0) {
           telemetrySomCluster = await (async () => {
-            const somRows = await pgPool.query<{ som_cluster: number | null }>(
-              `SELECT som_cluster
+            const somRows = await pgPool.query<{ centroid_id: string | null }>(
+              `SELECT centroid_id
                  FROM parent_atlas_documents
                 WHERE source_ref = ANY($1::text[])
-                  AND som_cluster IS NOT NULL
+                  AND centroid_id IS NOT NULL
                 ORDER BY source_ref
                 LIMIT 1`,
               [telemetrySourceRefs]
-            ).catch(() => ({ rows: [] as Array<{ som_cluster: number | null }> }));
-            const som = somRows.rows[0]?.som_cluster;
+            );
+            const som = somRows.rows[0]?.centroid_id;
             if (som != null) return String(som);
             const atlasRows = await pgPool.query<{ som_cluster: string | number | null }>(
               `SELECT som_cluster
-                 FROM atlas_feature_map
+                 FROM atlas_packets
                 WHERE source_ref = ANY($1::text[])
                   AND som_cluster IS NOT NULL
                 ORDER BY source_ref
                 LIMIT 1`,
               [telemetrySourceRefs]
-            ).catch(() => ({ rows: [] as Array<{ som_cluster: string | number | null }> }));
+            );
             const atlasSom = atlasRows.rows[0]?.som_cluster;
             return atlasSom != null ? String(atlasSom) : '';
           })();
@@ -4302,21 +4356,21 @@ export async function assembleACEContext(opts: {
 
       // Extract packet/feature IDs from top results
       const acePayloads = Array.isArray(finalContext.acePayloads) ? finalContext.acePayloads : [];
-      const { selectedPacketKey, selectedFeatureId, featureIds: emittedFeatureIds } =
+      const { selectedPacketKey, selectedPacketKeys, selectedFeatureId, featureIds: emittedFeatureIds, packetContext } =
         extractPacketAndFeatureIds(acePayloads.slice(0, 5) as any);
 
       // Phase 2: Extract SOM cell and other packet context from top candidate
-      const topCandidate = (acePayloads[0] as any) ?? {};
-      const somCell = topCandidate.som_cluster ?? topCandidate.som_cell ?? null;
+      const somCell = packetContext.som_cell ?? null;
 
       // Emit telemetry asynchronously (includes Phase 2 packet-centric context)
       recordACERetrievalTelemetry({
+        traceId: opts.traceId,
         query,
         vectorHits: codebaseContextCount,
         trigramHits: ragChunkCount,
         ftsHits: kbChunkCount,
         selectedPacketKey,
-        selectedPacketKeys: selectedPacketKey ? [selectedPacketKey] : [],
+        selectedPacketKeys,
         selectedFeatureId,
         featureIds: emittedFeatureIds,
         fusionScore: undefined,
@@ -4328,11 +4382,7 @@ export async function assembleACEContext(opts: {
         fromParentAtlas: opts.mode === 'parent_atlas',
         // Phase 2: Packet-centric context (8 mandatory fields)
         somCell,
-        schemaVersion: 1,
-        embeddingVersion: 'embeddinggemma:latest',
-        toolVersion: 'mcp:1.0',
-        gpuKernelVersion: (process.env.TENSORRT_BRIDGE_VERSION ?? 'tensorrt_bridge:1.0'),
-        rpcTransport: 'jsonrpc',
+        packetContext,
       }).catch(() => {
         // Telemetry failure is non-fatal
       });
@@ -4645,65 +4695,6 @@ export async function fetchCachedACEChunks(
   }
 }
 
-/**
- * Compute a stable fingerprint of the ACE context for cache keying.
- * Changes when any meaningful input changes (new chunks, neighbors, history, etc.).
- */
-function computeContextFingerprint(context: ACEContext, query: string): string {
-  const codebaseLabelSignature = (context.codebaseContext ?? [])
-    .slice(0, 3)
-    .map((c) =>
-      [
-        c.filePath ?? '',
-        c.clusterKey ?? '',
-        c.centroidLabel ?? '',
-        c.topologyLabel ?? c.topoClass ?? '',
-        c.hotnessBucket ?? '',
-        c.featureFamily ?? '',
-      ].join(':')
-    )
-    .join('|');
-
-  const clusterLabelSignature = (context.clusterContext ?? [])
-    .slice(0, 3)
-    .map((c) =>
-      [
-        c.clusterKey ?? '',
-        c.centroidLabel ?? '',
-        c.topoLabel ?? '',
-        c.hotnessBucket ?? '',
-        c.featureFamily ?? '',
-      ].join(':')
-    )
-    .join('|');
-
-  const parts = [
-    query.slice(0, 80),
-    context.caseContext?.slice(0, 40) ?? '',
-    String(context.ragChunks.length),
-    context.ragChunks[0]?.score.toFixed(3) ?? '0',
-    String(context.kbChunks?.length ?? 0),
-    String(context.caseChunks?.length ?? 0),
-    String(context.kagNeighbors.length),
-    String(context.chatHistory.length),
-    context.chatHistory.at(-1)?.content.slice(0, 30) ?? '',
-    String(context.evidenceMetadata?.length ?? 0),
-    String(context.evidenceConnections?.length ?? 0),
-    String(context.glossaryMatches?.length ?? 0),
-    context.persona ?? 'neutral',
-    codebaseLabelSignature,
-    clusterLabelSignature,
-  ];
-  // Fast non-crypto hash (FNV-1a 32-bit)
-  let h = 0x811c9dc5;
-  const s = parts.join('|');
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return (h >>> 0).toString(36);
-}
-
 /** Try Redis for a cached ACE prompt bundle. */
 async function getCachedACEBundle(key: string): Promise<ACEPrompt | null> {
   return traceCache('ace-prompt-get', { key }, async () => {
@@ -4769,7 +4760,7 @@ function buildACEContextWeightsBlock(
 
 /**
  * Build ACE prompt with Redis caching (Stage 4 — ace_context_bundle).
- * Returns cached prompt if context fingerprint hasn't changed (24h TTL).
+ * Returns cached prompt only for an exact rendered prompt and source identity (24h TTL).
  * Falls through to sync buildACEPrompt() on cache miss.
  */
 export async function buildACEPromptCached(
@@ -4805,23 +4796,28 @@ export async function buildACEPromptCached(
     // non-fatal
   }
 
-  const fingerprint = computeContextFingerprint(context, query);
-  const cacheKey = bundleCacheKey('ace', fingerprint);
+  if (statsOut?.attention_weights?.length) {
+    (context as unknown as Record<string, unknown>).__attentionWeights = statsOut.attention_weights;
+  }
+  const prompt = buildACEPrompt(context, query);
+  const promptChecksum = `sha256:${canonicalSha256V1(prompt)}`;
+  const sourceIdentityChecksum = `sha256:${canonicalSha256V1((context.codebaseContext ?? []).map((candidate) => ({
+    packetKey: candidate.packetKey ?? null,
+    sourceRef: candidate.sourceRef ?? null,
+    sourceRevision: candidate.sourceRevision ?? null,
+    workspaceRevision: candidate.workspaceRevision ?? null,
+  })))}`;
+  const cacheKey = acePromptBundleKeyV2({ promptChecksum, sourceIdentityChecksum });
 
   const cached = await getCachedACEBundle(cacheKey);
   if (cached) {
-    console.log(`[ACE Prompt] bundle cache HIT (key: ${fingerprint})`);
+    console.log(`[ACE Prompt] bundle cache HIT (key: ${cacheKey.slice(-12)})`);
     if (statsOut) {
       statsOut.packet_hit = true;
     }
     return cached;
   }
 
-  if (statsOut?.attention_weights?.length) {
-    (context as unknown as Record<string, unknown>).__attentionWeights = statsOut.attention_weights;
-  }
-
-  const prompt = buildACEPrompt(context, query);
   let acePacketTokens = countTokens(prompt.systemPrompt);
   const chunkCount =
     (context.ragChunks?.length ?? 0) +
@@ -5400,7 +5396,7 @@ export async function fetchGlossaryMatches(query: string): Promise<ACEContext['g
                FROM legal_glossary
                WHERE embedding IS NOT NULL
                  AND 1 - (embedding <=> $1::vector) > 0.4
-               ORDER BY embedding <=> $1::vector
+               ORDER BY embedding <=> $1::vector ASC, id ASC
                LIMIT 4`,
               [vecStr]
             );
@@ -6968,6 +6964,7 @@ export async function fetchCodebaseContext(
       filePath: String(r.chunk.path ?? r.chunk.relativePath ?? 'unknown'),
       content: String(r.chunk.content ?? ''),
       score: scoreOverride ?? r.score,
+      ...readAceCacheProjectionIdentityV1(r.chunk as Record<string, unknown>),
       lineStart: typeof r.chunk.lineStart === 'number' ? r.chunk.lineStart : undefined,
       lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
       tags: Array.isArray(r.chunk.tags) ? (r.chunk.tags as string[]) : undefined,

@@ -1,13 +1,13 @@
 {
   "schema": "atlas.graphify.ast-owner-trace.v1",
-  "generatedAt": "2026-08-14T16:26:33.794Z",
+  "generatedAt": "2026-10-19T06:56:50.010Z",
   "graphifyDaily": {
     "command": "node ../scripts/startup/run-graphify-daily-startup.mjs",
-    "chain": "npm run graphify:dedup-validation:apply && npm run graphify:materialize:apply && node ../scripts/atlas/daily-graphify-cold-processing.mjs && npm run atlas:phase8:fanout:apply && npm run atlas:qdrant:tag-mirror:apply && npm run atlas:qdrant:feature-map-sync:apply",
-    "invokesExistingAstFactsMaterializer": false
+    "chain": "npm run atlas:graphify:daily:admission && npm run atlas:ast:facts:apply && npm run graphify:dedup-validation:apply && npm run graphify:materialize:apply && node ../scripts/atlas/daily-graphify-cold-processing.mjs && npm run atlas:phase8:fanout:apply && npm run atlas:qdrant:tag-mirror:apply && npm run atlas:qdrant:feature-map-sync:apply && node ../scripts/atlas/graphify-daily-ace-packet-step-v1.mjs && npm run graphify:daily:embed-coverage",
+    "invokesExistingAstFactsMaterializer": true
   },
   "existingAstMaterializer": {
-    "packageScript": "node ../scripts/atlas/ast-treesitter-facts.mjs --apply --batch 200",
+    "packageScript": "node scripts/atlas/ast-treesitter-facts.mjs --apply --batch 200",
     "path": "sveltekit-frontend/scripts/atlas/ast-treesitter-facts.mjs",
     "present": true
   },
@@ -15,12 +15,13 @@
     "webTreeSitterFacts": true,
     "analysisBridge": true,
     "sidecarClient": true,
-    "legacyExtractor": true
+    "legacyExtractor": true,
+    "sidecar8095GraphIndexer": true
   },
-  "canonicalOwnerStatus": "UNRESOLVED",
+  "canonicalOwnerStatus": "IDENTIFIED",
   "replacementWiringStatus": "NOT_WIRED",
   "fallbackPolicyStatus": "NOT_DEFINED",
   "productionReceiptStatus": "NOT_WIRED",
-  "status": "OWNER_SELECTION_BLOCKED",
-  "conclusion": "graphify:daily does not invoke the existing AST facts materializer or the 8095 replacement; select one canonical owner before wiring a replacement."
+  "status": "OWNER_TRACE_PASS",
+  "conclusion": "The existing AST facts materializer is reachable from graphify:daily; replacement insertion can be evaluated at that boundary."
 }

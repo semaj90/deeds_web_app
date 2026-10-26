@@ -69,6 +69,25 @@ function fixture() {
   const providers: CanonicalShadowProvidersV1 = {
     loadSnapshot: async () => providerSnapshot,
     readSource: async () => sourceBytes,
+    verifySourceBinding: async (candidate, sourceText) => {
+      const submittedBytes = new TextEncoder().encode(sourceText);
+      const content = {
+        schema: 'atlas.grounded-extraction-source-binding-receipt.v1' as const,
+        status: 'VERIFIED_SOURCE_BINDING' as const,
+        canonicalPacketKey: candidate.packetKey,
+        storagePacketKey: candidate.packetKey,
+        packetResolutionSource: 'V2_DIRECT' as const,
+        sourceRef: candidate.sourceRef,
+        sourceRevision: candidate.sourceRevision,
+        workspaceRevision: candidate.workspaceRevision,
+        sourceBindingChecksum: `sha256:${'b'.repeat(64)}`,
+        submittedTextChecksum: `sha256:${sha256(submittedBytes)}`,
+        byteLength: submittedBytes.byteLength,
+        canonicalAuthority: false as const,
+        writesPerformed: false as const,
+      };
+      return { ...content, checksum: `sha256:${sha256(new TextEncoder().encode(JSON.stringify(content)))}` };
+    },
     loadProfile: async () => profile,
     loadSupplement: async () => ({
       packetKey: 'packet:one',
@@ -140,6 +159,18 @@ describe('revision-qualified shadow source provider v1', () => {
     expect(invalidBoundary).toMatchObject({ status: 'UNAVAILABLE', reason: 'UTF8_SPAN_BOUNDARY_INVALID' });
   });
 
+  it('requires the canonical source-binding receipt to match the reopened bytes and candidate', async () => {
+    const { providers } = fixture();
+    const unbound = await resolveRevisionQualifiedShadowSourcesV1(request, {
+      ...providers,
+      verifySourceBinding: async (candidate, sourceText) => ({
+        ...(await providers.verifySourceBinding(candidate, sourceText)),
+        sourceRevision: `sha256:${'f'.repeat(64)}`,
+      }),
+    });
+    expect(unbound).toMatchObject({ status: 'UNAVAILABLE', reason: 'SOURCE_AUTHORITY_BINDING_MISMATCH' });
+  });
+
   it('rejects missing or mismatched feature revisions without substituting producer revisions', async () => {
     const { providers } = fixture();
     const result = await resolveRevisionQualifiedShadowSourcesV1(request, {
@@ -164,6 +195,21 @@ describe('revision-qualified shadow source provider v1', () => {
         processFit: 0.4, featureRevision: 'features:r1',
         producerRevisions: {
           retrievalFrequency: 'frequency:r1', executionUtility: 'utility:r1', unrelated: 'other:r1',
+        }, evidenceRefs: ['evidence:one'],
+      }),
+    });
+    expect(result).toMatchObject({ status: 'UNAVAILABLE', reason: 'SUPPLEMENT_LINEAGE_MISSING' });
+  });
+
+  it('rejects non-finite live feature metrics', async () => {
+    const { providers } = fixture();
+    const result = await resolveRevisionQualifiedShadowSourcesV1(request, {
+      ...providers,
+      loadSupplement: async () => ({
+        packetKey: 'packet:one', retrievalFrequency: Number.NaN, executionUtility: 0.3,
+        processFit: 0.4, featureRevision: 'features:r1',
+        producerRevisions: {
+          retrievalFrequency: 'frequency:r1', executionUtility: 'utility:r1', processFit: 'process:r1',
         }, evidenceRefs: ['evidence:one'],
       }),
     });

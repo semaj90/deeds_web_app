@@ -84,7 +84,7 @@ export interface FixRecommendResult {
 
 export async function getFixRecommendations(req: FixRecommendRequest): Promise<FixRecommendResult> {
   const startMs = Date.now();
-  const model = 'gemma4-rotorquant:latest-fast:latest';
+  const model = 'ornith-1.5-9b';
   const topK = Math.min(req.topK ?? 3, 6);
 
   // ── Step 1: Build search query from error + context ───────────────────────

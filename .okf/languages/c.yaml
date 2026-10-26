@@ -1,0 +1,9 @@
+# C Language Profile for OKF
+
+version: 1
+language: c
+name: C
+grammar: c
+
+extensions:
+  - .c

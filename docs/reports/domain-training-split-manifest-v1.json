@@ -1,0 +1,395 @@
+{
+  "schema": "atlas.domain-training-split-manifest.v1",
+  "generatedAt": "2026-10-18T01:24:08.789Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "leakageCheck": {
+    "status": "PASSED",
+    "trainDistinctFiles": 956,
+    "validationDistinctFiles": 215,
+    "testDistinctFiles": 198,
+    "overlapCount": 0
+  },
+  "statistics": {
+    "totalChunks": 2000,
+    "distinctSourceFiles": 1369,
+    "chunkDistribution": {
+      "train": 1413,
+      "validation": 315,
+      "test": 272
+    },
+    "fileDistribution": {
+      "train": 956,
+      "validation": 215,
+      "test": 198
+    },
+    "chunkPercentages": {
+      "train": "70.7%",
+      "validation": "15.8%",
+      "test": "13.6%"
+    },
+    "domainDistribution": {
+      "frontend": 815,
+      "retrieval": 221,
+      "agent": 445,
+      "devops": 127,
+      "machine-learning": 41,
+      "documentation": 218,
+      "auth": 7,
+      "error-handling": 32,
+      "cache": 41,
+      "graph": 53
+    }
+  },
+  "manifestSha256": "sha256:12ca8cf8a126b14f71bdd6d2d34e28a358cecc0be646e76ce616a1a5843d0dfb",
+  "samples": [
+    {
+      "chunkId": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+      "sourceRef": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "split": "train",
+      "reviewedDomain": "frontend",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "lib",
+            "components",
+            "evidence",
+            "evidenceprimaryupload",
+            "svelte"
+          ],
+          "tokenCount": 6
+        },
+        "structural": {
+          "extension": "svelte",
+          "fileDepth": 5
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.124570884,
+            -0.007835271,
+            -0.02235379,
+            0.041350696,
+            -0.054595128
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "01e87f18-4164-43e4-8466-c189e0f8f0c5",
+      "sourceRef": "src/lib/components/evidence/EvidencePrimaryUpload.svelte",
+      "split": "train",
+      "reviewedDomain": "frontend",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "lib",
+            "components",
+            "evidence",
+            "evidenceprimaryupload",
+            "svelte"
+          ],
+          "tokenCount": 6
+        },
+        "structural": {
+          "extension": "svelte",
+          "fileDepth": 5
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.12054419,
+            -0.006244647,
+            -0.01892086,
+            0.048705958,
+            -0.06262194
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "0001981c-da69-4b0e-9acb-ad29544029c8",
+      "sourceRef": "src/routes/(app)/demos/+page.svelte",
+      "split": "validation",
+      "reviewedDomain": "frontend",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "routes",
+            "(app)",
+            "demos",
+            "+page",
+            "svelte"
+          ],
+          "tokenCount": 6
+        },
+        "structural": {
+          "extension": "svelte",
+          "fileDepth": 5
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.103761494,
+            -0.021728877,
+            0.009926007,
+            0.017257977,
+            -0.04321361
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "07f23175-a295-4824-b881-c9864ab682f6",
+      "sourceRef": "src/routes/(app)/demos/+page.svelte",
+      "split": "validation",
+      "reviewedDomain": "frontend",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "routes",
+            "(app)",
+            "demos",
+            "+page",
+            "svelte"
+          ],
+          "tokenCount": 6
+        },
+        "structural": {
+          "extension": "svelte",
+          "fileDepth": 5
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.12109441,
+            -0.025741719,
+            -0.012138433,
+            0.019882312,
+            -0.02301038
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "0002c4d4-3f96-4a8f-934d-61d8c6985340",
+      "sourceRef": "src/routes/(app)/demos/notifications/+page.svelte",
+      "split": "validation",
+      "reviewedDomain": "frontend",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "routes",
+            "(app)",
+            "demos",
+            "notifications",
+            "+page",
+            "svelte"
+          ],
+          "tokenCount": 7
+        },
+        "structural": {
+          "extension": "svelte",
+          "fileDepth": 6
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.13256888,
+            -0.007667572,
+            0.014434871,
+            0.044098075,
+            -0.036956932
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "0004791e-40fe-4736-be3b-d84796ac5476",
+      "sourceRef": "src/routes/(app)/admin/codebase-index/+page.svelte",
+      "split": "validation",
+      "reviewedDomain": "frontend",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "routes",
+            "(app)",
+            "admin",
+            "codebase",
+            "index",
+            "+page",
+            "svelte"
+          ],
+          "tokenCount": 8
+        },
+        "structural": {
+          "extension": "svelte",
+          "fileDepth": 6
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.107666835,
+            -0.04892005,
+            0.00821692,
+            0.025558667,
+            -0.021530315
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "00bc830e-5f84-4609-a314-a513aa409a30",
+      "sourceRef": "src/routes/(app)/admin/codebase-index/+page.svelte",
+      "split": "validation",
+      "reviewedDomain": "frontend",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "routes",
+            "(app)",
+            "admin",
+            "codebase",
+            "index",
+            "+page",
+            "svelte"
+          ],
+          "tokenCount": 8
+        },
+        "structural": {
+          "extension": "svelte",
+          "fileDepth": 6
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.101256356,
+            -0.019180115,
+            0.0104598,
+            0.021041669,
+            -0.039764024
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "0005b01a-8f57-4e30-8f61-5dc85bcd991d",
+      "sourceRef": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+      "split": "validation",
+      "reviewedDomain": "retrieval",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "packages",
+            "parent",
+            "atlas",
+            "retrieval",
+            "src",
+            "gpu",
+            "gpu",
+            "job",
+            "queue"
+          ],
+          "tokenCount": 9
+        },
+        "structural": {
+          "extension": "ts",
+          "fileDepth": 5
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.07458341,
+            0.026336124,
+            -0.0039519444,
+            -0.001416177,
+            0.01827965
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+      "sourceRef": "src/lib/server/analytics/unified-research-query.ts",
+      "split": "train",
+      "reviewedDomain": "retrieval",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "lib",
+            "server",
+            "analytics",
+            "unified",
+            "research",
+            "query"
+          ],
+          "tokenCount": 7
+        },
+        "structural": {
+          "extension": "ts",
+          "fileDepth": 5
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.10510166,
+            0.010505589,
+            -0.00092601,
+            -0.016158924,
+            0.03842131
+          ]
+        }
+      }
+    },
+    {
+      "chunkId": "000700dd-d698-4589-a3b3-62c404909095",
+      "sourceRef": "src/lib/server/db/schema-postgres.ts",
+      "split": "train",
+      "reviewedDomain": "agent",
+      "features": {
+        "lexical": {
+          "pathTokens": [
+            "src",
+            "lib",
+            "server",
+            "schema",
+            "postgres"
+          ],
+          "tokenCount": 5
+        },
+        "structural": {
+          "extension": "ts",
+          "fileDepth": 5
+        },
+        "semantic": {
+          "dimensions": 768,
+          "vectorNorm": 1,
+          "vectorHeadSample": [
+            -0.10583283,
+            0.026671827,
+            0.022643587,
+            0.027083805,
+            -0.039549984
+          ]
+        }
+      }
+    }
+  ]
+}

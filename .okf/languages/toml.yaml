@@ -1,0 +1,9 @@
+# TOML Language Profile for OKF
+
+version: 1
+language: toml
+name: TOML
+grammar: toml
+
+extensions:
+  - .toml

@@ -43,7 +43,8 @@
  env: { NODE_ENV: 'production', BROWSER: 'true' },
  browser: true,
  version: '',
- versions: { node: '18.0.0' },
+ // No fake Node version: ONNX Runtime treats versions.node as "running in Node" and loads worker_threads.
+ versions: {},
  cwd: function () {
  return '/';
  },

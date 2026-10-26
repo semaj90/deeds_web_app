@@ -1,0 +1,60 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "deltanet-swiglu-primary-papers",
+  "source_ref": "deltanet-swiglu-primary-papers:arxiv-org-abs-2412-06464-2412-06464",
+  "url": "https://arxiv.org/abs/2412.06464",
+  "title": "arxiv.org",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "deltanet",
+    "swiglu",
+    "attention_architecture",
+    "feed_forward_activation",
+    "model_boundary",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "arxiv.org",
+    "markdown_excerpt": "[Skip to main content](https://arxiv.org/abs/2412.06464#content) Search arXiv Press Enter to search · [Advanced search](https://arxiv.org/search/advanced) # Computer Science > Computation and Language **arXiv:2412.06464** (cs) \\[Submitted on 9 Dec 2024 ( [v1](https://arxiv.org/abs/2412.06464v1)), last revised 6 Mar 2025 (this version, v3)\\] # Title:Gated Delta Networks: Improving Mamba2 with Delta Rule Authors: [Songlin Yang](https://arxiv.org/search/cs?searchtype=author&query=Yang,+S), [Jan Kautz](https://arxiv.org/search/cs?searchtype=author&query=Kautz,+J), [Ali Hatamizadeh](https://arxiv.org/search/cs?searchtype=author&query=Hatamizadeh,+A) View a PDF of the paper titled Gated Delta Networks: Improving Mamba2 with Delta Rule, by Songlin Yang and 2 other authors [View PDF](https://arxiv.org/pdf/2412.06464) [HTML (experimental)](https://arxiv.org/html/2412.06464v3) > Abstract:Linear Transformers have gained attention as efficient alternatives to standard Transformers, but their performance in retrieval and long-context tasks has been limited. To address these limitations, recent work has explored two distinct mechanisms: gating for adaptive memory control and the delta update rul",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:deltanet-swiglu-primary-papers:arxiv-org-abs-2412-06464-2412-06464",
+    "title": "arxiv.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh DeltaNet and SwiGLU Primary Papers from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "0f230e612e10ffb97f950a1d22675d003bbaa6700b65e6edf6683cef502f1474",
+  "markdown_path": "docs/.okf/research/deltanet-swiglu/raw/deltanet-swiglu-primary-papers/arxiv-org-abs-2412-06464-2412-06464.md",
+  "fetched_at": "2026-10-13T23:37:06.446Z",
+  "metadata": {
+    "kind": "research_papers",
+    "source_id": "deltanet-swiglu-primary-papers",
+    "source_title": "DeltaNet and SwiGLU Primary Papers",
+    "source_revision": null,
+    "source_manifest": {
+      "authority": "primary_paper_landing_pages",
+      "admission": "REFERENCE_ONLY",
+      "license_review": "REQUIRED_BEFORE_REPUBLICATION",
+      "purpose": "Verify architecture terminology and keep model-internal mechanisms separate from Parent Atlas retrieval contracts."
+    },
+    "preferred_fetcher": "FIRECRAWL",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/research/deltanet-swiglu/raw/deltanet-swiglu-primary-papers/arxiv-org-abs-2412-06464-2412-06464.md"
+}

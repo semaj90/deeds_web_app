@@ -65,6 +65,7 @@ const LEGACY_SUBAGENT_TOOL_MAP: Record<LegacySubagentName, string[]> = {
 		'codebase_search',
 		'rag_search',
 		'glossary_search',
+		'oak_resolve_concept',
 		'ace_context',
 		'web_search',
 		'summarize',
@@ -198,6 +199,7 @@ export function classifyIntent(query: string): SubagentName {
 			'searchruntime',
 			'packet envelope',
 			'packet envelope',
+			'postgres_fts',
 			'postgres_trigram',
 			'qdrant',
 		])

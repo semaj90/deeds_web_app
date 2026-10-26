@@ -346,7 +346,7 @@
                   {/if}
                 </div>
 
-                <button onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-sand/10 rounded">
+                <button aria-label={`Remove ${file.name}`} onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-sand/10 rounded">
                   <span class="i-lucide-x h-4 w-4 inline-block"></span>
                 </button>
               </div>
@@ -403,9 +403,9 @@
           </div>
 
           <div class="space-y-2">
-            <label class="block text-sm font-medium">Tags</label>
+            <label for="tag-input" class="block text-sm font-medium">Tags</label>
             <div class="flex gap-2">
-              <input bind:value={tagInput} placeholder="Add a tag" disabled={isUploading}
+              <input id="tag-input" bind:value={tagInput} placeholder="Add a tag" disabled={isUploading}
                 onkeydown={(e: KeyboardEvent) => e.key === "Enter" && (e.preventDefault(), addTag())}
                 class="flex-1 border rounded px-3 py-2 text-sm" />
               <Button type="button" onclick={addTag} disabled={isUploading}>Add</Button>
@@ -426,7 +426,7 @@
           </div>
 
           <div class="space-y-3">
-            <label class="block text-sm font-medium">AI Processing Options</label>
+            <span class="block text-sm font-medium">AI Processing Options</span>
             <div class="grid grid-cols-2 gap-3">
               <div class="flex items-center space-x-2">
                 <input type="checkbox" bind:checked={formState.enableAiAnalysis} id="enableAiAnalysis" disabled={isUploading} />

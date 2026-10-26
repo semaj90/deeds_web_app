@@ -14,13 +14,15 @@ import {
 import { z } from 'zod';
 
 const gpuLeaseSchema = z.object({
-	backend: z.enum(['ollama', 'tensorrt']),
-	ttlSeconds: z.number().int().min(1).max(3600).optional().default(120)
+	backend: z.enum(['ollama', 'llama-server', 'tensorrt', 'cuvs']),
+	ttlSeconds: z.number().int().min(1).max(3600).optional().default(120),
+	leaseId: z.string().uuid().optional()
 });
 
-const gpuReleaseSchema = z.object({
-	backend: z.enum(['ollama', 'tensorrt'])
-});
+const gpuReleaseSchema = z.discriminatedUnion('backend', [
+	z.object({ backend: z.literal('cuvs'), leaseId: z.string().uuid() }),
+	z.object({ backend: z.enum(['ollama', 'llama-server', 'tensorrt']) })
+]);
 
 export const GET: RequestHandler = async ({ locals, request }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -56,10 +58,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!parsed.success) {
 		return json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 	}
-	const { backend, ttlSeconds } = parsed.data;
+	const { backend, ttlSeconds, leaseId } = parsed.data;
 
 	try {
-		const lease = await acquireGpuLease(backend, ttlSeconds);
+		const lease = await acquireGpuLease(backend, ttlSeconds, leaseId);
 		if (!lease) {
 			const current = await getGpuLeaseStatus();
 			return json({
@@ -86,7 +88,7 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 	const { backend } = parsed.data;
 
 	try {
-		const released = await releaseGpuLease(backend);
+		const released = await releaseGpuLease(backend, 'leaseId' in parsed.data ? parsed.data.leaseId : undefined);
 		return json({ released, backend });
 	} catch (err) {
 		console.error('GPU lease release error:', err);

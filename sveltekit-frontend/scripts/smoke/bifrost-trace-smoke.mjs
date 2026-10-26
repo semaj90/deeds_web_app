@@ -32,7 +32,7 @@ async function run() {
 		neo4jAuthorityScores: {
 			's3://evidence/case1/doc2.pdf': 0.85
 		},
-		bifrostModel: 'gemma4-rotorquant',
+		bifrostModel: 'ornith-1.5-9b',
 		bifrostLane: 'Interactive',
 		tokenSpend: 350,
 		latencyBreakdown: {
@@ -55,7 +55,7 @@ async function run() {
 			latency_breakdown: mockInput.latencyBreakdown,
 			fallback_reason: 'TS module load fallback',
 			token_spend: mockInput.tokenSpend,
-			model_lane: 'gemma4-rotorquant:Interactive',
+			model_lane: 'ornith-1.5-9b',
 			metadata: {
 				qdrant_count: mockInput.qdrantHits.length,
 				turbovec_diff: mockInput.turbovecDiff,

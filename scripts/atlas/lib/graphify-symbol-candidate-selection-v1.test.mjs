@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isGraphifySymbolExcludedArtifactV1, selectBoundedSupportedExtractorCandidates } from './graphify-symbol-candidate-selection-v1.mjs';
+import { isGraphifySymbolExcludedArtifactV1, isGraphifySymbolExcludedArtifactV2, selectBoundedSupportedExtractorCandidates } from './graphify-symbol-candidate-selection-v1.mjs';
 
 test('generated and evaluation JSON artifacts are excluded from symbol-source coverage', () => {
   const excluded = [
@@ -78,4 +78,28 @@ test('stale or missing admitted bytes do not consume the bounded extraction limi
   assert.equal(result.precheckRevisionMismatchRows, 1);
   assert.equal(result.precheckMissingSourceRows, 1);
   assert.deepEqual(result.sourceRevisionRejectSample, ['a.md']);
+});
+
+test('V2 excludes generated tool-output JSON that is not strict JSON, and V1 stays frozen', () => {
+  const v2Only = [
+    'sveltekit-frontend/svelte-errors.json',
+    'sveltekit-frontend/svelte-errors-utf8.json',
+    'docs/reports/drizzle-audit-current-utf8.json',
+    'sveltekit-frontend/drizzle/sidecar-audit-validated.json',
+    'sveltekit-frontend/drizzle/sidecar-audit-report.json',
+    'mcp_tools.json',
+    'mcp_init.json',
+  ];
+  for (const sourceRef of v2Only) {
+    assert.equal(isGraphifySymbolExcludedArtifactV2(sourceRef), true, sourceRef);
+    assert.equal(isGraphifySymbolExcludedArtifactV1(sourceRef), false, `V1 must not change: ${sourceRef}`);
+  }
+  // everything V1 excludes is still excluded by V2
+  for (const sourceRef of ['sveltekit-frontend/drizzle/meta/0041_snapshot.json', 'sveltekit-frontend/unreachable-classified.json']) {
+    assert.equal(isGraphifySymbolExcludedArtifactV2(sourceRef), true, sourceRef);
+  }
+  // authored files and nested lookalikes stay included
+  for (const sourceRef of ['sveltekit-frontend/package.json', 'docs/architecture/retrieval.json', 'sveltekit-frontend/tsconfig.frontend.json', 'sveltekit-frontend/src/mcp_tools.json']) {
+    assert.equal(isGraphifySymbolExcludedArtifactV2(sourceRef), false, sourceRef);
+  }
 });

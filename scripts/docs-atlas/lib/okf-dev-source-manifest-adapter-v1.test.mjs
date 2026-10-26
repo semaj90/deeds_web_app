@@ -72,3 +72,10 @@ test('retains legacy manifest inputs and places the preferred fetcher first', ()
   ]);
   assert.deepEqual(orderOkfDevFetchersV1(), ['FIRECRAWL', 'BEAUTIFULSOUP_HTTP', 'HTTP_FALLBACK']);
 });
+
+test('disables Firecrawl fallback for cost-controlled static documentation runs', () => {
+  assert.deepEqual(orderOkfDevFetchersV1('BEAUTIFULSOUP_HTTP', { allowFirecrawl: false }), [
+    'BEAUTIFULSOUP_HTTP', 'HTTP_FALLBACK',
+  ]);
+  assert.throws(() => orderOkfDevFetchersV1('FIRECRAWL', { allowFirecrawl: false }), /SOURCE_MANIFEST_FIRECRAWL_DISABLED/);
+});

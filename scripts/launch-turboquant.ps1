@@ -111,7 +111,45 @@ function Test-LlamaServerHealth {
   }
 }
 
-if ((Test-LlamaServerHealth) -and -not $PSBoundParameters.ContainsKey('StartupProfile') -and -not $env:TURBO_STARTUP_PROFILE) {
+function Test-HeadroomProxyHealth {
+  $headroomPort = $env:HEADROOM_PORT ?? 8787
+  $url = "http://127.0.0.1:${headroomPort}/livez"
+  # 1. Probe Windows host loopback first
+  try {
+    $response = Invoke-RestMethod -Uri $url -Method Get -TimeoutSec 2 -ErrorAction Stop
+    if ($response.alive -eq $true -or $response.status -eq 'healthy') {
+      return [PSCustomObject]@{
+        Healthy = $true
+        Version = $response.version
+        Namespace = 'Windows-Host-Loopback'
+        Url = "http://127.0.0.1:${headroomPort}"
+      }
+    }
+  } catch { }
+  # 2. Probe WSL2 Ubuntu loopback (:8787 is official Headroom v0.41.0; :8795 is historical headroom-proxy.mjs)
+  try {
+    $wslRaw = & wsl.exe -d Ubuntu -u james -- curl -4 -s --connect-timeout 2 $url 2>$null
+    if ($wslRaw) {
+      $wslJson = $wslRaw | ConvertFrom-Json -ErrorAction Stop
+      if ($wslJson.alive -eq $true -or $wslJson.status -eq 'healthy') {
+        return [PSCustomObject]@{
+          Healthy = $true
+          Version = $wslJson.version
+          Namespace = 'WSL2-Ubuntu-Loopback'
+          Url = "wsl://127.0.0.1:${headroomPort}"
+        }
+      }
+    }
+  } catch { }
+  return [PSCustomObject]@{
+    Healthy = $false
+    Version = $null
+    Namespace = 'Offline'
+    Url = "http://127.0.0.1:${headroomPort}"
+  }
+}
+
+if ((Test-LlamaServerHealth) -and -not $StatusOnly -and -not $PSBoundParameters.ContainsKey('StartupProfile') -and -not $env:TURBO_STARTUP_PROFILE) {
   Write-Host "✅ llama-server is already running on :8090" -ForegroundColor Green
   Write-Host "   URL: http://127.0.0.1:8090"
   Write-Host "   Skipping launch" -ForegroundColor Cyan
@@ -137,8 +175,8 @@ function Get-TurboStartupProfiles {
     [pscustomobject]@{
       Id = 'gemma4-direct'
       DisplayName = 'Gemma 4 Legal - Direct Tools'
-      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
-      Alias = 'gemma4-legal'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'
+      Alias = 'ornith-1.5-9b'
       TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
       Reasoning = 'off'
       ReasoningBudget = 0
@@ -201,8 +239,8 @@ function Get-TurboStartupProfiles {
     [pscustomobject]@{
       Id = 'gemma4-thinking'
       DisplayName = 'Gemma 4 Legal - Thinking'
-      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
-      Alias = 'gemma4-legal-thinking'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'
+      Alias = 'ornith-1.5-9b'
       TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
       Reasoning = 'on'
       ReasoningBudget = 2048
@@ -291,7 +329,7 @@ if ($StartupProfile) {
 #   4. Legacy model variables, in order: ROTORQUANT_MODEL_PATH >
 #      TURBO_MODEL_PATH > TURBO_MODEL > LOCAL_GEMMA_MODEL
 #   5. Auto-discovery (models/hfor/hforf.gguf > vendor/models/*.gguf >
-#      models/gemma4-legal-iq4xs-direct.gguf > Ollama blob store)
+#      models/ornith-1.5-9b > Ollama blob store)
 # When none of 1-3 select a profile, $activeTurboProfile stays $null and
 # resolution falls through to tier 4/5 below. Whichever tier resolves $model,
 # the chat-template decision downstream is derived from the FINAL resolved
@@ -448,10 +486,10 @@ $model = if ($activeTurboProfile) {
 } elseif ($env:LOCAL_GEMMA_MODEL) {
     Resolve-TurboModelRef $env:LOCAL_GEMMA_MODEL
 } else {
-    $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\gemma4-legal.gguf"
-    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\gemma4-rotorquant.gguf"
+    $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
+    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
     $hforfModel   = Join-Path $PSScriptRoot "..\models\hfor\hforf.gguf"
-    $localModel   = Join-Path $PSScriptRoot "..\models\gemma4-legal-iq4xs-direct.gguf"
+    $localModel   = Join-Path $PSScriptRoot "..\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
     $localLegacy  = Join-Path $PSScriptRoot "..\models\gemma4-turboquant-rotorquant.gguf"
 
     # Auto-discover RotorQuant/Gemma4 GGUF from Ollama blob store.
@@ -460,7 +498,7 @@ $model = if ($activeTurboProfile) {
     $ollamaBlob = $null
     $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
     $blobRoot     = Join-Path $env:USERPROFILE '.ollama\models\blobs'
-    $preferredTags = @('gemma4-legal', 'gemma4-rotorquant')
+    $preferredTags = @('ornith-1.5-9b', 'ornith-1.5-9b')
     foreach ($tag in $preferredTags) {
         $mf = Join-Path $manifestRoot "$tag\latest"
         if (-not (Test-Path $mf)) { continue }
@@ -663,7 +701,7 @@ if ($supportedKv -notcontains $kvV) {
 
 if (-not (Test-Path $llama)) { throw "llama-server.exe not found at $llama" }
 if (-not $model) {
-  throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place gemma4-legal.gguf in vendor/models/, or ensure gemma4-rotorquant is pulled in Ollama (~/.ollama/models/)."
+  throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place ornith-1.5-9b in vendor/models/, or ensure ornith-1.5-9b is pulled in Ollama (~/.ollama/models/)."
 }
 if (-not (Test-Path $model)) { throw "TurboQuant model GGUF not found at: $model" }
 
@@ -780,58 +818,86 @@ if ($safeProfile) {
         }
       }
       # Gate 2a — GGUF header scan: read the first 64 KB of the draft GGUF and
-      # look for MTP-head-only architecture strings (gemma4_assistant, etc.) that
-      # only AtomicBot binaries support. This runs before the binary probe because
-      # the CLI codepath (--model --n-predict 0) and the server codepath
-      # (--model-draft) use different architecture validators — the CLI path does
-      # not always surface the same "unknown model architecture" error that the
-      # server's srv_load_model does.
+      # look for MTP-head-only architecture strings (gemma4-assistant, etc.) and
+      # verify embedding dimension compatibility with the target model.
       $draftGgufArch = $null
+      $draftDim = 0
       try {
         $ggufStream = [System.IO.File]::OpenRead($env:MTP_DRAFT_MODEL)
         $ggufBuf    = New-Object byte[] 65536
         $ggufRead   = $ggufStream.Read($ggufBuf, 0, $ggufBuf.Length)
         $ggufStream.Close()
         $ggufText   = [System.Text.Encoding]::UTF8.GetString($ggufBuf, 0, $ggufRead)
-        # The general.architecture value is stored as a length-prefixed string in
-        # GGUF metadata. Scanning the raw bytes for known MTP-head arch names is
-        # reliable enough for a pre-flight gate.
-        $archNames  = @('gemma4_assistant', 'llama_assistant', 'qwen2_assistant')
+        # Scan raw bytes for known architecture names
+        $archNames  = @('gemma4-assistant', 'gemma4_assistant', 'llama-assistant', 'llama_assistant', 'qwen2-assistant', 'qwen2_assistant', 'gemma4', 'qwen35', 'qwen2', 'llama')
         foreach ($a in $archNames) {
           if ($ggufText -match [regex]::Escape($a)) { $draftGgufArch = $a; break }
+        }
+        $keyDraft = if ($ggufText.IndexOf('.embedding_length_out') -ge 0) { '.embedding_length_out' } else { '.embedding_length' }
+        $idxDraft = $ggufText.IndexOf($keyDraft)
+        if ($idxDraft -ge 0) {
+          $draftDim = [BitConverter]::ToUInt32($ggufBuf, $idxDraft + $keyDraft.Length + 4)
         }
       } catch {
         # Can't read the file — let the binary probe decide.
       }
 
-      $knownMtpOnlyArchs = @('gemma4_assistant', 'llama_assistant', 'qwen2_assistant')
-      $draftRequiresAtomicBot = $false
-      if ($draftGgufArch -and $knownMtpOnlyArchs -contains $draftGgufArch) {
-        $draftRequiresAtomicBot = $true
+      # Target model dimension & architecture preflight check
+      $targetGgufArch = $null
+      $targetDim = 0
+      if ($model -and (Test-Path $model)) {
+        try {
+          $tgtStream = [System.IO.File]::OpenRead($model)
+          $tgtBuf    = New-Object byte[] 65536
+          $tgtRead   = $tgtStream.Read($tgtBuf, 0, $tgtBuf.Length)
+          $tgtStream.Close()
+          $tgtText   = [System.Text.Encoding]::UTF8.GetString($tgtBuf, 0, $tgtRead)
+          $tgtArchs  = @('qwen35', 'qwen2', 'gemma4', 'llama')
+          foreach ($ta in $tgtArchs) {
+            if ($tgtText -match [regex]::Escape($ta)) { $targetGgufArch = $ta; break }
+          }
+          $idxTgt = $tgtText.IndexOf('.embedding_length')
+          if ($idxTgt -ge 0) {
+            $targetDim = [BitConverter]::ToUInt32($tgtBuf, $idxTgt + 17 + 4)
+          }
+        } catch {}
+      }
+
+      $knownMtpOnlyArchs = @('gemma4-assistant', 'gemma4_assistant', 'llama-assistant', 'llama_assistant', 'qwen2-assistant', 'qwen2_assistant')
+      $draftRequiresAtomicBot = ($draftGgufArch -and ($knownMtpOnlyArchs -contains $draftGgufArch))
+
+      if ($draftRequiresAtomicBot -and -not $binaryHasSpecDraft) {
         Write-Host ("Speculative decoding skipped: draft GGUF has MTP-head-only architecture '$draftGgufArch'. " +
           "The file '$($env:MTP_DRAFT_MODEL)' requires the AtomicBot llama-server binary. " +
           "Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set ENABLE_MTP_DRAFTER=false.") -ForegroundColor Yellow
+      } elseif ($draftDim -gt 0 -and $targetDim -gt 0 -and $draftDim -ne $targetDim) {
+        Write-Host ("Speculative decoding skipped: dimension mismatch between target model ($targetDim) and draft model ($draftDim). " +
+          "Target: '$model' ($targetGgufArch, dim=$targetDim) vs Draft: '$($env:MTP_DRAFT_MODEL)' ($draftGgufArch, dim_out=$draftDim). " +
+          "Speculative drafters must match the base model architecture and hidden dimension. Falling back to target-only execution.") -ForegroundColor Yellow
+      } elseif ($targetGgufArch -and $draftGgufArch -and ($targetGgufArch -match 'qwen' -and $draftGgufArch -match 'gemma')) {
+        Write-Host ("Speculative decoding skipped: cross-architecture mismatch between target '$targetGgufArch' and draft '$draftGgufArch'. " +
+          "Target model is Qwen/Ornith while draft model is Gemma. Falling back to target-only execution.") -ForegroundColor Yellow
       } else {
         # Gate 2b — Dry-load the draft GGUF with zero predictions and a minimal context.
         # Redirect stdout to null; capture stderr to detect arch errors.
         $draftProbeArgs = @(
           '--model', $env:MTP_DRAFT_MODEL,
-        '--ctx-size', '1',
-        '--n-predict', '0',
-        '--log-disable',
+          '--ctx-size', '1',
+          '--n-predict', '0',
+          '--log-disable',
           '--no-mmap'
-      )
-      $draftProbeOut = & $llama @draftProbeArgs 2>&1 | Out-String
-      $draftArchError = $draftProbeOut -match 'unknown model architecture'
+        )
+        $draftProbeOut = & $llama @draftProbeArgs 2>&1 | Out-String
+        $draftArchError = $draftProbeOut -match 'unknown model architecture'
 
-      if ($draftArchError) {
-        # Extract the arch name from the error for a useful message.
-        $archMatch = [regex]::Match($draftProbeOut, "unknown model architecture: '([^']+)'")
-        $badArch = if ($archMatch.Success) { $archMatch.Groups[1].Value } else { 'unknown' }
-        Write-Host ("Speculative decoding skipped: draft model has unsupported architecture '$badArch'. " +
-          "The GGUF at '$($env:MTP_DRAFT_MODEL)' is an MTP-head-only format that requires the AtomicBot " +
-          "llama-server binary. Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set " +
-          "ENABLE_MTP_DRAFTER=false to use the main model without speculative decoding.") -ForegroundColor Yellow
+        if ($draftArchError) {
+          # Extract the arch name from the error for a useful message.
+          $archMatch = [regex]::Match($draftProbeOut, "unknown model architecture: '([^']+)'")
+          $badArch = if ($archMatch.Success) { $archMatch.Groups[1].Value } else { 'unknown' }
+          Write-Host ("Speculative decoding skipped: draft model has unsupported architecture '$badArch'. " +
+            "The GGUF at '$($env:MTP_DRAFT_MODEL)' is an MTP-head-only format that requires the AtomicBot " +
+            "llama-server binary. Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set " +
+            "ENABLE_MTP_DRAFTER=false to use the main model without speculative decoding.") -ForegroundColor Yellow
         } else {
           $TurboDraftModel = $env:MTP_DRAFT_MODEL
           $TurboSpeculative = $true
@@ -841,10 +907,10 @@ if ($safeProfile) {
             $TurboDraftMode = 'legacy-draft'
           }
         }
-        }
       }
     }
   }
+}
 
 if ($env:DRAFT_MODEL_PATH) {
   Write-Host 'Deprecated DRAFT_MODEL_PATH is ignored by this launcher. Use ENABLE_MTP_DRAFTER=true and MTP_DRAFT_MODEL=<path> instead.' -ForegroundColor Yellow
@@ -870,6 +936,13 @@ Write-Host "  Batch size:       $(if ($batchSize) { $batchSize } else { 'default
 Write-Host "  UBatch size:      $(if ($ubatchSize) { $ubatchSize } else { 'default' })"
 Write-Host "  Tokens/sec:       $MeasuredTokensPerSecDisplay"
 Write-Host "  VRAM:             $MeasuredVramDisplay"
+$headroomInfo = Test-HeadroomProxyHealth
+$headroomDisplay = if ($headroomInfo.Healthy) {
+  "$($headroomInfo.Url) (ACTIVE: CCR & AST compression, v$($headroomInfo.Version))"
+} else {
+  "$($headroomInfo.Url) (INACTIVE: CCR proxy offline; start via 'headroom proxy')"
+}
+Write-Host "  Headroom Proxy:   $headroomDisplay"
 
 # Diagnostic Warnings
 if ([string]::IsNullOrWhiteSpace($ngl) -or $ngl -eq "0") {
@@ -913,6 +986,10 @@ if (-not $StatusOnly) {
             $modelOk = $false
             $reasoningOk = $false
             $runningModelAlias = $null
+            # A profile that wants vision must not accept a text-only server as "healthy":
+            # /props modalities.vision is false when the server was started without --mmproj.
+            $targetVision = [bool]($wantsVision -and -not $TextOnly -and $mmproj -and (Test-Path $mmproj))
+            $visionOk = $true
             # Prefer the profile's declared Alias over the raw filename: two profiles
             # (e.g. ornith / ornith-1.5) can point at files that both happen to be named
             # hforf.gguf, so a bare basename comparison cannot tell them apart. When no
@@ -935,6 +1012,7 @@ if (-not $StatusOnly) {
                 } else { $runningReasoningFormat -in @('none', 'auto') }
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
+                if ($targetVision) { $visionOk = ($props.modalities.vision -eq $true) }
             } catch {
                 # /props unavailable on old builds — treat as unknown, require restart
                 $jinjaOk = $false
@@ -942,7 +1020,7 @@ if (-not $StatusOnly) {
                 $modelOk = $false
             }
 
-            if ($ctxOk -and $jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk) {
+            if ($ctxOk -and $jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk -and $visionOk) {
                 Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                 exit 0
             } else {
@@ -952,6 +1030,7 @@ if (-not $StatusOnly) {
                 if (-not $supportsTools) { $reason += "supports_tools:false (wrong template — needs custom_pub_chat_template_gemma4.jinja)" }
                 if (-not $modelOk)     { $reason += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
                 if (-not $reasoningOk) { $reason += "reasoning mismatch: running=$runningReasoningFormat target=$reasoningMode" }
+                if (-not $visionOk)    { $reason += "vision mismatch: profile wants vision but running server reports modalities.vision=false (started without --mmproj)" }
                 Write-Host ("TurboQuant on :$port needs restart — $($reason -join '; ')") -ForegroundColor Cyan
                 $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                 if ($runningPids) {
@@ -970,7 +1049,9 @@ if (-not $StatusOnly) {
                 $runningModelAlias = $props.model_alias
                 if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
                 $modelOk = ($runningModelAlias -eq $targetModelAlias)
-                if ($jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk) {
+                $targetVision = [bool]($wantsVision -and -not $TextOnly -and $mmproj -and (Test-Path $mmproj))
+                $visionOk = if ($targetVision) { $props.modalities.vision -eq $true } else { $true }
+                if ($jinjaOk -and $supportsTools -and $modelOk -and $reasoningOk -and $visionOk) {
                     Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                     exit 0
                 } else {
@@ -979,6 +1060,7 @@ if (-not $StatusOnly) {
                     if (-not $supportsTools) { $reason2 += "supports_tools:false (needs custom_pub_chat_template_gemma4.jinja)" }
                     if (-not $modelOk)     { $reason2 += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
                     if (-not $reasoningOk) { $reason2 += "reasoning mismatch: running=$runningReasoningFormat target=$reasoningMode" }
+                    if (-not $visionOk)    { $reason2 += "vision mismatch: profile wants vision but running server reports modalities.vision=false" }
                     Write-Host "TurboQuant on :$port needs restart — $($reason2 -join '; ')" -ForegroundColor Cyan
                     $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                     if ($runningPids) {
@@ -1003,12 +1085,20 @@ if (-not $StatusOnly) {
 
 if ($StatusOnly) {
     Write-Host "--- Status Check ---" -ForegroundColor Gray
+    $headroomInfo = Test-HeadroomProxyHealth
+    if ($headroomInfo.Healthy) {
+        Write-Host "Headroom: OK (v$($headroomInfo.Version) on $($headroomInfo.Url) — CCR/AST optimization active)" -ForegroundColor Green
+    } else {
+        Write-Host "Headroom: INACTIVE (proxy offline on $($headroomInfo.Url); start via 'headroom proxy')" -ForegroundColor Yellow
+    }
     try {
         $health = Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 2
         Write-Host "Health: OK (status: $($health.status))" -ForegroundColor Green
         $null = Write-TurboLaunchStatus ([ordered]@{
             status = 'ok'
             port = $port
+            headroom_url = $headroomInfo.Url
+            headroom_healthy = [bool]$headroomInfo.Healthy
             model = $model
             draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
             speculative = [bool]$TurboSpeculative

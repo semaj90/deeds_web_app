@@ -10,7 +10,7 @@
  *   5. updateToolStats — EMA latency + gain update
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   scoreToolForContext,
   rankTools,
@@ -18,8 +18,20 @@ import {
   registerTool,
   getToolRegistry,
   updateToolStats,
+  persistToolStatsToDb,
   type TraceToolProfile,
 } from '$lib/server/mcp/tool-ranker.js';
+
+// tool_call_stats persistence: the DB pool and logger are mocked so no live database is touched.
+const { poolQuery, loggerWarn } = vi.hoisted(() => ({ poolQuery: vi.fn(), loggerWarn: vi.fn() }));
+
+vi.mock('$lib/server/db/client.js', () => ({
+  pool: { query: (...args: unknown[]) => poolQuery(...args) },
+}));
+
+vi.mock('$lib/server/production-logger.js', () => ({
+  logger: { warn: (...args: unknown[]) => loggerWarn(...args), error: vi.fn(), info: vi.fn(), debug: vi.fn() },
+}));
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -330,5 +342,35 @@ describe('updateToolStats — EMA updates', () => {
     }
 
     expect(registry.get(TOOL_NAME)!.avgGainScore).toBeCloseTo(0.9, 1);
+  });
+});
+
+describe('tool_call_stats persistence — failure visibility and NULL-safe average', () => {
+  const TOOL_NAME = 'trace.kag_search';
+
+  beforeEach(() => {
+    poolQuery.mockReset();
+    loggerWarn.mockReset();
+  });
+
+  it('logs a failed persist and does not throw', async () => {
+    poolQuery.mockRejectedValueOnce(new Error('connection refused'));
+
+    expect(() => updateToolStats(TOOL_NAME, 120, 0.4, true, 'LEGAL_AUTHORITY')).not.toThrow();
+
+    await vi.waitFor(() => expect(loggerWarn).toHaveBeenCalledTimes(1));
+    expect(String(loggerWarn.mock.calls[0]![0])).toContain(`tool_call_stats persist failed for ${TOOL_NAME}/LEGAL_AUTHORITY`);
+  });
+
+  it('upsert guards a NULL prior average with COALESCE and binds six params', async () => {
+    poolQuery.mockResolvedValueOnce({ rows: [] });
+
+    await persistToolStatsToDb(TOOL_NAME, 'LEGAL_AUTHORITY', 120, 0.4, true);
+
+    const [sql, params] = poolQuery.mock.calls[0] as [string, unknown[]];
+    expect(sql).toContain('COALESCE(tool_call_stats.avg_latency_ms, EXCLUDED.avg_latency_ms)');
+    expect(sql).toContain('COALESCE(tool_call_stats.avg_gain_score, EXCLUDED.avg_gain_score)');
+    expect(sql).toContain('ON CONFLICT (tool_name, hmm_section)');
+    expect(params).toEqual([TOOL_NAME, 'LEGAL_AUTHORITY', 1, 0, 120, 0.4]);
   });
 });

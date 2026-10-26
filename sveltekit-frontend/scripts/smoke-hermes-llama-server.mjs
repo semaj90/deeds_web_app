@@ -40,7 +40,7 @@ async function main() {
 
   const config = readFileSync(configPath, 'utf8');
   const baseUrl = normalizeBaseUrl(parseConfigValue(config, 'base_url'));
-  const model = parseConfigValue(config, 'default') ?? 'gemma4-legal-iq4xs-direct.gguf';
+  const model = parseConfigValue(config, 'default') ?? 'ornith-1.5-9b';
   const rootUrl = baseUrl.replace(/\/v1$/, '');
 
   const health = await fetchJson(`${rootUrl}/health`);

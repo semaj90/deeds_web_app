@@ -208,24 +208,6 @@ async function tryLitertInference(prompt: string, maxTokens: number = 200): Prom
 }
 
 // ══════════════════════════════════════════════════════════════
-// ONNX Inference
-// ══════════════════════════════════════════════════════════════
-
-/**
- * Run inference via ONNX Runtime (Gemma 3 270M, legacy fallback).
- * Returns null if ONNX session is not available.
- */
-async function tryOnnxInference(prompt: string, maxTokens: number = 200): Promise<string | null> {
-	try {
-		const { runOnnxInference } = await import('./onnx/inference.js');
-		const result = await runOnnxInference(prompt, { maxTokens });
-		return result;
-	} catch {
-		return null;
-	}
-}
-
-// ══════════════════════════════════════════════════════════════
 // Server Inference
 // ══════════════════════════════════════════════════════════════
 
@@ -361,31 +343,7 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 		// LiteRT failed → fall through to ONNX helper lane
 	}
 
-	// Step 4: Default ONNX/helper lane
-	if (
-		routerDecision.source === 'local-onnx' ||
-		routerDecision.source === 'local-e2b' ||
-		routerDecision.source === 'local-litert'
-	) {
-		const onnxResult = await tryOnnxInference(request.prompt, maxTokens);
-		if (onnxResult) {
-			const latencyMs = Math.round(performance.now() - start);
-			if (request.useBifrostCache !== false) {
-				storeBifrostCache(request.prompt, onnxResult).catch(() => {});
-			}
-			return {
-				text: onnxResult,
-				source: 'local-onnx',
-				intent: routerDecision.intent,
-				latencyMs,
-				cacheHit: false,
-				cacheLayer: 'none',
-			};
-		}
-		// ONNX failed → fall through to server
-	}
-
-	// Step 5: Server fallback (retrieval-hybrid or server-ollama)
+	// Step 4: Server fallback (retrieval-hybrid or server-ollama)
 	try {
 		const serverResult = await runServerInference(
 			request.prompt,

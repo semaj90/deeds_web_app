@@ -313,7 +313,7 @@ export function buildProgramWorkPackages(tasks, chunkSize = 10) {
     || (a.line ?? 0) - (b.line ?? 0))) {
     const architecture = task.program?.architecture;
     if (!architecture?.programId) continue; // Unmapped leaves are review-required, never guessed into a package.
-    const key = [task.change ?? 'UNOWNED_CHANGE', architecture.programId,
+    const key = [task.program?.wave ?? 'UNASSIGNED_WAVE', task.change ?? 'UNOWNED_CHANGE', architecture.programId,
       task.mutationClass ?? 'MUTATION_UNCLASSIFIED', task.gateState ?? 'READINESS_UNCLASSIFIED'].join(':');
     const group = buckets.get(key) ?? [];
     group.push(task);
@@ -322,9 +322,9 @@ export function buildProgramWorkPackages(tasks, chunkSize = 10) {
 
   const packages = [];
   for (const [key, members] of buckets) {
-    const [change, domainId, mutation, gateState] = key.split(':');
+    const [waveKey, change, domainId, mutation, gateState] = key.split(':');
+    const waveId = waveKey === 'UNASSIGNED_WAVE' ? null : Number(waveKey);
     const waveIds = [...new Set(members.map((task) => task.program?.wave).filter(Number.isInteger))].sort((a, b) => a - b);
-    const waveId = waveIds.length === 1 ? waveIds[0] : null;
     const wave = waveId == null ? null : PROGRAM_WAVES.find((item) => item.id === waveId);
     for (let offset = 0; offset < members.length; offset += chunkSize) {
       const part = members.slice(offset, offset + chunkSize);

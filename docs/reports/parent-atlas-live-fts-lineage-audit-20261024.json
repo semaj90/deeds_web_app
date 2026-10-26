@@ -1,0 +1,155 @@
+{
+  "schema": "atlas.parent-atlas-live-fts-lineage-audit.v1",
+  "generatedAt": "2026-10-25T00:44:32Z",
+  "scope": "READ_ONLY_LIVE_POSTGRESQL_CATALOG_FTS_AND_LINEAGE_CENSUS",
+  "canonicalAuthority": false,
+  "databaseWritesPerformed": false,
+  "servicesRestarted": false,
+  "summary": {
+    "ftsCapability": "PROVEN_FOR_BOUNDED_QUERY",
+    "currentSourceLineage": "PARTIAL_EXACT_JOIN",
+    "packetKeyV2Resolution": "NOT_PROVEN",
+    "graphifyProjectionAdmission": "NOT_SAFE_TO_PROJECT"
+  },
+  "postgres": {
+    "version": "18.4 (Debian 18.4-1.pgdg12+1)",
+    "ioMethod": "worker",
+    "effectiveIoConcurrency": 16,
+    "pgvector": "0.8.3",
+    "publicIndexCounts": {
+      "gin": 211,
+      "hnsw": 34,
+      "ivfflat": 2,
+      "other": 1957
+    }
+  },
+  "canonicalChunkIndex": {
+    "table": "public.codebase_chunk_index",
+    "rows": 274465,
+    "rowsWithSearchVector": 274465,
+    "rowsWithContentHash": 274428,
+    "rowsWithSemantic768": 274428,
+    "rowsWithSourceRef": 272110,
+    "distinctSourceRefs": 28070,
+    "rowsWithWorkspaceRevision": 0,
+    "rowsWithSourceRevision": 0,
+    "ftsIndex": "idx_codebase_chunk_bm25_search",
+    "ftsIndexMethod": "GIN"
+  },
+  "ftsSmoke": {
+    "query": "websearch_to_tsquery('simple', 'embedding OR retrieval')",
+    "sourceTable": "public.codebase_chunk_index",
+    "rowsReturned": 10,
+    "planner": [
+      "Limit",
+      "Sort",
+      "Bitmap Heap Scan on codebase_chunk_index",
+      "Bitmap Index Scan using idx_codebase_chunk_bm25_search"
+    ],
+    "executionMs": 146.654,
+    "sharedHitBlocks": 20285,
+    "sharedReadBlocks": 10329,
+    "interpretation": "Live FTS and the GIN bitmap path work for this bounded query. This is a single smoke query, not a performance benchmark or lineage admission proof."
+  },
+  "legacySearchFunction": {
+    "function": "public.search_code_lexical",
+    "language": "plpgsql",
+    "readsFrom": "public.code_retrieval_chunks",
+    "tableRows": 41662,
+    "allRowsHaveSearchVector": true,
+    "rowsWithEmbedding": 0,
+    "oldestUpdatedAt": "2026-05-17T00:50:58.858Z",
+    "newestUpdatedAt": "2026-05-17T00:54:23.269Z",
+    "ftsIndex": "crc_fts_gin",
+    "ftsIndexMethod": "GIN",
+    "packetKeyV2AliasMatchesForCurrentQualifiedRows": 0,
+    "interpretation": "The application lexical function currently queries a separate older projection, not codebase_chunk_index. Its result is not revision-qualified by the table's own columns."
+  },
+  "sourceAndChunkLineage": {
+    "workspaceRevision": "sha256:23413763d52c94ecf5e4566edbfbe283505e048aafe7f2b7a417dc55c74492e5",
+    "workspaceSourceBindings": 21311,
+    "chunkRowsWithExactSourceRefAndFileHashToBindingRevision": 144305,
+    "distinctSourceRefsWithExactSourceRefAndFileHashJoin": 17325,
+    "chunkRowsWithSourceRefOnlyJoin": 144344,
+    "sourceRefOnlyRowsWithoutEqualFileHashAndBindingRevision": 39,
+    "atlasPacketChunkLineageRows": 127927,
+    "distinctLineageChunkIds": 127927,
+    "exactChunkIdAndSourceRefLineageRows": 112050,
+    "duplicateLineageChunkIds": 0,
+    "sourceHashBoundLineageRowsMatchingAtlasPackets": 112050,
+    "distinctMatchedPacketKeys": 13718,
+    "matchedPacketKeysInPacketKeyV2Format": 0,
+    "matchedPacketKeysWithAliasRows": 0,
+    "packetSourceRevisionMatchesToCurrentBinding": 111987,
+    "packetContentHashEqualityMatches": 0,
+    "interpretation": "Exact source/hash and chunk-lineage joins establish useful projection lineage, but the matched packet keys are legacy-shaped, have no alias-to-PacketKeyV2 rows, and do not qualify for canonical promotion. The packet content_hash comparison is recorded as an observation only; its hash scope has not been established."
+  },
+  "admissionGate": {
+    "receipt": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-25.json",
+    "verdict": "NOT_SAFE_TO_PROJECT",
+    "predicatesBelowPass": 10,
+    "blockingPredicates": [
+      "IDENTITY_ALIGNED=NOT_PROVEN",
+      "REVISION_QUALIFIED=NOT_PROVEN",
+      "SYMBOLS_RESOLVED=PARTIAL_PROVEN",
+      "SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN",
+      "LATENT_FAMILY_PROVEN=PARTIAL_PROVEN",
+      "GRAPH_MANIFEST_SEALED=PARTIAL_PROVEN",
+      "ORDINAL_MAP_SEALED=NOT_PROVEN",
+      "PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN",
+      "BITFROST_KEYS_DERIVABLE=NOT_PROVEN",
+      "ACE_EVIDENCE_GROUNDED=NOT_PROVEN"
+    ],
+    "admittedRootPacketRows": 0,
+    "databaseTransaction": "READ ONLY; rolled back; zero canonical mutations"
+  },
+  "errorLog": [
+    {
+      "attempt": "Docker-based broad PostgreSQL index audit",
+      "error": "docker exec stalled at SHOW io_method; independent docker ps also stalled",
+      "resolution": "Stopped only the two read-only probes; used the existing direct PostgreSQL connection for bounded catalog and FTS queries"
+    },
+    {
+      "attempt": "First direct PostgreSQL smoke invocation",
+      "error": "PowerShell quoting parse error before the query reached PostgreSQL",
+      "resolution": "Reissued via a literal here-string"
+    },
+    {
+      "attempt": "Workspace-binding diagnostic query",
+      "error": "SQLSTATE 42P02: query referenced $1 without passing its parameter",
+      "resolution": "Passed the selected workspace revision as a bound parameter"
+    },
+    {
+      "attempt": "Packet/workspace join",
+      "error": "SQLSTATE 42883: atlas_packets.workspace_revision is integer, not the SHA-256 text revision",
+      "resolution": "Did not cast or equate the identities; inspected packet lineage separately"
+    },
+    {
+      "attempt": "Packet identity-format census",
+      "error": "SQLSTATE 42702: packet_key was ambiguous across joined tables",
+      "resolution": "Qualified packet_key with the lineage alias and reran successfully"
+    },
+    {
+      "attempt": "One slow query session",
+      "error": "Initial tool response did not preserve its session handle",
+      "resolution": "Checked process state, confirmed it was terminal, then reran once with a tracked handle"
+    }
+  ],
+  "nextRequirements": [
+    "Resolve current source and chunk candidates through the PacketKeyV2 owner; do not promote legacy packet keys from exact source matches alone.",
+    "Connect an independently authenticated actor-to-workspace/source grant provider before exposing a production query path.",
+    "Bind SearchRuntime results to current workspace/source revisions and admitted packet identity before PageRank, synthesis, ACE, or cache fanout.",
+    "Keep the existing GIN and HNSW indexes; do not add an AIO bitmap table or duplicate corpus store."
+  ],
+  "likely_cause": "The canonical chunk index is FTS-searchable and exact source/chunk bindings cover a substantial subset, but current revision fields and PacketKeyV2 resolution are absent from the candidate rows; the application lexical function also targets an older projection.",
+  "evidence": [
+    "Live PostgreSQL 18.4/pgvector 0.8.3 read-only catalog queries",
+    "Bounded canonical codebase_chunk_index FTS query and EXPLAIN ANALYZE bitmap plan",
+    "Exact source_ref/file_content_hash to atlas_workspace_source_bindings and atlas_packet_chunk_lineage census",
+    "Fresh canonical projection admission receipt: NOT_SAFE_TO_PROJECT"
+  ],
+  "patchTargets": [],
+  "safeNextCommand": "Review the existing PacketKeyV2 admission/source-owner path for the 13,718 legacy packet keys; do not run a writer until the admission gate passes.",
+  "smokeCommand": "cd sveltekit-frontend && npm run atlas:graphify:daily:admission",
+  "reportPath": "docs/reports/parent-atlas-live-fts-lineage-audit-20261024.json"
+}

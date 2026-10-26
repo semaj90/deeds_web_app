@@ -28,7 +28,7 @@
   LLAMA_SERVER_PATH      default: resolves same as launch-turboquant.ps1
   EMBED_MODEL_PATH       default: auto-discovers embeddinggemma blob from Ollama store
   EMBED_PORT             default: 8081
-  EMBED_NGL              default: 99  (full GPU offload)
+  EMBED_NGL              default: 0   (CPU-only; set explicitly for GPU use)
   EMBED_BATCH_SIZE       default: 2048 (must equal EMBED_UBATCH_SIZE and be >= EMBED_CTX — see invariant below)
   EMBED_UBATCH_SIZE      default: 2048
   EMBED_CTX              default: 2048 (embeddinggemma-300m model-card max input tokens)
@@ -159,7 +159,7 @@ if (-not (Test-Path $model)) { throw "Embed model GGUF not found at: $model" }
 
 # -- Config -------------------------------------------------------------------
 $port       = if ($env:EMBED_PORT)       { $env:EMBED_PORT }       else { '8081' }
-$ngl        = if ($env:EMBED_NGL)        { $env:EMBED_NGL }        else { '99'   }
+$ngl        = if ($env:EMBED_NGL)        { $env:EMBED_NGL }        else { '0'    }
 $ctxLen     = if ($env:EMBED_CTX)        { $env:EMBED_CTX }        else { '2048' }
 # batch/ubatch default to ctx (canonical EmbeddingGemma profile — see
 # EMBED-SERVER-PHYSICAL-BATCH-01 note above). Only override via env if you

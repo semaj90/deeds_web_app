@@ -7,6 +7,20 @@ import math
 from collections import deque
 from typing import Mapping, Sequence
 
+def _validated_heuristic(heuristic:Mapping[str,float]|None,error_code:str)->dict[str,float]:
+    values={}
+    for key,value in (heuristic or {}).items():
+        if isinstance(value,bool) or not isinstance(value,(int,float)):
+            raise ValueError(error_code)
+        try:
+            numeric=float(value)
+        except (OverflowError,TypeError,ValueError):
+            raise ValueError(error_code) from None
+        if not math.isfinite(numeric) or numeric<0:
+            raise ValueError(error_code)
+        values[key]=numeric
+    return values
+
 def cosine(a:Sequence[float],b:Sequence[float])->float:
     if len(a)!=len(b) or not a: raise ValueError("VECTOR_DIM_MISMATCH")
     if not all(math.isfinite(x) for x in (*a,*b)): raise ValueError("VECTOR_NONFINITE")
@@ -43,8 +57,7 @@ def astar(adj:Mapping[str,Sequence[tuple[str,float]]],start:str,goal:str, *,
           heuristic:Mapping[str,float]|None=None,max_expansions:int=1024)->tuple[str,...]:
     """Dijkstra when heuristic omitted. Optimal only with admissible consistent heuristic."""
     if not 1<=max_expansions<=100000:raise ValueError("ASTAR_BUDGET")
-    heuristic=heuristic or {}
-    if any(not math.isfinite(v) or v<0 for v in heuristic.values()):raise ValueError("ASTAR_HEURISTIC_INVALID")
+    heuristic=_validated_heuristic(heuristic,"ASTAR_HEURISTIC_INVALID")
     pq=[(float(heuristic.get(start,0)),0.,start)]
     costs={start:0.};parents={};expanded=0
     while pq and expanded<max_expansions:
@@ -67,6 +80,7 @@ def greedy_best_first(adj:Mapping[str,Sequence[str]],start:str,goal:str,
                       heuristic:Mapping[str,float],*,max_expansions:int=1024)->tuple[str,...]:
     """Heuristic-only greedy traversal, not guaranteed optimal."""
     if not 1<=max_expansions<=100000:raise ValueError("GREEDY_BUDGET")
+    heuristic=_validated_heuristic(heuristic,"GREEDY_HEURISTIC_INVALID")
     pq=[(heuristic.get(start,0.),start)];seen=set();parent={};expanded=0
     while pq and expanded<max_expansions:
         _,u=heapq.heappop(pq)

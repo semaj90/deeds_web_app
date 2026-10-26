@@ -139,11 +139,14 @@ function normalizeSemanticScores(
   const scores = candidates.map(c => c.qdrant_score);
   const minScore = Math.min(...scores);
   const maxScore = Math.max(...scores);
-  const range = maxScore - minScore || 1;
+  const range = maxScore - minScore;
 
   const normalized = new Map<string, number>();
   for (const candidate of candidates) {
-    const normalized_score = (candidate.qdrant_score - minScore) / range;
+    // Zero range (single candidate or identical scores): keep the raw score, clamped to [0,1], instead of collapsing to 0.
+    const normalized_score = range > 0
+      ? (candidate.qdrant_score - minScore) / range
+      : candidate.qdrant_score;
     normalized.set(candidate.packet_key, Math.max(0, Math.min(1, normalized_score)));
   }
   return normalized;

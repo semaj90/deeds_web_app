@@ -1,0 +1,4341 @@
+{
+  "generated": "2026-10-17T17:48:13.170Z",
+  "pgVersion": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu",
+  "counts": {
+    "drizzleTables": 378,
+    "liveTables": 567
+  },
+  "tablesDeclaredNotLive": [
+    "agent_memory_observations",
+    "agent_progress_log",
+    "ast_edges",
+    "ast_file_features",
+    "ast_nodes",
+    "atlas_cards",
+    "atlas_contract_fields",
+    "atlas_feature_dict",
+    "atlas_lane_dict",
+    "atlas_source_ref_dict",
+    "atlas_source_ref_synthesis",
+    "atlas_workspace_event_participants",
+    "atlas_workspace_events",
+    "atlas_workspace_heads",
+    "case_chunks",
+    "centroid_registry",
+    "codebase_audit_events",
+    "context_buffers",
+    "deep_research_reports",
+    "documents_atlas_entries",
+    "engram_cards",
+    "entities",
+    "entity_edges",
+    "evidence_board_edges",
+    "evidence_frames",
+    "evidence_items",
+    "evidence_media_assets",
+    "evidence_processing_jobs",
+    "evidence_transcript_segments",
+    "experiment_analysis_results",
+    "experiment_analysis_runs",
+    "feature_index_entries",
+    "feature_registry",
+    "feature_tasks",
+    "graph_pathway_cards",
+    "intent_synthesis",
+    "llm_context_cache",
+    "lora_training_runs",
+    "memory_registry",
+    "model_artifacts",
+    "packet_binary_registry",
+    "packet_markdown_chunks",
+    "parent_atlas_jobs",
+    "policy_reranker_metadata",
+    "repo_function_registry",
+    "retrieval_cache_traces",
+    "retrieval_provenance",
+    "rg_search_results",
+    "saved_citation_annotations",
+    "search_centroids",
+    "semantic_cache",
+    "semantic_embedding_cache_v2",
+    "summary_cards",
+    "synthesis_logs",
+    "token_map_cards",
+    "tool_execution_stats_7d",
+    "tool_traces",
+    "web_search_index"
+  ],
+  "tablesLiveNotDeclared": [
+    "tool_execution_audit",
+    "code_relations_v1",
+    "fix_attempts",
+    "fixer_patterns",
+    "atlas_feature_map_history",
+    "atlas_latent_fixture",
+    "workflow_runs",
+    "workflow_tasks",
+    "workflow_outbox",
+    "workflow_approvals",
+    "atlas_topology_eval_times",
+    "atlas_feature_evidence",
+    "atlas_context_manifests",
+    "community_reports_leiden",
+    "parent_atlas_records",
+    "parent_atlas_vectors",
+    "atlas_svg_glyphs",
+    "atlas_tree_nodes",
+    "atlas_higher_hop_index",
+    "atlas_feature_relationships",
+    "atlas_enrichment_progress",
+    "packet_features",
+    "agent_scheduler_jobs",
+    "code_feature_edges",
+    "code_feature_embeddings",
+    "feature_statistics",
+    "code_features",
+    "codebase_chunk_index_backup",
+    "codebase_chunk_index_stats",
+    "error_signal_stream",
+    "dag_hit_envelope_cache",
+    "error_cluster_groups",
+    "atlas_packet_features",
+    "graphify_audit_kanban",
+    "atlas_feature_envelopes",
+    "atlas_feature_recommendation_index",
+    "atlas_tensor_artifacts",
+    "atlas_tensor_tiles",
+    "packet_qdrant_bridge",
+    "atlas_packet_registry",
+    "atlas_topology_clusters",
+    "atlas_id_hierarchy_metadata",
+    "ontology_edges",
+    "packet_vector_bundles",
+    "atlas_tensor_tile_members",
+    "atlas_tensor_residency_events",
+    "tool_registry",
+    "proposed_tool_calls",
+    "trace_packet_events",
+    "projects",
+    "specs",
+    "spec_revisions",
+    "features",
+    "cache_probe_runs",
+    "atlas_execution_utility",
+    "phase2f_ground_truth_expectations",
+    "encoder_provenance",
+    "phase2f_ground_truth",
+    "atlas_packet_identity_aliases",
+    "evaluation_relevance_corrected",
+    "atlas_packets_materialization_queue",
+    "atlas_qdrant_repair_log",
+    "stories",
+    "graph_community_resolution_seeds",
+    "episodic_events",
+    "semantic_memories",
+    "atlas_chunk_packet_identity_links",
+    "workflow_artifacts",
+    "atlas_knowledge_objects",
+    "atlas_cluster_models",
+    "atlas_embeddings_384",
+    "workflow_action_leases",
+    "graphify_files",
+    "workflow_action_receipts",
+    "graphify_runs",
+    "workflow_artifact_events",
+    "atlas_validation_results",
+    "atlas_projection_state",
+    "atlas_source_refs",
+    "atlas_agent_action_events",
+    "atlas_observation_feature_rows",
+    "atlas_ast_nodes",
+    "atlas_recommendation_outcome_receipts",
+    "atlas_packet_metrics",
+    "atlas_topology_index",
+    "graphify_bm25_index_runs",
+    "som_adjacency_matrix",
+    "atlas_rpc_packets",
+    "atlas_acp_audit",
+    "feature_semantic_facts",
+    "atlas_topology_features",
+    "atlas_typed_edges",
+    "atlas_feature_snapshots",
+    "classification_envelope",
+    "ace_context_packets",
+    "ace_context_sources",
+    "ace_hit_logs",
+    "admin_raptor_summaries",
+    "agent_actions",
+    "agent_context_files",
+    "admin_telemetry",
+    "agent_context_files_history",
+    "agent_context_relations",
+    "code_repos",
+    "codebase_relationship_reports",
+    "code_retrieval_chunks",
+    "directory_context_bindings",
+    "enhanced_graph_mappings",
+    "feature_dependency_edges",
+    "feature_maps",
+    "file_hotness_scores",
+    "fixer_run_log",
+    "graph_expansion_cache",
+    "hermes_dag_runs",
+    "indexing_jobs",
+    "file_summaries",
+    "grpo_memory_sticks",
+    "llm_outputs",
+    "migrations",
+    "model_weights",
+    "screenshot_artifacts",
+    "symbol_runtime_stats",
+    "trace_events",
+    "trace_runs",
+    "vault_md_index",
+    "hypergraph_edge_members",
+    "llm_output_chunks",
+    "task_registry",
+    "gpu_candidate_eval",
+    "agent_os_events",
+    "atlas_feature_vectors",
+    "chrom97_packets",
+    "atlas_summary_layers",
+    "symbol_resolver",
+    "benchmark_results",
+    "packet_feature_keywords",
+    "ontology_keywords",
+    "agent_tasks",
+    "dispatcher_state_history",
+    "packet_source_features",
+    "retrieval_promotion_decisions",
+    "cache_probe_results",
+    "evaluation_queries",
+    "evaluation_relevance",
+    "phase2f_evaluation_results",
+    "evaluation_results",
+    "evaluation_corpora",
+    "evaluation_evidence",
+    "atlas_packets_identity_conflicts",
+    "evaluation_seed_queries",
+    "evaluation_candidates",
+    "evaluation_judgments",
+    "atlas_concepts",
+    "evaluation_datasets",
+    "evaluation_runs",
+    "evaluation_splits",
+    "promotion_outbox",
+    "atlas_embeddings_768",
+    "atlas_embeddings_64_latent",
+    "atlas_graph_facts",
+    "atlas_hyperedge_members",
+    "atlas_ontology_concepts",
+    "atlas_ontology_relations",
+    "atlas_features",
+    "feature_records",
+    "recommendation_events",
+    "atlas_index_runs",
+    "execution_reviews",
+    "atlas_acp_progress",
+    "atlas_feature_packets",
+    "registry_enrichment_projection",
+    "registry_embedding_identity",
+    "registry_topology_projection",
+    "registry_ontology_tuples",
+    "feature_structural",
+    "feature_lexical",
+    "feature_domain",
+    "ontology_domain_tuples",
+    "atlas_registry_alignment",
+    "atlas_graph_authority_runs",
+    "vector_index_registry",
+    "atlas_graph_authority_scores",
+    "atlas_vector_registry",
+    "atlas_document_classification",
+    "authorization_audit_log",
+    "domain_taxonomy_v1",
+    "atlas_ontology_linked_tuples",
+    "atlas_schema_registry",
+    "atlas_class_search_index_v1",
+    "atlas_ontology_tuples",
+    "atlas_hyperedges",
+    "atlas_taxonomy_assignment_candidates",
+    "atlas_fi_features",
+    "atlas_feature_aliases",
+    "atlas_fi_evidence",
+    "atlas_evidence",
+    "atlas_relationships",
+    "atlas_relationship_members",
+    "atlas_relationship_cardinality",
+    "atlas_dynamic_hyperedge_candidates",
+    "atlas_relationship_evidence",
+    "atlas_relationship_embeddings",
+    "atlas_feature_embeddings",
+    "atlas_feature_state_receipts",
+    "atlas_identity_alias_decisions",
+    "atlas_algorithm_execution_receipts",
+    "atlas_source_aliases",
+    "atlas_workspace_source_bindings",
+    "atlas_identity_ledger",
+    "atlas_packet_chunk_lineage",
+    "graphify_symbols",
+    "graphify_edges",
+    "outcome_ledger",
+    "graphify_execution_files",
+    "graphify_execution_stages",
+    "tool_call_events",
+    "task_semantic_packets",
+    "atlas_packet_write_receipts",
+    "atlas_projection_outbox",
+    "graphify_execution_file_membership_v2",
+    "atlas_representations",
+    "atlas_representation_providers",
+    "atlas_representation_lane_selections",
+    "atlas_representation_provider_fallbacks",
+    "atlas_retrieval_lane_fallbacks",
+    "atlas_representation_migrations",
+    "atlas_qdrant_collection_mappings",
+    "atlas_representation_compatibility_evaluations",
+    "atlas_representation_validation_results",
+    "route_metadata",
+    "error_cluster",
+    "route_health_event",
+    "error_brain_analysis",
+    "error_brain_patch",
+    "route_interaction_log",
+    "graphify_execution_authority",
+    "graphify_executions",
+    "atlas_repository_identity",
+    "atlas_stable_file_identity",
+    "atlas_stable_file_revision_binding",
+    "atlas_stable_file_alias",
+    "atlas_external_doc_analyses",
+    "atlas_directories",
+    "diagnostic_ast_facts",
+    "diagnostic_dag_runs",
+    "diagnostic_recommendations",
+    "codebase_chunk_eg2_embeddings"
+  ],
+  "columnsMissingLive": [
+    {
+      "table": "agent_observations",
+      "column": "id",
+      "drizzle": "serial"
+    },
+    {
+      "table": "agent_observations",
+      "column": "session_type",
+      "drizzle": "text"
+    },
+    {
+      "table": "agent_observations",
+      "column": "file_path",
+      "drizzle": "text"
+    },
+    {
+      "table": "agent_observations",
+      "column": "observation_text",
+      "drizzle": "text"
+    },
+    {
+      "table": "agent_observations",
+      "column": "char_interval_start",
+      "drizzle": "integer"
+    },
+    {
+      "table": "agent_observations",
+      "column": "som_cluster_id",
+      "drizzle": "integer"
+    },
+    {
+      "table": "agent_observations",
+      "column": "timestamp",
+      "drizzle": "timestamp with time zone"
+    },
+    {
+      "table": "ai_reports",
+      "column": "updated_at",
+      "drizzle": "timestamp"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "feature_label",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "canonical_name",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "community_id",
+      "drizzle": "integer"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "som_bmu_row",
+      "drizzle": "integer"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "som_bmu_col",
+      "drizzle": "integer"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "tree_node_id",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "qdrant_point_ids",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "neo4j_node_id",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "neo4j_node_ids",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "nes_card_id",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "packet_keys",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "file_path",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "source_refs",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "metadata",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "summary",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "pagerank",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "centrality",
+      "drizzle": "text"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "updated_at",
+      "drizzle": "timestamp with time zone"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "atlas_version",
+      "drizzle": "integer"
+    },
+    {
+      "table": "chunk_hit_log",
+      "column": "promotion_state",
+      "drizzle": "text"
+    },
+    {
+      "table": "chunk_hit_log",
+      "column": "promotion_boost",
+      "drizzle": "real"
+    },
+    {
+      "table": "chunk_hit_log",
+      "column": "base_score",
+      "drizzle": "real"
+    },
+    {
+      "table": "citations",
+      "column": "citation_type",
+      "drizzle": "varchar(100)"
+    },
+    {
+      "table": "citations",
+      "column": "title",
+      "drizzle": "varchar(500)"
+    },
+    {
+      "table": "citations",
+      "column": "annotation",
+      "drizzle": "text"
+    },
+    {
+      "table": "citations",
+      "column": "is_key_authority",
+      "drizzle": "boolean"
+    },
+    {
+      "table": "citations",
+      "column": "tags",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "citations",
+      "column": "embedding",
+      "drizzle": "vector(768)"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "centroid_id",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "collection",
+      "drizzle": "varchar(100)"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "source_refs",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "method_anchors",
+      "drizzle": "text[]"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "top_chunk_ids",
+      "drizzle": "uuid[]"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "top_file_paths",
+      "drizzle": "text[]"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "top_tags",
+      "drizzle": "text[]"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "summary_hints",
+      "drizzle": "text[]"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "cluster_summary",
+      "drizzle": "text"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "representative_embedding",
+      "drizzle": "vector(768)"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "authority_score",
+      "drizzle": "real"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "member_count",
+      "drizzle": "integer"
+    },
+    {
+      "table": "cluster_cards",
+      "column": "last_rebuilt_at",
+      "drizzle": "timestamp with time zone"
+    },
+    {
+      "table": "context_timeline",
+      "column": "reconstruction_error",
+      "drizzle": "real"
+    },
+    {
+      "table": "context_timeline",
+      "column": "routing_cluster",
+      "drizzle": "integer"
+    },
+    {
+      "table": "document_chunks",
+      "column": "embedding",
+      "drizzle": "vector(768)"
+    },
+    {
+      "table": "documents",
+      "column": "case_id",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "documents",
+      "column": "description",
+      "drizzle": "text"
+    },
+    {
+      "table": "documents",
+      "column": "file_path",
+      "drizzle": "varchar(500)"
+    },
+    {
+      "table": "documents",
+      "column": "file_type",
+      "drizzle": "varchar(100)"
+    },
+    {
+      "table": "documents",
+      "column": "summary",
+      "drizzle": "text"
+    },
+    {
+      "table": "documents",
+      "column": "embedding_id",
+      "drizzle": "varchar(255)"
+    },
+    {
+      "table": "documents",
+      "column": "metadata",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "evidence_vectors",
+      "column": "vector",
+      "drizzle": "vector(768)"
+    },
+    {
+      "table": "feature_structural_facts",
+      "column": "projection_key",
+      "drizzle": "text"
+    },
+    {
+      "table": "glyph_records",
+      "column": "source_ref",
+      "drizzle": "text"
+    },
+    {
+      "table": "glyph_records",
+      "column": "glyph_kind",
+      "drizzle": "text"
+    },
+    {
+      "table": "glyph_records",
+      "column": "embedding_model",
+      "drizzle": "text"
+    },
+    {
+      "table": "glyph_records",
+      "column": "batch_id",
+      "drizzle": "text"
+    },
+    {
+      "table": "gpu_cluster_centroids",
+      "column": "computed_at",
+      "drizzle": "timestamp with time zone"
+    },
+    {
+      "table": "jurisdictions",
+      "column": "created_at",
+      "drizzle": "timestamp with time zone"
+    },
+    {
+      "table": "jurisdictions",
+      "column": "updated_at",
+      "drizzle": "timestamp with time zone"
+    },
+    {
+      "table": "legal_documents",
+      "column": "s3_key",
+      "drizzle": "text"
+    },
+    {
+      "table": "legal_documents",
+      "column": "original_name",
+      "drizzle": "text"
+    },
+    {
+      "table": "legal_documents",
+      "column": "mime_type",
+      "drizzle": "text"
+    },
+    {
+      "table": "legal_documents",
+      "column": "file_size",
+      "drizzle": "bigint"
+    },
+    {
+      "table": "legal_documents",
+      "column": "case_id",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "legal_documents",
+      "column": "document_type",
+      "drizzle": "document_type"
+    },
+    {
+      "table": "legal_documents",
+      "column": "practice_area",
+      "drizzle": "varchar(100)"
+    },
+    {
+      "table": "library_document_versions",
+      "column": "amendment_note",
+      "drizzle": "text"
+    },
+    {
+      "table": "qlora_examples",
+      "column": "som_clusters",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "qlora_examples",
+      "column": "retrieval_strategy",
+      "drizzle": "text"
+    },
+    {
+      "table": "research_summaries",
+      "column": "source_ref",
+      "drizzle": "text"
+    },
+    {
+      "table": "research_summaries",
+      "column": "source_refs",
+      "drizzle": "text[]"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "tree_node_id",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "prompt_hash",
+      "drizzle": "text"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "reward",
+      "drizzle": "numeric"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "packet_uuid",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "route_state",
+      "drizzle": "text"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "feature_id",
+      "drizzle": "text"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "supersedes_packet_uuid",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "superseded_by",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "git_sha",
+      "drizzle": "text"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "git_diff_rank",
+      "drizzle": "numeric"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "repair_reason",
+      "drizzle": "text"
+    },
+    {
+      "table": "route_runtime_packets",
+      "column": "repair_method",
+      "drizzle": "text"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "id",
+      "drizzle": "uuid"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "query_hash",
+      "drizzle": "text"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "qdrant_collection",
+      "drizzle": "varchar(200)"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "qdrant_point_ids",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "context_chunks",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "cached_result",
+      "drizzle": "jsonb"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "expires_at",
+      "drizzle": "timestamp with time zone"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "updated_at",
+      "drizzle": "timestamp with time zone"
+    }
+  ],
+  "columnsLiveNotDeclared": [
+    {
+      "table": "admin_ai_chat_sessions",
+      "column": "context_tag",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "admin_ai_chat_sessions",
+      "column": "active",
+      "live": "boolean",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "observation_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "agent_name",
+      "live": "character varying(255)",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "tool_name",
+      "live": "character varying(255)",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "input_hash",
+      "live": "character varying(64)",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "output_summary",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "decision_context",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "confidence",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "bm25_tags",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "hnsw_embedding",
+      "live": "vector(384)",
+      "generated": false
+    },
+    {
+      "table": "agent_observations",
+      "column": "created_at",
+      "live": "timestamp without time zone",
+      "generated": false
+    },
+    {
+      "table": "ai_reports",
+      "column": "updatedAt",
+      "live": "timestamp without time zone",
+      "generated": false
+    },
+    {
+      "table": "atlas_external_doc_chunks",
+      "column": "start_byte",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_external_doc_chunks",
+      "column": "end_byte",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "group_id",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "packet_universe",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "som_cluster",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "content_embedding_384",
+      "live": "vector(384)",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "embedding_status",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "embedding_timestamp",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "extracted_entities",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "keywords",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "error_pattern",
+      "live": "character varying(255)",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "feature_group_id",
+      "live": "character varying(255)",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "taxonomy_level",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "bm25_indexed_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "bm25_score",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "bm25_terms",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "page_rank_score",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "kmeans_cluster_id",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "routing_hints",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "k_core",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "ngrams",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "trigrams",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "engrams",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "used_concepts",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "topolog_cluster",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "topolog_confidence",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "topolog_method",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "topolog_applied_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "repository_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "directory_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "file_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "module_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "symbol_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "chunk_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "recovery_lane",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "som_cluster_id",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "ontology",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "packet_type_test",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "packet_type",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "packet_ontology",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "parent_packet_key",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "related_packets",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "telemetry",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "embedding_eligible",
+      "live": "boolean",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "summary_hash",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "embedding_version",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "embedding_claimed_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "embedding_claimed_by",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "feature_envelope",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "domain_confidence",
+      "live": "double precision",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "title_generator_version",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "file_purpose",
+      "live": "file_purpose_enum",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "thoroughness",
+      "live": "thoroughness_enum",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "app_criticality",
+      "live": "app_criticality_enum",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "test_coverage_pct",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "file_understanding_computed_at",
+      "live": "timestamp without time zone",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "file_understanding_method",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "openspec_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "gsd_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "enrichment_updated_at",
+      "live": "timestamp without time zone",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "som_cell_x",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "som_cell_y",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "ast_score",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "community_boost",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "rerank_features",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "pagerank_score",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "som_distance",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "predicted_domain",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "classifier_kind",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "classifier_version",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "pagerank_raw",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "authority_score",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "semantic_anchor",
+      "live": "character varying(512)",
+      "generated": false
+    },
+    {
+      "table": "atlas_packets",
+      "column": "ontology_version",
+      "live": "character varying(64)",
+      "generated": false
+    },
+    {
+      "table": "atlas_artifacts",
+      "column": "metadata",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "cluster_cards",
+      "column": "id",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "cluster_cards",
+      "column": "card",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "cluster_cards",
+      "column": "centroid_dim",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "cluster_cards",
+      "column": "created_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "cluster_cards",
+      "column": "updated_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_dimension",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_normalized",
+      "live": "boolean",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_eligible",
+      "live": "boolean",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_version",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_dtype",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "embedding_created_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "encoder_id",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "search_vector",
+      "live": "tsvector",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_symbols",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_imports",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_exports",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "ast_facts_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_cluster",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "centroid_distance",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "second_cluster_id",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "second_distance",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "cluster_margin",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_model_version",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_assigned_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_vector_contract",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_cluster",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_distance",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_second_id",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_second_dist",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_margin",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_model_version",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans384_assigned_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "kmeans_distance",
+      "live": "real",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_256_checkpoint_revision",
+      "live": "character varying(64)",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent64_model",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_valid",
+      "live": "boolean",
+      "generated": false
+    },
+    {
+      "table": "codebase_chunk_index",
+      "column": "error_embedding_latent_validated_at",
+      "live": "timestamp with time zone",
+      "generated": false
+    },
+    {
+      "table": "concept_records",
+      "column": "metadata",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "embedded_summaries",
+      "column": "embedding",
+      "live": "vector(768)",
+      "generated": false
+    },
+    {
+      "table": "error_logs",
+      "column": "diagnostic_run_id",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "error_logs",
+      "column": "diagnostic_log_sha256",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "error_logs",
+      "column": "diagnostic_log_line",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "error_logs",
+      "column": "diagnostic_code",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "error_logs",
+      "column": "diagnostic_fingerprint",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "error_logs",
+      "column": "message_tsv",
+      "live": "tsvector",
+      "generated": true
+    },
+    {
+      "table": "evidence",
+      "column": "search_vector",
+      "live": "tsvector",
+      "generated": false
+    },
+    {
+      "table": "evidence_vectors",
+      "column": "embedding",
+      "live": "vector(384)",
+      "generated": false
+    },
+    {
+      "table": "evidence_vectors",
+      "column": "embedding_type",
+      "live": "character varying(50)",
+      "generated": false
+    },
+    {
+      "table": "evidence_vectors",
+      "column": "source_field",
+      "live": "character varying(100)",
+      "generated": false
+    },
+    {
+      "table": "evidence_vectors",
+      "column": "updated_at",
+      "live": "timestamp without time zone",
+      "generated": false
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "feature_id",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "binding_type",
+      "live": "text",
+      "generated": false
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "confidence",
+      "live": "double precision",
+      "generated": false
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "evidence_ids",
+      "live": "text[]",
+      "generated": false
+    },
+    {
+      "table": "legal_chunks",
+      "column": "tsv",
+      "live": "tsvector",
+      "generated": true
+    },
+    {
+      "table": "legal_documents",
+      "column": "content_tsv",
+      "live": "tsvector",
+      "generated": true
+    },
+    {
+      "table": "legal_documents",
+      "column": "jurisdiction",
+      "live": "character varying(100)",
+      "generated": false
+    },
+    {
+      "table": "legal_nodes",
+      "column": "tsv",
+      "live": "tsvector",
+      "generated": false
+    },
+    {
+      "table": "qlora_examples",
+      "column": "used_in_run",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "rag_query_log",
+      "column": "query_embedding",
+      "live": "halfvec(768)",
+      "generated": false
+    },
+    {
+      "table": "rag_query_log",
+      "column": "entity_ca_codes",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "recommendation_log",
+      "column": "superseded_by",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "recommendation_log",
+      "column": "updated_by",
+      "live": "character varying(255)",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "cache_id",
+      "live": "uuid",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "scenario_hash",
+      "live": "character varying(64)",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "model_id",
+      "live": "character varying(100)",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "model_version",
+      "live": "character varying(64)",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "context_contract_version",
+      "live": "character varying(64)",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "retrieval_manifest_hash",
+      "live": "character varying(64)",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "cached_response",
+      "live": "jsonb",
+      "generated": false
+    },
+    {
+      "table": "scenario_cache",
+      "column": "hit_count",
+      "live": "integer",
+      "generated": false
+    },
+    {
+      "table": "workspaces",
+      "column": "logical_key",
+      "live": "text",
+      "generated": false
+    }
+  ],
+  "typeMismatches": [
+    {
+      "table": "agent_run_actions",
+      "column": "risk_level",
+      "drizzle": "integer",
+      "live": "smallint"
+    },
+    {
+      "table": "agent_traces",
+      "column": "score",
+      "drizzle": "double precision",
+      "live": "real"
+    },
+    {
+      "table": "atlas_assertion_versions",
+      "column": "duplicate_ordinal",
+      "drizzle": "bigint",
+      "live": "integer"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "community_confidence",
+      "drizzle": "double precision",
+      "live": "numeric"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "content_hash",
+      "drizzle": "text",
+      "live": "character varying(64)"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "tree_node_id",
+      "drizzle": "uuid",
+      "live": "text"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "domain_class",
+      "drizzle": "text",
+      "live": "character varying(255)"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "domain_memberships",
+      "drizzle": "text[]",
+      "live": "jsonb"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "workspace_id",
+      "drizzle": "text",
+      "live": "character varying(256)"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "source_representation_id",
+      "drizzle": "text",
+      "live": "character varying(32)"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "projection_representation_id",
+      "drizzle": "text",
+      "live": "character varying(32)"
+    },
+    {
+      "table": "atlas_artifacts",
+      "column": "gan_validated",
+      "drizzle": "timestamp",
+      "live": "timestamp with time zone"
+    },
+    {
+      "table": "atlas_artifacts",
+      "column": "created_at",
+      "drizzle": "timestamp",
+      "live": "timestamp with time zone"
+    },
+    {
+      "table": "atlas_artifacts",
+      "column": "updated_at",
+      "drizzle": "timestamp",
+      "live": "timestamp with time zone"
+    },
+    {
+      "table": "atlas_semantic_diffs",
+      "column": "created_at",
+      "drizzle": "timestamp",
+      "live": "timestamp with time zone"
+    },
+    {
+      "table": "atlas_semantic_diffs",
+      "column": "updated_at",
+      "drizzle": "timestamp",
+      "live": "timestamp with time zone"
+    },
+    {
+      "table": "case_note_versions",
+      "column": "edited_by",
+      "drizzle": "integer",
+      "live": "uuid"
+    },
+    {
+      "table": "cases",
+      "column": "priority",
+      "drizzle": "case_priority",
+      "live": "text"
+    },
+    {
+      "table": "cases",
+      "column": "status",
+      "drizzle": "case_status",
+      "live": "text"
+    },
+    {
+      "table": "chat_embeddings",
+      "column": "created_at",
+      "drizzle": "timestamp",
+      "live": "timestamp with time zone"
+    },
+    {
+      "table": "citations",
+      "column": "created_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "citations",
+      "column": "updated_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "document_embeddings",
+      "column": "embedding",
+      "drizzle": "jsonb",
+      "live": "vector(384)"
+    },
+    {
+      "table": "document_processing",
+      "column": "status",
+      "drizzle": "document_status",
+      "live": "text"
+    },
+    {
+      "table": "documents",
+      "column": "created_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "documents",
+      "column": "updated_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "documents",
+      "column": "status",
+      "drizzle": "varchar(50)",
+      "live": "document_status"
+    },
+    {
+      "table": "error_logs",
+      "column": "fix_confidence",
+      "drizzle": "numeric(5, 2)",
+      "live": "numeric"
+    },
+    {
+      "table": "evidence",
+      "column": "file_type",
+      "drizzle": "varchar(100)",
+      "live": "character varying(50)"
+    },
+    {
+      "table": "evidence",
+      "column": "file_size",
+      "drizzle": "bigint",
+      "live": "integer"
+    },
+    {
+      "table": "evidence",
+      "column": "updated_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "evidence",
+      "column": "verified_at",
+      "drizzle": "timestamp",
+      "live": "timestamp with time zone"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "feature_key",
+      "drizzle": "varchar(255)",
+      "live": "text"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "packet_key",
+      "drizzle": "varchar(255)",
+      "live": "text"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "binding_kind",
+      "drizzle": "feature_binding_kind",
+      "live": "text"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "join_method",
+      "drizzle": "varchar(100)",
+      "live": "text"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "source_ref",
+      "drizzle": "varchar(500)",
+      "live": "text"
+    },
+    {
+      "table": "legal_documents",
+      "column": "status",
+      "drizzle": "document_status",
+      "live": "text"
+    },
+    {
+      "table": "library_document_versions",
+      "column": "source_date",
+      "drizzle": "timestamp",
+      "live": "date"
+    },
+    {
+      "table": "library_documents",
+      "column": "jurisdiction_id",
+      "drizzle": "integer",
+      "live": "bigint"
+    },
+    {
+      "table": "library_documents",
+      "column": "effective_date",
+      "drizzle": "timestamp",
+      "live": "date"
+    },
+    {
+      "table": "poi_photos",
+      "column": "face_embedding",
+      "drizzle": "vector(768)",
+      "live": "text"
+    },
+    {
+      "table": "report_versions",
+      "column": "changed_by",
+      "drizzle": "integer",
+      "live": "uuid"
+    },
+    {
+      "table": "reports",
+      "column": "type",
+      "drizzle": "varchar(64)",
+      "live": "character varying(50)"
+    },
+    {
+      "table": "reports",
+      "column": "report_type",
+      "drizzle": "varchar(100)",
+      "live": "character varying(50)"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "created_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_packets",
+      "column": "promotion_timestamp",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_packets",
+      "column": "ingested_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_packets",
+      "column": "scored_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_packets",
+      "column": "validated_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_packets",
+      "column": "resolved_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_packets",
+      "column": "updated_at",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_resolution_ledger",
+      "column": "check_timestamp",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    },
+    {
+      "table": "unknown_resolution_ledger",
+      "column": "action_timestamp",
+      "drizzle": "timestamp with time zone",
+      "live": "timestamp without time zone"
+    }
+  ],
+  "nullabilityRisks": [
+    {
+      "table": "agent_traces",
+      "column": "task_id",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "prompt",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "retrieved_packets",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "tool_calls",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "commands",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "outcome",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "selected_concepts",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "trace_source",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "agent_traces",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "analysis_pass_results",
+      "column": "output",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "analysis_pass_results",
+      "column": "scores",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "analysis_pass_results",
+      "column": "index_push",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "analysis_pass_results",
+      "column": "provenance",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "atlas_feature_map",
+      "column": "source_ref",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "source_ref",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "directory_path",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "feature_id",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "feature_label",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "atlas_packets",
+      "column": "tags",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "chat_embeddings",
+      "column": "embedding",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "chat_embeddings",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "deep_research_audit_log",
+      "column": "success",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "deep_research_audit_log",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "documents",
+      "column": "file_size",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "documents",
+      "column": "s3_key",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "documents",
+      "column": "original_name",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "documents",
+      "column": "mime_type",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "evidence",
+      "column": "evidence_type",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "evidence",
+      "column": "uploaded_at",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "feature_key",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "binding_kind",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "join_method",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "column": "processing_pass_id",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "jurisdictions",
+      "column": "parent_id",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "kag_dag_edges",
+      "column": "run_id",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "ldr_research_results",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "status",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "rank_model",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "include_web_search",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "include_ldr",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "top_k",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "started_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_research_tasks",
+      "column": "updated_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ldr_synthesis",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ml_clustering",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ml_ranking_cache",
+      "column": "cache_ttl_minutes",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ml_ranking_cache",
+      "column": "hit_count",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "ml_ranking_cache",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "panel_activity_log",
+      "column": "user_id",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "qlora_examples",
+      "column": "query",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "qlora_examples",
+      "column": "response_score",
+      "issue": "declared nullable, live NOT NULL without default (insert may fail)"
+    },
+    {
+      "table": "qlora_examples",
+      "column": "gpu_clusters",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "qlora_examples",
+      "column": "pipeline_hits",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "qlora_examples",
+      "column": "entity_tags",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "query_variance_pairs",
+      "column": "hit_count",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "entity_statutes",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "entity_cases",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "total_entity_tags",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "total_found",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "rerank_l0_hit",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "rerank_l1_hits",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "rerank_fresh_scored",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "dag_enabled",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "rag_query_log",
+      "column": "hybrid_search",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "ttl_seconds",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "scenario_cache",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "manifold4_x",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "manifold4_y",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "manifold4_z",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "manifold4_w",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "graph_authority_score",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "tensor_json",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "qdrant_payload",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "output_meta",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "created_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "column": "updated_at",
+      "issue": "declared NOT NULL, live nullable"
+    },
+    {
+      "table": "uploaded_files",
+      "column": "metadata",
+      "issue": "declared NOT NULL, live nullable"
+    }
+  ],
+  "declaredIndexesMissingLive": [
+    {
+      "table": "ace_chunks",
+      "index": "idx_ace_chunks_case_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_chunks",
+      "index": "idx_ace_chunks_type",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_chunks",
+      "index": "uq_ace_chunks_case_hash_type",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_chunks",
+      "index": "idx_ace_chunks_pipeline_version",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_chunks",
+      "index": "idx_ace_chunks_read_path",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_chunks",
+      "index": "idx_ace_chunks_embedding_hnsw",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_context_cache",
+      "index": "ace_context_cache_query_hash_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_context_cache",
+      "index": "ace_context_cache_user_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_docs",
+      "index": "ace_docs_source_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_docs",
+      "index": "ace_docs_fetched_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_sources",
+      "index": "ace_sources_url_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_sources",
+      "index": "ace_sources_domain_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ace_sources",
+      "index": "ace_sources_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_observations",
+      "index": "agent_observations_som_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_observations",
+      "index": "agent_observations_ts_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_sessions",
+      "index": "idx_agent_sessions_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_sessions",
+      "index": "idx_agent_sessions_lane",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_sessions",
+      "index": "idx_agent_sessions_status",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_traces",
+      "index": "idx_agent_traces_strategy",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_traces",
+      "index": "idx_agent_traces_score",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "agent_traces",
+      "index": "idx_agent_traces_trace_source",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ai_usage_log",
+      "index": "ai_usage_log_user_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ai_usage_log",
+      "index": "ai_usage_log_endpoint_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ai_usage_log",
+      "index": "ai_usage_log_created_at_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ai_usage_log",
+      "index": "ai_usage_log_model_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "analysis_pass_results_pass_key_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "analysis_pass_results_packet_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "analysis_pass_results_source_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "analysis_pass_results_pass_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "analysis_pass_results_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "analysis_pass_results_created_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "api_audit_log",
+      "index": "api_audit_created_at_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "api_audit_log",
+      "index": "api_audit_user_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "api_audit_log",
+      "index": "api_audit_path_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "api_audit_log",
+      "index": "api_audit_status_code_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_facts",
+      "index": "idx_atlas_facts_extracted_at",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "atlas_feature_map_feature_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "afm_feature_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "afm_community_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "idx_atlas_feature_map_source_ref",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "atlas_feature_map_packet_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "atlas_feature_map_som_cluster_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "atlas_feature_map_cluster_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "afm_pagerank_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "idx_atlas_feature_map_metadata_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "idx_atlas_feature_map_qdrant_point_ids_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "idx_atlas_feature_map_neo4j_node_ids_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "idx_atlas_feature_map_packet_keys_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "idx_atlas_feature_map_source_refs_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "atlas_feature_map_tree_node_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "atlas_feature_map_related_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_map",
+      "index": "atlas_feature_map_lane_ids_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_synthesis",
+      "index": "idx_atlas_feature_synthesis_cluster_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_feature_synthesis",
+      "index": "idx_atlas_feature_synthesis_synthesized_at",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_identity",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_directory_path",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_directory_feature",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_cluster_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_permissions_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_topology_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_vectors_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_pagerank",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_betweenness",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_eigenvector",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_reward_prior",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_community_confidence",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_updated_at",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_packets",
+      "index": "idx_atlas_packets_created_at",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "audio_transcripts",
+      "index": "audio_transcripts_evidence_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "audio_transcripts",
+      "index": "audio_transcripts_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "canonical_chunks",
+      "index": "canonical_chunks_document_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "canonical_chunks",
+      "index": "canonical_chunks_chunk_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "canonical_chunks",
+      "index": "canonical_chunks_semantic_label_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "canonical_documents",
+      "index": "canonical_docs_jurisdiction_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "canonical_documents",
+      "index": "canonical_docs_authority_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "canonical_documents",
+      "index": "canonical_docs_doc_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "canonical_documents",
+      "index": "canonical_docs_citation_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_library_links",
+      "index": "case_lib_links_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_library_links",
+      "index": "case_lib_links_doc_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_library_links",
+      "index": "case_lib_links_node_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_note_evidence_refs",
+      "index": "case_note_refs_note_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_note_evidence_refs",
+      "index": "case_note_refs_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_note_versions",
+      "index": "case_note_versions_note_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_note_versions",
+      "index": "case_note_versions_version_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_notes",
+      "index": "case_notes_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_notes",
+      "index": "case_notes_is_pinned_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_notes",
+      "index": "case_notes_created_at_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_statute_links",
+      "index": "case_statute_links_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_statute_links",
+      "index": "case_statute_links_statute_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "case_statute_links",
+      "index": "case_statute_links_citation_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_document_attachments",
+      "index": "chat_attachments_session_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_document_attachments",
+      "index": "chat_attachments_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_document_attachments",
+      "index": "chat_attachments_document_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_messages",
+      "index": "idx_chat_messages_chat_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_messages",
+      "index": "idx_chat_messages_user_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_messages",
+      "index": "idx_chat_messages_case_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_messages",
+      "index": "idx_chat_messages_timestamp",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_messages",
+      "index": "idx_chat_messages_migrated_from",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_metadata",
+      "index": "idx_chat_metadata_user_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_metadata",
+      "index": "idx_chat_metadata_case_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chat_metadata",
+      "index": "idx_chat_metadata_last_message",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "chunk_hit_log",
+      "index": "chunk_hit_promotion_state_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "citation_collections",
+      "index": "citation_collections_user_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "citation_tags",
+      "index": "citation_tags_jurisdiction_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "citation_tags",
+      "index": "citation_tags_name_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "cluster_cards",
+      "index": "cluster_cards_collection_authority_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "cluster_narratives",
+      "index": "cluster_narratives_cluster_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "cluster_summaries",
+      "index": "cluster_summaries_repo_cluster_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "codebase_audit_reports",
+      "index": "codebase_audit_reports_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "codebase_audit_reports",
+      "index": "codebase_audit_reports_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "codebase_audit_reports",
+      "index": "codebase_audit_reports_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "codebase_audit_reports",
+      "index": "codebase_audit_reports_created_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "codebase_chunk_index_repo_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "collection_citations",
+      "index": "collection_citations_collection_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "collection_citations",
+      "index": "collection_citations_citation_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "community_reports",
+      "index": "community_reports_cohesion_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "community_reports",
+      "index": "community_reports_built_at_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "diagnosis_events",
+      "index": "idx_diagnosis_events_route",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "diagnosis_events",
+      "index": "idx_diagnosis_events_mode",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "diagnosis_events",
+      "index": "idx_diagnosis_events_root_cause",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "diagnosis_events",
+      "index": "idx_diagnosis_events_created",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "document_topics",
+      "index": "document_topics_document_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "document_topics",
+      "index": "document_topics_topic_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "enrichment_jobs",
+      "index": "enrichment_jobs_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "enrichment_jobs",
+      "index": "enrichment_jobs_job_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_clusters",
+      "index": "idx_error_clusters_kind",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_clusters",
+      "index": "idx_error_clusters_severity",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_events",
+      "index": "idx_error_events_route",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_events",
+      "index": "idx_error_events_kind",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_events",
+      "index": "idx_error_events_cluster",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_events",
+      "index": "idx_error_events_collected",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_feedback",
+      "index": "idx_error_feedback_suggestion",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_feedback",
+      "index": "idx_error_feedback_route",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_suggestion_states",
+      "index": "idx_error_suggestion_states_suggestion_route",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_suggestions",
+      "index": "idx_error_suggestions_cluster",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_timeline",
+      "index": "idx_error_timeline_route",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "error_timeline",
+      "index": "idx_error_timeline_event",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_analysis_cache",
+      "index": "evidence_analysis_cache_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_analysis_cache",
+      "index": "evidence_analysis_cache_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_analysis_cache",
+      "index": "evidence_analysis_cache_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_analysis_cache",
+      "index": "evidence_analysis_cache_case_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_board_connections",
+      "index": "evidence_board_connections_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_board_connections",
+      "index": "evidence_board_connections_from_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_board_connections",
+      "index": "evidence_board_connections_to_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_board_connections",
+      "index": "evidence_board_connections_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_entities",
+      "index": "evidence_entities_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_entities",
+      "index": "evidence_entities_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_entities",
+      "index": "evidence_entities_label_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_entities",
+      "index": "evidence_entities_text_label_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_forensic_flags",
+      "index": "evidence_forensic_flags_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_forensic_flags",
+      "index": "evidence_forensic_flags_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_forensic_flags",
+      "index": "evidence_forensic_flags_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_forensic_flags",
+      "index": "evidence_forensic_flags_severity_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_tags",
+      "index": "evidence_tags_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_tags",
+      "index": "evidence_tags_tag_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_versions",
+      "index": "evidence_versions_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "evidence_versions",
+      "index": "evidence_versions_version_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_file_edges",
+      "index": "feat_file_path_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_file_edges",
+      "index": "feat_key_role_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_file_edges",
+      "index": "feat_file_packet_key_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_file_edges",
+      "index": "feat_file_source_ref_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_implementations",
+      "index": "feat_impl_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_implementations",
+      "index": "feat_impl_packet_key_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_implementations",
+      "index": "feat_impl_source_ref_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_lexical_facts",
+      "index": "feature_lexical_facts_feature_key_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_ontology_tuples",
+      "index": "feature_ontology_tuples_resolved_concept_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "index": "feature_packet_bindings_feature_key_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "index": "feature_packet_bindings_binding_kind_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_packet_bindings",
+      "index": "feature_packet_bindings_processing_pass_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "feature_structural_facts",
+      "index": "feature_structural_facts_feature_key_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_case_actors",
+      "index": "fictional_actors_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_case_actors",
+      "index": "fictional_actors_role_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_case_charges",
+      "index": "fictional_charges_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_case_events",
+      "index": "fictional_events_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_case_events",
+      "index": "fictional_events_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_cases",
+      "index": "fictional_cases_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_cases",
+      "index": "fictional_cases_category_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "fictional_cases",
+      "index": "fictional_cases_jurisdiction_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_glyph_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_source_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_cluster_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_centroid_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_section_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_reward_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_source_ref_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_glyph_kind_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "glyph_records",
+      "index": "glyph_records_batch_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "gpu_cluster_centroids",
+      "index": "idx_gpu_cluster_centroids_type",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_authority_runs_v2",
+      "index": "atlas_graph_authority_runs_v2_snapshot_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_authority_runs_v2",
+      "index": "atlas_graph_authority_runs_v2_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_authority_scores_v2",
+      "index": "atlas_graph_authority_scores_v2_run_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_nodes_v2",
+      "index": "atlas_graph_nodes_v2_snapshot_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_nodes_v2",
+      "index": "atlas_graph_nodes_v2_node_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_nodes_v2",
+      "index": "atlas_graph_nodes_v2_tree_node_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_nodes_v2",
+      "index": "atlas_graph_nodes_v2_packet_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_relation_events_v2",
+      "index": "atlas_graph_relation_events_v2_snapshot_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_relation_events_v2",
+      "index": "atlas_graph_relation_events_v2_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_relation_participants_v2",
+      "index": "atlas_graph_relation_participants_v2_relation_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_relation_participants_v2",
+      "index": "atlas_graph_relation_participants_v2_node_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_resolution_issues_v2",
+      "index": "atlas_graph_resolution_issues_v2_snapshot_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_resolution_issues_v2",
+      "index": "atlas_graph_resolution_issues_v2_unique_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_snapshot_exclusions_v2",
+      "index": "atlas_graph_snapshot_exclusions_v2_snapshot_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "atlas_graph_snapshot_exclusions_v2",
+      "index": "atlas_graph_snapshot_exclusions_v2_unique_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ingestion_jobs",
+      "index": "ingestion_jobs_doc_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "ingestion_jobs",
+      "index": "ingestion_jobs_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "jurisdictions",
+      "index": "idx_jurisdictions_code",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "jurisdictions",
+      "index": "idx_jurisdictions_level",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "knowledge_artifacts",
+      "index": "knowledge_artifacts_source_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "knowledge_artifacts",
+      "index": "knowledge_artifacts_cluster_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_chunks",
+      "index": "legal_chunks_node_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_chunks",
+      "index": "legal_chunks_embed_hnsw",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_citations",
+      "index": "idx_legal_citations_from",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_citations",
+      "index": "idx_legal_citations_to",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_citations",
+      "index": "idx_legal_citations_target",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_definitions",
+      "index": "legal_defs_term_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_definitions",
+      "index": "idx_legal_definitions_node_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_nodes",
+      "index": "legal_nodes_doc_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_nodes",
+      "index": "legal_nodes_path_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_nodes",
+      "index": "idx_legal_nodes_citation",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_terms",
+      "index": "legal_terms_term_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "legal_terms",
+      "index": "legal_terms_domain_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "library_documents",
+      "index": "library_docs_jurisdiction_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "library_documents",
+      "index": "library_docs_corpus_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "library_documents",
+      "index": "library_docs_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "library_documents",
+      "index": "library_docs_source_hash_uidx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "model_registry",
+      "index": "model_registry_backend_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "model_registry",
+      "index": "model_registry_capability_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "model_registry",
+      "index": "model_registry_active_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "page_artifacts",
+      "index": "page_artifacts_doc_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "poi_relationships",
+      "index": "poi_relationships_poi1_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "poi_relationships",
+      "index": "poi_relationships_poi2_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "qlora_examples",
+      "index": "qlora_examples_query_hash_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "qlora_examples",
+      "index": "qlora_examples_created_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rag_index_metadata",
+      "index": "rag_index_metadata_chunk_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rag_index_metadata",
+      "index": "rag_index_metadata_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rag_index_metadata",
+      "index": "rag_index_metadata_tags_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "report_audit_log",
+      "index": "report_audit_log_report_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "report_audit_log",
+      "index": "report_audit_log_user_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "report_audit_log",
+      "index": "report_audit_log_timestamp_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "report_versions",
+      "index": "report_versions_report_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "report_versions",
+      "index": "report_versions_version_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "research_summaries",
+      "index": "rs_source_ref",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "response_feedback",
+      "index": "response_feedback_user_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rg_search_hits",
+      "index": "rg_hits_run_rank_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rg_search_hits",
+      "index": "rg_hits_final_score_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rg_search_hits",
+      "index": "rg_hits_cluster_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rg_search_runs",
+      "index": "rg_runs_user_created_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "rg_search_runs",
+      "index": "rg_runs_runkey_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_error_patches",
+      "index": "idx_route_patches_route",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_error_patches",
+      "index": "idx_route_patches_status",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_error_patches",
+      "index": "idx_route_patches_error_code",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_health",
+      "index": "idx_route_health_path",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_health",
+      "index": "idx_route_health_state",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_health",
+      "index": "idx_route_health_updated",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_health",
+      "index": "idx_route_health_cluster",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_rrp_feature_cluster",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_rrp_raw_domain",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_rrp_raw_feature_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_route_runtime_packets_feature_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_route_runtime_packets_feature_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_route_runtime_packets_feature_ids_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_route_runtime_packets_source_refs_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_route_runtime_packets_tree_node_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_route_runtime_packets_raw_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_rrp_git_sha",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "idx_rrp_superseded_by",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "rrp_raw_gin",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "rrp_state_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "rrp_feature_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "route_runtime_packets",
+      "index": "rrp_packet_uuid_uidx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "service_capabilities",
+      "index": "svc_capabilities_tier_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "state_constitution_sources",
+      "index": "idx_scs_state_code",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "state_constitution_sources",
+      "index": "idx_scs_document_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "statute_chunks",
+      "index": "statute_chunks_statute_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "statute_chunks",
+      "index": "statute_chunks_chunk_index_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "synthesis_runs",
+      "index": "synthesis_runs_user_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "synthesis_runs",
+      "index": "synthesis_runs_created_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "term_examples",
+      "index": "term_examples_term_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "term_examples",
+      "index": "term_examples_relationship_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "timeline_events",
+      "index": "idx_timeline_events_poi_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "timeline_events",
+      "index": "idx_timeline_events_case_id",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "timeline_events",
+      "index": "idx_timeline_events_event_date",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "user_interaction_history",
+      "index": "user_interaction_history_user_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "user_interaction_history",
+      "index": "user_interaction_history_document_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "user_interaction_history",
+      "index": "user_interaction_history_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "user_interaction_history",
+      "index": "user_interaction_history_created_at_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "user_research_tasks",
+      "index": "urt_user_status",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "user_research_tasks",
+      "index": "urt_user_created",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "user_research_tasks",
+      "index": "urt_session",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_audit_log",
+      "index": "warden_audit_log_prosecutor_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_audit_log",
+      "index": "warden_audit_log_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_audit_log",
+      "index": "warden_audit_log_action_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_chunks",
+      "index": "warden_chunks_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_chunks",
+      "index": "warden_chunks_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_citation_graph",
+      "index": "warden_citation_graph_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_citation_graph",
+      "index": "warden_citation_graph_cited_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_citations",
+      "index": "warden_citations_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_citations",
+      "index": "warden_citations_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_evidence",
+      "index": "warden_evidence_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_evidence",
+      "index": "warden_evidence_sha256_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "warden_evidence",
+      "index": "warden_evidence_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "whisper_segments",
+      "index": "whisper_segments_evidence_segment_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "whisper_segments",
+      "index": "whisper_segments_case_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "whisper_segments",
+      "index": "whisper_segments_evidence_time_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_citations",
+      "index": "workspace_citations_workspace_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_citations",
+      "index": "workspace_citations_message_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_evidence",
+      "index": "workspace_evidence_workspace_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_evidence",
+      "index": "workspace_evidence_evidence_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_notes",
+      "index": "workspace_notes_workspace_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_notes",
+      "index": "workspace_notes_is_ai_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_sessions",
+      "index": "workspace_sessions_workspace_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_sessions",
+      "index": "workspace_sessions_session_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_statutes",
+      "index": "workspace_statutes_workspace_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspace_statutes",
+      "index": "workspace_statutes_statute_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspaces",
+      "index": "workspaces_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "workspaces",
+      "index": "workspaces_created_by_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_cases",
+      "index": "yorha_cases_case_number_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_cases",
+      "index": "yorha_cases_created_by_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_cases",
+      "index": "yorha_cases_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_chat_messages",
+      "index": "yorha_chat_messages_session_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_chat_messages",
+      "index": "yorha_chat_messages_role_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_chat_messages",
+      "index": "yorha_chat_messages_created_at_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_chat_sessions",
+      "index": "yorha_chat_sessions_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_chat_sessions",
+      "index": "yorha_chat_sessions_user_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_chat_sessions",
+      "index": "yorha_chat_sessions_status_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_evidence_connections",
+      "index": "yorha_evidence_connections_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_evidence_connections",
+      "index": "yorha_evidence_connections_source_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_evidence_connections",
+      "index": "yorha_evidence_connections_target_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_evidence_connections",
+      "index": "yorha_evidence_connections_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_evidence_nodes",
+      "index": "yorha_evidence_nodes_case_id_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_evidence_nodes",
+      "index": "yorha_evidence_nodes_type_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_evidence_nodes",
+      "index": "yorha_evidence_nodes_created_by_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    },
+    {
+      "table": "yorha_system_metrics",
+      "index": "yorha_system_metrics_recorded_at_idx",
+      "using": "unknown (Drizzle did not expose the method)"
+    }
+  ],
+  "specialTypes": [
+    {
+      "label": "jsonb",
+      "liveColumns": 583,
+      "tables": 330,
+      "notDeclaredInDrizzle": 237
+    },
+    {
+      "label": "bytea",
+      "liveColumns": 10,
+      "tables": 10,
+      "notDeclaredInDrizzle": 7
+    },
+    {
+      "label": "bit/varbit",
+      "liveColumns": 1,
+      "tables": 1,
+      "notDeclaredInDrizzle": 1
+    },
+    {
+      "label": "vector",
+      "liveColumns": 59,
+      "tables": 44,
+      "notDeclaredInDrizzle": 32
+    },
+    {
+      "label": "halfvec",
+      "liveColumns": 13,
+      "tables": 4,
+      "notDeclaredInDrizzle": 5
+    },
+    {
+      "label": "sparsevec",
+      "liveColumns": 0,
+      "tables": 0,
+      "notDeclaredInDrizzle": 0
+    },
+    {
+      "label": "tsvector",
+      "liveColumns": 12,
+      "tables": 12,
+      "notDeclaredInDrizzle": 9
+    },
+    {
+      "label": "uuid",
+      "liveColumns": 672,
+      "tables": 364,
+      "notDeclaredInDrizzle": 226
+    },
+    {
+      "label": "text[]",
+      "liveColumns": 184,
+      "tables": 84,
+      "notDeclaredInDrizzle": 119
+    }
+  ],
+  "generatedColumnsLive": [
+    "atlas_feature_map_synthesized.routing_score",
+    "code_retrieval_chunks.search_vector",
+    "file_hotness_scores.composite_score",
+    "legal_documents.content_tsv",
+    "feature_file_edges.stable_key",
+    "atlas_class_search_index_v1.search_vector",
+    "atlas_evidence.search_vector",
+    "atlas_external_doc_chunks.search_vector",
+    "error_logs.message_tsv",
+    "atlas_packet_class_lut_validation_receipts.search_document",
+    "legal_chunks.tsv"
+  ],
+  "indexMethods": {
+    "btree": {
+      "count": 1909,
+      "notDeclaredInDrizzle": 1578
+    },
+    "gin": {
+      "count": 210,
+      "notDeclaredInDrizzle": 160
+    },
+    "hnsw": {
+      "count": 35,
+      "notDeclaredInDrizzle": 33
+    },
+    "ivfflat": {
+      "count": 3,
+      "notDeclaredInDrizzle": 3
+    },
+    "brin": {
+      "count": 3,
+      "notDeclaredInDrizzle": 3
+    },
+    "hash": {
+      "count": 1,
+      "notDeclaredInDrizzle": 1
+    },
+    "bm25": {
+      "count": 1,
+      "notDeclaredInDrizzle": 1
+    }
+  },
+  "merkleLikeColumns": [
+    "atlas_tensor_artifacts.merkle_root text"
+  ],
+  "rowStatsNote": "not computed",
+  "pgSettings": {
+    "default_statistics_target": "100",
+    "effective_io_concurrency": "16",
+    "enable_bitmapscan": "on",
+    "enable_indexscan": "on",
+    "io_method": "worker",
+    "io_workers": "3",
+    "jit": "on",
+    "maintenance_io_concurrency": "16",
+    "random_page_cost": "4",
+    "shared_buffers": "16384",
+    "work_mem": "4096"
+  },
+  "extensions": [
+    "pg_search 0.25.1",
+    "pg_trgm 1.6",
+    "pgcrypto 1.4",
+    "plpgsql 1.0",
+    "uuid-ossp 1.1",
+    "vector 0.8.3"
+  ],
+  "explain": [
+    {
+      "label": "legal_nodes full-text (GIN tsv)",
+      "nodes": [
+        "Limit  (cost=43.00..47.01 rows=1 width=16) (actual time=0.372..10.551 rows=17.00 loops=1)",
+        "->  Bitmap Heap Scan on legal_nodes  (cost=43.00..47.01 rows=1 width=16) (actual time=0.370..10.543 rows=17.00 loops=1)",
+        "->  Bitmap Index Scan on legal_nodes_tsv_gin  (cost=0.00..43.00 rows=1 width=0) (actual time=0.154..0.156 rows=17.00 loops=1)"
+      ],
+      "timing": [
+        "Planning Time: 28.444 ms",
+        "Execution Time: 10.595 ms"
+      ]
+    },
+    {
+      "label": "legal_nodes citation lookup (btree)",
+      "nodes": [
+        "Index Scan using legal_nodes_citation_idx on legal_nodes  (cost=0.41..8.43 rows=1 width=16) (actual time=0.148..0.150 rows=1.00 loops=1)"
+      ],
+      "timing": [
+        "Planning Time: 1.331 ms",
+        "Execution Time: 0.171 ms"
+      ]
+    },
+    {
+      "label": "legal_chunks vector top-10 (HNSW)",
+      "nodes": [
+        "Limit  (cost=380.49..425.96 rows=10 width=24) (actual time=6.578..7.007 rows=10.00 loops=1)",
+        "->  Limit  (cost=0.00..0.66 rows=1 width=18) (actual time=1.045..1.046 rows=1.00 loops=1)",
+        "->  Seq Scan on legal_chunks legal_chunks_1  (cost=0.00..11569.32 rows=17543 width=18) (actual time=1.044..1.044 rows=1.00 loops=1)",
+        "->  Index Scan using legal_chunks_embedding_hnsw on legal_chunks  (cost=379.84..80141.42 rows=17543 width=24) (actual time=6.575..7.000 rows=10.00 loo"
+      ],
+      "timing": [
+        "Planning Time: 0.615 ms",
+        "Execution Time: 7.097 ms"
+      ]
+    }
+  ],
+  "summary": {
+    "tablesDeclaredNotLive": 58,
+    "tablesLiveNotDeclared": 247,
+    "columnsMissingLive": 100,
+    "columnsLiveNotDeclared": 160,
+    "typeMismatches": 54,
+    "nullabilityRisks": 78,
+    "declaredIndexesMissingLive": 334
+  }
+}

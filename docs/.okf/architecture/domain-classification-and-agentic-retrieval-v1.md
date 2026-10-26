@@ -139,6 +139,27 @@ The bounded operator coverage matrix below describes code and proof status, not 
 
 This is a finite, bounded inventory rather than a claim to implement every GNN architecture. GPU parity remains gated on explicit operator approval, an idle runtime slot, and the required free-memory floor.
 
+### Bounded CPU family scope
+
+The supported research scope is the following set of bounded operator references—not complete model packages, trained checkpoints, or a claim of exhaustive GNN coverage. The operator matrix above remains the executable source-of-truth list; this family table groups that list and the regression test requires every listed operator to occur exactly once.
+
+| Family slice | Included operator references | Explicit boundary |
+| --- | --- | --- |
+| GCN and residual propagation | `GCN_SYMMETRIC_V1`, `GCNII_LAYER_V1`, `FAGCN_FREQUENCY_ADAPTATION_V1` | Fixed graph/operator semantics; no training pipeline |
+| GraphSAGE aggregation | `SAGE_MEAN_V1`, `SAGE_MAXPOOL_V1`, `SAGE_LSTM_V1` | Deterministic bounded neighbors; no stochastic sampler |
+| Attention aggregation | `GAT_SINGLE_HEAD_V1`, `GAT_MULTI_HEAD_V1`, `GAT_V2_V1`, `AGNN_PROPAGATION_V1` | Bounded layer fixtures; no full training stack |
+| Multiset aggregation | `GIN_SUM_MLP_V1`, `PNA_LAYER_V1` | Selected aggregators/scalers only |
+| Polynomial and propagation methods | `SGC_K_STEP_V1`, `APPNP_PROPAGATION_V1`, `CHEB_CONV_V1`, `ARMA_RECURSIVE_V1`, `LIGHTGCN_PROPAGATION_V1`, `GPR_GNN_V1`, `GRAND_DROP_NODE_AVERAGE_V1` | Bounded depth/recurrence; no fitting or training |
+| Typed-relation and heterogeneous message passing | `RGCN_LAYER_V1`, `COMPGCN_MULTIPLICATIVE_V1`, `HGT_TYPED_ATTENTION_V1` | Explicit finite relation/type vocabularies; no scalable sampler |
+| Edge-conditioned and geometric operators | `GATED_GCN_EDGE_GATE_V1`, `MONET_GAUSSIAN_PSEUDOCOORD_V1`, `ECC_EDGE_CONDITIONED_FILTER_V1`, `EDGE_CONV_FIXED_GRAPH_V1` | Fixed, lineage-bound edge inputs; EdgeConv does not rebuild dynamic k-NN topology |
+| Multi-hop feature propagation | `MIXHOP_LAYER_V1`, `SIGN_CONCAT_V1`, `H2GCN_CHANNEL_CONCAT_V1` | Bounded hop channels and projections |
+| Layer aggregation | `JKNET_CONCAT_V1`, `JKNET_MAXPOOL_V1`, `JKNET_LSTM_ATTENTION_V1` | Bounded selector fixtures; not a trained encoder |
+| Gated recurrent propagation | `GGNN_GRU_PROPAGATION_V1` | Bounded recurrence only |
+| Graph transformer | `GRAPHORMER_SPATIAL_ATTENTION_V1` | Single-head/single-layer spatial and typed-path bias fixture |
+| Hypergraph incidence propagation | `HGNN_INCIDENCE_CONV_V1` | Unweighted incidence membership; not a production HyperGraphRAG model |
+
+Outside this scope are complete framework-compatible PyG/DGL model implementations, trained/published checkpoints, distributed training, temporal/streaming GNNs, learned dynamic graph construction, scalable neighbor sampling, and production Parent Atlas scoring. Add a family only with an explicit operator contract, input/lineage requirements, CPU oracle, regression coverage, and corresponding documentation; GPU parity and Atlas applicability remain separate gates.
+
 The fixture roster also includes `MIXHOP_LAYER_V1`: bounded hop-specific normalized-adjacency channels with distinct checksum-bound projection matrices. This validates operator wiring and deterministic CPU behavior only; it does not prove trained weights, GPU parity, or admitted Parent Atlas evidence. The formulation follows [Abu-El-Haija et al.](https://arxiv.org/abs/1905.00067).
 
 ## 4. Ontology-linked evidence, not a linked list

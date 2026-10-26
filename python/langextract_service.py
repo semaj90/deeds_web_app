@@ -51,7 +51,7 @@ except Exception:
 
 # Configuration
 LANGEXTRACT_PROVIDER = os.getenv("LANGEXTRACT_PROVIDER", "openai")
-DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL_ID", os.getenv("LANGEXTRACT_MODEL", "gemma4-legal-iq4xs-direct"))
+DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL_ID", os.getenv("LANGEXTRACT_MODEL", "ornith-1.5-9b"))
 LANGEXTRACT_BASE_URL = (
     os.getenv("LANGEXTRACT_BASE_URL")
     or os.getenv("LLAMA_SERVER_URL")

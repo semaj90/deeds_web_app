@@ -1,5 +1,10 @@
 # Tasks: parent-atlas-ace-bitfrost-cache-correctness
 
+## Legacy GPU numeric result-cache containment
+
+- [x] `BF-GPU-NUMERIC-CACHE-01` Remove raw-array Redis read/write/serialization from `gpu-pipeline.ts`. Preserve CPU/native compute and expose disabled storage policy in diagnostics. Regression tests cover changed attention keys, tail-only score changes, all six CPU operations and zero Redis calls. Existing keys were not read or deleted; no descriptor cache was added. Receipt: `docs/reports/parent-atlas-resource-observation-cache-boundary-v1.json`.
+- [ ] Consume qualified descriptors through the existing ACE/BitFrost residency owner only after its source/representation/graph/device gates pass. This containment is not production residency, cross-model cache reuse, or repository-wide cache qualification. Source-revision writes remain deferred under the post-P20 rule.
+
 ## Taxonomy-aware RLM cache handoff — 2026-09-06
 
 - [x] Narrow request-cache handoff proven: `RlmSearchRequest.taxonomyRevision` and
@@ -87,12 +92,32 @@
   The facade seam regression now passes 15/15; combined cache-key/facade coverage
   passes 29/29.
 
-- [ ] CACHE-PREFILL-01 audit the existing Ornith query-synthesis/prompt-build path,
+- [ ] [workstation-p14] CACHE-PREFILL-01 audit the existing Ornith query-synthesis/prompt-build path,
   then bind its exact cache identity to ContextManifestV2.identityChecksum,
-  modelRevision, chatTemplateRevision, toolSchemaRevision, promptTemplateRevision.
+  modelRevision, chatTemplateRevision, toolSchemaRevision, promptTemplateRevision. Audit is read-only;
+  creation/persistence of new revision fields remains deferred until after workstation P20.
   Include exact rendered request/prompt and generation parameters where output reuse
   depends on them; a manifest alone does not cover a changed user question.
   Use canonical structured serialization, not ambiguous string concatenation.
+- 2026-10-19 read-only caller audit: `/api/ace/stream` deliberately calls
+  `admitAceRouteCacheIdentityV1(undefined, cacheKey)`, so its revisioned Redis GET/SET
+  branches are unreachable until a server-owned admitted manifest is supplied. The
+  separate `buildAcePromptPreflight` cache still keys by query/intent/backend and can
+  return a cached prompt without the required ContextManifestV2, model/template/tool,
+  rendered-request, and generation-control identity. The strict prefix-descriptor
+  reader has no production caller. CACHE-PREFILL-01 remains open; no cache or data-store
+  writes were performed, and no missing revision was inferred.
+- Caller refinement: `openai-facade.ts` wraps that builder with a second key containing
+  query, model, system/tool hashes, repository revision, case/file scope, source/chunk/
+  packet IDs, and optional manifest identity; it still does not bind source revisions,
+  and `contextManifestIdentity` can be null. The facade passes `aceCtx`, while the
+  builder's declared field is `aceContext` and the builder does not consume either.
+  Therefore neither key establishes the required revision-qualified context. The
+  existing outer cache should remain non-authoritative until this input contract is
+  repaired and the true source revisions are available. `revisionedExactAnswerCache`
+  has a strict V2 key builder in `openai-facade.ts`, but repository search found no
+  production caller supplying it; the ACE stream route also does not supply a V2
+  manifest.
 - [x] CACHE-PREFILL-02 fixture-proven 2026-09-15: the canonical V2 completion-key
   fixture returns a repeatable HIT for identical complete identity and an isolated
   MISS for changed query, manifest, model, chat-template, tool-schema, prompt-template,
@@ -1028,3 +1053,19 @@ policy-learning path.
 - Candidate crosswalk composition: `searchWithAceManifest()` accepts an optional centroid card/manifest hint and resolves it against the exact ordinal map built by that SearchRuntime request. The returned crosswalk remains `CANDIDATE_HINTS_ONLY` / `UNVERIFIED`; it does not change the response packets or ranking. The adapter fixture verifies exact candidate identity and unchanged packet ordering. Independent checksum readback and crosswalk tests cover revision, checksum, row-count, and card-integrity rejection. A live producer/manifest readback and production route caller remain open, as do source-byte verification, task/evidence admission, and ContextManifest V2 readback.
 - Added a SearchRuntime-level stale-centroid regression: a stale manifest is rejected as diagnostic output and the exact response packet ordering remains identical to the ordinary search path. Focused cosine-index, crosswalk, and SearchRuntime suites pass 14/14. The cosine-ranked rows and `centroidId` dictionary remain an in-memory derived index; no persistent centroid table or Valkey write is required or introduced.
 - Production integration remains blocked: `/api/retrieval/search-unified` calls the existing semantic workflow, but no authoritative request-scoped feature-source provider or live centroid manifest reader is configured there. Do not call the fixture composition `LIVE_PROVEN`; the next owner must supply revision-qualified candidates/features and independently read back the centroid manifest before route wiring, ACE admission, or ContextManifest claims.
+
+### ACE cursor recovery lineage guard — 2026-10-13
+
+- `getCachedCursorPacket()` previously parsed Redis JSON with a TypeScript cast, accepted a cursor containing only `packet_key` plus self-reported PASS gates, and synthesized an empty `source_ref` with score `1.0`. It had no in-repository callers at audit time, so live exposure is not established.
+- Recovery now schema-validates the cursor and fails closed unless gates are nonempty and all PASS, the lane is `dense_768` at dimension 768, and packet/source/content/source-revision/workspace-revision/representation-revision bindings are present. Returned candidates preserve those bindings and the cursor score.
+- Existing cursor creation does not yet populate the required lineage fields; therefore these historical/session cursors intentionally become cache misses rather than evidence. Wiring a qualified cursor producer, caller reachability, current-source readback, and ACE/ContextManifest admission remain open.
+- Focused `context-assembler.spec.ts` passes 15/15. `npm run check` emitted the existing Svelte/Vite configuration warnings and was interrupted without diagnostics or a completion result; type-check status is not proven. No live Redis read/write or service change was performed.
+
+### P14 bounded policy/cache proof cross-reference — 2026-10-16
+
+`docs/reports/p14-p15-p19-cache-fusion-policy-receipt-v1.json` records a
+bounded P14 proof: revisioned cold/warm parity, stale-revision invalidation,
+and a 40,960-byte residency budget with 32,320 bytes selected. The proof uses
+an ephemeral in-memory cache client (`writesPerformed=false`); it does not
+establish live Valkey residency, production caller wiring, or full ACE/
+ContextManifest admission. Keep the live integration gates above open.

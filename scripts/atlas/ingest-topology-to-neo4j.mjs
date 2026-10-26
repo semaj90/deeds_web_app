@@ -12,6 +12,7 @@
  *
  * Uses UNWIND batched MERGE for speed (500 edges/batch).
  * Creates CodebaseFile nodes via MERGE so we don't need them pre-loaded.
+ * Pass --apply to connect to Neo4j and write. The default is an offline preview.
  */
 
 import { readFileSync } from 'fs';
@@ -24,7 +25,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
-const DRY_RUN = args.includes('--dry-run');
+const APPLY = args.includes('--apply');
+const DRY_RUN = !APPLY;
 const BATCH_SIZE = 500;
 
 // Read Neo4j connection from env (.env supports both NEO4J_PASS and NEO4J_PASSWORD)
@@ -46,7 +48,40 @@ function batches(arr, size) {
 }
 
 async function main() {
-  // Verify connection
+  if (args.includes('--dry-run') && APPLY) {
+    throw new Error('Choose either the default preview or --apply, not both.');
+  }
+
+  const dbEdgesPath = path.join(projectRoot, 'scripts/atlas/out/db-usage-edges.ndjson');
+  const toolEdgesPath = path.join(projectRoot, 'scripts/atlas/out/tool-usage-edges.ndjson');
+  const readNdjson = (filePath) => readFileSync(filePath, 'utf-8')
+    .split(/\r?\n/)
+    .filter((line) => line.trim())
+    .map((line, index) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        throw new Error(`Invalid NDJSON at ${filePath}:${index + 1}`);
+      }
+    });
+  const dbEdges = readNdjson(dbEdgesPath);
+  const toolObservations = readNdjson(toolEdgesPath);
+  const toolEdges = toolObservations.filter((edge) => (
+    edge.type === 'tool_call'
+    && typeof edge.source_file === 'string'
+    && Number.isInteger(edge.line_num)
+    && typeof edge.tool === 'string'
+    && edge.tool.length > 0
+  ));
+
+  if (DRY_RUN) {
+    console.log(`[DRY-RUN] Offline preview; no Neo4j connection or writes.`);
+    console.log(`  USES_DB rows: ${dbEdges.length}`);
+    console.log(`  USES_TOOL literal-call candidates: ${toolEdges.length}`);
+    console.log(`  Excluded route/registry/reference observations: ${toolObservations.length - toolEdges.length}`);
+    return;
+  }
+
   try {
     await driver.verifyConnectivity();
     console.log('[CONNECT] ✓ Neo4j reachable');
@@ -58,7 +93,6 @@ async function main() {
   const session = driver.session();
 
   try {
-    // 0. Ensure indexes/constraints
     console.log('[INDEX] Ensuring indexes/constraints...');
     const ddls = [
       'CREATE CONSTRAINT codebase_file_path IF NOT EXISTS FOR (f:CodebaseFile) REQUIRE f.filePath IS UNIQUE',
@@ -74,15 +108,8 @@ async function main() {
     }
     console.log('  ✓ Constraints ensured');
 
-    if (DRY_RUN) {
-      console.log('[DRY-RUN] Skipping writes.');
-      return;
-    }
-
     // 1. USES_DB edges (batched UNWIND)
     console.log('[1/2] Ingesting USES_DB edges...');
-    const dbEdges = readFileSync(path.join(projectRoot, 'scripts/atlas/out/').replace(/\\/g, '/') + 'db-usage-edges.ndjson', 'utf-8')
-      .trim().split('\n').filter(Boolean).map(l => JSON.parse(l));
 
     let dbCount = 0;
     for (const batch of batches(dbEdges, BATCH_SIZE)) {
@@ -109,8 +136,6 @@ async function main() {
 
     // 2. USES_TOOL edges (batched UNWIND)
     console.log('[2/2] Ingesting USES_TOOL edges...');
-    const toolEdges = readFileSync(path.join(projectRoot, 'scripts/atlas/out/').replace(/\\/g, '/') + 'tool-usage-edges.ndjson', 'utf-8')
-      .trim().split('\n').filter(Boolean).map(l => JSON.parse(l));
 
     let toolCount = 0;
     for (const batch of batches(toolEdges, BATCH_SIZE)) {

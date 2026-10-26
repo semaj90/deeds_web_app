@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
 import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
+import { isGraphifyStartupEnabled } from './graphify-startup-gate.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
@@ -621,7 +622,7 @@ async function main() {
       // failure: write the report and STOP dev:gpu here — do not retry, do
       // not fall back to a different backend, do not proceed into Vite with
       // an unverified/wrong LLM backend.
-      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith-1.5-vlm': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'gemma4-legal', 'gemma4-thinking': 'gemma4-legal-thinking' };
+      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith-1.5-vlm': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'ornith-1.5-9b', 'gemma4-thinking': 'ornith-1.5-9b' };
       const targetModel = launcherEnv.EXPECTED_LLAMA_MODEL ?? launcherEnv.TURBO_MODEL ?? launcherEnv.LOCAL_GEMMA_MODEL ?? profileAliasMap[startupProfile] ?? 'ornith-1.5-9b';
       console.log(`[dev:gpu] Verifying :8090 is serving "${targetModel}"...`);
       const verification = await verifyLlamaServerModelLoaded(targetModel, synthPort);
@@ -784,38 +785,39 @@ async function main() {
     console.log(`[dev:gpu] Starting Vite dev server (:${vitePort})...\n`);
   }
 
-  // Launch downstream pipeline orchestrator in background (after Vite warmup)
-  const orchestratorScript = path.resolve(REPO_ROOT, 'scripts/atlas/graphify-trigger-downstream-pipeline.mjs');
-  const orchestratorEnv = runtimeEmbeddingEnv({ SVELTEKIT_URL: `http://127.0.0.1:${vitePort}` });
-  const orchestratorChild = spawn('node', [orchestratorScript, '--wait-ready', '--verbose'], {
-    cwd: REPO_ROOT,
-    env: orchestratorEnv,
-    detached: process.platform !== 'win32', // Allow backgrounding on Unix
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
+  if (isGraphifyStartupEnabled(envFromFiles.GRAPHIFY_STARTUP_ENABLED ?? process.env.GRAPHIFY_STARTUP_ENABLED)) {
+    const orchestratorScript = path.resolve(REPO_ROOT, 'scripts/atlas/graphify-trigger-downstream-pipeline.mjs');
+    const orchestratorEnv = runtimeEmbeddingEnv({ SVELTEKIT_URL: `http://127.0.0.1:${vitePort}` });
+    const orchestratorChild = spawn('node', [orchestratorScript, '--wait-ready', '--verbose'], {
+      cwd: REPO_ROOT,
+      env: orchestratorEnv,
+      detached: process.platform !== 'win32',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
 
-  orchestratorChild.stdout?.on('data', (data) => {
-    const lines = data.toString().split('\n').filter(l => l.trim());
-    lines.forEach(line => console.log(`[orchestrator] ${line}`));
-  });
+    orchestratorChild.stdout?.on('data', (data) => {
+      const lines = data.toString().split('\n').filter(l => l.trim());
+      lines.forEach(line => console.log(`[orchestrator] ${line}`));
+    });
 
-  orchestratorChild.stderr?.on('data', (data) => {
-    const lines = data.toString().split('\n').filter(l => l.trim());
-    lines.forEach(line => console.error(`[orchestrator] ${line}`));
-  });
+    orchestratorChild.stderr?.on('data', (data) => {
+      const lines = data.toString().split('\n').filter(l => l.trim());
+      lines.forEach(line => console.error(`[orchestrator] ${line}`));
+    });
 
-  orchestratorChild.on('exit', (code) => {
-    if (code !== 0) {
-      console.log(`[orchestrator] Exited with code ${code}`);
-    } else {
-      console.log(`[orchestrator] ✅ Pipeline complete`);
-    }
-  });
+    orchestratorChild.on('exit', (code) => {
+      if (code !== 0) {
+        console.log(`[orchestrator] Exited with code ${code}`);
+      } else {
+        console.log('[orchestrator] ✅ Pipeline complete');
+      }
+    });
 
-  // Unref the orchestrator so it doesn't keep the process alive
-  if (orchestratorChild.unref) orchestratorChild.unref();
-
-  console.log('[dev:gpu] Downstream pipeline orchestrator started (background)\n');
+    if (orchestratorChild.unref) orchestratorChild.unref();
+    console.log('[dev:gpu] Downstream pipeline orchestrator started (background)\n');
+  } else {
+    console.log('[dev:gpu] Downstream Graphify pipeline skipped (GRAPHIFY_STARTUP_ENABLED is not enabled)\n');
+  }
 
   // Launch Vite dev server in foreground
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';

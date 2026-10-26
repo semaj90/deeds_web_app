@@ -53,7 +53,14 @@ export async function tagAceHits(
   try {
     const redis = getRedis();
     const pipe = redis.pipeline();
-    for (const fp of filePaths) pipe.incr(`${REDIS_PREFIX}${fp}`);
+    const HIT_TTL_SECONDS = 7 * 86400; // 7 days rolling window
+    for (const fp of filePaths) {
+      const key = `${REDIS_PREFIX}${fp}`;
+      pipe.incr(key);
+      if (typeof pipe.expire === 'function') {
+        pipe.expire(key, HIT_TTL_SECONDS);
+      }
+    }
     await pipe.exec();
   } catch {
     // non-fatal

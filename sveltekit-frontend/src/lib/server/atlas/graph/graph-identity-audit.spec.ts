@@ -4,7 +4,7 @@ import { auditGraphIdentityPopulation } from './graph-identity-audit.js';
 const meta = { runId: 'run-1' };
 
 describe('auditGraphIdentityPopulation', () => {
-  it('reports zero collisions and proves identity gates on a clean population', () => {
+  it('reports population diagnostics without promoting them to identity proof', () => {
     const receipt = auditGraphIdentityPopulation(
       {
         treeNodeIds: ['t1', 't2'],
@@ -30,12 +30,13 @@ describe('auditGraphIdentityPopulation', () => {
       symbolId: 0,
       symbolVersionId: 0,
     });
-    expect(receipt.gates.packetTreeLineageProven).toBe(true);
-    expect(receipt.gates.parseNodeIdentityProven).toBe(true);
-    expect(receipt.gates.stableSymbolIdentityProven).toBe(true);
-    expect(receipt.gates.symbolVersionIdentityProven).toBe(true);
-    expect(receipt.gates.parserManifestAlignmentProven).toBe(true);
+    expect(receipt.gates.packetTreeLineageProven).toBe(false);
+    expect(receipt.gates.parseNodeIdentityProven).toBe(false);
+    expect(receipt.gates.stableSymbolIdentityProven).toBe(false);
+    expect(receipt.gates.symbolVersionIdentityProven).toBe(false);
+    expect(receipt.gates.parserManifestAlignmentProven).toBe(false);
     expect(receipt.gates.canonicalGraphSnapshotProven).toBe(false);
+    expect(receipt.proofLimitations).toHaveLength(3);
   });
 
   it('detects duplicate symbolIds and fails the stable-symbol-identity gate', () => {
@@ -59,7 +60,7 @@ describe('auditGraphIdentityPopulation', () => {
     expect(receipt.gates.stableSymbolIdentityProven).toBe(false);
   });
 
-  it('marks packetTreeLineageProven false when orphan packets exist', () => {
+  it('does not infer packet-tree lineage from matching counts or orphan lists', () => {
     const receipt = auditGraphIdentityPopulation(
       {
         treeNodeIds: [],

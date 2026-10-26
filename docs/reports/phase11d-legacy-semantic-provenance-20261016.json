@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.component-proof.v1",
+  "gate": "PHASE11D-LEGACY-SEMANTIC-PROVENANCE-01",
+  "status": "LEGACY_RANKER_CONTAINED_CANONICAL_SEMANTIC_INTEGRATION_OPEN",
+  "canonicalAuthority": false,
+  "tests": {
+    "command": "node --test scripts/ingest/rank-cards.test.mjs",
+    "passed": 3,
+    "failed": 0,
+    "log": "docs/reports/phase11d-semantic-preview-tests-20261016.txt",
+    "scope": "Actual CLI fixture cards/cache, missing semantic signals, stable ties, no writes/model requests, apply rejection, bounds"
+  },
+  "writesPerformed": { "codeAndReports": true, "legacyVectorsOrRankingArtifacts": false, "database": false, "cacheOrProjection": false, "sourceRevision": false },
+  "modelRequestsPerformed": false,
+  "remaining": [
+    "Legacy embed-cards producer and historical pseudo-vector cache reconciliation",
+    "Canonical semantic/source admission through existing SearchRuntime owner",
+    "Reviewed golden relevance labels and held-out ranking quality",
+    "ContextManifest and production request proof"
+  ],
+  "likely_cause": "The legacy card ranker used hash-generated vectors as semantic evidence and its cache lacks the provenance needed to distinguish those vectors from real embeddings.",
+  "evidence": ["Legacy ranker and embedding-producer source", "Three passing actual CLI fixture tests", "Semantic null/presence fields and no implicit model request path"],
+  "patch_targets": [
+    "scripts/ingest/rank-cards.mjs",
+    "scripts/ingest/rank-cards.test.mjs",
+    "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+    "docs/reports/master-feature-phase-gates-review-20261016.md"
+  ],
+  "safe_next_command": "node --test scripts/ingest/rank-cards.test.mjs",
+  "smoke_command": "openspec validate parent-atlas-ace-rlm-bitfrost-integration --strict",
+  "report_path": "docs/reports/phase11d-legacy-semantic-provenance-20261016.json"
+}

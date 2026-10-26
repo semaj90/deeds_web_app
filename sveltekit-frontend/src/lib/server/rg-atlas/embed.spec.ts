@@ -10,18 +10,9 @@ vi.mock('$lib/server/env.server.js', () => ({
   },
 }));
 
-vi.mock('$lib/server/embedding-cache-service.js', () => ({
-  embeddingCacheService: {
-    getEmbedding: vi.fn(async () => null),
-    cacheEmbedding: vi.fn(async () => undefined),
-  },
-}));
-
-vi.mock('$lib/server/embedding/canonical-embed.js', () => ({
-  tryEmbedCanonical: vi.fn(async (text: string) => ({
-    model: 'embeddinggemma:latest',
-    embedding: new Array(768).fill(text.length / 1000),
-    source: 'api-embed' as const,
+vi.mock('$lib/server/grpc/embedding-client.js', () => ({
+  generateEmbeddings: vi.fn(async (texts: string[]) => ({
+    vectors: texts.map((text) => new Array(768).fill(text.length / 1000)),
   })),
 }));
 
@@ -49,29 +40,24 @@ describe('getBatchedEmbeddings', () => {
     vi.resetModules();
   });
 
-  it('routes misses through the canonical embedding lane', async () => {
+  it('delegates the complete batch to the shared artifact-qualified provider client', async () => {
     const { getBatchedEmbeddings } = await import('./embed.js');
-    const { tryEmbedCanonical } = await import('$lib/server/embedding/canonical-embed.js');
-    const { embeddingCacheService } = await import('$lib/server/embedding-cache-service.js');
+    const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
 
     const result = await getBatchedEmbeddings(['alpha', 'beta']);
 
     expect(result).toHaveLength(2);
     expect(result[0]).toHaveLength(768);
     expect(result[1]).toHaveLength(768);
-    expect(tryEmbedCanonical).toHaveBeenCalledTimes(2);
-    expect(embeddingCacheService.cacheEmbedding).toHaveBeenCalledTimes(2);
-    expect(embeddingCacheService.cacheEmbedding).toHaveBeenNthCalledWith(
-      1,
-      'alpha',
-      expect.any(Array),
-      'embeddinggemma:latest',
+    expect(generateEmbeddings).toHaveBeenCalledWith(['alpha', 'beta']);
+  });
+
+  it('rejects noncanonical model labels instead of assigning their vectors to semantic_768', async () => {
+    const { getBatchedEmbeddings } = await import('./embed.js');
+    const { validateResolvedBackend } = await import('$lib/server/embedding/embedding-backend-resolution.js');
+    await expect(getBatchedEmbeddings(['alpha'], 'other-model')).rejects.toThrow(
+      'RG_ATLAS_EMBEDDING_MODEL_MUST_BE_CANONICAL_SEMANTIC_768',
     );
-    expect(embeddingCacheService.cacheEmbedding).toHaveBeenNthCalledWith(
-      2,
-      'beta',
-      expect.any(Array),
-      'embeddinggemma:latest',
-    );
+    expect(validateResolvedBackend).not.toHaveBeenCalled();
   });
 });

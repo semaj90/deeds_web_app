@@ -9,16 +9,13 @@ const embeddingServiceSource = readFileSync(resolve(process.cwd(), 'src/lib/serv
 const embedSummary = clusterSummarySource.match(/async function embedSummary\(summary: string\): Promise<number\[\] \| null> \{([\s\S]*?)\n\}/)?.[1] ?? '';
 
 describe('codebase-context semantic_768 embedding boundary', () => {
-	it('uses the shared adapter with its existing raw-recipe transport and cache model', () => {
-		expect(embedQuery).toContain('executeProviderEmbeddingV1({');
-		expect(embedQuery).toContain("mode: 'unprompted_legacy'");
-		expect(embedQuery).toContain("provider: 'ollama'");
-		expect(embedQuery).toContain('baseUrl: ENV.OLLAMA_BASE_URL');
-		expect(embedQuery).toContain('modelId: SERVER_EMBEDDING_MODEL');
-		expect(embedQuery).toContain("keepAlive: '24h'");
-		expect(embedQuery).toContain('ollamaFetch(String(input), init)');
-		expect(embedQuery).toContain('getCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL)');
-		expect(embedQuery).toContain('setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, embedding)');
+	it('uses the shared identity-gated embedding client and validates semantic_768 width', () => {
+		expect(embedQuery).toContain('generateEmbeddings([prompt]');
+		expect(embedQuery).toContain("taskMode: 'unprompted_legacy'");
+		expect(embedQuery).toContain('result.vectors[0]');
+		expect(embedQuery).toContain('isValidEmbedding(embedding)');
+		expect(embedQuery).not.toContain('getCachedEmbedding');
+		expect(embedQuery).not.toContain('setCachedEmbedding');
 		expect(embedQuery).not.toContain('/api/embeddings');
 	});
 

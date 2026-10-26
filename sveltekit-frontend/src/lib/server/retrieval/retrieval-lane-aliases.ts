@@ -56,7 +56,7 @@ const DENSE_LANE_ALIASES: readonly string[] = [
 ];
 
 /** Executor/scoreSource names that all represent one logical lexical/BM25 vote. */
-const LEXICAL_LANE_ALIASES: readonly string[] = ['bm25', 'postgres_trigram', 'lexical'];
+const LEXICAL_LANE_ALIASES: readonly string[] = ['bm25', 'postgres_fts', 'postgres_trigram', 'lexical'];
 
 const DENSE_LANE_ALIAS_SET = new Set(DENSE_LANE_ALIASES);
 const LEXICAL_LANE_ALIAS_SET = new Set(LEXICAL_LANE_ALIASES);

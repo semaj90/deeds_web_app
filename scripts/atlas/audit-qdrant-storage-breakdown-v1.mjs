@@ -20,6 +20,12 @@ const ROOT = path.resolve(import.meta.dirname, '../..');
 const REPORT_PATH = path.join(ROOT, 'docs/reports/qdrant-storage-breakdown-v1.json');
 const QDRANT_URL = (process.env.QDRANT_URL || process.env.QDRANT_BASE_URL || 'http://127.0.0.1:6333').replace(/\/$/, '');
 const noReport = process.argv.includes('--no-report');
+const outputArg = process.argv.find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
+const outputPath = outputArg ? path.resolve(ROOT, outputArg) : REPORT_PATH;
+const outputRelativePath = path.relative(ROOT, outputPath);
+if (outputArg && (outputRelativePath === '..' || outputRelativePath.startsWith(`..${path.sep}`) || path.isAbsolute(outputRelativePath))) {
+  throw new Error('--output must resolve inside the repository root');
+}
 
 function scanConsumers() {
   try {
@@ -38,19 +44,49 @@ function scanConsumers() {
 
 const consumerCensus = scanConsumers();
 
-function scanCollectionConsumers(collection) {
+function scanCollectionConsumers(collectionNames) {
+  const byCollection = new Map(collectionNames.map((name) => [name, new Set()]));
+  if (collectionNames.length === 0) return { available: true, byCollection, error: null };
   try {
+    const expressions = collectionNames.map((name) => `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
     const output = execFileSync('rg', [
-      '-l', '-i', '-F', collection,
+      '--json', '-n', '-o', ...expressions.flatMap((expression) => ['-e', expression]),
       'scripts', 'services', 'docker', 'sveltekit-frontend', 'packages',
       '--glob', '!**/node_modules/**', '--glob', '!**/.venv*/**', '--glob', '!**/dist/**',
       '--glob', '!**/build/**', '--glob', '!**/docs/reports/**', '--glob', '!sveltekit-frontend/NUL',
       '--glob', '*.{mjs,mts,js,ts,tsx,jsx,py,go,rs,sql,yml,yaml,json}',
-    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 15000, maxBuffer: 32 * 1024 * 1024 });
-    return { available: true, files: output.split(/\r?\n/).filter(Boolean).sort() };
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60000, maxBuffer: 64 * 1024 * 1024 });
+    for (const line of output.split(/\r?\n/).filter(Boolean)) {
+      let event;
+      try { event = JSON.parse(line); } catch { continue; }
+      if (event.type !== 'match') continue;
+      const file = event.data?.path?.text;
+      for (const match of event.data?.submatches ?? []) {
+        const name = match.match?.text;
+        if (file && byCollection.has(name)) byCollection.get(name).add(file);
+      }
+    }
+    return { available: true, byCollection, error: null };
   } catch (error) {
-    if (error?.status === 1) return { available: true, files: [] };
-    return { available: false, files: [], error: error?.message ?? String(error) };
+    if (error?.status === 1) return { available: true, byCollection, error: null };
+    return { available: false, byCollection, error: error?.message ?? String(error) };
+  }
+}
+
+function qdrantVolumeStorage() {
+  const container = process.env.QDRANT_CONTAINER || 'legal-ai-qdrant';
+  try {
+    const output = execFileSync('docker', [
+      'exec', container, 'sh', '-c',
+      'for p in /qdrant /qdrant/storage /qdrant/snapshots; do du -sb "$p" 2>/dev/null; done',
+    ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000, maxBuffer: 4 * 1024 * 1024 });
+    const bytesByPath = Object.fromEntries(output.split(/\r?\n/).filter(Boolean).map((line) => {
+      const match = line.match(/^(\d+)\s+(.+)$/);
+      return match ? [match[2], Number(match[1])] : [line, null];
+    }));
+    return { available: Object.keys(bytesByPath).length > 0, container, bytesByPath, error: null };
+  } catch (error) {
+    return { available: false, container, bytesByPath: {}, error: error?.message ?? String(error) };
   }
 }
 
@@ -78,17 +114,25 @@ function classifyCollection(name) {
 
 async function getJson(relative) {
   const url = `${QDRANT_URL}${relative}`;
-  const response = await fetch(url, { signal: AbortSignal.timeout(20000) });
-  const text = await response.text();
-  let body = null;
-  try { body = JSON.parse(text); } catch {}
-  if (!response.ok) {
-    const error = new Error(`HTTP_${response.status}:${relative}`);
-    error.status = response.status;
-    error.body = body ?? text.slice(0, 500);
-    throw error;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(20000) });
+      const text = await response.text();
+      let body = null;
+      try { body = JSON.parse(text); } catch {}
+      if (!response.ok) {
+        const error = new Error(`HTTP_${response.status}:${relative}`);
+        error.status = response.status;
+        error.body = body ?? text.slice(0, 500);
+        throw error;
+      }
+      return body;
+    } catch (error) {
+      if (attempt === 3 || !/fetch failed|network error|ECONNRESET|ETIMEDOUT/i.test(error?.message ?? '')) throw error;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 250));
+    }
   }
-  return body;
+  throw new Error(`QDRANT_READ_RETRIES_EXHAUSTED:${relative}`);
 }
 
 function unwrap(body) {
@@ -135,6 +179,7 @@ function vectorConfigSummary(infoBody) {
   }
   return {
     pointsCount: info.points_count ?? null,
+    vectorsCount: info.vectors_count ?? null,
     indexedVectorsCount: info.indexed_vectors_count ?? null,
     segmentsCount: info.segments_count ?? null,
     status: info.status ?? null,
@@ -143,6 +188,7 @@ function vectorConfigSummary(infoBody) {
     quantizationConfig: info?.config?.quantization_config ?? null,
     hnswConfig: info?.config?.hnsw_config ?? null,
     payloadMemory: info?.config?.params?.payload?.memory ?? null,
+    payloadSchema: info.payload_schema ?? null,
   };
 }
 
@@ -190,6 +236,8 @@ const report = {
   mode: 'READ_ONLY',
   writesPerformed: false,
   destructiveActionsPerformed: false,
+  aliases: { available: false, count: 0, entries: [], error: null },
+  volumeStorage: { available: false, container: process.env.QDRANT_CONTAINER || 'legal-ai-qdrant', bytesByPath: {}, error: null },
   consumerCensus: {
     available: consumerCensus.available,
     count: consumerCensus.files.length,
@@ -213,18 +261,41 @@ const report = {
 
 try {
   const root = await getJson('/collections');
+  try {
+    const aliasBody = unwrap(await getJson('/aliases'));
+    const aliasRows = Array.isArray(aliasBody?.aliases) ? aliasBody.aliases : [];
+    report.aliases = {
+      available: true,
+      count: aliasRows.length,
+      entries: aliasRows.map((row) => ({ aliasName: row.alias_name ?? null, collectionName: row.collection_name ?? null })),
+      error: null,
+    };
+  } catch (error) {
+    report.aliases.error = error instanceof Error ? error.message : String(error);
+  }
   const collections = unwrap(root)?.collections ?? [];
   const names = collections.map((row) => row?.name).filter(Boolean).sort();
   report.totals.collectionCount = names.length;
+  const collectionConsumers = scanCollectionConsumers(names);
+  report.collectionConsumerCensus = { available: collectionConsumers.available, error: collectionConsumers.error };
+  report.volumeStorage = qdrantVolumeStorage();
+  const aliasesByCollection = new Map();
+  for (const alias of report.aliases.entries) {
+    if (!alias.collectionName) continue;
+    const namesForCollection = aliasesByCollection.get(alias.collectionName) ?? [];
+    namesForCollection.push(alias.aliasName);
+    aliasesByCollection.set(alias.collectionName, namesForCollection);
+  }
 
   for (const name of names) {
     const classification = classifyCollection(name);
-    const collectionConsumers = scanCollectionConsumers(name);
+    const consumerReferences = [...(collectionConsumers.byCollection.get(name) ?? [])].sort();
     const entry = {
       name,
       classification,
-      consumerReferences: collectionConsumers.files,
-      consumerReferenceCount: collectionConsumers.files.length,
+      aliases: aliasesByCollection.get(name) ?? [],
+      consumerReferences,
+      consumerReferenceCount: consumerReferences.length,
       consumerSearchAvailable: collectionConsumers.available,
       info: null,
       memory: null,
@@ -247,7 +318,7 @@ try {
       entry.errors.push(`MEMORY:${error.message}`);
     }
     try {
-      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`), name, entry.classification, collectionConsumers.files, collectionConsumers.available);
+      entry.snapshots = snapshotSummary(await getJson(`/collections/${encodeURIComponent(name)}/snapshots`), name, entry.classification, consumerReferences, collectionConsumers.available);
       report.totals.apiVisibleSnapshotBytes += entry.snapshots.totalBytes;
       report.totals.apiVisibleSnapshotCount += entry.snapshots.count;
       for (const snapshot of entry.snapshots.snapshots) {
@@ -277,8 +348,8 @@ report.recommendations = {
 };
 
 if (!noReport) {
-  fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
-  fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 }
 
 console.log(JSON.stringify({
@@ -291,9 +362,15 @@ console.log(JSON.stringify({
   snapshotRetentionDispositionCounts: report.totals.snapshotRetentionDispositionCounts,
   codebaseLiveDiskBytes: report.totals.codebaseLiveDiskBytes,
   codebaseSnapshotBytes: report.totals.codebaseSnapshotBytes,
+  aliasesAvailable: report.aliases.available,
+  aliasCount: report.aliases.count,
+  collectionConsumerCensusAvailable: report.collectionConsumerCensus?.available ?? false,
+  volumeStorage: report.volumeStorage,
+  collectionInfoUnavailableCount: report.collections.filter((row) => !row.info).length,
+  payloadSchemaCount: report.collections.filter((row) => row.info?.payloadSchema).length,
   largestCollections: report.collections.slice(0, 10).map((row) => ({ name: row.name, classification: row.classification, diskBytes: row.memory?.diskBytes ?? null, snapshotBytes: row.snapshots?.totalBytes ?? null })),
   errors: report.errors,
-  reportPath: noReport ? null : path.relative(ROOT, REPORT_PATH),
+  reportPath: noReport ? null : path.relative(ROOT, outputPath),
   writesPerformed: false,
 }, null, 2));
 

@@ -85,4 +85,17 @@ describe('astSidecarRouter.chunk', () => {
 		expect(result.structural?.projectionDiagnostic).toEqual(projectionDiagnostic);
 		expect(JSON.stringify(result)).not.toContain('compilation');
 	});
+
+	it('rejects source text above the sidecar limit before invoking the operation owner', async () => {
+		await expect(astSidecarRouter.createCaller({} as never).chunk({
+			sourceRef: 'src/a.ts',
+			sourceRevision: 'sha256:source',
+			workspaceRevision: undefined,
+			language: 'typescript',
+			source: 'a'.repeat(200_001),
+		})).rejects.toThrow();
+
+		expect(createAstChunkOperationRequestV1).not.toHaveBeenCalled();
+		expect(executeAtlasOperationV1).not.toHaveBeenCalled();
+	});
 });

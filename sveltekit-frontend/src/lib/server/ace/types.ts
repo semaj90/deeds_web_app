@@ -207,6 +207,11 @@ export interface ACEContext {
     filePath: string;
     content: string;
     score: number;
+    /** Projection-supplied identity dimensions for cache scoping only; not source authority. */
+    packetKey?: string | null;
+    sourceRef?: string | null;
+    sourceRevision?: string | null;
+    workspaceRevision?: string | null;
     lineStart?: number;
     lineEnd?: number;
     tags?: string[];

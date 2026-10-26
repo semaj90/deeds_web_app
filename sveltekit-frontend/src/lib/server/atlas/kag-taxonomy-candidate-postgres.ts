@@ -207,15 +207,6 @@ export async function decideTaxonomyAssignmentCandidateV1(input: {
     return { outcome: 'rejected', candidateId: input.candidateId };
   }
 
-  // Candidate status commits FIRST (Postgres-first, KAG-05E discipline) --
-  // this is truth regardless of whether the hyperedge write below succeeds.
-  await pool.query(
-    `UPDATE atlas_taxonomy_assignment_candidates
-     SET status = 'promoted', reviewed_by = $2, reviewed_at = now(), updated_at = now()
-     WHERE candidate_id = $1`,
-    [input.candidateId, input.reviewedBy]
-  );
-
   const promotedCandidate = TaxonomyAssignmentCandidateV1Schema.parse({ ...candidate, status: 'promoted' as const });
   const edge = promoteTaxonomyAssignmentV1({
     candidate: promotedCandidate,
@@ -225,6 +216,15 @@ export async function decideTaxonomyAssignmentCandidateV1(input: {
     promotionEvidenceRefs: input.promotionEvidenceRefs,
     producerRevision: input.producerRevision,
   });
+
+  // Candidate status commits FIRST (Postgres-first, KAG-05E discipline) --
+  // but only after all deterministic promotion preconditions have passed.
+  await pool.query(
+    `UPDATE atlas_taxonomy_assignment_candidates
+     SET status = 'promoted', reviewed_by = $2, reviewed_at = now(), updated_at = now()
+     WHERE candidate_id = $1`,
+    [input.candidateId, input.reviewedBy]
+  );
 
   const persistResult = await persistHyperedges([edge]);
   if (persistResult.written === 1) {

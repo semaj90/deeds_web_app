@@ -1,0 +1,29 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 18,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "engineering-acquisition-v1-7e825bb68e35550d",
+  "page_count": 1,
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "dcf36609c009d45ed299217838c62632d9fa2d39296bc2da9355a86b447918ea",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 18,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\engineering-acquisition\\utf8-v2\\opentelemetry-nodejs-instrumentation\\chunks.jsonl",
+      "page_receipt_checksum": "e37b0235e6e6f33bbf353c4f2a200d93f4ef1460579bab5099a8075a358dee9d",
+      "pages": 1,
+      "source_id": "opentelemetry-nodejs-instrumentation",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "writes_performed": true
+}

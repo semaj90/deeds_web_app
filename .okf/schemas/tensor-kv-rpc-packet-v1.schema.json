@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atlas.okf.tensor-kv-rpc-packet.v1",
+  "title": "Parent Atlas tensor, key-value, relation and RPC packet descriptor (draft)",
+  "description": "Descriptors only. Bulk numeric data is never inline; it is referenced by artifact_ref plus digest. Not canonical identity and not admission.",
+  "type": "object",
+  "required": ["version", "schema_id", "status", "canonical_authority", "kind", "packet_key", "entries", "tensors", "relations", "rpc"],
+  "properties": {
+    "version": {"const": 1},
+    "schema_id": {"const": "atlas.okf.tensor-kv-rpc-packet"},
+    "status": {"const": "DRAFT"},
+    "canonical_authority": {"const": false},
+    "kind": {"enum": ["KV_TENSOR_PACKET", "RPC_REQUEST", "RPC_RESPONSE"]},
+    "packet_key": {"type": "string", "minLength": 1},
+    "source_revision": {"$ref": "#/$defs/digest"},
+    "workspace_revision": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+    "entries": {"type": "array", "items": {"$ref": "#/$defs/keyValue"}, "uniqueItems": false},
+    "tensors": {"type": "array", "items": {"$ref": "#/$defs/tensorRef"}},
+    "relations": {"type": "array", "items": {"$ref": "#/$defs/tensorRelation"}},
+    "pytorch_load": {"$ref": "#/$defs/pytorchLoad"},
+    "rpc": {"$ref": "#/$defs/rpcEnvelope"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "keyValue": {
+      "type": "object",
+      "required": ["key", "value_type", "value"],
+      "properties": {
+        "key": {"type": "string", "pattern": "^[a-z][a-z0-9_.]*$", "maxLength": 128},
+        "value_type": {"enum": ["string", "integer", "number", "boolean", "null", "digest", "ref"]},
+        "value": {"type": ["string", "number", "boolean", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "tensorRef": {
+      "type": "object",
+      "required": ["tensor_id", "dtype", "shape", "layout", "byte_order", "byte_length", "digest", "artifact_ref"],
+      "properties": {
+        "tensor_id": {"type": "string", "pattern": "^[a-z][a-z0-9_.]*$"},
+        "dtype": {"enum": ["f32", "f16", "bf16", "i8", "u8", "i32", "i64"]},
+        "shape": {"type": "array", "items": {"type": "integer", "minimum": 1}, "minItems": 1, "maxItems": 8},
+        "layout": {"const": "row_major_contiguous"},
+        "byte_order": {"const": "little"},
+        "byte_length": {"type": "integer", "minimum": 1},
+        "digest": {"$ref": "#/$defs/digest"},
+        "artifact_ref": {"type": "string", "pattern": "^(mmap|arrow|file)://[^\\s]+$"}
+      },
+      "additionalProperties": false
+    },
+    "tensorRelation": {
+      "type": "object",
+      "required": ["from", "to", "relation"],
+      "properties": {
+        "from": {"type": "string"},
+        "to": {"type": "string"},
+        "relation": {"enum": ["derived_from", "row_of", "column_of", "concatenated_into", "same_shape_as", "candidate_ordinal_aligned"]},
+        "evidence_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]}
+      },
+      "additionalProperties": false
+    },
+    "pytorchLoad": {
+      "type": "object",
+      "required": ["loader", "weights_only", "map_location", "verify_before_load", "tensor_ids"],
+      "properties": {
+        "loader": {"const": "torch.load"},
+        "weights_only": {"const": true},
+        "map_location": {"const": "cpu"},
+        "verify_before_load": {"const": true},
+        "tensor_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      },
+      "additionalProperties": false
+    },
+    "rpcEnvelope": {
+      "type": "object",
+      "required": ["method", "request_id", "payload_digest", "max_bytes"],
+      "properties": {
+        "method": {"type": "string", "pattern": "^[a-z][a-zA-Z0-9_.]*$"},
+        "request_id": {"type": "string", "minLength": 1},
+        "payload_digest": {"$ref": "#/$defs/digest"},
+        "max_bytes": {"type": "integer", "minimum": 1, "maximum": 1048576}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { pgTable, text, jsonb, timestamp, integer, bigserial, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, jsonb, timestamp, integer, bigserial, boolean, index } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 export const kanbanTasks = pgTable('kanban_tasks', {
@@ -22,8 +22,15 @@ export const kanbanTasks = pgTable('kanban_tasks', {
   completedAt: timestamp('completed_at', { withTimezone: true }),
   idempotencyKey: text('idempotency_key'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull()
-});
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  workspaceId: text('workspace_id'),
+  sourceUrl: text('source_url'),
+  sourceRevision: text('source_revision')
+}, (table) => ({
+  idxWorkspaceId: index('idx_kanban_tasks_workspace_id').on(table.workspaceId),
+  kanbanReadyIdx: index('kanban_ready_idx').on(table.priority, table.createdAt),
+  kanbanRunningHeartbeatIdx: index('kanban_running_heartbeat_idx').on(table.lastHeartbeatAt),
+}));
 
 export type KanbanTask = typeof kanbanTasks.$inferSelect;
 export type NewKanbanTask = typeof kanbanTasks.$inferInsert;

@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.llama-runtime-trace-live-proof.v1",
+  "status": "DEPLOYED_DISCOVERY_AND_STATUS_PROVEN",
+  "observedAt": "2026-10-16T03:33:39.7239825Z",
+  "transport": "HTTP MCP JSON-RPC with SSE response at loopback :8788/mcp",
+  "traceRestart": { "previousVerifiedPid": 36936, "currentListenerPid": 50512, "healthOk": true },
+  "discovery": {
+    "previousToolCount": 193,
+    "currentToolCount": 196,
+    "tools": ["llama_server.status", "llama_server.start", "llama_server.unload"]
+  },
+  "statusCall": {
+    "tool": "llama_server.status",
+    "isError": false,
+    "runtimeStatus": "STOPPED",
+    "port": 8090,
+    "listenerPids": [],
+    "processIds": [],
+    "serviceMutationPerformed": false,
+    "gpuUuid": "GPU-8d67bfc5-6752-0bdb-e6a1-a66054883ec0",
+    "totalMiB": 8192,
+    "usedMiB": 2044,
+    "freeMiB": 5981,
+    "memoryReleaseObserved": null
+  },
+  "limits": {
+    "liveStartUnloadCycleProven": false,
+    "currentCodexSessionToolRegistryRefreshed": false,
+    "ornithStarted": false,
+    "otherServicesStopped": false
+  },
+  "likely_cause": "The running TRACE process predated registration of the three llama-server controls.",
+  "evidence": ["Verified previous listener command line belonged to this repository's TRACE server", "Existing ensure-mcp-server.mjs launcher completed successfully", "Live tools/list returned all three controls", "Live tools/call returned real Windows and NVIDIA status"],
+  "patch_targets": ["openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md", "docs/architecture/llama-runtime-mcp-controls.md"],
+  "safe_next_command": "Refresh the client's TRACE MCP connection, then call llama_server.status with empty arguments.",
+  "smoke_command": "pwsh -NoProfile -File scripts/atlas/llama-server-control.ps1 -Action status",
+  "report_path": "docs/reports/llama-runtime-trace-live-discovery-20261016T033339Z.json"
+}

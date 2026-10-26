@@ -2,8 +2,6 @@
 import { onMount, onDestroy } from 'svelte';
 import Icon from '$lib/components/ui/Icon.svelte';
 
-export const ssr = false;
-
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface GraphNode {
   id: string;

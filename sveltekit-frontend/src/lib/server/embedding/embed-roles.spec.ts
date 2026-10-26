@@ -50,12 +50,14 @@ beforeEach(() => {
 });
 
 describe('embedTextAs', () => {
-  it('document role => "title: {path} | text: {trimmed content}" reaches the generator and the cache keys', async () => {
+	it('document role => "title: {path} | text: {trimmed content}" reaches the generator without legacy cache access', async () => {
     await embedTextAs('document', '  const a = 1;\n ', 'src/a.ts');
     const expected = 'title: src/a.ts | text: const a = 1;';
     expect(h.generateSingleEmbedding).toHaveBeenCalledWith(expected);
-    expect(h.getCachedEmbedding).toHaveBeenCalledWith(expected);
-    expect(h.persistEmbedding).toHaveBeenCalledWith(expected, expect.any(Array));
+		expect(h.getCachedEmbedding).not.toHaveBeenCalled();
+		expect(h.getPersistedEmbedding).not.toHaveBeenCalled();
+		expect(h.cacheEmbedding).not.toHaveBeenCalled();
+		expect(h.persistEmbedding).not.toHaveBeenCalled();
   });
 
   it('document role without a title falls back to "none"', async () => {
@@ -70,16 +72,17 @@ describe('embedTextAs', () => {
     expect(h.generateSingleEmbedding).toHaveBeenNthCalledWith(2, 'task: code retrieval query | query: find auth');
   });
 
-  it('the same words under different roles never share a cache key', async () => {
+	it('the same words under different roles remain distinct generator inputs', async () => {
     await embedTextAs('retrieval_query', 'same words');
     await embedTextAs('document', 'same words');
-    const keys = h.getCachedEmbedding.mock.calls.map((c) => c[0]);
-    expect(new Set(keys).size).toBe(2);
+		expect(h.generateSingleEmbedding).toHaveBeenNthCalledWith(1, 'task: search result | query: same words');
+		expect(h.generateSingleEmbedding).toHaveBeenNthCalledWith(2, 'title: none | text: same words');
+		expect(h.getCachedEmbedding).not.toHaveBeenCalled();
   });
 
-  it('rejects empty input before touching the cache', async () => {
+	it('rejects empty input before calling the generator', async () => {
     await expect(embedTextAs('document', '   ')).rejects.toThrow('EMBEDDINGGEMMA_EMPTY_INPUT');
-    expect(h.getCachedEmbedding).not.toHaveBeenCalled();
+		expect(h.generateSingleEmbedding).not.toHaveBeenCalled();
   });
 });
 
@@ -88,5 +91,9 @@ describe('embedTextsAs', () => {
     await embedTextsAs('document', [' a ', 'b'], ['x.ts', undefined]);
     expect(h.generateEmbeddings).toHaveBeenCalledTimes(1);
     expect(h.generateEmbeddings.mock.calls[0][0]).toEqual(['title: x.ts | text: a', 'title: none | text: b']);
+		expect(h.batchGetCachedEmbeddings).not.toHaveBeenCalled();
+		expect(h.batchGetPersistedEmbeddings).not.toHaveBeenCalled();
+		expect(h.batchCacheEmbeddings).not.toHaveBeenCalled();
+		expect(h.batchPersistEmbeddings).not.toHaveBeenCalled();
   });
 });

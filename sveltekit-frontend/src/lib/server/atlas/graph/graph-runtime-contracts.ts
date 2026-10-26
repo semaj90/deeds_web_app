@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export const graphTraversalDirections = ['outbound', 'inbound', 'both'] as const;
 export type GraphTraversalDirection = (typeof graphTraversalDirections)[number];
 
@@ -67,6 +69,42 @@ export interface GraphTraverseRequestV1 {
   edgeTypes?: string[];
 }
 
+/** Which read model a graph packet belongs to. Views share one identity space; none mints identity. */
+export const graphViewKinds = ['STRUCTURAL', 'DOMAIN', 'KNOWLEDGE', 'TIMELINE', 'HYPERGRAPH'] as const;
+export type GraphViewKindV1 = (typeof graphViewKinds)[number];
+
+/**
+ * How far a node/edge has been verified. A classifier, LLM, PageRank or
+ * embedding-similarity signal can only reach PROPOSED; STRUCTURAL_PROVEN needs
+ * source-grounded evidence (CST/AST/LSP span), HUMAN_REVIEWED needs a reviewer.
+ */
+export const graphQualificationStates = [
+  'PROPOSED',
+  'STRUCTURAL_PROVEN',
+  /** Checksum-verified event chain; has no source span, so it is never STRUCTURAL_PROVEN. */
+  'EVENT_CHAIN_VERIFIED',
+  'HUMAN_REVIEWED',
+  'STALE',
+  'REJECTED',
+] as const;
+export type GraphQualificationV1 = (typeof graphQualificationStates)[number];
+
+export interface GraphSourceSpanV1 {
+  /** Exact UTF-8 byte offsets in the file identified by sourceRevision. */
+  startByte: number;
+  endByte: number;
+  startLine?: number;
+  endLine?: number;
+}
+
+/** Task/worktree context for TIMELINE view and revision comparison. Optional, additive. */
+export interface GraphTemporalContextV1 {
+  workspaceEventId: string | null;
+  taskId: string | null;
+  worktreeId: string | null;
+  recordedAt: string | null;
+}
+
 export interface GraphViewNodeV1 {
   id: string;
   type: string;
@@ -75,6 +113,12 @@ export interface GraphViewNodeV1 {
   sourceRef: string | null;
   hop: number;
   properties: Record<string, unknown>;
+  /** Additive (all optional) so existing producers keep compiling. */
+  sourceRevision?: string | null;
+  span?: GraphSourceSpanV1 | null;
+  qualification?: GraphQualificationV1;
+  evidenceRefs?: string[];
+  temporal?: GraphTemporalContextV1 | null;
 }
 
 export interface GraphViewEdgeV1 {
@@ -85,18 +129,42 @@ export interface GraphViewEdgeV1 {
   weight: number;
   confidence: number;
   hop: number;
+  qualification?: GraphQualificationV1;
+  evidenceRefs?: string[];
+  /** Revision of the source the relation was observed in. */
+  sourceRevision?: string | null;
+  span?: GraphSourceSpanV1 | null;
 }
 
 export interface GraphViewPacketV1 {
   schema: 'atlas.graph-view.v1';
   snapshotId: string;
   queryId: string;
-  executor: 'postgres';
+  /** 'neo4j' only for HYPERGRAPH (a derived mirror; never canonical). */
+  executor: 'postgres' | 'neo4j';
   nodes: GraphViewNodeV1[];
   edges: GraphViewEdgeV1[];
   truncated: boolean;
   maxHops: number;
   maxNodes: number;
+  /** Additive: defaults to STRUCTURAL when absent. */
+  view?: GraphViewKindV1;
+  /** Opaque cursor for paginated expansion; null when the page is complete. */
+  nextCursor?: string | null;
+  workspaceRevision?: string | null;
+}
+
+/**
+ * A relation may be shown as an edge in DOMAIN/KNOWLEDGE views only as
+ * PROPOSED unless backed by source-grounded evidence. Fails closed.
+ */
+export function clampGraphQualificationV1(
+  requested: GraphQualificationV1,
+  evidence: { hasSourceSpan: boolean; humanReviewed: boolean },
+): GraphQualificationV1 {
+  if (requested === 'HUMAN_REVIEWED') return evidence.humanReviewed ? 'HUMAN_REVIEWED' : 'PROPOSED';
+  if (requested === 'STRUCTURAL_PROVEN') return evidence.hasSourceSpan ? 'STRUCTURAL_PROVEN' : 'PROPOSED';
+  return requested;
 }
 
 export interface AtlasSynthesisRequestV1 {
@@ -138,9 +206,9 @@ export interface ContextManifestV1 {
   schema: 'atlas.context-manifest.v1';
   requestId: string;
   snapshotId: string;
-  graphRevision: string | null;
+  graphRevision?: string | null;
   query: string;
-  candidateBucket: AtlasCandidateBucket;
+  candidateBucket: AtlasCandidateBucket | number;
   candidateCount: number;
   tokenBudget: number;
   selectedNodeKeys: string[];
@@ -156,6 +224,31 @@ export interface ContextManifestV1 {
   };
   producerRevision: string;
 }
+
+const ContextManifestMutationAwarenessV1Schema = z.object({
+  proofPolicy: z.literal('content-hash-plus-tracked-git-provenance'),
+  freshCount: z.number().int().nonnegative(),
+  staleCount: z.number().int().nonnegative(),
+  unknownCount: z.number().int().nonnegative(),
+  missingCount: z.number().int().nonnegative(),
+  staleNodeKeys: z.array(z.string().min(1)),
+  unknownNodeKeys: z.array(z.string().min(1)),
+}).strict();
+
+export const ContextManifestV1Schema = z.object({
+  schema: z.literal('atlas.context-manifest.v1'),
+  requestId: z.string().min(1),
+  snapshotId: z.string().min(1),
+  graphRevision: z.string().min(1).nullable().optional(),
+  query: z.string(),
+  candidateBucket: z.number().int().positive(),
+  candidateCount: z.number().int().nonnegative(),
+  tokenBudget: z.number().int().positive(),
+  selectedNodeKeys: z.array(z.string().min(1)),
+  evidenceRefs: z.array(z.string().min(1)),
+  mutationAwareness: ContextManifestMutationAwarenessV1Schema.optional(),
+  producerRevision: z.string().min(1),
+}).strict();
 
 export function chooseCandidateBucket(candidateCount: number): AtlasCandidateBucket {
   const normalized = Math.max(1, Math.min(512, Math.ceil(candidateCount)));

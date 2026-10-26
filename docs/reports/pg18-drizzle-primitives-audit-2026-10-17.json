@@ -1,0 +1,608 @@
+{
+  "auditId": "PG18-PRIMITIVES-AUDIT-01",
+  "generatedAt": "2026-10-17T17:51:59.089Z",
+  "authorityBoundary": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "transactionMode": "BEGIN TRANSACTION READ ONLY ... ROLLBACK",
+    "aioBitmapRule": "PostgreSQL 18 AIO and bitmap heap scans are planner optimizations verified via EXPLAIN (ANALYZE, BUFFERS, SETTINGS); application bitsets use AlignedBitsetBlobV1 (ATLASBIT <-> bytea)."
+  },
+  "postgres18Settings": {
+    "effective_io_concurrency": {
+      "setting": "16",
+      "unit": null
+    },
+    "enable_bitmapscan": {
+      "setting": "on",
+      "unit": null
+    },
+    "enable_indexscan": {
+      "setting": "on",
+      "unit": null
+    },
+    "enable_seqscan": {
+      "setting": "on",
+      "unit": null
+    },
+    "io_combine_limit": {
+      "setting": "16",
+      "unit": "8kB"
+    },
+    "maintenance_io_concurrency": {
+      "setting": "16",
+      "unit": null
+    },
+    "max_parallel_workers_per_gather": {
+      "setting": "2",
+      "unit": null
+    },
+    "server_version": {
+      "setting": "18.4 (Debian 18.4-1.pgdg12+1)",
+      "unit": null
+    },
+    "server_version_num": {
+      "setting": "180004",
+      "unit": null
+    }
+  },
+  "indexSummary": {
+    "totalInspected": 406,
+    "byAccessMethod": {
+      "btree": 155,
+      "gin": 210,
+      "brin": 3,
+      "hnsw": 35,
+      "other": 3
+    },
+    "ginCount": 210,
+    "brinCount": 3,
+    "hnswCount": 35
+  },
+  "ginIndexes": [
+    {
+      "table": "agent_context_files",
+      "index": "agent_context_files_qdrant_tags_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX agent_context_files_qdrant_tags_gin ON public.agent_context_files USING gin (qdrant_tags)"
+    },
+    {
+      "table": "agent_context_files",
+      "index": "agent_context_files_rules_gin",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX agent_context_files_rules_gin ON public.agent_context_files USING gin (rules jsonb_path_ops)"
+    },
+    {
+      "table": "agent_context_files",
+      "index": "agent_context_files_tags_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX agent_context_files_tags_gin ON public.agent_context_files USING gin (semantic_tags)"
+    },
+    {
+      "table": "agent_context_relations",
+      "index": "agent_context_relations_evidence_gin_idx",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX agent_context_relations_evidence_gin_idx ON public.agent_context_relations USING gin (evidence)"
+    },
+    {
+      "table": "agent_observations",
+      "index": "idx_agent_observations_bm25_tags_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX idx_agent_observations_bm25_tags_gin ON public.agent_observations USING gin (bm25_tags)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "idx_analysis_pass_output_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX idx_analysis_pass_output_gin ON public.analysis_pass_results USING gin (output)"
+    },
+    {
+      "table": "analysis_pass_results",
+      "index": "idx_analysis_pass_provenance_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX idx_analysis_pass_provenance_gin ON public.analysis_pass_results USING gin (provenance)"
+    },
+    {
+      "table": "atlas_algorithm_execution_receipts",
+      "index": "atlas_algorithm_execution_receipts_manifest_gin",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_algorithm_execution_receipts_manifest_gin ON public.atlas_algorithm_execution_receipts USING gin (manifest jsonb_path_ops)"
+    },
+    {
+      "table": "atlas_artifacts",
+      "index": "idx_atlas_artifacts_metadata",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX idx_atlas_artifacts_metadata ON public.atlas_artifacts USING gin (metadata)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_calls_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_calls_gin ON public.atlas_callable_search USING gin (calls)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_enrichment_metadata_gin",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_enrichment_metadata_gin ON public.atlas_callable_search USING gin (enrichment_metadata jsonb_path_ops)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_imports_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_imports_gin ON public.atlas_callable_search USING gin (imports)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_inferred_uses_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_inferred_uses_gin ON public.atlas_callable_search USING gin (inferred_uses)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_metadata_gin",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_metadata_gin ON public.atlas_callable_search USING gin (callable_metadata jsonb_path_ops)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_parameter_names_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_parameter_names_gin ON public.atlas_callable_search USING gin (parameter_names)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_parameter_types_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_parameter_types_gin ON public.atlas_callable_search USING gin (parameter_types)"
+    },
+    {
+      "table": "atlas_callable_search",
+      "index": "atlas_callable_search_search_vector_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_callable_search_search_vector_gin ON public.atlas_callable_search USING gin (search_vector)"
+    },
+    {
+      "table": "atlas_class_search_index_v1",
+      "index": "atlas_class_search_index_v1_metadata_gin",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_class_search_index_v1_metadata_gin ON public.atlas_class_search_index_v1 USING gin (metadata jsonb_path_ops)"
+    },
+    {
+      "table": "atlas_class_search_index_v1",
+      "index": "atlas_class_search_index_v1_search_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_class_search_index_v1_search_gin ON public.atlas_class_search_index_v1 USING gin (search_vector)"
+    },
+    {
+      "table": "atlas_dynamic_hyperedge_candidates",
+      "index": "atlas_dynamic_hyperedge_participants_gin_idx",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_dynamic_hyperedge_participants_gin_idx ON public.atlas_dynamic_hyperedge_candidates USING gin (participants jsonb_path_ops)"
+    },
+    {
+      "table": "atlas_evidence",
+      "index": "atlas_evidence_payload_gin_idx",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_evidence_payload_gin_idx ON public.atlas_evidence USING gin (payload jsonb_path_ops)"
+    },
+    {
+      "table": "atlas_evidence",
+      "index": "atlas_evidence_search_gin_idx",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_evidence_search_gin_idx ON public.atlas_evidence USING gin (search_vector)"
+    },
+    {
+      "table": "atlas_evidence",
+      "index": "atlas_evidence_tags_gin_idx",
+      "isJsonbPathOps": false,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_evidence_tags_gin_idx ON public.atlas_evidence USING gin (tags)"
+    },
+    {
+      "table": "atlas_evidence_entities",
+      "index": "atlas_evidence_entities_metadata_gin_idx",
+      "isJsonbPathOps": true,
+      "isTsvector": false,
+      "def": "CREATE INDEX atlas_evidence_entities_metadata_gin_idx ON public.atlas_evidence_entities USING gin (metadata jsonb_path_ops)"
+    },
+    {
+      "table": "atlas_external_doc_analyses",
+      "index": "aeda_summary_fts_gin",
+      "isJsonbPathOps": false,
+      "isTsvector": true,
+      "def": "CREATE INDEX aeda_summary_fts_gin ON public.atlas_external_doc_analyses USING gin (to_tsvector('english'::regconfig, COALESCE(summary_text, ''::text)))"
+    }
+  ],
+  "brinIndexes": [
+    {
+      "table": "atlas_higher_hop_index",
+      "index": "idx_higher_hop_created_brin",
+      "def": "CREATE INDEX idx_higher_hop_created_brin ON public.atlas_higher_hop_index USING brin (created_at)"
+    },
+    {
+      "table": "atlas_higher_hop_index",
+      "index": "idx_higher_hop_lineage_brin",
+      "def": "CREATE INDEX idx_higher_hop_lineage_brin ON public.atlas_higher_hop_index USING brin (lineage_version)"
+    },
+    {
+      "table": "atlas_tensor_residency_events",
+      "index": "atlas_tensor_residency_created_brin",
+      "def": "CREATE INDEX atlas_tensor_residency_created_brin ON public.atlas_tensor_residency_events USING brin (created_at)"
+    }
+  ],
+  "hnswIndexes": [
+    {
+      "table": "agent_observations",
+      "index": "idx_agent_observations_hnsw",
+      "def": "CREATE INDEX idx_agent_observations_hnsw ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "table": "agent_observations",
+      "index": "idx_agent_observations_hnsw_768",
+      "def": "CREATE INDEX idx_agent_observations_hnsw_768 ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "table": "atlas_class_search_index_v1",
+      "index": "atlas_class_search_index_v1_embedding_hnsw",
+      "def": "CREATE INDEX atlas_class_search_index_v1_embedding_hnsw ON public.atlas_class_search_index_v1 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64') WHERE (embedding IS NOT NULL)"
+    },
+    {
+      "table": "atlas_embeddings_384",
+      "index": "idx_ae384_content_hnsw",
+      "def": "CREATE INDEX idx_ae384_content_hnsw ON public.atlas_embeddings_384 USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='128') WHERE ((vector_role = 'content'::text) AND (normalized = true))"
+    },
+    {
+      "table": "atlas_external_doc_chunks",
+      "index": "aedc_embedding_hnsw",
+      "def": "CREATE INDEX aedc_embedding_hnsw ON public.atlas_external_doc_chunks USING hnsw (content_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "table": "atlas_feature_embeddings",
+      "index": "atlas_feature_embeddings_hnsw_cosine_idx",
+      "def": "CREATE INDEX atlas_feature_embeddings_hnsw_cosine_idx ON public.atlas_feature_embeddings USING hnsw (embedding vector_cosine_ops)"
+    },
+    {
+      "table": "atlas_packet_registry",
+      "index": "idx_packet_embedding_cosine",
+      "def": "CREATE INDEX idx_packet_embedding_cosine ON public.atlas_packet_registry USING hnsw (embedding_768d vector_cosine_ops)"
+    },
+    {
+      "table": "atlas_relationship_embeddings",
+      "index": "atlas_relationship_embeddings_hnsw_cosine_idx",
+      "def": "CREATE INDEX atlas_relationship_embeddings_hnsw_cosine_idx ON public.atlas_relationship_embeddings USING hnsw (embedding vector_cosine_ops)"
+    },
+    {
+      "table": "cluster_summaries",
+      "index": "cluster_summaries_embedding_hnsw",
+      "def": "CREATE INDEX cluster_summaries_embedding_hnsw ON public.cluster_summaries USING hnsw (summary_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "table": "code_retrieval_chunks",
+      "index": "crc_embedding_hnsw",
+      "def": "CREATE INDEX crc_embedding_hnsw ON public.code_retrieval_chunks USING hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "table": "codebase_chunk_eg2_embeddings",
+      "index": "codebase_chunk_eg2_embeddings_hnsw",
+      "def": "CREATE INDEX codebase_chunk_eg2_embeddings_hnsw ON public.codebase_chunk_eg2_embeddings USING hnsw (embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "codebase_chunk_index_content_hnsw",
+      "def": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "codebase_chunk_index_summary_hnsw",
+      "def": "CREATE INDEX codebase_chunk_index_summary_hnsw ON public.codebase_chunk_index USING hnsw (summary_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "def": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+      "def": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+      "def": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_128 halfvec_cosine_ops) WHERE (error_embedding_latent_128 IS NOT NULL)"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+      "def": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_256 halfvec_cosine_ops) WHERE (error_embedding_latent_256 IS NOT NULL)"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "idx_codebase_chunk_index_error_embedding_hnsw",
+      "def": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64')"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "idx_codebase_chunk_latent64_hnsw",
+      "def": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+    },
+    {
+      "table": "codebase_chunk_index",
+      "index": "idx_codebase_chunk_latent_128_hnsw",
+      "def": "CREATE INDEX idx_codebase_chunk_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (latent_128 halfvec_cosine_ops) WHERE (latent_128 IS NOT NULL)"
+    }
+  ],
+  "typedColumns": {
+    "byteaColumns": [
+      {
+        "table_name": "atlas_packets",
+        "column_name": "latent_64",
+        "data_type": "bytea",
+        "udt_name": "bytea",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "column_name": "latent64_msgpack",
+        "data_type": "bytea",
+        "udt_name": "bytea",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "nes_chrom_packets",
+        "column_name": "packet_zstd",
+        "data_type": "bytea",
+        "udt_name": "bytea",
+        "is_nullable": "YES"
+      }
+    ],
+    "jsonbColumnsCount": 33,
+    "tsvectorColumns": [
+      {
+        "table_name": "codebase_chunk_index",
+        "column_name": "search_vector",
+        "data_type": "tsvector",
+        "udt_name": "tsvector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "legal_chunks",
+        "column_name": "tsv",
+        "data_type": "tsvector",
+        "udt_name": "tsvector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "legal_nodes",
+        "column_name": "tsv",
+        "data_type": "tsvector",
+        "udt_name": "tsvector",
+        "is_nullable": "YES"
+      }
+    ],
+    "vectorColumns": [
+      {
+        "table_name": "atlas_packets",
+        "column_name": "embedding",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "atlas_packets",
+        "column_name": "content_embedding_384",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "column_name": "summary_embedding_384",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "column_name": "latent_64",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "column_name": "content_embedding_768",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "codebase_chunk_index",
+        "column_name": "error_embedding_latent_64",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "legal_chunks",
+        "column_name": "embedding",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "nes_chrom_packets",
+        "column_name": "embedding",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      },
+      {
+        "table_name": "task_semantic_packets",
+        "column_name": "semantic_vector",
+        "data_type": "USER-DEFINED",
+        "udt_name": "vector",
+        "is_nullable": "YES"
+      }
+    ]
+  },
+  "plannerVerification": {
+    "defaultFtsPlan": {
+      "executionTimeMs": 6.182,
+      "planningTimeMs": 1.921,
+      "settings": {},
+      "nodes": [
+        {
+          "nodeType": "Limit",
+          "relationName": null,
+          "indexName": null,
+          "actualRows": 25,
+          "sharedHitBlocks": 29,
+          "sharedReadBlocks": 6
+        },
+        {
+          "nodeType": "Bitmap Heap Scan",
+          "relationName": "legal_nodes",
+          "indexName": null,
+          "actualRows": 25,
+          "sharedHitBlocks": 29,
+          "sharedReadBlocks": 6
+        },
+        {
+          "nodeType": "Bitmap Index Scan",
+          "relationName": null,
+          "indexName": "legal_nodes_tsv_gin",
+          "actualRows": 128,
+          "sharedHitBlocks": 6,
+          "sharedReadBlocks": 6
+        }
+      ]
+    },
+    "bitmapHeapScanPlan": {
+      "executionTimeMs": 8.132,
+      "planningTimeMs": 0.258,
+      "settings": {
+        "enable_seqscan": "off",
+        "enable_indexscan": "off"
+      },
+      "bitmapHeapScanObserved": true,
+      "nodes": [
+        {
+          "nodeType": "Limit",
+          "relationName": null,
+          "indexName": null,
+          "actualRows": 50,
+          "sharedHitBlocks": 37,
+          "sharedReadBlocks": 2
+        },
+        {
+          "nodeType": "Bitmap Heap Scan",
+          "relationName": "legal_nodes",
+          "indexName": null,
+          "actualRows": 50,
+          "sharedHitBlocks": 37,
+          "sharedReadBlocks": 2
+        },
+        {
+          "nodeType": "Bitmap Index Scan",
+          "relationName": null,
+          "indexName": "legal_nodes_tsv_gin",
+          "actualRows": 4145,
+          "sharedHitBlocks": 3,
+          "sharedReadBlocks": 2
+        }
+      ]
+    }
+  },
+  "drizzleSchemaMappings": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+      "customTypeByteaCount": 1,
+      "jsonbColumnCount": 207,
+      "vectorColumnCount": 31,
+      "ginIndexCount": 3,
+      "hnswIndexCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts",
+      "customTypeByteaCount": 1,
+      "jsonbColumnCount": 5,
+      "vectorColumnCount": 1,
+      "ginIndexCount": 5,
+      "hnswIndexCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/db/schema/nes-chrom-packets.ts",
+      "customTypeByteaCount": 1,
+      "jsonbColumnCount": 9,
+      "vectorColumnCount": 1,
+      "ginIndexCount": 16,
+      "hnswIndexCount": 1
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/db/schema/packet-binary-registry.ts",
+      "customTypeByteaCount": 1,
+      "jsonbColumnCount": 0,
+      "vectorColumnCount": 0,
+      "ginIndexCount": 0,
+      "hnswIndexCount": 0
+    }
+  ],
+  "alignedBitsetBlobProof": {
+    "schema": "AlignedBitsetBlobV1",
+    "magicHex": "0x54494253414c5441",
+    "magicValid": true,
+    "version": 1,
+    "bitCapacity": 1024,
+    "alignedPayloadBytes": 128,
+    "pgVarlenaAdjustedOffset": 60,
+    "pgMemoryAlignmentMod64": 0,
+    "totalByteaLength": 188,
+    "popcount": 8,
+    "expectedPopcount": 8,
+    "allOrdinalsVerified": true,
+    "webgpuU32WordCount": 32,
+    "payloadSha256": "sha256:d8c90408a5e749ca9a9652948812ed5e607f899f93c8df9ece4d539dc453ef37"
+  },
+  "rfc9162MerkleProof": {
+    "rfc": "RFC-9162",
+    "leafPrefixByte": "0x00",
+    "nodePrefixByte": "0x01",
+    "leafCount": 5,
+    "merkleTreeHash": "sha256:06b7f24fe295ffab10e155320a1cfaf0ab35172ce630171238e6e84dfce0c6d8",
+    "deterministicParity": true,
+    "tamperDetected": true,
+    "taxonomyMerkelToMerkleAliasPresent": true
+  },
+  "gates": {
+    "PG18_READ_ONLY_GUARD": "PASS",
+    "PG18_AIO_BITMAP_EXPLAIN_RECORDED": "PASS",
+    "PG18_GIN_JSONB_FTS_INDEXES_VERIFIED": "PASS",
+    "PG18_BRIN_TEMPORAL_INDEXES_VERIFIED": "PASS",
+    "PG18_HNSW_VECTOR_INDEXES_VERIFIED": "PASS",
+    "PG18_BYTEA_ATLASBIT_64B_ALIGNED": "PASS",
+    "PG18_RFC9162_MERKLE_DETERMINISTIC": "PASS"
+  }
+}

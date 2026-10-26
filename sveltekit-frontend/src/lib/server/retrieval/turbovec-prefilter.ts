@@ -1,10 +1,11 @@
 /**
  * turbovec-prefilter.ts
- * Thin client for the TurboVec ANN sidecar wrapper (:8792) and Python helper (:8793).
+ * Thin client for the configured TurboVec ANN sidecar.
  * Wraps /prefilter and /search endpoints with a configurable timeout + graceful fallback.
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
 import { turbovecGrpcSearch, type TurboVecCandidateIdentity } from '$lib/server/grpc/turbovec-cuda-client.js';
 
 export interface TurboVecPrefilterResult {
@@ -142,19 +143,29 @@ export async function turbovecSearch(
 /**
  * Health check — returns sidecar status or null if offline.
  */
-export async function turbovecHealth(): Promise<{
-  ok: boolean;
-  indexed: number;
-  dim: number;
-  bits: number;
-  backend: string;
-} | null> {
+const turboVecHealthSchema = z.object({
+  ok: z.boolean(),
+  indexed: z.number().int().nonnegative(),
+  dim: z.number().int().positive(),
+  bits: z.number().int().positive(),
+  backend: z.string().min(1).max(128).nullable().optional().default(null),
+  turbovec: z.boolean().nullable().optional().default(null),
+  source: z.string().min(1).max(128).nullable().optional().default(null),
+  collection: z.string().min(1).max(256).nullable().optional().default(null),
+  representationId: z.string().min(1).max(256).nullable().optional().default(null),
+  role: z.string().min(1).max(128).nullable().optional().default(null),
+});
+
+export type TurboVecHealth = z.infer<typeof turboVecHealthSchema>;
+
+export async function turbovecHealth(): Promise<TurboVecHealth | null> {
   try {
     const res = await fetch(`${sidecarUrl()}/health`, {
-      signal: AbortSignal.timeout(500),
+      signal: AbortSignal.timeout(5_000),
     });
     if (!res.ok) return null;
-    return res.json();
+    const parsed = turboVecHealthSchema.safeParse(await res.json());
+    return parsed.success ? parsed.data : null;
   } catch {
     return null;
   }

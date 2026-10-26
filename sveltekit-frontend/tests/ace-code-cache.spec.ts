@@ -121,7 +121,8 @@ vi.mock('$lib/server/db/schema/metadata-spine.js', () => ({ aceRetrievalRuns: {}
 vi.mock('$lib/server/db/schema/codebase-intelligence.js', () => ({ gpuClusterCentroids: {} }));
 
 vi.mock('$lib/server/env.server.js', () => ({
-  ENV: { QDRANT_URL: 'http://localhost:6333', OLLAMA_BASE_URL: 'http://localhost:11434' },
+  // ROTORQUANT_MODEL_PATH: required by the transitively imported llm runtime-contract at import time
+  ENV: { QDRANT_URL: 'http://localhost:6333', OLLAMA_BASE_URL: 'http://localhost:11434', ROTORQUANT_MODEL_PATH: 'test-model.gguf' },
 }));
 
 vi.mock('$env/dynamic/private', () => ({ env: {} }));

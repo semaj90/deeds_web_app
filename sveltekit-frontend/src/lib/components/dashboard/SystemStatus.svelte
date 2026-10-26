@@ -97,7 +97,9 @@
 			<div class="alerts-list">
 				{#each visibleAlerts as alert (alert.id)}
 					<div class="alert-item {getAlertColor(alert.type)}">
-						<Icon name={getAlertIcon(alert.type)} class="alert-icon" />
+						<span class="alert-icon">
+							<Icon name={getAlertIcon(alert.type)} />
+						</span>
 						<div class="alert-content">
 							<p class="alert-message">{alert.message}</p>
 							{#if showTimestamps}

@@ -2,13 +2,23 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { AtlasPacket } from '$lib/server/db/schema/atlas-packets.js';
 import type { AtlasTreeNode } from '$lib/server/db/schema/atlas-tree-nodes.js';
+import { verifyNaryFactProposalChecksumV1, type NaryFactProposalV1 } from '$lib/server/atlas/graph/nary-fact-proposal-v1.js';
+import { OntologyLinkedTupleV1Schema, type OntologyLinkedTupleV1 } from '$lib/server/atlas/contracts/ontology-linked-tuple-v1.js';
 import type {
   NewGraphEdgeV2Row,
   NewGraphNodeV2Row,
+  NewGraphRelationEventV2Row,
+  NewGraphRelationParticipantV2Row,
   NewGraphSnapshotExclusionV2Row,
   NewGraphSnapshotV2Row
 } from '$lib/server/db/schema/graph-authority-v2.js';
-import { topologyHash, type GraphEdge, type GraphNode } from './graph-snapshot.js';
+import {
+  graphifyEdgeProjectionCandidateV1Schema,
+  graphifySymbolProjectionCandidateV1Schema,
+  type GraphifyEdgeProjectionCandidateV1,
+  type GraphifySymbolProjectionCandidateV1
+} from '$lib/server/atlas/indexing/graphify-symbol-projection-v1.js';
+import { topologyHash, validateGraphSnapshotIdentity, type GraphEdge, type GraphNode, type GraphRelationEvent, type GraphRelationParticipant } from './graph-snapshot.js';
 
 export const GraphSnapshotManifestStatusSchema = z.enum([
   'MATERIALIZING',
@@ -23,13 +33,16 @@ export type GraphSnapshotManifestStatus = z.infer<typeof GraphSnapshotManifestSt
 export interface GraphSnapshotManifest {
   snapshotId: string;
   workspaceId: string;
+  workspaceRevision?: string | null;
   sourceInventorySnapshotId: string;
   identityContractVersion: string;
   parserContractVersion: string;
   nodeCount: number;
   edgeCount: number;
+  relationEventCount: number;
   excludedNodeCount: number;
   excludedEdgeCount: number;
+  excludedRelationCount: number;
   topologyHash: string;
   generatedAt: string;
   relationshipTypes: readonly string[];
@@ -46,6 +59,7 @@ export interface GraphSnapshotProof {
    *  fix, 146,655 rows show up here as rejectionCounts.HEURISTIC_AST_PROJECTION
    *  rather than silently disappearing from nodeCount with no trace. */
   rejectionCounts: Record<string, number>;
+  relationRejectionCounts: Record<string, number>;
   sourceInventoryHash: string;
   policyHash: string;
   topologyHash: string;
@@ -55,6 +69,8 @@ export interface GraphSnapshotProof {
   persistedNodeCount: number;
   eligibleEdgeCount: number;
   persistedEdgeCount: number;
+  eligibleRelationCount: number;
+  persistedRelationCount: number;
   excludedNodeCount: number;
   excludedEdgeCount: number;
   unresolvedEndpointCount: number;
@@ -66,18 +82,221 @@ export interface GraphSnapshotMaterialization {
   graphSnapshot: NewGraphSnapshotV2Row;
   graphSnapshotNodes: NewGraphNodeV2Row[];
   graphSnapshotEdges: NewGraphEdgeV2Row[];
+  graphSnapshotRelationEvents: NewGraphRelationEventV2Row[];
+  graphSnapshotRelationParticipants: NewGraphRelationParticipantV2Row[];
   graphSnapshotExclusions: NewGraphSnapshotExclusionV2Row[];
   graphSnapshotManifest: GraphSnapshotManifest;
   graphSnapshotProof: GraphSnapshotProof;
+  graphifyReplayProof?: {
+    structuralBatchChecksum?: string | null;
+    batchAssemblyChecksum: string | null;
+    replayPlanChecksum: string;
+    replayCounts: Record<string, number>;
+    candidateCount: number;
+    rejectedReferences: { referenceId: string; reason: string }[];
+    canonicalAuthority: false;
+    writesPerformed: false;
+  };
+}
+
+export interface GraphSnapshotRelationCandidateV1 {
+  relationId: string;
+  relationType: string;
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  confidence: number;
+  sourceSpan: {
+    coordinateSystem: 'utf8-byte';
+    startByte: number;
+    endByte: number;
+    nodeContentSha256: string;
+    producerId: string;
+    producerRevision: string;
+    parserId?: string;
+    parserVersion?: string;
+    evidenceRefs: readonly string[];
+  };
+  participants: readonly { nodeKey: string; role: string; ordinal: number }[];
+}
+
+export interface GraphSnapshotGraphifyPacketEdgeCandidateV1 {
+  edge: GraphifyEdgeProjectionCandidateV1;
+  subjectSymbol: GraphifySymbolProjectionCandidateV1;
+  targetSymbol: GraphifySymbolProjectionCandidateV1;
+  sourcePacketKey: string;
+  targetPacketKey: string;
+  sourceSymbolKey: string;
+  targetSymbolKey: string;
+  graphRevision: string;
+  sourceBytes: Uint8Array;
+  targetSourceBytes: Uint8Array;
+}
+
+export interface GraphSnapshotSourceSpanProofV1 {
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  coordinateSystem: 'utf8-byte';
+  sourceBytes: Uint8Array;
+  producerId: string;
+  producerRevision: string;
+  parserId?: string;
+  parserVersion?: string;
+  evidenceRefs: readonly string[];
+}
+
+export type OntologyTupleRelationCandidateResultV1 =
+  | { candidate: GraphSnapshotRelationCandidateV1; reason: null }
+  | { candidate: null; reason: string };
+
+export function buildGraphSnapshotRelationCandidateFromTupleV1(input: {
+  tuple: OntologyLinkedTupleV1;
+  proposal: NaryFactProposalV1;
+  sourceSpanProof: GraphSnapshotSourceSpanProofV1;
+  nodes: readonly GraphNode[];
+}): OntologyTupleRelationCandidateResultV1 {
+  const tuple = OntologyLinkedTupleV1Schema.parse(input.tuple);
+  const proposal = input.proposal;
+  const proof = input.sourceSpanProof;
+  const reject = (reason: string): OntologyTupleRelationCandidateResultV1 => ({ candidate: null, reason });
+  const tupleEvidenceRefs = [...tuple.evidenceRefs].sort();
+  const proposalEvidenceRefs = [...proposal.evidenceRefs].sort();
+  const proofEvidenceRefs = [...proof.evidenceRefs].sort();
+  if (!verifyNaryFactProposalChecksumV1(proposal) || proposal.canonicalAuthority !== false) {
+    return reject('NARY_PROPOSAL_CHECKSUM_INVALID');
+  }
+  if (proposal.admission !== 'ADMITTED') {
+    return reject('NARY_PROPOSAL_NOT_ADMITTED');
+  }
+  if (tuple.evidenceState !== 'ACTIVE_VERIFIED'
+    || !tuple.packetKey
+    || !tuple.evidenceSpan
+    || !tuple.provenance.sourceRevision
+    || !tuple.provenance.workspaceRevision
+    || !tuple.provenance.evidenceSpanChecksum
+    || !tuple.provenance.producerId) {
+    return reject('ONTOLOGY_TUPLE_LINEAGE_OR_SPAN_INCOMPLETE');
+  }
+  if (proposal.sourceRef !== tuple.sourceRef
+    || proposal.sourceRevision !== tuple.provenance.sourceRevision
+    || proposal.workspaceRevision !== tuple.provenance.workspaceRevision
+    || proposal.packetKey !== tuple.packetKey
+    || proposalEvidenceRefs.length !== tupleEvidenceRefs.length
+    || proposalEvidenceRefs.some((ref, index) => ref !== tupleEvidenceRefs[index])
+    || proofEvidenceRefs.length !== tupleEvidenceRefs.length
+    || proofEvidenceRefs.some((ref, index) => ref !== tupleEvidenceRefs[index])) {
+    return reject('NARY_PROPOSAL_TUPLE_IDENTITY_MISMATCH');
+  }
+  const sourceSpan = tuple.evidenceSpan;
+  if (proof.sourceRef !== sourceSpan.sourceRef
+    || proof.sourceRef !== tuple.sourceRef
+    || proof.sourceRevision !== tuple.provenance.sourceRevision
+    || proof.workspaceRevision !== tuple.provenance.workspaceRevision
+    || proof.producerId !== tuple.provenance.producerId
+    || proof.producerRevision !== tuple.provenance.producerRevision
+    || proof.coordinateSystem !== 'utf8-byte'
+    || !/^sha256:[a-f0-9]{64}$/i.test(proof.sourceRevision)
+    || !/^sha256:[a-f0-9]{64}$/i.test(proof.workspaceRevision)
+    || !proof.producerId || !proof.producerRevision
+    || Boolean(proof.parserId) !== Boolean(proof.parserVersion)
+    || !Number.isSafeInteger(sourceSpan.start) || sourceSpan.start < 0
+    || !Number.isSafeInteger(sourceSpan.end) || sourceSpan.end <= sourceSpan.start
+    || sourceSpan.end > proof.sourceBytes.byteLength) {
+    return reject('ONTOLOGY_TUPLE_SOURCE_SPAN_PROOF_MISMATCH');
+  }
+  const sourceBytes = Buffer.from(proof.sourceBytes);
+  const sourceRevision = `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`;
+  const spanBytes = sourceBytes.subarray(sourceSpan.start, sourceSpan.end);
+  const nodeContentSha256 = `sha256:${createHash('sha256').update(spanBytes).digest('hex')}`;
+  try {
+    const decoder = new TextDecoder('utf-8', { fatal: true });
+    decoder.decode(sourceBytes.subarray(0, sourceSpan.start));
+    const spanText = decoder.decode(spanBytes);
+    decoder.decode(sourceBytes.subarray(sourceSpan.end));
+    if (sourceRevision !== proof.sourceRevision
+      || nodeContentSha256 !== tuple.provenance.evidenceSpanChecksum
+      || spanText !== tuple.surfaceText) {
+      return reject('ONTOLOGY_TUPLE_SOURCE_BYTES_MISMATCH');
+    }
+  } catch {
+    return reject('ONTOLOGY_TUPLE_SOURCE_BYTES_INVALID_UTF8_BOUNDARY');
+  }
+  const tupleParticipants = new Set(tuple.participants.map((participant) => `${participant.entityId}\u0000${participant.role}\u0000${participant.entityKind.toUpperCase()}`));
+  const proposalParticipants = new Set(proposal.participants.map((participant) => `${participant.canonicalId}\u0000${participant.role}\u0000${participant.entityType}`));
+  if (tupleParticipants.size < 3 || tupleParticipants.size !== proposalParticipants.size
+    || [...tupleParticipants].some((participant) => !proposalParticipants.has(participant))) {
+    return reject('ONTOLOGY_TUPLE_PARTICIPANT_PROPOSAL_MISMATCH');
+  }
+
+  const participants: Array<{ nodeKey: string; role: string; ordinal: number }> = [];
+  for (const participant of proposal.participants) {
+    const matches = input.nodes.filter((node) => {
+      if (!node.packetKey) return false;
+      if (participant.entityType === 'PACKET') return node.nodeType === 'packet' && node.packetKey === participant.canonicalId;
+      if (participant.entityType === 'AST_SYMBOL') return node.nodeType === 'symbol' && node.treeNodeId === participant.canonicalId;
+      if (participant.entityType === 'TREE_NODE') return node.treeNodeId === participant.canonicalId;
+      if (['CONCEPT', 'SEMANTIC_CONCEPT', 'TOPIC'].includes(participant.entityType)) {
+        return node.nodeType === 'concept' && node.nodeKey === participant.canonicalId;
+      }
+      return false;
+    });
+    if (matches.length !== 1) return reject(matches.length ? 'ONTOLOGY_TUPLE_PARTICIPANT_AMBIGUOUS' : 'ONTOLOGY_TUPLE_PARTICIPANT_NODE_MISSING');
+    const node = matches[0];
+    if (participant.sourceRef && participant.sourceRef !== node.sourceRef) {
+      return reject('ONTOLOGY_TUPLE_PARTICIPANT_SOURCE_REF_MISMATCH');
+    }
+    if (participant.entityRevision && participant.entityRevision !== node.properties.sourceRevision) {
+      return reject('ONTOLOGY_TUPLE_PARTICIPANT_SOURCE_REVISION_MISMATCH');
+    }
+    if (typeof node.properties.sourceRevision !== 'string'
+      || !/^sha256:[a-f0-9]{64}$/i.test(node.properties.sourceRevision)
+      || node.properties.workspaceRevision !== proof.workspaceRevision) {
+      return reject('ONTOLOGY_TUPLE_PARTICIPANT_REVISION_UNQUALIFIED');
+    }
+    participants.push({ nodeKey: node.nodeKey, role: participant.role, ordinal: participant.ordinal ?? participants.length });
+  }
+  const sourcePacketNode = participants
+    .map((participant) => input.nodes.find((node) => node.nodeKey === participant.nodeKey))
+    .find((node) => node?.packetKey === tuple.packetKey
+      && node.sourceRef === tuple.sourceRef
+      && node.properties.sourceRevision === proof.sourceRevision
+      && node.properties.workspaceRevision === proof.workspaceRevision);
+  if (!sourcePacketNode) return reject('ONTOLOGY_TUPLE_SOURCE_PACKET_NODE_MISSING');
+
+  return {
+    reason: null,
+    candidate: {
+      relationId: `nary:${tuple.tupleId}`,
+      relationType: proposal.predicate,
+      sourceRef: tuple.sourceRef,
+      sourceRevision: proof.sourceRevision,
+      workspaceRevision: proof.workspaceRevision,
+      confidence: tuple.confidence,
+      sourceSpan: {
+        coordinateSystem: proof.coordinateSystem,
+        startByte: sourceSpan.start,
+        endByte: sourceSpan.end,
+        nodeContentSha256,
+        producerId: proof.producerId,
+        producerRevision: proof.producerRevision,
+        ...(proof.parserId ? { parserId: proof.parserId } : {}),
+        ...(proof.parserVersion ? { parserVersion: proof.parserVersion } : {}),
+        evidenceRefs: [...proof.evidenceRefs]
+      },
+      participants
+    }
+  };
 }
 
 export interface GraphSnapshotMaterializerInput {
   snapshotId: string;
   workspaceId: string;
+  workspaceRevision?: string | null;
   sourceInventorySnapshotId: string;
   identityContractVersion: string;
   parserContractVersion: string;
-  treeNodes: readonly Pick<
+  treeNodes: readonly (Pick<
     AtlasTreeNode,
     | 'nodeId'
     | 'parentId'
@@ -98,7 +317,7 @@ export interface GraphSnapshotMaterializerInput {
     | 'metadata'
     | 'ledgerType'
     | 'lineageVersion'
-  >[];
+  > & { sourceRevision?: string | null })[];
   packets: readonly Pick<
     AtlasPacket,
     | 'packetKey'
@@ -113,6 +332,7 @@ export interface GraphSnapshotMaterializerInput {
     | 'communityId'
     | 'clusterId'
     | 'sha256'
+    | 'sourceRevision'
     | 'sourceKind'
     | 'sourcePath'
     | 'topology'
@@ -124,9 +344,18 @@ export interface GraphSnapshotMaterializerInput {
     | 'ledgerType'
     | 'canonical'
     | 'treeNodeId'
+    | 'byteStart'
+    | 'byteEnd'
     | 'qdrantCollection'
     | 'qdrantVectorDim'
   >[];
+  relationCandidates?: readonly GraphSnapshotRelationCandidateV1[];
+  graphifyPacketEdgeCandidates?: readonly GraphSnapshotGraphifyPacketEdgeCandidateV1[];
+  ontologyTupleCandidates?: readonly {
+    tuple: OntologyLinkedTupleV1;
+    proposal: NaryFactProposalV1;
+    sourceSpanProof: GraphSnapshotSourceSpanProofV1;
+  }[];
   generatedAt?: string;
   edgeOrientationPolicy?: string;
   duplicateEdgePolicy?: string;
@@ -252,6 +481,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
   const sortedPackets = [...input.packets].sort((left, right) => left.packetKey.localeCompare(right.packetKey));
 
   const graphSnapshotExclusions: NewGraphSnapshotExclusionV2Row[] = [];
+  const graphSnapshotRelationEvents: NewGraphRelationEventV2Row[] = [];
+  const graphSnapshotRelationParticipants: NewGraphRelationParticipantV2Row[] = [];
   const treeNodeMap = new Map<string, typeof sortedTreeNodes[number]>();
   const packetMap = new Map<string, typeof sortedPackets[number]>();
 
@@ -279,6 +510,18 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
       continue;
     }
     packetMap.set(packet.packetKey, packet);
+  }
+
+  const sourceRevisionByRef = new Map<string, string | null>();
+  for (const packet of packetMap.values()) {
+    const revision = typeof packet.sourceRevision === 'string' && packet.sourceRevision.trim()
+      ? packet.sourceRevision
+      : null;
+    if (!sourceRevisionByRef.has(packet.sourceRef)) {
+      sourceRevisionByRef.set(packet.sourceRef, revision);
+    } else if (sourceRevisionByRef.get(packet.sourceRef) !== revision) {
+      sourceRevisionByRef.set(packet.sourceRef, null);
+    }
   }
 
   const graphSnapshotNodes: NewGraphNodeV2Row[] = [];
@@ -320,6 +563,11 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     }
 
     const nodeKey = `tree:${treeNode.nodeId}`;
+    const packetRevision = treeNode.packetKey ? packetMap.get(treeNode.packetKey)?.sourceRevision : null;
+    if (treeNode.sourceRevision && packetRevision && treeNode.sourceRevision !== packetRevision) {
+      throw new Error(`GRAPH_TREE_PACKET_SOURCE_REVISION_MISMATCH:${treeNode.nodeId}`);
+    }
+    const sourceRevision = treeNode.sourceRevision ?? packetRevision ?? sourceRevisionByRef.get(treeNode.sourceRef) ?? null;
     graphSnapshotNodes.push(
       parseGraphNode({
         snapshotId,
@@ -335,6 +583,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           nodeType: treeNode.nodeType,
           treeDepth: treeNode.treeDepth,
           sourceRef: treeNode.sourceRef,
+          sourceRevision,
+          workspaceRevision: input.workspaceRevision ?? null,
           filePath: treeNode.filePath,
           packetKey: treeNode.packetKey ?? null,
           featureId: treeNode.featureId ?? null,
@@ -356,6 +606,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           nodeType: treeNode.nodeType,
           treeDepth: treeNode.treeDepth,
           sourceRef: treeNode.sourceRef,
+          sourceRevision,
+          workspaceRevision: input.workspaceRevision ?? null,
           filePath: treeNode.filePath,
           packetKey: treeNode.packetKey ?? null,
           featureId: treeNode.featureId ?? null,
@@ -419,6 +671,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
         contentHash: packet.sha256 ?? hashStableRecord({
           packetKey: packet.packetKey,
           sourceRef: packet.sourceRef,
+          sourceRevision: packet.sourceRevision ?? null,
           canonicalSourceRef: packet.canonicalSourceRef ?? null,
           directoryPath: packet.directoryPath,
           filePath: packet.filePath ?? null,
@@ -428,6 +681,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           titleId: packet.titleId ?? null,
           communityId: packet.communityId ?? null,
           clusterId: packet.clusterId ?? null,
+          byteStart: packet.byteStart ?? null,
+          byteEnd: packet.byteEnd ?? null,
           sourceKind: packet.sourceKind ?? null,
           sourcePath: packet.sourcePath ?? null,
           domainClass: packet.domainClass ?? null,
@@ -442,6 +697,10 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           materializedFrom: 'atlas_packets',
           packetKey: packet.packetKey,
           sourceRef: packet.sourceRef,
+          sourceRevision: packet.sourceRevision ?? null,
+          byteStart: packet.byteStart ?? null,
+          byteEnd: packet.byteEnd ?? null,
+          workspaceRevision: input.workspaceRevision ?? null,
           canonicalSourceRef: packet.canonicalSourceRef ?? null,
           directoryPath: packet.directoryPath,
           filePath: packet.filePath ?? null,
@@ -545,26 +804,425 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     });
   }
 
+  const packetGraphNodes = new Map(
+    graphSnapshotNodes
+      .filter((node) => node.nodeType === 'packet' && node.packetKey)
+      .map((node) => [node.packetKey!, node])
+  );
+  const supportedGraphifyPredicates = new Set<GraphEdge['edgeType']>([
+    'CALLS', 'IMPORTS', 'REFERENCES', 'IMPLEMENTS', 'DEPENDS_ON', 'USES_CONCEPT'
+  ]);
+  const relationCandidates: GraphSnapshotRelationCandidateV1[] = [...(input.relationCandidates ?? [])];
+  const graphifySymbolNodes = new Map<string, NewGraphNodeV2Row>();
+  for (const candidate of [...(input.graphifyPacketEdgeCandidates ?? [])].sort((left, right) =>
+    left.edge.referenceId.localeCompare(right.edge.referenceId)
+      || left.sourcePacketKey.localeCompare(right.sourcePacketKey)
+      || left.targetPacketKey.localeCompare(right.targetPacketKey))) {
+    const edgeResult = graphifyEdgeProjectionCandidateV1Schema.safeParse(candidate.edge);
+    const subjectResult = graphifySymbolProjectionCandidateV1Schema.safeParse(candidate.subjectSymbol);
+    const targetResult = graphifySymbolProjectionCandidateV1Schema.safeParse(candidate.targetSymbol);
+    const edge = edgeResult.success ? edgeResult.data : candidate.edge;
+    const reject = (reason: string) => graphSnapshotExclusions.push(buildExclusion(snapshotId, 'edge_materialization', reason, {
+      candidateKey: `${edge.referenceId}:${candidate.sourcePacketKey}:${candidate.targetPacketKey}`,
+      packetKey: candidate.sourcePacketKey,
+      sourceRef: edge.sourceRef,
+      evidence: { referenceId: edge.referenceId, sourcePacketKey: candidate.sourcePacketKey, targetPacketKey: candidate.targetPacketKey }
+    }));
+    if (!edgeResult.success || !subjectResult.success || !targetResult.success) {
+      reject('GRAPHIFY_EDGE_OR_SYMBOL_SCHEMA_INVALID');
+      continue;
+    }
+    const subjectSymbol = subjectResult.data;
+    const targetSymbol = targetResult.data;
+    if (!edge.objectStableSymbolKey || edge.unresolvedTarget
+      || candidate.sourceSymbolKey !== edge.subjectStableSymbolKey
+      || candidate.targetSymbolKey !== edge.objectStableSymbolKey
+      || subjectSymbol.stableSymbolKey !== edge.subjectStableSymbolKey
+      || targetSymbol.stableSymbolKey !== edge.objectStableSymbolKey) {
+      reject('GRAPHIFY_EDGE_SYMBOL_BINDING_UNRESOLVED');
+      continue;
+    }
+    if (edge.workspaceRevision !== (input.workspaceRevision ?? null)
+      || !/^sha256:[a-f0-9]{64}$/i.test(edge.workspaceRevision)
+      || !/^sha256:[a-f0-9]{64}$/i.test(edge.sourceRevision)
+      || !/^sha256:[a-f0-9]{64}$/i.test(edge.objectSourceRevision ?? '')
+      || !/^[a-f0-9]{64}$/i.test(candidate.graphRevision)) {
+      reject('GRAPHIFY_EDGE_REVISION_UNQUALIFIED');
+      continue;
+    }
+    const subjectSourceRevision = `sha256:${createHash('sha256').update(candidate.sourceBytes).digest('hex')}`;
+    const targetSourceRevision = `sha256:${createHash('sha256').update(candidate.targetSourceBytes).digest('hex')}`;
+    const symbolBytesMatch = (symbol: GraphifySymbolProjectionCandidateV1, sourceBytes: Uint8Array) => {
+      if (!Number.isSafeInteger(symbol.startByte) || !Number.isSafeInteger(symbol.endByte)
+        || symbol.startByte < 0 || symbol.endByte <= symbol.startByte || symbol.endByte > sourceBytes.byteLength) return false;
+      try {
+        const decoder = new TextDecoder('utf-8', { fatal: true });
+        decoder.decode(sourceBytes);
+        decoder.decode(sourceBytes.slice(0, symbol.startByte));
+        decoder.decode(sourceBytes.slice(0, symbol.endByte));
+      } catch {
+        return false;
+      }
+      return createHash('sha256').update(sourceBytes.slice(symbol.startByte, symbol.endByte)).digest('hex')
+        === symbol.sourceTextHash;
+    };
+    const subjectSymbolBound = subjectSymbol.sourceRef === edge.sourceRef
+      && subjectSymbol.sourceRevision === edge.sourceRevision
+      && subjectSymbol.workspaceRevision === edge.workspaceRevision
+      && subjectSourceRevision === edge.sourceRevision
+      && symbolBytesMatch(subjectSymbol, candidate.sourceBytes);
+    const targetSymbolBound = targetSymbol.sourceRef === edge.objectSourceRef
+      && targetSymbol.sourceRevision === edge.objectSourceRevision
+      && targetSymbol.workspaceRevision === edge.workspaceRevision
+      && targetSourceRevision === edge.objectSourceRevision
+      && symbolBytesMatch(targetSymbol, candidate.targetSourceBytes);
+    const span = edge.evidenceSpan;
+    let spanBoundaryValid = false;
+    try {
+      const decoder = new TextDecoder('utf-8', { fatal: true });
+      decoder.decode(candidate.sourceBytes);
+      decoder.decode(candidate.sourceBytes.slice(0, span.startByte));
+      decoder.decode(candidate.sourceBytes.slice(0, span.endByte));
+      spanBoundaryValid = Number.isSafeInteger(span.startByte)
+        && Number.isSafeInteger(span.endByte)
+        && span.startByte >= 0
+        && span.endByte > span.startByte
+        && span.endByte <= candidate.sourceBytes.byteLength;
+    } catch {
+      spanBoundaryValid = false;
+    }
+    if (!subjectSymbolBound || !targetSymbolBound || !spanBoundaryValid) {
+      reject('GRAPHIFY_EDGE_SOURCE_BYTES_OR_SPAN_MISMATCH');
+      continue;
+    }
+    const sourceNode = packetGraphNodes.get(candidate.sourcePacketKey);
+    const targetNode = packetGraphNodes.get(candidate.targetPacketKey);
+    const sourceProps = (sourceNode?.properties ?? {}) as Record<string, unknown>;
+    const targetProps = (targetNode?.properties ?? {}) as Record<string, unknown>;
+    if (!sourceNode || !targetNode
+      || sourceProps.sourceRef !== edge.sourceRef
+      || sourceProps.sourceRevision !== edge.sourceRevision
+      || sourceProps.workspaceRevision !== edge.workspaceRevision
+      || targetProps.sourceRef !== edge.objectSourceRef
+      || targetProps.sourceRevision !== edge.objectSourceRevision
+      || targetProps.workspaceRevision !== edge.workspaceRevision) {
+      reject('GRAPHIFY_EDGE_PACKET_BINDING_MISMATCH');
+      continue;
+    }
+    const packetCoversSymbol = (node: NewGraphNodeV2Row, symbol: GraphifySymbolProjectionCandidateV1) => {
+      const props = (node.properties ?? {}) as Record<string, unknown>;
+      const startByte = props.byteStart;
+      const endByte = props.byteEnd;
+      return Number.isSafeInteger(startByte) && Number.isSafeInteger(endByte)
+        && (startByte as number) <= symbol.startByte
+        && (endByte as number) >= symbol.endByte;
+    };
+    if (!packetCoversSymbol(sourceNode, subjectSymbol) || !packetCoversSymbol(targetNode, targetSymbol)) {
+      reject('GRAPHIFY_EDGE_PACKET_SPAN_DOES_NOT_COVER_SYMBOL');
+      continue;
+    }
+    const edgeType = edge.predicate.toUpperCase() as GraphEdge['edgeType'];
+    if (!supportedGraphifyPredicates.has(edgeType)) {
+      reject('GRAPHIFY_EDGE_PREDICATE_UNSUPPORTED');
+      continue;
+    }
+    if (sourceNode.nodeKey === targetNode.nodeKey) {
+      selfLoopCount += 1;
+      reject('GRAPHIFY_EDGE_PACKET_SELF_LOOP');
+      continue;
+    }
+    const buildGraphifySymbolNode = (
+      symbol: GraphifySymbolProjectionCandidateV1,
+      packetKey: string,
+      sourceRef: string,
+      sourceRevision: string
+    ): NewGraphNodeV2Row => {
+      const nodeKey = `graphify-symbol:${hashStableRecord({
+        stableSymbolKey: symbol.stableSymbolKey,
+        packetKey,
+        sourceRef,
+        sourceRevision,
+        workspaceRevision: edge.workspaceRevision,
+        graphRevision: candidate.graphRevision,
+        startByte: symbol.startByte,
+        endByte: symbol.endByte,
+        sourceTextHash: symbol.sourceTextHash,
+        extractorRevision: symbol.extractorRevision
+      })}`;
+      const prior = graphifySymbolNodes.get(nodeKey);
+      if (prior) return prior;
+      const node = parseGraphNode({
+        snapshotId,
+        nodeKey,
+        nodeType: 'symbol',
+        packetKey,
+        treeNodeId: null,
+        sourceRef,
+        properties: {
+          graphifyStableSymbolKey: symbol.stableSymbolKey,
+          upstreamNodeId: symbol.upstreamNodeId,
+          sourceRevision,
+          workspaceRevision: edge.workspaceRevision,
+          graphRevision: candidate.graphRevision,
+          byteStart: symbol.startByte,
+          byteEnd: symbol.endByte,
+          sourceTextHash: symbol.sourceTextHash,
+          astFingerprint: symbol.astFingerprint,
+          extractorRevision: symbol.extractorRevision,
+          materializedFrom: 'graphify_structural_reference',
+          canonicalAuthority: false
+        }
+      });
+      graphifySymbolNodes.set(nodeKey, node);
+      graphSnapshotNodes.push(node);
+      return node;
+    };
+    const subjectSymbolNode = buildGraphifySymbolNode(subjectSymbol, sourceNode.packetKey!, edge.sourceRef, edge.sourceRevision);
+    const targetSymbolNode = buildGraphifySymbolNode(targetSymbol, targetNode.packetKey!, edge.objectSourceRef!, edge.objectSourceRevision!);
+    const edgeKey = `graphify:${hashStableRecord({
+      referenceId: edge.referenceId,
+      sourcePacketKey: candidate.sourcePacketKey,
+      targetPacketKey: candidate.targetPacketKey,
+      sourceRevision: edge.sourceRevision,
+      targetSourceRevision: edge.objectSourceRevision,
+      workspaceRevision: edge.workspaceRevision,
+      graphRevision: candidate.graphRevision
+    })}`;
+    addEdge(graphSnapshotEdges, seenEdgeKeys, graphSnapshotExclusions, snapshotId, {
+      snapshotId,
+      edgeKey,
+      sourceNodeKey: sourceNode.nodeKey,
+      targetNodeKey: targetNode.nodeKey,
+      edgeType,
+      weight: edge.confidence,
+      confidence: edge.confidence,
+      provenance: 'graphify_structural_reference',
+      properties: {
+        referenceId: edge.referenceId,
+        sourceSymbolKey: candidate.sourceSymbolKey,
+        targetSymbolKey: candidate.targetSymbolKey,
+        subjectSymbolSpan: { startByte: subjectSymbol.startByte, endByte: subjectSymbol.endByte, astFingerprint: subjectSymbol.astFingerprint },
+        targetSymbolSpan: { startByte: targetSymbol.startByte, endByte: targetSymbol.endByte, astFingerprint: targetSymbol.astFingerprint },
+        sourceRef: edge.sourceRef,
+        sourceRevision: edge.sourceRevision,
+        targetSourceRef: edge.objectSourceRef,
+        targetSourceRevision: edge.objectSourceRevision,
+        workspaceRevision: edge.workspaceRevision,
+        graphRevision: candidate.graphRevision,
+        evidenceKind: edge.evidenceKind,
+        evidenceSpan: { ...span },
+        evidenceSpanSha256: createHash('sha256').update(candidate.sourceBytes.slice(span.startByte, span.endByte)).digest('hex'),
+        evidenceRefs: [...edge.evidenceRefs].sort(),
+        canonicalAuthority: false
+      }
+    });
+
+    const evidenceBytes = candidate.sourceBytes.slice(span.startByte, span.endByte);
+    relationCandidates.push({
+        relationId: `graphify-nary:${hashStableRecord({
+          referenceId: edge.referenceId,
+          sourcePacketKey: candidate.sourcePacketKey,
+          subjectNodeKey: subjectSymbolNode.nodeKey,
+          targetSymbolNodeKey: targetSymbolNode.nodeKey,
+          targetPacketKey: candidate.targetPacketKey,
+          sourceRevision: edge.sourceRevision,
+          targetSourceRevision: edge.objectSourceRevision,
+          workspaceRevision: edge.workspaceRevision,
+          graphRevision: candidate.graphRevision
+        })}`,
+        relationType: edgeType,
+        sourceRef: edge.sourceRef,
+        sourceRevision: edge.sourceRevision,
+        workspaceRevision: edge.workspaceRevision,
+        confidence: edge.confidence,
+        sourceSpan: {
+          coordinateSystem: 'utf8-byte',
+          startByte: span.startByte,
+          endByte: span.endByte,
+          nodeContentSha256: `sha256:${createHash('sha256').update(evidenceBytes).digest('hex')}`,
+          producerId: 'graphify_structural_reference',
+          producerRevision: subjectSymbol.extractorRevision,
+          evidenceRefs: [...new Set([...edge.evidenceRefs, `reference:${edge.referenceId}`])].sort()
+        },
+        participants: [
+          { nodeKey: sourceNode.nodeKey, role: 'CALLER_PACKET', ordinal: 0 },
+          { nodeKey: subjectSymbolNode.nodeKey, role: 'CALLER_AST_SYMBOL', ordinal: 1 },
+          { nodeKey: targetSymbolNode.nodeKey, role: 'CALLEE_AST_SYMBOL', ordinal: 2 },
+          { nodeKey: targetNode.nodeKey, role: 'CALLEE_PACKET', ordinal: 3 }
+        ]
+      });
+  }
+
   const includedNodes = [...graphSnapshotNodes].sort((left, right) => left.nodeKey.localeCompare(right.nodeKey));
   const includedEdges = [...graphSnapshotEdges].sort((left, right) => left.edgeKey.localeCompare(right.edgeKey));
 
   const materializedNodes = includedNodes.map((node) => parseGraphNode(node));
   const materializedEdges = includedEdges.map((edge) => parseGraphEdge(edge));
+  const nodesByKey = new Map(materializedNodes.map((node) => [node.nodeKey, node]));
+  const seenCandidateRelationIds = new Set<string>();
+  for (const tupleCandidate of input.ontologyTupleCandidates ?? []) {
+    const adapted = buildGraphSnapshotRelationCandidateFromTupleV1({
+      ...tupleCandidate,
+      nodes: materializedNodes
+    });
+    if (!adapted.candidate) {
+      graphSnapshotExclusions.push(buildExclusion(snapshotId, 'relation_materialization', adapted.reason, {
+        candidateKey: `nary:${tupleCandidate.tuple.tupleId}`,
+        packetKey: tupleCandidate.tuple.packetKey ?? null,
+        sourceRef: tupleCandidate.tuple.sourceRef,
+        evidence: { tupleId: tupleCandidate.tuple.tupleId, reason: adapted.reason }
+      }));
+      continue;
+    }
+    relationCandidates.push(adapted.candidate);
+  }
 
-  const includedTopologyHash = topologyHash(materializedNodes, materializedEdges);
+  for (const candidate of relationCandidates.sort((a, b) => a.relationId.localeCompare(b.relationId))) {
+    const reject = (reason: string, evidence: Record<string, unknown>) => {
+      graphSnapshotExclusions.push(buildExclusion(snapshotId, 'relation_materialization', reason, {
+        candidateKey: candidate.relationId,
+        sourceRef: candidate.sourceRef,
+        evidence: { relationId: candidate.relationId, ...evidence }
+      }));
+    };
+    if (seenCandidateRelationIds.has(candidate.relationId)) {
+      reject('DUPLICATE_RELATION_ID', {});
+      continue;
+    }
+    seenCandidateRelationIds.add(candidate.relationId);
+    if (!/^sha256:[a-f0-9]{64}$/i.test(candidate.sourceRevision)
+      || !/^sha256:[a-f0-9]{64}$/i.test(candidate.workspaceRevision)
+      || candidate.workspaceRevision !== (input.workspaceRevision ?? null)) {
+      reject('RELATION_REVISION_UNQUALIFIED', {
+        sourceRevision: candidate.sourceRevision,
+        relationWorkspaceRevision: candidate.workspaceRevision,
+        snapshotWorkspaceRevision: input.workspaceRevision ?? null
+      });
+      continue;
+    }
+    const span = candidate.sourceSpan;
+    if (span.coordinateSystem !== 'utf8-byte'
+      || !Number.isSafeInteger(span.startByte) || span.startByte < 0
+      || !Number.isSafeInteger(span.endByte) || span.endByte <= span.startByte
+      || !/^sha256:[a-f0-9]{64}$/i.test(span.nodeContentSha256)
+      || !span.producerId || !span.producerRevision
+      || Boolean(span.parserId) !== Boolean(span.parserVersion)
+      || !Array.isArray(span.evidenceRefs) || span.evidenceRefs.length === 0
+      || span.evidenceRefs.some((ref) => typeof ref !== 'string' || ref.trim().length === 0)) {
+      reject('RELATION_SOURCE_SPAN_UNQUALIFIED', {});
+      continue;
+    }
+    const participants = [...candidate.participants].sort((a, b) => a.ordinal - b.ordinal
+      || a.role.localeCompare(b.role) || a.nodeKey.localeCompare(b.nodeKey));
+    const distinctNodeKeys = new Set(participants.map((participant) => participant.nodeKey));
+    if (participants.length < 3 || distinctNodeKeys.size < 3
+      || participants.some((participant) => !participant.nodeKey || !participant.role
+        || !Number.isSafeInteger(participant.ordinal) || participant.ordinal < 0)
+      || new Set(participants.map((participant) => participant.ordinal)).size !== participants.length) {
+      reject('RELATION_ARITY_OR_PARTICIPANTS_INVALID', { participantCount: participants.length });
+      continue;
+    }
+    const participantNodes = participants.map((participant) => nodesByKey.get(participant.nodeKey));
+    const sourceNode = participantNodes.find((node) => node?.sourceRef === candidate.sourceRef
+      && node.properties.sourceRevision === candidate.sourceRevision
+      && node.properties.workspaceRevision === candidate.workspaceRevision);
+    const revisionsQualified = participantNodes.every((node) => node?.packetKey
+      && node.sourceRef
+      && typeof node.properties.sourceRevision === 'string'
+      && /^sha256:[a-f0-9]{64}$/i.test(node.properties.sourceRevision)
+      && node.properties.workspaceRevision === candidate.workspaceRevision);
+    if (!sourceNode || !revisionsQualified) {
+      reject('RELATION_PARTICIPANT_IDENTITY_UNQUALIFIED', {
+        participantNodeKeys: participants.map((participant) => participant.nodeKey),
+        sourceAnchorFound: Boolean(sourceNode),
+        allParticipantsPacketBound: participantNodes.every((node) => Boolean(node?.packetKey))
+      });
+      continue;
+    }
+    graphSnapshotRelationEvents.push({
+      snapshotId,
+      relationId: candidate.relationId,
+      relationType: candidate.relationType,
+      sourceRef: candidate.sourceRef,
+      evidenceSpan: JSON.stringify({
+        sourceRevision: candidate.sourceRevision,
+        workspaceRevision: candidate.workspaceRevision,
+        ...span,
+        evidenceRefs: [...span.evidenceRefs].sort()
+      }),
+      confidence: candidate.confidence,
+      topologyHash: ''
+    });
+    for (const participant of participants) {
+      graphSnapshotRelationParticipants.push({ snapshotId, relationId: candidate.relationId, ...participant });
+    }
+  }
+
+  const includedTopologyHash = topologyHash(
+    materializedNodes,
+    materializedEdges,
+    graphSnapshotRelationEvents as GraphRelationEvent[],
+    graphSnapshotRelationParticipants as GraphRelationParticipant[]
+  );
+  for (const relation of graphSnapshotRelationEvents) relation.topologyHash = includedTopologyHash;
+  validateGraphSnapshotIdentity({
+    snapshotId,
+    nodes: materializedNodes,
+    edges: materializedEdges,
+    relationEvents: graphSnapshotRelationEvents as GraphRelationEvent[],
+    relationParticipants: graphSnapshotRelationParticipants as GraphRelationParticipant[]
+  });
   const replayedTopologyHash = topologyHash(
     materializedNodes.map((node) => ({ ...node })),
-    materializedEdges.map((edge) => ({ ...edge }))
+    materializedEdges.map((edge) => ({ ...edge })),
+    graphSnapshotRelationEvents as GraphRelationEvent[],
+    graphSnapshotRelationParticipants as GraphRelationParticipant[]
   );
 
   const sourceInventoryHash = hashStableRecord({
     snapshotId,
     workspaceId,
+    workspaceRevision: input.workspaceRevision ?? null,
     sourceInventorySnapshotId,
     identityContractVersion,
     parserContractVersion,
     treeNodes: sortedTreeNodes.map((treeNode) => normalizeTreeNode(treeNode)),
     packets: sortedPackets.map((packet) => normalizePacket(packet)),
+    relationCandidates: relationCandidates.map((candidate) => ({
+      ...candidate,
+      sourceSpan: { ...candidate.sourceSpan, evidenceRefs: [...candidate.sourceSpan.evidenceRefs].sort() },
+      participants: [...candidate.participants].sort((a, b) => a.ordinal - b.ordinal
+        || a.role.localeCompare(b.role) || a.nodeKey.localeCompare(b.nodeKey))
+    })).sort((a, b) => a.relationId.localeCompare(b.relationId)),
+    ontologyTupleCandidates: [...(input.ontologyTupleCandidates ?? [])]
+      .map((candidate) => ({
+        tuple: candidate.tuple,
+        proposal: candidate.proposal,
+        sourceSpanProof: (() => {
+          const { sourceBytes, ...proofMetadata } = candidate.sourceSpanProof;
+          return {
+            ...proofMetadata,
+            sourceBytesSha256: `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`
+          };
+        })()
+      }))
+      .sort((a, b) => a.tuple.tupleId.localeCompare(b.tuple.tupleId)),
+    graphifyPacketEdgeCandidates: [...(input.graphifyPacketEdgeCandidates ?? [])]
+      .map((candidate) => ({
+        edge: candidate.edge,
+        subjectSymbol: candidate.subjectSymbol,
+        targetSymbol: candidate.targetSymbol,
+        sourcePacketKey: candidate.sourcePacketKey,
+        targetPacketKey: candidate.targetPacketKey,
+        sourceSymbolKey: candidate.sourceSymbolKey,
+        targetSymbolKey: candidate.targetSymbolKey,
+        graphRevision: candidate.graphRevision,
+        sourceBytesSha256: createHash('sha256').update(candidate.sourceBytes).digest('hex'),
+        targetSourceBytesSha256: createHash('sha256').update(candidate.targetSourceBytes).digest('hex')
+      }))
+      .sort((a, b) => a.edge.referenceId.localeCompare(b.edge.referenceId)
+        || a.sourcePacketKey.localeCompare(b.sourcePacketKey)
+        || a.targetPacketKey.localeCompare(b.targetPacketKey)),
     edgeOrientationPolicy,
     duplicateEdgePolicy,
     selfLoopPolicy
@@ -574,19 +1232,24 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     relationshipTypes,
     edgeOrientationPolicy,
     duplicateEdgePolicy,
-    selfLoopPolicy
+    selfLoopPolicy,
+    ...(relationCandidates.length ? { relationAdmission: 'packet-bound-source-span-nary-v1' } : {}),
+    ...(input.graphifyPacketEdgeCandidates?.length ? { graphifyEdgeAdmission: 'packet-bound-source-span-binary-v1' } : {})
   });
 
   const graphSnapshotManifest: GraphSnapshotManifest = {
     snapshotId,
     workspaceId,
+    workspaceRevision: input.workspaceRevision ?? null,
     sourceInventorySnapshotId,
     identityContractVersion,
     parserContractVersion,
     nodeCount: includedNodes.length,
     edgeCount: includedEdges.length,
+    relationEventCount: graphSnapshotRelationEvents.length,
     excludedNodeCount: graphSnapshotExclusions.filter((item) => item.exclusionStage === 'node_materialization').length,
     excludedEdgeCount: graphSnapshotExclusions.filter((item) => item.exclusionStage === 'edge_materialization').length,
+    excludedRelationCount: graphSnapshotExclusions.filter((item) => item.exclusionStage === 'relation_materialization').length,
     topologyHash: includedTopologyHash,
     generatedAt,
     relationshipTypes,
@@ -602,6 +1265,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     status: 'BUILDING',
     sourceManifest: {
       workspaceId,
+      workspaceRevision: input.workspaceRevision ?? null,
       sourceInventorySnapshotId,
       identityContractVersion,
       parserContractVersion,
@@ -618,7 +1282,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     },
     nodeCount: includedNodes.length,
     edgeCount: includedEdges.length,
-    relationEventCount: 0,
+    relationEventCount: graphSnapshotRelationEvents.length,
     excludedCount: graphSnapshotExclusions.length,
     unresolvedCount: unresolvedEndpointCount,
     sourceHash: sourceInventoryHash,
@@ -646,19 +1310,27 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     if (exclusion.exclusionStage !== 'node_materialization') continue;
     rejectionCounts[exclusion.exclusionReason] = (rejectionCounts[exclusion.exclusionReason] ?? 0) + 1;
   }
+  const relationRejectionCounts: Record<string, number> = {};
+  for (const exclusion of graphSnapshotExclusions) {
+    if (exclusion.exclusionStage !== 'relation_materialization') continue;
+    relationRejectionCounts[exclusion.exclusionReason] = (relationRejectionCounts[exclusion.exclusionReason] ?? 0) + 1;
+  }
 
   const graphSnapshotProof: GraphSnapshotProof = {
     snapshotId,
     rejectionCounts,
+    relationRejectionCounts,
     sourceInventoryHash,
     policyHash,
     topologyHash: includedTopologyHash,
     replayedTopologyHash,
     replayMatches: includedTopologyHash === replayedTopologyHash,
-    eligibleNodeCount: treeNodeMap.size + includedPacketKeys.size,
+    eligibleNodeCount: includedNodes.length,
     persistedNodeCount: includedNodes.length,
     eligibleEdgeCount: includedEdges.length,
     persistedEdgeCount: includedEdges.length,
+    eligibleRelationCount: relationCandidates.length,
+    persistedRelationCount: graphSnapshotRelationEvents.length,
     excludedNodeCount: graphSnapshotManifest.excludedNodeCount,
     excludedEdgeCount: graphSnapshotManifest.excludedEdgeCount,
     unresolvedEndpointCount,
@@ -670,6 +1342,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     graphSnapshot,
     graphSnapshotNodes: includedNodes,
     graphSnapshotEdges: includedEdges,
+    graphSnapshotRelationEvents,
+    graphSnapshotRelationParticipants,
     graphSnapshotExclusions,
     graphSnapshotManifest,
     graphSnapshotProof
@@ -739,7 +1413,7 @@ function buildExclusion(
   };
 }
 
-function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'][number], 'nodeId' | 'parentId' | 'rootId' | 'pageIndexPath' | 'nodeType' | 'treeDepth' | 'sourceRef' | 'filePath' | 'packetKey' | 'featureId' | 'title' | 'summary' | 'contentPreview' | 'domain' | 'somCluster' | 'communityId' | 'metadata' | 'ledgerType' | 'lineageVersion'>) {
+function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'][number], 'nodeId' | 'parentId' | 'rootId' | 'pageIndexPath' | 'nodeType' | 'treeDepth' | 'sourceRef' | 'sourceRevision' | 'filePath' | 'packetKey' | 'featureId' | 'title' | 'summary' | 'contentPreview' | 'domain' | 'somCluster' | 'communityId' | 'metadata' | 'ledgerType' | 'lineageVersion'>) {
   return {
     nodeId: node.nodeId,
     parentId: node.parentId ?? null,
@@ -748,6 +1422,7 @@ function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'
     nodeType: node.nodeType,
     treeDepth: node.treeDepth,
     sourceRef: node.sourceRef,
+    sourceRevision: node.sourceRevision ?? null,
     filePath: node.filePath,
     packetKey: node.packetKey ?? null,
     featureId: node.featureId ?? null,
@@ -763,7 +1438,7 @@ function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'
   };
 }
 
-function normalizePacket(node: Pick<GraphSnapshotMaterializerInput['packets'][number], 'packetKey' | 'sourceRef' | 'canonicalSourceRef' | 'directoryPath' | 'filePath' | 'functionSymbol' | 'featureId' | 'featureLabel' | 'titleId' | 'communityId' | 'clusterId' | 'sha256' | 'sourceKind' | 'sourcePath' | 'topology' | 'vectors' | 'metadata' | 'domainClass' | 'tags' | 'lineageVersion' | 'ledgerType' | 'canonical' | 'treeNodeId' | 'qdrantCollection' | 'qdrantVectorDim'>) {
+function normalizePacket(node: Pick<GraphSnapshotMaterializerInput['packets'][number], 'packetKey' | 'sourceRef' | 'canonicalSourceRef' | 'directoryPath' | 'filePath' | 'functionSymbol' | 'featureId' | 'featureLabel' | 'titleId' | 'communityId' | 'clusterId' | 'sha256' | 'sourceRevision' | 'byteStart' | 'byteEnd' | 'sourceKind' | 'sourcePath' | 'topology' | 'vectors' | 'metadata' | 'domainClass' | 'tags' | 'lineageVersion' | 'ledgerType' | 'canonical' | 'treeNodeId' | 'qdrantCollection' | 'qdrantVectorDim'>) {
   return {
     packetKey: node.packetKey,
     sourceRef: node.sourceRef,
@@ -777,6 +1452,9 @@ function normalizePacket(node: Pick<GraphSnapshotMaterializerInput['packets'][nu
     communityId: node.communityId ?? null,
     clusterId: node.clusterId ?? null,
     sha256: node.sha256 ?? null,
+    byteStart: node.byteStart ?? null,
+    byteEnd: node.byteEnd ?? null,
+    sourceRevision: node.sourceRevision ?? null,
     sourceKind: node.sourceKind ?? null,
     sourcePath: node.sourcePath ?? null,
     topology: node.topology ?? {},

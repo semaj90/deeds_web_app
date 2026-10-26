@@ -1,13 +1,13 @@
 # Naive Bayes Packet Predictions
 
-Generated: 2026-07-05T21:50:12.006Z
+Generated: 2026-10-13T06:04:11.857Z
 Mode: dry-run
 
 ## Summary
 
-- rows processed: 20
+- rows processed: 500
 - rows written: 0
-- distinct predictions: 1
+- distinct predictions: 4
 
 ## Next Safe Action
 

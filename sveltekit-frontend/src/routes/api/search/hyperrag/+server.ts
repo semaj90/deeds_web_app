@@ -2,14 +2,13 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { createSearchRuntime, type SearchResult } from '$lib/server/retrieval/search-runtime.js';
-import { bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
 import { randomUUID } from 'node:crypto';
-import { classifyAtlasQuery, type QueryClassificationV1 } from '$lib/server/atlas/agentic-file-compiler/query-classifier.js';
-import { buildRetrievalPlan, type RetrievalPlanV1 } from '$lib/server/atlas/agentic-file-compiler/retrieval-plan.js';
-import { pool } from '$lib/server/db/client.js';
-import { createFeatureIntelligenceRepository } from '@deeds/parent-atlas';
-import { runHyperRagFusionRuntimeV1, type HyperRagFusionRuntimeResultV1 } from '$lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.js';
+import { classifyAtlasQuery, packageOntologyLabelCandidatesV1, type QueryClassificationV1 } from '$lib/server/atlas/agentic-file-compiler/query-classifier.js';
 import { enrichQueryClassificationWithOakV1 } from '$lib/server/atlas/agentic/oak-query-enrichment-v1.js';
+import { resolveOntologyLabelV1 } from '$lib/server/atlas/ontology-resolution-boundary-postgres.js';
+import type { HyperRagFusionRuntimeResultV1 } from '$lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.js';
+import { ENV } from '$lib/server/env.server.js';
+import { resolveTrustedWorkspaceAuthorityV1 } from '$lib/server/retrieval/trusted-workspace-authority-v1.js';
 
 const requestSchema = z.object({
   query: z.string().trim().min(1, 'Query string is required').max(1024, 'Query string is too long'),
@@ -34,13 +33,17 @@ function emptyResult(error: string, status: number) {
       hits: [],
       graphPaths: [],
       synthesis: null,
+      synthesisStatus: 'UNAVAILABLE',
       proof: null,
       classification: null,
       retrievalPlan: null,
+      ontologyQueryEvidence: [],
+      workspaceAuthority: { status: 'UNAVAILABLE', workspaceRevision: null, reason: 'NOT_EVALUATED', callerSuppliedWorkspaceContextIgnored: false },
+      graphExpansionStatus: 'NOT_EVALUATED',
       hypergraph: { status: 'UNAVAILABLE', acceptedCandidateCount: 0, rejectedCandidateCount: 0, relationshipCount: 0, acePayloadCount: 0 },
       oakEvidence: [],
       error,
-      provenance: { qdrant: false, turbovec: false, redis: false, neo4j: false, ace: false },
+      provenance: { pgvector: false, qdrant: false, turbovec: false, redis: false, neo4j: false, ace: false },
     },
     { status },
   );
@@ -92,20 +95,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     const input = parsed.data;
+    // Server-side only: the resolver never reads request workspace fields.
+    const trustedWorkspace = await resolveTrustedWorkspaceAuthorityV1();
     const requestId = request.headers.get('x-request-id')?.trim() || `hyperrag:${randomUUID()}`;
     const classification: QueryClassificationV1 = classifyAtlasQuery({
       requestId,
       query: input.query,
       producerRevision: 'hyperrag-front-door-v1',
     });
-    const retrievalPlan: RetrievalPlanV1 | null = input.workspaceRevision
-      ? buildRetrievalPlan({
-          classification,
-          workspaceRevision: input.workspaceRevision,
-          candidateBudget: input.topK ?? 15,
-          producerRevision: 'hyperrag-retrieval-plan-v1',
-        })
-      : null;
+    const retrievalPlan = null;
+    const ontologyLabels = packageOntologyLabelCandidatesV1(classification.packageCandidates);
+    const ontologyResolutions = await Promise.all(ontologyLabels.map((label) =>
+      resolveOntologyLabelV1({ schemaVersion: 'atlas.ontology-resolution-request.v1', label })
+    ));
+    const resolvedOntologyLabels = ontologyResolutions
+      .filter((resolution) => resolution.resolutionState === 'RESOLVED' && resolution.conceptId !== null)
+      .map((resolution) => resolution.label);
+    const lexicalExpansion = [...new Set([
+      ...classification.ngrams,
+      ...classification.packageCandidates,
+      ...resolvedOntologyLabels,
+    ])].slice(0, 32);
     // AR-07: additive OAK concept-evidence enrichment, called AFTER classification
     // (never inside classifyAtlasQuery itself, which stays synchronous). Bounded,
     // fail-closed -- a sidecar outage degrades to RESOLUTION_UNAVAILABLE entries,
@@ -114,78 +124,57 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       requestId,
       evidence: [],
     }));
-    const runtime = createSearchRuntime({ userId: locals.user.id });
+    const runtime = createSearchRuntime({
+      userId: locals.user.id,
+      readOnly: true,
+    });
     const result = await runtime.search({
       text: input.query,
-      topK: retrievalPlan?.candidateBudget ?? input.topK ?? 15,
-      workspaceId: input.workspaceId,
-      workspaceRevision: input.workspaceRevision,
-      sourceRevision: input.sourceRevision,
-      representationId: input.representationId,
-      representationRevision: input.representationRevision,
+      lexicalExpansion,
+      topK: input.topK ?? 15,
+      ...(input.useGraph && trustedWorkspace.status === 'TRUSTED'
+        ? { workspaceRevision: trustedWorkspace.workspaceRevision }
+        : {}),
       filters: {
         includeGenerated: false,
         includeLegacy: false,
       },
     });
 
-    let hypergraph: HyperRagFusionRuntimeResultV1 = {
+    const hypergraph: HyperRagFusionRuntimeResultV1 = {
       status: 'UNAVAILABLE',
       acceptedCandidateCount: 0,
       rejectedCandidateCount: 0,
       acePayloads: [],
       facade: null,
-      reason: input.workspaceRevision ? 'HYPERRAG_HYPERGRAPH_DISABLED' : 'HYPERRAG_WORKSPACE_REVISION_REQUIRED',
+      reason: !input.useGraph
+        ? 'HYPERRAG_GRAPH_NOT_REQUESTED'
+        : trustedWorkspace.status !== 'TRUSTED'
+          ? 'TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE'
+          : 'SEARCH_RUNTIME_GRAPH_EXPANSION_DELEGATED',
     };
-    if (input.useGraph === true && input.workspaceRevision) {
-      hypergraph = await runHyperRagFusionRuntimeV1({
-        queryId: requestId,
-        workspaceRevision: input.workspaceRevision,
-        producerRevision: 'hyperrag-live-fusion-v1',
-        packets: result.packets.map((packet) => ({
-          packet_key: packet.packet_key ?? null,
-          source_ref: packet.source_ref ?? null,
-          feature_id: packet.feature_id ?? null,
-          relationship_id: (packet as any).relationship_id ?? null,
-          evidence_id: (packet as any).evidence_id ?? null,
-          score: (packet as any).blended_score ?? (packet as any).retrieval_score ?? null,
-          workspace_revision: packet.workspace_revision ?? null,
-          identity_status: (packet as any).identityStatus,
-        })),
-        repository: createFeatureIntelligenceRepository(
-          pool as unknown as Parameters<typeof createFeatureIntelligenceRepository>[0],
-        ),
-      });
-    }
+    const graphExpansionStatus = !input.useGraph
+      ? 'NOT_REQUESTED'
+      : trustedWorkspace.status !== 'TRUSTED'
+        ? 'BLOCKED_TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE'
+        : 'DELEGATED_TO_SEARCH_RUNTIME';
 
-    const hypergraphByPacket = new Map(
-      hypergraph.acePayloads.map((payload) => [payload.packet_key, payload as unknown as Record<string, unknown>]),
-    );
+    const hypergraphByPacket = new Map<string, Record<string, unknown>>();
+
+    const facts: [] = [];
 
     let synthesis: string | null = null;
+    let synthesisStatus: 'BLOCKED_CONTEXT_MANIFEST_REQUIRED' | 'SYNTHESIS_UNAVAILABLE' | 'NOT_REQUESTED' = 'NOT_REQUESTED';
+
     if (input.synthesize) {
-      try {
-        synthesis = await bifrostChat(
-          [
-            {
-              role: 'user',
-              content: `Synthesize a concise answer from these packets:\n${result.packets
-                .slice(0, 5)
-                .map((packet, index) => `[${index + 1}] ${(packet as any).source_ref ?? (packet as any).chunk_id}\n${(packet as any).summary ?? ''}`)
-                .join('\n\n')}`,
-            },
-          ],
-          VLM_MODELS.legal,
-        );
-      } catch {
-        synthesis = null;
-      }
+      synthesisStatus = 'BLOCKED_CONTEXT_MANIFEST_REQUIRED';
     }
 
     return json({
       query: result.metadata.query,
       variants: [input.query],
       hits: result.packets.map((packet) => toHyperRagHit(packet, hypergraphByPacket.get(packet.packet_key ?? ''))),
+      facts,
       graphPaths: (hypergraph.facade?.relationships ?? []).map((relationship) => ({
         relationshipId: relationship.relationship_id,
         relationshipType: relationship.relationship_type,
@@ -197,29 +186,43 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         confidence: relationship.confidence,
       })),
       synthesis,
+      synthesisStatus,
       proof: result.proof ?? null,
       classification,
       retrievalPlan,
+      ontologyQueryEvidence: ontologyResolutions.map((resolution) => ({
+        ...resolution,
+        canonicalAuthority: false,
+      })),
+      workspaceAuthority: {
+        ...trustedWorkspace,
+        callerSuppliedWorkspaceContextIgnored: Boolean(
+          input.workspaceId || input.workspaceRevision || input.sourceRevision || input.representationId || input.representationRevision,
+        ),
+      },
+      graphExpansionStatus,
       oakEvidence: oakEnrichment.evidence,
       hypergraph: {
         status: hypergraph.status,
         acceptedCandidateCount: hypergraph.acceptedCandidateCount,
         rejectedCandidateCount: hypergraph.rejectedCandidateCount,
         relationshipCount: hypergraph.facade?.relationships.length ?? 0,
+        factCount: facts.length,
         acePayloadCount: hypergraph.acePayloads.length,
         sufficientContext: hypergraph.facade?.sufficient_context ?? null,
         reason: hypergraph.reason ?? null,
       },
       provenance: {
+        pgvector: false,
         qdrant: result.provenance.retrievalSources.includes('qdrant'),
         turbovec: false,
-        redis: result.provenance.retrievalSources.includes('postgres_trigram'),
-        neo4j: result.provenance.retrievalSources.includes('ast_tree'),
+        redis: Boolean(ENV.REDIS_URL || ENV.VALKEY_URL),
+        neo4j: false,
         ace: false,
       },
     });
   } catch (err) {
     console.error('[hyperrag-api] Error:', err);
-    return emptyResult((err as Error).message, 500);
+    return emptyResult('Search unavailable', 500);
   }
 };

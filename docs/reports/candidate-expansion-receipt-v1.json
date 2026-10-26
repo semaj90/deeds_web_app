@@ -1,0 +1,61 @@
+{
+  "$schema": "atlas.candidate-expansion.receipt.v1",
+  "receiptVersion": "1.0.0",
+  "timestamp": "2026-10-14T23:09:06.048Z",
+  "status": "PROVEN",
+  "rootSeed": {
+    "symbolVersionId": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+    "packetKey": "packet:9aec19d8-8e0a-5470-bef2-9b8fca6c313a"
+  },
+  "expansionBounds": {
+    "maxHops": 2,
+    "fanoutCap": 25,
+    "graphRevision": "sha256:0000000000000000000000000000000000000000000000000000000000000001"
+  },
+  "hop1": {
+    "edgeCount": 2,
+    "edges": [
+      {
+        "from": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+        "to": "file:sveltekit-frontend/src/lib/server/atlas/identity/atlas-uuid-namespaces-v1.ts",
+        "relation": "IMPORTS",
+        "weight": 1
+      },
+      {
+        "from": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+        "to": "file:sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts",
+        "relation": "IMPORTS",
+        "weight": 1
+      }
+    ]
+  },
+  "hop2": {
+    "edgeCount": 3,
+    "edges": [
+      {
+        "from": "file:sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts",
+        "to": "pkg:zod",
+        "relation": "DEPENDS_ON",
+        "weight": 1
+      },
+      {
+        "from": "file:sveltekit-frontend/src/lib/server/atlas/identity/atlas-uuid-namespaces-v1.ts",
+        "to": "sym:PACKET_AGGREGATE_NAMESPACE_V1",
+        "relation": "EXPORTS",
+        "weight": 1
+      },
+      {
+        "from": "file:sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+        "to": "sym:canonicalNameV2",
+        "relation": "CALLS",
+        "weight": 2
+      }
+    ]
+  },
+  "undirectedProjection": {
+    "contract": "atlas.undirected-weighted-projection.v1",
+    "reciprocalEdgeSumming": true,
+    "selfLoopsRejected": true
+  }
+}

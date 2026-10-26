@@ -142,7 +142,7 @@ $LlamaExe = if ($env:LLAMA_SERVER_PATH) { $env:LLAMA_SERVER_PATH }
 
 $ModelPath = if ($env:TURBO_MODEL_PATH) { $env:TURBO_MODEL_PATH } else {
   $blob = Join-Path $env:USERPROFILE ".ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43"
-  if (Test-Path $blob) { $blob } else { Join-Path $Frontend "models\gemma4-legal-q4_k_m.gguf" }
+  if (Test-Path $blob) { $blob } else { Join-Path $Frontend "models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf" }
 }
 
 $MmprojPath = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else {

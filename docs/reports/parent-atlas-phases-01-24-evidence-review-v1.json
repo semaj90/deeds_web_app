@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.parent-atlas-phase-evidence-review.v1",
+  "reviewDate": "2026-10-15",
+  "status": "PARTIAL",
+  "phaseNamespace": {
+    "reviewedOrdinals": "Legacy 1-24 rows reproduced from the workstation summary table; these ordinals are not a canonical workstation phase namespace.",
+    "canonicalWorkstationNamespace": "Stable roadmap IDs workstation-p11 through workstation-p25, defined in parent-atlas-workstation-todo.md and reconciled in docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json.",
+    "crosswalkStatus": "UNMAPPED_LEGACY_ORDINALS",
+    "implication": "The phaseCounts and per-phase rows below describe the legacy summary only. Do not interpret legacy rows 22-24 as canonical workstation P22-P24 or calculate canonical phase completion from them."
+  },
+  "completionPercentage": null,
+  "completionPercentageReason": "The reviewed 1-24 ordinals are not mapped to the canonical workstation roadmap IDs, and the mapped phases do not yet share current proof receipts and acceptance evidence.",
+  "authority": "Owning OpenSpec task ledgers and revision-bound runtime receipts; this report is a diagnostic projection only.",
+  "runtimeTerminology": {
+    "synthesis": "Read-only GET /v1/models at :8090 returned ornith-1.5-9b; this is the synthesis/tool-use model, not the embedding owner.",
+    "embeddings": "semantic_768 remains the canonical logical embedding representation; EmbeddingGemma is a distinct embedding owner, not the synthesis model.",
+    "vectorAuthority": "PostgreSQL 18.4 with pgvector is the canonical identity/vector owner only where owning rows and revision lineage are proven; Qdrant, cuVS, TurboVec and graph stores are projections or executors.",
+    "databaseMigration": "The LUT-validation receipt migration was atomically applied and independently read back on PostgreSQL 18.4; zero receipt rows were inserted."
+  },
+  "latestRecheck": {
+    "date": "2026-10-15",
+    "scope": "Read-only SearchRuntime replay for getErrorClustering using workspace sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc, exact source/chunk crosswalk, and per-stage identity disposition",
+    "commandLog": ".tmp/atlas/phase-closure-function-hydration-live-postprocess-v6-20261015.txt",
+    "commandLogSha256": "bb32858fd514edb062c6cd4b8bd9fb6f2086198bba741182fbab1867cdda837e",
+    "exitCode": 0,
+    "status": "PARTIAL",
+    "qualifiedFunctionSnapshots": 1,
+    "candidateHydration": "HYDRATED: unique PROVEN chunk row 751464de-b878-45d1-a123-b416bdca780b",
+    "candidateStageDisposition": {"afterHydration": true, "afterRerank": true, "afterPostProcess": false, "finalTopK": false, "dropStage": "POST_PROCESS", "decision": "DROP", "reason": "SOURCE_DIVERSITY", "detail": "dedupPrefixDepth=2 prefix=sveltekit-frontend/src"},
+    "reviewedLabelAudit": {"reportPath": "docs/reports/golden-review-corpus-v2.json", "generatedAt": "2026-10-15T19:03:07.981Z", "status": "GOLDEN_REVIEW_CORPUS_BLOCKED", "registeredQueries": 60, "judgmentsForRegisteredQueries": 0, "compatibleManifests": 0, "humanGradedJudgmentsDatabaseWide": false, "admittedWorkspaceBoundJudgments": false, "reportSha256": "2ccfb60faf15395767800b1bc6bb59088069cc49e100fc5b6a594426c03d05a3", "writesPerformed": false},
+    "contextManifestAdmitted": false,
+    "canonicalOrCacheWrites": 0,
+    "nextGate": "Evaluate whether source-diversity policy should be calibrated for exact function recall using reviewed relevance evidence; then prove exact source-qualified ContextManifest admission",
+    "validation": {
+      "crosswalkFocusedTests": {"log": ".tmp/atlas/phase-closure-crosswalk-tests-v3-20261015.txt", "exitCode": 0, "passed": 38},
+      "finalIdentityProofTests": {"log": ".tmp/atlas/phase-closure-postprocess-proof-tests-v2-20261015.txt", "exitCode": 0, "passed": 19},
+      "svelteCheck": {"log": ".tmp/atlas/phase-closure-postprocess-check-20261015.txt", "sha256": "01a94b7d962b42bc791c53925e23a2c5b0d122a56c83464b5281476d14379206", "exitCode": 0, "errors": 0, "warnings": 181, "files": 69},
+      "strictOpenSpecValidation": {"command": "npx --no-install openspec validate parent-atlas-retrieval-lod-algorithm-taxonomy --strict", "exitCode": 0},
+      "scopedDiffCheckExitCode": 0
+    },
+    "followUp": "Unique canonical chunk crosswalk and hydration are proven for one symbol. The candidate survives reranking and is explicitly dropped by SOURCE_DIVERSITY at depth 2; it is not a reranker or Top-K failure. Mixedbread remains policy-disabled and the XGBoost sidecar unavailable. Do not bypass current ranking policy or enable the feature flag without reviewed relevance evidence. Live replay remains PARTIAL: 0 qualified final candidates, no ContextManifest, zero writes."
+  },
+  "phaseCounts": {
+    "NOT_VERIFIED": 10,
+    "HISTORICAL_OR_STALE": 6,
+    "PARTIAL_NO_RECEIPT_BACKED_COMPLETION": 5,
+    "UNSPECIFIED": 2,
+    "PARTIAL": 1
+  },
+  "phases": [
+    {"phase": 1, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 2, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 3, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 4, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 5, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 6, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 7, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 8, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 9, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 10, "status": "NOT_VERIFIED", "basis": "No phase-specific authoritative acceptance ledger and current proof receipt were located in the scoped phase inventory."},
+    {"phase": 11, "status": "HISTORICAL_OR_STALE", "basis": "Workstation TODO contains an older partial projection; owning OpenSpec and current runtime proof were not revalidated."},
+    {"phase": 12, "status": "HISTORICAL_OR_STALE", "basis": "Workstation TODO contains an older identity-authority blockage; current owner-level proof was not revalidated."},
+    {"phase": 13, "status": "HISTORICAL_OR_STALE", "basis": "Workstation TODO contains an older partial projection; owning OpenSpec and current runtime proof were not revalidated."},
+    {"phase": 14, "status": "HISTORICAL_OR_STALE", "basis": "Workstation TODO describes bounded implementation; full current-workspace lineage and promotion are unproven."},
+    {"phase": 15, "status": "HISTORICAL_OR_STALE", "basis": "Workstation TODO contains an older current-cohort blockage; current owner-level proof was not revalidated."},
+    {"phase": 16, "status": "HISTORICAL_OR_STALE", "basis": "Workstation TODO contains an older graph-binding blockage; current graph snapshot and endpoint identity are unproven."},
+    {"phase": 17, "status": "PARTIAL_NO_RECEIPT_BACKED_COMPLETION", "basis": "2026-10-15 phase17-21 audit reports mapped_receipts=0 and passing_receipts=0; feature extraction/GPU surfaces do not establish a qualified cohort."},
+    {"phase": 18, "status": "PARTIAL_NO_RECEIPT_BACKED_COMPLETION", "basis": "2026-10-15 phase17-21 audit reports mapped_receipts=0 and passing_receipts=0; reviewed labels and held-out relevance evaluation are absent."},
+    {"phase": 19, "status": "PARTIAL_NO_RECEIPT_BACKED_COMPLETION", "basis": "The reported 443-row artifact does not establish replay-linked canonical source identity or verified outcomes."},
+    {"phase": 20, "status": "PARTIAL_NO_RECEIPT_BACKED_COMPLETION", "basis": "Parser, MapReduce and DuckDB artifacts exist; current lineage/readback hardening is not established by the stale component report."},
+    {"phase": 21, "status": "PARTIAL_NO_RECEIPT_BACKED_COMPLETION", "basis": "Replay/cache artifacts and policy scripts exist; qualified evaluation and promotion evidence remain open."},
+    {"phase": 22, "status": "UNSPECIFIED", "basis": "Legacy summary row 22 has no definition or acceptance gates. Canonical workstation P22 is a separate research-only learned-policy lane; no ordinal crosswalk or receipt-backed completion is established."},
+    {"phase": 23, "status": "UNSPECIFIED", "basis": "Legacy summary row 23 has no definition or acceptance gates. Canonical workstation P23 is a separate transport-validation lane; its local channel-pool tests do not map this legacy ordinal to the canonical phase."},
+    {"phase": 24, "status": "PARTIAL", "basis": "Legacy summary row 24 refers to the local retrieval-LOD/Function Registry workstream. One source/AST snapshot and exact packet/chunk lineage qualify and hydrate through the existing ast_tree lane. The candidate survives reranking but is dropped by existing SOURCE_DIVERSITY at dedupPrefixDepth=2; no ContextManifest is admitted. Mixedbread is policy-disabled and XGBoost fallback is unavailable. Training/evaluation, policy calibration on reviewed labels, and low-rank retrieval remain open. This is not canonical workstation P24, which is GPU/vector residency.", "latestEvidence": {"receiptPath": ".tmp/atlas/phase-closure-function-hydration-live-postprocess-v6-20261015.txt", "receiptChecksum": "sha256:bb32858fd514edb062c6cd4b8bd9fb6f2086198bba741182fbab1867cdda837e", "status": "PARTIAL_EXACT_CHUNK_HYDRATED_DROPPED_BY_SOURCE_DIVERSITY", "qualifiedCandidates": 1, "hydratedCandidates": 1, "rerankedCandidates": 1, "postProcessDropped": 1, "qualifiedFinalCandidates": 0, "contextManifestAdmitted": false, "writesPerformed": false}}
+  ],
+  "evidence": [
+    {"path": "docs/parent-atlas-workstation-todo.md", "use": "Legacy phase-summary rows 1-24 plus the separate canonical workstation roadmap; their numeric ordinals are not interchangeable."},
+    {"path": "docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json", "use": "Canonical workstation P11-P25 roadmap IDs and dependency spine; maps P22 to learned-policy research, P23 to transport validation, and P24 to GPU/vector residency."},
+    {"path": "docs/reports/phase17-21-workstation-audit.json", "use": "Generated 2026-10-15; aggregate 67% is not receipt-backed and mapped/passing receipt counts are zero."},
+    {"path": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md", "use": "Phase 24 owning task ledger; live request and learned-ranker gates remain open."},
+    {"path": "sveltekit-frontend/drizzle/manual/20261015_atlas_packet_class_lut_validation_receipts_v1.sql", "use": "Atomic migration applied after rollback rehearsal; readback confirmed the table, five indexes, two immutability triggers, and zero rows on PostgreSQL 18.4."}
+  ],
+  "sideEffects": {"schemaMigrationsApplied": 1, "receiptRowsInserted": 0, "cacheWrites": 0, "serviceRestarts": 0, "gpuJobs": 0, "trainingJobs": 0, "graphRebuilds": 0},
+  "validation": [
+    {"command": "Get-Content drizzle/manual/20261015_atlas_packet_class_lut_validation_receipts_v1.sql -Raw | docker exec -i legal-ai-postgres psql -X -v ON_ERROR_STOP=1 -U legal_admin -d legal_ai_db (inside BEGIN/ROLLBACK)", "exitCode": 0, "result": "PostgreSQL 18.4 rollback rehearsal passed."},
+    {"command": "Get-Content drizzle/manual/20261015_atlas_packet_class_lut_validation_receipts_v1.sql -Raw | docker exec -i legal-ai-postgres psql -X -1 -v ON_ERROR_STOP=1 -U legal_admin -d legal_ai_db", "exitCode": 0, "result": "Atomic additive migration applied; no receipt rows seeded."},
+    {"command": "Read-only psql schema/index/trigger/count readback", "exitCode": 0, "result": "Server 180004; 16 columns; five indexes; two immutability triggers; zero rows."},
+    {"command": "GET http://127.0.0.1:8090/v1/models", "exitCode": 0, "result": "Returned ornith-1.5-9b."},
+    {"command": "drizzle-kit check", "exitCode": 0, "result": "Migration journal check passed."},
+    {"command": "tsgo --ignoreConfig --noEmit --pretty false --skipLibCheck --target ES2022 --module ESNext --moduleResolution Bundler --strict src/lib/server/db/schema-atlas-lut-validation.ts", "exitCode": 0, "result": "New Drizzle table typing compiled."},
+    {"command": "node scripts/atlas/schema/audit-drizzle-schema-exports.mjs", "exitCode": 1, "result": "Existing schema export audit reports 23 duplicate database table names. The new LUT receipt table is listed in reachable declarations; overall schema export gate remains failed and needs separate reconciliation."},
+    {"command": ".\\node_modules\\.bin\\vitest.cmd run --pool=forks --maxWorkers=1 --minWorkers=1 src/lib/server/retrieval/function-registry-retrieval-proof-v1.spec.ts", "exitCode": 1, "result": "Focused runner emitted no diagnostics and was interrupted; no test pass is claimed."}
+  ],
+  "canonicalAuthority": false
+}

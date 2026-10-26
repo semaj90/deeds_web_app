@@ -61,7 +61,7 @@ export async function searchSimilarDocuments(
 			FROM legal_documents
 			WHERE embedding IS NOT NULL
 			AND 1 - (embedding <=> ${vectorString}::vector) > ${similarityThreshold}
-			ORDER BY embedding <=> ${vectorString}::vector
+			ORDER BY embedding <=> ${vectorString}::vector ASC, id ASC
 			LIMIT ${limit}
 		`);
 

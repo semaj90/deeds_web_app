@@ -123,19 +123,19 @@
 								<!-- Name + Alias row -->
 								<div class="form-row">
 									<div class="form-field">
-										<label class="form-label">Full Name <span class="required">*</span></label>
-										<input type="text" bind:value={formData.name} required class="form-input" placeholder="e.g. John Doe" />
+										<label for="poi-name" class="form-label">Full Name <span class="required">*</span></label>
+										<input id="poi-name" type="text" bind:value={formData.name} required class="form-input" placeholder="e.g. John Doe" />
 									</div>
 									<div class="form-field">
-										<label class="form-label">Alias / Known As</label>
-										<input type="text" bind:value={formData.alias} class="form-input" placeholder="e.g. JD, Johnny" />
+										<label for="poi-alias" class="form-label">Alias / Known As</label>
+										<input id="poi-alias" type="text" bind:value={formData.alias} class="form-input" placeholder="e.g. JD, Johnny" />
 									</div>
 								</div>
 
 								<!-- Status + Threat Level -->
 								<div class="form-row">
 									<div class="form-field">
-										<label class="form-label">Classification</label>
+										<span class="form-label">Classification</span>
 										<div class="chip-group">
 											{#each statuses as s}
 												<button type="button" class="chip" class:chip-active={formData.status === s.value} onclick={() => formData.status = s.value}>
@@ -149,7 +149,7 @@
 
 								<div class="form-row">
 									<div class="form-field">
-										<label class="form-label">Threat Assessment</label>
+										<span class="form-label">Threat Assessment</span>
 										<div class="threat-selector">
 											{#each threatLevels as t}
 												<button type="button" class="threat-chip" class:active={formData.threatLevel === t.value} style="--tc: {t.color}" onclick={() => formData.threatLevel = t.value}>
@@ -159,21 +159,21 @@
 										</div>
 									</div>
 									<div class="form-field">
-										<label class="form-label">Date of Birth</label>
-										<input type="date" bind:value={formData.dateOfBirth} class="form-input" />
+										<label for="poi-dob" class="form-label">Date of Birth</label>
+										<input id="poi-dob" type="date" bind:value={formData.dateOfBirth} class="form-input" />
 									</div>
 								</div>
 
 								<!-- Description -->
 								<div class="form-field">
-									<label class="form-label">Description / Notes</label>
-									<textarea bind:value={formData.description} rows={3} class="form-input form-textarea" placeholder="Physical description, known associates, notes..."></textarea>
+									<label for="poi-desc" class="form-label">Description / Notes</label>
+									<textarea id="poi-desc" bind:value={formData.description} rows={3} class="form-input form-textarea" placeholder="Physical description, known associates, notes..."></textarea>
 								</div>
 
 								<!-- Address -->
 								<div class="form-field">
-									<label class="form-label">Last Known Address</label>
-									<input type="text" bind:value={formData.address} class="form-input" placeholder="123 Main St, City, State" />
+									<label for="poi-address" class="form-label">Last Known Address</label>
+									<input id="poi-address" type="text" bind:value={formData.address} class="form-input" placeholder="123 Main St, City, State" />
 								</div>
 
 								<!-- Actions -->

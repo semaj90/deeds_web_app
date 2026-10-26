@@ -2,18 +2,30 @@
 /** Read-only adapter from WorkspaceSnapshotV1 to Graphify source bindings. */
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { dirname, extname, resolve } from 'node:path';
+import { dirname, extname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 import { normalizeInventoryPath, sourceIdentityKey } from './lib/canonical-source-inventory-hygiene-v1.mts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const REPORT = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
 const HYGIENE = resolve(ROOT, 'docs/reports/canonical-source-inventory-hygiene-v1.json');
 const hash = (value: string) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
 const jsonHash = (value: unknown) => `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
 const normalize = normalizeInventoryPath;
-function argument(name: string) { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : undefined; }
+function argument(name: string) {
+  const inline = process.argv.find((value) => value.startsWith(`${name}=`));
+  if (inline) return inline.slice(name.length + 1);
+  const index = process.argv.indexOf(name);
+  if (index < 0) return undefined;
+  const value = process.argv[index + 1];
+  if (!value || value.startsWith('--')) throw new Error(`MISSING_VALUE_FOR_${name.slice(2).replaceAll('-', '_').toUpperCase()}`);
+  return value;
+}
+const reportArgument = argument('--report');
+const REPORT = resolve(ROOT, reportArgument ?? 'docs/reports/graphify-source-selection-plan-v1.json');
+if (reportArgument && !REPORT.startsWith(`${resolve(ROOT, '.tmp')}${sep}`)) {
+  throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+}
 async function latestManifest() {
   const directory = resolve(ROOT, 'docs/reports/workspace-source-snapshots');
   const names = (await readdir(directory)).filter((name) => extname(name) === '.json');
@@ -25,9 +37,20 @@ async function latestManifest() {
 
 const manifestPath = resolve(ROOT, argument('--manifest') ?? process.argv[2] ?? await latestManifest());
 const hygienePath = resolve(ROOT, argument('--hygiene') ?? HYGIENE);
+const sourceReadRootArgument = argument('--source-read-root');
+let sourceReadRoot: string | undefined;
+if (sourceReadRootArgument) {
+  const materializedRoot = resolve(ROOT, sourceReadRootArgument);
+  const materializedBase = resolve(ROOT, '.tmp/workspace-source-snapshots');
+  const materializedRelative = relative(materializedBase, materializedRoot);
+  if (!materializedRelative || materializedRelative.startsWith('..') || resolve(materializedRoot) === materializedBase) {
+    throw new Error('SOURCE_READ_ROOT_MUST_BE_MATERIALIZED_SNAPSHOT');
+  }
+  sourceReadRoot = materializedRoot;
+}
 const snapshot = JSON.parse(await readFile(manifestPath, 'utf8'));
 const hygiene = JSON.parse(await readFile(hygienePath, 'utf8'));
-const snapshotReadback = validateSnapshot(snapshot);
+const snapshotReadback = validateSnapshot(snapshot, sourceReadRoot ? { sourceReadRoot } : undefined);
 const sources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
 const canonicalKeys = new Set(
   Array.isArray(hygiene.canonicalSources)

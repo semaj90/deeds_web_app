@@ -34,6 +34,8 @@ const input: GraphifyPacketIncidenceProjectionInputV1 = {
 		subjectStableSymbolKey: packet.graphEndpointKey,
 		predicate: 'IMPORTS',
 		objectStableSymbolKey: neighbor.graphEndpointKey,
+		objectSourceRef: neighbor.sourceRef,
+		objectSourceRevision: neighbor.sourceRevision,
 		unresolvedTarget: null,
 		evidenceKind: 'AST_REFERENCE',
 		evidenceSpan: { startByte: 10, endByte: 20, startRow: 1, endRow: 1 },

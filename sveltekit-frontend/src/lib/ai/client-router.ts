@@ -161,7 +161,7 @@ const LEGAL_TERM_CAP = 0.25;
 
 /** KAG-aware intent categories — each maps to a specific retrieval strategy */
 export type IntentCategory =
-	| 'greeting'        // "Hello" → local-onnx, no retrieval
+	| 'greeting'        // "Hello" → configured server model, no retrieval
 	| 'factual'         // "What is habeas corpus?" → KAG glossary lookup
 	| 'search'          // "Find cases about negligence" → RAG vector search
 	| 'procedural'      // "How do I file a motion?" → KAG procedure templates
@@ -311,13 +311,13 @@ export interface RouterDecision {
 }
 
 /**
- * Pick the best available local inference source.
- * Default: ONNX helper lane. Opt-in Gemma4 client helpers remain available when enabled.
+ * Pick the best available client helper source. If no approved helper is ready,
+ * route generation to the configured server model rather than a legacy ONNX chat model.
  */
 function pickLocalSource(e2bReady?: boolean, litertReady?: boolean, allowClientGemma = false): InferenceSource {
 	if (allowClientGemma && e2bReady) return 'local-e2b';
 	if (allowClientGemma && litertReady) return 'local-litert';
-	return 'local-onnx';
+	return 'server-ollama';
 }
 
 /**

@@ -13,7 +13,7 @@ export const MAX_PACKET_INCIDENCE_ENDPOINTS_V1 = 512;
 export async function verifyPacketIncidenceLineagesAgainstPostgresV1(
 	lineages: readonly PacketIncidenceLineageV1[],
 	snapshot: KagTraversalSnapshotV1,
-): Promise<void> {
+): Promise<ReadonlyMap<string, import('./packet-incidence-endpoint-resolver-v1.js').EndpointResolutionV1>> {
 	const endpointKeys = [...new Set(lineages.flatMap((lineage) => [lineage.packetKey, lineage.neighborPacketKey]))];
 	if (endpointKeys.length > MAX_PACKET_INCIDENCE_ENDPOINTS_V1) throw new Error('PACKET_INCIDENCE_ENDPOINT_LIMIT_EXCEEDED');
 	const { resolvePacketKeyResolutionV2 } = await import('../identity/packet-identity-resolver.js');
@@ -43,4 +43,5 @@ export async function verifyPacketIncidenceLineagesAgainstPostgresV1(
 			throw new Error(`PACKET_INCIDENCE_LINEAGE_UNPROVEN:${lineage.lineageChecksum}:${verdict.failed.join(',')}`);
 		}
 	}
+	return resolutions;
 }

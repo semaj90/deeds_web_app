@@ -1,5 +1,4 @@
 import { ENV } from '$lib/server/env.server.js';
-import { getJson, setJsonWithTtl } from '$lib/server/redis.js';
 import { canonicalSha256V1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
 import type { NeuralDecoderFeatureCache, NeuralDecoderFeatureCacheRecord, NeuralDecoderClientOptions } from '$lib/server/ai/neural-decoder-client.js';
 import { runNeuralDecoderPrefillCallerV1, type NeuralDecoderPrefillCallerReceiptV1 } from '$lib/server/ai/neural-decoder-prefill-caller-v1.js';
@@ -32,14 +31,12 @@ import type { ContextManifest } from './context-compiler.parent-atlas.js';
  * This function must never be able to break ACE context assembly.
  */
 
-const REDIS_FEATURE_CACHE_TTL_SECONDS = 86_400; // 24h, matches this repo's other GPU/Karpathy caches
-
-const redisNeuralDecoderFeatureCache: NeuralDecoderFeatureCache = {
-  async get(key: string): Promise<NeuralDecoderFeatureCacheRecord | null> {
-    return getJson<NeuralDecoderFeatureCacheRecord>(key);
+const nonPersistentNeuralDecoderFeatureCache: NeuralDecoderFeatureCache = {
+  async get(): Promise<NeuralDecoderFeatureCacheRecord | null> {
+    return null;
   },
-  async put(key: string, record: NeuralDecoderFeatureCacheRecord): Promise<void> {
-    await setJsonWithTtl(key, record, REDIS_FEATURE_CACHE_TTL_SECONDS);
+  async put(): Promise<void> {
+    return;
   },
 };
 
@@ -107,7 +104,7 @@ export async function runNeuralDecoderPrefillShadowForManifest(
           ? 'neural-decoder-prefill-shadow.query-and-candidates.v1'
           : 'neural-decoder-prefill-shadow.query-only.v1'),
       decoderPolicyRevision: opts.decoderPolicyRevision ?? 'neural-decoder-prefill-shadow.default-policy.v1',
-      cache: redisNeuralDecoderFeatureCache,
+      cache: nonPersistentNeuralDecoderFeatureCache,
       decoder: opts.decoder,
     });
   } catch (err) {

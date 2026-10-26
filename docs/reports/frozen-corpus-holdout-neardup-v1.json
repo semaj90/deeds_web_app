@@ -1,0 +1,277 @@
+{
+ "schema": "atlas.frozen-corpus-holdout-neardup.v1",
+ "generatedAt": "2026-10-19T08:52:07.478231+00:00",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "rows": 98335,
+ "holdoutSom": {
+  "split": "sha1(path) % 5 == 0 -> test (files, not chunks)",
+  "trainFiles": 8178,
+  "testFiles": 2071,
+  "config": {
+   "dim": 256,
+   "sigma0": 10.0,
+   "sigmaEnd": 1.0,
+   "init": "pca(train only)",
+   "epochs": 150
+  },
+  "mapFitOnTrain_evalTrain": {
+   "rows": 78443,
+   "qe": 0.6320022940635681,
+   "topographicError": 0.06231276213301373,
+   "neighbourPreservationGridDist2": 0.7041571587012225
+  },
+  "mapFitOnTrain_evalTest": {
+   "rows": 19892,
+   "qe": 0.6328243613243103,
+   "topographicError": 0.07128493866881158,
+   "neighbourPreservationGridDist2": 0.6993213352101347
+  },
+  "mapFitOnAll_evalAll_reference": {
+   "rows": 98335,
+   "qe": 0.6317169666290283,
+   "topographicError": 0.0595006864290436,
+   "neighbourPreservationGridDist2": 0.7099242385722276
+  },
+  "note": "neighbour preservation uses the full-set exact 768-d kNN; a small train/test gap means the ordering generalises to unseen files"
+ },
+ "nearDuplicateFiles": {
+  "method": "cosine of L2-normalised per-file mean chunk vectors; connected components; FLAG ONLY, nothing excluded or deleted",
+  "files": 10249,
+  "byThreshold": {
+   "0.95": {
+    "pairs": 1788,
+    "groups": 178,
+    "filesInGroups": 768,
+    "largestGroupSizes": [
+     365,
+     10,
+     7,
+     6,
+     6,
+     6,
+     4,
+     4
+    ]
+   },
+   "0.98": {
+    "pairs": 81,
+    "groups": 69,
+    "filesInGroups": 147,
+    "largestGroupSizes": [
+     6,
+     4,
+     3,
+     3,
+     3,
+     2,
+     2,
+     2
+    ]
+   },
+   "0.99": {
+    "pairs": 22,
+    "groups": 20,
+    "filesInGroups": 41,
+    "largestGroupSizes": [
+     3,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
+    ]
+   }
+  },
+  "groupsAt0.98SpanningTopDirectories": 8,
+  "sampleGroupsAt0.98": [
+   {
+    "files": [
+     "sveltekit-frontend/tests/routes/auto/api/cases.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/cases/__id.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/fictional-cases/__id.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/cases/__id/persons.test.ts",
+     "sveltekit-frontend/tests/routes/auto/sveltekit-frontend/src/routes/api/cases/__id.test.ts",
+     "sveltekit-frontend/tests/routes/auto/sveltekit-frontend/src/routes/api/fictional-cases/__id.test.ts"
+    ],
+    "size": 6
+   },
+   {
+    "files": [
+     "sveltekit-frontend/tests/routes/auto/api/health/ready.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/health/redis.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/health/status.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/health/system.test.ts"
+    ],
+    "size": 4
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/routes/(app)/evidence/analyze/+page.server.ts",
+     "sveltekit-frontend/src/routes/(app)/evidence/realtime/+page.server.ts",
+     "sveltekit-frontend/src/routes/(app)/cases/[id]/ai/+page.server.ts"
+    ],
+    "size": 3
+   },
+   {
+    "files": [
+     "sveltekit-frontend/tests/routes/auto/api/audio/analysis/__evidenceId.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/audio/progress/__evidenceId.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/video/analysis/__evidenceId.test.ts"
+    ],
+    "size": 3
+   },
+   {
+    "files": [
+     "sveltekit-frontend/tests/routes/auto/api/phase82/status.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/phase89/config.test.ts",
+     "sveltekit-frontend/tests/routes/auto/api/phase89/status.test.ts"
+    ],
+    "size": 3
+   },
+   {
+    "files": [
+     "scripts/atlas/audit-summary-quality.mjs",
+     "sveltekit-frontend/scripts/atlas/audit-summary-quality.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/backfill-latent-vectors.mjs",
+     "scripts/atlas/backfill-packet-metadata-to-postgres.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/daily-startup-validation.mjs",
+     "sveltekit-frontend/scripts/atlas/daily-startup-validation.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/enrich-packets-titles-summaries.mjs",
+     "sveltekit-frontend/scripts/atlas/enrich-packets-titles-summaries.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/lib/semantic-topk-storage.mjs",
+     "sveltekit-frontend/scripts/atlas/lib/semantic-topk-storage.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/normalize-qdrant-payloads-gate3-fixed.mjs",
+     "scripts/atlas/normalize-qdrant-payloads-session-76.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/phase-d-enrich-qdrant.mjs",
+     "sveltekit-frontend/scripts/atlas/phase-d-enrich-qdrant.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/qdrant-provision-384v2.mjs",
+     "scripts/atlas/qdrant-provision-768v2.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/test-turbovec-sidecar-contract.mjs",
+     "sveltekit-frontend/scripts/atlas/test-turbovec-sidecar-contract.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/validate-multi-vector-ab-test.mjs",
+     "sveltekit-frontend/scripts/atlas/validate-multi-vector-ab-test.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "scripts/atlas/validate-som-20x20-topology.mjs",
+     "sveltekit-frontend/scripts/atlas/validate-som-20x20-topology.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/scripts/atlas/phase3_sklearn_lr.py",
+     "sveltekit-frontend/scripts/atlas/phase4_xgb.py"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/scripts/atlas/phase4-rrf-score.mjs",
+     "sveltekit-frontend/scripts/atlas/phase4-rrf-scorer.mjs"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/lib/components/phase78/ErrorModal.svelte",
+     "sveltekit-frontend/src/routes/(admin)/error-brain/components/ErrorModal.svelte"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/lib/components/phase78/SuggestionsList.svelte",
+     "sveltekit-frontend/src/routes/(admin)/error-brain/components/SuggestionsList.svelte"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/lib/components/ui/enhanced-bits.svelte",
+     "sveltekit-frontend/src/lib/components/ui/bits/Button.svelte"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/lib/components/yorha/YoRHaAIChat.svelte",
+     "sveltekit-frontend/src/routes/(app)/demos/yorha/components/YoRHaAIChat.svelte"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/lib/components/yorha/YoRHaDetectiveCommandCenter.svelte",
+     "sveltekit-frontend/src/routes/(app)/demos/yorha/components/YoRHaDetectiveCommandCenter.svelte"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/lib/components/yorha/YoRHaTerminal.svelte",
+     "sveltekit-frontend/src/lib/components/yorha/_simulations/YoRHaTerminal.svelte"
+    ],
+    "size": 2
+   },
+   {
+    "files": [
+     "sveltekit-frontend/src/lib/icons/yorha/IconPanelClose.svelte",
+     "sveltekit-frontend/src/lib/icons/yorha/IconPanelOpen.svelte"
+    ],
+    "size": 2
+   }
+  ],
+  "status": "NEEDS_HUMAN_REVIEW_BEFORE_ANY_EXCLUSION"
+ }
+}

@@ -54,7 +54,7 @@ export interface RoutingDecision {
 export const MODELS = {
   LEGAL_VLM:   LLM_MODEL_ID,   // unified text+vision, production
   LEGAL_TEXT:  LLM_MODEL_ID,        // text-only fallback
-  FAST:        'gemma3:270m',                // sub-2s for simple queries
+  FAST:        LLM_MODEL_ID,                 // no smaller chat model on :8090; simple queries use Ornith too
   EMBED:       'embeddinggemma:latest',
 } as const;
 

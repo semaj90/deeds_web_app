@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.graphify-daily-discovery.v1",
+  "observedAt": "2026-10-16T02:32:09.507Z",
+  "mode": "search",
+  "status": "SEARCH_FAILED",
+  "canonicalAuthority": false,
+  "sourceWritesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "localArtifactWritesPerformed": true,
+  "promotionAuthorized": false,
+  "ownership": {
+    "path": "docs/architecture/runtime-ownership-registry.json",
+    "checksum": "sha256:fae1b52462b65245012ac0777b65ef1ea6aa2bb68c1d492afd0399ea4c88292a",
+    "declaredGeneratedAt": "2026-08-09",
+    "totalMatchingRecords": 0,
+    "records": [],
+    "truncated": false,
+    "promotionAuthorized": false
+  },
+  "search": {
+    "status": "SEARCH_FAILED",
+    "query": "FunctionRegistryEntryV1",
+    "limit": 8,
+    "matches": [],
+    "truncated": true,
+    "error": "RG_TIMEOUT",
+    "scope": {
+      "roots": [
+        "sveltekit-frontend/src",
+        "packages",
+        "python",
+        "simd-bridge",
+        "scripts/atlas"
+      ],
+      "selected": [
+        "docs/architecture/_topology_classifier_index.md",
+        "docs/architecture/_cuda_rtx_toc.md"
+      ],
+      "maxFileBytes": 2097152,
+      "maxMatchesPerFile": 5,
+      "resultOrder": "EXPLICIT_LEDGER_AND_RECEIPT_FIRST_THEN_SOURCE_PATH_LINE",
+      "exclusions": [
+        "!**/node_modules/**",
+        "!**/.git/**",
+        "!**/.venv*/**",
+        "!**/.python*/**",
+        "!**/.tmp/**",
+        "!**/.cache/**",
+        "!**/.svelte-kit/**",
+        "!**/__pycache__/**",
+        "!**/dist/**",
+        "!**/build*/**",
+        "!**/target/**",
+        "!**/vendor/**",
+        "!**/archive*/**",
+        "!**/docs/**",
+        "!**/reports/**",
+        "!**/.env*"
+      ]
+    },
+    "scopeIsExhaustive": false,
+    "rankingOwner": "SearchRuntime; lexical discovery creates no retrieval vote"
+  }
+}

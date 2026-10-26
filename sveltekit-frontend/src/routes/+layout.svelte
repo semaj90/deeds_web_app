@@ -756,6 +756,10 @@
 
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
+        .app-shell.with-global-sidebar {
+            padding-left: 60px;
+        }
+
         .content {
             padding: 1.5rem;
         }

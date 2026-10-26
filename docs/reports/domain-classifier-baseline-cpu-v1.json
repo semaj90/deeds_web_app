@@ -1,0 +1,55 @@
+{
+ "schema": "atlas.domain-classifier-baseline-cpu.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuUsed": false,
+ "labels": "LEGACY feature_domain.domain_class (weak, 40 classes) - not a reviewed taxonomy",
+ "features": "TF-IDF (1-2 gram, 5000) over tokenized source_ref path + extension only",
+ "split": "GroupShuffleSplit by first 4 path components, 80/20, seed 17",
+ "rows": 61658,
+ "train": 51543,
+ "test": 10115,
+ "classes": 40,
+ "results": [
+  {
+   "model": "majority_class",
+   "accuracy": 0.1566,
+   "macroF1": 0.0068,
+   "weightedF1": 0.0424,
+   "majorityClass": "Graph"
+  },
+  {
+   "model": "label_shuffled_baseline_linear_svc",
+   "accuracy": 0.2,
+   "macroF1": 0.0282,
+   "weightedF1": 0.1187
+  },
+  {
+   "model": "tfidf_path_linear_svc",
+   "accuracy": 0.939,
+   "macroF1": 0.7751,
+   "weightedF1": 0.9352,
+   "seconds": 22.1
+  },
+  {
+   "model": "tfidf_path_xgboost",
+   "accuracy": 0.9472,
+   "macroF1": 0.7581,
+   "weightedF1": 0.9444,
+   "seconds": 612.8,
+   "testRowsWithUnseenClass": 0
+  }
+ ],
+ "linearSvcExtra": {
+  "accuracy_excluding_Other_and_failed": 0.9357,
+  "rowsExcluded": 703
+ },
+ "totalSeconds": 887.5,
+ "caveats": [
+  "labels are noisy legacy labels; high scores prove predictability, not correctness",
+  "path-only features: no content, embedding, AST, KMeans or SOM features yet",
+  "no reviewed labels exist, so no external truth is measured"
+ ],
+ "checksum": "sha256:4e9f35ae7d6cc4f408c804dff0b647d2c5229203e84f5962d6ed93f9249724be"
+}

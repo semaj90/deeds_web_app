@@ -5,6 +5,7 @@ import { mkdir, readFile, readdir, realpath, writeFile } from 'node:fs/promises'
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { classifyTaskEnrichmentV1, extractMarkdownFencesV1 } from './lib/next-steps-enrichment-v1.mjs';
+import { assertCompleteAstScan } from './lib/source-observation-http-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const inputRoot = path.join(repoRoot, 'docs/next_steps');
@@ -171,6 +172,8 @@ async function enrichWithSidecar() {
 					filePath: `${candidate.source.file}#fence-${fence.fenceOrdinal}`,
 					sourceRevision: `sha256:${sha256(fence.snippet)}`,
 				});
+				// Fail closed: a partial or unreceipted snippet scan is not recorded as an AST hit.
+				assertCompleteAstScan(result);
 				candidate.codeEvidence.astChunkHits.push({
 					kind: 'FENCED_CODE',
 					markdownFile: candidate.source.file,
@@ -221,6 +224,8 @@ async function enrichWithSidecar() {
 					filePath: relativeSourcePath,
 					sourceRevision: `sha256:${sha256(source)}`,
 				});
+				// Fail closed: a partial or unreceipted file scan is not recorded as an AST hit.
+				assertCompleteAstScan(result);
 				candidate.codeEvidence.astChunkHits.push({
 					kind: 'AST_REFERENCED_FILE',
 					requestedPath: relativeSourcePath,

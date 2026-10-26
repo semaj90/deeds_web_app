@@ -141,7 +141,7 @@ async function main() {
   try {
     packet = JSON.parse(await fs.readFile(PACKET_IN, 'utf8'));
   } catch {
-    console.error(`❌ ${PACKET_IN} not found — run compress-cards.mjs first`);
+    console.error(`ACE_PACKET_UNAVAILABLE: ${PACKET_IN} not found or unreadable — run compress-cards.mjs first`);
     process.exit(1);
   }
 

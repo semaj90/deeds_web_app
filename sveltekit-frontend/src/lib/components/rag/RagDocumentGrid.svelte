@@ -174,8 +174,19 @@
 	{/if}
 
 	{#if selectedDocument}
-		<div class="doc-detail-overlay" onclick={() => (selectedDocument = null)} onkeydown={(e) => { if (e.key === 'Escape') selectedDocument = null; }} role="presentation" tabindex="-1">
-			<div class="doc-detail" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+		<div
+			class="doc-detail-overlay"
+			onclick={(e) => { if (e.target === e.currentTarget) selectedDocument = null; }}
+			onkeydown={(e) => { if (e.key === 'Escape') selectedDocument = null; }}
+			role="presentation"
+		>
+			<div
+				class="doc-detail"
+				role="dialog"
+				aria-modal="true"
+				aria-label={selectedDocument.filename}
+				tabindex="-1"
+			>
 				<div class="detail-header">
 					<h3>{selectedDocument.filename}</h3>
 					<button class="close-btn" onclick={() => (selectedDocument = null)}>

@@ -40,12 +40,14 @@ const WORKSPACE_ROOT = path.resolve(__dirname, '..', '..', '..', '..', '..', '..
 const KNOWN_OWNER = 'packages/parent-atlas/src/core/symbol-registry-repository.ts';
 const KNOWN_LEGACY_BYPASS_WRITERS = [
   'scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs',
+  'scripts/atlas/apply-symbol-registry-revision-repair-v1.mjs',
   'scripts/atlas/apply-symbol-revision-repair-v1.mjs',
   'scripts/atlas/freeze-symbol-revision-placeholder-repair-manifest-v1.mjs',
   'scripts/atlas/freeze-symbol-revision-repair-manifest-v1.mjs',
   'scripts/atlas/materialize-ast-symbol-versions.mjs',
   'scripts/atlas/promote-ast-symbols-to-registry.mjs',
   'scripts/atlas/prove-feature-intelligence-database.mjs',
+  'scripts/atlas/repair-symbol-version-workspace-placeholder-v1.mjs',
 ].sort();
 
 function findDirectWriters(): string[] {

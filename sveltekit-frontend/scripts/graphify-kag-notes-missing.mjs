@@ -15,7 +15,7 @@
  *
  * Environment:
  *   LLAMA_SERVER_URL=http://localhost:8090
- *   LLAMA_MODEL=gemma4-legal-iq4xs-direct.gguf
+ *   LLAMA_MODEL=ornith-1.5-9b
  *   COUCHDB_URL=http://localhost:5984
  *   COUCHDB_USER=admin (from .env)
  *   COUCHDB_PASSWORD=admin (from .env)

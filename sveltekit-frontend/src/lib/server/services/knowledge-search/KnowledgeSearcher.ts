@@ -267,7 +267,7 @@ Answer:`;
   }
 
   /**
-   * Call Ollama API (gemma4-rotorquant:latest)
+   * Call Ollama API (ornith-1.5-9b)
    */
   private async callOllama(prompt: string): Promise<string> {
     try {

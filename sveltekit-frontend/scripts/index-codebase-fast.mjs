@@ -40,6 +40,7 @@ import fs from 'fs';
 import path from 'path';
 import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
+import { analyzeRouteHandlers } from '../../scripts/atlas/lib/route-handler-ast-analyzer-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SVELTEKIT_ROOT = path.resolve(__dirname, '..');
@@ -421,7 +422,7 @@ function extractMeta(filePath, src) {
       rel, ext, isRoute: false, isServerRoute: false, isSvelteComp: false, isTest: false,
       imports: [], dynImports: [], hasViteIgnore: false, reExports: [], typeImports: new Set(),
       importedSymbols: new Set(), hasNamespaceImport: false,
-      hasAuth: false, hasZod: false, parsesBody: false, routeHandlers: [], drizzleRefs: [],
+      hasAuth: false, hasZod: false, parsesBody: false, routeHandlers: [], routeAnalysis: [], drizzleRefs: [],
       todos: [], lineCount: src.split('\n').length, components: [], localhostRefs: [],
       localhostBreaks: false, hasRawPort: false, typeImportCount: 0, exportedNames: [],
       sv4Props: false, sv4Reactive: false, sv4Events: false, sv4Dispatch: false, runeInTs: false,
@@ -474,10 +475,19 @@ function extractMeta(filePath, src) {
   const reExports = [...codeOnly.matchAll(RE_REEXPORT)].map(m => m[1]);
   // G4 — auth (inline guard OR layout-level protection)
   const hasAuth = RE_AUTH.test(src) || isLayoutGuarded(rel);
-  // G5 — zod
-  const hasZod = RE_ZOD.test(src);
-  // G5b — does this route actually parse a body? (Zod is irrelevant for pure GETs)
-  const parsesBody = /request\.(?:json|formData|text|arrayBuffer)\s*\(\s*\)/.test(src);
+  // G5 & G5b — route handler analysis (parsesBody & Zod validation)
+  let routeAnalysis = [];
+  let parsesBody = false;
+  let hasZod = false;
+  if (isServerRoute) {
+    const analysis = analyzeRouteHandlers(src, { rel });
+    routeAnalysis = analysis.handlers;
+    parsesBody = analysis.parsesBody;
+    hasZod = analysis.hasZod;
+  } else {
+    hasZod = RE_ZOD.test(src);
+    parsesBody = /request\.(?:json|formData|text|arrayBuffer)\s*\(\s*\)/.test(src);
+  }
   // G6 — route handlers
   const routeHandlers = [...src.matchAll(RE_ROUTE_H)].map(m => m[1]);
   // G7 — drizzle
@@ -603,7 +613,7 @@ function extractMeta(filePath, src) {
     imports, dynImports, hasViteIgnore, reExports, typeImports,
     importedSymbols, hasNamespaceImport,
     // G4-G8
-    hasAuth, hasZod, parsesBody, routeHandlers, drizzleRefs, todos,
+    hasAuth, hasZod, parsesBody, routeHandlers, routeAnalysis, drizzleRefs, todos,
     // G9-G12
     lineCount, components, localhostRefs, localhostBreaks, hasRawPort, typeImportCount,
     // G13 (cross-ref later)
@@ -632,7 +642,7 @@ let apiCount       = 0;
 let dbTableCount   = 0;
 let todoCount      = 0;
 
-const META_CACHE_VERSION = 'v24'; // bumped 2026-08-09 — invalidate cache for importedSymbols/G13 rewrite
+const META_CACHE_VERSION = 'v25'; // bumped 2026-10-25 — invalidate cache for routeAnalysis/G5 AST rewrite
 const CAN_WRITE_PROGRESS = Boolean(process.stdout?.isTTY && !process.stdout.destroyed);
 
 if (process.stdout?.on) {
@@ -671,6 +681,7 @@ for (const filePath of walk(scanRoot)) {
       if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
       if (Array.isArray(meta.importedSymbols)) meta.importedSymbols = new Set(meta.importedSymbols);
       cacheHits++;
+      meta.contentHash = contentHash;
       files.push(meta);
     }
     continue;
@@ -699,6 +710,7 @@ for (const filePath of walk(scanRoot)) {
     };
     await rset(cacheKey, metaForCache);
   }
+  meta.contentHash = contentHash;
   files.push(meta);
 
   // Gradient checkpoint: flush batch every CHECKPOINT_EVERY files so interrupted runs can resume.
@@ -772,6 +784,7 @@ if (!NO_EXTRA_INDEX_DIRS) {
     };
         await rset(cacheKey, metaForCache);
       }
+      meta.contentHash = contentHash;
       files.push(meta);
       extraIndexed++;
       if (meta.routeHandlers.length) apiCount++;
@@ -791,6 +804,18 @@ if (extraIndexed > 0 && !process.argv.includes('--quiet')) {
 // per the graph-refresh-recovery addendum if this instrumentation proves useful
 // long-term.
 const __stageT0 = Date.now();
+// Exact-content duplicates: every file keeps its own entry (path = identity, per the
+// Parent Atlas contract); later copies are only marked with the first path holding the same bytes.
+const firstPathByContentHash = new Map();
+let contentDuplicateCount = 0;
+for (const f of files) {
+  if (!f.contentHash) continue;
+  const first = firstPathByContentHash.get(f.contentHash);
+  if (first) { f.contentDuplicateOf = first; contentDuplicateCount++; }
+  else firstPathByContentHash.set(f.contentHash, f.rel);
+}
+console.log(`   Content duplicates: ${contentDuplicateCount} (entries kept, marked contentDuplicateOf)`);
+
 console.log(`\n⏱  Cross-file passes starting — ${files.length} files loaded (${((__stageT0 - t0) / 1000).toFixed(1)}s elapsed)`);
 
 // G13 — Dead export detection: build one global set of imported symbol names,
@@ -1187,13 +1212,14 @@ const graphJson = {
     routeHandlers: f.routeHandlers, drizzleRefs: f.drizzleRefs,
     todos: f.todos, components: f.components.slice(0, 20),
     isRoute: f.isRoute, isSvelteComp: f.isSvelteComp, isTest: f.isTest, lineCount: f.lineCount,
-    hasAuth: f.hasAuth, hasZod: f.hasZod, ssrUnsafe: f.ssrUnsafe,
+    hasAuth: f.hasAuth, hasZod: f.hasZod, parsesBody: f.parsesBody, routeAnalysis: f.routeAnalysis ?? [], ssrUnsafe: f.ssrUnsafe,
     sv4Legacy: f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch,
     runeInTs: f.runeInTs ?? false,
     hasPairedTest: f.hasPairedTest, fanIn: f.fanIn ?? 0,
     routeParams: f.routeParams, routeDepth: f.routeDepth,
     localhostRefs: f.localhostRefs,
     localhostBreaks: f.localhostBreaks ?? false,
+    contentDuplicateOf: f.contentDuplicateOf ?? null,
   })),
   directories: dirRows,
   tags: tagMap,

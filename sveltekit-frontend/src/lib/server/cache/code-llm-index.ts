@@ -63,7 +63,7 @@ export interface CodeLlmOutputMeta {
   groundingScore?: number;
   /** Tokens used to produce this output */
   tokensUsed?:     number;
-  /** Model used (e.g. gemma4-rotorquant:latest) */
+  /** Model used (e.g. ornith-1.5-9b) */
   model?:          string;
   /** Originating pipeline tag — finer-grained than CodeLlmEntry.source */
   pipeline?:       'rag-answer' | 'kag-traverse' | 'dag-cache' | 'agent-tool' | 'glyph-summary' | 'ace-synthesis';

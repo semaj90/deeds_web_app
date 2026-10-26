@@ -1281,9 +1281,10 @@
 			</aside>
 		{/if}
 
-		<!-- M2: UploadZone overlay -->
 		{#if isDraggingFiles}
-			<div class="upload-overlay" 
+			<div class="upload-overlay"
+				role="region"
+				aria-label="Evidence File Upload Drop Overlay"
 				ondragleave={(e) => {
 					// Only close if we're leaving the overlay, not entering a child
 					if (e.currentTarget === e.target) isDraggingFiles = false;

@@ -50,7 +50,7 @@ vi.mock('$lib/server/env.server.js', () => ({
     SEAWEED_MASTER_PORT: '9333',
     SEAWEED_FILER_PORT: '8382',
   },
-  ollamaFetch: mockOllamaFetch,
+  embedOrChatFetch: mockOllamaFetch,
 }));
 
 vi.mock('$lib/server/db/client', () => ({

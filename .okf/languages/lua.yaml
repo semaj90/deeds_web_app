@@ -1,0 +1,9 @@
+# Lua Language Profile for OKF
+
+version: 1
+language: lua
+name: Lua
+grammar: lua
+
+extensions:
+  - .lua

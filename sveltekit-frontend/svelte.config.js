@@ -29,6 +29,12 @@ const config = {
     if (suppressedWarnings.has(warning.code)) {
       return;
     }
+    if (
+      warning.code === 'legacy_props_invalid' &&
+      warning.filename?.includes('node_modules/lucide-svelte')
+    ) {
+      return;
+    }
     handler(warning);
   },
 
@@ -40,8 +46,7 @@ const config = {
       if (
         filename.includes('node_modules') &&
         !filename.includes('svelte-sonner') &&
-        !filename.includes('bits-ui') &&
-        !filename.includes('svelte-tiptap')
+        !filename.includes('bits-ui')
       ) {
         return { runes: false };
       }
@@ -51,6 +56,11 @@ const config = {
   kit: {
     // Ensure we explicitly use the Node adapter (not adapter-auto)
     adapter: nodeAdapter({ out: 'build', precompress: true }),
+
+    experimental: {
+      tracing: { server: true },
+      instrumentation: { server: true },
+    },
 
     // CSRF protection — reject cross-origin form submissions and API mutations
     csrf: {

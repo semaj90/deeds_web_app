@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.telemetry-live-readback.v1",
+  "trace_id": "trace:telemetry-proof:9080561e-d0c3-4c00-b28f-e37055fec224",
+  "status": "LIVE_DIAGNOSTIC_INSERT_READBACK_PROVEN",
+  "canonicalAuthority": false,
+  "sourceWritesPerformed": false,
+  "modelLoadsPerformed": false,
+  "likely_cause": "Live existing-writer insert and independent readback were not yet proven.",
+  "evidence": {
+    "rowId": "31",
+    "readbackConnection": "Independent pg.Client READ ONLY transaction",
+    "exactTransportPayloadMatch": true,
+    "packetIdentityInvented": false,
+    "httpVersion": null
+  },
+  "patch_targets": [
+    "sveltekit-frontend/scripts/atlas/prove-packet-telemetry-live-readback-v1.mts"
+  ],
+  "safe_next_command": "Review this receipt; do not repeat the approved insert.",
+  "smoke_command": "npx tsx scripts/atlas/prove-packet-telemetry-live-readback-v1.mts --preflight",
+  "database": {
+    "name": "legal_ai_db",
+    "version": "18.4 (Debian 18.4-1.pgdg12+1)"
+  },
+  "liveRequest": {
+    "tool": "db.table_inspect",
+    "columnCount": 33,
+    "durationMs": 245.06050000000005,
+    "transportTelemetry": {
+      "trace_id": "trace:telemetry-proof:9080561e-d0c3-4c00-b28f-e37055fec224",
+      "schema": "atlas.transport-codec-telemetry.v1",
+      "rpc_transport": "http",
+      "observed_at": "2026-10-16T07:46:53.464Z",
+      "operation": "mcp:db.table_inspect",
+      "measurement_scope": "CLIENT_CODEC_ONLY",
+      "http_version": null,
+      "measurements": {
+        "protobuf_encode": null,
+        "protobuf_decode": null,
+        "json_stringify": {
+          "calls": 1,
+          "failedCalls": 0,
+          "milliseconds": 0.02980000000002292,
+          "bytes": 265
+        },
+        "json_parse": {
+          "calls": 2,
+          "failedCalls": 0,
+          "milliseconds": 0.105300000000625,
+          "bytes": 8308
+        }
+      },
+      "canonicalAuthority": false,
+      "attempt_outcome": "RETURNED"
+    },
+    "packetQualification": "UNKNOWN_DIAGNOSTIC_ONLY"
+  },
+  "approvalConsumed": true,
+  "writerAcknowledged": true,
+  "readbackRows": 1,
+  "report_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-telemetry-live-readback-2026-10-16T07-46-53-789Z.json"
+}

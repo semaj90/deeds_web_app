@@ -84,9 +84,9 @@
 param(
   [string]$RepoRoot = "C:\Users\james\Videos\deeds-web-app",
   [string]$AppRoot = "C:\Users\james\Videos\deeds-web-app\sveltekit-frontend",
-  [string]$PostgresContainer = "parent-atlas-postgres",
+  [string]$PostgresContainer = "legal-ai-postgres",
   [string]$Database = "legal_ai_db",
-  [string]$DatabaseUser = "postgres",
+  [string]$DatabaseUser = "legal_admin",
   [string]$QdrantUrl = "http://127.0.0.1:6333",
   [string]$QdrantCollection = "codebase_chunks_768",
   [string]$Neo4jUrl = "http://127.0.0.1:7474",
@@ -181,18 +181,37 @@ function Invoke-SafeCommand {
     [int]$TimeoutSeconds = 30
   )
 
+  $resolvedCmd = Get-Command $FilePath -ErrorAction SilentlyContinue
+  $resolvedPath = if ($resolvedCmd -and $resolvedCmd.Source) { $resolvedCmd.Source } elseif ($resolvedCmd -and $resolvedCmd.Definition) { $resolvedCmd.Definition } else { $FilePath }
+
   $psi = [System.Diagnostics.ProcessStartInfo]::new()
-  $psi.FileName = $FilePath
+  $psi.FileName = $resolvedPath
   $psi.UseShellExecute = $false
   $psi.RedirectStandardOutput = $true
   $psi.RedirectStandardError = $true
-  foreach ($arg in $Arguments) {
-    [void]$psi.ArgumentList.Add($arg)
+
+  try {
+    foreach ($arg in $Arguments) {
+      [void]$psi.ArgumentList.Add($arg)
+    }
+  } catch {
+    $psi.Arguments = ($Arguments | ForEach-Object {
+      if ($_ -match '[\s"]') { '"{0}"' -f ($_ -replace '"', '\"') } else { $_ }
+    }) -join ' '
   }
 
   $process = [System.Diagnostics.Process]::new()
   $process.StartInfo = $psi
-  [void]$process.Start()
+  try {
+    [void]$process.Start()
+  } catch {
+    return [pscustomobject]@{
+      exit_code = 127
+      stdout = ""
+      stderr = $_.Exception.Message
+      timed_out = $false
+    }
+  }
 
   if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
     try { $process.Kill($true) } catch {}
@@ -273,7 +292,9 @@ function Invoke-PostgresQuery {
 }
 
 function Convert-TsvRows {
-  param([Parameter(Mandatory)][string]$Text)
+  param([string]$Text = "")
+
+  if ([string]::IsNullOrWhiteSpace($Text)) { return @() }
 
   $lines = $Text -split "`r?`n" | Where-Object {
     $_ -and
@@ -288,7 +309,7 @@ function Convert-TsvRows {
   $objects = @()
 
   foreach ($line in $lines[1..($lines.Count - 1)]) {
-    $values = $line -split "`t", -1
+    $values = $line -split "`t"
     if ($values.Count -ne $headers.Count) { continue }
 
     $row = [ordered]@{}
@@ -313,24 +334,29 @@ function Find-RepoMatches {
     return $output
   }
 
-  foreach ($pattern in $Patterns) {
-    $result = Invoke-SafeCommand -FilePath "rg" -Arguments @(
-      "-n",
-      "--hidden",
-      "--glob", "!.git/**",
-      "--glob", "!node_modules/**",
-      "--glob", "!dist/**",
-      "--glob", "!build/**",
-      "--glob", "!coverage/**",
-      $pattern,
-      $RepoRoot
-    ) -TimeoutSeconds 30
-
-    $lines = @()
-    if ($result.exit_code -eq 0) {
-      $lines = $result.stdout -split "`r?`n" | Where-Object { $_ } | Select-Object -First $MaxPerPattern
+  $results = $Patterns | ForEach-Object -Parallel {
+    $pattern = $_
+    $root = $using:RepoRoot
+    $max = $using:MaxPerPattern
+    $lines = @(& rg -n --hidden `
+      --glob "!.git/**" `
+      --glob "!node_modules/**" `
+      --glob "!dist/**" `
+      --glob "!build/**" `
+      --glob "!coverage/**" `
+      --glob "!.svelte-kit/**" `
+      --glob "!.tmp/**" `
+      --glob "!scratch/**" `
+      --glob "!*.log" `
+      $pattern $root 2>$null | Select-Object -First $max)
+    [pscustomobject]@{
+      pattern = $pattern
+      lines = $lines
     }
-    $output[$pattern] = @($lines)
+  } -ThrottleLimit 8
+
+  foreach ($item in $results) {
+    $output[$item.pattern] = @($item.lines)
   }
 
   return $output
@@ -589,14 +615,14 @@ ORDER BY ordinal_position;
       "latent_64"
     )
 
-    $presentFields = @($schemaRows.column_name)
+    $presentFields = @($schemaRows | ForEach-Object { $_.column_name })
     $missingFields = @($requiredFields | Where-Object { $_ -notin $presentFields })
 
     Add-Gate -Id "PA-PG-003" -Area "POSTGRES" -Title "Canonical atlas_packets schema surface" `
       -Status $(if ($missingFields.Count -eq 0) { "PASS" } else { "PARTIAL" }) `
       -EvidenceLevel "PRODUCTION_DATA_PROVEN" `
       -Summary "Required canonical, projection, and representation columns were checked against the live table." `
-      -Evidence @("live_column_count=$($schemaRows.Count)", "missing=$($missingFields -join ',')") `
+      -Evidence @("live_column_count=$(@($schemaRows).Count)", "missing=$($missingFields -join ',')") `
       -NextAction "Reconcile the application schema with live columns before changing constraints."
 
     $identityQuery = @"
@@ -647,10 +673,11 @@ FROM public.atlas_packets;
 "@
     $latentResult = Invoke-PostgresQuery $latentQuery
     $latentRows = Convert-TsvRows $latentResult.stdout
-    $latent = $latentRows | Select-Object -First 1
+    $latent = if ($latentRows.Count -gt 0) { $latentRows[0] } else { $null }
     $Facts.latent64 = $latent
 
-    $latentPass = [int64]$latent.latent64_wrong_size_rows -eq 0
+    $wrongRows = if ($null -ne $latent -and $null -ne $latent.latent64_wrong_size_rows) { [int64]@($latent.latent64_wrong_size_rows)[0] } else { 0 }
+    $latentPass = $wrongRows -eq 0
     Add-Gate -Id "PA-REP-001" -Area "REPRESENTATION" -Title "latent_64 BYTEA contract" `
       -Status $(if ($latentPass) { "PASS" } else { "FAIL" }) `
       -EvidenceLevel "PRODUCTION_DATA_PROVEN" `
@@ -682,7 +709,7 @@ FROM candidate_columns;
     $topologyResult = Invoke-PostgresQuery $topologyQuery
     $topologyRows = Convert-TsvRows $topologyResult.stdout
     $topologyColumns = ""
-    if ($topologyRows.Count -gt 0) {
+    if (@($topologyRows).Count -gt 0) {
       $topologyColumns = $topologyRows[0].topology_columns
     }
 
@@ -748,7 +775,13 @@ if (-not $qdrantHealth.ok) {
       -Evidence @($collectionInfo.error) `
       -NextAction "Confirm the canonical semantic collection name."
   } else {
-    $Facts.qdrant_collection = $collectionInfo.value
+    $res = $collectionInfo.value.result
+    $Facts.qdrant_collection = [pscustomobject]@{
+      status = $res.status
+      points_count = $res.points_count
+      indexed_vectors_count = $res.indexed_vectors_count
+      segments_count = $res.segments_count
+    }
 
     $sampleBody = @{
       limit = [Math]::Min($QdrantSampleSize, 256)
@@ -793,7 +826,7 @@ if (-not $qdrantHealth.ok) {
       $Facts.qdrant_payload_coverage = $coverage
       $Facts.qdrant_payload_signatures = $signatures
 
-      $sampled = $points.Count
+      $sampled = @($points).Count
       $packetQualified = $sampled -gt 0 -and
                          $coverage.packet_key -eq $sampled -and
                          $coverage.source_ref -eq $sampled -and
@@ -810,7 +843,7 @@ if (-not $qdrantHealth.ok) {
         -Summary "Sampled Qdrant payloads were checked for packet, workspace, source, representation, schema, and symbol lineage." `
         -Evidence @(
           "sampled=$sampled",
-          "signatures=$($signatures.Count)",
+          "signatures=$(@($signatures.Keys).Count)",
           ($coverage | ConvertTo-Json -Compress)
         ) `
         -NextAction "Patch and prove the active writer, then re-upsert or rebuild production points from canonical Postgres."
@@ -905,7 +938,14 @@ $patterns = @(
 )
 
 $matches = Find-RepoMatches $patterns
-$Facts.repository_matches = $matches
+$summaryMatches = [ordered]@{}
+foreach ($k in $matches.Keys) {
+  $summaryMatches[$k] = [pscustomobject]@{
+    count = @($matches[$k]).Count
+    sample = @($matches[$k] | Select-Object -First 3)
+  }
+}
+$Facts.repository_matches = $summaryMatches
 
 $semanticPresent = @($matches.semantic_768).Count -gt 0
 $latent64Present = @($matches.latent_64).Count -gt 0
@@ -927,11 +967,11 @@ Add-Gate -Id "PA-REP-002" -Area "REPRESENTATION" -Title "Representation lane sep
   -NextAction "Keep semantic, topology, projection, and fusion lanes separately named and versioned; never collapse RFF and RRF."
 
 $dagSignals = @(
-  @($matches.analysis_run).Count -gt 0,
-  @($matches.analysis_artifact).Count -gt 0,
-  @($matches.DERIVED_FROM).Count -gt 0,
-  @($matches.SUPERSEDES).Count -gt 0,
-  @($matches.projection_outbox).Count -gt 0
+  (@($matches.analysis_run).Count -gt 0),
+  (@($matches.analysis_artifact).Count -gt 0),
+  (@($matches.DERIVED_FROM).Count -gt 0),
+  (@($matches.SUPERSEDES).Count -gt 0),
+  (@($matches.projection_outbox).Count -gt 0)
 )
 $dagScore = @($dagSignals | Where-Object { $_ }).Count
 
@@ -943,11 +983,11 @@ Add-Gate -Id "PA-DAG-001" -Area "DAG" -Title "Revision-qualified analysis DAG" `
   -NextAction "Use immutable analysis artifacts and explicit mutation receipts before agentic repair writes."
 
 $mutationSignals = @(
-  @($matches."BEGIN TRANSACTION READ ONLY").Count -gt 0,
-  @($matches.validate_state_transition).Count -gt 0,
-  @($matches.schema_version).Count -gt 0,
-  @($matches.workspace_revision).Count -gt 0,
-  @($matches.representation_revision).Count -gt 0
+  (@($matches."BEGIN TRANSACTION READ ONLY").Count -gt 0),
+  (@($matches.validate_state_transition).Count -gt 0),
+  (@($matches.schema_version).Count -gt 0),
+  (@($matches.workspace_revision).Count -gt 0),
+  (@($matches.representation_revision).Count -gt 0)
 )
 $mutationScore = @($mutationSignals | Where-Object { $_ }).Count
 
@@ -1238,7 +1278,7 @@ $md.Add("")
 $md.Add("## Recommendations")
 $md.Add("")
 foreach ($rec in $Recommendations | Sort-Object priority, task_id) {
-  $md.Add("### $($rec.priority) $($rec.task_id) — $($rec.title)")
+  $md.Add("### $($rec.priority) $($rec.task_id) - $($rec.title)")
   $md.Add("")
   $md.Add($rec.reason)
   $md.Add("")

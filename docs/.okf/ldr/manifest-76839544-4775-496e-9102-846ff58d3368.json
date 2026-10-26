@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.okf.ldr.documentation-capture.v1",
+  "runId": "76839544-4775-496e-9102-846ff58d3368",
+  "createdAt": "2026-10-18T00:51:31.534Z",
+  "upstream": "LearningCircuit/local-deep-research",
+  "upstreamCheckoutCommit": "8239c68",
+  "fetchers": [
+    "BEAUTIFULSOUP_HTTP"
+  ],
+  "canonicalAuthority": false,
+  "datastoreWrites": false,
+  "ldrResearchJobExecuted": false,
+  "sources": [
+    {
+      "id": "ldr-api-quickstart",
+      "url": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/api-quickstart.md",
+      "title": "LearningCircuit LDR API quickstart",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "BEAUTIFULSOUP_HTTP",
+          "markdown": "docs/.okf/ldr/raw/ldr-api-quickstart.beautifulsoup.md",
+          "metadata": "docs/.okf/ldr/raw/ldr-api-quickstart.beautifulsoup.json",
+          "checksum": "a0473c1b403c5bd5d027560f615be9661ae00ceb184bcb2e8c15f7f29c7d2be1"
+        }
+      ]
+    },
+    {
+      "id": "ldr-mcp-server",
+      "url": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/mcp-server.md",
+      "title": "LearningCircuit LDR MCP server guide",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "BEAUTIFULSOUP_HTTP",
+          "markdown": "docs/.okf/ldr/raw/ldr-mcp-server.beautifulsoup.md",
+          "metadata": "docs/.okf/ldr/raw/ldr-mcp-server.beautifulsoup.json",
+          "checksum": "5cb35d04fa39d881ce9d777dfc96aecf7332250fdcb2e83cece130ea31df1965"
+        }
+      ]
+    },
+    {
+      "id": "firecrawl-scrape-api",
+      "url": "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+      "title": "Firecrawl v2 scrape API",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "BEAUTIFULSOUP_HTTP",
+          "markdown": "docs/.okf/ldr/raw/firecrawl-scrape-api.beautifulsoup.md",
+          "metadata": "docs/.okf/ldr/raw/firecrawl-scrape-api.beautifulsoup.json",
+          "checksum": "55851fecc6b3e82b318b7546032bfc96a4709f6191b7f77899a91ba8782d3cad"
+        }
+      ]
+    },
+    {
+      "id": "beautifulsoup-docs",
+      "url": "https://beautiful-soup-4.readthedocs.io/en/latest/",
+      "title": "Beautiful Soup documentation",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "BEAUTIFULSOUP_HTTP",
+          "markdown": "docs/.okf/ldr/raw/beautifulsoup-docs.beautifulsoup.md",
+          "metadata": "docs/.okf/ldr/raw/beautifulsoup-docs.beautifulsoup.json",
+          "checksum": "3afe34c5ceca336d4c1b6821afb1043070c7a8b52c474ff25a9da2084e697e84"
+        }
+      ]
+    }
+  ],
+  "status": "CAPTURED",
+  "failures": []
+}

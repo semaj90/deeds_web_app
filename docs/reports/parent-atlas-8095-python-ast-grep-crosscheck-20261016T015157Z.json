@@ -1,0 +1,55 @@
+{
+  "schema": "parent-atlas.8095-ast-grep-crosscheck-summary.v1",
+  "observedAtUtc": "2026-10-16T01:51:57.064Z",
+  "status": "PYTHON_PARSER_CLEAN_CROSSCHECK_PARTIAL",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "input": {
+    "path": "python/atlas_contract_parity/hyperedge_evidence_v1.py",
+    "sourceRevision": "sha256:d7ba8eb2c7d583ca4e5deb0357ab993d3492ecd67d4976fb75c85cc76bd69fb9",
+    "bytes": 5565,
+    "independentDiskHashMatched": true
+  },
+  "parser": {
+    "endpoint": "http://127.0.0.1:8095/ast/chunk",
+    "engine": "treesitter-chunker",
+    "engineVersion": "4.0.0",
+    "syntaxStatus": "CLEAN",
+    "nativeChunks": 8,
+    "nodeTypes": {
+      "function_definition": 2,
+      "class_definition": 5,
+      "decorated_definition": 1
+    }
+  },
+  "crosscheck": {
+    "astGrepMatches": 20,
+    "matchesCoveredByNativeChunks": 16,
+    "matchesNotCovered": 4,
+    "explicitlyCheckedStructuralMatches": 2,
+    "exactStructuralMatches": 2,
+    "enclosedStructuralMatches": 0,
+    "structuralDisagreements": 0,
+    "uncoveredClassifiedAs": "MODULE_LEVEL_TYPE_ALIAS_ASSIGNMENTS",
+    "uncoveredSymbols": [
+      "NonEmpty",
+      "Sha256",
+      "HexChecksum",
+      "ProposalChecksum"
+    ],
+    "uncoveredCrosscheckMeaning": "The Python ast-grep assignment rule detects these aliases, while the sidecar emitted function/class declaration chunks only; this is a structural-extraction coverage gap, not an observed disagreement on a comparable node type.",
+    "nativeDuplicates": 0,
+    "nativeOutOfBounds": 0
+  },
+  "executionReceipt": {
+    "path": ".tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T01-51-57-064Z-hyperedge_evidence_v1.py.json",
+    "checksum": "sha256:c08fcc0152db165b2ca2e396ef0681a61802c7ed240ea6318a6f2959e1b34743",
+    "independentChecksumMatched": true
+  },
+  "limits": [
+    "The zero-disagreement count applies only to the two AST-grep rules with declared compatible native node types; it does not cover all 20 matches.",
+    "Four AST-grep matches were not covered by any native chunk and need rule-level classification before broad parity claims.",
+    "No canonical identity, packet/chunk lineage, persistence, retrieval, or ContextManifest admission was tested."
+  ]
+}

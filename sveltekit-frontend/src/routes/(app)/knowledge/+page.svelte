@@ -287,13 +287,6 @@
 		cursor: pointer;
 	}
 
-	.provider-select {
-		padding: 0.5rem 1rem;
-		border: 2px solid #e2e8f0;
-		border-radius: 8px;
-		font-size: 0.9rem;
-	}
-
 	.samples {
 		display: flex;
 		gap: 0.5rem;
@@ -455,19 +448,6 @@
 		padding: 3rem;
 		color: #666;
 		font-size: 1.1rem;
-	}
-
-	/* Web Search Styles */
-	.web-search-toggle {
-		background: linear-gradient(135deg, #667eea15 0%, #22c55e15 100%);
-		padding: 0.5rem 1rem;
-		border-radius: 8px;
-		border: 1px solid #667eea30;
-	}
-
-	.web-search-toggle span {
-		font-weight: 500;
-		color: #22c55e;
 	}
 
 	.synthesized-answer.web-grounded {

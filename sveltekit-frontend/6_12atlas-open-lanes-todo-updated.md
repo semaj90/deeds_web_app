@@ -55,6 +55,26 @@ The board should now treat the following lanes as complete or baseline-ready:
 - **TurboVec/GpuBridge contract: complete.** Keep `TurboVecService` for ANN/compression/search and `GpuBridgeService` for numeric kernels.
 - **HyperRAG smoke: passing.** Keep smoke threshold realistic for cold-start Neo4j; prefer warm-run measurements for regression tracking.
 
+## 2026-10-23 Search routing contract — source/test verified
+
+The current `/api/search/hyperrag` route is a read-only retrieval front door, not an authority resolver or agent execution path:
+
+```text
+validated query + authenticated user
+  → QueryClassificationV1 (terms, n-grams, package candidates)
+  → bounded lexicalExpansion (unique n-grams + package candidates, max 32)
+  → SearchRuntime.search({ text: original query, lexicalExpansion, topK, source filters })
+  → normalized retrieval hits + provenance
+```
+
+- The route passes `readOnly: true`, `includeGenerated: false`, and `includeLegacy: false`. A caller-supplied workspace/source/representation revision is ignored; it cannot authorize retrieval scope or graph expansion.
+- Package candidates flow to OAK as noncanonical evidence and to the existing PostgreSQL ontology resolver via display labels. Only unique `RESOLVED` labels enter the existing BM25 expansion; ambiguous/unresolved/unavailable labels remain diagnostic and are excluded. This does not alter source identity, workspace authorization, or graph traversal.
+- Read-only PostgreSQL alias rows uniquely match `Drizzle ORM` to `concept:database`, but `SvelteKit` matches both frontend concepts; the route does not choose between them. OAK `:8095` search returned zero matches for package and broad domain labels, so it is not the resolution authority for this query.
+- Contract fixture: `Find SvelteKit 2 route functions that use Drizzle ORM`, `topK: 7` must reach SearchRuntime with the original query and lexical expansions containing `drizzle-orm` and `@sveltejs/kit`; forged revision fields must be absent. The response must report `TRUSTED_WORKSPACE_AUTHORITY_NOT_WIRED`, empty graph paths, and graph abstention when requested.
+- Validation on 2026-10-23: `src/routes/api/search/hyperrag/server.route.test.ts` passes 7/7. This is mocked route-contract proof, not a live database/SearchRuntime/ContextManifest trace.
+- Still missing: trusted server-side workspace selection and currency proof; matching graph revision and qualified edges; admitted ContextManifest assembly/readback; an authorized agent consumer. Until then graph expansion abstains and requested synthesis returns `BLOCKED_CONTEXT_MANIFEST_REQUIRED`.
+- NES LUT routing is a separate local taxonomy encoding. Its byte is metadata, not source identity, authorization, a retrieval vote, or proof of domain relevance. Keep MsgPack descriptor, ordinal bitmap, AVX2, residency, and tournament linkage in their existing OpenSpec owners; do not infer those lanes from this route test.
+
 ### New Active Lane — LangGraph Startup Orchestrator
 
 Goal: turn existing Atlas audits into a read-only startup graph that recommends and optionally queues bounded work for OpenCode/subagents.

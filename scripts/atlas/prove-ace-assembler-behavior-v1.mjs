@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildEvidenceReceiptV1, buildPortfolioCensus, verifyEvidenceReceiptV1 } from './audit-openspec-evidence-fabric-v1.mjs';
 import { recoverOpenSpecTaskIdentitiesV1 } from './recover-openspec-task-identities-v1.mjs';
+import { workspaceRevisionBindingStatusV1 } from './lib/workspace-revision-binding-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const CHANGE_ID = 'parent-atlas-compute-rank-cache-eval-dspy-gepa';
@@ -60,10 +61,12 @@ if (!symbolBinding?.packetKey || !symbolBinding.symbolVersionId || !symbolBindin
   || symbolBinding.sourceRef !== IMPLEMENTATION
   || symbolBinding.sourceRevision !== HASH(symbolSourceBytes)
   || symbolBinding.sourceBytesChecksum !== symbolBinding.sourceRevision
-  || symbolBinding.workspaceRevision !== symbolProof.exactBinding.workspaceRevision
   || !/^sha256:[a-f0-9]{64}$/.test(String(symbolBinding.workspaceRevision ?? ''))
   || symbolBinding.admissionStatus !== 'PROPOSAL_ONLY'
   || symbolBinding.canonicalAuthority !== false) throw new Error('LIVE_SYMBOL_BINDING_MISMATCH');
+if (workspaceRevisionBindingStatusV1(symbolBinding.workspaceRevision, census.source.workspaceRevision) !== 'MATCH') {
+  throw new Error('LIVE_SYMBOL_BINDING_WORKSPACE_REVISION_MISMATCH');
+}
 const symbolSpan = symbolSourceBytes.subarray(symbolBinding.byteStart, symbolBinding.byteEnd);
 if (!Number.isSafeInteger(symbolBinding.byteStart) || !Number.isSafeInteger(symbolBinding.byteEnd)
   || symbolBinding.byteStart < 0 || symbolBinding.byteEnd <= symbolBinding.byteStart

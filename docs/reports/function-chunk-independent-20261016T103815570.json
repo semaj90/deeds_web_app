@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.function-chunk-independent-readback.v1",
+  "transactionReadOnly": true,
+  "rows": [
+    {
+      "symbol_version_id": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "packet_key": "packet:804cec79a65c",
+      "chunk_row_id": "751464de-b878-45d1-a123-b416bdca780b",
+      "lineage_source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "chunk_source_revision": null,
+      "chunk_workspace_revision": null,
+      "chunk_metadata_packet_key": "8c9328db-7b66-4eb9-8761-e2817b77ce5d",
+      "chunk_metadata_symbol_version_id": null
+    },
+    {
+      "symbol_version_id": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "packet_key": "packet:804cec79a65c",
+      "chunk_row_id": "9f70b91b-ead5-466b-abbf-e2027207ceda",
+      "lineage_source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "chunk_source_revision": null,
+      "chunk_workspace_revision": null,
+      "chunk_metadata_packet_key": "9944b400-3c15-4900-9688-8263ecb224cb",
+      "chunk_metadata_symbol_version_id": null
+    }
+  ],
+  "contextManifestAdmitted": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

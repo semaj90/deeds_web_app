@@ -1,0 +1,45 @@
+{
+  "manifest_revision": "engineering-acquisition-v1-f1f3875c43153c10",
+  "workspace_revision": "UNBOUND_EXTERNAL_SOURCE_CATALOG",
+  "source_snapshot_revision": "atlas-library-docs-source-manifest-v1-2026-10-23",
+  "producer_revision": "build-engineering-acquisition-manifest-v1",
+  "output_root": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "embedding": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma-300m-f16.gguf"
+  },
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "external_programming_docs_768"
+  },
+  "features": {
+    "low_rank": 64,
+    "kmeans_clusters": 64,
+    "som": {
+      "rows": 20,
+      "columns": 20
+    }
+  },
+  "sources": [
+    {
+      "source_id": "langfuse-mastra-integration",
+      "source_revision": "sha256:d5ccb0db2506732dfb1e6f08e9977d1fe61f72e6cfead7ff7b7872f539b94f71",
+      "title": "langfuse-mastra-integration",
+      "base_urls": [
+        "https://langfuse.com/"
+      ],
+      "allowed_domains": [
+        "langfuse.com"
+      ],
+      "authority_class": "OFFICIAL_PRIMARY",
+      "default_fetcher": "BEAUTIFULSOUP_HTTP",
+      "output_namespace": "docs/.okf/engineering-acquisition/utf8-v2/langfuse-mastra-integration",
+      "maximum_pages": 1,
+      "maximum_depth": 0,
+      "follow_sitemap": false,
+      "pages": [
+        "https://langfuse.com/integrations/frameworks/mastra"
+      ]
+    }
+  ]
+}

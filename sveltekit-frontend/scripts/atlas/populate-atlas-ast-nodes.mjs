@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 /**
- * Populate atlas_ast_nodes from codebase_chunk_index.
+ * Dry-run legacy inventory of codebase_chunk_index symbols.
  *
  * Sources:
  *   - codebase_chunk_index rows with symbol + kind → one AST node per row
  *   - ast_symbols JSONB column → additional child nodes per chunk
  *
- * Contract:
- *   atlas_ast_nodes.source_content_hash is the whole-file raw-byte digest.
- *   This producer requires codebase_chunk_index.file_content_hash and never
- *   falls back to a path, symbol, or chunk hash. Missing file digests are
- *   reported in dry-run mode and fail closed before any apply write.
+ * This legacy source does not contain native Tree-sitter node identity,
+ * exact byte spans, or complete source/workspace revision bindings. It is
+ * diagnostic only and must not write canonical atlas_ast_nodes rows.
  *
  * tree_node_id = sha256(repo_id_str \x00 normalized_path \x00 parser_language \x00
  *                        node_kind \x00 qualified_symbol \x00 structural_parent_key \x00
@@ -37,6 +35,12 @@ const scopeArg  = process.argv.find(a => a.startsWith('--scope='));
 const scopePath = scopeArg ? path.resolve(scopeArg.slice('--scope='.length).trim()) : null;
 const graphifyParse = process.argv.includes('--graphify-parse');
 const declarationsOnly = process.argv.includes('--declarations-only');
+// Exact-byte input mode: read each source from the admitted snapshot instead of the working tree.
+// Every read is digest-checked against the snapshot's sourceRevision before parsing (fail closed).
+const snapshotJsonArg = process.argv.find(a => a.startsWith('--snapshot-json='));
+const snapshotJsonPath = snapshotJsonArg ? path.resolve(snapshotJsonArg.slice('--snapshot-json='.length).trim()) : null;
+const snapshotRootArg = process.argv.find(a => a.startsWith('--snapshot-root='));
+const snapshotRoot = snapshotRootArg ? path.resolve(snapshotRootArg.slice('--snapshot-root='.length).trim()) : null;
 const graphifyReportArg = process.argv.find(a => a.startsWith('--out='));
 const graphifyReportPath = graphifyReportArg
   ? path.resolve(graphifyReportArg.slice('--out='.length).trim())
@@ -80,7 +84,7 @@ const pool = new Pool({
 });
 
 const REPO_ID      = 'deeds-web-app';  // used in hash formula and structural keys
-const REPO_UUID    = '00000000-0000-0000-0000-000000000000'; // stored in uuid column
+const LEGACY_REPO_UUID = '00000000-0000-0000-0000-000000000000';
 
 // Map codebase_chunk_index.kind → atlas minimum_ast_kinds
 const KIND_MAP = {
@@ -256,15 +260,51 @@ async function runGraphifyParseProbe() {
     extractor: 'ast-grep-napi',
   };
   const allCandidates = [];
+  const snapshotEntries = snapshotJsonPath
+    ? new Map(JSON.parse(readFileSync(snapshotJsonPath, 'utf8')).sources
+        .filter((s) => s.repositoryId === 'repo:root')
+        .map((s) => [s.sourceRef, s]))
+    : null;
+  if (snapshotEntries && !snapshotRoot) throw new Error('SNAPSHOT_ROOT_REQUIRED_WITH_SNAPSHOT_JSON');
+  // Admitted workspace revision for exact-byte mode: only from an explicit, authoritative admission receipt.
+  let snapshotWorkspaceRevision = null;
+  if (snapshotEntries) {
+    const admission = JSON.parse(readFileSync(path.join(REPO_ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+    if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
+      throw new Error('ADMITTED_WORKSPACE_REVISION_REQUIRED_FOR_SNAPSHOT_MODE');
+    }
+    snapshotWorkspaceRevision = admission.workspaceRevision;
+  }
   for (const sourceRef of boundedRefs) {
-    const absolutePath = resolveGraphifyFile(sourceRef);
-    if (!absolutePath) {
-      report.filesMissing++;
-      if (report.missingSample.length < 20) report.missingSample.push(sourceRef);
-      continue;
+    let absolutePath;
+    let sourceText;
+    let snapshotEntry = null;
+    if (snapshotEntries) {
+      const entry = snapshotEntries.get(sourceRef);
+      if (!entry) {
+        report.filesMissing++;
+        if (report.missingSample.length < 20) report.missingSample.push(sourceRef);
+        continue;
+      }
+      absolutePath = path.join(snapshotRoot, sourceRef);
+      const bytes = readFileSync(absolutePath);
+      if (`sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}` !== entry.sourceRevision) {
+        report.filesDigestMismatch = (report.filesDigestMismatch ?? 0) + 1;
+        continue;
+      }
+      sourceText = bytes.toString('utf8');
+      snapshotEntry = entry;
+    } else {
+      absolutePath = resolveGraphifyFile(sourceRef);
+      if (!absolutePath) {
+        report.filesMissing++;
+        if (report.missingSample.length < 20) report.missingSample.push(sourceRef);
+        continue;
+      }
+      sourceText = readFileSync(absolutePath, 'utf8');
     }
     report.filesResolved++;
-    const extracted = graphifyAstCandidates(sourceRef, absolutePath, readFileSync(absolutePath, 'utf8'));
+    const extracted = graphifyAstCandidates(sourceRef, absolutePath, sourceText);
     if (extracted.skipped) {
       report.filesSkippedUnsupported++;
       continue;
@@ -285,6 +325,12 @@ async function runGraphifyParseProbe() {
         candidate.source_revision = packet.source_revision ?? null;
         candidate.workspace_revision = packet.workspace_revision ?? null;
         candidate.domain_class = packet.domain_class ?? null;
+      }
+      if (snapshotEntry) {
+        // Exact-byte mode: bind to the verified snapshot digest and the admitted workspace revision.
+        // Packet-index placeholders (workspace:0 / 0) are overwritten, never kept.
+        candidate.source_revision = snapshotEntry.sourceRevision;
+        candidate.workspace_revision = snapshotWorkspaceRevision;
       }
       if (candidatesOutputPath) allCandidates.push(candidate);
       report.candidatesByKind[candidate.symbol_kind] = (report.candidatesByKind[candidate.symbol_kind] ?? 0) + 1;
@@ -335,6 +381,11 @@ async function main() {
   if (graphifyParse) {
     await runGraphifyParseProbe();
     return;
+  }
+  if (!isDryRun && !isVerify) {
+    throw new Error(
+      'CANONICAL_AST_APPLY_DISABLED: this chunk-derived inventory does not prove native tree_node_id, exact byte spans, repository identity, or source/workspace revisions; use the revision-qualified Tree-sitter writer after its readback gate is implemented.'
+    );
   }
   const client = await pool.connect();
 
@@ -516,7 +567,7 @@ async function main() {
             )
             ON CONFLICT DO NOTHING
           `, [
-            n.tree_node_id, n.structural_key, REPO_UUID, n.relative_path,
+            n.tree_node_id, n.structural_key, LEGACY_REPO_UUID, n.relative_path,
             n.node_kind, n.qualified_symbol, n.parser_language, n.normalized_signature,
             n.parent_tree_node_id, n.line_start ?? 0, n.line_end ?? 0,
             n.normalized_node_hash, n.source_content_hash,

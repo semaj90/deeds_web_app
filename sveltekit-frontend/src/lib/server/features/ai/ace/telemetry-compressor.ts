@@ -55,30 +55,14 @@ export async function compressAndStoreTelemetry(
 			doc: 6
 		};
 
-		// 2. Query Postgres for source_ref_id for all source_refs
+		// 2. Resolve source_refs (parent_atlas_documents does not expose integer source_ref_id; keep raw paths in fallback x)
 		const sourceRefs = normalizeTelemetrySourceRefs(data.source_refs || []);
 		let sourceRefIds: number[] = [];
-		let unresolvedSourceRefs: string[] = [];
-		if (sourceRefs.length > 0) {
-			const res = await pool.query(
-				'SELECT DISTINCT source_ref, source_ref_id FROM parent_atlas_documents WHERE source_ref = ANY($1)',
-				[sourceRefs]
-			);
-			const sourceRefIdByRef = new Map<string, number>();
-			for (const row of res.rows as Array<{ source_ref: string | null; source_ref_id: number | string | null }>) {
-				const ref = row.source_ref ? String(row.source_ref) : '';
-				const id = Number(row.source_ref_id);
-				if (ref && Number.isFinite(id)) sourceRefIdByRef.set(ref, id);
-			}
-			sourceRefIds = sourceRefs
-				.map((ref) => sourceRefIdByRef.get(ref))
-				.filter((id): id is number => id != null);
-			unresolvedSourceRefs = sourceRefs.filter((ref) => !sourceRefIdByRef.has(ref));
-		}
+		let unresolvedSourceRefs: string[] = [...sourceRefs];
 
-		if (sourceRefIds.length === 0 && data.feature_ids?.length) {
-			const featureRes = await pool.query(
-				`SELECT DISTINCT source_ref, source_ref_id
+		if (unresolvedSourceRefs.length === 0 && data.feature_ids?.length) {
+			const featureRes = await pool.query<{ source_ref: string | null }>(
+				`SELECT DISTINCT source_ref
 				   FROM parent_atlas_documents
 				  WHERE feature_id = ANY($1)
 				    AND source_ref IS NOT NULL
@@ -88,10 +72,11 @@ export async function compressAndStoreTelemetry(
 				  ORDER BY source_ref
 				  LIMIT 8`,
 				[[...new Set(data.feature_ids)]]
-			).catch(() => ({ rows: [] as Array<{ source_ref: string | null; source_ref_id: number | string | null }> }));
-			sourceRefIds = (featureRes.rows as Array<{ source_ref: string | null; source_ref_id: number | string | null }>)
-				.map((row) => Number(row.source_ref_id))
-				.filter((id): id is number => Number.isFinite(id));
+			).catch(() => ({ rows: [] as Array<{ source_ref: string | null }> }));
+			const extraRefs = featureRes.rows
+				.map((row) => (row.source_ref ? String(row.source_ref) : ''))
+				.filter(Boolean);
+			unresolvedSourceRefs.push(...extraRefs);
 		}
 
 		// 3. Map feature_ids to codes
@@ -160,20 +145,6 @@ export async function decompressTelemetry(
 		const decodeLanes = decodeLanesRaw ? JSON.parse(decodeLanesRaw) : {};
 
 		const sourceIds = Array.isArray(packet.s) ? packet.s.map((id: unknown) => Number(id)).filter(Number.isFinite) : [];
-		const missingSourceIds = sourceIds.filter((id: number) => !decodeSources[String(id)]);
-		if (missingSourceIds.length > 0) {
-			const res = await pool.query(
-				`SELECT source_ref_id, source_ref
-				   FROM parent_atlas_documents
-				  WHERE source_ref_id = ANY($1::int[])`,
-				[[...new Set(missingSourceIds)]]
-			).catch(() => ({ rows: [] as Array<{ source_ref_id: number; source_ref: string }> }));
-			for (const row of res.rows as Array<{ source_ref_id: number; source_ref: string }>) {
-				if (row.source_ref_id != null && row.source_ref) {
-					decodeSources[String(row.source_ref_id)] = row.source_ref;
-				}
-			}
-		}
 
 		// Map integer codes back to strings
 		const sourceRefs = sourceIds

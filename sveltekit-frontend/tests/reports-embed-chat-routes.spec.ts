@@ -74,9 +74,9 @@ const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-	ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+	embedOrChatFetch: (...args: unknown[]) => mockOllamaFetch(...args),
 }));
 
 vi.mock('$lib/server/db/client', () => ({
@@ -572,6 +572,11 @@ describe('/api/reports/save (POST)', () => {
 		expect(res.status).toBe(400);
 	});
 
+	it('returns 400 when no report fields are supplied', async () => {
+		const res = await POST({ request: mkRequest({ reportId: UUID1 }), locals: authedLocals });
+		expect(res.status).toBe(400);
+	});
+
 	it('saves report successfully', async () => {
 		const { db } = await import('$lib/server/db/client');
 		const updated = { id: UUID1, title: 'Saved Report', content: '<p>Updated</p>' };
@@ -593,6 +598,25 @@ describe('/api/reports/save (POST)', () => {
 		expect(data.report.title).toBe('Saved Report');
 	});
 
+	it('persists an empty document without overwriting an omitted title', async () => {
+		const { db } = await import('$lib/server/db/client');
+		const set = vi.fn((_updates: Record<string, unknown>) => ({
+			where: vi.fn(() => ({
+				returning: vi.fn(async () => [{ id: UUID1, title: 'Existing title', content: '' }]),
+			})),
+		}));
+		(db.update as any).mockReturnValueOnce({ set });
+
+		const res = await POST({
+			request: mkRequest({ reportId: UUID1, contentHtml: '' }),
+			locals: authedLocals,
+		});
+
+		expect(res.status).toBe(200);
+		expect(set).toHaveBeenCalledWith(expect.objectContaining({ content: '', updatedAt: expect.any(Date) }));
+		expect(set.mock.calls[0][0]).not.toHaveProperty('title');
+	});
+
 	it('returns 404 when report not found', async () => {
 		const { db } = await import('$lib/server/db/client');
 		(db.update as any).mockReturnValueOnce({
@@ -604,7 +628,7 @@ describe('/api/reports/save (POST)', () => {
 		});
 
 		const res = await POST({
-      request: mkRequest({ reportId: UUID2 }),
+      request: mkRequest({ reportId: UUID2, title: 'Missing report' }),
       locals: authedLocals,
     });
 		expect(res.status).toBe(404);
@@ -621,7 +645,7 @@ describe('/api/reports/save (POST)', () => {
 		});
 
 		const res = await POST({
-      request: mkRequest({ reportId: UUID1 }),
+      request: mkRequest({ reportId: UUID1, title: 'Save failure' }),
       locals: authedLocals,
     });
 		expect(res.status).toBe(500);
@@ -667,7 +691,7 @@ describe('/api/summarize (POST)', () => {
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.summary).toBe('The court held that the defendant was liable for damages.');
-		expect(data.model).toBe('gemma4-rotorquant:latest');
+		expect(data.model).toBe('ornith-1.5-9b');
 		expect(data.confidence).toBeGreaterThan(0.5);
 	});
 
@@ -826,7 +850,7 @@ describe('/api/chat (POST)', () => {
 			ok: true,
 			json: async () => ({
 				message: { content: 'In tort law, negligence requires duty, breach, causation, and damages.' },
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			}),
 		});
 
@@ -837,7 +861,7 @@ describe('/api/chat (POST)', () => {
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.response).toContain('negligence');
-		expect(data.model).toBe('gemma4-rotorquant:latest');
+		expect(data.model).toBe('ornith-1.5-9b');
 	});
 
 	it('supports messages array format', async () => {
@@ -845,7 +869,7 @@ describe('/api/chat (POST)', () => {
 			ok: true,
 			json: async () => ({
 				message: { content: 'Yes, that is correct.' },
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			}),
 		});
 
@@ -869,7 +893,7 @@ describe('/api/chat (POST)', () => {
 			ok: true,
 			json: async () => ({
 				message: { content: 'Legal response here.' },
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			}),
 		});
 
@@ -886,7 +910,7 @@ describe('/api/chat (POST)', () => {
 		const { trackTokenUsage } = await import('$lib/server/ai/token-tracker.js');
 		mockOllamaFetch.mockResolvedValueOnce({
 			ok: true,
-			json: async () => ({ message: { content: 'Response' }, model: 'gemma4-rotorquant:latest' }),
+			json: async () => ({ message: { content: 'Response' }, model: 'ornith-1.5-9b' }),
 		});
 
 		await POST({
@@ -896,7 +920,7 @@ describe('/api/chat (POST)', () => {
 		expect(trackTokenUsage).toHaveBeenCalledWith(
 			expect.objectContaining({
 				endpoint: '/api/chat',
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			})
 		);
 	});

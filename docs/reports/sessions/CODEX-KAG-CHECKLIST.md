@@ -38,7 +38,7 @@ Use a hybrid GPU/CPU pipeline. Do not force one algorithm to solve all stages.
 
 | Stage | Task | Algorithms | Primary Libraries |
 |---|---|---|---|
-| S1 | Structural graph path search | BFS, SSSP, k-shortest paths, Personalized PageRank, random walks, Leiden/Louvain | RAPIDS cuGraph |
+| S1 | Structural ast lexical graph path search | BFS, SSSP, k-shortest paths, Personalized PageRank, random walks, Leiden/Louvain | RAPIDS cuGraph |
 | S2 | Semantic/vector neighborhood search | ANN KNN, IVF/HNSW/CAGRA, cosine/L2 batch scoring | cuVS or FAISS GPU + Qdrant/pgvector |
 | S3 | SOM/topological expansion | BMU nearest cell, fixed-radius grid expansion, flood-fill, Gaussian smoothing | CuPy or PyTorch CUDA (custom CUDA later) |
 | S4 | Manifold + cluster synthesis | UMAP-4D, PCA/SVD fallback, KMeans/HDBSCAN, community overlays | RAPIDS cuML + cuGraph |
@@ -106,7 +106,7 @@ Persistence targets:
 ## Implementation Order (P0-P3)
 
 P0 (safe prototype):
-1. Export hot subgraph from Neo4j/Postgres to JSONL.
+1. Export hot subgraph from Neo4j/Postgres to JSONL.networkx python sidecar 8095 treesitter-chunker naive bayes logistic regression, pytorch array tensor alignment for rtx cuda gemm libtorch calculations
 2. Run BFS/SSSP/PageRank in cuGraph (fallback to CPU graph lib if GPU unavailable).
 3. Join path candidates with Qdrant/pgvector semantic scores.
 4. Write `graph_pathway_cards` JSONB records.

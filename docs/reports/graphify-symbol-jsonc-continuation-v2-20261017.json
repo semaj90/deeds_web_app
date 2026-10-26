@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.graphify-symbol-jsonc-continuation.v2",
+  "generatedAt": "2026-10-17",
+  "status": "DIAGNOSTIC_DRY_RUN_PARTIAL",
+  "plan": {
+    "path": ".tmp/atlas/graphify-symbol-unprocessed-plan-v5.json",
+    "manifestChecksum": "sha256:345bc5460ecfded4c62d12506653b98babbe516b748bbd9af46fa62690bcb170",
+    "rowCount": 704,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "producerRevision": "sha256:e5c45155ac3365032ecc32c5acec31e984202453b052ba7235f80178ecba53c9",
+    "frozenCandidateChecks": 704,
+    "sourceRevisionMismatch": 0,
+    "missingSource": 0,
+    "readErrors": 0
+  },
+  "dryRun": {
+    "shardSize": 25,
+    "nonOverlappingCandidateCount": 175,
+    "wouldExtractCandidates": 175,
+    "proposedSymbolCount": 1384,
+    "sourceRevisionMismatches": 0,
+    "parseFailures": 0,
+    "datastoreWriteAttempted": false,
+    "symbolsPersisted": false,
+    "independentReadbackProven": false,
+    "shardCompletionProven": false,
+    "receipts": [
+      {"path":"docs/reports/graphify-symbol-extractor-v1-1792262283379.json","sha256":"2f1a74dfa0bed772fae1ec5e356a31a35c32317aa41c8f230f0692a4c95ecd24","offset":0,"count":25,"symbols":402},
+      {"path":"docs/reports/graphify-symbol-extractor-v1-1792262313724.json","sha256":"da251996815742db1b032f63e3e8421d5f2f10b65358440d4b562b48d114032b","offset":250,"count":25,"symbols":168},
+      {"path":"docs/reports/graphify-symbol-extractor-v1-1792262345168.json","sha256":"ae8a0f9a2fc69d811e0386ef957cbe1367ba7f506de1b4050c0f3d64941f602a","offset":275,"count":25,"symbols":221},
+      {"path":"docs/reports/graphify-symbol-extractor-v1-1792262347330.json","sha256":"cbd5f5fe60512983942ce513227a9b77e10ae5572ffd3d731f412387a6c45f51","offset":300,"count":25,"symbols":176},
+      {"path":"docs/reports/graphify-symbol-extractor-v1-1792262348027.json","sha256":"ee55a2488dcd1669576b6f7c8da088b2ff8c4dc404147b6e1d3a2d5883550dd3","offset":325,"count":25,"symbols":107},
+      {"path":"docs/reports/graphify-symbol-extractor-v1-1792262349269.json","sha256":"4e1dab618beb3925f7db8c94236d7a8ca97ff878179420a015c21f4872e26cd8","offset":350,"count":25,"symbols":175},
+      {"path":"docs/reports/graphify-symbol-extractor-v1-1792262387833.json","sha256":"d352fc7989655a95d15c956a5e0e13b95b694c6c954a758cfff4b7db8cae3d50","offset":375,"count":25,"symbols":135}
+    ]
+  },
+  "overlapDiagnostic": {
+    "path": "docs/reports/graphify-symbol-extractor-v1-1792262903964.json",
+    "sha256": "b2aa22dc0f1e9a9bcbffd22fdd8ebc63189aecd1f6822e3cbad2f3fd68dcd163",
+    "candidateOffset": 300,
+    "candidateCount": 1,
+    "symbolsExtracted": 15,
+    "status": "SHARD_INCOMPLETE",
+    "countedInNonOverlappingTotal": false,
+    "reason": "A one-row size-1 partition overlaps the already counted size-25 range 300..324; receipt does not prove shard completion or readback."
+  },
+  "scope": {
+    "canonicalAuthority": false,
+    "productionMutations": false,
+    "graphifyDailyRun": false,
+    "gpuWork": false,
+    "admissionPromoted": false,
+    "otherFivePredicatesClosed": false
+  },
+  "limitations": [
+    "The 175 candidates are dry-run extraction observations only; no symbol rows were persisted or independently read back.",
+    "The extractor receipts use SHARD_INCOMPLETE because the proof requires persistence/readback and the run was intentionally non-applying.",
+    "The repeated one-row diagnostic is overlapping evidence and is excluded from the 175-candidate total.",
+    "No claim is made for the untested portion of the 704-candidate cohort or for full symbol coverage.",
+    "The remaining admission predicates and production qualification remain open."
+  ]
+}

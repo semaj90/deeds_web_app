@@ -33,9 +33,12 @@ import os
 import time
 from typing import Any
 
+import numpy as np
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+from knn_contract import canonical_candidate_ordinals, deterministic_topk_with_boundary, l2_normalize_f32
 
 try:
     import uvicorn
@@ -227,6 +230,18 @@ _MAX_CORPUS_ROWS = int(os.getenv("ATLAS_RAPIDS_KNN_MAX_ROWS", "25000"))
 _MIN_FREE_GPU_MB = float(os.getenv("ATLAS_RAPIDS_KNN_MIN_FREE_GPU_MB", "512"))
 _EXPECTED_DIMENSION = 768
 
+# Exact-KNN metric contract (KNN-TOPK-02/03). Owner: GPU-09A. Vectors are
+# L2-normalized into float32 copies inside the sidecar; request vectors are never
+# mutated. Distances are cosine distance (lower is better). Ties are resolved by
+# canonical identity, not by corpus position. The CAGRA path is not covered.
+KNN_METRIC_CONTRACT = {
+    "metric": "cosine_distance",
+    "definition": "1 - cos(query, row) on L2-normalized float32 copies",
+    "scoreDirection": "lower_is_better",
+    "normalization": "l2_float32_copy_inside_sidecar",
+    "tieBreak": "float32 distance ascending, then canonical candidate ordinal ascending (rank of (packetKey, sourceRevision) in the snapshot)",
+    "boundaryRule": "fetch max(k+1, 2k) rows, growing until the next fetched distance exceeds the k-th distance or the full corpus is searched (knn_contract.deterministic_topk_with_boundary)",
+}
 
 class KnnQuery(BaseModel):
     vector: list[float]
@@ -274,11 +289,19 @@ class ExactKnnResponse(BaseModel):
     gpuMemoryAfterMb: float | None
     durationMs: float
     truncated: bool
+    metric: str = KNN_METRIC_CONTRACT["metric"]
+    scoreDirection: str = KNN_METRIC_CONTRACT["scoreDirection"]
+    normalization: str = KNN_METRIC_CONTRACT["normalization"]
+    tieBreak: str = KNN_METRIC_CONTRACT["tieBreak"]
 
 
 class CagraKnnResponse(ExactKnnResponse):
     operation: str = "knn.cagra"
     backend: str = "cuvs.cagra"
+    # CAGRA is quarantined and still uses the unverified sqeuclidean path.
+    metric: str = "sqeuclidean_unverified"
+    normalization: str = "none"
+    tieBreak: str = "none"
 
 
 def _fail_closed(code: str, message: str) -> None:
@@ -339,6 +362,13 @@ def _device_rows_to_list(device_array: Any) -> list[Any]:
     return host_array.tolist()
 
 
+def _device_rows_to_list_array(device_array: Any) -> "np.ndarray":
+    host_array = cp.asnumpy(device_array)
+    if getattr(host_array, "ndim", 1) > 1:
+        host_array = host_array[0]
+    return host_array
+
+
 @app.post("/v1/knn/exact", response_model=ExactKnnResponse)
 def knn_exact(req: ExactKnnRequest) -> ExactKnnResponse:
     t0 = time.time()
@@ -347,27 +377,41 @@ def knn_exact(req: ExactKnnRequest) -> ExactKnnResponse:
     # brute_force is already imported (probed) at module scope above — reuse it
     # rather than re-importing, which pyflakes correctly flags as a shadowing
     # redefinition even though both names resolve to the same object.
-    query_arr = cp.asarray([req.query.vector], dtype=cp.float32)
-    corpus_arr = cp.asarray([row.vector for row in req.corpus], dtype=cp.float32)
+    try:
+        query_host = l2_normalize_f32(np.asarray([req.query.vector], dtype=np.float32))
+        corpus_host = l2_normalize_f32(np.asarray([row.vector for row in req.corpus], dtype=np.float32))
+    except ValueError as exc:
+        _fail_closed("ZERO_OR_NONFINITE_NORM", f"vector normalization rejected: {exc}")
 
-    index = brute_force.build(corpus_arr)
-    # Correct return order confirmed this session (GS1.31-33): brute_force.search
-    # returns (distances, neighbors), NOT (neighbors, distances) — a real bug was
-    # found and fixed in the earlier proof script from exactly this swap.
-    distances, neighbors = brute_force.search(index, query_arr, k=req.topK)
+    identities = [(row.packetKey, row.sourceRevision) for row in req.corpus]
+    candidate_ordinals = canonical_candidate_ordinals(identities)
+    # Keep the device arrays in named locals for the whole call: cuVS holds a view of
+    # the dataset, not a copy, so a temporary cp.asarray(...) can be freed and reused
+    # while the index is still searched (illegal memory access observed in testing).
+    corpus_dev = cp.asarray(corpus_host)
+    query_arr = cp.asarray(query_host)
+    index = brute_force.build(corpus_dev, metric="cosine")
 
-    neighbor_idx = _device_rows_to_list(neighbors)
-    neighbor_dist = _device_rows_to_list(distances)
+    def _search(k: int) -> tuple[list[float], list[int]]:
+        # Return order confirmed (GS1.31-33): brute_force.search returns (distances, neighbors).
+        # .tolist() yields plain Python floats/ints, which the shared contract validates.
+        distances, neighbors = brute_force.search(index, query_arr, k=k)
+        return (
+            _device_rows_to_list_array(distances).astype(np.float32).tolist(),
+            _device_rows_to_list_array(neighbors).astype(np.int64).tolist(),
+        )
+
+    ranked = deterministic_topk_with_boundary(_search, candidate_ordinals, limit=req.topK)
 
     results = [
         ExactKnnHit(
             rank=rank + 1,
-            packetKey=req.corpus[idx].packetKey,
-            sourceRevision=req.corpus[idx].sourceRevision,
-            symbolVersionId=req.corpus[idx].symbolVersionId,
-            distance=float(dist),
+            packetKey=req.corpus[position].packetKey,
+            sourceRevision=req.corpus[position].sourceRevision,
+            symbolVersionId=req.corpus[position].symbolVersionId,
+            distance=float(distance),
         )
-        for rank, (idx, dist) in enumerate(zip(neighbor_idx, neighbor_dist))
+        for rank, (distance, _ordinal, position) in enumerate(ranked)
     ]
 
     mem_after = _gpu_memory_mb()

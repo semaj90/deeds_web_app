@@ -1,0 +1,124 @@
+{
+ "schema": "atlas.kmeans-raw768-nprobe-sweep.v1",
+ "generatedAt": "2026-10-18",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuUsed": false,
+ "canonicalAuthority": false,
+ "recipe": "RAW content_embedding_768",
+ "k": 256,
+ "train": 197987,
+ "queries": 1000,
+ "topK": 10,
+ "algo": "lloyd",
+ "bySeed": {
+  "42": {
+   "1": {
+    "recallAt10": 0.6724,
+    "p10Recall": 0.2,
+    "candidateFraction": 0.0048,
+    "recallOverNull": 140.7
+   },
+   "2": {
+    "recallAt10": 0.7847,
+    "p10Recall": 0.3,
+    "candidateFraction": 0.0096,
+    "recallOverNull": 81.6
+   },
+   "3": {
+    "recallAt10": 0.8389,
+    "p10Recall": 0.5,
+    "candidateFraction": 0.0143,
+    "recallOverNull": 58.6
+   },
+   "5": {
+    "recallAt10": 0.8898,
+    "p10Recall": 0.6,
+    "candidateFraction": 0.0235,
+    "recallOverNull": 37.8
+   },
+   "8": {
+    "recallAt10": 0.9277,
+    "p10Recall": 0.8,
+    "candidateFraction": 0.038,
+    "recallOverNull": 24.4
+   },
+   "16": {
+    "recallAt10": 0.9634,
+    "p10Recall": 0.9,
+    "candidateFraction": 0.0757,
+    "recallOverNull": 12.7
+   },
+   "32": {
+    "recallAt10": 0.9846,
+    "p10Recall": 0.9,
+    "candidateFraction": 0.1488,
+    "recallOverNull": 6.6
+   }
+  },
+  "43": {
+   "1": {
+    "recallAt10": 0.6784,
+    "p10Recall": 0.2,
+    "candidateFraction": 0.0051,
+    "recallOverNull": 133.2
+   },
+   "2": {
+    "recallAt10": 0.795,
+    "p10Recall": 0.4,
+    "candidateFraction": 0.0104,
+    "recallOverNull": 76.7
+   },
+   "3": {
+    "recallAt10": 0.8511,
+    "p10Recall": 0.5,
+    "candidateFraction": 0.0152,
+    "recallOverNull": 55.8
+   },
+   "5": {
+    "recallAt10": 0.8978,
+    "p10Recall": 0.6,
+    "candidateFraction": 0.0249,
+    "recallOverNull": 36.0
+   },
+   "8": {
+    "recallAt10": 0.9322,
+    "p10Recall": 0.8,
+    "candidateFraction": 0.0396,
+    "recallOverNull": 23.5
+   },
+   "16": {
+    "recallAt10": 0.9652,
+    "p10Recall": 0.9,
+    "candidateFraction": 0.079,
+    "recallOverNull": 12.2
+   },
+   "32": {
+    "recallAt10": 0.9865,
+    "p10Recall": 1.0,
+    "candidateFraction": 0.154,
+    "recallOverNull": 6.4
+   }
+  }
+ },
+ "clusterSizesMinMedMax": {
+  "42": [
+   35,
+   776,
+   2101
+  ],
+  "43": [
+   69,
+   780,
+   3678
+  ]
+ },
+ "caveats": [
+  "self-query proxy (holdout chunks), NOT a golden query set",
+  "same-source_ref chunks excluded from truth and candidates",
+  "exact search inside probed clusters; no HNSW/ANN effects",
+  "recall = share of the exact top-K kept by the partition; says nothing about answer quality",
+  "seed-to-seed ARI ~0.45, so compare seeds before trusting any single number"
+ ],
+ "checksum": "sha256:275f9631753f0d0d55211bb22db5b64b4d4134562fdd6de56d1eee96ac32a442"
+}

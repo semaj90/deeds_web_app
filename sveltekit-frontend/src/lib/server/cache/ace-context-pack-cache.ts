@@ -8,7 +8,8 @@ import {
   type AceContextCacheMetrics,
 } from './ace-context-cache-metrics.js';
 import { buildAceContextManifestCacheKeyV1 } from '../atlas/cache/ace-bitfrost-cache-identity-v1.js';
-import { ContextManifestV2Schema, type ContextManifestV2 } from '../atlas/graph/context-manifest-v2.js';
+import { buildContextManifestV2, ContextManifestV2Schema, type ContextManifestV2 } from '../atlas/graph/context-manifest-v2.js';
+import { canonicalSha256V1 } from '../atlas/prefill/canonical-hash-v1.js';
 
 // ACE Context Pack Cache — skeleton implementation
 // Purpose:
@@ -397,10 +398,18 @@ export async function getRevisionedAceContextPackV1(
     const storedManifest = 'manifest' in parsed && parsed.manifest
       ? ContextManifestV2Schema.safeParse(parsed.manifest)
       : null;
+    const recomputedManifest = storedManifest?.success
+      ? buildContextManifestV2(storedManifest.data.v1, storedManifest.data.identityInput)
+      : null;
+    const manifestBodyMatches = storedManifest?.success
+      && canonicalSha256V1(storedManifest.data.v1) === canonicalSha256V1(manifest.v1);
     if (
       !('pack' in parsed) ||
       !parsed.pack ||
       !storedManifest?.success ||
+      !recomputedManifest ||
+      !manifestBodyMatches ||
+      recomputedManifest.identityChecksum !== storedManifest.data.identityChecksum ||
       parsed.manifestChecksum !== storedManifest.data.identityChecksum ||
       storedManifest.data.identityChecksum !== manifest.identityChecksum
     ) {

@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
 import { buildGraphifyStructuralProjectionPipelineV1 } from './graphify-structural-projection-pipeline-v1.js';
+import { buildGraphifyStructuralProjectionBatchV1 } from './graphify-structural-projection-batch-v1.js';
 import type { StructuralMaterializationResult } from './graphify-structural-materializer.js';
 
 const source = 'export function PATCH() { return authorizeCase(); }';
@@ -129,5 +130,33 @@ describe('Graphify structural projection pipeline v1', () => {
     const second = buildGraphifyStructuralProjectionPipelineV1(input());
 
     expect(second.checksum).toBe(first.checksum);
+  });
+
+  it('builds shared import contexts for an exact multi-file source cohort without writes', () => {
+    const secondSourceRef = 'src/lib/server/authorize.ts';
+    const secondInput = input({
+      sourceRef: secondSourceRef,
+      sourceBinding: {
+        ...input().sourceBinding,
+        fileId: '32345678-1234-4234-8234-123456789012',
+        sourceRef: secondSourceRef,
+      },
+      materialization: {
+        ...materialization(),
+        sourceRef: secondSourceRef,
+        evidence: { ...materialization().evidence!, file_path: secondSourceRef },
+      },
+    });
+
+    const result = buildGraphifyStructuralProjectionBatchV1([input(), secondInput]);
+
+    expect(result.status).toBe('MAPPED');
+    expect(result.pipelines).toHaveLength(2);
+    expect(result.importContextChecksum).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.pipelines.map((pipeline) => pipeline.sourceRef)).toEqual([
+      'src/lib/server/authorize.ts', sourceRef,
+    ]);
+    expect(result.canonicalAuthority).toBe(false);
+    expect(result.writesPerformed).toBe(false);
   });
 });

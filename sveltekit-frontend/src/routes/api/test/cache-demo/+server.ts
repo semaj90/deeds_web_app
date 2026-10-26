@@ -13,11 +13,12 @@ import type { RequestHandler } from './$types';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { getExactMatchStats } from '$lib/server/cache/redis-exact-match.js';
 import { z } from 'zod';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 const cacheDemoSchema = z.object({
   query: z.string().max(1000).default('What is hearsay evidence in criminal law?'),
   runs: z.number().int().min(1).max(10).default(3),
-  model: z.string().max(100).default('gemma3:270m'),
+  model: z.literal(SERVER_CHAT_MODEL).default(SERVER_CHAT_MODEL),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {

@@ -77,6 +77,28 @@ describe('persistTaxonomyAssignmentCandidates', () => {
 });
 
 describe('decideTaxonomyAssignmentCandidateV1', () => {
+  it('rejects a graph revision mismatch before changing candidate status or persisting a hyperedge', async () => {
+    queryMock.mockClear();
+    persistHyperedgesMock.mockClear();
+    const row = candidateRow();
+    queryMock.mockResolvedValueOnce({ rows: [row] });
+    const { decideTaxonomyAssignmentCandidateV1 } = await import('./kag-taxonomy-candidate-postgres.js');
+
+    await expect(decideTaxonomyAssignmentCandidateV1({
+      candidateId: row.candidate_id as string,
+      decision: 'promoted',
+      reviewedBy: 'reviewer-1',
+      workspaceRevision: 'workspace:1',
+      sourceRevision: 'source:1',
+      graphRevision: 'graph:other',
+      promotionEvidenceRefs: ['review:approved:1'],
+      producerRevision: 'review:1',
+    })).rejects.toThrow(`TAXONOMY_PROMOTION_GRAPH_REVISION_MISMATCH:${row.candidate_id}`);
+
+    expect(queryMock).toHaveBeenCalledTimes(1);
+    expect(persistHyperedgesMock).not.toHaveBeenCalled();
+  });
+
   it('throws a coded error when the candidate does not exist', async () => {
     queryMock.mockClear();
     queryMock.mockResolvedValueOnce({ rows: [] });
@@ -164,7 +186,7 @@ describe('decideTaxonomyAssignmentCandidateV1', () => {
       reviewedBy: 'reviewer-1',
       workspaceRevision: 'workspace:1',
       sourceRevision: 'source:1',
-      graphRevision: 'graph:1',
+      graphRevision: 'graph:9',
       promotionEvidenceRefs: ['review:approved:1'],
       producerRevision: 'review:1',
     });
@@ -198,7 +220,7 @@ describe('decideTaxonomyAssignmentCandidateV1', () => {
       reviewedBy: 'reviewer-1',
       workspaceRevision: 'workspace:1',
       sourceRevision: 'source:1',
-      graphRevision: 'graph:1',
+      graphRevision: 'graph:9',
       promotionEvidenceRefs: ['review:approved:1'],
       producerRevision: 'review:1',
     });
@@ -222,7 +244,7 @@ describe('decideTaxonomyAssignmentCandidateV1', () => {
       reviewedBy: 'reviewer-1',
       workspaceRevision: 'workspace:1',
       sourceRevision: 'source:1',
-      graphRevision: 'graph:1',
+      graphRevision: 'graph:9',
       promotionEvidenceRefs: ['review:approved:1'],
       producerRevision: 'review:1',
     });

@@ -21,6 +21,29 @@ def test_declarator_kind_override_unit_cases():
     assert override('interface_declaration', 'interface Foo { bar: () => void }') is None
 
 
+def test_ast_evidence_byte_span_validator_rejects_invalid_and_duplicate_spans():
+    chunk = sidecar_v2.AstEvidenceChunkV2(
+        upstream_node_id='node:1', node_type='function_declaration', kind='function',
+        start_byte=0, end_byte=4, start_line=1, start_column=0, end_line=1, end_column=4,
+    )
+    duplicate = chunk.model_copy()
+    assert sidecar_v2.validate_ast_evidence_byte_spans([chunk, duplicate], b'test') == [
+        {'index': 1, 'code': 'DUPLICATE_SPAN'}
+    ]
+    invalid_boundary = chunk.model_copy(update={'start_byte': 1, 'end_byte': 2})
+    assert sidecar_v2.validate_ast_evidence_byte_spans([invalid_boundary], 'é'.encode('utf-8')) == [
+        {'index': 0, 'code': 'SPAN_NOT_UTF8_BOUNDARY'}
+    ]
+    out_of_bounds = chunk.model_copy(update={'start_byte': 0, 'end_byte': 5})
+    assert sidecar_v2.validate_ast_evidence_byte_spans([out_of_bounds], b'test') == [
+        {'index': 0, 'code': 'SPAN_OUT_OF_BOUNDS'}
+    ]
+    malformed_utf8 = chunk.model_copy(update={'start_byte': 0, 'end_byte': 2})
+    assert sidecar_v2.validate_ast_evidence_byte_spans([malformed_utf8], bytes([0xC0, 0xAF])) == [
+        {'index': 0, 'code': 'SPAN_NOT_UTF8_BOUNDARY'}
+    ]
+
+
 def _run_single_chunk(monkeypatch, *, node_type: str, source: str, name: str):
     raw = SimpleNamespace(
         content=source,
@@ -81,3 +104,51 @@ def test_native_ast_evidence_leaves_non_function_variable_declarator_as_fragment
         name='count',
     )
     assert chunk.kind == 'fragment'
+
+
+def test_native_ast_evidence_derives_function_signature_and_ancestor_spans(monkeypatch):
+    source = 'export function resolve(value: string): number { return value.length; }'
+    chunk = _run_single_chunk(
+        monkeypatch,
+        node_type='function_declaration',
+        source=source,
+        name='resolve',
+    )
+    assert chunk.signature_text == 'function resolve(value: string): number '
+    assert chunk.syntax_ancestry
+    assert chunk.syntax_ancestry[-1]['node_type'] == 'export_statement'
+    assert source.encode('utf-8')[chunk.syntax_ancestry[-1]['start_byte']:chunk.syntax_ancestry[-1]['end_byte']] == source.encode('utf-8')
+
+
+def test_syntax_node_index_keeps_matching_scoped_to_node_type_and_span():
+    source = 'export function first() {}\nfunction second() {}'
+    source_bytes = source.encode('utf-8')
+    root = sidecar_v2.legacy.get_parser('typescript').parse(source_bytes).root_node
+    node_index = sidecar_v2._index_syntax_nodes(root)
+    first_start = source_bytes.index(b'function first')
+    first_end = source_bytes.index(b'\n')
+
+    signature, ancestry = sidecar_v2._syntax_signature_and_ancestry(
+        source_bytes,
+        node_index,
+        'function_declaration',
+        first_start,
+        first_end,
+        'first',
+    )
+
+    assert signature == 'function first() '
+    assert ancestry[-1]['node_type'] == 'export_statement'
+    assert sidecar_v2._byte_offset_line_column(source_bytes, [0, source_bytes.index(b'\n') + 1], first_start) == (1, 7)
+
+
+def test_native_ast_evidence_leaves_signature_missing_when_parser_evidence_is_ambiguous(monkeypatch):
+    source = 'function resolve() {} function resolve() {}'
+    chunk = _run_single_chunk(
+        monkeypatch,
+        node_type='function_declaration',
+        source=source,
+        name='resolve',
+    )
+    assert chunk.signature_text is None
+    assert chunk.syntax_ancestry == []

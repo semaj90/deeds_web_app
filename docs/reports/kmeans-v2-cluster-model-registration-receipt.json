@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.kmeans-v2-cluster-model-registration.v1",
+  "generatedAt": "2026-10-18T06:39:56.909Z",
+  "mode": "APPLY",
+  "writesPerformed": true,
+  "canonicalAuthority": false,
+  "insertedRow": {
+    "id": 6,
+    "model_version": "mbk-spherical-content768-k256-v2",
+    "k": 256,
+    "dim": 768,
+    "is_assignment_active": false,
+    "model_role": "EVALUATION_CANDIDATE",
+    "vector_contract": "eg-task-prefix-v1"
+  },
+  "artifactSha256": "sha256:58d6db30f30fc8883599cb8dd25996a8a7da4466116360e03e68f4fab3c7392d",
+  "readbackVerified": true,
+  "status": "REGISTRATION_COMPLETE"
+}

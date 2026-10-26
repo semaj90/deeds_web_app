@@ -1,31 +1,53 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { _resolveRouteFields } from '../+page.server.js';
+import { astNodeToRouteNode, resolveRouteFields } from '../route-lineage.js';
 
-// Placeholder tests for all-routes
-// These will be implemented as features are built
+describe('All Routes Page & AST Node Mapping', () => {
+	it('normalizes phase72 routePath and filePath into RouteNode shape with PROVEN lineage', () => {
+		expect(_resolveRouteFields).toBe(resolveRouteFields);
+		const astNode = {
+			id: 'route__app__admin_atlas',
+			routePath: '/admin/atlas',
+			filePath: 'src/routes/(app)/admin/atlas/+page.svelte',
+			kind: 'page',
+		};
 
-describe('All Routes Page', () => {
-  it('should pass basic test', () => {
-    expect(true).toBe(true);
-  });
+		const resolved = resolveRouteFields(astNode);
+		expect(resolved.ok).toBe(true);
+		if (resolved.ok) {
+			expect(resolved.rawPath).toBe('/admin/atlas');
+			expect(resolved.file).toContain('+page.svelte');
+			expect(resolved.source).toBe('route_ast_graph');
+			expect(resolved.lineageStatus).toBe('PROVEN');
+		}
 
-  it('should handle route data', () => {
-    const mockRoute = {
-      id: 'test-route',
-      path: '/test',
-      kind: 'page' as const,
-      errorCount: 0,
-      warningCount: 0,
-      infoCount: 0,
-      errorState: 'healthy' as const,
-      status: 'ok' as const
-    };
+		const node = astNodeToRouteNode(astNode);
+		expect(node).not.toBeNull();
+		expect(node?.path).toBe('/admin/atlas');
+		expect(node?.group).toBe('(admin)');
+		expect(node?.source).toBe('route_ast_graph');
+		expect(node?.lineageStatus).toBe('PROVEN');
+	});
 
-    expect(mockRoute.id).toBe('test-route');
-    expect(mockRoute.errorState).toBe('healthy');
-  });
+	it('rejects records missing a valid routePath or path with MISSING_ROUTE_PATH', () => {
+		const invalidNode = {
+			id: 'orphan_node',
+			filePath: 'src/routes/(app)/orphan/+page.svelte',
+		};
 
-  it('should handle SSE updates (placeholder)', () => {
-    // Will implement when SSE functionality is tested
-    expect(true).toBe(true);
-  });
+		const resolved = resolveRouteFields(invalidNode);
+		expect(resolved.ok).toBe(false);
+		if (!resolved.ok) {
+			expect(resolved.reason).toBe('MISSING_ROUTE_PATH');
+		}
+
+		expect(astNodeToRouteNode(invalidNode)).toBeNull();
+	});
+
+	it('classifies /demos/* and /api/* routes into dedicated groups', () => {
+		expect(astNodeToRouteNode({ id: 'd1', routePath: '/demos/webgpu-memory-palace', filePath: 'src/routes/(app)/demos/webgpu-memory-palace/+page.svelte' })?.group).toBe('(demos)');
+		expect(astNodeToRouteNode({ id: 'a1', routePath: '/admin/all-routes', filePath: 'src/routes/(app)/admin/all-routes/+page.svelte' })?.group).toBe('(admin)');
+		expect(astNodeToRouteNode({ id: 'api1', routePath: '/api/routes/metadata', filePath: 'src/routes/api/routes/metadata/+server.ts' })?.group).toBe('(api)');
+	});
 });
+

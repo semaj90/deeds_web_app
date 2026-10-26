@@ -20,7 +20,7 @@ const OUTPUT_JSONL_PATH = path.join(REPO_ROOT, '.tmp', 'sourceRef-first-nes-glyp
 const DEFAULT_DATABASE_URL = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const DEFAULT_REDIS_URL = 'redis://127.0.0.1:6379';
 const DEFAULT_BIFROST_URL = 'http://127.0.0.1:3040';
-const DEFAULT_BIFROST_MODEL = 'ollama/gemma4-rotorquant:latest';
+const DEFAULT_BIFROST_MODEL = 'ollama/ornith-1.5-9b';
 const FALLBACK_BIFROST_MODEL = 'ollama/ibm/granite-docling:258m';
 const BIFROST_REQUEST_TIMEOUT_MS = Number(process.env.SOURCE_REF_BIFROST_TIMEOUT_MS || 20_000);
 

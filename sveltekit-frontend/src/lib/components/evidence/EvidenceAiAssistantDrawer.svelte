@@ -5,7 +5,7 @@
 	import EvidenceAssistant from '$lib/components/evidence/EvidenceAssistant.svelte';
 	import ContextualEvidenceChatModal from '$lib/components/ai/ContextualEvidenceChatModal.svelte';
 	import LegalDocumentSummarizer from '$lib/components/ai/LegalDocumentSummarizer.svelte';
-	import Gemma270MWebAssembly from '$lib/components/ai/Gemma270MWebAssembly.svelte';
+	import WebGPUGemma4MtpAssistant from '$lib/components/ai/WebGPUGemma4MtpAssistant.svelte';
 	import VisionImageAnalyzer from '$lib/components/evidence/VisionImageAnalyzer.svelte';
 	import ContradictionReveal from '$lib/components/yorha/ContradictionReveal.svelte';
 	import LegalAnalysisDialog from '$lib/components/LegalAnalysisDialog.svelte';
@@ -41,7 +41,7 @@
 		{ id: 'assistant', label: 'AI Assistant' },
 		{ id: 'chat', label: 'Evidence Chat' },
 		{ id: 'summarizer', label: 'Summarizer' },
-		{ id: 'vlm', label: 'Image Analysis' },
+		{ id: 'vlm', label: 'Gemma 4 MTP' },
 		{ id: 'vision', label: 'Vision Pipeline' }
 	];
 
@@ -153,7 +153,7 @@
 					</Svelte5TabPanel>
 
 					<Svelte5TabPanel value="vlm">
-						<Gemma270MWebAssembly {caseId} />
+						<WebGPUGemma4MtpAssistant {caseId} />
 					</Svelte5TabPanel>
 
 					<Svelte5TabPanel value="vision">

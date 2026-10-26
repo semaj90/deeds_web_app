@@ -1,0 +1,370 @@
+{
+  "schema": "atlas.task-semantic-packets-live-schema-audit.v1",
+  "generatedAt": "2026-10-17T17:12:04.446Z",
+  "readOnlyTransaction": "ROLLED_BACK",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "table": "public.task_semantic_packets",
+  "columnCount": 39,
+  "reconciliation": {
+    "aliasIdPresent": true,
+    "aliasIdColumn": {
+      "column_name": "alias_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    "featureIdPresent": true,
+    "featureIdColumn": {
+      "column_name": "feature_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    "sourceRefPresent": true,
+    "sourceRefColumn": {
+      "column_name": "source_ref",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    }
+  },
+  "rowStats": {
+    "total_rows": 2,
+    "rows_with_alias_id": 2,
+    "rows_with_feature_id": 2,
+    "rows_with_source_ref": 2,
+    "rows_with_workspace_task_id": 0,
+    "rows_with_qdrant_point_id": 2,
+    "rows_with_summary_llm": 2,
+    "rows_with_cluster_id": 0
+  },
+  "indexes": [
+    {
+      "indexname": "idx_task_semantic_packets_agent_pickup_ready",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_agent_pickup_ready ON public.task_semantic_packets USING btree (agent_pickup_ready)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_alias_id",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_alias_id ON public.task_semantic_packets USING btree (alias_id)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_feature_id",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_feature_id ON public.task_semantic_packets USING btree (feature_id)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_metadata",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_metadata ON public.task_semantic_packets USING gin (metadata)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_metadata_gin",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_metadata_gin ON public.task_semantic_packets USING gin (metadata)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_packet_key",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_packet_key ON public.task_semantic_packets USING btree (packet_key)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_source_ref",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_source_ref ON public.task_semantic_packets USING btree (source_ref)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_status_feature",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_status_feature ON public.task_semantic_packets USING btree (status, feature_id)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_validation_status",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_validation_status ON public.task_semantic_packets USING btree (validation_status)"
+    },
+    {
+      "indexname": "idx_task_semantic_packets_workspace_task_created",
+      "indexdef": "CREATE INDEX idx_task_semantic_packets_workspace_task_created ON public.task_semantic_packets USING btree (workspace_task_id, created_at DESC)"
+    },
+    {
+      "indexname": "task_semantic_packets_packet_key_key",
+      "indexdef": "CREATE UNIQUE INDEX task_semantic_packets_packet_key_key ON public.task_semantic_packets USING btree (packet_key)"
+    },
+    {
+      "indexname": "task_semantic_packets_pkey",
+      "indexdef": "CREATE UNIQUE INDEX task_semantic_packets_pkey ON public.task_semantic_packets USING btree (id)"
+    }
+  ],
+  "columns": [
+    {
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": "gen_random_uuid()"
+    },
+    {
+      "column_name": "packet_key",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "source_ref",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "feature_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "feature_label",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "alias_id",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "qdrant_score",
+      "data_type": "real",
+      "udt_name": "float4",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "cluster_score",
+      "data_type": "real",
+      "udt_name": "float4",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "topological_score",
+      "data_type": "real",
+      "udt_name": "float4",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "fusion_score",
+      "data_type": "real",
+      "udt_name": "float4",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "metadata",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "semantic_vector",
+      "data_type": "USER-DEFINED",
+      "udt_name": "vector",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "validation_status",
+      "data_type": "character varying",
+      "udt_name": "varchar",
+      "is_nullable": "NO",
+      "column_default": "'pending'::character varying"
+    },
+    {
+      "column_name": "error_message",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "point_kind",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "'task_summary'::text"
+    },
+    {
+      "column_name": "qdrant_point_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "workspace_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "workspace_task_id",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "file_path",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "semantic_path",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "related_feature_ids",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "related_task_ids",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "related_file_paths",
+      "data_type": "jsonb",
+      "udt_name": "jsonb",
+      "is_nullable": "NO",
+      "column_default": "'[]'::jsonb"
+    },
+    {
+      "column_name": "cluster_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "centroid_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "parent_centroid_id",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "summary_llm",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "summary_model",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "next_action",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "summary_hash",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "confidence",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "status",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "NO",
+      "column_default": "'todo'::text"
+    },
+    {
+      "column_name": "agent_pickup_ready",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "false"
+    },
+    {
+      "column_name": "observed_at",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "valid_from",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "NO",
+      "column_default": "now()"
+    },
+    {
+      "column_name": "valid_to",
+      "data_type": "timestamp with time zone",
+      "udt_name": "timestamptz",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "deleted",
+      "data_type": "boolean",
+      "udt_name": "bool",
+      "is_nullable": "NO",
+      "column_default": "false"
+    }
+  ]
+}

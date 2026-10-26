@@ -41,3 +41,14 @@ test('tuple lineage census remains explicit and does not imply admission',()=>{
   assert.equal(r.evidenceAdmissionProven,false);
   assert.equal(r.canonicalWrites,false);
 });
+test('tuple surface counts remain separate and never imply evidence admission',()=>{
+  const counts={status:'READ_ONLY_EXACT_COUNTS',rows:[
+    {table:'atlas_ontology_tuples',rowCount:'12'},
+    {table:'atlas_ontology_linked_tuples',rowCount:'0'},
+  ]};
+  const r=buildCatalogReport([],[],[],null,null,counts);
+  assert.deepEqual(r.tupleSurfaceCounts,counts);
+  assert.equal(r.evidenceAdmissionProven,false);
+  assert.equal(r.storageOwnerProven,false);
+  assert.equal(r.canonicalWrites,false);
+});

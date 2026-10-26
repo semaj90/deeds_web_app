@@ -1,5 +1,6 @@
 import {
   assertNoCommittedMcpWritesV1,
+  buildAgenticValidationReceiptV1,
   extractMcpTextV1,
   parseMcpResponseV1,
   validateMiniforgeHealthV1,
@@ -37,6 +38,12 @@ try {
 
   const healthResult = await callMcpTool('miniforge.health', {});
   const health = validateMiniforgeHealthV1(JSON.parse(extractMcpTextV1(healthResult)));
+  const receipt = buildAgenticValidationReceiptV1({
+    traceUrl: traceBaseUrl,
+    retrievalHits: Array.isArray(retrievalHits) ? retrievalHits.length : 0,
+    readOnlyEffects: retrievalEffects,
+    health,
+  });
 
   process.stdout.write(`TRACE_MCP_TOOL_CALLS=PASS atlas.query,miniforge.health\n`);
   process.stdout.write(`TRACE_RETRIEVAL_HITS=${Array.isArray(retrievalHits) ? retrievalHits.length : 0}\n`);
@@ -44,6 +51,7 @@ try {
   process.stdout.write(`FASTAPI_NLP_SIDECAR=READY ${health.sidecarUrl}\n`);
   process.stdout.write(`NLP_CAPABILITIES=${health.capabilities ? JSON.stringify(health.capabilities) : 'UNAVAILABLE_FROM_HEALTH_TOOL'}\n`);
   process.stdout.write('AGENTIC_REVIEW=ADVISORY_ONLY; HUMAN_APPROVAL=NOT_GRANTED\n');
+  process.stdout.write(`AGENTIC_VALIDATION_RECEIPT=${JSON.stringify(receipt)}\n`);
 } catch (error) {
   process.stderr.write(`AGENTIC_VALIDATION_RUNTIME=FAIL ${error instanceof Error ? error.message : String(error)}\n`);
   process.exitCode = 1;

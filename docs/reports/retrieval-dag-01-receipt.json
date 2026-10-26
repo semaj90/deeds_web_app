@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "atlas.retrieval-dag-01.receipt.v1",
+  "milestone": "RETRIEVAL-DAG-01",
+  "timestamp": "2026-10-18T07:03:08.647Z",
+  "status": "VERIFIED",
+  "elapsedMs": 206,
+  "environment": {
+    "platform": "win32",
+    "nodeVersion": "v22.23.3"
+  },
+  "verificationGates": {
+    "topKSearchRRF": {
+      "status": "VERIFIED",
+      "candidateCount": 2,
+      "rank1Candidate": "packet:qualified:client_ts",
+      "rank1FusionScore": 0.925
+    },
+    "unqualifiedEvidenceGate": {
+      "status": "VERIFIED",
+      "rejectionReason": "LIVE_FEATURE_JOIN_BLOCKED",
+      "zeroUnqualifiedAdmitted": true
+    },
+    "contextManifestAdmission": {
+      "status": "VERIFIED",
+      "admittedCandidateCount": 1,
+      "tokenBudget": 1024,
+      "graphRevision": "graph:r1",
+      "writesPerformed": false,
+      "canonicalAuthority": false
+    },
+    "actionDagLifecycle": {
+      "status": "VERIFIED",
+      "actionId": "act-retrieval-dag-001",
+      "finalState": "VERIFIED",
+      "transitionCount": 5,
+      "history": [
+        {
+          "from": "PROPOSED",
+          "to": "QUALIFIED",
+          "timestamp": "2026-10-18T07:03:08.606Z",
+          "reason": "Admitted by ContextManifest with matching source & graph revisions"
+        },
+        {
+          "from": "QUALIFIED",
+          "to": "QUEUED",
+          "timestamp": "2026-10-18T07:03:08.607Z",
+          "reason": "Placed in execution scheduler with concurrency limits"
+        },
+        {
+          "from": "QUEUED",
+          "to": "LEASED",
+          "timestamp": "2026-10-18T07:03:08.607Z",
+          "reason": "Acquired 15s execution lease by worker worker-1"
+        },
+        {
+          "from": "LEASED",
+          "to": "RUNNING",
+          "timestamp": "2026-10-18T07:03:08.646Z",
+          "reason": "Worker executing bounded test suite"
+        },
+        {
+          "from": "RUNNING",
+          "to": "VERIFIED",
+          "timestamp": "2026-10-18T07:03:08.646Z",
+          "receiptRef": "docs/reports/retrieval-dag-01-receipt.json",
+          "reason": "All tests passed; zero writes performed; source revision verified"
+        }
+      ],
+      "canonicalAuthority": false
+    },
+    "guardrails": {
+      "emptyEvidenceRejected": true,
+      "illegalTransitionBlocked": true,
+      "zeroCanonicalMutations": true
+    }
+  }
+}

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..', '..');
 const BIFROST_URL = process.env.BIFROST_URL ?? 'http://127.0.0.1:3040';
-const REQUESTED_MODEL = process.env.BIFROST_SMOKE_MODEL ?? 'ollama/gemma4-rotorquant:latest';
+const REQUESTED_MODEL = process.env.BIFROST_SMOKE_MODEL ?? 'ollama/ornith-1.5-9b';
 const STRICT = process.argv.includes('--strict');
 const REPORT = process.argv.includes('--report');
 const FAIL_OPEN = process.argv.includes('--fail-open');
@@ -168,15 +168,15 @@ async function main() {
   const preferredModelOrder = [
     REQUESTED_MODEL,
     REQUESTED_MODEL.includes('/') ? REQUESTED_MODEL : `ollama/${REQUESTED_MODEL}`,
-    'ollama/gemma4-rotorquant:latest',
-    'ollama/gemma4-rotorquant:latest',
-    'ollama/gemma4-rotorquant:latest',
-    'ollama/gemma4-rotorquant:latest',
+    'ollama/ornith-1.5-9b',
+    'ollama/ornith-1.5-9b',
+    'ollama/ornith-1.5-9b',
+    'ollama/ornith-1.5-9b',
   ];
 
   const candidateModels = new Set([
     ...preferredModelOrder,
-    'ollama/gemma4-rotorquant:latest',
+    'ollama/ornith-1.5-9b',
   ]);
 
   try {

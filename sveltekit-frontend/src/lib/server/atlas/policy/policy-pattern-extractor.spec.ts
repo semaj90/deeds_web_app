@@ -5,7 +5,7 @@ const fixture = {
   schema: 'atlas.policy-pattern-input.v1' as const,
   queryClass: 'code-repair',
   classifier: { naiveBayes: 0.8, logistic: 0.6, margin: 0.2, abstain: false },
-  hmmPosterior: { TRACE: 0.7, REPAIR: 0.2 },
+  hmmPosterior: { LOCATE: 0, UNDERSTAND: 0, TRACE: 0.7, REPAIR: 0.2, VALIDATE: 0, RECOVER: 0 },
   retrieval: {
     bm25: 4.0,
     bm42Experimental: 2.0,

@@ -47,6 +47,7 @@ vi.mock('$lib/server/db/client.js', () => ({
 import {
   claimKanbanTask,
   createChildKanbanTask,
+  createKanbanTask,
   completeKanbanTask,
   formatKanbanTaskSummary,
   heartbeatKanbanTask,

@@ -6,6 +6,36 @@ version: '3.8'
 
 services:
   # ========================================================================
+  # Isolated CUDA 13.4 Ampere SIMT + CUDA C++ Tile parity challenger.
+  # One-shot only; no API, ports, canonical stores, or default startup.
+  # Run only after the documented VRAM/Ornith preflight.
+  # ========================================================================
+  atlas-cuda134-simt:
+    profiles: ["atlas-cuda134-simt"]
+    build:
+      context: ..
+      dockerfile: docker/atlas-cuda134-simt/Dockerfile
+    image: atlas-cuda134-simt:13.4.1-sm86
+    platform: linux/amd64
+    container_name: atlas-cuda134-simt
+    volumes:
+      - type: bind
+        source: ../.tmp/atlas/cuda134-simt/fixtures
+        target: /fixtures
+        read_only: true
+        bind:
+          create_host_path: false
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    network_mode: none
+    restart: "no"
+
+  # ========================================================================
   # Parent Atlas RAPIDS graph/vector executor (read-only)
   # ========================================================================
   atlas-gpu-8098:

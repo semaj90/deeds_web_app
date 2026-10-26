@@ -1,0 +1,20 @@
+{
+ "schema": "atlas.golden-legal-candidates.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "queries": 20,
+ "candidates": 245,
+ "foundByBothLanes": 13,
+ "corpusChunksEmbedded": 60431,
+ "goldLabels": 0,
+ "sheet": "docs/reports/golden-legal-review-sheet-v1.html",
+ "jsonl": "docs/reports/golden-legal-candidates-v1.jsonl (gitignored)",
+ "caveats": [
+  "queries written by the assistant, review/replace them",
+  "legal_chunks embedding recipe/model is NOT recorded; raw query embedding is an assumption",
+  "corpus holds only Health & Safety, Welfare & Institutions, Penal, Civil and Evidence codes (no Family, Vehicle, B&P)",
+  "pooling favours the embedding under test",
+  "no gold labels until a human labels"
+ ],
+ "checksum": "sha256:a90a84b74cd4b281db783d072afbcf40cd49151edf6da5318e9d2a02762a58ec"
+}

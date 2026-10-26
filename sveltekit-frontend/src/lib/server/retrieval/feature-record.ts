@@ -298,24 +298,39 @@ export async function getFeatureHistory(
  * Uses a server-side cursor to avoid loading all rows into memory at once.
  * Caller provides an async callback invoked per batch.
  */
+export interface FeatureRecordCursor {
+  createdAt: Date | string;
+  featureId: string;
+}
+
 export async function streamFeatureRecords(
   feature_type: FeatureType,
   version: string,
   onBatch: (batch: FeatureRecord[]) => Promise<void>,
   batchSize = 500,
-): Promise<{ total: number }> {
-  let offset = 0;
+  initialCursor?: FeatureRecordCursor | null,
+): Promise<{ total: number; lastCursor: FeatureRecordCursor | null }> {
   let total = 0;
+  // Keyset cursor on (created_at, feature_id): feature_id is the primary key UUID, so the
+  // ordering is total, deterministic, and guarantees zero omissions and zero duplicates.
+  let cursor: FeatureRecordCursor | null = initialCursor ?? null;
 
   while (true) {
+    const cursorCreatedAt = cursor?.createdAt instanceof Date
+      ? cursor.createdAt.toISOString()
+      : typeof cursor?.createdAt === 'string'
+        ? cursor.createdAt
+        : null;
+
     const result = await db.execute(sql`
       SELECT *
       FROM feature_records
       WHERE feature_type = ${feature_type}
         AND version      = ${version}
         AND superseded_at IS NULL
-      ORDER BY created_at ASC
-      LIMIT ${batchSize} OFFSET ${offset}
+        ${cursorCreatedAt && cursor?.featureId ? sql`AND (created_at, feature_id) > (${cursorCreatedAt}::timestamptz, ${cursor.featureId}::uuid)` : sql``}
+      ORDER BY created_at ASC, feature_id ASC
+      LIMIT ${batchSize}
     `);
 
     const rows = result.rows as Array<Record<string, unknown>>;
@@ -323,12 +338,17 @@ export async function streamFeatureRecords(
 
     await onBatch(rows.map(rowToRecord));
     total += rows.length;
-    offset += rows.length;
+
+    const last = rows[rows.length - 1]!;
+    cursor = {
+      createdAt: last.created_at instanceof Date ? last.created_at : new Date(String(last.created_at)),
+      featureId: String(last.feature_id),
+    };
 
     if (rows.length < batchSize) break;
   }
 
-  return { total };
+  return { total, lastCursor: cursor };
 }
 
 // ---------------------------------------------------------------------------

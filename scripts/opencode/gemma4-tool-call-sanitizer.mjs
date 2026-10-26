@@ -497,7 +497,7 @@ const server = http.createServer((req, res) => {
                 // AI SDK (vercel/ai) requires: role chunk → per-tool (index+id+name) chunk
                 // → arguments chunk → finish chunk. Full args in one delta is NOT parsed.
                 const chunkId = firstChunkId || `chatcmpl-${Date.now()}`;
-                const chunkModel = firstModel || 'gemma4-legal.gguf';
+                const chunkModel = firstModel || 'ornith-1.5-9b';
                 const created = Math.floor(Date.now() / 1000);
                 const sseLines = [];
 
@@ -562,7 +562,7 @@ const server = http.createServer((req, res) => {
               const rewritten = rewriteResponse(obj, requestedTools);
               const choice = rewritten.choices?.[0];
               const chunkId = rewritten.id || `chatcmpl-${Date.now()}`;
-              const chunkModel = rewritten.model || 'gemma4-legal.gguf';
+              const chunkModel = rewritten.model || 'ornith-1.5-9b';
               const created = rewritten.created || Math.floor(Date.now() / 1000);
 
               const sseLines = [];

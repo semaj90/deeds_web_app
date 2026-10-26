@@ -1,0 +1,272 @@
+{
+  "schema": "atlas.okf-domain-keyword-bitmap-alignment.v1",
+  "generatedAt": "2026-10-24T00:22:21.365Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "verdicts": {
+    "OKF_CORPUS_GROUNDED": "PROVEN",
+    "ONTOLOGY_CROSSWALK_REVIEWED": "PROVEN",
+    "KEYWORD_CORPUS_SHADOW_READY": "PROVEN",
+    "EMBEDDING_RECIPE_COMPATIBLE": "PROVEN",
+    "ORDINAL_MAP_SEALED": "PROVEN",
+    "DOMAIN_BITMAP_PARITY": "PROVEN",
+    "NES_LUT_MAPPING_PRESERVED": "PROVEN",
+    "HYBRID_TOPK_BASELINE": "PROVEN",
+    "WORKSPACE_ADMISSION_VERDICT": "BLOCKED_WORKSPACE_AUTHORITY_UNAVAILABLE",
+    "LIVE_MASTRA_REFUSAL_VERDICT": "FAIL_CLOSED_CONFIRMED",
+    "LANGFUSE_SERVER_SPAN_READBACK": "NOT_PROVEN_INITIALIZATION_ORDER_DIAGNOSED",
+    "FIRST_FAILING_BOUNDARY": "WORKSPACE_AUTHORITY"
+  },
+  "postgres18Inventory": {
+    "keywordCorpusExists": false,
+    "ginIndexCount": 213,
+    "activeTaxonomyDomains": 17
+  },
+  "okfAcquisition": {
+    "chunksIngested": 84,
+    "shadowCorpusEntries": 155,
+    "shadowCorpusPath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\keyword-corpus-v1\\keyword-corpus.jsonl"
+  },
+  "ordinalMap": {
+    "totalEntries": 84,
+    "ordinalMapDigest": "sha256:1adb65b3f883530827908fec8fe870066e919591419524c705173d134c51bc9d"
+  },
+  "domainBitmaps": {
+    "auth": {
+      "domainId": "auth",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "ui": {
+      "domainId": "ui",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "retrieval": {
+      "domainId": "retrieval",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "network": {
+      "domainId": "network",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "database": {
+      "domainId": "database",
+      "byteLength": 11,
+      "popcount": 7,
+      "bitmapDigest": "sha256:a0f91bf9fde12c26674f1afa719d16e5e3624803ebb9bc39e615f1c365736709",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "cache": {
+      "domainId": "cache",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "agent": {
+      "domainId": "agent",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "graph": {
+      "domainId": "graph",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    },
+    "ml": {
+      "domainId": "ml",
+      "byteLength": 11,
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706",
+      "codecVersion": "ATLASBIT_V1_LITTLE_ENDIAN"
+    }
+  },
+  "keywordBitmaps": {
+    "multicolumn index": {
+      "keyword": "multicolumn index",
+      "popcount": 2,
+      "bitmapDigest": "sha256:eca3b891437e93aed56b175c768e34cc0b9cd508135f84cbf591e9839963262a"
+    },
+    "B-tree": {
+      "keyword": "B-tree",
+      "popcount": 5,
+      "bitmapDigest": "sha256:16aa032d52650ed4a9040e14f4dd0b1cac0f9fe9106ed567a8ea2682c9fac564"
+    },
+    "GIN": {
+      "keyword": "GIN",
+      "popcount": 12,
+      "bitmapDigest": "sha256:75f889bfa191644d83b251b087ddd8d10fc7d46be33581193bb9889f56ee62c5"
+    },
+    "BRIN": {
+      "keyword": "BRIN",
+      "popcount": 3,
+      "bitmapDigest": "sha256:fa56551921dd4ef071acb257594f3f54470841da8282851c23d8020bceddeeb8"
+    },
+    "tsvector": {
+      "keyword": "tsvector",
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706"
+    },
+    "OpenTelemetry": {
+      "keyword": "OpenTelemetry",
+      "popcount": 12,
+      "bitmapDigest": "sha256:9b445b4fb6ca19384b3f01fe5443907869d2fee36a5d5d12f158539ef27d4ee5"
+    },
+    "SERVER span": {
+      "keyword": "SERVER span",
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706"
+    },
+    "Langfuse": {
+      "keyword": "Langfuse",
+      "popcount": 1,
+      "bitmapDigest": "sha256:53ec7b12935dbc4cadaa429b8eff1ed06981e7179a17f1dd7d90be550efa2277"
+    },
+    "Mastra": {
+      "keyword": "Mastra",
+      "popcount": 19,
+      "bitmapDigest": "sha256:f0e0ec58bf96c983953c32997f8d94f3bbe707a7dac773f91b67a610cf659a9d"
+    },
+    "agent tracing": {
+      "keyword": "agent tracing",
+      "popcount": 0,
+      "bitmapDigest": "sha256:71b6c1d53832f789a7f2435a7c629245fa3761ad8487775ebf4957330213a706"
+    },
+    "CREATE INDEX": {
+      "keyword": "CREATE INDEX",
+      "popcount": 1,
+      "bitmapDigest": "sha256:5563cc1568e244183804e0db3cec6ff9bf577f4a403924096177bf4a586160da"
+    }
+  },
+  "nesLutPreservation": {
+    "verified": true,
+    "paletteRevision": "nes-domain-palette-v1",
+    "unresolvedByte": 0,
+    "paletteChecksum": "sha256:e1b8ccdc6661a3faed3316cf276f01dd16a1edf80a9aba2d465def40461b9b0f"
+  },
+  "embeddingRecipe": {
+    "canonicalModel": "embeddinggemma-300m",
+    "canonicalDimensions": 768,
+    "distanceMetric": "COSINE",
+    "queryRecipe": "task: sentence similarity | query: {query_text}",
+    "documentRecipe": "title: {title} | text: {document_text}",
+    "pooling": "mean_pooling_normalized",
+    "floatPrecision": "FLOAT32_L2_NORMALIZED",
+    "legacy384Retired": true,
+    "dim512IncompatibleWithoutProjection": true,
+    "verification": "PROVEN_COMPATIBLE"
+  },
+  "frozenQueryDemonstration": {
+    "query": "PostgreSQL 18 multicolumn B-tree GIN indexes",
+    "totalHits": 20,
+    "topK": [
+      {
+        "chunkId": "doc:postgresql-18-multicolumn:50110d7cb1e1eb6c:0",
+        "sourceId": "postgresql-18-multicolumn",
+        "heading": "Unheaded",
+        "exactMatchTerms": [
+          "postgresql",
+          "18",
+          "multicolumn",
+          "indexes"
+        ],
+        "bm25Score": 18.9856,
+        "domainClass": "database"
+      },
+      {
+        "chunkId": "doc:postgresql-18-multicolumn:50110d7cb1e1eb6c:5",
+        "sourceId": "postgresql-18-multicolumn",
+        "heading": "11.3. Multicolumn Indexes #",
+        "exactMatchTerms": [
+          "multicolumn",
+          "b-tree",
+          "gin",
+          "indexes"
+        ],
+        "bm25Score": 15.6319,
+        "domainClass": "database"
+      },
+      {
+        "chunkId": "doc:postgresql-18-multicolumn:50110d7cb1e1eb6c:1",
+        "sourceId": "postgresql-18-multicolumn",
+        "heading": "11.3. Multicolumn Indexes #",
+        "exactMatchTerms": [
+          "postgresql",
+          "b-tree",
+          "gin",
+          "indexes"
+        ],
+        "bm25Score": 13.0927,
+        "domainClass": "database"
+      }
+    ],
+    "candidateConcepts": [
+      "concept:db:multicolumn_index",
+      "concept:db:btree_index",
+      "concept:db:gin_inverted_index",
+      "concept:db:brin_index",
+      "concept:db:create_index"
+    ],
+    "ambiguityReasons": [],
+    "rejectionReasons": [
+      "NON_QUALIFIED_WORKSPACES_EXCLUDED",
+      "UNAPPROVED_ONTOLOGY_MAPPINGS_REFUSED"
+    ]
+  },
+  "taxonomyCrosswalk": {
+    "reviewedRelationshipsCount": 12,
+    "sampleCrosswalk": [
+      {
+        "nineDomain": "auth",
+        "seventeenGroup": "auth",
+        "relationship": "EXACT",
+        "reason": "Direct identity match between authentication domains"
+      },
+      {
+        "nineDomain": "ui",
+        "seventeenGroup": "frontend",
+        "relationship": "NARROWER",
+        "reason": "ui is a presentation layer within frontend"
+      },
+      {
+        "nineDomain": "ui",
+        "seventeenGroup": "frontend.sveltekit",
+        "relationship": "BROADER",
+        "reason": "ui encompasses SvelteKit runes and UI components"
+      },
+      {
+        "nineDomain": "retrieval",
+        "seventeenGroup": "retrieval",
+        "relationship": "EXACT",
+        "reason": "Direct match for search, ANN, BM25, and RRF ranking"
+      },
+      {
+        "nineDomain": "network",
+        "seventeenGroup": "api",
+        "relationship": "BROADER",
+        "reason": "network includes HTTP, tRPC, RPC descriptors, and fetch protocols"
+      },
+      {
+        "nineDomain": "database",
+        "seventeenGroup": "database",
+        "relationship": "EXACT",
+        "reason": "Direct relational/persistence match"
+      }
+    ]
+  }
+}

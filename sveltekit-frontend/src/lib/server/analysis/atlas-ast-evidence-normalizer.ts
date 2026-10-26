@@ -33,6 +33,43 @@ export type AtlasAstEvidenceInput = {
   diagnostics: string[];
 };
 
+export type AstSpanValidationIssue = {
+  index: number;
+  code: 'SCHEMA_INVALID' | 'SPAN_INVALID' | 'SPAN_OUT_OF_BOUNDS' | 'SPAN_NOT_UTF8_BOUNDARY' | 'DUPLICATE_SPAN';
+};
+
+export function validateAtlasAstEvidenceBytes(
+  input: AtlasAstEvidenceInput,
+  sourceBytes: Uint8Array,
+): AstSpanValidationIssue[] {
+  const issues: AstSpanValidationIssue[] = [];
+  const seen = new Set<string>();
+  if (input.schema !== 'atlas.ast.evidence.v1') {
+    return [{ index: -1, code: 'SCHEMA_INVALID' }];
+  }
+  for (const [index, chunk] of input.chunks.entries()) {
+    const { start_byte: start, end_byte: end } = chunk;
+    if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end <= start) {
+      issues.push({ index, code: 'SPAN_INVALID' });
+      continue;
+    }
+    if (end > sourceBytes.byteLength) {
+      issues.push({ index, code: 'SPAN_OUT_OF_BOUNDS' });
+      continue;
+    }
+    try {
+      new TextDecoder('utf-8', { fatal: true }).decode(sourceBytes.subarray(start, end));
+    } catch {
+      issues.push({ index, code: 'SPAN_NOT_UTF8_BOUNDARY' });
+      continue;
+    }
+    const key = `${chunk.upstream_node_id ?? ''}:${start}:${end}`;
+    if (seen.has(key)) issues.push({ index, code: 'DUPLICATE_SPAN' });
+    seen.add(key);
+  }
+  return issues;
+}
+
 export type AtlasAstEvidenceEdge = {
   from_evidence_key: string;
   to_evidence_key: string;

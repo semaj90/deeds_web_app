@@ -68,6 +68,65 @@ ontology:
     - canonical_chunk_id
     - graph_revision
 
+# Domain-classification contract crosswalk. This is a documentation registry,
+# not a migration or an instruction to persist labels. Keep the strict OKF
+# evidence envelope distinct from the runtime classifier's richer output.
+domain_classification:
+  schema: "atlas.okf.domain-classification.v1"
+  contract_owner: "sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.ts"
+  proposal_array_adapter: "sveltekit-frontend/src/lib/server/atlas/domain-classification-adapter-v1.ts::buildOkfDomainClassificationProposalArrayV1"
+  single_candidate_adapter: "sveltekit-frontend/src/lib/server/atlas/domain-classification-adapter-v1.ts::buildOkfDomainClassificationBatchV1"
+  batch_schema: "atlas.okf.domain-classification-batch.v1"
+  json_schema: "docs/.okf/schemas/domain-classification-batch-v1.schema.json"
+  json_schema_status: "AUTHORED_REQUIRES_CONTRACT_PARITY_REVIEW"
+  batch_shape:
+    collection: "rows[]"
+    row_contract: "atlas.okf.domain-classification.v1"
+    max_input_candidates: 500
+    deterministic_order: "codepoint order by subjectRef, subjectKind, domainId, then classificationId; evidenceRefs are deduplicated and sorted by the single-candidate adapter"
+    empty_or_unqualified_batch: "UNAVAILABLE; do not persist"
+    upsert_status: "NOT_IMPLEMENTED"
+  runtime_classifier_owner: "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+  semantic_signal_contract: "sveltekit-frontend/src/lib/server/atlas/contracts/semantic-signal-v1.ts"
+  taxonomy_revision_owner: "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts"
+  canonical_authority: false
+  output_status: "PROPOSAL_ONLY"
+  labels_are: "bounded evidence-backed proposal array; not packet identity or ontology admission"
+  identity_fields:
+    - subjectRef
+    - subjectKind
+    - sourceRevision
+    - taxonomyRevision
+    - producerId
+    - producerRevision
+    - evidenceRefs
+    - lifecycle
+  feature_label_is_distinct: true
+  summary_is_distinct: true
+  existing_storage_candidate:
+    table: "feature_domain_facts"
+    schema_owner: "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+    unique_key:
+      - packet_key
+      - classifier_version
+      - content_hash
+    alignment_status: "REVIEW_REQUIRED"
+    known_gap: "table has no dedicated source_revision, workspace_revision, or taxonomy_revision columns; classifier_version must not be assumed equivalent to taxonomy_revision"
+  write_policy:
+    migration_or_upsert_authorized: false
+    target_table_mapping_status: "BLOCKED_SCHEMA_ALIGNMENT"
+    proposal_rows_are_persistable: false
+    packet_key_resolution_required: true
+    classifier_version_is_taxonomy_revision: false
+    source_ref_is_packet_key: false
+    require_packet_source_readback: true
+    postgres_aio_bitmap: "planner_execution_behavior_only"
+    vector_owner: "existing semantic_768 content_embedding_768 and Qdrant content projection"
+    require_content_digest: true
+    content_digest_contract: "compare digests only when both are recomputed over the same owner-defined byte representation; normalized-source, raw-response, Markdown, chunk, and packet digests are distinct"
+    reject_unqualified_revisions: true
+    do_not_promote_classifier_output_to_ontology_fact: true
+
 # Typed code-capability cards are a repo-local documentation projection only.
 # They reuse the existing Concept kind and never create identity or storage authority.
 capability_card_contract:

@@ -28,7 +28,7 @@ export function mapAgentWorkReceiptToOutcomeLedgerV1(
   return {
     outcomeType: 'agent_work_receipt',
     taskId: nullableUuid(receipt.taskId),
-    traceId: null,
+    traceId: nullableUuid(receipt.correlation?.traceId ?? null),
     toolCallId: null,
     score: null,
     reward: null,
@@ -37,6 +37,8 @@ export function mapAgentWorkReceiptToOutcomeLedgerV1(
       schema: receipt.schema,
       receiptId: receipt.receiptId,
       runId: receipt.runId,
+      taskId: receipt.taskId,
+      ...(receipt.correlation === undefined ? {} : { correlation: receipt.correlation }),
       openspecChange: receipt.openspecChange,
       openspecTaskIds: receipt.openspecTaskIds,
       agentId: receipt.agentId,

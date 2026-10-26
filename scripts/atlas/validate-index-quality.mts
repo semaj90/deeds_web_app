@@ -15,9 +15,6 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
-import Database from 'duckdb-async';
-import { QdrantClient } from '@qdrant/js-client-rest';
-import fetch from 'node-fetch';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SNAPSHOT_PATH = path.join(__dirname, '../../data/atlas-ml/snapshot_5k_384dim.parquet');
@@ -67,6 +64,15 @@ function l2Distance(a: number[], b: number[]): number {
 }
 
 async function validateIndexQuality(): Promise<void> {
+  console.error('LEGACY_384_INDEX_VALIDATION_DISABLED: the validator uses a 384-D snapshot and retired Qdrant collection; create a revision-matched semantic_768 evaluation before enabling it');
+  process.exitCode = 78;
+  return;
+
+  const [{ default: Database }, { QdrantClient }] = await Promise.all([
+    import('duckdb-async'),
+    import('@qdrant/js-client-rest'),
+  ]);
+
   const args = process.argv.slice(2);
   const verbose = args.includes('--verbose');
 

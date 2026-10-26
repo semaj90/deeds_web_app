@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.lineage-e2e-proof-diagnostic.v1",
+  "status": "BLOCKED_AT_CANDIDATE_PREFLIGHT",
+  "canonicalAuthority": false,
+  "productionQualified": false,
+  "firstBlockingGate": "CALLABLE_PROJECTION_REVISION_MISMATCH",
+  "evidenceReceipt": "docs/reports/graphrag-single-candidate-preflight-20261016T110902360.json",
+  "stderrLog": "docs/reports/graphrag-single-candidate-preflight-20261016T110902360.txt",
+  "execution": {
+    "owner": "scripts/atlas/audit-function-discovery-readback-v1.mts",
+    "query": "getErrorClustering",
+    "limit": 1,
+    "qualificationRequested": true,
+    "actualExitCode": 3,
+    "status": "PROJECTION_REVISION_MISMATCH",
+    "postgresReadOnlyTransaction": true
+  },
+  "packet": {
+    "packetKey": "packet:804cec79a65c",
+    "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+    "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+    "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  },
+  "stages": [
+    { "stage": "canonical-function-snapshot", "status": "QUALIFIED" },
+    { "stage": "callable-projection-readback", "status": "REVISION_MISMATCH" },
+    { "stage": "graph-expansion", "status": "NOT_RUN" },
+    { "stage": "expanded-evidence-requalification", "status": "NOT_RUN" },
+    { "stage": "SearchRuntime-final-TopK", "status": "NOT_RUN" },
+    { "stage": "ACE-ContextManifest", "status": "NOT_RUN" },
+    { "stage": "Ornith-synthesis-and-citation-readback", "status": "NOT_RUN" },
+    { "stage": "BitFrost-cache-readback", "status": "NOT_RUN" }
+  ],
+  "writeBoundary": {
+    "localDiagnosticArtifactsCreated": true,
+    "postgresMutationsRequested": false,
+    "qdrantInvoked": false,
+    "neo4jInvoked": false,
+    "cacheInvoked": false,
+    "telemetryInsertRequested": false,
+    "modelGenerationRequested": false,
+    "serviceRestartRequested": false,
+    "sidecarInternalSideEffectsIndependentlyAudited": false
+  },
+  "constraints": [
+    "Source-revision propagation remains deferred until post-P20 by operator rule",
+    "Historical symbol materializer is retired; its override was not used",
+    "Existing chunk-row qualification gaps were not repaired or bypassed",
+    "No synthetic candidates, embeddings, revisions or ContextManifest were substituted"
+  ],
+  "likely_cause": "The canonical source snapshot qualifies, but the existing callable projection still carries different source/workspace revisions, preventing this seed from establishing a qualified retrieval-to-generation chain.",
+  "evidence": [
+    "docs/reports/graphrag-single-candidate-preflight-20261016T110902360.json",
+    "scripts/atlas/audit-function-discovery-readback-v1.mts",
+    "CLAUDE.md"
+  ],
+  "patch_targets": [
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "npx --no-install openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict",
+  "smoke_command": "node --test scripts/atlas/lib/function-discovery-readback-v1.test.mjs",
+  "report_path": "docs/reports/graphrag-single-candidate-attempt-20261016T110902.json"
+}

@@ -5,6 +5,7 @@
   import type { RpcCacheResult } from '$lib/types/rpc-cache.js';
   import type { GlyphDescriptor, GlyphAtlasManifest } from '$lib/server/graph/glyph-atlas-builder.js';
   import BagOfWordsTexturePanel from './BagOfWordsTexturePanel.svelte';
+  import { filterGraphTopologyFilesV1, type GraphTopologyFilterV1 } from './graph-topology-filter-v1.js';
 
   interface GraphFile {
     rel: string;
@@ -79,6 +80,7 @@
   let prError         = $state('');
   let selectedCluster = $state<number | null>(null);
   let searchQuery     = $state('');
+  let topologyFilter  = $state<GraphTopologyFilterV1>('ALL');
   let page            = $state(0);
   const PAGE_SIZE     = 50;
 
@@ -263,7 +265,8 @@
       ? graphFiles.filter(f => (f.clusterId ?? -1) === selectedCluster)
       : graphFiles;
     const q = searchQuery.toLowerCase();
-    return q ? source.filter(f => f.rel.toLowerCase().includes(q)) : source;
+    const topologyFiltered = filterGraphTopologyFilesV1(source, topologyFilter);
+    return q ? topologyFiltered.filter(f => f.rel.toLowerCase().includes(q)) : topologyFiltered;
   });
 
   let pageCount    = $derived(Math.ceil(clusterFiles.length / PAGE_SIZE));
@@ -999,6 +1002,20 @@
         bind:value={searchQuery}
         oninput={() => { page = 0; }}
       />
+      <label class="topology-filter-label" for="graph-topology-filter">Structure</label>
+      <select
+        id="graph-topology-filter"
+        bind:value={topologyFilter}
+        onchange={() => { page = 0; }}
+        aria-label="Filter files by import graph structure"
+      >
+        <option value="ALL">All files</option>
+        <option value="HAS_IMPORTS">Has imports</option>
+        <option value="IMPORTED_BY">Imported by another file</option>
+        <option value="ROUTE">Routes</option>
+        <option value="TEST">Tests</option>
+        <option value="SSR_UNSAFE">SSR risk</option>
+      </select>
       <span class="result-count">{clusterFiles.length} files</span>
     </div>
 
@@ -1284,10 +1301,6 @@
     display: flex; align-items: flex-end; gap: 0.65rem; flex-wrap: wrap; margin-top: 0.25rem;
   }
   .atlas-compare-row label { font-size: 0.72rem; color: #99b; display: flex; flex-direction: column; gap: 3px; }
-  .atlas-compare-row input {
-    width: 90px; padding: 3px 6px; background: #111; border: 1px solid #334;
-    color: #eee; border-radius: 4px; font-size: 0.75rem;
-  }
   .atlas-compare-row button {
     padding: 4px 12px; background: #111; border: 1px solid #334; color: #88f;
     border-radius: 4px; cursor: pointer; font-size: 0.75rem;

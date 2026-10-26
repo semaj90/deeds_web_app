@@ -83,7 +83,7 @@ export class PgVectorService {
 			SELECT id, doc, 1.0 - (vector <=> $1::vector) as score
 			FROM ${this.tableName}
 			${filterClause}
-			ORDER BY vector <=> $1::vector
+			ORDER BY vector <=> $1::vector ASC, id ASC
 			LIMIT $2
 		`;
 

@@ -1,0 +1,99 @@
+{
+  "schema": "atlas.p14-p15-p19-cache-fusion-policy-receipt.v1",
+  "generatedAt": "2026-10-16T01:12:20.420Z",
+  "testCommand": "cd sveltekit-frontend && ./node_modules/.bin/tsx ../scripts/atlas/prove-p14-p15-p19-cache-fusion-policy-v1.mts",
+  "writesPerformed": false,
+  "p14CacheAndResidency": {
+    "cacheKey": "bifrost:eligibility:sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32:parent-atlas.policy-decision.v1:sha256:1644213f096c5277c7b32f61f8cbddc19a01f6c3bb4ee36d77db9d31daf3db53",
+    "workspaceRevision": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32",
+    "policyRevision": "parent-atlas.policy-decision.v1",
+    "coldWarmParity": true,
+    "staleInvalidationProven": true,
+    "residencyPlan": {
+      "budgetMaxBytes": 40960,
+      "usedBytes": 32320,
+      "selectedObjectIds": [
+        "obj:candidate_feature_matrix_50x8",
+        "obj:semantic_768_top10"
+      ],
+      "deferredObjectIds": [
+        "obj:oversized_cold_tensor"
+      ]
+    },
+    "status": "PASS"
+  },
+  "p15SingleFusionOwner": {
+    "denseSeedPacketKeys": [
+      "pkt:AccessibilityPanel",
+      "pkt:Button"
+    ],
+    "fusedCandidateCount": 2,
+    "topFusionIdentityKey": "symv:AccessibilityPanel:v1",
+    "topFusionScore": 0.03278688524590164,
+    "expectedTwoLaneBestRankScore": 0.03278688524590164,
+    "rrfExactScoreMatch": true,
+    "denseLaneContributionCount": 1,
+    "denseLaneSupportingHitCount": 2,
+    "lexicalLaneContributionCount": 1,
+    "oneVotePerLogicalLaneProven": true,
+    "status": "PASS"
+  },
+  "p19PolicyBaseline": {
+    "policyReplayChecksum": "sha256:69fc5b94dc7d55268c550923067ed0d576313d28e0e5868fd6197e7c5a36b674",
+    "stateDecisions": [
+      {
+        "stateHint": "LOCATE",
+        "selectedAction": "SEMANTIC_SEARCH",
+        "selectedModel": "NO_LLM",
+        "selectedBudget": "SMALL",
+        "allRankedLegal": true,
+        "deterministicReplay": true
+      },
+      {
+        "stateHint": "UNDERSTAND",
+        "selectedAction": "INSPECT_SOURCE",
+        "selectedModel": "GEMMA4",
+        "selectedBudget": "SMALL",
+        "allRankedLegal": true,
+        "deterministicReplay": true
+      },
+      {
+        "stateHint": "TRACE",
+        "selectedAction": "GRAPH_TRACE",
+        "selectedModel": "NO_LLM",
+        "selectedBudget": "MEDIUM",
+        "allRankedLegal": true,
+        "deterministicReplay": true
+      },
+      {
+        "stateHint": "REPAIR",
+        "selectedAction": "PATCH",
+        "selectedModel": "ORNITH",
+        "selectedBudget": "SMALL",
+        "allRankedLegal": true,
+        "deterministicReplay": true
+      },
+      {
+        "stateHint": "VALIDATE",
+        "selectedAction": "TEST",
+        "selectedModel": "NO_LLM",
+        "selectedBudget": "SMALL",
+        "allRankedLegal": true,
+        "deterministicReplay": true
+      },
+      {
+        "stateHint": "RECOVER",
+        "selectedAction": "LEXICAL_SEARCH",
+        "selectedModel": "NO_LLM",
+        "selectedBudget": "MEDIUM",
+        "allRankedLegal": true,
+        "deterministicReplay": true
+      }
+    ],
+    "highPressureDemotionProven": true,
+    "classifierGateAdmittedOnValidSha256": "HYPERGRAPH_NARY",
+    "classifierGateFallbackOnLegacyGitRev": "SEMANTIC_DENSE_768",
+    "status": "PASS"
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,294 @@
+{
+  "schema": "atlas.pgvector-hnsw-unqualified-diagnostic.v1",
+  "generatedAt": "2026-10-18T09:47:17.335Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "semanticQualityClaim": false,
+  "lineageQualification": "BLOCKED_MISSING_SOURCE_AND_WORKSPACE_REVISIONS",
+  "sampleLimit": 5,
+  "topK": 10,
+  "queryMode": "DETERMINISTIC_CORPUS_ROWS_EXCLUDED_FROM_CANDIDATES",
+  "cohorts": [
+    {
+      "key": "halfvec_content",
+      "column": "public.codebase_chunk_index.content_embedding",
+      "vectorCast": "halfvec",
+      "rowCount": "57243",
+      "sourceRevisionCount": "0",
+      "workspaceRevisionCount": "0",
+      "indexes": [
+        {
+          "indexname": "codebase_chunk_index_content_hnsw",
+          "indexdef": "CREATE INDEX codebase_chunk_index_content_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='200')",
+          "size_bytes": "115523584"
+        },
+        {
+          "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')",
+          "size_bytes": "805158912"
+        }
+      ],
+      "queryIdsChecksum": "sha256:abd45db0997688d5985da922b8bd4e79254de3d08f5b6fad9e09d3304babe3ba",
+      "queryCount": 5,
+      "queries": [
+        {
+          "queryId": "a3a26d79-c8cf-406b-865a-3c6351557cb0",
+          "exactIdsChecksum": "sha256:5a61a0250c18f74ff2343995390ab643778a3a0d5922fda35e5ae32b43060dbd",
+          "hnswIdsChecksum": "sha256:5a61a0250c18f74ff2343995390ab643778a3a0d5922fda35e5ae32b43060dbd",
+          "recallAtK": 1,
+          "exactMs": 409.566,
+          "hnswMs": 2.364,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "5c085c83-a7ea-4bb2-b118-65c5ed733b4a",
+          "exactIdsChecksum": "sha256:96b04ef9965daebb30e519ac66076384a361e44df24ccd87397c1305dbe65b02",
+          "hnswIdsChecksum": "sha256:96b04ef9965daebb30e519ac66076384a361e44df24ccd87397c1305dbe65b02",
+          "recallAtK": 1,
+          "exactMs": 420.536,
+          "hnswMs": 3.327,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "e8cf4417-22f3-4220-a9ad-ccc9301a8fc3",
+          "exactIdsChecksum": "sha256:c0f62dee34354cdb7bc7e91bc1072e853df7e1e60eaf52daca042d429f0f40eb",
+          "hnswIdsChecksum": "sha256:c0f62dee34354cdb7bc7e91bc1072e853df7e1e60eaf52daca042d429f0f40eb",
+          "recallAtK": 1,
+          "exactMs": 523.094,
+          "hnswMs": 2.584,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "0e8e58a8-5d7f-4cc7-8645-939a67a283ab",
+          "exactIdsChecksum": "sha256:30297036980afe727d004ddea62f674180d1a36bd27c6e27c69358b927d502b2",
+          "hnswIdsChecksum": "sha256:30297036980afe727d004ddea62f674180d1a36bd27c6e27c69358b927d502b2",
+          "recallAtK": 1,
+          "exactMs": 410.206,
+          "hnswMs": 2.469,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "662b363a-f2c5-465e-b106-2dc0243e02c5",
+          "exactIdsChecksum": "sha256:2e4290ad98f68cb16ff8d53300714ae51435c525636bd9f421f91a9367445dec",
+          "hnswIdsChecksum": "sha256:2e4290ad98f68cb16ff8d53300714ae51435c525636bd9f421f91a9367445dec",
+          "recallAtK": 1,
+          "exactMs": 508.285,
+          "hnswMs": 2.918,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "codebase_chunk_index_content_hnsw",
+          "expectedHnswIndexUsed": true
+        }
+      ],
+      "meanRecallAtK": 1,
+      "meanExactMs": 454.3374,
+      "meanHnswMs": 2.7323999999999997
+    },
+    {
+      "key": "vector_content_768",
+      "column": "public.codebase_chunk_index.content_embedding_768",
+      "vectorCast": "vector",
+      "rowCount": "219998",
+      "sourceRevisionCount": "0",
+      "workspaceRevisionCount": "0",
+      "indexes": [
+        {
+          "indexname": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "indexdef": "CREATE INDEX idx_codebase_chunk_content_embedding_768_hnsw ON public.codebase_chunk_index USING hnsw (content_embedding_768 vector_cosine_ops) WITH (m='16', ef_construction='64')",
+          "size_bytes": "805158912"
+        }
+      ],
+      "queryIdsChecksum": "sha256:5a9760074f78ef98cc925ee25c27bff52ef33fe099c00d0d9d3dc975511a08e6",
+      "queryCount": 5,
+      "queries": [
+        {
+          "queryId": "0b66cb46-8a59-4f50-afdb-8e2fa5541a83",
+          "exactIdsChecksum": "sha256:095da76dff4cafd9b9a2e0ade5908b3d2e9e086a369e25d4056895044c57fd0e",
+          "hnswIdsChecksum": "sha256:095da76dff4cafd9b9a2e0ade5908b3d2e9e086a369e25d4056895044c57fd0e",
+          "recallAtK": 1,
+          "exactMs": 1617.647,
+          "hnswMs": 3.029,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "46a48574-fca5-4196-861f-66d4e5aba9e3",
+          "exactIdsChecksum": "sha256:6fb938e85f354da2e06cac9a6bf77b9f20983024594cfa9307420ddd8c18b71b",
+          "hnswIdsChecksum": "sha256:6fb938e85f354da2e06cac9a6bf77b9f20983024594cfa9307420ddd8c18b71b",
+          "recallAtK": 1,
+          "exactMs": 1709.115,
+          "hnswMs": 3.554,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "0bfbb5eb-f124-4635-8c17-83281154ea4a",
+          "exactIdsChecksum": "sha256:7a38b6f0c26fea35b96ed93fef00bcd424adf29bb9cf6446823e1236139d78a7",
+          "hnswIdsChecksum": "sha256:7a38b6f0c26fea35b96ed93fef00bcd424adf29bb9cf6446823e1236139d78a7",
+          "recallAtK": 1,
+          "exactMs": 4004.227,
+          "hnswMs": 7.656,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "5561f5fb-b733-47cc-a558-8f5fb3a2a27e",
+          "exactIdsChecksum": "sha256:0bd2826597561309c14cbe1a653401e85b7ed25d1911f76af9d7a03da9c21997",
+          "hnswIdsChecksum": "sha256:0bd2826597561309c14cbe1a653401e85b7ed25d1911f76af9d7a03da9c21997",
+          "recallAtK": 1,
+          "exactMs": 2534.741,
+          "hnswMs": 3.809,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        },
+        {
+          "queryId": "7c002903-2e26-4af8-abf9-072871d0e69d",
+          "exactIdsChecksum": "sha256:0b3534f4c4b3b29aedd4fb4dac37b55ebee80a1764ba1b18f66d78783bf63523",
+          "hnswIdsChecksum": "sha256:0b3534f4c4b3b29aedd4fb4dac37b55ebee80a1764ba1b18f66d78783bf63523",
+          "recallAtK": 1,
+          "exactMs": 2204.317,
+          "hnswMs": 4.927,
+          "exactPlanNodeTypes": [
+            "Limit",
+            "Gather Merge",
+            "Sort",
+            "Seq Scan"
+          ],
+          "exactPlanUsesSeqScan": true,
+          "hnswPlanNodeTypes": [
+            "Limit",
+            "Incremental Sort",
+            "Index Scan"
+          ],
+          "hnswPlanNode": "Limit",
+          "expectedHnswIndex": "idx_codebase_chunk_content_embedding_768_hnsw",
+          "expectedHnswIndexUsed": true
+        }
+      ],
+      "meanRecallAtK": 1,
+      "meanExactMs": 2414.0094,
+      "meanHnswMs": 4.595000000000001
+    }
+  ],
+  "status": "DIAGNOSTIC_COMPLETE_UNQUALIFIED_LINEAGE"
+}

@@ -144,11 +144,18 @@ export const VECTOR_SEARCH_CONFIG = {
 // ============================================================================
 // DATABASE CONFIGURATION
 // ============================================================================
-const _dbUrl = (() => { try { return new URL(ENV.DATABASE_URL.replace(/^postgres:\/\//, 'postgresql://')); } catch { return null; } })();
+const _dbUrl = (() => {
+	if (typeof ENV.DATABASE_URL !== 'string' || !ENV.DATABASE_URL.trim()) return null;
+	try {
+		return new URL(ENV.DATABASE_URL.replace(/^postgres:\/\//, 'postgresql://'));
+	} catch {
+		return null;
+	}
+})();
 export const DATABASE_CONFIG = {
   url: ENV.DATABASE_URL,
   postgres: {
-	  host: _dbUrl?.hostname || env.DATABASE_HOST || new URL(ENV.DATABASE_URL).hostname,
+	  host: _dbUrl?.hostname || env.DATABASE_HOST || '127.0.0.1',
     port: parseInt(_dbUrl?.port || env.DATABASE_PORT || '5434', 10),
     database: (_dbUrl?.pathname.slice(1)) || env.DATABASE_NAME || 'legal_ai_db',
     username: _dbUrl?.username || env.DATABASE_USER || 'legal_admin',
@@ -163,10 +170,17 @@ export const DATABASE_CONFIG = {
 // ============================================================================
 // REDIS CONFIGURATION
 // ============================================================================
-const _redisUrl = (() => { try { return new URL(ENV.REDIS_URL); } catch { return null; } })();
+const _redisUrl = (() => {
+	if (typeof ENV.REDIS_URL !== 'string' || !ENV.REDIS_URL.trim()) return null;
+	try {
+		return new URL(ENV.REDIS_URL);
+	} catch {
+		return null;
+	}
+})();
 export const REDIS_CONFIG = {
 	url: ENV.REDIS_URL,
-	host: _redisUrl?.hostname || env.REDIS_HOST || new URL(ENV.REDIS_URL).hostname,
+	host: _redisUrl?.hostname || env.REDIS_HOST || '127.0.0.1',
 	port: parseInt(_redisUrl?.port || env.REDIS_PORT || '6379', 10),
 	password: process.env.REDIS_PASSWORD || undefined,
 	db: parseInt(process.env.REDIS_DB || '0', 10),

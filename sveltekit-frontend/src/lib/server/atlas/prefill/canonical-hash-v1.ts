@@ -3,6 +3,15 @@ import { z } from 'zod';
 
 export const sha256HexSchema = z.string().regex(/^[a-f0-9]{64}$/);
 
+export function normalizeSha256HexV1(value: string): string {
+  const digest = value.startsWith('sha256:') ? value.slice('sha256:'.length) : value;
+  return sha256HexSchema.parse(digest);
+}
+
+export function formatSha256RevisionV1(value: string): string {
+  return `sha256:${normalizeSha256HexV1(value)}`;
+}
+
 const canonicalScalarSchema = z.union([
   z.string(),
   z.number().finite(),

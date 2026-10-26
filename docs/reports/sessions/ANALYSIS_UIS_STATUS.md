@@ -183,7 +183,7 @@ async processVideo(job: VideoVLMJob): Promise<void> {
   // Stage 3: Extract frames (every 2 seconds, max 30 frames)
   const framePaths = await this.extractFrames(job.evidenceId, job.filePath, videoMetadata.duration);
 
-  // Stage 4: 🤖 Run Gemma4 VLM analysis on each frame
+  // Stage 4: 🤖 Run ornith 1.5 VLM llama-server 8090  analysis on each frame
   const frameAnalysis = await this.analyzeFramesWithVLM(framePaths);
 
   // Stage 5: Detect scenes (visual similarity via object/tag IoU)

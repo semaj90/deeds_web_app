@@ -1,0 +1,126 @@
+{
+  "schema": "atlas.parent-atlas-graph-analysis-proof-gates.v1",
+  "generatedAt": "2026-10-15T01:11:39Z",
+  "status": "PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionEligible": false,
+  "scope": "Fixed checklist for .okf structural validation, read-only graph mirroring, canonical ontology qualification, GPU parity, and ACE handoff. This is not overall Parent Atlas completion.",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "progress": {
+    "proven": 3,
+    "partial": 1,
+    "blockedOrNotRun": 5,
+    "total": 9,
+    "provenPercent": 33.3,
+    "interpretation": "Fraction of this fixed checklist with explicit PROVEN status only; not portfolio, feature, or production completion."
+  },
+  "gates": [
+    {
+      "id": "OKF-MANIFEST-01",
+      "status": "PROVEN",
+      "claim": "All declared .okf manifest references resolve without unsafe or unregistered structured files.",
+      "evidence": ".okf/manifest.yaml",
+      "observed": "26/26 references; 9 registries; 0 missing, unsafe, or unregistered structured files.",
+      "evidenceSha256": "16674046414fb2d279e18cba340fa770abf395535f6848669391601ab6a98a9d"
+    },
+    {
+      "id": "OKF-PREDICATE-SCHEMA-01",
+      "status": "PROVEN",
+      "claim": "The registered feature-relationships predicate YAML passes its Draft 2020-12 schema validator.",
+      "evidence": ".okf/predicates/feature-relationships.yaml",
+      "observed": "VALID; zero errors; writesPerformed=false.",
+      "documentSha256": "243dae1b3520655aa6a88ea60c9fa56ee83de3df5259347b367ff837d87028fd",
+      "schemaSha256": "2b50f8ced271efd34a49920cdc73f07f605f63962112e101322a2dc348d012cf"
+    },
+    {
+      "id": "GRAPH-NETWORKX-01",
+      "status": "PROVEN",
+      "claim": "The bounded read-only graph export and NetworkX mirror have exact directed node/edge parity under matching expected workspace and graph revisions.",
+      "evidence": "docs/reports/networkx-graph-mirror-live-readonly-v1.json",
+      "observed": "48,339 nodes; 32,226 directed edges; parity and both revision qualifications true; databaseWrites=false; promotionEligible=false.",
+      "exportSha256": "423c08162249fadaba391a472926b60bdecdaa45862c3e01666fe6b4c964e11b",
+      "networkxReceiptSha256": "6bb7d09cbac624b8345c0805cd6b9a5236cc04901dcde42bb4285cfef7139fbf"
+    },
+    {
+      "id": "GRAPH-ACTIVE-SNAPSHOT-01",
+      "status": "BLOCKED",
+      "claim": "The derived graph revision is bound to a current ACTIVE PostgreSQL graph snapshot.",
+      "evidence": "docs/reports/atlas-graph-snapshot-traversal-preflight-20261014.json",
+      "observed": "Two snapshot rows are superseded; current graph/workspace revision bindings are absent. No DDL was applied.",
+      "nextProof": "Approved schema change and independently verified current snapshot readback."
+    },
+    {
+      "id": "ONTOLOGY-ENTITY-01",
+      "status": "BLOCKED",
+      "claim": "An .okf ontology tuple resolves to canonical PostgreSQL terms, participants, and exact evidence revisions.",
+      "evidence": "openspec/changes/parent-atlas-gpu-graph-vector-substrate/tasks.md",
+      "observed": "Live ontology-linked tuple and taxonomy candidate census recorded zero rows; local schema/fixture validation does not substitute for canonical resolution.",
+      "nextProof": "A real admitted tuple with canonical participant IDs and revision-qualified evidence."
+    },
+    {
+      "id": "GRAPH-TYPED-RELATIONS-01",
+      "status": "BLOCKED",
+      "claim": "The live export contains source-qualified directed code relations such as CALLS, IMPORTS, and DEPENDS_ON.",
+      "evidence": "docs/reports/networkx-graph-mirror-live-readonly-v1.json",
+      "observed": "The proven export contains CONTAINS and DERIVED_FROM only.",
+      "nextProof": "A separately qualified graph materialization with typed endpoints and current source/workspace/graph revisions."
+    },
+    {
+      "id": "GRAPH-ORDINAL-FEATURES-01",
+      "status": "NOT_PROVEN",
+      "claim": "One frozen canonical ordinal map aligns graph, semantic, ontology, and hyperedge-incidence feature matrices.",
+      "evidence": "python/atlas_compute/nary_networkx_alignment_v1.py",
+      "observed": "Fixture-level CSR and incidence checks exist; no live canonical participant cohort or shared E/H/T matrix proof is recorded.",
+      "nextProof": "One revision-qualified cohort with deterministic IDs-to-ordinals mapping and matrix checksums."
+    },
+    {
+      "id": "GRAPH-CUGRAPH-PARITY-01",
+      "status": "BLOCKED",
+      "claim": "cuGraph results match the NetworkX oracle on the same frozen, identity-mapped graph snapshot.",
+      "evidence": "docs/reports/networkx-graph-mirror-live-readonly-v1.json",
+      "observed": "The approved graceful preparation unloaded embeddinggemma:latest and stopped only the llama-server owning --port 8090; it reported 7,115 MiB free VRAM. The RAPIDS and minimal Ubuntu probes previously timed out, but current Docker evidence confirms the WSL2-backed engine works. The configured miniforge-nlp-sidecar was started and is running/healthy; in-container and host /health requests return HTTP 200. Its reported capabilities include LangExtract and NetworkX but not torch, cuGraph, cuVS, CuPy, or nx-cugraph. The configured ornith-1.5-vlm server was restored successfully (PID 45632); post-restore /slots returned HTTP 200 with is_processing=false and port 8090 is listening. No cuGraph/PyTorch computation ran; GPU parity remains unproven.",
+      "nextProof": "When GPU parity is needed, separately verify Ubuntu's configured RAPIDS interpreter and imports; only then repeat approved graceful GPU preparation and bounded parity on the exact frozen graph snapshot and ordinal checksum. The CPU NLP sidecar is not the RAPIDS executor."
+    },
+    {
+      "id": "ACE-RETRIEVAL-HANDOFF-01",
+      "status": "PARTIAL",
+      "claim": "The same qualified graph/candidate snapshot flows through SearchRuntime, ContextManifest, ACE/BitFrost, and independent residency readback.",
+      "evidence": "docs/reports/agent-retrieval-execution-receipt-v1.json",
+      "observed": "Existing pieces include dry-run/proposal receipts; no single request proves the full production handoff or physical cache residency.",
+      "nextProof": "One request-linked receipt with shared revisions/checksums, approved cache operation, and independent cold/warm readback."
+    }
+  ],
+  "validation": [
+    {
+      "command": "py -3.13 scripts/atlas/audit_okf_manifest_coverage_v1.py --root .",
+      "exitCode": 0,
+      "result": "26/26 references resolved; no missing, unsafe, or unregistered files."
+    },
+    {
+      "command": "py -3.13 scripts/atlas/validate-okf-yaml-schema-v1.py",
+      "exitCode": 0,
+      "result": "Predicate document VALID; zero schema errors."
+    },
+    {
+      "command": "node scripts/atlas/validate-code-capability-okf-contract-v1.mjs",
+      "exitCode": 0,
+      "result": "Seven typed capability kinds and 18 linked gates validate; no persistence. Contract-only evidence."
+    },
+    {
+      "command": "npx tsx scripts/atlas/prove-okf-domain-python-zod-parity-v1.mts",
+      "exitCode": 0,
+      "result": "PARITY_PROVEN_FOR_FIXTURES_ONLY; 10 fixtures, 9 rejected, zero mismatches; no canonical admission or persistent writes."
+    },
+    {
+      "command": "node scripts/atlas/audit-openspec-evidence-fabric-v1.mjs --check-only",
+      "exitCode": 0,
+      "result": "DIAGNOSTIC_ONLY_NOT_PROMOTABLE; 12,812 tasks, 7,821 checked, zero checked tasks with qualifying linked evidence; outputs empty."
+    },
+    {
+      "command": "Get-NetTCPConnection -State Listen -LocalPort 8090; GET http://127.0.0.1:8090/slots; wsl --list --verbose",
+      "exitCode": 0,
+      "result": "Port 8090 listening; slot not certified idle; Ubuntu stopped and docker-desktop running. No service was stopped or GPU work launched."
+    }
+  ]
+}

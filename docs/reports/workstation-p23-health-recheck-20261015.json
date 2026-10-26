@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.workstation-phase-health-recheck.v1",
+  "roadmapId": "workstation-p23-transport-validation",
+  "observedAt": "2026-10-15T20:06:34.761Z",
+  "status": "PARTIAL_CONTRACTS_AND_HEALTH_BUSINESS_RPC_UNPROVEN",
+  "probes": [
+    {
+      "command": "node scripts/atlas/probe-go-grpc-health-v1.mjs --service=retrieval",
+      "exitCode": 0,
+      "endpoint": "127.0.0.1:50053",
+      "rpc": "Health",
+      "rpcReachable": true,
+      "serviceHealth": "healthy",
+      "dependencies": {
+        "pgvectorConnected": true,
+        "qdrantConnected": true,
+        "redisConnected": true,
+        "embeddingServiceUp": true
+      }
+    },
+    {
+      "command": "node scripts/atlas/probe-go-grpc-health-v1.mjs --service=search",
+      "exitCode": 1,
+      "endpoint": "127.0.0.1:50055",
+      "rpc": "Health",
+      "rpcReachable": false,
+      "error": "14 UNAVAILABLE: No connection established; ECONNREFUSED 127.0.0.1:50055"
+    },
+    {
+      "command": "node scripts/atlas/probe-go-grpc-health-v1.mjs --service=embedding",
+      "exitCode": 0,
+      "endpoint": "127.0.0.1:50051",
+      "rpc": "Health",
+      "rpcReachable": true,
+      "serviceHealth": "healthy",
+      "reportedDevice": "cpu",
+      "reportedGpuMemoryUsedGb": 0,
+      "reportedGpuMemoryTotalGb": 0
+    }
+  ],
+  "focusedContractTests": {
+    "command": "npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts src/lib/server/acp/acp-quic-advertisement-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=verbose",
+    "exitCode": 0,
+    "testFilesPassed": 2,
+    "testsPassed": 6,
+    "testsFailed": 0,
+    "logCaptured": false
+  },
+  "scope": "Health RPC only; no search/embedding business RPC, HTTP/3 or QUIC negotiation, production caller, or agent-to-DAG request was exercised.",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

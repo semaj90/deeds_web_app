@@ -153,13 +153,12 @@
 			<p class="text-xs mt-1">View, search, or upload evidence to see it here</p>
 		</div>
 	{:else}
-		<div class="space-y-1" role="list">
+		<div class="space-y-1">
 			{#each displayItems as item (item.evidenceId + item.timestamp)}
 				<button
 					type="button"
 					class="w-full flex items-center gap-3 px-3 py-2 text-left rounded hover:bg-sand/10 transition-colors group"
 					onclick={() => onSelect?.(item)}
-					role="listitem"
 					aria-label="{item.action} {item.title} — {formatTime(item.timestamp)}"
 				>
 					<div class="flex-shrink-0 w-6 h-6 rounded bg-sand/10 flex items-center justify-center">

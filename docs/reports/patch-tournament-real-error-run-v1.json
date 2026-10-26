@@ -1,0 +1,227 @@
+{
+  "schema": "atlas.patch-tournament-real-error-run.v1",
+  "generatedAt": "2026-10-19T10:05:14.981Z",
+  "mode": "REAL_TSC_ERROR_ISOLATED_COPY_ORNITH_CANDIDATES",
+  "authority": false,
+  "canonicalWrites": false,
+  "autoApply": false,
+  "training": false,
+  "hiddenReasoningStored": false,
+  "target": {
+    "file": "sveltekit-frontend/src/lib/utils/file-uploader.ts",
+    "originalFileSha256Before": "0cdff44c3dddc736968e01cccf27fcce0033f8b1136361db6fb17af2d0b8bb0b",
+    "originalFileSha256After": "0cdff44c3dddc736968e01cccf27fcce0033f8b1136361db6fb17af2d0b8bb0b",
+    "originalUntouched": true,
+    "eolNormalizedForIsolation": true
+  },
+  "baseline": {
+    "baseRevision": "cc69e752be960bdb82a63c45a08b0b72f21abff8",
+    "tscErrorCount": 3,
+    "errors": [
+      "file-uploader.ts(24,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'.",
+      "file-uploader.ts(25,2): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'.",
+      "file-uploader.ts(27,2): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'."
+    ]
+  },
+  "ornith": {
+    "endpoint": "http://127.0.0.1:8090",
+    "model": "ornith-1.5-9b",
+    "stream": true,
+    "temperature": 0.8,
+    "seeds": [
+      101,
+      202,
+      303
+    ],
+    "promptDigest": "15061dba4158dc8546ffa32a5e9552e057317fe4fedf8b722965592df0d5c1a6"
+  },
+  "ranking": [
+    {
+      "candidateId": "ornith-candidate-1",
+      "rank": 1,
+      "score": 116,
+      "reviewStatus": "review_first",
+      "rationale": "2/2 static checks pass the evidence-field gate; 1/1 focused tests pass the evidence-field gate; 3 check evidence refs pass the evidence-field gate (not independently verified); isolated worktree provided"
+    },
+    {
+      "candidateId": "ornith-candidate-2",
+      "rank": 2,
+      "score": 72,
+      "reviewStatus": "blocked",
+      "rationale": "1/2 static checks pass the evidence-field gate; 1/1 focused tests pass the evidence-field gate; 2 check evidence refs pass the evidence-field gate (not independently verified); isolated worktree provided; 1 risk signals"
+    },
+    {
+      "candidateId": "ornith-candidate-3",
+      "rank": 3,
+      "score": -16,
+      "reviewStatus": "blocked",
+      "rationale": "0/2 static checks pass the evidence-field gate; 0/1 focused tests pass the evidence-field gate; 0 check evidence refs pass the evidence-field gate (not independently verified); isolated worktree provided; 1 risk signals"
+    }
+  ],
+  "candidates": [
+    {
+      "candidateId": "ornith-candidate-1",
+      "patchSummary": "Type the `on` callback parameters so indexing `listeners[event]` is safe. Replacing `(event: any, callback: any)` with the inferred `on: <T extends keyof UploaderEvents>(event: T, callback: UploaderEvents[T]) => void` resolves all three TS7053 errors. The `any` Promise executor params are already fi",
+      "outcome": "PASSED_UNVERIFIED",
+      "seed": 101,
+      "ornithMs": 4269,
+      "responseContentDigest": "b44b92a850ca32cad7fec05fb2ab8684c924d1f26caaa4028546737a7c9c0904",
+      "responseChars": 683,
+      "applyReason": null,
+      "edits": [
+        {
+          "find": " on: (event: any, callback: any) => {\n if (!listeners[event]) {\n listeners[event] = [];\n }\n listeners[event]?.push(callback);\n },",
+          "replace": " on: <T extends keyof UploaderEvents>(event: T, callback: UploaderEvents[T]) => {\n if (!listeners[event]) {\n listeners[event] = [];\n }\n listeners[event]?.push(callback);\n },"
+        }
+      ],
+      "remainingTscErrors": 0,
+      "remainingErrorSample": [],
+      "changedFiles": [
+        "file-uploader.ts"
+      ],
+      "changedLines": 2,
+      "finalFileDigest": "7ae3d36a05144c49507898fa646e7796dec7c46e4ab2366f9631c90082e33d7b"
+    },
+    {
+      "candidateId": "ornith-candidate-2",
+      "patchSummary": "Add explicit string type annotations to the three dynamic index accesses (listeners[event], listeners[error], listeners[progress]) to satisfy strict mode. Convert the any-typed `event` parameter to `string` so it can be used as an index key.",
+      "outcome": "CHECK_FAILED",
+      "seed": 202,
+      "ornithMs": 5661,
+      "responseContentDigest": "8e2f9435c8ebcce19d04c94a9f15ca55334efaf809e684fcaf94dbdf2bb50ff4",
+      "responseChars": 959,
+      "applyReason": null,
+      "edits": [
+        {
+          "find": " on: (event: any, callback: any) => {\n if (!listeners[event]) {\n listeners[event] = [];\n }\n listeners[event]?.push(callback);\n },",
+          "replace": " on: (event: string, callback: any) => {\n if (!listeners[event]) {\n listeners[event] = [];\n }\n listeners[event]?.push(callback);\n },"
+        },
+        {
+          "find": " listeners.progress?.forEach((cb: any) => cb(i));",
+          "replace": " listeners[event]?.forEach((cb: any) => cb(i));"
+        },
+        {
+          "find": " listeners.success?.forEach((cb: any) => cb(response));",
+          "replace": " listeners[event]?.forEach((cb: any) => cb(response));"
+        },
+        {
+          "find": " listeners.error?.forEach((cb: any) => cb(error));",
+          "replace": " listeners[event]?.forEach((cb: any) => cb(error));"
+        }
+      ],
+      "remainingTscErrors": 9,
+      "remainingErrorSample": [
+        "file-uploader.ts(24,7): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'.",
+        "file-uploader.ts(25,2): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'.",
+        "file-uploader.ts(27,2): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'."
+      ],
+      "changedFiles": [
+        "file-uploader.ts"
+      ],
+      "changedLines": 8,
+      "finalFileDigest": "25ee18aea3004468080587143a7e16bfaca03f546cacfe8a8632493937bbde1c"
+    },
+    {
+      "candidateId": "ornith-candidate-3",
+      "patchSummary": "MODEL_OUTPUT_NOT_PARSEABLE",
+      "outcome": "CHECK_FAILED",
+      "seed": 303,
+      "ornithMs": 3106,
+      "responseContentDigest": "b606c70ec4d92cab3da7650a8a310e9353977acead161825211b5c2d823584f2",
+      "responseChars": 516,
+      "applyReason": "MODEL_OUTPUT_NOT_PARSEABLE",
+      "edits": null,
+      "remainingTscErrors": 3,
+      "remainingErrorSample": [
+        "file-uploader.ts(24,7): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'.",
+        "file-uploader.ts(25,2): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'.",
+        "file-uploader.ts(27,2): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ success?: ((response: unknown) => void)[] | undefined; error?: ((error: unknown) => void)[] | undefined; progress?: ((percentage: number) => void)[] | undefined; }'."
+      ],
+      "changedFiles": [],
+      "changedLines": 0,
+      "finalFileDigest": "6e81ba5ed01deb2bd09c56ab9af140ff899037b0b64b641e1c3dc40a3b192c83"
+    }
+  ],
+  "outcomeReceipts": [
+    {
+      "executionId": "patchtour:c8d414f0e008f3862dba9c30e5dbb32ed780d039fc867555dde8d4383da43d80",
+      "candidateId": "ornith-candidate-1",
+      "outcome": "PASSED_UNVERIFIED",
+      "rank": 1,
+      "reviewStatus": "review_first"
+    },
+    {
+      "executionId": "patchtour:c0d104545457a399c334a79f222e46bd03391d8c50ff3f71c8ecb34135942427",
+      "candidateId": "ornith-candidate-2",
+      "outcome": "CHECK_FAILED",
+      "rank": 2,
+      "reviewStatus": "blocked"
+    },
+    {
+      "executionId": "patchtour:d526054ef562dad866d3f2769c4b12000af304ba4c42df097802ee4156be403d",
+      "candidateId": "ornith-candidate-3",
+      "outcome": "CHECK_FAILED",
+      "rank": 3,
+      "reviewStatus": "blocked"
+    }
+  ],
+  "dbRehearsal": {
+    "mode": "BEGIN_ROLLBACK_ONLY",
+    "before": 0,
+    "firstPass": [
+      "INSERTED",
+      "INSERTED",
+      "INSERTED"
+    ],
+    "secondPass": [
+      "IDEMPOTENT",
+      "IDEMPOTENT",
+      "IDEMPOTENT"
+    ],
+    "insideTx": 3,
+    "afterRollback": 0,
+    "leftBehind": 0,
+    "checkReceiptsLeftBehind": 0,
+    "verifierRowsLeftBehind": 0,
+    "verifiedRehearsal": {
+      "verdicts": {
+        "ornith-candidate-1:apply": "passed/VERIFIED_PASS",
+        "ornith-candidate-1:tsc": "passed/VERIFIED_PASS",
+        "ornith-candidate-1:scope": "passed/VERIFIED_PASS",
+        "ornith-candidate-2:apply": "passed/VERIFIED_PASS",
+        "ornith-candidate-2:tsc": "failed/VERIFIED_PASS",
+        "ornith-candidate-2:scope": "passed/VERIFIED_PASS"
+      },
+      "resolvedRefCount": 5,
+      "receiptCount": 6,
+      "ranking": [
+        "1:ornith-candidate-1:review_first:score=116",
+        "2:ornith-candidate-2:blocked:score=72",
+        "3:ornith-candidate-3:blocked:score=-16"
+      ],
+      "outcomes": [
+        "ornith-candidate-1:ALL_CHECKS_PASSED_VERIFIED",
+        "ornith-candidate-2:CHECK_FAILED",
+        "ornith-candidate-3:CHECK_FAILED"
+      ],
+      "receiptWrites": [
+        "INSERTED",
+        "INSERTED",
+        "INSERTED",
+        "INSERTED",
+        "INSERTED",
+        "INSERTED"
+      ],
+      "verifierWrites": [
+        "INSERTED",
+        "INSERTED",
+        "INSERTED",
+        "INSERTED",
+        "INSERTED",
+        "INSERTED"
+      ]
+    }
+  },
+  "noAutoApply": true,
+  "limits": "one real error, three samples from a 9B model; shows the loop runs end to end, not that the tournament picks correct patches in general. Passes are PASSED_UNVERIFIED (evidence refs are not in the independent verifier table). Edits are stored; model reasoning is not."
+}

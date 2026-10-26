@@ -1,0 +1,123 @@
+{
+  "schema": "atlas.simdjson-tensor-mcp-proof.v1",
+  "observedAt": "2026-10-16T03:42:36.651Z",
+  "transport": "IN_MEMORY_MCP_REAL_NATIVE_ADDON",
+  "tools": [
+    "atlas.backend_info",
+    "atlas.exact_topk_oracle",
+    "atlas.parity_report",
+    "atlas.simdjson_tensor_metrics"
+  ],
+  "result": {
+    "schema": "atlas.simdjson-graph-gather.v1",
+    "status": "CPU_NATIVE_PARITY_PASSED",
+    "inputKind": "NUMERICAL_FIXTURE",
+    "parserBackend": "icelake (Intel/AMD AVX512)",
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "sourceWritesPerformed": false,
+    "datastoreWritesPerformed": false,
+    "gpu": {
+      "status": "NOT_REQUESTED",
+      "preflightFreeBytes": null,
+      "reserveBytes": 2147483648,
+      "estimatedWorkingBytes": 268496896
+    },
+    "arrayMetrics": {
+      "embeddings": {
+        "shape": [
+          4,
+          768
+        ],
+        "byteLength": 12288,
+        "dtype": "float32",
+        "computation": "CPU_FLOAT64_ACCUMULATION",
+        "elementCount": 3072,
+        "minimum": -1,
+        "maximum": 1,
+        "mean": 0.0007812500116415303,
+        "populationVariance": 0.0013014729972746864,
+        "zeroCount": 3067,
+        "zeroFraction": 0.9983723958333334,
+        "rowL2Norms": [
+          1,
+          1.000000023841858,
+          1,
+          1
+        ]
+      },
+      "query": {
+        "computation": "CPU_FLOAT64_ACCUMULATION",
+        "dtype": "float32",
+        "shape": [
+          1,
+          768
+        ],
+        "elementCount": 768,
+        "byteLength": 3072,
+        "minimum": 0,
+        "maximum": 1,
+        "mean": 0.0013020833333333354,
+        "populationVariance": 0.0013003879123263896,
+        "zeroCount": 767,
+        "zeroFraction": 0.9986979166666666,
+        "rowL2Norms": [
+          1
+        ]
+      }
+    },
+    "inputChecksums": {
+      "parameters": "sha256:e4c627b9ec6798fdb4d7ce2cf9d7fe8278ceb2a0b457a67fb0998edee9ea6cbe",
+      "graph": "sha256:773a006e56e96aa1083a37929dbd10a3b7b7d0df588308a35e89a75c2433e31c",
+      "embeddings": "sha256:1c52d3fd16fbfd2ae4ac8aa73ce699355966676d712124cd73d13df2741607ee",
+      "query": "sha256:e61a2e3c81d6733c0f44e35ebb53f04f82a640202c6657e4fdeadd95a28857ff"
+    },
+    "cpu": {
+      "csrParity": true,
+      "bfsParity": true,
+      "queryExtractionParity": true,
+      "utf8BoundaryFixtureParity": true,
+      "candidateOrdinals": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "topK": [
+        {
+          "ordinal": 0,
+          "score": 1
+        },
+        {
+          "ordinal": 1,
+          "score": 0.7999999928474427
+        },
+        {
+          "ordinal": 2,
+          "score": 0
+        }
+      ]
+    },
+    "evidenceAdmission": "NOT_EXERCISED"
+  },
+  "executionReceipt": {
+    "schema": "atlas.native-acceleration-tool-receipt.v1",
+    "toolName": "atlas.simdjson_tensor_metrics",
+    "access": "READ",
+    "resultSha256": "sha256:940b1c6fa69e3e73bd2c0357867b7d40f92d866921eaf0be929d73d76148f42a",
+    "backend": "icelake (Intel/AMD AVX512)",
+    "executionCounters": {
+      "cuda_execution": 0,
+      "cpu_fallback": 1,
+      "stub_invocation": 0,
+      "cuda_error_fallback": 0,
+      "oom_fallback": 0
+    },
+    "counterScope": "CUMULATIVE_PROCESS_SNAPSHOT_NOT_PER_CALL",
+    "writesPerformed": false,
+    "modelCallsPerformed": false,
+    "canonicalAuthority": false,
+    "receiptChecksum": "sha256:28024a92ec7dcc61c948c8251894be865b5c7797429074c8f2cf7ba20f8db4fc"
+  },
+  "deployedTraceDiscoveryProven": false
+}

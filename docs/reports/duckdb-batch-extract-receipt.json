@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.duckdb-batch-extract.v1",
+  "generated_at": "2026-10-16T00:19:08.888Z",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "writes_performed": false,
+  "zero_copy_memory_transfer_proven": false,
+  "input": {
+    "synthetic_rows_generated": 5000,
+    "table_name": "staged_candidates"
+  },
+  "export": {
+    "format": "PARQUET",
+    "compression": "ZSTD",
+    "file_path": ".tmp/atlas/duckdb-batch-extract-sample.parquet",
+    "file_bytes": 15388
+  },
+  "verification": {
+    "readback_total_rows": 5000,
+    "readback_distinct_sources": 250,
+    "rollup_groups_count": 8,
+    "sample_rollup": [
+      {
+        "domain_label": "EVALUATION",
+        "language": "svelte",
+        "row_count": 1000,
+        "avg_confidence": 0.9000000059604645,
+        "max_pagerank": 0.099,
+        "dense_vectors_ready": 667
+      },
+      {
+        "domain_label": "UI",
+        "language": "svelte",
+        "row_count": 1000,
+        "avg_confidence": 0.9000000208616257,
+        "max_pagerank": 0.096,
+        "dense_vectors_ready": 667
+      },
+      {
+        "domain_label": "LEGAL_ONTOLOGY",
+        "language": "svelte",
+        "row_count": 1000,
+        "avg_confidence": 0.9000000059604645,
+        "max_pagerank": 0.097,
+        "dense_vectors_ready": 667
+      }
+    ],
+    "parity_verified": true
+  },
+  "performance": {
+    "total_duration_ms": 191,
+    "throughput_rows_per_second": 26231
+  },
+  "status": "PASSED",
+  "operator_notes": "DuckDB in-memory batch extraction to Parquet verified with round-trip schema and row-count readback fidelity and zero database mutations. Zero-copy memory ownership is not claimed by this receipt."
+}

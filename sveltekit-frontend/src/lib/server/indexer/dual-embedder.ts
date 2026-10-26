@@ -15,7 +15,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL, SERVER_EMBEDDING_DIMS } from '$lib/ai/model-ids.js';
 import type { CodeChunk } from './ast-chunker.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { runWithAdaptiveBatch } from '$lib/server/gpu/libtorch-bridge.js';
 import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
@@ -63,7 +63,7 @@ function isValidEmbedding(value: unknown): value is number[] {
 /**
  * Generate a 768-dim embedding via the 4-tier embedding fallback chain.
  * Uses embedding-client.ts (gRPC→QUIC→HTTP batch→HTTP seq) which always
- * targets Ollama :11434 — NOT ollamaFetch which may route to llama-server :8090.
+ * targets Ollama :11434 — NOT embedOrChatFetch which may route to llama-server :8090.
  * Redis-cached by content hash to avoid re-embedding identical text.
  */
 async function embed(text: string): Promise<number[]> {

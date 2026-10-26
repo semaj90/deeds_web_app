@@ -2,7 +2,7 @@
  * GET /api/ace/health
  *
  * Live end-to-end health check for the ACE agentic pipeline:
- *   1. ollama         — embed + chat reachability (gemma4-rotorquant:latest-fast model)
+ *   1. ollama         — embed + chat reachability (ornith-1.5-9b model)
  *   2. qdrant         — codebase_chunks_768 collection reachability + point count
  *   3. semantic_search — single round-trip embed → search to confirm the path works
  *   4. postgres       — research_summaries count + embedding coverage

@@ -36,6 +36,7 @@ const COL_FLAG          = process.argv.find(a => a.startsWith('--collection='))?
 
 const QDRANT_URL        = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = COL_FLAG || process.env.ATLAS_QDRANT_COLLECTION || 'codebase_chunks_768';
+const RETIRED_384_COLLECTION = /^codebase_chunks_384(?:_|$)/;
 const SCROLL_BATCH = 500;
 const UPDATE_BATCH = 500;
 
@@ -213,6 +214,12 @@ async function batchSetPayload(pointIds, payload) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
+  if (!DRY_RUN && RETIRED_384_COLLECTION.test(QDRANT_COLLECTION)) {
+    console.error('LEGACY_384_ARTIFACT_KIND_WRITE_DISABLED: retired 384-D collections are read-only');
+    process.exitCode = 78;
+    return;
+  }
+
   console.log(`=== Qdrant Artifact-Kind Backfill — ${DRY_RUN ? 'DRY RUN' : 'LIVE'} ===`);
   console.log(`Collection: ${QDRANT_COLLECTION}`);
   if (KIND_FILTER) console.log(`Kind filter: ${KIND_FILTER}`);

@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.legacy-symbol-materializer-input-integrity.v1",
+  "generatedAt": "2026-10-16T00:28:21Z",
+  "status": "HISTORICAL_INPUT_COHORT_MISMATCH",
+  "mode": "LOCAL_READ_ONLY_IN_MEMORY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "databaseWrites": 0,
+  "cacheWrites": 0,
+  "graphWrites": 0,
+  "method": "Exact nomination_id intersection; materializer-equivalent eligibility and structural snapshot bridge predicates were inspected without invoking the writer.",
+  "inputs": [
+    {
+      "path": ".tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl",
+      "rows": 461,
+      "bytes": 606710,
+      "lastModified": "2026-09-10T02:18:11.517Z",
+      "sha256": "sha256:69a38803ae442e677009e2b3b4e123f296d31b52f21c245384cbd051c811d5dc"
+    },
+    {
+      "path": ".tmp/atlas/graphify-file-index-v1/ast-symbol-resolution.jsonl",
+      "rows": 42524,
+      "bytes": 27359587,
+      "lastModified": "2026-09-10T02:00:20.595Z",
+      "sha256": "sha256:b6efdba4204d7b90caab679a02fce50b9f828dfca256dbd44da87e261a5f8754"
+    },
+    {
+      "path": ".tmp/atlas/current-source-ast-snapshot-v1.ndjson",
+      "rows": 565,
+      "bytes": 529123,
+      "lastModified": "2026-09-18T02:21:44.840Z",
+      "sha256": "sha256:4f5968b04febffec6ff9fda256fa0ce100660fb818cfe2468d15bb4033495696"
+    }
+  ],
+  "cohortIntegrity": {
+    "nominationIdIntersection": 0,
+    "materializerEligibleUniqueRows": 0,
+    "bridgeOutcomesComputed": false,
+    "interpretation": "The files do not define a shared input cohort. Zero eligible rows is not a live identity failure or a successful qualification."
+  },
+  "downstreamHistoricalArtifacts": [
+    {
+      "path": "docs/reports/current-structural-symbol-resolution-v1.json",
+      "sha256": "sha256:d2f41fbb45a5b3458a4559c72ffecf986f0c482b2f3e80767c300629a25f134a",
+      "status": "READ_ONLY_BLOCKED",
+      "nominations": 461,
+      "sourceOnly": 461,
+      "astMatched": 0,
+      "treeBound": 0
+    },
+    {
+      "path": "docs/reports/current-tree-bound-symbol-registry-input-v1.json",
+      "sha256": "sha256:422a21112d7cba5d7a3b78c119707e6ef6d0551c5eb0a2c8459f4da14a82498d",
+      "status": "TREE_NODE_IDENTITY_REQUIRED",
+      "entryCount": 0
+    },
+    {
+      "path": "docs/reports/ast-symbol-resolution-v1.json",
+      "sha256": "sha256:e6b6a96f4a936eb9f5a206e33993aec85d41cff348aa22248cc74fd32b7fc2c2",
+      "status": "READ_ONLY_BLOCKED",
+      "inputDeclarations": 0,
+      "resolutionAttempted": false
+    }
+  ],
+  "firstFailure": "NOMINATION_RESOLUTION_COHORT_ID_MISMATCH",
+  "nextGate": "REGENERATE_A_CHECKSUM_BOUND_NOMINATION_RESOLUTION_SNAPSHOT_TRIO_FROM_ONE_ADMITTED_COHORT",
+  "guardrails": [
+    "Do not run the legacy materializer dry-run with its fixed report output path.",
+    "Do not enable its retired direct-SQL apply bypass.",
+    "Keep P12 source-revision writes and backfill deferred until after P20.",
+    "Do not interpret this stale artifact comparison as current live source-lineage evidence."
+  ]
+}

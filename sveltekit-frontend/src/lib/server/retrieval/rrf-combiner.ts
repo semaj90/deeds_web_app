@@ -6,6 +6,7 @@
  */
 
 export type RetrievalLaneName =
+  | 'postgres_fts'
   | 'postgres_trigram'
   | 'qdrant_vector'
   | 'go_retrieval_semantic'

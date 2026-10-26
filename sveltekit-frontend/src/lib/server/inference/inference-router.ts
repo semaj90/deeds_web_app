@@ -24,7 +24,7 @@
  * 8x attention speedup on GPU, 5x VRAM savings. OpenAI-compatible API.
  *
  * Startup with vision:
- *   llama-server -m gemma4-rotorquant:latest.gguf --mmproj siglip.gguf \
+ *   llama-server -m ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf --mmproj mmproj-Ornith-1.5-9B-BF16.gguf \
  *     -ctk turbo3 -ctv turbo3 --port 8090 -ngl 99 --flash-attn on
  *
  * GPU arbiter ensures TRT-LLM and local VLM inference don't fight for VRAM.
@@ -38,7 +38,7 @@ import { logLLMInference } from '$lib/server/observability/inference-log.js';
 import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbiter.js';
 import { inferLLM, healthCheck as trtHealthCheck, streamLLM as streamTrtLLM } from '$lib/server/trt-llm.js';
 import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM as streamTritonLLM } from '$lib/server/triton-llm.js';
-import { bifrostChat, ollamaFetch, type OllamaMessage } from '$lib/server/ollama.js';
+import { bifrostChat, embedOrChatFetch, type OllamaMessage } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
@@ -73,6 +73,7 @@ export interface InferenceRequest {
   temperature?: number;
   systemPrompt?: string;
   preferTensorrt?: boolean;
+  backendPreference?: 'llama-server';
   stream?: boolean;
   /** Base64-encoded image for VLM analysis (TurboQuant with --mmproj, HF VLM, or llama-server) */
   imageBase64?: string;
@@ -137,12 +138,24 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
     }
     return {
       text: '',
-      model: 'gemma4-rotorquant:latest',
+      model: 'ornith-1.5-9b',
       backend: 'vlm-hf',
       latencyMs: Math.round(performance.now() - start),
       error:
         'No VLM backend available — TurboQuant (mmproj), HF server (:8085), and llama-server VLM all failed',
     };
+  }
+
+  if (request.backendPreference === 'llama-server') {
+    const localResult = await llamaServerInference(request, start);
+    localResult.latencyMs = Math.round(performance.now() - start);
+    logLLMInference({
+      model: localResult.model,
+      backend: 'llama-server',
+      latencyMs: localResult.latencyMs,
+      tokenCount: localResult.usage?.total_tokens,
+    });
+    return localResult;
   }
 
   // Try TensorRT first if preferred and available
@@ -315,7 +328,7 @@ async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse
 
 		return {
 			text: result.text,
-			model: 'gemma4-rotorquant:latest-trt',
+			model: 'ornith-1.5-9b',
 			backend: 'tensorrt',
 			usage: result.usage,
 			latencyMs: 0
@@ -981,7 +994,7 @@ export async function getRouterStatus() {
         .then((r) => r.ok)
         .catch(() => false),
       // Check if Ollama has the VLM model available (list models, check for e4b)
-      ollamaFetch(`${getOllamaEndpoint()}/api/tags`, { signal: AbortSignal.timeout(2_000) })
+      embedOrChatFetch(`${getOllamaEndpoint()}/api/tags`, { signal: AbortSignal.timeout(2_000) })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => d?.models?.some((m: { name: string }) => m.name.includes('e4b-it')) ?? false)
         .catch(() => false),
@@ -1012,7 +1025,7 @@ export async function getRouterStatus() {
       backend: 'hf-nf4',
       visionCapable: true,
     },
-    ollamaVlm: { available: ollamaVlmOk, model: 'gemma4:e4b-it-q4_K_M', visionCapable: true },
+    ollamaVlm: { available: ollamaVlmOk, model: 'ornith-1.5-9b', visionCapable: true },
     bifrost: { enabled: ENV.BIFROST_ENABLED, url: ENV.BIFROST_URL },
     litert: { available: litertOk, url: LITERT_BASE_URL, model: 'gemma-4-E2B-it', backend: 'cpu' },
     ollama: { url: getOllamaEndpoint() },

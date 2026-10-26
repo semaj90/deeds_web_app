@@ -212,22 +212,14 @@ ADVERSARIAL_TESTS = [
 
 
 def query_llm(prompt: str, temperature: float = 0.2) -> str:
-    """Send prompt to Ollama and return response text."""
-    payload = json.dumps({
-        "model": LLM_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "stream": False,
-        "options": {**ADVERSARIAL_OPTIONS, "temperature": temperature},
-    }).encode()
-    req = urllib.request.Request(
-        f"{OLLAMA_URL}/api/chat",
-        data=payload,
-        headers={"Content-Type": "application/json"},
-    )
+    """Send prompt to llama-server (Ornith 1.5, :8090) and return response text."""
+    from config.llama_chat import llama_chat
     try:
-        with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as resp:
-            data = json.loads(resp.read())
-            return data.get("message", {}).get("content", "")
+        return llama_chat(
+            [{"role": "user", "content": prompt}],
+            max_tokens=ADVERSARIAL_OPTIONS.get("num_predict", 250),
+            temperature=temperature,
+        )
     except Exception as e:
         return f"[error: {e}]"
 

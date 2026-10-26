@@ -1,0 +1,186 @@
+{
+  "schema": "atlas.autoencoder-evaluation-gate.v1",
+  "generatedAt": "2026-10-14",
+  "status": "BLOCKED_NO_REVISION_QUALIFIED_COHORT",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "trainingPerformed": false,
+  "gpuExecuted": false,
+  "liveReadback": {
+    "postgres": {
+      "database": "legal_ai_db",
+      "transactionMode": "READ ONLY",
+      "totalChunkRows": 274465,
+      "contentEmbedding768Rows": 219998,
+      "vectorRowsWithSourceRef": 219864,
+      "vectorRowsWithSourceRevision": 0,
+      "vectorRowsWithWorkspaceRevision": 0,
+      "vectorRowsWithRepresentationRevision": 0,
+      "vectorRowsWithEmbeddingModelLabel": 219998,
+      "rowsMeetingAllRequiredBindings": 0
+    },
+    "qdrant": {
+      "metadataOnly": true,
+      "aliasCount": 0,
+      "collections": {
+        "codebase_chunks_768": { "points": 328348, "indexedVectors": 328386, "vectors": ["content:768", "error:768", "signature:768"] },
+        "codebase_chunks_512": { "points": 53380, "indexedVectors": 50149, "vectorDimensions": [512] },
+        "codebase_chunks_latent256": { "points": 55169, "indexedVectors": 47000, "vectorDimensions": [256] },
+        "codebase_topology_64": { "points": 105761, "indexedVectors": 0, "vectors": ["latent_64:64"] }
+      }
+    },
+    "valkey": {
+      "metadataOnly": true,
+      "writesPerformed": 0,
+      "aceAutoencoderWeights": "ABSENT",
+      "aceAutoencoderMeta": "ABSENT",
+      "aceAutoencoderHistory": "ABSENT",
+      "aceAutoencoderDecoderWeights": "ABSENT",
+      "legacyAutoencoderWeightsPrefix": { "keysFound": 0, "scanComplete": true }
+    },
+    "embeddingModelRuntime": {
+      "tag": "embeddinggemma:latest",
+      "digest": "sha256:82f094e4c0e19bc4208c692996d4f1ecf14e82a8dee579ee1d2ca1175260058e",
+      "architecture": "gemma-embedding",
+      "parameterCount": 307581696,
+      "embeddingDimension": 768,
+      "contextLengthTokens": 2048,
+      "slidingWindowTokens": 512,
+      "quantization": "BF16",
+      "metadataOnly": true
+    }
+  },
+  "codePathAudit": {
+    "trainingOwner": "python/train_latent_autoencoder.py",
+    "trainingAliases": ["ae:train", "ae:train:dry"],
+    "trainingExecutionInThisAudit": false,
+    "legacyRedisWeightLoader": {
+      "path": "sveltekit-frontend/src/lib/server/gpu/autoencoder-weights.ts",
+      "runtimeAdmission": "NOT_ADMITTED",
+      "reason": "no immutable checkpoint descriptor and retrieval qualification receipt are approved"
+    },
+    "neuralDecoder": {
+      "path": "python/atlas_neural_decoder_service.py",
+      "aceCaller": "sveltekit-frontend/src/lib/server/ace/neural-decoder-prefill-shadow.ts",
+      "mode": "opt-in SHADOW_READONLY; environment flag defaults false",
+      "receiptClaims": { "canonicalAuthority": false, "canonicalWrites": 0, "retrievalVotesAdded": 0 },
+      "checkpointHandling": "checks configured revision string, loads weights_only checkpoint, computes file SHA-256 after load; no pre-load allowlisted file digest or evaluation-receipt admission",
+      "cacheBehaviorWhenEnabled": "shadow feature cache can read/write Valkey through its adapter; not invoked during this audit",
+      "liveExecutionProven": false
+    },
+    "representationArtifactDescriptor": {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/representation-artifact-v1.ts",
+      "hasModelAndTransformIdentity": true,
+      "hasEvaluationReceiptField": false,
+      "promotionAssertionRequiresSourceAuthorityProven": false,
+      "evidence": "representation-artifact-v1.spec.ts explicitly accepts UNPROVEN source authority in assertPromotionReadyRepresentationArtifact"
+    },
+    "disposition": "shadow computation is not evidence of production promotion; require a distinct strict retrieval-promotion receipt and allowlisted checkpoint digest before any production executor is enabled"
+  },
+  "semanticWriterCensus": {
+    "command": "node scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs --static-only --output=.tmp/atlas/semantic-768-writer-ownership-static-2026-10-14.json",
+    "exitCode": 0,
+    "liveDatabaseCensus": "SKIPPED_BY_STATIC_ONLY_MODE",
+    "verdict": "OWNER_NOT_PROVEN",
+    "staticWriterCandidates": {
+      "content_embedding_768": [
+        "scripts/atlas/apply-lineage-qualified-semantic-768-backfill-v1.mjs",
+        "sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs"
+      ],
+      "legacyContentEmbedding": [
+        "scripts/atlas/reembed-corpus-document-prefix-v1.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts",
+        "sveltekit-frontend/scripts/atlas/graphify-incremental.mjs"
+      ],
+      "atlasPacketsEmbedding": 11
+    },
+    "canonicalCandidatesFailClosed": {
+      "15RowLineageBackfill": "SEMANTIC_768_APPLY_BLOCKED:CANONICAL_WRITER_PROVENANCE_INCOMPLETE",
+      "FullCorpusBackfill": "SEMANTIC_768_LINEAGE_GATE_BLOCKED"
+    },
+    "interpretation": "The static census finds two candidate source paths but neither is an admitted general canonical writer; older embedding surfaces remain and ownership is unresolved."
+  },
+  "excludedFrozenSnapshot": {
+    "path": "docs/reports/semantic768-ae-training-snapshot-v4.json",
+    "rowCount": 55169,
+    "dimensions": 768,
+    "matrixPath": "docs/reports/semantic768/frozen_semantic_768_v4_matrix.f32bin",
+    "declaredAndObservedMatrixSha256": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+    "sourceColumn": "codebase_chunk_index.content_embedding",
+    "sourceColumnType": "halfvec(768)",
+    "producerRevision": "embeddinggemma:latest",
+    "perRowSourceWorkspaceRepresentationRevisions": "NOT_PRESENT",
+    "disposition": "REJECTED_FOR_CURRENT_PRODUCTION_EVALUATION"
+  },
+  "historicalComparisons": {
+    "session121": {
+      "receipt": "docs/reports/session-121-autoencoder-reconciliation-2026-10-13.json",
+      "status": "HISTORICAL_DIAGNOSTIC_ONLY",
+      "cohort": "100 queries versus 900 candidates from training_vectors.npy",
+      "mrl512": { "pairwiseSpearman": 0.963, "recallAt10": 0.825, "recallAt50": 0.854 },
+      "mrl256": { "pairwiseSpearman": 0.9012, "recallAt10": 0.713, "recallAt50": 0.7514 },
+      "mrl128": { "pairwiseSpearman": 0.8029, "recallAt10": 0.596, "recallAt50": 0.6296 },
+      "mrl64": { "pairwiseSpearman": 0.6711, "recallAt10": 0.434, "recallAt50": 0.4762 },
+      "simpleAverage64": { "pairwiseSpearman": 0.6644, "recallAt10": 0.426, "recallAt50": 0.471 },
+      "historicalAutoencoder64": { "pairwiseSpearman": 0.4989, "recallAt10": 0.097, "recallAt50": 0.2506 },
+      "historicalAutoencoderReconstruction768": { "pairwiseSpearman": 0.4595, "recallAt10": 0.092, "recallAt50": 0.2388 },
+      "qualification": "Input cohort is not bound to current source and representation revisions; these results are not production promotion evidence."
+    },
+    "nestedAutoencoderV3": {
+      "receipt": "docs/reports/latent-autoencoder-training-receipt-v3-full01.json",
+      "status": "DIAGNOSTIC_ONLY_SOURCE_LINEAGE_BLOCKED",
+      "snapshotRows": 55169,
+      "trainRows": 49622,
+      "validationRows": 5547,
+      "sourceGroupOverlap": 0,
+      "modelStateChecksum": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "checkpointFileSha256": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5",
+      "reconstructionCosine": { "latent256": 0.9568437, "latent128": 0.9239793, "latent64": 0.8906443 },
+      "exactKnnRecall": { "latent256": 0.8957094, "latent128": 0.8571660, "latent64": 0.7932576 },
+      "sourceAdmission": "NOT_PROVEN; snapshot selected historical halfvec(768) without per-row source/workspace/representation revisions."
+    }
+  },
+  "confirmedFindings": [
+    "Session 121 Gate 4 remains failed and its coordinate-wise Spearman is not retrieval ranking.",
+    "The June trainer applies tanh at each layer; the July evaluator substitutes ReLU in two hidden layers and omits tanh at the bottleneck and output.",
+    "The July evaluator does not explicitly apply or verify the trainer's L2 input normalization.",
+    "No current PostgreSQL vector row has source_revision, workspace_revision, or representation_revision populated.",
+    "The Qdrant projection counts exceed the PostgreSQL chunk-row count in the 768 collection; no aliases are configured.",
+    "The checked Valkey model key families are absent at read time."
+  ],
+  "hypothesesNotProven": [
+    "Training-data mismatch or wrong producer model caused the historical low score.",
+    "MSE-only training objective alone caused the retrieval-quality failure.",
+    "The checkpoint tensors are corrupt or random.",
+    "Diagnostic MRL/AE comparisons predict current production retrieval quality."
+  ],
+  "validation": {
+    "trainingPlanOnly": {
+      "command": "npm run ae:train:dry",
+      "workingDirectory": "sveltekit-frontend",
+      "exitCode": 0,
+      "status": "TRAINING_BLOCKED",
+      "reason": "SEMANTIC_WRITER_AND_ADMITTED_INPUT_PROVENANCE_REQUIRED",
+      "databaseRead": false,
+      "trainingPerformed": false,
+      "checkpointWritten": false,
+      "architectureRevision": "atlas.latent-ae.768-512-256-128.v2",
+      "inputProvenance": "NOT_PROVEN"
+    },
+    "tests": {
+      "command": "npx vitest run src/lib/server/atlas/tensors/representation-artifact-v1.spec.ts src/lib/server/ai/neural-decoder-client.spec.ts",
+      "workingDirectory": "sveltekit-frontend",
+      "exitCode": 0,
+      "testFilesPassed": 2,
+      "testsPassed": 35,
+      "scope": "fixture/mocked structural artifact and neural decoder client contracts; not live service or production admission"
+    },
+    "openSpec": {
+      "command": "npx openspec validate parent-atlas-gpu-graph-vector-substrate --type change --strict",
+      "exitCode": 0
+    },
+    "gitDiffCheck": { "scope": "three audit/ledger artifacts", "exitCode": 0 },
+    "checkpointFileSha256IndependentReadback": true
+  },
+  "nextGate": "Re-export and independently read back a source/workspace/representation-revision-qualified semantic_768 cohort with immutable model and recipe identity; then run a deterministic CPU evaluator with separate reconstruction, pairwise-ranking, exact Recall@K, and judged relevance metrics."
+}

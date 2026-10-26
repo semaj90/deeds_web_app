@@ -119,3 +119,9 @@ The separate embedding-runtime convergence issue remains open: `retrieval/embedd
   check still uses `Buffer.byteLength()` first (does not materialize bytes, cheap to call before
   deciding whether to proceed at all) — the actual buffer allocation only happens once, after that
   guard passes. Pure perf, no behavior change; only call site updated consistently.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

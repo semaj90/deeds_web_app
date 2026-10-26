@@ -11,7 +11,7 @@ $llama = Join-Path $env:USERPROFILE 'Desktop\llama-server-cuda\llama-server.exe'
 $mainModel = if ($env:ROTORQUANT_MODEL_PATH) {
     $env:ROTORQUANT_MODEL_PATH
 } else {
-    Join-Path $repoRoot 'models\gemma4-legal-iq4xs-direct.gguf'
+    Join-Path $repoRoot 'models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'
 }
 $draftModel = if ($env:MTP_DRAFT_MODEL) {
     $env:MTP_DRAFT_MODEL

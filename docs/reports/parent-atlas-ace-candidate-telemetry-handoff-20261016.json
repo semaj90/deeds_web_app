@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.integration-progress.v1",
+  "status": "ACTIVE_PARTIAL",
+  "gate": "ACE-CANDIDATE-TELEMETRY-HANDOFF-01",
+  "implemented": [
+    "Shared selected-row metadata extraction in existing packet telemetry owner",
+    "ACE emitter extraction and direct packet events use the same selected candidate",
+    "Actual context assembler forwards bound source/feature/SOM and all selected packet keys",
+    "No primary row when no packet key exists; no enrichment from later duplicate or unrelated rows"
+  ],
+  "validation": {
+    "suitesPassed": 6,
+    "testsPassed": 37,
+    "log": "docs/reports/ace-packet-provenance-final-20261016T001809.txt",
+    "regressionFinding": "New feature-only cohort test exposed undefined packet keys comparing equal; selection now explicitly requires a present primary key.",
+    "writerScope": "Real selector, emitter and packet writer with mocked database",
+    "syntaxTranspileErrors": 0,
+    "syntaxScope": ["telemetry/packet-centric-telemetry.ts", "telemetry/ace-telemetry-emitter.ts", "features/ai/ace/context-assembler.ts"],
+    "fullTypecheck": "NOT_RUN",
+    "liveContextAssembly": "NOT_RUN",
+    "durableReadback": "NOT_RUN"
+  },
+  "additionalFinding": {
+    "owner": "sveltekit-frontend/src/lib/server/telemetry/acp-mcp-telemetry.ts",
+    "method": "flush",
+    "observedImplementation": "Clears events without durable write",
+    "alternateCollector": "sveltekit-frontend/src/lib/server/acp/acp-telemetry-collector.ts",
+    "qualification": "Full ACP provenance trail remains unproven; consolidate actual owners/callers rather than adding another collector"
+  },
+  "notPerformed": ["live database writes", "source-revision writes", "backfill", "service restart", "model load", "GPU job", "Svelte check", "promotion"],
+  "remaining": ["ACP durable handoff", "qualified provenance from decision through final result", "live ContextManifest admission", "durable independent readback", "actual kernel proof", "identity and enrichment requirements of full goal objective"],
+  "likely_cause": "ACE independently selected packet, feature and first-row SOM metadata instead of preserving the selected packet's row binding.",
+  "evidence": ["Actual context assembler caller", "Existing packet selector and ACE extraction", "37 passing focused tests", "ACP collector flush source"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-telemetry-emitter.ts",
+    "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-packet-provenance.spec.ts",
+    "docs/architecture/packet-telemetry-existing-writer-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-telemetry-lowrank-recommendation-okf-integration --strict",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/telemetry/ace-packet-provenance.spec.ts src/lib/server/telemetry/packet-centric-telemetry.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-ace-candidate-telemetry-handoff-20261016.json",
+  "canonicalAuthority": false
+}

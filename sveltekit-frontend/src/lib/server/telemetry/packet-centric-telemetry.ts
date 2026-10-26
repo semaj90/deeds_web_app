@@ -11,9 +11,15 @@
 
 import { pool } from '$lib/server/db/client.js';
 import { ENV } from '$lib/server/env.server.js';
+import { recordRetrievalEvalTelemetry } from './retrieval-recorder.js';
+import type { TransportTelemetry } from '../grpc/transport-telemetry.js';
+import { TransportTelemetrySchema } from '../grpc/transport-telemetry.js';
+import { ResourceOperationObservationSchema, type ResourceOperationObservation } from './gpu-telemetry.js';
+import { validateTelemetryTraceBinding } from './acp-observation.js';
 
 /** Packet-centric context added to every telemetry event. */
 export interface PacketCentricContext {
+  source_ref?: string | null;
   /** Primary packet identifier (packet_key). */
   packet_id?: string | null;
 
@@ -41,6 +47,10 @@ export interface PacketCentricContext {
 
 /** Enriched telemetry signal combining retrieval + packet context. */
 export interface PacketCentricTelemetryEvent {
+  trace_id?: string | null;
+  acp_observation?: import('./acp-observation.js').AcpObservation;
+  resource_observation?: ResourceOperationObservation;
+  transport_telemetry?: TransportTelemetry;
   // Base retrieval fields
   query?: string;
   query_hash?: string;
@@ -92,42 +102,18 @@ export interface PacketCentricTelemetryEvent {
  * @returns Normalized packet_context with all Phase 2 fields
  */
 export function extractPacketContext(event: any): PacketCentricContext {
-  const ctx: PacketCentricContext = {};
-
-  // Primary identity
-  ctx.packet_id = event.packet_id ?? event.selected_packet_key ?? null;
-  ctx.feature_id = event.feature_id ?? event.selected_feature_id ?? null;
-
-  // SOM routing
-  ctx.som_cell = event.som_cell ?? event.som_cluster ?? null;
-
-  // Versions (try multiple sources)
-  ctx.schema_version = event.schema_version ?? 1;
-  ctx.embedding_version = event.embedding_version ?? 'embeddinggemma:latest';
-  ctx.tool_version = event.tool_version ?? 'mcp:1.0';
-  ctx.gpu_kernel_version = event.gpu_kernel_version ?? 'tensorrt_bridge:1.0';
-  ctx.rpc_transport = event.rpc_transport ?? determineRpcTransport(event);
-
-  return ctx;
-}
-
-/**
- * Infer RPC transport from telemetry context.
- *
- * @param event - Telemetry event
- * @returns Inferred transport (jsonrpc, http, grpc, mcp)
- */
-function determineRpcTransport(event: any): string {
-  if (event.rpc_transport) return event.rpc_transport;
-
-  // Heuristics
-  if (event.surface === 'mcp') return 'mcp';
-  if (event.surface === 'grpc' || event.proto === 'grpc') return 'grpc';
-  if (event.surface === 'jsonrpc') return 'jsonrpc';
-  if (event.retrieval_strategy === 'cold_neschrom') return 'http';
-
-  // Default
-  return 'jsonrpc';
+  const provided = event.packet_context ?? {};
+  return {
+    packet_id: Object.hasOwn(provided, 'packet_id') ? provided.packet_id : event.packet_id ?? event.selected_packet_key ?? null,
+    source_ref: Object.hasOwn(provided, 'source_ref') ? provided.source_ref : event.source_ref ?? null,
+    feature_id: Object.hasOwn(provided, 'feature_id') ? provided.feature_id : event.feature_id ?? event.selected_feature_id ?? null,
+    som_cell: Object.hasOwn(provided, 'som_cell') ? provided.som_cell : event.som_cell ?? event.som_cluster ?? null,
+    schema_version: Object.hasOwn(provided, 'schema_version') ? provided.schema_version : event.schema_version ?? null,
+    embedding_version: Object.hasOwn(provided, 'embedding_version') ? provided.embedding_version : event.embedding_version ?? null,
+    tool_version: Object.hasOwn(provided, 'tool_version') ? provided.tool_version : event.tool_version ?? null,
+    gpu_kernel_version: Object.hasOwn(provided, 'gpu_kernel_version') ? provided.gpu_kernel_version : event.gpu_kernel_version ?? null,
+    rpc_transport: Object.hasOwn(provided, 'rpc_transport') ? provided.rpc_transport : event.rpc_transport ?? null,
+  };
 }
 
 /**
@@ -135,8 +121,8 @@ function determineRpcTransport(event: any): string {
  *
  * This function:
  * 1. Extracts packet_id, feature_id, som_cell
- * 2. Fills in versions (schema, embedding, tool, gpu_kernel)
- * 3. Infers rpc_transport if not present
+ * 2. Preserves supplied versions (schema, embedding, tool, gpu_kernel)
+ * 3. Leaves unobserved versions and rpc_transport null
  * 4. Stores as a single packet_context field for consistency
  *
  * @param event - Raw telemetry event (may have scattered fields)
@@ -154,18 +140,31 @@ export function normalizePacketContext(event: PacketCentricTelemetryEvent): Pack
 }
 
 /**
- * Store packet-centric telemetry to postgres retrieval_telemetry + enriched payload.
+ * Store packet-centric telemetry with its enriched payload.
  *
- * Writes to atlas_retrieval_eval_times (if phase_2_telemetry table exists).
- * Otherwise falls back to retrieval_telemetry.
+ * Writes to phase_2_telemetry when present.
+ * Otherwise reuses the existing atlas_retrieval_eval_times writer.
  *
  * Non-blocking: errors logged but not thrown.
  *
  * @param event - Enriched telemetry event
  */
 export async function recordPacketCentricTelemetry(event: PacketCentricTelemetryEvent): Promise<void> {
+  await recordPacketCentricTelemetryAcknowledged(event);
+}
+
+export async function recordPacketCentricTelemetryAcknowledged(event: PacketCentricTelemetryEvent): Promise<boolean> {
   try {
     const normalized = normalizePacketContext(event);
+    if (normalized.acp_observation) {
+      const { AcpObservationSchema } = await import('./acp-observation.js');
+      normalized.acp_observation = AcpObservationSchema.parse(normalized.acp_observation);
+    }
+    normalized.trace_id = validateTelemetryTraceBinding(normalized.trace_id, normalized.acp_observation);
+    if (normalized.transport_telemetry) normalized.transport_telemetry = TransportTelemetrySchema.parse(normalized.transport_telemetry);
+    if (normalized.resource_observation) normalized.resource_observation = ResourceOperationObservationSchema.parse(normalized.resource_observation);
+    validateTelemetryTraceBinding(normalized.trace_id, normalized.transport_telemetry);
+    validateTelemetryTraceBinding(normalized.trace_id, normalized.resource_observation);
     const ctx = normalized.packet_context || {};
 
     // Try new phase_2_telemetry table first (if it exists)
@@ -207,41 +206,29 @@ export async function recordPacketCentricTelemetry(event: PacketCentricTelemetry
         ]
       );
     } catch (err) {
-      // Table may not exist — fall back to retrieval_telemetry with enriched payload
+      // Table may not exist — reuse the existing eval writer with pointer-only provenance.
       if ((err as any)?.code === '42P01') {
         // Relation does not exist
-        await pool.query(
-          `
-          insert into retrieval_telemetry (
-            query_hash,
-            latency_ms,
-            vector_hits,
-            trigram_hits,
-            fts_hits,
-            cache_hit,
-            fusion_score,
-            retrieval_strategy,
-            surface,
-            environment
-          ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-          `,
-          [
-            normalized.query_hash,
-            normalized.latency_ms,
-            normalized.vector_hits,
-            normalized.trigram_hits,
-            normalized.fts_hits,
-            normalized.cache_hit,
-            normalized.fusion_score,
-            normalized.retrieval_strategy,
-            normalized.surface,
-            normalized.environment,
-          ]
-        );
+        await recordRetrievalEvalTelemetry({
+          query: normalized.query, queryHash: normalized.query_hash, latencyMs: normalized.latency_ms,
+          vectorHits: normalized.vector_hits ?? 0, trigramHits: normalized.trigram_hits ?? 0,
+          ftsHits: normalized.fts_hits ?? 0, selectedPacketKey: ctx.packet_id,
+          selectedPacketKeys: normalized.selected_packet_keys ?? (ctx.packet_id ? [ctx.packet_id] : []),
+          selectedFeatureId: ctx.feature_id, featureIds: normalized.feature_ids,
+          sourceRef: ctx.source_ref, protocol: ctx.rpc_transport ?? undefined,
+          surface: normalized.surface ?? 'unknown', environment: normalized.environment ?? 'unknown',
+          cacheHit: normalized.cache_hit, retrievalStrategy: normalized.retrieval_strategy,
+          timings: normalized.timings, accelerator: normalized.accelerator,
+          cudaAvailable: normalized.cuda_available, matmulMs: normalized.matmul_ms,
+          embeddingMs: normalized.embedding_ms,
+          hitsPayload: { trace_id: normalized.trace_id, packet_context: ctx, transport_telemetry: normalized.transport_telemetry,
+            resource_observation: normalized.resource_observation, acp_observation: normalized.acp_observation },
+        });
       } else {
         throw err;
       }
     }
+    return true;
   } catch (err) {
     // Non-blocking
     console.debug('[Packet-Centric Telemetry] Record failed (non-blocking):', {
@@ -249,6 +236,7 @@ export async function recordPacketCentricTelemetry(event: PacketCentricTelemetry
       feature_id: event.packet_context?.feature_id,
       error: err instanceof Error ? err.message : String(err),
     });
+    return false;
   }
 }
 
@@ -268,9 +256,15 @@ export function buildPacketCentricEvent(
   latencyMs: number,
   strategy: 'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom'
 ): PacketCentricTelemetryEvent {
+  return { ...selectPacketTelemetryCandidates(candidates), latency_ms: latencyMs,
+    retrieval_strategy: strategy, vector_hits: candidates.length };
+}
+
+export function selectPacketTelemetryCandidates(
+  candidates: Array<{ packet_key?: string; feature_id?: string; som_cluster?: string; [key: string]: unknown }>,
+): Pick<PacketCentricTelemetryEvent, 'selected_packet_key' | 'selected_packet_keys' | 'selected_feature_id' | 'feature_ids' | 'packet_context'> {
   const packetKeys = new Set<string>();
   const featureIds = new Set<string>();
-  let somCell: string | null = null;
 
   for (const candidate of candidates) {
     if (candidate.packet_key && typeof candidate.packet_key === 'string') {
@@ -279,31 +273,29 @@ export function buildPacketCentricEvent(
     if (candidate.feature_id && typeof candidate.feature_id === 'string') {
       featureIds.add(candidate.feature_id);
     }
-    if (!somCell && candidate.som_cluster && typeof candidate.som_cluster === 'string') {
-      somCell = candidate.som_cluster;
-    }
   }
 
   const packetKeysArray = Array.from(packetKeys);
   const featureIdsArray = Array.from(featureIds);
+  const primaryCandidate = packetKeysArray.length > 0
+    ? candidates.find((candidate) => candidate.packet_key === packetKeysArray[0]) : undefined;
 
   return {
     selected_packet_key: packetKeysArray[0] ?? null,
     selected_packet_keys: packetKeysArray,
-    selected_feature_id: featureIdsArray[0] ?? null,
+    selected_feature_id: typeof primaryCandidate?.feature_id === 'string' ? primaryCandidate.feature_id : null,
     feature_ids: featureIdsArray,
-    latency_ms: latencyMs,
-    retrieval_strategy: strategy,
-    vector_hits: candidates.length,
     packet_context: {
       packet_id: packetKeysArray[0] ?? null,
-      feature_id: featureIdsArray[0] ?? null,
-      som_cell: somCell,
-      schema_version: 1,
-      embedding_version: 'embeddinggemma:latest',
-      tool_version: 'mcp:1.0',
-      gpu_kernel_version: 'tensorrt_bridge:1.0',
-      rpc_transport: 'jsonrpc',
+      source_ref: typeof primaryCandidate?.source_ref === 'string' ? primaryCandidate.source_ref : null,
+      feature_id: typeof primaryCandidate?.feature_id === 'string' ? primaryCandidate.feature_id : null,
+      som_cell: typeof primaryCandidate?.som_cell === 'string' ? primaryCandidate.som_cell
+        : typeof primaryCandidate?.som_cluster === 'string' ? primaryCandidate.som_cluster : null,
+      schema_version: null,
+      embedding_version: null,
+      tool_version: null,
+      gpu_kernel_version: null,
+      rpc_transport: null,
     },
   };
 }

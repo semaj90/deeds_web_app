@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
-import { makeCbmTextSearchHandlerV1, type CbmTextReceiptV1, decideCbmFallbackV1, qualifyCbmObservationV1, makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type AstExtractLikeV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
+import { makeCbmTextSearchHandlerV1, type CbmTextReceiptV1, decideCbmFallbackV1, qualifyCbmObservationV1, makeAstHandlerV1, makeDefaultAstGrepRefinementHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type AstExtractLikeV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
 import { buildContextToolDagFromPreAgentStages, executeContextToolDagV1 } from './context-tool-dag-contracts.js';
 import { AstGrepStructuralCandidateV1Schema } from '../language/ast-grep-structural-topk.js';
 
@@ -8,6 +8,7 @@ const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graph
 const revisionOfBytes = (source: Uint8Array) => `sha256:${createHash('sha256').update(source).digest('hex')}`;
 const revisionOf = (source: string) => revisionOfBytes(Buffer.from(source, 'utf8'));
 const workspaceRevision = `sha256:${'a'.repeat(64)}`;
+const dagContext = { workflowId: 'wf', workflowRevision: 1, requestId: 'rq', workspaceRevision, graphRevision: 'g1', producerRevision: 'p1' };
 
 function astCandidate(input: Parameters<AstExtractLikeV1>[0], values: { name: string; startByte: number; endByte: number }) {
   return AstGrepStructuralCandidateV1Schema.parse({
@@ -60,7 +61,7 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       files: ['src/a.ts', 'src/readme.md', 'src/norev.ts', 'src/bad.ts', 'src/boom.ts'].map((filePath) => ({ filePath, lineNumbers: [1] })),
       symbols: ['buildA'], totalMatches: 5, truncated: false, canonicalAuthority: false,
     };
-    const out = (await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: { LEXICAL: lexical } })) as { declarations: Array<{ filePath: string; name: string; sourceRef: string; sourceRevision: string; workspaceRevision: string; spanSha256: string; logicalLaneVoteAdded: false }>; matchedLexicalFilePaths: string[]; skipped: Array<{ filePath: string; reason: string }> };
+    const out = (await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: { LEXICAL: lexical }, context: dagContext })) as { declarations: Array<{ filePath: string; name: string; sourceRef: string; sourceRevision: string; workspaceRevision: string; spanSha256: string; logicalLaneVoteAdded: false }>; matchedLexicalFilePaths: string[]; skipped: Array<{ filePath: string; reason: string }> };
     expect(out.declarations.map((d) => `${d.filePath}:${d.name}`)).toEqual(['src/a.ts:buildA']);
     expect(out.declarations[0]).toMatchObject({ sourceRef: 'repo:src/a.ts', sourceRevision: revisionOf('// src/a.ts'), workspaceRevision, logicalLaneVoteAdded: false });
     expect(out.declarations[0]?.spanSha256).toMatch(/^[a-f0-9]{64}$/);
@@ -78,7 +79,7 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf('short') }),
       extract: async (input) => [astCandidate(input, { name: 'buildA', startByte: 0, endByte: 99 })],
     });
-    const out = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+    const out = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', context: dagContext, inputs: {
       LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: ['buildA'], totalMatches: 1, truncated: false, canonicalAuthority: false },
     } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
     expect(out.declarations).toEqual([]);
@@ -91,7 +92,7 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf('old bytes') }),
       extract: async () => { throw new Error('must not extract stale bytes'); },
     });
-    const staleOutput = await stale({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+    const staleOutput = await stale({ nodeId: 'AST_STRUCTURAL_REFINE', context: dagContext, inputs: {
       LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
     } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
     expect(staleOutput.declarations).toEqual([]);
@@ -103,11 +104,49 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf(unicode) }),
       extract: async (input) => [astCandidate(input, { name: 'accent', startByte: 1, endByte: 2 })],
     });
-    const splitOutput = await split({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+    const splitOutput = await split({ nodeId: 'AST_STRUCTURAL_REFINE', context: dagContext, inputs: {
       LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
     } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
     expect(splitOutput.declarations).toEqual([]);
     expect(splitOutput.skipped).toEqual([{ filePath: 'src/a.ts', reason: 'INVALID_SPAN' }]);
+  });
+
+  it('rejects source bindings from a different request workspace revision before reading bytes', async () => {
+    const handler = makeDefaultAstGrepRefinementHandlerV1({
+      symbols: [],
+      producerRevision: 'ast-grep-workspace-scope-test-v1',
+      readSourceBytes: async () => { throw new Error('must not read bytes outside the request snapshot'); },
+      resolveSourceBinding: () => ({
+        sourceRef: 'repo:src/a.ts',
+        workspaceRevision: `sha256:${'b'.repeat(64)}`,
+        sourceRevision: revisionOf('source'),
+      }),
+    });
+    const output = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', context: dagContext, inputs: {
+      LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
+    } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
+
+    expect(output.declarations).toEqual([]);
+    expect(output.skipped).toEqual([{ filePath: 'src/a.ts', reason: 'WORKSPACE_REVISION_MISMATCH' }]);
+  });
+
+  it('fails closed when AST refinement is invoked without DAG execution context', async () => {
+    const handler = makeDefaultAstGrepRefinementHandlerV1({
+      symbols: [],
+      producerRevision: 'ast-grep-missing-context-test-v1',
+      readSourceBytes: async () => { throw new Error('must not read without DAG context'); },
+      resolveSourceBinding: () => ({
+        sourceRef: 'repo:src/a.ts',
+        workspaceRevision,
+        sourceRevision: revisionOf('source'),
+      }),
+    });
+    const output = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+      LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
+    } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
+
+    expect(output.declarations).toEqual([]);
+    expect(output.skipped).toEqual([{ filePath: 'src/a.ts', reason: 'WORKSPACE_REVISION_MISMATCH' }]);
   });
 
   it('rejects invalid UTF-8 bytes even when their digest matches the binding', async () => {
@@ -117,7 +156,7 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOfBytes(raw) }),
       extract: async () => { throw new Error('must not extract invalid UTF-8'); },
     });
-    const output = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+    const output = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', context: dagContext, inputs: {
       LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
     } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
     expect(output.declarations).toEqual([]);
@@ -133,6 +172,7 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
     const source = 'export function target() {}';
     const dag = buildContextToolDagFromPreAgentStages({
       ...meta,
+      workspaceRevision,
       stages: ['QUERY_ANALYSIS', 'LEXICAL', 'AST_STRUCTURAL_REFINE'],
     });
     const receipt = await executeContextToolDagV1(dag, {
@@ -171,6 +211,46 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       }],
     });
     expect(dag.canonicalWritesAllowed).toBe(false);
+  });
+
+  it('composes lexical refinement with the canonical ast-grep extractor', async () => {
+    const source = 'export function target() { return 1; }';
+    const dag = buildContextToolDagFromPreAgentStages({
+      ...meta,
+      workspaceRevision,
+      stages: ['QUERY_ANALYSIS', 'LEXICAL', 'AST_STRUCTURAL_REFINE'],
+    });
+    const receipt = await executeContextToolDagV1(dag, {
+      QUERY_ANALYSIS: async () => ({ query: 'target' }),
+      LEXICAL: makeLexicalHandlerV1({
+        symbols: ['target'],
+        search: async () => ({ matches: [{ filePath: 'src/a.ts', lineNumber: 1 }], totalMatches: 1, truncated: false }),
+      }),
+      AST_STRUCTURAL_REFINE: makeDefaultAstGrepRefinementHandlerV1({
+        symbols: ['target'],
+        producerRevision: 'ast-grep-napi-test-v1',
+        readSourceBytes: async () => Buffer.from(source, 'utf8'),
+        resolveSourceBinding: (filePath) => filePath === 'src/a.ts'
+          ? { sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf(source) }
+          : null,
+      }),
+      EXACT_PROMOTION: async ({ inputs }) => Object.keys(inputs),
+      ACE_PACKET_ASSEMBLY: async () => ({ status: 'FIXTURE_ONLY' }),
+    });
+
+    expect(receipt.ok).toBe(true);
+    expect(receipt.outputs.AST_STRUCTURAL_REFINE).toMatchObject({
+      schema: 'atlas.ast-grep-refinement-output.v1',
+      canonicalAuthority: false,
+      declarations: [{
+        name: 'target',
+        sourceRef: 'repo:src/a.ts',
+        sourceRevision: revisionOf(source),
+        workspaceRevision,
+        logicalLaneVoteAdded: false,
+        canonicalWritesAllowed: false,
+      }],
+    });
   });
 
   it('candidate lane adapter returns compact qualified refs only (no content/summary) and flags unqualified hits', async () => {

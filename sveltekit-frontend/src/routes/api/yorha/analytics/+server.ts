@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 
 const querySchema = z.object({
 	period: z.enum(['7d', '30d', '90d']).default('30d')
@@ -115,7 +115,7 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
         // Ollama health
         (async () => {
           try {
-            const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
+            const res = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
               signal: AbortSignal.timeout(2000),
             });
             if (res.ok) {

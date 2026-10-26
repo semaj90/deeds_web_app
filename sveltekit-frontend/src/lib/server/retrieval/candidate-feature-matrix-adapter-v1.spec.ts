@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   adaptProfilesToCandidateFeatureMatrixV1,
   retrievalCandidateFeatureMatrixReceiptV1Schema,
+  serializeCandidateFeatureMatrixAdapterV1,
+  verifyCandidateFeatureMatrixAdapterReadbackV1,
 } from './candidate-feature-matrix-adapter-v1.js';
 import type { ChunkRetrievalProfileV1 } from './chunk-retrieval-profile-v1.js';
 import { candidateOrdinalMapChecksum, materializeCandidateOrdinalMap } from '../atlas/features/canonical-candidate-v1.js';
+import { formatSha256RevisionV1, normalizeSha256HexV1 } from '../atlas/prefill/canonical-hash-v1.js';
 
 function profile(packetKey: string, sourceRevision = 'sha256:source-a'): ChunkRetrievalProfileV1 {
   return {
@@ -57,6 +60,16 @@ function ordinalMap(profiles: readonly ChunkRetrievalProfileV1[]) {
 }
 
 describe('candidate feature matrix adapter v1', () => {
+  it('normalizes bare and prefixed SHA-256 only at the declared digest boundary', () => {
+    const bare = 'a'.repeat(64);
+    expect(normalizeSha256HexV1(bare)).toBe(bare);
+    expect(normalizeSha256HexV1(`sha256:${bare}`)).toBe(bare);
+    expect(formatSha256RevisionV1(bare)).toBe(`sha256:${bare}`);
+    expect(formatSha256RevisionV1(`sha256:${bare}`)).toBe(`sha256:${bare}`);
+    expect(() => normalizeSha256HexV1(`title:${bare.slice(0, 8)}`)).toThrow();
+    expect(() => normalizeSha256HexV1('A'.repeat(64))).toThrow();
+  });
+
   it('wraps the existing matrix with identity, revision, and executor provenance', () => {
     const map = ordinalMap([profile('a'), profile('b')]);
     const result = adaptProfilesToCandidateFeatureMatrixV1({
@@ -175,5 +188,69 @@ describe('candidate feature matrix adapter v1', () => {
       ...result.receipt,
       unavailableFeatureCount: result.receipt.unavailableFeatureCount - 1,
     })).toThrow('MATRIX_RECEIPT_AVAILABILITY_COUNT_MISMATCH');
+  });
+
+  it('serializes and independently verifies matrix, row, identity, and receipt checksums', () => {
+    const frozenMap = ordinalMap([profile('a'), profile('b')]);
+    const result = adaptProfilesToCandidateFeatureMatrixV1({
+      profiles: [profile('a'), profile('b')],
+      ordinalMap: frozenMap,
+      executorProvenance: [{ executor: 'fixture', executorRevision: 'fixture:v1' }],
+    });
+    const readback = verifyCandidateFeatureMatrixAdapterReadbackV1(
+      serializeCandidateFeatureMatrixAdapterV1(result),
+      frozenMap,
+    );
+
+    expect(readback.status).toBe('MATCH');
+    expect(readback.matrixChecksum).toBe(result.matrixChecksum);
+    expect(readback.rowBindingChecksum).toBe(result.rowBindingChecksum);
+    expect(readback.receiptChecksum).toBe(result.receipt.receiptChecksum);
+    expect(readback.receipt).toEqual(result.receipt);
+    expect(readback.canonicalAuthority).toBe(false);
+    expect(readback.writesPerformed).toBe(false);
+  });
+
+  it('rejects changed serialized matrix values even if the receipt is retained', () => {
+    const frozenMap = ordinalMap([profile('a')]);
+    const result = adaptProfilesToCandidateFeatureMatrixV1({
+      profiles: [profile('a')],
+      ordinalMap: frozenMap,
+      executorProvenance: [{ executor: 'fixture', executorRevision: 'fixture:v1' }],
+    });
+    const payload = JSON.parse(serializeCandidateFeatureMatrixAdapterV1(result));
+    payload.matrix.candidate_features[0] += 1;
+
+    expect(() => verifyCandidateFeatureMatrixAdapterReadbackV1(JSON.stringify(payload), frozenMap))
+      .toThrow('CANDIDATE_FEATURE_MATRIX_READBACK_MATRIX_CHECKSUM_MISMATCH');
+  });
+
+  it('rejects changed row identity even when matrix packet ordering is unchanged', () => {
+    const frozenMap = ordinalMap([profile('a'), profile('b')]);
+    const result = adaptProfilesToCandidateFeatureMatrixV1({
+      profiles: [profile('a'), profile('b')],
+      ordinalMap: frozenMap,
+      executorProvenance: [{ executor: 'fixture', executorRevision: 'fixture:v1' }],
+    });
+    const payload = JSON.parse(serializeCandidateFeatureMatrixAdapterV1(result));
+    payload.identities[0].canonicalId = 'canonical:tampered';
+
+    expect(() => verifyCandidateFeatureMatrixAdapterReadbackV1(JSON.stringify(payload), frozenMap))
+      .toThrow('CANDIDATE_FEATURE_MATRIX_READBACK_CANONICAL_ROW_MISMATCH');
+  });
+
+  it('rejects a valid ordinal map from a different candidate snapshot', () => {
+    const frozenMap = ordinalMap([profile('a')]);
+    const otherMap = ordinalMap([profile('other')]);
+    const result = adaptProfilesToCandidateFeatureMatrixV1({
+      profiles: [profile('a')],
+      ordinalMap: frozenMap,
+      executorProvenance: [{ executor: 'fixture', executorRevision: 'fixture:v1' }],
+    });
+
+    expect(() => verifyCandidateFeatureMatrixAdapterReadbackV1(
+      serializeCandidateFeatureMatrixAdapterV1(result),
+      otherMap,
+    )).toThrow('CANDIDATE_FEATURE_MATRIX_READBACK_ORDINAL_BINDING_MISMATCH');
   });
 });

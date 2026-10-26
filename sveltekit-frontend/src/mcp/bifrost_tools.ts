@@ -5,6 +5,7 @@ import { resolveLoadedLlamaModel } from '../lib/server/ai/llama-server-model-res
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 import { resolveRerankEndpoint } from '../lib/server/search/rerank-endpoint.js';
+import { readBoundedJsonResponse, MCP_UPSTREAM_JSON_MAX_BYTES } from './read-tool-bounds.js';
 
 const OLLAMA_URL      = ENV.OLLAMA_BASE_URL;
 const LLAMA_SERVER_URL = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
@@ -23,8 +24,19 @@ export function registerBifrostTools(server: McpServer, dispatcherMiddleware?: D
       description: 'Unified inference routing (Bifrost Gateway).',
       inputSchema: z.object({
         tier: z.enum(['EMBED', 'RERANK', 'GENERATE_FAST', 'GENERATE_LONG']).describe('Inference tier'),
-        payload: z.record(z.string(), z.any()).describe('OpenAI-compatible payload or tool-specific JSON')
-      })
+        payload: z.record(z.string(), z.unknown()).superRefine((payload, ctx) => {
+          let serialized: string;
+          try {
+            serialized = JSON.stringify(payload);
+          } catch {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Payload must be JSON-serializable' });
+            return;
+          }
+          if (Buffer.byteLength(serialized, 'utf8') > 256 * 1024) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Payload exceeds 256 KiB' });
+          }
+        }).describe('Bounded JSON payload for the selected inference tier')
+      }).strict()
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -66,11 +78,12 @@ export function registerBifrostTools(server: McpServer, dispatcherMiddleware?: D
         const res = await fetch(`${targetUrl}${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestPayload)
+          body: JSON.stringify(requestPayload),
+          signal: AbortSignal.timeout(tier.startsWith('GENERATE_') ? 90_000 : 15_000),
         });
 
         if (!res.ok) throw new Error(`${tier} endpoint returned ${res.status}`);
-        const data = await res.json();
+        const data = await readBoundedJsonResponse(res, MCP_UPSTREAM_JSON_MAX_BYTES);
 
         return {
           content: [{ type: 'text', text: JSON.stringify(data, null, 2) }]
@@ -79,6 +92,8 @@ export function registerBifrostTools(server: McpServer, dispatcherMiddleware?: D
         return { content: [{ type: 'text', text: `Bifrost Dispatch failed [${tier}]: ${err.message}` }], isError: true };
       }
       }
+    ,
+    'READ_ONLY'
     )
   );
 }

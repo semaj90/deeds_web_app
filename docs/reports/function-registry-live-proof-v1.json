@@ -1,0 +1,29 @@
+{
+  "$schema": "atlas.function-registry-live-proof.v1",
+  "receiptVersion": "1.0.0",
+  "timestamp": "2026-10-14T23:09:06.047Z",
+  "status": "PROVEN",
+  "symbol": {
+    "symbolName": "computePacketKeyV2",
+    "symbolVersionId": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+    "nodeType": "function_declaration",
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+    "sourceRevision": "sha256:805b339b4374f53f568b166ea7115bbf25d2cdbb28f7f7fcc9e68c1b618b55b4",
+    "workspaceRevision": "sha256:69e37be3a985552b9195b07fb8848ba42f5f137ebfe688a209b5eb02446f25cb",
+    "packetKey": "packet:9aec19d8-8e0a-5470-bef2-9b8fca6c313a",
+    "repositoryScope": "repo:root",
+    "byteSpan": {
+      "startByte": 4702,
+      "endByte": 4852,
+      "startLine": 81,
+      "endLine": 82
+    },
+    "functionSha256": "sha256:c06d78755a7b3614c0e7cc600ef946da29446571597e8687af95d1c13220ef2b",
+    "exactSourceText": "\n}\n\nexport function computePacketKeyV2(input: PacketKeyV2Input): string {\n\treturn `packet:${uuidv5(canonicalNameV2(input), PACKET_AGGREGATE_NAMESPACE_"
+  },
+  "readbackValidation": {
+    "sourceBytesVerified": true,
+    "matchingSha256": true,
+    "failClosedEnforced": true
+  }
+}

@@ -38,7 +38,7 @@ const DEFAULT_BASE_URL =
   'http://127.0.0.1:8090';
 
 function resolveLlamaServerModelId() {
-  const explicit = String(process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
+  const explicit = String(process.env.ORNITH_MODEL ?? process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
   if (explicit) return explicit;
 
   const modelPath = String(
@@ -53,16 +53,17 @@ function resolveLlamaServerModelId() {
   }
 
   const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
-  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+  if (gemma4 && !/^ornith-1.5-9b(?::latest)?$/i.test(gemma4)) return gemma4;
 
-  return 'hforf.gguf';
+  return 'ornith-1.5-9b';
 }
 
 const DEFAULT_MODEL = resolveLlamaServerModelId();
 
 const DEFAULT_SYSTEM =
+  process.env.ORNITH_SYSTEM ??
   process.env.GEMMA4_SYSTEM ??
-  'You are Gemma4 on the repo-audit path. Stay grounded in provided repo evidence.';
+  'You are Ornith 1.5 on the repo-audit path. Stay grounded in provided repo evidence.';
 
 function normalizeBaseUrl(value) {
   return String(value ?? '').replace(/\/+$/, '');

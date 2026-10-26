@@ -29,7 +29,7 @@ export interface AnswerGenerationRequest {
 	validation_id: string;
 	case_id: string;
 	query: string;
-	llm_provider?: string; // Default: "gemma4-rotorquant:latest"
+	llm_provider?: string; // Default: "ornith-1.5-9b"
 	max_tokens?: number; // Default: 2000
 }
 

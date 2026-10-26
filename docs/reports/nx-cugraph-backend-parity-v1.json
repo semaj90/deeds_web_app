@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.nx-cugraph-parity.v1",
+  "seed": 20261017,
+  "nodes": 3000,
+  "edges": 15000,
+  "writesPerformed": false,
+  "networkx": "3.6.1",
+  "nxCugraph": "26.06.00",
+  "gpu": "NVIDIA GeForce RTX 3060 Ti",
+  "checks": {
+    "pagerank": {
+      "maxAbsDiff": 3.2526065174565133e-19,
+      "topKOverlap": 1.0,
+      "cpuMs": 592.27,
+      "gpuFirstCallMs": 3049.46,
+      "gpuWarmMedianMs": 8.37,
+      "pass": true
+    },
+    "bfs": {
+      "exactDistanceEquality": true,
+      "cpuMsTotal": 15.37,
+      "gpuMsTotal": 2211.64,
+      "pass": true
+    },
+    "connectedComponents": {
+      "components": 1,
+      "partitionEqual": true,
+      "pass": true
+    }
+  },
+  "cacheConvertedGraphsConfig": "True",
+  "status": "PARITY_PASS",
+  "caveat": "One seeded random fixture; not a claim about the real Atlas graph, other algorithms, or production load. Do not set NETWORKX_AUTOMATIC_BACKENDS globally on this evidence."
+}

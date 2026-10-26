@@ -1,0 +1,4835 @@
+{
+  "schema": "atlas.parent-atlas-promotion-gates.v1",
+  "generatedAt": "2026-10-16T17:00:04.501Z",
+  "mode": "READ_ONLY",
+  "status": "BLOCKED",
+  "proofLevel": "BLOCKED",
+  "writesPerformed": false,
+  "authority": false,
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "workspaceRevisionCandidate": null,
+  "authorityInputConsistency": {
+    "derivationStatus": "WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION",
+    "planStatus": "SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED",
+    "derivationPlanSnapshotMatch": false,
+    "admissionMatchesCurrentCandidate": true
+  },
+  "workspaceAuthority": {
+    "status": "ADMITTED",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "sourceCount": 25542,
+    "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+    "receiptPath": "docs/reports/workspace-revision-tournament-admission-v1.json",
+    "authority": true
+  },
+  "graphifyExecution": {
+    "status": "PROVEN",
+    "executionId": null,
+    "expectedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "matchesAdmittedWorkspaceRevision": true,
+    "blocker": null,
+    "receiptPath": "docs/reports/current-graphify-run-owner-v1.json"
+  },
+  "independentLaneFindings": {
+    "structural": {
+      "report": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "exists": true,
+      "status": "CURRENT_PACKET_CHUNK_JOIN_PARTIAL",
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": "STATUS_NOT_PROMOTABLE:CURRENT_PACKET_CHUNK_JOIN_PARTIAL"
+    },
+    "semanticOwner": {
+      "report": "docs/reports/semantic-768-writer-ownership-v1.json",
+      "exists": true,
+      "status": "OWNER_NOT_PROVEN",
+      "proofLevel": null,
+      "authority": "postgres",
+      "writesPerformed": false,
+      "firstBlockingInvariant": "multiple 768 surfaces remain populated or referenced"
+    },
+    "representation": {
+      "report": "docs/reports/latent-representation-identity-audit-2026-09-10.json",
+      "exists": true,
+      "status": null,
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": null
+    },
+    "graph": {
+      "report": "docs/reports/current-graph-artifact-readiness-v1.json",
+      "exists": true,
+      "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION",
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": "STATUS_NOT_PROMOTABLE:CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION"
+    },
+    "qdrant": {
+      "report": "docs/reports/qdrant-packet-fanout-v1.json",
+      "exists": true,
+      "status": null,
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": null
+    },
+    "rrfWeights": {
+      "report": "docs/reports/rrf-lane-weight-census-v1.json",
+      "exists": true,
+      "status": "CENSUS_COMPLETE_MIGRATION_NOT_AUTHORIZED",
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": "MIGRATION_REQUIRES_EXPLICIT_LOGICAL_LANE_MAPPING"
+    },
+    "rrfIdentity": {
+      "report": "docs/reports/rrf-real-caller-identity-envelope-v1.json",
+      "exists": true,
+      "status": "IDENTITY_ENVELOPE_PARTIAL",
+      "proofLevel": "PARTIAL_PROVEN",
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": "IDENTITY_REVISION_FIELDS_INCOMPLETE"
+    },
+    "classifier": {
+      "report": "docs/reports/domain-classifier-lineage-v1.json",
+      "exists": true,
+      "status": "CLASSIFIER_LINEAGE_BLOCKED",
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": "STATUS_NOT_PROMOTABLE:CLASSIFIER_LINEAGE_BLOCKED"
+    },
+    "ontology": {
+      "report": "docs/reports/parent-atlas-concept-fabric-audit-v1.json",
+      "exists": true,
+      "status": null,
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": null
+    },
+    "ace": {
+      "report": "docs/reports/ace-live-dry-input-readiness-v2.json",
+      "exists": true,
+      "status": "ACE_LIVE_DRY_INPUT_BLOCKED",
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": "CandidateOrdinalMapV1:MISSING_ARGUMENT"
+    },
+    "judgment": {
+      "report": "docs/reports/golden-relevance-review-queue-validation-2026-10-16T16-56-25-155Z.json",
+      "exists": true,
+      "status": "GOLDEN_VALIDATION_INPUT_BOUND",
+      "proofLevel": null,
+      "authority": false,
+      "writesPerformed": false,
+      "firstBlockingInvariant": "HUMAN_REVIEWED_JUDGMENTS_PENDING",
+      "validationReadback": {
+        "status": "GOLDEN_VALIDATION_INPUT_BOUND",
+        "canonicalAuthority": false,
+        "inputPath": ".tmp/atlas/golden-relevance-review-queue-pooled-v1.ndjson",
+        "inputChecksum": "sha256:cd37b7049febf3aa8e0db572a247977e8c7a36bebafbe62b3d584b356ef24ca6",
+        "validationReceiptChecksum": "sha256:d53d95d08a4c3c57881d51d4dc775c4cff41541c4453c913929b148123c62aaf",
+        "queryCount": 60,
+        "judgmentCount": 1287,
+        "completedJudgmentCount": 0,
+        "blankJudgmentCount": 1287,
+        "invalidJudgmentCount": 0,
+        "hardNegativeCount": 0,
+        "importAllowed": false,
+        "firstBlockingInvariant": "HUMAN_REVIEWED_JUDGMENTS_PENDING"
+      }
+    }
+  },
+  "workspaceRevisionPolicy": "TOURNAMENT_CONTROL_PLANE_ADMITTED_CANONICAL_OWNER_PENDING",
+  "counts": {
+    "totalGates": 10,
+    "evaluatedGates": 1,
+    "blockedGates": 10,
+    "provenGates": 0,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  },
+  "violations": [],
+  "gates": [
+    {
+      "id": "CURRENT-SOURCE-TERMINAL-EXECUTION-01",
+      "name": "Current source terminal execution",
+      "status": "PROVEN",
+      "proofLevel": "PARTIAL_PROVEN",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/current-graphify-snapshot-authority-v1.json",
+          "exists": true,
+          "status": "CURRENT_SNAPSHOT_PROVEN"
+        },
+        {
+          "report": "docs/reports/current-source-owner-reconciliation-v1.json",
+          "exists": true,
+          "status": null
+        },
+        {
+          "report": "docs/reports/current-source-evidence-hydration-v1.json",
+          "exists": true,
+          "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED"
+        },
+        {
+          "report": "docs/reports/graphify-snapshot-consumer-preflight-v1.json",
+          "exists": true,
+          "status": "GRAPHIFY_SNAPSHOT_CONSUMER_PREFLIGHT_PROVEN"
+        }
+      ],
+      "violations": []
+    },
+    {
+      "id": "CURRENT-STRUCTURAL-LINEAGE-01",
+      "name": "Current structural lineage",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/current-graphify-snapshot-authority-v1.json",
+          "exists": true,
+          "status": "CURRENT_SNAPSHOT_PROVEN"
+        },
+        {
+          "report": "docs/reports/current-source-evidence-hydration-v1.json",
+          "exists": true,
+          "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED"
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "SEMANTIC-768-OWNER-RECONCILIATION-01",
+      "name": "Semantic 768 owner reconciliation",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+          "exists": true,
+          "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED"
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "REPRESENTATION-LEDGER-01",
+      "name": "Representation ledger",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/latent-representation-identity-audit-2026-09-08.json",
+          "exists": true,
+          "status": null
+        },
+        {
+          "report": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+          "exists": true,
+          "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED"
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "QDRANT-V2-IDENTITY-LINEAGE-01",
+      "name": "Qdrant v2 identity lineage",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+          "exists": true,
+          "status": "CANARY_QDRANT_IDENTITY_BLOCKED"
+        },
+        {
+          "report": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+          "exists": true,
+          "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED"
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "LEIDEN-EXACT-PROJECTION-IDENTITY-01",
+      "name": "Leiden exact projection identity",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+          "exists": true,
+          "status": "CANARY_QDRANT_IDENTITY_BLOCKED"
+        },
+        {
+          "report": "docs/reports/graph-projection-manifest-v1.json",
+          "exists": false,
+          "status": null
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "GRAPH-PROJECTION-MANIFEST-01",
+      "name": "Graph projection manifest",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/graph-projection-manifest-v1.json",
+          "exists": false,
+          "status": null
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "RRF-CURRENT-PRODUCTION-REPLAY-01",
+      "name": "RRF current production replay",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "RETRIEVAL-JUDGMENT-SET-01",
+      "name": "Reviewed retrieval judgment set",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/retrieval-judgment-set-v1.json",
+          "exists": false,
+          "status": null
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    },
+    {
+      "id": "RETRIEVAL-PARITY-RECEIPT-01",
+      "name": "Retrieval parity receipt",
+      "status": "BLOCKED_BY_PREVIOUS_GATE",
+      "proofLevel": "BLOCKED",
+      "blocking": true,
+      "writesPerformed": false,
+      "authority": false,
+      "evidence": [
+        {
+          "report": "docs/reports/retrieval-parity-receipt-v1.json",
+          "exists": false,
+          "status": null
+        },
+        {
+          "report": "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+          "exists": true,
+          "status": "CANARY_QDRANT_IDENTITY_BLOCKED"
+        },
+        {
+          "report": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+          "exists": true,
+          "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED"
+        }
+      ],
+      "violations": [
+        "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN"
+      ]
+    }
+  ],
+  "firstBlockingGate": "CURRENT-STRUCTURAL-LINEAGE-01",
+  "firstBlockingInvariant": "CURRENT_STRUCTURAL_LINEAGE_NOT_PROVEN",
+  "nextGate": "CURRENT-STRUCTURAL-LINEAGE-01",
+  "safeNextCommand": "npx tsx scripts/atlas/audit-current-structural-lineage-v1.mjs",
+  "reportPath": "docs\\reports\\parent-atlas-promotion-gates-golden-readback-20261016.json",
+  "evidence": {
+    "sourceAuthority": {
+      "path": "docs/reports/current-graphify-snapshot-authority-v1.json",
+      "exists": true,
+      "value": {
+        "schema": "atlas.current-graphify-snapshot-authority.v1",
+        "status": "CURRENT_SNAPSHOT_PROVEN",
+        "sourceSnapshot": {
+          "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "sourceManifestDigest": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+          "sourceCount": 25542,
+          "sourceManifestChecksum": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+          "workspaceRevisionRecordChecksum": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+          "snapshotManifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+          "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+          "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+          "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+          "observedAt": "2026-09-21T22:53:47.662Z"
+        },
+        "qualifyingExecutionIds": [
+          "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+          "74d50c86-8194-45ea-8c3d-61aab737ef83"
+        ],
+        "ownerSelection": {
+          "requestedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+          "preflightStatus": "OWNER_SELECTION_APPLIED_READBACK_VERIFIED",
+          "ownerPlanChecksum": "sha256:ae591c99013c268ba48251978f48fe339597b02c06f774def82bbc6edec83f97",
+          "validated": true,
+          "reason": null
+        },
+        "candidates": [
+          {
+            "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "status": "COMPLETED",
+            "canonicalAuthority": false,
+            "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "sourceSelectionStatus": "COMPLETED",
+            "selectionPolicyRevision": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+            "selectionPolicyIsNonCanary": true,
+            "sourceSelectionOutputChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+            "sourceRefSetChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "snapshotSourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "sourceIdentitySetChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+            "executionContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+            "snapshotContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+            "sourceCount": 25542,
+            "expectedSourceCount": 25542,
+            "workspaceRevisionMatches": true,
+            "sourceCountMatches": true,
+            "sourceBindingsMatch": true,
+            "sourceRefSetChecksumMatches": true,
+            "sourceIdentitySetChecksumMatches": true,
+            "snapshotContentChecksumMatches": true,
+            "eligible": true
+          },
+          {
+            "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "status": "COMPLETED",
+            "canonicalAuthority": true,
+            "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "sourceSelectionStatus": "COMPLETED",
+            "selectionPolicyRevision": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+            "selectionPolicyIsNonCanary": true,
+            "sourceSelectionOutputChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+            "sourceRefSetChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "snapshotSourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "sourceIdentitySetChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+            "executionContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+            "snapshotContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+            "sourceCount": 25542,
+            "expectedSourceCount": 25542,
+            "workspaceRevisionMatches": true,
+            "sourceCountMatches": true,
+            "sourceBindingsMatch": true,
+            "sourceRefSetChecksumMatches": true,
+            "sourceIdentitySetChecksumMatches": true,
+            "snapshotContentChecksumMatches": true,
+            "eligible": true
+          }
+        ],
+        "graphSnapshot": {
+          "status": "GRAPH_CANONICAL_AUTHORITY_PROVEN",
+          "canonicalAuthorityTrueExecutions": 1
+        },
+        "authorityShadow": {
+          "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+          "error": null,
+          "observation": {
+            "schema": "atlas.graphify-authority-shadow-observation.v1",
+            "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "authorityState": "LEGACY_IMPORTED",
+            "parityStatus": "PARITY_PROVEN",
+            "readParityProven": true,
+            "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+            "shadowAuthorityObserved": true,
+            "mutationAuthorized": false
+          }
+        },
+        "canonicalAuthority": false,
+        "readOnly": true,
+        "writesPerformed": false,
+        "producerRevision": "atlas.current-graphify-snapshot-authority.v1"
+      }
+    },
+    "sourceOwner": {
+      "path": "docs/reports/current-source-owner-reconciliation-v1.json",
+      "exists": true,
+      "value": {
+        "schema": "atlas.current-source-owner-reconciliation.v1",
+        "generatedAt": "2026-10-05T17:29:31.487Z",
+        "mode": "READ_ONLY",
+        "writesPerformed": false,
+        "databaseWrites": 0,
+        "graphifyMutations": 0,
+        "packetWrites": 0,
+        "projectionWrites": 0,
+        "workspace": {
+          "root": "C:\\Users\\james\\Videos\\deeds-web-app",
+          "gitRoot": "C:/Users/james/Videos/deeds-web-app",
+          "gitCommonDir": ".git",
+          "headCommit": "ae9651941ea3ed0ebfd5630ca22be4ccdb496b45",
+          "headTree": "0f7b71ef26b575b6ec44df4ec345cd48d83ecf11",
+          "hostname": "DESKTOP-Q18MPHM",
+          "dirty": true,
+          "sourceCount": 26748,
+          "sourceRefChecksum": "sha256:2eed529628ede1aab620bc5bd3f4f0b4ffe328f4e8630d0346e32bbbe18e4141",
+          "inventoryPolicy": {
+            "command": "git ls-files --cached --others --exclude-standard -z",
+            "trackedAtHeadCount": 32739,
+            "candidateCount": 26787,
+            "admittedCount": 26748,
+            "skippedCount": 39,
+            "maxSourceBytes": 5242880,
+            "generatedPrefixesExcluded": [
+              "docs/reports/"
+            ],
+            "sourceExtensions": [
+              ".bash",
+              ".c",
+              ".cc",
+              ".cjs",
+              ".cpp",
+              ".cs",
+              ".cts",
+              ".cxx",
+              ".go",
+              ".gql",
+              ".graphql",
+              ".h",
+              ".hh",
+              ".hpp",
+              ".java",
+              ".js",
+              ".json",
+              ".jsonl",
+              ".jsx",
+              ".kt",
+              ".kts",
+              ".md",
+              ".mdx",
+              ".mjs",
+              ".mts",
+              ".proto",
+              ".ps1",
+              ".psm1",
+              ".py",
+              ".rs",
+              ".sh",
+              ".sql",
+              ".svelte",
+              ".toml",
+              ".ts",
+              ".tsx",
+              ".yaml",
+              ".yml",
+              ".zsh"
+            ],
+            "skippedByReason": {
+              "SOURCE_TOO_LARGE": 31,
+              "NOT_VALID_UTF8_SOURCE": 8
+            }
+          },
+          "status": "PROVEN",
+          "admittedSnapshotDelta": {
+            "snapshotRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "snapshotSourceCount": 25542,
+            "currentSourceCount": 26748,
+            "sharedSourceCount": 24446,
+            "currentOnlyCount": 2302,
+            "admittedOnlyCount": 1096,
+            "sharedDigestMatchCount": 23265,
+            "sharedDigestMismatchCount": 1181,
+            "dispositionCounts": {
+              "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23265,
+              "WORKTREE_BYTES_DRIFTED": 1181,
+              "WORKTREE_ADDED_AFTER_SNAPSHOT": 2302,
+              "MISSING_FROM_CURRENT_WORKTREE": 1096
+            },
+            "requiresSnapshotRefresh": true,
+            "currentOnlySample": [
+              ".claude/skills/openspec-quickhit/SKILL.md",
+              ".claude/skills/parent-atlas-workstation/SKILL.md",
+              ".claude/skills/validating-parent-atlas/SKILL.md",
+              ".claude/skills/validating-parent-atlas/reference/adversarial-probes.md",
+              ".claude/skills/validating-parent-atlas/reference/identity-and-lineage.md",
+              ".claude/skills/validating-parent-atlas/reference/proof-levels.md",
+              ".claude/skills/validating-parent-atlas/reference/runtime-side-effects.md",
+              ".claude/skills/validating-parent-atlas/reference/semantic-projection.md",
+              ".claude/skills/validating-parent-atlas/reference/structural-lineage.md",
+              ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
+              ".okf/docs/dspy/corpus-3.4.0.json",
+              ".okf/docs/dspy/corpus.json",
+              ".okf/docs/dspy/postgres-index-contract.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/indexes/firecrawl-map.json",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/manifest.json",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0150a9bf3908b8d567987f068e43b5108781feff2b8ccbb7edc2ba0aa090d051.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/04565bee03781ddd66524ca26fcf64c4a8425f3ebabfc57f99ba9d904d6ab69a.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0507794de7baf379eb626ddd1ebde433a82b06b3e0910e2203b0d9cc24c79ae0.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/07ae7e91bf239d28c4d0a4eaffbefdfd07ed73a3cf5b50b179ffe998178cbc5e.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/097569378fbff92f48e8e3af03f37b06107c6467bb36897ef5e85fc48733bba0.md"
+            ],
+            "admittedOnlySample": [
+              "claude-mem/.agent/rules/claude-mem-context.md",
+              "claude-mem/.agents/plugins/marketplace.json",
+              "claude-mem/.claude-plugin/marketplace.json",
+              "claude-mem/.claude-plugin/plugin.json",
+              "claude-mem/.claude/commands/anti-pattern-czar.md",
+              "claude-mem/.claude/plans/animated-installer.md",
+              "claude-mem/.claude/reports/test-audit-2026-01-05.md",
+              "claude-mem/.claude/settings.json",
+              "claude-mem/.codex-plugin/plugin.json",
+              "claude-mem/.github/FUNDING.yml",
+              "claude-mem/.github/ISSUE_TEMPLATE/bug_report.md",
+              "claude-mem/.github/ISSUE_TEMPLATE/feature_request.md",
+              "claude-mem/.github/copilot-instructions.md",
+              "claude-mem/.markdownlint.json",
+              "claude-mem/.plan/issue-2341-reliability-slice.md",
+              "claude-mem/.plan/npx-distribution.md",
+              "claude-mem/.plan/subagent-summary-disable-and-labeling.md",
+              "claude-mem/.plan/worktree-adoption.md",
+              "claude-mem/.translation-cache.json",
+              "claude-mem/.windsurf/rules/claude-mem-context.md"
+            ],
+            "sharedDigestMismatchSample": [
+              ".claude/settings.local.json",
+              ".claude/skills/drizzle-schema-review/SKILL.md",
+              ".okf/index.md",
+              ".vscode/tasks.json",
+              "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+              "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+              "AGENTS.md",
+              "claude.md",
+              "codex.md",
+              "crates/turbovec-napi/index.d.ts",
+              "crates/turbovec-napi/index.js",
+              "crates/turbovec-napi/src/lib.rs",
+              "docker-compose.yml",
+              "docker/bifrost/config.json",
+              "docker/clickhouse-mirror/clickhouse-mirror.py",
+              "docker/docker-compose.gpu.yml",
+              "docker/docling-vlm/app.py",
+              "docker/image-synthesis/app.py",
+              "docker/langgraph-synthesis/app.py",
+              "docs/.okf/registry.yaml"
+            ],
+            "deltaChecksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
+          }
+        },
+        "currentExecutionCandidates": [
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-15T01:13:15.628Z",
+            "memberCount": 25542,
+            "distinctSourceCount": 25542,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+              "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "status": "COMPLETED",
+            "canonical_authority": true,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-15T01:11:57.965Z",
+            "memberCount": 25542,
+            "distinctSourceCount": 25542,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+              "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+            "execution_id": "b337f94c-850b-44b5-99a7-ba6a6cfaeedf",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-13T01:40:49.787Z",
+            "memberCount": 1,
+            "distinctSourceCount": 1,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+            "execution_id": "3ded0ce6-cd8c-419f-96c9-49984824c956",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-13T01:40:07.535Z",
+            "memberCount": 1,
+            "distinctSourceCount": 1,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+            "execution_id": "24c421a1-28b1-431d-ac09-2793ed807ca6",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-13T01:39:34.179Z",
+            "memberCount": 1,
+            "distinctSourceCount": 1,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+            "execution_id": "c531a1b0-c932-482f-8a21-5d067f504a13",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-13T01:08:02.795Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:6b356954650330b3e17abbd19533a89ce5db3904ea35840f9117d4ca315c2bd5",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:c21bb5a366c1dcdb44fceb84a966763f2cf2cc88680faad2680324fcb605ae73",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+            "execution_id": "5013de19-7bed-4703-bd6b-1684b19e2aaf",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-13T01:04:14.357Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:dd7ef6419773d004445845b19bb1e280aa35c717284fa0b5795ae6b8432237d2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9a27e2d43d28913ef1c97256a5fe2e374ff3ceea4e4d0d24401bfa086f5001ae",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+            "execution_id": "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-11T15:44:01.520Z",
+            "memberCount": 25291,
+            "distinctSourceCount": 25291,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:d7eaf600123b6d55bb8be3193e154e9f24acf217e8e79bc2b3c383a99c2d1869",
+              "receipt_ref": "sealed-snapshot:sha256:06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:15bca318677e8624a2bf4e44a03a91a5d02636516973b120e61e26c21e1e00a5",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+            "execution_id": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T22:46:18.679Z",
+            "memberCount": 25271,
+            "distinctSourceCount": 25271,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:889d6a1457a73e5c42b6d650bbd012e214d1ea7d6838a453558b612ed4df22de",
+              "receipt_ref": "sealed-snapshot:sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:e3c9e8ddd4f96516825e658a82d01c0e6553aaf5c5f8ed1cc26337ea4dccab02",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+            "execution_id": "255ca44b-947a-4a25-9e6c-a8890ea7555a",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T03:17:24.206Z",
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+            "execution_id": "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T03:15:00.376Z",
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+            "execution_id": "de58de64-0b29-4dea-b1bc-88949458793a",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T03:13:04.218Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+            "execution_id": "49681845-d45e-4e00-851a-31a28fb993ab",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:51:09.991Z",
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+            "execution_id": "c418970d-b6d1-4258-a262-2ba3fb06f213",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:47:48.343Z",
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
+            "execution_id": "98c5f3a0-290c-4ae6-a76a-a48d565b91b7",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:44:15.257Z",
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
+            "execution_id": "945b3d60-784a-4669-a08a-82405bbb8133",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:36:37.458Z",
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
+            "execution_id": "956f03c2-d396-4e9e-9b68-69a8fb38cdb4",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-10T01:33:01.264Z",
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+            "execution_id": "8c6891d3-27fe-4913-9f46-bd8f6cb129cf",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:29:33.761Z",
+            "memberCount": 50,
+            "distinctSourceCount": 50,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:f0f64e3d6831fe2ea1e3e2c29fb70f37b2b18fb287dedf26f24bf63cc88f1bd1",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:3a0f9c2425e73280ec0e2cd5629c1b0135990667b8f667a2ae949604a696cda3",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+            "execution_id": "de2b1e77-9849-4449-98ca-96a729491f2e",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:28:48.283Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+            "execution_id": "24b32bc1-beca-4451-ad97-d71e7abe1af4",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:19:52.474Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+            "execution_id": "747d0c3d-f9a6-4376-8314-387ecdef9923",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-10T01:18:59.683Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
+            "execution_id": "8bd073a7-a8a9-43b7-b53a-778d33e3b524",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-09T19:03:46.923Z",
+            "memberCount": 24139,
+            "distinctSourceCount": 24139,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+            "execution_id": "24719bbd-3d33-4daf-bdec-f65277c6b149",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-09T17:36:13.412Z",
+            "memberCount": 24132,
+            "distinctSourceCount": 24132,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
+            "execution_id": "ccb615ba-99da-4801-bcf7-0e8a63e7376a",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+            "completed_at": "2026-09-09T17:30:35.026Z",
+            "memberCount": 24132,
+            "distinctSourceCount": 24132,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+              "receipt_ref": "graphify-current-workspace-source-selection:v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
+            "execution_id": "45938370-7d17-4b25-a118-363997035e40",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-09T17:25:46.263Z",
+            "memberCount": 50,
+            "distinctSourceCount": 50,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
+            "execution_id": "8894000e-d7cc-4298-8201-3f3ad6a0ce57",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-09T17:11:56.196Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
+            "execution_id": "709e5232-879a-46a8-963d-71c45e2658f0",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-09T16:25:50.662Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
+            "execution_id": "5b219159-d033-4d09-8174-6f602789e89b",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-05T07:03:28.110Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
+            "execution_id": "680906bc-2bfd-48d5-b96e-5b9b4a4198d1",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-05T06:58:05.409Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
+            "execution_id": "fe3dcfa6-da34-4a30-9281-e56d752f77ec",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-05T05:49:24.161Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": "committed-canary-fresh-materialization-v1"
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+            "execution_id": "f9115616-7747-4879-a98f-fc0e189f71d8",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-04T19:06:10.134Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": null
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+            "execution_id": "6e64486f-c195-4b31-9b9e-7fe8f194523b",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-04T18:49:03.528Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": null
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+            "execution_id": "bfc5739f-554a-44c9-86f6-d239cb9b842a",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-04T18:31:35.096Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+              "receipt_ref": null
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          },
+          {
+            "workspace_id": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+            "execution_id": "5dc82676-d8a5-470e-a3b9-e06a98fb3de5",
+            "status": "COMPLETED",
+            "canonical_authority": false,
+            "trigger_kind": "BOUNDED_COMMITTED_CANARY",
+            "completed_at": "2026-09-04T03:06:58.472Z",
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
+            "sourceSelection": {
+              "status": "COMPLETED",
+              "output_checksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
+              "receipt_ref": null
+            },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
+            "sourceRefChecksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
+            "selectionMembershipReadback": true,
+            "canonicalAuthority": false
+          }
+        ],
+        "legacyGraphifyCandidates": [
+          {
+            "run_id": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
+            "status": "SUPERSEDED",
+            "workspace_revision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "completed_at": "2026-09-08T23:38:12.571Z",
+            "file_count": 57
+          },
+          {
+            "run_id": "b1a103ac-c717-430b-9643-a8c9818064ae",
+            "status": "SUPERSEDED",
+            "workspace_revision": "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+            "completed_at": "2026-09-08T23:38:12.571Z",
+            "file_count": 2
+          },
+          {
+            "run_id": "48485685-e773-4433-a1f8-00f5524cca44",
+            "status": "COMPLETED",
+            "workspace_revision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+            "completed_at": "2026-09-05T23:06:59.988Z",
+            "file_count": 23758
+          },
+          {
+            "run_id": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
+            "status": "COMPLETED",
+            "workspace_revision": "sha256:db4d688bf34a4207ad9ba9cadf4dcc64b3b27d8809472bf51007d32bfa9e122c",
+            "completed_at": "2026-09-05T22:55:37.505Z",
+            "file_count": 12
+          },
+          {
+            "run_id": "55888921-5f7e-4047-9ec4-96912659c2f7",
+            "status": "COMPLETED",
+            "workspace_revision": "sha256:3097d43973a39310034724c60036120e9877816ff6833259cd5b97277fe442e1",
+            "completed_at": "2026-09-05T22:50:25.967Z",
+            "file_count": 5
+          },
+          {
+            "run_id": "369e4270-7689-4536-8816-4ec4a5517b3e",
+            "status": "COMPLETED",
+            "workspace_revision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+            "completed_at": "2026-09-03T00:55:51.093Z",
+            "file_count": 2180
+          }
+        ],
+        "sourceAuthority": {
+          "schema": "atlas.current-graphify-snapshot-authority.v1",
+          "status": "CURRENT_SNAPSHOT_PROVEN",
+          "sourceSnapshot": {
+            "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "sourceManifestDigest": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+            "sourceCount": 25542,
+            "sourceManifestChecksum": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+            "workspaceRevisionRecordChecksum": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+            "snapshotManifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+            "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+            "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+            "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+            "observedAt": "2026-09-21T22:53:47.662Z"
+          },
+          "qualifyingExecutionIds": [
+            "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+            "74d50c86-8194-45ea-8c3d-61aab737ef83"
+          ],
+          "ownerSelection": {
+            "requestedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "preflightStatus": "OWNER_SELECTION_APPLIED_READBACK_VERIFIED",
+            "ownerPlanChecksum": "sha256:ae591c99013c268ba48251978f48fe339597b02c06f774def82bbc6edec83f97",
+            "validated": true,
+            "reason": null
+          },
+          "candidates": [
+            {
+              "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+              "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+              "status": "COMPLETED",
+              "canonicalAuthority": false,
+              "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+              "sourceSelectionStatus": "COMPLETED",
+              "selectionPolicyRevision": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+              "selectionPolicyIsNonCanary": true,
+              "sourceSelectionOutputChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+              "sourceRefSetChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+              "snapshotSourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+              "sourceIdentitySetChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+              "executionContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+              "snapshotContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+              "sourceCount": 25542,
+              "expectedSourceCount": 25542,
+              "workspaceRevisionMatches": true,
+              "sourceCountMatches": true,
+              "sourceBindingsMatch": true,
+              "sourceRefSetChecksumMatches": true,
+              "sourceIdentitySetChecksumMatches": true,
+              "snapshotContentChecksumMatches": true,
+              "eligible": true
+            },
+            {
+              "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+              "status": "COMPLETED",
+              "canonicalAuthority": true,
+              "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+              "sourceSelectionStatus": "COMPLETED",
+              "selectionPolicyRevision": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+              "selectionPolicyIsNonCanary": true,
+              "sourceSelectionOutputChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+              "sourceRefSetChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+              "snapshotSourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+              "sourceIdentitySetChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+              "executionContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+              "snapshotContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
+              "sourceCount": 25542,
+              "expectedSourceCount": 25542,
+              "workspaceRevisionMatches": true,
+              "sourceCountMatches": true,
+              "sourceBindingsMatch": true,
+              "sourceRefSetChecksumMatches": true,
+              "sourceIdentitySetChecksumMatches": true,
+              "snapshotContentChecksumMatches": true,
+              "eligible": true
+            }
+          ],
+          "graphSnapshot": {
+            "status": "GRAPH_CANONICAL_AUTHORITY_PROVEN",
+            "canonicalAuthorityTrueExecutions": 1
+          },
+          "authorityShadow": {
+            "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+            "error": null,
+            "observation": {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+              "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityState": "LEGACY_IMPORTED",
+              "parityStatus": "PARITY_PROVEN",
+              "readParityProven": true,
+              "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            }
+          },
+          "canonicalAuthority": false,
+          "readOnly": true,
+          "writesPerformed": false,
+          "producerRevision": "atlas.current-graphify-snapshot-authority.v1"
+        },
+        "ownerDecision": "CURRENT_EXECUTION_OWNER_CANDIDATE",
+        "admission": {
+          "canonicalAuthority": false,
+          "safeToPromote": false,
+          "reasons": [
+            "WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY",
+            "STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST"
+          ],
+          "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN"
+        },
+        "database": {
+          "connected": true,
+          "workspaceCandidates": [
+            "625743d2-092b-4fa8-abe0-9dc094920c80"
+          ]
+        },
+        "authorityShadow": {
+          "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+          "error": null,
+          "observations": [
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+              "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityState": "LEGACY_IMPORTED",
+              "parityStatus": "PARITY_PROVEN",
+              "readParityProven": true,
+              "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            }
+          ]
+        },
+        "checksum": "sha256:ff75a46dcaea076347ff1bc0c20beb53ac50de1857629869c319f301a3848a6f"
+      }
+    },
+    "sourceHydration": {
+      "path": "docs/reports/current-source-evidence-hydration-v1.json",
+      "exists": true,
+      "value": {
+        "schema": "atlas.current-source-evidence-hydration.v1",
+        "mode": "READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT",
+        "inputSource": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+        "inputRows": 24181,
+        "exactRevisionMatches": 23397,
+        "contentHydrated": 19906,
+        "authoritativeNamespaces": 0,
+        "namespaceStatus": "MISSING",
+        "evidenceSpanReady": 0,
+        "revisionBoundSpanOwner": 0,
+        "astCandidateRows": 168,
+        "astRevisionQualifiedRows": 48,
+        "classifierReady": 0,
+        "ownerCandidates": {
+          "atlas_ast_nodes": {
+            "present": true,
+            "hasSourceRevision": true,
+            "hasContent": false,
+            "hasContentHash": false,
+            "hasEvidenceSpan": true,
+            "hasSourceNamespace": false
+          },
+          "atlas_packets": {
+            "present": true,
+            "hasSourceRevision": true,
+            "hasContent": false,
+            "hasContentHash": true,
+            "hasEvidenceSpan": true,
+            "hasSourceNamespace": false
+          },
+          "atlas_source_refs": {
+            "present": true,
+            "hasSourceRevision": false,
+            "hasContent": false,
+            "hasContentHash": true,
+            "hasEvidenceSpan": true,
+            "hasSourceNamespace": false
+          },
+          "atlas_workspace_source_bindings": {
+            "present": true,
+            "hasSourceRevision": true,
+            "hasContent": false,
+            "hasContentHash": true,
+            "hasEvidenceSpan": false,
+            "hasSourceNamespace": false
+          },
+          "codebase_chunk_index": {
+            "present": true,
+            "hasSourceRevision": true,
+            "hasContent": true,
+            "hasContentHash": true,
+            "hasEvidenceSpan": false,
+            "hasSourceNamespace": false
+          },
+          "graphify_files": {
+            "present": true,
+            "hasSourceRevision": true,
+            "hasContent": false,
+            "hasContentHash": true,
+            "hasEvidenceSpan": false,
+            "hasSourceNamespace": false
+          }
+        },
+        "missingByReason": {
+          "CANONICAL_CHUNK_OWNER_MISSING": 4275,
+          "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 19906
+        },
+        "writes": 0,
+        "postgresWrites": false,
+        "qdrantWrites": false,
+        "neo4jWrites": false,
+        "valkeyWrites": false,
+        "canonicalAuthority": false,
+        "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
+        "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
+        "reportChecksum": "d513a2854ab7415868e02e54b409466e326ebf8fc112faa76c0b427702f88b11"
+      }
+    },
+    "semantic": {
+      "path": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+      "exists": true,
+      "value": {
+        "schema": "atlas.evaluation-corpus-manifest-v1",
+        "status": "CURRENT_SEMANTIC768_MANIFEST_PLANNED",
+        "canonicalAuthority": false,
+        "corpusVersion": "semantic768-b2a60ab978f4",
+        "gitCommit": "b2a60ab978f4b69c8f37565156c4cc0c492c5f7b",
+        "postgresPacketCount": null,
+        "postgresChunkCount": 55169,
+        "qdrantCollection": "UNRESOLVED_MULTIPLE_768_COLLECTIONS",
+        "qdrantPointCount": null,
+        "qdrantCollections": [
+          {
+            "collection": "codebase_chunks_768",
+            "pointCount": 109776,
+            "vectors": {
+              "content": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "error": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "signature": {
+                "size": 768,
+                "distance": "Cosine"
+              }
+            }
+          },
+          {
+            "collection": "codebase_chunks_768_v2",
+            "pointCount": 52816,
+            "vectors": {
+              "content": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "error": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "signature": {
+                "size": 768,
+                "distance": "Cosine"
+              }
+            }
+          }
+        ],
+        "qdrantCollectionRoles": {
+          "configuredCanonical": "codebase_chunks_768_v2",
+          "configuredSourceLane": "codebase_chunks_768",
+          "liveCorpusSelection": "UNRESOLVED_MULTIPLE_768_COLLECTIONS"
+        },
+        "embeddingModel": "embeddinggemma:latest",
+        "embeddingDimension": 768,
+        "embeddingModelVersion": "current-workstation-contract",
+        "querySetHash": "sha256:3f3fade5bb160a90c95458acac46e5b27b7e14d76629ef6fe34f3c63349a52d9",
+        "judgmentSetHash": "pending",
+        "queryCount": 60,
+        "qdrantMetadataReachable": true,
+        "databaseWrites": false,
+        "importAllowed": false,
+        "nextRequiredStep": "Verify codebase_chunks_768_v2 as the configured canonical projection, classify codebase_chunks_768 as a separate source lane, and complete reviewed grades before registering this manifest."
+      }
+    },
+    "qdrant": {
+      "path": "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+      "exists": true,
+      "value": {
+        "schema": "atlas.lineage-qdrant-semantic-canary.v1",
+        "collection": "codebase_chunks_768",
+        "qdrantUrl": "http://127.0.0.1:6333",
+        "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+        "candidateCount": 15,
+        "pointsReturned": 30,
+        "exactMatches": 30,
+        "historicalPoints": 0,
+        "mismatches": [],
+        "missingPacketKeys": [],
+        "duplicatePacketKeys": [
+          "packet:db66369e866a",
+          "packet:225fa0b05a89",
+          "packet:8d268e81f842",
+          "packet:7c61a052540c",
+          "packet:6bd874a60226",
+          "packet:196138c47be8",
+          "packet:d2c2643163a8",
+          "packet:8589ed47d789",
+          "packet:41aaad7c7e65",
+          "packet:64838394f8dc",
+          "packet:25ac9148f9bf",
+          "packet:547e1c54b3a0",
+          "packet:c6c4bb257069",
+          "packet:1daa458bdb73",
+          "packet:64b8a0ed69b3"
+        ],
+        "promotionEligible": false,
+        "status": "CANARY_QDRANT_IDENTITY_BLOCKED",
+        "canonicalAuthority": false,
+        "writes": false,
+        "matches": [
+          {
+            "pointId": "1255",
+            "packetKey": "packet:db66369e866a",
+            "sourceRef": "crates/turbovec-napi/build.rs",
+            "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:fd5043d3abdfef4ee0934eb63c0d5977c5dba3d1d0f9025943b573a9c1d31268",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "5432",
+            "packetKey": "packet:225fa0b05a89",
+            "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+            "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:291832d023e8529d1740425fa76a9445d3ce0e0bb82787a8732168ac162645ff",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "13146",
+            "packetKey": "packet:8d268e81f842",
+            "sourceRef": "crates/turbovec-napi/package.json",
+            "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:6528a33d34d91c48d1d326eab9cda4904fc0fc57b88d9f723c6971b71c36c3f1",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "15264",
+            "packetKey": "packet:7c61a052540c",
+            "sourceRef": "docs/atlas/cluster-cards.json",
+            "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:a1b172a49a9d1733a290f7356c206c5801f0a72324f3dddeddf97d30539bb0a4",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "20025",
+            "packetKey": "packet:6bd874a60226",
+            "sourceRef": "crates/turbovec-napi/wrapper.js",
+            "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:83157e31c15d7edf413068d0dff881c4410081892ea29fc3e80893244e287b7b",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "24575",
+            "packetKey": "packet:196138c47be8",
+            "sourceRef": "docs/ai-os/atlas-retry-index.json",
+            "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:a5f00035d57d79b22bb00ef34e5750a56db13e86366692062cc044ef2bc036a8",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "25037",
+            "packetKey": "packet:d2c2643163a8",
+            "sourceRef": "docs/atlas/native-gemm-deferral.md",
+            "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:1d98fa2cbb8e2ac9f0542a675f1c5037506588eaa034dccf58494e98f1786bdd",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "25348",
+            "packetKey": "packet:8589ed47d789",
+            "sourceRef": "crates/atlas_packet_parser/build.rs",
+            "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:fea29b92856b32923629d4aefbee190a0d7b9bd8628f6a552e4810116451ca14",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "27737",
+            "packetKey": "packet:41aaad7c7e65",
+            "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+            "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:eae73ddfb07efc85380e9d02f994b6a9431573396d9d02a49dd1a411e9985b3d",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "34039",
+            "packetKey": "packet:64838394f8dc",
+            "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+            "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:35dd8438740b96e5eec90f8990c22252e83911cc30aab834e9076e55ec753349",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "34838",
+            "packetKey": "packet:25ac9148f9bf",
+            "sourceRef": "crates/atlas_packet_parser/package.json",
+            "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:f808e536608b5e30bf95574aeefbe64837f1f0450254bb155f6a4efe231308a6",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "39367",
+            "packetKey": "packet:547e1c54b3a0",
+            "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+            "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:c6ad357a3940eab1232feff8a9346c37b6c5ecb4921ff060d874b7d8f08ea969",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "39624",
+            "packetKey": "packet:c6c4bb257069",
+            "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+            "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:9b387b82c05a8ca982e59ba1df994a036d52bf5e4be010dab3bc5f246f8f0f7f",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "40123",
+            "packetKey": "packet:1daa458bdb73",
+            "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+            "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:1396a2468c022278fdfa4c62310906c4c730fbf4ef51a395509118bbcd267980",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "52486",
+            "packetKey": "packet:64b8a0ed69b3",
+            "sourceRef": "crates/omni-bridge/build.rs",
+            "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:fa2905ddb43ca9aeae8d0a3a007439c0614f747ee359ef8ba086c8d919e677ce",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "01130d0c-6d1f-4fb4-8592-43f3550794d5",
+            "packetKey": "packet:db66369e866a",
+            "sourceRef": "crates/turbovec-napi/build.rs",
+            "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:fd5043d3abdfef4ee0934eb63c0d5977c5dba3d1d0f9025943b573a9c1d31268",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "144079f0-43df-42f1-a363-e77fb913b76e",
+            "packetKey": "packet:225fa0b05a89",
+            "sourceRef": "crates/atlas_packet_parser/index.d.ts",
+            "sourceRevision": "sha256:0e7602dfb459b9ac3c51f34542f7461bbd9d6fc073de96b106740680ec671733",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:291832d023e8529d1740425fa76a9445d3ce0e0bb82787a8732168ac162645ff",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "39a3a174-f87c-41ae-8221-1557c187c078",
+            "packetKey": "packet:8d268e81f842",
+            "sourceRef": "crates/turbovec-napi/package.json",
+            "sourceRevision": "sha256:fdca83ec264edd7f987c60bbe1993bbdfa0ef0d51ceb17873f9f54780dab3b5a",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:6528a33d34d91c48d1d326eab9cda4904fc0fc57b88d9f723c6971b71c36c3f1",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "44318cbc-211b-4b57-8212-6a8b9f7abac6",
+            "packetKey": "packet:7c61a052540c",
+            "sourceRef": "docs/atlas/cluster-cards.json",
+            "sourceRevision": "sha256:dfedffa0dace728095fb8f1d30e2d0d84806feb0f820187f271b68f7dcd0beb6",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:a1b172a49a9d1733a290f7356c206c5801f0a72324f3dddeddf97d30539bb0a4",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "5b9447df-c4b5-4634-853c-c06384abfc0b",
+            "packetKey": "packet:6bd874a60226",
+            "sourceRef": "crates/turbovec-napi/wrapper.js",
+            "sourceRevision": "sha256:7eab75bf1fce68e8672b405ca64db4bb62159d5e4660b80e240f88c1f0435d56",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:83157e31c15d7edf413068d0dff881c4410081892ea29fc3e80893244e287b7b",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "7252a838-1e9b-445a-8abd-0d5ad413567d",
+            "packetKey": "packet:196138c47be8",
+            "sourceRef": "docs/ai-os/atlas-retry-index.json",
+            "sourceRevision": "sha256:7b0b603adcefed1df8ca784fb55c3ddf90439c4268aa841d9198751441a71628",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:a5f00035d57d79b22bb00ef34e5750a56db13e86366692062cc044ef2bc036a8",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "748c3951-eed7-4139-a2ea-aa279ce82796",
+            "packetKey": "packet:d2c2643163a8",
+            "sourceRef": "docs/atlas/native-gemm-deferral.md",
+            "sourceRevision": "sha256:54bbcac440335b02c62a9af09888810b763bf3b3129eee31ea740a541979f384",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:1d98fa2cbb8e2ac9f0542a675f1c5037506588eaa034dccf58494e98f1786bdd",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "76266fe6-4285-4dbb-8724-270c139fd4f8",
+            "packetKey": "packet:8589ed47d789",
+            "sourceRef": "crates/atlas_packet_parser/build.rs",
+            "sourceRevision": "sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:fea29b92856b32923629d4aefbee190a0d7b9bd8628f6a552e4810116451ca14",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "822a81b8-5e81-4ff0-a645-b1ed7df2584e",
+            "packetKey": "packet:41aaad7c7e65",
+            "sourceRef": "crates/atlas_packet_parser/Cargo.toml",
+            "sourceRevision": "sha256:fb7c517edecc838e066c2cd04b41e9e60975d0f4c915faef4ebe9d654334c068",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:eae73ddfb07efc85380e9d02f994b6a9431573396d9d02a49dd1a411e9985b3d",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "a0e64259-6219-4c97-9b04-e22b9808c36b",
+            "packetKey": "packet:64838394f8dc",
+            "sourceRef": "docs/architecture/couchdb-mapreduce-atlas-ingestion.md",
+            "sourceRevision": "sha256:22428ba7391697f35336a1da8b71478a70f3fd8d36bdbdb6247306c1813b3d7e",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:35dd8438740b96e5eec90f8990c22252e83911cc30aab834e9076e55ec753349",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "a4a643ab-c3fb-49d5-976b-845820c67a7e",
+            "packetKey": "packet:25ac9148f9bf",
+            "sourceRef": "crates/atlas_packet_parser/package.json",
+            "sourceRevision": "sha256:da4e8e5a20040ddec287d85c871667b6dee636df1a4dda2a3c81d70640300830",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:f808e536608b5e30bf95574aeefbe64837f1f0450254bb155f6a4efe231308a6",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "bb0c9b56-45e4-46e5-8347-25ea009ddfea",
+            "packetKey": "packet:547e1c54b3a0",
+            "sourceRef": "docs/architecture/neo4j-graphrag-parent-atlas.md",
+            "sourceRevision": "sha256:d9d704dd555a3163fe7fa68c84bcb3dbded2c9fdc561aaaa85db880365715cfe",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:c6ad357a3940eab1232feff8a9346c37b6c5ecb4921ff060d874b7d8f08ea969",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "bc31cec8-73d5-4f4c-be58-3fafb1898bf9",
+            "packetKey": "packet:c6c4bb257069",
+            "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+            "sourceRevision": "sha256:2821d678d3eb726b3a3fc3388d8907197db0e1a99e2cd70cf6c77d7782e38c50",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:9b387b82c05a8ca982e59ba1df994a036d52bf5e4be010dab3bc5f246f8f0f7f",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "bec6f7b7-0a45-42e6-b7f9-0d7d16e39383",
+            "packetKey": "packet:1daa458bdb73",
+            "sourceRef": "crates/atlas_packet_parser/wrapper.js",
+            "sourceRevision": "sha256:7d127f6ad38bf4fea345831f0afd0c4f7f5d2afdbebcc505b95191af6994f484",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:1396a2468c022278fdfa4c62310906c4c730fbf4ef51a395509118bbcd267980",
+            "embeddingDimension": 768,
+            "failures": []
+          },
+          {
+            "pointId": "fbc57936-1be4-4fb2-a6fe-3f84a1486d5a",
+            "packetKey": "packet:64b8a0ed69b3",
+            "sourceRef": "crates/omni-bridge/build.rs",
+            "sourceRevision": "sha256:a6e6f76185b8d0bc2849c53c1af9f0bc16771dfc03c878797215c275f430acc9",
+            "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+            "representationId": "semantic_768",
+            "representationRevision": "semantic_768:embeddinggemma:latest:fa2905ddb43ca9aeae8d0a3a007439c0614f747ee359ef8ba086c8d919e677ce",
+            "embeddingDimension": 768,
+            "failures": []
+          }
+        ],
+        "historical": []
+      }
+    },
+    "latent": {
+      "path": "docs/reports/latent-representation-identity-audit-2026-09-08.json",
+      "exists": true,
+      "value": {
+        "schema_version": "latent-representation-identity-audit-v1",
+        "generated_at": "2026-09-08T21:42:26.204Z",
+        "repository_commit": "0e11be8bcdce639787df6247a903aa2b392bf7df",
+        "database_identity": "127.0.0.1:5434",
+        "sample_parameters": {
+          "limit": 1000,
+          "order_by": "atlas_packets.packet_id ASC"
+        },
+        "limitations": [
+          "SOURCE_VERSION_JOIN = NOT_PROVEN in this sample — 0 matches (do not synthesize one)"
+        ],
+        "query_digests": [
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "04f15e5820ca959a",
+            "sql": "SELECT column_name, data_type, udt_name, is_nullable FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position;"
+          },
+          {
+            "digest": "3af765062b11b7b6",
+            "sql": "SELECT table_name, column_name, udt_name FROM information_schema.columns WHERE udt_name IN ('vector','halfvec','sparsevec') ORDER BY table_name, column_name;"
+          },
+          {
+            "digest": "d2115895a169e364",
+            "sql": "SELECT packet_id, packet_key, source_ref, qdrant_point_id, tree_node_id, latent_64 FROM atlas_packets WHERE latent_64 IS NOT NULL ORDER BY packet_id LIMIT $1;"
+          },
+          {
+            "digest": "d1bedb715d128444",
+            "sql": "SELECT source_ref_key, source_revision, workspace_id FROM atlas_ast_nodes WHERE source_ref_key = ANY($1::text[]);"
+          },
+          {
+            "digest": "bcff7b9d54276eb8",
+            "sql": "SELECT node_id::text AS node_id FROM atlas_tree_nodes WHERE node_id::text = ANY($1::text[]);"
+          },
+          {
+            "digest": "651d6031589b11ce",
+            "sql": "SELECT source_ref_key, source_revision FROM atlas_ast_nodes WHERE source_ref_key = ANY($1::text[]);"
+          }
+        ],
+        "proof_status": {
+          "LAT_AUDIT1_READ_ONLY_GUARD": "PASS",
+          "LAT_AUDIT2_SCHEMA_INVENTORY": "PASS",
+          "LAT_AUDIT3_VECTOR_STORE_CLASSIFICATION": "PARTIAL_PROVEN",
+          "LAT_AUDIT4_PACKET_IDENTITY": "PASS",
+          "LAT_AUDIT5_QDRANT_JOIN_CLASSIFIED": "PASS",
+          "LAT_AUDIT6_SOURCE_VERSION_JOIN": "NOT_PROVEN",
+          "LAT_AUDIT7_TREE_JOIN": "PARTIAL_PROVEN",
+          "LAT_AUDIT8_SYMBOL_JOIN": "NOT_PROVEN",
+          "LAT_AUDIT9_BYTEA_ENCODING_CONTRACT": "PARTIAL_PROVEN",
+          "LAT_AUDIT10_REPRESENTATION_LEDGER": "NOT_PROVEN",
+          "LAT_AUDIT11_LINEAGE_CLASSIFICATION": "PASS",
+          "LAT_AUDIT12_JSON_REPORT": "PASS",
+          "LAT_AUDIT13_MARKDOWN_REPORT": "PASS",
+          "LAT_AUDIT14_ZERO_PRODUCTION_MUTATIONS": "PASS"
+        },
+        "schema_inventory": {
+          "atlas_packets": {
+            "exists": true,
+            "columns": [
+              {
+                "name": "packet_id",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "artifact_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "packet_key",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_ref",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_ref_key",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "file_path",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "directory_path",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "feature_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "feature_label",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "community_id",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "concept_ids",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "cluster_id",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "embedding",
+                "type": "vector",
+                "nullable": true
+              },
+              {
+                "name": "payload",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "metadata",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "permissions",
+                "type": "jsonb",
+                "nullable": false
+              },
+              {
+                "name": "topology",
+                "type": "jsonb",
+                "nullable": false
+              },
+              {
+                "name": "vectors",
+                "type": "jsonb",
+                "nullable": false
+              },
+              {
+                "name": "summary",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "tags",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "byte_start",
+                "type": "int8",
+                "nullable": true
+              },
+              {
+                "name": "byte_end",
+                "type": "int8",
+                "nullable": true
+              },
+              {
+                "name": "sha256",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_kind",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_path",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "group_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "packet_universe",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "qdrant_point_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "qdrant_collection",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "qdrant_vector_dim",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "identity_lane",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "identity_confidence",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "som_cluster",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "som_row",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "som_col",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "som_index",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "pagerank",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "betweenness",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "eigenvector",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "neo4j_node_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "redis_centroid_key",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "latent_64",
+                "type": "bytea",
+                "nullable": true
+              },
+              {
+                "name": "reward_prior",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "created_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "updated_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "function_symbol",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "content_embedding_384",
+                "type": "vector",
+                "nullable": true
+              },
+              {
+                "name": "embedding_status",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "embedding_timestamp",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "extracted_entities",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "keywords",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "error_pattern",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "feature_group_id",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "domain_class",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "taxonomy_level",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "bm25_indexed_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "bm25_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "bm25_terms",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "packet_ulid",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "title_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "canonical_source_ref",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "page_rank_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans_cluster_id",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "tree_node_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "routing_hints",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "community_source",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "community_confidence",
+                "type": "numeric",
+                "nullable": true
+              },
+              {
+                "name": "lineage_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "ledger_type",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "canonical",
+                "type": "bool",
+                "nullable": true
+              },
+              {
+                "name": "payload_backfilled_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "k_core",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "ngrams",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "trigrams",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "engrams",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "used_concepts",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "topolog_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "topolog_confidence",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "topolog_method",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "topolog_applied_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "repository_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "directory_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "file_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "module_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "symbol_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "chunk_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "recovery_lane",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "som_cluster_id",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "ontology",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "packet_type_test",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "packet_type",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "packet_ontology",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "parent_packet_key",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "related_packets",
+                "type": "_text",
+                "nullable": true
+              },
+              {
+                "name": "telemetry",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "embedding_eligible",
+                "type": "bool",
+                "nullable": false
+              },
+              {
+                "name": "summary_hash",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "embedding_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "embedding_claimed_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "embedding_claimed_by",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "feature_envelope",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "domain_confidence",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "title_generator_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "file_purpose",
+                "type": "file_purpose_enum",
+                "nullable": true
+              },
+              {
+                "name": "thoroughness",
+                "type": "thoroughness_enum",
+                "nullable": true
+              },
+              {
+                "name": "app_criticality",
+                "type": "app_criticality_enum",
+                "nullable": true
+              },
+              {
+                "name": "test_coverage_pct",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "file_understanding_computed_at",
+                "type": "timestamp",
+                "nullable": true
+              },
+              {
+                "name": "file_understanding_method",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "openspec_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "gsd_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "enrichment_updated_at",
+                "type": "timestamp",
+                "nullable": true
+              },
+              {
+                "name": "som_cell_x",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "som_cell_y",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "ast_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "community_boost",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "rerank_features",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "pagerank_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "som_distance",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "predicted_domain",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "classifier_kind",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "classifier_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "pagerank_raw",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "authority_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "workspace_id",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "semantic_anchor",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "ontology_version",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "content_hash",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "domain_memberships",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "primary_domain",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "workspace_revision",
+                "type": "int4",
+                "nullable": false
+              },
+              {
+                "name": "representation_revision",
+                "type": "int4",
+                "nullable": false
+              },
+              {
+                "name": "embedding_digest",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_representation_id",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "source_dimension",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "projection_representation_id",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "projection_dimension",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "encoder_revision",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "som_revision",
+                "type": "text",
+                "nullable": true
+              }
+            ]
+          },
+          "atlas_representation_records": {
+            "exists": false,
+            "columns": []
+          },
+          "atlas_tree_nodes": {
+            "exists": true,
+            "columns": [
+              {
+                "name": "node_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "root_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "parent_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "packet_key",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "feature_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "feature_label",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_ref",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "file_path",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "page_index_path",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "node_type",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "tree_depth",
+                "type": "int4",
+                "nullable": false
+              },
+              {
+                "name": "title",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "summary",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "metadata",
+                "type": "jsonb",
+                "nullable": false
+              },
+              {
+                "name": "ledger_type",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "lineage_version",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "community_id",
+                "type": "int8",
+                "nullable": true
+              },
+              {
+                "name": "som_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "som_x",
+                "type": "int2",
+                "nullable": true
+              },
+              {
+                "name": "som_y",
+                "type": "int2",
+                "nullable": true
+              },
+              {
+                "name": "qdrant_point_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "neo4j_node_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "glyph_record_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "created_at",
+                "type": "timestamptz",
+                "nullable": false
+              },
+              {
+                "name": "updated_at",
+                "type": "timestamptz",
+                "nullable": false
+              },
+              {
+                "name": "content_preview",
+                "type": "text",
+                "nullable": true
+              }
+            ]
+          },
+          "atlas_ast_nodes": {
+            "exists": true,
+            "columns": [
+              {
+                "name": "tree_node_id",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "structural_key",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "repo_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "relative_path",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "node_kind",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "qualified_symbol",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "start_byte",
+                "type": "int8",
+                "nullable": true
+              },
+              {
+                "name": "end_byte",
+                "type": "int8",
+                "nullable": true
+              },
+              {
+                "name": "line_start",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "line_end",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "normalized_node_hash",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "source_content_hash",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "parser_name",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "parser_version",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "created_at",
+                "type": "timestamptz",
+                "nullable": false
+              },
+              {
+                "name": "superseded_by",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "parser_language",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "normalized_signature",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "parent_tree_node_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_ref_key",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "updated_at",
+                "type": "timestamptz",
+                "nullable": false
+              },
+              {
+                "name": "workspace_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_revision",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "grammar_version",
+                "type": "text",
+                "nullable": true
+              }
+            ]
+          },
+          "graphify_files": {
+            "exists": true,
+            "columns": [
+              {
+                "name": "file_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "workspace_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "source_ref",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "source_revision",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "content_hash",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "byte_length",
+                "type": "int8",
+                "nullable": false
+              },
+              {
+                "name": "language",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "parser_name",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "parser_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "parse_status",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "parse_error",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "first_seen_run_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "last_seen_run_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "code_source_revision",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "workspace_revision",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_revision_authority",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "producer_revision",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "git_blob_oid",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "created_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "updated_at",
+                "type": "timestamptz",
+                "nullable": true
+              }
+            ]
+          },
+          "graphify_symbols": {
+            "exists": true,
+            "columns": [
+              {
+                "name": "symbol_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "file_id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "stable_symbol_key",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "symbol_kind",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "qualified_name",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "parent_symbol_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "start_byte",
+                "type": "int8",
+                "nullable": false
+              },
+              {
+                "name": "end_byte",
+                "type": "int8",
+                "nullable": false
+              },
+              {
+                "name": "start_row",
+                "type": "int4",
+                "nullable": false
+              },
+              {
+                "name": "end_row",
+                "type": "int4",
+                "nullable": false
+              },
+              {
+                "name": "signature_text",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "source_text_hash",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "ast_fingerprint",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "metadata",
+                "type": "jsonb",
+                "nullable": false
+              }
+            ]
+          },
+          "codebase_chunk_index": {
+            "exists": true,
+            "columns": [
+              {
+                "name": "id",
+                "type": "uuid",
+                "nullable": false
+              },
+              {
+                "name": "qdrant_id",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "relative_path",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "symbol",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "kind",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "line_start",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "line_end",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "content_embedding",
+                "type": "halfvec",
+                "nullable": true
+              },
+              {
+                "name": "gpu_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "som_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "page_rank_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "community_id",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "tags",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "neo4j_meta",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "indexed_at",
+                "type": "timestamptz",
+                "nullable": false
+              },
+              {
+                "name": "enriched_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "updated_at",
+                "type": "timestamptz",
+                "nullable": false
+              },
+              {
+                "name": "content",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "cluster_summary",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "summary_embedding",
+                "type": "halfvec",
+                "nullable": true
+              },
+              {
+                "name": "signature_embedding",
+                "type": "halfvec",
+                "nullable": true
+              },
+              {
+                "name": "domain",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "language",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "extension",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "embedding_model",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "summary_model",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "summary",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "metadata",
+                "type": "jsonb",
+                "nullable": false
+              },
+              {
+                "name": "semantic_tags",
+                "type": "_text",
+                "nullable": false
+              },
+              {
+                "name": "som_bmu_row",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "som_bmu_col",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "manifold4",
+                "type": "_float4",
+                "nullable": true
+              },
+              {
+                "name": "chunk_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "repo_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "content_hash",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "token_count",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "neo4j_gpu_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "output_meta",
+                "type": "jsonb",
+                "nullable": false
+              },
+              {
+                "name": "summary_embedding_384",
+                "type": "vector",
+                "nullable": true
+              },
+              {
+                "name": "embedding_dimension",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "embedding_normalized",
+                "type": "bool",
+                "nullable": true
+              },
+              {
+                "name": "error_embedding",
+                "type": "vector",
+                "nullable": true
+              },
+              {
+                "name": "source_ref",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "latent_64",
+                "type": "vector",
+                "nullable": true
+              },
+              {
+                "name": "latent64_model",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "latent64_meta",
+                "type": "jsonb",
+                "nullable": true
+              },
+              {
+                "name": "latent64_validated_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "latent64_msgpack",
+                "type": "bytea",
+                "nullable": true
+              },
+              {
+                "name": "embedding_eligible",
+                "type": "bool",
+                "nullable": false
+              },
+              {
+                "name": "summary_hash",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "embedding_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "embedding_dtype",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "embedding_created_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "encoder_id",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "latent_embedding_valid",
+                "type": "bool",
+                "nullable": true
+              },
+              {
+                "name": "latent_embedding_validated_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "search_vector",
+                "type": "tsvector",
+                "nullable": true
+              },
+              {
+                "name": "ast_symbols",
+                "type": "jsonb",
+                "nullable": false
+              },
+              {
+                "name": "ast_imports",
+                "type": "_text",
+                "nullable": false
+              },
+              {
+                "name": "ast_exports",
+                "type": "_text",
+                "nullable": false
+              },
+              {
+                "name": "ast_facts_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "kmeans_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "centroid_distance",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "second_cluster_id",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "second_distance",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "cluster_margin",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans_model_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "kmeans_assigned_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "kmeans_vector_contract",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "kmeans384_cluster",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans384_distance",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans384_second_id",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans384_second_dist",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans384_margin",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "kmeans384_model_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "kmeans384_assigned_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "kmeans_distance",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "content_embedding_768",
+                "type": "vector",
+                "nullable": true
+              },
+              {
+                "name": "centroid_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "reconstruction_error",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "routing_tier",
+                "type": "varchar",
+                "nullable": true
+              },
+              {
+                "name": "latent_256",
+                "type": "halfvec",
+                "nullable": true
+              },
+              {
+                "name": "latent_256_checkpoint_revision",
+                "type": "varchar",
+                "nullable": true
+              }
+            ]
+          },
+          "atlas_topology_index": {
+            "exists": true,
+            "columns": [
+              {
+                "name": "packet_key",
+                "type": "text",
+                "nullable": false
+              },
+              {
+                "name": "relation_type",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "x_cosine",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "y_graph",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "z_som",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "w_authority",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "cheirank_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "cheirank_rank",
+                "type": "int4",
+                "nullable": true
+              },
+              {
+                "name": "som_source",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "karpathy_score",
+                "type": "float4",
+                "nullable": true
+              },
+              {
+                "name": "latent_64",
+                "type": "bytea",
+                "nullable": true
+              },
+              {
+                "name": "community_id",
+                "type": "int8",
+                "nullable": true
+              },
+              {
+                "name": "tree_node_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "pagerank",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "betweenness",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "eigenvector",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "nn_1",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "nn_2",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "nn_3",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "nn_4",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "ae_distance",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "topology_version",
+                "type": "int4",
+                "nullable": false
+              },
+              {
+                "name": "topology_updated_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "created_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "updated_at",
+                "type": "timestamptz",
+                "nullable": true
+              },
+              {
+                "name": "authority_score",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "pagerank_raw",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "pagerank_percentile",
+                "type": "float8",
+                "nullable": true
+              },
+              {
+                "name": "authority_band",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "pagerank_run_id",
+                "type": "uuid",
+                "nullable": true
+              },
+              {
+                "name": "pagerank_contract_version",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "graph_snapshot_hash",
+                "type": "text",
+                "nullable": true
+              },
+              {
+                "name": "pagerank_computed_at",
+                "type": "timestamptz",
+                "nullable": true
+              }
+            ]
+          }
+        },
+        "identity_field_classification": {
+          "source_version_id": "ABSENT",
+          "symbol_version_id": "ABSENT",
+          "stable_symbol_id": "ABSENT",
+          "representation_revision": "PRESENT(atlas_packets)",
+          "producer_revision": "PRESENT(graphify_files)",
+          "input_digest": "ABSENT"
+        },
+        "vector_store_inventory": [
+          {
+            "table": "ace_chunks",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "agent_observations",
+            "column": "hnsw_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_class_search_index_v1",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_concepts",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_embeddings_384",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_embeddings_64_latent",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_embeddings_768",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_external_doc_chunks",
+            "column": "content_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_feature_embeddings",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_packet_registry",
+            "column": "embedding_768d",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_packet_registry",
+            "column": "latent_384d",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_packets",
+            "column": "content_embedding_384",
+            "type": "vector",
+            "classification": "LEGACY"
+          },
+          {
+            "table": "atlas_packets",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "CANONICAL_SOURCE"
+          },
+          {
+            "table": "atlas_relationship_embeddings",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "atlas_summary_layers",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "canonical_chunks",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "chat_embeddings",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "cluster_narratives",
+            "column": "narrative_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "cluster_summaries",
+            "column": "summary_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "code_retrieval_chunks",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "content_embedding",
+            "type": "halfvec",
+            "classification": "DERIVED_PROJECTION"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "content_embedding_768",
+            "type": "vector",
+            "classification": "CANONICAL_SOURCE"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "error_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "latent_256",
+            "type": "halfvec",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "latent_64",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "signature_embedding",
+            "type": "halfvec",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "summary_embedding",
+            "type": "halfvec",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index",
+            "column": "summary_embedding_384",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index_backup",
+            "column": "content_embedding",
+            "type": "halfvec",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index_backup",
+            "column": "content_embedding_384",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index_backup",
+            "column": "error_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index_backup",
+            "column": "signature_embedding",
+            "type": "halfvec",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index_backup",
+            "column": "summary_embedding",
+            "type": "halfvec",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "codebase_chunk_index_backup",
+            "column": "summary_embedding_384",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "community_reports",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "community_reports_leiden",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "diagnosis_events",
+            "column": "query_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "document_embeddings",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "embedded_summaries",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "embedding_cache",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "evidence",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "evidence_analysis_cache",
+            "column": "result_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "evidence_vectors",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "fixer_patterns",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "legal_chunks",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "legal_documents",
+            "column": "content_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "legal_glossary",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "nes_chrom_packets",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "api_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "content_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "graph_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "keyword_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "latent64_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "summary_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "title_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "packet_vector_bundles",
+            "column": "topology_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "parent_atlas_vectors",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "rag_query_log",
+            "column": "query_embedding",
+            "type": "halfvec",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "research_summaries",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "screenshot_artifacts",
+            "column": "caption_embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "statute_chunks",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "task_semantic_packets",
+            "column": "semantic_vector",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "tool_registry",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "warden_chunks",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "warden_chunks",
+            "column": "latent128",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "whisper_segments",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          },
+          {
+            "table": "workspace_notes",
+            "column": "embedding",
+            "type": "vector",
+            "classification": "UNKNOWN"
+          }
+        ],
+        "sample_summary": {
+          "selected_count": 1000,
+          "packet_id_count": 1000,
+          "packet_key_count": 1000,
+          "qdrant_point_id_count": 675,
+          "source_ref_count": 1000,
+          "sample_selection_digest": "63204034d8c7c16ac5a865a5a5a3f0e4688ce0586c1585dee08d94c749822a2f",
+          "first_packet_id": "packet:000db15dc8ef",
+          "last_packet_id": "packet:13460638e860"
+        },
+        "packet_identity": {
+          "duplicate_packet_id_count": 0,
+          "duplicate_packet_key_count": 0,
+          "duplicate_qdrant_point_id_count": 0,
+          "source_ref_fanout_count": 0,
+          "missing_packet_key_count": 0,
+          "missing_source_ref_count": 0,
+          "missing_qdrant_point_id_count": 325,
+          "note": "qdrant_point_id is a projection identifier, not canonical identity — never treated as such in this audit"
+        },
+        "qdrant_identity": {
+          "sampled_points": 250,
+          "classification_counts": {
+            "MISSING_SOURCE_REVISION": 250
+          },
+          "required_payload_fields_present": {
+            "packet_key": 250,
+            "source_ref": 250,
+            "source_revision": 0,
+            "workspace_revision": 0,
+            "representation_id": 250
+          },
+          "writer_resolution_order_observed": "backfill-latent-vectors.mjs resolves rows via: (1) qdrant_point_id exact match, (2) packet_key ANY() match with sveltekit-frontend/ prefix variants, (3) source_ref ANY() match with prefix variants, (4) JSONB payload/metadata containment fallback on qdrant_point_id/packet_key/packetKey/source_ref/sourceRef/primary_id — none of these branches require or verify source_revision or workspace_revision"
+        },
+        "source_lineage": {
+          "source_ref_joined_count": 0,
+          "source_version_joined_count": 0,
+          "source_join_missing_count": 1000,
+          "source_join_ambiguous_count": 0,
+          "workspace_revision_aligned_count": 0,
+          "workspace_revision_mismatch_count": 0,
+          "note": "atlas_ast_nodes.source_revision (joined via source_ref_key) is the only live revision-bearing proxy found — NOT a canonical source_version_id join, which does not exist yet (GS1.10 NOT_PROVEN). workspace_revision alignment not computed: no live packet-side workspace_revision column found on atlas_packets."
+        },
+        "tree_and_symbol_lineage": {
+          "tree_node_joined_count": 1000,
+          "tree_node_missing_count": 0,
+          "tree_node_fanout_count": 0,
+          "tree_node_id_format_mismatch_count": 0,
+          "graphify_symbol_joined_count": 0,
+          "graphify_symbol_missing_count": 1000,
+          "symbol_join_ambiguous_count": 0,
+          "stable_symbol_key_present_count": 0,
+          "symbol_version_id_present_count": 0,
+          "note": "graphify_symbols does not exist live (confirmed via schema inventory) — all symbol-join metrics are structurally 0/ABSENT, not a bug in this audit. atlas_ast_nodes is the only live AST-adjacent table; atlas_tree_nodes is a separate, provisional structural-inventory table (GS1.10: \"provisional structural inventory, not canonical graph identity\"). REAL FINDING this pass: atlas_packets.tree_node_id is declared `text` but 0/1000 sampled non-null values are NOT UUID-formatted (they look like content-hash strings, e.g. sha1/sha256-length hex) — while atlas_tree_nodes.node_id is declared `uuid`. A naive `::uuid` cast join throws 22P02; this audit casts the uuid side to text instead so the join can even be attempted. This is itself evidence of an unreconciled tree_node_id identity scheme, separate from GS1.10's already-known provisional-identity finding. Production writer/retrieval-path consumption of atlas_ast_nodes vs atlas_tree_nodes was not independently re-verified in this pass — see GS1.10-GS1.12 for prior findings."
+        },
+        "bytea_contract": {
+          "non_null_latent_count": 1000,
+          "distinct_byte_lengths": 1,
+          "minimum_byte_length": 256,
+          "maximum_byte_length": 256,
+          "uniform_byte_length": true,
+          "encoding_contract_result": "CONSISTENT_WITH_64_FLOAT32_LITTLE_ENDIAN(byte length 256 = 64*4, matches backfill-latent-vectors.mjs writeFloatLE encoding — but dtype/byte-order are read from the writer source code, not derived from the bytes themselves)",
+          "note": "Dimension/dtype/byte-order are asserted from reading backfill-latent-vectors.mjs source (floatArrayToBuffer: writeFloatLE, 4 bytes/float, 64 floats), not inferred from the column name. No producer_id/producer_revision/serialization-method field exists anywhere on atlas_packets to make this a proven encoding contract — do not infer float32 merely because the field is named latent_64."
+        },
+        "representation_ledger": {
+          "representation_record_joined_count": 0,
+          "representation_record_missing_count": 1000,
+          "representation_id_values": [],
+          "representation_revision_values": [],
+          "source_representation_id_values": [],
+          "producer_id_values": [],
+          "producer_revision_values": [],
+          "input_digest_present_count": 0,
+          "parameters_digest_present_count": 0,
+          "note": "atlas_representation_records DOES NOT EXIST live (confirmed via schema inventory) — this is a real, total absence, not a query bug. atlas_packets does carry source_representation_id/projection_representation_id/representation_revision columns (confirmed live), but generic packet metadata is not a complete representation ledger per this audit's own definition (producer identity, input digest, parameters digest all absent)."
+        },
+        "lineage_classification_counts": {
+          "NUMERIC_BYTES_PRESENT": 1000,
+          "REPRESENTATION_RECORD_PRESENT": 0,
+          "SOURCE_VERSION_JOINED": 0,
+          "SYMBOL_VERSION_JOINED": 0,
+          "FULL_LINEAGE_PROVEN": 0,
+          "PARTIAL_LINEAGE": 0,
+          "LINEAGE_MISSING": 1000,
+          "AMBIGUOUS_JOIN": 0
+        }
+      }
+    },
+    "admission": {
+      "path": "docs/reports/admission-parameters-v1.json",
+      "exists": true,
+      "value": {
+        "schema": "atlas.admission-parameters.v1",
+        "status": "PARAMETERS_BLOCKED",
+        "canonicalAuthority": false,
+        "workspace": {
+          "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "sourceSelectionExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+          "sourceCount": 26748,
+          "sourceAuthorityStatus": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN"
+        },
+        "graph": {
+          "graphRevision": null,
+          "projectionName": null,
+          "nodeCount": null,
+          "edgeCount": null,
+          "authorityStatus": "CURRENT_SNAPSHOT_PROVEN"
+        },
+        "semantic": {
+          "representationId": "semantic_768",
+          "dimension": 768,
+          "embeddingModel": "embeddinggemma:latest",
+          "representationRevision": "current-workstation-contract",
+          "canonicalCollection": "codebase_chunks_768_v2",
+          "sourceCollection": "codebase_chunks_768",
+          "corpusVersion": "semantic768-b2a60ab978f4",
+          "sourceCohortChecksum": "sha256:3f3fade5bb160a90c95458acac46e5b27b7e14d76629ef6fe34f3c63349a52d9",
+          "judgmentSetHash": "pending",
+          "currentManifestAdmitted": false
+        },
+        "qdrant": {
+          "canonicalCollection": "codebase_chunks_768_v2",
+          "sourceCollection": "codebase_chunks_768",
+          "vectorName": "content",
+          "dimension": 768,
+          "distance": "Cosine",
+          "pointCount": 52816,
+          "provenanceStatus": "PARTIAL",
+          "lineageStatus": "CANARY_QDRANT_IDENTITY_BLOCKED"
+        },
+        "leiden": {
+          "status": "CANARY_QDRANT_IDENTITY_BLOCKED",
+          "candidateCount": 15,
+          "exactMatches": 30,
+          "mismatches": 0,
+          "missing": 0,
+          "duplicateMatches": 15
+        },
+        "blockers": [
+          "SEMANTIC_768_CURRENT_MANIFEST_NOT_ADMITTED",
+          "QDRANT_V2_IDENTITY_LINEAGE_NOT_PROVEN",
+          "JUDGMENT_SET_NOT_REVIEWED"
+        ],
+        "sourceReceipts": {
+          "sourceOwner": {
+            "path": "docs/reports/current-source-owner-reconciliation-v1.json",
+            "present": true,
+            "checksum": "sha256:40967fd8904aff3c1c2d250278e4cbaaa920e0ddc9e9d57654398df85100745f"
+          },
+          "graphAuthority": {
+            "path": "docs/reports/current-graphify-snapshot-authority-v1.json",
+            "present": true,
+            "checksum": "sha256:e028a43f4a15eb4caeff9fa59043f0c4ea4020825cbab244cded6d8f3ced2f1e"
+          },
+          "semanticManifest": {
+            "path": "docs/reports/current-semantic768-corpus-manifest-plan-v1.json",
+            "present": true,
+            "checksum": "sha256:84090e2f38ee4d89e3455804dd33e9ab46a68bc2a7ece2acb276b3bd229d83a4"
+          },
+          "qdrantProvenance": {
+            "path": "docs/reports/qdrant-768-provenance-census.json",
+            "present": true,
+            "checksum": "sha256:0d93e2b86a2b74a653a13bce52df162dd75c8d951e0bde4c10296ab809ba4938"
+          },
+          "leidenCanary": {
+            "path": "docs/reports/lineage-qdrant-semantic-canary-v1.json",
+            "present": true,
+            "checksum": "sha256:ec99ef7935662b94a3a933e70f37612b1a30d42da4c97368ac0c2e2815f578b1"
+          }
+        },
+        "writesPerformed": false
+      }
+    },
+    "graph": {
+      "path": "docs/reports/graph-projection-manifest-v1.json",
+      "exists": false,
+      "value": null
+    },
+    "judgment": {
+      "path": "docs/reports/retrieval-judgment-set-v1.json",
+      "exists": false,
+      "value": null
+    },
+    "parity": {
+      "path": "docs/reports/retrieval-parity-receipt-v1.json",
+      "exists": false,
+      "value": null
+    },
+    "snapshotConsumerPreflight": {
+      "path": "docs/reports/graphify-snapshot-consumer-preflight-v1.json",
+      "exists": true,
+      "value": {
+        "schema": "atlas.graphify-snapshot-consumer-preflight.v1",
+        "gate": "GRAPHIFY-SNAPSHOT-CONSUMER-PREFLIGHT-01",
+        "status": "GRAPHIFY_SNAPSHOT_CONSUMER_PREFLIGHT_PROVEN",
+        "proofLevel": "BOUNDED_LIVE_PROVEN",
+        "readOnly": true,
+        "sourceKind": "ADMITTED_WORKSPACE_SNAPSHOT",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "materializedRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "sourceCount": 25542,
+        "repositoryCount": 7,
+        "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+        "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+        "liveInventoryBuilderCalls": 0,
+        "gitRevisionDerivationCalls": 0,
+        "unexpectedRepositoryDiscovery": 0,
+        "persistentWrites": 0,
+        "childApplyCommands": 0,
+        "missingSources": 0,
+        "hashMismatches": 0,
+        "sizeMismatches": 0,
+        "duplicateIdentities": 0,
+        "blockers": [],
+        "violations": [],
+        "authority": false,
+        "writesPerformed": false,
+        "nextGate": "SNAPSHOT-BOUND-GRAPHIFY-CANARY-01"
+      }
+    }
+  },
+  "checksum": "sha256:6ddacdd75ea1e721b329ba5abad4907851cf73b98befd962e5b067b7ed63468c"
+}

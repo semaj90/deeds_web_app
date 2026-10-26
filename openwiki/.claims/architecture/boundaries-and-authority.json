@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:cf155a655d1f1af1d4da04b3d0c71eea78c06b64f2de83e9a056ff59bf390535",
+  "pageVersion": "sha256:180ddfe5cd4f2ea0232b328cea1355dd038d4c0014f8d993d497fe45fde4c703",
   "claims": [
     {
       "id": "claim_796cc6becd3844d293e1d4d337ab34c6",
@@ -177,6 +177,172 @@
         {
           "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L91-L98",
           "version": "repo-lines-v1:sha256:8539c16c706cf475af1468c78226d985348e9bf2e1fe3f6df2f47af3a105f887:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTAwNjcwZGIxNTZhMzNlZTlkMDUyNGNkOGJiYjI4YTg3ZGVjOGQzZjFiOTRhNTBlNWU3M2RjYzI2OWRlODIyMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzFkYWEyMzgyNGU0YzE5NTY5ODhiMTg1OTlhMDc4Njg3OWYzOTAzYmExYmM3OWUzOTYyNjY5OTUxMzAzYjA5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzJiNDAxNGEyODBjOWIzYTE1YmU4OGI0ZGU4NDc1MTRhNjVkZmViZWJhN2YxZWE0ODIwY2Q1NGFjZDI2NzRiNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6f1f1f6321c44e899d6ce6fc60042817",
+      "statement": "The `atlas_packets` Drizzle schema treats PostgreSQL as the packet identity spine and stores packet, source, workspace, representation, embedding-lineage, and Qdrant reference fields as distinct lineage anchors; storing a Qdrant, Neo4j, or Redis reference in the row does not transfer authority to that external system.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L102-L140",
+          "version": "repo-lines-v1:sha256:e5775b7dc03a193b8857682b774d7146c0ac0fbbf1a09dfed0153c090e5e62ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYjg5YzBjNjljOWZhMTFhZWZhNmQ4OWU2YzZjNDk2MjcxYjU0ZGNjZmU4ZTk2NzE2YjRjYjQzZmZlM2VhMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNjdiY2NjZjI4ZDUzMjc3YjAyYjdlMTdmZWZhZjQyYzg3ZTQ3ODc1MzFkZWQ3YjY3Zjc1NmE3ZTI2NzgyMmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhMTM0OWU5MGE2MWE5OGY0ODBkNmEyZWQ5NzMwNjY3N2IzYTFmZjNiOWE1ZWM0MDZjMjc5YTg0ZWFkNTIwZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwNWQ4Y2RkNzI5MjE5NTBhZDQ1YTVkMWE3NzE3ZWFmN2Y5MGZhYmJhZDAyM2RiMjYzY2ViZTZkNmFjOGVkMGQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L30-L45",
+          "version": "repo-lines-v1:sha256:3351f44d516c2e588f4885e6be0b6e91c663210c7a7d1e2ebc7f0ad9969d206a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzMzNjU4NTE5ODZjNjIyNGFlNGMwMThhYTYzMzZiZGE1ODI5YTBlMDI2NTcwOGE4NWRiZmQ5NmY0ODMyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYjU2YzcwZmJiYjMzNGZkYmY4MjJmNGEyODIxNWJmYzg5ODk4YWQ4OGM0NDExY2RkYjZlZjA5ZjkxNzFjZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFjYjFiYTQ2M2RiZDAwMjI1YzM2MTIxNjY0ODlkZWQ4NTZlYzQzYTUyNGUzOTAxOTlkMzhlYWZjMTgzOGQzNmMifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L63-L76",
+          "version": "repo-lines-v1:sha256:1f13a7e7de6dced059d1fd210961c65c28e5013722e5283cdc304156bbc68319:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0Yjc5OTQzYzljNDY5ODRkMWMzMzBiYjdhNjc0ZWNmOTZkZGE2ZTE1ZmI1YjM4MDliYzVkYjMzZDFlNDU5MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjYjBhN2RmYzdkYmE2MTNjOWRlZjI3NTY3OWY2YzlhYzNhZjJhMDk2ZjhiYWViOWMxZGE2YThiMTA1YjgxYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1MDhlNmI2ZDZjN2Y4MzY3MmUzNTUzYTk3MWEwMjkyZTJiMjMzNmViYWQzZDRhY2IzZTRiOWM3ODBkZDY2ODkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmMWZkYmVhYWM4YTM3Y2JlM2IwNWEyZjk2YTc4NzMzNzg0ODJhNWI4ZjUxMGI3NmZjNWJjYTMyYmVmNzkwOTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_51bc60b0b9034e6eb2df65a2da7f837d",
+      "statement": "Parent Atlas keeps acquisition identities separate: research runs, fetches, fetch attempts, digest-deduplicated source revisions, and extractor-specific extractions are different lifecycle records, so a fetch or extraction identity must not replace source-revision authority.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-acquisition.ts#L3-L15",
+          "version": "repo-lines-v1:sha256:118491d0c27f5f5be89a3576018a9cb408b322fbcfa3097bae0ea411b6815c1d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhOGQyZjhhNTBkMTkyMGIzZWJmYWQxN2VhOTI5MzNkZGNlZGRjNTZlODEyZDQ2MmJkMTBjMzU3NDI0N2Q3MTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5MzNlMjdkOTc0MTRmYzMzOTFmNGU0MjVjMzIzYTQ3OGIyYmNiZjYxYzc5OTZhODliYTI1ZTZmZDlhNGMzNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5ZDM2ZTRiZWUxNGJhZDY5YjUzNWFiMzc3M2Y1Njc2NTUxZWYwZWRmMmFhMjA3NGEzNGY4NTA4ZDA0YWI3NjUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-acquisition.ts#L50-L125",
+          "version": "repo-lines-v1:sha256:273ff913a469da1c2af2d98b8ba507ccae4dcf20fd97196ba444d3444b03231d:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlYzhmZjViOTYwNGJhYzVmMjI3YzgwMDQ4OGEyN2Q4NDcyM2YxNjQ1Njc5ODJjMDlhNzhlYTgwMTA2ZWFhYjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0MDQ4NzQxMTlmYWM0MDAwNDU4NjBjOWE1NTMwZTlhY2Y5MzdiOTBkMTAzMDYyZjgyZmY1MzkzZDgzNGFjYTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE4ZThmZGQxOTc1NTkzZDBmOTEyYmI0ZjcxOWQ3M2Q0MDFhZWRiNjQzYWM0YzJlMTdjOGEyNjI5ZmIxNWM1YjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2YThiMWM3YjExNGYwYTBhNmJjNDliZDk2YTNhZTA5NjJiOTA3ZGM2MmNmYjI2Mzc2ZWUwY2Q1MGIyYjA4Y2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fa327763b0da45aaaf8e02b49982083f",
+      "statement": "The workspace-event schema mirror records checksummed event and head revisions but explicitly leaves the manual sidecar as migration authority and declares `applied: false` and `writesPerformed: false`, so the mirror cannot prove live database application.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts#L11-L40",
+          "version": "repo-lines-v1:sha256:9dc2c711be67e90a02cf53bd32b489b99e240991481cca45c8c795a2b8bddfb5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiZDk3ZDRhZWMyNmU0M2M1ZDBkMTFjMDdhNDZhYjlkNjA1ODMxODMyYzAyNmRmNWZiZDIyMzBkZDZlZTJmMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNzQxZDJjMDhlNmY1MTBiN2U5YTI2NGYzNzhmOWNlMDA0OWE1MDRlMGU3ZWY1ZDY3Y2QzZWE4MTNmODU0NzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiNGIwZDVmZDEwMDEyMjQwNTE0NjcwZmEwYzVlM2Y0OTA0YjkyZjZiNGM2NzU1MTBkYzU2YjQ0NmU0ZTViNTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhZWY3MjJmODE0NTg2MDJlODVlNTAzMzAwOTg1YjM0OWQ3NGJhZjkwNWI5OTAzY2U1NTVmZmI3NTg1MWFiMmUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts#L5-L9",
+          "version": "repo-lines-v1:sha256:0e7450c4e5c766da44c8f31d47b6e048d252bd80a2094b94573c7e54de415c6d:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjIxMmEyMDczZjFhYzY5NmU0MjkzZjc3NTY1Y2FlNTkyNWZlZTZlY2EyZTI1YjZkNjAxYTZlMzhjMDg1YzZjZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTIyY2NmOTE2OGE1ODEwMmQyNTc5Nzg2ZGM2ZDEzYjFhN2M4NWUxZjdlOGRiMzQ5M2ZjNWViY2RjNjZmNTEwMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGU4NTY5MjJjMmM2YWIzZDg3YjAzNTAwYWI5MjVkNjVjYzQ1ODBkMzQzZWI1OGMxMzE2YzA1YWFjYTIzYzYxMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTQ2ZDVmOGQyNTk5Nzk0OTI1NjMyNDI1OGE3YTRiNDdlNDVlMzA0NmIwMWMzNjM3MTg2NGJjZGE4Njg0MDQzZiJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts#L63-L95",
+          "version": "repo-lines-v1:sha256:fb81ea10039cc1d0c6c2e3e1653a83443847e74e6dea2e38052cd47f3f181665:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyNzhmODkzMmU2YTZiNjMxMDExY2U0ZjY5YzFlOGRhMTU2YTJiNzQ1NmM4YWMwYzU4OWExNjg3Y2Y4ODY0NTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMWQxYTYzMzkwMjI5Yzc5ODM0N2U4M2EwNDA1NDQxYzk0MDAwMzUyODRhZDE2OGMxYmY2Y2RmMWQ3MGEzNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIzMjllMDJiNjhmYzYyZmJhZmY2MmUyYzE3ZWRmZWY1MjNlYmQ1OTI2YjNjMTRjNWRiMzMyN2UyMTIxYTFiMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_90eafe3283e449549f871f2c3d0bb846",
+      "statement": "The current tRPC `getPacketRegistry` procedure intentionally returns an unavailable, non-authoritative result because the live schema lacks a canonical packet-revision owner and closed packet/source/AST joins; its focused test requires `UNAVAILABLE`, `canonicalAuthority: false`, and `writesPerformed: false`.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/trpc/routers/atlas.spec.ts#L4-L14",
+          "version": "repo-lines-v1:sha256:b9010721028319c3916d06eb6e7d6a8857098ad4c2b13ed253545d15e9319967:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjYjkzNTRiM2JhYWU5MGFjODBiMTAzODM3ZDI3OWQwN2VjZDI4NjA1ZDdkNWYzODk1NTJlMGVmNjZiNDg1MjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3ZmM2YjAxNTNiOTEyYmMwMGNlYTdmMzJlMDY5ZDQyNWUxNzJlOTNmZWMxNTg5ODM3ZDRlNDk5MzkzOTM3ZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZGRlZjcyNDc4NmI0YWY0NWFiN2NhZDgxZDM3N2FlNTQzYmI3ODQxMjk2NTY4ZmI1MjI2OTk4YWVjMjE2MzQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/trpc/routers/atlas.ts#L27-L47",
+          "version": "repo-lines-v1:sha256:10e7ef92f6c5cf1ac6fedfedc040734380f8f6c26bfdb91087341bb66e1ee54b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkNTI4ZWQyNzBmYTNmMjI4N2QyY2UzYmIxMTVmNjdjNjQ3NDViOWM2ZjQ0Njc4MGJlMDhmNTJjZDI0OTlhNDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5OTBlYjZjY2RiMGZlZmNjM2M5YTg4M2M4NzljOTg2NmJlMzM5MzFjYWFhYmYzNjYyZDdhYzRjNDEzZWM4YjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2ZDY4ODIyODA3MWMzZTZmOGFiMmEzZDY5NTNmNmI5MjI2ZGE3ZThkNjZlOWM1ZDJhZTRmNGQyZjhkZjRhYTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjOGUyYmVlODY1NjViY2M2NWI0ZDczMDRiN2I0YTMxZjFiYTA5MWM3YjA5MzQ1OTRmNzExOGM5MjU3ZGQ3M2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_caf2452f07114cef80569ac6fba19919",
+      "statement": "The current lane census is conservative observability rather than parity proof: PostgreSQL BM25 is `READY` and `READ_ONLY`, pgvector is `DEGRADED`, Qdrant is `DEGRADED` and `PROJECTION_ONLY`, and cuVS or FastAPI are `UNPROVEN` and `PROJECTION_ONLY`; lane descriptors carry status, model, representation, collection, index, checksum, and write-policy fields.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-lanes-v1.ts#L7-L50",
+          "version": "repo-lines-v1:sha256:84a31332843879d3c9e97ac5cf0fa4a304e4c2818ab9fdaa9c391073e5dbf770:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkZDIxMDVlN2MxMjZmYTg3MjI0NmE5MzQ4MGJjN2Q2MWZiNTg2NTIyMjZmNjMxY2ZkZjdjMjJiMDlkY2Y4OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhMTQwN2YyZjIyMThmYjAyMGRkMjEwMzZiYTU0ZGFhNjU0NDAxNTA1YmM3N2FkN2U0MzA3YmM5ODUxNDA3YmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2YmIzNDZhZDQ1MTU1YTZjNmZiMTYzYzUxNWYxMTNiYmY2YjBiNDUyMTA4MWM5OGE0ZGIzMmU4NjAxODcxODIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MmY3ODdjYjM2OTI0ZDA2MTM5N2ZhMDFjMTBiNGFlM2ZiNDRlOTIzYTFkN2RlYmE1MmViY2VhNTI4NGI4ZTgifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L34-L56",
+          "version": "repo-lines-v1:sha256:44e4c607d1ae3660f3dc526be1f6383cb6d5d58de6ae54e383b53e0a572a7810:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkYTg3ODRiNDBkZDBiNGRjYWViNjEwOGYxM2Y5NmM5MDFkMmVmNzA0OTRkYWY3NjMwZDRiZjRjYjk3NmQ1NmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjU5NWZjMTc1NWMwMGNiMDk2MWNlNzUyMzk5MTgzYjM5ODA2YTNmMDBkNTU0ZmM0Y2E1MDU3Yzk4NGRkMTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzNDEwZDI0YTNiMzJkNzY0ZDhlOTlhMzg2YTM4NDQ5MTRlNzZlMjE5OGJjODk0YWZhOTU1NDkwZTRjYTRhZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzMDgyZWIwN2U5MjRjNDE3NGViNGFmMmI4MzM3Mzk3NDgwNmQ2YTU1MjE1N2YzOWZkY2U1YjRjMTYzZTg1YzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c55e93349e204fb3bde892d9ce1bebfb",
+      "statement": "The implemented evidence service preserves the caller's workspace revision, selects retrieval lanes, and validates the output, while the parallel orchestrator uses `Promise.allSettled`, aggregates lane outcomes, deduplicates by result identity, and blends scores before returning top-K results.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/parent-atlas/precall/retrieve-evidence-service.ts#L59-L164",
+          "version": "repo-lines-v1:sha256:be7ac24c41e5e3d206de7200c0a1c7d52c5dd640d378efa296965d1a17eb5270:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5ZjYzYzNkNzRkMTI2NjE0MTY1YTFiYmZmZjNiYTc1OGI3YzM4MWUwOTgzZTIyYWIyNWE4NzVmODIxZDMxMzhkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5MDdkZWY5NGQzNTc3MGY0OWU1NzgzMjMwNTJhODg0MDUyYjBkMzQ5NTY5YTViNWQ3N2MxY2U4NGMwYTUzYmVjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxMzQyNzUxY2RmNjgwOTMzZWNlMGZjZDJlMTE2M2VkYjEwZTExMjk1NTQwYWYxMGM4OTdiMDQ0YTUxOGEyZWY5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIn0"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/parallel-orchestrator.ts#L70-L150",
+          "version": "repo-lines-v1:sha256:8faf60fbd60f000121b097773a89ec23c3a6818fa6b4990931d67552841b9585:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyMTQ2MGM0NWI1Njg1ZDg5NWZkMmJmMWEzOGFiOTNkNjIzOTllZGJiMWViODAzZDlmNjMwMWQyOGYzODNlOTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhODIzZmVmZWJkYzU2NmYzNzVmODVkYTc1ZDJlNDg2ZGVhOWI2NmQ1YmRhYmY0NWI2OWE3NDIyMjA0MWJlOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2NzBiZWRjMjFmZGM1OGIzNDQ4MDMxYjZiZTBhZWUzNDc5NjEyN2RmYTM2OTcwMDE3ZTE1YjQ0MWQ2NmRiZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlZmJiOWU1OTE2M2I5NGI5NmNlZDhmMmEwYWEwNjBiYzhlMDg0ZDY4MTg1ZWIwYjQ4ZmZmMjg5YTc5ZWY4ZjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ae0a85b989743a7a4410567a5602b02",
+      "statement": "SvelteKit server hooks enforce request-level size, rate, authentication, authorization, timeout, and cache controls at the entrypoint; these controls protect access and transport behavior but do not grant handlers ownership of PostgreSQL, Qdrant, Neo4j, or Valkey state.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/hooks.server.ts#L1019-L1029",
+          "version": "repo-lines-v1:sha256:8aed4fbc9f25a25402b4c89888763f6b64f84066a6666b6ec8e4390d64f429cc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1MjBiMGMzYjA1NGExODRkYzAwYTEyNjQ0YTNmNzNjZDU2NzM5ZjI1OTc1YmUyZGY1M2E1ZDk5OWExNGJmOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhZTU5ZTk0YjI5ODA2NDQxMDdkN2Y4MTMwNDMyZmJjNDAyOGUwYjNmYWQxZWMyODMwZTllODk4Njc2NmM0ZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiNmQ5ODc1NWZiYjc2NmQwYjExNmEyMjUzZDkyYTk2N2NlMTQyZjE5MjI4NWUzZWE0YTkxZTJhNzkzOWIyZTMifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/hooks.server.ts#L677-L720",
+          "version": "repo-lines-v1:sha256:8e4c0aeac0bd92268dd62337addc7424435b0bba68b0ec016514cb6f0e5326af:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjYTZkMjE1MjJjOTA1YjJjYmEyNmZlMWIxODIwYTM1OTkzZDFlYTYzOWE2MmFlYWM1MTdjNjMzYTA0ODNkMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhNGU2NzllZjU3ODllYTg2ZmQyNzNiN2ZjOGJiNDI0OWI5ZjRkNWY3OTJhNDZmNGUyODg4ZDQ0YTA5YTk1OGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyNmZjNDdhZmUxNWU0OTllYmM3ZjU5Zjg2NjZkYTkxNzhmMTkzYzZkY2Y5NDc0MjMwZDNhZWUxNDI3NjBiYTAifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/hooks.server.ts#L722-L877",
+          "version": "repo-lines-v1:sha256:c2bad25d1b1b06cad24245f6f50a55e2b3112703fca6b76ad64a9302fc587076:eyJzZWxlY3RlZExpbmVDb3VudCI6MTU2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzNGEwNjM5NWQyZDNlN2VhMTFkZjg4ZGM0Yjk1MDM2YWY0YjVmZTdlNWIwNzY0ZTk4MWQ1MmIyZWJkZDViYzk2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3MTM0NTE4MDEwNWIwYzY2YTc3ZGFkNTFiYjM3OTAxYTM3MzJjOTY1NGJhNGRlMzk4MWY4MWUxODE3NTI0OGJmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1ODUwOGI2Y2IwNTg5YWJhNzUwMzIwMmRlMmM4Zjg3ZWQ5YjE5Y2Q1ODY1M2ZkMDFhM2U2NzVlM2FiN2I1OTY3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlYzY5YzMzNzc2OWZmNTBlZjM5NTRjNGYxZDY1ZjQyMmE1NzIxNjg1NDRkZWU4MzIzZjljMDVhOTE0YWQzN2Y5In0"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/hooks.server.ts#L879-L933",
+          "version": "repo-lines-v1:sha256:233bf2b67b87a1ce873e522c22695ea1c56d322261e50b8f8a350e6a77979ec0:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5MWZiYzBhM2U1NGY4NjAwMjRhNzI3ZGQxOTA2MGY5NjVhOTg4ZTA3NjQ0OTQxNTQyOTdlMjM2YmM3ODJhMDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4NTA4YjZjYjA1ODlhYmE3NTAzMjAyZGUyYzhmODdlZDliMTljZDU4NjUzZmQwMWEzZTY3NWUzYWI3YjU5NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhhZDFmOTdmMDA2Yzg1NGNiM2I4NjM4ZjliMGVlNDA0N2ExYjMwZmM0MTI1NGY4ODk0MGE1YTcyYzE0YzhlZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b10f84a893c04cbe80682dc4715fba2d",
+      "statement": "The packet-registry semantic-AST schema requires a revision-qualified identity tuple and validates AST byte-span ordering, while the registry entry schema makes lane status and write policy explicit; these contracts qualify transported data without making RPC the owner.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L21-L30",
+          "version": "repo-lines-v1:sha256:e16023af7800768e3288f964c007653d1a74023cf32a728f9bd3c2607bd411fa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNmY2MmFlYmI0ZWVmOTI5MDhiMmFmZThmN2JkN2MxNjk1MTVhNmYwNGFlMTA3MzRjMjM3ZWIzMjJlYWUzYzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjU5NWZjMTc1NWMwMGNiMDk2MWNlNzUyMzk5MTgzYjM5ODA2YTNmMDBkNTU0ZmM0Y2E1MDU3Yzk4NGRkMTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI5ZjRjZjY5MWE4NGI2ZTE0ODNiYzZkMjlhNTdiYWU4ZjRmODEzOWM5ZTQwNDhlNmRlMzM0YTUyNjMyM2RhMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzNDEwZDI0YTNiMzJkNzY0ZDhlOTlhMzg2YTM4NDQ5MTRlNzZlMjE5OGJjODk0YWZhOTU1NDkwZTRjYTRhZTIifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L34-L56",
+          "version": "repo-lines-v1:sha256:44e4c607d1ae3660f3dc526be1f6383cb6d5d58de6ae54e383b53e0a572a7810:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkYTg3ODRiNDBkZDBiNGRjYWViNjEwOGYxM2Y5NmM5MDFkMmVmNzA0OTRkYWY3NjMwZDRiZjRjYjk3NmQ1NmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjU5NWZjMTc1NWMwMGNiMDk2MWNlNzUyMzk5MTgzYjM5ODA2YTNmMDBkNTU0ZmM0Y2E1MDU3Yzk4NGRkMTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzNDEwZDI0YTNiMzJkNzY0ZDhlOTlhMzg2YTM4NDQ5MTRlNzZlMjE5OGJjODk0YWZhOTU1NDkwZTRjYTRhZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzMDgyZWIwN2U5MjRjNDE3NGViNGFmMmI4MzM3Mzk3NDgwNmQ2YTU1MjE1N2YzOWZkY2U1YjRjMTYzZTg1YzkifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L60-L76",
+          "version": "repo-lines-v1:sha256:cf2744f5d4e37be3ee00925f6ece173dd9e0389169edc8aa5feaee2422cc6cb6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4YzI0YWYwMWUyNDdhNjAxYjBmNjJmOGE2NzE0NWQ2ZDEyMzE3YWI3MjA5NGUxODk5NGIzNWVhZjJmZDA5NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzMDgyZWIwN2U5MjRjNDE3NGViNGFmMmI4MzM3Mzk3NDgwNmQ2YTU1MjE1N2YzOWZkY2U1YjRjMTYzZTg1YzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2NGRlN2M4MWZkYTgyMTcyNDFmNWFkNjI5YzI5MjkzY2IwMGVkZmYwYThiZDVhMzE0N2RiNzVlOTA4NjFiMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5c02c9483b3d40b0857f6120c302a9e4",
+      "statement": "The current title-writer compatibility regression pin classifies all known title writers, requires every result to be non-persistence-eligible, and surfaces registry-version drift, making compatibility classification a safety gate rather than evidence that a backfill is authorized.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/atlas/title-writer-compat-v1.test.mjs#L45-L67",
+          "version": "repo-lines-v1:sha256:c2a9ffa3f9b0577fc10dcf809742770722834eb3a808e9e55c70f20cafc91282:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmOTIwMTFlMWRiMDQxMWJmY2RlMzZlZDYxNGIxYmFiNjk2M2Q0OWZiNGNlM2RjMjM2ZWQwNDQ4NDEzOTczNzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzZGRlZjcyNDc4NmI0YWY0NWFiN2NhZDgxZDM3N2FlNTQzYmI3ODQxMjk2NTY4ZmI1MjI2OTk4YWVjMjE2MzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyZGFmN2Q3NGFiNzhjNTM3NDg0ZDY2OTQ0NjQzYzkyNGY5MWNkZTk3NTc3NDk3MWMzZTk4Y2E3NDJiOTM2ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f42c13945dc3452ca383a4aadb32ad76",
+      "statement": "The index-stream boundary tests require Qdrant content vectors to stay out of the PostgreSQL canonical semantic lane and require the PostgreSQL mirror to receive metadata without the Qdrant content vector.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/atlas/index-stream-semantic-write-boundary-v1.test.mjs#L21-L31",
+          "version": "repo-lines-v1:sha256:ce4188fa46ae308e5cde149a25be6a8dfe4d1094e610a33027139fdb071610eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhMDM0YjBlMjE1MzJmN2FlZTc3ODI4NTU3ZDNiM2IxNTE2Mzc0YTcxYTBjODYwMWZlNDY2OTczZjE4ZWU2OTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzZGRlZjcyNDc4NmI0YWY0NWFiN2NhZDgxZDM3N2FlNTQzYmI3ODQxMjk2NTY4ZmI1MjI2OTk4YWVjMjE2MzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1MzBlNTQ4NzU3YmRkMDYzM2ZlOTZjNzc4YWE5NzRiYjNlMDc2Y2YyYmJiMjVlMmEyZjcxMGI5NDA0NDVjODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkMGU0ZjdlZWI3NzQxM2NmNzVlY2UyOTlmOGI2ODZkZWFhZGRmYTVjMWU4ZGYyNjU1NjE0YzZhNmFlNTY0ZGUifQ"
+        },
+        {
+          "resource": "repo://scripts/atlas/index-stream-semantic-write-boundary-v1.test.mjs#L45-L58",
+          "version": "repo-lines-v1:sha256:e20ac867368d3b22150dc173f54c678efcd2f72358900a8f0d25c753548e41eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlNGMxYjhhZTlmZmJhZjY1MDY1ZjE2MDI2MDI5MDE4OWVkZjRhZTEwMzNmZDMwNGRjNGMzYjFkNTRmNmNhMDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0YTU2ZTkzMDM1ZDRhMmIzODYwNDQyY2NiNTk2ZmE0ZWJjMzIwNTcxZTFiMjA5NjExOTU3ZWVlY2MyNzMyNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3Yjk0OGU1YzdjM2M1NzY5M2NhYmUzYmUzM2I1MDhlM2Y3ZGYwN2U5YmI2MTZhNGUwMmIzNzk3ZjUzN2E0N2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYzZWI5ODI2NGMzMGUzY2I3MjdjYTY2YzVmNzEyNzlhNjY4ZDI5ZDA2MjZmMGVhZmJmYzVlOGFhY2MxMzBiNGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cf9bf107de6c4b9dbe1987a5b31325d8",
+      "statement": "The package-boundary verifier checks declared package exports, owner paths, forbidden mirrors, required package imports, and runtime imports before reporting package-boundary readiness.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/atlas/verify-atlas-package-boundaries.mjs#L11-L55",
+          "version": "repo-lines-v1:sha256:7219eaac06579c93e23a0b49de14eb5333931719263d2e43701927dcb9f880d0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMWNlNzZjY2VhYWIzMTMxMDkzZGNmNzIxMGY1OWUyM2JmN2RlMWE4ZmFjN2IwN2JhMGNlMjU5OWMxMWVjN2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhZWQ1NmM0YmFhYjFiYmU4YTZhMmEwNmIwZDkyM2VjM2MyNzM0NjNkYTNiMzk5MzUyMWI1MDEwZjNkNDY4YzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2YmVjNjAwZTE0NjgyMmIzNGVkZjRkMTkwOWQzMDQxZjlmZTA5Yzg5ZmQ1MWFlNGEyNjBkOGZhOTU1Y2Q2ZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJlYzBiMTIyMWRhYmU5Y2EzYzY4OWJiMzdkNGU1NzkwZTM2YTRlMzNjNGYyOWI1MTAxNDkyNWI4Njg3ODAwNjIifQ"
         }
       ]
     }

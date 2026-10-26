@@ -52,9 +52,10 @@ export function createToolWithDispatcher(
   toolName: string,
   sessionId: string,
   handler: (input: unknown, context: QueryExecutionContextV1) => Promise<unknown>,
-  executionMode: QueryExecutionModeV1 = 'MUTATING'
+  executionMode: QueryExecutionModeV1 = 'MUTATING',
+  options?: { operatorGated?: boolean }
 ): (input: unknown) => Promise<unknown> {
-  return middleware.wrap(handler, toolName, sessionId, executionMode);
+  return middleware.wrap(handler, toolName, sessionId, executionMode, options);
 }
 
 /**

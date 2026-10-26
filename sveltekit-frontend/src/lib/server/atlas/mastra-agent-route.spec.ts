@@ -1,146 +1,114 @@
-import { createHash } from 'node:crypto';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { buildContextManifestV2 } from '$lib/server/atlas/graph/context-manifest-v2.js';
-import { buildPromptPlanV1 } from '$lib/server/atlas/prefill/prompt-plan-v1.js';
+import { describe, expect, it, vi } from 'vitest';
 
-const { executeMastraPromptPlanV1, resolveLoadedLlamaModel } = vi.hoisted(() => ({
-  executeMastraPromptPlanV1: vi.fn(),
-  resolveLoadedLlamaModel: vi.fn(),
-}));
-
-vi.mock('@deeds/atlas-orchestrator/prompt-plan-agent', () => ({ executeMastraPromptPlanV1 }));
-vi.mock('$lib/server/ai/llama-server-model-resolver.js', () => ({ resolveLoadedLlamaModel }));
-vi.mock('$lib/server/env.server.js', () => ({ ENV: {
-  LLAMA_SERVER_URL: 'https://llama.fixture',
-  LLAMA_SERVER_MODEL: 'configured-model',
-} }));
+const setSpanAttributes = vi.hoisted(() => vi.fn());
+vi.mock('@opentelemetry/api', () => ({ trace: { getActiveSpan: () => ({ setAttributes: setSpanAttributes }) } }));
 
 import { POST } from '../../../routes/api/atlas/mastra-agent/+server.js';
+import { createVerifiedContextRuntimeV1 } from './execution/verified-context-runtime-v1.js';
 
-const sha = (s: string) => createHash('sha256').update(s, 'utf8').digest('hex');
-const prompt = 'Summarize the admitted evidence.';
+const admitted = {
+  schema: 'atlas.verified-context-result.v1' as const,
+  status: 'ADMITTED' as const,
+  requestId: 'server-request-1',
+  contextPacketRef: 'verified-context:sha256:packet',
+  contextPacketDigest: 'a'.repeat(64),
+  contextManifestChecksum: 'b'.repeat(64),
+  promptPlanChecksum: 'c'.repeat(64),
+  promptPlan: { checksumSha256: 'c'.repeat(64) },
+  receipt: { receiptChecksum: 'd'.repeat(64) },
+  canonicalAuthority: false as const,
+  writesPerformed: false as const,
+};
 
-function requestData() {
-  const selectedOrdinalSetChecksum = sha('selected');
-  const sourceRevisionSetChecksum = sha('sources');
-  const v1 = {
-    schema: 'atlas.context-manifest.v1' as const,
-    requestId: 'request-route-test',
-    snapshotId: sha('snapshot'),
-    graphRevision: null,
-    query: 'fixture query',
-    candidateBucket: 1 as const,
-    candidateCount: 1,
-    tokenBudget: 100,
-    selectedNodeKeys: ['packet-key-1'],
-    evidenceRefs: ['packet-key-1:chunk:1'],
-    producerRevision: 'candidate-producer-v1',
-  };
-  const identityInput = {
-    selectedOrdinalSetChecksum,
-    evidenceRevisions: {
-      sourceRevision: sourceRevisionSetChecksum,
-      representationRevision: null,
-      featureRevision: sha('feature'),
-      ontologyRevision: null,
-      modelRevision: null,
-      promptTemplateRevision: null,
-    },
-    ordinalMapChecksum: sha('ordinal-map'),
-    retrievalPolicyRevision: 'retrieval-policy-v1',
-    acePlaybookRevision: 'ace-playbook-v1',
-  };
-  const manifest = buildContextManifestV2(v1, identityInput);
-  const admission = {
-    manifest,
-    selectedOrdinalSetChecksum,
-    sourceRevisionSetChecksum,
-    canonicalAuthority: false as const,
-  };
-  const promptPlan = buildPromptPlanV1({
-    requestId: v1.requestId,
-    contextManifestChecksum: manifest.identityChecksum,
-    tokenizerRevision: 'fixture-tokenizer-v1',
-    promptTemplateRevision: 'fixture-template-v1',
-    instructionRevision: 'fixture-instruction-v1',
-    segments: [{
-      ordinal: 0,
-      kind: 'EVIDENCE',
-      packetKey: 'packet-key-1',
-      evidenceRefs: ['packet-key-1:chunk:1'],
-      contentChecksum: sha(prompt),
-      tokenCount: 8,
-    }],
-    contextLimitTokens: 512,
-    reservedOutputTokens: 64,
-    maxInputTokens: 448,
-  });
-  return { admission, promptPlan, segmentContent: [{ ordinal: 0, content: prompt }] };
+function post(body: unknown, locals: Record<string, unknown> = { user: { id: 'actor-1' }, requestId: 'server-request-1' }) {
+  return POST({
+    request: new Request('https://app.fixture/api/atlas/mastra-agent', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+    }),
+    locals,
+  } as never);
 }
 
 describe('POST /api/atlas/mastra-agent', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    resolveLoadedLlamaModel.mockResolvedValue({
-      configuredModel: 'configured-model',
-      resolvedModel: 'opaque-loaded-model-id',
-      source: 'llama-server-loaded',
-    });
-    executeMastraPromptPlanV1.mockResolvedValue({
-      schema: 'atlas.mastra-prompt-plan-execution-receipt.v1',
-      content: 'Grounded response.',
-      model: 'opaque-loaded-model-id',
-      requestId: 'request-route-test',
-      contextManifestChecksum: sha('manifest'),
-      promptPlanChecksum: sha('plan'),
-      canonicalAuthority: false,
-      writesPerformed: false,
-      durableStatePersisted: false,
-    });
+  it('rejects caller-assembled admission and PromptPlan fields', async () => {
+    const response = await post({ query: 'find route helpers', admission: {}, promptPlan: {}, segmentContent: [] });
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ success: false, error: 'INVALID_REQUEST', writesPerformed: false });
   });
 
-  it('executes only an admitted packet-key manifest and its checksum-bound evidence plan', async () => {
-    const data = requestData();
-    const response = await POST({
-      request: new Request('https://app.fixture/api/atlas/mastra-agent', {
-        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data),
-      }),
-      locals: { user: { id: 'user-fixture' } },
-    } as never);
-    expect(response.status).toBe(200);
-    expect(resolveLoadedLlamaModel).toHaveBeenCalledWith('https://llama.fixture', 'configured-model');
-    expect(executeMastraPromptPlanV1).toHaveBeenCalledWith(expect.objectContaining({
-      baseUrl: 'https://llama.fixture',
-      resolvedModel: 'opaque-loaded-model-id',
-      promptPlan: data.promptPlan,
-      segmentContent: data.segmentContent,
-    }));
-    expect(await response.json()).toMatchObject({
-      success: true,
-      result: { model: 'opaque-loaded-model-id', writesPerformed: false, canonicalAuthority: false },
-    });
-  });
-
-  it('blocks packet/evidence identity drift before model resolution', async () => {
-    const data = requestData();
-    data.promptPlan.segments[0]!.packetKey = 'different-packet-key';
-    const response = await POST({
-      request: new Request('https://app.fixture/api/atlas/mastra-agent', {
-        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data),
-      }),
-      locals: { user: { id: 'user-fixture' } },
-    } as never);
-    expect(response.status).toBe(422);
-    expect(resolveLoadedLlamaModel).not.toHaveBeenCalled();
-    expect(executeMastraPromptPlanV1).not.toHaveBeenCalled();
-  });
-
-  it('requires an authenticated user', async () => {
-    const response = await POST({
-      request: new Request('https://app.fixture/api/atlas/mastra-agent', { method: 'POST' }),
-      locals: {},
-    } as never);
+  it('requires authentication before invoking the service', async () => {
+    const execute = vi.fn();
+    const response = await post({ query: 'find route helpers' }, { verifiedContextService: { execute } });
     expect(response.status).toBe(401);
-    expect(resolveLoadedLlamaModel).not.toHaveBeenCalled();
+    expect(execute).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when the server-owned service is unconfigured', async () => {
+    const response = await post({ query: 'find route helpers' });
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      success: false,
+      error: 'VERIFIED_CONTEXT_SERVICE_NOT_CONFIGURED',
+      requestId: 'server-request-1',
+      writesPerformed: false,
+    });
+  });
+
+  it('uses the registered server runtime and returns its exact authority refusal', async () => {
+    setSpanAttributes.mockClear();
+    const service = createVerifiedContextRuntimeV1(async () => ({
+      status: 'UNAVAILABLE', workspaceRevision: null, reason: 'LIVE_READBACK_NOT_PROVEN',
+      resolverRevision: 'atlas.trusted-workspace-resolver.v1',
+    }));
+    const response = await post({ query: 'find route helpers' }, {
+      user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: service,
+    });
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      success: false, error: 'TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE',
+      requestId: 'server-request-1', firstFailingBoundary: 'WORKSPACE_AUTHORITY', writesPerformed: false,
+    });
+    expect(setSpanAttributes).toHaveBeenCalledWith(expect.objectContaining({
+      'parent_atlas.request_id': 'server-request-1',
+      'parent_atlas.service_health': 'AVAILABLE',
+      'parent_atlas.agent_execution_status': 'NOT_STARTED',
+      'parent_atlas.evidence_validity': 'NOT_ADMITTED',
+      'parent_atlas.canonical_admission': 'NOT_ADMITTED',
+      'parent_atlas.first_failing_boundary': 'WORKSPACE_AUTHORITY',
+      'parent_atlas.refusal_code': 'TRUSTED_WORKSPACE_AUTHORITY_UNAVAILABLE',
+      'parent_atlas.writes_performed': false,
+    }));
+  });
+
+  it('propagates exact service refusal without invoking inference', async () => {
+    const execute = vi.fn().mockResolvedValue({
+      schema: 'atlas.verified-context-result.v1', status: 'REFUSED', requestId: 'server-request-1',
+      refusalCode: 'FEATURE_SNAPSHOT_READBACK_NOT_ADMITTED', firstFailingBoundary: 'FEATURE_SNAPSHOT',
+      receipt: { refusalCode: 'FEATURE_SNAPSHOT_READBACK_NOT_ADMITTED' }, canonicalAuthority: false, writesPerformed: false,
+    });
+    const response = await post({ query: 'find route helpers', topK: 3 }, { user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: { execute } });
+    expect(execute).toHaveBeenCalledWith('actor-1', { query: 'find route helpers', topK: 3, requestId: 'server-request-1' });
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      success: false,
+      error: 'FEATURE_SNAPSHOT_READBACK_NOT_ADMITTED',
+      firstFailingBoundary: 'FEATURE_SNAPSHOT',
+      writesPerformed: false,
+    });
+  });
+
+  it('does not synthesize until an immutable packet hydrator exists', async () => {
+    const execute = vi.fn().mockResolvedValue(admitted);
+    const response = await post({ query: 'find route helpers' }, { user: { id: 'actor-1' }, requestId: 'server-request-1', verifiedContextService: { execute } });
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      success: false,
+      error: 'VERIFIED_CONTEXT_PACKET_HYDRATOR_NOT_CONFIGURED',
+      contextPacketRef: admitted.contextPacketRef,
+      contextPacketDigest: admitted.contextPacketDigest,
+      promptPlanChecksum: admitted.promptPlanChecksum,
+      writesPerformed: false,
+    });
   });
 });

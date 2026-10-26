@@ -20,13 +20,148 @@
  * openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md.
  */
 
+import { z } from 'zod';
 import {
   buildDomainClassificationV1,
   type DomainClassificationV1,
 } from '@deeds/parent-atlas';
-import type { DomainClassification } from './domain-taxonomy.js';
+import { canonicalSha256V1 } from './prefill/canonical-hash-v1.js';
+import {
+  DomainClassificationV1Schema as OkfDomainClassificationV1Schema,
+  OkfDomainClassificationBatchV1Schema,
+  OkfDomainSubjectKindSchema,
+  type DomainClassificationV1 as OkfDomainClassificationV1,
+  type OkfDomainClassificationBatchV1,
+} from './contracts/okf-cross-domain-v1.js';
+import { CANONICAL_DOMAINS, DOMAIN_TAXONOMY_VERSION, type DomainClassification } from './domain-taxonomy.js';
 
 export const DOMAIN_TAXONOMY_RULES_CLASSIFIER_REVISION = 'parent-atlas-domain-taxonomy-v1' as const;
+
+export type OkfDomainClassificationCandidateV1 = {
+  classification: DomainClassification;
+  subjectRef: string;
+  subjectKind: z.infer<typeof OkfDomainSubjectKindSchema>;
+  sourceRevision: string;
+};
+
+export const OKF_DOMAIN_CLASSIFICATION_BATCH_MAX_CANDIDATES_V1 = 500;
+
+function parseDomainClassificationBatchV1(
+  input: unknown,
+): OkfDomainClassificationBatchV1 {
+  return OkfDomainClassificationBatchV1Schema.parse(input);
+}
+
+export function buildOkfDomainClassificationProposalArrayV1(input: {
+  candidates: readonly OkfDomainClassificationCandidateV1[];
+}): OkfDomainClassificationBatchV1 {
+  if (input.candidates.length > OKF_DOMAIN_CLASSIFICATION_BATCH_MAX_CANDIDATES_V1) {
+    throw new Error('OKF_DOMAIN_CLASSIFICATION_BATCH_LIMIT_EXCEEDED');
+  }
+
+  const identities = new Set<string>();
+  const rows: OkfDomainClassificationV1[] = [];
+
+  for (const candidate of input.candidates) {
+    const identity = JSON.stringify([
+      candidate.subjectKind,
+      candidate.subjectRef.trim(),
+      candidate.sourceRevision.trim(),
+    ]);
+    if (identities.has(identity)) throw new Error('OKF_DOMAIN_CLASSIFICATION_DUPLICATE_CANDIDATE');
+    identities.add(identity);
+
+    const batch = buildOkfDomainClassificationBatchV1(candidate);
+    if (batch.status === 'UNAVAILABLE') {
+      return parseDomainClassificationBatchV1({
+        schema: 'atlas.okf.domain-classification-batch.v1',
+        status: 'UNAVAILABLE',
+        taxonomyRevision: DOMAIN_TAXONOMY_VERSION,
+        rows: [],
+        reason: batch.reason,
+        canonicalAuthority: false,
+        writesPerformed: false,
+      });
+    }
+    rows.push(...batch.rows);
+  }
+
+  const compare = (left: string, right: string) => left < right ? -1 : left > right ? 1 : 0;
+  rows.sort((left, right) => compare(left.subjectRef, right.subjectRef)
+    || compare(left.subjectKind, right.subjectKind)
+    || compare(left.domainId, right.domainId)
+    || compare(left.classificationId, right.classificationId));
+
+  return parseDomainClassificationBatchV1({
+    schema: 'atlas.okf.domain-classification-batch.v1',
+    status: rows.length > 0 ? 'PROPOSAL_ONLY' : 'UNAVAILABLE',
+    taxonomyRevision: DOMAIN_TAXONOMY_VERSION,
+    rows,
+    reason: rows.length > 0 ? null : 'NO_CANONICAL_DOMAIN_LABELS',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  });
+}
+
+export function buildOkfDomainClassificationBatchV1(input: {
+  classification: DomainClassification;
+  subjectRef: string;
+  subjectKind: z.infer<typeof OkfDomainSubjectKindSchema>;
+  sourceRevision: string;
+}): OkfDomainClassificationBatchV1 {
+  const subjectRef = input.subjectRef.trim();
+  const sourceRevision = input.sourceRevision.trim();
+  if (!subjectRef) throw new Error('OKF_DOMAIN_SUBJECT_REF_REQUIRED');
+  if (!sourceRevision) throw new Error('OKF_DOMAIN_SOURCE_REVISION_REQUIRED');
+  if (!/^sha256:[a-f0-9]{64}$/.test(sourceRevision)) throw new Error('OKF_DOMAIN_SOURCE_REVISION_INVALID');
+
+  const evidenceRefs = [...new Set(input.classification.evidence
+    .map((item) => item.source_ref?.trim())
+    .filter((value): value is string => Boolean(value)))].sort((left, right) => left.localeCompare(right));
+  if (evidenceRefs.length === 0) {
+    return parseDomainClassificationBatchV1({
+      schema: 'atlas.okf.domain-classification-batch.v1',
+      status: 'UNAVAILABLE',
+      taxonomyRevision: DOMAIN_TAXONOMY_VERSION,
+      rows: [],
+      reason: 'CLASSIFICATION_EVIDENCE_REFS_MISSING',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    });
+  }
+
+  const canonicalLabelSet = new Set<string>(CANONICAL_DOMAINS);
+  const rows = input.classification.labels
+    .filter((label) => label.source === 'deterministic' && canonicalLabelSet.has(label.label))
+    .map((label) => {
+      const producerRevision = input.classification.classifier_version || DOMAIN_TAXONOMY_RULES_CLASSIFIER_REVISION;
+      const rowBody = {
+        schemaVersion: 'atlas.okf.domain-classification.v1' as const,
+        subjectRef,
+        subjectKind: input.subjectKind,
+        domainId: label.label,
+        taxonomyRevision: DOMAIN_TAXONOMY_VERSION,
+        confidence: label.score,
+        evidenceRefs,
+        sourceRevision,
+        producerId: 'domain-taxonomy:deterministic-rules',
+        producerRevision,
+        lifecycle: 'DERIVED' as const,
+      };
+      const classificationId = `okf-domain-classification:${canonicalSha256V1(rowBody)}`;
+      return OkfDomainClassificationV1Schema.parse({ ...rowBody, classificationId });
+    });
+
+  return parseDomainClassificationBatchV1({
+    schema: 'atlas.okf.domain-classification-batch.v1',
+    status: rows.length > 0 ? 'PROPOSAL_ONLY' : 'UNAVAILABLE',
+    taxonomyRevision: DOMAIN_TAXONOMY_VERSION,
+    rows,
+    reason: rows.length > 0 ? null : 'NO_CANONICAL_DOMAIN_LABELS',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  });
+}
 
 export function buildRulesDomainClassificationV1(
   classification: DomainClassification,

@@ -1,0 +1,32 @@
+[
+  {
+    "path": "python/atlas_rff_features_v1.py",
+    "sha256": "2df6c70a9ea94f2f040882c9f07e6a9cd5c2509731332d7db690fa0108916986",
+    "archivedAt": "2026-10-13",
+    "reason": "duplicate of existing owner; never committed"
+  },
+  {
+    "path": "python/test_atlas_rff_features_v1.py",
+    "sha256": "4c117ff1171e3a51b1d9e39379e256340d4e40e3c57bde5241c3d74d80a1a12c",
+    "archivedAt": "2026-10-13",
+    "reason": "duplicate of existing owner; never committed"
+  },
+  {
+    "path": "python/atlas_cuda_cutile_vecadd_smoke_v1.py",
+    "sha256": "38d892e4c24f9966063f9f53f3ca2817ab23a3328f293207e4d394bbed5de7e8",
+    "archivedAt": "2026-10-13",
+    "reason": "duplicate of existing owner; never committed"
+  },
+  {
+    "path": "scripts/atlas/graph_stream_batch_v1.py",
+    "sha256": "4c9a0de1f664c07467b265ca28a5790c35bade57f3d495b5cb8492aa9ebfbb8e",
+    "archivedAt": "2026-10-13",
+    "reason": "duplicate of existing owner; never committed"
+  },
+  {
+    "path": "tests/test_graph_stream_batch_v1.py",
+    "sha256": "cdc08eb115a40ef3b3cad3e125de4289769b5fcb7426cecb65f70076c6c751d1",
+    "archivedAt": "2026-10-13",
+    "reason": "duplicate of existing owner; never committed"
+  }
+]

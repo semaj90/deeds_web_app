@@ -1,45 +1,45 @@
 # SIMD Bridge Memory & VRAM Safety Audit
 
 ## Execution Overview
-- **Run ID**: \`simd-audit-1789791227254\`
-- **Timestamp**: 2026-09-19T04:13:47.254Z
-- **Scanned Files**: \`binding.cc\`, \`cuda_graph_bridge.cu\`, \`cuvs_bridge.cc\`, \`gpu_error_codes.h\`, \`libtorch_stubs.cc\`, \`lstm_bridge.cc\`, \`lstm_gpu.cu\`, \`pytorch_graph.cc\`, \`pytorch_graph_fp16.cc\`, \`simdjson_bridge.cc\`, \`som_cache.cu\`, \`tensor_bridge.cc\`
+- **Run ID**: \`simd-audit-1792397008711\`
+- **Timestamp**: 2026-10-19T08:03:28.711Z
+- **Scanned Files**: \`binding.cc\`, \`cuda_graph_bridge.cu\`, \`cuvs_bridge.cc\`, \`gpu_error_codes.h\`, \`graph_search.cc\`, \`libtorch_stubs.cc\`, \`lstm_bridge.cc\`, \`lstm_gpu.cu\`, \`manifold_interpolate.cc\`, \`native_runtime_info.cu\`, \`pytorch_graph.cc\`, \`pytorch_graph_fp16.cc\`, \`simdjson_bridge.cc\`, \`som_cache.cu\`, \`tensor_bridge.cc\`, \`tree_ensemble.cc\`
 
 ## Summary Statistics
-- **Total Findings**: 104
+- **Total Findings**: 124
 - **High Severity Risks**: 13
-- **Medium Severity Risks**: 58
-- **Low/Safe Allocations**: 57
+- **Medium Severity Risks**: 59
+- **Low/Safe Allocations**: 95
 
 ### Classification Matrix
 - **gpu_allocation (CUDA VRAM)**: 14
 - **napi_buffer (GC / Host memory)**: 12
 - **tensor_lifetime (LibTorch blocks)**: 0
-- **missing_timeout (Deadlock vector)**: 45
+- **missing_timeout (Deadlock vector)**: 46
 - **missing_cpu_fallback (OOM safety)**: 2
 - **possible_concurrent_gpu_job (Synch locks)**: 7
-- **safe (Pooled recyclers)**: 24
+- **safe (Pooled recyclers)**: 43
 
 ---
 
 ## High & Medium Severity Findings Detail
 
 
-### Finding #1: binding.cc:59 [NAPI_BUFFER]
+### Finding #1: binding.cc:60 [NAPI_BUFFER]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`napi_create_external_arraybuffer\`
 - **Trigger Snippet**: \`napi_status napi_create_external_arraybuffer(napi_env, void*, size_t, napi_finalize, void*, napi_value*);\`
 - **Architectural Risk**: *"N-API external buffer transfer to V8"*
 
 
-### Finding #2: binding.cc:156 [NAPI_BUFFER]
+### Finding #2: binding.cc:269 [NAPI_BUFFER]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`napi_create_external_arraybuffer\`
 - **Trigger Snippet**: \`// Strategy: napi_create_external_arraybuffer transfers ownership of a raw\`
 - **Architectural Risk**: *"N-API external buffer transfer to V8"*
 
 
-### Finding #3: binding.cc:246 [NAPI_BUFFER]
+### Finding #3: binding.cc:359 [NAPI_BUFFER]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`napi_create_external_arraybuffer\`
 - **Trigger Snippet**: \`return napi_create_external_arraybuffer(\`
@@ -459,63 +459,70 @@
 - **Architectural Risk**: *"Native entrypoint "run_relu" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."*
 
 
-### Finding #63: pytorch_graph_fp16.cc:1 [MISSING_TIMEOUT]
+### Finding #63: native_runtime_info.cu:1 [MISSING_TIMEOUT]
+- **Risk Severity**: \`MEDIUM\`
+- **Matched Pattern**: \`missing_timeout\`
+- **Trigger Snippet**: \`Function boundary: atlasGetCudaRuntimeInfo\`
+- **Architectural Risk**: *"Native entrypoint "atlasGetCudaRuntimeInfo" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."*
+
+
+### Finding #64: pytorch_graph_fp16.cc:1 [MISSING_TIMEOUT]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`missing_timeout\`
 - **Trigger Snippet**: \`Function boundary: attentionScoreGPU_fp16\`
 - **Architectural Risk**: *"Native entrypoint "attentionScoreGPU_fp16" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."*
 
 
-### Finding #64: pytorch_graph_fp16.cc:1 [MISSING_TIMEOUT]
+### Finding #65: pytorch_graph_fp16.cc:1 [MISSING_TIMEOUT]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`missing_timeout\`
 - **Trigger Snippet**: \`Function boundary: rewardScoreGPU_fp16\`
 - **Architectural Risk**: *"Native entrypoint "rewardScoreGPU_fp16" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."*
 
 
-### Finding #65: pytorch_graph_fp16.cc:1 [MISSING_TIMEOUT]
+### Finding #66: pytorch_graph_fp16.cc:1 [MISSING_TIMEOUT]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`missing_timeout\`
 - **Trigger Snippet**: \`Function boundary: batchCosineSimilarity_fp16\`
 - **Architectural Risk**: *"Native entrypoint "batchCosineSimilarity_fp16" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."*
 
 
-### Finding #66: som_cache.cu:104 [POSSIBLE_CONCURRENT_GPU_JOB]
+### Finding #67: som_cache.cu:104 [POSSIBLE_CONCURRENT_GPU_JOB]
 - **Risk Severity**: \`HIGH\`
 - **Matched Pattern**: \`cudaDeviceSynchronize\`
 - **Trigger Snippet**: \`cudaDeviceSynchronize();\`
 - **Architectural Risk**: *"Full CUDA device synchronization"*
 
 
-### Finding #67: som_cache.cu:108 [POSSIBLE_CONCURRENT_GPU_JOB]
+### Finding #68: som_cache.cu:108 [POSSIBLE_CONCURRENT_GPU_JOB]
 - **Risk Severity**: \`HIGH\`
 - **Matched Pattern**: \`cudaDeviceSynchronize\`
 - **Trigger Snippet**: \`cudaDeviceSynchronize();\`
 - **Architectural Risk**: *"Full CUDA device synchronization"*
 
 
-### Finding #68: tensor_bridge.cc:1 [MISSING_TIMEOUT]
+### Finding #69: tensor_bridge.cc:1 [MISSING_TIMEOUT]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`missing_timeout\`
 - **Trigger Snippet**: \`Function boundary: runSOMCache\`
 - **Architectural Risk**: *"Native entrypoint "runSOMCache" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."*
 
 
-### Finding #69: tensor_bridge.cc:1 [MISSING_CPU_FALLBACK]
+### Finding #70: tensor_bridge.cc:1 [MISSING_CPU_FALLBACK]
 - **Risk Severity**: \`HIGH\`
 - **Matched Pattern**: \`missing_cpu_fallback\`
 - **Trigger Snippet**: \`Function boundary: runSOMCache\`
 - **Architectural Risk**: *"Native entrypoint "runSOMCache" does not have an in-situ CPU execution fallback registered."*
 
 
-### Finding #70: tensor_bridge.cc:1 [MISSING_TIMEOUT]
+### Finding #71: tensor_bridge.cc:1 [MISSING_TIMEOUT]
 - **Risk Severity**: \`MEDIUM\`
 - **Matched Pattern**: \`missing_timeout\`
 - **Trigger Snippet**: \`Function boundary: bridgeSIMDToTensorRT\`
 - **Architectural Risk**: *"Native entrypoint "bridgeSIMDToTensorRT" lacks custom milliseconds timeout limits (relying solely on iteration bounds)."*
 
 
-### Finding #71: tensor_bridge.cc:1 [MISSING_CPU_FALLBACK]
+### Finding #72: tensor_bridge.cc:1 [MISSING_CPU_FALLBACK]
 - **Risk Severity**: \`HIGH\`
 - **Matched Pattern**: \`missing_cpu_fallback\`
 - **Trigger Snippet**: \`Function boundary: bridgeSIMDToTensorRT\`
@@ -525,7 +532,7 @@
 ---
 
 ## Safe / Thread-Local Recycling Architecture Analysis
-The static analyzer successfully confirmed that [binding.cc](file:///c:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/binding.cc) includes **24 direct uses** of the high-performance \`create_pooled_ab\` thread-local recycler.
+The static analyzer successfully confirmed that [binding.cc](file:///c:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/binding.cc) includes **43 direct uses** of the high-performance \`create_pooled_ab\` thread-local recycler.
 This pooled structure successfully bounds CPU host allocations, bypassing default V8 garbage collector churn during repeated semantic calculations.
 
 ## Phase 12 Security Recommendations

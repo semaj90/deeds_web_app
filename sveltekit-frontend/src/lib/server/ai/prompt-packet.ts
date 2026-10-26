@@ -42,7 +42,7 @@ export interface SemanticPromptPacket {
   summary: string;                 // ≤200 chars — shown to model as context card
   tags: string[];                  // TAG field for FT.SEARCH pre-filter
   sourceRefs: string[];            // file paths or task refs that informed this packet
-  model: string;                   // 'gemma4-rotorquant:latest' | 'gemma4-legal-iq4xs' | ...
+  model: string;                   // 'ornith-1.5-9b' | 'ornith-1.5-9b' | ...
   score?: number;                  // cosine similarity from last FT.SEARCH (runtime only)
   answer?: string;                 // cached model output (omitted for rule/source_ref kinds)
   createdAt: string;               // ISO timestamp

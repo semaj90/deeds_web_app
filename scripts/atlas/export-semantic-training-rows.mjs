@@ -133,7 +133,7 @@ function featureFlagsFromRow(row) {
   const hasLexical = Array.isArray(row.lexical_features) && row.lexical_features.filter(Boolean).length > 0;
   const concepts = Array.isArray(row.used_concepts) ? row.used_concepts : row.concept_ids;
   const hasConcepts = Array.isArray(concepts) && concepts.filter(Boolean).length > 0;
-  const hasEmbedding = Boolean(row.embedding || row.content_embedding_384 || row.latent_64);
+  const hasEmbedding = Boolean(row.embedding);
   const hasQdrant = normalizeText(row.qdrant_point_id);
   const hasSom = Number.isFinite(Number(row.som_row)) && Number.isFinite(Number(row.som_col));
   const hasPagerank = Number.isFinite(Number(row.page_rank_score ?? row.pagerank));
@@ -191,13 +191,9 @@ async function loadAcceptedRows(limit, offset) {
       'ap.page_rank_score',
       'ap.pagerank',
       'ap.embedding',
-      'ap.latent_64',
       'ap.concept_ids',
       'ap.keywords',
     ];
-    if (packetCols.has('content_embedding_384')) {
-      select.push('ap.content_embedding_384');
-    }
     if (packetCols.has('mmap_file')) select.push('ap.mmap_file');
     if (packetCols.has('mmap_offset')) select.push('ap.mmap_offset');
     if (packetCols.has('mmap_length')) select.push('ap.mmap_length');

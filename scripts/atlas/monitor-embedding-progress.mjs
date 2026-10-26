@@ -28,7 +28,7 @@ async function monitor() {
   const interval = setInterval(async () => {
     try {
       const result = await pool.query(
-        `SELECT COUNT(*) total, COUNT(CASE WHEN content_embedding_384 IS NOT NULL THEN 1 END) embedded FROM atlas_packets`
+        `SELECT COUNT(*) total, COUNT(CASE WHEN embedding IS NOT NULL THEN 1 END) embedded FROM atlas_packets`
       );
 
       const { total, embedded } = result.rows[0];

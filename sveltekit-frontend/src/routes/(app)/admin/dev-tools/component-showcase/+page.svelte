@@ -9,11 +9,18 @@
 
 	let commandPaletteOpen = $state(false);
 	let activeSection = $state('command-palette');
+	let runeProbe = $state({ count: 0, label: 'Live rune state', enabled: true });
+	let runeDerived = $derived({
+		countLabel: `${runeProbe.count} updates`,
+		status: runeProbe.enabled ? `Active: ${runeProbe.label}` : 'Paused',
+		labelLength: runeProbe.label.length
+	});
 
 	const sections = [
 		{ id: 'command-palette', label: 'CommandPalette + Fuse.js', icon: 'search' },
 		{ id: 'expand-grid', label: 'ExpandGrid', icon: 'grid-3x3' },
 		{ id: 'evidence-cards', label: 'EvidenceCard Variants', icon: 'file-text' },
+		{ id: 'runes-inspector', label: 'Svelte 5 Runes Inspector', icon: 'code' },
 	];
 
 	const sampleEvidence = [
@@ -200,6 +207,34 @@
 					{/each}
 				</div>
 			</section>
+		{:else if activeSection === 'runes-inspector'}
+			<section class="demo-section">
+				<h2>Live Svelte 5 Runes Inspector</h2>
+				<p class="demo-desc">Edit the reactive state and watch the derived values update immediately. This inspects this demo's local state only.</p>
+				<div class="demo-actions rune-controls">
+					<label>
+						<span>Label</span>
+						<input bind:value={runeProbe.label} aria-label="Rune inspector label" />
+					</label>
+					<div class="rune-counter">
+						<button class="demo-btn" onclick={() => (runeProbe.count = Math.max(0, runeProbe.count - 1))} aria-label="Decrease rune counter">−</button>
+						<output aria-live="polite">{runeDerived.countLabel}</output>
+						<button class="demo-btn" onclick={() => (runeProbe.count += 1)} aria-label="Increase rune counter">+</button>
+					</div>
+					<label class="rune-toggle">
+						<input type="checkbox" bind:checked={runeProbe.enabled} />
+						<span>Enabled</span>
+					</label>
+				</div>
+				<div class="demo-info" aria-live="polite">
+					<h3>Reactive snapshot</h3>
+					<dl>
+						<dt>Derived status</dt><dd>{runeDerived.status}</dd>
+						<dt>Derived label length</dt><dd>{runeDerived.labelLength}</dd>
+						<dt>State count</dt><dd>{runeProbe.count}</dd>
+					</dl>
+				</div>
+			</section>
 		{/if}
 	</div>
 </div>
@@ -319,6 +354,27 @@
 		background: var(--panel-soft, #f9f9f9);
 		border-radius: 0.5rem;
 		border: 1px solid var(--sand-light, #e5e5e5);
+	}
+
+	.rune-controls,
+	.rune-counter {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.rune-controls {
+		flex-wrap: wrap;
+	}
+
+	.rune-controls label {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.rune-toggle input {
+		accent-color: var(--accent, #a51c30);
 	}
 
 	.demo-info h3 {

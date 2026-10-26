@@ -1,0 +1,322 @@
+{
+  "generated_at": "2026-10-15T20:06:10.614Z",
+  "status": "FAIL",
+  "query": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow",
+  "rule": "LIVE_PASS means real service, real port, real data. Fallbacks and warnings are visible, not green.",
+  "lanes": {
+    "embeddinggemma": {
+      "status": "LIVE_PASS",
+      "url": "http://localhost:11434",
+      "model": "embeddinggemma:latest",
+      "dimension": 768,
+      "duration_ms": 666
+    },
+    "qdrant": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:6333",
+      "collection": "codebase_chunks_768",
+      "vector_name": "content",
+      "hits": 16,
+      "identity_hits": 16,
+      "duration_ms": 134
+    },
+    "postgres_pgvector": {
+      "status": "LIVE_PASS",
+      "table": "codebase_chunk_index",
+      "column": "content_embedding_768",
+      "index": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "hits": 16,
+      "duration_ms": 49
+    },
+    "turbovec_grpc": {
+      "status": "LIVE_PASS",
+      "grpc_url": "127.0.0.1:50062",
+      "transport": "grpc",
+      "backend": "bridge:py(python)+addon(cuda)",
+      "in_dim": 768,
+      "out_dim": 64,
+      "duration_ms": 457
+    },
+    "go_retrieval": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8100",
+      "endpoint": "/search/codebase",
+      "query_used": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow",
+      "results": 8,
+      "total_ms": 17,
+      "duration_ms": 28
+    },
+    "postgres_truth_join": {
+      "status": "LIVE_PASS",
+      "table": "atlas_packets",
+      "packet_keys_in": 40,
+      "source_refs_in": 40,
+      "rows": 14,
+      "identity_rows": 14,
+      "duration_ms": 28
+    },
+    "langextract": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8095",
+      "entities": 7,
+      "structure_keys": 5,
+      "duration_ms": 8347
+    },
+    "ornith_synthesis": {
+      "status": "FAIL",
+      "url": "http://127.0.0.1:8090/v1",
+      "model": "ornith-1.5-9b",
+      "reasoning_leak_stripped": true,
+      "json_parsed": false,
+      "output_chars": 3259,
+      "citation_verification": {
+        "status": "NO_CITATIONS_RETURNED",
+        "admittedCount": 8,
+        "raw_citations": [],
+        "accepted": [],
+        "rejected": []
+      },
+      "cited_source_refs": 0,
+      "accepted_source_refs": 0,
+      "rejected_source_refs": [],
+      "duration_ms": 48109
+    }
+  },
+  "candidates": {
+    "qdrant": [
+      {
+        "id": "c92a3eb6-67cc-47d2-9527-3ba66ddbfede",
+        "score": 0.59767723,
+        "packet_key": "packet:72638704a2e9",
+        "source_ref": "docs/PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT.md",
+        "feature_id": "docs.PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT",
+        "feature_label": "PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT.md"
+      },
+      {
+        "id": "42250",
+        "score": 0.59767723,
+        "packet_key": "packet:72638704a2e9",
+        "source_ref": "docs/PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT.md",
+        "feature_id": "docs.PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT",
+        "feature_label": "PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT.md"
+      },
+      {
+        "id": "038ce0b3-21b2-4a28-af6d-435c8492aba6",
+        "score": 0.59457207,
+        "packet_key": "038ce0b3-21b2-4a28-af6d-435c8492aba6",
+        "source_ref": "scripts/atlas/graphify-summary-ranking-pipeline.mjs",
+        "feature_id": "scripts-atlas-graphify-summary-ranking-pipeline.mjs-graphify-summary-ranking-pipeline",
+        "feature_label": null
+      },
+      {
+        "id": "7d1bbfc1-ac8c-4cbe-993a-aac9e9a8e57c",
+        "score": 0.57818794,
+        "packet_key": "ace:packet:408a9022581d",
+        "source_ref": "docs/PHASE_A_STATUS.md",
+        "feature_id": "PHASE_A_STATUS",
+        "feature_label": "PHASE_A_STATUS"
+      },
+      {
+        "id": "26798",
+        "score": 0.57818794,
+        "packet_key": "ace:packet:408a9022581d",
+        "source_ref": "docs/PHASE_A_STATUS.md",
+        "feature_id": "PHASE_A_STATUS",
+        "feature_label": "PHASE_A_STATUS"
+      },
+      {
+        "id": "46e141d1-a12a-4216-9b02-fa7472e2a28d",
+        "score": 0.5757618,
+        "packet_key": "ace:packet:616a5fa9aaa0",
+        "source_ref": "docs/PHASE-85-P5-P9-INTEGRATION-SUMMARY.md",
+        "feature_id": "PHASE-85-P5-P9-INTEGRATION-SUMMARY",
+        "feature_label": "PHASE-85-P5-P9-INTEGRATION-SUMMARY"
+      },
+      {
+        "id": "15838",
+        "score": 0.5757618,
+        "packet_key": "ace:packet:616a5fa9aaa0",
+        "source_ref": "docs/PHASE-85-P5-P9-INTEGRATION-SUMMARY.md",
+        "feature_id": "PHASE-85-P5-P9-INTEGRATION-SUMMARY",
+        "feature_label": "PHASE-85-P5-P9-INTEGRATION-SUMMARY"
+      },
+      {
+        "id": "15933",
+        "score": 0.5754528,
+        "packet_key": "ace:packet:46bddf1fe040",
+        "source_ref": "docs/PHASE-B-EXECUTION-READY.md",
+        "feature_id": "PHASE-B-EXECUTION-READY",
+        "feature_label": "PHASE-B-EXECUTION-READY"
+      }
+    ],
+    "postgres_pgvector": [
+      {
+        "id": "c37f2c38-beba-49bc-87c4-88de7d5ffa7b",
+        "qdrant_id": "038ce0b3-21b2-4a28-af6d-435c8492aba6",
+        "score": 0.5937711128766615,
+        "source_ref": "scripts/atlas/graphify-summary-ranking-pipeline.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 22
+      },
+      {
+        "id": "94eae603-72ed-404b-b669-606b657a55d1",
+        "qdrant_id": "8f60c8d2-359b-4139-813a-50dde54746e7",
+        "score": 0.5652863380502641,
+        "source_ref": "scripts/atlas/prove-retrieval-summarization-flow.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 21
+      },
+      {
+        "id": "541af279-4518-4cc5-92aa-e8fb628343f5",
+        "qdrant_id": "38d80c95-2f13-4704-b490-c15b76eb7e8a",
+        "score": 0.5607819420078309,
+        "source_ref": "scripts/atlas/gemma4-parent-atlas-summaries.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 21
+      },
+      {
+        "id": "6077576f-a3ea-4abd-9e02-e25b42d54a4d",
+        "qdrant_id": "be6b505b-0954-422a-8ae1-c99fa8d2e42b",
+        "score": 0.5596338713201234,
+        "source_ref": "scripts/atlas/prove-retrieval-summarization-flow.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 477,
+        "line_end": 503
+      },
+      {
+        "id": "16bdd353-5cb1-4700-8479-25a3871092b6",
+        "qdrant_id": "af21a8b9-2120-4f46-b086-6daa0816d549",
+        "score": 0.5544975713459772,
+        "source_ref": "scripts/atlas/gemma4-parent-atlas-summaries.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 20,
+        "line_end": 41
+      },
+      {
+        "id": "c5596362-a2f2-4a2f-9094-aac49d17da94",
+        "qdrant_id": "bf22fcc8-5a70-43e5-bff8-4833599ff007",
+        "score": 0.5510131839967164,
+        "source_ref": "scripts/atlas/build-gpu-retrieval-summary-envelope.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 25
+      },
+      {
+        "id": "9cd368c7-8b14-49df-825f-c8a735617417",
+        "qdrant_id": "c3f63e6f-170f-4f9e-8390-75f4dbabc35f",
+        "score": 0.5498829862990008,
+        "source_ref": "sveltekit-frontend/scripts/atlas/export-structured-cards.mts",
+        "symbol": null,
+        "kind": null,
+        "line_start": 303,
+        "line_end": 333
+      },
+      {
+        "id": "ea085056-7830-429b-92c8-cb9093a67215",
+        "qdrant_id": "6963c409-46e1-4463-b341-586e78ad97db",
+        "score": 0.5472142347319872,
+        "source_ref": "scripts/atlas/analysis-pass-orchestrator.mts",
+        "symbol": null,
+        "kind": null,
+        "line_start": 128,
+        "line_end": 159
+      }
+    ],
+    "go_retrieval_count": 8
+  },
+  "summary": {
+    "summary": "{\n\"summary\": \"The Parent Atlas summarization flow is a multi-stage pipeline that ingests packet feature envelopes, derives parent-atlas feature IDs, compresses them via a TurboVec compression plan, and generates summaries with Gemma4. Key components include scripts/atlas/parent-atlas-turbovec-compression-plan.mjs (TurboVec compression planning), scripts/atlas/gemma4-parent-atlas-summaries.mjs (Gemma4 summarization), sveltekit-frontend/src/lib/server/generation/packet-summary-pipeline.ts (packet summary pipeline), and scripts/atlas/graphify-summary-ranking-pipeline.mjs (summary ranking). The flow integrates with the graph traversal API (src/routes/api/graph/traverse/+server.ts), code intelligence datastore (src/lib/server/ace/codeintel-datastore.ts), and context-for-file (src/lib/server/atlas/context-for-file.ts). The P4 Gap Analysis provides a summary index using Self-Organizing Maps (SOM) and Autoencoders (AE) for dimensionality reduction and visualization. The overall pipeline follows a phased execution model (Phase A: status/commands, Phase B: execution-ready, Phase 2: multivector enrichment, Phase 3: execution pipeline map, Phase 4: gap analysis).\",\n\"domain_class\": \"retrieval_summarization_flow\",\n\"ontology_label\": \"Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow\",\n\"topology_label\": \"multi_stage_pipeline\",\n\"citations\": [\n{\n\"evidence_id\": \"ev_6a432e8a6679f68c\",\n\"source_revision\": \"sha256:97c0289bf0bc214f427c682853fa7878cf0e5787d5f449d5366e54d5068cde08\",\n\"start_byte\": 0,\n\"end_byte\": 12837\n},\n{\n\"evidence_id\": \"ev_c252472110fcba13\",\n\"source_revision\": \"sha256:68a3940991abed3366506fc132799dbd08ff0eed25f1e476a304fd089abb6cbf\",\n\"start_byte\": 0,\n\"end_byte\": 12030\n},\n{\n\"evidence_id\": \"ev_3115185b854a997b\",\n\"source_revision\": \"sha256:5083075083d7a2c03a0350e7cbd7fdd65be3449eba5d084833b3fd1e95d2945e\",\n\"start_byte\": 0,\n\"end_byte\": 15233\n},\n{\n\"evidence_id\": \"ev_fa9e9081a607f05b\",\n\"source_revision\": \"sha256:cc97dd7d087861cb4700dbf9ae9be5f9db6d28173095ff0ccb1a5c3849941171\",\n\"start_byte\": 0,\n\"end_byte\": 4062\n},\n{\n\"evidence_id\": \"ev_a3695c9585640400\",\n\"source_revision\": \"sha256:33764777465353bc6e70326d39dfce05e6d33280a994b374ff4ce6e0c0106b89\",\n\"start_byte\": 0,\n\"end_byte\": 5160\n},\n{\n\"evidence_id\": \"ev_2c53de3128d5f211\",\n\"source_revision\": \"sha256:0c9b963a36343ed19632bc87cd06dbf6f5015941ef3b3f840d7278ee2d798dcd\",\n\"start_byte\": 0,\n\"end_byte\": 16948\n},\n{\n\"evidence_id\": \"ev_a88a1b9dd93fd157\",\n\"source_revision\": \"sha256:21341fad65c990edb2874deea14671a6582d139f463d4b5eddaac4c3f99eccaa\",\n\"start_byte\": 0,\n\"end_byte\": 14321\n},\n{\n\"evidence_id\": \"ev_e1ea9c0454ffc373\",\n\"source_revision\": \"sha256:5278d46bf1c7ad8527d32074f274cb9266421898cfca32b14210c62f2efb01a1\",\n\"start_byte\": 0,\n\"end_byte\": 12475\n}\n],\n\"missing_evidence\": [\n{\n\"evidence_id\": \"ev_4d5bc6f79d4f\",\n\"source_ref\": \"src/lib/server/atlas/context-for-file.ts\",\n\"feature_id\": \"context-for-file\",\n\"reason\": \"No summary content provided; only metadata header present\"\n},\n{\n\"evidence_id\": \"ev_616a5fa9aaa0\",\n\"source_ref\": \"docs/PHASE-85-P5-P9-INTEGRATION-SUMMARY.md\",\n\"feature_id\": \"PHASE-85-P5-P9-INTEGRATION-SUMMARY\",\n\"reason\": \"No summary content provided; only metadata header present\"\n},\n{\n\"evidence_id\": \"ev_46bddf1fe040\",\n\"source_ref\": \"docs/PHASE"
+  },
+  "parity_pgvector_qdrant": {
+    "top_k_evaluated": 8,
+    "pgvector_hits": 16,
+    "qdrant_hits": 16,
+    "id_overlap_count": 1,
+    "source_ref_overlap_count": 1,
+    "id_overlap_ratio": 0.125,
+    "parity_status": "PARTIAL_PARITY",
+    "overlap_samples": [
+      {
+        "qdrant_id": "038ce0b3-21b2-4a28-af6d-435c8492aba6",
+        "source_ref": "scripts/atlas/graphify-summary-ranking-pipeline.mjs",
+        "qdrant_score": 0.59457207,
+        "pg_score": 0.5937711128766615
+      }
+    ]
+  },
+  "dag_alignment": [
+    {
+      "layer": 1,
+      "name": "source_bytes_sha256",
+      "status": "LIVE_PASS",
+      "evidence": {
+        "digested": 14,
+        "of": 14
+      }
+    },
+    {
+      "layer": 2,
+      "name": "candidate_ordinal_map",
+      "status": "NOT_BUILT",
+      "evidence": {
+        "reason": "proof does not seal a CandidateOrdinalMapV1"
+      }
+    },
+    {
+      "layer": 3,
+      "name": "ace_packet_v3_sealed",
+      "status": "BLOCKED",
+      "evidence": {
+        "chunk_rows_with_source_revision": 0,
+        "chunk_rows_total": 274465,
+        "reason": "source_revision NULL for most rows; workspace_revision is an integer default 0 in atlas_packets"
+      }
+    },
+    {
+      "layer": 4,
+      "name": "context_manifest_admission",
+      "status": "BLOCKED",
+      "evidence": {
+        "projection_admission": "NOT_SAFE_TO_PROJECT",
+        "reason": "9/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=PARTIAL_PROVEN, SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=PARTIAL_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN"
+      }
+    },
+    {
+      "layer": 5,
+      "name": "context_compression_headroom",
+      "status": "NOT_BUILT",
+      "evidence": {
+        "canonicalAuthority": false,
+        "note": "downstream of ContextManifest only"
+      }
+    },
+    {
+      "layer": 6,
+      "name": "bitfrost_key",
+      "status": "NOT_PROVEN",
+      "evidence": {
+        "note": "no manifest-keyed cache key built for this run"
+      }
+    },
+    {
+      "layer": 7,
+      "name": "ornith_synthesis",
+      "status": "FAIL",
+      "evidence": {
+        "model": "ornith-1.5-9b",
+        "ungrounded": null
+      }
+    }
+  ],
+  "chain_status": "NOT_ALIGNED",
+  "elapsed_ms": 57995
+}

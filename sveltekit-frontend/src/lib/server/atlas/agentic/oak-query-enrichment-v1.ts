@@ -16,7 +16,7 @@ import type { OakResolutionEvidenceV1 } from './contracts/oak-resolution-evidenc
  * regex provides.
  *
  * Bounded and best-effort: resolves at most `maxLabels` distinct labels
- * (domains + targetHints + symbols, deduped), each independently
+ * (domains + packageCandidates + targetHints + symbols, deduped), each independently
  * fail-closed via resolveOakEvidenceV1 (never fabricates a CURIE). A
  * resolution failure for one label never blocks the others.
  */
@@ -31,6 +31,7 @@ export interface QueryOakEnrichmentV1 {
 function candidateLabels(classification: QueryClassificationV1, maxLabels: number): string[] {
   const ordered = [
     ...classification.domains,
+    ...classification.packageCandidates,
     ...classification.symbols,
     ...classification.targetHints,
   ];

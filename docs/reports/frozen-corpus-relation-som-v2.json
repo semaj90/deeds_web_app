@@ -1,0 +1,162 @@
+{
+ "schema": "atlas.frozen-corpus-relation-som.v1",
+ "generatedAt": "2026-10-19T08:21:19.395375+00:00",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "rows": 100086,
+ "torch": "2.8.0+cu128",
+ "device": "NVIDIA GeForce RTX 3060 Ti",
+ "somV2Candidate": {
+  "input": "128-d MRL prefix (first 128 of semantic_768), L2-renormalized",
+  "grid": [
+   20,
+   20
+  ],
+  "epochs": 40,
+  "seed": 20261019,
+  "init": "random data rows",
+  "weightsSha256": "8ad166c6d08e1310b8f9273725daf1b5be9033feafe08783ec77f8c97d12148b",
+  "quantizationErrorMean": 0.5832698345184326,
+  "topographicError": 0.37651619607137865,
+  "emptyCells": 0,
+  "occupancyMinMaxMedian": [
+   33,
+   764,
+   247.0
+  ],
+  "bmuParityCudaF32VsNumpyF64Mismatches": 0,
+  "minisomReferenceQE_20kSubsample": 0.6563461474736084,
+  "seconds": 7.4,
+  "status": "CANDIDATE_ONLY_NOT_ADMITTED"
+ },
+ "relationAnalysis": {
+  "k": 10,
+  "backend": "cuda",
+  "peakCudaAllocatedMiB": 114.2,
+  "seconds": 23.2,
+  "cpuOracleSample": 300,
+  "tieAwareRecallVsFloat64Oracle": 1.0,
+  "worstSortedScoreAbsDiff": 0.0,
+  "meanCosineAtRank": [
+   0.809802234172821,
+   0.7756373286247253,
+   0.7575948238372803,
+   0.7452486157417297,
+   0.73623126745224,
+   0.7289758920669556,
+   0.7231229543685913,
+   0.7181587815284729,
+   0.7138816118240356,
+   0.7101235389709473
+  ],
+  "sameFileNeighborFraction": 0.2852636732410127,
+  "identicalVectorNeighborFraction": 0.006336550566512799,
+  "directories": [
+   "packages/parent-atlas",
+   "scripts/atlas",
+   "sveltekit-frontend/scripts",
+   "sveltekit-frontend/src",
+   "sveltekit-frontend/tests"
+  ],
+  "neighborDirectoryMatrix": [
+   [
+    18272,
+    965,
+    197,
+    5853,
+    33
+   ],
+   [
+    1433,
+    179578,
+    36864,
+    18209,
+    576
+   ],
+   [
+    200,
+    38819,
+    82455,
+    18670,
+    1826
+   ],
+   [
+    6666,
+    19283,
+    18642,
+    447354,
+    7665
+   ],
+   [
+    37,
+    845,
+    1551,
+    6842,
+    88025
+   ]
+  ],
+  "topCrossFilePairs": [
+   [
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/CaseTheoryConstructor.svelte",
+    "sveltekit-frontend/src/lib/components/yorha/CaseTheoryConstructor.svelte",
+    33
+   ],
+   [
+    "scripts/atlas/extract-md-checkbox-features.ts",
+    "scripts/atlas/rlm-condense-index.ts",
+    29
+   ],
+   [
+    "scripts/atlas/rlm-condense-index.ts",
+    "scripts/atlas/extract-md-checkbox-features.ts",
+    27
+   ],
+   [
+    "sveltekit-frontend/tests/ai-routes-comprehensive.spec.ts",
+    "sveltekit-frontend/tests/ai-canon-routes.spec.ts",
+    26
+   ],
+   [
+    "sveltekit-frontend/scripts/atlas/audit-qdrant-component-parity.mjs",
+    "scripts/atlas/qdrant-parity-repair-core.mjs",
+    26
+   ],
+   [
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/PhoenixProsecutorDashboard.svelte",
+    "sveltekit-frontend/src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+    25
+   ],
+   [
+    "sveltekit-frontend/src/routes/(app)/simulation/+page.svelte",
+    "sveltekit-frontend/src/routes/(app)/demos/courtroom-sim/+page.svelte",
+    25
+   ],
+   [
+    "scripts/atlas/backfill-latent-vectors.mjs",
+    "scripts/atlas/backfill-packet-metadata-to-postgres.mjs",
+    24
+   ],
+   [
+    "sveltekit-frontend/src/routes/(analysis)/audio-analysis/[evidenceId]/+page.svelte",
+    "sveltekit-frontend/src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.svelte",
+    23
+   ],
+   [
+    "sveltekit-frontend/scripts/mcp/agent-orchestrator.mjs",
+    "sveltekit-frontend/scripts/mcp/agent_orchestrator.py",
+    23
+   ],
+   [
+    "scripts/atlas/infer-siblings.mjs",
+    "scripts/atlas/repair-topology-mirror.mjs",
+    23
+   ],
+   [
+    "scripts/atlas/rebuild-gemma4-summaries-768.mjs",
+    "scripts/atlas/rebuild-gemma4-summaries-384.mjs",
+    23
+   ]
+  ],
+  "status": "EXPLORATORY_NOT_RETRIEVAL_AUTHORITY"
+ }
+}

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { createHash } from 'node:crypto';
 import { Node, Project, SyntaxKind, type Identifier, type SourceFile } from 'ts-morph';
 import {
   AstGrepStructuralCandidateV1Schema,
@@ -186,6 +187,13 @@ export function enrichAstCandidateWithTsMorph(
   const candidate = input.candidate;
   if (candidate.filePath !== input.filePath) {
     throw new Error(`TS_MORPH_FILE_PATH_MISMATCH:${candidate.filePath}:${input.filePath}`);
+  }
+  if (!candidate.sourceContentSha256) {
+    throw new Error('TS_MORPH_SOURCE_CONTENT_HASH_MISSING');
+  }
+  const actualSourceContentSha256 = `sha256:${createHash('sha256').update(input.code, 'utf8').digest('hex')}`;
+  if (candidate.sourceContentSha256 !== actualSourceContentSha256) {
+    throw new Error('TS_MORPH_SOURCE_CONTENT_HASH_MISMATCH');
   }
 
   const { sourceFile } = createProject(input);

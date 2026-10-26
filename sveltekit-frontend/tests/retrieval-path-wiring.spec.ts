@@ -89,11 +89,11 @@ vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
 
 // ── Mock Ollama ─────────────────────────────────────────────────────────
 vi.mock('$lib/server/ollama.js', () => ({
-	ollamaFetch: vi.fn(async () => ({
+	embedOrChatFetch: vi.fn(async () => ({
 		ok: true,
 		json: async () => ({
 			response: 'test response',
-			model: 'gemma4-rotorquant:latest',
+			model: 'ornith-1.5-9b',
 			embedding: new Array(768).fill(0.1),
 		}),
 	})),

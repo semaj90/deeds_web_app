@@ -162,7 +162,7 @@
 				</div>
 
 				<div class="flex flex-col gap-2">
-					<label class="text-sm font-medium">Focus Areas</label>
+					<span class="text-sm font-medium">Focus Areas</span>
 					<div class="flex flex-col gap-1.5">
 						<label class="flex items-center gap-2 text-sm cursor-pointer">
 							<input type="checkbox" bind:checked={focusAreas.precedents} />

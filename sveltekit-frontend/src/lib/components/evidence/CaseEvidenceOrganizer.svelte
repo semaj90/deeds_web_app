@@ -603,7 +603,6 @@
 	.ceo-card.selected { border-color: #3b82f6; background: #eff6ff; }
 	.ceo-card h4 { margin: 0 0 0.25rem; font-size: 0.85rem; font-weight: 600; color: #1e293b; }
 	.ceo-card p { margin: 0 0 0.5rem; font-size: 0.75rem; color: #64748b; line-height: 1.4; }
-	.ceo-card.compact p { display: none; }
 	.ceo-card-meta { display: flex; gap: 0.5rem; align-items: center; }
 	.ceo-card-row { display: flex; justify-content: space-between; align-items: center; }
 

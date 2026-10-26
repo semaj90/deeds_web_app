@@ -2,11 +2,11 @@
  * GET /api/acp/service-ports
  *
  * ACP (Agent Communication Protocol) service port discovery endpoint.
- * Returns gRPC service definitions and QUIC transport negotiation info.
+ * Returns gRPC metadata; QUIC is not advertised without a verified listener.
  *
  * Used by:
  *   - Other agents discovering gRPC service boundaries
- *   - A2A clients negotiating QUIC alt-svc
+ *   - A2A clients discovering approved service metadata
  *   - Tool registries building proto-to-tool mappings
  */
 
@@ -74,9 +74,10 @@ export const GET: RequestHandler = (event) => {
   // Build A2A agent descriptor with service ports
   const agentDescriptor = buildA2AAgentDescriptor('deeds-legal-ai', acpToolRegistry, defaultRegistry);
 
-  // Negotiate QUIC transport with alt-svc headers
+  // Do not advertise HTTP/3 until a live listener and end-to-end path are verified.
   const servicePorts = negotiateQuicTransport(agentDescriptor.servicePorts, {
-    enabled: true,
+    enabled: false,
+    listenerVerified: false,
     port: 443,
     altSvcPort: 443,
     alpn: ['h3', 'h2', 'http/1.1'],
@@ -99,8 +100,8 @@ export const GET: RequestHandler = (event) => {
         serviceName: port.serviceName,
         methods: port.methods,
         tls: port.tls ?? false,
-        quicEnabled: port.quicEnabled ?? true,
-        altSvc: port.altSvc ?? 'h3=":443"; ma=3600',
+        quicEnabled: port.quicEnabled ?? false,
+        altSvc: port.altSvc,
       })) as A2AServicePort[],
       tools: listA2APeerTools(acpToolRegistry, agentDescriptor).map((tool) => ({
         id: tool.id,
@@ -112,15 +113,14 @@ export const GET: RequestHandler = (event) => {
       })),
       timestamp: new Date().toISOString(),
       quicSupport: {
-        enabled: true,
-        altSvcHeader: agentDescriptor.altSvcHeader,
-        alpn: ['h3', 'h2', 'http/1.1'],
+        enabled: false,
+        altSvcHeader: null,
+        alpn: ['h2', 'http/1.1'],
       },
     },
     {
       headers: {
         'Cache-Control': 'private, max-age=300',
-        'Alt-Svc': 'h3=":443"; ma=3600',
       },
     }
   );

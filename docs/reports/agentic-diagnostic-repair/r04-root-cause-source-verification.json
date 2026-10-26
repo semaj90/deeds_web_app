@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.repair-root-cause-verification.v1",
+  "cohort": "R04",
+  "clustersReceipt": "docs/reports/agentic-diagnostic-repair/r03-root-cause-clusters.json",
+  "baselineReceipt": "docs/reports/agentic-diagnostic-repair/r01b-svelte-check-baseline.json",
+  "method": "Read the flagged source line plus two lines of context for each diagnostic (sed -n) and grep for the referenced class or handler. No file was edited.",
+  "verdicts": [
+    {
+      "clusterId": "RC-01",
+      "hypothesisAsWritten": "Label elements lack a for/id pairing or a nested control.",
+      "verdict": "PARTIALLY_CONFIRMED_HYPOTHESIS_REFINED",
+      "split": [
+        {
+          "kind": "FIELD_LABEL_NEEDS_ASSOCIATION",
+          "diagnostics": 3,
+          "sites": [
+            "src/lib/components/APITesterModal.svelte:132:6 (label.form-label before select)",
+            "src/lib/components/APITesterModal.svelte:142:6 (label.form-label before textarea)",
+            "src/lib/components/APITesterModal.svelte:154:7 (label.form-label before textarea)"
+          ],
+          "fixDirection": "Give each control an id and point the label's for at it, or nest the control."
+        },
+        {
+          "kind": "HEADING_USED_AS_LABEL",
+          "diagnostics": 5,
+          "sites": [
+            "src/lib/components/ai/EnhancedDocumentUploader.svelte:617:7 (section-label with no control)",
+            "src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte:1050:15 (label above a span/slider row)",
+            "src/lib/components/ai/LLMSelector.svelte:143:2 (label above a button)",
+            "src/lib/components/ai/LocalImageGenerator.svelte:131:3 (label above a button group)",
+            "src/lib/components/ai/ThinkingStyleToggle.svelte:165:6 (section label above checkboxes)"
+          ],
+          "fixDirection": "Per site: associate with the control it names, or change the element to a non-label (for example a span or a fieldset legend). A single id fix does not fit all five."
+        }
+      ],
+      "filesVerified": 7
+    },
+    {
+      "clusterId": "RC-02",
+      "hypothesisAsWritten": "Clickable containers have no keyboard handler or role.",
+      "verdict": "HYPOTHESIS_PARTLY_WRONG",
+      "evidence": [
+        "src/lib/components/ui/gaming/n64/Switch.svelte:193:3 opens the element that carries role=\"switch\" (line 213), tabindex and onclick (line 216). The role and tabindex exist. No onkeydown or onkeyup is present, so the missing piece is the key handler.",
+        "src/lib/components/ui/gaming/n64/Select.svelte:173:13 is a span with onclick, role=\"button\" and tabindex=\"0\". The role exists here too. No key handler is present."
+      ],
+      "correctedHypothesis": "Both elements have an onclick with no keyboard handler. The role is already present on both.",
+      "diagnostics": 2,
+      "filesVerified": 2
+    },
+    {
+      "clusterId": "RC-03",
+      "hypothesisAsWritten": "The .tab-bar and .tab rules no longer match any markup.",
+      "verdict": "CONFIRMED",
+      "evidence": [
+        "src/routes/(app)/demos/client-inference/+page.svelte:20 is the only tab-related class in markup (tab-content).",
+        "The strings tab-bar, .tab and .tab.active do not occur outside the style block lines 69-100."
+      ],
+      "diagnostics": 4,
+      "filesVerified": 1,
+      "note": "The four selectors are .tab-bar (69), .tab (79), .tab:hover (96) and .tab.active (100). Removing the rules or restoring the markup both clear them. Pick one after checking whether the tabs were meant to exist."
+    },
+    {
+      "clusterId": "RC-04",
+      "hypothesisAsWritten": "A vendor-prefixed line-clamp is used without the standard property.",
+      "verdict": "CONFIRMED",
+      "evidence": [
+        "src/routes/(app)/admin/ai-dashboard/+page.svelte:559-561 sets display: -webkit-box and -webkit-line-clamp: 3. No standard line-clamp property is set."
+      ],
+      "diagnostics": 1,
+      "filesVerified": 1
+    }
+  ],
+  "summary": {
+    "diagnosticsVerified": 15,
+    "clustersConfirmed": 2,
+    "clustersPartlyWrong": 2,
+    "fixGroups": 6
+  },
+  "status": "VERIFIED_AGAINST_SOURCE_NO_EDITS",
+  "notVerified": [
+    "Behaviour in a browser (keyboard and screen-reader behaviour is inferred from the markup).",
+    "Whether the client-inference tabs are supposed to exist (needs an owner decision).",
+    "The R05 ContextManifest and R06 recommendation steps."
+  ]
+}

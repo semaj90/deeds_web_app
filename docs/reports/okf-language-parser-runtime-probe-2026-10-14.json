@@ -1,0 +1,165 @@
+{
+  "schema": "atlas.okf-language-parser-runtime-probe.v1",
+  "observedOn": "2026-10-14",
+  "scope": "local and WSL in-memory grammar parsing plus one bounded live sidecar request; no repository source was parsed",
+  "environment": {
+    "local": {
+      "os": "Windows-10-10.0.19045-SP0",
+      "python": "3.13.5",
+      "treeSitterLanguagePack": "0.9.0"
+    },
+    "wslRAPIDS": {
+      "python": "3.14.6",
+      "treeSitterLanguagePack": "1.14.0",
+      "matchesCatalogVersion": true
+    }
+  },
+  "profileInputs": {
+    ".okf/languages/go.yaml": "db50d89537d26da1eb820f3aaf42b9105cc09a89b09f51c29f710609a2659393",
+    ".okf/languages/python.yaml": "d1a0392e074926a7c5b450470fda589efeac7719ebf91f1fdc806a0795ede4c2",
+    ".okf/languages/rust.yaml": "3d4862ac39154a1815b1230055c870eb2ff3d0a3a056a827d2ab2bdc56580736",
+    ".okf/languages/typescript.yaml": "1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a"
+  },
+  "parserResults": [
+    {
+      "grammarId": "python",
+      "profileRef": ".okf/languages/python.yaml",
+      "rootType": "module",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "go",
+      "profileRef": ".okf/languages/go.yaml",
+      "rootType": "source_file",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "rust",
+      "profileRef": ".okf/languages/rust.yaml",
+      "rootType": "source_file",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "typescript",
+      "profileRef": ".okf/languages/typescript.yaml",
+      "rootType": "program",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "tsx",
+      "profileRef": null,
+      "rootType": "program",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "svelte",
+      "profileRef": ".okf/languages/typescript.yaml",
+      "rootType": "document",
+      "hasError": false,
+      "status": "PASS"
+    }
+  ],
+  "wslParserResults": [
+    {
+      "grammarId": "python",
+      "rootType": "module",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "go",
+      "rootType": "source_file",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "rust",
+      "rootType": "source_file",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "typescript",
+      "rootType": "program",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "tsx",
+      "rootType": "program",
+      "hasError": false,
+      "status": "PASS"
+    },
+    {
+      "grammarId": "svelte",
+      "rootType": "document",
+      "hasError": false,
+      "status": "PASS"
+    }
+  ],
+  "ownerEvidence": {
+    "nodeTreeSitterProvider": {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+      "sourceSha256": "eda642d0a9796671c07edb31d8c10bf20e107bab80f3fd4abdbb7bfa71670245",
+      "declaredLanguages": [
+        "typescript",
+        "tsx",
+        "javascript",
+        "jsx"
+      ],
+      "focusedVitest": "7 passed"
+    },
+    "pythonSidecar": {
+      "path": "python/miniforge_nlp_sidecar.py",
+      "sourceSha256": "4a61e29b321021e28412cafe2dd9f55afe6a1a081fd4747fc6655f9ea0ccc2c8",
+      "declaredExtensionMapIncludesSvelte": true,
+      "svelteExtensionBinding": "svelte",
+      "wslTreeSitterChunkerAvailable": false,
+      "wslCapabilityProbe": {
+        "moduleImported": true,
+        "extensionVocabularyIncludesSvelte": true,
+        "languageVocabularyIncludesSvelte": true,
+        "extensionBinding": "svelte",
+        "resolverResult": [
+          "svelte",
+          null
+        ],
+        "endpointInvoked": false,
+        "pytestInstalled": false
+      },
+      "liveSidecarExecution": false
+    }
+  },
+  "alignmentFindings": [
+    "Four checked-in language profiles cover 31 symbol kinds; TypeScript has 8 feature rules.",
+    "The TypeScript profile lists .svelte; the source sidecar declares .svelte -> svelte, and Windows regression tests plus the direct WSL capability/resolver probe pass.",
+    "The already-running Docker sidecar returned HTTP success for the request envelope but rejected the Svelte fixture with UnsupportedLanguageError; its live capability response did not advertise Svelte. Source mapping and the loaded service are therefore out of sync.",
+    "WSL RAPIDS Python 3.14.6 with tree-sitter-language-pack 1.14.0 successfully parsed all six in-memory fixtures, matching the catalog source package version.",
+    "The WSL environment lacks treesitter_chunker and pytest, so the WSL AST chunker path and test-suite run remain unavailable. The live Docker service also lacks the source Svelte mapping until its runtime is refreshed.",
+    "Six successful grammar probes do not validate 371 candidates, 140+ language nuances, live LSP, or production AST ingestion."
+  ],
+  "snapshotSha256": "8044c79e922b464317d4ea7edd42cd028cf6bec708bf4591c5afa09e6c73b6ac",
+  "canonicalAuthority": false,
+  "persistentStoreWrites": false,
+  "serviceCalls": true,
+  "gpuExecution": false,
+  "liveSidecarProbe": {
+    "endpoint": "POST /ast/chunk",
+    "fixture": "synthetic Svelte snippet; no repository source",
+    "fixtureSha256": "97ee8c4a2f5357f01a11169a46545293b30e04388a7665b44f475c510c72b271",
+    "health": "ok",
+    "responseSchema": "atlas.ast.evidence.v1",
+    "language": "svelte",
+    "errorTag": "UnsupportedLanguageError",
+    "chunkCount": 0,
+    "revisionMatches": true,
+    "liveCapabilityAdvertisesSvelte": false,
+    "status": "BLOCKED_STALE_RUNTIME_MAPPING"
+  },
+  "status": "WSL_GRAMMAR_PROBES_PROVEN / SOURCE_SIDECAR_MAPPING_TESTED / LIVE_SIDECAR_SVELTE_BLOCKED_STALE_RUNTIME / WSL_CHUNKER_UNAVAILABLE / WSL_PYTEST_UNAVAILABLE"
+}

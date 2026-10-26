@@ -40,7 +40,7 @@ export interface GisSymbolResolverV1 {
 }
 
 export interface GisReferenceResolverV1 {
-  resolve(fact: StructuralReferenceFactV1): Promise<StructuralReferenceResolutionV1>;
+  resolve(fact: StructuralReferenceFactV1, options?: { persist: boolean }): Promise<StructuralReferenceResolutionV1>;
 }
 
 export type GisCanonicalizationResultV1 = {
@@ -68,8 +68,13 @@ export async function canonicalizeStructuralEvidence(input: {
   reference_facts: StructuralReferenceFactV1[];
   symbol_resolver: GisSymbolResolverV1;
   reference_resolver?: GisReferenceResolverV1;
+  persist_references?: boolean;
   promote_unresolved?: boolean;
 }): Promise<GisCanonicalizationResultV1> {
+  if (input.reference_facts.length > 0 && !input.reference_resolver) {
+    throw new Error('STRUCTURAL_REFERENCE_RESOLVER_REQUIRED');
+  }
+
   const symbolResolutions: SymbolResolutionV1[] = [];
   const symbolVersions: SymbolVersionV1[] = [];
   let created = false;
@@ -102,7 +107,9 @@ export async function canonicalizeStructuralEvidence(input: {
   const referenceResolutions: StructuralReferenceResolutionV1[] = [];
   if (input.reference_resolver) {
     for (const fact of input.reference_facts) {
-      referenceResolutions.push(await input.reference_resolver.resolve(fact));
+      referenceResolutions.push(await input.reference_resolver.resolve(fact, {
+        persist: input.persist_references ?? true,
+      }));
     }
   }
 

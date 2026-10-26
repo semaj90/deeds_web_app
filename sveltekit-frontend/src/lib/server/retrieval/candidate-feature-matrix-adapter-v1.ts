@@ -1,5 +1,5 @@
-import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { canonicalSha256V1, formatSha256RevisionV1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
 import {
   buildCandidateFeatureMatrix,
   type RetrievalCandidateFeatureMatrixV1,
@@ -85,7 +85,171 @@ export interface CandidateFeatureMatrixAdapterV1 {
 }
 
 function sha256(value: unknown): string {
-  return `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
+  return `sha256:${canonicalSha256V1(value)}`;
+}
+
+const serializedCandidateFeatureMatrixAdapterV1Schema = z.object({
+  schema: z.literal(CANDIDATE_FEATURE_MATRIX_ADAPTER_V1_SCHEMA),
+  matrix: z.object({
+    candidate_packet_keys: z.array(z.string().min(1)),
+    candidate_features: z.array(z.number().finite()),
+    presence_mask: z.array(z.number().int().min(0).max(1)),
+    candidate_count: z.number().int().positive(),
+    feature_count: z.literal(25),
+  }).strict(),
+  ordinalMapRevision: sha256Schema,
+  ordinalMapChecksum: z.string().regex(/^(?:sha256:)?[0-9a-f]{64}$/),
+  featureRevision: z.string().min(1),
+  identities: z.array(z.object({
+    candidateOrdinal: z.number().int().nonnegative(),
+    rowOrdinal: z.number().int().nonnegative(),
+    canonicalId: z.string().min(1),
+    packetKey: z.string().min(1),
+    symbolVersionId: z.string().min(1).nullable(),
+    sourceRef: z.string().min(1),
+    sourceRevision: z.string().min(1),
+    workspaceRevision: z.string().min(1),
+  }).strict()).min(1),
+  rowBindingChecksum: sha256Schema,
+  receipt: retrievalCandidateFeatureMatrixReceiptV1Schema,
+  executorProvenance: z.array(z.object({
+    executor: z.string().min(1),
+    executorRevision: z.string().min(1),
+    representationId: z.string().min(1).optional(),
+    parityStatus: z.string().min(1).optional(),
+  }).strict()),
+  matrixChecksum: sha256Schema,
+  identityChecksum: sha256Schema,
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  rankingPromotion: z.literal(false),
+}).strict();
+
+export function serializeCandidateFeatureMatrixAdapterV1(
+  result: CandidateFeatureMatrixAdapterV1,
+): string {
+  return JSON.stringify({
+    ...result,
+    matrix: {
+      candidate_packet_keys: result.matrix.candidate_packet_keys,
+      candidate_features: Array.from(result.matrix.candidate_features),
+      presence_mask: Array.from(result.matrix.presence_mask),
+      candidate_count: result.matrix.candidate_count,
+      feature_count: result.matrix.feature_count,
+    },
+  });
+}
+
+export function verifyCandidateFeatureMatrixAdapterReadbackV1(
+  serialized: string,
+  ordinalMapInput: CandidateOrdinalMapV1,
+) {
+  const ordinalMap = candidateOrdinalMapV1Schema.parse(ordinalMapInput);
+  assertCandidateOrdinalMapIntegrityV1(ordinalMap);
+  let decoded: unknown;
+  try {
+    decoded = JSON.parse(serialized);
+  } catch {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_JSON_INVALID');
+  }
+  const result = serializedCandidateFeatureMatrixAdapterV1Schema.parse(decoded);
+  const { matrix, identities, receipt } = result;
+  if (matrix.candidate_count !== identities.length ||
+      matrix.candidate_packet_keys.length !== identities.length ||
+      matrix.candidate_features.length !== identities.length * matrix.feature_count ||
+      matrix.presence_mask.length !== identities.length * matrix.feature_count) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_SHAPE_MISMATCH');
+  }
+  if (identities.some((identity, row) => identity.candidateOrdinal !== row || identity.rowOrdinal !== row ||
+      identity.packetKey !== matrix.candidate_packet_keys[row] ||
+      identity.workspaceRevision !== receipt.workspaceRevision)) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_ROW_BINDING_MISMATCH');
+  }
+  const normalizedOrdinalMapChecksum = formatSha256RevisionV1(result.ordinalMapChecksum);
+  if (result.ordinalMapRevision !== normalizedOrdinalMapChecksum ||
+      ordinalMap.rowCount !== matrix.candidate_count ||
+      ordinalMap.workspaceRevision !== receipt.workspaceRevision ||
+      ordinalMap.ordinalMapChecksum !== result.ordinalMapChecksum ||
+      receipt.candidateOrdinalMapRevision !== result.ordinalMapRevision ||
+      receipt.candidateOrdinalMapChecksum !== result.ordinalMapChecksum ||
+      receipt.rowCount !== matrix.candidate_count || receipt.columnCount !== matrix.feature_count) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_ORDINAL_BINDING_MISMATCH');
+  }
+  if (ordinalMap.candidates.some((candidate, row) => {
+    const identity = identities[row];
+    return !identity || candidate.candidateOrdinal !== identity.candidateOrdinal ||
+      candidate.canonicalId !== identity.canonicalId || candidate.packetKey !== identity.packetKey ||
+      candidate.symbolVersionId !== identity.symbolVersionId || candidate.sourceRef !== identity.sourceRef ||
+      candidate.sourceRevision !== identity.sourceRevision || candidate.workspaceRevision !== identity.workspaceRevision;
+  })) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_CANONICAL_ROW_MISMATCH');
+  }
+  const expectedMatrixChecksum = sha256({
+    candidatePacketKeys: matrix.candidate_packet_keys,
+    candidateFeatures: matrix.candidate_features,
+    presenceMask: matrix.presence_mask,
+    featureCount: matrix.feature_count,
+  });
+  if (expectedMatrixChecksum !== result.matrixChecksum || expectedMatrixChecksum !== receipt.matrixChecksum) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_MATRIX_CHECKSUM_MISMATCH');
+  }
+  const rowBindingChecksum = sha256({
+    schema: 'atlas.candidate-matrix-row-crosswalk.v1',
+    ordinalMapRevision: result.ordinalMapRevision,
+    workspaceRevision: receipt.workspaceRevision,
+    rows: identities.map(({ candidateOrdinal, rowOrdinal, canonicalId, packetKey, symbolVersionId, sourceRef, sourceRevision }) => ({
+      candidateOrdinal, rowOrdinal, canonicalId, packetKey, symbolVersionId, sourceRef, sourceRevision,
+    })),
+  });
+  if (rowBindingChecksum !== result.rowBindingChecksum || rowBindingChecksum !== receipt.rowBindingChecksum) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_ROW_CHECKSUM_MISMATCH');
+  }
+  const identityChecksum = sha256({
+    ordinalMapRevision: result.ordinalMapRevision,
+    ordinalMapChecksum: result.ordinalMapChecksum,
+    identities,
+  });
+  if (identityChecksum !== result.identityChecksum) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_IDENTITY_CHECKSUM_MISMATCH');
+  }
+  const featureVocabularyChecksum = sha256(CANDIDATE_FEATURE_NAMES);
+  const matrixRevision = sha256({
+    featureVocabularyChecksum,
+    rowBindingChecksum,
+    workspaceRevision: receipt.workspaceRevision,
+    graphRevision: null,
+    graphUnavailableReason: 'NO_GRAPH_REVISION_BOUND_TO_MATRIX_ROWS',
+    representationRevision: null,
+    representationUnavailableReason: 'NO_EXACT_REPRESENTATION_REVISION_BOUND_TO_MATRIX_ROWS',
+  });
+  const producerRevision = sha256({
+    owner: CANDIDATE_FEATURE_MATRIX_ADAPTER_V1_SCHEMA,
+    featureRevision: result.featureRevision,
+    featureVocabularyChecksum,
+  });
+  const availableFeatureCount = matrix.presence_mask.reduce((sum, value) => sum + value, 0);
+  if (receipt.featureVocabularyChecksum !== featureVocabularyChecksum ||
+      receipt.matrixRevision !== matrixRevision || receipt.producerRevision !== producerRevision ||
+      receipt.availableFeatureCount !== availableFeatureCount ||
+      receipt.unavailableFeatureCount !== matrix.presence_mask.length - availableFeatureCount) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_RECEIPT_BINDING_MISMATCH');
+  }
+  const { receiptChecksum, ...receiptBody } = receipt;
+  if (sha256(receiptBody) !== receiptChecksum) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_READBACK_RECEIPT_CHECKSUM_MISMATCH');
+  }
+  return {
+    schema: 'atlas.candidate-feature-matrix-readback.v1' as const,
+    status: 'MATCH' as const,
+    rowCount: matrix.candidate_count,
+    columnCount: matrix.feature_count,
+    matrixChecksum: expectedMatrixChecksum,
+    rowBindingChecksum,
+    receiptChecksum,
+    receipt,
+    canonicalAuthority: false as const,
+    writesPerformed: false as const,
+  };
 }
 
 function stableExecutorProvenance(

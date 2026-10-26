@@ -23,6 +23,7 @@ os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 import argparse
 import json
 import random
+import re
 import sys
 import time
 from hashlib import sha256
@@ -51,6 +52,13 @@ def blocked_training_report() -> dict:
             "writerAndPerRowProvenance": "NOT_PROVEN",
         },
         "encoderDimensions": [768, 512, 256, 128],
+        "precisionPolicy": {
+            "parameterDtype": "float32",
+            "activationDtype": "float32",
+            "autocast": "DISABLED",
+            "quantization": "NONE",
+            "lowerPrecisionChallengers": "NOT_ENABLED",
+        },
         "outputs": {
             "latent_256": "learned_intermediate",
             "latent_128": "learned_bottleneck",
@@ -63,12 +71,16 @@ def blocked_training_report() -> dict:
     }
 
 
-def fetch_semantic_768(database_url: str, limit: int) -> tuple[list[str], list[str], np.ndarray]:
-    """Read-only candidate source. Returns (chunk_ids, source_refs, vectors[N,768]), ordered by id."""
+def fetch_semantic_768(database_url: str, limit: int):
+    """Read-only candidate source, ordered by chunk id with source/workspace revisions."""
+    import numpy as np
+    import psycopg2
+    import psycopg2.extras
+
     conn = psycopg2.connect(database_url)
     try:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            sql = "SELECT id::text AS id, source_ref, content_embedding_768::text AS embedding FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL ORDER BY id"
+            sql = "SELECT id::text AS id, source_ref, source_revision, workspace_revision, content_embedding_768::text AS embedding FROM codebase_chunk_index WHERE content_embedding_768 IS NOT NULL ORDER BY id"
             if limit > 0:
                 sql += f" LIMIT {int(limit)}"
             cur.execute(sql)
@@ -76,9 +88,11 @@ def fetch_semantic_768(database_url: str, limit: int) -> tuple[list[str], list[s
     finally:
         conn.close()
     if not rows:
-        return [], [], np.empty((0, 768), dtype=np.float32)
+        return [], [], [], [], np.empty((0, 768), dtype=np.float32)
     ids = [row["id"] for row in rows]
-    source_refs = [row["source_ref"] or f"__no_source_ref__:{row['id']}" for row in rows]
+    source_refs = [row["source_ref"] for row in rows]
+    source_revisions = [row["source_revision"] for row in rows]
+    workspace_revisions = [row["workspace_revision"] for row in rows]
     # pgvector returns a string like "[0.1,0.2,...]" via psycopg2 without a registered adapter.
     vectors = np.array(
         [np.fromstring(row["embedding"].strip("[]"), sep=",", dtype=np.float32) for row in rows],
@@ -88,7 +102,76 @@ def fetch_semantic_768(database_url: str, limit: int) -> tuple[list[str], list[s
         raise ValueError(f"canonical content_embedding_768 must be [N,768], got {vectors.shape}")
     if not np.isfinite(vectors).all():
         raise ValueError("canonical content_embedding_768 contains non-finite values")
-    return ids, source_refs, vectors
+    return ids, source_refs, source_revisions, workspace_revisions, vectors
+
+
+def build_input_row_digest_ledger(
+    ids: list[str],
+    source_refs: list[str],
+    source_revisions: list[str],
+    workspace_revisions: list[str],
+    embeddings,
+) -> tuple[bytes, str, str]:
+    import numpy as np
+
+    row_count = len(ids)
+    if not row_count or any(len(values) != row_count for values in (source_refs, source_revisions, workspace_revisions)):
+        raise ValueError("INPUT_ROW_LEDGER_CARDINALITY_MISMATCH")
+    matrix = np.ascontiguousarray(embeddings, dtype=np.float32)
+    if matrix.shape != (row_count, 768) or not np.isfinite(matrix).all():
+        raise ValueError("INPUT_ROW_LEDGER_MATRIX_INVALID")
+    if len(set(ids)) != row_count:
+        raise ValueError("INPUT_ROW_LEDGER_DUPLICATE_CHUNK_ID")
+    revision_pattern = re.compile(r"^sha256:[a-f0-9]{64}$")
+    if any(not isinstance(value, str) or not value for value in source_refs):
+        raise ValueError("INPUT_ROW_LEDGER_SOURCE_REF_MISSING")
+    if any(not isinstance(value, str) or not revision_pattern.fullmatch(value) for value in source_revisions):
+        raise ValueError("INPUT_ROW_LEDGER_SOURCE_REVISION_UNQUALIFIED")
+    if any(not isinstance(value, str) or not revision_pattern.fullmatch(value) for value in workspace_revisions):
+        raise ValueError("INPUT_ROW_LEDGER_WORKSPACE_REVISION_UNQUALIFIED")
+    if len(set(workspace_revisions)) != 1:
+        raise ValueError("INPUT_ROW_LEDGER_WORKSPACE_REVISION_MIXED")
+
+    lines = []
+    for ordinal, (chunk_id, source_ref, source_revision, workspace_revision, vector) in enumerate(
+        zip(ids, source_refs, source_revisions, workspace_revisions, matrix, strict=True)
+    ):
+        row = {
+            "schema": "atlas.latent-training-input-row.v1",
+            "ordinal": ordinal,
+            "codebaseChunkId": chunk_id,
+            "sourceRef": source_ref,
+            "sourceRevision": source_revision,
+            "workspaceRevision": workspace_revision,
+            "embeddingSha256": sha256(np.ascontiguousarray(vector, dtype=np.float32).tobytes()).hexdigest(),
+        }
+        lines.append(json.dumps(row, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
+    payload = ("\n".join(lines) + "\n").encode("utf-8")
+    return payload, sha256(payload).hexdigest(), workspace_revisions[0]
+
+
+def semantic_input_snapshot_revision(workspace_revision: str, row_ledger_checksum: str, matrix_checksum: str) -> str:
+    identity = json.dumps({
+        "schema": "atlas.latent-semantic-input-snapshot.v1",
+        "workspaceRevision": workspace_revision,
+        "rowDigestLedgerChecksum": row_ledger_checksum,
+        "semanticMatrixChecksum": matrix_checksum,
+    }, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return f"sha256:{sha256(identity).hexdigest()}"
+
+
+def write_input_row_digest_ledger(path: str, payload: bytes) -> None:
+    temporary_path = f"{path}.tmp-{os.getpid()}"
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    try:
+        with open(temporary_path, "xb") as output:
+            output.write(payload)
+            output.flush()
+            os.fsync(output.fileno())
+        os.replace(temporary_path, path)
+    finally:
+        if os.path.exists(temporary_path):
+            os.remove(temporary_path)
 
 
 def row_identity_checksum(ids: list[str]) -> str:
@@ -114,6 +197,7 @@ def semantic_matrix_checksum(embeddings: np.ndarray) -> str:
     """Checksums the actual ordered FP32 bytes — binds the receipt to the exact vectors trained
     on, not just their row identities. Catches the case row_identity_checksum can't: same ids,
     different embedding values (e.g. a re-embedding run between snapshot and training)."""
+    import numpy as np
     return sha256(np.ascontiguousarray(embeddings, dtype=np.float32).tobytes()).hexdigest()
 
 
@@ -121,6 +205,7 @@ def source_grouped_split(source_refs: list[str], val_fraction: float, seed: int)
     """Splits by DISTINCT source_ref, not by row — every chunk from one source file lands
     entirely in train or entirely in val, never both. Row-random splitting lets near-duplicate
     chunks from the same file leak across the split, inflating reconstruction/KNN metrics."""
+    import numpy as np
     unique_sources = sorted(set(source_refs))
     rng = np.random.default_rng(seed=seed)
     perm = rng.permutation(len(unique_sources))
@@ -201,11 +286,19 @@ def main() -> None:
         print(json.dumps({"event": "NO_FALLBACK_NOTICE", "message": "CUDA unavailable; training on CPU. This is logged explicitly, not silent. Pass --require-cuda to fail closed instead."}))
 
     print(json.dumps({"event": "fetching_data", "limit": args.limit}))
-    ids, source_refs, embeddings = fetch_semantic_768(args.database_url, args.limit)
+    ids, source_refs, source_revisions, workspace_revisions, embeddings = fetch_semantic_768(args.database_url, args.limit)
     if len(ids) == 0:
         print(json.dumps({"status": "FAILED", "reason": "no rows fetched"}))
         sys.exit(1)
     print(json.dumps({"event": "data_fetched", "row_count": len(ids), "embedding_dim": embeddings.shape[1]}))
+
+    input_ledger_bytes, input_ledger_checksum, input_workspace_revision = build_input_row_digest_ledger(
+        ids, source_refs, source_revisions, workspace_revisions, embeddings
+    )
+    input_matrix_checksum = semantic_matrix_checksum(embeddings)
+    input_snapshot_revision = semantic_input_snapshot_revision(
+        input_workspace_revision, input_ledger_checksum, input_matrix_checksum
+    )
 
     train_idx, val_idx, train_source_count, val_source_count = source_grouped_split(source_refs, args.val_fraction, args.seed)
     train_source_checksum = row_identity_checksum(sorted(set(np.array(source_refs)[train_idx])))
@@ -259,18 +352,26 @@ def main() -> None:
     duration_s = time.time() - started_at
     print(json.dumps({"event": "training_complete", "duration_s": duration_s}))
 
+    input_ledger_path = f"{args.receipt_out}.input-row-digests.jsonl"
+    write_input_row_digest_ledger(input_ledger_path, input_ledger_bytes)
     torch.save(model.state_dict(), args.out)
     print(json.dumps({"event": "checkpoint_saved", "path": args.out}))
 
     receipt = build_training_receipt(
         model=model,
-        source_snapshot_revision=f"codebase_chunk_index:limit={args.limit}:rows={len(ids)}",
+        source_snapshot_revision=input_snapshot_revision,
         row_identity_checksum=row_identity_checksum(ids),
         metrics=val_metrics,
         producer_revision="atlas.train-latent-autoencoder.2026-09-30.v2",
     )
     receipt["training_duration_s"] = duration_s
     receipt["device"] = str(device)
+    receipt["precision_policy"] = {
+        "parameter_dtype": "float32",
+        "input_dtype": "float32",
+        "autocast": "disabled",
+        "quantization": "none",
+    }
     receipt["train_rows"] = len(train_idx)
     receipt["val_rows"] = len(val_idx)
     receipt["checkpoint_path"] = args.out
@@ -289,9 +390,13 @@ def main() -> None:
         "expectedEmbeddingFamily": "EmbeddingGemma",
         "embeddingModelRevision": None,
         "tokenizerRevision": None,
-        "authorityStatus": "CANONICAL_COLUMN_PRESENT_WRITER_AND_PER_ROW_PROVENANCE_UNPROVEN",
+        "authorityStatus": "CANDIDATE_ROW_LINEAGE_CAPTURED_SEMANTIC_WRITER_AUTHORITY_UNPROVEN",
         "orderedRowIdentityChecksum": ordered_row_identity_checksum(ids),
-        "semanticMatrixChecksum": semantic_matrix_checksum(embeddings),
+        "semanticMatrixChecksum": input_matrix_checksum,
+        "workspaceRevision": input_workspace_revision,
+        "inputRowDigestLedger": os.path.relpath(input_ledger_path),
+        "inputRowDigestLedgerChecksum": input_ledger_checksum,
+        "inputRowDigestLedgerRowCount": len(ids),
         "eligibleRowCount": len(ids),
         "embeddingDimension": embeddings.shape[1],
     }

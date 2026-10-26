@@ -1,12 +1,42 @@
 {
   "schema": "atlas.graphify-current-run-eligibility.v1",
-  "generatedAt": "2026-09-19T04:17:55.702Z",
+  "generatedAt": "2026-10-19T07:17:50.819Z",
   "mode": "READ_ONLY_CURRENT_RUN_ELIGIBILITY",
   "runningRunCount": 0,
   "staleRunCount": 19,
   "currentRunCount": 0,
   "lifecycleOwner": null,
   "lifecycleOwnerProven": false,
+  "ownerRoles": {
+    "status": "OWNER_ROLES_IDENTIFIED",
+    "roleCounts": {
+      "REVISION_INVENTORY_WRITER": 1,
+      "PER_ATTEMPT_EXECUTION_WRITER": 1,
+      "EXECUTION_AUTHORITY_WRITER": 1,
+      "STALE_RUN_MAINTENANCE_WRITER": 1,
+      "DAILY_WORKFLOW_ORCHESTRATOR": 1
+    },
+    "missingRoles": [],
+    "unclassifiedMutatorPaths": [],
+    "singleLifecycleWriterClaimed": false
+  },
+  "receiptConsistency": {
+    "status": "CONFLICTING_RECEIPTS",
+    "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "dailyExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+    "authorityRows": 1,
+    "selectedAuthorityRows": 0,
+    "reasonCodes": [
+      "DECISION_DAILY_EXECUTION_ID_MISMATCH",
+      "AUTHORITY_TABLE_DOES_NOT_CONFIRM_DECISION_RECEIPT"
+    ]
+  },
+  "authorityRows": [
+    {
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "authority_state": "LEGACY_IMPORTED"
+    }
+  ],
   "supportedLifecycleStates": [
     "COMPLETED",
     "SUPERSEDED"
@@ -15,16 +45,17 @@
   "staleRunsReconciled": true,
   "namespaceOwner": "workspace-source-namespace-audit (authority unresolved)",
   "namespaceAuthorityStatus": "PROVEN",
-  "repositoryRevision": "5de75715fb65f9aaae94aa6d2af4fdc68929d253",
+  "repositoryRevision": "5ae2e388f85c285bd476cf2cd354754e021d3caa",
   "workspaceRevision": null,
   "inputSnapshotChecksum": null,
   "eligibleForFreshRun": false,
   "blockers": [
-    "LIFECYCLE_OWNER_UNPROVEN",
+    "DECISION_DAILY_EXECUTION_ID_MISMATCH",
+    "AUTHORITY_TABLE_DOES_NOT_CONFIRM_DECISION_RECEIPT",
     "CURRENT_RUN_NOT_ESTABLISHED",
     "REPOSITORY_REVISION_NOT_CURRENT"
   ],
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "sha256:c029194bda8f552cb0bc944e9b7e7954ed2fa0dbe039e358afb49733747aa2cf"
+  "reportChecksum": "sha256:bd289ac5979c12e3f25354f7c87bff66a707ddb795cb580c0a52f6c7fc3fb30e"
 }

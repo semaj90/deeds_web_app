@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:db67379560850d3f4584421a740e1bc47f6ea8f7181d6cb945a6e86c89823c76",
+  "pageVersion": "sha256:36d59ad1d5d69e49c3b98fbb2afd50fd64387125371673533b9348bdf667f81b",
   "claims": [
     {
       "id": "claim_c551ba1d8307402ca68091b271ccc3ee",
@@ -135,12 +135,8 @@
       "statement": "@deeds/atlas-orchestrator packages Mastra and LangGraph-based durable workflows, model/planning components, executors, and PostgreSQL/Redis-backed orchestration dependencies, but it is not the owner of canonical packet identity.",
       "evidence": [
         {
-          "resource": "repo://packages/atlas-orchestrator/package.json#L1-L25",
-          "version": "repo-lines-v1:sha256:8c8ffe904b2989e97ed781fb13b1f76821625e21daa0946cb7f717fedf7ec4c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZTg5OWUzODdlMTQyOWY3OTBhMzg2NjNjMzE5N2JlOTEyM2E0MWNmYjE0ODA3ZTU4YTM3NjIwMDY4ZWYwYWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwMzk1YWFjOWNkMTQ2ODI2NmYzNTc5MzQ0YmYzZGI5ZDBiOGZhMjkxNWI0ZWQwY2E5NTg2NjEzYjVjOTI1MDIifQ"
-        },
-        {
-          "resource": "repo://packages/atlas-orchestrator/package.json#L27-L44",
-          "version": "repo-lines-v1:sha256:69a643987b2c971d5ec9c3187fbbb5a59ceda2d3ba999816afd82279b2705e4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhM2I0NjlkOWUwOTc1NzIyNDY2NjczNGM5ZWY3YjI1NGQ4ODUzNGY1ZDViYjcwOTg5NjA4MDVjNTUzZGMzMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlYWIzZGYwMzkyODZkZTA1ZmFmYmZlNWU4YjIyNDlkNzlhYzIwNGQ4ZDUwNmM4Y2VmMGUxMjU1NTIyNmI3MGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3OTNlN2QwNDc4ODVhYTQwMTllNDYzMTE2MDJiYjA5N2EzYmY2NmU2MGIzNzY2OGViNjlhMThhYjQxN2U5M2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyODg2Y2U2NzM1YjZiYjg5YTQ2ZDVmMGIyZjc3ZTJkZTRkYjExMDdjODQ1MWQzYWI3MDBmY2MxMmY3OGVlMTcifQ"
+          "resource": "repo://packages/atlas-orchestrator/package.json",
+          "version": "repo-file-v1:sha256:8c89158fe24dd800f0077e97e1a96ee3349a4a164ad2799184093ae916a2a3d3"
         },
         {
           "resource": "repo://packages/parent-atlas-core/src/index.ts#L18-L34",
@@ -173,6 +169,126 @@
         {
           "resource": "repo://packages/parent-atlas-runtime/src/facade/retrieval-facade.ts#L95-L120",
           "version": "repo-lines-v1:sha256:528db895567aec9b9db51511d298245dce5d3af5e422a4ac48279598d29c38be:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYTIwYmYyYTViMTRiZDhiYTA4ODhiYzI3ZmU3Yjg3YTM4MzA5ZjM4NDNiMDJiODhlYTNlZDU5MjE3ODY5YmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NjJmYTU3OTcxMGIzZmY1ZTQyYThlMTAwMDJjNWFlN2JmMDUwOTllN2Y0Yzk5NWE2ODVmNTc2YWM3ODc1OTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4YTM3OWJjNjhmNTA3Mzg5ODY1ZDUxNDU1NjVjZGQ4ZWZhYTJmYWYyZWU1ZmZhNDU4MDU5MGZkOTA5M2YxMTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2Y2I3YTFkNjY1N2MyMTYzOTY2NjExY2VkZjhmZTA5MmZiNGMyY2E5ODAzOTIzNzgzOGY1ODMwMWNkZTg4YzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_63f4c568b1464b29bcf6fadd4618518d",
+      "statement": "SearchRuntime is the canonical SvelteKit retrieval orchestrator: it validates bounded queries, gates dense lanes on embedding health, retrieves and RRF-fuses candidates, hydrates them with canonical proof, applies policy-driven reranking, and suppresses promotion and training writes in readOnly mode; injected lane failures and empty reranker output degrade without discarding the retrieval path.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts#L100-L250",
+          "version": "repo-lines-v1:sha256:6d4ba134d3d7beeed5e31a1d2092bf8e58b7c55b6d6ce4a95877fefce1b685ac:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0YWQ2NzE5NGM4NDg0MWRmMjYyNjg5ZGIzNmY3ZGE1ZTk5M2FmYmUyMjFhMTZiNWI3OWNlNTdmMGM1M2Y1OWMxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5ZDFkNWY4Y2UzYTk3NDhhZmNjMmIzNWM4NzZhYjM3ZGJiNzQwNDg3OWUwZDc1YjA4OTk0MzEyZjBkODM3NjVmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZTRiODI4YjBiNGQ5NGZkNDI1MTAzNzE2Y2VmOGJkMDYyZTg1MGI1YjBhNTYzNzI0OTc0ZDFhYWIwMmNmNjBhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5NTg0NWY3YmVhNDdjNDQyZjE2NzZhZWZmYTU2YmUwNTM3OTk1ZjAxNjMyNTYyZGRiNWI3NWUxM2I2NjA0YmRiIn0"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts#L501-L643",
+          "version": "repo-lines-v1:sha256:f7491bacccc4c01954e087ddd280583aa5470b0760325a7d70836366d19242bd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyYWE0ZTU0ODMzYTFiODBiNzg3NmE4MDRlOWE3ODIxZTNiOTg2OTc5MjM1NzBhZmNhMDRkY2ViNWI5MWY4ZTRmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJmMDhiNjliMTIzMWU3NTAzMzVkOWRkMWY3OWQ3ODZlYzhkMzIxM2U0NjA0ZjM0YTBhMTJkY2U0YzAzNGUwZWExIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2MDVkZDA0NDk5OWU0ZDQ2NzUwNjg3YzYxNTQwNDQ0MmVmY2FkNjRmY2Y2YWYxNTg4NDE3YzhiNzQ1OTdlYjk3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwZDZlY2JjODc4ZTBlZjljNWUzOTA2MzI2M2RhYTc0ODhkYmNjODFmYWNkODZiMzU5NGQxMTdkOTgyM2NjMzY5In0"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts#L1025-L1157",
+          "version": "repo-lines-v1:sha256:db645c15721b6b82d0bf6d40fe553fbe4e7072dcf3e81cb56aea71ac01ef4428:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwZjM1ZDk4NjYxNjc2MzNmZWI4YTVhMGFkYjRlMmY4ZWU0OGE5NWY4MmJlZGY3MjA4NWRjODM5N2Y3MjQ2NTBiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI2ZGMyOTlhMTA3ZTJlZDlkZDUyZjRiYjY0NzgzZTY4M2JjZTk5NDA3NTc5YjkzMDNjYjRmYzBmOTgzZDZkZTlkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZDgwMzI1OGNjODgyMzZlNWU1NjU5ZTIyM2RmZThmODVlNzVjYjFiMDYxZGZlMTllYWViMTFjMWEwYzUwMDY5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxYTg3MGVkMWYwNjIwMmRhMTMxMmFjZjIwY2ZhZmUyMjIxNzJkNTZmNTYyM2Y5NGJjYjJlZTg5OWVhMDQ1OWFkIn0"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts#L478-L658",
+          "version": "repo-lines-v1:sha256:caa18b7bda1c11ad7f3de2bdb6d12f4864c35a6d536b43f5adfb886d89c0fbb7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmYzY1MDg0OTlkMmQxYzI5YWI5YTE0ZjYwYTBjNTkzZjEzOTkwMmJhNmVlMjg2Yjg4M2FiMDMyYTQwZmI2NDU3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJlZTEyMzZmMmFlYTFjZTQyZmEyYjBjY2IyNzgzMmM3OGY1ZDhjMWMxOTIzOGEyNDA5MjIxMDY2M2Q1MzllZDYxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjNTAzYzViODJlZGFlMzNlM2E3MWNhZDYyMjUzNGM4ZGY5NDMwYWJlOWJkODEwMzg0MWE2MTE4MDU2MmUxZmUwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhNGEzOWVlYzgwMTE1ODk4ODFlYjQxZDg3M2E5Y2JlZTkyZjY4YmNiYzE3MjBiMGVmNzg4ZTYzN2IyY2I2ZjcwIn0"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts#L880-L1023",
+          "version": "repo-lines-v1:sha256:1e48b4eb93d9dc169b71dd9ed2ee9c33970be94d488935f29581eedef52bf264:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwZjM1ZDk4NjYxNjc2MzNmZWI4YTVhMGFkYjRlMmY4ZWU0OGE5NWY4MmJlZGY3MjA4NWRjODM5N2Y3MjQ2NTBiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3MTM0NTE4MDEwNWIwYzY2YTc3ZGFkNTFiYjM3OTAxYTM3MzJjOTY1NGJhNGRlMzk4MWY4MWUxODE3NTI0OGJmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1ODUwOGI2Y2IwNTg5YWJhNzUwMzIwMmRlMmM4Zjg3ZWQ5YjE5Y2Q1ODY1M2ZkMDFhM2U2NzVlM2FiN2I1OTY3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI3ZTNlNzVmM2YwNjFkNGJiNjI3N2Q4Y2MwNmE1MzZmZWVkYzE3MmE0N2RkNjdhODZjMTI2NzQ2NzRiZTYyNTBlIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_37f838870c8b41898c0308f2866a2f7f",
+      "statement": "The authenticated GET /api/search Platform Search route is a separate fan-out implementation rather than a SearchRuntime alias: it checks semantic cache, selects domain adapters and optional router lanes, tries Go gRPC then Go HTTP then SQL for legal search, isolates adapter failures with Promise.allSettled, sorts PlatformSearchHit results, and performs non-blocking cache and ETag handling.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/search/%2Bserver.ts#L112-L226",
+          "version": "repo-lines-v1:sha256:2b9488cf53702450d966cbfc243648086d77dec48b4eee107afa486ba6d7f52c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTE1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0MzUzMDg5Yzc0MDEzMzkzOTFlMjk0NTU5ZThiMGZiZTEwMjI0NWFhMTc1MGM1OGI2ODk4MGY1YzVhMzA0YzczIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyZDc1NDM1NGZmYjQxMTgzMThlYzZhMDAxNDhlODllYzIwMjhiYTlhOWJhZDYzNjc2MWZjMWYzYmVkMjVmYjgwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJhZWE1MmQyNzIzMGI4OWNhMWI3MzI4NjZhZmJlMTM3YTk4ZTY1MTAwMDQ5YTU2YjMyOTNkZWY4ZDVmZTdkZGEwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxYzNlYTdlZmIyZGNiMzU0ZWI3OGUwZjliMGQzY2Q0MTRkNjY1YWIyNzZiZTNjZjQ2MmVmOTA5NjkyZDQ4ZGE1In0"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/search/%2Bserver.ts#L40-L67",
+          "version": "repo-lines-v1:sha256:39240fda310cf2bf9b87f96ef821d185c6dc223fb4e2e30b28254dce1e8fd24c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjMzRmNjE4MzJkNWZmZDlkODQ0Y2UyM2NjMjdhODRkYTI5ZjM1OTJmZjgxNjA4MTBjN2FjYThkYzM0NDAzZDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM5ZGQ0OGFhOGUzYTYxYjg5MmNjZGU3ZGNjZWU4YmZlNmEzMDg2NWVjZWNlMzRkZDhlZjEzNDdhZDMyYjllZmEifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/search/%2Bserver.ts#L553-L600",
+          "version": "repo-lines-v1:sha256:4eae6507a821d45716101e125b6d49412a3bf1c3e473514ffabda4478a43b60c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmMjU0ZDU0Y2Q4NGY4ZjEyMmVjMmZhNzEzYTg0NTA2NGMwZGVjNGFhYzQ3Mzg3NjczZTI3YmNjZTNhZDk1MzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZDE0YWIwYWE1MWYxMzBmMWU3NmUyMGJhMjBlNGQ3MzdkYjA2MjZlNTY2ZjhiNTBhOGIwYzk0MGExNjk3OTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhNDAxMzljODQwMjI0YTBhNDljYzQwYTRjMzYzZjY5YjZkMDA0MjI4YzlkOWEwYjQ4OTMyMDliN2Y0YzQyNjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFiNDVkZDA0OTY2MjVjYTM0NTJkOTYyNWM3MDBkZGEyNGY5YzZmZTBlYWNiNTc5NjUxZTdjZThiYWI4MTQxZWIifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/search/%2Bserver.ts#L605-L713",
+          "version": "repo-lines-v1:sha256:ef4ad1b20f2d9b270a7a4df4692a0a87e57ef635909d3593b9477aee237fc8e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkZGUyN2RmNmMxOTA3YTEyNDljYjJiZjQ2NjUxM2U2NjhlMDE4NzBlOGE2NzRkNDVmMWYyM2Y0NmNiZGQyZTZkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5M2QxNGFiMGFhNTFmMTMwZjFlNzZlMjBiYTIwZTRkNzM3ZGIwNjI2ZTU2NmY4YjUwYThiMGM5NDBhMTY5NzkzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjZDRlZDI4NTJjNzY3NzkyYTNmYjA0N2FkYWIyMTFkNjMwOGRhYWVlMTRhNDY4NGEwM2QyNWI2YzlhZDU1MDE3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MSwiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyZmUxMWE3MTJiOGM3M2MwOTdlOGExZjBhY2JhOWM0MjI2MTVjM2I5ZWU3N2Y3YTcwYjE2YWRmMTE5NzEzZTBkIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_d323665db6cb464f80f19aa945327e7e",
+      "statement": "The /api/search/hyperrag and /api/rag/hyperrag callers delegate retrieval to SearchRuntime, with the latter translating its result into a legacy compatibility packet; the route test verifies authenticated delegation and unauthenticated rejection.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/rag/hyperrag/%2Bserver.ts#L7-L18",
+          "version": "repo-lines-v1:sha256:47f3f2bcab72aa93565ce8a17b37058ad524cdb86bc2ff7284adcf229ad0be4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5MTg1MTI5OTJjOTk3ZTg1MmFjNTMyNTEwZTc3ZDJkMDliYTdmYWM4MDAwNGJkMGFiOGEyY2I2N2M0NzRlYWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmMmFhMDkwOGRkOWQzZDNiZmFiMGUzNDU4MDg2MDQ3MmM0NmRkZWMwN2RhYWQwMmQyY2JiYzI1YWJmY2ViNjMifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/rag/hyperrag/%2Bserver.ts#L74-L103",
+          "version": "repo-lines-v1:sha256:b85dfb36c112f0d0a162393fb8ca393dc0b0ea6fff121fbc289f536fa2e4a4da:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZTk2NTE3MDU1NDAxZmZhOTQzZGY1MGE1ZGVlNGI0YTViYThkMzBjYTQ1MTY4ZmVmM2NmYzdlOTlhMmJkZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZTQ4ODYxODNlYjk3MjIxODRiMzdiYThmNjQxZTJkODQyM2VjNzYxYzQ2NTRiY2Q5Y2Y4NTBiMmViNDk5Y2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3OTFhMDQ5YzJjNDY1NmFjMTAzMjNjMWQxNTYyN2Q5NjliOWE4NDc1ODA5NWQwNjc0NjEzYThjZWQzYzkxZGQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/rag/hyperrag/server.route.test.ts#L21-L90",
+          "version": "repo-lines-v1:sha256:6d01020b3fa091be923b1253428a09f25369c7f35af75ff75a9746f0124fff1c:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2ZmJlODY3MDI0NjhkNzcxODM0NDRlZDhkMGI2MDkxMGM5NTUyMzUwODk4ZjFhMWFmNDdmN2EzM2ViZDg5ZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0MzUxNDQyNWZiNzc2MWRhNmE3OWQ5MWYwOTg2ZDc3NTcxZmYyMzcwNWY4ZTdmMWZlMjFkYzkxMjU4ZDI0NjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/search/hyperrag/%2Bserver.ts#L83-L143",
+          "version": "repo-lines-v1:sha256:172611431010962d41abec7df86de0934560258bf8012ced0be50d23bd5000cd:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmZTk2NTE3MDU1NDAxZmZhOTQzZGY1MGE1ZGVlNGI0YTViYThkMzBjYTQ1MTY4ZmVmM2NmYzdlOTlhMmJkZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZDExY2FmNDNlOTdlZjM2OWU2YmVlZDFhMjY4YmQwNTgzOGYyOWI5ZGQyNTRiZjY5YmE2NDg4NDE0NzIzNGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyMDQwZTA5NWE5NGUyYWRhNzRlNDIxZjM3MTg3NTFhOTFhODEwYmZkNjZmNDhmNGU5MzljN2I3NDgwZWI2NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlODk0MDZmYjI3MTFkZmE4MGY4MTUxZGYxYTExOGIyZDZmOGEyZWM2N2Q4ZWU3ZTZiNmQyZGQzZDJlMGRlNWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_796fd028a97f45b4bfa8955bdc820f36",
+      "statement": "The SvelteKit packet-pipeline bridge lazily loads the Rust TurboVec N-API addon and falls back to JavaScript for hashing, edge deduplication, SOM scoring, JSONL loading, and Qdrant payload packing; it is a compute and projection adapter rather than canonical identity storage.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas-core/src/index.ts#L18-L34",
+          "version": "repo-lines-v1:sha256:f3af666c049c3d127565ad80af7c8abaf9cbf0e4cb4dc001169cefdda4302100:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmI4ZmMzYzYxZjlmMDAwZTUwOGMyZmQxMTM4ZmUwYzQ5ZmFiMTcxMTI3N2Y5NTQyOGQ2ZDM5ZTBkNDFmNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYzQ5ZGYzMTJlOWI4ZDgwYTRkODRiZjZmYTU0ODJjM2I3MThmODgxOGU4OWU2OTg4ZjRmNTcwNDk3N2JmNzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3NDAxODkxNzFmN2ZiYTE0Mjc0ODNmM2JmOTc4ODJkNWFmMTFiMTk4NWUzOWE5YTI5NzVjNTI0NzcxNmFlYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYTljOThlM2M3Nzk2YjFjZWQxNjQ0YzI5YmZiYWZlYWQ4MmJhZDg0NDZkN2RlMGFjM2VjODc4ODNmMjdkN2MifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/packet-pipeline.ts#L168-L254",
+          "version": "repo-lines-v1:sha256:805f0632a50fc7011ceb8ff548494bb16ae8cd93eee50a911a2f8cbe727e7f60:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxZTJmMWNkMmEzYTJkNGI2ZDU3NDVjMmVjYTg4ZjlhNzJmZGExMjBlODFiNTFkY2M2MTc4YWVkNTMxMDBlNjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2MDBmZDA4ODU1MTEyMDNmY2IwZDY0OWYxNmRjMDdlNTJkNGUwZWVlMTZkYWNjMDdlNzNhYTgzODUxMWQzNjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkZTA5MGZmYzQ5ZGMzOWI2MmIyYjQ3MDc4MDI0NWNlMzYzOWM4ZTg5NDg5NjY0NzRiZTNjYWEwNzBmNDM1ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyNDQxZDA3ZmE1YjY3NzA1MDhiYzk3NTk4Nzk3ZDQ4YzI1MDY2NDNiNzI2YmU1ODhhMDFiMTAzNmJlODBlZjAifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/packet-pipeline.ts#L4-L67",
+          "version": "repo-lines-v1:sha256:9f097795bad1f1a8306b4f41d846648ce18caf37be6456428c40920a9ff0568c:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1YWU1M2Y0N2U3YTQyOWM1MThjZWYzMWNhMDM0MTA5N2U2OGYzMGM2NmZjNmExNWY1NzgzZjQwYzExNzQzYWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhOWJlNDIwYzFlYjE3NjBhNzUwMjIxMDFiYjZkYWJhNzVjNDMyMWViMmJkNjZmM2M0M2FiM2E5ZmE4MWIxZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmZGZmMzIwZGMzNzhiZGRhMzUzYWUxOGRlZjk2MWJkMDFjMjRjZTYxMDVlNDhkNWVkNmVlYTAwYzNjYTFjODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMxZmE3ODljYjZjOGRkMWMyODYzMWRkNjM1Zjk3NDg2MjU1NjVmNmM1NTBjNDk4ODFjOTQzYjg5MmJiYzQ3NWYifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/packet-pipeline.ts#L70-L149",
+          "version": "repo-lines-v1:sha256:f7e495f3c19dfde406b345edd00419fb240fb6a02041902c3e00b65b07268866:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkZGUzMzJkMWM2ODJmODE4NTIwZjE0MDQ0YTA5NjMwZWY3ZGE3MDI4NzU0ODZmY2NiN2Y3MTcxYjcxMDc4MzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3ZDllNmVjYWJiNzcwNDIyOGYxZWE5MDM5YjMwMzJmMjZmZGE1ZDc2Njc2M2MwNWVkYmE5MWExMmMxYzQ1YWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3NTFjMzRjMGQ0NjJlODg4YzBmNGQ1MGEzNDVhYmEyZDg5ZGMzZDEzOGMxN2MwNGEwYjVhZDIxNDY2ZTY1YTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b36f4414657e4c028398c9409ed533ce",
+      "statement": "The packet consumer pipeline forms a downstream evidence-to-tool lifecycle by ranking packets, constructing features, selecting within token and count budgets, assembling a manifest, validating a tool decision, executing MCP, recording a receipt, and synthesizing from that receipt.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/packet-consumer-pipeline.ts#L14-L43",
+          "version": "repo-lines-v1:sha256:b0784311dcecbabadc246e89c053f9e110c8721c1c89a6d544bf51ed5a8c22ba:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4OTExMWViOGU0NWNiMTFiMmZhMjUzMDlkZDA0NzBlMjJhNTNlOWYzZGYxMzg1OWFjNmJmOWI5N2NjMjNmNjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkZmFjMTFlNDZhMmY3YzM0NWJiYmVhZmY2NDBlOWM2ZDNiYTg4ZTU2MTk1ZWRhMGJlYzdmYzQ0ZTcyNWY5YzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlMzc1YjRkMGRjNTI5ZmE2ZmJlOTBhYTk1YjJmNTFhZTYwZmM5NDFkZDVhYWVkMmZjMDdjMzRkMTgxYTI3NjYifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/packet-consumer-pipeline.ts#L67-L142",
+          "version": "repo-lines-v1:sha256:319d3eaccb58b220a98dd3a861262f549fc093e0e76751aa36b9da06665b0f2a:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlYmMwNzlmYzhhMWEwNzNkMGFkY2VhMjJmNDg1NTA1YWIxYmUyNjMxYzdjMWQ5YzA3ODVkNzMxNzEzNzJjY2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjM2EyMDc3NGQ1YzJiYjRjNzkwYzE4ODkwYTljNDk0Y2NiNTEwZmM4ZThjMDllYzc0NTE5YmMxNjRmYzc4NGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1NjI2NDhjMjc5MzFhYmZlMTZlNDk3YWJiZmQ4ZDhkYTI0NGEzNmNiNTJjMThlNzI3M2FkMWE4NmEyYzYzNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzZDljZGUzMjc4YmYzMmYyYWNkOTZiMmYyYmI1OGIzNjk5ODdlZjY2MzI0MDFiYjBlNjI1OGExNGFkN2E0N2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ee176b9aa6244a46b1e2cdafc46a8c96",
+      "statement": "The SvelteKit root server layout applies private no-store caching to authenticated sessions and public browser and shared-cache lifetimes to unauthenticated sessions, while retrieval routes retain their own authorization checks.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/%2Blayout.server.ts#L3-L28",
+          "version": "repo-lines-v1:sha256:bc4104ca1c56257e6cfb7d37409c1b3d2ec2bd85ec09d4d138809cef7178f76c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzODM2NTgyZjcyOWJlOGY5N2E4ODAyN2Y4OTJkMDc2NTY2NzBhNmJiMGYwOTM3ODI3YjFmYzU3MDAzNWM5NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxOTcyMzhmY2Y3OGQ2ZGZlODYzZGIxNDVjNWY5NDk5ZDgzNjE1ZTFkYmZhOWE0ZjMzMTA3NjVkZmM2N2FkMGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZhODMxNGJjYmJkNGM5NGJjZTVkZjE2MmM2OWM1NWQ5ZTBmMjkzYmY0NDZkYTY4Y2FhZmQ4NDgyZjQzMWFlMTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlYzQ4MTRjYzRkNDI2Yjc0ZmVhMjIyMDNlM2FhMDQ1OWNmYzQyZjI3YzQxYWUyMTY2MmRhZDgyZDYyZmVmNzYifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/routes/api/search/%2Bserver.ts#L555-L567",
+          "version": "repo-lines-v1:sha256:d8a0de95346270eee772e337a530300d2155cb0e6ec9a3181dc3f23f736f2135:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwNGU4YjEwMTNkMDNkOTE3ZmFkMjUxYTFiNzQ1MzVkMTBjZmQxNzNiZTQzNTEwMzEwZTNhZTliN2M5NzU3MGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyNTZhMWI0ZGE5NWMxOTEyYzQyM2QxZDRiNDk2OGNhMzNhYTI3MDZiYWVmMjE0YjUwMDUwYzMyMjExZTQxMjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlMGJiOWE1Yzk5ZmQxMjQ2NTBiOTRlZTQzYTRjODI2ZWI3ZWYwN2QwYTQ0ZGFhNTVhYjBhYjVhMzE1YmZlNWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiNmYyMjAyMmVkOWMxMTdmZDEwMTIxZGY2NzQyZjc1OWNmZjNlN2NmODgxMWFlNWExNjlkYTQyZTBhYzM2MmQifQ"
         }
       ]
     }

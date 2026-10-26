@@ -14,7 +14,12 @@ const GEMMA4_URL =
   process.env.TURBOQUANT_URL ||
   process.env.LLM_SERVER_URL ||
   'http://127.0.0.1:8090/v1';
-const MODEL = process.env.GEMMA4_MODEL || process.env.OLLAMA_MODEL || 'gemma4-tq';
+const MODEL =
+  process.env.ORNITH_MODEL ||
+  process.env.LLAMA_MODEL ||
+  process.env.GEMMA4_MODEL ||
+  process.env.OLLAMA_MODEL ||
+  'ornith-1.5-9b';
 const CONCURRENCY = Number(process.env.SUMMARY_CONCURRENCY || 1);
 
 function usage(){

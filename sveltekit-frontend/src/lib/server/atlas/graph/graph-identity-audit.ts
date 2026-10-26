@@ -39,14 +39,6 @@ export function auditGraphIdentityPopulation(
   const symbolId = duplicateCount(population.symbolIds);
   const symbolVersionId = duplicateCount(population.symbolVersionIds);
 
-  const packetTreeLineageProven =
-    population.orphanPacketKeys.length === 0 &&
-    population.linkedPacketKeys.length === population.canonicalChunkPacketKeys.length;
-
-  const parserManifestAlignmentProven =
-    Boolean(population.parserManifestBackend) &&
-    population.parserManifestBackend === population.parserRuntimeBackend;
-
   return {
     schemaVersion: 'atlas.graph-identity-audit.v1',
     runId: meta.runId,
@@ -72,20 +64,20 @@ export function auditGraphIdentityPopulation(
     },
 
     gates: {
-      packetTreeLineageProven,
-      parseNodeIdentityProven:
-        population.parseNodeIds.length > 0 &&
-        parseNodeId === 0 &&
-        pageIndexPath === 0 &&
-        parserManifestAlignmentProven,
-      stableSymbolIdentityProven:
-        population.symbolIds.length > 0 && symbolId === 0,
-      symbolVersionIdentityProven:
-        population.symbolVersionIds.length > 0 && symbolVersionId === 0,
+      packetTreeLineageProven: false,
+      parseNodeIdentityProven: false,
+      stableSymbolIdentityProven: false,
+      symbolVersionIdentityProven: false,
       packetToSymbolLineageProven: false,
-      parserManifestAlignmentProven,
+      parserManifestAlignmentProven: false,
       canonicalGraphSnapshotProven: false, // never auto-promote
     },
+
+    proofLimitations: [
+      'Population lists and uniqueness counts do not prove source/revision bindings or authoritative joins.',
+      'Backend-name equality does not prove parser manifest, grammar revision, or fixture parity.',
+      'Cross-revision symbol stability and version-bound occurrence identity require source-qualified evidence.',
+    ],
 
     evidenceRefs: meta.evidenceRefs ?? [],
   };

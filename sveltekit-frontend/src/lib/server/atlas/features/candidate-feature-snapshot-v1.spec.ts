@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   assertExecutorIdIsNotCanonicalIdentity,
@@ -6,6 +6,7 @@ import {
   resolveCanonicalCandidateByOrdinal,
 } from './canonical-candidate-v1.js';
 import {
+  admitCurrentCandidateFeatureSnapshotFromReadbackV1,
   admitCurrentCandidateFeatureSnapshotV1,
   materializeCandidateFeatureSnapshot,
   selectCandidateFeatureRows,
@@ -16,6 +17,7 @@ function identities() {
     {
       canonicalId: 'canonical:z',
       packetKey: 'packet:z',
+      sourceRef: 'src/z.ts',
       treeNodeId: 'tree:z',
       symbolVersionId: 'symbol:z',
       workspaceRevision: 'workspace:1',
@@ -28,6 +30,7 @@ function identities() {
     {
       canonicalId: 'canonical:a',
       packetKey: 'packet:a',
+      sourceRef: 'src/a.ts',
       treeNodeId: 'tree:a',
       symbolVersionId: 'symbol:a',
       workspaceRevision: 'workspace:1',
@@ -76,6 +79,7 @@ function row(candidate: ReturnType<typeof materializeCandidateOrdinalMap>['candi
     candidateOrdinal: candidate.candidateOrdinal,
     canonicalId: candidate.canonicalId,
     packetKey: candidate.packetKey,
+    sourceRef: candidate.sourceRef,
     treeNodeId: candidate.treeNodeId,
     symbolVersionId: candidate.symbolVersionId,
     workspaceRevision: candidate.workspaceRevision,
@@ -356,6 +360,13 @@ describe('CandidateFeatureSnapshotV1', () => {
       featureRevision: 'feature:1',
       producerRevision: 'test:v1',
     })).toThrow('FEATURE_ROW_IDENTITY_REVISION_MISMATCH:0:packetKey');
+
+    expect(() => materializeCandidateFeatureSnapshot({
+      ordinalMap: map,
+      rows: [{ ...row(map.candidates[0]), sourceRef: 'src/alias.ts' }, row(map.candidates[1])],
+      featureRevision: 'feature:1',
+      producerRevision: 'test:v1',
+    })).toThrow('FEATURE_ROW_IDENTITY_REVISION_MISMATCH:0:sourceRef');
   });
 
   it('rejects missing and duplicate ordinals instead of padding logical candidates', () => {
@@ -379,5 +390,59 @@ describe('CandidateFeatureSnapshotV1', () => {
       featureRevision: 'feature:1',
       producerRevision: 'test:v1',
     })).toThrow('FEATURE_ROW_DUPLICATE_ORDINAL');
+  });
+});
+
+describe('admitCurrentCandidateFeatureSnapshotFromReadbackV1', () => {
+  const map = materializeCandidateOrdinalMap({
+    candidates: identities(),
+    candidateSnapshotRevision: 'candidate:s1',
+    workspaceRevision: 'workspace:1',
+    producerRevision: 'test:v1',
+  });
+  const admittedCohort = {
+    ordinalMap: map,
+    rows: [],
+    featureRevision: 'feature:1',
+    producerRevision: 'test:v1',
+    sourceRevisionSetChecksum: 'a'.repeat(64),
+    candidateSetChecksum: 'b'.repeat(64),
+    sourceChunkCohortStatus: 'REVISION_QUALIFIED' as const,
+    semanticCohortStatus: 'ADMITTED' as const,
+    graphFeatureStatus: 'ADMITTED' as const,
+  };
+
+  beforeEach(() => {
+    vi.stubEnv('ATLAS_ADMITTED_WORKSPACE_REVISION', '');
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('refuses a complete valid cohort even when the caller forges current: true', async () => {
+    const forgedInput = {
+      ...admittedCohort,
+      rows: map.candidates.map((candidate) => row(candidate)),
+      currentness: { current: true, reason: 'LIVE_SNAPSHOT_MATCHES_ADMITTED' },
+    };
+    const result = await admitCurrentCandidateFeatureSnapshotFromReadbackV1(forgedInput);
+
+    expect(result.status).toBe('BLOCKED_CURRENTNESS');
+    expect(result.reason).toBe('BLOCKED_CURRENTNESS:NO_OPERATOR_PIN');
+    expect(result.snapshot).toBeNull();
+    expect(result.canonicalAuthority).toBe(false);
+    expect(result.rowCount).toBe(0);
+  });
+
+  it('refuses before cohort validation when the trusted workspace resolver has no pin', async () => {
+    const result = await admitCurrentCandidateFeatureSnapshotFromReadbackV1(admittedCohort);
+    expect(result).toMatchObject({
+      status: 'BLOCKED_CURRENTNESS',
+      reason: 'BLOCKED_CURRENTNESS:NO_OPERATOR_PIN',
+      snapshot: null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    });
   });
 });

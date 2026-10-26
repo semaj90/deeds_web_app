@@ -7,11 +7,13 @@ import { ENV } from '$lib/server/env.server.js';
 
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { fork, type ChildProcess } from 'child_process';
-import { glob } from 'glob';
+import globPkg from 'glob';
+const glob = (globPkg as any).glob ?? globPkg;
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { fork, type ChildProcess } from 'node:child_process';
+
 
 export interface MapReduceJob {
   id: string;

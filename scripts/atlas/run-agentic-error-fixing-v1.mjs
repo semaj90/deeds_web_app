@@ -29,6 +29,7 @@ const getArg = (name) => {
 const inputFile = getArg('--file');
 const inlineText = getArg('--text');
 const validate = args.includes('--validate');
+const offline = args.includes('--offline');
 const reportPath = path.resolve(ROOT, getArg('--report') ?? 'docs/reports/agentic-error-fixing-v1.json');
 const llamaServerUrl = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 const configuredModel = process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b';
@@ -45,10 +46,13 @@ function readDiagnostics() {
 }
 
 function classify(line) {
-  if (/lineage|namespace|source revision|canonical chunk/i.test(line)) return 'LINEAGE_ADMISSION';
+  if (/PGVECTOR_EXACT_HNSW_REPLAY/i.test(line)) return 'RETRIEVAL_OR_PROJECTION';
+  if (/SYMBOLS_RESOLVED|ACE_EVIDENCE_GROUNDED|lineage|namespace|source[_ ]revision|workspace[_ ]revision|canonical chunk/i.test(line)) return 'LINEAGE_ADMISSION';
+  if (/SEMANTIC_OWNER_PROVEN|PROJECTIONS_CHECKSUM_ALIGNED|BITFROST_KEYS_DERIVABLE|semantic owner|projection checksum|bitfrost/i.test(line)) return 'RETRIEVAL_OR_PROJECTION';
+  if (/LATENT_FAMILY_PROVEN|GRAPH_MANIFEST_SEALED|ORDINAL_MAP_SEALED|latent family|graph manifest|ordinal map/i.test(line)) return 'GRAPH_OR_GPU';
   if (/TS\d{4}|svelte-check|typecheck|cannot find module|does not exist/i.test(line)) return 'TYPECHECK_OR_SCHEMA';
   if (/timeout|ETIMEDOUT|abort/i.test(line)) return 'TIMEOUT';
-  if (/qdrant|vector|empty result|no rows/i.test(line)) return 'RETRIEVAL_OR_PROJECTION';
+  if (/qdrant|turbovec|embedding|vector|empty result|no rows/i.test(line)) return 'RETRIEVAL_OR_PROJECTION';
   if (/permission|unauthori[sz]ed|forbidden/i.test(line)) return 'AUTHORIZATION';
   if (/relation|column|migration|postgres|database/i.test(line)) return 'DATABASE_SCHEMA';
   if (/graph|neo4j|cugraph|cuda|gpu/i.test(line)) return 'GRAPH_OR_GPU';
@@ -62,6 +66,17 @@ function extractCode(line) {
 function extractFile(line) {
   const normalized = line.replace(/\\/g, '/');
   return normalized.match(/(?:src|scripts|packages|python|services)\/[A-Za-z0-9_./-]+\.(?:svelte|ts|tsx|js|mjs|mts|py|go)/)?.[0] ?? null;
+}
+
+function extractGateId(line) {
+  return line.match(/\b([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)\s*(?:=|:)/)?.[1] ?? null;
+}
+
+function redactDiagnostic(line) {
+  return line
+    .replace(/\b(password|passwd|token|api[_-]?key|secret|authorization)\s*([:=])\s*([^\s,;]+)/gi, '$1$2[REDACTED]')
+    .replace(/\bBearer\s+[A-Za-z0-9._~+\/-]+=*/gi, 'Bearer [REDACTED]')
+    .replace(/:\/\/([^:/\s]+):([^@/\s]+)@/g, '://$1:[REDACTED]@');
 }
 
 function ownerFor(kind, file) {
@@ -88,25 +103,87 @@ function actionFor(kind) {
   return actions[kind];
 }
 
+function buildStructuredGraphifyEligibilityPlan(text) {
+  let report;
+  try {
+    report = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (report?.schema !== 'atlas.graphify-current-run-eligibility.v1' || !Array.isArray(report.blockers)) return null;
+
+  const receiptConsistency = report.receiptConsistency ?? {};
+  const details = [
+    `runningRunCount=${report.runningRunCount ?? 'unknown'}`,
+    `staleRunCount=${report.staleRunCount ?? 'unknown'}`,
+    `currentRunCount=${report.currentRunCount ?? 'unknown'}`,
+    `selectedExecutionId=${receiptConsistency.selectedExecutionId ?? 'unknown'}`,
+    `dailyExecutionId=${receiptConsistency.dailyExecutionId ?? 'unknown'}`,
+  ].join('; ');
+
+  return [...new Set(report.blockers)]
+    .filter((gateId) => typeof gateId === 'string' && /^[A-Z][A-Z0-9_]{2,127}$/.test(gateId))
+    .sort()
+    .map((gateId) => {
+      const diagnostic = `GRAPHIFY_LIFECYCLE_BLOCKER=${gateId}; ${details}`;
+      return {
+        fingerprint: sha256(`GRAPHIFY_CURRENT_RUN_ELIGIBILITY|${gateId}`).slice(0, 23),
+        errorCode: null,
+        gateId,
+        kind: 'GRAPH_OR_GPU',
+        file: 'scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs',
+        owner: 'Graphify lifecycle authority',
+        diagnostic: redactDiagnostic(diagnostic).slice(0, 1000),
+        proposedAction: 'Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify or dispatch repairs until eligibility passes.',
+        recommendedMcpTools: ['read_file', 'trace_tool_chain'],
+        status: 'PROPOSED',
+        mutationAllowed: false,
+      };
+    });
+}
+
+function recommendedMcpToolsFor(kind, file) {
+  switch (kind) {
+    case 'GRAPH_OR_GPU':
+      return ['atlas.graph.expand', 'trace_tool_chain', 'read_file'];
+    case 'TYPECHECK_OR_SCHEMA':
+      return ['find_source_refs', 'read_file'];
+    case 'LINEAGE_ADMISSION':
+      return ['find_source_refs', 'trace_database', 'read_file'];
+    case 'RETRIEVAL_OR_PROJECTION':
+      return ['atlas.search', 'build_agentic_rag_context', 'read_file'];
+    case 'DATABASE_SCHEMA':
+      return ['trace_database', 'read_file'];
+    default:
+      return ['read_file'];
+  }
+}
+
 function buildPlan(text) {
+  const structuredPlan = buildStructuredGraphifyEligibilityPlan(text);
+  if (structuredPlan !== null) return structuredPlan;
+
   const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const candidates = [];
   const seen = new Set();
   for (const line of lines) {
-    if (!/(error|fail|warn|TS\d{4}|exception|timeout|does not exist|cannot find|blocked|unproven|missing|ambiguous)/i.test(line)) continue;
+    if (!/(error|fail|warn|TS\d{4}|exception|timeout|stale|does not exist|cannot find|blocked|unproven|partial_proven|not_proven|missing|ambiguous)/i.test(line)) continue;
     const kind = classify(line);
     const file = extractFile(line);
+    const gateId = extractGateId(line);
     const fingerprint = sha256(`${kind}|${extractCode(line) ?? ''}|${file ?? ''}|${line.replace(/\s+/g, ' ').slice(0, 500)}`).slice(0, 23);
     if (seen.has(fingerprint)) continue;
     seen.add(fingerprint);
     candidates.push({
       fingerprint,
       errorCode: extractCode(line),
+      gateId,
       kind,
       file,
       owner: ownerFor(kind, file),
-      diagnostic: line.slice(0, 1000),
+      diagnostic: redactDiagnostic(line).slice(0, 1000),
       proposedAction: actionFor(kind),
+      recommendedMcpTools: recommendedMcpToolsFor(kind, file),
       status: 'PROPOSED',
       mutationAllowed: false,
     });
@@ -188,11 +265,13 @@ async function resolveLlamaModel() {
 const diagnostics = readDiagnostics();
 const candidates = buildPlan(diagnostics);
 const validation = validate ? runValidation() : null;
-const modelResolution = await resolveLlamaModel();
+const modelResolution = offline
+  ? { status: 'SKIPPED_OFFLINE', configuredModel, runtimeModelId: null, reason: 'OFFLINE_MODE' }
+  : await resolveLlamaModel();
 const deterministicBody = {
   schema: 'atlas.agentic-error-fixing.v1',
   inputChecksum: sha256(diagnostics),
-  candidates: candidates.map(({ fingerprint, errorCode, kind, file, owner, proposedAction, status, mutationAllowed }) => ({ fingerprint, errorCode, kind, file, owner, proposedAction, status, mutationAllowed })),
+  candidates: candidates.map(({ fingerprint, errorCode, gateId, kind, file, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ fingerprint, errorCode, gateId, kind, file, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed })),
   validation: validation ? { command: validation.command, exitCode: validation.exitCode, timedOut: validation.timedOut, outputChecksum: validation.outputChecksum } : null,
   modelResolution: {
     status: modelResolution.status,
@@ -201,6 +280,45 @@ const deterministicBody = {
     resolutionSource: modelResolution.resolutionSource ?? null,
   },
 };
+
+async function synthesizePlanWithOrnith(planCandidates, resolvedModel) {
+  if (!resolvedModel.runtimeModelId || resolvedModel.status !== 'PROVEN_RUNTIME') {
+    return { status: 'SKIPPED', reason: 'MODEL_NOT_AVAILABLE', synthesis: null };
+  }
+  const prompt = [
+    `You are the Parent Atlas diagnostic planner. Given these error repair candidates:`,
+    JSON.stringify(planCandidates, null, 2),
+    ``,
+    `Synthesize a grounded, minimal, non-mutating repair advice sequence.`,
+    `Do not invent new files. Preserve existing interfaces and canonical rules.`,
+  ].join('\n');
+
+  try {
+    const res = await fetch(`${resolvedModel.endpoint}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: resolvedModel.runtimeModelId,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.1,
+        max_tokens: 512,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return { status: 'SYNTHESIS_FAILED', reason: `HTTP_${res.status}`, synthesis: null };
+    const data = await res.json();
+    return {
+      status: 'SYNTHESIS_COMPLETE',
+      modelUsed: resolvedModel.runtimeModelId,
+      synthesis: data.choices?.[0]?.message?.content ?? null,
+    };
+  } catch (err) {
+    return { status: 'SYNTHESIS_FAILED', reason: err instanceof Error ? err.message : String(err), synthesis: null };
+  }
+}
+
+const synthesize = args.includes('--synthesize');
+const synthesisResult = synthesize ? await synthesizePlanWithOrnith(deterministicBody.candidates, modelResolution) : null;
 
 const report = {
   ...deterministicBody,
@@ -212,6 +330,7 @@ const report = {
   canonicalAuthority: false,
   validationDetails: validation ? { launchError: validation.launchError, outputExcerpt: validation.outputExcerpt } : null,
   modelResolution,
+  synthesis: synthesisResult,
   deterministicPlanChecksum: sha256(JSON.stringify(deterministicBody)),
   candidateCount: candidates.length,
   nextGate: candidates.length ? 'OPERATOR_REVIEW_THEN_SCOPED_VALIDATION' : 'SUPPLY_DIAGNOSTICS',

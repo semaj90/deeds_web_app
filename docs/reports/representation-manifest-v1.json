@@ -1,0 +1,112 @@
+{
+  "schema": "atlas.representation-manifest.v1",
+  "generatedAt": "2026-10-18T06:47:01.711Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "status": "ALIGNED_AND_FROZEN",
+  "representations": {
+    "canonical": {
+      "representationId": "semantic_768_retrieval_v1",
+      "model": "embeddinggemma:latest",
+      "promptRevision": "eg-task-prefix-v1",
+      "documentPrompt": "title: {relative_path} | text: {content}",
+      "queryPrompt": "task: search result | query: {query}",
+      "dimension": 768,
+      "metric": "cosine",
+      "normalization": "L2_UNIT_NORM",
+      "physicalStorage": {
+        "table": "codebase_chunk_index",
+        "column": "content_embedding",
+        "dataType": "halfvec(768)",
+        "authority": "REPRESENTATION_OWNER_ONLY"
+      }
+    },
+    "challenger": {
+      "representationId": "raw_semantic_768_v1",
+      "model": "embeddinggemma:latest",
+      "promptRevision": "unprompted-v0",
+      "documentPrompt": "{content}",
+      "queryPrompt": "{query}",
+      "dimension": 768,
+      "metric": "cosine",
+      "physicalStorage": {
+        "table": "codebase_chunk_index",
+        "column": "content_embedding_768",
+        "dataType": "vector(768)",
+        "authority": "NONCANONICAL_CHALLENGER"
+      }
+    }
+  },
+  "clusteringTopology": {
+    "activeEvaluationCandidate": {
+      "modelRevision": "mbk-spherical-content768-k256-v2",
+      "storageRow": "atlas_cluster_models:row_6",
+      "algorithm": "Spherical MiniBatch KMeans",
+      "k": 256,
+      "dimension": 768,
+      "seed": 42,
+      "holdoutAgreement": 0.9267,
+      "inertia": 827.73,
+      "vectorContract": "eg-task-prefix-v1",
+      "modelRole": "EVALUATION_CANDIDATE",
+      "isAssignmentActive": false
+    },
+    "historicalBaseline": {
+      "modelRevision": "mbk-spherical-content768-k256-v1",
+      "storageRow": "atlas_cluster_models:row_3",
+      "algorithm": "Spherical MiniBatch KMeans",
+      "k": 256,
+      "dimension": 768,
+      "seed": 42,
+      "fittedPopulation": 52380,
+      "replayAgreement": 0.8125,
+      "compatibilityStatus": "TASK_PREFIX_COMPATIBLE_ONLY"
+    }
+  },
+  "pgvectorHnswContract": {
+    "indexName": "idx_codebase_chunk_index_content768_hnsw",
+    "tableName": "codebase_chunk_index",
+    "column": "content_embedding_768",
+    "opclass": "vector_cosine_ops",
+    "m": 16,
+    "efConstruction": 200,
+    "queryEfSearch": 40,
+    "complexity": "O(log N)"
+  },
+  "qdrantGrpcProjection": {
+    "host": "127.0.0.1",
+    "grpcPort": 6334,
+    "collection": "codebase_chunks_768_v2",
+    "namedVector": "content",
+    "dimension": 768,
+    "serialization": "Protobuf PointStructSchema / UpsertPointsSchema"
+  },
+  "domainTaxonomyGovernance": {
+    "yamlSource": ".okf/domains/atlas-domain-taxonomy.yaml",
+    "schemaSource": ".okf/schemas/domain-taxonomy-v1.schema.json",
+    "topLevelGroupCount": 13,
+    "childGroupCount": 4,
+    "governanceMode": "PROPOSAL_AND_VALIDATION_ONLY"
+  },
+  "graphRagCentrality": {
+    "oracle": "NetworkX CPU Deterministic Interchange Oracle",
+    "metrics": [
+      "PageRank",
+      "CheiRank",
+      "Leiden/Louvain Modularity"
+    ],
+    "executionBoundary": "IN_MEMORY_BOUNDED_LOCAL_SUBGRAPH"
+  },
+  "atenTensorBridge": {
+    "napiAddon": "tensorrt_bridge.node",
+    "tensorType": "at::kFloat",
+    "shape": [
+      "N",
+      768
+    ],
+    "layout": "CONTIGUOUS_ROW_MAJOR",
+    "memoryPool": "Float32Array Pool (90% GC reduction)",
+    "hiddenThoughtsPersisted": false
+  },
+  "manifestChecksum": "sha256:783c63efba62e70288138718e13b8007ed9a832c8d342c5121a0590217e86a16"
+}

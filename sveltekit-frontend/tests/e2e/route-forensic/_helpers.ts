@@ -18,8 +18,10 @@ export const BASE = PORTS.APP_BASE;
 
 // Port 5434 = deeds-postgres-prod-proxy → legal-ai-postgres container.
 // Port 5432 on the host is squatted by a native Windows Postgres.
+const DB_PASS = process.env.POSTGRES_PASSWORD ?? process.env.PGPASSWORD ?? '';
 const DB_URL =
-	process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+	process.env.DATABASE_URL ||
+	`postgresql://legal_admin${DB_PASS ? `:${DB_PASS}` : ''}@127.0.0.1:5434/legal_ai_db`;
 
 let _pool: pg.Pool | null = null;
 function pool(): pg.Pool {

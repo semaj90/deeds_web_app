@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.function-discovery-readback.v1",
+  "status": "PROJECTION_REVISION_MISMATCH",
+  "query": "getErrorClustering",
+  "sourceBindings": {
+    "audit": "sha256:c4da207f1d68cb4044a8213f3a77a900b69e423aaea579e5ae8be87f28a50a0d",
+    "readbackVerifier": "sha256:3ceb9c08c9292b3485c63f8620099f6276924b7734022e727ddcca656a44f584",
+    "query": "sha256:072f46e7ef48acdc123aeb81f4680a8c3624325777bdb60703960f4e087eb5d3",
+    "qualifier": "sha256:f6a98d33b45eb6b94133d63230ded32069eff437e0184e7b735a3f03ee0f9fc3",
+    "pathPolicy": "sha256:daf746dd3506d4fd98c356d78f60415491f8402bfb514b23dbd1f7527f9961d9"
+  },
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "limit": 1,
+  "candidateCount": 1,
+  "candidates": [
+    {
+      "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444"
+    }
+  ],
+  "readback": [
+    {
+      "symbol_version_id": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "projection_source_revision": "1bb240fb20f1d4ba5651d8a4da9a10c9d6337aaf",
+      "projection_workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "projection_producer_revision": "atlas-ast-symbol-version-materializer-v1",
+      "projection_updated_at": "2026-08-30T04:10:31.796Z",
+      "canonical_source_revision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "canonical_workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "canonical_producer_revision": "atlas-ast-symbol-version-materializer-v1",
+      "registry_status": "active"
+    }
+  ],
+  "projectionRevisionDifferenceCount": 1,
+  "projectionReadbackVerified": false,
+  "canonicalReadbackVerified": true,
+  "qualificationRequested": true,
+  "astDiagnostics": [
+    {
+      "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "upstreamNodeId": "3561bb301bdf5dcab4a7134afd843fb78da32acb",
+      "qualifiedName": "export_statement::function_declaration::getErrorClustering",
+      "signatureNormalized": null,
+      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts",
+      "byteStart": 979,
+      "byteEnd": 1154,
+      "bindingCount": 1,
+      "astObservationCount": 1,
+      "observedNodeIds": [
+        "3561bb301bdf5dcab4a7134afd843fb78da32acb"
+      ],
+      "observedNames": [
+        "export_statement::function_declaration::getErrorClustering"
+      ]
+    }
+  ],
+  "snapshotOutcomes": [
+    {
+      "schema": "atlas.function-registry-load-receipt.v1",
+      "symbolVersionId": "symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+      "sourceRevision": "sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "packetKey": "packet:804cec79a65c",
+      "treeNodeId": "3561bb301bdf5dcab4a7134afd843fb78da32acb",
+      "sourceContentHash": "efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444",
+      "snapshotChecksum": "242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091",
+      "qualificationOutcome": "QUALIFIED",
+      "rejectionReason": null,
+      "evidenceRefs": [
+        "atlas_symbol_versions:symbol-version:0c6919c323dfd1c95920a33679764d0b32f19a645c1ec2198ebbc773294781c7",
+        "atlas_ast_nodes:3561bb301bdf5dcab4a7134afd843fb78da32acb",
+        "atlas_packets:packet:804cec79a65c",
+        "atlas_workspace_source_bindings:sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts:sha256:efd35051d50fc241012b1f17d043199974294dd6aadfbd87409056aa5a599444:sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      ],
+      "receiptChecksum": "a4446d0853377ccf22f2df639b948e0ff82a3d4bc963066ba428bf4f5682be02"
+    }
+  ],
+  "sourceBytesVerified": true,
+  "registrySnapshotQualified": true,
+  "contextManifestAdmitted": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

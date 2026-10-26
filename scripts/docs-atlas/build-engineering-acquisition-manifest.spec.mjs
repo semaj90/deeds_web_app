@@ -37,3 +37,31 @@ test('rejects non-primary catalogs and non-HTTPS sources', () => {
 	assert.throws(() => buildEngineeringAcquisitionManifestV1(base, { outputRoot: 'C:/temp/out' }), /HTTPS_REQUIRED/);
 	assert.throws(() => buildEngineeringAcquisitionManifestV1({ ...base, rules: { officialSourcesOnly: false } }, { outputRoot: 'C:/temp/out' }), /NOT_REVIEWED_PRIMARY_ONLY/);
 });
+
+test('selects only requested source IDs and rejects unknown IDs', async () => {
+	const catalog = JSON.parse(await readFile(catalogPath, 'utf8'));
+	const manifest = buildEngineeringAcquisitionManifestV1(catalog, {
+		outputRoot: 'C:/temp/engineering-acquisition-test',
+		fetcher: 'BEAUTIFULSOUP_HTTP',
+		maximumPagesPerSource: 2,
+		sourceIds: ['langfuse-opentelemetry', 'mastra-tracing-agents', 'opentelemetry-javascript'],
+		outputPrefix: 'docs/.okf/engineering-acquisition/utf8-v2',
+	});
+	assert.deepEqual(manifest.sources.map((source) => source.source_id), [
+		'langfuse-opentelemetry', 'mastra-tracing-agents', 'opentelemetry-javascript',
+	]);
+	assert.equal(manifest.sources.reduce((count, source) => count + source.pages.length, 0), 4);
+	assert.ok(manifest.sources.every((source) => source.output_namespace.startsWith('docs/.okf/engineering-acquisition/utf8-v2/')));
+	assert.throws(() => buildEngineeringAcquisitionManifestV1(catalog, {
+		outputRoot: 'C:/temp/engineering-acquisition-test',
+		sourceIds: ['not-in-catalog'],
+	}), /UNKNOWN_SOURCE_ID/);
+	assert.throws(() => buildEngineeringAcquisitionManifestV1(catalog, {
+		outputRoot: 'C:/temp/engineering-acquisition-test',
+		sourceIds: [],
+	}), /SOURCE_IDS_REQUIRED/);
+	assert.throws(() => buildEngineeringAcquisitionManifestV1(catalog, {
+		outputRoot: 'C:/temp/engineering-acquisition-test',
+		outputPrefix: 'docs/.okf/../outside',
+	}), /OUTPUT_PREFIX_MUST_STAY_UNDER_DOCS_OKF/);
+});

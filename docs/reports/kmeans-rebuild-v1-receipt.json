@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.kmeans-rebuild.v1",
+  "generatedAt": "2026-10-18T03:07:50.393483+00:00",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "gpuUsed": false,
+  "hardwareNote": "Fitted entirely on CPU; RTX 3060 Ti VRAM preserved for llama-server :8090",
+  "trainingCohort": {
+    "totalChunks": 3000,
+    "trainChunks": 2400,
+    "testChunks": 600,
+    "previouslyClustered": 2866,
+    "previouslyUnclustered": 134,
+    "embeddingRecipe": "eg-task-prefix-v1",
+    "dimensions": 768
+  },
+  "modelMetrics": {
+    "k": 256,
+    "modelVersion": "mbk-spherical-content768-k256-v2",
+    "fitDurationSeconds": 82.3,
+    "inertia": 827.73,
+    "holdoutAgreement": 0.9267,
+    "historicalJulyAgreement": 0.0101,
+    "clusterBalance": {
+      "min": 1,
+      "median": 9,
+      "max": 52,
+      "emptyClusters": 0
+    },
+    "routingMargin": {
+      "p10": 0.0193,
+      "median": 0.0801,
+      "p90": 0.1845,
+      "ambiguousShareMarginBelow002": 0.1037
+    }
+  },
+  "artifacts": {
+    "centroidsJson": {
+      "path": ".tmp/atlas/kmeans-v2/k256-v2-centroids.json",
+      "sha256": "sha256:58d6db30f30fc8883599cb8dd25996a8a7da4466116360e03e68f4fab3c7392d"
+    },
+    "unclusteredAssignmentsNdjson": {
+      "path": ".tmp/atlas/kmeans-v2/unclustered-2789-proposed-assignments.ndjson",
+      "assignedCount": 134,
+      "sha256": "sha256:16a034653e16c1e149027207cae497f1871957aabc45727184882959d9fa7a75"
+    }
+  },
+  "status": "REBUILD_PROVEN_READY_FOR_ADMISSION",
+  "checksum": "sha256:348ec59fbca48bcaac09154573080adc34ff79e15ab7a9f2e5f99fe46b802509"
+}

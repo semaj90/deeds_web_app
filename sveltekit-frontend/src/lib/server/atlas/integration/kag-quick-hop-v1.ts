@@ -46,6 +46,19 @@ export interface KagQuickHopReceiptV1 {
   checksum: string;
 }
 
+export function quickHopEvidenceByTargetV1(paths: readonly KagQuickHopPathV1[]): Map<string, string[]> {
+  const evidenceByTarget = new Map<string, Set<string>>();
+  for (const path of paths) {
+    if (!path.toCanonicalId.trim() || !path.hyperedgeId.trim()) continue;
+    const evidence = evidenceByTarget.get(path.toCanonicalId) ?? new Set<string>();
+    evidence.add(path.hyperedgeId);
+    evidenceByTarget.set(path.toCanonicalId, evidence);
+  }
+  return new Map([...evidenceByTarget.entries()]
+    .sort(([left], [right]) => compare(left, right))
+    .map(([target, evidence]) => [target, [...evidence].sort(compare)]));
+}
+
 export interface KagQuickHopReaderV1 {
   readHyperedges(canonicalIds: readonly string[], snapshot: { workspaceRevision: string; graphRevision: string }): Promise<HyperedgeV1[]>;
 }
@@ -53,8 +66,8 @@ export interface KagQuickHopReaderV1 {
 /** Production composition point. Construction is side-effect free; the caller
  * still supplies the revision pair and decides when a governed traversal runs. */
 export async function createPostgresKagQuickHopReaderV1(): Promise<KagQuickHopReaderV1> {
-  const { readKagHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
-  return { readHyperedges: readKagHyperedgesStrictV1 };
+  const { readKagCodeHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+  return { readHyperedges: readKagCodeHyperedgesStrictV1 };
 }
 
 const text = (value: string, name: string) => {

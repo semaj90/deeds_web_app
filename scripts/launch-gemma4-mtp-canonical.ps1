@@ -36,16 +36,22 @@ Write-Host ""
 # ── Validate and consolidate drafters ──────────────────────────────────────
 Write-Host "Checking MTP drafter models..." -ForegroundColor Yellow
 
+$modeCPath = if (Test-Path "$repoRoot\models\atlas-gemma4-e4b-assistant\mtp-f16\atlas-gemma4-e4b-assistant-mtp-f16.gguf") {
+  "$repoRoot\models\atlas-gemma4-e4b-assistant\mtp-f16\atlas-gemma4-e4b-assistant-mtp-f16.gguf"
+} else {
+  "$repoRoot\.tmp\atomic-mtp\gemma-4-E4B-it-assistant.Q4_K_M.gguf"
+}
+
 $drafterPaths = @{
   "C" = @{
-    path = "$repoRoot\.tmp\atomic-mtp\gemma-4-E4B-it-assistant.Q4_K_M.gguf"
-    size_gb = 0.075
-    name = "Gemma4 E4B Assistant Q4_K_M (Mode C, 75MB)"
+    path = $modeCPath
+    size_gb = 0.17
+    name = "Gemma4 E4B Assistant MTP F16 (Mode C, 171MB)"
   }
   "B" = @{
     path = "$repoRoot\models\gemma4-e2b-rotorquant-iq4xs\gemma-4-E2B-it-RotorQuant-IQ4_XS.gguf"
-    size_gb = 3.1
-    name = "Gemma4 E2B IQ4_XS (Mode B, 3.1GB)"
+    size_gb = 3.31
+    name = "Gemma4 E2B IQ4_XS (Mode B, 3.31GB)"
   }
 }
 
@@ -78,10 +84,21 @@ if (Test-Path $unsloth) {
 Write-Host ""
 Write-Host "Environment Setup:" -ForegroundColor Yellow
 
-$env:TURBO_MODEL_PATH = "$repoRoot\models\gemma4-legal-iq4xs-direct.gguf"
+if (-not $env:TURBO_MODEL_PATH) {
+  $env:TURBO_MODEL_PATH = "$repoRoot\models\ornith-1_5-9b-ad-q5_k-q4_k\hforf.gguf"
+}
 $env:TURBO_PORT = "8090"
 $env:TURBO_CTX = "65536"
 $env:TURBO_NGL = "99"
+
+# ── Dimension & Architecture Compatibility Guard ───────────────────────────
+if ($DrafterMode -ne "disabled" -and ($env:TURBO_MODEL_PATH -match 'ornith|hforf|qwen')) {
+  Write-Host "⚠️  MTP drafter Mode '$DrafterMode' is a Gemma4 drafter." -ForegroundColor Yellow
+  Write-Host "   Base model is Ornith (Qwen 3.5 architecture, dim=4096)." -ForegroundColor Yellow
+  Write-Host "   MTP speculative decoding requires matching target backbone architecture and dimension." -ForegroundColor Yellow
+  Write-Host "   Falling back to target-only mode (DrafterMode='disabled')." -ForegroundColor Yellow
+  $DrafterMode = "disabled"
+}
 
 # ── Wire AtomicBot binary for MTP support ──────────────────────────────────
 $atomicbotPath = "$repoRoot\.tmp\atomic-mtp\bin\build\bin\llama-server.exe"
@@ -132,11 +149,16 @@ $templateSize = (Get-Item $templatePath).Length
 Write-Host "✓ Template found: custom_pub_chat_template_gemma4.jinja ($([math]::Round($templateSize/1KB, 1))KB)" -ForegroundColor Green
 Write-Host "  Features: system_role, tool_calls, thinking, null handling" -ForegroundColor DarkGreen
 
-# ── Stop existing servers ──────────────────────────────────────────────────
+# ── Stop existing servers gracefully ───────────────────────────────────────
 Write-Host ""
-Write-Host "Starting server..." -ForegroundColor Yellow
+Write-Host "Checking for existing servers..." -ForegroundColor Yellow
 
-Get-Process llama-server -ErrorAction SilentlyContinue | Stop-Process -Force 2>&1 | Out-Null
+$runningLlama = Get-Process llama-server -ErrorAction SilentlyContinue
+if ($runningLlama) {
+  Write-Host "Gracefully stopping existing llama-server process (PID: $($runningLlama.Id))..." -ForegroundColor Yellow
+  $runningLlama | Stop-Process -ErrorAction SilentlyContinue
+  Start-Sleep -Seconds 2
+}
 Start-Sleep -Seconds 2
 
 # ── Launch via canonical script ───────────────────────────────────────────
@@ -158,7 +180,7 @@ Write-Host "Validating template and tool support..." -ForegroundColor Yellow
 
 $testUrl = "http://127.0.0.1:8090/v1/chat/completions"
 $testPayload = @{
-  model = "gemma4-legal-iq4xs-direct.gguf"
+  model = "ornith-1.5-9b"
   messages = @(
     @{ role = "system"; content = "Reply exactly: SYSTEM_OK" }
     @{ role = "user"; content = "test" }
@@ -187,7 +209,7 @@ try {
 Write-Host "Testing tool-calling support..." -ForegroundColor Yellow
 
 $toolPayload = @{
-  model = "gemma4-legal-iq4xs-direct.gguf"
+  model = "ornith-1.5-9b"
   messages = @(
     @{ role = "user"; content = "Use the test_tool to get info" }
   )

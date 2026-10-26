@@ -1,0 +1,100 @@
+{
+ "schema": "atlas.som-20x20-provenance-audit.v1",
+ "generatedAt": "2026-10-17",
+ "readOnly": true,
+ "writesPerformed": false,
+ "gpuInitialized": false,
+ "canonicalAuthority": false,
+ "steps": {
+  "1_writer_of_som_cell_xy_and_revision": {
+   "status": "BLOCKED",
+   "finding": "No script was found that sets atlas_packets.som_cell_x/som_cell_y. Columns are plain integers (no default, not generated, no triggers). som_distance defaults to 0.0. som_revision is set on 1 packet only.",
+   "candidateWriters": {
+    "graphify-cluster-sync-partition.mjs": "scripts/atlas/graphify-cluster-sync-partition.mjs:232-244 (sha256(packet_key) % cells -> som_row/som_col; comment: heuristic, real BMU should use 768d)",
+    "backfill-neo4j-packet-som-from-canonical.mjs": "scripts/atlas/backfill-neo4j-packet-som-from-canonical.mjs:72-73,87 ((community_id | hash(feature_id)) % 400 as som_cluster)",
+    "normalize-qdrant-payloads": "scripts/atlas/normalize-qdrant-payloads-gate3-fixed.mjs:57-58,84-85 and -session-76.mjs:61-62 (idx/20, idx%20)",
+    "train-som-20x20.mjs": "scripts/atlas/train-som-20x20.mjs:351,379,408 (UPDATE atlas_packets som_row/som_col/som_index from BMU; trains on latent_64)",
+    "enrich-qdrant-som-payload.mts": "scripts/atlas/enrich-qdrant-som-payload.mts:101 (som_cell_x: row.som_row -- Qdrant payload mirror)"
+   }
+  },
+  "2_generation_method": {
+   "status": "PARTIAL",
+   "finding": "som_cell_x/y: exactly equal-count bins (145-146 per cell), inconsistent with trained BMUs and with hash placement; method unproven. som_row/col: 342 cells, 1..19,095 per cell, mixture of writers. The two pairs agree on 165 of 58365 rows."
+  },
+  "3_trained_prototypes": {
+   "status": "PARTIAL",
+   "finding": "models/som/som_20x20_codebook.json: 400 prototypes, latent_dim 64 (NOT 768), 50 iterations, native-cuda, 2026-07-28. som_assignments.json: 32,310 packets, 388 cells. 0 of 32,310 packet_ids exist in current atlas_packets. Source embedding revision / training receipt not found.",
+   "paths": [
+    "models/som/som_20x20_codebook.json",
+    "models/som/som_assignments.json"
+   ]
+  },
+  "4_purity_nmi_null": {
+   "status": "PASS",
+   "results": [
+    {
+     "assignment": "som_cell_x/y",
+     "packets": 58365,
+     "cells": 400,
+     "distinctDomains": 25,
+     "perCellMin": 145,
+     "perCellMax": 146,
+     "weightedPurity": 0.1443,
+     "unweightedMeanPurity": 0.1443,
+     "majorityClassBaseline": 0.1322,
+     "majorityClass": "Graph",
+     "shuffledNullWeightedPurityMean": 0.1436,
+     "shuffledNullWeightedPurityMax": 0.1448,
+     "mutualInformationNats": 0.0755,
+     "NMI": 0.0173,
+     "shuffledNullNMIMean": 0.0175,
+     "shuffledNullNMIMax": 0.0181
+    },
+    {
+     "assignment": "som_row/col",
+     "packets": 61660,
+     "cells": 342,
+     "distinctDomains": 41,
+     "perCellMin": 1,
+     "perCellMax": 19095,
+     "weightedPurity": 0.3236,
+     "unweightedMeanPurity": 0.4748,
+     "majorityClassBaseline": 0.1251,
+     "majorityClass": "Graph",
+     "shuffledNullWeightedPurityMean": 0.1315,
+     "shuffledNullWeightedPurityMax": 0.1325,
+     "mutualInformationNats": 0.7257,
+     "NMI": 0.2518,
+     "shuffledNullNMIMean": 0.0186,
+     "shuffledNullNMIMax": 0.0189
+    }
+   ]
+  },
+  "5_vocabulary": {
+   "status": "PARTIAL",
+   "finding": "atlas_packets.domain_class has 41 distinct values; 8 are ontology group_ids, 33 are legacy. No silent mapping applied; see docs/reports/domain-crosswalk-proposal-v1.json.",
+   "rowsInOntologyVocabulary": 23616,
+   "rowsInLegacyVocabulary": 38102
+  },
+  "6_quantization_topographic_neighborhood": {
+   "status": "BLOCKED",
+   "finding": "Needs revision-qualified source vectors that match the codebook space (64-d latent from the July autoencoder). Current latent_64 exists for 1,703 chunks only, from an autoencoder the repo records as untrained; old packet_ids do not join. Not computed."
+  },
+  "7_pg_owners": {
+   "status": "PASS",
+   "finding": "atlas_packets.som_* (9 columns), codebase_chunk_index.som_bmu_row/som_bmu_col/som_cluster, table som_adjacency_matrix, feature_statistics.som_cell_x/y (drizzle 0102). No revision-qualified SOM projection table exists; the drafted atlas_som_projection_v1 is a proposal only."
+  },
+  "8_recommendation": {
+   "status": "PASS",
+   "recommendation": "Keep the existing grid only as a labelled visualization (not routing). Use the existing KMeans K=256 assignments (weighted domain purity 0.674 on 52,380 chunks) for coarse routing. Rebuild a genuinely trained SOM on validated semantic_768, with stamped som_revision and a training receipt, only after the 768 recipe decision. Do not promote ACE packets keyed by the current cells."
+  }
+ },
+ "restrictionsHonored": [
+  "no database updates",
+  "no SOM retraining",
+  "no GPU initialization",
+  ":8090 not stopped",
+  "no stale ACE packet promotion"
+ ],
+ "receiptChecksum": "sha256:9adfa9814c91bc385598653d13a18322fb38136a3aed4e3a483a7f46c3ec108a"
+}

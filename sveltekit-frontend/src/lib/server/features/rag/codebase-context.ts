@@ -18,18 +18,16 @@
  *             Chunks that appear in error-vector results are promoted in the final ranking.
  */
 import Fuse from 'fuse.js';
+import { building } from '$app/environment';
 import { ENV } from '$lib/server/env.server.js';
-import { SERVER_CHAT_MODEL, SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithCrossEncoder } from '$lib/server/retrieval/cross-encoder-reranker.js';
 import { logRagHitWithTopology } from '$lib/server/indexer/ast-ingest-logger.js';
-import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
+import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import {
-  getCachedEmbedding,
   getCachedSearchResults,
-  setCachedEmbedding,
   setCachedSearchResults,
 } from '$lib/server/knowledge-cache.js';
 
@@ -100,6 +98,7 @@ export interface RankedChunk {
 let metadataCache: ChunkMetadata[] = [];
 let fuseIndex: Fuse<ChunkMetadata> | null = null;
 let lastRefresh = 0;
+let refreshPromise: Promise<void> | null = null;
 const REFRESH_INTERVAL = 5 * 60 * 1000;
 
 const SCROLL_PAGE_SIZE = 1000;
@@ -113,9 +112,21 @@ const SCROLL_PAYLOAD_FIELDS = [
 const SCROLL_TOTAL_DEADLINE_MS = 20_000;
 
 export async function refreshMetadataCache(): Promise<void> {
+  if (building) return;
   const now = Date.now();
+  if (refreshPromise) return refreshPromise;
   if (fuseIndex && now - lastRefresh < REFRESH_INTERVAL) return;
 
+  const pendingRefresh = performMetadataRefresh();
+  refreshPromise = pendingRefresh;
+  try {
+    await pendingRefresh;
+  } finally {
+    refreshPromise = null;
+  }
+}
+
+async function performMetadataRefresh(): Promise<void> {
   try {
     const points: Array<{ payload: Record<string, unknown> }> = [];
     let offset: string | number | null = null;
@@ -170,7 +181,7 @@ export async function refreshMetadataCache(): Promise<void> {
       minMatchCharLength: 2,
     });
 
-    lastRefresh = now;
+    lastRefresh = Date.now();
   } catch (err) {
     console.error('[codebase-context] Failed to refresh metadata cache:', err);
   }
@@ -267,25 +278,11 @@ function isValidEmbedding(value: unknown): value is number[] {
 
 async function embedQuery(text: string): Promise<number[]> {
   const prompt = text.trim() || text;
-  const cached = await getCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL).catch(() => null);
-  if (isValidEmbedding(cached)) {
-    return cached;
+  const result = await generateEmbeddings([prompt], { taskMode: 'unprompted_legacy' });
+  const embedding = result.vectors[0];
+  if (!isValidEmbedding(embedding)) {
+    throw new Error('CODEBASE_CONTEXT_SEMANTIC_768_VECTOR_INVALID');
   }
-
-  const embeddingFetch: typeof fetch = (input, init) => ollamaFetch(String(input), init);
-  const { embedding } = await executeProviderEmbeddingV1({
-    text: prompt,
-    mode: 'unprompted_legacy',
-    provider: {
-      provider: 'ollama',
-      baseUrl: ENV.OLLAMA_BASE_URL,
-      modelId: SERVER_EMBEDDING_MODEL,
-    },
-    timeoutMs: 15_000,
-    keepAlive: '24h',
-    fetchImpl: embeddingFetch,
-  });
-  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, embedding).catch(() => {});
   return embedding;
 }
 
@@ -883,8 +880,3 @@ export async function searchCodebaseByCluster(
     })
   );
 }
-
-// -- Eager pre-warm on first import ------------------------------------------
-refreshMetadataCache().catch(() => {
-	/* Qdrant may not be ready at startup -- first search will retry */
-});

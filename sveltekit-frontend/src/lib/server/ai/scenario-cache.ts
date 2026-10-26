@@ -144,7 +144,7 @@ import { scenarioCache } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 import { getRedis } from '$lib/server/redis.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import crypto from 'crypto';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -165,7 +165,7 @@ function getQueryHash(query: string): string {
 
 async function embedQuery(query: string): Promise<number[] | null> {
   try {
-    const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+    const res = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),

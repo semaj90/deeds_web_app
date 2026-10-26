@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.domain-crosswalk-fixture-readback.v1",
+  "status": "PROPOSAL_ONLY_REVIEW_REQUIRED",
+  "sourceCapture": {
+    "sourceRef": "https://huggingface.co/google/embeddinggemma-2/raw/main/README.md",
+    "localPath": "docs/.okf/embeddinggemma2/hf-README.md",
+    "sourceDigest": "sha256:b677a0ee2818c36f091b65fd3d9b4baea9f04d53b02b49cae916c74bf9682037",
+    "groundedText": "retrieval-augmented generation (RAG)",
+    "charSpan": [1621, 1657],
+    "utf8ByteSpan": [1625, 1661],
+    "spanVerified": true,
+    "workspaceRevision": null,
+    "sourceAuthorization": "NOT_ESTABLISHED"
+  },
+  "taxonomySnapshot": {
+    "sourceOwner": "postgresql18.public.atlas_domain_ontology",
+    "sourceTaxonomyRevision": "sha256:2cd1f71d88141fd29d7f3e84169e9967d55beaeafde91d446a9f4e69bbebf8c0",
+    "ontologyRevision": "sha256:179f022f668d7f7a276a73e90cdfcb5d29cfa681cef8f0f3ad19721853e24e3e",
+    "rowCount": 17,
+    "parentEdgeCount": 4,
+    "canonicalAuthority": false
+  },
+  "oaklibSearch": {
+    "producerRevision": "miniforge-nlp-sidecar-v2:sha256:42955b4c5e34a24737d8897214b562c86383091dcc1bed15a980065c047c4a61",
+    "rawTermResults": {
+      "retrieval": [],
+      "search": []
+    },
+    "preferredLabelSearch": "Information Retrieval",
+    "candidate": {
+      "candidateId": "oaklib-concept-candidate:3f88c94d8e4de6dae27d6f3b12ce72d8",
+      "externalId": "ATLAS-DOMAIN:retrieval",
+      "label": "Information Retrieval",
+      "status": "PROPOSED"
+    },
+    "crosswalkOutcome": "REVIEW_REQUIRED",
+    "tupleCreated": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "liveDeployment": {
+    "port": 8095,
+    "oaklibSearchRouteDeployed": false
+  },
+  "receiptChecksum": "sha256:857168c395dae535de1e3aa876a92bb240a4203471f3a1e7270cd26bb44d7aea"
+}

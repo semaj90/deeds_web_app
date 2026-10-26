@@ -3,9 +3,42 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { classifyInspectRef, findSourceRefs, buildAgenticRagContext, buildAgenticRagContextLive, buildLiveAtlasContext, callTraceTool, buildCodebaseFileLookupKeys, collapseDependencyRows, findDependencies } from './atlas-tools-mcp.mjs';
+import {
+  classifyInspectRef,
+  findSourceRefs,
+  buildAgenticRagContext,
+  buildAgenticRagContextLive,
+  buildLiveAtlasContext,
+  callTraceTool,
+  buildCodebaseFileLookupKeys,
+  collapseDependencyRows,
+  findDependencies,
+  validateToolCallArguments,
+  dispatch,
+} from './atlas-tools-mcp.mjs';
 
 const ROOT = 'C:/Users/james/Videos/deeds-web-app';
+
+test('MCP call arguments are validated against the exact schema advertised by tools/list', async () => {
+  assert.equal(validateToolCallArguments('classify_intent', { prompt: 'repair this error' }).valid, true);
+  assert.equal(validateToolCallArguments('classify_intent', {}).valid, false);
+  assert.equal(validateToolCallArguments('classify_intent', { prompt: 'repair', unexpected: true }).valid, false);
+  assert.equal(validateToolCallArguments('find_source_refs', {}).valid, true);
+
+  const invalidCall = await dispatch('tools/call', {
+    name: 'record_outcome',
+    arguments: { intent: 'repair' },
+  }, 1);
+  assert.equal(invalidCall.isError, true);
+  assert.match(invalidCall.content[0].text, /Invalid arguments for record_outcome/);
+
+  const validCall = await dispatch('tools/call', {
+    name: 'classify_intent',
+    arguments: { prompt: 'repair this TypeScript error' },
+  }, 2);
+  assert.equal(validCall.isError, undefined);
+  assert.equal(JSON.parse(validCall.content[0].text).intent, 'repair');
+});
 
 test('every input form of one file resolves to the same canonical key', () => {
   const forms = [
@@ -293,10 +326,24 @@ test('a packet content checksum does not satisfy source revision, and proofUsabl
 });
 
 test('only an explicit source revision field removes MISSING_SOURCE_REVISION', async () => {
-  const sourcePacket = { ...packet('packet:aaa', 'src/a.ts', 'abc123'), source_revision: 'sha256:source-v1' };
+  const sourcePacket = {
+    ...packet('packet:aaa', 'src/a.ts', 'abc123'),
+    source_revision: 'sha256:source-v1',
+    workspace_revision: 'sha256:workspace-v1',
+    byte_start: 12,
+    byte_end: 32,
+  };
   const trace = fakeTrace({ 'atlas.query': () => [hit('c1', 'src/a.ts', 0.5)], 'atlas.packet_search': () => ({ packets: [sourcePacket] }) });
   const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
   assert.ok(!result.cards[0].rejectionReasons.includes('MISSING_SOURCE_REVISION'));
+  assert.deepEqual(result.cards[0].packetBindings, [{
+    packetKey: 'packet:aaa',
+    sourceRevision: 'sha256:source-v1',
+    workspaceRevision: 'sha256:workspace-v1',
+    sha256: 'abc123',
+    byteStart: 12,
+    byteEnd: 32,
+  }]);
   assert.equal(result.cards[0].proofUsable, false);
 });
 
@@ -413,13 +460,14 @@ test('classifyInspectRef separates paths, packet keys, names and empties', () =>
 });
 
 test('a path resolves to exactly one packet and is identity-bound but revision-unqualified', async () => {
-  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts')] }) });
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { workspace_revision: 'sha256:workspace-v1' })] }) });
   const result = await findSourceRefs({ query: 'sveltekit-frontend/src/a.ts' }, { trace });
   assert.equal(trace.calls[0].args.source_ref, 'src/a.ts'); // the canonical workspace-relative form is what is searched
   const [item] = result.inspected;
   assert.equal(item.status, 'IDENTITY_BOUND');
   assert.deepEqual(item.packetKeys, ['packet:aaa']);
   assert.equal(item.packets[0].summary, 'a summary'); // whitespace collapsed
+  assert.equal(item.packets[0].workspaceRevision, 'sha256:workspace-v1');
   assert.equal(result.provenance.authority, 'atlas_packets_via_trace');
   assert.equal(result.provenance.status, 'IDENTITY_BOUND_REVISION_UNQUALIFIED');
   assert.equal(result.provenance.graphRevision, null);

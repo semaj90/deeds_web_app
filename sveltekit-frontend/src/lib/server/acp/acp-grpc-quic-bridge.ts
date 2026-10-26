@@ -1,18 +1,16 @@
 // @ts-nocheck — gRPC types are complex and version-dependent
 /**
- * ACP/A2A gRPC + QUIC Integration Bridge
+ * ACP/A2A gRPC transport metadata and channel helpers
  *
- * Wires gRPC proto definitions into the Agent Communication Protocol (ACP)
- * and Agent-to-Agent (A2A) discovery system with QUIC transport fallback.
+ * Describes gRPC proto boundaries for ACP/A2A discovery. QUIC/HTTP3 remains
+ * disabled until an applicable listener and end-to-end transport are verified.
  *
  * Architecture:
- *   ACP Tool Registry (canonical) → gRPC ServicePort binding → HTTP2 / QUIC
- *   A2A Agent Discovery (.well-known/agent.json) → ServicePorts → QUIC negotiation
+ *   ACP Tool Registry (canonical) → gRPC ServicePort binding → HTTP/2
+ *   A2A Agent Discovery (.well-known/agent.json) → typed ServicePort metadata
  *
- * Transport Tiers (fallback order):
- *   1. QUIC (:443+alt-svc)  — UDP multiplexing, connection migration
- *   2. HTTP/2 gRPC (:50051-57) — TCP with multiplexed streams
- *   3. HTTP/1.1 REST (:8090-8100) — JSON fallback for legacy clients
+ * QUIC/HTTP3 advertisement is fail-closed; this module does not implement
+ * transport negotiation or HTTP fallback.
  *
  * Proto Coverage:
  *   - embedding.proto → EmbeddingService :50051
@@ -22,8 +20,8 @@
  *   - codeintel.proto → CodeIntelService (traversal)
  */
 
-import { credentials, status } from '@grpc/grpc-js';
-import type { ChannelCredentials, Channel, Client, ClientDuplexStream, ClientReadableStream } from '@grpc/grpc-js';
+import { Client, credentials } from '@grpc/grpc-js';
+import type { Channel } from '@grpc/grpc-js';
 import { z } from 'zod';
 
 // ─────────────────────────────────────────────────────────────────────
@@ -88,7 +86,7 @@ export const A2AServicePortSchema = z.object({
   serviceName: z.string(), // Full proto service path
   methods: z.array(z.string()),
   tls: z.boolean().default(false),
-  quicEnabled: z.boolean().default(true),
+  quicEnabled: z.boolean().default(false),
   altSvc: z.string().optional(), // Alt-Svc header for QUIC: "h3=\":443\""
 });
 
@@ -108,67 +106,36 @@ interface ACPChannelConfig {
 }
 
 class ACPGrpcChannelPool {
-  private channels = new Map<string, Channel>();
+  private channels = new Map<string, { serviceId: string; client: Client; channel: Channel }>();
   private defaultHost = '127.0.0.1';
-  private defaultTimeoutMs = 30000;
 
   /**
-   * Get or create a gRPC channel for a service.
-   * Falls back to HTTP if gRPC unavailable.
+   * Get or create a lazy gRPC channel for a service.
+   * Transport fallback is selected by the caller, not this channel pool.
    */
   async getChannel(serviceId: string, config: ACPChannelConfig): Promise<Channel> {
-    const key = `${config.host || this.defaultHost}:${config.port}`;
+    const host = config.host || this.defaultHost;
+    const key = `${serviceId}\u0000${host}:${config.port}\u0000${config.tls ? 'tls' : 'insecure'}`;
 
     if (this.channels.has(key)) {
-      return this.channels.get(key)!;
+      return this.channels.get(key)!.channel;
     }
 
-    const host = config.host || this.defaultHost;
     const grpcCredentials = config.tls
       ? credentials.createSsl()
       : credentials.createInsecure();
-
-    // Note: gRPC Channel creation is service-specific in grpc-js v1+
-    // Clients are created directly with credentials and address
     const address = `${host}:${config.port}`;
-
-    // Probe connectivity (non-blocking)
-    try {
-      const state = await Promise.race([
-        new Promise((resolve) => {
-          const checkState = () => {
-            const s = channel.getConnectivityState(true);
-            if (s === 3) { // READY
-              resolve(true);
-            } else {
-              setTimeout(checkState, 100);
-            }
-          };
-          checkState();
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000)),
-      ]);
-    } catch {
-      console.warn(`[ACP] gRPC :${config.port} unavailable (fallback to HTTP)`);
-    }
-
-    this.channels.set(key, channel);
+    const client = new Client(address, grpcCredentials);
+    const channel = client.getChannel();
+    this.channels.set(key, { serviceId, client, channel });
     return channel;
   }
 
   close(serviceId?: string) {
-    if (serviceId) {
-      // Find and close channels for this service
-      for (const [key, ch] of this.channels.entries()) {
-        this.channels.delete(key);
-        ch.close();
-      }
-    } else {
-      // Close all
-      for (const ch of this.channels.values()) {
-        ch.close();
-      }
-      this.channels.clear();
+    for (const [key, entry] of this.channels.entries()) {
+      if (serviceId && entry.serviceId !== serviceId) continue;
+      entry.client.close();
+      this.channels.delete(key);
     }
   }
 }
@@ -240,7 +207,7 @@ export class ACPToolRegistry {
         methods: service.methods,
         port: service.grpcPort,
         tls: false,
-        quicEnabled: true,
+        quicEnabled: false,
       },
     };
   }
@@ -259,7 +226,7 @@ export interface A2AAgentDescriptor {
   tools: string[]; // Tool IDs this agent exposes
   servicePorts: A2AServicePort[];
   quicEnabled: boolean;
-  altSvcHeader?: string; // For QUIC alt-svc negotiation
+  altSvcHeader?: string;
 }
 
 const A2A_PEER_TOOL_ALLOWLIST = new Set(['identity:recover']);
@@ -294,8 +261,7 @@ export function buildA2AAgentDescriptor(
         methods,
         port: service.grpcPort,
         host: '127.0.0.1',
-        quicEnabled: true,
-        altSvc: 'h3=":443"; ma=3600',
+        quicEnabled: false,
       });
     }
   }
@@ -304,12 +270,11 @@ export function buildA2AAgentDescriptor(
     id: agentId,
     name: 'Deeds Legal AI',
     version: '1.0.0',
-    description: 'Unified legal AI assistant with gRPC/QUIC proto boundaries',
+    description: 'Unified legal AI assistant with gRPC proto boundaries; QUIC is not enabled',
     capabilities: peerTools.length > 0 ? ['retrieval'] : [],
     tools: peerTools.filter((tool) => servicePorts.some((port) => port.id === tool.serviceId)).map((tool) => tool.id),
     servicePorts,
-    quicEnabled: true,
-    altSvcHeader: 'h3=":443"; h2=":443"; http/1.1',
+    quicEnabled: false,
   };
 }
 
@@ -328,6 +293,7 @@ export function listA2APeerTools(
 
 export interface QuicTransportConfig {
   enabled: boolean;
+  listenerVerified: boolean;
   port?: number;
   altSvcPort?: number;
   keyFile?: string;
@@ -339,7 +305,9 @@ export function negotiateQuicTransport(
   servicePorts: A2AServicePort[],
   config: QuicTransportConfig
 ): A2AServicePort[] {
-  if (!config.enabled) return servicePorts;
+  if (!config.enabled || !config.listenerVerified) {
+    return servicePorts.map((port) => ({ ...port, quicEnabled: false, altSvc: undefined }));
+  }
 
   return servicePorts.map((port) => ({
     ...port,

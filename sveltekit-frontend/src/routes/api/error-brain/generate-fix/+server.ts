@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { embedOrChatFetch, getLlamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 
@@ -84,7 +84,7 @@ Respond in JSON format:
 }`;
 
 	try {
-		const ollamaRes = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const ollamaRes = await embedOrChatFetch(`${getLlamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

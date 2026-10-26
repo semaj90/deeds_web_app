@@ -1,0 +1,68 @@
+{
+  "schema": "atlas.postgres-first-qdrant-hydration.v1",
+  "status": "EXISTING_HANDOFF_HARDENED_COMPONENT_TESTED",
+  "productionGraphRagProven": false,
+  "promotionAuthorized": false,
+  "canonicalAuthority": false,
+  "ownership": {
+    "candidateSelection": "Existing QdrantSearchBackend, content named vector",
+    "contentReadback": "PostgreSQL codebase_chunk_index via hydrateCanonicalCandidates",
+    "revisionQualifiedReadback": "Existing hydrateRevisionQualifiedCandidatesV1",
+    "fusion": "Existing SearchRuntime; no additional fusion owner",
+    "packetAdmission": "Existing ACE/ContextManifest owners, not closed by these tests"
+  },
+  "implementation": [
+    "Existing application Qdrant backend already invokes PostgreSQL content hydration; no additional vector database or wrapper was installed",
+    "Reject missing/conflicting hashes, source paths, supplied chunk identities, missing content, invalid scores and ambiguous canonical rows",
+    "Preserve input candidate rank and batch PostgreSQL identity reads with deduplicated IDs",
+    "Keep physical Qdrant point IDs separate from canonical row IDs and unresolved packetKey=null",
+    "Require chunk row source/workspace revisions to agree with qualified lineage and requested workspace",
+    "Do not select the newest source binding to hide ambiguous canonical readback"
+  ],
+  "validation": {
+    "filesPassed": 3,
+    "testsPassed": 29,
+    "testsFailed": 0,
+    "log": "docs/reports/postgres-first-hydration-isolated-20261016T105657162.txt",
+    "mechanism": "Actual projection mapper and hydration functions with isolated mocked database ports; revision-qualified SQL compiled through PgDialect",
+    "initialRunLog": "docs/reports/postgres-first-hydration-tests-20261016T105507657.txt",
+    "livePipelineInvoked": false,
+    "svelteCheckRun": false,
+    "fullApplicationTypecheckRun": false
+  },
+  "remainingProofGates": [
+    "Qualified source/packet/chunk data and canonical packet join",
+    "Canonical semantic_768 vector provenance and projection parity",
+    "Repair of the observed stale callable projection and unqualified chunk rows under existing post-P20 write gates",
+    "Revision-bound graph traversal and GraphRAG caller integration",
+    "Actual SearchRuntime Top-K through ACE/ContextManifest and independent readback",
+    "BitFrost cache readback and operational admission"
+  ],
+  "sideEffects": {
+    "codeAndLocalArtifactsChanged": true,
+    "productionDatabaseWrites": false,
+    "qdrantWrites": false,
+    "neo4jWrites": false,
+    "cacheWrites": false,
+    "serviceEnablement": false,
+    "sourceRevisionBackfill": false,
+    "modelOrGpuJob": false
+  },
+  "likely_cause": "Existing Qdrant/PostgreSQL hydration accepted absent hash bindings, and revision-qualified hydration could borrow qualification from lineage while chunk rows lacked their own revisions.",
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+    "sveltekit-frontend/src/lib/server/search/hydrate-canonical-candidates.ts",
+    "sveltekit-frontend/src/lib/server/search/hydrate-revision-qualified-candidates-v1.ts"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/search/hydrate-canonical-candidates.ts",
+    "sveltekit-frontend/src/lib/server/search/hydrate-canonical-candidates.spec.ts",
+    "sveltekit-frontend/src/lib/server/search/hydrate-revision-qualified-candidates-v1.ts",
+    "sveltekit-frontend/src/lib/server/search/hydrate-revision-qualified-candidates-v1.spec.ts",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/specs/retrieval-lineage-dag/spec.md"
+  ],
+  "safe_next_command": "npx --no-install openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict",
+  "smoke_command": "cd sveltekit-frontend && npx --no-install vitest run src/lib/server/search/hydrate-canonical-candidates.spec.ts src/lib/server/search/hydrate-revision-qualified-candidates-v1.spec.ts src/lib/server/search/projection-candidate-v1.spec.ts --maxWorkers=1 --no-file-parallelism",
+  "report_path": "docs/reports/postgres-first-qdrant-hydration-20261016T105657.json"
+}

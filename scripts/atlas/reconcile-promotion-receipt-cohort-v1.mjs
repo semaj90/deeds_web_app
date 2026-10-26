@@ -72,12 +72,14 @@ function firstDeepString(value, keys) {
   const wanted = new Set(keys);
   const seen = new Set();
   const queue = [value];
-  while (queue.length > 0) {
-    const current = queue.shift();
+  let head = 0;
+  while (head < queue.length) {
+    const current = queue[head++];
     if (!current || typeof current !== 'object' || seen.has(current)) continue;
     seen.add(current);
     for (const [key, nested] of Object.entries(current)) {
       if (wanted.has(key) && typeof nested === 'string' && nested.trim()) return nested.trim();
+      if (key === 'candidates' || key === 'rows') continue;
       if (nested && typeof nested === 'object') queue.push(nested);
     }
   }
@@ -94,7 +96,8 @@ function normalizeGraphAnchor(graphReport, selectedWorkspaceRevision) {
     if (graphRevision && workspaceRevision) {
       candidates.push({ graphRevision, workspaceRevision, value: parent ?? value });
     }
-    for (const nested of Object.values(value)) {
+    for (const [key, nested] of Object.entries(value)) {
+      if (key === 'candidates' || key === 'rows') continue;
       if (nested && typeof nested === 'object') walk(nested, value);
     }
   };

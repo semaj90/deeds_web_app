@@ -453,6 +453,8 @@ if (projectedIds.length > 0) {
     for (const row of rows) {
       existingProjectionById.set(String(row.packet_id), row);
     }
+  } catch (err) {
+    console.log('  [Projection State] Table atlas_qdrant_projection_state not present; proceeding with cold projection set');
   } finally {
     projectionClient.release();
   }

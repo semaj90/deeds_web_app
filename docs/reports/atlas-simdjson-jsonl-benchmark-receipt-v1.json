@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.simdjson-jsonl-benchmark-receipt.v1",
+  "status": "FIXTURE_PARITY_PROVEN",
+  "proofScope": "bounded generated JSONL fixture through incremental typed-evidence stream owner",
+  "parser": {
+    "addonAvailable": true,
+    "implementation": "simdjson N-API validation/minification followed by V8 JSON.parse",
+    "parserReuse": "native thread-local parser in the existing C++ addon",
+    "cachePolicy": "cold pass clears bridge LRU; warm pass replays identical records"
+  },
+  "fixture": {
+    "inputPath": ".tmp/atlas/simdjson-jsonl-benchmark-v1/fixture.jsonl",
+    "recordTarget": 512,
+    "inputBytes": 948872,
+    "validRecords": 512,
+    "malformedRecords": 1,
+    "minRecordBytes": 37,
+    "maxRecordBytes": 1896
+  },
+  "runs": [
+    {
+      "name": "V8_JSON_PARSE_BASELINE",
+      "backendCounts": {
+        "SIMDJSON_NAPI": 0,
+        "V8_JSON_PARSE": 0,
+        "CACHE": 0
+      },
+      "validRecords": 512,
+      "parseFailures": 1,
+      "inputBytes": 948872,
+      "minRecordBytes": 37,
+      "maxRecordBytes": 1896,
+      "durationMs": 37.424,
+      "bytesPerSecond": 25354842,
+      "recordsPerSecond": 13708,
+      "heapDeltaBytes": 1750776,
+      "peakSampledRssBytes": 457826304,
+      "semanticChecksum": "75e936024d6dd5ae8be59b8d71dd13cda178e9ef15430aa466c1182ee946d21e"
+    },
+    {
+      "name": "BRIDGE_COLD_CACHE",
+      "backendCounts": {
+        "SIMDJSON_NAPI": 512,
+        "V8_JSON_PARSE": 1,
+        "CACHE": 0
+      },
+      "validRecords": 512,
+      "parseFailures": 1,
+      "inputBytes": 948872,
+      "minRecordBytes": 37,
+      "maxRecordBytes": 1896,
+      "durationMs": 115.519,
+      "bytesPerSecond": 8213969,
+      "recordsPerSecond": 4441,
+      "heapDeltaBytes": -4462896,
+      "peakSampledRssBytes": 459628544,
+      "semanticChecksum": "75e936024d6dd5ae8be59b8d71dd13cda178e9ef15430aa466c1182ee946d21e"
+    },
+    {
+      "name": "BRIDGE_WARM_CACHE",
+      "backendCounts": {
+        "SIMDJSON_NAPI": 0,
+        "V8_JSON_PARSE": 1,
+        "CACHE": 512
+      },
+      "validRecords": 512,
+      "parseFailures": 1,
+      "inputBytes": 948872,
+      "minRecordBytes": 37,
+      "maxRecordBytes": 1896,
+      "durationMs": 40.453,
+      "bytesPerSecond": 23456333,
+      "recordsPerSecond": 12681,
+      "heapDeltaBytes": -6683456,
+      "peakSampledRssBytes": 461721600,
+      "semanticChecksum": "75e936024d6dd5ae8be59b8d71dd13cda178e9ef15430aa466c1182ee946d21e"
+    }
+  ],
+  "parity": {
+    "semanticChecksum": "75e936024d6dd5ae8be59b8d71dd13cda178e9ef15430aa466c1182ee946d21e",
+    "semanticParity": true,
+    "parseFailureParity": true,
+    "expectedMalformedRecordRejected": true,
+    "nativePathExercised": true,
+    "coldCacheStats": {
+      "hits": 0,
+      "misses": 513,
+      "nativeParses": 512,
+      "fallbackParses": 1,
+      "totalBytesParsed": 942727,
+      "cacheSize": 512
+    },
+    "warmCacheStats": {
+      "hits": 512,
+      "misses": 1,
+      "nativeParses": 0,
+      "fallbackParses": 1,
+      "totalBytesParsed": 37,
+      "cacheSize": 512
+    }
+  },
+  "memoryMeasurement": {
+    "peakRss": "sampled process.memoryUsage().rss every 64 records; process-wide, not isolated allocation accounting",
+    "heapDelta": "heapUsed after run minus before run; GC is not forced",
+    "allocationCount": null,
+    "allocationCountReason": "Node/V8 allocation count is not exposed by this bounded runner"
+  },
+  "limitations": [
+    "No production data, stores, model calls, or services are used.",
+    "The legacy string-based API still buffers/splits its input; this benchmark exercises the new incremental byte-stream API.",
+    "Warm-cache throughput measures the existing LRU hit path, not native parser throughput.",
+    "No throughput threshold is used as an admission decision."
+  ],
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

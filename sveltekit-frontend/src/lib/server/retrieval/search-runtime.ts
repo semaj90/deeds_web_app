@@ -7,7 +7,7 @@
  *   PROMOTION: accepted answer → evaluation → persistence → future retrieval
  *
  * Core principle: Nothing else queries Qdrant, reranks, or calls Mixedbread.
- * All search flows through search() → retrieve() → fuse() → rerank() → promote() → return
+ * All search flows through search() → retrieve() → qualified graph fanout → fuse() → rerank() → promote() → return
  */
 
 import { z } from 'zod';
@@ -15,7 +15,7 @@ import { createHash } from 'node:crypto';
 import type { FeatureEnvelope } from './feature-envelope.js';
 import type { ScorerOptions } from './candidate-scorer.js';
 import type { PostProcessConfig } from './post-process-reranker.js';
-import type { Retriever, Reranker } from './lane-contracts.js';
+import type { LaneCandidate, Retriever, Reranker } from './lane-contracts.js';
 import { ENV } from '../env.server.js';
 import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
 import type { HydrationProofContext, HydrationProofSummary, HydratedCandidatesWithProof } from './hydrate-candidates.js';
@@ -178,6 +178,7 @@ export async function initializeSearchRuntime(): Promise<void> {
  */
 export const SearchQuerySchema = z.object({
   text: z.string().min(1).max(1000),
+  lexicalExpansion: z.array(z.string().trim().min(1).max(100)).max(32).optional(),
   userId: z.string().min(1).optional(),
   caseId: z.string().optional(),
   workspaceId: z.string().min(1).optional(),
@@ -206,6 +207,7 @@ export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 export interface Candidate {
   id: string;
   packetKey: string;
+  packetId?: string | null;
   symbolVersionId?: string | null;
   symbol_version_id?: string | null;
   packet_key?: string | null;
@@ -217,6 +219,7 @@ export interface Candidate {
   content: string;
   score: number;
   scoreSource:
+    | 'postgres_fts'
     | 'postgres_trigram'
     | 'qdrant'
     | 'qdrant_768'
@@ -228,6 +231,8 @@ export interface Candidate {
   workspaceId?: string | null;
   workspaceRevision?: string | null;
   sourceRevision?: string | null;
+  graphRevision?: string | null;
+  graphEvidenceRefs?: string[];
   representationId?: string | null;
   representationRevision?: number | null;
   qdrantPointId?: string | null;
@@ -236,6 +241,7 @@ export interface Candidate {
   treeNodeId?: string | null;
   pageRankScore?: number | null;
   stableSymbolId?: string | null;
+  functionRegistryEvidence?: FunctionRegistryCandidateEvidenceV1;
 
   /**
    * Which field `packetKey`/`symbolVersionId` actually resolved from, per
@@ -261,6 +267,141 @@ export interface Candidate {
    * `identityStatus` precedence above. Wiring it into V2-based dedup is a separate, later step.
    */
   canonicalChunkId?: string | null;
+}
+
+export const FunctionRegistryCandidateEvidenceV1Schema = z.object({
+  snapshotChecksum: z.string().regex(/^[a-f0-9]{64}$/i),
+  canonicalId: z.string().min(1),
+  symbolVersionId: z.string().min(1),
+  treeNodeId: z.string().min(1),
+  sourceContentHash: z.string().regex(/^[a-f0-9]{64}$/i),
+  startByte: z.number().int().nonnegative(),
+  endByte: z.number().int().positive(),
+  evidenceChecksum: z.string().regex(/^[a-f0-9]{64}$/i),
+}).strict().refine((value) => value.endByte > value.startByte, 'Function registry span must be non-empty');
+
+export type FunctionRegistryCandidateEvidenceV1 = z.infer<typeof FunctionRegistryCandidateEvidenceV1Schema>;
+
+export interface FunctionRegistryRetrievalProofV1 {
+  status: 'DISABLED' | 'NO_QUALIFIED_CANDIDATES' | 'QUALIFIED_CANDIDATES_PRESENT';
+  qualifiedCandidateCount: number;
+  qualifiedFinalCandidateCount: number;
+  candidates: Array<FunctionRegistryCandidateEvidenceV1 & {
+    packetKey: string;
+    sourceRef: string;
+    sourceRevision: string;
+    workspaceRevision: string;
+    presentAfterHydration: boolean;
+    presentAfterRerank: boolean;
+    presentAfterPostProcess: boolean;
+    presentInFinalTopK: boolean;
+    dropStage: 'NONE' | 'HYDRATION' | 'RERANKER' | 'POST_PROCESS' | 'TOP_K';
+    postProcessDecision: { decision: 'KEEP' | 'DROP'; reason: string; detail: string } | null;
+  }>;
+  contextManifestAdmitted: false;
+  canonicalAuthority: false;
+  writesSuppressed: boolean;
+}
+
+export function functionRegistryEvidenceFromMetadataV1(input: {
+  metadata: Record<string, unknown> | undefined;
+  packetKey: string;
+  symbolVersionId: string | null | undefined;
+  treeNodeId: string | null | undefined;
+  sourceRevision: string | null | undefined;
+}): FunctionRegistryCandidateEvidenceV1 | null {
+  const metadata = input.metadata;
+  if (!metadata) return null;
+  const parsed = FunctionRegistryCandidateEvidenceV1Schema.safeParse({
+    snapshotChecksum: metadata['function_registry_snapshot_checksum'],
+    canonicalId: metadata['canonical_function_id'],
+    symbolVersionId: metadata['symbol_version_id'],
+    treeNodeId: metadata['tree_node_id'],
+    sourceContentHash: metadata['source_content_hash'],
+    startByte: metadata['byte_start'],
+    endByte: metadata['byte_end'],
+    evidenceChecksum: metadata['evidence_checksum'],
+  });
+  if (!parsed.success || parsed.data.symbolVersionId !== input.symbolVersionId
+    || parsed.data.treeNodeId !== input.treeNodeId
+    || !input.packetKey || !input.sourceRevision) return null;
+  return parsed.data;
+}
+
+export function buildFunctionRegistryRetrievalProofV1(input: {
+  enabled: boolean;
+  readOnly: boolean;
+  candidates: readonly Candidate[];
+  hydratedPackets?: readonly FeatureEnvelope[];
+  rerankedPackets?: readonly FeatureEnvelope[];
+  postProcessedPacketKeys?: readonly string[];
+  postProcessDecisions?: readonly import('./post-process-reranker.js').PostProcessDecision[];
+  finalPackets: readonly FeatureEnvelope[];
+}): FunctionRegistryRetrievalProofV1 {
+  const seen = new Set<string>();
+  const candidates = input.candidates.flatMap((candidate) => {
+    const evidence = candidate.functionRegistryEvidence;
+    const sourceRevision = candidate.sourceRevision;
+    const workspaceRevision = candidate.workspaceRevision;
+    if (!evidence || !sourceRevision || !workspaceRevision || seen.has(evidence.symbolVersionId)) return [];
+    seen.add(evidence.symbolVersionId);
+    const matchesQualifiedIdentity = (packet: FeatureEnvelope) => {
+      return packet.symbol_version_id === evidence.symbolVersionId
+        && packet.tree_node_id === evidence.treeNodeId
+        && packet.source_revision === sourceRevision
+        && packet.workspace_revision === workspaceRevision
+        && packet.source_ref === candidate.sourceRef;
+    };
+    const presentAfterHydration = input.hydratedPackets?.some(matchesQualifiedIdentity) ?? false;
+    const presentAfterRerank = input.rerankedPackets?.some(matchesQualifiedIdentity) ?? false;
+    const rerankedIdentityKeys = new Set((input.rerankedPackets ?? [])
+      .filter(matchesQualifiedIdentity)
+      .map((packet) => packet.packet_key ?? packet.chunk_id)
+      .filter((key): key is string => typeof key === 'string' && key.length > 0));
+    const postProcessedKeys = new Set(input.postProcessedPacketKeys ?? []);
+    const presentAfterPostProcess = [...rerankedIdentityKeys].some((key) => postProcessedKeys.has(key));
+    const postProcessDecision = [...rerankedIdentityKeys]
+      .map((key) => input.postProcessDecisions?.find((decision) => decision.packetKey === key))
+      .find((decision) => decision !== undefined) ?? null;
+    const presentInFinalTopK = input.finalPackets.some(matchesQualifiedIdentity);
+    const dropStage: FunctionRegistryRetrievalProofV1['candidates'][number]['dropStage'] = presentInFinalTopK
+      ? 'NONE'
+      : !presentAfterHydration ? 'HYDRATION'
+        : !presentAfterRerank ? 'RERANKER'
+          : !presentAfterPostProcess ? 'POST_PROCESS'
+            : 'TOP_K';
+    return [{
+      ...evidence,
+      packetKey: candidate.packetKey,
+      sourceRef: candidate.sourceRef,
+      sourceRevision,
+      workspaceRevision,
+      presentAfterHydration,
+      presentAfterRerank,
+      presentAfterPostProcess,
+      presentInFinalTopK,
+      dropStage,
+      postProcessDecision: postProcessDecision ? {
+        decision: postProcessDecision.decision,
+        reason: postProcessDecision.reason,
+        detail: postProcessDecision.detail,
+      } : null,
+    }];
+  }).sort((left, right) => left.symbolVersionId.localeCompare(right.symbolVersionId));
+  const qualifiedCandidateCount = new Set(input.candidates
+    .map((candidate) => candidate.functionRegistryEvidence?.symbolVersionId)
+    .filter((symbolVersionId): symbolVersionId is string => typeof symbolVersionId === 'string')).size;
+  return {
+    status: !input.enabled ? 'DISABLED'
+      : qualifiedCandidateCount === 0 ? 'NO_QUALIFIED_CANDIDATES'
+        : 'QUALIFIED_CANDIDATES_PRESENT',
+    qualifiedCandidateCount,
+    qualifiedFinalCandidateCount: candidates.filter((candidate) => candidate.presentInFinalTopK).length,
+    candidates,
+    contextManifestAdmitted: false,
+    canonicalAuthority: false,
+    writesSuppressed: input.readOnly,
+  };
 }
 
 /**
@@ -313,6 +454,50 @@ export interface RetrievalProofSummary {
   rrfOutputCount: number;
   finalContextCount: number;
   validationReasons: Record<string, number>;
+  hydrationCandidateResolutions?: HydrationProofSummary['candidateResolutions'];
+  functionRegistry: FunctionRegistryRetrievalProofV1;
+}
+
+export interface GraphCandidateEvidenceV1 {
+  packetKey: string;
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  graphRevision: string;
+  evidenceRefs: string[];
+}
+
+export function buildGraphCandidateEvidenceV1(
+  rawCandidates: readonly Candidate[],
+  finalPackets: readonly FeatureEnvelope[],
+): GraphCandidateEvidenceV1[] {
+  const finalByPacket = new Map(finalPackets
+    .filter((packet) => typeof packet.packet_key === 'string' && packet.packet_key.length > 0)
+    .map((packet) => [packet.packet_key!, packet]));
+  const evidenceByPacket = new Map<string, GraphCandidateEvidenceV1>();
+  for (const candidate of rawCandidates) {
+    if (candidate.graphEvidenceRefs?.length === 0 || !candidate.graphEvidenceRefs) continue;
+    const packet = finalByPacket.get(candidate.packetKey);
+    if (!packet
+      || packet.source_ref !== candidate.sourceRef
+      || packet.source_revision !== candidate.sourceRevision
+      || packet.workspace_revision !== candidate.workspaceRevision
+      || packet.graph_revision !== candidate.graphRevision
+      || !candidate.sourceRevision
+      || !candidate.workspaceRevision
+      || !candidate.graphRevision) continue;
+    const existing = evidenceByPacket.get(candidate.packetKey) ?? {
+      packetKey: candidate.packetKey,
+      sourceRef: candidate.sourceRef,
+      sourceRevision: candidate.sourceRevision,
+      workspaceRevision: candidate.workspaceRevision,
+      graphRevision: candidate.graphRevision,
+      evidenceRefs: [],
+    };
+    existing.evidenceRefs = [...new Set([...existing.evidenceRefs, ...candidate.graphEvidenceRefs])].sort();
+    evidenceByPacket.set(candidate.packetKey, existing);
+  }
+  return [...evidenceByPacket.values()].sort((left, right) => left.packetKey.localeCompare(right.packetKey));
 }
 
 /**
@@ -343,17 +528,18 @@ export interface SearchResult {
     };
   };
   provenance: {
-    retrievalSources: Array<'postgres_trigram' | 'qdrant' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>;
+    retrievalSources: Array<'postgres_fts' | 'postgres_trigram' | 'qdrant' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>;
     fusionMethod: 'rrf';
     rerankModel: string;
     rerankerUsed: boolean;
     promotionAttempted?: boolean;
     /**
      * KAG hypergraph neighbor evidence (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration,
-     * KAG-01/KAG-02/KAG-06), purely additive/informational — NEVER used for
-     * scoring, fusion, or reranking above. Populated by
+     * KAG-01/KAG-02/KAG-06), informational evidence about final packets.
+     * Qualified packet-incidence neighbors can separately enter candidates
+     * before fusion through `expandGraphCandidates()`. Populated by
      * `lookupHypergraphNeighbors()` (below) via
-     * `kag-hypergraph-reader-v1.ts::readKagHypergraphNeighborsV1()`, which
+     * `kag-hypergraph-reader-v1.ts::readKagHypergraphNeighborsStrictV1()`, which
      * reads real `atlas_ontology_linked_tuples`/`atlas_hyperedges` rows and
      * runs them through `kag-mutual-index-v1.ts::buildKagMutualIndexV1()`.
      *
@@ -365,6 +551,8 @@ export interface SearchResult {
      * than throwing.
      */
     hypergraphNeighbors?: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
+    hypergraphGraphRevision?: string;
+    graphCandidateEvidence?: GraphCandidateEvidenceV1[];
     /**
      * True when this SearchRuntime instance was constructed with
    * `readOnly: true` (see `SearchRuntimeConfig.readOnly`) — i.e. this call
@@ -399,6 +587,12 @@ export interface SearchRuntimeConfig {
   caseId?: string;
   /** Injected retrieval adapters. When absent, production singletons are used. */
   retrievers?: Retriever[];
+  /** Optional, read-only, revision-qualified function discovery supplement. */
+  functionRegistry?: {
+    enabled: boolean;
+    repoRoot: string;
+    maxCandidates?: number;
+  };
   /** Injected reranker. When absent, `rerankCanonicalFeatureEnvelopes` is used. */
   reranker?: Reranker;
   /** Options for Stage 3b: candidate scorer. */
@@ -471,6 +665,7 @@ export class SearchRuntime {
   private userId?: string;
   private caseId?: string;
   private injectedRetrievers?: Retriever[];
+  private functionRegistry?: SearchRuntimeConfig['functionRegistry'];
   private injectedReranker?: Reranker;
   private scorerOptions?: ScorerOptions;
   private postProcessConfig?: Partial<PostProcessConfig>;
@@ -482,6 +677,7 @@ export class SearchRuntime {
     this.userId = config.userId;
     this.caseId = config.caseId;
     this.injectedRetrievers = config.retrievers;
+    this.functionRegistry = config.functionRegistry?.enabled ? config.functionRegistry : undefined;
     this.injectedReranker = config.reranker;
     this.scorerOptions = config.scorerOptions;
     this.postProcessConfig = config.postProcessConfig;
@@ -522,6 +718,8 @@ export class SearchRuntime {
       // Stage 1: Retrieve candidates from multiple sources
       const retrieveStart = Date.now();
       const candidates = await this.retrieveCandidates(query, { includeVectorLanes: embeddingHealthy });
+      const graphExpandedCandidates = await this.expandGraphCandidates(candidates, query);
+      candidates.push(...graphExpandedCandidates);
       stageTiming.retrieve = Date.now() - retrieveStart;
       const denseSeedPacketKeys = selectDenseSearchSeedPacketKeys(candidates);
 
@@ -555,6 +753,7 @@ export class SearchRuntime {
               summaryResolvedCount: 0,
               summaryStaleRejectedCount: 0,
               validationReasons: {},
+              candidateResolutions: [],
             },
             finalPackets: [],
             postProcessedCount: 0,
@@ -602,7 +801,8 @@ export class SearchRuntime {
           proofContext,
         );
         const topPackets = hydrated.envelopes;
-        const hypergraphNeighborsDegraded = await this.lookupHypergraphNeighbors(topPackets);
+        const hypergraphNeighborsDegraded = await this.lookupHypergraphNeighbors(topPackets, query.workspaceRevision);
+        const graphCandidateEvidence = buildGraphCandidateEvidenceV1(candidates, topPackets);
 
         return {
           packets: topPackets,
@@ -639,7 +839,13 @@ export class SearchRuntime {
             rerankerUsed: false,
             promotionAttempted: false,
             readOnly: this.readOnly,
-            ...(hypergraphNeighborsDegraded ? { hypergraphNeighbors: hypergraphNeighborsDegraded } : {}),
+            ...(hypergraphNeighborsDegraded ? {
+              hypergraphNeighbors: hypergraphNeighborsDegraded.neighbors,
+              hypergraphGraphRevision: hypergraphNeighborsDegraded.graphRevision,
+            } : {}),
+            ...(graphCandidateEvidence.length > 0
+              ? { graphCandidateEvidence }
+              : {}),
           },
         };
       }
@@ -648,7 +854,31 @@ export class SearchRuntime {
       // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
       const scoreStart = Date.now();
       const { scoreCandidates } = await import('./candidate-scorer.js');
-      const scored = await scoreCandidates(
+      let authorityScores = new Map<string, number>();
+      const graphRevisions = new Set(fused.map((candidate) => candidate.graphRevision?.trim()).filter(Boolean));
+      if (query.workspaceRevision && graphRevisions.size === 1) {
+        const graphRevision = [...graphRevisions][0]!;
+        const identities = fused.slice(0, 256).flatMap((candidate) => {
+          if (
+            !candidate.packetKey?.trim()
+            || !candidate.sourceRef?.trim()
+            || !candidate.sourceRevision?.trim()
+            || candidate.workspaceRevision !== query.workspaceRevision
+            || candidate.graphRevision !== graphRevision
+          ) return [];
+          return [{ packetKey: candidate.packetKey, sourceRef: candidate.sourceRef, sourceRevision: candidate.sourceRevision }];
+        });
+        if (identities.length > 0) {
+          try {
+            const { fetchAuthorityScores } = await import('./feature-matrix.js');
+            authorityScores = await fetchAuthorityScores({ identities, workspaceRevision: query.workspaceRevision, graphRevision });
+          } catch (error) {
+            console.warn('[search-runtime] snapshot-qualified PageRank unavailable:', (error as Error).message);
+          }
+        }
+      }
+      const { resolveAuthorityScore } = await import('./feature-matrix.js');
+      const scoredValues = await scoreCandidates(
         query.text,
         fused.map(c => ({
           packetKey: c.packetKey,
@@ -659,21 +889,26 @@ export class SearchRuntime {
           scoreSource: c.scoreSource,
           qdrantPointId: (c as any).qdrantPointId,
           packetId: (c as any).packetId,
-          // Previously dropped here despite blendScores() having a live 0.1 weight for it —
-          // pagerank silently contributed zero to every ranked result. See
-          // openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy.
-          //
-          // graphScore (atlas_graph_authority_scores) deliberately NOT wired here yet —
-          // held pending an authority-provenance audit: atlas_graph_authority_scores also
-          // stores pagerank_raw/pagerank_l1 alongside authority_percentile, so it may be the
-          // SAME PageRank signal as pageRankScore under a different name. Wiring both would
-          // double-count one signal as 0.05·PR + 0.10·"authority" ≈ 0.15·PR. See the
-          // "2026-08-08 addendum" in the LOD taxonomy proposal.md — do not re-add graphScore
-          // here until that audit reaches a DISTINCT_SIGNAL verdict with evidence.
-          pagerankScore: c.pageRankScore ?? undefined,
+          // One canonical snapshot-qualified PageRank input; projection metadata is not mixed in.
+          pagerankScore: resolveAuthorityScore(authorityScores, c.packetKey, c.sourceRef),
         })) as any,
         this.scorerOptions,
       );
+      const fusedByPacketKey = new Map(fused.map((candidate) => [candidate.packetKey, candidate]));
+      const scored = scoredValues.map((candidate) => {
+        const source = fusedByPacketKey.get(candidate.packetKey);
+        if (!source) return candidate;
+        return {
+          ...candidate,
+          packetId: source.packetId ?? candidate.packetId,
+          symbolVersionId: source.symbolVersionId ?? null,
+          treeNodeId: source.treeNodeId ?? null,
+          workspaceRevision: source.workspaceRevision ?? null,
+          sourceRevision: source.sourceRevision ?? null,
+          graphRevision: source.graphRevision ?? null,
+          functionRegistryEvidence: source.functionRegistryEvidence,
+        };
+      });
       stageTiming.score = Date.now() - scoreStart;
 
       // Sort by blendedScore before hydration so we hydrate the best candidates first
@@ -687,9 +922,10 @@ export class SearchRuntime {
         scoredSorted.slice(0, query.topK).map((sc) => {
           const scoreCandidate = sc as any;
           return {
-            id: sc.packetKey,
+            id: sc.packetId ?? sc.packetKey,
             packetKey: sc.packetKey,
-            symbolVersionId: scoreCandidate.symbolVersionId ?? sc.packetKey,
+            packetId: sc.packetId ?? null,
+            symbolVersionId: scoreCandidate.symbolVersionId ?? null,
             sourceRef: sc.sourceRef,
             summary: '',
             content: '',
@@ -748,7 +984,12 @@ export class SearchRuntime {
           scorerVersion: 'passthrough',
           modelScored: false,
         };
-        return { ...base, blendedScore: base.blendedScore || (reranked.length - idx) / reranked.length };
+        return {
+          ...base,
+          blendedScore: this.injectedReranker
+            ? env.blended_score ?? (reranked.length - idx) / reranked.length
+            : base.blendedScore || (reranked.length - idx) / reranked.length,
+        };
       });
 
       const { postProcessCandidates } = await import('./post-process-reranker.js');
@@ -821,7 +1062,8 @@ export class SearchRuntime {
         );
       }
 
-      const hypergraphNeighbors = await this.lookupHypergraphNeighbors(finalPackets);
+      const hypergraphNeighbors = await this.lookupHypergraphNeighbors(finalPackets, query.workspaceRevision);
+      const graphCandidateEvidence = buildGraphCandidateEvidenceV1(candidates, finalPackets);
 
       return {
         packets: finalPackets,
@@ -841,6 +1083,10 @@ export class SearchRuntime {
           rawCandidates: candidates,
           fusedCandidates: fused,
           hydrationProof: hydrated.proof,
+          hydratedPackets: envelopes,
+          rerankedPackets: reranked,
+          postProcessedPacketKeys: postProcessed.map((candidate) => candidate.packetKey),
+          postProcessDecisions: ppAudit.decisions,
           finalPackets,
           postProcessedCount: postProcessed.length,
           rerankedCount: reranked.length,
@@ -849,10 +1095,20 @@ export class SearchRuntime {
           retrievalSources: this.getRetrievalSources(candidates),
           fusionMethod: 'rrf',
           rerankModel: reranked[0]?.model_version ?? 'mixedbread-ai/mxbai-rerank-base-v2',
-          rerankerUsed: reranked.length > 0,
+          rerankerUsed: reranked.length > 0 && !reranked.some((packet) => [
+            'injected-reranker-invalid-input',
+            'injected-reranker-invalid-output',
+            'injected-reranker-error-fallback',
+          ].includes(packet.model_version ?? '')),
           promotionAttempted: !this.readOnly,
           readOnly: this.readOnly,
-          ...(hypergraphNeighbors ? { hypergraphNeighbors } : {}),
+          ...(hypergraphNeighbors ? {
+            hypergraphNeighbors: hypergraphNeighbors.neighbors,
+            hypergraphGraphRevision: hypergraphNeighbors.graphRevision,
+          } : {}),
+          ...(graphCandidateEvidence.length > 0
+            ? { graphCandidateEvidence }
+            : {}),
         },
       };
     } catch (error) {
@@ -873,13 +1129,29 @@ export class SearchRuntime {
   ): Promise<Candidate[]> {
     if (!this.injectedRetrievers || this.injectedRetrievers.length === 0) {
       const { retrieveAllCandidates } = await import('./retrieve-candidates.js');
-      return applySearchMetadataFilter(
-        await retrieveAllCandidates(query.text, query.filters, undefined, options),
-        query.filters
-      );
+      const baseCandidates = await retrieveAllCandidates(query.text, query.filters, undefined, {
+        ...options,
+        lexicalExpansion: query.lexicalExpansion,
+      });
+      const functionCandidates = await this.retrieveFunctionRegistryCandidates(query);
+      const candidatesWithGraphRevision = baseCandidates.map((candidate) => {
+        const raw = candidate as Candidate & { graph_revision?: unknown };
+        return {
+          ...candidate,
+          graphRevision: typeof raw.graphRevision === 'string'
+            ? raw.graphRevision
+            : typeof raw.graph_revision === 'string' ? raw.graph_revision : undefined,
+        };
+      });
+      return applySearchMetadataFilter([...candidatesWithGraphRevision, ...functionCandidates], query.filters);
     }
 
-    const input = { query: query.text, limit: query.topK * 5, filters: query.filters as Record<string, unknown> };
+    const input = {
+      query: query.text,
+      limit: query.topK * 5,
+      filters: query.filters as Record<string, unknown>,
+      ...(query.workspaceRevision ? { workspaceRevision: query.workspaceRevision } : {}),
+    };
     const perLane = await Promise.all(
       this.injectedRetrievers.map(r => r.retrieve(input).catch(err => {
         console.warn(`[search-runtime] retriever(${r.lane}) failed:`, (err as Error).message);
@@ -897,7 +1169,8 @@ export class SearchRuntime {
     return applySearchMetadataFilter(stamped.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetId ?? lc.packetKey,
       packetKey: lc.packetKey,
-      symbolVersionId: lc.symbolVersionId ?? lc.packetKey ?? null,
+      packetId: lc.packetId ?? null,
+      symbolVersionId: lc.symbolVersionId ?? null,
       sourceRef: lc.sourceRef,
       summary: String(lc.metadata?.['summary'] ?? ''),
       content: String(lc.metadata?.['content'] ?? ''),
@@ -914,6 +1187,7 @@ export class SearchRuntime {
       workspaceId: typeof lc.workspaceId === 'string' ? lc.workspaceId : undefined,
       workspaceRevision: typeof lc.workspaceRevision === 'string' ? lc.workspaceRevision : undefined,
       sourceRevision: typeof lc.sourceRevision === 'string' ? lc.sourceRevision : undefined,
+      graphRevision: typeof lc.metadata?.['graph_revision'] === 'string' ? String(lc.metadata['graph_revision']) : undefined,
       representationId: typeof lc.representationId === 'string' ? lc.representationId : undefined,
       representationRevision: typeof lc.representationRevision === 'number' ? lc.representationRevision : undefined,
       qdrantPointId: typeof lc.qdrantPointId === 'string' ? lc.qdrantPointId : undefined,
@@ -932,6 +1206,208 @@ export class SearchRuntime {
             ? 'bm42'
             : undefined,
     })), query.filters);
+  }
+
+  private async expandGraphCandidates(candidates: Candidate[], query: SearchQuery): Promise<Candidate[]> {
+    if (!query.workspaceRevision || candidates.length === 0) return [];
+    const graphRevisions = new Set(candidates
+      .filter((candidate) => candidate.workspaceRevision === query.workspaceRevision)
+      .map((candidate) => candidate.graphRevision?.trim())
+      .filter((revision): revision is string => Boolean(revision)));
+    if (graphRevisions.size !== 1) return [];
+    const graphRevision = [...graphRevisions][0]!;
+    const seeds = candidates.filter((candidate) =>
+      candidate.workspaceRevision === query.workspaceRevision
+      && candidate.graphRevision === graphRevision
+      && candidate.packetKey?.trim()
+      && candidate.sourceRef?.trim()
+      && candidate.sourceRevision?.trim());
+    if (seeds.length === 0) return [];
+
+    try {
+      const { resolvePacketKeyResolutionV2 } = await import('../atlas/identity/packet-identity-resolver.js');
+      const resolvedSeeds = await Promise.all(seeds.slice(0, 64).map(async (candidate) => {
+        try {
+          const identity = await resolvePacketKeyResolutionV2(candidate.packetKey);
+          return identity.storagePacketKey === candidate.packetKey ? identity.canonicalPacketKey : null;
+        } catch {
+          return null;
+        }
+      }));
+      const canonicalIds = [...new Set(resolvedSeeds.filter((key): key is string => Boolean(key)))];
+      if (canonicalIds.length === 0) return [];
+      const { readKagHypergraphNeighborsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+      let receipt: Awaited<ReturnType<typeof readKagHypergraphNeighborsStrictV1>> | undefined;
+      try {
+        receipt = await readKagHypergraphNeighborsStrictV1(canonicalIds, {
+          workspaceRevision: query.workspaceRevision,
+          graphRevision,
+        });
+      } catch (error) {
+        console.warn('[search-runtime] packet-incidence fanout unavailable:', (error as Error).message);
+      }
+      const existingPacketKeys = new Set(candidates.map((candidate) => candidate.packetKey));
+      const seedScore = Math.max(...seeds.map((candidate) => candidate.score));
+      type QualifiedBinding = {
+        canonicalId: string;
+        packetKey: string;
+        sourceRef: string;
+        sourceRevision: string;
+        workspaceRevision: string;
+        graphRevision: string;
+        hyperedgeId?: string;
+        graphEvidenceRefs: string[];
+      };
+      const bindings: QualifiedBinding[] = (receipt?.neighbors ?? [])
+        .flatMap((neighbor) => neighbor.candidateBindings ?? [])
+        .map((binding) => ({ ...binding, graphEvidenceRefs: [`kag:${binding.hyperedgeId}`] }));
+      const expanded: Candidate[] = [];
+      try {
+        const { executeGraphV2BoundedTraversalV1 } = await import('../atlas/integration/graph-v2-bounded-traversal-v1.js');
+        const graphV2Candidates = await executeGraphV2BoundedTraversalV1({
+          seeds: seeds.map((candidate) => ({
+            packetKey: candidate.packetKey,
+            sourceRef: candidate.sourceRef,
+            sourceRevision: candidate.sourceRevision!,
+          })),
+          workspaceRevision: query.workspaceRevision,
+          graphRevision,
+          limit: Math.min(query.topK * 4, 64),
+          maxDepth: 3,
+        });
+        for (const binding of graphV2Candidates) {
+          if (existingPacketKeys.has(binding.packetKey)) continue;
+          existingPacketKeys.add(binding.packetKey);
+          expanded.push({
+            id: binding.packetKey,
+            packetKey: binding.packetKey,
+            sourceRef: binding.sourceRef,
+            summary: '',
+            content: '',
+            score: binding.relationConfidence,
+            scoreSource: 'ast_tree',
+            retrievalExecutor: 'graph_v2_fanout',
+            workspaceRevision: binding.workspaceRevision,
+            sourceRevision: binding.sourceRevision,
+            graphRevision: binding.graphRevision,
+            graphEvidenceRefs: binding.relationPathIds.map((relationId) => `graph-v2:${relationId}`),
+          });
+        }
+      } catch (error) {
+        console.warn('[search-runtime] GraphV2 packet fanout unavailable:', (error as Error).message);
+      }
+      const expandedCanonicalIds = new Set<string>();
+      try {
+        const { createPostgresKagQuickHopReaderV1, executeKagQuickHopV1, quickHopEvidenceByTargetV1 } = await import('../atlas/integration/kag-quick-hop-v1.js');
+        const { resolveKagPacketCandidateBindingsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+        const quickHopReader = await createPostgresKagQuickHopReaderV1();
+        const traversal = await executeKagQuickHopV1({
+          seedCanonicalIds: canonicalIds,
+          workspaceRevision: query.workspaceRevision,
+          graphRevision,
+        }, quickHopReader);
+        for (const canonicalId of traversal.visitedCanonicalIds) {
+          if (!canonicalIds.includes(canonicalId)
+            && /^packet:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(canonicalId)) {
+            expandedCanonicalIds.add(canonicalId);
+          }
+        }
+        const naryBindings = await resolveKagPacketCandidateBindingsStrictV1(
+          [...expandedCanonicalIds],
+          { workspaceRevision: query.workspaceRevision, graphRevision },
+        );
+        const evidenceByTarget = quickHopEvidenceByTargetV1(traversal.paths);
+        bindings.push(...naryBindings.flatMap((binding) => {
+          const hyperedgeIds = evidenceByTarget.get(binding.canonicalId) ?? [];
+          return hyperedgeIds.length > 0
+            ? [{ ...binding, graphEvidenceRefs: hyperedgeIds.map((id) => `kag:${id}`) }]
+            : [];
+        }));
+      } catch (error) {
+        console.warn('[search-runtime] qualified n-ary graph fanout unavailable:', (error as Error).message);
+      }
+      for (const binding of bindings) {
+        if (
+          existingPacketKeys.has(binding.packetKey)
+          || binding.workspaceRevision !== query.workspaceRevision
+          || binding.graphRevision !== graphRevision
+          || !binding.sourceRef.trim()
+          || !/^sha256:[0-9a-f]{64}$/i.test(binding.sourceRevision)
+        ) continue;
+        existingPacketKeys.add(binding.packetKey);
+        expanded.push({
+          id: binding.packetKey,
+          packetKey: binding.packetKey,
+          sourceRef: binding.sourceRef,
+          summary: '',
+          content: '',
+          score: seedScore * 0.8,
+          scoreSource: 'ast_tree',
+          workspaceRevision: binding.workspaceRevision,
+          sourceRevision: binding.sourceRevision,
+          graphRevision: binding.graphRevision,
+          graphEvidenceRefs: binding.graphEvidenceRefs,
+        });
+        if (expanded.length >= Math.min(query.topK * 4, 64)) break;
+      }
+      return expanded;
+    } catch (error) {
+      console.warn('[search-runtime] qualified graph fanout unavailable:', (error as Error).message);
+      return [];
+    }
+  }
+
+  private async retrieveFunctionRegistryCandidates(query: SearchQuery): Promise<Candidate[]> {
+    if (!this.functionRegistry || !query.workspaceRevision) return [];
+    try {
+      const { createPostgresFunctionRegistryRetrieverV1 } = await import(
+        '../atlas/function-registry/function-registry-postgres-snapshot-loader-v1.js'
+      );
+      const retriever = createPostgresFunctionRegistryRetrieverV1({
+        repoRoot: this.functionRegistry.repoRoot,
+        expectedWorkspaceRevision: query.workspaceRevision,
+        maxCandidates: Math.min(this.functionRegistry.maxCandidates ?? 8, 16),
+      });
+      const rows = await retriever.retrieve({
+        query: query.text,
+        limit: Math.min(query.topK * 2, 32),
+        workspaceRevision: query.workspaceRevision,
+      });
+      return rows.flatMap((row) => {
+        const treeNodeId = typeof row.metadata?.['tree_node_id'] === 'string'
+          ? String(row.metadata['tree_node_id'])
+          : undefined;
+        const evidence = functionRegistryEvidenceFromMetadataV1({
+          metadata: row.metadata,
+          packetKey: row.packetKey,
+          symbolVersionId: row.symbolVersionId,
+          treeNodeId,
+          sourceRevision: row.sourceRevision,
+        });
+        if (!evidence) return [];
+        return [{
+          functionRegistryEvidence: evidence,
+          id: row.packetId ?? row.packetKey,
+          packetKey: row.packetKey,
+          packetId: row.packetId ?? null,
+          symbolVersionId: row.symbolVersionId ?? null,
+          sourceRef: row.sourceRef,
+          summary: '',
+          content: '',
+          score: row.score ?? 0,
+          scoreSource: 'ast_tree',
+          workspaceRevision: row.workspaceRevision ?? query.workspaceRevision,
+          sourceRevision: row.sourceRevision ?? undefined,
+          retrievalExecutor: 'function_registry_verified_snapshot',
+          treeNodeId,
+          identityStatus: 'canonical',
+          identitySource: 'symbol_version_id',
+        }];
+      });
+    } catch (error) {
+      console.warn('[search-runtime] function registry supplement unavailable:', (error as Error).message);
+      return [];
+    }
   }
 
   /**
@@ -972,6 +1448,91 @@ export class SearchRuntime {
     envelopes: FeatureEnvelope[],
     query: SearchQuery,
   ): Promise<Array<FeatureEnvelope & { model_version?: string; blended_score?: number }>> {
+    if (this.injectedReranker) {
+      const identity = (candidate: LaneCandidate) => ({
+        packetKey: candidate.packetKey,
+        sourceRef: candidate.sourceRef,
+        sourceRevision: candidate.sourceRevision,
+        workspaceRevision: candidate.workspaceRevision,
+        representationId: candidate.representationId,
+        representationRevision: candidate.representationRevision,
+      });
+      const inputs: LaneCandidate[] = [];
+      const envelopesByKey = new Map<string, FeatureEnvelope>();
+
+      for (const [index, envelope] of envelopes.entries()) {
+        const packetKey = envelope.packet_key?.trim();
+        const sourceRef = envelope.source_ref?.trim();
+        if (!packetKey || !sourceRef || envelopesByKey.has(packetKey)) {
+          console.warn('[stage:rerank] injected reranker skipped: candidate identity is missing or duplicated');
+          return envelopes.map((item) => ({ ...item, model_version: 'injected-reranker-invalid-input' }));
+        }
+        const lane = envelope.retrieval_source;
+        const normalizedLane = lane ? normalizeRetrievalLane(lane) : undefined;
+        const rerankerLane: LaneCandidate['lane'] = normalizedLane === 'dense'
+          ? 'dense'
+          : normalizedLane === 'lexical'
+            ? 'bm25'
+            : lane === 'sparse' || lane === 'bm42' || lane === 'bm25' || lane === 'exact'
+              || lane === 'ast' || lane === 'ast_tree' || lane === 'rg'
+              || lane === 'rg_keyword' || lane === 'go-retrieval'
+              ? lane === 'ast_tree'
+                ? 'ast'
+                : lane === 'rg_keyword'
+                  ? 'rg'
+                  : lane
+              : 'exact';
+        const candidate: LaneCandidate = {
+          packetKey,
+          sourceRef,
+          sourceRevision: envelope.source_revision,
+          workspaceRevision: envelope.workspace_revision,
+          representationId: envelope.representation_id,
+          representationRevision: envelope.representation_revision,
+          rank: envelope.retrieved_rank ?? index + 1,
+          score: envelope.retrieval_score ?? envelope.fusion_score ?? envelope.rrf_score ?? null,
+          lane: rerankerLane,
+          metadata: {
+            ...(envelope.domain ? { domain: envelope.domain } : {}),
+            ...(envelope.domain_class ? { domainClass: envelope.domain_class } : {}),
+            ...(envelope.language ? { language: envelope.language } : {}),
+            ...(envelope.kind ? { kind: envelope.kind } : {}),
+          },
+          fusionStage: 'search_runtime',
+        };
+        inputs.push(candidate);
+        envelopesByKey.set(packetKey, envelope);
+      }
+
+      try {
+        const result = await this.injectedReranker.rerank({ query: query.text, candidates: inputs });
+        const ranked = result.ranked;
+        const inputByKey = new Map(inputs.map((candidate) => [candidate.packetKey, candidate]));
+        const rankedKeys = ranked.map((candidate) => candidate.packetKey);
+        const validPermutation = ranked.length === inputs.length
+          && new Set(rankedKeys).size === inputs.length
+          && ranked.every((candidate) => {
+            const original = inputByKey.get(candidate.packetKey);
+            return original
+              && JSON.stringify(identity(candidate)) === JSON.stringify(identity(original));
+          });
+
+        if (!validPermutation) {
+          console.warn('[stage:rerank] injected reranker rejected: output is not an identity-preserving permutation');
+          return envelopes.map((item) => ({ ...item, model_version: 'injected-reranker-invalid-output' }));
+        }
+
+        return ranked.map((candidate, index) => ({
+          ...envelopesByKey.get(candidate.packetKey)!,
+          model_version: result.modelVersion || this.injectedReranker!.modelVersion,
+          blended_score: (ranked.length - index) / ranked.length,
+        }));
+      } catch (error) {
+        console.warn('[stage:rerank] injected reranker failed; preserving retrieval order', error);
+        return envelopes.map((item) => ({ ...item, model_version: 'injected-reranker-error-fallback' }));
+      }
+    }
+
     const { rerankCanonicalFeatureEnvelopes } = await import('./canonical-rerank-executor.js');
     const policyInput = buildPolicyStateFromRerankSignals({
       query: query.text,
@@ -979,7 +1540,7 @@ export class SearchRuntime {
         denseScore: envelope.dense?.score ?? null,
         lexicalScore: envelope.lexical?.score ?? null,
         astScore: envelope.ast?.score ?? null,
-        pageRankScore: envelope.authority?.page_rank ?? envelope.authority?.score ?? null,
+        pageRankScore: envelope.authority?.page_rank ?? envelope.page_rank_score ?? null,
         communityScore: envelope.authority?.score ?? null,
         exactPathScore: envelope.ast?.score ?? envelope.metadata?.score ?? null,
       })),
@@ -1100,21 +1661,26 @@ export class SearchRuntime {
   /**
    * KAG "next steps" item 1 (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration):
    * looks up real hypergraph neighbor evidence for the final packet set via
-   * `kag-hypergraph-reader-v1.ts`. Purely additive/informational — called
+   * `kag-hypergraph-reader-v1.ts`. Informational for final packets; candidate
+   * expansion is performed before fusion by `expandGraphCandidates()`. Called
    * only after ranking is final, and never allowed to throw into the main
    * search path (fail-open, returns undefined on any error so `provenance`
    * simply omits the field, matching its pre-existing optional contract).
    */
   private async lookupHypergraphNeighbors(
     packets: FeatureEnvelope[],
-  ): Promise<Array<{ canonicalId: string; hyperedgeIds: string[] }> | undefined> {
+    requestedWorkspaceRevision?: string | null,
+  ): Promise<{
+    graphRevision?: string;
+    neighbors: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
+  } | undefined> {
+    // Graph evidence is diagnostic only, but it must still be bound to one exact snapshot.
     const workspaceRevisions = new Set(packets.map((packet) => packet.workspace_revision?.trim()).filter(Boolean));
     const graphRevisions = new Set(packets.map((packet) => packet.graph_revision?.trim()).filter(Boolean));
-    if (
-      packets.some((packet) => !packet.workspace_revision?.trim() || !packet.graph_revision?.trim()) ||
-      workspaceRevisions.size !== 1 ||
-      graphRevisions.size !== 1
-    ) return undefined;
+    const workspaceRevision = workspaceRevisions.size === 1 ? [...workspaceRevisions][0] : undefined;
+    const graphRevision = graphRevisions.size === 1 ? [...graphRevisions][0] : undefined;
+    if (!workspaceRevision || !graphRevision) return undefined;
+    if (requestedWorkspaceRevision?.trim() && requestedWorkspaceRevision.trim() !== workspaceRevision) return undefined;
 
     const packetKeys = [...new Set(packets.map((packet) => packet.packet_key?.trim()).filter((key): key is string => Boolean(key)))];
     if (packetKeys.length === 0) return undefined;
@@ -1133,11 +1699,10 @@ export class SearchRuntime {
         .filter((key): key is string => Boolean(key)))];
       if (canonicalIds.length === 0) return undefined;
       const { readKagHypergraphNeighborsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
-      const receipt = await readKagHypergraphNeighborsStrictV1(canonicalIds, {
-        workspaceRevision: [...workspaceRevisions][0]!,
-        graphRevision: [...graphRevisions][0]!,
-      });
-      return receipt.neighbors.length > 0 ? receipt.neighbors : undefined;
+      const receipt = await readKagHypergraphNeighborsStrictV1(canonicalIds, { workspaceRevision, graphRevision });
+      // catch-all bucket, not a topic; excluded from provenance (hyperparameter, see OpenSpec visual/graph notes)
+      const neighbors = receipt.neighbors.filter((n) => n.canonicalId !== 'topo:unclassified');
+      return neighbors.length > 0 ? { graphRevision, neighbors } : undefined;
     } catch (error) {
       console.warn('[search-runtime] hypergraph neighbor lookup failed (non-blocking):', error);
       return undefined;
@@ -1162,6 +1727,10 @@ export class SearchRuntime {
     rawCandidates: Candidate[];
     fusedCandidates: FusedCandidate[];
     hydrationProof: HydrationProofSummary;
+    hydratedPackets?: FeatureEnvelope[];
+    rerankedPackets?: FeatureEnvelope[];
+    postProcessedPacketKeys?: string[];
+    postProcessDecisions?: import('./post-process-reranker.js').PostProcessDecision[];
     finalPackets: FeatureEnvelope[];
     postProcessedCount: number;
     rerankedCount: number;
@@ -1215,6 +1784,17 @@ export class SearchRuntime {
       rrfOutputCount: fusedCandidates.length,
       finalContextCount: finalPackets.length,
       validationReasons: hydrationProof.validationReasons,
+      hydrationCandidateResolutions: hydrationProof.candidateResolutions,
+      functionRegistry: buildFunctionRegistryRetrievalProofV1({
+        enabled: this.functionRegistry !== undefined,
+        readOnly: this.readOnly,
+        candidates: rawCandidates,
+        hydratedPackets: input.hydratedPackets,
+        rerankedPackets: input.rerankedPackets,
+        postProcessedPacketKeys: input.postProcessedPacketKeys,
+        postProcessDecisions: input.postProcessDecisions,
+        finalPackets,
+      }),
     };
   }
 }
@@ -1516,7 +2096,13 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
  * Factory for creating search runtime instances (production path — no injected adapters).
  * Backward-compatible: existing callers require no changes.
  */
-export function createSearchRuntime(config?: { userId?: string; caseId?: string; readOnly?: boolean }): SearchRuntime {
+export function createSearchRuntime(config?: {
+  userId?: string;
+  caseId?: string;
+  readOnly?: boolean;
+  reranker?: SearchRuntimeConfig['reranker'];
+  functionRegistry?: SearchRuntimeConfig['functionRegistry'];
+}): SearchRuntime {
   return new SearchRuntime(config ?? {});
 }
 
@@ -1524,6 +2110,12 @@ export function createSearchRuntime(config?: { userId?: string; caseId?: string;
  * Production factory with explicitly wired DI adapters.
  * Each adapter is fail-closed: returns [] on any error, never throws.
  */
-export function createProductionSearchRuntime(config?: { userId?: string; caseId?: string; readOnly?: boolean }): SearchRuntime {
+export function createProductionSearchRuntime(config?: {
+  userId?: string;
+  caseId?: string;
+  readOnly?: boolean;
+  reranker?: SearchRuntimeConfig['reranker'];
+  functionRegistry?: SearchRuntimeConfig['functionRegistry'];
+}): SearchRuntime {
   return new SearchRuntime({ ...(config ?? {}) });
 }

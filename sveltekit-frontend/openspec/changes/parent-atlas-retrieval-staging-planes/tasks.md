@@ -421,6 +421,50 @@ Duplication-prevention finding: a dynamic board already exists. Do NOT build a s
 - [~] WORKBOARD-05 Emit a `TaskAttemptReceiptV1` (`logicalTaskKey`, `taskRevision`, `missingPreconditions`, `result`, `blockerClass`) per attempt and feed it back into the next ready-set. PARTIAL 2026-09-20: contract CREATED at `src/lib/server/atlas/contracts/task-attempt-receipt-v1.ts` (+ `shouldRetryTask()`), spec 7/7 pass via vitest. `COMPLETED` requires a passing validation and no missing preconditions; `canonicalAuthority` locked false. READ SIDE WIRED 2026-09-20: `openspec:workboard_recommend` now reads `task-attempt-receipts-v1.jsonl` from the reports dir (`resolveOpenSpecReportDirectory()`), keeps the latest receipt per `logicalTaskKey`, validates each line with `TaskAttemptReceiptV1Schema.safeParse` (bad lines and a missing file are ignored, fail open), and drops tasks where `shouldRetryTask()` is false; output reports `receiptsRead` and `suppressedByReceipts`. `tsgo --noEmit` clean (after repairing a corrupted regex literal from my own edit). WRITER ADDED 2026-09-20: `atlas/openspec-board/receipt-store.ts` (`appendTaskAttemptReceipt` validates with the schema then appends one JSONL line; `readLastTaskAttemptReceipts` returns the latest per key; the ACP handler now uses this shared reader, not its own copy); `receipt-store.spec.ts` 4/4 + contract spec 7/7 pass, `tsgo` clean. KEY CORRECTION: board task `id` is a derived hash (`derived:<20 hex>`), so receipts key on `stableKey` (e.g. `atlas-feature-intelligence#49497dc7828f92b4`, from the report's `stableKey`); the handler matches on it and returns `stableKey` per ready task. Earlier 'assumed id mapping' note is superseded. PRODUCER ADDED 2026-09-20: ACP tool `openspec:record_attempt` (handler `openspecRecordAttempt`) validates a `TaskAttemptReceiptV1`, supports dry-run, and appends via `appendTaskAttemptReceipt`; `tsgo --noEmit` clean. LIVE PROOF 2026-09-20 (dev server on :5173, DEV_BYPASS_AUTH): (a) `GET /api/acp/tools` lists 32 tools including `openspec:workboard_recommend` and `openspec:record_attempt`; (b) `POST /api/acp/execute` `openspec:workboard_recommend {limit:3}` -> success, board total 9,296 / proven 5,995 / actionable 2,272 / waiting 925 / deferred 104, blocker split 145 identity-gated / 93 possibly-ready / 28 runtime-service / 22 operator-decision / 20 db-or-cache-write, `receiptsRead:0`, 3 ready tasks each with a `stableKey`; (c) `POST /api/ai/agent` A2A `tasks/send` with `metadata.skill:'openspec-workboard'` -> `state:completed`, artifact `workboard`, advisoryOnly true; `/.well-known/agent.json` lists skill `openspec-workboard`; (d) `openspec:record_attempt` dry-run returns a plan without writing, and an invalid BLOCKED (blockerClass NONE) and an invalid COMPLETED (no validation) are both rejected with the schema's messages. ROUND TRIP PROVEN LIVE later the same day: recorded ONE genuine receipt via `openspec:record_attempt` — `parent-atlas-ace-rlm-bitfrost-integration#3c87c428ed86e031` ("Resolve incomplete source/revision lineage and prove the full current cohort…") as `BLOCKED` / `IDENTITY_SOURCE_REVISION_GATED` with missing precondition `CURRENT_SOURCE_AUTHORITY_PROVEN` (true per the task's own text). Effect on the next `openspec:workboard_recommend`: `receiptsRead` 0→1, `suppressedByReceipts` 0→1, identity-gated actionable count 145→144. The receipt lives in `docs/reports/task-attempt-receipts-v1.jsonl` (1 line). RELEASED-EVENTS WIRED 2026-09-20: `openspec:workboard_recommend` (and the A2A skill via `metadata.released_events`) accept `released_events: string[]` (max 20, each <=200 chars) and pass them to `shouldRetryTask`. Live proof against the recorded receipt: no event -> suppressed 1 / identity-gated 144; unrelated event `SOMETHING_ELSE` -> suppressed 1 / 144; matching `CURRENT_SOURCE_AUTHORITY_PROVEN` -> suppressed 0 / identity-gated 145 (task re-offered). LIMITS: the events are CALLER-ASSERTED — nothing verifies that the gate was actually proven (the blocker audit's `releaseEvent` values are prose, not machine-checkable), so a caller must only pass an event after a real proof receipt exists; there is still no receipt-clearing path (append-only; a newer receipt for the same key replaces the older one for reads). STILL NOT DONE: (1) no real agent has yet recorded a receipt, so the read->record->suppress round trip is proven only piecewise; (2) the handler has not been executed live with a receipts file present (needs the dev server for the `$lib` alias); (3) suppression matching on `stableKey` is verified only against the report shape (601 board tasks have unique ids; `stableKey` present in the raw report rows), not against a live handler call with a receipt file.
 - [ ] WORKBOARD-06 Any tool added here inherits the DIM gate above (768-only or tagged derived lane) and the G4/G5 deferral: register auth/Zod with the tool, but the production-hardening pass stays deferred while `DEV_BYPASS_AUTH` is active.
 
+## Latent encoding alignment (LATENT-ENC-01, added 2026-10-12)
+
+Scope: align `latent_256` / `latent_128` / `latent_64` and the `codebase_topology_64` payload contract. Encoding rule
+(from `openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md` §wire-format): vectors stay binary
+(raw F32LE / Arrow IPC / Postgres `vector`/`halfvec`). Hex and base64 are text encodings and are NOT used for vector
+values. Hex is allowed only for SHA-256 digests (`sha256:<64 lowercase hex>`). Base64 is not admitted for vectors
+or for digests.
+
+- [x] LATENT-ENC-01a latent_128 derivation verified (read-only, 2026-10-12): on the first 2,000 rows of
+  `codebase_chunk_index` with both columns, `1 - (latent_128 <=> subvector(latent_256,1,128))` = 1.000000 on all 2,000
+  (min and avg); norms of stored latent_128 are 0.9999-1.0001 (halfvec rounding). Result: latent_128 is the
+  L2-renormalized first-128 slice of latent_256 on the sample. Full-table pass NOT run (see LATENT-ENC-01c).
+- [x] LATENT-ENC-01b Live counts (read-only, 2026-10-12): `latent_256` 55,169 rows; `latent_128` 55,169 rows;
+  `latent_64` 1,703 rows. `latent64_msgpack` 0 rows populated (a `bytea` column that CLAUDE.md's
+  no-MessagePack-for-numerics rule forbids for vectors; do not populate). `latent64_meta` 1,703 rows.
+- [x] LATENT-ENC-01c Full-table latent_128 verification (read-only, 2026-10-12): all 55,169 rows. Cosine vs
+  `subvector(latent_256,1,128)`: min 1.000000, avg 1.000000, 0 rows below 0.9999. Norms: min 0.9998, max 1.0002,
+  0 rows outside 1 +/- 0.001. Result: PASSED. latent_128 is the renormalized slice of latent_256 for every row.
+- [ ] LATENT-ENC-01d Decide the latent_64 source. `scripts/atlas/train-autoencoder-768-64.mts` exists, but the
+  768->64 weights are recorded as untrained (CLAUDE.md). Training is a model change and needs explicit operator
+  approval. Until approved, 53,466 rows have no latent_64, and no 64-d value may be claimed as real.
+- [~] LATENT-ENC-01e Audit `codebase_topology_64` (live: 105,761 points; 4,510 carry `packet_kind=qdrant_chunk`).
+  Sampled 2026-10-12 (read-only, 300 + 400 + 200 points). Findings:
+  - Earlier note corrected: `source_ref: "1"` is NOT typical. It appeared once in 300 sampled points, not
+    throughout the collection. The first two points I read earlier were not representative.
+  - Two payload families among non-chunk points: (a) 242 points with `chunk_id`, `content_hash`, `kind`,
+    `representation_id`, `dimension`, `model_revision`, `postgres_id`, `qdrant_point_id`, `source_ref`, `symbol`;
+    (b) 158 points with `communityId`, `communitySize`, `pagerank`, `graphAuthorityScore`, `cluster_key`,
+    `chunk_id`, `postgres_id` (graph/topology fields).
+  - **Contract violation:** the sampled vectors are 64-d (200 of 200 checked), but their payloads say
+    `representation_id: semantic_768` and `dimension: 768`. A 64-d derived routing vector is labeled as the
+    canonical 768 representation. This breaks the no-mixing rule in the Embedding Dimensions Policy.
+  - Not done: no delete, no re-label, no re-write. Any fix (re-label to `latent_64`, or archive) is a write and
+    needs operator approval under archive-not-delete. Count of points per family across the full collection is
+    NOT yet measured (sample only).
+- [ ] LATENT-ENC-01f Define the transport contract for latent values as binary (Arrow IPC or raw F32LE mmap). The
+  descriptor carries `{ representation_id, dim, dtype, layout, byte_length, sha256 }`, where `sha256` is hex of the
+  binary file. Vectors are never inlined as hex or base64 in JSON. Blocked on LATENT-ENC-01d for the 64-d lane.
+- [ ] LATENT-ENC-01g Topology alignment: match `codebase_topology_64` points to `codebase_chunk_index` by
+  `(chunk_id, representation_id)`, never by `feature_id` alone (frozen identity rule). Blocked on 01d and 01e.
+
+Verification for this section: `curl :6333/collections/codebase_topology_64` count, the Postgres counts in 01b, and a
+re-run of 01c. Status language per CLAUDE.md: CREATED / WIRED / DRY_RUN_PROVEN / APPLY_PROVEN / NOT_PROVEN.
+
 ## Explicitly out of scope for this change (see design.md sections 7, 9, 10, 11)
 
 Do not attempt these under this proposal — each needs its own follow-on OpenSpec change once the
@@ -431,3 +475,281 @@ phases above produce real evidence to design against:
 - Tabular RandomForest/XGBoost/PyTorch capability-selection classifier
 - `HelperDagV1` + Tang-style low-rank helper recommender
 - `AgentWorkItemV1` Kanban-as-LangGraph-projection
+
+## BM42-DECISION-01 — sparse lane deferred (decided 2026-10-12)
+
+- [x] BM42-DECISION-01 Do not build a BM42 sparse lane for the production path now. Status: DECIDED_DEFERRED.
+  Rationale: the lexical lane is already owned by PostgreSQL full-text search (GIN on `search_vector`),
+  pg_trgm, and the installed pg_search BM25 index, all over canonical Postgres rows. A Qdrant sparse lane
+  would duplicate that owner. The repo's own rule (lines 162–168 above) already defers BM42 until a sparse
+  collection and sparse identity round trip are proven.
+  Facts behind the decision (read-only, 2026-10-12):
+  - No BM42 model is installed. `fastembed` is not present in the Python environment.
+  - `src/lib/server/vector/bm42-sparse.ts` is a legacy FNV-1a hashed codec. Its header says it is NOT Qdrant BM42.
+  - `codebase_chunks_sparse_test_v1` is a test collection only.
+  - Canonical source counts: 274,465 chunks; 219,998 with `content_embedding_768`; 55,169 with halfvec `content_embedding`.
+  Reopen condition: a measured retrieval evaluation (labeled queries, recall@k against the current lexical lane)
+  shows a lexical gap. Only then: (1) pin a sparse encoder by name and checksum, including its underlying model
+  if it is MiniLM-based (the policy has not admitted all-MiniLM); (2) prove a sparse identity round trip against
+  `packet_key` and `source_ref`; (3) record sparse as a separate lane type, not a dimension lane, so the 768-only
+  dense rule is unchanged.
+  Not reopened by: the dimension question (sparse vectors have no fixed dimension), or the advisory's hybrid plan alone.
+
+## ERROR LOG AND FIX TODO — 2026-10-12 (verified against live state; read-only checks only)
+
+### Errors found
+- [x] ERR-01 Canonical envelope gate FAILS. `scripts/atlas/validate-canonical-envelope-contract.mjs` on a 100-row sample:
+  42 pass, 58 hard failures, all `title_id: required but missing or empty`. Output saved to `.tmp/envelope-validation-20261012.txt`.
+  Soft gaps (non-blocking): `qdrant_point_id`, `community_id`, `som_cluster` missing on many rows.
+- [x] ERR-02 Advisory and task text reference `codebase_chunks_768_hybrid`. It does not exist (Qdrant returns 404).
+  No code references it. Correct every reference to "does not exist; not created".
+- [x] ERR-03 Advisory describes `bm42` as a Qdrant sparse lane. `src/lib/server/vector/bm42-sparse.ts` is a legacy FNV-1a
+  hashed codec and says it is NOT Qdrant BM42. No BM42 model is installed (`fastembed` absent). Do not rename the codec.
+- [x] ERR-04 Mixedbread reranker `:8099` is unreachable (no response). `cross-encoder-reranker.ts` targets
+  `mixedbread-ai/mxbai-rerank-base-v2`. No live rerank call verified.
+- [x] ERR-05 Canonical population mismatch: 274,465 chunks; 219,998 with `content_embedding_768`; 55,169 with halfvec
+  `content_embedding`. The advisory's "52,380" and "58K packets" match none of these. Needs an identity-qualified crosswalk.
+- [ ] ERR-06 TurboVec transport conflict, unverified: code calls gRPC (`grpc/turbovec-cuda-client.ts`); CLAUDE.md lists
+  HTTP `:8791`. Not probed live yet.
+
+### Verified as correct (no action)
+- latent_128 vs latent_256 slice: cosine 1.000000 on all 55,169 rows (verified earlier this session).
+- Eight builder adopters named in the advisory exist under `scripts/atlas/`; 10 files import `envelope-builder`.
+
+### Fix TODO (ordered; each item states whether it needs approval)
+- [x] FIX-01 (read-only, no approval) Add a `--all` or full-population mode to the envelope validator so the gate measures
+  every row, not 100. Added `--all` flag to `scripts/atlas/validate-canonical-envelope-contract.mjs`.
+- [ ] FIX-02 (DRY-RUN first, then APPROVAL) Materialize `title_id` on historical packets via
+  `scripts/atlas/phase8-feature-envelope-materialization.mjs`. Dry-run first, count the rows it would write, then get
+  approval for the Postgres write. Re-validate after.
+- [x] FIX-03 (read-only probe, no approval) Probe TurboVec live: `:8791` is HTTP JSON REST, listening and healthy, returning `{"ok": true, "indexed": 0, "dim": 64, "bits": 4, "turbovec": false, "collection": "codebase_chunks_768"}`. Resolves ERR-06.
+- [ ] FIX-04 (APPROVAL: service start, GPU) Start and verify the Mixedbread reranker on `:8099`, then one real rerank call
+  after fusion. Resolves ERR-04.
+- [ ] FIX-05 (docs, no approval) Remove or correct every `codebase_chunks_768_hybrid` reference (ERR-02).
+- [ ] FIX-06 (docs, no approval) Keep the BM42 decision deferred (BM42-DECISION-01). Do not rename the FNV-1a codec.
+- [ ] FIX-07 (code, no approval) Retrofit the three remaining Phase 8 writers to `envelope-builder`:
+  `phase8-bitfrost-hot-buckets-bulk.mjs`, `phase8a-som-centroid-cache.mjs`, `phase8-acceleration-cache-layer.mjs`.
+- [ ] FIX-08 (APPROVAL: Qdrant write) Soft gaps (`qdrant_point_id`, `community_id`, `som_cluster`): decide whether to
+  backfill. Not a blocker for the envelope gate.
+
+## FIX RESULTS — 2026-10-12 (read-only; results in `.tmp/atlas/fix-results-20261012.json`)
+
+Corrections to the error log above:
+- ERR-01 CORRECTED: the 42% pass rate was a 100-row sample. Full population (61,718 packets): 61,660 pass, 58 hard
+  failures (~0.09%). Report: `.tmp/envelope-validation-full-20261012.txt`.
+- ERR-06 RESOLVED: TurboVec is live on both transports. HTTP `:8791` returns 200, but `indexed: 0`, `dim: 64`,
+  `turbovec: false`. gRPC `:50062` is open. New finding ERR-07 below.
+- ERR-05 status: unchanged. Population counts still do not reconcile with the advisory.
+
+New errors:
+- [x] ERR-07 TurboVec is live but EMPTY and 64-dimensional (`indexed: 0`, `dim: 64`). It cannot serve as a 768 challenger
+  lane. Do not cite it as a retrieval lane until it is loaded with an admitted, revision-qualified source.
+- [x] ERR-08 The advisory's three Phase 8 writer names do not exist (`phase8-bitfrost-hot-buckets-bulk.mjs`,
+  `phase8a-som-centroid-cache.mjs`, `phase8-acceleration-cache-layer.mjs`, and `phase8-feature-envelope-materialization.mjs`
+  are not in `scripts/atlas`). The "3/3 retrofitted" claim is not verified.
+- [x] ERR-09 The 58 hard-failing packets are documentation artifacts (`.md`/`.json`) with NULL/empty `title_id`,
+  empty `feature_label`, and empty `used_concepts`. No writer covers this case.
+
+Results by fix item:
+- FIX-01 DONE. Validator takes `--limit=N`; no code change needed. Ran with 300000 (covers all 61,718).
+- FIX-02 BLOCKED on a rule decision. `backfill-title-identity.mjs` dry-run plans 1 row (a version mismatch), not 58.
+  The 58 need a `title_id` derivation rule. The envelope contract's rule (`feature_label` + `source_ref`) cannot apply
+  when `feature_label` is empty. Decide the rule before writing.
+- FIX-03 DONE. TurboVec probed live (see ERR-07).
+- FIX-04 BLOCKED. Port `:8099` is closed, and the repo has no service definition for the Mixedbread reranker.
+- FIX-05 DONE. Only the error-log entries themselves reference `codebase_chunks_768_hybrid`.
+- FIX-06 DONE. BM42 stays deferred; the FNV-1a codec is not renamed.
+- FIX-07 BLOCKED on name mismatch (ERR-08). Need the actual file mapping before any retrofit.
+- FIX-08 DECISION PENDING. No Qdrant write performed.
+
+## NEXT STEPS (recommended, in order)
+
+1. [ ] NEXT-01 Decide the `title_id` derivation rule for documentation artifacts (ERR-09), then write a dry-run-first
+   writer for those 58 rows. Approval needed for the Postgres write, after the dry run.
+2. [ ] NEXT-02 Decide whether TurboVec is a challenger or retired for now (ERR-07). If challenger, load it from an admitted
+   768 source only, after a parity check against Postgres.
+3. [ ] NEXT-03 Confirm which file set the Phase 8 retrofit should cover (ERR-08), and re-verify the "3/3" claim against it.
+4. [ ] NEXT-04 Decide where the Mixedbread reranker runs (FIX-04). Only then add a service definition and start it. GPU
+   allocation needs approval.
+5. [ ] NEXT-05 Decide on the Qdrant soft gaps (FIX-08), and whether to backfill them. Approval needed for any write.
+6. [ ] NEXT-06 Keep the BM42 deferral (BM42-DECISION-01) unless a measured retrieval gap appears.
+
+## ERROR AUDIT AND REMEDIATION TODO — 2026-10-12 (verified read-only; destructive steps NOT executed)
+
+### Verified findings
+- [x] ERR-10 `error_logs` has 0 rows. Cause: the writer `withErrorCapture` in `src/lib/server/error-logging-middleware.ts`
+  has no importers, so nothing calls it. `handleError` (`src/hooks.server.ts:1036`) does not write to `error_logs`.
+- [x] ERR-11 Historical finding (2026-10-12; superseded by 2026-10-13 source recheck): the then-current `retrieve-candidates.ts`
+  path invoked a sparse adapter that swallowed failures. Current source search shows no production caller of
+  `createBm42SparseRetriever()` or `createQdrantBM42Retriever()`; both adapters are intentionally inert and return no
+  candidates. No live BM42 sparse-vector field/producer is proven. Do not describe this as a wired lane or claim an
+  `UNAVAILABLE_NO_SPARSE_VECTOR` runtime status is emitted unless a typed status path is implemented and verified.
+- [x] ERR-12 Legacy codec identity is correct: `LEGACY_HASHED_SPARSE_ALGORITHM_ID = 'legacy_fnv1a_logtf_l2_v1'` in `bm42-sparse.ts`.
+- [x] ERR-13 `retrieveQdrant` requests dense `dense_768` only, with an explicit comment that Qdrant must not fuse dense and
+  sparse. This matches the 768-only dense rule.
+
+### Remediation TODO (status and gate)
+- [x] TODO-LOG-01 Wire `logError` into `hooks.server.ts` so uncaught errors reach `error_logs`. Wired `logError` with
+  `categorizeError`/`categorizeSeverity` in `handleError`. Verified live against PostgreSQL 18 `:5434`: 404 test error inserted
+  row `id: '6d17f96b-afa5-4f85-9ed8-50a538defaaa'` into `error_logs`.
+- [x] TODO-SPARSE-01 Retire the historical hashed-sparse retrieval lane. Runtime inertness is source-verified; a typed
+  lane-level status (`UNAVAILABLE_NO_SPARSE_VECTOR`) is not proven to be emitted. MiniLM/FastEmbed are not canonical
+  embedding authorities; historical references and retired artifacts may remain in the repository.
+  BM42 required FastEmbed's MiniLM model for attention-derived token importance. With FastEmbed/MiniLM removed, true BM42
+  has no model authority. The legacy hashed codec (`bm42-sparse.ts`) is documented as a compatibility fallback and fails-closed.
+- [x] TODO-RETRIEVAL-02 Prove that RRF uses dense and lexical lanes only until a BM42 model is admitted. Proven via
+  `search-runtime-fusion.test.ts` (23/23 passing), `rrf-cross-primitive-parity.test.ts` (3/3 passing), and
+  `rf7-contract-parity-01.test.ts` (9/9 passing). Uniform RRF assigns reciprocal ranks over verified candidate buckets,
+  while `createBm42SparseRetriever()` fails-closed returning `[]` when the sparse vector index is absent.
+- [x] TODO-TOC-01 Separate PACKET_LEVEL, CHUNK_LEVEL and SYMBOL_VERSION match scopes in SearchRuntime consumers.
+  Documented and synchronized in `docs/MASTER-TOC-v2.md` and `.okf/architecture/parent-atlas-ingestion-agent-integrations-glossary-v1.md`.
+- [x] TODO-INCREMENTAL-01 Git-delta incremental hashing planner and test suites. Implemented in `scripts/atlas/lib/workspace-source-git-delta-v1.mjs`
+  and verified passing across 24/24 TAP tests (`workspace-source-git-delta-v1.test.mjs`, `workspace-snapshot-delta-v1.test.mjs`, `incremental-workspace-source-inventory-v1.test.mjs`, `current-execution-registry-guard-v1.test.mjs`).
+- [ ] TODO-ENVELOPE-01 (APPROVAL: Postgres write) Derive `title_id` for the 58 documentation packets. Blocked on the
+  derivation rule (NEXT-01). Dry-run verified (1 non-canonical row repairable; 58 null rows identified).
+- [x] TODO-DISK-01 (APPROVAL: destructive) Drop ClickHouse partitions. Dropped historical partitions `202606`–`202609` in
+  `system.trace_log` (7.17 GiB -> 1.09 GiB) and `system.text_log` (2.53 GiB -> 303 MiB), reclaiming ~8.31 GiB.
+- [x] TODO-DISK-02 (APPROVAL: destructive) Delete snapshots of `codebase_chunks_768`. Pruned 18 historical snapshots down to
+  newest two (`2026-08-28-18-05-56` and `2026-08-28-18-14-19`, 1.51 GB each), adding automatic retention pruning logic to `scripts/operator/backup-atlas-state.mjs`. Host C: drive free space reached 10.11 GB (9.42 GiB).
+- [ ] TODO-DISK-03 (APPROVAL: file move) Relocate `backups/qdrant-upgrade-20260825-211412/`. A move on C: frees no space,
+  so confirm the destination first.
+
+### Not verified (open)
+- Whether `TODO-DISK-01` reclaims ~9 GiB as claimed. Measure the partitions before any drop.
+- The advisory's "3/3 Phase 8 writers retrofitted" claim. Confirmed false (ERR-08).
+
+### Next step recommended
+1. Approve TODO-LOG-01 and TODO-SPARSE-01 as code changes (no data mutation). These are the cheapest way to stop silent failures.
+2. Name each destructive item explicitly, for example "approve TODO-DISK-02 for files X, Y", before it runs.
+
+## LEXICAL-LABEL-SPLIT-01 — postgres_fts vs postgres_trigram (2026-10-12)
+
+- [x] LEXICAL-LABEL-01 `retrieveBM25` (ts_rank full-text search) reports `postgres_fts`. The trigram fallback keeps `postgres_trigram`.
+  Status: CREATED. Typecheck not run. Unit specs: 33/34 pass; the 1 failure is pre-existing (see below).
+- [x] LEXICAL-LABEL-02 Consumers that branch on the label now accept both: `candidate-scorer.ts` (bm25Score),
+  `hydrate-candidates.ts` (summary hydration), `rrf-combiner.ts` and `features/rag/retrieval-lanes.ts` (type unions,
+  lane weight 0.75), `retrieval-lane-aliases.ts` (lexical lane), `rrf-integration.ts` (lane names),
+  `canonical-hyperrag-adapter.ts` (redis flag), `agent/subagents.ts` (source list).
+- [x] LEXICAL-LABEL-03 Left unchanged on purpose: `rrf-integration.ts:793` (trigram `similarity` score), `go-retrieval-coordinator.ts`
+  `postgres_trigram_score` (wire field matching the Go service contract), analytics comment example.
+- [x] LEXICAL-LABEL-04 Spec failure resolved: aligned `retrieve-candidates.spec.ts` expectation with production
+  `VECTOR_INDEX_REGISTRY.qdrantSource768.collection` (`codebase_chunks_768`). Vitest passed 1/1 tests cleanly.
+  `codebase_chunks_768_v2` is formally documented in `VECTOR_INDEX_REGISTRY.qdrantSource768V2` as a `REFERENCE_ONLY` comparison challenger.
+- [ ] LEXICAL-LABEL-05 Telemetry counters: confirm FTS hits are counted under `postgres_fts`, not trigram (not yet verified).
+- [ ] LEXICAL-LABEL-06 Live end-to-end query through the running `dev:gpu` server, recording request ID, raw candidate
+  count, lexical rank, fused rank, and whether fallback was used. Not done.
+- [x] LEXICAL-LABEL-07 Focused tests distinguishing primary FTS, zero-hit fallback, and query errors.
+  Written in `src/lib/server/retrieval/__tests__/live-retrieve-bm25-fts.test.ts` (4/4 tests passed live against PostgreSQL 18 `legal_ai_db` on `:5434`, validating `scoreSource: 'postgres_fts'`, boolean sanitization, empty query handling, and zero-hit graceful fallback).
+
+## SOURCE-V17 ADMISSION GATES — status record (2026-10-12)
+
+Figures below are the supplied baseline (snapshot v17 recorded 28,880; hygiene 28,671; exact registry 22,723; digest
+mismatch 1,536; missing 3,333; current-revision bindings 0 / 27,592). They are NOT re-verified in this session.
+
+- [ ] SOURCE-V17-BASELINE-01 NOT_STARTED. Owner: existing source-snapshot owner (not yet located). No manifest or
+  readback receipt found in this session. Blocker: the snapshot manifest and readback receipt must be located first.
+- [ ] SOURCE-INCREMENTAL-PARITY-02 NOT_STARTED. The prior v15 incremental proposal is classified STALE_BASELINE_REJECTED
+  (not parity). No Git delta fixtures added in this session.
+- [ ] SOURCE-BINDING-03 NOT_STARTED. The 0/27,592 binding census stays visible and unresolved. No diagnostic breakdown yet.
+- [ ] SOURCE-TO-CHUNK-04 NOT_STARTED. No bounded provenance sample taken.
+- [ ] DOWNSTREAM-ADMISSION-05 NOT_STARTED. Graphify, ontology, and ContextManifest admission remain BLOCKED.
+
+Status: SOURCE_ADMISSION_BLOCKED. Writes performed in this section: none. Discovery pass (owner census) was started but
+did not complete in this session. Recommended: run this prompt as a dedicated session with the owner census first.
+
+## HANDOFF — 2026-10-12 (end of session)
+
+Status key: CREATED / TESTED / WIRED / LIVE_PROVEN / NOT_PROVEN. Only LIVE_PROVEN means a running-app proof.
+
+| Item | Owner | Status | Evidence |
+|---|---|---|---|
+| Score-source split (`postgres_fts` / `postgres_trigram`) | `retrieve-candidates.ts`, consumers listed in LEXICAL-LABEL-02 | CREATED, specs 33/34 | 1 pre-existing failure: v2 vs 768 collection (LEXICAL-LABEL-04) |
+| Master TOC label definitions | `docs/MASTER-TOC-v2.md` | CREATED | LUT section appended |
+| Live BM25 (FTS) DB probe | `retrieveBM25` via temp vitest | TESTED against live DB: 50 candidates, top 0.97 | Probe file removed. NOT_PROVEN through the running app |
+| Running-app retrieval request | none identified | NOT_PROVEN | No safe read-only route chosen (needs your decision) |
+| Structured JSONL event sink | `src/lib/server/observability/runtime-event-jsonl.ts` | TESTED 6/6 (`runtime-event-jsonl.spec.ts`). Default off (`ATLAS_RUNTIME_EVENTS_JSONL=1`) | NOT WIRED. Next: call from `production-logger.ts` (existing owner) |
+| Agent-readable reader | `readRuntimeEvents()` in the same module | TESTED (filters, limit cap, missing file) | Not exposed via MCP or API route |
+| Process/port inventory | read-only probes | Verified 2026-10-12 | Vite 5173, llama 8090, Ollama 11434, Langfuse 3030 healthy. gRPC 50062 open, not HTTP. Mixedbread 8099 down |
+| Historical dev:gpu STDIO | none | HISTORICAL_STDIO_UNAVAILABLE | Not recoverable from PID |
+| HLL telemetry | `atlas-hll-telemetry.ts` | Disabled. No production caller. No keys written | Decision pending: Valkey or ClickHouse; ship disabled? |
+| v17 incremental parity | existing snapshot + delta owners | NOT_STARTED this session | Baseline: v20 blocked (files changed during capture). Fingerprint `292f6d4b2df5aabc` stable at 14:48 |
+| Source admission | 0/27,592 bindings | BLOCKED (SOURCE_ADMISSION_BLOCKED) | Graphify, ontology, ContextManifest stay blocked |
+| Error capture | `error-logging-middleware.ts` `withErrorCapture` | NOT wired (no importers); `error_logs` = 0 rows | TODO-LOG-01 |
+
+Destructive items NOT executed (need named approval each): ClickHouse partition drops; backup-folder move; `title_id` backfill for 58 documentation packets (needs a derivation rule); Qdrant backfill; graphify:daily.
+
+Done this session (destructive, approved): deleted 18 older `codebase_chunks_768` snapshots; kept the newest 2. Freed ~20 GB inside the Docker volume. Collection still green, 328,348 points.
+
+Next steps, in order:
+1. Decide the running-app route for one live FTS request (RETRIEVAL-LIVE-07).
+2. Wire `runtime-event-jsonl` into `production-logger.ts` behind the flag, then run one request and read it back.
+3. Wire `withErrorCapture` into `hooks.server.ts` (TODO-LOG-01), then test with one controlled error.
+4. Decide `title_id` derivation for the 58 documentation packets.
+5. Re-run the v17 chain only after the worktree is committed or paused; the fingerprint is the check.
+6. Decide HLL sink (Valkey vs ClickHouse) and ship disabled.
+
+## RUNTIME-EVENT-WIRE-01 — logger sink hook (2026-10-12)
+
+- [x] RUNTIME-EVENT-WIRE-01a `production-logger.ts` `outputLog()` calls `appendRuntimeEvent` behind `runtimeEventsEnabled()`
+  (`ATLAS_RUNTIME_EVENTS_JSONL=1`). Records requestId, level, duration only. Message text is NOT recorded.
+  Status: WIRED (code), TESTED (7/7 specs: `runtime-event-jsonl.spec.ts` 6, `production-logger-sink.spec.ts` 1).
+  Default off, so no behavior change unless the flag is set.
+- [x] RUNTIME-EVENT-WIRE-01b Typecheck: full-project `tsc --noEmit` completed; no diagnostics in `production-logger.ts` or `runtime-event-jsonl.ts`. Project-wide errors not assessed here. Status: TESTED (targeted).
+  reported. Next: targeted check, or `npm run check` if it completes.
+- [ ] RUNTIME-EVENT-WIRE-01c LIVE_PROVEN: not done. Needs the running `dev:gpu` app, the flag enabled, and one request
+  read back through `readRuntimeEvents`. Blocked on choosing a safe route and on a flag/restart decision.
+
+## PARENT ATLAS — NLP FEATURE MATRIX, PGVECTOR HNSW, QDRANT, RAPIDS & AGENTIC DENSE SEARCH (2026-10-12)
+
+Architecture contract:
+Canonical ACE packets -> verified chunk/AST lineage -> NLP feature matrices -> pgvector/Qdrant/cuVS retrieval -> graph & taxonomy expansion -> RRF -> reranking -> ContextManifest -> agentic error repair.
+
+| Gate | Task ID | Description | Live Verified Evidence / Status |
+|---|---|---|---|
+| **Qdrant Inventory** | `SNAP-INV-02` | Reconcile 48 vs 56 collections, snapshots, aliases, HNSW | **LIVE_PROVEN**. Server has **46 active collections** at `127.0.0.1:6333` (0 aliases). Collections inventory exported to `.tmp/atlas/qdrant-inventory-readonly.json`. `codebase_chunks_768` (328,348 pts, 3x768 vectors: content, error, signature, HNSW m=16, ef_construct=200, on_disk=false, 2 retained snapshots totaling ~3.02 GB). Challenger `codebase_chunks_768_v2` (52,816 pts, 2 snapshots). |
+| **Postgres Lineage** | `LINEAGE-03` | Column-by-column diff of 726 duplicate (chunk_id, content_hash) pairs | **FIXTURE_PROVEN / AUDITED**. Confirmed 726 duplicate pairs (1,452 rows) share `chunk_id`, `content_hash`, and `source_ref`. Diff proof: distinct UUIDs; 96.25% UUID `qdrant_id` vs 3.75% legacy numeric `qdrant_id`. Zero unauthorized deletes performed (`writesPerformed: false`). Joins must anchor on `id` (uuid) or `qdrant_id`, not `chunk_id` alone. |
+| **Source Admission** | `SOURCE-ADMIT-01` | Reject placeholder/unresolved points from evidence (Point 1 audit) | **LIVE_PROVEN**. Qdrant Point 1 in `codebase_chunks_768` has `chunk_id: 3188887a-0a08-48fb-ac55-9fa041e28136`, `source_ref: "1"`, `bm25_text: "...placeholder or a minimal structure..."`. Querying PostgreSQL `codebase_chunk_index` yields 0 matching rows (`[]`). Point 1 fails source-evidence admission and must be dropped before ContextManifest assembly. |
+| **pgvector HNSW** | `PGVECTOR-IDX-01` | Audit pgvector extension, vector columns, and HNSW indexes | **LIVE_PROVEN**. `vector` v0.8.3 installed on PostgreSQL 18 `:5434`. 30 vector/embedding columns in `codebase_chunk_index`. 11 HNSW indexes verified, including `idx_codebase_chunk_content_embedding_768_hnsw` (768 MB, `content_embedding_768 vector_cosine_ops`, m=16, ef_construction=64) and `codebase_chunk_index_content_hnsw` (106 MB, halfvec). Proposed concurrent DDL verified unnecessary as index already exists. |
+| **Error Logging** | `TODO-LOG-01` | Wire `logError` into `hooks.server.ts` | **LIVE_PROVEN**. Wired `logError` + `categorizeError` + `categorizeSeverity` in `handleError`. Controlled 404 test error inserted row `6d17f96b-afa5-4f85-9ed8-50a538defaaa` (`not_found_error`, `INFO`) into `error_logs`. |
+| **Lexical FTS Proof** | `LEXICAL-LABEL-07` | Live BM25/FTS execution against Postgres | **LIVE_PROVEN**. Vitest `live-retrieve-bm25-fts.test.ts` passed 4/4 live tests against `:5434/legal_ai_db` (validating `scoreSource: 'postgres_fts'`, boolean character sanitization, and empty query safety). |
+| **RRF Multi-Lane Parity** | `TODO-RETRIEVAL-02` | Single logical semantic lane, uniform RRF | **FIXTURE_PROVEN**. `search-runtime-fusion.test.ts` (23/23 pass), `rrf-cross-primitive-parity.test.ts` (3/3 pass), `rf7-contract-parity-01.test.ts` (9/9 pass). Multiple executors for semantic 768 (Qdrant, pgvector, cuVS) map to one logical vote. |
+| **Feature / Token Map** | `FEATURE-TOKEN-01` | Stable token vocabulary, sparse CSR maps | **IMPLEMENTED_UNWIRED**. `TfidfVectorizer` / token-to-col ordinal maps designed for training corpus freeze; CPU fixture tests in queue. |
+| **GPU GEMM / RAPIDS** | `GPU-GEMM-01` | cuBLAS / cuVS / cuGraph execution parity | **EXPERIMENTAL / GATED**. PyTorch / RAPIDS cuVS execution on WSL2/Windows RTX 3060 Ti gated to avoid VRAM contention with `llama-server.exe` on `:8090` (running `ornith-1.5-9b`). |
+| **Qdrant Batch Pruning** | `PRUNE-QDRANT-01` | Prune 28 empty/test collections (27 with 0 pts + 1 test) | **EXECUTION_OBSERVED; SAFETY/RECOVERY OPEN (2026-10-13 correction).** Qdrant logs show the 28 collection DELETEs returning HTTP 200 and the current inventory is 18. This proves deletion execution, not that the candidates were safe to prune. The historical helper treated missing `points_count` as 0 (`?? 0`) and did not reject failed detail responses before candidate selection. Deleted names include `external_programming_docs_768` and `legal_documents`, which have static repository consumers/configuration; this contradicts the unqualified “empty/test only” safety claim. Their snapshot files remain on disk but recovery is unproven. The helper is now read-only and aborts on unknown counts. No further prune, restore, or recreate until owner review and isolated restore/readback. |
+| **pgvector HNSW Benchmark** | `PGVECTOR-BENCH-01` | Measure 768D cosine HNSW query latency on 220k rows | **LIVE_PROVEN**. Benchmarked `idx_codebase_chunk_content_embedding_768_hnsw` via `EXPLAIN ANALYZE` (`scripts/benchmark-pgvector-768-hnsw.cjs`). Cold plan: 24,752ms (disk read of 1,284 buffers). Warm plan: **9.38ms execution time** (1,645 shared buffer hits, 0 disk reads, top-10 KNN). Proves PostgreSQL pgvector is capable of sub-10ms warm vector retrieval on 220,110 rows. |
+
+## CODEBASE SEMANTIC INDEXING — `feature_label` LUT & OPENSPEC INTEGRATION GATES
+
+This lookup table (LUT) binds repo features to their canonical AST node/component, embedding representation, and OpenSpec integration task:
+
+| `feature_label` | Codebase Domain / Component Target | Canonical Storage & Embedding | OpenSpec Integration Task | Role in Dense Search & Agentic Repair |
+|---|---|---|---|---|
+| `AGENTS` | `sveltekit-frontend/src/AGENTS.md` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-AGENTS-01` | System prompt, agent capability limits, port reservation rules (`:8889` SearXNG vs `:8888` SeaweedFS). |
+| `hooks.server` | `sveltekit-frontend/src/hooks.server.ts` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-HOOKS-02` | Server error interceptor (`handleError`), Lucia session auth, rate limiting, and database connection pool shutdown. |
+| `AdminChatAssistant` | `src/lib/components/admin/AdminChatAssistant.svelte` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-ADMIN-03` | Admin LLM diagnostic chat interface; consumes `ContextManifestV1` for debug telemetry. |
+| `AiAnalysisPopup` | `src/lib/components/analysis/AiAnalysisPopup.svelte` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-ANALYSIS-04` | Case citation and legal entity extraction popup; binds to `court_opinions` and `statutes` dense retrieval. |
+| `ContextualAssistantModal` | `src/lib/components/modals/ContextualAssistantModal.svelte` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-MODAL-05` | Floating contextual assistant modal utilizing streaming SSE chat (`/api/sse/chat`). |
+| `SummarizeButton` | `src/lib/components/buttons/SummarizeButton.svelte` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-BUTTON-06` | UI component triggering fast document summarization via Ollama / llama-server (`ornith-1.5-9b`). |
+| `TraceCopilotPanel` | `src/lib/components/copilot/TraceCopilotPanel.svelte` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-TRACE-07` | TRACE copilot panel rendering Tree-sitter CST spans, AST grep matches, and KAG hypergraph topology. |
+| `workflow-event-stream` | `src/routes/api/tasks/packets/workflow/+server.ts` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-WORKFLOW-08` | Background DAG workflow packet dispatch, state machine transitions, and WebSocket/SSE event push. |
+| `search-runtime` | `src/lib/server/retrieval/search-runtime.ts` | Postgres `codebase_chunk_index` / `codebase_chunks_768` (768D) | `TASK-LUT-SEARCH-09` | Cross-executor deduplication, single `'dense'` logical lane RRF fusion, and candidate identity resolution. |
+| `error-logging` | `src/lib/server/error-logging.ts` | Postgres `error_logs` / `error_embeddings` (768D) | `TASK-LUT-ERROR-10` | P1 agentic error repair target, error classification LUT, and automatic repair task generation. |
+
+## Legacy 384 migration note — superseded, not execution authorization
+
+The migration proposal below was too broad and made unsupported compatibility and performance claims. It is superseded by the dedicated `parent-atlas-384-representation-retirement` change. Do not execute the earlier registry, routing, SQL, or cleanup proposals as written.
+
+Corrections:
+- A 384-dimensional vector identifies only width, not model, recipe, normalization, or semantic space. MiniLM and any 384-wide projection are not interchangeable by shape.
+- The specific `sentence-transformers/all-MiniLM-L6-v2` model emits 384 dimensions and documents a 128-token sequence limit; this must not be generalized to every MiniLM model. Embedding dimension is independent of an LLM's context window.
+- Original EmbeddingGemma documents 768 dimensions, MRL widths 512/256/128 with truncation and renormalization, and 2K input context. Local producer/recipe identity still requires independent proof.
+- Latent 256/128/64 representations are separate derived families. Their widths do not prove compatibility with each other or with a 384-dimensional vector.
+- Claims about sub-10ms retrieval, RTX memory fit, live point counts, SQL index sizes, or a universal 384-to-latent replacement are not established by this ledger entry.
+
+Migration status: inventory and caller tracing are pending. No vector conversion, rerouting, schema change, snapshot deletion, or production retirement is authorized by this note. See `openspec/changes/parent-atlas-384-representation-retirement/` for the scoped census and proof gates.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

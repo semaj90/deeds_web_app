@@ -1,11 +1,8 @@
-"""Exports a read-only, checksummed, frozen semantic_768 training snapshot from
-codebase_chunk_index.content_embedding -- the canonical input for AE_TRAIN_V4.
+"""Exports a read-only, checksummed diagnostic snapshot from
+codebase_chunk_index.content_embedding, whose canonical model/source lineage is unverified.
 
-This is STEP 1 of the AE training gate (AE_TRAIN_V4_INPUT_01). It does NOT train
-anything. It freezes the exact FP32 matrix + ordinal map that a training run
-must consume, so a training run never reads directly against mutable Postgres
-(the corpus can grow between when you decide to train and when the run
-actually starts -- freeze first, train against the frozen artifact).
+This does NOT train anything or qualify a production cohort. It freezes a
+structural diagnostic matrix + ordinal map; source/model lineage remains unproven.
 
 Ordering: rows are ordered by id (the primary key) for full determinism --
 re-running this exporter against an unchanged corpus must produce byte-identical
@@ -25,11 +22,11 @@ Outputs:
     ordinal (0..N-1) -> {id, source_ref}, in matrix row order.
   docs/reports/semantic768-ae-training-snapshot-<tag>.json
     The manifest: row count, matrix checksum, ordinal map checksum,
-    sourceRef coverage, representation revision, producer revision, training
-    code revision (git SHA of train_latent_autoencoder.py at export time).
+    sourceRef coverage, code-revision fields, and explicit unqualified lineage
+    status. Existing tags are never overwritten.
 
 Usage:
-  python python/export_frozen_semantic768_snapshot.py --tag v4
+  python python/export_frozen_semantic768_snapshot.py --tag diagnostic-v5
 """
 
 from __future__ import annotations
@@ -38,6 +35,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -70,11 +68,47 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def snapshot_output_paths(tag: str) -> tuple[str, str, str]:
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", tag) or ".." in tag:
+        raise ValueError("snapshot tag must be a simple filename component")
+    return (
+        os.path.join(OUT_DIR, f"frozen_semantic_768_{tag}_matrix.f32bin"),
+        os.path.join(OUT_DIR, f"frozen_semantic_768_{tag}_ordinal_map.json"),
+        os.path.join(REPORT_DIR, f"semantic768-ae-training-snapshot-{tag}.json"),
+    )
+
+
+def ensure_snapshot_paths_new(paths: tuple[str, ...]) -> None:
+    existing = [path for path in paths if os.path.lexists(path)]
+    if existing:
+        raise FileExistsError("refusing to overwrite existing snapshot artifacts: " + ", ".join(existing))
+
+
+def snapshot_qualification_fields() -> dict[str, object]:
+    return {
+        "representationRevision": None,
+        "sourceColumn": "codebase_chunk_index.content_embedding",
+        "canonicalSourceColumn": None,
+        "producerRevision": None,
+        "lineageQualification": "NOT_PROVEN",
+        "modelIdentityQualification": "NOT_PROVEN",
+        "statusExplanation": "Structural dimensions, finiteness, and artifact checksums do not establish canonical source/model lineage.",
+        "status": "FROZEN_ARTIFACT_STRUCTURAL_ONLY",
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--database-url", default=os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL))
     parser.add_argument("--tag", default="v4", help="snapshot tag, e.g. v4")
     args = parser.parse_args()
+
+    try:
+        matrix_path, ordinal_map_path, manifest_path = snapshot_output_paths(args.tag)
+        ensure_snapshot_paths_new((matrix_path, ordinal_map_path, manifest_path))
+    except (ValueError, FileExistsError) as exc:
+        print(json.dumps({"status": "BLOCKED_NO_OVERWRITE", "reason": str(exc)}))
+        sys.exit(78)
 
     os.makedirs(OUT_DIR, exist_ok=True)
     started_at = time.time()
@@ -127,13 +161,9 @@ def main() -> None:
     matrix_checksum = sha256_bytes(matrix_bytes)
     ordinal_map_checksum = sha256_bytes(json.dumps(ordinal_map, sort_keys=False).encode("utf-8"))
 
-    matrix_path = os.path.join(OUT_DIR, f"frozen_semantic_768_{args.tag}_matrix.f32bin")
-    ordinal_map_path = os.path.join(OUT_DIR, f"frozen_semantic_768_{args.tag}_ordinal_map.json")
-    manifest_path = os.path.join(REPORT_DIR, f"semantic768-ae-training-snapshot-{args.tag}.json")
-
-    with open(matrix_path, "wb") as fh:
+    with open(matrix_path, "xb") as fh:
         fh.write(matrix_bytes)
-    with open(ordinal_map_path, "w", encoding="utf-8") as fh:
+    with open(ordinal_map_path, "x", encoding="utf-8") as fh:
         json.dump(ordinal_map, fh)
 
     first_row_checksum = sha256_bytes(matrix[0].tobytes())
@@ -153,17 +183,14 @@ def main() -> None:
         "firstRowChecksum": first_row_checksum,
         "lastRowChecksum": last_row_checksum,
         "sourceRefCoverage": len(source_refs_seen),
-        "representationRevision": "semantic_768",
-        "canonicalSourceColumn": "codebase_chunk_index.content_embedding",
-        "producerRevision": "embeddinggemma:latest",
+        **snapshot_qualification_fields(),
         "trainingCodeRevision": git_sha_for("python/train_latent_autoencoder.py"),
         "exporterCodeRevision": git_sha_for("python/export_frozen_semantic768_snapshot.py"),
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "durationS": time.time() - started_at,
-        "status": "FROZEN_SNAPSHOT_PROVEN",
     }
 
-    with open(manifest_path, "w", encoding="utf-8") as fh:
+    with open(manifest_path, "x", encoding="utf-8") as fh:
         json.dump(manifest, fh, indent=2)
 
     print(json.dumps(manifest, indent=2))

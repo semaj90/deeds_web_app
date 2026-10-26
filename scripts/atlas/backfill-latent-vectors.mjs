@@ -15,9 +15,8 @@
  *
  * Usage:
  *   node scripts/atlas/backfill-latent-vectors.mjs [--dry-run] [--limit=N] [--batch=100]
- *   Legacy persistence additionally requires --workspace-revision=<sha256>.
- *   Legacy persistence additionally requires --legacy-unsafe-apply. This
- *   writer is not the promotion producer for RepresentationArtifactV1.
+ *   Persistence is blocked until revision-qualified source CAS and independent
+ *   vector readback are implemented. No unsafe override is accepted.
  *
  * Exit codes: 0 = success, 1 = weights missing, 2 = Qdrant unreachable, 3 = DB error
  */
@@ -55,7 +54,6 @@ const REDIS_TTL   = 7 * 24 * 3600; // 7 days
 
 const args     = process.argv.slice(2);
 const APPLY    = args.includes('--apply');
-const LEGACY_UNSAFE_APPLY = args.includes('--legacy-unsafe-apply');
 const DRY_RUN  = !APPLY || args.includes('--dry-run');
 const RESUME   = args.includes('--resume');
 const limitArg = args.find(a => a.startsWith('--limit='));
@@ -244,11 +242,9 @@ function writeCheckpoint(checkpoint) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  if (APPLY && !LEGACY_UNSAFE_APPLY) {
-    throw new Error(
-      'LATENT_LEGACY_WRITER_APPLY_BLOCKED: use the revision-qualified canary producer; '
-      + 'explicit --legacy-unsafe-apply is required for diagnostic legacy persistence',
-    );
+  if (APPLY) {
+    console.error('LATENT_LEGACY_WRITER_APPLY_BLOCKED: source-revision CAS, durable lineage, and independent vector readback are required.');
+    process.exit(78);
   }
 
   // This legacy writer can update Postgres and Redis.  Never let its
@@ -547,7 +543,7 @@ async function main() {
     writeFileSync(FRONTEND_LATENT_FILE, latentArtifactJson);
     console.log(`  🔍 DRY-RUN — wrote ${Object.keys(latentIndex).length} entries to ${LATENT_FILE}`);
     console.log(`   Mirror wrote to ${FRONTEND_LATENT_FILE}`);
-    console.log('   Skipping Postgres and Redis writes. Use --apply to persist database state.');
+    console.log('   Skipping Postgres and Redis writes. Persistence remains blocked pending lineage gates.');
     return;
   }
 

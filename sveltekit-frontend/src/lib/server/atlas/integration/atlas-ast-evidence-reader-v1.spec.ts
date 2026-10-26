@@ -34,3 +34,56 @@ describe('readAtlasAstEvidenceV1', () => {
     expect(queryMock).not.toHaveBeenCalled();
   });
 });
+
+describe('readAtlasCanonicalAstEvidenceV1', () => {
+  const request = {
+    treeNodeId: 'node:1',
+    symbolVersionId: 'symbol-version:1',
+    canonicalId: 'symbol:stable:1',
+    packetKey: 'packet:1',
+    sourceRef: 'src/example.ts#example',
+    sourceRevision: 'source:r1',
+    workspaceRevision: 'workspace:r1',
+  };
+  const canonicalRow = {
+    treeNodeId: request.treeNodeId,
+    symbolVersionId: request.symbolVersionId,
+    canonicalId: request.canonicalId,
+    packetKey: request.packetKey,
+    sourceRef: request.sourceRef,
+    sourceRevision: request.sourceRevision,
+    workspaceRevision: request.workspaceRevision,
+    sourceContentHash: 'a'.repeat(64),
+    startByte: 10,
+    endByte: 24,
+  };
+
+  it('reads and verifies canonical symbol, packet, source, workspace, and byte-span bindings', async () => {
+    queryMock.mockResolvedValue({ rows: [canonicalRow] });
+    const { readAtlasCanonicalAstEvidenceV1 } = await import('./atlas-ast-evidence-reader-v1.js');
+    await expect(readAtlasCanonicalAstEvidenceV1(request)).resolves.toEqual(canonicalRow);
+    expect(queryMock.mock.calls.at(-1)?.[0]).toContain('JOIN atlas_symbol_versions sv');
+    expect(queryMock.mock.calls.at(-1)?.[1]).toEqual([
+      request.treeNodeId,
+      request.canonicalId,
+      request.packetKey,
+      request.sourceRef,
+      request.sourceRevision,
+      request.workspaceRevision,
+    ]);
+  });
+
+  it('refuses missing or ambiguous canonical bindings', async () => {
+    const { readAtlasCanonicalAstEvidenceV1, AtlasAstEvidenceReadErrorV1 } = await import('./atlas-ast-evidence-reader-v1.js');
+    queryMock.mockResolvedValueOnce({ rows: [] });
+    await expect(readAtlasCanonicalAstEvidenceV1(request)).rejects.toMatchObject({ code: 'AST_EVIDENCE_CANONICAL_BINDING_MISSING' });
+    queryMock.mockResolvedValueOnce({ rows: [canonicalRow, { ...canonicalRow, symbolVersionId: 'symbol-version:2' }] });
+    await expect(readAtlasCanonicalAstEvidenceV1(request)).rejects.toBeInstanceOf(AtlasAstEvidenceReadErrorV1);
+  });
+
+  it('rejects a caller-selected symbol version that differs from the database binding', async () => {
+    queryMock.mockResolvedValue({ rows: [{ ...canonicalRow, symbolVersionId: 'symbol-version:other' }] });
+    const { readAtlasCanonicalAstEvidenceV1 } = await import('./atlas-ast-evidence-reader-v1.js');
+    await expect(readAtlasCanonicalAstEvidenceV1(request)).rejects.toMatchObject({ code: 'AST_EVIDENCE_CANONICAL_BINDING_MISSING' });
+  });
+});

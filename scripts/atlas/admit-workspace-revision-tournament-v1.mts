@@ -1,15 +1,21 @@
 #!/usr/bin/env node
 
 /** Bounded, explicit snapshot admission for the tournament control plane. */
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateCanonicalGraphifySnapshotBindingV1 } from './lib/canonical-graphify-snapshot-binding-v1.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const argValue = (name: string) => process.argv.slice(2).find((value) => value.startsWith(`${name}=`))?.slice(name.length + 1);
 const PREFLIGHT = resolve(ROOT, argValue('--preflight') ?? 'docs/reports/workspace-revision-tournament-source-authority-v1.json');
 const REPORT = resolve(ROOT, argValue('--report') ?? 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const REQUIRED = 'AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1';
+// Approval scope is explicit: source authority only (default) or the canonical binding write scope.
+const APPROVAL_SCOPES = ['TOURNAMENT_SOURCE_AUTHORITY_ONLY', 'CANONICAL_SOURCE_BINDING_WRITE'];
+const approvalScope = argValue('--approval-scope') ?? 'TOURNAMENT_SOURCE_AUTHORITY_ONLY';
+if (!APPROVAL_SCOPES.includes(approvalScope)) throw new Error(`APPROVAL_SCOPE_NOT_ALLOWED:${approvalScope}`);
 const confirm = process.argv.slice(2).find((value) => value.startsWith('--confirm='))?.slice('--confirm='.length)
   ?? (process.argv.includes('--confirm') ? process.argv[process.argv.indexOf('--confirm') + 1] : null);
 if (confirm !== REQUIRED) throw new Error(`EXPLICIT_CONFIRMATION_REQUIRED:${REQUIRED}`);
@@ -32,6 +38,16 @@ const snapshotBindingValid = snapshotBindingError === null
   && Array.isArray(snapshot?.sources)
   && snapshot.sources.length === preflight.snapshotSourceCount
   && snapshot?.sourceMembershipChecksum === preflight.snapshotMembershipChecksum;
+let snapshotAuthorityBinding = { valid: false, reason: 'SNAPSHOT_MANIFEST_UNREADABLE', workspaceId: null };
+if (snapshotBindingError === null) {
+  const dailyConfig = JSON.parse(await readFile(resolve(ROOT, 'scripts/atlas/daily-graphify-config.json'), 'utf8'));
+  snapshotAuthorityBinding = validateCanonicalGraphifySnapshotBindingV1({
+    snapshot,
+    expectedWorkspaceId: dailyConfig.workspace_uuid,
+    manifestPath,
+    root: ROOT,
+  });
+}
 const sourceInventoryBindingValid = typeof preflight.sourceInventoryRevision === 'string'
   && typeof preflight.sourceInventoryChecksum === 'string'
   && /^sha256:[0-9a-f]{64}$/i.test(preflight.sourceInventoryChecksum)
@@ -39,6 +55,15 @@ const sourceInventoryBindingValid = typeof preflight.sourceInventoryRevision ===
   && /^sha256:[0-9a-f]{64}$/i.test(preflight.sourceSelectionChecksum)
   && Number.isInteger(preflight.sourceCount)
   && preflight.sourceCount > 0;
+// WSR-09a / WSR-13: the admitted manifest must be the exact bytes the preflight validated.
+const manifestBytes = manifestPath ? await readFile(manifestPath).catch(() => null) : null;
+const manifestSha256 = manifestBytes ? `sha256:${createHash('sha256').update(manifestBytes).digest('hex')}` : null;
+const validationReceiptSha256 = `sha256:${createHash('sha256').update(await readFile(PREFLIGHT)).digest('hex')}`;
+const manifestBindingValid = manifestSha256 !== null && typeof preflight.manifestSha256 === 'string' && preflight.manifestSha256 === manifestSha256;
+// Operator-supplied expectations: the approval must name the exact manifest and validation receipt it authorizes.
+const expectedManifestSha256 = process.argv.slice(2).find((v) => v.startsWith('--expected-manifest-sha256='))?.split('=').slice(1).join('=') ?? null;
+const expectedValidationSha256 = process.argv.slice(2).find((v) => v.startsWith('--expected-validation-sha256='))?.split('=').slice(1).join('=') ?? null;
+const operatorBindingValid = manifestSha256 !== null && expectedManifestSha256 === manifestSha256 && expectedValidationSha256 === validationReceiptSha256;
 const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION'
   && preflight.authority === false
   && preflight.workspaceRevision === null
@@ -47,8 +72,11 @@ const ready = preflight.status === 'CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMI
   && /^sha256:[0-9a-f]{64}$/i.test(workspaceRevision)
   && workspaceRevision === preflight.workspaceRevisionCandidate
   && snapshotBindingValid
+  && snapshotAuthorityBinding.valid
   && sourceInventoryBindingValid
-  && preflight.approvalRequired === true;
+  && preflight.approvalRequired === true
+  && manifestBindingValid
+  && operatorBindingValid;
 
 async function atomicWriteJson(path: string, value: unknown): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
@@ -59,6 +87,9 @@ async function atomicWriteJson(path: string, value: unknown): Promise<void> {
 
 if (!ready) {
   const blocker = snapshotBindingError
+    ?? (!snapshotAuthorityBinding.valid ? snapshotAuthorityBinding.reason : null)
+    ?? (!manifestBindingValid ? 'MANIFEST_SHA256_NOT_BOUND_OR_MISMATCH' : null)
+    ?? (!operatorBindingValid ? 'OPERATOR_BINDING_NOT_PROVIDED_OR_MISMATCH' : null)
     ?? (!sourceInventoryBindingValid
       ? 'SOURCE_INVENTORY_PROVENANCE_MISSING_OR_INVALID'
       : (workspaceRevision !== preflight.workspaceRevisionCandidate
@@ -66,9 +97,10 @@ if (!ready) {
         : (!snapshotBindingValid ? 'PREFLIGHT_SNAPSHOT_BINDING_MISMATCH' : 'SNAPSHOT_REVISION_IS_NOT_WORKSPACE_REVISION')));
   const correction = {
     schema: 'atlas.workspace-revision-tournament-admission.v1', generatedAt: new Date().toISOString(),
-    mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT', status: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_BLOCKED_REVISION_KIND_MISMATCH',
+    mode: 'EXPLICIT_BOUNDED_ADMISSION_RECEIPT', status: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_BLOCKED',
     proofLevel: 'BLOCKED', authority: false, workspaceRevision: null,
     snapshotRevision: preflight.snapshotRevision ?? null,
+    workspaceId: snapshotAuthorityBinding.workspaceId,
     workspaceRevisionCandidate: null, approvalRequired: true, autoApply: false, training: false,
     writesPerformed: false, datastoreWritesPerformed: false, preflightPath: PREFLIGHT,
     blocker,
@@ -93,6 +125,7 @@ if (!ready) {
     authority: true,
     workspaceRevision,
     snapshotRevision: preflight.snapshotRevision,
+    workspaceId: snapshotAuthorityBinding.workspaceId,
     snapshotSourceCount: preflight.snapshotSourceCount,
     sourceCount: preflight.sourceCount,
     sourceSelectionChecksum: preflight.sourceSelectionChecksum,
@@ -101,7 +134,9 @@ if (!ready) {
     sourceInventoryWriterRevisionChecksum: preflight.sourceInventoryWriterRevisionChecksum ?? null,
     snapshotMembershipChecksum: preflight.snapshotMembershipChecksum,
     manifestPath,
-    approval: { confirmation: REQUIRED, scope: 'TOURNAMENT_SOURCE_AUTHORITY_ONLY' },
+    manifestSha256,
+    validationReceiptSha256,
+    approval: { confirmation: REQUIRED, scope: approvalScope },
     graphifyExecutionAuthorized: false,
     projectionWritesAuthorized: false,
     autoApply: false,

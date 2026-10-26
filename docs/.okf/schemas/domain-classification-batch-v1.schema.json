@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parent-atlas.local/schemas/domain-classification-batch-v1.schema.json",
+  "title": "Parent Atlas OKF domain classification proposal batch V1",
+  "description": "Proposal-only rows matching DomainClassificationV1Schema. This schema does not authorize database writes or ontology admission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "taxonomyRevision",
+    "rows",
+    "reason",
+    "canonicalAuthority",
+    "writesPerformed"
+  ],
+  "properties": {
+    "schema": {
+      "const": "atlas.okf.domain-classification-batch.v1"
+    },
+    "status": {
+      "enum": ["PROPOSAL_ONLY", "UNAVAILABLE"]
+    },
+    "taxonomyRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/classification"
+      }
+    },
+    "reason": {
+      "enum": [
+        "CLASSIFICATION_EVIDENCE_REFS_MISSING",
+        "NO_CANONICAL_DOMAIN_LABELS",
+        null
+      ]
+    },
+    "canonicalAuthority": {
+      "const": false
+    },
+    "writesPerformed": {
+      "const": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "PROPOSAL_ONLY"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "rows": {
+            "minItems": 1
+          },
+          "reason": {
+            "const": null
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "UNAVAILABLE"
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "rows": {
+            "maxItems": 0
+          },
+          "reason": {
+            "enum": [
+              "CLASSIFICATION_EVIDENCE_REFS_MISSING",
+              "NO_CANONICAL_DOMAIN_LABELS"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "classificationId",
+        "subjectRef",
+        "subjectKind",
+        "domainId",
+        "taxonomyRevision",
+        "confidence",
+        "evidenceRefs",
+        "sourceRevision",
+        "producerId",
+        "producerRevision",
+        "lifecycle"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": "atlas.okf.domain-classification.v1"
+        },
+        "classificationId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subjectRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subjectKind": {
+          "enum": ["document", "file", "feature", "symbol", "task"]
+        },
+        "domainId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "taxonomyRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sourceRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producerId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producerRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lifecycle": {
+          "enum": ["OBSERVED", "DERIVED", "SUPERSEDED"]
+        }
+      }
+    }
+  }
+}

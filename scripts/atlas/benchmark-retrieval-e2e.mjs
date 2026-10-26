@@ -881,7 +881,7 @@ async function answerWithTurboQuant(query, retrieved) {
     contextLines || 'No context returned.',
   ].join('\n');
 
-  const models = [env.TURBOQUANT_MODEL || TURBOQUANT_MODEL, 'gemma4-rotorquant:latest', 'local'];
+  const models = [env.TURBOQUANT_MODEL || TURBOQUANT_MODEL, 'ornith-1.5-9b', 'local'];
   for (const model of [...new Set(models.filter(Boolean))]) {
     try {
       const res = await fetch(`${TURBOQUANT_BASE}/v1/chat/completions`, {

@@ -625,7 +625,7 @@
 				{:else if activeTool === 'graph'}
 					<GraphVisualizationGallery />
 				{:else if activeTool === 'research'}
-					<AutomatedLegalResearch research={{ query: '', jurisdiction: '', case_type: '', research_depth: 'comprehensive', metadata: { research_timestamp: '', model_used: 'gemma4-legal' } }} />
+					<AutomatedLegalResearch research={{ query: '', jurisdiction: '', case_type: '', research_depth: 'comprehensive', metadata: { research_timestamp: '', model_used: 'ornith-1.5-9b' } }} />
 				{:else if activeTool === 'detective'}
 					<ContextualDetectiveBoard caseId={selectedCaseId || ''} initialEvidence={evidencePool} />
 				{:else if activeTool === 'whiteboard'}
@@ -1354,13 +1354,6 @@
 		color: #10b981;
 		font-weight: bold;
 		margin-left: auto;
-	}
-
-	/* Summary Toggle */
-	.summary-toggle {
-		position: relative;
-		z-index: 1;
-		padding: 0.5rem 1rem;
 	}
 
 	.summary-reader-container {

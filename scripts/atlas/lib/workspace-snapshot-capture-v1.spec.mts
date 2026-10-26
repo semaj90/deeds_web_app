@@ -5,7 +5,10 @@ import { existsSync, mkdirSync, symlinkSync, realpathSync, lstatSync, mkdtempSyn
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { captureStableSnapshot, createSymlinkProbeV1, createDigestCacheContext, hash, observeSnapshot, loadDigestCache, saveDigestCache, validateSnapshot } from './workspace-snapshot-capture-v1.mts';
+import { materializeWorkspaceRevisionOriginV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 import type { WorkspaceDigestCacheV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
+import { buildIncrementalWorkspaceSourceInventoryV1 } from './incremental-workspace-source-inventory-v1.mjs';
+import { collectRepositorySourceGitDeltaV1 } from './workspace-source-git-delta-v1.mjs';
 
 // WSR-03/05 digest cache: derived facts only; byte output must be identical with or without it.
 const git = (cwd: string, ...args: string[]) => execFileSync('git', args, { cwd, stdio: 'ignore' });
@@ -16,7 +19,7 @@ function makeRepo() {
   git(root, 'config', 'user.name', 't');
   writeFileSync(path.join(root, '.gitignore'), '.tmp/\n');
   const old = new Date(Date.now() - 60_000);
-  for (const [name, body] of [['a.ts', 'export const a = 1;\n'], ['b.md', '# b\n']]) {
+  for (const [name, body] of [['a.ts', 'export const a = 1;\n'], ['b.md', '# b\n'], ['c.py', 'value = 3\n']]) {
     writeFileSync(path.join(root, name), body);
     utimesSync(path.join(root, name), old, old);
   }
@@ -36,6 +39,116 @@ test('cached observation equals uncached observation and a warm cache is populat
     const warm = observeSnapshot(root, 'ws-test', { digestCache: cache });
     assert.deepEqual(ids(cold), ids(plain));
     assert.deepEqual(ids(warm), ids(plain));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('source owner can materialize an exact bounded path allowlist', () => {
+  const root = makeRepo();
+  try {
+    const digestStats = { reused: 0, rehashed: 0 };
+    const result = materializeWorkspaceRevisionOriginV1({
+      workspaceRoot: root,
+      repositoryId: 'ws-test',
+      producerRevision: 'test-v1',
+      sourceRefs: ['a.ts'],
+      digestStats,
+    });
+    assert.deepEqual(result.bindings.map((row) => row.sourceRef), ['a.ts']);
+    assert.equal(digestStats.rehashed, 1);
+    assert.equal(digestStats.reused, 0);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('source owner hashes caller-supplied bytes and rejects byte-length drift', () => {
+  const root = makeRepo();
+  try {
+    const bytes = readFileSync(path.join(root, 'a.ts'));
+    const accepted = materializeWorkspaceRevisionOriginV1({
+      workspaceRoot: root,
+      repositoryId: 'ws-test',
+      producerRevision: 'test-v1',
+      sourceRefs: ['a.ts'],
+      sourceBytesByRef: new Map([['a.ts', bytes]]),
+    });
+    assert.equal(accepted.bindings.length, 1);
+    assert.equal(accepted.skipped.length, 0);
+
+    const rejected = materializeWorkspaceRevisionOriginV1({
+      workspaceRoot: root,
+      repositoryId: 'ws-test',
+      producerRevision: 'test-v1',
+      sourceRefs: ['a.ts', 'b.md'],
+      sourceBytesByRef: new Map([
+        ['a.ts', bytes],
+        ['b.md', Buffer.from('stale')],
+      ]),
+    });
+    assert.deepEqual(rejected.bindings.map((row) => row.sourceRef), ['a.ts']);
+    assert.deepEqual(rejected.skipped, [{ sourceRef: 'b.md', reason: 'SOURCE_BYTES_CHANGED_DURING_OBSERVATION' }]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('two-file Git delta merges to the same source set as a full capture', () => {
+  const root = makeRepo();
+  try {
+    const previous = captureStableSnapshot(root, 'ws-test');
+    const previousReadback = validateSnapshot(previous);
+    assert.equal(previous.status, 'CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK');
+    assert.equal(previousReadback.status, 'SNAPSHOT_BYTES_READBACK_PROVEN');
+
+    writeFileSync(path.join(root, 'a.ts'), 'export const a = 22;\n');
+    writeFileSync(path.join(root, 'b.md'), '# changed\n');
+    const repository = previous.repositories.find((row: any) => row.relativePath === '');
+    const delta = collectRepositorySourceGitDeltaV1({
+      repositoryPath: root,
+      baselineCommit: repository.head,
+    });
+    assert.equal(delta.status, 'GIT_DELTA_READY_NOT_ADMITTED');
+    assert.equal(delta.changedCount, 2);
+
+    const changedPaths = delta.changedPaths.map((row) => row.sourceRef);
+    const materialized = materializeWorkspaceRevisionOriginV1({
+      workspaceRoot: root,
+      repositoryId: 'ws-test',
+      producerRevision: 'test-v1',
+      sourceRefs: changedPaths,
+    });
+    const changedObservations = materialized.bindings.map((binding) => {
+      const sourceRef = binding.sourceRef.replaceAll('\\', '/');
+      const source = {
+        sourceRef,
+        repositoryId: 'repo:root',
+        repositoryRelativePath: sourceRef,
+        sourceIdentityKey: `repo:root:${sourceRef}`,
+        sourceRevision: binding.sourceRevision,
+        contentDigest: binding.contentDigest,
+        byteLength: binding.byteLength,
+        repositoryPath: '',
+      };
+      return {
+        sourceRef,
+        status: 'SOURCE',
+        source,
+        bytes: readFileSync(path.join(root, sourceRef)),
+      };
+    });
+    const incremental = buildIncrementalWorkspaceSourceInventoryV1({
+      previousSnapshot: previous,
+      previousReadback,
+      repositoryDelta: delta,
+      changedObservations,
+    });
+    assert.equal(incremental.status, 'INCREMENTAL_SOURCE_INVENTORY_PROPOSAL_NOT_ADMITTED');
+    assert.equal(incremental.rehashedSourceCount, 2);
+    assert.equal(incremental.reusedSourceCount, 1);
+
+    const full = observeSnapshot(root, 'ws-test');
+    assert.deepEqual(incremental.sources, full.sources);
+    assert.equal(incremental.sourceMembershipChecksum, hash(full.sources
+      .map((source) => source.sourceIdentityKey).sort()));
+    assert.equal(incremental.sourceContentChecksum, hash(full.sources.map((source) => [
+      source.sourceIdentityKey, source.sourceRevision, source.byteLength,
+    ])));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -179,6 +292,31 @@ test('persisted cold and warm captures are timed and produce the same source fra
     assert.deepEqual(ids(warm), ids(cold));
     assert.equal(validateSnapshot(warm).status, 'SNAPSHOT_BYTES_READBACK_PROVEN');
     console.log(JSON.stringify({ coldCaptureMs: Number(coldCaptureMs.toFixed(2)), warmCaptureMs: Number(warmCaptureMs.toFixed(2)) }));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('snapshot readback rejects a tampered snapshot revision', () => {
+  const root = makeRepo();
+  try {
+    const snapshot = captureStableSnapshot(root, 'ws-test');
+    const tampered = { ...snapshot, snapshotRevision: `sha256:${'0'.repeat(64)}` };
+    const readback = validateSnapshot(tampered);
+    assert.equal(readback.status, 'SNAPSHOT_READBACK_BLOCKED');
+    assert.ok(readback.violations.includes('MANIFEST_CHECKSUM_MISMATCH'));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('snapshot byte drift readback records expected and observed source revisions', () => {
+  const root = makeRepo();
+  try {
+    const snapshot = captureStableSnapshot(root, 'ws-test');
+    writeFileSync(path.join(root, 'a.ts'), 'export const a = 22;\n');
+    const readback = validateSnapshot(snapshot);
+    const drift = readback.violationDetails.find((row) => row.sourceRef === 'a.ts');
+    assert.equal(drift?.code, 'SOURCE_BYTES_CHANGED');
+    assert.notEqual(drift?.observedSourceRevision, drift?.expectedSourceRevision);
+    assert.equal(drift?.observedByteLength, Buffer.byteLength('export const a = 22;\n'));
+    assert.equal(drift?.repositoryId, 'repo:root');
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 

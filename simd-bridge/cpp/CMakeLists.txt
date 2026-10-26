@@ -367,6 +367,9 @@ set(ADDON_SOURCES
   simdjson_bridge.cc
   lstm_bridge.cc
   cuvs_bridge.cc
+  graph_search.cc
+  tree_ensemble.cc
+  manifold_interpolate.cc
 )
 
 if(EXISTS "${SIMDJSON_SRC}")

@@ -12,7 +12,7 @@ for (const f of files) {
       (match) => match + `
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',`
     );
     fs.writeFileSync(f, c);

@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.retrieval-dag-prefill-lut-receipt.v1",
+  "generatedAt": "2026-10-16T01:56:58.797Z",
+  "writesPerformed": false,
+  "artifacts": {
+    "lutJsonPath": "sveltekit-frontend/data/atlas-tensor-proof/retrieval_dag_prefill_lut_v1.json",
+    "lutChecksumSha256": "36eed1e0f905d2cca8f792ddb2db68944408efe1115322c1190e8da58166c687",
+    "ordinalRegistryChecksumSha256": "3dcc6c7e603fb83752fd28b457b850b3dc77ba100179d519b684281563bf365a",
+    "f32BinPath": "sveltekit-frontend/data/atlas-tensor-proof/retrieval_dag_prefill_768.f32bin",
+    "f32BinTotalBytes": 153600,
+    "f32BinSha256": "00c838c8fb5098161ec919421299bafdefc9521bc250df629787ba59da534afd",
+    "entryCount": 50
+  },
+  "osDirectSliceVerification": {
+    "submittedOrdinalsUnordered": [
+      0,
+      10,
+      20,
+      30
+    ],
+    "slicesVerifiedViaOpenSyncReadSync": 4,
+    "bytesPerSlice": 3072
+  },
+  "dagTopologicalPrefillSynthesis": {
+    "orderedOrdinals": [
+      30,
+      20,
+      10,
+      0
+    ],
+    "topologicalDependencyOrderVerified": true,
+    "cyclesBroken": 0,
+    "promptPlanChecksumSha256": "c836d04eef866b9c7d7c742a02ec509dc7109bd69b0a9899c7eeca93bc2d1655",
+    "promptPlanTotalTokens": 1089,
+    "promptPlanMaxInputTokens": 57344,
+    "contextPrefixIdentityChecksum": "55cd007126d3daf2d3a48e440991f5e1396d75e44f3d51e6545238e2289f36d0",
+    "stablePrefixChecksum": "7f5f0d5a4cdf09c92bd591ea95d8e5a34a59354f5051c79f3193c46161fb0f44",
+    "stablePrefixByteLength": 4284,
+    "kvCachePersisted": false
+  },
+  "status": "PASS"
+}

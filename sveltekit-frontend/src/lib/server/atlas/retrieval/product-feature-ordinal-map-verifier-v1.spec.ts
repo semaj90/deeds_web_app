@@ -75,4 +75,54 @@ describe('verifyProductFeatureOrdinalMapV1', () => {
     expect(() => verifyProductFeatureOrdinalMapV1(input({ ...map, ordinalMapChecksum: '0'.repeat(64) })))
       .toThrow(/CANDIDATE_ORDINAL_MAP_CHECKSUM_MISMATCH/);
   });
+
+  it('rejects a stale candidate snapshot revision and a request checksum that differs from a valid map', () => {
+    const value = input();
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, candidateSnapshotRevision: 'snapshot-stale' }))
+      .toThrow('PRODUCT_FEATURE_ORDINAL_MAP_BINDING_MISMATCH');
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, ordinalMapChecksum: 'f'.repeat(64) }))
+      .toThrow('PRODUCT_FEATURE_ORDINAL_MAP_BINDING_MISMATCH');
+  });
+
+  it('rejects swapped packetKey / sourceRef identity and unknown canonical ids', () => {
+    const value = input();
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, candidates: [{ ...value.candidates[0], packetKey: 'packet-other' }] }))
+      .toThrow('PRODUCT_FEATURE_CANDIDATE_NOT_BOUND_TO_ORDINAL_MAP');
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, candidates: [{ ...value.candidates[0], sourceRef: 'src/other.ts' }] }))
+      .toThrow('PRODUCT_FEATURE_CANDIDATE_NOT_BOUND_TO_ORDINAL_MAP');
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, candidates: [{ ...value.candidates[0], canonicalCandidateId: 'candidate-unknown' }] }))
+      .toThrow('PRODUCT_FEATURE_CANDIDATE_NOT_BOUND_TO_ORDINAL_MAP');
+  });
+
+  it('rejects missing and duplicate canonical candidate ids', () => {
+    const value = input();
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, candidates: [{ ...value.candidates[0], canonicalCandidateId: '' }] }))
+      .toThrow('PRODUCT_FEATURE_CANDIDATE_ID_MISSING_OR_DUPLICATE');
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, candidates: [value.candidates[0], value.candidates[0]] }))
+      .toThrow('PRODUCT_FEATURE_CANDIDATE_ID_MISSING_OR_DUPLICATE');
+  });
+
+  it('verifies the joined ordinal when supplied: right ordinal matches, wrong ordinal is rejected', () => {
+    const value = input();
+    expect(verifyProductFeatureOrdinalMapV1({ ...value, candidates: [{ ...value.candidates[0], candidateOrdinal: 0 }] }).status).toBe('MATCH');
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...value, candidates: [{ ...value.candidates[0], candidateOrdinal: 1 }] }))
+      .toThrow('PRODUCT_FEATURE_CANDIDATE_ORDINAL_MISMATCH');
+    // omitting the ordinal keeps the previous binding-by-canonicalId behavior (backward compatible)
+    expect(verifyProductFeatureOrdinalMapV1(value).status).toBe('MATCH');
+  });
+
+  it('a candidate bound to the wrong row of a multi-row map is caught by ordinal even when ids are valid', () => {
+    const map = materializeCandidateOrdinalMap({
+      candidateSnapshotRevision: 'snapshot-r1', workspaceRevision: 'workspace-r1', producerRevision: 'producer-r1',
+      candidates: ['a', 'b'].map((id) => ({
+        canonicalId: `candidate-${id}`, packetKey: `packet-${id}`, sourceRef: `src/${id}.ts`, treeNodeId: null, symbolVersionId: null,
+        workspaceRevision: 'workspace-r1', sourceRevision: `source-${id}`, graphRevision: null, semanticRevision: null,
+        degradedIdentity: false, evidenceRefs: [], representationBindings: [],
+      })),
+    });
+    const base = { requestId: 'r', workspaceRevision: map.workspaceRevision, candidateSnapshotRevision: map.candidateSnapshotRevision, ordinalMapChecksum: map.ordinalMapChecksum, ordinalMap: map };
+    const b = { canonicalCandidateId: 'candidate-b', packetKey: 'packet-b', sourceRef: 'src/b.ts', sourceRevision: 'source-b' };
+    expect(verifyProductFeatureOrdinalMapV1({ ...base, candidates: [{ ...b, candidateOrdinal: 1 }] }).verifiedCandidateCount).toBe(1);
+    expect(() => verifyProductFeatureOrdinalMapV1({ ...base, candidates: [{ ...b, candidateOrdinal: 0 }] })).toThrow('PRODUCT_FEATURE_CANDIDATE_ORDINAL_MISMATCH');
+  });
 });

@@ -9,7 +9,7 @@
  */
 
 import fetch from 'node-fetch';
-import { sql, eq } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { codebaseChunkIndex } from '../db/schema-postgres.js';
 
@@ -64,53 +64,27 @@ export class TurboVecKMeansLauncher {
    * Submit a single feature for KMeans progression
    */
   async submitKMeansJob(featureId: string, embedding768: number[]): Promise<string> {
-    const plan: KMeansProgressionPlan = {
-      feature_id: featureId,
-      input_embedding: embedding768,
-      levels: {
-        level_384: { k: 100, timeout_ms: 5000 },
-        level_128: { k: 64, timeout_ms: 3000 },
-        level_64: { k: 20, timeout_ms: 2000 }
-      }
-    };
-
-    try {
-      const response = await fetch(`${this.turbovecUrl}/kmeans/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(plan)
-      });
-
-      if (!response.ok) {
-        throw new Error(`TurboVec returned ${response.status}`);
-      }
-
-      const data = (await response.json()) as { job_id: string };
-      return data.job_id;
-    } catch (err) {
-      console.error(`Failed to submit KMeans job for ${featureId}:`, err);
-      throw err;
-    }
+    void featureId;
+    void embedding768;
+    throw new Error('KMEANS_EXECUTION_DISABLED: source and representation revisions are not admitted');
   }
 
   /**
    * Batch submit KMeans jobs for multiple features
    */
   async submitBatch(embeddings: Map<string, number[]>, dryRun = false): Promise<Map<string, string>> {
+    if (!dryRun) {
+      throw new Error('KMEANS_EXECUTION_DISABLED: source and representation revisions are not admitted');
+    }
+
     const jobIds = new Map<string, string>();
 
     console.log(`Submitting ${embeddings.size} KMeans jobs...`);
 
     for (const [featureId, embedding] of embeddings) {
       try {
-        if (dryRun) {
-          console.log(`[DRY RUN] Would submit KMeans for ${featureId}`);
-          jobIds.set(featureId, `dry-run-${featureId}`);
-        } else {
-          const jobId = await this.submitKMeansJob(featureId, embedding);
-          jobIds.set(featureId, jobId);
-          console.log(`Submitted ${featureId} → job ${jobId}`);
-        }
+        console.log(`[DRY RUN] Would submit KMeans for ${featureId}`);
+        jobIds.set(featureId, `dry-run-${featureId}`);
       } catch (err) {
         console.error(`Failed to submit job for ${featureId}:`, err);
       }
@@ -173,95 +147,22 @@ export class TurboVecKMeansLauncher {
    * Fetch and process completed jobs, writing results to Postgres
    */
   async processCompletedJobs(jobIds: Map<string, string>, dryRun = false): Promise<{ success: number; failed: number }> {
-    let success = 0;
-    let failed = 0;
-
-    console.log(`Processing ${jobIds.size} completed jobs...`);
-
-    for (const [featureId, jobId] of jobIds) {
-      try {
-        const job = await this.waitForCompletion(jobId);
-
-        if (!job || job.status !== 'complete') {
-          console.error(`Job ${jobId} did not complete`);
-          failed++;
-          continue;
-        }
-
-        if (dryRun) {
-          console.log(`[DRY RUN] Would write results for ${featureId}`);
-          success++;
-          continue;
-        }
-
-        // Write results to Postgres
-        await this.writeJobResults(featureId, job);
-        success++;
-        console.log(`Processed results for ${featureId}`);
-      } catch (err) {
-        console.error(`Failed to process job ${jobId}:`, err);
-        failed++;
-      }
+    if (!dryRun) {
+      throw new Error('KMEANS_RESULT_ADMISSION_DISABLED: outputs lack revision-qualified identity and readback');
     }
 
-    return { success, failed };
-  }
-
-  /**
-   * Write KMeans job results to Postgres
-   */
-  private async writeJobResults(featureId: string, job: KMeansJob): Promise<void> {
-    if (!job.levels) {
-      throw new Error(`No results in job ${job.job_id}`);
-    }
-
-    const updates: Record<string, unknown> = {};
-
-    // Write 384-dim vector
-    if (job.levels.embedding_384) {
-      updates.embedding_384 = JSON.stringify(job.levels.embedding_384.vector);
-    }
-
-    // Write 128-dim compressed (bytea)
-    if (job.levels.embedding_128) {
-      updates.embedding_128 = job.levels.embedding_128.compressed as any;
-    }
-
-    // Write 64-dim compressed (bytea)
-    if (job.levels.embedding_64) {
-      updates.embedding_64 = job.levels.embedding_64.compressed as any;
-    }
-
-    if (Object.keys(updates).length === 0) {
-      throw new Error('No embeddings to write');
-    }
-
-    // Update chunk
-    const chunks = await db
-      .select()
-      .from(codebaseChunkIndex)
-      .where(eq(codebaseChunkIndex.chunkId, featureId))
-      .limit(1);
-
-    if (chunks.length === 0) {
-      throw new Error(`Chunk not found for feature ${featureId}`);
-    }
-
-    const chunk = chunks[0];
-
-    await db
-      .update(codebaseChunkIndex)
-      .set({
-        ...updates,
-        enrichedAt: new Date()
-      })
-      .where(eq(codebaseChunkIndex.id, chunk.id));
+    console.log(`[DRY RUN] Would review ${jobIds.size} KMeans jobs; no polling or writes performed.`);
+    return { success: jobIds.size, failed: 0 };
   }
 
   /**
    * Full pipeline: load embeddings, submit, wait, write results
    */
   async runFullPipeline(limit = 1000, dryRun = false): Promise<{ submitted: number; processed: number; failed: number }> {
+    if (!dryRun) {
+      throw new Error('KMEANS_RESULT_ADMISSION_DISABLED: live execution is blocked pending revision-qualified output admission');
+    }
+
     console.log('Starting TurboVec KMeans pipeline...');
 
     // Check health

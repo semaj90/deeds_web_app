@@ -16,11 +16,21 @@ import crypto from 'crypto';
 
 const DEFAULT_MODEL = 'embeddinggemma:latest';
 const EMBEDDING_TTL = CACHE_TTL.EMBEDDING; // 7 days
+const SEMANTIC_EMBEDDING_DIMENSIONS = 768;
 
-// Base64 helper for legacy emb: key format
-function generateLegacyEmbKey(text: string, model: string): string {
-  const content = `${model}:${text}`;
-  return Buffer.from(content).toString('base64').substring(0, 40);
+function decodeCanonicalEmbedding(buffer: Buffer): Float32Array | null {
+  if (buffer.byteLength !== SEMANTIC_EMBEDDING_DIMENSIONS * Float32Array.BYTES_PER_ELEMENT) return null;
+  const vector = new Float32Array(buffer.buffer, buffer.byteOffset, SEMANTIC_EMBEDDING_DIMENSIONS);
+  return Array.from(vector).every(Number.isFinite) ? vector : null;
+}
+
+function assertCanonicalEmbedding(vector: Float32Array): void {
+  if (vector.length !== SEMANTIC_EMBEDDING_DIMENSIONS) {
+    throw new Error(`SEMANTIC_768_CACHE_INVALID_DIMENSIONS:${vector.length}`);
+  }
+  if (!Array.from(vector).every(Number.isFinite)) {
+    throw new Error('SEMANTIC_768_CACHE_NON_FINITE_VALUE');
+  }
 }
 
 /**
@@ -28,13 +38,6 @@ function generateLegacyEmbKey(text: string, model: string): string {
  */
 export function hashTextSha256(text: string): string {
   return crypto.createHash('sha256').update(text).digest('hex');
-}
-
-/**
- * Hash text using MD5 for legacy formats
- */
-export function hashTextMd5(text: string): string {
-  return crypto.createHash('md5').update(text).digest('hex');
 }
 
 /**
@@ -65,7 +68,7 @@ async function fetchEmbedding(
 }
 
 /**
- * Retrieve cached embedding with incremental lazy key rehashing
+ * Retrieve only representation-sized entries from the model-qualified key.
  */
 export async function getEmbedding(
   text: string,
@@ -78,69 +81,7 @@ export async function getEmbedding(
   // 1. Try reading the new binary key format
   const buffer = await redis.getBuffer(cacheKey).catch(() => null);
   if (buffer) {
-    return new Float32Array(buffer.buffer, buffer.byteOffset, buffer.byteLength / 4);
-  }
-
-  // 2. Lazy Rehashing: Check legacy key formats
-  const md5 = hashTextMd5(text);
-  const legacyKeys = [
-    `emb:${generateLegacyEmbKey(text, model)}`,
-    `embeddings:${md5}`,
-    `embed:${md5}`,
-    `cache:embedding:${md5}`
-  ];
-
-  for (const legKey of legacyKeys) {
-    try {
-      const cached = await redis.get(legKey);
-      if (cached) {
-        let embedding: number[] | null = null;
-        if (legKey.startsWith('emb:')) {
-          // JSON string containing base64 encoded compressed list
-          const entry = JSON.parse(cached);
-          if (entry.embedding) {
-            if (typeof entry.embedding === 'string') {
-              const json = Buffer.from(entry.embedding, 'base64').toString();
-              embedding = JSON.parse(json);
-            } else {
-              embedding = entry.embedding;
-            }
-          }
-        } else {
-          // MD5 keys can store JSON of number[] or EmbeddingData schema
-          const data = JSON.parse(cached);
-          if (Array.isArray(data)) {
-            embedding = data;
-          } else if (data && Array.isArray(data.embedding)) {
-            embedding = data.embedding;
-          }
-        }
-
-        if (embedding && embedding.length > 0) {
-          const vector = new Float32Array(embedding);
-          // Migrate/rehash to the new binary format
-          const buf = Buffer.from(vector.buffer, vector.byteOffset, vector.byteLength);
-          await redis.setex(cacheKey, EMBEDDING_TTL, buf).catch(() => {});
-          // Del legacy key to cleanup
-          redis.del(legKey).catch(() => {});
-          console.debug(`[EmbeddingCache] Rehashed legacy key ${legKey} -> ${cacheKey}`);
-          return vector;
-        }
-      } else {
-        // Also check if any legacy keys are stored as binary buffers
-        const bufCached = await redis.getBuffer(legKey).catch(() => null);
-        if (bufCached && bufCached.length > 0) {
-          const vector = new Float32Array(bufCached.buffer, bufCached.byteOffset, bufCached.byteLength / 4);
-          const buf = Buffer.from(vector.buffer, vector.byteOffset, vector.byteLength);
-          await redis.setex(cacheKey, EMBEDDING_TTL, buf).catch(() => {});
-          redis.del(legKey).catch(() => {});
-          console.debug(`[EmbeddingCache] Rehashed legacy buffer key ${legKey} -> ${cacheKey}`);
-          return vector;
-        }
-      }
-    } catch (err) {
-      console.warn(`[EmbeddingCache] Legacy key parse error for ${legKey}:`, err);
-    }
+    return decodeCanonicalEmbedding(buffer);
   }
 
   return null;
@@ -154,6 +95,7 @@ export async function cacheEmbedding(
   embedding: Float32Array,
   model: string = DEFAULT_MODEL
 ): Promise<void> {
+  assertCanonicalEmbedding(embedding);
   const key = CACHE_KEYS.EMBEDDING(model, hashTextSha256(text));
   const buffer = Buffer.from(embedding.buffer, embedding.byteOffset, embedding.byteLength);
   const redis = getRedis();
@@ -168,6 +110,7 @@ export async function batchCacheEmbeddings(
   model: string = DEFAULT_MODEL
 ): Promise<void> {
   if (entries.length === 0) return;
+  for (const { embedding } of entries) assertCanonicalEmbedding(embedding);
 
   const redis = getRedis();
   const pipeline = redis.pipeline();
@@ -206,7 +149,7 @@ export async function batchGetCachedEmbeddings(
     const [err, buffer] = results![i];
     if (!err && buffer) {
       const buf = buffer as Buffer;
-      outputs.push(new Float32Array(buf.buffer, buf.byteOffset, buf.byteLength / 4));
+      outputs.push(decodeCanonicalEmbedding(buf));
     } else {
       // Fallback to single get (which handles lazy rehashing)
       const fallback = await getEmbedding(texts[i], model);

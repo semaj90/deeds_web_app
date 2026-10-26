@@ -50,6 +50,27 @@ test('requires independent checksum readback even when other stages parse', () =
   assert.ok(result.failedGates.includes('READBACK:INDEPENDENT_CHECKSUM_READBACK_REQUIRED'));
 });
 
+test('preserves the exact blocked reason returned by the ContextManifest owner', () => {
+  const result = verifyProofChainV1({
+    taskCard: {}, evidenceTask: {}, evidenceCard: {}, receipt: {}, receiptBindings: [],
+    ontologyTuple: null,
+    contextManifest: { identityChecksum: 'fixture-checksum' },
+    contextManifestReadback: {
+      schema: 'atlas.context-manifest-v2-readback.v1',
+      status: 'BLOCKED',
+      reason: 'MANIFEST_READBACK_OWNER_UNAVAILABLE',
+      manifest: null,
+      identityChecksum: null,
+      payloadChecksum: null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    },
+    artifactReadback: { source: 'FIXTURE', independentlyReopened: false, artifacts: [] },
+  });
+
+  assert.ok(result.failedGates.includes('CONTEXT_MANIFEST_READBACK:MANIFEST_READBACK_OWNER_UNAVAILABLE'));
+});
+
 test('reports absent ontology and manifest inputs separately from invalid schemas', () => {
   const result = verifyProofChainV1({
     taskCard: {},
@@ -67,7 +88,9 @@ test('reports absent ontology and manifest inputs separately from invalid schema
   });
 
   assert.ok(result.failedGates.includes('ONTOLOGY_TUPLE:INPUT_MISSING'));
+  assert.ok(result.failedGates.includes('ONTOLOGY_SOURCE_SPAN:READBACK_MISSING'));
   assert.ok(result.failedGates.includes('CONTEXT_MANIFEST:INPUT_MISSING'));
+  assert.ok(result.failedGates.includes('CONTEXT_MANIFEST_READBACK:READBACK_MISSING'));
   assert.ok(!result.failedGates.some((gate) => gate.includes('SCHEMA_INVALID')));
 });
 
@@ -133,7 +156,8 @@ test('keeps task-ledger revision distinct from the grounded code-source revision
     artifactReadback: { source: 'FIXTURE', independentlyReopened: true, artifacts: [] },
   });
 
-  assert.ok(result.passedStages.includes('ONTOLOGY_TUPLE'));
+  assert.ok(result.passedStages.includes('ONTOLOGY_TUPLE_CONTRACT'));
+  assert.ok(result.failedGates.includes('ONTOLOGY_TUPLE_ADMISSION:AUTHORIZED_OWNER_READBACK_NOT_WIRED'));
   assert.ok(result.passedStages.includes('EVIDENCE_RECEIPT'));
   assert.notEqual(taskLedgerRevision, codeRevision);
 });
@@ -179,4 +203,97 @@ test('requires ContextManifest to reference the grounded tuple source, not only 
   });
 
   assert.ok(result.failedGates.includes('CONTEXT_MANIFEST:EVIDENCE_REFERENCES_INCOMPLETE'));
+});
+
+test('requires ContextManifest source revision to match the grounded ontology tuple', () => {
+  const taskRef = 'openspec/changes/example/tasks.md#L5';
+  const sourceRef = 'src/cache/valkey.ts';
+  const sourceRevision = `sha256:${'a'.repeat(64)}`;
+  const taskRevision = `sha256:${'b'.repeat(64)}`;
+  const workspaceRevision = `sha256:${'c'.repeat(64)}`;
+  const evidenceCardChecksum = `sha256:${'d'.repeat(64)}`;
+  const tuple = {
+    tupleId: 'tuple:revision-bound', schemaVersion: 'ontology-linked-tuple.v1', sourceRef,
+    surfaceText: 'cache lookup', label: 'Valkey lookup', labelKind: 'ontology', labelSource: 'manual',
+    ontologyIds: [], conceptIds: [], participants: [], evidenceRefs: [taskRef], confidence: 1,
+    evidenceState: 'ACTIVE_VERIFIED',
+    provenance: {
+      sourceTables: [], labelerVersion: null, taggerVersion: null, ontologyVersion: null, nlpVersion: null,
+      sourceRevision, workspaceRevision, taskRevision, evidenceCardChecksum,
+    },
+  };
+  const contextManifest = buildContextManifestV2({
+    schema: 'atlas.context-manifest.v1', requestId: 'request:revision', snapshotId: 'snapshot:revision',
+    graphRevision: null, query: 'trace Valkey caching to ACE', candidateBucket: 1,
+    candidateCount: 1, tokenBudget: 512, selectedNodeKeys: ['packet:fixture'],
+    evidenceRefs: [sourceRef], producerRevision: 'fixture-v1',
+  }, {
+    selectedOrdinalSetChecksum: `sha256:${'1'.repeat(64)}`,
+    evidenceRevisions: {
+      sourceRevision: `sha256:${'e'.repeat(64)}`, representationRevision: null, featureRevision: null,
+      ontologyRevision: null, modelRevision: null, promptTemplateRevision: null,
+    },
+    ordinalMapChecksum: `sha256:${'2'.repeat(64)}`,
+    retrievalPolicyRevision: 'policy:fixture-v1', acePlaybookRevision: 'ace:fixture-v1',
+  });
+
+  const verifierInput = {
+    taskCard: {}, evidenceTask: {}, evidenceCard: {}, receipt: {}, receiptBindings: [],
+    ontologyTuple: tuple,
+    artifactReadback: { source: 'FIXTURE', independentlyReopened: true, artifacts: [] },
+  };
+  const result = verifyProofChainV1({ ...verifierInput, contextManifest });
+
+  assert.ok(result.failedGates.includes('CONTEXT_MANIFEST:SOURCE_REVISION_MISMATCH'));
+
+  const matchingManifest = buildContextManifestV2(contextManifest.v1, {
+    ...contextManifest.identityInput,
+    evidenceRevisions: { ...contextManifest.identityInput.evidenceRevisions, sourceRevision },
+  });
+  const matchingResult = verifyProofChainV1({ ...verifierInput, contextManifest: matchingManifest });
+  assert.ok(matchingResult.passedStages.includes('CONTEXT_MANIFEST'));
+  assert.ok(matchingResult.failedGates.includes('CONTEXT_MANIFEST_READBACK:READBACK_MISSING'));
+});
+
+test('rejects unqualified source and workspace revision strings', () => {
+  const taskRevision = `sha256:${'a'.repeat(64)}`;
+  const taskLedgerRevision = `sha256:${'b'.repeat(64)}`;
+  const sourceRef = 'src/cache/valkey.ts';
+  const evidenceId = 'receipt:revision-format';
+  const receipt = buildEvidenceReceiptV1({
+    schema: 'atlas.evidence-receipt.v1', evidenceId, evidenceType: 'TEST', changeId: 'example',
+    taskId: 'VALKEY-1', claim: 'Revision format test', workspaceRevision: 'workspace-latest',
+    sourceRevision: taskLedgerRevision, taskRevision,
+    sourceRefs: [{ file: sourceRef, lineStart: 1, lineEnd: 1, sourceRevision: 'source-latest' }],
+    producer: 'node:test', inputs: [], observedAt: '2026-10-11T00:00:00Z',
+    expectedAssertions: [{ id: 'test:1' }], actualAssertions: [{ id: 'test:1', passed: true }],
+    outputs: [], independentVerifier: 'independent-test-readback', readbackRequired: true,
+    readbackPerformed: true, verdict: 'PROVEN',
+  });
+  const result = verifyProofChainV1({
+    taskCard: { sourceRevision: taskLedgerRevision, workspaceRevision: 'workspace-latest' },
+    evidenceTask: { taskId: 'VALKEY-1', changeId: 'example', taskHash: taskRevision },
+    evidenceCard: { evidenceIds: [evidenceId] }, receipt, receiptBindings: [],
+    ontologyTuple: null, contextManifest: null,
+    artifactReadback: { source: 'FIXTURE', independentlyReopened: true, artifacts: [] },
+  });
+
+  assert.ok(result.failedGates.includes('EVIDENCE_RECEIPT:REVISION_FORMAT_INVALID'));
+
+  const invalidTupleResult = verifyProofChainV1({
+    taskCard: {}, evidenceTask: {}, evidenceCard: {}, receipt: {}, receiptBindings: [],
+    ontologyTuple: {
+      tupleId: 'tuple:unqualified', schemaVersion: 'ontology-linked-tuple.v1', sourceRef,
+      surfaceText: 'cache lookup', label: 'Valkey lookup', labelKind: 'ontology', labelSource: 'manual',
+      ontologyIds: [], conceptIds: [], participants: [], evidenceRefs: [], confidence: 1,
+      evidenceState: 'ACTIVE_VERIFIED',
+      provenance: {
+        sourceTables: [], labelerVersion: null, taggerVersion: null, ontologyVersion: null, nlpVersion: null,
+        sourceRevision: 'source-latest', workspaceRevision: 'workspace-latest',
+      },
+    },
+    contextManifest: null,
+    artifactReadback: { source: 'FIXTURE', independentlyReopened: true, artifacts: [] },
+  });
+  assert.ok(invalidTupleResult.failedGates.includes('ONTOLOGY_TUPLE:REVISION_FORMAT_INVALID'));
 });

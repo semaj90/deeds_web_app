@@ -18,6 +18,15 @@ const require = createRequire(import.meta.url);
 export const NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1 = Object.freeze(['typescript', 'tsx', 'javascript', 'jsx'] as const);
 export type NodeTreeSitterProviderLanguage = typeof NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1[number];
 
+export function nodeTreeSitterLanguageForSourceRefV1(sourceRef: string): NodeTreeSitterProviderLanguage | null {
+  const extension = sourceRef.toLowerCase().match(/\.[^./\\]+$/)?.[0];
+  if (extension === '.tsx') return 'tsx';
+  if (extension === '.jsx') return 'jsx';
+  if (['.ts', '.mts', '.cts'].includes(extension ?? '')) return 'typescript';
+  if (['.js', '.mjs', '.cjs'].includes(extension ?? '')) return 'javascript';
+  return null;
+}
+
 export function nodeTreeSitterProviderLanguageVocabularyV1() {
   const labels = [...NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1];
   const sourceRevision = `sha256:${createHash('sha256').update(JSON.stringify(labels)).digest('hex')}`;
@@ -30,7 +39,7 @@ export function nodeTreeSitterProviderLanguageVocabularyV1() {
 }
 
 type PositionLike = { row: number; column: number };
-type SyntaxNodeLike = {
+export type SyntaxNodeLike = {
   type: string;
   text: string;
   startIndex: number;
@@ -375,20 +384,25 @@ function collectEvidence(
  * Graphify provenance gate naturally treats this provider as a parity
  * observation until GIS/canonical-owner acceptance is separately proven.
  */
+export function parseNodeTreeSitterSourceV1(input: { source: string; language: string; sourceRef: string }) {
+  const language = normalizeLanguage(input.language, input.sourceRef);
+  const runtime = loadRuntime(language);
+  const parser = new runtime.Parser();
+  parser.setLanguage(runtime.grammar);
+  const tree = parser.parse(input.source);
+  return { tree, language, parserRevision: runtime.parserRevision, grammarRevision: runtime.grammarRevision };
+}
+
 export function createNodeTreeSitterAstProvider(): AstProvider {
   return {
     async materialize(input: CanonicalSourceRef): Promise<AstProviderResult> {
       try {
-        const language = normalizeLanguage(input.language, input.sourceRef);
-        const runtime = loadRuntime(language);
-        const parser = new runtime.Parser();
-        parser.setLanguage(runtime.grammar);
-        const tree = parser.parse(input.source);
+        const { tree, language, parserRevision } = parseNodeTreeSitterSourceV1(input);
         const { chunks, edges, diagnostics } = collectEvidence(tree, input.source, input.sourceRef);
         const evidence: AtlasStructuralEvidence = {
           schema: 'atlas.ast.evidence.v1',
           engine: 'node-tree-sitter',
-          engine_version: runtime.parserRevision,
+          engine_version: parserRevision,
           language,
           file_path: input.sourceRef,
           source_revision: input.sourceRevision,

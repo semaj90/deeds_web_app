@@ -1,9 +1,6 @@
 <script lang="ts">
 	import ClientGemmaDemo from '$lib/components/ClientGemmaDemo.svelte';
-	import ClientGemmaInference from '$lib/components/ClientGemmaInference.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
-
-	let activeTab = $state<'ollama' | 'onnx'>('ollama');
 
 </script>
 
@@ -15,28 +12,13 @@
 			</div>
 			<div>
 				<h1 class="brand-title">Client Inference Lab</h1>
-				<p class="brand-sub">Compare Ollama server-side vs ONNX client-side (WebGPU) inference</p>
+				<p class="brand-sub">Chat uses the configured local server model; embeddings remain a separate service.</p>
 			</div>
 		</div>
 	</header>
 
-	<nav class="tab-bar">
-		<button class="tab" class:active={activeTab === 'ollama'} onclick={() => activeTab = 'ollama'}>
-			<Icon name="server" size={14} />
-			Ollama (Server)
-		</button>
-		<button class="tab" class:active={activeTab === 'onnx'} onclick={() => activeTab = 'onnx'}>
-			<Icon name="monitor" size={14} />
-			ONNX (Client WebGPU)
-		</button>
-	</nav>
-
 	<div class="tab-content">
-		{#if activeTab === 'ollama'}
-			<ClientGemmaDemo />
-		{:else}
-			<ClientGemmaInference />
-		{/if}
+		<ClientGemmaDemo />
 	</div>
 </div>
 
@@ -82,43 +64,6 @@
 		font-size: 0.6875rem;
 		color: var(--t-text-muted);
 		margin: 0.125rem 0 0;
-	}
-
-	.tab-bar {
-		display: flex;
-		gap: 0.25rem;
-		margin-bottom: 1.5rem;
-		background: color-mix(in srgb, var(--t-text) 4%, transparent);
-		border: 1px solid color-mix(in srgb, var(--t-border) 40%, transparent);
-		border-radius: 0.5rem;
-		padding: 3px;
-	}
-
-	.tab {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.375rem;
-		padding: 0.5rem 1rem;
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: var(--t-text-muted);
-		background: none;
-		border: none;
-		border-radius: 0.375rem;
-		cursor: pointer;
-		transition: color 0.15s, background 0.15s;
-	}
-
-	.tab:hover {
-		color: var(--t-text);
-	}
-
-	.tab.active {
-		color: var(--t-text);
-		background: color-mix(in srgb, var(--t-text) 8%, transparent);
-		font-weight: 600;
 	}
 
 	.tab-content {

@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.integration-progress.v1",
+  "status": "ACTIVE_PARTIAL",
+  "gate": "RETRIEVAL-FAILED-ATTEMPT-01",
+  "implemented": [
+    "Optional attempt_outcome preserves readability of older observations",
+    "Existing generic/evidence gRPC and codebase/evidence HTTP callers retain failed codec observations",
+    "NO_RESULT and THREW outcomes preserve existing null fallback and original thrown exceptions",
+    "Existing packet/eval writer receives only validated codec metadata and observed transport",
+    "No invented packet/source/model identity and no request, response or exception content in new structured payload",
+    "Shared lazy writer import; detached best-effort writes do not block retrieval"
+  ],
+  "validation": {
+    "suitesPassed": 11,
+    "testsPassed": 54,
+    "log": "docs/reports/retrieval-failure-final-20261016T001413.txt",
+    "transport": "Real temporary loopback grpc-js and HTTP fixture servers",
+    "failureCases": ["gRPC UNAVAILABLE generic caller", "gRPC UNAVAILABLE evidence caller", "HTTP 503 codebase", "HTTP 503 evidence", "HTTP JSON parse failure", "uncaught action exception", "pending or throwing observer"],
+    "writer": "Mocked existing packet writer; no live insert/readback",
+    "productionServices": "NOT_QUERIED",
+    "fullTypecheck": "NOT_RUN",
+    "svelteCheck": "NOT_RUN"
+  },
+  "notPerformed": ["live database writes", "source-revision writes", "backfill", "service restart", "model load", "GPU job", "graph refresh", "promotion"],
+  "remaining": ["bounded/guaranteed delivery", "qualified provenance from ACP through final result", "production transport replay", "durable independent readback", "actual GPU kernel timing and identity", "identity and enrichment requirements in full goal objective"],
+  "likely_cause": "Null fallbacks and thrown transport actions lost codec observations because telemetry was attached only to successful object results.",
+  "evidence": ["Existing observeTransport result-only attachment", "Five loopback failure cases", "54 passing focused tests"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/grpc/transport-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/grpc/transport-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.failure-telemetry.spec.ts",
+    "docs/architecture/retrieval-transport-codec-telemetry-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-telemetry-lowrank-recommendation-okf-integration --strict",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/grpc/transport-telemetry.spec.ts src/lib/server/grpc/retrieval-client.failure-telemetry.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-retrieval-failed-attempts-20261016.json",
+  "canonicalAuthority": false
+}

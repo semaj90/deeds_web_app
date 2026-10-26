@@ -210,7 +210,7 @@
 		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
 	>
 		<!-- Modal panel -->
-		<div class="modal-panel" role="dialog" aria-modal="true" aria-label="Evidence Detail">
+		<div class="modal-panel" role="dialog" aria-modal="true" aria-label="Evidence Detail" tabindex="-1">
 			<!-- Type accent strip -->
 			<div class="modal-accent-strip" style="background: {accentColor.strip};"></div>
 
@@ -564,11 +564,11 @@
 		role="dialog"
 		aria-modal="true"
 		aria-label="Image viewer"
-		onclick={closeLightbox}
+		onclick={(e) => { if (e.target === e.currentTarget) closeLightbox(); }}
 		onkeydown={(e) => { if (e.key === 'Escape') closeLightbox(); if (e.key === '+' || e.key === '=') zoomIn(); if (e.key === '-') zoomOut(); if (e.key === '0') resetZoom(); }}
 		tabindex="-1"
 	>
-		<div class="lightbox-toolbar" onclick={(e) => e.stopPropagation()}>
+		<div class="lightbox-toolbar">
 			<button type="button" class="lb-btn" onclick={zoomOut} title="Zoom out (-)">
 				<Icon name="zoom-out" class="w-4 h-4" />
 			</button>
@@ -583,7 +583,7 @@
 				<Icon name="x" class="w-4 h-4" />
 			</button>
 		</div>
-		<div class="lightbox-img-wrap" onclick={(e) => e.stopPropagation()}>
+		<div class="lightbox-img-wrap">
 			<img
 				src={fileUrl}
 				alt={doc?.title ?? 'Evidence'}

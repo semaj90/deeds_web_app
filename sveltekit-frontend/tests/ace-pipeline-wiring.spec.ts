@@ -139,11 +139,11 @@ vi.mock('$lib/server/langextract/bag-cache.js', () => ({
 
 // ── Mock Ollama ─────────────────────────────────────────────────────────────
 vi.mock('$lib/server/ollama.js', () => ({
-  ollamaFetch: vi.fn(async () => ({
+  embedOrChatFetch: vi.fn(async () => ({
     ok:   true,
     json: async () => ({
       response:         'test response',
-      model:            'gemma4-rotorquant:latest',
+      model:            'ornith-1.5-9b',
       eval_count:       100,
       prompt_eval_count: 50,
     }),
@@ -151,11 +151,11 @@ vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat:          vi.fn(async () => 'test response'),
   getChatModelKeepAlive: vi.fn(() => '24h'),
   VLM_MODELS: {
-    vision:    'gemma4-rotorquant:latest',
+    vision:    'ornith-1.5-9b',
     embedding: 'embeddinggemma:latest',
-    legal:     'gemma4-rotorquant:latest',
-    gemma4:    'gemma4-rotorquant:latest',
-    tool:      'gemma4-rotorquant:latest',
+    legal:     'ornith-1.5-9b',
+    gemma4:    'ornith-1.5-9b',
+    tool:      'ornith-1.5-9b',
   },
 }));
 

@@ -287,7 +287,7 @@ async function writeSummaryLayer(pool, row, summary, packet, cacheStatus) {
     source: 'gemma4-parent-atlas-summaries',
     source_ref: row.source_ref ?? null,
     feature_id: row.feature_id ?? null,
-    model: packet?.model ?? process.env.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
+    model: packet?.model ?? process.env.LOCAL_GEMMA_MODEL ?? 'ornith-1.5-9b',
     backend: 'llama-server',
     cache_mode: cacheStatus ?? null,
     summary_packet_key: packet?.packetId ?? null,
@@ -343,7 +343,7 @@ async function writeSummaryLayer(pool, row, summary, packet, cacheStatus) {
 
 function resolveLlamaModel(env) {
   const explicit = String(env.LOCAL_GEMMA_MODEL ?? env.LLAMA_MODEL ?? env.TURBOQUANT_MODEL ?? '').trim();
-  if (explicit && !/^gemma4-rotorquant(?::latest)?$/i.test(explicit)) return explicit;
+  if (explicit && !/^ornith-1.5-9b(?::latest)?$/i.test(explicit)) return explicit;
   const modelPath = String(
     env.ROTORQUANT_MODEL_PATH ??
     env.TURBO_MODEL_PATH ??
@@ -351,7 +351,7 @@ function resolveLlamaModel(env) {
     '',
   ).trim();
   if (modelPath) return path.basename(modelPath);
-  return 'gemma4-legal-iq4xs-direct.gguf';
+  return 'ornith-1.5-9b';
 }
 
 const ENV = loadRepoEnv(process.env);
@@ -807,13 +807,13 @@ function buildCachedSummaryInput(row, snippet) {
     semanticEmbedding: buildDeterministicSemanticEmbedding(`${row.source_ref}:${row.feature_id ?? 'unknown'}:${snippet.slice(0, 160)}`),
     intent: 'summary',
     promptVersion: 'phase101-summary-v1',
-    model: process.env.LOCAL_GEMMA_MODEL ?? 'gemma4-rotorquant:latest',
+    model: process.env.LOCAL_GEMMA_MODEL ?? 'ornith-1.5-9b',
   };
 }
 
 async function fetchGemma4Summary(row, cacheText) {
   const baseUrl = String(process.env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1').replace(/\/+$/, '');
-  const model = String(process.env.LOCAL_GEMMA_MODEL ?? 'gemma4-rotorquant:latest').trim();
+  const model = String(process.env.LOCAL_GEMMA_MODEL ?? 'ornith-1.5-9b').trim();
   const prompt = `${buildStableSummaryPrefix(row)}\n\n${buildSummaryUserPrompt(row, cacheText)}`;
   const r = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
@@ -1026,7 +1026,7 @@ async function processOne(row, pool, dryRun, cacheRedis) {
           queryHash: sha256(cacheText),
           contentHash: sha256(cacheText),
           repoRevision: repoRev,
-          model: String(process.env.LOCAL_GEMMA_MODEL ?? 'gemma4-rotorquant:latest').trim(),
+          model: String(process.env.LOCAL_GEMMA_MODEL ?? 'ornith-1.5-9b').trim(),
           promptVersion: 'phase101-summary-v1',
           intent: 'summary',
           sourceRefs: [row.source_ref],

@@ -81,7 +81,7 @@ describe('assertRuntimeIdentityIsMocked — the actual bug this contract prevent
       resolutionSource: 'LLAMA_PROPS',
       runtimeDiscovered: true,
     });
-    expect(() => assertRuntimeIdentityIsMocked(resolution, 'gemma4-rotorquant:latest')).toThrow();
+    expect(() => assertRuntimeIdentityIsMocked(resolution, 'ornith-1.5-9b')).toThrow();
   });
 
   it('refuses to assert against an undiscovered (unmocked) resolution', () => {

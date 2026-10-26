@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { createHash } from 'node:crypto';
+import { createReadStream } from 'node:fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const OUT_JSON = path.join('.tmp','phase-lane-completion.json');
-const OUT_REPORT = path.join('reports','phase-lane-completion.md');
+const outputStamp = new Date().toISOString().replace(/[:.]/g, '-');
+const OUT_JSON = process.argv.find((arg) => arg.startsWith('--output='))?.slice(9)
+  ?? path.join('.tmp', `phase-lane-completion-${outputStamp}.json`);
+const OUT_REPORT = `${OUT_JSON}.md`;
 
 async function exists(p){ try{ await fs.access(p); return true;}catch(e){return false;} }
 
@@ -19,28 +23,23 @@ async function statMtimeMs(p) {
 }
 
 async function readJsonlKeySet(p, key) {
-  try {
+    const info = await fs.stat(p);
+    if (info.size > 16 * 1024 * 1024) throw new Error('SEED_EVIDENCE_SIZE_LIMIT');
     const text = await fs.readFile(p, 'utf8');
     const rows = text.split(/\r?\n/).filter(Boolean);
     const values = new Set();
     for (const line of rows) {
-      try {
         const row = JSON.parse(line);
         const value = row?.[key];
-        if (value !== undefined && value !== null && `${value}`.trim()) values.add(`${value}`);
-      } catch {
-        continue;
-      }
+        if (typeof value !== 'string' || !value.trim() || values.has(value)) throw new Error('INVALID_OR_DUPLICATE_SEED_ID');
+        values.add(value);
     }
     return values;
-  } catch {
-    return null;
-  }
 }
 
 const APP_ROOT = path.resolve(__dirname, '../../..');
 
-async function classifyRefreshPromotion(pathValue, { exists: pathExists, generated = false, active = false, sourceMissing = false, sourcePath = null } = {}) {
+export async function classifyRefreshPromotion(pathValue, { exists: pathExists, generated = false, active = false, sourceMissing = false, sourcePath = null } = {}) {
   if (sourceMissing) return 'MISSING_SOURCE';
   if (!pathExists) return 'MISSING_SOURCE';
   if (active) return 'ALREADY_ACTIVE';
@@ -51,17 +50,46 @@ async function classifyRefreshPromotion(pathValue, { exists: pathExists, generat
     }
   }
   if (generated) return 'GENERATED_DO_NOT_PROMOTE';
-  return 'READY_TO_PROMOTE';
+  return 'ARTIFACT_PRESENT_PROOF_REQUIRED';
 }
 
-async function classifyFreshness(outputPath, sourcePath) {
+export async function classifyFreshness(outputPath, sourcePath) {
   const outputExists = await exists(outputPath);
   const sourceExists = await exists(sourcePath);
   if (!sourceExists) return 'MISSING_SOURCE';
   if (!outputExists) return 'MISSING_SOURCE';
   const [outputMtime, sourceMtime] = await Promise.all([statMtimeMs(outputPath), statMtimeMs(sourcePath)]);
   if (outputMtime !== null && sourceMtime !== null && sourceMtime > outputMtime) return 'STALE_NEEDS_REGEN';
-  return 'READY_TO_PROMOTE';
+  return 'FRESHNESS_OBSERVED_PROOF_REQUIRED';
+}
+
+export async function classifySeedCoverage(outputPath, sourcePath) {
+  if (!await exists(sourcePath) || !await exists(outputPath)) return 'MISSING_SOURCE';
+  try {
+    const [sourceIds, outputIds] = await Promise.all([
+      readJsonlKeySet(sourcePath, 'card_id'), readJsonlKeySet(outputPath, 'card_id'),
+    ]);
+    if (sourceIds.size === 0 || outputIds.size === 0) return 'EMPTY_SEED_EVIDENCE';
+    if ([...sourceIds].some((id) => !outputIds.has(id))) return 'SEED_ID_COVERAGE_INCOMPLETE';
+    const freshness = await classifyFreshness(outputPath, sourcePath);
+    return freshness === 'FRESHNESS_OBSERVED_PROOF_REQUIRED' ? 'SEED_IDS_COVERED_PROOF_REQUIRED' : freshness;
+  } catch {
+    return 'INVALID_SEED_EVIDENCE';
+  }
+}
+
+async function fileEvidence(filePath) {
+  try {
+    const hash = createHash('sha256');
+    let byteLength = 0;
+    for await (const bytes of createReadStream(filePath)) {
+      hash.update(bytes);
+      byteLength += bytes.length;
+    }
+    return { path: filePath, byteLength, sha256: `sha256:${hash.digest('hex')}` };
+  } catch {
+    return { path: filePath, byteLength: null, sha256: null };
+  }
 }
 
 async function run(){
@@ -88,28 +116,7 @@ async function run(){
   const phase19Output = files.retrieval_loop_log;
   const phase19Source = files.phase18;
   const phase19Report = path.join('reports','phase19-retrieval-loop-seed.md');
-  const phase19Status = await (async () => {
-    const [outputExists, sourceExists] = await Promise.all([exists(phase19Output), exists(phase19Source)]);
-    if (!sourceExists) return 'MISSING_SOURCE';
-    if (!outputExists) return 'MISSING_SOURCE';
-    const [phase18Ids, phase19Ids] = await Promise.all([
-      readJsonlKeySet(phase19Source, 'card_id'),
-      readJsonlKeySet(phase19Output, 'card_id'),
-    ]);
-    if (phase18Ids && phase19Ids) {
-      let covered = true;
-      for (const id of phase18Ids) {
-        if (!phase19Ids.has(id)) {
-          covered = false;
-          break;
-        }
-      }
-      if (covered) return 'READY_TO_PROMOTE';
-    }
-    const [outputMtime, sourceMtime] = await Promise.all([statMtimeMs(phase19Output), statMtimeMs(phase19Source)]);
-    if (outputMtime !== null && sourceMtime !== null && sourceMtime > outputMtime) return 'STALE_NEEDS_REGEN';
-    return 'READY_TO_PROMOTE';
-  })();
+  const phase19Status = await classifySeedCoverage(phase19Output, phase19Source);
   const refreshPromotionCandidates = [
     {
       id: 'phase16_refresh_runner',
@@ -190,6 +197,12 @@ async function run(){
     },
   ];
   status.generated_at = new Date().toISOString();
+  status.qualification = {
+    status: 'ARTIFACT_INVENTORY_ONLY', canonicalAuthority: false, promotionEligible: false,
+    artifactBaseDirectory: path.resolve('.'),
+    runtimeProof: false, modelAdmission: false, sourceAdmission: false,
+    evidence: await Promise.all([...new Set(Object.values(files))].map(fileEvidence)),
+  };
   status.phase16_refresh_promotion = {
     marker: 'phase16_refresh_promotion',
     items: refreshPromotionCandidates,
@@ -216,8 +229,9 @@ async function run(){
     status: phase19Status,
   };
   await fs.mkdir(path.dirname(OUT_JSON),{recursive:true});
-  await fs.writeFile(OUT_JSON, JSON.stringify(status,null,2),'utf8');
-  const lines = ['# Phase Lane Completion','',`generated_at: ${status.generated_at}`,'','## Status',''];
+  await fs.writeFile(OUT_JSON, JSON.stringify(status,null,2), { encoding: 'utf8', flag: 'wx' });
+  const lines = ['# Phase Lane Completion','',`generated_at: ${status.generated_at}`,
+    '', 'Qualification: ARTIFACT_INVENTORY_ONLY; promotionEligible=false; no runtime/model/source admission proof.', '', '## Status',''];
   for(const k of Object.keys(files)){
     lines.push(`- **${k}**: ${status[k].exists ? 'present' : 'missing'} — ${status[k].path}`);
   }
@@ -249,8 +263,10 @@ async function run(){
     'Next steps: keep the Phase 12 overlay aligned in `docs/atlas/feature-registry.json`, keep Phase 16 refresh promotion pointed at the canonical sourceRef-first join artifacts, regenerate Phase 17 only if its output is stale relative to memory/knowledge/schema-indexer-contract-cards.jsonl, regenerate Phase 18 only if its rerank output is stale relative to Phase 17, and regenerate Phase 19 only if its retrieval loop seed is stale relative to Phase 18.'
   );
   await fs.mkdir(path.dirname(OUT_REPORT),{recursive:true});
-  await fs.writeFile(OUT_REPORT, lines.join('\n'),'utf8');
+  await fs.writeFile(OUT_REPORT, lines.join('\n'), { encoding: 'utf8', flag: 'wx' });
   console.log('wrote', OUT_JSON, OUT_REPORT);
 }
 
-run().catch(e=>{ console.error(e); process.exit(1); });
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  run().catch(e=>{ console.error(e); process.exitCode = 1; });
+}

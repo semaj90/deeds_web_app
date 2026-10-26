@@ -23,6 +23,7 @@ export interface ExactPromotionSourceBytesV1 {
   span_found: boolean;
   span_sha256: string | null;
   span_byte_length: number | null;
+  span_utf8_valid?: boolean;
   evidence_ref?: string | null;
 }
 

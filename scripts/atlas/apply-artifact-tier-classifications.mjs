@@ -18,7 +18,7 @@ const OUT_MD = path.join(REPORTS_DIR, 'artifact-tiering-application.md');
 const MANIFEST = path.join(REPO_ROOT, 'memory', 'exports', 'artifact-tiering-manifest.jsonl');
 
 const RUNTIME_PROTECTED = new Map([
-  ['models/gemma4-legal-iq4xs-direct.gguf', 'active llama-server chat model'],
+  ['models/ornith-1.5-9b', 'active llama-server chat model'],
   ['models/mmproj-F16.gguf', 'active VLM projection asset'],
   ['models/embeddinggemma-300m-f16.gguf', 'local embedding fallback'],
   ['models/embeddinggemma-300m-q8_0.gguf', 'local embedding fallback'],

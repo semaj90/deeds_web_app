@@ -4,10 +4,11 @@ import math
 from dataclasses import replace
 from pathlib import Path
 import re
+from typing import get_args
 import unittest
 
 from atlas_graph_runtime.gnn_fixtures import fixture_gnn_input_v1, fixture_gnn_models_v1
-from atlas_graph_runtime.gnn_reference import GnnEdgeFeatureV1, GnnHyperedgeV1, GnnInputV1, GnnModelV1, compare_gnn_outputs_v1, run_gnn_v1
+from atlas_graph_runtime.gnn_reference import GnnArchitectureV1, GnnEdgeFeatureV1, GnnHyperedgeV1, GnnInputV1, GnnModelV1, compare_gnn_outputs_v1, run_gnn_v1
 
 
 class NetworkxGnnReferenceTests(unittest.TestCase):
@@ -24,6 +25,26 @@ class NetworkxGnnReferenceTests(unittest.TestCase):
         executable = {model.architecture for model in fixture_gnn_models_v1()}
         self.assertEqual(documented, executable)
         self.assertEqual(len(documented), 35)
+        self.assertEqual(documented, set(get_args(GnnArchitectureV1)))
+
+    def test_bounded_family_scope_covers_each_fixture_operator_once(self) -> None:
+        doc_path = (
+            Path(__file__).resolve().parents[2]
+            / "docs"
+            / ".okf"
+            / "architecture"
+            / "domain-classification-and-agentic-retrieval-v1.md"
+        )
+        doc = doc_path.read_text(encoding="utf-8")
+        family_section = doc.split("### Bounded CPU family scope", 1)[1].split("\n## ", 1)[0]
+        family_rows = [line for line in family_section.splitlines() if line.startswith("| ")]
+        scoped = re.findall(r"`([A-Z0-9_]+_V1)`", "\n".join(family_rows))
+        executable = [model.architecture for model in fixture_gnn_models_v1()]
+
+        self.assertEqual(len(scoped), len(set(scoped)))
+        self.assertEqual(set(scoped), set(executable))
+        self.assertEqual(len(scoped), 35)
+        self.assertEqual(set(scoped), set(get_args(GnnArchitectureV1)))
 
     def test_all_fixture_operators_are_deterministic_and_non_authoritative(self) -> None:
         graph_input = fixture_gnn_input_v1()

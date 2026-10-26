@@ -15,6 +15,7 @@ describe('Atlas semantic_768 exact client', () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
       operation: 'knn.exact',
       backend: 'cuvs.brute_force',
+      metric: 'cosine_distance',
       representationId: 'semantic_768',
       dimension: 768,
       corpusRows: 1,
@@ -47,9 +48,9 @@ describe('Atlas semantic_768 exact client', () => {
     expect(receipt.backend).toBe('cuvs.brute_force');
   });
 
-  it('derives cosineSimilarity=1 from sqeuclideanDistance=0 for identical unit vectors', async () => {
+  it('maps cosineDistance=0 to cosineSimilarity=1 for identical unit vectors', async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
-      operation: 'knn.exact', backend: 'cuvs.brute_force', representationId: 'semantic_768', dimension: 768,
+      operation: 'knn.exact', backend: 'cuvs.brute_force', metric: 'cosine_distance', representationId: 'semantic_768', dimension: 768,
       corpusRows: 1, gpuMemoryBeforeMb: null, gpuMemoryAfterMb: null, durationMs: 1, truncated: false,
       results: [{ rank: 1, packetKey: 'p1', sourceRevision: 'r1', symbolVersionId: null, distance: 0 }],
     }), { status: 200, headers: { 'content-type': 'application/json' } }));
@@ -61,15 +62,15 @@ describe('Atlas semantic_768 exact client', () => {
       corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(0) }],
       topK: 1,
     });
-    expect(receipt.results[0].sqeuclideanDistance).toBe(0);
+    expect(receipt.results[0].cosineDistance).toBe(0);
     expect(receipt.results[0].cosineSimilarity).toBe(1);
   });
 
-  it('derives cosineSimilarity=0 from sqeuclideanDistance=2 for orthogonal unit vectors', async () => {
+  it('maps cosineDistance=1 to cosineSimilarity=0 for orthogonal unit vectors', async () => {
     const fetchMock = vi.fn(async () => new Response(JSON.stringify({
-      operation: 'knn.exact', backend: 'cuvs.brute_force', representationId: 'semantic_768', dimension: 768,
+      operation: 'knn.exact', backend: 'cuvs.brute_force', metric: 'cosine_distance', representationId: 'semantic_768', dimension: 768,
       corpusRows: 1, gpuMemoryBeforeMb: null, gpuMemoryAfterMb: null, durationMs: 1, truncated: false,
-      results: [{ rank: 1, packetKey: 'p1', sourceRevision: 'r1', symbolVersionId: null, distance: 2 }],
+      results: [{ rank: 1, packetKey: 'p1', sourceRevision: 'r1', symbolVersionId: null, distance: 1 }],
     }), { status: 200, headers: { 'content-type': 'application/json' } }));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -80,6 +81,22 @@ describe('Atlas semantic_768 exact client', () => {
       topK: 1,
     });
     expect(receipt.results[0].cosineSimilarity).toBe(0);
+  });
+
+  it('fails closed when the sidecar reports a non-cosine metric (old sqeuclidean path)', async () => {
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({
+      operation: 'knn.exact', backend: 'cuvs.brute_force', metric: 'sqeuclidean_unverified', representationId: 'semantic_768', dimension: 768,
+      corpusRows: 1, gpuMemoryBeforeMb: null, gpuMemoryAfterMb: null, durationMs: 1, truncated: false,
+      results: [{ rank: 1, packetKey: 'p1', sourceRevision: 'r1', symbolVersionId: null, distance: 0 }],
+    }), { status: 200, headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const client = createAtlasRapidsSemantic768Client('http://127.0.0.1:8098');
+    await expect(client.exactKnn({
+      query: { vector: unitVector(0), representationId: 'semantic_768', representationRevision: 'semantic-768-test-v1' },
+      corpus: [{ packetKey: 'p1', sourceRevision: 'r1', vector: unitVector(0) }],
+      topK: 1,
+    })).rejects.toThrow(/ATLAS_SEMANTIC768_METRIC_MISMATCH/);
   });
 
   it('fails closed on a non-unit-normalized query vector — does not silently send it', async () => {

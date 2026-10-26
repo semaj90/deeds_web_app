@@ -90,21 +90,19 @@ export function buildPacketBitmapPrefilterQuery(
     p++;
   }
   if (filters.workspaceRevision) {
-    conditions.push(`workspace_revision = $${p}`);
+    // workspace_revision (integer) is the legacy placeholder column; the admitted revision lives in
+    // workspace_revision_key (text, sha256:…). Filter on the key so a real revision can match.
+    conditions.push(`workspace_revision_key = $${p}`);
     params.push(filters.workspaceRevision);
     p++;
   }
 
   const where = conditions.join(' AND ');
-  // source_ref is selected alongside packet_key because Stage 2 (Qdrant) filters on source_ref,
-  // not packet_key — source_ref is indexed and 100%-populated on both codebase_chunks_768 and
-  // _768_v2; packet_key is unindexed on _768 (though present) and only ~12% populated on _768_v2
-  // (see packet-dense-rerank.ts's header comment for the full live-verified finding, corrected
-  // twice 2026-09-16). packet_key remains the
-  // Stage 3 join-back key (never source_ref alone, since one source_ref can back multiple
-  // packets — different symbols in the same file).
+  // source_ref accompanies packet_key for exact checks against canonical packet/chunk lineage.
+  // Stage 2 resolves packet keys through atlas_packet_chunk_lineage and filters Qdrant by
+  // codebase_chunk_index.id; neither Qdrant source_ref nor packet_key is canonical identity.
   const sql = `
-    SELECT packet_key, source_ref, source_revision, workspace_revision,
+    SELECT packet_key, source_ref, source_revision, workspace_revision, workspace_revision_key,
            representation_revision, source_representation_id AS representation_id,
            title_id, feature_id, content_hash
     FROM atlas_packets
@@ -147,7 +145,8 @@ export async function runPacketBitmapPrefilter(
   const { sql, params } = buildPacketBitmapPrefilterQuery(filters, cap);
   const result = await db.query<{
     packet_key: string; source_ref: string; source_revision?: string | null;
-    workspace_revision?: string | number | null; representation_revision?: string | number | null;
+    workspace_revision?: string | number | null; workspace_revision_key?: string | null;
+    representation_revision?: string | number | null;
     representation_id?: string | null; content_hash?: string | null;
   }>(sql, params);
   const candidateSetTruncated = result.rows.length > cap;
@@ -157,7 +156,7 @@ export async function runPacketBitmapPrefilter(
       packetKey: r.packet_key,
       sourceRef: r.source_ref,
       sourceRevision: r.source_revision ?? null,
-      workspaceRevision: r.workspace_revision ?? null,
+      workspaceRevision: r.workspace_revision_key ?? null,
       representationRevision: r.representation_revision ?? null,
       representationId: r.representation_id ?? null,
       contentHash: r.content_hash ?? null,

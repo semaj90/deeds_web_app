@@ -141,6 +141,8 @@
 <div 
 	bind:this={canvasRef}
 	class="absolute inset-0 z-0 h-screen w-screen overflow-hidden bg-[#050905] {isPanning ? 'cursor-grabbing' : 'cursor-default'}"
+	role="region"
+	aria-label="NES Graph Viewport"
 	onpointerdown={handlePointerDown}
 	onpointermove={handlePointerMove}
 	onpointerup={handlePointerUp}

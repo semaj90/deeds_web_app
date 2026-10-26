@@ -3,21 +3,21 @@ import {
   redisSetRevisionedAcePacketV1,
   hashQuery,
 } from '$lib/server/cache/ace-packet-cache.js';
-import { admitAceRouteCacheIdentityV1 } from '$lib/server/ace/ace-route-cache-admission-v1.js';
+import {
+  admitAceRouteCacheIdentityV1,
+  isAceRouteSynthesisAdmittedV1,
+} from '$lib/server/ace/ace-route-cache-admission-v1.js';
 import { buildVarianceRecoveryContext } from '$lib/server/ace/variance-recovery.js';
 import { buildStreamPreamble } from '$lib/server/mcp/atlas-tools-client.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import path from 'path';
 import fs from 'fs';
+import { runAceScriptV1 } from '$lib/server/ace/ace-script-runner-v1.js';
+import { aceStreamRequestV1Schema } from '$lib/server/ace/ace-stream-request-v1.js';
 import {
   deriveTokenMapCartridgePayloadFromAcePacket,
   persistTokenMapCartridge,
 } from '$lib/server/token-map/token-map-service.js';
-import { aceStreamRequestV1Schema } from '$lib/server/ace/ace-stream-request-v1.js';
-
-const execAsync = promisify(exec);
 
 function makeRequestFromUrl(url: URL) {
   const query = url.searchParams.get('q') ?? url.searchParams.get('query') ?? '';
@@ -29,8 +29,7 @@ function makeRequestFromUrl(url: URL) {
 }
 
 async function buildAcePacket(query: string) {
-  const scriptPath = path.join(process.cwd(), 'scripts', 'ace', 'build-packet.mjs');
-  await execAsync(`node ${scriptPath} "${query}"`);
+  await runAceScriptV1('build-packet.mjs', query);
   const queryHash = hashQuery(query).split(':').pop();
   const packetPath = path.join(process.cwd(), '.tmp', 'ace', `packet-${queryHash}.json`);
   if (fs.existsSync(packetPath)) {
@@ -119,6 +118,24 @@ export async function POST({ request, locals }) {
       // until a server-owned admitted ContextManifest/V3 bridge is connected.
       const cacheAdmission = admitAceRouteCacheIdentityV1(undefined, cacheKey);
 
+      if (!isAceRouteSynthesisAdmittedV1(cacheAdmission)) {
+        send({
+          type: 'cache.blocked',
+          reason: cacheAdmission.reason,
+          degraded: true,
+          canonicalAuthority: false,
+        });
+        send({
+          type: 'synthesis.blocked',
+          reason: 'ACE_CONTEXT_MANIFEST_ADMISSION_REQUIRED',
+          degraded: true,
+          canonicalAuthority: false,
+        });
+        send({ type: 'done' });
+        controller.close();
+        return;
+      }
+
       // ── Atlas-tools preamble (classify intent + RAG context) ─────────────────
       // Runs in parallel with cache lookup. Fails silently — stream continues.
       const preamblePromise = buildStreamPreamble(query, 12).catch((err) => {
@@ -130,15 +147,6 @@ export async function POST({ request, locals }) {
         ? await redisGetRevisionedAcePacketV1(cacheAdmission.identity).catch(() => null)
         : null;
       let packetToUse = cached;
-
-      if (cacheAdmission.status !== 'ADMITTED') {
-        send({
-          type: 'cache.blocked',
-          reason: cacheAdmission.reason,
-          degraded: true,
-          canonicalAuthority: false,
-        });
-      }
 
       const preamble = await preamblePromise;
       if (preamble) {
@@ -158,8 +166,8 @@ export async function POST({ request, locals }) {
       } else {
         send({
           type: 'cache.miss',
-          key: cacheAdmission.status === 'ADMITTED' ? cacheAdmission.cacheKey : cacheKey,
-          degraded: cacheAdmission.status !== 'ADMITTED',
+          key: cacheAdmission.cacheKey,
+          degraded: false,
         });
         send({ type: 'retrieval.start', strategy: 'qdrant_postgres_hybrid' });
         
@@ -173,9 +181,7 @@ export async function POST({ request, locals }) {
           varianceRecovery: packet.varianceRecovery
         });
         
-        if (cacheAdmission.status === 'ADMITTED') {
-          await redisSetRevisionedAcePacketV1(cacheAdmission.identity, packet).catch(() => null);
-        }
+        await redisSetRevisionedAcePacketV1(cacheAdmission.identity, packet).catch(() => null);
       }
 
       const tokenMapPayload = deriveTokenMapCartridgePayloadFromAcePacket(query, packetToUse ?? {});

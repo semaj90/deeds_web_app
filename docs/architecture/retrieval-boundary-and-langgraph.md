@@ -67,6 +67,8 @@ cuVS is an **optional GPU acceleration lane** behind the same `SearchBackend<T>`
 
 LangGraph is **optional orchestration and testing infrastructure only**.
 
+Mastra has a separate request-scoped inference route at `sveltekit-frontend/src/routes/api/atlas/mastra-agent/+server.ts`. It accepts an already admitted ContextManifest, a bound PromptPlan, and bounded segment content, then invokes the configured llama-server model through `executeMastraPromptPlanV1`. This route is an execution adapter, not the canonical candidate/retrieval owner, ontology admission authority, or durable persistence owner; its returned result explicitly reports `canonicalAuthority: false` and `writesPerformed: false`. Route existence does not prove that a production caller invokes it or that a manifest-bound execution receipt is independently read back.
+
 ### Allowed
 
 - Validation workflows (dry-run only)

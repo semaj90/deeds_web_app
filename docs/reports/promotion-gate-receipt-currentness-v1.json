@@ -1,35 +1,35 @@
 {
   "schema": "PromotionGateReceiptCurrentnessV1",
-  "generatedAt": "2026-09-11T05:50:03.604Z",
-  "status": "SELECTED_REVISION_RECONCILED_HISTORICAL_EVIDENCE",
+  "generatedAt": "2026-10-12T03:09:37.188Z",
+  "status": "AGGREGATE_MIXED_REVISION_EVIDENCE",
   "proofLevel": "READ_ONLY_RECONCILIATION",
   "authority": false,
   "writesPerformed": false,
-  "admittedWorkspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-  "admittedSnapshotRevision": "sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5",
-  "admittedExecutionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admittedSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "admittedExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
   "selection": {
-    "explicitWorkspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-    "selectedWorkspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-    "selectedReceiptCount": 2,
+    "explicitWorkspaceRevision": null,
+    "selectedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "selectedReceiptCount": 4,
     "selectedReceiptPaths": [
       "docs/reports/graphify-snapshot-native-readback-v1.json",
-      "docs/reports/graphify-daily-lifecycle-v1.json"
+      "docs/reports/graphify-daily-lifecycle-v1.json",
+      "docs/reports/current-source-cohort-lineage-v1.json",
+      "docs/reports/parent-atlas-promotion-gates-v1.json"
     ],
-    "selectedRevisionSafe": true,
+    "selectedRevisionSafe": false,
     "aggregateStillMixed": true
   },
   "graphifyReconciliation": {
-    "executionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
-    "validForOwnRevision": true,
-    "doesNotProveCurrentSourceCohort": true,
-    "currentSourceCohortRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3"
+    "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+    "validForOwnRevision": false,
+    "doesNotProveCurrentSourceCohort": false,
+    "currentSourceCohortRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
   },
   "revisionSet": [
-    "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-    "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-    "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
-    "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e"
+    "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc"
   ],
   "mixedRevisionEvidence": true,
   "receiptCount": 12,
@@ -37,42 +37,42 @@
     {
       "receiptPath": "docs/reports/graphify-snapshot-native-readback-v1.json",
       "exists": true,
-      "receiptChecksum": "36dca577f36d29c16e1726682ad9578e2b62945b73064f809f138f1523acc490",
+      "receiptChecksum": "bcbacb652c2af25f73ddb499bed67f8464132920594858763abe317b0c1fd3f1",
       "generatedAt": null,
-      "status": "SNAPSHOT_NATIVE_READBACK_PROVEN",
-      "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-      "snapshotRevision": "sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5",
+      "status": "SNAPSHOT_NATIVE_READBACK_BLOCKED",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
       "sourceCohortChecksum": null,
-      "executionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+      "executionId": null,
       "authorityScope": null,
       "canonicalAuthority": null,
       "writesPerformed": false,
-      "selectedSourceCount": 25271,
+      "selectedSourceCount": 25542,
       "currentness": "CURRENT_TO_GRAPHIFY_ANCHOR"
     },
     {
       "receiptPath": "docs/reports/graphify-daily-lifecycle-v1.json",
       "exists": true,
-      "receiptChecksum": "157b80f82cfdcc397b8aa701c6a43444de9849840c5e8d76fec20d278992b290",
+      "receiptChecksum": "4b87de9c823ecb4bfca9dd50d9b931be3ece19d33f36507b59a7d9a939c2e233",
       "generatedAt": null,
-      "status": "SNAPSHOT_NATIVE_EXECUTION_COMPLETED",
-      "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
-      "snapshotRevision": "sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5",
-      "sourceCohortChecksum": "sha256:889d6a1457a73e5c42b6d650bbd012e214d1ea7d6838a453558b612ed4df22de",
-      "executionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+      "status": "SNAPSHOT_NATIVE_EXECUTION_OPENED",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "sourceCohortChecksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
+      "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
       "authorityScope": null,
       "canonicalAuthority": false,
       "writesPerformed": true,
-      "selectedSourceCount": 25271,
+      "selectedSourceCount": 25542,
       "currentness": "CURRENT_TO_GRAPHIFY_ANCHOR"
     },
     {
       "receiptPath": "docs/reports/current-source-cohort-lineage-v1.json",
       "exists": true,
-      "receiptChecksum": "da7c513379954e366ccaf0cbf2307631baf0027e19260a882500eee726ccc53e",
-      "generatedAt": "2026-09-10T22:55:12.603Z",
+      "receiptChecksum": "9c6a2c7b9f174566b255f3f465e19814bf8634f661343809a6bffdd661310b02",
+      "generatedAt": "2026-10-05T17:30:21.789Z",
       "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
-      "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "snapshotRevision": null,
       "sourceCohortChecksum": null,
       "executionId": null,
@@ -80,13 +80,13 @@
       "canonicalAuthority": false,
       "writesPerformed": null,
       "selectedSourceCount": 52,
-      "currentness": "HISTORICAL_OR_DIFFERENT_REVISION"
+      "currentness": "CURRENT_TO_GRAPHIFY_ANCHOR"
     },
     {
       "receiptPath": "docs/reports/lineage-semantic-768-cohort-v1.json",
       "exists": true,
-      "receiptChecksum": "04d1d87d7ca2e3783cb5529af2294ecbaa6dbcdc82df8aef3eec79b9072e109c",
-      "generatedAt": "2026-09-10T19:59:03.110Z",
+      "receiptChecksum": "f9ed0856ad49673b3d48b50d5f5befbc64b9797e146ec0a13f2dfed89250184d",
+      "generatedAt": "2026-09-15T23:58:53.812Z",
       "status": "SEMANTIC_768_COHORT_PROVEN",
       "workspaceRevision": "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
       "snapshotRevision": null,
@@ -101,7 +101,7 @@
     {
       "receiptPath": "docs/reports/current-repair-candidate-feature-matrix-v1.json",
       "exists": true,
-      "receiptChecksum": "cc59e2ec29e47e820a66c83afaff7e4afd6d8c01e90403d96b0b56833c741238",
+      "receiptChecksum": "cb98d02ac08bcf528388457054e7dfc93942fdf4338866c7b683b5759050d1b6",
       "generatedAt": null,
       "status": "REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN",
       "workspaceRevision": null,
@@ -117,8 +117,8 @@
     {
       "receiptPath": "docs/reports/feature-ontology-current-cohort-v1.json",
       "exists": true,
-      "receiptChecksum": "667a33f168c14e3343e44fc934b04a369c79e9a9b9d45347218b4199ae93e944",
-      "generatedAt": "2026-09-10T20:29:33.030Z",
+      "receiptChecksum": "79416feb28016558852cda2f5aad4231bc569a9e11d1afe328d9c94c2a53f2ae",
+      "generatedAt": "2026-09-14T16:33:52.414Z",
       "status": "CURRENT_RELATIONSHIP_COHORT_EMPTY",
       "workspaceRevision": null,
       "snapshotRevision": null,
@@ -133,7 +133,7 @@
     {
       "receiptPath": "docs/reports/qdrant-packet-fanout-v1.json",
       "exists": true,
-      "receiptChecksum": "b4f090ae4cb3b9befee01614d6e0e2c01f5c17a5aa068c0209afd7b1767439ae",
+      "receiptChecksum": "80f684cde120deee055778fced1f27dc1db5c50799c09d5c6cf80838975fdc61",
       "generatedAt": null,
       "status": "UNSPECIFIED",
       "workspaceRevision": null,
@@ -165,8 +165,8 @@
     {
       "receiptPath": "docs/reports/domain-classifier-lineage-v1.json",
       "exists": true,
-      "receiptChecksum": "b05753ebf5ae14828f58994ff9509b33567e59238bee10fc10de08757fd4aaf2",
-      "generatedAt": "2026-09-10T19:27:49.158Z",
+      "receiptChecksum": "a33e907379516aeccf3df8755c2001df13bad6bc4076eba3bbcf8ef7b3daf392",
+      "generatedAt": "2026-09-19T09:31:40.584Z",
       "status": "CLASSIFIER_LINEAGE_BLOCKED",
       "workspaceRevision": null,
       "snapshotRevision": null,
@@ -197,9 +197,9 @@
     {
       "receiptPath": "docs/reports/current-graph-artifact-readiness-v1.json",
       "exists": true,
-      "receiptChecksum": "12a1995cc000bb1011d797e2b5406693c7c1adcee757584f59321c87098dcfaa",
-      "generatedAt": "2026-09-10T20:21:20.641Z",
-      "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER",
+      "receiptChecksum": "c981e2117a21ac32ee4118ef49097f57456d70cf78aa7fbab10206df5983afe3",
+      "generatedAt": "2026-10-12T00:41:24.103Z",
+      "status": "CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION",
       "workspaceRevision": null,
       "snapshotRevision": null,
       "sourceCohortChecksum": null,
@@ -213,10 +213,10 @@
     {
       "receiptPath": "docs/reports/parent-atlas-promotion-gates-v1.json",
       "exists": true,
-      "receiptChecksum": "0d628abb3d6d8bfa0218fd0cc37b48ff0815084f613fe489f85c2a0da0364626",
-      "generatedAt": "2026-09-10T20:32:21.065Z",
+      "receiptChecksum": "66cb90124560a42994431485f674e72cca32430f552c49029122938d24f23167",
+      "generatedAt": "2026-09-18T19:42:40.237Z",
       "status": "BLOCKED",
-      "workspaceRevision": "sha256:d7f9563f5861b6890ac7e6d2c87df4ad6fa0eebb825f66387fba0e750ef91f2e",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "snapshotRevision": null,
       "sourceCohortChecksum": null,
       "executionId": null,
@@ -224,13 +224,13 @@
       "canonicalAuthority": null,
       "writesPerformed": false,
       "selectedSourceCount": null,
-      "currentness": "HISTORICAL_OR_DIFFERENT_REVISION"
+      "currentness": "CURRENT_TO_GRAPHIFY_ANCHOR"
     }
   ],
   "blockerSource": "AGGREGATE_DERIVED",
   "violations": [
     "AGGREGATE_MIXED_REVISION_EVIDENCE",
-    "GRAPHIFY_EXECUTION_DOES_NOT_PROVE_CURRENT_SOURCE_COHORT"
+    "GRAPHIFY_EXECUTION_ANCHOR_INVALID"
   ],
-  "nextGate": "RERUN_DEPENDENT_LINEAGE_AUDITS_FOR_SELECTED_REVISION"
+  "nextGate": "SELECT_ONE_REVISION_AND_RERUN_DEPENDENT_LINEAGE_AUDITS"
 }

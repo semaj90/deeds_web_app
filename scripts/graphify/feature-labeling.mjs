@@ -100,9 +100,17 @@ async function main() {
   // Collect sourceRefs from ace-packet + merged cards
   const sourceRefs = new Set();
 
-  const packet = JSON.parse(
-    await fs.readFile(path.join(ROOT, '.opencode', 'ace-packet.json'), 'utf8').catch(() => '{}')
-  );
+  // Explicit status: a missing packet is not an empty packet. Fail closed; no silent default.
+  const packetPath = path.join(ROOT, '.opencode', 'ace-packet.json');
+  const packetText = await fs.readFile(packetPath, 'utf8').catch((err) => {
+    if (err.code === 'ENOENT') return null;
+    throw err;
+  });
+  if (packetText === null) {
+    console.error(`ACE_PACKET_UNAVAILABLE: ${packetPath} is missing; feature labeling not run.`);
+    process.exit(1);
+  }
+  const packet = JSON.parse(packetText);
   for (const c of (packet.cards || [])) {
     if (c.sourceRef) sourceRefs.add(c.sourceRef);
   }

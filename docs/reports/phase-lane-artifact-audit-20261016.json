@@ -1,0 +1,196 @@
+{
+  "parent_atlas_cards": {
+    "exists": false,
+    "path": ".tmp\\parent-atlas-profile-cards.jsonl"
+  },
+  "phase12_overlay": {
+    "exists": true,
+    "path": "docs\\atlas\\feature-registry.json"
+  },
+  "phase16_refresh_runner": {
+    "exists": true,
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\sourceRef-first-parent-atlas-refresh.mjs"
+  },
+  "phase16_refresh_report": {
+    "exists": true,
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-first-parent-atlas-refresh.md"
+  },
+  "phase17_source": {
+    "exists": true,
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\schema-indexer-contract-cards.jsonl"
+  },
+  "phase17_output": {
+    "exists": true,
+    "path": ".tmp\\phase17-pytorch-features.jsonl"
+  },
+  "phase17_report": {
+    "exists": true,
+    "path": "reports\\phase17-pytorch-feature-summary.md"
+  },
+  "phase18": {
+    "exists": true,
+    "path": ".tmp\\phase18-xgboost-rerank.jsonl"
+  },
+  "hot_keyword_clusters": {
+    "exists": false,
+    "path": ".tmp\\hot-keyword-clusters.json"
+  },
+  "retrieval_loop_log": {
+    "exists": true,
+    "path": ".tmp\\atlas-retrieval-loop.jsonl"
+  },
+  "generated_at": "2026-10-16T17:03:05.227Z",
+  "qualification": {
+    "status": "ARTIFACT_INVENTORY_ONLY",
+    "canonicalAuthority": false,
+    "promotionEligible": false,
+    "artifactBaseDirectory": "C:\\Users\\james\\Videos\\deeds-web-app",
+    "runtimeProof": false,
+    "modelAdmission": false,
+    "sourceAdmission": false,
+    "evidence": [
+      {
+        "path": ".tmp\\parent-atlas-profile-cards.jsonl",
+        "byteLength": null,
+        "sha256": null
+      },
+      {
+        "path": "docs\\atlas\\feature-registry.json",
+        "byteLength": 2680460,
+        "sha256": "sha256:d497f02ac1aea8ed95052beeabfa90c307f0f47d6ebc5801ca51d7ab6de71a88"
+      },
+      {
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\sourceRef-first-parent-atlas-refresh.mjs",
+        "byteLength": 18781,
+        "sha256": "sha256:831a070ff92feb521e44f04dc519857798a92bf3ccb7c8e56ff0bb02fa326484"
+      },
+      {
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-first-parent-atlas-refresh.md",
+        "byteLength": 896,
+        "sha256": "sha256:dd07cbe100896cde344a114fd10109516698bb671c9e4b2372f5dc2f3f2670e6"
+      },
+      {
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\schema-indexer-contract-cards.jsonl",
+        "byteLength": 16867,
+        "sha256": "sha256:271d968ab4f6798eea02861be0a5a9bea70071cf14d06730c181c97359cea2db"
+      },
+      {
+        "path": ".tmp\\phase17-pytorch-features.jsonl",
+        "byteLength": 260,
+        "sha256": "sha256:7823a9ddd211bda9da3952ed6fa7d161a8794a4726f066da3b8b529c4df3927d"
+      },
+      {
+        "path": "reports\\phase17-pytorch-feature-summary.md",
+        "byteLength": 298,
+        "sha256": "sha256:b0f1adb9382fdea30e54d160076156c88502742be5fab528be574be6bb36567f"
+      },
+      {
+        "path": ".tmp\\phase18-xgboost-rerank.jsonl",
+        "byteLength": 103,
+        "sha256": "sha256:5bc14693ad1c946e152b3ebcde3d2e8afc8e8b96da3a109eb079d8c1bcbdd78b"
+      },
+      {
+        "path": ".tmp\\hot-keyword-clusters.json",
+        "byteLength": null,
+        "sha256": null
+      },
+      {
+        "path": ".tmp\\atlas-retrieval-loop.jsonl",
+        "byteLength": 171037,
+        "sha256": "sha256:ea5e29145d2436d84c3cf05cb70326e8048088175911056bdeeb3ac27bd84848"
+      }
+    ]
+  },
+  "phase16_refresh_promotion": {
+    "marker": "phase16_refresh_promotion",
+    "items": [
+      {
+        "id": "phase16_refresh_runner",
+        "label": "sourceRef-first parent atlas refresh runner",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\sourceRef-first-parent-atlas-refresh.mjs",
+        "status": "ARTIFACT_PRESENT_PROOF_REQUIRED"
+      },
+      {
+        "id": "phase16_refresh_report_md",
+        "label": "sourceRef-first parent atlas refresh report",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-first-parent-atlas-refresh.md",
+        "status": "ALREADY_ACTIVE"
+      },
+      {
+        "id": "phase16_refresh_report_json",
+        "label": "sourceRef-first parent atlas refresh report json",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-first-parent-atlas-refresh.json",
+        "status": "ALREADY_ACTIVE"
+      },
+      {
+        "id": "sourceRef_parent_join_dry_run_md",
+        "label": "sourceRef parent join dry run",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-parent-join-dry-run.md",
+        "status": "GENERATED_DO_NOT_PROMOTE"
+      },
+      {
+        "id": "sourceRef_parent_join_dry_run_json",
+        "label": "sourceRef parent join dry run json",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-parent-join-dry-run.json",
+        "status": "GENERATED_DO_NOT_PROMOTE"
+      },
+      {
+        "id": "sourceRef_parent_join_archive_plan_md",
+        "label": "sourceRef parent join archive plan",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-parent-join-archive-plan.md",
+        "status": "GENERATED_DO_NOT_PROMOTE"
+      },
+      {
+        "id": "sourceRef_parent_join_archive_plan_json",
+        "label": "sourceRef parent join archive plan json",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-parent-join-archive-plan.json",
+        "status": "GENERATED_DO_NOT_PROMOTE"
+      },
+      {
+        "id": "sourceRef_parent_join_archive_move_list_md",
+        "label": "sourceRef parent join archive move list",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-parent-join-archive-move-list.md",
+        "status": "GENERATED_DO_NOT_PROMOTE"
+      },
+      {
+        "id": "sourceRef_parent_join_archive_move_list_json",
+        "label": "sourceRef parent join archive move list json",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-parent-join-archive-move-list.json",
+        "status": "GENERATED_DO_NOT_PROMOTE"
+      },
+      {
+        "id": "sourceRef_atlas_join_inventory_md",
+        "label": "sourceRef atlas join inventory",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\sourceRef-atlas-join-inventory.md",
+        "status": "ALREADY_ACTIVE"
+      },
+      {
+        "id": "offline_synthesis_mapreduce_duckdb_report_md",
+        "label": "offline synthesis mapreduce duckdb report",
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\offline-synthesis-mapreduce-duckdb-report.md",
+        "status": "ALREADY_ACTIVE"
+      }
+    ]
+  },
+  "phase17_workstation_artifact": {
+    "marker": "phase17_workstation_artifact",
+    "source": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\knowledge\\schema-indexer-contract-cards.jsonl",
+    "output": ".tmp\\phase17-pytorch-features.jsonl",
+    "report": "reports\\phase17-pytorch-feature-summary.md",
+    "status": "STALE_NEEDS_REGEN"
+  },
+  "phase18_reranker_contract": {
+    "marker": "phase18_reranker_contract",
+    "input": ".tmp\\phase17-pytorch-features.jsonl",
+    "output": ".tmp\\phase18-xgboost-rerank.jsonl",
+    "report": "reports\\phase18-xgboost-rerank-summary.md",
+    "status": "FRESHNESS_OBSERVED_PROOF_REQUIRED"
+  },
+  "phase19_retrieval_loop_seed": {
+    "marker": "phase19_retrieval_loop_seed",
+    "input": ".tmp\\phase18-xgboost-rerank.jsonl",
+    "output": ".tmp\\atlas-retrieval-loop.jsonl",
+    "report": "reports\\phase19-retrieval-loop-seed.md",
+    "status": "INVALID_SEED_EVIDENCE"
+  }
+}

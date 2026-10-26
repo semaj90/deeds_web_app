@@ -1,16 +1,10 @@
 import { json } from '@sveltejs/kit';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
 import { z } from 'zod';
-import { safeValidateRequest } from '$lib/server/utils/validateRequest';
-
+import { runAceScriptV1 } from '$lib/server/ace/ace-script-runner-v1.js';
 import { requireUser } from '$lib/server/auth-utils.js';
 
-const execAsync = promisify(exec);
-
 const AceAskSchema = z.object({
-  query: z.string().min(1),
+  query: z.string().trim().min(1, 'Query cannot be empty').max(4096, 'Query exceeds 4096 character limit'),
   messages: z.array(z.unknown()).optional(),
   contextPackKey: z.string().optional(),
   model: z.string().optional(),
@@ -20,18 +14,30 @@ const AceAskSchema = z.object({
 export const POST = async (event) => {
   requireUser(event);
   const { request } = event;
-  const body = (await safeValidateRequest(request, AceAskSchema, async (error) => {
-    throw new Error(JSON.stringify(error));
-  })) as any;
 
-  const { query } = body;
-  const scriptPath = path.join(process.cwd(), 'scripts', 'ace', 'ask-gemma4.mjs');
+  let body: unknown;
   try {
-    const { stdout } = await execAsync(`node ${scriptPath} "${query}"`);
+    body = await request.json();
+  } catch {
+    return json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const parsed = AceAskSchema.safeParse(body);
+  if (!parsed.success) {
+    return json(
+      { error: 'Validation failed', details: parsed.error.format() },
+      { status: 400 }
+    );
+  }
+
+  const { query } = parsed.data;
+  try {
+    const { stdout } = await runAceScriptV1('ask-gemma4.mjs', query);
     return json({ result: stdout });
   } catch (err) {
+    console.error('[api/ace/ask] Script execution error:', err instanceof Error ? err.message : String(err));
     return json(
-      { error: 'Ask failed', details: err instanceof Error ? err.message : String(err) },
+      { error: 'Ask failed', details: 'Script execution failed or timed out' },
       { status: 500 }
     );
   }

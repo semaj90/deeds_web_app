@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
+import { canonicalSha256V1 } from '../../sveltekit-frontend/src/lib/server/atlas/prefill/canonical-hash-v1.js';
 import {
   candidateOrdinalMapChecksum,
   materializeCandidateOrdinalMap,
@@ -17,7 +18,7 @@ const workspaceRevision = 'sha256:fixture-workspace-row-crosswalk-v1';
 const candidateSnapshotRevision = 'sha256:fixture-candidate-snapshot-row-crosswalk-v1';
 
 function sha256(value: unknown): string {
-  return `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
+  return `sha256:${canonicalSha256V1(value)}`;
 }
 
 function fixtureProfile(packetKey: string): ChunkRetrievalProfileV1 {
@@ -118,8 +119,23 @@ const proofBody = {
   rankingPromotion: false,
 };
 const receipt = { ...proofBody, receiptChecksum: sha256(proofBody) };
-const receiptPath = resolve(root, '.tmp/atlas/candidate-feature-matrix-row-crosswalk-fixture-v1.json');
-await mkdir(resolve(root, '.tmp/atlas'), { recursive: true });
+const requestedOutput = process.argv.find((argument) => argument.startsWith('--output='))?.slice('--output='.length);
+const scratchRoot = resolve(root, '.tmp/atlas');
+const receiptPath = resolve(root, requestedOutput ?? '.tmp/atlas/candidate-feature-matrix-row-crosswalk-fixture-v1.json');
+if (requestedOutput) {
+  const outputRelative = relative(scratchRoot, receiptPath);
+  if (!outputRelative || outputRelative === '..' || outputRelative.startsWith(`..${sep}`) || isAbsolute(outputRelative)) {
+    throw new Error('CANDIDATE_FEATURE_MATRIX_OUTPUT_MUST_STAY_UNDER_TMP_ATLAS');
+  }
+  try {
+    await readFile(receiptPath);
+    throw new Error('CANDIDATE_FEATURE_MATRIX_OUTPUT_ALREADY_EXISTS');
+  } catch (error) {
+    if (error instanceof Error && error.message === 'CANDIDATE_FEATURE_MATRIX_OUTPUT_ALREADY_EXISTS') throw error;
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+  }
+}
+await mkdir(scratchRoot, { recursive: true });
 await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
 
 const readback = JSON.parse(await readFile(receiptPath, 'utf8')) as typeof receipt;
@@ -183,29 +199,32 @@ const mapRowsMatch = readbackRows.every((row, index) => {
     candidate.sourceRevision === row.sourceRevision && candidate.workspaceRevision === row.workspaceRevision;
 });
 
-if (readbackOrdinalMapChecksum !== readback.ordinalMapChecksum ||
-    readbackRowBindingChecksum !== readback.rowBindingChecksum ||
-    readbackMatrixChecksum !== readback.matrixChecksum ||
-    readbackMatrixReceiptChecksum !== readbackMatrixReceipt.receiptChecksum ||
-    readbackMatrixReceipt.matrixChecksum !== readbackMatrixChecksum ||
-    readbackMatrixReceipt.rowBindingChecksum !== readbackRowBindingChecksum ||
-    readbackMatrixReceipt.candidateOrdinalMapChecksum !== readback.ordinalMapChecksum ||
-    readbackMatrixReceipt.candidateOrdinalMapRevision !== readback.ordinalMapRevision ||
-    readbackMatrixReceipt.featureVocabularyChecksum !== sha256(readback.featureVocabulary) ||
-    readbackMatrixReceipt.matrixRevision !== expectedMatrixRevision ||
-    readbackMatrixReceipt.rowCount !== readback.rowCount || readbackMatrixReceipt.columnCount !== readback.columnCount ||
-    readbackMatrixReceipt.availableFeatureCount !== readbackAvailableFeatureCount ||
-    readbackMatrixReceipt.unavailableFeatureCount !== readback.rowCount * readback.columnCount - readbackAvailableFeatureCount ||
-    readbackMatrixReceipt.graphRevision !== null ||
-    readbackMatrixReceipt.representationRevision !== null ||
-    receiptChecksum !== readback.receiptChecksum ||
-    readbackRows.length !== readback.rowCount || readback.featureVocabulary.length !== readback.columnCount ||
-    new Set(readbackRows.map((row) => row.candidateOrdinal)).size !== readback.rowCount ||
-    new Set(readbackRows.map((row) => row.rowOrdinal)).size !== readback.rowCount ||
-    new Set(readbackRows.map((row) => row.canonicalId)).size !== readback.rowCount || !mapRowsMatch ||
-    readback.canonicalAuthority !== false || readback.canonicalWritesPerformed !== false ||
-    readback.rankingPromotion !== false) {
-  throw new Error('CANDIDATE_FEATURE_MATRIX_ROW_CROSSWALK_READBACK_MISMATCH');
+const failedChecks = [
+  ['ordinal-map-checksum', readbackOrdinalMapChecksum === readback.ordinalMapChecksum],
+  ['row-binding-checksum', readbackRowBindingChecksum === readback.rowBindingChecksum],
+  ['matrix-checksum', readbackMatrixChecksum === readback.matrixChecksum],
+  ['matrix-receipt-checksum', readbackMatrixReceiptChecksum === readbackMatrixReceipt.receiptChecksum],
+  ['matrix-receipt-matrix-checksum', readbackMatrixReceipt.matrixChecksum === readbackMatrixChecksum],
+  ['matrix-receipt-row-binding', readbackMatrixReceipt.rowBindingChecksum === readbackRowBindingChecksum],
+  ['matrix-receipt-ordinal-checksum', readbackMatrixReceipt.candidateOrdinalMapChecksum === readback.ordinalMapChecksum],
+  ['matrix-receipt-ordinal-revision', readbackMatrixReceipt.candidateOrdinalMapRevision === readback.ordinalMapRevision],
+  ['feature-vocabulary-checksum', readbackMatrixReceipt.featureVocabularyChecksum === sha256(readback.featureVocabulary)],
+  ['matrix-revision', readbackMatrixReceipt.matrixRevision === expectedMatrixRevision],
+  ['row-count', readbackMatrixReceipt.rowCount === readback.rowCount && readbackRows.length === readback.rowCount],
+  ['column-count', readbackMatrixReceipt.columnCount === readback.columnCount && readback.featureVocabulary.length === readback.columnCount],
+  ['available-feature-count', readbackMatrixReceipt.availableFeatureCount === readbackAvailableFeatureCount],
+  ['unavailable-feature-count', readbackMatrixReceipt.unavailableFeatureCount === readback.rowCount * readback.columnCount - readbackAvailableFeatureCount],
+  ['graph-revision-unavailable', readbackMatrixReceipt.graphRevision === null],
+  ['representation-revision-unavailable', readbackMatrixReceipt.representationRevision === null],
+  ['proof-receipt-checksum', receiptChecksum === readback.receiptChecksum],
+  ['candidate-ordinal-unique', new Set(readbackRows.map((row) => row.candidateOrdinal)).size === readback.rowCount],
+  ['row-ordinal-unique', new Set(readbackRows.map((row) => row.rowOrdinal)).size === readback.rowCount],
+  ['canonical-id-unique', new Set(readbackRows.map((row) => row.canonicalId)).size === readback.rowCount],
+  ['candidate-map-row-identity', mapRowsMatch],
+  ['non-authoritative', readback.canonicalAuthority === false && readback.canonicalWritesPerformed === false && readback.rankingPromotion === false],
+].filter(([, passed]) => !passed).map(([name]) => name);
+if (failedChecks.length) {
+  throw new Error(`CANDIDATE_FEATURE_MATRIX_ROW_CROSSWALK_READBACK_MISMATCH:${failedChecks.join(',')}`);
 }
 
 console.log(JSON.stringify({
@@ -220,6 +239,6 @@ console.log(JSON.stringify({
   canonicalAuthority: false,
   canonicalWritesPerformed: false,
   rankingPromotion: false,
-  receiptPath: '.tmp/atlas/candidate-feature-matrix-row-crosswalk-fixture-v1.json',
+  receiptPath: relative(root, receiptPath),
   receiptChecksum: readback.receiptChecksum,
 }, null, 2));

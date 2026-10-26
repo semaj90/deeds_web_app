@@ -30,6 +30,7 @@ import { pool } from '$lib/server/db/client';
 import { generateClusterSummary } from '$lib/server/indexer/cluster-summary.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 // ── Schema ─────────────────────────────────────────────────────────────────
 
@@ -225,14 +226,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       //       response + self_eval_score live under the nested 'metadata' key, not top-level.
       let llmResponse = '';
       try {
-        const couchUrl  = process.env.COUCHDB_URL  ?? 'http://localhost:5984';
-        const couchUser = process.env.COUCHDB_USER ?? 'admin';
-        const couchPass = process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
-        const couchAuth = 'Basic ' + Buffer.from(`${couchUser}:${couchPass}`).toString('base64');
+        const couchDb = resolveCouchDbConfigV1(process.env);
 
-        const couchRes = await fetch(`${couchUrl}/inference_log/_find`, {
+        const couchRes = await fetch(`${couchDb.baseUrl}/inference_log/_find`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: couchAuth },
+          headers: { 'Content-Type': 'application/json', Authorization: couchDb.authorization },
           body: JSON.stringify({
             selector: { queryHash: row.query_hash },   // camelCase — matches InferenceLogEntry
             sort:     [{ timestamp: 'desc' }],         // 'timestamp' is what BufferedEntry stores

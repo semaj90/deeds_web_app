@@ -1,0 +1,292 @@
+{
+  "schema": "atlas.retrieval-context-execution-receipt.v1",
+  "generated_at": "2026-10-16T00:40:45.166Z",
+  "mode": "READ_ONLY_DIAGNOSTIC_INTEGRATION",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "request": {
+    "requestId": "req:frozen-svelte-context-v1",
+    "snapshotId": "snap:frozen-svelte-cohort-20261015",
+    "query": "ActionPopup rune $props and onclick event handler dispatch",
+    "cohortFiles": [
+      "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte",
+      "sveltekit-frontend/src/lib/components/CaseSelector.svelte"
+    ]
+  },
+  "referencedOwningReceipts": {
+    "tensorGemmParity": {
+      "path": "docs/reports/tensor-gemm-parity-receipt.json",
+      "exists": true,
+      "schema": "atlas.tensor-gemm-parity.v1",
+      "status": "PASSED",
+      "sha256": "sha256:b2504ddfa122cc43e0a17511c831827045ca8080cba0bd3e739f750277be6930"
+    },
+    "duckdbBatchExtract": {
+      "path": "docs/reports/duckdb-batch-extract-receipt.json",
+      "exists": true,
+      "schema": "atlas.duckdb-batch-extract.v1",
+      "status": "PASSED",
+      "sha256": "sha256:97112391113b7c6178daea9ed85aa9aba21da3afd08bcb5d1ca769009960e0a0"
+    },
+    "phase7TopkHydration": {
+      "path": "docs/reports/phase7-topk-hydration-receipt.json",
+      "exists": true,
+      "schema": "atlas.phase7-topk-hydration-receipt.v1",
+      "status": null,
+      "sha256": "sha256:c7a270dd74a06f9c5c954c80553172a410889c83089d3136f3186d0635233262"
+    },
+    "seedAmbiguityRejection": {
+      "path": "docs/reports/candidate-hydration-proof-v1-function-registry-seed.json",
+      "exists": true,
+      "schema": "atlas.candidate-hydration-proof.v1",
+      "status": null,
+      "sha256": "sha256:7689f427b31f0dbf1ff4b882d452f15014f040f116901694603b70c4707ba378"
+    }
+  },
+  "gates": {
+    "SOURCE_COHORT_01": {
+      "status": "PASS",
+      "cohortCount": 3,
+      "observations": [
+        {
+          "ordinal": 0,
+          "sourceRef": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+          "sourceRevision": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32",
+          "byteLength": 1543,
+          "symbolCount": 6,
+          "runeCount": 1,
+          "handlerCount": 3,
+          "primaryTreeNodeId": "tn_v1_5d3a34a4c9474c82cc10b3bdbb52f393",
+          "hyperedge": {
+            "hyperedgeId": "he_v1_0f8f6fad3f7c9e89c33132f401bf9680",
+            "relationKind": "COMPONENT_RUNE_HANDLER_BINDING",
+            "sortedMembers": [
+              "tn_v1_5d3a34a4c9474c82cc10b3bdbb52f393",
+              "tn_v1_73494fe9373c265880be21c4cd3a98ea",
+              "tn_v1_77e5b2de89d6be2c94bf4ea1c5897e74",
+              "tn_v1_df249a706d05f53ff2decacf78ba8d85"
+            ]
+          },
+          "hydratedSpan": {
+            "symbolName": "$props(pendingFile, onSelect, onClose)",
+            "kind": "svelte_rune",
+            "startLine": 7,
+            "endLine": 11,
+            "startByte": 213,
+            "endByte": 283,
+            "excerptSha256": "sha256:c08727c8220083aa323e3015cee9cb1a93e12b41eaf3a69589049e8b405c92d9",
+            "readbackVerified": true
+          }
+        },
+        {
+          "ordinal": 1,
+          "sourceRef": "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte",
+          "sourceRevision": "sha256:ae3d7ef858768071995db67190c3f7358d5e1408a23dcbf4901dc547e651234a",
+          "byteLength": 3574,
+          "symbolCount": 9,
+          "runeCount": 5,
+          "handlerCount": 2,
+          "primaryTreeNodeId": "tn_v1_ac032db3f548e99d4cf9a326797b27c8",
+          "hyperedge": {
+            "hyperedgeId": "he_v1_67a16b2f78279d820154ce3b42000bdd",
+            "relationKind": "COMPONENT_RUNE_HANDLER_BINDING",
+            "sortedMembers": [
+              "tn_v1_7eb685c68de99c7d42f39eca72403fc3",
+              "tn_v1_7f6d8a14334452dc7c2bcb0e697d251d",
+              "tn_v1_81e67b38ec0892cc472c135f9fbcbdc9",
+              "tn_v1_ac032db3f548e99d4cf9a326797b27c8"
+            ]
+          },
+          "hydratedSpan": {
+            "symbolName": "$props(caseId, initialContext)",
+            "kind": "svelte_rune",
+            "startLine": 4,
+            "endLine": 4,
+            "startByte": 85,
+            "endByte": 166,
+            "excerptSha256": "sha256:3005d9b221cc484d11a3f0cdf686e58b6a82879c91396cf450d6683d818209f9",
+            "readbackVerified": true
+          }
+        },
+        {
+          "ordinal": 2,
+          "sourceRef": "sveltekit-frontend/src/lib/components/CaseSelector.svelte",
+          "sourceRevision": "sha256:35f09267356015be35f8fbdaa08adb717851a55f4259e4114e69d4c620fb1048",
+          "byteLength": 5842,
+          "symbolCount": 23,
+          "runeCount": 8,
+          "handlerCount": 7,
+          "primaryTreeNodeId": "tn_v1_999a61ec2c8c7bfe94f838bd7c99caff",
+          "hyperedge": {
+            "hyperedgeId": "he_v1_061d2aec03898f38d194a8da3f81166b",
+            "relationKind": "COMPONENT_RUNE_HANDLER_BINDING",
+            "sortedMembers": [
+              "tn_v1_2a05f6cc6342cb023f84923523742b02",
+              "tn_v1_4dd1a2fd5827fd8899bfc64ea19c2576",
+              "tn_v1_5a9816a0aed6dae4a70a863e4e53da13",
+              "tn_v1_999a61ec2c8c7bfe94f838bd7c99caff"
+            ]
+          },
+          "hydratedSpan": {
+            "symbolName": "$props(onselect, placeholder, className)",
+            "kind": "svelte_rune",
+            "startLine": 15,
+            "endLine": 15,
+            "startByte": 259,
+            "endByte": 345,
+            "excerptSha256": "sha256:e17713e120ae2ee31fca070bbeab21a9167bdea87d43f43d19c076d15cef3553",
+            "readbackVerified": true
+          }
+        }
+      ]
+    },
+    "RETRIEVAL_PLAN_02": {
+      "status": "PASS",
+      "prefilterSql": "\n    SELECT packet_key, source_ref, source_revision, workspace_revision,\n           representation_revision, source_representation_id AS representation_id,\n           title_id, feature_id, content_hash\n    FROM atlas_packets\n    WHERE source_ref = $1 AND tags && $2::text[] AND packet_key IS NOT NULL AND source_ref IS NOT NULL\n    LIMIT $3\n  ",
+      "explainAnalyze": {
+        "executed": true,
+        "outerNodeType": "Limit",
+        "scanNodeType": "Index Scan",
+        "relationName": "atlas_packets",
+        "indexName": "atlas_packets_source_ref_pattern_idx",
+        "actualRows": 0,
+        "sharedHitBlocks": 4,
+        "sharedReadBlocks": 0,
+        "planningTimeMs": 32.433,
+        "executionTimeMs": 0.624,
+        "plannerNote": "Recorded from live PostgreSQL 18 EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON). Bitmap/index selection is planner-governed by selectivity, not assumed."
+      }
+    },
+    "GRAPH_EXPANSION_03": {
+      "status": "PASS",
+      "admittedMode": "HYPERGRAPH_NARY",
+      "admittedCount": 3,
+      "staleRevisionFailClosedReason": "STALE_OR_MISSING_SOURCE_REVISION",
+      "csrGraphChecksum": "sha256:4cfdf86ec77dfaa8137d4ea4b6a30e9dd8064d392538b65f6d55e00ef345a0c8",
+      "authorityNote": "Code-level hyperedges derived strictly from Svelte/TS AST spans; conceptual/taxonomy edges cannot mint code authority."
+    },
+    "FEATURE_GEMM_04": {
+      "status": "PASS",
+      "ordinalMapChecksum": "sha256:efe8aa44f6079d93fe017c3e669917d7de42ab8a205bc344abdb3c487d891e3f",
+      "shadowModeOnly": true,
+      "calibratedProbabilityProven": false,
+      "promotesRankingOrder": false,
+      "shadowChallengerScores": [
+        {
+          "ordinal": 0,
+          "sourceRef": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+          "rrfBaseScore": 0.94,
+          "shadowLogisticSigma": 0.692961
+        },
+        {
+          "ordinal": 1,
+          "sourceRef": "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte",
+          "rrfBaseScore": 0.89,
+          "shadowLogisticSigma": 0.67018
+        },
+        {
+          "ordinal": 2,
+          "sourceRef": "sveltekit-frontend/src/lib/components/CaseSelector.svelte",
+          "rrfBaseScore": 0.84,
+          "shadowLogisticSigma": 0.646571
+        }
+      ]
+    },
+    "CONTEXT_HYDRATE_05": {
+      "status": "PASS",
+      "hydratedCount": 3,
+      "unhydratedPromotions": 0
+    },
+    "MANIFEST_READBACK_06": {
+      "status": "PASS",
+      "manifestIdentityChecksum": "1644213f096c5277c7b32f61f8cbddc19a01f6c3bb4ee36d77db9d31daf3db53",
+      "selectedOrdinalSetChecksum": "200a9a02a6ef8298ab02c379c664d9bf22d0b71f5140c3d222d6ee5c2ef974df",
+      "orderedSelectionChecksum": "f57393340ae8abb54c73145a0441905c391341f722c7f96b210d765f9354e9ca",
+      "manifestV2": {
+        "schema": "atlas.context-manifest.v2",
+        "v1": {
+          "schema": "atlas.context-manifest.v1",
+          "requestId": "req:frozen-svelte-context-v1",
+          "snapshotId": "snap:frozen-svelte-cohort-20261015",
+          "graphRevision": "sha256:4cfdf86ec77dfaa8137d4ea4b6a30e9dd8064d392538b65f6d55e00ef345a0c8",
+          "query": "ActionPopup rune $props and onclick event handler dispatch",
+          "candidateBucket": 16,
+          "candidateCount": 3,
+          "tokenBudget": 4096,
+          "selectedNodeKeys": [
+            "tn_v1_5d3a34a4c9474c82cc10b3bdbb52f393",
+            "tn_v1_ac032db3f548e99d4cf9a326797b27c8",
+            "tn_v1_999a61ec2c8c7bfe94f838bd7c99caff"
+          ],
+          "evidenceRefs": [
+            "sveltekit-frontend/src/lib/components/ActionPopup.svelte@sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32#213-283",
+            "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte@sha256:ae3d7ef858768071995db67190c3f7358d5e1408a23dcbf4901dc547e651234a#85-166",
+            "sveltekit-frontend/src/lib/components/CaseSelector.svelte@sha256:35f09267356015be35f8fbdaa08adb717851a55f4259e4114e69d4c620fb1048#259-345"
+          ],
+          "producerRevision": "prove-frozen-retrieval-context-integration-v1"
+        },
+        "identityInput": {
+          "selectedOrdinalSetChecksum": "200a9a02a6ef8298ab02c379c664d9bf22d0b71f5140c3d222d6ee5c2ef974df",
+          "evidenceRevisions": {
+            "sourceRevision": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32",
+            "representationRevision": "semantic_768:embeddinggemma:v1",
+            "featureRevision": "feature-matrix:v1",
+            "ontologyRevision": null,
+            "modelRevision": "ornith-1.5-9b",
+            "promptTemplateRevision": "ace-grounded-citation:v1"
+          },
+          "ordinalMapChecksum": "sha256:efe8aa44f6079d93fe017c3e669917d7de42ab8a205bc344abdb3c487d891e3f",
+          "retrievalPolicyRevision": "rrf-single-owner:v1",
+          "acePlaybookRevision": "ace-gate:v1",
+          "orderedSelectionChecksum": "f57393340ae8abb54c73145a0441905c391341f722c7f96b210d765f9354e9ca"
+        },
+        "identityChecksum": "1644213f096c5277c7b32f61f8cbddc19a01f6c3bb4ee36d77db9d31daf3db53"
+      }
+    },
+    "ORNITH_HANDOFF_07": {
+      "status": "PASS",
+      "promptPlanChecksum": "sha256:abfb954ad15a519f939e721ac266067d8cb79222ffb4494a9d54dc49072f3171",
+      "promptPlan": {
+        "schema": "atlas.ornith-prompt-plan.v1",
+        "targetModelAuthority": "ornith-1.5-9b",
+        "manifestIdentityChecksum": "1644213f096c5277c7b32f61f8cbddc19a01f6c3bb4ee36d77db9d31daf3db53",
+        "orderedSelectionChecksum": "f57393340ae8abb54c73145a0441905c391341f722c7f96b210d765f9354e9ca",
+        "systemInstruction": "Answer using only the revision-qualified source spans in citations[]. Cite exact [sourceRef#Lstart-Lend] and tree_node_id.",
+        "userQuery": "ActionPopup rune $props and onclick event handler dispatch",
+        "citations": [
+          {
+            "ordinal": 0,
+            "sourceRef": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+            "sourceRevision": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32",
+            "treeNodeId": "tn_v1_5d3a34a4c9474c82cc10b3bdbb52f393",
+            "lineSpan": "L7-L11",
+            "byteSpan": "213-283",
+            "symbolName": "$props(pendingFile, onSelect, onClose)",
+            "excerptSha256": "sha256:c08727c8220083aa323e3015cee9cb1a93e12b41eaf3a69589049e8b405c92d9"
+          },
+          {
+            "ordinal": 1,
+            "sourceRef": "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte",
+            "sourceRevision": "sha256:ae3d7ef858768071995db67190c3f7358d5e1408a23dcbf4901dc547e651234a",
+            "treeNodeId": "tn_v1_ac032db3f548e99d4cf9a326797b27c8",
+            "lineSpan": "L4-L4",
+            "byteSpan": "85-166",
+            "symbolName": "$props(caseId, initialContext)",
+            "excerptSha256": "sha256:3005d9b221cc484d11a3f0cdf686e58b6a82879c91396cf450d6683d818209f9"
+          },
+          {
+            "ordinal": 2,
+            "sourceRef": "sveltekit-frontend/src/lib/components/CaseSelector.svelte",
+            "sourceRevision": "sha256:35f09267356015be35f8fbdaa08adb717851a55f4259e4114e69d4c620fb1048",
+            "treeNodeId": "tn_v1_999a61ec2c8c7bfe94f838bd7c99caff",
+            "lineSpan": "L15-L15",
+            "byteSpan": "259-345",
+            "symbolName": "$props(onselect, placeholder, className)",
+            "excerptSha256": "sha256:e17713e120ae2ee31fca070bbeab21a9167bdea87d43f43d19c076d15cef3553"
+          }
+        ]
+      }
+    }
+  }
+}

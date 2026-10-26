@@ -137,3 +137,51 @@ It contains 466 archived checklist rows, 297 historically checked and 169 histor
 the archived `sourceRef` and the TODO SHA-256 `sourceRevision`. These are candidate mappings only:
 no OpenSpec task was copied, closed, or merged. DOC-GOV-MASTER-TODO-05 remains open until
 ambiguous-match review is explicitly represented and human-reviewed.
+
+### Master phase-gate inventory refresh (2026-10-16; review projection only)
+
+- [x] Extend the existing master open-task extractor with `--all` to retain
+  checked/partial/open claims and repeated heading occurrences, including empty
+  sections. Preserve exact mixed-newline/Unicode byte coordinates and source
+  checksum. Eight focused tests passed; log:
+  `docs/reports/master-claims-extractor-tests-final-20261016.txt`.
+- Current source snapshot contains 466 claims: 302 checked and 164 open, not the
+  historical 297/169 split above. Every inventory entry remains
+  `NOT_VERIFIED_BY_CHECKLIST`; no completion percentage or task closure follows.
+  Artifact: `docs/reports/master-feature-all-claims-20261016.json`.
+- Review: `docs/reports/master-feature-phase-gates-review-20261016.md`.
+  Both 11G meanings remain separate. Actual pooled golden queue has 60 queries,
+  1,287 candidate judgments and zero graded judgments; no review journal exists
+  at the expected path. Browser `compute-worker.mjs` is Node-only; `/sw.js`
+  registration needs build/runtime reconciliation before model-cache wiring.
+- [ ] Review exact claim-to-owner mappings and independent acceptance receipts
+  for every phase. Lexical hints, checked boxes, directory counts and fixture
+  tests cannot close live lineage, golden relevance or production gates.
+
+### Full master reference inspection (2026-10-16; review projection)
+
+- [x] Extend the existing extractor with opt-in `--all --inspect-references`, not a new task authority. Inspect only explicit literal paths against root/frontend candidates and one tracked Git inventory; no recursive traversal, dependency import, service call or canonical write. Preserve ambiguous references and reject traversal/out-of-workspace targets. Directory and symbolic references remain unresolved rather than being counted as missing code.
+- [x] Fix reference tokenization to retain Svelte `+server.ts`, `[id]` segments, Unicode paths and single-directory references. Do not double-prefix explicitly rooted `sveltekit-frontend/` paths. Retain repeated heading occurrences and exact UTF-8 claim spans. **14/14** tests pass: `docs/reports/master-reference-inspection-verified-tests-20261016T112819105.txt`.
+- [x] Re-run the reference projection against the current **466** claims / **31** headings: 302 checked, 164 open; 316 claims have no explicit extracted path. Current source SHA-256: `6a8b6d6fdceb6e11973a143213c746b0db6e12bb998037e0992f985ad11e6556`. Of 147 unique path-like references: 64 have one exact candidate, 10 are ambiguous, 7 literal file references are missing, and 66 directory/symbolic references remain unresolved. The prior `master-all-claims-reference-verified-20261016T112819105.json` inspection was tied to source SHA-256 `60d43e671d3087311d3988d7f7bbf506cd010bd76518ab154ac2ee9b3a97ced2`; its 146/65 counts are superseded. Current readback receipt: `docs/reports/master-reference-inspection-current-20261016T195844Z.json` (SHA-256 `9778d01636cf40a880daea0e1d5e08fb84b286e5154ab97a589fd457a345e8f8`; `canonicalAuthority=false`, `writesPerformed=false`). All 466 current source-byte spans are independently verified by `docs/reports/master-feature-all-claims-20261016T122418876.json`. This reference census does not close the unchecked claim-to-owner and acceptance review below.
+- Current missing-reference disposition: the four checked `artifacts/db-analysis-report.md` / `artifacts/stack-research-report.md` claims have no named artifacts at those paths; treat their checked state as historical until receipts or reviewed replacements are bound. The two `.opencode/recommendations*` and two `rg_*.txt` paths belong to open optional/migration work. The checked `scripts/ingest/load-ace-packet.mjs` path is absent; newer `packages/parent-atlas` cache hydration and SvelteKit ACE cache admission modules exist, but equivalence to the claimed Valkey → disk → rerank fallback is not proven. Do not infer replacement equivalence or close the outstanding owner/evidence mapping task.
+- [x] Reconcile all seven missing literal paths using current ownership, output paths, ignore/tracked state, and source-context evidence. Dispositions: two report artifacts `MISSING` (checked claims remain historical); two flat recommendation paths map to the existing nested generated owner as `RESOLVED_GENERATED` while optional flat aliases stay open; two `rg_*.txt` inputs are `MISSING` generated evidence with no producer proven; the old ACE loader remains `AMBIGUOUS` because current cache hydration/admission owners do not prove its Valkey → disk → rerank contract. Record in `docs/reports/master-feature-phase-gates-review-20261016.md`.
+- [x] Classify the 66 unique directory/symbolic references (88 claim occurrences) from their exact checklist contexts. All are slash-terminated, non-literal path fragments, not exact file references; route/subsystem hints require claim-level owner/contract review, and prose/range fragments are not missing implementations. No task checkbox or production gate is promoted by this classification.
+- [ ] Map every claim to its owning acceptance ledger and current implementation/test/live/provenance/golden/admission evidence. File presence, a checked box or a path hint remains insufficient. Missing references may be moved/renamed artifacts, not absent capability. No capability or production gate was closed by this inspection.
+- No DB writes, source-revision writes, model load, service restart, Graphify
+  refresh, production build, Svelte check or archive operation was performed.
+
+## Next steps — TOC check drift and disk-bounded verification (2026-10-11)
+
+Evidence: `node scripts/atlas/build-master-toc.mjs` is deterministic for fixed inputs (two runs into scratch produced identical `MASTER-TOC.md` bytes only when no input changed). Between two runs, three `openspec/changes/*/tasks.md` files were modified by concurrent writers, which changed the registry checksum. `--check` therefore fails on input drift, not generator logic. A clean HEAD export previously passed build-then-check.
+
+- [ ] **DOC-GOV-TOC-CHECK-01** Make `--check` report `INPUT_DRIFT` (inputs hashed before and after the read pass changed) separately from `OUTPUT_MISMATCH` (inputs stable, bytes differ). Acceptance: a deliberate edit during the run yields `INPUT_DRIFT`; a quiescent tree yields `MASTER_TOC_CHECK_OK`.
+
+### Bounded source-read replay follow-up (2026-10-13)
+
+- [x] Reuse one shared 16 MiB source bound in both Master TOC generators. The V1 crash on a 590 MB report is fixed; `scripts/atlas/document-governance-source-bounds-v1.mjs` filters by file size before content reads, and its temporary-file regression test passes 1/1.
+- [x] Run `npm run atlas:docs:toc:replay-smoke`: PASS. Two rebuilds produced byte-identical registry, Master TOC, and architecture TOC outputs: registry `604566764b161c7b894936833cabb8a9a9ec3bef2bd372cebf2a218ef806f4a0`; Master TOC `a1186ac2b39ca9090da63ef98dda00c64c41f143c1a73e1f7806d331ed989c7d`; architecture TOC `0e90d821d1fc48b05b9ea1dd72be509377f73ee3d9f1c1662420f4033bb639e4`. Each build indexed 7,271 bounded records and reported 102 skipped sources above 16 MiB. Skipping affects navigation only; source artifacts remain untouched.
+- [ ] Keep `DOC-GOV-TOC-CHECK-01` open: distinguish input drift from output mismatch during `--check`; deterministic replay does not prove a concurrent-input-drift diagnostic.
+- [ ] **DOC-GOV-TOC-VERIFY-01** Verify without copying directories: run the build with output redirected to scratch (preload that rewrites the three output paths), then `cmp` against the repo files. Record the result in a receipt. Do not `robocopy` or junction the repo into scratch.
+- [ ] **DOC-GOV-TOC-SNAPSHOT-01** Optional: pin the generator's inputs to a git revision (`git ls-files` + `git show`) when a deterministic receipt is required, instead of reading the live working tree. Defer until DOC-GOV-TOC-CHECK-01 shows whether drift is the only cause.
+- [ ] **DOC-GOV-TOC-CLAUDE-SYNC-01** Keep the "Revision definitions" table in `scripts/atlas/build-master-toc.mjs` identical in wording to the `sourceRevision and workspaceRevision` sections in `codex.md` and `CLAUDE.md`. Add a check so future edits to either side are caught.
+- [ ] **DOC-GOV-DISK-GUARD-01** Before any build that writes the 9.9 MB registry, check free space on the repo drive and refuse below a set threshold. Disk exhaustion at 0.1 GB free was the reason the earlier reproduction copy never completed.

@@ -1,0 +1,550 @@
+{
+  "schema": "atlas.parent-atlas-phase-roadmap-reconciliation.v1",
+  "generatedAt": "2026-10-15",
+  "workspaceHead": "9de1faa659053b4d6761d4de43c2074a1a29dc38",
+  "status": "PARTIAL_CANONICAL_INDEX_FOUND",
+  "authority": "OpenSpec owning tasks.md files; this report is diagnostic and cannot promote completion.",
+  "finding": "The root workstation TODO explicitly directs new work to its 2026-09-07 canonical phase index, which resolves the workstation meanings for P17-P25 and legacy collision aliases. It does not establish a universal phase numbering across independent OpenSpec changes, nor define the workstation P1-P10 catalog. Use stable roadmap IDs and owning task ledgers; do not merge similarly numbered local phases.",
+  "canonicalWorkstationIndex": {
+    "source": "parent-atlas-workstation-todo.md",
+    "authorityScope": "workstation phase namespace only; OpenSpec owner tasks.md files remain authoritative for acceptance and completion claims",
+    "instruction": "Use the 2026-09-07 canonical phase index above for new work.",
+    "phases": [
+      { "phase": 11, "roadmapId": "workstation-p11-experience-memory-wiring", "meaning": "Experience and memory wiring" },
+      { "phase": 12, "roadmapId": "workstation-p12-source-revision-chunk-authority", "meaning": "Source, revision, and chunk authority" },
+      { "phase": 13, "roadmapId": "workstation-p13-feature-registry-classification", "meaning": "Feature registry and capability classification" },
+      { "phase": 14, "roadmapId": "workstation-p14-context-cache-residency", "meaning": "Exact context cache and residency" },
+      { "phase": 15, "roadmapId": "workstation-p15-semantic-retrieval-fusion", "meaning": "Semantic retrieval and single fusion owner" },
+      { "phase": 16, "roadmapId": "workstation-p16-graph-ontology-expansion", "meaning": "Graph, KAG, ontology, and bounded expansion" },
+      { "phase": 17, "roadmapId": "workstation-p17-nlp-structural-numeric-features", "meaning": "NLP, structural facts, numeric feature assembly" },
+      { "phase": 18, "roadmapId": "workstation-p18-learned-reranking-evaluation", "meaning": "Learned reranking evaluation; mxbai incumbent, XGBoost/AtlasGemma challengers" },
+      { "phase": 19, "roadmapId": "workstation-p19-deterministic-policy-baseline", "meaning": "Deterministic policy baseline" },
+      { "phase": 20, "roadmapId": "workstation-p20-program-workflow-contracts", "meaning": "Program and workflow contracts" },
+      { "phase": 21, "roadmapId": "workstation-p21-reflective-program-optimization", "meaning": "Reflective program optimization" },
+      { "phase": 22, "roadmapId": "workstation-p22-rl-learned-policy-experiments", "meaning": "RL and later learned-policy experiments; experimental" },
+      { "phase": 23, "roadmapId": "workstation-p23-transport-validation", "meaning": "Transport validation" },
+      { "phase": 24, "roadmapId": "workstation-p24-gpu-vector-residency", "meaning": "GPU/vector residency experiments" },
+      { "phase": 25, "roadmapId": "workstation-p25-model-policy-training", "meaning": "PPO or other model-policy training; evaluation-only" }
+    ],
+    "unmappedRange": "workstation phases 1-10 were not established by this index",
+    "documentedDependencyOrder": "P12 → P13 → P15 → P16 → P17 → P18 → P14 → P20/P21 → P11/P25; P22, P23, P24 and P27-P30 remain separate evaluation/transport/execution lanes"
+  },
+  "examples": [
+    {
+      "phase": 22,
+      "roadmap": "workstation-p22-rl-learned-policy-experiments",
+      "meaning": "learned-policy experiments / PPO research",
+      "source": "docs/atlas/parent-atlas-phases-17-24-audit-and-roadmap.md",
+      "status": "RESEARCH_ONLY"
+    },
+    {
+      "phase": 22,
+      "roadmap": "tensor-residency-integration (local OpenSpec phase label; not workstation P22)",
+      "meaning": "XGBoost / gradient boosting / reinforcement-learning experiments",
+      "source": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "status": "LATER_EXPERIMENTAL_LANE"
+    },
+    {
+      "phase": 23,
+      "roadmap": "workstation-p25-model-policy-training (legacy model-training label; not workstation P23)",
+      "meaning": "QLoRA / SFT",
+      "source": "docs/atlas/parent-atlas-phases-17-24-audit-and-roadmap.md",
+      "status": "EVAL_ONLY"
+    },
+    {
+      "phase": 23,
+      "roadmap": "agent-framework-integration-hardening",
+      "meaning": "EmbeddingGemma 2 runtime evaluation, including Ollama-first comparison",
+      "source": "openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md",
+      "status": "OPEN"
+    },
+    {
+      "phase": 24,
+      "roadmap": "workstation-p25-model-policy-training (legacy model-training label; not workstation P24)",
+      "meaning": "DPO after a qualified SFT baseline",
+      "source": "docs/atlas/parent-atlas-phases-17-24-audit-and-roadmap.md",
+      "status": "NOT_STARTED"
+    },
+    {
+      "phase": 24,
+      "roadmap": "agent-framework-integration-hardening",
+      "meaning": "live source lineage and governed document editing",
+      "source": "openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md",
+      "status": "PARTIAL"
+    },
+    {
+      "phase": 24,
+      "roadmap": "retrieval-lod-algorithm-taxonomy",
+      "meaning": "Function Registry, reviewed-label recommender, low-rank/Tang evaluation, and governed editor exit gates",
+      "source": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+      "status": "PARTIAL_TEST_LOCKED"
+    }
+  ],
+  "phase01To16": {
+    "status": "P1_TO_P10_UNMAPPED_P11_TO_P16_MAPPED",
+    "finding": "The workstation canonical index explicitly maps P11-P16. It does not establish P1-P10. Other documents contain independent local numbering; do not infer workstation phase identity from those ordinals.",
+    "currentProjection": "docs/parent-atlas-workstation-todo.md",
+    "historicalProjection": "reports/parent-atlas-workstation-todo.md"
+  },
+  "phaseEvidenceUpdates": [
+    {
+      "roadmapId": "workstation-p12-source-revision-chunk-authority",
+      "status": "SEALED_COHORT_AUTHORITY_PROVEN_CURRENT_WORKTREE_LINEAGE_PARTIAL",
+      "command": "node_modules/.bin/tsx.cmd scripts/atlas/audit-current-source-authority-v1.mts --stdout-only",
+      "exitCode": 0,
+      "scriptSha256": "0d28c6a8214ebb1b57d1e93eb0775fa49f609079603a8a338a3aca57a9a6b778",
+      "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "qualifiedSelectedSources": 25542,
+      "missingRevision": 0,
+      "revisionMismatch": 0,
+      "namespaceAmbiguous": 0,
+      "notInAdmittedCohort": 0,
+      "selectionChecksum": "sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b",
+      "membershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+      "registryCoverage": { "exact": 24456, "absent": 1086, "mismatch": 0 },
+      "liveDrift": { "state": "DRIFT_PRESENT", "changed": 719, "excludedNested": 1086, "unavailable": 8, "notObserved": 0, "driftCount": 1813 },
+      "reportWritten": false,
+      "writesPerformed": false,
+      "interpretation": "Read-only proof applies to the admitted sealed cohort only; does not prove current-worktree source binding, packet/chunk admission, or ContextManifest admission.",
+      "packetChunkBridge": {
+        "command": "node scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --report-path .tmp/atlas/phase-closure-p12-packet-chunk-canonical-20261015.json",
+        "exitCode": 1,
+        "status": "CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PARTIAL",
+        "firstBlocker": "CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_INCOMPLETE",
+        "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "supersededNoncanonicalComparisonExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "counts": { "selectedMembershipRows": 25542, "repositoryCount": 7, "duplicateMembershipIdentities": 0, "workspaceRevisionMismatches": 0, "exactCurrentSourceBindingMembers": 24456, "membersWithExactProvenLineage": 14628, "membersWithoutExactProvenLineage": 10914, "exactCurrentPacketChunkBridgeMembers": 14628, "totalExactProvenLineageRows": 127926, "totalValidLineageRows": 127926, "aliasResolvedLineageRows": 0 },
+        "classificationCounts": { "EXACT_CURRENT_PACKET_CHUNK_BRIDGE": 14628, "PROVEN_LINEAGE_MISSING": 9827, "PROVEN_LINEAGE_REVISION_MISMATCH": 1, "REPOSITORY_NAMESPACE_MISSING": 1086 },
+        "scopeDiagnostics": { "rootMissingLineage": { "rows": 9827, "exactSourceBindings": 9827, "sourceRefsWithPhysicalChunks": 5503, "sourceRefsWithoutPhysicalChunks": 4324 }, "nestedNamespaceMissing": { "total": 1086, "byRepository": { "claude-mem": 763, "mcp-server-mcp": 192, "turbovec": 86, "sites/parent-atlas-gateboard": 22, "models/embeddinggemma_300m": 13, "granite-docling-258M": 10 }, "exactBindings": 0, "physicalChunks": 0 }, "revisionMismatch": { "rows": 1, "provenLineageAtOtherRevision": 1 } },
+        "checksums": { "selectedMembershipChecksum": "sha256:e4c2fd1240cc06b0d86caf3038e91fc884be6afe1fa752960ac8ff6d0721c96d", "provenLineageCandidateChecksum": "sha256:68249e7df0084e444a99940ec12c983536f8b38de308df742559e2e19b9a5a15", "receiptChecksum": "sha256:b9261390cb583883ef24acbf76a967d400c05632c494b441cf1dca59a17bfaf8" },
+        "reportPath": ".tmp/atlas/phase-closure-p12-packet-chunk-canonical-20261015.json",
+        "nextGate": "CURRENT-PACKET-CHUNK-EXPECTED-SOURCE-SCOPE-01",
+        "databaseTransaction": "REPEATABLE READ READ ONLY, ROLLBACK",
+        "postgresWrites": 0,
+        "projectionWrites": 0,
+        "promotionPreflight": {
+          "command": "node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --execution-id=74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision=sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --limit=10 --report-path=.tmp/atlas/phase-closure-p12-promotion-preflight-20261015.json",
+          "exitCode": 0,
+          "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+          "eligibleCandidateCount": 0,
+          "databaseError": null,
+          "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+          "receiptPath": ".tmp/atlas/phase-closure-p12-promotion-preflight-20261015.json",
+          "receiptChecksum": "sha256:2a1c42436c076d8bad0ee84895b0c1aee0c73af5cbbc672f41daab85ba4f3c6f",
+          "databaseTransaction": "REPEATABLE READ READ ONLY",
+          "transactionOpened": true,
+          "transactionRolledBack": true,
+          "canonicalAuthority": false,
+          "promotionAuthorized": false,
+          "writesPerformed": false,
+          "interpretation": "Bounded diagnostic only; zero eligible candidates. No packet/chunk lineage promotion is authorized.",
+          "explicitLinkedRunProbe": {
+            "command": "node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --execution-id=74d50c86-8194-45ea-8c3d-61aab737ef83 --run-id=01a8d8fc-2507-4f39-868e-039039237b98 --workspace-revision=sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --limit=10 --report-path=.tmp/atlas/phase-closure-p12-promotion-preflight-canonical-run-20261015.json",
+            "exitCode": 0,
+            "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+            "eligibleCandidateCount": 0,
+            "requestedRunId": "01a8d8fc-2507-4f39-868e-039039237b98",
+            "requestedRunStatus": "COMPLETED",
+            "requestedRunWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "requestedRunManifestSourceCount": 25542,
+            "requestedRunFileRows": 0,
+            "legacyRunSourceRows": 0,
+            "legacySourceRefsUnderOtherRuns": 23743,
+            "firstFailingBoundary": "RUN_FILE_MISSING",
+            "receiptPath": ".tmp/atlas/phase-closure-p12-promotion-preflight-canonical-run-20261015.json",
+            "receiptChecksum": "sha256:a1237754cf0059b023f0587e20d361849daccbd0076bdcc173a769c7bcd95b27",
+            "transactionOpened": true,
+            "transactionRolledBack": true,
+            "writesPerformed": false,
+            "canonicalAuthority": false,
+            "promotionAuthorized": false,
+            "interpretation": "The canonical execution is linked to a completed run, but mutable legacy graphify_files has no rows tied to that run. Other-run matches are not accepted as lineage.",
+            "autoLinkedReplay": {
+              "exitCode": 0,
+              "requestedRunId": "01a8d8fc-2507-4f39-868e-039039237b98",
+              "linkedRunIdMatches": true,
+              "requestedRunFileRows": 0,
+              "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+              "eligibleCandidateCount": 0,
+              "receiptPath": ".tmp/atlas/phase-closure-p12-promotion-preflight-auto-linked-20261015.json",
+              "receiptChecksum": "sha256:dc732df7d2fae9415ec19454455f1ea089d55638bfad381f81391efe08926e9e",
+              "transactionRolledBack": true,
+              "writesPerformed": false
+            },
+            "mismatchedRunNegativeReplay": {
+              "exitCode": 0,
+              "providedRunId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+              "verdict": "BLOCKED_EXECUTION_AUTHORITY",
+              "executionBridgeStatus": "EXECUTION_RUN_ID_MISMATCH",
+              "eligibleCandidateCount": 0,
+              "receiptPath": ".tmp/atlas/phase-closure-p12-promotion-preflight-mismatch-20261015.json",
+              "receiptChecksum": "sha256:d140ff6c2b83bd44f2fc5e10767b9b4e0211e3389b3a19aa440993dd6bd0ce1c",
+              "transactionRolledBack": true,
+              "writesPerformed": false
+            },
+            "bounded100SourceReplay": {
+              "command": "node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs --execution-id=74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision=sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --limit=100 --report-path=.tmp/atlas/phase-closure-p12-promotion-preflight-100-20261015.json",
+              "exitCode": 0,
+              "verdict": "BLOCKED_NO_QUALIFIED_CANDIDATE",
+              "requestedRunId": "01a8d8fc-2507-4f39-868e-039039237b98",
+              "candidatesExamined": 100,
+              "eligibleCandidateCount": 0,
+              "blockedReasonCounts": { "PACKET_MISSING": 70, "PACKET_REVISION_MISMATCH": 16, "PACKET_DIGEST_MISMATCH": 14, "CHUNK_MISSING": 100 },
+              "firstFailingBoundary": "RUN_FILE_MISSING",
+              "receiptPath": ".tmp/atlas/phase-closure-p12-promotion-preflight-100-20261015.json",
+              "receiptChecksum": "sha256:1fc774ad72bb3533c5cdf5edb1cd83634c2a07dc2d53c4ad69f2bde035ae7eb0",
+              "transactionRolledBack": true,
+              "writesPerformed": false
+            },
+            "strictCanonicalCensus": {
+              "command": "node scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --output=.tmp/atlas/phase-closure-p12-strict-packet-chunk-20261015.json",
+              "exitCode": 0,
+              "scope": "FULL",
+              "status": "CURRENT_PACKET_CHUNK_JOIN_PARTIAL",
+              "counts": { "bindingSources": 24456, "bindingProvenLineageSources": 14628, "packetRevisionWorkspaceBindingMatches": 16151, "packetChunkExactSources": 14564, "packetLegacyContentHashMatches": 0, "packetAmbiguousSources": 0 },
+              "receiptPath": ".tmp/atlas/phase-closure-p12-strict-packet-chunk-20261015.json",
+              "writesPerformed": false,
+              "canonicalAuthority": false,
+              "interpretation": "The strict owner join requires one packet key, source_revision equality, packet lineage-binding checksum and producer revision, plus same packet-key/source-revision proven chunk lineage. This is stronger than the earlier source+lineage-only 14,628 count."
+            },
+            "singleSourceSeed": {
+              "script": "scripts/atlas/prove-current-packet-chunk-seed-v1.mjs",
+              "command": "node scripts/atlas/prove-current-packet-chunk-seed-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --source-ref crates/atlas_packet_parser/index.js --report-path .tmp/atlas/phase-closure-p12-single-source-index-js-20261015.json",
+              "exitCode": 0,
+              "status": "P12_SINGLE_SOURCE_QUALIFIED",
+              "sourceRef": "crates/atlas_packet_parser/index.js",
+              "packetKey": "packet:0ef4e5eff91e",
+              "sourceRevision": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769",
+              "provenPhysicalChunkRows": 14,
+              "receiptPath": ".tmp/atlas/phase-closure-p12-single-source-index-js-20261015.json",
+              "receiptChecksum": "sha256:dce55a7fafc726f69f7f535810d6d254a647d14638ac320e67b5d543f830d98d",
+              "transactionRolledBack": true,
+              "writesPerformed": false,
+              "canonicalAuthority": false,
+              "promotionAuthorized": false
+            },
+            "singleSourceByteReadback": {
+              "command": "node scripts/atlas/prove-current-packet-chunk-seed-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --source-ref crates/atlas_packet_parser/index.js --report-path .tmp/atlas/phase-closure-p12-single-source-index-js-byte-readback-20261015.json",
+              "exitCode": 0,
+              "status": "P12_SINGLE_SOURCE_QUALIFIED",
+              "sourceRef": "crates/atlas_packet_parser/index.js",
+              "sourceByteLength": 9875,
+              "sourceSha256": "sha256:5bb2826a27ba9434029c48b27ccf75dd1b08857d6b9ab110a14f0833cabc4769",
+              "sourceBytesMatchWorkspaceBinding": true,
+              "allQualificationChecks": true,
+              "receiptPath": ".tmp/atlas/phase-closure-p12-single-source-index-js-byte-readback-20261015.json",
+              "receiptChecksum": "sha256:03a807d8c28de9723a9b7f5740650a78064cfff52eea1a4a829be1bd3c6ee772",
+              "transactionRolledBack": true,
+              "writesPerformed": false,
+              "canonicalAuthority": false,
+              "promotionAuthorized": false
+            },
+            "legacyHashNegativeControl": {
+              "exitCode": 1,
+              "status": "P12_SINGLE_SOURCE_REJECTED",
+              "sourceRef": "crates/atlas_packet_parser/build.rs",
+              "failedCheck": "packetSourceRevisionAndLineageProvenance",
+              "receiptPath": ".tmp/atlas/phase-closure-p12-single-source-build-rs-negative-20261015.json",
+              "receiptChecksum": "sha256:c7520df95cf35cf8ca7f763f136edb46546d79613d39c53cc0b031ea5691363e",
+              "transactionRolledBack": true,
+              "writesPerformed": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "roadmapId": "workstation-p23-transport-validation",
+      "status": "LOCAL_CHANNEL_POOL_CONTRACT_PROVEN_LIVE_TRANSPORT_NOT_PROVEN",
+      "command": "cd sveltekit-frontend && npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts src/lib/server/acp/acp-quic-advertisement-v1.spec.ts",
+      "exitCode": 0,
+      "testsPassed": 6,
+      "testsFailed": 0,
+      "implementationSha256": "ca41415eb4b43f128f94bfb16de86149b7dee137cb420e8a8d3144b56d7e6b4c",
+      "specSha256": "68e922e3392519d74773e84a0c6b2e3371cfe46845fc42e2d637b219c5ddd7d5",
+      "findings": [
+        "Fixed undeclared channel reference and incorrect READY state value in channel construction path.",
+        "Channel pooling now keys by service, address, and TLS mode; close(serviceId) is scoped to that service.",
+        "QUIC defaults disabled; listener verification is required before the helper can advertise QUIC.",
+        "The admin service-port route returns quicSupport.enabled=false and no Alt-Svc response header.",
+        "No production acpChannelPool.getChannel caller was found in the searched source tree.",
+        "QUIC/HTTP3, protobuf RPC mapping, live business-method parity, and agent-to-DAG execution remain NOT_PROVEN."
+      ],
+      "additionalSpecSha256": "f7ac9b5fbfa47897bdb4e366110bfd43594812e5cc42dbba9204e56e892db54b",
+      "routeSha256": "fba3cfe7b5c37fa5b1412943e1ee7083358e0f3624c4339c98db60a3958dc49e",
+      "servicesTouched": false,
+      "networkCalls": 0,
+      "canonicalWrites": 0
+    },
+    {
+      "roadmapId": "workstation-p23-transport-validation",
+      "status": "GRPC_HEALTH_PARTIAL_RETRIEVAL_UNHEALTHY_SEARCH_EMBEDDING_UNAVAILABLE",
+      "observedAt": "2026-10-15T16:56:20Z",
+      "probes": [
+        { "command": "node scripts/atlas/probe-go-grpc-health-v1.mjs --service=retrieval", "exitCode": 0, "rpcReachable": true, "serviceHealth": "unhealthy", "dependencies": { "pgvectorConnected": true, "qdrantConnected": true, "redisConnected": true, "embeddingServiceUp": false } },
+        { "command": "node scripts/atlas/probe-go-grpc-health-v1.mjs --service=search", "exitCode": 1, "rpcReachable": false, "error": "14 UNAVAILABLE: ECONNREFUSED 127.0.0.1:50055" },
+        { "command": "node scripts/atlas/probe-go-grpc-health-v1.mjs --service=embedding", "exitCode": 1, "rpcReachable": false, "error": "14 UNAVAILABLE: ECONNREFUSED 127.0.0.1:50051" }
+      ],
+      "readOnly": true,
+      "writesPerformed": false,
+      "interpretation": "Health-only evidence; does not prove business RPC parity, transport negotiation, production caller wiring, or an end-to-end agent workflow."
+    }
+  ],
+  "latestPhaseProofRefresh": {
+    "roadmapId": "workstation-p12-source-revision-chunk-authority",
+    "status": "PARTIAL_BOUNDED_JOIN_MISSING",
+    "observedAt": "2026-10-15T19:52:16.476Z",
+    "command": "node scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --limit 100 --output=.tmp/atlas/p12-phase-proof-refresh-20261015.json",
+    "exitCode": 0,
+    "scope": "BOUNDED_SAMPLE_NOT_POPULATION_ESTIMATE",
+    "selectedRows": 100,
+    "exactGraphifyMembers": 100,
+    "packetChunkExactSources": 0,
+    "provenLineageSources": 0,
+    "classificationCounts": {
+      "NO_PACKET_REFERENCE": 85,
+      "CANONICAL_PACKET_IDENTITY_ONLY": 14,
+      "PACKET_PRESENT_NO_CHUNK_BINDING": 1,
+      "EXACT_LINEAGE": 0
+    },
+    "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "receiptPath": ".tmp/atlas/p12-phase-proof-refresh-20261015.json",
+    "receiptSha256": "sha256:5d7b1e91b4563218e6fda5bed92ed873b5041180944754d5cf22227d09ec0c08",
+    "classificationSha256": "sha256:5a2f8a94fca8fa36ff10f7aa12bad44757b8c02581058cb7b5e48c7c4dcc6fd6",
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "interpretation": "A deterministic sorted sample has no packet/chunk joins, but is not representative; the separate full bridge audit found 5,503 root sources with exact-ref physical chunks and missing proven lineage. Next gate is a stratified read-only source-scope audit; no identity inference or bulk refresh."
+  },
+  "p12StratifiedProof": {
+    "roadmapId": "workstation-p12-source-revision-chunk-authority",
+    "status": "PARTIAL_STRATIFIED_DIAGNOSTIC_PROVEN",
+    "observedAt": "2026-10-15T19:55:25.667Z",
+    "command": "node scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --report-path .tmp/atlas/p12-stratified-lineage-refresh-20261015.json",
+    "exitCode": 1,
+    "auditOutcome": "CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PARTIAL",
+    "focusedTestCommand": "node --test scripts/atlas/lib/stratified-packet-chunk-samples-v1.test.mjs",
+    "focusedTestExitCode": 0,
+    "focusedTestsPassed": 2,
+    "implementationSha256": "sha256:1c4d36d186a50e12905389939d8b5a34394efba39b540b103c939e17d18c8fe7",
+    "samplerSha256": "sha256:c16d66721be78fce6d7830da9e33dfb126f52a9ae5330fc03c01447c204a30a6",
+    "testSha256": "sha256:4e403c65b667b61f08f3d502b693167d63feffd42c18c122fd2199df7a4a6349",
+    "selectedMembershipRows": 25542,
+    "exactCurrentPacketChunkBridgeMembers": 14628,
+    "stratifiedFailurePopulationCounts": {
+      "LINEAGE_MISSING_WITH_PHYSICAL_CHUNKS": 5503,
+      "LINEAGE_MISSING_WITHOUT_PHYSICAL_CHUNKS": 4324,
+      "LINEAGE_OTHER_REVISION": 1,
+      "REPOSITORY_NAMESPACE_MISSING": 1086
+    },
+    "stratifiedSampleRows": 31,
+    "sampleLimitPerStratum": 10,
+    "receiptPath": ".tmp/atlas/p12-stratified-lineage-refresh-20261015.json",
+    "receiptSha256": "sha256:7da53f4633ba5a6c7a5734b7ee69f8b79edeb5f277c5598b06f1935832e45222",
+    "receiptInternalChecksum": "sha256:28ba150f5d15ed8fdf68396a18c24138f2c67a1097f29b699c8ab72390868f71",
+    "readOnly": true,
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "interpretation": "The stratified diagnostic is proven, but the P12 source/chunk bridge remains partial; sample rows are diagnostic locators and are not promotion candidates."
+  },
+  "p12SeedReadback": {
+    "roadmapId": "workstation-p12-source-revision-chunk-authority",
+    "status": "SINGLE_SOURCE_REJECTED_AT_PACKET_IDENTITY_BOUNDARY",
+    "command": "node scripts/atlas/prove-current-packet-chunk-seed-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --source-ref sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts --report-path .tmp/atlas/p12-stratified-seed-ace-lod-promoter-20261015.json",
+    "exitCode": 1,
+    "expectedStatus": "P12_SINGLE_SOURCE_REJECTED",
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts",
+    "sourceRevision": "sha256:a6ef4da67b4e6a0e7fdfee46d87fa9a163c5f5d13d47be0954f0970d7854297c",
+    "physicalChunkRowsAtExactSourceRef": 4,
+    "checks": {
+      "canonicalExecution": true,
+      "executionWorkspaceRevision": true,
+      "uniqueMembership": true,
+      "exactWorkspaceSourceBinding": true,
+      "uniquePacketIdentity": false,
+      "packetSourceRevisionAndLineageProvenance": false,
+      "exactProvenPacketChunkRows": false,
+      "sourceBytesReadWithinRepository": true,
+      "sourceBytesMatchWorkspaceBinding": true
+    },
+    "receiptPath": ".tmp/atlas/p12-stratified-seed-ace-lod-promoter-20261015.json",
+    "receiptSha256": "sha256:bbe4531707c7976a2bd6a2b6019385300391bcbce44d715bf21ffab72c942261",
+    "receiptInternalChecksum": "sha256:abdf2259eb2530ef13dce0052f590e2254174c8fbc497a7ecde1d03cf54239ed",
+    "databaseTransaction": "REPEATABLE READ READ ONLY",
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "interpretation": "One stratified sample source matches execution, membership, source binding, and bytes, but fails unique packet identity and proven lineage. Do not generalize this single row to the full stratum."
+  },
+  "p12SeedSampleDisposition": {
+    "roadmapId": "workstation-p12-source-revision-chunk-authority",
+    "status": "PARTIAL_MULTIPLE_FAILURE_SHAPES_CONFIRMED",
+    "sampledUniqueSources": 4,
+    "sampleStratum": "LINEAGE_MISSING_WITH_PHYSICAL_CHUNKS",
+    "commandTemplate": "node scripts/atlas/prove-current-packet-chunk-seed-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --source-ref <sample-source-ref> --report-path .tmp/atlas/<unique-receipt>.json",
+    "exitCodes": [1, 1, 1, 1],
+    "allExpectedStatus": "P12_SINGLE_SOURCE_REJECTED",
+    "checksSummary": {
+      "canonicalExecution": "4/4 true",
+      "executionWorkspaceRevision": "4/4 true",
+      "uniqueMembership": "4/4 true",
+      "exactWorkspaceSourceBinding": "4/4 true",
+      "sourceBytesReadWithinRepository": "4/4 true",
+      "packetSourceRevisionAndLineageProvenance": "0/4 true",
+      "exactProvenPacketChunkRows": "0/4 true",
+      "uniquePacketIdentity": "1/4 true",
+      "sourceBytesMatchWorkspaceBinding": "3/4 true"
+    },
+    "sampledSources": [
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts",
+        "packetKey": null,
+        "receiptPath": ".tmp/atlas/p12-stratified-seed-sample-1-20261015.json",
+        "receiptSha256": "sha256:3b39a57095825a1b7b50be10d303fd5e62545e00e83654565c813045e7f487c5"
+      },
+      {
+        "sourceRef": "scripts/atlas/audit-lineage-qdrant-semantic-canary-v1.mjs",
+        "packetKey": null,
+        "receiptPath": ".tmp/atlas/p12-stratified-seed-sample-2-20261015.json",
+        "receiptSha256": "sha256:fe2ec4566223d48a68fb0e906f73baafc2d370b8199b2ab4a8a0220ea9ca055d"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts",
+        "packetKey": "packet:68fc6bb8e017",
+        "sourceBytesMatchWorkspaceBinding": false,
+        "workingTreeModified": false,
+        "currentFileSha256": "sha256:f377f95da2f620001faa0742051bbfba4ba29b7eda7a8d7cb25b75d496d2934c",
+        "lastCommitForFile": "29f27d4a7237e9516780e8d6321e9475b024d5ce",
+        "receiptPath": ".tmp/atlas/p12-stratified-seed-sample-3-20261015.json",
+        "receiptSha256": "sha256:122151f5f11326542023b3b29a2d6cfdfad1b8ad00291061c4226a91b9412824"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/language/ast-query-semantic-pipeline.spec.ts",
+        "packetKey": null,
+        "receiptPath": ".tmp/atlas/p12-stratified-seed-sample-4-20261015.json",
+        "receiptSha256": "sha256:1846da5332d6e138b55d627c5fb5fdd0574f2528f7bd67326c266221f3167c31"
+      }
+    ],
+    "allDatabaseTransactions": "REPEATABLE READ READ ONLY",
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "interpretation": "The same high-level missing-lineage stratum contains absent packet identity and a packet/source-digest mismatch; four sampled rejects are not a population estimate."
+  },
+  "closureProtocol": [
+    "Assign each phase a stable roadmapId plus phaseId; never identify work by an ordinal alone.",
+    "For every phase, link one authoritative OpenSpec owner, explicit acceptance gates, and required live or test receipts.",
+    "Classify each gate as CREATED, WIRED, PROVEN, BLOCKED, NOT_VERIFIED, or DONE; DONE requires wired, proven, and accepted evidence.",
+    "Bind evidence to exact source/workspace/data/model revisions, checksums, command and exit code, independent readback, and side-effect counts.",
+    "Run the narrowest safe gate first; preserve phase dependencies, approval boundaries, and explicit test locks.",
+    "Publish counts by roadmap and status only. Do not calculate one portfolio percentage until the phase namespace and denominator are agreed."
+  ],
+  "sources": [
+    {
+      "path": "parent-atlas-workstation-todo.md",
+      "sha256AtAudit": "453672d501b201ba26ea27630ec65c43f53ee17c65c1e9072ae114bd686d0c5d",
+      "bytes": 311405,
+      "relevantLines": "686, 976-1015"
+    },
+    {
+      "path": "docs/parent-atlas-workstation-todo.md",
+      "sha256AtAudit": "c383b1c814947087a54cfab22a4051b1a290b64ddb47282d3f84aaca1d447c2a",
+      "bytes": 203663
+    },
+    {
+      "path": "docs/atlas/parent-atlas-phases-17-24-audit-and-roadmap.md",
+      "sha256AtAudit": "738e86a67e150b212ded3c54da64984091b96efd7fad90a58087633cfcf15062",
+      "bytes": 5109
+    },
+    {
+      "path": "openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md",
+      "sha256AtAudit": "d04504f754687fbaa649b5d74bb5c10494a2b29ceac00096536ea0b5788ba095",
+      "bytes": 22933
+    },
+    {
+      "path": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "sha256AtAudit": "b38f03af5d5a06c0c4531772abb80a5168a6d3d2a550e5c4d333b0f3a509fcb4",
+      "bytes": 300421,
+      "earlierRecheckSha256": "40a16d0483e2cd7d2635591de3b7993b5638d04419ab5037c36245f1bb5273f9",
+      "earlierRecheckBytes": 302689,
+      "intermediateRecheckSha256": "2482df2dbc4051cebbd3319a275a1df02d05050b708a8ffdf83553ce71031d3f",
+      "intermediateRecheckBytes": 304819,
+      "laterRecheckSha256": "e0671cbf258142a8eaf54d4bdec25cb2094c4b8e0cacfef972c38fb463b8a42e",
+      "laterRecheckBytes": 307699,
+      "sha256LastObserved": "75610e2cd6daca57f2cfe5ed66b34bd35737f18ea7786722db23c9dd9526eb3e",
+      "integrityStatus": "UNSTABLE_SOURCE_CHANGED_REPEATEDLY_DURING_AUDIT"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "sha256ObservedAtRecheck": "5e332413f88670a442815df58c9eed36b00eb548a8c71868ec728e2f44e5b007",
+      "bytesObservedAtRecheck": 1231230,
+      "integrityStatus": "LIVE_SOURCE_FOR_P12_RECHECK"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-transport-memory-boundaries/tasks.md",
+      "sha256ObservedAtRecheck": "e1914f4e47052994a8c74218b0d01646aed02fe2683131bda181339f4fdbacb0",
+      "bytesObservedAtRecheck": 68181,
+      "integrityStatus": "LIVE_SOURCE_FOR_P23_RECHECK"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts",
+      "sha256ObservedAtRecheck": "ca41415eb4b43f128f94bfb16de86149b7dee137cb420e8a8d3144b56d7e6b4c",
+      "bytesObservedAtRecheck": 17426,
+      "integrityStatus": "PATCHED_AND_FOCUSED_TESTED"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.spec.ts",
+      "sha256ObservedAtRecheck": "68e922e3392519d74773e84a0c6b2e3371cfe46845fc42e2d637b219c5ddd7d5",
+      "bytesObservedAtRecheck": 4289,
+      "integrityStatus": "PATCHED_AND_FOCUSED_TESTED"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/acp/acp-quic-advertisement-v1.spec.ts",
+      "sha256ObservedAtRecheck": "f7ac9b5fbfa47897bdb4e366110bfd43594812e5cc42dbba9204e56e892db54b",
+      "bytesObservedAtRecheck": 2410,
+      "integrityStatus": "FOCUSED_TESTED"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts",
+      "sha256ObservedAtRecheck": "fba3cfe7b5c37fa5b1412943e1ee7083358e0f3624c4339c98db60a3958dc49e",
+      "bytesObservedAtRecheck": 3776,
+      "integrityStatus": "FAIL_CLOSED_ADVERTISEMENT_CONFIGURED_RUNTIME_NOT_PROVEN"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+      "sha256AtAudit": "571272965c3cefc0e0d65fd9c42ee578a5d11a5717faa42e4146090c3f009e3c",
+      "bytes": 155122
+    }
+  ],
+  "commands": [
+    {
+      "command": "rg -n --pcre2 \"^#{1,4} .*Phase\\s+(?:[1-9]|1[0-6])\\b\" docs/atlas docs/architecture openspec/changes --glob \"*.md\" --glob \"!**/tasks-20260912-owner-collision-reconcile-v*.md\" | Select-Object -First 120",
+      "exitCode": 0,
+      "result": "Independent Phase 1-16 sequences and duplicate Phase 22-24 meanings found."
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "exitCode": 0,
+      "result": "9de1faa659053b4d6761d4de43c2074a1a29dc38"
+    },
+    {
+      "command": "rg -n \"Use the 2026-09-07 canonical phase index|\\| P(11|12|13|14|15|16|17|18|19|20|21|22|23|24|25) \\|\" parent-atlas-workstation-todo.md",
+      "exitCode": 0,
+      "result": "Canonical workstation phase map entries 11-25 found; documented dependency sequence P12 -> P13 -> P15 -> P16 -> P17 -> P18 -> P14 -> P20/P21 -> P11/P25."
+    },
+    {
+      "command": "node_modules/.bin/tsx.cmd scripts/atlas/audit-current-source-authority-v1.mts --stdout-only",
+      "exitCode": 0,
+      "observedAt": "2026-10-15T16:45:30Z",
+      "result": "CURRENT_SOURCE_AUTHORITY_PROVEN for the 25,542-source admitted revision; liveDrift=DRIFT_PRESENT (719 changed, 1,086 excluded nested, 8 unavailable); reportWritten=false."
+    }
+  ],
+  "sideEffects": {
+    "databaseReadTransactions": 1,
+    "databaseWrites": 0,
+    "databaseWrites": 0,
+    "cacheWrites": 0,
+    "serviceChanges": 0,
+    "gpuJobs": 0,
+    "trainingJobs": 0
+  },
+    "nextGate": "Use the workstation P11-P25 roadmap IDs and documented dependency order to audit each owning OpenSpec task ledger and gather current receipts. Establish the missing workstation P1-P10 scope from its owner before claiming full 1-24 completion; do not assign local phase labels by ordinal or calculate an aggregate percentage."
+}

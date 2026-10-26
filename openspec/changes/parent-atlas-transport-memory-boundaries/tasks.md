@@ -5,6 +5,14 @@
 - [ ] **PROTO-01** Freeze the transport ownership matrix for tRPC, gRPC, MCP, ACP, and A2A; record current callers and reject duplicate bus ownership.
 - [x] **PROTO-02A** Classify TurboVec HTTP/gRPC operations, N-API adapter, and spawned-Python wrapper against one service owner; prove HTTP/gRPC health and fail closed on the missing N-API module/method. Evidence: `parent-atlas-transport-owner-matrix-v1.json`; no writes.
 - [ ] **PROTO-02B** Extend the owner/lifecycle matrix to all remaining active sidecars and verify each operation's runtime caller/protocol, without treating parallel interfaces as duplicate canonical owners.
+  - Read-only protobuf inventory (2026-10-17): the canonical source directory is `proto/active/` (also the input to `scripts/atlas/audit-proto-registry.mjs`); the inventory contains 117 tracked `.proto` paths repository-wide, including archived and duplicated copies, so that count is not a count of distinct active contracts.
+  - Copy drift found: of 13 root `proto/active/*.proto` basenames, `scripts/atlas/proto/active/` has 11 byte-normalized matches and 2 divergent files (`retrieval.proto`, `turbovec.proto`). `sveltekit-frontend/proto/active/` overlaps only 3 files and all 3 differ from root. Do not bulk-copy: first establish each mirror's consumers and whether it is generated, compatibility-only, or retired; the retrieval divergence includes missing root RPCs/fields, so it is behaviorally significant.
+  - Relevant root contracts: `retrieval.proto` (application retrieval/streaming), `vectors.proto` (CyberElephant service), `turbovec*.proto`, `gpu_bridge.proto`, `graph.proto`, `packet_topology_envelope.proto`, and `shared_ids.proto`. The installed Qdrant gRPC SDK supplies Qdrant's schemas; do not add a duplicate Qdrant `.proto`. Qdrant's new vector `upsertPoints` still has no caller; its existing payload script only calls `findPointIds`/`setPayload`, while the projection worker remains REST-based.
+  - `scripts/atlas/audit-proto-registry.mjs` is not a safe read-only inventory command: source includes embedding/API calls and an `--apply` path with PostgreSQL, Qdrant, Redis, and report writes. It was not run. This entry is source/path inspection only; no proto or generated binding was changed and no parity/generation test was run.
+  - [ ] **PROTO-02B-AUDIT-01** Build a deterministic, read-only source-to-copy parity inventory for `proto/active/`, `scripts/atlas/proto/active/`, and `sveltekit-frontend/proto/active/`; report normalized content hashes, missing/extra files, and field/service-level drift. Do not overwrite, archive, or delete a divergent copy until its consumer and owner are classified.
+  - [ ] **PROTO-02B-AUDIT-02** Trace each non-archived service/method to its runtime caller, transport selection, generated binding, and health/business-RPC proof. Start with `retrieval.proto` and `turbovec.proto`; compare field numbers and method signatures to generated Go and TypeScript clients, and record whether generation is reproducible. Contract text or generated files alone do not prove a live caller.
+  - [ ] **PROTO-02B-AUDIT-03** Record protocol-specific identity mapping and reject namespace confusion: Parent Atlas `packet_key`/source revisions, transport request/receipt IDs, vector-service document IDs, and Qdrant point IDs remain distinct. Confirm Qdrant messages come from the installed SDK rather than introducing a local duplicate proto.
+  - [ ] **PROTO-02B-AUDIT-04** Add focused tests for the read-only inventory's stable classification and drift detection. The audit must not call embedding/model endpoints, PostgreSQL, Qdrant, Redis/Valkey, or generate/overwrite bindings; write only an explicitly selected local audit receipt.
 - [x] **PROTO-03** Declare gRPC the typed cross-language contract for native/polyglot compute, while permitting operation-specific HTTP health/compatibility/fallback routes under the same service owner. No app identity or fusion ownership transfers; contract added to the OpenSpec spec.
 - [x] **PROTO-04** Declare tRPC optional for demonstrated TypeScript application-local control surfaces. OpenSpec now states it is dormant capability without a client and cannot own identity, durable truth, cross-language compute, or workflow authority; the caller census found no in-repo tRPC client. Server mount remains unchanged.
 - [x] **ACP-01** Define the Parent Atlas coding-agent ACP boundary for editor sessions, permissions, tool actions, patches, terminal output, and progress. Contract-only: the new transport-memory-boundaries requirement and design section keep editor/session/action IDs protocol-local; delegate permission to `tool-authorization.ts`; bind actions to caller-resolved task/run/workflow-event/receipt owners; treat patches as proposals; bound/redact terminal output; and project progress from existing workflow events/receipts. ACP remains legacy inbound only with outbound disabled; no runtime adoption is claimed. `openspec validate parent-atlas-transport-memory-boundaries --strict` passes.
@@ -527,3 +535,179 @@ the artifacts are historical observations, not valid ordered frames.
 
 Evidence: `docs/reports/temporal-bootstrap-plan-v1.json`.
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+### QUIC, HTTP QUERY, RPC packet, and procedural-agent handoff (2026-10-14)
+
+The following is an audit handoff, not a live transport or end-to-end proof. Keep
+the existing packet, service, retrieval, and workflow owners; do not create a
+second packet registry or orchestration authority.
+
+- [ ] **QUIC-RPC-01** Distinguish edge protocol negotiation from RPC transport.
+  Caddy is configured for H1/H2/H3 at `https://localhost:8443`; this establishes
+  an HTTP/3-capable edge listener, not QUIC delivery of gRPC packets to a
+  backend. `negotiateQuicTransport()` currently returns capability/Alt-Svc
+  metadata, and `executeTraversalRpc()` returns an empty stub result. Record
+  actual client, server, protocol, method, deadline, and caller before claiming
+  QUIC or traversal is live. Existing gRPC remains on its independently proven
+  service transport; do not tunnel or relabel gRPC as HTTP/3 without a tested
+  compatible client/server implementation. HTTP methods such as QUERY are
+  independent of HTTP/1.1, HTTP/2, or HTTP/3 transport.
+- [ ] **HTTP-QUERY-01** Evaluate RFC 10008 QUERY for the read-only structured
+  Atlas search endpoint. Verify client, Caddy/proxy, and application-server
+  method handling; advertise supported request media types; require a bounded
+  schema-validated body and explicit Content-Type; preserve caller,
+  requestDigest, packet/source/workspace revisions, and existing SearchRuntime
+  ownership. Keep QUERY safe/idempotent with no canonical writes or tool
+  execution. Test unsupported method/media type behavior and explicit fallback.
+  For caching, include the complete query body and relevant authorization,
+  revision, and representation metadata in the key or disable shared caching.
+  RFC 10008 was published June 2026; support in Atlas is not yet established.
+- [ ] **RPC-PACKET-PROTO-01** Map `AtlasCustomRpcPacketV1` to the existing or
+  approved protobuf service contract without changing packet identity. Preserve
+  `packetKey`, `titleId`, `sourceRef`, source/workspace revisions, request and
+  execution IDs, caller, idempotency key, and request digest as distinct typed
+  fields. First prove read-only GET/SEARCH encode/decode round trips and typed
+  errors. CREATE/PATCH/TRANSITION remain disabled behind their existing
+  authorization and mutation gates; ANALYZE remains proposal-only. Bound frame
+  size, deadlines, cancellation, retries, and duplicate handling. No generated
+  protobuf service currently proves this mapping.
+- [ ] **AGENT-WORKFLOW-E2E-01** Trace one bounded request through the existing
+  procedural owners: ACP/MCP entry → `SearchRuntime` candidate retrieval and
+  single RRF fusion → qualified ACE/ContextManifest → tool-policy validation
+  → existing workflow/DAG proposal → separately authorized executor →
+  independent test/readback receipt. Bind request ID, packet/source/workspace
+  revisions, evidence refs, and checksums across every handoff; report zero
+  writes unless an explicitly authorized execution test proves otherwise.
+  `runPacketConsumerPipeline()` and `synthesizeAgenticDagV1()` are source-level
+  owners/contracts, not proof that this full chain ran. Its lexical default
+  tool selector is not a production authorization policy and must not be used
+  to infer permission to invoke a tool.
+- [ ] **GPU-CANDIDATE-GATHER-01** After the native C ABI/protobuf contract is
+  qualified, test CPU-produced bounded candidate ordinals against an already
+  revision-qualified GPU embedding snapshot; measure host-to-device transfer,
+  gather/GEMM, and end-to-end latency separately. Preserve buffer lifetimes,
+  bounds, canonical ordinal mapping, CPU parity, and fallback behavior. This is
+  an accelerator challenger; it does not own identity, retrieval fusion, or
+  evidence admission. Coordinate with P2.5/P3.3 in
+  `parent-atlas-native-acceleration-cabi/tasks.md` rather than adding another
+  transport or execution owner.
+- [ ] **HTTP3-ASGI-01** Inventory the actual FastAPI server/runtime and caller
+  for the selected endpoint. Current Atlas GPU FastAPI launchers use Uvicorn;
+  this audit found no configured HTTP/3 server. If HTTP/3 is still required,
+  first verify an existing approved ASGI server/runtime can serve the app over
+  QUIC; add no dependency until the existing runtime-ownership registry and
+  deployment constraints are checked. Prove client negotiation, request,
+  response, cancellation, TLS, and proxy-to-upstream protocol separately.
+- [ ] **CPU-WORKER-BOUNDS-01** For CPU-heavy request processing, define a
+  bounded worker count, queue ceiling, input-size ceiling, timeout/cancel
+  behavior, backpressure response, and per-job receipt. Benchmark process-pool,
+  thread/native, and inline options against the actual workload; `async` and
+  FastAPI in-process background tasks alone do not prove CPU parallelism or
+  durable execution. Keep worker scheduling under the existing service owner.
+- [ ] **PACKET-ORDER-IDEMPOTENCY-01** Test concurrent packet submissions with
+  deliberately reordered completion, duplicate retries, cancellation, and
+  partial failure. Join by request/correlation ID and canonical identity;
+  require explicit idempotency semantics and stable output ordering where the
+  caller requires order. Do not infer application order from QUIC datagram,
+  stream, or worker completion order.
+- [ ] **ORDINAL-BATCH-ALIGNMENT-01** If GPU/tensor batches are reordered for
+  shard or memory locality, seal and checksum the execution-ordinal-to-canonical
+  identity map, then prove score-to-identity join-back and stable Top-K parity.
+  Benchmark radix sorting only against an appropriate bounded baseline; make
+  it optional unless it yields a measured end-to-end improvement. Sorting must
+  not change canonical IDs, retrieval ranks, or logical lane votes.
+
+Audit evidence: `sveltekit-frontend/src/lib/server/acp/acp-grpc-quic-bridge.ts`
+contains capability metadata and a traversal stub;
+`sveltekit-frontend/src/lib/server/atlas/contracts/atlas-custom-rpc-packet-v1.ts`
+defines the Zod packet but has no proven protobuf serializer;
+`infra/caddy/Caddyfile` enables H1/H2/H3 only at the edge;
+`sveltekit-frontend/src/lib/server/atlas/packet-consumer-pipeline.ts` and
+`sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-dag-synthesis-v1.ts`
+provide procedural pipeline/DAG composition contracts. Existing tests validate
+the packet schema, not gRPC/QUIC wire parity or a live agent-to-DAG execution.
+The FastAPI launchers in `services/atlas-gpu-8098/app.py` and
+`services/topology-gpu/app.py` start Uvicorn; no HTTP/3 server configuration,
+bounded CPU worker pool, or radix-sort identity restoration was established by
+this source audit. HTTP/3/QUIC support remains a target to verify, not a present
+service capability. RFC 10008 defines HTTP QUERY as a safe, idempotent,
+body-bearing query method; it is a possible search API method, not a QUIC
+transport or gRPC replacement. Current Atlas routes have not been verified to
+accept QUERY, advertise `Accept-Query`, or preserve body-aware cache keys.
+No service, datastore, GPU process, or packet was changed in this audit.
+
+#### RFC and context-vocabulary evidence update (2026-10-14)
+
+Added `docs/.okf/rfc-http-query/README.md` with the verified RFC titles and a
+method-versus-transport summary, then added a reference-only entry to the
+existing `.okf/corpora/keyword-corpus.yaml` and a focused corpus-search test.
+Firecrawl retrieved RFC 10008, RFC 9114, RFC 9000, and the ASGI implementations
+page. The existing BeautifulSoup/Pydantic validator could not start in the
+current Windows Python environment (`ModuleNotFoundError: pydantic`, exit 1 for
+each URL); it did not fetch or validate the pages. No checkbox above is closed:
+this source/vocabulary work does not prove an Atlas QUERY route, HTTP/3 server,
+QUIC RPC, runtime search integration, or cache behavior. No indexing, Qdrant,
+database, or service writes were performed.
+
+#### HTTP ingress and Redis event delivery audit (2026-10-14)
+
+The repository already has two relevant event owners; do not add another stream
+or job authority. `sveltekit-frontend/src/lib/server/queue/valkey-event-stream.ts`
+publishes validated EventFabric JSON envelopes idempotently to
+`atlas:events:v1` and provides bounded consumer-group read/ack helpers.
+`sveltekit-frontend/src/lib/server/atlas/acquisition/acquisition-stream.ts`
+owns a separate bounded acquisition queue with `XREADGROUP`, `XACK`, pending
+recovery, and dead-letter behavior; use it only for acquisition work. PostgreSQL
+outbox/task state remains durable authority; Redis/Valkey carries delivery.
+
+Caddy advertises H1/H2/H3 at ingress, while the Atlas GPU FastAPI launchers
+currently start Uvicorn. Hypercorn is a candidate ASGI server with H3 support,
+but adding or switching a runtime is not approved by this audit. The initial
+design should terminate H2/H3 at Caddy and retain the existing upstream protocol;
+use the existing gRPC-over-H2 path where typed RPC is required. Long jobs should
+be accepted through a bounded HTTP request, persist through the existing
+PostgreSQL/outbox owner, return a request ID, and be executed by a bounded stream
+consumer. Return status from the durable owner; SSE may notify clients but must
+not become the job ledger. Bind retries and reordered completions by request,
+event, and idempotency IDs plus source/workspace revisions, not HTTP stream or
+worker completion order.
+
+This is source-level owner mapping only. It does not prove a live Redis 8
+deployment, an event-to-FastAPI worker caller, end-to-end HTTP/2 or HTTP/3
+negotiation, durable GPU job execution, or browser event readback. Keep
+QUIC-RPC-01, HTTP3-ASGI-01, CPU-WORKER-BOUNDS-01, and
+PACKET-ORDER-IDEMPOTENCY-01 open until their respective runtime receipts pass.
+
+#### SvelteKit worker queue hardening (2026-10-14)
+
+The existing `tensorrt-worker-pool.ts` already provides Node `worker_threads`,
+a four-worker cap, transferable buffers, and a 256-item pending ceiling. Fixed
+an uncovered timeout behavior: a queued task now leaves the FIFO queue when its
+deadline expires, task IDs must be non-empty and unique across active/queued
+work, and settlement is idempotent so late worker replies cannot resolve a
+timed-out request. Added focused queue-removal regression tests. This is local
+contract hardening only; it does not prove CPU-core affinity, GPU parallel
+speedup, durable RPC dispatch, cache tier transitions, or end-to-end execution.
+Do not close CPU-WORKER-BOUNDS-01 or the transport gates on this evidence.
+
+#### ACP gRPC channel-pool runtime defect correction (2026-10-15)
+
+The focused source review found that `ACPGrpcChannelPool.getChannel()` referenced an undeclared `channel`, treated connectivity state `3` as READY (the installed grpc-js enum defines READY as `2` and `3` as TRANSIENT_FAILURE), and claimed an HTTP fallback it could not return through its `Promise<Channel>` contract. Replaced that broken probe with lazy `Client`/`getChannel()` construction, keyed pooling by service/address/TLS mode, and service-scoped client closure. The transport selection/fallback decision remains the caller's responsibility. Focused command `cd sveltekit-frontend && npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts` exited **0**, **4/4** tests passed, including lazy channel creation/reuse and closing only the requested service. Implementation SHA-256: `abc5424045c2c3d5aab5337b3dbb145a2d82559313749e1c2baa707bb6da6742`; spec SHA-256: `68e922e3392519d74773e84a0c6b2e3371cfe46845fc42e2d637b219c5ddd7d5`.
+
+This closes only a local channel-pool contract defect. Source search found no production caller of `acpChannelPool.getChannel()`; no service connection was attempted. QUIC/HTTP3, RPC packet protobuf mapping, real gRPC business-method parity, and ACP/MCP → SearchRuntime → ContextManifest → DAG execution remain **NOT_PROVEN**. Do not close `QUIC-RPC-01`, `RPC-PACKET-PROTO-01`, `AGENT-WORKFLOW-E2E-01`, or `HTTP3-ASGI-01` based on this unit test.
+
+Follow-up fail-closed advertisement correction: QUIC defaults false in A2A metadata; `negotiateQuicTransport()` now requires both `enabled` and explicit `listenerVerified`; `/api/acp/service-ports` sets both false, reports `quicSupport.enabled=false`, omits the Alt-Svc response header, and returns null/no advertised Alt-Svc metadata. Focused command `cd sveltekit-frontend && npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts src/lib/server/acp/acp-quic-advertisement-v1.spec.ts` exited **0**, **6/6** tests passed. Current source hashes: bridge `ca41415eb4b43f128f94bfb16de86149b7dee137cb420e8a8d3144b56d7e6b4c`, original bridge spec `68e922e3392519d74773e84a0c6b2e3371cfe46845fc42e2d637b219c5ddd7d5`, new QUIC spec `f7ac9b5fbfa47897bdb4e366110bfd43594812e5cc42dbba9204e56e892db54b`, route `fba3cfe7b5c37fa5b1412943e1ee7083358e0f3624c4339c98db60a3958dc49e`.
+
+This corrects false capability advertisement; it does not implement or verify HTTP/3, QUIC, or the application route at runtime. No service, network listener, datastore, or GPU was touched. Keep P23 transport proof gates open.
+
+#### P23 live gRPC health-only recheck (2026-10-15)
+
+The existing bounded read-only probe reached retrieval Health on `127.0.0.1:50053` (exit 0), but that service reported `unhealthy` because `embeddingServiceUp=false`; PostgreSQL/pgvector, Qdrant, and Redis were reported connected. Search Health on `127.0.0.1:50055` and embedding Health on `127.0.0.1:50051` each returned `14 UNAVAILABLE / ECONNREFUSED` (exit 1). This proves only mixed Health RPC reachability—not business RPC parity, HTTP/2 or QUIC/HTTP3 negotiation, production caller wiring, or agent-to-DAG execution. No writes or service changes occurred. Keep P23 runtime and E2E gates open. Receipt: `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json`.
+
+#### P23 focused transport-contract replay (2026-10-15)
+
+Re-ran `cd sveltekit-frontend && npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts src/lib/server/acp/acp-quic-advertisement-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=verbose`; exit **0**, 2 files / **6 tests passed**. Log: `.tmp/atlas/p23-transport-contract-tests-20261015.txt` (SHA-256 `9CC47E4C6F650F304ADB0051220551581EF4452CD39728CEE952292D716FC623`). This is current contract evidence only; it does not promote the local channel helper to a live caller or prove protocol negotiation/business parity. No service, network listener, database, or cache was changed; P23 remains partial.
+
+#### P23 live Health refresh (2026-10-15)
+
+Ran the read-only, 2-second-timeout Health probe against the existing local Go service endpoints. Retrieval on `127.0.0.1:50053` is now `healthy` with pgvector, Qdrant, Redis, and embedding dependency flags true (exit 0). Embedding on `127.0.0.1:50051` is `healthy`, `modelLoaded=true`, device `cpu` (exit 0); this is not GPU evidence. Search on `127.0.0.1:50055` remains unreachable with `ECONNREFUSED` (exit 1). Full captured outputs and per-service exit codes: `.tmp/atlas/p23-live-health-20261015.json` (SHA-256 `F25522219662CA57C31949A98DE15C374659B1FF5EFF2AFA992138FD49221431`). This updates service Health only; no business method, QUIC/HTTP3 negotiation, ACP caller, or DAG path was exercised. No writes or service changes occurred; P23 remains partial.

@@ -1,0 +1,53 @@
+{
+  "canonicalAuthority": false,
+  "canonicalDataWritesPerformed": false,
+  "createdAtUtc": "2026-10-14T19:00:44.281334Z",
+  "errorCount": 0,
+  "errors": [],
+  "profileCount": 4,
+  "profiles": [
+    {
+      "errors": [],
+      "featureRuleCount": 0,
+      "language": "go",
+      "path": ".okf/languages/go.yaml",
+      "sha256": "db50d89537d26da1eb820f3aaf42b9105cc09a89b09f51c29f710609a2659393",
+      "symbolKindCount": 5,
+      "valid": true
+    },
+    {
+      "errors": [],
+      "featureRuleCount": 0,
+      "language": "python",
+      "path": ".okf/languages/python.yaml",
+      "sha256": "d1a0392e074926a7c5b450470fda589efeac7719ebf91f1fdc806a0795ede4c2",
+      "symbolKindCount": 8,
+      "valid": true
+    },
+    {
+      "errors": [],
+      "featureRuleCount": 0,
+      "language": "rust",
+      "path": ".okf/languages/rust.yaml",
+      "sha256": "3d4862ac39154a1815b1230055c870eb2ff3d0a3a056a827d2ab2bdc56580736",
+      "symbolKindCount": 7,
+      "valid": true
+    },
+    {
+      "errors": [],
+      "featureRuleCount": 8,
+      "language": "typescript",
+      "path": ".okf/languages/typescript.yaml",
+      "sha256": "1e9d12307da1d4fe9a2c7d32ff89aea0e3e693de3f63c629f3f8fec452cea25a",
+      "symbolKindCount": 11,
+      "valid": true
+    }
+  ],
+  "reportPath": "docs/reports/okf-language-profile-validation-2026-10-14.json",
+  "reportWritten": true,
+  "schema": "atlas.language-profile-validation-receipt.v1",
+  "schemaSha256": "28500e5c5f61c925e83e02e45e3359d00880d3eefafdf07df19a4ad55a729173",
+  "serviceCallsPerformed": false,
+  "snapshotSha256": "389b71bd0a17312f8ddb172c3aa4de7a6a37fa3ccf1c4f6d0e058f67a8ce9c61",
+  "validCount": 4
+}

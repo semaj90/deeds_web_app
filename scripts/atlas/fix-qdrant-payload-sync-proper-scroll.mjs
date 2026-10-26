@@ -36,6 +36,10 @@ console.log(`Scroll limit: ${SCROLL_LIMIT}`);
 console.log();
 
 async function syncQdrantPayloads() {
+  if (isApply) {
+    throw new Error('UNSAFE_NON_UNIQUE_PACKET_POINT_SYNC_APPLY_DISABLED');
+  }
+
   const qdrant = new QdrantClient({ url: QDRANT_URL });
   const pgClient = new Client({ connectionString: POSTGRES_URL });
 

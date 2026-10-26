@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { REPO_ROOT } from './connection-config.mjs';
 import { deriveGraphNodeKeyV1 } from '../../packages/parent-atlas/dist/index.js';
+import { astScanCompleteness } from './lib/source-observation-http-v1.mjs';
 
 const root = REPO_ROOT;
 const mapPath = path.resolve(process.env.ATLAS_CANDIDATE_MAP ?? path.join(root, '.tmp/atlas/lineage-qualified-candidate-map-v1.json'));
@@ -77,6 +78,12 @@ async function main() {
       continue;
     }
     const evidence = await response.json();
+    // Fail closed: edges are only planned from a COMPLETE AST scan.
+    const scan = astScanCompleteness(evidence);
+    if (!scan.complete) {
+      errors.push({ sourceRef: candidate.sourceRef, error: `AST_SCAN_INCOMPLETE:${scan.scanCompleteness}${scan.scanFailure ? `:${scan.scanFailure}` : ''}` });
+      continue;
+    }
     const chunks = (evidence.chunks ?? []).map((chunk) => ({ ...chunk, sourceRef: candidate.sourceRef, sourceRevision: candidate.sourceRevision }));
     if (candidate.packetKey) {
       const packetNodeKey = `packet:${candidate.packetKey}`;
@@ -108,10 +115,13 @@ async function main() {
     workspaceRevision: map.workspaceRevision ?? null,
     sidecar: { url: sidecarUrl, endpoint: '/ast/chunk' },
     selectedSourceCount: selected.length,
-    nodeCount: canonicalNodes.length,
-    edgeCount: canonicalEdges.length,
-    nodes: canonicalNodes,
-    edges: canonicalEdges,
+    // Fail closed: nodes and edges are withheld unless every selected source produced a COMPLETE scan.
+    nodeCount: errors.length === 0 ? canonicalNodes.length : 0,
+    edgeCount: errors.length === 0 ? canonicalEdges.length : 0,
+    withheldNodeCount: errors.length === 0 ? 0 : canonicalNodes.length,
+    withheldEdgeCount: errors.length === 0 ? 0 : canonicalEdges.length,
+    nodes: errors.length === 0 ? canonicalNodes : [],
+    edges: errors.length === 0 ? canonicalEdges : [],
     unresolvedEdgeCount: unresolved.length,
     unresolvedEdges: unresolved,
     errors,

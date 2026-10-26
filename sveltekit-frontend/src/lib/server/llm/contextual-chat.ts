@@ -1,7 +1,7 @@
 // src/lib/server/llm/contextual-chat.ts
 import { db } from '$lib/server/db/client';
 import { ragMessages } from '$lib/server/db/schema-postgres.js';
-import { callOllamaChat } from '$lib/server/ollama.js';
+import { callLlamaServerChat } from '$lib/server/ollama.js';
 import { extractKeywords } from '$lib/server/keyword-extractor.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
@@ -185,7 +185,7 @@ export async function contextualChat(params: ContextChatRequest): Promise<Contex
 	].join('\n');
 
 	// 3) Call Ollama (real implementation with circuit breaker + retry)
-	const answer = await callOllamaChat(systemPrompt, message);
+	const answer = await callLlamaServerChat(systemPrompt, message);
 
 	// 4) Extract keywords / key phrases using real Ollama-backed extractor
 	const extractionResult = await extractKeywords(`${message}\n\n${answer}`, 'chat');

@@ -46,9 +46,19 @@ export const graphSnapshotsV2 = pgTable('atlas_graph_snapshots_v2', {
   topologyHash: text('topology_hash').notNull(),
   policyHash: text('policy_hash').notNull(),
   eligibilityPredicate: text('eligibility_predicate').notNull(),
+  workspaceRevision: text('workspace_revision'),
+  sourceInventoryRevision: text('source_inventory_revision'),
+  graphRevision: text('graph_revision'),
+  identityContractVersion: text('identity_contract_version'),
+  parserContractVersion: text('parser_contract_version'),
+  revisionChecksum: text('revision_checksum'),
   createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
   finalizedAt: timestamp('finalized_at', { withTimezone: true, mode: 'string' }),
-});
+}, (table) => ({
+  workspaceRevisionIdx: index('atlas_graph_snapshots_v2_workspace_revision_idx').on(table.workspaceRevision, table.createdAt).where(sql`${table.workspaceRevision} IS NOT NULL`),
+  graphRevisionIdx: index('atlas_graph_snapshots_v2_graph_revision_idx').on(table.graphRevision, table.createdAt).where(sql`${table.graphRevision} IS NOT NULL`),
+  sourceInventoryRevisionIdx: index('atlas_graph_snapshots_v2_source_inventory_revision_idx').on(table.sourceInventoryRevision, table.createdAt).where(sql`${table.sourceInventoryRevision} IS NOT NULL`),
+}));
 
 export const graphNodesV2 = pgTable('atlas_graph_nodes_v2', {
   snapshotId: uuid('snapshot_id').notNull(),
@@ -58,6 +68,7 @@ export const graphNodesV2 = pgTable('atlas_graph_nodes_v2', {
   treeNodeId: uuid('tree_node_id'),
   sourceRef: text('source_ref'),
   contentHash: text('content_hash'),
+  sourceRevision: text('source_revision'),
   properties: jsonb('properties').default(sql`'{}'::jsonb`).notNull(),
 }, (table) => ({
   primaryKey: primaryKey({ columns: [table.snapshotId, table.nodeKey] }),
@@ -65,6 +76,9 @@ export const graphNodesV2 = pgTable('atlas_graph_nodes_v2', {
   nodeTypeIdx: index('atlas_graph_nodes_v2_node_type_idx').on(table.nodeType),
   treeNodeIdx: index('atlas_graph_nodes_v2_tree_node_idx').on(table.snapshotId, table.treeNodeId),
   packetIdx: index('atlas_graph_nodes_v2_packet_idx').on(table.snapshotId, table.packetKey),
+  snapshotTypeNodeIdx: index('atlas_graph_nodes_v2_snapshot_type_node_idx').on(table.snapshotId, table.nodeType, table.nodeKey),
+  snapshotSourceRefIdx: index('atlas_graph_nodes_v2_snapshot_source_ref_idx').on(table.snapshotId, table.sourceRef).where(sql`${table.sourceRef} IS NOT NULL`),
+  sourceRevisionIdx: index('atlas_graph_nodes_v2_source_revision_idx').on(table.snapshotId, table.sourceRevision).where(sql`${table.sourceRevision} IS NOT NULL`),
   snapshotFk: foreignKey({
     columns: [table.snapshotId],
     foreignColumns: [graphSnapshotsV2.snapshotId],
@@ -86,6 +100,8 @@ export const graphEdgesV2 = pgTable('atlas_graph_edges_v2', {
   primaryKey: primaryKey({ columns: [table.snapshotId, table.edgeKey] }),
   sourceIdx: index('atlas_graph_edges_v2_source_idx').on(table.snapshotId, table.sourceNodeKey),
   targetIdx: index('atlas_graph_edges_v2_target_idx').on(table.snapshotId, table.targetNodeKey),
+  forwardTypedIdx: index('atlas_graph_edges_v2_forward_typed_idx').on(table.snapshotId, table.sourceNodeKey, table.edgeType, table.targetNodeKey),
+  reverseTypedIdx: index('atlas_graph_edges_v2_reverse_typed_idx').on(table.snapshotId, table.targetNodeKey, table.edgeType, table.sourceNodeKey),
   snapshotFk: foreignKey({
     columns: [table.snapshotId],
     foreignColumns: [graphSnapshotsV2.snapshotId],
@@ -132,6 +148,7 @@ export const graphRelationParticipantsV2 = pgTable('atlas_graph_relation_partici
   primaryKey: primaryKey({ columns: [table.snapshotId, table.relationId, table.nodeKey, table.role] }),
   relationIdx: index('atlas_graph_relation_participants_v2_relation_idx').on(table.snapshotId, table.relationId),
   nodeIdx: index('atlas_graph_relation_participants_v2_node_idx').on(table.snapshotId, table.nodeKey),
+  nodeRoleIdx: index('atlas_graph_relation_participants_v2_node_role_idx').on(table.snapshotId, table.nodeKey, table.role, table.relationId),
   relationFk: foreignKey({
     columns: [table.snapshotId, table.relationId],
     foreignColumns: [graphRelationEventsV2.snapshotId, graphRelationEventsV2.relationId],

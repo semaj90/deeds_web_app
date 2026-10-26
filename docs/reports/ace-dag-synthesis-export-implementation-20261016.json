@@ -1,0 +1,54 @@
+{
+  "schema": "atlas.ace-dag-synthesis-export-implementation.v1",
+  "status": "LIVE_E2E_BLOCKED_AT_ACE_CONTEXT",
+  "created_at": "2026-10-16",
+  "likely_cause": "The recommendation workflow exposes ACE and DAG data separately, without a guarded JSON export that ties evidence to manifest-selected packet identities.",
+  "implementation": {
+    "export": "scripts/atlas/agentic-recommendation-workflow.mjs#buildAceDagSynthesisPacket",
+    "integration": "runRecommendationWorkflow returns and reports dag_synthesis_packet",
+    "guards": [
+      "ACE status must be ADMITTED",
+      "ContextManifest must exist and select packet keys",
+      "each exported card must match a selected packet key and include source_ref, tree_node_id, source_revision, and workspace_revision",
+      "source and workspace revisions must use sha256:<64 hex> shape",
+      "TOC references are contextual pointers, not evidence"
+    ],
+    "side_effects": {
+      "database_writes": 0,
+      "projection_writes": 0,
+      "model_invocations_by_exporter": 0,
+      "canonical_authority": false
+    }
+  },
+  "validation": {
+    "node_syntax_check": "PASS",
+    "focused_regression_test": "PASS",
+    "git_diff_check": "PASS",
+    "live_service_health": "TRACE MCP healthy; PostgreSQL and Redis dependencies reported healthy",
+    "direct_live_atlas_query": "HTTP 200; 3 bounded hits returned",
+    "live_ace_context": "BLOCKED; wrapper returned contextSource.kind=NONE, 0 cards, and no ContextManifest",
+    "live_ace_context_manifest_readback": "BLOCKED_NO_MANIFEST",
+    "live_source_revision_verification": "NOT_RUN",
+    "dag_synthesis_execution": "NOT_RUN",
+    "database_or_projection_writes": "NOT_RUN"
+  },
+  "live_export_result": {
+    "status": "BLOCKED",
+    "reasons": [
+      "ACE_CONTEXT_NOT_ADMITTED",
+      "CONTEXT_MANIFEST_MISSING",
+      "NO_MANIFEST_SELECTED_PACKET_KEYS",
+      "NO_EVIDENCE_BOUND_TO_MANIFEST"
+    ],
+    "exported_evidence_count": 0,
+    "writes_performed": false,
+    "model_invoked": false,
+    "canonical_authority": false
+  },
+  "evidence": [
+    "scripts/atlas/agentic-recommendation-workflow.mjs",
+    "scripts/atlas/agentic-recommendation-workflow.build-ace-evidence-blocks.test.mjs",
+    "docs/atlas/parent-atlas-table-of-contents.md"
+  ],
+  "next_gate": "Diagnose why build_agentic_rag_context returns contextSource.kind=NONE while direct atlas.query returns hits; then rerun one bounded read-only request and verify manifest selection plus current source/workspace revisions before enabling synthesis."
+}

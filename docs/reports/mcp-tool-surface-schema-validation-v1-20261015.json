@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.mcp-tool-surface-schema-validation.v1",
+  "observedAt": "2026-10-15T22:30:24.298Z",
+  "status": "LIVE_TRACE_SCHEMA_COMPILE_PASS",
+  "server": {
+    "url": "http://127.0.0.1:8788/mcp",
+    "transport": "streamable-http",
+    "httpStatus": 200,
+    "contentType": "text/event-stream"
+  },
+  "operation": "tools/list",
+  "toolCalls": 0,
+  "tools": {
+    "count": 193,
+    "uniqueNames": 193,
+    "duplicateNames": 0,
+    "toolsetSha256": "5024992e6d512be7d6c9355f95ad0e3452c6733f2f21914cdc55bc9aa0ea4199"
+  },
+  "inputSchemaValidation": {
+    "validator": "Ajv 8.20.0",
+    "draft7Compiled": 16,
+    "draft2020_12Compiled": 177,
+    "invalidSchemas": 0,
+    "schemaErrors": []
+  },
+  "duplicateRegistrationCheck": {
+    "toolName": "context.prefetch_feature_context",
+    "liveEntries": 1,
+    "liveSchemaSha256": "f66ef50330a55ac4bcfddfdacdc7bdd92855560de8708da0c85f2a8762d0cede",
+    "liveProperties": [
+      "activityLimit",
+      "includeAgentsMd",
+      "includeCommunity",
+      "includeNotecards",
+      "limit",
+      "path",
+      "query"
+    ],
+    "liveRequired": [
+      "limit",
+      "activityLimit",
+      "includeCommunity",
+      "includeNotecards",
+      "includeAgentsMd"
+    ],
+    "sourceMatches": "new_tools.ts schema; does not match the legacy inline TRACE block",
+    "sourceBuildIdentityVerified": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "limitations": [
+    "Validates advertised TRACE input schemas against their declared JSON Schema drafts; it does not validate semantic behavior or handler implementation.",
+    "Does not verify atlas-tools stdio, other MCP servers, static source-to-runtime parity, or the deployed TRACE source/build revision.",
+    "No tools/call request was made."
+  ]
+}

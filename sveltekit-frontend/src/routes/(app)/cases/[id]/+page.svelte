@@ -673,7 +673,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
        <EnhancedInlineEditor
          bind:value={caseDescription}
          placeholder="Type case description — AI suggestions appear as you type..."
-         aiModel="gemma4-legal"
+         aiModel="ornith-1.5-9b"
          enableAutoComplete={true}
          enableGrammarCheck={true}
          enableSemanticSuggestions={true}
@@ -724,12 +724,12 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
 
  <!-- Notes Modal (NES-styled) -->
  {#if showNotesPanel}
- <div class="nes-modal-backdrop" onclick={() => (showNotesPanel = false)} onkeydown={(e) => e.key === 'Escape' && (showNotesPanel = false)} role="dialog" aria-modal="true" aria-label="Case Notes" tabindex="-1">
-   <div class="nes-modal-container" onclick={(e) => e.stopPropagation()}>
+ <div class="nes-modal-backdrop" onclick={(e) => { if (e.target === e.currentTarget) showNotesPanel = false; }} onkeydown={(e) => e.key === 'Escape' && (showNotesPanel = false)} role="dialog" aria-modal="true" aria-label="Case Notes" tabindex="-1">
+   <div class="nes-modal-container">
      <div class="nes-modal-titlebar">
        <span class="nes-modal-label">[CASE_NOTES::TERMINAL]</span>
        <span class="nes-modal-id">{caseId.slice(0, 8)}</span>
-       <button class="nes-modal-close" onclick={() => (showNotesPanel = false)}>X</button>
+       <button type="button" class="nes-modal-close" onclick={() => (showNotesPanel = false)} aria-label="Close notes">X</button>
      </div>
      <div class="nes-modal-body">
        <CaseNotesEditor {caseId} onClose={() => showNotesPanel = false} />

@@ -1883,10 +1883,40 @@ Next gate: reviewer completion and sealed judgment-set validation.
 - [x] Reran the live-caller identity-envelope audit in read-only mode.
 - [x] Confirmed the route is reachable, but all `20/20` sampled callers lack
   the complete revision envelope.
-- [ ] Bind the existing RRF callers to canonical source/workspace/
+- [ ] [workstation-p15] Bind the existing RRF callers to canonical source/workspace/
   representation revisions through the current SearchRuntime owner; do not
-  create a second fusion or identity owner.
+  create a second fusion or identity owner. Defer creating or persisting revision
+  fields until after workstation P20; missing identity continues to fail closed.
 
 Status: `IDENTITY_ENVELOPE_PARTIAL`; `authority=false`; `writesPerformed=false`.
 Evidence: `docs/reports/rrf-real-caller-identity-envelope-v1.json`.
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+### P15 bounded SearchRuntime fusion proof cross-reference — 2026-10-16
+
+`docs/reports/p14-p15-p19-cache-fusion-policy-receipt-v1.json` records
+exact RRF arithmetic and one vote per logical lane for a two-candidate fixture
+through the existing `fuseSearchRuntimeCandidates` owner. This proves the
+bounded fusion contract, not live Postgres/Qdrant retrieval, canonical source
+and workspace revision qualification, caller coverage, or ContextManifest
+admission. RF5/RF6 and live identity-envelope gates remain open.
+
+### RRF legacy-caller migration preflight — 2026-10-17
+
+- [x] Reconfirmed the Svelte `search-fused` route performs a Legal-AI retrieval:
+  Qdrant `legal_documents` dense hits plus PostgreSQL `sparseLegalSearch`, with
+  configured 0.6/0.4 weights and its own response/timing contract.
+- [x] Reconfirmed the MCP repair tool ranks a different candidate shape across
+  Qdrant, lexical, semantic, AST, noun, and path signals with its own weights.
+- [ ] Do not replace either caller with the codebase `SearchRuntime` by import
+  alone. First define canonical IDs for each retrieval domain, map executor
+  aliases to one logical lane, and produce caller-specific output/parity tests
+  against the existing behavior. `fusion-core-v1` is a possible shared math
+  primitive, not yet proof that either adapter is identity-safe or equivalent.
+- [ ] Migrate callers only after the canonical identity envelope and bounded
+  caller replay pass; preserve endpoint contracts and one vote per logical lane.
+
+Evidence: `sveltekit-frontend/src/routes/api/rag/search-fused/+server.ts`,
+`sveltekit-frontend/src/mcp/tools/repair_tools.ts`,
+`sveltekit-frontend/src/lib/server/retrieval/fusion-core-v1.ts`, and the open
+identity-envelope tasks above. No caller was changed in this preflight.

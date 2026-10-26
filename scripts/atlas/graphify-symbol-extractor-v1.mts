@@ -17,6 +17,7 @@
  *       never the default path).
  *   .json  -> top-level/nested key structural extraction for authored/configuration documents;
  *             known generated/test snapshots are excluded by the versioned candidate-scope policy
+ *   .jsonl/.ndjson -> bounded record-span observations, never code-symbol identity
  *   .md    -> ATX heading structural extraction, nested by heading level
  *   .txt   -> zero symbols, marked PROCESSED (valid: opaque text has no structure to extract)
  * All file reads go through lib/source-text-envelope.mjs's SourceTextEnvelopeV1 (SOURCE-TEXT-
@@ -38,15 +39,20 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadEnvFiles, REPO_ROOT } from './connection-config.mjs';
-import { extractSymbolsFromSource } from '../graphify/lib/ts-ast-extractor.mjs';
+import { extractSymbolsFromSource, extractSymbolsFromSourceGuarded } from '../graphify/lib/ts-ast-extractor.mjs';
 import { extractJsonSymbols } from './lib/json-symbol-extractor.mjs';
+import { extractJsonlRecordNodesV1 } from './lib/jsonl-record-extractor-v1.mjs';
 import { JSON_SOURCE_SHAPE_POLICY_V1 } from './lib/json-source-shape-policy-v1.mjs';
 import { extractMarkdownSymbols, extractMarkdownFences } from './lib/markdown-symbol-extractor.mjs';
 import { requestDocumentSymbolsOnce, mapLspSymbolKind, fileUriFor } from './lib/lsp-client.mjs';
 import { decodeSourceTextEnvelope, decodedOffsetToRawByte, classifySourceKind, MARKDOWN_FENCE_LANGUAGE_TO_EXT } from './lib/source-text-envelope.mjs';
+import { loadSidecarLanguageAuthority, mapSidecarUtf8ByteOffset, resolveSourceParserRouteV1,
+  validateSidecarAstReceipt } from './lib/source-parser-route-v1.mjs';
+import { classifySidecarAstCompleteness, planToRouteDecisions, summarizeRouteRun, accountForSubmittedSources } from './lib/graphify-route-receipt-v1.mjs';
 import { writeAtlasAstNodes, indexSafeQualifiedSymbolV1 } from './lib/atlas-ast-nodes-writer.mjs';
-import { isGraphifySymbolExcludedArtifactV1, selectBoundedSupportedExtractorCandidates } from './lib/graphify-symbol-candidate-selection-v1.mjs';
-import { buildSymbolBatchPlan, validateSymbolBatchPlan, buildSymbolBaselineShards, selectLiveSymbolPlanRows, verifySymbolObservationReadback, requireSymbolBatchHeadroom, findSymbolIdentityConflicts, disambiguateSymbolOccurrenceKeysV1, disambiguateAstOccurrenceNamesV1 } from './lib/graphify-symbol-batch-plan-v1.mjs';
+import { isGraphifySymbolExcludedArtifactV2, selectBoundedSupportedExtractorCandidates } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { resolveSourceReadRootV1 } from './lib/source-read-root-v1.mjs';
+import { admitFrozenSymbolRunFileV1, buildSymbolBatchPlan, validateSymbolBatchPlan, buildSymbolBaselineShards, selectLiveSymbolPlanRows, verifySymbolObservationReadback, requireSymbolBatchHeadroom, findSymbolIdentityConflicts, disambiguateSymbolOccurrenceKeysV1, disambiguateAstOccurrenceNamesV1, requireWorkspaceAlignedGraphifyFileApplyV1 } from './lib/graphify-symbol-batch-plan-v1.mjs';
 
 type ExtractedSymbol = {
   kind: string;
@@ -83,9 +89,16 @@ const inputPlanPath = opt('--plan', '');
 const rebindPlanPath = opt('--rebind-plan', '');
 const shardIndex = Number(opt('--shard', '0'));
 const batches = Number(opt('--batches', '1'));
+const shardSize = Number(opt('--shard-size', '250'));
 const maxFilesPerRun = Number(opt('--max-files', '250'));
 const workspaceIdFilter = opt('--workspace-id', '');
 const workspaceRevisionFilter = opt('--workspace-revision', '');
+// Source bytes come from the working tree unless ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT names the admitted, materialized snapshot (fail-closed).
+const SOURCE_READ = resolveSourceReadRootV1({
+  repoRoot: REPO_ROOT, env: process.env, workspaceRevision: workspaceRevisionFilter,
+  admission: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT
+    ? JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'docs', 'reports', 'workspace-revision-tournament-admission-v1.json'), 'utf8')) : null,
+});
 const sourceRefsFilter = opt('--source-refs', '')
   .split(',')
   .map((s) => s.trim())
@@ -104,7 +117,8 @@ if (flag('--help') || flag('-h')) {
     '  --use-lsp                   Use the opt-in LSP symbol provider',
     '  --freeze-plan <path>        Freeze ALL exact-byte unprocessed refs; local artifacts only',
     '  --rebind-plan <old>         With --freeze-plan, revalidate the SAME cohort under new parser bytes',
-    '  --plan <path> --shard <n>    Run a fixed 1-based, 250-file shard (dry-run unless --apply)',
+    '  --plan <path> --shard <n>    Run a 1-based frozen shard (dry-run unless --apply)',
+    '  --shard-size <n>             Frozen shard size, 1..250 (default: 250)',
     '  --batches <n>               Consecutive frozen shards (default: 1, maximum: 64)',
     '  --max-files <n>             Maximum newly processed files per shard (1..250; resume same shard)',
     '  --apply                     Apply extraction writes (explicit)',
@@ -126,13 +140,15 @@ if (freezePlanPath || inputPlanPath) {
   if (rebindPlanPath && (!freezePlanPath || inputPlanPath)) throw new Error('SYMBOL_PLAN_REBIND_REQUIRES_FREEZE');
   if (useLsp) throw new Error('SYMBOL_BASELINE_REQUIRES_DETERMINISTIC_PARSER');
   if (!Number.isSafeInteger(batches) || batches < 1 || batches > 64
+    || !Number.isSafeInteger(shardSize) || shardSize < 1 || shardSize > 250
     || !Number.isSafeInteger(maxFilesPerRun) || maxFilesPerRun < 1 || maxFilesPerRun > 250) {
     throw new Error('SYMBOL_PLAN_BATCH_BOUNDS_INVALID');
   }
   if (inputPlanPath && (!Number.isSafeInteger(shardIndex) || shardIndex < 1)) {
     throw new Error('SYMBOL_PLAN_SHARD_REQUIRED');
   }
-} else if (args.includes('--shard') || args.includes('--batches') || args.includes('--max-files') || rebindPlanPath) {
+} else if (args.includes('--shard') || args.includes('--batches') || args.includes('--shard-size')
+  || args.includes('--max-files') || rebindPlanPath) {
   throw new Error('SYMBOL_PLAN_SHARD_REQUIRES_PLAN');
 }
 
@@ -148,8 +164,11 @@ function symbolPlanContext() {
     'scripts/atlas/graphify-symbol-extractor-v1.mts',
     'scripts/graphify/lib/ts-ast-extractor.mjs',
     'scripts/atlas/lib/json-symbol-extractor.mjs',
+    'scripts/atlas/lib/jsonl-record-extractor-v1.mjs',
+    'scripts/atlas/lib/json-source-shape-policy-v1.mjs',
     'scripts/atlas/lib/markdown-symbol-extractor.mjs',
     'scripts/atlas/lib/source-text-envelope.mjs',
+    'scripts/atlas/lib/source-parser-route-v1.mjs',
     'scripts/atlas/lib/atlas-ast-nodes-writer.mjs',
     'scripts/atlas/lib/graphify-symbol-candidate-selection-v1.mjs',
     'scripts/atlas/lib/graphify-symbol-batch-plan-v1.mjs',
@@ -159,6 +178,9 @@ function symbolPlanContext() {
     .update(fs.readFileSync(path.join(REPO_ROOT, name))).digest('hex')]);
   inputs.push(['typescript', createHash('sha256').update(fs.readFileSync(require.resolve('typescript'))).digest('hex')]);
   inputs.push(['node', process.version]);
+  if (sidecarLanguageAuthority) {
+    inputs.push(['sidecar-language-authority', JSON.stringify([...sidecarLanguageAuthority.entries()].sort(([a], [b]) => a.localeCompare(b)))]);
+  }
   return {
     workspaceRevision: workspaceRevisionFilter,
     sourceSnapshotChecksum: receipt.sourceSelectionChecksum,
@@ -178,16 +200,22 @@ const LSP_LANGUAGE_ID: Record<string, string> = {
   '.js': 'javascript', '.mjs': 'javascript', '.cjs': 'javascript', '.jsx': 'javascriptreact',
 };
 
-type FileKind = 'ts_js' | 'json' | 'markdown' | 'text' | 'unsupported';
+type FileKind = 'ts_js' | 'json' | 'jsonl' | 'markdown' | 'text' | 'sidecar_code' | 'unsupported';
+let sidecarLanguageAuthority: Map<string, { language: string; authorityRevision: string }> | null = null;
 
 function classify(sourceRef: string): FileKind {
-  if (isGraphifySymbolExcludedArtifactV1(sourceRef)) return 'unsupported';
+  if (isGraphifySymbolExcludedArtifactV2(sourceRef)) return 'unsupported';
   const kind = classifySourceKind(sourceRef);
   if (!kind) return 'unsupported';
   if (kind.documentKind === 'code') return 'ts_js';
   if (kind.documentKind === 'json') return 'json';
+  if (kind.documentKind === 'jsonl') return 'jsonl';
   if (kind.documentKind === 'markdown') return 'markdown';
   if (kind.documentKind === 'plaintext') return 'text';
+  if (kind.documentKind === 'sidecar_code') {
+    const route = resolveSourceParserRouteV1(sourceRef, sidecarLanguageAuthority);
+    return route.status === 'ROUTED' ? 'sidecar_code' : 'unsupported';
+  }
   return 'unsupported';
 }
 
@@ -367,6 +395,7 @@ type ExtractionResult = {
   astNodes: ExtractedSymbol[];
   /** Code symbols extracted from Markdown's own embedded fenced code -> graphify_symbols, with provenance. */
   embeddedCodeSymbols: Array<ExtractedSymbol & { provenance: Record<string, unknown> }>;
+  astParser?: { language: string; name: string; version: string; authorityRevision: string };
 };
 
 async function extractSymbolsForFile(absPath: string, sourceRef: string, kind: FileKind): Promise<ExtractionResult> {
@@ -383,12 +412,15 @@ async function extractSymbolsForFile(absPath: string, sourceRef: string, kind: F
   if (kind === 'ts_js') {
     const codeSymbols = useLsp
       ? await extractViaLsp(absPath, text, ext)
-      : (extractSymbolsFromSource(text, sourceRef) as ExtractedSymbol[]);
+      : (extractSymbolsFromSourceGuarded(text, sourceRef) as ExtractedSymbol[]);
     return { sourceDigest, codeSymbols: rawSpans(codeSymbols), astNodes: [], embeddedCodeSymbols: [] };
   }
   if (kind === 'json') {
     return { sourceDigest, codeSymbols: [], astNodes: rawSpans(extractJsonSymbols(text, sourceRef,
       { maxSymbols: JSON_SOURCE_SHAPE_POLICY_V1.maxObservationsPerFile }) as ExtractedSymbol[]), embeddedCodeSymbols: [] };
+  }
+  if (kind === 'jsonl') {
+    return { sourceDigest, codeSymbols: [], astNodes: await extractJsonlRecordNodesV1(envelope), embeddedCodeSymbols: [] };
   }
   if (kind === 'markdown') {
     const astNodes = extractMarkdownSymbols(text, sourceRef) as ExtractedSymbol[];
@@ -401,6 +433,50 @@ async function extractSymbolsForFile(absPath: string, sourceRef: string, kind: F
           [key, decodedOffsetToRawByte(envelope, Number(symbol.provenance[key]))])),
       },
     })) };
+  }
+  if (kind === 'sidecar_code') {
+    const route = resolveSourceParserRouteV1(sourceRef, sidecarLanguageAuthority);
+    if (route.status !== 'ROUTED' || route.parser !== 'sidecar-ast-chunk') {
+      throw new Error(`SIDECAR_ROUTE_UNAVAILABLE:${route.status}:${'reason' in route ? route.reason : ''}`);
+    }
+    const baseUrl = env.MINIFORGE_SIDECAR_URL || env.NLP_SIDECAR_URL || env.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
+    const response = await fetch(`${baseUrl.replace(/\/$/, '')}/ast/chunk`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ source: envelope.parserBuffer.toString('utf8'), language: route.language,
+        filePath: sourceRef, sourceRevision: sourceDigest }),
+      signal: AbortSignal.timeout(300000),
+    });
+    if (!response.ok) throw new Error(`SIDECAR_AST_HTTP_${response.status}`);
+    const body = await response.json() as any;
+    validateSidecarAstReceipt(body, { filePath: sourceRef, sourceRevision: sourceDigest, language: route.language });
+    // Fail closed: a partial or incomplete parse must not yield admitted structure or count as covered.
+    const completeness = classifySidecarAstCompleteness(body);
+    if (completeness.status !== 'COMPLETE') {
+      throw new Error(`SIDECAR_AST_NOT_COMPLETE:${completeness.status}:${completeness.reason ?? ''}`);
+    }
+    const parserBuffer = envelope.parserBuffer;
+    const mapParserByte = (offset: number): { decodedOffset: number; rawOffset: number } => {
+      const decodedOffset = mapSidecarUtf8ByteOffset(envelope.text, offset);
+      return { decodedOffset, rawOffset: decodedOffsetToRawByte(envelope, decodedOffset) };
+    };
+    const astNodes = body.chunks.map((chunk: any) => {
+      if (typeof chunk.kind !== 'string' || typeof chunk.node_type !== 'string'
+        || !Number.isInteger(chunk.start_line) || !Number.isInteger(chunk.end_line)
+        || chunk.end_line < chunk.start_line) throw new Error('SIDECAR_AST_CHUNK_INVALID');
+      const start = mapParserByte(chunk.start_byte);
+      const end = mapParserByte(chunk.end_byte);
+      if (start.rawOffset >= end.rawOffset) throw new Error('SIDECAR_AST_EMPTY_SPAN');
+      const text = envelope.text.slice(start.decodedOffset, end.decodedOffset);
+      const hash = createHash('sha256').update(Buffer.from(text, 'utf8')).digest('hex');
+      return { kind: chunk.kind, name: chunk.name || chunk.node_type,
+        start_byte: start.rawOffset, end_byte: end.rawOffset, start_line: chunk.start_line, end_line: chunk.end_line,
+        signature_text: text.slice(0, 400), hash: hash.slice(0, 12), ast_fingerprint: hash,
+        parent_chain: [] } satisfies ExtractedSymbol;
+    });
+    return { sourceDigest, codeSymbols: [], astNodes, embeddedCodeSymbols: [],
+      astParser: { language: route.language, name: body.engine, version: body.engine_version,
+        authorityRevision: route.authorityRevision } };
   }
   return { sourceDigest, codeSymbols: [], astNodes: [], embeddedCodeSymbols: [] }; // 'text' -- opaque, no structure to extract yet
 }
@@ -460,8 +536,8 @@ function expectedObservations(extraction: ExtractionResult, row: { file_id: stri
   const ast = toAstNodeInputs(extraction.astNodes, extraction.sourceDigest).map(node => ({
     node_kind: node.kind, qualified_symbol: indexSafeQualifiedSymbolV1(node.qualifiedSymbol),
     source_revision: row.source_revision, source_content_hash: extraction.sourceDigest,
-    parser_name: kind === 'json' ? 'json-symbol-extractor' : 'markdown-symbol-extractor',
-    parser_version: kind === 'json' ? 'json-symbol-extractor-v1' : 'markdown-symbol-extractor-v1',
+    parser_name: kind === 'json' ? 'json-symbol-extractor' : kind === 'jsonl' ? 'stream-jsonl-batches' : 'markdown-symbol-extractor',
+    parser_version: kind === 'json' ? 'json-symbol-extractor-v2' : kind === 'jsonl' ? 'stream-jsonl-batches-v1' : 'markdown-symbol-extractor-v1',
     start_byte: node.startByte, end_byte: node.endByte,
   }));
   return { symbols, ast };
@@ -507,15 +583,17 @@ function diskHeadroom() {
 }
 
 async function main(currentShard = shardIndex) {
+  const sidecarUrl = env.MINIFORGE_SIDECAR_URL || env.NLP_SIDECAR_URL || env.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
+  sidecarLanguageAuthority = await loadSidecarLanguageAuthority(sidecarUrl);
   const planContext = freezePlanPath || inputPlanPath ? symbolPlanContext() : null;
   const frozenPlan = inputPlanPath
     ? validateSymbolBatchPlan(JSON.parse(fs.readFileSync(path.resolve(REPO_ROOT, inputPlanPath), 'utf8')), planContext)
     : null;
   const previousPlan = rebindPlanPath ? JSON.parse(fs.readFileSync(path.resolve(REPO_ROOT, rebindPlanPath), 'utf8')) : null;
   if (previousPlan) validateSymbolBatchPlan(previousPlan, { ...planContext, producerRevision: previousPlan.producerRevision });
-  const shard = frozenPlan ? buildSymbolBaselineShards(frozenPlan).shards[currentShard - 1] : null;
+  const shard = frozenPlan ? buildSymbolBaselineShards(frozenPlan, shardSize).shards[currentShard - 1] : null;
   if (frozenPlan && !shard) throw new Error('SYMBOL_PLAN_SHARD_OUT_OF_RANGE');
-  if (frozenPlan && shardIndex + batches - 1 > buildSymbolBaselineShards(frozenPlan).shards.length) {
+  if (frozenPlan && shardIndex + batches - 1 > buildSymbolBaselineShards(frozenPlan, shardSize).shards.length) {
     throw new Error('SYMBOL_PLAN_BATCH_RANGE_OUT_OF_BOUNDS');
   }
   const plannedRows = previousPlan?.rows ?? (shard ? frozenPlan.rows.slice(shard.offset, shard.offset + shard.maxFiles) : null);
@@ -579,7 +657,7 @@ async function main(currentShard = shardIndex) {
 
   const checkCurrentSourceBytes = workspaceRevisionFilter
     ? (row: { source_ref: string; source_revision: string }): boolean | 'MISSING' | 'READ_ERROR' => {
-      const absPath = path.join(REPO_ROOT, row.source_ref);
+      const absPath = path.join(SOURCE_READ.root, row.source_ref);
       if (!fs.existsSync(absPath)) return 'MISSING';
       try {
         return sourceDigestForFile(absPath) === row.source_revision;
@@ -601,6 +679,19 @@ async function main(currentShard = shardIndex) {
     } : null);
   const supportedRows = selection.candidates;
   const skippedUnsupported = selection.skippedUnsupported;
+  const unsupportedRouteCounts: Record<string, number> = {};
+  const unsupportedRouteSample: Array<{ sourceRef: string; status: string; reason: string }> = [];
+  for (const row of candidates.rows) {
+    if (classify(row.source_ref) !== 'unsupported') continue;
+    const route = isGraphifySymbolExcludedArtifactV2(row.source_ref)
+      ? { status: 'EXCLUDED_BY_SCOPE_POLICY', reason: 'EXCLUDED_BY_SCOPE_POLICY' }
+      : resolveSourceParserRouteV1(row.source_ref, sidecarLanguageAuthority);
+    const reason = 'reason' in route ? route.reason : route.status;
+    const key = `${route.status}:${reason}`;
+    unsupportedRouteCounts[key] = (unsupportedRouteCounts[key] ?? 0) + 1;
+    if (unsupportedRouteSample.length < 100) unsupportedRouteSample.push({ sourceRef: row.source_ref,
+      status: route.status, reason });
+  }
 
   if (freezePlanPath) {
     if (previousPlan && supportedRows.length !== previousPlan.rowCount) {
@@ -615,7 +706,7 @@ async function main(currentShard = shardIndex) {
     if (fs.existsSync(output) || fs.existsSync(shardsPath)) throw new Error('SYMBOL_PLAN_OUTPUT_EXISTS');
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, JSON.stringify(manifest, null, 2) + '\n', { flag: 'wx' });
-    const shards = buildSymbolBaselineShards(manifest);
+    const shards = buildSymbolBaselineShards(manifest, shardSize);
     fs.writeFileSync(shardsPath, JSON.stringify(shards, null, 2) + '\n', { flag: 'wx' });
     fs.writeFileSync(`${output}.freeze.json`, JSON.stringify({
       schema: 'atlas.graphify-symbol-baseline-freeze.v1', generatedAt: new Date().toISOString(),
@@ -645,18 +736,22 @@ async function main(currentShard = shardIndex) {
       | 'PROCESSED_STRUCTURE_ONLY' | 'PROCESSED_NO_EVIDENCE' | 'READBACK_FAILED'
       | 'WRITE_FAILED_ROLLED_BACK' | 'COMMIT_OUTCOME_UNKNOWN';
     symbolCount?: number;
+    routeLanguage?: string | null;
+    sourceBytes?: number;
     error?: string;
   }> = [];
 
   let totalSymbolsExtracted = 0;
   let totalSymbolsInserted = 0;
   let filesProcessed = 0;
+  let filesAttempted = 0;
   let filesFailed = 0;
   const byFileKind: Record<string, number> = {};
   const workspaceRevisions = new Set(supportedRows.map(({ row }) => row.workspace_revision).filter(Boolean));
   const graphifyWorkspaceRevisionMismatchCount = supportedRows.filter(({ row }) =>
     Boolean(workspaceRevisionFilter) && row.graphify_workspace_revision !== workspaceRevisionFilter,
   ).length;
+  requireWorkspaceAlignedGraphifyFileApplyV1({ apply, workspaceRevisionMismatchCount: graphifyWorkspaceRevisionMismatchCount });
   let sourceRevisionMismatchCount = 0;
   let fatalError: string | null = null;
   const readbacks: Array<Record<string, unknown>> = [];
@@ -666,13 +761,17 @@ async function main(currentShard = shardIndex) {
   if (apply && frozenPlan) availableBytes = diskHeadroom();
   for (const { row, kind } of supportedRows) {
     byFileKind[kind] = (byFileKind[kind] ?? 0) + 1;
-    const absPath = path.join(REPO_ROOT, row.source_ref);
-    if (frozenPlan && apply && row.parse_status !== 'PROCESSED' && filesProcessed >= maxFilesPerRun) {
+    const absPath = path.join(SOURCE_READ.root, row.source_ref);
+    const admission = frozenPlan
+      ? admitFrozenSymbolRunFileV1(row.parse_status, filesAttempted, maxFilesPerRun)
+      : null;
+    if (admission && !admission.admitted) {
       plan.push({ fileId: row.file_id, sourceRef: row.source_ref, sourceRevision: row.source_revision,
         workspaceRevision: row.workspace_revision, graphifyWorkspaceRevision: row.graphify_workspace_revision,
         workspaceRevisionMatches: true, fileKind: kind, outcome: 'NOT_ATTEMPTED_RUN_LIMIT' });
       continue;
     }
+    if (admission) filesAttempted = admission.attemptedFiles;
     if (!fs.existsSync(absPath)) {
       plan.push({
         fileId: row.file_id, sourceRef: row.source_ref, workspaceRevision: row.workspace_revision,
@@ -761,6 +860,7 @@ async function main(currentShard = shardIndex) {
       sourceRevision: row.source_revision,
       sourceDigest: extraction.sourceDigest,
       fileKind: kind, outcome: 'WOULD_EXTRACT', symbolCount: totalCount,
+      routeLanguage: extraction.astParser?.language ?? null,
     });
     totalSymbolsExtracted += totalCount;
 
@@ -902,14 +1002,14 @@ async function main(currentShard = shardIndex) {
 
       // Document structure (json/markdown headings) -> atlas_ast_nodes, never graphify_symbols.
       if (astNodes.length > 0) {
-        const parserLanguage = kind === 'json' ? 'json' : 'markdown';
-        const parserName = kind === 'json' ? 'json-symbol-extractor' : 'markdown-symbol-extractor';
+        const parserLanguage = extraction.astParser?.language ?? (kind === 'json' ? 'json' : kind === 'jsonl' ? 'jsonl' : 'markdown');
+        const parserName = extraction.astParser?.name ?? (kind === 'json' ? 'json-symbol-extractor' : kind === 'jsonl' ? 'stream-jsonl-batches' : 'markdown-symbol-extractor');
         // parser_version on graphify_files describes an older inventory observation, not this
         // extractor run. Record the actual producer revision unconditionally; never inherit a
         // stale-but-non-null version from the legacy row.
-        const parserVersion = kind === 'json'
-          ? 'json-symbol-extractor-v1'
-          : 'markdown-symbol-extractor-v1';
+        const parserVersion = extraction.astParser
+          ? `${extraction.astParser.name}@${extraction.astParser.version};authority=${extraction.astParser.authorityRevision}`
+          : kind === 'json' ? 'json-symbol-extractor-v2' : kind === 'jsonl' ? 'stream-jsonl-batches-v1' : 'markdown-symbol-extractor-v1';
         const { inserted } = await writeAtlasAstNodes(client, {
           sourceRef: row.source_ref,
           parserLanguage,
@@ -973,8 +1073,26 @@ async function main(currentShard = shardIndex) {
   const shardCompletionProven = Boolean(memberChecks?.length && !fatalError
     && memberChecks.every(entry => entry.readbackProven));
 
+  let exactStatusByRef = new Map<string, string>();
+  if (sourceRefsFilter.length && workspaceRevisionFilter) {
+    // Read-only lookup: exact-revision graphify row status for each submitted source at the admitted revision.
+    const exact = await pool.query<{ source_ref: string; parse_status: string }>(
+      `SELECT g.source_ref, g.parse_status FROM graphify_files g
+       JOIN atlas_workspace_source_bindings b
+         ON b.canonical_source_ref = g.source_ref AND b.source_revision = g.code_source_revision
+       WHERE b.repo_id = 'deeds-web-app' AND b.workspace_revision = $1 AND g.source_ref = ANY($2::text[])`,
+      [workspaceRevisionFilter, sourceRefsFilter],
+    );
+    exactStatusByRef = new Map(exact.rows.map(row => [row.source_ref, row.parse_status]));
+  }
+  const routeReceipt = {
+    ...summarizeRouteRun(planToRouteDecisions(plan)),
+    accounting: sourceRefsFilter.length
+      ? accountForSubmittedSources(sourceRefsFilter, plan, unsupportedRouteSample, exactStatusByRef) : null,
+  };
   const report = {
     schema: 'atlas.graphify-symbol-extractor-receipt.v1',
+    routeReceipt,
     frozenManifestChecksum: frozenPlan?.planChecksum ?? null,
     shard,
     frozenMemberChecks: memberChecks,
@@ -983,6 +1101,7 @@ async function main(currentShard = shardIndex) {
     fatalError,
     availableBytes,
     maxFilesPerRun,
+    shardSize: frozenPlan ? shardSize : null,
     readbacks,
     generatedAt: new Date().toISOString(),
     apply,
@@ -991,6 +1110,8 @@ async function main(currentShard = shardIndex) {
     workspaceIdFilter: workspaceIdFilter || null,
     workspaceRevisionFilter: workspaceRevisionFilter || null,
     admissionMode: workspaceRevisionFilter ? 'CANONICAL_WORKSPACE_SOURCE_BINDING' : 'GRAPHIFY_OBSERVATION_ONLY',
+    sourceReadMode: SOURCE_READ.mode,
+    sourceReadSnapshotRevision: SOURCE_READ.snapshotRevision,
     workspaceRevisionCount: workspaceRevisions.size,
     graphifyWorkspaceRevisionMismatchCount,
     sourceRevisionMismatchCount,
@@ -1003,8 +1124,11 @@ async function main(currentShard = shardIndex) {
     sourceRevisionRejectSample: selection.sourceRevisionRejectSample,
     candidatesConsidered: supportedRows.length,
     skippedUnsupported,
+    unsupportedRouteCounts,
+    unsupportedRouteSample,
     byFileKind,
     filesProcessed,
+    filesAttempted,
     filesFailed,
     totalSymbolsExtracted,
     totalSymbolsInserted: apply ? totalSymbolsInserted : null,
@@ -1045,10 +1169,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const summary = {
         schema: 'atlas.graphify-symbol-baseline-run.v1', generatedAt: new Date().toISOString(),
         manifestChecksum: reports[0].frozenManifestChecksum, manifestRowCount: manifest.rowCount,
-        workspaceRevision: workspaceRevisionFilter, apply, firstShard: shardIndex, requestedBatches: batches,
+        workspaceRevision: workspaceRevisionFilter, apply, firstShard: shardIndex, requestedBatches: batches, shardSize,
         visitedMembers: members.length, independentlyVerifiedMembers: verified, fullManifestVisited,
         baselineSealProven: fullManifestVisited && verified === manifest.rowCount
           && reports.every(report => report.shardCompletionProven),
+        filesAttemptedThisRun: reports.reduce((n, report) => n + report.filesAttempted, 0),
         filesCommittedThisRun: reports.reduce((n, report) => n + report.filesProcessed, 0),
         outcomeCounts, receipts: reports.map(report => report.reportPath),
         canonicalAuthority: false, projectionAdmissionPromoted: false,

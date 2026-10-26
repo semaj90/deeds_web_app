@@ -131,20 +131,29 @@ export const atlasCallableSearch = pgTable('atlas_callable_search', {
 
 export const atlasStructuralReferenceResolutions = pgTable('atlas_structural_reference_resolutions', {
   referenceId: text('reference_id').primaryKey(),
+  sourceRef: text('source_ref'),
+  workspaceRevision: text('workspace_revision'),
   sourceStableSymbolId: text('source_stable_symbol_id'),
   targetStableSymbolId: text('target_stable_symbol_id'),
+  upstreamSourceNodeId: text('upstream_source_node_id'),
+  upstreamTargetNodeId: text('upstream_target_node_id'),
+  upstreamChunkId: text('upstream_chunk_id'),
   referenceKind: text('reference_kind').notNull(),
   targetText: text('target_text').notNull(),
+  captures: jsonb('captures').notNull().default(sql`'{}'::jsonb`),
   resolutionStatus: text('resolution_status').notNull(),
   resolutionBasis: text('resolution_basis').notNull(),
   sourceRevision: text('source_revision').notNull(),
   evidenceRefs: jsonb('evidence_refs').notNull().default(sql`'[]'::jsonb`),
   producerRevision: text('producer_revision').notNull(),
+  extractor: text('extractor'),
+  extractorRevision: text('extractor_revision'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => ({
   sourceIdx: index('idx_atlas_reference_resolution_source').on(t.sourceStableSymbolId),
   targetIdx: index('idx_atlas_reference_resolution_target').on(t.targetStableSymbolId),
+  workspaceSourceIdx: index('idx_atlas_reference_resolution_workspace_source').on(t.workspaceRevision, t.sourceRef),
 }));
 
 /**

@@ -3,10 +3,10 @@
  *
  * Root cause this contract fixes (docs/reports/tree-node-occurrence-producer-census-v1.json): the earliest live
  * producer of `ast-entities.jsonl`, `scripts/atlas/run-ast-entity-prefill-yaml.mjs`, built each declaration row via
- * `{ ...packet, symbol_name, start_byte, end_byte, ... }` -- the `...packet` spread carries the PACKET's single
- * `tree_node_id` into EVERY declaration row extracted from that packet's file, verbatim, unoverridden. A file with N
- * declarations produced N rows sharing ONE tree_node_id. This is a FILE-SCOPED identifier value flowing through a
- * field that must be DECLARATION-SCOPED.
+ * `{ ...packet, symbol_name, start_byte, end_byte, ... }` -- the `...packet` spread carried the PACKET's single
+ * `tree_node_id` into EVERY declaration row extracted from that packet's file. Declaration occurrence IDs now use
+ * `tree_node_occurrence_id`; packet hierarchy identity is preserved separately as `packet_tree_node_id`. The
+ * ambiguous legacy `tree_node_id` alias is no longer emitted by the prefill pipeline.
  *
  * Never conflate with (per the S01-08G design, restated here since it names the same axes):
  *   stableFileId          -- logical file lifecycle identity (S01-08, not yet built)

@@ -432,11 +432,12 @@
 
               <!-- Tags -->
               <div class="space-y-1">
-                <label class="block text-sm font-medium text-sand/80">Tags</label>
+                <label for="evidence-tag-input" class="block text-sm font-medium text-sand/80">Tags</label>
                 <div class="space-y-2">
                   {#if !isReadonly}
                     <div class="flex gap-2">
                       <input
+                        id="evidence-tag-input"
                         type="text"
                         bind:value={tagInput}
                         placeholder="Add tag"
@@ -460,7 +461,7 @@
                           #{tag}
                           {#if !isReadonly}
                             <button
-                              onclick={() => removeTag(tag)}
+                              onclick={() => removeTag(tag)} aria-label={`Remove tag ${tag}`}
                               class="hover:text-danger transition-colors"
                             >
                               <span class="i-lucide-x w-3 h-3 inline-block"></span>
@@ -479,7 +480,7 @@
               <!-- File Upload -->
               {#if !isReadonly}
                 <div class="space-y-1">
-                  <label class="block text-sm font-medium text-sand/80">File Upload</label>
+                  <span class="block text-sm font-medium text-sand/80">File Upload</span>
                   <div
                     class="crud-upload-zone"
                     class:dragging={dragOver}
@@ -529,7 +530,7 @@
               <!-- AI Analysis -->
               <div class="space-y-1">
                 <div class="flex items-center justify-between">
-                  <label class="block text-sm font-medium text-sand/80">AI Analysis</label>
+                  <span class="block text-sm font-medium text-sand/80">AI Analysis</span>
                   {#if !isReadonly}
                     <Button
                       variant="ghost"
@@ -587,7 +588,7 @@
               <!-- Metadata -->
               {#if evidence.metadata && Object.keys(evidence.metadata).length > 0}
                 <div class="space-y-1">
-                  <label class="block text-sm font-medium text-sand/80">Metadata</label>
+                  <span class="block text-sm font-medium text-sand/80">Metadata</span>
                   <div class="p-3 bg-sand/5 rounded-md border border-sand/20 overflow-auto max-h-40">
                     <pre class="text-xs text-sand/80 whitespace-pre-wrap">{JSON.stringify(evidence.metadata, null, 2)}</pre>
                   </div>

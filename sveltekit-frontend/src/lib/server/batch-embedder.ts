@@ -1,6 +1,6 @@
 /**
  * Batch embedding service with automatic batching window
- * Accumulates embedding requests and sends them in batches to Ollama
+ * Accumulates embedding requests and sends batches through the shared provider
  *
  * Benefits:
  * - 32x faster for batch operations (GPU parallelism)
@@ -8,10 +8,7 @@
  * - Better GPU utilization
  */
 
-import { ENV } from './env.server.js';
-import { getCachedEmbedding, cacheEmbedding, batchGetCachedEmbeddings, batchCacheEmbeddings } from './embedding-cache.js';
-import { traceEmbedding } from '$lib/server/observability/langfuse.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 
 const BATCH_SIZE = 32;
 const BATCH_TIMEOUT_MS = 50; // 50ms batching window
@@ -32,10 +29,6 @@ class BatchEmbedder {
 	 * @returns 768-dim Float32Array embedding
 	 */
 	async embed(text: string): Promise<Float32Array> {
-		// Check cache first
-		const cached = await getCachedEmbedding(text);
-		if (cached) return cached;
-
 		// Queue for batching
 		return new Promise((resolve, reject) => {
 			this.queue.push({ text, resolve, reject });
@@ -58,47 +51,7 @@ class BatchEmbedder {
 	async embedBatch(texts: string[]): Promise<Float32Array[]> {
 		if (texts.length === 0) return [];
 
-		// Check cache for all texts
-		const cachedEmbeddings = await batchGetCachedEmbeddings(texts);
-		const uncachedIndices: number[] = [];
-		const uncachedTexts: string[] = [];
-
-		cachedEmbeddings.forEach((cached, i) => {
-			if (!cached) {
-				uncachedIndices.push(i);
-				uncachedTexts.push(texts[i]);
-			}
-		});
-
-		// If all cached, return early
-		if (uncachedTexts.length === 0) {
-			return cachedEmbeddings as Float32Array[];
-		}
-
-		// Fetch uncached embeddings from Ollama
-		const freshEmbeddings = await this.fetchFromOllama(uncachedTexts);
-
-		// Cache new embeddings
-		await batchCacheEmbeddings(
-			uncachedTexts.map((text, i) => ({
-				text,
-				embedding: freshEmbeddings[i]
-			}))
-		);
-
-		// Merge cached + fresh
-		const results: Float32Array[] = [];
-		let freshIndex = 0;
-
-		for (let i = 0; i < texts.length; i++) {
-			if (cachedEmbeddings[i]) {
-				results.push(cachedEmbeddings[i]!);
-			} else {
-				results.push(freshEmbeddings[freshIndex++]);
-			}
-		}
-
-		return results;
+		return this.fetchFromProvider(texts);
 	}
 
 	/**
@@ -114,15 +67,7 @@ class BatchEmbedder {
 		if (batch.length === 0) return;
 
 		try {
-			const embeddings = await this.fetchFromOllama(batch.map((req) => req.text));
-
-			// Cache all embeddings
-			await batchCacheEmbeddings(
-				batch.map((req, i) => ({
-					text: req.text,
-					embedding: embeddings[i]
-				}))
-			);
+			const embeddings = await this.fetchFromProvider(batch.map((req) => req.text));
 
 			// Resolve all promises
 			for (let i = 0; i < batch.length; i++) {
@@ -137,29 +82,11 @@ class BatchEmbedder {
 	}
 
 	/**
-	 * Fetch embeddings from Ollama (no caching)
+	 * Generate through the shared identity-qualified provider/cache contract.
 	 */
-	private async fetchFromOllama(texts: string[]): Promise<Float32Array[]> {
-		const model = 'embeddinggemma:latest';
-		return traceEmbedding(`[batch:${texts.length}]`, model, async () => {
-			const response = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model,
-					input: texts
-				})
-			});
-
-			if (!response.ok) {
-				throw new Error(`Ollama embedding failed: ${response.statusText}`);
-			}
-
-			const data = await response.json();
-			const embeddings = data.embeddings as number[][];
-
-			return embeddings.map((arr) => new Float32Array(arr));
-		});
+	private async fetchFromProvider(texts: string[]): Promise<Float32Array[]> {
+		const result = await generateEmbeddings(texts);
+		return result.vectors.map((embedding) => new Float32Array(embedding));
 	}
 
 	/**

@@ -117,7 +117,7 @@
 
 	<section class="controls">
 		<div class="control-group">
-			<label>Size</label>
+			<span class="control-label">Size</span>
 			<div class="pill-row">
 				{#each sizes as s}
 					<button class="pill" class:active={selectedSize === s} onclick={() => selectedSize = s}>{s}px</button>
@@ -125,7 +125,7 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label>Glow</label>
+			<span class="control-label">Glow</span>
 			<div class="pill-row">
 				{#each colors as c}
 					<button
@@ -139,8 +139,8 @@
 			</div>
 		</div>
 		<div class="control-group search-group">
-			<label>Filter</label>
-			<input type="text" class="search-input" placeholder="Search icons..." bind:value={searchQuery} />
+			<label for="celestial-filter">Filter</label>
+			<input id="celestial-filter" type="text" class="search-input" placeholder="Search icons..." bind:value={searchQuery} />
 		</div>
 	</section>
 
@@ -340,7 +340,7 @@
 		z-index: 1;
 	}
 	.control-group { display: flex; flex-direction: column; gap: 0.4rem; }
-	.control-group label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }
+	.control-group label, .control-group .control-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }
 	.pill-row { display: flex; gap: 0.35rem; }
 	.pill {
 		background: rgba(255,255,255,0.05);

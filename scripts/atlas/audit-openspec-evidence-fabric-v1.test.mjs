@@ -71,6 +71,7 @@ test('requires complete uniquely identified assertions before a PROVEN receipt c
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ expectedAssertions: [], actualAssertions: [] })), /proven requires assertions/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'other', passed: true }] })), /assertion identity mismatch/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'assert-1', passed: false }] })), /unsatisfied assertion/);
+  assert.throws(() => buildEvidenceReceiptV1(receiptInput({ independentVerifier: undefined, verifier: 'legacy-self-attestation' })), /independent verifier required/);
 });
 
 test('verifies receipt checksum before report-output association', () => {
@@ -401,15 +402,27 @@ test('promotes only an exact current receipt and marks it stale after task-sourc
   assert.equal(proven.evidenceMatches[0].actualAssertions[0].claimRef, 'predicate-abc');
   assert.equal(proven.evidenceMatches[0].sourceRefsCurrent, true);
 
+  const unrelatedTasksFile = path.join(root, 'openspec', 'changes', 'change-b', 'tasks.md');
+  fs.mkdirSync(path.dirname(unrelatedTasksFile), { recursive: true });
+  fs.writeFileSync(unrelatedTasksFile, '- [ ] **XYZ-1** unrelated ledger item\n');
+  const unrelatedLedgerEdit = buildPortfolioCensus(root);
+  assert.equal(unrelatedLedgerEdit.summary.checkedWithEvidence, 0);
+  assert.equal(unrelatedLedgerEdit.summary.taskLocalEvidenceCandidateReceipts, 1);
+  assert.equal(unrelatedLedgerEdit.summary.tasksWithTaskLocalEvidenceCandidates, 1);
+  assert.equal(unrelatedLedgerEdit.evidenceCards[0].proofState, 'STALE');
+  assert.equal(unrelatedLedgerEdit.evidenceMatches[0].workspaceCurrent, false);
+
   fs.writeFileSync(implementationPath, 'export const answer = 43;\n');
   const staleImplementation = buildPortfolioCensus(root);
   assert.equal(staleImplementation.summary.staleEvidenceCount, 1);
+  assert.equal(staleImplementation.summary.taskLocalEvidenceCandidateReceipts, 0);
   assert.equal(staleImplementation.evidenceCards[0].proofState, 'STALE');
   assert.equal(staleImplementation.evidenceMatches[0].sourceRefsCurrent, false);
 
   fs.writeFileSync(tasksFile, '- [x] **ABC-1** implement the revised contract\n');
   const stale = buildPortfolioCensus(root);
   assert.equal(stale.summary.staleEvidenceCount, 1);
+  assert.equal(stale.summary.taskLocalEvidenceCandidateReceipts, 0);
   assert.equal(stale.evidenceCards[0].proofState, 'STALE');
   assert.equal(stale.evidenceCards[0].sourceRevision, `sha256:${crypto.createHash('sha256').update(fs.readFileSync(tasksFile)).digest('hex')}`);
   assert.equal(stale.evidenceCards[0].proofUsable, false);

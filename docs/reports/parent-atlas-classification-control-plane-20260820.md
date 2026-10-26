@@ -13,9 +13,9 @@ This tranche integrates classification into existing Parent Atlas owners without
 - deterministic structural code-role classifier
 - classifier-to-existing-candidate-feature compiler
 - classifier-to-existing-HMM sequence bridge
-- ambiguity-gated CrossEncoder escalation using the existing `rerankWithMarco()` endpoint
+- ambiguity-gated CrossEncoder escalation using the existing `rerankWithembeddingemma()` endpoint
 - `atlas.classification-control-plane.v1` orchestrator
-- EmbeddingGemma intent/domain challenger manifest; current MiniLM default remains unchanged
+- EmbeddingGemma intent/domain challenger manifest; current MiniLM has been retired.
 - focused contract tests
 
 ## Authority rules
@@ -83,4 +83,4 @@ Then run the existing HMM smoke separately:
 node ..\scripts\atlas\smoke-hmm-error.mjs
 ```
 
-A later classifier fixture should compare MiniLM intent baseline against EmbeddingGemma MRL 128/256/512/768 on the same frozen labels before changing `DEFAULT_INTENT_ENCODER_MANIFEST`.
+A later classifier fixture should compare embeddingemma 2 intent baseline against EmbeddingGemma MRL 128/256/512/768 on the same frozen labels before changing `DEFAULT_INTENT_ENCODER_MANIFEST`.

@@ -1,0 +1,470 @@
+{
+  "schema": "atlas.ace-vectorized-packet.v1",
+  "featureLabel": "chat",
+  "tokenBudget": 4096,
+  "queryCoordinates": [
+    5.0,
+    5.0,
+    0.2,
+    0.85
+  ],
+  "selectedCount": 50,
+  "sourceRefs": [
+    "src/components/chat/component_2.svelte",
+    "src/components/chat/component_34.svelte",
+    "src/components/chat/component_68.svelte",
+    "src/components/chat/component_59.svelte",
+    "src/components/chat/component_38.svelte",
+    "src/components/chat/component_73.svelte",
+    "src/components/chat/component_99.svelte",
+    "src/components/chat/component_12.svelte",
+    "src/components/chat/component_80.svelte",
+    "src/components/chat/component_16.svelte",
+    "src/components/chat/component_95.svelte",
+    "src/components/chat/component_53.svelte",
+    "src/components/chat/component_79.svelte",
+    "src/components/chat/component_60.svelte",
+    "src/components/chat/component_57.svelte",
+    "src/components/chat/component_10.svelte",
+    "src/components/chat/component_32.svelte",
+    "src/components/chat/component_24.svelte",
+    "src/components/chat/component_20.svelte",
+    "src/components/chat/component_46.svelte",
+    "src/components/chat/component_94.svelte",
+    "src/components/chat/component_40.svelte",
+    "src/components/chat/component_78.svelte",
+    "src/components/chat/component_96.svelte",
+    "src/components/chat/component_43.svelte",
+    "src/components/chat/component_19.svelte",
+    "src/components/chat/component_88.svelte",
+    "src/components/chat/component_18.svelte",
+    "src/components/chat/component_18.svelte",
+    "src/components/chat/component_16.svelte",
+    "src/components/chat/component_47.svelte",
+    "src/components/chat/component_37.svelte",
+    "src/components/chat/component_68.svelte",
+    "src/components/chat/component_55.svelte",
+    "src/components/chat/component_4.svelte",
+    "src/components/chat/component_35.svelte",
+    "src/components/chat/component_29.svelte",
+    "src/components/chat/component_32.svelte",
+    "src/components/chat/component_94.svelte",
+    "src/components/chat/component_93.svelte",
+    "src/components/chat/component_93.svelte",
+    "src/components/chat/component_69.svelte",
+    "src/components/chat/component_68.svelte",
+    "src/components/chat/component_54.svelte",
+    "src/components/chat/component_43.svelte",
+    "src/components/chat/component_74.svelte",
+    "src/components/chat/component_84.svelte",
+    "src/components/chat/component_91.svelte",
+    "src/components/chat/component_85.svelte",
+    "src/components/chat/component_37.svelte"
+  ],
+  "candidates": [
+    {
+      "chunk_id": "chunk_047102",
+      "source_ref": "src/components/chat/component_2.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 1.3630189895629883,
+      "rank_score": 0.7629114985466003,
+      "grade_score": 0.9893941283226013
+    },
+    {
+      "chunk_id": "chunk_009834",
+      "source_ref": "src/components/chat/component_34.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 2.106511354446411,
+      "rank_score": 0.7180926203727722,
+      "grade_score": 0.9822179079055786
+    },
+    {
+      "chunk_id": "chunk_026268",
+      "source_ref": "src/components/chat/component_68.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 2.0781655311584473,
+      "rank_score": 0.7139259576797485,
+      "grade_score": 0.9732972979545593
+    },
+    {
+      "chunk_id": "chunk_018359",
+      "source_ref": "src/components/chat/component_59.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 0.843616247177124,
+      "rank_score": 0.7060267925262451,
+      "grade_score": 0.8151031136512756
+    },
+    {
+      "chunk_id": "chunk_043538",
+      "source_ref": "src/components/chat/component_38.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 1.2583690881729126,
+      "rank_score": 0.702774167060852,
+      "grade_score": 0.8760920166969299
+    },
+    {
+      "chunk_id": "chunk_044473",
+      "source_ref": "src/components/chat/component_73.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 1.6969009637832642,
+      "rank_score": 0.6954594850540161,
+      "grade_score": 0.9119017720222473
+    },
+    {
+      "chunk_id": "chunk_034199",
+      "source_ref": "src/components/chat/component_99.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 3.5898163318634033,
+      "rank_score": 0.6845775246620178,
+      "grade_score": 0.9957134127616882
+    },
+    {
+      "chunk_id": "chunk_004312",
+      "source_ref": "src/components/chat/component_12.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 1.2712252140045166,
+      "rank_score": 0.6793064475059509,
+      "grade_score": 0.8386500477790833
+    },
+    {
+      "chunk_id": "chunk_001980",
+      "source_ref": "src/components/chat/component_80.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 4.07799768447876,
+      "rank_score": 0.6785674095153809,
+      "grade_score": 0.999660313129425
+    },
+    {
+      "chunk_id": "chunk_012716",
+      "source_ref": "src/components/chat/component_16.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 3.2276999950408936,
+      "rank_score": 0.6758835315704346,
+      "grade_score": 0.968782365322113
+    },
+    {
+      "chunk_id": "chunk_029095",
+      "source_ref": "src/components/chat/component_95.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 2.9935736656188965,
+      "rank_score": 0.6701319217681885,
+      "grade_score": 0.949951708316803
+    },
+    {
+      "chunk_id": "chunk_010153",
+      "source_ref": "src/components/chat/component_53.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 3.9717681407928467,
+      "rank_score": 0.6701192259788513,
+      "grade_score": 0.9827748537063599
+    },
+    {
+      "chunk_id": "chunk_008679",
+      "source_ref": "src/components/chat/component_79.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 1.7385226488113403,
+      "rank_score": 0.6665673851966858,
+      "grade_score": 0.8675053119659424
+    },
+    {
+      "chunk_id": "chunk_012760",
+      "source_ref": "src/components/chat/component_60.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 1.786115288734436,
+      "rank_score": 0.6627665162086487,
+      "grade_score": 0.8653289675712585
+    },
+    {
+      "chunk_id": "chunk_028457",
+      "source_ref": "src/components/chat/component_57.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 4.7019219398498535,
+      "rank_score": 0.6621416211128235,
+      "grade_score": 0.9866496324539185
+    },
+    {
+      "chunk_id": "chunk_045210",
+      "source_ref": "src/components/chat/component_10.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 4.280261516571045,
+      "rank_score": 0.6616090536117554,
+      "grade_score": 0.9764253497123718
+    },
+    {
+      "chunk_id": "chunk_005632",
+      "source_ref": "src/components/chat/component_32.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 6.044208526611328,
+      "rank_score": 0.6554996371269226,
+      "grade_score": 0.997859001159668
+    },
+    {
+      "chunk_id": "chunk_019624",
+      "source_ref": "src/components/chat/component_24.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 3.2708044052124023,
+      "rank_score": 0.6552200317382812,
+      "grade_score": 0.9359347224235535
+    },
+    {
+      "chunk_id": "chunk_011220",
+      "source_ref": "src/components/chat/component_20.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 2.113093137741089,
+      "rank_score": 0.6523034572601318,
+      "grade_score": 0.8730230927467346
+    },
+    {
+      "chunk_id": "chunk_033946",
+      "source_ref": "src/components/chat/component_46.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 6.737178802490234,
+      "rank_score": 0.6499095559120178,
+      "grade_score": 0.9970184564590454
+    },
+    {
+      "chunk_id": "chunk_014894",
+      "source_ref": "src/components/chat/component_94.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 4.386862277984619,
+      "rank_score": 0.6496028900146484,
+      "grade_score": 0.9589135050773621
+    },
+    {
+      "chunk_id": "chunk_024640",
+      "source_ref": "src/components/chat/component_40.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 4.0648956298828125,
+      "rank_score": 0.6486459374427795,
+      "grade_score": 0.9494516253471375
+    },
+    {
+      "chunk_id": "chunk_001078",
+      "source_ref": "src/components/chat/component_78.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 4.929521083831787,
+      "rank_score": 0.6447453498840332,
+      "grade_score": 0.9621436595916748
+    },
+    {
+      "chunk_id": "chunk_038896",
+      "source_ref": "src/components/chat/component_96.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 3.750586986541748,
+      "rank_score": 0.6444613933563232,
+      "grade_score": 0.9337687492370605
+    },
+    {
+      "chunk_id": "chunk_036443",
+      "source_ref": "src/components/chat/component_43.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 7.6786088943481445,
+      "rank_score": 0.6420125961303711,
+      "grade_score": 0.9932038187980652
+    },
+    {
+      "chunk_id": "chunk_032219",
+      "source_ref": "src/components/chat/component_19.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 6.1251935958862305,
+      "rank_score": 0.641922116279602,
+      "grade_score": 0.9763054847717285
+    },
+    {
+      "chunk_id": "chunk_003388",
+      "source_ref": "src/components/chat/component_88.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 7.8739399909973145,
+      "rank_score": 0.6397509574890137,
+      "grade_score": 0.9911251664161682
+    },
+    {
+      "chunk_id": "chunk_013618",
+      "source_ref": "src/components/chat/component_18.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 7.552493095397949,
+      "rank_score": 0.6392700672149658,
+      "grade_score": 0.9875000715255737
+    },
+    {
+      "chunk_id": "chunk_026818",
+      "source_ref": "src/components/chat/component_18.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 7.66124153137207,
+      "rank_score": 0.6365664005279541,
+      "grade_score": 0.9839727282524109
+    },
+    {
+      "chunk_id": "chunk_039116",
+      "source_ref": "src/components/chat/component_16.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 1.265048861503601,
+      "rank_score": 0.6358583569526672,
+      "grade_score": 0.7654362320899963
+    },
+    {
+      "chunk_id": "chunk_022847",
+      "source_ref": "src/components/chat/component_47.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 3.7612977027893066,
+      "rank_score": 0.6356549263000488,
+      "grade_score": 0.9194070100784302
+    },
+    {
+      "chunk_id": "chunk_007337",
+      "source_ref": "src/components/chat/component_37.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 7.7025251388549805,
+      "rank_score": 0.6350880861282349,
+      "grade_score": 0.9818740487098694
+    },
+    {
+      "chunk_id": "chunk_039468",
+      "source_ref": "src/components/chat/component_68.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 5.355097770690918,
+      "rank_score": 0.6334975361824036,
+      "grade_score": 0.9509265422821045
+    },
+    {
+      "chunk_id": "chunk_022055",
+      "source_ref": "src/components/chat/component_55.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 6.65415096282959,
+      "rank_score": 0.6323037147521973,
+      "grade_score": 0.9667407870292664
+    },
+    {
+      "chunk_id": "chunk_009504",
+      "source_ref": "src/components/chat/component_4.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 11.676726341247559,
+      "rank_score": 0.6263765692710876,
+      "grade_score": 0.9913711547851562
+    },
+    {
+      "chunk_id": "chunk_033935",
+      "source_ref": "src/components/chat/component_35.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 8.103249549865723,
+      "rank_score": 0.6255502700805664,
+      "grade_score": 0.9693498015403748
+    },
+    {
+      "chunk_id": "chunk_044429",
+      "source_ref": "src/components/chat/component_29.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 14.957568168640137,
+      "rank_score": 0.6245660781860352,
+      "grade_score": 0.999165952205658
+    },
+    {
+      "chunk_id": "chunk_038632",
+      "source_ref": "src/components/chat/component_32.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 6.670278072357178,
+      "rank_score": 0.623899519443512,
+      "grade_score": 0.9529168605804443
+    },
+    {
+      "chunk_id": "chunk_032494",
+      "source_ref": "src/components/chat/component_94.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 9.608437538146973,
+      "rank_score": 0.6238008737564087,
+      "grade_score": 0.9768250584602356
+    },
+    {
+      "chunk_id": "chunk_014993",
+      "source_ref": "src/components/chat/component_93.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 14.597406387329102,
+      "rank_score": 0.6231787800788879,
+      "grade_score": 0.9958890676498413
+    },
+    {
+      "chunk_id": "chunk_005093",
+      "source_ref": "src/components/chat/component_93.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 11.17238712310791,
+      "rank_score": 0.6230298280715942,
+      "grade_score": 0.9836141467094421
+    },
+    {
+      "chunk_id": "chunk_029469",
+      "source_ref": "src/components/chat/component_69.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 2.408135414123535,
+      "rank_score": 0.6217391490936279,
+      "grade_score": 0.8406214118003845
+    },
+    {
+      "chunk_id": "chunk_029568",
+      "source_ref": "src/components/chat/component_68.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 6.586505889892578,
+      "rank_score": 0.6212616562843323,
+      "grade_score": 0.947560727596283
+    },
+    {
+      "chunk_id": "chunk_029854",
+      "source_ref": "src/components/chat/component_54.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 11.390207290649414,
+      "rank_score": 0.6202069520950317,
+      "grade_score": 0.9798722863197327
+    },
+    {
+      "chunk_id": "chunk_027643",
+      "source_ref": "src/components/chat/component_43.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 8.01677131652832,
+      "rank_score": 0.6201630234718323,
+      "grade_score": 0.959668755531311
+    },
+    {
+      "chunk_id": "chunk_031174",
+      "source_ref": "src/components/chat/component_74.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 14.508458137512207,
+      "rank_score": 0.6198909282684326,
+      "grade_score": 0.9901642799377441
+    },
+    {
+      "chunk_id": "chunk_027984",
+      "source_ref": "src/components/chat/component_84.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 5.4068684577941895,
+      "rank_score": 0.6198234558105469,
+      "grade_score": 0.9289840459823608
+    },
+    {
+      "chunk_id": "chunk_033891",
+      "source_ref": "src/components/chat/component_91.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 20.17305564880371,
+      "rank_score": 0.6187700629234314,
+      "grade_score": 0.9997968077659607
+    },
+    {
+      "chunk_id": "chunk_006985",
+      "source_ref": "src/components/chat/component_85.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 15.978957176208496,
+      "rank_score": 0.6185399293899536,
+      "grade_score": 0.9916356205940247
+    },
+    {
+      "chunk_id": "chunk_008437",
+      "source_ref": "src/components/chat/component_37.svelte",
+      "feature_label": "chat",
+      "manifold_dist": 4.214604377746582,
+      "rank_score": 0.6181410551071167,
+      "grade_score": 0.9023889899253845
+    }
+  ],
+  "backend": "CPU_PYARROW",
+  "processingTimeMs": 5299.798,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

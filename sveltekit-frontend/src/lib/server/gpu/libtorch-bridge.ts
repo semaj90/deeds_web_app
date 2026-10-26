@@ -65,6 +65,18 @@ export interface BatchSimilarityResult {
 	source: 'gpu' | 'cpu';
 }
 
+export function* iterateSimilarityChunks<T>(
+	rows: readonly T[],
+	chunkSize = 500
+): IterableIterator<{ start: number; rows: T[] }> {
+	if (!Number.isSafeInteger(chunkSize) || chunkSize <= 0) {
+		throw new Error('SIMILARITY_CHUNK_SIZE_INVALID');
+	}
+	for (let start = 0; start < rows.length; start += chunkSize) {
+		yield { start, rows: rows.slice(start, start + chunkSize) };
+	}
+}
+
 export interface HalfPrecisionSimilarityResult {
 	matrix: number[][];
 	n: number;
@@ -808,19 +820,31 @@ export async function batchCosineSimilarity(
 export async function batchCosineSimilarityChunked(
   query: number[],
   corpus: number[][],
-  chunkSize = 4096
+	chunkSize = 500
 ): Promise<BatchSimilarityResult> {
+	if (!Number.isSafeInteger(chunkSize) || chunkSize <= 0) {
+		throw new Error('SIMILARITY_CHUNK_SIZE_INVALID');
+	}
+	if (corpus.length === 0) return { scores: [], n: 0, source: 'cpu' };
   if (corpus.length <= chunkSize) {
-    return batchCosineSimilarity(query, corpus);
+		const result = await batchCosineSimilarity(query, corpus);
+		if (result.n !== corpus.length || result.scores.length !== corpus.length) {
+			throw new Error('SIMILARITY_CHUNK_RESULT_LENGTH_MISMATCH');
+		}
+		return result;
   }
 
   const allScores: number[] = [];
-  for (let i = 0; i < corpus.length; i += chunkSize) {
-    const chunk = corpus.slice(i, i + chunkSize);
+	let allChunksUsedGpu = true;
+	for (const { rows: chunk } of iterateSimilarityChunks(corpus, chunkSize)) {
     const res = await batchCosineSimilarity(query, chunk);
+		if (res.n !== chunk.length || res.scores.length !== chunk.length) {
+			throw new Error('SIMILARITY_CHUNK_RESULT_LENGTH_MISMATCH');
+		}
     allScores.push(...res.scores);
+		allChunksUsedGpu &&= res.source === 'gpu';
   }
-  return { scores: allScores, n: allScores.length, source: 'cpu' };
+	return { scores: allScores, n: allScores.length, source: allChunksUsedGpu ? 'gpu' : 'cpu' };
 }
 
 /**

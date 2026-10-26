@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.component-proof.v1",
+  "gate": "TREE-NODE-RESOLVER-FAIL-CLOSED-01",
+  "status": "COMPONENT_TESTED_LIVE_WRITER_UNPROVEN",
+  "canonicalAuthority": false,
+  "tests": {
+    "command": "node --test scripts/atlas/tree-node-resolver-contract-v1.test.mjs",
+    "passed": 21,
+    "failed": 0,
+    "log": "docs/reports/tree-node-resolver-contract-20261016.txt",
+    "scope": "Actual private resolver bodies extracted via TypeScript AST; mocked query clients; CLI entrypoints not imported"
+  },
+  "validation": {
+    "javascriptSyntax": "PASSED_FOR_BOTH_ROOT_WRITERS",
+    "scopedWhitespace": "PASSED"
+  },
+  "writesPerformed": {
+    "workspaceCodeAndReports": true,
+    "database": false,
+    "sourceRevision": false,
+    "cacheOrProjection": false
+  },
+  "remaining": [
+    "Concurrent no-match allocation is not protected by this resolver change",
+    "Canonical grain schema uniqueness remains unconstrained",
+    "No live writer replay or independent writer readback",
+    "No new source, symbol, packet, semantic, topology or ContextManifest qualification"
+  ],
+  "likely_cause": "Three existing tree-node lookup owners silently selected one match without canonical-ledger scope or ambiguity rejection.",
+  "evidence": [
+    "21 passing isolated resolver regressions",
+    "Both root JavaScript writer syntax checks passed",
+    "Existing lineage ledger ambiguity follow-up and DATA_UNIQUE_SCHEMA_UNCONSTRAINED census"
+  ],
+  "patch_targets": [
+    "scripts/atlas/backfill-tree-nodes.mjs",
+    "scripts/atlas/ingest-tree-nodes.mjs",
+    "packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts",
+    "scripts/atlas/tree-node-resolver-contract-v1.test.mjs",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "node --test scripts/atlas/tree-node-resolver-contract-v1.test.mjs",
+  "smoke_command": "openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict",
+  "report_path": "docs/reports/tree-node-resolver-hardening-20261016T080000Z.json"
+}

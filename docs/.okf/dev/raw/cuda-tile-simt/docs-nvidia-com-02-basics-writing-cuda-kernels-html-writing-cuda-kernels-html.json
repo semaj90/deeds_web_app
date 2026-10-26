@@ -1,0 +1,58 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "cuda-tile-simt",
+  "source_ref": "cuda-tile-simt:docs-nvidia-com-02-basics-writing-cuda-kernels-html-writing-cuda-kernels-html",
+  "url": "https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html",
+  "title": "2.3. Writing SIMT Kernels &#8212; CUDA Programming Guide",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "cuda",
+    "cutile",
+    "tile-ir",
+    "simt",
+    "kernel-parity",
+    "llm_synthesis",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "2.3. Writing SIMT Kernels &#8212; CUDA Programming Guide",
+    "markdown_excerpt": "2.3. Writing SIMT Kernels &#8212; CUDA Programming Guide Skip to main content Back to top Ctrl + K CUDA Programming Guide v13.4.2 | PDF | Archive Search Ctrl + K Search Ctrl + K CUDA Programming Guide v13.4.2 | PDF | Archive Table of Contents CUDA Programming Guide 1. Introduction to CUDA 1.1. Introduction 1.2. Programming Model 1.3. The CUDA platform 2. Programming GPUs in CUDA 2.1. Intro to CUDA C++ 2.2. Intro to CUDA Python 2.3. Writing SIMT Kernels 2.4. Writing Tile Kernels 2.5. Asynchronous Execution 2.6. Unified and System Memory 2.7. NVCC: The NVIDIA CUDA Compiler 3. Advanced CUDA 3.1. Advanced CUDA APIs and Features 3.2. Advanced Kernel Programming 3.3. The CUDA Driver API 3.4. Programming Systems with Multiple GPUs 3.5. A Tour of CUDA Features 4. CUDA Features 4.1. Unified Memory 4.2. CUDA Graphs 4.3. Stream-Ordered Memory Allocator 4.4. Cooperative Groups 4.5. Programmatic Dependent Launch and Synchronization 4.6. Green Contexts 4.7. Locality Domains 4.8. Lazy Loading 4.9. Error Log Management 4.10. Asynchronous Barriers 4.11. Pipelines 4.12. Asynchronous Data Copies 4.13. Work Stealing with Cluster Launch Control 4.14. L2 Cache Control 4.15. Memory Synchronization Domain",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:cuda-tile-simt:docs-nvidia-com-02-basics-writing-cuda-kernels-html-writing-cuda-kernels-html",
+    "title": "2.3. Writing SIMT Kernels &#8212; CUDA Programming Guide",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh NVIDIA CUDA Tile and SIMT Programming Guide from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "1a8e3e0c0a3b0cb3ef7425017d84ee821bdbc6e482447205aef9dec73a4284df",
+  "markdown_path": "docs/.okf/dev/raw/cuda-tile-simt/docs-nvidia-com-02-basics-writing-cuda-kernels-html-writing-cuda-kernels-html.md",
+  "fetched_at": "2026-10-11T17:24:32.482Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "cuda-tile-simt",
+    "source_title": "NVIDIA CUDA Tile and SIMT Programming Guide",
+    "source_revision": null,
+    "source_manifest": null,
+    "preferred_fetcher": "BEAUTIFULSOUP_HTTP",
+    "fetched_via": "fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/cuda-tile-simt/docs-nvidia-com-02-basics-writing-cuda-kernels-html-writing-cuda-kernels-html.md"
+}

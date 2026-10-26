@@ -18,7 +18,7 @@ import { ENV } from '$lib/server/env.server.js';
 
 export interface GenerateRequest {
   messages: Message[];
-  model: string;                       // "gemma4:e4b-it-q4_K_M" | "gemma3-legal:latest"
+  model: string;                       // "ornith-1.5-9b" | "gemma3-legal:latest"
   options?: GenerateOptions;
   tools?: Tool[];                      // Tool calling
   images?: Image[];                    // Global images (or per-message)
@@ -331,7 +331,7 @@ export const generationClient = new GenerationClient(
  */
 export async function chat(
   messages: Message[],
-  model: string = 'gemma4:e4b-it-q4_K_M',
+  model: string = 'ornith-1.5-9b',
   options?: GenerateOptions
 ): Promise<string> {
   const response = await generationClient.generate({ messages, model, options });
@@ -344,7 +344,7 @@ export async function chat(
 export async function chatVLM(
   messages: Message[],
   images: Image[],
-  model: string = 'gemma4:e4b-it-q4_K_M',
+  model: string = 'ornith-1.5-9b',
   options?: GenerateOptions
 ): Promise<string> {
   const response = await generationClient.generate({
@@ -362,7 +362,7 @@ export async function chatVLM(
 export async function chatWithTools(
   messages: Message[],
   tools: Tool[],
-  model: string = 'gemma4:e4b-it-q4_K_M',
+  model: string = 'ornith-1.5-9b',
   options?: GenerateOptions
 ): Promise<GenerateResponse> {
   return generationClient.generate({
@@ -378,7 +378,7 @@ export async function chatWithTools(
  */
 export async function chatJSON<T = any>(
   messages: Message[],
-  model: string = 'gemma4:e4b-it-q4_K_M',
+  model: string = 'ornith-1.5-9b',
   options?: GenerateOptions
 ): Promise<T> {
   const response = await generationClient.generate({

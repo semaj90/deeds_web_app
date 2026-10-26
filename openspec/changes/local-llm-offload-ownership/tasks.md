@@ -559,3 +559,28 @@ evidence, and never requests a GPU device or allocates model buffers. The focuse
 model-policy, and pure sampler suites pass 17/17. This is capability preflight only: no WebGPU
 adapter was queried in a live browser, no model was loaded, and the BROWSER-GEN-EVAL-07 live
 runtime gate remains open.
+
+## ALIGNMENT ADDENDUM — challenger lanes around llama-server `:8090` (2026-10-12)
+
+Cross-reference: the full lane plan (A–G) lives in `parent-atlas-kv-cache-adaptation-research/tasks.md`
+under "CHALLENGER-LANE ALIGNMENT". This section records only the ownership decisions that touch this change.
+
+- [x] OWN-1 Canonical chat/synthesis owner remains llama-server `:8090` (alias `ornith-1.5-9b`). Verified live 2026-10-12.
+- [x] OWN-2 LangExtract default moved off the Gemma4 file to `ornith-1.5-9b` (`.env.local`, `scripts/atlas/start-langextract-gemma4.mjs`,
+  `scripts/langextract/langextract-gemma4-bridge.py` docstring). The `.mjs` and `.py` file names still say `gemma4` and are kept for now.
+  Runtime: NOT_PROVEN (no LangExtract run performed).
+- [ ] OWN-3 Do not treat `triton-model-repository` (`gemma4_e2b_*`) or any TRT-LLM engine as a chat owner. They are challengers
+  behind the admission gates in the lane plan (ALIGN-D2 and D4).
+- [ ] OWN-4 `gemma4-offload` / `local-llm-offload` MCP naming is unchanged here. Renaming the MCP registration key is a separate decision.
+- [ ] OWN-5 The Gemma4 GGUF on disk (`models/gemma4-legal-iq4xs-direct.gguf`) has no live consumer after OWN-2. Its removal or
+  hardlink is gated on ALIGN-F3 in the lane plan. Do not remove it under this change.
+- [ ] OWN-6 Unified-research self-prompting now calls `resolveLlamaInferenceTarget()` and uses its configured model and
+  llama-server base URL; adjacent MCP descriptions now name Ornith `:8090` rather than Ollama chat. Source patch is present,
+  but focused validation and a bounded request receipt were not run; keep this gate open until those proofs exist. No web
+  fetch, database, corpus, cache, or vector write was performed.
+
+## Ornith-only A/B routing (2026-10-12)
+
+- [x] AB-AUTH-01 `src/lib/server/ai/ab-test.ts` no longer offers Gemma3/Gemma4/Ollama chat variants. The two historical experiment IDs are inactive and retain only the canonical `SERVER_CHAT_MODEL` as a status descriptor; `registerExperiment()` rejects any noncanonical model or backend override. The literal-ratchet allowlist dropped the migrated file and two already-stale entries. Focused A/B and model-literal guard suites pass 7/7.
+- [ ] AB-CALLER-01 No in-repository `getVariant()` caller was found in this source pass. Dynamic/external callers and production experiment traffic remain NOT_VERIFIED; no live A/B request was made.
+- Receipt: `.tmp/atlas/production-hardening-seed-20261012/model-authority-ab-test-convergence-v1.json`.

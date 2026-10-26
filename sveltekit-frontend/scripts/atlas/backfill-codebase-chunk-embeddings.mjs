@@ -31,6 +31,7 @@
  *   --verbose        Detailed logging
  */
 
+import { createHash } from 'node:crypto';
 import { Pool } from 'pg';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 
@@ -99,6 +100,29 @@ function formatDuration(ms) {
   if (ms < 1000) return `${ms}ms`;
   if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`;
   return `${(ms / 60_000).toFixed(1)}m`;
+}
+
+/**
+ * Record per-chunk failures in error_logs and keep going (indexing never aborts on one bad chunk).
+ * Dry-run writes nothing. Logging failures are swallowed so they cannot stop the backfill.
+ * Deduped by fingerprint sha256(chunkId|reason) against unresolved rows.
+ */
+const ERROR_RUN_ID = `embed-backfill-${new Date().toISOString().slice(0, 10)}`;
+async function recordChunkErrors(chunks, reason, severity = 'ERROR') {
+  if (DRY_RUN || chunks.length === 0) return;
+  try {
+    for (const c of chunks) {
+      const fp = createHash('sha256').update(`${c.id}|${reason}`).digest('hex');
+      await pool.query(
+        `INSERT INTO error_logs (error_category, severity, message, file_path, source_ref, line_number,
+                                 diagnostic_run_id, diagnostic_code, diagnostic_fingerprint, context_key, workspace_id)
+         SELECT 'embedding_backfill_failure', $1, $2, $3, $3, $4, $5, 'SEMANTIC_768_EMBED_FAILED', $6, $7, $8
+         WHERE NOT EXISTS (SELECT 1 FROM error_logs WHERE diagnostic_fingerprint = $6 AND resolved = false)`,
+        [severity, `chunk ${c.id}: ${reason}`.slice(0, 500), c.file_path ?? null, c.line_start ?? null, ERROR_RUN_ID, fp, String(c.id), process.env.ATLAS_WORKSPACE_ID || 'deeds-web-app']);
+    }
+  } catch (e) {
+    log('WARN', `error_logs write failed (indexing continues): ${e.message}`);
+  }
 }
 
 /**
@@ -321,6 +345,7 @@ async function backfillEmbeddings() {
     // Prepare updates (filter out failed embeddings)
     const updates = [];
     let batchFailures = 0;
+    const failedChunks = [];
     for (let i = 0; i < chunks.length; i++) {
       const embedding = embeddingResult.embeddings[i];
       if (isValidEmbedding(embedding)) {
@@ -332,8 +357,10 @@ async function backfillEmbeddings() {
       } else {
         batchFailures++;
         stats.chunksFailed++;
+        failedChunks.push(chunks[i]);
       }
     }
+    await recordChunkErrors(failedChunks, embeddingResult.error ?? 'invalid or missing 768-d embedding');
 
     // Write to Postgres (if not dry-run)
     if (!DRY_RUN && updates.length > 0) {
@@ -342,6 +369,7 @@ async function backfillEmbeddings() {
         log('ERROR', `Failed to update ${updates.length} chunks: ${pgResult.error}`);
         stats.chunksFailed += updates.length;
         stats.chunksEmbedded -= updates.length;
+        await recordChunkErrors(chunks.filter((c) => updates.some((u) => u.id === c.id)), `postgres update failed: ${pgResult.error}`);
       }
     }
 

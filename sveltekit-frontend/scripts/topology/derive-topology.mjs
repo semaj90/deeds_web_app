@@ -59,6 +59,10 @@ if (!hasSteps) {
 }
 
 async function main() {
+  console.error('LEGACY_384_TOPOLOGY_ORCHESTRATOR_DISABLED: this historical pipeline assumes 384-D input and contains unimplemented steps; no database or GPU work was started.');
+  process.exitCode = 2;
+  return;
+
   console.log('\n🧬 Topology Derivation Orchestrator\n');
   console.log(`Mode: ${MODE}`);
   console.log(`Steps: ${Object.entries(steps).filter(([k, v]) => v && k !== 'all').map(([k]) => k).join(', ')}\n`);

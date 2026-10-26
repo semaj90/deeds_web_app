@@ -9,13 +9,13 @@ export const load: PageServerLoad = async () => {
 				name: 'EmbeddingGemma 300M (ONNX)',
 				path: '/embeddinggemma_300m_onnx/model.onnx',
 				size: '291 MB',
-				outputDim: 384,
+				outputDim: 768,
 				purpose: 'Client-side embedding for batch packets',
 				location: 'browser'
 			},
 			fallbackModel: {
 				name: 'Gemma4 E2B (ONNX) — NEW',
-				path: '/gemma4_e2b_onnx/model.onnx',
+				path: '/gemma4_e2b_onnx/onnx/decoder_model_merged_q4f16.onnx',
 				size: '~1.5 GB',
 				speed: '120-255 tokens/sec',
 				purpose: 'Fast client-side fallback text generation',
@@ -24,12 +24,6 @@ export const load: PageServerLoad = async () => {
 				downloadScript: 'bash scripts/download-gemma4-e2b-onnx.sh',
 				huggingface: 'https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX',
 				note: 'Replaces Gemma3 270M — 4x faster, better reasoning'
-			},
-			deprecatedModel: {
-				name: 'Gemma3 270M (ONNX) — DEPRECATED',
-				path: '/gemma3_270m_onnx/gemma3_270m_w8a16.onnx',
-				size: '418 MB',
-				status: 'Safe to delete after E2B download'
 			},
 			summaryModel: {
 				name: 'Gemma4 9B (TurboQuant)',

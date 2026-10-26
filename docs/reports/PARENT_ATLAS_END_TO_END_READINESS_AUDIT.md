@@ -150,7 +150,7 @@ cutover can proceed while this bypasses the collection registry.
    detailed lane, test-only, or delete.
 3. Do not enable 64/128 topology routing until their collections contain a
    snapshot-identified population and centroid provenance.
-4. Run live exact, FTS, sparse, dense-384, dense-768, graph, and reranker
+4. Run live exact, FTS, sparse, latent256, latent128, latent64, dense-512, dense256, dense128, dense-768, graph, and reranker
    evidence smoke tests with lane reports and identity deduplication.
 5. Tune RRF only from recorded judgments. Evaluate NDCG@5/10/20, MRR@10/20,
    latency percentiles, path validity, and identity exclusion rate.

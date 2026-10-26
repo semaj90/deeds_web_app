@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.okf.ldr.capture.v1",
+  "runId": "76839544-4775-496e-9102-846ff58d3368",
+  "sourceId": "ldr-api-quickstart",
+  "requestedUrl": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/api-quickstart.md",
+  "resolvedUrl": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/api-quickstart.md",
+  "title": "local-deep-research/docs/api-quickstart.md at 8239c688206976926752ddfda8a76d9362a3e021 · LearningCircuit/local-deep-research · GitHub",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "rawChecksum": "662aff3b8b539b026d92c99b6a68dc37af49e2f7e7b3118c76d122f77512d8c7",
+  "normalizedChecksum": "a0473c1b403c5bd5d027560f615be9661ae00ceb184bcb2e8c15f7f29c7d2be1",
+  "capturedMarkdownSha256": "a0473c1b403c5bd5d027560f615be9661ae00ceb184bcb2e8c15f7f29c7d2be1",
+  "capturedAt": "2026-10-18T00:51:34.101Z",
+  "parser": "html.parser",
+  "parserVersion": "4.15.0",
+  "canonicalAuthority": false
+}

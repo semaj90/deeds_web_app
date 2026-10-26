@@ -23,6 +23,9 @@
 
 import { COLLECTION_CONTRACTS } from './qdrant-parity-contract.mjs';
 
+console.error('LEGACY_384_COLLECTION_PROVISION_DISABLED: 384-D is not a supported semantic or admitted MRL representation');
+process.exit(2);
+
 // ── CLI flags ─────────────────────────────────────────────────────────────────
 
 const APPLY   = process.argv.includes('--apply');

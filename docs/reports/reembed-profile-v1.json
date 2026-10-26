@@ -1,0 +1,52 @@
+{
+ "schema": "atlas.reembed-profile.v1",
+ "generatedAt": "2026-10-18T09:21:08.917Z",
+ "slice": "canary 1000 rows (already canonical)",
+ "snapshotSha256": "2d6db7d1e56b1dca6ff73c3ecebf3eae921f9427484185934c0771ee74d915b6",
+ "caveats": [],
+ "embedBench": [
+  {
+   "batchSize": 1,
+   "rows": 192,
+   "seconds": 5.79,
+   "rowsPerSecond": 33.2,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 8,
+   "rows": 192,
+   "seconds": 4.12,
+   "rowsPerSecond": 46.6,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 16,
+   "rows": 192,
+   "seconds": 4.58,
+   "rowsPerSecond": 41.9,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 32,
+   "rows": 192,
+   "seconds": 3.93,
+   "rowsPerSecond": 48.8,
+   "cosineMean": 1,
+   "cosineMin": 1
+  },
+  {
+   "batchSize": 64,
+   "rows": 192,
+   "seconds": 3.64,
+   "rowsPerSecond": 52.8,
+   "cosineMean": 1,
+   "cosineMin": 1
+  }
+ ],
+ "bestBatchSize": 64,
+ "parityGate": "PASS",
+ "checksum": "sha256:c7c65a90780f2554103385663d3842418552067a52a86ab3288236aa508a88ef"
+}

@@ -1,0 +1,85 @@
+{
+  "schema": "atlas.graphify-daily-discovery-validation.v1",
+  "status": "LOCAL_HELPERS_PROVEN",
+  "scope": "Daily local repository inventory, ownership discovery, bounded lexical searches and graph artifact inspection",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "productionPipelineProven": false,
+  "sourceWritesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "localArtifactsCreated": true,
+  "tests": {
+    "command": "node --test scripts/atlas/lib/graphify-daily-discovery-v1.test.mjs",
+    "exitCode": 0,
+    "passed": 9,
+    "failed": 0,
+    "log": "docs/reports/graphify-daily-discovery-tests-20261016T024005203Z.txt"
+  },
+  "inspectionSmoke": {
+    "command": "npm run --silent graphify:daily:inspect -- --hash-graphs --output <new-report-path>",
+    "cwd": "sveltekit-frontend",
+    "receipt": "docs/reports/graphify-daily-discovery-inspect-20261016T023157929Z.json",
+    "receiptReadback": "JSON_PARSED_DURING_SMOKE",
+    "exitCode": 0,
+    "elapsedMs": 2361,
+    "physicalRootDirectories": 139,
+    "trackedPaths": 34731,
+    "trackedDirectoryPrefixes": 4696,
+    "graphCompatibilityCopiesEqual": true,
+    "graphSourceLineageVerified": false
+  },
+  "searchSmoke": {
+    "command": "npm run --silent graphify:daily:search -- --query SearchRuntime --limit 8 --output <new-report-path>",
+    "cwd": "sveltekit-frontend",
+    "receipt": "docs/reports/graphify-daily-discovery-search-20261016T023817737Z.json",
+    "receiptReadback": "JSON_PARSED_DURING_SMOKE",
+    "exitCode": 0,
+    "elapsedMs": 2598,
+    "returnedMatches": 8,
+    "sourceCandidateCount": 10601,
+    "maxCandidateSourceFiles": 250,
+    "resultAdmission": "LEXICAL_DISCOVERY_ONLY"
+  },
+  "archiveBehavior": {
+    "existingOutputExitCode": 1,
+    "existingReportSha256Unchanged": true,
+    "error": "EEXIST"
+  },
+  "validation": {
+    "javascriptSyntax": "PASS",
+    "scopedWhitespace": "PASS",
+    "packageJsonAndAliases": "PASS",
+    "openspecCommand": "openspec validate parent-atlas-graphify-recovery-proof-ladder --strict",
+    "openspecExitCode": 0
+  },
+  "preservedFailedAttempts": [
+    "docs/reports/graphify-daily-discovery-search-20261016T023157954Z.json",
+    "docs/reports/graphify-daily-discovery-search-20261016T023500683Z.json",
+    "docs/reports/graphify-daily-discovery-search-20261016T023628288Z.json"
+  ],
+  "limitations": [
+    "Observed timings describe this checkout and these invocations only.",
+    "The source search has explicit file, match, byte and runtime bounds; it is not exhaustive.",
+    "Ownership statuses are declarations from the existing registry, not new runtime verification.",
+    "No daily maintenance chain, database/service/GPU request or ContextManifest replay ran."
+  ],
+  "likely_cause": "Routine discovery had no dedicated bounded command separate from the apply-capable daily maintenance chain.",
+  "evidence": [
+    "scripts/startup/run-graphify-daily-startup.mjs",
+    "docs/architecture/runtime-ownership-registry.json",
+    "scripts/atlas/lib/repo-scan-roots.mjs",
+    "docs/reports/graphify-daily-discovery-tests-20261016T024005203Z.txt"
+  ],
+  "patch_targets": [
+    "scripts/atlas/graphify-daily-discovery-v1.mjs",
+    "scripts/atlas/lib/graphify-daily-discovery-v1.mjs",
+    "scripts/atlas/lib/graphify-daily-discovery-v1.test.mjs",
+    "sveltekit-frontend/package.json",
+    "docs/architecture/graphify-daily-discovery-helpers-v1.md",
+    "docs/atlas/parent-atlas-table-of-contents.md",
+    "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md"
+  ],
+  "safe_next_command": "npm run graphify:daily:inspect",
+  "smoke_command": "npm run graphify:daily:helpers:test",
+  "report_path": "docs/reports/graphify-daily-discovery-validation-20261016T024005203Z.json"
+}

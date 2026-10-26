@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { CANONICAL_QDRANT_COLLECTION } from '../embedding/embedding-contract-768.js';
 import { runRepositoryProvenanceWorkflow } from './repository-provenance-workflow.js';
 
 function makeTempRepo() {
@@ -24,6 +25,7 @@ function makeTempRepo() {
       '',
     ].join('\n'),
   );
+  fs.copyFileSync(path.join(root, 'src', 'example.ts'), path.join(root, 'src', 'example-copy.ts'));
 
   fs.writeFileSync(
     path.join(root, 'docs', 'README.md'),
@@ -53,10 +55,29 @@ describe('repository provenance workflow', () => {
       embedder,
     });
 
-    expect(first.stages.snapshot.totalFiles).toBeGreaterThanOrEqual(2);
+    expect(first.stages.snapshot.totalFiles).toBeGreaterThanOrEqual(3);
     expect(first.stages.inventory.codeFiles).toBeGreaterThanOrEqual(1);
     expect(first.stages.structural.factCount).toBeGreaterThan(0);
+    expect(first.stages.identity.duplicateIds).toBe(0);
+    expect(first.stages.validation.duplicateFileHashes).toBeGreaterThan(0);
+    expect(first.stages.validation.pass).toBe(true);
     expect(first.stages.semantic.embeddedFiles).toBeGreaterThan(0);
+    expect(first.stages.gpu).toMatchObject({
+      status: 'SKIPPED',
+      embeddingProbeCount: 0,
+      embeddingProbeHits: 0,
+      analysisMode: 'unavailable',
+      reason: 'GPU_EXECUTOR_NOT_INVOKED',
+    });
+    expect(first.stages.projection).toMatchObject({
+      status: 'SKIPPED',
+      postgresCanonicalRecords: 0,
+      qdrantProjectionRecords: 0,
+      neo4jProjectionRecords: 0,
+      redisProjectionRecords: 0,
+      candidateCounts: { sources: first.stages.snapshot.totalFiles },
+      reason: 'PROJECTION_WRITERS_NOT_INVOKED',
+    });
     expect(first.stages.relationships.entries).toBeGreaterThan(0);
     expect(first.stages.validation.pass).toBe(true);
     expect(first.stages.evaluation.totalQueries).toBeGreaterThan(0);
@@ -73,7 +94,9 @@ describe('repository provenance workflow', () => {
 
     expect(second.stages.incremental.priorReportFound).toBe(true);
     expect(second.stages.incremental.reusedFiles).toBeGreaterThan(0);
-    expect(second.stages.projection.collectionName).toBe('codebase_chunks_768_v2');
+    // Single source: the declared embedding contract (a literal here drifted from it; whether the
+    // contract should name the _v2 collection is an open owner decision, not a spec concern).
+    expect(second.stages.projection.collectionName).toBe(CANONICAL_QDRANT_COLLECTION);
     expect(second.stages.projection.denseVectorName).toBe('content');
 
     const latest = JSON.parse(fs.readFileSync(second.outputs.latestReportPath, 'utf8'));

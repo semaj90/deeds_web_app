@@ -25,10 +25,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       // Fall through to database query
     }
 
-    // Query from database
-    const nodes = await sql`SELECT id, kind, label, meta FROM kg_nodes`;
-    const edges = await sql`SELECT from_id, to_id, type, weight, evidence FROM kg_edges`;
+    // Query from database. kg_nodes columns are id, node_type, label, properties; the aliases keep the
+    // response keys (kind, meta) stable for callers.
+    const nodes = await sql`SELECT id, node_type AS kind, label, properties AS meta FROM kg_nodes`;
 
+    // No edge table is keyed to kg_nodes ids: kg_edges does not exist, and cpg_edges / phase89_import_edges
+    // reference other id spaces (cpg_nodes ids, file paths), so joining them here would invent edges.
     const graphData = {
       nodes: nodes.map(n => ({
         id: n.id,
@@ -36,13 +38,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
         label: n.label,
         meta: n.meta,
       })),
-      edges: edges.map(e => ({
-        from: e.from_id,
-        to: e.to_id,
-        type: e.type,
-        weight: e.weight,
-        evidence: e.evidence,
-      })),
+      edges: [] as Array<{ from: number; to: number; type: string; weight: number | null; evidence: unknown }>,
     };
 
     return json(graphData);

@@ -265,7 +265,7 @@ async function main() {
     console.log(`  - Format: JSONL (instruction/input/output/reward)`);
     console.log('\nNext steps:');
     console.log('  1. Transfer dataset to Colab or local training environment');
-    console.log('  2. Run: python -m unsloth.train --dataset=atlas-phase6.jsonl --model=gemma4-legal');
+    console.log('  2. Run: python -m unsloth.train --dataset=atlas-phase6.jsonl --model=ornith-1.5-9b');
     console.log('  3. Deploy fine-tuned model to production');
   }
 

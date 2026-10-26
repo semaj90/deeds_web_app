@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.integration-progress.v1",
+  "status": "ACTIVE_PARTIAL",
+  "gate": "RETRIEVAL-CACHE-DELIVERY-01",
+  "implemented": [
+    "Five existing cached retrieval methods retain current delivery provenance",
+    "Cache hits do not expose old codec measurements as current transportTelemetry",
+    "Historical observations remain explicitly origin_transport_telemetry",
+    "Missing or invalid origin is null; compute return does not imply RPC success",
+    "No new cache, index, table, writer or canonical identity owner"
+  ],
+  "validation": {
+    "suitesPassed": 5,
+    "testsPassed": 17,
+    "log": "docs/reports/retrieval-delivery-focused-20261016T001008.txt",
+    "cacheReplay": "Actual withRpcCache envelope implementation with injected in-memory store",
+    "callerCoverage": ["searchChunks", "getClusterSummary", "expandAstNeighbors", "getTopologyContext", "getResearchContext"],
+    "networkScope": "Existing temporary loopback gRPC/HTTP fixtures; not production services",
+    "liveRedis": "NOT_RUN",
+    "durableReadback": "NOT_RUN",
+    "fullTypecheck": "NOT_RUN"
+  },
+  "notPerformed": ["live database writes", "source-revision writes", "backfill", "cache invalidation", "service restart", "GPU job", "model load", "Svelte check", "promotion"],
+  "remaining": ["failed-attempt retention", "live endpoint replay", "qualified provenance through ACP to final packet", "durable independent readback", "actual kernel timing and identity", "full identity and enrichment gates from goal objective"],
+  "likely_cause": "Cached retrieval wrappers discarded cache delivery metadata and replayed historical transport codec observations as top-level current measurements.",
+  "evidence": ["Five cached retrieval wrappers", "Actual cache-envelope replay", "17 passing focused tests"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/grpc/transport-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-delivery-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/grpc/retrieval-client.cache-delivery.spec.ts",
+    "docs/architecture/retrieval-transport-codec-telemetry-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-telemetry-lowrank-recommendation-okf-integration --strict",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/grpc/retrieval-delivery-telemetry.spec.ts src/lib/server/grpc/retrieval-client.cache-delivery.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-retrieval-delivery-provenance-20261016.json",
+  "canonicalAuthority": false
+}

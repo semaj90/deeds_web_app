@@ -1,0 +1,9 @@
+# Plain Text Profile for OKF (opaque text; no grammar, zero symbols by policy)
+
+version: 1
+language: text
+name: Plain text
+grammar: none
+
+extensions:
+  - .txt

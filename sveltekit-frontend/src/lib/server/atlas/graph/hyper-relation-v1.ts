@@ -11,6 +11,7 @@ export const HyperRelationV1Schema = z.object({
 	schema: z.literal('atlas.hyper-relation.v1'),
 	relationId: z.string().min(1),
 	relationType: z.string().min(1),
+	graphRevision: z.string().min(1).optional(),
 	participants: z.array(HyperRelationParticipantV1Schema).min(2),
 	evidenceRefs: z.array(z.string().min(1)).min(1),
 	workspaceRevision: z.string().min(1),

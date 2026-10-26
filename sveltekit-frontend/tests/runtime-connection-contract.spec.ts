@@ -156,9 +156,9 @@ vi.mock('$lib/gpu/runtime-optimizations.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-  ollamaFetch: vi.fn(async () => ({ ok: true })),
+  embedOrChatFetch: vi.fn(async () => ({ ok: true })),
 }));
 
 vi.mock('net', () => ({

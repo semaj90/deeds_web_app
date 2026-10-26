@@ -1,8 +1,9 @@
 /**
- * Trace Execution Utility Compiler — Single Aggregation Owner for trace_packet_events
+ * Trace Execution Utility Compiler — Pure aggregation for supplied trace_packet_events
  *
- * Sole owner responsible for querying trace_packet_events and compiling execution_utility.
- * Output is passed downstream to FeatureVector5 materializers.
+ * This module does not query storage or establish event provenance. Callers must
+ * provide independently qualified events; the aggregate is only a derived value.
+ * Output can be passed downstream to FeatureVector5 materializers after that gate.
  */
 
 export interface TracePacketEvent {

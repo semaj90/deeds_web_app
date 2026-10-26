@@ -34,7 +34,7 @@
  *   (default 5) with Promise.allSettled — 5× throughput vs sequential awaits.
  *
  * Deep research summarization:
- *   Each hyperedge gets an ACE-style summary via bifrostChat (gemma4-rotorquant:latest).
+ *   Each hyperedge gets an ACE-style summary via bifrostChat (ornith-1.5-9b).
  *   Summary cached in Redis hg:edge:{hash} (4h TTL) + Postgres hypergraph_edges.
  */
 
@@ -113,7 +113,7 @@ export interface HyperEdge {
   centroid:     number[];                  // 768-dim mean of member embeddings
   gradeScore:   number;                    // GRPO reward score [0,1]
   gradeLabel:   HyperEdgeGrade;
-  summary:      string;                    // ACE-style gemma4-rotorquant:latest summary
+  summary:      string;                    // ACE-style ornith-1.5-9b summary
   pipeline:     string;                    // dominant pipeline label
   memberCount:  number;
   builtAt:      string;
@@ -897,7 +897,7 @@ async function persistToRedis(
  *   5. rewardScoreGPU → edge weights W (GRPO)
  *   6. hgnnPropagate → enriched hyperedge representations X'
  *   7. Grade hyperedges (A/B/C/D)
- *   8. Summarize each hyperedge with gemma4-rotorquant:latest
+ *   8. Summarize each hyperedge with ornith-1.5-9b
  *   9. Write to Redis + Neo4j
  */
 export async function buildHypergraph4D(): Promise<HypergraphBuildResult> {
@@ -1307,15 +1307,32 @@ export async function getHypergraphStats(): Promise<{
   };
 }
 
-/** Invalidate the entire hypergraph cache. */
+/**
+ * Invalidate the entire hypergraph cache. Throws if a SCAN or DEL fails, so callers
+ * never treat a partial invalidation as success.
+ *
+ * SCAN instead of KEYS: KEYS blocks Valkey for the whole keyspace walk. SCAN is not a
+ * point-in-time snapshot, so keys written during the walk may survive; rebuilds should
+ * run after invalidation, not concurrently with it.
+ */
 export async function invalidateHypergraph(): Promise<void> {
   const redis = getRedis();
+  const scanPattern = (match: string): Promise<string[]> =>
+    new Promise<string[]>((resolve, reject) => {
+      const keys: string[] = [];
+      const stream = redis.scanStream({ match, count: 500 });
+      stream.on('data', (batch: string[]) => keys.push(...batch));
+      stream.on('end', () => resolve(keys));
+      stream.on('error', reject);
+    });
   const [edgeKeys, coordKeys] = await Promise.all([
-    redis.keys('hg:edge:*').catch(() => [] as string[]),
-    redis.keys('hg:4d:*').catch(() => [] as string[]),
+    scanPattern('hg:edge:*'),
+    scanPattern('hg:4d:*'),
   ]);
   const all = [...edgeKeys, ...coordKeys, HG_IDX_KEY, HG_BUILT_KEY];
-  if (all.length) await redis.del(...all).catch(() => {});
+  for (let i = 0; i < all.length; i += 500) {
+    await redis.del(...all.slice(i, i + 500));
+  }
 }
 
 // ── Adaptive Memory Interface ──────────────────────────────────────────────────
@@ -1339,7 +1356,7 @@ export interface MemoryModule {
   gradeLabel:     HyperEdgeGrade;
   gradeScore:     number;
   pipeline:       string;
-  summary:        string;        // gemma4-rotorquant:latest ACE synthesis of cluster members
+  summary:        string;        // ornith-1.5-9b ACE synthesis of cluster members
   xPrimeCentroid: number[];      // 768-dim HGNN-enriched centroid (reward-weighted)
   memberCount:    number;
   similarity:     number;        // cosine similarity to the incoming query embedding

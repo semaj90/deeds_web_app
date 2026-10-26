@@ -11,8 +11,9 @@
  * All addresses resolved via ENV.* getters in env.server.ts.
  */
 import { ENV } from '$lib/server/env.server.js';
+import { createHash } from 'node:crypto';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
 import {
   prepareEmbeddingInputV1,
@@ -22,6 +23,12 @@ import {
 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 import type { QueryExecutionModeV1 } from '$lib/server/execution/query-execution-policy-v1.js';
 import { shouldPopulateEmbeddingCacheV1 } from '$lib/server/execution/query-execution-policy-v1.js';
+import { CANONICAL_SEMANTIC_ENCODER_REVISION } from '$lib/server/embedding/semantic-lineage.js';
+import {
+  createSemanticEmbeddingCacheKeyV2,
+  hashSemanticEmbeddingCacheKeyV2,
+  type SemanticEmbeddingCacheKeyV2,
+} from '$lib/server/embedding/semantic-embedding-cache-key-v2.js';
 // Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -60,7 +67,7 @@ export interface EmbeddingOptions {
 // `onnx-local` remains a legacy receipt/cache label only. This canonical
 // generator no longer emits it; ONNX is available through the explicit
 // non-canonical challenger API in canonical-embed.ts.
-type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'onnx-local' | 'cache';
+type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'http-openai-compatible' | 'onnx-local' | 'cache';
 
 export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
 
@@ -98,7 +105,7 @@ export interface EmbeddingTransportHealth {
  * Stored in Redis as JSON string; shape mirrors what would be indexed in a
  * PostgreSQL JSONB column if the cache were ever promoted to durable storage.
  *
- * Key: `embed:{model}:{sha256_16hex}` (24h TTL — embeddings are deterministic)
+ * Key: `embed:v2:{sha256}` (24h TTL — identity includes producer revisions and prepared input)
  * Qdrant tag enrichment (qdrantTags) is populated fire-and-forget after generation
  * and is used by bifrostChat() to sharpen the semantic cache key.
  */
@@ -112,12 +119,14 @@ export interface EmbeddingCacheEntry {
   queryHash: string; // FNV-1a of original text (8 hex chars)
   createdAt: string; // ISO timestamp
   hitCount: number; // incremented on cache hits (approximate)
+  cacheIdentity: SemanticEmbeddingCacheKeyV2;
 }
 
-/** Legacy narrow shape for backwards-compat reads. */
+/** Narrow Redis read shape; unqualified legacy values are rejected. */
 interface CachedEmbeddingEntry {
   vector: number[];
   source?: EmbeddingSource;
+  cacheIdentity: SemanticEmbeddingCacheKeyV2;
 }
 
 class EmbeddingGenerationError extends Error {
@@ -483,7 +492,7 @@ async function generateViaHttp(
 
   const batchStart = performance.now();
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+    const res = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: texts }),
@@ -579,7 +588,7 @@ async function fetchOllamaEmbeddingSingle(
         ? JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: text })
         : JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text });
 
-      const res = await ollamaFetch(url, {
+      const res = await embedOrChatFetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,
@@ -626,40 +635,71 @@ async function generateViaHttpSingle(
 
 const EMBED_CACHE_TTL = 24 * 60 * 60; // 24h — embeddings are deterministic for same model+text
 
-async function getCachedEmbedding(text: string): Promise<number[] | null> {
+function createEmbeddingCacheIdentity(text: string, artifactRevision: string): SemanticEmbeddingCacheKeyV2 {
+  const inputPolicyRevision = ENV.EMBEDDING_INPUT_POLICY_REVISION;
+
+  return createSemanticEmbeddingCacheKeyV2({
+    representationId: 'semantic_768',
+    representationRevision: CANONICAL_SEMANTIC_ENCODER_REVISION,
+    modelArtifactRevision: artifactRevision,
+    tokenizerRevision: `ollama-manifest-bound:${artifactRevision}`,
+    inputPolicyRevision,
+    normalizedInputChecksum: `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`,
+  });
+}
+
+async function resolveQualifiedCacheArtifactRevision(): Promise<string | null> {
+  if (
+    typeof ENV.EMBEDDING_INPUT_POLICY_REVISION !== 'string' || ENV.EMBEDDING_INPUT_POLICY_REVISION.trim() === '' ||
+    ENV.EMBEDDING_GRPC_ENABLED || ENV.EMBEDDING_QUIC_ENABLED
+  ) return null;
+
   try {
-    const { getRedis } = await import('../redis.js');
-    const redis = getRedis();
-    if (!redis) return null;
-    const { createHash } = await import('crypto');
-    const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
-    const cached = await redis.get(key);
-    if (!cached) return null;
-    const parsed = JSON.parse(cached) as number[] | CachedEmbeddingEntry;
-    if (Array.isArray(parsed)) return parsed;
-    return Array.isArray(parsed.vector) ? parsed.vector : null;
+    const { resolveEmbeddingProviderV1 } = await import('$lib/server/embedding/embedding-provider-v1.js');
+    const provider = resolveEmbeddingProviderV1();
+    const ollamaBaseUrl = ENV.OLLAMA_BASE_URL?.replace(/\/$/, '');
+    if (!ollamaBaseUrl || provider.provider === 'onnx_directml' || provider.baseUrl?.replace(/\/$/, '') !== ollamaBaseUrl) {
+      return null;
+    }
+    const response = await embedOrChatFetch(`${ollamaBaseUrl}/api/tags`);
+    if (!response.ok) return null;
+    const payload = await response.json() as { models?: Array<{ name?: string; model?: string; digest?: string }> };
+    const model = payload.models?.find((candidate) =>
+      candidate.name === SERVER_EMBEDDING_MODEL || candidate.model === SERVER_EMBEDDING_MODEL,
+    );
+    if (!model || typeof model.digest !== 'string') return null;
+    const liveRevision = model.digest.startsWith('sha256:') ? model.digest : `sha256:${model.digest}`;
+    return /^sha256:[a-f0-9]{64}$/i.test(liveRevision) ? liveRevision : null;
   } catch {
     return null;
   }
 }
 
-async function getCachedEmbeddingEntry(text: string): Promise<CachedEmbeddingEntry | null> {
+export async function resolveEmbeddingArtifactRevisionV1(): Promise<string | null> {
+  return resolveQualifiedCacheArtifactRevision();
+}
+
+function qualifiedEmbeddingCacheRedisKey(identity: SemanticEmbeddingCacheKeyV2): string {
+  return `embed:v2:${hashSemanticEmbeddingCacheKeyV2(identity)}`;
+}
+
+async function getCachedEmbeddingEntry(
+  identity: SemanticEmbeddingCacheKeyV2,
+): Promise<CachedEmbeddingEntry | null> {
   try {
     const { getRedis } = await import('../redis.js');
     const redis = getRedis();
     if (!redis) return null;
-    const { createHash } = await import('crypto');
-    const key = `embed:${SERVER_EMBEDDING_MODEL}:${createHash('sha256').update(text).digest('hex').slice(0, 16)}`;
+    const key = qualifiedEmbeddingCacheRedisKey(identity);
     const cached = await Promise.race([
       redis.get(key),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
     ]);
     if (!cached) return null;
-    const parsed = JSON.parse(cached) as number[] | CachedEmbeddingEntry;
-    if (Array.isArray(parsed)) {
-      return { vector: parsed, source: 'http-ollama' };
-    }
+    const parsed = JSON.parse(cached) as CachedEmbeddingEntry;
     if (!Array.isArray(parsed.vector) || parsed.source === 'onnx-local') return null;
+    if (JSON.stringify(parsed.cacheIdentity) !== JSON.stringify(identity)) return null;
+    validateEmbeddingBatchV1([parsed.vector], 1);
     return parsed;
   } catch {
     return null;
@@ -670,15 +710,16 @@ async function setCachedEmbedding(
   text: string,
   vector: number[],
   source: EmbeddingSource,
+  cacheIdentity: SemanticEmbeddingCacheKeyV2,
   qdrantTags: string[] = [],
 ): Promise<void> {
   try {
+    if (await resolveQualifiedCacheArtifactRevision() !== cacheIdentity.modelArtifactRevision) return;
+    validateEmbeddingBatchV1([vector], 1);
     const { getRedis } = await import('../redis.js');
     const redis = getRedis();
     if (!redis) return;
-    const { createHash } = await import('crypto');
-    const sha = createHash('sha256').update(text).digest('hex').slice(0, 16);
-    const key = `embed:${SERVER_EMBEDDING_MODEL}:${sha}`;
+    const key = qualifiedEmbeddingCacheRedisKey(cacheIdentity);
     const entry: EmbeddingCacheEntry = {
       vector,
       source,
@@ -688,6 +729,7 @@ async function setCachedEmbedding(
       queryHash:  fnv1aHash(text),
       createdAt:  new Date().toISOString(),
       hitCount:   0,
+      cacheIdentity,
     };
     await redis.set(key, JSON.stringify(entry), 'EX', EMBED_CACHE_TTL);
   } catch {
@@ -784,9 +826,12 @@ export async function generateEmbeddingsWithTags(
     suppressionReason: 'READ_ONLY_CACHE_LOOKUP_ONLY',
   });
   if (qdrantTags.length && !lookupOnly) {
+    const artifactRevision = await resolveQualifiedCacheArtifactRevision();
     for (let i = 0; i < texts.length; i++) {
       const cacheText = prepareEmbeddingInputV1({ text: texts[i], mode: options.taskMode, title: options.title }).formattedText;
-      setCachedEmbedding(cacheText, result.vectors[i], result.source, qdrantTags).catch(() => {});
+      if (!artifactRevision) continue;
+      const cacheIdentity = createEmbeddingCacheIdentity(cacheText, artifactRevision);
+      setCachedEmbedding(cacheText, result.vectors[i], result.source, cacheIdentity, qdrantTags).catch(() => {});
     }
   }
   return { result, qdrantTags };
@@ -815,12 +860,22 @@ export async function generateEmbeddings(
   }));
   const cacheTexts = preparedInputs.map((prepared) => prepared.formattedText);
 
-  const cachedEntries = options.skipCacheRead
+  const cacheArtifactRevision = await resolveQualifiedCacheArtifactRevision();
+  const cacheIdentities = cacheArtifactRevision
+    ? cacheTexts.map((text) => createEmbeddingCacheIdentity(text, cacheArtifactRevision))
+    : texts.map(() => null);
+  const cacheIdentityQualified = cacheIdentities.every((identity) => identity !== null);
+  const cachedEntries = options.skipCacheRead || !cacheIdentityQualified
     ? texts.map(() => null)
-    : await Promise.all(cacheTexts.map(getCachedEmbeddingEntry));
+    : await Promise.all(cacheIdentities.map((identity) =>
+        identity ? getCachedEmbeddingEntry(identity) : Promise.resolve(null),
+      ));
   options.recordSideEffect?.({
-    subsystem: 'embedding-cache', operation: 'lookup', reads: options.skipCacheRead ? 0 : cacheTexts.length,
-    attemptedWrites: 0, committedWrites: 0, suppressionReason: null,
+    subsystem: 'embedding-cache', operation: 'lookup',
+    reads: options.skipCacheRead || !cacheIdentityQualified ? 0 : cacheTexts.length,
+    attemptedWrites: 0, committedWrites: 0,
+    suppressionReason: options.skipCacheRead ? 'CACHE_READ_DISABLED'
+      : !cacheIdentityQualified ? 'EMBEDDING_CACHE_IDENTITY_UNQUALIFIED' : null,
   });
 
   // Check cache for each text
@@ -865,19 +920,19 @@ export async function generateEmbeddings(
       const llamaVecs = await generateViaLlamaEmbed(uncachedTexts);
       if (llamaVecs) {
         newVectors = llamaVecs;
-        source = 'http-ollama';
+        source = 'http-openai-compatible';
         model = 'embeddinggemma-openai-compatible';
         attempts.push({
-          transport: 'http-ollama',
+          transport: 'http-openai-compatible',
           status: 'success',
-          detail: `llama-embed ${providerV1.baseUrl}`,
+          detail: 'dedicated OpenAI-compatible embedding endpoint',
           durationMs: Math.round(performance.now() - llamaStart),
         });
       } else {
         attempts.push({
-          transport: 'http-ollama',
+          transport: 'http-openai-compatible',
           status: 'failed',
-          detail: `llama-embed ${providerV1.baseUrl} unavailable`,
+          detail: 'dedicated OpenAI-compatible embedding endpoint unavailable',
           durationMs: Math.round(performance.now() - llamaStart),
         });
       }
@@ -992,8 +1047,16 @@ export async function generateEmbeddings(
     suppressionReason: 'READ_ONLY_CACHE_LOOKUP_ONLY',
   });
   for (let j = 0; !lookupOnly && j < uncachedIndices.length; j++) {
-    setCachedEmbedding(cacheTexts[uncachedIndices[j]], newVectors[j], source).catch(() => {});
+    const cacheIdentity = cacheIdentities[uncachedIndices[j]];
+    if (cacheIdentity) {
+      setCachedEmbedding(cacheTexts[uncachedIndices[j]], newVectors[j], source, cacheIdentity).catch(() => {});
+    }
   }
+  if (!lookupOnly && !cacheIdentityQualified && uncachedIndices.length > 0) options.recordSideEffect?.({
+    subsystem: 'embedding-cache', operation: 'populate-on-miss', reads: 0,
+    attemptedWrites: 0, committedWrites: 0,
+    suppressionReason: 'EMBEDDING_CACHE_IDENTITY_UNQUALIFIED',
+  });
 
   return {
     vectors: validatedVectors,

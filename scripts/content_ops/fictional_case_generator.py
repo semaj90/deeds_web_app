@@ -352,39 +352,29 @@ def generate_case(case_id: str, category: str, template: dict, rng: random.Rando
         amount=amount,
     )
 
-    # Call LLM with keep-alive and model pinning
-    payload = json.dumps({
-        "model": LLM_MODEL,
-        "messages": [
-            {
-                "role": "system",
-                "content": (
-                    "You are a legal fiction writer creating case summaries for a simulation platform. "
-                    "All output is fictional. Use only the names and details provided in the prompt. "
-                    "Never use real living or deceased persons' names."
-                )
-            },
-            {"role": "user", "content": prompt},
-        ],
-        "stream": False,
-        "keep_alive": "24h",
-        "options": GEN_OPTIONS,
-    }).encode()
+    # llama-server (Ornith 1.5, :8090). Ollama is embeddings-only; keep_alive no longer applies.
+    from config.llama_chat import llama_chat
+    messages = [
+        {
+            "role": "system",
+            "content": (
+                "You are a legal fiction writer creating case summaries for a simulation platform. "
+                "All output is fictional. Use only the names and details provided in the prompt. "
+                "Never use real living or deceased persons' names."
+            )
+        },
+        {"role": "user", "content": prompt},
+    ]
 
     narrative = ""
     for attempt in range(MAX_RETRIES):
-        req = urllib.request.Request(
-            f"{OLLAMA_URL}/api/chat",
-            data=payload,
-            headers={
-                "Content-Type": "application/json",
-                "Connection": "keep-alive",
-            },
-        )
         try:
-            with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT_SECS) as resp:
-                data = json.loads(resp.read())
-                narrative = data.get("message", {}).get("content", "")
+            narrative = llama_chat(
+                messages,
+                max_tokens=GEN_OPTIONS.get("num_predict", 600),
+                temperature=GEN_OPTIONS.get("temperature", 0.7),
+                timeout=HTTP_TIMEOUT_SECS,
+            )
             break
         except (TimeoutError, _socket.timeout, urllib.error.URLError, ConnectionError, OSError) as e:
             is_timeout = isinstance(e, (TimeoutError, _socket.timeout)) or "timed out" in str(e).lower()

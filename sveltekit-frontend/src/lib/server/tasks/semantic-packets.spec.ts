@@ -23,7 +23,7 @@ vi.mock('$lib/server/redis', () => ({
   setJsonWithTtl: vi.fn(),
 }));
 
-vi.mock('$lib/server/ollama', () => ({ callOllamaChat: vi.fn() }));
+vi.mock('$lib/server/ollama', () => ({ callLlamaServerChat: vi.fn() }));
 vi.mock('$lib/server/grpc/embedding-client', () => ({ generateEmbeddings: vi.fn() }));
 vi.mock('$lib/server/observability/langfuse', () => ({ traceSpan: (_name: string, fn: () => unknown) => fn() }));
 vi.mock('$lib/server/config/vector-config.js', () => ({ buildVectorPayload: vi.fn() }));

@@ -15,7 +15,7 @@ vi.mock('$lib/server/retrieval/search-runtime.js', () => ({
 
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat: (...args: unknown[]) => mocks.bifrostChat(...args),
-  VLM_MODELS: { legal: 'gemma4-legal-iq4xs-direct.gguf' },
+  VLM_MODELS: { legal: 'ornith-1.5-9b' },
 }));
 
 describe('/api/rag/hyperrag', () => {

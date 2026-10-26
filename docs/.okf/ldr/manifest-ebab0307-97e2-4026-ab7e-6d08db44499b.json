@@ -1,0 +1,111 @@
+{
+  "schema": "atlas.okf.ldr.documentation-capture.v1",
+  "runId": "ebab0307-97e2-4026-ab7e-6d08db44499b",
+  "createdAt": "2026-10-18T00:50:18.006Z",
+  "upstream": "LearningCircuit/local-deep-research",
+  "upstreamCheckoutCommit": "8239c68",
+  "fetchers": [
+    "FIRECRAWL_V2",
+    "BEAUTIFULSOUP_HTTP"
+  ],
+  "canonicalAuthority": false,
+  "datastoreWrites": false,
+  "ldrResearchJobExecuted": false,
+  "sources": [
+    {
+      "id": "ldr-api-quickstart",
+      "url": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/api-quickstart.md",
+      "title": "LearningCircuit LDR API quickstart",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "FIRECRAWL_V2",
+          "markdown": "docs/.okf/ldr/raw/ldr-api-quickstart.firecrawl.md",
+          "metadata": "docs/.okf/ldr/raw/ldr-api-quickstart.firecrawl.json",
+          "checksum": "09d1ac4684da84b290f8664a781c4d4601decd8ba3d198f81692814407e40399"
+        },
+        {
+          "fetcher": "beautifulsoup",
+          "status": "FAILED"
+        }
+      ]
+    },
+    {
+      "id": "ldr-mcp-server",
+      "url": "https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/mcp-server.md",
+      "title": "LearningCircuit LDR MCP server guide",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "FIRECRAWL_V2",
+          "markdown": "docs/.okf/ldr/raw/ldr-mcp-server.firecrawl.md",
+          "metadata": "docs/.okf/ldr/raw/ldr-mcp-server.firecrawl.json",
+          "checksum": "e0fbeacddb90e34b2327678d31f1b18ff265a5f589c01360af8cc1ca1ca5369f"
+        },
+        {
+          "fetcher": "beautifulsoup",
+          "status": "FAILED"
+        }
+      ]
+    },
+    {
+      "id": "firecrawl-scrape-api",
+      "url": "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+      "title": "Firecrawl v2 scrape API",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "FIRECRAWL_V2",
+          "markdown": "docs/.okf/ldr/raw/firecrawl-scrape-api.firecrawl.md",
+          "metadata": "docs/.okf/ldr/raw/firecrawl-scrape-api.firecrawl.json",
+          "checksum": "9ffa7406ddad3b2c9fe8c8f0a394d831387dc85332ab0f1a3896644b22f74354"
+        },
+        {
+          "fetcher": "beautifulsoup",
+          "status": "FAILED"
+        }
+      ]
+    },
+    {
+      "id": "beautifulsoup-docs",
+      "url": "https://beautiful-soup-4.readthedocs.io/en/latest/",
+      "title": "Beautiful Soup documentation",
+      "canonicalAuthority": false,
+      "captures": [
+        {
+          "fetcher": "FIRECRAWL_V2",
+          "markdown": "docs/.okf/ldr/raw/beautifulsoup-docs.firecrawl.md",
+          "metadata": "docs/.okf/ldr/raw/beautifulsoup-docs.firecrawl.json",
+          "checksum": "efe14ef69c770b412534619d8c3b645848ac204cb1a20e97358669f6198a9627"
+        },
+        {
+          "fetcher": "beautifulsoup",
+          "status": "FAILED"
+        }
+      ]
+    }
+  ],
+  "status": "PARTIAL",
+  "failures": [
+    {
+      "sourceId": "ldr-api-quickstart",
+      "fetcher": "beautifulsoup",
+      "message": "Command failed: python C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\docs-atlas\\fetch-beautifulsoup.py https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/api-quickstart.md\n"
+    },
+    {
+      "sourceId": "ldr-mcp-server",
+      "fetcher": "beautifulsoup",
+      "message": "Command failed: python C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\docs-atlas\\fetch-beautifulsoup.py https://github.com/LearningCircuit/local-deep-research/blob/8239c68/docs/mcp-server.md\n"
+    },
+    {
+      "sourceId": "firecrawl-scrape-api",
+      "fetcher": "beautifulsoup",
+      "message": "Command failed: python C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\docs-atlas\\fetch-beautifulsoup.py https://docs.firecrawl.dev/api-reference/endpoint/scrape\n"
+    },
+    {
+      "sourceId": "beautifulsoup-docs",
+      "fetcher": "beautifulsoup",
+      "message": "Command failed: python C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\docs-atlas\\fetch-beautifulsoup.py https://beautiful-soup-4.readthedocs.io/en/latest/\n"
+    }
+  ]
+}

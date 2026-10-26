@@ -1,7 +1,4 @@
 import { z } from 'zod';
-import { db } from '$lib/server/db/client.js';
-import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
-import { eq } from 'drizzle-orm';
 
 /**
  * SOM Clustering via pytorch-graph N-API bridge.
@@ -49,9 +46,9 @@ export class SomClusterer {
     }
 
     try {
+      const nativeAddonPath = '../../../gpu/libtorch-bridge.node';
       // Vite must not try to statically analyze the native addon path.
-      // @ts-expect-error Native addon import is runtime-only.
-      const mod = await import(/* @vite-ignore */ '../../../gpu/libtorch-bridge.node');
+            const mod = await import(/* @vite-ignore */ nativeAddonPath);
       this.addon = (mod as { default?: any }).default ?? mod;
       return this.addon;
     } catch {
@@ -270,34 +267,8 @@ export class SomClusterer {
    * Materialize cluster assignments to Postgres.
    * Direct UPDATE: 4 columns, no conditionals.
    */
-  async materializeToPostgres(result: SomClusterResult): Promise<{ updated: number; failed: number }> {
-    let updated = 0;
-    let failed = 0;
-
-    const batchSize = 1000;
-    for (let i = 0; i < result.assignments.length; i += batchSize) {
-      const batch = result.assignments.slice(i, i + batchSize);
-
-      for (const assignment of batch) {
-        try {
-          await db
-            .update(atlasPackets)
-            .set({
-              kmeansCluster: assignment.clusterId,
-              somRow: assignment.somBmuRow,
-              somCol: assignment.somBmuCol,
-              somIndex: assignment.clusterId,
-            })
-            .where(eq(atlasPackets.packetKey, assignment.packetKey));
-          updated++;
-        } catch (err) {
-          console.error(`Failed to update packet ${assignment.packetKey}:`, err);
-          failed++;
-        }
-      }
-    }
-
-    return { updated, failed };
+  async materializeToPostgres(_result: SomClusterResult): Promise<{ updated: number; failed: number }> {
+    throw new Error('SOM_MATERIALIZATION_BLOCKED: revision-qualified admission and readback owner required');
   }
 
   /**

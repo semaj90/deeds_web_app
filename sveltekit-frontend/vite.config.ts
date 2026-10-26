@@ -5,6 +5,7 @@ import path from 'path';
 import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
 import { loadRuntimeEnv } from './src/lib/server/config/load-runtime-env.js';
+import { ensureOpenTelemetry } from './src/lib/server/observability/opentelemetry.js';
 
 // vite.config.ts is the actual Node.js entrypoint for `vite dev` / `npm run dev`.
 // It does NOT get .env populated into process.env automatically (Vite's own
@@ -147,6 +148,10 @@ const stripDashedDefineKeys = {
   },
 };
 
+// OBS-06: start the OpenTelemetry SDK before Vite creates the dev HTTP server, so the inbound
+// request instrumentation wraps it. Runs after loadRuntimeEnv() above. The hooks-level call remains and is idempotent.
+await ensureOpenTelemetry();
+
 export default defineConfig(({ mode }) => {
   // Don't load env vars with loadEnv - let SvelteKit handle it naturally
   const wsPort = '5173';
@@ -188,21 +193,7 @@ export default defineConfig(({ mode }) => {
       stubNativeAddons,
       stripDashedDefineKeys,
       ENABLE_CJS_RESOLVER_PATCH && esbuildCommonJsResolverPatch,
-      sveltekit({
-        compilerOptions: {
-          runes: true, // Enable runes mode for Svelte 5
-        },
-        onwarn(warning, handler) {
-          // Suppress $$props warnings from lucide-svelte (Svelte 4 library in Svelte 5)
-          if (
-            warning.code === 'legacy_props_invalid' &&
-            warning.filename?.includes('node_modules/lucide-svelte')
-          ) {
-            return;
-          }
-          handler(warning);
-        },
-      }),
+      sveltekit(),
       UnoCSS(),
       vscodeErrorLogger({ enabled: mode === 'development' }),
       devRequestLoggerPlugin(mode === 'development'),
@@ -212,6 +203,13 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       host: '0.0.0.0',
       allowedHosts: ['host.docker.internal', 'localhost', '127.0.0.1'],
+      // Same isolation headers as hooks.server.ts. Vite serves /src/**/*.worker.ts itself
+      // (before SvelteKit hooks run); without COEP a page that sets require-corp blocks the
+      // worker script (net::ERR_BLOCKED_BY_RESPONSE).
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+      },
       // Pre-transform frequently imported modules on dev server start
       warmup: {
         clientFiles: [
@@ -338,7 +336,6 @@ export default defineConfig(({ mode }) => {
         '@internationalized/date',
         'drizzle-orm',
         'svelte',
-        '@sveltejs/kit',
         'onnxruntime-web',
       ],
       esbuildOptions: {

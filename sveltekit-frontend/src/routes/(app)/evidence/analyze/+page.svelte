@@ -151,7 +151,7 @@
 					legalRelevance: data.data?.analysis?.legalRelevance ?? 'Unknown',
 					keyFindings: data.data?.analysis?.keyFindings ?? [],
 					recommendations: data.data?.analysis?.recommendations ?? [],
-					model: data.data?.model ?? 'gemma4-legal',
+					model: data.data?.model ?? 'ornith-1.5-9b',
 					processedAt: data.data?.processedAt
 				}
 			};

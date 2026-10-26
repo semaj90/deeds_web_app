@@ -1,12 +1,12 @@
 /**
  * AI endpoint helpers — re-exports canonical implementations.
  *
- * getOllamaEndpoint / getOllamaEmbeddingEndpoint / getOllamaGenerationEndpoint
+ * getOllamaEndpoint / getOllamaEmbeddingEndpoint / getLlamaGenerationEndpoint
  * → ollama.ts (canonical, Docker-aware)
  */
 export {
   getOllamaEndpoint,
   getOllamaEmbeddingEndpoint,
-  getOllamaGenerationEndpoint,
-  getOllamaChatEndpoint,
+  getLlamaGenerationEndpoint,
+  getLlamaChatEndpoint,
 } from '$lib/server/ollama.js';

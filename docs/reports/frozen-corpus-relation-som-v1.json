@@ -1,0 +1,162 @@
+{
+ "schema": "atlas.frozen-corpus-relation-som.v1",
+ "generatedAt": "2026-10-19T07:58:36.092527+00:00",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "rows": 106271,
+ "torch": "2.8.0+cu128",
+ "device": "NVIDIA GeForce RTX 3060 Ti",
+ "somV2Candidate": {
+  "input": "128-d MRL prefix (first 128 of semantic_768), L2-renormalized",
+  "grid": [
+   20,
+   20
+  ],
+  "epochs": 40,
+  "seed": 20261019,
+  "init": "random data rows",
+  "weightsSha256": "29cf4c0aad61420cf2d2971f14f6c37431de42ede566ac59c2898ca02b3cb520",
+  "quantizationErrorMean": 0.5858769416809082,
+  "topographicError": 0.3832089657573562,
+  "emptyCells": 0,
+  "occupancyMinMaxMedian": [
+   5,
+   764,
+   261.5
+  ],
+  "bmuParityCudaF32VsNumpyF64Mismatches": 0,
+  "minisomReferenceQE_20kSubsample": 0.6587377059804538,
+  "seconds": 7.0,
+  "status": "CANDIDATE_ONLY_NOT_ADMITTED"
+ },
+ "relationAnalysis": {
+  "k": 10,
+  "backend": "cuda",
+  "peakCudaAllocatedMiB": 114.4,
+  "seconds": 21.0,
+  "cpuOracleSample": 300,
+  "tieAwareRecallVsFloat64Oracle": 1.0,
+  "worstSortedScoreAbsDiff": 0.0,
+  "meanCosineAtRank": [
+   0.8097915053367615,
+   0.7747513651847839,
+   0.756533682346344,
+   0.7440031170845032,
+   0.7349360585212708,
+   0.7276057600975037,
+   0.7217091917991638,
+   0.7166873216629028,
+   0.7123884558677673,
+   0.7085772752761841
+  ],
+  "sameFileNeighborFraction": 0.28764984850480835,
+  "identicalVectorNeighborFraction": 0.005954419707548413,
+  "directories": [
+   "packages/parent-atlas",
+   "scripts/atlas",
+   "sveltekit-frontend/scripts",
+   "sveltekit-frontend/src",
+   "sveltekit-frontend/tests"
+  ],
+  "neighborDirectoryMatrix": [
+   [
+    18271,
+    963,
+    205,
+    5848,
+    33
+   ],
+   [
+    1433,
+    179472,
+    37083,
+    18100,
+    572
+   ],
+   [
+    240,
+    39489,
+    126795,
+    33980,
+    2056
+   ],
+   [
+    6649,
+    18931,
+    27505,
+    440212,
+    7573
+   ],
+   [
+    37,
+    839,
+    1621,
+    6803,
+    88000
+   ]
+  ],
+  "topCrossFilePairs": [
+   [
+    "sveltekit-frontend/scripts/fix-rabbitmq-worker.cjs",
+    "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts",
+    40
+   ],
+   [
+    "scripts/atlas/backfill-latent-vectors.mjs",
+    "scripts/atlas/backfill-packet-metadata-to-postgres.mjs",
+    32
+   ],
+   [
+    "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+    "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/detective/insights/+server.ts",
+    31
+   ],
+   [
+    "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/v1/citations/verify/+server.ts",
+    "sveltekit-frontend/scripts/phase104-backups/src/routes_parked/api/yorha/enhanced-rag/+server.ts",
+    30
+   ],
+   [
+    "sveltekit-frontend/scripts/phase104-backups/src/lib/services/glyph-diffusion-service.ts",
+    "sveltekit-frontend/src/lib/server/glyph-diffusion-service.ts",
+    30
+   ],
+   [
+    "sveltekit-frontend/src/lib/components/yorha/_simulations/YoRHaDataViz.svelte",
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/_simulations/YoRHaDataViz.svelte",
+    28
+   ],
+   [
+    "sveltekit-frontend/scripts/phase104-backups/src/lib/workers/rabbitmq-embedding-worker.ts",
+    "sveltekit-frontend/scripts/fix-rabbitmq-worker.cjs",
+    28
+   ],
+   [
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/PhoenixProsecutorDashboard.svelte",
+    "sveltekit-frontend/src/lib/components/yorha/PhoenixProsecutorDashboard.svelte",
+    28
+   ],
+   [
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/JudicialAnalysisAgent.svelte",
+    "sveltekit-frontend/src/lib/components/yorha/JudicialAnalysisAgent.svelte",
+    27
+   ],
+   [
+    "sveltekit-frontend/src/routes/(app)/legal-corpus/[id]/+page.svelte",
+    "sveltekit-frontend/src/lib/components/legal-corpus/LegalCorpusClassicView.svelte",
+    27
+   ],
+   [
+    "sveltekit-frontend/src/lib/components/yorha/YoRHaDetectiveCommandCenter.svelte",
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/YoRHaDetectiveCommandCenter.svelte",
+    26
+   ],
+   [
+    "sveltekit-frontend/src/routes/(app)/demos/yorha/components/YoRHaDetectiveCommandCenter.svelte",
+    "sveltekit-frontend/src/lib/components/yorha/YoRHaDetectiveCommandCenter.svelte",
+    25
+   ]
+  ],
+  "status": "EXPLORATORY_NOT_RETRIEVAL_AUTHORITY"
+ }
+}

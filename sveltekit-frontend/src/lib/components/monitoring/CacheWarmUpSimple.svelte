@@ -46,10 +46,11 @@
 	</h3>
 
 	<div style="margin-bottom: 1rem;">
-		<label style="display: block; font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem;">
+		<label for="simple-warmup-domain" style="display: block; font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem;">
 			Domain:
 		</label>
 		<select
+			id="simple-warmup-domain"
 			bind:value={selectedDomain}
 			disabled={isRunning}
 			style="width: 100%; padding: 0.5rem; background: #0f172a; border: 1px solid #334155; border-radius: 4px; color: #e2e8f0;"

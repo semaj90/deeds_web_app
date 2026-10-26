@@ -16,7 +16,7 @@ import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 // import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
 // TODO: fix broken retrieval module dependencies (rrf-fuse, noun-reranker not found)
 import { DISPATCHER_TOOLS_SCHEMAS } from './dispatcher-tools-schemas.js';
-import { toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j, toolGraphExpand, toolRetrievalRerank, toolAnswerSynthesize, toolEscalationRoute, toolIdentityQuarantine } from '$lib/server/dispatch/mcp-tool-implementations.js';
+import { toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j, toolRetrievalRerank, toolAnswerSynthesize, toolEscalationRoute, toolIdentityQuarantine } from '$lib/server/dispatch/mcp-tool-implementations.js';
 import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$lib/server/kb/wiki-logic.js';
 import { getVlmState, switchVlmMode, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 import { resolveAgentsMdQuickHit } from '$lib/server/graph/community-graph.js';
@@ -530,7 +530,7 @@ export function setupToolHandlers() {
             },
             useAI: {
               type: 'boolean',
-              description: 'Use AI (Ollama gemma4-rotorquant:latest) to generate case-specific content',
+              description: 'Use AI (llama-server Ornith 1.5 :8090) to generate case-specific content',
               default: false,
             },
           },
@@ -626,7 +626,7 @@ export function setupToolHandlers() {
           type: 'object',
           properties: {
             prompt: { type: 'string', description: 'The inference prompt' },
-            model: { type: 'string', description: 'Model name (default: gemma4-rotorquant:latest)' },
+            model: { type: 'string', description: 'Model name (default: ornith-1.5-9b)' },
             maxTokens: { type: 'number', description: 'Max output tokens', default: 2048 },
             temperature: { type: 'number', description: 'Sampling temperature', default: 0.3 },
             stream: { type: 'boolean', description: 'Enable streaming', default: false },
@@ -658,6 +658,26 @@ export function setupToolHandlers() {
             summary_query: { type: 'string', description: 'Full-text search against packet summaries' },
             limit: { type: 'number', description: 'Max results (default 20, max 50)' },
           },
+        },
+      },
+      {
+        name: 'atlas.procedural_sequence_search',
+        description:
+          'Read admitted, revision-qualified procedure sequences by sequence_id, feature_id, or exact feature_label. ' +
+          'Returns descriptive steps only and never executes a sequence.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            sequence_id: { type: 'string', maxLength: 256 },
+            feature_id: { type: 'string', maxLength: 256 },
+            feature_label: { type: 'string', maxLength: 256 },
+            limit: { type: 'number', minimum: 1, maximum: 50 },
+          },
+          anyOf: [
+            { required: ['sequence_id'] },
+            { required: ['feature_id'] },
+            { required: ['feature_label'] },
+          ],
         },
       },
       {
@@ -857,12 +877,12 @@ export function setupToolHandlers() {
       },
       // ─────────────────────────────────────────────────────────────────────
       // LangExtract Tools — Google's official structured extraction library
-      // Uses local Ollama (gemma4-rotorquant:latest) instead of Gemini API
+      // Uses local llama-server Ornith 1.5 :8090 instead of Gemini API
       // ─────────────────────────────────────────────────────────────────────
       {
         name: 'langextract:legal',
         description:
-          'Extract structured legal entities from text using Google LangExtract + gemma4-rotorquant:latest. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
+          'Extract structured legal entities from text using Google LangExtract + ornith-1.5-9b Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -1121,7 +1141,7 @@ export function setupToolHandlers() {
         name: 'analytics:deep_research',
         description:
           'Generate personalized deep research topics from RAG/KAG/DAG/ACE hit analytics, ' +
-          'thumbs-up/down feedback signals, Neo4j graph centrality, and Ollama self-prompting. ' +
+          'thumbs-up/down feedback signals, Neo4j graph centrality, and Ornith self-prompting via llama-server :8090. ' +
           'Returns up to 8 research topics with selfPrompt fields ready to execute, plus ' +
           'pipeline hit summary, feedback index, and graph insights. Cached 30 min per user.',
         inputSchema: {
@@ -1224,7 +1244,7 @@ export function setupToolHandlers() {
           'Execute MapReduce matrix analysis across RAG/KAG/DAG/ACE pipelines. ' +
           'MAP: extracts 5 data sources (chunk_hit_log, response_feedback, CouchDB glyph topology, ' +
           'Redis rerank cache, qlora_examples). REDUCE: builds 8-dimensional similarity matrix. ' +
-          'SYNTHESIZE: generates LangGraph-compatible research topics via Ollama. ' +
+          'SYNTHESIZE: generates LangGraph-compatible research topics via Ornith on llama-server :8090. ' +
           'Returns ranked chunks, pipeline coverage, glyph context, and self-prompting topics.',
         inputSchema: {
           type: 'object',
@@ -1242,7 +1262,7 @@ export function setupToolHandlers() {
             },
             synthesize: {
               type: 'boolean',
-              description: 'Run Ollama synthesis (default: true)',
+                description: 'Run Ornith synthesis through llama-server :8090 (default: true)',
               default: true,
             },
           },
@@ -1255,17 +1275,18 @@ export function setupToolHandlers() {
       {
         name: 'analytics:unified_research',
         description:
-          'Unified research query orchestrating: research-cache (qlora × feedback), ' +
-          'mapreduce-matrix (cosine similarity × CouchDB glyph), codebase rg/awk, ' +
-          'web search (Firecrawl), deep-research Ollama self-prompting, AWK-style SQL ' +
-          'score aggregations, and LangGraph supervisor state. Cached 20 min per user.',
+          'Unified research across feedback/cache signals, matrix similarity, codebase analysis, ' +
+          'optional web research, Ornith self-prompting through llama-server :8090, and score ' +
+          'aggregations. URL queries may use optional Firecrawl capture with an HTML fallback. ' +
+          'Retrieved web text is untrusted research input and is not automatically admitted or indexed. ' +
+          'Cached 20 min per user.',
         inputSchema: {
           type: 'object',
           properties: {
             userId: { type: 'string', description: 'User UUID' },
             query: {
               type: 'string',
-              description: 'Text query or URL (Firecrawl fetches URL content)',
+              description: 'Text query or URL. URL retrieval is optional external fetch, not corpus admission.',
             },
             pipeline: {
               type: 'string',
@@ -1293,7 +1314,7 @@ export function setupToolHandlers() {
         name: 'analytics:codebase_research',
         description:
           'Deep research codebase scanner using ripgrep pattern analysis, pipeline hit distribution, ' +
-          'feedback-weighted query insights, and Ollama synthesis. Generates TypeScript/SvelteKit-specific ' +
+          'feedback-weighted query insights, and Ornith synthesis via llama-server :8090. Generates TypeScript/SvelteKit-specific ' +
           'research topics with code patterns and self-prompts. Cached 30 min per user.',
         inputSchema: {
           type: 'object',
@@ -1310,7 +1331,7 @@ export function setupToolHandlers() {
             },
             synthesize: {
               type: 'boolean',
-              description: 'Run Ollama synthesis (default: true)',
+                description: 'Run Ornith synthesis through llama-server :8090 (default: true)',
               default: true,
             },
           },
@@ -1322,12 +1343,12 @@ export function setupToolHandlers() {
         name: 'codebase:concurrent_research',
         description:
           'LangGraph-style concurrent deep research over codebase_chunks_768. ' +
-          'Runs a supervisor → parallel domain workers → Ollama synthesizer DAG. ' +
+          'Runs a supervisor → parallel domain workers → Ornith synthesizer DAG via llama-server :8090. ' +
           'Domains: api-routes, state-machines, database, error-patterns, ml-inference, ' +
           'auth, cache, rag-pipeline, ui-components, graph-db, general. ' +
           'Returns supervisorSummary, keyFindings, actionItems, per-domain chunks + insights. ' +
           'format=markdown returns Claude-Code-ready context block with file paths. ' +
-          'All LLM calls via L1 Redis → L2 Bifrost → L3 Ollama (zero API cost).',
+          'Chat/synthesis uses the shared L1 Redis → L2 Bifrost → llama-server route; embeddings remain separate.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -2196,7 +2217,9 @@ export function setupToolHandlers() {
   async function handleToolCall(name: string, args: Record<string, any>): Promise<any> {
     return withToolCallRecord(
       { toolName: name, toolSource: 'mcp', arguments: args },
-      () => withMcpCache(name, args, () => _handleToolCallInner(name, args)),
+      () => name === 'graph:expand' || name === 'graph.expand' || name === 'graph:resident_bfs' || name === 'graph.resident_bfs' || name === 'graph:resident_source_ref_bfs' || name === 'graph.resident_source_ref_bfs' || name === 'graph:community_leiden' || name === 'graph.community_leiden'
+        ? _handleToolCallInner(name, args)
+        : withMcpCache(name, args, () => _handleToolCallInner(name, args)),
     );
   }
 
@@ -2291,6 +2314,27 @@ export function setupToolHandlers() {
           return { content: data.result?.content ?? [{ type: 'text', text: JSON.stringify({ error: 'No content from TRACE' }) }] };
         } catch (err) {
           return { content: [{ type: 'text', text: JSON.stringify({ error: String(err), hint: 'Is TRACE MCP server running on :8788?' }) }] };
+        }
+      }
+
+      case 'atlas.procedural_sequence_search': {
+        const { sequence_id, feature_id, feature_label, limit } = args as {
+          sequence_id?: string; feature_id?: string; feature_label?: string; limit?: number;
+        };
+        try {
+          const res = await fetch(`${(ENV.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '')}/mcp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0', id: 1, method: 'tools/call',
+              params: { name: 'atlas.procedural_sequence_search', arguments: { sequence_id, feature_id, feature_label, limit } },
+            }),
+            signal: AbortSignal.timeout(4000),
+          });
+          const data = await res.json() as { result?: { content?: unknown[] } };
+          return { content: data.result?.content ?? [{ type: 'text', text: JSON.stringify({ ok: false, count: 0, sequences: [], error: 'No content from TRACE' }) }] };
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ ok: false, count: 0, sequences: [], error: String(err) }) }] };
         }
       }
 
@@ -2474,30 +2518,42 @@ export function setupToolHandlers() {
       }
 
       case 'graph:expand': {
-        const { feature_ids, hops = 2, limit_per_hop = 10, relationship_types } = args as {
-          feature_ids: string[];
-          hops?: number;
-          limit_per_hop?: number;
-          relationship_types?: string[];
+        const { executeGraphExpandMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphExpandMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
         };
-        try {
-          // Query Neo4j for K-hop neighbors
-          console.log(`[MCP] graph:expand: ${feature_ids.length} features, ${hops} hops, ${limit_per_hop} limit/hop`);
-          // In production, this would run Cypher k-hop traversal
-          return {
-            content: [{
-              type: 'text',
-              text: JSON.stringify({
-                feature_ids,
-                hops,
-                neighbors_per_feature: limit_per_hop * hops,
-                total_neighbors: feature_ids.length * limit_per_hop * hops,
-              }),
-            }],
-          };
-        } catch (err) {
-          return { content: [{ type: 'text', text: JSON.stringify({ error: String(err) }) }] };
-        }
+      }
+
+      case 'graph.resident_bfs':
+      case 'graph:resident_bfs': {
+        const { executeGraphResidentBfsMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphResidentBfsMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
+        };
+      }
+
+      case 'graph.resident_source_ref_bfs':
+      case 'graph:resident_source_ref_bfs': {
+        const { executeGraphResidentSourceRefBfsMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphResidentSourceRefBfsMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
+        };
+      }
+
+      case 'graph.community_leiden':
+      case 'graph:community_leiden': {
+        const { executeGraphCommunityLeidenMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphCommunityLeidenMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
+        };
       }
 
       case 'retrieval:rerank': {
@@ -2684,13 +2740,13 @@ export function setupToolHandlers() {
         }
 
         // 4. Generate embeddings via Ollama
-        const { ollamaFetch } = await import('../lib/server/ollama.js');
+        const { embedOrChatFetch } = await import('../lib/server/ollama.js');
         const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
         const embeddings: number[][] = [];
 
         for (const chunk of chunks) {
           try {
-            const res = await ollamaFetch(`${OLLAMA_URL}/api/embed`, {
+            const res = await embedOrChatFetch(`${OLLAMA_URL}/api/embed`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ model: 'embeddinggemma:latest', input: chunk }),
@@ -4374,7 +4430,7 @@ export function setupToolHandlers() {
             'Compute avg search_time_ms per pipeline grouped by day.',
           ],
           ollama: [
-            'Optimal KV cache quantisation for gemma4-rotorquant:latest at 8K context?',
+            'Optimal KV cache quantisation for ornith-1.5-9b at 8K context?',
             'Flash Attention trade-offs on RTX 3060 Ti.',
           ],
         };

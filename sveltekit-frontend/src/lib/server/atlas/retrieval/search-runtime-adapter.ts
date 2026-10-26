@@ -1,5 +1,4 @@
 import { SearchRuntime, type SearchQuery, type SearchResult } from '../../retrieval/search-runtime.js';
-import { graphRetrieve, type GraphCandidate } from './graph-retriever.js';
 import { RETRIEVAL_LIMITS, SearchMetadataFilterSchema } from '../../retrieval/search-contract.js';
 import {
   buildSearchRuntimeQasRows,
@@ -10,7 +9,9 @@ import {
 import type { CandidateProjectionInput } from '$lib/server/retrieval/retrieval-candidate-feature-matrix-v1.js';
 import {
   joinSearchRuntimeQasFeatureSources,
+  joinSearchRuntimeQasAsyncFeatureSources,
   type SearchRuntimeQasFeatureSources,
+  type SearchRuntimeQasAsyncFeatureSources,
 } from './search-runtime-qas-feature-resolver.js';
 import {
   materializeCandidateFeatureSnapshotWithOrdinalMapFromQasRowsV1,
@@ -51,6 +52,7 @@ interface CachedPacketSourceEvidenceInputV1 {
 
 export interface AtlasSearchRequest {
   query: string;
+  lexicalExpansion?: string[];
   topK?: number;
   userId?: string;
   caseId?: string;
@@ -67,19 +69,22 @@ export interface AtlasSearchResponse {
   topPacketKeys: string[];
   metadata: SearchResult['metadata'];
   provenance: SearchResult['provenance'];
-  /** Graph candidates seeded only from SearchRuntime's pre-fusion canonical dense lane. */
-  graphExpanded?: GraphCandidate[];
+  graphExpansionStatus: 'NOT_REQUESTED' | 'DELEGATED_TO_SEARCH_RUNTIME' | 'BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING';
 }
 
-export interface AtlasSearchQasOptions {
+interface AtlasSearchQasOptionsBase {
   requestId: string;
   policyRevision: string;
   workspaceRevision: string;
   representationRevision: string;
-  sources: SearchRuntimeQasFeatureSources;
 }
 
-export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
+export type AtlasSearchQasOptions = AtlasSearchQasOptionsBase & (
+  | { sources: SearchRuntimeQasFeatureSources; asyncSources?: never }
+  | { sources?: never; asyncSources: SearchRuntimeQasAsyncFeatureSources }
+);
+
+export type AtlasSearchAceManifestOptions = AtlasSearchQasOptions & {
   candidateSnapshotRevision: string;
   retrievalPolicyRevision: string;
   acePlaybookRevision: string;
@@ -104,7 +109,7 @@ export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
   centroidCandidateHint?: { card: CentroidCardV1; manifest: CentroidManifestV1 };
   /** Optional independently acquired source bytes/spans; verified but never admitted here. */
   cachedPacketSourceEvidence?: readonly ({ hintId: string } & CachedPacketSourceEvidenceInputV1)[];
-}
+};
 
 export type SearchRuntimeUnifiedResidencyOptions = AtlasSearchAceManifestOptions
   & Pick<UnifiedResidencyAceBridgeInputV1, 'domain' | 'lutRevision' | 'lut' | 'tokenizerRevision' | 'ropeRevision' | 'artifactChecksum' | 'dtype'>
@@ -182,22 +187,50 @@ export function projectAtlasSearchResponseToQas(input: {
   policyRevision: string;
   workspaceRevision: string;
   representationRevision: string;
-  response: Pick<AtlasSearchResponse, 'packets'>;
+  response: Pick<AtlasSearchResponse, 'packets'> & Partial<Pick<AtlasSearchResponse, 'provenance'>>;
   projections: CandidateProjectionInput[];
   resolveFeatures: SearchRuntimeQasFeatureResolver;
 }): SearchRuntimeQasProjectionResult {
-  const candidates = input.response.packets.map((packet) => ({
-    packetKey: packet.packet_key ?? packet.chunk_id,
-    sourceRef: packet.source_ref ?? packet.relative_path ?? '',
-    stableSymbolId: packet.stable_symbol_id ?? null,
-    symbolVersionId: packet.symbol_version_id ?? null,
-    workspaceRevision: packet.workspace_revision ?? null,
-    sourceRevision: packet.source_revision ?? null,
-    representationRevision: packet.representation_revision ?? null,
-    score: packet.retrieval_score,
-    fusionScore: packet.fusion_score,
-    rankBefore: packet.fusion_rank,
-  }));
+  const graphEvidenceByPacket = new Map<string, string[]>();
+  const packetsByKey = new Map<string, Array<Record<string, unknown>>>();
+  for (const packet of input.response.packets) {
+    const packetKey = String(packet.packet_key ?? packet.chunk_id ?? '');
+    const rows = packetsByKey.get(packetKey) ?? [];
+    rows.push(packet as Record<string, unknown>);
+    packetsByKey.set(packetKey, rows);
+  }
+  for (const evidence of input.response.provenance?.graphCandidateEvidence ?? []) {
+    const packets = packetsByKey.get(evidence.packetKey) ?? [];
+    if (packets.length !== 1) continue;
+    const packet = packets[0]!;
+    if (!packet
+      || packet.source_ref !== evidence.sourceRef
+      || packet.source_revision !== evidence.sourceRevision
+      || packet.workspace_revision !== evidence.workspaceRevision
+      || packet.graph_revision !== evidence.graphRevision
+      || !/^sha256:[a-f0-9]{64}$/i.test(evidence.sourceRevision)
+      || !/^sha256:[a-f0-9]{64}$/i.test(evidence.workspaceRevision)
+      || !evidence.graphRevision.trim()) continue;
+    const refs = evidence.evidenceRefs.filter((ref) => typeof ref === 'string' && ref.trim().length > 0);
+    if (refs.length === 0) continue;
+    graphEvidenceByPacket.set(evidence.packetKey, [...new Set([...(graphEvidenceByPacket.get(evidence.packetKey) ?? []), ...refs])].sort());
+  }
+  const candidates = input.response.packets.map((packet) => {
+    const packetKey = packet.packet_key ?? packet.chunk_id;
+    return {
+      packetKey,
+      sourceRef: packet.source_ref ?? packet.relative_path ?? '',
+      graphEvidenceRefs: graphEvidenceByPacket.get(packetKey ?? '') ?? [],
+      stableSymbolId: packet.stable_symbol_id ?? null,
+      symbolVersionId: packet.symbol_version_id ?? null,
+      workspaceRevision: packet.workspace_revision ?? null,
+      sourceRevision: packet.source_revision ?? null,
+      representationRevision: packet.representation_revision ?? null,
+      score: packet.retrieval_score,
+      fusionScore: packet.fusion_score,
+      rankBefore: packet.fusion_rank,
+    };
+  });
 
   const result: SearchRuntimeQasAdapterResult = buildSearchRuntimeQasRows({
     requestId: input.requestId,
@@ -247,7 +280,7 @@ export function projectAtlasSearchResponseToQasFromSources(input: {
   policyRevision: string;
   workspaceRevision: string;
   representationRevision: string;
-  response: Pick<AtlasSearchResponse, 'packets'>;
+  response: Pick<AtlasSearchResponse, 'packets'> & Partial<Pick<AtlasSearchResponse, 'provenance'>>;
   sources: SearchRuntimeQasFeatureSources;
 }): SearchRuntimeQasProjectionResult {
   const candidates = input.response.packets.map((packet) => ({
@@ -275,9 +308,42 @@ export function projectAtlasSearchResponseToQasFromSources(input: {
   });
 }
 
+export async function projectAtlasSearchResponseToQasFromAsyncSources(input: {
+  requestId: string;
+  policyRevision: string;
+  workspaceRevision: string;
+  representationRevision: string;
+  response: Pick<AtlasSearchResponse, 'packets'> & Partial<Pick<AtlasSearchResponse, 'provenance'>>;
+  sources: SearchRuntimeQasAsyncFeatureSources;
+}): Promise<SearchRuntimeQasProjectionResult> {
+  const candidates = input.response.packets.map((packet) => ({
+    packetKey: packet.packet_key ?? packet.chunk_id,
+    sourceRef: packet.source_ref ?? packet.relative_path ?? '',
+    stableSymbolId: packet.stable_symbol_id ?? null,
+    symbolVersionId: packet.symbol_version_id ?? null,
+    workspaceRevision: packet.workspace_revision ?? null,
+    sourceRevision: packet.source_revision ?? null,
+    representationRevision: packet.representation_revision ?? null,
+    score: packet.retrieval_score,
+    fusionScore: packet.fusion_score,
+    rankBefore: packet.fusion_rank,
+  }));
+  const joined = await joinSearchRuntimeQasAsyncFeatureSources(candidates, input.sources, {});
+  return projectAtlasSearchResponseToQas({
+    requestId: input.requestId,
+    policyRevision: input.policyRevision,
+    workspaceRevision: input.workspaceRevision,
+    representationRevision: input.representationRevision,
+    response: input.response,
+    projections: joined.projections,
+    resolveFeatures: joined.resolveFeatures,
+  });
+}
+
 export function createAtlasSearchAdapter(config?: {
   userId?: string;
   caseId?: string;
+  readOnly?: boolean;
   runtime?: Pick<SearchRuntime, 'search'>;
 }) {
   const runtime = config?.runtime ?? new SearchRuntime(config ?? {});
@@ -285,6 +351,7 @@ export function createAtlasSearchAdapter(config?: {
     async search(req: AtlasSearchRequest): Promise<AtlasSearchResponse> {
       const query: SearchQuery = {
         text: req.query,
+        lexicalExpansion: req.lexicalExpansion,
         topK: req.topK ?? RETRIEVAL_LIMITS.defaultTopKPerLane,
         userId: req.userId ?? config?.userId,
         caseId: req.caseId ?? config?.caseId,
@@ -299,32 +366,16 @@ export function createAtlasSearchAdapter(config?: {
         .map(p => (p as Record<string, unknown>).packet_key ?? (p as Record<string, unknown>).chunk_id ?? '')
         .filter((k): k is string => typeof k === 'string' && k.length > 0)
         .slice(0, 5);
-      const denseSeedPacketKeys = result.denseSeedPacketKeys ?? [];
-
-      let graphExpanded: GraphCandidate[] | undefined;
-      if (req.withGraphExpansion && denseSeedPacketKeys.length > 0) {
-        try {
-          graphExpanded = await graphRetrieve({
-            seedPacketKeys: denseSeedPacketKeys,
-            allowedRelationships: ['IMPORTS', 'CALLS', 'SIMILAR_TOPOLOGY', 'USES_CONCEPT'],
-            maxDepth: 2,
-            maxCandidates: 20,
-          });
-          // Remove results already present in the main fused response.
-          const existingKeys = new Set(topPacketKeys);
-          graphExpanded = graphExpanded.filter(g => !existingKeys.has(g.packetKey));
-        } catch {
-          // Graph expansion is best-effort; never degrades the main result
-          graphExpanded = [];
-        }
-      }
-
       return {
         packets: result.packets,
         topPacketKeys,
         metadata: result.metadata,
         provenance: result.provenance,
-        ...(graphExpanded !== undefined ? { graphExpanded } : {}),
+        graphExpansionStatus: !req.withGraphExpansion
+          ? 'NOT_REQUESTED'
+          : req.workspaceRevision
+            ? 'DELEGATED_TO_SEARCH_RUNTIME'
+            : 'BLOCKED_TRUSTED_WORKSPACE_REVISION_MISSING',
       };
     },
     /**
@@ -337,14 +388,16 @@ export function createAtlasSearchAdapter(config?: {
       qas: AtlasSearchQasOptions,
     ): Promise<{ response: AtlasSearchResponse; qas: SearchRuntimeQasProjectionResult }> {
       const response = await this.search(req);
-      const projection = projectAtlasSearchResponseToQasFromSources({
+      const projectionInput = {
         requestId: qas.requestId,
         policyRevision: qas.policyRevision,
         workspaceRevision: qas.workspaceRevision,
         representationRevision: qas.representationRevision,
         response,
-        sources: qas.sources,
-      });
+      };
+      const projection = 'sources' in qas
+        ? projectAtlasSearchResponseToQasFromSources({ ...projectionInput, sources: qas.sources })
+        : await projectAtlasSearchResponseToQasFromAsyncSources({ ...projectionInput, sources: qas.asyncSources });
       return { response, qas: projection };
     },
     /**
@@ -371,7 +424,7 @@ export function createAtlasSearchAdapter(config?: {
         modelRevision: options.modelRevision,
         promptTemplateRevision: options.promptTemplateRevision,
       });
-      const { ordinalMap, ...aceAdmission } = ace;
+      const { ordinalMap, snapshot: _snapshot, ...aceAdmission } = ace;
       const cachedPacketCandidateResolution = options.cachedPacketHints
         ? resolveCachedPacketCandidatesV1({
             workspaceRevision: options.workspaceRevision,

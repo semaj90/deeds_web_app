@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.validation-progress.v1",
+  "generatedAt": "2026-10-14T16:08:50.367Z",
+  "scope": "only the gates listed here; unscoped phases are N/A, not 0%",
+  "gates": [
+    {
+      "id": "G-01",
+      "title": "Resident BFS vs NetworkX parity",
+      "evidence": "docs/reports/atlas-resident-bfs-proof-2026-10-13.json",
+      "class": "TESTED_FIXTURE",
+      "detail": "status=FIXTURE_ONLY; liveBfsRequestPerformed=false; firstUnprovenGate=LIVE_RESIDENT_GRAPH_AND_GPU_EXECUTION"
+    },
+    {
+      "id": "G-02",
+      "title": "CPU worker pool qualification",
+      "evidence": "docs/reports/graph-cpu-worker-qualification-2026-10-13.json",
+      "class": "FAILING",
+      "detail": "parity ok but slower than single-thread; do not promote"
+    },
+    {
+      "id": "G-03",
+      "title": "Schema topology PageRank (NetworkX CPU reference)",
+      "evidence": "docs/reports/atlas-schema-topology-pagerank-receipt-2026-10-13.json",
+      "class": "GENERATED_UNVERIFIED",
+      "detail": "receipt parses; no independent cuGraph comparison"
+    },
+    {
+      "id": "G-04",
+      "title": "Docs/OpenSpec links resolve",
+      "evidence": ".tmp/atlas/docs-link-audit.json",
+      "class": "FAILING",
+      "detail": "broken_links=5532; scanned=3450; many are in vendored/raw doc crawls (not triaged)"
+    },
+    {
+      "id": "G-05",
+      "title": "Sidecar migrations reconciled with live DB",
+      "evidence": "sveltekit-frontend/drizzle/sidecar-migrations.json",
+      "class": "BLOCKED",
+      "detail": "statusCounts={\"planned_sidecar\":6,\"applied\":35,\"design_unapplied\":6,\"manual_sidecar\":34,\"superseded_unapplied\":1,\"applied_additive\":1}; registry is bookkeeping, not live-DB proof"
+    },
+    {
+      "id": "G-06",
+      "title": "ACTIVE graph snapshot with revision binding in PostgreSQL",
+      "evidence": "session census: scripts/atlas/check-graph-snapshot-coverage.mjs",
+      "class": "BLOCKED",
+      "detail": "both snapshots SUPERSEDED; graph_revision/workspace_revision columns not applied; traversal + source_ref indexes not applied (manual gate)"
+    }
+  ],
+  "counts": {
+    "PROVEN_LIVE": 0,
+    "TESTED_FIXTURE": 1,
+    "GENERATED_UNVERIFIED": 1,
+    "FAILING": 2,
+    "BLOCKED": 2,
+    "NOT_PROVEN": 0
+  },
+  "percent": {
+    "provenLive": 0,
+    "fixtureOrBetter": 16.7,
+    "gateCount": 6
+  },
+  "workboard": {
+    "completed": 7228,
+    "total": 11729,
+    "fraction": 0.6162503197203513,
+    "caveat": "checkbox completion in tasks.md; controller evidence is stale for most tasks and completion does not imply live proof",
+    "controllerStaleOrMissing": 8896
+  },
+  "writesPerformed": false
+}

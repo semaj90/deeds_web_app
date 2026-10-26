@@ -25,10 +25,12 @@ import pg from 'pg';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadEnvFiles, REPO_ROOT } from './connection-config.mjs';
+import { loadEnvFiles, loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 import { canonicalizeStructuralEvidence } from '../../packages/parent-atlas/dist/core/gis-canonicalization.js';
 import { createSymbolRegistryRepository } from '../../packages/parent-atlas/dist/core/symbol-registry-repository.js';
-import { deriveUpstreamSymbolNominationKey, STRUCTURAL_SYMBOL_KIND_VALUES } from '../../packages/parent-atlas/dist/core/structural-symbol.js';
+import { deriveUpstreamSymbolNominationKey, STRUCTURAL_SYMBOL_KIND_VALUES, structuralReferenceFactSchema } from '../../packages/parent-atlas/dist/core/structural-symbol.js';
+import { createStructuralReferenceResolver } from '../../packages/parent-atlas/dist/core/structural-reference-resolver.js';
+import { buildGraphifyStructuralReferenceFactsV1 } from './lib/graphify-structural-reference-facts-v1.mjs';
 import { classifyStructuralSymbolKindV1 } from './lib/structural-symbol-kind-admission-v1.mjs';
 import { loadBindingProvenanceV1, provenanceForV1, qualifyPromotionNominationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/symbol-revision-qualification-v1.js';
 
@@ -46,12 +48,17 @@ const opt = (name: string, fallback: string) => {
   return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
 };
 
-const ADMITTED_REVISION_DEFAULT = 'sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf';
+// Admitted sealed-snapshot derivation revision (workspace-revision-tournament-admission-v1.json).
+const ADMITTED_REVISION_DEFAULT = 'sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c';
 const targetWorkspaceRevision = opt('--workspace-revision', ADMITTED_REVISION_DEFAULT);
 const allowCreate = flag('--allow-create');
 const apply = flag('--apply');
 const reportOutput = opt('--output', '');
 const sourceRefsFilter = opt('--source-refs', '').split(',').map((value) => value.trim()).filter(Boolean);
+const referenceLimit = Number(opt('--reference-limit', '5000'));
+if (!Number.isInteger(referenceLimit) || referenceLimit < 1 || referenceLimit > 20000) {
+  throw new Error('REFERENCE_LIMIT_MUST_BE_INTEGER_1_TO_20000');
+}
 
 const databaseUrl =
   env.DATABASE_URL ||
@@ -102,6 +109,22 @@ async function checkGrounding(workspaceRevision: string, sourceRefs: readonly st
 }
 
 async function main() {
+  if (flag('--plan-callable-refresh')) {
+    if (apply || allowCreate) throw new Error('CALLABLE_REFRESH_PLAN_IS_DRY_RUN_ONLY');
+    if (!args.includes('--workspace-revision')) throw new Error('CALLABLE_PLAN_EXPLICIT_WORKSPACE_REQUIRED');
+    const { planCallableProjectionRefreshV1 } = await import('./lib/plan-callable-projection-refresh-v1.mts');
+    const readPool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, connectionTimeoutMillis: 5000, statement_timeout: 12000 });
+    try {
+      const plan = await planCallableProjectionRefreshV1({ pool: readPool, root: REPO_ROOT, symbolVersionId: opt('--symbol-version-id', ''), workspaceRevision: targetWorkspaceRevision });
+      writeReport(plan);
+      console.log(JSON.stringify(plan, null, 2));
+      if (plan.status === 'BLOCKED' || plan.status === 'RECONCILIATION_REQUIRES_AST_REVIEW') process.exitCode = 3;
+    } finally {
+      await readPool.end();
+      await pool.end();
+    }
+    return;
+  }
   const gate = await checkGrounding(targetWorkspaceRevision, sourceRefsFilter);
 
   const report: Record<string, unknown> = {
@@ -138,7 +161,7 @@ async function main() {
   const symbolRows = await pool.query(
     `SELECT gs.symbol_id, gs.stable_symbol_key, gs.symbol_kind, gs.qualified_name,
             gs.start_byte, gs.end_byte, gs.signature_text, gs.ast_fingerprint,
-            gf.source_ref AS source_ref, b.source_revision, b.workspace_revision, gf.language
+            gf.source_ref AS source_ref, gf.file_id AS upstream_file_id, b.source_revision, b.workspace_revision, gf.language
      FROM atlas_workspace_source_bindings b
      JOIN graphify_files gf
        ON gf.source_ref = b.canonical_source_ref
@@ -149,9 +172,83 @@ async function main() {
        AND b.canonical_source_ref = ANY($2::text[])`,
     [targetWorkspaceRevision, boundRefs.rows.map((r) => r.canonical_source_ref)],
   );
+  const edgeInventory = await pool.query(
+    `SELECT count(*)::int AS total_edge_count,
+            count(*) FILTER (WHERE predicate = 'CALLS')::int AS calls_edge_count,
+            count(*) FILTER (WHERE predicate IN ('IMPORTS', 'EXPORTS', 'EXTENDS', 'INHERITS', 'IMPLEMENTS', 'REFERENCES'))::int AS other_structural_edge_count
+     FROM graphify_edges`,
+  );
+  const boundEdgeInventory = await pool.query(
+    `SELECT count(*)::int AS bound_source_edge_count
+     FROM graphify_edges e
+     JOIN graphify_symbols source_symbol ON source_symbol.symbol_id = e.subject_symbol_id
+     JOIN graphify_files source_file
+       ON source_file.file_id = source_symbol.file_id
+      AND source_file.workspace_id = e.workspace_id
+     JOIN atlas_workspace_source_bindings source_binding
+       ON source_binding.repo_id = 'deeds-web-app'
+      AND source_binding.canonical_source_ref = source_file.source_ref
+      AND source_binding.workspace_revision = $1
+      AND source_binding.source_revision = e.source_revision
+      AND source_file.code_source_revision = source_binding.source_revision
+     WHERE source_file.source_ref = ANY($2::text[])`,
+    [targetWorkspaceRevision, boundRefs.rows.map((r) => r.canonical_source_ref)],
+  );
+  const structuralEdgeRows = await pool.query(
+    `SELECT e.edge_id::text AS edge_id, e.predicate, e.evidence_kind, e.evidence_span,
+            e.confidence, e.source_revision,
+            source_symbol.symbol_id::text AS source_symbol_id,
+            source_file.source_ref AS source_ref,
+            source_binding.source_revision AS source_binding_revision,
+            source_binding.workspace_revision AS source_binding_workspace_revision,
+            target_symbol.symbol_id::text AS target_symbol_id,
+            target_symbol.qualified_name AS target_qualified_name,
+            e.unresolved_target,
+            target_file.source_ref AS target_source_ref,
+            target_binding.source_revision AS target_source_revision,
+            target_binding.source_revision AS target_binding_revision,
+            target_binding.workspace_revision AS target_binding_workspace_revision
+     FROM graphify_edges e
+     JOIN graphify_symbols source_symbol ON source_symbol.symbol_id = e.subject_symbol_id
+     JOIN graphify_files source_file
+       ON source_file.file_id = source_symbol.file_id
+      AND source_file.workspace_id = e.workspace_id
+     LEFT JOIN atlas_workspace_source_bindings source_binding
+       ON source_binding.repo_id = 'deeds-web-app'
+      AND source_binding.canonical_source_ref = source_file.source_ref
+      AND source_binding.workspace_revision = $1
+      AND source_binding.source_revision = e.source_revision
+      AND source_file.code_source_revision = source_binding.source_revision
+     LEFT JOIN graphify_symbols target_symbol ON target_symbol.symbol_id = e.object_symbol_id
+     LEFT JOIN graphify_files target_file
+       ON target_file.file_id = target_symbol.file_id
+      AND target_file.workspace_id = e.workspace_id
+     LEFT JOIN atlas_workspace_source_bindings target_binding
+       ON target_binding.repo_id = 'deeds-web-app'
+      AND target_binding.canonical_source_ref = target_file.source_ref
+      AND target_binding.workspace_revision = $1
+      AND target_binding.source_revision = target_file.code_source_revision
+     WHERE e.predicate IN ('CALLS', 'IMPORTS', 'EXPORTS', 'EXTENDS', 'INHERITS', 'IMPLEMENTS', 'REFERENCES')
+       AND source_file.source_ref = ANY($2::text[])
+     ORDER BY e.edge_id
+     LIMIT $3`,
+    [targetWorkspaceRevision, boundRefs.rows.map((r) => r.canonical_source_ref), referenceLimit],
+  );
+  const structuralReferencePlan = buildGraphifyStructuralReferenceFactsV1(
+    structuralEdgeRows.rows as any[],
+    targetWorkspaceRevision,
+  );
+  const structuralReferenceFacts = structuralReferencePlan.facts.map((fact) => structuralReferenceFactSchema.parse(fact));
 
   const unsupportedKinds: Array<{ symbolId: string; symbolKind: string }> = [];
+  // Code-only registry: Markdown, JSON, YAML, CSV and text sections/keys are document artifacts, not code identities.
+  const NON_CODE_SOURCE = /\.(md|mdx|txt|json|ya?ml|csv)$/i;
+  const nonCodeExcluded: Array<{ symbolId: string; sourceRef: string }> = [];
   const nominations = symbolRows.rows.flatMap((row: any) => {
+    if (NON_CODE_SOURCE.test(String(row.source_ref))) {
+      nonCodeExcluded.push({ symbolId: String(row.symbol_id), sourceRef: String(row.source_ref) });
+      return [];
+    }
     const classification = classifyStructuralSymbolKindV1(row.symbol_kind);
     if (!classification.admitted) {
       unsupportedKinds.push({ symbolId: String(row.symbol_id), symbolKind: String(row.symbol_kind) });
@@ -175,6 +272,7 @@ async function main() {
       source_ref: row.source_ref,
       source_revision: row.source_revision,
       workspace_revision: row.workspace_revision,
+      upstream_file_id: row.upstream_file_id,
       upstream_node_id: row.symbol_id,
       upstream_symbol_id: row.symbol_id,
       upstream_chunk_id: row.symbol_id,
@@ -277,15 +375,22 @@ async function main() {
   if (promoting) {
     const provenanceMap = await loadBindingProvenanceV1(pool, nominations.map((n) => ({ sourceRef: n.source_ref, sourceRevision: n.source_revision })));
     admittedNominations = nominations.filter((n) => {
+      // Fail closed before the package writes: a nomination with no upstream file id (e.g. a Markdown source) cannot form a version row.
+      if (!n.upstream_file_id) {
+        revisionRejections.push({ nomination_id: n.nomination_id, reasons: ['UPSTREAM_FILE_ID_MISSING'] });
+        return false;
+      }
       const v = qualifyPromotionNominationV1(n, targetWorkspaceRevision, provenanceForV1(provenanceMap, n.source_ref, n.source_revision));
       if (!v.admitted) revisionRejections.push({ nomination_id: n.nomination_id, reasons: v.reasons });
       return v.admitted;
     });
   }
+  report.nonCodeExcludedCount = nonCodeExcluded.length;
   report.revisionRejectedCount = revisionRejections.length;
   report.revisionRejectionSample = revisionRejections.slice(0, 20);
 
   const repo = createSymbolRegistryRepository(pool);
+  const referenceResolver = createStructuralReferenceResolver(pool);
   const result = await canonicalizeStructuralEvidence({
     evidence_id: `symbol-reconciliation-run:${targetWorkspaceRevision}`,
     evidence_revision: 'symbol-reconciliation-writer-v1',
@@ -294,7 +399,15 @@ async function main() {
     workspace_revision: targetWorkspaceRevision,
     producer_revision: 'symbol-reconciliation-writer-v1',
     symbol_nominations: admittedNominations as any,
-    reference_facts: [],
+    reference_facts: structuralReferenceFacts as any,
+    reference_resolver: {
+      resolve: (fact, options) => referenceResolver.resolve({
+        fact,
+        producer_revision: 'symbol-reconciliation-writer-v1',
+        persist: options?.persist ?? false,
+      }),
+    },
+    persist_references: false,
     symbol_resolver: {
       resolve: (n) => repo.resolveNomination({ nomination: n, registry_revision: targetWorkspaceRevision }),
       promote: apply && allowCreate
@@ -320,6 +433,23 @@ async function main() {
       candidateSymbolIds: row.candidate_symbol_ids,
     })),
   };
+  report.structuralReferenceSummary = {
+    edgeTableInventory: edgeInventory.rows[0],
+    exactBoundSourceEdgeCount: boundEdgeInventory.rows[0]?.bound_source_edge_count ?? 0,
+    edgeRowsRead: structuralEdgeRows.rows.length,
+    queryLimit: referenceLimit,
+    candidateFactCount: structuralReferencePlan.facts.length,
+    rejectedCount: structuralReferencePlan.rejections.length,
+    rejectionSample: structuralReferencePlan.rejections.slice(0, 20),
+    resolutionCounts: {
+      revisionBoundIdentityPairCandidates: result.reference_resolutions.filter((row) => row.status === 'canonical').length,
+      degraded: result.reference_resolutions.filter((row) => row.status === 'degraded').length,
+      ambiguous: result.reference_resolutions.filter((row) => row.status === 'ambiguous').length,
+      unresolved: result.reference_resolutions.filter((row) => row.status === 'unresolved').length,
+    },
+    persistenceEnabled: false,
+    canonicalAuthority: false,
+  };
   report.receipt = result.receipt;
   writeReport(report);
   console.log(JSON.stringify(report, null, 2));
@@ -332,7 +462,7 @@ function writeReport(report: Record<string, unknown>) {
     : path.join(REPO_ROOT, 'docs', 'reports', `symbol-reconciliation-writer-v1-${Date.now()}.json`);
   const dir = path.dirname(outPath);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(outPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(outPath, JSON.stringify(report, null, 2) + '\n', { encoding: 'utf8', flag: 'wx' });
   (report as any)._reportPath = path.relative(REPO_ROOT, outPath);
 }
 

@@ -29,7 +29,7 @@ const DEFAULT_TTL_SECONDS = 6 * 60 * 60;
 export interface SemanticCacheRecord {
 	queryHash: string;
 	semanticCacheKey: string;
-	model: string; // e.g., 'gemma4-rotorquant:latest'
+	model: string; // e.g., 'ornith-1.5-9b'
 	provider: string; // e.g., 'bifrost/ollama' or 'turboquant/llama-server'
 	sourceRefs: string[]; // Postgres llm_context_cache ids or evidence ids
 	chunkIds: string[]; // canonical chunk ids referenced in the response

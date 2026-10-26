@@ -31,11 +31,11 @@ function isAstChunkResult(value: unknown): value is AstChunkOperationResultV1 {
 }
 
 const AstChunkInputSchema = z.object({
-  sourceRef: z.string().min(1),
-  sourceRevision: z.string().min(1),
-  workspaceRevision: z.string().min(1).optional(),
-  language: z.string().min(1),
-  source: z.string(),
+  sourceRef: z.string().min(1).max(2_000),
+  sourceRevision: z.string().min(1).max(256),
+  workspaceRevision: z.string().min(1).max(256).optional(),
+  language: z.string().min(1).max(64),
+  source: z.string().min(1).max(200_000),
 });
 
 const AstEvidenceChunkSchema = z.object({

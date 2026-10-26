@@ -27,8 +27,8 @@ function createMockableWrapper(orig) {
   return wrapper;
 }
 
-// Export the mockable wrapper for ollamaFetch; also export default underlying impl
-export const ollamaFetch = createMockableWrapper(impl.ollamaFetch);
+// Export the mockable wrapper for embedOrChatFetch; also export default underlying impl
+export const embedOrChatFetch = createMockableWrapper(impl.embedOrChatFetch);
 
 export * from './ollama.ts';
 export default impl;

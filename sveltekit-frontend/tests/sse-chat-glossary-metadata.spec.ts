@@ -62,15 +62,15 @@ vi.mock('$lib/server/db/schema', () => ({
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
-  ollamaFetch: mockOllamaFetch,
+  embedOrChatFetch: mockOllamaFetch,
   getChatModelKeepAlive: vi.fn(() => '5m'),
   getEmbeddingModelKeepAlive: vi.fn(() => '5m'),
   VLM_MODELS: {
-    vision: 'gemma4-rotorquant:latest',
+    vision: 'ornith-1.5-9b',
     embedding: 'embeddinggemma:latest',
-    legal: 'gemma4-rotorquant:latest',
-    gemma4: 'gemma4-rotorquant:latest',
-    tool: 'gemma4-rotorquant:latest',
+    legal: 'ornith-1.5-9b',
+    gemma4: 'ornith-1.5-9b',
+    tool: 'ornith-1.5-9b',
   },
 }));
 
@@ -357,7 +357,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain probable cause for this case.',
         conversationId: 'conversation-glossary-metadata',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -434,7 +434,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain probable cause for this case.',
         conversationId: 'conversation-glossary-live',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -469,7 +469,7 @@ describe('/api/sse/chat glossary metadata', () => {
 
     expect(assistantInsertCall.role).toBe('assistant');
     expect(assistantInsertCall.content).toBe('Probable cause applies.');
-    expect(assistantMetadata.model).toBe('gemma4-rotorquant:latest');
+    expect(assistantMetadata.model).toBe('ornith-1.5-9b');
     expect(assistantMetadata.conversationTurns).toBe(2);
     expect(assistantMetadata.glossaryMatches).toEqual(doneEvent?.glossaryMatches);
     expect(assistantMetadata.contextUsed?.glossaryMatches).toEqual(doneEvent?.glossaryMatches);
@@ -484,7 +484,7 @@ describe('/api/sse/chat glossary metadata', () => {
         expect.objectContaining({
           query: 'Explain probable cause for this case.',
           response: 'Probable cause applies.',
-          model: 'gemma4-rotorquant:latest',
+          model: 'ornith-1.5-9b',
           context: expect.any(String),
           queryEmbedding: MOCK_EMBEDDING_768,
           confidence: doneEvent?.confidence,
@@ -641,7 +641,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain the legal grounding for this issue.',
         conversationId: 'conversation-non-attachment-retry',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -706,7 +706,7 @@ describe('/api/sse/chat glossary metadata', () => {
         expect.objectContaining({
           query: 'Explain the legal grounding for this issue.',
           response: 'Improved legal answer with explicit support [Source 1].',
-          model: 'gemma4-rotorquant:latest',
+          model: 'ornith-1.5-9b',
           context: expect.stringContaining(
             'Retrieved non-attachment legal grounding text that should back the retried answer.'
           ),
@@ -800,7 +800,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Provide the supporting legal analysis.',
         conversationId: 'conversation-high-quality-live',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -856,7 +856,7 @@ describe('/api/sse/chat glossary metadata', () => {
           query: 'Provide the supporting legal analysis.',
           response:
             'High-quality legal answer with explicit support [Source 1] and sufficient detail for evaluation.',
-          model: 'gemma4-rotorquant:latest',
+          model: 'ornith-1.5-9b',
           context: expect.stringContaining(
             'Retrieved legal grounding text for a high-quality response with explicit support.'
           ),
@@ -968,7 +968,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this route handler in this repo with supporting legal context.',
         conversationId: 'conversation-code-kag-high-quality',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -1030,7 +1030,7 @@ describe('/api/sse/chat glossary metadata', () => {
           query: 'Explain this route handler in this repo with supporting legal context.',
           response:
             'High-quality code-aware legal answer with explicit support [Source 1] and route analysis.',
-          model: 'gemma4-rotorquant:latest',
+          model: 'ornith-1.5-9b',
           context: expect.stringMatching(
             /Retrieved legal grounding text for a code-aware high-quality response\.[\s\S]*## Knowledge Graph Context[\s\S]*## Codebase Context/
           ),
@@ -1132,7 +1132,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this legal relationship with graph-backed support.',
         conversationId: 'conversation-kag-only-high-quality',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -1192,7 +1192,7 @@ describe('/api/sse/chat glossary metadata', () => {
           query: 'Explain this legal relationship with graph-backed support.',
           response:
             'High-quality graph-aware legal answer with explicit support [Source 1] and linked evidence analysis.',
-          model: 'gemma4-rotorquant:latest',
+          model: 'ornith-1.5-9b',
           context: expect.stringMatching(
             /Retrieved legal grounding text for a KAG-only high-quality response\.[\s\S]*## Knowledge Graph Context/
           ),
@@ -1292,7 +1292,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this endpoint in this repo with legal support.',
         conversationId: 'conversation-code-aware-cached',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -1357,7 +1357,7 @@ describe('/api/sse/chat glossary metadata', () => {
         context: expect.stringMatching(
           /Retrieved legal grounding text for a code-aware cached response\.[\s\S]*## Codebase Context/
         ),
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       })
     );
     expect(mockStoreCachedResponse).not.toHaveBeenCalled();
@@ -1441,7 +1441,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this legal relationship with graph-backed support.',
         conversationId: 'conversation-kag-aware-cached',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -1503,7 +1503,7 @@ describe('/api/sse/chat glossary metadata', () => {
         context: expect.stringMatching(
           /Retrieved legal grounding text for a KAG-aware cached response\.[\s\S]*## Knowledge Graph Context/
         ),
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       })
     );
     const lookupCall = mockLookupCachedResponse.mock.calls.at(-1)?.[0] as {
@@ -1606,7 +1606,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this route handler in this repo with supporting legal context.',
         conversationId: 'conversation-code-kag-cached',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -1671,7 +1671,7 @@ describe('/api/sse/chat glossary metadata', () => {
         context: expect.stringMatching(
           /Retrieved legal grounding text for a code-and-KAG-aware cached response\.[\s\S]*## Knowledge Graph Context[\s\S]*## Codebase Context/
         ),
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       })
     );
     expect(mockStoreCachedResponse).not.toHaveBeenCalled();
@@ -1768,7 +1768,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this endpoint in this repo with legal support.',
         conversationId: 'conversation-context-parity-live',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -1866,7 +1866,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Provide a very long legal answer with source support.',
         conversationId: 'conversation-queue-truncate-live',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -1994,7 +1994,7 @@ describe('/api/sse/chat glossary metadata', () => {
       body: JSON.stringify({
         message: 'Explain this endpoint in this repo with legal support.',
         conversationId: 'conversation-code-only-high-quality',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
       }),
     });
 
@@ -2056,7 +2056,7 @@ describe('/api/sse/chat glossary metadata', () => {
           query: 'Explain this endpoint in this repo with legal support.',
           response:
             'High-quality codebase-aware legal answer with explicit support [Source 1] and endpoint analysis.',
-          model: 'gemma4-rotorquant:latest',
+          model: 'ornith-1.5-9b',
           context: expect.stringMatching(
             /Retrieved legal grounding text for a codebase-only high-quality response\.[\s\S]*## Codebase Context/
           ),

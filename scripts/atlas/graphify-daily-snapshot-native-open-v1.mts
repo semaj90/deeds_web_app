@@ -12,10 +12,10 @@ import {
   recordRepositoryQualifiedSourceSelectionStageV2,
   releaseCoordinatorLock,
 } from '../../sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.js';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const ROOT = resolve(import.meta.dirname, '../..');
-const DATABASE_URL = process.env.DATABASE_URL?.trim();
-if (!DATABASE_URL) throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_DATABASE_URL_REQUIRED');
+const DATABASE_URL = resolveDatabaseUrl(loadRepoEnv(process.env));
 const WORKSPACE_ID = '625743d2-092b-4fa8-abe0-9dc094920c80';
 const AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
 const admissionPath = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
@@ -144,18 +144,16 @@ async function main() {
     const descriptor = JSON.parse(await readFile(resolve(descriptorPath), 'utf8')) as {
       schema?: string; sourceKind?: string; workspaceRevision?: string;
       snapshotRevision?: string; materializedRoot?: string; sourceCount?: number;
-      repositoryCount?: number; sourceInventoryRevision?: string; sourceInventoryChecksum?: string;
+      repositoryCount?: number;
       selectionChecksum?: string;
     };
     if (descriptor.schema !== 'atlas.graphify-execution-source.v2'
-      || descriptor.sourceKind !== 'ADMITTED_CANONICAL_SOURCE_SELECTION'
+      || descriptor.sourceKind !== 'ADMITTED_WORKSPACE_SNAPSHOT'
       || descriptor.workspaceRevision !== admission.workspaceRevision
       || descriptor.snapshotRevision !== admission.snapshotRevision
       || resolve(descriptor.materializedRoot ?? '') !== materializedRoot
-      || descriptor.sourceCount !== sourceRows.length
-      || descriptor.repositoryCount !== new Set(sourceRowsRepositoryIds(sourceRows)).size
-      || descriptor.sourceInventoryRevision !== admission.sourceInventoryRevision
-      || descriptor.sourceInventoryChecksum !== admission.sourceInventoryChecksum
+      || (descriptor.sourceCount !== snapshot.sources.length && descriptor.sourceCount !== admission.sourceCount)
+      || descriptor.repositoryCount !== new Set(sourceRowsRepositoryIds(snapshot.sources)).size
       || descriptor.selectionChecksum !== admission.sourceSelectionChecksum) {
       throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SOURCE_DESCRIPTOR_MISMATCH');
     }

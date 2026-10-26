@@ -1,0 +1,76 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "a2a-protocol",
+  "source_ref": "a2a-protocol:a2a-protocol-org-latest-latest",
+  "url": "https://a2a-protocol.org/latest/",
+  "title": "A2A Protocol",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "taskboard",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "A2A Protocol",
+    "markdown_excerpt": "A2A Protocol Skip to content New on the blog: A2A joins the Agentic AI Foundation Read the announcement Join the DeepLearning.AI course to explore the A2A Protocol Enroll for free --> A2A Protocol Home Initializing search A2A Python Go Java JS .NET Rust Home Documentation Extensions Specification Resources Community Blog A2A Protocol Home Home Table of contents What is A2A Protocol? Key Features Get started with A2A How A2A Works with MCP What A2A Is Not Governance &amp; Open Source License Documentation Documentation What is A2A? A2A and MCP Core Concepts Life of a Task Agent Discovery Enterprise Features Streaming & Asynchronous Operations Multi-Tenancy Extensions Extensions Overview Custom Protocol Bindings Extension & Binding Governance Specification Specification Overview What's New in v1.0 Protocol Definition Resources Resources SDKs SDKs Python API Reference Tutorials Tutorials Quickstart (Python) Quickstart (Python) Introduction Setup Agent Skills & Agent Card Agent Executor Start Server Interact with Server Streaming & Multiturn Next Steps DeepLearning.AI Course Community Community Overview Roadmap Partners Blog Blog Release Notes Archive Archive 2026 Categories Categories",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:a2a-protocol:a2a-protocol-org-latest-latest",
+    "title": "A2A Protocol",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Agent2Agent Protocol Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "9381540f7565a724f03ee76122ae09a693b844d09af8f43fb2e124db75dd17b9",
+  "markdown_path": "docs/.okf/dev/raw/a2a-protocol/a2a-protocol-org-latest-latest.md",
+  "fetched_at": "2026-10-11T19:44:38.271Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "a2a-protocol",
+    "source_title": "Agent2Agent Protocol Documentation",
+    "source_revision": "a2a-latest-spec-2026-10-11",
+    "source_manifest": {
+      "manifest_revision": "okf-tooling-docs-r3",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "output_namespace": "docs/.okf/a2a-protocol",
+      "maximum_pages": 2,
+      "maximum_depth": 0,
+      "allowed_domains": [
+        "a2a-protocol.org"
+      ],
+      "provider": "a2a-protocol",
+      "product": "a2a-latest",
+      "version_qualification": "LATEST_SPECIFICATION_CAPTURED_AT_FETCH",
+      "language": "protocol",
+      "publisher": "A2A Protocol"
+    },
+    "preferred_fetcher": "HTTP_FALLBACK",
+    "fetched_via": "http_fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/a2a-protocol/a2a-protocol-org-latest-latest.md"
+}

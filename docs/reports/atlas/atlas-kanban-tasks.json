@@ -1,4 +1,355 @@
 {
-  "generated": "2026-06-13T21:14:10.180Z",
-  "tasks": []
+  "generated": "2026-10-19T07:24:47.296Z",
+  "tasks": [
+    {
+      "id": "err-fix:sha256:f2a663af527f5b72",
+      "priority": "P1",
+      "label": "[SearchRuntime/retrieval owner] scripts/atlas/kanban-turbovec-consolidation.mts: Verify revision, identity, collection/vector binding, and strict failure behavior.",
+      "status": "PROPOSED",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/kanban-turbovec-consolidation.mts",
+      "evidence_refs": [
+        "TURBOVEC_SYNTHETIC_FALLBACK=BLOCKED scripts/atlas/kanban-turbovec-consolidation.mts used pseudo-embeddings and hash-derived cluster IDs when dependencies were unavailable.",
+        "Verify revision, identity, collection/vector binding, and strict failure behavior."
+      ],
+      "reason_codes": [
+        "RETRIEVAL_OR_PROJECTION",
+        "TURBOVEC_SYNTHETIC_FALLBACK"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:5686015c86a8b437",
+      "priority": "P1",
+      "label": "[SearchRuntime/retrieval owner] Verify revision, identity, collection/vector binding, and strict failure behavior.",
+      "status": "PROPOSED",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "TURBOVEC_CANDIDATE_ORDINAL_BRIDGE=BLOCKED Qdrant codebase_chunks_768 has 328348 points; bounded sample 1000/1000 has no CandidateOrdinal and exact chunk_id join to the 100000-entry current chunk map matches 0/1000; packet key and source ref repeat, do not substitute them.",
+        "Verify revision, identity, collection/vector binding, and strict failure behavior."
+      ],
+      "reason_codes": [
+        "RETRIEVAL_OR_PROJECTION",
+        "TURBOVEC_CANDIDATE_ORDINAL_BRIDGE"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:b0615c8b0ee66cf1",
+      "priority": "P1",
+      "label": "[Graph projection/executor owner] Verify projection identity and CPU/GPU parity on the existing frozen fixture.",
+      "status": "PROPOSED",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "GRAPHIFY_LIFECYCLE_STALE=STALE report=docs/reports/graphify-daily-lifecycle-v1.json execution=0dba1c0d-2cf7-4f35-a61b-c77956f60d3d terminalStatus=RUNNING but no matching process is live; older execution, not a current daily pass.",
+        "Verify projection identity and CPU/GPU parity on the existing frozen fixture."
+      ],
+      "reason_codes": [
+        "GRAPH_OR_GPU",
+        "GRAPHIFY_LIFECYCLE_STALE"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:bf6b80434b640368",
+      "priority": "P2",
+      "label": "[Operator review] Reduce the bounded input or isolate the dependency timeout before changing limits.",
+      "status": "PROPOSED",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "TURBOVEC_DRY_RUN_TIMEOUT=TIMEOUT report=docs/reports/graphify-downstream-chain-2026-10-18.json stage=turbovec error=TurboVec timeout (180s); other dry-run stages passed; no production writes.",
+        "Reduce the bounded input or isolate the dependency timeout before changing limits."
+      ],
+      "reason_codes": [
+        "TIMEOUT",
+        "TURBOVEC_DRY_RUN_TIMEOUT"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:d035997f77253c33",
+      "priority": "P1",
+      "label": "[SearchRuntime/retrieval owner] Verify revision, identity, collection/vector binding, and strict failure behavior.",
+      "status": "PROPOSED",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "TURBOVEC_RUNTIME_ALIGNMENT=PARTIAL_PROVEN :8791 HTTP health is 200 but indexed=0 dim=64 bits=4 turbovec=false; :50062 gRPC also indexed=0 dim=64.",
+        "Verify revision, identity, collection/vector binding, and strict failure behavior."
+      ],
+      "reason_codes": [
+        "RETRIEVAL_OR_PROJECTION",
+        "TURBOVEC_RUNTIME_ALIGNMENT"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:031ebb21b6291192",
+      "priority": "P0",
+      "label": "[PostgreSQL canonical identity and Qdrant projection reconciliation] scripts/atlas/audit-qdrant-payload-canonical-bridge-v1.mjs: Trace the canonical Qdrant point producer and establish a collision-fre",
+      "status": "PROPOSED",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/audit-qdrant-payload-canonical-bridge-v1.mjs",
+      "evidence_refs": [
+        "Full payload-only census of codebase_chunks_768 found 328348 points, 88028 missing and 925 ambiguous chunk_id joins, and zero strictly qualified joins. A separate read-only PostgreSQL census found workspace_revision=0/274465 and representation_revision=0/274465; source_revision is also empty but intentionally deferred and is not the blocker for this gate. Exact source_ref plus content_hash matched 220673 Qdrant candidates but does not supply the missing workspace/representation binding.",
+        "Trace the canonical Qdrant point producer and establish a collision-free point-to-canonical-chunk/ordinal crosswalk with workspace and representation qualification; keep source_revision deferred and independently read back before enabling semantic fanout."
+      ],
+      "reason_codes": [
+        "LINEAGE_ADMISSION",
+        "QDRANT_ORDINAL_REVISION_BRIDGE"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:f82b9697bd3d40ec",
+      "priority": "P1",
+      "label": "[PostgreSQL semantic representation and retrieval qualification] scripts/atlas/prove-postgres-pgvector-exact-hnsw-replay-v1.mjs: Resolve the existing writer/model/recipe provenance for the qualified s",
+      "status": "PROPOSED",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/prove-postgres-pgvector-exact-hnsw-replay-v1.mjs",
+      "evidence_refs": [
+        "Fresh lineage-qualified PostgreSQL exact-vs-HNSW replay: 116657 candidates in the sealed workspace, 8 deterministic probes, topK=10, mean/min Recall@10=1.0; exact plans used sequential scans and HNSW plans used the named index. Status remains PGVECTOR_LINEAGE_DIAGNOSTIC because SEMANTIC_REPRESENTATION_PROVENANCE_UNAVAILABLE. No codebase_chunk_index revision columns were backfilled; source_revision remains deferred.",
+        "Resolve the existing writer/model/recipe provenance for the qualified semantic_768 vectors; retain the exact/HNSW parity receipt as a diagnostic and do not promote retrieval until representation identity is independently proven."
+      ],
+      "reason_codes": [
+        "RETRIEVAL_OR_PROJECTION",
+        "PGVECTOR_EXACT_HNSW_REPLAY"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:2457e18dafd3c0eb",
+      "priority": "P0",
+      "label": "[Packet/source lineage authority] scripts/atlas/graphify-symbol-extractor-v1.mts: Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:48b3201bc2525868290fcd455ff358cbb12e9082e839a9f19545ce0cbc77acf2",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/graphify-symbol-extractor-v1.mts",
+      "evidence_refs": [
+        "SYMBOLS_RESOLVED=PARTIAL_PROVEN Nomination resolution is clean (194/194 resolved, 0 unresolved, 0 ambiguous), but extractor population coverage is incomplete: 18881/20744 supported admitted source refs are processed (91.0%); 704 exact-revision rows remain UNPROCESSED; 1155 refs lack an exact Graphify source-revision row (616 have no Graphify source-ref row, 539 have only nonmatching revision rows); 0 have duplicate exact rows. 10733 exact-revision source refs currently have 73307 symbol rows. This is extraction coverage, not a requirement for one symbol per file -- see scripts/atlas/graphify-symbol-extractor-v1.mts.",
+        "Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven."
+      ],
+      "reason_codes": [
+        "LINEAGE_ADMISSION",
+        "SYMBOLS_RESOLVED"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:732293818577ca31",
+      "priority": "P1",
+      "label": "[SearchRuntime/retrieval owner] Verify revision, identity, collection/vector binding, and strict failure behavior.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:48b3201bc2525868290fcd455ff358cbb12e9082e839a9f19545ce0cbc77acf2",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN The live atlas_representations registry records representation/artifact metadata, not a per-run projection binding. No ordinal_map_checksum column was found in public table columns; no receipt currently proves the same input and ordinal-map checksums across the projections. Keep NOT_PROVEN; do not create a parallel registry solely to satisfy this predicate.",
+        "Verify revision, identity, collection/vector binding, and strict failure behavior."
+      ],
+      "reason_codes": [
+        "RETRIEVAL_OR_PROJECTION",
+        "PROJECTIONS_CHECKSUM_ALIGNED"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:779069967d1a1616",
+      "priority": "P3",
+      "label": "[Operator review] python/prove_polyglot_aten_dspy_gepa_oak_v1.py: Collect a focused diagnostic and identify the owning boundary before proposing a patch.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:48b3201bc2525868290fcd455ff358cbb12e9082e839a9f19545ce0cbc77acf2",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "python/prove_polyglot_aten_dspy_gepa_oak_v1.py",
+      "evidence_refs": [
+        "ACE_GEPA_EXECUTION=NOT_PROVEN python/prove_polyglot_aten_dspy_gepa_oak_v1.py constructs a local score and fixture proposal, not actual DSPy GEPA OaK or ContextManifest admission.",
+        "Collect a focused diagnostic and identify the owning boundary before proposing a patch."
+      ],
+      "reason_codes": [
+        "UNKNOWN",
+        "ACE_GEPA_EXECUTION"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:94de778f2563ea65",
+      "priority": "P1",
+      "label": "[Graph projection/executor owner] Verify projection identity and CPU/GPU parity on the existing frozen fixture.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:48b3201bc2525868290fcd455ff358cbb12e9082e839a9f19545ce0cbc77acf2",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "LATENT_FAMILY_PROVEN=PARTIAL_PROVEN latent_64, latent_128, latent_256 are all registered with a real, cross-checked artifact digest (state_dict tensor-content checksum, verified live against the checkpoint file and against codebase_chunk_index.latent_256_checkpoint_revision, 55169 rows), producer chain and derivation mechanism (AUTOENCODER for latent_256, SLICE_FIRST_N for the renormalized prefixes) recorded in dimension_method + notes. Still below PASS: no per-row *input*-digest ledger exists (which source semantic_768 snapshot the checkpoint was trained against), and lifecycle_status stays CANDIDATE (no promotion vote taken).",
+        "Verify projection identity and CPU/GPU parity on the existing frozen fixture."
+      ],
+      "reason_codes": [
+        "GRAPH_OR_GPU",
+        "LATENT_FAMILY_PROVEN"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:bfeeba9e2a32b4b3",
+      "priority": "P0",
+      "label": "[Packet/source lineage authority] Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:48b3201bc2525868290fcd455ff358cbb12e9082e839a9f19545ce0cbc77acf2",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "BITFROST_KEYS_DERIVABLE=NOT_PROVEN The v1 key namespace is counted separately from the legacy bitfrost:packet:* prefix. Even observed keys prove presence only: promotion still requires the admitted ACE packet-key producer/caller, identity-bound write/readback, and current artifact checksums. Deterministic key-builder fixture tests are not live cache-warming proof.",
+        "Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven."
+      ],
+      "reason_codes": [
+        "LINEAGE_ADMISSION",
+        "BITFROST_KEYS_DERIVABLE"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:c50e831e18eb15d6",
+      "priority": "P1",
+      "label": "[SearchRuntime/retrieval owner] Verify revision, identity, collection/vector binding, and strict failure behavior.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:48b3201bc2525868290fcd455ff358cbb12e9082e839a9f19545ce0cbc77acf2",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN The declared semantic_768 contract target codebase_chunk_index.content_embedding_768 is present. Column presence does not prove a unique writer, revision-qualified reads, per-row representation provenance, or projection readback; content_embedding and atlas_packets.embedding remain historical/unresolved surfaces.",
+        "Verify revision, identity, collection/vector binding, and strict failure behavior."
+      ],
+      "reason_codes": [
+        "RETRIEVAL_OR_PROJECTION",
+        "SEMANTIC_OWNER_PROVEN"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:f2b5d9a780d954ad",
+      "priority": "P0",
+      "label": "[Packet/source lineage authority] Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven.",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:48b3201bc2525868290fcd455ff358cbb12e9082e839a9f19545ce0cbc77acf2",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": null,
+      "evidence_refs": [
+        "ACE_EVIDENCE_GROUNDED=NOT_PROVEN ace_context_sources is a legacy diagnostic only; its row count cannot prove production retrieval admission, AcePacketV3 identity, ContextManifest source grounding, or independent readback.",
+        "Trace the authoritative workspace namespace and source revision; keep promotion blocked until both are proven."
+      ],
+      "reason_codes": [
+        "LINEAGE_ADMISSION",
+        "ACE_EVIDENCE_GROUNDED"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:d9781fe12f2ea601",
+      "priority": "P1",
+      "label": "[Graphify lifecycle authority] scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs: Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify o",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:81ade8232402a76885441c18cf0c9ec878f8f1a0f54f068fd7a5f89a8d949e5e",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "evidence_refs": [
+        "GRAPHIFY_LIFECYCLE_BLOCKER=AUTHORITY_TABLE_DOES_NOT_CONFIRM_DECISION_RECEIPT; runningRunCount=0; staleRunCount=19; currentRunCount=0; selectedExecutionId=74d50c86-8194-45ea-8c3d-61aab737ef83; dailyExecutionId=0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify or dispatch repairs until eligibility passes."
+      ],
+      "reason_codes": [
+        "GRAPH_OR_GPU",
+        "AUTHORITY_TABLE_DOES_NOT_CONFIRM_DECISION_RECEIPT"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:4c6ae409ca885d97",
+      "priority": "P1",
+      "label": "[Graphify lifecycle authority] scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs: Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify o",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:81ade8232402a76885441c18cf0c9ec878f8f1a0f54f068fd7a5f89a8d949e5e",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "evidence_refs": [
+        "GRAPHIFY_LIFECYCLE_BLOCKER=CURRENT_RUN_NOT_ESTABLISHED; runningRunCount=0; staleRunCount=19; currentRunCount=0; selectedExecutionId=74d50c86-8194-45ea-8c3d-61aab737ef83; dailyExecutionId=0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify or dispatch repairs until eligibility passes."
+      ],
+      "reason_codes": [
+        "GRAPH_OR_GPU",
+        "CURRENT_RUN_NOT_ESTABLISHED"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:ab8790de3a94e830",
+      "priority": "P1",
+      "label": "[Graphify lifecycle authority] scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs: Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify o",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:81ade8232402a76885441c18cf0c9ec878f8f1a0f54f068fd7a5f89a8d949e5e",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "evidence_refs": [
+        "GRAPHIFY_LIFECYCLE_BLOCKER=DECISION_DAILY_EXECUTION_ID_MISMATCH; runningRunCount=0; staleRunCount=19; currentRunCount=0; selectedExecutionId=74d50c86-8194-45ea-8c3d-61aab737ef83; dailyExecutionId=0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify or dispatch repairs until eligibility passes."
+      ],
+      "reason_codes": [
+        "GRAPH_OR_GPU",
+        "DECISION_DAILY_EXECUTION_ID_MISMATCH"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "err-fix:sha256:96986df3a83e069f",
+      "priority": "P1",
+      "label": "[Graphify lifecycle authority] scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs: Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify o",
+      "status": "PROPOSED",
+      "mutationAllowed": false,
+      "canonicalAuthority": false,
+      "dispatchable": false,
+      "diagnostic_plan_checksum": "sha256:81ade8232402a76885441c18cf0c9ec878f8f1a0f54f068fd7a5f89a8d949e5e",
+      "origin": "agentic_error_fixing_v1",
+      "source_ref": "scripts/atlas/audit-graphify-lifecycle-owner-v1.mjs",
+      "evidence_refs": [
+        "GRAPHIFY_LIFECYCLE_BLOCKER=REPOSITORY_REVISION_NOT_CURRENT; runningRunCount=0; staleRunCount=19; currentRunCount=0; selectedExecutionId=74d50c86-8194-45ea-8c3d-61aab737ef83; dailyExecutionId=0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "Resolve this gate from authoritative lifecycle receipts and the current repository revision; do not start Graphify or dispatch repairs until eligibility passes."
+      ],
+      "reason_codes": [
+        "GRAPH_OR_GPU",
+        "REPOSITORY_REVISION_NOT_CURRENT"
+      ],
+      "blockedBy": []
+    }
+  ]
 }

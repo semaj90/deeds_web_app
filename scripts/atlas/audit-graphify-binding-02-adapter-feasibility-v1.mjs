@@ -22,16 +22,26 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
-const OUT = path.join(REPO_ROOT, 'docs/reports/graphify-binding-02-adapter-feasibility-v1.json');
+const outputArgIndex = process.argv.indexOf('--output');
+const outputArg = outputArgIndex >= 0 ? process.argv[outputArgIndex + 1] : null;
+if (outputArgIndex >= 0 && (!outputArg || outputArg.startsWith('--'))) throw new Error('OUTPUT_PATH_REQUIRED');
+const OUT = path.resolve(REPO_ROOT, outputArg ?? 'docs/reports/graphify-binding-02-adapter-feasibility-v1.json');
+const outputRelative = path.relative(REPO_ROOT, OUT);
+if (!outputRelative || outputRelative.startsWith('..') || path.isAbsolute(outputRelative)) {
+  throw new Error('OUTPUT_MUST_REMAIN_INSIDE_REPOSITORY');
+}
 
 const modPath = path.resolve(REPO_ROOT, 'sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts');
 const { buildWorkspaceRevisionRecordV1, buildWorkspaceSourceBindingsV1 } = await import(`file:///${modPath.replace(/\\/g, '/')}`);
+import { selectRootWorkspaceSnapshotScopeV1 } from './lib/graphify-binding-02-snapshot-scope-v1.mjs';
 
 const admission = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
 if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
   throw new Error('NO_ADMITTED_WORKSPACE_REVISION');
 }
 const snapshot = JSON.parse(fs.readFileSync(path.resolve(admission.manifestPath), 'utf8'));
+const sourceAuthority = JSON.parse(fs.readFileSync(path.resolve(admission.preflightPath), 'utf8'));
+const revisionDerivation = JSON.parse(fs.readFileSync(path.resolve(sourceAuthority.derivationPath), 'utf8'));
 
 const report = {
   schema: 'atlas.graphify-binding-02-adapter-feasibility.v1',
@@ -42,13 +52,38 @@ const report = {
   admittedWorkspaceRevision: admission.workspaceRevision,
   snapshotRevision: snapshot.snapshotRevision,
   snapshotSourceCount: snapshot.sources.length,
+  sourceScope: 'repo:root',
+  admittedRevisionContract: {
+    policyRevision: revisionDerivation.schema,
+    sourceCount: revisionDerivation.sourceCount ?? null,
+    repositoryCount: revisionDerivation.repositoryCount ?? null,
+    candidate: revisionDerivation.workspaceRevisionCandidate ?? null,
+    sourceSelectionChecksum: sourceAuthority.sourceSelectionChecksum ?? null,
+    matchesAdmission: revisionDerivation.workspaceRevisionCandidate === admission.workspaceRevision
+      && revisionDerivation.snapshotRevision === admission.snapshotRevision
+      && sourceAuthority.workspaceRevisionCandidate === admission.workspaceRevision
+      && sourceAuthority.sourceSelectionChecksum === admission.sourceSelectionChecksum
+      && sourceAuthority.sourceCount === admission.sourceCount,
+    derivationArtifact: path.relative(REPO_ROOT, path.resolve(sourceAuthority.derivationPath)),
+  },
   errors: [],
 };
 
-// ---- Step 1: map admitted snapshot sources -> WorkspaceSourceManifestEntryV1 candidates ----
-let entries;
+// The admitted packet/symbol gate is rooted at repo:root; nested repositories have
+// separate identities and must not be folded into the root workspace digest.
+let rootScope;
 try {
-  entries = snapshot.sources.map((s) => ({
+  rootScope = selectRootWorkspaceSnapshotScopeV1(snapshot);
+  report.selectedSourceCount = rootScope.rootSources.length;
+  report.excludedNestedRepositorySourceCount = rootScope.excludedNestedRepositorySourceCount;
+} catch (error) {
+  report.errors.push({ step: 'SELECT_ROOT_SCOPE', message: error instanceof Error ? error.message : String(error) });
+}
+
+// ---- Step 1: map admitted root sources -> WorkspaceSourceManifestEntryV1 candidates ----
+let entries;
+if (rootScope) try {
+  entries = rootScope.rootSources.map((s) => ({
     sourceRef: s.sourceRef,
     sourceRevision: s.sourceRevision,
     contentDigest: s.contentDigest,
@@ -63,7 +98,7 @@ try {
 // ---- Step 2: build WorkspaceRevisionRecordV1 via the EXISTING owner, no reimplementation ----
 let record = null;
 if (entries) {
-  const repo = snapshot.repositories.find((r) => r.relativePath === '') ?? snapshot.repositories[0];
+  const repo = rootScope.rootRepository;
   try {
     const built = buildWorkspaceRevisionRecordV1({
       repositoryId: 'repo:root',
@@ -110,8 +145,10 @@ report.sampleEntries = (entries ?? []).slice(0, 2);
 report.sampleBindings = (bindings ?? []).slice(0, 2);
 report.verdict = report.recomputedMatchesAdmitted && report.bindingsBuilt
   ? 'ADAPTER_FEASIBLE_NO_NEW_IDENTITY_LOGIC_NEEDED'
-  : report.recordBuilt && !report.recomputedMatchesAdmitted
-    ? 'DIGEST_MISMATCH_INVESTIGATE_BEFORE_PROCEEDING'
+  : report.recordBuilt && !report.recomputedMatchesAdmitted && report.admittedRevisionContract.matchesAdmission
+    ? 'MULTI_REPOSITORY_REVISION_NOT_REPRESENTABLE_BY_SINGLE_REPOSITORY_BINDING_V1'
+    : report.recordBuilt && !report.recomputedMatchesAdmitted
+      ? 'DIGEST_MISMATCH_INVESTIGATE_BEFORE_PROCEEDING'
     : 'BLOCKED_SEE_ERRORS';
 
 fs.writeFileSync(OUT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');

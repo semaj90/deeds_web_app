@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.chunk-metadata-merge-select-proof.v1",
+  "transactionReadOnly": true,
+  "productionWriterExecuted": false,
+  "writesPerformed": false,
+  "tests": [
+    {
+      "name": "legacy projection key",
+      "passed": true
+    },
+    {
+      "name": "existing other binding",
+      "passed": true
+    },
+    {
+      "name": "unresolved new row",
+      "passed": true
+    }
+  ]
+}

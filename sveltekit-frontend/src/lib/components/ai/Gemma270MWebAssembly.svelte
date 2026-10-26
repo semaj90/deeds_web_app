@@ -373,6 +373,8 @@
 			{#if !selectedFile}
 				<div
 					class="drop-zone {isDragging ? 'dragging' : ''}"
+					role="region"
+					aria-label="Image drop zone for VLM analysis"
 					ondragover={handleDragOver}
 					ondragleave={handleDragLeave}
 					ondrop={handleDrop}
@@ -391,7 +393,7 @@
 					<div class="preview-header">
 						<span class="file-name">{selectedFile.name}</span>
 						<span class="file-size">{(selectedFile.size / 1024 / 1024).toFixed(1)}MB</span>
-						<button class="icon-btn" onclick={clearFile} disabled={analysisStep !== 'idle' && analysisStep !== 'complete' && analysisStep !== 'error'}>
+						<button class="icon-btn" aria-label="Clear selected image" onclick={clearFile} disabled={analysisStep !== 'idle' && analysisStep !== 'complete' && analysisStep !== 'error'}>
 							<span class="i-lucide-x w-3.5 h-3.5 inline-block"></span>
 						</button>
 					</div>
@@ -501,7 +503,7 @@
 							<span class="confidence">{(vlmConfidence * 100).toFixed(0)}%</span>
 						{/if}
 						<span class="timing">{vlmProcessingTime.toFixed(0)}ms</span>
-						<button class="icon-btn" onclick={() => copyToClipboard(vlmDescription)}>
+						<button class="icon-btn" aria-label="Copy description" onclick={() => copyToClipboard(vlmDescription)}>
 							<span class="i-lucide-copy w-3 h-3 inline-block"></span>
 						</button>
 					</div>

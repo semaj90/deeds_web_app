@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+const normalizedEmbedding = () => new Array(768).fill(1 / Math.sqrt(768));
+
 describe('tryEmbedCanonical', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -10,7 +12,7 @@ describe('tryEmbedCanonical', () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
       expect(String(input)).toBe('http://127.0.0.1:5173/api/embed');
       return new Response(JSON.stringify({
-        embedding: new Array(768).fill(0.25),
+        embedding: normalizedEmbedding(),
         model: 'embeddinggemma:latest',
       }), { status: 200, headers: { 'content-type': 'application/json' } });
     });
@@ -30,11 +32,11 @@ describe('tryEmbedCanonical', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('sends a body the /api/embed route accepts ({ text, model: "embeddinggemma" }), even for a tagged model name', async () => {
+  it('sends a body the /api/embed route accepts ({ text, model: "embeddinggemma", taskMode: "code_retrieval_query" }), even for a tagged model name', async () => {
     let sentBody: Record<string, unknown> = {};
     const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
       sentBody = JSON.parse(String(init?.body));
-      return new Response(JSON.stringify({ embedding: new Array(768).fill(0.25) }), {
+      return new Response(JSON.stringify({ embedding: normalizedEmbedding() }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
       });
@@ -47,7 +49,58 @@ describe('tryEmbedCanonical', () => {
       model: 'embeddinggemma:latest',
     });
 
-    expect(sentBody).toEqual({ text: 'semantic retrieval proof', model: 'embeddinggemma' });
+    expect(sentBody).toEqual({
+      text: 'semantic retrieval proof',
+      model: 'embeddinggemma',
+      taskMode: 'code_retrieval_query',
+    });
+  });
+
+  it('forwards custom taskMode when explicitly specified', async () => {
+    let sentBody: Record<string, unknown> = {};
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      sentBody = JSON.parse(String(init?.body));
+      return new Response(JSON.stringify({ embedding: normalizedEmbedding() }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    await tryEmbedCanonical('semantic document proof', {
+      baseUrl: 'http://127.0.0.1:5173',
+      taskMode: 'retrieval_document',
+    });
+
+    expect(sentBody).toEqual({
+      text: 'semantic document proof',
+      model: 'embeddinggemma',
+      taskMode: 'retrieval_document',
+    });
+  });
+
+  it('omits taskMode when model is mock', async () => {
+    let sentBody: Record<string, unknown> = {};
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      sentBody = JSON.parse(String(init?.body));
+      return new Response(JSON.stringify({ embedding: normalizedEmbedding() }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    await tryEmbedCanonical('mock text', {
+      baseUrl: 'http://127.0.0.1:5173',
+      model: 'mock',
+    });
+
+    expect(sentBody).toEqual({
+      text: 'mock text',
+      model: 'mock',
+    });
   });
 
   it('fails closed when the canonical route fails: never an ONNX or pseudo vector', async () => {
@@ -63,6 +116,16 @@ describe('tryEmbedCanonical', () => {
 
   it('rejects the route\'s unauthenticated 200 all-zero vector', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ embedding: new Array(768).fill(0) }), { status: 200 })));
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    expect(await tryEmbedCanonical('x', { baseUrl: 'http://127.0.0.1:5173' })).toBeNull();
+  });
+
+  it.each([
+    ['wrong dimension', new Array(767).fill(1 / Math.sqrt(767))],
+    ['non-finite values', Object.assign(normalizedEmbedding(), { 12: Number.NaN })],
+    ['unnormalized vector', new Array(768).fill(0.25)],
+  ])('rejects %s from the local embedding route', async (_label, embedding) => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ embedding }), { status: 200 })));
     const { tryEmbedCanonical } = await import('./canonical-embed.js');
     expect(await tryEmbedCanonical('x', { baseUrl: 'http://127.0.0.1:5173' })).toBeNull();
   });

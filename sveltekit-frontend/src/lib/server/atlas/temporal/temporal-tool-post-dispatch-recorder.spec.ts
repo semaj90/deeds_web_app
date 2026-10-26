@@ -27,7 +27,7 @@ const descriptor = {
 function workflow(kind: 'completed' | 'failed') {
   return {
     schema: 'atlas.workflow-action.v1' as const,
-    workflowId: 'wf:proof', workflowRevision: 1, sequence: 7, actionId: 'action:rg',
+    workflowId: 'wf:proof', workflowRevision: 1, runId: 'run:proof', sequence: 7, actionId: 'action:rg',
     dagNodeId: 'node:rg', attempt: 1, lane: 'tool' as const, kind,
     toolId: 'rg_search', receiptId: kind === 'completed' ? 'receipt:rg' : undefined,
     resourceRefs: [], evidenceRefs: [], artifactRefs: [],

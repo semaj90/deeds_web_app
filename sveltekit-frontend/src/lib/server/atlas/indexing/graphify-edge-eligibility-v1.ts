@@ -19,6 +19,8 @@ type TreesitterChunkerXrefEdgeV1 = StructuralExtractionFabricResultV1['xref_edge
 
 export type EdgeEligibilityStatusV1 =
   | 'SOURCE_AUTHORITY_UNPROVEN'
+  | 'SOURCE_REVISION_MISSING'
+  | 'SOURCE_REVISION_MISMATCH'
   | 'GRAPHIFY_EDGE_SUBJECT_SYMBOL_UNMAPPED'
   | 'TARGET_SYMBOL_UNRESOLVED'
   | 'SOURCE_NODE_UNQUALIFIED'
@@ -66,6 +68,7 @@ export type AstEdgeClassificationV1 =
 
 export type AstEdgeEligibilityFileInputV1 = {
   sourceRef: string;
+  sourceRevision: string | null;
   sourceRevisionAuthority: 'PROVEN' | 'UNPROVEN';
   fabric: Pick<StructuralExtractionFabricResultV1,
     'chunks' | 'xref_edges' | 'symbol_nominations' | 'reference_facts'>;
@@ -350,6 +353,7 @@ function resolveTarget(input: {
 function classifyEdge(input: {
   sourceRef: string;
   sourceAuthority: 'PROVEN' | 'UNPROVEN';
+  sourceRevisionStatus: 'MATCH' | 'MISSING' | 'MISMATCH';
   edge: TreesitterChunkerXrefEdgeV1;
   subject: AstEdgeNodeV1;
   target: AstEdgeNodeV1;
@@ -357,6 +361,8 @@ function classifyEdge(input: {
 }): AstEdgeEligibilityV1 {
   const rejectionReasons: EdgeEligibilityStatusV1[] = [];
   if (input.sourceAuthority !== 'PROVEN') rejectionReasons.push('SOURCE_AUTHORITY_UNPROVEN');
+  if (input.sourceRevisionStatus === 'MISSING') rejectionReasons.push('SOURCE_REVISION_MISSING');
+  if (input.sourceRevisionStatus === 'MISMATCH') rejectionReasons.push('SOURCE_REVISION_MISMATCH');
   if (input.subject.qualifiedKind === 'UNRESOLVED') {
     rejectionReasons.push('GRAPHIFY_EDGE_SUBJECT_SYMBOL_UNMAPPED', 'SOURCE_NODE_UNQUALIFIED');
   }
@@ -380,7 +386,8 @@ function classifyEdge(input: {
   }
 
   const disqualified = new Set<EdgeEligibilityStatusV1>([
-    'SOURCE_AUTHORITY_UNPROVEN', 'GRAPHIFY_EDGE_SUBJECT_SYMBOL_UNMAPPED', 'SOURCE_NODE_UNQUALIFIED',
+    'SOURCE_AUTHORITY_UNPROVEN', 'SOURCE_REVISION_MISSING', 'SOURCE_REVISION_MISMATCH',
+    'GRAPHIFY_EDGE_SUBJECT_SYMBOL_UNMAPPED', 'SOURCE_NODE_UNQUALIFIED',
     'TARGET_SYMBOL_UNRESOLVED', 'TARGET_NODE_UNQUALIFIED', 'BUILTIN_REFERENCE', 'EXTERNAL_PACKAGE_REFERENCE',
     'PARAMETER_REFERENCE', 'UNSUPPORTED_EDGE_KIND', 'EDGE_EVIDENCE_MISSING', 'EDGE_ENDPOINT_KIND_INCOMPATIBLE',
   ]);
@@ -449,6 +456,11 @@ export function classifyRawStructuralEdgesV1(
         endByte: evidenceRecord?.endByte ?? null,
         evidenceRefs: [...(evidenceRecord?.evidenceRefs ?? [])].sort(),
       };
+      const sourceRevisionStatus = !file.sourceRevision
+        ? 'MISSING'
+        : !fact?.source_revision
+          ? 'MISSING'
+          : fact.source_revision === file.sourceRevision ? 'MATCH' : 'MISMATCH';
       const subjectChunk = indexedChunksById.get(edge.src) ?? [];
       const uniqueSubjectChunk = subjectChunk.length === 1 ? subjectChunk[0] : null;
       let subject = uniqueSubjectChunk
@@ -472,7 +484,7 @@ export function classifyRawStructuralEdgesV1(
         knownSourceRefs,
         importContext: file.importResolutionContext,
       });
-      const row = classifyEdge({ sourceRef, sourceAuthority: file.sourceRevisionAuthority, edge, subject, target, evidence });
+      const row = classifyEdge({ sourceRef, sourceAuthority: file.sourceRevisionAuthority, sourceRevisionStatus, edge, subject, target, evidence });
       row.edgeOrdinal = edgeOrdinal;
       edgeRows.push(row);
     }

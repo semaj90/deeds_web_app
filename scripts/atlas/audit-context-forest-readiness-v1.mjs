@@ -35,7 +35,22 @@ function gate(name, status, proofLevel, blocking, evidence) {
 }
 
 function isProvenStatus(status) {
-  return ['PASS', 'PROVEN', 'CONTRACT_PROVEN', 'CURRENT_SNAPSHOT_PROVEN', 'CURRENT_GRAPHIFY_SOURCE_PROVEN'].includes(status);
+  return ['PASS', 'PROVEN', 'CONTRACT_PROVEN', 'GRAPH_CANONICAL_AUTHORITY_PROVEN', 'CURRENT_GRAPHIFY_SOURCE_PROVEN'].includes(status);
+}
+
+function graphAuthorityOf(value) {
+  const snapshotCurrent = value?.status === 'CURRENT_SNAPSHOT_PROVEN';
+  const canonicalAuthority = snapshotCurrent
+    && value.canonicalAuthority === true
+    && value.graphSnapshot?.status === 'GRAPH_CANONICAL_AUTHORITY_PROVEN';
+  return {
+    status: canonicalAuthority
+      ? 'GRAPH_CANONICAL_AUTHORITY_PROVEN'
+      : snapshotCurrent
+        ? 'CURRENT_SNAPSHOT_PROVEN_NON_AUTHORITY'
+        : statusOf(value),
+    canonicalAuthority,
+  };
 }
 
 function main() {
@@ -43,10 +58,11 @@ function main() {
   const fabric = loaded.fabric;
   const semantic = loaded.semanticOwner;
   const latent = loaded.latent;
+  const graphAuthority = graphAuthorityOf(loaded.graphifyAuthority);
   const gates = [
     gate('Leiden projection incident', 'NOT_PROVEN', 'NOT_RUN', true, 'No current bounded Leiden projection receipt supplied'),
     gate('Semantic-768 owner', semantic?.verdict ?? 'OWNER_NOT_PROVEN', 'PARTIAL_PROVEN', true, sources.semanticOwner),
-    gate('Graphify source membership', statusOf(loaded.graphifyAuthority), 'LIVE_PROVEN', !isProvenStatus(statusOf(loaded.graphifyAuthority)), sources.graphifyAuthority),
+    gate('Graphify source membership', graphAuthority.status, graphAuthority.canonicalAuthority ? 'CANONICAL_AUTHORITY_READBACK' : 'READ_ONLY_SNAPSHOT_OBSERVATION', !graphAuthority.canonicalAuthority, sources.graphifyAuthority),
     gate('Packet/chunk/symbol identity', fabric?.IDENTITY_ALIGNED?.verdict ?? 'NOT_PROVEN', 'PARTIAL_PROVEN', true, sources.fabric),
     gate('Representation ledger', latent?.proofStatus?.LAT_AUDIT10_REPRESENTATION_LEDGER ?? 'NOT_PROVEN', 'READ_ONLY_AUDIT', true, sources.latent),
     gate('Projection identity', fabric?.PROJECTIONS_CHECKSUM_ALIGNED?.verdict ?? 'NOT_PROVEN', 'NOT_PROVEN', true, sources.fabric),
@@ -75,7 +91,7 @@ function main() {
       sourceAuthority: statusOf(loaded.sourceHydration),
       symbolAuthority: 'NOT_PROVEN',
       representationAuthority: latent?.proofStatus?.LAT_AUDIT10_REPRESENTATION_LEDGER ?? 'NOT_PROVEN',
-      graphAuthority: statusOf(loaded.graphifyAuthority),
+      graphAuthority: graphAuthority.status,
       projectionIdentityAuthority: 'NOT_PROVEN',
     },
     forestRuntimeReady: 'PARTIAL_PROVEN',

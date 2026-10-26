@@ -109,7 +109,7 @@ async function generate(prompt, timeoutMs = 45_000) {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:       'gemma4-rotorquant:latest',
+        model:       'ornith-1.5-9b',
         messages:    [{ role: 'user', content: prompt }],
         max_tokens:  300,
         temperature: 0.3,

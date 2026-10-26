@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { deriveFeatureIdentity, titleCase } from './derive-feature-identity.mjs';
+import { deriveFeatureIdentity, titleCase, classifyFeatureLabelRevisionJoinV1 } from './derive-feature-identity.mjs';
 
 test('Case 1: Case Scoring Dashboard page', () => {
   const row = {
@@ -110,4 +110,16 @@ test('Fallback to basename when all else fails', () => {
   assert.strictEqual(titleCase('page'), 'Page');
   assert.strictEqual(titleCase('_page'), '_Page');
   assert.strictEqual(titleCase('page route'), 'Page Route');
+});
+
+test('feature label revision join is diagnostic and requires exact metadata revisions', () => {
+  const packet = { packetSourceRevision: 'src-r1', packetWorkspaceRevision: 'ws-r1' };
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ ...packet, summaryMetadata: null }), 'SUMMARY_REVISION_METADATA_MISSING');
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ ...packet, summaryMetadata: { source_revision: 'src-r1' } }), 'SUMMARY_REVISION_METADATA_INCOMPLETE');
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ ...packet, summaryMetadata: { source_revision: 'src-r2', workspace_revision: 'ws-r1' } }), 'REVISION_METADATA_MISMATCH');
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ ...packet, summaryMetadata: { source_revision: 'src-r1', workspace_revision: 'ws-r1' } }), 'REVISION_METADATA_MATCH_UNVERIFIED');
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ packetSourceRevision: null, packetWorkspaceRevision: 'ws-r1', summaryMetadata: { source_revision: 'src-r1', workspace_revision: 'ws-r1' } }), 'PACKET_REVISION_BINDING_MISSING');
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ packetSourceRevision: {}, packetWorkspaceRevision: 'ws-r1', summaryMetadata: { source_revision: {}, workspace_revision: 'ws-r1' } }), 'PACKET_REVISION_BINDING_MISSING');
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ ...packet, summaryMetadata: { source_revision: ' ', workspace_revision: 'ws-r1' } }), 'SUMMARY_REVISION_METADATA_INCOMPLETE');
+  assert.strictEqual(classifyFeatureLabelRevisionJoinV1({ packetSourceRevision: ' src-r1 ', packetWorkspaceRevision: 'ws-r1', summaryMetadata: { source_revision: 'src-r1', workspace_revision: 'ws-r1' } }), 'REVISION_METADATA_MATCH_UNVERIFIED');
 });

@@ -3,9 +3,9 @@
  * Wraps rg exec + parses output → RgHit[]
  */
 
-import { execFile, execSync } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
 
 /**
@@ -19,7 +19,10 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 
 function buildSearchPaths(paths) {
-  return paths.map((p) => resolve(process.cwd(), p)).filter((p) => existsSync(p));
+  const root = process.cwd();
+  return paths
+    .map((p) => resolve(root, p))
+    .filter((p) => (p === root || p.startsWith(root + sep)) && existsSync(p));
 }
 
 function parseRgOutput(output) {
@@ -66,19 +69,24 @@ export function runRg(query, paths = ['src'], options = {}) {
   if (searchPaths.length === 0) return [];
 
   try {
-    // -n: line number, --column: column, --no-heading, --color never
-    // --no-ignore --hidden: reach gitignored/dotfile paths (e.g. .opencode/ndjson/*)
-    // when explicitly requested — off by default so callers don't accidentally sweep
-    // node_modules/.git/build output.
-    const ignoreFlags = options.includeGitignored ? '--no-ignore --hidden ' : '';
-    const cmd = `rg -n --column --no-heading --color never ${ignoreFlags}"${query.replace(/"/g, '\\"')}" ${searchPaths.join(' ')}`;
-    const output = execSync(cmd, { encoding: 'utf8', maxBuffer: 1024 * 1024 * 10 });
+    const ignoreFlags = options.includeGitignored ? ['--no-ignore', '--hidden'] : [];
+    const args = ['-n', '--column', '--no-heading', '--color', 'never', ...ignoreFlags, query, ...searchPaths];
+    const output = execFileSync('rg', args, {
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024 * 10,
+      windowsHide: true,
+    });
 
     return parseRgOutput(output);
   } catch (err) {
-    // rg exits with 1 if no matches found
-    if (err.status !== 1) {
-      console.error('[run-rg] Error:', err.message);
+    const exitCode =
+      typeof err?.code === 'number'
+        ? err.code
+        : typeof err?.status === 'number'
+          ? err.status
+          : null;
+    if (exitCode !== 1) {
+      console.error('[run-rg] Error:', err?.message ?? String(err));
     }
   }
 

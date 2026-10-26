@@ -1,0 +1,54 @@
+{
+  "schema": "parent-atlas.sidecar-runtime-observation.v1",
+  "observedAtUtc": "2026-10-16T01:49:59.6192845Z",
+  "endpoint": "http://127.0.0.1:8095",
+  "mode": "read-only GET /health + GET /capabilities",
+  "writesPerformed": false,
+  "status": "RUNTIME_HEALTHY_PARSER_FIXTURE_UNVERIFIED",
+  "healthStatus": "ok",
+  "synthesisModel": "ornith-1.5-9b",
+  "runtime": {
+    "pythonExecutable": "/usr/local/bin/python",
+    "pythonVersion": "3.13.15",
+    "environmentType": "system-python"
+  },
+  "parser": {
+    "engine": "treesitter-chunker",
+    "available": true,
+    "treeSitter": true,
+    "treesitterChunker": true,
+    "chunkerVersion": "4.0.0",
+    "chunkerFixtureVerified": false,
+    "treeSitterLanguagePackVersion": "0.9.0",
+    "astGrep": true,
+    "astGrepPyVersion": "0.45.3",
+    "languageMapOwner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS",
+    "languageMapSha256": "sha256:4407f506bcdde65937a4a76c2239f49bea71a9df2be68687fa84de546be5c039",
+    "extensions": [
+      ".cjs",
+      ".cts",
+      ".go",
+      ".java",
+      ".js",
+      ".jsx",
+      ".mjs",
+      ".mts",
+      ".py",
+      ".pyi",
+      ".rs",
+      ".svelte",
+      ".ts",
+      ".tsx"
+    ]
+  },
+  "gpu": {
+    "torch": false,
+    "cugraph": false,
+    "cuvs": false
+  },
+  "limits": [
+    "Health/capabilities do not prove parser fixture behavior.",
+    "No AST payload source-byte digest validation, exact identity crosswalk, canonical persistence, or retrieval admission was exercised.",
+    "Svelte template/rune evidence remains owned by the svelte/compiler pipeline; sidecar map presence is not template coverage."
+  ]
+}

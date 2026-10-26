@@ -28,10 +28,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { evidence_id, prompt, style, dimensions } = parsed.data;
 
 		// Generate a text-based glyph descriptor via LLM
-		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
+		const { embedOrChatFetch, getLlamaGenerationEndpoint } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
 
-		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const res = await embedOrChatFetch(`${getLlamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

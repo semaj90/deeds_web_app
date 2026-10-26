@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
 import {
   UnifiedResidencyAdapter, admitResidency, admitWithSharedGpuResidencyLeaseV1, assertNoPersistedGpuState, descriptorCacheKey,
-  domainRoutingCacheKey, packFloat32Tile, requireProvider, routeDomainWithLut, serializeResidencyControl, transitionResidency, unpackFloat32Tile, validateUnifiedDescriptor, type UnifiedResidencyDescriptor
+  domainRoutingCacheKey, packFloat32Tile, requireProvider, routeDomainWithLut, serializeResidencyControl, transitionResidency, unpackFloat32Tile, validateUnifiedDescriptor,
+  createTitansMemoryProviderV1, buildTitansMemoryDescriptorV1, type UnifiedResidencyDescriptor
 } from './unified-residency-adapter-v1';
 
 const base: UnifiedResidencyDescriptor = {
   schema: 'atlas.unified-residency.v1', residencyKey: 'tile-0', kind: 'FEATURE_TILE',
   workspaceRevision: 'wr-1', sourceRevision: 'sr-1', representationRevision: 'rep-1', featureRevision: 'feat-1',
   modelRevision: 'model-1', tokenizerRevision: 'tok-1', ropeRevision: 'rope-1', candidateOrdinal: 0,
-  artifactChecksum: 'sha256:artifact', shape: [256, 768], dtype: 'float16', byteLength: 393216, state: 'EMPTY'
+  artifactChecksum: 'sha256:artifact', payloadChecksum: createHash('sha256').update(new Uint8Array(393216)).digest('hex'),
+  shape: [256, 768], dtype: 'float16', byteLength: 393216, state: 'EMPTY'
 };
 
 describe('unified residency adapter v1', () => {
@@ -22,6 +25,8 @@ describe('unified residency adapter v1', () => {
     validateUnifiedDescriptor(base);
     expect(() => validateUnifiedDescriptor({ ...base, kind: 'TRANSFORMER_KV', contextWindow: 512 })).toThrow('positionBase_REQUIRED');
     expect(() => validateUnifiedDescriptor({ ...base, sourceRevision: '' })).toThrow('sourceRevision_REQUIRED');
+    expect(() => validateUnifiedDescriptor({ ...base, byteLength: base.byteLength - 1 })).toThrow('RESIDENCY_SHAPE_BYTE_LENGTH_MISMATCH');
+    expect(() => validateUnifiedDescriptor({ ...base, shape: [Number.MAX_SAFE_INTEGER, 2] })).toThrow('shape_SIZE_UNSAFE');
   });
   it('enforces state transitions, leases, LRU, and ceiling', () => {
     expect(transitionResidency('EMPTY', 'LOADING')).toBe('LOADING');
@@ -31,10 +36,11 @@ describe('unified residency adapter v1', () => {
     expect(adapter.acquire('tile-0').state).toBe('IN_USE');
     adapter.release('tile-0');
     expect(adapter.evictLeastRecentlyUsed()?.state).toBe('EVICTED');
-    expect(() => admitResidency({ ...base, byteLength: 700000 }, 500000, 0)).toThrow('GPU_RESIDENCY_BUDGET_EXCEEDED');
+    expect(() => admitResidency({ ...base, shape: [1, 350000], byteLength: 700000 }, 500000, 0)).toThrow('GPU_RESIDENCY_BUDGET_EXCEEDED');
   });
   it('keys all revision and artifact inputs and blocks GPU-state persistence', () => {
     expect(descriptorCacheKey(base)).not.toBe(descriptorCacheKey({ ...base, ropeRevision: 'rope-2' }));
+    expect(descriptorCacheKey(base)).not.toBe(descriptorCacheKey({ ...base, payloadChecksum: 'b'.repeat(64) }));
     expect(() => assertNoPersistedGpuState({ tensor: true })).toThrow('GPU_STATE_MUST_NOT_BE_PERSISTED');
     expect(() => assertNoPersistedGpuState({ workspaceRevision: 'wr-1', artifactChecksum: 'sha256:x' })).not.toThrow();
   });
@@ -57,6 +63,27 @@ describe('unified residency adapter v1', () => {
       kind: 'FEATURE_TILE',
       async load() { return null; }
     })).rejects.toThrow('RESIDENCY_BUFFER_LENGTH_MISMATCH');
+  });
+
+  it('requires a payload checksum and rejects mismatched bytes before making them resident', async () => {
+    const adapter = new UnifiedResidencyAdapter(64);
+    const descriptor: UnifiedResidencyDescriptor = {
+      ...base,
+      residencyKey: 'checksum-tile',
+      shape: [4],
+      dtype: 'uint8',
+      byteLength: 4,
+      payloadChecksum: createHash('sha256').update(new Uint8Array(4)).digest('hex'),
+    };
+    await expect(adapter.load({ ...descriptor, payloadChecksum: undefined }, {
+      kind: 'FEATURE_TILE',
+      async load() { return { byteLength: 4, buffer: new Uint8Array(4) }; },
+    })).rejects.toThrow('RESIDENCY_PAYLOAD_CHECKSUM_REQUIRED');
+    await expect(adapter.load(descriptor, {
+      kind: 'FEATURE_TILE',
+      async load() { return { byteLength: 4, buffer: new Uint8Array([1, 2, 3, 4]) }; },
+    })).rejects.toThrow('RESIDENCY_PAYLOAD_CHECKSUM_MISMATCH');
+    expect(adapter.usedBytes()).toBe(0);
   });
 
   it('routes executor admission through the shared budget owner before residency', () => {
@@ -101,5 +128,57 @@ describe('unified residency adapter v1', () => {
     };
     expect(() => admitWithSharedGpuResidencyLeaseV1({ adapter, descriptor: base, budget, budgetRevision: 'budget-1', leaseId: 'lease:test:reject', leaseEpoch: 1, executor: 'tensorrt_rtx' })).toThrow('GPU_EXECUTOR_RESIDENCY_ADMISSION_GPU_RESIDENCY_BUDGET_EXCEEDED');
     expect(adapter.usedBytes()).toBe(0);
+  });
+
+  it('builds and loads TITANS_MEMORY descriptors through createTitansMemoryProviderV1', async () => {
+    const rawBuffer = new Float32Array([0.1, 0.4, 0.9, 0.2]);
+    const { descriptor, buffer } = buildTitansMemoryDescriptorV1({
+      residencyKey: 'titans:surprise:slot-1',
+      workspaceRevision: 'wr-1',
+      sourceRevision: 'sr-1',
+      representationRevision: 'rep-1',
+      featureRevision: 'feat-1',
+      modelRevision: 'ornith-1.5-9b',
+      tokenizerRevision: 'tok-1',
+      ropeRevision: 'rope-1',
+      candidateOrdinal: 1,
+      surpriseArtifactChecksum: 'sha256:surprise-ccr-receipt',
+      buffer: rawBuffer,
+      shape: [4],
+      dtype: 'float32',
+      contextWindow: 2048,
+    });
+
+    expect(descriptor.kind).toBe('TITANS_MEMORY');
+    expect(descriptor.byteLength).toBe(16);
+
+    const provider = createTitansMemoryProviderV1({
+      resolveBuffer: (d) => {
+        if (d.residencyKey === 'titans:surprise:slot-1') return buffer;
+        return null;
+      },
+    });
+
+    expect(requireProvider(provider, 'TITANS_MEMORY')).toBe(provider);
+
+    const adapter = new UnifiedResidencyAdapter(500000);
+    const loaded = await adapter.load(descriptor, provider);
+
+    expect(loaded.state).toBe('RESIDENT');
+    expect(adapter.usedBytes()).toBe(16);
+
+    const acquired = adapter.acquire('titans:surprise:slot-1');
+    expect(acquired.state).toBe('IN_USE');
+
+    adapter.release('titans:surprise:slot-1');
+    expect(adapter.usedBytes()).toBe(16);
+
+    // Verify rejection when buffer cannot be resolved
+    const unresolvableProvider = createTitansMemoryProviderV1({
+      resolveBuffer: () => null,
+    });
+    await expect(
+      adapter.load({ ...descriptor, residencyKey: 'titans:surprise:slot-2' }, unresolvableProvider)
+    ).rejects.toThrow('RESIDENCY_BUFFER_LENGTH_MISMATCH');
   });
 });

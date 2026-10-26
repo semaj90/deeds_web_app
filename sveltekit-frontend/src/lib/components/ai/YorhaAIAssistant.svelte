@@ -32,6 +32,7 @@
 		initialOpen?: boolean;
 		theme?: 'light' | 'dark' | 'yorha';
 		enableGPUAcceleration?: boolean;
+		preferSSE?: boolean;
 	}
 
 	let {
@@ -39,7 +40,8 @@
 		caseID = '',
 		initialOpen = false,
 		theme = 'yorha',
-		enableGPUAcceleration = true
+		enableGPUAcceleration = true,
+		preferSSE = true
 	}: Props = $props();
 
 	let isOpen = $state(false);
@@ -73,12 +75,17 @@
 		caseID ? `case-${caseID}` : `chat-${chatSession.id}`
 	);
 
-	// Connection management: try WebSocket first, fall back to SSE
+	// Connection management: prefer SSE for native SvelteKit streaming, or try WebSocket
 	$effect(() => {
 		if (!isOpen || !browser) {
 			chatSocket?.close();
 			chatSocket = null;
 			transport = 'none';
+			return;
+		}
+
+		if (preferSSE) {
+			fallbackToSSE();
 			return;
 		}
 

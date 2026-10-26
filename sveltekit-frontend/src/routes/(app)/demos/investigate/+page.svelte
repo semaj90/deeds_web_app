@@ -646,7 +646,7 @@
 		</ul>
 
 		<div class="pt-3 border-t border-sand-6 text-xs text-sand-10">
-			<strong>Tech Stack:</strong> LangChain + Ollama (gemma4-legal:latest) + 14 FastMCP Tools + ACE
+			<strong>Tech Stack:</strong> LangChain + llama-server Ornith 1.5 :8090 + 14 FastMCP Tools + ACE
 			Context Engine + Self-Prompting + Multi-Modal Recommender + SearXNG (optional)
 		</div>
 	</div>

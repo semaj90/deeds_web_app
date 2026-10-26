@@ -46,7 +46,8 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
   graph, exact symbol and mutation freshness.
 - [x] Predict bounded candidate / graph-hop / rerank budgets.
 - [x] Classification output has `evidenceAuthority=false`.
-- [ ] Execute schema tests.
+- [x] Execute schema tests. `npm run test -- --run src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts` passed 7/7 on 2026-10-26.
+- [ ] Compose QueryClassificationV2 with the existing concept-extraction and ontology-lookup owners into a bounded, revision-qualified query context. Carry topic/concept IDs, grounded entity spans/evidence refs, taxonomy/ontology revision, and confidence; keep unsupported guesses proposal-only and do not add a second classifier or retrieval vote.
 
 ## NLP-2 — deterministic query/POS-like feature projection
 
@@ -184,6 +185,27 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
 - [ ] Learned router must beat or materially simplify the static policy before
   promotion.
 
+### Domain prefilter paired replay (2026-10-17)
+
+- [ ] Supply a frozen candidate-pool snapshot, held-out query-domain predictions,
+  taxonomy revision, and complete relevance judgments independently admitted by
+  the existing golden-review owner; current local GA8 inputs are absent and the
+  review queue remains ungraded.
+- [x] Add an offline paired evaluator that compares baseline rank order with a
+  strict domain prefilter, verifies candidate/judgment checksums, and reports
+  removed relevant candidates, nDCG@K, MRR@K, and judged-pool Recall@K.
+- [x] Add fixture tests proving the evaluator exposes relevant-result loss,
+  rejects model-generated labels, and rejects snapshot tampering.
+- [ ] Verify the human-review admission receipt and reviewer authority outside
+  this evaluator; row markers and checksums alone are not proof of review.
+- [ ] Run on the qualified reviewed cohort; proxy/LLM labels do not qualify.
+- [ ] Keep domain as a routing/filter feature, never an independent RRF lane;
+  do not promote without paired quality and coverage evidence.
+
+Evidence: `python/domain_filter_retrieval_replay_v1.py` and
+`python/test_domain_filter_retrieval_replay_v1.py`. No database, vector-store,
+cache, or production retrieval writes are performed by this evaluator.
+
 ## NLP-8 — shadow runtime
 
 - [ ] Run classifier beside current routing only.
@@ -300,3 +322,27 @@ writes are authorized by this change.
   extend the existing server-owned query taxonomy output with explicit primary
   domain and taxonomy revision, and bind any learned contribution to an
   independently verified model artifact before adding a shadow caller.
+
+### Web-search and MLP tournament alignment review (2026-10-12)
+
+- Web search has multiple callers: `research.web_search` and `kag.web_search` use
+  the shared SearXNG/DuckDuckGo adapter; the agent tool-loop has a separately
+  gated cache → SearXNG → Qdrant `research_summaries` path; ACE has another
+  fallback caller. These are not one verified web-search DAG. Search snippets
+  remain external observations until capture, license/scope review, revision
+  binding, admission, and ContextManifest readback pass.
+- NLP-5's PyTorch MLP architecture and the router tensor contract are present.
+  A newly found contract conflict must be resolved first: NLP-4 documents a
+  154-wide v1 tensor, while `train-query-router-pytorch-v2.py` and the v2
+  manifest use width 234. No crosswalk or common dataset owner is proven.
+  NLP-5 training/calibration, NLP-7 same-corpus comparison against static rules
+  and XGBoost, NLP-8 shadow routing, and NLP-9 promotion remain open. The model
+  is a query-plan classifier, not a content ranker or MCP authorization owner.
+- No web-search route was called, no page was crawled, and no training or
+  tournament run was performed. Existing unchecked tasks remain unchanged.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

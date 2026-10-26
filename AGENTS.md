@@ -88,14 +88,14 @@ npm run audit:drizzle            # Drizzle ↔ Postgres drift
 npm run services:health          # TCP health gate
 ```
 
-## Engram-only mode (current)
+## Redis / Valkey enabled mode (current)
 
 ```
-ENGRAM_ONLY=true  REDIS_ENABLED=false  QDRANT_ENABLED=false
+ENGRAM_ONLY=false  REDIS_ENABLED=true  VALKEY_ENABLED=true  QDRANT_ENABLED=false
 NEO4J_ENABLED=false  GRAPHIFY_STARTUP_ENABLED=false
 ```
 
-Startup does NOT require Redis/Qdrant/Neo4j. Engram MCP at `:8792` is the only required memory lane.
+Startup has Redis/Valkey cache on `:6379` enabled for transient ACE and RLM packet caching.
 
 ## Gotchas
 

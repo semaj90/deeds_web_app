@@ -3,9 +3,6 @@ type: concept
 title: Quickstart Guide
 description: Primary entry point for navigating the Parent Atlas repository and its documentation.
 tags: [getting-started, documentation, overview]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-07T02:11:06.802Z
 ---
 
 # Quickstart Guide

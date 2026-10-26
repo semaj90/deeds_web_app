@@ -15,9 +15,9 @@ describe('model lanes', () => {
 		expect([SERVER_CHAT_MODEL, SERVER_GEMMA4_MODEL]).toContain(getReasoningModelId('legal'));
 	});
 
-	it('defaults client chat to helper ONNX instead of client Gemma4', () => {
+	it('defaults chat to the configured server model instead of legacy ONNX', () => {
 		const decision = shouldEscalateToServer('hello', [], {});
-		expect(decision.source).toBe('local-onnx');
+		expect(decision.source).toBe('server-ollama');
 	});
 
 	it('allows client Gemma4 only when explicitly enabled', () => {
@@ -26,5 +26,52 @@ describe('model lanes', () => {
 			e2bReady: true,
 		});
 		expect(decision.source).toBe('local-e2b');
+	});
+});
+
+import { ATLAS_MODEL_BINDINGS, getActiveChatBinding, resolveModelCacheIdentityV1 } from './model-registry.js';
+
+describe('atlas model bindings', () => {
+	it('has exactly one enabled chat binding served by llama-server :8090', () => {
+		const chat = getActiveChatBinding();
+		expect(chat.modelId).toBe('ornith-1.5-9b');
+		expect(chat.backend).toBe('llama-server');
+		expect(chat.endpoint).toBe('http://127.0.0.1:8090/v1');
+	});
+
+	it('keeps vision disabled until a runtime capability test enables it', () => {
+		const vision = ATLAS_MODEL_BINDINGS.filter((b) => b.role === 'vision');
+		expect(vision.length).toBeGreaterThan(0);
+		for (const b of vision) expect(b.enabled).toBe(false);
+	});
+
+	it('never routes an enabled chat binding to Ollama or another backend', () => {
+		const badChat = ATLAS_MODEL_BINDINGS.filter((b) => b.role === 'chat' && b.enabled && b.backend !== 'llama-server');
+		expect(badChat).toEqual([]);
+	});
+
+	it('keeps the legacy Gemma4 identity disabled and distinct from the chat model', () => {
+		const legacy = ATLAS_MODEL_BINDINGS.find((b) => b.modelId === 'gemma4:e4b-it-q4_K_M');
+		expect(legacy?.enabled).toBe(false);
+		expect(legacy?.modelId).not.toBe('ornith-1.5-9b');
+	});
+
+	it('records the chat weight digest as a 64-char lowercase SHA-256', () => {
+		const chat = ATLAS_MODEL_BINDINGS.find((b) => b.role === 'chat');
+		expect(chat?.artifactSha256).toMatch(/^[0-9a-f]{64}$/);
+	});
+
+	it('resolves model cache identity from the registered artifact and isolates adapter revisions', () => {
+		const chat = getActiveChatBinding();
+		expect(resolveModelCacheIdentityV1({ modelId: chat.modelId })).toEqual({
+			modelRevision: `sha256:${chat.artifactSha256}`,
+			adapterRevision: null,
+		});
+		expect(resolveModelCacheIdentityV1({ modelId: chat.modelId, adapterRevision: `sha256:${'a'.repeat(64)}` }))
+			.toEqual({ modelRevision: `sha256:${chat.artifactSha256}`, adapterRevision: `sha256:${'a'.repeat(64)}` });
+	});
+
+	it('does not invent model revisions for unknown models', () => {
+		expect(resolveModelCacheIdentityV1({ modelId: 'unknown-model' })).toBeNull();
 	});
 });

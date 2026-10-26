@@ -140,9 +140,10 @@
 </script>
 
 <div class="relative w-full">
-	<label class="block text-sm font-medium mb-1.5 opacity-80">AI Model Selection</label>
+	<label class="block text-sm font-medium mb-1.5 opacity-80" for="llm-selector-trigger">AI Model Selection</label>
 
 	<button
+		id="llm-selector-trigger"
 		onclick={() => (isOpen = !isOpen)}
 		class="flex items-center justify-between w-full h-12 px-3 py-2 border border-sand-dark rounded-lg bg-panel-soft text-inherit cursor-pointer hover:border-accent transition-colors"
 		aria-label="Select AI Model"

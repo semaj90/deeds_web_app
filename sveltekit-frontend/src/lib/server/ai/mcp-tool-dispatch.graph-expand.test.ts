@@ -1,12 +1,24 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DISPATCHER_TOOLS_SCHEMAS } from '../../../mcp/dispatcher-tools-schemas.js';
 
-const mockExpandNeighbours = vi.hoisted(() => vi.fn());
+const mockExpandNeighbourPathEdges = vi.hoisted(() => vi.fn());
 const mockBuildSubgraph = vi.hoisted(() => vi.fn());
 const mockRedisGet = vi.hoisted(() => vi.fn());
+const mockRapidsBfs = vi.hoisted(() => vi.fn());
+const mockRapidsSourceRefBfs = vi.hoisted(() => vi.fn());
+const mockRapidsCommunity = vi.hoisted(() => vi.fn());
+
+vi.mock('$lib/server/atlas/graph/atlas-rapids-pagerank-client.js', () => ({
+  createAtlasRapidsPageRankClient: () => ({ bfs: mockRapidsBfs, sourceRefBfs: mockRapidsSourceRefBfs }),
+}));
+
+vi.mock('$lib/server/graph/rapids-community-client.js', () => ({
+  runRapidsCommunityV1: mockRapidsCommunity,
+}));
 
 vi.mock('$lib/server/search/neo4j-rerank.js', () => ({
-  expandNeighbours: mockExpandNeighbours,
+  expandNeighbourPathEdges: mockExpandNeighbourPathEdges,
 }));
 
 vi.mock('$lib/server/retrieval/subgraph-seed-neighborhood.js', () => ({
@@ -27,10 +39,57 @@ describe('tool_graph_expand_neighborhood', () => {
     vi.resetAllMocks();
   });
 
+  it('advertises Leiden with the same bounded diagnostic request contract', () => {
+    const tool = DISPATCHER_TOOLS_SCHEMAS.find(({ name }) => name === 'graph:community_leiden');
+    expect(tool?.inputSchema).toEqual(expect.objectContaining({
+      properties: expect.objectContaining({
+        nodes: expect.objectContaining({ maxItems: 512 }),
+        edges: expect.objectContaining({ maxItems: 4096 }),
+      }),
+      required: expect.arrayContaining(['graphRevision', 'topologyHash', 'projectionRevision', 'nodes', 'edges']),
+    }));
+    expect(tool?.description).toContain('diagnostic-only');
+  });
+
+  it('bounds diagnostic Leiden requests and labels results noncanonical', async () => {
+    mockRapidsCommunity.mockResolvedValueOnce({
+      schema: 'atlas.community-partition-response.v1',
+      algorithm: 'leiden',
+      algorithmId: 'cugraph.leiden.26.06',
+      backend: 'cugraph',
+      graphRevision: 'graph:r1',
+      topologyHash: 'sha256:topology',
+      projectionRevision: 'projection:r1',
+      assignments: [],
+      communities: [],
+    });
+    const { executeGraphCommunityLeidenMcpTool } = await import('./mcp-tool-dispatch.js');
+    const invalid = await executeGraphCommunityLeidenMcpTool({
+      graphRevision: 'graph:r1', topologyHash: 'sha256:topology', projectionRevision: 'projection:r1',
+      nodes: [], edges: [],
+    });
+    expect(invalid.success).toBe(false);
+    expect(mockRapidsCommunity).not.toHaveBeenCalled();
+
+    const valid = await executeGraphCommunityLeidenMcpTool({
+      graphRevision: 'graph:r1', topologyHash: 'sha256:topology', projectionRevision: 'projection:r1',
+      nodes: [{ nodeId: 'node:a' }, { nodeId: 'node:b' }],
+      edges: [{ source: 'node:a', target: 'node:b', weight: 1 }],
+      randomState: 7,
+    });
+    expect(valid.success).toBe(true);
+    expect(mockRapidsCommunity).toHaveBeenCalledWith(expect.objectContaining({
+      algorithm: 'leiden', graphRevision: 'graph:r1', randomState: 7,
+    }));
+    expect(valid.data).toEqual(expect.objectContaining({
+      status: 'DIAGNOSTIC_ONLY', canonicalAuthority: false, productionAdmitted: false, writesPerformed: false,
+    }));
+  });
+
   it('returns sourceRefs-first graph payload with compatibility neighbors', async () => {
-    mockExpandNeighbours.mockResolvedValueOnce([
-      'file:src/lib/server/retrieval/query-profile-router.ts',
-      'file:src/lib/server/retrieval/routing-explanation.ts',
+    mockExpandNeighbourPathEdges.mockResolvedValueOnce([
+      { from: 'file:src/start.ts', to: 'file:src/lib/server/retrieval/query-profile-router.ts', relation: 'CALLS', hop: 1 },
+      { from: 'file:src/lib/server/retrieval/query-profile-router.ts', to: 'file:src/lib/server/retrieval/routing-explanation.ts', relation: 'IMPORTS', hop: 2 },
     ]);
     mockRedisGet.mockResolvedValueOnce(
       JSON.stringify({
@@ -97,6 +156,142 @@ describe('tool_graph_expand_neighborhood', () => {
         ]),
       })
     );
+    expect(result.data).toEqual(expect.objectContaining({
+      edges: [
+        expect.objectContaining({ relation: 'CALLS', hop: 1 }),
+        expect.objectContaining({ relation: 'IMPORTS', hop: 2 }),
+      ],
+      confidence: 0,
+    }));
+  });
+
+  it('routes only checksum-qualified resident graph lookups and rejects unbounded inputs', async () => {
+    mockRapidsBfs.mockResolvedValueOnce({
+      schema: 'atlas.graph-bfs-receipt.v1',
+      graphRevision: 'g-1',
+      writesPerformed: false,
+      canonicalAuthority: false,
+    });
+    const { executeGraphResidentBfsMcpTool } = await import('./mcp-tool-dispatch.js');
+    const invalid = await executeGraphResidentBfsMcpTool({ graphRevision: 'g-1', startNodeKey: 'node:1' });
+    expect(invalid.success).toBe(false);
+    expect(mockRapidsBfs).not.toHaveBeenCalled();
+
+    const valid = await executeGraphResidentBfsMcpTool({
+      graphRevision: 'g-1',
+      projectionRevision: 'p-1',
+      projectionChecksum: 'sha256:p',
+      startNodeKey: 'node:1',
+      depthLimit: 2,
+      expectedArtifactChecksum: 'sha256:a',
+      expectedGraphOrdinalMapChecksum: 'sha256:o',
+    });
+    expect(valid.success).toBe(true);
+    expect(mockRapidsBfs).toHaveBeenCalledWith(expect.objectContaining({
+      graphRevision: 'g-1',
+      expectedGraphOrdinalMapChecksum: 'sha256:o',
+    }));
+  });
+
+  it('routes exact revision-qualified resident sourceRef lookups without allowing arbitrary references', async () => {
+    mockRapidsSourceRefBfs.mockResolvedValueOnce({
+      schema: 'atlas.graph-source-ref-bfs-receipt.v1',
+      sourceRef: 'src/start.ts',
+      sourceRevision: 'source:r1',
+      workspaceRevision: 'workspace:r1',
+      graphRevision: 'g-1',
+      projectionRevision: 'p-1',
+      projectionChecksum: 'sha256:p',
+      artifactChecksum: 'sha256:a',
+      graphOrdinalMapChecksum: 'sha256:o',
+      matches: [],
+      writesPerformed: false,
+      canonicalAuthority: false,
+    });
+    const { executeGraphResidentSourceRefBfsMcpTool } = await import('./mcp-tool-dispatch.js');
+    const invalid = await executeGraphResidentSourceRefBfsMcpTool({
+      graphRevision: 'g-1',
+      sourceRef: 'src/start.ts',
+    });
+    expect(invalid.success).toBe(false);
+    expect(mockRapidsSourceRefBfs).not.toHaveBeenCalled();
+
+    const valid = await executeGraphResidentSourceRefBfsMcpTool({
+      graphRevision: 'g-1',
+      projectionRevision: 'p-1',
+      projectionChecksum: 'sha256:p',
+      sourceRef: 'src/start.ts',
+      expectedSourceRevision: 'source:r1',
+      expectedWorkspaceRevision: 'workspace:r1',
+      depthLimit: 1,
+      expectedArtifactChecksum: 'sha256:a',
+      expectedGraphOrdinalMapChecksum: 'sha256:o',
+    });
+    expect(valid.success).toBe(true);
+    expect(mockRapidsSourceRefBfs).toHaveBeenCalledWith(expect.objectContaining({
+      sourceRef: 'src/start.ts',
+      expectedSourceRevision: 'source:r1',
+      expectedWorkspaceRevision: 'workspace:r1',
+    }));
+  });
+
+  it('validates graph MCP seeds and forwards bounded requests to the real expander', async () => {
+    mockExpandNeighbourPathEdges.mockResolvedValueOnce([
+      { from: 'file:src/start.ts', to: 'file:src/neighbor.ts', relation: 'CALLS', hop: 1 },
+    ]);
+    mockRedisGet.mockResolvedValueOnce(null);
+    mockBuildSubgraph.mockResolvedValueOnce({
+      version: 'subgraph_v1_seed_neighborhood',
+      contract: {},
+      caps: { maxSeeds: 8, maxNeighbors: 24, maxHops: 2 },
+      labels: {},
+      primaryFileTargets: [],
+      seeds: [],
+      neighborhood: [],
+    });
+
+    const { executeGraphExpandMcpTool } = await import('./mcp-tool-dispatch.js');
+    const missingSeed = await executeGraphExpandMcpTool({ maxHops: 2 });
+    expect(missingSeed.success).toBe(false);
+    expect(mockExpandNeighbourPathEdges).not.toHaveBeenCalled();
+
+    const result = await executeGraphExpandMcpTool({
+      sourceRefs: ['src/start.ts'],
+      maxHops: 2,
+      limit: 12,
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockExpandNeighbourPathEdges).toHaveBeenCalledWith('file:src/start.ts', 2, 12);
+    expect(mockBuildSubgraph).toHaveBeenCalledWith(
+      expect.objectContaining({ maxHops: 2 })
+    );
+  });
+
+  it('honors an explicit one-hop limit despite the legacy depth default', async () => {
+    mockExpandNeighbourPathEdges.mockResolvedValueOnce([]);
+    mockRedisGet.mockResolvedValueOnce(null);
+    mockBuildSubgraph.mockResolvedValueOnce({
+      version: 'subgraph_v1_seed_neighborhood',
+      contract: {},
+      caps: { maxSeeds: 8, maxNeighbors: 24, maxHops: 1 },
+      labels: {},
+      primaryFileTargets: [],
+      seeds: [],
+      neighborhood: [],
+    });
+
+    const { executeGraphExpandMcpTool } = await import('./mcp-tool-dispatch.js');
+    const result = await executeGraphExpandMcpTool({ sourceRefs: ['src/start.ts'], maxHops: 1 });
+
+    expect(result.success).toBe(true);
+    expect(mockExpandNeighbourPathEdges).toHaveBeenCalledWith('file:src/start.ts', 1, 40);
+    expect(mockBuildSubgraph).toHaveBeenCalledWith(expect.objectContaining({ maxHops: 1 }));
+    expect(result.data).toEqual(expect.objectContaining({
+      confidence: 0,
+      nodes: [expect.objectContaining({ isSeed: true })],
+      edges: [],
+    }));
   });
 });
 

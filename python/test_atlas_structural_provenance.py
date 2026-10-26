@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from atlas_structural_provenance import (
+    find_call_expression_byte_spans,
     find_occurrence_positions,
     is_exact_langextract_alignment,
     normalize_langextract_extraction,
@@ -159,6 +160,20 @@ def test_find_occurrence_positions_returns_empty_list_for_absent_name():
 def test_find_occurrence_positions_never_raises_on_empty_or_invalid_input():
     assert find_occurrence_positions("", "javascript", ["foo"]) == {"foo": []}
     assert find_occurrence_positions("const x = ", "javascript", []) == {}
+
+
+def test_call_expression_spans_are_exact_utf8_bytes_and_proposal_only():
+    source = "const résumé = path.join('a');\npath.join('b');"
+    spans = find_call_expression_byte_spans(source, "javascript", ["path.join"])
+    source_bytes = source.encode("utf-8")
+    assert [source_bytes[start:end].decode("utf-8") for start, end in spans["path.join"]] == [
+        "path.join('a')", "path.join('b')"
+    ]
+
+
+def test_call_expression_spans_return_empty_for_unmatched_or_invalid_calls():
+    assert find_call_expression_byte_spans("const value = 1", "javascript", ["missing"]) == {"missing": []}
+    assert find_call_expression_byte_spans("", "javascript", ["missing"]) == {"missing": []}
 
 
 # --- occurrence_to_absolute_position ---

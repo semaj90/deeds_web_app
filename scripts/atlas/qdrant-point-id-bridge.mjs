@@ -79,6 +79,10 @@ function candidateChunkRefs(chunk) {
 }
 
 async function bridgeQdrantPoints() {
+  if (APPLY) {
+    throw new Error('UNSAFE_SOURCE_PATH_QDRANT_BRIDGE_APPLY_DISABLED');
+  }
+
   try {
     console.log('📊 Step 1: Audit current state\n');
 
@@ -110,8 +114,9 @@ async function bridgeQdrantPoints() {
 
     console.log('🔗 Step 2: Build deterministic packet bridge via concrete provenance joins\n');
 
-    await pgPool.query(`
-      CREATE TABLE IF NOT EXISTS packet_qdrant_bridge (
+    if (APPLY) {
+      await pgPool.query(`
+        CREATE TABLE IF NOT EXISTS packet_qdrant_bridge (
         packet_key TEXT PRIMARY KEY,
         source_ref TEXT NOT NULL,
         feature_id TEXT,
@@ -128,9 +133,10 @@ async function bridgeQdrantPoints() {
         ADD COLUMN IF NOT EXISTS directory_path TEXT;
       CREATE INDEX IF NOT EXISTS idx_packet_qdrant_bridge_point_id
         ON packet_qdrant_bridge (qdrant_point_id);
-      CREATE INDEX IF NOT EXISTS idx_packet_qdrant_bridge_source_ref
-        ON packet_qdrant_bridge (source_ref);
-    `);
+        CREATE INDEX IF NOT EXISTS idx_packet_qdrant_bridge_source_ref
+          ON packet_qdrant_bridge (source_ref);
+      `);
+    }
 
     // Load canonical packets and chunk index separately, then join in JS using
     // the same provenance normalization logic the other Atlas bridge lanes use.

@@ -15,6 +15,7 @@ readback parity.
 from __future__ import annotations
 
 import argparse
+import gc
 import hashlib
 import json
 import mmap
@@ -226,12 +227,11 @@ def main() -> int:
                 }, indent=2))
                 return 3
 
-            mapped_view = memoryview(mapped)
             reader = None
             ipc_file = None
             table = None
             try:
-                reader = pa.BufferReader(mapped_view)
+                reader = pa.memory_map(str(file_path), "r")
                 ipc_file = ipc.open_file(reader)
                 table = ipc_file.read_all()
                 row_count = table.num_rows
@@ -261,6 +261,7 @@ def main() -> int:
                     "status": "CANDIDATE_FEATURE_ARROW_MMAP_PROVEN",
                     "pyarrowAvailable": True,
                     "arrowReadbackProven": True,
+                    "arrowReadMode": "PYARROW_READ_ONLY_MMAP",
                     "denseOrdinalVerified": True,
                     "expectedColumnarVerified": expected is not None,
                     "rowCount": row_count,
@@ -277,7 +278,7 @@ def main() -> int:
                 if reader is not None:
                     reader.close()
                 reader = None
-                mapped_view.release()
+                gc.collect()
 
             print(json.dumps(output, indent=2))
             return 0

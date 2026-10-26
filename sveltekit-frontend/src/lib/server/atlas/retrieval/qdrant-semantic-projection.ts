@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import {
+  CANONICAL_QDRANT_COLLECTION,
   SEMANTIC_DIMENSION,
   SEMANTIC_REPRESENTATION_ID,
 } from '../../embedding/embedding-contract-768.js';
@@ -14,7 +15,7 @@ export const ATLAS_CANONICAL_SEMANTIC_REPRESENTATION = SEMANTIC_REPRESENTATION_I
 export const ATLAS_CANONICAL_SEMANTIC_DIMENSION = SEMANTIC_DIMENSION;
 export const ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION = SEMANTIC_DIMENSION;
 export const ATLAS_SEMANTIC_PROJECTION_METHOD = 'embeddinggemma-native-768' as const;
-export const QDRANT_SEMANTIC_COLLECTION = 'codebase_chunks_768' as const;
+export const QDRANT_SEMANTIC_COLLECTION = CANONICAL_QDRANT_COLLECTION;
 export const QDRANT_SEMANTIC_VECTOR_NAME = 'content' as const;
 
 export const QDRANT_BM42_CHALLENGER_COLLECTION = 'codebase_chunks_384_hybrid' as const;

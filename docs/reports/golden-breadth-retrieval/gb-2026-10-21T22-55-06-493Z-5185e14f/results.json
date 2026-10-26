@@ -1,0 +1,54 @@
+{
+  "runId": "gb-2026-10-21T22-55-06-493Z-5185e14f",
+  "mode": "LIVE",
+  "results": [
+    {
+      "id": "GB-001",
+      "query": "How do SvelteKit 2 load functions return data to +page.svelte?",
+      "lanes": {
+        "svelte": {
+          "status": "OK",
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "3 similar results for \"How do SvelteKit 2 load functions return data to +page.svelte?\":\n- title: sv, section: cli/sv\n- title: Loading data, section: kit/load\n- title: svelte, section: svelte/svelte\n\n---\n\nSection not found: \"How do SvelteKit 2 load functions return data to +page.svelte?\"."
+              }
+            ]
+          },
+          "tools": [
+            "get-documentation",
+            "list-sections",
+            "playground-link",
+            "svelte-autofixer"
+          ],
+          "latencyMs": 9969
+        }
+      }
+    },
+    {
+      "id": "GB-002",
+      "query": "SvelteKit 2 form actions with use:enhance and superforms",
+      "lanes": {
+        "svelte": {
+          "status": "OK",
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "3 similar results for \"SvelteKit 2 form actions with use:enhance and superforms\":\n- title: sv, section: cli/sv\n- title: use:, section: svelte/use\n- title: svelte, section: svelte/svelte\n\n---\n\nSection not found: \"SvelteKit 2 form actions with use:enhance and superforms\"."
+              }
+            ]
+          },
+          "tools": [
+            "get-documentation",
+            "list-sections",
+            "playground-link",
+            "svelte-autofixer"
+          ],
+          "latencyMs": 6527
+        }
+      }
+    }
+  ]
+}

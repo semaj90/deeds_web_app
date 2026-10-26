@@ -22,12 +22,12 @@ const TEST_EVIDENCE_ID = 'c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f';
 const TEST_PERSON_ID = 'd4e5f6a7-b8c9-4d0e-9f2a-3b4c5d6e7f8a';
 const TEST_CITATION_ID = 'e5f6a7b8-c9d0-4e1f-aa3b-4c5d6e7f8a9b';
 
-// ── ollamaFetch mock ──
+// ── embedOrChatFetch mock ──
 const mockOllamaFetch = vi.fn(async () =>
 	new Response(JSON.stringify({
 		message: { content: 'Mock LLM response' },
 		response: '{"keyPoints":["Point 1","Point 2","Point 3"],"confidence":0.85}',
-		model: 'gemma4-rotorquant:latest',
+		model: 'ornith-1.5-9b',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } })
 );
 vi.mock('$lib/server/middleware/cache-headers.js', () => ({
@@ -39,9 +39,9 @@ vi.mock('$lib/server/middleware/cache-headers.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+	embedOrChatFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── ENV mock ──

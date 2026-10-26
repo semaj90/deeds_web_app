@@ -1,6 +1,6 @@
 export {
   getOllamaEndpoint,
   getOllamaEmbeddingEndpoint,
-  getOllamaGenerationEndpoint,
-  getOllamaChatEndpoint,
+  getLlamaGenerationEndpoint,
+  getLlamaChatEndpoint,
 } from '$lib/server/ollama.js';

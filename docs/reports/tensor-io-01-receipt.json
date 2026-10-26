@@ -1,0 +1,85 @@
+{
+  "milestone": "TENSOR-IO-01",
+  "schema_version": "1.0.0",
+  "timestamp": "2026-10-16T01:36:55.927Z",
+  "status": "VERIFIED",
+  "total_duration_ms": 1048,
+  "parameters": {
+    "corpus_rows": 1000,
+    "dimensions": 768,
+    "candidate_pool_size": 50,
+    "top_k": 5,
+    "binary_snapshot_path": "sveltekit-frontend/data/atlas-tensor-proof/corpus_semantic_768_proof.f32bin",
+    "binary_snapshot_sha256": "dd9159fe17e67a8479c4e047f5973f6e3a9001cd25234e5c182f9ee26dffde15",
+    "lut_path": "sveltekit-frontend/data/atlas-tensor-proof/corpus_semantic_768_lut.json"
+  },
+  "hardware": {
+    "backend": "cuda_cublas",
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 3060 Ti",
+    "free_vram_gb": 6.958984375,
+    "total_vram_gb": 7.99951171875
+  },
+  "benchmarks": {
+    "gemm_duration_ms": 246.67450000000008,
+    "max_oracle_discrepancy": 1.7881393432617188e-7,
+    "tolerance": 0.00001
+  },
+  "resolved_top_k": [
+    {
+      "rank": 1,
+      "score": 1.0000001192092896,
+      "subIndex": 2,
+      "candidateOrdinal": 42,
+      "canonicalId": "packet:source:legal_273a",
+      "sourceRevision": "git:sha256:dbe86759025b9ea5",
+      "featureLabel": "ground_truth_target",
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "rank": 2,
+      "score": 0.08027090132236481,
+      "subIndex": 17,
+      "candidateOrdinal": 323,
+      "canonicalId": "packet:source:legal_2853",
+      "sourceRevision": "git:sha256:337b481a99d60352",
+      "featureLabel": "candidate_chunk",
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "rank": 3,
+      "score": 0.07285569608211517,
+      "subIndex": 8,
+      "candidateOrdinal": 152,
+      "canonicalId": "packet:source:legal_27a8",
+      "sourceRevision": "git:sha256:51c455600d6227ef",
+      "featureLabel": "candidate_chunk",
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "rank": 4,
+      "score": 0.05910822004079819,
+      "subIndex": 5,
+      "candidateOrdinal": 95,
+      "canonicalId": "packet:source:legal_276f",
+      "sourceRevision": "git:sha256:12e1dc24b3617d36",
+      "featureLabel": "candidate_chunk",
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "rank": 5,
+      "score": 0.05469279736280441,
+      "subIndex": 11,
+      "candidateOrdinal": 209,
+      "canonicalId": "packet:source:legal_27e1",
+      "sourceRevision": "git:sha256:645d620b4d4df7e7",
+      "featureLabel": "candidate_chunk",
+      "representationRevision": "semantic_768:v1"
+    }
+  ],
+  "invariants": {
+    "canonical_writes_performed": 0,
+    "vram_headroom_preserved": true,
+    "nes_decoupled_lut_contract": true
+  }
+}

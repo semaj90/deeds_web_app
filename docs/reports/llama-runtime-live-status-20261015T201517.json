@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.llama-runtime-mcp-status-proof.v1",
+  "observedAt": "2026-10-16T03:15:40.615Z",
+  "transport": "in-memory MCP; real Windows controller and NVIDIA readback",
+  "tools": [
+    "llama_server.status",
+    "llama_server.start",
+    "llama_server.unload"
+  ],
+  "receipt": {
+    "schema": "atlas.llama-runtime-control.v1",
+    "action": "status",
+    "port": 8090,
+    "status": "STOPPED",
+    "serviceMutationPerformed": false,
+    "before": {
+      "observedAt": "2026-10-16T03:15:40.4799381Z",
+      "listenerPids": [],
+      "processIds": [],
+      "healthy": false,
+      "modelId": null,
+      "slots": null,
+      "gpus": [
+        {
+          "uuid": "GPU-8d67bfc5-6752-0bdb-e6a1-a66054883ec0",
+          "totalMiB": 8192,
+          "usedMiB": 1114,
+          "freeMiB": 6911
+        }
+      ],
+      "gpuError": null
+    },
+    "after": {
+      "observedAt": "2026-10-16T03:15:40.4799381Z",
+      "listenerPids": [],
+      "processIds": [],
+      "healthy": false,
+      "modelId": null,
+      "slots": null,
+      "gpus": [
+        {
+          "uuid": "GPU-8d67bfc5-6752-0bdb-e6a1-a66054883ec0",
+          "totalMiB": 8192,
+          "usedMiB": 1114,
+          "freeMiB": 6911
+        }
+      ],
+      "gpuError": null
+    },
+    "memoryDeltas": [],
+    "memoryReleaseObserved": null,
+    "error": null
+  },
+  "deployedTraceDiscoveryProven": false,
+  "liveStartUnloadCycleProven": false
+}

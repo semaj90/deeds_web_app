@@ -20,7 +20,8 @@ const ROOT = path.resolve(__dir, '../..');
 const argv = process.argv.slice(2);
 const inputI = argv.indexOf('--input');
 const outI = argv.indexOf('--out');
-const DRY_RUN = argv.includes('--dry-run');
+const WRITE = argv.includes('--write');
+const DRY_RUN = !WRITE;
 const LIMIT_I = argv.indexOf('--limit');
 
 const INPUT_PATH = inputI >= 0 ? argv[inputI + 1] : path.join(ROOT, '.tmp', 'ast-neo4j-dryrun.json');
@@ -64,6 +65,10 @@ function buildRecord(fileNode) {
 }
 
 async function main() {
+  if (WRITE && argv.includes('--dry-run')) {
+    throw new Error('Choose either the default preview or --write, not both.');
+  }
+
   if (!fs.existsSync(INPUT_PATH)) {
     console.error('[label-features] Missing input:', INPUT_PATH);
     process.exit(1);

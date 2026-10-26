@@ -10,7 +10,7 @@
  * @example
  * const response = await llamaServerCachedChat(
  *   [{ role: 'user', content: 'What is hearsay?' }],
- *   'gemma4-legal-iq4xs-direct.gguf',
+ *   'ornith-1.5-9b',
  *   { temperature: 0.3, maxTokens: 200 }
  * );
  */

@@ -71,7 +71,12 @@ const receipt = {
 };
 
 const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
-const out = path.join(ROOT, 'docs/reports', `gan-adversarial-proof-v1-${stamp}.json`);
+const outputArg = process.argv.find((arg) => arg.startsWith('--output='));
+const outputPath = outputArg?.slice('--output='.length);
+if (outputArg && !outputPath) throw new Error('--output requires a non-empty file path');
+const out = outputPath
+  ? path.resolve(ROOT, outputPath)
+  : path.join(ROOT, 'docs/reports', `gan-adversarial-proof-v1-${stamp}.json`);
 fs.writeFileSync(out, JSON.stringify(receipt, null, 2), { flag: 'wx' });
 console.log(JSON.stringify({ receipt: path.relative(ROOT, out), status: receipt.status, totals: receipt.totals, lanes, selfTests, failed: results.filter((r) => !r.passed).map((r) => ({ id: r.id, expected: r.expectedCode, got: r.maliciousRejectedWith, control: r.controlResult, error: r.error })), knownGaps: knownGaps.map((g) => `${g.id}: ${g.detail}`) }, null, 2));
 process.exit(allPassed ? 0 : 2);

@@ -23,6 +23,16 @@ export const structuralReferenceResolutionSchema = z.object({
   ]),
   candidate_symbol_ids: z.array(id).default([]),
   source_revision: revision,
+  source_ref: z.string().min(1),
+  target_source_revision: revision.nullable().optional(),
+  target_source_ref: z.string().min(1).nullable().optional(),
+  workspace_revision: revision,
+  upstream_source_node_id: id,
+  upstream_target_node_id: id.nullable(),
+  upstream_chunk_id: id,
+  captures: z.record(z.string(), z.string()).default({}),
+  extractor: z.enum(['treesitter_chunker', 'ast_grep', 'framework_adapter']),
+  extractor_revision: revision,
   evidence_refs: z.array(id).default([]),
   producer_revision: revision,
 }).strict();
@@ -33,15 +43,17 @@ async function resolveOneSide(pool: Pool, input: {
   upstream_node_id?: string | null;
   upstream_symbol_id?: string | null;
   text?: string | null;
+  source_ref: string;
   source_revision: string;
+  workspace_revision: string;
 }): Promise<{ ids: string[]; basis: StructuralReferenceResolutionV1['resolution_basis'] }> {
   if (input.upstream_node_id) {
     const result = await pool.query<{ stable_symbol_id: string }>(`
       SELECT DISTINCT stable_symbol_id
       FROM atlas_symbol_versions
-      WHERE upstream_node_id = $1 AND source_revision = $2
+      WHERE upstream_node_id = $1 AND source_revision = $2 AND workspace_revision = $3 AND source_ref = $4
       ORDER BY stable_symbol_id
-    `, [input.upstream_node_id, input.source_revision]);
+    `, [input.upstream_node_id, input.source_revision, input.workspace_revision, input.source_ref]);
     if (result.rows.length > 0) return { ids: result.rows.map((row) => row.stable_symbol_id), basis: 'upstream_node_version' };
   }
 
@@ -82,25 +94,30 @@ export function createStructuralReferenceResolver(pool: Pool) {
       fact: StructuralReferenceFactV1;
       producer_revision: string;
       persist?: boolean;
-    }): Promise<StructuralReferenceResolutionV1> {
+    }, options?: { persist: boolean }): Promise<StructuralReferenceResolutionV1> {
       const fact = input.fact;
       const source = await resolveOneSide(pool, {
         upstream_node_id: fact.upstream_source_node_id,
+        source_ref: fact.source_ref,
         source_revision: fact.source_revision,
+        workspace_revision: fact.workspace_revision,
       });
       const target = await resolveOneSide(pool, {
         upstream_node_id: fact.upstream_target_node_id,
         text: fact.target_text,
-        source_revision: fact.source_revision,
+        source_ref: fact.target_source_ref ?? fact.source_ref,
+        source_revision: fact.target_source_revision ?? fact.source_revision,
+        workspace_revision: fact.workspace_revision,
       });
 
       const sourceId = source.ids.length === 1 ? source.ids[0]! : null;
       const targetId = target.ids.length === 1 ? target.ids[0]! : null;
       const candidates = [...new Set([...source.ids, ...target.ids])].sort();
       const ambiguous = source.ids.length > 1 || target.ids.length > 1;
+      const exactRevisionBoundPair = source.basis === 'upstream_node_version' && target.basis === 'upstream_node_version';
       const status: StructuralReferenceResolutionV1['status'] = ambiguous
         ? 'ambiguous'
-        : sourceId && targetId
+        : sourceId && targetId && exactRevisionBoundPair
           ? 'canonical'
           : sourceId || targetId
             ? 'degraded'
@@ -123,29 +140,63 @@ export function createStructuralReferenceResolver(pool: Pool) {
         resolution_basis: basis,
         candidate_symbol_ids: candidates,
         source_revision: fact.source_revision,
+        source_ref: fact.source_ref,
+        target_source_revision: fact.target_source_revision ?? fact.source_revision,
+        target_source_ref: fact.target_source_ref ?? fact.source_ref,
+        workspace_revision: fact.workspace_revision,
+        upstream_source_node_id: fact.upstream_source_node_id,
+        upstream_target_node_id: fact.upstream_target_node_id ?? null,
+        upstream_chunk_id: fact.upstream_chunk_id,
+        captures: fact.captures,
+        extractor: fact.extractor,
+        extractor_revision: fact.extractor_revision,
         evidence_refs: fact.evidence_refs,
         producer_revision: input.producer_revision,
       });
 
-      if (input.persist ?? true) {
+      if (options?.persist ?? input.persist ?? false) {
         await pool.query(`
           INSERT INTO atlas_structural_reference_resolutions (
-            reference_id, source_stable_symbol_id, target_stable_symbol_id,
+            reference_id, source_ref, workspace_revision,
+            target_source_ref, target_source_revision,
+            source_stable_symbol_id, target_stable_symbol_id,
+            upstream_source_node_id, upstream_target_node_id, upstream_chunk_id,
             reference_kind, target_text, resolution_status, resolution_basis,
-            source_revision, evidence_refs, producer_revision
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb,$10)
+            source_revision, evidence_refs, producer_revision,
+            captures, extractor, extractor_revision
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16::jsonb,$17,$18::jsonb,$19,$20)
           ON CONFLICT (reference_id) DO UPDATE SET
+            source_ref = EXCLUDED.source_ref,
+            workspace_revision = EXCLUDED.workspace_revision,
+            target_source_ref = EXCLUDED.target_source_ref,
+            target_source_revision = EXCLUDED.target_source_revision,
             source_stable_symbol_id = EXCLUDED.source_stable_symbol_id,
             target_stable_symbol_id = EXCLUDED.target_stable_symbol_id,
+            upstream_source_node_id = EXCLUDED.upstream_source_node_id,
+            upstream_target_node_id = EXCLUDED.upstream_target_node_id,
+            upstream_chunk_id = EXCLUDED.upstream_chunk_id,
+            reference_kind = EXCLUDED.reference_kind,
+            target_text = EXCLUDED.target_text,
+            source_revision = EXCLUDED.source_revision,
             resolution_status = EXCLUDED.resolution_status,
             resolution_basis = EXCLUDED.resolution_basis,
             evidence_refs = EXCLUDED.evidence_refs,
             producer_revision = EXCLUDED.producer_revision,
+            captures = EXCLUDED.captures,
+            extractor = EXCLUDED.extractor,
+            extractor_revision = EXCLUDED.extractor_revision,
             updated_at = now()
         `, [
           resolution.reference_id,
+          resolution.source_ref,
+          resolution.workspace_revision,
+          resolution.target_source_ref,
+          resolution.target_source_revision,
           resolution.source_stable_symbol_id,
           resolution.target_stable_symbol_id,
+          resolution.upstream_source_node_id,
+          resolution.upstream_target_node_id,
+          resolution.upstream_chunk_id,
           resolution.reference_kind,
           resolution.target_text,
           resolution.status,
@@ -153,6 +204,9 @@ export function createStructuralReferenceResolver(pool: Pool) {
           resolution.source_revision,
           JSON.stringify(resolution.evidence_refs),
           resolution.producer_revision,
+          JSON.stringify(resolution.captures),
+          resolution.extractor,
+          resolution.extractor_revision,
         ]);
       }
 

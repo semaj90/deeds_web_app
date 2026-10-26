@@ -106,6 +106,30 @@ describe('entity-concept taxonomy contracts', () => {
 		expect(edge.evidenceRefs).toContain('review:approved:1');
 	});
 
+	it('rejects a graph revision different from the reviewed candidate snapshot', () => {
+		const candidate = TaxonomyAssignmentCandidateV1Schema.parse({
+			...createTaxonomyAssignmentCandidateV1({
+				entityId: 'symbol:searchCandidates',
+				conceptId: 'concept:semantic-retrieval',
+				taxonomyRevision: 'taxonomy:1',
+				semanticRevision: 'semantic_768:7',
+				graphRevision: 'graph:reviewed',
+				evidenceRefs: ['source:span:1'],
+				producerRevision: 'taxonomy-candidate:1',
+			}),
+			status: 'promoted',
+		});
+
+		expect(() => promoteTaxonomyAssignmentV1({
+			candidate,
+			workspaceRevision: 'workspace:1',
+			sourceRevision: 'source:1',
+			graphRevision: 'graph:current',
+			promotionEvidenceRefs: ['review:approved:1'],
+			producerRevision: 'taxonomy-promotion:1',
+		})).toThrow(`TAXONOMY_PROMOTION_GRAPH_REVISION_MISMATCH:${candidate.candidateId}`);
+	});
+
 	it('refuses to promote a candidate that has not cleared review (KAG-HYP-01 sibling gate)', () => {
 		const baseCandidate = createTaxonomyAssignmentCandidateV1({
 			entityId: 'symbol:searchCandidates',

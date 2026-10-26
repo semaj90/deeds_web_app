@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.p16-graph-csr-cugraph-parity-receipt.v1",
+  "generatedAt": "2026-10-16T01:06:38.832545+00:00",
+  "writesPerformed": false,
+  "sourceCohortReceipt": "docs/reports/p13-p17-stratified-feature-cohort-receipt-v1.json",
+  "ordinalMapChecksum": "sha256:5d00f097941fd064238b9f5c445cbf2c13efd9a0edb7c82b83dd56dac60facbf",
+  "csrContract": {
+    "numNodes": 396,
+    "numCohortFileNodes": 50,
+    "numExternalTargetNodes": 346,
+    "numUniqueDirectedEdges": 625,
+    "indptrLen": 397,
+    "indicesLen": 625,
+    "weightsLen": 625,
+    "csrInvariantsVerified": true,
+    "csrChecksum": "sha256:3ac3595b2ab666359b79c9d2f5b12ba8aa2254640045351961338cea16a39166"
+  },
+  "pageRankParity": {
+    "dampingAlpha": 0.85,
+    "cpuBackend": "NetworkX 3.6.1",
+    "gpuBackend": "PyTorch 2.13.0+cu130 sparse_csr_tensor SpMV (NVIDIA GeForce RTX 3060 Ti)",
+    "cpuLatencyMs": 265.893,
+    "gpuLatencyMs": 615.1196,
+    "gpuIterations": 7,
+    "maxAbsDiff": 2.987709125240601e-11,
+    "l1Diff": 4.7269590281937e-10,
+    "top10CohortOrdinalsCpu": [
+      25,
+      0,
+      2,
+      1,
+      4,
+      5,
+      6,
+      3,
+      8,
+      9
+    ],
+    "top10CohortOrdinalsGpu": [
+      25,
+      0,
+      2,
+      1,
+      4,
+      5,
+      6,
+      3,
+      8,
+      9
+    ],
+    "top10ExactOrderParity": true,
+    "top5CohortFilesByPageRank": [
+      {
+        "ordinal": 25,
+        "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+        "pageRank": 0.00241672
+      },
+      {
+        "ordinal": 0,
+        "sourceRef": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+        "pageRank": 0.00228913
+      },
+      {
+        "ordinal": 2,
+        "sourceRef": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+        "pageRank": 0.00228913
+      },
+      {
+        "ordinal": 1,
+        "sourceRef": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+        "pageRank": 0.00228913
+      },
+      {
+        "ordinal": 4,
+        "sourceRef": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+        "pageRank": 0.00228913
+      }
+    ]
+  },
+  "rapidsCuGraphExecution": {
+    "cugraph_importable": true,
+    "pylibcugraph_importable": true,
+    "executed": true,
+    "cugraph_version": "26.06.00",
+    "pylibcugraph_version": "26.06.00",
+    "cugraphLatencyMs": 689.3498,
+    "maxAbsDiffVsNetworkX": 0.0022891289745659814,
+    "top10CohortOrdinalsCuGraph": [
+      25,
+      0,
+      2,
+      1,
+      4,
+      5,
+      6,
+      3,
+      8,
+      9
+    ]
+  },
+  "status": "PASS"
+}

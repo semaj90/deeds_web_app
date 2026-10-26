@@ -1872,3 +1872,250 @@ Rules: routing proposes, policy/authorization decides, execution happens only af
 - [ ] VITERBI-NEG-01 Negative-control variants per scenario (remove semantic/graph evidence, tool unavailable, tool schema changed, permission denied, registry revision changed, high latency, reduced context budget); the router's path must change predictably. First evaluation uses hand-authored/deterministic transition scores (READ->READ high, READ->VALIDATE high, VALIDATE->WRITE gated, WRITE->WRITE forbidden, FAIL->FALLBACK allowed); transitions learned from `LearningOutcomeV1` only as an offline challenger, never mutating production weights.
 - [ ] OKF-TOPIC-05..09 Exact-span replay across HTML normalization changes; profile + extractor revision recorded; authority-class evaluation (official vs community docs); topic observation -> ContextManifest evidence reference; no direct ontology/Qdrant/Neo4j promotion.
 - Promotion gate for `CONTROL_TOOL_ROUTER=viterbi_v1` (flag; deterministic selector stays control/fallback): CURRENT_REGISTRY_BINDING proven, held-out routing eval pass, WRITE_TOOL_FALSE_POSITIVE_RATE = 0, replay determinism proven, fallback path proven, validator enforcement proven. Contract priority: P0 `QueryExecutionPlanV1`, `ValidatorFabric`; P1 `NegativeControlGenerator`, `GroupRelativeCandidateEval`; P2 `NextActionProposalV1`, `PromptProgramRevision`, `TypedExecutionDagV1`, `ProjectionFreshnessV1` (assign each to an existing owner first; see the 15-contract matrix, no new peer owners).
+
+
+## NX-CUGRAPH-BACKEND-01 (2026-10-17): NetworkX dispatch to nx-cugraph, one bounded fixture
+
+No install was needed: `nx-cugraph 26.6.0`, `cugraph 26.6.0`, `cudf`, `cuml 26.6.0`, `cupy 14.1.1`, `torch 2.13`, `xgboost 3.3.0`, `networkx 3.6.1` already exist in `atlas-rapids-cu13` (runtime registry: NetworkX `installAllowed:false`, stays the CPU parity oracle). The 8095 CPU sidecar reports `nx_cugraph:false` by design. The cuTile venv has `cuda-tile 1.5.0` and `cuda-toolkit 13.2.1`, but cuTile stays `AVAILABLE_FUTURE_CHALLENGER` (gated by ACE-RADIX-01 on a CUDA 13.2+ host; this host runs 13.0; toolkit installed in a venv does not prove WSL driver capability).
+
+- [x] **PARITY_PASS on one seeded fixture** (`scripts/atlas/prove_nx_cugraph_backend_parity_v1.py`, receipt `docs/reports/nx-cugraph-backend-parity-v1.json`, RTX 3060 Ti, 3,000 nodes / 15,000 edges): PageRank max abs diff 3.3e-19, top-50 overlap 1.0; BFS distances exactly equal for 5 sources; connected-component partition equal.
+- Timing (separate first and warm): PageRank CPU 592 ms, GPU first call 3,049 ms (CUDA init and graph conversion), GPU warm median 8.4 ms. BFS GPU was **slower** than CPU on this small graph (2,212 ms vs 15 ms total over 5 calls, conversion cost). Do not route small-graph traversals to the GPU.
+- Converted-graph cache is on by default (`nx.config.cache_converted_graphs=True`) and warns that mutating a graph by hand makes the cache stale; clear with `G.__networkx_cache__.clear()`.
+- [ ] Open: real Atlas graph (162,234 nodes / 108,156 edges parity snapshot) not run; other algorithms (Louvain, betweenness) not tested; unsupported-algorithm fallback behavior untested; memory overhead on the 8 GB card shared with Ornith untested. **Do not set `NETWORKX_AUTOMATIC_BACKENDS` globally on this evidence.**
+- ACE feature tensor parity (`ace_packet_proposal_v1.py`) also passed under this env's torch 2.13 (15/15 tests).
+
+## TRITON-CHALLENGER-01 (2026-10-18): fused remap + tiled GEMM + bit-FSM kernel recorded as a challenger only (paper entry; no code, no install, no GPU run)
+
+Source: an externally pasted Triton sketch (token remap gather -> tiled GEMM `num_stages=3` -> bit-packed 4-bit FSM mask). Reviewed against this repo; cross-ref `parent-atlas-ace-rlm-bitfrost-integration/tasks.md` `ALIGN-RTX-01`.
+
+**Classification.** `EXPERIMENT` / LEVEL 2-3 challenger under this change. Not a new owner, not a default, not a retrieval vote. Triton imports under Windows py3.13 (`site-packages\triton`) but no repo module uses it and no owner lists it.
+
+**Standing ladder (unchanged).** LEVEL 1 vendor primitive / CPU oracle (cuBLASLt, LibTorch) -> LEVEL 2 simple SIMT -> LEVEL 3 cuTile. Anchors: `python/tests/test_avx2_cutile_miras_fsm.py`, `scripts/atlas/lib/domain-taxonomy-nes-lut-batch-gemm-v1.mjs`. A Triton kernel may only be a challenger at LEVEL 2/3. No rung skipped.
+
+**Gates before any challenger run (all required, each recorded as an explicit null with reason if it fails):**
+- [ ] TRITON-GATE-VRAM Free-VRAM check from `nvidia-smi` outside the CUDA process (not `cudaMemGetInfo`, which overstates on WDDM). Budget < ~1 GiB alongside `:8090` Ornith (~6.2-6.7 GiB of 8 GiB). Never stop `:8090` for this.
+- [ ] TRITON-GATE-ORACLE CPU-oracle parity on ordering, masks, dims and checksums with a bounded tolerance; seeded.
+- [ ] TRITON-GATE-RECEIPT One validated row in `atlas_algorithm_execution_receipts` (live columns verified 2026-10-18: `execution_id, workflow_id, action_id, dag_node_id, stage, logical_lane, algorithm_class, algorithm, geometry, metric, compute_backend, compilation_mode, transport, serialization, source_snapshot_revision, representation_revision, graph_snapshot_revision, relationship_snapshot_revision, input/output/manifest checksums, manifest jsonb`). The table has no outcome status; a pass/fail verdict still needs `atlas_receipt_verification_v1` (RECEIPT-OWNER-01, unapproved).
+- [ ] TRITON-GATE-NOBUILD Do not modify CUDA/native build files (`tensorrt_bridge.node`, CMake) or `legal-ai-postgres` settings; keep `io_method=worker` (live: `io_workers=3`, `effective_io_concurrency=16`).
+
+**Defects in the sketch to fix before it is even a fixture:**
+- [ ] TRITON-FIX-01 FP16 mask: `-1e9` cast to fp16 becomes `-inf`; use `torch.finfo(torch.float16).min` (-65504) or keep the epilogue in fp32.
+- [ ] TRITON-FIX-02 Not a true FSM: next state is `(table[state] >> 4*(offs_n & 15)) & 0xF` per column, and `FSM_States` is never written back. A real FSM must persist the transition only after token selection (or run a persistent multi-step kernel).
+- [ ] TRITON-FIX-03 Remap is a no-op permutation: rows gathered by `Token_Map` are scattered back to the same indices. Justify only if `B` is grouped per expert/state or the output stays permuted for the next layer; otherwise drop the gather.
+- [ ] TRITON-FIX-04 Sm_86 reality: GeForce Ampere fp16 tensor math with fp32 accumulate runs at half rate; the pasted ">85% FLOPs", "3-10 us launch" and "2.5-3x io_uring" figures are unsourced and must not be cited.
+
+**Postgres 18 AIO (decision, no change).** AIO and bitmap scans are planner behavior (AGENTS.md); no application abstraction. Keep `io_method=worker`: `io_uring` is Linux-only and Docker's default seccomp profile may block it. The hot vector path is pgvector HNSW index scans, not bitmap heap scans. Record `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` when evaluating. The pasted `token_blocks` example table does not exist (`to_regclass` null).
+
+**Not ratified here.** The pasted note calls `codebase_chunks_768_v2` part of the right setup; that default is an open risk (ALIGN-TV-06: `_v2` has 52,816 points vs 219,998 Postgres chunks) and is not endorsed by this entry.
+
+Next (needs a decision): none of the above starts without an explicit request for a Triton fixture; the cheapest first step would be a CPU-only reference of the remap+mask epilogue to settle TRITON-FIX-01..03.
+
+## CODEBASE-INDEX-OPTIMIZE-01 (2026-10-21) — hypergraph writer ownership finding (no decision yet)
+
+- Two live writers of `hg:4d:*`, `hg:edge:*`, `hg:edge:idx`, `hg:built_at`: `scripts/run-hypergraph.ts` (CI smoke `scripts/ci-smoke-hypergraph.mjs` expects its keys) and `src/lib/server/features/cases/hypergraph-4d.ts` (re-exported by `src/lib/server/graph/hypergraph-4d.ts`; called by `/api/codebase-index/orchestrate` Stage 9 and `gemma4-agent.ts`).
+- `docs/architecture/runtime-ownership-registry.json` has no hypergraph entry, so no canonical owner is recorded.
+- Operator answer (2026-10-21): the two writers serve different logic (legal-case / Parent Atlas path vs `scripts/atlas` standalone run), so they are distinct producers, not duplicates. Neither is removed.
+- Still open: the shared key names collide. Splitting by producer namespace needs reader changes in `topological-search.ts` and `ci-smoke-hypergraph.mjs` plus a decision on the namespace scheme.
+- `invalidateHypergraph()` now uses `SCAN` instead of `KEYS` (same change set).
+
+### ATen/PyTorch/RTX tensor sequence RPC packet synthesis fusion: ownership audit (2026-10-24, read-only, no code)
+
+Status: AUDIT ONLY. No new owner is proposed. Each capability below needs an explicit extend-or-new decision before implementation (DEPENDENCY-CAPABILITY-GUARD-01 and the one-owner rule in CLAUDE.md).
+
+| Existing owner | Purpose (from header) | Production callers | Relation to the request |
+|---|---|---|---|
+| `python/prove_polyglot_aten_dspy_gepa_oak_v1.py` | Five-plane polyglot proof (tiered memory, ATen, DSPy/GEPA, OaK) | Proof script only | ATen proof lane; a challenger, not a service |
+| `python/atlas_compute/` (e.g. `async_dag_worker_v1.py`, `concept_tile_*`, `cugraph_ppr.py`, `cluster_softmax.py`) | Numerical compute modules | Mixed; not audited per module | Candidate home for tensor sequence work; extend, do not duplicate |
+| `docker/atlas-neural-decoder` (`:8121`) | NestedSemanticAutoencoder projection, PyTorch 2.13 cu132 | Live-proven encode path | RTX tensor service; numerical only |
+| `docker/atlas-gemma-rank` | AtlasGemmaRankV1 reranker, PyTorch 2.13 cu132 | Ranker container | RTX tensor service; numerical only |
+| `sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts` | Retrieval packet RPC (pg, ACE envelope) | `packet-search.tool.ts`, `topk-rpc-descriptor-v1.ts`, `master-feature-map.ts`, `api/atlas/hyperrag-packet-rpc/+server.ts` | The existing RPC packet owner; a sequence packet must join here, not beside it |
+| `sveltekit-frontend/src/lib/server/atlas/transport/feature-row-rpc-packet-v1.*` | Feature-row RPC packet encode/decode with tests | Tests and the feature-row contract | Existing typed packet codec; reuse its encoding rules |
+
+Findings:
+- Two RTX services already exist. A new tensor-sequence service would be a third; extend one of the two, or decide that the sequence work belongs to the packet owner rather than a tensor service.
+- "Packet synthesis fusion" overlaps `hyperrag-packet-rpc.ts`, which already returns the ACE envelope. A sequence packet needs its own contract that the existing envelope can carry.
+- Wire-format rule (CLAUDE.md): JSON for descriptors, raw F32LE or Arrow for bulk tensors. A sequence packet must carry references, not inline float arrays.
+- Procedural sequences (see the DSPy change tasks.md) are text-keyed and not yet stored (table absent in `legal_ai_db`). The sequence-fusion step depends on that storage gate.
+
+Decisions needed before implementation:
+1. Which owner receives sequence fusion: the packet RPC owner, or one of the two RTX services?
+2. Is the first deliverable a CPU-reference fusion over the feature-row codec, with GPU execution deferred? (The rules require CPU parity before any GPU promotion.)
+3. Confirm the wire format: descriptor JSON plus raw F32LE tensor references, with no inline vectors.
+
+No code changed. No database or service writes.
+
+### Sequence fusion decisions: defaults recorded (2026-10-24)
+
+- Decision 2 (CPU first): ADOPTED. CLAUDE.md requires a CPU-reference result with parity before any GPU promotion. The first deliverable is a CPU-reference fusion; GPU execution is deferred.
+- Decision 3 (wire format): ADOPTED. CLAUDE.md wire-format rule: JSON for descriptors, raw F32LE or Arrow for bulk tensors, references instead of inline vectors.
+- Decision 1 (owner): OPEN, operator to confirm. Recommended: the packet RPC owner (`hyperrag-packet-rpc.ts`) as the only existing packet owner. The two RTX services stay numerical-only.
+- Implementation: not started. It begins only after decision 1 is confirmed, and it is bounded to the CPU reference over the feature-row codec.
+
+### RTX tensor loader: RPC packets into PyTorch, after the XGBoost stage (2026-10-24, plan only)
+
+Status: PLAN ONLY. No code. Two inputs are still open.
+
+Open inputs:
+- Owner (decision 1 above): operator to confirm. Recommended: the packet RPC owner.
+- XGBoost role: XGBoost is supervised; it has no unsupervised mode. Operator to confirm which design applies:
+  (a) unsupervised clustering (KMeans, cuVS) produces labels, and XGBoost learns from them;
+  (b) XGBoost classifies feature rows with reviewed or pseudo labels;
+  (c) XGBoost leaf indices are used as features for a downstream PyTorch model.
+
+Plan once the inputs are confirmed:
+1. Contract: a descriptor JSON per RPC packet, carrying `packetKey`, `sourceRef`, revisions, and a reference (path, byte offset, dtype F32LE, shape) to the raw tensor. No inline vectors.
+2. CPU reference loader: decode the descriptor, verify the byte length and checksum, and produce a tensor. Parity is checked against the feature-row codec.
+3. RTX load (only after CPU parity): copy the verified tensor to the GPU. Runs under the existing compute executor; no new service.
+4. Stage ordering: the XGBoost output is an input reference, not an identity. Labels or leaf indices must stay bound to the same `packetKey`.
+5. Gates: no canonical write, no admission, no Graphify promotion. A GPU result is promotion-eligible only after CPU parity.
+
+### RTX tensor RPC loader: CPU reference built (2026-10-24, fixture only, no production wiring)
+
+- Module: `python/atlas_compute/rtx_tensor_rpc_loader_v1.py` (provisional location; owner decision still open). Descriptor schema `atlas.rpc-tensor-descriptor.v1`; raw little-endian float32 file referenced by relative path, byte offset, shape and SHA-256.
+- Fail-closed checks: schema, packetKey, sourceRevision format, dtype, shape, byte offset, relative and in-root paths (POSIX and Windows absolute forms rejected), byte length, checksum, finite values.
+- Output: a derived tensor with `packetKey` and `sourceRevision` carried through unchanged; `canonical_authority` is always False.
+- Tests: `py -3.13 -m pytest python/tests/test_rtx_tensor_rpc_loader_v1.py -q` → 15 passed (fixture files in a temp directory; no database, no GPU).
+- Not done: GPU copy (gated on CPU parity in production data); production wiring; XGBoost placement; the actor-to-workspace authorization owner (verified-context service stays fail-closed).
+- Open inputs: owner (decision 1); XGBoost role (it may be one of the NB/LR classifiers or its own stage); whether the loader should be fed by real packets only after the authorization owner exists.
+
+### NEXT STEPS (2026-10-24, ordered; nothing below is marked complete)
+
+| # | Step | Owner | Gate | Blocked by |
+|---|---|---|---|---|
+| 1 | Operator confirms the owner for the RTX tensor loader (recommended: packet RPC owner) | Operator | Written decision here | Nothing |
+| 2 | Operator confirms the XGBoost placement: a classifier among NB/LR, or its own stage | Operator | Written decision here | Nothing |
+| 3 | Identify the actor-to-workspace/repository authorization owner; keep the verified-context service fail-closed until found | Application authorization (to be identified) | Named owner plus a fail-closed test | Step 1 for ownership context |
+| 4 | Restore Ornith on `:8090` (TurboQuant start task); run one bounded live candidate through `procedural-candidate-generator-v1.ts` | Operator plus `ornith-1.5-9b` | Receipt with raw output preserved | Operator action |
+| 5 | Procedural sequence storage: apply the draft DDL only after explicit approval; first confirm the table is absent or present in the target database | PostgreSQL 18 via manual SQL | Rollback test, pre-image note, post-check | Operator approval; database location unconfirmed |
+| 6 | Loader to GPU copy: only after CPU parity against real production descriptors | Chosen owner from step 1 | CPU parity receipt, then the GPU copy | Steps 1, 3, and a real descriptor source |
+| 7 | Stage wiring: bind XGBoost or classifier outputs to `packetKey` as references, never as identity | Chosen owner from steps 1 and 2 | Test that a label-only match is rejected | Steps 1 and 2 |
+
+Status of work already done (not repeated as tasks): CPU-reference loader with 15 fixture tests; procedural contract and generator with 13 tests; ownership audit recorded; DSPy repair worker in its own ledger.
+
+### Operator decisions recorded (2026-10-24)
+
+- XGBoost role: DECIDED, option (a). XGBoost is the contextual tree stage over KMeans clustering: KMeans (cuVS) produces cluster labels, and XGBoost learns contextual trees from them. It is not unsupervised. Its outputs bind to `packetKey` as references only.
+- Loader owner: operator wrote "loaders own". Recorded literally. Working interpretation (to confirm): the RPC tensor loader is owned by the packet RPC loader lane, i.e. the packet RPC owner recommended in decision 1. Until confirmed, the loader stays provisional in `python/atlas_compute/`.
+- Next-steps table above: steps 1 and 2 are now decided. Steps 3 to 7 unchanged.
+
+### Constraints from the active-goal report (2026-10-24, recorded)
+
+- `feature_label` is descriptive/evidence only. It may summarize a feature and its related files from joined evidence. It must not be identity, authorization, or numeric tensor input. The RTX tensor loader already excludes it: it loads only verified float32 tensors keyed by `packetKey`.
+- Oaklib-normalized candidates stay distinct from reviewed ontology tuples. Neither feeds the loader as identity.
+- Ontology tuple regression checks for sourceRef, workspaceRevision and sourceRevision mismatches pass (15/15, focused adapter suite). Owner: the ontology tuple lane, not this ledger.
+- Production path stays blocked on the actor-to-workspace/repository grant owner. Case ownership is not a substitute. Next-steps step 3 is unchanged.
+
+### /deep-audit report (2026-10-24; scope and gates as requested; mode=report; no fixes applied)
+
+Scope: procedural folder, `gemma4-tool-controller.ts`, ` onnx/session.ts`, `atlas/evals`, the RTX loader, the DSPy repair module, and the DSPy worker container.
+Serial pass (concurrency 1). Graph read once from `sveltekit-frontend/docs/graph/codebase-graph.json` (34,183 files).
+
+| Gate | Result | Notes |
+|---|---|---|
+| G59 index freshness | STALE | Graph mtime Oct 17 (more than 24h). New procedural files are not in the graph. |
+| G1 imports / G2 dynamic | 24 / 5 | Counts only, no failure. |
+| G4 auth on routes | 0 | No scoped route handlers. |
+| G5 Zod on body parsing | 0 | No scoped route handlers. |
+| G8 TODOs | 0 | |
+| G11 localhost refs | 1 warning | `atlas/evals/dspy-llama-server-caller-v1.ts`: default `http://127.0.0.1:8090` fallback. Existing pattern is `ENV.LLAMA_SERVER_URL` with a fallback; consider the `ENV` pattern. |
+| G14 Svelte 4 | 0 | |
+| G15 SSR-unsafe | 0 | |
+| G16 test pairing | 0 | Scoped files are not routes. |
+| Cycles | 16 (repo-wide) | Not scoped. |
+
+Coverage gaps (not gate failures):
+- The new TypeScript files (`procedural-sequence-contract-v1.ts`, `procedural-candidate-generator-v1.ts`, and their spec) are not in the graph, so the code gates did not cover them. A fresh index run is needed.
+- The Python files (`rtx_tensor_rpc_loader_v1.py`, `parent_atlas_dspy_repair.py`) and the DSPy worker container are outside the TypeScript graph. Covered only by their tests (loader 15, DSPy 72).
+
+Top remediation (priority order):
+1. Regenerate the index (`npm run index:codebase:fast`) so G59 and gate coverage include today's files. Read-only apart from the probe output.
+2. Decide the G11 pattern for `dspy-llama-server-caller-v1.ts`: keep the existing `ENV` fallback as-is, or route it through the `ENV` helper.
+3. No Python gate exists in the graph. Add a Python test gate to the next audit run.
+
+Run: serial, concurrency 1, wall time not measured; serial oracle: not run (single pass). No database, Valkey, Qdrant or Neo4j writes. Graph freshness is the main limit on this report.
+
+### Deep-audit remediation 1 and 2 (2026-10-24)
+
+- Index regenerated: probe `docs/reports/graph-probes/codebase-graph.2026-10-24T08-01-47-190Z-40892.json` (35,770 files). The canonical `docs/graph/codebase-graph.json` was not republished (still Oct 17).
+- Code gates on the new probe: 15 scoped files. G11 warning unchanged (`dspy-llama-server-caller-v1.ts`). No hard failures. Repo-wide cycles 17 (was 16), not scoped to this change.
+- Side effect to disclose: the index run wrote 1,677 wiki notes to Redis (`wiki:note:dir:*`) because `--skip-redis` was not passed. Deep-audit rules forbid Valkey writes from audit gates. Recommend clearing or re-running with `--skip-redis`; not done here.
+
+### Correction (2026-10-24)
+
+- The Redis writes from the index run (1,677 `wiki:note:dir:*` notes) are intended. The indexer writes them by design; `--skip-redis` is only an opt-out. The earlier recommendation to clear them is withdrawn. The deep-audit rule against Valkey writes applies to the audit gates themselves, not to the indexer run.
+
+### HANDOFF (2026-10-24, end of session)
+
+State
+- Branch `chore/parent-atlas-session-2026-10-17` is pushed to origin at `d0061e099c`. Local and origin match.
+- `main` was fast-forwarded to `f72b8941c6` earlier (no content change from the merge with origin/main).
+- Commits from this session on the branch: `d44aac816c` (DSPy worker, procedural contract and generator, RTX loader, browser embedding fix), `18117eb7a6` (ignore claude-mem), `817b539e5a` (.okf/systems), `9c5796b0ea` (openspec/changes), `a133b3e3d8` (sveltekit-frontend/openspec), `21f773f600` (docs/.okf), `d0061e099c` (docs/reports).
+
+Open work
+- 239 uncommitted paths still need review and commit, in batches, by area. Largest: `sveltekit-frontend/src` (139), then `scripts/atlas` (53, untracked 40), `docs/reports` remainder (none, done), and smaller areas. Owners of in-progress work should review before commit.
+- `docs/reports/document-governance-registry-v1.json` (11.4 MB) is excluded. It is a regenerated projection with other sessions' progress. Do not commit as-is.
+- `claude-mem` is a tracked gitlink (commit 5f0a63fa). `.gitignore` does not affect it. Decision needed: unregister the gitlink or keep it.
+- Ornith on `:8090` is stopped. Restart with the TurboQuant start task before any live run.
+- Procedural sequence table is absent from `legal_ai_db`. Need the database and port that hold it, or confirmation it is still a draft.
+- Loader owner: "loaders own" recorded literally; working reading is the packet RPC loader lane. Confirm.
+- Authorization: no actor-to-workspace owner exists. Verified-context service stays fail-closed.
+- Deep-audit: code index probe `codebase-graph.2026-10-24T08-01-47-190Z-40892.json`; canonical graph still Oct 17. Gate G11 warning only.
+
+Batch procedure (used for the committed batches)
+1. Scan the area's files for secret patterns and files over 10 MB (stat, not find on directories).
+2. Commit only clean batches, one commit per area, with a summary and the Co-Authored-By line.
+3. Exclude any file over 10 MB and say so in the commit message.
+4. Push as a fast-forward only. No force.
+
+Next steps
+1. Resolve the claude-mem gitlink decision.
+2. Review and commit the 239 paths by area, starting with the smallest.
+3. Restore Ornith on `:8090`, then run one bounded live procedural candidate and record the receipt.
+4. Confirm the loader owner and the authorization owner.
+
+### HANDOFF UPDATE (2026-10-24, late session)
+
+State
+- Branch `chore/parent-atlas-session-2026-10-17` is pushed to origin through `ebb40b2db5`, including tool-call argument validation (`1abcbc2487`).
+- Four test-only fixture commits are local and not pushed: `872d1c862c`, `97c7c32fdf`, `1fe375c0ba`, `1d6900584f`.
+- `origin/main` has PR #123 merge `237fe580bc`. A dry-run merge of the branch into `origin/main` is conflict-free. Not merged. Not pushed to `main`.
+- Excluded from every commit: `docs/reports/document-governance-registry-v1.json` (11.4 MB) and four submodule gitlinks (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec`).
+
+Tool-call validation (`1abcbc2487`)
+- `dispatchToolCall` checks arguments against the cached tools/list schema. Invalid arguments are refused with `INVALID_TOOL_ARGUMENTS`.
+- No cached schema: the call proceeds with a printed warning. This is the chosen policy, not a fail-closed one.
+- Not exercised against a live TRACE server.
+
+Test status (atlas and AI suites, run on the committed batches)
+- 786 files: 765 passed, 4 skipped, 17 reported failed. The log names only 8 failing files, so the count of 17 is unreconciled.
+- Fixed and committed: bundle-provider (4/4), both temporal recorders (3/3, 4/4), projection registry (4/4), policy extractor (5/5).
+- Open:
+  - `openspec-board/workboard-contract-v1.spec.ts` (9 tests): 121 architecture-tagged WAVE-00 tasks have no work package. The gap is in program-plan packaging (`scripts/atlas/lib/openspec-program-plan-v1.mjs`), not the artifact. A builder-side filter on wave membership reduced the count to 121 but did not pass the spec, and was reverted.
+  - `cached-packet-candidate-resolution-v1.spec.ts` (1 test): spec expects `CACHED_PACKET_SOURCE_BINDING_RECEIPT_…`; source throws `SOURCE_BINDING_RECEIPT_MISMATCH`. Canonical code needs a decision.
+  - `polyglot-dag-oak-rlm-prefill.spec.ts` (1 test): LUT hash for `src/routes/api/ace/ask/+server.ts` is stale. Needs LUT regeneration.
+
+Unresolved
+- `scripts/atlas/build-openspec-workboard-v1.mjs` may have had an uncommitted change from outside this session. A `git checkout` during revert may have discarded it. Recovery not found; editor history search timed out.
+- `docs/reports/openspec-workboard-v1.json` matches HEAD (55,603,833 bytes).
+
+NES lineage (`NES-ATLAS-LINEAGE-PRODUCER-01`, read-only)
+- Producer `scripts/atlas/materialize-addressable-packets.mjs` writes `.tmp/addressable-packets.ndjson` (61,718 rows). No row carries `source_revision` or `workspace_revision`.
+- Stop rule applied: NES rows are legacy projection data (`LEGACY_NES_PROJECTION` / `NES_LEGACY_LINEAGE_BLOCKED`). No crosswalk built. Verified 1,992/1,992 `atlas_feature_map.packet_id` matches against `nes_chrom_packets.packet_key` (`0` canonical `atlas_packets.packet_key` matches).
+- Security: `ingest-nes-chrom.mjs` hardcodes a database password in its connection string. Move it to `.env` and rotate.
+
+Operations & L2 Authorization / Headroom Update (2026-10-24)
+- llama-server `:8090` (`ornith-1.5-9b`) is running on Windows host loopback (`127.0.0.1:8090`). Headroom v0.41.0 is running on WSL2 Ubuntu loopback (`127.0.0.1:8787`); `scripts/launch-turboquant.ps1` (`Test-HeadroomProxyHealth`) checks Windows loopback and falls back to WSL2 loopback while reporting namespace isolation.
+- Headroom CCR smoke test (`scripts/test-headroom-ccr-smoke.py`) verified `"config": {"mode": "ccr"}` on `:8787`: `11,736 -> 3,136` tokens (`8,600` saved), `code_aware` exact SHA-256 recovery, and `smart_crusher` semantic JSON array recovery (compact re-serialization changes raw byte length, confirming CCR text is never canonical source evidence).
+- `ACTOR-WORKSPACE-GRANT-02` (`actor-workspace-grant-v1.ts` + `candidate-feature-to-feature-row-v1.ts`): Added `AuthoritativeCachedGrantProvider` (`STALE_GRANT_CACHE`, `GRANT_REVOKED`), symlink/alias `sourceNormalizer`, segment-boundary prefix checks, and `promoteAuthorizedCandidateFeatureRowV1` L2 gate (`34/34` focused tests passing; `15/15` `:8095` PyTorch NLP sidecar tests passing).
+- Port `:5434` PostgreSQL session query and `http://localhost:5173/` verified healthy (`HTTP 200 OK`, zero console errors) after resolving `wslrelay.exe` port conflict.
+- Procedural sequence steps 1–2 (table DDL, Drizzle entry) are not started. Steps 3–4 are built with fixtures only.
+
+Next steps
+1. Decide whether to merge the branch into `main` and push the four fixture commits.
+2. Packaging gap in `openspec-program-plan-v1.mjs` for the workboard spec.
+3. Decide the canonical error code for `cached-packet-candidate-resolution`.
+4. Regenerate the polyglot LUT.
+5. Reconcile the 17-vs-8 failing-file count.
+6. Confirm whether the workboard builder had an uncommitted change that was lost.
+7. Move the NES ingest password to `.env` and rotate it.
+8. Connect a production server-owned RBAC grant provider before enabling live workspace-authorized L2 promotion.

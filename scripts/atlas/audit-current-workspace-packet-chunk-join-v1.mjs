@@ -250,10 +250,61 @@ try {
         GROUP BY pk.source_ref
       ), source_chunk_diagnostic AS MATERIALIZED (
         SELECT s.source_ref,
-          count(c.id)::integer AS exact_source_ref_chunk_count
+          count(c.id) FILTER (
+            WHERE lower(regexp_replace(regexp_replace(btrim(c.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+          )::integer AS exact_source_ref_chunk_count,
+          count(c.id) FILTER (
+            WHERE lower(regexp_replace(regexp_replace(btrim(c.relative_path), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+          )::integer AS exact_relative_path_chunk_count,
+          count(c.id) FILTER (
+            WHERE lower(regexp_replace(regexp_replace(btrim(c.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+              AND regexp_replace(lower(btrim(c.file_content_hash)), '^sha256:', '')
+                = regexp_replace(lower(btrim(s.content_digest)), '^sha256:', '')
+          )::integer AS whole_source_digest_match_count,
+          count(c.id) FILTER (
+            WHERE lower(regexp_replace(regexp_replace(btrim(c.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+              AND lower(btrim(c.source_revision::text)) = s.source_revision
+              AND lower(btrim(c.workspace_revision::text)) = lower(s.workspace_revision)
+          )::integer AS source_workspace_revision_match_count,
+          count(c.id) FILTER (
+            WHERE lower(regexp_replace(regexp_replace(btrim(c.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+              AND lower(btrim(c.source_revision::text)) = s.source_revision
+              AND lower(btrim(c.workspace_revision::text)) = lower(s.workspace_revision)
+              AND EXISTS (
+                SELECT 1 FROM public.atlas_workspace_source_bindings b
+                WHERE b.repo_id = 'deeds-web-app'
+                  AND lower(regexp_replace(regexp_replace(btrim(canonical_source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+                  AND lower(b.source_revision::text) = s.source_revision
+                  AND lower(b.workspace_revision::text) = lower(s.workspace_revision)
+                  AND regexp_replace(lower(btrim(b.content_digest::text)), '^sha256:', '')
+                    = regexp_replace(lower(btrim(s.content_digest)), '^sha256:', '')
+                  AND c.lineage_binding_checksum = b.binding_checksum
+                  AND c.lineage_producer_revision = b.producer_revision
+              )
+          )::integer AS lineage_envelope_match_count,
+          count(c.id) FILTER (
+            WHERE lower(regexp_replace(regexp_replace(btrim(c.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+              AND lower(btrim(c.source_revision::text)) = s.source_revision
+              AND lower(btrim(c.workspace_revision::text)) = lower(s.workspace_revision)
+              AND EXISTS (
+                SELECT 1
+                FROM public.atlas_packet_chunk_lineage l
+                JOIN public.atlas_packets p ON p.packet_key = l.packet_key
+                WHERE l.chunk_row_id = c.id
+                  AND lower(regexp_replace(regexp_replace(btrim(l.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+                  AND lower(btrim(l.source_revision::text)) = s.source_revision
+                  AND l.revision_status = 'PROVEN'
+                  AND lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+                  AND lower(btrim(p.source_revision::text)) = s.source_revision
+                  AND p.lineage_binding_checksum = c.lineage_binding_checksum
+                  AND p.lineage_producer_revision = c.lineage_producer_revision
+              )
+          )::integer AS proven_packet_chunk_lineage_count
         FROM selected s
-        LEFT JOIN public.codebase_chunk_index c ON c.source_ref::text = s.source_ref
-        GROUP BY s.source_ref
+        LEFT JOIN public.codebase_chunk_index c
+          ON lower(regexp_replace(regexp_replace(btrim(c.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+          OR lower(regexp_replace(regexp_replace(btrim(c.relative_path), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+        GROUP BY s.source_ref, s.workspace_revision, s.source_revision, s.content_digest
       )
       SELECT s.source_ref, s.workspace_revision, s.source_revision, s.content_digest,
         COALESCE(packet_data.packet_rows, '[]'::jsonb) AS packet_rows,
@@ -261,8 +312,12 @@ try {
         COALESCE(packet_lineage_data.packet_lineage_rows, '[]'::jsonb) AS packet_lineage_rows,
         jsonb_build_object(
           'exactSourceRefChunkCount', source_chunk_diagnostic.exact_source_ref_chunk_count,
-          'revisionQualified', false,
-          'reason', 'CODEBASE_CHUNK_INDEX_SOURCE_REVISION_COLUMN_UNAVAILABLE'
+          'exactRelativePathChunkCount', source_chunk_diagnostic.exact_relative_path_chunk_count,
+          'wholeSourceDigestMatchCount', source_chunk_diagnostic.whole_source_digest_match_count,
+          'sourceWorkspaceRevisionMatchCount', source_chunk_diagnostic.source_workspace_revision_match_count,
+          'lineageEnvelopeMatchCount', source_chunk_diagnostic.lineage_envelope_match_count,
+          'provenPacketChunkLineageCount', source_chunk_diagnostic.proven_packet_chunk_lineage_count,
+          'sourceRevisionAndWorkspaceColumnsVerified', true
         ) AS source_chunk_diagnostic
       FROM selected s
       LEFT JOIN packet_data ON packet_data.source_ref = s.source_ref

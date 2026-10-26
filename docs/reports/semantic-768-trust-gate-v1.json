@@ -1,6 +1,6 @@
 {
   "schema": "atlas.semantic-768-trust-gate.v1",
-  "generatedAt": "2026-09-19T09:25:32.858Z",
+  "generatedAt": "2026-10-18T19:51:39.782Z",
   "status": "SEMANTIC_768_DIMENSION_PROVEN_ACTIVE_LINEAGE_REMAINING",
   "contract": {
     "representationId": "semantic_768",
@@ -137,6 +137,10 @@
         },
         {
           "table_name": "code_retrieval_chunks",
+          "column_name": "embedding"
+        },
+        {
+          "table_name": "codebase_chunk_eg2_embeddings",
           "column_name": "embedding"
         },
         {

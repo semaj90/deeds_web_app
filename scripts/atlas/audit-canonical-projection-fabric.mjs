@@ -26,7 +26,8 @@ import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import { readSubmodulePaths, classifyRepositoryId } from './lib/gitmodules-registry.mjs';
-import { GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { summarizeCanonicalProjectionAuditPredicatesV1 } from './canonical-projection-admission-summary-v1.mjs';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 loadAtlasEnv(REPO_ROOT);
@@ -261,11 +262,18 @@ async function main() {
            SELECT * FROM admitted
            WHERE extension = ANY(ARRAY['ts','mts','tsx','js','mjs','cjs','jsx','json','jsonc','md','markdown','txt']::text[])
              AND canonical_source_ref ~* $2
+         ), graphify_by_source_ref AS (
+           SELECT source_ref, COUNT(*)::int AS row_count
+           FROM graphify_files
+           GROUP BY source_ref
          )
          SELECT
            (SELECT COUNT(*)::int FROM admitted) AS bound_source_ref_count,
            (SELECT COUNT(*)::int FROM supported) AS supported_source_ref_count,
            (SELECT COUNT(*)::int FROM excluded_generated_artifacts) AS excluded_generated_artifact_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gfs.row_count IS NOT NULL)::int AS graphify_source_ref_present_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gfs.row_count IS NULL)::int AS graphify_source_ref_absent_count,
+           COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gfs.row_count IS NOT NULL AND gf.file_id IS NULL)::int AS revision_mismatch_only_source_ref_count,
            COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.file_id IS NOT NULL)::int AS exact_graphify_source_ref_count,
            COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'PROCESSED')::int AS processed_source_ref_count,
            COUNT(DISTINCT s.canonical_source_ref) FILTER (WHERE gf.parse_status = 'UNPROCESSED')::int AS unprocessed_source_ref_count,
@@ -285,8 +293,9 @@ async function main() {
          LEFT JOIN graphify_files gf
            ON gf.source_ref = s.canonical_source_ref
           AND gf.code_source_revision = s.source_revision
+         LEFT JOIN graphify_by_source_ref gfs ON gfs.source_ref = s.canonical_source_ref
          LEFT JOIN graphify_symbols gs ON gs.file_id = gf.file_id;`,
-        [admittedWorkspaceRevision, GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1],
+        [admittedWorkspaceRevision, GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2],
       );
       reconciliationGate = {
         status: population.bound_source_ref_count === 0
@@ -392,7 +401,7 @@ async function main() {
         : symbolsResolvedVerdict === 'PASS'
           ? 'Every extractor-supported source ref in the admitted revision has an exact code_source_revision Graphify observation marked PROCESSED, and the nominated symbols resolve cleanly. Files that legitimately produce no code-symbol rows are not treated as missing symbols.'
           : nominationResolutionClean
-            ? `Nomination resolution is clean (${nominationCount}/${nominationCount} resolved, 0 unresolved, 0 ambiguous), but extractor population coverage is incomplete: ${processedSourceRefCount}/${supportedSourceRefCount} supported admitted source refs are processed (${(coverageRatio * 100).toFixed(1)}%); ${reconciliationGate?.unprocessed_source_ref_count ?? 0} remain UNPROCESSED, ${reconciliationGate?.missing_exact_graphify_source_ref_count ?? 0} lack an exact Graphify source-revision row, and ${reconciliationGate?.duplicate_exact_graphify_source_ref_count ?? 0} have duplicate exact rows. ${sourceRefsWithSymbols} exact-revision source refs currently have ${symbolRowCount} symbol rows. This is extraction coverage, not a requirement for one symbol per file -- see scripts/atlas/graphify-symbol-extractor-v1.mts.`
+            ? `Nomination resolution is clean (${nominationCount}/${nominationCount} resolved, 0 unresolved, 0 ambiguous), but extractor population coverage is incomplete: ${processedSourceRefCount}/${supportedSourceRefCount} supported admitted source refs are processed (${(coverageRatio * 100).toFixed(1)}%); ${reconciliationGate?.unprocessed_source_ref_count ?? 0} exact-revision rows remain UNPROCESSED; ${reconciliationGate?.missing_exact_graphify_source_ref_count ?? 0} refs lack an exact Graphify source-revision row (${reconciliationGate?.graphify_source_ref_absent_count ?? 'unknown'} have no Graphify source-ref row, ${reconciliationGate?.revision_mismatch_only_source_ref_count ?? 'unknown'} have only nonmatching revision rows); ${reconciliationGate?.duplicate_exact_graphify_source_ref_count ?? 0} have duplicate exact rows. ${sourceRefsWithSymbols} exact-revision source refs currently have ${symbolRowCount} symbol rows. This is extraction coverage, not a requirement for one symbol per file -- see scripts/atlas/graphify-symbol-extractor-v1.mts.`
             : `Nomination resolution is not clean or no matching receipt exists for the current admitted revision (${admittedWorkspaceRevision}). Run scripts/atlas/symbol-reconciliation-writer-v1.mts --workspace-revision ${admittedWorkspaceRevision} to produce a fresh receipt before re-auditing.`,
     };
 
@@ -1047,12 +1056,9 @@ async function main() {
       ACE_EVIDENCE_GROUNDED: aceEvidenceGrounded,
     };
 
-    const verdicts = Object.values(report.predicates).map((p) => p.verdict);
-    const allPass = verdicts.every((v) => v === 'PASS');
-    report.overall_verdict = allPass ? 'SAFE_TO_PROJECT' : 'NOT_SAFE_TO_PROJECT';
-    report.overall_verdict_reason = allPass
-      ? 'All 11 predicates PASS.'
-      : `${verdicts.filter((v) => v !== 'PASS').length}/11 predicates below PASS: ${Object.entries(report.predicates).filter(([, p]) => p.verdict !== 'PASS').map(([k, p]) => `${k}=${p.verdict}`).join(', ')}`;
+    const predicateSummary = summarizeCanonicalProjectionAuditPredicatesV1(report.predicates);
+    report.overall_verdict = predicateSummary.verdict;
+    report.overall_verdict_reason = predicateSummary.reason;
 
     // ── Write reports ──
     const reportsDir = REPORT_DIR;

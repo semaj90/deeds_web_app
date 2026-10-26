@@ -1,0 +1,98 @@
+{
+  "schema": "atlas.ver01-ver02-webgpu-rendering-audit-receipt.v1",
+  "generatedAt": "2026-10-16T01:05:57.239Z",
+  "openspecChange": "visual-element-rendering",
+  "testCommand": "node scripts/atlas/prove-ver01-ver02-ver04-visual-rendering-v1.mjs",
+  "writesPerformed": false,
+  "ver01": {
+    "file": "sveltekit-frontend/src/lib/courtroom/courtroom-scene.svelte.ts",
+    "sha256": "sha256:8c7d576cef71035a80039158c48328e41dbddbacf63c1ea843c65521559d9f2c",
+    "engineBackend": {
+      "primary": "Babylon.js WebGPUEngine (initAsync)",
+      "fallback": "Babylon.js WebGL2 Engine",
+      "runsInBrowserOrWorkerOnly": true,
+      "nodeMainThreadExecution": false,
+      "svelte5RunesUsed": [
+        "$state(false)",
+        "$state<'webgpu' | 'webgl'>('webgl')",
+        "$state(0)"
+      ]
+    },
+    "skeletalAndProceduralContracts": {
+      "glbLoader": "SceneLoader.ImportMeshAsync + SceneLoader.ImportAnimationsAsync (NoSync)",
+      "skeletonBinding": "result.skeletons?.[0] + AnimationGroup map (14 ANIM_TYPE_MAP states)",
+      "proceduralFallback": "MeshBuilder.CreateBox (torso, head) + MeshBuilder.CreateCylinder (arms)",
+      "disposalContract": "dispose() stops renderLoop, disposes crtPostProcess, scene, and engine",
+      "auditNote": "In buildProceduralCharacters (lines 780-807), two cylinder arm meshes are created per role but omitted from charData.meshes ([torso, head]), so replacing a procedural character with a GLB model in disposeCharacter leaves 2 procedural arm meshes unless tracked."
+    },
+    "skinWeightVerification": {
+      "inputSha256": "sha256:4cfe2a8cf7d7a39384812beaf3febd6358de4681d052f938d4864e8ad31ea621",
+      "boneCount": 14,
+      "vertexCountChecked": 32,
+      "maxWeightSumDeviation": 1.1102e-16,
+      "tolerance": 0.000001,
+      "nanWeightCount": 0,
+      "withinTolerance": true
+    },
+    "status": "PROVEN"
+  },
+  "ver02": {
+    "files": [
+      {
+        "file": "sveltekit-frontend/src/lib/webgpu/texture-streaming.ts",
+        "sha256": "sha256:4686fc80a5b60b7e8beff2733584ec706478842093ea066a0a65fc6353a34917"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/webgpu/N64TextureLODSystem.ts",
+        "sha256": "sha256:068fd9a2e03710ecb4b0ad95a52b9cce49cf482162869fcd95cac46d55b27ec2"
+      }
+    ],
+    "memoryBudgets": {
+      "nesStreamer": {
+        "RAM": 2048,
+        "CHR_ROM": 8192,
+        "PRG_ROM": 32768,
+        "TOTAL": 40960
+      },
+      "n64LodSystem": {
+        "TEXTURE_CACHE_SIZE": 4194304,
+        "PAGE_SIZE": 4096,
+        "MAX_ACTIVE_TEXTURES": 32,
+        "TMEM_SIZE": 4096
+      },
+      "testTextureBudgetCheck": {
+        "width": 16,
+        "height": 16,
+        "rawBytes": 1024,
+        "compressedBytes": 1024,
+        "fitsActiveRam2KB": true,
+        "fitsTotal40KB": true
+      }
+    },
+    "cpuReferenceDeterminism": {
+      "run1Sha256": "sha256:48346544cc04ceda0305682c425e81b17dec21954a281bd8982a929bfb04aaa7",
+      "run2Sha256": "sha256:48346544cc04ceda0305682c425e81b17dec21954a281bd8982a929bfb04aaa7",
+      "deterministicMatch": true,
+      "compressionRatio": 1
+    },
+    "gpuVsCpuRowAlignmentParity": {
+      "unpaddedBytesPerRow": 64,
+      "alignedBytesPerRow": 256,
+      "paddedBufferBytes": 4096,
+      "maxPixelAbsDiff": 0,
+      "exactParityWithinTolerance": true
+    },
+    "pixelFormatsAndAlignment": {
+      "canvasContextFormat": "bgra8unorm (alphaMode: premultiplied)",
+      "textureFormat": "rgba8unorm (GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST)",
+      "writeTextureBytesPerRowExpr": "nesTexture.width * 4",
+      "webgpuAlignmentContract": {
+        "requiredMultipleBytes": 256,
+        "satisfiesWhenWidthMultipleOf64": true,
+        "unalignedWidthRisk": "WebGPU queue.writeTexture requires bytesPerRow to be a multiple of 256 when rowsPerImage/height > 1; widths not divisible by 64 require 256-byte row padding."
+      },
+      "lodEvictionContract": "N64TextureLODSystem.evictLeastUsed calls oldest.gpuTexture.destroy() and decrements currentMemoryUsage"
+    },
+    "status": "PROVEN"
+  }
+}

@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
+  acePromptBundleKeyV2,
   aceTopkRevisionedKeyV1,
   bifrostRetrievalCacheKeyV2,
   bifrostRetrievalCacheKeyV3,
@@ -9,6 +10,28 @@ import {
   type BifrostRetrievalCacheIdentityV3,
   type RetrievalCacheIdentityV1,
 } from './cache-keys.js';
+
+describe('ACE prompt bundle cache identity v2', () => {
+  const base = {
+    promptChecksum: `sha256:${'a'.repeat(64)}`,
+    sourceIdentityChecksum: `sha256:${'b'.repeat(64)}`,
+  };
+
+  it('uses a stable versioned SHA-256 namespace', () => {
+    expect(acePromptBundleKeyV2(base)).toBe(acePromptBundleKeyV2({ ...base }));
+    expect(acePromptBundleKeyV2(base)).toMatch(/^ace:prompt:v2:[a-f0-9]{64}$/);
+  });
+
+  it('invalidates for prompt content or source identity changes', () => {
+    const key = acePromptBundleKeyV2(base);
+    expect(acePromptBundleKeyV2({ ...base, promptChecksum: `sha256:${'c'.repeat(64)}` })).not.toBe(key);
+    expect(acePromptBundleKeyV2({ ...base, sourceIdentityChecksum: `sha256:${'d'.repeat(64)}` })).not.toBe(key);
+  });
+
+  it('rejects missing or malformed identity checksums', () => {
+    expect(() => acePromptBundleKeyV2({ ...base, sourceIdentityChecksum: '' })).toThrow('ACE_PROMPT_BUNDLE_V2_IDENTITY_INCOMPLETE');
+  });
+});
 
 describe('revision-qualified ACE retrieval cache identity', () => {
   const base: RetrievalCacheIdentityV1 = {

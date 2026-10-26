@@ -320,6 +320,15 @@ export const graphExpandNeighborhoodInputSchema = z.object({
   filePath: z.string().max(GRAPH_EXPAND_REF_MAX_CHARS).optional().describe('Optional explicit file path.'),
 });
 
+export function resolveGraphExpandHops(input: { maxHops?: number; depth?: number }): 1 | 2 {
+  if (input.maxHops === 1 || input.maxHops === 2) return input.maxHops;
+  return (input.depth ?? 2) >= 2 ? 2 : 1;
+}
+
+export function graphNeighborhoodNeedsFallback(edges: readonly unknown[]): boolean {
+  return edges.length === 0;
+}
+
 export const graphAnalysisNeighborhoodInputSchema = z.object({
   path: z.string().min(1).max(GRAPH_ANALYSIS_PATH_MAX_CHARS),
   hops: z.number().int().min(1).max(GRAPH_ANALYSIS_MAX_HOPS).default(2).optional(),
@@ -375,6 +384,18 @@ export const atlasPacketSearchInputSchema = z.object({
     || filters.concept_id !== undefined
     || filters.summary_query !== undefined,
   { message: 'At least one non-empty packet search filter is required.' },
+);
+
+export const atlasProceduralSequenceSearchInputSchema = z.object({
+  sequence_id: z.string().trim().min(1).max(256).optional(),
+  feature_id: z.string().trim().min(1).max(256).optional(),
+  feature_label: z.string().trim().min(1).max(256).optional(),
+  limit: z.number().int().min(1).max(50).default(20).optional(),
+}).refine(
+  (filters) => filters.sequence_id !== undefined
+    || filters.feature_id !== undefined
+    || filters.feature_label !== undefined,
+  { message: 'At least one sequence_id, feature_id, or feature_label filter is required.' },
 );
 
 const atlasPacketDenseCodeSearchInputSchema = z.object({

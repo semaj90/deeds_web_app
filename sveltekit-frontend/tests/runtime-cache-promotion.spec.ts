@@ -34,14 +34,14 @@ describe('Runtime Cache + Promotion Pipeline', () => {
 
   it('stable POST input produces a stable cache key', () => {
     const input1 = {
-      model: 'gemma4-legal-iq4xs',
+      model: 'ornith-1.5-9b',
       messages: [{ role: 'user' as const, content: 'What is hearsay?' }],
       temperature: 0.3,
       maxTokens: 200
     };
 
     const input2 = {
-      model: 'gemma4-legal-iq4xs',
+      model: 'ornith-1.5-9b',
       messages: [{ role: 'user' as const, content: 'What is hearsay?' }],
       temperature: 0.3,
       maxTokens: 200

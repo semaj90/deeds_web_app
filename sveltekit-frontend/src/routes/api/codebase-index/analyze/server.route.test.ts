@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   analyze: vi.fn(),
   createClient: vi.fn(),
-  callOllamaChat: vi.fn(),
+  callLlamaServerChat: vi.fn(),
   bifrostChat: vi.fn(),
   traceLLM: vi.fn(),
   getJsonbDocument: vi.fn(),
@@ -32,7 +32,7 @@ vi.mock('$lib/server/observability/langfuse.js', () => ({
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
-  callOllamaChat: (...args: unknown[]) => mocks.callOllamaChat(...args),
+  callLlamaServerChat: (...args: unknown[]) => mocks.callLlamaServerChat(...args),
   bifrostChat: (...args: unknown[]) => mocks.bifrostChat(...args),
 }));
 
@@ -57,7 +57,7 @@ describe('/api/codebase-index/analyze', () => {
   beforeEach(() => {
     mocks.analyze.mockReset();
     mocks.createClient.mockReset();
-    mocks.callOllamaChat.mockReset();
+    mocks.callLlamaServerChat.mockReset();
     mocks.bifrostChat.mockReset();
     mocks.traceLLM.mockReset();
     mocks.getJsonbDocument.mockReset();
@@ -69,7 +69,7 @@ describe('/api/codebase-index/analyze', () => {
     mocks.setCache.mockResolvedValue(undefined);
     mocks.readFileSync.mockReturnValue('export function hello() { return 1; }');
     mocks.statSync.mockReturnValue({ size: 38 } as any);
-    mocks.callOllamaChat.mockResolvedValue(JSON.stringify({
+    mocks.callLlamaServerChat.mockResolvedValue(JSON.stringify({
       summary: 'Legacy summary',
       risks: [],
       dependencies: [],

@@ -4,7 +4,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import type { RequestHandler } from './$types.js';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { getQuicEmbeddingHealth } from '$lib/server/grpc/embedding-client.js';
 import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 
@@ -44,7 +44,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 			return 'PONG';
 		}),
 		checkService('ollama', async () => {
-			const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
+			const res = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
 			if (!res.ok) throw new Error(`Ollama ${res.status}`);
 			const data = await res.json() as { models?: Array<{ name: string }> };
 			const models = data.models?.map(m => m.name) ?? [];

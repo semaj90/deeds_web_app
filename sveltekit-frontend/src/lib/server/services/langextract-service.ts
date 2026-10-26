@@ -402,7 +402,7 @@ export async function extractSectionsBatch(
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Google LangExtract Integration (Official Library)
-// Uses gemma4-rotorquant:latest via Ollama — much better structured extraction
+// Uses ornith-1.5-9b via Ollama — much better structured extraction
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface GoogleLangExtractEntity {

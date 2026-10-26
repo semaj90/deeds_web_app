@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { SgNode } from '@ast-grep/napi';
 import {
@@ -137,6 +138,7 @@ function toCandidate(
     symbolVersionId: null,
     workspaceRevision: extraction.workspaceRevision,
     sourceRevision: extraction.sourceRevision,
+    sourceContentSha256: `sha256:${createHash('sha256').update(extraction.code, 'utf8').digest('hex')}`,
     engine: 'AST_GREP_NAPI',
     structuralMatchExactForDeclaredRule: true,
     requiresCanonicalTreeJoin: true,

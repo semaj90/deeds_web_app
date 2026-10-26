@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.calls-phase2-owner-audit.v1",
+  "status": "PROPOSAL_SPANS_ADDED_IDENTITY_AND_PROMOTION_BLOCKED",
+  "auditMode": "READ_ONLY_SOURCE_AND_RECEIPT_REVIEW",
+  "recordedDate": "2026-10-18",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "runtime": {
+    "service": "8095",
+    "entrypoint": "python/miniforge_nlp_sidecar_oak.py",
+    "astOwner": "python/miniforge_nlp_sidecar_v2.py::_native_ast_evidence",
+    "healthProvesCallExtraction": false,
+    "liveLegacyDependencyMatchesCheckout": false
+  },
+  "extractionFindings": {
+    "v2CallTarget": "name-only chunk.calls value",
+    "v2Resolution": "resolved=false; resolution=unresolved_target",
+    "v2Span": "enclosing chunk span; not exact call_expression byte span",
+    "legacyFallback": "name-based edge; no canonical callee symbol-version binding",
+    "sourceRevision": "request value is echoed; AST path does not verify sha256 against exact submitted source bytes",
+    "resolutionClasses": ["EXACT", "UNRESOLVED", "DYNAMIC"],
+    "classesCurrentlyDistinguished": false
+  },
+  "checkoutPatch": {
+    "ownerExtended": "python/atlas_structural_provenance.py::find_call_expression_byte_spans",
+    "edgeField": "occurrence_byte_spans",
+    "coordinateBasis": "absolute UTF-8 byte offsets in submitted source",
+    "clientValidation": "shape, positive range, source bounds, and UTF-8 code-point boundaries",
+    "callTargetsRemainUnresolved": true,
+    "liveSidecarRestartedOrVerified": false
+  },
+  "existingDiagnostic": {
+    "path": "docs/reports/ast-edge-eligibility-v1.json",
+    "generatedAt": "2026-10-19T03:56:46.599Z",
+    "files": 6,
+    "calls": 1158,
+    "resolvedBySidecar": 0,
+    "eligible": 0,
+    "sourceAuthorityBlockers": {
+      "WORKSPACE_REVISION_MISMATCH": 4,
+      "SOURCE_NOT_ADMITTED": 2
+    },
+    "corpusWide": false
+  },
+  "symbolExtractorReceipt": {
+    "path": "docs/reports/graphify-symbol-extractor-v1-1792372287403.json",
+    "status": "SHARD_INCOMPLETE",
+    "readbacks": 0,
+    "sourceReadMode": "WORKING_TREE",
+    "sourceReadSnapshotRevision": null,
+    "proofEligible": false
+  },
+  "graphifyGate": {
+    "eligibleForFreshRun": false,
+    "blockers": [
+      "LIFECYCLE_OWNER_UNPROVEN",
+      "CURRENT_RUN_NOT_ESTABLISHED",
+      "REPOSITORY_REVISION_NOT_CURRENT"
+    ],
+    "projectionWritesAuthorized": false
+  },
+  "acceptanceStillRequired": [
+    "canonical caller and callee symbol-version identities",
+    "exact per-call UTF-8 byte spans against exact source bytes",
+    "source-byte digest and revision binding under the admitted snapshot",
+    "explicit EXACT, UNRESOLVED, and DYNAMIC classifications",
+    "deterministic duplicate handling and focused fixtures for aliases, methods, unresolved imports, and dynamic dispatch",
+    "read-only qualified-edge census followed by authorized writer proof and independent readback"
+  ],
+  "limitations": [
+    "The six-file edge-eligibility report is a diagnostic sample, not corpus-wide coverage.",
+    "No live /ast/chunk POST, Graphify run, or database/cache/Neo4j write was performed for this audit.",
+    "The broad focused Vitest AST and edge-eligibility suites were interrupted after startup stalled; a narrower NLP sidecar Vitest suite subsequently passed 12/12.",
+    "Python provenance tests passed 13/13; sidecar byte and multiline-CRLF suites passed 4/4 combined.",
+    "No live sidecar restart or /ast/chunk request proved the new edge field in the running container.",
+    "Historical CALLS edge totals do not establish current source-qualified canonical edges."
+  ]
+}

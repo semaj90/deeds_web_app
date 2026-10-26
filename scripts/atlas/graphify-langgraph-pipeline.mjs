@@ -8,7 +8,7 @@
  *   audit_coverage   → compute signal-density gaps (BM25, concept_ids, community_conf, Qdrant)
  *   feature_extract  → assign feature_id to packets missing it (path heuristic + domain label)
  *   kanban_task      → emit prioritised task evidence + TaskCandidate JSONL (what needs enrichment, in what order)
- *   embed_missing    → embed packets missing Qdrant vectors (nomic-embed-text → embeddinggemma fallback)
+ *   embed_missing    → embed packets missing Qdrant vectors (embeddinggemma:latest, 768-d; no nomic fallback)
  *   index_bm25       → backfill bm25_text in payload for packets that lack it
  *   rank_signals     → compute + persist RRF ranking signal coverage report
  *   prune_noise      → remove .cache/ artifact packets + flag duplicates
@@ -249,7 +249,8 @@ async function neo4jRun(stmt, params = {}) {
 }
 
 async function embed(text) {
-  for (const model of ['nomic-embed-text:latest', 'embeddinggemma:latest']) {
+  // embeddinggemma:latest is the only admitted embedding model (semantic_768); nomic-embed-text is not a fallback.
+  for (const model of [process.env.GRAPHIFY_EMBED_MODEL || 'embeddinggemma:latest']) {
     try {
       const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
         method: 'POST',
@@ -594,7 +595,8 @@ async function kanbanTask(state) {
 
   log(`  tasks generated: ${tasks.length}`);
   for (const t of tasks) {
-    log(`    [${t.priority}] ${t.id} — ${t.count.toLocaleString()} items`);
+    // count is null when the upstream stage did not produce one; report that instead of crashing or coercing to 0.
+    log(`    [${t.priority}] ${t.id} — ${t.count == null ? 'n/a' : t.count.toLocaleString()} items`);
   }
 
   mkdirSync(REPORT, { recursive: true });
@@ -761,6 +763,49 @@ async function indexBm25(state) {
 }
 
 /**
+ * Read-only canonical-identity coverage of the Qdrant mirror. A packet counts as covered only when
+ * its recorded qdrant_point_id exists in COLLECTION AND the point payload carries the same packet_key
+ * and the same source_ref (exact equality). Existence or a source_ref-only match is not identity.
+ * Any request failure yields NOT_MEASURED (never a pass).
+ */
+async function measureQdrantIdentityCoverage(denominator) {
+  try {
+    const rows = await query(
+      `SELECT packet_key, source_ref, qdrant_point_id FROM atlas_packets
+        WHERE packet_key IS NOT NULL AND qdrant_point_id IS NOT NULL AND qdrant_point_id <> ''
+          AND (qdrant_collection IS NULL OR qdrant_collection = $1)`,
+      [COLLECTION],
+    );
+    // A point id mapped to several packets cannot identify any one of them: count only unambiguous ids.
+    const idCount = new Map();
+    for (const r of rows) idCount.set(r.qdrant_point_id, (idCount.get(r.qdrant_point_id) ?? 0) + 1);
+    const unique = rows.filter((r) => idCount.get(r.qdrant_point_id) === 1);
+    const ambiguous = rows.length - unique.length;
+    let verified = 0, missing = 0, mismatched = 0;
+    for (let i = 0; i < unique.length; i += 500) {
+      const batch = unique.slice(i, i + 500);
+      const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ids: batch.map((r) => (/^\d+$/.test(r.qdrant_point_id) ? Number(r.qdrant_point_id) : r.qdrant_point_id)), with_payload: true, with_vector: false }),
+        signal: AbortSignal.timeout(20_000),
+      });
+      if (!res.ok) return { status: 'NOT_MEASURED', reason: `qdrant retrieve HTTP ${res.status}`, percent: null };
+      const found = new Map((await res.json()).result.map((p) => [String(p.id), p.payload ?? {}]));
+      for (const r of batch) {
+        const payload = found.get(String(r.qdrant_point_id));
+        if (!payload) { missing++; continue; }
+        const refs = [payload.source_ref, payload.canonical_source_ref, payload.sourceRef];
+        if (payload.packet_key === r.packet_key && refs.includes(r.source_ref)) verified++; else mismatched++;
+      }
+    }
+    return { ...coverageMetric(verified, denominator), recorded: rows.length, ambiguousIds: ambiguous, verified, missing, mismatched };
+  } catch (error) {
+    return { status: 'NOT_MEASURED', reason: String(error?.message ?? error).slice(0, 160), percent: null };
+  }
+}
+
+/**
  * Node 6: rank_signals
  * Audits RRF signal coverage and emits a report.
  * Computes: BM25 coverage, concept coverage, community_conf tier, Qdrant density.
@@ -787,6 +832,7 @@ async function rankSignals(state) {
   } catch { /* offline */ }
 
   const addr         = parseInt(cov.addressable);
+  const qdrantIdentity = await measureQdrantIdentityCoverage(addr);
   const bm25Coverage = coverageMetric(parseInt(cov.has_bm25), addr);
   const conceptCoverage = coverageMetric(parseInt(cov.has_concepts), addr);
   const communityCoverage = coverageMetric(parseInt(cov.any_conf), addr);
@@ -800,7 +846,7 @@ async function rankSignals(state) {
     { name: 'bm25_coverage_85pct',    pass: bm25Coverage.status === 'MEASURED' && bm25Pct >= 85, detail: bm25Coverage.status === 'MEASURED' ? `${bm25Pct}% (${cov.has_bm25}/${addr})` : `${bm25Coverage.status} (${cov.has_bm25}/${addr})` },
     { name: 'concept_coverage_60pct', pass: conceptCoverage.status === 'MEASURED' && conceptPct >= 60, detail: conceptCoverage.status === 'MEASURED' ? `${conceptPct}% (${cov.has_concepts}/${addr})` : `${conceptCoverage.status} (${cov.has_concepts}/${addr})` },
     { name: 'community_conf_95pct',   pass: communityCoverage.status === 'MEASURED' && communityCoverage.percent >= 95, detail: communityCoverage.status === 'MEASURED' ? `${communityCoverage.percent}% (${cov.any_conf}/${addr}); missing=${addr - parseInt(cov.any_conf)}` : `${communityCoverage.status} (${cov.any_conf}/${addr})` },
-    { name: 'qdrant_unique_packet_coverage_50pct', pass: false, detail: `NOT_MEASURED_CANONICAL_IDENTITY_JOIN_REQUIRED (points=${qdrantCount}; packet_denominator=${addr})` },
+    { name: 'qdrant_unique_packet_coverage_50pct', pass: qdrantIdentity.status === 'MEASURED' && qdrantIdentity.percent >= 50, detail: qdrantIdentity.status === 'MEASURED' ? `${qdrantIdentity.percent}% identity-verified (${qdrantIdentity.verified}/${addr}; recorded=${qdrantIdentity.recorded}, missing=${qdrantIdentity.missing}, key/ref mismatch=${qdrantIdentity.mismatched}, ambiguous ids=${qdrantIdentity.ambiguousIds}; points=${qdrantCount})` : `NOT_MEASURED (${qdrantIdentity.reason ?? 'unknown'}; points=${qdrantCount}; packet_denominator=${addr})` },
   ];
 
   log('  Ranking signal coverage:');
@@ -818,7 +864,7 @@ async function rankSignals(state) {
     concepts: { count: parseInt(cov.has_concepts), coverage: conceptCoverage },
     communityConfidence: { count: parseInt(cov.any_conf), coverage: communityCoverage, missing: addr > 0 ? addr - parseInt(cov.any_conf) : null },
     highConf: { count: parseInt(cov.high_conf), pct: highConfPct },
-    qdrant:   { pointCount: qdrantCount, packetCoverage: { status: 'NOT_MEASURED', percent: null, requires: 'deduplicated canonical packet identity join' } },
+    qdrant:   { pointCount: qdrantCount, packetCoverage: qdrantIdentity },
     gates,
     xgboostUnblocked: allPass,
   };
@@ -928,7 +974,7 @@ async function main() {
   if (result.tasks?.length > 0) {
     console.log(`\n  Kanban task queue (${result.tasks.length} tasks):`);
     for (const t of result.tasks) {
-      console.log(`    [${t.priority}] ${t.id} — ${t.count.toLocaleString()} items — gate: ${t.gate}`);
+      console.log(`    [${t.priority}] ${t.id} — ${t.count == null ? 'n/a' : t.count.toLocaleString()} items — gate: ${t.gate}`);
     }
   }
 

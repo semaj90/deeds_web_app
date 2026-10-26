@@ -1,0 +1,2563 @@
+{
+ "schema": "atlas.directory-relevance-scores.v1",
+ "weights": {
+  "sourceShare": 0.3,
+  "parserShare": 0.2,
+  "embeddingCoverage": 0.3,
+  "volume": 0.2
+ },
+ "formula": "relevancePct = round(100 * (0.3*sourceShare + 0.2*parserShare + 0.3*embeddingCoverage + 0.2*volume)); volume = min(1, log10(1+inScope)/log10(1+10000)); 0 when no in-scope content",
+ "inventorySha256": "sha256:6f88a152d4f89b1c0871e3efa1e210a618c616cab746e1380bec09af57b2ec50",
+ "embeddingSource": "postgres codebase_chunk_index.content_embedding_768 grouped by first path segment (prefixes inconsistent; see note)",
+ "canonicalAuthority": false,
+ "writesPerformed": "valkey_namespace_only",
+ "directories": [
+  {
+   "directory": "docs",
+   "files": 8634,
+   "inScope": 7629,
+   "outside": 1005,
+   "languages": {
+    "markdown": 2228,
+    "json": 5245,
+    "yaml": 4,
+    "sql": 5,
+    "ndjson": 6,
+    "bash": 1,
+    "html": 5,
+    "text": 3,
+    "typescript": 1
+   },
+   "embedding": {
+    "chunks": 4551,
+    "emb768": 4551
+   },
+   "relevancePct": 81,
+   "sourceShare": 0.8836,
+   "parserShare": 0.8814,
+   "embeddingCoverage": 0.5965,
+   "volume": 0.9706,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "scripts",
+   "files": 11905,
+   "inScope": 4825,
+   "outside": 7080,
+   "languages": {
+    "typescript": 4166,
+    "python": 202,
+    "powershell": 114,
+    "markdown": 94,
+    "bash": 58,
+    "json": 77,
+    "sql": 22,
+    "yaml": 2,
+    "proto": 45,
+    "html": 2
+   },
+   "embedding": {
+    "chunks": 23922,
+    "emb768": 23922
+   },
+   "relevancePct": 80,
+   "sourceShare": 0.4053,
+   "parserShare": 0.9911,
+   "embeddingCoverage": 1.0,
+   "volume": 0.9209,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "sveltekit-frontend",
+   "files": 187706,
+   "inScope": 18352,
+   "outside": 169354,
+   "languages": {
+    "typescript": 10124,
+    "json": 1167,
+    "markdown": 5464,
+    "python": 95,
+    "yaml": 31,
+    "powershell": 178,
+    "bash": 27,
+    "sql": 600,
+    "proto": 14,
+    "html": 7,
+    "cpp": 4,
+    "text": 2,
+    "css": 1,
+    "ndjson": 1
+   },
+   "embedding": {
+    "chunks": 239564,
+    "emb768": 239564
+   },
+   "relevancePct": 72,
+   "sourceShare": 0.0978,
+   "parserShare": 0.9462,
+   "embeddingCoverage": 1.0,
+   "volume": 1.0,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "packages",
+   "files": 31382,
+   "inScope": 712,
+   "outside": 30670,
+   "languages": {
+    "json": 40,
+    "typescript": 629,
+    "markdown": 36,
+    "sql": 7
+   },
+   "embedding": {
+    "chunks": 4525,
+    "emb768": 4525
+   },
+   "relevancePct": 65,
+   "sourceShare": 0.0227,
+   "parserShare": 0.9972,
+   "embeddingCoverage": 1.0,
+   "volume": 0.7133,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "next_steps",
+   "files": 218,
+   "inScope": 216,
+   "outside": 2,
+   "languages": {
+    "markdown": 214,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 61,
+   "sourceShare": 0.9908,
+   "parserShare": 0.9954,
+   "embeddingCoverage": 0.0,
+   "volume": 0.5841,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "src",
+   "files": 196,
+   "inScope": 196,
+   "outside": 0,
+   "languages": {
+    "typescript": 196
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 61,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.5736,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "drizzle",
+   "files": 94,
+   "inScope": 94,
+   "outside": 0,
+   "languages": {
+    "sql": 86,
+    "json": 2,
+    "typescript": 4,
+    "markdown": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 60,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4944,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "gsd_archives",
+   "files": 117,
+   "inScope": 116,
+   "outside": 1,
+   "languages": {
+    "typescript": 113,
+    "markdown": 1,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 60,
+   "sourceShare": 0.9915,
+   "parserShare": 0.9914,
+   "embeddingCoverage": 0.0,
+   "volume": 0.517,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "experiments",
+   "files": 73,
+   "inScope": 73,
+   "outside": 0,
+   "languages": {
+    "markdown": 10,
+    "python": 59,
+    "typescript": 2,
+    "json": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 59,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4673,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent_atlas_tensor_residency_integration_v2",
+   "files": 90,
+   "inScope": 88,
+   "outside": 2,
+   "languages": {
+    "powershell": 1,
+    "markdown": 19,
+    "json": 6,
+    "python": 18,
+    "typescript": 40,
+    "sql": 2,
+    "proto": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 59,
+   "sourceShare": 0.9778,
+   "parserShare": 0.9886,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4873,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "proto",
+   "files": 55,
+   "inScope": 55,
+   "outside": 0,
+   "languages": {
+    "proto": 54,
+    "go": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 59,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.437,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-tensor-residency-integration",
+   "files": 65,
+   "inScope": 63,
+   "outside": 2,
+   "languages": {
+    "powershell": 1,
+    "json": 5,
+    "markdown": 14,
+    "python": 11,
+    "typescript": 28,
+    "sql": 2,
+    "proto": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 58,
+   "sourceShare": 0.9692,
+   "parserShare": 0.9841,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4515,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "tests",
+   "files": 52,
+   "inScope": 49,
+   "outside": 3,
+   "languages": {
+    "typescript": 43,
+    "python": 2,
+    "json": 2,
+    "markdown": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 57,
+   "sourceShare": 0.9423,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4247,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "atlas-openspec-awareness-v2",
+   "files": 43,
+   "inScope": 40,
+   "outside": 3,
+   "languages": {
+    "markdown": 3,
+    "typescript": 32,
+    "python": 3,
+    "json": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 56,
+   "sourceShare": 0.9302,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4032,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "llm",
+   "files": 13,
+   "inScope": 13,
+   "outside": 0,
+   "languages": {
+    "markdown": 13
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 56,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2865,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-rtx-gpu-lab",
+   "files": 14,
+   "inScope": 14,
+   "outside": 0,
+   "languages": {
+    "json": 1,
+    "python": 8,
+    "yaml": 1,
+    "markdown": 2,
+    "bash": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 56,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.294,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "services",
+   "files": 3673,
+   "inScope": 48,
+   "outside": 3625,
+   "languages": {
+    "typescript": 2,
+    "go": 27,
+    "bash": 3,
+    "python": 3,
+    "json": 1,
+    "markdown": 4
+   },
+   "embedding": {
+    "chunks": 329,
+    "emb768": 329
+   },
+   "relevancePct": 56,
+   "sourceShare": 0.0131,
+   "parserShare": 0.8333,
+   "embeddingCoverage": 1.0,
+   "volume": 0.4225,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "specify",
+   "files": 13,
+   "inScope": 13,
+   "outside": 0,
+   "languages": {
+    "markdown": 13
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 56,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2865,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "ace-vector-selection-slice",
+   "files": 7,
+   "inScope": 7,
+   "outside": 0,
+   "languages": {
+    "typescript": 6,
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 55,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2258,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-capability-census-v5",
+   "files": 7,
+   "inScope": 7,
+   "outside": 0,
+   "languages": {
+    "markdown": 1,
+    "typescript": 5,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 55,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2258,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-graph-revision-fix-v1",
+   "files": 11,
+   "inScope": 11,
+   "outside": 0,
+   "languages": {
+    "json": 2,
+    "typescript": 7,
+    "markdown": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 55,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2698,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-qas-bundle",
+   "files": 10,
+   "inScope": 10,
+   "outside": 0,
+   "languages": {
+    "markdown": 5,
+    "typescript": 5
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 55,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2603,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "phase13graph_exportgenerator",
+   "files": 10,
+   "inScope": 10,
+   "outside": 0,
+   "languages": {
+    "typescript": 1,
+    "markdown": 8,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 55,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2603,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "karpathy-wiki",
+   "files": 5,
+   "inScope": 5,
+   "outside": 0,
+   "languages": {
+    "markdown": 5
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 54,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1945,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "datasets",
+   "files": 4,
+   "inScope": 4,
+   "outside": 0,
+   "languages": {
+    "markdown": 3,
+    "typescript": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 53,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1747,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "examples",
+   "files": 3,
+   "inScope": 3,
+   "outside": 0,
+   "languages": {
+    "json": 3
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 53,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1505,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "python-workers",
+   "files": 4,
+   "inScope": 4,
+   "outside": 0,
+   "languages": {
+    "python": 4
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 53,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1747,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "reports",
+   "files": 54,
+   "inScope": 48,
+   "outside": 6,
+   "languages": {
+    "markdown": 29,
+    "json": 12,
+    "ndjson": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 53,
+   "sourceShare": 0.8889,
+   "parserShare": 0.875,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4225,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "sql",
+   "files": 4,
+   "inScope": 4,
+   "outside": 0,
+   "languages": {
+    "sql": 4
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 53,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1747,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "__tests__",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "typescript": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "audit",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "config",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {
+    "json": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "cypress",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "typescript": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "deeds-web-app",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "typescript": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "deeds_lab",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "migrations",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {
+    "sql": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "minio",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "openspec-changes",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {
+    "markdown": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "plans",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "sidecars",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "python": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "skills",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "specs",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {
+    "markdown": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "static",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "typescript": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "test",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {
+    "typescript": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 52,
+   "sourceShare": 1.0,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "go-retrieval-classifier",
+   "files": 6,
+   "inScope": 6,
+   "outside": 0,
+   "languages": {
+    "markdown": 1,
+    "go": 4
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 51,
+   "sourceShare": 1.0,
+   "parserShare": 0.8333,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2113,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "openspec",
+   "files": 1000,
+   "inScope": 589,
+   "outside": 411,
+   "languages": {
+    "yaml": 31,
+    "markdown": 557,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 51,
+   "sourceShare": 0.589,
+   "parserShare": 0.9491,
+   "embeddingCoverage": 0.0,
+   "volume": 0.6927,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-gpu-math-bundle",
+   "files": 25,
+   "inScope": 22,
+   "outside": 3,
+   "languages": {
+    "json": 1,
+    "markdown": 3,
+    "python": 3,
+    "cpp": 6,
+    "typescript": 7
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 51,
+   "sourceShare": 0.88,
+   "parserShare": 0.9091,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3404,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "simd-bridge",
+   "files": 4630,
+   "inScope": 578,
+   "outside": 4052,
+   "languages": {
+    "powershell": 2,
+    "json": 86,
+    "cpp": 44,
+    "c": 10,
+    "yaml": 14,
+    "markdown": 8,
+    "rust": 4,
+    "typescript": 9,
+    "text": 2,
+    "bash": 2,
+    "toml": 3
+   },
+   "embedding": {
+    "chunks": 1403,
+    "emb768": 1403
+   },
+   "relevancePct": 51,
+   "sourceShare": 0.1248,
+   "parserShare": 0.192,
+   "embeddingCoverage": 1.0,
+   "volume": 0.6907,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "crates",
+   "files": 4429,
+   "inScope": 30,
+   "outside": 4399,
+   "languages": {
+    "typescript": 8,
+    "json": 5,
+    "rust": 6,
+    "toml": 3
+   },
+   "embedding": {
+    "chunks": 79,
+    "emb768": 79
+   },
+   "relevancePct": 50,
+   "sourceShare": 0.0068,
+   "parserShare": 0.6333,
+   "embeddingCoverage": 1.0,
+   "volume": 0.3728,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "native",
+   "files": 23,
+   "inScope": 19,
+   "outside": 4,
+   "languages": {
+    "cpp": 11,
+    "python": 2,
+    "text": 1,
+    "typescript": 1,
+    "c": 2,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 50,
+   "sourceShare": 0.8261,
+   "parserShare": 0.9474,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3253,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-graph-runtime-enhancement",
+   "files": 24,
+   "inScope": 24,
+   "outside": 0,
+   "languages": {
+    "markdown": 2,
+    "cpp": 1,
+    "python": 2,
+    "powershell": 2,
+    "typescript": 5,
+    "java": 1,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 49,
+   "sourceShare": 1.0,
+   "parserShare": 0.5833,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3495,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-rel-01a3-explicit-alias-review",
+   "files": 6,
+   "inScope": 5,
+   "outside": 1,
+   "languages": {
+    "json": 1,
+    "markdown": 2,
+    "typescript": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 49,
+   "sourceShare": 0.8333,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1945,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "(root-files)",
+   "files": 940,
+   "inScope": 494,
+   "outside": 446,
+   "languages": {
+    "markdown": 382,
+    "json": 23,
+    "typescript": 39,
+    "yaml": 9,
+    "python": 3,
+    "powershell": 4,
+    "bash": 2,
+    "sql": 3,
+    "ndjson": 1,
+    "toml": 1
+   },
+   "embedding": {
+    "chunks": 37,
+    "emb768": 0
+   },
+   "relevancePct": 48,
+   "sourceShare": 0.5255,
+   "parserShare": 0.9251,
+   "embeddingCoverage": 0.0,
+   "volume": 0.6736,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "duckdb",
+   "files": 3,
+   "inScope": 3,
+   "outside": 0,
+   "languages": {
+    "powershell": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 46,
+   "sourceShare": 1.0,
+   "parserShare": 0.6667,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1505,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "openwiki",
+   "files": 26,
+   "inScope": 26,
+   "outside": 0,
+   "languages": {
+    "json": 14,
+    "markdown": 12
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 46,
+   "sourceShare": 1.0,
+   "parserShare": 0.4615,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3578,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "data",
+   "files": 48,
+   "inScope": 28,
+   "outside": 20,
+   "languages": {
+    "json": 1,
+    "markdown": 26,
+    "html": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 45,
+   "sourceShare": 0.5833,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3656,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "python",
+   "files": 1367,
+   "inScope": 515,
+   "outside": 852,
+   "languages": {
+    "python": 499,
+    "text": 7,
+    "json": 5,
+    "toml": 1,
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 45,
+   "sourceShare": 0.3767,
+   "parserShare": 0.9961,
+   "embeddingCoverage": 0.0,
+   "volume": 0.6782,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".okf",
+   "files": 734,
+   "inScope": 730,
+   "outside": 4,
+   "languages": {
+    "yaml": 38,
+    "json": 16,
+    "html": 331,
+    "markdown": 343
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 44,
+   "sourceShare": 0.9946,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.716,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "memory",
+   "files": 406,
+   "inScope": 176,
+   "outside": 230,
+   "languages": {
+    "markdown": 76,
+    "ndjson": 16,
+    "json": 78
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 44,
+   "sourceShare": 0.4335,
+   "parserShare": 0.9659,
+   "embeddingCoverage": 0.0,
+   "volume": 0.562,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "triton-trt-llm",
+   "files": 19,
+   "inScope": 17,
+   "outside": 2,
+   "languages": {
+    "json": 9,
+    "bash": 2,
+    "typescript": 2,
+    "python": 1,
+    "powershell": 1,
+    "markdown": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 44,
+   "sourceShare": 0.8947,
+   "parserShare": 0.5294,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3138,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-rel-01a-current-ontology-cohort",
+   "files": 6,
+   "inScope": 4,
+   "outside": 2,
+   "languages": {
+    "markdown": 1,
+    "typescript": 2,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 43,
+   "sourceShare": 0.6667,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1747,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "cmd",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {
+    "go": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 42,
+   "sourceShare": 1.0,
+   "parserShare": 0.5,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "infra",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {
+    "yaml": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 42,
+   "sourceShare": 1.0,
+   "parserShare": 0.5,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "scripts-data",
+   "files": 12,
+   "inScope": 7,
+   "outside": 5,
+   "languages": {
+    "markdown": 4,
+    "python": 2,
+    "typescript": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 42,
+   "sourceShare": 0.5833,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2258,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "parent-atlas-ampere-quantization-proof-kit",
+   "files": 5,
+   "inScope": 3,
+   "outside": 2,
+   "languages": {
+    "python": 2,
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 41,
+   "sourceShare": 0.6,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1505,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".claude",
+   "files": 68,
+   "inScope": 68,
+   "outside": 0,
+   "languages": {
+    "markdown": 63,
+    "typescript": 2,
+    "json": 3
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 39,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4597,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "neo4j",
+   "files": 5,
+   "inScope": 5,
+   "outside": 0,
+   "languages": {
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 38,
+   "sourceShare": 1.0,
+   "parserShare": 0.2,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1945,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "graphify",
+   "files": 2,
+   "inScope": 1,
+   "outside": 1,
+   "languages": {
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 37,
+   "sourceShare": 0.5,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "workers",
+   "files": 2,
+   "inScope": 1,
+   "outside": 1,
+   "languages": {
+    "python": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 37,
+   "sourceShare": 0.5,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".github",
+   "files": 18,
+   "inScope": 18,
+   "outside": 0,
+   "languages": {
+    "markdown": 17,
+    "yaml": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 36,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3197,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".parent-atlas",
+   "files": 12,
+   "inScope": 12,
+   "outside": 0,
+   "languages": {
+    "toml": 4,
+    "markdown": 4,
+    "python": 4
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 36,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2785,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".clinerules",
+   "files": 10,
+   "inScope": 10,
+   "outside": 0,
+   "languages": {
+    "markdown": 10
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 35,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2603,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".codex",
+   "files": 9,
+   "inScope": 9,
+   "outside": 0,
+   "languages": {
+    "markdown": 9
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 35,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.25,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".scripts",
+   "files": 8,
+   "inScope": 8,
+   "outside": 0,
+   "languages": {
+    "powershell": 8
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 35,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2386,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".githooks",
+   "files": 5,
+   "inScope": 5,
+   "outside": 0,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 34,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1945,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".cline",
+   "files": 12,
+   "inScope": 11,
+   "outside": 1,
+   "languages": {
+    "markdown": 11
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 33,
+   "sourceShare": 0.9167,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2698,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".woodpecker",
+   "files": 3,
+   "inScope": 3,
+   "outside": 0,
+   "languages": {
+    "yaml": 2,
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 33,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1505,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".clarity",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {
+    "markdown": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 32,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "nginx",
+   "files": 2,
+   "inScope": 2,
+   "outside": 0,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 32,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "redis",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 32,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "souffle",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 32,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "ssl",
+   "files": 1,
+   "inScope": 1,
+   "outside": 0,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 32,
+   "sourceShare": 1.0,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "vectors",
+   "files": 3,
+   "inScope": 1,
+   "outside": 2,
+   "languages": {
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 32,
+   "sourceShare": 0.3333,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".archive",
+   "files": 34,
+   "inScope": 27,
+   "outside": 7,
+   "languages": {
+    "markdown": 4,
+    "typescript": 5,
+    "python": 9,
+    "json": 7
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 31,
+   "sourceShare": 0.7941,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3618,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "configs",
+   "files": 8,
+   "inScope": 6,
+   "outside": 2,
+   "languages": {
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 30,
+   "sourceShare": 0.75,
+   "parserShare": 0.1667,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2113,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "deeds_labs",
+   "files": 54678,
+   "inScope": 19,
+   "outside": 54659,
+   "languages": {
+    "markdown": 5,
+    "sql": 3,
+    "typescript": 10,
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 27,
+   "sourceShare": 0.0003,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.3253,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "vscode-extension",
+   "files": 285,
+   "inScope": 14,
+   "outside": 271,
+   "languages": {
+    "typescript": 10,
+    "json": 2,
+    "markdown": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 27,
+   "sourceShare": 0.0491,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.294,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "qdrant",
+   "files": 9,
+   "inScope": 1,
+   "outside": 8,
+   "languages": {
+    "yaml": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 25,
+   "sourceShare": 0.1111,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.0753,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "tools",
+   "files": 90309,
+   "inScope": 11,
+   "outside": 90298,
+   "languages": {
+    "proto": 1,
+    "typescript": 2,
+    "powershell": 3,
+    "sql": 1,
+    "json": 1,
+    "markdown": 2,
+    "python": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 25,
+   "sourceShare": 0.0001,
+   "parserShare": 1.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2698,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".proofs",
+   "files": 10,
+   "inScope": 6,
+   "outside": 4,
+   "languages": {
+    "json": 6
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 22,
+   "sourceShare": 0.6,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.2113,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "docker",
+   "files": 48488,
+   "inScope": 64,
+   "outside": 48424,
+   "languages": {
+    "yaml": 7,
+    "sql": 3,
+    "python": 13,
+    "markdown": 4,
+    "powershell": 1,
+    "text": 4,
+    "json": 2,
+    "bash": 3,
+    "proto": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 21,
+   "sourceShare": 0.0013,
+   "parserShare": 0.5938,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4532,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "models",
+   "files": 185,
+   "inScope": 41,
+   "outside": 144,
+   "languages": {
+    "markdown": 6,
+    "json": 21,
+    "python": 1,
+    "powershell": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 15,
+   "sourceShare": 0.2216,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4058,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".opencode",
+   "files": 3722,
+   "inScope": 44,
+   "outside": 3678,
+   "languages": {
+    "json": 7,
+    "markdown": 34,
+    "typescript": 1,
+    "yaml": 2
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 9,
+   "sourceShare": 0.0118,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.4133,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".vscode",
+   "files": 65,
+   "inScope": 5,
+   "outside": 60,
+   "languages": {
+    "json": 3
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 6,
+   "sourceShare": 0.0769,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1945,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": "target",
+   "files": 2267,
+   "inScope": 2,
+   "outside": 2265,
+   "languages": {
+    "json": 1
+   },
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 2,
+   "sourceShare": 0.0009,
+   "parserShare": 0.0,
+   "embeddingCoverage": 0.0,
+   "volume": 0.1193,
+   "reason": "WEIGHTED"
+  },
+  {
+   "directory": ".cache",
+   "files": 10,
+   "inScope": 0,
+   "outside": 10,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".gemini",
+   "files": 4,
+   "inScope": 0,
+   "outside": 4,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".git",
+   "files": 132305,
+   "inScope": 0,
+   "outside": 132305,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".pytest_cache",
+   "files": 5,
+   "inScope": 0,
+   "outside": 5,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".python311",
+   "files": 4362,
+   "inScope": 0,
+   "outside": 4362,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".rag-metrics",
+   "files": 8,
+   "inScope": 0,
+   "outside": 8,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".svelte-error-fixes-backup",
+   "files": 692,
+   "inScope": 0,
+   "outside": 692,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".svelte-kit",
+   "files": 16,
+   "inScope": 0,
+   "outside": 16,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".tmp",
+   "files": 264580,
+   "inScope": 0,
+   "outside": 264580,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".venv",
+   "files": 73458,
+   "inScope": 0,
+   "outside": 73458,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".venv-cu130",
+   "files": 23106,
+   "inScope": 0,
+   "outside": 23106,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".venv-gemma4",
+   "files": 1941,
+   "inScope": 0,
+   "outside": 1941,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": ".vs",
+   "files": 5,
+   "inScope": 0,
+   "outside": 5,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "__pycache__",
+   "files": 1,
+   "inScope": 0,
+   "outside": 1,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "archive",
+   "files": 50,
+   "inScope": 0,
+   "outside": 50,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "artifacts",
+   "files": 3,
+   "inScope": 0,
+   "outside": 3,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "backups",
+   "files": 7,
+   "inScope": 0,
+   "outside": 7,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "benchmarks",
+   "files": 1,
+   "inScope": 0,
+   "outside": 1,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "classifier-datasets",
+   "files": 1,
+   "inScope": 0,
+   "outside": 1,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "claude-mem",
+   "files": 44251,
+   "inScope": 0,
+   "outside": 44251,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "exports",
+   "files": 4,
+   "inScope": 0,
+   "outside": 4,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "granite-docling-258M",
+   "files": 54,
+   "inScope": 0,
+   "outside": 54,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "lawpdfs",
+   "files": 42,
+   "inScope": 0,
+   "outside": 42,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "llama-cpp-turboquant-gemma4",
+   "files": 2725,
+   "inScope": 0,
+   "outside": 2725,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "log",
+   "files": 24,
+   "inScope": 0,
+   "outside": 24,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "logs",
+   "files": 763,
+   "inScope": 0,
+   "outside": 763,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "mcp-server-mcp",
+   "files": 27890,
+   "inScope": 0,
+   "outside": 27890,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "minio-data",
+   "files": 69,
+   "inScope": 0,
+   "outside": 69,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "neschrom97",
+   "files": 8178,
+   "inScope": 0,
+   "outside": 8178,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "node_modules",
+   "files": 153749,
+   "inScope": 0,
+   "outside": 153749,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "offline-data",
+   "files": 1,
+   "inScope": 0,
+   "outside": 1,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "onnx",
+   "files": 1,
+   "inScope": 0,
+   "outside": 1,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "parent-atlas-gpu-context-tranche",
+   "files": 1,
+   "inScope": 0,
+   "outside": 1,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "pgvector-precompiled",
+   "files": 48,
+   "inScope": 0,
+   "outside": 48,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "qdrant-windows",
+   "files": 182,
+   "inScope": 0,
+   "outside": 182,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "scratch",
+   "files": 81,
+   "inScope": 0,
+   "outside": 81,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "sites",
+   "files": 18897,
+   "inScope": 0,
+   "outside": 18897,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "storage",
+   "files": 174,
+   "inScope": 0,
+   "outside": 174,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "test-results",
+   "files": 1,
+   "inScope": 0,
+   "outside": 1,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "tmp",
+   "files": 581,
+   "inScope": 0,
+   "outside": 581,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "training-datasets",
+   "files": 4,
+   "inScope": 0,
+   "outside": 4,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "triton-model-repository",
+   "files": 7,
+   "inScope": 0,
+   "outside": 7,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "turbovec",
+   "files": 1442,
+   "inScope": 0,
+   "outside": 1442,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  },
+  {
+   "directory": "vendor",
+   "files": 3,
+   "inScope": 0,
+   "outside": 3,
+   "languages": {},
+   "embedding": {
+    "chunks": 0,
+    "emb768": 0
+   },
+   "relevancePct": 0,
+   "reason": "NO_IN_SCOPE_CONTENT"
+  }
+ ],
+ "receiptChecksum": "sha256:ab8d5c046871165939f43617f6750b8cf547c7fb0cebbde351fae612d49c4d04"
+}

@@ -37,6 +37,12 @@ export const actions: Actions = {
         // Push to RabbitMQ (works for both anonymous and authenticated users)
         try {
             const conn = await (amqp as any).connect(getRabbitMQUrl());
+            conn.on('error', (err: unknown) => {
+                console.error('[chat-action] RabbitMQ connection error (handled):', err instanceof Error ? err.message : err);
+            });
+            conn.on('close', () => {
+                console.warn('[chat-action] RabbitMQ connection closed');
+            });
             const ch = await conn.createChannel();
             await ch.assertQueue('ai_jobs');
 

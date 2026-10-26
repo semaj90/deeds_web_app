@@ -32,6 +32,124 @@ class VerifiedGraphProjectionSnapshotV1:
     edge_checksum: str
 
 
+def resolve_graph_source_ref_v1(
+    manifest: Mapping[str, Any],
+    node_rows: Sequence[Mapping[str, Any]],
+    edge_rows: Sequence[Mapping[str, Any]],
+    *,
+    source_ref: str,
+    expected_source_revision: str,
+    expected_workspace_revision: str,
+    limit: int = 64,
+) -> tuple[dict[str, Any], ...]:
+    """Resolve an exact sourceRef only within a checksum-validated projection."""
+    if not isinstance(source_ref, str) or not source_ref.strip() or source_ref != source_ref.strip():
+        raise ValueError("GRAPH_SOURCE_REF_INVALID")
+    if not isinstance(expected_source_revision, str) or not expected_source_revision.strip():
+        raise ValueError("GRAPH_SOURCE_REVISION_REQUIRED")
+    if not isinstance(expected_workspace_revision, str) or not expected_workspace_revision.strip():
+        raise ValueError("GRAPH_SOURCE_WORKSPACE_REVISION_REQUIRED")
+    if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1 or limit > 64:
+        raise ValueError("GRAPH_SOURCE_REF_LIMIT_OUT_OF_BOUNDS")
+
+    snapshot = validate_graph_projection_artifact_v1(manifest, node_rows, edge_rows)
+    if snapshot.workspace_revision != expected_workspace_revision:
+        raise ValueError("GRAPH_SOURCE_WORKSPACE_REVISION_MISMATCH")
+
+    matches = [row for row in node_rows if row.get("source_ref") == source_ref]
+    if not matches:
+        raise ValueError("GRAPH_SOURCE_REF_NOT_FOUND")
+    if len(matches) > limit:
+        raise ValueError("GRAPH_SOURCE_REF_MATCH_LIMIT_EXCEEDED")
+
+    resolved: list[dict[str, Any]] = []
+    for row in matches:
+        source_revision = row.get("source_revision")
+        node_workspace_revision = row.get("workspace_revision")
+        if not isinstance(source_revision, str) or not source_revision:
+            raise ValueError("GRAPH_SOURCE_REVISION_MISSING")
+        if source_revision != expected_source_revision:
+            raise ValueError("GRAPH_SOURCE_REVISION_MISMATCH")
+        if node_workspace_revision != expected_workspace_revision:
+            raise ValueError("GRAPH_SOURCE_NODE_WORKSPACE_REVISION_MISMATCH")
+        resolved.append({
+            "graphOrdinal": row["gpu_node_id"],
+            "graphNodeKey": row["graph_node_key"],
+            "packetKey": row.get("packet_key"),
+            "sourceRef": source_ref,
+            "sourceRevision": source_revision,
+            "workspaceRevision": node_workspace_revision,
+        })
+
+    return tuple(sorted(resolved, key=lambda row: (row["graphOrdinal"], row["graphNodeKey"])))
+
+
+def lookup_networkx_source_ref_v1(
+    manifest: Mapping[str, Any],
+    node_rows: Sequence[Mapping[str, Any]],
+    edge_rows: Sequence[Mapping[str, Any]],
+    *,
+    source_ref: str,
+    expected_source_revision: str,
+    expected_workspace_revision: str,
+    max_depth: int,
+    limit: int = 16,
+) -> tuple[dict[str, Any], ...]:
+    """Run bounded CPU BFS from every exact, revision-qualified source match."""
+    if isinstance(max_depth, bool) or not isinstance(max_depth, int) or not 0 <= max_depth <= 4:
+        raise ValueError("GRAPH_SOURCE_LOOKUP_DEPTH_OUT_OF_BOUNDS")
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 16:
+        raise ValueError("GRAPH_SOURCE_LOOKUP_LIMIT_OUT_OF_BOUNDS")
+
+    resolved = resolve_graph_source_ref_v1(
+        manifest,
+        node_rows,
+        edge_rows,
+        source_ref=source_ref,
+        expected_source_revision=expected_source_revision,
+        expected_workspace_revision=expected_workspace_revision,
+        limit=limit,
+    )
+    snapshot = validate_graph_projection_artifact_v1(manifest, node_rows, edge_rows)
+    node_by_ordinal = {row["gpu_node_id"]: row for row in node_rows}
+
+    from .networkx_executor import run_bfs_neighborhood
+
+    results: list[dict[str, Any]] = []
+    for seed in resolved:
+        paths, receipt = run_bfs_neighborhood(
+            graph_revision=snapshot.graph_revision,
+            node_ordinals=snapshot.node_ordinals,
+            edges=snapshot.edges,
+            source_ordinal=seed["graphOrdinal"],
+            max_depth=max_depth,
+        )
+        neighbors = []
+        for ordinal, depth, parent_ordinal in paths:
+            node = node_by_ordinal[ordinal]
+            parent = node_by_ordinal.get(parent_ordinal) if parent_ordinal >= 0 else None
+            neighbors.append({
+                "graphOrdinal": ordinal,
+                "graphNodeKey": node["graph_node_key"],
+                "packetKey": node.get("packet_key"),
+                "sourceRef": node.get("source_ref"),
+                "sourceRevision": node.get("source_revision"),
+                "workspaceRevision": node.get("workspace_revision"),
+                "depth": depth,
+                "parentGraphNodeKey": parent.get("graph_node_key") if parent else None,
+            })
+        results.append({
+            **seed,
+            "graphRevision": snapshot.graph_revision,
+            "graphOrdinalMapChecksum": snapshot.graph_ordinal_map_checksum,
+            "neighbors": tuple(neighbors),
+            "executionReceipt": receipt,
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+        })
+    return tuple(results)
+
+
 def validate_graph_projection_artifact_v1(
     manifest: Mapping[str, Any],
     node_rows: Sequence[Mapping[str, Any]],

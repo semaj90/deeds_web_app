@@ -13,7 +13,15 @@ import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.
 
 const root = REPO_ROOT;
 const admissionPath = path.join(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
-const reportPath = path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
+const scratchRoot = path.resolve(root, '.tmp/atlas');
+const outputIndex = process.argv.indexOf('--output');
+const reportPath = path.resolve(root, outputIndex >= 0
+  ? process.argv[outputIndex + 1] ?? ''
+  : '.tmp/atlas/current-graphify-execution-owner-resolution-v1.json');
+const reportRelativeToScratch = path.relative(scratchRoot, reportPath);
+if (reportRelativeToScratch.startsWith('..') || path.isAbsolute(reportRelativeToScratch)) {
+  throw new Error('REPORT_OUTPUT_MUST_REMAIN_UNDER_TMP_ATLAS');
+}
 const sha256 = (value) => `sha256:${crypto.createHash('sha256').update(value, 'utf8').digest('hex')}`;
 const jsonSha256 = (value) => sha256(JSON.stringify(value));
 const sortedConcatChecksum = (values) => sha256([...values].sort().join(''));

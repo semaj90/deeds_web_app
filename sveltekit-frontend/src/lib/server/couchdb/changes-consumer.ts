@@ -18,13 +18,9 @@ import { getRedis } from '$lib/server/redis.js';
 import { MEMORY_DATABASES } from './mango-indexes.js';
 import type { MemoryDatabase, MemoryDoc } from './mango-indexes.js';
 import { mirrorMemoryDoc } from './memory-mirror.js';
-import { ENV } from '$lib/server/env.server.js';
+import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
 
 // ── Config ─────────────────────────────────────────────────────────────────────
-
-const COUCHDB_URL  = ENV.COUCHDB_URL;
-const COUCHDB_USER = process.env.COUCHDB_USER ?? 'admin';
-const COUCHDB_PASS = (process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass');
 
 const POLL_TIMEOUT_MS = 30_000;   // longpoll heartbeat
 const ERROR_BACKOFF_MS = 5_000;   // wait between retries on error
@@ -47,10 +43,6 @@ interface ChangesResponse {
 }
 
 // ── Per-DB consumer ───────────────────────────────────────────────────────────
-
-function authHeader(): string {
-  return 'Basic ' + Buffer.from(COUCHDB_USER + ':' + COUCHDB_PASS).toString('base64');
-}
 
 async function getLastSeq(dbName: string): Promise<string> {
   try {
@@ -75,13 +67,14 @@ async function pollOnce(dbName: MemoryDatabase, since: string): Promise<{
   rows: ChangeRow[];
   lastSeq: string | number;
 }> {
+  const couchDb = resolveCouchDbConfigV1(process.env);
   const url =
-    `${COUCHDB_URL}/${dbName}/_changes` +
+    `${couchDb.baseUrl}/${dbName}/_changes` +
     `?feed=longpoll&include_docs=true&since=${encodeURIComponent(since)}&timeout=${POLL_TIMEOUT_MS}`;
 
   const res = await fetch(url, {
     signal: AbortSignal.timeout(POLL_TIMEOUT_MS + 5_000),
-    headers: { Authorization: authHeader() },
+    headers: { Authorization: couchDb.authorization },
   });
 
   if (!res.ok) throw new Error(`[changes-consumer] ${dbName} poll failed: ${res.status}`);

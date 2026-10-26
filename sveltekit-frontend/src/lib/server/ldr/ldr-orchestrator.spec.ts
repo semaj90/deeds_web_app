@@ -21,7 +21,7 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
     // Set test environment variables
     process.env.SEARXNG_URL = process.env.SEARXNG_URL || 'http://127.0.0.1:8888';
     process.env.LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1';
-    process.env.LLAMA_SERVER_MODEL = process.env.LLAMA_SERVER_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
+    process.env.LLAMA_SERVER_MODEL = process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b';
   });
 
   describe('Web Search Client', () => {

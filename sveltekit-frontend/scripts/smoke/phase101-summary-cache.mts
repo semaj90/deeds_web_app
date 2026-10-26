@@ -43,7 +43,7 @@ function makeInput(): Phase101SummaryInput {
 		laneIds: ['phase101', 'summary-cache'],
 		intent: 'summary',
 		promptVersion: 'phase101-summary-v1',
-		model: 'gemma4-rotorquant:latest',
+		model: 'ornith-1.5-9b',
 		semanticEmbedding: smokeEmbedding
 	};
 }

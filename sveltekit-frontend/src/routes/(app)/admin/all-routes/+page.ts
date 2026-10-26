@@ -18,10 +18,13 @@ const EMPTY_METADATA = {
   },
 };
 
-/**
- * Return empty metadata immediately so page renders fast.
- * Actual metadata is fetched client-side with IDB caching in +page.svelte.
- */
-export const load = async () => {
-  return { apiMetadata: EMPTY_METADATA };
+export const ssr = true;
+
+export const load = async ({ data }: { data?: Record<string, unknown> }) => {
+  return {
+    ...(data ?? {}),
+    apiMetadata: (data?.apiMetadata as typeof EMPTY_METADATA) ?? EMPTY_METADATA,
+  };
 };
+
+

@@ -11,7 +11,7 @@
  * Prerequisites:
  *   - Dev server running on :5173 (npm run dev in sveltekit-frontend/)
  *   - Qdrant running on :6333
- *   - Ollama running on :11434 with gemma4-rotorquant:latest loaded
+ *   - Ollama running on :11434 with ornith-1.5-9b loaded
  *   - Redis running on :6379
  *
  * Usage:
@@ -83,8 +83,8 @@ const TIMEOUT_MS        = 120_000;
 async function directLLMQuery(prompt, { timeoutMs = 60_000 } = {}) {
   // Try TurboQuant first (fast), then Ollama
   const backends = [
-    { url: `${TURBO_URL}/v1/chat/completions`, model: 'gemma4-rotorquant:latest', check: `${TURBO_URL}/health` },
-    { url: `${OLLAMA_URL}/api/chat`, model: 'gemma4-rotorquant:latest', check: `${OLLAMA_URL}/api/tags`, ollama: true },
+    { url: `${TURBO_URL}/v1/chat/completions`, model: 'ornith-1.5-9b', check: `${TURBO_URL}/health` },
+    { url: `${OLLAMA_URL}/api/chat`, model: 'ornith-1.5-9b', check: `${OLLAMA_URL}/api/tags`, ollama: true },
   ];
 
   for (const b of backends) {

@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.integration-progress.v1",
+  "status": "ACTIVE_PARTIAL",
+  "gate": "ACP-TELEMETRY-DURABLE-HANDOFF-01",
+  "implemented": [
+    "Existing ACP collector flush projects strict bounded operation summaries through existing packet/eval writer",
+    "Compatible void writer API plus shared explicit command acknowledgement API",
+    "Only acknowledged buffer entries removed; concurrent flush and newly appended entries preserved",
+    "Default volatile bound 1000 events, maximum 10000; batch limit 16; overflow count exposed",
+    "Explicit packet context snapshot; raw metadata, arguments, results, parameter hashes and exception strings omitted from new structured payload",
+    "Existing MCP wrappers detach packet flush, destroy timers, preserve handler outcomes and label explicit returned failure",
+    "Legacy Redis thrown-error metric uses fixed error category instead of raw exception"
+  ],
+  "validation": {
+    "suitesPassed": 8,
+    "testsPassed": 43,
+    "log": "docs/reports/acp-writer-final-20261016T002430.txt",
+    "storeScope": "Mocked database and Redis; real collector, packet writer, eval fallback and MCP wrapper",
+    "coverage": ["context snapshots", "payload minimization", "unacknowledged retry", "existing eval fallback", "concurrent flush", "new events during flush", "overflow", "batch bounds", "malformed payload rejection", "timer cleanup", "returned failure", "original exception", "pending writer"],
+    "liveReadback": "NOT_RUN",
+    "fullTypecheck": "NOT_RUN",
+    "svelteCheck": "NOT_RUN"
+  },
+  "limits": [
+    "Database command acknowledgement is not independent readback or exactly-once delivery",
+    "No durable retry spool; process exit, explicit clear, overflow or per-invocation object loss can lose observations",
+    "Lost acknowledgement can duplicate observations on retry",
+    "Actual callers do not yet establish qualified per-request packet context and final-result correlation",
+    "Legacy Redis metrics retain existing await behavior"
+  ],
+  "notPerformed": ["live database writes", "source-revision writes", "backfill", "service restart", "model load", "GPU job", "graph refresh", "promotion"],
+  "likely_cause": "The existing ACP collector discarded buffered events during flush and its MCP wrapper left interval timers running after invocation.",
+  "evidence": ["Existing collector flush source", "Actual MCP tool implementation wrapper imports", "43 passing focused tests"],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/telemetry/acp-observation.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/acp-mcp-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/acp-mcp-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/mcp-tool-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/mcp-tool-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/retrieval-recorder.ts",
+    "docs/architecture/packet-telemetry-existing-writer-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "openspec validate parent-atlas-telemetry-lowrank-recommendation-okf-integration --strict",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/telemetry/acp-mcp-telemetry.spec.ts src/lib/server/telemetry/mcp-tool-telemetry.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-acp-existing-writer-handoff-20261016.json",
+  "canonicalAuthority": false
+}

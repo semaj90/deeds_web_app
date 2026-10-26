@@ -72,6 +72,7 @@ export function admitNaryFactProposalV1(input: NaryFactAdmissionInputV1): NaryFa
     producerRevision: proposal.producerRevision,
     ontologyRevision: proposal.ontologyRevision ?? null,
     predicate: proposal.predicate,
+    predicatePolicy: proposal.predicatePolicy,
     participants: proposal.participants,
     evidenceRefs: proposal.evidenceRefs,
     admission: 'ADMITTED',

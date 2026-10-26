@@ -29,6 +29,7 @@ const CONFIG = {
     '.tsx': 'typescript',
     '.js': 'javascript',
     '.jsx': 'javascript',
+    '.svelte': 'svelte',
     '.py': 'python',
     '.go': 'go',
     '.rs': 'rust',
@@ -52,6 +53,18 @@ const CONFIG = {
       'ArrowFunctionExpression',
       'VariableDeclarator',
       'EnumDeclaration',
+    ],
+    svelte: [
+      'FunctionDeclaration',
+      'ClassDeclaration',
+      'InterfaceDeclaration',
+      'ImportDeclaration',
+      'ExportDeclaration',
+      'ArrowFunctionExpression',
+      'VariableDeclarator',
+      'RuneStateDeclaration',
+      'RuneDerivedDeclaration',
+      'SnippetBlock',
     ],
     javascript: [
       'FunctionDeclaration',
@@ -200,7 +213,7 @@ async function extractASTSymbols(content, language, file_path) {
 async function extractSymbolsViaRegex(content, language) {
   const symbols = new Set();
 
-  if (language === 'typescript' || language === 'javascript') {
+  if (language === 'typescript' || language === 'javascript' || language === 'svelte') {
     // Extract function names: function foo() | const foo = () | export function foo
     const funcRegex = /(?:export\s+)?(?:async\s+)?(?:function|const)\s+(\w+)/g;
     let match;

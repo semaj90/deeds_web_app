@@ -74,7 +74,7 @@ export function searchResultToHyperRagResult(
     provenance: {
       qdrant: hasQdrant,
       turbovec: false,
-      redis: retrievalSources.includes('postgres_trigram'),
+      redis: retrievalSources.includes('postgres_fts') || retrievalSources.includes('postgres_trigram'),
       neo4j: retrievalSources.includes('ast_tree'),
       ace: false,
       taskDistillates: false,

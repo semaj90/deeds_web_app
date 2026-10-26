@@ -30,6 +30,7 @@ import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { loadStableFileBackfillClassifierModuleV1 } from './lib/load-stable-file-backfill-classifier-v1.mjs';
+import { buildStratifiedPacketChunkSamplesV1 } from './lib/stratified-packet-chunk-samples-v1.mjs';
 
 const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
@@ -105,6 +106,7 @@ let client;
 let execution = null;
 let members = [];
 let bindings = [];
+let repositoryIdentities = [];
 let lineageRows = [];
 let physicalChunkCounts = [];
 let aliasTablePresent = false;
@@ -144,6 +146,15 @@ try {
         AND canonical_source_ref::text = ANY($2::text[])
       ORDER BY repo_id, canonical_source_ref, observed_at DESC NULLS LAST`,
     [workspaceRevision, sourceRefs],
+  )).rows;
+
+  const sourceAuthorityRepoIds = [...new Set(bindings.map((row) => clean(row.repo_id)).filter(Boolean))];
+  repositoryIdentities = sourceAuthorityRepoIds.length === 0 ? [] : (await client.query(
+    `SELECT repository_id::text, source_authority_repo_id::text
+       FROM public.atlas_repository_identity
+      WHERE source_authority_repo_id::text = ANY($1::text[])
+      ORDER BY source_authority_repo_id, repository_id`,
+    [sourceAuthorityRepoIds],
   )).rows;
 
   aliasTablePresent = Boolean((await client.query(
@@ -235,6 +246,14 @@ for (const row of bindings) {
   bindingRowsBySourceRef.set(ref, byRef);
 }
 
+const repositoryIdentityRowsBySourceAuthority = new Map();
+for (const row of repositoryIdentities) {
+  const sourceAuthorityRepoId = clean(row.source_authority_repo_id);
+  const matching = repositoryIdentityRowsBySourceAuthority.get(sourceAuthorityRepoId) ?? [];
+  matching.push(row);
+  repositoryIdentityRowsBySourceAuthority.set(sourceAuthorityRepoId, matching);
+}
+
 const lineageByExactSourceRevision = new Map();
 const lineageBySourceRef = new Map();
 for (const row of lineageRows) {
@@ -308,6 +327,12 @@ const rows = members.map((member) => {
   });
   const sourceAuthorityRepoId = namespaceResult.sourceAuthorityRepoId;
   const namespaceAdmitted = namespaceResult.classification === 'SAFE_NEW_ID';
+  const canonicalRepositoryIdentityRows = sourceAuthorityRepoId
+    ? repositoryIdentityRowsBySourceAuthority.get(sourceAuthorityRepoId) ?? []
+    : [];
+  const canonicalRepositoryId = canonicalRepositoryIdentityRows.length === 1
+    ? clean(canonicalRepositoryIdentityRows[0].repository_id)
+    : null;
   const refOwners = selectedSourceRefOwners.get(sourceRef) ?? new Set();
   const sourceRefAmbiguousAcrossSelectedRepositories = refOwners.size > 1;
 
@@ -384,8 +409,9 @@ const rows = members.map((member) => {
       mappingSource: 'STABLE_FILE_BACKFILL_CLASSIFIER_V1',
       mappingStatus: namespaceAdmitted ? 'ADMITTED' : namespaceResult.classification,
       evidenceRefs: ['docs/reports/stable-file-population-preview-v1.json', 'docs/reports/current-source-authority-cohort-v1.json'],
-      canonicalRepositoryId: null,
-      canonicalAuthority: false,
+      canonicalRepositoryIdentityRows: canonicalRepositoryIdentityRows.length,
+      canonicalRepositoryId,
+      canonicalAuthority: canonicalRepositoryId !== null,
     } : null,
     namespaceClassification: namespaceResult.classification,
     repositoryRelativePath,
@@ -531,8 +557,17 @@ const report = {
     mappingSource: 'STABLE_FILE_BACKFILL_CLASSIFIER_V1',
     mappingStatus: 'PER_ROW_CLASSIFIED_AGAINST_ADMITTED_SOURCE_BINDING',
     evidenceRefs: ['docs/reports/stable-file-population-preview-v1.json', 'docs/reports/current-source-authority-cohort-v1.json'],
-    canonicalRepositoryIdentityAvailable: false,
-    canonicalAuthority: false,
+    canonicalRepositoryIdentityAvailable: repositoryIdentities.length > 0,
+    canonicalRepositoryIdentityRows: repositoryIdentities.length,
+    canonicalRepositoryIdentityCoverage: {
+      sourceAuthorityRepos: new Set(bindings.map((row) => clean(row.repo_id)).filter(Boolean)).size,
+      uniquelyMapped: [...repositoryIdentityRowsBySourceAuthority.values()].filter((items) => items.length === 1).length,
+      missing: [...new Set(bindings.map((row) => clean(row.repo_id)).filter(Boolean))]
+        .filter((repoId) => !repositoryIdentityRowsBySourceAuthority.has(repoId)).length,
+      ambiguous: [...repositoryIdentityRowsBySourceAuthority.values()].filter((items) => items.length > 1).length,
+    },
+    canonicalAuthority: exactRows.length > 0
+      && exactRows.every((row) => row.repositoryNamespaceBridge?.canonicalAuthority === true),
     unresolvedGraphifyRepositories: Object.keys(namespacePreview.bySourceRepository ?? {}).filter((repositoryId) => !repositoryBridge[repositoryId]).sort(),
   },
   hashGrain: {
@@ -566,6 +601,11 @@ const report = {
       || a.classification.localeCompare(b.classification)
       || a.sourceRef.localeCompare(b.sourceRef))
     .slice(0, 250),
+  stratifiedUnresolvedSamples: buildStratifiedPacketChunkSamplesV1(rows, {
+    executionId,
+    workspaceRevision,
+    limitPerStratum: 10,
+  }),
   nextGate: status === 'CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PROVEN'
     ? 'PROMOTION-RECEIPT-COHORT-01'
     : 'CURRENT-PACKET-CHUNK-EXPECTED-SOURCE-SCOPE-01',

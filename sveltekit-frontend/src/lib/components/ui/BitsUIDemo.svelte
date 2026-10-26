@@ -56,7 +56,7 @@
       Search Interface
     </h2>
     <div class="max-w-md">
-      <label class="block text-sm font-medium text-yorha-text-primary mb-1">Global Search</label>
+      <span class="block text-sm font-medium text-yorha-text-primary mb-1">Global Search</span>
       <div class="relative">
         <Icon name="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
         <Input
@@ -77,9 +77,9 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Input, Demo -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-yorha-text-primary">
+        <span class="block text-sm font-medium text-yorha-text-primary">
           Case Name <span class="text-yorha-accent">*</span>
-        </label>
+        </span>
         <div class="relative">
           <Icon name="file-text" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
           <Input
@@ -92,9 +92,9 @@
       </div>
       <!-- Select, Demo -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-yorha-text-primary">
+        <span class="block text-sm font-medium text-yorha-text-primary">
           Case Type <span class="text-yorha-accent">*</span>
-        </label>
+        </span>
         <Select
           bind:value={selectedCaseType}
           placeholder="Select case type..."
@@ -139,7 +139,7 @@
         <div class="space-y-4">
           <!-- Case: Name, Input -->
           <div class="space-y-2">
-            <label class="block text-sm font-medium text-yorha-text-primary">Case Name</label>
+            <span class="block text-sm font-medium text-yorha-text-primary">Case Name</span>
             <div class="relative">
               <Icon name="file-text" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
               <Input
@@ -151,7 +151,7 @@
           </div>
           <!-- Client: Name, Input -->
           <div class="space-y-2">
-            <label class="block text-sm font-medium text-yorha-text-primary">Client Name</label>
+            <span class="block text-sm font-medium text-yorha-text-primary">Client Name</span>
             <div class="relative">
               <Icon name="users" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yorha-text-secondary" />
               <Input
@@ -163,9 +163,9 @@
           </div>
           <!-- Case: Type, Select -->
           <div class="space-y-2">
-            <label class="block text-sm font-medium text-yorha-text-primary">
+            <span class="block text-sm font-medium text-yorha-text-primary">
               Case Type <span class="text-yorha-accent">*</span>
-            </label>
+            </span>
             <Select
               bind:value={selectedCaseType}
               placeholder="Select legal area..."

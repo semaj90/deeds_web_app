@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { createHash } from 'node:crypto';
 
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
@@ -7,6 +8,20 @@ vi.mock('$lib/server/env.server.js', () => ({
     LANGEXTRACT_URL: '',
   },
 }));
+
+describe('NLP size-limit receipt (P9-03)', () => {
+  it('reports SIZE_LIMIT_EXCEEDED only when text is longer than the limit', async () => {
+    const { sizeLimitReceipt } = await import('./miniforge-nlp-sidecar.js');
+    expect(sizeLimitReceipt('abc', 3)).toEqual({ reason: null, maxChars: 3, originalChars: 3 });
+    expect(sizeLimitReceipt('abcd', 3)).toEqual({ reason: 'SIZE_LIMIT_EXCEEDED', maxChars: 3, originalChars: 4 });
+  });
+
+  it('counts characters, not UTF-16 units, to match the sidecar slicing', async () => {
+    const { sizeLimitReceipt } = await import('./miniforge-nlp-sidecar.js');
+    // one astral code point is one character for Python but two UTF-16 units for JS .length
+    expect(sizeLimitReceipt('\u{1F600}\u{1F600}', 2)).toEqual({ reason: null, maxChars: 2, originalChars: 2 });
+  });
+});
 
 describe('miniforge-nlp-sidecar', () => {
   beforeEach(() => {
@@ -268,6 +283,31 @@ describe('miniforge-nlp-sidecar', () => {
       .toBe('SKIPPED_MISSING_EXPLICIT_LINEAGE');
   });
 
+  it('rejects an AST evidence payload whose scan is partial (fail closed)', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      engine: 'treesitter-chunker',
+      engine_version: '0.1.0',
+      language: 'typescript',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      chunks: [],
+      edges: [],
+      diagnostics: [],
+      scan_completeness: 'PARTIAL_AST_FAILED',
+      scan_failure: 'RuntimeError: chunker exploded',
+    }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    await expect(client.astChunk({
+      source: 'export function hello() {}',
+      language: 'typescript',
+      filePath: 'src/example.ts',
+      sourceRevision: 'rev-1',
+    } as any)).rejects.toThrow(/scan incomplete: PARTIAL_AST_FAILED.*chunker exploded/);
+  });
+
   it('validates the atlas structural evidence endpoint without promoting upstream ids', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any) => {
       expect(String(input)).toBe('http://127.0.0.1:9997/ast/chunk');
@@ -278,6 +318,8 @@ describe('miniforge-nlp-sidecar', () => {
         language: 'typescript',
         file_path: 'src/example.ts',
         source_revision: 'rev-1',
+        scan_completeness: 'COMPLETE',
+        scan_failure: null,
         chunks: [{
           upstream_chunk_id: 'upstream-only',
           node_type: 'function_declaration',
@@ -326,9 +368,123 @@ describe('miniforge-nlp-sidecar', () => {
     expect(evidence.edges[0]?.occurrence_positions).toEqual([[1, 7], [3, 4]]);
   });
 
+  it('rejects absent or mismatched parser source identity instead of echoing request values', async () => {
+    const response = (overrides: Record<string, unknown>) => new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      scan_completeness: 'COMPLETE',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      chunks: [],
+      edges: [],
+      diagnostics: [],
+      ...overrides,
+    }), { status: 200 });
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(response({ source_revision: 'stale-rev' }))
+      .mockResolvedValueOnce(response({ file_path: undefined }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    const request = { source: 'const value = 1;', language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1' };
+
+    await expect(client.astChunk(request)).rejects.toThrow(/source_revision does not match/);
+    await expect(client.astChunk(request)).rejects.toThrow(/file_path does not match/);
+  });
+
+  it('preserves byte-bound parser observations and treats ERROR or MISSING nodes as recovered syntax', async () => {
+    const source = 'const λ = "😀";\r\n';
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    for (const counts of [{ root_has_error: true, error_node_count: 1, missing_node_count: 0 },
+      { root_has_error: false, error_node_count: 0, missing_node_count: 1 }]) {
+      const observation = {
+        schema: 'atlas.ast.parser-observation.v1',
+        source_sha256: createHash('sha256').update(source).digest('hex'),
+        utf8_byte_length: new TextEncoder().encode(source).byteLength,
+        ...counts,
+      };
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+        schema: 'atlas.ast.evidence.v1', scan_completeness: 'COMPLETE',
+        file_path: 'src/example.ts', source_revision: 'rev-1', syntax_status: 'CLEAN',
+        chunks: [], edges: [], diagnostics: [], parser_observation: observation,
+      }), { status: 200 }));
+      const result = await createMiniforgeNlpSidecarClient().astChunk({
+        source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+      });
+      expect(result.parser_observation).toEqual(observation);
+      expect(result.syntax_status).toBe('RECOVERED_WITH_ERRORS');
+      expect(result.scan_completeness).toBe('COMPLETE');
+    }
+  });
+
+  it('rejects malformed or source-mismatched parser observations', async () => {
+    const source = 'const λ = "😀";\r\n';
+    const observation = {
+      schema: 'atlas.ast.parser-observation.v1',
+      source_sha256: createHash('sha256').update(source).digest('hex'),
+      utf8_byte_length: new TextEncoder().encode(source).byteLength,
+      root_has_error: false, error_node_count: 0, missing_node_count: 0,
+    };
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    for (const change of [{ source_sha256: '0'.repeat(64) }, { utf8_byte_length: source.length },
+      { error_node_count: -1 }, { missing_node_count: 0.5 }, { root_has_error: 'false' }]) {
+      vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+        schema: 'atlas.ast.evidence.v1', scan_completeness: 'COMPLETE',
+        file_path: 'src/example.ts', source_revision: 'rev-1', chunks: [],
+        parser_observation: { ...observation, ...change },
+      }), { status: 200 }));
+      await expect(createMiniforgeNlpSidecarClient().astChunk({
+        source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+      })).rejects.toThrow();
+    }
+  });
+
+  it('does not invent parser counters when an older response lacks the observation', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1', scan_completeness: 'COMPLETE',
+      file_path: 'src/example.ts', source_revision: 'rev-1', chunks: [],
+    }), { status: 200 }));
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const result = await createMiniforgeNlpSidecarClient().astChunk({
+      source: '', language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+    });
+    expect(result.parser_observation).toBeUndefined();
+  });
+
+  it('preserves native declarator signature and ancestry evidence when the sidecar provides it', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      scan_completeness: 'COMPLETE',
+      engine: 'treesitter-chunker',
+      engine_version: '4',
+      language: 'typescript',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      syntax_status: 'CLEAN',
+      chunks: [{
+        upstream_node_id: 'native-node-1', node_type: 'function_declaration', kind: 'function', name: 'resolve',
+        start_byte: 0, end_byte: 40, start_line: 1, start_column: 0, end_line: 1, end_column: 40,
+        calls: [], imports: [], exports: [], signature_text: 'function resolve() ',
+        syntax_ancestry: [{ node_type: 'program', start_byte: 0, end_byte: 40 }],
+      }],
+      edges: [], diagnostics: [],
+    }), { status: 200 }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const result = await createMiniforgeNlpSidecarClient().astChunk({
+      source: 'function resolve() { return true; }', language: 'typescript',
+      filePath: 'src/example.ts', sourceRevision: 'rev-1',
+    });
+
+    expect(result.chunks[0]?.signature_text).toBe('function resolve() ');
+    expect(result.chunks[0]?.syntax_ancestry).toEqual([{ node_type: 'program', start_byte: 0, end_byte: 40 }]);
+  });
+
   it('rejects malformed occurrence coordinates instead of dropping span evidence', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
       schema: 'atlas.ast.evidence.v1',
+      scan_completeness: 'COMPLETE',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
       chunks: [],
       edges: [{
         from_evidence_key: 'example:hello',
@@ -350,6 +506,62 @@ describe('miniforge-nlp-sidecar', () => {
       filePath: 'src/example.ts',
       sourceRevision: 'rev-1',
     })).rejects.toThrow(/invalid occurrence_positions/);
+  });
+
+  it('preserves exact UTF-8 call spans and rejects spans outside source bytes', async () => {
+    const source = "const résumé = path.join('a');";
+    const start = new TextEncoder().encode('const résumé = ').length;
+    const end = new TextEncoder().encode(source).length;
+    const response = (span: [number, number]) => new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      scan_completeness: 'COMPLETE',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      chunks: [],
+      edges: [{
+        from_evidence_key: 'caller', to_evidence_key: 'path.join', type: 'CALLS',
+        evidence_start_line: 1, evidence_start_column: 0,
+        evidence_end_line: 1, evidence_end_column: end,
+        resolved: false, resolution: 'unresolved_target',
+        occurrence_byte_spans: [span],
+      }],
+      diagnostics: [],
+    }), { status: 200 });
+
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(response([start, end]))
+      .mockResolvedValueOnce(response([start, end + 1]));
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    const request = { source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1' };
+    const evidence = await client.astChunk(request);
+    expect(evidence.edges[0]?.occurrence_byte_spans).toEqual([[start, end]]);
+    await expect(client.astChunk(request)).rejects.toThrow(/invalid occurrence_byte_spans/);
+  });
+
+  it('rejects call spans that split a UTF-8 code point', async () => {
+    const source = 'const résumé = invoke();';
+    const sourceBytes = new TextEncoder().encode(source);
+    const accentByte = sourceBytes.indexOf(0xc3);
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      scan_completeness: 'COMPLETE',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      chunks: [],
+      edges: [{
+        from_evidence_key: 'caller', to_evidence_key: 'invoke', type: 'CALLS',
+        evidence_start_line: 1, evidence_start_column: 0,
+        evidence_end_line: 1, evidence_end_column: sourceBytes.length,
+        resolved: false, resolution: 'unresolved_target',
+        occurrence_byte_spans: [[accentByte + 1, accentByte + 2]],
+      }],
+    }), { status: 200 }));
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    await expect(client.astChunk({
+      source, language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1',
+    })).rejects.toThrow(/non-UTF-8-aligned occurrence_byte_spans/);
   });
 
   it('calls the read-only POS endpoint and preserves UTF-8 token byte offsets', async () => {

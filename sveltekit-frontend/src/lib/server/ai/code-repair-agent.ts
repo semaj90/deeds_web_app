@@ -1,5 +1,5 @@
 import { bifrostChat } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
+import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import type { DiagnosticResult } from './agentic-diagnostic';
 
 export interface RepairProposal {
@@ -37,7 +37,7 @@ Return ONLY a JSON object with:
 		try {
 			const response = await bifrostChat(
 				[{ role: 'user', content: prompt }],
-				ENV.GEMMA4_MODEL,
+				BIFROST_CHAT_MODEL,
 				{ temperature: 0.1, maxTokens: 800 }
 			);
 

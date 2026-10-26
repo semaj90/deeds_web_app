@@ -174,28 +174,21 @@ def sample_from_ollama(prompt_template: str) -> str:
         "citing at least two relevant federal cases and the applicable sentencing guidelines. "
         "Include specific section numbers and case citations."
     )
-    payload = json.dumps({
-        "model": LLM_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "stream": False,
-        "options": CITATION_OPTIONS,
-    }).encode()
-    req = urllib.request.Request(
-        f"{OLLAMA_URL}/api/chat",
-        data=payload,
-        headers={"Content-Type": "application/json"},
-    )
+    from config.llama_chat import llama_chat
+    # llama-server (Ornith 1.5, :8090); Ollama stays embeddings-only.
     for attempt in range(2):
         try:
-            with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as resp:
-                data = json.loads(resp.read())
-                return data.get("message", {}).get("content", "")
+            return llama_chat(
+                [{"role": "user", "content": prompt}],
+                max_tokens=CITATION_OPTIONS.get("num_predict", 350),
+                temperature=CITATION_OPTIONS.get("temperature", 0.3),
+            )
         except Exception as e:
             if attempt == 0:
                 print(f"  [retry] LLM timeout on attempt 1, retrying...", flush=True)
                 continue
-            return f"[ollama error: {e}]"
-    return "[ollama error: exhausted retries]"
+            return f"[llama-server error: {e}]"
+    return "[llama-server error: exhausted retries]"
 
 
 def evaluate_text(text: str, check_corpus: bool = True) -> dict:

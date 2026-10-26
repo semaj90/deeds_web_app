@@ -193,7 +193,7 @@
 					{#each colors as color}
 						<button
 							type="button"
-							onclick={() => { newCollectionColor = color; }}
+							onclick={() => { newCollectionColor = color; }} aria-label={`Select color ${color}`}
 							class="color-option"
 							class:selected={newCollectionColor === color}
 							style:background-color={color}
@@ -250,7 +250,7 @@
 							{#each colors as color}
 								<button
 									type="button"
-									onclick={() => { editColor = color; }}
+									onclick={() => { editColor = color; }} aria-label={`Select color ${color}`}
 									class="color-option small"
 									class:selected={editColor === color}
 									style:background-color={color}

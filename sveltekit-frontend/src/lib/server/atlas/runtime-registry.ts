@@ -174,9 +174,9 @@ export const ATLAS_RUNTIME_REGISTRY: AtlasRuntimeRegistrySection[] = [
     notes: 'Atlas-relevant local model surfaces used by chat, retrieval, and document understanding.',
     items: [
       {
-        key: 'gemma4-rotorquant-iq4xs-direct',
+        key: 'ornith-1.5-9b-direct',
         title: 'Gemma 4 RotorQuant IQ4_XS Direct',
-        path: 'models/gemma4-rotorquant:latest-iq4xs-direct.gguf',
+        path: 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
         owner: 'reasoning',
         status: 'active',
         notes: 'Canonical local chat GGUF for Gemma 4 synthesis and reasoning; served from the /models lane.',

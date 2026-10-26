@@ -225,7 +225,7 @@ export type YoloVLMResult = VLMOCRResult & {
  *
  * @param imageBuffer - Raw image bytes (PNG, JPG, TIFF, WebP)
  * @param docType     - Document category hint; 'auto' = VLM self-classifies
- * @param model       - Override VLM model (default: VLM_MODEL env = gemma4:e4b)
+ * @param model       - Override VLM model (default: VLM_MODEL env = ornith-1.5-9b)
  */
 export async function ocrWithVLM(
 	imageBuffer: Buffer,
@@ -278,7 +278,7 @@ export async function ocrWithVLM(
  * @param imageBuffer - Raw image bytes (PNG, JPG, TIFF, WebP)
  * @param docType     - Document category hint; 'auto' = VLM self-classifies per region
  * @param confidence  - YOLO detection confidence threshold (default 0.25)
- * @param model       - Override VLM model (default: VLM_MODEL env = gemma4:e4b)
+ * @param model       - Override VLM model (default: VLM_MODEL env = ornith-1.5-9b)
  */
 export async function ocrWithYoloVLM(
 	imageBuffer: Buffer,
