@@ -40,7 +40,9 @@ export function buildQdrantSyncPayload(packet: Record<string, unknown>): Record<
   if (!canonicalId) throw new Error('Missing canonical_id for canonical Qdrant payload');
 
   const workspaceRevision = requireContentRevision(
-    p.canonicalWorkspaceRevision ?? p.canonical_workspace_revision ?? p.workspaceRevision ?? p.workspace_revision,
+    p.canonicalWorkspaceRevision ?? p.canonical_workspace_revision
+      ?? p.workspaceRevisionKey ?? p.workspace_revision_key
+      ?? p.workspace_revision ?? p.workspaceRevision,
     'workspace_revision',
   );
   const sourceRevision = requireContentRevision(p.sourceRevision ?? p.source_revision, 'source_revision');

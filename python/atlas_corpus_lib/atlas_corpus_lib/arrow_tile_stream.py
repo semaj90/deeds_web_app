@@ -341,7 +341,11 @@ def bind_hnsw_hits_to_lod_tile_records_v1(
         if not isinstance(hit, dict) or not isinstance(hit.get("payload"), dict):
             raise ValueError("HNSW_TILE_HIT_SHAPE_INVALID")
         payload = hit["payload"]
-        required = ("packet_key", "source_ref", "source_revision", "workspace_revision", "feature_id", "feature_label", "representation_id")
+        required = (
+            "packet_key", "source_ref", "source_revision", "workspace_revision",
+            "feature_id", "feature_label", "taxonomy_revision", "parser_language",
+            "language_resolver_revision", "representation_id",
+        )
         if any(not isinstance(payload.get(key), str) or not payload[key].strip() for key in required):
             raise ValueError("HNSW_TILE_HIT_CANONICAL_PAYLOAD_INCOMPLETE")
         if payload["workspace_revision"] != workspace_revision:
@@ -363,16 +367,25 @@ def bind_hnsw_hits_to_lod_tile_records_v1(
             and record.ast_payload.workspace_revision == workspace_revision
             and record.ast_payload.feature_id == payload["feature_id"]
             and record.ast_payload.feature_label == payload["feature_label"]
+            and record.ast_payload.taxonomy_revision == payload["taxonomy_revision"]
+            and record.ast_payload.parser_language == payload["parser_language"]
+            and record.ast_payload.language_resolver_revision == payload["language_resolver_revision"]
         ]
-        span_fields = ("start_byte", "end_byte")
-        has_start, has_end = (key in payload for key in span_fields)
+        start_byte = payload.get("start_byte")
+        end_byte = payload.get("end_byte")
+        has_start, has_end = start_byte is not None, end_byte is not None
         if has_start != has_end:
             raise ValueError("HNSW_TILE_HIT_SPAN_PARTIAL")
         if has_start:
+            if (
+                isinstance(start_byte, bool) or not isinstance(start_byte, int) or start_byte < 0
+                or isinstance(end_byte, bool) or not isinstance(end_byte, int) or end_byte <= start_byte
+            ):
+                raise ValueError("HNSW_TILE_HIT_SPAN_INVALID")
             candidates = [
                 record for record in candidates
-                if record.ast_payload.start_byte == payload["start_byte"]
-                and record.ast_payload.end_byte == payload["end_byte"]
+                if record.ast_payload.start_byte == start_byte
+                and record.ast_payload.end_byte == end_byte
             ]
         symbol = payload.get("symbol")
         if isinstance(symbol, str) and symbol.strip():
