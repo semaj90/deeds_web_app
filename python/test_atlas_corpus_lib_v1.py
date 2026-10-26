@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import struct
 import sys
 from pathlib import Path
 
@@ -99,7 +100,11 @@ def test_bitset_bytea_bitshift_protobuf_and_lod_texture_streaming() -> None:
     )
     wire_bytes = encode_lod_packet_protobuf_fields_1_to_20(env)
     decoded_env = decode_lod_packet_protobuf_fields_1_to_20(wire_bytes)
-    assert decoded_env == env
+    expected_decoded_env = env.model_copy(update={
+        "field_18_quant_minimum": struct.unpack("<f", struct.pack("<f", env.field_18_quant_minimum))[0],
+        "field_19_scale_4bit": struct.unpack("<f", struct.pack("<f", env.field_19_scale_4bit))[0],
+    })
+    assert decoded_env == expected_decoded_env
 
     # 5. PyTorch `from_blob` / `from_numpy` 128-byte LOD texture tile streaming
     tensor_or_arr = stream_lod_blocks_to_pytorch_blob([block_128b, block_128b])

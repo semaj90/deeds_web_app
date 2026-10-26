@@ -265,9 +265,10 @@ def iter_jsonl_batches(
     batch_bytes = 0
     with Path(path).open("rb") as stream:
         line_number = 0
-        while line := stream.readline(max_line_bytes + 1):
+        while line := stream.readline(max_line_bytes + 3):
             line_number += 1
-            if len(line) > max_line_bytes:
+            payload = line[:-2] if line.endswith(b"\r\n") else line[:-1] if line.endswith(b"\n") else line
+            if len(payload) > max_line_bytes:
                 raise ValueError(f"JSONL_ROW_BYTE_LIMIT_EXCEEDED:{line_number}")
             if not line.strip():
                 continue
@@ -281,12 +282,12 @@ def iter_jsonl_batches(
                 raise ValueError(f"JSONL_JSON_INVALID:{line_number}") from error
             if not isinstance(value, dict):
                 raise ValueError(f"JSONL_ROW_MUST_BE_OBJECT:{line_number}")
-            if batch and (len(batch) >= batch_size or batch_bytes + len(line) > max_batch_bytes):
+            if batch and (len(batch) >= batch_size or batch_bytes + len(payload) > max_batch_bytes):
                 yield batch
                 batch = []
                 batch_bytes = 0
             batch.append(value)
-            batch_bytes += len(line)
+            batch_bytes += len(payload)
     if batch:
         yield batch
 

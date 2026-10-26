@@ -532,3 +532,24 @@ Master TOC Governance: Rebuilt & checked (master_agents_toc.md, 7,277 records, 0
 Document Graph & OpenSpec Audit: Scanned 3,450 files, 322 gates, 2,638 edges (.tmp/atlas/docs-link-audit.json).
 BitFrost 5-State Token FSM: Formatted transitions (UNLOADED  → ADMITTED  → RESIDENT  → EVICTING  → PURGED) and knapsack context packing without raw hit injection (bitfrost-token-fsm-v1.ts).
 NetworkX CPU Reference & cuGraph BFS Parity: Verified zero-hop, cycles, multiple shortest paths, and negative controls; emitted the canonical proof receipt (docs/reports/atlas-resident-bfs-proof-2026-10-13.json).
+
+## 26. Tooling in use (2026-10-26, verified on disk)
+
+| Tool | Version / source | Used for | Status |
+|---|---|---|---|
+| Node.js | 22.23.3 (Windows) | all npm scripts | in use |
+| ESLint | 8.57.1, flat config `eslint.config.mjs` (repo root) | lint | config loads; full baseline pending (src/mcp done, src/lib and src/routes timed out) |
+| eslint-plugin-svelte | 3.23.1 | Svelte lint rules | upgraded from 2.46.1; no before/after comparison |
+| typescript-eslint | 8.71.2 (exact) | type-aware TS lint | installed in `sveltekit-frontend` |
+| eslint-config-prettier | 10.1.8 (exact) | disables conflicting formatting rules | installed in `sveltekit-frontend` |
+| svelte-check | via `npm run check` | Svelte/TS diagnostics | 0 errors / 0 warnings across 16,317 files (whole project) |
+| ast-grep | 0.45.3, Linux build in WSL | structural Svelte element counts | in use (VER-03-04) |
+| `libtree_sitter_svelte.so` | tree-sitter-language-pack 1.14.0 cache (WSL) | baseline Svelte grammar | in use |
+| `sveltejs/tree-sitter-svelte` | commit `e36b60c` (2026-06-17), built with gcc 13.3.0 | challenger grammar | experimental; not the :8095 parser |
+| `@tree-sitter-grammars/tree-sitter-svelte` | 1.0.2 (npm, 2024-09-08) | prior grammar source | superseded for challenger work |
+
+Notes:
+- The root lint config needs `typescript-eslint` and `eslint-config-prettier`; without them `eslint .` fails at import.
+- Legacy `.eslintrc.cjs` / `.eslintrc.json` / `.eslintignore` remain in `sveltekit-frontend`; flat mode ignores them, ESLint 10 will not.
+- Full-repo `eslint .` crashed with EMFILE; directory batches are needed.
+- Graphify tiers were not used for lint; they stay gated by the source-admission gate.
