@@ -3,6 +3,7 @@
 #include "turbovec_pack.hpp"
 #include "tile_assembler.hpp"
 #include "pgvector_binary.hpp"
+#include "batch_tile_assembler.hpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -118,6 +119,38 @@ PYBIND11_MODULE(_atlas_native_core, module) {
         const auto encoded = atlas::native::serialize_lod_texture_block_v1(record);
         return py::bytes(reinterpret_cast<const char*>(encoded.data()), encoded.size());
     }, "values"_a, "candidate_ordinal"_a, "som_bmu_id"_a, "kmeans_cluster_id"_a);
+    module.def("assemble_lod_texture_blocks_v1", [](
+        const std::vector<float>& values,
+        std::size_t row_count,
+        std::size_t row_stride,
+        const std::vector<std::uint32_t>& candidate_ordinals,
+        const std::vector<std::uint16_t>& som_bmu_ids,
+        const std::vector<std::uint16_t>& kmeans_cluster_ids,
+        std::size_t worker_count) {
+        if (row_count == 0 || row_count > atlas::native::MAX_LOD_TILE_BATCH_ROWS_V1 ||
+            row_stride < atlas::native::TURBOVEC_MRL_DIM ||
+            row_stride > atlas::native::MAX_LOD_TILE_BATCH_STRIDE_V1 ||
+            row_count > SIZE_MAX / row_stride || values.size() != row_count * row_stride ||
+            candidate_ordinals.size() != row_count || som_bmu_ids.size() != row_count ||
+            kmeans_cluster_ids.size() != row_count) {
+            throw py::value_error("LOD_TILE_BATCH_SHAPE_INVALID");
+        }
+
+        std::vector<std::array<std::uint8_t, sizeof(atlas::native::LodTextureBlock128B)>> blocks;
+        {
+            py::gil_scoped_release release;
+            blocks = atlas::native::assemble_lod_texture_blocks_v1(
+                values.data(), row_count, row_stride,
+                candidate_ordinals.data(), som_bmu_ids.data(), kmeans_cluster_ids.data(), worker_count);
+        }
+        std::string encoded(blocks.size() * sizeof(atlas::native::LodTextureBlock128B), '\0');
+        for (std::size_t index = 0; index < blocks.size(); ++index) {
+            std::memcpy(encoded.data() + index * sizeof(atlas::native::LodTextureBlock128B),
+                        blocks[index].data(), blocks[index].size());
+        }
+        return py::bytes(encoded);
+    }, "values"_a, "row_count"_a, "row_stride"_a, "candidate_ordinals"_a,
+       "som_bmu_ids"_a, "kmeans_cluster_ids"_a, "worker_count"_a = 0);
     module.def("bitset128_jaccard_similarity", [](const py::bytes& a_bytes, const py::bytes& b_bytes) {
         std::string a = a_bytes;
         std::string b = b_bytes;

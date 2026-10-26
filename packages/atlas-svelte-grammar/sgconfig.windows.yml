@@ -1,0 +1,7 @@
+ruleDirs:
+  - ./rules
+customLanguages:
+  svelte:
+    libraryPath: ./dist/win32-x64/tree-sitter-svelte.dll
+    extensions:
+      - svelte

@@ -41,6 +41,58 @@ for vector, payload in zip(threaded_inputs, threaded_payloads, strict=True):
     assert payload["bytea_4bit"] == bytes.fromhex(expected.bytea_hex[2:])
     assert payload["sign_bitset_128_bit_string"] == expected.sign_bitset_128_bit_string
 
+batch_ordinals = [91, 14, 52, 37]
+batch_som_cells = [1, 17, 205, 399]
+batch_clusters = [3, 2, 5, 1]
+batch_vectors = vectors * (len(batch_ordinals) // len(vectors))
+batch_bytes = native.assemble_lod_texture_blocks_v1(
+    [value for vector in batch_vectors for value in vector],
+    len(batch_vectors),
+    128,
+    batch_ordinals,
+    batch_som_cells,
+    batch_clusters,
+    4,
+)
+assert len(batch_bytes) == 128 * len(batch_vectors)
+for index, vector in enumerate(batch_vectors):
+    expected_block = native.assemble_lod_texture_block_v1(
+        vector, batch_ordinals[index], batch_som_cells[index], batch_clusters[index]
+    )
+    assert batch_bytes[index * 128 : (index + 1) * 128] == expected_block
+
+try:
+    native.assemble_lod_texture_blocks_v1(
+        [value for vector in batch_vectors for value in vector],
+        len(batch_vectors),
+        128,
+        batch_ordinals[:-1],
+        batch_som_cells,
+        batch_clusters,
+        2,
+    )
+except ValueError as error:
+    assert "LOD_TILE_BATCH_SHAPE_INVALID" in str(error)
+else:
+    raise AssertionError("native tile batch accepted metadata arrays with different lengths")
+
+invalid_batch_vectors = [value for vector in batch_vectors for value in vector]
+invalid_batch_vectors[128] = float("nan")
+try:
+    native.assemble_lod_texture_blocks_v1(
+        invalid_batch_vectors,
+        len(batch_vectors),
+        128,
+        batch_ordinals,
+        batch_som_cells,
+        batch_clusters,
+        2,
+    )
+except ValueError as error:
+    assert "LOD_TILE_BATCH_VECTOR_INVALID_AT_ROW_1" in str(error)
+else:
+    raise AssertionError("native tile batch accepted a non-finite vector")
+
 assert native.detect_rfc_or_language_proposal("detect RFC7519")["authority"] == "PROPOSAL_ONLY"
 
 left = bytes([0b11000000]) + bytes(15)

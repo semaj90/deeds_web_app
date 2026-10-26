@@ -2,6 +2,7 @@
 #include "radix_sort.hpp"
 #include "pgvector_binary.hpp"
 #include "tile_assembler.hpp"
+#include "batch_tile_assembler.hpp"
 #include "turbovec_pack.hpp"
 
 #include <array>
@@ -9,6 +10,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <vector>
 
 int main(int argc, char** argv) {
     constexpr char sha256_abc[] = "abc";
@@ -49,6 +51,45 @@ int main(int argc, char** argv) {
     assert(atlas::native::get_sign_bit_128(packed.sign_bitset_128.data(), 0));
     assert(!atlas::native::get_sign_bit_128(packed.sign_bitset_128.data(), 128));
     assert(atlas::native::sign_bitset_128_as_bit_string(packed.sign_bitset_128.data()).size() == 128);
+
+    std::vector<float> batch_values(4 * atlas::native::TURBOVEC_MRL_DIM);
+    for (std::size_t row = 0; row < 4; ++row) {
+        for (std::size_t column = 0; column < atlas::native::TURBOVEC_MRL_DIM; ++column) {
+            batch_values[row * atlas::native::TURBOVEC_MRL_DIM + column] =
+                static_cast<float>((row * 19 + column * 7) % 101) - 50.0f;
+        }
+    }
+    const std::array<std::uint32_t, 4> batch_ordinals{91, 14, 52, 37};
+    const std::array<std::uint16_t, 4> batch_som_cells{1, 17, 205, 399};
+    const std::array<std::uint16_t, 4> batch_clusters{3, 2, 5, 1};
+    const auto serial_blocks = atlas::native::assemble_lod_texture_blocks_v1(
+        batch_values.data(), 4, atlas::native::TURBOVEC_MRL_DIM,
+        batch_ordinals.data(), batch_som_cells.data(), batch_clusters.data(), 1);
+    const auto parallel_blocks = atlas::native::assemble_lod_texture_blocks_v1(
+        batch_values.data(), 4, atlas::native::TURBOVEC_MRL_DIM,
+        batch_ordinals.data(), batch_som_cells.data(), batch_clusters.data(), 4);
+    assert(serial_blocks == parallel_blocks);
+    for (std::size_t row = 0; row < batch_ordinals.size(); ++row) {
+        atlas::native::CandidateTileRecord scalar_record{};
+        scalar_record.candidate_ordinal = batch_ordinals[row];
+        scalar_record.som_bmu_id = batch_som_cells[row];
+        scalar_record.kmeans_cluster_id = batch_clusters[row];
+        scalar_record.packed_vector = atlas::native::pack_turbovec_mrl128(
+            batch_values.data() + row * atlas::native::TURBOVEC_MRL_DIM,
+            atlas::native::TURBOVEC_MRL_DIM);
+        assert(serial_blocks[row] == atlas::native::serialize_lod_texture_block_v1(scalar_record));
+    }
+    bool rejected_duplicate_batch_ordinal = false;
+    auto duplicate_ordinals = batch_ordinals;
+    duplicate_ordinals[1] = duplicate_ordinals[0];
+    try {
+        atlas::native::assemble_lod_texture_blocks_v1(
+            batch_values.data(), 4, atlas::native::TURBOVEC_MRL_DIM,
+            duplicate_ordinals.data(), batch_som_cells.data(), batch_clusters.data(), 2);
+    } catch (const std::invalid_argument&) {
+        rejected_duplicate_batch_ordinal = true;
+    }
+    assert(rejected_duplicate_batch_ordinal);
 
     std::array<std::uint8_t, 16> bits_a{};
     std::array<std::uint8_t, 16> bits_b{};
