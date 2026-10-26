@@ -191,7 +191,8 @@ def _prepare_turbovec_index_candidates_v1(
         raise ValueError("TURBOVEC_INDEX_CANDIDATES_MUST_NOT_BE_EMPTY")
     assignment_revisions = {row.cluster_assignment_revision for row in rows}
     assignment_presence = {row.kmeans_cluster_id is not None for row in rows}
-    if len(assignment_revisions) != 1 or len(assignment_presence) != 1:
+    som_presence = {row.som_bmu_id is not None for row in rows}
+    if len(assignment_revisions) != 1 or len(assignment_presence) != 1 or len(som_presence) != 1:
         raise ValueError("TURBOVEC_INDEX_CLUSTER_ASSIGNMENT_COHORT_MISMATCH")
     if not _SHA256_REVISION_RE.fullmatch(spec.workspace_revision):
         raise ValueError("TURBOVEC_INDEX_WORKSPACE_REVISION_INVALID")
@@ -239,13 +240,8 @@ def _prepare_turbovec_index_candidates_v1(
             raise ValueError(f"TURBOVEC_INDEX_TAXONOMY_REVISION_INVALID:{row_number}")
         if not all((row.packet_key, row.domain_id, row.feature_id, row.feature_label)):
             raise ValueError(f"TURBOVEC_INDEX_FEATURE_BINDING_INCOMPLETE:{row_number}")
-        assignment_fields = (
-            row.kmeans_cluster_id,
-            row.som_bmu_id,
-            row.cluster_assignment_revision,
-        )
-        if any(value is not None for value in assignment_fields) and not all(
-            value is not None for value in assignment_fields
+        if (row.kmeans_cluster_id is None) != (row.cluster_assignment_revision is None) or (
+            row.som_bmu_id is not None and row.kmeans_cluster_id is None
         ):
             raise ValueError(f"TURBOVEC_INDEX_CLUSTER_ASSIGNMENT_INCOMPLETE:{row_number}")
         if row.cluster_assignment_revision is not None and not _SHA256_REVISION_RE.fullmatch(
@@ -297,6 +293,143 @@ def _prepare_turbovec_index_candidates_v1(
         vectors.append(values)
 
     return tuple(identities), np.asarray(vectors, dtype=np.float32, order="C")
+
+
+def attach_kmeans_assignments_to_turbovec_candidates_v1(
+    spec: ResidentIndexBuildSpec,
+    candidates: Iterable[TurboVecIndexCandidateV1],
+    assignment_artifact: dict[str, Any],
+) -> tuple[ResidentIndexBuildSpec, tuple[TurboVecIndexCandidateV1, ...]]:
+    rows = tuple(candidates)
+    if any(
+        row.kmeans_cluster_id is not None
+        or row.som_bmu_id is not None
+        or row.cluster_assignment_revision is not None
+        for row in rows
+    ):
+        raise ValueError("TURBOVEC_CANDIDATES_ALREADY_HAVE_CLUSTER_ASSIGNMENTS")
+    if assignment_artifact.get("schema") != "atlas.kmeans-ordinal-assignments.v1":
+        raise ValueError("KMEANS_ASSIGNMENT_SCHEMA_INVALID")
+    if assignment_artifact.get("authority") != "PROPOSAL_ONLY" or assignment_artifact.get("promotionEligible") is not False:
+        raise ValueError("KMEANS_ASSIGNMENT_AUTHORITY_INVALID")
+    if (
+        assignment_artifact.get("workspaceRevision") != spec.workspace_revision
+        or assignment_artifact.get("representationRevision") != spec.representation_revision
+    ):
+        raise ValueError("KMEANS_ASSIGNMENT_REVISION_SCOPE_MISMATCH")
+
+    identities, vectors = _prepare_turbovec_index_candidates_v1(spec, rows)
+    vector_by_ordinal = {
+        identity.candidate_ordinal: vectors[index]
+        for index, identity in enumerate(identities)
+    }
+    candidate_ordinals = {identity.candidate_ordinal for identity in identities}
+    input_ordinals = assignment_artifact.get("inputCandidateOrdinals")
+    identity_bindings = assignment_artifact.get("candidateIdentityBindings")
+    assignments = assignment_artifact.get("assignments")
+    receipt = assignment_artifact.get("receipt")
+    if (
+        not isinstance(receipt, dict)
+        or not isinstance(input_ordinals, list)
+        or not isinstance(identity_bindings, list)
+        or not isinstance(assignments, list)
+    ):
+        raise ValueError("KMEANS_ASSIGNMENT_ARTIFACT_SHAPE_INVALID")
+    if any(
+        isinstance(ordinal, bool) or not isinstance(ordinal, int) or not 0 <= ordinal <= 0xFFFFFFFF
+        for ordinal in input_ordinals
+    ):
+        raise ValueError("KMEANS_ASSIGNMENT_INPUT_ORDINAL_INVALID")
+    if (
+        receipt.get("rows") != len(rows)
+        or receipt.get("dimensions") != spec.dimension
+        or isinstance(receipt.get("n_clusters"), bool)
+        or not isinstance(receipt.get("n_clusters"), int)
+        or not 1 <= receipt["n_clusters"] <= 0x10000
+        or len(input_ordinals) != len(rows)
+        or len(identity_bindings) != len(rows)
+        or set(input_ordinals) != candidate_ordinals
+        or len(set(input_ordinals)) != len(input_ordinals)
+    ):
+        raise ValueError("KMEANS_ASSIGNMENT_COHORT_MISMATCH")
+
+    candidate_by_ordinal = {row.candidate_ordinal: row for row in rows}
+    for ordinal, binding in zip(input_ordinals, identity_bindings):
+        if not isinstance(binding, dict) or binding.get("candidateOrdinal") != ordinal:
+            raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_ORDINAL_MISMATCH")
+        row = candidate_by_ordinal[ordinal]
+        expected_identity = {
+            "packet_key": row.packet_key,
+            "source_ref": row.source_ref,
+            "source_revision": row.source_revision,
+            "domain_id": row.domain_id,
+            "feature_id": row.feature_id,
+            "feature_label": row.feature_label,
+            "taxonomy_revision": row.taxonomy_revision,
+        }
+        if any(binding.get(key) != value for key, value in expected_identity.items()):
+            raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_BINDING_MISMATCH")
+
+    assignment_by_ordinal: dict[int, int] = {}
+    assignment_order: list[int] = []
+    for assignment in assignments:
+        if not isinstance(assignment, dict):
+            raise ValueError("KMEANS_ASSIGNMENT_ROW_INVALID")
+        ordinal = assignment.get("candidateOrdinal")
+        cluster_id = assignment.get("kmeansClusterId")
+        if (
+            isinstance(ordinal, bool)
+            or not isinstance(ordinal, int)
+            or isinstance(cluster_id, bool)
+            or not isinstance(cluster_id, int)
+            or ordinal not in candidate_ordinals
+            or not 0 <= cluster_id < receipt["n_clusters"]
+            or ordinal in assignment_by_ordinal
+        ):
+            raise ValueError("KMEANS_ASSIGNMENT_ROW_INVALID")
+        assignment_by_ordinal[ordinal] = cluster_id
+        assignment_order.append(ordinal)
+    if set(assignment_by_ordinal) != candidate_ordinals or assignment_order != sorted(assignment_order):
+        raise ValueError("KMEANS_ASSIGNMENT_COHORT_MISMATCH")
+
+    label_bytes = np.ascontiguousarray(
+        [assignment_by_ordinal[ordinal] for ordinal in input_ordinals], dtype=np.int64
+    ).tobytes()
+    if sha256(label_bytes).hexdigest() != receipt.get("labels_checksum"):
+        raise ValueError("KMEANS_ASSIGNMENT_LABEL_CHECKSUM_MISMATCH")
+    input_matrix = np.ascontiguousarray(
+        np.stack([vector_by_ordinal[ordinal] for ordinal in input_ordinals]), dtype=np.float32
+    )
+    if sha256(input_matrix.tobytes()).hexdigest() != receipt.get("input_checksum"):
+        raise ValueError("KMEANS_ASSIGNMENT_INPUT_CHECKSUM_MISMATCH")
+
+    canonical = {
+        "schema": assignment_artifact["schema"],
+        "workspaceRevision": assignment_artifact["workspaceRevision"],
+        "representationRevision": assignment_artifact["representationRevision"],
+        "receipt": receipt,
+        "inputCandidateOrdinals": input_ordinals,
+        "candidateIdentityBindings": identity_bindings,
+        "assignments": assignments,
+    }
+    encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    assignment_revision = "sha256:" + sha256(encoded).hexdigest()
+    if assignment_artifact.get("assignmentRevision") != assignment_revision:
+        raise ValueError("KMEANS_ASSIGNMENT_ARTIFACT_DIGEST_MISMATCH")
+
+    enriched = tuple(
+        dataclass_replace(
+            row,
+            kmeans_cluster_id=assignment_by_ordinal[row.candidate_ordinal],
+            cluster_assignment_revision=assignment_revision,
+        )
+        for row in rows
+    )
+    enriched_spec = dataclass_replace(
+        spec,
+        dataset_checksum_sha256=turbovec_index_dataset_checksum_v1(spec, enriched),
+    )
+    return enriched_spec, enriched
 
 
 class CuvsBackend(Protocol):
