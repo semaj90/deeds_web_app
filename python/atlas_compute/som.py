@@ -10,12 +10,15 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import hashlib
 import json
+import re
 from typing import Any, Sequence
 
 import numpy as np
 
 from .determinism import configure_torch_determinism
 from .rapids_matrix import RapidsKMeansArtifact
+
+_SHA256_REVISION_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 
 
 @dataclass(frozen=True)
@@ -292,6 +295,96 @@ def train_deterministic_som(
         canonical_authority=False,
     )
     return coordinates, codebook, receipt
+
+
+def build_som_ordinal_assignments_v1(
+    coordinates: Any,
+    receipt: SomReceipt,
+    candidate_ordinals: Sequence[int],
+    *,
+    candidate_identity_bindings: Sequence[dict[str, Any]],
+    candidate_vectors: Sequence[Sequence[float]] | np.ndarray,
+    workspace_revision: str,
+    representation_revision: str,
+) -> dict[str, Any]:
+    coords_source = coordinates.detach().cpu().numpy() if hasattr(coordinates, "detach") else coordinates
+    coords = np.ascontiguousarray(coords_source, dtype=np.float32)
+    vectors = np.ascontiguousarray(candidate_vectors, dtype=np.float32)
+    ordinals = list(candidate_ordinals)
+    identities = list(candidate_identity_bindings)
+    if not _SHA256_REVISION_RE.fullmatch(workspace_revision) or not _SHA256_REVISION_RE.fullmatch(representation_revision):
+        raise ValueError("SOM_ASSIGNMENT_REVISION_INVALID")
+    if receipt.canonical_authority or receipt.schema != "atlas.som-receipt.v2":
+        raise ValueError("SOM_ASSIGNMENT_RECEIPT_AUTHORITY_OR_SCHEMA_INVALID")
+    if (
+        coords.shape != (receipt.rows, 2)
+        or vectors.shape != (receipt.rows, receipt.dimensions)
+        or len(ordinals) != receipt.rows
+        or len(identities) != receipt.rows
+    ):
+        raise ValueError("SOM_ASSIGNMENT_COHORT_SHAPE_MISMATCH")
+    if _checksum(coords) != receipt.topology_checksum or _checksum(vectors) != receipt.input_checksum:
+        raise ValueError("SOM_ASSIGNMENT_RECEIPT_CHECKSUM_MISMATCH")
+    if (
+        receipt.grid_rows <= 0
+        or receipt.grid_columns <= 0
+        or receipt.grid_rows * receipt.grid_columns > 400
+        or not np.isfinite(coords).all()
+        or not np.array_equal(coords, np.rint(coords))
+        or np.any(coords[:, 0] < 0)
+        or np.any(coords[:, 0] >= receipt.grid_rows)
+        or np.any(coords[:, 1] < 0)
+        or np.any(coords[:, 1] >= receipt.grid_columns)
+    ):
+        raise ValueError("SOM_ASSIGNMENT_COORDINATE_OUT_OF_RANGE")
+    if any(isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 0xFFFFFFFF for value in ordinals):
+        raise ValueError("SOM_ASSIGNMENT_ORDINAL_INVALID")
+    if len(set(ordinals)) != len(ordinals):
+        raise ValueError("SOM_ASSIGNMENT_ORDINALS_MUST_BE_UNIQUE")
+
+    bound_identities: list[dict[str, Any]] = []
+    identity_fields = (
+        "packetKey", "sourceRef", "sourceRevision", "domainId", "featureId", "featureLabel", "taxonomyRevision"
+    )
+    for index, (ordinal, identity) in enumerate(zip(ordinals, identities)):
+        if not isinstance(identity, dict) or identity.get("candidateOrdinal") != ordinal:
+            raise ValueError("SOM_ASSIGNMENT_IDENTITY_ORDINAL_MISMATCH")
+        if any(not isinstance(identity.get(field), str) or not identity[field] for field in identity_fields):
+            raise ValueError("SOM_ASSIGNMENT_IDENTITY_BINDING_INCOMPLETE")
+        if not _SHA256_REVISION_RE.fullmatch(identity["sourceRevision"]) or not _SHA256_REVISION_RE.fullmatch(identity["taxonomyRevision"]):
+            raise ValueError("SOM_ASSIGNMENT_IDENTITY_REVISION_INVALID")
+        bound_identities.append({
+            **identity,
+            "vectorSha256": hashlib.sha256(vectors[index].tobytes()).hexdigest(),
+        })
+
+    assignments = [
+        {
+            "candidateOrdinal": ordinal,
+            "somRow": int(coords[index, 0]),
+            "somColumn": int(coords[index, 1]),
+            "somBmuId": int(coords[index, 0]) * receipt.grid_columns + int(coords[index, 1]),
+        }
+        for index, ordinal in enumerate(ordinals)
+    ]
+    assignments.sort(key=lambda row: row["candidateOrdinal"])
+    canonical = {
+        "schema": "atlas.som-ordinal-assignments.v1",
+        "workspaceRevision": workspace_revision,
+        "representationRevision": representation_revision,
+        "receipt": receipt.to_dict(),
+        "inputCandidateOrdinals": ordinals,
+        "candidateIdentityBindings": bound_identities,
+        "assignments": assignments,
+    }
+    encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8")
+    return {
+        **canonical,
+        "assignmentRevision": "sha256:" + hashlib.sha256(encoded).hexdigest(),
+        "authority": "PROPOSAL_ONLY",
+        "canonicalAuthority": False,
+        "promotionEligible": False,
+    }
 
 
 def aggregate_som_lattice(

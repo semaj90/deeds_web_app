@@ -11,6 +11,7 @@ from atlas_compute.rapids_matrix import (
     RapidsKMeansReceipt,
     build_kmeans_ordinal_assignments_v1,
 )
+from atlas_compute.som import build_som_ordinal_assignments_v1, train_deterministic_som
 from atlas_cuvs_resident_registry import (
     CorpusIdentity,
     ResidentCuvsIndexRegistry,
@@ -19,6 +20,7 @@ from atlas_cuvs_resident_registry import (
     checksum_identity_order,
     TurboVecIndexCandidateV1,
     attach_kmeans_assignments_to_turbovec_candidates_v1,
+    attach_som_assignments_to_turbovec_candidates_v1,
     turbovec_index_dataset_checksum_v1,
     turbovec_index_representation_revision_v1,
 )
@@ -155,6 +157,7 @@ def test_turbovec_cagra_hnsw_roundtrip_keeps_source_taxonomy_and_ordinals():
             kmeans_cluster_id=2,
             som_bmu_id=3,
             cluster_assignment_revision="sha256:" + "9" * 64,
+            som_assignment_revision="sha256:" + "8" * 64,
         ),
         TurboVecIndexCandidateV1(
             candidate_ordinal=7,
@@ -177,6 +180,7 @@ def test_turbovec_cagra_hnsw_roundtrip_keeps_source_taxonomy_and_ordinals():
             kmeans_cluster_id=1,
             som_bmu_id=9,
             cluster_assignment_revision="sha256:" + "9" * 64,
+            som_assignment_revision="sha256:" + "8" * 64,
         ),
     ]
     representation_revision = turbovec_index_representation_revision_v1(
@@ -332,17 +336,44 @@ def test_rapids_kmeans_assignments_join_turbovec_by_verified_ordinal_and_bytes()
             }
             for row in candidates
         ],
+        candidate_vectors=training_matrix,
         workspace_revision=spec.workspace_revision,
         representation_revision=spec.representation_revision,
     )
     joined_spec, joined_candidates = attach_kmeans_assignments_to_turbovec_candidates_v1(
         spec, candidates, assignments
     )
+    coordinates, _, som_receipt = train_deterministic_som(
+        training_matrix,
+        grid_rows=1,
+        grid_columns=2,
+        epochs=2,
+        device="cpu",
+    )
+    som_assignments = build_som_ordinal_assignments_v1(
+        coordinates,
+        som_receipt,
+        [40, 7],
+        candidate_identity_bindings=assignments["candidateIdentityBindings"],
+        candidate_vectors=training_matrix,
+        workspace_revision=spec.workspace_revision,
+        representation_revision=spec.representation_revision,
+    )
+    joined_spec, joined_candidates = attach_som_assignments_to_turbovec_candidates_v1(
+        joined_spec, joined_candidates, som_assignments
+    )
     by_ordinal = {row.candidate_ordinal: row for row in joined_candidates}
     assert by_ordinal[40].kmeans_cluster_id == 0
     assert by_ordinal[7].kmeans_cluster_id == 1
     assert by_ordinal[40].cluster_assignment_revision == assignments["assignmentRevision"]
+    assert by_ordinal[40].som_bmu_id is not None
+    assert by_ordinal[40].som_assignment_revision == som_assignments["assignmentRevision"]
     assert joined_spec.dataset_checksum_sha256 != spec.dataset_checksum_sha256
+    built = ResidentCuvsIndexRegistry(FakeBackend()).build_turbovec_candidates_v1(
+        joined_spec, joined_candidates
+    )
+    assert built["rows"] == len(candidates)
+    assert built["domainId"] == "domain:retrieval"
 
     tampered = {**assignments, "assignments": [
         {**assignments["assignments"][0], "kmeansClusterId": 0},
@@ -350,6 +381,24 @@ def test_rapids_kmeans_assignments_join_turbovec_by_verified_ordinal_and_bytes()
     ]}
     with pytest.raises(ValueError, match="LABEL_CHECKSUM_MISMATCH"):
         attach_kmeans_assignments_to_turbovec_candidates_v1(spec, candidates, tampered)
+    identity_tamper = {
+        **assignments,
+        "candidateIdentityBindings": [
+            {**assignments["candidateIdentityBindings"][0], "sourceRef": "src/other.ts"},
+            assignments["candidateIdentityBindings"][1],
+        ],
+    }
+    with pytest.raises(ValueError, match="IDENTITY_OR_VECTOR_BINDING_MISMATCH"):
+        attach_kmeans_assignments_to_turbovec_candidates_v1(spec, candidates, identity_tamper)
+    vector_tamper = {
+        **assignments,
+        "candidateIdentityBindings": [
+            {**assignments["candidateIdentityBindings"][0], "vectorSha256": "0" * 64},
+            assignments["candidateIdentityBindings"][1],
+        ],
+    }
+    with pytest.raises(ValueError, match="IDENTITY_OR_VECTOR_BINDING_MISMATCH"):
+        attach_kmeans_assignments_to_turbovec_candidates_v1(spec, candidates, vector_tamper)
 
 
 def test_turbovec_index_checksum_binds_cluster_assignment_and_requires_pair():

@@ -186,6 +186,7 @@ def test_som_rejects_centroid_checksum_or_input_revision_mismatch() -> None:
 
 
 def test_kmeans_labels_bind_to_stable_candidate_ordinals_and_revision() -> None:
+    training_vectors = np.asarray([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], dtype=np.float32)
     labels = np.asarray([1, 0, 1], dtype=np.int64)
     centroids = np.asarray([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
     receipt = RapidsKMeansReceipt(
@@ -199,12 +200,13 @@ def test_kmeans_labels_bind_to_stable_candidate_ordinals_and_revision() -> None:
         iterations=3,
         inertia=0.25,
         labels_checksum=_checksum(labels),
-        input_checksum="a" * 64,
+        input_checksum=_checksum(training_vectors),
         centroids_checksum=_checksum(centroids),
         canonical_authority=False,
     )
     artifact = RapidsKMeansArtifact(receipt=receipt, centroids=centroids, labels=labels)
     kwargs = {
+        "candidate_vectors": training_vectors,
         "candidate_identity_bindings": [
             {
                 "candidateOrdinal": ordinal,

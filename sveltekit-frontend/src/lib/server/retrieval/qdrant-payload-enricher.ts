@@ -90,6 +90,11 @@ export interface EnrichedPayload {
   representation_revision: number | null;
   schema_version: string;
   feature_label: string | null;
+  taxonomy_revision: string | null;
+  parser_language: string | null;
+  language_resolver_revision: string | null;
+  start_byte: number | null;
+  end_byte: number | null;
   graph_revision: string | null;
   projection_revision: string | null;
 
@@ -223,7 +228,9 @@ export class QdrantPayloadEnricher {
 
     const packetRows = sourceRef
       ? await (await getDb()).execute(sql`
-      SELECT packet_key, tree_node_id, feature_label, sha256, metadata, workspace_revision, representation_revision, qdrant_point_id
+      SELECT packet_key, tree_node_id, feature_label, function_symbol, byte_start, byte_end,
+             sha256, metadata, workspace_revision, workspace_revision_key, source_revision,
+             representation_revision, qdrant_point_id
       FROM atlas_packets
       WHERE source_ref = ${sourceRef}
          OR canonical_source_ref = ${sourceRef}
@@ -400,8 +407,12 @@ export function buildEnrichedPayload(
     ) ?? 'atlas.qdrant.payload.v1';
   const workspaceRevision =
     pickTextOrNumber(
+      packet?.workspace_revision_key,
+      packet?.workspaceRevisionKey,
       packet?.workspace_revision,
       packet?.workspaceRevision,
+      packetMetadata.workspace_revision_key,
+      packetMetadata.workspaceRevisionKey,
       packetMetadata.workspace_revision,
       packetMetadata.workspaceRevision,
       chunkMetadata.workspace_revision,
@@ -412,6 +423,8 @@ export function buildEnrichedPayload(
     );
   const sourceRevision =
     pickString(
+      packet?.source_revision,
+      packet?.sourceRevision,
       packetMetadata.source_revision,
       packetMetadata.sourceRevision,
       packetMetadata.source_revision_id,
@@ -425,6 +438,58 @@ export function buildEnrichedPayload(
       chunk.source_revision_id,
       chunk.sourceRevisionId
     );
+  const taxonomyRevision = pickString(
+    packet?.taxonomy_revision,
+    packet?.taxonomyRevision,
+    packetMetadata.taxonomy_revision,
+    packetMetadata.taxonomyRevision,
+    chunkMetadata.taxonomy_revision,
+    chunkMetadata.taxonomyRevision,
+    chunk.taxonomy_revision,
+    chunk.taxonomyRevision
+  );
+  const parserLanguage = pickString(
+    packetMetadata.parser_language,
+    packetMetadata.parserLanguage,
+    chunkMetadata.parser_language,
+    chunkMetadata.parserLanguage,
+    chunk.parser_language,
+    chunk.parserLanguage
+  );
+  const languageResolverRevision = pickString(
+    packetMetadata.language_resolver_revision,
+    packetMetadata.languageResolverRevision,
+    chunkMetadata.language_resolver_revision,
+    chunkMetadata.languageResolverRevision,
+    chunk.language_resolver_revision,
+    chunk.languageResolverRevision
+  );
+  const rawStartByte = pickNumber(
+    packet?.byte_start,
+    packet?.byteStart,
+    packetMetadata.start_byte,
+    packetMetadata.startByte,
+    chunkMetadata.start_byte,
+    chunkMetadata.startByte,
+    chunk.start_byte,
+    chunk.startByte,
+    chunk.byte_start,
+    chunk.byteStart
+  );
+  const rawEndByte = pickNumber(
+    packet?.byte_end,
+    packet?.byteEnd,
+    packetMetadata.end_byte,
+    packetMetadata.endByte,
+    chunkMetadata.end_byte,
+    chunkMetadata.endByte,
+    chunk.end_byte,
+    chunk.endByte,
+    chunk.byte_end,
+    chunk.byteEnd
+  );
+  const hasValidByteSpan = Number.isSafeInteger(rawStartByte) && Number.isSafeInteger(rawEndByte)
+    && rawStartByte! >= 0 && rawEndByte! > rawStartByte!;
   const stableSymbolId =
     pickString(
       packetMetadata.stable_symbol_id,
@@ -615,7 +680,12 @@ export function buildEnrichedPayload(
     representation_id: representationId,
     representation_revision: representationRevision,
     schema_version: schemaVersion,
-    feature_label: packet?.feature_label ?? chunk.feature_label ?? null,
+    feature_label: packet?.feature_label ?? packet?.featureLabel ?? chunk.feature_label ?? chunk.featureLabel ?? null,
+    taxonomy_revision: taxonomyRevision,
+    parser_language: parserLanguage,
+    language_resolver_revision: languageResolverRevision,
+    start_byte: hasValidByteSpan ? rawStartByte : null,
+    end_byte: hasValidByteSpan ? rawEndByte : null,
     graph_revision: graphRevision,
     projection_revision: projectionRevision,
 

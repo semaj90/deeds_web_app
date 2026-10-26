@@ -58,15 +58,23 @@ function makePacketRows(count: number) {
       packet_key: `packet-${index}`,
       tree_node_id: `tree-${index}`,
       feature_label: `Feature ${index}`,
+      function_symbol: `symbol_${index}`,
+      byte_start: index * 10,
+      byte_end: index * 10 + 20,
       sha256: `sha256-${index}`,
       workspace_revision: `1842`,
+      workspace_revision_key: `sha256:${'a'.repeat(64)}`,
+      source_revision: `sha256:${'b'.repeat(64)}`,
       representation_revision: 1,
       qdrant_point_id: `qdrant-${index}`,
       metadata: {
         workspace_id: 'workspace:proof',
         schema_version: 'atlas.qdrant.payload.v1',
         workspace_revision: '1842',
-        source_revision: `source-revision-${index}`,
+        source_revision: `stale-metadata-revision-${index}`,
+        taxonomy_revision: `sha256:${'c'.repeat(64)}`,
+        parser_language: 'typescript',
+        language_resolver_revision: 'atlas.8095-language-resolver.v1',
         stable_symbol_id: `stable-${index}`,
         symbol_version_id: `symbol-version-${index}`,
         representation_id: 'semantic_768',
@@ -114,8 +122,8 @@ describe('QdrantPayloadEnricher', () => {
       expect(payload.qdrant_point_id).toBe(`qdrant-${index}`);
       expect(payload.source_ref).toBe(`src/proof/file-${index}.ts`);
       expect(payload.workspace_id).toBe('workspace:proof');
-      expect(payload.workspace_revision).toBe('1842');
-      expect(payload.source_revision).toBe(`source-revision-${index}`);
+      expect(payload.workspace_revision).toBe(`sha256:${'a'.repeat(64)}`);
+      expect(payload.source_revision).toBe(`sha256:${'b'.repeat(64)}`);
       expect(payload.representation_id).toBe('semantic_768');
       expect(payload.representation_revision).toBe(1);
       expect(payload.schema_version).toBe('atlas.qdrant.payload.v1');
@@ -123,6 +131,12 @@ describe('QdrantPayloadEnricher', () => {
       expect(payload.stable_symbol_id).toBe(`stable-${index}`);
       expect(payload.symbol_version_id).toBe(`symbol-version-${index}`);
       expect(payload.feature_label).toBe(`Feature ${index}`);
+      expect(payload.taxonomy_revision).toBe(`sha256:${'c'.repeat(64)}`);
+      expect(payload.parser_language).toBe('typescript');
+      expect(payload.language_resolver_revision).toBe('atlas.8095-language-resolver.v1');
+      expect(payload.start_byte).toBe(index * 10);
+      expect(payload.end_byte).toBe(index * 10 + 20);
+      expect(payload.symbol).toBe(`symbol_${index}`);
     }
   });
 

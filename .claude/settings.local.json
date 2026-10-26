@@ -644,7 +644,9 @@
       "Bash(wc -l tests/tool-ranker.spec.ts)",
       "Bash(sed -n '1,30p' tests/tool-ranker.spec.ts)",
       "Bash(grep -n \"describe\\(\\\\|it\\(\\\\|vi.mock\" tests/tool-ranker.spec.ts)",
-      "Bash(cat *)"
+      "Bash(cat *)",
+      "Bash(git -C .. log -1 --format=%cd -- sveltekit-frontend/docs/graph)",
+      "Skill(atlas-tools-mcp)"
     ],
     "deny": [],
     "ask": []

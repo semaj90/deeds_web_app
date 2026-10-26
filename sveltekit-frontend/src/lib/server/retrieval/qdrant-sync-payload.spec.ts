@@ -54,6 +54,34 @@ describe('buildQdrantSyncPayload canonical lineage contract', () => {
     expect(payload.graph_revision).toBe('d'.repeat(64));
   });
 
+  it('uses workspace revision keys and preserves feature, parser, taxonomy, and source-span lineage', () => {
+    const taxonomyRevision = `sha256:${'d'.repeat(64)}`;
+    const payload = buildQdrantSyncPayload({
+      ...validPacket,
+      workspaceRevision: 41,
+      workspaceRevisionKey: workspaceRevision,
+      featureLabel: 'Retrieval Ranking',
+      byteStart: 12,
+      byteEnd: 64,
+      functionSymbol: 'rankCandidates',
+      metadata: {
+        taxonomy_revision: taxonomyRevision,
+        parser_language: 'typescript',
+        language_resolver_revision: 'atlas.8095-language-resolver.v1',
+      },
+    });
+    expect(payload).toMatchObject({
+      workspace_revision: workspaceRevision,
+      feature_label: 'Retrieval Ranking',
+      taxonomy_revision: taxonomyRevision,
+      parser_language: 'typescript',
+      language_resolver_revision: 'atlas.8095-language-resolver.v1',
+      start_byte: 12,
+      end_byte: 64,
+      symbol: 'rankCandidates',
+    });
+  });
+
   it('rejects a numeric cache epoch masquerading as canonical workspace revision', () => {
     expect(() => buildQdrantSyncPayload({
       ...validPacket,

@@ -226,6 +226,7 @@ def build_kmeans_ordinal_assignments_v1(
     candidate_ordinals: Sequence[int],
     *,
     candidate_identity_bindings: Sequence[dict[str, Any]],
+    candidate_vectors: Sequence[Sequence[float]] | np.ndarray,
     workspace_revision: str,
     representation_revision: str,
 ) -> dict[str, Any]:
@@ -241,6 +242,11 @@ def build_kmeans_ordinal_assignments_v1(
     identities = list(candidate_identity_bindings)
     if len(identities) != len(ordinals):
         raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_COUNT_MISMATCH")
+    vectors = np.ascontiguousarray(candidate_vectors, dtype=np.float32)
+    if vectors.ndim != 2 or vectors.shape != (receipt.rows, receipt.dimensions):
+        raise ValueError("KMEANS_ASSIGNMENT_VECTOR_SHAPE_MISMATCH")
+    if _checksum_array(vectors) != receipt.input_checksum:
+        raise ValueError("KMEANS_ASSIGNMENT_VECTOR_CHECKSUM_MISMATCH")
     if any(isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 0xFFFFFFFF for value in ordinals):
         raise ValueError("KMEANS_ASSIGNMENT_ORDINAL_INVALID")
     if len(set(ordinals)) != len(ordinals):
@@ -249,13 +255,18 @@ def build_kmeans_ordinal_assignments_v1(
         "candidateOrdinal", "packetKey", "sourceRef", "sourceRevision", "domainId",
         "featureId", "featureLabel", "taxonomyRevision",
     )
-    for ordinal, identity in zip(ordinals, identities):
+    bound_identities: list[dict[str, Any]] = []
+    for index, (ordinal, identity) in enumerate(zip(ordinals, identities)):
         if not isinstance(identity, dict) or identity.get("candidateOrdinal") != ordinal:
             raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_ORDINAL_MISMATCH")
         if any(not isinstance(identity.get(field), str) or not identity[field] for field in required_identity_fields[1:]):
             raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_BINDING_INCOMPLETE")
         if not _SHA256_REVISION_RE.fullmatch(identity["sourceRevision"]) or not _SHA256_REVISION_RE.fullmatch(identity["taxonomyRevision"]):
             raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_REVISION_INVALID")
+        bound_identities.append({
+            **identity,
+            "vectorSha256": hashlib.sha256(vectors[index].tobytes()).hexdigest(),
+        })
 
     assignments = [
         {"candidateOrdinal": ordinal, "kmeansClusterId": int(label)}
@@ -267,7 +278,7 @@ def build_kmeans_ordinal_assignments_v1(
         "representationRevision": representation_revision,
         "receipt": receipt.to_dict(),
         "inputCandidateOrdinals": ordinals,
-        "candidateIdentityBindings": identities,
+        "candidateIdentityBindings": bound_identities,
         "assignments": assignments,
     }
     encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
