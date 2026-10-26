@@ -1,7 +1,7 @@
 /**
  * src/routes/api/llm/gemma4-chat-clean/+server.ts
  *
- * Wrapper for Gemma4 chat completions that sanitizes leaked thinking blocks.
+ * Wrapper for local llama-server chat completions that sanitizes leaked reasoning blocks.
  *
  * Proxies requests to llama-server :8090/v1/chat/completions
  * and strips <|channel>thought...thought|> blocks from responses.
@@ -9,10 +9,17 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { sanitizeGemma4Summary } from '../../../../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
+import { sanitizeOrnithSummary } from '../../../../../../scripts/atlas/lib/ornith-summary-sanitizer.mjs';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const LLAMA_SERVER = 'http://127.0.0.1:8090';
+const LLAMA_SERVER = (ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
+
+// Unsafe output (unclosed reasoning, leftover markers) is never passed on as an answer.
+function cleanChoiceContent(content: string): string {
+  const sanitized = sanitizeOrnithSummary(content);
+  return sanitized.safe ? sanitized.summary : '';
+}
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
@@ -39,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
           ? {
               ...choice.message,
               content: choice.message.content
-                ? sanitizeGemma4Summary(choice.message.content).summary
+                ? cleanChoiceContent(choice.message.content)
                 : undefined,
             }
           : undefined,
