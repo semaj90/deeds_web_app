@@ -13,7 +13,17 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 const { Pool } = pg;
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const FRONTEND = path.join(ROOT, 'sveltekit-frontend');
-const REPORT = path.join(ROOT, 'docs', 'reports', 'atlas-migration-owner-audit-v1.json');
+const outputIndex = process.argv.indexOf('--output');
+const outputValue = outputIndex >= 0 ? process.argv[outputIndex + 1] : null;
+const scratchReportRoot = path.resolve(ROOT, '.tmp', 'atlas');
+const defaultReport = path.join(ROOT, 'docs', 'reports', 'atlas-migration-owner-audit-v1.json');
+if (outputIndex >= 0 && !outputValue) throw new Error('--output requires a path under .tmp/atlas');
+const requestedReport = outputValue ? path.resolve(ROOT, outputValue) : defaultReport;
+const outputRelativeToScratch = path.relative(scratchReportRoot, requestedReport);
+if (outputValue && (outputRelativeToScratch === '..' || outputRelativeToScratch.startsWith(`..${path.sep}`) || path.isAbsolute(outputRelativeToScratch))) {
+  throw new Error('--output must stay under .tmp/atlas');
+}
+const REPORT = requestedReport;
 
 const targets = [
   {

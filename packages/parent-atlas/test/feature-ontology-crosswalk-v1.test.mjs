@@ -31,15 +31,52 @@ test('crosswalk classifies a feature without treating source paths as feature id
 test('crosswalk preserves many-to-many implementation evidence and marks missing revisions', () => {
   const result = deriveFeatureOntologyCrosswalk(base);
   assert.equal(result.implementations.length, 4);
-  assert.equal(result.implementations[0].bindingStatus, 'UNVERIFIED_SOURCE_REVISION');
+  assert.equal(result.implementations[0].bindingStatus, 'UNVERIFIED_SOURCE_BINDING');
   assert.ok(result.implementations.some((item) => item.role === 'TEST'));
   assert.deepEqual(result.dependencies, []);
 });
 
-test('revision-qualified source bindings are retained when supplied', () => {
+test('feature-level revisions do not qualify unrelated implementation paths', () => {
   const result = deriveFeatureOntologyCrosswalkRows([{ ...base, source_revision: `sha256:${'b'.repeat(64)}` }]);
-  assert.equal(result.records[0].implementations.every((item) => item.sourceRevision?.startsWith('sha256:')), true);
+  assert.equal(result.records[0].implementations.every((item) => item.sourceRevision === null), true);
+  assert.equal(result.records[0].implementations.every((item) => item.bindingStatus === 'UNVERIFIED_SOURCE_BINDING'), true);
   assert.equal(result.records[0].classification.status, 'CLASSIFIED');
+});
+
+test('only exact source and workspace binding readbacks qualify implementations', () => {
+  const sourceRevision = `sha256:${'c'.repeat(64)}`;
+  const workspaceRevision = `sha256:${'d'.repeat(64)}`;
+  const result = deriveFeatureOntologyCrosswalk(base, {
+    workspaceRevision,
+    sourceBindings: [{
+      canonical_source_ref: 'src/lib/server/auth.ts',
+      source_revision: sourceRevision,
+      workspace_revision: workspaceRevision,
+      content_digest: sourceRevision,
+      binding_checksum: `sha256:${'e'.repeat(64)}`,
+    }],
+  });
+  const matched = result.implementations.find((item) => item.sourceRef === 'src/lib/server/auth.ts');
+  const unmatched = result.implementations.find((item) => item.sourceRef === 'src/routes/api/auth/session/+server.ts');
+  assert.equal(matched.sourceRevision, sourceRevision);
+  assert.equal(matched.workspaceRevision, workspaceRevision);
+  assert.equal(matched.bindingStatus, 'SOURCE_BINDING_MATCHED');
+  assert.equal(unmatched.sourceRevision, null);
+  assert.equal(unmatched.bindingStatus, 'UNVERIFIED_SOURCE_BINDING');
+});
+
+test('bindings from another workspace cannot qualify an implementation', () => {
+  const result = deriveFeatureOntologyCrosswalk(base, {
+    workspaceRevision: `sha256:${'d'.repeat(64)}`,
+    sourceBindings: [{
+      canonical_source_ref: 'src/lib/server/auth.ts',
+      source_revision: `sha256:${'c'.repeat(64)}`,
+      workspace_revision: `sha256:${'f'.repeat(64)}`,
+      content_digest: `sha256:${'c'.repeat(64)}`,
+      binding_checksum: `sha256:${'e'.repeat(64)}`,
+    }],
+  });
+  assert.equal(result.implementations.find((item) => item.sourceRef === 'src/lib/server/auth.ts').bindingStatus, 'UNVERIFIED_SOURCE_BINDING');
 });
 
 test('unknown feature vocabulary remains unverified instead of receiving a guessed domain', () => {

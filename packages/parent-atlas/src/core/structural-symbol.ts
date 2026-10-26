@@ -227,6 +227,8 @@ export const structuralReferenceFactSchema = z.object({
   reference_kind: structuralReferenceKindSchema,
   source_ref: z.string().min(1),
   source_revision: revision,
+  target_source_ref: z.string().min(1).optional(),
+  target_source_revision: revision.optional(),
   workspace_revision: revision,
   upstream_source_node_id: id,
   upstream_target_node_id: id.optional(),
@@ -240,7 +242,15 @@ export const structuralReferenceFactSchema = z.object({
   evidence_refs: z.array(id).default([]),
   extractor: z.enum(['treesitter_chunker', 'ast_grep', 'framework_adapter']),
   extractor_revision: revision,
-}).strict();
+}).strict().superRefine((fact, context) => {
+  if (Boolean(fact.target_source_ref) !== Boolean(fact.target_source_revision)) {
+    context.addIssue({
+      code: 'custom',
+      message: 'TARGET_SOURCE_REF_AND_REVISION_MUST_BE_PROVIDED_TOGETHER',
+      path: ['target_source_ref'],
+    });
+  }
+});
 
 export const frameworkEntityNominationSchema = z.object({
   schema: z.literal('atlas.framework-entity-nomination.v1').default('atlas.framework-entity-nomination.v1'),

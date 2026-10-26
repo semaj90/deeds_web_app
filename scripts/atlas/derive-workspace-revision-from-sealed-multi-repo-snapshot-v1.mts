@@ -3,7 +3,7 @@
 /** Read-only derivation of a multi-repository workspace revision candidate. */
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat, mkdir, writeFile } from 'node:fs/promises';
-import { dirname, extname, resolve } from 'node:path';
+import { dirname, extname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash as sha256Hash } from 'node:crypto';
 import { sealReadbackFromReceiptV1, validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
@@ -29,6 +29,19 @@ const readbackArg = argValue('--readback');
 // WSR-08b: `--seal-readback=<reseal receipt>` binds a sealed snapshot to its seal-time readback evidence
 // instead of re-reading live bytes (needed once the workspace has moved on). Default stays the live readback.
 const sealReadbackArg = argValue('--seal-readback');
+// `--source-read-root=<materialized snapshot dir>` validates the sealed snapshot against its own
+// materialized bytes (same contract as the hygiene audit) instead of the live working tree.
+const sourceReadRootArg = argValue('--source-read-root');
+let sourceReadRoot: string | undefined;
+if (sourceReadRootArg) {
+  const materializedRoot = resolve(ROOT, sourceReadRootArg);
+  const materializedBase = resolve(ROOT, '.tmp/workspace-source-snapshots');
+  const materializedRelative = relative(materializedBase, materializedRoot);
+  if (!materializedRelative || materializedRelative.startsWith('..') || resolve(materializedRoot) === materializedBase) {
+    throw new Error('SOURCE_READ_ROOT_MUST_BE_MATERIALIZED_SNAPSHOT');
+  }
+  sourceReadRoot = materializedRoot;
+}
 let readback;
 if (sealReadbackArg) {
   const receiptBytes = await readFile(resolve(ROOT, sealReadbackArg));
@@ -36,7 +49,7 @@ if (sealReadbackArg) {
 } else {
   readback = readbackArg
     ? JSON.parse(await readFile(resolve(ROOT, readbackArg), 'utf8'))
-    : validateSnapshot(snapshot);
+    : validateSnapshot(snapshot, sourceReadRoot ? { sourceReadRoot } : undefined);
 }
 const sources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
 const repositories = Array.isArray(snapshot.repositories) ? snapshot.repositories : [];

@@ -20,7 +20,7 @@
  *     --dry-run
  *
  *   node scripts/atlas/project-feature-matrix-neo4j.mjs \
- *     --input tmp/chunks/error-context-rg.ndjson
+ *   node scripts/atlas/project-feature-matrix-neo4j.mjs --input tmp/chunks/error-context-rg.ndjson --apply
  *
  * Env:
  *   NEO4J_URI      default bolt://localhost:7687
@@ -38,7 +38,8 @@ const ROOT  = path.resolve(__dir, '../..');
 // ── Args ─────────────────────────────────────────────────────────────────────
 const argv      = process.argv.slice(2);
 const inputI    = argv.indexOf('--input');
-const DRY_RUN   = argv.includes('--dry-run');
+const APPLY     = argv.includes('--apply');
+const DRY_RUN   = !APPLY;
 const VERBOSE   = argv.includes('--verbose');
 
 const INPUT_PATH = inputI >= 0 ? argv[inputI + 1] : null;
@@ -117,6 +118,10 @@ function deriveFeatureKey(tags, sourcePath) {
 }
 
 async function main() {
+  if (APPLY && argv.includes('--dry-run')) {
+    throw new Error('Choose either the default dry run or --apply, not both.');
+  }
+
   if (!INPUT_PATH) {
     console.error('[neo4j-matrix] --input required');
     process.exit(1);
@@ -180,7 +185,9 @@ async function main() {
         edgesCreated += 2;
       }
 
-      process.stdout.write(`\r[neo4j-matrix] ${i + 1}/${records.length}  nodes=${nodesCreated} edges=${edgesCreated}  `);
+      if ((i + 1) % 1000 === 0 || i === records.length - 1) {
+        process.stdout.write(`\r[neo4j-matrix] ${i + 1}/${records.length}  nodes=${nodesCreated} edges=${edgesCreated}  `);
+      }
     }
   } finally {
     if (session) await session.close();

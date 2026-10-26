@@ -23,6 +23,12 @@ export async function mapWithConcurrency(items, limit, mapper) {
   return results;
 }
 
+export function duplicateHashLimitBytes(kind) {
+  if (kind === 'evidence_run') return 200 * 1024 * 1024;
+  if (kind === 'arrow_artifact') return 512 * 1024 * 1024;
+  return 50 * 1024 * 1024;
+}
+
 export function groupDuplicateCandidatesBySize(entries) {
   const bySize = new Map();
   for (const entry of entries) {

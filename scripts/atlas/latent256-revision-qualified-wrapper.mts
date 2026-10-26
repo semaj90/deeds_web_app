@@ -87,6 +87,7 @@ const CHECKPOINT_PATH = resolve(
   ROOT,
   'python', 'checkpoints', 'nested_semantic_autoencoder_v3_full01.pt',
 );
+const PRODUCER_BATCH_SIZE = 2000;
 const RECEIPT_PATH = resolve(
   ROOT,
   'docs', 'reports', 'latent-autoencoder-training-receipt-v3-full01.json',
@@ -302,6 +303,15 @@ function loadAndVerifyCorpusBundle(path: string): CorpusBundleReport {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+
+function resolvePythonExecutable(): string {
+  const explicit = process.env.ATLAS_PYTHON_EXE || process.env.PYTHON_EXE;
+  if (explicit && explicit.trim()) return explicit.trim();
+  const winPy = resolve(ROOT, '.venv', 'Scripts', 'python.exe');
+  const unixPy = resolve(ROOT, '.venv', 'bin', 'python');
+  return existsSync(winPy) ? winPy : existsSync(unixPy) ? unixPy : 'python';
+}
+
 async function main(): Promise<void> {
   const { bundle: corpusBundle, eligibleIds: bundleEligibleIds } = loadAndVerifyCorpusBundle(corpusBundlePath);
   let explicitCohortIds: string[] | undefined;
@@ -424,6 +434,8 @@ async function main(): Promise<void> {
         '--checkpoint', CHECKPOINT_PATH,
         '--receipt', RECEIPT_PATH,
         '--limit', String(APPLY ? LIMIT : eligibleCount),
+        '--batch-size', String(PRODUCER_BATCH_SIZE),
+        '--architecture-receipt', resolve(ROOT, 'docs', 'reports', 'latent-checkpoint-architecture-receipt.json'),
       ];
       if (LIMIT > 0) {
         const idsFile = resolve(ROOT, 'docs', 'reports', `latent-phase16-cohort-${LIMIT}.json`);
@@ -433,7 +445,7 @@ async function main(): Promise<void> {
       if (APPLY) pyArgs.push('--apply');
 
       const exitCode: number = await new Promise((resolvePromise) => {
-        const child = spawn('python', pyArgs, { stdio: 'inherit' });
+        const child = spawn(resolvePythonExecutable(), pyArgs, { stdio: 'inherit' });
         child.on('exit', (code) => resolvePromise(code ?? 1));
         child.on('error', (err) => {
           console.error(`❌ Failed to spawn python: ${err.message}`);
@@ -507,7 +519,9 @@ async function main(): Promise<void> {
 
       rowCount: bundleEligibleIds.length,
       eligibleCount,
-      processedCount: LIMIT > 0 ? eligibleIds.length : (APPLY ? eligibleIds.length : 0),
+      processedCount: APPLY
+        ? eligibleIds.length
+        : Math.min(eligibleIds.length, PRODUCER_BATCH_SIZE),
       writtenCount,
       unchangedCount: 0,
       rejectedCount: 0,
@@ -528,14 +542,22 @@ async function main(): Promise<void> {
     const outPath = resolve(outDir, `latent-phase16-representation-artifact-${runId}.json`);
     writeFileSync(outPath, JSON.stringify(parsed, null, 2));
 
+    const remainingEligibleCount = Math.max(0, eligibleCount - (APPLY ? eligibleIds.length : Math.min(eligibleIds.length, PRODUCER_BATCH_SIZE)));
+
     console.log(JSON.stringify({
       event: 'latent256_wrapper_complete',
       status: APPLY ? 'BACKFILL_APPLY_PROVEN' : 'BACKFILL_DRY_RUN_PROVEN',
       mode: APPLY ? 'APPLY' : 'DRY_RUN',
       eligibleCount,
+      processedCount: APPLY ? eligibleIds.length : Math.min(eligibleIds.length, PRODUCER_BATCH_SIZE),
+      remainingEligibleCount,
+      intentionalProducerBatchSize: PRODUCER_BATCH_SIZE,
+      reconciliationNote: remainingEligibleCount > 0
+        ? `${remainingEligibleCount} eligible records remain unprocessed because dry-run is intentionally bounded by PRODUCER_BATCH_SIZE=${PRODUCER_BATCH_SIZE}.`
+        : 'All eligible records processed.',
       writtenCount,
       receiptPath: outPath,
-      artifactDigest,
+      artifactDigest: parsed.artifactDigest,
     }));
   } finally {
     await pool.end();

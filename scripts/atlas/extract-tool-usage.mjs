@@ -2,17 +2,25 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createGraphifySnapshotEvidenceBinderV1 } from './lib/graphify-snapshot-evidence-binder-v1.mjs';
+import { buildToolEdgeProposalV1 } from '../packets/tool-edge-proposal-v1.mjs';
+import { resolveProposalOutputDirV1 } from './lib/proposal-output-dir-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
-const svelteRoot = path.join(projectRoot, 'sveltekit-frontend');
-const OUT_DIR = path.join(projectRoot, 'scripts/atlas/out');
-
+const admission = JSON.parse(fs.readFileSync(path.join(projectRoot, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+const manifestPath = path.resolve(projectRoot, admission.manifestPath ?? '');
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+const snapshotRoot = path.join(projectRoot, '.tmp/workspace-source-snapshots', manifest.snapshotRevision.replace(/^sha256:/, ''));
+const sourceEvidenceBinder = createGraphifySnapshotEvidenceBinderV1({ admission, manifest, snapshotRoot });
+const svelteRoot = path.join(snapshotRoot, 'sveltekit-frontend');
 const args = process.argv.slice(2);
 const DRY_RUN = !args.includes('--write');
 const SAMPLE_ONLY = args.includes('--sample');
+const outputDirArg = args.find((arg) => arg.startsWith('--output-dir='))?.slice('--output-dir='.length);
+const OUT_DIR = resolveProposalOutputDirV1(projectRoot, outputDirArg);
 
-if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
+if (!DRY_RUN && !fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 
 function walk(dir, results = []) {
   if (!fs.existsSync(dir)) return results;
@@ -43,12 +51,13 @@ async function main() {
   const sampledApiFiles = SAMPLE_ONLY ? allApiFiles.slice(0, 50) : allApiFiles;
 
   for (const file of sampledApiFiles) {
-    const relPath = path.relative(projectRoot, file).replace(/\\/g, '/');
+    const relPath = path.relative(snapshotRoot, file).replace(/\\/g, '/');
     const apiPath = `/api${relPath.replace(/sveltekit-frontend\/src\/routes\/api|\/\+server\.(ts|js)/g, '')}`;
 
     edges.push({
       source_file: relPath,
-      line_num: 1,
+      line_num: null,
+      evidence_scope: 'FILE',
       caller: 'api-handler',
       tool: apiPath,
       endpoint: apiPath,
@@ -66,11 +75,12 @@ async function main() {
   for (const file of toolFiles) {
     const basename = path.basename(file, path.extname(file));
     if (basename === 'index' || basename === 'LLMS') continue;
-    const relPath = path.relative(projectRoot, file).replace(/\\/g, '/');
+    const relPath = path.relative(snapshotRoot, file).replace(/\\/g, '/');
 
     edges.push({
       source_file: relPath,
-      line_num: 1,
+      line_num: null,
+      evidence_scope: 'FILE',
       caller: 'tool-registry',
       tool: basename,
       endpoint: `tool://${basename}`,
@@ -90,7 +100,7 @@ async function main() {
   const toolRefRegex = /\b(atlas-tools|trace-mcp|langextract|mcpClient|traceMcpClient)\b/gi;
 
   for (const file of allSrcFiles) {
-    const relPath = path.relative(projectRoot, file).replace(/\\/g, '/');
+    const relPath = path.relative(snapshotRoot, file).replace(/\\/g, '/');
     // Skip test files, outputs, and build products
     if (relPath.includes('/__tests__/') || relPath.includes('.spec.ts') || relPath.includes('.test.ts')) continue;
 
@@ -105,6 +115,7 @@ async function main() {
         edges.push({
           source_file: relPath,
           line_num: index + 1,
+          evidence_scope: 'LINE',
           caller: 'code-invocation',
           tool: match[1],
           endpoint: `tool://${match[1]}`,
@@ -119,6 +130,7 @@ async function main() {
         edges.push({
           source_file: relPath,
           line_num: index + 1,
+          evidence_scope: 'LINE',
           caller: 'system-reference',
           tool: 'mcp-system',
           endpoint: 'system://mcp',
@@ -135,16 +147,23 @@ async function main() {
   const outputFile = path.join(OUT_DIR, 'tool-usage-edges.ndjson');
 
   let ndjson = '';
+  let snapshotBoundProposals = 0;
+  let reviewRequiredProposals = 0;
   for (const edge of edges) {
-    ndjson += JSON.stringify(edge) + '\n';
+    const sourceEvidence = sourceEvidenceBinder.read({ sourceRef: edge.source_file, lineNumber: edge.line_num });
+    const proposal = buildToolEdgeProposalV1(edge, edge.source_file, { sourceEvidence });
+    if (proposal.workspace_revision === admission.workspaceRevision && proposal.source_revision && proposal.evidence.source_content_digest) snapshotBoundProposals++;
+    if (proposal.admission_status === 'REVIEW_REQUIRED' && proposal.canonical_authority === false) reviewRequiredProposals++;
+    ndjson += JSON.stringify({ ...edge, proposal }) + '\n';
   }
 
   if (DRY_RUN) {
     console.log(`[DRY-RUN] Would write ${outputFile}`);
+    console.log(`[PROPOSAL-LINEAGE] ${snapshotBoundProposals}/${edges.length} snapshot-bound; ${reviewRequiredProposals}/${edges.length} review-required; canonical writes=0`);
     console.log(`[SAMPLE] First 5 edges:`);
     edges.slice(0, 5).forEach(e => console.log(JSON.stringify(e)));
   } else {
-    fs.writeFileSync(outputFile, ndjson);
+    fs.writeFileSync(outputFile, ndjson, outputDirArg ? { flag: 'wx' } : undefined);
     console.log(`[WRITE] ✓ ${outputFile}`);
   }
 

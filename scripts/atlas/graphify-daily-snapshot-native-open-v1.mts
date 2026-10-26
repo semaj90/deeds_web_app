@@ -152,7 +152,7 @@ async function main() {
       || descriptor.workspaceRevision !== admission.workspaceRevision
       || descriptor.snapshotRevision !== admission.snapshotRevision
       || resolve(descriptor.materializedRoot ?? '') !== materializedRoot
-      || descriptor.sourceCount !== snapshot.sources.length
+      || (descriptor.sourceCount !== snapshot.sources.length && descriptor.sourceCount !== admission.sourceCount)
       || descriptor.repositoryCount !== new Set(sourceRowsRepositoryIds(snapshot.sources)).size
       || descriptor.selectionChecksum !== admission.sourceSelectionChecksum) {
       throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_SOURCE_DESCRIPTOR_MISMATCH');
