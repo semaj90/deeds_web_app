@@ -46,7 +46,8 @@ canonical identity. `WRITTEN != WIRED != PROVEN`.
   graph, exact symbol and mutation freshness.
 - [x] Predict bounded candidate / graph-hop / rerank budgets.
 - [x] Classification output has `evidenceAuthority=false`.
-- [ ] Execute schema tests.
+- [x] Execute schema tests. `npm run test -- --run src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts` passed 7/7 on 2026-10-26.
+- [ ] Compose QueryClassificationV2 with the existing concept-extraction and ontology-lookup owners into a bounded, revision-qualified query context. Carry topic/concept IDs, grounded entity spans/evidence refs, taxonomy/ontology revision, and confidence; keep unsupported guesses proposal-only and do not add a second classifier or retrieval vote.
 
 ## NLP-2 — deterministic query/POS-like feature projection
 

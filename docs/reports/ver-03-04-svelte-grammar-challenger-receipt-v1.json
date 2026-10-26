@@ -1,0 +1,150 @@
+{
+  "schema": "ver-03-04-svelte-grammar-challenger-receipt-v1",
+  "generated_at": "2026-10-26T18:32:00.000Z",
+  "gate": "VER-03-04",
+  "mode": "READ_ONLY_CHALLENGER_EVALUATION",
+  "authority": false,
+  "writesPerformed": false,
+  "challenger": {
+    "source": "https://github.com/sveltejs/tree-sitter-svelte",
+    "commit": "e36b60c145a4fd52a29e8b40a75174638d61f170",
+    "libraryPath": ".tmp/atlas/svelte-grammar-challenger/lib/tree-sitter-svelte-fork.so",
+    "librarySha256": "5137f7e98bcdb8de2cedf62f26befe94b44a609600a74b7cfb08030a2780b133",
+    "astGrepVersion": "0.45.3 linux (WSL)",
+    "treeSitterVersion": "0.26.0 (python / gcc 13.3.0)"
+  },
+  "svelte5Fixture": {
+    "path": ".tmp/atlas/svelte-grammar-challenger/fixtures/svelte5-challenger.svelte",
+    "parseErrors": 0,
+    "snippetCount": 1,
+    "renderCount": 1,
+    "excludedSvelteElements": [
+      "svelte:head"
+    ],
+    "regularElementsCount": 6
+  },
+  "baselineComparison": {
+    "totalFiles": 10,
+    "agree": 8,
+    "parseErrors": 2,
+    "results": [
+      {
+        "file": "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte",
+        "splitterExpected": 11,
+        "challengerCounted": 11,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": false,
+        "match": true
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/ChatContextPanel.svelte",
+        "splitterExpected": 12,
+        "challengerCounted": 12,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 1,
+        "parseError": false,
+        "match": true
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+        "splitterExpected": 6,
+        "challengerCounted": 6,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": true,
+        "match": false
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/CaseSelector.svelte",
+        "splitterExpected": 10,
+        "challengerCounted": 10,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": false,
+        "match": true
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/ArchivedRoutesPanel.svelte",
+        "splitterExpected": 41,
+        "challengerCounted": 41,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": false,
+        "match": true
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/CanvasEditor.svelte",
+        "splitterExpected": 12,
+        "challengerCounted": 12,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": false,
+        "match": true
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/APITesterModal.svelte",
+        "splitterExpected": 33,
+        "challengerCounted": 33,
+        "excludedSvelteStarExpected": 1,
+        "excludedSvelteStarCounted": 1,
+        "excludedSvelteStarTags": [
+          "svelte:window"
+        ],
+        "scriptStyleCount": 2,
+        "parseError": false,
+        "match": true
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/CaseOutcomePrediction.svelte",
+        "splitterExpected": 146,
+        "challengerCounted": 146,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": true,
+        "match": false
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/ChatMessages.svelte",
+        "splitterExpected": 14,
+        "challengerCounted": 14,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": false,
+        "match": true
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/components/ChatPanel.svelte",
+        "splitterExpected": 17,
+        "challengerCounted": 17,
+        "excludedSvelteStarExpected": 0,
+        "excludedSvelteStarCounted": 0,
+        "excludedSvelteStarTags": [],
+        "scriptStyleCount": 2,
+        "parseError": false,
+        "match": true
+      }
+    ]
+  },
+  "policy": {
+    "svelteStarExcluded": true,
+    "rationale": "The splitter counts only RegularElement and Component; svelte:* special elements are excluded by design and reported separately."
+  },
+  "status": "CHALLENGER_PARTIAL"
+}

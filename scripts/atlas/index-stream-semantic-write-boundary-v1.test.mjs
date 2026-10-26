@@ -52,7 +52,7 @@ test('broad full-repo indexer keeps embeddings in Qdrant and does not write cano
   assert.doesNotMatch(writerMatch[0], /vecStr/);
   const values = writerMatch[0].match(/VALUES\s*\(([^)]*)\)/i);
   assert.ok(values, 'expected positional metadata INSERT values');
-  assert.equal(Math.max(...[...values[1].matchAll(/\$(\d+)/g)].map((m) => Number(m[1]))), 19);
+  assert.equal(Math.max(...[...values[1].matchAll(/\$(\d+)/g)].map((m) => Number(m[1]))), 20);
   assert.match(fullRepoIndexerSource, /await upsertQdrant\(chunk\.qdrant_id, embedding, payload\)/);
   assert.match(fullRepoIndexerSource, /await upsertPostgresMetadata\(pool, chunk\)/);
   assert.doesNotMatch(fullRepoIndexerSource, /upsertPostgresMetadata\(pool, chunk, embedding\)/);

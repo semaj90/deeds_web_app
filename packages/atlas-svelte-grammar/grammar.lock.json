@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.svelte-grammar-lock.v1",
+  "repository": "https://github.com/sveltejs/tree-sitter-svelte",
+  "sourceCommit": "29886944d756e6eeebe38c09db87b17efdc93e93",
+  "buildMode": "generated-c-sources",
+  "languageSymbol": "tree_sitter_svelte",
+  "sourceFingerprints": {
+    "parser.c": "a1ec6da50ae8eb9321ef1eb52fcb53589b25121bc36ef3ff5b31df58a0bfb563",
+    "scanner.c": "cfad553c3065a4e5bb0a3c20db2057d6bb8b5d3a5ca07bfaec0ce363b9cfa420",
+    "grammar.json": "f366aa902b74eebe40b2bc112dbfcb297b5e40787a256a053c82ce025ec13aa3"
+  },
+  "platforms": {
+    "linux-x64": {
+      "artifact": "dist/linux-x64/tree-sitter-svelte.so",
+      "sha256": "5137f7e98bcdb8de2cedf62f26befe94b44a609600a74b7cfb08030a2780b133",
+      "compiler": "gcc-13 (Ubuntu 13.3.0)",
+      "exportSymbol": "tree_sitter_svelte",
+      "testedRuntime": "WSL2 Ubuntu 24.04 / ast-grep 0.45.3"
+    },
+    "win32-x64": {
+      "artifact": "dist/win32-x64/tree-sitter-svelte.dll",
+      "sha256": null,
+      "status": "BLOCKED_WINDOWS_SDK_HEADERS"
+    }
+  }
+}

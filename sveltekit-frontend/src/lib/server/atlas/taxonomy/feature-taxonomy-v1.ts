@@ -68,7 +68,7 @@ export const FEATURE_TAXONOMY_V1: Record<CanonicalFeatureLabel, FeatureTaxonomyE
     displayName: 'Client-Side AI & Assistant',
     description: 'Client-side ONNX chat, local AI assistant, and direct synthesis chat demos.',
     sveltekitRoutes: ['/demos/client-ai-chat', '/demos/client-inference', '/demos/ai-assistant', '/demos/ask-ai'],
-    coreComponents: ['src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte', 'src/lib/components/ai/CaseScoringDashboard.svelte'],
+    coreComponents: ['src/lib/components/AIChatAssistant.svelte', 'src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte', 'src/lib/components/ai/CaseScoringDashboard.svelte'],
     databaseTables: ['atlas_analysis_jobs', 'dossier_records'],
     backendServices: ['Ornith 1.5 9B (:8090)', 'WebGPU ONNX Runtime'],
     tokenBudget: 4096,

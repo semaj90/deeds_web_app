@@ -4,27 +4,34 @@ import test from 'node:test';
 import { reconcileSelectedSourceManifestV1 } from './source-selection-manifest-reconciliation-v1.mjs';
 
 const checksum = (value) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
+const digest = (value) => checksum(value).slice('sha256:'.length);
 
 function fixture() {
+  const sourceRevision = checksum('source-a');
+  const contentDigest = digest('source-a');
+  const archiveRevision = checksum('archive');
+  const archiveDigest = digest('archive');
   const snapshot = {
     snapshotRevision: `sha256:${'a'.repeat(64)}`,
     sources: [
-      { repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', sourceRevision: 'sha256:source-a', contentDigest: 'source-a', byteLength: 10 },
-      { repositoryId: 'repo:root', repositoryRelativePath: '.archive/old.ts', sourceRef: '.archive/old.ts', sourceRevision: 'sha256:archive', contentDigest: 'archive', byteLength: 20 },
+      { repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', sourceRevision, contentDigest, byteLength: 10 },
+      { repositoryId: 'repo:root', repositoryRelativePath: '.archive/old.ts', sourceRef: '.archive/old.ts', sourceRevision: archiveRevision, contentDigest: archiveDigest, byteLength: 20 },
     ],
   };
   const sourceSelectionChecksum = checksum(JSON.stringify(['repo:root:src/a.ts']));
   const selectionPlan = {
     schema: 'atlas.graphify-source-selection-plan.v1',
     status: 'SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED',
+    workspaceRevisionCandidate: checksum('workspace-candidate'),
     snapshotRevision: snapshot.snapshotRevision,
     sourceCount: 1,
     sourceSelectionChecksum,
-    bindings: [{ repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', codeSourceRevision: 'sha256:source-a', contentHash: 'source-a', byteLength: 10 }],
+    bindings: [{ repositoryId: 'repo:root', repositoryRelativePath: 'src/a.ts', sourceRef: 'src/a.ts', codeSourceRevision: sourceRevision, contentHash: contentDigest, byteLength: 10 }],
   };
   const admission = {
     status: 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED',
     authority: true,
+    workspaceRevision: selectionPlan.workspaceRevisionCandidate,
     snapshotRevision: snapshot.snapshotRevision,
     sourceCount: 1,
     sourceSelectionChecksum,
@@ -41,10 +48,21 @@ test('compares execution membership to selected snapshot sources, excluding unse
 
 test('rejects a selection binding whose digest differs from the frozen snapshot', () => {
   const input = fixture();
-  input.selectionPlan.bindings[0].contentHash = 'sha256:forged';
+  input.selectionPlan.bindings[0].contentHash = digest('forged');
   const result = reconcileSelectedSourceManifestV1(input);
   assert.equal(result.valid, false);
   assert.equal(result.checks.everyBindingMatchesSnapshot, false);
+});
+
+test('rejects malformed source digests and unsafe byte lengths', () => {
+  const input = fixture();
+  input.selectionPlan.bindings[0].codeSourceRevision = 'sha256:short';
+  input.selectionPlan.bindings[0].contentHash = 'not-a-digest';
+  input.selectionPlan.bindings[0].byteLength = Number.MAX_SAFE_INTEGER + 1;
+  const result = reconcileSelectedSourceManifestV1(input);
+  assert.equal(result.valid, false);
+  assert.equal(result.checks.sourceDigestsValid, false);
+  assert.equal(result.checks.sourceByteLengthsValid, false);
 });
 
 test('rejects duplicate selected source identities', () => {
@@ -92,4 +110,12 @@ test('rejects a selection plan from a different snapshot revision', () => {
   const result = reconcileSelectedSourceManifestV1(input);
   assert.equal(result.valid, false);
   assert.equal(result.checks.snapshotRevisionMatches, false);
+});
+
+test('rejects an admitted workspace revision that differs from the plan candidate', () => {
+  const input = fixture();
+  input.admission.workspaceRevision = checksum('different-workspace');
+  const result = reconcileSelectedSourceManifestV1(input);
+  assert.equal(result.valid, false);
+  assert.equal(result.checks.admissionWorkspaceMatchesCandidate, false);
 });

@@ -53,6 +53,7 @@ from .rapids_matrix import (
     RapidsKMeansArtifact,
     RapidsKMeansReceipt,
     RapidsPcaReceipt,
+    build_kmeans_ordinal_assignments_v1,
     deterministic_farthest_first_ordinals,
     run_cuvs_kmeans,
     run_cuvs_kmeans_artifact,

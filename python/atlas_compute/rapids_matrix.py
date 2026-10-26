@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import hashlib
+import json
+import re
 from typing import Any, Literal, Sequence
 
 import numpy as np
@@ -59,6 +61,24 @@ class RapidsKMeansArtifact:
 
     receipt: RapidsKMeansReceipt
     centroids: np.ndarray
+    labels: np.ndarray | None = None
+
+    def __post_init__(self) -> None:
+        if self.labels is None:
+            return
+        labels = np.asarray(self.labels)
+        if labels.ndim != 1 or labels.size != self.receipt.rows or not np.issubdtype(labels.dtype, np.integer):
+            raise ValueError("KMEANS_LABEL_ARTIFACT_SHAPE_OR_DTYPE_INVALID")
+        labels = np.ascontiguousarray(labels, dtype=np.int64)
+        if labels.size and (int(labels.min()) < 0 or int(labels.max()) >= self.receipt.n_clusters):
+            raise ValueError("KMEANS_LABEL_ARTIFACT_CLUSTER_RANGE_INVALID")
+        if _checksum_array(labels) != self.receipt.labels_checksum:
+            raise ValueError("KMEANS_LABEL_ARTIFACT_CHECKSUM_MISMATCH")
+        labels.setflags(write=False)
+        object.__setattr__(self, "labels", labels)
+
+
+_SHA256_REVISION_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 
 
 def _checksum_array(value: np.ndarray) -> str:
@@ -151,7 +171,8 @@ def _run_cuvs_kmeans(
         canonical_authority=False,
     )
     centroids_host.setflags(write=False)
-    return RapidsKMeansArtifact(receipt=receipt, centroids=centroids_host)
+    labels_host.setflags(write=False)
+    return RapidsKMeansArtifact(receipt=receipt, centroids=centroids_host, labels=labels_host)
 
 
 def run_cuvs_kmeans(
@@ -198,6 +219,66 @@ def run_cuvs_kmeans_artifact(
         batch_samples=batch_samples,
         batch_centroids=batch_centroids,
     )
+
+
+def build_kmeans_ordinal_assignments_v1(
+    artifact: RapidsKMeansArtifact,
+    candidate_ordinals: Sequence[int],
+    *,
+    candidate_identity_bindings: Sequence[dict[str, Any]],
+    workspace_revision: str,
+    representation_revision: str,
+) -> dict[str, Any]:
+    labels = artifact.labels
+    receipt = artifact.receipt
+    if labels is None:
+        raise ValueError("KMEANS_LABELS_NOT_RETAINED_IN_ARTIFACT")
+    if not _SHA256_REVISION_RE.fullmatch(workspace_revision) or not _SHA256_REVISION_RE.fullmatch(representation_revision):
+        raise ValueError("KMEANS_ASSIGNMENT_REVISION_INVALID")
+    ordinals = list(candidate_ordinals)
+    if len(ordinals) != receipt.rows or len(labels) != receipt.rows:
+        raise ValueError("KMEANS_ASSIGNMENT_ROW_COUNT_MISMATCH")
+    identities = list(candidate_identity_bindings)
+    if len(identities) != len(ordinals):
+        raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_COUNT_MISMATCH")
+    if any(isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 0xFFFFFFFF for value in ordinals):
+        raise ValueError("KMEANS_ASSIGNMENT_ORDINAL_INVALID")
+    if len(set(ordinals)) != len(ordinals):
+        raise ValueError("KMEANS_ASSIGNMENT_ORDINALS_MUST_BE_UNIQUE")
+    required_identity_fields = (
+        "candidateOrdinal", "packetKey", "sourceRef", "sourceRevision", "domainId",
+        "featureId", "featureLabel", "taxonomyRevision",
+    )
+    for ordinal, identity in zip(ordinals, identities):
+        if not isinstance(identity, dict) or identity.get("candidateOrdinal") != ordinal:
+            raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_ORDINAL_MISMATCH")
+        if any(not isinstance(identity.get(field), str) or not identity[field] for field in required_identity_fields[1:]):
+            raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_BINDING_INCOMPLETE")
+        if not _SHA256_REVISION_RE.fullmatch(identity["sourceRevision"]) or not _SHA256_REVISION_RE.fullmatch(identity["taxonomyRevision"]):
+            raise ValueError("KMEANS_ASSIGNMENT_IDENTITY_REVISION_INVALID")
+
+    assignments = [
+        {"candidateOrdinal": ordinal, "kmeansClusterId": int(label)}
+        for ordinal, label in sorted(zip(ordinals, labels), key=lambda pair: pair[0])
+    ]
+    canonical = {
+        "schema": "atlas.kmeans-ordinal-assignments.v1",
+        "workspaceRevision": workspace_revision,
+        "representationRevision": representation_revision,
+        "receipt": receipt.to_dict(),
+        "inputCandidateOrdinals": ordinals,
+        "candidateIdentityBindings": identities,
+        "assignments": assignments,
+    }
+    encoded = json.dumps(canonical, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    assignment_revision = "sha256:" + hashlib.sha256(encoded).hexdigest()
+    return {
+        **canonical,
+        "assignmentRevision": assignment_revision,
+        "authority": "PROPOSAL_ONLY",
+        "canonicalAuthority": False,
+        "promotionEligible": False,
+    }
 
 
 def run_cuvs_pca(

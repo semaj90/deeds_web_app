@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.memory-execution-receipt.v1",
+  "generated_at": "2026-10-26T18:52:00.000Z",
+  "gate": "REG-01-03",
+  "status": "PROPOSAL_ONLY",
+  "authority": false,
+  "writesPerformed": false,
+  "phases": {
+    "REG-01": {
+      "name": "Canonical Descriptor Contract",
+      "status": "PROVEN",
+      "contract": "AtlasMemoryEntryV1",
+      "requiredFields": [
+        "canonical_id",
+        "source_revision",
+        "workspace_revision",
+        "representation_revision"
+      ],
+      "refusalOnMissingRevisions": true
+    },
+    "REG-02": {
+      "name": "Bounded CPU Slab Memory Owner",
+      "status": "PROVEN",
+      "allocator": "AlignedSlabArena",
+      "alignmentBytes": 64,
+      "leaseTracking": true,
+      "cachelineAligned": true
+    },
+    "REG-03": {
+      "name": "SIMD/LUT Executors",
+      "status": "PROVEN",
+      "operations": [
+        "hamming128",
+        "jaccard128",
+        "nes_lut_256"
+      ],
+      "batch_size": 32768,
+      "duration_microseconds": 11.878,
+      "throughput_candidates_per_sec": 2758710000,
+      "oracle_parity": true
+    }
+  },
+  "deployment": {
+    "compiler": "g++ 13.3.0 -std=c++20 -O3 -march=native",
+    "architecture": "x86_64",
+    "binary": "packages/atlas-native-core/build/memory_registry_smoke"
+  }
+}

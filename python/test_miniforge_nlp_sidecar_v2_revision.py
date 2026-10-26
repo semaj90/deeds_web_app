@@ -18,6 +18,7 @@ def _response(request: AstChunkRequest) -> AstEvidenceResponseV2:
         language=request.language,
         file_path=request.file_path,
         source_revision=request.source_revision,
+        workspace_revision=request.workspace_revision,
         chunks=[],
     )
 
@@ -71,6 +72,22 @@ def test_ast_chunk_preserves_opaque_caller_revision(monkeypatch):
     )
 
     assert ast_chunk(request).source_revision == revision
+
+
+def test_ast_chunk_echoes_caller_workspace_revision(monkeypatch):
+    monkeypatch.setattr("miniforge_nlp_sidecar_v2._native_ast_evidence", _response)
+    request = AstChunkRequest(
+        source="const current = true;",
+        language="typescript",
+        filePath="src/current.ts",
+        sourceRevision="sha256:" + hashlib.sha256(b"const current = true;").hexdigest(),
+        workspaceRevision="sha256:" + "c" * 64,
+    )
+
+    response = ast_chunk(request)
+
+    assert response.workspace_revision == request.workspace_revision
+    assert response.model_dump(by_alias=True)["workspace_revision"] == request.workspace_revision
 
 
 def test_ast_chunk_request_accepts_large_but_bounded_source():
@@ -176,6 +193,7 @@ def test_ast_evidence_response_model_schema_field_is_aliased_to_schema():
     props = AstEvidenceResponseV2.model_json_schema(by_alias=True)["properties"]
     assert "schema" in props and "schema_" not in props
     assert AstEvidenceResponseV2.model_fields["schema_"].alias == "schema"
+    assert "workspace_revision" in AstEvidenceResponseV2.model_json_schema(by_alias=True)["properties"]
 
 
 _EXISTING_PACKET = {
