@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.latent-checkpoint-architecture-receipt.v1",
+  "architectureId": "legacy_v3_768_384_256",
+  "checkpointSha256": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5",
+  "modelChecksum": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+  "loaderRevision": "latent_checkpoint_loader.v2",
+  "inputRepresentationRevision": "semantic_768:embedding_gemma",
+  "transformPolicyRevision": "nested-semantic-autoencoder-v1",
+  "strictStateDictValidation": true,
+  "checkpointPath": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\checkpoints\\nested_semantic_autoencoder_v3_full01.pt",
+  "receiptPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\latent-autoencoder-training-receipt-v3-full01.json",
+  "verifiedAt": "2026-10-26T03:39:46.162238+00:00"
+}

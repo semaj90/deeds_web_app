@@ -72,7 +72,7 @@ function classifyDimension(haystack, rules) {
   return match ? { id: match[0], status: 'INFERRED_RULE', rule: String(match[1]) } : { id: null, status: 'UNVERIFIED', rule: null };
 }
 
-function buildImplementations(row, sourceRevision) {
+function buildImplementations(row, sourceBindings, workspaceRevision) {
   const refs = [
     ...values(row.source_refs).map((sourceRef) => ({ sourceRef, sourceKind: 'source' })),
     ...values(row.code_refs).map((sourceRef) => ({ sourceRef, sourceKind: 'code' })),
@@ -85,16 +85,26 @@ function buildImplementations(row, sourceRevision) {
       seen.add(sourceRef);
       return true;
     })
-    .map(({ sourceRef, sourceKind }) => ({
-      sourceRef,
-      sourceRevision: sourceRevision || null,
-      role: classifyRole(sourceRef, sourceKind),
-      evidenceRefs: [`feature_registry:${text(row.feature_key)}`, `feature_registry:${sourceKind}_refs`],
-      bindingStatus: sourceRevision ? 'REVISION_QUALIFIED' : 'UNVERIFIED_SOURCE_REVISION',
-    }));
+    .map(({ sourceRef, sourceKind }) => {
+      const matches = sourceBindings.filter((candidate) =>
+        text(candidate.canonical_source_ref ?? candidate.canonicalSourceRef) === sourceRef
+        && text(candidate.workspace_revision ?? candidate.workspaceRevision) === workspaceRevision
+        && Boolean(text(candidate.source_revision ?? candidate.sourceRevision))
+        && Boolean(text(candidate.content_digest ?? candidate.contentDigest))
+        && Boolean(text(candidate.binding_checksum ?? candidate.bindingChecksum)));
+      const binding = matches.length === 1 ? matches[0] : null;
+      return {
+        sourceRef,
+        sourceRevision: binding ? text(binding.source_revision ?? binding.sourceRevision) : null,
+        workspaceRevision: binding ? workspaceRevision : null,
+        role: classifyRole(sourceRef, sourceKind),
+        evidenceRefs: [`feature_registry:${text(row.feature_key)}`, `feature_registry:${sourceKind}_refs`, ...(binding ? ['atlas_workspace_source_bindings'] : [])],
+        bindingStatus: binding ? 'SOURCE_BINDING_MATCHED' : 'UNVERIFIED_SOURCE_BINDING',
+      };
+    });
 }
 
-export function deriveFeatureOntologyCrosswalk(row) {
+export function deriveFeatureOntologyCrosswalk(row, options = {}) {
   const featureKey = text(row.feature_key ?? row.featureKey);
   if (!featureKey) throw new Error('FEATURE_ONTOLOGY_CROSSWALK_FEATURE_KEY_REQUIRED');
   const sourceRefs = unique([
@@ -111,9 +121,10 @@ export function deriveFeatureOntologyCrosswalk(row) {
   ].join(' ').toLowerCase();
   const domain = classifyDimension(haystack, DOMAIN_RULES);
   const capability = classifyDimension(haystack, CAPABILITY_RULES);
-  const sourceRevision = text(row.source_revision ?? row.sourceRevision) || null;
+  const sourceBindings = Array.isArray(options.sourceBindings) ? options.sourceBindings : [];
+  const workspaceRevision = text(options.workspaceRevision);
   const surfaces = classifySurfaces(sourceRefs, haystack);
-  const implementations = buildImplementations(row, sourceRevision);
+  const implementations = buildImplementations(row, sourceBindings, workspaceRevision);
 
   return {
     schema: 'atlas.feature-ontology-crosswalk.v1',
@@ -145,12 +156,12 @@ export function deriveFeatureOntologyCrosswalk(row) {
   };
 }
 
-export function deriveFeatureOntologyCrosswalkRows(rows) {
+export function deriveFeatureOntologyCrosswalkRows(rows, options = {}) {
   const records = [];
   const rejected = [];
   for (const row of rows) {
     try {
-      records.push(deriveFeatureOntologyCrosswalk(row));
+      records.push(deriveFeatureOntologyCrosswalk(row, options));
     } catch (error) {
       rejected.push({ featureKey: text(row?.feature_key ?? row?.featureKey) || null, reason: error instanceof Error ? error.message : String(error) });
     }

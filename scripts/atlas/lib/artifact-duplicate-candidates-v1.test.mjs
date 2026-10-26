@@ -1,10 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  duplicateHashLimitBytes,
   groupDuplicateCandidatesByFingerprint,
   groupDuplicateCandidatesBySize,
   mapWithConcurrency,
 } from './artifact-duplicate-candidates-v1.mjs';
+
+test('uses bounded hash limits for evidence and Arrow artifacts', () => {
+  assert.equal(duplicateHashLimitBytes('evidence_run'), 200 * 1024 * 1024);
+  assert.equal(duplicateHashLimitBytes('arrow_artifact'), 512 * 1024 * 1024);
+  assert.equal(duplicateHashLimitBytes('report'), 50 * 1024 * 1024);
+});
+
+test('keeps 312 MiB Arrow peers eligible for sampled and exact comparison', () => {
+  const sizeBytes = 312 * 1024 * 1024;
+  const entries = ['rollup-a', 'rollup-b'].map((relPath) => ({
+    relPath,
+    sizeBytes,
+    maxHashBytes: duplicateHashLimitBytes('arrow_artifact'),
+  }));
+  assert.equal(groupDuplicateCandidatesBySize(entries).length, 2);
+});
 
 test('only same-size files within their hash limits become duplicate candidates', () => {
   const entries = [

@@ -258,9 +258,9 @@ export function createFeatureIntelligenceRepository(pool: Pool) {
     },
 
     /**
-     * GRAPH-PROD-01: bulk read every real FeatureRelationshipV1 currently
-     * persisted, unfiltered by entity. atlas_relationships has 0 real rows as
-     * of 2026-08-26 -- this exists for when that changes.
+     * GRAPH-PROD-01: bulk read persisted FeatureRelationshipV1 rows without
+     * filtering by entity. Callers must independently validate source and
+     * workspace lineage before using these rows in a graph projection.
      */
     async listAllRelationships(limit = 1000): Promise<FeatureRelationshipV1[]> {
       const boundedLimit = Math.max(1, Math.min(limit, 5000));

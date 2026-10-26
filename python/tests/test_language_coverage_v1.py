@@ -1,4 +1,5 @@
 import hashlib
+import gzip
 import json
 import tempfile
 import unittest
@@ -13,6 +14,7 @@ from parent_atlas_ontology.language_coverage_v1 import (
     verify_language_coverage_v2,
     verify_language_coverage_evidence_join_v1,
     verify_language_coverage_evidence_join_v2,
+    _write_path_manifest,
 )
 
 
@@ -173,6 +175,27 @@ class LanguageCoverageTests(unittest.TestCase):
             b"".join(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n" for row in first_paths)
         ).hexdigest())
         verify_language_coverage_v2(first)
+
+    def test_gzip_path_manifest_writer_is_deterministic_and_reports_both_digests(self):
+        content = b'{"relativePath":"src/a.ts"}\n' * 100
+        first_path = Path(self.temp_dir.name) / "first.jsonl.gz"
+        second_path = Path(self.temp_dir.name) / "second.jsonl.gz"
+        outputs = []
+        for output_path in (first_path, second_path):
+            with tempfile.TemporaryFile(mode="w+b") as spool:
+                spool.write(content)
+                outputs.append(_write_path_manifest(spool, output_path, "gzip"))
+
+        first_bytes = first_path.read_bytes()
+        second_bytes = second_path.read_bytes()
+        self.assertEqual(first_bytes, second_bytes)
+        self.assertEqual(gzip.decompress(first_bytes), content)
+        self.assertEqual(outputs[0], outputs[1])
+        self.assertEqual(outputs[0]["compression"], "gzip")
+        self.assertEqual(outputs[0]["uncompressedBytes"], len(content))
+        self.assertEqual(outputs[0]["storedBytes"], len(first_bytes))
+        self.assertEqual(outputs[0]["storedSha256"], hashlib.sha256(first_bytes).hexdigest())
+        self.assertLess(outputs[0]["storedBytes"], outputs[0]["uncompressedBytes"])
 
     def test_files_outside_source_scope_are_labeled_and_not_counted_as_languages(self):
         paths = []

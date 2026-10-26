@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { createHash } from 'node:crypto';
-import { createReadStream, mkdirSync, readFileSync, statSync, statfsSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, statfsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline';
 import { tableFromIPC } from 'apache-arrow';
 import { buildDirectoryPathArrowV1 } from './lib/directory-intelligence-arrow-v1.mjs';
+import { openPathManifestStream, verifyPathManifestArtifact } from './lib/path-manifest-stream-v1.mjs';
 import { REPO_ROOT } from './connection-config.mjs';
 
 const arg = name => process.argv.find(value => value.startsWith(`${name}=`))?.slice(name.length + 1);
@@ -27,17 +28,15 @@ const inventoryBody = Object.fromEntries(Object.entries(inventory).filter(([key]
 if (sha256(Buffer.from(canonical(inventoryBody))) !== inventory.inventorySha256) throw new Error('INVENTORY_CHECKSUM_INVALID');
 const pathManifest = path.resolve(root, inventory.workspace.pathManifestPath);
 if (!pathManifest.startsWith(`${root}${path.sep}`)) throw new Error('PATH_MANIFEST_OUTSIDE_REPOSITORY');
-const inputHash = createHash('sha256');
-for await (const chunk of createReadStream(pathManifest)) inputHash.update(chunk);
-const pathManifestSha256 = inputHash.digest('hex');
-if (pathManifestSha256 !== inventory.workspace.pathManifestSha256) throw new Error('PATH_MANIFEST_CHECKSUM_INVALID');
-const manifestBytes = statSync(pathManifest).size;
+const pathManifestIntegrity = await verifyPathManifestArtifact(pathManifest, inventory.workspace);
+const pathManifestSha256 = pathManifestIntegrity.contentSha256;
+const manifestBytes = pathManifestIntegrity.contentBytes;
 const disk = statfsSync(root);
 const availableBytes = disk.bavail * disk.bsize;
 if (availableBytes < manifestBytes * 2) throw new Error('INSUFFICIENT_OUTPUT_DISK_HEADROOM');
 
 async function* rows() {
-  const lines = readline.createInterface({ input: createReadStream(pathManifest), crlfDelay: Infinity });
+  const lines = readline.createInterface({ input: openPathManifestStream(pathManifest, inventory.workspace), crlfDelay: Infinity });
   for await (const line of lines) {
     if (!line) continue;
     const row = JSON.parse(line);

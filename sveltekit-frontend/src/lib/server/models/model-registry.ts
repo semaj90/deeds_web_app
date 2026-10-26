@@ -205,6 +205,19 @@ export const ATLAS_MODEL_BINDINGS: readonly AtlasModelBinding[] = [
 	},
 ];
 
+export function resolveModelCacheIdentityV1(input: {
+	modelId: string;
+	modelRevision?: string | null;
+	adapterRevision?: string | null;
+}): { modelRevision: string; adapterRevision: string | null } | null {
+	const binding = ATLAS_MODEL_BINDINGS.find((candidate) => candidate.modelId === input.modelId && candidate.enabled);
+	const modelRevision = input.modelRevision ?? (binding?.artifactSha256 ? `sha256:${binding.artifactSha256}` : null);
+	if (!modelRevision?.trim()) return null;
+	const adapterRevision = input.adapterRevision === undefined ? binding?.adapterRevision ?? null : input.adapterRevision;
+	if (adapterRevision !== null && !adapterRevision.trim()) return null;
+	return { modelRevision, adapterRevision };
+}
+
 /** The single active chat route. Throws if the chat binding is missing or not served by llama-server :8090. */
 export function getActiveChatBinding(): AtlasModelBinding {
 	const chats = ATLAS_MODEL_BINDINGS.filter((b) => b.role === 'chat' && b.enabled);

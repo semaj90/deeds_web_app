@@ -1576,6 +1576,8 @@ export async function assembleACEContext(opts: {
   includeResearch?: boolean;
   sectionTypes?: string[];
   modelName?: string;
+  modelRevision?: string | null;
+  adapterRevision?: string | null;
   modelQuant?: string;
   kvQuant?: string;
   draftModel?: boolean;
@@ -2036,6 +2038,8 @@ export async function assembleACEContext(opts: {
         persona: opts.persona,
         tokenAwarePacking: opts.tokenAwarePacking,
         modelName: opts.modelName,
+        modelRevision: opts.modelRevision,
+        adapterRevision: opts.adapterRevision,
         modelQuant: opts.modelQuant,
         kvQuant: opts.kvQuant,
         draftModel: opts.draftModel,
@@ -2681,7 +2685,7 @@ export async function assembleACEContext(opts: {
         hit: Boolean(acePlannerHit),
         source: acePlannerHit?.meta.source ?? 'miss',
         cacheKey: acePlannerState.cacheKey,
-        contextHash: acePlannerState.cacheKey.replace(/^ace:context:/, ''),
+        contextHash: acePlannerState.cacheKey?.replace(/^ace:context:/, '') ?? null,
         deltaFields: acePlannerHit?.meta.deltaFields ?? [],
         retrievalModeHash: acePlannerState.retrievalModeHash,
         sectionTypesHash: acePlannerState.sectionTypesHash,
@@ -3956,7 +3960,7 @@ export async function assembleACEContext(opts: {
           const packId = `pack:${Date.now()}:${Math.random().toString(36).slice(2, 8)}`;
           const acePack = buildAceContextPack({
             id: packId,
-            contextId: acePlannerState.cacheKey,
+            contextId: acePlannerState.cacheKey ?? packId,
             createdAt: new Date().toISOString(),
             summary: (finalContext as any).summary ?? packet.contextMarkdown?.slice(0, 200) ?? '',
             chunkIds: (codebaseContext ?? []).map((c) => c.filePath).filter(Boolean),
@@ -3968,7 +3972,9 @@ export async function assembleACEContext(opts: {
             },
             authority: (finalContext as any).authority ?? undefined,
           });
-          void setAceContextPackPointer(acePlannerState.cacheKey, acePack).catch(() => {});
+          if (acePlannerState.cacheKey) {
+            void setAceContextPackPointer(acePlannerState.cacheKey, acePack).catch(() => {});
+          }
           // Revisioned BitFrost admission is deliberately opt-in and strict.
           // The legacy pointer remains for compatibility, but it is not used
           // as a substitute when a complete ContextManifestV2 is unavailable.
@@ -3990,7 +3996,7 @@ export async function assembleACEContext(opts: {
             const { intentSynthesis } = await import('$lib/server/db/schema-postgres.js');
             const synthRow = {
               queryHash: qHash,
-              contextPackKey: acePlannerState.cacheKey,
+              contextPackKey: acePlannerState.cacheKey ?? packId,
               authority: (finalContext as any).authority ?? null,
               sourceRefs: ((finalContext as any).sourceRefs ?? []) as string[],
               chunkIds: (codebaseContext ?? []).map((c: any) => c.filePath).filter(Boolean),
@@ -4125,7 +4131,7 @@ export async function assembleACEContext(opts: {
           hit: Boolean(acePlannerHit),
           source: acePlannerHit?.meta.source ?? 'miss',
           cacheKey: acePlannerState.cacheKey,
-          contextHash: acePlannerState.cacheKey.replace(/^ace:context:/, ''),
+          contextHash: acePlannerState.cacheKey?.replace(/^ace:context:/, '') ?? null,
           deltaFields: acePlannerHit?.meta.deltaFields ?? [],
           retrievalModeHash: acePlannerState.retrievalModeHash,
           sectionTypesHash: acePlannerState.sectionTypesHash,

@@ -120,6 +120,18 @@ test('8095 evidence can reach GIS canonical evidence entities without extractor 
     ]),
   );
 
+  await assert.rejects(canonicalizeStructuralEvidence({
+    evidence_id: 'evidence:route-file',
+    evidence_revision: 'evidence-rev-1',
+    source_ref: evidence.file_path,
+    source_revision: evidence.source_revision,
+    workspace_revision: 'ws-742',
+    producer_revision: 'gis:missing-reference-resolver',
+    symbol_nominations: [],
+    reference_facts: fabric.reference_facts,
+    symbol_resolver: { async resolve() { throw new Error('UNEXPECTED_SYMBOL_RESOLUTION'); } },
+  }), /STRUCTURAL_REFERENCE_RESOLVER_REQUIRED/);
+
   const result = await canonicalizeStructuralEvidence({
     evidence_id: 'evidence:route-file',
     evidence_revision: 'evidence-rev-1',
@@ -155,6 +167,14 @@ test('8095 evidence can reach GIS canonical evidence entities without extractor 
           resolution_basis: 'upstream_node_version',
           candidate_symbol_ids: ['symbol:patch', 'symbol:authorize-case'],
           source_revision: fact.source_revision,
+          source_ref: fact.source_ref,
+          workspace_revision: fact.workspace_revision,
+          upstream_source_node_id: fact.upstream_source_node_id,
+          upstream_target_node_id: fact.upstream_target_node_id ?? null,
+          upstream_chunk_id: fact.upstream_chunk_id,
+          captures: fact.captures,
+          extractor: fact.extractor,
+          extractor_revision: fact.extractor_revision,
           evidence_refs: ['evidence:route-file'],
           producer_revision: 'reference-resolver:fixture',
         });

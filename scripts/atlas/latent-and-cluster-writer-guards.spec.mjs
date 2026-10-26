@@ -27,6 +27,12 @@ test('latent-256 wrapper refuses apply before creating its PostgreSQL pool', () 
   assert.match(latent256Wrapper, /compare-and-swap or independent vector readback/);
 });
 
+test('latent-256 dry-run artifact reports the bounded producer batch as processed', () => {
+  assert.match(latent256Wrapper, /const PRODUCER_BATCH_SIZE = 2000;/);
+  assert.match(latent256Wrapper, /'--batch-size', String\(PRODUCER_BATCH_SIZE\)/);
+  assert.match(latent256Wrapper, /processedCount: APPLY\s*\?\s*eligibleIds\.length\s*:\s*Math\.min\(eligibleIds\.length, PRODUCER_BATCH_SIZE\)/);
+});
+
 test('phase-7 latent writer rejects apply before loading CUDA or opening PostgreSQL', () => {
   const result = spawnSync(process.execPath, ['scripts/phase7-cuda-accelerator-correct.mjs', '--encode-latent', '--apply'], {
     cwd: REPO_ROOT,

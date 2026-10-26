@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -36,6 +37,30 @@ def _canonical_bytes(value: Any) -> bytes:
 
 def _sha256(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
+
+
+def _write_path_manifest(path_spool: Any, path_output: Path, compression: str) -> dict[str, Any]:
+    path_spool.seek(0, os.SEEK_END)
+    uncompressed_bytes = path_spool.tell()
+    path_spool.seek(0)
+    with path_output.open("xb") as stored_file:
+        if compression == "gzip":
+            with gzip.GzipFile(fileobj=stored_file, mode="wb", filename="", mtime=0) as output_file:
+                shutil.copyfileobj(path_spool, output_file)
+        elif compression == "none":
+            shutil.copyfileobj(path_spool, stored_file)
+        else:
+            raise ValueError("LANGUAGE_COVERAGE_PATH_MANIFEST_COMPRESSION_INVALID")
+    digest = hashlib.sha256()
+    with path_output.open("rb") as stored_file:
+        for chunk in iter(lambda: stored_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return {
+        "compression": compression,
+        "storedBytes": path_output.stat().st_size,
+        "storedSha256": digest.hexdigest(),
+        "uncompressedBytes": uncompressed_bytes,
+    }
 
 
 def _read_profiles(profile_dir: Path) -> tuple[dict[str, str], list[dict[str, str]], dict[str, list[str]]]:
@@ -764,6 +789,7 @@ def main() -> int:
     parser.add_argument("--profiles", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--path-manifest-output", type=Path)
+    parser.add_argument("--path-manifest-compression", choices=("none", "gzip"), default="none")
     parser.add_argument("--graphify-authority-receipt", type=Path)
     parser.add_argument("--workspace-revision")
     parser.add_argument(
@@ -773,7 +799,8 @@ def main() -> int:
     )
     args = parser.parse_args()
     output = args.output.resolve()
-    path_output = (args.path_manifest_output or output.with_name("paths.jsonl")).resolve()
+    default_path_name = "paths.jsonl.gz" if args.path_manifest_compression == "gzip" else "paths.jsonl"
+    path_output = (args.path_manifest_output or output.with_name(default_path_name)).resolve()
     if output.exists() or path_output.exists():
         raise FileExistsError("LANGUAGE_COVERAGE_OUTPUT_ALREADY_EXISTS")
     root = args.repo.resolve(strict=True)
@@ -792,9 +819,9 @@ def main() -> int:
     if args.graphify_authority_receipt:
         authority_path = args.graphify_authority_receipt.resolve(strict=True)
         graphify_overlay = load_graphify_overlay(root, authority_path)
-    with tempfile.TemporaryFile(mode="w+t", encoding="utf-8", newline="\n") as path_spool:
+    with tempfile.TemporaryFile(mode="w+b") as path_spool:
         def write_path(row: dict[str, Any]) -> None:
-            path_spool.write(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n")
+            path_spool.write(json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8") + b"\n")
 
         inventory = build_language_coverage_v2(
             grammar_catalog=json.loads(args.catalog.read_text(encoding="utf-8")),
@@ -808,10 +835,10 @@ def main() -> int:
         verify_language_coverage_v2(inventory, require_complete=False)
         path_output.parent.mkdir(parents=True, exist_ok=True)
         output.parent.mkdir(parents=True, exist_ok=True)
-        path_spool.seek(0)
-        with path_output.open("x", encoding="utf-8", newline="\n") as path_file:
-            shutil.copyfileobj(path_spool, path_file)
+        storage = _write_path_manifest(path_spool, path_output, args.path_manifest_compression)
     inventory["workspace"]["pathManifestPath"] = path_output.relative_to(root).as_posix()
+    if args.path_manifest_compression != "none":
+        inventory["workspace"]["pathManifestStorage"] = storage
     body = {key: value for key, value in inventory.items() if key != "inventorySha256"}
     inventory["inventorySha256"] = _sha256(_canonical_bytes(body))
     with output.open("x", encoding="utf-8", newline="\n") as result:

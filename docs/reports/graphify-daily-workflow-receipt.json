@@ -1,9 +1,9 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "31d6f979-c57b-46dd-bf38-a0728c1f51f9",
-  "repositoryRevision": "3f803daf5e4ef383f1f76cc5002c33865485386f",
-  "generatedAt": "2026-10-25T15:47:04.039Z",
+  "runId": "e6fcee87-b885-4151-91ea-5b1cc8a7b7be",
+  "repositoryRevision": "fb35394b149272c8d87549ca6fdfdd63fc7bde6f",
+  "generatedAt": "2026-10-26T02:52:42.079Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
@@ -11,8 +11,8 @@
       "status": "PROVEN",
       "totalFiles": 30327,
       "totalBytes": 528720368,
-      "currentRevision": "3f803daf5e4ef383f1f76cc5002c33865485386f",
-      "priorRevision": "867dca776e288cbe53f1aa577576d065e4e85597"
+      "currentRevision": "fb35394b149272c8d87549ca6fdfdd63fc7bde6f",
+      "priorRevision": "fb35394b149272c8d87549ca6fdfdd63fc7bde6f"
     },
     "inventory": {
       "status": "PROVEN",
@@ -76,14 +76,14 @@
       "status": "PROVEN",
       "filesProcessed": 30327,
       "filesWithStructure": 14863,
-      "factCount": 151750,
-      "functionCount": 53769,
+      "factCount": 151745,
+      "functionCount": 53767,
       "classCount": 1303,
       "interfaceCount": 1636,
-      "methodCount": 4320,
+      "methodCount": 4318,
       "importCount": 46481,
       "constCount": 8936,
-      "arrowCount": 35305,
+      "arrowCount": 35304,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -288,11 +288,11 @@
       ]
     },
     "identity": {
-      "status": "PARTIAL",
+      "status": "PROVEN",
       "uniqueIds": 151745,
-      "duplicateIds": 5,
-      "reusedIds": 151409,
-      "supersededIds": 5
+      "duplicateIds": 0,
+      "reusedIds": 151745,
+      "supersededIds": 0
     },
     "lexical": {
       "status": "PROVEN",
@@ -2231,10 +2231,10 @@
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 349981,
-      "containsEdges": 151750,
+      "entries": 349971,
+      "containsEdges": 151745,
       "importEdges": 46481,
-      "declaresEdges": 151750,
+      "declaresEdges": 151745,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2578,17 +2578,25 @@
       ]
     },
     "gpu": {
-      "status": "PARTIAL",
-      "embeddingProbeCount": 24,
-      "embeddingProbeHits": 24,
-      "analysisMode": "embedded"
+      "status": "SKIPPED",
+      "embeddingProbeCount": 0,
+      "embeddingProbeHits": 0,
+      "analysisMode": "unavailable",
+      "reason": "GPU_EXECUTOR_NOT_INVOKED"
     },
     "projection": {
-      "status": "PROVEN",
-      "postgresCanonicalRecords": 30327,
-      "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 349981,
-      "redisProjectionRecords": 30327,
+      "status": "SKIPPED",
+      "postgresCanonicalRecords": 0,
+      "qdrantProjectionRecords": 0,
+      "neo4jProjectionRecords": 0,
+      "redisProjectionRecords": 0,
+      "candidateCounts": {
+        "sources": 30327,
+        "semanticVectors": 24,
+        "relationships": 349971,
+        "lexicalEntries": 30327
+      },
+      "reason": "PROJECTION_WRITERS_NOT_INVOKED",
       "representationName": "semantic_768",
       "denseVectorName": "content",
       "collectionName": "codebase_chunks_768_v2"
@@ -2624,9 +2632,9 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 30155,
-      "invalidatedFiles": 172,
-      "reusedRatio": 0.9943284861674415
+      "reusedFiles": 30327,
+      "invalidatedFiles": 0,
+      "reusedRatio": 1
     }
   },
   "outputs": {

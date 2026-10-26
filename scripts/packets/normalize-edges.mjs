@@ -1,18 +1,17 @@
 #!/usr/bin/env node
 /**
- * Normalizes raw extraction edge files into the canonical atlas-graph-edges.jsonl schema.
- * Run once after extract-db-usage.mjs / extract-tool-usage.mjs to populate canonical location.
+ * Converts legacy heuristic edge extracts into gated, deterministic proposal records.
  */
 import fs from 'node:fs';
 import readline from 'node:readline';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { randomUUID } from 'node:crypto';
+import { buildGraphEdgeProposalV1 } from './graph-edge-proposal-v1.mjs';
+import { buildToolEdgeProposalV1 } from './tool-edge-proposal-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
-const OUT_FILE = path.join(ROOT, 'memory', 'packets', 'atlas-graph-edges.jsonl');
-const NOW = new Date().toISOString();
+const OUT_FILE = path.join(ROOT, '.tmp', 'atlas', 'graph-edge-proposals-v1.jsonl');
 
 function normPath(p) {
   return p.replace(/\\/g, '/').replace(/^.*sveltekit-frontend\//, 'src/');
@@ -24,13 +23,14 @@ const SOURCES = [
     normalize(r) {
       if (!r.source_file || !r.table) return null;
       return {
-        id: randomUUID(), packet_uuid: null,
         src: normPath(r.source_file),
         dst: r.table,
         edge_type: 'USES_DB',
-        weight: 1,
         metadata: { operation: r.operation, line: r.line_num, caller: r.caller },
-        feature_id: null, som_cluster: null, created_at: NOW,
+        source_revision: r.source_revision ?? null,
+        workspace_revision: r.workspace_revision ?? null,
+        line: r.line_num,
+        caller: r.caller,
       };
     },
   },
@@ -38,15 +38,9 @@ const SOURCES = [
     file: path.join(ROOT, 'scripts', 'atlas', 'out', 'tool-usage-edges.ndjson'),
     normalize(r) {
       if (!r.source_file) return null;
-      const dst = r.tool || r.endpoint || r.service || 'unknown';
       return {
-        id: randomUUID(), packet_uuid: null,
         src: normPath(r.source_file),
-        dst,
-        edge_type: 'USES_TOOL',
-        weight: 1,
-        metadata: { type: r.type, line: r.line_num },
-        feature_id: null, som_cluster: null, created_at: NOW,
+        proposal: buildToolEdgeProposalV1(r, normPath(r.source_file)),
       };
     },
   },
@@ -56,13 +50,15 @@ const SOURCES = [
       if (!r.source_file || !r.callee) return null;
       const srcPath = normPath(r.source_file);
       return {
-        id: randomUUID(), packet_uuid: null,
-        src: `${srcPath}:${r.line_num ?? 0}:${r.caller ?? '(module)'}`,
+        src: srcPath,
         dst: r.callee,
         edge_type: 'CALLS',
-        weight: 1,
         metadata: { kind: r.kind, line: r.line_num },
-        feature_id: null, som_cluster: null, created_at: NOW,
+        source_revision: r.source_revision ?? null,
+        workspace_revision: r.workspace_revision ?? null,
+        line: r.line_num,
+        caller: r.caller,
+        type: r.kind,
       };
     },
   },
@@ -70,6 +66,7 @@ const SOURCES = [
 
 async function run() {
   console.log('\n=== normalize-edges ===');
+  fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   const out = fs.createWriteStream(OUT_FILE);
   let total = 0;
   let skipped = 0;
@@ -88,7 +85,17 @@ async function run() {
       try { r = JSON.parse(t); } catch { skipped++; continue; }
       const norm = normalize(r);
       if (!norm) { skipped++; continue; }
-      out.write(JSON.stringify(norm) + '\n');
+      out.write(JSON.stringify(norm.proposal ?? buildGraphEdgeProposalV1({
+        source_locator: norm.src,
+        target_label: norm.dst,
+        relation: norm.edge_type,
+        source_revision: norm.source_revision,
+        workspace_revision: norm.workspace_revision,
+        line: norm.line,
+        caller: norm.caller,
+        type: norm.type,
+        metadata: norm.metadata,
+      })) + '\n');
       total++;
       fileTotal++;
     }
@@ -96,7 +103,7 @@ async function run() {
   }
 
   await new Promise(resolve => out.end(resolve));
-  console.log(`\nTotal: ${total} edges written (${skipped} skipped)\n→ ${OUT_FILE}`);
+  console.log(`\nTotal: ${total} proposal records written (${skipped} skipped)\nCanonical graph output was not changed.\n→ ${OUT_FILE}`);
 }
 
 run().catch(e => { console.error(e.message); process.exit(1); });

@@ -1,4 +1,5 @@
 import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
+import { resolveModelCacheIdentityV1 } from '$lib/server/models/model-registry.js';
 import { generateContextHash } from '$lib/server/cache-keys.js';
 import { aceTopkRevisionedKeyV1, type RetrievalCacheIdentityV1 } from './cache-keys.js';
 import type { FeatureWikiPacket } from './token-aware-context-packer.js';
@@ -14,8 +15,10 @@ import {
 export type AceContextPlannerState = {
   query: string;
   queryHash: string;
-  cacheKey: string;
+  cacheKey: string | null;
   modelName: string;
+  modelRevision: string;
+  adapterRevision: string | null;
   modelQuant: string;
   kvQuant: string;
   draftModel: boolean;
@@ -57,6 +60,8 @@ export type AceContextPlannerHit = {
 const PLANNER_STATE_KEYS: Array<keyof AceContextPlannerState> = [
   'queryHash',
   'modelName',
+  'modelRevision',
+  'adapterRevision',
   'modelQuant',
   'kvQuant',
   'draftModel',
@@ -105,7 +110,10 @@ const UNQUALIFIED_CONTEXT_IDENTITIES = new Set([
   'graph:none',
 ]);
 
-function hasNonPlaceholderContextIdentity(state: AceContextPlannerState): boolean {
+function hasNonPlaceholderContextIdentity(
+  state: AceContextPlannerState,
+): state is AceContextPlannerState & { cacheKey: string; modelRevision: string; adapterRevision: string | null } {
+  if (!state.cacheKey || !state.modelRevision.trim()) return false;
   if (/^ace:topk:v1:[a-f0-9]{64}$/.test(state.retrievalCacheIdentityKey ?? '')) return true;
   return [
     state.repoGitSha,
@@ -172,6 +180,8 @@ function toContextPack(
     plannerState: {
       queryHash: state.queryHash,
       modelName: state.modelName,
+      modelRevision: state.modelRevision,
+      adapterRevision: state.adapterRevision,
       modelQuant: state.modelQuant,
       kvQuant: state.kvQuant,
       draftModel: state.draftModel,
@@ -219,6 +229,8 @@ export function buildAceContextPlannerState(input: {
   conversationId?: string;
   filePath?: string;
   modelName?: string;
+  modelRevision?: string | null;
+  adapterRevision?: string | null;
   modelQuant?: string;
   kvQuant?: string;
   draftModel?: boolean;
@@ -250,10 +262,18 @@ export function buildAceContextPlannerState(input: {
       tokenAwarePacking: Boolean(input.tokenAwarePacking),
     })
   );
+  const modelName = input.modelName ?? SERVER_CHAT_MODEL;
+  const modelIdentity = resolveModelCacheIdentityV1({
+    modelId: modelName,
+    modelRevision: input.modelRevision,
+    adapterRevision: input.adapterRevision,
+  });
   const state = {
     query: input.query.trim(),
     queryHash: generateContextHash(input.query.trim()),
-    modelName: input.modelName ?? SERVER_CHAT_MODEL,
+    modelName,
+    modelRevision: modelIdentity?.modelRevision ?? '',
+    adapterRevision: modelIdentity?.adapterRevision ?? null,
     modelQuant: input.modelQuant ?? 'iq4_xs',
     kvQuant: input.kvQuant ?? 'q8_0/q8_0',
     draftModel: input.draftModel ?? false,
@@ -279,9 +299,11 @@ export function buildAceContextPlannerState(input: {
     filePath: input.filePath,
   };
 
-  const cacheKey = buildContextCacheKey({
+  const cacheKey = modelIdentity ? buildContextCacheKey({
     queryHash: state.queryHash,
     modelName: state.modelName,
+    modelRevision: modelIdentity.modelRevision,
+    adapterRevision: modelIdentity.adapterRevision,
     modelQuant: state.modelQuant,
     kvQuant: state.kvQuant,
     draftModel: state.draftModel,
@@ -303,7 +325,7 @@ export function buildAceContextPlannerState(input: {
     caseId: state.caseId,
     conversationId: state.conversationId,
     filePath: state.filePath,
-  });
+  }) : null;
   return {
     ...state,
     cacheKey,

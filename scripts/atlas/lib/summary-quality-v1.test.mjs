@@ -82,3 +82,14 @@ test('regression: the legacy sanitizer contract is exactly {raw, summary, change
   assert.equal(ok.clean, undefined);
   assert.equal(ok.text, undefined);
 });
+
+test('Ornith-style llama-server channel output returns only the final completion', () => {
+  const result = sanitizeGemma4Summary(
+    '<|channel|>analysis\nLet me reason through this.\n<|channel|>final\nThe API route resolves the active model from llama-server and returns its completion text.',
+  );
+  assert.equal(
+    result.summary,
+    'The API route resolves the active model from llama-server and returns its completion text.',
+  );
+  assert.equal(result.safe, true);
+});

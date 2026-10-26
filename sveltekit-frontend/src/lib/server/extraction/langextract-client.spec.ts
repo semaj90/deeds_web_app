@@ -2,12 +2,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const analyzeResponse = {
+  document_id: 'evidence-123',
+  source_type: 'plain_text',
+  extraction_mode: 'full',
   entities: [
     { text: 'Jane Doe', label: 'person', confidence: 0.97, source: 'spacy' },
     { text: 'Acme Corp', label: 'organization', confidence: 0.92, source: 'spacy' },
   ],
   relationships: [{ subject: 'Jane Doe', predicate: 'works_for', object: 'Acme Corp' }],
   concepts: ['employment', 'corporate-affiliation'],
+  chunks: [],
+  metadata: {},
+  capabilities: {},
+  processing_time_ms: 1,
 };
 
 beforeEach(() => {

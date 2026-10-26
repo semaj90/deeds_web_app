@@ -10,6 +10,8 @@ import { getRedis } from '$lib/server/redis.js';
 export type ContextCacheIdentity = {
   queryHash: string;
   modelName: string;
+  modelRevision: string;
+  adapterRevision: string | null;
   modelQuant: string;
   kvQuant?: string;
   draftModel?: boolean;
@@ -112,6 +114,8 @@ export function buildContextCacheKey(identity: ContextCacheIdentity): string {
     filePath: identity.filePath ?? '',
     graphSnapshotHash: identity.graphSnapshotHash,
     modelName: identity.modelName,
+    modelRevision: identity.modelRevision,
+    adapterRevision: identity.adapterRevision,
     modelQuant: identity.modelQuant,
     personaKey: identity.personaKey,
     repoGitSha: identity.repoGitSha,

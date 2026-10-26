@@ -148,10 +148,12 @@ docs/reports/graphify-workspace-snapshot-binding-v1-rerun-20260914.json 43,680,2
 docs/reports/graphify-workspace-snapshot-binding-v1.json         44,883,450 bytes
 ```
 
-- [ ] 7.1 Determine whether `feature-ontology-current-cohort-v1-codex.json` and
-      `feature-ontology-current-cohort-v1.json.tmp-3904` are genuinely stale duplicates of
-      `feature-ontology-current-cohort-v1.json` (byte-identical size strongly suggests yes) — if
-      confirmed, archive per this repo's archive-not-delete convention rather than deleting.
+- [x] 7.1 Compared full SHA-256 values for `feature-ontology-current-cohort-v1-codex.json`,
+      `feature-ontology-current-cohort-v1.json.tmp-3904`, and `feature-ontology-current-cohort-v1.json`.
+      Although all three are 332,702,851 bytes, their digests differ (`7e474cb0…d3ba6`,
+      `07ac4b04…d04a3`, and `79416feb…3f2ae` respectively); they are not byte-identical duplicates.
+      All three remain at their original paths and were NTFS-compressed with unchanged hashes;
+      no archival or deletion was performed.
 - [ ] 7.2 Investigate why `feature-ontology-current-cohort-v1.json` / `-packet-lineage-v1.json`
       are ~330MB — almost certainly a producer bug (e.g. writing a full corpus dump instead of a
       bounded cohort, matching this same session's earlier discovery that "current cohort" work

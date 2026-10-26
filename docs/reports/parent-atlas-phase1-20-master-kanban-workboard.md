@@ -1,9 +1,43 @@
 # Parent Atlas: Phase 1–20+ Master Kanban Workboard & Production Hardening
 
-> **Status:** ACTIVE WORKBOARD  
+> **Status:** HISTORICAL BASELINE — see current evidence overlay below.
 > **Date:** 2026-10-15  
 > **Schema:** `atlas.parent-atlas-kanban-workboard.v1`  
 > **Authority Order:** PostgreSQL 18.4 (Canonical Truth) → 8095 Tree-sitter/AST-grep → pgvector / Qdrant (Projections) → TurboVec gRPC → Go Retrieval → LangExtract → Ornith 1.5-9b (:8090 Synthesis)
+
+## Current evidence overlay — 2026-10-25
+
+This overlay supersedes historical status labels below where they conflict. The detailed October 15 architecture, counts, service-health claims, and phase assertions are retained for provenance; they have not all been revalidated as current. OpenSpec owner `tasks.md` files remain authoritative. This document and the generated OpenSpec workboard are diagnostic projections, not completion authority.
+
+### Phase namespace and current verdict
+
+The repository uses two incompatible numbering systems: approximate legacy Phase 1–24 labels and canonical workstation IDs `workstation-p11` through `workstation-p25`. Do not map same-numbered legacy rows onto workstation phases. The canonical index leaves workstation P1–P10 unmapped; therefore no overall Phase 1–20 percentage is computable.
+
+| Canonical phase | Current evidence verdict | First outstanding proof |
+|---|---|---|
+| P1–P10 | `NOT_MAPPED` | Identify canonical workstation phase IDs and owners; do not borrow legacy ordinals. |
+| P11 — Experience/memory wiring | `NOT_VERIFIED` | Current phase-specific receipt for the admitted revision and caller path. |
+| P12 — Source/revision/chunk authority | `PARTIAL / BLOCKED` | Source bindings exist, but the current projection audit reports zero exact admitted packet matches; identity and revision qualification remain unproven. |
+| P13 — Feature registry/classification | `PARTIAL / NOT_PROVEN` | The classifier ledger reports `CLASSIFIER_LINEAGE_BLOCKED`; current admitted classifier lineage is absent. |
+| P14 — Context cache/residency | `PARTIAL / NOT_PROVEN` | No admitted user-query lifecycle proves actual load/unload, readback, and residency identity. |
+| P15 — Semantic retrieval/fusion | `PARTIAL / NOT_PROVEN` | No correlated authenticated query trace reaches a qualified `ContextManifest` and `PromptPlan`. |
+| P16 — Graph/ontology expansion | `BLOCKED` | No terminal Graphify run matches workspace revision `c636…`; projection audit verdict is `NOT_SAFE_TO_PROJECT`. |
+| P17 — NLP/structural/numeric features | `NOT_PROVEN` | Phase audit has zero mapped or passing receipts. |
+| P18 — Learned reranking evaluation | `NOT_PROVEN` | Phase audit has zero mapped or passing receipts; label-gated experiments are not production proof. |
+| P19 — Deterministic policy baseline | `NOT_PROVEN` | Phase audit has zero mapped or passing receipts. |
+| P20 — Program/workflow contracts | `NOT_PROVEN` | Phase audit has zero mapped or passing receipts; post-P20 deferrals remain separate gates. |
+
+Evidence: `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json`, `docs/parent-atlas-workstation-todo.md`, `docs/reports/phase17-21-current-proof-audit-20261016.json`, `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-25.json`, and `openspec/changes/parent-atlas-workspace-snapshot-runtime/tasks.md`. The projection audit reports `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`, `SYMBOLS_RESOLVED`, `ORDINAL_MAP_SEALED`, `PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`, and `ACE_EVIDENCE_GROUNDED` as `NOT_PROVEN`; other predicates are partial except the ontology cohort predicate.
+
+**First failing boundary:** the source snapshot/bindings do not join to an exact canonical packet cohort (`IDENTITY_ALIGNED` and `REVISION_QUALIFIED` are `NOT_PROVEN`; exact admitted packet matches: 0). Separately, no terminal Graphify run is recorded for `c636…`, and the documented terminal path requires explicit authorization for a write-capable apply chain. Neither failure authorizes packet tagging or projection writes.
+
+### Fresh OpenSpec task snapshot
+
+The read-only projection generated at `2026-10-26T02:23:57.558Z` contains **13,344 tasks**: **7,885 marked complete** and **5,459 open**. This is a generated task-state summary, not a Phase 1–20 or production-completion percentage. The hardening ledger contains **13 checked / 69 open (13/82 = 15.9%)**, a checkbox ratio only.
+
+Isolated JSON and Markdown outputs: `.tmp/atlas/openspec-workboard-phase1-20-refresh-20261025T192353.json` and `.tmp/atlas/openspec-workboard-phase1-20-refresh-20261025T192353.md`. They are ignored local diagnostics generated with an absent controller input; the shared 59 MB `docs/reports/openspec-workboard-v1.json` was not overwritten.
+
+No database, cache, Graphify, model, service, or projection-store writes occurred. The historical workboard sections below are preserved as an October 15 snapshot; do not use their service counts or `DONE` labels as current proof.
 
 ---
 
@@ -59,20 +93,21 @@
 
 ## 2. Phase 1–12 Review: Did We Accomplish Them?
 
-### Summary Analysis
+### Summary Analysis — evidence-qualified verdicts
 The repository historical record has two phase counting systems:
 1. **Legacy Ordinals (1–24)**: Found in legacy markdown summaries; were rough project milestones, not receipt-backed OpenSpec ledgers.
 2. **Canonical Workstation Roadmap (`workstation-p11` through `workstation-p25`)**: Defined in `docs/parent-atlas-workstation-todo.md` and reconciled in `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json`.
 
 | Phase Milestone | Description | Audit Status | Accomplished? | Details & Blockers |
 |---|---|---|---|---|
-| **Phase 1–6 (Legacy)** | Workspace Ingestion, Chunking, Initial FTS | `HISTORICAL_MERGED` | **YES (Subsumed)** | Subsumed into PostgreSQL 18 `codebase_chunk_index` (274k chunks) and `atlas_packets`. |
-| **Phase 7 (AWM-07)** | Top-K PageRank Candidate Hydration & Parity | `PROVEN_CLOSED` | **YES** | Closed 2026-10-15 via `docs/reports/phase7-topk-hydration-receipt.json`. 1,761 distinct PageRank scores (`8129be75-9b01...`), 25 sampled, 1 HYDRATED, 24 rejected (`writes: 0`). |
-| **Phase 8 (AWM-08)** | QLoRA / Safetensors Challenger Reranker | `GATED_LABELS` | **PARTIAL** | Supervised training gated on reviewed label floor (current: 49/200 reviewed rows, need 30/class). |
-| **Phase 9 (AWM-09)** | Multi-Lane SearchRuntime Recommendations | `PROVEN_DIAGNOSTIC`| **YES (Diagnostic)**| `recommendation-smoke.spec.ts` passes 1/1. Multi-lane fusion (Lexical + Semantic + AST) verified. Citations grounded to evidence IDs. |
-| **Phase 10 (AWM-10)**| Source Revision Propagation & Invalidation | `DEFERRED_POST_P20`| **NO (By Design)** | Deferred to after P20 by operator decision. Prevents 274k unrevisioned chunk rows from halting retrieval. |
-| **Workstation P11** | Local Infrastructure & TCP Health Gate | `VERIFIED_OPERATIONAL`| **YES** | Engram mode (`:8792`), Ollama (`:11434`), Qdrant (`:6333`), Postgres (`:5434`), TurboVec (`:50062`), Go Retrieval (`:8100`), LangExtract (`:8095`), Ornith (`:8090`). |
-| **Workstation P12** | Identity Authority & Chunk Writer Revision | `BLOCKED_DEFERRED` | **NO (Deferred)** | Identity authority blocked on unrevisioned legacy chunk rows (`safeToBackfill=false`). Frozen until P20. |
+| **Phase 1–6 (Legacy)** | Workspace Ingestion, Chunking, Initial FTS | `HISTORICAL_MERGED / NOT_VERIFIED` | **Unknown** | Historical summaries claim these were subsumed by PostgreSQL chunk/packet surfaces, but no phase-specific acceptance receipts are cited. Canonical workstation P1–P10 are unmapped; do not infer equivalence or completion. |
+| **Phase 7 (AWM-07)** | Top-K PageRank Candidate Hydration & Parity | `BOUNDED_READ_ONLY_GATE_PASS / PHASE_PARTIAL` | **Partial** | The 2026-10-15 receipt sampled 25 candidates: 1 hydrated/admitted, 24 terminally rejected, zero unhydrated promotions, and zero writes. This proves bounded safe handling, not whole-phase closure; owner-ledger tasks remain open. See `docs/reports/phase7-topk-hydration-receipt.json` and `openspec/changes/parent-atlas-adaptive-backprop-hll-monitoring/tasks.md`. |
+| **Phase 8 (AWM-08)** | QLoRA / Safetensors Challenger Reranker | `BLOCKED_NO_ELIGIBLE_REVIEWED_LABELS` | **No — incomplete** | The old 49/200 tally is unreconciled. Fresh 2026-10-25 validation found 0/2,433 completed grades and 0 revision-bound queries/candidates; the separate 1,287-judgment queue has 0 completed judgments and 0 hard negatives. No challenger training or held-out evaluation is eligible. See `docs/reports/golden-relevance-review-pool-validation-2026-10-25-phase8.json`, `docs/reports/golden-relevance-review-queue-validation-2026-10-25-phase8.json`, and the AWM-08 owner ledger. |
+| **Phase 9 (AWM-09)** | Multi-Lane SearchRuntime Recommendations | `DIAGNOSTIC_SUBTASK_PROVEN / PHASE_PARTIAL` | **Partial** | AWM-09-02 records a 1/1 lexical/semantic/AST fusion smoke. AWM-09-01 and 09-03–09-05 remain open; revision-qualified evidence and an end-to-end receipt are still required. |
+| **Phase 10 (AWM-10)** | Source Revision Propagation & Invalidation | `DEFERRED_POST_P20` | **No — intentionally deferred** | The owner ledger defers source-revision propagation until post-P20 and GPU-sidecar gates pass. Deferral is not completion. |
+| **Legacy Phase 11–12** | No canonical legacy definitions established | `NOT_MAPPED` | **Unknown** | The reconciliation does not define legacy ordinals 11–12. The workstation P11/P12 entries below are a separate numbering system. |
+| **Workstation P11** | Experience & memory wiring | `HISTORICAL_HEALTH_CLAIM / NOT_REVERIFIED` | **Not currently proven** | The October 15 material reports local service health, but that is not current availability or a phase-specific caller-path receipt. This canonical phase is not the old “local infrastructure health” label. |
+| **Workstation P12** | Source, revision & chunk authority | `PARTIAL / IDENTITY_AND_REVISION_BLOCKED` | **No — incomplete** | Source-binding work exists, but the current overlay reports zero exact admitted packet matches and legacy chunk rows remain unrevisioned. No backfill is authorized. |
 
 ---
 
@@ -83,7 +118,7 @@ The repository historical record has two phase counting systems:
 │         BACKLOG / GATED         │   │          IN PROGRESS            │   │        VERIFIED / PROVEN        │   │        DONE & HARDENED          │
 ├─────────────────────────────────┤   ├─────────────────────────────────┤   ├─────────────────────────────────┤   ├─────────────────────────────────┤
 │ • P10 / P12 Source Revision     │   │ • P8 QLoRA Reranker Challenger  │   │ • P7 PageRank Top-K Hydration   │   │ • OpenSpec Change Suite         │
-│   Backfill (Post-P20)           │   │   (Label curation: 49/200)      │   │   (Receipt PASS, writes: 0)     │   │   (108/108 Valid)               │
+│   Backfill (Post-P20)           │   │   (Eligible labels: 0 current)  │   │   (Receipt PASS, writes: 0)     │   │   (108/108 Valid)               │
 │ • P17 LibTorch CUDA Feature     │   │ • P14 WebGPU N64 LOD Streaming  │   │ • P9 Multi-Lane Recommendations │   │ • PostgreSQL 18 pgvector HNSW   │
 │   Extraction Tournament         │   │   (Resource Viewpoint Bridge)   │   │   (SearchRuntime 1-vote fusion) │   │   (220k vectors, 768-D)         │
 │ • P18 Supervised XGBoost GNN    │   │ • P16 OAKLib / NetworkX         │   │ • P11 Infrastructure TCP Health │   │ • Ornith 1.5-9b Local Synthesis │
@@ -112,7 +147,7 @@ The repository historical record has two phase counting systems:
 ### P8: QLoRA / Safetensors Challenger Reranker
 - **State:** `IN PROGRESS (Gated on Data)`
 - **Owner:** `parent-atlas-retrieval-lod-algorithm-taxonomy` (ATLAS-LEARNING-01)
-- **Current Metric:** 49 of 200 reviewed query-grouped label rows.
+- **Current Metric:** 0 eligible labels in the current relevance-review inputs (0/2,433 pool grades and 0/1,287 queue judgments complete; zero revision-bound queries/candidates). The old 49/200 is unreconciled. A separate inventory describes 49 revision-qualified rows in a 142-row *unreviewed domain-classification draft*; this is a different task and is not evidence for AWM-08 relevance labels.
 - **Rule:** No synthetic reasoning traces or unreviewed model outputs as labels.
 
 ### P9: Canonical AST, Semantic, Contextual Recommendations

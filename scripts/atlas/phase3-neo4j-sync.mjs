@@ -25,8 +25,16 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
-const DRY_RUN = args.includes('--dry-run');
+const APPLY = args.includes('--apply');
+const DRY_RUN = !APPLY;
 const RESET = args.includes('--reset');
+
+if (args.includes('--dry-run') && APPLY) {
+  throw new Error('Choose either the default preview or --apply, not both.');
+}
+if (RESET && !APPLY) {
+  throw new Error('--reset requires explicit --apply.');
+}
 
 function canonicalSourceRefFrom(filePath) {
   const relativeToRoot = path.relative(projectRoot, filePath).replace(/\\/g, '/');
@@ -94,7 +102,7 @@ async function main() {
     });
 
     if (DRY_RUN) {
-      console.log('[DRY-RUN] Would sync to Neo4j. Run without --dry-run to proceed.');
+      console.log('[DRY-RUN] Offline preview only. Pass --apply to write to Neo4j.');
       console.log(`[PREVIEW] First 5 edges:`);
       enrichedEdges.slice(0, 5).forEach((e) => {
         console.log(`  ${e.filePath} (${e.canonicalSourceRef}) :${e.line_num} -[USES_DB]-> ${e.table}`);

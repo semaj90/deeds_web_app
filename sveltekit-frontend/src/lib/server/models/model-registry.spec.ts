@@ -29,7 +29,7 @@ describe('model lanes', () => {
 	});
 });
 
-import { ATLAS_MODEL_BINDINGS, getActiveChatBinding } from './model-registry.js';
+import { ATLAS_MODEL_BINDINGS, getActiveChatBinding, resolveModelCacheIdentityV1 } from './model-registry.js';
 
 describe('atlas model bindings', () => {
 	it('has exactly one enabled chat binding served by llama-server :8090', () => {
@@ -59,5 +59,19 @@ describe('atlas model bindings', () => {
 	it('records the chat weight digest as a 64-char lowercase SHA-256', () => {
 		const chat = ATLAS_MODEL_BINDINGS.find((b) => b.role === 'chat');
 		expect(chat?.artifactSha256).toMatch(/^[0-9a-f]{64}$/);
+	});
+
+	it('resolves model cache identity from the registered artifact and isolates adapter revisions', () => {
+		const chat = getActiveChatBinding();
+		expect(resolveModelCacheIdentityV1({ modelId: chat.modelId })).toEqual({
+			modelRevision: `sha256:${chat.artifactSha256}`,
+			adapterRevision: null,
+		});
+		expect(resolveModelCacheIdentityV1({ modelId: chat.modelId, adapterRevision: `sha256:${'a'.repeat(64)}` }))
+			.toEqual({ modelRevision: `sha256:${chat.artifactSha256}`, adapterRevision: `sha256:${'a'.repeat(64)}` });
+	});
+
+	it('does not invent model revisions for unknown models', () => {
+		expect(resolveModelCacheIdentityV1({ modelId: 'unknown-model' })).toBeNull();
 	});
 });

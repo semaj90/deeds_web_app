@@ -10,7 +10,28 @@
 
 import { createHash } from 'crypto';
 import { execSync } from 'child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'fs';
+
+function writeFileSyncSafe(destPath, content, encoding = 'utf8') {
+  try {
+    writeFileSync(destPath, content, encoding);
+  } catch (err) {
+    if (err && (err.code === 'UNKNOWN' || String(err.message).includes('UNKNOWN') || err.code === 'EBUSY' || err.code === 'EPERM')) {
+      const tmpPath = destPath + '.tmp.' + process.pid + '.' + Date.now();
+      writeFileSync(tmpPath, content, encoding);
+      try {
+        renameSync(tmpPath, destPath);
+      } catch {
+        try {
+          copyFileSync(tmpPath, destPath);
+          unlinkSync(tmpPath);
+        } catch {}
+      }
+    } else {
+      throw err;
+    }
+  }
+}
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { acquireStartupLock, releaseStartupLock } from './lib/graphify-startup-lock.mjs';
@@ -52,9 +73,12 @@ let dailyEmbeddingStatus = 'NOT_REQUESTED';
 let nesPacketStatus = 'NOT_REQUESTED';
 // Opt-in (GRAPHIFY_LIVE_EMBEDDER=1): real EmbeddingGemma via Ollama, read-only. Default stays the
 // deterministic hash smoke so the daily run does not depend on Ollama being up.
+// The dry step never invokes projection writers, so the default production-projection profile
+// (which requires projection PROVEN) can never pass here. semantic-full keeps the validation and
+// semantic checks; projection admission is enforced later by the admission gate.
 const provenanceScript = process.env.GRAPHIFY_LIVE_EMBEDDER === '1'
-  ? 'npm run atlas:phase109b:workflow:dry -- --live-embedder'
-  : 'npm run atlas:phase109b:workflow:dry';
+  ? 'npm run atlas:phase109b:workflow:dry -- --live-embedder --profile=semantic-full'
+  : 'npm run atlas:phase109b:workflow:dry -- --profile=semantic-full';
 const TERMINAL_RUN_AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
 const ADMISSION_REPORT = path.resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const ADMITTED_SNAPSHOT_DIR = path.resolve(ROOT, 'docs/reports/workspace-source-snapshots');
@@ -92,9 +116,60 @@ function sha256(value) {
   return createHash('sha256').update(typeof value === 'string' ? value : stable(value), 'utf8').digest('hex');
 }
 
-function writeGraphifyExecutionSourceV2({ admission, snapshot, materializedRoot }) {
+// The hygiene audit owns the admitted source selection. Re-run it read-only against the materialized
+// bytes and fail closed unless its canonical count and selection checksum equal the admission's.
+function readAdmittedSelectionBinding({ admission, snapshot, materializedRoot }) {
+  const reportRelative = '.tmp/atlas/graphify-daily-selection-hygiene-v1.json';
+  const readRootRelative = path.relative(ROOT, materializedRoot).replaceAll('\\', '/');
+  const manifestRelative = path.relative(ROOT, path.resolve(ADMITTED_SNAPSHOT_DIR, `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`)).replaceAll('\\', '/');
+  execSync(`npx tsx ../scripts/atlas/audit-canonical-source-inventory-hygiene-v1.mts --manifest=${manifestRelative} --source-read-root=${readRootRelative} --report=${reportRelative}`, {
+    cwd: FRONTEND,
+    stdio: quiet ? 'ignore' : 'inherit',
+    timeout: 20 * 60 * 1000,
+    shell: true,
+  });
+  const hygiene = JSON.parse(readFileSync(path.resolve(ROOT, reportRelative), 'utf8'));
+  if (hygiene.status !== 'SOURCE_INVENTORY_HYGIENE_PASS' || (hygiene.blockers ?? []).length !== 0) {
+    throw new Error(`GRAPHIFY_SELECTION_HYGIENE_NOT_PASS:${hygiene.status}`);
+  }
+  if (hygiene.canonicalSourceCount !== admission.sourceCount
+    || hygiene.sourceSelectionChecksum !== admission.sourceSelectionChecksum) {
+    throw new Error('GRAPHIFY_SELECTION_MISMATCH_WITH_ADMISSION');
+  }
+  const selectedKeys = new Set(hygiene.canonicalSources.map((source) => source.sourceIdentityKey));
+  const selectedSources = snapshot.sources.filter((source) =>
+    selectedKeys.has(source.sourceIdentityKey ?? `${source.repositoryId}:${source.repositoryRelativePath}`));
+  if (selectedSources.length !== admission.sourceCount) {
+    throw new Error('GRAPHIFY_SELECTION_SNAPSHOT_COUNT_MISMATCH');
+  }
+  return { reportRelative, selectedSources, selectionChecksum: hygiene.sourceSelectionChecksum };
+}
+
+// The derivation owner recomputes the workspace revision from the sealed snapshot against its
+// materialized bytes. Fail closed unless it reproduces the admitted revision.
+function readAdmittedDerivationBinding({ admission, snapshot, materializedRoot }) {
+  const reportRelative = '.tmp/atlas/graphify-daily-derivation-v1.json';
+  const readRootRelative = path.relative(ROOT, materializedRoot).replaceAll('\\', '/');
+  const snapshotRelative = path.relative(ROOT, path.resolve(ADMITTED_SNAPSHOT_DIR, `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`)).replaceAll('\\', '/');
+  execSync(`npx tsx scripts/atlas/derive-workspace-revision-from-sealed-multi-repo-snapshot-v1.mts --snapshot=${snapshotRelative} --source-read-root=${readRootRelative} --report=${reportRelative}`, {
+    cwd: ROOT,
+    stdio: quiet ? 'ignore' : 'inherit',
+    timeout: 20 * 60 * 1000,
+    shell: true,
+  });
+  const derivation = JSON.parse(readFileSync(path.resolve(ROOT, reportRelative), 'utf8'));
+  if (derivation.status !== 'WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION' || (derivation.blockers ?? []).length !== 0) {
+    throw new Error(`GRAPHIFY_DERIVATION_NOT_READY:${derivation.status}`);
+  }
+  if (derivation.workspaceRevisionCandidate !== admission.workspaceRevision || derivation.sourceCount !== snapshot.sources.length) {
+    throw new Error('GRAPHIFY_DERIVATION_MISMATCH_WITH_ADMISSION');
+  }
+  return { workspaceRevision: derivation.workspaceRevisionCandidate, sourceCount: derivation.sourceCount, reportRelative };
+}
+
+function writeGraphifyExecutionSourceV2({ admission, snapshot, materializedRoot, selection }) {
   const repositoryRows = new Map();
-  for (const source of snapshot.sources) {
+  for (const source of selection.selectedSources) {
     const repositoryId = String(source.repositoryId ?? '');
     const repositoryRelativePath = String(source.repositoryRelativePath ?? source.sourceRef ?? '').replaceAll('\\', '/');
     const row = repositoryRows.get(repositoryId) ?? { repositoryId, paths: [] };
@@ -112,15 +187,17 @@ function writeGraphifyExecutionSourceV2({ admission, snapshot, materializedRoot 
     workspaceRevision: admission.workspaceRevision,
     snapshotRevision: admission.snapshotRevision,
     materializedRoot,
-    sourceCount: snapshot.sources.length,
+    snapshotSourceCount: snapshot.sources.length,
+    sourceCount: selection.selectedSources.length,
     repositoryCount: repositories.length,
     sourceCohortChecksum: snapshot.sourceMembershipChecksum ?? null,
-    selectionChecksum: admission.sourceSelectionChecksum ?? snapshot.sourceMembershipChecksum ?? null,
+    selectionChecksum: selection.selectionChecksum,
+    selectionReportRef: selection.reportRelative,
     repositories,
     admissionReceiptRef: 'docs/reports/workspace-revision-tournament-admission-v1.json',
   };
   const descriptorPath = path.resolve(ROOT, 'docs/reports/graphify-execution-source-v2.json');
-  writeFileSync(descriptorPath, `${JSON.stringify(descriptor, null, 2)}\n`, 'utf8');
+  writeFileSyncSafe(descriptorPath, `${JSON.stringify(descriptor, null, 2)}\n`, 'utf8');
   return descriptorPath;
 }
 
@@ -244,10 +321,16 @@ try {
     timeout: 10 * 60 * 1000,
   });
   process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT = path.resolve(ROOT, '.tmp', 'workspace-source-snapshots', admittedSnapshotBinding.snapshot.snapshotRevision.replace(/^sha256:/, ''));
+  const admittedSelection = readAdmittedSelectionBinding({
+    admission: admittedSnapshotBinding.admission,
+    snapshot: admittedSnapshotBinding.snapshot,
+    materializedRoot: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT,
+  });
   process.env.ATLAS_GRAPHIFY_EXECUTION_SOURCE_DESCRIPTOR = writeGraphifyExecutionSourceV2({
     admission: admittedSnapshotBinding.admission,
     snapshot: admittedSnapshotBinding.snapshot,
     materializedRoot: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT,
+    selection: admittedSelection,
   });
   if (!quiet) console.log(`[graphify:daily] Bound to admitted workspace snapshot (${admittedSnapshotBinding.snapshot.sources.length} sources)...`);
 
@@ -269,8 +352,21 @@ try {
 
   const workflowReceiptPath = path.resolve(ROOT, 'docs/reports/graphify-daily-workflow-receipt.json');
   const workflowReceipt = JSON.parse(readFileSync(workflowReceiptPath, 'utf8'));
+  // The guard checks the revision recomputed from the admitted snapshot's materialized bytes, not
+  // the observer's candidate file (its revision is a different digest, from an older capture).
+  const derivedBinding = readAdmittedDerivationBinding({
+    admission: admittedSnapshotBinding.admission,
+    snapshot: admittedSnapshotBinding.snapshot,
+    materializedRoot: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT,
+  });
   assertGraphifyWorkflowRevisionMatchesAdmissionV1(
-    workflowReceipt,
+    {
+      ...workflowReceipt,
+      sourceBindingObservation: {
+        ...workflowReceipt.sourceBindingObservation,
+        workspaceRevision: derivedBinding.workspaceRevision,
+      },
+    },
     admittedSnapshotBinding.admission.workspaceRevision,
   );
   const observedSourceCount = Number(
@@ -283,6 +379,24 @@ try {
   if (observedSourceCount !== admittedSourceCount) {
     throw new Error(`GRAPHIFY_ADMITTED_SNAPSHOT_SOURCE_COUNT_MISMATCH:${observedSourceCount}:${admittedSourceCount}`);
   }
+
+  // Pre-admission binding owner (dry run only). It verifies the atlas_workspace_source_bindings table
+  // and writes a plan under .tmp/atlas. It never writes to the database; a write needs the
+  // explicit --apply --confirm CANONICAL_SOURCE_BINDING_WRITE gate in a separate approved step.
+  const bindingPlanRelative = '.tmp/atlas/workspace-source-binding-dryrun-c636.json';
+  execSync(`npx tsx scripts/atlas/bind-admitted-workspace-sources-v1.mts --report=${bindingPlanRelative}`, {
+    cwd: FRONTEND,
+    stdio: quiet ? 'ignore' : 'inherit',
+    timeout: 20 * 60 * 1000,
+    shell: true,
+  });
+  const bindingPlan = JSON.parse(readFileSync(path.resolve(ROOT, bindingPlanRelative), 'utf8'));
+  if (bindingPlan.status !== 'BINDING_DRY_RUN_READY_NOT_WRITTEN' || bindingPlan.tableOk !== true
+    || bindingPlan.targetWorkspaceRevision !== admittedSnapshotBinding.admission.workspaceRevision
+    || bindingPlan.dbWritesPerformed !== false) {
+    throw new Error(`GRAPHIFY_SOURCE_BINDING_DRY_RUN_NOT_READY:${bindingPlan.status}`);
+  }
+  if (!quiet) console.log(`[graphify:daily] Binding dry run ready: ${bindingPlan.rowCount} rows (not written)`);
 
   if (derivedContext) {
     if (!quiet) console.log('[graphify:daily] Running optional derived-context read lane...');

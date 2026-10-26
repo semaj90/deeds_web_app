@@ -17639,3 +17639,47 @@ Parsing 768-d embedding text (`content_embedding`, ~9.5 KB/row) from `.tmp/atlas
 
 Evidence: `scripts/atlas/lib/source-text-envelope.mjs` and `scripts/atlas/lib/source-text-envelope.test.mjs`.
 Status: `SOURCE_BYTE_COORDINATE_MAPPING_TESTED`; canonical authority=false; writesPerformed=false.
+
+### SNAPSHOT-BOUND-EDGE-EXTRACTION-AND-PACKET-CANARY-HANDOFF-2026-10-26
+
+- [ ] Keep Graphify execution, canonical edge persistence, and packet revision updates blocked until their independent owner/admission gates pass.
+- [x] Recorded the bounded snapshot-bound CALLS proposal run: 50 bound root files considered, 47 parsed, 54 CALLS observations, 0 resolved to canonical symbols; this is syntax-only proposal evidence, not admitted graph edges. The related 5-file sidecar run produced 255 deduplicated CALL proposals, with 165 observations lacking valid byte spans; preserve the proposal artifact and do not promote it.
+- [x] Rejected the supplied five-packet canary mapping: its five example packet keys have no live matches; two paths do not match the sealed manifest; its target source revisions repeat a snapshot digest instead of per-file digests; and its SQL targets integer `workspace_revision` rather than digest-bearing `workspace_revision_key`.
+- [x] Replaced the diagnostic plan with five actual read-only packet candidates bound to workspace `sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c`; their existing workspace key is `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`. Changing those keys would overwrite lineage and is not authorized by this handoff.
+- [ ] Do not rehearse or apply packet updates until Phase 20 deferral is lifted, the canonical packet writer and non-overwrite semantics are proven, and an exact operation is separately authorized. A transaction rollback is not a substitute for those gates.
+- [ ] Resolve the outstanding symbol-resolution owner handoff before converting syntax-only calls into canonical graph relations; `graphify_edges` having no rows means no current source edges are available to resolve.
+- [ ] Reconcile the reported 24,253-row root-binding commit against its immutable receipt before citing it as independently verified; do not repeat the commit/upsert.
+
+Evidence (proposal/read-only): `.tmp/atlas/packet-identity-canary-plan-c636.json`, `.tmp/atlas/calls-edge-population-plan-2026-10-26T01-07-05-950Z.json`, `.tmp/atlas/calls-edge-proposals-2026-10-26T01-07-05-950Z.ndjson`, `scripts/atlas/plan-8095-calls-edge-population-c636.mjs`. No database, cache, Neo4j, or projection writes were performed for this handoff.
+Status: `IDENTITY_ALIGNED=BLOCKED_PRE_PHASE20`; `SNAPSHOT_BOUND_CALLS=PROPOSAL_ONLY`; canonicalAuthority=false; writesPerformed=false.
+
+### SNAPSHOT-BOUND-PROPOSAL-GRAPH-COMPOSITION-2026-10-26
+
+- [x] Added a receipt-checked composer for snapshot-bound CALLS candidates. It refuses mismatched workspace revisions, unsupported predicates, malformed source/span lineage, duplicate proposal IDs, and promotion-shaped inputs; output is restricted to `.tmp/atlas`.
+- [x] Composed and independently read back `.tmp/atlas/snapshot-bound-proposal-graph-c636-v1.json`: 255 edges, 196 nodes, 0 dangling node/evidence references; graph digest `sha256:d9897b1d772f7ef7461de84435ab983ed6658382fd96e81b367c90b5e06adea9` matches readback. Input CALLS artifact digest: `sha256:72309429cce0fff26b8398382e700fbc2e23f64044fe5ddaccd6e9379771b025`.
+- [x] Focused proposal/lineage/Neo4j-guard tests passed 24/24. `git diff --check` passed (Git emitted the existing LF-to-CRLF notice for this ledger).
+- [ ] This is an integrated **proposal graph**, not a canonical graph: 39 callers are unresolved, all 255 call targets are unresolved labels, and every edge remains `REVIEW_REQUIRED`. No Graphify execution, Neo4j write, PostgreSQL update, or projection write occurred.
+- [x] Extended composition to independently generated `USES_DB`, `USES_QDRANT`, and `USES_TOOL` proposal artifacts; all four lane inputs have digest readback and the same workspace revision. The legacy raw-edge file was not used.
+
+Evidence: `scripts/atlas/compose-snapshot-bound-proposal-graph-v1.mjs`, `scripts/atlas/lib/snapshot-bound-proposal-graph-v1.mjs`, `scripts/atlas/lib/snapshot-bound-proposal-graph-v1.test.mjs`, `.tmp/atlas/snapshot-bound-proposal-graph-c636-v1.json`. Status: `INTEGRATED_PROPOSAL_GRAPH_REVIEW_REQUIRED`; `canonicalAuthority=false`; `writesPerformed=false`.
+
+### SNAPSHOT-BOUND-FOUR-LANE-GRAPH-2026-10-26
+
+- [x] Added a bounded `.tmp/atlas` output option with exclusive-create semantics to the DB and Qdrant extractor; prior `scripts/atlas/out` files were preserved.
+- [x] Fresh bounded extraction emitted 103 `USES_DB`, 93 `USES_QDRANT`, and 550 tool-family proposals. Together with 255 CALLS proposals, the composer produced 1,001 edges and 861 nodes on workspace `sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c`.
+- [x] Independent readback verified all four input artifact digests, the graph digest, and zero dangling node/evidence references. Relation counts: CALLS 255; USES_DB 103; USES_QDRANT 93; HANDLES_ENDPOINT 50; REGISTERS_TOOL 8; REFERENCES_MCP 481; USES_TOOL 11.
+- [x] Focused extractor/composer tests passed 8/8; proposal/lineage/projection-guard tests passed 18/18; scoped `git diff --check` passed with existing line-ending notices.
+- [ ] The graph is still review-only: unresolved CALLS endpoints and proposal target labels are not canonical identities; no Graphify execution, Neo4j/PostgreSQL/cache write, or projection was performed. Preserve the independent execution and admission gates.
+
+Evidence: `.tmp/atlas/snapshot-bound-four-lane-proposal-graph-c636-v1.json`, `.tmp/atlas/proposal-inputs-20261026-db/db-usage-edges.ndjson`, `.tmp/atlas/proposal-inputs-20261026-db/qdrant-usage-proposals.ndjson`, `.tmp/atlas/proposal-inputs-20261026/tool-usage-edges.ndjson`. Status: `INTEGRATED_PROPOSAL_GRAPH_REVIEW_REQUIRED`; `canonicalAuthority=false`; `writesPerformed=false`.
+
+### SNAPSHOT-BOUND-SYMBOL-CANDIDATE-HANDOFF-2026-10-26
+
+- [x] Composed the four proposal lanes with the read-only symbol candidate census into `.tmp/atlas/snapshot-bound-four-lane-symbol-candidate-graph-c636-v2.json`; the receipt binds workspace `sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c`, 1,001 proposal edges, and 861 nodes.
+- [x] Census readback reports 112 unique CALLS target labels, 23 labels with exact registry/alias candidates, 76 unique target-symbol pairs across 120 evidence rows, and 0 pairs qualified by a symbol version at the c636 workspace revision. Candidate annotations remain advisory; target identity remains unresolved.
+- [x] Focused extractor/composer/output-path tests pass 9/9. `git diff --check` passes with existing line-ending notices.
+- [x] Independently read `.tmp/atlas/workspace-source-binding-root-24253-receipt-c636.json`: status `COMMITTED_AND_READBACK_VERIFIED`, 24,253 expected and committed rows, 0 checksum mismatches, 0 missing rows, workspace revision matches c636. Do not repeat the commit/upsert.
+- [ ] Do not run the pasted five-packet update/rehearsal: its example keys and paths are not verified, it uses legacy `workspace_revision` rather than canonical `workspace_revision_key`, and snapshot digest is not a per-source revision. Existing c636 packet-key changes remain blocked by Phase 20, owner non-overwrite semantics, and separate operation authorization.
+- [ ] Keep Graphify execution and canonical edge persistence blocked: no terminal execution is qualified for this revision, `graphify_edges` has no current rows, and proposal graph composition is not projection admission.
+
+Evidence: `.tmp/atlas/calls-target-symbol-candidates-c636-v2.json`, `.tmp/atlas/snapshot-bound-four-lane-symbol-candidate-graph-c636-v2.json`, `.tmp/atlas/workspace-source-binding-root-24253-receipt-c636.json`, `scripts/atlas/lib/snapshot-bound-proposal-graph-v1.test.mjs`, attached handoff `e174fd91-40fc-497d-87f0-9ee772ef787b`. Independent graph readback: graph digest matches; all five input artifact digests match. Status: `INTEGRATED_PROPOSAL_GRAPH_REVIEW_REQUIRED`; `callTargetsWithAdvisoryCandidates=23`; `revisionQualifiedPairCount=0`; `canonicalAuthority=false`; `writesPerformed=false`.

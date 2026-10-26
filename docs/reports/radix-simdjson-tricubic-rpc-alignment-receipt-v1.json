@@ -1,6 +1,6 @@
 {
   "schema": "atlas.radix-simdjson-tricubic-rpc-alignment-receipt.v1",
-  "generatedAt": "2026-10-25T00:04:10.121379+00:00",
+  "generatedAt": "2026-10-25T23:33:57.609868+00:00",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "radixSort64BitProof": {
@@ -112,5 +112,5 @@
     },
     "v2ReceiptChecksum": "sha256:6bc87dbbd900297d5d66f1fe592df70a1e36f8e618ddf5c443ae4128811550da"
   },
-  "receiptChecksum": "sha256:d58a01481d38a09c7f70a94e4048f383e168aec56bb35af6f50b9ce030c096d4"
+  "receiptChecksum": "sha256:583951c251ffa54091195da9e40de42b3d7a2a86ed9c60cab9cce6069f580a28"
 }

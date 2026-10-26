@@ -13,20 +13,29 @@
  * {source_file, line_num, caller, table, operation, type}
  */
 
-import { execSync } from 'child_process';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { execFileSync, execSync } from 'child_process';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'fs';
 import path from 'path';
+import { createGraphifySnapshotEvidenceBinderV1 } from './lib/graphify-snapshot-evidence-binder-v1.mjs';
 import { fileURLToPath } from 'url';
+import { buildGraphEdgeProposalFromSnapshotV1 } from '../packets/graph-edge-proposal-v1.mjs';
+import { resolveProposalOutputDirV1 } from './lib/proposal-output-dir-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
-const OUT_DIR = path.join(projectRoot, 'scripts/atlas/out');
+const outputDirArg = process.argv.slice(2).find((arg) => arg.startsWith('--output-dir='))?.slice('--output-dir='.length);
+const OUT_DIR = resolveProposalOutputDirV1(projectRoot, outputDirArg);
+const admission = JSON.parse(readFileSync(path.join(projectRoot, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'));
+const manifestPath = path.resolve(projectRoot, admission.manifestPath ?? '');
+const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+const snapshotRoot = path.join(projectRoot, '.tmp/workspace-source-snapshots', manifest.snapshotRevision.replace(/^sha256:/, ''));
+const sourceEvidenceBinder = createGraphifySnapshotEvidenceBinderV1({ admission, manifest, snapshotRoot });
 
 const args = process.argv.slice(2);
 const DRY_RUN = !args.includes('--write');
 const SAMPLE_ONLY = args.includes('--sample');
 
-if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
+if (!DRY_RUN && !existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
 
 function parseFilePath(line) {
   // Handle both Windows (C:\path\file:123:content) and Unix (/path/file:123:content)
@@ -48,6 +57,11 @@ function parseFilePath(line) {
     lineNum = parseInt(parts[1]) || 1;
     return { filePath, lineNum, content: parts.slice(2).join(':') };
   }
+}
+
+function findRgMatches(pattern, srcDir, limit) {
+  const output = execFileSync('rg', ['--json', '--glob', '*.ts', '--glob', '*.svelte.ts', pattern, srcDir], { encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024 });
+  return output.split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line)).filter((event) => event.type === 'match').slice(0, limit).map((event) => ({ filePath: event.data.path.text, lineNum: event.data.line_number, content: event.data.lines.text.trimEnd() }));
 }
 
 function parseDbOperation(text) {
@@ -106,7 +120,7 @@ function parsePoolQuery(text) {
 
 function parseSqlTemplate(text) {
   // Match sql`SELECT ... FROM table`
-  const selectMatch = text.match(/sql`\s*SELECT\s+.*?\s+FROM\s+(\w+)/i);
+  const selectMatch = text.match(/sql`\s*SELECT\s+[\s\S]*?\s+FROM\s+(\w+)/i);
   if (selectMatch) return { table: selectMatch[1], operation: 'raw_sql' };
 
   // Match sql`INSERT INTO table`
@@ -129,30 +143,22 @@ async function main() {
   console.log();
 
   const edges = [];
+  const qdrantEdges = [];
 
   // Grep for db.select/insert/update/delete patterns
   console.log('[EXTRACT] Drizzle operations (db.select/insert/update/delete)...');
   try {
-    const srcDir = path.join(projectRoot, 'sveltekit-frontend/src');
-    const matches = execSync(
-      `grep -rn "db\\.(select\\|insert\\|update\\|delete)" "${srcDir}" --include="*.ts" --include="*.svelte.ts" 2>/dev/null | head -${SAMPLE_ONLY ? 100 : 1000}`,
-      { encoding: 'utf-8' }
-    )
-      .trim()
-      .split('\n')
-      .filter(l => l);
+    const srcDir = path.join(snapshotRoot, 'sveltekit-frontend/src');
+    const matches = findRgMatches('db\\.(select|insert|update|delete)', srcDir, SAMPLE_ONLY ? 100 : 1000);
 
-    for (const line of matches) {
-      const parsed = parseFilePath(line);
-      if (!parsed) continue;
-
-      const relPath = path.relative(projectRoot, parsed.filePath);
-      const dbOp = parseDbOperation(parsed.content);
+    for (const match of matches) {
+      const relPath = path.relative(snapshotRoot, match.filePath).replace(/\\/g, '/');
+      const dbOp = parseDbOperation(match.content);
 
       if (dbOp) {
         edges.push({
           source_file: relPath,
-          line_num: parsed.lineNum,
+          line_num: match.lineNum,
           caller: 'drizzle-query',
           table: dbOp.table,
           operation: dbOp.operation,
@@ -169,26 +175,22 @@ async function main() {
   console.log('[EXTRACT] Raw SQL (sql`...`)...');
   const sqlEdgesCount = edges.length;
   try {
-    const srcDir = path.join(projectRoot, 'sveltekit-frontend/src');
-    const matches = execSync(
-      `grep -rn "sql\\\`" "${srcDir}" --include="*.ts" --include="*.svelte.ts" 2>/dev/null | head -${SAMPLE_ONLY ? 50 : 500}`,
-      { encoding: 'utf-8' }
-    )
-      .trim()
-      .split('\n')
-      .filter(l => l);
+    const srcDir = path.join(snapshotRoot, 'sveltekit-frontend/src');
+    const matches = findRgMatches('sql`', srcDir, SAMPLE_ONLY ? 50 : 500);
 
-    for (const line of matches) {
-      const parsed = parseFilePath(line);
-      if (!parsed) continue;
-
-      const relPath = path.relative(projectRoot, parsed.filePath);
-      const sqlOp = parseSqlTemplate(parsed.content);
+    for (const match of matches) {
+      const relPath = path.relative(snapshotRoot, match.filePath).replace(/\\/g, '/');
+      const sourceLines = readFileSync(match.filePath, 'utf-8').split(/\r?\n/);
+      const templateLines = sourceLines.slice(match.lineNum - 1, match.lineNum + 29);
+      const templateText = templateLines.join('\n');
+      const templateStart = templateText.indexOf('sql`');
+      const templateEnd = templateText.indexOf('`', templateStart + 4);
+      const sqlOp = parseSqlTemplate(templateEnd >= 0 ? templateText.slice(templateStart, templateEnd + 1) : templateText);
 
       if (sqlOp) {
         edges.push({
           source_file: relPath,
-          line_num: parsed.lineNum,
+          line_num: match.lineNum,
           caller: 'raw-sql',
           table: sqlOp.table,
           operation: sqlOp.operation,
@@ -206,7 +208,7 @@ async function main() {
   console.log('[EXTRACT] Pool queries (pool.query)...');
   const poolEdgesCount = edges.length;
   try {
-    const srcDir = path.join(projectRoot, 'sveltekit-frontend/src');
+    const srcDir = path.join(snapshotRoot, 'sveltekit-frontend/src');
     // -A 3: 3 lines after the match line to capture multiline SQL args
     const raw = execSync(
       `grep -rn -A 3 "pool\\.query" "${srcDir}" --include="*.ts" --include="*.svelte.ts" 2>/dev/null | head -${SAMPLE_ONLY ? 200 : 2000}`,
@@ -256,8 +258,12 @@ async function main() {
       // Skip transaction control lines
       if (/pool\.query\s*\(\s*['"`]?\s*(BEGIN|COMMIT|ROLLBACK)\s*['"`]?\s*\)/i.test(block.text)) continue;
 
-      const relPath = path.relative(projectRoot, block.filePath);
+      const relPath = path.relative(snapshotRoot, block.filePath).replace(/\\/g, '/');
       const poolOp = parsePoolQuery(block.text);
+      if (!poolOp) {
+        poolUnknown++;
+        continue;
+      }
 
       const table = poolOp?.table ?? 'unknown';
       const operation = poolOp?.operation ?? 'pool';
@@ -272,9 +278,35 @@ async function main() {
         type: 'pool',
       });
     }
-    console.log(`  ✓ Found ${edges.length - poolEdgesCount} pool queries (${poolResolved} resolved, ${poolUnknown} unknown)`);
+    console.log(`  ✓ Emitted ${edges.length - poolEdgesCount} resolved pool edges (${poolResolved} resolved, ${poolUnknown} unresolved)`);
   } catch (e) {
     console.log(`  ⚠ Pool scan error: ${e.message}`);
+  }
+
+  console.log('[EXTRACT] Qdrant vector-store calls (proposal-only)...');
+  try {
+    const srcDir = path.join(snapshotRoot, 'sveltekit-frontend/src');
+    const matches = findRgMatches(
+      '(?:getQdrantManager\\s*\\(\\)\\s*\\.|\\b(?:qdrant|qdrantClient|this\\.qdrant)\\s*\\.\\s*)(search|query|upsert|scroll|retrieve|setPayload|delete)\\s*\\(',
+      srcDir,
+      SAMPLE_ONLY ? 100 : 3000,
+    );
+    for (const match of matches) {
+      const operation = match.content.match(/(search|query|upsert|scroll|retrieve|setPayload|delete)/i)?.[1];
+      if (!operation) continue;
+      qdrantEdges.push({
+        source_file: path.relative(snapshotRoot, match.filePath).split(path.sep).join('/'),
+        line_num: match.lineNum,
+        caller: 'qdrant-client',
+        target: 'qdrant',
+        operation: operation.toLowerCase(),
+        type: 'qdrant',
+        relation: 'USES_QDRANT',
+      });
+    }
+    console.log(`  ✓ Found ${qdrantEdges.length} Qdrant call candidates`);
+  } catch (e) {
+    console.log(`  ⚠ Qdrant scan error: ${e.message}`);
   }
 
   // Output: NDJSON format
@@ -283,17 +315,54 @@ async function main() {
   const outputFile = path.join(OUT_DIR, 'db-usage-edges.ndjson');
 
   let ndjson = '';
+  let snapshotBoundProposals = 0;
+  let reviewRequiredProposals = 0;
   for (const edge of edges) {
-    ndjson += JSON.stringify(edge) + '\n';
+    const proposal = buildGraphEdgeProposalFromSnapshotV1({
+      source_locator: edge.source_file,
+      target_label: edge.table,
+      relation: 'USES_DB',
+      line: edge.line_num,
+      caller: edge.caller,
+      type: edge.type,
+      metadata: { operation: edge.operation, table: edge.table },
+    }, sourceEvidenceBinder);
+    if (proposal.workspace_revision === admission.workspaceRevision && proposal.source_revision && proposal.evidence.source_content_digest) snapshotBoundProposals++;
+    if (proposal.admission_status === 'REVIEW_REQUIRED' && proposal.canonical_authority === false) reviewRequiredProposals++;
+    ndjson += JSON.stringify({ ...edge, proposal }) + '\n';
+  }
+
+  const qdrantOutputFile = path.join(OUT_DIR, 'qdrant-usage-proposals.ndjson');
+  let qdrantNdjson = '';
+  let qdrantSnapshotBound = 0;
+  let qdrantReviewRequired = 0;
+  for (const edge of qdrantEdges) {
+    const proposal = buildGraphEdgeProposalFromSnapshotV1({
+      source_locator: edge.source_file,
+      target_label: edge.target,
+      relation: edge.relation,
+      line: edge.line_num,
+      caller: edge.caller,
+      type: edge.type,
+      metadata: { operation: edge.operation },
+    }, sourceEvidenceBinder);
+    if (proposal.workspace_revision === admission.workspaceRevision && proposal.source_revision && proposal.evidence.source_content_digest) qdrantSnapshotBound++;
+    if (proposal.admission_status === 'REVIEW_REQUIRED' && proposal.canonical_authority === false) qdrantReviewRequired++;
+    qdrantNdjson += JSON.stringify({ ...edge, proposal }) + '\n';
   }
 
   if (DRY_RUN) {
     console.log(`[DRY-RUN] Would write ${outputFile}`);
+    console.log(`[PROPOSAL-LINEAGE] ${snapshotBoundProposals}/${edges.length} snapshot-bound; ${reviewRequiredProposals}/${edges.length} review-required; canonical writes=0`);
+    console.log(`[QDRANT-PROPOSALS] ${qdrantEdges.length} candidates; ${qdrantSnapshotBound}/${qdrantEdges.length} snapshot-bound; ${qdrantReviewRequired}/${qdrantEdges.length} review-required; would write ${qdrantOutputFile}; canonical writes=0`);
     console.log(`[SAMPLE] First 10 edges:`);
     edges.slice(0, 10).forEach(e => console.log(JSON.stringify(e)));
   } else {
-    writeFileSync(outputFile, ndjson);
+    const outputOptions = outputDirArg ? { flag: 'wx' } : undefined;
+    writeFileSync(outputFile, ndjson, outputOptions);
+    writeFileSync(qdrantOutputFile, qdrantNdjson, outputOptions);
     console.log(`[WRITE] ✓ ${outputFile}`);
+    console.log(`[WRITE] ✓ ${qdrantOutputFile} (proposal-only)`);
   }
 
   console.log();
