@@ -127,5 +127,11 @@ def test_bitset_bytea_bitshift_protobuf_and_lod_texture_streaming() -> None:
     assert encoded_tile[0] == 0x0A
     assert len(encoded_tile.hex()) == 752
     assert encoded_tile.hex().startswith("0a1461746c61732e74656e736f722d74696c652e763112477368613235363a31")
+    print("PASS: test_bitset_bytea_bitshift_protobuf_and_lod_texture_streaming verified.")
+
+
+if __name__ == "__main__":
+    test_bitset_bytea_bitshift_protobuf_and_lod_texture_streaming()
+    print("ALL TESTS IN test_atlas_corpus_lib_v1.py PASSED SUCCESSFULLY.")
 
 
