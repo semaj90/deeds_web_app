@@ -8,6 +8,7 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 const root = process.cwd();
 const registrationPath = path.resolve(root, 'docs/reports/golden-review-query-registration-receipt-v1.json');
 const reviewQueuePath = path.resolve(root, '.tmp/atlas/golden-relevance-review-queue-pooled-v1.ndjson');
+const reviewPoolPath = path.resolve(root, '.tmp/atlas/golden-relevance-review-pool-v1.ndjson');
 const requestedOutput = process.argv.find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
 const outputPath = path.resolve(root, requestedOutput ?? `.tmp/atlas/phase8-live-label-census-${new Date().toISOString().replace(/[:.]/g, '-')}.json`);
 const relativeOutput = path.relative(path.resolve(root, '.tmp/atlas'), outputPath);
@@ -25,6 +26,14 @@ const reviewQueueRows = fs.readFileSync(reviewQueuePath, 'utf8').split(/\r?\n/).
   try { return JSON.parse(line); }
   catch (error) { throw new Error(`REVIEW_QUEUE_JSONL_INVALID_LINE_${index + 1}: ${error.message}`); }
 });
+const reviewPoolRows = fs.readFileSync(reviewPoolPath, 'utf8').split(/\r?\n/).filter(Boolean).map((line, index) => {
+  try { return JSON.parse(line); }
+  catch (error) { throw new Error(`REVIEW_POOL_JSONL_INVALID_LINE_${index + 1}: ${error.message}`); }
+});
+const poolCandidatePairs = reviewPoolRows.flatMap((row) => (row.candidates ?? []).map((candidate) => ({
+  candidateId: candidate.candidateId ?? null,
+  sourceRef: candidate.sourceRef ?? null,
+})));
 const candidateSourcePairs = reviewQueueRows.flatMap((row) => (row.judgments ?? []).map((judgment) => ({
   packetKey: judgment.packetKey ?? null,
   sourceRef: judgment.sourceRef ?? judgment.display?.sourceRef ?? null,
@@ -139,6 +148,46 @@ try {
     packet_key: query.packetKey,
     source_ref: query.sourceRef,
   })))] )).rows[0];
+  const poolCandidateIdReadback = (await client.query(`
+    WITH wanted AS (
+      SELECT slot_index, candidate_id, source_ref
+      FROM jsonb_to_recordset($1::jsonb) AS candidate(slot_index int, candidate_id text, source_ref text)
+    )
+    SELECT count(*)::int AS candidate_slots,
+      count(*) FILTER (WHERE EXISTS (
+        SELECT 1 FROM atlas_packets p WHERE p.packet_id = wanted.candidate_id
+      ))::int AS exact_packet_id_matches,
+      count(*) FILTER (WHERE EXISTS (
+        SELECT 1 FROM atlas_packets p
+        WHERE p.packet_id = wanted.candidate_id AND p.source_ref = wanted.source_ref
+      ))::int AS exact_packet_id_source_pair_matches,
+      count(*) FILTER (WHERE EXISTS (
+        SELECT 1 FROM atlas_packets p
+        WHERE p.qdrant_point_id = wanted.candidate_id AND p.source_ref = wanted.source_ref
+      ))::int AS exact_qdrant_point_source_pair_matches,
+      count(*) FILTER (WHERE (
+        SELECT count(*) FROM atlas_packets p
+        WHERE p.qdrant_point_id = wanted.candidate_id AND p.source_ref = wanted.source_ref
+      ) = 1)::int AS uniquely_resolved_qdrant_packet_pairs,
+      count(*) FILTER (WHERE EXISTS (
+        SELECT 1 FROM atlas_packets p
+        WHERE p.packet_id = wanted.candidate_id AND p.source_ref = wanted.source_ref
+          AND p.workspace_revision_key ~ '^sha256:[a-f0-9]{64}$'
+          AND p.source_revision ~ '^sha256:[a-f0-9]{64}$'
+      ))::int AS exact_pair_with_sha256_revisions,
+      count(*) FILTER (WHERE EXISTS (
+        SELECT 1 FROM atlas_packets p
+        WHERE p.packet_id = wanted.candidate_id AND p.source_ref = wanted.source_ref
+          AND p.workspace_revision_key ~ '^sha256:[a-f0-9]{64}$'
+          AND p.source_revision ~ '^sha256:[a-f0-9]{64}$'
+          AND p.byte_start IS NOT NULL AND p.byte_end > p.byte_start
+      ))::int AS exact_pair_with_revisions_and_byte_span
+    FROM wanted
+  `, [JSON.stringify(poolCandidatePairs.map((candidate, slot_index) => ({
+    slot_index,
+    candidate_id: candidate.candidateId,
+    source_ref: candidate.sourceRef,
+  })))] )).rows[0];
   const candidateRevisionGroups = (await client.query(`
     WITH wanted AS (
       SELECT slot_index, packet_key, source_ref
@@ -184,6 +233,11 @@ try {
     pooledReviewQueryLineage: {
       exactReadback: 'packet_key plus source_ref equality only',
       ...queryPairReadback,
+    },
+    reviewerPoolCandidateLineage: {
+      poolPath: path.relative(root, reviewPoolPath),
+      exactReadback: 'candidateId to atlas_packets.packet_id plus exact source_ref equality',
+      ...poolCandidateIdReadback,
     },
     candidateWorkspaceRevisionGroups: candidateRevisionGroups,
     databaseWideJudgments: {

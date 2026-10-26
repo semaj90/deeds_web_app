@@ -116,6 +116,7 @@ class AstEvidenceResponseV2(BaseModel):
     language: str
     file_path: str
     source_revision: str
+    workspace_revision: Optional[str] = None
     chunks: list[AstEvidenceChunkV2]
     edges: list[legacy.AstEvidenceEdge] = Field(default_factory=list)
     diagnostics: list[str] = Field(default_factory=list)
@@ -1317,6 +1318,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             language=language,
             file_path=req.file_path,
             source_revision=req.source_revision,
+            workspace_revision=req.workspace_revision,
             chunks=[],
             diagnostics=[language_error],
             error_tag="UnsupportedLanguageError",
@@ -1334,6 +1336,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             language=language,
             file_path=req.file_path,
             source_revision=req.source_revision,
+            workspace_revision=req.workspace_revision,
             chunks=[],
             diagnostics=["treesitter-chunker is unavailable; no replacement evidence was produced"],
             error_tag="ChunkingError",
@@ -1636,6 +1639,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         language=language,
         file_path=req.file_path,
         source_revision=req.source_revision,
+        workspace_revision=req.workspace_revision,
         chunks=evidence_chunks,
         edges=edges,
         diagnostics=diagnostics,

@@ -70,6 +70,7 @@ describe('FeatureTaxonomyV1 Contract', () => {
   it('maps exact packet source references to existing catalog labels as proposals', () => {
     const examples = [
       ['sveltekit-frontend/src/routes/(app)/chat/+page.svelte', 'chat'],
+      ['sveltekit-frontend/src/lib/components/AIChatAssistant.svelte', 'ai_chat'],
       ['sveltekit-frontend/src/routes/login/+page.svelte', 'auth'],
       ['sveltekit-frontend/src/lib/features/evidence-command-center/EvidenceGraphPane.svelte', 'canvas'],
       ['sveltekit-frontend/src/lib/server/ai/whisper.ts', 'media_transcribe'],

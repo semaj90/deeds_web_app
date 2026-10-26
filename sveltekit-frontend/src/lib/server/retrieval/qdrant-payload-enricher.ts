@@ -75,6 +75,7 @@ export interface EnrichedPayload {
   qdrant_point_id: string | null;
   feature_id: string;
   source_ref: string;
+  file_path: string;
   workspace_id: string;
   directory_path: string;
   symbol: string;
@@ -600,6 +601,7 @@ export function buildEnrichedPayload(
     qdrant_point_id: qdrantPointId || null,
     feature_id: String(chunk.featureId ?? chunk.feature_id ?? sourceRef ?? chunk.id ?? chunk.qdrantId ?? 'unknown'),
     source_ref: sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? ''),
+    file_path: sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? ''),
     workspace_id: workspaceId,
     directory_path: chunk.directoryPath || chunk.directory_path || sourceRef.split('/').slice(0, -1).join('/') || 'root',
     symbol: chunk.symbol || chunk.functionSymbol || '',

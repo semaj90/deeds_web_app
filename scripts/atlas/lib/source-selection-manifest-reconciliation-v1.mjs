@@ -4,6 +4,8 @@ const normalizeRef = (value) => String(value ?? '').trim().replaceAll('\\', '/')
 const normalizeDigest = (value) => String(value ?? '').trim().replace(/^sha256:/i, '').toLowerCase();
 const text = (value) => value === null || value === undefined ? null : String(value);
 const hash = (value) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
+const isSha256Revision = (value) => /^sha256:[a-f0-9]{64}$/i.test(text(value) ?? '');
+const isSha256Digest = (value) => /^[a-f0-9]{64}$/i.test(text(value) ?? '');
 
 export function reconcileSelectedSourceManifestV1({ admission, selectionPlan, snapshot }) {
   const bindings = Array.isArray(selectionPlan?.bindings) ? selectionPlan.bindings : [];
@@ -24,6 +26,12 @@ export function reconcileSelectedSourceManifestV1({ admission, selectionPlan, sn
     planSchema: selectionPlan?.schema === 'atlas.graphify-source-selection-plan.v1',
     planReady: selectionPlan?.status === 'SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED',
     admissionReady: admission?.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' && admission?.authority === true,
+    admissionWorkspaceMatchesCandidate: isSha256Revision(selectionPlan?.workspaceRevisionCandidate)
+      && isSha256Revision(admission?.workspaceRevision)
+      && admission.workspaceRevision === selectionPlan.workspaceRevisionCandidate,
+    snapshotRevisionsValid: isSha256Revision(selectionPlan?.snapshotRevision)
+      && isSha256Revision(admission?.snapshotRevision)
+      && isSha256Revision(snapshot?.snapshotRevision),
     snapshotRevisionMatches: selectionPlan?.snapshotRevision === admission?.snapshotRevision
       && snapshot?.snapshotRevision === admission?.snapshotRevision,
     selectionCountMatches: rows.length > 0 && rows.length === selectionPlan?.sourceCount && rows.length === admission?.sourceCount,
@@ -31,6 +39,8 @@ export function reconcileSelectedSourceManifestV1({ admission, selectionPlan, sn
       && selectionPlan?.sourceSelectionChecksum === hash(JSON.stringify([...keys].sort())),
     uniqueSourceIdentities: new Set(keys).size === keys.length,
     uniqueSourceRefs: new Set(sourceRefs).size === sourceRefs.length,
+    sourceDigestsValid: rows.every((row) => isSha256Revision(row.sourceRevision) && isSha256Digest(row.contentDigest)),
+    sourceByteLengthsValid: rows.every((row) => Number.isSafeInteger(row.byteLength) && row.byteLength >= 0),
     everyBindingMatchesSnapshot: bindings.every((binding) => {
       const source = snapshotByIdentity.get(identityKey(binding));
       return Boolean(source)

@@ -24,6 +24,7 @@ describe('buildQdrantSyncPayload canonical lineage contract', () => {
       canonical_id: 'chunk:canonical:test:1',
       packet_key: 'packet:test:1',
       source_ref: 'src/test.ts',
+      file_path: 'src/test.ts',
       workspace_revision: workspaceRevision,
       workspace_cache_revision: 41,
       repository_revision: 'c'.repeat(40),

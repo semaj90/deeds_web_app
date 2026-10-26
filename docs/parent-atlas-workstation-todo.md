@@ -2718,6 +2718,84 @@ crosswalk.
 
 **Not a code-index stage:** YaRN is an Ornith/llama.cpp generation-context setting. Quaternion/SO(4), Hilbert, SVD/UMAP, and topology coordinates are derived routing/analysis features. Titans/SSM references are not, by themselves, a Parent Atlas indexing owner. Hidden thoughts, raw hidden-state tensors, and KV cache remain non-persistable under repository policy.
 
+### Unified phase and data contract (2026-10-26)
+
+These two phase namespaces are intentionally not interchangeable. The legacy
+Adaptive Workstream phases P1-P10 belong only to
+`parent-atlas-adaptive-backprop-hll-monitoring`: P1 change detection, P2
+invalidation/reprocessing, P3 HLL telemetry, P4 adaptive backprop, P5
+monitoring, P6 optional GPU rerank wiring, P7 Top-K/PageRank, P8 reviewed-label
+QLoRA, P9 diagnostic recommendations, and P10 source-revision propagation
+(deferred). They do not define workstation P1-P10. The canonical workstation
+roadmap maps P11-P25: P11 experience/memory; P12 source/revision/chunk
+authority; P13 feature registry/classification; P14 context/cache residency;
+P15 semantic retrieval/fusion; P16 graph/ontology; P17 NLP/structural/numeric
+features; P18 learned-reranking evaluation; P19 deterministic policy baseline;
+P20 program/workflow contracts; P21 reflective optimization; P22 RL policy
+experiments; P23 transport validation; P24 GPU/vector residency; P25
+evaluation-only model-policy training. P1-P10 remain unmapped in the
+workstation namespace. Phase 8 QLoRA and workstation P18 are related but
+distinct gates; neither inherits the other's completion claim.
+
+The ordered implementation contract is: (1) the sealed source inventory owns
+canonical repository-relative `sourceRef` and source/workspace revisions; a
+`file_path` compatibility field must resolve to that same normalized path;
+(2) Tree-sitter chooses only a grammar supported by the pinned language map
+(currently the structural adapter maps TS/TSX/JS, Python, Rust, Go, and Java
+from the `sourceRef` extension); LSP adds symbol/type/reference evidence but
+does not establish language or source identity; (3) CST/AST function chunks
+preserve exact UTF-8 byte spans and parser revision, and the existing index
+writer must explicitly join symbols/chunks to `feature_id` and a versioned,
+descriptive `feature_label`. That production enrichment handoff is not yet
+proven end-to-end; unresolved labels remain unknown/proposal-only, never
+fabricated as identity; (4) validate and admit canonical packet/chunk identity
+and metadata through the existing PostgreSQL owners before building vector or
+graph projections; (5) store canonical `semantic_768` vectors before the
+PostgreSQL HNSW index, then independently reconcile Qdrant/TurboVec projections
+to packet keys and revisions. SearchRuntime remains the single fusion owner.
+
+SVD/PCA, KMeans, the 20x20 SOM, PageRank, and graph features are derived from a
+frozen canonical vector cohort and sealed ordinal map; they do not alter the
+canonical vector, create identity, or add retrieval votes. The reported
+342/400 SOM-cell occupancy is a historical diagnostic, not current
+revision-qualified proof. TurboVec 4-bit/2-bit compression is an executor
+projection and must be measured against an exact CPU reference on the same
+candidate IDs. For persisted binary masks, use the existing versioned `bytea`
+codec owner with logical bit length, bit order, checksum, and ordinal-map
+digest; base64 is a transport encoding and base32 is for textual token needs,
+not the canonical stored representation. PostgreSQL UUIDs are correlation/event
+IDs where the owning schema calls for them; they do not replace `PacketKeyV2`,
+source identity, or CandidateOrdinal.
+
+Runtime/build boundary: keep CPU reference helpers and schemas in the existing
+Parent Atlas package; use Python 8095 for bounded Tree-sitter/LangExtract and a
+separately pinned Python environment for PyTorch-side analysis, with parity
+against the shared contract. Do not assume the sidecar and GPU analysis share
+an ABI or environment. Use the existing Rust/Node-API TurboVec owner for measured
+in-process native operations; add C++/N-API only when the existing native owner
+cannot provide a measured benefit. The pinned
+`docker/atlas-cuda134-simt` lane compiles CUDA 13.4.1 / SM86 C++ and CUDA Tile
+fixtures; it is not the PyTorch/CUDA 13.2 RAPIDS environment. Pin and report
+Python, PyTorch, CUDA, compiler, Node-API and native-artifact versions per lane;
+never assume their ABIs interoperate. The Windows `.venv-cu130` and WSL
+`atlas-rapids-cu13` are separate environments, not a single install target.
+
+For user-query routing, keep the existing `atlas.query-classification.v2`
+contract as the intent/domain/operation/retrieval-budget owner and compose it
+with the existing concept-extraction and ontology-lookup owners. A typed,
+versioned query plan may carry domain, topic/concept IDs, grounded entity
+mentions, confidence, taxonomy/ontology revision, and evidence refs; topic or
+entity guesses without grounded evidence must remain proposals. The actual
+topic/entity-to-evidence handoff is not yet proven end-to-end. Do not add a
+second classifier, let an LLM choose arbitrary tables/tools, or turn taxonomy
+labels into packet identity or an extra retrieval vote.
+
+AWM-08 exit remains blocked on the owning ledger's 200 reviewer-authored,
+query-grouped, revision-qualified judgments (at least 30 per grade 0-3),
+including hard negatives and independent corpus validation. The October 26
+read-only census found zero human judgments; the prior 49/200 count is not
+reconciled. Do not train or promote a QLoRA/ranker from the stale review pool.
+
 ### Structural-index use in lineage, extraction, and context work
 
 An external structural index such as Codebase-Memory may help locate the

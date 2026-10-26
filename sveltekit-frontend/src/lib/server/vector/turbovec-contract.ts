@@ -10,6 +10,8 @@ export const TURBOVEC_ROTATION_SEED = 'rotorquant-v1';
 export const TURBOVEC_INDEX_DIMENSION = 128;
 export const TURBOVEC_PROJECTION = 'mrl-prefix-l2';
 export const TURBOVEC_REPRESENTATION_ID = 'embeddinggemma_mrl128_l2_4bit_v1';
+export const TURBOVEC_2BIT_REPRESENTATION_ID = 'embeddinggemma_mrl128_l2_2bit_v1';
+export const TURBOVEC_LOD_TILE_128B_LAYOUT = 'lod_tile_128b';
 
 export interface TurboVecMetadata {
   embeddingModel: string;
@@ -24,6 +26,10 @@ export interface TurboVecMetadata {
   clusterId?: string;
   manifold4?: [number, number, number, number];
   sourceRef?: string;
+  lodTileRef?: string;
+  bytea4bitHex?: string;
+  bytea2bitHex?: string;
+  signBitset128Hex?: string;
 }
 
 export function assertTurboVecEmbedding(vector: number[], expectedDimension = TURBOVEC_EMBEDDING_DIMENSION): void {
@@ -46,6 +52,10 @@ export function buildTurboVecMetadata(input: {
   manifold4?: [number, number, number, number];
   sourceRef?: string;
   packedBytesRef?: string;
+  lodTileRef?: string;
+  bytea4bitHex?: string;
+  bytea2bitHex?: string;
+  signBitset128Hex?: string;
 }): TurboVecMetadata {
   return {
     embeddingModel: TURBOVEC_EMBEDDING_MODEL,
@@ -60,12 +70,17 @@ export function buildTurboVecMetadata(input: {
     clusterId: input.clusterId,
     manifold4: input.manifold4,
     sourceRef: input.sourceRef,
+    lodTileRef: input.lodTileRef,
+    bytea4bitHex: input.bytea4bitHex,
+    bytea2bitHex: input.bytea2bitHex,
+    signBitset128Hex: input.signBitset128Hex,
   };
 }
 
 // -- Runtime contract for the :8791 HTTP ANN sidecar (derived prefilter, never a retrieval vote) --
 export const TurboVecRepresentationSchema = z.enum([
   'embeddinggemma_mrl128_l2_4bit_v1',
+  'embeddinggemma_mrl128_l2_2bit_v1',
   'embeddinggemma_mrl64_l2_4bit_v1', // lower tier: recall@50 0.858 vs 0.946 at 128-d (50-query probe)
 ]);
 
