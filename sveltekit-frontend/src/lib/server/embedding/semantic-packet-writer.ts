@@ -10,9 +10,12 @@ import {
 	type CanonicalSemanticLineage,
 } from '$lib/server/embedding/semantic-lineage.js';
 import {
-	semanticPacketWriteAdmissionV1Schema,
-	type SemanticPacketWriteAdmissionV1,
+	buildSemanticPacketWriteAdmissionV1,
+	validateSemanticPacketExecutionAuthorityV1,
+	type SemanticPacketExecutionAuthorityReceiptV1,
+	type WorkspaceRevisionTournamentAdmissionReceiptV1,
 } from './semantic-packet-write-admission-v1.js';
+import type { WorkspaceSourceBindingV1 } from '$lib/server/atlas/identity/workspace-source-binding-v1.js';
 import { derivePacketRevisionV1 } from '$lib/server/atlas/identity/packet-revision-v1.js';
 
 export interface PersistCanonicalSemanticPacketEmbeddingInput {
@@ -58,6 +61,12 @@ type AtlasPacketWriter = {
 	insert: typeof db.insert;
 };
 
+type AdmittedPacketLineage = {
+	workspaceRevisionKey: string;
+	lineageBindingChecksum: string;
+	lineageProducerRevision: string;
+};
+
 async function resolvePersistedPacketKey(
 	input: PersistCanonicalSemanticPacketEmbeddingInput
 ): Promise<string> {
@@ -90,6 +99,14 @@ async function resolvePersistedPacketKey(
 export async function persistCanonicalSemanticPacketEmbedding(
 	input: PersistCanonicalSemanticPacketEmbeddingInput,
 	database: AtlasPacketWriter = db,
+): Promise<PersistCanonicalSemanticPacketEmbeddingResult> {
+	return persistSemanticPacketEmbedding(input, database);
+}
+
+async function persistSemanticPacketEmbedding(
+	input: PersistCanonicalSemanticPacketEmbeddingInput,
+	database: AtlasPacketWriter,
+	admittedLineage?: AdmittedPacketLineage,
 ): Promise<PersistCanonicalSemanticPacketEmbeddingResult> {
 	const packetKey = await resolvePersistedPacketKey(input);
 	const packetId = input.packetId?.trim() || packetKey;
@@ -169,6 +186,9 @@ export async function persistCanonicalSemanticPacketEmbedding(
 			projectionDimension: input.projectionDimension ?? null,
 			encoderRevision: lineage.encoderRevision,
 			embeddingDigest: lineage.embeddingDigest,
+			workspaceRevisionKey: admittedLineage?.workspaceRevisionKey ?? null,
+			lineageBindingChecksum: admittedLineage?.lineageBindingChecksum ?? null,
+			lineageProducerRevision: admittedLineage?.lineageProducerRevision ?? null,
 			createdAt: now,
 			updatedAt: now,
 		})
@@ -200,6 +220,9 @@ export async function persistCanonicalSemanticPacketEmbedding(
 				projectionDimension: input.projectionDimension ?? null,
 				encoderRevision: lineage.encoderRevision,
 				embeddingDigest: lineage.embeddingDigest,
+				workspaceRevisionKey: admittedLineage?.workspaceRevisionKey ?? atlasPackets.workspaceRevisionKey,
+				lineageBindingChecksum: admittedLineage?.lineageBindingChecksum ?? atlasPackets.lineageBindingChecksum,
+				lineageProducerRevision: admittedLineage?.lineageProducerRevision ?? atlasPackets.lineageProducerRevision,
 				updatedAt: now,
 			},
 		});
@@ -220,13 +243,27 @@ export async function persistCanonicalSemanticPacketEmbedding(
  * integer cache epoch; the source/workspace binding remains the authority.
  */
 export async function persistAdmittedSemanticPacketEmbedding(
-	input: Omit<PersistCanonicalSemanticPacketEmbeddingInput, 'packetKey' | 'sourceRef' | 'sourceRevision' | 'contentHash' | 'metadata'> & {
-		admission: SemanticPacketWriteAdmissionV1;
+	input: Omit<PersistCanonicalSemanticPacketEmbeddingInput, 'sourceRef' | 'sourceRevision' | 'contentHash' | 'metadata'> & {
+		binding: WorkspaceSourceBindingV1;
+		tournamentAdmission: WorkspaceRevisionTournamentAdmissionReceiptV1;
+		executionReceipt: SemanticPacketExecutionAuthorityReceiptV1;
 		metadata?: Record<string, unknown>;
 	},
 	database: AtlasPacketWriter = db,
 ): Promise<PersistCanonicalSemanticPacketEmbeddingResult> {
-	const admission = semanticPacketWriteAdmissionV1Schema.parse(input.admission);
+	const execution = validateSemanticPacketExecutionAuthorityV1({
+		tournamentAdmission: input.tournamentAdmission,
+		executionReceipt: input.executionReceipt,
+	});
+	const admission = buildSemanticPacketWriteAdmissionV1({
+		packetKey: input.packetKey,
+		binding: input.binding,
+		admittedWorkspaceRevision: input.tournamentAdmission.workspaceRevision,
+		executionId: execution.executionId,
+	});
+	if (input.tournamentAdmission.projectionWritesAuthorized === false) {
+		throw new Error('SEMANTIC_PACKET_PROJECTION_WRITES_NOT_AUTHORIZED');
+	}
 	const packetRevision = derivePacketRevisionV1({
 		packetKey: admission.packetKey,
 		sourceRef: admission.sourceRef,
@@ -245,12 +282,16 @@ export async function persistAdmittedSemanticPacketEmbedding(
 		},
 	};
 
-	return persistCanonicalSemanticPacketEmbedding({
+	return persistSemanticPacketEmbedding({
 		...input,
 		packetKey: admission.packetKey,
 		sourceRef: admission.sourceRef,
 		sourceRevision: admission.sourceRevision,
 		contentHash: admission.contentDigest,
 		metadata,
-	}, database);
+	}, database, {
+		workspaceRevisionKey: admission.workspaceRevision,
+		lineageBindingChecksum: admission.bindingChecksum,
+		lineageProducerRevision: input.binding.producerRevision,
+	});
 }

@@ -39,7 +39,7 @@ def test_all_current_language_profiles_validate() -> None:
 def test_manifest_registers_every_validated_language_profile() -> None:
     manifest = yaml.safe_load((ROOT / ".okf" / "manifest.yaml").read_text(encoding="utf-8"))
     declared = set(manifest["registries"]["languages"]["schemas"])
-    profiles = {path.name for path in PROFILE_DIR.glob("*.yaml") if path.name in declared}
+    profiles = {path.name for path in PROFILE_DIR.glob("*.yaml")}
 
     assert declared == profiles
 

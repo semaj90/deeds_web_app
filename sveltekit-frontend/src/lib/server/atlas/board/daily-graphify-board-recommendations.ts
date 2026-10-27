@@ -23,6 +23,10 @@ import {
 } from './graphify-task-candidates.js';
 import type { DailyGraphifyBoardData } from './daily-graphify-board.js';
 import { resolveCurrentGraphifyWorkspaceRevision } from './graphify-current-workspace-revision.js';
+import { resolveAdmittedSourceRevisionV1 } from '../identity/admitted-source-revision-resolver-v1.js';
+import type { AdmittedSourceRevisionV1 } from '../identity/admitted-source-revision-resolver-v1.js';
+
+const MAX_SOURCE_BINDING_CANDIDATES = 64;
 type GraphifyTaskCandidate = ReturnType<typeof buildDailyGraphifyTaskCandidates>[number];
 
 export const DailyGraphifyBoardRecommendationSchema = z
@@ -51,6 +55,9 @@ export type DailyGraphifyBoardRecommendation = z.infer<typeof DailyGraphifyBoard
 export interface DailyGraphifyBoardRecommendationContext extends GraphifyTaskCandidateBuildContext {
 	policyRevision?: string;
 	featureRevision?: string;
+	eventRevision?: string;
+	admittedWorkspaceRevision?: string | null;
+	resolveSourceBinding?: typeof resolveAdmittedSourceRevisionV1;
 	traceId?: string;
 	sourceRef?: string;
 	maxResults?: number;
@@ -105,7 +112,8 @@ async function buildEvidencePacket(
 ) {
 	const sourceRef = candidate.source_ref?.trim() ?? null;
 	const packetKey = candidate.packet_keys[0]?.trim() ?? null;
-	if (!sourceRef) return null;
+	const sourceRevision = candidate.source_revision?.trim() ?? null;
+	if (!sourceRef || !sourceRevision) return null;
 	const pos = inferPartOfSpeech(candidate.task_label, candidate.script);
 	const text = [
 		candidate.task_label,
@@ -123,7 +131,7 @@ async function buildEvidencePacket(
 	return buildPosConceptTaggingPacketFromSource({
 		packetKey,
 		sourceRef,
-		sourceRevision: eventRevision,
+		sourceRevision,
 		workspaceRevision,
 		featureId: candidate.task_id,
 		featureLabel: candidate.task_label ?? candidate.task_id,
@@ -206,12 +214,12 @@ export async function buildDailyGraphifyBoardRecommendations(
 	board: DailyGraphifyBoardData,
 	context: DailyGraphifyBoardRecommendationContext = {},
 ): Promise<DailyGraphifyBoardRecommendation[]> {
-	const candidates = buildDailyGraphifyTaskCandidates(board, context);
+	const candidates = buildDailyGraphifyTaskCandidates(board, context).slice(0, MAX_SOURCE_BINDING_CANDIDATES);
 	const policyRevision = context.policyRevision ?? 'daily-graphify-board-policy-v1';
 	const featureRevision = context.featureRevision ?? 'daily-graphify-board-feature-v1';
 	const traceId = context.traceId ?? board.generated;
 	const sourceRef = context.sourceRef;
-	const eventRevision = context.sourceRevision ?? board.generated;
+	const eventRevision = context.eventRevision ?? board.generated;
 	const generatedAt = context.generatedAt ?? board.generated;
 
 	if (candidates.length === 0) return [];
@@ -230,13 +238,31 @@ export async function buildDailyGraphifyBoardRecommendations(
 			runGraphRevision = resolved?.graphRevision ?? null;
 		}
 	}
+	const admittedWorkspaceRevision = context.admittedWorkspaceRevision?.trim() ?? '';
+	const sourceBindingResolver = context.resolveSourceBinding ?? resolveAdmittedSourceRevisionV1;
+	const sourceBindings = new Map<string, AdmittedSourceRevisionV1>();
+	if (/^sha256:[a-f0-9]{64}$/i.test(admittedWorkspaceRevision)) {
+		for (const sourceRef of [...new Set(candidates.map((candidate) => candidate.source_ref?.trim()).filter((value): value is string => Boolean(value)))]) {
+			try {
+				sourceBindings.set(sourceRef, await sourceBindingResolver({ sourceRef, workspaceRevision: admittedWorkspaceRevision }));
+			} catch {
+				continue;
+			}
+		}
+	}
+	const sourceQualifiedCandidates = candidates.flatMap((candidate) => {
+		const binding = candidate.source_ref ? sourceBindings.get(candidate.source_ref.trim()) : undefined;
+		return binding
+			? [{ ...candidate, workspace_revision: binding.workspaceRevision, source_revision: binding.sourceRevision }]
+			: [];
+	});
 
 	const evidencePackets = await Promise.all(
-		candidates.map((candidate) =>
-			buildEvidencePacket(candidate, board.generated, featureRevision, eventRevision, workspaceRevision, runGraphRevision),
+		sourceQualifiedCandidates.map((candidate) =>
+			buildEvidencePacket(candidate, board.generated, featureRevision, eventRevision, candidate.workspace_revision ?? workspaceRevision, runGraphRevision),
 		),
 	);
-	const admittedCandidates = candidates.filter((_, index) => evidencePackets[index] !== null);
+	const admittedCandidates = sourceQualifiedCandidates.filter((_, index) => evidencePackets[index] !== null);
 	const admittedPackets = evidencePackets.filter(
 		(packet): packet is NonNullable<typeof packet> => packet !== null,
 	);

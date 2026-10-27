@@ -28,6 +28,17 @@ export interface PacketIdentityAliasRowV1 {
 
 export interface PacketIdentityRegistryLookupsV1 {
 	identityByKey(packetKey: string): Promise<PacketIdentityRegistryRowV1 | null>;
+	repositoryScopeMappingByScope(scope: string): Promise<{
+		membershipRepositoryScope: string;
+		repositoryId: string;
+		sourceAuthorityRepoId?: string;
+		mappingKind: 'ROOT_SCOPE' | 'NESTED_REPOSITORY' | 'LOGICAL_SUBSCOPE';
+	} | null>;
+	repositoryAuthorityById(repositoryId: string): Promise<{
+		repositoryId: string;
+		sourceAuthorityRepoId: string;
+		repositoryKind: string;
+	} | null>;
 	aliasByKey(aliasKey: string): Promise<PacketIdentityAliasRowV1 | null>;
 	storageKeysByCanonical(canonicalPacketKey: string): Promise<string[]>;
 }
@@ -51,7 +62,9 @@ export class PacketIdentityRegistryErrorV1 extends Error {
 			| 'ALIAS_NOT_REGISTERED'
 			| 'ALIAS_TARGET_INVALID'
 			| 'IDENTITY_ROW_INVALID'
-			| 'STORAGE_KEY_AMBIGUOUS',
+			| 'REPOSITORY_MAPPING_INVALID'
+			| 'STORAGE_KEY_AMBIGUOUS'
+			| 'REGISTRY_DDL_NOT_APPLIED',
 		public readonly inputKey: string,
 	) {
 		super(`PACKET_IDENTITY_REGISTRY_${code}: ${inputKey}`);
@@ -61,6 +74,7 @@ export class PacketIdentityRegistryErrorV1 extends Error {
 
 const LEGACY_PACKET_KEY_PATTERN = /^(?:ace:)?packet:[0-9a-f]{12}$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const ROOT_REPOSITORY_SCOPE = 'repo:root';
 
 function validateIdentityRow(row: PacketIdentityRegistryRowV1, inputKey: string): void {
 	if (
@@ -111,6 +125,7 @@ export async function resolvePacketIdentityRegistryCoreV1(
 		alias &&
 		(alias.aliasKind !== PACKET_IDENTITY_ALIAS_KIND_V1 ||
 			alias.aliasKey !== key ||
+			alias.storagePacketKey !== alias.aliasKey ||
 			!PACKET_KEY_V2_PATTERN.test(alias.canonicalPacketKey) ||
 			!alias.storagePacketKey.trim() ||
 			!alias.evidenceRef.trim() ||
@@ -123,6 +138,22 @@ export async function resolvePacketIdentityRegistryCoreV1(
 	const row = await lookups.identityByKey(canonicalPacketKey);
 	if (!row) throw new PacketIdentityRegistryErrorV1('IDENTITY_NOT_REGISTERED', inputKey);
 	validateIdentityRow(row, inputKey);
+	const scopeMapping = await lookups.repositoryScopeMappingByScope(row.membershipRepositoryScope);
+	const repositoryAuthority = await lookups.repositoryAuthorityById(row.repositoryId);
+	if (
+		!scopeMapping ||
+		scopeMapping.membershipRepositoryScope !== row.membershipRepositoryScope ||
+		scopeMapping.repositoryId !== row.repositoryId ||
+		(scopeMapping.membershipRepositoryScope === ROOT_REPOSITORY_SCOPE && scopeMapping.mappingKind !== 'ROOT_SCOPE') ||
+		!repositoryAuthority ||
+		repositoryAuthority.repositoryId !== row.repositoryId ||
+		(scopeMapping.sourceAuthorityRepoId !== undefined && repositoryAuthority.sourceAuthorityRepoId !== scopeMapping.sourceAuthorityRepoId) ||
+		(scopeMapping.mappingKind === 'ROOT_SCOPE' && repositoryAuthority.repositoryKind !== 'ROOT') ||
+		(scopeMapping.mappingKind === 'NESTED_REPOSITORY' && repositoryAuthority.repositoryKind !== 'NESTED_GIT_REPOSITORY') ||
+		(scopeMapping.mappingKind === 'LOGICAL_SUBSCOPE' && repositoryAuthority.repositoryKind !== 'ROOT')
+	) {
+		throw new PacketIdentityRegistryErrorV1('REPOSITORY_MAPPING_INVALID', inputKey);
+	}
 
 	const storageKeys = alias
 		? [alias.storagePacketKey]

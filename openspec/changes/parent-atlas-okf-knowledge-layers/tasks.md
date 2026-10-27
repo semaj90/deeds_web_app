@@ -485,7 +485,7 @@ any library, database feature, model, or accelerator into a canonical owner.
 
 ## 2026-09-27 — Portable OKF / registry owner audit
 
-- [x] Read-only inventory against the live PostgreSQL 18.4 `legal_ai_db` confirmed several distinct existing owners: `atlas_schema_registry` (schema metadata), `atlas_domain_ontology` (17 domain-ontology group rows), `atlas_packet_registry` (packet-oriented registry), `atlas_ontology_concepts` (empty concept identity schema), `domain_taxonomy_v1` (empty version/alias adapter), and `taxonomy_nodes` / `taxonomy_edges` (populated topology read model). Application domain classification is separately owned by `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` (`CANONICAL_DOMAINS`). This does **not** establish one universal registry or authorize merging/populating these tables.
+- [x] Historical read-only inventory (2026-09-27) confirmed distinct owners: `atlas_schema_registry`, `atlas_domain_ontology`, `atlas_packet_registry`, `atlas_ontology_concepts`, `domain_taxonomy_v1`, and `taxonomy_nodes` / `taxonomy_edges`. Its description of `domain_taxonomy_v1` as empty is superseded by the 2026-10-27 live refresh below. Application domain classification remains separately owned by `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` (`CANONICAL_DOMAINS`). This does **not** establish one universal registry or authorize merging/populating these tables.
 - [x] Keep OKF as portable Markdown + YAML authoring/interchange, validated against existing local schemas and checksums. It may nominate documented use-cases, keywords, language/domain labels, and routing metadata; it cannot mint canonical packet/symbol IDs, ordinals, revisions, or promote classifier output.
 - [ ] Before adding a PostgreSQL registry table or admin editor, close the existing domain-class owner decision and map each OKF field to exactly one admitted owner. Prefer a read-only registry projection/API over a new table if the existing owner is sufficient. No DDL, row writes, OpenWiki integration install, or wiki initialization occurred in this audit.
 - [ ] If later approved, expose the reviewed registry through the existing Admin Unified Indexing Studio as a read-only inspector first. A Pokédex-like display is an ordinal/hex UI metaphor only; do not copy Pokémon source/assets or use display numbers as identity.
@@ -582,3 +582,24 @@ TypeScript import smoke proves imports only, not agent execution. The available
 resident-BFS receipt is fixture-only; current WSL/cuTile live execution and
 corpus-wide semantic indexing are not established. Keep every task above open
 until its owner-specific receipt is independently reviewed.
+
+**Read-only schema evidence refresh (2026-10-27):** registered
+`.okf/domains/atlas-domain-taxonomy.yaml` to
+`.okf/schemas/domain-taxonomy-v1.schema.json`; the actual document validates
+with `writesPerformed:false` in
+`.tmp/atlas/okf-domain-taxonomy-validation-20261027-v1.json`. The manifest-bound
+keyword corpus also validates against its declared schema in
+`.tmp/atlas/okf-keyword-corpus-validation-20261027-v1.json`. Manifest coverage
+is 49/49 across 9 registries with no missing/unsafe or unregistered structured
+files, receipt `.tmp/atlas/okf-manifest-coverage-20261027-v3.json`. This does
+not close the strict Atlas v0.2 profile, whole-tree document-schema coverage,
+or PostgreSQL/OAK domain_id/version/replacement parity. No database, service,
+or canonical writes occurred.
+
+**OAK transport/content distinction (2026-10-27):** live `/oak/health` reports
+OAKLib 0.7.4 and a configured PostgreSQL adapter in `READ_ONLY_SHADOW`; bounded
+`/oak/search` and `/oak/lookup` return no concept for `database`. Read-only
+counts are zero for `atlas_ontology_concepts`, `atlas_ontology_relations`, and
+`concept_records`. Receipt
+`.tmp/atlas/oak-live-readonly-audit-20261027-v2.json`. The prior 503 is not the
+current transport status; semantic OAK term/relationship coverage remains open.

@@ -14,6 +14,7 @@
 
 import { codebaseChunkIndex } from '../db/schema-postgres.js';
 import { inArray, sql } from 'drizzle-orm';
+import { isDeepStrictEqual } from 'node:util';
 import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 async function getDb() {
@@ -182,9 +183,15 @@ export class QdrantPayloadEnricher {
 
         for (const chunk of batch) {
           try {
+            const pointId = chunk.qdrantId ?? chunk.qdrant_id;
+            if (!((typeof pointId === 'string' && pointId.trim().length > 0)
+              || (typeof pointId === 'number' && Number.isSafeInteger(pointId) && pointId >= 0))) {
+              throw new Error('Qdrant enrichment requires an existing projection point ID');
+            }
             const payload = await this.buildPayload(chunk);
+            payload.qdrant_point_id = String(pointId);
             payloads.push({
-              id: chunk.qdrantId ?? chunk.qdrant_id ?? chunk.id,
+              id: pointId,
               payload: payload
             });
             success++;
@@ -196,14 +203,18 @@ export class QdrantPayloadEnricher {
 
         // Upload to Qdrant
         if (!dryRun && payloads.length > 0) {
-          try {
-            await this.uploadPayloads(payloads);
-            console.log(`Uploaded ${payloads.length} payloads to Qdrant`);
-          } catch (err) {
-            console.error('Failed to upload payloads to Qdrant:', err);
-            failed += payloads.length;
-            success -= payloads.length;
+          let uploaded = 0;
+          for (const payload of payloads) {
+            try {
+              await this.uploadPayloads([payload]);
+              uploaded++;
+            } catch (err) {
+              console.error(`Failed to upload payload for point ${payload.id}:`, err);
+              failed++;
+              success--;
+            }
           }
+          if (uploaded > 0) console.log(`Uploaded ${uploaded} payloads to Qdrant`);
         }
       }
     } catch (err) {
@@ -226,22 +237,57 @@ export class QdrantPayloadEnricher {
       ''
     ).trim();
 
-    const packetRows = sourceRef
-      ? await (await getDb()).execute(sql`
-      SELECT packet_key, tree_node_id, feature_label, function_symbol, byte_start, byte_end,
-             sha256, metadata, workspace_revision, workspace_revision_key, source_revision,
-             representation_revision, qdrant_point_id
-      FROM atlas_packets
-      WHERE source_ref = ${sourceRef}
-         OR canonical_source_ref = ${sourceRef}
-         OR source_path = ${sourceRef}
-         OR file_path = ${sourceRef}
-      ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST
-      LIMIT 1
-    `)
-      : { rows: [] as any[] };
-    const packet = packetRows.rows[0] as any | undefined;
-    return buildEnrichedPayload(chunk, packet);
+    if (!sourceRef || !chunk.id) throw new Error('Qualified chunk identity is required for Qdrant enrichment');
+    const packetRows = await (await getDb()).execute(sql`
+      SELECT p.packet_key, p.feature_id, p.tree_node_id, p.feature_label, p.function_symbol,
+             p.byte_start, p.byte_end, p.sha256, p.metadata, p.workspace_revision,
+             p.workspace_revision_key, p.source_revision, p.representation_revision, p.qdrant_point_id
+      FROM atlas_packet_chunk_lineage l
+      JOIN codebase_chunk_index c ON c.id = l.chunk_row_id AND c.chunk_id = l.canonical_chunk_id
+      JOIN atlas_packets p ON p.packet_key = l.packet_key
+      WHERE l.chunk_row_id = ${chunk.id}
+        AND l.source_ref = ${sourceRef}
+        AND l.membership_status IN ('EXACT_SINGLE_MEMBER', 'EXACT_MULTI_MEMBER')
+        AND l.revision_status = 'PROVEN'
+        AND p.source_ref = l.source_ref AND p.source_revision = l.source_revision
+        AND c.source_revision = l.source_revision AND c.workspace_revision = p.workspace_revision_key
+        AND EXISTS (
+          SELECT 1 FROM atlas_workspace_source_bindings b
+          WHERE b.workspace_revision = p.workspace_revision_key
+            AND b.canonical_source_ref = l.source_ref AND b.source_revision = l.source_revision
+        )
+      LIMIT 2
+    `);
+    if (packetRows.rows.length !== 1) throw new Error('Qdrant enrichment requires exactly one qualified packet binding');
+    const packet = packetRows.rows[0] as any;
+    const requestedPacketKey = pickString(chunk.packetKey, chunk.packet_key);
+    const requestedFeatureId = pickString(chunk.featureId, chunk.feature_id);
+    if (requestedPacketKey && requestedPacketKey !== packet.packet_key) throw new Error('Qdrant enrichment packet identity mismatch');
+    if (requestedFeatureId && requestedFeatureId !== packet.feature_id) throw new Error('Qdrant enrichment feature identity mismatch');
+    const payload = buildEnrichedPayload(chunk, packet);
+    const requiredTextFields = [
+      payload.packet_key,
+      payload.feature_id,
+      payload.feature_label,
+      payload.source_ref,
+      payload.workspace_id,
+      payload.parser_language,
+      payload.language_resolver_revision,
+    ];
+    if (requiredTextFields.some((value) => typeof value !== 'string' || value.trim().length === 0)) {
+      throw new Error('Qdrant enrichment requires canonical feature and parser metadata');
+    }
+    if (!/^sha256:[a-f0-9]{64}$/.test(payload.workspace_revision ?? '')
+      || !/^sha256:[a-f0-9]{64}$/.test(payload.source_revision ?? '')
+      || !/^sha256:[a-f0-9]{64}$/.test(payload.taxonomy_revision ?? '')
+      || payload.representation_id !== SEMANTIC_REPRESENTATION_ID
+      || !Number.isSafeInteger(payload.representation_revision)
+      || !Number.isSafeInteger(payload.start_byte)
+      || !Number.isSafeInteger(payload.end_byte)
+      || payload.end_byte! <= payload.start_byte!) {
+      throw new Error('Qdrant enrichment requires revision-qualified feature and source metadata');
+    }
+    return payload;
   }
 
   private extractDirectoryPath(sourceRef: string): string {
@@ -352,21 +398,29 @@ export class QdrantPayloadEnricher {
   }
 
   private async uploadPayloads(payloads: Array<{ id: string | number; payload: EnrichedPayload }>): Promise<void> {
-    // Use Qdrant client to upsert points with enriched payloads
-    // Implementation depends on qdrant-js client API
-    // This is a stub — actual implementation uses the Qdrant HTTP API
     const qdrant = await getQdrant();
 
     for (const item of payloads) {
-      await qdrant.upsert({
-        collection: this.qdrantCollection,
-        points: [
-          {
-            id: item.id as string | number,
-            payload: item.payload
-          }
-        ]
-      } as any);
+      const expectedPayload = JSON.parse(JSON.stringify(item.payload)) as Record<string, unknown>;
+      const before = await qdrant.client.retrieve(this.qdrantCollection, {
+        ids: [item.id], with_payload: false, with_vector: true,
+      });
+      if (before.length !== 1 || before[0].id !== item.id || before[0].vector == null) {
+        throw new Error('Qdrant enrichment target point or vector is missing');
+      }
+      await qdrant.client.setPayload(this.qdrantCollection, {
+        points: [item.id],
+        payload: expectedPayload,
+        wait: true,
+      });
+      const after = await qdrant.client.retrieve(this.qdrantCollection, {
+        ids: [item.id], with_payload: true, with_vector: true,
+      });
+      if (after.length !== 1 || after[0].id !== item.id || !after[0].payload
+        || Object.entries(expectedPayload).some(([key, value]) => !isDeepStrictEqual(after[0].payload?.[key], value))
+        || !isDeepStrictEqual(before[0].vector, after[0].vector)) {
+        throw new Error('Qdrant enrichment readback mismatch; update may have occurred');
+      }
     }
   }
 }
@@ -664,7 +718,7 @@ export function buildEnrichedPayload(
   return {
     packet_key: packet?.packet_key ? String(packet.packet_key) : String(chunk.packet_key ?? chunk.id ?? chunk.source_ref ?? ''),
     qdrant_point_id: qdrantPointId || null,
-    feature_id: String(chunk.featureId ?? chunk.feature_id ?? sourceRef ?? chunk.id ?? chunk.qdrantId ?? 'unknown'),
+    feature_id: String(packet?.feature_id ?? packet?.featureId ?? chunk.featureId ?? chunk.feature_id ?? sourceRef ?? chunk.id ?? chunk.qdrantId ?? 'unknown'),
     source_ref: sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? ''),
     file_path: sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? ''),
     workspace_id: workspaceId,

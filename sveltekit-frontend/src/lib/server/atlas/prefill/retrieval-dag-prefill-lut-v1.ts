@@ -244,12 +244,13 @@ export function readVectorSliceFromF32Bin(
 export function readUtf8SourceSpanSlice(
   repoRoot: string,
   entry: RetrievalDagPrefillLutEntryV1,
-  maxBytes = 2048
+  maxBytes = 2048,
+  options?: { verifyRevision?: boolean }
 ): { text: string; contentChecksum: string; bytesRead: number } {
   const absPath = `${repoRoot.replace(/\\/g, '/')}/${entry.sourceRef.replace(/^\/+/, '')}`;
   const fullBuf = fs.readFileSync(absPath);
   const actualRev = `sha256:${createHash('sha256').update(fullBuf).digest('hex')}`;
-  if (actualRev !== entry.sourceRevision) {
+  if (options?.verifyRevision !== false && actualRev !== entry.sourceRevision) {
     throw new Error(
       `STALE_SOURCE_REVISION for ${entry.sourceRef}: LUT expected ${entry.sourceRevision}, disk has ${actualRev}`
     );

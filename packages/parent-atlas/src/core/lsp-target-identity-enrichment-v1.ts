@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { lspRangeToUtf8ByteRange } from './lsp-semantic-observation.js';
 import {
   buildRevisionQualifiedSymbolResolution,
   type RevisionQualifiedSymbolResolutionV1,
@@ -28,6 +29,7 @@ export interface LspTargetIdentityEnrichmentInputV1 {
     lspServerRevision: string;
     projectRevision: string;
     resolverRevision: string;
+    positionEncoding?: 'utf-8' | 'utf-16' | 'utf-32';
   };
 }
 
@@ -72,6 +74,7 @@ export interface RevisionQualifiedTargetIdentityV1 {
     sourceContentDigest: string;
     symbolRegistryRevision: string;
     lookupMethod: LspTargetIdentityLookupMethodV1;
+    positionEncoding: 'utf-8' | 'utf-16' | 'utf-32';
   };
 }
 
@@ -83,27 +86,6 @@ export interface LspTargetIdentityEnrichmentResultV1 {
 
 function sha256(value: unknown): string {
   return createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex');
-}
-
-function byteOffsetAtPosition(text: string, line: number, character: number): number {
-  if (!Number.isInteger(line) || !Number.isInteger(character) || line < 0 || character < 0) {
-    throw new Error('LSP_TARGET_POSITION_INVALID');
-  }
-  const lines = text.split('\n');
-  if (line >= lines.length) throw new Error('LSP_TARGET_POSITION_OUT_OF_RANGE');
-  const lineText = lines[line].replace(/\r$/, '');
-  let utf16 = 0;
-  let byteOffset = 0;
-  for (const codePoint of lineText) {
-    if (utf16 >= character) break;
-    const width = codePoint.length;
-    if (utf16 + width > character) throw new Error('LSP_TARGET_POSITION_SPLITS_CODE_POINT');
-    utf16 += width;
-    byteOffset += Buffer.byteLength(codePoint, 'utf8');
-  }
-  if (utf16 !== character) throw new Error('LSP_TARGET_POSITION_OUT_OF_RANGE');
-  const prefix = lines.slice(0, line).map((item) => `${item}\n`).join('');
-  return Buffer.byteLength(prefix, 'utf8') + byteOffset;
 }
 
 function producerRevision(input: LspTargetIdentityEnrichmentInputV1): string {
@@ -155,10 +137,17 @@ export function enrichLspTargetIdentityV1(
 
   const targetSource = readers.lookupSourceRevision(targetSourceRef);
   if (!targetSource) return unresolved(input, targetSourceRef, '', 'UNRESOLVED', ['TARGET_SOURCE_REVISION_NOT_FOUND']);
+  if (targetSource.sourceRef !== targetSourceRef) throw new Error('LSP_TARGET_SOURCE_REF_MISMATCH');
+  const sourceBytes = Buffer.from(targetSource.sourceText, 'utf8');
+  if (sourceBytes.toString('utf8') !== targetSource.sourceText) throw new Error('LSP_TARGET_SOURCE_INVALID_UTF8');
+  const sourceDigest = `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`;
+  if (targetSource.contentDigest !== sourceDigest) throw new Error('LSP_TARGET_SOURCE_DIGEST_MISMATCH');
 
-  const startByte = byteOffsetAtPosition(targetSource.sourceText, input.target.range.startLine, input.target.range.startCharacter);
-  const endByte = byteOffsetAtPosition(targetSource.sourceText, input.target.range.endLine, input.target.range.endCharacter);
-  if (endByte < startByte) throw new Error('LSP_TARGET_RANGE_REVERSED');
+  const positionEncoding = input.producer.positionEncoding ?? 'utf-16';
+  const { byte_start: startByte, byte_end: endByte } = lspRangeToUtf8ByteRange(targetSource.sourceText, {
+    start: { line: input.target.range.startLine, character: input.target.range.startCharacter },
+    end: { line: input.target.range.endLine, character: input.target.range.endCharacter },
+  }, positionEncoding);
 
   const candidates = readers.lookupSymbols({
     sourceRef: targetSourceRef,
@@ -170,6 +159,11 @@ export function enrichLspTargetIdentityV1(
   const byNode = input.target.upstreamNodeId
     ? candidates.filter((candidate) => candidate.treeNodeId === input.target.upstreamNodeId)
     : [];
+  if (byNode.some((candidate) => !Number.isSafeInteger(candidate.startByte) || !Number.isSafeInteger(candidate.endByte)
+    || candidate.startByte < 0 || candidate.endByte <= candidate.startByte || candidate.startByte > startByte
+    || candidate.endByte < endByte || candidate.endByte > sourceBytes.length)) {
+    throw new Error('LSP_TARGET_NODE_RANGE_MISMATCH');
+  }
   const byRange = candidates.filter((candidate) => candidate.startByte === startByte && candidate.endByte === endByte);
   const containing = candidates.filter((candidate) => candidate.startByte <= startByte && candidate.endByte >= endByte);
   const matches = byNode.length === 1 ? { rows: byNode, method: 'EXACT_TREE_NODE' as const }
@@ -202,6 +196,7 @@ export function enrichLspTargetIdentityV1(
       sourceContentDigest: targetSource.contentDigest,
       symbolRegistryRevision: row.symbolRegistryRevision,
       lookupMethod: matches.method,
+      positionEncoding,
     },
   };
   const resolution = buildRevisionQualifiedSymbolResolution({

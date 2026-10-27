@@ -373,7 +373,18 @@ export function buildPrefillCacheEntry(input: Omit<z.input<typeof prefillSynthes
 }
 
 export function canReusePrefillCache(entry: PrefillSynthesisCacheEntryV1, input: Parameters<typeof prefillCacheKey>[0]): boolean {
-  return entry.status === 'VALID' && entry.cache_key === prefillCacheKey(input);
+  const parsed = prefillSynthesisCacheEntrySchema.safeParse(entry);
+  if (!parsed.success || parsed.data.status !== 'VALID') return false;
+  const stored = parsed.data;
+  const storedKey = prefillCacheKey({
+    prefill_identity_checksum: stored.prefill_identity_checksum,
+    instruction_set_checksum: stored.instruction_set_checksum,
+    hydration_manifest_checksum: stored.hydration_manifest_checksum,
+    feature_alignment_checksum: stored.feature_alignment_checksum,
+    context_manifest_checksum: stored.context_manifest_checksum,
+    compiler_revision: stored.compiler_revision,
+  });
+  return stored.cache_key === storedKey && stored.cache_key === prefillCacheKey(input);
 }
 
 export function describeContextualPrefillFabric(): string {

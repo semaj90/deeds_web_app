@@ -127,6 +127,22 @@ describe('parseNdjsonTypedEvidence', () => {
 		expect(report.rejected[0]!.reason).toContain('SIMDJSON_TYPED_EVIDENCE_PARSE_FAILED');
 	});
 
+	it('rejects duplicate JSON keys before invoking the native or V8 parser', () => {
+		const report = parseNdjsonTypedEvidence({
+			artifactRef: 'artifact:test:duplicate-key',
+			artifactRevision: 'sha256:' + 'f'.repeat(64),
+			ndjson: '{"receiptId":"first","\\u0072eceiptId":"second","status":"PASS","durationMs":1}',
+			payloadSchema: receiptSchema,
+			payloadSchemaId: 'atlas.receipt.v1',
+		});
+
+		expect(report.accepted).toHaveLength(0);
+		expect(report.rejected).toHaveLength(1);
+		expect(report.rejected[0]!.code).toBe('DUPLICATE_KEY');
+		expect(report.parserExecution.backend).toBe('NO_INPUT');
+		expect(report.parserExecution.nativeParses + report.parserExecution.fallbackParses).toBe(0);
+	});
+
 	it('incrementally streams split UTF-8 chunks with the same envelope checksums', async () => {
 		const ndjson = [
 			JSON.stringify({ receiptId: 'stream-1', status: 'PASS', durationMs: 7, note: '東京 🧪' }),
@@ -189,5 +205,22 @@ describe('parseNdjsonTypedEvidence', () => {
 			})) { }
 		};
 		await expect(consume()).rejects.toThrow('maxLineBytes=8');
+	});
+
+	it('bounds total streamed bytes and nonblank record count', async () => {
+		const line = JSON.stringify({ receiptId: 'bounded', status: 'PASS', durationMs: 1 });
+		async function* chunks(value: string) { yield new TextEncoder().encode(value); }
+		const consume = async (value: string, limits: { maxRecords?: number; maxTotalBytes?: number }) => {
+			for await (const _row of parseNdjsonTypedEvidenceStream({
+				artifactRef: 'artifact:test:bounded',
+				artifactRevision: 'sha256:' + '3'.repeat(64),
+				chunks: chunks(value),
+				payloadSchema: receiptSchema,
+				payloadSchemaId: 'atlas.receipt.v1',
+				...limits,
+			})) { }
+		};
+		await expect(consume(`${line}\n${line}`, { maxRecords: 1 })).rejects.toThrow('maxRecords=1');
+		await expect(consume(line, { maxTotalBytes: 8 })).rejects.toThrow('maxTotalBytes=8');
 	});
 });

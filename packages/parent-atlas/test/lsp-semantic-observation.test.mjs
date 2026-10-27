@@ -93,6 +93,15 @@ test('LSP coordinate codec preserves CRLF and UTF-32 byte alignment', () => {
   });
 });
 
+test('line starts and invalid coordinates are handled for every negotiated encoding', () => {
+  const source = 'a\r\nλ😀';
+  for (const [encoding, end] of [['utf-8', 6], ['utf-16', 3], ['utf-32', 2]]) {
+    assert.deepEqual(lspRangeToUtf8ByteRange(source, { start: { line: 1, character: 0 }, end: { line: 1, character: end } }, encoding), { byte_start: 3, byte_end: 9 });
+    assert.throws(() => lspRangeToUtf8ByteRange(source, { start: { line: 1, character: -1 }, end: { line: 1, character: 0 } }, encoding), /LSP_POSITION_INVALID/);
+  }
+  assert.throws(() => lspRangeToUtf8ByteRange(source, { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } }, 'utf-7'), /LSP_POSITION_ENCODING_INVALID/);
+});
+
 test('LSP target range alignment requires an exact target source revision', () => {
   const aligned = alignLspTargetByteRanges({
     target_source_ref: 'src/target.ts',

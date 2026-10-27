@@ -1,15 +1,17 @@
 // @vitest-environment node
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { db } from '$lib/server/db/client.js';
 
 import { resolveCurrentGraphifyWorkspaceRevision } from './graphify-current-workspace-revision.js';
 
 describe('resolveCurrentGraphifyWorkspaceRevision', () => {
 	it('degrades to null instead of throwing when Postgres is unreachable (KANBAN-RECOMMENDATION-REVISION-BINDING-01 regression guard)', async () => {
-		// This test environment has no live DB credentials wired (matches the pre-existing
-		// daily-graphify-board-recommendations.spec.ts environment) — the SASL auth failure this
-		// exercises is exactly the failure mode that must degrade, not throw, per the Degraded
-		// Response Contract this resolver follows.
-		await expect(resolveCurrentGraphifyWorkspaceRevision({ skipCache: true })).resolves.toBeNull();
+		const spy = vi.spyOn(db, 'execute').mockRejectedValueOnce(new Error('Postgres unreachable (simulated)'));
+		try {
+			await expect(resolveCurrentGraphifyWorkspaceRevision({ skipCache: true })).resolves.toBeNull();
+		} finally {
+			spy.mockRestore();
+		}
 	});
 
 	it('never returns a value shaped like a timestamp (the exact regression this gate closes)', async () => {

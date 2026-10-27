@@ -18,6 +18,7 @@ function fixture() {
     candidateOrdinal: candidate.candidateOrdinal,
     canonicalId: candidate.canonicalId,
     packetKey: candidate.packetKey,
+    sourceRef: candidate.sourceRef,
     treeNodeId: candidate.treeNodeId,
     symbolVersionId: candidate.symbolVersionId,
     workspaceRevision: candidate.workspaceRevision,

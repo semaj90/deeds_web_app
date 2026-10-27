@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { mockSelect, mockExecute } = vi.hoisted(() => ({
 	mockSelect: vi.fn(),
@@ -32,6 +32,11 @@ function mockDirectLookup(rows: Array<{ packetKey: string }>) {
 	mockSelect.mockReturnValueOnce({ from });
 	return { from, where, limit };
 }
+
+beforeEach(() => {
+	mockSelect.mockReset();
+	mockExecute.mockReset();
+});
 
 describe('resolveCanonicalPacketKey', () => {
 	it('returns a direct atlas_packets key without consulting aliases', async () => {

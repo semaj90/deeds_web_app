@@ -95,8 +95,18 @@ reinterpreted. The read resolver verifies that the stored key recomputes from
 the registered tuple and returns `identityRevisionQualified: false`; source
 and workspace revision admission remains a separate gate.
 
+**Owner decision (2026-10-27):** for the root `deeds-web-app` repository,
+`PacketKeyV2@1` continues to hash membership scope `repo:root`; the registry
+stores the mapped `atlas_repository_identity.repository_id` UUID
+(`01a13137-1378-7df9-9968-53738dbf0e48`) alongside that scope. The packet grain
+is `SOURCE_FILE`. Existing legacy packet keys remain physical storage locators;
+logical coexistence requires explicit, evidence-backed alias rows. This
+decision does not change the key recipe, create a packet key, authorize alias
+population, or authorize a migration or datastore write.
+
 The schema and resolver are code-only until an operator separately authorizes
 the manual migration. No writer or automatic mint is included. Repository-scope
-mapping evidence, alias review, source/workspace revision binding, and ACE
-manifest/cache wiring remain open; this registry alone cannot enable cache
-admission.
+row population, per-row alias review, source/workspace revision binding, and
+ACE manifest/cache wiring remain open; this registry alone cannot enable cache
+admission. The decision is scoped to the root repository and does not approve
+other repository-scope mappings.

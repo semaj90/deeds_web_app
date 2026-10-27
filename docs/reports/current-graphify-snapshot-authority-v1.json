@@ -1,22 +1,83 @@
 {
   "schema": "atlas.current-graphify-snapshot-authority.v1",
-  "status": "NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE",
+  "status": "CURRENT_SNAPSHOT_PROVEN",
   "sourceSnapshot": {
     "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
     "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
     "sourceManifestDigest": "sha256:e70734ea279111dfbfa3bdb1bfb8b53c01d1e192d4408cd3820ad5b5654ea69c",
     "sourceCount": 30327,
+    "selectedSourceCount": 30105,
+    "hygieneExcludedCandidateCount": 222,
     "sourceManifestChecksum": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
     "workspaceRevisionRecordChecksum": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
     "snapshotManifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258.json",
     "snapshotRevision": "sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258",
     "snapshotSourceMembershipChecksum": "sha256:5dd39938beddee3908f0dd06fe338ea07c98980a27c750a9cb7e01a555697889",
     "snapshotSourceContentChecksum": "sha256:e70734ea279111dfbfa3bdb1bfb8b53c01d1e192d4408cd3820ad5b5654ea69c",
-    "observedAt": "2026-10-25T17:32:00.256Z"
+    "observedAt": "2026-10-27T20:44:13.452Z"
   },
-  "qualifyingExecutionIds": [],
+  "sourceSelection": {
+    "planPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graphify-source-selection-plan-v1.json",
+    "status": "SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED",
+    "authority": false,
+    "workspaceRevisionCandidate": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+    "sourceCount": 30105,
+    "sourceSelectionChecksum": "sha256:7c0c36d079a4a115e0157d2db53d1429f2a5805301bc1d35998bbb1773643131",
+    "reconciliation": {
+      "valid": true,
+      "checks": {
+        "planSchema": true,
+        "planReady": true,
+        "admissionReady": true,
+        "admissionWorkspaceMatchesCandidate": true,
+        "snapshotRevisionsValid": true,
+        "snapshotRevisionMatches": true,
+        "selectionCountMatches": true,
+        "selectionChecksumMatches": true,
+        "uniqueSourceIdentities": true,
+        "uniqueSourceRefs": true,
+        "sourceDigestsValid": true,
+        "sourceByteLengthsValid": true,
+        "everyBindingMatchesSnapshot": true
+      },
+      "rowCount": 30105
+    }
+  },
+  "qualifyingExecutionIds": [
+    "01a1763a-4355-71d7-9b81-2c7a1814a41f"
+  ],
   "ownerSelection": null,
-  "candidates": [],
+  "candidates": [
+    {
+      "executionId": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+      "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+      "status": "COMPLETED",
+      "canonicalAuthority": false,
+      "triggerKind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
+      "sourceSelectionStatus": "COMPLETED",
+      "selectionPolicyRevision": "sealed-snapshot-canonical-inventory:sha256:891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258:sha256:f29251a2737d492973b16e959b539b910743f85689ee87f49f352baf8ad88264",
+      "selectionPolicyIsNonCanary": true,
+      "sourceSelectionOutputChecksum": "sha256:e4f2b158c8546f2869feb55023449969a930168d74d1d07bdb8ac5b84c2d5514",
+      "sourceRefSetChecksum": "sha256:90e1607b393df42e4cb2c832a272b5d1ed0f3fb4557dc64e73c8d2c2a65f7f8f",
+      "selectedSourceRefChecksum": "sha256:90e1607b393df42e4cb2c832a272b5d1ed0f3fb4557dc64e73c8d2c2a65f7f8f",
+      "snapshotSourceRefChecksum": "sha256:bfafce4b86c44280d12c74d782a20829bc8b3a22533f64cea9b16ae360c025fe",
+      "sourceIdentitySetChecksum": "sha256:e4f2b158c8546f2869feb55023449969a930168d74d1d07bdb8ac5b84c2d5514",
+      "executionContentChecksum": "sha256:83dd7494ed8a7c8d24b8758c366009466c6c885cd38a847dbc5a794f7a09bfd5",
+      "snapshotContentChecksum": "sha256:83dd7494ed8a7c8d24b8758c366009466c6c885cd38a847dbc5a794f7a09bfd5",
+      "sourceCount": 30105,
+      "expectedSourceCount": 30105,
+      "snapshotCandidateCount": 30327,
+      "selectedSnapshotSourceCount": 30105,
+      "selectionManifestReconciled": true,
+      "workspaceRevisionMatches": true,
+      "sourceCountMatches": true,
+      "sourceBindingsMatch": true,
+      "sourceRefSetChecksumMatches": true,
+      "sourceIdentitySetChecksumMatches": true,
+      "snapshotContentChecksumMatches": true,
+      "eligible": true
+    }
+  ],
   "graphSnapshot": {
     "status": "GRAPH_CANONICAL_AUTHORITY_UNPROVEN",
     "canonicalAuthorityTrueExecutions": 0

@@ -160,4 +160,7 @@ test('prefill cache is reusable only for an identical compiled dependency identi
   assert.equal(canReusePrefillCache(entry, input), true);
   assert.equal(canReusePrefillCache(entry, { ...input, hydration_manifest_checksum: H('changed') }), false);
   assert.equal(canReusePrefillCache({ ...entry, status: 'STALE' }, input), false);
+  assert.equal(canReusePrefillCache({ ...entry, hydration_manifest_checksum: H('tampered') }, input), false);
+  assert.equal(canReusePrefillCache({ ...entry, compiler_revision: 'compiler:other' }, input), false);
+  assert.equal(canReusePrefillCache({ ...entry, canonical_authority: true }, input), false);
 });

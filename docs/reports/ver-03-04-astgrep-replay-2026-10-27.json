@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.ver-03-04-live-replay-receipt.v1",
+  "timestampUtc": "2026-10-27T18:58:21.540Z",
+  "status": "PASS",
+  "scope": "10 Svelte components from the prior bounded cohort; prior receipt used only for file selection",
+  "tools": {
+    "astGrep": "ast-grep 0.45.3",
+    "svelteCompiler": "5.53.3",
+    "grammarPath": "packages/atlas-svelte-grammar/dist/linux-x64/tree-sitter-svelte.so",
+    "grammarSha256": "sha256:5137f7e98bcdb8de2cedf62f26befe94b44a609600a74b7cfb08030a2780b133",
+    "config": ".tmp/atlas/ver-03-04-astgrep/sgconfig.yml"
+  },
+  "policy": {
+    "countedKinds": ["RegularElement", "Component"],
+    "excludedNames": ["svelte:*", "script", "style"],
+    "databaseWrites": false,
+    "canonicalPromotion": false
+  },
+  "files": [
+    { "file": "sveltekit-frontend/src/lib/components/AIChatAssistant.svelte", "sourceSha256": "sha256:ae3d7ef858768071995db67190c3f7358d5e1408a23dcbf4901dc547e651234a", "svelteCompilerElements": 11, "astGrepElements": 11, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/ChatContextPanel.svelte", "sourceSha256": "sha256:3f87f91b53b7b0244ccd23d478aa7ea3fad5d4b77115d9f7d1ddfcb46d7a3e26", "svelteCompilerElements": 12, "astGrepElements": 12, "excludedSvelteSpecial": 0, "excludedScriptStyle": 1, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/ActionPopup.svelte", "sourceSha256": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32", "svelteCompilerElements": 6, "astGrepElements": 6, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/CaseSelector.svelte", "sourceSha256": "sha256:35f09267356015be35f8fbdaa08adb717851a55f4259e4114e69d4c620fb1048", "svelteCompilerElements": 10, "astGrepElements": 10, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/ArchivedRoutesPanel.svelte", "sourceSha256": "sha256:f741a962cd6330a877757d5b7c689d0732f8fdeae0f8045248821e2bcfaaba75", "svelteCompilerElements": 41, "astGrepElements": 41, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/CanvasEditor.svelte", "sourceSha256": "sha256:0cd8a71353e253c61ddcd12dc6be43d8ee550759363012c39926589b1d752dee", "svelteCompilerElements": 12, "astGrepElements": 12, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/APITesterModal.svelte", "sourceSha256": "sha256:e006f62ef138df4e3c1d3b2ada37f04260f46f187975a843e3ab4d2a19a4e160", "svelteCompilerElements": 33, "astGrepElements": 33, "excludedSvelteSpecial": 1, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/CaseOutcomePrediction.svelte", "sourceSha256": "sha256:8aa96a96b06d199186e4a4c7957e9e56bc02ecf0008c98a22e653853205cc6f2", "svelteCompilerElements": 146, "astGrepElements": 146, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/ChatMessages.svelte", "sourceSha256": "sha256:be07d22ce3b4666d58c9e671d38dc3dcb112d6823fa03ef9831df91acb98db30", "svelteCompilerElements": 14, "astGrepElements": 14, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true },
+    { "file": "sveltekit-frontend/src/lib/components/ChatPanel.svelte", "sourceSha256": "sha256:27eabe05a249d855a82c43a3fec175747412fd23344fc8194edd63ddecab83bb", "svelteCompilerElements": 17, "astGrepElements": 17, "excludedSvelteSpecial": 0, "excludedScriptStyle": 2, "match": true }
+  ],
+  "agreementCount": 10,
+  "baselineReceipt": ".tmp/atlas/ver-03-04-astgrep/comparison.json",
+  "windowsDll": { "status": "BLOCKED_WINDOWS_SDK_HEADERS", "requiredForThisLinuxProof": false },
+  "writesPerformed": false
+}
