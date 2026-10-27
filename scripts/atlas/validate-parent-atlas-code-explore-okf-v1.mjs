@@ -8,7 +8,13 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const manifestPath = path.join(root, '.okf', 'indexes', 'parent-atlas-code-explore.yaml');
-const reportPath = path.join(root, 'docs', 'reports', 'parent-atlas-code-explore-okf-v1.json');
+const outputArg = process.argv.find((arg) => arg.startsWith('--out='))?.slice(6);
+const reportPath = outputArg ? path.resolve(root, outputArg) : path.join(root, 'docs', 'reports', 'parent-atlas-code-explore-okf-v1.json');
+if (outputArg) {
+  const outputRoot = path.resolve(root, '.tmp/atlas');
+  const relativeOutput = path.relative(outputRoot, reportPath);
+  if (!relativeOutput || relativeOutput.startsWith('..') || path.isAbsolute(relativeOutput)) throw new Error('VALIDATION_RECEIPT_MUST_STAY_UNDER_TMP_ATLAS');
+}
 const require = createRequire(import.meta.url);
 const { parse } = require(path.join(root, 'sveltekit-frontend', 'node_modules', 'yaml'));
 const { z } = require(path.join(root, 'node_modules', 'zod'));
@@ -31,6 +37,7 @@ const required = new Set(contract.identity.required);
 if (!['source_ref', 'source_revision', 'workspace_revision', 'content_hash'].every((key) => required.has(key))) throw new Error('EXPLORE_IDENTITY_FIELDS_INCOMPLETE');
 if (contract.context.max_span_bytes !== contract.parameters.span_max_bytes) throw new Error('EXPLORE_SPAN_LIMIT_MISMATCH');
 const manifestChecksum = `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
-const report = { schema: 'atlas.explore-index-contract-validation.v1', manifest: path.relative(root, manifestPath).replaceAll('\\', '/'), manifestChecksum, status: 'CONTRACT_VALID_UNPROVEN_RUNTIME', identityFieldsComplete: true, canonicalCoordinates: 'utf8_byte', lspProtocolCoordinates: 'lsp_utf16', semanticRepresentation: 'semantic_768', semanticProjectionEnabled: false, astGrepFallbackAuthority: 'discovery_only', canonicalAuthority: false, modelCalls: false, datastoreWrites: false, cacheWarming: false, nextGate: 'AST-EXPLORE-INDEX-ADAPTER-01', blockers: ['current workspace/source/chunk join is not exact', 'seed symbols lack revision and byte-span identity'] };
-await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const validatorPath = 'scripts/atlas/validate-parent-atlas-code-explore-okf-v1.mjs';
+const report = { schema: 'atlas.explore-index-contract-validation.v1', path: '.okf/indexes/parent-atlas-code-explore.yaml', sha256: manifestChecksum, profile: 'atlas.explore-index-definition.v1', validatorPath, validatorSha256: `sha256:${createHash('sha256').update(await readFile(path.join(root, validatorPath))).digest('hex')}`, manifest: path.relative(root, manifestPath).replaceAll('\\', '/'), manifestChecksum, valid: true, status: 'CONTRACT_VALID_UNPROVEN_RUNTIME', identityFieldsComplete: true, canonicalCoordinates: 'utf8_byte', lspProtocolCoordinates: 'lsp_utf16', semanticRepresentation: 'semantic_768', semanticProjectionEnabled: false, astGrepFallbackAuthority: 'discovery_only', canonicalAuthority: false, modelCalls: false, datastoreWrites: false, cacheWarming: false, nextGate: 'AST-EXPLORE-INDEX-ADAPTER-01', blockers: ['current workspace/source/chunk join is not exact', 'seed symbols lack revision and byte-span identity'] };
+await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8', outputArg ? { flag: 'wx' } : undefined);
 console.log(JSON.stringify({ report: path.relative(root, reportPath).replaceAll('\\', '/'), status: report.status, manifestChecksum, writesPerformed: false }, null, 2));

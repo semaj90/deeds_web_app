@@ -10,9 +10,11 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { resolveGraphifyExecutionExpectedCohortV1 } from './lib/graphify-execution-expected-cohort-v1.mjs';
 
 const root = REPO_ROOT;
 const admissionPath = path.join(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const hygienePath = path.join(root, '.tmp/atlas/graphify-daily-selection-hygiene-v1.json');
 const scratchRoot = path.resolve(root, '.tmp/atlas');
 const outputIndex = process.argv.indexOf('--output');
 const reportPath = path.resolve(root, outputIndex >= 0
@@ -40,16 +42,14 @@ if (snapshot.snapshotRevision !== admission.snapshotRevision
   || !Array.isArray(snapshot.sources)) {
   throw new Error('ADMITTED_SNAPSHOT_MANIFEST_INVALID');
 }
-
-const expectedRefs = snapshot.sources.map((source) => String(source.sourceRef));
-const expectedRefChecksum = sortedConcatChecksum(expectedRefs);
-const expectedIdentityChecksum = sortedConcatChecksum(snapshot.sources.map((source) => String(source.sourceIdentityKey)));
-const expectedContentChecksum = jsonSha256(snapshot.sources.map((source) => [
-  source.sourceIdentityKey,
-  source.sourceRevision,
-  source.byteLength,
-]));
-const expectedByRef = new Map(snapshot.sources.map((source) => [String(source.sourceRef), source]));
+const hygiene = JSON.parse(await fs.readFile(hygienePath, 'utf8'));
+const expectedCohort = resolveGraphifyExecutionExpectedCohortV1({ admission, snapshot, hygiene });
+const expectedSources = expectedCohort.sources;
+const expectedSourceCount = expectedCohort.expectedSourceCount;
+const expectedRefChecksum = expectedCohort.expectedRefChecksum;
+const expectedIdentityChecksum = expectedCohort.expectedIdentityChecksum;
+const expectedContentChecksum = expectedCohort.expectedContentChecksum;
+const expectedByRef = expectedCohort.sourceByRef;
 
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)),
@@ -96,12 +96,12 @@ try {
     const members = memberResult.rows;
     const memberByRef = new Map(members.map((member) => [String(member.source_ref), member]));
     const sourceRefChecksum = sortedConcatChecksum(members.map((member) => String(member.source_ref)));
-    const identityChecksum = sortedConcatChecksum(snapshot.sources.map((source) => String(source.sourceIdentityKey)));
-    const contentChecksum = jsonSha256(snapshot.sources.map((source) => {
+    const identityChecksum = expectedIdentityChecksum;
+    const contentChecksum = jsonSha256(expectedSources.map((source) => {
       const member = memberByRef.get(String(source.sourceRef));
       return [source.sourceIdentityKey, member?.code_source_revision, Number(member?.byte_length)];
     }));
-    const sourceMembershipExact = members.length === snapshot.sources.length
+    const sourceMembershipExact = members.length === expectedSources.length
       && members.every((member) => {
         const source = expectedByRef.get(String(member.source_ref));
         return source
@@ -169,7 +169,9 @@ const report = {
   admittedWorkspaceRevision: admission.workspaceRevision,
   admittedSnapshotRevision: admission.snapshotRevision,
   manifestPath,
-  expectedSourceCount: snapshot.sources.length,
+  snapshotCandidatePathCount: snapshot.sources.length,
+  expectedSourceCount,
+  sourceSelectionChecksum: admission.sourceSelectionChecksum,
   expectedRefChecksum,
   expectedIdentityChecksum,
   expectedContentChecksum,

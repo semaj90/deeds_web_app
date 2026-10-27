@@ -16,35 +16,44 @@ function walk(directory, files = []) {
     if (['node_modules', '.git', '.tmp'].includes(entry.name)) continue;
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(absolute, files);
-    else if (/\.(?:yaml|yml|md)$/i.test(entry.name)) files.push(absolute);
+    else files.push(absolute);
   }
   return files.sort();
 }
 
 function parseDocument(file, text) {
   if (path.extname(file).toLowerCase() === '.md') {
-    if (!text.startsWith('---')) return {};
+    if (!text.startsWith('---')) return { document: {}, parseReason: 'MARKDOWN_FRONTMATTER_MISSING' };
     const end = text.indexOf('\n---', 3);
-    return end > 0 ? parseYaml(text.slice(3, end)) ?? {} : {};
+    if (end <= 0) return { document: {}, parseReason: 'MARKDOWN_FRONTMATTER_UNTERMINATED' };
+    try { return { document: parseYaml(text.slice(3, end)) ?? {}, parseReason: null }; }
+    catch { return { document: {}, parseReason: 'MARKDOWN_FRONTMATTER_YAML_INVALID' }; }
   }
-  try { return parseYaml(text) ?? {}; } catch { return {}; }
+  if (!['.yaml', '.yml'].includes(path.extname(file).toLowerCase())) return { document: {}, parseReason: 'UNSUPPORTED_EXTENSION_FOR_V02_PROFILE' };
+  try { return { document: parseYaml(text) ?? {}, parseReason: null }; }
+  catch { return { document: {}, parseReason: 'YAML_DOCUMENT_INVALID' }; }
 }
 
 function validateFile(file) {
   const text = fs.readFileSync(file, 'utf8');
-  const document = parseDocument(file, text);
+  const { document, parseReason } = parseDocument(file, text);
+  const relativePath = path.relative(root, file).replaceAll('\\', '/');
+  if (parseReason === 'UNSUPPORTED_EXTENSION_FOR_V02_PROFILE') {
+    return { path: relativePath, status: 'EXCLUDED_FROM_V02_PROFILE', reasonCodes: [parseReason], missing: [], canonicalAuthority: false, writesPerformed: false };
+  }
   const missing = [];
   for (const field of ['provenance', 'trust', 'lifecycle']) {
     if (document[field] === undefined || document[field] === null || document[field] === '') missing.push(field);
   }
-  const relativePath = path.relative(root, file).replaceAll('\\', '/');
+  const reasonCodes = parseReason ? [parseReason] : missing.map((field) => `REQUIRED_FIELD_MISSING:${field}`);
   return {
     path: relativePath,
     type: document.type ?? null,
     schema: document.schema ?? null,
     version: document.version ?? null,
     id: document.id ?? document.gap_id ?? null,
-    status: missing.length === 0 ? 'VALID_V02_PROFILE' : 'MISSING_V02_FIELDS',
+    status: reasonCodes.length === 0 ? 'VALID_V02_PROFILE' : 'INVALID_V02_PROFILE',
+    reasonCodes,
     missing,
     canonicalAuthority: false,
     writesPerformed: false,
@@ -65,6 +74,10 @@ const missingDeclaredDomains = declaredDomainNames.filter((name) => !actualDomai
 const undeclaredDomains = actualDomains.filter((name) => !declaredDomainNames.includes(name));
 
 const valid = fileResults.filter((item) => item.status === 'VALID_V02_PROFILE').length;
+const excluded = fileResults.filter((item) => item.status === 'EXCLUDED_FROM_V02_PROFILE').length;
+const invalid = fileResults.filter((item) => item.status === 'INVALID_V02_PROFILE').length;
+const reasonCounts = {};
+for (const item of fileResults) for (const reason of item.reasonCodes ?? []) reasonCounts[reason] = (reasonCounts[reason] ?? 0) + 1;
 const report = {
   schema: 'atlas.okf-v02-bundle-audit.v1',
   status: valid === fileResults.length && missingDeclaredDomains.length === 0 && undeclaredDomains.length === 0 ? 'OKF_V02_PROFILE_PROVEN' : 'OKF_V02_REVIEW_REQUIRED',
@@ -74,9 +87,12 @@ const report = {
     autoRepair: false,
   },
   sourceRoot: path.relative(root, okfRoot).replaceAll('\\', '/'),
-  filesScanned: fileResults.length,
+  filesConsidered: fileResults.length,
+  filesScanned: fileResults.length - excluded,
   validFiles: valid,
-  invalidFiles: fileResults.length - valid,
+  invalidFiles: invalid,
+  excludedFiles: excluded,
+  reasonCounts,
   files: fileResults,
   manifestDrift: { declaredDomains: declaredDomainNames, actualDomains, missingDeclaredDomains, undeclaredDomains },
   canonicalAuthority: false,

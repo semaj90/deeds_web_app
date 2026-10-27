@@ -136,6 +136,10 @@ function main() {
         }
         continue;
       }
+      if (cls === 'UNKNOWN' || entry.unproven === true) {
+        notProven.push({ capability: capabilityId, detail: `implementation classification remains UNKNOWN: ${entry.note ?? entry.name ?? entry.path ?? entry.item ?? JSON.stringify(entry)}` });
+        continue;
+      }
       if (OPTIONAL_CHALLENGER_CLASSIFICATIONS.has(cls)) {
         notProven.push({ capability: capabilityId, detail: `optional challenger entry deferred: ${cls}` });
         continue;

@@ -12,6 +12,33 @@ export const ADMISSION_STATUSES = Object.freeze([
   'ADMISSION_READY', 'PACKET_NOW_EXISTS_VIA_V2', 'PACKET_NOW_EXISTS_VIA_LEGACY_ALIAS', 'PACKET_KEY_CANONICAL_COLLISION', 'IDENTITY_CONFLICT',
 ]);
 
+export function isCanonicalGraphifyExecution(row, expectedWorkspaceRevision) {
+  return row?.status === 'COMPLETED'
+    && row?.canonical_authority === true
+    && row?.workspace_revision === expectedWorkspaceRevision;
+}
+
+/** Validate a persisted membership-scope mapping against its joined repository authority row. */
+export function resolveGraphifyScopeRepositoryMappingV1(scope, rows) {
+  if (typeof scope !== 'string' || !/^repo:.+/.test(scope)) return { ok: false, code: 'MEMBERSHIP_SCOPE_INVALID' };
+  if (!Array.isArray(rows) || rows.length === 0) return { ok: false, code: 'SCOPE_MAPPING_UNRESOLVED' };
+  if (rows.length !== 1) return { ok: false, code: 'SCOPE_MAPPING_AMBIGUOUS' };
+  const row = rows[0];
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (row?.membership_repository_scope !== scope || !uuidPattern.test(row?.repository_id ?? '')
+    || !row?.source_authority_repo_id || row.source_authority_repo_id !== row.persisted_source_authority_repo_id) {
+    return { ok: false, code: 'SCOPE_MAPPING_AUTHORITY_MISMATCH' };
+  }
+  const validRoot = row.mapping_kind === 'ROOT_SCOPE' && scope === 'repo:root'
+    && row.repository_kind === 'ROOT' && row.parent_repository_id === null;
+  const validLogical = row.mapping_kind === 'LOGICAL_SUBSCOPE' && scope !== 'repo:root'
+    && row.repository_kind === 'ROOT' && row.parent_repository_id === null;
+  const validNested = row.mapping_kind === 'NESTED_REPOSITORY' && scope !== 'repo:root'
+    && row.repository_kind === 'NESTED_GIT_REPOSITORY' && row.parent_repository_id !== null;
+  if (!validRoot && !validLogical && !validNested) return { ok: false, code: 'SCOPE_MAPPING_KIND_MISMATCH' };
+  return { ok: true, code: null, repositoryId: row.repository_id, mappingKind: row.mapping_kind };
+}
+
 /**
  * Classify one entry against live state. `live` = {
  *   v2StoredFor: source_ref stored under the V2 key | null,
@@ -64,11 +91,11 @@ export function loadPacketKeyV2AdmissionManifest(dir, expectedRootSha256) {
 
 /**
  * Apply is deliberately unavailable in this tranche. It needs an explicit authorization receipt bound to this exact
- * manifest root, AND the alias-kind DDL must be applied. There is no ON CONFLICT DO NOTHING on this path: a unique
- * violation must be surfaced as a PACKET_KEY_CANONICAL_COLLISION receipt, never skipped.
+ * manifest root, AND the registry-v1 relations and source guard must be applied. A unique violation must be surfaced
+ * as a PACKET_KEY_CANONICAL_COLLISION receipt, never skipped.
  */
-export function assertApplyAuthorized({ authorizationReceipt, manifestRootSha256, aliasKindDdlApplied }) {
-  if (!aliasKindDdlApplied) throw new Error('PACKET_KEY_ALIAS_DDL_NOT_APPLIED');
+export function assertApplyAuthorized({ authorizationReceipt, manifestRootSha256, registryContractApplied }) {
+  if (!registryContractApplied) throw new Error('PACKET_IDENTITY_REGISTRY_V1_DDL_NOT_APPLIED');
   if (!authorizationReceipt || authorizationReceipt.schema !== 'atlas.packet-admission-apply-authorization.v1'
     || authorizationReceipt.status !== 'PACKET_ADMISSION_APPLY_AUTHORIZED' || authorizationReceipt.manifestRootSha256 !== manifestRootSha256) {
     throw new Error('PACKET_ADMISSION_APPLY_AUTHORIZATION_REQUIRED');
@@ -76,12 +103,21 @@ export function assertApplyAuthorized({ authorizationReceipt, manifestRootSha256
   return true;
 }
 
-/** Explicit, conflict-free INSERT (no ON CONFLICT). Not executed anywhere in this tranche. */
-export function buildV2PacketInsert(entry, derived) {
+/** Explicit registry identity INSERT (no ON CONFLICT). Not executed anywhere in this tranche. */
+export function buildRegistryV1PacketInsert(entry, { repositoryId, repositoryScope }) {
   return {
-    text: `INSERT INTO atlas_packets (packet_id, packet_key, source_ref, source_revision, workspace_revision_key, lineage_binding_checksum, directory_path, feature_id, domain_class, source_kind, created_at, updated_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())`,
-    values: [derived.packetId, entry.packetKeyV2, entry.canonicalSourceRef, entry.sourceRevision, entry.workspaceRevision, entry.lineageBindingChecksum, derived.directoryPath, derived.featureId, derived.domainClass, derived.sourceKind],
+    text: `INSERT INTO atlas_packet_identity_registry_v1 (packet_key, repository_id, membership_repository_scope, source_ref, packet_kind, key_recipe_revision)
+           VALUES ($1, $2, $3, $4, 'SOURCE_FILE', 'PacketKeyV2@1')`,
+    values: [entry.packetKeyV2, repositoryId, repositoryScope, entry.canonicalSourceRef],
+  };
+}
+
+/** Explicit immutable storage-alias INSERT (no ON CONFLICT). Not executed anywhere in this tranche. */
+export function buildRegistryV1StorageAliasInsert(entry, { storagePacketKey, evidenceRef, evidenceDigest }) {
+  return {
+    text: `INSERT INTO atlas_packet_identity_aliases_v1 (alias_key, canonical_packet_key, storage_packet_key, alias_kind, evidence_ref, evidence_digest)
+           VALUES ($1, $2, $3, 'PACKET_KEY_V1_STORAGE_TO_V2', $4, $5)`,
+    values: [storagePacketKey, entry.packetKeyV2, storagePacketKey, evidenceRef, evidenceDigest],
   };
 }
 

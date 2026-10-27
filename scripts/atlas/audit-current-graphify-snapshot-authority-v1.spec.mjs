@@ -18,3 +18,10 @@ test('optional audit receipts are restricted to the scratch Atlas directory', ()
   assert.match(source, /REPORT_DIR_MUST_BE_UNDER_TMP_ATLAS/);
   assert.match(source, /resolve\(root, '\.tmp\/atlas'\)/);
 });
+
+test('snapshot authority compares execution membership with the admitted selected cohort', () => {
+  assert.match(source, /reconcileSelectedSourceManifestV1\(\{ admission, selectionPlan, snapshot \}\)/);
+  assert.match(source, /members\.length === selectedPlanBindings\.length/);
+  assert.match(source, /sourceRefSetChecksum === selectedSourceRefChecksum/);
+  assert.doesNotMatch(source, /members\.length === workspace\.sourceCount/);
+});

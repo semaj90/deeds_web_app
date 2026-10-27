@@ -1,9 +1,17 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { parse } from 'yaml';
 
 const root = process.cwd();
+const outputArg = process.argv.find((arg) => arg.startsWith('--out='))?.slice(6) ?? null;
+const outputPath = outputArg ? resolve(root, outputArg) : null;
+const atlasTmp = resolve(root, '.tmp/atlas');
+if (outputPath) {
+  const outputRelative = relative(atlasTmp, outputPath);
+  if (outputRelative.startsWith('..') || isAbsolute(outputRelative)) throw new Error('OUTPUT_MUST_STAY_UNDER_TMP_ATLAS');
+}
 const readYaml = (path) => parse(readFileSync(resolve(root, path), 'utf8'));
 const schema = readYaml('docs/.okf/schema.yaml');
 const index = readYaml('.okf/indexes/code-capability-knowledge-v1.yaml');
@@ -54,4 +62,31 @@ for (let number = 1; number <= 18; number += 1) {
 assert.ok(masterToc.includes('Code Capability Knowledge and Agentic DAG Retrieval'));
 assert.ok(masterToc.includes('CODE-KNOW-01..18'));
 
+const digest = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+const indexPath = '.okf/indexes/code-capability-knowledge-v1.yaml';
+const schemaPath = 'docs/.okf/schema.yaml';
+const validatorPath = 'scripts/atlas/validate-code-capability-okf-contract-v1.mjs';
+const receipt = {
+  schema: 'atlas.okf-owner-validation-receipt.v1',
+  status: 'VALID',
+  canonicalAuthority: false,
+  writesPerformed: false,
+  validatorPath,
+  validatorSha256: digest(readFileSync(resolve(root, validatorPath))),
+  files: [{
+    path: indexPath,
+    status: 'PASS',
+    valid: true,
+    sha256: digest(readFileSync(resolve(root, indexPath))),
+    schemaPath,
+    schemaSha256: digest(readFileSync(resolve(root, schemaPath))),
+    profile: 'code-capability-knowledge-index-v1',
+    errors: [],
+  }],
+};
+if (outputPath) {
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: 'wx' });
+}
 process.stdout.write('OKF_CAPABILITY_CONTRACT_VALID: seven typed kinds; base kind unchanged; non-authoritative; 18 gates linked; no persistence.\n');
+if (outputPath) process.stdout.write(`${relative(root, outputPath).replaceAll('\\', '/')}\n`);

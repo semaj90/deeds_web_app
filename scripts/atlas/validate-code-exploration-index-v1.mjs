@@ -8,7 +8,13 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const definition = path.join(root, '.okf', 'indexes', 'code-exploration.yaml');
-const reportPath = path.join(root, 'docs', 'reports', 'code-exploration-index-contract-v1.json');
+const outputArg = process.argv.find((arg) => arg.startsWith('--out='))?.slice(6);
+const reportPath = outputArg ? path.resolve(root, outputArg) : path.join(root, 'docs', 'reports', 'code-exploration-index-contract-v1.json');
+if (outputArg) {
+  const outputRoot = path.resolve(root, '.tmp/atlas');
+  const relativeOutput = path.relative(outputRoot, reportPath);
+  if (!relativeOutput || relativeOutput.startsWith('..') || path.isAbsolute(relativeOutput)) throw new Error('VALIDATION_RECEIPT_MUST_STAY_UNDER_TMP_ATLAS');
+}
 const require = createRequire(import.meta.url);
 const { parse } = require(path.join(root, 'sveltekit-frontend', 'node_modules', 'yaml'));
 const { z } = require(path.join(root, 'node_modules', 'zod'));
@@ -27,7 +33,8 @@ const schema = z.object({
 const value = schema.parse(parse(text));
 const required = new Set(value.identity.required);
 if (!['source_ref', 'source_revision', 'workspace_revision', 'content_hash'].every((key) => required.has(key))) throw new Error('CODE_EXPLORATION_IDENTITY_INCOMPLETE');
-const report = { schema: 'atlas.code-exploration-index-contract-receipt.v1', definition: '.okf/indexes/code-exploration.yaml', definitionChecksum: `sha256:${createHash('sha256').update(text).digest('hex')}`, valid: true, semanticAdmission: false, astExplore02: 'BLOCKED_UPSTREAM', currentPopulationAdmitted: 0, writes: 0, canonicalAuthority: false, modelCalls: false, status: 'CONTRACT_PROVEN_POPULATION_UNADMITTED', blockers: ['current source/chunk/workspace join is not exact', 'existing symbol seed lacks revision and canonical byte spans'] };
-await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const validatorPath = 'scripts/atlas/validate-code-exploration-index-v1.mjs';
+const report = { schema: 'atlas.code-exploration-index-contract-receipt.v1', path: '.okf/indexes/code-exploration.yaml', sha256: `sha256:${createHash('sha256').update(text).digest('hex')}`, profile: 'atlas.code-exploration-index.v1', validatorPath, validatorSha256: `sha256:${createHash('sha256').update(await readFile(path.join(root, validatorPath))).digest('hex')}`, definition: '.okf/indexes/code-exploration.yaml', definitionChecksum: `sha256:${createHash('sha256').update(text).digest('hex')}`, valid: true, semanticAdmission: false, astExplore02: 'BLOCKED_UPSTREAM', currentPopulationAdmitted: 0, writes: 0, canonicalAuthority: false, modelCalls: false, status: 'CONTRACT_PROVEN_POPULATION_UNADMITTED', blockers: ['current source/chunk/workspace join is not exact', 'existing symbol seed lacks revision and canonical byte spans'] };
+await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8', outputArg ? { flag: 'wx' } : undefined);
 console.log(JSON.stringify({ report: path.relative(root, reportPath).replaceAll('\\', '/'), status: report.status, astExplore02: report.astExplore02, writes: 0 }, null, 2));
 

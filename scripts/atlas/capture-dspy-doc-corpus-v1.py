@@ -21,6 +21,7 @@ from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "python"))
+from atlas_dspy_corpus_config_v1 import parse_json_no_duplicates, validate_dspy_corpus_source_v1  # noqa: E402
 from atlas_external_docs import extract_structured_text  # noqa: E402
 
 CONFIG_PATH = ROOT / ".okf/docs/dspy/corpus.json"
@@ -108,6 +109,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fetch", action="store_true", help="perform bounded local capture; without this flag only print the plan")
     parser.add_argument("--verify-dir", help="verify a prior snapshot directory without network access")
+    parser.add_argument("--validate-config-only", action="store_true", help="validate one local corpus config without network or snapshot writes")
+    parser.add_argument("--receipt-out", help="write validation-only receipt under .tmp/atlas")
     parser.add_argument("--config", default=str(CONFIG_PATH.relative_to(ROOT)), help="source config inside .okf/docs/dspy")
     parser.add_argument("--limit", type=int, default=250)
     parser.add_argument("--concurrency", type=int, default=3)
@@ -116,6 +119,10 @@ def main() -> int:
         parser.error("limit must be 1..250 and concurrency must be 1..4")
     if args.fetch and args.verify_dir:
         parser.error("--fetch and --verify-dir are mutually exclusive")
+    if args.validate_config_only and (args.fetch or args.verify_dir):
+        parser.error("--validate-config-only cannot be combined with --fetch or --verify-dir")
+    if args.validate_config_only and not args.receipt_out:
+        parser.error("--validate-config-only requires --receipt-out")
     if args.verify_dir:
         snapshot = (ROOT / args.verify_dir).resolve()
         if not snapshot.is_relative_to(OUTPUT_ROOT.resolve()):
@@ -162,9 +169,54 @@ def main() -> int:
     config_path = (ROOT / args.config).resolve()
     if not config_path.is_relative_to(CONFIG_ROOT.resolve()):
         raise ValueError("CONFIG_OUTSIDE_DSPY_DOCS_ROOT")
-    config = json.loads(config_path.read_text(encoding="utf-8"))
-    if config.get("schema") != "atlas.local-doc-corpus-source.v1" or config.get("canonicalAuthority") is not False:
-        raise ValueError("DSPY_CORPUS_CONFIG_INVALID")
+    config_bytes = config_path.read_bytes()
+    errors = []
+    try:
+        config = parse_json_no_duplicates(config_bytes.decode("utf-8"))
+        errors = validate_dspy_corpus_source_v1(config)
+    except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
+        config = {}
+        errors = [f"CONFIG_PARSE_ERROR:{type(exc).__name__}:{exc}"]
+    if args.validate_config_only:
+        report_root = (ROOT / ".tmp/atlas").resolve()
+        report_path = (ROOT / args.receipt_out).resolve()
+        if not report_path.is_relative_to(report_root):
+            raise ValueError("VALIDATION_RECEIPT_OUTSIDE_TMP_ATLAS")
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        validator_path = Path(__file__).resolve()
+        helper_path = Path(__file__).resolve().parents[2] / "python/atlas_dspy_corpus_config_v1.py"
+        receipt = {
+            "schema": "atlas.okf-owner-validation-receipt.v1",
+            "status": "VALID" if not errors else "INVALID",
+            "validationKind": "PROFILE_CONTRACT",
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+            "networkRequests": 0,
+            "files": [{
+                "path": config_path.relative_to(ROOT).as_posix(),
+                "sha256": sha256(config_bytes),
+                "profile": "atlas.local-doc-corpus-source.v1",
+                "validationKind": "PROFILE_CONTRACT",
+                "validatorPath": validator_path.relative_to(ROOT).as_posix(),
+                "validatorSha256": sha256(validator_path.read_bytes()),
+            "codeDependencies": [{
+                "path": helper_path.relative_to(ROOT).as_posix(),
+                "sha256": sha256(helper_path.read_bytes()),
+            }],
+                "helperPath": helper_path.relative_to(ROOT).as_posix(),
+                "helperSha256": sha256(helper_path.read_bytes()),
+                "schemaPath": None,
+                "errors": errors,
+            }],
+        }
+        with report_path.open("xb") as stream:
+            stream.write(stable_json(receipt))
+            stream.flush()
+            os.fsync(stream.fileno())
+        print(json.dumps({"status": receipt["status"], "receiptPath": report_path.relative_to(ROOT).as_posix(), "networkRequests": 0, "writesPerformed": False}, indent=2))
+        return 0 if not errors else 2
+    if errors:
+        raise ValueError("DSPY_CORPUS_CONFIG_INVALID:" + ",".join(errors))
     api_key = os.environ.get("FIRECRAWL_API_KEY")
     if not api_key:
         raise RuntimeError("FIRECRAWL_API_KEY_REQUIRED")

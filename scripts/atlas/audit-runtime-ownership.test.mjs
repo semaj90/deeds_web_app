@@ -58,10 +58,29 @@ function evaluate(registry, baseline) {
         const label = entry.note ?? entry.name ?? entry.item;
         if (isTolerated(capabilityId, label)) knownExisting.push({ capabilityId, label });
         else violations.push({ class: 'NEW_UNCLASSIFIED_IMPLEMENTATION', capabilityId, label });
+      } else if (entry.classification === 'UNKNOWN' || entry.unproven === true) {
+        notProven.push({ capabilityId, entry: entry.note ?? entry.name ?? entry.path ?? entry.item });
       }
     }
   }
   return { violations, knownExisting, notProven };
+}
+
+// Unknown runtime ownership is an explicit evidence gap, not a proven duplicate
+// and not a new unclassified implementation violation.
+{
+  const registry = {
+    schema_version: 'atlas.runtime-ownership.v1',
+    capabilities: {
+      rerank: {
+        owner: { classification: 'CANONICAL_OWNER', runtime_status: 'UNKNOWN', unproven: true, path: 'canonical.ts' },
+        known_existing_duplication: [{ item: 'candidate.ts', classification: 'UNKNOWN', unproven: true }],
+      },
+    },
+  };
+  const result = evaluate(registry, { tolerated: [] });
+  assertCase('unknown reranker implementation is not a duplicate violation', result.violations.length, 0);
+  assertCase('unknown reranker implementation remains not proven', result.notProven.length, 2);
 }
 
 let failures = 0;

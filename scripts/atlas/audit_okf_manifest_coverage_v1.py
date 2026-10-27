@@ -169,6 +169,21 @@ def audit_okf_manifest(root: Path) -> dict[str, Any]:
         if "schema_file" in registry:
             check_file(registry_name, "schema_file", registry["schema_file"], registry_path)
 
+        schema_files = registry.get("schema_files", {})
+        if not isinstance(schema_files, dict):
+            unsafe.append({"registry": registry_name, "kind": "schema_files", "reference": str(schema_files), "reason": "SCHEMA_FILES_NOT_A_MAPPING"})
+            schema_files = {}
+        declared_schema_members: set[str] = set()
+        for reference in schema_refs:
+            member = reference if isinstance(reference, str) else reference.get("path", reference.get("file")) if isinstance(reference, dict) else None
+            if isinstance(member, str):
+                declared_schema_members.add(member)
+        for member, schema_reference in schema_files.items():
+            if not isinstance(member, str) or member not in declared_schema_members:
+                unsafe.append({"registry": registry_name, "kind": "schema_files_member", "reference": str(member), "reason": "SCHEMA_MEMBER_NOT_DECLARED"})
+                continue
+            check_file(registry_name, "schema_file_for_member", schema_reference, registry_path)
+
         catalogs = registry.get("candidateCatalogs", [])
         if not isinstance(catalogs, list):
             unsafe.append({"registry": registry_name, "kind": "candidateCatalogs", "reference": str(catalogs), "reason": "CATALOGS_NOT_A_LIST"})

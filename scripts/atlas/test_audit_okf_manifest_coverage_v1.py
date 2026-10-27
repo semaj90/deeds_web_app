@@ -36,6 +36,51 @@ def test_declared_schema_and_catalog_references_resolve() -> None:
         assert result["unregisteredStructuredFiles"] == []
 
 
+def test_schema_files_bind_only_declared_registry_members() -> None:
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        domains = root / ".okf" / "domains"
+        schemas = root / ".okf" / "schemas"
+        domains.mkdir(parents=True)
+        schemas.mkdir()
+        (domains / "taxonomy.yaml").write_text("name: taxonomy\n", encoding="utf-8")
+        (domains / "unbound.yaml").write_text("name: unbound\n", encoding="utf-8")
+        (schemas / "taxonomy.schema.json").write_text("{}\n", encoding="utf-8")
+        write_fixture(root, {"registries": {"domains": {
+            "path": "domains/",
+            "schemas": ["taxonomy.yaml", "unbound.yaml"],
+            "schema_files": {"taxonomy.yaml": "../schemas/taxonomy.schema.json"},
+        }}})
+
+        result = audit_okf_manifest(root)
+
+        assert result["status"] == "OKF_MANIFEST_REFERENCES_PROVEN"
+        assert result["declaredReferenceCount"] == 3
+        assert result["resolvedReferenceCount"] == 3
+        assert result["unsafeReferences"] == []
+
+
+def test_schema_files_reject_bindings_for_undeclared_members() -> None:
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        domains = root / ".okf" / "domains"
+        schemas = root / ".okf" / "schemas"
+        domains.mkdir(parents=True)
+        schemas.mkdir()
+        (domains / "taxonomy.yaml").write_text("name: taxonomy\n", encoding="utf-8")
+        (schemas / "taxonomy.schema.json").write_text("{}\n", encoding="utf-8")
+        write_fixture(root, {"registries": {"domains": {
+            "path": "domains/",
+            "schemas": ["taxonomy.yaml"],
+            "schema_files": {"not-listed.yaml": "../schemas/taxonomy.schema.json"},
+        }}})
+
+        result = audit_okf_manifest(root)
+
+        assert result["status"] == "OKF_MANIFEST_REFERENCES_STALE"
+        assert result["unsafeReferences"][0]["reason"] == "SCHEMA_MEMBER_NOT_DECLARED"
+
+
 def test_missing_and_unlisted_files_are_reported_without_claiming_authority() -> None:
     with TemporaryDirectory() as directory:
         root = Path(directory)
