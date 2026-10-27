@@ -9,7 +9,25 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 
 dotenv.config({ path: path.resolve(REPO_ROOT, '.env') });
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+/** Credentials come from the environment only; there is no fallback connection string. */
+export function resolveDatabaseUrl(env = process.env) {
+  const value = env.DATABASE_URL;
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error('DATABASE_URL_NOT_CONFIGURED: set DATABASE_URL in .env.local or the environment; no default credential is used.');
+  }
+  return value;
+}
+
+/** Host/database only, never the user info. */
+export function redactDatabaseUrl(value) {
+  try {
+    const url = new URL(value);
+    return `${url.protocol}//${url.host}${url.pathname}`;
+  } catch {
+    return '<unparseable DATABASE_URL>';
+  }
+}
+
 const args = process.argv.slice(2);
 const sqlIdx = args.findIndex((arg) => arg === '--sql' || arg === '--file');
 const sqlFileArg = sqlIdx >= 0 ? args[sqlIdx + 1] : null;
@@ -19,6 +37,7 @@ const sqlFilePath = path.resolve(
 );
 
 async function run() {
+  const DATABASE_URL = resolveDatabaseUrl();
   console.log(`Loading SQL schema from: ${sqlFilePath}`);
   if (!fs.existsSync(sqlFilePath)) {
     console.error(`File does not exist: ${sqlFilePath}`);
@@ -26,7 +45,7 @@ async function run() {
   }
 
   const sql = fs.readFileSync(sqlFilePath, 'utf8');
-  console.log(`Connecting to Postgres database at ${DATABASE_URL}...`);
+  console.log(`Connecting to Postgres database at ${redactDatabaseUrl(DATABASE_URL)}...`);
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
   try {
@@ -41,4 +60,9 @@ async function run() {
   }
 }
 
-run();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  run().catch((err) => {
+    console.error(String(err?.message ?? err));
+    process.exit(1);
+  });
+}
