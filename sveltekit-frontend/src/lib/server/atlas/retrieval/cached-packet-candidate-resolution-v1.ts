@@ -8,6 +8,7 @@ import {
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
 import {
   assertGroundedExtractionSourceBindingReceiptV1,
+  GroundedExtractionSourceBindingError,
   type GroundedExtractionSourceBindingReceiptV1,
 } from '../identity/grounded-extraction-source-binding-v1.js';
 
@@ -154,13 +155,20 @@ export function verifyCachedPacketCandidateSourceBindingSpanV1(
   receipt: GroundedExtractionSourceBindingReceiptV1,
 ): CachedPacketSourceBindingSpanVerificationV1 {
   const spanVerification = verifyCachedPacketCandidateSourceSpanV1(match, evidence);
-  assertGroundedExtractionSourceBindingReceiptV1(receipt, {
-    packetKey: match.packetKey ?? '',
-    sourceRef: match.sourceRef,
-    sourceRevision: spanVerification.sourceRevision,
-    workspaceRevision: match.workspaceRevision,
-    byteLength: evidence.sourceBytes.byteLength,
-  });
+  try {
+    assertGroundedExtractionSourceBindingReceiptV1(receipt, {
+      packetKey: match.packetKey ?? '',
+      sourceRef: match.sourceRef,
+      sourceRevision: spanVerification.sourceRevision,
+      workspaceRevision: match.workspaceRevision,
+      byteLength: evidence.sourceBytes.byteLength,
+    });
+  } catch (error) {
+    if (error instanceof GroundedExtractionSourceBindingError) {
+      throw new Error('CACHED_PACKET_SOURCE_BINDING_RECEIPT_MISMATCH');
+    }
+    throw error;
+  }
   const payload = {
     ...spanVerification,
     canonicalPacketKey: receipt.canonicalPacketKey,

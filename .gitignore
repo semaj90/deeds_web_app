@@ -704,6 +704,7 @@ docs/.okf/pinned/admission-envelopes-v1.json
 *.txt
 !docs/reports/parent-atlas-streaming-graph-gpu-proof-audit-2026-10-14.txt
 !native/atlas_core/CMakeLists.txt
+!packages/atlas-native-core/CMakeLists.txt
 !README*.txt
 !LICENSE*.txt
 !CHANGELOG*.txt

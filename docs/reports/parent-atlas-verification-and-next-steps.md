@@ -39,6 +39,7 @@
 | **Svelte 2026 Challenger** | **PROVEN (Challenger)** | Pinned commit `29886944d756e6...`, native `.so` built (67.2 KB), Svelte 5 runes/snippets verified. | `packages/atlas-svelte-grammar/` |
 | **VER-03-04 Element Census** | **PARTIAL (Policy)** | 10/10 component element counts match splitter exactly (100%); 1 `<svelte:window>` excluded; 2 raw `&` entity warnings. | `docs/reports/ver-03-04-svelte-grammar-challenger-receipt-v1.json` |
 | **Memory Registry REG-01/02/03** | **PROVEN** | `AtlasMemoryEntryV1` descriptor contract, `AlignedSlabArena` 64B cacheline allocator, SIMD/LUT 2.75B/s. | `docs/reports/reg-01-03-memory-registry-receipt-v1.json` |
+| **GPU Feature Tile (Phase A/B)** | **PROVEN (Proposal)** | `AtlasFeatureRow` (24B ABI verified), 64-bit feature mask, SIMT filter (1.47B rows/s), `AtlasGpuFeatureTileV1`. | `docs/reports/phase-a-b-nes-gpu-feature-tile-receipt-v1.json` |
 | **Live :8095 $\rightarrow$ Arrow $\rightarrow$ ATen** | **PROVEN** | Real `turbovec-contract.ts` parsed via `:8095/extract`, encoded into 43.7 KB Arrow IPC, streamed to `torch.uint8` tensor. | `scripts/pipeline_live_8095_arrow.py` |
 | **PostgreSQL 18 Readback** | **PROVEN** | Server-side cursor streaming 768-D vectors on port 5434; bytewise `std::bit_cast` safe decoder. | `scripts/atlas/readback_pg18_binary_cursor.cjs` |
 | **Staged Workboard Writer** | **PROVEN** | Staging write + readback validation + `.bak` preservation + atomic rename; 13,345 tasks cataloged. | `scripts/atlas/build-openspec-workboard-v1.mjs` |

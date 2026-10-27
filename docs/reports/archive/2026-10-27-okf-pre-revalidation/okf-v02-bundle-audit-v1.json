@@ -1,0 +1,418 @@
+{
+  "schema": "atlas.okf-v02-bundle-audit.v1",
+  "status": "OKF_V02_REVIEW_REQUIRED",
+  "profile": {
+    "requiredFields": [
+      "provenance",
+      "trust",
+      "lifecycle"
+    ],
+    "profileRevision": "atlas-okf-v02-validation-profile-v1",
+    "autoRepair": false
+  },
+  "sourceRoot": ".okf",
+  "filesScanned": 25,
+  "validFiles": 0,
+  "invalidFiles": 25,
+  "files": [
+    {
+      "path": ".okf/concepts/cluster-run-lineage-gap.yaml",
+      "type": null,
+      "schema": "atlas.okf-concept-gap.v1",
+      "version": null,
+      "id": "cluster-run-lineage-gap",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/concepts/concept-edge-ledger-gap.yaml",
+      "type": null,
+      "schema": "atlas.okf-concept-gap.v1",
+      "version": null,
+      "id": "concept-edge-ledger-gap",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/concepts/domain-lineage-gap.yaml",
+      "type": null,
+      "schema": "atlas.okf-concept-gap.v1",
+      "version": null,
+      "id": "domain-lineage-gap",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/concepts/representation-fragmentation-gap.yaml",
+      "type": null,
+      "schema": "atlas.okf-concept-gap.v1",
+      "version": null,
+      "id": "representation-fragmentation-gap",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/concepts/som-run-lineage-gap.yaml",
+      "type": null,
+      "schema": "atlas.okf-concept-gap.v1",
+      "version": null,
+      "id": "som-run-lineage-gap",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/concepts/topology-schema-drift-gap.yaml",
+      "type": null,
+      "schema": "atlas.okf-concept-gap.v1",
+      "version": null,
+      "id": "topology-schema-drift-gap",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/domains/feature-intelligence.yaml",
+      "type": null,
+      "schema": null,
+      "version": 1,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/domains/parent-atlas-execution.yaml",
+      "type": null,
+      "schema": null,
+      "version": 1,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/domains/structured-value.yaml",
+      "type": null,
+      "schema": null,
+      "version": 1,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/index.md",
+      "type": "index",
+      "schema": null,
+      "version": null,
+      "id": "index",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/indexes/code-exploration.yaml",
+      "type": null,
+      "schema": "atlas.code-exploration-index.v1",
+      "version": 1,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/indexes/feature-intelligence.yaml",
+      "type": null,
+      "schema": null,
+      "version": 2,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/indexes/parent-atlas-code-explore.yaml",
+      "type": null,
+      "schema": "atlas.explore-index-definition.v1",
+      "version": null,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/languages/typescript.yaml",
+      "type": null,
+      "schema": null,
+      "version": 1,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/manifest.yaml",
+      "type": null,
+      "schema": null,
+      "version": 2,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/pipelines/ast-entity-prefill.yaml",
+      "type": null,
+      "schema": "atlas.ast-entity-prefill-pipeline.v1",
+      "version": null,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/pipelines/retrieval-ranking-synthesis.md",
+      "type": "pipeline",
+      "schema": null,
+      "version": null,
+      "id": "pipeline/retrieval-ranking-synthesis",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/pipelines/sveltekit-vitest-validation.md",
+      "type": "pipeline",
+      "schema": null,
+      "version": null,
+      "id": "pipeline/sveltekit-vitest-validation",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/pipelines/web-sources.md",
+      "type": "pipeline",
+      "schema": null,
+      "version": null,
+      "id": "pipeline/web-sources",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/predicates/feature-relationships.yaml",
+      "type": null,
+      "schema": null,
+      "version": 1,
+      "id": null,
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/runbooks/admin-dashboard-setup.md",
+      "type": "runbook",
+      "schema": null,
+      "version": null,
+      "id": "runbook/admin-dashboard-setup",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/systems/deep-research.md",
+      "type": "system",
+      "schema": null,
+      "version": null,
+      "id": "system/deep-research",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/systems/hyperrag.md",
+      "type": "system",
+      "schema": null,
+      "version": null,
+      "id": "system/hyperrag",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/tools/gemma4-synthesis.md",
+      "type": "tool",
+      "schema": null,
+      "version": null,
+      "id": "tool/gemma4-synthesis",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    },
+    {
+      "path": ".okf/tools/ml-ranking-sidecar.md",
+      "type": "tool",
+      "schema": null,
+      "version": null,
+      "id": "tool/ml-ranking-sidecar",
+      "status": "MISSING_V02_FIELDS",
+      "missing": [
+        "provenance",
+        "trust",
+        "lifecycle"
+      ],
+      "canonicalAuthority": false,
+      "writesPerformed": false
+    }
+  ],
+  "manifestDrift": {
+    "declaredDomains": [
+      "cache.yaml",
+      "database.yaml",
+      "feature-intelligence.yaml",
+      "parent-atlas-execution.yaml",
+      "retrieval.yaml"
+    ],
+    "actualDomains": [
+      "feature-intelligence.yaml",
+      "parent-atlas-execution.yaml",
+      "structured-value.yaml"
+    ],
+    "missingDeclaredDomains": [
+      "cache.yaml",
+      "database.yaml",
+      "retrieval.yaml"
+    ],
+    "undeclaredDomains": [
+      "structured-value.yaml"
+    ]
+  },
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false
+}

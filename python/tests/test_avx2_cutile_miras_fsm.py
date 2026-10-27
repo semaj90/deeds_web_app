@@ -204,6 +204,25 @@ class TestAvx2CuTileMirasFsm(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "CUTILE_KV_INSERT_REQUESTED_BUT_CUDA_TILE_UNAVAILABLE"):
                 launch_kv_block_insert(host_kv, device_kv, page_map, use_cutile=True)
 
+    def test_kv_page_map_rejects_non_integer_indices_and_accepts_int32(self):
+        if not HAVE_TORCH:
+            self.skipTest("PyTorch not installed")
+
+        import torch
+
+        host_kv = torch.tensor([[11.0], [22.0]])
+        device_kv = torch.zeros(3, 1)
+        for page_map in (torch.tensor([1.5, 2.0]), torch.tensor([True, False])):
+            for use_cutile in (False, True):
+                with self.subTest(dtype=page_map.dtype, use_cutile=use_cutile):
+                    with self.assertRaisesRegex(ValueError, "KV_PAGE_TABLE_REQUIRES_INT32_OR_INT64"):
+                        launch_kv_block_insert(host_kv, device_kv, page_map, use_cutile=use_cutile)
+                    self.assertEqual(device_kv.tolist(), [[0.0], [0.0], [0.0]])
+
+        copied = launch_kv_block_insert(host_kv, device_kv, torch.tensor([2, 0], dtype=torch.int32))
+        self.assertEqual(copied, 2)
+        self.assertEqual(device_kv.tolist(), [[22.0], [0.0], [11.0]])
+
 
 if __name__ == "__main__":
     unittest.main()

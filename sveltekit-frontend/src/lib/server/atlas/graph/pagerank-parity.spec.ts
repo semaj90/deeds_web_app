@@ -49,7 +49,7 @@ function run(command: string, args: string[]): string {
 // (no pip install: see runtime-capability-registry graph.oracle.cpu). Set, for example:
 //   ATLAS_NETWORKX_PYTHON=wsl:/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python
 // Unset, the oracle runs with the default `python` exactly as before.
-const networkxPython = process.env.ATLAS_NETWORKX_PYTHON;
+const networkxPython = process.env.ATLAS_NETWORKX_PYTHON ?? (process.platform === 'win32' ? 'wsl:/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python' : undefined);
 
 function toWslPath(windowsPath: string): string {
 	return windowsPath.replace(/^([A-Za-z]):[\\/]/, (_match, drive: string) => `/mnt/${drive.toLowerCase()}/`).replace(/\\/g, '/');

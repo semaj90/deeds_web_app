@@ -17,10 +17,29 @@ registries:
     path: languages/
     description: Language-specific AST rules, extensions, exclusions
     schemas:
+      - bash.yaml
+      - binary.yaml
+      - c.yaml
+      - cmake.yaml
+      - cpp.yaml
+      - css.yaml
+      - glsl.yaml
       - go.yaml
+      - html.yaml
+      - java.yaml
+      - json.yaml
+      - lua.yaml
+      - markdown.yaml
+      - ndjson.yaml
+      - powershell.yaml
+      - proto.yaml
       - python.yaml
       - rust.yaml
+      - sql.yaml
+      - text.yaml
+      - toml.yaml
       - typescript.yaml
+      - yaml.yaml
     candidateCatalogs:
       - path: languages/tree-sitter-language-pack-catalog-v1.json
         schema: ../schemas/tree-sitter-language-catalog-v1.schema.json
@@ -35,7 +54,9 @@ registries:
       - feature-intelligence.yaml
       - parent-atlas-execution.yaml
       - structured-value.yaml
-      - atlas-domain-taxonomy.yaml   # validates against ../schemas/domain-taxonomy-v1.schema.json
+      - atlas-domain-taxonomy.yaml
+    schema_files:
+      atlas-domain-taxonomy.yaml: ../schemas/domain-taxonomy-v1.schema.json
 
   corpora:
     path: corpora/
@@ -50,6 +71,7 @@ registries:
       Evidence-linked gap records (missing lineage, fragmented ownership,
       undecided schema). status is always NOT_PROVEN until closed by a
       real fix with a receipt; never PROVEN by a concept file alone.
+    schema_file: ../schemas/okf-concept-gap-v1.schema.json
     schemas:
       - domain-lineage-gap.yaml
       - concept-edge-ledger-gap.yaml

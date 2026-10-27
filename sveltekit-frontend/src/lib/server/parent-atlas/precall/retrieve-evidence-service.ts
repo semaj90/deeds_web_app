@@ -139,14 +139,20 @@ export async function retrieveEvidence(rawInput: unknown): Promise<RetrieveEvide
     ...orchestratorLanes,
   ];
 
+  const readMetadataString = (metadata: Record<string, unknown> | undefined, ...keys: string[]) => {
+    for (const key of keys) {
+      const value = metadata?.[key];
+      if (typeof value === 'string' && value.length > 0) return value;
+    }
+    return null;
+  };
+
   const evidence = orchestratorResult.results.map((r) => ({
-    packetKey: r.id,
-    sourceRef:
-      typeof r.metadata?.source_ref === 'string'
-        ? (r.metadata.source_ref as string)
-        : typeof r.metadata?.sourceRef === 'string'
-          ? (r.metadata.sourceRef as string)
-          : r.id,
+    candidateId: r.id,
+    packetKey: readMetadataString(r.metadata, 'packet_key', 'packetKey'),
+    sourceRef: readMetadataString(r.metadata, 'source_ref', 'sourceRef'),
+    sourceRevision: readMetadataString(r.metadata, 'source_revision', 'sourceRevision'),
+    workspaceRevision: readMetadataString(r.metadata, 'workspace_revision', 'workspaceRevision'),
     score: r.score,
     summary: typeof r.content === 'string' ? r.content.slice(0, 400) : undefined,
   }));

@@ -14,12 +14,33 @@
 import { createHash } from 'node:crypto';
 import { ENV } from '../env.server.js';
 import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtime-v1.js';
-import type { EmbeddingGemmaTaskModeV1 } from './embedding-contract-768.js';
+import { EMBEDDINGGEMMA_TASK_MODES_V1, type EmbeddingGemmaTaskModeV1 } from './embedding-contract-768.js';
+import type { EmbeddingInputModeV1 } from './embedding-execution-adapter-v1.js';
+
+type ApiEmbedObservation = {
+  schema: 'atlas.embedding-execution-observation.v1';
+  status: 'OBSERVED_NOT_VERIFIED';
+  source: string;
+  reportedModel: string;
+  dimensions: number;
+  cacheHit: boolean;
+  inputChecksum: string;
+  vectorChecksum: string;
+};
+
+type ApiEmbedInputRecipe = {
+  mode: EmbeddingInputModeV1;
+  promptRevision: string;
+  sourceTextDigest: string;
+  formattedInputChecksum: string;
+};
 
 export type CanonicalEmbeddingResult = {
   model: string;
   embedding: number[];
   source: 'api-embed';
+  executionObservation?: ApiEmbedObservation;
+  inputRecipe?: ApiEmbedInputRecipe;
 };
 
 /** Result of the explicit, non-canonical ONNX challenger executor. */
@@ -49,6 +70,42 @@ export type Semantic768CanonicalResult = {
 };
 
 export type Semantic768QueryExecutionEvidence = Omit<Semantic768CanonicalResult, 'embedding'>;
+
+const SHA256_HEX = /^(?:sha256:)?[a-f0-9]{64}$/i;
+
+function readApiEmbedObservation(value: unknown): ApiEmbedObservation | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const observation = value as Partial<ApiEmbedObservation>;
+  if (
+    observation.schema !== 'atlas.embedding-execution-observation.v1'
+    || observation.status !== 'OBSERVED_NOT_VERIFIED'
+    || typeof observation.source !== 'string'
+    || typeof observation.reportedModel !== 'string'
+    || observation.dimensions !== 768
+    || typeof observation.cacheHit !== 'boolean'
+    || typeof observation.inputChecksum !== 'string'
+    || !SHA256_HEX.test(observation.inputChecksum)
+    || typeof observation.vectorChecksum !== 'string'
+    || !SHA256_HEX.test(observation.vectorChecksum)
+  ) return undefined;
+  return observation as ApiEmbedObservation;
+}
+
+function readApiEmbedInputRecipe(value: unknown): ApiEmbedInputRecipe | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
+  const recipe = value as Partial<ApiEmbedInputRecipe>;
+  if (
+    typeof recipe.mode !== 'string'
+    || ![...EMBEDDINGGEMMA_TASK_MODES_V1, 'unprompted_legacy'].includes(recipe.mode as EmbeddingInputModeV1)
+    || typeof recipe.promptRevision !== 'string'
+    || !recipe.promptRevision
+    || typeof recipe.sourceTextDigest !== 'string'
+    || !SHA256_HEX.test(recipe.sourceTextDigest)
+    || typeof recipe.formattedInputChecksum !== 'string'
+    || !SHA256_HEX.test(recipe.formattedInputChecksum)
+  ) return undefined;
+  return recipe as ApiEmbedInputRecipe;
+}
 
 /** Strict canonical lane. No app-route, ONNX, Ollama, or zero-vector fallback. */
 export async function embedSemantic768Canonical(
@@ -147,13 +204,22 @@ export async function tryEmbedCanonical(
       });
 
       if (response.ok) {
-        const data = await response.json() as { embedding?: number[]; model?: string };
+        const data = await response.json() as {
+          embedding?: number[];
+          model?: string;
+          executionObservation?: unknown;
+          inputRecipe?: unknown;
+        };
         if (Array.isArray(data.embedding)) {
           const embedding = validateSemantic768OutputV1(data.embedding);
+          const executionObservation = readApiEmbedObservation(data.executionObservation);
+          const inputRecipe = readApiEmbedInputRecipe(data.inputRecipe);
           return {
             model: data.model ?? opts?.model ?? 'embeddinggemma:latest',
             embedding: Array.from(embedding),
             source: 'api-embed',
+            ...(executionObservation && { executionObservation }),
+            ...(inputRecipe && { inputRecipe }),
           };
         }
       }

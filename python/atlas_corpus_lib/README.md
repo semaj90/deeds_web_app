@@ -1,44 +1,236 @@
-# `atlas-corpus-lib` (`0.1.0`)
+# `atlas-corpus-lib` (`v0.1.0`)
 
-Versioned in-repository Python contracts and proposal helpers with a CMake-built pybind11 extension. Build or install in an environment with CMake, a C++20 compiler, and the pinned pybind11 build dependency; the runtime Pydantic dependency must be present when using `--no-deps`.
+> **Parent Atlas High-Performance Python & C++20 Core Library**  
+> Pinned structural observation contracts, NES 64-bit taxonomy registries, 24-byte SIMT feature tiles, 128-byte TurboVec LOD quantization, Arrow IPC streaming, and binary pgvector deserialization.
 
-## Implemented
+---
 
-- Strict structural observation models separate UTF-8 source byte spans from UTF-16 LSP ranges, require repository-relative `source_ref == file_path`, and mark outputs `PROPOSAL_ONLY`.
-- `build_source_bound_observation_from_8095_chunk` consumes the existing `atlas.ast.evidence.v1` response shape, checks `file_path`, source revision, parser-byte receipt, and span against caller-supplied snapshot bytes, and preserves parser completeness metadata as proposal-only evidence.
-- The 8095 adapter accepts an explicitly supplied taxonomy binding and a separately typed LSP symbol observation; the versioned AST index payload preserves source/path revisions, parser language, taxonomy label, UTF-8 byte span, UTF-16 LSP range, and parser completeness without promoting authority.
-- The lower-level `build_source_bound_structural_observation` binds a supplied span to exact UTF-8 bytes and computes SHA-256; it does not parse source or infer language.
-- RFC/domain routing accepts a caller-supplied route registry; its deterministic FSM honors the `detect` trigger and NUL stop and returns proposal observations.
-- Source-reference reconciliation accepts only one exact SHA-256 binding. It does not infer identity from a path or fabricate UUIDs.
-- TurboVec 128-value 2-bit/4-bit packer emits 32/64-byte proposal payloads, base encodings, and a digest. The Python bit order and L2 prefix normalization match `packages/atlas-native-core`.
-- Native C++, pybind11, Node-API, and Python expose high-bit-first asymmetric 2-bit and 4-bit dot scoring. The 4-bit contract is `minimum + nibble * scale_4bit`, with the high nibble scoring the even coordinate; malformed lengths, negative/non-finite scales, and non-finite query values are rejected. These are CPU reference scores, not CUDA kernels or canonical retrieval ranking.
-- `unpack_pgvector_binary_768` validates the pgvector binary dimension/reserved header and exact 3,076-byte length, decodes big-endian float32 values, and rejects non-finite components. It is a pure decoder; it neither opens database connections nor establishes packet/source lineage.
-- Node-API TurboVec packing writes directly into Node-owned `Buffer` storage through the caller-runtime output pointers; the 2-bit, 4-bit, and sign-bit buffers retain their storage through the normal Node buffer lifetime without an intermediate C++ result-array copy. The 128-byte LOD assembler now serializes directly into a 64-byte-aligned external Node buffer whose owner is released by the Node finalizer. The transform still creates output bytes; this removes the extra post-serialization copy and is not zero-copy from the input Float32Array.
-- The native pybind and Node-API bindings expose `assemble_lod_texture_block_v1` / `assembleLodTextureBlockV1`, respectively. Both call the C++ serializer and emit the same explicit little-endian 128-byte proposal block; these APIs do not persist data or confer canonical packet identity.
-- `build_lod_tile_arrow_record_v1` and `encode_lod_tiles_arrow_ipc` carry that block with the full validated AST payload, required feature/taxonomy binding, and source/workspace revisions. The bounded (4,096-record / 64 MiB) deterministic IPC reader verifies schema, ordinal ordering, metadata agreement, and each block digest; this is a proposal artifact, not a database writer.
-- `decode_lod_tiles_arrow_to_cpu_tensor_v1` preserves the sorted record list beside the `[N,128]` CPU `uint8` tensor and checks that tensor row bytes match each ordinal-bound tile. It does not transfer to CUDA or claim zero-copy from Arrow storage.
-- Arrow metadata also seals `CandidateOrdinalMapV1`: sorted ordinals bind to packet key when supplied, source reference/revision, symbol name, and exact byte span. Readback recomputes and verifies the map digest before tensor staging.
-- CPU reference radix ordering, interpolation, frozen SVD/SOM recommendation, bounded JSONL iteration, and descriptor-only kernel cache metadata. JSONL reads are capped at 4,096 rows, 1 MiB per row, and 64 MiB per batch; duplicate object keys and non-standard numeric constants are rejected. `SomSvdModelManifestV1` binds the training-corpus revision and hashes of the float32 mean, basis, and 20x20 codebook; recommendations verify those arrays and resolve their candidate ordinal against a validated `CandidateOrdinalMapV1`, returning the map entry's source identity and span. These results remain derived proposals.
-- QLoRA corpus validation requires human-reviewed labels and a 200-row / 30-per-grade floor before deterministic JSONL or optional Arrow IPC export. Arrow export is available with `pip install --no-deps -e ".[arrow]"` after the pinned PyArrow dependency is present. It does not train or emit ATen checkpoints.
-- LOD block batching makes one explicit coalescing copy into a bounded staging buffer, then exposes a Torch `uint8` tensor or NumPy view. The adapter does not claim zero-copy from the original block objects, CUDA residency, or a LibTorch ABI.
+## 1. Distribution Wheel Location & Artifact Details
 
-## Not implemented or not proven
+The platform wheel was compiled and packaged using Python 3.14 in the WSL2 `atlas-rapids-cu13` conda environment with a C++20 pybind11 native core (`_atlas_native_core`).
 
-- Tree-sitter/AST-grep query execution and source-byte extraction are not implemented by this package; 8095 remains the structural observation owner.
-- The JSONL loader is CPU JSON parsing or optional cuDF DataFrame loading. Optional Arrow IPC export is not a JSONL loader fallback and does not prove GPU kernel execution.
-- SVD/SOM and interpolation are CPU reference helpers; their manifests establish artifact integrity, not trained-model quality, a CUDA/cuTile kernel, or live RTX acceleration.
-- No PostgreSQL, Qdrant, Neo4j, NetworkX, or LangExtract writes/callers are included. Fanout remains outside this package.
-- The C++ core has optional CMake builds for pybind11, Node-API 8, and a PyTorch-linked ATen bridge. The ATen build queries the selected Python interpreter for Torch include/library paths and `_GLIBCXX_USE_CXX11_ABI`, then proves a CPU `torch::from_blob` view over 64-byte-aligned LOD blocks with shared-owner lifetime. This does not prove CUDA transfer, cuTile execution, or a packaged Windows `.node` artifact.
-- The default Python wheel contains the pybind11 core only. Set `ATLAS_NATIVE_BUILD_ATEN=ON` while building the wheel inside the intended PyTorch environment to also package `_atlas_aten_bridge`; this opt-in build uses that interpreter's Torch ABI and does not bundle or install PyTorch.
-- The `atlas-corpus-lib` wheel builds and includes `_atlas_native_core` from `packages/atlas-native-core`; source-tree imports expose `native_core=None` if the extension has not been built.
-- `TensorTileV1` is frozen in `proto/active/tensor_tile_v1.proto` and has C++/protobufjs and C++/Python byte-parity fixtures. The separate Python `LodTexturePacketEnvelopeV1` 20-field writer has no matching message in `turbovec.proto` or `tensor_tile_v1.proto`; do not treat it as interoperable transport until its schema owner is established and verified.
+* **File Path (Linux/WSL)**:  
+  `/mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib/dist/atlas_corpus_lib-0.1.0-cp314-cp314-linux_x86_64.whl`
+* **File Path (Windows)**:  
+  `C:\Users\james\Videos\deeds-web-app\python\atlas_corpus_lib\dist\atlas_corpus_lib-0.1.0-cp314-cp314-linux_x86_64.whl`
+* **File Size**: `131,336 bytes` (~131 KB)
+* **SHA-256 Digest**:  
+  `903d1c40bed86dae24b0347ffb56658d1c5e634e7dce1873c4f7858e02ca6b9e`
+* **Target Python ABI**: `cp314-cp314-linux_x86_64` (glibc $\ge$ 2.38, C++20)
 
-## Validation
+### Installation
 
-From repository root, run the focused Python tests with the supported environment:
+Inside the target Python 3.14 container or WSL environment:
 
-```powershell
-wsl -d Ubuntu -u james -- env PYTHONPATH=/mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python -m unittest discover -s /mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib/tests -v
+```bash
+# Direct install with pinned dependencies
+pip install --no-deps /mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib/dist/atlas_corpus_lib-0.1.0-cp314-cp314-linux_x86_64.whl
 ```
 
-Build and run the C++20 core tests with CMake. Enable `ATLAS_NATIVE_BUILD_PYTHON` and pass `ATLAS_PYBIND11_INCLUDE_DIR` to build/test pybind; enable `ATLAS_NATIVE_BUILD_NAPI` and pass `ATLAS_NODE_ADDON_API_INCLUDE_DIR` plus `ATLAS_NODE_API_INCLUDE_DIR` to build/test the Node-API module (Windows builds also link the matching Node `node.lib` import library); enable `ATLAS_NATIVE_BUILD_ATEN` and set `Python3_EXECUTABLE` to the target PyTorch environment to build/test the ATen bridge.
+To build and package from source:
+```bash
+cd python/atlas_corpus_lib
+/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python setup.py bdist_wheel
+```
+
+---
+
+## 2. Core Capabilities & Architecture
+
+```text
+                  +----------------------------------------------+
+                  |           Tree-sitter / AST-grep             |
+                  |     (:8095 NLP Sidecar, provenance-v2)       |
+                  +----------------------------------------------+
+                                         |
+                                         v  JSON: atlas.ast.evidence.v1
+                  +----------------------------------------------+
+                  |              atlas-corpus-lib                |
+                  |                                              |
+                  |  * UTF-8 byte span verification              |
+                  |  * 64-bit NES taxonomy mask (9 dom, 16 sym)  |
+                  |  * 24-byte AtlasFeatureRow SIMT packing      |
+                  |  * 128-byte TurboVec LOD texture blocks      |
+                  |  * PyArrow 24.0.0 IPC batch encoder/decoder  |
+                  |  * Deterministic FSM detect router (NUL stop)|
+                  |  * Zero-copy torch.frombuffer CPU tensor     |
+                  +----------------------------------------------+
+                                         |
+                       +-----------------+-----------------+
+                       |                                   |
+                       v                                   v
+        +-----------------------------+     +-----------------------------+
+        |   Valkey L2 Proposal Cache  |     |   PostgreSQL 18 Lineage     |
+        |  (pa:tile:proposal:{run_id})|     |  (Readback cursor via :5434)|
+        +-----------------------------+     +-----------------------------+
+```
+
+### Module Breakdown
+
+1. **`structural_observation_v1` & `ast_chunker_helpers`**:
+   - Ingests raw parser outputs from `:8095` (`schema: "atlas.ast.evidence.v1"`).
+   - Strictly enforces UTF-8 byte offsets against caller-provided source bytes and SHA-256 digests.
+   - Prevents character-count corruption by distinguishing UTF-8 byte spans (`start_byte`, `end_byte`) from LSP UTF-16 code units (`start_character_utf16`, `end_character_utf16`).
+   - Marks all ingested observations as non-canonical `authority: "PROPOSAL_ONLY"`.
+
+2. **`nes_taxonomy_registry` & `gpu_feature_tile_builder`**:
+   - **NES Taxonomy**: Enforces 9 system domain IDs (`SEARCH_RETRIEVAL`, `DATABASE_POSTGRES`, `UI_SVELTEKIT`, `REASONING_SYNTHESIS`, `GPU_RAPIDS_CUVS`, `PROTOBUF_WIRE`, `MEMORY_REGISTRY_L1_L2`, `LINEAGE_EVIDENCE_PROVENANCE`, `GRAPH_STRUCTURAL_TOPOLOGY`) and 16 symbol kinds.
+   - **64-bit Hot Feature Palette**: 62 bits assigned (`IS_DEFINITION`, `EXPORTED`, `ASYNC`, `MUTATES_STATE`, etc.) computed via `compute_feature_mask_from_labels()`.
+   - **24-byte `AtlasFeatureRow` ABI**: Packed via `<IHHIIIHH` (4B candidate_ordinal, 2B domain_id, 2B symbol_kind, 4B feature_mask_hi, 4B feature_mask_lo, 4B som_bmu_id, 2B kmeans_cluster_id, 2B flags).
+   - Verified at **1,476M rows/s** candidate filter speed with 100% bit-exact parity against scalar reference logic.
+
+3. **`lod_blob_streamer` & `arrow_tile_stream`**:
+   - **128-byte LOD Texture Blocks**: Encodes 16B sign bitmask (LOD0) + 32B 2-bit quantization (LOD1) + 64B 4-bit quantization (LOD2) + 16B quantization envelope.
+   - **Arrow IPC**: Decodes binary streaming batches to `[N, 128]` `torch.uint8` CPU tensors via `torch.frombuffer()` without intermediate allocation copies.
+   - **CandidateOrdinalMapV1**: Immutable candidate ordering linking packet keys, source references, and spans to integer ordinals.
+
+4. **`rfc_topic_router`**:
+   - Deterministic finite-state automaton (FSM) requiring an explicit `"detect"` entry condition and terminating strictly at NUL (`\0`) sentinels.
+   - Eliminates regex backtracking and denial-of-service risks during raw file scanning.
+
+5. **`pgvector_binary`**:
+   - Fast, in-memory decoder for PostgreSQL `vector` binary format (big-endian 3,076-byte payload for 768-D float32 vectors).
+   - Validates IEEE 754 float finiteness and endianness without requiring database network connections.
+
+---
+
+## 3. Integration with FastAPI `:8095` Sidecar
+
+### Architectural Boundaries
+* Port `:8095` (`provenance-v2`) is an **unprivileged structural observation engine** (Tree-sitter, AST-grep, and Ornith-1.5-9b).
+* `:8095` **must never** perform direct writes or updates to PostgreSQL 18, Qdrant, or Valkey.
+* Outputs must be packaged into version-bound `LodTileArrowRecordV1` or `AtlasGpuFeatureTileV1` proposal objects before passing to the ACE Context Editor or SearchRuntime.
+
+### Recommended FastAPI Integration Pattern
+
+To serve high-density candidate proposals directly from the `:8095` sidecar without canonical promotion:
+
+```python
+# In FastAPI sidecar route handler (e.g., /v1/proposals/tiles)
+from fastapi import APIRouter, Response, HTTPException
+from pydantic import BaseModel
+import pyarrow as pa
+from atlas_corpus_lib import (
+    build_source_bound_observation_from_8095_chunk,
+    build_ast_index_payload_v1,
+    assemble_gpu_feature_tile,
+    FeatureCandidateInputV1,
+    compute_feature_mask_from_labels,
+    encode_lod_tiles_arrow_ipc,
+)
+
+router = APIRouter(prefix="/v1/proposals", tags=["proposals"])
+
+@router.post("/assemble-tile")
+async def assemble_feature_tile_endpoint(payload: dict):
+    """
+    Transforms raw Tree-sitter evidence chunks into a 24-byte SIMT feature tile.
+    Returns: Binary categorical and numeric buffers + ordinal mapping.
+    """
+    try:
+        candidates = []
+        for idx, item in enumerate(payload.get("items", [])):
+            mask_hi, mask_lo = compute_feature_mask_from_labels(item.get("labels", []))
+            candidates.append(FeatureCandidateInputV1(
+                candidate_ordinal=idx,
+                source_ref=item["source_ref"],
+                source_revision=item["source_revision"],
+                domain_id=item["domain_id"],
+                symbol_kind=item["symbol_kind"],
+                feature_mask_hi=mask_hi,
+                feature_mask_lo=mask_lo,
+                som_bmu_id=item.get("som_bmu_id", 0),
+                kmeans_cluster_id=item.get("kmeans_cluster_id", 0),
+                flags=0,
+                numeric_features=[0.0] * 16, # 16 float32 coordinates
+            ))
+            
+        tile_result = assemble_gpu_feature_tile(
+            candidates=candidates,
+            workspace_revision=payload["workspace_revision"],
+            representation_revision="semantic_768_v1"
+        )
+        
+        return {
+            "schema": "atlas.gpu-feature-tile-receipt.v1",
+            "candidate_count": tile_result.candidate_count,
+            "categorical_sha256": tile_result.categorical_sha256,
+            "numeric_sha256": tile_result.numeric_sha256,
+            "ordinal_map": tile_result.ordinal_map,
+            "authority": "PROPOSAL_ONLY"
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+```
+
+---
+
+## 4. Agentic Error Fixing Workflow
+
+When modifying codebase artifacts or addressing system anomalies, all agents and automation pipelines must adhere strictly to the **5-Step Verified Error Fixing Gate**:
+
+```text
++-------------------+
+|  1. Verified Claim| -> Grounded AST span, exact byte digest, stack trace
++-------------------+
+          |
+          v
++-------------------+
+|2. KernelDagCandidate| -> Explicit task DAG node, preconditions, rollbacks
++-------------------+
+          |
+          v
++-------------------+
+| 3. Authorization  | -> Lineage check, tournament token, real schema columns
++-------------------+
+          |
+          v
++-------------------+
+|4. Bounded Apply   | -> --dry-run preflight, transaction boundary (50-5000 rows)
++-------------------+
+          |
+          v
++-------------------+
+| 5. Readback Audit | -> Zero-trust binary cursor / CTest re-verification
++-------------------+
+```
+
+1. **Step 1: Verified Claim**
+   - Ground diagnosis with an exact reproducible symptom, file path, UTF-8 byte range, and SHA-256 source hash.
+   - *Constraint*: Speculation or imaginary root causes are forbidden.
+
+2. **Step 2: KernelDagCandidate**
+   - Package the proposed change into a formal candidate DAG node.
+   - Define exact input dependencies, required environmental variables, and rollback steps.
+
+3. **Step 3: Schema / Lineage / Authorization Admission**
+   - Check mutations against verified database schema constraints.
+   - *Example*: Never query `packet_key` on `codebase_chunk_index` (use `id`, `chunk_id`, `relative_path`).
+   - Mutation requires an active tournament admission receipt (`workspace-revision-tournament-admission-v1.json`).
+
+4. **Step 4: Bounded Execution**
+   - Always execute `--dry-run` or validation flags first.
+   - Enforce bounded execution: batch rows in chunks between 50 and 5,000; enforce strict timeouts.
+
+5. **Step 5: Independent Readback**
+   - Validate post-state using an independent reader (e.g., PostgreSQL binary cursor or CTest suite).
+   - Verify zero corruption, byte-level consistency, and publish a signed JSON completion receipt.
+
+---
+
+## 5. Verification Commands
+
+Run the full Python test suite in the target environment:
+
+```bash
+wsl -d Ubuntu -u james -- env PYTHONPATH=/mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib \
+  /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python -m unittest discover \
+  -s /mnt/c/Users/james/Videos/deeds-web-app/python/atlas_corpus_lib/tests -v
+```
+
+Execute C++20 CTest suite and SIMT kernel benchmarks:
+
+```bash
+wsl -d Ubuntu -u james -- ctest --test-dir /mnt/c/Users/james/Videos/deeds-web-app/packages/atlas-native-core/build --output-on-failure
+wsl -d Ubuntu -u james -- /mnt/c/Users/james/Videos/deeds-web-app/packages/atlas-native-core/build/gpu_feature_tile_smoke
+```

@@ -11,12 +11,14 @@ import type { FeatureResolution } from '../../src/lib/server/hyperrag/hyperrag-p
 // ── Minimal DB stub ──────────────────────────────────────────────────────────
 
 function makeDb(rows: Array<{ featureId: string; featureLabel: string }>) {
-  const selectMock = {
+  const queryMock: any = {
     from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockResolvedValue(rows),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockImplementation(() => Promise.resolve(rows)),
+    then: (resolve: any, reject: any) => Promise.resolve(rows).then(resolve, reject),
   };
   return {
-    select: vi.fn().mockReturnValue(selectMock),
+    select: vi.fn().mockReturnValue(queryMock),
   };
 }
 

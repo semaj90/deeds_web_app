@@ -1766,6 +1766,9 @@ reproduce once the mount was visible. The sidecar is healthy after restart.
 | Read-only lexical request | **PROVEN_LIVE** | `/oak/search` completed with bounded `limit=3`; current concept table returned zero matches |
 | Deterministic replay | **PROVEN_BOUNDED** | two identical `/oak/search` requests returned the same output checksum `5c0ec8292fe8f32e71d655baf1cb04e2d3e10cb6b16984d24b463c63b4627eda` |
 | Existing ontology data | **EMPTY_LIVE_OWNER** | `atlas_ontology_concepts`, `atlas_ontology_relations`, `atlas_ontology_tuples`, and `atlas_ontology_linked_tuples` each currently contain 0 rows |
+| Current OAK health (2026-10-27) | **PROVEN_LIVE_READ_ONLY** | `/oak/health`: OAKLib 0.7.4, configured `atlas-postgres`, `READ_ONLY_SHADOW`, `canonicalAuthority:false` |
+| Current concept search/lookup (2026-10-27) | **NO_MATCHES_EMPTY_SOURCE** | `search("database")` gives 0 matches; lookup has no label/aliases; PostgreSQL `atlas_ontology_concepts`, `atlas_ontology_relations`, and `concept_records` each have 0 rows. Receipt `.tmp/atlas/oak-live-readonly-audit-20261027-v2.json` |
+| Ontology population writer audit (2026-10-27) | **NO_DIRECT_WRITER_FOUND** | Scoped source search found no direct SQL `INSERT`/`UPDATE` or Drizzle insert targeting the two ontology tables. `build-concept-seed-dry-v1.mts` is proposal-only and writes a tracked report; its schema-level `canonicalAuthority:true` does not prove proposal admission. Indirect/dynamic writers are not ruled out; no script was run and no canonical rows were written. Profile-validator receipt `.tmp/atlas/okf-language-profile-validation-20261027-v3.json` records 23/23 language profiles valid; focused tests passed 7/7. |
 | Lookup/traversal positive-data proof | **BLOCKED_ON_EMPTY_DATA** | no canonical ontology rows are available for a positive lookup or relation traversal |
 | Canonical writes | **FORBIDDEN** | no inserts, migrations, projections, or ontology downloads performed |
 

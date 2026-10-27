@@ -138,8 +138,10 @@
     "rerank": {
       "owner": {
         "classification": "CANONICAL_OWNER",
+        "runtime_status": "UNKNOWN",
+        "unproven": true,
         "path": "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts",
-        "evidence": "Docstring self-identifies as canonical; imports blendScores/RuntimeReranker from runtime-reranker.ts."
+        "evidence": "Declared architectural owner; its docstring and imports do not prove that every production SearchRuntime caller reaches it. A caller trace is still required."
       },
       "backends": [
         {
@@ -155,8 +157,25 @@
       ],
       "known_existing_duplication": [
         {
-          "note": "13 other files matching *reranker* in sveltekit-frontend/src/lib/server/retrieval/ (attention-reranker.ts, boosted-reranker.ts, cluster-aware-reranker.ts, cross-encoder-reranker.ts, cuda-rnn-reranker.ts, gpu-reranker.ts, langextract-reranker.ts, noun-reranker.ts, post-process-reranker.ts, reranker-blend.ts, runtime-reranker.ts, semantic-vector-reranker.ts, triton-reranker.ts, turbovec-rerank.ts) are UNCLASSIFIED — found live 2026-08-09, not yet audited for caller status.",
-          "classification": "UNCLASSIFIED"
+          "note": "14 neighboring files matching *reranker* in sveltekit-frontend/src/lib/server/retrieval/ were inventoried 2026-08-09, but filename matches do not prove competing production owners. Caller reachability and overlapping decision authority remain UNKNOWN pending a current call-graph audit.",
+          "classification": "UNKNOWN",
+          "unproven": true,
+          "evidence_paths": [
+            "sveltekit-frontend/src/lib/server/retrieval/attention-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/boosted-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/cluster-aware-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/cross-encoder-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/cuda-rnn-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/gpu-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/langextract-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/noun-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/post-process-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/reranker-blend.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/runtime-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/semantic-vector-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/triton-reranker.ts",
+            "sveltekit-frontend/src/lib/server/retrieval/turbovec-rerank.ts"
+          ]
         }
       ]
     },

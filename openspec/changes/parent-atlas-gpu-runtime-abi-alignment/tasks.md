@@ -248,3 +248,23 @@ not character offsets).
   TensorRT provider, TensorRT-LLM/Triton engine, and WebGPU projection as separate derived
   deployment artifacts. No current evidence authorizes installing CUDA 13.2/cuTile or claiming
   TensorRT-LLM readiness.
+
+## WSL NVIDIA Python-version audit (2026-10-27, read-only)
+
+- All inventoried WSL GPU environments use Python 3.14.6: `atlas-rapids-cu13` and the isolated
+  `atlas-cutile-cu132` venv. RAPIDS/cuDF/cuGraph/cuML/cuVS, CuPy, PyTorch, and Triton imports
+  succeeded in the RAPIDS env; the separate cuTile package advertises `>=3.10,<3.15`. Conda
+  records show the RAPIDS native libraries are installed in the conda env with `cp311_abi3`
+  builds. This proves local installed-build compatibility, not a blanket future vendor support
+  guarantee.
+- WSL conda base is Python 3.13.13, system Python is 3.12.3, and `atlas-dspy-exp` is Python
+  3.13.13; direct inventories found no NVIDIA/GPU distributions in those interpreters.
+- `pip check` is nonzero in the mixed conda/pip RAPIDS environment: it reports PyPI-name
+  dependencies that have conda equivalents, plus a PyArrow/cudf metadata-range mismatch,
+  cuda-core/cuda-python metadata mismatch, and a malformed Transformers RECORD. Do not treat
+  the pip-only output as conclusive conda solver failure, but keep packaging cleanliness open.
+- `nvidia-smi` sees RTX 3060 Ti / driver 580.88. A fresh `torch.cuda.is_available()` query did
+  not return during this bounded probe and was stopped; no CUDA workload was run. CuTile is not
+  installed in `atlas-rapids-cu13`; keep the RAPIDS and cuTile lanes separate.
+- Receipt: `docs/reports/wsl-nvidia-python-compatibility-audit-2026-10-27.md`. No installs,
+  package changes, service changes, or database/cache/index writes.

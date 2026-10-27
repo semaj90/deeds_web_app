@@ -1,0 +1,92 @@
+{
+  "schema": "atlas.lineage-e2e-proof-diagnostic.v1",
+  "status": "BLOCKED",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "reportFileOutput": true,
+  "auditMode": "READ_ONLY",
+  "candidateSource": {
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts",
+    "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+    "sourceRevision": "sha256:e4dec11e3d169dc793fee58b65b3c472f966aabcaa464627ef13406ca0f387ce",
+    "contentDigest": "sha256:e4dec11e3d169dc793fee58b65b3c472f966aabcaa464627ef13406ca0f387ce",
+    "byteLength": 9295,
+    "sourceManifestOrdinal": 18285,
+    "sourceBindingStatus": "READ_ONLY_MATCH"
+  },
+  "qualifiedPacket": null,
+  "graphSnapshotBinding": "NOT_VERIFIED",
+  "gates": {
+    "PACKET-01": "BLOCKED_PACKET_NOT_QUALIFIED",
+    "JSONL-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "POS-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "CLASSIFY-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "FEATURE-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "ROUTE-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "REPR-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "RETRIEVE-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "CANDIDATE-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "CONTEXT-01": "NOT_RUN_STOPPED_AT_FIRST_GATE",
+    "PROV-01": "NOT_RUN_STOPPED_AT_FIRST_GATE"
+  },
+  "firstBlockingGate": "PACKET-01",
+  "blockingReasons": [
+    "No atlas_packets row joins this source binding on canonical source_ref, source_revision, and workspace_revision_key.",
+    "The v1 packet identity registry relations are absent; no current canonical packet identity is available for the selected source."
+  ],
+  "databaseReadback": {
+    "transaction": "READ ONLY; ROLLBACK",
+    "exactCurrentPacketJoinCount": 0,
+    "packetIdentityRegistryV1Present": false,
+    "packetIdentityAliasesV1Present": false
+  },
+  "ownersExercised": [
+    "PostgreSQL atlas_workspace_source_bindings read-only source/revision lookup"
+  ],
+  "ownersMissing": [
+    "Qualified packet owner and canonical identity registry",
+    "JSONL/POS/classifier/feature/routing/representation/retrieval/ContextManifest owners for one frozen packet"
+  ],
+  "identityFieldsPreserved": [
+    "sourceRef",
+    "workspaceRevision",
+    "sourceRevision",
+    "contentDigest"
+  ],
+  "identityFieldsMissing": [
+    "packetKey",
+    "canonicalId",
+    "chunkId",
+    "graphRevision",
+    "representationRevision"
+  ],
+  "revisionsProven": [
+    "workspaceRevision",
+    "sourceRevision"
+  ],
+  "revisionsMissing": [
+    "graphRevision",
+    "parserRevision",
+    "extractorRevision",
+    "classifierRevision",
+    "featureRevision",
+    "routingRevision",
+    "representationRevision",
+    "retrievalConfigRevision"
+  ],
+  "evidencePreserved": true,
+  "routingProven": false,
+  "representationProven": false,
+  "retrievalProven": false,
+  "contextManifestProposal": null,
+  "negativeControl": "NOT_RUN_NO_QUALIFIED_PACKET",
+  "deterministicReplay": "NOT_RUN_NO_QUALIFIED_PACKET",
+  "likelyCause": "The admitted source is bound, but no current packet identity/source-revision join exists to freeze as the end-to-end input.",
+  "patchTargets": [
+    "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-registry-v1.ts",
+    "sveltekit-frontend/drizzle/manual/20261020_atlas_packet_identity_registry_v1_DRAFT.sql"
+  ],
+  "safeNextCommand": "Review the unapplied additive packet-identity DDL with the schema owner; do not execute it without separate authorization.",
+  "smokeCommand": "npx vitest run src/lib/server/atlas/identity/packet-identity-registry-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1",
+  "reportPath": "docs/reports/lineage-e2e-01-derivation-slice-2026-10-27.json"
+}

@@ -5,7 +5,7 @@ Method: read-only `rg` and `grep` over tracked source. Counts are exact file mat
 
 ## 1. Summary
 
-- **Ranking has the most duplicate owners.** Several rerank entry points exist, and two different functions are both named `rerankCandidates`. This conflicts with the one-owner rule in the project instructions.
+- **Reranker ownership is not fully classified.** Several rerank/score entry points and two `rerankCandidates` names were found, but the inventory did not establish that they are competing production owners. Treat runtime ownership as `UNKNOWN` until current callers and decision authority are traced.
 - **Two context assemblers** with near-identical names exist: `AceContextAssembler` (`ace/ace-context-assembler.ts`) and `ACEContextAssembler` (`ace/context-assembler.ts`).
 - **EmbeddingGemma 768-d** is the canonical contract, with a working `/api/embed` path. Client and server embedding helpers are separate.
 - **Directory summarization** is live through `/api/codebase-index/summarize-dirs` and `features/codebase-intel/indexer/directory-summarizer.ts`.
@@ -56,7 +56,13 @@ Exported rerank and score entry points, with file locations:
 
 Callers of `rerankCandidates` include `search/hybrid-search.ts`, `reranker-client.ts`, `retrieval/search-runtime.ts`, and `routes/api/error-brain/diagnose/+server.ts`.
 
-Recommendation: run `npm run atlas:audit:ownership` (`scripts/atlas/audit-runtime-ownership.mjs`) and classify each function as `CANONICAL_OWNER`, `BACKEND`, `ADAPTER`, `EXPERIMENT`, `COMPATIBILITY`, `FIXTURE_ONLY`, or `DEAD`. Then rename or retire the duplicates. Do not add a new reranker until that is done.
+Recommendation: trace actual SearchRuntime callers and classify each implementation as `CANONICAL_OWNER`, `BACKEND`, `ADAPTER`, `EXPERIMENT`, `COMPATIBILITY`, `FIXTURE_ONLY`, `DEAD`, or `UNKNOWN` when evidence is insufficient. Rename or retire a reranker only after a caller trace proves overlapping production authority. Do not add a new reranker before this review.
+
+### 2026-10-26 ownership-status correction
+
+The function/file inventory is evidence of candidate implementations, not proof of duplicate runtime ownership. The registry therefore retains `canonical-rerank-executor.ts` as the declared architectural owner while marking its runtime caller proof `UNKNOWN`; the 14 neighboring retrieval files are also `UNKNOWN` pending a current caller/authority trace. This is an evidence status, not a claim that those modules are absent or broken.
+
+This aligns with `openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/proposal.md`: ranking proposals must carry evidence refs, target files, acceptance criteria, validation commands, revisions, and a human decision; incomplete evidence maps to `review_required`, not an automatic patch. DSPy `RepairProgramV1` consumes an exact admitted `ContextManifest`, and GEPA optimizes against validator-derived metrics; neither decides canonical ownership or changes evidence identity. Prime/RLM execution remains with the separate ACE/RLM runtime owner. Keep training/QLoRA gates marked blocked only where their concrete data/evaluation prerequisites are unmet; do not reuse that gate status as a reranker ownership classification.
 
 ## 6. Comment tooling
 
