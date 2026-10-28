@@ -48,7 +48,7 @@ function gate(repoRoot) {
     return {
       present: true, valid: typeof v.overall === 'string', runDir: runs[i], createdAtUtc: v.createdAtUtc ?? null, overall: v.overall ?? null,
       firstFailedMandatoryPredicate: v.firstFailedMandatoryPredicate ? { id: v.firstFailedMandatoryPredicate.id ?? null, category: v.firstFailedMandatoryPredicate.category ?? null, verdict: v.firstFailedMandatoryPredicate.verdict ?? null, reasons: Array.isArray(v.firstFailedMandatoryPredicate.reasons) ? v.firstFailedMandatoryPredicate.reasons.slice(0, 3) : [] } : null, executionStatus: v.executionStatus ?? null, promotionStatus: v.promotionStatus ?? null,
-      graphifyExecutionId: v.graphifyExecutionId ?? null, canonicalAuthority: v.canonicalAuthority ?? null,
+      graphifyExecutionId: v.graphifyExecutionId ?? null, workspaceRevision: v.workspaceRevision ?? null, canonicalAuthority: v.canonicalAuthority ?? null,
       checks: Array.isArray(v.checks) ? v.checks.map((c) => ({ id: c.id, verdict: c.verdict ?? c.status ?? null, reasons: Array.isArray(c.reasons) ? c.reasons.slice(0, 3) : [] })) : [],
       receiptSha256: r.sha256, receiptChecksumVerified: null, runsScanned: runs.length - i,
     };
@@ -62,15 +62,19 @@ export function readGraphifyStatus({ repoRoot, now = Date.now() }) {
   const g = gate(repoRoot);
   const fresh = lc.valid === true && lc.stale === false;
   const gatePass = g.valid === true && g.overall === 'PASS';
+  const receiptConflicts = [];
+  if (lc.executionId && g.graphifyExecutionId && lc.executionId !== g.graphifyExecutionId) receiptConflicts.push('LIFECYCLE_GATE_EXECUTION_MISMATCH');
+  if (lc.workspaceRevision && g.workspaceRevision && lc.workspaceRevision !== g.workspaceRevision) receiptConflicts.push('LIFECYCLE_GATE_WORKSPACE_REVISION_MISMATCH');
   const reasons = [];
   if (!lc.valid) reasons.push(`LIFECYCLE_${lc.reason}`);
   else if (lc.stale) reasons.push('LIFECYCLE_STALE');
   if (!g.valid) reasons.push(`GATE_${g.reason}`);
   else if (!gatePass) reasons.push(`GATE_${g.overall}`);
+  reasons.push(...receiptConflicts);
   if (g.valid && g.firstFailedMandatoryPredicate) reasons.push(`FIRST_BLOCKER:${g.firstFailedMandatoryPredicate.category ?? g.firstFailedMandatoryPredicate.id}:${g.firstFailedMandatoryPredicate.reasons[0] ?? 'NO_REASON'}`);
   return {
     schema: 'atlas.graphify-status.v1', generatedAt: new Date(now).toISOString(), lifecycle: lc, gate: g,
-    graphifyDependentWork: fresh && gatePass ? 'ELIGIBLE_PENDING_OTHER_GATES' : 'GATED', reasons,
+    receiptConflicts, graphifyDependentWork: fresh && gatePass && receiptConflicts.length === 0 ? 'ELIGIBLE_PENDING_OTHER_GATES' : 'GATED', reasons,
     readOnly: true, writesPerformed: false, runsGraphify: false, canonicalAuthority: false,
   };
 }

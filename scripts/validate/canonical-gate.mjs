@@ -5,8 +5,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildCanonicalGateReceiptV2, classifyProcessResult, combineProcessAndPredicateResult, verifyCanonicalGateEvidenceV2, verifyCanonicalGateReceiptV2 } from './canonical-gate-core.mjs';
+import { classifyOkfProfileEvidence } from './canonical-gate-okf-profile-core-v1.mjs';
 import { verifyNeo4jGraphCoverageReceiptV2 } from '../atlas/lib/neo4j-graph-coverage-v2.mjs';
-import { reconcileOkfAudit } from './okf-reconciliation-core.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const onlyArg = process.argv.find((arg) => arg.startsWith('--only='));
@@ -167,6 +167,7 @@ const specs = [
     args: (out) => [
       'scripts/atlas/validate-graph-json-contract.mjs',
       `--in=${path.relative(root, path.join(runDir, 'neo4j-graph-export.json')).replaceAll('\\', '/')}`,
+      `--coverage=${path.relative(root, path.join(runDir, 'neo4j-export-coverage-v2.json')).replaceAll('\\', '/')}`,
       `--report=${path.relative(root, out).replaceAll('\\', '/')}`,
     ],
     evidencePaths: (out) => [
@@ -213,19 +214,10 @@ const specs = [
   },
   {
     id: 'ontology-schema', category: 'ONTOLOGY_SCHEMA', needsJson: true,
-    validatorPath: 'scripts/atlas/audit-okf-v02-bundle-v1.mjs',
-    args: (out) => ['scripts/atlas/audit-okf-v02-bundle-v1.mjs', '.okf', path.relative(root, out).replaceAll('\\', '/')],
-    evaluate: (json) => {
-      // Cause counts explain the verdict; they never relax it.
-      const causes = Array.isArray(json.files)
-        ? Object.entries(reconcileOkfAudit(json.files).byCause).filter(([, row]) => row.files > 0).map(([cause, row]) => `OKF_CAUSE:${cause}:${row.files}`)
-        : ['OKF_CAUSE:UNAVAILABLE_NO_FILE_LIST'];
-      return json.status === 'OKF_V02_PROFILE_PROVEN' && json.invalidFiles === 0 && json.excludedFiles === 0
-        ? { verdict: 'PASS', reasons: [] }
-        : json.invalidFiles > 0
-          ? { verdict: 'FAIL', reasons: [`INVALID_OKF_FILES:${json.invalidFiles}`, `EXCLUDED_FILES:${json.excludedFiles ?? 'UNKNOWN'}`, ...causes] }
-          : { verdict: 'PARTIAL', reasons: [`OKF_STATUS:${json.status ?? 'MISSING'}`, `EXCLUDED_FILES:${json.excludedFiles ?? 'UNKNOWN'}`, ...causes] };
-    },
+    validatorPath: 'scripts/validate/canonical-gate-okf-profile-v1.mjs',
+    args: (out) => ['scripts/validate/canonical-gate-okf-profile-v1.mjs', `--out=${path.relative(root, out).replaceAll('\\', '/')}`],
+    evidencePaths: (out) => [out, `${out}.broad-audit.json`, `${out}.profile-reconciliation.json`],
+    evaluate: classifyOkfProfileEvidence,
   },
   {
     id: 'graph-coverage', category: 'GRAPH_COVERAGE', needsJson: true,

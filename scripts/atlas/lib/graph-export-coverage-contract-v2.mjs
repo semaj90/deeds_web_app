@@ -20,6 +20,34 @@ export function evaluateGraphExportCoverageV2(graphJson) {
 	if (!Array.isArray(coverage.coverageThresholds) || coverage.coverageThresholds.length === 0) {
 		reasons.push('COVERAGE_THRESHOLDS_MISSING');
 	}
+	let computedThresholdsPassed = true;
+	for (const threshold of Array.isArray(coverage.coverageThresholds) ? coverage.coverageThresholds : []) {
+		const scope = threshold?.scope;
+		const key = threshold?.key;
+		const minimumCoverage = threshold?.minimumCoverage;
+		if (!['nodeClass', 'relationshipType'].includes(scope)
+			|| typeof key !== 'string' || key.length === 0
+			|| typeof minimumCoverage !== 'number' || !Number.isFinite(minimumCoverage)
+			|| minimumCoverage < 0 || minimumCoverage > 1) {
+			computedThresholdsPassed = false;
+			reasons.push('COVERAGE_THRESHOLD_INVALID');
+			continue;
+		}
+		const rows = scope === 'nodeClass' ? coverage.nodeClasses : coverage.relationshipTypes;
+		const row = rows?.[key];
+		if (!row || !Number.isSafeInteger(row.considered) || row.considered <= 0
+			|| !Number.isSafeInteger(row.exported) || row.exported < 0 || row.exported > row.considered) {
+			computedThresholdsPassed = false;
+			reasons.push(`COVERAGE_THRESHOLD_TARGET_UNAVAILABLE:${scope}:${key}`);
+			continue;
+		}
+		const actualCoverage = row.exported / row.considered;
+		if (actualCoverage < minimumCoverage) {
+			computedThresholdsPassed = false;
+			reasons.push(`COVERAGE_THRESHOLD_NOT_MET:${scope}:${key}:${actualCoverage}<${minimumCoverage}`);
+		}
+	}
+	if (coverage.thresholdsPassed === true && !computedThresholdsPassed) reasons.push('COVERAGE_THRESHOLD_ATTESTATION_CONFLICT');
 	for (const [name, row] of Object.entries(coverage.nodeClasses ?? {})) {
 		if (!Number.isSafeInteger(row?.considered) || !Number.isSafeInteger(row?.exported)
 			|| !Number.isSafeInteger(row?.excluded) || !Number.isSafeInteger(row?.unresolved)
@@ -36,7 +64,7 @@ export function evaluateGraphExportCoverageV2(graphJson) {
 	}
 	if (Object.keys(coverage.nodeClasses ?? {}).length === 0) reasons.push('NODE_CENSUS_MISSING');
 	if (Object.keys(coverage.relationshipTypes ?? {}).length === 0) reasons.push('RELATIONSHIP_CENSUS_MISSING');
-	if (coverage.thresholdsPassed !== true) reasons.push('COVERAGE_THRESHOLDS_NOT_PASSED');
+	if (coverage.thresholdsPassed !== true || !computedThresholdsPassed) reasons.push('COVERAGE_THRESHOLDS_NOT_PASSED');
 	return { status: reasons.length === 0 ? 'PASS' : 'FAIL', reasons };
 }
 

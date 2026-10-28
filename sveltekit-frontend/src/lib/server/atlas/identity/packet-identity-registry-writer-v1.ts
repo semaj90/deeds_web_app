@@ -14,11 +14,10 @@ import {
  */
 
 const ROOT_REPOSITORY_SCOPE = 'repo:root';
-const ROOT_REPOSITORY_ID = '01a13137-1378-7df9-9968-53738dbf0e48';
 
 export type RegistryWriteRejectionV1 =
 	| 'UNKNOWN_REPOSITORY'
-	| 'ROOT_MAPPING_MISMATCH'
+	| 'SCOPE_MAPPING_MISMATCH'
 	| 'KEY_RECIPE_MISMATCH'
 	| 'CANONICAL_KEY_CONFLICT'
 	| 'SOURCE_KIND_CONFLICT'
@@ -36,6 +35,12 @@ export type RegistryWriteDecisionV1 =
 
 export interface RegistryWriteLookupsV1 {
 	repositoryAuthorityById(repositoryId: string): Promise<{ repositoryId: string; sourceAuthorityRepoId: string } | null>;
+	repositoryScopeMappingByScope(scope: string): Promise<{
+		membershipRepositoryScope: string;
+		repositoryId: string;
+		sourceAuthorityRepoId: string;
+		mappingKind: 'ROOT_SCOPE' | 'NESTED_REPOSITORY' | 'LOGICAL_SUBSCOPE';
+	} | null>;
 	identityByKey(packetKey: string): Promise<PacketIdentityRegistryRowV1 | null>;
 	identityBySourceKind(repositoryId: string, sourceRef: string, packetKind: PacketKindV2): Promise<PacketIdentityRegistryRowV1 | null>;
 	aliasByStorageKey(storagePacketKey: string): Promise<PacketIdentityAliasRowV1 | null>;
@@ -71,13 +76,14 @@ export async function decideRegistryIdentityWriteV1(
 
 	const repository = await lookups.repositoryAuthorityById(identity.repositoryId);
 	if (!repository) return reject('UNKNOWN_REPOSITORY');
-	if (
-		identity.repositoryId !== ROOT_REPOSITORY_ID ||
-		identity.membershipRepositoryScope !== ROOT_REPOSITORY_SCOPE ||
-		repository.repositoryId !== ROOT_REPOSITORY_ID
-	) {
-		return reject('ROOT_MAPPING_MISMATCH');
-	}
+	const scopeMapping = await lookups.repositoryScopeMappingByScope(identity.membershipRepositoryScope);
+	if (identity.membershipRepositoryScope !== ROOT_REPOSITORY_SCOPE
+		|| !scopeMapping
+		|| scopeMapping.membershipRepositoryScope !== identity.membershipRepositoryScope
+		|| scopeMapping.repositoryId !== identity.repositoryId
+		|| scopeMapping.mappingKind !== 'ROOT_SCOPE'
+		|| repository.repositoryId !== identity.repositoryId
+		|| repository.sourceAuthorityRepoId !== scopeMapping.sourceAuthorityRepoId) return reject('SCOPE_MAPPING_MISMATCH');
 
 	let recomputed: string;
 	try {

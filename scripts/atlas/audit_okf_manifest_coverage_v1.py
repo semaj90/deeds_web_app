@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path, PureWindowsPath
 from typing import Any
 
@@ -236,9 +237,53 @@ def audit_okf_manifest(root: Path) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
+    parser.add_argument("--receipt-out", type=Path, help="write an immutable owner-validation receipt under .tmp/atlas")
     args = parser.parse_args()
-    result = audit_okf_manifest(args.root)
+    root = args.root.resolve()
+    result = audit_okf_manifest(root)
+    if args.receipt_out:
+        receipt_path = args.receipt_out if args.receipt_out.is_absolute() else root / args.receipt_out
+        receipt_path = receipt_path.resolve()
+        receipt_root = (root / ".tmp" / "atlas").resolve()
+        try:
+            receipt_path.relative_to(receipt_root)
+        except ValueError as error:
+            raise ValueError("VALIDATION_RECEIPT_OUTSIDE_TMP_ATLAS") from error
+        manifest_path = root / ".okf" / "manifest.yaml"
+        validator_path = Path(__file__).resolve()
+        code_root = validator_path.parents[2]
+        manifest_digest = hashlib.sha256(manifest_path.read_bytes()).hexdigest() if manifest_path.is_file() else None
+        validator_digest = hashlib.sha256(validator_path.read_bytes()).hexdigest()
+        errors = [] if result["status"] == "OKF_MANIFEST_REFERENCES_PROVEN" else [result["status"]]
+        body = {
+            "schema": "atlas.okf-owner-validation-receipt.v1",
+            "status": "VALID" if not errors else "INVALID",
+            "validationKind": "PROFILE_CONTRACT",
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+            "networkRequests": 0,
+            "files": [{
+                "path": ".okf/manifest.yaml",
+                "sha256": f"sha256:{manifest_digest}" if manifest_digest else None,
+                "profile": SCHEMA,
+                "validationKind": "PROFILE_CONTRACT",
+                "validatorPath": validator_path.relative_to(code_root).as_posix(),
+                "validatorSha256": f"sha256:{validator_digest}",
+                "valid": not errors,
+                "status": "PASS" if not errors else "FAIL",
+                "errors": errors,
+            }],
+        }
+        checksum_payload = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        receipt = {**body, "receiptChecksum": f"sha256:{hashlib.sha256(checksum_payload).hexdigest()}"}
+        receipt_path.parent.mkdir(parents=True, exist_ok=True)
+        with receipt_path.open("xb") as stream:
+            stream.write((json.dumps(receipt, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+            stream.flush()
+            os.fsync(stream.fileno())
     print(json.dumps(result, indent=2, sort_keys=True))
+    if args.receipt_out:
+        print(json.dumps({"receiptPath": receipt_path.relative_to(root).as_posix(), "receiptChecksum": receipt["receiptChecksum"]}, sort_keys=True))
     return 0 if result["status"] == "OKF_MANIFEST_REFERENCES_PROVEN" else 2
 
 

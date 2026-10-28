@@ -176,7 +176,7 @@ export async function shouldSkipSummaryRegeneration(
   try {
     const result = await db.query(
       `
-      SELECT content_hash, summary_generated_at
+      SELECT content_hash
       FROM atlas_packets
       WHERE packet_key = $1
       `,

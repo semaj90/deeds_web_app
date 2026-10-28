@@ -99,9 +99,6 @@ def group_split(rows: Sequence[dict[str, Any]], group_of: Callable[[dict[str, An
 
 def fit(rows: Sequence[dict[str, Any]], *, mechanics_only: bool = False, alpha: float = 1.0) -> dict[str, Any]:
     """Fit MultinomialNB on trusted gold. Refuses below the evaluator's floors unless mechanics_only (then trustedForScoring=False)."""
-    from sklearn.feature_extraction.text import CountVectorizer
-    from sklearn.naive_bayes import MultinomialNB
-
     gold, disposition = trusted_gold(rows)
     counts: dict[str, int] = {}
     for row in gold:
@@ -114,6 +111,9 @@ def fit(rows: Sequence[dict[str, Any]], *, mechanics_only: bool = False, alpha: 
         )
     if len(counts) < 2:
         raise InsufficientTrustedLabels("need at least 2 reviewed classes")
+    from sklearn.feature_extraction.text import CountVectorizer
+    from sklearn.naive_bayes import MultinomialNB
+
     vec = CountVectorizer(analyzer=lambda record: symbol_tokens(record), lowercase=False)
     x = vec.fit_transform(gold)
     y = [row["reviewedGroup"] for row in gold]

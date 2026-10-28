@@ -1,8 +1,8 @@
 # Svelte and ast-grep alignment: how it works, what is wrong, how to improve (2026-10-28)
-**Status**: read-only audit, no config or code changed | **ast-grep**: 0.45.3 | **Svelte**: 5.53.3 | **Gate**: Canonical Gate V2 FAIL
+**Status**: audit plus focused span-preserving extractor update | **ast-grep**: 0.45.3 | **Svelte**: 5.53.3 | **Gate**: Canonical Gate V2 FAIL
 
 ## TL;DR
-ast-grep has **no Svelte language**. `sgconfig.yml` maps `*.svelte` to the **HTML** grammar. That is enough to match **script contents** (the CLI injects `<script>` as TypeScript/JavaScript automatically, with exact absolute byte offsets) but **wrong for template syntax** (`{#if}`, snippets, handlers produce ERROR nodes). The comment in `sgconfig.yml` saying script blocks are not matched is **stale for the CLI**. The correct split is: ast-grep for script structure, the Svelte compiler AST for template structure. Several Svelte splitters now overlap and need one owner.
+ast-grep has **no Svelte language**. `sgconfig.yml` maps `*.svelte` to the **HTML** grammar. The CLI injects `<script>` as TypeScript/JavaScript; its config comments distinguish that from the Node binding, which does not inject. HTML parsing remains wrong for template syntax (`{#if}`, snippets, handlers produce ERROR nodes). The symbol adapter now reuses the span-carrying script splitter and compiler-AST snippet observations. The correct split remains: ast-grep for script structure, Svelte compiler AST for template structure. Several Svelte splitters still need one owner.
 
 ## 1. How it works today (layers)
 | Layer | Component | What it does for `.svelte` | Evidence |
@@ -41,8 +41,8 @@ Consequence: never use ast-grep patterns on `.svelte` for blocks, snippets, rend
 ## 4. Gaps
 | # | Gap | Impact |
 |---|---|---|
-| G1 | `sgconfig.yml` comment says script blocks are not matched; the CLI does match them | Misleading; led to temp-file extraction workarounds |
-| G2 | Symbol extraction uses regex for blocks and snippet names, and drops offsets | No byte spans for Svelte symbols from this path; regex can miscount nested/commented text |
+| G1 | `sgconfig.yml` accurately distinguishes CLI injection from Node binding behavior | Resolved in config |
+| G2 | Symbol extraction previously used regex for blocks/snippet names and dropped offsets | Fixed for script offsets and compiler-AST snippet spans; exact byte-readback tests pass |
 | G3 | `ruleDirs: []`: no ast-grep rules for Svelte 5 conventions | Rune/legacy checks (`export let`, `$:`, `on:click`, `<slot>`) are not structural gates |
 | G4 | At least four Svelte splitters overlap (dom-splitter, template-chunks, template-references, the other session's observations) | Duplicate-owner risk; see ownership rules |
 | G5 | Node binding does not inject; CLI does | The same query behaves differently in CLI vs library code |
@@ -52,8 +52,8 @@ Consequence: never use ast-grep patterns on `.svelte` for blocks, snippets, rend
 ## 5. How to make it better (ranked)
 | # | Change | Effort | Risk | Why |
 |---|---|---|---|---|
-| 1 | Correct the `sgconfig.yml` comment: script blocks **are** matched by the CLI via built-in HTML injection; template syntax is not understood | tiny | none | Fixes G1 |
-| 2 | Replace regex block/snippet extraction in `ast-grep-symbol-extraction.mjs` with offset-carrying extraction (`extractScriptBlocks` already returns `utf8Start`) and compiler snippet names | small | low | Fixes G2; gives byte spans |
+| 1 | Correct the `sgconfig.yml` comment | done | none | CLI/Node distinction is documented |
+| 2 | Replace adapter-local regex extraction with offset-carrying `extractScriptBlocks` and compiler-AST snippet names | done | low | Exact UTF-8 observation spans are tested |
 | 3 | Add ast-grep YAML rules under `ruleDirs` for script-level Svelte conventions (runes present; legacy `export let`, `$:`, `createEventDispatcher` absent) | small | low | Fixes G3; structural, replaces text grep gates. Template-level legacy checks (`on:click`, `<slot>`) are untested with the HTML grammar |
 | 4 | Three-way agreement harness over the 937 components: CLI-injected ast-grep rune matches vs compiler splitter vs `svelte-script-scope-v1`, with byte readback and a checksummed receipt | medium | low | Extends the existing two-way rune cross-check |
 | 5 | Choose one owner for Svelte template structure (compiler-based) and make the others thin consumers; run `npm run atlas:audit:ownership` | medium | low | Fixes G4 |
@@ -73,3 +73,10 @@ Do not: install an unverified grammar crate, build `themixednuts` crates, fork a
 - [ast-grep sgconfig reference](https://ast-grep.github.io/reference/sgconfig.html)
 - [Svelte 5 ast-grep rules (custom parser)](https://sveltethemes.dev/jvz-devx/ast-grep-svelte-rules)
 - Local: `sgconfig.yml`, `scripts/atlas/svelte-dom-splitter-v1.mjs`, `scripts/atlas/svelte-rune-crosscheck-v1.mjs`, `scripts/atlas/lib/ast-grep-symbol-extraction.mjs`
+
+## Addendum: span-preserving ast-grep symbol observations (2026-10-27)
+
+- `ast-grep-symbol-extraction.mjs` now reuses `extractScriptBlocks()` for `.svelte` scripts, carrying each script's UTF-8 base offset into observations. Snippet names and complete snippet spans come from the existing Svelte compiler-AST chunk owner. The public `symbols` string list remains compatible; `observations` is additive.
+- A CRLF/Unicode/multiple-script fixture checks original-byte readback for imports, runes, declarations, module-script functions, and snippets. Focused extractor/template/scope tests pass 29/29.
+- Existing read-only rune fusion over 937 components reports 6,202 `AGREED_INDEPENDENT`, zero compiler parse errors, and deterministic two-pass output digest `sha256:ce6d115595d1b148788f3e15f94d11cfcfe798efb969144af3bd03b6ef77eed5`. Receipt `.tmp/atlas/svelte-rune-fusion-after-span-extractor-20261027-v1.json`; receipt checksum `sha256:82467a07b2139522ea30dd12caff95a73d49bd69f6f42e9c84a562c3435b5d7f`.
+- The separate Tree-sitter v6 comparison still fails parity and is not a source of authority. Svelte LSP template binding remains unverified after the prior bounded definition timeout. NB trust-gate tests pass 3/3 after deferring the scikit-learn import until trust checks finish; the combined suite has 7 model-test errors because local `scikit-learn` is unavailable. No dependency was installed. With no verified human labels, classifier accuracy and learned reranking remain unproven. No service or datastore changed.

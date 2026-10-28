@@ -78,3 +78,88 @@ export async function writeJsonObjectWithArrayFilesV1({ outputPath, properties, 
 		await fs.promises.rm(partialPath, { force: true });
 	}
 }
+
+export async function forEachJsonArrayObjectV1({ filePath, onValue, maxValues = 1_000_000, maxValueBytes = 8 * 1024 * 1024 }) {
+	if (typeof filePath !== 'string' || typeof onValue !== 'function') throw new TypeError('JSON_ARRAY_READER_INPUT_INVALID');
+	if (!Number.isSafeInteger(maxValues) || maxValues < 0 || !Number.isSafeInteger(maxValueBytes) || maxValueBytes < 1) {
+		throw new RangeError('JSON_ARRAY_READER_BOUNDS_INVALID');
+	}
+	const decoder = new TextDecoder('utf-8', { fatal: true });
+	let started = false;
+	let ended = false;
+	let expectingItem = true;
+	let commaSeen = false;
+	let valueText = '';
+	let valueBytes = 0;
+	let objectDepth = 0;
+	let inString = false;
+	let escaped = false;
+	let count = 0;
+	const fail = (reason) => { throw new Error(reason); };
+	const consume = async (text) => {
+		for (const character of text) {
+			if (!started) {
+				if (/\s/.test(character)) continue;
+				if (character !== '[') fail('JSON_ARRAY_EXPECTED_OPEN');
+				started = true;
+				continue;
+			}
+			if (ended) {
+				if (!/\s/.test(character)) fail('JSON_ARRAY_TRAILING_CONTENT');
+				continue;
+			}
+			if (objectDepth === 0) {
+				if (/\s/.test(character)) continue;
+				if (character === ']') {
+					if (commaSeen) fail('JSON_ARRAY_TRAILING_COMMA');
+					ended = true;
+					continue;
+				}
+				if (character === ',') {
+					if (expectingItem || commaSeen) fail('JSON_ARRAY_SEPARATOR_INVALID');
+					expectingItem = true;
+					commaSeen = true;
+					continue;
+				}
+				if (character !== '{' || !expectingItem) fail('JSON_ARRAY_OBJECT_EXPECTED');
+				if (count >= maxValues) fail('JSON_ARRAY_VALUE_LIMIT_EXCEEDED');
+				valueText = '{';
+				valueBytes = 1;
+				objectDepth = 1;
+				inString = false;
+				escaped = false;
+				expectingItem = false;
+				commaSeen = false;
+				continue;
+			}
+			valueText += character;
+			valueBytes += Buffer.byteLength(character, 'utf8');
+			if (valueBytes > maxValueBytes) fail('JSON_ARRAY_VALUE_SIZE_LIMIT_EXCEEDED');
+			if (inString) {
+				if (escaped) escaped = false;
+				else if (character === '\\') escaped = true;
+				else if (character === '"') inString = false;
+				continue;
+			}
+			if (character === '"') inString = true;
+			else if (character === '{') objectDepth += 1;
+			else if (character === '}') {
+				objectDepth -= 1;
+				if (objectDepth < 0) fail('JSON_ARRAY_OBJECT_DEPTH_INVALID');
+				if (objectDepth === 0) {
+					let value;
+					try { value = JSON.parse(valueText); } catch { fail('JSON_ARRAY_OBJECT_MALFORMED'); }
+					await onValue(value, count);
+					count += 1;
+					valueText = '';
+					valueBytes = 0;
+				}
+			}
+		}
+	};
+	for await (const chunk of fs.createReadStream(filePath)) await consume(decoder.decode(chunk, { stream: true }));
+	await consume(decoder.decode());
+	if (!started) fail('JSON_ARRAY_EMPTY_INPUT');
+	if (!ended || objectDepth !== 0 || inString) fail('JSON_ARRAY_TRUNCATED');
+	return count;
+}

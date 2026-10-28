@@ -14,11 +14,13 @@ import hashlib
 import json
 import sys
 from pathlib import PurePosixPath
+import re
 
 import polars as pl
 
-SCHEMA = "atlas.kv-enrichment.v1"
+SCHEMA = "atlas.kv-enrichment.v2"
 STATUS = "HINT"
+SHA256 = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 def directory_of(source_ref: str) -> str:
@@ -26,7 +28,29 @@ def directory_of(source_ref: str) -> str:
     return "" if parent == "." else parent
 
 
-def build(inventory: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame, list[dict]]:
+def build(
+    inventory: pl.DataFrame,
+    *,
+    workspace_revision: str,
+    inventory_manifest_digest: str,
+    producer_revision: str,
+) -> tuple[pl.DataFrame, pl.DataFrame, list[dict]]:
+    if not SHA256.fullmatch(workspace_revision):
+        raise ValueError("workspace_revision must be a sha256-prefixed digest")
+    if not SHA256.fullmatch(inventory_manifest_digest):
+        raise ValueError("inventory_manifest_digest must be a sha256-prefixed digest")
+    if not producer_revision.strip():
+        raise ValueError("producer_revision must be non-empty")
+    required_columns = {"source_ref", "extension", "byte_length", "source_digest"}
+    missing_columns = required_columns.difference(inventory.columns)
+    if missing_columns:
+        raise ValueError(f"inventory is missing required columns: {', '.join(sorted(missing_columns))}")
+    invalid_digest_count = inventory.filter(~pl.col("source_digest").str.contains(SHA256.pattern)).height
+    if invalid_digest_count:
+        raise ValueError(f"inventory contains {invalid_digest_count} malformed source digest(s)")
+    if inventory.select((pl.col("byte_length") < 0).any()).item():
+        raise ValueError("inventory contains a negative byte_length")
+
     df = inventory.with_columns(
         pl.col("source_ref").map_elements(directory_of, return_dtype=pl.Utf8).alias("directory_path"),
     ).with_columns(pl.col("source_digest").is_duplicated().alias("is_duplicate_content"))
@@ -57,14 +81,22 @@ def build(inventory: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame, list[dic
         long_rows.append((row["directory_path"], "top_extension", row["top_extension"], None, "string", row["evidence_digest"]))
     kv = pl.DataFrame(long_rows, schema=["subject_id", "key", "value_str", "value_num", "value_type", "evidence_digest"], orient="row").with_columns(
         pl.lit("directory").alias("subject_kind"), pl.lit("filesystem-inventory").alias("source"), pl.lit(SCHEMA).alias("schema"), pl.lit(STATUS).alias("status"),
+        pl.lit(workspace_revision).alias("workspace_revision"),
+        pl.lit(inventory_manifest_digest).alias("inventory_manifest_digest"),
+        pl.lit(producer_revision).alias("producer_revision"),
         pl.col("value_num").cast(pl.Float64),
-    ).select("schema", "subject_kind", "subject_id", "key", "value_str", "value_num", "value_type", "source", "status", "evidence_digest").sort("subject_id", "key")
+    ).select("schema", "subject_kind", "subject_id", "key", "value_str", "value_num", "value_type", "source", "status", "workspace_revision", "inventory_manifest_digest", "producer_revision", "evidence_digest").sort("subject_id", "key")
 
     wide = grouped.select(["directory_path", *numeric, "evidence_digest"]).with_columns(
         [pl.col(c).cast(pl.Int64) for c in numeric if c not in ("mean_file_bytes", "svelte_fraction")]
+    ).with_columns(
+        pl.lit(workspace_revision).alias("workspace_revision"),
+        pl.lit(inventory_manifest_digest).alias("inventory_manifest_digest"),
+        pl.lit(producer_revision).alias("producer_revision"),
     )
     hints = [
-        {"schema": "atlas.directory-enrichment-hint.v1", "directory_path": r["directory_path"], "status": STATUS, "packet_identity": None,
+        {"schema": "atlas.directory-enrichment-hint.v2", "directory_path": r["directory_path"], "status": STATUS, "packet_identity": None,
+         "workspace_revision": workspace_revision, "inventory_manifest_digest": inventory_manifest_digest, "producer_revision": producer_revision,
          "kv": {k: r[k] for k in [*numeric, "top_extension"]}, "evidence_digest": r["evidence_digest"], "canonicalAuthority": False, "writesPerformed": False}
         for r in grouped.iter_rows(named=True)
     ]
@@ -72,10 +104,19 @@ def build(inventory: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame, list[dic
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 5:
-        print("usage: atlas_directory_kv_enrichment_v1.py <inventory.parquet> <out_kv.parquet> <out_wide.parquet> <out_hints.jsonl>", file=sys.stderr)
+    if len(argv) != 8:
+        print("usage: atlas_directory_kv_enrichment_v1.py <inventory.parquet> <out_kv.parquet> <out_wide.parquet> <out_hints.jsonl> <workspace_revision> <inventory_manifest_digest> <producer_revision>", file=sys.stderr)
         return 2
-    kv, wide, hints = build(pl.read_parquet(argv[1]))
+    try:
+        kv, wide, hints = build(
+            pl.read_parquet(argv[1]),
+            workspace_revision=argv[5],
+            inventory_manifest_digest=argv[6],
+            producer_revision=argv[7],
+        )
+    except (ValueError, pl.exceptions.PolarsError) as error:
+        print(json.dumps({"error": str(error), "writesPerformed": False}), file=sys.stderr)
+        return 2
     kv.write_parquet(argv[2], compression="zstd")
     wide.write_parquet(argv[3], compression="zstd")
     with open(argv[4], "w", encoding="utf-8", newline="\n") as handle:

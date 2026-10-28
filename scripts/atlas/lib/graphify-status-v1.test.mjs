@@ -50,6 +50,14 @@ test('only a fresh completed run AND a passing gate is eligible, and it still sa
   assert.equal(r.canonicalAuthority, false);
 });
 
+test('fresh passing receipts with conflicting execution or workspace revisions remain GATED', () => {
+  const gate = { overall: 'PASS', graphifyExecutionId: 'other-exec', workspaceRevision: 'sha256:other', checks: [] };
+  const r = readGraphifyStatus({ repoRoot: fixture({ lifecycle: { ...completed(5), workspaceRevision: 'sha256:current' }, gates: [['g1', gate]] }), now: NOW });
+  assert.equal(r.graphifyDependentWork, 'GATED');
+  assert.deepEqual(r.receiptConflicts, ['LIFECYCLE_GATE_EXECUTION_MISMATCH', 'LIFECYCLE_GATE_WORKSPACE_REVISION_MISMATCH']);
+  assert.ok(r.reasons.includes('LIFECYCLE_GATE_EXECUTION_MISMATCH'));
+});
+
 test('missing, malformed, non-completed and future-dated lifecycle receipts are typed and gated, never thrown', () => {
   for (const [lifecycle, reason] of [[undefined, 'LIFECYCLE_ABSENT'], ['{not json', 'LIFECYCLE_MALFORMED_JSON'], [{ terminalStatus: 'FAILED', completedAt: iso(1) }, 'LIFECYCLE_TERMINAL_STATUS_NOT_COMPLETED'], [{ terminalStatus: 'COMPLETED', completedAt: iso(-30) }, 'LIFECYCLE_COMPLETED_AT_INVALID']]) {
     const r = readGraphifyStatus({ repoRoot: fixture({ lifecycle }), now: NOW });

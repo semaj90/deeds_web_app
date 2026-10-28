@@ -15,6 +15,8 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { extractScriptBlocks } from './svelte-script-scope-v1.mjs';
+import { extractSvelteTemplateChunks } from './svelte-template-chunks-v1.mjs';
 
 const TS_JS_PATTERNS = [
   { kind: 'FUNCTION', pattern: 'function $NAME($$$ARGS) { $$$ }' },
@@ -72,26 +74,6 @@ const SVELTE_RUNE_PATTERNS = [
   { kind: 'RUNE_DERIVED_CONST', pattern: 'const $NAME = $derived($$$ARGS)' },
 ];
 
-function extractSvelteScriptBlocks(content) {
-  const blocks = [];
-  const regex = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    if (match[1]?.trim()) blocks.push(match[1]);
-  }
-  return blocks;
-}
-
-function extractSvelteSnippetNames(content) {
-  const names = [];
-  const regex = /\{#snippet\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/g;
-  let match;
-  while ((match = regex.exec(content)) !== null) {
-    if (match[1]) names.push(`snippet:${match[1]}`);
-  }
-  return names;
-}
-
 /**
  * Real ast-grep structural extraction for TypeScript/JavaScript/Svelte (.svelte).
  * Returns null (not an empty result) when the language isn't TS/JS/Svelte or the
@@ -110,38 +92,66 @@ export function extractSymbolsViaAstGrep(content, language) {
   if (!checkAstGrepAvailable()) return null;
 
   const symbols = new Set();
-  const sourcesToScan = isSvelte ? extractSvelteScriptBlocks(content) : [content];
+  const observations = [];
+  const sourceBuffer = Buffer.from(content, 'utf8');
+  const sourcesToScan = isSvelte
+    ? extractScriptBlocks(content)
+    : [{ text: content, utf8Start: 0 }];
   const patternsToRun = isSvelte
     ? [...TS_JS_PATTERNS, ...SVELTE_RUNE_PATTERNS]
     : TS_JS_PATTERNS;
 
-  for (const snippetName of isSvelte ? extractSvelteSnippetNames(content) : []) {
-    symbols.add(snippetName);
+  if (isSvelte) {
+    const template = extractSvelteTemplateChunks(content);
+    for (const chunk of template.chunks ?? []) {
+      if (chunk.chunkType !== 'snippet_block' || !chunk.name) continue;
+      const symbol = `snippet:${chunk.name}`;
+      symbols.add(symbol);
+      observations.push({
+        kind: 'SNIPPET', symbol, name: chunk.name,
+        startByte: chunk.startByte, endByte: chunk.endByte,
+        spanVerified: chunk.spanVerified,
+        source: 'svelte_compiler_ast',
+      });
+    }
   }
 
   for (const block of sourcesToScan) {
-    if (!block) continue;
+    if (!block.text?.trim()) continue;
     for (const { kind, pattern } of patternsToRun) {
       let matches;
       try {
-        matches = runPattern(block, lang, pattern);
+        matches = runPattern(block.text, lang, pattern);
       } catch {
         continue;
       }
       for (const match of matches) {
+        const range = match.range?.byteOffset;
+        if (!range || !Number.isInteger(range.start) || !Number.isInteger(range.end)) continue;
+        const startByte = block.utf8Start + range.start;
+        const endByte = block.utf8Start + range.end;
+        const sourceText = sourceBuffer.subarray(startByte, endByte).toString('utf8');
         if (kind === 'IMPORT') {
           const src = match.metaVariables?.single?.SRC?.text;
-          if (src) symbols.add(`import:${src.replace(/^['"]|['"]$/g, '')}`);
+          if (src) {
+            const symbol = `import:${src.replace(/^['"]|['"]$/g, '')}`;
+            symbols.add(symbol);
+            observations.push({ kind, symbol, startByte, endByte, sourceText, spanVerified: sourceText === match.text, scriptBlock: isSvelte ? block.attrs : null });
+          }
           continue;
         }
         const name = match.metaVariables?.single?.NAME?.text;
-        if (name) symbols.add(name);
+        if (name) {
+          symbols.add(name);
+          observations.push({ kind, symbol: name, name, startByte, endByte, sourceText, spanVerified: sourceText === match.text, scriptBlock: isSvelte ? block.attrs : null });
+        }
       }
     }
   }
 
   return {
     symbols: [...symbols].sort(),
+    observations: observations.sort((a, b) => a.startByte - b.startByte || a.endByte - b.endByte || a.kind.localeCompare(b.kind)),
     coverage: symbols.size > 0 ? 1.0 : 0,
     method: 'ast_grep',
     error: null,
