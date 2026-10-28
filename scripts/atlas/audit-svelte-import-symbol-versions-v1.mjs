@@ -77,6 +77,8 @@ const body = {
   svelteFilesInManifestOnDisk: a.files, scriptParseErrors: a.scriptParseErrors, filesWithoutImports: a.noImports, bindings: a.records.length,
   byResolution: tally(a.records, (r) => r.resolution), byKind: tally(a.records, (r) => r.importKind), typeOnlyBindings: a.records.filter((r) => r.typeOnly).length,
   reasons: tally(a.records.filter((r) => r.reason), (r) => r.reason), rejected: tally(a.rejected, (r) => r.reason),
+  exportNotExportedByTarget: tally(a.records.filter((r) => r.reason === 'EXPORT_NOT_EXPORTED'), (r) => `${r.importKind}:${path.extname(r.targetSourceRef ?? '') || 'none'}`),
+  sampleNamedNotExported: a.records.filter((r) => r.reason === 'EXPORT_NOT_EXPORTED' && r.importKind === 'NAMED').slice(0, 12).map((r) => ({ importer: r.importerSourceRef, name: r.importedName, target: r.targetSourceRef, typeOnly: r.typeOnly })),
   distinctSymbolVersionWorkspaceRevisions: [...new Set(a.records.map((r) => r.symbolVersionWorkspaceRevision).filter(Boolean))],
   determinism: { runs: 2, equal: sha(JSON.stringify(a)) === sha(JSON.stringify(b)), digest: sha(JSON.stringify(a)) },
   sampleVerified: a.records.filter((r) => r.resolution === 'SYMBOL_VERSION_VERIFIED').slice(0, 5).map((r) => ({ importer: r.importerSourceRef, name: r.importedName, target: r.targetSourceRef, symbolId: r.targetSymbolId })),
