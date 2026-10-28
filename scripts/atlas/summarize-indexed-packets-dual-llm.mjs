@@ -74,7 +74,8 @@ async function summarizePacketBatch(packets) {
   const prompt = `Summarize these ${packets.length} indexed code packets in 1 sentence each:\n\n${packetsList}\n\nProvide concise, technical summaries for legal AI indexing.`;
 
   try {
-    // The route now requires a session or the internal service key (INTERNAL_SERVICE_KEY in .env.local).
+    // The route accepts a session or INTERNAL_SERVICE_KEY, but hooks.server.ts (deny-by-default for /api/*)
+    // does not read x-service-key: outside `npm run dev` (DEV_BYPASS_AUTH) this call needs a session cookie.
     const response = await fetch(GEMMA4_ENDPOINT, {
       method: 'POST',
       headers: {

@@ -11,7 +11,14 @@
 import type { RequestHandler } from './$types';
 import { getRetrievalMetricsSummary } from '$lib/server/telemetry/retrieval-metrics.js';
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, locals }) => {
+  // /api/metrics is a PUBLIC prefix in hooks.server.ts (Prometheus scrape); this sub-route is not.
+  if (!locals.user) {
+    return new Response(JSON.stringify({ error: 'Authentication required' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
   try {
     const branch = url.searchParams.get('branch') || undefined;
     const hoursStr = url.searchParams.get('hours') || '24';
