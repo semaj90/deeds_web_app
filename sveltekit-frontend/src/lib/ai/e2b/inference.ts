@@ -10,7 +10,7 @@
  *   - Streaming: ~50-100ms per token
  */
 
-import { getE2bSession, getE2bLoadError } from './session.js';
+import { getE2bSession, getE2bLoadError, type ChatMessage } from './session.js';
 
 // ══════════════════════════════════════════════════════════════
 // Types
@@ -37,17 +37,18 @@ export interface E2bInferenceResult {
 // ══════════════════════════════════════════════════════════════
 
 /**
- * Format prompt for Gemma 4 E2B instruction tuning.
- *
- * Template:
- * <start_of_turn>user
- * {prompt}<end_of_turn>
- * <start_of_turn>model
- *
- * This matches the Gemma 4 IT (instruction-tuned) format.
+ * Build the chat input for Gemma 4 E2B. Passing messages (not a pre-formatted string) lets Transformers.js apply the
+ * model's own chat template from tokenizer_config.json. The previous hand-written `<start_of_turn>` string was the
+ * Gemma 3 format; on Gemma 4 it made the model echo the prompt and loop (measured 2026-10-28, WebGPU eval).
  */
-function formatPrompt(prompt: string): string {
-	return `<start_of_turn>user\n${prompt}<end_of_turn>\n<start_of_turn>model\n`;
+function toChat(prompt: string): ChatMessage[] {
+	return [{ role: 'user', content: prompt }];
+}
+
+/** Text of the assistant reply from either pipeline output shape (messages array or plain string). */
+function replyText(generated: string | ChatMessage[] | undefined): string {
+	if (Array.isArray(generated)) return generated[generated.length - 1]?.content ?? '';
+	return generated ?? '';
 }
 
 /**
@@ -99,11 +100,11 @@ export async function runE2bInference(
 			return null;
 		}
 
-		// Step 2: Format prompt for Gemma 4 IT
-		const formattedPrompt = formatPrompt(prompt);
+		// Step 2: Chat messages (model template applied by the tokenizer)
+		const chat = toChat(prompt);
 
 		// Step 3: Run inference
-		const result = await session(formattedPrompt, {
+		const result = await session(chat, {
 			max_new_tokens: options.maxTokens ?? 200,
 			temperature: options.temperature ?? 0.3,
 			top_p: options.topP ?? 0.9,
@@ -114,8 +115,8 @@ export async function runE2bInference(
 		});
 
 		// Step 4: Extract generated text
-		const generated = result[0]?.generated_text ?? '';
-		const cleaned = cleanOutput(generated, formattedPrompt);
+		const generated = replyText(result[0]?.generated_text);
+		const cleaned = cleanOutput(generated, '');
 
 		const latencyMs = Math.round(performance.now() - start);
 		console.info(`[e2b-inference] Generated ${cleaned.length} chars in ${latencyMs}ms`);
@@ -149,9 +150,9 @@ export async function runE2bInferenceDetailed(
 			};
 		}
 
-		const formattedPrompt = formatPrompt(prompt);
+		const chat = toChat(prompt);
 
-		const result = await session(formattedPrompt, {
+		const result = await session(chat, {
 			max_new_tokens: options.maxTokens ?? 200,
 			temperature: options.temperature ?? 0.3,
 			top_p: options.topP ?? 0.9,
@@ -161,8 +162,8 @@ export async function runE2bInferenceDetailed(
 			return_full_text: false,
 		});
 
-		const generated = result[0]?.generated_text ?? '';
-		const cleaned = cleanOutput(generated, formattedPrompt);
+		const generated = replyText(result[0]?.generated_text);
+		const cleaned = cleanOutput(generated, '');
 		const latencyMs = Math.round(performance.now() - start);
 
 		// Estimate token count (rough: 1 token ≈ 4 chars for English)

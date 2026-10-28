@@ -32,8 +32,14 @@ interface TransformersModule {
 	};
 }
 
+export interface ChatMessage {
+	role: 'system' | 'user' | 'assistant';
+	content: string;
+}
+
 interface TextGenerationPipeline {
-	(input: string, options?: GenerationOptions): Promise<Array<{ generated_text: string }>>;
+	// A messages array makes Transformers.js apply the model's own chat template; a bare string is sent raw.
+	(input: string | ChatMessage[], options?: GenerationOptions): Promise<Array<{ generated_text: string | ChatMessage[] }>>;
 	model: any;
 	tokenizer: any;
 	dispose?: () => Promise<void>;
@@ -96,7 +102,12 @@ async function detectWebGPU(): Promise<WebGPUInfo | null> {
 			return { available: false };
 		}
 
-		const adapterInfo = await adapter.requestAdapterInfo();
+		// `adapter.info` is the current API; `requestAdapterInfo()` was removed from Chrome (calling it threw and made
+		// WebGPU look unavailable, so E2B never loaded). Keep the old call only as a fallback for older browsers.
+		type AdapterInfoLike = { vendor?: string; architecture?: string; device?: string; description?: string };
+		const legacyAdapter = adapter as unknown as { info?: AdapterInfoLike; requestAdapterInfo?: () => Promise<AdapterInfoLike> };
+		const adapterInfo: AdapterInfoLike =
+			legacyAdapter.info ?? (legacyAdapter.requestAdapterInfo ? await legacyAdapter.requestAdapterInfo() : {});
 		const limits = adapter.limits;
 
 		// Estimate VRAM from maxBufferSize (rough heuristic)
