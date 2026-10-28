@@ -17,6 +17,8 @@ import {
 	PHASE_CAMERA_MAP,
 } from './courtroom-types.js';
 import { createCRTPostProcess } from './crt-postprocess.js';
+import { admitAnimationGroupTargets } from './animation-target-admission-v1.js';
+import { RetargetRuntime } from './character-retarget-runtime-v1.js';
 
 // Lazy-loaded Babylon.js modules (tree-shaken)
 let BABYLON: typeof import('@babylonjs/core');
@@ -76,6 +78,9 @@ interface CharacterData {
 	skeleton?: any;     // Skeleton for animation
 	animGroups: Map<string, any>; // AnimationGroup by name
 	isModel: boolean;   // true = loaded .glb, false = procedural
+	/** Set when the .glb has a J_Bip_* humanoid skeleton: clips are then retargeted from their GLB tracks. */
+	retarget?: RetargetRuntime;
+	boneNodes?: Map<string, any>;
 	currentAnim?: string;
 	// Procedural fallback meshes
 	torso?: any;
@@ -186,6 +191,7 @@ export class CourtroomScene {
 
     // Render loop
     this.renderLoop = () => this.scene.render();
+    this.scene.onBeforeRenderObservable.add(() => this.applyRetargets());
     this.engine.runRenderLoop(this.renderLoop);
 
     // FPS tracking
@@ -247,6 +253,14 @@ export class CourtroomScene {
 
         this.characters.set(modelDef.role, charData);
 
+        // Humanoid (J_Bip_*) characters: retarget clips from their GLB tracks instead of Babylon's by-name import.
+        try {
+          const rt = new RetargetRuntime();
+          if (await rt.init(modelDef.modelUrl)) charData.retarget = rt;
+        } catch (err) {
+          console.warn(`[courtroom] Retarget runtime unavailable for ${modelDef.role}:`, err);
+        }
+
         // Load additional animation clips
         if (modelDef.animations) {
           for (const animDef of modelDef.animations) {
@@ -277,8 +291,18 @@ export class CourtroomScene {
     const char = this.characters.get(role);
     if (!char || !char.isModel) return;
 
+    if (char.retarget) {
+      try {
+        await char.retarget.addClip(animType, url);
+      } catch (err) {
+        console.warn(`[courtroom] Rejected retargeted clip ${animType} for ${role}:`, err);
+      }
+      return;
+    }
+
     try {
-      const result = await B.SceneLoader.ImportAnimationsAsync(
+      const groupsBeforeImport = new Set(this.scene.animationGroups);
+      const importedScene = await B.SceneLoader.ImportAnimationsAsync(
         '',
         url,
         this.scene,
@@ -286,14 +310,26 @@ export class CourtroomScene {
         B.SceneLoaderAnimationGroupLoadingMode.NoSync
       );
 
-      // Map the imported animation groups
-      for (const ag of this.scene.animationGroups) {
-        if (!char.animGroups.has(animType) && !char.animGroups.has(ag.name)) {
-          char.animGroups.set(animType, ag);
-          ag.stop();
-          break;
-        }
+      const importedGroups = importedScene.animationGroups.filter((group) => !groupsBeforeImport.has(group));
+      if (importedGroups.length !== 1) {
+        for (const group of importedGroups) group.dispose();
+        console.warn(`[courtroom] Rejected animation clip ${animType} for ${role}: expected one imported group, found ${importedGroups.length}`);
+        return;
       }
+
+      const [group] = importedGroups;
+      const admission = admitAnimationGroupTargets(group, char);
+      if ('reason' in admission) {
+        group.dispose();
+        console.warn(`[courtroom] Rejected animation clip ${animType} for ${role}: ${admission.reason}`);
+        return;
+      }
+      if (char.animGroups.has(animType) || char.animGroups.has(group.name)) {
+        group.dispose();
+        return;
+      }
+      char.animGroups.set(animType, group);
+      group.stop();
     } catch (err) {
       console.warn(`[courtroom] Failed to load animation clip ${animType} for ${role}:`, err);
     }
@@ -308,15 +344,13 @@ export class CourtroomScene {
     if (!char) return;
 
     if (char.isModel) {
-      // Stop current animation with blend-out
-      if (char.currentAnim) {
-        const currentAg = char.animGroups.get(char.currentAnim);
-        if (currentAg) {
-          // Cross-fade: weight current down over 10 frames
-          currentAg.stop();
-        }
+      if (char.retarget?.has(animType)) {
+        if (char.currentAnim) char.animGroups.get(char.currentAnim)?.stop();
+        char.retarget.play(animType, performance.now(), animType === 'idle' || animType === 'speaking');
+        char.currentAnim = animType;
+        return;
       }
-
+      char.retarget?.stop();
       // Find animation group — try direct name, then mapped name
       let ag = char.animGroups.get(animType);
       if (!ag) {
@@ -332,12 +366,16 @@ export class CourtroomScene {
         }
       }
 
-      // Fallback to first animation if specific one not found
-      if (!ag && char.animGroups.size > 0) {
-        ag = char.animGroups.values().next().value;
-      }
-
       if (ag) {
+        const admission = admitAnimationGroupTargets(ag, char);
+        if ('reason' in admission) {
+          console.warn(`[courtroom] Rejected animation ${animType} for ${role}: ${admission.reason}`);
+          return;
+        }
+        if (char.currentAnim) {
+          const currentAg = char.animGroups.get(char.currentAnim);
+          if (currentAg) currentAg.stop();
+        }
         const shouldLoop = animType === 'idle' || animType === 'speaking';
         ag.start(shouldLoop);
         char.currentAnim = animType;
@@ -345,6 +383,25 @@ export class CourtroomScene {
     } else {
       // Procedural character animation (bob, shake, etc.)
       this.playProceduralAnimation(role, animType);
+    }
+  }
+
+  /** Writes the active retargeted pose onto each character's own bone nodes (looked up per character, not by scene-wide name). */
+  private applyRetargets(): void {
+    const now = performance.now();
+    for (const char of this.characters.values()) {
+      const pose = char.retarget?.frame(now);
+      if (!pose) continue;
+      if (!char.boneNodes) {
+        char.boneNodes = new Map();
+        for (const node of char.root?.getChildTransformNodes?.(false) ?? []) char.boneNodes.set(node.name, node);
+      }
+      for (const [name, q] of Object.entries(pose)) {
+        const node = char.boneNodes.get(name);
+        if (!node) continue;
+        node.rotationQuaternion = node.rotationQuaternion ?? new BABYLON.Quaternion();
+        node.rotationQuaternion.set(q[0], q[1], q[2], q[3]);
+      }
     }
   }
 
