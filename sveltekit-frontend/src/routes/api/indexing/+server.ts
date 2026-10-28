@@ -13,7 +13,7 @@ import crypto from 'crypto';
 import fs from 'fs/promises';
 import globPkg from 'glob';
 const glob = (globPkg as any).glob ?? globPkg;
-import { ensureSeaweedBucket as ensureBucket, putSeaweedObject as putObject } from '$lib/server/seaweed-client.js';
+import { ensureSeaweedBucket, putSeaweedObject } from '$lib/server/seaweed-client.js';
 import path from 'path';
 import postgres from 'postgres';
 
@@ -26,7 +26,7 @@ const CONFIG = {
     collectionCode: 'phase79_codebase',
     collectionErrors: 'phase79_error_analysis'
   },
-  minio: {
+  seaweed: {
     bucketCode: 'codebase-index',
     bucketErrors: 'error-analysis'
   },
@@ -172,7 +172,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
       }
 
       // Ensure bucket exists
-      await ensureBucket(CONFIG.minio.bucketCode);
+      await ensureSeaweedBucket(CONFIG.seaweed.bucketCode);
 
       // Find files
       const patterns = ['**/*.ts', '**/*.svelte', '**/*.js'];
@@ -208,8 +208,8 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
           const metadata = extractFileMetadata(content, relativePath);
           const chunks = chunkFileContent(content, 500, 100);
 
-          // Upload to MinIO
-          await putObject(CONFIG.minio.bucketCode, `${fileHash}.ts`, Buffer.from(content), {
+          // Upload to SeaweedFS
+          await putSeaweedObject(CONFIG.seaweed.bucketCode, `${fileHash}.ts`, Buffer.from(content), {
             'X-Amz-Meta-RelativePath': relativePath,
           });
 
@@ -290,7 +290,7 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
     try {
       const sql = postgres(CONFIG.postgres.url);
       // Ensure bucket exists
-      await ensureBucket(CONFIG.minio.bucketErrors);
+      await ensureSeaweedBucket(CONFIG.seaweed.bucketErrors);
 
       // Fetch error clusters
       const errorClusters = await sql`
@@ -363,9 +363,9 @@ Phase: Phase 66-79 Error Analysis`.trim();
             throw new Error(`Qdrant upsert failed: ${upsertResponse.statusText}`);
           }
 
-          // Store in MinIO
-          await putObject(
-            CONFIG.minio.bucketErrors,
+          // Store in SeaweedFS
+          await putSeaweedObject(
+            CONFIG.seaweed.bucketErrors,
             `${error_code}_${Date.now()}.json`,
             Buffer.from(JSON.stringify({ file_path, error_code, message, error_count }, null, 2))
           );
