@@ -5807,11 +5807,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { readFileSync as _readFileSync } from 'node:fs';
 import { resolve as _resolvePath } from 'node:path';
-import { fileURLToPath as _fileURLToPath } from 'node:url';
 import { verifyMcpOperatorToken } from './operator-token-verifier.js';
-import { readGraphifyStatus } from '../../../scripts/atlas/lib/graphify-status-v1.mjs';
-
-const ATLAS_REPOSITORY_ROOT = _fileURLToPath(new URL('../../../', import.meta.url));
 
 const execFileAsync = promisify(execFile);
 

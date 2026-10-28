@@ -26,7 +26,6 @@ function identityFor(sourceRef: string, overrides: Partial<PacketIdentityRegistr
 
 function lookups(state: {
 	repositories?: string[];
-	mappedRootRepositoryId?: string;
 	identities?: PacketIdentityRegistryRowV1[];
 	aliases?: PacketIdentityAliasRowV1[];
 	admitted?: Record<string, string | null>;
@@ -36,12 +35,6 @@ function lookups(state: {
 	const aliases = state.aliases ?? [];
 	return {
 		repositoryAuthorityById: async (id) => (repositories.includes(id) ? { repositoryId: id, sourceAuthorityRepoId: 'deeds-web-app' } : null),
-		repositoryScopeMappingByScope: async (scope) => scope === 'repo:root' ? {
-			membershipRepositoryScope: scope,
-			repositoryId: state.mappedRootRepositoryId ?? ROOT,
-			sourceAuthorityRepoId: 'deeds-web-app',
-			mappingKind: 'ROOT_SCOPE',
-		} : null,
 		identityByKey: async (key) => identities.find((row) => row.packetKey === key) ?? null,
 		identityBySourceKind: async (repo, ref, kind) =>
 			identities.find((row) => row.repositoryId === repo && row.sourceRef === ref && row.packetKind === kind) ?? null,
@@ -85,29 +78,15 @@ describe('decideRegistryIdentityWriteV1', () => {
 	it('rejects a known repository that is not the root mapping', async () => {
 		const wrongRoot = identityFor('src/a.ts', { repositoryId: OTHER_REPO });
 		const result = await decideRegistryIdentityWriteV1({ identity: wrongRoot, observedSourceRevision: REVISION }, lookups({ repositories: [ROOT, OTHER_REPO] }));
-		expect(result).toEqual({ decision: 'REJECT', reason: 'SCOPE_MAPPING_MISMATCH' });
+		expect(result).toEqual({ decision: 'REJECT', reason: 'ROOT_MAPPING_MISMATCH' });
 	});
 
 	it('rejects a root UUID paired with a different scope string', async () => {
 		const wrongScope = identityFor('src/a.ts', { membershipRepositoryScope: 'repo:other' });
 		expect(await decideRegistryIdentityWriteV1({ identity: wrongScope, observedSourceRevision: REVISION }, lookups())).toEqual({
 			decision: 'REJECT',
-			reason: 'SCOPE_MAPPING_MISMATCH',
+			reason: 'ROOT_MAPPING_MISMATCH',
 		});
-	});
-
-	it('rejects when the persisted scope map points to a different repository UUID', async () => {
-		const result = await decideRegistryIdentityWriteV1(candidate, lookups({ mappedRootRepositoryId: OTHER_REPO }));
-		expect(result).toEqual({ decision: 'REJECT', reason: 'SCOPE_MAPPING_MISMATCH' });
-	});
-
-	it('uses the persisted UUID mapping instead of a hardcoded repository ID', async () => {
-		const mappedIdentity = identityFor('src/a.ts', { repositoryId: OTHER_REPO });
-		const result = await decideRegistryIdentityWriteV1(
-			{ identity: mappedIdentity, observedSourceRevision: REVISION },
-			lookups({ repositories: [ROOT, OTHER_REPO], mappedRootRepositoryId: OTHER_REPO }),
-		);
-		expect(result).toEqual({ decision: 'INSERT' });
 	});
 
 	it('rejects a key that is not the recomputed PacketKeyV2', async () => {
