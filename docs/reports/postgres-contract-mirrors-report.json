@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-28T04:29:26.363Z",
+  "generatedAt": "2026-10-28T16:22:02.768Z",
   "liveReachable": true,
   "liveError": null,
   "summary": {
@@ -11,10 +11,10 @@
     "blockers": [
       "feature_registry: live LIVE_TABLE_MISSING",
       "task_semantic_packets: static COLUMN_MISMATCH",
-      "task_semantic_packets: live COLUMN_MISMATCH",
+      "task_semantic_packets: live INDEX_MISMATCH",
       "atlas_packets: static COLUMN_MISMATCH",
       "atlas_packets: live COLUMN_MISMATCH",
-      "route_runtime_packets: live COLUMN_MISMATCH"
+      "route_runtime_packets: live INDEX_MISMATCH"
     ]
   },
   "tables": [
@@ -687,6 +687,7 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260606_task_semantic_packets_live_alignment.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260908_task_semantic_packets_production_indexes.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260908_task_semantic_packets_writer_columns_only.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261028_align_task_semantic_and_route_runtime_packets_DRAFT.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\9999_create_task_semantic_packets.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\phase17_task_semantic_packets.sql"
       ],
@@ -1006,7 +1007,7 @@
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "COLUMN_MISMATCH",
+        "classification": "INDEX_MISMATCH",
         "error": null,
         "columns": [
           "id",
@@ -1047,7 +1048,23 @@
           "observed_at",
           "valid_from",
           "valid_to",
-          "deleted"
+          "deleted",
+          "canonical",
+          "canonical_source_ref",
+          "community_confidence",
+          "community_id",
+          "community_source",
+          "domain_class",
+          "kmeans_cluster",
+          "ledger_type",
+          "lineage_version",
+          "payload_backfilled_at",
+          "som_col",
+          "som_index",
+          "som_row",
+          "source_ref_hash",
+          "summary",
+          "tags"
         ],
         "indexes": [
           "idx_task_semantic_packets_agent_pickup_ready",
@@ -1065,24 +1082,7 @@
         ],
         "rowCount": 2,
         "columnDiffs": {
-          "onlyInA": [
-            "canonical",
-            "canonical_source_ref",
-            "community_confidence",
-            "community_id",
-            "community_source",
-            "domain_class",
-            "kmeans_cluster",
-            "ledger_type",
-            "lineage_version",
-            "payload_backfilled_at",
-            "som_col",
-            "som_index",
-            "som_row",
-            "source_ref_hash",
-            "summary",
-            "tags"
-          ],
+          "onlyInA": [],
           "onlyInB": []
         },
         "indexDiffs": {
@@ -1121,7 +1121,7 @@
           "onlyInB": []
         }
       },
-      "classification": "COLUMN_MISMATCH",
+      "classification": "INDEX_MISMATCH",
       "repairClass": "ADD_DRIZZLE_MIRROR",
       "identityFields": [
         "packet_key",
@@ -2937,7 +2937,8 @@
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\0999_fix-grpc-proto-alignment.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260603_atlas_synthesis_tables.sql",
         "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20260606_route_packet_tables.sql",
-        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261025_route_runtime_packets_packet_uuid_v1.sql"
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261025_route_runtime_packets_packet_uuid_v1.sql",
+        "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\drizzle\\manual\\20261028_align_task_semantic_and_route_runtime_packets_DRAFT.sql"
       ],
       "static": {
         "classification": "SQL_AND_DRIZZLE_ALIGNED",
@@ -3238,7 +3239,7 @@
       "live": {
         "reachable": true,
         "tableExists": true,
-        "classification": "COLUMN_MISMATCH",
+        "classification": "INDEX_MISMATCH",
         "error": null,
         "columns": [
           "id",
@@ -3280,7 +3281,18 @@
           "raw",
           "packet_version",
           "source_ref_quality",
-          "packet_uuid"
+          "packet_uuid",
+          "feature_id",
+          "git_diff_rank",
+          "git_sha",
+          "prompt_hash",
+          "repair_method",
+          "repair_reason",
+          "reward",
+          "route_state",
+          "superseded_by",
+          "supersedes_packet_uuid",
+          "tree_node_id"
         ],
         "indexes": [
           "idx_route_runtime_packets_community_confidence_idx",
@@ -3312,19 +3324,7 @@
         ],
         "rowCount": 11,
         "columnDiffs": {
-          "onlyInA": [
-            "feature_id",
-            "git_diff_rank",
-            "git_sha",
-            "prompt_hash",
-            "repair_method",
-            "repair_reason",
-            "reward",
-            "route_state",
-            "superseded_by",
-            "supersedes_packet_uuid",
-            "tree_node_id"
-          ],
+          "onlyInA": [],
           "onlyInB": []
         },
         "indexDiffs": {
@@ -3348,8 +3348,8 @@
           "onlyInB": []
         }
       },
-      "classification": "COLUMN_MISMATCH",
-      "repairClass": "ADD_MISSING_COLUMNS_VERIFY_WRITERS",
+      "classification": "INDEX_MISMATCH",
+      "repairClass": "ADD_MISSING_INDEXES_VERIFY_QUERIES",
       "identityFields": [
         "packet_uuid",
         "source_ref",

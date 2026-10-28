@@ -1,3 +1,4 @@
+-- APPLIED to live legal_ai_db (PostgreSQL 18.4) 2026-10-28 by operator authorization (additive DDL only): task_semantic_packets 39->55, route_runtime_packets 40->51 columns; rows 2 and 11 unchanged. Pre-image: .tmp/atlas/preimage-task-route-packets-schema-20261028.sql (sha256 b75dbec3e347827163401a59d0d81bae84af8fe701e980e90b75d0fb7b2b2d2a). Filename keeps DRAFT because other docs reference it.
 -- DRAFT, NOT APPLIED. Additive alignment of two live tables to their declared Drizzle schemas. Do not apply without explicit operator approval.
 --
 -- Pre-image (read-only audit 2026-10-28, `npm run audit:drizzle`, live legal_ai_db PostgreSQL 18):

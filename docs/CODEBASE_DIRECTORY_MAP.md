@@ -1,23 +1,46 @@
 # Codebase Directory Map
 > Generated: 2026-07-01 15:46:19
 > Source: `sveltekit-frontend/src/`
-> Script: `scripts/tests/generate-codebase-directory-map.mjs`
-> Wiki notes from Redis-valkey centroid made 10_23_26: 0 / 1058 directories
-
-## Overview
-
-| Tier | Count | Description |
-|------|-------|-------------|
-| 🔴 Critical (score < 40) | 4 | Auth/Zod/hardcoded-URL gaps |
-| 🟡 Warning (40–69) | 159 | Minor production gaps |
-| 🟢 Good (≥ 70) | 895 | Production-ready |
-| **Total** | **1058** | Directories with ≥1 code file(s) |
-
-**Score formula:** Zod(20) + Auth(20) + NoTODO(15) + NoHardURL(20) + NoSvelte4(15) + HasExports(10) = 100
+> Script: `sveltekit-frontend/scripts/tests/generate-codebase-directory-map.mjs`
+> **Historical snapshot only:** generated 2026-07-01 (1,058 directories). Its scores are regex-derived, not current production-readiness findings. The 2026-10-28 audit found `no-zod` was not applicable in 206 of 209 flagged directories. Use the AST-backed worklist below for triage; verify every candidate before changing code.
+> **Current evidence:** see the dated worklist below and the read-only receipts it cites. No score or parser observation grants canonical authority or authorizes a write.
 
 ---
 
-## Full Directory Scoreboard
+## Production Hardening Worklist (evidence snapshot, 2026-10-28)
+
+**Evidence inputs:** `.tmp/atlas/file_ast_summary.jsonl`, `.tmp/atlas/directory_remediation_rank.parquet`, and `.tmp/atlas/svelte-structural-fusion-20261028-v2.json`. These are dated local analysis artifacts, not canonical records. The AST inventory reports 6,784 analyzed files and 0 digest mismatches (`canonical_authority:false`); the Svelte fusion receipt reports 937 components and 11,676 independently agreed script facts across the Svelte compiler and Tree-sitter/ast-grep parser families. Its replay digest is `sha256:d65bb5b39fe4e6368bce7efffd46121266520dfcf53949a42dab9aa3e68116fb`.
+
+**Fusion boundary:** the CLI and N-API ast-grep producers share a Tree-sitter family and count as one witness; the Svelte compiler is the independent witness. This receipt covers rune calls, imports, and function declarations. It does not prove template-reference binding, cross-file identity, LSP resolution, revision-qualified symbol admission, or relation authorization. Keep the Svelte compiler as template-structure owner and use LSP/Graphify only as separate semantic evidence producers.
+
+**Scope:** non-test files under `sveltekit-frontend/src/` in the cited inventory. The worklist is proposal-only; candidates require source review and targeted tests. It does not post tickets or write stores. Rebuild with `scripts/atlas/file-ast-facts-v1.mjs` and `scripts/atlas/directory-remediation-rank-v1.sql` only when the source inventory/revision inputs are available and recorded.
+
+| Signal (non-test) | Count | Reading |
+|---|---|---|
+| Svelte 4 syntax | 0 | None observed in this scan; not a general readiness or migration verdict |
+| Route `+server.ts` files | 858 | |
+| `request.json()` read / schema-validated / unresolved | 526 / 415 / 111 | Unresolved = AST could not see a schema on the path. REVIEW_REQUIRED, not a confirmed gap (helpers and wrappers may validate) |
+| URL literals | 576 | Includes `process.env.X \|\| 'http://127.0.0.1:…'` fallbacks. Not defects by themselves |
+| TODO comments | 86 | |
+
+**Hardening order (one pass, with tests, per the `DEV_BYPASS_AUTH` deferral rule):**
+
+| # | Lane | Where (files) | Action |
+|---|---|---|---|
+| H1 | Unresolved body validation | `routes/api/`: codebase-index 10, graph 8, admin 7, analytics 6, cache 6, research 5, ai 5, atlas 5, ace 5, cartridge 4 (111 total) | Per file: confirm a Zod `safeParse` on the path, else add one. Status codes stay as-is. Review list: AST summary rows with `review_required_request_json > 0` |
+| H1 triage (2026-10-28, text search over the 109 unresolved files, not proof) | 97 of 109 contain `safeParse`/`Schema.parse`/`validate*` text (sampled `api/ace/ask`: real Zod `safeParse` plus `requireUser`, so the AST flag is a false positive there; the other 96 are unsampled). 3 more validate via helpers: `codebase-index/couchdb-pagerank`, `code-intel/graph/gds-status`, `wiki/moc`. **9 read the body with a cast or hand check and no schema:** `admin/atlas/ontology-resolution` (+`/oak-search`), `admin/batch-embeddings/embed`, `admin/parents-atlas/actions`, `cache/bitfrost-effectiveness`, `codebase-index/agents-write`, `ai/emotion`, `browser-context/snapshot` (passes a sanitizer), `llm/gemma4-chat-clean` (forwards body to llama-server). **4 have no auth text:** `ai/emotion`, `llm/gemma4-chat-clean`, `atlas/rpc/packet-assemble`, `atlas/studio/stream` | Fix the no-schema routes first (Zod `safeParse`, 400 on failure). Follow-up (regex flow check, not proof): of the other 97 files, 96 pass the body into a `safeParse`/`parse`/`validate*` call (the 95 matched automatically plus `retrieval/search-unified`, checked by hand: it parses a schema built from body fields); **1 has no schema: `analytics/research-topics` POST** (auth present, `action` read from a cast body). Total no-schema list: 10 (9 above + this one; 3 of the original 12 validate via helpers). Deferred: no code edited while `DEV_BYPASS_AUTH` is active |
+| H2 | Unauthenticated mutating routes | G4/G5 findings in `CLAUDE.md` (`api/ai/emotion`, `api/batch-summary/jobs`, …) | Same pass as H1 so each route gets auth + Zod + a test together |
+| H3 | Env-driven service URLs | `lib/server/legal` 105, `retrieval` 55, `data` 49, `atlas` 34, `routes/api/admin` 19 | Triage env-fallback defaults vs real literals; only real literals move to `env.server.ts` |
+| H4 | `.bak` / duplicate cleanup (archive, never delete) | AST top-15: `lib/components/ai`, `yorha` (+ `_simulations`, `evidence`, `dashboard`, `cases`), `ui/gaming/n64`, `lib/server/{retrieval,ace,ai}` | Archive with a manifest entry (SHA-256) |
+| H5 | TODO triage | `lib/server/atlas` 7, `lib/server/ai` 5, `lib/server/retrieval` 4 | Record or close; no behaviour change |
+
+**Implementation loop:** (1) select a candidate from exact file-level evidence; (2) inspect the route/component and its callers, wrappers, and policy; (3) write a focused regression test; (4) make the smallest reviewed change; (5) rerun focused tests and structural analysis against the new source digest; (6) keep any relation or recommendation proposal revision-qualified and unpromoted until its own admission gate passes. Archive rather than delete files.
+
+**Separate follow-up work:** Playwright verification for the 127 static button candidates (`.tmp/atlas/dead_button_candidates.json`) and Drizzle contract reconciliation (ledger §6.M60 and §6.M62). Neither is established by parser agreement. The legacy directory tiers and score formula are preserved below as historical data only.
+
+---
+
+## Historical Regex Scoreboard (2026-07-01; not a readiness verdict)
 
 | Tier | Directory | Files | Lines | Score | Issues | Tags |
 |------|-----------|-------|-------|-------|--------|------|
@@ -1082,7 +1105,7 @@
 
 ---
 
-## Tier Breakdown
+## Historical Tier Breakdown (2026-07-01; regex-derived)
 
 ### 🔴 Critical — needs immediate attention (4)
 
@@ -2165,7 +2188,13 @@ _No wiki notes found. Run `deep-directory-audit.mjs` (any target) to populate._
 
 ## How to Update This Map
 
+The generator below produces the historical regex scoreboard, not the AST
+hardening worklist. Do not overwrite this reference with a fresh generator run;
+write new snapshots to `.tmp/atlas/` and update the worklist only with a dated,
+revision-qualified receipt. The 2026-10-28 AST/fusion inputs are local artifacts.
+
 ```bash
+# Run from sveltekit-frontend/ (the scripts live there, not at the repo root)
 # Re-generate (structural metrics only):
 node scripts/tests/generate-codebase-directory-map.mjs
 
@@ -2180,10 +2209,11 @@ node scripts/tests/generate-codebase-directory-map.mjs
 
 ## Integration with ACE Context
 
-Directory summaries cached in Redis under `wiki:note:dir:*` are automatically
-injected into ACE context as KAG notes when queries match the directory path.
+The historical wiki-note section above is not proof that directory summaries
+are currently hydrated or injected. Treat any Redis/Valkey directory hint as
+proposal-only until writer/reader key parity, revision and digest validation,
+and live readback are verified.
 
-Key in Redis: `wiki:note:dir:dir_{sanitized_path}` (24h TTL)
-Populated by: `/api/codebase-index/summarize-dirs` (POST) or `deep-directory-audit.mjs`
-Consumed by: `getDirectoryKAGContext()` in `community-graph.ts`
-Injected by: `assembleACEContext()` → `webSearchContext` → `## KAG Directory Audit Notes`
+Do not use path-derived cache keys as identity: lossy sanitization can collide.
+ACE context must continue through the current canonical selection and validation
+owners; this map does not establish an ACE injection path.
