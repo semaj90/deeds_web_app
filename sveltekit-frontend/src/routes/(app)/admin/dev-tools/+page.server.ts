@@ -1,5 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { getMinioConfig, getOllamaUrl, getQdrantUrl } from '$lib/config/env.server.js';
+import { db } from '$lib/server/db/client';
+import { sql } from 'drizzle-orm';
 
 interface ServiceHealth {
 	name: string;
@@ -109,17 +111,12 @@ async function getIndexingStatus(signal?: AbortSignal): Promise<IndexingStatus> 
 		/* Qdrant not running or aborted */
 	}
 	try {
-		const errRes = await fetch(`${getQdrantUrl()}/collections/phase79_error_analysis`, { signal });
-		if (errRes.ok) {
-			const data = await errRes.json();
-			const r = data.result ?? {};
-			result.errors = {
-				pointCount: (r.points_count as number) ?? 0,
-				vectorSize: extractVectorSize(r)
-			};
-		}
+		// Error index lives in Postgres (error_logs.message_embedding, pgvector 768-d), not Qdrant.
+		const res: any = await db.execute(sql`SELECT count(*)::int AS n FROM error_logs WHERE message_embedding IS NOT NULL`);
+		const n = Number((res.rows ?? res)[0]?.n ?? 0);
+		result.errors = { pointCount: n, vectorSize: 768 };
 	} catch {
-		/* Qdrant not running or aborted */
+		/* database unavailable */
 	}
 	return result;
 }

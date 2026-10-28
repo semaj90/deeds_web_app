@@ -229,7 +229,7 @@
 		indexingLog = [...indexingLog, `[${new Date().toLocaleTimeString()}] Starting ${type} indexing...`];
 
 		try {
-			const res = await fetch('/api/indexing', {
+			const res = await fetch(`/api/indexing?action=${type}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ action: type })

@@ -23,12 +23,10 @@ import { ENV } from '$lib/server/env.server.js';
 const CONFIG = {
   qdrant: {
     url: ENV.QDRANT_URL,
-    collectionCode: 'phase79_codebase',
-    collectionErrors: 'phase79_error_analysis'
+    collectionCode: 'phase79_codebase'
   },
   seaweed: {
-    bucketCode: 'codebase-index',
-    bucketErrors: 'error-analysis'
+    bucketCode: 'codebase-index'
   },
   ollama: {
     url: ENV.OLLAMA_BASE_URL,
@@ -127,6 +125,9 @@ function chunkFileContent(content: string, chunkSize: number = 500, overlap: num
 }
 
 const PROJECT_ROOT = path.resolve(process.cwd());
+
+const ERROR_INDEX_BATCH = 50;
+const EMBEDDING_DIM = 768;
 
 const indexCodebaseSchema = z.object({
   rootPath: z
@@ -285,112 +286,57 @@ export const POST: RequestHandler = async ({ request, url, locals }) => {
     }
   }
 
-  // Index Errors
+  // Index Errors: embed error_logs.message into error_logs.message_embedding (pgvector, semantic_768).
+  // Bounded batch per call; rows are picked oldest-unembedded-first so repeated clicks make progress.
   if (pathname === '/api/indexing/errors' || action === 'errors') {
+    const sql = postgres(CONFIG.postgres.url);
     try {
-      const sql = postgres(CONFIG.postgres.url);
-      // Ensure bucket exists
-      await ensureSeaweedBucket(CONFIG.seaweed.bucketErrors);
-
-      // Fetch error clusters
-      const errorClusters = await sql`
-        SELECT DISTINCT
-          file_path, error_code,
-          message,
-          COUNT(*) as error_count
-        FROM error_cluster
-        WHERE file_path IS NOT NULL
-        GROUP BY file_path, error_code, message
-        ORDER BY error_count DESC
-        LIMIT 50
+      const rows = await sql`
+        SELECT id, error_category, message, file_path, route_path
+        FROM error_logs
+        WHERE message_embedding IS NULL AND message IS NOT NULL AND btrim(message) <> ''
+        ORDER BY created_at DESC, id
+        LIMIT ${ERROR_INDEX_BATCH}
       `;
 
-      // Ensure Qdrant collection exists
-      await ensureQdrantCollection(CONFIG.qdrant.collectionErrors);
-
-      // Index error clusters
       let indexed = 0;
-      const results: {
-        file: string;
-        chunks?: number;
-        vectors?: number;
-        code?: string;
-        count?: string;
-      }[] = [];
-
-      for (const cluster of errorClusters) {
-        try {
-          const { file_path, error_code, message, error_count } = cluster;
-          const errorContext = `Error Code: ${error_code}
-File: ${file_path}
-Message: ${message}
-Occurrences: ${error_count}
-Phase: Phase 66-79 Error Analysis`.trim();
-
-          const embedding = await generateEmbedding(errorContext);
-
-          if (!embedding || embedding.length === 0) continue;
-
-          const pointId =
-            parseInt(crypto.createHash('md5').update(errorContext).digest('hex').slice(0, 8), 16) %
-            10 ** 8;
-
-          const upsertResponse = await fetch(
-            `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points`,
-            {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                points: [
-                  {
-                    id: pointId,
-                    vector: Array.from(embedding),
-                    payload: {
-                      error_code,
-                      file_path,
-                      message,
-                      error_count,
-                      phase: 'phase66-79',
-                      indexed_at: new Date().toISOString(),
-                    },
-                  },
-                ],
-              }),
-              signal: AbortSignal.timeout(10_000),
-            }
-          );
-          if (!upsertResponse.ok) {
-            throw new Error(`Qdrant upsert failed: ${upsertResponse.statusText}`);
-          }
-
-          // Store in SeaweedFS
-          await putSeaweedObject(
-            CONFIG.seaweed.bucketErrors,
-            `${error_code}_${Date.now()}.json`,
-            Buffer.from(JSON.stringify({ file_path, error_code, message, error_count }, null, 2))
-          );
-
-          results.push({
-            code: error_code,
-            file: file_path,
-            count: error_count,
-          });
-
-          indexed++;
-        } catch (err) {
-          console.error('Error indexing cluster:', err);
+      let skipped = 0;
+      for (const row of rows) {
+        const text = `Error Category: ${row.error_category ?? 'unknown'}
+File: ${row.file_path ?? row.route_path ?? 'unknown'}
+Message: ${row.message}`;
+        const embedding = await generateEmbedding(text);
+        if (embedding.length !== EMBEDDING_DIM) {
+          skipped++;
+          continue;
         }
+        await sql`
+          UPDATE error_logs
+          SET message_embedding = ${`[${embedding.join(',')}]`}::vector,
+              message_embedding_model = ${CONFIG.ollama.embeddingModel},
+              message_embedded_at = now()
+          WHERE id = ${row.id}
+        `;
+        indexed++;
       }
 
-      await sql.end();
+      const [{ remaining }] = await sql`
+        SELECT count(*)::int AS remaining FROM error_logs
+        WHERE message_embedding IS NULL AND message IS NOT NULL AND btrim(message) <> ''
+      `;
 
       return json({
         success: true,
-        indexed: results,
-        message: `Indexed ${indexed} error clusters`,
+        indexed,
+        skipped,
+        remaining,
+        message: `Embedded ${indexed} error_logs rows (${skipped} skipped, ${remaining} remaining)`,
       });
     } catch (err) {
+      console.error('Error indexing failed:', err);
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
+    } finally {
+      await sql.end();
     }
   }
 
@@ -468,37 +414,32 @@ Phase: Phase 66-79 Error Analysis`.trim();
         return json({ success: false, error: 'Failed to generate embedding' }, { status: 400 });
       }
 
-      const searchResponse = await fetch(
-        `${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}/points/query`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: Array.from(embedding),
-            limit,
-            with_payload: true,
-          }),
-          signal: AbortSignal.timeout(10_000),
-        }
-      );
-
-      if (!searchResponse.ok) {
-        throw new Error(`Qdrant search failed: ${searchResponse.statusText}`);
+      if (embedding.length !== EMBEDDING_DIM) {
+        return json({ success: false, error: 'Embedding dimension mismatch' }, { status: 400 });
       }
 
-      const searchData = await searchResponse.json();
-      const results = searchData?.result?.points || [];
-
-      return json({
-        success: true,
-        results: results.map((r: { score: number; payload?: Record<string, unknown> }) => ({
-          code: r.payload?.error_code,
-          file: r.payload?.file_path,
-          count: r.payload?.error_count,
-          similarity: (r.score * 100).toFixed(1),
-          message: String(r.payload?.message ?? '').substring(0, 100) + '...',
-        })),
-      });
+      const sql = postgres(CONFIG.postgres.url);
+      try {
+        const rows = await sql`
+          SELECT error_category, file_path, route_path, message,
+                 1 - (message_embedding <=> ${`[${embedding.join(',')}]`}::vector) AS similarity
+          FROM error_logs
+          WHERE message_embedding IS NOT NULL
+          ORDER BY message_embedding <=> ${`[${embedding.join(',')}]`}::vector
+          LIMIT ${limit}
+        `;
+        return json({
+          success: true,
+          results: rows.map((r) => ({
+            code: r.error_category,
+            file: r.file_path ?? r.route_path,
+            similarity: (Number(r.similarity) * 100).toFixed(1),
+            message: String(r.message ?? '').substring(0, 100) + '...',
+          })),
+        });
+      } finally {
+        await sql.end();
+      }
     } catch (err) {
       return json({ success: false, error: 'Indexing operation failed' }, { status: 500 });
     }
@@ -513,13 +454,18 @@ export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
     const codebaseResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionCode}`, { signal: AbortSignal.timeout(5_000) });
-    const errorsResponse = await fetch(`${CONFIG.qdrant.url}/collections/${CONFIG.qdrant.collectionErrors}`, { signal: AbortSignal.timeout(5_000) });
 
     const codebaseData = codebaseResponse.ok ? await codebaseResponse.json() : null;
-    const errorsData = errorsResponse.ok ? await errorsResponse.json() : null;
+    const sql = postgres(CONFIG.postgres.url);
+    let errorsEmbedded = 0;
+    try {
+      const [row] = await sql`SELECT count(*)::int AS n FROM error_logs WHERE message_embedding IS NOT NULL`;
+      errorsEmbedded = row?.n ?? 0;
+    } finally {
+      await sql.end();
+    }
 
     const codebaseCollection = codebaseData?.result;
-    const errorsCollection = errorsData?.result;
 
     return json({
       success: true,
@@ -529,8 +475,8 @@ export const GET: RequestHandler = async ({ locals }) => {
           vectors_size: codebaseCollection?.config?.params?.vectors?.size ?? 768
         },
         errors: {
-          points_count: errorsCollection?.points_count ?? 0,
-          vectors_size: errorsCollection?.config?.params?.vectors?.size ?? 768
+          points_count: errorsEmbedded,
+          vectors_size: EMBEDDING_DIM
         }
       },
       timestamp: new Date().toISOString()
