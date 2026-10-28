@@ -5,7 +5,8 @@ vi.mock('node:fs', () => ({ existsSync: vi.fn(() => true) }));
 vi.mock('node:fs/promises', () => ({
   readFile: vi.fn(async () => JSON.stringify({ files: [] })),
 }));
-vi.mock('$lib/server/redis.js', () => ({ getRedis: vi.fn(() => ({})) }));
+const getRedis = vi.hoisted(() => vi.fn(() => ({ setex: vi.fn(), mget: vi.fn(async () => []) })));
+vi.mock('$lib/server/redis.js', () => ({ getRedis }));
 
 import { POST } from './+server.js';
 
@@ -30,8 +31,15 @@ describe('POST /api/codebase-index/agents-write', () => {
     }
   });
 
-  it('an empty or malformed-JSON body means defaults, not a 400', async () => {
-    const res = await POST(event('{nope'));
+  it('accepts an empty body as defaults without performing a real store write', async () => {
+    const res = await POST(event(''));
     expect(res.status).not.toBe(400);
+  });
+
+  it('rejects malformed JSON before obtaining the Redis writer', async () => {
+    getRedis.mockClear();
+    const res = await POST(event('{nope'));
+    expect(res.status).toBe(400);
+    expect(getRedis).not.toHaveBeenCalled();
   });
 });

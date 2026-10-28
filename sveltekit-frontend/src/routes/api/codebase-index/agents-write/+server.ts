@@ -147,7 +147,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   // An empty body means "all defaults"; a present but malformed body is a 400.
-  const rawBody = await request.json().catch(() => ({}));
+  const rawText = await request.text();
+  let rawBody: unknown = {};
+  if (rawText.trim() !== '') {
+    try {
+      rawBody = JSON.parse(rawText);
+    } catch {
+      return json({ error: 'invalid_json' }, { status: 400 });
+    }
+  }
   const parsedBody = agentsWriteBodySchema.safeParse(rawBody);
   if (!parsedBody.success) {
     return json({ error: 'invalid_request', issues: parsedBody.error.issues.slice(0, 5) }, { status: 400 });
