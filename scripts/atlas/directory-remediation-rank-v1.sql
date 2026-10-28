@@ -5,6 +5,8 @@
 --   Packet directories are frontend-relative (src/...); one EXPLICIT namespace rule maps them: 'sveltekit-frontend/' || directory_path when it starts with src/. No fuzzy matching.
 -- Revision binding (optional, needs ATLAS_INV + ATLAS_WSB): a ticket carries workspaceRevision ONLY when every inventory file in the directory matches the admitted
 --   binding by exact path + digest; otherwise it stays null and _proposal records exact/files counts. Never inferred from git.
+-- AST alternative (optional, ATLAS_AST=<file_ast_facts.jsonl from scripts/atlas/file-ast-facts-v1.mjs>): non-test per-directory facts replace the regex map debt in a SECOND score (score_ast / rank_ast);
+--   the ticket selection still uses `score` so the two can be compared before anything switches.
 -- Outputs: ./.tmp/atlas/directory_remediation_rank.parquet and ./.tmp/atlas/directory_remediation_tickets.jsonl (fixed paths; COPY needs literals).
 -- Tickets use the create_ticket shape of /api/admin/atlas/kanban-tickets (+ a sibling _proposal block); nothing is posted, no datastore is written.
 -- The map's own 'Generated:' date is carried into every ticket as map_input, so a stale map is visible, not assumed.
@@ -42,6 +44,15 @@ FROM read_parquet(coalesce(nullif(getenv('ATLAS_INV'), ''), 'NO_INVENTORY.parque
 LEFT JOIN read_csv(coalesce(nullif(getenv('ATLAS_WSB'), ''), 'NO_BINDINGS.csv')) b ON b.canonical_source_ref = i.source_ref
 GROUP BY 1;
 
+CREATE OR REPLACE TEMP TABLE astd AS
+SELECT regexp_replace(source_ref, '/[^/]*$', '') AS directory_path,
+       sum(CASE WHEN unvalidated_request_json THEN 1 ELSE 0 END) AS ast_unvalidated_json,
+       sum(CASE WHEN NOT is_test THEN url_literals ELSE 0 END) AS ast_url_literals,
+       sum(todo_comments) AS ast_todo_comments,
+       sum(svelte4_export_let + svelte4_on_directive + svelte4_reactive_label + svelte4_slot) AS ast_svelte4
+FROM read_json_auto(coalesce(nullif(getenv('ATLAS_AST'), ''), 'NO_AST.jsonl'), format = 'newline_delimited')
+GROUP BY 1;
+
 CREATE OR REPLACE TEMP TABLE ranked AS
 SELECT
   w.directory_path,
@@ -54,6 +65,8 @@ SELECT
   least(20, 5 * w.duplicate_content_files) AS t_dup,
   least(10, w.file_count / 10) AS t_size,
   (m.map_dir IS NOT NULL) AS map_matched,
+  a.ast_unvalidated_json, a.ast_url_literals, a.ast_todo_comments, a.ast_svelte4,
+  least(40, 15 * coalesce(a.ast_unvalidated_json, 0) + least(15, coalesce(a.ast_url_literals, 0)) + least(10, coalesce(a.ast_todo_comments, 0)) + least(10, 2 * coalesce(a.ast_svelte4, 0))) AS t_ast_debt,
   bd.bind_files, bd.bind_exact, CASE WHEN bd.bind_files > 0 AND bd.bind_exact = bd.bind_files THEN bd.bind_revision END AS bound_revision,
   coalesce(round(20 * r.pr_pct, 1), 0) AS t_centrality,
   r.pr_run_id, r.graph_revision AS pr_graph_revision,
@@ -63,9 +76,12 @@ FROM wide w
 LEFT JOIN dirmap m ON m.map_dir = regexp_replace(w.directory_path, '^sveltekit-frontend/src/?', '')
 LEFT JOIN pr r ON r.repo_dir = w.directory_path
 LEFT JOIN bind bd ON bd.directory_path = w.directory_path
+LEFT JOIN astd a ON a.directory_path = w.directory_path
 WHERE w.directory_path <> '';
 
-COPY (SELECT *, row_number() OVER (ORDER BY score DESC, directory_path ASC) AS rank FROM ranked ORDER BY rank)
+COPY (SELECT *, t_ast_debt + t_bak + t_dup + t_size + t_centrality AS score_ast,
+             row_number() OVER (ORDER BY t_ast_debt + t_bak + t_dup + t_size + t_centrality DESC, directory_path ASC) AS rank_ast,
+             row_number() OVER (ORDER BY score DESC, directory_path ASC) AS rank FROM ranked ORDER BY rank)
   TO '.tmp/atlas/directory_remediation_rank.parquet' (FORMAT parquet, COMPRESSION zstd);
 
 -- Dry-run tickets, create_ticket shape. validationCommand strings are proposals, not yet executed.
