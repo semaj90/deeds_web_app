@@ -86,6 +86,7 @@ import { CLIP_TO_ALICE_BONE } from './src/lib/courtroom/bone-retarget-v1';
 		jesterParts.forEach((m: any) => restC.set(m, cen(m)));
 		res.jester = { parts: jesterParts.length, attached, scale: Math.round(k * 1000) / 1000, perBone };
 		cam.radius = Math.max(asize.y * 2.0, 2.0);
+		scene.meshes.filter((m: any) => m.skeleton).forEach((m: any) => { m.isVisible = false; }); // judge the jester alone
 	}
 	scene.animationGroups.slice(before).forEach((g) => g.start(true));
 	for (const frame of [60, 600, 1500, 2500]) { groups.forEach((g) => g.goToFrame(frame)); for (let i = 0; i < 4; i++) { scene.render(); await new Promise((r) => setTimeout(r, 30)); } marks.push({ ...dAt('f' + frame), dirErr: dirErr(), vecs: vecs(), jesterMoved: jesterParts.filter((m: any) => Vector3.Distance(cen(m), restC.get(m) as any) > 0.02).length, jesterMaxShift: Math.round(Math.max(0, ...jesterParts.map((m: any) => Vector3.Distance(cen(m), restC.get(m) as any))) * 100) / 100 }); shots.push(canvas.toDataURL('image/png')); }
