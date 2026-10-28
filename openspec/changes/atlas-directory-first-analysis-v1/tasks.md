@@ -832,11 +832,10 @@ Target remains open. First blocker: `SVELTE_LSP_TEMPLATE_DEFINITION_TIMEOUT`; ex
 5. `atlas_source_refs` registration for 1,118 unbound `.ts` files (24 more unexplained), then binder re-run: canonical write, not done.
 6. Unresolved: `/demos/page-layouts` logs one aborted `__data.json` invalidation (likely test teardown).
 
-**Push status (BLOCKED, nothing pushed):**
-- Branch `handoff/working-tree-2026-10-25` is 41 commits ahead and 16 behind `origin/main` (diverged; a plain push would be rejected, force not used). `git merge-tree` probe of a merge with `origin/main` is conflict-free.
-- Size gate FAILED: `docs/reports/current-source-selection-input-v1.json` is 12.3 MB in the outgoing range (a new version, added by commit 2f65116c058 on 2026-10-27; an older version is already on `origin/main`). No other blob in the range exceeds 5 MB.
-- Secret scan of the outgoing diff (JSON/JSONL receipts excluded): no credentials found.
-- Needs an operator choice: rewrite local commit 2f65116c058 (changes later hashes cited in this ledger), or accept the file with an explicit exception, or move it out of git by convention.
+**Push status (merge-ready branch prepared, nothing pushed):**
+- Branch `handoff/merge-ready-2026-10-28` is `handoff/working-tree-2026-10-25` with one change: `docs/reports/current-source-selection-input-v1.json` (a 12.3 MB generated artifact introduced by commit 2f65116c058 on 2026-10-27, replacing a 919-byte stub) is pinned to its previous 919-byte version in the 40 commits from 2f65116c058 onward. Everything else is identical (`git diff --stat` between the two branches shows that file only). Those 40 commits were replayed with the same authors, dates and messages, so their hashes differ from the ones cited in this ledger; the original branch keeps the original hashes. The 12.3 MB version still exists on disk in the working tree and on the original local branch (not deleted); regenerate or archive it outside git.
+- Size gate: PASS (no blob over 10 MB in `origin/main..handoff/merge-ready-2026-10-28`; largest 2.28 MB). Secret scan of the outgoing diff (JSON/JSONL receipts excluded): no credentials found.
+- Divergence: 42 ahead, 16 behind `origin/main`; `git merge-tree --write-tree` shows the merge is conflict-free. Operator steps (not run here): merge `origin/main` into `handoff/merge-ready-2026-10-28`, push that branch, open a PR into `main` (earlier work reached `main` through PRs #126 and #127 from the handoff branch).
 
 **Do not:** apply the draft DDL, run `drizzle-kit push`, write `atlas_packets.feature_label`, backfill source identities, run Graphify, hydrate Valkey, upload to S3 or run GPU jobs without explicit approval. Other sessions have uncommitted edits to `file-ast-facts-v1.mjs`, `directory-remediation-rank-v1.sql` and docs; review them before committing.
 
