@@ -3,6 +3,7 @@
 	import { browser } from '$app/environment';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import DiamondModal from '$lib/components/ui/DiamondModal.svelte';
+	import { DEMO_DOMAINS, demoMatchesQuery, domainForDemo, type DemoDomainId } from '$lib/demos/demo-domains.js';
 
 	type DemoCategory = 'ai' | 'visualization' | 'gaming' | 'ui' | 'system';
 
@@ -126,12 +127,29 @@
 	let selectedDemo = $state<Demo | null>(null);
 	let modalOpen = $state(false);
 	let filterCategory = $state<DemoCategory | null>(null);
+	let filterDomain = $state<DemoDomainId | null>(null);
+	let searchQuery = $state('');
 	let svgContainer = $state<SVGSVGElement | null>(null);
 	let graphDrawn = $state(false);
 
 	const allDemos = $derived([...demos, ...showcases]);
-	const filteredDemos = $derived(filterCategory ? demos.filter(d => d.category === filterCategory) : demos);
-	const filteredShowcases = $derived(filterCategory ? showcases.filter(d => d.category === filterCategory) : showcases);
+	function matchesFilters(d: Demo): boolean {
+		return (
+			(!filterCategory || d.category === filterCategory) &&
+			(!filterDomain || domainForDemo(d.href) === filterDomain) &&
+			demoMatchesQuery(d, searchQuery)
+		);
+	}
+	const filteredDemos = $derived(demos.filter(matchesFilters));
+	const filteredShowcases = $derived(showcases.filter(matchesFilters));
+	const domainCounts = $derived.by(() => {
+		const counts: Record<string, number> = {};
+		for (const d of allDemos) {
+			const domain = domainForDemo(d.href);
+			counts[domain] = (counts[domain] || 0) + 1;
+		}
+		return counts;
+	});
 	const totalLines = $derived(demos.reduce((s, d) => s + (d.lines || 0), 0));
 
 	const categoryCounts = $derived.by(() => {
@@ -458,6 +476,31 @@
 			</button>
 		{/each}
 	</nav>
+
+	<section class="domain-filter" aria-label="Filter demos by domain and search">
+		<input
+			class="demo-search"
+			type="search"
+			placeholder="Search demos by name, description, route or domain"
+			aria-label="Search demos"
+			bind:value={searchQuery}
+		/>
+		<nav class="domain-chips" aria-label="Domain taxonomy">
+			<button class="filter-chip" class:active={!filterDomain} onclick={() => (filterDomain = null)}>All domains</button>
+			{#each Object.entries(DEMO_DOMAINS) as [id, label]}
+				{#if domainCounts[id]}
+					<button
+						class="filter-chip"
+						class:active={filterDomain === id}
+						onclick={() => (filterDomain = filterDomain === id ? null : (id as DemoDomainId))}
+					>
+						{label}
+						<span class="filter-count">{domainCounts[id]}</span>
+					</button>
+				{/if}
+			{/each}
+		</nav>
+	</section>
 
 	{#if viewMode === 'graph'}
 		<section class="graph-panel">
@@ -1172,5 +1215,27 @@
 			align-items: flex-start;
 			gap: 0.25rem;
 		}
+	}
+
+	.domain-filter {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin: 0 0 1.25rem;
+	}
+	.demo-search {
+		width: 100%;
+		max-width: 32rem;
+		padding: 0.5rem 0.75rem;
+		border-radius: 0.375rem;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: transparent;
+		color: inherit;
+		font: inherit;
+	}
+	.domain-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
 </style>
