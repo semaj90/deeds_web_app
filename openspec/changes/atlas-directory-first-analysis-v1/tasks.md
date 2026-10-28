@@ -883,4 +883,45 @@ Target remains open. First blocker: `SVELTE_LSP_TEMPLATE_DEFINITION_TIMEOUT`; ex
 - **Route hardening:** Wave 1–3 focused regressions pass 29/29 across eight files. Coverage includes auth guards, schema validation, stable GET failure shape, browser-context envelope validation, and malformed JSON rejection before Redis acquisition in `agents-write`.
 - **Verification boundary:** Local `DEV_BYPASS_AUTH=true`; auth was verified in mocked route tests, not a live deployment. No datastore writes, Graphify run, service restart, migration, or branch merge occurred in this verification pass. Existing unrelated TypeScript diagnostic remains at `multiruntime-worker-receipt-v1.ts:153`; full `svelte-check` did not complete.
 - **Next:** review the resolver and route diff; separately review live-persistence authority and finish Wave 4 URL triage. Detailed evidence and reproduction commands: `docs/reports/production-hardening-route-waves-1-3-and-packet-writer-2026-10-28.md`.
+
+### 6.M67 Wave 4 admin URL and archive-candidate triage (2026-10-28)
+
+- **H3 admin URL triage:** no direct URL literals found in API fetch/URL construction. Three handlers read service URLs directly from `process.env`; `COUCHDB_URL` and `ROTORQUANT_URL` now resolve through `ENV` in `env.server.ts`, preserving defaults. The scoped TypeScript check reports no diagnostics in those edited files; it still reports the unrelated `multiruntime-worker-receipt-v1.ts:153` error.
+- **H4 inventory:** 34 `.bak`/`.backup` files, 430,068 bytes, 34 unique SHA-256 values across the listed candidate directories. Manifest: `.tmp/atlas/archive-candidates-sha256-20261028.json`, checksum `cd60ae9029bc5af5f441ae7bcfe2aaf19b9d03c14a4c0fa4f9a43416a3f821a8`. Inventory only; no move/delete performed.
+- **Security follow-up:** CouchDB handlers retain hard-coded fallback credentials. URL centralization does not resolve credential management or route-role review; leave that as an explicit production blocker.
+- **Validation:** Wave 1–3 focused suite remains 29/29 passing; `git diff --check` passes with existing CRLF normalization warnings. Evidence details: `docs/reports/production-hardening-route-waves-1-3-and-packet-writer-2026-10-28.md`.
+
+### 6.M68 H4 backup reference audit (2026-10-28)
+
+- The 34-file SHA-256 manifest is complete and has 34 unique content hashes. A source/evidence reference scan found `scripts/opencode/ingest-cards.mjs` explicitly includes `AGENTS.md.bak`; a graph path resolver test expects `.bak` classification, and derived reports contain backup source references.
+- **Decision:** do not move these files yet. Moving without updating/rebuilding those consumers and revision-bound evidence could break ingestion or create stale references. No files moved or deleted; reconcile the consumers first, then archive with before/after hash verification.
+- See the execution tracker in `docs/CODEBASE_DIRECTORY_MAP.md` and report `docs/reports/production-hardening-route-waves-1-3-and-packet-writer-2026-10-28.md`.
+
+### 6.M69 Atlas service URL ownership alignment (2026-10-28)
+
+- Centralized Atlas Rapids, Qdrant, strict-embedding, Ollama challenger, and Go Retrieval URL reads through `ENV` in `env.server.ts`; added default endpoint values there where a client already had the same fallback. Explicit endpoint overrides remain supported.
+- Validation: combined packet, Wave 1–3, and selected affected-client Vitest set passes 69/69 across 14 files. TypeScript reports only the existing `multiruntime-worker-receipt-v1.ts:153` union comparison error; no other diagnostic was reported.
+- This is not a live connectivity proof or complete H3 closure across `lib/server/data`, `retrieval`, and `legal`. Remaining URL fallbacks still need owner-by-owner triage. No service was started and no datastore changed.
 - **Indexes applied (2026-10-28, same authorization: DDL, no table dropped):** the 15 plain `CREATE INDEX IF NOT EXISTS` statements from the existing reviewed `drizzle/manual/20260606_task_semantic_packets_live_alignment.sql`, extracted to `.tmp/atlas/tsp-indexes-20261028.sql` and run in one transaction on `task_semantic_packets` only (2 rows). `pg_indexes` count 12 to 26 (14 new, `idx_task_semantic_packets_metadata_gin` already existed); row count unchanged. Rollback is `DROP INDEX` per name (indexes only). `npm run audit:drizzle` still reports live aligned 7 of 11 tables; the remainder (for example `feature_registry` LIVE_TABLE_MISSING) are other tables, not touched. Also: `svelte-check` unfiltered over 16,327 files found 1 error, in `multiruntime-worker-receipt-v1.ts:153` (not touched here); no diagnostics in files changed by this work.
+
+### 6.M70 Database credential fallback hardening (2026-10-28)
+
+- Removed embedded PostgreSQL credentials from the ACE context assembler and GPU MapReduce worker; both now require configured `DATABASE_URL` and fail closed when it is absent. Removed the default CouchDB password from the shared writer, admin rollback/synthesis routes, and RabbitMQ inference-log reader; these use centralized server environment values and reject missing credentials.
+- Added focused regressions for missing CouchDB credentials and database URL resolution. CouchDB writer, ACE context assembler and soft-routing suites pass 35/35. No live CouchDB/PostgreSQL request or datastore mutation was performed.
+- A source scan still finds legacy PostgreSQL credential fallbacks in `src/lib/config/env.server.ts`, `src/lib/config/pgvector-gpu-config.js`, `src/routes/dev/file-card/[...sourceRef]/+page.server.ts`, and `src/routes/api/atlas/schema-dependents/+server.ts`. These are not claimed fixed; review their owners and callers before changing defaults.
+- TypeScript reports only the pre-existing TS2367 at `src/lib/server/atlas/contracts/multiruntime-worker-receipt-v1.ts:153`; it is outside these edits. No migration, Graphify run, service restart, or datastore write occurred.
+
+### 6.M71 H1/H2 route acceptance and admin-role enforcement (2026-10-28)
+
+- Audited all 13 concrete route files named in the 2026-10-28 worklist. Their request-body routes now use schemas on the inspected path; auth boundaries were present for the reviewed endpoints. `batch-summary/jobs` is GET-only and guarded by `requireAdmin`.
+- Found two admin-prefixed operations (`admin/batch-embeddings/embed` and `admin/parents-atlas/actions`) that only required a signed-in user. Replaced those checks with the shared `requireAdmin`, which distinguishes unauthenticated (401) from non-admin (403) and accepts the repository's admin/superadmin policy. Added no-body-parse/no-side-effect regressions for both routes.
+- Added route-level denial and invalid-body tests for both ontology-resolution endpoints. Combined tests across all 13 worklist routes: 35 passed, 12 existing TODO tests. This is local route behavior evidence, not live authorization or persistence proof.
+- No datastore writes, migrations, service restarts, or Graphify execution occurred. Continue keeping the production gate blocked pending live auth/persistence proof and remaining H3/H4 items.
+
+### 6.M72 Schema-dependents DB fallback removal (2026-10-28)
+
+- Removed the route's embedded PostgreSQL credential. It now constructs a pool only from `ENV.DATABASE_URL`; when missing, valid GET/POST requests return a stable 503 response shape and do not attempt DB access. POST still validates its body before reporting the missing dependency.
+- Added route tests for configured-DB absence, consistent GET error keys, POST invalid-body 400, and valid-body 503/no query. Focused route suite passes 3/3.
+- This closes one of the remaining credential fallback sites from §6.M70. Other legacy values in `lib/config/env.server.ts`, `lib/config/pgvector-gpu-config.js`, and the development file-card route remain under review. No DB access/write occurred.
+- **`:8090` vision restart (2026-10-28, operator-approved "Yes, restart it with the vision profile"):** `/slots` idle, only the `--port 8090` llama-server (PID 25436) stopped gracefully, relaunched with `scripts/launch-turboquant.ps1 -Detached -StartupProfile ornith-1.5-vlm` and `LLAMA_ARG_MMPROJ_OFFLOAD=0`. `/props`: `ornith-1.5-9b`, `modalities.vision:true`. A direct `image_url` request (64x64 solid red PNG built in memory) returned "Red", confirming the message shape `/api/ai/emotion` now sends. GPU after launch: 7,684 MiB used, 341 MiB free, so no WSL RAPIDS/cuVS job fits until `:8090` is freed again (use the Prepare task). `:8085/health` returned nothing on one probe (not investigated). The emotion route itself was not called end to end (needs a session cookie and a webcam frame).
+- **Courtroom assets (repo search):** `sveltekit-frontend/static/models/courtroom/` holds 51 files: Mixamo-style clip `.glb`s (gesture_*, objection_*, run_*, walk_*, speaking_crossstage, point_audience, sprint_forward, room_*) and the rigged `character_alice.glb`, usable as the donor skeleton for the jester parts. `build/client/models/courtroom/` is a build copy. **4x4x6:** no definition in the repo (searched md/ts/mjs/py/sql/json/yaml/svelte; only unrelated numeric matches).
