@@ -1,7 +1,11 @@
-# ast-grep project config. ast-grep 0.45.3 has no built-in Svelte language.
-# Template-level structural matching only (HTML grammar); Svelte syntax such as {#if} is not understood.
-# Script blocks are NOT matched here: svelte-rune-crosscheck-v1.mjs extracts them to a temp .ts file.
-# The svelte/compiler splitter (scripts/atlas/svelte-dom-splitter-v1.mjs) stays the authority; this is a challenger.
+# ast-grep project config. ast-grep 0.45.3 has no built-in Svelte language; *.svelte is parsed with the HTML grammar.
+# Verified 2026-10-28 (docs/reports/parent-atlas-svelte-ast-grep-alignment-2026-10-28.md):
+#  - The CLI injects <script> blocks automatically (lang="ts" -> TypeScript, no lang -> JavaScript, <script module> too) with
+#    exact absolute UTF-8 byte offsets, so script-level patterns ($state, $props, imports, calls) match directly.
+#  - Template syntax is NOT understood: the HTML grammar errors on a bare ">" in text, so {#if a > b}, "=>" in handlers and
+#    {#snippet}/{@render} produce ERROR or plain-text nodes. Do not rely on template matches.
+#  - The Node binding (parse(Lang.Html)) does not inject; the script body is one raw_text node. Extract script blocks there.
+# The svelte/compiler splitter (scripts/atlas/svelte-dom-splitter-v1.mjs) stays the authority for template structure.
 ruleDirs: []
 languageGlobs:
   html: ["*.svelte"]
