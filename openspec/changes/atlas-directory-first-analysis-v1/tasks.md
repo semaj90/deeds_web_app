@@ -810,7 +810,7 @@ Target remains open. First blocker: `SVELTE_LSP_TEMPLATE_DEFINITION_TIMEOUT`; ex
 
 ### 6.M62 Handoff: ranking, UI fix, Drizzle drift and push status (2026-10-28)
 
-**TL;DR.** Read-only ranking, AST facts, Drizzle deep audit and one UI fix are committed locally on `handoff/working-tree-2026-10-25`. Nothing from this stretch has been pushed: the branch has diverged from `origin/main` and one outgoing file exceeds the 10 MB cap. No production DDL, canonical write, S3 upload, GPU job or Valkey write was performed. `:8090` was found down and not restarted by this session.
+**TL;DR.** Read-only ranking, AST facts, Drizzle deep audit and one UI fix are merged to `main` (PRs #128 and #129, operator-merged 2026-10-28; `origin/main` tip cbafa03d25a at handoff time). No production DDL, canonical write, S3 upload, GPU job or Valkey write was performed by this stretch. `:8090` was found down and not restarted by this session. Operator decision (option 3): the three files over 10 MB that reached `main` are intentionally kept in git (see Push status).
 
 | Area | Status | Commits / receipts |
 |---|---|---|
@@ -832,11 +832,18 @@ Target remains open. First blocker: `SVELTE_LSP_TEMPLATE_DEFINITION_TIMEOUT`; ex
 5. `atlas_source_refs` registration for 1,118 unbound `.ts` files (24 more unexplained), then binder re-run: canonical write, not done.
 6. Unresolved: `/demos/page-layouts` logs one aborted `__data.json` invalidation (likely test teardown).
 
-**Push status (merge-ready branch prepared, nothing pushed):**
-- Branch `handoff/merge-ready-2026-10-28` is `handoff/working-tree-2026-10-25` with one change: `docs/reports/current-source-selection-input-v1.json` (a 12.3 MB generated artifact introduced by commit 2f65116c058 on 2026-10-27, replacing a 919-byte stub) is pinned to its previous 919-byte version in the 40 commits from 2f65116c058 onward. Everything else is identical (`git diff --stat` between the two branches shows that file only). Those 40 commits were replayed with the same authors, dates and messages, so their hashes differ from the ones cited in this ledger; the original branch keeps the original hashes. The 12.3 MB version still exists on disk in the working tree and on the original local branch (not deleted); regenerate or archive it outside git.
-- Size gate: PASS (no blob over 10 MB in `origin/main..handoff/merge-ready-2026-10-28`; largest 2.28 MB). Secret scan of the outgoing diff (JSON/JSONL receipts excluded): no credentials found.
-- Divergence: 42 ahead, 16 behind `origin/main`; `git merge-tree --write-tree` shows the merge is conflict-free. Operator steps (not run here): merge `origin/main` into `handoff/merge-ready-2026-10-28`, push that branch, open a PR into `main` (earlier work reached `main` through PRs #126 and #127 from the handoff branch).
+**Push status (DONE, 2026-10-28):**
+- PR #128 merged `handoff/merge-ready-2026-10-28` (the branch with `docs/reports/current-source-selection-input-v1.json` pinned to its 919-byte stub; 40 commits replayed with new hashes, so hashes cited above for commits from 2f65116c058 onward exist on the original branch history, not on that branch). PR #129 then merged `handoff/working-tree-2026-10-25`, which carries the original history and the operator's commit 8bffbe01208 ("symbols?", 59 files, ~1.2M lines).
+- Result on `main`: the 12.3 MB `docs/reports/current-source-selection-input-v1.json` is the full version again (12,877,561 bytes), plus `docs/reports/current-packet-digest-producer-v1.census.json` (46.1 MB) and `docs/reports/neo4j-graph-export.json` (11.5 MB). The 10 MB cap was therefore NOT met on `main`; the operator chose to accept this ("i wanted everything there"). No history rewrite or force push was done. All three are below GitHub's 100 MB hard limit; the 46 MB file triggers GitHub's large-file warning (50 MB) only if it grows.
+- Commit 8bffbe01208 also swept in other sessions' previously uncommitted work (for example `scripts/atlas/file-ast-facts-v1.mjs`, `validate-graph-json-contract.mjs`, new Svelte grammar/parity scripts). Those edits were not reviewed by this session; treat their ledger claims (6.M61) as that session's.
+- Verified on `main`: no conflict markers in tracked text files; the `svelte.config.js` fix, its regression spec, the DRAFT migration file (file only, not applied to any database) and this section are present.
+- Local branch `handoff/working-tree-2026-10-25` was fast-forwarded to `origin/handoff/working-tree-2026-10-25` (f5aa0e18b2e); it is 1 commit behind `origin/main` (the PR #129 merge commit only).
 
-**Do not:** apply the draft DDL, run `drizzle-kit push`, write `atlas_packets.feature_label`, backfill source identities, run Graphify, hydrate Valkey, upload to S3 or run GPU jobs without explicit approval. Other sessions have uncommitted edits to `file-ast-facts-v1.mjs`, `directory-remediation-rank-v1.sql` and docs; review them before committing.
+**Resume here (after the break):**
+1. `git fetch origin && git switch main && git pull --ff-only` (or stay on the handoff branch and merge `origin/main`); working tree was clean apart from the `claude-mem`, `models/embeddinggemma_300m`, `turbovec` submodule entries and untracked `granite-docling-258M`.
+2. Restore `:8090` with the VS Code task `TurboQuant: Start (vision, CPU projector, :8090)` if chat or synthesis is needed. Confirm `legal-ai-postgres` is the target (`legal_ai_db`, user `legal_admin`; `scripts/atlas/drizzle-deep-audit-v1.mts` refuses on a fingerprint mismatch).
+3. Decide open decisions 1 to 5 above; none is started. Regenerate `.tmp/atlas` inputs with `scripts/atlas/directory-remediation-rank-v1.sql` and `file-ast-facts-v1.mjs` (inputs were scratchpad files: inventory Parquet, PageRank CSV, binding CSV) before relying on the sample or tickets.
+
+**Do not:** apply the draft DDL, run `drizzle-kit push`, write `atlas_packets.feature_label`, backfill source identities, run Graphify, hydrate Valkey, upload to S3 or run GPU jobs without explicit approval.
 
 - Next free number: 6.M63.
