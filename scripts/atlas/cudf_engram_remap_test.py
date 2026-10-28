@@ -43,5 +43,23 @@ class EngramRemap(unittest.TestCase):
         self.assertFalse(out["canonical_authority"])
 
 
+class DomainBucketTable(unittest.TestCase):
+    def test_generated_table_loads_and_is_exact_case(self):
+        table = m.load_domain_buckets(Path(__file__).resolve().parent / "engram-domain-buckets-v1.json")
+        self.assertEqual(len(table), 41)
+        self.assertEqual(table["Graph"], table["graph"])          # both raw spellings listed explicitly
+        self.assertTrue(all(0 <= v < 6 for v in table.values()))
+        self.assertEqual(table["Other"], 5)
+        self.assertNotIn("GRAPH", table)                           # no fuzzy matching for unseen spellings
+
+    def test_rejects_bad_tables(self):
+        import json, tempfile, os
+        with tempfile.TemporaryDirectory() as d:
+            bad = os.path.join(d, "bad.json")
+            Path(bad).write_text(json.dumps({"schema": "atlas.engram-domain-buckets.v1", "mapping": {"a": 6}}), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                m.load_domain_buckets(bad)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -91,6 +91,20 @@ def engram_token_id(
     return a0 * (ENGRAM_QUADRANTS * ENGRAM_DOMAIN_BUCKETS) + a1 * ENGRAM_DOMAIN_BUCKETS + a2
 
 
+def load_domain_buckets(path: str | Path) -> dict[str, int]:
+    """Load an engram domain-bucket table (schema atlas.engram-domain-buckets.v1) and validate it."""
+    doc = json.loads(Path(path).read_text(encoding="utf-8"))
+    if doc.get("schema") != "atlas.engram-domain-buckets.v1":
+        raise ValueError("unexpected domain-bucket schema")
+    mapping = doc.get("mapping")
+    if not isinstance(mapping, dict) or not mapping:
+        raise ValueError("domain-bucket mapping missing")
+    for key, bucket in mapping.items():
+        if not isinstance(key, str) or _as_index(bucket) is None or not 0 <= bucket < ENGRAM_DOMAIN_BUCKETS:
+            raise ValueError(f"invalid domain bucket entry: {key!r}")
+    return {k: int(v) for k, v in mapping.items()}
+
+
 def remap_engram_tokens(
     records: list[dict[str, Any]],
     domain_buckets: dict[str, int],
