@@ -26,6 +26,12 @@ const NEO4J_PASSWORD = ENV.NEO4J_PASSWORD;
 const PAGE_SIZE = Number.parseInt(ENV.ATLAS_NEO4J_EXPORT_PAGE_SIZE ?? '1000', 10);
 const MAX_EXPORT_ROWS = Number.parseInt(ENV.ATLAS_NEO4J_EXPORT_MAX_ROWS ?? '1000000', 10);
 
+async function sha256File(filePath) {
+  const hash = createHash('sha256');
+  for await (const chunk of fs.createReadStream(filePath)) hash.update(chunk);
+  return `sha256:${hash.digest('hex')}`;
+}
+
 async function main() {
   if (!NEO4J_USER || !NEO4J_PASSWORD) throw new Error('NEO4J_CREDENTIALS_REQUIRED');
   if (!Number.isSafeInteger(PAGE_SIZE) || PAGE_SIZE < 1 || !Number.isSafeInteger(MAX_EXPORT_ROWS) || MAX_EXPORT_ROWS < PAGE_SIZE) {
@@ -391,8 +397,8 @@ async function main() {
       properties: report,
       arrays: [{ key: 'nodes', filePath: nodesPath }, { key: 'edges', filePath: edgesPath }],
     });
-    const outputHash = createHash('sha256');
-    for await (const chunk of fs.createReadStream(reportPath)) outputHash.update(chunk);
+    const nodeArraySha256 = await sha256File(nodesPath);
+    const edgeArraySha256 = await sha256File(edgesPath);
     const receipt = {
       schema: 'NEO4J_GRAPH_EXPORT_COVERAGE_V2',
       runId,
@@ -415,7 +421,15 @@ async function main() {
         GRAPH_CANONICAL_LINEAGE: 'NOT_PROVEN',
       },
       outputPath: path.relative(outputBase, reportPath).replaceAll('\\', '/'),
-      outputSha256: `sha256:${outputHash.digest('hex')}`,
+      outputSha256: await sha256File(reportPath),
+      nodeArrayPath: path.relative(outputBase, nodesPath).replaceAll('\\', '/'),
+      edgeArrayPath: path.relative(outputBase, edgesPath).replaceAll('\\', '/'),
+      nodeArrayCount: nodesWriter.count,
+      edgeArrayCount: edgesWriter.count,
+      nodeArraySha256,
+      edgeArraySha256,
+      graphContentSha256: `sha256:${createHash('sha256').update(`atlas-graph-export-content-v1\n${nodeArraySha256}\n${edgeArraySha256}`).digest('hex')}`,
+      graphMetadata: { exportCoverage: report.metadata.exportCoverage },
       sourceRevision: null,
       workspaceRevision: null,
       executionId: null,

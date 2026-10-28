@@ -65,6 +65,8 @@ const ownerReceiptPaths = [
   '.tmp/atlas/okf-dspy-corpus-3.4.0-validation-20261027-v1.json',
   '.tmp/atlas/okf-dspy-corpus-current-validation-20261027-v2.json',
   '.tmp/atlas/okf-dspy-corpus-3.4.0-validation-20261027-v2.json',
+  ...fs.readdirSync(atlasTmp).filter((name) => /^okf-manifest-profile-validation-.*\.json$/.test(name)).map((name) => `.tmp/atlas/${name}`),
+  ...fs.readdirSync(atlasTmp).filter((name) => /^okf-ast-entity-prefill-profile-validation-.*\.json$/.test(name)).map((name) => `.tmp/atlas/${name}`),
 ];
 const supersededOwnerReceiptPaths = [
   '.tmp/atlas/okf-domain-schema-mismatch-feature-intelligence-20261027.json',

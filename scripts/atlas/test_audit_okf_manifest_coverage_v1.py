@@ -1,4 +1,7 @@
 from pathlib import Path
+import json
+import subprocess
+import sys
 from tempfile import TemporaryDirectory
 
 import yaml
@@ -34,6 +37,33 @@ def test_declared_schema_and_catalog_references_resolve() -> None:
         assert result["resolvedReferenceCount"] == 3
         assert result["unsafeReferences"] == []
         assert result["unregisteredStructuredFiles"] == []
+
+
+def test_cli_writes_immutable_manifest_profile_receipt() -> None:
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        okf = root / ".okf"
+        records = okf / "records"
+        records.mkdir(parents=True)
+        (records / "record.yaml").write_text("name: record\n", encoding="utf-8")
+        write_fixture(root, {"registries": {"records": {"path": "records/", "schemas": ["record.yaml"]}}})
+        receipt_relative = Path(".tmp/atlas/manifest-profile-validation.json")
+        command = [
+            sys.executable,
+            str(Path(__file__).with_name("audit_okf_manifest_coverage_v1.py")),
+            "--root", str(root),
+            "--receipt-out", str(receipt_relative),
+        ]
+        result = subprocess.run(command, check=False, capture_output=True, text=True)
+        assert result.returncode == 0
+        receipt = json.loads((root / receipt_relative).read_text(encoding="utf-8"))
+        assert receipt["status"] == "VALID"
+        assert receipt["files"][0]["path"] == ".okf/manifest.yaml"
+        assert receipt["files"][0]["validationKind"] == "PROFILE_CONTRACT"
+        assert receipt["canonicalAuthority"] is False
+        assert receipt["writesPerformed"] is False
+        repeated = subprocess.run(command, check=False, capture_output=True, text=True)
+        assert repeated.returncode != 0
 
 
 def test_schema_files_bind_only_declared_registry_members() -> None:

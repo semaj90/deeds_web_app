@@ -174,14 +174,14 @@ function protoCount() {
 
 const GATES = {
   // Signal density gates (block XGBoost training)
-  bm25_coverage:              { label: 'BM25 summary coverage ≥85%',              threshold: 85,    unit: '%' },
+  bm25_coverage:              { label: 'Packet summary coverage (BM25 prerequisite) ≥85%', threshold: 85, unit: '%' },
   concept_coverage_addressable: { label: 'concept_ids (addressable pkts) ≥60%',  threshold: 60,    unit: '%' },
   community_conf:             { label: 'community_conf (col+JSONB) ≥95%',          threshold: 95,    unit: '%' },
   // Retrieval gates
   qdrant_packets:             { label: 'Qdrant codebase_chunks_768 ≥7000',        threshold: 7000,  unit: 'pts' },
   neo4j_edges:                { label: 'Neo4j USED_CONCEPT ≥10000',               threshold: 10000, unit: 'edges' },
   // Training gate
-  xgboost_features:           { label: 'XGBoost feature rows ≥50000',             threshold: 50000, unit: 'rows' },
+  xgboost_features:           { label: 'XGBoost feature-row volume ≥50000 (not quality)', threshold: 50000, unit: 'rows' },
   // Domain gate
   domain_coverage:            { label: 'Domain classification (addressable pkts) ≥95%', threshold: 95, unit: '%' },
 };
@@ -454,11 +454,11 @@ async function main() {
 
   if (!gateResults.bm25_coverage.pass) {
     kanban.tasks.push({
-      id: 'backfill-bm25-summaries',
+      id: 'backfill-packet-summaries',
       priority: 'P0',
-      title: 'Backfill BM25 summaries',
-      detail: `Only ${pg.bm25_pct}% of packets have summaries (gate ≥85%). Run: npm run atlas:backfill-reward`,
-      command: 'node scripts/atlas/backfill-packet-metadata.mjs --apply',
+      title: 'Backfill packet summaries',
+      detail: `Only ${pg.bm25_pct}% of packets have summaries (gate ≥85%). Preview eligible updates with: npm run atlas:packet-summaries:backfill`,
+      command: 'npm run atlas:packet-summaries:backfill',
       blocks: ['xgboost_training'],
     });
   }

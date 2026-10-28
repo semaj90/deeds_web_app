@@ -10182,6 +10182,30 @@ server.registerTool(
 // ── Knowledge Graph Tools: Attention Rank, SOM Topology, Language Distribution, Playbook Lookup ──
 
 server.registerTool(
+  'graphify.status',
+  {
+    description:
+      'Read the existing Graphify lifecycle and Canonical Gate receipts. This tool never runs Graphify, ' +
+      'never writes state, and reports eligibility only as pending other gates.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    try {
+      const status = readGraphifyStatus({ repoRoot: ATLAS_REPOSITORY_ROOT });
+      return {
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult(status) }],
+      };
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : String(err);
+      return {
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult({ status: 'ERROR', error: error.slice(0, 500), readOnly: true, writesPerformed: false, runsGraphify: false }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
+server.registerTool(
   'atlas.workstation_status',
   {
     description:

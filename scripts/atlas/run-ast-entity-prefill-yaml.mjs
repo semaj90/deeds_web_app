@@ -17,9 +17,12 @@ import { ORF_AST_PREFILL_NODE_KIND_TO_SYMBOL_KIND_V1 } from './lib/orf-ast-kind-
 import { resolveSourceReadRootV1 } from './lib/source-read-root-v1.mjs';
 import { resolveSourceRefPathV1 } from './lib/resolve-source-ref-path-v1.mjs';
 import { matchExactSymbolVersionV1 } from './lib/match-exact-symbol-version-v1.mjs';
+import { validateAstEntityPrefillProfileV1 } from './lib/ast-entity-prefill-profile-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const configPath = path.resolve(ROOT, process.argv.find((a) => a.startsWith('--config='))?.slice(9) ?? '.okf/pipelines/ast-entity-prefill.yaml');
+const validateConfigOnly = process.argv.includes('--validate-config-only');
+const validationReceiptArg = process.argv.find((a) => a.startsWith('--receipt-out='))?.slice('--receipt-out='.length) ?? null;
 const all = process.argv.includes('--all');
 const requestedLimit = Number(process.argv.find((a) => a.startsWith('--limit='))?.slice(8) ?? 100);
 const limit = all ? 0 : Math.max(1, Number.isFinite(requestedLimit) ? requestedLimit : 100);
@@ -34,6 +37,63 @@ if (admittedSnapshotMode && (existsSync(outputPath) || existsSync(receiptPath)))
 const admission = admittedSnapshotMode
   ? JSON.parse(await fs.readFile(path.join(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json'), 'utf8'))
   : null;
+const { parse: parseYaml } = await import('yaml');
+const configBytes = await fs.readFile(configPath);
+let config;
+let profileErrors = [];
+try {
+  config = parseYaml(configBytes.toString('utf8'));
+  profileErrors = validateAstEntityPrefillProfileV1(config);
+} catch (error) {
+  profileErrors = [`YAML_PARSE_ERROR:${error.name ?? 'Error'}`];
+}
+if (validateConfigOnly) {
+  if (!validationReceiptArg) throw new Error('VALIDATE_CONFIG_ONLY_REQUIRES_RECEIPT_OUT');
+  if (admittedSnapshotMode || process.argv.some((argument) => argument.startsWith('--output=')) || process.argv.some((argument) => argument.startsWith('--source-ref='))) {
+    throw new Error('VALIDATE_CONFIG_ONLY_CANNOT_RUN_PIPELINE_OPTIONS');
+  }
+  const atlasTmp = path.resolve(ROOT, '.tmp/atlas');
+  const relativeConfigPath = path.relative(ROOT, configPath);
+  if (relativeConfigPath.startsWith('..') || path.isAbsolute(relativeConfigPath) || !relativeConfigPath.replaceAll('\\', '/').startsWith('.okf/')) {
+    throw new Error('VALIDATION_CONFIG_MUST_BE_UNDER_OKF');
+  }
+  const receiptPath = path.resolve(ROOT, validationReceiptArg);
+  const relativeReceiptPath = path.relative(atlasTmp, receiptPath);
+  if (!relativeReceiptPath || relativeReceiptPath.startsWith('..') || path.isAbsolute(relativeReceiptPath)) {
+    throw new Error('VALIDATION_RECEIPT_OUTSIDE_TMP_ATLAS');
+  }
+  const hash = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+  const validatorPath = path.relative(ROOT, fileURLToPath(import.meta.url)).replaceAll('\\', '/');
+  const helperPath = 'scripts/atlas/lib/ast-entity-prefill-profile-v1.mjs';
+  const validationEntry = {
+    path: path.relative(ROOT, configPath).replaceAll('\\', '/'),
+    sha256: hash(configBytes),
+    profile: config?.schema ?? null,
+    validationKind: 'PROFILE_CONTRACT',
+    valid: profileErrors.length === 0,
+    status: profileErrors.length === 0 ? 'PASS' : 'FAIL',
+    errors: profileErrors,
+    validatorPath,
+    validatorSha256: hash(await fs.readFile(path.resolve(ROOT, validatorPath))),
+    codeDependencies: [{ path: helperPath, sha256: hash(await fs.readFile(path.resolve(ROOT, helperPath))) }],
+  };
+  const receiptBody = {
+    schema: 'atlas.okf-owner-validation-receipt.v1',
+    status: profileErrors.length === 0 ? 'VALID' : 'INVALID',
+    validationKind: 'PROFILE_CONTRACT',
+    canonicalAuthority: false,
+    writesPerformed: false,
+    networkRequests: 0,
+    files: [validationEntry],
+  };
+  const receiptChecksum = hash(JSON.stringify(receiptBody));
+  const receipt = { ...receiptBody, receiptChecksum };
+  await fs.mkdir(path.dirname(receiptPath), { recursive: true });
+  await fs.writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { encoding: 'utf8', flag: 'wx' });
+  process.stdout.write(`${JSON.stringify({ status: receipt.status, receiptPath: path.relative(ROOT, receiptPath).replaceAll('\\', '/'), receiptChecksum, networkRequests: 0, writesPerformed: false }, null, 2)}\n`);
+  process.exit(profileErrors.length === 0 ? 0 : 2);
+}
+if (profileErrors.length) throw new Error(`AST_ENTITY_PREFILL_PROFILE_INVALID:${profileErrors.join(',')}`);
 const snapshotDigest = String(admission?.snapshotRevision ?? '').replace(/^sha256:/, '');
 const sourceRead = resolveSourceReadRootV1({
   repoRoot: ROOT,
@@ -43,13 +103,7 @@ const sourceRead = resolveSourceReadRootV1({
   workspaceRevision,
   admission,
 });
-const { parse: parseYaml } = await import('yaml');
 const { Lang, parse } = await import(pathToFileURL(path.join(ROOT, 'sveltekit-frontend/node_modules/@ast-grep/napi/index.js')).href);
-
-const config = parseYaml(await fs.readFile(configPath, 'utf8'));
-if (config?.schema !== 'atlas.ast-entity-prefill-pipeline.v1') throw new Error('invalid AST entity prefill YAML schema');
-if (config.extraction?.engine !== 'ast-grep-napi') throw new Error('YAML must select ast-grep-napi');
-if (config.embedding?.representation !== 'semantic_768' || config.embedding?.normalization !== 'L2_VECTOR') throw new Error('YAML embedding contract must remain semantic_768/L2_VECTOR');
 const astGrepPackageMetadata = JSON.parse(await fs.readFile(path.join(ROOT, 'sveltekit-frontend/node_modules/@ast-grep/napi/package.json'), 'utf8'));
 const astGrepExtractorRevision = resolveAstGrepExtractorRevisionV1(astGrepPackageMetadata);
 const astPrefillPipelineRevision = 'atlas.ast-entity-prefill-yaml.v2';

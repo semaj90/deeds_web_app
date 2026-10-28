@@ -8,6 +8,7 @@ import { runHypergraphFusionFacade } from '../dist/core/hypergraph-fusion-facade
 import { attachDomainClassificationHintToAcePacketV3, attachHypergraphEvidenceToAcePacketV3, buildAcePacketV3, verifyAcePacketV3 } from '../dist/core/ace-packet-v3.js';
 import { buildDomainClassificationV1 } from '../dist/core/domain-classification-v1.js';
 import { buildAcePacketV4, verifyAcePacketV4 } from '../dist/core/ace-packet-v4.js';
+import { proposeDirectoryEnrichmentAceLinkV1 } from '../dist/core/directory-enrichment-ace-link-v1.js';
 
 const sha = (c) => `sha256:${c.repeat(64)}`;
 const SRC = 'src/routes/api/case/[id]/+server.ts';
@@ -280,4 +281,30 @@ test('optional structural section: absent keeps checksum; present is sealed; CUR
   assert.throws(() => buildAcePacketV3(body(base, { structural: structural('s1', null) })), /provider_revision/);
   const bad = structural('s1', 'x'); bad.data.symbols[0].byte_end = 5;
   assert.throws(() => buildAcePacketV3(body(base, { structural: bad })), /byte_end/);
+});
+
+test('directory enrichment link is revision-bound and proposal-only', async () => {
+  const packet = buildAcePacketV3(body(await baseV2()));
+  const hint = {
+    schema: 'atlas.directory-enrichment-hint.v2',
+    directory_path: 'src/routes/api/case/[id]',
+    status: 'HINT',
+    packet_identity: null,
+    workspace_revision: packet.identity.workspace_revision,
+    inventory_manifest_digest: sha('f'),
+    producer_revision: 'directory-enrichment-test-v2',
+    kv: { file_count: 4, top_extension: '.ts' },
+    evidence_digest: sha('a'),
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
+  const link = proposeDirectoryEnrichmentAceLinkV1(packet, hint);
+  assert.equal(link.packet_key, packet.identity.packet_key);
+  assert.equal(link.packet_checksum, packet.integrity.packet_checksum);
+  assert.equal(link.status, 'HINT');
+  assert.equal(link.canonicalAuthority, false);
+  assert.equal(link.writesPerformed, false);
+  assert.match(link.proposal_checksum, /^sha256:[0-9a-f]{64}$/);
+  assert.throws(() => proposeDirectoryEnrichmentAceLinkV1(packet, { ...hint, workspace_revision: 'other' }), /WORKSPACE_REVISION_MISMATCH/);
+  assert.throws(() => proposeDirectoryEnrichmentAceLinkV1(packet, { ...hint, directory_path: 'src/other' }), /DIRECTORY_MEMBERSHIP_NOT_EXACT/);
 });
