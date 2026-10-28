@@ -44,6 +44,88 @@ CANONICAL_FEATURES = [
 ]
 
 
+# --- Engram 4x4x6 token remap (operator-defined axes, 2026-10-28) -------------------------------
+# axis 0 (4): SOM row quadrant   axis 1 (4): SOM col quadrant   axis 2 (6): domain bucket 0..5
+# engram_token_id = axis0 * 24 + axis1 * 6 + axis2  ->  0..95.
+# The repo has no canonical 6-value domain set (live atlas_packets.domain_class has 41 distinct,
+# case-inconsistent values), so the domain-to-bucket table is an explicit INPUT. A row whose SOM
+# cell or domain bucket is missing or out of range gets None, never a defaulted 0.
+ENGRAM_QUADRANTS = 4
+ENGRAM_DOMAIN_BUCKETS = 6
+ENGRAM_TOKEN_COUNT = ENGRAM_QUADRANTS * ENGRAM_QUADRANTS * ENGRAM_DOMAIN_BUCKETS  # 96
+
+
+def _as_index(value: Any) -> int | None:
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, float):
+        if value != value or value in (float("inf"), float("-inf")) or value != int(value):
+            return None
+        return int(value)
+    if isinstance(value, int):
+        return value
+    return None
+
+
+def som_quadrant(index: Any, size: int) -> int | None:
+    """Map a SOM row/col index in [0, size) to a quadrant 0..3 (floor(index * 4 / size))."""
+    i = _as_index(index)
+    if i is None or size < ENGRAM_QUADRANTS or not 0 <= i < size:
+        return None
+    return (i * ENGRAM_QUADRANTS) // size
+
+
+def engram_token_id(
+    som_row: Any,
+    som_col: Any,
+    domain_bucket: Any,
+    som_rows: int = 20,
+    som_cols: int = 20,
+) -> int | None:
+    """Return the 0..95 engram token for one record, or None when any axis is unresolved."""
+    a0 = som_quadrant(som_row, som_rows)
+    a1 = som_quadrant(som_col, som_cols)
+    a2 = _as_index(domain_bucket)
+    if a0 is None or a1 is None or a2 is None or not 0 <= a2 < ENGRAM_DOMAIN_BUCKETS:
+        return None
+    return a0 * (ENGRAM_QUADRANTS * ENGRAM_DOMAIN_BUCKETS) + a1 * ENGRAM_DOMAIN_BUCKETS + a2
+
+
+def remap_engram_tokens(
+    records: list[dict[str, Any]],
+    domain_buckets: dict[str, int],
+    som_rows: int = 20,
+    som_cols: int = 20,
+) -> dict[str, Any]:
+    """Assign engram tokens to records carrying som_row, som_col and domain_class.
+
+    `domain_buckets` maps an exact domain_class string to 0..5 (no case folding or aliasing).
+    Returns tokens in input order plus per-reason unresolved counts and a 96-bucket histogram.
+    """
+    tokens: list[int | None] = []
+    unresolved = {"no_som_cell": 0, "unmapped_domain": 0}
+    histogram = [0] * ENGRAM_TOKEN_COUNT
+    for rec in records:
+        bucket = domain_buckets.get(rec.get("domain_class")) if rec.get("domain_class") is not None else None
+        token = engram_token_id(rec.get("som_row"), rec.get("som_col"), bucket, som_rows, som_cols)
+        if token is None:
+            if som_quadrant(rec.get("som_row"), som_rows) is None or som_quadrant(rec.get("som_col"), som_cols) is None:
+                unresolved["no_som_cell"] += 1
+            else:
+                unresolved["unmapped_domain"] += 1
+        else:
+            histogram[token] += 1
+        tokens.append(token)
+    return {
+        "tokens": tokens,
+        "unresolved": unresolved,
+        "histogram": histogram,
+        "token_count": ENGRAM_TOKEN_COUNT,
+        "canonical_authority": False,
+        "writes_performed": False,
+    }
+
+
 def generate_feature_json_records(run_id: str) -> list[dict[str, Any]]:
     """Generates canonical ACE feature records for validation and ingestion."""
     records = []
