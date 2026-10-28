@@ -216,7 +216,7 @@
   },
   "share": "disabled",
   "mode": {},
-  "plugin": [],
+  "plugin": ["@xberg-io/opencode-xberg@1.3.11"],
   "command": {
     "rg-atlas": {
       "template": "Run the tool-first retrieval lane.\n\n1. Use `rg` for exact repo search.\n2. Use Atlas or LangExtract-style compact extraction for sourceRefs.\n3. Return only verified paths, symbols, and a short answer.\n4. If evidence is weak, stop and say so."
