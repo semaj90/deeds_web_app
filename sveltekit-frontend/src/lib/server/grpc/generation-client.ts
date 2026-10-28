@@ -18,7 +18,7 @@ import { ENV } from '$lib/server/env.server.js';
 
 export interface GenerateRequest {
   messages: Message[];
-  model: string;                       // "ornith-1.5-9b" | "gemma3-legal:latest"
+  model: string;                       // served llama-server model (currently "ornith-1.5-9b"); resolve via llama-server-model-resolver, never hardcode
   options?: GenerateOptions;
   tools?: Tool[];                      // Tool calling
   images?: Image[];                    // Global images (or per-message)

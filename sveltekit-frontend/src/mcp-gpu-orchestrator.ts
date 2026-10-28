@@ -302,7 +302,7 @@ class MCPGPUOrchestrator {
 	private async processLegalAnalysis(task: GPUTask): Promise<ServiceResponse> {
 		const prompt = this.buildLegalPrompt(task.data, task.context);
 
-		// Use Enhanced RAG + Gemma3 Legal if requested
+		// Use Enhanced RAG + the llama-server synthesis model (:8090, Ornith 1.5) if requested
 		if (task.config?.useRAG) {
 			const ragResponse = await productionServiceClient.callService('/api/v1/rag/query', {
 				query: task.data.query ?? task.data.document,
