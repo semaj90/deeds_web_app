@@ -10,6 +10,7 @@
  * POST { action: 'reset' } — reset counters (admin only)
  */
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 
@@ -192,12 +193,26 @@ export const GET: RequestHandler = async ({ locals }) => {
   });
 };
 
+const bitfrostBodySchema = z.discriminatedUnion('action', [
+  z.object({ action: z.literal('reset') }),
+  z.object({
+    action: z.literal('record'),
+    layer: z.enum(['L1', 'L2', 'L3']),
+    hit: z.boolean().optional(),
+    latency_ms: z.number().finite().min(0).max(600_000).optional(),
+  }),
+]);
+
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (locals.user?.role !== 'admin') {
     return json({ error: 'Admin only' }, { status: 403 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+  const parsedBody = bitfrostBodySchema.safeParse(await request.json().catch(() => null));
+  if (!parsedBody.success) {
+    return json({ error: 'Unknown action' }, { status: 400 });
+  }
+  const body = parsedBody.data;
 
   if (body.action === 'reset') {
     try {
@@ -214,11 +229,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   // Log L1/L2/L3 events from telemetry
   if (body.action === 'record') {
-    const { layer, hit, latency_ms } = body as {
-      layer: 'L1' | 'L2' | 'L3';
-      hit?: boolean;
-      latency_ms?: number;
-    };
+    const { layer, hit, latency_ms } = body;
 
     try {
       if (layer === 'L1') {

@@ -1,17 +1,18 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 import { resolveCanonicalPacketKey } from '$lib/server/atlas/identity/packet-identity-resolver.js';
 
-interface EmbedRequest {
-	packetKey?: string;
-	sourceRef?: string;
-	treeNodeId?: string;
-	titleId?: string;
-	text: string;
-}
+const embedRequestSchema = z.object({
+	packetKey: z.string().max(512).optional(),
+	sourceRef: z.string().max(1024).optional(),
+	treeNodeId: z.string().max(512).optional(),
+	titleId: z.string().max(512).optional(),
+	text: z.string().min(1).max(100_000),
+});
 
 interface EmbedResponse {
 	embedding: number[];
@@ -27,7 +28,14 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const startTime = Date.now();
 
 	try {
-		const body = (await request.json()) as EmbedRequest;
+		const parsedBody = embedRequestSchema.safeParse(await request.json().catch(() => null));
+		if (!parsedBody.success) {
+			return json(
+				{ embedding: [], cacheHit: false, duration: 0, error: 'Missing packetKey or sourceRef/treeNodeId/titleId or text' },
+				{ status: 400 }
+			);
+		}
+		const body = parsedBody.data;
 		const packetKey = body.packetKey?.trim() ?? '';
 		const sourceRef = body.sourceRef?.trim() ?? '';
 		const treeNodeId = body.treeNodeId?.trim() ?? '';

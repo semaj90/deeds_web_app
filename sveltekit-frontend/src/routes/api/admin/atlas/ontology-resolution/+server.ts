@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 import { pool } from '$lib/server/db/client.js';
@@ -149,9 +150,9 @@ export const GET: RequestHandler = async (event) => {
   }
 };
 
-interface ResolveLabelRequestBody {
-  label?: string;
-}
+const resolveLabelBodySchema = z.object({
+  label: z.string().trim().min(1).max(512),
+});
 
 /**
  * Live test tool for the Phase 1 resolver -- lets an admin type a raw label
@@ -161,13 +162,14 @@ interface ResolveLabelRequestBody {
 export const POST: RequestHandler = async (event) => {
   requireAdmin(event);
   try {
-    const body = (await event.request.json()) as ResolveLabelRequestBody;
-    if (!body.label?.trim()) {
+    const raw = await event.request.json().catch(() => null);
+    const parsed = resolveLabelBodySchema.safeParse(raw);
+    if (!parsed.success) {
       return json({ ok: false, error: 'label is required' }, { status: 400 });
     }
     const result = await resolveOntologyLabelV1({
       schemaVersion: 'atlas.ontology-resolution-request.v1',
-      label: body.label.trim(),
+      label: parsed.data.label,
     });
     return json({ ok: true, result });
   } catch (error) {

@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -16,24 +17,25 @@ function oakSidecarBaseUrl(): string {
   return ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
 }
 
-interface OakSearchRequestBody {
-  query?: string;
-  limit?: number;
-}
+const oakSearchBodySchema = z.object({
+  query: z.string().trim().min(1).max(1024),
+  limit: z.number().int().min(1).max(100).optional(),
+});
 
 export const POST: RequestHandler = async (event) => {
   requireAdmin(event);
   try {
-    const body = (await event.request.json()) as OakSearchRequestBody;
-    if (!body.query?.trim()) {
+    const raw = await event.request.json().catch(() => null);
+    const parsed = oakSearchBodySchema.safeParse(raw);
+    if (!parsed.success) {
       return json({ ok: false, error: 'query is required' }, { status: 400 });
     }
-    const limit = Number.isFinite(body.limit) ? Math.min(Math.max(1, Number(body.limit)), 100) : 20;
-
+    const body = parsed.data;
+    const limit = body.limit ?? 20;
     const res = await fetch(`${oakSidecarBaseUrl()}/oak/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: body.query.trim(), limit }),
+      body: JSON.stringify({ query: body.query, limit }),
       signal: AbortSignal.timeout(5000),
     });
 

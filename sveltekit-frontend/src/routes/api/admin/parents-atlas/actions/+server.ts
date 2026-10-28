@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -44,15 +45,19 @@ const TOPIC_LABELS: Record<string, string> = {
 	'graph-rag': 'Graph-Enhanced Retrieval (GraphRAG)',
 };
 
+const actionBodySchema = z.object({
+	action: z.enum(['hyperrag-expand', 'topology-rerank', 'compress-paths', 'compile-wiki']),
+	query: z.string().max(4000).optional(),
+});
+
 export const POST: RequestHandler = async ({ request, locals}) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const body = await request.json();
-		const { action, query } = body;
-
-		if (!action) {
-			return json({ success: false, error: 'Missing action parameter' }, { status: 400 });
+		const parsedBody = actionBodySchema.safeParse(await request.json().catch(() => null));
+		if (!parsedBody.success) {
+			return json({ success: false, error: 'Missing or unknown action parameter' }, { status: 400 });
 		}
+		const { action, query } = parsedBody.data;
 
 		// ─── 1. HyperRAG Multi-Query Expansion (real Qdrant llm_wiki_chunks) ────
 		if (action === 'hyperrag-expand') {

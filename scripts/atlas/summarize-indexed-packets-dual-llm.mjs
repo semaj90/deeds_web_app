@@ -74,9 +74,13 @@ async function summarizePacketBatch(packets) {
   const prompt = `Summarize these ${packets.length} indexed code packets in 1 sentence each:\n\n${packetsList}\n\nProvide concise, technical summaries for legal AI indexing.`;
 
   try {
+    // The route now requires a session or the internal service key (INTERNAL_SERVICE_KEY in .env.local).
     const response = await fetch(GEMMA4_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.INTERNAL_SERVICE_KEY ? { 'x-service-key': process.env.INTERNAL_SERVICE_KEY } : {}),
+      },
       body: JSON.stringify({
         model: process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
         messages: [

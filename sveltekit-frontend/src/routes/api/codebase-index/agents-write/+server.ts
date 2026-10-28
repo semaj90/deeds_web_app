@@ -20,6 +20,7 @@
  */
 
 import { json } from '@sveltejs/kit';
+import { z } from 'zod';
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -129,6 +130,13 @@ function buildDirMarkdown(
   return lines.join('\n');
 }
 
+const agentsWriteBodySchema = z.object({
+  filter: z.string().max(512).optional(),
+  minFiles: z.number().int().min(1).max(10_000).optional(),
+  rootOnly: z.boolean().optional(),
+  dryRun: z.boolean().optional(),
+});
+
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) {
     return json({ error: 'Unauthorized' }, { status: 401 });
@@ -138,12 +146,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({ error: 'Graph JSON not found. Run npm run index:codebase:fast first.' }, { status: 424 });
   }
 
-  const body = await request.json().catch(() => ({})) as {
-    filter?: string;
-    minFiles?: number;
-    rootOnly?: boolean;
-    dryRun?: boolean;
-  };
+  // An empty body means "all defaults"; a present but malformed body is a 400.
+  const rawBody = await request.json().catch(() => ({}));
+  const parsedBody = agentsWriteBodySchema.safeParse(rawBody);
+  if (!parsedBody.success) {
+    return json({ error: 'invalid_request', issues: parsedBody.error.issues.slice(0, 5) }, { status: 400 });
+  }
+  const body = parsedBody.data;
 
   const filter = body.filter ?? null;
   const minFiles = body.minFiles ?? 2;

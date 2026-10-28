@@ -280,11 +280,14 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
 // ── POST: force rebuild ────────────────────────────────────────────────────────
 
+const researchTopicsBodySchema = z.object({ action: z.enum(['rebuild']) });
+
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
-	const body = await request.json().catch(() => ({})) as Record<string, unknown>;
-	const action = body.action as string | undefined;
+	const parsedBody = researchTopicsBodySchema.safeParse(await request.json().catch(() => null));
+	if (!parsedBody.success) return json({ error: 'Unknown action' }, { status: 400 });
+	const { action } = parsedBody.data;
 
 	if (action === 'rebuild') {
 		const result = await buildResearchIndex();
