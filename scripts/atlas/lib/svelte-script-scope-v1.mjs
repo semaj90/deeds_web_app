@@ -9,12 +9,16 @@ export const SVELTE_RUNES = Object.freeze(['$state', '$derived', '$effect', '$pr
 
 export function extractScriptBlocks(source) {
   const blocks = [];
+  // HTML comments may contain example <script> blocks (documentation headers do); mask them with same-length spaces so indexes stay
+  // valid UTF-16 positions in the original, then read each block's text back from the original source.
+  const masked = source.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\r\n]/g, ' '));
   const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
-  for (let m = re.exec(source); m; m = re.exec(source)) {
+  for (let m = re.exec(masked); m; m = re.exec(masked)) {
     const attrs = m[1];
     const contentStart = m.index + m[0].indexOf('>') + 1;
+    const contentEnd = m.index + m[0].length - '</script>'.length;
     const lang = /\blang\s*=\s*["']?(ts|typescript)["']?/i.test(attrs) ? 'typescript' : 'javascript';
-    blocks.push({ attrs: attrs.trim(), language: lang, module: /\bmodule\b|context\s*=\s*["']module["']/i.test(attrs), text: m[2], utf16Start: contentStart, utf8Start: Buffer.byteLength(source.slice(0, contentStart), 'utf8') });
+    blocks.push({ attrs: attrs.trim(), language: lang, module: /\bmodule\b|context\s*=\s*["']module["']/i.test(attrs), text: source.slice(contentStart, contentEnd), utf16Start: contentStart, utf8Start: Buffer.byteLength(source.slice(0, contentStart), 'utf8') });
   }
   return blocks;
 }

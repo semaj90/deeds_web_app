@@ -54,3 +54,25 @@ test('output is deterministic, ordered by byte position, and carries no authorit
   assert.equal(a.writesPerformed, false);
   assert.ok(a.facts.every((f) => f.proposalOnly === true && !('confidence' in f)));
 });
+
+test('facts from different files or different source bytes never merge, even at the same name and start byte', () => {
+  const base = { kind: 'RUNE_CALL', name: '$state', startByte: 10, endByte: 20 };
+  const r = fuseObservations([
+    { ...base, source: 'ast-grep-cli', sourceRef: 'a.svelte', sourceDigest: 'sha256:1' }, { ...base, source: 'svelte-compiler', sourceRef: 'a.svelte', sourceDigest: 'sha256:1' },
+    { ...base, source: 'ast-grep-cli', sourceRef: 'b.svelte', sourceDigest: 'sha256:1' },
+    { ...base, source: 'svelte-compiler', sourceRef: 'a.svelte', sourceDigest: 'sha256:2' },
+  ], { groupOf });
+  assert.equal(r.facts.length, 3);
+  assert.deepEqual(r.facts.map((f) => f.status).sort(), ['AGREED_INDEPENDENT', 'SINGLE_GROUP', 'SINGLE_GROUP']);
+});
+
+test('reviewed kind normalization joins tree-sitter and compiler node names; an unreviewed native kind is rejected', () => {
+  const r = fuseObservations([
+    { source: 'ast-grep-napi', nativeKind: 'import_statement', name: './h', startByte: 0, endByte: 20 },
+    { source: 'svelte-compiler', nativeKind: 'ImportDeclaration', name: './h', startByte: 0, endByte: 20 },
+  ], { groupOf });
+  assert.equal(r.facts.length, 1);
+  assert.equal(r.facts[0].kind, 'IMPORT_DECLARATION');
+  assert.equal(r.facts[0].status, 'AGREED_INDEPENDENT');
+  assert.throws(() => fuseObservations([{ source: 'ast-grep-napi', nativeKind: 'mystery_node', name: 'x', startByte: 0 }], { groupOf }), /UNREVIEWED_NATIVE_KIND/);
+});

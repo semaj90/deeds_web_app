@@ -46,3 +46,14 @@ test('two blocks keep separate scopes and shifted spans', () => {
   assert.equal(r.occurrences.find((o) => o.name === 'shared').outcome, 'FREE_IDENTIFIER');
   assert.equal(verifySpans(Buffer.from(source, 'utf8'), [...r.occurrences, ...r.bindings]).ok, r.occurrences.length + r.bindings.length);
 });
+
+test('a <script> example inside an HTML comment is not a script block, and real blocks keep correct offsets after it', () => {
+  const src = '<!--\r\n  usage:\r\n  <script>\r\n    import X from "./x.svelte";\r\n  </script>\r\n-->\r\n<script lang="ts">\r\n  let a = $state(1);\r\n</script>\r\n';
+  const blocks = extractScriptBlocks(src);
+  assert.equal(blocks.length, 1);
+  assert.equal(blocks[0].language, 'typescript');
+  assert.equal(Buffer.from(src, 'utf8').subarray(blocks[0].utf8Start, blocks[0].utf8Start + blocks[0].text.length).toString('utf8'), blocks[0].text);
+  const r = analyzeSvelteScripts(src);
+  assert.ok(r.bindings.every((b) => b.name !== 'X'));
+  assert.equal(verifySpans(Buffer.from(src, 'utf8'), [...r.occurrences, ...r.bindings]).ok, r.occurrences.length + r.bindings.length);
+});
