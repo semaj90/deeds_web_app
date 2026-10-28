@@ -67,6 +67,28 @@ export const ANIMATION_TYPES = [
 
 export type CourtroomAnimType = typeof ANIMATION_TYPES[number];
 
+/**
+ * Webcam/face emotion (`FaceEmotion` in `$lib/ai/emotion-context`, produced by `/api/ai/emotion`
+ * from the llama-server :8090 vision lane) to the existing courtroom animation set. Only clips
+ * already in ANIMATION_TYPES are used; `happy` has no dedicated Mixamo clip, so it nods.
+ */
+export const EMOTION_TO_COURTROOM_ANIM = {
+	happy: 'nod',
+	sad: 'react_sad',
+	angry: 'react_angry',
+	fear: 'react_surprised',
+	surprise: 'react_surprised',
+	disgust: 'shake_head',
+	neutral: 'idle',
+} as const satisfies Record<string, CourtroomAnimType>;
+
+export type CourtroomEmotion = keyof typeof EMOTION_TO_COURTROOM_ANIM;
+
+/** Unknown or null emotion falls back to `idle`; never throws. */
+export function courtroomAnimForEmotion(emotion: string | null | undefined): CourtroomAnimType {
+	return (EMOTION_TO_COURTROOM_ANIM as Record<string, CourtroomAnimType>)[emotion ?? ''] ?? 'idle';
+}
+
 /** Visual effects that can be triggered during playback */
 export const TIMELINE_EFFECTS = [
 	'screen_flash', 'shake', 'spotlight', 'dim',
