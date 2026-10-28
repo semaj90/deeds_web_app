@@ -1,24 +1,27 @@
 -- Directory remediation rank (read-only, CPU, deterministic). Run from the repo root:
---   ATLAS_WIDE=<kv wide.parquet> duckdb -c ".read scripts/atlas/directory-remediation-rank-v1.sql"
+--   ATLAS_WIDE=<kv wide.parquet> [ATLAS_MAP=<directory map .md>] duckdb -c ".read scripts/atlas/directory-remediation-rank-v1.sql"
 -- Inputs : wide enrichment Parquet (python/atlas_directory_kv_enrichment_v1.py), docs/CODEBASE_DIRECTORY_MAP.md.
 -- Outputs: ./.tmp/atlas/directory_remediation_rank.parquet and ./.tmp/atlas/directory_remediation_tickets.jsonl (fixed paths; COPY needs literals).
 -- Tickets use the create_ticket shape of /api/admin/atlas/kanban-tickets (+ a sibling _proposal block); nothing is posted, no datastore is written.
--- The directory map is generated 2026-07-01 and covers fewer directories: its flags are STALE INPUT and are labelled as such.
+-- The map's own 'Generated:' date is carried into every ticket as map_input, so a stale map is visible, not assumed.
 -- Score is a fixed, auditable weighted sum; every term is a column. It is a proposal and carries no identity or retrieval vote.
 
 CREATE OR REPLACE TEMP TABLE wide AS SELECT * FROM read_parquet(getenv('ATLAS_WIDE'));
 
 CREATE OR REPLACE TEMP TABLE dirmap AS
-WITH lines AS (
-  SELECT unnest(string_split(content, chr(10))) AS line FROM read_text('docs/CODEBASE_DIRECTORY_MAP.md')
+WITH src AS (
+  SELECT content, regexp_extract(content, 'Generated: ([0-9-]+)', 1) AS generated FROM read_text(coalesce(nullif(getenv('ATLAS_MAP'), ''), 'docs/CODEBASE_DIRECTORY_MAP.md'))
+), lines AS (
+  SELECT unnest(string_split(content, chr(10))) AS line, generated FROM src
 ), cells AS (
-  SELECT string_split(line, '|') AS c FROM lines WHERE line LIKE '| %' AND line LIKE '%`%/`%'
+  SELECT string_split(line, '|') AS c, generated FROM lines WHERE line LIKE '| %' AND line LIKE '%`%/`%'
 )
 SELECT regexp_replace(trim(replace(c[3], '`', '')), '/$', '') AS map_dir,
        try_cast(replace(trim(c[4]), ',', '') AS INT) AS map_files,
        try_cast(trim(c[6]) AS INT) AS map_score,
        trim(c[7]) AS map_issues,
-       trim(c[2]) AS map_tier
+       trim(c[2]) AS map_tier,
+       generated AS map_generated
 FROM cells WHERE len(c) >= 8;
 
 CREATE OR REPLACE TEMP TABLE ranked AS
@@ -26,7 +29,7 @@ SELECT
   w.directory_path,
   w.file_count, w.bak_count, w.duplicate_content_files, w.svelte_count, w.ts_count, w.depth,
   w.evidence_digest,
-  m.map_score, m.map_issues, m.map_tier,
+  m.map_score, m.map_issues, m.map_tier, m.map_generated,
   -- terms (fixed weights; cap each so no single term dominates)
   least(40, 100 - coalesce(m.map_score, 100)) AS t_map_debt,
   least(30, 10 * w.bak_count) AS t_bak,
@@ -56,7 +59,7 @@ COPY (
     'permissionMode', 'proposal_only',
     'workspaceRevision', NULL, -- the wide input predates revision columns; a promoted ticket needs a real workspace revision
     '_proposal', json_object('status', 'PROPOSED', 'evidence_digest', evidence_digest, 'map_issues', map_issues,
-                              'map_input', 'STALE_2026-07-01', 'map_matched', map_matched, 'canonicalAuthority', false, 'writesPerformed', false)
+                              'map_input', 'directory-map generated ' || coalesce(map_generated, 'UNMATCHED'), 'map_matched', map_matched, 'canonicalAuthority', false, 'writesPerformed', false)
   ) AS ticket
   FROM ranked WHERE score > 0 QUALIFY row_number() OVER (ORDER BY score DESC, directory_path ASC) <= 50
   ORDER BY score DESC, directory_path ASC
