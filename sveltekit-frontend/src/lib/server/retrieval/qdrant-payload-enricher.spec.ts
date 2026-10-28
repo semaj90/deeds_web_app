@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { PgDialect } from 'drizzle-orm/pg-core';
 import { QdrantPayloadEnricher } from './qdrant-payload-enricher.js';
 
 const state = vi.hoisted(() => ({
   chunkRows: [] as any[],
   packetRows: [] as any[],
+  payloads: new Map<string | number, Record<string, unknown>>(),
 }));
 
 const dbMock = vi.hoisted(() => ({
@@ -12,11 +14,18 @@ const dbMock = vi.hoisted(() => ({
   })),
   execute: vi.fn(async () => {
     const row = state.packetRows.shift();
-    return { rows: row ? [row] : [] };
+    return { rows: Array.isArray(row) ? row : row ? [row] : [] };
   }),
 }));
 
 const qdrantUpsert = vi.hoisted(() => vi.fn(async () => undefined));
+const qdrantSetPayload = vi.hoisted(() => vi.fn(async (_collection: string, request: { points: Array<string | number>; payload: Record<string, unknown> }) => {
+  state.payloads.set(request.points[0], request.payload);
+}));
+const qdrantRetrieve = vi.hoisted(() => vi.fn(async (_collection: string, request: { ids: Array<string | number> }) => {
+  const id = request.ids[0];
+  return [{ id, vector: { content: [0.25, 0.75] }, payload: state.payloads.get(id) ?? {} }];
+}));
 
 vi.mock('../db/client.js', () => ({
   db: dbMock,
@@ -25,6 +34,7 @@ vi.mock('../db/client.js', () => ({
 vi.mock('../vector/qdrant-manager.js', () => ({
   qdrant: {
     upsert: qdrantUpsert,
+    client: { setPayload: qdrantSetPayload, retrieve: qdrantRetrieve },
   },
 }));
 
@@ -56,6 +66,7 @@ function makePacketRows(count: number) {
     const sourceRef = `src/proof/file-${index}.ts`;
     return {
       packet_key: `packet-${index}`,
+      feature_id: `feature-${index}`,
       tree_node_id: `tree-${index}`,
       feature_label: `Feature ${index}`,
       function_symbol: `symbol_${index}`,
@@ -89,9 +100,12 @@ describe('QdrantPayloadEnricher', () => {
   beforeEach(() => {
     state.chunkRows = [];
     state.packetRows = [];
+    state.payloads.clear();
     dbMock.select.mockClear();
     dbMock.execute.mockClear();
     qdrantUpsert.mockClear();
+    qdrantSetPayload.mockClear();
+    qdrantRetrieve.mockClear();
   });
 
   it('emits canonical packet lineage for a 20-row synthetic fixture', async () => {
@@ -103,21 +117,22 @@ describe('QdrantPayloadEnricher', () => {
 
     expect(result.success).toBe(20);
     expect(result.failed).toBe(0);
-    expect(qdrantUpsert).toHaveBeenCalledTimes(20);
+    expect(qdrantUpsert).not.toHaveBeenCalled();
+    expect(qdrantSetPayload).toHaveBeenCalledTimes(20);
+    const firstQuery = (dbMock.execute.mock.calls as unknown as [Parameters<PgDialect['sqlToQuery']>[0]][])[0][0];
+    const compiled = new PgDialect().sqlToQuery(firstQuery);
+    expect(compiled.sql).toContain('FROM atlas_packet_chunk_lineage l');
+    expect(compiled.sql).toContain("l.revision_status = 'PROVEN'");
+    expect(compiled.sql).toContain('c.workspace_revision = p.workspace_revision_key');
+    expect(compiled.sql).toContain('FROM atlas_workspace_source_bindings b');
+    expect(compiled.params).toEqual([1, 'src/proof/file-0.ts']);
 
     for (let index = 0; index < 20; index += 1) {
-      const call = qdrantUpsert.mock.calls[index]?.[0] as {
-        collection: string;
-        points: Array<{ id: string | number; payload: Record<string, unknown> }>;
-      };
-
-      expect(call.collection).toBe('codebase_chunks_768');
-      expect(call.points).toHaveLength(1);
-
-      const point = call.points[0];
-      const payload = point.payload;
-
-      expect(point.id).toBe(`qdrant-${index}`);
+      const call = qdrantSetPayload.mock.calls[index] as unknown as [string, { points: Array<string | number>; payload: Record<string, unknown>; wait: boolean }];
+      expect(call[0]).toBe('codebase_chunks_768');
+      expect(call[1].points).toEqual([`qdrant-${index}`]);
+      expect(call[1].wait).toBe(true);
+      const payload = call[1].payload;
       expect(payload.packet_key).toBe(`packet-${index}`);
       expect(payload.qdrant_point_id).toBe(`qdrant-${index}`);
       expect(payload.source_ref).toBe(`src/proof/file-${index}.ts`);
@@ -161,6 +176,7 @@ describe('QdrantPayloadEnricher', () => {
     state.packetRows = [
       {
         packet_key: 'packet-missing',
+        feature_id: 'feature-missing',
         tree_node_id: 'tree-missing',
         feature_label: 'Feature missing',
         sha256: 'sha256-missing',
@@ -184,5 +200,55 @@ describe('QdrantPayloadEnricher', () => {
     expect(result.success).toBe(0);
     expect(result.failed).toBe(1);
     expect(qdrantUpsert).not.toHaveBeenCalled();
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
+  });
+
+  it('refuses ambiguous or mismatched packet bindings instead of selecting by source path', async () => {
+    state.chunkRows = makeChunkRows(1);
+    const packet = makePacketRows(1)[0];
+    state.packetRows = [[packet, { ...packet, packet_key: 'other-packet' }]];
+
+    const enricher = new QdrantPayloadEnricher();
+    expect(await enricher.enrich([], false)).toMatchObject({ success: 0, failed: 1 });
+    expect(qdrantUpsert).not.toHaveBeenCalled();
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
+
+    state.packetRows = [{ ...packet, packet_key: 'other-packet' }];
+    expect(await enricher.enrich([], false)).toMatchObject({ success: 0, failed: 1 });
+    expect(qdrantUpsert).not.toHaveBeenCalled();
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
+
+    state.packetRows = [{ ...packet, feature_id: 'other-feature' }];
+    expect(await enricher.enrich([], false)).toMatchObject({ success: 0, failed: 1 });
+    expect(qdrantUpsert).not.toHaveBeenCalled();
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
+  });
+
+  it('refuses a chunk without a qualified packet binding', async () => {
+    state.chunkRows = makeChunkRows(1);
+    expect(await new QdrantPayloadEnricher().enrich([], false)).toMatchObject({ success: 0, failed: 1 });
+    expect(qdrantUpsert).not.toHaveBeenCalled();
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
+  });
+
+  it('refuses packet bindings missing canonical feature or revision metadata', async () => {
+    state.chunkRows = makeChunkRows(1);
+    const packet = makePacketRows(1)[0];
+    state.packetRows = [{ ...packet, feature_label: null }];
+    expect(await new QdrantPayloadEnricher().enrich([], false)).toMatchObject({ success: 0, failed: 1 });
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
+
+    state.packetRows = [{ ...packet, source_revision: null }];
+    expect(await new QdrantPayloadEnricher().enrich([], false)).toMatchObject({ success: 0, failed: 1 });
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
+  });
+
+  it('refuses a missing Qdrant point ID instead of substituting the PostgreSQL row ID', async () => {
+    state.chunkRows = [{ ...makeChunkRows(1)[0], qdrant_id: null }];
+    state.packetRows = makePacketRows(1);
+    expect(await new QdrantPayloadEnricher().enrich([], false)).toMatchObject({ success: 0, failed: 1 });
+    expect(dbMock.execute).not.toHaveBeenCalled();
+    expect(qdrantUpsert).not.toHaveBeenCalled();
+    expect(qdrantSetPayload).not.toHaveBeenCalled();
   });
 });

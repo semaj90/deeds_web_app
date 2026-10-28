@@ -1,6 +1,6 @@
 {
   "schema": "atlas.retrieval-dag-prefill-lut-receipt.v1",
-  "generatedAt": "2026-10-16T01:56:58.797Z",
+  "generatedAt": "2026-10-27T18:46:45.990Z",
   "writesPerformed": false,
   "artifacts": {
     "lutJsonPath": "sveltekit-frontend/data/atlas-tensor-proof/retrieval_dag_prefill_lut_v1.json",

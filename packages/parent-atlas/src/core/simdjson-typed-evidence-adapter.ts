@@ -41,6 +41,7 @@ export type TypedEvidenceEnvelopeV1 = z.infer<typeof typedEvidenceEnvelopeSchema
 
 export const typedEvidenceFailureCodeSchema = z.enum([
   'JSON_PARSE_FAILED',
+  'DUPLICATE_KEY',
   'UTF8_INVALID',
   'SCHEMA_REJECTED',
   'SCHEMA_REVISION_UNSUPPORTED',

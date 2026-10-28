@@ -75,6 +75,7 @@ function fixture(graph = true) {
       candidateOrdinal: 0,
       canonicalId: 'candidate:value',
       packetKey: 'packet:value',
+      sourceRef: entry.sourceRef,
       treeNodeId: null,
       symbolVersionId: null,
       workspaceRevision: record.workspaceRevision,

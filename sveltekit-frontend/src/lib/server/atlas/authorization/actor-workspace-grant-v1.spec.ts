@@ -23,7 +23,7 @@ describe('actor-workspace-grant-v1 (ACTOR-WORKSPACE-GRANT-V1 & ACTOR-WORKSPACE-G
 		status: 'GRANTED',
 		authoritativeOwner: 'auth_database_rbac_v2',
 		issuedAt: '2026-10-24T00:00:00.000Z',
-		expiresAt: '2026-10-25T00:00:00.000Z',
+		expiresAt: '2099-01-01T00:00:00.000Z',
 		canonicalAuthority: false,
 		writesPerformed: false,
 	};

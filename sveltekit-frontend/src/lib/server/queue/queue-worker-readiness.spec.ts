@@ -76,7 +76,7 @@ describe('queue worker readiness', () => {
   });
 
   it('propagates consume registration failure and records FAILED', async () => {
-    rabbitmq.consume.mockRejectedValue(new Error('broker unavailable'));
+    rabbitmq.consume.mockRejectedValueOnce(new Error('broker unavailable'));
     const worker = new FailingWorker();
 
     await expect(worker.start()).rejects.toThrow('broker unavailable');

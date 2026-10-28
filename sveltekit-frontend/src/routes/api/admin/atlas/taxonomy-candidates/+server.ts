@@ -54,7 +54,11 @@ export const POST: RequestHandler = async (event) => {
     }
     const parsed = taxonomyCandidateDecisionRequestSchema.safeParse(rawBody);
     if (!parsed.success) {
-      return json({ ok: false, error: 'invalid taxonomy candidate decision', issues: parsed.error.issues }, { status: 400 });
+      const issueDetails = parsed.error.issues.map((i) => i.path.join('.')).filter(Boolean).join(', ');
+      const errorMessage = issueDetails
+        ? `invalid taxonomy candidate decision: missing or invalid ${issueDetails}`
+        : 'invalid taxonomy candidate decision';
+      return json({ ok: false, error: errorMessage, issues: parsed.error.issues }, { status: 400 });
     }
     const body = parsed.data;
     if (!admin.id.trim()) return json({ ok: false, error: 'authenticated admin identity is unavailable' }, { status: 401 });

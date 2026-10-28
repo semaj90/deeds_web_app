@@ -4,6 +4,7 @@ vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     OLLAMA_CHAT_MODEL: 'ornith-1.5-9b',
     OLLAMA_EMBED_MODEL: 'embeddinggemma:latest',
+    ROTORQUANT_MODEL_PATH: 'C:\\Users\\james\\Videos\\deeds-web-app\\models\\test-stub.gguf',
   },
 }));
 

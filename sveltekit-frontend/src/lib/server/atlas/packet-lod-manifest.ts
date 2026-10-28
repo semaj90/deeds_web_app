@@ -28,7 +28,7 @@ export function determineLod(destination: string): '0' | '1' | '2' | '3' {
 
 export function estimateTokenCount(text: string): number {
   // Rough estimate: ~4 chars per token (GPT tokenizer average)
-  return Math.ceil(text.length / 4);
+  return Math.ceil([...text].length / 4);
 }
 
 export async function buildPacketLodManifest(

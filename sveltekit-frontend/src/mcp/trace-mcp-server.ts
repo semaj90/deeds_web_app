@@ -5807,12 +5807,13 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { readFileSync as _readFileSync } from 'node:fs';
 import { resolve as _resolvePath } from 'node:path';
+import { verifyMcpOperatorToken } from './operator-token-verifier.js';
 
 const execFileAsync = promisify(execFile);
 
 function requireToken(token: unknown): string | null {
-  if (!token || typeof token !== 'string' || token.trim() === '') return 'operator_token required';
-  return null;
+  const verdict = verifyMcpOperatorToken(token);
+  return verdict.authorized ? null : verdict.reason;
 }
 
 // ── ops.propose_patch ──────────────────────────────────────────────────────────

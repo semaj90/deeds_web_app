@@ -18,6 +18,7 @@ import argparse
 import hashlib
 import json
 from collections import Counter, defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Optional, Sequence
 
@@ -88,11 +89,46 @@ def floor_sweep(conf: Sequence[float], correct: Sequence[bool], floors: Sequence
     return rows
 
 
+def _human_reviewer_id(row: dict[str, Any], *, second: bool = False) -> Optional[str]:
+    keys = ("secondReviewer", "secondReviewerId", "second_reviewer") if second else ("reviewer", "reviewerId", "reviewer_id")
+    value = next((row.get(key) for key in keys if row.get(key) is not None), None)
+    if not isinstance(value, str):
+        return None
+    normalized = value.strip()
+    reviewer_tokens = normalized.casefold().replace("-", "_").replace(".", "_").split("_")
+    forbidden_tokens = {"synthetic", "model", "agent", "bot", "assistant", "llm", "dspy", "classifier", "predictor"}
+    if not normalized or "test" in reviewer_tokens or "not_a_human" in normalized.casefold() or any(token in forbidden_tokens for token in reviewer_tokens):
+        return None
+    return normalized
+
+
+def _has_human_review_provenance(row: dict[str, Any], *, second: bool = False) -> bool:
+    if _human_reviewer_id(row, second=second) is None:
+        return False
+    timestamp_keys = ("secondReviewedAt", "second_reviewed_at") if second else ("reviewedAt", "reviewed_at")
+    reviewed_at = next((row.get(key) for key in timestamp_keys if row.get(key)), None)
+    if not isinstance(reviewed_at, str) or not reviewed_at.strip():
+        return False
+    try:
+        parsed_at = datetime.fromisoformat(reviewed_at.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return parsed_at.tzinfo is not None and parsed_at.utcoffset() is not None
+
+
 def evaluate(rows: list[dict[str, Any]], predictor: Predictor, *, revision_qualified_only: bool = False) -> dict[str, Any]:
     considered = [r for r in rows if not revision_qualified_only or r.get("sourceRevision")]
-    # Reviewer escape hatches are counted but are not gold labels.
+    # Escape-hatch labels and labels without a verified human reviewer are never gold.
     non_gold = [r for r in considered if r.get("reviewedGroup") in NON_GOLD_CHOICES]
-    gold_rows = [r for r in considered if r.get("reviewedGroup") and r.get("reviewedGroup") not in NON_GOLD_CHOICES]
+    labeled_rows = [r for r in considered if r.get("reviewedGroup") and r.get("reviewedGroup") not in NON_GOLD_CHOICES]
+    unverified_review_rows = [r for r in labeled_rows if not _has_human_review_provenance(r)]
+    gold_rows = [r for r in labeled_rows if _has_human_review_provenance(r)]
+    double_reviewed = [
+        r for r in gold_rows
+        if _has_human_review_provenance(r, second=True)
+        and _human_reviewer_id(r, second=True).casefold() != _human_reviewer_id(r).casefold()
+    ]
+    minimum_double_review_rows = (len(gold_rows) + 9) // 10
     warnings: list[str] = []
     report: dict[str, Any] = {
         "schema": SCHEMA,
@@ -101,13 +137,17 @@ def evaluate(rows: list[dict[str, Any]], predictor: Predictor, *, revision_quali
         "writesPerformed": False,
         "rowsConsidered": len(considered),
         "goldRows": len(gold_rows),
+        "unverifiedReviewRows": len(unverified_review_rows),
+        "doubleReviewedGoldRows": len(double_reviewed),
+        "doubleReviewCoverage": len(double_reviewed) / len(gold_rows) if gold_rows else 0.0,
+        "minimumDoubleReviewRows": minimum_double_review_rows,
         "reviewedNonGoldRows": dict(Counter(r["reviewedGroup"] for r in non_gold)),
         "revisionQualifiedOnly": revision_qualified_only,
         "warnings": warnings,
     }
     if not gold_rows:
         report["status"] = "NO_GOLD_LABELS"
-        warnings.append("No row has a human reviewedGroup; accuracy is NOT computable. Weak-label agreement below is a diagnostic only.")
+        warnings.append("No row has a non-test human reviewer and reviewedGroup; accuracy is NOT computable. Weak-label agreement below is a diagnostic only.")
     else:
         gold = [r["reviewedGroup"] for r in gold_rows]
         preds = [predictor(r) for r in gold_rows]
@@ -127,6 +167,9 @@ def evaluate(rows: list[dict[str, Any]], predictor: Predictor, *, revision_quali
         if len(gold_rows) < MIN_TOTAL_FOR_TRUST or thin:
             report["status"] = "INSUFFICIENT_SAMPLE"
             warnings.append(f"n={len(gold_rows)} (<{MIN_TOTAL_FOR_TRUST}) or classes below {MIN_PER_CLASS_FOR_TRUST} examples: {thin}. Numbers are not trustworthy.")
+        elif len(double_reviewed) < minimum_double_review_rows:
+            report["status"] = "INSUFFICIENT_REVIEWER_COVERAGE"
+            warnings.append(f"double-reviewed rows={len(double_reviewed)} (<{minimum_double_review_rows}, 10% of gold rows); independent-review coverage is insufficient.")
         else:
             report["status"] = "SCORED"
     # Diagnostic, explicitly NOT accuracy: agreement with the weak label the draft was proposed from.

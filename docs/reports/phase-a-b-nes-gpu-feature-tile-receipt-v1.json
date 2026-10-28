@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.gpu.feature-tile-receipt.v1",
+  "generated_at": "2026-10-27T04:45:30.000Z",
+  "gate": "GPU-FEATURE-TILE-PHASE-A-B",
+  "status": "PROPOSAL_ONLY",
+  "authority": false,
+  "writesPerformed": false,
+  "phases": {
+    "PHASE_A": {
+      "name": "NES Taxonomy Inventory & Feature-Label Reconciliation",
+      "status": "PROVEN",
+      "canonicalDomains": {
+        "auth": 1,
+        "ui": 2,
+        "retrieval": 3,
+        "network": 4,
+        "database": 5,
+        "cache": 6,
+        "agent": 7,
+        "graph": 8,
+        "ml": 9
+      },
+      "hotFeatureBitsAssigned": 62,
+      "hotFeaturePaletteFile": "python/atlas_corpus_lib/atlas_corpus_lib/nes_taxonomy_registry.py"
+    },
+    "PHASE_B": {
+      "name": "Deterministic Bitencoded Directory Feature Tiles",
+      "status": "PROVEN",
+      "descriptor": "AtlasFeatureRow",
+      "descriptorByteSize": 24,
+      "alignmentBytes": 4,
+      "offsetsVerified": {
+        "candidate_ordinal": 0,
+        "domain_id": 4,
+        "symbol_kind_id": 6,
+        "feature_mask_lo": 8,
+        "feature_mask_hi": 12,
+        "relation_offset": 16,
+        "relation_count": 20,
+        "diagnostic_flags": 22
+      },
+      "filterPerformance": {
+        "rowCount": 16384,
+        "latencyMicroseconds": 11.099,
+        "throughputRowsPerSec": 1476170000,
+        "scalarOracleParity": true
+      },
+      "artifacts": {
+        "categoricalRowBytes": 24,
+        "numericDimensions": 64,
+        "numericPrecision": "FP32_LE",
+        "envelopeSchema": "atlas.gpu.feature-tile.v1"
+      }
+    }
+  },
+  "distribution": {
+    "wheel": "python/atlas_corpus_lib/dist/atlas_corpus_lib-0.1.0-cp314-cp314-linux_x86_64.whl",
+    "wheelSha256": "903d1c40bed86dae24b0347ffb56658d1c5e634e7dce1873c4f7858e02ca6b9e",
+    "cHeader": "packages/atlas-native-core/include/gpu_feature_tile.hpp",
+    "cBinary": "packages/atlas-native-core/build/gpu_feature_tile_smoke"
+  }
+}

@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS public.atlas_packet_identity_registry_v1 (
   packet_key TEXT PRIMARY KEY
     CHECK (packet_key ~ '^packet:[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'),
   repository_id UUID NOT NULL REFERENCES public.atlas_repository_identity(repository_id) ON DELETE RESTRICT,
-  membership_repository_scope TEXT NOT NULL
-    CHECK (membership_repository_scope ~ '^repo:[^[:cntrl:]]+$'),
+  membership_repository_scope TEXT NOT NULL,
   source_ref TEXT NOT NULL
     CHECK (source_ref <> '' AND source_ref = btrim(source_ref)
       AND source_ref !~ E'(^/|\\\\|(^|/)\\.\\.?(/|$)|//)'),
@@ -15,6 +14,8 @@ CREATE TABLE IF NOT EXISTS public.atlas_packet_identity_registry_v1 (
   key_recipe_revision TEXT NOT NULL DEFAULT 'PacketKeyV2@1'
     CHECK (key_recipe_revision = 'PacketKeyV2@1'),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT atlas_packet_identity_registry_v1_root_repository_check
+    CHECK (membership_repository_scope = 'repo:root'),
   CONSTRAINT atlas_packet_identity_registry_v1_repository_source_kind_key
     UNIQUE (repository_id, source_ref, packet_kind),
   CONSTRAINT atlas_packet_identity_registry_v1_scope_source_kind_key
@@ -34,8 +35,10 @@ CREATE TABLE IF NOT EXISTS public.atlas_packet_identity_aliases_v1 (
   evidence_ref TEXT NOT NULL CHECK (evidence_ref <> '' AND evidence_ref = btrim(evidence_ref)),
   evidence_digest TEXT NOT NULL CHECK (evidence_digest ~ '^sha256:[0-9a-f]{64}$'),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT atlas_packet_identity_aliases_v1_no_self_check CHECK (alias_key <> canonical_packet_key)
+  CONSTRAINT atlas_packet_identity_aliases_v1_no_self_check CHECK (alias_key <> canonical_packet_key),
+  CONSTRAINT atlas_packet_identity_aliases_v1_storage_locator_check CHECK (alias_key = storage_packet_key),
+  -- Forward: alias_key is the primary key, so one storage locator maps to exactly one canonical key.
+  -- Reverse: one canonical key owns exactly one storage locator. A second legacy row for the same
+  -- source file is an ambiguity to resolve, not a mapping to accept. (Schema-owner decision.)
+  CONSTRAINT atlas_packet_identity_aliases_v1_canonical_key UNIQUE (canonical_packet_key)
 );
-
-CREATE INDEX IF NOT EXISTS idx_atlas_packet_identity_aliases_v1_canonical
-  ON public.atlas_packet_identity_aliases_v1 (canonical_packet_key);

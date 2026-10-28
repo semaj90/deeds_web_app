@@ -11,69 +11,102 @@ const { mockResolveCanonicalPacketKey } = vi.hoisted(() => ({
 	mockResolveCanonicalPacketKey: vi.fn(async (inputKey: string) => inputKey),
 }));
 
+const workspaceRevision = `sha256:${'a'.repeat(64)}`;
+const sourceRevision = `sha256:${'b'.repeat(64)}`;
+const binding = {
+	schema: 'atlas.workspace-source-binding.v1' as const,
+	workspaceRevision,
+	sourceRef: 'src/lib/server/admitted.ts',
+	sourceRevision,
+	contentDigest: 'b'.repeat(64),
+	byteLength: 10,
+	gitObjectFormat: 'sha1' as const,
+	baseCommitOid: 'c'.repeat(40),
+	gitBlobOid: null,
+	trackedAtBaseCommit: false,
+	dirtyRelativeToBaseCommit: true,
+	sourceManifestOrdinal: 0,
+	readOnlyObservation: true as const,
+	canonicalAuthority: false as const,
+	producerRevision: 'test:source-binding:v1',
+	checksum: 'd'.repeat(64),
+};
+const tournamentAdmission = {
+	schema: 'atlas.workspace-revision-tournament-admission.v1' as const,
+	status: 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' as const,
+	authority: true as const,
+	workspaceRevision,
+	graphifyExecutionAuthorized: false as const,
+	projectionWritesAuthorized: false as const,
+	writesPerformed: false as const,
+};
+const executionReceipt = {
+	schema: 'atlas.graphify-workspace-snapshot-binding.v1',
+	status: 'GRAPHIFY_SNAPSHOT_BINDING_PROVEN' as const,
+	authority: true as const,
+	executionId: 'execution-admitted-1',
+	workspaceRevision,
+	sourceMembershipChecksum: `sha256:${'e'.repeat(64)}`,
+	writesPerformed: false as const,
+};
+
 vi.mock('$lib/server/atlas/identity/packet-identity-resolver.js', () => ({
 	resolveCanonicalPacketKey: mockResolveCanonicalPacketKey,
 }));
 
 describe('persistCanonicalSemanticPacketEmbedding', () => {
-	it('requires and preserves a revision-qualified current-corpus admission', async () => {
-		const values = vi.fn().mockReturnValue({ onConflictDoUpdate: vi.fn().mockResolvedValue(undefined) });
-		const insert = vi.fn().mockReturnValue({ values });
+	it('refuses writes when workspace admission explicitly disables projection writes', async () => {
+		const insert = vi.fn();
 		const database = { insert } as any;
 		const vector = Array.from({ length: 768 }, () => 0.11);
-		const workspaceRevision = `sha256:${'a'.repeat(64)}`;
-		const sourceRevision = `sha256:${'b'.repeat(64)}`;
-		const contentDigest = 'c'.repeat(64);
 
-		await persistAdmittedSemanticPacketEmbedding({
-			admission: {
-				packetKey: 'packet:admitted:1',
-				sourceRef: 'src/lib/server/admitted.ts',
-				sourceRevision,
-				workspaceRevision,
-				contentDigest,
-				executionId: 'execution-admitted-1',
-				bindingChecksum: 'd'.repeat(64),
-				authorityScope: 'ADMITTED_EXECUTION_SOURCE_BINDING',
-				writesPerformed: false,
-			},
+		await expect(persistAdmittedSemanticPacketEmbedding({
+			packetKey: 'packet:admitted:1',
+			binding,
+			tournamentAdmission,
+			executionReceipt,
 			vector,
 			representationRevision: 7,
-			metadata: { test: true },
-		}, database);
-
-		const row = values.mock.calls[0]?.[0] as Record<string, unknown>;
-		expect(row.sourceRevision).toBe(sourceRevision);
-		expect(row.contentHash).toBe(contentDigest);
-		expect(row.metadata).toMatchObject({
-			test: true,
-			canonical_packet_admission: {
-				executionId: 'execution-admitted-1',
-				workspaceRevision,
-				bindingChecksum: 'd'.repeat(64),
-			},
-		});
-		const admissionMetadata = (row.metadata as Record<string, unknown>).canonical_packet_admission as Record<string, unknown>;
-		expect(admissionMetadata.packetRevision).toMatch(/^sha256:[a-f0-9]{64}$/);
+		}, database)).rejects.toThrow('SEMANTIC_PACKET_PROJECTION_WRITES_NOT_AUTHORIZED');
+		expect(insert).not.toHaveBeenCalled();
 	});
 
 	it('rejects an admission with missing canonical content digest', async () => {
 		const database = { insert: vi.fn() } as any;
 		await expect(persistAdmittedSemanticPacketEmbedding({
-			admission: {
-				packetKey: 'packet:admitted:missing-digest',
-				sourceRef: 'src/lib/server/missing.ts',
-				sourceRevision: `sha256:${'a'.repeat(64)}`,
-				workspaceRevision: `sha256:${'b'.repeat(64)}`,
-				contentDigest: 'not-a-digest',
-				executionId: 'execution-admitted-2',
-				bindingChecksum: 'c'.repeat(64),
-				authorityScope: 'ADMITTED_EXECUTION_SOURCE_BINDING',
-				writesPerformed: false,
-			},
+			packetKey: 'packet:admitted:missing-digest',
+			binding: { ...binding, contentDigest: 'not-a-digest' },
+			tournamentAdmission,
+			executionReceipt,
 			vector: Array.from({ length: 768 }, () => 0),
 			representationRevision: 7,
 		}, database)).rejects.toThrow();
+		expect(database.insert).not.toHaveBeenCalled();
+	});
+
+	it('refuses a source binding from a different admitted workspace before database access', async () => {
+		const database = { insert: vi.fn() } as any;
+		await expect(persistAdmittedSemanticPacketEmbedding({
+			packetKey: 'packet:wrong-workspace',
+			binding: { ...binding, workspaceRevision: `sha256:${'f'.repeat(64)}` },
+			tournamentAdmission,
+			executionReceipt,
+			vector: Array.from({ length: 768 }, () => 0),
+			representationRevision: 7,
+		}, database)).rejects.toThrow('SEMANTIC_PACKET_WORKSPACE_REVISION_MISMATCH');
+		expect(database.insert).not.toHaveBeenCalled();
+	});
+
+	it('refuses a terminal receipt from a different admitted workspace before database access', async () => {
+		const database = { insert: vi.fn() } as any;
+		await expect(persistAdmittedSemanticPacketEmbedding({
+			packetKey: 'packet:wrong-execution',
+			binding,
+			tournamentAdmission,
+			executionReceipt: { ...executionReceipt, workspaceRevision: `sha256:${'f'.repeat(64)}` },
+			vector: Array.from({ length: 768 }, () => 0),
+			representationRevision: 7,
+		}, database)).rejects.toThrow('SEMANTIC_PACKET_EXECUTION_WORKSPACE_REVISION_MISMATCH');
 		expect(database.insert).not.toHaveBeenCalled();
 	});
 

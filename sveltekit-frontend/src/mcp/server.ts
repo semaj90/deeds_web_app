@@ -2403,7 +2403,7 @@ export function setupToolHandlers() {
         try {
           // Route packets to operator review queue (non-blocking)
           // In production, this would emit to RabbitMQ queue: operator.review.packets
-          console.log(`[MCP] identity:quarantine: ${packet_keys.length} packets → operator queue. Reason: ${reason}`);
+          console.error(`[MCP] identity:quarantine: ${packet_keys.length} packets → operator queue. Reason: ${reason}`);
           return {
             content: [{
               type: 'text',
@@ -2565,7 +2565,7 @@ export function setupToolHandlers() {
         };
         try {
           // GPU-accelerated cosine similarity reranking
-          console.log(`[MCP] retrieval:rerank: reranking ${candidates.length} candidates (GPU=${use_gpu}) → top ${top_k}`);
+          console.error(`[MCP] retrieval:rerank: reranking ${candidates.length} candidates (GPU=${use_gpu}) → top ${top_k}`);
           // In production, this would call computeGpuSimilarity or CPU fallback
           return {
             content: [{
@@ -2594,7 +2594,7 @@ export function setupToolHandlers() {
         };
         try {
           // Gemma4 answer generation with ranked candidates as context
-          console.log(`[MCP] answer:synthesize: generating answer (model=${synthesis_model}, tokens=${max_tokens}, citations=${include_citations})`);
+          console.error(`[MCP] answer:synthesize: generating answer (model=${synthesis_model}, tokens=${max_tokens}, citations=${include_citations})`);
           // In production, this would stream from Gemma4 LLM
           return {
             content: [{
@@ -2625,7 +2625,7 @@ export function setupToolHandlers() {
         };
         try {
           // Route unhandled decisions to operator alert queue
-          console.log(`[MCP] escalation:route: ${severity} escalation. Decision: ${decision}. Reason: ${reason}`);
+          console.error(`[MCP] escalation:route: ${severity} escalation. Decision: ${decision}. Reason: ${reason}`);
           // In production, this would emit to RabbitMQ: operator.alerts with severity badge
           return {
             content: [{
@@ -5049,7 +5049,7 @@ export function setupToolHandlers() {
                   maxNodes: 500,
                 });
               }
-              console.log(
+              console.error(
                 JSON.stringify({ mcp: true, tool: 'graph.index', jobId, status: 'done' })
               );
             } catch (e: unknown) {

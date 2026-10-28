@@ -4,6 +4,7 @@ import { isAbsolute, relative, resolve } from 'node:path';
 import { Client } from 'pg';
 import { loadAuthorityShadowV1, type AuthorityShadowObservationV1 } from '../../sveltekit-frontend/src/lib/server/atlas/admission/graphify-authority-shadow-read-v1.ts';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { reconcileSelectedSourceManifestV1 } from './lib/source-selection-manifest-reconciliation-v1.mjs';
 
 const root = process.cwd();
 const databaseUrl = resolveDatabaseUrl(loadRepoEnv(process.env));
@@ -26,6 +27,7 @@ if (reportDirArg) {
 const authorityPath = resolve(reportDir, 'current-graphify-snapshot-authority-v1.json');
 const selectionPath = resolve(reportDir, 'current-source-selection-input-v1.json');
 const admissionPath = resolve(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
+const selectionPlanPath = resolve(root, 'docs/reports/graphify-source-selection-plan-v1.json');
 const ownerPlanPath = resolve(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
 const ownerPreflightPath = resolve(root, 'docs/reports/selected-graphify-execution-owner-v1.json');
 const executionIdArgIndex = process.argv.indexOf('--execution-id');
@@ -41,6 +43,8 @@ const admission = JSON.parse(await readFile(admissionPath, 'utf8')) as {
   authority?: boolean;
   workspaceRevision?: string;
   snapshotRevision?: string;
+  sourceCount?: number;
+  sourceSelectionChecksum?: string;
   manifestPath?: string;
 };
 if (admission.status !== 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' || admission.authority !== true) {
@@ -71,6 +75,23 @@ const snapshot = JSON.parse(await readFile(snapshotManifestPath, 'utf8')) as {
     byteLength?: number;
   }>;
 };
+const selectionPlan = JSON.parse(await readFile(selectionPlanPath, 'utf8')) as {
+  schema?: string;
+  status?: string;
+  authority?: boolean;
+  workspaceRevisionCandidate?: string;
+  snapshotRevision?: string;
+  sourceCount?: number;
+  sourceSelectionChecksum?: string;
+  bindings?: Array<{
+    repositoryId?: string;
+    repositoryRelativePath?: string;
+    sourceRef?: string;
+    codeSourceRevision?: string;
+    contentHash?: string;
+    byteLength?: number;
+  }>;
+};
 if (snapshot.schema !== 'atlas.workspace-source-snapshot-capture.v1'
   || snapshot.snapshotRevision !== admission.snapshotRevision
   || snapshot.status !== 'CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK'
@@ -91,12 +112,17 @@ const workspace = {
 const bindingByRef = new Map(snapshotSources.map((source) => [String(source.sourceRef), source]));
 if (bindingByRef.size !== snapshotSources.length) throw new Error('ADMITTED_SNAPSHOT_SOURCE_REF_AMBIGUOUS');
 const snapshotSourceRefChecksum = stableSourceRefChecksum(snapshotSources.map((source) => String(source.sourceRef)));
-// The Graphify SOURCE_SELECTION stage records the historical identity-set
-// checksum as a sorted concatenation (not the JSON-array checksum used by the
-// sealed snapshot's sourceMembershipChecksum field). Keep both forms explicit
-// so a stage checksum is compared with the representation it actually owns.
-const snapshotIdentityChecksum = digest(snapshotSources.map((source) => String(source.sourceIdentityKey)).sort().join(''));
-const snapshotContentChecksum = objectDigest(snapshotSources.map((source) => [
+const selectionManifestReconciliation = reconcileSelectedSourceManifestV1({ admission, selectionPlan, snapshot });
+const selectedPlanBindings = selectionPlan.bindings ?? [];
+const selectedRefs = new Set(selectedPlanBindings.map((binding) => String(binding.sourceRef ?? '')));
+const selectedSnapshotSources = snapshotSources.filter((source) => selectedRefs.has(String(source.sourceRef)));
+const selectedSourceRefChecksum = stableSourceRefChecksum(selectedSnapshotSources.map((source) => String(source.sourceRef)));
+// The SOURCE_SELECTION stage owns the selected cohort's sorted identity-set
+// checksum. The sealed snapshot also contains hygiene-excluded candidates, so
+// its full candidate set is reported separately and is not the execution
+// denominator.
+const selectedIdentityChecksum = digest(selectedSnapshotSources.map((source) => String(source.sourceIdentityKey)).sort().join(''));
+const selectedContentChecksum = objectDigest(selectedSnapshotSources.map((source) => [
   source.sourceIdentityKey,
   source.sourceRevision,
   source.byteLength,
@@ -207,32 +233,32 @@ try {
       const members = membersResult.rows;
       const sourceRefSetChecksum = stableSourceRefChecksum(members.map((row) => String(row.source_ref)));
       const workspaceRevisionMatches = members.every((row) => row.workspace_revision === admittedWorkspaceRevision);
-      const sourceCountMatches = members.length === workspace.sourceCount;
+      const sourceCountMatches = members.length === selectedPlanBindings.length
+        && members.length === selectedSnapshotSources.length
+        && members.length === selectionPlan.sourceCount
+        && members.length === admission.sourceCount;
+      const selectedBindingByRef = new Map(selectedPlanBindings.map((binding) => [String(binding.sourceRef), binding] as const));
       const sourceBindingsMatch = members.every((row) => {
-        const binding = bindingByRef.get(String(row.source_ref));
+        const binding = selectedBindingByRef.get(String(row.source_ref));
         return Boolean(binding)
-          && row.code_source_revision === binding.sourceRevision
-          && String(row.content_hash).replace(/^sha256:/, '') === String(binding.contentDigest)
-          && Number(row.byte_length) === binding.byteLength;
+          && row.code_source_revision === binding.codeSourceRevision
+          && String(row.content_hash).replace(/^sha256:/, '').toLowerCase() === String(binding.contentHash).replace(/^sha256:/i, '').toLowerCase()
+          && Number(row.byte_length) === Number(binding.byteLength);
       });
-      const sourceRefSetChecksumMatches = sourceRefSetChecksum === snapshotSourceRefChecksum;
-      const sourceIdentitySetChecksumMatches = stage?.output_checksum === snapshotIdentityChecksum;
-      // The sealed snapshot's content checksum follows its source-ref order.
-      // Reuse that exact order rather than sorting the execution rows by a
-      // different identity key; otherwise an equivalent multi-repository
-      // membership can appear changed solely because the serialization order
-      // differs.
+      const sourceRefSetChecksumMatches = sourceRefSetChecksum === selectedSourceRefChecksum;
+      const sourceIdentitySetChecksumMatches = stage?.output_checksum === selectedIdentityChecksum;
       const executionByRef = new Map<string, { code_source_revision?: unknown; byte_length?: unknown }>(
         members.map((row) => [String(row.source_ref), row] as const),
       );
-      const executionContentChecksum = objectDigest(snapshotSources.map((binding) => {
+      const executionContentChecksum = objectDigest(selectedSnapshotSources.map((binding) => {
         const row = executionByRef.get(String(binding.sourceRef));
         return [binding.sourceIdentityKey, row?.code_source_revision, Number(row?.byte_length)];
       }));
-      const snapshotContentChecksumMatches = executionContentChecksum === snapshotContentChecksum;
+      const snapshotContentChecksumMatches = executionContentChecksum === selectedContentChecksum;
       const selectionPolicyIsNonCanary = typeof stage?.receipt_ref === 'string'
         && !/canary|bounded/i.test(stage.receipt_ref);
-      const eligible = stage?.status === 'COMPLETED'
+      const eligible = selectionManifestReconciliation.valid
+        && stage?.status === 'COMPLETED'
         && Boolean(stage.output_checksum)
         && Boolean(stage.receipt_ref)
         && selectionPolicyIsNonCanary
@@ -253,12 +279,16 @@ try {
         selectionPolicyIsNonCanary,
         sourceSelectionOutputChecksum: stage?.output_checksum ?? null,
         sourceRefSetChecksum,
+        selectedSourceRefChecksum,
         snapshotSourceRefChecksum,
-        sourceIdentitySetChecksum: snapshotIdentityChecksum,
+        sourceIdentitySetChecksum: selectedIdentityChecksum,
         executionContentChecksum,
-        snapshotContentChecksum,
+        snapshotContentChecksum: selectedContentChecksum,
         sourceCount: members.length,
-        expectedSourceCount: workspace.sourceCount,
+        expectedSourceCount: selectedPlanBindings.length,
+        snapshotCandidateCount: workspace.sourceCount,
+        selectedSnapshotSourceCount: selectedSnapshotSources.length,
+        selectionManifestReconciled: selectionManifestReconciliation.valid,
         workspaceRevisionMatches,
         sourceCountMatches,
         sourceBindingsMatch,
@@ -285,6 +315,7 @@ else if (requestedExecutionId && !selected) sourceStatus = 'SELECTED_EXECUTION_N
 else if (authorityCandidates.length === 0) sourceStatus = 'NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE';
 else if (!requestedExecutionId && eligible.length > 1) sourceStatus = 'AMBIGUOUS_QUALIFYING_EXECUTIONS';
 else if (selected) sourceStatus = 'CURRENT_SNAPSHOT_PROVEN';
+else if (!selectionManifestReconciliation.valid) sourceStatus = 'SOURCE_SELECTION_MANIFEST_RECONCILIATION_FAILED';
 else if (authorityCandidates.some((candidate) => candidate.sourceSelectionStatus !== 'COMPLETED' || candidate.selectionPolicyIsNonCanary === false)) sourceStatus = 'SOURCE_SELECTION_INCOMPLETE';
 else if (authorityCandidates.some((candidate) => candidate.sourceCountMatches === false)) sourceStatus = 'SOURCE_COUNT_MISMATCH';
 else if (authorityCandidates.some((candidate) => candidate.sourceRefSetChecksumMatches === false || candidate.sourceIdentitySetChecksumMatches === false)) sourceStatus = 'SOURCE_SET_CHECKSUM_MISMATCH';
@@ -299,6 +330,8 @@ const authorityReport = {
     workspaceRevision: admittedWorkspaceRevision,
     sourceManifestDigest: workspace.sourceManifestDigest,
     sourceCount: workspace.sourceCount,
+    selectedSourceCount: selectedPlanBindings.length,
+    hygieneExcludedCandidateCount: Math.max(0, workspace.sourceCount - selectedPlanBindings.length),
     sourceManifestChecksum: workspace.checksum,
     workspaceRevisionRecordChecksum: workspace.checksum,
     snapshotManifestPath,
@@ -306,6 +339,19 @@ const authorityReport = {
     snapshotSourceMembershipChecksum: snapshot.sourceMembershipChecksum,
     snapshotSourceContentChecksum: snapshot.sourceContentChecksum,
     observedAt: new Date().toISOString(),
+  },
+  sourceSelection: {
+    planPath: selectionPlanPath,
+    status: selectionPlan.status ?? 'UNKNOWN',
+    authority: selectionPlan.authority ?? false,
+    workspaceRevisionCandidate: selectionPlan.workspaceRevisionCandidate ?? null,
+    sourceCount: selectionPlan.sourceCount ?? 0,
+    sourceSelectionChecksum: selectionPlan.sourceSelectionChecksum ?? null,
+    reconciliation: {
+      valid: selectionManifestReconciliation.valid,
+      checks: selectionManifestReconciliation.checks,
+      rowCount: selectionManifestReconciliation.rows.length,
+    },
   },
   qualifyingExecutionIds: eligible.map((candidate) => candidate.executionId),
   ownerSelection,

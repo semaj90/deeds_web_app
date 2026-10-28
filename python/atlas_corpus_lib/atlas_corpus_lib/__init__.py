@@ -58,6 +58,23 @@ from .structural_observation_v1 import (
     LspSymbolObservationV1,
     StructuralFunctionObservationV1,
 )
+from .nes_taxonomy_registry import (
+    AtlasFeatureRowV1,
+    CANONICAL_DOMAIN_IDS,
+    DOMAIN_ID_TO_NAME,
+    SYMBOL_KIND_IDS,
+    SYMBOL_ID_TO_KIND,
+    HOT_FEATURE_BITS,
+    FEATURE_BIT_TO_NAME,
+    compute_feature_mask_from_labels,
+)
+from .gpu_feature_tile_builder import (
+    AtlasGpuFeatureTileV1,
+    FeatureCandidateInputV1,
+    assemble_gpu_feature_tile,
+)
+
+
 from .lod_blob_streamer import (
     LodTexturePacketEnvelopeV1,
     TensorTileDescriptorV1,

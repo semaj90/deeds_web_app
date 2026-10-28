@@ -71,6 +71,7 @@ Git Bash remains fine for plain `git`, `curl`, `head`/`tail`, and `node`/`npm` f
 | Repo rule | JSON parsing/validation is CPU work (simdjson N-API is CPU SIMD). A cuDF JSON path is a challenger: needs a measured case with CPU-reference parity, run in `atlas-rapids-cu13` only after freeing `:8090` |
 
 ## Gaps / open
+- **Fresh WSL interpreter/package audit (2026-10-27):** all inventoried GPU environments (`atlas-rapids-cu13` and `atlas-cutile-cu132`) are Python 3.14.6; `atlas-dspy-exp` is Python 3.13.13 and has no NVIDIA/GPU distributions. RAPIDS imports pass, but `pip check` is nonzero in the mixed conda/pip env, CUDA availability probe did not return, and Python version alignment is not a fresh GPU execution proof. Details: `docs/reports/wsl-nvidia-python-compatibility-audit-2026-10-27.md`.
 - Duplicate-looking envs (`.venv`, `.venv-cu130`, `.venv-gemma4`, `sveltekit-frontend/.venv`) have no recorded owner; classify before archiving (archive, never delete).
 - Roles marked "unverified" come from names/packages, not from callers. Grep callers before relying on them.
 - Docker images (`atlas-gpu-8098`, `atlas-neural-decoder`) are separate runtimes and not listed here.

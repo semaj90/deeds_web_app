@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.packet-source-revision-repair-manifest.v2",
+  "checksumRecipe": "sorted-key-json-sha256-v1",
+  "executionId": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+  "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
+  "targetTable": "atlas_packets",
+  "targetColumns": [
+    "source_revision",
+    "workspace_revision_key",
+    "lineage_binding_checksum",
+    "lineage_producer_revision"
+  ],
+  "beforeStateGuard": {
+    "sourceRevision": null,
+    "contentHash": null,
+    "workspaceRevisionKey": null,
+    "lineageBindingChecksum": null
+  },
+  "entryCount": 279,
+  "shards": [
+    {
+      "name": "shard-0000.json",
+      "sha256": "823946e77cbcacd8bd3bdf5f7e6baf782584ea83a00c56df7b2b099b2c171b4a",
+      "entryCount": 279
+    }
+  ],
+  "accounting": {
+    "membershipTotal": 30105,
+    "inScope": 29026,
+    "outcomes": {
+      "MISSING_PACKET": 7656,
+      "IDENTITY_COLLISION": 16086,
+      "UNQUALIFIED_BINDING": 4773,
+      "ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE": 132,
+      "LEGACY_CONTENT_HASH_UNQUALIFIED": 99,
+      "LEGACY_LINEAGE_FIELDS_MISSING": 279,
+      "SOURCE_BYTES_MISSING": 1,
+      "OUT_OF_SCOPE_REPOSITORY": 1079,
+      "WORKSPACE_SCOPE_MISMATCH": 0
+    },
+    "outcomeSum": 30105,
+    "fullyAccounted": true
+  }
+}

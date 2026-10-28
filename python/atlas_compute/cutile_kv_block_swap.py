@@ -109,6 +109,8 @@ def launch_kv_block_insert(
     max_blocks = clamped_lod * 4
     if page_table_map.ndim != 1:
         raise ValueError("KV_PAGE_TABLE_MUST_BE_ONE_DIMENSIONAL")
+    if page_table_map.dtype not in (torch.int32, torch.int64):
+        raise ValueError("KV_PAGE_TABLE_REQUIRES_INT32_OR_INT64")
     if device_paged_kv.ndim < 2 or host_pinned_kv.ndim != device_paged_kv.ndim:
         raise ValueError("KV_BLOCK_RANK_MISMATCH")
     if tuple(host_pinned_kv.shape[1:]) != tuple(device_paged_kv.shape[1:]):
@@ -155,6 +157,7 @@ def launch_kv_block_insert(
         return active_blocks
 
     # PyTorch non-blocking H2D DMA copy
+    target_pages = target_pages.to(device=device_paged_kv.device, dtype=torch.int64, non_blocking=True)
     if device_paged_kv.is_cuda:
         src_slice = host_pinned_kv[:active_blocks].to(device_paged_kv.device, non_blocking=True)
         device_paged_kv.index_copy_(0, target_pages, src_slice)

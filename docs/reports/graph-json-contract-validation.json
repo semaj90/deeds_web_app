@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-10-27T20:43:45.645Z",
+  "input": "neo4j-graph-export.json",
+  "validation_tests": {
+    "packet_identity_chain": {
+      "total_packets": 19308,
+      "with_complete_identity": 50,
+      "coverage_percent": 0.2589600165734411,
+      "status": "FAIL"
+    },
+    "feature_naming": {
+      "total_features": 13290,
+      "with_label": 49,
+      "coverage_percent": 0.3686982693754703,
+      "status": "FAIL"
+    },
+    "som_coordinates": {
+      "total_som_cells": 0,
+      "with_valid_coordinates": 0,
+      "coverage_percent": 0,
+      "status": "FAIL"
+    },
+    "edge_integrity": {
+      "total_edges": 271,
+      "with_valid_refs": 271,
+      "with_valid_weights": 271,
+      "coverage_percent": 100,
+      "status": "PASS"
+    },
+    "traversal_paths": {
+      "nodes_with_paths": 0,
+      "with_valid_arrays": 0,
+      "coverage_percent": 0,
+      "status": "WARN"
+    }
+  },
+  "passes": 1,
+  "failures": 3,
+  "warnings": 1,
+  "verdict": "FAIL"
+}

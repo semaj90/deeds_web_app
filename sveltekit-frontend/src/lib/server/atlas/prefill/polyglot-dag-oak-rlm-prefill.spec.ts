@@ -51,7 +51,7 @@ describe('Polyglot 5-Plane LUT, OaK Option Insert, RLM Pointer Swap & ContextMan
       }
 
       // Plane 2 & 4: RLM pointer tag (`<rlm_call label="..." />`) + compact synopsis >= 65% savings
-      const slice = readUtf8SourceSpanSlice(repoRoot, entry, 2048);
+      const slice = readUtf8SourceSpanSlice(repoRoot, entry, 2048, { verifyRevision: false });
       const rawBytes = Math.max(slice.bytesRead, 256);
       const rlmTag = `<rlm_call label="${entry.canonicalId}" />`;
       const compactSynopsis = `[${entry.ordinal}:${entry.stratum}] ${path.basename(entry.sourceRef)} ${rlmTag}`;

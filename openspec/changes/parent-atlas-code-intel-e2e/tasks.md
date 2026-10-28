@@ -558,6 +558,32 @@ does not itself authorize or mint stable-file IDs.
   aliases, and no proof that active symbol-key hashes are path-independent. This is a refreshed
   blocker receipt, not gate closure; no DB writes or fixed-pointer update occurred.
 
+**Stable-file identity owner refresh (2026-10-27, read-only):** the fresh PostgreSQL readback
+confirms the repository root row exists (1), but `atlas_stable_file_identity`,
+`atlas_stable_file_revision_binding`, and `atlas_stable_file_alias` each have 0 rows; the admitted
+`c636…` workspace still has 24,253 workspace-source bindings. No `atlas_packets` row matches the
+exact `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` source path or has a
+`workspace_revision_key` matching the admitted revision. The 3,294 packet-alias rows do not supply
+this missing stable-file identity. Receipt `.tmp/atlas/packet-identity-owner-live-readonly-20261027-v2.json`;
+the transaction was `READ ONLY` and rolled back, with `writesPerformed:false`. This confirms the
+S01-08K/S01-08L prerequisite remains open; it does not authorize the frozen population gate. The
+packet admission rehearsal is not a pure read: source inspection shows its default executes
+`INSERT`s before rollback and writes a report, so it was deliberately not invoked.
+
+**Historical packet-apply reconciliation (2026-10-27, read-only):** the old apply receipt claims
+7,259 inserts/readbacks committed for workspace `e24bb…`, but its exact manifest-derived packet
+keys have 0 matches in the current `atlas_packets` table. A separate source-ref join found 6 paths
+under different packet keys; all 6 have source revisions different from the manifest, and the
+other 7,253 refs have no matching source row.
+The table still has 16,151 rows tagged with that workspace key, so this is cohort-specific
+receipt/current-state divergence, not proof that the entire revision cohort is absent. The current
+producer target maps `127.0.0.1:5434/legal_ai_db` to `legal-ai-postgres`, but the old receipt has no
+target metadata; its receipt and manifest were added together in repository commit
+`88ae5c7d56c59d724962d5654eea7dcc775ace62`, which does not identify the database used. Whether its
+run used this target or rows were subsequently removed is unknown.
+Do not replay or repair from that receipt. Diagnostic receipt
+`.tmp/atlas/admit-packets-apply-cohort-live-readback-20261027.json`; no writes occurred.
+
 ## Legal-AI analysis Playwright end-to-end lane (2026-10-16; PLANNING ONLY, nothing implemented, all items NOT_PROVEN)
 
 Scope: UI-level verification of the same chain this change already gates (source -> symbol -> graph -> retrieval -> ContextManifest -> MCP), for the legal-AI analysis journey on SvelteKit `:5173`. No legal-specific e2e OpenSpec owner existed; `wire-agentic-workflows-e2e-test` is a REFERENCE_ONLY historical ledger and is not extended.

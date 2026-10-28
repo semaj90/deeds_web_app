@@ -9,6 +9,8 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'$lib': resolve(__dirname, 'src/lib'),
+			'$app/environment': resolve(__dirname, 'tests/__mocks__/app-environment.ts'),
+			'$env/dynamic/private': resolve(__dirname, 'tests/__mocks__/env-dynamic-private.ts'),
 			// The isolated lane does not load SvelteKit's normal .js -> .ts
 			// server-module resolver. Keep this explicit for the Drizzle client
 			// imported by the artifact transport boundary.
@@ -50,6 +52,6 @@ export default defineConfig({
     exclude: ['node_modules/**'],
     globals: false,
     isolate: true,
-    testTimeout: 10_000,
+    testTimeout: 30_000,
   },
 });

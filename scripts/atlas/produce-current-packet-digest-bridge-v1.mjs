@@ -31,6 +31,8 @@
  *              four lineage fields exactly equal the post-apply state (content_hash must be
  *              unchanged); already-restored rows are idempotent; any other state is drift
  *              and aborts. Reports SOURCE_REPAIR_ROLLBACK_PARTIAL after a later-batch abort.
+ * --source-ref  restricts the default read-only plan to one exact canonical source reference.
+ * --report-path writes that plan's report under .tmp without replacing shared reports.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -51,6 +53,8 @@ const value = (name) => {
 };
 const workspaceRevision = value('--workspace-revision');
 const executionId = value('--execution-id');
+const sourceRef = value('--source-ref');
+const reportPathOverride = value('--report-path');
 const limit = Number(value('--limit') ?? 25);
 const apply = args.includes('--apply');
 const confirm = args.includes('--confirm-current-packet-digest-bridge-v1');
@@ -59,6 +63,11 @@ const applyDurable = args.includes('--apply-durable');
 const rollbackDurable = args.includes('--rollback-durable');
 if (census && (apply || applyDurable || rollbackDurable)) throw new Error('CENSUS_IS_READ_ONLY');
 if ([apply, applyDurable, rollbackDurable].filter(Boolean).length > 1) throw new Error('CHOOSE_ONE_WRITE_MODE');
+if (sourceRef !== null && census) throw new Error('SOURCE_REF_FILTER_IS_PLAN_ONLY');
+if (sourceRef !== null && (!sourceRef.trim() || sourceRef !== sourceRef.trim() || sourceRef.includes('\\') || sourceRef.startsWith('./') || sourceRef.split('/').some((segment) => !segment || segment === '.' || segment === '..'))) {
+  throw new Error('SOURCE_REF_FILTER_MUST_BE_CANONICAL');
+}
+if (reportPathOverride && (census || apply || applyDurable || rollbackDurable)) throw new Error('ISOLATED_REPORT_PATH_IS_PLAN_ONLY');
 if (!/^sha256:[0-9a-f]{64}$/i.test(workspaceRevision ?? '')) throw new Error('EXPLICIT_VALID_WORKSPACE_REVISION_REQUIRED');
 if (!executionId) throw new Error('EXPLICIT_EXECUTION_ID_REQUIRED');
 if (!census && !applyDurable && !rollbackDurable && (!Number.isInteger(limit) || limit < 1 || limit > 500)) throw new Error('BOUNDED_LIMIT_REQUIRED');
@@ -67,9 +76,20 @@ if (apply && !confirm) throw new Error('EXPLICIT_CONFIRMATION_REQUIRED_FOR_CANAR
 const producerRevision = 'current-packet-digest-bridge-v1';
 const digest = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');
 const normalizeRef = (value) => String(value ?? '').trim().replaceAll('\\', '/').replace(/^\.\//, '').toLowerCase();
+const defaultReportPath = path.join(REPO_ROOT, 'docs/reports/current-packet-digest-producer-v1.json');
+const reportPath = reportPathOverride ? path.resolve(REPO_ROOT, reportPathOverride) : defaultReportPath;
+if (reportPathOverride) {
+  const tmpRoot = path.join(REPO_ROOT, '.tmp');
+  const relativeReportPath = path.relative(tmpRoot, reportPath);
+  if (path.isAbsolute(relativeReportPath) || relativeReportPath === '..' || relativeReportPath.startsWith(`..${path.sep}`)) {
+    throw new Error('ISOLATED_REPORT_PATH_MUST_REMAIN_UNDER_TMP');
+  }
+  if (!reportPath.toLowerCase().endsWith('.json') || fs.existsSync(reportPath) || fs.existsSync(reportPath.replace(/\.json$/i, '.md'))) {
+    throw new Error('ISOLATED_REPORT_PATH_MUST_BE_NEW_JSON_PATH');
+  }
+}
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, connectionTimeoutMillis: 5000 });
 const client = await pool.connect();
-const reportPath = path.join(REPO_ROOT, 'docs/reports/current-packet-digest-producer-v1.json');
 const manifestRootDir = path.join(REPO_ROOT, 'docs/reports/packet-source-revision-repair-v1');
 const writeJsonAtomic = (target, content) => {
   fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -210,6 +230,11 @@ const bump = (key) => { counts[key] = (counts[key] ?? 0) + 1; };
 try {
   await client.query(`BEGIN ISOLATION LEVEL REPEATABLE READ${apply ? '' : ' READ ONLY'}`);
   await client.query("SET LOCAL statement_timeout='30000'");
+  const sourceRefFilter = sourceRef !== null ? 'AND m.source_ref = $3' : '';
+  const queryLimit = census ? '' : sourceRef !== null ? 'LIMIT $4' : 'LIMIT $3';
+  const queryParams = census ? [executionId, workspaceRevision] : sourceRef !== null
+    ? [executionId, workspaceRevision, sourceRef, limit]
+    : [executionId, workspaceRevision, limit];
   const result = await client.query(`
     SELECT m.repository_relative_path, m.source_ref, m.code_source_revision,
            m.content_hash AS membership_content_digest,
@@ -222,8 +247,9 @@ try {
     WHERE m.execution_id = $1
       AND m.workspace_revision = $2
       AND m.repository_id = 'repo:root'
+      ${sourceRefFilter}
     ORDER BY m.source_ref
-    ${census ? '' : 'LIMIT $3'}`, census ? [executionId, workspaceRevision] : [executionId, workspaceRevision, limit]);
+    ${queryLimit}`, queryParams);
 
   const sourceRefs = [...new Set(result.rows.map((row) => normalizeRef(row.source_ref)))];
   const packetResult = await client.query(`

@@ -70,7 +70,7 @@ import { execFileSync } from 'node:child_process';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveBoundedPacketSourceRevisionV1, resolvePacketSourceRevisionV1 } from './lib/packet-source-revision-admission-v1.mjs';
-import { assertApplyAuthorized, classifyV2AdmissionLiveState, loadPacketKeyV2AdmissionManifest } from './lib/packet-key-v2-admission-v1.mjs';
+import { assertApplyAuthorized, classifyV2AdmissionLiveState, isCanonicalGraphifyExecution, loadPacketKeyV2AdmissionManifest } from './lib/packet-key-v2-admission-v1.mjs';
 import { assertLegacyPacketKeyCorpusV1, legacyPacketKeyFromSourceRef } from './lib/canonical-source-ref.mjs';
 import { qualifyChunkLineageRowsV1 } from './lib/chunk-source-span-v1.mjs';
 
@@ -355,23 +355,45 @@ const V2_AUTH_ARG = process.argv.find(a => a.startsWith('--apply-authorization='
 async function runPacketKeyV2Preflight(pool) {
   const rootSha = V2_MANIFEST_ROOT_ARG.split('=')[1];
   const dir = path.join(ROOT, 'docs', 'reports', 'packet-key-v2-admission-v1', rootSha);
-  const { entries } = loadPacketKeyV2AdmissionManifest(dir, rootSha);
-  const ddlApplied = (await pool.query("SELECT 1 FROM pg_trigger WHERE tgname = 'trg_atlas_packet_identity_alias_guard'")).rowCount === 1;
+  const { root, entries } = loadPacketKeyV2AdmissionManifest(dir, rootSha);
+  const executionRows = (await pool.query(`
+    SELECT status, canonical_authority, workspace_revision::text AS workspace_revision
+      FROM graphify_executions
+     WHERE execution_id = $1::uuid AND workspace_revision::text = $2
+  `, [root.executionId, root.workspaceRevision])).rows;
+  const canonicalExecution = executionRows.length === 1 && isCanonicalGraphifyExecution(executionRows[0], root.workspaceRevision);
+  const registryState = (await pool.query(`
+    SELECT to_regclass('public.atlas_packet_identity_registry_v1') IS NOT NULL AS registry_present,
+           to_regclass('public.atlas_packet_identity_aliases_v1') IS NOT NULL AS aliases_present,
+           EXISTS (
+             SELECT 1 FROM pg_trigger t JOIN pg_proc p ON p.oid = t.tgfoid
+              WHERE t.tgname = 'trg_atlas_packet_identity_aliases_v1_guard'
+                AND t.tgrelid = to_regclass('public.atlas_packet_identity_aliases_v1')
+                AND NOT t.tgisinternal AND t.tgenabled <> 'D'
+                AND p.proname = 'atlas_packet_identity_aliases_v1_guard_fn'
+           ) AS source_guard_present
+  `)).rows[0];
+  const registryContractApplied = registryState.registry_present && registryState.aliases_present && registryState.source_guard_present;
   if (APPLY) {
+    if (!canonicalExecution) throw new Error('GRAPHIFY_EXECUTION_NOT_CANONICAL');
     const authorizationReceipt = V2_AUTH_ARG ? JSON.parse(readFileSync(path.resolve(ROOT, V2_AUTH_ARG.split('=').slice(1).join('=')), 'utf8')) : null;
-    assertApplyAuthorized({ authorizationReceipt, manifestRootSha256: rootSha, aliasKindDdlApplied: ddlApplied });
-    throw new Error('PACKET_KEY_V2_APPLY_NOT_IMPLEMENTED_IN_THIS_TRANCHE: preflight only; the plain INSERT (buildV2PacketInsert) is wired only after authorization and readback design');
+    assertApplyAuthorized({ authorizationReceipt, manifestRootSha256: rootSha, registryContractApplied });
+    throw new Error('PACKET_KEY_V2_APPLY_NOT_IMPLEMENTED_IN_THIS_TRANCHE: registry inserts are staged as parameterized statements only; transactional execution and independent readback remain unwired');
   }
   const refs = entries.map(e => e.canonicalSourceRef);
   const v2Keys = entries.map(e => e.packetKeyV2);
   const legacyKeys = entries.map(e => e.legacyCompatibilityKey.key);
   const q = async (text, param) => (await pool.query(text, [param])).rows;
-  const storedV2 = new Map((await q('SELECT packet_key, source_ref FROM atlas_packets WHERE packet_key = ANY($1::text[])', v2Keys)).map(r => [r.packet_key, r.source_ref]));
+  const storedV2 = new Map(registryState.registry_present
+    ? (await q('SELECT packet_key, source_ref FROM atlas_packet_identity_registry_v1 WHERE packet_key = ANY($1::text[])', v2Keys)).map(r => [r.packet_key, r.source_ref])
+    : []);
   const storedLegacy = new Map((await q('SELECT packet_key, source_ref FROM atlas_packets WHERE packet_key = ANY($1::text[])', legacyKeys)).map(r => [r.packet_key, r.source_ref]));
   const bySourceRef = new Map();
   for (const r of await q('SELECT packet_key, source_ref FROM atlas_packets WHERE source_ref = ANY($1::text[])', refs)) bySourceRef.set(r.source_ref, [...(bySourceRef.get(r.source_ref) ?? []), r.packet_key]);
   const aliasByV2 = new Map();
-  for (const r of await q("SELECT alias_key, canonical_packet_key FROM atlas_packet_identity_aliases WHERE canonical_packet_key = ANY($1::text[]) AND alias_kind = 'PACKET_KEY_V1_STORAGE_TO_V2'", v2Keys)) aliasByV2.set(r.canonical_packet_key, [...(aliasByV2.get(r.canonical_packet_key) ?? []), r.alias_key]);
+  if (registryState.aliases_present) {
+    for (const r of await q("SELECT alias_key, canonical_packet_key FROM atlas_packet_identity_aliases_v1 WHERE canonical_packet_key = ANY($1::text[]) AND alias_kind = 'PACKET_KEY_V1_STORAGE_TO_V2'", v2Keys)) aliasByV2.set(r.canonical_packet_key, [...(aliasByV2.get(r.canonical_packet_key) ?? []), r.alias_key]);
+  }
   const counts = {};
   const drift = [];
   for (const entry of entries) {
@@ -381,8 +403,9 @@ async function runPacketKeyV2Preflight(pool) {
     if (verdict.status !== entry.status) drift.push({ sourceRef: entry.canonicalSourceRef, manifestStatus: entry.status, liveStatus: verdict.status, code: verdict.code });
   }
   const receipt = { schema: 'atlas.packet-key-v2-admission-preflight.v1', mode: 'READ_ONLY_PREFLIGHT', writesPerformed: false, generatedAt: new Date().toISOString(),
-    manifestRootSha256: rootSha, entryCount: entries.length, liveCounts: counts, driftFromManifest: drift.length, driftSamples: drift.slice(0, 20), aliasKindDdlApplied: ddlApplied,
-    result: drift.length === 0 && !counts.IDENTITY_CONFLICT && !counts.PACKET_KEY_CANONICAL_COLLISION ? (ddlApplied ? 'PREFLIGHT_CLEAN' : 'PREFLIGHT_CLEAN_ALIAS_DDL_NOT_APPLIED') : 'PREFLIGHT_DRIFT_OR_CONFLICT' };
+    manifestRootSha256: rootSha, entryCount: entries.length, liveCounts: counts, driftFromManifest: drift.length, driftSamples: drift.slice(0, 20), canonicalExecution, registryContractApplied,
+    registryPresent: registryState.registry_present, aliasesPresent: registryState.aliases_present, sourceGuardPresent: registryState.source_guard_present,
+    result: !canonicalExecution ? 'PREFLIGHT_BLOCKED_NONCANONICAL_EXECUTION' : drift.length === 0 && !counts.IDENTITY_CONFLICT && !counts.PACKET_KEY_CANONICAL_COLLISION ? (registryContractApplied ? 'PREFLIGHT_CLEAN' : 'PREFLIGHT_CLEAN_REGISTRY_V1_DDL_NOT_APPLIED') : 'PREFLIGHT_DRIFT_OR_CONFLICT' };
   writeFileSync(path.join(ROOT, 'docs', 'reports', 'packet-key-v2-admission-preflight-v1.json'), JSON.stringify(receipt, null, 2) + '\n');
   console.log(JSON.stringify(receipt, null, 2));
 }

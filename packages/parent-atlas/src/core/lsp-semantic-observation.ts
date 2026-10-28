@@ -274,8 +274,15 @@ export function lspPositionToUtf8ByteOffset(
   input: LspPositionV1,
   encoding: 'utf-8' | 'utf-16' | 'utf-32',
 ): number {
+  if (!Number.isSafeInteger(input.line) || input.line < 0 || !Number.isSafeInteger(input.character) || input.character < 0) {
+    throw new Error('LSP_POSITION_INVALID');
+  }
+  if (encoding !== 'utf-8' && encoding !== 'utf-16' && encoding !== 'utf-32') {
+    throw new Error('LSP_POSITION_ENCODING_INVALID');
+  }
   const line = lineSlices(source)[input.line];
   if (!line) throw new Error('LSP_POSITION_LINE_OUT_OF_RANGE');
+  if (input.character === 0) return Buffer.byteLength(source.slice(0, line.start), 'utf8');
   let jsOffset = 0;
   if (encoding === 'utf-16') {
     if (input.character > line.text.length) throw new Error('LSP_POSITION_CHARACTER_OUT_OF_RANGE');

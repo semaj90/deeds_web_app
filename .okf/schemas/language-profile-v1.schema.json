@@ -3,13 +3,14 @@
   "$id": "atlas.okf-language-profile.v1",
   "title": "Parent Atlas language syntax profile",
   "type": "object",
-  "required": ["version", "language", "name", "extensions", "exclude_paths", "symbol_kinds"],
+  "required": ["version", "language", "name", "extensions"],
   "additionalProperties": false,
   "properties": {
     "version": {"const": 1},
     "language": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
     "name": {"type": "string", "minLength": 1},
     "extensions": {"$ref": "#/$defs/stringList"},
+    "grammar": {"type": "string", "minLength": 1},
     "exclude_paths": {"$ref": "#/$defs/stringList"},
     "symbol_kinds": {
       "type": "object",
@@ -24,6 +25,10 @@
     },
     "validation": {"$ref": "#/$defs/validation"}
   },
+  "anyOf": [
+    {"required": ["grammar"]},
+    {"required": ["exclude_paths", "symbol_kinds"]}
+  ],
   "$defs": {
     "stringList": {
       "type": "array",

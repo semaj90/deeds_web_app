@@ -1964,3 +1964,9 @@ Open:
 - Align or retire `ace_compiler.py` `NES_LUT_PALETTES`.
 - Decide whether `svelte5_runes` (`0x2A`) becomes a palette entry or stays a router-only label.
 - Confirm where the ACE palette reaches prompt text. Line 52 only selects it; the injection site hasn't been traced.
+
+## Validator receipts before status edits (2026-10-27)
+
+- Run the receipt-writing validators first. Only after they finish, correct status docs (`master_feature_todo_*.md`, `tasks.md`) and cite each receipt by its `docs/reports/...` file path.
+- Before a validator overwrites an existing receipt, copy the old file to `docs/reports/archive/<date>-<slug>/`. Never delete it.
+- Pass dated output paths where the script accepts an output argument. Use repo-root paths, because the shell's working directory persists between calls.

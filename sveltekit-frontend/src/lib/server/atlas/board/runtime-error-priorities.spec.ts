@@ -40,7 +40,7 @@ describe('runtime error priority projection', () => {
 	});
 
 	it('fails closed to an unavailable empty diagnostic lane', async () => {
-		query.mockRejectedValue(new Error('database unavailable'));
+		query.mockRejectedValueOnce(new Error('database unavailable'));
 
 		await expect(loadRuntimeErrorPriorities()).resolves.toEqual({
 			status: 'UNAVAILABLE',

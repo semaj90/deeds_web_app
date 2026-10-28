@@ -41,8 +41,8 @@ class MetricTests(unittest.TestCase):
 class EvaluateTests(unittest.TestCase):
     def rows(self, reviewed):
         return [
-            {"sourceRef": "x.ts", "originalLabel": "ui", "reviewedGroup": "ui" if reviewed else None, "sourceRevision": "r1"},
-            {"sourceRef": "y.ts", "originalLabel": "db", "reviewedGroup": "db" if reviewed else None, "sourceRevision": None},
+            {"sourceRef": "x.ts", "originalLabel": "ui", "reviewedGroup": "ui" if reviewed else None, "reviewer": "human-reviewer-1" if reviewed else None, "reviewedAt": "2026-10-27T12:00:00Z" if reviewed else None, "sourceRevision": "r1"},
+            {"sourceRef": "y.ts", "originalLabel": "db", "reviewedGroup": "db" if reviewed else None, "reviewer": "human-reviewer-2" if reviewed else None, "reviewedAt": "2026-10-27T12:01:00Z" if reviewed else None, "sourceRevision": None},
         ]
 
     def test_no_gold_refuses_accuracy_and_labels_weak_agreement_as_non_accuracy(self):
@@ -69,13 +69,74 @@ class EvaluateTests(unittest.TestCase):
         self.assertEqual(rep["goldRows"], 0)
         self.assertEqual(rep["reviewedNonGoldRows"], {"AMBIGUOUS": 1, "NOT_A_DOMAIN": 1, "SKIP": 1})
 
+    def test_synthetic_and_model_reviewers_never_count_as_gold(self):
+        rows = [
+            {"reviewedGroup": "ui", "reviewer": "PIPELINE_TEST_NOT_A_HUMAN"},
+            {"reviewedGroup": "db", "reviewer": "model-classifier-v1"},
+            {"reviewedGroup": "graph", "reviewer": "agent-7"},
+            {"reviewedGroup": "cache"},
+        ]
+        rep = evaluate(rows, lambda r: ("ui", 0.9, None))
+        self.assertEqual(rep["status"], "NO_GOLD_LABELS")
+        self.assertEqual(rep["goldRows"], 0)
+        self.assertEqual(rep["unverifiedReviewRows"], 4)
+
+    def test_large_sample_without_independent_review_cannot_be_scored(self):
+        rows = [{"reviewedGroup": "a" if i % 2 else "b", "reviewer": f"human-{i}", "reviewedAt": "2026-10-27T12:00:00Z"} for i in range(240)]
+        rep = evaluate(rows, lambda r: (r["reviewedGroup"], 1.0, None))
+        self.assertEqual(rep["status"], "INSUFFICIENT_REVIEWER_COVERAGE")
+        self.assertEqual(rep["minimumDoubleReviewRows"], 24)
+
+    def test_second_reviewer_must_be_distinct_and_cover_at_least_ten_percent(self):
+        rows = [
+            {
+                "reviewedGroup": "a" if i % 2 else "b",
+                "reviewer": f"human-{i}",
+                "reviewedAt": "2026-10-27T12:00:00Z",
+                "secondReviewer": f"second-{i}" if i < 24 else (f"human-{i}" if i == 24 else None),
+                "secondReviewedAt": "2026-10-27T13:00:00Z" if i < 24 or i == 24 else None,
+            }
+            for i in range(240)
+        ]
+        rep = evaluate(rows, lambda r: (r["reviewedGroup"], 1.0, None))
+        self.assertEqual(rep["status"], "SCORED")
+        self.assertEqual(rep["doubleReviewedGoldRows"], 24)
+
+    def test_second_reviewer_without_timestamp_does_not_count(self):
+        rows = [{
+            "reviewedGroup": "a" if i % 2 else "b",
+            "reviewer": f"human-{i}",
+            "reviewedAt": "2026-10-27T12:00:00Z",
+            "secondReviewer": f"second-{i}" if i < 24 else None,
+        } for i in range(240)]
+        rep = evaluate(rows, lambda r: (r["reviewedGroup"], 1.0, None))
+        self.assertEqual(rep["status"], "INSUFFICIENT_REVIEWER_COVERAGE")
+        self.assertEqual(rep["doubleReviewedGoldRows"], 0)
+
+    def test_naive_review_timestamp_is_not_human_review_provenance(self):
+        rows = [{
+            "reviewedGroup": "ui",
+            "reviewer": "human-reviewer",
+            "reviewedAt": "2026-10-27T12:00:00",
+        }]
+        rep = evaluate(rows, lambda r: ("ui", 0.9, None))
+        self.assertEqual(rep["status"], "NO_GOLD_LABELS")
+        self.assertEqual(rep["unverifiedReviewRows"], 1)
+
     def test_revision_qualified_only_filters_rows(self):
         rep = evaluate(self.rows(True), lambda r: (r["reviewedGroup"], None, None), revision_qualified_only=True)
         self.assertEqual(rep["rowsConsidered"], 1)
         self.assertIsNone(rep["ece"])
 
     def test_large_balanced_gold_can_reach_scored(self):
-        rows = [{"reviewedGroup": "a" if i % 2 else "b", "originalLabel": "a"} for i in range(240)]
+        rows = [{
+            "reviewedGroup": "a" if i % 2 else "b",
+            "originalLabel": "a",
+            "reviewer": f"human-{i}",
+            "reviewedAt": "2026-10-27T12:00:00Z",
+            "secondReviewer": f"second-{i}" if i < 24 else None,
+            "secondReviewedAt": "2026-10-27T13:00:00Z" if i < 24 else None,
+        } for i in range(240)]
         rep = evaluate(rows, lambda r: (r["reviewedGroup"], 1.0, None))
         self.assertEqual(rep["status"], "SCORED")
 

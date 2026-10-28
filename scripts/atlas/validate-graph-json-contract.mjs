@@ -17,6 +17,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { evaluateGraphExportCoverageV2 } from './lib/graph-export-coverage-contract-v2.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -187,6 +188,17 @@ function validateGraphContract(graphJson) {
   console.log(`   Valid path arrays: ${validPaths}/${pathCount}`);
   console.log(`   Status: ${pathTest.status}`);
 
+  const coverageResult = evaluateGraphExportCoverageV2(graphJson);
+  report.validation_tests['export_coverage'] = {
+    status: coverageResult.status,
+    reasons: coverageResult.reasons
+  };
+  if (coverageResult.status === 'PASS') report.passes++;
+  else report.failures++;
+  console.log('\n📋 Test 6: Export Coverage Receipt');
+  console.log(`   Status: ${coverageResult.status}`);
+  if (coverageResult.reasons.length > 0) console.log(`   Reasons: ${coverageResult.reasons.join(', ')}`);
+
   // Final verdict
   console.log('\n' + '='.repeat(70));
   console.log('📊 Validation Summary:');
@@ -194,9 +206,12 @@ function validateGraphContract(graphJson) {
   console.log(`   Failed: ${report.failures}`);
   console.log(`   Warnings: ${report.warnings}`);
 
-  if (report.failures === 0) {
+  if (coverageResult.status !== 'PASS') {
+    report.verdict = 'FAIL';
+    console.log('\n❌ VERDICT: FAIL — Required export coverage evidence is incomplete');
+  } else if (report.failures === 0) {
     report.verdict = 'PASS';
-    console.log('\n✅ VERDICT: PASS — Graph JSON is valid and ready for algorithms');
+    console.log('\n✅ VERDICT: PASS — Graph JSON and declared export coverage are valid');
   } else if (report.failures <= 2) {
     report.verdict = 'PARTIAL';
     console.log('\n⚠️  VERDICT: PARTIAL — Some issues found but processable');
@@ -210,7 +225,9 @@ function validateGraphContract(graphJson) {
 
 async function main() {
   try {
-    const exportPath = path.resolve(__dirname, '../../docs/reports/neo4j-graph-export.json');
+    // --in / --report select an isolated export and receipt (report must stay under .tmp/atlas).
+    const argValue = (name) => process.argv.find(arg => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
+    const exportPath = path.resolve(__dirname, '../../', argValue('in') ?? 'docs/reports/neo4j-graph-export.json');
 
     if (!fs.existsSync(exportPath)) {
       console.error(`❌ Export not found: ${exportPath}`);
@@ -222,7 +239,10 @@ async function main() {
     const report = validateGraphContract(graphJson);
 
     // Write validation report
-    const reportPath = path.resolve(__dirname, '../../docs/reports/graph-json-contract-validation.json');
+    const reportPath = path.resolve(__dirname, '../../', argValue('report') ?? 'docs/reports/graph-json-contract-validation.json');
+    if (argValue('report') && !reportPath.startsWith(path.resolve(__dirname, '../../.tmp/atlas') + path.sep)) {
+      throw new Error('VALIDATION_REPORT_MUST_STAY_UNDER_TMP_ATLAS');
+    }
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
     console.log(`\n📄 Report: ${reportPath}`);
 

@@ -47,6 +47,8 @@ export * from './core/external-doc-retrieval-proof.js';
 export * from './core/external-doc-retrieval-runtime.js';
 export * from './core/ast-grep-observation-adapter.js';
 export * from './core/simdjson-typed-evidence-adapter.js';
+export * from './core/json-duplicate-key-guard-v1.js';
+export * from './core/repository-analysis-batch-v1.js';
 export * from './core/summary-search-census-v1.js';
 export * from './core/adaptive-dag-plan-v1.js';
 export * from './core/parameter-artifact-v1.js';

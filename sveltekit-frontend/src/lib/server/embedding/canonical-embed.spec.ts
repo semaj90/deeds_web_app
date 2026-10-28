@@ -80,6 +80,53 @@ describe('tryEmbedCanonical', () => {
     });
   });
 
+  it('preserves validated execution and input-recipe observations without promoting their status', async () => {
+    const executionObservation = {
+      schema: 'atlas.embedding-execution-observation.v1',
+      status: 'OBSERVED_NOT_VERIFIED',
+      source: 'ollama',
+      reportedModel: 'embeddinggemma:latest',
+      dimensions: 768,
+      cacheHit: false,
+      inputChecksum: `sha256:${'a'.repeat(64)}`,
+      vectorChecksum: `sha256:${'b'.repeat(64)}`,
+    };
+    const inputRecipe = {
+      mode: 'code_retrieval_query',
+      promptRevision: 'eg-task-prefix-v1',
+      sourceTextDigest: 'c'.repeat(64),
+      formattedInputChecksum: 'd'.repeat(64),
+    };
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      embedding: normalizedEmbedding(),
+      model: 'embeddinggemma:latest',
+      executionObservation,
+      inputRecipe,
+    }), { status: 200 })));
+
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    const result = await tryEmbedCanonical('source text', { baseUrl: 'http://127.0.0.1:5173' });
+
+    expect(result?.executionObservation).toEqual(executionObservation);
+    expect(result?.inputRecipe).toEqual(inputRecipe);
+    expect(result?.executionObservation?.status).toBe('OBSERVED_NOT_VERIFIED');
+  });
+
+  it('drops malformed execution and recipe observations while retaining a valid vector', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      embedding: normalizedEmbedding(),
+      executionObservation: { status: 'VERIFIED', vectorChecksum: 'not-a-digest' },
+      inputRecipe: { mode: 'unknown', promptRevision: '', sourceTextDigest: 'x' },
+    }), { status: 200 })));
+
+    const { tryEmbedCanonical } = await import('./canonical-embed.js');
+    const result = await tryEmbedCanonical('source text', { baseUrl: 'http://127.0.0.1:5173' });
+
+    expect(result?.embedding).toHaveLength(768);
+    expect(result).not.toHaveProperty('executionObservation');
+    expect(result).not.toHaveProperty('inputRecipe');
+  });
+
   it('omits taskMode when model is mock', async () => {
     let sentBody: Record<string, unknown> = {};
     const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {

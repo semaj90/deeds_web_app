@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atlas.okf-concept-gap.v1",
+  "title": "Parent Atlas OKF concept gap",
+  "type": "object",
+  "required": [
+    "schema",
+    "gap_id",
+    "title",
+    "status",
+    "owner",
+    "summary",
+    "evidence",
+    "discovered_at"
+  ],
+  "properties": {
+    "schema": { "const": "atlas.okf-concept-gap.v1" },
+    "gap_id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "status": { "const": "NOT_PROVEN" },
+    "owner": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ref"],
+        "properties": {
+          "ref": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "discovered_at": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}
