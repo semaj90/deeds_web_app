@@ -9,8 +9,8 @@ export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
  *
  * Client inference tiers (priority order):
  *   1. Tiny ONNX / helper models (browser-local utility lane)
- *   2. Optional Gemma 4 client helpers (WebGPU or LiteRT)
- *   3. Gemma 3 270M ONNX (legacy helper fallback)
+ *   2. Gemma 4 E2B ONNX client generation (WebGPU, canonical per browser-model-policy.ts; eval-testing)
+ *   3. Gemma 3 270M ONNX (legacy helper fallback; artifact only in stale build/client, not static/)
  *
  * Server inference tiers (priority order):
  *   1. TensorRT-LLM (INT4 AWQ, :8099)
