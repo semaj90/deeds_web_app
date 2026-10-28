@@ -1,12 +1,13 @@
 // Babylon retarget harness (tooling evidence, not app code). Bundle from sveltekit-frontend/ so Babylon and the repo modules resolve:
 //   cp scripts/atlas/babylon-retarget-harness/entry.ts sveltekit-frontend/harness.entry.tmp.ts && cd sveltekit-frontend && npx esbuild ./harness.entry.tmp.ts --bundle --format=iife --outfile=../.tmp/atlas/babylon-harness/bundle.js && rm harness.entry.tmp.ts
 // Run (dev server on :5173; set MSYS_NO_PATHCONV=1 in Git Bash): MSYS_NO_PATHCONV=1 node run.mjs <clip> [/models/courtroom/character_alice_skinned.glb]  (paths in run.mjs are relative to sveltekit-frontend/)
-import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, SceneLoader, SceneLoaderAnimationGroupLoadingMode, Quaternion } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, SceneLoader, SceneLoaderAnimationGroupLoadingMode, Quaternion, TransformNode, StandardMaterial, Color3 } from '@babylonjs/core';
+import '@babylonjs/loaders/OBJ';
 import '@babylonjs/loaders/glTF';
 import { retargetPose, qAngleDeg } from './src/lib/courtroom/rest-pose-retarget-v1';
 import { CLIP_TO_ALICE_BONE } from './src/lib/courtroom/bone-retarget-v1';
 
-(window as any).runHarness = async (charUrl: string, clipUrl: string) => {
+(window as any).runHarness = async (charUrl: string, clipUrl: string, jesterUrl?: string) => {
 	const canvas = document.createElement('canvas'); canvas.width = 640; canvas.height = 480; document.body.appendChild(canvas);
 	const engine = new Engine(canvas, true, { preserveDrawingBuffer: true });
 	const scene = new Scene(engine);
@@ -70,8 +71,24 @@ import { CLIP_TO_ALICE_BONE } from './src/lib/courtroom/bone-retarget-v1';
 	const dirErr = () => { const out: any = {}; for (const [a1, b1] of pairs) { const sa = srcLeaf.find((n: any) => n.name === a1), sb = srcLeaf.find((n: any) => n.name === b1); const ta = tgtLeaf.find((n: any) => n.name === (CLIP_TO_ALICE_BONE as any)[a1]), tb = tgtLeaf.find((n: any) => n.name === (CLIP_TO_ALICE_BONE as any)[b1]); if (!sa || !sb || !ta || !tb) { out[a1] = 'missing'; continue; } const ds = wp(sb).subtract(wp(sa)).normalize(); const dt = wp(tb).subtract(wp(ta)).normalize(); out[a1 + '>' + b1] = Math.round(Math.acos(Math.max(-1, Math.min(1, Vector3.Dot(ds, dt)))) * 180 / Math.PI); } return out; };
 	const marks: any[] = []; const shots: string[] = [];
 	marks.push({ ...dAt('rest-input'), dirErr: dirErr(), vecs: vecs() }); shots.push(canvas.toDataURL('image/png'));
+	let jesterParts: any[] = []; const restC = new Map<any, Vector3>();
+	const cen = (m: any) => { m.computeWorldMatrix(true); return m.getBoundingInfo().boundingBox.centerWorld.clone(); };
+	if (jesterUrl) {
+		const jr = await SceneLoader.ImportMeshAsync('', '', jesterUrl, scene);
+		jesterParts = jr.meshes.filter((m: any) => m.getTotalVertices() > 0);
+		const jx = scene.getWorldExtends((m: any) => jesterParts.includes(m)); const jsize = jx.max.subtract(jx.min); const jcen = jx.min.add(jx.max).scale(0.5);
+		const ax = scene.getWorldExtends((m: any) => m.skeleton && m.isVisible); const asize = ax.max.subtract(ax.min); const acen = ax.min.add(ax.max).scale(0.5);
+		const k = (asize.y * 0.9) / jsize.y; const rootN = new TransformNode('jesterRoot', scene); rootN.scaling.setAll(k); rootN.position = acen.subtract(jcen.scale(k));
+		jesterParts.forEach((m: any) => { m.parent = rootN; const mat = new StandardMaterial('jm' + m.name, scene); mat.diffuseColor = new Color3(0.85, 0.1, 0.15); mat.emissiveColor = new Color3(0.35, 0.02, 0.05); m.material = mat; });
+		const bones = tgtLeaf.filter((n: any) => !n.name.endsWith('_end'));
+		let attached = 0; const perBone: any = {};
+		jesterParts.forEach((m: any) => { const c = cen(m); let best: any = null, bd = 1e9; for (const b of bones) { const d = Vector3.Distance(c, wp(b)); if (d < bd) { bd = d; best = b; } } if (best) { (m as any).setParent(best); attached++; perBone[best.name.replace('J_Bip_', '')] = (perBone[best.name.replace('J_Bip_', '')] || 0) + 1; } });
+		jesterParts.forEach((m: any) => restC.set(m, cen(m)));
+		res.jester = { parts: jesterParts.length, attached, scale: Math.round(k * 1000) / 1000, perBone };
+		cam.radius = Math.max(asize.y * 2.0, 2.0);
+	}
 	scene.animationGroups.slice(before).forEach((g) => g.start(true));
-	for (const frame of [60, 600, 1500, 2500]) { groups.forEach((g) => g.goToFrame(frame)); for (let i = 0; i < 4; i++) { scene.render(); await new Promise((r) => setTimeout(r, 30)); } marks.push({ ...dAt('f' + frame), dirErr: dirErr(), vecs: vecs() }); shots.push(canvas.toDataURL('image/png')); }
+	for (const frame of [60, 600, 1500, 2500]) { groups.forEach((g) => g.goToFrame(frame)); for (let i = 0; i < 4; i++) { scene.render(); await new Promise((r) => setTimeout(r, 30)); } marks.push({ ...dAt('f' + frame), dirErr: dirErr(), vecs: vecs(), jesterMoved: jesterParts.filter((m: any) => Vector3.Distance(cen(m), restC.get(m) as any) > 0.02).length, jesterMaxShift: Math.round(Math.max(0, ...jesterParts.map((m: any) => Vector3.Distance(cen(m), restC.get(m) as any))) * 100) / 100 }); shots.push(canvas.toDataURL('image/png')); }
 	res.marks = marks; res.shots = shots;
 	return res;
 };
