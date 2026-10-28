@@ -283,6 +283,9 @@
 		<div class="bg-panel border-2 border-black/20 rounded-lg p-12 text-center">
 			<div class="text-6xl mb-4">📊</div>
 			<h2 class="text-2xl font-bold text-black mb-2 uppercase tracking-wide">No Analysis Generated Yet</h2>
+			{#if data.loadError}
+				<p class="text-black/60 mb-4" role="status">{data.loadError}</p>
+			{/if}
 			<p class="text-black/60 mb-6">
 				Click "Regenerate Analysis" to start comprehensive error analysis with RAG+KAG integration.
 			</p>

@@ -39,21 +39,24 @@ let modalElement: HTMLDivElement | null = $state(null);
 
 	$effect(() => {
 
+		let stopObserving: (() => void) | undefined;
 		if (diamondPattern && canvasElement) {
-			drawDiamondPattern();
+			stopObserving = drawDiamondPattern();
 		}
 		return () => {
+			stopObserving?.();
 			if (animationFrame) {
 				cancelAnimationFrame(animationFrame);
 			}
 		};
-	
-});
+	});
 
-	function drawDiamondPattern() {
-		if (!canvasElement) return;
+	/** Draws the animated pattern at the canvas' real CSS size (no stretching); returns a cleanup function. */
+	function drawDiamondPattern(): (() => void) | undefined {
+		const canvas = canvasElement;
+		if (!canvas) return;
 
-		const ctx = canvasElement.getContext('2d');
+		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
 		const colors = {
@@ -64,12 +67,22 @@ let modalElement: HTMLDivElement | null = $state(null);
 			error: '#ff6b6b'
 		};
 
-		const width = (canvasElement.width = 400);
-		const height = (canvasElement.height = 400);
-
 		const diamondSize = 40;
-		const rows = Math.ceil(height / diamondSize) + 2;
-		const cols = Math.ceil(width / diamondSize) + 2;
+		const MAX_SIDE = 1600;
+		let width = 400;
+		let height = 400;
+		let rows = 0;
+		let cols = 0;
+
+		function resize() {
+			width = canvas.width = Math.min(MAX_SIDE, Math.max(1, Math.round(canvas.clientWidth)) || 400);
+			height = canvas.height = Math.min(MAX_SIDE, Math.max(1, Math.round(canvas.clientHeight)) || 400);
+			rows = Math.ceil(height / diamondSize) + 2;
+			cols = Math.ceil(width / diamondSize) + 2;
+		}
+		resize();
+		const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(resize);
+		observer?.observe(canvas);
 
 		let offset = 0;
 
@@ -113,6 +126,7 @@ let modalElement: HTMLDivElement | null = $state(null);
 		}
 
 		animate();
+		return () => observer?.disconnect();
 	}
 
 	function closeModal() {
@@ -126,6 +140,8 @@ let modalElement: HTMLDivElement | null = $state(null);
 		}
 	}
 </script>
+
+<svelte:window onkeydown={(e) => open && handleKeydown(e)} />
 
 {#if open}
 	<div
@@ -203,6 +219,8 @@ let modalElement: HTMLDivElement | null = $state(null);
 		justify-content: center;
 		z-index: 9999;
 	padding: 1rem;
+		overflow-y: auto;
+		overscroll-behavior: contain;
 	}
 
 	.modal-container { position: relative;
@@ -220,6 +238,10 @@ let modalElement: HTMLDivElement | null = $state(null);
 			inset 0 0 32px rgba(255, 255, 255, 0.05);
 		overflow: hidden;
 	width: 100%;
+		margin: auto;
+		max-height: calc(100dvh - 2rem);
+		display: flex;
+		flex-direction: column;
 	}
 
 	.glass-effect {
@@ -259,7 +281,10 @@ let modalElement: HTMLDivElement | null = $state(null);
 	display: flex;
 		flex-direction: column;
 		min-height: 200px;
-		max-height: 85vh;
+		min-height: min(200px, 100%);
+		max-height: 100%;
+		flex: 1 1 auto;
+		min-width: 0;
 	}
 
 	.modal-header {
@@ -284,6 +309,7 @@ let modalElement: HTMLDivElement | null = $state(null);
 	.modal-body {
 		padding: 2rem;
 		overflow-y: auto;
+		min-height: 0;
 	flex: 1;
 		color: rgba(255, 255, 255, 0.9);
 	}

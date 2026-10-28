@@ -133,7 +133,9 @@
 			const q = searchQuery.toLowerCase();
 			result = result.filter(c => c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q));
 		}
-		return result.sort((a, b) => b.score - a.score);
+		// Copy first: with no filter active `result` is the `cases` $state array, and sorting it in place
+		// inside $derived throws state_unsafe_mutation.
+		return [...result].sort((a, b) => b.score - a.score);
 	});
 
 	function getScoreColor(score: number): string {

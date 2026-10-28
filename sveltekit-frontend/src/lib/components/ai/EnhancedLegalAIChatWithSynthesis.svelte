@@ -160,7 +160,8 @@ How can I assist with your legal work today?`);
   // ==================== DATABASE INTEGRATION FUNCTIONS ====================
 
   async function initializeChatSession() {
-    if (!persistConversation || !browser) return;
+    // The sessions API rejects an empty userId (400); without a user the chat simply runs unpersisted.
+    if (!persistConversation || !browser || !userId) return;
 
     try {
       const sessionData = {
