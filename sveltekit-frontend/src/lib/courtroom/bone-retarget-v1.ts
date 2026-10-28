@@ -79,3 +79,50 @@ export const UNMAPPED_CLIP_NODES = ["HeadTip", "LeftFinger1Metacarpal", "LeftFin
 export function aliceBoneForClipNode(name: string): string | null {
 	return (CLIP_TO_ALICE_BONE as Record<string, string>)[name] ?? null;
 }
+
+/**
+ * Mixamo-skeleton variant: clips exported from Mixamo (for example `objection_dramatic.glb`, `walk_normal.glb`)
+ * name their bones `mixamorig:Hips`, `mixamorig:LeftUpLeg`, ... instead of the plain motion-capture names above.
+ * Built from the standard Mixamo bone set; Mixamo thumb/finger tips (`...4`), `HeadTop_End` and `Toe_End` have no
+ * VRM counterpart and stay unmapped. Name table only: rest-pose compatibility with the alice skeleton has not been
+ * measured for this skeleton, and playback has not been verified.
+ */
+const MIXAMO_BASE: Record<string, string> = {
+	Hips: 'J_Bip_C_Hips',
+	Spine: 'J_Bip_C_Spine',
+	Spine1: 'J_Bip_C_Chest',
+	Spine2: 'J_Bip_C_UpperChest',
+	Neck: 'J_Bip_C_Neck',
+	Head: 'J_Bip_C_Head',
+};
+const MIXAMO_SIDE: Record<string, string> = {
+	Shoulder: 'Shoulder',
+	Arm: 'UpperArm',
+	ForeArm: 'LowerArm',
+	Hand: 'Hand',
+	UpLeg: 'UpperLeg',
+	Leg: 'LowerLeg',
+	Foot: 'Foot',
+	ToeBase: 'ToeBase',
+};
+const MIXAMO_FINGERS: Record<string, string> = { Thumb: 'Thumb', Index: 'Index', Middle: 'Middle', Ring: 'Ring', Pinky: 'Little' };
+
+function buildMixamoTable(): Record<string, string> {
+	const table: Record<string, string> = {};
+	for (const [k, v] of Object.entries(MIXAMO_BASE)) table[`mixamorig:${k}`] = v;
+	for (const [side, letter] of [['Left', 'L'], ['Right', 'R']] as const) {
+		for (const [k, v] of Object.entries(MIXAMO_SIDE)) table[`mixamorig:${side}${k}`] = `J_Bip_${letter}_${v}`;
+		for (const [finger, vrm] of Object.entries(MIXAMO_FINGERS)) {
+			for (const joint of [1, 2, 3]) table[`mixamorig:${side}Hand${finger}${joint}`] = `J_Bip_${letter}_${vrm}${joint}`;
+		}
+	}
+	return table;
+}
+
+export const MIXAMO_TO_ALICE_BONE: Readonly<Record<string, string>> = buildMixamoTable();
+
+/** Alice bone for either skeleton family (plain motion-capture names or `mixamorig:` names); null when unmapped. */
+export function aliceBoneForAnyClipNode(name: string): string | null {
+	return aliceBoneForClipNode(name) ?? MIXAMO_TO_ALICE_BONE[name] ?? null;
+}
+

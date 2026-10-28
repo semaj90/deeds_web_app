@@ -18,4 +18,17 @@ describe('bone retarget table', () => {
 		expect(aliceBoneForClipNode('Root')).toBeNull();
 		expect(aliceBoneForClipNode('NotABone')).toBeNull();
 	});
+
+	it('maps Mixamo-named bones to the same alice bones, with unique targets and no tip bones', async () => {
+		const { MIXAMO_TO_ALICE_BONE, aliceBoneForAnyClipNode } = await import('./bone-retarget-v1.js');
+		const targets = Object.values(MIXAMO_TO_ALICE_BONE);
+		expect(targets).toHaveLength(6 + 2 * (8 + 15));
+		expect(new Set(targets).size).toBe(targets.length);
+		expect(aliceBoneForAnyClipNode('mixamorig:Hips')).toBe('J_Bip_C_Hips');
+		expect(aliceBoneForAnyClipNode('mixamorig:LeftArm')).toBe('J_Bip_L_UpperArm');
+		expect(aliceBoneForAnyClipNode('mixamorig:RightHandPinky2')).toBe('J_Bip_R_Little2');
+		expect(aliceBoneForAnyClipNode('mixamorig:LeftHandIndex4')).toBeNull();
+		expect(aliceBoneForAnyClipNode('mixamorig:HeadTop_End')).toBeNull();
+		expect(aliceBoneForAnyClipNode('LeftArm')).toBe('J_Bip_L_UpperArm'); // plain names still work
+	});
 });
