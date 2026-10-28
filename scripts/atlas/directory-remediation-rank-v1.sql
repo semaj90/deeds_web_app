@@ -1,8 +1,10 @@
 -- Directory remediation rank (read-only, CPU, deterministic). Run from the repo root:
---   ATLAS_WIDE=<kv wide.parquet> [ATLAS_MAP=<directory map .md>] [ATLAS_PR=<directory pagerank csv>] duckdb -c ".read scripts/atlas/directory-remediation-rank-v1.sql"
+--   ATLAS_WIDE=<kv wide.parquet> [ATLAS_MAP=<directory map .md>] [ATLAS_PR=<directory pagerank csv>] [ATLAS_INV=<inventory.parquet> ATLAS_WSB=<bindings csv: workspace_revision,canonical_source_ref,content_digest>] duckdb -c ".read scripts/atlas/directory-remediation-rank-v1.sql"
 -- Inputs : wide enrichment Parquet (python/atlas_directory_kv_enrichment_v1.py), docs/CODEBASE_DIRECTORY_MAP.md.
 -- PageRank (optional): CSV of directory_path,pr_max,pr_run_id,graph_revision,algorithm_revision from the latest graph_node_metrics run joined through atlas_packets.
 --   Packet directories are frontend-relative (src/...); one EXPLICIT namespace rule maps them: 'sveltekit-frontend/' || directory_path when it starts with src/. No fuzzy matching.
+-- Revision binding (optional, needs ATLAS_INV + ATLAS_WSB): a ticket carries workspaceRevision ONLY when every inventory file in the directory matches the admitted
+--   binding by exact path + digest; otherwise it stays null and _proposal records exact/files counts. Never inferred from git.
 -- Outputs: ./.tmp/atlas/directory_remediation_rank.parquet and ./.tmp/atlas/directory_remediation_tickets.jsonl (fixed paths; COPY needs literals).
 -- Tickets use the create_ticket shape of /api/admin/atlas/kanban-tickets (+ a sibling _proposal block); nothing is posted, no datastore is written.
 -- The map's own 'Generated:' date is carried into every ticket as map_input, so a stale map is visible, not assumed.
@@ -32,6 +34,14 @@ SELECT 'sveltekit-frontend/' || directory_path AS repo_dir, pr_max, pr_run_id, g
 FROM read_csv(coalesce(nullif(getenv('ATLAS_PR'), ''), 'NO_PAGERANK_INPUT.csv'), ignore_errors = true)
 WHERE directory_path = 'src' OR directory_path LIKE 'src/%';
 
+CREATE OR REPLACE TEMP TABLE bind AS
+SELECT regexp_replace(i.source_ref, '/[^/]*$', '') AS directory_path, count(*) AS bind_files,
+       count(*) FILTER (WHERE replace(i.source_digest, 'sha256:', '') = replace(b.content_digest, 'sha256:', '')) AS bind_exact,
+       any_value(b.workspace_revision) AS bind_revision
+FROM read_parquet(coalesce(nullif(getenv('ATLAS_INV'), ''), 'NO_INVENTORY.parquet')) i
+LEFT JOIN read_csv(coalesce(nullif(getenv('ATLAS_WSB'), ''), 'NO_BINDINGS.csv')) b ON b.canonical_source_ref = i.source_ref
+GROUP BY 1;
+
 CREATE OR REPLACE TEMP TABLE ranked AS
 SELECT
   w.directory_path,
@@ -44,6 +54,7 @@ SELECT
   least(20, 5 * w.duplicate_content_files) AS t_dup,
   least(10, w.file_count / 10) AS t_size,
   (m.map_dir IS NOT NULL) AS map_matched,
+  bd.bind_files, bd.bind_exact, CASE WHEN bd.bind_files > 0 AND bd.bind_exact = bd.bind_files THEN bd.bind_revision END AS bound_revision,
   coalesce(round(20 * r.pr_pct, 1), 0) AS t_centrality,
   r.pr_run_id, r.graph_revision AS pr_graph_revision,
   least(40, 100 - coalesce(m.map_score, 100)) + least(30, 10 * w.bak_count) + least(20, 5 * w.duplicate_content_files) + least(10, w.file_count / 10) + coalesce(round(20 * r.pr_pct, 1), 0) AS score,
@@ -51,6 +62,7 @@ SELECT
 FROM wide w
 LEFT JOIN dirmap m ON m.map_dir = regexp_replace(w.directory_path, '^sveltekit-frontend/src/?', '')
 LEFT JOIN pr r ON r.repo_dir = w.directory_path
+LEFT JOIN bind bd ON bd.directory_path = w.directory_path
 WHERE w.directory_path <> '';
 
 COPY (SELECT *, row_number() OVER (ORDER BY score DESC, directory_path ASC) AS rank FROM ranked ORDER BY rank)
@@ -68,9 +80,9 @@ COPY (
     'acceptanceCriteria', [CASE WHEN lane = 'CLEANUP' THEN 'Archive (not delete) duplicate/.bak files under the directory' ELSE 'Clear the listed map issues for the directory' END],
     'validationCommand', CASE WHEN lane = 'CLEANUP' THEN 'git ls-files ' || directory_path || ' | rg "\.bak$"' ELSE 'cd sveltekit-frontend && npm run check' END,
     'permissionMode', 'proposal_only',
-    'workspaceRevision', NULL, -- the wide input predates revision columns; a promoted ticket needs a real workspace revision
+    'workspaceRevision', bound_revision, -- set only when every file in the directory matches the admitted binding exactly
     '_proposal', json_object('status', 'PROPOSED', 'evidence_digest', evidence_digest, 'map_issues', map_issues,
-                              'map_input', 'directory-map generated ' || coalesce(map_generated, 'UNMATCHED'), 'map_matched', map_matched, 'pagerank_run_id', pr_run_id, 'pagerank_graph_revision', pr_graph_revision, 'canonicalAuthority', false, 'writesPerformed', false)
+                              'map_input', 'directory-map generated ' || coalesce(map_generated, 'UNMATCHED'), 'map_matched', map_matched, 'binding_files', bind_files, 'binding_exact', bind_exact, 'pagerank_run_id', pr_run_id, 'pagerank_graph_revision', pr_graph_revision, 'canonicalAuthority', false, 'writesPerformed', false)
   ) AS ticket
   FROM ranked WHERE score > 0 QUALIFY row_number() OVER (ORDER BY score DESC, directory_path ASC) <= 50
   ORDER BY score DESC, directory_path ASC
