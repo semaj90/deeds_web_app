@@ -43,10 +43,13 @@ const config = {
     dynamicCompileOptions({ filename }) {
       // Svelte 4 legacy packages (lucide-svelte uses $$props) need runes disabled.
       // svelte-sonner and bits-ui use $props() runes and must NOT be overridden.
+      // @sveltejs/kit's default layout (svelte-5/layout.svelte) also uses $props(); compiled with runes:false it throws
+      // "props is not defined" on routes whose layout level has a +layout.ts but no +layout.svelte (e.g. /demos/*).
       if (
         filename.includes('node_modules') &&
         !filename.includes('svelte-sonner') &&
-        !filename.includes('bits-ui')
+        !filename.includes('bits-ui') &&
+        !filename.includes('@sveltejs/kit')
       ) {
         return { runes: false };
       }
