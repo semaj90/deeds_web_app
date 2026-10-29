@@ -4,7 +4,7 @@ Statuses use the repo vocabulary. `[x]` means done AND verified as stated; brows
 Test command (courtroom): `cd sveltekit-frontend && npx vitest run src/lib/courtroom`
 Type check: `svelte-check` with a scoped tsconfig over the courtroom page, components and `src/lib/courtroom/**`.
 
-## 0. Handoff ledger (state on 2026-10-28; nothing committed; shared files carry another session's edits)
+## 0. Handoff ledger (state on 2026-10-28; checkpoint commit `1161e901d25` is local; submodule worktrees remain separate)
 
 | ID | Item | Status | Evidence |
 |---|---|---|---|
@@ -18,9 +18,10 @@ Type check: `svelte-check` with a scoped tsconfig over the courtroom page, compo
 | H-08 | bits-ui action bar, timeline panel, cast dialog, coordinate readout | DONE, type-checked | `CourtroomActionBar/TimelinePanel/CastDialog/CoordinateReadout.svelte` |
 | H-09 | Text-to-emotion (offline lexicon) | CREATED, not wired to the page | `text-emotion-v1.ts` |
 | H-10 | Jester accessories (cap horns, halo, wings, staff, tail) on Alice via GLB + manifest | WIRED, axes/scale unverified in render | `build-jester-accessories-v1.py`, `jester-accessory-*` |
-| H-11 | Alice GLB variants full / N64 / SNES from `alice.blend` | DONE | `scripts/atlas/export-alice-variants-v1.py`; `static/models` is gitignored (assets exist only on this machine) |
+| H-11 | Alice GLB variants full / N64 / SNES from `alice.blend` | DONE | `scripts/atlas/export-alice-variants-v1.py`; three Alice GLBs are included in checkpoint commit `1161e901d25` (7.73 MB total) |
 
 | H-12 | Timeline keyframe moves routed through the validated `moveTo` (no direct position setter) | REPORTED by the other session, not re-verified here | scene file edit in their report |
+| H-13 | CSP-DEMO-L1 local Level 1 orientation: real scene readiness, all three camera receipts, one terminal movement receipt, final coordinates when finished, and no case/session writes | BROWSER-PROVEN | `tests/e2e/courtroom-sim-level1.spec.ts`; `PLAYWRIGHT_SKIP_GLOBAL_SETUP=true npx playwright test tests/e2e/courtroom-sim-level1.spec.ts --config=playwright.config.ts --project=chromium`; 2 passed at 1280x720 and 1920x1080 on :5173; receipt JSON `sveltekit-frontend/test-results/e2e-results.json`; renderer status is recorded by the test and is not a performance claim |
 
 Known open from the ledger: station occupancy (CSP-12), stray `room_*.glb` "environment" model in the foreground, `P/I/G` toggles only added to preview mode, icons from `@iconify-json/lucide` blank (CSP-60).
 
@@ -29,7 +30,7 @@ Known open from the ledger: station occupancy (CSP-12), stray `room_*.glb` "envi
 - [ ] CSP-10 Index cues by tick (`Map<tick, Cue[]>`) so `step()` stops scanning every cue every tick; keep output identical (property test against the current engine).
 - [ ] CSP-11 Add `music` cue kind (`value` = track id from a manifest); validation rejects unknown ids.
 - [x] CSP-12 RESOLVED (code by another session, verified here by `move-cue.spec.ts` passing): `scene-adapter.ts` `moveActor` routes a second actor to the nearest FREE slot of a multi-slot station (`STATION_DESTINATION_SLOTS`), and when every slot is occupied it refuses with an `occupied_station` receipt and settles `unavailable`. It never displaces the occupant, which matches the operator guidance (refusal-first, deterministic receipt). The earlier "conflict" was two tests of one policy. Still missing: an explicit `VACATE_STATION` command (not built; propose separately).
-- [x] CSP-13 Arrival wait rule: reported by another session as done (story pauses before the cross-examination cue until the move settles; HUD shows the move outcome and final coordinates; 20 movement/story tests, scoped check 4,476 files / 0 errors; see `docs/reports/courtroom-agentic-simulation-evidence-pipeline-audit-2026-10-28.md`). NOT_PROVEN in the browser: the HUD receipt was not yet visible in their headless run. Not re-run by this session.
+- [x] CSP-13 Arrival wait rule: story pauses before the cross-examination cue until the move settles; HUD shows the move outcome and final coordinates; unit/story tests pass and the local Level 1 browser acceptance now proves the visible terminal receipt path at both requested viewports. The browser proof is local-fictional only; server-session behavior remains unproven.
 - [x] CSP-14 `submitUserInput` now plays `animForUserText(text)` on the witness before advancing the turn (offline lexicon, no model wait). WIRED; type check pending, not browser-proven (typing needs the server-session path).
 
 ## 1b. Legal-AI API calls (evidence, video, sharing)
@@ -88,6 +89,6 @@ Known open from the ledger: station occupancy (CSP-12), stray `room_*.glb` "envi
 
 ## 10. Verification gates
 
-- [ ] CSP-95 Gate A: all courtroom specs and a scoped type check green.
+- [ ] CSP-95 Gate A: all courtroom specs and a scoped type check green. PARTIAL: focused Level 1/adapter suites pass (3 files, 16 tests); the full `npm run check -- --output human` invocation timed out without diagnostics in this session, so do not mark the gate complete. Prior preserved log `docs/.tmp/atlas/svelte-check-full-20261028n.log` records a separate 0-error run and is not a substitute for a fresh completion receipt.
 - [ ] CSP-96 Gate B: local preview probe (no DB writes) shows the full upload fixture to a grounded story with the loading bar and positions readout.
 - [ ] CSP-97 Gate C (needs approval): one real upload end to end, with Postgres readback.
