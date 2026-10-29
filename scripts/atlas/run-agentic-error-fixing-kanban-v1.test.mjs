@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -58,7 +59,7 @@ test('audit gates and a timed-out pipeline stage retain distinct evidence in the
     assert.equal(plan.candidates.find((candidate) => candidate.gateId === 'TURBOVEC_CANDIDATE_ORDINAL_BRIDGE')?.kind, 'RETRIEVAL_OR_PROJECTION');
 
     writeFileSync(boardPath, JSON.stringify({ generated: 'fixture', tasks: [{ id: 'keep-me', origin: 'other' }] }));
-    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath], { cwd: root });
+    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--write'], { cwd: root });
     const board = JSON.parse(readFileSync(boardPath, 'utf8'));
     const tasks = board.tasks.filter((task) => task.origin === 'agentic_error_fixing_v1');
     const gateIds = new Set(plan.candidates.map((candidate) => candidate.gateId));
@@ -91,7 +92,7 @@ test('merge mode adds a new diagnostic without replacing existing agentic propos
     execFileSync(process.execPath, [planner, '--text', 'TURBOVEC_DRY_RUN_TIMEOUT=TIMEOUT TurboVec downstream dry-run timed out after 180 seconds.', '--report', planPath, '--offline'], { cwd: root });
     writeFileSync(boardPath, JSON.stringify({ tasks: [existingTask, unrelatedTask] }));
 
-    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--merge'], { cwd: root });
+    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--merge', '--write'], { cwd: root });
     const board = JSON.parse(readFileSync(boardPath, 'utf8'));
     assert.ok(!board.tasks.some((task) => task.id === existingTask.id));
     assert.ok(board.tasks.some((task) => task.id === unrelatedTask.id));
@@ -99,13 +100,37 @@ test('merge mode adds a new diagnostic without replacing existing agentic propos
     assert.equal(timeoutTasks.length, 1);
     assert.equal(timeoutTasks[0].status, 'PROPOSED');
 
-    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--merge'], { cwd: root });
+    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--merge', '--write'], { cwd: root });
     const rerun = JSON.parse(readFileSync(boardPath, 'utf8'));
     assert.equal(rerun.tasks.filter((task) => task.reason_codes?.includes('TURBOVEC_DRY_RUN_TIMEOUT')).length, 1);
     assert.ok(rerun.tasks.some((task) => task.id === unrelatedTask.id));
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }
+});
+
+test('Kanban bridge defaults to preview and requires explicit write opt-in', () => {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atlas-error-kanban-default-preview-'));
+  try {
+    const diagnosticsPath = path.join(tempDir, 'diagnostics.txt');
+    const planPath = path.join(tempDir, 'plan.json');
+    const boardPath = path.join(tempDir, 'board.json');
+    const boardBefore = JSON.stringify({ tasks: [{ id: 'preserve-me' }] });
+    writeFileSync(diagnosticsPath, 'GRAPHIFY_GATE=BLOCKED Source lineage remains unverified.\n');
+    execFileSync(process.execPath, [planner, '--file', diagnosticsPath, '--report', planPath, '--offline'], { cwd: root });
+    writeFileSync(boardPath, boardBefore);
+
+    const preview = JSON.parse(execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath], { cwd: root, encoding: 'utf8' }));
+    assert.equal(preview.status, 'BOARD_PREVIEW');
+    assert.equal(preview.writesPerformed, false);
+    assert.equal(readFileSync(boardPath, 'utf8'), boardBefore);
+
+    assert.throws(
+      () => execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--write', '--dry-run'], { cwd: root, stdio: 'pipe' }),
+      /WRITE_AND_DRY_RUN_ARE_MUTUALLY_EXCLUSIVE/
+    );
+    assert.equal(readFileSync(boardPath, 'utf8'), boardBefore);
+  } finally { rmSync(tempDir, { recursive: true, force: true }); }
 });
 
 test('structured Graphify eligibility produces gate-specific non-dispatching proposals', () => {
@@ -228,4 +253,135 @@ test('receipt collision is rejected before changing board or input artifacts', (
       assert.equal(readFileSync(receiptPath, 'utf8'), 'preserve receipt');
     }
   } finally { rmSync(tempDir, { recursive: true, force: true }); }
+});
+
+test('reviewed source findings become revision-bound proposals only after byte verification', () => {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atlas-reviewed-source-finding-'));
+  try {
+    const findingsPath = path.join(tempDir, 'findings.json');
+    const planPath = path.join(tempDir, 'plan.json');
+    const boardPath = path.join(tempDir, 'board.json');
+    const sourceRef = 'scripts/atlas/build-error-fixing-kanban-tasks-v1.mjs';
+    const sourceBytes = readFileSync(path.join(root, sourceRef));
+    const startByte = 0;
+    const endByte = 32;
+    const digest = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
+    const finding = {
+      findingStatus: 'CONFIRMED',
+      kind: 'TYPECHECK_OR_SCHEMA',
+      sourceRef,
+      sourceRevision: digest(sourceBytes),
+      workspaceRevision: null,
+      startByte,
+      endByte,
+      evidenceDigest: digest(sourceBytes.subarray(startByte, endByte)),
+      verificationMethod: 'HUMAN_REVIEW',
+      verificationRef: 'review-fixture:case-1',
+      evidenceRefs: ['review-fixture:source-inspection'],
+      diagnostic: 'Reviewed fixture finding for the byte-provenance pipeline.',
+      proposedAction: 'Review the referenced source and apply an independently approved repair.',
+    };
+    const envelope = {
+      schema: 'atlas.reviewed-source-findings.v1',
+      status: 'REVIEWED',
+      canonicalAuthority: false,
+      writesPerformed: false,
+      findings: [finding],
+    };
+    writeFileSync(findingsPath, JSON.stringify(envelope));
+    execFileSync(process.execPath, [planner, '--findings', findingsPath, '--report', planPath], { cwd: root });
+    const plan = JSON.parse(readFileSync(planPath, 'utf8'));
+    assert.equal(plan.modelResolution.status, 'SKIPPED_NOT_REQUESTED');
+    assert.equal(plan.modelResolution.configuredModel, null);
+    assert.equal(plan.synthesis, null);
+    assert.equal(plan.candidateCount, 1);
+    assert.equal(plan.candidates[0].sourceRevision, finding.sourceRevision);
+    assert.equal(plan.candidates[0].workspaceRevision, null);
+    assert.equal(plan.candidates[0].evidenceDigest, finding.evidenceDigest);
+    assert.deepEqual(plan.candidates[0].sourceSpan, { startByte, endByte });
+    assert.equal(plan.candidates[0].status, 'PROPOSED');
+    assert.equal(plan.candidates[0].mutationAllowed, false);
+
+    writeFileSync(boardPath, JSON.stringify({ tasks: [] }));
+    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--write'], { cwd: root });
+    const task = JSON.parse(readFileSync(boardPath, 'utf8')).tasks[0];
+    assert.equal(task.source_revision, finding.sourceRevision);
+    assert.equal(task.evidence_digest, finding.evidenceDigest);
+    assert.deepEqual(task.source_span, { startByte, endByte });
+    assert.equal(task.dispatchable, false);
+    assert.equal(task.canonicalAuthority, false);
+
+    const reviewRequired = structuredClone(envelope);
+    reviewRequired.findings[0].findingStatus = 'REVIEW_REQUIRED';
+    writeFileSync(findingsPath, JSON.stringify(reviewRequired));
+    const rejectedPlan = path.join(tempDir, 'review-required-plan.json');
+    assert.throws(
+      () => execFileSync(process.execPath, [planner, '--findings', findingsPath, '--report', rejectedPlan, '--offline'], { cwd: root, stdio: 'pipe' }),
+      /REVIEWED_FINDING_SCHEMA_INVALID/
+    );
+    assert.equal(existsSync(rejectedPlan), false);
+
+    const stale = structuredClone(envelope);
+    stale.findings[0].sourceRevision = `sha256:${'f'.repeat(64)}`;
+    writeFileSync(findingsPath, JSON.stringify(stale));
+    const stalePlan = path.join(tempDir, 'stale-plan.json');
+    assert.throws(
+      () => execFileSync(process.execPath, [planner, '--findings', findingsPath, '--report', stalePlan, '--offline'], { cwd: root, stdio: 'pipe' }),
+      /REVIEWED_FINDING_SOURCE_REVISION_MISMATCH/
+    );
+    assert.equal(existsSync(stalePlan), false);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('qualified source and byte-span evidence survives Kanban projection and stale source is rejected', () => {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atlas-error-kanban-provenance-'));
+  try {
+    const diagnosticsPath = path.join(tempDir, 'diagnostics.txt');
+    const planPath = path.join(tempDir, 'plan.json');
+    const boardPath = path.join(tempDir, 'board.json');
+    const sourceRef = 'scripts/atlas/run-agentic-error-fixing-kanban-v1.test.mjs';
+    const sourceBytes = readFileSync(path.join(root, sourceRef));
+    const startByte = 0;
+    const endByte = 24;
+    const digest = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
+    const evidenceDigest = digest(sourceBytes.subarray(startByte, endByte));
+    writeFileSync(diagnosticsPath, 'GRAPHIFY_GATE=BLOCKED A revision-bound source finding needs review.\n');
+    execFileSync(process.execPath, [planner, '--file', diagnosticsPath, '--report', planPath, '--offline'], { cwd: root });
+
+    const plan = JSON.parse(readFileSync(planPath, 'utf8'));
+    plan.candidates[0] = {
+      ...plan.candidates[0],
+      file: sourceRef,
+      sourceRevision: digest(sourceBytes),
+      workspaceRevision: null,
+      evidenceDigest,
+      sourceSpan: { startByte, endByte },
+      evidenceRefs: [`${sourceRef}#${startByte}-${endByte}`],
+    };
+    writeFileSync(planPath, JSON.stringify(plan));
+    writeFileSync(boardPath, JSON.stringify({ tasks: [] }));
+    execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath, '--write'], { cwd: root });
+    const task = JSON.parse(readFileSync(boardPath, 'utf8')).tasks[0];
+    assert.equal(task.source_ref, sourceRef);
+    assert.equal(task.source_revision, digest(sourceBytes));
+    assert.equal(task.workspace_revision, null);
+    assert.equal(task.evidence_digest, evidenceDigest);
+    assert.deepEqual(task.source_span, { startByte, endByte });
+    assert.ok(task.evidence_refs.includes(`${sourceRef}#${startByte}-${endByte}`));
+    assert.equal(task.canonicalAuthority, false);
+    assert.equal(task.dispatchable, false);
+
+    plan.candidates[0].sourceRevision = `sha256:${'f'.repeat(64)}`;
+    writeFileSync(planPath, JSON.stringify(plan));
+    const boardBefore = readFileSync(boardPath, 'utf8');
+    assert.throws(
+      () => execFileSync(process.execPath, [boardBuilder, '--input', planPath, '--board', boardPath], { cwd: root, stdio: 'pipe' }),
+      /PROVENANCE_SOURCE_REVISION_MISMATCH/
+    );
+    assert.equal(readFileSync(boardPath, 'utf8'), boardBefore);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
 });

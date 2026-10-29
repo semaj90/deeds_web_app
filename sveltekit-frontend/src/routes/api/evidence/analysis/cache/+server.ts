@@ -39,10 +39,10 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   }
 
   const parsed = analysisCacheSchema.safeParse({
-    evidenceId: url.searchParams.get('evidenceId'),
-    caseId: url.searchParams.get('caseId'),
-    type: url.searchParams.get('type'),
-    limit: url.searchParams.get('limit'),
+    evidenceId: url.searchParams.get('evidenceId') ?? undefined,
+    caseId: url.searchParams.get('caseId') ?? undefined,
+    type: url.searchParams.get('type') ?? undefined,
+    limit: url.searchParams.get('limit') ?? undefined,
   });
 
   if (!parsed.success) {
@@ -59,8 +59,42 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
   const { evidenceId, caseId, type: analysisType, limit } = parsed.data;
 
+  const ownerId = Number(locals.user.id);
+  if (!Number.isSafeInteger(ownerId) || ownerId <= 0) {
+    return json({ error: 'Not found', data: [], cacheHit: false, count: 0 }, { status: 404 });
+  }
+
+  try {
+    const ownershipRows = evidenceId
+      ? await db.execute(sql`
+          SELECT EXISTS (
+            SELECT 1
+            FROM evidence e
+            LEFT JOIN cases c ON c.id = e.case_id
+            WHERE e.id = ${evidenceId}::uuid
+              ${caseId ? sql`AND e.case_id = ${caseId}::uuid` : sql``}
+              AND (e.user_id = ${ownerId} OR c.user_id = ${ownerId} OR c.assigned_attorney = ${ownerId})
+          ) AS authorized
+        `)
+      : await db.execute(sql`
+          SELECT EXISTS (
+            SELECT 1
+            FROM cases c
+            WHERE c.id = ${caseId}::uuid
+              AND (c.user_id = ${ownerId} OR c.assigned_attorney = ${ownerId})
+          ) AS authorized
+        `);
+    const ownership = pgRows(ownershipRows)[0] as { authorized?: boolean | string } | undefined;
+    if (ownership?.authorized !== true && ownership?.authorized !== 'true') {
+      return json({ error: 'Not found', data: [], cacheHit: false, count: 0 }, { status: 404 });
+    }
+  } catch (err) {
+    console.error('[analysis/cache] Ownership check failed:', err);
+    return json({ error: 'Unavailable', data: [], cacheHit: false, count: 0 }, { status: 503 });
+  }
+
   // L0: Memory cache check
-  const cacheKey = `analysis_cache:${evidenceId ?? ''}:${caseId ?? ''}:${analysisType ?? 'all'}`;
+  const cacheKey = `analysis_cache:${ownerId}:${evidenceId ?? ''}:${caseId ?? ''}:${analysisType ?? 'all'}:${limit}`;
   const mem = getFromMemoryCache(cacheKey);
   if (mem.found) {
     const data = Array.isArray(mem.value) ? mem.value : [];

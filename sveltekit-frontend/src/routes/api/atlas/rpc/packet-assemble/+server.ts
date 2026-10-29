@@ -5,8 +5,11 @@ import {
 	type AtlasCustomRpcPacketV1
 } from '$lib/server/atlas/contracts/atlas-custom-rpc-packet-v1.js';
 import { getRedis } from '$lib/server/redis.js';
+import { requireUser } from '$lib/server/auth-utils.js';
 
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async (event) => {
+	requireUser(event);
+	const { request } = event;
 	let body: unknown;
 	try {
 		body = await request.json();

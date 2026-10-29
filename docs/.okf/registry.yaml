@@ -316,6 +316,19 @@ contracts:
       - lexical_no_field_schema: .okf/manifest.yaml defines a lexical-v1 lane (keywords, path terms, imports) with no field-level schema
       - analyze_response_no_okf_schema: AnalyzeResponse fields (features, pass_results, classification_proposal) have no OKF definition
       - canonical_authority_false
+  - name: repository-capability-classification-v1
+    owner: .okf/domains/repository-capability-classification-v1.yaml
+    role: proposal-only, revision-bound repository capability and library-fit classification profile
+    validator: python/parent_atlas_ontology/repository_capability_profile_v1.py
+    notes:
+      - deterministic_evidence_first
+      - tree_sitter_8095_ast_grep_and_optional_lsp
+      - package_manifests_are_declarations_not_runtime_proof
+      - openwiki_is_navigation_not_authority
+      - networkx_is_cpu_reference_not_canonical
+      - byog_edges_require_source_provenance
+      - deep_agents_optional_and_non_authoritative
+      - no_feature_label_or_datastore_writes
 notes:
   - The repository currently stores live contracts in multiple places.
   - This registry is the directory entry point, not a migration target.

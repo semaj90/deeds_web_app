@@ -27,30 +27,30 @@ class EngramRemap(unittest.TestCase):
                     (True, 0, 0), (float("nan"), 0, 0), (1.5, 0, 0), ("3", 0, 0)]:
             self.assertIsNone(m.engram_token_id(*bad), bad)
 
-    def test_remap_counts_and_exact_domain_match(self):
+    def test_remap_counts_and_normalized_domain_match(self):
         buckets = {"graph": 0, "ui": 1}
         recs = [
             {"som_row": 0, "som_col": 0, "domain_class": "graph"},   # token 0
             {"som_row": 19, "som_col": 19, "domain_class": "ui"},    # token 91
-            {"som_row": 3, "som_col": 3, "domain_class": "Graph"},   # case differs -> unmapped
+            {"som_row": 3, "som_col": 3, "domain_class": " Graph "}, # normalized spelling -> token 0
             {"som_row": None, "som_col": 3, "domain_class": "ui"},   # no SOM cell
             {"som_row": 3, "som_col": 3},                            # no domain
         ]
         out = m.remap_engram_tokens(recs, buckets)
-        self.assertEqual(out["tokens"], [0, 91, None, None, None])
-        self.assertEqual(out["unresolved"], {"no_som_cell": 1, "unmapped_domain": 2})
-        self.assertEqual(sum(out["histogram"]), 2)
+        self.assertEqual(out["tokens"], [0, 91, 0, None, None])
+        self.assertEqual(out["unresolved"], {"no_som_cell": 1, "unmapped_domain": 1})
+        self.assertEqual(sum(out["histogram"]), 3)
         self.assertFalse(out["canonical_authority"])
 
 
 class DomainBucketTable(unittest.TestCase):
-    def test_generated_table_loads_and_is_exact_case(self):
+    def test_generated_table_loads_with_normalized_keys(self):
         table = m.load_domain_buckets(Path(__file__).resolve().parent / "engram-domain-buckets-v1.json")
-        self.assertEqual(len(table), 41)
-        self.assertEqual(table["Graph"], table["graph"])          # both raw spellings listed explicitly
+        self.assertEqual(len(table), 39)
+        self.assertEqual(table["graph"], 0)
         self.assertTrue(all(0 <= v < 6 for v in table.values()))
-        self.assertEqual(table["Other"], 5)
-        self.assertNotIn("GRAPH", table)                           # no fuzzy matching for unseen spellings
+        self.assertEqual(table["other"], 5)
+        self.assertNotIn("GRAPH", table)
 
     def test_rejects_bad_tables(self):
         import json, tempfile, os
@@ -58,6 +58,14 @@ class DomainBucketTable(unittest.TestCase):
             bad = os.path.join(d, "bad.json")
             Path(bad).write_text(json.dumps({"schema": "atlas.engram-domain-buckets.v1", "mapping": {"a": 6}}), encoding="utf-8")
             with self.assertRaises(ValueError):
+                m.load_domain_buckets(bad)
+
+    def test_rejects_conflicting_normalized_aliases(self):
+        import json, tempfile, os
+        with tempfile.TemporaryDirectory() as d:
+            bad = os.path.join(d, "bad.json")
+            Path(bad).write_text(json.dumps({"schema": "atlas.engram-domain-buckets.v1", "mapping": {"Graph": 0, " graph ": 1}}), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "conflicting normalized domain bucket"):
                 m.load_domain_buckets(bad)
 
 

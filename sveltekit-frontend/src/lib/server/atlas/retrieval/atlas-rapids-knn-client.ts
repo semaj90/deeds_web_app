@@ -4,6 +4,7 @@
 // lane. It intentionally uses the native-dimension constant (768), while
 // derived MRL prefixes use their own explicit dimensions.
 import { ATLAS_EMBEDDINGGEMMA_NATIVE_DIMENSION as SEMANTIC_DIMENSION } from './qdrant-semantic-projection.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export type AtlasKnnCorpusRow = {
   packetKey: string;
@@ -64,7 +65,7 @@ function assertRequest(input: AtlasKnnRequest): void {
   }
 }
 
-export function createAtlasRapidsKnnClient(baseUrl = process.env.ATLAS_RAPIDS_SIDECAR_URL ?? 'http://127.0.0.1:8098') {
+export function createAtlasRapidsKnnClient(baseUrl = ENV.ATLAS_RAPIDS_SIDECAR_URL) {
   async function search(input: AtlasKnnRequest, mode: 'exact' | 'cagra'): Promise<AtlasKnnResponse> {
     assertRequest(input);
     const response = await fetch(`${baseUrl}/v1/knn/${mode}`, {

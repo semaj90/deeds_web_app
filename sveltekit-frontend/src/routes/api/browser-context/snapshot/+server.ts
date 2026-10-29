@@ -6,7 +6,7 @@ import {
   emptyContext,
 } from '$lib/server/admin/browser-context-sanitizer.js';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
-import { BROWSER_CONTEXT_CAPS } from '$lib/types/browser-context.js';
+import { BROWSER_CONTEXT_CAPS, BrowserContextSnapshotSchema } from '$lib/types/browser-context.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 /**
@@ -58,7 +58,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   try { body = await request.json(); }
   catch { throw error(400, 'Invalid JSON'); }
 
-  const { context, stats, rejected_reason } = sanitizeBrowserContext(body);
+  const parsed = BrowserContextSnapshotSchema.safeParse(body);
+  if (!parsed.success) {
+    return json({
+      ok: false,
+      stats: {
+        tabs_dropped: 0,
+        snippets_dropped: 0,
+        history_hits_dropped: 0,
+        urls_redacted: 0,
+        snippet_redactions: 0,
+        forbidden_schemes_seen: 0,
+      },
+      rejected_reason: parsed.error.message.slice(0, 500),
+    });
+  }
+
+  const { context, stats, rejected_reason } = sanitizeBrowserContext(parsed.data);
   if (rejected_reason) {
     // Schema-rejected payload — still return 200 with stats so the extension
     // can show "snapshot dropped" without a 4xx noise burst.

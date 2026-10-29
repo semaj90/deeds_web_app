@@ -32,6 +32,7 @@ import { Client, Pool } from 'pg';
 import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pass-results.js';
 import type { ExtractedFeature } from './ast-langextract-bridge.js';
 import { classifyPostgresError } from '$lib/server/db/readiness.js';
+import { getDatabaseUrl as getConfiguredDatabaseUrl } from '$lib/config/env.server.js';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
 
@@ -120,7 +121,7 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 
 		// Upsert to code_features table (idempotent by UNIQUE constraint)
 		const pool = new Pool({
-			connectionString: process.env.DATABASE_URL || 'postgres://legal_admin:legal_ai@127.0.0.1:5434/legal_ai_db',
+			connectionString: getConfiguredDatabaseUrl(),
 			max: 5,
 		});
 
@@ -540,10 +541,10 @@ async function pollOnce(): Promise<void> {
 }
 
 async function startNotificationListener(): Promise<void> {
-	const databaseUrl = process.env.DATABASE_URL;
-	if (!databaseUrl || notificationClient) return;
+	if (notificationClient) return;
 
 	try {
+		const databaseUrl = getConfiguredDatabaseUrl();
 		const client = new Client({
 			connectionString: databaseUrl,
 			application_name: 'parent-atlas-analysis-worker-listener',

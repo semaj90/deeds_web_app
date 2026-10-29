@@ -1,34 +1,47 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { ENV } from '$lib/server/env.server.js';
-import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
-import { db } from '$lib/server/db/client';
+import { requireAdmin } from '$lib/server/auth-utils.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
+import { db } from '$lib/server/db/client.js';
 import { chatMessages } from '$lib/server/db/schema.js';
 import { z } from 'zod';
 
-const MODEL_URL = ENV.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090';
-
 const chatSchema = z.object({
-  message: z.string().min(1),
+  message: z.string().trim().min(1).max(32_000),
   history: z.array(z.object({
     role: z.enum(['user', 'assistant', 'system']),
-    content: z.string()
-  })).default([]),
-  chatId: z.string().min(1),
+    content: z.string().max(32_000)
+  }).strict()).max(32).default([]),
+  chatId: z.string().min(1).max(200),
   systemContext: z.object({
-    rabbit: z.object({ pending: z.number(), failed: z.number() }).optional(),
-    postgres: z.object({ summary_count: z.number() }).optional(),
-    neo4j: z.object({ nodes: z.number() }).optional(),
-    qdrant: z.object({ collectionCount: z.number() }).optional()
-  }).optional()
+    rabbit: z.object({ pending: z.number().finite().nonnegative(), failed: z.number().finite().nonnegative() }).strict().optional(),
+    postgres: z.object({ summary_count: z.number().finite().nonnegative() }).strict().optional(),
+    neo4j: z.object({ nodes: z.number().finite().nonnegative() }).strict().optional(),
+    qdrant: z.object({ collectionCount: z.number().finite().nonnegative() }).strict().optional()
+  }).strict().optional()
 });
 
-export const POST: RequestHandler = async ({ request, locals }) => {
-  const body = await request.json();
-  const { message, history, chatId, systemContext } = chatSchema.parse(body);
-  const userId = locals.user?.id ? Number(locals.user.id) : undefined;
+export const POST: RequestHandler = async (event) => {
+  const user = requireAdmin(event);
+  let rawBody: unknown;
+  try {
+    rawBody = await event.request.json();
+  } catch {
+    return json({ error: 'invalid_json' }, { status: 400 });
+  }
+  const parsedBody = chatSchema.safeParse(rawBody);
+  if (!parsedBody.success) {
+    return json({ error: 'invalid_request', issues: parsedBody.error.issues.slice(0, 5) }, { status: 400 });
+  }
+  const { message, history, chatId, systemContext } = parsedBody.data;
+  const userId = user.id ? Number(user.id) : undefined;
+  let target: Awaited<ReturnType<typeof resolveLlamaInferenceTarget>>;
+  try {
+    target = await resolveLlamaInferenceTarget();
+  } catch {
+    return json({ error: 'llama_server_unavailable' }, { status: 503 });
+  }
 
-  // 1. Log User Message
   const userMsgId = `msg_${Date.now()}_u`;
   await db.insert(chatMessages).values({
     id: userMsgId,
@@ -36,10 +49,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     userId: userId,
     role: 'user',
     content: message,
-    metadata: JSON.stringify({ model: SERVER_CHAT_MODEL, systemContext })
+    metadata: JSON.stringify({ model: target.model, systemContext })
   });
 
-  // 2. Prepare Context (Indexing Studio Context + RabbitMQ Health)
   const systemPrompt = `You are the TRACE Indexing Assistant.
   You help admins manage the N8-N10 Knowledge Retrieval pipeline.
 
@@ -52,13 +64,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   If RabbitMQ "failed" count is > 0, prioritize explaining potential worker bottlenecks (GPU exhaustion or SIMD-bridge crashes).
   Provide technical, precise, and concise answers.`;
 
-  // 3. Call Model (TurboQuant / llama-server /v1/chat/completions)
   try {
-    const response = await fetch(`${MODEL_URL}/v1/chat/completions`, {
+    const response = await fetch(`${target.baseUrl.replace(/\/+$/, '')}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4',
+        model: target.model,
         messages: [
           { role: 'system', content: systemPrompt },
           ...history,
@@ -71,7 +82,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const data = await response.json();
     const assistantContent = data.choices?.[0]?.message?.content || 'Error: No response from model.';
 
-    // 4. Log Assistant Message
     const assistantMsgId = `msg_${Date.now()}_a`;
     await db.insert(chatMessages).values({
       id: assistantMsgId,

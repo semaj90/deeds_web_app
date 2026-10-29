@@ -1,23 +1,47 @@
 import { describe, expect, it } from 'vitest';
-import { evaluateE2BMemoryAdmission } from './gemma4-e2b-client.js';
+import { inspectE2BGpuAdmissionV1 } from './gemma4-gpu-admission-v1.js';
+
+const base = {
+  browser: true,
+  webgpu: true,
+  adapterPresent: true,
+  requiredMemoryMB: 2048,
+};
 
 describe('Gemma 4 offline GPU admission (no model runtime)', () => {
   it('rejects SSR and browsers without WebGPU', () => {
-    expect(evaluateE2BMemoryAdmission({ browser: false, webgpu: true, minimumMB: 2048 }).reason).toBe('ssr');
-    expect(evaluateE2BMemoryAdmission({ browser: true, webgpu: false, minimumMB: 2048 }).reason).toBe('no-webgpu');
+    expect(inspectE2BGpuAdmissionV1({ ...base, browser: false }).reason).toBe('SSR');
+    expect(inspectE2BGpuAdmissionV1({ ...base, webgpu: false }).reason).toBe('NO_WEBGPU');
   });
   it('never interprets adapter resource limits as free VRAM', () => {
-    const decision = evaluateE2BMemoryAdmission({ browser: true, webgpu: true, minimumMB: 2048 });
-    expect(decision).toMatchObject({ available: false, gpuMemoryMB: null, reason: 'gpu-memory-unverified' });
+    const decision = inspectE2BGpuAdmissionV1({ ...base, maxBufferSize: 8_000_000_000, maxStorageBufferBindingSize: 8_000_000_000 });
+    expect(decision).toMatchObject({ eligible: false, availableMemoryMB: null, reason: 'GPU_MEMORY_UNVERIFIED' });
   });
   it('rejects verified but insufficient headroom', () => {
-    expect(evaluateE2BMemoryAdmission({ browser: true, webgpu: true, minimumMB: 2048, verifiedFreeMB: 512 })).toMatchObject({
-      available: false, reason: 'gpu-memory-low'
+    expect(inspectE2BGpuAdmissionV1({
+      ...base,
+      independentlyVerifiedMemoryReceipt: true,
+      operatorFreeMemoryMB: 512,
+    })).toMatchObject({
+      eligible: false, reason: 'GPU_MEMORY_INSUFFICIENT', availableMemoryMB: 512,
     });
   });
-  it('does not permit model initialization with memory evidence alone', () => {
-    expect(evaluateE2BMemoryAdmission({ browser: true, webgpu: true, minimumMB: 2048, verifiedFreeMB: 8192 })).toMatchObject({
-      available: false, reason: 'model-admission-unverified'
+  it('requires verified local assets and explicit approval after memory admission', () => {
+    const memoryVerified = {
+      ...base,
+      independentlyVerifiedMemoryReceipt: true,
+      operatorFreeMemoryMB: 8192,
+    };
+    expect(inspectE2BGpuAdmissionV1(memoryVerified)).toMatchObject({
+      eligible: false, reason: 'ASSETS_UNVERIFIED', availableMemoryMB: 8192,
     });
+    expect(inspectE2BGpuAdmissionV1({ ...memoryVerified, offlineAssetManifestVerified: true })).toMatchObject({
+      eligible: false, reason: 'USER_APPROVAL_REQUIRED', availableMemoryMB: 8192,
+    });
+    expect(inspectE2BGpuAdmissionV1({
+      ...memoryVerified,
+      offlineAssetManifestVerified: true,
+      userApprovedLoad: true,
+    })).toMatchObject({ eligible: true, reason: 'PREFLIGHT_READY', availableMemoryMB: 8192 });
   });
 });

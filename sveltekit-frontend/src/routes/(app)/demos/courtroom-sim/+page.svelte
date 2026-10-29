@@ -6,7 +6,25 @@
 	import { TimelineEngine } from '$lib/courtroom/timeline-engine.svelte.js';
 	import type { TimelineKeyframe } from '$lib/courtroom/timeline-engine.svelte.js';
 	import { ROLE_COLORS } from '$lib/courtroom/courtroom-types.js';
+	import { sampleStory, type State as StoryState } from '$lib/courtroom/story/engine.js';
+	import { ActorRegistry } from '$lib/courtroom/runtime/actor-runtime.js';
+	import { createSceneAdapter } from '$lib/courtroom/runtime/scene-adapter.js';
+	import { CourtroomSimulation } from '$lib/courtroom/runtime/simulation.js';
+	import { createSessionPresentationStory, sessionActorIdForRole } from '$lib/courtroom/runtime/session-presentation.js';
+	import { makeDialogueRequest, requestDialogue, type DialogueProposal } from '$lib/courtroom/runtime/ai-context.js';
 	import StrategyWizard from '$lib/components/courtroom/StrategyWizard.svelte';
+	import LoadingAssistant from '$lib/components/courtroom/LoadingAssistant.svelte';
+	import CourtroomActionBar from '$lib/components/courtroom/CourtroomActionBar.svelte';
+	import CourtroomTimelinePanel from '$lib/components/courtroom/CourtroomTimelinePanel.svelte';
+	import { animForUserText } from '$lib/courtroom/text-emotion-v1.js';
+	import CourtroomEvidenceSearch from '$lib/components/courtroom/CourtroomEvidenceSearch.svelte';
+	import CourtroomCastDialog from '$lib/components/courtroom/CourtroomCastDialog.svelte';
+	import CourtroomCoordinateReadout from '$lib/components/courtroom/CourtroomCoordinateReadout.svelte';
+	import CourtroomLevelPanel from '$lib/components/courtroom/CourtroomLevelPanel.svelte';
+	import { deriveLevel1, type MoveOutcome } from '$lib/courtroom/demo-level1-v1.js';
+	import type { CourtroomView } from '$lib/courtroom/courtroom-types.js';
+	import CourtroomProgressOrbit from '$lib/components/courtroom/CourtroomProgressOrbit.svelte';
+	import { OBJECTIONS, actionBarButtons, type ActionId } from '$lib/courtroom/courtroom-hud-v1.js';
 
 	let { data } = $props();
 
@@ -21,15 +39,16 @@
 		timestamp: string;
 	}
 
+	/** Shape returned by GET /api/simulation (the list endpoint names the id `id`, the phase by name, progress as 'n/total'). */
 	interface SessionSummary {
-		sessionId: string;
+		id: string;
 		caseNumber: string;
 		status: string;
-		currentPhase: number;
-		totalPhases: number;
-		procedureType: string;
+		currentPhase: string;
+		progress: string;
 		charge: string;
 		defendant: string;
+		createdAt: string;
 	}
 
 	interface InsightPopup {
@@ -60,8 +79,53 @@
 	let currentSpeaker = $state('');
 	let currentRole = $state('');
 	let insight = $state<InsightPopup | null>(null);
+	// The app shell puts a header above this page, so a fixed 100vh-60px pushed the bottom bars off-screen.
+	let wrapperEl = $state<HTMLDivElement | null>(null);
+	let wrapperHeight = $state<string | undefined>(undefined);
+	function fitWrapper() {
+		if (!wrapperEl) return;
+		const top = wrapperEl.getBoundingClientRect().top + window.scrollY;
+		wrapperHeight = `${Math.max(360, Math.floor(window.innerHeight - top))}px`;
+	}
 	let userInputMode = $state(false);
 	let userInputText = $state('');
+	let scriptedMode = $state(false);
+	let scriptedStoryState = $state<StoryState | null>(null);
+	let scriptedPlaying = $state(false);
+	let movementReceipt = $state<{ actorId: string; station: string; outcome: string; position: { x: number; z: number } | null } | null>(null);
+	let dialogueProposal = $state<DialogueProposal | null>(null);
+	let dialogueProposalAccepted = $state(false);
+	let dialogueProposalLoading = $state(false);
+	let dialogueProposalError = $state('');
+	let storySimulation: CourtroomSimulation | null = null;
+	// Level 1 demo: the adapter the local story already uses, kept so the controls issue the same validated moves.
+	let storyAdapter: ReturnType<typeof createSceneAdapter> | null = null;
+	let camerasSeen = $state<CourtroomView[]>([]);
+	$effect(() => {
+		if (!scriptedMode || !scene.isReady) return;
+		const view = scene.currentView;
+		if (!camerasSeen.includes(view)) camerasSeen = [...camerasSeen, view];
+	});
+	let level1 = $derived(
+		deriveLevel1({
+			sceneReady: scene.isReady,
+			storyTick: scriptedStoryState?.tick ?? null,
+			cameraPreset: scene.currentView,
+			camerasSeen,
+			activeActor: scene.activeCharacter ?? null,
+			move: movementReceipt
+				? { actorId: movementReceipt.actorId, station: movementReceipt.station, outcome: movementReceipt.outcome as MoveOutcome, position: movementReceipt.position }
+				: null
+		})
+	);
+	function issueDemoMove(station: string) {
+		if (!storyAdapter?.moveActor) return;
+		movementReceipt = null;
+		storyAdapter.moveActor('jester', station);
+	}
+
+	let sessionPresentationSimulation: CourtroomSimulation | null = null;
+	let unsubscribeStory: (() => void) | null = null;
 
 	// ── Babylon Scene ──
 	let canvasEl = $state<HTMLCanvasElement | null>(null);
@@ -71,6 +135,8 @@
 	// ── Timeline Engine ──
 	let timeline = new TimelineEngine();
 	let showTimeline = $state(false);
+	let showCast = $state(false);
+	let showCoords = $state(false);
 	let timelineLoading = $state(false);
 
 	// ── Derived timeline state ──
@@ -105,10 +171,19 @@
 
 	let currentPhaseName = $derived(sessionData?.phases?.[sessionData?.currentPhase] ?? '');
 	let progress = $derived(
-		sessionData ? ((sessionData.currentPhase + 1) / (sessionData.phases?.length ?? 1)) * 100 : 0,
+		scriptedMode
+			? Math.min(100, ((scriptedStoryState?.tick ?? 0) / 450) * 100)
+			: sessionData ? ((sessionData.currentPhase + 1) / (sessionData.phases?.length ?? 1)) * 100 : 0,
 	);
 
 	// ── Lifecycle ──
+	$effect(() => {
+		if (!wrapperEl) return;
+		fitWrapper();
+		window.addEventListener('resize', fitWrapper);
+		return () => window.removeEventListener('resize', fitWrapper);
+	});
+
 	onMount(() => {
 		loadActiveSessions();
 		loadModels();
@@ -116,7 +191,16 @@
 		// Wire timeline engine → courtroom scene
 		timeline.onKeyframeReached((kf) => {
 			if (scene.isReady) {
-				scene.executeKeyframe(kf);
+					const sessionProjection = sessionId && !scriptedMode
+						? sessionPresentationSimulation
+						: null;
+					const actorId = sessionProjection ? sessionActorIdForRole(kf.characterRole) : null;
+					if (sessionProjection && actorId && kf.animType) {
+						sessionProjection.dispatch({ type: 'SCENE_ANIMATION', actorId, animation: kf.animType });
+						scene.executeKeyframe(kf, { skipAnimation: true });
+					} else {
+					scene.executeKeyframe(kf);
+				}
 				// Sync dialogue display to timeline
 				if (kf.dialogueTurn != null && kf.animType === 'speaking') {
 					const entry = dialogue.find((d) => d.turn === kf.dialogueTurn);
@@ -131,6 +215,15 @@
 
 		const handler = (e: KeyboardEvent) => {
 			if (view !== 'courtroom' || userInputMode) return;
+			if (scriptedMode) {
+				if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advanceScriptedStory(); }
+				if (e.key === 'Escape') { backToLobby(); }
+				// View-only toggles also work in the local preview (they change what is shown, never the story).
+				if (e.key === 'p' || e.key === 'P') showTimeline = !showTimeline;
+				if (e.key === 'i' || e.key === 'I') showCast = !showCast;
+				if (e.key === 'g' || e.key === 'G') showCoords = !showCoords;
+				return;
+			}
 			if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advanceTurn('next_turn'); }
 			if (e.key === 'o' || e.key === 'O') advanceTurn('objection', { objectionType: 'hearsay', objectionBasis: 'Rule 802' });
 			if (e.key === 'h' || e.key === 'H') advanceTurn('objection', { objectionType: 'relevance', objectionBasis: 'Rule 401/403' });
@@ -140,12 +233,15 @@
 			if (e.key === 'l' || e.key === 'L') showLog = !showLog;
 			if (e.key === 'n' || e.key === 'N') advanceTurn('next_phase');
 			if (e.key === 'p' || e.key === 'P') { showTimeline = !showTimeline; }
+			if (e.key === 'i' || e.key === 'I') { showCast = !showCast; }
+			if (e.key === 'g' || e.key === 'G') { showCoords = !showCoords; }
 			if (e.key === 'Escape') { insight = null; showStrategy = false; showLog = false; }
 			if (e.key === 'r' || e.key === 'R') { userInputMode = true; }
 		};
 		window.addEventListener('keydown', handler);
 		return () => {
 			window.removeEventListener('keydown', handler);
+			stopStoryRuntime();
 			timeline.dispose();
 		};
 	});
@@ -154,7 +250,10 @@
 	$effect(() => {
 		if (canvasEl && view === 'courtroom' && !scene.isReady) {
 			scene.init(canvasEl).then(() => {
-				loadModels();
+				void loadModels().then(() => {
+					if (scriptedMode) startStoryRuntime();
+				else if (sessionId) startSessionPresentationRuntime();
+				});
 				if (sessionId) loadTimeline();
 			});
 		}
@@ -265,6 +364,8 @@
 	// ── User Response Input ──
 	function submitUserInput() {
 		if (!userInputText.trim()) { userInputMode = false; return; }
+		// The witness reacts to what the user (prosecution) just said; offline lexicon, no model wait.
+		if (scene.isReady) scene.playAnimation('witness', animForUserText(userInputText));
 		advanceTurn('next_turn', { userInput: userInputText.trim() });
 		userInputText = '';
 		userInputMode = false;
@@ -282,6 +383,8 @@
 	}
 
 	async function startSimulation(fictionalCaseId: string) {
+		stopStoryRuntime();
+		scriptedMode = false;
 		isLoading = true;
 		error = '';
 		try {
@@ -301,6 +404,8 @@
 	}
 
 	async function resumeSession(sid: string) {
+		stopStoryRuntime();
+		scriptedMode = false;
 		isLoading = true;
 		error = '';
 		try {
@@ -349,7 +454,10 @@
 	async function loadModels() {
 		try {
 			const res = await fetch('/api/courtroom/models');
-			if (!res.ok) return;
+			if (!res.ok) {
+				if (scene.isReady) await scene.loadModels([]);
+				return;
+			}
 			const data = await res.json();
 			if (data.models?.length > 0 && scene.isReady) {
 				const modelDefs: ModelDef[] = data.models.map((m: any) => ({
@@ -363,8 +471,157 @@
 					})),
 				}));
 				await scene.loadModels(modelDefs);
+			} else if (scene.isReady) {
+				await scene.loadModels([]);
 			}
-		} catch { /* models are optional — procedural fallback works */ }
+		} catch {
+			if (scene.isReady) await scene.loadModels([]);
+		}
+	}
+
+	async function startScriptedPreview() {
+		stopStoryRuntime();
+		scriptedMode = true;
+		scriptedStoryState = null;
+		movementReceipt = null;
+		dialogueProposal = null;
+		dialogueProposalAccepted = false;
+		dialogueProposalError = '';
+		sessionId = null;
+		sessionData = null;
+		dialogue = [];
+		error = '';
+		view = 'courtroom';
+		if (scene.isReady) {
+			await loadModels();
+			startStoryRuntime();
+		}
+	}
+
+	function acceptScriptedDialogueProposal() {
+		const proposal = dialogueProposal;
+		const state = scriptedStoryState;
+		if (!proposal || !state || !storySimulation || dialogueProposalAccepted) return;
+		const evidenceMatches = proposal.evidenceIds.length === state.evidence.length &&
+			proposal.evidenceIds.every((id, index) => id === state.evidence[index]);
+		if (proposal.phase !== state.phase || !evidenceMatches || !sampleStory.actors.some((actor) => actor.id === proposal.actorId)) {
+			dialogueProposalError = 'This suggestion is stale because the story phase or evidence changed. Request a fresh suggestion.';
+			return;
+		}
+		storySimulation.dispatch({
+			type: 'ACCEPT_DIALOGUE_PROPOSAL',
+			actorId: proposal.actorId,
+			expectedPhase: proposal.phase,
+			expectedEvidenceIds: proposal.evidenceIds,
+			text: proposal.text,
+			intent: proposal.intent,
+		});
+		dialogueProposalAccepted = true;
+	}
+
+	function startStoryRuntime() {
+		if (!scriptedMode || !scene.isReady || storySimulation) return;
+		const registry = ActorRegistry.fromStory(sampleStory);
+		const adapter = createSceneAdapter(scene, registry, {
+			onDialogue: (actorId, text) => {
+				const actor = registry.find(actorId);
+				const role = actor?.role === 'jester' ? 'defense' : (actor?.role ?? 'witness');
+				dialogue = [...dialogue, {
+					phase: scriptedStoryState?.phase ?? 'lobby',
+					turn: dialogue.length + 1,
+					speaker: actor?.name ?? actorId,
+					role,
+					content: text,
+					canonRefs: [],
+					timestamp: new Date().toISOString(),
+				}];
+			},
+			onCueSettled: ({ actorId, clip, outcome }) => {
+				if (!clip.startsWith('move:')) return;
+				const station = clip.slice('move:'.length);
+				storySimulation?.dispatch({
+					type: 'MOVE_SETTLED',
+					actorId,
+					station,
+					outcome,
+				});
+				const actor = registry.find(actorId);
+				const role = actor?.role === 'jester' ? 'defense' : actor?.role;
+				movementReceipt = { actorId, station, outcome, position: role ? scene.getPosition(role) : null };
+			},
+		});
+		storyAdapter = adapter;
+		storySimulation = new CourtroomSimulation(sampleStory, adapter);
+		unsubscribeStory = storySimulation.subscribe((state) => {
+			scriptedStoryState = state;
+		});
+		storySimulation.dispatch({ type: 'TICK' });
+	}
+
+	function startSessionPresentationRuntime() {
+		if (!sessionId || scriptedMode || !scene.isReady || sessionPresentationSimulation) return;
+		const story = createSessionPresentationStory();
+		const registry = ActorRegistry.fromStory(story);
+		const adapter = createSceneAdapter(scene, registry);
+		sessionPresentationSimulation = new CourtroomSimulation(story, adapter);
+	}
+
+	function stopStoryRuntime() {
+		unsubscribeStory?.();
+		unsubscribeStory = null;
+		storySimulation?.dispose();
+		storySimulation = null;
+		storyAdapter = null;
+		camerasSeen = [];
+		sessionPresentationSimulation?.dispose();
+		sessionPresentationSimulation = null;
+		scriptedPlaying = false;
+	}
+
+	function toggleScriptedPlayback() {
+		if (!storySimulation) return;
+		if (scriptedPlaying) {
+			storySimulation.stop();
+			scriptedPlaying = false;
+		} else {
+			storySimulation.start();
+			scriptedPlaying = true;
+		}
+	}
+
+	function advanceScriptedStory() {
+		storySimulation?.dispatch({ type: 'TICK', steps: 30 });
+	}
+
+	function askScriptedWitness() {
+		storySimulation?.dispatch({ type: 'QUESTION', actorId: 'jester', topic: 'the ledger photograph' });
+	}
+
+	async function requestScriptedDialogueProposal() {
+		if (!scriptedMode || !scriptedStoryState || dialogueProposalLoading) return;
+		dialogueProposalLoading = true;
+		dialogueProposal = null;
+		dialogueProposalAccepted = false;
+		dialogueProposalError = '';
+		try {
+			const request = makeDialogueRequest(
+				sampleStory,
+				scriptedStoryState,
+				ActorRegistry.fromStory(sampleStory),
+				'jester',
+				'the ledger photograph'
+			);
+			dialogueProposal = await requestDialogue(request);
+			if (!dialogueProposal) dialogueProposalError = 'No valid proposal returned. The story was not changed.';
+		} catch {
+			dialogueProposalError = 'AI assistance is unavailable. The scripted story remains unchanged.';
+		} finally {
+			dialogueProposalLoading = false;
+		}
+	}
+
+	function submitScriptedEvidence() {
+		storySimulation?.dispatch({ type: 'SUBMIT_EVIDENCE', id: 'ledger-photo' });
 	}
 
 	/** Load or generate timeline keyframes for the current session */
@@ -400,7 +657,46 @@
 		return `${m}:${sec.toString().padStart(2, '0')}`;
 	}
 
+	const timelineMarkers = $derived(
+		(timeline.keyframes ?? []).map((kf) => ({ timeMs: kf.timeMs, label: `${kf.characterRole}: ${kf.animType} @ ${formatTime(kf.timeMs)}` }))
+	);
+
+	const actionButtons = $derived(
+		actionBarButtons({
+			mode: scriptedMode ? 'scripted' : sessionData?.status === 'completed' ? 'completed' : 'live',
+			isAdvancing,
+			textAnimating,
+			storyReady: scriptedStoryState !== null, // storySimulation is a plain field; this state is set in the same call, and reactive
+			scriptedPlaying,
+			proposalLoading: dialogueProposalLoading,
+			evidenceAdmitted: Boolean(scriptedStoryState?.evidence.includes('ledger-photo'))
+		})
+	);
+
+	/** One entry point for the action bar; each case calls the handler the old inline buttons called. */
+	function handleAction(id: ActionId) {
+		switch (id) {
+			case 'next_turn': return void advanceTurn('next_turn');
+			case 'next_phase': return void advanceTurn('next_phase');
+			case 'respond': userInputMode = !userInputMode; return;
+			case 'strategy': showStrategy = !showStrategy; return;
+			case 'objection_hearsay':
+			case 'objection_relevance':
+			case 'objection_foundation': return void advanceTurn('objection', { ...OBJECTIONS[id] });
+			case 'quit': return void abandonSession();
+			case 'cast': showCast = !showCast; return;
+			case 'return_to_lobby':
+			case 'scripted_exit': return backToLobby();
+			case 'scripted_toggle': return toggleScriptedPlayback();
+			case 'scripted_advance': return advanceScriptedStory();
+			case 'scripted_ask': return askScriptedWitness();
+			case 'scripted_ai': return void requestScriptedDialogueProposal();
+			case 'scripted_evidence': return submitScriptedEvidence();
+		}
+	}
+
 	function backToLobby() {
+		stopStoryRuntime();
 		scene.dispose();
 		timeline.reset();
 		sessionId = null;
@@ -411,6 +707,9 @@
 		currentRole = '';
 		insight = null;
 		userInputMode = false;
+		scriptedMode = false;
+		scriptedStoryState = null;
+		movementReceipt = null;
 		showTimeline = false;
 		view = 'lobby';
 		loadActiveSessions();
@@ -445,15 +744,23 @@
 				<h2 class="section-title">ACTIVE SESSIONS</h2>
 				<div class="sessions-row">
 					{#each activeSessions as sess}
-						<button class="session-chip" onclick={() => resumeSession(sess.sessionId)}>
-							<span class="chip-type">{sess.procedureType}</span>
+						<button class="session-chip" onclick={() => resumeSession(sess.id)}>
+							<span class="chip-type">{sess.caseNumber}</span>
 							<span class="chip-charge">{sess.charge}</span>
-							<span class="chip-progress">Phase {sess.currentPhase + 1}/{sess.totalPhases}</span>
+							<span class="chip-progress">Phase {sess.currentPhase.replace(/_/g, ' ')} · {sess.progress}</span>
 						</button>
 					{/each}
 				</div>
 			</section>
 		{/if}
+
+		<section class="section scripted-preview-card">
+			<div>
+				<h2 class="section-title">LOCAL SCRIPTED PREVIEW</h2>
+				<p>A deterministic fictional story drives the existing Babylon scene. This preview creates no case or server session.</p>
+			</div>
+			<button class="btn-prosecute" onclick={startScriptedPreview} disabled={isLoading}>PLAY LOCAL STORY</button>
+		</section>
 
 		<section class="section">
 			<div class="toolbar">
@@ -498,12 +805,17 @@
 
 {:else}
 	<!-- ════════ COURTROOM ════════ -->
-	<div class="courtroom-wrapper">
-		<canvas class="courtroom-canvas" bind:this={canvasEl}></canvas>
+	<div class="courtroom-wrapper" bind:this={wrapperEl} style:height={wrapperHeight} data-camera-view={scene.currentView} data-scene-ready={scene.isReady}>
+		<canvas
+			class="courtroom-canvas"
+			data-scene-ready={scene.isReady ? 'true' : 'false'}
+			data-models-loaded={scene.modelsLoaded ? 'true' : 'false'}
+			bind:this={canvasEl}
+		></canvas>
 
 		<!-- ── Top Bar ── -->
 		<div class="overlay-top">
-			<button class="btn-icon" onclick={backToLobby} title="Back to lobby">
+			<button class="btn-icon" onclick={backToLobby} title="Back to lobby" aria-label="Back to lobby">
 				<Icon name="arrow-left" size={16} />
 			</button>
 			<div class="top-case-info">
@@ -512,21 +824,28 @@
 				<span class="top-defendant">v. {sessionData?.caseData?.defendantName ?? ''}</span>
 			</div>
 			<div class="top-phase">
-				Phase {(sessionData?.currentPhase ?? 0) + 1}/{sessionData?.phases?.length ?? 0}:
-				{currentPhaseName.replace(/_/g, ' ').toUpperCase()}
+				{#if scriptedMode}
+					LOCAL STORY · {(scriptedStoryState?.phase ?? 'lobby').replace(/_/g, ' ').toUpperCase()} · TICK {scriptedStoryState?.tick ?? 0}
+					{#if movementReceipt}
+						<span class="movement-receipt" data-testid="movement-receipt"> · MOVE {movementReceipt.actorId.toUpperCase()} → {movementReceipt.station.toUpperCase()}: {movementReceipt.outcome.toUpperCase()}{movementReceipt.position ? ` @ ${movementReceipt.position.x.toFixed(1)},${movementReceipt.position.z.toFixed(1)}` : ''}</span>
+					{/if}
+				{:else}
+					Phase {(sessionData?.currentPhase ?? 0) + 1}/{sessionData?.phases?.length ?? 0}:
+					{currentPhaseName.replace(/_/g, ' ').toUpperCase()}
+				{/if}
 			</div>
 			<div class="top-controls">
-				<button class="btn-icon" class:active={crtEnabled} onclick={() => (crtEnabled = !crtEnabled)} title="CRT filter [C]">
+				<button class="btn-icon" class:active={crtEnabled} onclick={() => (crtEnabled = !crtEnabled)} title="CRT filter [C]" aria-label="Toggle CRT filter">
 					<Icon name="monitor" size={16} />
 				</button>
-				<button class="btn-icon" class:active={showEvidence} onclick={() => (showEvidence = !showEvidence)} title="Evidence [E]">
-					<Icon name="file-text" size={16} />
+				<button class="btn-icon" class:active={showEvidence} onclick={() => (showEvidence = !showEvidence)} title="Evidence [E]" aria-label="Toggle evidence panel">
+					<Icon name="yorha-evidence" size={16} />
 				</button>
-				<button class="btn-icon" class:active={showLog} onclick={() => (showLog = !showLog)} title="Dialogue log [L]">
-					<Icon name="scroll-text" size={16} />
+				<button class="btn-icon" class:active={showLog} onclick={() => (showLog = !showLog)} title="Dialogue log [L]" aria-label="Toggle transcript">
+					<Icon name="yorha-citation" size={16} />
 				</button>
-				<button class="btn-icon" class:active={showTimeline} onclick={() => (showTimeline = !showTimeline)} title="Timeline playback [P]">
-					<Icon name="clock" size={16} />
+				<button class="btn-icon" class:active={showTimeline} onclick={() => (showTimeline = !showTimeline)} title="Timeline playback [P]" aria-label="Toggle timeline">
+					<Icon name="yorha-timeline" size={16} />
 				</button>
 				{#if scene.modelsLoaded}
 					<span class="badge-3d">3D</span>
@@ -538,16 +857,20 @@
 		</div>
 
 		<!-- ── Progress Bar ── -->
-		<div class="overlay-progress">
-			<div class="progress-track">
-				<div class="progress-fill" style="width: {progress}%"></div>
-			</div>
-		</div>
+		{#if scriptedMode && scene.isReady}
+			<CourtroomLevelPanel level={level1} onCamera={(view) => scene.setCameraView(view)} onMove={issueDemoMove} />
+		{/if}
+		<CourtroomProgressOrbit
+			progress={progress}
+			phase={scriptedMode ? (scriptedStoryState?.phase ?? 'local preview').replace(/_/g, ' ') : currentPhaseName.replace(/_/g, ' ')}
+			tick={scriptedMode ? (scriptedStoryState?.tick ?? 0) : null}
+		/>
 
 		<!-- ── Evidence Sidebar (left) ── -->
 		{#if showEvidence && sessionData}
 			<div class="evidence-sidebar">
 				<h3>CASE BRIEF</h3>
+				<CourtroomEvidenceSearch caseId={typeof sessionData?.caseId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionData.caseId) ? sessionData.caseId : undefined} localPreview={scriptedMode} />
 				{#if sessionData.charges?.length}
 					<div class="evidence-group">
 						<h4>CHARGES</h4>
@@ -636,6 +959,23 @@
 			{#if !textAnimating && displayedText}
 				<div class="dialogue-hint">Select text to analyze | SPACE to continue</div>
 			{/if}
+			{#if scriptedMode}
+				{#if dialogueProposalError}
+					<div class="dialogue-proposal-status" role="status">{dialogueProposalError}</div>
+				{/if}
+				{#if dialogueProposal}
+					<div class="dialogue-proposal" role="status">
+						<strong>AI PROPOSAL · NOT PART OF THE STORY</strong>
+						<p>{dialogueProposal.text}</p>
+						<small>{dialogueProposal.intent} · {dialogueProposal.emotion ?? 'neutral'} · {dialogueProposal.modelRevision}</small>
+						{#if dialogueProposalAccepted}
+							<p class="dialogue-proposal-status">Added to the local story transcript.</p>
+						{:else}
+							<button type="button" onclick={acceptScriptedDialogueProposal}>Add suggestion to story</button>
+						{/if}
+					</div>
+				{/if}
+			{/if}
 			{#if dialogue.length > 0}
 				{@const latest = dialogue[dialogue.length - 1]}
 				{#if latest.canonRefs?.length > 0}
@@ -681,137 +1021,52 @@
 			</div>
 		{/if}
 
-		<!-- ── Timeline Controls ── -->
+		<!-- ── Timeline (bits-ui Slider + ToggleGroup) ── -->
 		{#if showTimeline}
-			<div class="timeline-panel">
-				<div class="timeline-header">
-					<Icon name="clock" size={14} />
-					<span class="timeline-title">3D TIMELINE</span>
-					<span class="timeline-time">{formatTime(timelineCurrentTime)} / {formatTime(timelineDuration)}</span>
-					{#if timelineLoading}
-						<span class="timeline-loading">Loading...</span>
-					{/if}
-				</div>
-				<div class="timeline-controls">
-					<button class="tl-btn" onclick={() => timeline.stepBackward()} title="Previous keyframe">
-						<Icon name="skip-back" size={14} />
-					</button>
-					<button class="tl-btn tl-play" onclick={() => timeline.toggle()}>
-						{#if timelineState === 'playing'}
-							<Icon name="pause" size={16} />
-						{:else}
-							<Icon name="play" size={16} />
-						{/if}
-					</button>
-					<button class="tl-btn" onclick={() => timeline.stepForward()} title="Next keyframe">
-						<Icon name="skip-forward" size={14} />
-					</button>
-					<div class="tl-scrubber">
-						<input
-							type="range"
-							min="0"
-							max={timelineDuration}
-							value={timelineCurrentTime}
-							oninput={(e) => timeline.seekTo(Number((e.target as HTMLInputElement).value))}
-						/>
-						<div class="tl-progress" style="width: {timelineProgress}%"></div>
-					</div>
-					<div class="tl-speed">
-						<button class="tl-speed-btn" class:active={timeline.playbackSpeed === 0.5} onclick={() => timeline.setSpeed(0.5)}>0.5x</button>
-						<button class="tl-speed-btn" class:active={timeline.playbackSpeed === 1} onclick={() => timeline.setSpeed(1)}>1x</button>
-						<button class="tl-speed-btn" class:active={timeline.playbackSpeed === 2} onclick={() => timeline.setSpeed(2)}>2x</button>
-					</div>
-					<button class="tl-btn" onclick={() => timeline.reset()} title="Reset">
-						<Icon name="rotate-ccw" size={14} />
-					</button>
-					<button class="tl-btn" onclick={loadTimeline} title="Regenerate timeline" disabled={timelineLoading}>
-						<Icon name="refresh-cw" size={14} />
-					</button>
-				</div>
-				<!-- Keyframe markers -->
-				{#if timelineDuration > 0}
-					<div class="tl-markers">
-						{#each timeline.keyframes ?? [] as kf, i}
-							{@const left = (kf.timeMs / timelineDuration) * 100}
-							<button
-								class="tl-marker"
-								class:active={timeline.currentKeyframeIndex === i}
-								style="left: {left}%"
-								onclick={() => timeline.seekTo(kf.timeMs)}
-								title="{kf.characterRole}: {kf.animType} @ {formatTime(kf.timeMs)}"
-							></button>
-						{/each}
-					</div>
-				{/if}
-			</div>
+			<CourtroomTimelinePanel
+				currentMs={timelineCurrentTime}
+				durationMs={timelineDuration}
+				playing={timelineState === 'playing'}
+				loading={timelineLoading}
+				speed={timeline.playbackSpeed}
+				markers={timelineMarkers}
+				activeMarker={timeline.currentKeyframeIndex}
+				onToggle={() => timeline.toggle()}
+				onStep={(direction) => (direction < 0 ? timeline.stepBackward() : timeline.stepForward())}
+				onSeek={(ms) => timeline.seekTo(ms)}
+				onSpeed={(next) => timeline.setSpeed(next)}
+				onReset={() => timeline.reset()}
+				onRegenerate={loadTimeline}
+			/>
 		{/if}
 
-		<!-- ── Action Bar (bottom horizontal) ── -->
-		<div class="action-bar">
-			{#if sessionData?.status === 'completed'}
-				<button class="ab-btn ab-done" onclick={backToLobby}>
-					<span class="ab-label">RETURN TO LOBBY</span>
-				</button>
-			{:else}
-				<button class="ab-btn ab-next" onclick={() => advanceTurn('next_turn')} disabled={isAdvancing}>
-					<span class="ab-key">SPACE</span>
-					<span class="ab-label">{textAnimating ? 'SKIP' : isAdvancing ? '...' : 'NEXT'}</span>
-				</button>
-
-				<button class="ab-btn ab-phase" onclick={() => advanceTurn('next_phase')} disabled={isAdvancing || textAnimating}>
-					<span class="ab-key">N</span>
-					<span class="ab-label">PHASE</span>
-				</button>
-
-				<button class="ab-btn ab-respond" onclick={() => (userInputMode = !userInputMode)} disabled={isAdvancing || textAnimating}>
-					<span class="ab-key">R</span>
-					<span class="ab-label">RESPOND</span>
-				</button>
-
-				<button class="ab-btn ab-strategy" onclick={() => (showStrategy = !showStrategy)} disabled={isAdvancing || textAnimating}>
-					<span class="ab-key">S</span>
-					<span class="ab-label">STRATEGY</span>
-				</button>
-
-				<div class="ab-divider"></div>
-
-				<button class="ab-btn ab-objection" onclick={() => advanceTurn('objection', { objectionType: 'hearsay', objectionBasis: 'Rule 802' })} disabled={isAdvancing || textAnimating}>
-					<span class="ab-key">O</span>
-					<span class="ab-label">OBJECTION!</span>
-				</button>
-
-				<button class="ab-btn ab-holdit" onclick={() => advanceTurn('objection', { objectionType: 'relevance', objectionBasis: 'Rule 401/403' })} disabled={isAdvancing || textAnimating}>
-					<span class="ab-key">H</span>
-					<span class="ab-label">HOLD IT!</span>
-				</button>
-
-				<button class="ab-btn ab-takethat" onclick={() => advanceTurn('objection', { objectionType: 'foundation', objectionBasis: 'Insufficient foundation' })} disabled={isAdvancing || textAnimating}>
-					<span class="ab-key">T</span>
-					<span class="ab-label">TAKE THAT!</span>
-				</button>
-
-				<div class="ab-divider"></div>
-
-				<button class="ab-btn ab-quit" onclick={abandonSession}>
-					<span class="ab-label">QUIT</span>
-				</button>
-			{/if}
-		</div>
+		<!-- ── Action bar (bits-ui Toolbar; rules live in courtroom-hud-v1) ── -->
+		<CourtroomActionBar buttons={actionButtons} onAction={handleAction} />
+		<CourtroomCastDialog bind:open={showCast} proposal={dialogueProposal} />
+		{#if showCoords}
+			<CourtroomCoordinateReadout getPosition={(role) => scene.getPosition(role)} />
+		{/if}
 
 		<!-- ── Misc overlays ── -->
 		<div class="overlay-disclaimer">FICTIONAL SIMULATION</div>
 
 		{#if scene.isReady}
 			<div class="overlay-fps">
-				{scene.engineType.toUpperCase()} | {scene.fps} FPS
+				N64 PROFILE · {scene.engineType.toUpperCase()} · {scene.fps} FPS · GEO {(scene.estimatedGeometryBytes / (1024 * 1024)).toFixed(2)}/{(scene.geometryBudgetBytes / (1024 * 1024)).toFixed(0)} MiB
 				{#if scene.modelsLoaded}| 3D{/if}
 			</div>
 		{/if}
 
-		{#if scene.loadingProgress > 0 && scene.loadingProgress < 100}
+		{#if scene.loadingStage && (!scene.modelsLoaded || scene.loadingFailures.length > 0)}
 			<div class="overlay-model-loading">
-				Loading 3D models... {scene.loadingProgress}%
+				{scene.modelsLoaded ? scene.loadingStage : `Loading ${scene.loadingStage} · ${scene.loadingProgress}%`}
 			</div>
+			<LoadingAssistant
+				progress={scene.loadingProgress}
+				brief={sessionData
+					? { charges: sessionData.charges?.length ?? 0, parties: sessionData.actors?.length ?? 0, events: sessionData.events?.length ?? 0 }
+					: null}
+			/>
 		{/if}
 
 		{#if error}
@@ -828,6 +1083,8 @@
 	.lobby-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--t-text); margin: 0; letter-spacing: 0.05em; }
 	.disclaimer-tag { font-size: 0.7rem; color: var(--t-accent); padding: 0.25rem 0.75rem; border: 1px solid var(--t-accent); border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
 	.section { margin-bottom: 2rem; }
+	.scripted-preview-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; background: var(--t-panel); border: 1px solid var(--t-border); border-radius: 8px; }
+	.scripted-preview-card p { margin: 0; color: var(--t-text-muted); font-size: 0.8rem; }
 	.section-title { font-size: 0.85rem; color: var(--t-text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
 	.sessions-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 	.session-chip { display: flex; flex-direction: column; gap: 0.2rem; padding: 0.6rem 1rem; background: var(--t-panel); border: 1px solid var(--t-border); border-radius: 6px; cursor: pointer; color: var(--t-text); font-family: inherit; text-align: left; transition: border-color 0.15s; }
@@ -857,26 +1114,23 @@
 	.courtroom-canvas { width: 100%; height: 100%; display: block; }
 
 	/* ── Top Bar ── */
-	.overlay-top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent); z-index: 10; }
-	.btn-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: rgba(0,0,0,0.4); color: #ccc; cursor: pointer; font-family: inherit; }
-	.btn-icon:hover { color: #fff; border-color: rgba(255,255,255,0.5); }
-	.btn-icon.active { color: var(--t-accent); border-color: var(--t-accent); }
+	.overlay-top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 1rem; background: linear-gradient(110deg, rgba(9,13,24,0.94), rgba(13,19,33,0.82) 72%, rgba(13,19,33,0.35)); border-bottom: 1px solid rgba(139,223,255,0.2); box-shadow: 0 8px 28px rgba(0,0,0,0.24); backdrop-filter: blur(12px); z-index: 10; }
+	.btn-icon { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid rgba(186,208,255,0.2); border-radius: 3px; background: rgba(20,29,48,0.72); color: #c4d2e6; cursor: pointer; font-family: inherit; transition: color 120ms ease, border-color 120ms ease, background 120ms ease; }
+	.btn-icon:hover { color: #8bdfff; border-color: rgba(139,223,255,0.7); background: rgba(27,39,64,0.92); }
+	.btn-icon.active { color: #f3d471; border-color: #f3d471; box-shadow: 0 0 10px rgba(243,212,113,0.16); }
 	.top-case-info { flex: 1; display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; }
 	.top-case-num { font-family: monospace; color: #888; }
 	.top-charge { font-weight: 600; color: #eee; }
 	.top-defendant { color: #999; }
-	.top-phase { font-size: 0.75rem; color: var(--t-accent); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+	.top-phase { font-size: 0.68rem; color: #c2aaff; text-transform: uppercase; letter-spacing: 0.09em; white-space: nowrap; }
 	.top-controls { display: flex; gap: 0.35rem; align-items: center; }
 	.badge-done { font-size: 0.65rem; padding: 0.2rem 0.5rem; background: var(--t-accent); color: #000; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; }
 
 	/* ── Progress ── */
-	.overlay-progress { position: absolute; top: 44px; left: 0; right: 0; height: 3px; z-index: 10; }
-	.progress-track { width: 100%; height: 100%; background: rgba(255,255,255,0.1); }
-	.progress-fill { height: 100%; background: var(--t-accent); transition: width 0.4s ease; }
 
 	/* ── Evidence Sidebar (left) ── */
-	.evidence-sidebar { position: absolute; top: 50px; left: 0; width: 280px; max-height: calc(100% - 200px); overflow-y: auto; background: rgba(0,0,0,0.9); border-right: 1px solid rgba(255,255,255,0.1); padding: 1rem; z-index: 15; }
-	.evidence-sidebar h3 { font-size: 0.8rem; color: var(--t-accent); letter-spacing: 0.06em; margin: 0 0 0.75rem; }
+	.evidence-sidebar { position: absolute; top: 50px; left: 0; width: 280px; max-height: calc(100% - 200px); overflow-y: auto; background: linear-gradient(135deg, rgba(20,29,48,0.86), rgba(10,13,27,0.82)); backdrop-filter: blur(14px); border-right: 1px solid rgba(186,208,255,0.22); box-shadow: 0 10px 28px rgba(0,0,0,0.4); padding: 1rem; z-index: 15; }
+	.evidence-sidebar h3 { font-size: 0.8rem; color: #f3d471; letter-spacing: 0.06em; margin: 0 0 0.75rem; }
 	.evidence-group { margin-bottom: 1rem; }
 	.evidence-group h4 { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
 	.evidence-item { font-size: 0.75rem; color: #ccc; padding: 0.25rem 0; display: flex; flex-direction: column; gap: 0.1rem; }
@@ -887,7 +1141,7 @@
 	.evt-desc { font-size: 0.7rem; color: #999; }
 
 	/* ── Dialogue Log (right overlay) ── */
-	.dialogue-log { position: absolute; top: 50px; right: 0; width: 320px; max-height: calc(100% - 200px); background: rgba(0,0,0,0.9); border-left: 1px solid rgba(255,255,255,0.1); z-index: 15; display: flex; flex-direction: column; }
+	.dialogue-log { position: absolute; top: 50px; right: 0; width: 320px; max-height: calc(100% - 200px); background: linear-gradient(135deg, rgba(20,29,48,0.86), rgba(10,13,27,0.82)); backdrop-filter: blur(14px); border-left: 1px solid rgba(186,208,255,0.22); box-shadow: 0 10px 28px rgba(0,0,0,0.4); z-index: 15; display: flex; flex-direction: column; }
 	.log-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
 	.log-header h3 { font-size: 0.8rem; color: var(--t-accent); letter-spacing: 0.06em; margin: 0; }
 	.log-count { font-size: 0.65rem; color: #666; }
@@ -899,7 +1153,7 @@
 	.log-preview { color: #999; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 	/* ── Dialogue Box ── */
-	.dialogue-box { position: absolute; bottom: 48px; left: 0; right: 0; min-height: 120px; max-height: 200px; background: rgba(0,0,0,0.92); border-top: 2px solid rgba(255,255,255,0.15); padding: 0.75rem 1.5rem; z-index: 20; cursor: text; user-select: text; }
+	.dialogue-box { position: absolute; bottom: 48px; left: 0; right: 0; min-height: 120px; max-height: 200px; background: linear-gradient(110deg, rgba(9,13,24,0.94), rgba(15,20,36,0.9)); backdrop-filter: blur(14px); border-top: 1px solid rgba(243,212,113,0.62); box-shadow: 0 -8px 30px rgba(0,0,0,0.28); padding: 0.75rem 1.5rem; z-index: 20; cursor: text; user-select: text; }
 	.speaker-plate { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.2rem 0.8rem; font-size: 0.75rem; font-weight: 700; color: #000; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.4rem; border-radius: 2px; }
 	.speaker-name { font-size: 0.75rem; }
 	.speaker-role { font-size: 0.6rem; opacity: 0.7; }
@@ -907,7 +1161,12 @@
 	.dialogue-text::selection { background: rgba(146, 204, 65, 0.4); color: #fff; }
 	.text-cursor { animation: blink 0.6s infinite; color: var(--t-accent); }
 	@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-	.dialogue-hint { font-size: 0.6rem; color: #555; margin-top: 0.3rem; letter-spacing: 0.04em; }
+	.dialogue-hint { font-size: 0.6rem; color: #9baac0; margin-top: 0.3rem; letter-spacing: 0.04em; }
+	.dialogue-proposal-status { margin-top: 0.35rem; color: #f7d51d; font-size: 0.65rem; }
+	.dialogue-proposal { margin-top: 0.45rem; border-left: 2px solid #92cc41; padding: 0.3rem 0.55rem; background: rgba(26,58,10,0.32); font-family: 'Courier New', monospace; }
+	.dialogue-proposal strong { color: #b7e884; font-size: 0.6rem; letter-spacing: 0.05em; }
+	.dialogue-proposal p { margin: 0.2rem 0; color: #f0f0f0; font-size: 0.78rem; }
+	.dialogue-proposal small { color: #8f9b85; font-size: 0.58rem; }
 	.canon-refs { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.3rem; }
 	.canon-tag { font-size: 0.6rem; padding: 0.1rem 0.35rem; background: rgba(255,204,102,0.15); color: #ffcc66; border-radius: 2px; font-family: monospace; }
 
@@ -922,32 +1181,16 @@
 	.insight-body { font-size: 0.72rem; color: #ccc; line-height: 1.5; max-height: 150px; overflow-y: auto; }
 
 	/* ── User Input Bar ── */
-	.user-input-bar { position: absolute; bottom: 48px; left: 0; right: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: rgba(15,15,30,0.97); border-top: 2px solid #7c4dff; z-index: 25; }
+	.user-input-bar { position: absolute; bottom: 48px; left: 0; right: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: linear-gradient(135deg, rgba(20,29,48,0.86), rgba(10,13,27,0.82)); backdrop-filter: blur(14px); border-top: 1px solid rgba(194,170,255,0.7); z-index: 25; }
 	.input-label { font-size: 0.65rem; color: #7c4dff; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
 	.user-input { flex: 1; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #f0f0f0; font-size: 0.85rem; font-family: 'Courier New', monospace; outline: none; }
-	.user-input:focus { border-color: #7c4dff; }
-	.input-send { padding: 0.45rem 1rem; background: #7c4dff; color: #fff; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: inherit; letter-spacing: 0.04em; }
-	.input-send:hover { background: #9c6fff; }
+	.user-input:focus { border-color: #8bdfff; box-shadow: 0 0 10px rgba(131,225,255,0.35); }
+	.input-send { padding: 0.45rem 1rem; background: linear-gradient(135deg, #b4a0ff, #8cb7ff); color: #0a0d1b; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: inherit; letter-spacing: 0.04em; }
+	.input-send:hover { filter: brightness(1.12); }
 	.input-cancel { padding: 0.45rem 0.75rem; background: none; border: 1px solid rgba(255,255,255,0.2); color: #888; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-family: inherit; }
 
 	/* ── Action Bar (horizontal bottom) ── */
-	.action-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 48px; display: flex; align-items: stretch; background: rgba(0,0,0,0.95); border-top: 1px solid rgba(255,255,255,0.1); z-index: 20; }
-	.ab-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 0 0.6rem; border: none; cursor: pointer; font-family: inherit; transition: filter 0.1s; min-width: 60px; }
-	.ab-btn:hover:not(:disabled) { filter: brightness(1.3); }
-	.ab-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-	.ab-key { font-size: 0.5rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; padding: 0 0.25rem; border: 1px solid rgba(255,255,255,0.15); border-radius: 2px; line-height: 1.4; }
-	.ab-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-	.ab-divider { width: 1px; background: rgba(255,255,255,0.1); margin: 8px 0; }
 
-	.ab-next { background: #1a3a0a; color: #92cc41; flex: 1; }
-	.ab-phase { background: #0a2a3a; color: #3cbcfc; }
-	.ab-respond { background: #1a0a3a; color: #b388ff; }
-	.ab-strategy { background: #2a0a3a; color: #ce93d8; }
-	.ab-objection { background: #3a0a0a; color: #f83800; }
-	.ab-holdit { background: #3a2a0a; color: #f7d51d; }
-	.ab-takethat { background: #0a3a15; color: #92cc41; }
-	.ab-quit { background: rgba(255,255,255,0.03); color: #555; }
-	.ab-done { background: var(--t-accent); color: #000; flex: 1; }
 
 	/* ── Misc ── */
 	.overlay-disclaimer { position: absolute; top: 52px; left: 50%; transform: translateX(-50%); font-size: 0.55rem; color: rgba(255,204,102,0.4); letter-spacing: 0.1em; text-transform: uppercase; z-index: 10; pointer-events: none; }
@@ -957,27 +1200,4 @@
 	.badge-3d { font-size: 0.6rem; padding: 0.15rem 0.4rem; background: #7c4dff; color: #fff; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; }
 
 	/* ── Timeline Panel ── */
-	.timeline-panel { position: absolute; bottom: 48px; left: 0; right: 0; background: rgba(0,0,0,0.94); border-top: 2px solid rgba(124,77,255,0.6); padding: 0.5rem 1rem; z-index: 22; }
-	.timeline-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; color: #b388ff; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
-	.timeline-title { font-weight: 700; }
-	.timeline-time { margin-left: auto; font-family: monospace; color: #999; font-size: 0.7rem; }
-	.timeline-loading { color: var(--t-accent); animation: pulse-text 1s infinite; font-size: 0.65rem; }
-	.timeline-controls { display: flex; align-items: center; gap: 0.4rem; }
-	.tl-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #ccc; cursor: pointer; font-family: inherit; }
-	.tl-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
-	.tl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-	.tl-play { width: 36px; height: 36px; background: rgba(124,77,255,0.2); border-color: #7c4dff; color: #b388ff; }
-	.tl-play:hover { background: rgba(124,77,255,0.4); color: #fff; }
-	.tl-scrubber { flex: 1; position: relative; height: 28px; display: flex; align-items: center; }
-	.tl-scrubber input[type="range"] { width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; cursor: pointer; position: relative; z-index: 2; }
-	.tl-scrubber input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #b388ff; border-radius: 50%; cursor: pointer; }
-	.tl-progress { position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 4px; background: #7c4dff; border-radius: 2px; pointer-events: none; z-index: 1; }
-	.tl-speed { display: flex; gap: 0.15rem; }
-	.tl-speed-btn { padding: 0.2rem 0.35rem; font-size: 0.55rem; background: none; border: 1px solid rgba(255,255,255,0.12); border-radius: 3px; color: #888; cursor: pointer; font-family: inherit; }
-	.tl-speed-btn:hover { color: #ccc; }
-	.tl-speed-btn.active { color: #b388ff; border-color: #7c4dff; background: rgba(124,77,255,0.15); }
-	.tl-markers { position: relative; height: 8px; margin-top: 0.3rem; }
-	.tl-marker { position: absolute; width: 4px; height: 8px; background: rgba(255,255,255,0.2); border: none; cursor: pointer; padding: 0; transform: translateX(-50%); }
-	.tl-marker:hover { background: rgba(255,255,255,0.5); }
-	.tl-marker.active { background: #b388ff; box-shadow: 0 0 6px rgba(124,77,255,0.6); }
 </style>

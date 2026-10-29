@@ -70,7 +70,7 @@ export const PUBLIC_NEO4J_URL: string;
 
 export interface EnhancedEnv {
 DATABASE_URL: string;
-	POSTGRES_URL: string;
+POSTGRES_URL?: string;
 POSTGRES_HOST: string;
 	POSTGRES_PORT: string;
 POSTGRES_DB: string;

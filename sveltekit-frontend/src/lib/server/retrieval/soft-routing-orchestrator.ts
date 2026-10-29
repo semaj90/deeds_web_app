@@ -49,6 +49,15 @@ export interface SoftRoutingResult {
   lanes_completed: string[];
 }
 
+export function resolveSoftRoutingDatabaseUrl(
+  override?: string,
+  configuredUrl: string | undefined = ENV.DATABASE_URL
+): string {
+  const databaseUrl = override?.trim() || configuredUrl?.trim();
+  if (!databaseUrl) throw new Error('DATABASE_URL_REQUIRED');
+  return databaseUrl;
+}
+
 export class SoftRoutingOrchestrator {
   private qdrant: QdrantClient;
   private pgPool: pg.Pool;
@@ -66,10 +75,10 @@ export class SoftRoutingOrchestrator {
     });
 
     this.pgPool = new pg.Pool({
-      connectionString: pgUrl || process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
+      connectionString: resolveSoftRoutingDatabaseUrl(pgUrl),
     });
 
-    this.turboVecUrl = turboVecUrl || ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791';
+    this.turboVecUrl = turboVecUrl || (ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791');
   }
 
   /**

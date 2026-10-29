@@ -40,7 +40,7 @@ export async function evaluateResponse(opts: {
   query: string;
   response: string;
   context: ACEContext;
-  backend: 'ollama' | 'tensorrt' | 'triton';
+  backend: 'ollama' | 'llama-server' | 'tensorrt' | 'triton' | 'cache' | 'unavailable';
 }): Promise<SelfEvaluation> {
   const start = Date.now();
 

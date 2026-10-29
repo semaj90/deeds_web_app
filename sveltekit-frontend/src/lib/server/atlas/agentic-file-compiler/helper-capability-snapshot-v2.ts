@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 import { sha256Stable } from './contracts.js';
 import type { HelperRegistryV1 } from './helper-registry-v2.js';
 
@@ -68,7 +69,7 @@ export async function observeHelperCapabilitySnapshotV1(registry: HelperRegistry
   for (const helper of registry.helpers) {
     switch (helper.helperId) {
       case 'semantic-768': {
-        const embeddingUrl = process.env.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081';
+        const embeddingUrl = ENV.EMBEDDING_STRICT_BASE_URL;
         const probe = await probeHttp(`${embeddingUrl}/health`);
         observations.push({
           helperId: helper.helperId, helperRevision: helper.helperRevision,

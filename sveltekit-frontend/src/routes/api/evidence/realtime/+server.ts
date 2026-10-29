@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { subscribe, getJob } from '$lib/server/evidence-progress';
-import { getAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
+import { subscribe, getJob, isJobOwnedBy } from '$lib/server/evidence-progress';
+import { getAnalysisJob, getAnalysisJobForOwner } from '$lib/server/analysis/analysis-jobs.js';
 
 const querySchema = z.object({
 	jobId: z.string().min(1, 'Missing jobId parameter').max(200)
@@ -24,6 +24,18 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		return new Response(parsed.error.issues[0]?.message ?? 'Missing jobId parameter', { status: 400 });
 	}
 	const { jobId } = parsed.data;
+	const ownerId = String(locals.user.id);
+	const memJob = getJob(jobId);
+	if (memJob && !isJobOwnedBy(jobId, ownerId)) {
+		return new Response('Job not found', { status: 404 });
+	}
+	if (!memJob) {
+		const numericOwnerId = Number(ownerId);
+		const ownedJob = Number.isSafeInteger(numericOwnerId) && numericOwnerId > 0
+			? await getAnalysisJobForOwner(jobId, numericOwnerId)
+			: null;
+		if (!ownedJob) return new Response('Job not found', { status: 404 });
+	}
 
 	const encoder = new TextEncoder();
 	let isClosed = false;
@@ -59,7 +71,6 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			safeEnqueue(`data: ${JSON.stringify({ type: 'connected', jobId })}\n\n`);
 
 			// Try in-memory store first (fast path — same-process uploads)
-			const memJob = getJob(jobId);
 			if (memJob) {
 				// Subscribe to in-memory progress updates
 				unsubscribe = subscribe(jobId, (progress) => {

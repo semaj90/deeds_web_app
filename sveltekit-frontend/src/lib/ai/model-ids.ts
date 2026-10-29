@@ -411,7 +411,8 @@ export type InferenceSource =
 	| 'local-wasm'       // Archived — was llama.cpp WASM
 	| 'server-vlm'       // VLM server (HF Transformers + NF4, vision + text, :8085)
 	| 'server-turboquant' // TurboQuant llama-server (turbo3 KV cache, :8090)
-	| 'server-ollama'    // Ollama Gemma4 reasoning/synthesis (default server)
+	| 'server-generation' // Configured server generation cascade; backend is reported separately
+	| 'server-ollama'    // Legacy attribution retained for previously persisted chat metadata
 	| 'server-agentic'   // Gemma4 multi-round tool-calling agent (/api/ai/agent)
 	| 'server-gemini'    // Gemini API (external)
 	| 'retrieval-hybrid'; // EmbeddingGemma + server RAG search + synthesis

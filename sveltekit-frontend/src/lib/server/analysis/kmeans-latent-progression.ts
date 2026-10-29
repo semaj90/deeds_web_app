@@ -168,7 +168,7 @@ export interface TurboVecKMeansJob {
  */
 export async function queryTurboVecKMeansJob(
   jobId: string,
-  turboVecUrl: string = ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791'
+  turboVecUrl: string = ENV.TURBOVEC_SIDECAR
 ): Promise<TurboVecKMeansJob | null> {
   try {
     const response = await fetch(`${turboVecUrl}/jobs/${jobId}`);

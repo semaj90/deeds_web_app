@@ -11,10 +11,12 @@
  * Usage:
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --text "TS2307 ..."
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt
+ *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --findings reviewed-findings.json --offline
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --validate
+ *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file report.txt --synthesize
  */
 
-import { existsSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
@@ -27,12 +29,17 @@ const getArg = (name) => {
 };
 
 const inputFile = getArg('--file');
+const findingsFile = getArg('--findings');
 const inlineText = getArg('--text');
 const validate = args.includes('--validate');
 const offline = args.includes('--offline');
+const synthesize = args.includes('--synthesize');
 const reportPath = path.resolve(ROOT, getArg('--report') ?? 'docs/reports/agentic-error-fixing-v1.json');
 const llamaServerUrl = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 const configuredModel = process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b';
+const allowedKinds = new Set(['AUTHORIZATION', 'LINEAGE_ADMISSION', 'DATABASE_SCHEMA', 'RETRIEVAL_OR_PROJECTION', 'GRAPH_OR_GPU', 'TYPECHECK_OR_SCHEMA', 'TIMEOUT', 'UNKNOWN']);
+
+if (findingsFile && (inputFile || inlineText)) throw new Error('FINDINGS_INPUT_CANNOT_BE_COMBINED_WITH_TEXT_DIAGNOSTICS');
 
 function sha256(value) {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
@@ -192,6 +199,104 @@ function buildPlan(text) {
   return candidates;
 }
 
+function verifiedSourcePath(sourceRef) {
+  if (typeof sourceRef !== 'string' || sourceRef.length === 0 || sourceRef.includes('\0') || path.isAbsolute(sourceRef)) {
+    throw new Error('FINDING_SOURCE_REF_MUST_BE_REPOSITORY_RELATIVE');
+  }
+  const sourcePath = path.resolve(ROOT, sourceRef);
+  const relativePath = path.relative(ROOT, sourcePath);
+  if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+    throw new Error('FINDING_SOURCE_REF_OUTSIDE_REPOSITORY');
+  }
+  if (!existsSync(sourcePath)) throw new Error('FINDING_SOURCE_FILE_MISSING');
+  const realPath = realpathSync(sourcePath);
+  const realRelativePath = path.relative(ROOT, realPath);
+  if (!realRelativePath || realRelativePath === '..' || realRelativePath.startsWith(`..${path.sep}`) || path.isAbsolute(realRelativePath)) {
+    throw new Error('FINDING_SOURCE_SYMLINK_OUTSIDE_REPOSITORY');
+  }
+  return realPath;
+}
+
+function buildReviewedSourceFindingsPlan(text) {
+  let envelope;
+  try {
+    envelope = JSON.parse(text);
+  } catch {
+    throw new Error('REVIEWED_FINDINGS_JSON_INVALID');
+  }
+  if (envelope?.schema !== 'atlas.reviewed-source-findings.v1'
+    || envelope?.status !== 'REVIEWED'
+    || envelope?.canonicalAuthority !== false
+    || envelope?.writesPerformed !== false
+    || !Array.isArray(envelope.findings)
+    || envelope.findings.length > 1000) {
+    throw new Error('REVIEWED_FINDINGS_ENVELOPE_INVALID');
+  }
+
+  const seen = new Set();
+  return envelope.findings.map((finding) => {
+    if (finding?.findingStatus !== 'CONFIRMED'
+      || !allowedKinds.has(finding.kind)
+      || typeof finding.sourceRevision !== 'string'
+      || !/^sha256:[a-f0-9]{64}$/.test(finding.sourceRevision)
+      || !(finding.workspaceRevision === null || (typeof finding.workspaceRevision === 'string' && /^sha256:[a-f0-9]{64}$/.test(finding.workspaceRevision)))
+      || typeof finding.evidenceDigest !== 'string'
+      || !/^sha256:[a-f0-9]{64}$/.test(finding.evidenceDigest)
+      || !Number.isInteger(finding.startByte)
+      || !Number.isInteger(finding.endByte)
+      || finding.startByte < 0
+      || finding.endByte <= finding.startByte
+      || !['HUMAN_REVIEW', 'TEST_FAILURE', 'COMPILER_DIAGNOSTIC'].includes(finding.verificationMethod)
+      || typeof finding.verificationRef !== 'string'
+      || finding.verificationRef.length === 0
+      || finding.verificationRef.length > 1000
+      || typeof finding.diagnostic !== 'string'
+      || finding.diagnostic.length === 0
+      || typeof finding.proposedAction !== 'string'
+      || finding.proposedAction.length === 0
+      || !Array.isArray(finding.evidenceRefs)
+      || finding.evidenceRefs.length > 32
+      || finding.evidenceRefs.some((ref) => typeof ref !== 'string' || ref.length === 0 || ref.length > 1000)) {
+      throw new Error('REVIEWED_FINDING_SCHEMA_INVALID');
+    }
+
+    const sourcePath = verifiedSourcePath(finding.sourceRef);
+    const sourceBytes = readFileSync(sourcePath);
+    if (sha256(sourceBytes) !== finding.sourceRevision) throw new Error('REVIEWED_FINDING_SOURCE_REVISION_MISMATCH');
+    if (finding.endByte > sourceBytes.length) throw new Error('REVIEWED_FINDING_SPAN_OUT_OF_BOUNDS');
+    if (sha256(sourceBytes.subarray(finding.startByte, finding.endByte)) !== finding.evidenceDigest) {
+      throw new Error('REVIEWED_FINDING_EVIDENCE_DIGEST_MISMATCH');
+    }
+
+    const identity = [finding.kind, finding.sourceRef, finding.sourceRevision, finding.startByte, finding.endByte, finding.evidenceDigest].join('\0');
+    const findingId = sha256(identity);
+    if (seen.has(findingId)) throw new Error('DUPLICATE_REVIEWED_FINDING');
+    seen.add(findingId);
+    const fingerprint = sha256(`REVIEWED_SOURCE_FINDING|${identity}`).slice(0, 23);
+    return {
+      findingId,
+      fingerprint,
+      errorCode: null,
+      gateId: null,
+      kind: finding.kind,
+      file: finding.sourceRef,
+      sourceRevision: finding.sourceRevision,
+      workspaceRevision: finding.workspaceRevision,
+      evidenceDigest: finding.evidenceDigest,
+      sourceSpan: { startByte: finding.startByte, endByte: finding.endByte },
+      evidenceRefs: [...new Set([...finding.evidenceRefs, finding.verificationRef, `${finding.sourceRef}#${finding.startByte}-${finding.endByte}`])],
+      verificationMethod: finding.verificationMethod,
+      verificationRef: finding.verificationRef,
+      owner: typeof finding.owner === 'string' && finding.owner.length > 0 ? finding.owner.slice(0, 200) : ownerFor(finding.kind, finding.sourceRef),
+      diagnostic: redactDiagnostic(finding.diagnostic).slice(0, 1000),
+      proposedAction: finding.proposedAction.slice(0, 1000),
+      recommendedMcpTools: recommendedMcpToolsFor(finding.kind, finding.sourceRef),
+      status: 'PROPOSED',
+      mutationAllowed: false,
+    };
+  });
+}
+
 function runValidation() {
   const frontendRoot = path.resolve(ROOT, 'sveltekit-frontend');
   const checkCommand = process.platform === 'win32'
@@ -262,16 +367,20 @@ async function resolveLlamaModel() {
   }
 }
 
-const diagnostics = readDiagnostics();
-const candidates = buildPlan(diagnostics);
+const diagnostics = findingsFile
+  ? readFileSync(path.resolve(ROOT, findingsFile), 'utf8')
+  : readDiagnostics();
+const candidates = findingsFile ? buildReviewedSourceFindingsPlan(diagnostics) : buildPlan(diagnostics);
 const validation = validate ? runValidation() : null;
 const modelResolution = offline
-  ? { status: 'SKIPPED_OFFLINE', configuredModel, runtimeModelId: null, reason: 'OFFLINE_MODE' }
-  : await resolveLlamaModel();
+  ? { status: 'SKIPPED_OFFLINE', configuredModel: null, runtimeModelId: null, reason: 'OFFLINE_MODE' }
+  : synthesize
+    ? await resolveLlamaModel()
+    : { status: 'SKIPPED_NOT_REQUESTED', configuredModel: null, runtimeModelId: null, reason: 'SYNTHESIS_NOT_REQUESTED' };
 const deterministicBody = {
   schema: 'atlas.agentic-error-fixing.v1',
   inputChecksum: sha256(diagnostics),
-  candidates: candidates.map(({ fingerprint, errorCode, gateId, kind, file, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ fingerprint, errorCode, gateId, kind, file, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed })),
+  candidates: candidates.map(({ findingId, fingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ findingId, fingerprint, errorCode, gateId, kind, file, sourceRevision, workspaceRevision, evidenceDigest, sourceSpan, evidenceRefs, verificationMethod, verificationRef, owner, diagnostic, proposedAction, recommendedMcpTools, status, mutationAllowed })),
   validation: validation ? { command: validation.command, exitCode: validation.exitCode, timedOut: validation.timedOut, outputChecksum: validation.outputChecksum } : null,
   modelResolution: {
     status: modelResolution.status,
@@ -317,7 +426,6 @@ async function synthesizePlanWithOrnith(planCandidates, resolvedModel) {
   }
 }
 
-const synthesize = args.includes('--synthesize');
 const synthesisResult = synthesize ? await synthesizePlanWithOrnith(deterministicBody.candidates, modelResolution) : null;
 
 const report = {

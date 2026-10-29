@@ -4,8 +4,11 @@ import {
 	formatAgUiSseEventV1,
 } from '$lib/server/agui/agui-protocol-contract-v1.js';
 import { createHash } from 'node:crypto';
+import { requireUser } from '$lib/server/auth-utils.js';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+	requireUser(event);
+	const { request } = event;
 	let rawBody: unknown;
 	try {
 		rawBody = await request.json();

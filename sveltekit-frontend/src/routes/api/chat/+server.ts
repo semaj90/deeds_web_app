@@ -124,7 +124,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         stream: false,
         temperature: body.temperature ?? 0.7,
       }),
-      signal: AbortSignal.timeout(30_000),
+      signal:
+        typeof AbortSignal.any === 'function'
+          ? AbortSignal.any([request.signal, AbortSignal.timeout(25_000)])
+          : AbortSignal.timeout(25_000),
     });
 
     if (!res.ok) {
@@ -176,11 +179,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       toolContext,
     });
   } catch (err) {
-    console.error('[/api/chat]', err);
-    // Release lease on error so TRT-LLM can take over if needed
     await releaseGpuLease('llama-server').catch((e) =>
       console.warn('[/api/chat] GPU lease release failed:', e)
     );
+    if (err instanceof Error && err.name === 'TimeoutError') {
+      return json(
+        { message: 'Chat inference timed out; the backend may be busy or offline', response: '' },
+        { status: 504 }
+      );
+    }
+    const cause = err && typeof err === 'object' && 'cause' in err ? err.cause : null;
+    if (cause && typeof cause === 'object' && 'code' in cause && cause.code === 'ECONNREFUSED') {
+      return json({ message: 'Chat inference backend is unavailable', response: '' }, { status: 503 });
+    }
+    console.error('[/api/chat]', err);
     return json({ message: 'Chat service error', response: '' }, { status: 503 });
   }
 };

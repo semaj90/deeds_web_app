@@ -2,12 +2,13 @@
  * GET /api/ace/health
  *
  * Live end-to-end health check for the ACE agentic pipeline:
- *   1. ollama         — embed + chat reachability (ornith-1.5-9b model)
- *   2. qdrant         — codebase_chunks_768 collection reachability + point count
- *   3. semantic_search — single round-trip embed → search to confirm the path works
- *   4. postgres       — research_summaries count + embedding coverage
- *   5. redis          — ping + rlpolicy:pipeline_weights key present
- *   6. langgraph      — /health proxy check
+ *   1. llama_server   — active chat model reachability
+ *   2. ollama         — embedding model reachability
+ *   3. qdrant         — codebase_chunks_768 collection reachability + point count
+ *   4. semantic_search — single round-trip embed → search to confirm the path works
+ *   5. postgres       — research_summaries count + embedding coverage
+ *   6. redis          — ping + rlpolicy:pipeline_weights key present
+ *   7. langgraph      — /health proxy check
  *
  * Returns { ok, checks, latencyMs }
  * Auth: requires locals.user
@@ -16,7 +17,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 const T = (ms: number) => AbortSignal.timeout(ms);
 
@@ -26,28 +27,37 @@ export const GET: RequestHandler = async ({ locals }) => {
   const start = Date.now();
   const checks: Record<string, unknown> = {};
 
-  // ── 1. Ollama reachability ──────────────────────────────────────────────
+  // ── 1. Active llama-server chat model ───────────────────────────────────
+  try {
+    const target = await resolveLlamaInferenceTarget(5_000);
+    checks.llamaServer = {
+      ok: true,
+      model: target.model,
+      modelSource: target.modelSource,
+    };
+  } catch (e) {
+    checks.llamaServer = { ok: false, error: (e as Error).message };
+  }
+
+  // ── 2. Ollama embedding model reachability ──────────────────────────────
   try {
     const r = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: T(5000) });
     const data = await r.json() as { models?: { name: string }[] };
     const models = data.models?.map(m => m.name) ?? [];
-    const chatModel  = LLM_MODEL_ID;
     const embedModel = ENV.OLLAMA_EMBED_MODEL   ?? 'embeddinggemma:latest';
     checks.ollama = {
       ok: r.ok,
-      chatModelLoaded:  models.includes(chatModel),
       embedModelLoaded: models.includes(embedModel),
-      chatModel,
       embedModel,
     };
   } catch (e) {
     checks.ollama = { ok: false, error: (e as Error).message };
   }
 
-  // ── 2. Qdrant collection stats ─────────────────────────────────────────
+  // ── 3. Qdrant collection stats ─────────────────────────────────────────
   try {
     const r = await fetch(
-      `${ENV.QDRANT_URL ?? `http://${['local', 'host'].join('')}:6333`}/collections/codebase_chunks_768`,
+      `${ENV.QDRANT_URL}/collections/codebase_chunks_768`,
       { signal: T(5000) },
     );
     const data = await r.json() as { result?: { points_count?: number; status?: string } };
@@ -60,7 +70,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     checks.qdrant = { ok: false, error: (e as Error).message };
   }
 
-  // ── 3. Semantic search round-trip ──────────────────────────────────────
+  // ── 4. Semantic search round-trip ──────────────────────────────────────
   const embedOk = (checks.ollama as any)?.embedModelLoaded &&
                   (checks.qdrant as any)?.ok;
   if (embedOk) {
@@ -78,7 +88,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
       if (vec?.length) {
         const sResp = await fetch(
-          `${ENV.QDRANT_URL ?? `http://${['local', 'host'].join('')}:6333`}/collections/codebase_chunks_768/points/query`,
+          `${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -102,7 +112,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     checks.semanticSearch = { ok: false, skipped: true, reason: 'ollama or qdrant not ready' };
   }
 
-  // ── 4. Postgres — research_summaries ───────────────────────────────────
+  // ── 5. Postgres — research_summaries ───────────────────────────────────
   try {
     const { pool } = await import('$lib/server/db/client');
     const r = await pool.query(`
@@ -122,7 +132,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     checks.postgres = { ok: false, error: (e as Error).message };
   }
 
-  // ── 5. Redis — ping + RL policy key ────────────────────────────────────
+  // ── 6. Redis — ping + RL policy key ────────────────────────────────────
   try {
     const { redis } = await import('$lib/server/redis.js');
     const pong = await redis.ping();
@@ -137,9 +147,9 @@ export const GET: RequestHandler = async ({ locals }) => {
     checks.redis = { ok: false, error: (e as Error).message };
   }
 
-  // ── 6. LangGraph ───────────────────────────────────────────────────────
+  // ── 7. LangGraph ───────────────────────────────────────────────────────
   try {
-    const r = await fetch(`${ENV.LANGGRAPH_URL ?? `http://${['local', 'host'].join('')}:8091`}/health`, { signal: T(4000) });
+    const r = await fetch(`${ENV.LANGGRAPH_URL}/health`, { signal: T(4000) });
     const data = await r.json() as { status?: string; gpu?: boolean };
     checks.langgraph = {
       ok: ['ok', 'healthy', 'degraded'].includes(data.status ?? ''),

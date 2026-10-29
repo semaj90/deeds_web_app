@@ -12,6 +12,7 @@
 
 import crypto from 'crypto';
 import pg from 'pg';
+import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { setACECursor, validateACECursor, type ACECursor } from '$lib/server/cache/ace-cursor-cache.js';
 export {
@@ -92,6 +93,12 @@ export function estimateContentTokensV1(content: string): number {
   return Math.ceil(Buffer.byteLength(content, 'utf8') / 4);
 }
 
+export function resolveAceContextDatabaseUrl(override?: string, configuredUrl = ENV.DATABASE_URL): string {
+  const databaseUrl = override?.trim() || configuredUrl?.trim();
+  if (!databaseUrl) throw new Error('DATABASE_URL_REQUIRED');
+  return databaseUrl;
+}
+
 export class ACEContextAssembler {
 
   private pgPool: pg.Pool;
@@ -103,7 +110,7 @@ export class ACEContextAssembler {
 
   constructor(pgUrl?: string, redisHost?: string, redisPort?: number, redisPassword?: string) {
     this.pgPool = new pg.Pool({
-      connectionString: pgUrl || process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
+      connectionString: resolveAceContextDatabaseUrl(pgUrl),
     });
 
     // T2 item 1 fix (parent-atlas-ace-bitfrost-cache-correctness): previously this

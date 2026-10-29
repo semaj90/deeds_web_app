@@ -17,6 +17,7 @@ vi.mock('$lib/server/db/client.js', () => ({
 vi.mock('$lib/server/db/schema/atlas-packets.js', () => ({
 	atlasPackets: {
 		packetKey: { __col: 'packet_key' },
+		sourceRef: { __col: 'source_ref' },
 	},
 }));
 
@@ -133,5 +134,50 @@ describe('resolvePacketKeyForWrite', () => {
 		const { PacketIdentityAmbiguousError, resolvePacketKeyForWrite } = await import('./packet-identity-resolver.js');
 		await expect(resolvePacketKeyForWrite('unresolved_key', 'src/ambiguous.ts')).rejects.toBeInstanceOf(PacketIdentityAmbiguousError);
 		expect(sourceRows.limit).toHaveBeenCalledWith(2);
+	});
+});
+
+describe('resolveCanonicalPacketKeyForWrite', () => {
+	const canonicalKey = 'packet:01234567-89ab-5cde-8fab-0123456789ab';
+
+	it('returns only a stored PacketKeyV2 for an explicit identity', async () => {
+		mockDirectLookup([{ packetKey: canonicalKey }]);
+		const { resolveCanonicalPacketKeyForWrite } = await import('./packet-identity-resolver.js');
+		await expect(resolveCanonicalPacketKeyForWrite(canonicalKey)).resolves.toBe(canonicalKey);
+	});
+
+	it('resolves an exact source reference through a stored PacketKeyV2', async () => {
+		mockDirectLookup([{ packetKey: canonicalKey }]);
+		mockDirectLookup([{ packetKey: canonicalKey }]);
+		const { resolveCanonicalPacketKeyForWrite } = await import('./packet-identity-resolver.js');
+		await expect(resolveCanonicalPacketKeyForWrite(undefined, 'src/routes/example.ts')).resolves.toBe(canonicalKey);
+	});
+
+	it('rejects a missing source binding instead of deriving identity', async () => {
+		mockDirectLookup([]);
+		const { PacketIdentityUnresolvedError, resolveCanonicalPacketKeyForWrite } = await import('./packet-identity-resolver.js');
+		await expect(resolveCanonicalPacketKeyForWrite(undefined, 'src/routes/unbound.ts')).rejects.toBeInstanceOf(PacketIdentityUnresolvedError);
+	});
+
+	it('rejects ambiguous source bindings', async () => {
+		mockDirectLookup([{ packetKey: canonicalKey }, { packetKey: 'packet:89abcdef-0123-5abc-8def-0123456789ab' }]);
+		const { PacketIdentityAmbiguousError, resolveCanonicalPacketKeyForWrite } = await import('./packet-identity-resolver.js');
+		await expect(resolveCanonicalPacketKeyForWrite(undefined, 'src/routes/ambiguous.ts')).rejects.toBeInstanceOf(PacketIdentityAmbiguousError);
+	});
+
+	it('rejects an explicit key that resolves to a different exact source binding', async () => {
+		mockDirectLookup([{ packetKey: canonicalKey }]);
+		mockDirectLookup([{ packetKey: 'packet:89abcdef-0123-5abc-8def-0123456789ab' }]);
+		mockDirectLookup([{ packetKey: 'packet:89abcdef-0123-5abc-8def-0123456789ab' }]);
+		const { PacketIdentitySourceMismatchError, resolveCanonicalPacketKeyForWrite } = await import('./packet-identity-resolver.js');
+		await expect(resolveCanonicalPacketKeyForWrite(canonicalKey, 'src/routes/different.ts')).rejects.toBeInstanceOf(PacketIdentitySourceMismatchError);
+	});
+
+	it('does not fall back from an invalid explicit identity to a source reference', async () => {
+		mockExecute.mockResolvedValueOnce({ rows: [] });
+		const { PacketKeyResolutionError } = await import('./packet-key-resolution-v2.js');
+		const { resolveCanonicalPacketKeyForWrite } = await import('./packet-identity-resolver.js');
+		await expect(resolveCanonicalPacketKeyForWrite('packet:0123456789ab', 'src/routes/example.ts')).rejects.toBeInstanceOf(PacketKeyResolutionError);
+		expect(mockSelect).not.toHaveBeenCalled();
 	});
 });

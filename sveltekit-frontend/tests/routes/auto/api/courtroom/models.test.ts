@@ -127,7 +127,7 @@ describe('src/routes/api/courtroom/models/+server.ts', () => {
 
 			expect(models[0]).toMatchObject({
 				role: 'prosecutor',
-				modelUrl: '/models/courtroom/character_alice.glb',
+				modelUrl: '/models/courtroom/character_alice_n64.glb',
 				skeletonType: 'mixamo',
 			});
 			expect(animations[0]).toMatchObject({

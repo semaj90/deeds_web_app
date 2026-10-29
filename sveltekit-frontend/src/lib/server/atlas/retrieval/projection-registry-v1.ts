@@ -25,6 +25,7 @@
  * Read-only: this module never writes to Postgres or Qdrant.
  */
 import { QDRANT_SEMANTIC_COLLECTION } from './qdrant-semantic-projection.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export type RepresentationIdentityV1 = 'semantic_768';
 
@@ -58,7 +59,7 @@ export type ProjectionResolutionV1 =
   | { ok: true; ref: ProjectionRefV1 }
   | { ok: false; failure: ProjectionResolutionFailureV1 };
 
-const QDRANT_URL = (process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/^0\.0\.0\.0/, '127.0.0.1');
+const QDRANT_URL = ENV.QDRANT_URL.replace(/^0\.0\.0\.0/, '127.0.0.1');
 
 interface QdrantPointLike {
   id: string | number;

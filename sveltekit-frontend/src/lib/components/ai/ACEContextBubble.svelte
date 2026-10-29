@@ -4,7 +4,7 @@
 
   interface ACEContextProps {
     confidence: number;
-    source: 'local-onnx' | 'server-ollama';
+    source: 'local-onnx' | 'server-generation' | 'server-ollama';
     confidenceFactors?: {
       caseContext: boolean;
       ragHits: number;
@@ -22,7 +22,7 @@
 
   let {
     confidence = 0.4,
-    source = 'server-ollama',
+    source = 'server-generation',
     confidenceFactors,
     citations,
     contextUsed,
@@ -41,7 +41,7 @@
     return 'danger';
   });
 
-  const sourceLabel = $derived(source === 'local-onnx' ? 'ONNX' : 'Ollama');
+  const sourceLabel = $derived(source === 'local-onnx' ? 'ONNX' : 'Server');
   const sourceIcon = $derived(source === 'local-onnx' ? 'i-lucide-cpu' : 'i-lucide-server');
 </script>
 

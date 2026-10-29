@@ -328,7 +328,13 @@ export default defineConfig(({ mode }) => {
       reportCompressedSize: false,
     },
     optimizeDeps: {
-      exclude: ['@webgpu/types', 'lucide-svelte', '@huggingface/transformers'],
+      exclude: [
+        '@webgpu/types',
+        'lucide-svelte',
+        '@huggingface/transformers',
+        '@babylonjs/core',
+        '@babylonjs/loaders',
+      ],
       include: [
         '@grpc/grpc-js',
         '@grpc/proto-loader',

@@ -757,7 +757,7 @@ export async function checkGoRetrievalHealth(): Promise<{
 
   // Check TurboVec
   try {
-    const res = await fetch(`${process.env.TURBOVEC_HEALTH_URL?.trim() || 'http://127.0.0.1:8791'}/health`, { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(`${ENV.TURBOVEC_HEALTH_URL}/health`, { signal: AbortSignal.timeout(2000) });
     services.turbovec = res.ok;
     details.turbovec = res.ok ? 'OK' : `HTTP ${res.status}`;
   } catch (err) {

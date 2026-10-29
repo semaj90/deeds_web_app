@@ -186,7 +186,7 @@ export class ChatSession {
   status = $state<'idle' | 'thinking' | 'streaming' | 'error'>('idle');
   error = $state<string | null>(null);
   lastConfidence = $state<number>(1.0);
-  lastSource = $state<InferenceSource>('server-ollama');
+  lastSource = $state<InferenceSource>('server-generation');
   connectionStatus = $state<'connected' | 'disconnected'>('disconnected');
   debugInfo = $state({ reason: '', latencyMs: 0, cacheHit: 'none', provider: 'unknown', e2bReady: false, inferenceTier: 'unknown' as string });
 
@@ -583,7 +583,7 @@ export class ChatSession {
         console.warn(`[ChatRouter] E2B quality low (${quality.score.toFixed(2)}): ${quality.reason}, escalating`);
         await this._handleServerInference(message, {
           ...decision,
-          source: 'server-ollama',
+          source: 'server-generation',
           reason: `e2b-quality-low(${quality.reason})`,
         });
         return;
@@ -617,7 +617,7 @@ export class ChatSession {
       console.warn('[ChatRouter] E2B failed, falling back to the configured server model:', err.message);
       await this._handleServerInference(message, {
         ...decision,
-        source: 'server-ollama',
+        source: 'server-generation',
         reason: `e2b-fallback(${decision.reason}): ${err.message}`,
       });
     }
@@ -626,7 +626,7 @@ export class ChatSession {
   private async _handleLocalInference(message: string, decision: RouterDecision) {
     await this._handleServerInference(message, {
       ...decision,
-      source: 'server-ollama',
+      source: 'server-generation',
       reason: `legacy-local-route-disabled(${decision.reason})`,
     });
   }
@@ -676,7 +676,7 @@ export class ChatSession {
         console.warn('[ChatRouter] RAG search failed, falling back to server');
         await this._handleServerInference(message, {
           ...decision,
-          source: 'server-ollama',
+          source: 'server-generation',
           reason: `retrieval-fallback(rag-${searchRes.status})`,
         });
         return;
@@ -710,7 +710,7 @@ export class ChatSession {
         console.info('[ChatRouter] Retrieval confidence too low, escalating to server');
         await this._handleServerInference(message, {
           ...decision,
-          source: 'server-ollama',
+          source: 'server-generation',
           reason: `retrieval-confidence-low(${retrievalConfidence.toFixed(2)})`,
         });
         return;
@@ -759,7 +759,7 @@ export class ChatSession {
               console.warn(`[ChatRouter] Synthesis quality low (${quality.score.toFixed(2)}): ${quality.reason}, escalating`);
               await this._handleServerInference(message, {
                 ...decision,
-                source: 'server-ollama',
+                source: 'server-generation',
                 reason: `retrieval-synthesis-quality-low(${quality.reason})`,
               });
               return;
@@ -809,7 +809,7 @@ export class ChatSession {
           this.messages.pop();
           await this._handleServerInference(message, {
             ...decision,
-            source: 'server-ollama',
+            source: 'server-generation',
             reason: `retrieval-escalated(${postQuality.reason})`,
           });
         } else {
@@ -823,7 +823,7 @@ export class ChatSession {
         console.warn('[ChatRouter] Retrieval local synthesis failed, escalating to server');
         await this._handleServerInference(message, {
           ...decision,
-          source: 'server-ollama',
+          source: 'server-generation',
           reason: `retrieval-fallback(synthesis-failed)`,
         });
       }
@@ -831,7 +831,7 @@ export class ChatSession {
       console.warn('[ChatRouter] Retrieval pipeline error:', err.message);
       await this._handleServerInference(message, {
         ...decision,
-        source: 'server-ollama',
+        source: 'server-generation',
         reason: `retrieval-fallback(${err.message})`,
       });
     }
@@ -885,7 +885,7 @@ export class ChatSession {
         this.messages.splice(assistantIdx, 1);
         await this._handleServerInference(message, {
           ...decision,
-          source: 'server-ollama',
+          source: 'server-generation',
           reason: decision.reason + '+agent-fallback',
         }, options);
         return;
@@ -942,7 +942,7 @@ export class ChatSession {
       }
       await this._handleServerInference(message, {
         ...decision,
-        source: 'server-ollama',
+        source: 'server-generation',
         reason: decision.reason + '+agent-error',
       }, options);
     } finally {
@@ -1104,7 +1104,7 @@ export class ChatSession {
         ...this.debugInfo,
         cacheHit: 'none',
         latencyMs: Math.round(performance.now() - t0),
-        provider: 'server-ollama',
+        provider: 'server-generation',
       };
 
       // Persist completed assistant message to IndexedDB

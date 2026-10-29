@@ -1,5 +1,6 @@
 import { env } from '$lib/env';
 import { z } from 'zod';
+import { resolveDatabaseUrl } from './database-url.js';
 
 // Determine if running in a Docker environment
 const isDocker = env.DOCKER_ENV === 'true';
@@ -101,7 +102,7 @@ function normalizeRedisUrl(rawValue?: string): string {
 }
 
 export function getDatabaseUrl(): string {
- return env?.DATABASE_URL ?? `postgresql://legal_admin:123456@${LOCALHOST}:5434/legal_ai_db`;
+ return resolveDatabaseUrl(env?.DATABASE_URL, env?.POSTGRES_URL);
 }
 
 export function getRedisUrl(): string {
@@ -184,7 +185,7 @@ export function getNeo4jConfig() {
  return {
   uri: env?.NEO4J_URI|| `bolt://${isDocker ? 'neo4j' : LOCALHOST}:7687`,
   user: env?.NEO4J_USER ?? 'neo4j',
-   password: env?.NEO4J_PASSWORD ?? 'neo4j123',
+   password: env?.NEO4J_PASSWORD,
   };
 }
 
@@ -230,12 +231,12 @@ export function isProduction(): boolean {
 // Define the Zod schema for environment variables
 const ConfigSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  POSTGRES_URL: z.string().url().default(getDatabaseUrl()),
-  POSTGRES_USER: z.string().default('legal_admin'),
-  POSTGRES_PASSWORD: z.string().default('123456'),
-  POSTGRES_DB: z.string().default('legal_ai_db'),
-   POSTGRES_HOST: z.string().default(isDocker ? 'postgres' : LOCALHOST),
-  POSTGRES_PORT: z.coerce.number().default(5432),
+  POSTGRES_URL: z.string().url().optional(),
+  POSTGRES_USER: z.string().optional(),
+  POSTGRES_PASSWORD: z.string().optional(),
+  POSTGRES_DB: z.string().optional(),
+  POSTGRES_HOST: z.string().optional(),
+  POSTGRES_PORT: z.coerce.number().optional(),
   REDIS_URL: z.string().url().default(getRedisUrl()),
   REDIS_PASSWORD: z.string().default('redis'),
   OLLAMA_URL: z.string().url().default(getOllamaUrl()),
@@ -246,7 +247,7 @@ const ConfigSchema = z.object({
   QDRANT_URL: z.string().url().default(getQdrantUrl()),
   NEO4J_URL: z.string().url().default(getNeo4jConfig().uri),
   NEO4J_USER: z.string().default('neo4j'),
-  NEO4J_PASSWORD: z.string().default('neo4j123'),
+  NEO4J_PASSWORD: z.string().optional(),
   MINIO_URL: z.string().url().default(normalizeObjectStorageUrl()),
   MINIO_ACCESS_KEY: z.string().default('minioadmin'),
   MINIO_SECRET_KEY: z.string().default('minioadmin'),

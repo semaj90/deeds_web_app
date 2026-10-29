@@ -123,4 +123,31 @@ describe('/api/ace/summarize', () => {
       maxTokens: 2000,
     });
   });
+
+  it.each([
+    'workspaceRevision',
+    'candidateSnapshotRevision',
+    'ordinalMapChecksum',
+    'representationRevision',
+    'featureRevision',
+    'retrievalPolicyRevision',
+    'contextPolicyRevision',
+    'graphRevision',
+    'modelRevision',
+    'dimension',
+  ])('rejects client-owned %s before retrieval or inference', async (field) => {
+    const { POST } = await import('./+server.js');
+    const request = new Request('http://localhost/api/ace/summarize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: 'Bounded fixture', [field]: 'attacker-selected-revision' }),
+    });
+
+    const response = await POST({ request, locals: { user: { id: '42' } } } as any);
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: 'Cache identity revisions are server-owned' });
+    expect(mocks.assembleACEContext).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
+  });
 });

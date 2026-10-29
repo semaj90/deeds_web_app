@@ -56,9 +56,7 @@ export interface ModelAnalysisSidecarClient {
 function resolveBaseUrl(baseUrl?: string): string {
 	return (
 		baseUrl ??
-		process.env.MODEL_ANALYSIS_SIDECAR_URL ??
-		ENV.LANGGRAPH_URL ??
-		'http://127.0.0.1:8091'
+		ENV.MODEL_ANALYSIS_SIDECAR_URL
 	).replace(/\/+$/, '');
 }
 

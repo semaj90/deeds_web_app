@@ -13,6 +13,7 @@
  */
 
 import neo4j, { Driver, Session } from 'neo4j-driver';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface GraphNeighbor {
   node_id: string;
@@ -37,11 +38,13 @@ export interface KAGExpansionResult {
 export class KAGExpander {
   private driver: Driver;
 
-  constructor(neo4jUri: string = 'bolt://127.0.0.1:7687', auth?: { username: string; password: string }) {
-    this.driver = neo4j.driver(
-      neo4jUri,
-      auth ? neo4j.auth.basic(auth.username, auth.password) : neo4j.auth.basic('neo4j', 'password')
-    );
+  constructor(neo4jUri: string = ENV.NEO4J_URI, auth?: { username: string; password: string }) {
+    const credentials = auth ?? (ENV.NEO4J_PASSWORD
+      ? { username: ENV.NEO4J_USER, password: ENV.NEO4J_PASSWORD }
+      : undefined);
+    if (!credentials?.password) throw new Error('NEO4J_PASSWORD_REQUIRED');
+
+    this.driver = neo4j.driver(neo4jUri, neo4j.auth.basic(credentials.username, credentials.password));
   }
 
   /**

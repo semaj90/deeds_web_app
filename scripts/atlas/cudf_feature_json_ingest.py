@@ -75,6 +75,13 @@ def som_quadrant(index: Any, size: int) -> int | None:
     return (i * ENGRAM_QUADRANTS) // size
 
 
+def _normalize_domain_class(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    normalized = value.strip().casefold()
+    return normalized or None
+
+
 def engram_token_id(
     som_row: Any,
     som_col: Any,
@@ -92,17 +99,26 @@ def engram_token_id(
 
 
 def load_domain_buckets(path: str | Path) -> dict[str, int]:
-    """Load an engram domain-bucket table (schema atlas.engram-domain-buckets.v1) and validate it."""
+    """Load and normalize an engram domain-bucket table, rejecting conflicting aliases."""
     doc = json.loads(Path(path).read_text(encoding="utf-8"))
     if doc.get("schema") != "atlas.engram-domain-buckets.v1":
         raise ValueError("unexpected domain-bucket schema")
     mapping = doc.get("mapping")
     if not isinstance(mapping, dict) or not mapping:
         raise ValueError("domain-bucket mapping missing")
+    normalized_mapping: dict[str, int] = {}
     for key, bucket in mapping.items():
         if not isinstance(key, str) or _as_index(bucket) is None or not 0 <= bucket < ENGRAM_DOMAIN_BUCKETS:
             raise ValueError(f"invalid domain bucket entry: {key!r}")
-    return {k: int(v) for k, v in mapping.items()}
+        normalized_key = _normalize_domain_class(key)
+        if normalized_key is None:
+            raise ValueError("domain bucket keys must not be blank")
+        normalized_bucket = int(bucket)
+        previous = normalized_mapping.get(normalized_key)
+        if previous is not None and previous != normalized_bucket:
+            raise ValueError(f"conflicting normalized domain bucket entry: {normalized_key!r}")
+        normalized_mapping[normalized_key] = normalized_bucket
+    return normalized_mapping
 
 
 def remap_engram_tokens(
@@ -113,14 +129,14 @@ def remap_engram_tokens(
 ) -> dict[str, Any]:
     """Assign engram tokens to records carrying som_row, som_col and domain_class.
 
-    `domain_buckets` maps an exact domain_class string to 0..5 (no case folding or aliasing).
+    `domain_buckets` maps normalized domain_class values (trim + casefold) to 0..5.
     Returns tokens in input order plus per-reason unresolved counts and a 96-bucket histogram.
     """
     tokens: list[int | None] = []
     unresolved = {"no_som_cell": 0, "unmapped_domain": 0}
     histogram = [0] * ENGRAM_TOKEN_COUNT
     for rec in records:
-        bucket = domain_buckets.get(rec.get("domain_class")) if rec.get("domain_class") is not None else None
+        bucket = domain_buckets.get(_normalize_domain_class(rec.get("domain_class")))
         token = engram_token_id(rec.get("som_row"), rec.get("som_col"), bucket, som_rows, som_cols)
         if token is None:
             if som_quadrant(rec.get("som_row"), som_rows) is None or som_quadrant(rec.get("som_col"), som_cols) is None:

@@ -328,10 +328,11 @@ async function generateDialogueTurn(
 		const queryVector = embedResult.vectors?.[0];
 
 		if (queryVector && queryVector.length === 768) {
-			const mustConditions: Array<{ key: string; match: { value: string } }> = [];
-			if (caseData.jurisdiction) {
-				mustConditions.push({ key: 'jurisdiction', match: { value: caseData.jurisdiction } });
-			}
+			// hybridSearch takes an object-style filter ({ field: value }); buildAtlasQdrantFilter turns it into
+			// must conditions. Passing a ready-made { must: [...] } made Qdrant reject the request with
+			// "data did not match any variant of untagged enum MatchInterface" (HTTP 400), so retrieval never ran.
+			const canonFilter: Record<string, string> = {};
+			if (caseData.jurisdiction) canonFilter.jurisdiction = caseData.jurisdiction;
 
 			const searchResult = await qdrant.hybridSearch({
 				collection: 'legal_canon_chunks',
@@ -339,7 +340,7 @@ async function generateDialogueTurn(
 				query: ragQuery,
 				limit: 3,
 				scoreThreshold: 0.35,
-				filters: mustConditions.length > 0 ? { must: mustConditions } : undefined,
+				filters: Object.keys(canonFilter).length > 0 ? canonFilter : undefined,
 			}).catch(() => ({ results: [] }));
 
 			const hits = searchResult.results ?? [];

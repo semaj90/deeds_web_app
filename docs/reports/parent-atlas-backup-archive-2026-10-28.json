@@ -1,0 +1,216 @@
+{
+  "schema": "atlas.backup-archive-receipt.v1",
+  "archivedAt": "2026-10-28T18:36:41.9470283Z",
+  "action": "MOVE_TO_LOCAL_ARCHIVE",
+  "archiveRoot": "deeds_labs/archive/2026-10-28-production-hardening-backups/original",
+  "sourceManifest": ".tmp/atlas/archive-candidates-sha256-20261028.json",
+  "sourceManifestSha256": "cd60ae9029bc5af5f441ae7bcfe2aaf19b9d03c14a4c0fa4f9a43416a3f821a8",
+  "candidateCount": 34,
+  "totalBytes": 430068.0,
+  "files": [
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/ACEContextBubble.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/ACEContextBubble.svelte.backup",
+      "bytes": 7759,
+      "sha256": "3b9468e11cf1a66585b56cbcd7e31522490ca3a42d54f12532c18a78fe415441"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AGENTS.md.bak",
+      "bytes": 5691,
+      "sha256": "9cdf314a38fdedbd73ee2192554eccda5bb60ae140bd0d21ddce7e07f4847f0e"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AIAssistantButton.svelte.backup",
+      "bytes": 6168,
+      "sha256": "a8ebf98206026c65e68d2c6cfc6f2c3ded156c69e19b778d609385c99fdbf782"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AIAssistantPanel.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AIAssistantPanel.svelte.backup",
+      "bytes": 2208,
+      "sha256": "b047e44321d389ca7f2ab28460a3bb07d0511e9ee1158cf1c86e00065a88948f"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AIButton.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AIButton.svelte.backup",
+      "bytes": 6430,
+      "sha256": "73c14cecfcc2f2829087ba74b62f2ec623a4e2c7b6d1cc901cc460bba17550d0"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AIChatWidget.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AIChatWidget.svelte.backup",
+      "bytes": 2084,
+      "sha256": "50c524a94c1c3a1c45c006755c7d4f26d5988494f2588732c2f6c5a01ef3bbbd"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AIRecommendation.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AIRecommendation.svelte.backup",
+      "bytes": 2547,
+      "sha256": "ed6eb676b6ba606179c666cde3558902f482e21d4559d0c780d9bf7ad513855d"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AIStatusIndicator.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AIStatusIndicator.svelte.backup",
+      "bytes": 7989,
+      "sha256": "7690816850abf96e15df117fc49e420f013c4a6bc3a41b5a427a8d50d650adcc"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/AskAI.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/AskAI.svelte.backup",
+      "bytes": 12199,
+      "sha256": "ce0a24c3196ac5e058fdff45e31ac3252ed45fb3e84d4815cea37db55553d6af"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/ClientSideAIChat.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/ClientSideAIChat.svelte.backup",
+      "bytes": 9673,
+      "sha256": "da83e9749433d73dc77f8589916d7a5a0c47c0989260804f5e67db109f9d26de"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/ContextualChatDemo.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/ContextualChatDemo.svelte.backup",
+      "bytes": 16198,
+      "sha256": "ac4d8276e644ae2f3186817e52e6d7bd5f14a534b16098396ef9fbb0794e910f"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/ContextualEvidenceChatModal.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/ContextualEvidenceChatModal.svelte.backup",
+      "bytes": 32520,
+      "sha256": "86e6b26716d59fe7eb0c1be9e6a119f319aacf8a6ba9bd35e8495c10fccdce19"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/EnhancedAIChatTest.svelte.backup",
+      "bytes": 15375,
+      "sha256": "5680a2357d374cdd11cf4034cd515fa82e86ca3e374cf2f869a3472880a995bf"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/EnhancedFileUpload.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/EnhancedFileUpload.svelte.backup",
+      "bytes": 15716,
+      "sha256": "d5f6618ff8688c7305ad3144ce43a365251e390ee285eb390bfa255cf49991c1"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/EnhancedInlineEditor.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/EnhancedInlineEditor.svelte.backup",
+      "bytes": 8979,
+      "sha256": "c52333f4ac61b22956dfcbdff0235e422bf29329ad830cdcf54a6ff22f2a0367"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte.backup",
+      "bytes": 52426,
+      "sha256": "a097abe4d54526f2bcf2be35346bc97aae906bd1b768da1184c95025c7fd2e0f"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/FloatingChatModal.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/FloatingChatModal.svelte.backup",
+      "bytes": 14031,
+      "sha256": "6b4f06d99286c33ea06e19a3999be2077311e148eeec7ccbe59616d0caf605f1"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/GamingAIButton.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/GamingAIButton.svelte.backup",
+      "bytes": 7115,
+      "sha256": "58f7dd373affce52e1a52b2c357b772c8475e2a4378e699ce85c3f135dba471f"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/Gemma270MWebAssembly.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/Gemma270MWebAssembly.svelte.backup",
+      "bytes": 28129,
+      "sha256": "d13df7e39c519b31f020740c167ff8d761a2b14be594679fff5d51da6d0b11ad"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/LegalDocumentSummarizer.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/LegalDocumentSummarizer.svelte.backup",
+      "bytes": 20321,
+      "sha256": "f3ede2d9c6ccf67a12c3d1c5230150e1c8ed02446833c420349a99cb4a68fe78"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/LLMSelector.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/LLMSelector.svelte.backup",
+      "bytes": 8605,
+      "sha256": "536149477290e50208a802f6ef99a2fe6da22b188c4ca264a48f9fd3d3637601"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/RAGAssistantChat.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/RAGAssistantChat.svelte.backup",
+      "bytes": 15905,
+      "sha256": "2d5e7bfa78de866be4ea593cce5040dae84a546859b60eb71d10300cda9687f9"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/SimpleWorkingChat.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/SimpleWorkingChat.svelte.backup",
+      "bytes": 27322,
+      "sha256": "4d441ae88cd022bc04d03a12944ce81eddb604a514ebceb090ae8a0b0bdc5cf3"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/ThinkingStyleToggle.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/ThinkingStyleToggle.svelte.backup",
+      "bytes": 7267,
+      "sha256": "20eb724cc949ae90f9f66823d7f36df934c0b1d6a893cb2ea82ffbb1a364ed6a"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ai/YorhaAIAssistant.svelte.backup",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ai/YorhaAIAssistant.svelte.backup",
+      "bytes": 18113,
+      "sha256": "e0c6f2fed9388f6f79a65ae146d63c0dca4104ce3b780717389b82db1b71cc2b"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/ui/gaming/n64/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/ui/gaming/n64/AGENTS.md.bak",
+      "bytes": 5071,
+      "sha256": "156c3189abb061ab028ee2e486c7b53971f22a795628c6163f2cbd0eab2ea9c1"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/yorha/_simulations/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/yorha/_simulations/AGENTS.md.bak",
+      "bytes": 4468,
+      "sha256": "7e33a7f044d338ebab8578bf73db0ba095aa36f8cbff02643ed871c6dcdc9fe0"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/yorha/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/yorha/AGENTS.md.bak",
+      "bytes": 5272,
+      "sha256": "fab8f9f8f76532e7cac4cda350b6bc52b5077d568f2ea92278396f4683123b1e"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/yorha/cases/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/yorha/cases/AGENTS.md.bak",
+      "bytes": 14271,
+      "sha256": "d4ddcfae11716ccabf5faa938c462822efc102f0cc0b8727b9fa09cdd13ec924"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/yorha/dashboard/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/yorha/dashboard/AGENTS.md.bak",
+      "bytes": 4617,
+      "sha256": "9ee228dde56ecf90f04d0d3f89a4a34f1a08e87c0f984c245408d70c9dc476cb"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/components/yorha/evidence/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/components/yorha/evidence/AGENTS.md.bak",
+      "bytes": 5140,
+      "sha256": "4b511108d0ff9191f1e92b08a672426b2444f7674c74beac2112a7be056a1fe4"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/server/ace/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/server/ace/AGENTS.md.bak",
+      "bytes": 28349,
+      "sha256": "e4c34b1352f804625a51ad6bd1efea22bd6d817577ba42986ecc1693448fad2a"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/server/ai/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/server/ai/AGENTS.md.bak",
+      "bytes": 6486,
+      "sha256": "4ab75eb07acd87d3b2629e7f77be9b2facb4a43cd6493eb1619736bec9b25b77"
+    },
+    {
+      "originalPath": "sveltekit-frontend/src/lib/server/retrieval/AGENTS.md.bak",
+      "archivePath": "deeds_labs/archive/2026-10-28-production-hardening-backups/original/sveltekit-frontend/src/lib/server/retrieval/AGENTS.md.bak",
+      "bytes": 5624,
+      "sha256": "abbee8e386aa5d702cf5d6f53795e642042fb4896a57c0aa20f7198ccca16cb6"
+    }
+  ]
+}

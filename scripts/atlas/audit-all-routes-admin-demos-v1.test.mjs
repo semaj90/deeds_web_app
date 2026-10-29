@@ -13,6 +13,7 @@ describe('ALL-ROUTES-ADMIN-DEMOS-AUDIT-01', () => {
   const inventory = buildRouteInventory(routes);
 
   it('indexes 100% of static /demos/* routes with zero broken demo catalog links', () => {
+    expect(catalogAudit.demosCatalog.sourceOfTruth).toBe('DEMO_REGISTRY');
     expect(catalogAudit.demosCatalog.brokenDemoLinks).toEqual([]);
     expect(catalogAudit.demosCatalog.unindexedDemoPages).toEqual([]);
     expect(catalogAudit.demosCatalog.actualDemoRoutesCount).toBeGreaterThanOrEqual(82);

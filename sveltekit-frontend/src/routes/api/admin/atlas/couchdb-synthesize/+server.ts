@@ -12,12 +12,13 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const COUCHDB_URL      = (process.env.COUCHDB_URL  ?? 'http://localhost:5984').replace(/\/+$/, '');
-const COUCHDB_USER     = process.env.COUCHDB_USER  ?? 'admin';
-const COUCHDB_PASS     = process.env.COUCHDB_PASS  ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
-const DB_NAME          = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
-const ROTORQUANT_URL   = (process.env.ROTORQUANT_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
+const COUCHDB_URL      = ENV.COUCHDB_URL.replace(/\/+$/, '');
+const COUCHDB_USER     = ENV.COUCHDB_USER;
+const COUCHDB_PASS     = ENV.COUCHDB_PASSWORD;
+const DB_NAME          = ENV.COUCHDB_AGENTS_DB;
+const ROTORQUANT_URL   = ENV.ROTORQUANT_URL.replace(/\/+$/, '');
 
 const schema = z.object({
 	maxClusters: z.number().int().min(1).max(50).default(10),
@@ -131,6 +132,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const body   = await request.json().catch(() => ({}));
 	const parsed = schema.safeParse(body);
 	if (!parsed.success) throw error(400, parsed.error.issues[0]?.message ?? 'Bad request');
+	if (!COUCHDB_PASS) throw error(503, 'CouchDB credentials are not configured');
 
 	const { maxClusters, dryRun } = parsed.data;
 	const t0 = Date.now();

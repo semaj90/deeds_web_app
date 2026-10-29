@@ -92,7 +92,7 @@ export interface RapidsSidecarClient {
 }
 
 function resolveRapidsSidecarBaseUrl(baseUrl?: string): string {
-  return (baseUrl ?? ENV.ATLAS_RAPIDS_SIDECAR_URL ?? 'http://127.0.0.1:8098').replace(/\/+$/, '');
+  return (baseUrl ?? ENV.ATLAS_RAPIDS_SIDECAR_URL).replace(/\/+$/, '');
 }
 
 async function safeReadText(response: Response): Promise<string> {

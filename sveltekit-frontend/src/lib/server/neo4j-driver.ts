@@ -10,6 +10,8 @@ export function getNeo4jDriver(): Driver {
     const user     = ENV.NEO4J_USER;
     const password = ENV.NEO4J_PASSWORD;
 
+    if (!password?.trim()) throw new Error('NEO4J_PASSWORD_REQUIRED');
+
     cachedDriver = neo4j.driver(uri, neo4j.auth.basic(user, password), {
         disableLosslessIntegers: true,
         connectionTimeout: 5000,

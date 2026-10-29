@@ -30,7 +30,7 @@ import { resolveOntologyLabelV1 } from '$lib/server/atlas/ontology-resolution-bo
  */
 
 function oakSidecarBaseUrl(): string {
-  return ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
+  return (ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || '').trim().replace(/\/+$/, '');
 }
 
 interface DomainOntologyRow {
@@ -55,6 +55,7 @@ async function resolutionColumnsExist(): Promise<boolean> {
 
 interface OakHealth {
   reachable: boolean;
+  configured?: boolean;
   available?: boolean;
   oaklibVersion?: string | null;
   adapterConfigured?: boolean;
@@ -63,14 +64,18 @@ interface OakHealth {
 }
 
 async function fetchOakKernelHealth(): Promise<OakHealth> {
+  const baseUrl = oakSidecarBaseUrl();
+  if (!baseUrl) return { reachable: false, configured: false };
+
   try {
-    const res = await fetch(`${oakSidecarBaseUrl()}/oak/health`, {
+    const res = await fetch(`${baseUrl}/oak/health`, {
       signal: AbortSignal.timeout(2000),
     });
-    if (!res.ok) return { reachable: false };
+    if (!res.ok) return { reachable: false, configured: true };
     const body = await res.json();
     return {
       reachable: true,
+      configured: true,
       available: body.available,
       oaklibVersion: body.oaklibVersion ?? null,
       adapterConfigured: body.adapterConfigured,
@@ -78,7 +83,7 @@ async function fetchOakKernelHealth(): Promise<OakHealth> {
       mode: body.mode,
     };
   } catch {
-    return { reachable: false };
+    return { reachable: false, configured: true };
   }
 }
 
@@ -145,7 +150,7 @@ export const GET: RequestHandler = async (event) => {
       vocabulary: [],
       resolutionStats: null,
       totalTuples: 0,
-      oakKernel: { reachable: false },
+      oakKernel: { reachable: false, configured: Boolean(oakSidecarBaseUrl()) },
     });
   }
 };

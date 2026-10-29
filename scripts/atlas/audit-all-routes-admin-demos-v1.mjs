@@ -448,7 +448,13 @@ export function auditCatalogOrganization(routes = discoverFilesystemRoutes()) {
   // 1. /demos/+page.svelte catalog check
   const demosPagePath = resolve(ROOT, 'sveltekit-frontend/src/routes/(app)/demos/+page.svelte');
   const demosSrc = readFileSync(demosPagePath, 'utf8');
-  const demoHrefs = [...demosSrc.matchAll(/href:\s*'([^']+)'/g)].map((m) => m[1]);
+  const demoRegistryPath = resolve(ROOT, 'sveltekit-frontend/src/lib/demos/demo-registry.ts');
+  const demoRegistrySrc = readFileSync(demoRegistryPath, 'utf8');
+  const demoCatalogUsesRegistry = /import\s*\{[^}]*\bDEMO_REGISTRY\b[^}]*\}\s*from\s*['"]\$lib\/demos\/demo-registry\.js['"]/.test(demosSrc);
+  const demoEntriesSource = demoRegistrySrc.match(/export const DEMO_REGISTRY[^=]*=\s*\[([\s\S]*?)\n\];/)?.[1] ?? '';
+  const demoHrefs = demoCatalogUsesRegistry
+    ? [...demoEntriesSource.matchAll(/href:\s*["']([^"']+)["']/g)].map((m) => m[1])
+    : [];
   const brokenDemoLinks = demoHrefs.filter((href) => !urlSet.has(href));
   const actualDemoPages = pages
     .filter((p) => p.url.startsWith('/demos/') && !p.isDynamic)
@@ -496,6 +502,7 @@ export function auditCatalogOrganization(routes = discoverFilesystemRoutes()) {
     staticFilesystemPages: pages.filter((p) => !p.isDynamic).length,
     dynamicFilesystemPages: pages.filter((p) => p.isDynamic).length,
     demosCatalog: {
+      sourceOfTruth: demoCatalogUsesRegistry ? 'DEMO_REGISTRY' : 'UNRESOLVED',
       catalogCount: demoHrefs.length,
       actualDemoRoutesCount: actualDemoPages.length,
       brokenDemoLinks,

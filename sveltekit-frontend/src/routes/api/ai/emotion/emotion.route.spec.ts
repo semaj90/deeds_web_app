@@ -3,12 +3,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from './+server.js';
 
 vi.mock('$lib/server/auth-utils.js', () => ({
-  requireUser: vi.fn(),
+  requireUser: vi.fn((event: { locals: { user?: unknown } }) => {
+    if (!event.locals.user) throw Object.assign(new Error('Authentication required'), { status: 401 });
+    return event.locals.user;
+  }),
 }));
 
 vi.mock('$lib/server/ai/local-llama-provider.js', () => ({
   LLAMA_SERVER_BASE_URL: 'http://127.0.0.1:8090/v1',
-  getActiveLocalVlmModel: vi.fn(async () => 'ornith-1.5-9b'),
+  getActiveLocalVlmModel: vi.fn(async () => 'llama-server-loaded-test-model'),
 }));
 
 function makeEvent(body: unknown) {
@@ -44,6 +47,15 @@ describe('POST /api/ai/emotion', () => {
     vi.unstubAllGlobals();
   });
 
+  it('rejects unauthenticated callers before parsing or contacting llama-server', async () => {
+    const request = new Request('http://localhost/api/ai/emotion', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{not json',
+    });
+    await expect(POST({ request, locals: {} } as any)).rejects.toMatchObject({ status: 401 });
+  });
+
   it('400 on invalid JSON', async () => {
     const res = await POST(makeEvent('{not json'));
     expect(res.status).toBe(400);
@@ -76,7 +88,7 @@ describe('POST /api/ai/emotion', () => {
 
     const chat = fetchMock.mock.calls.find(([u]) => String(u).endsWith('/chat/completions'))!;
     const sent = JSON.parse((chat[1] as RequestInit).body as string);
-    expect(sent.model).toBe('ornith-1.5-9b');
+    expect(sent.model).toBe('llama-server-loaded-test-model');
     const parts = sent.messages[0].content;
     expect(parts[1]).toEqual({ type: 'image_url', image_url: { url: 'data:image/jpeg;base64,QUJD' } });
     expect(sent.messages[0].images).toBeUndefined();

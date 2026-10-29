@@ -261,7 +261,7 @@
 	let selectedCategory = $state<AdminCategory | 'all'>('all');
 	let adminSearch = $state('');
 
-	// --- admin nav links (all 46 static /admin/* routes) ---
+	// --- admin nav links (all 48 static /admin/* routes) ---
 	const adminLinks: AdminLink[] = [
 		// AI & Research (10)
 		{ href: '/admin/ai-dashboard', label: 'AI Dashboard', icon: 'brain', desc: 'Operator + Lab consoles', category: 'ai' },
@@ -285,6 +285,8 @@
 		{ href: '/admin/topology', label: 'System Topology', icon: 'share-2', desc: 'Interactive service dependency view', category: 'atlas' },
 		{ href: '/admin/case-graph', label: 'Case Graph', icon: 'git-fork', desc: 'D3 case/evidence/person relationships', category: 'atlas' },
 		{ href: '/admin/gpu-evidence-graph', label: 'GPU Evidence Graph', icon: 'box', desc: 'WebGPU-accelerated evidence graph', category: 'atlas' },
+		{ href: '/admin/atlas/task-sources', label: 'Task Sources', icon: 'layers', desc: 'Advisory OpenSpec task source index', category: 'atlas' },
+		{ href: '/admin/feature-labels', label: 'Feature Labels', icon: 'tag', desc: 'Read-only feature-label registry view', category: 'atlas' },
 
 		// Codebase & Indexing (12)
 		{ href: '/admin/unified-indexing-studio', label: 'Unified Indexing Studio', icon: 'database', desc: 'Corpus + codebase indexing control', category: 'codebase' },

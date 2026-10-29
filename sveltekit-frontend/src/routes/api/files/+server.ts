@@ -113,7 +113,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         workflowRunId: `ocr-${row.id}`,
         evidenceId: row.id,
         fileName: file.name,
-        mimeType: file.type || "application/pdf"
+        mimeType: file.type || "application/pdf",
+        ownerId: locals.user?.id ? String(locals.user.id) : undefined
       }).catch(err => console.warn("[Workflow] Failed to register OCR run:", err));
     }
 

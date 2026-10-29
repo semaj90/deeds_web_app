@@ -24,6 +24,8 @@ export interface GoRetrievalHit {
  * Create a best-effort retriever backed by the Go retrieval service.
  * Returns an empty array when disabled or when the service is unavailable.
  */
+import { ENV } from '$lib/server/env.server.js';
+
 export function createGoRetrievalRetriever(opts?: GoRetrievalRetrieverOptions): {
   lane: 'go-retrieval';
   retrieve(input: { query: string; limit: number }): Promise<GoRetrievalHit[]>;
@@ -32,7 +34,7 @@ export function createGoRetrievalRetriever(opts?: GoRetrievalRetrieverOptions): 
     opts?.enabled ??
     (process.env.GO_RETRIEVAL_ENABLED === 'true' || process.env.GO_RETRIEVAL_ENABLED === '1');
 
-  const httpUrl = opts?.httpUrl ?? process.env.GO_RETRIEVAL_HTTP_URL;
+  const httpUrl = opts?.httpUrl ?? ENV.GO_RETRIEVAL_HTTP_URL;
   const timeoutMs = opts?.timeoutMs ?? 8_000;
 
   return {

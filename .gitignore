@@ -1123,3 +1123,11 @@ docs/reports/openspec-evidence/20261015193714990-cd8858b116da/census-v1.json
 
 # Nested claude-mem repo and node_modules (local plugin data, not project source)
 /claude-mem/
+
+# Track the small courtroom accessory OBJ; large model assets remain ignored.
+!sveltekit-frontend/static/models/
+!sveltekit-frontend/static/models/courtroom/
+!sveltekit-frontend/static/models/courtroom/jester_accessories_v1.obj
+!sveltekit-frontend/static/models/courtroom/character_alice_full.glb
+!sveltekit-frontend/static/models/courtroom/character_alice_n64.glb
+!sveltekit-frontend/static/models/courtroom/character_alice_snes.glb

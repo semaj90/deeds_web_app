@@ -10,6 +10,7 @@
 
 import type { Pool } from 'pg';
 import type { Redis } from 'ioredis';
+import { ENV } from '$lib/server/env.server.js';
 import { RETRIEVAL_LIMITS } from './search-contract.js';
 import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName } from './rrf-combiner.js';
 import type { DispatcherOrchestrationResult } from '../dispatcher/dispatcher-orchestrator.js';
@@ -266,7 +267,7 @@ async function queryQdrantVectorSignal(
         const seededVector = buildVectorPayload(collections[0], truncateEmbeddingForCollection(embedding, collections[0]));
         let seededRes: Response | null = null;
         try {
-          seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/${collections[0]}/points/query`, {
+          seededRes = await fetch(`${ENV.QDRANT_URL}/collections/${collections[0]}/points/query`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -376,7 +377,7 @@ async function queryQdrantVectorSignal(
     if (!cleanedSeeds.length) return [];
 
     const seededVector = buildVectorPayload('codebase_chunks_768', truncateEmbeddingForCollection(embedding, 'codebase_chunks_768'));
-    const res = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/query`, {
+    const res = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -439,7 +440,7 @@ async function queryTopology64Signal(
   if (!topologyVector) return [];
 
   const topologyVectorPayload = buildVectorPayload('codebase_topology_64', Array.from(topologyVector));
-  const topologyRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_topology_64/points/query`, {
+  const topologyRes = await fetch(`${ENV.QDRANT_URL}/collections/codebase_topology_64/points/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

@@ -6,12 +6,12 @@ import { pgRows } from '$lib/server/db/client';
  */
 
 import { db } from '$lib/server/db/client';
-import { analysisJobs } from '$lib/server/db/schema-postgres.js';
+import { analysisJobs, cases, evidence } from '$lib/server/db/schema-postgres.js';
 import {
   coercePersistedPayloadEnvelope,
   type PersistedEnvelope,
 } from '$lib/shared/schemas/protocol.js';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, or, sql } from 'drizzle-orm';
 import { postgresErrorDetails } from '$lib/server/db/postgres-error-details.js';
 import { classifyPostgresError } from '$lib/server/db/readiness.js';
 
@@ -276,6 +276,35 @@ export async function getAnalysisJob(id: string) {
     }
     throw err;
   }
+}
+
+export async function getAnalysisJobForOwner(id: string, ownerId: number) {
+	if (analysisJobsTableMissing || !Number.isSafeInteger(ownerId) || ownerId <= 0) return null;
+
+	try {
+		const [row] = await db
+			.select({ job: analysisJobs })
+			.from(analysisJobs)
+			.innerJoin(evidence, eq(analysisJobs.evidenceId, evidence.id))
+			.leftJoin(cases, eq(evidence.caseId, cases.id))
+			.where(and(
+				eq(analysisJobs.id, id),
+				or(
+					eq(evidence.uploadedBy, ownerId),
+					eq(evidence.userId, ownerId),
+					eq(cases.userId, ownerId),
+					eq(cases.assignedAttorney, ownerId),
+				),
+			))
+			.limit(1);
+		return row?.job ?? null;
+	} catch (err) {
+		if (isMissingAnalysisJobsTableError(err)) {
+			markAnalysisJobsUnavailable();
+			return null;
+		}
+		throw err;
+	}
 }
 
 /**

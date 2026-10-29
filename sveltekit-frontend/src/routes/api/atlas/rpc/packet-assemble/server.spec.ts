@@ -1,5 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { POST } from './+server.js';
+
+const requireUser = vi.hoisted(() => vi.fn());
+
+vi.mock('$lib/server/auth-utils.js', () => ({ requireUser }));
 
 vi.mock('$lib/server/redis.js', () => ({
 	getRedis: vi.fn(() => ({
@@ -8,6 +12,13 @@ vi.mock('$lib/server/redis.js', () => ({
 }));
 
 describe('POST /api/atlas/rpc/packet-assemble', () => {
+	beforeEach(() => {
+		requireUser.mockReset().mockImplementation((event: any) => {
+			if (!event.locals.user) throw Object.assign(new Error('Authentication required'), { status: 401 });
+			return event.locals.user;
+		});
+	});
+
 	const validPacket = {
 		schema: 'atlas.rpc.packet.v1',
 		registry: {
@@ -45,7 +56,7 @@ describe('POST /api/atlas/rpc/packet-assemble', () => {
 			body: JSON.stringify(validPacket)
 		});
 
-		const response = await POST({ request, locals: {} } as any);
+		const response = await POST({ request, locals: { user: { id: 'test-user' } } } as any);
 		expect(response.status).toBe(200);
 
 		const result = await response.json();
@@ -62,7 +73,7 @@ describe('POST /api/atlas/rpc/packet-assemble', () => {
 			body: 'not a json'
 		});
 
-		const response = await POST({ request, locals: {} } as any);
+		const response = await POST({ request, locals: { user: { id: 'test-user' } } } as any);
 		expect(response.status).toBe(400);
 
 		const result = await response.json();
@@ -78,11 +89,22 @@ describe('POST /api/atlas/rpc/packet-assemble', () => {
 			body: JSON.stringify(invalid)
 		});
 
-		const response = await POST({ request, locals: {} } as any);
+		const response = await POST({ request, locals: { user: { id: 'test-user' } } } as any);
 		expect(response.status).toBe(400);
 
 		const result = await response.json();
 		expect(result.ok).toBe(false);
 		expect(result.error).toBe('VALIDATION_FAILED');
+	});
+
+	it('rejects unauthenticated callers before parsing or caching a packet', async () => {
+		const request = new Request('http://localhost/api/atlas/rpc/packet-assemble', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(validPacket)
+		});
+
+		await expect(POST({ request, locals: {} } as any)).rejects.toMatchObject({ status: 401 });
+		expect(requireUser).toHaveBeenCalledOnce();
 	});
 });

@@ -1,12 +1,16 @@
 // @vitest-environment node
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-const { mockExecute } = vi.hoisted(() => ({
+const { mockExecute, mockSelect, mockInsert, resolveCanonicalPacketKeyForWrite, PacketIdentityUnresolvedError } = vi.hoisted(() => ({
   mockExecute: vi.fn(),
+  mockSelect: vi.fn(),
+  mockInsert: vi.fn(),
+  resolveCanonicalPacketKeyForWrite: vi.fn(),
+  PacketIdentityUnresolvedError: class PacketIdentityUnresolvedError extends Error {},
 }));
 
 vi.mock('$lib/server/db/client', () => ({
-  db: { execute: mockExecute },
+  db: { execute: mockExecute, select: mockSelect, insert: mockInsert },
   pgRows: (result: unknown) => (Array.isArray((result as { rows?: unknown[] }).rows)
     ? (result as { rows: unknown[] }).rows
     : (Array.isArray(result) ? result : [])),
@@ -25,9 +29,13 @@ vi.mock('$lib/server/redis', () => ({
 
 vi.mock('$lib/server/ollama', () => ({ callLlamaServerChat: vi.fn() }));
 vi.mock('$lib/server/grpc/embedding-client', () => ({ generateEmbeddings: vi.fn() }));
-vi.mock('$lib/server/observability/langfuse', () => ({ traceSpan: (_name: string, fn: () => unknown) => fn() }));
+vi.mock('$lib/server/observability/langfuse', () => ({ traceSpan: (_name: string, _attributes: unknown, fn: () => unknown) => fn() }));
 vi.mock('$lib/server/config/vector-config.js', () => ({ buildVectorPayload: vi.fn() }));
 vi.mock('$lib/server/atlas/identity/packet-key-builder.js', () => ({ computePacketKey: vi.fn() }));
+vi.mock('$lib/server/atlas/identity/packet-identity-resolver.js', () => ({
+  PacketIdentityUnresolvedError,
+  resolveCanonicalPacketKeyForWrite,
+}));
 
 // TASK-SEMANTIC-PACKET-COMPATIBILITY-01 step 2 (2026-09-08): the given smoke_command
 // (semantic-packet-writer.spec.ts) tests a different, unrelated module
@@ -36,13 +44,17 @@ vi.mock('$lib/server/atlas/identity/packet-key-builder.js', () => ({ computePack
 describe('assertTaskSemanticPacketSchemaCompatible', () => {
   beforeEach(() => {
     mockExecute.mockReset();
+    mockSelect.mockReset();
+    mockInsert.mockReset();
+    resolveCanonicalPacketKeyForWrite.mockReset();
   });
 
   const REQUIRED_COLUMNS = [
     'point_kind', 'qdrant_point_id', 'workspace_id', 'workspace_task_id',
+    'packet_key',
     'feature_id', 'alias_id', 'source_ref', 'file_path', 'semantic_path',
     'related_feature_ids', 'related_task_ids', 'related_file_paths', 'cluster_id',
-    'centroid_id', 'parent_centroid_id', 'summary_llm', 'summary_model',
+    'centroid_id', 'parent_centroid_id', 'summary_llm', 'summary_model', 'metadata',
     'next_action', 'summary_hash', 'confidence', 'status', 'agent_pickup_ready',
     'observed_at', 'valid_from', 'valid_to', 'created_at', 'updated_at', 'deleted',
   ];
@@ -71,6 +83,83 @@ describe('assertTaskSemanticPacketSchemaCompatible', () => {
     await expect(assertTaskSemanticPacketSchemaCompatible()).rejects.toThrow(/qdrant_point_id/);
   });
 
+  it('rejects live NOT NULL columns without defaults when the writer omits them', async () => {
+    const liveColumns = [
+      ...REQUIRED_COLUMNS.map((column_name) => ({
+        column_name,
+        is_nullable: 'YES',
+        column_default: null,
+        is_identity: 'NO',
+        is_generated: 'NEVER',
+      })),
+      {
+        column_name: 'feature_label',
+        is_nullable: 'NO',
+        column_default: null,
+        is_identity: 'NO',
+        is_generated: 'NEVER',
+      },
+    ];
+    mockExecute.mockResolvedValue({ rows: liveColumns });
+    const { assertTaskSemanticPacketSchemaCompatible } = await import('./semantic-packets.js');
+
+    await expect(assertTaskSemanticPacketSchemaCompatible()).rejects.toThrow(
+      /unprovided_required=feature_label/,
+    );
+  });
+
+  it('reports only provenance-dependent required fields after supplying empty metadata', async () => {
+    const requiredButUnproduced = [
+      'feature_label', 'alias_id', 'qdrant_score', 'cluster_score', 'topological_score', 'fusion_score',
+    ];
+    mockExecute.mockResolvedValue({ rows: [
+      ...REQUIRED_COLUMNS.map((column_name) => ({
+        column_name,
+        is_nullable: 'YES',
+        column_default: null,
+        is_identity: 'NO',
+        is_generated: 'NEVER',
+      })),
+      ...requiredButUnproduced.map((column_name) => ({
+        column_name,
+        is_nullable: 'NO',
+        column_default: null,
+        is_identity: 'NO',
+        is_generated: 'NEVER',
+      })),
+    ] });
+    const { assertTaskSemanticPacketSchemaCompatible } = await import('./semantic-packets.js');
+
+    await expect(assertTaskSemanticPacketSchemaCompatible(undefined, ['alias_id'])).rejects.toThrow(
+      /unprovided_required=feature_label,alias_id,qdrant_score,cluster_score,topological_score,fusion_score/,
+    );
+  });
+
+  it('checks a route writer against its own supplied insert columns', async () => {
+    const liveColumns = [
+      ...REQUIRED_COLUMNS.map((column_name) => ({
+        column_name,
+        is_nullable: 'YES',
+        column_default: null,
+        is_identity: 'NO',
+        is_generated: 'NEVER',
+      })),
+      {
+        column_name: 'feature_label',
+        is_nullable: 'NO',
+        column_default: null,
+        is_identity: 'NO',
+        is_generated: 'NEVER',
+      },
+    ];
+    mockExecute.mockResolvedValue({ rows: liveColumns });
+    const { assertTaskSemanticPacketSchemaCompatible } = await import('./semantic-packets.js');
+
+    await expect(assertTaskSemanticPacketSchemaCompatible([
+      'point_kind', 'packet_key', 'feature_id', 'source_ref',
+    ])).rejects.toThrow(/unprovided_required=feature_label/);
+  });
+
   it('createTaskSemanticPacket rejects before loading the task row when schema is incompatible', async () => {
     mockExecute.mockResolvedValue({ rows: [{ column_name: 'id' }] });
     const { createTaskSemanticPacket } = await import('./semantic-packets.js');
@@ -79,6 +168,22 @@ describe('assertTaskSemanticPacketSchemaCompatible', () => {
     // Only the schema-compatibility SELECT should have run -- no task-row load, no Qdrant
     // upsert, no INSERT attempt reached.
     expect(mockExecute).toHaveBeenCalledTimes(1);
+  });
+
+  it('blocks task summaries without a bound source reference before attempting identity resolution or insertion', async () => {
+    mockExecute.mockResolvedValue({ rows: REQUIRED_COLUMNS.map((column_name) => ({ column_name })) });
+    mockSelect.mockReturnValue({
+      from: () => ({
+        where: () => ({
+          limit: async () => [{ id: 1, workspace_id: 'workspace:default', feature_id: 'feature-1' }],
+        }),
+      }),
+    });
+    const { createTaskSemanticPacket } = await import('./semantic-packets.js');
+
+    await expect(createTaskSemanticPacket(1)).rejects.toThrow(/TASK_SOURCE_REF_NOT_BOUND/);
+    expect(resolveCanonicalPacketKeyForWrite).not.toHaveBeenCalled();
+    expect(mockInsert).not.toHaveBeenCalled();
   });
 });
 

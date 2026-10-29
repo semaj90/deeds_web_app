@@ -150,7 +150,6 @@ export function aggregateWorkerResultsDeterministically(params: {
 
     validatedResults.push({
       ...result,
-      status: result.status === 'COMPLETED' ? 'VALIDATED' : result.status,
     });
   }
 

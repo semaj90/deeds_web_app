@@ -491,6 +491,47 @@ describe('bounded heat ZSETs', () => {
 });
 
 describe('ACE packet v3 BitFrost cache owner', () => {
+  it('proves an in-memory miss, admitted warm, and hit; rejects a cached packet from an older source revision', async () => {
+    const redis = new FakeRedis();
+    const packet = makeCurrentAcePacketV3();
+    const cacheIdentity = cacheIdentityForPacket(packet);
+    const embedAllowedPacketKeys = new Set([packet.identity.packet_key]);
+
+    const initialRead = await readAcePacketV3FromBitfrostV1(redis as unknown as Redis, {
+      cacheIdentity,
+      expected: expectationForPacket(packet),
+      embedAllowedPacketKeys,
+    });
+    expect(initialRead.status).toBe('MISS');
+    if (initialRead.status !== 'MISS') return;
+    expect(initialRead.reason).toBe('CACHE_EMPTY');
+
+    const write = await writeAcePacketV3ToBitfrostV1(redis as unknown as Redis, {
+      packet,
+      cacheIdentity,
+      embedAllowedPacketKeys,
+    });
+    expect(write.status).toBe('WRITTEN');
+
+    const hit = await readAcePacketV3FromBitfrostV1(redis as unknown as Redis, {
+      cacheIdentity,
+      expected: expectationForPacket(packet),
+      embedAllowedPacketKeys,
+    });
+    expect(hit.status).toBe('HIT');
+    if (hit.status === 'HIT') expect(hit.packet.integrity.packet_checksum).toBe(packet.integrity.packet_checksum);
+
+    const nextSourceIdentity = { ...cacheIdentity, sourceRevision: 'source-rev-2' };
+    const nextSourceKey = buildAceBitfrostCacheKeyV1(nextSourceIdentity);
+    redis.strings.set(nextSourceKey, JSON.stringify(packet));
+    const staleRead = await readAcePacketV3FromBitfrostV1(redis as unknown as Redis, {
+      cacheIdentity: nextSourceIdentity,
+      expected: { ...expectationForPacket(packet), source_revision: 'source-rev-2' },
+      embedAllowedPacketKeys,
+    });
+    expect(staleRead.status).toBe('MISS');
+  });
+
   it('exposes the guarded v3 cache owner through the existing ACE reader and writer', async () => {
     const redis = new FakeRedis();
     const packet = makeCurrentAcePacketV3();

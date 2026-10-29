@@ -149,7 +149,7 @@ export interface LangExtractSidecarRequestOptions {
 }
 
 export function resolveLangExtractBaseUrl(baseUrl?: string): string {
-  return baseUrl ?? (ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095');
+  return baseUrl ?? ENV.LANGEXTRACT_BASE_URL;
 }
 
 // CHUNK0's one remaining gap (openspec/changes/parent-atlas-code-ingestion-pipeline

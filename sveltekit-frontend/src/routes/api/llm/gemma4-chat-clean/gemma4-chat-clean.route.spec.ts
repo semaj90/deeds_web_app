@@ -3,11 +3,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { POST } from './+server.js';
 
 const requireUserOrService = vi.hoisted(() => vi.fn());
+const env = vi.hoisted(() => ({ LLAMA_SERVER_URL: 'http://127.0.0.1:8090' as string | undefined }));
 
 vi.mock('$lib/server/auth-utils.js', () => ({ requireUserOrService }));
-vi.mock('$lib/server/env.server.js', () => ({ ENV: { LLAMA_SERVER_URL: 'http://127.0.0.1:8090' } }));
+vi.mock('$lib/server/env.server.js', () => ({ ENV: env }));
 vi.mock('$lib/server/ai/llama-server-model-resolver.js', () => ({
-  resolveLoadedLlamaModel: vi.fn(async () => ({ resolvedModel: 'ornith-1.5-9b' })),
+  resolveLoadedLlamaModel: vi.fn(async () => ({ resolvedModel: 'llama-server-loaded-test-model' })),
 }));
 
 function makeEvent(body: unknown) {
@@ -55,6 +56,21 @@ describe('POST /api/llm/gemma4-chat-clean (proxy to llama-server :8090)', () => 
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('fails closed when no llama-server URL is configured', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    const configuredUrl = env.LLAMA_SERVER_URL;
+    env.LLAMA_SERVER_URL = undefined;
+    try {
+      const response = await POST(makeEvent({ messages: okMessages }));
+      expect(response.status).toBe(503);
+      expect(await response.json()).toEqual({ error: 'llama_server_not_configured' });
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      env.LLAMA_SERVER_URL = configuredUrl;
+    }
+  });
+
   it('forwards only allowed fields, pins the resolved model, and sanitizes reasoning leaks', async () => {
     const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>
       new Response(
@@ -68,7 +84,7 @@ describe('POST /api/llm/gemma4-chat-clean (proxy to llama-server :8090)', () => 
     );
     expect(res.status).toBe(200);
     const sent = JSON.parse(fetchMock.mock.calls[0][1]!.body as string);
-    expect(sent.model).toBe('ornith-1.5-9b');
+    expect(sent.model).toBe('llama-server-loaded-test-model');
     expect(sent.extra).toBeUndefined();
     expect(sent.max_tokens).toBe(64);
     expect(fetchMock.mock.calls[0][0]).toBe('http://127.0.0.1:8090/v1/chat/completions');

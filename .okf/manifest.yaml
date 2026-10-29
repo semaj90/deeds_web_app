@@ -55,6 +55,7 @@ registries:
       - parent-atlas-execution.yaml
       - structured-value.yaml
       - atlas-domain-taxonomy.yaml
+      - repository-capability-classification-v1.yaml
     schema_files:
       atlas-domain-taxonomy.yaml: ../schemas/domain-taxonomy-v1.schema.json
 

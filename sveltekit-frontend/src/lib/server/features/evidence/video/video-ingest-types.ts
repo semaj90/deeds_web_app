@@ -54,6 +54,7 @@ export interface VideoIngestResult {
   storageUri: string;
   transcriptCount: number;
   summary: string;
+  searchIndexStatus: 'indexed' | 'failed' | 'not_applicable';
 }
 
 export interface QdrantEvidencePayload {
@@ -62,6 +63,7 @@ export interface QdrantEvidencePayload {
   modality: EvidenceModality;
   view: 'transcript_segment' | 'frame_caption' | 'summary';
   chunk_id: string;
+  source_revision: string;
   start_ms?: number;
   end_ms?: number;
   language?: string;

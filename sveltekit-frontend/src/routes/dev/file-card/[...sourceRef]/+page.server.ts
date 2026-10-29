@@ -3,16 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 import neo4jPkg from 'neo4j-driver';
+import { ENV } from '$lib/server/env.server.js';
 
 // Target directory for generated profile jsons (relative to sveltekit-frontend)
 const DATA_DIR = path.resolve('../docs/profile-cards/data');
-
-// Retrieve configs
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const NEO4J_URI = process.env.NEO4J_URI || 'bolt://127.0.0.1:7687';
-const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
-const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || 'neo4j123';
-const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 
 export const load = async ({ params }) => {
   const { sourceRef } = params;
@@ -36,8 +30,13 @@ export const load = async ({ params }) => {
 
   // 2. Dynamic database/service fallback queries
   console.log(`[dev-file-card] Pre-generated card not found at ${jsonPath}, running fallback live queries for ${sourceRef}`);
-  
-  const pool = new pg.Pool({ connectionString: DATABASE_URL });
+
+  const databaseUrl = ENV.DATABASE_URL?.trim();
+  if (!databaseUrl) {
+    throw error(503, 'Database is not configured');
+  }
+
+  const pool = new pg.Pool({ connectionString: databaseUrl });
   let card = null;
 
   try {
@@ -87,9 +86,9 @@ export const load = async ({ params }) => {
     let nestedRoutes = [];
     let relatedFeatures = new Set();
 
-    if (neo4jPkg) {
+    if (neo4jPkg && ENV.NEO4J_URI && ENV.NEO4J_USER && ENV.NEO4J_PASSWORD) {
       try {
-        const driver = neo4jPkg.driver(NEO4J_URI, neo4jPkg.auth.basic(NEO4J_USER, NEO4J_PASSWORD), {
+        const driver = neo4jPkg.driver(ENV.NEO4J_URI, neo4jPkg.auth.basic(ENV.NEO4J_USER, ENV.NEO4J_PASSWORD), {
           disableLosslessIntegers: true
         });
         const session = driver.session({ database: 'neo4j' });
@@ -132,7 +131,7 @@ export const load = async ({ params }) => {
     if (row.qdrant_point_id) {
       try {
         const pointId = /^\d+$/.test(row.qdrant_point_id) ? parseInt(row.qdrant_point_id, 10) : row.qdrant_point_id;
-        const qdrantRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
+        const qdrantRes = await fetch(`${ENV.QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

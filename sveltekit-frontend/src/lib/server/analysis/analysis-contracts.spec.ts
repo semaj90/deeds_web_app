@@ -355,6 +355,7 @@ describe('analysis contracts', () => {
       packetKey: 'packet:1',
       sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
       sourceRevision: 'source-v1',
+      representationRevision: 'semantic-768-v1',
       passResults,
     });
 

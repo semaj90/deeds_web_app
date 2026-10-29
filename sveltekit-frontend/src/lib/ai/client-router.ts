@@ -5,11 +5,11 @@
  *   LOCAL-HELPER  helper-only browser/local models (default)
  *   LOCAL-ONNX    Gemma 3 270M ONNX or other tiny helper models
  *   RETRIEVAL     Hybrid client+server — factual queries needing search
- *   SERVER        Gemma4 reasoning/synthesis with agentic tools
+ *   SERVER        configured server generation with agentic tools
  *   VISION        multimodal server reasoning where needed
  *
  * Client Gemma4 lanes remain opt-in helpers only. The default local lane is
- * tiny ONNX/helper models; server-side Gemma4 handles reasoning and synthesis.
+ * tiny ONNX/helper models; the configured server runtime handles reasoning and synthesis.
  *
  * Health-aware: polls /api/health/capabilities (30s cache) to know which
  * server services are actually available before escalating.
@@ -24,6 +24,7 @@ import { LITERT_BASE_URL } from './model-ids.js';
 
 export interface ServerCapabilities {
 	ollama: boolean;
+	generation: boolean;
 	embedding: boolean;
 	rag: boolean;
 	postgres: boolean;
@@ -145,7 +146,7 @@ const LOCAL_PATTERNS = [
 /** Score >= this → retrieval-hybrid mode */
 const RETRIEVAL_THRESHOLD = 0.3;
 
-/** Score >= this → full server-ollama mode */
+/** Score >= this → configured server-generation mode */
 const SERVER_THRESHOLD = 0.6;
 
 /** Messages longer than this (chars) get mild escalation */
@@ -317,7 +318,7 @@ export interface RouterDecision {
 function pickLocalSource(e2bReady?: boolean, litertReady?: boolean, allowClientGemma = false): InferenceSource {
 	if (allowClientGemma && e2bReady) return 'local-e2b';
 	if (allowClientGemma && litertReady) return 'local-litert';
-	return 'server-ollama';
+	return 'server-generation';
 }
 
 /**
@@ -325,7 +326,7 @@ function pickLocalSource(e2bReady?: boolean, litertReady?: boolean, allowClientG
  *   - locally via ONNX/helper lanes by default
  *   - optionally via client Gemma4 helpers when explicitly enabled
  *   - via retrieval-hybrid (client embed + server search + local answer)
- *   - via server Gemma4 reasoning/synthesis
+ *   - via configured server reasoning/synthesis
  */
 export function shouldEscalateToServer(
 	message: string,
@@ -375,7 +376,7 @@ export function shouldEscalateToServer(
 				intent,
 			};
 		}
-		return { source: 'server-ollama', reason: 'user-forced-server', confidence: 1.0, intent };
+		return { source: 'server-generation', reason: 'user-forced-server', confidence: 1.0, intent };
 	}
 
 	const lower = message.toLowerCase();
@@ -439,7 +440,7 @@ export function shouldEscalateToServer(
 
 	if (serverScore >= SERVER_THRESHOLD) {
 		// Health check: if server is down, fall to retrieval or local
-		if (caps && !caps.ollama) {
+		if (caps && !caps.generation) {
 			return {
 				source: pickLocalSource(options?.e2bReady, litertOk, allowClientGemma),
 				reason: reasonStr + '+server-unavailable',
@@ -460,7 +461,7 @@ export function shouldEscalateToServer(
 		}
 
 		return {
-			source: 'server-ollama',
+			source: 'server-generation',
 			reason: reasonStr,
 			confidence: Math.min(serverScore, 1.0),
 			intent,

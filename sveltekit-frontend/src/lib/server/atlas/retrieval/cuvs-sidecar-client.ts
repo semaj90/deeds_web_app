@@ -79,11 +79,8 @@ let _healthCacheTs = 0;
 
 function getBaseUrl(baseUrl?: string): string {
   // CUVS_SIDECAR_URL is the dedicated sidecar; CUVS_BENCH_URL is the benchmarking lane.
-  // 8098 matches ATLAS_RAPIDS_SIDECAR_PORT's default in atlas_rapids_sidecar.py.
-  return (
-    baseUrl ??
-    (process.env['CUVS_SIDECAR_URL'] || ENV.CUVS_BENCH_URL || 'http://127.0.0.1:8098')
-  );
+  // CUVS_SIDECAR_URL in ENV preserves the dedicated-to-benchmark fallback order.
+  return baseUrl ?? ENV.CUVS_SIDECAR_URL;
 }
 
 export function createCuvsSidecarClient(baseUrl?: string): CuvsSidecarClient {

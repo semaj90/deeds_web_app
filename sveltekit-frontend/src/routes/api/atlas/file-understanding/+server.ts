@@ -1,8 +1,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import type { PoolClient } from 'pg';
 import pg from 'pg';
 import { z } from 'zod';
 import { requireUser } from '$lib/server/auth-utils.js';
+import { getDatabaseUrl } from '$lib/config/env.server.js';
 
 const fileUnderstandingUpdateSchema = z.object({
   packet_key: z.string().min(1),
@@ -13,9 +15,16 @@ const fileUnderstandingUpdateSchema = z.object({
   reasoning: z.string().optional()
 });
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin@localhost/legal_ai_db',
-});
+let pool: pg.Pool | undefined;
+
+function getPool(): pg.Pool {
+  if (!pool) pool = new pg.Pool({ connectionString: getDatabaseUrl() });
+  return pool;
+}
+
+function isDatabaseConfigurationError(value: unknown): boolean {
+  return value instanceof Error && /^DATABASE_URL_(REQUIRED|INVALID)$/.test(value.message);
+}
 
 interface FileLabel {
   packet_key: string;
@@ -57,8 +66,9 @@ interface LabelStats {
 export const GET: RequestHandler = async (event) => {
   requireUser(event);
   const { url } = event;
-  const client = await pool.connect();
+  let client: PoolClient | undefined;
   try {
+    client = await getPool().connect();
     const purpose = url.searchParams.get('purpose');
     const thoroughness = url.searchParams.get('thoroughness');
     const criticality = url.searchParams.get('criticality');
@@ -169,13 +179,16 @@ export const GET: RequestHandler = async (event) => {
       });
     }
   } catch (err) {
+    if (isDatabaseConfigurationError(err)) {
+      return json({ error: 'Database is not configured' }, { status: 503 });
+    }
     console.error('File understanding query error:', err);
     return json(
       { error: 'Failed to retrieve file understanding labels' },
       { status: 500 }
     );
   } finally {
-    client.release();
+    client?.release();
   }
 };
 
@@ -195,13 +208,14 @@ export const GET: RequestHandler = async (event) => {
  */
 export const POST: RequestHandler = async (event) => {
   requireUser(event);
-  const client = await pool.connect();
+  let client: PoolClient | undefined;
   try {
     const rawBody = await event.request.json().catch(() => ({}));
     const parsed = fileUnderstandingUpdateSchema.safeParse(rawBody);
     if (!parsed.success) {
       return json({ error: 'Invalid request body', issues: parsed.error.issues }, { status: 400 });
     }
+    client = await getPool().connect();
     const {
       packet_key,
       file_purpose,
@@ -248,9 +262,12 @@ export const POST: RequestHandler = async (event) => {
 
     return json({ success: true, packet_key });
   } catch (err) {
+    if (isDatabaseConfigurationError(err)) {
+      return json({ error: 'Database is not configured' }, { status: 503 });
+    }
     console.error('File understanding update error:', err);
     return json({ error: 'Failed to update labels' }, { status: 500 });
   } finally {
-    client.release();
+    client?.release();
   }
 };

@@ -1,3 +1,5 @@
+import { ENV } from '$lib/server/env.server.js';
+
 export type ResidentCuvsAlgorithm = 'brute_force' | 'cagra' | 'ivf_flat' | 'ivf_pq';
 export type ResidentCuvsMetric = 'cosine' | 'sqeuclidean' | 'inner_product';
 
@@ -72,7 +74,7 @@ function assertBuild(input: ResidentIndexBuildRequest): void {
 }
 
 export function createAtlasRapidsResidentIndexClient(
-  baseUrl = process.env.ATLAS_RAPIDS_SIDECAR_URL ?? 'http://127.0.0.1:8098',
+  baseUrl = ENV.ATLAS_RAPIDS_SIDECAR_URL,
 ) {
   async function json<T>(path: string, init?: RequestInit): Promise<T> {
     const response = await fetch(`${baseUrl}${path}`, init);

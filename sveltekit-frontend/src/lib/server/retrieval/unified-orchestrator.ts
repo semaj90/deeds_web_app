@@ -4,7 +4,7 @@
  * Coordinates the complete pipeline:
  * Postgres truth → embeddinggemma 768d → [STAGE 1.5: Rust N-API optional] → Qdrant named-vector
  * → Qdrant RRF fusion → TurboVec prefilter → Postgres join
- * → LangExtract + Gemma4 summary
+ * → LangExtract + configured llama-server summary
  *
  * Each service has a clear job:
  * - Postgres: canonical packet truth, joins, provenance, summaries
@@ -12,7 +12,7 @@
  * - Qdrant: GPU vector index + named-vector search + RRF
  * - TurboVec: CUDA RAM prefilter/rerank + 768→64 latent transform
  * - Go Retrieval: fast API facade + orchestration
- * - LangExtract + Gemma4: structured extraction + bounded summaries
+ * - llama-server: bounded, model-resolved summaries
  */
 
 import fetch from 'node-fetch';
@@ -52,8 +52,8 @@ export interface RetrievalConfig {
   turbovec: { host: string; port: number };
   goRetrieval: { host: string; port: number };
   postgres: { host: string; port: number; user: string; password: string; database: string };
-  ollama: { host: string; port: number };
-  gemma4: { host: string; port: number };
+  ollamaEmbedding: { host: string; port: number };
+  llamaServer: { host: string; port: number };
   /** Experimental candidate-side dedup. Disabled unless explicitly enabled by a caller. */
   latent256Dedup?: {
     enabled: boolean;
@@ -202,8 +202,8 @@ const DEFAULT_CONFIG: RetrievalConfig = {
     password: process.env.POSTGRES_PASSWORD || '',
     database: process.env.POSTGRES_DB || 'legal_ai_db'
   },
-  ollama: { host: '127.0.0.1', port: 11434 },
-  gemma4: { host: '127.0.0.1', port: 8090 }
+  ollamaEmbedding: { host: '127.0.0.1', port: 11434 },
+  llamaServer: { host: '127.0.0.1', port: 8090 }
 };
 
 let unifiedRetrievalRuntimeInitialized = false;
@@ -218,8 +218,8 @@ export async function initializeUnifiedRetrievalRuntime(config?: Partial<Retriev
     Object.assign(DEFAULT_CONFIG.turbovec, config.turbovec ?? {});
     Object.assign(DEFAULT_CONFIG.goRetrieval, config.goRetrieval ?? {});
     Object.assign(DEFAULT_CONFIG.postgres, config.postgres ?? {});
-    Object.assign(DEFAULT_CONFIG.ollama, config.ollama ?? {});
-    Object.assign(DEFAULT_CONFIG.gemma4, config.gemma4 ?? {});
+    Object.assign(DEFAULT_CONFIG.ollamaEmbedding, config.ollamaEmbedding ?? {});
+    Object.assign(DEFAULT_CONFIG.llamaServer, config.llamaServer ?? {});
   }
 
   unifiedRetrievalRuntimeInitialized = true;
@@ -301,7 +301,7 @@ async function generateEmbedding(query: string, config: RetrievalConfig): Promis
     const result = await executeProviderEmbeddingV1({
       text: query,
       mode: 'unprompted_legacy',
-      provider: { provider: 'ollama', baseUrl: `http://${config.ollama.host}:${config.ollama.port}`, modelId: 'embeddinggemma:latest' }
+      provider: { provider: 'ollama', baseUrl: `http://${config.ollamaEmbedding.host}:${config.ollamaEmbedding.port}`, modelId: 'embeddinggemma:latest' }
     });
     return result.embedding;
   } catch (err) {
@@ -864,9 +864,9 @@ export async function applyConfiguredLatent256Dedup(
 }
 
 /**
- * STAGE 6: LangExtract + Gemma4 summarization
+ * STAGE 6: LangExtract + configured llama-server summarization
  */
-async function summarizeWithGemma4(
+async function summarizeWithLlamaServer(
   candidates: RankedCandidate[],
   query: string,
   config: RetrievalConfig,
@@ -892,7 +892,7 @@ Provide a 1-2 sentence summary of the relevant code structure and functionality.
     // Loaded lazily: runtime-contract throws at import when ROTORQUANT_MODEL_PATH is unset, which
     // must only affect synthesis, not importing or running retrieval.
     const { LLM_MODEL_ID } = await import('$lib/server/llm/runtime-contract.js');
-    const res = await fetch(`http://${config.gemma4.host}:${config.gemma4.port}/v1/chat/completions`, {
+    const res = await fetch(`http://${config.llamaServer.host}:${config.llamaServer.port}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -904,7 +904,7 @@ Provide a 1-2 sentence summary of the relevant code structure and functionality.
       })
     });
 
-    if (!res.ok) throw new Error(`Gemma4 synthesis failed: ${res.status}`);
+    if (!res.ok) throw new Error(`llama-server synthesis failed: ${res.status}`);
     const data = await res.json() as { choices?: Array<{ message?: { content: string } }> };
     const summary = data.choices?.[0]?.message?.content || '';
 
@@ -917,9 +917,18 @@ Provide a 1-2 sentence summary of the relevant code structure and functionality.
       timing: Date.now() - startTime
     };
   } catch (err) {
-    console.error('Gemma4 summarization failed:', err);
+    console.error('llama-server summarization failed:', err);
     throw err;
   }
+}
+
+export async function summarizeRetrievalCandidates(
+  candidates: RankedCandidate[],
+  query: string,
+  config: RetrievalConfig = DEFAULT_CONFIG,
+  options?: { max_tokens?: number; temperature?: number },
+): Promise<SummarizationResult> {
+  return summarizeWithLlamaServer(candidates, query, config, options);
 }
 
 const READ_STAGE_SUBSYSTEMS: Record<string, string> = {
@@ -1166,7 +1175,7 @@ export async function executeUnifiedRetrievalWithSummarization(
     return retrievalResult;
   }
 
-  const summaryResult = await summarizeWithGemma4(
+  const summaryResult = await summarizeWithLlamaServer(
     retrievalResult.candidates,
     request.query,
     config,
@@ -1187,7 +1196,7 @@ export default {
   turboVecPrefilter,
   postgresJoin,
   rankCandidates,
-  summarizeWithGemma4,
+  summarizeWithLlamaServer,
   resolveParentAtlasContext,
   enrichFilterWithDomainTaxonomy,
   batchResolveParentAtlasContext,

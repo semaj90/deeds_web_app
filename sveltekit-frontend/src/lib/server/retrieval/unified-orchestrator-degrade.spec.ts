@@ -38,8 +38,8 @@ const config = {
   turbovec: { host: '127.0.0.1', port: 8791 },
   goRetrieval: { host: '127.0.0.1', port: 8100 },
   postgres: { host: '127.0.0.1', port: 5434, user: 'u', password: 'pw', database: 'd' },
-  ollama: { host: '127.0.0.1', port: 11434 },
-  gemma4: { host: '127.0.0.1', port: 8090 },
+  ollamaEmbedding: { host: '127.0.0.1', port: 11434 },
+  llamaServer: { host: '127.0.0.1', port: 8090 },
 } as unknown as RetrievalConfig;
 
 const okVector = () => ({ vector: new Float32Array(768).fill(0.1), model: 'm', dimension: 768, cached: false, exec_ms: 1 });

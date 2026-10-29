@@ -26,6 +26,7 @@ import {
   rerankCanonicalFeatureEnvelopes,
   type CanonicalRerankEnvelope,
 } from './canonical-rerank-executor.js';
+import { ENV } from '$lib/server/env.server.js';
 import {
   XGBOOST_SIDECAR_FEATURES,
   xgboostSidecarFeatureSchemaRevision,
@@ -572,6 +573,7 @@ describe('canonical rerank executor', () => {
       });
 
       expect(requestedUrls.some((url) => url.endsWith('/score'))).toBe(true);
+      expect(requestedUrls.some((url) => url.startsWith(`${ENV.XGBOOST_SIDECAR_URL}/score`))).toBe(true);
       expect(ranked.results[0]?.model_version).not.toBe('xgboost-sidecar');
       expect(ranked.provenance.fallbackUsed).toBe(true);
     } finally {

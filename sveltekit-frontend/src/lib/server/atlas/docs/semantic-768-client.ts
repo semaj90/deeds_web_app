@@ -23,7 +23,7 @@ function resolveEmbeddingClientInfo(): Semantic768EmbeddingClientInfo {
       transport: 'openai_compatible',
     };
   }
-  const ollama = (ENV.OLLAMA_BASE_URL ?? process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434').replace(/\/$/, '');
+  const ollama = (ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434').replace(/\/$/, '');
   return {
     endpoint: `${ollama}/api/embed`,
     model: ENV.OLLAMA_EMBED_MODEL ?? process.env.PRIMARY_EMBEDDING_MODEL ?? process.env.EMBED_MODEL ?? process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest',

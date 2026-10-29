@@ -5,7 +5,7 @@ import path from 'path';
 
 const CARDS_DIR = path.resolve(process.cwd(), '.opencode', 'cards');
 const OUT_DIR = path.resolve(process.cwd(), '.opencode', 'ingest');
-const AGENTS_FILENAMES = ['AGENTS.md', 'AGENTS.md.bak', 'llms.md', 'LLMS.md', 'llms.MD'];
+const AGENTS_FILENAMES = ['AGENTS.md', 'llms.md', 'LLMS.md', 'llms.MD'];
 
 async function ensureDir(d){
   try{ await fs.mkdir(d, { recursive: true }); }catch(e){ /* ignore */ }

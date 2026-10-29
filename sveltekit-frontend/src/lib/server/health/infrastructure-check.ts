@@ -189,7 +189,7 @@ export async function checkInfrastructure(): Promise<InfrastructureSnapshot> {
     },
     {
       name: 'TurboVec',
-      url: `${process.env.TURBOVEC_HEALTH_URL?.trim() || 'http://127.0.0.1:8791'}/health`,
+      url: `${ENV.TURBOVEC_HEALTH_URL}/health`,
       protocol: 'http' as const,
       critical: false,
     },

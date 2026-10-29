@@ -15,9 +15,7 @@ import { sanitizeOrnithSummary } from '../../../../../../scripts/atlas/lib/ornit
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { ENV } from '$lib/server/env.server.js';
 
-const LLAMA_SERVER = (ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
-
-// Route name is historical: the proxy serves whatever llama-server :8090 has loaded (Ornith 1.5).
+// Route name is historical: the proxy serves the model discovered from llama-server :8090.
 // Only these fields reach llama-server; `model` is always resolved server-side and `stream` is
 // not accepted because the response is read as one JSON document and sanitized.
 const messageSchema = z.object({
@@ -56,9 +54,13 @@ export const POST: RequestHandler = async (event) => {
   const body = parsed.data;
 
   try {
+    const configuredLlamaServer = ENV.LLAMA_SERVER_URL?.trim().replace(/\/+$/, '');
+    if (!configuredLlamaServer) {
+      return json({ error: 'llama_server_not_configured' }, { status: 503 });
+    }
 
-    const loaded = await resolveLoadedLlamaModel(LLAMA_SERVER, null);
-    const response = await fetch(`${LLAMA_SERVER}/v1/chat/completions`, {
+    const loaded = await resolveLoadedLlamaModel(configuredLlamaServer, null);
+    const response = await fetch(`${configuredLlamaServer}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...body, model: loaded.resolvedModel }),

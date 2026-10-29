@@ -12,11 +12,13 @@ const digest = (bytes) => `sha256:${crypto.createHash('sha256').update(bytes).di
 const sqlQuote = (value) => `'${value.replaceAll("'", "''")}'`;
 
 test('inventory-bound facts preserve spans, distinguish review from defects, and replay deterministically', () => {
+  fs.rmSync(scratch, { recursive: true, force: true });
   fs.mkdirSync(scratch, { recursive: true });
   const fixtureRoot = path.join(scratch, 'src');
   fs.mkdirSync(fixtureRoot, { recursive: true });
   const files = new Map([
     ['src/routes/api/fixture/+server.ts', `// https://comment.invalid/TODO\nconst schema = { safeParse: (x: unknown) => ({ success: true, data: x }) };\nexport async function POST({ request }: { request: Request }) {\n  const raw = await request.json();\n  const checked = schema.safeParse(raw);\n  return Response.json(checked);\n}\nexport async function GET({ request }: { request: Request }) {\n  const raw = await request.json();\n  return Response.json(raw);\n}\n`],
+    ['src/routes/api/assignment/+server.ts', `const schema = { safeParse: (x: unknown) => ({ success: true, data: x }) };\nexport async function PUT({ request }: { request: Request }) {\n  let raw: unknown;\n  raw = await request.json();\n  const checked = schema.safeParse(raw);\n  return Response.json(checked);\n}\n`],
     ['src/client.ts', `const endpoint = 'https://api.example.test/items';\nexport const load = () => fetch(endpoint);\n`],
     ['src/Widget.svelte', `<!-- TODO: migrate old slot -->\n<script lang="ts">\n  let count = 0;\n</script>\n<button on:click={() => count++}>{count}</button><slot />\n`],
   ]);
@@ -34,6 +36,7 @@ test('inventory-bound facts preserve spans, distinguish review from defects, and
   const invalidUtf8Bytes = Buffer.from([0x63, 0x6f, 0x6e, 0x73, 0x74, 0x20, 0xff, 0x3b]);
   fs.writeFileSync(invalidUtf8Path, invalidUtf8Bytes);
   inventoryRows.push({ source_ref: invalidUtf8Ref, extension: '.ts', byte_length: invalidUtf8Bytes.length, source_digest: digest(invalidUtf8Bytes) });
+  inventoryRows.push({ source_ref: '../../outside.ts', extension: '.ts', byte_length: 0, source_digest: digest(Buffer.alloc(0)) });
   const inventoryPath = path.join(scratch, 'inventory.parquet');
   const values = inventoryRows.map((row) => `(${sqlQuote(row.source_ref)}, ${sqlQuote(row.extension)}, ${row.byte_length}, ${sqlQuote(row.source_digest)})`).join(',');
   execFileSync('duckdb', ['-c', `COPY (SELECT * FROM (VALUES ${values}) AS t(source_ref, extension, byte_length, source_digest)) TO '${inventoryPath.replace(/\\/g, '/')}' (FORMAT parquet)`], { cwd: root, stdio: 'pipe' });
@@ -56,6 +59,10 @@ test('inventory-bound facts preserve spans, distinguish review from defects, and
   assert.equal(routeFacts.filter((fact) => fact.fact_kind === 'REQUEST_BODY_VALIDATED').length, 1);
   assert.equal(routeFacts.filter((fact) => fact.fact_kind === 'REQUEST_BODY_VALIDATION_UNRESOLVED').length, 1);
   assert.ok(routeFacts.filter((fact) => fact.fact_kind === 'REQUEST_BODY_READ').every((fact) => fact.ast_grep_agrees === true));
+  const assignmentFacts = first.facts.filter((fact) => fact.source_ref.endsWith('/assignment/+server.ts'));
+  assert.equal(assignmentFacts.filter((fact) => fact.fact_kind === 'REQUEST_BODY_READ').length, 1);
+  assert.equal(assignmentFacts.filter((fact) => fact.fact_kind === 'REQUEST_BODY_VALIDATED').length, 1);
+  assert.equal(assignmentFacts.filter((fact) => fact.fact_kind === 'REQUEST_BODY_VALIDATION_UNRESOLVED').length, 0);
   assert.equal(routeFacts.some((fact) => fact.fact_kind === 'URL_LITERAL' && fact.literal?.includes('comment.invalid')), false);
   assert.equal(routeFacts[0].workspace_revision, `sha256:${'a'.repeat(64)}`);
   assert.ok(routeFacts.every((fact) => fact.symbol_resolution === 'NOT_VERIFIED'));
@@ -73,6 +80,9 @@ test('inventory-bound facts preserve spans, distinguish review from defects, and
   const invalidSummary = first.summaries.find((row) => row.source_ref === invalidUtf8Ref);
   assert.equal(invalidSummary.analysis_status, 'SOURCE_UTF8_ROUNDTRIP_MISMATCH');
   assert.equal(first.facts.some((fact) => fact.source_ref === invalidUtf8Ref), false);
+  const outsideSummary = first.summaries.find((row) => row.source_ref === '../../outside.ts');
+  assert.equal(outsideSummary.analysis_status, 'SOURCE_REF_OUTSIDE_REPOSITORY');
+  assert.equal(first.facts.some((fact) => fact.source_ref === '../../outside.ts'), false);
   for (const [relative] of files) fs.rmSync(path.join(root, 'sveltekit-frontend', relative), { force: true });
   fs.rmSync(invalidUtf8Path, { force: true });
 });

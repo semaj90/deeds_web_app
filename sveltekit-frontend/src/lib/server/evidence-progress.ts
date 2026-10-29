@@ -20,6 +20,7 @@ type ProgressCallback = (progress: JobProgress) => void;
 
 const jobs = new Map<string, JobProgress>();
 const subscribers = new Map<string, Set<ProgressCallback>>();
+const jobOwners = new Map<string, string>();
 
 const CLEANUP_INTERVAL_MS = 60_000; // Check every minute
 const MAX_AGE_MS = 10 * 60_000; // Remove after 10 minutes
@@ -33,11 +34,12 @@ setInterval(() => {
 		if (now - job.updatedAt > MAX_AGE_MS) {
 			jobs.delete(jobId);
 			subscribers.delete(jobId);
+			jobOwners.delete(jobId);
 		}
 	}
 }, CLEANUP_INTERVAL_MS).unref();
 
-export function createJob(jobId: string): JobProgress {
+export function createJob(jobId: string, ownerId?: string): JobProgress {
 	const job: JobProgress = {
 		jobId,
 		step: 'uploading',
@@ -52,10 +54,16 @@ export function createJob(jobId: string): JobProgress {
 		if (oldest) {
 			jobs.delete(oldest);
 			subscribers.delete(oldest);
+			jobOwners.delete(oldest);
 		}
 	}
 	jobs.set(jobId, job);
+	if (ownerId) jobOwners.set(jobId, ownerId);
 	return job;
+}
+
+export function isJobOwnedBy(jobId: string, ownerId: string): boolean {
+	return Boolean(ownerId) && jobOwners.get(jobId) === ownerId;
 }
 
 export function updateJob(jobId: string, update: Partial<Pick<JobProgress, 'step' | 'progress' | 'message' | 'error' | 'evidenceId'>>): void {

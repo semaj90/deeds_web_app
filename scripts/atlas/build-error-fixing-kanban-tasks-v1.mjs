@@ -18,9 +18,10 @@
  *
  * Usage:
  *   node scripts/atlas/run-agentic-error-fixing-v1.mjs --file some-diagnostics.txt
- *   node scripts/atlas/build-error-fixing-kanban-tasks-v1.mjs
+ *   node scripts/atlas/build-error-fixing-kanban-tasks-v1.mjs --dry-run
+ *   node scripts/atlas/build-error-fixing-kanban-tasks-v1.mjs --write
  */
-import { existsSync, readFileSync, mkdirSync, writeFileSync, renameSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, mkdirSync, writeFileSync, renameSync } from 'node:fs';
 import { createHash, randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { z } from 'zod';
@@ -36,7 +37,10 @@ const ERROR_FIXING_ORIGIN = 'agentic_error_fixing_v1';
 const inputPath = path.resolve(ROOT, getArg('--input', 'docs/reports/agentic-error-fixing-v1.json'));
 const boardPath = path.resolve(ROOT, getArg('--board', 'docs/reports/atlas/atlas-kanban-tasks.json'));
 const mergeTasks = args.includes('--merge');
-const dryRun = args.includes('--dry-run');
+if (args.includes('--write') && args.includes('--dry-run')) {
+  throw new Error('WRITE_AND_DRY_RUN_ARE_MUTUALLY_EXCLUSIVE');
+}
+const dryRun = !args.includes('--write');
 const receiptPath = getArg('--receipt', null);
 const receiptTarget = receiptPath ? path.resolve(ROOT, receiptPath) : null;
 if (inputPath === boardPath || (receiptTarget && [inputPath, boardPath].includes(receiptTarget))) {
@@ -69,9 +73,28 @@ const CandidateSchema = z.object({
   diagnostic: z.string().min(1).max(1000),
   proposedAction: z.string().min(1).max(1000),
   file: z.string().min(1).max(1000).nullable().optional(),
+  sourceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/).optional(),
+  workspaceRevision: z.string().regex(/^sha256:[a-f0-9]{64}$/).nullable().optional(),
+  evidenceDigest: z.string().regex(/^sha256:[a-f0-9]{64}$/).optional(),
+  sourceSpan: z.object({
+    startByte: z.number().int().nonnegative(),
+    endByte: z.number().int().positive(),
+  }).refine((span) => span.endByte > span.startByte).optional(),
+  evidenceRefs: z.array(z.string().min(1).max(1000)).max(32).optional(),
   status: z.literal('PROPOSED'),
   mutationAllowed: z.literal(false),
-}).passthrough();
+}).passthrough().superRefine((candidate, context) => {
+  const hasSpanEvidence = candidate.evidenceDigest !== undefined || candidate.sourceSpan !== undefined;
+  if (candidate.sourceRevision !== undefined && !candidate.file) {
+    context.addIssue({ code: 'custom', path: ['file'], message: 'sourceRevision requires a repository-relative file' });
+  }
+  if (candidate.workspaceRevision && !candidate.sourceRevision) {
+    context.addIssue({ code: 'custom', path: ['sourceRevision'], message: 'workspaceRevision requires sourceRevision' });
+  }
+  if (hasSpanEvidence && (!candidate.sourceRevision || !candidate.file || !candidate.evidenceDigest || !candidate.sourceSpan)) {
+    context.addIssue({ code: 'custom', path: ['sourceSpan'], message: 'span evidence requires file, sourceRevision, evidenceDigest, and sourceSpan' });
+  }
+});
 
 const PlanSchema = z.object({
   schema: z.literal('atlas.agentic-error-fixing.v1'),
@@ -96,6 +119,30 @@ if (!plan || plan.schema !== 'atlas.agentic-error-fixing.v1') {
 
 const candidates = Array.isArray(plan.candidates) ? plan.candidates : [];
 PlanSchema.parse(plan);
+for (const candidate of candidates) {
+  if (!candidate.sourceRevision) continue;
+  if (candidate.file.includes('\0') || path.isAbsolute(candidate.file)) throw new Error('PROVENANCE_FILE_MUST_BE_REPOSITORY_RELATIVE');
+  const candidatePath = path.resolve(ROOT, candidate.file);
+  const relativePath = path.relative(ROOT, candidatePath);
+  if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${path.sep}`) || path.isAbsolute(relativePath)) {
+    throw new Error('PROVENANCE_FILE_OUTSIDE_REPOSITORY');
+  }
+  if (!existsSync(candidatePath)) throw new Error('PROVENANCE_SOURCE_FILE_MISSING');
+  const realCandidatePath = realpathSync(candidatePath);
+  const realRelativePath = path.relative(ROOT, realCandidatePath);
+  if (!realRelativePath || realRelativePath === '..' || realRelativePath.startsWith(`..${path.sep}`) || path.isAbsolute(realRelativePath)) {
+    throw new Error('PROVENANCE_FILE_SYMLINK_OUTSIDE_REPOSITORY');
+  }
+  const sourceBytes = readFileSync(realCandidatePath);
+  const sourceRevision = `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`;
+  if (sourceRevision !== candidate.sourceRevision) throw new Error('PROVENANCE_SOURCE_REVISION_MISMATCH');
+  if (candidate.sourceSpan) {
+    const { startByte, endByte } = candidate.sourceSpan;
+    if (endByte > sourceBytes.length) throw new Error('PROVENANCE_SPAN_OUT_OF_BOUNDS');
+    const evidenceDigest = `sha256:${createHash('sha256').update(sourceBytes.subarray(startByte, endByte)).digest('hex')}`;
+    if (evidenceDigest !== candidate.evidenceDigest) throw new Error('PROVENANCE_EVIDENCE_DIGEST_MISMATCH');
+  }
+}
 if (new Set(candidates.map((candidate) => candidate.fingerprint)).size !== candidates.length) {
   throw new Error('DUPLICATE_DIAGNOSTIC_FINGERPRINT');
 }
@@ -109,10 +156,14 @@ const mappedTasks = candidates.map((candidate) => ({
   mutationAllowed: false,
   canonicalAuthority: false,
   dispatchable: false,
+  source_revision: candidate.sourceRevision ?? null,
+  workspace_revision: candidate.workspaceRevision ?? null,
+  evidence_digest: candidate.evidenceDigest ?? null,
+  source_span: candidate.sourceSpan ?? null,
   diagnostic_plan_checksum: planFileChecksum,
   origin: ERROR_FIXING_ORIGIN,
   source_ref: candidate.file ?? null,
-  evidence_refs: [candidate.diagnostic, candidate.proposedAction].filter(Boolean),
+  evidence_refs: [...new Set([...(candidate.evidenceRefs ?? []), candidate.diagnostic, candidate.proposedAction].filter(Boolean))],
   reason_codes: [candidate.kind, candidate.gateId, candidate.errorCode].filter(Boolean),
   blockedBy: [],
 }));

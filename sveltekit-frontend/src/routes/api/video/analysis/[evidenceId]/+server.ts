@@ -1,105 +1,134 @@
-/**
- * GET /api/video/analysis/[evidenceId]
- * Retrieve video analysis including VLM frame analysis, transcription, and metadata
- */
-
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { pool } from '$lib/server/db/client';
+import { and, asc, eq, or } from 'drizzle-orm';
+import { db } from '$lib/server/db/client';
+import {
+	cases,
+	evidenceItems,
+	evidenceMediaAssets,
+	evidenceFrames,
+	evidenceTranscriptSegments
+} from '$lib/server/db/schema/index.js';
+import { EvidenceCaseNotFoundError, requireOwnedEvidenceCaseV1 } from '$lib/server/evidence-case-admission-v1.js';
+import { buildVideoAnalysisReadModelV1 } from '$lib/server/features/evidence/video/video-analysis-read-model-v1.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function emptyAnalysis(evidenceId: string, error: string) {
+	return {
+		ok: false,
+		error,
+		evidenceId,
+		title: '',
+		fileName: '',
+		filePath: '',
+		fileSize: 0,
+		mimeType: '',
+		processingStatus: 'unavailable',
+		transcription: null,
+		transcriptSegments: [],
+		transcriptSummary: null,
+		summaryRevision: null,
+		keyFacts: [],
+		vlmAnalysis: null,
+		frameAnalysis: [],
+		sceneDetection: [],
+		entities: [],
+		aceAnalysis: null,
+		videoMetadata: {},
+		createdAt: null
+	};
+}
+
 export const GET: RequestHandler = async ({ params, locals }) => {
+	const { evidenceId } = params;
 	if (!locals.user && process.env.DEV_BYPASS_AUTH !== 'true') {
-		return json({ error: 'Unauthorized' }, { status: 401 });
+		return json(emptyAnalysis(evidenceId, 'Unauthorized'), { status: 401 });
+	}
+	if (!UUID_RE.test(evidenceId)) {
+		return json(emptyAnalysis(evidenceId, 'Invalid evidence ID'), { status: 400 });
 	}
 
-	const { evidenceId } = params;
-
-	if (!UUID_RE.test(evidenceId)) {
-		return json({ error: 'Invalid evidence ID' }, { status: 400 });
+	const ownerId = Number(locals.user?.id);
+	if (!Number.isSafeInteger(ownerId) || ownerId <= 0) {
+		return json(emptyAnalysis(evidenceId, 'Authenticated user has no valid evidence-owner identity'), { status: 403 });
 	}
 
 	try {
-		// Use raw query with proper column names (snake_case in DB)
-		const query = `
-      SELECT
-        id,
-        title,
-        file_name,
-        file_path,
-        file_size,
-        mime_type,
-        evidence_type,
-        metadata,
-        created_at,
-        updated_at
-      FROM evidence
-      WHERE id = $1
-      LIMIT 1
-    `;
+		const [evidence] = await db
+			.select({
+				id: evidenceItems.id,
+				caseId: evidenceItems.caseId,
+				modality: evidenceItems.modality,
+				status: evidenceItems.status,
+				storageUri: evidenceItems.storageUri,
+				metadataJson: evidenceItems.metadataJson,
+				createdAt: evidenceItems.createdAt
+			})
+			.from(evidenceItems)
+			.where(eq(evidenceItems.id, evidenceId))
+			.limit(1);
 
-		const result = await pool.query(query, [evidenceId]);
-		const rows = result.rows;
-
-		if (!rows || rows.length === 0) {
-			return json({ error: 'Video evidence not found' }, { status: 404 });
+		if (!evidence || evidence.modality !== 'video') {
+			return json(emptyAnalysis(evidenceId, 'Video evidence not found'), { status: 404 });
 		}
 
-		const videoEvidence = rows[0];
-		let metadata: Record<string, unknown> = {};
-		try {
-			const raw = videoEvidence.metadata;
-			metadata = typeof raw === 'string' ? JSON.parse(raw) : (raw ?? {});
-		} catch { /* use empty */ }
+		await requireOwnedEvidenceCaseV1(evidence.caseId, ownerId, async (caseId, userId) => {
+			const [ownedCase] = await db
+				.select({ id: cases.id })
+				.from(cases)
+				.where(and(eq(cases.id, caseId), or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId))))
+				.limit(1);
+			return ownedCase?.id ?? null;
+		});
 
-		// Extract video-specific analysis from metadata
-		const transcription = metadata.transcription || null; // Audio track transcription
-		const vlmAnalysis = metadata.vlmAnalysis || null; // Gemma4 VLM frame analysis
-		const frameAnalysis = metadata.frameAnalysis || []; // Per-frame VLM results
-		const sceneDetection = metadata.sceneDetection || []; // Scene boundaries
-		const entities = metadata.entities || [];
-		const aceAnalysis = metadata.aceAnalysis || null;
-		const videoMetadata = metadata.videoMetadata || {}; // Duration, resolution, codec, etc.
-		const processingStatus = metadata.processingStatus || 'unknown';
+		const [transcript, frames, originalAsset] = await Promise.all([
+			db
+				.select({
+					startMs: evidenceTranscriptSegments.startMs,
+					endMs: evidenceTranscriptSegments.endMs,
+					text: evidenceTranscriptSegments.text,
+					language: evidenceTranscriptSegments.language,
+					confidence: evidenceTranscriptSegments.confidence,
+					model: evidenceTranscriptSegments.model
+				})
+				.from(evidenceTranscriptSegments)
+				.where(eq(evidenceTranscriptSegments.evidenceId, evidenceId))
+				.orderBy(asc(evidenceTranscriptSegments.startMs), asc(evidenceTranscriptSegments.id)),
+			db
+				.select({
+					timestampMs: evidenceFrames.timestampMs,
+					storageUri: evidenceFrames.storageUri,
+					caption: evidenceFrames.caption,
+					objectsJson: evidenceFrames.objectsJson,
+					tagsJson: evidenceFrames.tagsJson,
+					confidence: evidenceFrames.confidence
+				})
+				.from(evidenceFrames)
+				.where(eq(evidenceFrames.evidenceId, evidenceId))
+				.orderBy(asc(evidenceFrames.timestampMs)),
+			db
+				.select({ mimeType: evidenceMediaAssets.mimeType })
+				.from(evidenceMediaAssets)
+				.where(and(eq(evidenceMediaAssets.evidenceId, evidenceId), eq(evidenceMediaAssets.assetType, 'original')))
+				.limit(1)
+		]);
 
 		return json({
-			evidenceId: videoEvidence.id,
-			title: videoEvidence.title,
-			fileName: videoEvidence.file_name,
-			filePath: videoEvidence.file_path,
-			fileSize: videoEvidence.file_size,
-			mimeType: videoEvidence.mime_type,
-			processingStatus,
-			transcription, // Audio transcription (if video has audio)
-			vlmAnalysis, // Overall VLM summary
-			frameAnalysis, // Array of { timestamp, framePath, description, objects, tags }
-			sceneDetection, // Array of { startTime, endTime, description }
-			entities, // Extracted from transcription + VLM
-			aceAnalysis, // ACE analysis of combined audio + visual
-			videoMetadata, // { duration, width, height, codec, fps, bitrate }
-			createdAt: videoEvidence.created_at,
-			updatedAt: videoEvidence.updated_at
+			ok: true,
+			error: null,
+			...buildVideoAnalysisReadModelV1({
+				evidence,
+				transcript,
+				frames,
+				originalMimeType: originalAsset[0]?.mimeType ?? null
+			})
 		});
 	} catch (error) {
-		console.error('Error fetching video analysis:', error);
-		return json({
-      evidenceId,
-      title: '',
-      fileName: '',
-      filePath: '',
-      fileSize: 0,
-      mimeType: '',
-      processingStatus: 'error',
-      transcription: null,
-      vlmAnalysis: null,
-      frameAnalysis: [],
-      sceneDetection: [],
-      entities: [],
-      aceAnalysis: null,
-      videoMetadata: {},
-      createdAt: null,
-      updatedAt: null,
-    });
+		if (error instanceof EvidenceCaseNotFoundError) {
+			return json(emptyAnalysis(evidenceId, 'Video evidence not found'), { status: 404 });
+		}
+		console.error('[VideoAnalysisAPI] Read failed:', error);
+		return json(emptyAnalysis(evidenceId, 'Failed to load video analysis'), { status: 500 });
 	}
 };

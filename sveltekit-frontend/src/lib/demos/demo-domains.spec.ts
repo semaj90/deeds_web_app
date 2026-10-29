@@ -22,10 +22,10 @@ function routeHasPage(urlPath: string): boolean {
 }
 
 describe('demo registry', () => {
-	it('has one entry per (section, href) and 94 entries (84 demos + 10 showcases)', () => {
+	it('has one entry per (section, href) and 96 entries (86 demos + 10 showcases)', () => {
 		const keys = DEMO_REGISTRY.map((d) => `${d.section}:${d.href}`);
 		expect(new Set(keys).size).toBe(keys.length);
-		expect(DEMO_REGISTRY.filter((d) => d.section === 'demos')).toHaveLength(84);
+		expect(DEMO_REGISTRY.filter((d) => d.section === 'demos')).toHaveLength(86);
 		expect(DEMO_REGISTRY.filter((d) => d.section === 'showcases')).toHaveLength(10);
 	});
 

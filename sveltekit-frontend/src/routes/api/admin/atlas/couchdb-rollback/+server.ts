@@ -2,11 +2,12 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { rollbackByRunId } from '$lib/server/agents/regen/writers/couchdb-writer.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const COUCHDB_URL  = (process.env.COUCHDB_URL  ?? 'http://localhost:5984').replace(/\/+$/, '');
-const COUCHDB_USER = process.env.COUCHDB_USER  ?? 'admin';
-const COUCHDB_PASS = process.env.COUCHDB_PASS  ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
-const DB_NAME      = process.env.COUCHDB_AGENTS_DB ?? 'karpathy_wiki';
+const COUCHDB_URL  = ENV.COUCHDB_URL.replace(/\/+$/, '');
+const COUCHDB_USER = ENV.COUCHDB_USER;
+const COUCHDB_PASS = ENV.COUCHDB_PASSWORD;
+const DB_NAME      = ENV.COUCHDB_AGENTS_DB;
 
 const schema = z.object({
 	runId:  z.string().min(1).max(200),
@@ -25,6 +26,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!parsed.success) throw error(400, parsed.error.issues[0]?.message ?? 'Bad request');
 
 	const { runId, dryRun } = parsed.data;
+	if (!COUCHDB_PASS) throw error(503, 'CouchDB credentials are not configured');
 
 	if (dryRun) {
 		// Count how many docs would be deleted without touching anything.

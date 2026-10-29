@@ -1007,7 +1007,7 @@ Target remains open. First blocker: `SVELTE_LSP_TEMPLATE_DEFINITION_TIMEOUT`; ex
 | `:8090` vision profile | RESTARTED with operator approval (`ornith-1.5-9b`, vision true) | VRAM about 7.7 of 8.2 GiB used, so no WSL RAPIDS job fits without freeing it |
 | Demo catalog | DONE | `lib/demos/demo-registry.ts` (94 entries, 13 ontology domains, 9 topic facets), `demo-domains.ts`, spec 7 tests; sweep: 88 of 91 routes clean, 3 fixed (`agentic-errors/analysis`, `case-scoring`, `synthesis-chat`) |
 | Modal centring | FIXED at root | `app.html` body transform/perspective/will-change removed; `DiamondModal` canvas sized to box, Escape closes |
-| 4x4x6 engram remap | DONE (advisory) | `scripts/atlas/cudf_feature_json_ingest.py` + `engram-domain-buckets-v1.json` (`review_required`, bucket 5 holds 52.5% of packets); tests `cudf_engram_remap_test.py` |
+| 4x4x6 engram remap | PARTIAL (pure helper only; no producer integration) | `scripts/atlas/cudf_feature_json_ingest.py` + `engram-domain-buckets-v1.json`; normalized mapping tests pass, but no revision-qualified input join or cuDF/Engram execution is proven |
 | Courtroom retarget stack | VERIFIED in harness | `bone-retarget-v1.ts` (MVN names 62, Mixamo 52), `rest-pose-retarget-v1.ts`, `glb-clip-sampler-v1.ts`, `animation-clip-bank.ts`, `character-retarget-runtime-v1.ts` (specs pass; asset-dependent specs skip when GLBs absent) |
 | Skinned character | GENERATED locally | `scripts/atlas/skin-body-nearest-bone-v1.py` -> `static/models/courtroom/character_alice_skinned.glb` (gitignored, regenerate with the script); crude two-bone weights |
 | Scene wiring | EDITED, NOT COMMITTED | `courtroom-scene.svelte.ts` (7 additive edits using `RetargetRuntime`); the file also holds another session's uncommitted edits and imports its untracked `animation-target-admission-v1.ts`, so it was left uncommitted |
@@ -1074,4 +1074,189 @@ Target remains open. First blocker: `SVELTE_LSP_TEMPLATE_DEFINITION_TIMEOUT`; ex
 
 **Authorizations used:** E2B eval with `:8090` stop and restart; seeding one labeled fictional case and starting simulation sessions; additive DDL on `error_logs`; copying from `~/Downloads`; no pushes; no canonical row writes outside those.
 
-- Next free number: 6.M80.
+- Section numbering note: 6.M81–6.M88 were appended after this earlier handoff; next free number is 6.M89.
+
+### 6.M80 Handoff: courtroom simulation request, camera, and validation status (2026-10-28)
+
+**Scope:** Reconciles the new courtroom-simulation error report with the shared working tree. No database, Qdrant, model-service, GPU, or canonical writes were made in this pass.
+
+| Finding | Current evidence | Status / boundary |
+|---|---|---|
+| H1/H2 route regression coverage | Ran the 12 checked-in route suites plus the sibling `batch-summary/jobs.spec.ts` with process-level `DEV_BYPASS_AUTH=false`: **13 suites, 40 tests passed**. The batch-summary handler calls `requireAdmin`; its test rejects unauthenticated and authenticated non-admin requests. | Focused route tests pass. They do not substitute for full Svelte check or live auth integration; no route code or datastore was changed in this pass. |
+| Qdrant `MatchInterface` 400 | `api/simulation/[sessionId]/+server.ts` now passes a flat `{ jurisdiction: value }` filter to `hybridSearch`; `buildAtlasQdrantFilter` converts flat entries to Qdrant `must` conditions. Added a regression asserting that scalar jurisdiction serializes as `{ key, match: { value } }`. | Caller-shape fix is uncommitted; focused filter suite passes 2/2. The test covers the shared serializer, not a live Qdrant request or the simulation route end-to-end. |
+| Simulation outer timeout | `hooks.server.ts` includes `/api/simulation/` in the 300-second AI route class. `generateDialogueTurn` has a 30-second abort and returns a template turn in its caught-error/non-OK paths. | Code-path mitigation exists, but the longer outer timeout does not prove fast offline behavior. Verify the actual embed/chat transport retry behavior and API response while `:8090` is unavailable before claiming the UI no longer waits. Do not add an invented turn or silently treat model output as canonical evidence. |
+| Camera / animation response | `courtroom-sim/+page.svelte::advanceTurn` awaits POST and reloads session before the dialogue reactive path can select a speaker; objection flash also occurs after the response. | Optimistic camera/animation response remains unimplemented/unverified. Any immediate cue must be deterministic and reversible if the request fails; no model-directed skeleton writes. |
+| Camera positions and stations | Inspected `.tmp/atlas/sim-cam-1.png`: the courtroom is visible, disproving a completely black frame for this captured run. The foreground counsel table obscures the actor, the loading badge remains at 9%, and the screenshot is from DEV_BYPASS_AUTH mode. `courtroom-scene.svelte.ts` also contains another session's N64 profile, lighting, and geometry edits. | Partial visual proof only; not a clean camera/prop/UI acceptance result or production-auth proof. Reconcile the shared scene file before further edits. |
+| Timeline types | Added explicit element casts to the six timeline event-value reads. A scoped `svelte-check` using `.tmp/atlas/tsconfig-courtroom-timeline-check.json` checked the route with its declaration files: **743 files, 0 errors, 0 warnings, exit 0**. `svelte/compiler` also reports zero warnings; story-runtime and Qdrant-filter suites pass (11 tests total). | Scoped type-check is proven. Full application-wide Svelte check remains unverified. |
+| Full Svelte check | First captured check session ended without an exit record. A fresh full check was manually interrupted before diagnostics. The initial memory display was a unit-conversion error: a later raw reading showed 1,241,452 KB (~1.18 GiB) free after interruption. | NOT VERIFIED; no full-check exit code or diagnostics. Do not claim the machine had 0 GiB free. |
+
+**Next safe sequence:** (1) preserve the scoped type-check receipt and run the full check when operationally appropriate; (2) add a route-level filter regression and a bounded offline-turn test using mocked transport; (3) improve camera/prop framing and clear the 9% loading state, then repeat browser capture; (4) reconcile shared scene edits before changing optimistic cues. Keep `:8090`, persistence, and external services untouched during unit tests.
+
+**Claim boundary:** Existing code changes are not runtime proof. This entry does not mark live Qdrant retrieval, offline latency, camera cut, animation, prop attachment, timeline type-check, or full Svelte check as end-to-end complete.
+
+### 6.M81 Demo domain catalog coverage audit (2026-10-28)
+
+Read-only audit of the existing `DEMO_REGISTRY` / `DEMO_DOMAINS` owner; no domain assignments or database labels were changed.
+
+- **Coverage and structure:** 96 catalog entries use 13 canonical top-level ontology domains. The existing `demo-domains.spec.ts` passes **7/7**, including route-to-page resolution, valid ontology/topic IDs, duplicate-domain rejection, and the `classification` consistency rule (multiple domains => `ambiguous`; one domain => `proposed`).
+- **Review state:** 75 entries are marked `proposed`; 21 are `ambiguous`. The registry header explicitly says these assignments are not human reviewed. Passing structural tests validates shape and route coverage, not semantic correctness.
+- **Courtroom entries:** `/demos/courtroom-sim` is `frontend + machine-learning`; `/demos/courtroom-n64` and `/demos/courtroom-timeline` are `frontend + graph`. These are still proposals; review their primary domain and supporting topics before using them as recommendation or feature-label authority.
+- **Authority boundary:** Demo catalog domains are navigation/classification metadata. They are not persisted `atlas_packets.feature_label` values and do not complete the separate 4×4×6 engram remap or canonical label-derivation gate.
+
+**Next:** Review the 21 multi-domain entries and the highest-impact single-domain proposals against route implementation and feature ownership; record human decisions separately. Do not auto-write labels or promote the catalog into canonical feature identity.
+
+### 6.M82 Demo taxonomy exposed as explicitly proposed UI metadata (2026-10-28)
+
+- Updated the existing demo catalog cards to show their domain labels and the review state: single-domain entries display **Proposed**; multi-domain entries display **Review proposal**. The exact domain assignments, category/topic filters, route structure, and canonical database values were not changed.
+- Verification: scoped `svelte-check` over the demo index and courtroom timeline reports **794 files, 0 errors, 0 warnings**; `demo-domains.spec.ts` passes **7/7**. The local `/demos` browser capture visibly shows the labels on demo cards.
+- Limitation: the card labels expose unreviewed registry metadata for navigation; they are not approved taxonomy, persisted `feature_label`, or authority for recommendations or packet admission.
+
+### 6.M83 Courtroom timeline save and visual smoke follow-up (2026-10-28)
+
+- **Timeline save failure fixed:** the page passed a Svelte `$state` proxy directly to IndexedDB, which raised `DataCloneError` and triggered the application error boundary. Save now persists `$state.snapshot(story)`; save/load failures are surfaced as status text instead of uncaught rejections.
+- **Browser smoke:** isolated browser context added a cue, saved and loaded the story through IndexedDB, and scrubbed to tick 120; no page errors. This verifies the local prototype path only.
+- **Type/test checks:** scoped `svelte-check` reports **794 files, 0 errors, 0 warnings, exit 0**. Qdrant filter and demo-domain suites pass **9/9** (2 + 7). No full application check or live Qdrant request was run.
+- **Courtroom visual:** resumed an already-existing fictional session (GET-only interaction) in headless software WebGL. `.tmp/atlas/courtroom-handoff-current.png` shows the room and one canvas; zero browser console errors, failed requests, or failed courtroom/model responses; loading badge absent. The actor remains a white silhouette and is partly obscured by the counsel table, so animation/material/prop framing are unresolved. The browser list showed eight repeated session cards; their origin was not investigated.
+- **Boundaries:** no new session was started, no turn was advanced, and no datastore write, service restart, GPU job, migration, commit, or push was performed. Shared scene and hook files remain untouched by this follow-up.
+
+**Next:** fix actor material/skinning and table occlusion in an isolated reviewed change, investigate repeated session-card rendering read-only, then repeat the screenshot. Keep live-auth and full Svelte-check gates separate.
+
+### 6.M84 Engram domain normalization matches the declared bucket contract (2026-10-28)
+
+- **Mismatch found and fixed:** `engram-domain-buckets-v1.json` declares `trim + casefold` normalization, while `cudf_feature_json_ingest.py` previously required exact spelling. The loader now returns normalized keys, the record lookup normalizes string `domain_class` values, blank keys are rejected, and aliases that normalize to conflicting buckets fail closed.
+- **Verification:** `py -3.13 scripts/atlas/cudf_engram_remap_test.py` passes **8/8**; `py -3.13 -m py_compile` succeeds for the remapper and tests; scoped diff check passes.
+- **Authority boundary:** the third engram axis still consumes legacy `domain_class`, not canonical `feature_label`. Normalization resolves case/whitespace variance only; it does not establish taxonomy validity, semantic feature identity, or canonical authority. Keep tokens advisory and unresolved where no mapping exists.
+- **Not run:** no cuDF/GPU execution, feature-label canonical write, database operation, Graphify run, or full remap over the inventory.
+
+**Next:** connect only reviewed, revision-qualified domain-classification proposals to the existing feature-label derivation owner; do not infer domain labels from basename fallbacks or use the 4×4×6 projection as identity.
+
+### 6.M85 Engram-to-feature-label join readiness audit (2026-10-28)
+
+- **Source inspected:** `docs/reports/summary-index-ranker.json`, a 270-row top/bottom sample of a 5,000-row report. The sample has 183 `DERIVED_HIGH_CONFIDENCE`, 84 `DERIVED_PATH_FALLBACK`, and 3 `CANONICAL` labels; its revision join status is incomplete for 182 rows and missing packet revision binding for 88 rows.
+- **Required engram axes:** all 270 sampled rows have `som_cluster`, but **0** have `som_row` and **0** have `som_col`; a cluster identifier is not a substitute for the two required 4-way coordinates.
+- **Decision:** do not generate aligned tokens from this report. It lacks the two spatial axes and revision-qualified feature-label/domain lineage; current label derivations are proposal evidence, not a canonical class assignment. The normalized domain remapper remains a pure advisory component.
+- **Side effects:** read-only report inspection; no model, database, GPU, or graph execution.
+
+**Next:** obtain a revision-qualified producer receipt that joins reviewed feature/domain assignments and SOM row/column coordinates to packet identity. Until then, keep token values unresolved and report the missing counts.
+
+### 6.M86 Existing SOM coordinate writers do not establish revision-bound remap inputs (2026-10-28)
+
+- **`scripts/atlas/train-som-20x20.mjs`:** static source review finds the apply path admits latent entries when `canonical !== false` (so a missing flag is accepted) and requires only a packet key or source reference. The Postgres update tries Qdrant point ID, then packet key, source reference, and JSONB identity fallbacks. The inspected writer does not require or compare source/workspace revisions or a feature-label review receipt.
+- **`scripts/atlas/collect-runtime-evidence.mjs`:** its parser can convert a scalar `som_cluster` into row/column coordinates, defaults missing `domain_class` to `codebase`, and its `--apply` path upserts into `atlas_packets`. This is a separate writer and is not evidence that the values belong to a reviewed feature/domain assignment.
+- **Decision:** neither writer is an admissible source for the 4×4×6 feature-label join without an independently verified revision/identity binding and explicit domain-assignment status. Do not invoke either apply path or substitute Qdrant IDs, raw paths, cluster labels, or defaults for canonical identity.
+- **Scope:** source inspection only; no database, model, graph, or GPU operation.
+
+**Next:** trace the latent-index producer and its manifest to determine whether revision-bound inputs already exist upstream. If none do, specify the missing evidence contract with the existing SOM and feature-label owners; do not create a parallel canonical writer.
+
+### 6.M87 4×4×6 remapper is not wired to the cuDF ingestion path (2026-10-28)
+
+- **Call-site audit:** `remap_engram_tokens()` is called only by its unit test; the CLI path in `cudf_feature_json_ingest.py` generates a fixed synthetic `CANONICAL_FEATURES` list and invokes `ingest_feature_records()` without SOM coordinates, `domain_class`, packet/source identity, or revision metadata. The CLI receipt reports feature JSON ingestion only; it does not report any engram mapping.
+- **Correction:** downgraded the earlier task-table status from `DONE (advisory)` to `PARTIAL (pure helper only; no producer integration)`. The 4×4×6 arithmetic and domain normalization are tested; alignment to real feature-label/domain assignments is not implemented or verified.
+- **Safety:** do not join synthetic labels, raw basenames, the 270-row summary sample, legacy SOM clusters, or fuzzy packet/path aliases to manufacture missing axes. Keep all absent/unqualified token values null.
+- **Scope:** source/call-site inspection and task-ledger correction only; no cuDF execution, database write, Graphify run, or GPU use.
+
+**Next:** continue with existing revision-qualified source and feature-label owners. Wire an engram producer only after exact packet identity, reviewed domain assignment, source/workspace revision, and both SOM coordinates are available in one verified row contract.
+
+### 6.M88 Latent-index producer lacks per-row lineage for SOM feature join (2026-10-28)
+
+- **Producer traced:** `scripts/atlas/backfill-latent-vectors.mjs` writes a local `autoencoder_latent_index.json` whose entries include projection ID, optional packet/source refs, feature ID and latent values, but not feature label, domain class, source revision, or per-row workspace revision. The workspace revision appears in a checkpoint, not the row contract; existing representation audit also records no per-row input-digest ledger.
+- **Apply boundary:** the script currently exits with `LATENT_LEGACY_WRITER_APPLY_BLOCKED` before writes. Its dry-run path still writes the two local latent-index artifacts, so it was not invoked.
+- **Implication:** the downstream SOM trainer cannot turn these latent entries into revision-qualified spatial coordinates merely by adding a workspace-revision flag; the model-input/source lineage and row join remain unproven. No SOM or engram output should be treated as aligned feature-label evidence from this index.
+- **Scope:** source inspection only; no latent generation, GPU task, local artifact write, database/Valkey/Neo4j write, or Graphify run.
+
+**Next:** the latent representation owner must provide an immutable input cohort receipt with packet/source identity, source/workspace revisions, feature-label/domain proposal status, and SOM assignment model/input digests. Reuse the current owner; do not unblock the legacy writer or create a parallel one.
+
+### 6.M89 Courtroom handoff verification refresh (2026-10-28)
+
+- **Timeline types:** reran the focused `svelte-check` using `.tmp/atlas/tsconfig-courtroom-timeline-check.json`: **794 files, 0 errors, 0 warnings, exit 0**. This resolves the earlier six editor diagnostics for the current scoped source set; the full application check remains unverified.
+- **Focused regression tests:** story runtime, Qdrant filter contract, and demo-domain suites pass **18/18**. The Qdrant contract test verifies a scalar jurisdiction filter serializes to `{ key, match: { value } }`; no live Qdrant call was made.
+- **Visual evidence:** reviewed `.tmp/atlas/courtroom-handoff-current.png`; it visibly contains the courtroom and one canvas, but the actor is a white silhouette and partly hidden by the foreground table. This is an existing capture, not a new browser run.
+- **Live browser limitation:** `http://localhost:5173/demos/courtroom-sim` did not return within a 10-second read-only request. No current live screenshot, console/network capture, camera telemetry, or animation proof was produced.
+- **Ownership and scope:** did not edit or stage the shared scene, hook, or simulation-route changes. No full-app Svelte check, request advancing the simulation, service restart, database/Qdrant write, migration, commit, or push was performed.
+
+**Next:** retry a bounded browser capture after the dev server responds; inspect camera position/target, backend, mesh count, asset requests, and console output. Keep actor skinning/material/table occlusion and optimistic camera timing distinct from the camera-wall fix. Reconcile the shared scene edits before changing them.
+
+### 6.M90 Production-hardening route regression coverage (2026-10-28)
+
+- **Coverage added:** `src/routes/api/atlas/studio/stream/server.spec.ts` now verifies authentication before request parsing, malformed JSON (400), schema rejection (422), read-only diagnostic SSE completion, and refusal of `AUTHORITY_ADMITTED` while workspace admission is closed.
+- **Route regression run:** executed the focused suites for all 12 routes in the 2026-10-28 H1/H2 worklist with `DEV_BYPASS_AUTH=false`: **13 test files, 42 tests passed, exit 0**. The extra file is the new Atlas Studio stream suite; route-specific tests remain isolated/mocked and are not live auth integration proof.
+- **Scope:** no production route behavior, database schema, live data, model service, or canonical state changed. The new test protects the existing auth/schema gates and proposal-only refusal path.
+
+**Next:** continue the H1/H2 audit from current source and tests; separate unit-level auth/schema coverage from live authorization and persistence proof. Do not treat the 2026-07-01 directory scores as current findings.
+
+### 6.M91 Courtroom regression checks and current verification boundary (2026-10-28)
+
+- **Focused tests rerun:** `qdrant-filter-contract.spec.ts`, `story-runtime.spec.ts`, and `cutscene-csv-v1.spec.ts` pass **20/20** (2 + 9 + 9), exit 0. This verifies the shared filter serializer and deterministic story/cutscene helpers; it does not prove the simulation route’s caller wiring or live Qdrant behavior.
+- **Timeline check attempt:** the full `svelte-check --output machine` did not produce diagnostics or an exit code in this run; its log contains only the START marker. Do not count this as a full-check pass. The prior scoped route check recorded in 6.M89 remains the available evidence for timeline types.
+- **Browser/camera:** no fresh browser screenshot was obtained. The existing capture remains partial evidence only; actor visibility, loading-state completion, camera telemetry, asset requests, and runtime animation are still unresolved. No simulation turn was advanced and no service was restarted.
+- **Ownership:** left the shared `courtroom-scene.svelte.ts`, `hooks.server.ts`, and simulation route edits untouched. No database, Qdrant, GPU, migration, canonical write, commit, or push occurred.
+
+**Next:** obtain a bounded live-browser capture after the existing dev server responds, and add a simulation-route regression for the flat jurisdiction filter and offline turn path using mocked transport. Keep the full application check separate and record its actual exit code.
+
+### 6.M92 Current H1/H2 named-route regression replay (2026-10-28)
+
+- Replayed the complete 13-file suite for the 12 named H1/H2 worklist routes (including the ontology-resolution sibling) with process-level `DEV_BYPASS_AUTH=false`: **13 files, 42 tests passed**, exit 0.
+- This revalidates the current route handlers' mocked auth, schema, and malformed-body behaviors. It does not prove live deployment auth, external-service behavior, or database persistence.
+- No production route code, datastore, migration, service, or canonical state changed.
+
+**Next:** retain the production auth-bypass configuration audit as a separate release gate; continue with the remaining source-level findings and full application check only when adequate memory is available.
+
+### 6.M93 Fresh courtroom timeline scoped check (2026-10-28)
+
+- Ran `npx svelte-check --tsconfig ../.tmp/atlas/tsconfig-courtroom-timeline-check.json --output machine`: **794 files, 0 errors, 0 warnings, exit 0**. This scoped result covers the current timeline route/declaration set, not the full application.
+- Opened `/demos/courtroom-sim` in a read-only browser tab; the route title loaded, but no canvas screenshot, browser console/network evidence, camera telemetry, or runtime animation measurement was captured. The earlier five-second HTTP probe timed out; do not claim the courtroom visual gate passed.
+- No simulation action, service restart, database/Qdrant operation, GPU work, or canonical write occurred.
+
+**Next:** produce a fresh rendered screenshot plus console/network and camera/mesh/backend measurements once the existing route can be inspected reliably; keep full-app typecheck status separate.
+
+### 6.M94 Read-only courtroom browser attempt blocked by local dev server (2026-10-28)
+
+- A Playwright attempt used a synthetic session/model fixture and intercepted every non-GET API request. It produced no screenshot; the run was stopped after it remained stalled.
+- Bounded GET probes to `/@vite/client`, `/login`, and `/demos/courtroom-sim` each timed out at four seconds while port 5173 remained in LISTEN state. The failure is therefore not isolated to courtroom SSR; the existing dev server did not answer these unrelated requests either.
+- Source review confirmed the reusable `sim-check.mjs` clicks a `.btn-prosecute`, which POSTs to `/api/simulation` and creates a session. That script was not run. The fixture run blocked all mutation methods; no simulation action or datastore mutation was intended or observed.
+- **Status:** runtime screenshot and camera acceptance remain unverified. No server was restarted or stopped; no database, Valkey, Qdrant, GPU, or canonical write was requested.
+
+**Next:** inspect the existing Vite process and its available logs/health through read-only diagnostics; only after it responds should the screenshot harness be rerun. Keep the app restart a separate operator action.
+
+### 6.M95 Vite listener process inspection (2026-10-28)
+
+- Port `5173` is owned by PID `2356`, launched as `node .../vite/bin/vite.js dev --port 5173` at 16:56:43. The process remains alive at about 471 MiB RSS; CPU usage changed by **0 seconds over a 3-second sample**.
+- A subsequent three-second GET to `@vite/client` still timed out. TCP inspection showed several server-side `CLOSE_WAIT` connections and one active client owned by the Codex app. The app terminal reader reports that no terminal session is attached, so Vite stdout diagnostics were unavailable.
+- This narrows the symptom to a live but non-responsive dev-server process; it does not identify whether the cause is a stuck request, socket handling, HMR/client state, or another wait. No process was stopped or restarted.
+
+**Next:** obtain the Vite terminal output or operator approval to restart the existing dev task; then repeat the static-route probe before the courtroom screenshot. Continue independent code/test work without treating the listener state as browser proof.
+
+### 6.M96 Simulation offline fallback regression and scoped recheck (2026-10-28)
+
+- Added an isolated route regression in `sveltekit-frontend/src/routes/api/simulation/[sessionId]/simulation-session.route.spec.ts`. With mocked Redis, embeddings, Qdrant, and chat transport, it verifies that the caller supplies a flat jurisdiction filter and that a chat timeout advances the fictional turn, returns the deterministic template dialogue, and saves the session. No external model or datastore was contacted.
+- Replayed the Qdrant filter contract and simulation route suites after strengthening the route test: **2 files, 3 tests passed**, exit 0. The story runtime and cutscene CSV suites also passed in the preceding combined run; no live Qdrant call was made.
+- Re-ran the timeline-scoped Svelte check with `.tmp/atlas/tsconfig-courtroom-timeline-check.json` after the test change: **794 files, 0 errors, 0 warnings**, exit 0. This is not a full application check.
+- Kept the shared simulation route, scene, and request-hook implementation unchanged. The previously observed non-responsive Vite listener still prevents a fresh visual screenshot; camera placement, asset loading, and browser animation remain unverified.
+- No simulation session, live database/cache/Qdrant write, migration, service restart, GPU job, commit, or push occurred.
+
+**Next:** inspect the existing Vite task output and restore its responsiveness through the operator-owned task; then capture a read-only courtroom frame and record backend, camera/target, mesh count, asset requests, and console errors. Do not use a harness that advances or creates a simulation session.
+
+### 6.M97 Repository capability classification profile (2026-10-28)
+
+- Added `.okf/domains/repository-capability-classification-v1.yaml` as a proposal-only profile, registered it in `.okf/manifest.yaml` and `docs/.okf/registry.yaml`, and added a strict Pydantic v2 validator plus tests.
+- The profile defines evidence priority across LSP/compiler, Tree-sitter/8095, ast-grep, dependency manifests/lockfiles, tests/runtime receipts, imports/calls, paths, and OpenWiki. It distinguishes declaration from installed/runtime dependency, keeps OpenWiki navigational, makes Deep Agents optional and non-authoritative, and permits revision-qualified BYOG/NetworkX/GraphRAG relation analysis only as bounded projections. Similarity alone cannot create edges; stale/missing graph data is omitted.
+- Tool-fit guidance: package/lockfile parsers for declared dependency and version facts; Tree-sitter plus ast-grep for syntax/structure; LSP/ts-morph for semantic symbol links; NetworkX as CPU reference; Neo4j/cuGraph only when admitted scale and a measured need justify them; OpenWiki for discovery followed by source verification. No package installation, feature-label update, graph projection, external service call, or datastore write occurred.
+- Validation: Pydantic profile CLI `VALID`; focused Python tests **2/2 passed**; OKF manifest coverage `OKF_MANIFEST_REFERENCES_PROVEN` (50/50 references); scoped `git diff --check` passed. These checks validate the profile, not a repository-wide classification run or installed/runtime status.
+
+**Next:** implement a separate bounded, read-only evidence collector that consumes this profile and emits revision-bound candidate capability records; preserve abstentions and do not write canonical `feature_label` values.
+
+### 6.M98 Route catalog audit follows current owners (2026-10-28)
+
+- Corrected `scripts/atlas/audit-all-routes-admin-demos-v1.mjs`: the demos page consumes `DEMO_REGISTRY`, so catalog coverage now reads the hrefs from that registry instead of searching the page template for inline href literals. It limits extraction to the registry array, excluding `DEMO_ALIASES` redirects from static-page coverage, and fails coverage if the page stops importing the registry.
+- Added navigation entries for the actual `/admin/atlas/task-sources` and `/admin/feature-labels` pages. Their descriptions retain advisory/read-only semantics. Updated the static route count comment; no data or classifications changed.
+- Validation: the audit's Vitest suite passes **5/5**, including 100% static demo/admin coverage, route lineage, filesystem denominator, and broken `$lib` imports; scoped `git diff --check` passes. No service, datastore, Graphify, or canonical state was touched.
+
+**Next:** continue source-grounded review of the remaining H1/H2 and feature-label evidence gates; do not treat static catalog coverage as runtime UI proof.
+
+### 6.M99 ACE route cache-revision input boundary tests (2026-10-28)
+
+- Current source inspection confirms `/api/v1/query` and `/api/ace/summarize` require `locals.user` and reject all ten client-supplied cache identity/revision fields before invoking ACE assembly. Added focused regressions for each field on each route; tests assert a 400 response and no assembler call, and summarize also asserts no inference fetch.
+- Validation: two Vitest files, **21/21 tests passed** with one worker; scoped diff check passed. No production route logic changed, no service or datastore was contacted, and `DEV_BYPASS_AUTH` remains enabled in the local environment.
+- This proves only rejection at these two HTTP boundaries. Server-derived revisioned cache identity is not shown to be wired into these route calls; legacy/unrevisioned cache behavior and end-to-end manifest admission remain separate gates.
+
+**Next:** trace whether `ContextManifestV2` or the existing ACE route-manifest bridge can supply a complete server-owned `retrievalCacheIdentityV3`; if unavailable, keep revisioned cache promotion blocked rather than accepting client values.

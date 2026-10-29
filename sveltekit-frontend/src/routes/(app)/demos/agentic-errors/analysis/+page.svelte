@@ -106,7 +106,7 @@
 		</div>
 	{/if}
 
-	{#if data.analysis}
+	{#if data.analysis && data.analysis.metadata && data.analysis.knowledge?.collections}
 		<!-- Summary Cards -->
 		<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 			<div class="p-4 bg-panel border-2 border-black/20 rounded-lg">

@@ -1,0 +1,329 @@
+{
+ "scale": 0.34,
+ "boneRestRotationDeg": {
+  "J_Bip_C_Head": 0.62,
+  "J_Bip_C_UpperChest": 19.38,
+  "J_Bip_C_Hips": 7.21,
+  "J_Bip_R_Hand": 90.0
+ },
+ "pivots": [
+  {
+   "id": "halo",
+   "bone": "J_Bip_C_Head",
+   "parent": null,
+   "offset": [
+    0.0839,
+    0.27083,
+    -0.17689
+   ],
+   "baseRotation": [
+    -0.005404,
+    -0.0,
+    -0.0,
+    0.999985
+   ]
+  },
+  {
+   "id": "capA0",
+   "bone": "J_Bip_C_Head",
+   "parent": null,
+   "offset": [
+    0.02763,
+    0.12252,
+    -0.01608
+   ],
+   "baseRotation": [
+    -0.005404,
+    -0.0,
+    -0.0,
+    0.999985
+   ]
+  },
+  {
+   "id": "capA1",
+   "bone": "J_Bip_C_Head",
+   "parent": "capA0",
+   "offset": [
+    0.01169,
+    0.06721,
+    -0.03416
+   ]
+  },
+  {
+   "id": "capA2",
+   "bone": "J_Bip_C_Head",
+   "parent": "capA1",
+   "offset": [
+    0.0454,
+    0.04033,
+    -0.01778
+   ]
+  },
+  {
+   "id": "capA3",
+   "bone": "J_Bip_C_Head",
+   "parent": "capA2",
+   "offset": [
+    0.03107,
+    0.03288,
+    -0.015
+   ]
+  },
+  {
+   "id": "capA4",
+   "bone": "J_Bip_C_Head",
+   "parent": "capA3",
+   "offset": [
+    0.02767,
+    0.01839,
+    -0.01976
+   ]
+  },
+  {
+   "id": "capA5",
+   "bone": "J_Bip_C_Head",
+   "parent": "capA4",
+   "offset": [
+    0.03469,
+    0.00995,
+    -0.00197
+   ]
+  },
+  {
+   "id": "capA6",
+   "bone": "J_Bip_C_Head",
+   "parent": "capA5",
+   "offset": [
+    0.05808,
+    -0.01621,
+    -0.01707
+   ]
+  },
+  {
+   "id": "capB0",
+   "bone": "J_Bip_C_Head",
+   "parent": null,
+   "offset": [
+    -0.02584,
+    0.12517,
+    -0.01298
+   ],
+   "baseRotation": [
+    -0.005404,
+    -0.0,
+    -0.0,
+    0.999985
+   ]
+  },
+  {
+   "id": "capB1",
+   "bone": "J_Bip_C_Head",
+   "parent": "capB0",
+   "offset": [
+    -0.00898,
+    0.06823,
+    -0.03295
+   ]
+  },
+  {
+   "id": "capB2",
+   "bone": "J_Bip_C_Head",
+   "parent": "capB1",
+   "offset": [
+    -0.04301,
+    0.04467,
+    -0.01261
+   ]
+  },
+  {
+   "id": "capB3",
+   "bone": "J_Bip_C_Head",
+   "parent": "capB2",
+   "offset": [
+    -0.02925,
+    0.03584,
+    -0.01147
+   ]
+  },
+  {
+   "id": "capB4",
+   "bone": "J_Bip_C_Head",
+   "parent": "capB3",
+   "offset": [
+    -0.02786,
+    0.02112,
+    -0.01651
+   ]
+  },
+  {
+   "id": "capB5",
+   "bone": "J_Bip_C_Head",
+   "parent": "capB4",
+   "offset": [
+    -0.03355,
+    0.01329,
+    0.00203
+   ]
+  },
+  {
+   "id": "capB6",
+   "bone": "J_Bip_C_Head",
+   "parent": "capB5",
+   "offset": [
+    -0.0639,
+    -0.00664,
+    -0.00862
+   ]
+  },
+  {
+   "id": "collar",
+   "bone": "J_Bip_C_UpperChest",
+   "parent": null,
+   "offset": [
+    -0.00149,
+    -0.00645,
+    -0.0031
+   ],
+   "baseRotation": [
+    0.16829,
+    -0.0,
+    0.0,
+    0.985737
+   ]
+  },
+  {
+   "id": "wingAngel",
+   "bone": "J_Bip_C_UpperChest",
+   "parent": null,
+   "offset": [
+    0.0715,
+    -0.05563,
+    -0.06416
+   ],
+   "baseRotation": [
+    0.16829,
+    -0.0,
+    0.0,
+    0.985737
+   ]
+  },
+  {
+   "id": "wingDemon",
+   "bone": "J_Bip_C_UpperChest",
+   "parent": null,
+   "offset": [
+    -0.17269,
+    -0.20574,
+    -0.03944
+   ],
+   "baseRotation": [
+    0.16829,
+    -0.0,
+    0.0,
+    0.985737
+   ]
+  },
+  {
+   "id": "staff",
+   "bone": "J_Bip_R_Hand",
+   "parent": null,
+   "offset": [
+    0.11412,
+    0.19058,
+    0.0119
+   ],
+   "baseRotation": [
+    0.0,
+    -0.0,
+    -0.707107,
+    0.707107
+   ]
+  },
+  {
+   "id": "tail0",
+   "bone": "J_Bip_C_Hips",
+   "parent": null,
+   "offset": [
+    -0.0515,
+    0.0131,
+    -0.04584
+   ],
+   "baseRotation": [
+    -0.062898,
+    -0.0,
+    -0.0,
+    0.99802
+   ]
+  },
+  {
+   "id": "tail1",
+   "bone": "J_Bip_C_Hips",
+   "parent": "tail0",
+   "offset": [
+    -0.02626,
+    -0.0335,
+    -0.02021
+   ]
+  },
+  {
+   "id": "tail2",
+   "bone": "J_Bip_C_Hips",
+   "parent": "tail1",
+   "offset": [
+    -0.02596,
+    -0.02178,
+    -0.02455
+   ]
+  },
+  {
+   "id": "tail3",
+   "bone": "J_Bip_C_Hips",
+   "parent": "tail2",
+   "offset": [
+    -0.03123,
+    -0.00051,
+    -0.02697
+   ]
+  },
+  {
+   "id": "tail4",
+   "bone": "J_Bip_C_Hips",
+   "parent": "tail3",
+   "offset": [
+    -0.0242,
+    0.02048,
+    -0.04182
+   ]
+  },
+  {
+   "id": "tail5",
+   "bone": "J_Bip_C_Hips",
+   "parent": "tail4",
+   "offset": [
+    -0.01923,
+    0.03662,
+    -0.0529
+   ]
+  },
+  {
+   "id": "tail6",
+   "bone": "J_Bip_C_Hips",
+   "parent": "tail5",
+   "offset": [
+    -0.02266,
+    0.04797,
+    -0.05568
+   ]
+  },
+  {
+   "id": "tail7",
+   "bone": "J_Bip_C_Hips",
+   "parent": "tail6",
+   "offset": [
+    -0.00542,
+    0.01111,
+    -0.05958
+   ]
+  }
+ ]
+}

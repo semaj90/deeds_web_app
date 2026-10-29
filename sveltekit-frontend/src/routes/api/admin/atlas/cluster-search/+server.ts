@@ -12,11 +12,11 @@ const schema = z.object({
 	limit:      z.number().int().min(1).max(50).default(20),
 });
 
-const QDRANT_URL      = ENV.QDRANT_URL ?? 'http://localhost:6333';
+const QDRANT_URL      = ENV.QDRANT_URL.replace(/\/+$/, '');
 const COLLECTION      = 'codebase_chunks_768';
 const EMBED_URL       = `${ENV.OLLAMA_BASE_URL}/api/embed`;
 const EMBED_MODEL     = 'embeddinggemma:latest';
-const ROTORQUANT_URL  = (process.env.ROTORQUANT_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
+const ROTORQUANT_URL  = ENV.ROTORQUANT_URL.replace(/\/+$/, '');
 
 async function embed(text: string): Promise<number[]> {
 	const res = await fetch(EMBED_URL, {

@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import { tmpdir } from 'node:os';
-import { eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 import { db } from '$lib/server/db/client';
 import {
   cases,
@@ -16,8 +16,13 @@ import { getRedis } from '$lib/server/redis.js';
 import { embedText } from '$lib/server/evidence/services/embedding.js';
 import { ENV } from '$lib/server/env.server.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress.js';
+import { requireOwnedEvidenceCaseV1 } from '$lib/server/evidence-case-admission-v1.js';
+import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
+import { buildVideoTranscriptPointV1 } from './video-qdrant-point-v1.js';
 import { transcribeVideoAudio } from './transcript-service.js';
 import { summarizeVideoTranscript } from './video-summary-service.js';
+import { checkVideoUploadSizeV1, MAX_VIDEO_UPLOAD_BYTES_V1 } from './video-upload-policy-v1.js';
+import { mapBoundedV1 } from './map-bounded-v1.js';
 import type {
   VideoIngestRequest,
   VideoIngestResult,
@@ -45,6 +50,12 @@ function buildObjectName(caseId: string, evidenceId: string, jobId: string, file
 
 async function prepareUploadSource(request: VideoIngestRequest): Promise<UploadSource & { sourceMetadata?: Record<string, unknown> }> {
   if (request.file) {
+    const sizeDecision = checkVideoUploadSizeV1(request.file.size);
+    if ('reason' in sizeDecision) {
+      throw new Error(sizeDecision.reason === 'too_large'
+        ? `Video file exceeds the ${MAX_VIDEO_UPLOAD_BYTES_V1 / 1024 / 1024} MiB upload limit`
+        : 'Video file has an invalid size');
+    }
     const buffer = Buffer.from(await request.file.arrayBuffer());
     return {
       fileName: request.file.name,
@@ -69,11 +80,21 @@ async function prepareUploadSource(request: VideoIngestRequest): Promise<UploadS
   throw new Error('Provide either a video file or a source URL');
 }
 
-async function ensureCaseExists(caseId: string): Promise<void> {
-  const [row] = await db.select({ id: cases.id }).from(cases).where(eq(cases.id, caseId)).limit(1);
-  if (!row) {
-    throw new Error('Case not found');
-  }
+async function ensureCaseOwned(caseId: string, ownerId: string): Promise<void> {
+  const numericOwnerId = Number(ownerId);
+  await requireOwnedEvidenceCaseV1(caseId, numericOwnerId, async (requestedCaseId, userId) => {
+    const [row] = await db
+      .select({ id: cases.id })
+      .from(cases)
+      .where(
+        and(
+          eq(cases.id, requestedCaseId),
+          or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId))
+        )
+      )
+      .limit(1);
+    return row?.id ?? null;
+  });
 }
 
 async function setRedisBestEffort(key: string, value: unknown, ttlSeconds: number): Promise<void> {
@@ -85,11 +106,11 @@ async function setRedisBestEffort(key: string, value: unknown, ttlSeconds: numbe
   }
 }
 
-export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<VideoIngestResult> {
-  await ensureCaseExists(request.caseId);
+export async function ingestVideoEvidence(request: VideoIngestRequest, ownerId: string): Promise<VideoIngestResult> {
+  await ensureCaseOwned(request.caseId, ownerId);
 
   const jobId = crypto.randomUUID();
-  createJob(jobId);
+  createJob(jobId, ownerId);
   updateJob(jobId, { step: 'uploading', progress: 3, message: 'Starting video ingestion...' });
 
   const workDir = join(tmpdir(), `deeds-video-ingest-${jobId}`);
@@ -107,6 +128,7 @@ export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<
 
     const originalBuffer = uploadSource.buffer;
     const checksum = sha256(originalBuffer);
+    const sourceRevision = formatEvidenceSourceRevisionV1(checksum);
     const evidenceId = crypto.randomUUID();
     const bucket = ENV.MINIO_EVIDENCE_BUCKET;
     const objectName = buildObjectName(request.caseId, evidenceId, jobId, originalFileName);
@@ -177,6 +199,7 @@ export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<
       metadataJson: {
         chunkIndex: index,
         trustTier: 'transcript_candidate',
+          source_revision: sourceRevision,
         sourceUri: uploadedOriginalUri,
         audioUri: storageUri(bucket, audioObjectName),
       },
@@ -230,38 +253,44 @@ export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<
 
     updateJob(jobId, { step: 'embedding', progress: 80, message: 'Embedding transcript chunks...' });
 
-    const points = await Promise.all(
-      chunks.map(async (chunk, index) => {
+    const points = await mapBoundedV1(chunks, 4, async (chunk, index) => {
         const vector = await embedText(chunk.text);
-        return {
-          id: `${evidenceId}-${index}`,
-          vector: { content: vector },
-          payload: {
-            evidence_id: evidenceId,
-            case_id: request.caseId,
-            modality: 'video',
-            view: 'transcript_segment',
-            start_ms: chunk.startMs,
-            end_ms: chunk.endMs,
-            language: chunk.language ?? transcription.language,
-            text: chunk.text,
-            source_uri: uploadedOriginalUri,
-            trust_tier: 'transcript_candidate',
-            tags: [request.title ?? 'video', 'transcript'],
-            entities: [],
-            model: 'whisper',
-          },
-        };
-      })
-    );
+        return buildVideoTranscriptPointV1({
+          evidenceId,
+          caseId: request.caseId,
+          sourceRevisionHex: checksum,
+          chunkIndex: index,
+          startMs: chunk.startMs,
+          endMs: chunk.endMs,
+          text: chunk.text,
+          language: chunk.language ?? transcription.language,
+          model: chunk.model,
+          vector,
+          sourceUri: uploadedOriginalUri,
+        });
+    });
 
+    let searchIndexStatus: VideoIngestResult['searchIndexStatus'] = 'not_applicable';
+    let searchIndexError: string | null = null;
     if (points.length > 0) {
-      await fetch(`${ENV.QDRANT_URL}/collections/evidence_items/points`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ points }),
-      }).catch(() => null);
+      try {
+        const response = await fetch(`${ENV.QDRANT_URL}/collections/evidence_items/points?wait=true`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ points }),
+        });
+        if (!response.ok) throw new Error(`Qdrant returned HTTP ${response.status}`);
+        searchIndexStatus = 'indexed';
+      } catch (error) {
+        searchIndexStatus = 'failed';
+        searchIndexError = error instanceof Error ? error.message : 'Qdrant indexing failed';
+        console.warn('[VideoIngest] Transcript search indexing failed:', searchIndexError);
+      }
     }
+
+    const summaryRevision = formatEvidenceSourceRevisionV1(
+      crypto.createHash('sha256').update(summary.summary).digest('hex')
+    );
 
     await db
       .update(evidenceItems)
@@ -272,14 +301,20 @@ export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<
           description: request.description ?? null,
           sourceUrl: request.sourceUrl ?? null,
           originalFileName,
+          fileSize: originalBuffer.byteLength,
+          mimeType: uploadSource.mimeType,
           checksum,
+          sourceRevision,
+          summaryRevision,
           transcriptCount: chunks.length,
           summary: summary.summary,
           keyFacts: summary.keyFacts,
           operatorApproved: Boolean(request.operatorApproved),
           sourceMetadata,
-          processingStatus: 'complete',
+          processingStatus: searchIndexStatus === 'failed' ? 'complete_with_search_index_error' : 'complete',
           processingJobId: jobId,
+          searchIndexStatus,
+          searchIndexError,
         },
       })
       .where(eq(evidenceItems.id, evidenceId));
@@ -290,11 +325,18 @@ export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<
         status: 'completed',
         progress: '100',
         updatedAt: new Date(),
-        errorText: null,
+        errorText: searchIndexError,
       })
       .where(eq(evidenceProcessingJobs.id, jobId));
 
-    updateJob(jobId, { step: 'complete', progress: 100, message: 'Video ingestion complete.' });
+    updateJob(jobId, {
+      step: 'complete',
+      progress: 100,
+      message: searchIndexStatus === 'failed'
+        ? 'Video analysis complete; transcript search indexing failed.'
+        : 'Video ingestion complete.',
+      ...(searchIndexError ? { error: searchIndexError } : {}),
+    });
 
     await setRedisBestEffort(`evidence:summary:${evidenceId}`, {
       evidenceId,
@@ -316,6 +358,7 @@ export async function ingestVideoEvidence(request: VideoIngestRequest): Promise<
       storageUri: evidenceInsert[0]?.storageUri ?? uploadedOriginalUri,
       transcriptCount: chunks.length,
       summary: summary.summary,
+      searchIndexStatus,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Video ingestion failed';

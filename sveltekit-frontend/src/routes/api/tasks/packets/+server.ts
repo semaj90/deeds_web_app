@@ -4,6 +4,14 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { taskSemanticPackets, workspaceTasks, taskFileLinks, taskClusterLinks, agentPickupQueue } from '$lib/server/db/schema/tasks.js';
 import { eq, desc, and, isNull, isNotNull, sql } from 'drizzle-orm';
+import {
+	PacketIdentityAmbiguousError,
+	PacketIdentitySourceMismatchError,
+	PacketIdentityUnresolvedError,
+	resolveCanonicalPacketKeyForWrite,
+} from '$lib/server/atlas/identity/packet-identity-resolver.js';
+import { PacketKeyResolutionError } from '$lib/server/atlas/identity/packet-key-resolution-v2.js';
+import { assertTaskSemanticPacketSchemaCompatible } from '$lib/server/tasks/task-semantic-packet-schema.js';
 
 const listSchema = z.object({
 	limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -67,10 +75,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 };
 
 const createSchema = z.object({
+	packet_key: z.string().trim().min(1).max(255).optional(),
 	workspace_task_id: z.number().int().optional(),
-	feature_id: z.string().max(200),
-	source_ref: z.string().max(1000).optional(),
-	file_path: z.string().max(1000).optional(),
+	feature_id: z.string().trim().min(1).max(200),
+	source_ref: z.string().trim().min(1).max(512).optional(),
+	file_path: z.string().trim().min(1).max(1000).optional(),
 	summary_llm: z.string().max(4000).optional(),
 	next_action: z.string().max(2000).optional(),
 	confidence: z.number().min(0).max(1).default(0.7),
@@ -89,12 +98,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!parsed.success) return json({ error: parsed.error.issues[0]?.message }, { status: 400 });
 
 	const data = parsed.data;
+	const sourceRef = data.source_ref ?? data.file_path;
+	if (!sourceRef) return json({ error: 'source_ref or file_path is required' }, { status: 400 });
+	if (sourceRef.length > 512) return json({ error: 'source_ref exceeds the database column limit' }, { status: 400 });
 	try {
-		const [row] = await db.insert(taskSemanticPackets).values({
+		const packetKey = await resolveCanonicalPacketKeyForWrite(data.packet_key, sourceRef);
+		const packetValues = {
 			point_kind: 'task_summary',
+			packet_key: packetKey,
 			workspace_task_id: data.workspace_task_id,
 			feature_id: data.feature_id,
-			source_ref: data.source_ref ?? data.file_path ?? data.feature_id,
+			source_ref: sourceRef,
 			file_path: data.file_path,
 			summary_llm: data.summary_llm,
 			next_action: data.next_action,
@@ -104,10 +118,41 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			semantic_path: data.semantic_path,
 			related_feature_ids: data.related_feature_ids,
 			related_file_paths: data.related_file_paths,
+			metadata: {},
 			agent_pickup_ready: false,
-		}).returning();
+		};
+		const providedValues = Object.entries(packetValues).filter(([, value]) => value !== undefined);
+		const nullValueColumns = providedValues.filter(([, value]) => value === null).map(([column]) => column);
+		await assertTaskSemanticPacketSchemaCompatible(providedValues.map(([column]) => column), nullValueColumns);
+		const [row] = await db.insert(taskSemanticPackets).values(packetValues).returning({
+			id: taskSemanticPackets.id,
+			packet_key: taskSemanticPackets.packet_key,
+			feature_id: taskSemanticPackets.feature_id,
+			source_ref: taskSemanticPackets.source_ref,
+			status: taskSemanticPackets.status,
+			created_at: taskSemanticPackets.created_at,
+			updated_at: taskSemanticPackets.updated_at,
+		});
 		return json({ packet: row }, { status: 201 });
 	} catch (err) {
+		if (err instanceof PacketIdentityAmbiguousError || err instanceof PacketIdentitySourceMismatchError) {
+			return json({ error: 'Packet identity does not uniquely match the supplied source reference' }, { status: 409 });
+		}
+		if (err instanceof PacketIdentityUnresolvedError || err instanceof PacketKeyResolutionError) {
+			return json({ error: 'A resolvable canonical packet identity is required' }, { status: 409 });
+		}
+		const postgresCode = typeof err === 'object' && err !== null && 'code' in err
+			? (err as { code?: unknown }).code
+			: undefined;
+		if (postgresCode === '23505') {
+			return json({ error: 'A task packet already exists for this canonical identity' }, { status: 409 });
+		}
+		if (postgresCode === '23502') {
+			return json({ error: 'Task packet schema is incompatible with this writer' }, { status: 503 });
+		}
+		if (err instanceof Error && err.message.startsWith('TASK_SEMANTIC_PACKET_SCHEMA_INCOMPATIBLE:')) {
+			return json({ error: 'Task packet schema is incompatible with this writer' }, { status: 503 });
+		}
 		console.error('[api/tasks/packets] POST error:', err);
 		return json({ error: 'Failed to create packet' }, { status: 500 });
 	}

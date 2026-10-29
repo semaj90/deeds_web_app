@@ -45,7 +45,7 @@
   <header class="p-4 border-b border-white/5 flex items-center justify-between bg-white/5">
     <div class="flex items-center gap-3">
       <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
-      <span class="text-xs font-bold tracking-widest uppercase opacity-70">Gemma 4 / TRACE Oracle</span>
+      <span class="text-xs font-bold tracking-widest uppercase opacity-70">Ornith 1.5 / TRACE Oracle</span>
     </div>
     <button
       class="text-[10px] uppercase tracking-tighter opacity-40 hover:opacity-100 transition-opacity"

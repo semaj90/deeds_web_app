@@ -6,6 +6,7 @@ import type {
 	rollbackByRunId,
 	CouchWriteOptions,
 } from './couchdb-writer.js';
+import { resolveCouchDbPassword } from './couchdb-writer.js';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -53,6 +54,10 @@ beforeEach(async () => {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('writeCardToCouchDB', () => {
+	it('fails closed when no CouchDB password is configured', () => {
+		expect(() => resolveCouchDbPassword(undefined, undefined, undefined)).toThrow('COUCHDB_CREDENTIALS_REQUIRED');
+	});
+
 	it('returns skipped:disabled when enabled is false', async () => {
 		const result = await writer.writeCardToCouchDB(makeCard(), { enabled: false });
 		expect(result.wrote).toBe(false);

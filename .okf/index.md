@@ -1,6 +1,11 @@
 ---
 type: index
+okf_version: "0.2"
 title: OKF Knowledge Graph Index
+description: Curated navigation into Parent Atlas concepts, systems, pipelines, and proposals.
+resource: .okf/index.md
+tags: [okf, index, parent-atlas, navigation]
+timestamp: 2026-10-28T00:00:00Z
 id: index
 status: active
 owners:
@@ -22,6 +27,7 @@ This directory contains curated knowledge concepts for the deeds-web-app legal A
 - **tools/**: Agentic tools and integrations (MCP servers, ML sidecars, synthesis models)
 - **runbooks/**: Operational guides and setup procedures
 - **concepts/**: Domain knowledge and decision records
+- **domains/**: Versioned domain profiles and proposal-only classification contracts
 
 ## Key Concepts
 
@@ -49,6 +55,7 @@ OKF serves as curated knowledge export, not replacement.
 
 - [Parent Atlas Compute and Retrieval Ownership](systems/parent-atlas-compute-ownership.md)
 - [SvelteKit Vite/Vitest Lane](pipelines/sveltekit-vitest-validation.md)
+- [Repository Capability Classification](domains/index.md)
 
 - [Parent Atlas Canonical Architecture](../docs/architecture/CANONICAL-PACKET-WIRING-BLUEPRINT.md)
 - [Deep Research Infrastructure](../docs/DEEP-RESEARCH-INDEX.md)

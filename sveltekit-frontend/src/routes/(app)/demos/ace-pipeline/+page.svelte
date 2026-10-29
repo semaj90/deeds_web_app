@@ -22,7 +22,7 @@
 				<span class="text-[10px] uppercase tracking-wider text-sand/40">High Confidence (Server)</span>
 				<ACEContextBubble
 					confidence={0.85}
-					source="server-ollama"
+					source="server-generation"
 					confidenceFactors={{
 						caseContext: true,
 						ragHits: 4,
@@ -37,7 +37,7 @@
 					]}
 					contextUsed={['evidence_items:abc123', 'legal_documents:xyz789']}
 					conversationTurns={4}
-					routerDecision={{ source: 'server-ollama', reason: 'legal-keywords(3)+case-context-available', confidence: 0.85 }}
+					routerDecision={{ source: 'server-generation', reason: 'legal-keywords(3)+case-context-available', confidence: 0.85 }}
 				/>
 			</div>
 
@@ -57,7 +57,7 @@
 				<span class="text-[10px] uppercase tracking-wider text-sand/40">Medium (KAG Active)</span>
 				<ACEContextBubble
 					confidence={0.62}
-					source="server-ollama"
+					source="server-generation"
 					confidenceFactors={{
 						caseContext: false,
 						ragHits: 2,
@@ -67,7 +67,7 @@
 						kagNeighbors: 1
 					}}
 					conversationTurns={1}
-					routerDecision={{ source: 'server-ollama', reason: 'rag-trigger+long-message', confidence: 0.62 }}
+					routerDecision={{ source: 'server-generation', reason: 'rag-trigger+long-message', confidence: 0.62 }}
 				/>
 			</div>
 

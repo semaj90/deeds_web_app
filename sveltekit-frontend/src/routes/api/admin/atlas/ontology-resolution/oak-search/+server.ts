@@ -14,7 +14,7 @@ import { ENV } from '$lib/server/env.server.js';
  */
 
 function oakSidecarBaseUrl(): string {
-  return ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
+  return (ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || '').trim().replace(/\/+$/, '');
 }
 
 const oakSearchBodySchema = z.object({
@@ -32,7 +32,11 @@ export const POST: RequestHandler = async (event) => {
     }
     const body = parsed.data;
     const limit = body.limit ?? 20;
-    const res = await fetch(`${oakSidecarBaseUrl()}/oak/search`, {
+    const baseUrl = oakSidecarBaseUrl();
+    if (!baseUrl) {
+      return json({ ok: false, error: 'oak_kernel_not_configured' }, { status: 503 });
+    }
+    const res = await fetch(`${baseUrl}/oak/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: body.query, limit }),

@@ -1,4 +1,5 @@
 import type { EmbeddingGemmaNativeExecutorV1 } from './embeddinggemma-task-runtime-v1.js';
+import { ENV } from '$lib/server/env.server.js';
 
 /**
  * Isolated EmbeddingGemma 2 challenger executor (Ollama, Q8_0 GGUF).
@@ -26,7 +27,7 @@ export function createEmbeddingGemma2ChallengerExecutorV1(input: {
   model?: string;
   fetchImpl?: FetchLike;
 } = {}): EmbeddingGemmaNativeExecutorV1 {
-  const endpoint = (input.endpoint ?? process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
+  const endpoint = (input.endpoint ?? ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
   const model = input.model ?? EMBEDDINGGEMMA2_CHALLENGER_MODEL;
   const fetchImpl = input.fetchImpl ?? fetch;
 

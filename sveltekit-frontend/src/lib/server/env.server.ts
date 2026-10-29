@@ -78,6 +78,7 @@ export const ENV = Object.freeze({
   TRITON_URL: privateEnv.TRITON_URL,
   LANGEXTRACT_URL: privateEnv.LANGEXTRACT_URL ?? privateEnv.MINIFORGE_SIDECAR_URL,
   MINIFORGE_SIDECAR_URL: privateEnv.MINIFORGE_SIDECAR_URL,
+  LANGEXTRACT_BASE_URL: privateEnv.MINIFORGE_SIDECAR_URL || privateEnv.LANGEXTRACT_URL || 'http://127.0.0.1:8095',
 
   SEAWEED_ENDPOINT: privateEnv.SEAWEED_ENDPOINT ?? privateEnv.MINIO_ENDPOINT,
   MINIO_ENDPOINT: privateEnv.MINIO_ENDPOINT ?? privateEnv.SEAWEED_ENDPOINT,
@@ -97,7 +98,11 @@ export const ENV = Object.freeze({
   GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL,
 
   RABBITMQ_URL: privateEnv.RABBITMQ_URL,
-  COUCHDB_URL: privateEnv.COUCHDB_URL,
+  COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://localhost:5984',
+  COUCHDB_USER: privateEnv.COUCHDB_USER ?? 'admin',
+  COUCHDB_PASSWORD: privateEnv.COUCHDB_PASS ?? privateEnv.COUCHDB_PASSWORD,
+  COUCHDB_AGENTS_DB: privateEnv.COUCHDB_AGENTS_DB ?? 'karpathy_wiki',
+  ROTORQUANT_URL: privateEnv.ROTORQUANT_URL ?? privateEnv.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090',
   // Host-dev default matches the docker-compose port mapping (7687 bolt,
   // 7474 HTTP) exposed directly on the same port numbers. NEO4J_PASSWORD has
   // no default — it's a credential and must come from .env.local; consumers
@@ -155,7 +160,8 @@ export const ENV = Object.freeze({
   CUDA_MAX_STREAMS: privateEnv.CUDA_MAX_STREAMS,
   CUDA_SERVICE_URL: privateEnv.CUDA_SERVICE_URL,
   CUVS_BENCH_URL: privateEnv.CUVS_BENCH_URL,
-  ATLAS_RAPIDS_SIDECAR_URL: privateEnv.ATLAS_RAPIDS_SIDECAR_URL,
+  CUVS_SIDECAR_URL: privateEnv.CUVS_SIDECAR_URL ?? privateEnv.CUVS_BENCH_URL ?? 'http://127.0.0.1:8098',
+  ATLAS_RAPIDS_SIDECAR_URL: privateEnv.ATLAS_RAPIDS_SIDECAR_URL ?? 'http://127.0.0.1:8098',
   ATLAS_RAPIDS_COMMUNITY_URL: privateEnv.ATLAS_RAPIDS_COMMUNITY_URL,
   COMMUNITY_TAXONOMY_ALGORITHM: privateEnv.COMMUNITY_TAXONOMY_ALGORITHM,
   DEV_BYPASS_AUTH: devBypassAuth,
@@ -171,7 +177,7 @@ export const ENV = Object.freeze({
   // URL was pointed at :8081 (llama-server) while EMBEDDING_PROVIDER stayed
   // 'ollama' (correct, for the unrelated /api/embed auto-DirectML-suppression
   // use in embedding-provider-v1.ts). See docs/reports/emb-prov-01-embedding-provenance-receipt.json.
-  EMBEDDING_STRICT_BASE_URL: privateEnv.EMBEDDING_STRICT_BASE_URL,
+  EMBEDDING_STRICT_BASE_URL: privateEnv.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
   // EMBED-PROVIDER-CONVERGENCE-01: compatibility input only, consumed
   // exclusively by resolveEmbeddingProviderV1() (embedding-provider-v1.ts).
   // No other module should read this directly.
@@ -221,7 +227,9 @@ export const ENV = Object.freeze({
   LANGFUSE_PUBLIC_KEY: privateEnv.LANGFUSE_PUBLIC_KEY,
   LANGFUSE_SECRET_KEY: privateEnv.LANGFUSE_SECRET_KEY,
   LANGGRAPH_ENABLED: parseBoolean(privateEnv.LANGGRAPH_ENABLED, false),
-  LANGGRAPH_URL: privateEnv.LANGGRAPH_URL,
+  LANGGRAPH_URL: privateEnv.LANGGRAPH_URL ?? 'http://127.0.0.1:8091',
+  EXPERIMENT_ANALYSIS_SIDECAR_URL: privateEnv.EXPERIMENT_ANALYSIS_SIDECAR_URL ?? privateEnv.LANGGRAPH_URL ?? 'http://127.0.0.1:8091',
+  MODEL_ANALYSIS_SIDECAR_URL: privateEnv.MODEL_ANALYSIS_SIDECAR_URL ?? privateEnv.LANGGRAPH_URL ?? 'http://127.0.0.1:8091',
   LDR_BASE_URL: privateEnv.LDR_BASE_URL,
   LDR_PASSWORD: privateEnv.LDR_PASSWORD,
   LDR_USERNAME: privateEnv.LDR_USERNAME,
@@ -271,6 +279,7 @@ export const ENV = Object.freeze({
   RERANK_BASE_URL: privateEnv.RERANK_BASE_URL,
   RERANK_URL: privateEnv.RERANK_URL,
   RERANKER_SIDECAR_URL: privateEnv.RERANKER_SIDECAR_URL,
+  XGBOOST_SIDECAR_URL: privateEnv.XGBOOST_SIDECAR_URL ?? 'http://127.0.0.1:8765',
   RETRIEVAL_GRPC_ENABLED: parseBoolean(privateEnv.RETRIEVAL_GRPC_ENABLED, false),
   RETRIEVAL_GRPC_URL: privateEnv.RETRIEVAL_GRPC_URL,
   RETRIEVAL_HTTP_ENABLED: parseBoolean(privateEnv.RETRIEVAL_HTTP_ENABLED, false),
@@ -308,6 +317,8 @@ export const ENV = Object.freeze({
   TURBOQUANT_MODEL_PATH: privateEnv.TURBOQUANT_MODEL_PATH,
   TURBOQUANT_URL: privateEnv.TURBOQUANT_URL,
   TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791',
+  TURBOVEC_HEALTH_URL:
+    privateEnv.TURBOVEC_HEALTH_URL?.trim() || privateEnv.TURBOVEC_SIDECAR?.trim() || 'http://127.0.0.1:8791',
   TURBOVEC_SIDECAR_GRPC_ENABLED: parseBoolean(privateEnv.TURBOVEC_SIDECAR_GRPC_ENABLED, false),
   TURBOVEC_SIDECAR_GRPC_URL: privateEnv.TURBOVEC_SIDECAR_GRPC_URL,
   TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL,

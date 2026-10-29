@@ -1,3 +1,5 @@
+import { ENV } from '$lib/server/env.server.js';
+
 // This client is an explicitly derived MRL prefix lane. It must not inherit
 // the active native semantic_768 dimension from the Qdrant projection.
 const SEMANTIC512_DIMENSION = 512 as const;
@@ -86,7 +88,7 @@ function assertExactRequest(input: AtlasSemantic512ExactRequestV1): void {
 }
 
 export function createAtlasRapidsSemantic512Client(
-  baseUrl = process.env.ATLAS_RAPIDS_SIDECAR_URL ?? 'http://127.0.0.1:8098',
+  baseUrl = ENV.ATLAS_RAPIDS_SIDECAR_URL,
 ) {
   return {
     exactKnn: async (input: AtlasSemantic512ExactRequestV1): Promise<AtlasSemantic512ExactReceiptV1> => {

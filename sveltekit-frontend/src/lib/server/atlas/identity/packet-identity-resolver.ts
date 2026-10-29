@@ -44,6 +44,13 @@ export class PacketIdentityAmbiguousError extends Error {
 	}
 }
 
+export class PacketIdentitySourceMismatchError extends Error {
+	constructor(public readonly sourceRef: string, public readonly packetKey: string) {
+		super(`PACKET_IDENTITY_SOURCE_MISMATCH: packet key does not resolve to source_ref "${sourceRef}"`);
+		this.name = 'PacketIdentitySourceMismatchError';
+	}
+}
+
 export class PacketIdentityMalformedError extends Error {
 	constructor(public readonly inputKey: string) {
 		super(`PACKET_IDENTITY_MALFORMED: "${inputKey}" is not a usable packet identity`);
@@ -139,6 +146,40 @@ export async function resolvePacketKeyForWrite(
 	throw new PacketIdentityUnresolvedError(
 		suppliedPacketKey || sourceRef || 'UNKNOWN_WRITE_KEY'
 	);
+}
+
+
+/**
+ * Resolve the logical PacketKeyV2 identity for task-packet writes.
+ * Source references are lookup keys only: they are never hashed or otherwise
+ * transformed into a packet identity here.
+ */
+export async function resolveCanonicalPacketKeyForWrite(
+	suppliedPacketKey?: string | null,
+	sourceRef?: string | null
+): Promise<string> {
+	const suppliedResolution = suppliedPacketKey === undefined || suppliedPacketKey === null
+		? null
+		: await resolvePacketKeyResolutionV2(suppliedPacketKey);
+	const hasSourceRef = sourceRef !== undefined && sourceRef !== null && sourceRef.trim() !== '';
+	if (!hasSourceRef) {
+		if (suppliedResolution) return suppliedResolution.canonicalPacketKey;
+		throw new PacketIdentityUnresolvedError('UNKNOWN_WRITE_KEY');
+	}
+
+	const matches = await db
+		.select({ packetKey: atlasPackets.packetKey })
+		.from(atlasPackets)
+		.where(eq(atlasPackets.sourceRef, sourceRef))
+		.limit(2);
+	if (matches.length > 1) throw new PacketIdentityAmbiguousError(sourceRef);
+	if (matches.length === 0) throw new PacketIdentityUnresolvedError(sourceRef);
+
+	const sourceResolution = await resolvePacketKeyResolutionV2(matches[0].packetKey);
+	if (suppliedResolution && suppliedResolution.canonicalPacketKey !== sourceResolution.canonicalPacketKey) {
+		throw new PacketIdentitySourceMismatchError(sourceRef, suppliedPacketKey!);
+	}
+	return sourceResolution.canonicalPacketKey;
 }
 
 

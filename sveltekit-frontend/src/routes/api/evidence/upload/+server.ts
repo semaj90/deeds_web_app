@@ -2,10 +2,16 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import crypto from 'crypto';
 import { deleteSeaweedFile as deleteFile, uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
+import { buildEvidenceProcessPayloadV1 } from '$lib/server/evidence/evidence-process-payload-v1.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
+import {
+  admitEvidenceCaseV1,
+  EvidenceCaseNotFoundError,
+} from '$lib/server/evidence-case-admission-v1.js';
+import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
 import { generateSingleEmbedding, generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
@@ -142,57 +148,44 @@ async function persistProcessingDiagnostics(
 	`);
 }
 
-async function resolveEvidenceCaseId(requestedCaseId: string | null, ownerUserId: string): Promise<string> {
-  if (requestedCaseId) {
-    const existingCase = getResultRows(
-      await db.execute(sql`
+async function resolveEvidenceCaseId(requestedCaseId: string | null, ownerId: number): Promise<string> {
+  return admitEvidenceCaseV1(requestedCaseId, ownerId, {
+    findOwnedCase: async (caseId, userId) => {
+      const row = getResultRows(await db.execute(sql`
         SELECT id
         FROM cases
-        WHERE id = ${requestedCaseId}
+        WHERE id = ${caseId}
+          AND (user_id = ${userId} OR assigned_attorney = ${userId})
         LIMIT 1
-      `)
-    )[0];
-
-    if (!existingCase?.id || typeof existingCase.id !== 'string') {
-      throw new Error('Selected case was not found');
-    }
-
-    return existingCase.id;
-  }
-
-  const fallbackCase = getResultRows(
-    await db.execute(sql`
-      SELECT id
-      FROM cases
-      WHERE title = ${FALLBACK_UPLOAD_CASE_TITLE}
-      ORDER BY created_at ASC
-      LIMIT 1
-    `)
-  )[0];
-
-  if (fallbackCase?.id && typeof fallbackCase.id === 'string') {
-    return fallbackCase.id;
-  }
-
-  const createdFallbackCase = getResultRows(
-    await db.execute(sql`
-      INSERT INTO cases (title, description, user_id, status, priority)
-      VALUES (
-        ${FALLBACK_UPLOAD_CASE_TITLE},
-        ${FALLBACK_UPLOAD_CASE_DESCRIPTION},
-        ${ownerUserId},
-        'open',
-        'medium'
-      )
-      RETURNING id
-    `)
-  )[0];
-
-  if (!createdFallbackCase?.id || typeof createdFallbackCase.id !== 'string') {
-    throw new Error('Failed to resolve a fallback case for uploaded evidence');
-  }
-
-  return createdFallbackCase.id;
+      `))[0];
+      return typeof row?.id === 'string' ? row.id : null;
+    },
+    findOwnedFallbackCase: async (userId) => {
+      const row = getResultRows(await db.execute(sql`
+        SELECT id
+        FROM cases
+        WHERE title = ${FALLBACK_UPLOAD_CASE_TITLE}
+          AND (user_id = ${userId} OR assigned_attorney = ${userId})
+        ORDER BY created_at ASC
+        LIMIT 1
+      `))[0];
+      return typeof row?.id === 'string' ? row.id : null;
+    },
+    createFallbackCase: async (userId) => {
+      const row = getResultRows(await db.execute(sql`
+        INSERT INTO cases (title, description, user_id, status, priority)
+        VALUES (
+          ${FALLBACK_UPLOAD_CASE_TITLE},
+          ${FALLBACK_UPLOAD_CASE_DESCRIPTION},
+          ${userId},
+          'open',
+          'medium'
+        )
+        RETURNING id
+      `))[0];
+      return typeof row?.id === 'string' ? row.id : null;
+    },
+  });
 }
 
 /** Check Redis for cached extraction result by file SHA-256 hash. */
@@ -255,6 +248,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const n = Number(uploaderUserId);
     return Number.isFinite(n) && Number.isInteger(n) && n > 0 ? n : null;
   })();
+  if (uploaderIntId === null) {
+    return json(
+      { success: false, error: 'Authenticated user has no valid evidence-owner identity' },
+      { status: 403 }
+    );
+  }
 
   // Rate limit: 10 uploads/min per client (heavy operation)
   const rateCheck = heavyRateLimiter.check(request);
@@ -316,7 +315,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const userType = parsed.data.evidenceType;
     const autoType = detectEvidenceType(file.type, file.name);
     const evidenceType = userType && userType !== 'UNKNOWN' ? userType : autoType;
-    const caseId = await resolveEvidenceCaseId(requestedCaseId, uploaderUserId);
+    let caseId: string;
+    try {
+      caseId = await resolveEvidenceCaseId(requestedCaseId, uploaderIntId);
+    } catch (err) {
+      if (err instanceof EvidenceCaseNotFoundError) {
+        return json({ success: false, error: 'Case not found' }, { status: 404 });
+      }
+      throw err;
+    }
     const parseBooleanField = (key: string, defaultValue: boolean = false): boolean => {
       const val = formData.get(key);
       if (val === null) return defaultValue;
@@ -336,7 +343,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     // Register job for progress tracking
-    createJob(jobId);
+    createJob(jobId, String(uploaderUserId));
     updateJob(jobId, { step: 'uploading', progress: 10, message: `Uploading ${file.name}...` });
 
     // 1. Read file into buffer
@@ -457,6 +464,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         evidenceId,
         fileName: file.name,
         mimeType: file.type || 'application/pdf',
+        ownerId: String(uploaderUserId),
       });
     }
 
@@ -487,20 +495,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         error: 'Processing failed',
       });
     });
-
-    // 6. Dispatch evidence processing (queue or inline fallback)
-    try {
-      const { dispatchOrExecuteInline } = await import('$lib/server/queue/dispatch-inline.js');
-      await dispatchOrExecuteInline('evidence.process', {
-        evidenceId,
-        text: '',
-        caseId,
-        fileName: file.name,
-        metadata: { fileSize: file.size, mimeType: file.type, hash: fileHash },
-      });
-    } catch (err) {
-      console.warn('[Upload] Evidence dispatch failed (non-critical):', (err as Error).message);
-    }
 
     // 7. Invalidate evidence and case caches
     await Promise.all([
@@ -958,6 +952,7 @@ async function processAndEmbed(
 
   // Check extraction cache by file hash (SHA-256 keyed, 7-day TTL)
   const fileHash = crypto.createHash('sha256').update(buffer).digest('hex');
+  const sourceRevision = formatEvidenceSourceRevisionV1(fileHash);
   let extractionResult = await getCachedExtraction(fileHash);
   if (extractionResult) {
     console.log(
@@ -991,6 +986,20 @@ async function processAndEmbed(
 
   const { text: fullText, method: extractionMethod } = extractionResult;
   let { doclingBlocks } = extractionResult;
+  const evidenceProcessPayload = buildEvidenceProcessPayloadV1({
+    evidenceId,
+    text: fullText,
+    extractionMethod,
+  });
+  if (evidenceProcessPayload) {
+    try {
+      const { dispatchOrExecuteInline } = await import('$lib/server/queue/dispatch-inline.js');
+      await dispatchOrExecuteInline('evidence.process', evidenceProcessPayload);
+    } catch (err) {
+      console.warn('[Upload] Evidence dispatch failed (non-critical):', (err as Error).message);
+    }
+  }
+
   if (!fullText.trim()) {
     markStage(diagnostics, 'chunking', 'skipped', 'No text extracted');
     markStage(diagnostics, 'embedding', 'skipped', 'No text extracted');
@@ -1412,6 +1421,7 @@ async function processAndEmbed(
 
       try {
         await storeChunkVector(evidenceId, chunk.chunkIndex, chunk.text.slice(0, 4000), embedding, {
+          source_revision: sourceRevision,
           model: 'embeddinggemma:latest',
           extractionMethod,
           fileName,
@@ -1434,6 +1444,7 @@ async function processAndEmbed(
         payload: {
           evidence_id: evidenceId,
           case_id: caseId,
+          source_revision: sourceRevision,
           chunk_index: chunk.chunkIndex,
           file_name: fileName,
           content_preview: chunk.text.slice(0, 500),
@@ -1997,6 +2008,9 @@ async function processAndEmbed(
   // 7b. Embed summary for vector retrieval in Qdrant legal_documents (with auto binary cache)
   if (summary && summary.length > 50) {
     try {
+      const summaryRevision = formatEvidenceSourceRevisionV1(
+        crypto.createHash('sha256').update(summary).digest('hex')
+      );
       const embeddings = await gated(embedGate, () => embedTexts([summary.slice(0, 4000)]));
       if (embeddings[0]?.length === 768) {
         const summaryEmbedding = Array.from(embeddings[0]);
@@ -2008,6 +2022,8 @@ async function processAndEmbed(
           metadata: {
             document_type: 'evidence-summary',
             case_id: caseId,
+            source_revision: sourceRevision,
+            summary_revision: summaryRevision,
             evidence_type: finalType,
             chunk_count: stored,
             entity_count: entities.length,

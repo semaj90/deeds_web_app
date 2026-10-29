@@ -10,6 +10,7 @@
  */
 
 import neo4j, { type Driver, type Session } from 'neo4j-driver';
+import { ENV } from '../env.server.js';
 import { db } from '../db/client.js';
 import { eq } from 'drizzle-orm';
 
@@ -44,7 +45,12 @@ export class Neo4jGDSOrchestrator {
   private driver: Driver;
   private session: Session | null = null;
 
-  constructor(private neo4jUrl: string = 'neo4j://localhost:7687', private neo4jUser: string = 'neo4j', private neo4jPassword: string = 'password') {
+  constructor(
+    private neo4jUrl: string = ENV.NEO4J_URI,
+    private neo4jUser: string = ENV.NEO4J_USER,
+    private neo4jPassword: string | undefined = ENV.NEO4J_PASSWORD,
+  ) {
+    if (!neo4jPassword?.trim()) throw new Error('NEO4J_PASSWORD_REQUIRED');
     this.driver = neo4j.driver(neo4jUrl, neo4j.auth.basic(neo4jUser, neo4jPassword));
   }
 

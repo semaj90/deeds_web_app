@@ -34,9 +34,7 @@ export interface ExperimentAnalysisSidecarClient {
 function resolveBaseUrl(baseUrl?: string): string {
 	return (
 		baseUrl ??
-		process.env.EXPERIMENT_ANALYSIS_SIDECAR_URL ??
-		ENV.LANGGRAPH_URL ??
-		'http://127.0.0.1:8091'
+		ENV.EXPERIMENT_ANALYSIS_SIDECAR_URL
 	).replace(/\/+$/, '');
 }
 

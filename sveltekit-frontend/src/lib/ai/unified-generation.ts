@@ -5,7 +5,7 @@
  *   1. Check Bifrost L2 cache (2-5s semantic match) — if available
  *   2. Local ONNX / helper models by default
  *   3. Optional client Gemma4 helper lanes when explicitly enabled
- *   4. Server (via client-router decision: retrieval-hybrid or server-ollama)
+ *   4. Server (via client-router decision: retrieval-hybrid or server-generation)
  *
  * Bifrost integration: Checks semantic cache BEFORE running local inference.
  * Cache hit (score > threshold) → instant return. Cache miss → run local, store result.
@@ -213,7 +213,7 @@ async function tryLitertInference(prompt: string, maxTokens: number = 200): Prom
 
 /**
  * Run inference via server (SSE chat endpoint).
- * Handles both retrieval-hybrid and server-ollama modes.
+ * Handles both retrieval-hybrid and server-generation modes.
  */
 async function runServerInference(
 	prompt: string,
@@ -257,7 +257,7 @@ async function runServerInference(
  *   2. Local E2B (WebGPU) → ~1-2s for 200 tokens
  *   3. Local LiteRT-LM (CPU) → ~3-5s for 200 tokens
  *   4. Local ONNX (270M) → ~5-8s for 200 tokens
- *   5. Server (retrieval-hybrid or server-ollama) → 25-30s for 500 tokens
+ *   5. Server (retrieval-hybrid or server-generation) → 25-30s for 500 tokens
  */
 export async function generateText(request: GenerationRequest): Promise<GenerationResponse> {
 	const start = performance.now();
@@ -343,7 +343,7 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 		// LiteRT failed → fall through to ONNX helper lane
 	}
 
-	// Step 4: Server fallback (retrieval-hybrid or server-ollama)
+	// Step 4: Server fallback (retrieval-hybrid or server-generation)
 	try {
 		const serverResult = await runServerInference(
 			request.prompt,
@@ -354,7 +354,7 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 		// Server responses already cached by L1 (Redis) + L2 (Bifrost) on server-side
 		return {
 			text: serverResult,
-			source: routerDecision.source, // 'retrieval-hybrid' or 'server-ollama'
+			source: routerDecision.source,
 			intent: routerDecision.intent,
 			latencyMs,
 			cacheHit: false,
@@ -364,7 +364,7 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 		const latencyMs = Math.round(performance.now() - start);
 		return {
 			text: '',
-			source: 'server-ollama',
+			source: 'server-generation',
 			intent: routerDecision.intent,
 			latencyMs,
 			error: err instanceof Error ? err.message : 'Server inference failed',

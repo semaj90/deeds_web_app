@@ -24,6 +24,13 @@ import { traceSpan } from '$lib/server/observability/langfuse';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { desc, eq, sql } from 'drizzle-orm';
 import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
+import {
+  PacketIdentityUnresolvedError,
+  resolveCanonicalPacketKeyForWrite,
+} from '$lib/server/atlas/identity/packet-identity-resolver.js';
+import { assertTaskSemanticPacketSchemaCompatible } from './task-semantic-packet-schema.js';
+
+export { assertTaskSemanticPacketSchemaCompatible } from './task-semantic-packet-schema.js';
 
 const TASK_COLLECTION_NAME = qdrantManager.collections.codebase_chunks;
 const TASK_COLLECTION = process.env.TASKS_QDRANT_COLLECTION || TASK_COLLECTION_NAME;
@@ -348,15 +355,6 @@ async function fileLinksTableExists(): Promise<boolean> {
   return taskFileLinksTableExists;
 }
 
-const TASK_SEMANTIC_PACKET_INSERT_COLUMNS = [
-  'point_kind', 'qdrant_point_id', 'workspace_id', 'workspace_task_id',
-  'feature_id', 'alias_id', 'source_ref', 'file_path', 'semantic_path',
-  'related_feature_ids', 'related_task_ids', 'related_file_paths', 'cluster_id',
-  'centroid_id', 'parent_centroid_id', 'summary_llm', 'summary_model',
-  'next_action', 'summary_hash', 'confidence', 'status', 'agent_pickup_ready',
-  'observed_at', 'valid_from', 'valid_to', 'created_at', 'updated_at', 'deleted',
-] as const;
-
 export function assertCanonicalSemantic768Vector(vector: unknown): asserts vector is number[] {
   if (!Array.isArray(vector) || vector.length !== 768 || vector.some((value) => typeof value !== 'number' || !Number.isFinite(value))) {
     const length = Array.isArray(vector) ? vector.length : 0;
@@ -364,38 +362,24 @@ export function assertCanonicalSemantic768Vector(vector: unknown): asserts vecto
   }
 }
 
-/**
- * Read-only guard for the active MCP workflow. The Drizzle table definition
- * is ahead of some deployed databases; fail before Qdrant/DB work rather than
- * creating a partial mirror or surfacing a low-level INSERT error afterward.
- */
-export async function assertTaskSemanticPacketSchemaCompatible(): Promise<void> {
-  const rows = await db.execute(sql`
-    SELECT column_name
-    FROM information_schema.columns
-    WHERE table_schema = 'public'
-      AND table_name = 'task_semantic_packets'
-  `);
-  const present = new Set(pgRows<{ column_name: string }>(rows).map((row) => row.column_name));
-  const missing = TASK_SEMANTIC_PACKET_INSERT_COLUMNS.filter((column) => !present.has(column));
-  if (missing.length > 0) {
-    throw new Error(
-      `TASK_SEMANTIC_PACKET_SCHEMA_INCOMPATIBLE: missing=${missing.join(',')}; `
-      + 'workflow blocked before Qdrant or PostgreSQL writes',
-    );
-  }
-}
-
 export async function createTaskSemanticPacket(taskId: number) {
-  await assertTaskSemanticPacketSchemaCompatible();
+  await assertTaskSemanticPacketSchemaCompatible(undefined, ['alias_id']);
   await traceTaskPacketLifecycle(taskId, 'start');
 
   const task = await loadTaskRow(taskId);
   if (!task) throw new Error(`Task ${taskId} not found`);
 
+  const taskIdentity = task as unknown as Record<string, unknown>;
   const workspaceId = getWorkspaceId(task);
   const featureId = normalizeText(task.feature_id) || null;
-  const sourceRef = getTaskSourceRef(task);
+  const sourceRef = normalizeText(
+    taskIdentity.source_ref ?? taskIdentity.canonical_source_ref ?? taskIdentity.file_path,
+  );
+  if (!sourceRef) throw new PacketIdentityUnresolvedError(`TASK_SOURCE_REF_NOT_BOUND:${taskId}`);
+  const packetKey = await resolveCanonicalPacketKeyForWrite(
+    normalizeText(taskIdentity.packet_key) || undefined,
+    sourceRef,
+  );
   const semanticPath = [...TASK_PACKET_SEMANTIC_PATH];
 
   const plan = await generateTaskSummary(task);
@@ -413,6 +397,7 @@ export async function createTaskSemanticPacket(taskId: number) {
 
   const packetRow = {
     point_kind: 'task_summary',
+    packet_key: packetKey,
     kind: 'task_summary',
     workspace_id: workspaceId,
     source_ref: sourceRef,
@@ -448,6 +433,7 @@ export async function createTaskSemanticPacket(taskId: number) {
     .insert(taskSemanticPackets)
     .values({
       point_kind: 'task_summary',
+      packet_key: packetKey,
       qdrant_point_id: qdrantPointId,
       workspace_id: workspaceId,
       workspace_task_id: taskId,
@@ -467,6 +453,7 @@ export async function createTaskSemanticPacket(taskId: number) {
       next_action: nextAction,
       summary_hash: summaryHash,
       confidence: confidence.toFixed(4) as any,
+      metadata: {},
       status,
       agent_pickup_ready: false,
       observed_at: new Date(),
@@ -500,6 +487,7 @@ export async function createTaskSemanticPacket(taskId: number) {
   });
 
   const packetRowLike = {
+    packet_key: packetKey,
     workspace_id: workspaceId,
     source_ref: sourceRef,
     observed_at: new Date().toISOString(),
@@ -510,6 +498,7 @@ export async function createTaskSemanticPacket(taskId: number) {
   const bundle: TaskSemanticPacketBundle = {
     taskId,
     packetId,
+    packetKey,
     qdrantPointId,
     workspaceId,
     featureId,

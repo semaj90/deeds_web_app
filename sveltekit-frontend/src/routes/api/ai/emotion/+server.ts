@@ -9,9 +9,9 @@ import type { RequestHandler } from './$types';
  * local-llama-provider.ts directly (it pulls in node:path + private env state) — this route is
  * the only place that talks to llama-server for this feature. See src/lib/ai/emotion-context.ts.
  *
- * Runtime: llama-server :8090 (Ornith 1.5). It answers an image only when /props reports
- * modalities.vision (the `ornith-1.5-vlm` launcher profile loads the mmproj); on a text-only
- * runtime this route returns 503 instead of letting the model guess an emotion it cannot see.
+ * Runtime: the configured llama-server endpoint. It answers an image only when /props reports
+ * modalities.vision; on a text-only runtime this route returns 503 instead of letting the model
+ * guess an emotion it cannot see. The loaded model is resolved by the llama-server provider.
  *
  * Output is the closed FaceEmotion set (emotion-context.ts) so a later courtroom/Mixamo
  * animation mapping can key on it; anything outside the set is returned as null.

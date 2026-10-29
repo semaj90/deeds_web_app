@@ -43,7 +43,7 @@ describe('courtroom models fallback', () => {
 		expect(body.animations).toHaveLength(5);
 		expect(body.models[0]).toMatchObject({
 			role: 'prosecutor',
-			modelUrl: '/models/courtroom/character_alice.glb',
+			modelUrl: '/models/courtroom/character_alice_n64.glb',
 			skeletonType: 'mixamo',
 		});
 		expect(body.animations[0]).toMatchObject({

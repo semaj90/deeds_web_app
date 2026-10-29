@@ -1,16 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { Pool } from 'pg';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { ENV } from '$lib/server/env.server.js';
-
-const pgPool = new Pool({
-  host: process.env.POSTGRES_HOST || 'localhost',
-  port: parseInt(process.env.POSTGRES_PORT || '5434'),
-  database: process.env.POSTGRES_DB || 'legal_ai_db',
-  user: process.env.POSTGRES_USER || 'legal_admin',
-  password: process.env.POSTGRES_PASSWORD || '123456',
-});
+import { pool } from '$lib/server/db/client.js';
 
 const redis = getValkeyClient().duplicate({
   lazyConnect: true,
@@ -25,7 +17,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
   try {
     // Fetch Postgres metrics
-    const pgResult = await pgPool.query(`
+    const pgResult = await pool.query(`
       SELECT
         COUNT(*) AS total_summaries,
         COUNT(CASE WHEN updated_at > NOW() - INTERVAL '5 minutes' THEN 1 END) AS recent_5min,
@@ -73,7 +65,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     let gemma4_status: 'connected' | 'disconnected' = 'disconnected';
 
     try {
-      const response = await fetch(`${ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/models`, {
+      const response = await fetch(`${(ENV.LLAMA_SERVER_URL ?? ENV.ROTORQUANT_URL).replace(/\/+$/, '')}/v1/models`, {
         signal: AbortSignal.timeout(2000),
       });
       gemma4_status = response.ok ? 'connected' : 'disconnected';

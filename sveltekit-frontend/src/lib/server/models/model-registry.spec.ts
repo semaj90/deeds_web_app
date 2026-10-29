@@ -11,13 +11,32 @@ describe('model lanes', () => {
 		expect(getEmbeddingModelId()).toBe(SERVER_EMBEDDING_MODEL);
 	});
 
-	it('keeps Gemma4 on the reasoning lane', () => {
+	it('keeps the configured server chat model on the reasoning lane', () => {
 		expect([SERVER_CHAT_MODEL, SERVER_GEMMA4_MODEL]).toContain(getReasoningModelId('legal'));
 	});
 
 	it('defaults chat to the configured server model instead of legacy ONNX', () => {
 		const decision = shouldEscalateToServer('hello', [], {});
-		expect(decision.source).toBe('server-ollama');
+		expect(decision.source).toBe('server-generation');
+	});
+
+	it('does not require Ollama availability for server chat generation', () => {
+		const decision = shouldEscalateToServer('draft a legal analysis', [], {
+			capabilities: {
+				ollama: false,
+				generation: true,
+				embedding: false,
+				rag: false,
+				postgres: true,
+				redis: false,
+				ragEnabled: false,
+				serverReady: true,
+				models: [],
+				latencyMs: 0,
+				ts: new Date(0).toISOString(),
+			},
+		});
+		expect(decision.source).toBe('server-generation');
 	});
 
 	it('allows client Gemma4 only when explicitly enabled', () => {

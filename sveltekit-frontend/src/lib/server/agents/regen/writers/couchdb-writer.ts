@@ -19,9 +19,9 @@ import type { AgentsDirectoryCard } from '../../agents-card-store.js';
 import { ENV } from '../../../env.server.js';
 
 const DEFAULT_COUCHDB_URL  = ENV.COUCHDB_URL;
-const DEFAULT_COUCHDB_DB   = process.env.COUCHDB_AGENTS_DB    ?? 'karpathy_wiki';
-const DEFAULT_COUCHDB_USER = process.env.COUCHDB_USER          ?? 'admin';
-const DEFAULT_COUCHDB_PASS = process.env.COUCHDB_PASSWORD      ?? 'legal_ai_pass';
+const DEFAULT_COUCHDB_DB   = ENV.COUCHDB_AGENTS_DB;
+const DEFAULT_COUCHDB_USER = ENV.COUCHDB_USER;
+const DEFAULT_COUCHDB_PASS = ENV.COUCHDB_PASSWORD;
 const DEFAULT_TIMEOUT_MS   = 5_000;
 const BULK_CHUNK_SIZE      = 100;
 
@@ -84,6 +84,12 @@ function sleep(ms: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export function resolveCouchDbPassword(override?: string, configuredPassword?: string): string {
+	const password = override ?? configuredPassword;
+	if (!password) throw new Error('COUCHDB_CREDENTIALS_REQUIRED');
+	return password;
+}
+
 interface CouchCtx {
 	baseUrl:   string;
 	db:        string;
@@ -103,7 +109,7 @@ function buildCtx(opts: CouchWriteOptions): CouchCtx {
 		: rawUrl.replace(/\/+$/, '');
 	const db        = opts.database  ?? DEFAULT_COUCHDB_DB;
 	const user      = opts.user      ?? parsedUrl?.username ?? DEFAULT_COUCHDB_USER;
-	const password  = opts.password  ?? parsedUrl?.password ?? DEFAULT_COUCHDB_PASS;
+	const password  = resolveCouchDbPassword(opts.password, DEFAULT_COUCHDB_PASS);
 	const fetcher   = opts.fetchImpl ?? fetch;
 	const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
 	const auth      = 'Basic ' + Buffer.from(`${user}:${password}`).toString('base64');

@@ -2055,9 +2055,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         return;
       }
 
-      // Cache MISS — streaming inference cascade: TRT-LLM → Triton → Ollama
+      // Cache MISS — streaming inference cascade: TRT-LLM → Triton → llama-server
       try {
-        // Build multi-turn messages array for Ollama /api/chat
+        // Build the shared multi-turn chat message payload.
         // Prepend page context to the user message so the model sees it inline
         let augmentedMessage = message;
         if (currentRoute) {
@@ -2075,7 +2075,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           '<|assistant|>',
         ].join('\n');
 
-        const ollamaMessages = [
+        const chatMessages = [
           { role: 'system', content: systemPrompt },
           ...conversationHistory,
           { role: 'user', content: augmentedMessage },
@@ -2083,7 +2083,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         const llmStreamStart = performance.now();
         let tokenSeq = 0;
-        let inferenceBackend: 'tensorrt' | 'triton' | 'ollama' | 'turboquant' = 'ollama';
+        const inferenceBackend: { value: 'tensorrt' | 'triton' | 'llama-server' | 'cache' | 'unavailable' } = { value: 'unavailable' };
 
         await traceLLM(
           'sse-chat-generation',
@@ -2120,7 +2120,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             let cacheHit = false;
 
             try {
-              const cachedResponse = await getCachedStreamResponse(ollamaMessages, {
+              const cachedResponse = await getCachedStreamResponse(chatMessages, {
                 model: model ?? 'LLM_MODEL_ID',
                 temperature: 0.7,
                 maxTokens: 2048,
@@ -2130,7 +2130,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 console.log('[SSE chat] Redis L1 cache HIT — streaming cached response');
                 cacheHit = true;
                 streamed = true;
-                inferenceBackend = 'ollama'; // Mark as Ollama since that's where it came from originally
+                inferenceBackend.value = 'cache';
 
                 // Stream cached response chunk-by-chunk using the consumeStream helper
                 await consumeStream(
@@ -2156,7 +2156,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   if (lease) {
                     try {
                       await consumeStream(streamTrtLLM({ prompt: flatPrompt, temperature: 0.7 }));
-                      inferenceBackend = 'tensorrt';
+                      inferenceBackend.value = 'tensorrt';
                       streamed = true;
                     } finally {
                       releaseGpuLease('tensorrt').catch((e) =>
@@ -2179,7 +2179,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 const tritonHealthy = await tritonHealthCheck().catch(() => false);
                 if (tritonHealthy) {
                   await consumeStream(streamTritonLLM({ prompt: flatPrompt, temperature: 0.7 }));
-                  inferenceBackend = 'triton';
+                  inferenceBackend.value = 'triton';
                   streamed = true;
                 }
               } catch (tritonErr) {
@@ -2201,7 +2201,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     model: LOCAL_VLM_MODEL,
-                    messages: ollamaMessages,
+                    messages: chatMessages,
                     stream: true,
                     temperature: 0.7,
                     max_tokens: 2048,
@@ -2239,7 +2239,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                       }
                     }
                   }
-                  inferenceBackend = 'turboquant';
+                  inferenceBackend.value = 'llama-server';
                   streamed = true;
                 }
               } catch (tqErr) {
@@ -2256,7 +2256,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 completionTokens: tokenSeq,
                 totalTokens: tokenSeq,
               },
-              statusMessage: inferenceBackend,
+              statusMessage: inferenceBackend.value,
             });
           }
         );
@@ -2264,7 +2264,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Store in Redis L1 cache for future instant retrieval (fire-and-forget)
         // Note: cacheHit tracking removed - always attempt to cache successful responses
         if (fullResponse) {
-          storeCachedStreamResponse(ollamaMessages, fullResponse, {
+          storeCachedStreamResponse(chatMessages, fullResponse, {
             model: model ?? 'LLM_MODEL_ID',
             temperature: 0.7,
             maxTokens: 2048,
@@ -2369,7 +2369,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   docChunks: [],
                   policyDecision: null,
                 },
-                backend: inferenceBackend,
+                backend: inferenceBackend.value,
               }),
               evalTimeout,
             ]);
@@ -2410,8 +2410,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 let improvedResponse = '';
                 let retryStreamed = false;
 
-                // Use same backend cascade for retry: TRT-LLM → Triton → Ollama
-                const retryBackend = inferenceBackend as 'tensorrt' | 'triton' | 'ollama' | 'turboquant';
+                // Use the same backend cascade for retry: TRT-LLM → Triton → llama-server.
+                const retryBackend = inferenceBackend.value;
                 if (retryBackend === 'tensorrt' || retryBackend === 'triton') {
                   try {
                     const retryStream =
@@ -2432,7 +2432,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                     }
                     retryStreamed = true;
                   } catch {
-                    // Fall through to Ollama retry
+                    // Fall through to the llama-server retry.
                   }
                 }
 
@@ -2579,8 +2579,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           logInference({
             type: 'llm',
             model:
-              inferenceBackend === 'ollama' ? (model ?? 'LLM_MODEL_ID') : inferenceBackend,
-            backend: inferenceBackend,
+              model ?? inferenceBackend.value,
+            ...(inferenceBackend.value === 'cache' || inferenceBackend.value === 'unavailable'
+              ? {}
+              : { backend: inferenceBackend.value }),
             latencyMs: Math.round(performance.now() - llmStreamStart),
             tokenCount: tokenSeq,
             cacheHit: false,
@@ -2644,7 +2646,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 setExactMatchCache(exactCacheKey, {
                   content: fullResponse,
                   model: model ?? 'LLM_MODEL_ID',
-                  backend: inferenceBackend,
+                  backend: inferenceBackend.value,
                 }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
               })
               .catch(() => {

@@ -503,6 +503,14 @@
 									<Icon name="arrow-right" size={12} />
 								</span>
 							</div>
+							<div class="domain-labels" aria-label={demo.classification === 'ambiguous' ? 'Unreviewed multi-domain proposal' : 'Unreviewed domain proposal'}>
+								{#each demo.domains as domain}
+									<span class="domain-label">{DEMO_DOMAINS[domain]}</span>
+								{/each}
+								<span class="taxonomy-status" class:multi-domain={demo.classification === 'ambiguous'} title="Domain assignments have not been human reviewed">
+									{demo.classification === 'ambiguous' ? 'Review proposal' : 'Proposed'}
+								</span>
+							</div>
 						</button>
 					{/each}
 				</div>
@@ -535,6 +543,14 @@
 								</span>
 								<span class="card-arrow">
 									<Icon name="arrow-right" size={12} />
+								</span>
+							</div>
+							<div class="domain-labels" aria-label={demo.classification === 'ambiguous' ? 'Unreviewed multi-domain proposal' : 'Unreviewed domain proposal'}>
+								{#each demo.domains as domain}
+									<span class="domain-label">{DEMO_DOMAINS[domain]}</span>
+								{/each}
+								<span class="taxonomy-status" class:multi-domain={demo.classification === 'ambiguous'} title="Domain assignments have not been human reviewed">
+									{demo.classification === 'ambiguous' ? 'Review proposal' : 'Proposed'}
 								</span>
 							</div>
 						</button>
@@ -1020,6 +1036,32 @@
 		color: var(--card-accent, var(--t-text-muted));
 		letter-spacing: 0.03em;
 		opacity: 0.7;
+	}
+	.domain-labels {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.3rem;
+		margin-top: 0.45rem;
+	}
+	.domain-label,
+	.taxonomy-status {
+		border: 1px solid color-mix(in srgb, var(--t-border) 35%, transparent);
+		border-radius: 9999px;
+		padding: 0.1rem 0.4rem;
+		font-size: 0.55rem;
+		line-height: 1.35;
+		color: var(--t-text-muted);
+	}
+	.domain-label {
+		background: color-mix(in srgb, var(--t-accent-2) 7%, transparent);
+	}
+	.taxonomy-status {
+		border-style: dashed;
+	}
+	.taxonomy-status.multi-domain {
+		color: var(--t-warning, #fbbf24);
+		border-color: color-mix(in srgb, var(--t-warning, #fbbf24) 45%, transparent);
 	}
 	.tag-dot {
 		width: 5px;

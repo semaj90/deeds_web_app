@@ -12,16 +12,14 @@ import {
  * ancestors (via /oak/traverse). Never synthesizes `concept:<raw-label>`
  * on failure -- returns RESOLUTION_UNAVAILABLE instead.
  *
- * Reuses the same base-URL resolution as the existing oak-search admin
- * proxy (ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL ||
- * 'http://127.0.0.1:8095') -- does not introduce a second sidecar owner.
+ * Reuses the centralized LangExtract/OAK sidecar endpoint.
  */
 
 const RESOLVER_REVISION = 'oak-resolution-evidence-client:v1';
 const DEFAULT_TIMEOUT_MS = 5000;
 
 function oakSidecarBaseUrl(): string {
-  return ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
+  return ENV.LANGEXTRACT_BASE_URL;
 }
 
 function normalizeLabel(label: string): string {

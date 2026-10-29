@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 import { getRedis } from '$lib/server/redis.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
@@ -20,10 +21,9 @@ interface EmbedResponse {
 	duration: number;
 }
 
-export const POST: RequestHandler = async ({ locals, request }) => {
-	if (!locals.user) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+export const POST: RequestHandler = async (event) => {
+	requireAdmin(event);
+	const { request } = event;
 
 	const startTime = Date.now();
 

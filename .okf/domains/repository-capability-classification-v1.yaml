@@ -1,0 +1,297 @@
+version: 1
+domain_id: atlas.repository-capability-classification
+name: Repository Capability Classification
+status: proposal_profile
+owner: parent-atlas
+canonical_authority: false
+
+purpose: >-
+  Classify repository capabilities and recommend fit-for-purpose libraries from
+  revision-bound source evidence. This profile produces reviewable proposals only;
+  it does not write feature_label, mint packet identity, or authorize execution.
+
+classification:
+  mode: deterministic_evidence_first
+  output_status: PROPOSAL_ONLY
+  abstain_on_ambiguous_or_conflicting_evidence: true
+  evidence_precedence:
+    - exact_source_revision_and_resolved_symbol_identity
+    - tree_sitter_structure_and_source_spans
+    - ast_grep_structural_matches
+    - verified_api_route_and_drizzle_relationships
+    - document_semantics_with_attributable_spans
+    - graph_neighborhood_or_embedding_recommendations
+    - directory_paths_and_basenames
+  recommendation_evidence_precedence:
+    - revision_bound_implementation_call_site
+    - resolved_manifest_and_lockfile_version
+    - focused_test_or_runtime_receipt
+    - version_matched_official_api_documentation
+    - openwiki_navigation_summary
+  capability_dimensions:
+    - application_surface
+    - data_and_storage
+    - retrieval_and_search
+    - language_and_static_analysis
+    - graph_and_relationships
+    - model_and_agent_orchestration
+    - gpu_and_native_compute
+    - testing_and_operations
+  labels_are_not_identity: true
+  basename_only_is_insufficient: true
+  required_source_binding:
+    - source_ref
+    - source_revision
+    - workspace_revision
+    - producer_revision
+    - evidence_digest
+
+  evidence_grain:
+    - repository
+    - package
+    - module
+    - symbol
+    - dependency
+    - test
+    - runtime_observation
+  recommendation_policy:
+    require_problem_statement: true
+    require_candidate_function_or_api: true
+    require_version_and_compatibility_evidence: true
+    explain_fit_and_tradeoffs: true
+    include_alternatives_when_evidence_is_close: true
+    no_install_or_code_execution: true
+    no_package_manifest_mutation: true
+
+source_lanes:
+  manifests:
+    role: declared_dependencies_and_scripts
+    inputs:
+      - package.json
+      - package-lock.json
+      - pnpm-lock.yaml
+      - yarn.lock
+      - pyproject.toml
+      - uv.lock
+      - requirements.txt
+      - requirements-*.txt
+      - poetry.lock
+      - setup.py
+      - setup.cfg
+      - Cargo.toml
+      - go.mod
+      - CMakeLists.txt
+      - vcpkg.json
+      - conanfile.py
+    claims:
+      - declared_dependency
+      - version_constraint
+      - package_script
+    cannot_prove:
+      - dependency_installed
+      - runtime_active
+      - production_caller
+
+  source_search:
+    tools: [rg]
+    role: bounded_lexical_discovery
+    include_source_extensions: [.ts, .tsx, .js, .jsx, .svelte, .py, .c, .h, .cc, .cpp, .hpp, .cu, .cuh, .go, .rs]
+    claims: [candidate_import, candidate_symbol, candidate_call_site]
+    authority: discovery_only
+
+  structure:
+    providers: [tree_sitter_8095, ast_grep]
+    tree_sitter:
+      owner: 8095
+      role: syntax_nodes_fields_and_exact_byte_spans
+      required_lineage: [source_ref, source_revision, parser_revision, grammar_revision, start_byte, end_byte]
+    ast_grep:
+      role: structural_pattern_matches
+      required_lineage: [source_ref, source_revision, rule_revision, start_byte, end_byte]
+    lsp:
+      role: optional_semantic_symbols_definitions_references_and_types
+      coordinate_conversion: utf16_to_verified_utf8_bytes
+      authority: observation_only
+    failure_policy: retain_partial_status_and_abstain; do_not_replace_missing_structure_with_regex
+
+  documentation:
+    openwiki:
+      role: generated_navigation_and_evidence_summary
+      use: locate_claims_then_verify_against_source_owner
+      authority: noncanonical
+      stale_or_unbound_claims: abstain
+    external_docs:
+      role: versioned_api_reference
+      require_library_version_match: true
+
+  graph:
+    byog: true
+    accepted_inputs: [revisioned_edge_list, graphml, gexf, jsonl_relationships]
+    networkx:
+      role: bounded_cpu_reference_and_small_graph_analysis
+      canonical: false
+      repository_functions:
+        pagerank: python/atlas_graph_runtime/networkx_executor.py:run_pagerank_v2
+        personalized_pagerank: python/atlas_graph_runtime/networkx_executor.py:run_personalized_pagerank
+        neighborhood: python/atlas_graph_runtime/networkx_executor.py:run_bfs_neighborhood
+        cheirank: python/atlas_graph_runtime/networkx_executor.py:run_cheirank
+      recommended_for: [byog_import_validation, directed_relationship_traversal, cpu_reference_parity]
+      not_for: [canonical_identity, unverified_semantic_edges, unbounded_graphrag_fanout]
+    graphrag:
+      role: derived_relation_traversal_and_community_context
+      requires: [source_bound_nodes, typed_edges, graph_revision, provenance]
+      authority: noncanonical
+      edges_are_source_verified: true
+      scores_are_classification_authority: false
+    relationship_types:
+      - imports
+      - calls
+      - references
+      - depends_on
+      - tests
+      - implements
+      - documents
+      - configures
+      - invokes
+    limits:
+      max_hops: 2
+      max_fanout: 20
+      preserve_edge_direction_and_type: true
+      similarity_alone_is_not_a_relationship: true
+      hidden_connection_is_candidate_until_source_verified: true
+    missing_or_stale_graph: omit_graph_features_and_continue_deterministically
+
+  agents:
+    deep_agents:
+      role: optional_bounded_research_orchestration
+      ecosystem: langchain_deepagents
+      not_google_adk: true
+      default_enabled: false
+      allowed: [decompose_research, retrieve_source_evidence, compare_library_options, draft_explanation]
+      forbidden: [write_source, install_dependency, mutate_manifest, write_canonical_store, promote_label]
+      inputs: canonicalized_bounded_evidence_only
+      outputs: proposal_with_citations_and_abstention
+      model_output_is_authority: false
+    google_adk:
+      role: optional_agent_workflow_orchestration
+      ecosystem: google_agent_development_kit
+      default_enabled: false
+      primitives: [LlmAgent, SequentialAgent, ParallelAgent, LoopAgent, FunctionTool, AgentTool]
+      allowed: [decompose_research, retrieve_source_evidence, draft_explanation, local_evaluation]
+      forbidden: [write_source, install_dependency, write_canonical_store, promote_label]
+      model_output_is_authority: false
+      canonical_authority: false
+
+  runtime_8095:
+    role: structural_and_nlp_observation_service
+    endpoints: [/ast/chunk, /analyze, /extract, /extract/documentation-facts]
+    preferred_operations:
+      - tree_sitter_cst_ast
+      - ast_grep_structural_match
+      - lsp_symbol_resolution_when_available
+    calls_are_optional: true
+    timeout_and_cancellation_required: true
+    service_health_is_not_evidence_authority: true
+    no_direct_store_writes: true
+
+  cache:
+    role: transient_revision_qualified_projection
+    owners:
+      ace_packet_cache: sveltekit-frontend/src/lib/server/ace/ace-packet-reader.ts
+      ace_packet_writer: sveltekit-frontend/src/lib/server/ace/ace-packet-writer.ts
+      bitfrost_warming: sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.ts
+      stream_reader: sveltekit-frontend/src/routes/api/ace/stream/+server.ts
+      generic_warmup: sveltekit-frontend/src/routes/api/cache/warm-up/+server.ts
+    current_evidence: code_paths_exist
+    feature_label_to_ace_prefill_to_cache_warm: not_proven_end_to_end
+    requires: [reviewed_feature_label, admitted_packet_identity, compatible_source_revision, cache_key_receipt, readback_and_hit_metrics]
+    canonical_authority: false
+    live_cache_operations_performed: false
+    warmup_must_not_infer_identity_or_labels: true
+
+recommended_tool_fit:
+  package_metadata:
+    preferred: [package_manifest_parser, lockfile_parser]
+    reason: distinguish declarations, resolved versions, and executable scripts
+  syntax:
+    preferred: [tree_sitter_8095, ast_grep]
+    reason: provide exact language-aware structure and bounded pattern evidence
+  semantic_symbols:
+    preferred: [ts_morph]
+    optional_only_when_verified: [lsp]
+    reason: compiler-backed TypeScript enrichment can resolve definitions, references, and types; do not claim a live LSP caller without call-site evidence
+  graph:
+    preferred: [networkx]
+    reason: deterministic CPU baseline for BYOG edge lists and parity checks
+    optional_scale: [neo4j, cugraph]
+    reason_scale: use only when an admitted graph snapshot and measured scale justify projection or GPU execution
+  narrative_research:
+    preferred: [openwiki]
+    reason: repository-local navigation to evidence; verify every claim against the source owner
+    not_runtime_classifier: true
+    optional_orchestration: [deepagents]
+    reason_orchestration: bounded multi-step research; never source of labels or write authority
+
+function_catalog:
+  - id: source_inventory
+    functions: [rg --files, package-manifest-and-lockfile-parsers]
+    best_for: discovering source and dependency surfaces across TS, Svelte, Python, C/C++, CUDA, Go, and Rust
+    why: fast bounded inventory; manifests and lockfiles distinguish declared from resolved versions
+    limitation: does not prove a runtime import or production caller
+  - id: structural_facts
+    functions: [8095 Tree-sitter CST/AST, extractSymbolsViaAstGrep]
+    source: [sveltekit-frontend/scripts/atlas/prove-node-tree-sitter-parity.mts, scripts/atlas/lib/ast-grep-symbol-extraction.mjs]
+    best_for: syntax-aware facts, exact spans, symbols, and rule matches
+    why: combines concrete syntax structure with structural patterns; avoids regex-only inference
+    limitation: syntax facts alone do not establish types, runtime behavior, or canonical admission
+  - id: semantic_resolution
+    functions: [ts-morph semantic enrichment]
+    source: sveltekit-frontend/src/lib/server/atlas/language/ts-morph-semantic-enrichment.ts
+    best_for: definitions, references, inferred types, and caller resolution
+    why: compiler-backed TypeScript semantic enrichment supplements syntax facts
+    limitation: this is not evidence of a live LSP/tsserver caller; unresolved symbols remain unresolved rather than guessed from paths
+  - id: byog_graph
+    functions: [run_bfs_neighborhood, run_personalized_pagerank, run_pagerank_v2]
+    source: python/atlas_graph_runtime/networkx_executor.py
+    best_for: directed BYOG traversal and explainable CPU reference analysis
+    why: typed, revisioned edge inputs produce reproducible BFS, PageRank, and personalized PageRank outputs
+    limitation: run_bfs_neighborhood caps depth but has no max-fanout parameter; callers must pre-bound graph input and output. PPR uses untyped ordinal edges. Edges require source evidence; scores are never identity or proof
+  - id: scale_projection
+    functions: [cuGraph executor, Neo4j projection]
+    best_for: measured large-graph workloads after parity against an admitted snapshot
+    why: optional acceleration/projection without replacing NetworkX reference semantics
+    limitation: derived only; no graph refresh or writes during classification
+  - id: proposal_orchestration
+    functions: [LangChain Deep Agents, Google Agent Development Kit]
+    best_for: optional bounded evidence gathering and explanation drafting
+    why: can decompose research; deterministic validators still own outputs and admission
+    limitation: Deep Agents and Google ADK are distinct ecosystems; neither is enabled or a label authority
+  - id: offline_analysis
+    functions: [DuckDB, PyArrow, cuDF, cuML, PyTorch]
+    best_for: local tabular joins, columnar batches, and experimental embedding/topology analysis
+    why: CPU-first reproducible preparation, with optional acceleration for measured batches
+    limitation: outputs are derived and need exact input/model revisions and evaluation
+  - id: serialization_and_validation
+    functions: [Pydantic, msgpack]
+    best_for: validating proposal envelopes and compact transient transport
+    why: Pydantic validates shape; MessagePack may reduce bounded payload overhead
+    limitation: neither grants persistence authority or replaces canonical digest rules
+
+output_contract:
+  schema: atlas.repository-capability-proposal.v1
+  required_fields: [proposal_id, capability, feature_label_proposal, domain_class_proposal, source_scope, subject_ref, evidence_refs, source_revision, workspace_revision, producer_revision, confidence, reasons, alternatives, status, abstention_reason]
+  source_scope_values: [first_party, vendored, generated, documentation, test, unknown]
+  confidence_range: [0.0, 1.0]
+  status_values: [PROPOSAL_ONLY, REVIEW_REQUIRED, ABSTAINED]
+  persistence: none
+  canonical_feature_label_write: false
+  packet_identity_owner: existing_parent_atlas_packet_identity_contract
+  feature_label_owner: feature-label-semantic-derivation
+  recommendation_provenance_fields: [function_ref, package_name, declared_version, problem_fit, tradeoffs, evidence_refs]
+
+evaluation:
+  baselines: [deterministic_rules, reviewed_human_labels]
+  report: [exact_feature_accuracy, domain_class_accuracy, abstention_rate, unsupported_label_rate, evidence_coverage, revision_coverage, missing_symbol_identity_count, false_positive_examples, reviewer_disagreement]
+  split_by: [workspace_revision, repository]
+  leakage_policy: keep_same_source_revision_and_near_duplicate_modules_in_one_split
+  promotion_requires: [reviewed_labels, held_out_evaluation, source_lineage, owner_approval]

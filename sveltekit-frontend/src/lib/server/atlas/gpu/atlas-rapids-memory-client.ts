@@ -1,4 +1,5 @@
 import type { GpuMemoryTelemetryV1 } from './gpu-residency-budget.js';
+import { ENV } from '../../env.server.js';
 
 export interface AtlasRapidsHealthV1 {
   status: string;
@@ -17,7 +18,7 @@ export interface AtlasRapidsHealthV1 {
 const MIB = 1024 * 1024;
 
 export function createAtlasRapidsMemoryClient(
-  baseUrl = process.env.ATLAS_RAPIDS_SIDECAR_URL ?? 'http://127.0.0.1:8098',
+  baseUrl = ENV.ATLAS_RAPIDS_SIDECAR_URL,
 ) {
   async function readTelemetry(timeoutMs = 1_500): Promise<GpuMemoryTelemetryV1 | null> {
     try {

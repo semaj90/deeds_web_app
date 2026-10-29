@@ -1,6 +1,6 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-10-28T16:37:19.803Z
+Generated: 2026-10-29T00:28:48.156Z
 
 ## Summary
 
@@ -90,7 +90,7 @@ Generated: 2026-10-28T16:37:19.803Z
 
 - classification: INDEX_MISMATCH
 - repair_class: ADD_DRIZZLE_MIRROR
-- static: COLUMN_MISMATCH
+- static: INDEX_MISMATCH
 - live: INDEX_MISMATCH
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/tasks.ts
 - manual sources: sveltekit-frontend/drizzle/manual/0024_feature_id_metadata_gin_indexes.sql, sveltekit-frontend/drizzle/manual/0999_fix-grpc-proto-alignment.sql, sveltekit-frontend/drizzle/manual/20260601_add_alias_and_parent_atlas_indexes.sql, sveltekit-frontend/drizzle/manual/20260601_task_semantic_packets_alias_id_and_atlas_profile_gin.sql, sveltekit-frontend/drizzle/manual/20260601_task_semantic_packets_v2.sql, sveltekit-frontend/drizzle/manual/20260606_task_semantic_packets_live_alignment.sql, sveltekit-frontend/drizzle/manual/20260908_task_semantic_packets_production_indexes.sql, sveltekit-frontend/drizzle/manual/20260908_task_semantic_packets_writer_columns_only.sql, sveltekit-frontend/drizzle/manual/20261028_align_task_semantic_and_route_runtime_packets_DRAFT.sql, sveltekit-frontend/drizzle/manual/9999_create_task_semantic_packets.sql, sveltekit-frontend/drizzle/manual/phase17_task_semantic_packets.sql
@@ -173,7 +173,7 @@ Generated: 2026-10-28T16:37:19.803Z
 ## Blockers
 
 - feature_registry: live LIVE_TABLE_MISSING
-- task_semantic_packets: static COLUMN_MISMATCH
+- task_semantic_packets: static INDEX_MISMATCH
 - task_semantic_packets: live INDEX_MISMATCH
 - atlas_packets: static COLUMN_MISMATCH
 - atlas_packets: live COLUMN_MISMATCH

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
-import { ACEContextAssembler, estimateContentTokensV1, selectTopCandidatesV1 } from './context-assembler.js';
+import { ACEContextAssembler, estimateContentTokensV1, resolveAceContextDatabaseUrl, selectTopCandidatesV1 } from './context-assembler.js';
 import { buildTopologicalKagCacheScopeV1, readAceCacheProjectionIdentityV1 } from '../features/ai/ace/context-assembler.js';
 
 describe('buildTopologicalKagCacheScopeV1', () => {
@@ -54,6 +54,17 @@ describe('estimateContentTokensV1', () => {
     expect(estimateContentTokensV1('a'.repeat(8))).toBe(2);
     expect(estimateContentTokensV1('')).toBe(0);
     expect(estimateContentTokensV1('é'.repeat(4))).toBe(2);
+  });
+});
+
+describe('resolveAceContextDatabaseUrl', () => {
+  it('prefers a non-empty explicit URL and falls back to configured URL', () => {
+    expect(resolveAceContextDatabaseUrl(' postgres://override ', 'postgres://configured')).toBe('postgres://override');
+    expect(resolveAceContextDatabaseUrl(undefined, ' postgres://configured ')).toBe('postgres://configured');
+  });
+
+  it('fails closed when the database URL is missing', () => {
+    expect(() => resolveAceContextDatabaseUrl(undefined, '  ')).toThrow('DATABASE_URL_REQUIRED');
   });
 });
 

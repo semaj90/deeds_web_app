@@ -35,6 +35,10 @@
 			codec: string;
 		};
 		transcription: { text: string } | null;
+		transcriptSegments: Array<{ startMs: number; endMs: number; text: string; language: string | null; confidence: string | number | null; model: string | null }>;
+		transcriptSummary: string | null;
+		summaryRevision: string | null;
+		keyFacts: string[];
 		aceAnalysis: {
 			summary: string;
 			confidence: number;
@@ -308,39 +312,53 @@
 			<div class="center-panel">
 				{#if activeTab === 'overview'}
 					<div class="panel-content">
-						{#if analysis?.vlmAnalysis}
+						{#if analysis && (analysis.vlmAnalysis || analysis.transcriptSummary || analysis.frameAnalysis.length || analysis.sceneDetection.length)}
 							<div class="overview-grid">
+								{#if analysis.transcriptSummary}
+									<div class="overview-card overview-card-wide">
+										<h3><Icon name="file-text" /> Generated Transcript Summary</h3>
+										<p class="summary-text">{analysis.transcriptSummary}</p>
+										<p class="analysis-caveat">AI-generated aid · verify against the source recording and transcript.</p>
+										{#if analysis.keyFacts.length}
+											<div class="tags-grid">
+												{#each analysis.keyFacts as fact}<span class="tag tag-object">{fact}</span>{/each}
+											</div>
+										{/if}
+										{#if analysis.summaryRevision}<small class="summary-revision">Summary revision · {analysis.summaryRevision}</small>{/if}
+									</div>
+								{/if}
+
 								<!-- VLM Summary Card -->
-								<div class="overview-card overview-card-wide">
+								{#if analysis.vlmAnalysis}<div class="overview-card overview-card-wide">
 									<h3><Icon name="sparkles" /> AI Visual Analysis</h3>
 									<p class="summary-text">{analysis.vlmAnalysis.summary}</p>
-								</div>
+								</div>{/if}
 
 								<!-- Key Objects Card -->
-								<div class="overview-card">
+								{#if analysis.vlmAnalysis}<div class="overview-card">
 									<h3><Icon name="cube" /> Key Objects</h3>
 									<div class="tags-grid">
 										{#each analysis.vlmAnalysis.keyObjects as obj}
 											<span class="tag tag-object">{obj}</span>
 										{/each}
 									</div>
-								</div>
+								</div>{/if}
 
 								<!-- Activities Card -->
-								<div class="overview-card">
+								{#if analysis.vlmAnalysis}<div class="overview-card">
 									<h3><Icon name="activity" /> Activities</h3>
 									<div class="tags-grid">
 										{#each analysis.vlmAnalysis.activities as activity}
 											<span class="tag tag-activity">{activity}</span>
 										{/each}
 									</div>
-								</div>
+								</div>{/if}
 
 								<!-- Setting Card -->
-								<div class="overview-card overview-card-wide">
+								{#if analysis.vlmAnalysis}<div class="overview-card overview-card-wide">
 									<h3><Icon name="map-pin" /> Setting</h3>
 									<p class="setting-text">{analysis.vlmAnalysis.setting}</p>
-								</div>
+								</div>{/if}
 
 								<!-- Stats Card -->
 								<div class="overview-card">
@@ -437,8 +455,20 @@
 					<div class="panel-content">
 						{#if analysis?.transcription}
 							<div class="transcription-view">
-								<h3><Icon name="file-text" /> Audio Transcription</h3>
-								<div class="transcription-text">{analysis.transcription.text}</div>
+								<h3><Icon name="file-text" /> Machine-Generated Transcript</h3>
+								<p class="analysis-caveat">Transcript segments are analysis candidates, not verified quotations.</p>
+								{#if analysis.transcriptSegments.length}
+									<ol class="transcript-segments">
+										{#each analysis.transcriptSegments as segment (segment.startMs)}
+											<li>
+												<time>{formatTimestamp(segment.startMs / 1000)}</time>
+												<span>{segment.text}</span>
+											</li>
+										{/each}
+									</ol>
+								{:else}
+									<div class="transcription-text">{analysis.transcription.text}</div>
+								{/if}
 							</div>
 						{:else}
 							<div class="empty-state">
@@ -951,6 +981,45 @@
 		background: var(--t-panel);
 		border-radius: 0.5rem;
 		border: 1px solid var(--t-border);
+	}
+
+	.summary-revision {
+		display: block;
+		margin-top: 0.75rem;
+		color: var(--t-text-secondary);
+		font: 0.7rem/1.4 ui-monospace, monospace;
+		overflow-wrap: anywhere;
+	}
+
+	.analysis-caveat {
+		margin: 0.4rem 0 0.8rem;
+		color: var(--t-text-secondary);
+		font-size: 0.75rem;
+	}
+
+	.transcript-segments {
+		display: grid;
+		gap: 0.5rem;
+		max-width: 800px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.transcript-segments li {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 1fr);
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		background: var(--t-panel);
+		border: 1px solid var(--t-border);
+		border-radius: 0.375rem;
+		line-height: 1.6;
+	}
+
+	.transcript-segments time {
+		color: var(--t-accent);
+		font: 600 0.75rem/1.6 ui-monospace, monospace;
 	}
 
 	.analysis-section {

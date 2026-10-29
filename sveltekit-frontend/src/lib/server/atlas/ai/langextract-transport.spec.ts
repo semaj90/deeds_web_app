@@ -1,11 +1,13 @@
 import { createHash } from 'node:crypto';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  resolveLangExtractBaseUrl,
   requestLangExtractAnalyze,
   requestLangExtractDocumentationFacts,
   requestLangExtractHealth,
   requestOaklibLabelSearch,
 } from './langextract-transport.js';
+import { ENV } from '$lib/server/env.server.js';
 
 function mockFetchOnce(body: unknown, init: { ok?: boolean; status?: number } = {}) {
   const response = {
@@ -105,6 +107,11 @@ const VALID_OAKLIB_SEARCH_RESPONSE = {
 };
 
 describe('CHUNK0: langextract-transport response validation', () => {
+  it('uses the centralized sidecar endpoint and allows an explicit test override', () => {
+    expect(resolveLangExtractBaseUrl()).toBe(ENV.LANGEXTRACT_BASE_URL);
+    expect(resolveLangExtractBaseUrl('http://sidecar.test')).toBe('http://sidecar.test');
+  });
+
   afterEach(() => {
     vi.unstubAllGlobals();
   });

@@ -155,9 +155,7 @@
 		return map[priority] ?? '';
 	}
 
-	$effect(() => {
-		loadScores();
-	});
+	loadScores();
 </script>
 
 <div class="scoring-dashboard">

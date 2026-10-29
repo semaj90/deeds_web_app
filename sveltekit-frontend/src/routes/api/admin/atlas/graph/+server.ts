@@ -48,26 +48,24 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 
     // Pull IMPORTS edges from Neo4j (top-N nodes only — bounded query)
     try {
-      const neo4j = await import('neo4j-driver');
-      const { ENV } = await import('$lib/server/env.server.js');
-      const driver = neo4j.default.driver(
-        ENV.NEO4J_URI ?? 'bolt://localhost:7687',
-        neo4j.default.auth.basic(ENV.NEO4J_USER ?? 'neo4j', ENV.NEO4J_PASSWORD ?? 'password')
-      );
+      const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
+      const driver = getNeo4jDriver();
       const session = driver.session();
-      const paths = [...pathSet].slice(0, 40);
-      const result = await session.run(
-        `UNWIND $paths AS p
-         MATCH (a:CodebaseFile {filePath: p})-[r:IMPORTS]->(b:CodebaseFile)
-         WHERE b.filePath IN $paths
-         RETURN a.filePath AS src, b.filePath AS tgt, type(r) AS rel LIMIT 200`,
-        { paths }
-      );
-      for (const rec of result.records) {
-        edges.push({ source: rec.get('src'), target: rec.get('tgt'), type: rec.get('rel') });
+      try {
+        const paths = [...pathSet].slice(0, 40);
+        const result = await session.run(
+          `UNWIND $paths AS p
+           MATCH (a:CodebaseFile {filePath: p})-[r:IMPORTS]->(b:CodebaseFile)
+           WHERE b.filePath IN $paths
+           RETURN a.filePath AS src, b.filePath AS tgt, type(r) AS rel LIMIT 200`,
+          { paths }
+        );
+        for (const rec of result.records) {
+          edges.push({ source: rec.get('src'), target: rec.get('tgt'), type: rec.get('rel') });
+        }
+      } finally {
+        await session.close();
       }
-      await session.close();
-      await driver.close();
     } catch {
       // Neo4j offline — return nodes only
     }

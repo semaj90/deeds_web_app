@@ -14,6 +14,7 @@
 
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 import {
   XGBOOST_SIDECAR_FEATURES,
   xgboostSidecarFeatureSchemaRevision,
@@ -45,7 +46,7 @@ const CANONICAL_RERANK_SCHEMA_VERSION = 1;
 const DEFAULT_RENDERER_VERSION = 'canonical-envelope-v1';
 const DEFAULT_MAX_LENGTH = 4096;
 const DEFAULT_CACHE_TTL_SECONDS = 300;
-const XGBOOST_SIDECAR_URL = process.env.XGBOOST_SIDECAR_URL ?? 'http://127.0.0.1:8765';
+const XGBOOST_SIDECAR_URL = ENV.XGBOOST_SIDECAR_URL;
 
 /**
  * XGBOOST-RERANK-ACTIVATION-01 execution mode (openspec parent-atlas-best-fit-score-fabric,

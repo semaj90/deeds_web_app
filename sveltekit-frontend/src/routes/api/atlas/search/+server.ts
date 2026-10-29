@@ -51,6 +51,7 @@ import { embedAtlasSearchQuery } from './embedding.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
 import { unifiedSearch } from '$lib/server/retrieval/service.js';
+import { expandPacketKeysByConcept } from '$lib/server/atlas/graph/atlas-search-concept-expansion.js';
 import type { RequestHandler } from './$types';
 
 const { Pool } = pg;
@@ -128,10 +129,6 @@ const QDRANT_URL  = ENV.QDRANT_URL || 'http://localhost:6333';
 const COLLECTION  = 'codebase_chunks_768';
 const POSTGRES_URL = ENV.DATABASE_URL;
 const POSTGRES_POOL = new Pool({ connectionString: POSTGRES_URL, max: 1, allowExitOnIdle: true });
-
-const NEO4J_URI   = (process.env.NEO4J_URI  ?? process.env.NEO4J_URL  ?? 'bolt://localhost:7687');
-const NEO4J_USER  = (process.env.NEO4J_USER ?? 'neo4j');
-const NEO4J_PASS  = (process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4j123');
 
 // RRF weights matching Phase 4B canonical weights
 const RRF_K = 60;
@@ -480,36 +477,7 @@ async function neo4jExpand(
   conceptIds: string[],
   limit: number
 ): Promise<string[]> {
-  try {
-    // Lazy-import neo4j-driver to avoid SSR bundling issues
-    const neo4j = await import('neo4j-driver');
-    const driver = neo4j.default.driver(
-      NEO4J_URI,
-      neo4j.default.auth.basic(NEO4J_USER, NEO4J_PASS),
-    );
-    const session = driver.session({ defaultAccessMode: neo4j.default.session.READ });
-
-    try {
-      // Expand via USED_CONCEPT edges: find packets sharing concepts with the top hits
-      const result = await session.run(
-        `
-        MATCH (p:Packet)-[:USED_CONCEPT]->(c:Concept)
-        WHERE c.concept_id IN $conceptIds
-          AND NOT p.packet_key IN $existingKeys
-        RETURN DISTINCT p.packet_key AS packet_key, count(c) AS shared_concepts
-        ORDER BY shared_concepts DESC
-        LIMIT $limit
-        `,
-        { conceptIds, existingKeys: packetKeys, limit }
-      );
-      return result.records.map(r => r.get('packet_key') as string).filter(Boolean);
-    } finally {
-      await session.close();
-      await driver.close();
-    }
-  } catch {
-    return []; // Neo4j offline → skip expansion gracefully
-  }
+  return expandPacketKeysByConcept(packetKeys, conceptIds, limit);
 }
 
 // ── GAP 2: Bifrost temporal recency batch fetch ───────────────────────────────

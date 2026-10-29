@@ -2,7 +2,7 @@
  * Admin Retrieval Stream (Session 100 — Critical Path)
  *
  * Unified retrieval pipeline with SSE streaming:
- * - rg-pool → Qdrant → TurboVec → Postgres join → Gemma4 summary
+ * - rg-pool → Qdrant → TurboVec → Postgres join → configured LLM summary
  * - Progress streaming via canonical SSE-contract
  * - Automatic cleanup, timeout guards, proper error handling
  *
@@ -17,14 +17,14 @@
  *   - data: { stage: "turbovec", prefiltered: 10 }
  *   - data: { stage: "postgres_join", rows: 10 }
  *   - data: { stage: "ranking", top_score: 0.92 }
- *   - data: { stage: "gemma4", summary: "..." }
+ *   - data: { stage: "summary", summary: "..." }
  *   - data: { complete: true, total_time_ms: 5123 }
  *   - Or: { error: "...", code: "..." } on failure
  */
 
 import type { RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
-import { executeUnifiedRetrieval, executeUnifiedRetrievalWithSummarization } from '$lib/server/retrieval/unified-orchestrator.js';
+import { executeUnifiedRetrieval, summarizeRetrievalCandidates } from '$lib/server/retrieval/unified-orchestrator.js';
 import { createSSEResponse } from '$lib/server/streaming/sse-contract.js';
 
 const streamRequestSchema = z.object({
@@ -56,29 +56,13 @@ async function* generateStreamEvents(query: string, limit: number = 10, useRgPoo
 
     // Execute unified retrieval with progress updates
     const retrievalStart = Date.now();
-    const result = await executeUnifiedRetrieval(
-      {
-        query,
-        limit,
-        useRRF: true,
-        useLexical: true,
-        useRgPool
-      },
-      {
-        qdrant: { host: '127.0.0.1', port: 6333 },
-        turbovec: { host: '127.0.0.1', port: 8791 },
-        goRetrieval: { host: '127.0.0.1', port: 8100 },
-        postgres: {
-          host: process.env.POSTGRES_HOST || '127.0.0.1',
-          port: parseInt(process.env.POSTGRES_PORT || '5434'),
-          user: process.env.POSTGRES_USER || 'legal_admin',
-          password: process.env.POSTGRES_PASSWORD || '123456',
-          database: process.env.POSTGRES_DB || 'legal_ai_db'
-        },
-        ollama: { host: '127.0.0.1', port: 11434 },
-        gemma4: { host: '127.0.0.1', port: 8090 }
-      }
-    );
+    const result = await executeUnifiedRetrieval({
+      query,
+      limit,
+      useRRF: true,
+      useLexical: true,
+      useRgPool
+    });
 
     const retrievalTime = Date.now() - retrievalStart;
 
@@ -96,16 +80,10 @@ async function* generateStreamEvents(query: string, limit: number = 10, useRgPoo
     // Optionally summarize top candidates
     if (result.candidates.length > 0) {
       const summaryStart = Date.now();
-      const summaryResult = await executeUnifiedRetrievalWithSummarization(
-        {
-          query,
-          limit,
-          useRgPool
-        }
-      );
+      const summaryResult = await summarizeRetrievalCandidates(result.candidates, query);
 
       if (summaryResult.summary) {
-        yield { data: { stage: 'gemma4_summary', summary: summaryResult.summary.summary, time_ms: Date.now() - summaryStart } };
+        yield { data: { stage: 'summary', summary: summaryResult.summary, time_ms: Date.now() - summaryStart } };
       }
     }
 

@@ -2628,8 +2628,9 @@ export class RabbitMQManager extends EventEmitter {
         }
         couchCleanUrl = parsed.toString().replace(/\/$/, '');
       } catch {
-        const user = process.env.COUCHDB_USER ?? 'admin';
-        const pass = process.env.COUCHDB_PASS ?? process.env.COUCHDB_PASSWORD ?? 'legal_ai_pass';
+        const user = ENV.COUCHDB_USER;
+        const pass = ENV.COUCHDB_PASSWORD;
+        if (!pass) throw new Error('COUCHDB_CREDENTIALS_REQUIRED');
         headers['Authorization'] = 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64');
       }
 

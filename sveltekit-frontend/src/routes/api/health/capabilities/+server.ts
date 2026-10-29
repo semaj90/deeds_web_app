@@ -6,6 +6,8 @@ import { getParentAtlasRuntimeProfileManifest } from '$lib/server/runtime-profil
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { getLangExtractStatus } from '$lib/server/langextract-client.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
+import { getLlamaSessionDescriptor } from '$lib/server/ai/local-llama-provider.js';
+import { healthCheck as tritonHealthCheck } from '$lib/server/triton-llm.js';
 
 /**
  * GET /api/health/capabilities
@@ -14,17 +16,18 @@ import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
  * Returns which server capabilities are available RIGHT NOW.
  *
  * Design: fast (2s timeout per check, parallel), cacheable (30s TTL).
- * Client polls this to decide local-onnx vs server-ollama routing.
+ * Client polls this to decide local-helper vs server-generation routing.
  *
  * Contract:
  * {
- *   ollama: boolean,        // LLM inference available
+ *   ollama: boolean,        // Ollama service available (currently embedding lane)
+ *   generation: boolean,    // TRT-LLM, Triton, or loaded llama-server generation available
  *   embedding: boolean,     // Embedding generation available
  *   rag: boolean,           // Full RAG search (Qdrant) available
  *   postgres: boolean,      // Database available
  *   redis: boolean,         // Cache available
  *   ragEnabled: boolean,    // Composite: ollama + embedding + rag + postgres
- *   serverReady: boolean,   // Composite: ollama + postgres (minimum for server mode)
+ *   serverReady: boolean,   // Composite: generation + postgres (minimum for server mode)
  *   models: string[],       // Available Ollama model names
  *   latencyMs: number,      // Total check time
  *   ts: string,             // ISO timestamp
@@ -55,6 +58,8 @@ export const GET: RequestHandler = async ({ locals }) => {
     postgresOk,
     redisOk,
     tensorrtOk,
+    tritonOk,
+    llamaSession,
     gpuLease,
     langExtractStatus,
     grpcStatus,
@@ -123,6 +128,10 @@ export const GET: RequestHandler = async ({ locals }) => {
     // TensorRT-LLM: check /health endpoint
     check(`${trtllmUrl}/health`),
 
+    // Server generation providers used by /api/sse/chat.
+    tritonHealthCheck().catch(() => false),
+    getLlamaSessionDescriptor(true, TIMEOUT).catch(() => ({ healthy: false })),
+
     // GPU lease status
     getGpuLeaseStatus().catch(() => null),
 
@@ -143,12 +152,14 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const embedding = ollama && models.some((m: string) => m.includes('embed'));
 	const rag = ollama && embedding && qdrantHealth.ok;
 	const ragEnabled = rag && postgresOk;
-	const serverReady = ollama && postgresOk;
+	const generation = tensorrtOk || tritonOk || llamaSession.healthy;
+	const serverReady = generation && postgresOk;
 	const runtimeProfile = getParentAtlasRuntimeProfileManifest();
 
 	return json(
     {
       ollama,
+      generation,
       embedding,
       rag: qdrantHealth.ok,
       qdrant: {

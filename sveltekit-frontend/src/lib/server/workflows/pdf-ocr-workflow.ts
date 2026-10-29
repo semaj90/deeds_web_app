@@ -10,6 +10,7 @@ export type PdfOcrWorkflowTransport = 'pending' | 'rabbitmq' | 'local-fallback';
 
 export interface PdfOcrWorkflowInput {
 	workflowRunId: string;
+	ownerId?: string;
 	evidenceId?: string;
 	fileName: string;
 	mimeType: string;
@@ -59,8 +60,8 @@ function deriveStatus(job: JobProgress | undefined): PdfOcrWorkflowStatus {
 	return job.progress > 0 ? 'running' : 'queued';
 }
 
-function ensureJob(jobId: string): void {
-	if (!getJob(jobId)) createJob(jobId);
+function ensureJob(jobId: string, ownerId?: string): void {
+	if (!getJob(jobId)) createJob(jobId, ownerId);
 }
 
 function upsertMeta(input: PdfOcrWorkflowInput, transport: PdfOcrWorkflowTransport): PdfOcrWorkflowRun {
@@ -90,7 +91,7 @@ export async function registerPdfOcrWorkflowRun(
 	input: PdfOcrWorkflowInput,
 	publisher = publishPdfOcrWorkflowJob,
 ): Promise<PdfOcrWorkflowRun> {
-	ensureJob(input.workflowRunId);
+	ensureJob(input.workflowRunId, input.ownerId);
 	upsertMeta(input, 'pending');
 
 	const published = await publisher({
