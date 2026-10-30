@@ -1,26 +1,19 @@
 {
   "schema": "atlas.current-graphify-execution-owner-decision.v1",
-  "generatedAt": "2026-09-21T20:13:30.443Z",
+  "generatedAt": "2026-10-30T02:27:45.537Z",
   "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
   "mode": "REHEARSAL_ROLLED_BACK",
   "authorityTableOwner": "graphify_execution_authority",
-  "chosenExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-  "otherCandidateExecutionIds": [
-    "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
-  ],
+  "chosenExecutionId": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+  "otherCandidateExecutionIds": [],
   "authorizedEnvVarPresent": false,
   "applyFlagPresent": false,
   "writesPerformed": false,
   "before": [
     {
-      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
       "canonical_authority": false,
-      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
-    },
-    {
-      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-      "canonical_authority": true,
-      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      "workspace_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c"
     }
   ],
   "after": null,
@@ -28,12 +21,12 @@
   "rehearsal": {
     "legacy": [
       {
-        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+        "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f"
       }
     ],
     "authority": [
       {
-        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
         "authority_state": "SELECTED",
         "selected_by": "REHEARSAL",
         "selection_receipt": "REHEARSAL-NOT-A-RECEIPT",
@@ -41,12 +34,7 @@
         "import_receipt": null
       }
     ],
-    "previousAuthority": [
-      {
-        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-        "authority_state": "LEGACY_IMPORTED"
-      }
-    ]
+    "previousAuthority": []
   },
-  "reportChecksum": "792b56fd943d37b7fbace2f30a912859c8df7fd6182ac448444a455e056c79cb"
+  "reportChecksum": "a4459f14dcbc4a8d91e962bfb63438fe3e28d7fcbc9963c0d1de4c75f646be4f"
 }

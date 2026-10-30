@@ -50,7 +50,18 @@ const SELECTION_RECEIPT = argValue('--selection-receipt');
 const execArgIndex = args.indexOf('--execution-id');
 const CHOSEN_EXECUTION_ID = execArgIndex >= 0 ? args[execArgIndex + 1] : null;
 
-const resolutionPath = path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
+// --resolution <path> selects a freshly generated read-only plan (e.g. one for a newer admitted workspace revision);
+// it must stay under docs/reports or .tmp/atlas. Default stays the committed plan.
+const RESOLUTION_ARG = argValue('--resolution');
+const resolutionPath = RESOLUTION_ARG
+  ? path.resolve(root, RESOLUTION_ARG)
+  : path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
+if (RESOLUTION_ARG) {
+  const allowedRoots = [path.join(root, 'docs/reports'), path.join(root, '.tmp/atlas')];
+  if (!allowedRoots.some((allowed) => !path.relative(allowed, resolutionPath).startsWith('..') && !path.isAbsolute(path.relative(allowed, resolutionPath)))) {
+    throw new Error('RESOLUTION_PATH_MUST_BE_UNDER_DOCS_REPORTS_OR_TMP_ATLAS');
+  }
+}
 const reportPath = path.join(
   root,
   // A rehearsal must never overwrite the historical APPLY record; it gets its own file.
@@ -74,9 +85,17 @@ if (!fs.existsSync(resolutionPath)) {
   throw new Error('GATE_0A_RESOLUTION_REPORT_MISSING: run plan-current-graphify-execution-owner-resolution-v1.mjs first');
 }
 const resolution = JSON.parse(fs.readFileSync(resolutionPath, 'utf8'));
-if (resolution.status !== 'DUPLICATE_EQUIVALENT_EXECUTIONS' || resolution.equivalence?.allEquivalent !== true) {
+const provenDuplicates = resolution.status === 'DUPLICATE_EQUIVALENT_EXECUTIONS' && resolution.equivalence?.allEquivalent === true;
+// A single COMPLETED execution for the admitted revision is the trivially proven case: the read-only plan found exactly one
+// candidate, and it belongs to the revision the plan itself records as admitted. No other execution can be demoted or confused.
+const provenSingle = resolution.status === 'SINGLE_CURRENT_EXECUTION_CANDIDATE'
+  && Array.isArray(resolution.candidates) && resolution.candidates.length === 1
+  && typeof resolution.admittedWorkspaceRevision === 'string'
+  && resolution.candidates[0].workspace_revision === resolution.admittedWorkspaceRevision
+  && resolution.candidates[0].status === 'COMPLETED';
+if (!provenDuplicates && !provenSingle) {
   throw new Error(
-    `GATE_0A_NOT_EQUIVALENT: resolution status is "${resolution.status}", not the proven-equivalent ` +
+    `GATE_0A_NOT_EQUIVALENT: resolution status is "${resolution.status}", not a proven-equivalent or single-candidate ` +
       'case this apply script was built for. A genuinely divergent case needs separate review, not this path.',
   );
 }
