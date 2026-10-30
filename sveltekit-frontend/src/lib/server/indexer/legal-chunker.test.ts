@@ -111,3 +111,36 @@ phone metadata is unconstitutional. See Cal. Const. art. I, § 13; 42 U.S.C. § 
 		expect(tier1.length).toBeGreaterThan(0);
 	});
 });
+
+describe('chunker keeps text that lives on a section heading line', () => {
+	const allText = (chunks: Array<{ text: string }>) => chunks.map((chunk) => chunk.text).join('\n');
+
+	it('keeps an inline-body "Section N." line that is the last paragraph', () => {
+		const text =
+			'Intro paragraph one.\n\nThe lease was signed on May 3.\n\nSection 2. The monthly rent is due on the first day of each month.\n';
+		const chunks = chunkLegalDocument(text, { maxTokens: 512, overlap: 128 });
+		expect(allText(chunks)).toContain('monthly rent is due on the first day of each month');
+	});
+
+	it('keeps an inline-body section heading in the middle of a document, in order', () => {
+		const text =
+			'Intro paragraph one with enough words to pass.\n\nSection 2. The monthly rent is due on the first day of each month.\n\nSection 3. Late payments accrue interest at five percent per year.\n';
+		const joined = allText(chunkLegalDocument(text, { maxTokens: 512, overlap: 128 }));
+		expect(joined.indexOf('monthly rent')).toBeGreaterThan(-1);
+		expect(joined.indexOf('Late payments')).toBeGreaterThan(joined.indexOf('monthly rent'));
+	});
+
+	it('does not turn a bare title heading with a tiny body into a chunk', () => {
+		const text = 'Intro paragraph one with enough words to pass.\n\nSection 2. Rent\n\nx\n';
+		const joined = allText(chunkLegalDocument(text, { maxTokens: 512, overlap: 128 }));
+		expect(joined).not.toContain('Rent');
+	});
+
+	it('does not duplicate heading text when the section body is already long enough', () => {
+		const body = 'The monthly rent is due on the first day of each month and is payable in full.';
+		const text = `Intro paragraph one with enough words to pass.\n\nSection 2. Payment terms apply\n${body}\n`;
+		const joined = allText(chunkLegalDocument(text, { maxTokens: 512, overlap: 128 }));
+		expect(joined.split('Payment terms apply').length - 1).toBe(0);
+		expect(joined).toContain(body);
+	});
+});

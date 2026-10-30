@@ -1363,3 +1363,30 @@ Open decisions (none executed):
 Blocked: LR-05 (OAK via PostgreSQL boundary) on decision 2; live LangExtract run on decision 5; TensorRT-RTX 1.6 on an operator-supplied installer path; PyTorch PageRank backend on NetworkX parity (not started).
 
 Not promoted by this checkpoint: HypergraphRAG, PyTorch PageRank, TensorRT-RTX, cuVS search, ACE admission, any recommendation output.
+
+### Update 2026-10-29 — LR-01 registry table applied; TRACE read tool added (approved by operator: "yes apply then review add the tool")
+| Item | Result | Evidence |
+|---|---|---|
+| LR-01 definition | DONE (as DDL): inverse DAG = the input set behind a recommendation; bipartite recommendation → input, so acyclic by construction; `canonical = false` by CHECK | `sveltekit-frontend/drizzle/manual/20261029_atlas_todo_inverse_dag_v1.sql` |
+| Duplication audit | Reuse, no peer owner: `kanban_task_dependencies` is task→task execution order (different grain); `atlas_feature_recommendation_index` stays the scorer; outcome receipts and the OpenSpec task index are referenced by key, not copied | live catalog 2026-10-29 |
+| ROLLBACK rehearsal | PASS: created, `edge_id` is UUIDv7, 8 of 8 bad inserts rejected (canonical=true, bad revision, NaN weight, unknown kind, unknown role, blank key, negative ordinal, exact duplicate); rollback script drops an empty table and refuses a table holding a row | rehearsal transcript, session 2026-10-29 |
+| Apply | APPLY_PROVEN (structure only): 14 columns, 18 constraints, 3 indexes (`pkey`, `edge_uidx`, `input_idx`), 0 rows, table comment present. Pre-image: table absent. Registered in `drizzle/sidecar-migrations.json` | live readback |
+| TRACE tool `atlas.todo_inverse_dag` | CREATED + unit-proven: read-only (`BEGIN READ ONLY`, 15 s statement timeout), exactly one lookup form, parameterized, limit clamped to 200, empty same-shape result if the table is missing. 10 of 10 unit tests pass. NOT live: the running TRACE `:8788` process predates the change and must be restarted by the operator | `src/mcp/atlas-todo-inverse-dag.ts`, `.spec.ts`; registered in `trace-mcp-server.ts` |
+
+Not done: no producer writes rows yet (table is empty, so the tool returns an empty result); `npm run trace:mcp:census-reconcile` not run (static tool count changed); LR-02..LR-05 unchanged.
+
+### Update 2026-10-29 — packet identity registry v1 applied (empty)
+- Applied `sveltekit-frontend/drizzle/manual/20261020_atlas_packet_identity_registry_v1_DRAFT.sql` as drafted, one transaction, after explicit operator approval. Rehearsed first in a rolled-back transaction (2/2 valid inserts, 8/8 invalid rejected).
+- Readback: `atlas_packet_identity_registry_v1` 7 columns / 16 constraints / 4 indexes / 0 rows; `atlas_packet_identity_aliases_v1` 7 columns / 16 constraints / 2 indexes / 0 rows. Older `atlas_packet_identity_aliases` (3,294 rows) untouched.
+- Not done: seeding, repository-scope widening (scope pinned to `repo:root`), `20261027_..._source_guard_DRAFT.sql` (unrehearsed), Graphify execution owner decision. No rollback script exists for this file; both tables are empty, so a drop is the rollback until rows exist.
+
+### Update 2026-10-30 — evidence_vectors 768 migration applied
+- Applied `sveltekit-frontend/drizzle/manual/20261029_evidence_vectors_semantic_768.sql` after the operator's explicit instruction. Pre-check: 0 rows, `vector(384)`, no competing query. Applied with lock_timeout 5s / statement_timeout 30s via `psql -v ON_ERROR_STOP=1`.
+- Readback: `embedding vector(768) NOT NULL`; `chunk_index`, `content`, `metadata`, `source_revision` NOT NULL; CHECKs `source_revision_sha256_ck`, `chunk_index_nonnegative_ck`, `embedding_type_ck` (= `evidence_text_semantic_768`), `source_field_ck` (= `canonical_evidence_text`); indexes `evidence_vectors_hnsw_idx`, `evidence_vectors_pkey`, `evidence_vectors_source_chunk_uq`; 0 rows.
+- Caveat: the file gained NOT NULL/CHECK clauses from another session after my disposable rehearsal, so those clauses were first exercised on the live empty table. No rollback script exists; with 0 rows the rollback is column/constraint drops plus `ALTER ... TYPE vector(384)`.
+- Not done: the two `20261027_*` drafts (scope map, aliases source guard) remain unapplied.
+
+### Update 2026-10-30 — packet identity scope map and aliases source guard applied (empty)
+- Applied `20261027_atlas_graphify_scope_repository_map_v1_DRAFT.sql` then `20261027_atlas_packet_identity_registry_v1_source_guard_DRAFT.sql` in one transaction after the operator's explicit instruction. Rehearsed first (rolled back) on live PG18: valid ROOT_SCOPE/LOGICAL_SUBSCOPE mapping and valid alias accepted; wrong source authority, nested kind on a ROOT identity, missing identity, bad digest, alias source_ref mismatch, missing storage/registry rows and alias UPDATE rejected.
+- Readback: `atlas_graphify_scope_repository_map_v1` constraints include `_pkey`, `_repository_id_fkey`, `_root_scope_kind_check`, `_scope_repository_key` (the four names `build-packet-key-v2-admission-manifest-v1.mts` checks); `atlas_packet_identity_registry_v1_scope_repository_fk` present; triggers `trg_atlas_graphify_scope_repository_map_v1_guard` and `trg_atlas_packet_identity_aliases_v1_guard` enabled; 0 rows in scope map, registry and aliases_v1.
+- Not done: no scope mapping seeded (needs evidence_ref/digest), no registry/alias rows, Graphify execution owner decision still open. No rollback script; with all three tables empty the rollback is dropping the two triggers/functions, the registry FK and the scope map table.

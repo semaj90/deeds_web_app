@@ -80,6 +80,50 @@ describe('KAG-05: persistHyperedges', () => {
     expect(releaseMock).toHaveBeenCalledTimes(1); // one client, released once at the end of the batch
   });
 
+  it('treats identity and revision columns as immutable on conflict', async () => {
+    queryMock.mockClear();
+    queryMock.mockImplementation((sql: string) => {
+      if (sql.includes('INSERT INTO atlas_hyperedges')) return Promise.resolve({ rows: [{ hyperedge_id: 'uuid-1' }] });
+      return Promise.resolve({ rows: [] });
+    });
+
+    const { persistHyperedges } = await import('./kag-hyperedge-postgres.js');
+    await persistHyperedges([edge()]);
+
+    const upsertSql = String(queryMock.mock.calls.map((c) => c[0]).find((s) => String(s).includes('INSERT INTO atlas_hyperedges')));
+    const afterSet = upsertSql.split('DO UPDATE SET')[1];
+    const setClause = afterSet.split('WHERE')[0];
+    const guardClause = afterSet.split('WHERE')[1];
+
+    expect(setClause).toMatch(/confidence/);
+    expect(setClause).toMatch(/lifecycle/);
+    for (const immutable of ['relation_type', 'packet_key', 'workspace_revision', 'source_revision', 'graph_revision', 'producer_revision', 'evidence_hash', 'evidence_refs', 'checksum']) {
+      expect(setClause, `${immutable} must not be overwritten`).not.toContain(immutable);
+      expect(guardClause, `${immutable} must be guarded`).toContain(`atlas_hyperedges.${immutable} IS NOT DISTINCT FROM EXCLUDED.${immutable}`);
+    }
+  });
+
+  it('rejects a same-id edge with a different revision instead of overwriting it', async () => {
+    queryMock.mockClear();
+    releaseMock.mockClear();
+    queryMock.mockImplementation((sql: string) => {
+      if (sql.includes('INSERT INTO atlas_hyperedges')) return Promise.resolve({ rows: [] }); // guard blocked the update
+      return Promise.resolve({ rows: [] });
+    });
+
+    const { persistHyperedges } = await import('./kag-hyperedge-postgres.js');
+    const result = await persistHyperedges([edge()]);
+    const calls = queryMock.mock.calls.map((call) => String(call[0]));
+
+    expect(result.written).toBe(0);
+    expect(result.errors).toHaveLength(1);
+    expect(result.errors[0].message).toMatch(/^KAG_HYPEREDGE_REVISION_CONFLICT:/);
+    expect(calls).toContain('ROLLBACK');
+    expect(calls.some((c) => c.includes('INSERT INTO atlas_hyperedge_members'))).toBe(false);
+    expect(calls).not.toContain('COMMIT');
+    expect(releaseMock).toHaveBeenCalledTimes(1);
+  });
+
   it('releases the client even when every edge fails', async () => {
     queryMock.mockClear();
     releaseMock.mockClear();

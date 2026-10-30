@@ -46,20 +46,19 @@ export async function persistHyperedges(
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
                    $13, $14::jsonb, $15, $16::jsonb, $17, $18)
            ON CONFLICT (contract_hyperedge_id) WHERE contract_hyperedge_id IS NOT NULL
-           DO UPDATE SET relation_type = EXCLUDED.relation_type,
-             packet_key = EXCLUDED.packet_key,
-             workspace_revision = EXCLUDED.workspace_revision,
-             source_revision = EXCLUDED.source_revision,
-             graph_revision = EXCLUDED.graph_revision,
-             producer_revision = EXCLUDED.producer_revision,
-             evidence_hash = EXCLUDED.evidence_hash,
-             evidence_refs = EXCLUDED.evidence_refs,
-             checksum = EXCLUDED.checksum,
-             properties = EXCLUDED.properties,
+           DO UPDATE SET properties = EXCLUDED.properties,
              lifecycle = EXCLUDED.lifecycle,
              provenance = EXCLUDED.provenance,
-             extractor_version = EXCLUDED.extractor_version,
              confidence = EXCLUDED.confidence
+           WHERE atlas_hyperedges.relation_type IS NOT DISTINCT FROM EXCLUDED.relation_type
+             AND atlas_hyperedges.packet_key IS NOT DISTINCT FROM EXCLUDED.packet_key
+             AND atlas_hyperedges.workspace_revision IS NOT DISTINCT FROM EXCLUDED.workspace_revision
+             AND atlas_hyperedges.source_revision IS NOT DISTINCT FROM EXCLUDED.source_revision
+             AND atlas_hyperedges.graph_revision IS NOT DISTINCT FROM EXCLUDED.graph_revision
+             AND atlas_hyperedges.producer_revision IS NOT DISTINCT FROM EXCLUDED.producer_revision
+             AND atlas_hyperedges.evidence_hash IS NOT DISTINCT FROM EXCLUDED.evidence_hash
+             AND atlas_hyperedges.evidence_refs IS NOT DISTINCT FROM EXCLUDED.evidence_refs
+             AND atlas_hyperedges.checksum IS NOT DISTINCT FROM EXCLUDED.checksum
            RETURNING hyperedge_id`,
           [row.contractHyperedgeId, row.relationType, row.schemaId, row.schemaVersion,
             row.sourceRefKey, row.packetKey, row.workspaceRevision, row.sourceRevision,
@@ -69,7 +68,10 @@ export async function persistHyperedges(
         );
 
         const hyperedgeId = insertResult.rows[0]?.hyperedge_id;
-        if (!hyperedgeId) throw new Error(`KAG_HYPEREDGE_UPSERT_MISSING_ID:${row.contractHyperedgeId}`);
+        // The conflict update above only fires when every identity/revision field matches the stored
+        // row, so no returned id means the same contract id arrived with a different revision, checksum
+        // or evidence set. History is never overwritten in place; the edge is rolled back and reported.
+        if (!hyperedgeId) throw new Error(`KAG_HYPEREDGE_REVISION_CONFLICT:${row.contractHyperedgeId}`);
 
         for (const member of members) {
           await client.query(

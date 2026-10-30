@@ -101,6 +101,12 @@ export interface LegalStructureSection {
   children: LegalStructureSection[];
   /** Resolved section path from root */
   path: string[];
+  /**
+   * Text that follows the label on the heading line itself (Section/Subdivision only), e.g. the body of
+   * "Section 2. The monthly rent is due on the first day." The heading line is not part of `text`, so a short
+   * body would otherwise drop this content entirely.
+   */
+  inlineText?: string;
 }
 
 export interface LegalChunkerOptions {
@@ -183,10 +189,16 @@ export function chunkLegalDocument(fullText: string, opts?: LegalChunkerOptions)
   let globalChunkIndex = 0;
 
   for (const section of flatSections) {
-    if (section.text.trim().length < minLen) continue;
+    // A short body must not silently erase the clause: when the heading line itself carries text, keep it.
+    let sectionText = section.text;
+    if (sectionText.trim().length < minLen && section.inlineText) {
+      const combined = `${section.inlineText}\n${sectionText}`.trim();
+      if (combined.length >= minLen) sectionText = `${combined}\n`;
+    }
+    if (sectionText.trim().length < minLen) continue;
 
     const sectionChunks = chunkSectionText(
-      section.text,
+      sectionText,
       maxTokens,
       overlap,
       section.path,
@@ -245,6 +257,7 @@ export function parseSections(text: string): LegalStructureSection[] {
         endOffset: lineOffset,
         children: [],
         path: [],
+        ...(heading.inlineText ? { inlineText: heading.inlineText } : {}),
       };
 
       // Pop stack until we find a parent with lower level
@@ -279,13 +292,15 @@ export function parseSections(text: string): LegalStructureSection[] {
   return root;
 }
 
-function detectHeading(line: string): { level: number; fullHeading: string } | null {
+function detectHeading(line: string): { level: number; fullHeading: string; inlineText?: string } | null {
   if (!line || line.length > 200) return null; // Headings are short
 
   for (const { pattern, level } of HEADING_PATTERNS) {
     const match = line.match(pattern);
     if (match) {
-      return { level, fullHeading: line.trim() };
+      // Section (4) and Subdivision (5) patterns end in a free-text group that is often the clause body itself.
+      const inlineText = level >= 4 ? (match[match.length - 1] ?? '').trim() : '';
+      return { level, fullHeading: line.trim(), ...(inlineText ? { inlineText } : {}) };
     }
   }
 

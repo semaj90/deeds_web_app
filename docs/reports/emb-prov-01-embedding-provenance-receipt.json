@@ -1,6 +1,6 @@
 {
   "schema": "atlas.emb-prov-01-embedding-provenance-receipt.v1",
-  "generatedAt": "2026-10-03T22:34:29.809Z",
+  "generatedAt": "2026-10-30T01:15:30.678Z",
   "config": {
     "provider": "ollama",
     "baseUrl": "http://127.0.0.1:11434",

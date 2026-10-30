@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 export async function embedText(text: string): Promise<number[]> {
     // Try to use @xenova/transformers or transformers.js if available
     try {
@@ -11,18 +9,16 @@ export async function embedText(text: string): Promise<number[]> {
             const embeddings = await pipe(text);
             // Normalize to a flat number[] if nested
             const flat = Array.isArray(embeddings) ? embeddings.flat(Infinity).map(Number) : [];
-            return flat.slice(0, 768); // Usually 768 dims, previously code said 1536 but standard BERT/etc is 768. Safely usage.
+            if (flat.length !== 768 || !flat.every((value) => Number.isFinite(value))) {
+                throw new Error(`EVIDENCE_EMBEDDING_INVALID: expected 768 finite components, got ${flat.length}`);
+            }
+            return flat.slice(0, 768);
         }
     } catch (err) {
         // ignore and fall back
     }
 
-    // Fallback: deterministic pseudo-embedding via hash
-    const hash = crypto.createHash('sha256').update(text).digest();
-    const vec: number[] = [];
-    // Creating a 768-dim vector by repeating hash bytes
-    for (let i = 0; i < 768; i++) {
-        vec.push(hash[i % hash.length] / 255.0);
-    }
-    return vec;
+    // No pseudo-embedding fallback: a SHA-256-derived vector is not semantic and must never reach a
+    // persistence path (evidence_vectors, Qdrant evidence_items). Fail closed instead.
+    throw new Error('EVIDENCE_EMBEDDING_UNAVAILABLE: no qualified embedding producer; refusing pseudo-vector fallback');
 }
