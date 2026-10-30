@@ -384,6 +384,40 @@
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT column_name, data_type FROM information_schema.columns WHERE table_name='legal_documents' AND column_name='content_embedding';\""
     },
     {
+      "file": "manual/20261029_duplicate_index_consolidation_v2.sql",
+      "status": "active_candidate",
+      "reason": "Prepared PostgreSQL 18 concurrent drops for reviewed duplicate indexes only. V2 remains unapplied; it passed a disposable PostgreSQL 18.4 drop-and-recreate fixture rehearsal with row counts preserved.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261029_evidence_vectors_semantic_768.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-30 after explicit operator instruction (\"do the migration first, ddl\"): evidence_vectors (0 rows, was vector(384)) is now vector(768) with chunk_index/content/analysis_type/metadata/source_revision, NOT NULL + CHECK constraints (sha256 source_revision, chunk_index>=0, embedding_type=evidence_text_semantic_768, source_field=canonical_evidence_text), HNSW index and partial unique index (evidence_id, source_revision, chunk_index). Empty-table guard held (0 rows before and after). Rehearsed earlier on a disposable PostgreSQL 18 (an earlier revision of the file; the CHECK/NOT NULL additions were added later by another session and were not separately rehearsed).",
+      "appliedBy": "operator-approved, session 2026-10-30",
+      "appliedAt": "2026-10-30",
+      "requiresJournalEntry": false
+    },
+    {
+      "file": "manual/20261029_promotion_outbox_revision_dedupe_v1.sql",
+      "status": "active_candidate",
+      "reason": "Prepared PostgreSQL 18 source_revision column and concurrent partial-index replacement so pending promotion jobs deduplicate by exact source and content revisions. Not applied. Requires a coordinated pause/drain of all promotion enqueuers and workers, migration, matching application deployment, then resume; mixed old/new application instances are incompatible with the respective conflict targets.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "rollbackFile": "manual/20261029_promotion_outbox_revision_dedupe_v1.rollback.sql"
+    },
+    {
+      "file": "manual/20261029_atlas_stable_file_composite_primary_keys_v1.sql",
+      "status": "active_candidate",
+      "reason": "Unapplied PostgreSQL 18 proposal replacing the existing empty-relation composite UNIQUE constraints with semantically identical composite primary keys. Requires a disposable-database apply/readback/rollback rehearsal and operator approval; no production DDL is authorized.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "rollbackFile": "manual/20261029_atlas_stable_file_composite_primary_keys_v1.rollback.sql"
+    },
+    {
       "file": "20260516_hnsw_indexes.sql",
       "status": "manual_sidecar",
       "reason": "Applies HNSW indexes to core vector tables for performance. CONCURRENTLY IF NOT EXISTS safe for live data.",
@@ -899,12 +933,39 @@
     },
     {
       "file": "manual/20261020_atlas_packet_identity_registry_v1_DRAFT.sql",
-      "status": "planned_sidecar",
-      "reason": "DRAFT, NOT APPLIED. Separates canonical PacketKeyV2 logical identities and evidence-backed legacy aliases from physical atlas_packets rows and projection/cache metadata. No identities or aliases are seeded. Repository-scope mapping, source/workspace revision qualification, and identity writes remain separately gated.",
-      "appliedBy": null,
-      "appliedAt": null,
+      "status": "applied",
+      "reason": "Applied 2026-10-29 after explicit approval (file applied as drafted, one transaction): creates atlas_packet_identity_registry_v1 and atlas_packet_identity_aliases_v1, empty. Separates canonical PacketKeyV2 logical identities and evidence-backed legacy aliases from physical atlas_packets rows. Scope pinned to repo:root. No identities or aliases seeded; seeding, repository-scope widening, revision qualification and the 20261027 source-guard draft remain separately gated. Distinct from the older atlas_packet_identity_aliases table (3,294 rows, untouched).",
+      "appliedBy": "operator-approved, session 2026-10-29",
+      "appliedAt": "2026-10-29",
       "requiresJournalEntry": false,
       "validationCommand": "Run the packet-identity-registry-v1 Vitest suite and a disposable PostgreSQL 18 rollback rehearsal; do not apply to the live database without explicit operator authorization."
+    },
+    {
+      "file": "manual/20261029_atlas_todo_inverse_dag_v1.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-29 after explicit approval: creates atlas_todo_inverse_dag_v1, a derived non-canonical inverse-DAG registry (input set behind each to-do recommendation; INVERSE-DAG-LOWRANK-01 / LR-01). Additive: one table, two indexes, no FKs. Created empty; nothing backfilled. Rehearsed first in a ROLLBACK transaction (8 of 8 bad inserts rejected; rollback script refuses to drop a table holding rows).",
+      "appliedBy": "operator-approved, session 2026-10-29",
+      "appliedAt": "2026-10-29",
+      "requiresJournalEntry": false,
+      "validationCommand": "Readback after apply: 14 columns, 18 constraints incl. canonical_chk, 3 indexes (pkey, edge_uidx, input_idx), 0 rows, table comment present. Rollback: manual/20261029_atlas_todo_inverse_dag_v1.rollback.sql (refuses when rows exist)."
+    },
+    {
+      "file": "manual/20261027_atlas_graphify_scope_repository_map_v1_DRAFT.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-30 after explicit instruction (\"apply the two 20261027 drafts\"), scope map first then aliases source guard, one transaction (psql -1, ON_ERROR_STOP). Supplemental to the applied packet identity registry v1: creates atlas_graphify_scope_repository_map_v1 (membership_repository_scope PK, repository_id, source_authority_repo_id, mapping_kind ROOT_SCOPE|NESTED_REPOSITORY|LOGICAL_SUBSCOPE, evidence ref/digest), a guard trigger that checks the persisted atlas_repository_identity row, and adds the registry composite scope/repository FK. No mappings seeded. This is the contract the Drizzle model, packet-identity-registry-postgres-v1.ts and build-packet-key-v2-admission-manifest-v1.mts expect. A duplicate 20261030 draft was archived to docs/reports/archive/2026-10-30-superseded-drafts/. Readback: scope map + registry composite FK + both guard triggers present; scope map, registry and aliases_v1 all 0 rows. No mappings seeded.",
+      "appliedBy": "operator-approved, session 2026-10-30",
+      "appliedAt": "2026-10-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "BEGIN..ROLLBACK rehearsal only; do not apply to the live database without explicit operator authorization."
+    },
+    {
+      "file": "manual/20261027_atlas_packet_identity_registry_v1_source_guard_DRAFT.sql",
+      "status": "applied",
+      "reason": "Applied 2026-10-30 after explicit instruction (\"apply the two 20261027 drafts\"), scope map first then aliases source guard, one transaction (psql -1, ON_ERROR_STOP). Supplemental to the applied packet identity registry v1: adds atlas_packet_identity_aliases_v1_guard_fn and trigger trg_atlas_packet_identity_aliases_v1_guard so an alias can only bind a registry row to a storage packet with the identical source_ref, and aliases are immutable. Rehearsed 2026-10-30 in a rolled-back transaction together with the 20261027 scope-map draft (valid alias accepted; source mismatch, missing storage packet, missing registry row and UPDATE rejected). Readback: scope map + registry composite FK + both guard triggers present; scope map, registry and aliases_v1 all 0 rows. No mappings seeded.",
+      "appliedBy": "operator-approved, session 2026-10-30",
+      "appliedAt": "2026-10-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "BEGIN..ROLLBACK rehearsal only; do not apply to the live database without explicit operator authorization."
     }
   ]
 }

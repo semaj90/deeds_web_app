@@ -27,7 +27,15 @@ test('rejects absolute and parent-traversal paths', () => {
 
 test('rejects ignored paths and non-indexable files', () => {
   assert.throws(() => resolve('.tmp/atlas/symbol-toc-stale-chunk-dry-run-20261011.json'), /EXCLUDED/);
+  assert.throws(() => resolve('sveltekit-frontend/memory/runs/2026-10-29/run.json'), /EXCLUDED/);
   assert.throws(() => resolve('package.json'), /EXTENSION_UNSUPPORTED/);
+});
+
+test('skips the generated run-artifact tree without skipping source memory paths', () => {
+  assert.equal(shouldSkipDirectory('sveltekit-frontend/memory/runs'), true);
+  assert.equal(shouldSkipDirectory('sveltekit-frontend/memory/runs/2026-10-29/run.json'), true);
+  assert.equal(shouldSkipDirectory('sveltekit-frontend/src/lib/server/memory/runs.ts'), false);
+  assert.equal(shouldSkipDirectory('sveltekit-frontend/memory/atlas'), false);
 });
 
 test('rejects missing paths and directories', () => {

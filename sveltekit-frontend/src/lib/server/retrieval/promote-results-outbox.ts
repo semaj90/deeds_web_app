@@ -31,6 +31,7 @@ export interface PromotionJob {
   summary: string | null;
   operation: PromotionOperation;
   payload: Record<string, unknown>;
+  retry_count?: number;
 }
 
 export interface PromotionResult {
@@ -69,6 +70,21 @@ export async function recordPromotionIntent(
     }> = [];
 
     for (const packet of packets) {
+      const packetKey = packet.packet_key?.trim();
+      const sourceRef = packet.source_ref?.trim();
+      const sourceRevision = packet.source_revision?.trim();
+      const contentHash = packet.content_hash?.trim();
+      if (
+        !packetKey
+        || !sourceRef
+        || !contentHash
+        || !/^sha256:[0-9a-f]{64}$/i.test(contentHash)
+        || !sourceRevision
+        || !/^sha256:[0-9a-f]{64}$/i.test(sourceRevision)
+      ) {
+        continue;
+      }
+
       // Step 1: Enrich packet with semantic metadata (domain + title_id)
       const enriched = enrichPacketSemantics(packet);
 
@@ -80,9 +96,9 @@ export async function recordPromotionIntent(
 
       // Step 2: Enqueue summary promotion (now includes domain_class, title_id, title_generator_version)
       jobs.push({
-        packet_key: packet.packet_key,
-        source_ref: packet.source_ref,
-        content_hash: packet.content_hash || null,
+        packet_key: packetKey,
+        source_ref: sourceRef,
+        content_hash: contentHash,
         summary: packet.summary || null,
         operation: 'promote_summary',
         payload: {
@@ -100,15 +116,16 @@ export async function recordPromotionIntent(
           domain_classification: enriched._enrichment.domainClassification,
           domain_class_source: enriched._enrichment.domainClassSource,
           enrichment_valid: enriched._enrichmentValid,
+          source_revision: sourceRevision,
         },
       });
 
       // Step 4: Enqueue Qdrant promotion if vector reference exists
       if (packet.qdrant_point_id) {
         jobs.push({
-          packet_key: packet.packet_key,
-          source_ref: packet.source_ref,
-          content_hash: packet.content_hash || null,
+          packet_key: packetKey,
+          source_ref: sourceRef,
+          content_hash: contentHash,
           summary: packet.summary || null,
           operation: 'promote_qdrant',
           payload: {
@@ -119,23 +136,24 @@ export async function recordPromotionIntent(
             title_id: enriched._enrichment.titleId,
             domain_class: enriched._enrichment.domainClass,
             classifier_version: enriched._enrichment.classifierVersion,
+          source_revision: sourceRevision,
           },
         });
       }
     }
 
     // Batch insert all jobs in a single transaction
-    // Idempotency: ON CONFLICT (packet_key, source_ref, operation) prevents duplicate promotions
-    // with the same (packet_key, source_ref, operation) triple and title_generator_version
+    // Keep retries idempotent while allowing a new source or content revision to queue.
     if (jobs.length > 0) {
       const result = await db.execute(sql`
-        INSERT INTO promotion_outbox (packet_key, source_ref, content_hash, summary, operation, payload, status)
+        INSERT INTO promotion_outbox (packet_key, source_ref, content_hash, source_revision, summary, operation, payload, status)
         VALUES ${sql.join(
           jobs.map(
             job => sql`(
               ${job.packet_key},
               ${job.source_ref},
               ${job.content_hash},
+              ${job.payload.source_revision as string},
               ${job.summary},
               ${job.operation},
               ${JSON.stringify(job.payload)}::jsonb,
@@ -144,7 +162,9 @@ export async function recordPromotionIntent(
           ),
           sql`, `
         )}
-        ON CONFLICT (packet_key, source_ref, operation) WHERE status = 'pending' DO NOTHING
+        ON CONFLICT (packet_key, source_ref, operation, content_hash, source_revision)
+          WHERE status = 'pending' AND content_hash IS NOT NULL AND source_revision IS NOT NULL
+        DO NOTHING
       `);
       console.log(`Enqueued ${jobs.length} promotion jobs from ${packets.length} packets`);
       return jobs.length;
@@ -161,36 +181,74 @@ export async function recordPromotionIntent(
  * Stage 2: Dequeue and process promotion jobs
  * Called by background worker to process pending outbox jobs
  */
-export async function dequeuePromotionJobs(batchSize: number = 10): Promise<PromotionJob[]> {
-  try {
-    const result = await db.execute(sql`
-      SELECT
-        id,
-        packet_key,
-        source_ref,
-        content_hash,
-        summary,
-        operation,
-        payload
+/**
+ * Claim and mark in ONE statement. The pooled client runs each db.execute in its own
+ * autocommit transaction, so a separate SELECT ... FOR UPDATE SKIP LOCKED released its row
+ * locks before the status UPDATE and two workers could claim the same pending rows.
+ */
+export function buildPromotionClaimQuery(batchSize: number) {
+  if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 100) {
+    throw new RangeError('Promotion batch size must be an integer between 1 and 100');
+  }
+
+  return sql`
+    UPDATE promotion_outbox
+    SET status = 'processing', started_at = NOW()
+    WHERE id IN (
+      SELECT id
       FROM promotion_outbox
       WHERE status = 'pending'
       ORDER BY created_at ASC
       LIMIT ${batchSize}
       FOR UPDATE SKIP LOCKED
-    `);
+    )
+    RETURNING id, packet_key, source_ref, content_hash, summary, operation, payload, retry_count, created_at
+  `;
+}
 
-    // Mark as processing
-    await db.execute(sql`
-      UPDATE promotion_outbox
-      SET status = 'processing', started_at = NOW()
-      WHERE id IN (${sql.join(result.rows.map((r: any) => sql`${r.id}`), sql`, `)})
-    `);
+export async function dequeuePromotionJobs(batchSize: number = 10): Promise<PromotionJob[]> {
+  try {
+    const result = await db.execute(buildPromotionClaimQuery(batchSize));
 
-    return result.rows as unknown as PromotionJob[];
+    // RETURNING order is unspecified; restore oldest-first.
+    const claimed = [...(result.rows as Array<Record<string, unknown>>)].sort(
+      (a, b) => new Date(String(a.created_at)).getTime() - new Date(String(b.created_at)).getTime()
+    );
+    return claimed.map(({ created_at: _createdAt, ...job }) => job) as unknown as PromotionJob[];
   } catch (error) {
+    // A failed claim is a queue failure, not an empty queue: surface it to the caller.
     console.error('Failed to dequeue promotion jobs:', error);
-    return [];
+    throw error;
   }
+}
+
+export interface PromotionQueueMetrics {
+  claimed: number;
+  promoted: number;
+  /** success=true results that matched no canonical row at the exact revisions (marked completed). */
+  stale_noop: number;
+  failed: number;
+  /** Claimed attempts whose outbox row had already failed at least once. */
+  retried: number;
+}
+
+/**
+ * Separates real promotions from stale no-ops, which also report success=true.
+ * Retry accounting lives in mark_promotion_completed (retry_count < max_retries requeues), so
+ * "retried" is read from promotion_outbox.retry_count, not derived here.
+ */
+export function summarizePromotionResults(
+  claimed: number,
+  results: readonly PromotionResult[],
+  retried = 0
+): PromotionQueueMetrics {
+  const metrics: PromotionQueueMetrics = { claimed, promoted: 0, stale_noop: 0, failed: 0, retried };
+  for (const result of results) {
+    if (!result.success) metrics.failed += 1;
+    else if (result.stages_completed.some((stage) => stage.endsWith('_stale_revision_skipped'))) metrics.stale_noop += 1;
+    else metrics.promoted += 1;
+  }
+  return metrics;
 }
 
 /**
@@ -227,8 +285,8 @@ export async function executePromotionJob(job: PromotionJob): Promise<PromotionR
 
 /**
  * Substage: Promote summary to atlas_packets in Postgres
- * Uses INSERT ... ON CONFLICT for single-query atomicity (eliminates double-query antipattern)
- * Includes semantic enrichment fields: domain_class, title_id, title_generator_version
+ * Updates only an existing canonical packet row at the exact source/content revision.
+ * Includes semantic enrichment fields: domain_class, title_id, title_generator_version.
  */
 async function promoteSummary(
   job: PromotionJob,
@@ -236,30 +294,38 @@ async function promoteSummary(
   stagesFailed: string[]
 ): Promise<PromotionResult> {
   try {
-    // Single atomic query: insert or update summary + enrichment fields
-    await db.execute(sql`
-      INSERT INTO atlas_packets (
-        packet_key, source_ref, summary,
-        domain_class, title_id, title_generator_version,
-        updated_at
-      )
-      VALUES (
-        ${job.packet_key},
-        ${job.source_ref},
-        ${job.summary},
-        ${(job.payload.domain_class as string) || null},
-        ${(job.payload.title_id as string) || null},
-        ${(job.payload.title_generator_version as string) || null},
-        NOW()
-      )
-      ON CONFLICT (packet_key) DO UPDATE
-      SET
-        summary = EXCLUDED.summary,
-        domain_class = EXCLUDED.domain_class,
-        title_id = EXCLUDED.title_id,
-        title_generator_version = EXCLUDED.title_generator_version,
-        updated_at = NOW()
-    `);
+    const sourceRevision = job.payload.source_revision;
+    if (
+      typeof sourceRevision !== 'string'
+      || !/^sha256:[0-9a-f]{64}$/i.test(sourceRevision)
+      || typeof job.content_hash !== 'string'
+      || !/^sha256:[0-9a-f]{64}$/i.test(job.content_hash)
+    ) {
+      stagesFailed.push('postgres_summary: revision_identity_missing_or_invalid');
+      return {
+        job_id: job.id,
+        success: false,
+        operation: job.operation,
+        message: 'Summary promotion refused without a SHA-256 source revision',
+        stages_completed: stagesCompleted,
+        stages_failed: stagesFailed,
+      };
+    }
+
+    const result = await db.execute(buildPromotionSummaryQuery(job, sourceRevision));
+
+    if (result.rows.length === 0) {
+      stagesCompleted.push('postgres_summary_stale_revision_skipped');
+      return {
+        job_id: job.id,
+        success: true,
+        operation: job.operation,
+        message: 'Stale summary job skipped; no canonical packet matched the exact source and content revisions',
+        stages_completed: stagesCompleted,
+        stages_failed: stagesFailed,
+      };
+    }
+
     stagesCompleted.push('postgres_summary_upsert');
 
     return {
@@ -276,6 +342,23 @@ async function promoteSummary(
   }
 }
 
+export function buildPromotionSummaryQuery(job: PromotionJob, sourceRevision: string) {
+  return sql`
+      UPDATE atlas_packets
+      SET
+        summary = ${job.summary},
+        domain_class = ${(job.payload.domain_class as string) || null},
+        title_id = ${(job.payload.title_id as string) || null},
+        title_generator_version = ${(job.payload.title_generator_version as string) || null},
+        updated_at = NOW()
+      WHERE packet_key = ${job.packet_key}
+        AND source_ref = ${job.source_ref}
+        AND content_hash = ${job.content_hash}
+        AND source_revision = ${sourceRevision}
+      RETURNING packet_id
+    `;
+}
+
 /**
  * Substage: Promote to Qdrant (vector sync)
  * Updates Qdrant point payload with latest summary/metadata from Postgres.
@@ -288,6 +371,71 @@ async function promoteQdrant(
   stagesFailed: string[]
 ): Promise<PromotionResult> {
   try {
+    const sourceRevision = job.payload.source_revision;
+    if (
+      typeof sourceRevision !== 'string'
+      || !/^sha256:[0-9a-f]{64}$/i.test(sourceRevision)
+      || typeof job.content_hash !== 'string'
+      || !/^sha256:[0-9a-f]{64}$/i.test(job.content_hash)
+    ) {
+      stagesFailed.push('qdrant_payload_update: revision_identity_missing_or_invalid');
+      return {
+        job_id: job.id,
+        success: false,
+        operation: job.operation,
+        message: 'Qdrant promotion refused without valid source and content revisions',
+        stages_completed: stagesCompleted,
+        stages_failed: stagesFailed,
+      };
+    }
+
+    const canonicalResult = await db.execute(sql`
+      SELECT packet_id, summary
+      FROM atlas_packets
+      WHERE packet_key = ${job.packet_key}
+        AND source_ref = ${job.source_ref}
+        AND content_hash = ${job.content_hash}
+        AND source_revision = ${sourceRevision}
+      LIMIT 1
+    `);
+
+    if (canonicalResult.rows.length === 0) {
+      stagesCompleted.push('qdrant_payload_stale_revision_skipped');
+      return {
+        job_id: job.id,
+        success: true,
+        operation: job.operation,
+        message: 'Stale Qdrant job skipped; no canonical packet matched the exact source and content revisions',
+        stages_completed: stagesCompleted,
+        stages_failed: stagesFailed,
+      };
+    }
+
+    const canonicalRow = canonicalResult.rows[0];
+    if (typeof canonicalRow !== 'object' || canonicalRow === null || !('summary' in canonicalRow)) {
+      stagesFailed.push('qdrant_payload_update: canonical_summary_readback_invalid');
+      return {
+        job_id: job.id,
+        success: false,
+        operation: job.operation,
+        message: 'Qdrant mirror deferred because the canonical PostgreSQL summary readback was malformed',
+        stages_completed: stagesCompleted,
+        stages_failed: stagesFailed,
+      };
+    }
+
+    if (canonicalRow.summary !== job.summary) {
+      stagesFailed.push('qdrant_payload_update: postgres_summary_not_yet_current');
+      return {
+        job_id: job.id,
+        success: false,
+        operation: job.operation,
+        message: 'Qdrant mirror deferred until the canonical PostgreSQL summary matches',
+        stages_completed: stagesCompleted,
+        stages_failed: stagesFailed,
+      };
+    }
+
     if (!job.payload.qdrant_point_id) {
       console.warn(
         `[promotion-worker] Qdrant point id missing for ${job.packet_key}; falling back to packet_key lookup`,
@@ -295,6 +443,8 @@ async function promoteQdrant(
     }
     const syncResult = await syncSummaryPayloadToQdrant({
       packetKey: job.packet_key,
+      sourceRevision,
+      contentHash: job.content_hash,
       qdrantPointId: (job.payload.qdrant_point_id as string | null) ?? null,
       payload: {
         source_ref: job.source_ref,
@@ -481,6 +631,10 @@ export async function processPromotionQueue(batchSize: number = 10): Promise<Pro
       await markPromotionJobComplete(job.id, false, String(error));
     }
   }
+
+  const retried = jobs.filter((job) => (job.retry_count ?? 0) > 0).length;
+  const metrics = summarizePromotionResults(jobs.length, results, retried);
+  console.log(`[promotion-worker] claimed=${metrics.claimed} promoted=${metrics.promoted} stale_noop=${metrics.stale_noop} failed=${metrics.failed} retried=${metrics.retried}`);
 
   return results;
 }

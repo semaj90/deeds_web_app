@@ -123,7 +123,7 @@ export function encodeRecommendationGlyph(
 	bytes[0] = ((topicId & 0x0f) << 4) | (confidenceBucket(doc.score) & 0x0f);
 
 	// Bytes 1-5: Individual signal scores (quantized 0-255)
-	bytes[1] = quantizeScore(signals.vectorSimilarity);
+	bytes[1] = quantizeScore(signals.retrievalRelevance);
 	bytes[2] = quantizeScore(signals.tagOverlap);
 	bytes[3] = quantizeScore(signals.topicAffinity);
 	bytes[4] = quantizeScore(signals.graphCentrality);

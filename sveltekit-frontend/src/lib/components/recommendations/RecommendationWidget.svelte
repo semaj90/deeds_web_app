@@ -37,7 +37,7 @@
 		title: string;
 		score: number;
 		signals: {
-			vectorSimilarity: number;
+			retrievalRelevance: number;
 			tagOverlap: number;
 			topicAffinity: number;
 			graphCentrality: number;
@@ -283,7 +283,7 @@
 
 	function getSignalLabel(key: string): string {
 		const labels: Record<string, string> = {
-			vectorSimilarity: 'Vector',
+			retrievalRelevance: 'Retrieval',
 			tagOverlap: 'Tags',
 			topicAffinity: 'Topic',
 			graphCentrality: 'Graph',

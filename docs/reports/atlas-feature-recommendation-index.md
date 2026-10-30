@@ -1,9 +1,9 @@
 # Atlas Feature Recommendation Index
 
-Generated: 2026-08-09T17:07:06.002Z
+Generated: 2026-10-29T16:45:38.930Z
 Mode: dry-run
-Batch: limit=100 offset=0
-Rows: 100
+Batch: limit=500 offset=0
+Rows: 500
 
 ## Top Features
 

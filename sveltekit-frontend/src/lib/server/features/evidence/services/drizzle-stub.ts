@@ -2,6 +2,11 @@ import { db } from '$lib/server/db/client';
 import { evidenceVectors } from '$lib/server/db/schema-postgres.js';
 import { eq, and, sql } from 'drizzle-orm';
 import { pgRows } from '$lib/server/db/client';
+import { validateEvidenceEmbeddingV1 } from '$lib/server/evidence-indexing-receipt-v1.js';
+import {
+  assertEvidenceEmbeddingAdmitted,
+  type EvidenceEmbeddingProvenance,
+} from '$lib/server/evidence/evidence-embedding-contract.js';
 
 /**
  * Upsert an embedding vector for a given evidence item into the evidence_vectors table.
@@ -16,6 +21,21 @@ export async function upsertEmbedding(
   vector: number[],
   meta: Record<string, any>
 ): Promise<void> {
+  if (validateEvidenceEmbeddingV1(vector) !== 'valid') {
+    throw new Error('evidence_vectors accepts only finite 768-dimensional embeddings');
+  }
+  const content = typeof meta.content === 'string' ? meta.content : '';
+  const sourceRevision = typeof meta.sourceRevision === 'string' ? meta.sourceRevision : '';
+  const chunkIndex = Number.isInteger(meta.chunkIndex) ? Number(meta.chunkIndex) : -1;
+  const provenance = (meta.provenance ?? null) as EvidenceEmbeddingProvenance | null;
+  const admission = assertEvidenceEmbeddingAdmitted({
+    evidenceId,
+    sourceRevision,
+    chunkIndex,
+    content,
+    vector,
+    provenance,
+  });
   const model = (meta.model as string) || 'embeddinggemma';
 
   try {
@@ -23,20 +43,37 @@ export async function upsertEmbedding(
     const existing = await db
       .select({ id: evidenceVectors.id })
       .from(evidenceVectors)
-      .where(and(eq(evidenceVectors.evidenceId, evidenceId), eq(evidenceVectors.model, model)))
+      .where(and(
+        eq(evidenceVectors.evidenceId, evidenceId),
+        eq(evidenceVectors.chunkIndex, chunkIndex),
+        eq(evidenceVectors.sourceRevision, sourceRevision),
+        eq(evidenceVectors.model, model),
+      ))
       .limit(1);
 
     if (existing.length > 0) {
       // Update existing vector
       await db
         .update(evidenceVectors)
-        .set({ vector })
+        .set({
+          embedding: vector,
+          content,
+          chunkIndex,
+          sourceRevision,
+          embeddingType: admission.embeddingType,
+          sourceField: admission.sourceField,
+        })
         .where(eq(evidenceVectors.id, existing[0].id));
     } else {
       // Insert new vector
       await db.insert(evidenceVectors).values({
         evidenceId,
-        vector,
+        chunkIndex,
+        content,
+        embedding: vector,
+        sourceRevision,
+        embeddingType: admission.embeddingType,
+        sourceField: admission.sourceField,
         model,
       });
     }
@@ -59,7 +96,7 @@ export async function getEmbedding(
 ): Promise<number[] | null> {
   try {
     const result = await db
-      .select({ vector: evidenceVectors.vector })
+      .select({ vector: evidenceVectors.embedding })
       .from(evidenceVectors)
       .where(and(eq(evidenceVectors.evidenceId, evidenceId), eq(evidenceVectors.model, model)))
       .limit(1);
@@ -84,13 +121,16 @@ export async function findSimilar(
   limit = 10,
   model = 'embeddinggemma'
 ): Promise<Array<{ evidenceId: string; distance: number }>> {
+  if (validateEvidenceEmbeddingV1(queryVector) !== 'valid') {
+    throw new Error('evidence vector search requires a finite 768-dimensional query');
+  }
   try {
     const vectorStr = `[${queryVector.join(',')}]`;
     const result = await db.execute(
-      sql`SELECT evidence_id, vector <=> ${vectorStr}::vector AS distance
+      sql`SELECT evidence_id, embedding <=> ${vectorStr}::vector AS distance
 				FROM evidence_vectors
-				WHERE model = ${model}
-				ORDER BY vector <=> ${vectorStr}::vector
+				WHERE model = ${model} AND embedding IS NOT NULL
+				ORDER BY embedding <=> ${vectorStr}::vector
 				LIMIT ${limit}`
     );
 

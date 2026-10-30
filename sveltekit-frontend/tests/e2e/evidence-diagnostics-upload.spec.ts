@@ -1,20 +1,35 @@
 import { expect, test, type Page } from '@playwright/test';
 import pg from 'pg';
 
-// Port 5434 = deeds-postgres-prod-proxy → legal-ai-postgres container.
-// Port 5432 on the host is squatted by a native Windows Postgres with a different schema.
-// Always route through 5434 unless DATABASE_URL explicitly overrides.
-const DB_URL =
-	process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DB_URL = process.env.EVIDENCE_UPLOAD_E2E_DATABASE_URL;
+if (DB_URL) {
+	const parsed = new URL(DB_URL);
+	const databaseName = decodeURIComponent(parsed.pathname.replace(/^\//, ''));
+	if (
+		!['postgres:', 'postgresql:'].includes(parsed.protocol)
+		|| !['127.0.0.1', 'localhost', '[::1]'].includes(parsed.hostname)
+		|| !parsed.port
+		|| ['5432', '5434'].includes(parsed.port)
+		|| !/(^|[-_])(scratch|disposable)([-_]|$)/i.test(databaseName)
+	) {
+		throw new Error('Evidence upload Playwright tests require a loopback disposable/test database URL');
+	}
+}
 const DEV_USER_ID = '00000000-0000-0000-0000-000000000001';
 // evidence.uploaded_by is integer (FK to users.id), distinct from evidence.user_id (uuid).
 // The seeded dev/bypass user has integer id=1; UUID DEV_USER_ID is for the user_id column only.
 const DEV_USER_INT_ID = 1;
-const pool = new pg.Pool({ connectionString: DB_URL });
+let pool: pg.Pool | undefined;
 const cleanupEvidenceIds = new Set<string>();
 
+function getPool(): pg.Pool {
+	if (!DB_URL) throw new Error('EVIDENCE_UPLOAD_E2E_DATABASE_URL is required');
+	pool ??= new pg.Pool({ connectionString: DB_URL });
+	return pool;
+}
+
 async function loadSeededCaseId(): Promise<string> {
-	const result = await pool.query<{ id: string }>(
+	const result = await getPool().query<{ id: string }>(
 		"SELECT id FROM cases WHERE title LIKE '[PW-TEST]%' ORDER BY created_at ASC LIMIT 1"
 	);
 
@@ -66,7 +81,7 @@ async function insertEvidenceWithDiagnostics(
 		},
 	};
 
-	const result = await pool.query<{ id: string }>(
+	const result = await getPool().query<{ id: string }>(
 		`INSERT INTO evidence (
 			case_id,
 			evidence_number,
@@ -138,16 +153,18 @@ async function insertEvidenceWithDiagnostics(
 	return evidenceId;
 }
 
-test.describe('Evidence diagnostics upload flow', () => {
+const describeDisposable = DB_URL ? test.describe : test.describe.skip;
+
+describeDisposable('Evidence diagnostics upload flow', () => {
 	test.afterEach(async () => {
 		for (const evidenceId of cleanupEvidenceIds) {
-			await pool.query('DELETE FROM evidence WHERE id = $1', [evidenceId]).catch(() => {});
+			await getPool().query('DELETE FROM evidence WHERE id = $1', [evidenceId]).catch(() => {});
 		}
 		cleanupEvidenceIds.clear();
 	});
 
 	test.afterAll(async () => {
-		await pool.end();
+		await pool?.end();
 	});
 
 	test('uploads evidence from the live UI and shows diagnostics in the detail modal', async ({

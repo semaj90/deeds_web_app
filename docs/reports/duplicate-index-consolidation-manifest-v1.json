@@ -1,0 +1,708 @@
+{
+ "schema": "atlas.index-consolidation-manifest.v1",
+ "state": "PREPARED_NOT_APPLIED",
+ "generatedAt": "2026-10-29",
+ "statsResetAt": null,
+ "note": "scan counts are not reliable (stats_reset unknown); classification does not use them",
+ "candidates": [
+  {
+   "table": "agent_observations",
+   "method": "hnsw",
+   "keep": "idx_agent_observations_hnsw",
+   "drop": "idx_agent_observations_hnsw_768",
+   "class": "PROTECTED",
+   "why": [
+    "vector index: never removed in this pass"
+   ],
+   "bytes": 16384,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_agent_observations_hnsw_768 ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')",
+   "keeperDefinition": "CREATE INDEX idx_agent_observations_hnsw ON public.agent_observations USING hnsw (hnsw_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')",
+   "manualSqlRefs": 0,
+   "lockImplication": "n/a",
+   "estimatedSavingsBytes": 16384,
+   "rationale": "vector index: never removed in this pass"
+  },
+  {
+   "table": "atlas_packet_features",
+   "method": "btree",
+   "keep": "idx_ast_packet_key",
+   "drop": "idx_atlas_packet_features_packet_key",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 4956160,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_packet_features_packet_key ON public.atlas_packet_features USING btree (packet_key)",
+   "keeperDefinition": "CREATE INDEX idx_ast_packet_key ON public.atlas_packet_features USING btree (packet_key)",
+   "manualSqlRefs": 1,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 4956160,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "btree",
+   "keep": "idx_atlas_packets_source_ref_idx",
+   "drop": "idx_atlas_packets_source_ref",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 12386304,
+   "scansDropped": 0,
+   "scansKept": 4,
+   "definition": "CREATE INDEX idx_atlas_packets_source_ref ON public.atlas_packets USING btree (source_ref)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_source_ref_idx ON public.atlas_packets USING btree (source_ref)",
+   "manualSqlRefs": 4,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 12386304,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "gin",
+   "keep": "idx_atlas_packets_payload_gin_pathops",
+   "drop": "idx_atlas_packets_payload_path",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 17866752,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_packets_payload_path ON public.atlas_packets USING gin (payload jsonb_path_ops)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_payload_gin_pathops ON public.atlas_packets USING gin (payload jsonb_path_ops)",
+   "manualSqlRefs": 2,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 17866752,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "btree",
+   "keep": "idx_atlas_packets_domain_class",
+   "drop": "idx_atlas_packets_domain_class_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 2228224,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_packets_domain_class_idx ON public.atlas_packets USING btree (domain_class)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_domain_class ON public.atlas_packets USING btree (domain_class)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 2228224,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "btree",
+   "keep": "idx_packets_source_feature_multi_hop",
+   "drop": "idx_atlas_packets_source_feature",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 16850944,
+   "scansDropped": 0,
+   "scansKept": 1,
+   "definition": "CREATE INDEX idx_atlas_packets_source_feature ON public.atlas_packets USING btree (source_ref, feature_id)",
+   "keeperDefinition": "CREATE INDEX idx_packets_source_feature_multi_hop ON public.atlas_packets USING btree (source_ref, feature_id)",
+   "manualSqlRefs": 1,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 16850944,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "gin",
+   "keep": "idx_atlas_packets_tags",
+   "drop": "idx_atlas_packets_tags_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 3153920,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_packets_tags_gin ON public.atlas_packets USING gin (tags)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_tags ON public.atlas_packets USING gin (tags)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 3153920,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "gin",
+   "keep": "atlas_packets_metadata_gin_idx",
+   "drop": "idx_atlas_packets_metadata_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 167845888,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_packets_metadata_gin ON public.atlas_packets USING gin (metadata)",
+   "keeperDefinition": "CREATE INDEX atlas_packets_metadata_gin_idx ON public.atlas_packets USING gin (metadata)",
+   "manualSqlRefs": 2,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 167845888,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "btree",
+   "keep": "idx_atlas_packets_community_id",
+   "drop": "idx_atlas_packets_community_id_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 2449408,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_packets_community_id_idx ON public.atlas_packets USING btree (community_id)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_community_id ON public.atlas_packets USING btree (community_id)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 2449408,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "btree",
+   "keep": "idx_atlas_packets_packet_key_idx",
+   "drop": "idx_atlas_packets_packet_key",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 5283840,
+   "scansDropped": 0,
+   "scansKept": 15,
+   "definition": "CREATE INDEX idx_atlas_packets_packet_key ON public.atlas_packets USING btree (packet_key)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_packet_key_idx ON public.atlas_packets USING btree (packet_key)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 5283840,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "btree",
+   "keep": "idx_atlas_packets_som_index",
+   "drop": "idx_atlas_packets_som_index_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 2244608,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_packets_som_index_idx ON public.atlas_packets USING btree (som_index)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_som_index ON public.atlas_packets USING btree (som_index)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 2244608,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_packets",
+   "method": "btree",
+   "keep": "idx_atlas_packets_feature_id_idx",
+   "drop": "idx_atlas_packets_feature_id",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 5439488,
+   "scansDropped": 0,
+   "scansKept": 1,
+   "definition": "CREATE INDEX idx_atlas_packets_feature_id ON public.atlas_packets USING btree (feature_id)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_packets_feature_id_idx ON public.atlas_packets USING btree (feature_id)",
+   "manualSqlRefs": 5,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 5439488,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "atlas_projection_outbox",
+   "method": "btree",
+   "keep": "atlas_projection_outbox_aggregate_idx",
+   "drop": "idx_atlas_projection_outbox_aggregate",
+   "class": "EXACT_DUPLICATE_CANDIDATE",
+   "why": [],
+   "bytes": 16384,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_atlas_projection_outbox_aggregate ON public.atlas_projection_outbox USING btree (aggregate_type, aggregate_id)",
+   "keeperDefinition": "CREATE INDEX atlas_projection_outbox_aggregate_idx ON public.atlas_projection_outbox USING btree (aggregate_type, aggregate_id)",
+   "manualSqlRefs": 2,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 16384,
+   "rationale": "catalog-identical to keeper; no constraint/partition dependency"
+  },
+  {
+   "table": "atlas_summary_layers",
+   "method": "btree",
+   "keep": "idx_atlas_summary_layers_packet_key",
+   "drop": "idx_summary_layers_packet_key",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 1097728,
+   "scansDropped": 0,
+   "scansKept": 3,
+   "definition": "CREATE INDEX idx_summary_layers_packet_key ON public.atlas_summary_layers USING btree (packet_key)",
+   "keeperDefinition": "CREATE INDEX idx_atlas_summary_layers_packet_key ON public.atlas_summary_layers USING btree (packet_key)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 1097728,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "cluster_cards",
+   "method": "btree",
+   "keep": "cluster_cards_centroid_dim",
+   "drop": "cluster_cards_centroid_dim_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 65536,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX cluster_cards_centroid_dim_idx ON public.cluster_cards USING btree (centroid_dim)",
+   "keeperDefinition": "CREATE INDEX cluster_cards_centroid_dim ON public.cluster_cards USING btree (centroid_dim)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 65536,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "cluster_summaries",
+   "method": "gin",
+   "keep": "cluster_summaries_tags_gin",
+   "drop": "idx_cluster_summaries_tags_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 16384,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_cluster_summaries_tags_gin ON public.cluster_summaries USING gin (tags)",
+   "keeperDefinition": "CREATE INDEX cluster_summaries_tags_gin ON public.cluster_summaries USING gin (tags)",
+   "manualSqlRefs": 2,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 16384,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "code_features",
+   "method": "btree",
+   "keep": "idx_code_features_page_rank",
+   "drop": "idx_code_features_page_rank_score",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 106496,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_code_features_page_rank_score ON public.code_features USING btree (page_rank_score DESC)",
+   "keeperDefinition": "CREATE INDEX idx_code_features_page_rank ON public.code_features USING btree (page_rank_score DESC)",
+   "manualSqlRefs": 1,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 106496,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "codebase_chunk_index",
+   "method": "gin",
+   "keep": "codebase_chunk_index_semantic_tags_gin",
+   "drop": "idx_codebase_chunk_semantic_tags_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 2523136,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_codebase_chunk_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)",
+   "keeperDefinition": "CREATE INDEX codebase_chunk_index_semantic_tags_gin ON public.codebase_chunk_index USING gin (semantic_tags)",
+   "manualSqlRefs": 2,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 2523136,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "codebase_chunk_index",
+   "method": "gin",
+   "keep": "codebase_chunk_index_metadata_gin",
+   "drop": "idx_codebase_chunk_metadata_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 40747008,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_codebase_chunk_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)",
+   "keeperDefinition": "CREATE INDEX codebase_chunk_index_metadata_gin ON public.codebase_chunk_index USING gin (metadata jsonb_path_ops)",
+   "manualSqlRefs": 2,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 40747008,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "feature_packet_bindings",
+   "method": "btree",
+   "keep": "feature_packet_bindings_source_idx",
+   "drop": "feature_packet_bindings_source_ref_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 8192,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX feature_packet_bindings_source_ref_idx ON public.feature_packet_bindings USING btree (source_ref)",
+   "keeperDefinition": "CREATE INDEX feature_packet_bindings_source_idx ON public.feature_packet_bindings USING btree (source_ref)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 8192,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "feature_packet_bindings",
+   "method": "btree",
+   "keep": "feature_packet_bindings_packet_idx",
+   "drop": "feature_packet_bindings_packet_key_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 8192,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX feature_packet_bindings_packet_key_idx ON public.feature_packet_bindings USING btree (packet_key)",
+   "keeperDefinition": "CREATE INDEX feature_packet_bindings_packet_idx ON public.feature_packet_bindings USING btree (packet_key)",
+   "manualSqlRefs": 0,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 8192,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "graph_communities",
+   "method": "btree",
+   "keep": "graph_communities_pkey",
+   "drop": "graph_communities_unique_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "unique index; keeper enforces same key but constraint semantics need owner review"
+   ],
+   "bytes": 54722560,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE UNIQUE INDEX graph_communities_unique_idx ON public.graph_communities USING btree (run_id, algorithm, community_id)",
+   "keeperDefinition": "CREATE UNIQUE INDEX graph_communities_pkey ON public.graph_communities USING btree (run_id, algorithm, community_id)",
+   "manualSqlRefs": 1,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 54722560,
+   "rationale": "unique index; keeper enforces same key but constraint semantics need owner review"
+  },
+  {
+   "table": "graphify_files",
+   "method": "btree",
+   "keep": "graphify_files_code_source_revision_compat_v1",
+   "drop": "graphify_files_code_source_revision_idx_v2",
+   "class": "EXACT_DUPLICATE_CANDIDATE",
+   "why": [],
+   "bytes": 3645440,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX graphify_files_code_source_revision_idx_v2 ON public.graphify_files USING btree (code_source_revision) WHERE (code_source_revision IS NOT NULL)",
+   "keeperDefinition": "CREATE INDEX graphify_files_code_source_revision_compat_v1 ON public.graphify_files USING btree (code_source_revision) WHERE (code_source_revision IS NOT NULL)",
+   "manualSqlRefs": 1,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 3645440,
+   "rationale": "catalog-identical to keeper; no constraint/partition dependency"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "gin",
+   "keep": "idx_nes_chrom_packets_feature_ids_gin",
+   "drop": "nes_chrom_packets_feature_ids_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 32768,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_feature_ids_gin ON public.nes_chrom_packets USING gin (feature_ids)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_feature_ids_gin ON public.nes_chrom_packets USING gin (feature_ids)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 32768,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "gin",
+   "keep": "idx_nes_chrom_packets_metadata_gin",
+   "drop": "nes_chrom_packets_metadata_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 1851392,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_metadata_gin ON public.nes_chrom_packets USING gin (metadata)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_metadata_gin ON public.nes_chrom_packets USING gin (metadata)",
+   "manualSqlRefs": 4,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 1851392,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "btree",
+   "keep": "idx_nes_chrom_packets_feature_id",
+   "drop": "idx_nes_chrom_packets_feature_id_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 155648,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_nes_chrom_packets_feature_id_idx ON public.nes_chrom_packets USING btree (feature_id)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_feature_id ON public.nes_chrom_packets USING btree (feature_id)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 155648,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "btree",
+   "keep": "idx_nes_chrom_packets_feature_id",
+   "drop": "nes_chrom_packets_feature_id_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 155648,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_feature_id_idx ON public.nes_chrom_packets USING btree (feature_id)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_feature_id ON public.nes_chrom_packets USING btree (feature_id)",
+   "manualSqlRefs": 4,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 155648,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "gin",
+   "keep": "idx_nes_chrom_packets_lane_ids_gin",
+   "drop": "nes_chrom_packets_lane_ids_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 32768,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_lane_ids_gin ON public.nes_chrom_packets USING gin (lane_ids)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_lane_ids_gin ON public.nes_chrom_packets USING gin (lane_ids)",
+   "manualSqlRefs": 4,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 32768,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "btree",
+   "keep": "idx_nes_chrom_packets_source_ref",
+   "drop": "idx_nes_chrom_packets_source_ref_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 172032,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_nes_chrom_packets_source_ref_idx ON public.nes_chrom_packets USING btree (source_ref)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_source_ref ON public.nes_chrom_packets USING btree (source_ref)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 172032,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "btree",
+   "keep": "idx_nes_chrom_packets_source_ref",
+   "drop": "nes_chrom_packets_source_ref_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 172032,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_source_ref_idx ON public.nes_chrom_packets USING btree (source_ref)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_source_ref ON public.nes_chrom_packets USING btree (source_ref)",
+   "manualSqlRefs": 4,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 172032,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "gin",
+   "keep": "idx_nes_chrom_packets_tags_gin",
+   "drop": "nes_chrom_packets_tags_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 32768,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_tags_gin ON public.nes_chrom_packets USING gin (tags)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_tags_gin ON public.nes_chrom_packets USING gin (tags)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 32768,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "btree",
+   "keep": "idx_nes_chrom_packets_kmeans_cluster_idx",
+   "drop": "nes_chrom_packets_kmeans_cluster_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 32768,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_kmeans_cluster_idx ON public.nes_chrom_packets USING btree (kmeans_cluster)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_kmeans_cluster_idx ON public.nes_chrom_packets USING btree (kmeans_cluster)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 32768,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "nes_chrom_packets",
+   "method": "btree",
+   "keep": "idx_nes_chrom_packets_som_index_idx",
+   "drop": "nes_chrom_packets_som_index_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 32768,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX nes_chrom_packets_som_index_idx ON public.nes_chrom_packets USING btree (som_index)",
+   "keeperDefinition": "CREATE INDEX idx_nes_chrom_packets_som_index_idx ON public.nes_chrom_packets USING btree (som_index)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 32768,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "rag_query_log",
+   "method": "btree",
+   "keep": "rag_query_log_hash_idx",
+   "drop": "rag_query_log_query_hash_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 16384,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX rag_query_log_query_hash_idx ON public.rag_query_log USING btree (query_hash)",
+   "keeperDefinition": "CREATE INDEX rag_query_log_hash_idx ON public.rag_query_log USING btree (query_hash)",
+   "manualSqlRefs": 1,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 16384,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "route_runtime_packets",
+   "method": "btree",
+   "keep": "idx_route_runtime_packets_source_ref",
+   "drop": "idx_route_runtime_packets_source_ref_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 16384,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_route_runtime_packets_source_ref_idx ON public.route_runtime_packets USING btree (source_ref)",
+   "keeperDefinition": "CREATE INDEX idx_route_runtime_packets_source_ref ON public.route_runtime_packets USING btree (source_ref)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 16384,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "task_semantic_packets",
+   "method": "gin",
+   "keep": "idx_task_semantic_packets_metadata",
+   "drop": "idx_task_semantic_packets_metadata_gin",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 24576,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_task_semantic_packets_metadata_gin ON public.task_semantic_packets USING gin (metadata)",
+   "keeperDefinition": "CREATE INDEX idx_task_semantic_packets_metadata ON public.task_semantic_packets USING gin (metadata)",
+   "manualSqlRefs": 5,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 24576,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  },
+  {
+   "table": "task_semantic_packets",
+   "method": "btree",
+   "keep": "idx_task_semantic_packets_packet_key",
+   "drop": "idx_task_semantic_packets_packet_key_idx",
+   "class": "REVIEW_REQUIRED",
+   "why": [
+    "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+   ],
+   "bytes": 16384,
+   "scansDropped": 0,
+   "scansKept": 0,
+   "definition": "CREATE INDEX idx_task_semantic_packets_packet_key_idx ON public.task_semantic_packets USING btree (packet_key)",
+   "keeperDefinition": "CREATE INDEX idx_task_semantic_packets_packet_key ON public.task_semantic_packets USING btree (packet_key)",
+   "manualSqlRefs": 3,
+   "lockImplication": "SHARE UPDATE EXCLUSIVE during DROP INDEX CONCURRENTLY",
+   "estimatedSavingsBytes": 16384,
+   "rationale": "declared in Drizzle schema; drop needs a paired schema edit or drizzle-kit regenerates it"
+  }
+ ]
+}

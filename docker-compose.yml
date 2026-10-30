@@ -734,6 +734,9 @@ services:
       PRELOAD_MODELS: ${PRELOAD_MODELS:-false}
       # Set true + install gsplat for multi-image Gaussian Splatting
       ENABLE_GAUSSIAN_SPLATTING: ${ENABLE_GAUSSIAN_SPLATTING:-false}
+    volumes:
+      # Single source for /glyph/condition math (no copy in the image to drift)
+      - ./python/glyph_conditioner_v1.py:/app/glyph_conditioner_v1.py:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

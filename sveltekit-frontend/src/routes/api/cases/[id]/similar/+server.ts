@@ -54,7 +54,7 @@ interface SimilarCase {
 	practiceArea?: string;
 	similarity: number;
 	breakdown: {
-		vector: number;
+		retrieval: number;
 		tags: number;
 		topic: number;
 		centrality: number;
@@ -202,7 +202,7 @@ export const GET: RequestHandler = async ({ params, url, locals, request }) => {
           ...original,
           similarity: r.score,
           breakdown: {
-            vector: r.signals.vectorSimilarity,
+            retrieval: r.signals.retrievalRelevance,
             tags: r.signals.tagOverlap,
             topic: r.signals.topicAffinity,
             centrality: r.signals.graphCentrality,
@@ -456,7 +456,7 @@ async function searchQdrantCases(
 				practiceArea: p.practice_area as string | undefined,
 				similarity: r.score ?? 0,
 				breakdown: {
-					vector: r.score ?? 0,
+					retrieval: r.score ?? 0,
 					tags: 0,
 					topic: 0,
 					centrality: 0,
@@ -503,7 +503,7 @@ async function searchPgvectorCases(
 		practiceArea: row.practice_area,
 		similarity: parseFloat(row.similarity) || 0,
 		breakdown: {
-			vector: parseFloat(row.similarity) || 0,
+			retrieval: parseFloat(row.similarity) || 0,
 			tags: 0,
 			topic: 0,
 			centrality: 0,

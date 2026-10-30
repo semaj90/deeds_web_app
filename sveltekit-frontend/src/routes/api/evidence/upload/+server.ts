@@ -12,12 +12,15 @@ import {
   EvidenceCaseNotFoundError,
 } from '$lib/server/evidence-case-admission-v1.js';
 import { formatEvidenceSourceRevisionV1 } from '$lib/server/evidence-source-revision-v1.js';
+import {
+  buildEvidenceIndexingReceiptV1,
+  canProjectEvidenceEmbeddingToQdrantV1,
+  validateEvidenceEmbeddingV1,
+} from '$lib/server/evidence-indexing-receipt-v1.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
-import { generateSingleEmbedding, generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { embedTexts } from '$lib/server/batch-embedder.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
-import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
@@ -27,7 +30,6 @@ import { buildCodeFeatureRegistryEnqueueResult } from '$lib/server/analysis/code
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { detectEvidenceType, inferLegalClassification } from '$lib/server/evidence/type-detector.js';
 import { invalidateEvidenceCache, invalidateCaseCache, invalidateACEChunksCache } from '$lib/server/cache/invalidation.js';
-import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { triggerEvidenceGpuAnalysis } from '$lib/server/gpu/background-analyzer.js';
 import { extractSectionsFromText, detectSectionsHeuristic, type LangExtractSection } from '$lib/server/services/langextract-service.js';
 import {
@@ -46,11 +48,19 @@ import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
 import { createYOLOService } from '$lib/server/yolo.js';
-import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { createUploadedFile } from '$lib/server/files/upload-file-service.js';
 
 import { insertEvidenceSchema } from '$lib/server/db/zod-schemas.js';
+import {
+  evidenceQdrantPointId,
+  type EvidenceEmbeddingProvenance,
+} from '$lib/server/evidence/evidence-embedding-contract.js';
+import { persistEvidenceVectorForProjectionV1 } from '$lib/server/evidence/evidence-vector-persistence-v1.js';
+import { createEvidenceEmbeddingProducer } from '$lib/server/evidence/evidence-embedding-producer.js';
+
+// Strict llama.cpp lane (:8081) bound to the EMB-PROV-01 receipt; re-probed on every call, fails closed.
+const produceEvidenceEmbedding = createEvidenceEmbeddingProducer(ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081');
 
 const evidenceUploadSchema = z.object({
   title: insertEvidenceSchema.shape.title.optional(),
@@ -60,7 +70,6 @@ const evidenceUploadSchema = z.object({
 });
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 /** Min text length before we try OCR fallback for scanned PDFs */
@@ -441,7 +450,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       bytes: buffer,
       objectKey,
       bucket: BUCKET,
-      storageBackend: 'minio',
+      storageBackend: 'seaweed',
       upload: async ({ objectKey, bytes, contentType }) => {
         await uploadFile(BUCKET, objectKey, Buffer.from(bytes), {
           'Content-Type': contentType,
@@ -1360,8 +1369,11 @@ async function processAndEmbed(
     message: `Generating embeddings for ${legalChunks.length} chunk(s)...`,
   });
 
-  let stored = 0;
+  let embeddedCount = 0;
+  let pgVectorStored = 0;
   let vectorStoreFailures = 0;
+  let qdrantIndexFailed = false;
+  let qdrantIndexedCount = 0;
   const qdrantPoints: Array<{
     id: string;
     vector: { content: number[] };
@@ -1376,53 +1388,39 @@ async function processAndEmbed(
     const batch = legalChunks.slice(batchStart, batchStart + EMBED_BATCH_SIZE);
     const texts = batch.map((c) => c.text.slice(0, 8000));
 
-    let batchEmbeddings: (number[] | null)[] = new Array(batch.length).fill(null);
-    try {
-      // Check cache first, collect misses
-      const cacheResults = await Promise.all(
-        texts.map((t) =>
-          getEmbeddingCache(t, 'embeddinggemma:latest').catch(() => ({ entry: null }))
-        )
-      );
-      const needEmbed: { idx: number; text: string }[] = [];
-      for (let i = 0; i < cacheResults.length; i++) {
-        if (cacheResults[i].entry) {
-          batchEmbeddings[i] = cacheResults[i].entry!.embedding;
-        } else {
-          needEmbed.push({ idx: i, text: texts[i] });
-        }
-      }
-
-      // Batch-embed cache misses through concurrency gate (with auto binary Redis cache)
-      if (needEmbed.length > 0) {
-        const embeddings = await gated(embedGate, () => embedTexts(needEmbed.map((n) => n.text)));
-        for (let j = 0; j < needEmbed.length; j++) {
-          const embedding = embeddings[j] ? Array.from(embeddings[j]) : null;
-          batchEmbeddings[needEmbed[j].idx] = embedding;
-          if (embedding) {
-            setEmbeddingCache(needEmbed[j].text, embedding, 'embeddinggemma:latest').catch(
-              () => {}
-            );
-          }
-        }
-      }
-    } catch (err) {
-      console.warn(`[Upload] Batch embedding failed at offset ${batchStart}:`, err);
-    }
-
+    // Canonical evidence lane: every vector comes from the strict llama.cpp producer, bound to the live GGUF via
+    // the EMB-PROV-01 receipt. No Ollama/cache/pseudo-vector path: an unbound runtime fails the chunk closed.
     // Store results for each chunk in this batch
     for (let i = 0; i < batch.length; i++) {
       const chunk = batch[i];
-      const embedding = batchEmbeddings[i];
-      if (!embedding || embedding.length === 0) continue;
+      let produced: Awaited<ReturnType<typeof produceEvidenceEmbedding>>;
+      try {
+        produced = await gated(embedGate, () => produceEvidenceEmbedding(texts[i]));
+      } catch (err) {
+        console.warn(`[Upload] Chunk ${chunk.chunkIndex} canonical embedding unavailable:`, err);
+        vectorStoreFailures++;
+        continue;
+      }
+      const embedding = produced.vector;
 
-      const chunkUUID = crypto.randomUUID();
+      embeddedCount++;
+      const embeddingStatus = validateEvidenceEmbeddingV1(embedding);
+      if (embeddingStatus !== 'valid') {
+        console.warn(`[Upload] Chunk ${chunk.chunkIndex} embedding rejected: ${embeddingStatus}`);
+        vectorStoreFailures++;
+        continue;
+      }
+
       const sectionType = findChunkSectionType(chunk.startOffset, chunk.endOffset, chunkSectionMap);
+      let postgresStored = false;
+      let postgresEmbedding: number[] | null = null;
+      const embeddingProvenance: EvidenceEmbeddingProvenance = produced.provenance;
 
       try {
-        await storeChunkVector(evidenceId, chunk.chunkIndex, chunk.text.slice(0, 4000), embedding, {
+        postgresEmbedding = await storeChunkVector(evidenceId, chunk.chunkIndex, texts[i], embedding, produced.outputChecksum, {
           source_revision: sourceRevision,
-          model: 'embeddinggemma:latest',
+          model: produced.model,
+          embedding_provenance: embeddingProvenance,
           extractionMethod,
           fileName,
           sectionPath: chunk.sectionPath,
@@ -1433,18 +1431,36 @@ async function processAndEmbed(
           tokenCount: chunk.tokenCount,
           sectionType,
         });
+        pgVectorStored++;
+        postgresStored = true;
       } catch (err) {
         console.warn(`[Upload] Chunk ${chunk.chunkIndex} pgvector store failed:`, err);
         vectorStoreFailures++;
       }
 
+      if (!canProjectEvidenceEmbeddingToQdrantV1(embedding, postgresStored)) continue;
+      if (!embeddingProvenance || !postgresEmbedding) continue;
+
+      const chunkUUID = await evidenceQdrantPointId({
+        evidenceId,
+        sourceRevision,
+        chunkIndex: chunk.chunkIndex,
+        modelArtifactSha256: embeddingProvenance.modelArtifactSha256,
+      });
       qdrantPoints.push({
         id: chunkUUID,
-        vector: { content: embedding },
+        vector: { content: postgresEmbedding },
         payload: {
           evidence_id: evidenceId,
           case_id: caseId,
           source_revision: sourceRevision,
+          embedding_input_recipe_revision: embeddingProvenance.inputRecipeRevision,
+          embedding_input_sha256: embeddingProvenance.inputSha256,
+          model_artifact_sha256: embeddingProvenance.modelArtifactSha256,
+          embedding_output_sha256: produced.outputChecksum,
+          embedding_type: 'evidence_text_semantic_768',
+          source_field: 'canonical_evidence_text',
+          embedding_provenance: embeddingProvenance,
           chunk_index: chunk.chunkIndex,
           file_name: fileName,
           content_preview: chunk.text.slice(0, 500),
@@ -1492,36 +1508,38 @@ async function processAndEmbed(
           });
         }
       }
-
-      stored++;
     }
 
-    const pct = 70 + Math.round((stored / legalChunks.length) * 15);
+    const pct = 70 + Math.round((embeddedCount / legalChunks.length) * 15);
     updateJob(jobId, {
       step: 'embedding',
       progress: pct,
-      message: `Embedded ${stored}/${legalChunks.length} chunks`,
+      message: `Embedded ${embeddedCount}/${legalChunks.length} chunks`,
     });
   }
 
   markStage(
     diagnostics,
     'embedding',
-    stored > 0 ? 'success' : 'warning',
-    `Embedded ${stored} of ${legalChunks.length} chunk(s)`,
+    embeddedCount === legalChunks.length ? 'success' : 'warning',
+    `Embedded ${embeddedCount} of ${legalChunks.length} chunk(s)`,
     {
       chunkCount: legalChunks.length,
-      embeddedCount: stored,
+      embeddedCount,
     }
   );
+  const vectorStorageStatus =
+    embeddedCount === 0 ? 'skipped' : vectorStoreFailures > 0 ? 'warning' : 'success';
   markStage(
     diagnostics,
     'vector_storage',
-    vectorStoreFailures > 0 ? 'warning' : 'success',
+    vectorStorageStatus,
     vectorStoreFailures > 0
       ? `${vectorStoreFailures} chunk vector store operation(s) failed`
-      : `Stored ${stored} chunk vector(s) in pgvector`,
-    { stored, failures: vectorStoreFailures }
+      : embeddedCount === 0
+        ? 'No embeddings were available to store in PostgreSQL'
+        : `Stored ${pgVectorStored} of ${embeddedCount} chunk vector(s) in PostgreSQL`,
+    { embeddedCount, stored: pgVectorStored, failures: vectorStoreFailures }
   );
 
   // Batch upsert to Qdrant evidence_items collection
@@ -1532,6 +1550,7 @@ async function processAndEmbed(
         collection: 'evidence',
         points: qdrantPoints,
       });
+      qdrantIndexedCount = qdrantPoints.length;
       console.log(`[Upload] Upserted ${qdrantPoints.length} points to Qdrant evidence_items`);
       markStage(
         diagnostics,
@@ -1543,12 +1562,13 @@ async function processAndEmbed(
         }
       );
     } catch (err) {
-      console.warn('[Upload] Qdrant upsert failed (pgvector data is safe):', err);
+      qdrantIndexFailed = true;
+      console.warn('[Upload] Qdrant upsert failed; PostgreSQL vector writes are reported independently:', err);
       markStage(
         diagnostics,
         'qdrant_index',
         'warning',
-        'Qdrant upsert failed; pgvector data remains available',
+        'Qdrant upsert failed; PostgreSQL vector availability is reported separately',
         {
           pointCount: qdrantPoints.length,
         }
@@ -2025,7 +2045,7 @@ async function processAndEmbed(
             source_revision: sourceRevision,
             summary_revision: summaryRevision,
             evidence_type: finalType,
-            chunk_count: stored,
+            chunk_count: embeddedCount,
             entity_count: entities.length,
           },
         });
@@ -2316,7 +2336,7 @@ async function processAndEmbed(
   }
 
   // 9. GPU background analysis — fire-and-forget (similarity, clustering, case embedding)
-  if (caseId && stored > 0) {
+  if (caseId && embeddedCount > 0) {
     triggerEvidenceGpuAnalysis(evidenceId, caseId);
     markStage(diagnostics, 'gpu_analysis', 'success', 'Triggered background GPU analysis');
   } else {
@@ -2325,10 +2345,10 @@ async function processAndEmbed(
       'gpu_analysis',
       'skipped',
       caseId
-        ? 'No stored chunks for background GPU analysis'
+        ? 'No embedded chunks for background GPU analysis'
         : 'Missing caseId for background GPU analysis',
       {
-        stored,
+        embeddedCount,
       }
     );
   }
@@ -2337,7 +2357,7 @@ async function processAndEmbed(
   if (pipelineJobId) {
     try {
       await completeAnalysisJob(pipelineJobId, {
-        chunks: stored,
+        chunks: embeddedCount,
         entities: entities.length,
         flags: forensicFlags.length,
         sections: sectionsSeen.size,
@@ -2355,7 +2375,7 @@ async function processAndEmbed(
     await db.execute(sql`
       UPDATE evidence
       SET ai_analysis = COALESCE(ai_analysis, '{}'::jsonb) || ${JSON.stringify({
-        chunkCount: stored,
+        chunkCount: embeddedCount,
         entityCount: entities.length,
         forensicFlagCount: forensicFlags.length,
         sectionCount: sectionsSeen.size,
@@ -2367,10 +2387,19 @@ async function processAndEmbed(
     console.warn('[Upload] Failed to mark evidence complete:', err);
   }
 
+  const indexingReceipt = buildEvidenceIndexingReceiptV1({
+    totalChunks: legalChunks.length,
+    embeddedCount,
+    pgVectorStored,
+    pgVectorFailures: vectorStoreFailures,
+    qdrantPointCount: qdrantIndexedCount,
+    qdrantStatus: qdrantIndexFailed ? 'failed' : qdrantIndexedCount > 0 ? 'indexed' : 'skipped',
+  });
+
   updateJob(jobId, {
     step: 'complete',
     progress: 100,
-    message: `Complete: ${stored} chunks, ${entities.length} entities, ${forensicFlags.length} flags${highSeverity.length ? ` (${highSeverity.length} HIGH)` : ''}, ${sectionsSeen.size} sections, ${allCitations.length} citations (${extractionMethod})`,
+    message: `${indexingReceipt.message}; ${entities.length} entities, ${forensicFlags.length} flags${highSeverity.length ? ` (${highSeverity.length} HIGH)` : ''}, ${sectionsSeen.size} sections, ${allCitations.length} citations (${extractionMethod})`,
   });
 }
 
@@ -2445,81 +2474,40 @@ async function createGraphNodes(
 }
 
 /**
- * Generate a 768-dim embedding. Checks Redis/memory cache first, then
- * tries the Go gRPC EmbeddingGemma lane, then direct EmbeddingGemma HTTP.
- * Caches result (60min TTL).
- */
-async function embedText(text: string): Promise<number[] | null> {
-	const model = 'embeddinggemma:latest';
-
-	// Check embedding cache (Memory Map → Redis) — skip re-embedding duplicate text
-	try {
-		const { entry: cached } = await getEmbeddingCache(text, model);
-		if (cached) return cached.embedding;
-	} catch { /* cache miss or unavailable */ }
-
-	// Try gRPC embedding service first (fastest path when available)
-	let embedding: number[] | null = null;
-	try {
-		const vec = await generateSingleEmbedding(text);
-		if (vec && vec.length > 0) embedding = vec;
-	} catch {
-		// gRPC unavailable — fall through to direct Ollama
-	}
-
-	if (!embedding) {
-		try {
-			embedding = await traceEmbedding(text, model, async () => {
-				const res = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model, prompt: text }),
-					signal: AbortSignal.timeout(30_000),
-				});
-
-				if (!res.ok) return null;
-
-				const data = await res.json();
-				return data.embedding;
-			});
-		} catch {
-			return null;
-		}
-	}
-
-	// Cache the fresh embedding — fire-and-forget (60min TTL in vector-cache.ts)
-	if (embedding) {
-		setEmbeddingCache(text, embedding, model).catch(() => {});
-	}
-
-	return embedding;
-}
-
-/**
- * Store a chunk embedding into evidence_vectors using raw SQL
- * (Drizzle schema is out of sync with actual DB columns).
- *
- * Actual DB schema:
- *   evidence_vectors(id uuid, evidence_id uuid, chunk_index int, content text,
- *                    embedding vector(768), analysis_type text, metadata jsonb, created_at timestamp)
+ * Store a revision-bound EmbeddingGemma chunk in the canonical 768-D lane.
  */
 async function storeChunkVector(
 	evidenceId: string,
 	chunkIndex: number,
 	content: string,
 	embedding: number[],
+	outputChecksum: string,
 	metadata: Record<string, unknown>
-): Promise<void> {
-	const vectorStr = `[${embedding.join(',')}]`;
-	await db.execute(sql`
-		INSERT INTO evidence_vectors (evidence_id, chunk_index, content, embedding, analysis_type, metadata)
-		VALUES (
-			${evidenceId},
-			${chunkIndex},
-			${content},
-			${vectorStr}::vector,
-			'upload-embedding',
-			${metadata}::jsonb
-		)
-	`);
+): Promise<number[]> {
+	const sourceRevision = metadata.source_revision;
+	const model = metadata.model;
+  const provenance = metadata.embedding_provenance as EvidenceEmbeddingProvenance | null | undefined;
+	if (typeof sourceRevision !== 'string' || sourceRevision.length === 0) {
+		throw new Error('Evidence vector requires a source revision');
+	}
+	if (typeof model !== 'string' || model.length === 0) {
+		throw new Error('Evidence vector requires a model identifier');
+	}
+  if (typeof sourceRevision !== 'string' || typeof model !== 'string' || !provenance) {
+    throw new Error('Evidence vector identity or provenance is missing');
+  }
+  return persistEvidenceVectorForProjectionV1(
+    { execute: (query) => db.execute(query) },
+    {
+      evidenceId,
+      sourceRevision,
+      chunkIndex,
+      content,
+      embedding,
+      model,
+      outputChecksum,
+      provenance,
+      metadata: { ...metadata, embedding_provenance: provenance },
+    },
+  );
 }

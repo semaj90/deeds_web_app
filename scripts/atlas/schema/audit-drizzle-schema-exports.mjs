@@ -35,6 +35,7 @@ const REPORT_DIR = join(ROOT, 'docs/reports/schema');
 
 const args = process.argv.slice(2);
 const verbose = args.includes('--verbose');
+const outputArg = args.find((arg) => arg.startsWith('--output='))?.slice('--output='.length);
 
 // ---------------------------------------------------------------------------
 // 1. Parse schema files reachable from the entrypoint
@@ -160,8 +161,9 @@ if (existsSync(JOURNAL)) {
         const snapPath = join(SNAPSHOTS, `${String(lastIdx).padStart(4, '0')}_snapshot.json`);
         if (existsSync(snapPath)) {
             const snap = JSON.parse(readFileSync(snapPath, 'utf8'));
-            snapshotTables = Object.keys(snap.tables ?? {});
-            snapshotEnums  = Object.keys(snap.enums ?? {});
+            const normalizeSnapshotName = (name) => name.replace(/^public\./, '');
+            snapshotTables = Object.keys(snap.tables ?? {}).map(normalizeSnapshotName);
+            snapshotEnums  = Object.keys(snap.enums ?? {}).map(normalizeSnapshotName);
             if (verbose) console.log(`  Last snapshot: ${relative(FRONTEND, snapPath)} (${snapshotTables.length} tables, ${snapshotEnums.length} enums)`);
         }
     } catch (e) {
@@ -234,6 +236,7 @@ const report = {
     configuredSchemaEntrypoint: relative(FRONTEND, SCHEMA_EP),
     reachableFileCount: reachableFiles.size,
     tableCount: declaredTableNames.length,
+    declaredTables: [...allObjects.tables].sort((a, b) => a.name.localeCompare(b.name) || a.file.localeCompare(b.file)),
     enumCount: declaredEnumNames.length,
     viewCount: allObjects.views.length,
     sequenceCount: allObjects.sequences.length,
@@ -255,8 +258,12 @@ const report = {
     generatedAt: new Date().toISOString(),
 };
 
-mkdirSync(REPORT_DIR, { recursive: true });
-const outPath = join(REPORT_DIR, 'desired-schema-export-audit.json');
+const outPath = outputArg ? resolve(ROOT, outputArg) : join(REPORT_DIR, 'desired-schema-export-audit.json');
+const relativeOutputPath = relative(ROOT, outPath);
+if (outputArg && (relativeOutputPath.startsWith('..') || relativeOutputPath === '' || relativeOutputPath.includes(':'))) {
+    throw new Error('OUTPUT_PATH_MUST_BE_A_REPO_RELATIVE_FILE');
+}
+mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, JSON.stringify(report, null, 2));
 
 // ---------------------------------------------------------------------------

@@ -15,7 +15,11 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import pg from 'pg';
+import { PgDialect } from 'drizzle-orm/pg-core';
+import type { SQL } from 'drizzle-orm';
 import { createEvidenceEmbeddingProducer, type EvidenceEmbeddingReceipt } from './evidence-embedding-producer.js';
+import { persistEvidenceVectorForProjectionV1 } from './evidence-vector-persistence-v1.js';
+import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
 import {
   assertEvidenceEmbeddingAdmitted,
   evidenceQdrantPointId,
@@ -114,14 +118,7 @@ function startStubQdrant() {
   });
 }
 
-// Mirrors the INSERT in routes/api/evidence/upload/+server.ts::storeChunkVector.
-const UPSERT = `
-  INSERT INTO evidence_vectors (evidence_id, chunk_index, content, embedding, analysis_type, metadata, model, source_revision, embedding_type, source_field)
-  VALUES ($1, $2, $3, $4::vector, 'upload-embedding', $5::jsonb, $6, $7, $8, $9)
-  ON CONFLICT (evidence_id, source_revision, chunk_index)
-  WHERE source_revision IS NOT NULL AND chunk_index IS NOT NULL
-  DO UPDATE SET content = EXCLUDED.content, embedding = EXCLUDED.embedding, analysis_type = EXCLUDED.analysis_type,
-    metadata = EXCLUDED.metadata, model = EXCLUDED.model`;
+const dialect = new PgDialect();
 
 describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, disposable PostgreSQL)', () => {
   let pool: pg.Pool;
@@ -148,30 +145,32 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     await pool.query('INSERT INTO evidence (id) VALUES ($1) ON CONFLICT DO NOTHING', [EVIDENCE_ID]);
   });
 
-  const producer = () =>
-    createEvidenceEmbeddingProducer(llama.baseUrl, { receipt, tokenizerRevision: 'tok-rev', inputPolicyRevision: 'semantic-input-v1', now: NOW });
+  const producer = (modelReceipt: EvidenceEmbeddingReceipt = receipt) =>
+    createEvidenceEmbeddingProducer(llama.baseUrl, { receipt: modelReceipt, tokenizerRevision: 'tok-rev', inputPolicyRevision: 'semantic-input-v1', now: NOW });
 
-  async function persistChunk(text: string, chunkIndex: number) {
-    const produced = await producer()(text);
-    const admission = assertEvidenceEmbeddingAdmitted({
+  async function persistChunk(text: string, chunkIndex: number, modelReceipt: EvidenceEmbeddingReceipt = receipt) {
+    const produced = await producer(modelReceipt)(text);
+    const database = {
+      execute: async (query: SQL) => {
+        const compiled = dialect.sqlToQuery(query);
+        const result = await pool.query(compiled.sql, compiled.params);
+        return { rows: result.rows as Array<Record<string, unknown>> };
+      },
+    };
+    const canonicalVector = await persistEvidenceVectorForProjectionV1(database, {
       evidenceId: EVIDENCE_ID,
       sourceRevision: SOURCE_REVISION,
       chunkIndex,
       content: text,
-      vector: produced.vector,
+      embedding: produced.vector,
+      model: produced.model,
+      outputChecksum: produced.outputChecksum,
       provenance: produced.provenance,
+      metadata: {
+        source_revision: SOURCE_REVISION,
+        embedding_provenance: produced.provenance,
+      },
     });
-    await pool.query(UPSERT, [
-      EVIDENCE_ID,
-      chunkIndex,
-      text,
-      `[${produced.vector.join(',')}]`,
-      JSON.stringify({ source_revision: SOURCE_REVISION, embedding_provenance: produced.provenance }),
-      produced.model,
-      SOURCE_REVISION,
-      admission.embeddingType,
-      admission.sourceField,
-    ]);
     const pointId = await evidenceQdrantPointId({
       evidenceId: EVIDENCE_ID,
       sourceRevision: SOURCE_REVISION,
@@ -181,14 +180,24 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     const response = await fetch(`${qdrant.baseUrl}/collections/evidence_items/points?wait=true`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ points: [{ id: pointId, vector: produced.vector, payload: { evidence_id: EVIDENCE_ID, chunk_index: chunkIndex } }] }),
+      body: JSON.stringify({ points: [{
+        id: pointId,
+        vector: canonicalVector,
+        payload: {
+          evidence_id: EVIDENCE_ID,
+          chunk_index: chunkIndex,
+          source_revision: SOURCE_REVISION,
+          model_artifact_sha256: produced.provenance.modelArtifactSha256,
+          embedding_output_sha256: produced.outputChecksum,
+        },
+      }] }),
     });
     expect(response.ok).toBe(true);
-    return { produced, pointId };
+    return { produced, pointId, canonicalVector };
   }
 
   it('produces, admits, persists and projects a qualified chunk with read-back parity', async () => {
-    const { produced, pointId } = await persistChunk('Exhibit A: the lease was signed on May 3.', 0);
+    const { produced, pointId, canonicalVector } = await persistChunk('Exhibit A: the lease was signed on May 3.', 0);
 
     expect(produced.vector).toHaveLength(768);
     expect(looksLikePseudoVector(produced.vector)).toBe(false);
@@ -196,7 +205,10 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     expect(produced.provenance.modelReceipt).toEqual({ provider: 'llama-server', artifactIdentityBound: true, dimensionBound: true, runtimeReady: true });
 
     const row = (await pool.query(
-      `SELECT embedding_type, source_field, vector_dims(embedding) AS dims, embedding::text AS embedding, metadata->'embedding_provenance'->>'modelArtifactSha256' AS sha
+      `SELECT embedding_type, source_field, vector_dims(embedding) AS dims,
+              vector_to_float4(embedding, 768, false) AS embedding_float4,
+              metadata->'embedding_provenance'->>'modelArtifactSha256' AS sha,
+              metadata->>'embedding_output_sha256' AS output_sha
        FROM evidence_vectors WHERE evidence_id = $1`,
       [EVIDENCE_ID]
     )).rows[0];
@@ -204,11 +216,15 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     expect(row.source_field).toBe('canonical_evidence_text');
     expect(row.dims).toBe(768);
     expect(row.sha).toBe(`sha256:${ARTIFACT_SHA}`);
-    // PostgreSQL stores float4: parity with the produced vector within float32 precision.
-    const stored = (JSON.parse(row.embedding) as number[]);
-    expect(stored.every((value, i) => Math.abs(value - produced.vector[i]) < 1e-6)).toBe(true);
+    expect(row.output_sha).toBe(produced.outputChecksum);
+    const stored = validateSemantic768OutputV1(row.embedding_float4 as number[]);
+    expect(digestSemantic768OutputV1(stored)).toBe(produced.outputChecksum);
+    expect(canonicalVector).toEqual(Array.from(stored));
 
-    expect(qdrant.points.get(pointId)?.payload).toMatchObject({ evidence_id: EVIDENCE_ID, chunk_index: 0 });
+    expect(qdrant.points.get(pointId)).toMatchObject({
+      vector: canonicalVector,
+      payload: { evidence_id: EVIDENCE_ID, chunk_index: 0, embedding_output_sha256: produced.outputChecksum },
+    });
   });
 
   it('is idempotent under retry: same row, same Qdrant point', async () => {
@@ -216,6 +232,31 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     const second = await persistChunk('Exhibit B text', 1);
     expect(second.pointId).toBe(first.pointId);
     expect((await pool.query('SELECT count(*)::int AS n FROM evidence_vectors')).rows[0].n).toBe(1);
+    expect(qdrant.points.size).toBe(1);
+  });
+
+  it('refuses to overwrite a canonical row with another model artifact revision', async () => {
+    const text = 'same evidence content under a different encoder artifact';
+    const first = await persistChunk(text, 4);
+    const secondArtifactSha = 'b'.repeat(64);
+    const secondModelPath = 'C:\\models\\embeddinggemma-300m-other.gguf';
+    const secondReceipt: EvidenceEmbeddingReceipt = {
+      ...receipt,
+      artifact: {
+        ...receipt.artifact,
+        modelPath: secondModelPath,
+        liveArtifactSha256: secondArtifactSha,
+        recordedModelArtifactRevision: secondArtifactSha,
+      },
+    };
+    llama.setModelPath(secondModelPath);
+    await expect(persistChunk(text, 4, secondReceipt)).rejects.toThrow(/EVIDENCE_VECTOR_COMMITTED_READBACK_NOT_UNIQUE/);
+
+    const row = (await pool.query(
+      `SELECT metadata->'embedding_provenance'->>'modelArtifactSha256' AS sha FROM evidence_vectors WHERE evidence_id = $1`,
+      [EVIDENCE_ID],
+    )).rows[0];
+    expect(row.sha).toBe(first.produced.provenance.modelArtifactSha256);
     expect(qdrant.points.size).toBe(1);
   });
 

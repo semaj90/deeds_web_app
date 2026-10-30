@@ -4,6 +4,7 @@ import {
     bigint,
     bigserial,
     boolean,
+    check,
     customType,
     date,
     foreignKey,
@@ -1063,7 +1064,7 @@ export const citations = pgTable('citations', {
   annotation: text('annotation'),
   isKeyAuthority: boolean('is_key_authority').default(false),
   tags: jsonb('tags').default([]),
-  embedding: vector('embedding', { dimensions: 768 }),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
 });
 
 // === CITATION TAGS ===
@@ -1463,10 +1464,25 @@ export const evidenceVectors = pgTable('evidence_vectors', {
     .primaryKey()
     .notNull(),
   evidenceId: uuid('evidence_id').notNull(),
-  vector: vector('vector', { dimensions: 768 }).notNull(),
+  chunkIndex: integer('chunk_index').notNull(),
+  content: text('content').notNull(),
+  embedding: vector('embedding', { dimensions: 768 }).notNull(),
+  analysisType: text('analysis_type'),
+  metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
+  sourceRevision: text('source_revision').notNull(),
+  embeddingType: varchar('embedding_type', { length: 50 }).notNull(),
+  sourceField: varchar('source_field', { length: 100 }).notNull(),
   model: varchar('model', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+}, (table) => [
+  check('evidence_vectors_source_revision_sha256_ck', sql`${table.sourceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+  check('evidence_vectors_chunk_index_nonnegative_ck', sql`${table.chunkIndex} >= 0`),
+  check('evidence_vectors_embedding_type_ck', sql`${table.embeddingType} = 'evidence_text_semantic_768'`),
+  check('evidence_vectors_source_field_ck', sql`${table.sourceField} = 'canonical_evidence_text'`),
+  uniqueIndex('evidence_vectors_source_chunk_uq')
+    .on(table.evidenceId, table.sourceRevision, table.chunkIndex)
+    .where(sql`source_revision IS NOT NULL AND chunk_index IS NOT NULL`),
+]);
 
 /**
  * Evidence Analysis Cache — queryable analysis results for fast client hits.

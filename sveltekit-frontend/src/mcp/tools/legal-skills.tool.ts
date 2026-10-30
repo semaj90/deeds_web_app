@@ -3,6 +3,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { resolveCouchDbConfigV1 } from '$lib/server/config/couchdb-config.js';
+import { opinionCorpusLimitation, searchStatuteChunks, searchStatuteChunksText, toOrWebSearchQuery } from '$lib/server/legal/statute-search-v1.js';
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 
@@ -313,25 +314,25 @@ Respond as JSON: { "witness": "${witnessName}", "questions": [...], "strategy": 
           return { content: [{ type: 'text', text: JSON.stringify({ error: 'Case not found', caseId }) }] };
         }
         const { title, description } = refRow.rows[0];
-        const queryText = `${title ?? ''} ${description ?? ''}`.trim();
+        const queryText = toOrWebSearchQuery(`${title ?? ''} ${description ?? ''}`.slice(0, 500));
         if (!queryText) {
-          return { content: [{ type: 'text', text: JSON.stringify({ results: [], reason: 'no text to match' }) }] };
+          return { content: [{ type: 'text', text: JSON.stringify({ sourceType: 'case', results: [], reason: 'no text to match' }) }] };
         }
         const rows = await pool.query(
           `SELECT id, title, description, status, created_at,
                   ts_rank(to_tsvector('english', COALESCE(title,'') || ' ' || COALESCE(description,'')),
-                          plainto_tsquery('english', $1)) AS similarity
+                          websearch_to_tsquery('english', $1)) AS similarity
            FROM cases
            WHERE id <> $2
-             AND to_tsvector('english', COALESCE(title,'') || ' ' || COALESCE(description,'')) @@ plainto_tsquery('english', $1)
+             AND to_tsvector('english', COALESCE(title,'') || ' ' || COALESCE(description,'')) @@ websearch_to_tsquery('english', $1)
            ORDER BY similarity DESC NULLS LAST
            LIMIT $3`,
-          [queryText.slice(0, 500), caseId, limit],
+          [queryText, caseId, limit],
         );
         return {
           content: [{
             type: 'text',
-            text: JSON.stringify({ referenceCaseId: caseId, results: rows.rows, count: rows.rowCount }),
+            text: JSON.stringify({ sourceType: 'case', referenceCaseId: caseId, results: rows.rows, count: rows.rowCount }),
           }],
         };
       } finally {
@@ -649,7 +650,9 @@ Return JSON with exactly these fields:
                   chargeCode: h.payload?.charge_code,
                   similarity: h.score,
                 }));
-              return { content: [{ type: 'text', text: JSON.stringify({ source: 'qdrant', opinions: hits, count: hits.length }) }] };
+              if (hits.length > 0) {
+                return { content: [{ type: 'text', text: JSON.stringify({ sourceType: 'judicial_opinion', source: 'qdrant', opinions: hits, count: hits.length }) }] };
+              }
             }
           }
         }
@@ -674,12 +677,68 @@ Return JSON with exactly these fields:
             court:    r.court,
             similarity: r.rank,
           }));
-          return { content: [{ type: 'text', text: JSON.stringify({ source: 'postgres_fts', opinions, count: opinions.length }) }] };
+          if (opinions.length === 0) {
+            // No verified opinion corpus: say so. Never substitute statutes (legal_chunks) for opinions.
+            return { content: [{ type: 'text', text: JSON.stringify(opinionCorpusLimitation()) }] };
+          }
+          return { content: [{ type: 'text', text: JSON.stringify({ sourceType: 'judicial_opinion', source: 'postgres_fts', opinions, count: opinions.length }) }] };
         } finally {
           await pool.end();
         }
       } catch (err) {
         return { content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }] };
+      }
+    },
+  );
+
+  // ── legal.search_statutes ─────────────────────────────────────────────
+  server.registerTool(
+    'legal.search_statutes',
+    {
+      description:
+        'Search California statutory and treatise text (legal_chunks, 60k chunks) with PostgreSQL pgvector (768-d embeddinggemma) plus an OR-style full-text fallback. Every hit carries sourceType (statute/treatise/unregistered), citation label, node and document ids. These are NOT judicial opinions.',
+      inputSchema: {
+        query: z.string().min(3).max(500).describe('Legal question or fact pattern'),
+        limit: z.number().int().min(1).max(40).default(5).optional(),
+      },
+    },
+    async ({ query, limit = 5 }) => {
+      const { Pool } = await import('pg');
+      const pool = new Pool({ connectionString: ENV.DATABASE_URL, max: 2 });
+      try {
+        let embedding: unknown = null;
+        try {
+          const serverBase = process.env.ORIGIN ?? 'http://localhost:5173';
+          const embedRes = await fetch(`${serverBase}/api/embed`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: query }),
+            signal: AbortSignal.timeout(15_000),
+          });
+          if (embedRes.ok) embedding = ((await embedRes.json()) as { embedding?: unknown }).embedding;
+        } catch { /* fall through to full text */ }
+
+        const vector = embedding ? await searchStatuteChunks(pool, embedding, limit) : null;
+        if (vector && vector.status === 'OK' && vector.hits.length > 0) {
+          return { content: [{ type: 'text', text: JSON.stringify({ sourceType: 'statute', source: 'postgres_pgvector', ...vector, count: vector.hits.length }) }] };
+        }
+        const text = await searchStatuteChunksText(pool, query, limit);
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              sourceType: 'statute',
+              source: 'postgres_fts',
+              embeddingStatus: vector ? vector.status : 'EMBEDDING_UNAVAILABLE',
+              ...text,
+              count: text.hits.length,
+            }),
+          }],
+        };
+      } catch (err) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }] };
+      } finally {
+        await pool.end();
       }
     },
   );

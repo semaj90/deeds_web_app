@@ -183,8 +183,8 @@
 								<div class="text-[10px] font-semibold opacity-60 mb-0.5">Score Breakdown:</div>
 								<div class="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[10px]">
 									<div class="flex justify-between">
-										<span class="opacity-60">Vector:</span>
-										<span>{Math.round(similarCase.breakdown.vector * 100)}%</span>
+										<span class="opacity-60">Retrieval:</span>
+										<span>{Math.round(similarCase.breakdown.retrieval * 100)}%</span>
 									</div>
 									<div class="flex justify-between">
 										<span class="opacity-60">Tags:</span>

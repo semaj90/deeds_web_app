@@ -1227,27 +1227,8 @@ async def glyph_condition(req: GlyphConditionRequest):
     if not req.tiles:
         raise HTTPException(status_code=400, detail="tiles must be non-empty")
 
-    import numpy as np  # already imported at module level; re-import for clarity
-
     t0 = time.time()
-    k = len(req.tiles)
-
-    # ── Build pseudo-embedding matrix from tile positions ──────────────────
-    # dims 0-1: normX, normY  (spatial layout signal)
-    # dims 2-9: cluster_id one-hot encoding (mod 8, scaled to [0,1])
-    # dims 10+: confidence broadcast, zeros
-    DIM = 768
-    mat = np.zeros((k, DIM), dtype=np.float32)
-    for i, t in enumerate(req.tiles):
-        mat[i, 0] = float(t.get("normX", 0.0))
-        mat[i, 1] = float(t.get("normY", 0.0))
-        cid = int(t.get("clusterId", 0)) % 8
-        mat[i, 2 + cid] = 1.0
-        mat[i, 10] = float(t.get("confidence", 0.5))
-
-    # ── Attention weights (query → tile centroids) ─────────────────────────
-    weights = np.ones(k, dtype=np.float32) / k   # uniform default
-
+    qvec = None
     if req.query.strip():
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
@@ -1255,41 +1236,21 @@ async def glyph_condition(req: GlyphConditionRequest):
                     f"{OLLAMA_URL}/api/embeddings",
                     json={"model": "embeddinggemma:latest", "prompt": req.query},
                 )
-                qdata = resp.json()
-                qvec = np.array(qdata.get("embedding", []), dtype=np.float32)
-                if qvec.size == DIM:
-                    # Scaled dot-product attention
-                    scores = mat[:, :DIM] @ qvec / (DIM ** 0.5)
-                    scores -= scores.max()                 # numerical stability
-                    weights = np.exp(scores)
-                    weights /= weights.sum()
+                qvec = resp.json().get("embedding")
         except Exception as exc:
             print(f"[glyph/condition] query embed skipped: {exc}")
 
-    # ── Weighted centroid (conditioning vector) ────────────────────────────
-    conditioning_vec = (weights[:, None] * mat).sum(axis=0)   # [768]
-
-    # Normalise to unit sphere
-    norm = float(np.linalg.norm(conditioning_vec))
-    if norm > 1e-6:
-        conditioning_vec /= norm
-
-    # ── Spatial layout map (for ControlNet spatial hint) ──────────────────
-    # Rasterise tile positions onto a (height × width) grid at 1/8 resolution
-    gh, gw = req.height // 8, req.width // 8
-    spatial_map = np.zeros((gh, gw), dtype=np.float32)
-    for i, t in enumerate(req.tiles):
-        px = int(float(t.get("normX", 0)) * (gw - 1))
-        py = int(float(t.get("normY", 0)) * (gh - 1))
-        px = max(0, min(gw - 1, px))
-        py = max(0, min(gh - 1, py))
-        spatial_map[py, px] = float(weights[i])
+    # Math lives in python/glyph_conditioner_v1.py (bind-mounted; also usable without this container).
+    try:
+        out = condition_glyph_tiles_v1(req.tiles, qvec, req.width, req.height)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
     return {
-        "conditioning_vector": conditioning_vec.tolist(),  # 768-dim float list
-        "attention_weights":   weights.tolist(),           # per-tile weights
-        "spatial_map":         spatial_map.tolist(),       # (H/8 × W/8) heatmap
-        "tile_count":          k,
+        "conditioning_vector": out["conditioning_vector"].tolist(),  # 768-dim float list
+        "attention_weights":   out["attention_weights"].tolist(),
+        "spatial_map":         out["spatial_map"].tolist(),
+        "tile_count":          out["tile_count"],
         "processing_time_ms":  int((time.time() - t0) * 1000),
     }
 

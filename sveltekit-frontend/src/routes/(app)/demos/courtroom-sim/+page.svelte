@@ -93,6 +93,7 @@
 	let scriptedStoryState = $state<StoryState | null>(null);
 	let scriptedPlaying = $state(false);
 	let movementReceipt = $state<{ actorId: string; station: string; outcome: string; position: { x: number; z: number } | null } | null>(null);
+	let scene = new CourtroomScene();
 	let dialogueProposal = $state<DialogueProposal | null>(null);
 	let dialogueProposalAccepted = $state(false);
 	let dialogueProposalLoading = $state(false);
@@ -129,7 +130,6 @@
 
 	// ── Babylon Scene ──
 	let canvasEl = $state<HTMLCanvasElement | null>(null);
-	let scene = new CourtroomScene();
 	let dialogueBoxEl = $state<HTMLDivElement | null>(null);
 
 	// ── Timeline Engine ──

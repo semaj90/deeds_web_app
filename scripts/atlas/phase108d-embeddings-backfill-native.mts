@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Phase 108D: Qdrant Embeddings Backfill (52,380 chunks) — Native Node.js
+ * RETIRED: this writer restarts point IDs at 1 and is not idempotent.
+ * Use the admitted semantic_768 projection owner.
  *
  * Uses native Postgres + fetch, no shell/docker/curl overhead.
  * Keeps 768-dim vectors in memory, streams directly to Qdrant HTTP API.
@@ -13,6 +14,9 @@
 import { writeFileSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 import { execSync } from 'child_process';
+
+console.error('LEGACY_QDRANT_NUMERIC_ID_BACKFILL_DISABLED: numeric IDs are not canonical and retries can collide or duplicate vectors; use the admitted semantic_768 projection owner');
+process.exit(2);
 
 const isDryRun = process.argv.includes('--dry-run');
 const limitArg = process.argv.find(arg => arg.startsWith('--limit='));

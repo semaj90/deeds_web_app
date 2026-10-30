@@ -15,6 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { parseQdrantStorageUsageV1 } from './lib/qdrant-storage-usage-v1.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const REPORT_PATH = path.join(ROOT, 'docs/reports/qdrant-storage-breakdown-v1.json');
@@ -78,15 +79,12 @@ function qdrantVolumeStorage() {
   try {
     const output = execFileSync('docker', [
       'exec', container, 'sh', '-c',
-      'for p in /qdrant /qdrant/storage /qdrant/snapshots; do du -sb "$p" 2>/dev/null; done',
+      'for p in /qdrant /qdrant/storage /qdrant/snapshots; do du -sb "$p" 2>/dev/null; done; find /qdrant/storage/collections -type d -name wal -exec du -sb {} + 2>/dev/null',
     ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30000, maxBuffer: 4 * 1024 * 1024 });
-    const bytesByPath = Object.fromEntries(output.split(/\r?\n/).filter(Boolean).map((line) => {
-      const match = line.match(/^(\d+)\s+(.+)$/);
-      return match ? [match[2], Number(match[1])] : [line, null];
-    }));
-    return { available: Object.keys(bytesByPath).length > 0, container, bytesByPath, error: null };
+    const usage = parseQdrantStorageUsageV1(output);
+    return { available: Object.keys(usage.bytesByPath).length > 0, container, ...usage, error: null };
   } catch (error) {
-    return { available: false, container, bytesByPath: {}, error: error?.message ?? String(error) };
+    return { available: false, container, bytesByPath: {}, walByCollection: {}, walDirectoryCount: 0, walTotalBytes: 0, error: error?.message ?? String(error) };
   }
 }
 
@@ -237,7 +235,7 @@ const report = {
   writesPerformed: false,
   destructiveActionsPerformed: false,
   aliases: { available: false, count: 0, entries: [], error: null },
-  volumeStorage: { available: false, container: process.env.QDRANT_CONTAINER || 'legal-ai-qdrant', bytesByPath: {}, error: null },
+  volumeStorage: { available: false, container: process.env.QDRANT_CONTAINER || 'legal-ai-qdrant', bytesByPath: {}, walByCollection: {}, walDirectoryCount: 0, walTotalBytes: 0, error: null },
   consumerCensus: {
     available: consumerCensus.available,
     count: consumerCensus.files.length,
@@ -300,8 +298,10 @@ try {
       info: null,
       memory: null,
       snapshots: null,
+      walBytes: null,
       errors: [],
     };
+    entry.walBytes = report.volumeStorage.walByCollection[name] ?? null;
     try {
       entry.info = vectorConfigSummary(await getJson(`/collections/${encodeURIComponent(name)}`));
     } catch (error) {
@@ -360,6 +360,11 @@ console.log(JSON.stringify({
   apiVisibleSnapshotBytes: report.totals.apiVisibleSnapshotBytes,
   snapshotMetadataIncompleteCount: report.totals.snapshotMetadataIncompleteCount,
   snapshotRetentionDispositionCounts: report.totals.snapshotRetentionDispositionCounts,
+  walDirectoryCount: report.volumeStorage.walDirectoryCount,
+  walTotalBytes: report.volumeStorage.walTotalBytes,
+  storageBytesNotInCollectionMemoryApi: report.volumeStorage.bytesByPath['/qdrant/storage'] != null
+    ? report.volumeStorage.bytesByPath['/qdrant/storage'] - report.totals.liveCollectionDiskBytes
+    : null,
   codebaseLiveDiskBytes: report.totals.codebaseLiveDiskBytes,
   codebaseSnapshotBytes: report.totals.codebaseSnapshotBytes,
   aliasesAvailable: report.aliases.available,

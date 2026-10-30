@@ -42,6 +42,24 @@ export const DEFAULT_IGNORE_DIRS = new Set([
   '.agent',
 ]);
 
+const DEFAULT_IGNORE_PATHS = new Set([
+  'sveltekit-frontend/memory/runs',
+]);
+
+const DEFAULT_IGNORE_INDEX_PATHS = new Set([
+  'docs/graph',
+  'memory/graphify/gds',
+  'static/models',
+  'sveltekit-frontend/uploads',
+]);
+
+function containsPath(normalized, candidate) {
+  return normalized === candidate
+    || normalized.startsWith(`${candidate}/`)
+    || normalized.includes(`/${candidate}/`)
+    || normalized.endsWith(`/${candidate}`);
+}
+
 export function parseRoots(value) {
   return String(value ?? '')
     .split(',')
@@ -52,6 +70,9 @@ export function parseRoots(value) {
 export function shouldSkipDirectory(dir) {
   if (!dir) return false;
   const normalized = String(dir).replaceAll('\\', '/');
+  if ([...DEFAULT_IGNORE_PATHS].some((ignoredPath) => normalized === ignoredPath || normalized.startsWith(`${ignoredPath}/`))) {
+    return true;
+  }
   if ([...DEFAULT_IGNORE_DIRS].some((name) => normalized === name || normalized.startsWith(`${name}/`) || normalized.includes(`/${name}/`))) {
     return true;
   }
@@ -63,4 +84,12 @@ export function shouldSkipDirectory(dir) {
   // pass. A dot-directory holding real indexable source would be a genuine
   // exception to repo convention; none has been found in this repo.
   return normalized.split('/').some((segment) => segment.startsWith('.') && segment !== '.' && segment !== '..');
+}
+
+export function shouldSkipIndexPath(dir, options = {}) {
+  const normalized = String(dir ?? '').replaceAll('\\', '/').replace(/^\.\//, '');
+  const isDocReport = containsPath(normalized, 'docs/reports');
+  if (isDocReport && options.includeDocReports !== true) return true;
+  if ([...DEFAULT_IGNORE_INDEX_PATHS].some((ignoredPath) => containsPath(normalized, ignoredPath))) return true;
+  return shouldSkipDirectory(normalized);
 }

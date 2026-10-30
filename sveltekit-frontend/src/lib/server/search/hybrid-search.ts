@@ -14,7 +14,7 @@
 import { searchCodeLexical, searchCodeHybridPg } from './postgres-fts.js';
 import { searchQdrantCode }                       from './qdrant-search.js';
 import { fetchAuthorityScores }                   from './neo4j-rerank.js';
-import { rerankCandidates }                       from './gpu-rerank.js';
+import { isComparableEmbedding, rerankCandidates } from './gpu-rerank.js';
 import { applyAuthorityBoost }                    from '../retrieval/authority-boost.js';
 import { buildRetrievalTrace, SCORE_WEIGHTS }     from './retrieval-explainer.js';
 import { recordEvent }                            from '$lib/server/trace/trace-collector.js';
@@ -42,6 +42,10 @@ export interface HybridSearchResult {
   final_score:     number;
   headline?:       string;
   sources:         string[];
+}
+
+interface HybridSearchCandidate extends HybridSearchResult {
+  candidate_embedding?: number[];
 }
 
 export interface HybridSearchOptions {
@@ -185,7 +189,7 @@ export async function hybridSearch(
 
   // ── Merge by stable_key ───────────────────────────────────────────────────
 
-  const merged = new Map<string, HybridSearchResult>();
+  const merged = new Map<string, HybridSearchCandidate>();
 
   for (const r of pgRows) {
     if ('path' in r) {
@@ -281,7 +285,9 @@ export async function hybridSearch(
 
   // ── GPU rerank (top candidates only) ──────────────────────────────────────
 
-  const useGpu = !skipGpuRerank && queryEmbedding.length > 0;
+  const useGpu = !skipGpuRerank && candidates.some((candidate) =>
+    isComparableEmbedding(queryEmbedding, candidate.candidate_embedding),
+  );
   const tGpu0 = Date.now();
   if (useGpu) {
     const topN = candidates.slice(0, Math.min(candidates.length, limit * 3));
@@ -289,6 +295,7 @@ export async function hybridSearch(
       queryEmbedding,
       topN.map((c) => ({
         stable_key: c.stable_key,
+        embedding: c.candidate_embedding,
         pre_score:  c.final_score,
       })),
       1 - (weights.gpu ?? 0.15)

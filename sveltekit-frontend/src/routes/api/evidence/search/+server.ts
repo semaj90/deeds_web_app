@@ -26,7 +26,8 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
-import { embedText } from '$lib/server/embedding/embed.js';
+import { createEvidenceEmbeddingProducer } from '$lib/server/evidence/evidence-embedding-producer.js';
+import { EVIDENCE_EMBEDDING_TYPE } from '$lib/server/evidence/evidence-embedding-contract.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -437,10 +438,17 @@ function extractQueryCitations(query: string): string[] {
 
 // ── Embedding (uses unified facade with cache + dedup) ───────────────────
 
+// Evidence chunks are persisted only through the strict llama.cpp lane (evidence-embedding-producer), so queries use
+// the same executor and the same raw-text recipe; an unbound or unreachable lane returns null (reported as a lane
+// failure by the caller), never a different executor's vector.
+const produceEvidenceEmbedding = createEvidenceEmbeddingProducer(ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081');
+
 async function embedQuery(text: string): Promise<number[] | null> {
   try {
-    return await traceEmbedding(text, 'embeddinggemma:latest', () => embedText(text));
-  } catch {
+    const produced = await traceEmbedding(text, 'embeddinggemma:strict-llama', async () => (await produceEvidenceEmbedding(text)).vector);
+    return produced;
+  } catch (err) {
+    console.error('[Evidence Search] canonical evidence embedding lane unavailable:', err);
     return null;
   }
 }
@@ -600,7 +608,7 @@ async function searchPgvector(
 				1 - (ev.embedding <=> ${vectorStr}::vector) AS score
 			FROM evidence_vectors ev
 			JOIN evidence e ON e.id = ev.evidence_id
-			WHERE e.case_id = ${caseId}${sectionFilter}
+			WHERE e.case_id = ${caseId} AND ev.embedding_type = ${EVIDENCE_EMBEDDING_TYPE}${sectionFilter}
 			ORDER BY ev.embedding <=> ${vectorStr}::vector
 			LIMIT ${limit}
 		`
@@ -608,7 +616,7 @@ async function searchPgvector(
 			SELECT ev.evidence_id, ev.chunk_index, ev.content, ev.metadata,
 				1 - (ev.embedding <=> ${vectorStr}::vector) AS score
 			FROM evidence_vectors ev
-			WHERE 1=1${sectionFilter}
+			WHERE ev.embedding_type = ${EVIDENCE_EMBEDDING_TYPE}${sectionFilter}
 			ORDER BY ev.embedding <=> ${vectorStr}::vector
 			LIMIT ${limit}
 		`;

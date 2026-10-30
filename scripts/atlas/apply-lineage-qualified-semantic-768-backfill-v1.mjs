@@ -93,7 +93,7 @@ async function qdrantReadback(packetKeys) {
   return Array.isArray(body?.result?.points) ? body.result.points : [];
 }
 
-function assertSemanticWriterProvenanceReady() {
+export function assertSemanticWriterProvenanceReady() {
   // This 15-row canary does not yet satisfy the current semantic-owner contract:
   // /api/embed returns a mutable model label, modelRevision below is synthesized
   // from content hashes, no tokenizer/input/vector provenance receipt is persisted,

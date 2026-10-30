@@ -8,6 +8,8 @@ export const CANONICAL_CODEBASE_QDRANT_COLLECTIONS = [
 
 export interface QdrantSummarySyncInput {
   packetKey: string;
+  sourceRevision: string;
+  contentHash: string;
   payload: Record<string, unknown>;
   qdrantPointId?: string | null;
   collection?: string | null;
@@ -73,40 +75,42 @@ async function resolveCanonicalCodebaseCollection(): Promise<string> {
 export async function syncSummaryPayloadToQdrant(
   input: QdrantSummarySyncInput,
 ): Promise<QdrantSummarySyncResult> {
-  const qdrant = getQdrantManager();
-  const collection = input.collection?.trim() || (await resolveCanonicalCodebaseCollection());
-  const pointIds = new Set<string | number>();
-
-  if (input.qdrantPointId) {
-    pointIds.add(input.qdrantPointId);
-  } else {
-    try {
-      const scrollResponse = await qdrant.client.scroll(collection, {
-        limit: 50,
-        with_payload: false,
-        with_vector: false,
-        filter: {
-          must: [
-            {
-              key: 'packet_key',
-              match: { value: input.packetKey },
-            },
-          ],
-        },
-      });
-
-      for (const point of normalizeQdrantPoints(scrollResponse)) {
-        pointIds.add(point.id);
-      }
-    } catch (error) {
-      console.warn(
-        `[qdrant-sync] packet lookup failed for ${input.packetKey}:`,
-        (error as Error).message,
-      );
-    }
+  if (
+    !/^sha256:[a-f0-9]{64}$/i.test(input.sourceRevision)
+    || !/^sha256:[a-f0-9]{64}$/i.test(input.contentHash)
+  ) {
+    throw new Error('Qdrant summary sync requires source revision and content hash');
   }
 
-  const ids = [...pointIds];
+  const qdrant = getQdrantManager();
+  const collection = input.collection?.trim() || (await resolveCanonicalCodebaseCollection());
+
+  const revisionFilter = {
+    must: [
+      { key: 'packet_key', match: { value: input.packetKey } },
+      { key: 'source_revision', match: { value: input.sourceRevision } },
+      { key: 'content_hash', match: { value: input.contentHash } },
+    ],
+    ...(input.qdrantPointId ? { has_id: [input.qdrantPointId] } : {}),
+  };
+  let pointIds: Array<string | number>;
+  try {
+    const scrollResponse = await qdrant.client.scroll(collection, {
+      limit: 50,
+      with_payload: false,
+      with_vector: false,
+      filter: revisionFilter,
+    });
+    pointIds = normalizeQdrantPoints(scrollResponse).map((point) => point.id);
+  } catch (error) {
+    console.warn(
+      `[qdrant-sync] revision-qualified packet lookup failed for ${input.packetKey}:`,
+      (error as Error).message,
+    );
+    pointIds = [];
+  }
+
+  const ids = pointIds;
   if (ids.length === 0) {
     return {
       collection,
@@ -122,19 +126,15 @@ export async function syncSummaryPayloadToQdrant(
     qdrant_synced_at: new Date().toISOString(),
   };
 
-  let updatedPoints = 0;
-  for (const pointId of ids) {
-    await (qdrant.client as any).setPayload(collection, {
-      points: [pointId],
-      payload,
-    });
-    updatedPoints += 1;
-  }
+  await qdrant.client.setPayload(collection, {
+    filter: revisionFilter,
+    payload,
+  });
 
   return {
     collection,
     matchedPoints: ids.length,
-    updatedPoints,
+    updatedPoints: ids.length,
     pointIds: ids,
   };
 }

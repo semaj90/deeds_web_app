@@ -42,6 +42,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { observeStoreRequest } from '../telemetry/gpu-telemetry.js';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { searchCodebaseSemanticContext } from './codebase-semantic-search.js';
 
 // Re-export ContextDoc so callers don't need graph-informed-retrieval import
 export type { ContextDoc };
@@ -54,7 +55,6 @@ const CORRECTIVE_RAG_THRESHOLD = 0.5;
 
 const KB_COLLECTIONS = ['legal_canon_chunks', 'legal_documents', 'court_opinions'] as const;
 const CASE_COLLECTIONS = ['case_chunks', 'evidence_vectors'] as const;
-const CODEBASE_COLLECTIONS = ['codebase_chunks_768'] as const;
 
 // ── Request / Result Types ──────────────────────────────────────────────────
 
@@ -306,14 +306,7 @@ async function searchCodebaseCollections(
 	vector: number[],
 	topK: number,
 ): Promise<ContextDoc[]> {
-	const hits = await Promise.all(
-		CODEBASE_COLLECTIONS.map((col) => searchCollection(col, vector, topK))
-	);
-	return hits.flat()
-		.sort((a, b) => b.score - a.score)
-		.slice(0, topK)
-		.map(pointToContextDoc)
-		.filter((d): d is ContextDoc => d !== null && d.content.length > 0);
+	return searchCodebaseSemanticContext(vector, topK);
 }
 
 // ── Main Orchestrator ───────────────────────────────────────────────────────

@@ -83,6 +83,7 @@ export interface EmbeddingResult {
   model: string;
   dimension: number;
   source: EmbeddingSource;
+  modelArtifactRevision?: string;
   totalMs: number;
   cacheHit?: boolean;
   attempts?: EmbeddingAttempt[];
@@ -891,6 +892,12 @@ export async function generateEmbeddings(
       model: SERVER_EMBEDDING_MODEL,
       dimension: cachedResults[0]?.length ?? 768,
       source: cachedSource,
+      ...(cacheArtifactRevision && cachedEntries.every((entry) => Boolean(
+        entry && entry.model === SERVER_EMBEDDING_MODEL
+        && (entry.source === 'http-ollama' || entry.source === 'http-ollama-sequential')
+      ))
+        ? { modelArtifactRevision: cacheArtifactRevision }
+        : {}),
       totalMs: Math.round(performance.now() - start),
       cacheHit: true,
       inputRecipes: preparedInputs.map((prepared) => prepared.inputRecipe),
@@ -1063,6 +1070,10 @@ export async function generateEmbeddings(
     model,
     dimension,
     source,
+    ...(cacheArtifactRevision && model === SERVER_EMBEDDING_MODEL
+      && (source === 'http-ollama' || source === 'http-ollama-sequential')
+      ? { modelArtifactRevision: cacheArtifactRevision }
+      : {}),
     totalMs: Math.round(performance.now() - start),
     cacheHit: false,
     attempts,

@@ -280,6 +280,16 @@ extern "C" napi_value RegisterSimdJsonToCSR(napi_env env, napi_callback_info inf
 // addresses within 64-byte regions), which matters for sm_86 GPU data prep.
 
 static constexpr size_t AB_POOL_MAX_PER_BUCKET = 8;
+// Cap on idle (recycled, not yet handed out) bytes per thread. The per-bucket count cap alone let 8 large
+// buffers per size class sit idle; this bounds the total.
+static constexpr size_t AB_POOL_MAX_IDLE_BYTES = 256U * 1024U * 1024U;
+static thread_local size_t g_ab_pool_idle_bytes = 0;
+// Telemetry (per thread): leased = handed to JS and not yet finalized; idle = parked in the pool.
+static thread_local size_t g_ab_leased_bytes = 0;
+static thread_local size_t g_ab_peak_leased_bytes = 0;
+static thread_local size_t g_ab_alloc_count = 0;
+static thread_local size_t g_ab_reuse_count = 0;
+static thread_local size_t g_ab_rejected_returns = 0;
 static constexpr size_t L1_CACHE_LINE_BYTES = 64U;
 
 static thread_local std::unordered_map<size_t, std::vector<void*>> g_ab_pool;
@@ -315,10 +325,13 @@ static inline size_t ab_next_pow2(size_t n) {
 // hint encodes the power-of-2 capacity so we return to the correct bucket.
 static void pool_finalizer(napi_env /*env*/, void* data, void* hint) {
     const size_t cap = reinterpret_cast<size_t>(hint);
+    g_ab_leased_bytes = (g_ab_leased_bytes >= cap) ? g_ab_leased_bytes - cap : 0;
     auto& bucket = g_ab_pool[cap];
-    if (bucket.size() < AB_POOL_MAX_PER_BUCKET) {
+    if (bucket.size() < AB_POOL_MAX_PER_BUCKET && g_ab_pool_idle_bytes + cap <= AB_POOL_MAX_IDLE_BYTES) {
         bucket.push_back(data);  // recycle — no free()
+        g_ab_pool_idle_bytes += cap;
     } else {
+        ++g_ab_rejected_returns;  // cap reached: freed instead of cached
         free(data);              // bucket full — release to OS
     }
 }
@@ -334,6 +347,8 @@ static void* pool_acquire(size_t bytes, size_t* cap_out) {
     if (AB_LIKELY(!bucket.empty())) {
         void* ptr = bucket.back();
         bucket.pop_back();
+        g_ab_pool_idle_bytes -= cap;  // block leaves the idle pool
+        ++g_ab_reuse_count;
         memset(ptr, 0, bytes);  // zero used region only
         return ptr;
     }
@@ -341,7 +356,7 @@ static void* pool_acquire(size_t bytes, size_t* cap_out) {
     // malloc on x86-64 returns 16-byte-aligned memory; sufficient for AVX2
     // unaligned loads used inside the GPU kernels.
     void* ptr = malloc(cap);
-    if (AB_LIKELY(ptr != nullptr)) { memset(ptr, 0, bytes); }
+    if (AB_LIKELY(ptr != nullptr)) { memset(ptr, 0, bytes); ++g_ab_alloc_count; }
     return ptr;
 }
 
@@ -356,12 +371,21 @@ static napi_status create_pooled_ab(napi_env env, size_t bytes,
     if (AB_UNLIKELY(ptr == nullptr)) { return napi_generic_failure; }
     *out_data = ptr;
     // hint = capacity as void* — recovered in pool_finalizer to pick bucket.
-    return napi_create_external_arraybuffer(
+    napi_status st = napi_create_external_arraybuffer(
         env, ptr, bytes,
         pool_finalizer,
         reinterpret_cast<void*>(cap),
         out_ab
     );
+    if (AB_UNLIKELY(st != napi_ok)) {
+        // V8 did not take ownership, so no finalizer will run: release the block here.
+        free(ptr);
+        *out_data = nullptr;
+        return st;
+    }
+    g_ab_leased_bytes += cap;
+    if (g_ab_leased_bytes > g_ab_peak_leased_bytes) { g_ab_peak_leased_bytes = g_ab_leased_bytes; }
+    return st;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
@@ -1369,6 +1393,16 @@ static napi_value PoolStatsWrapper(napi_env env, napi_callback_info info) {
 
   napi_value obj, vBuckets, vPooled, vBytes;
   napi_create_object(env, &obj);
+  const auto setNum = [&](const char* name, size_t v) {
+    napi_value n; napi_create_double(env, static_cast<double>(v), &n); napi_set_named_property(env, obj, name, n);
+  };
+  setNum("idleBytes", g_ab_pool_idle_bytes);
+  setNum("leasedBytes", g_ab_leased_bytes);
+  setNum("peakLeasedBytes", g_ab_peak_leased_bytes);
+  setNum("allocationCount", g_ab_alloc_count);
+  setNum("reuseCount", g_ab_reuse_count);
+  setNum("rejectedPoolReturns", g_ab_rejected_returns);
+  setNum("maxIdleBytesPerThread", AB_POOL_MAX_IDLE_BYTES);
   napi_create_int32(env, static_cast<int32_t>(totalBuckets), &vBuckets);
   napi_create_int32(env, static_cast<int32_t>(totalPooled),  &vPooled);
   // Use double for byte counts — may exceed 2^31 on memory-heavy workloads

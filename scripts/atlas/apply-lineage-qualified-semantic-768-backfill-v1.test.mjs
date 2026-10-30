@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createHash } from 'node:crypto';
-import { buildLineageQualifiedQdrantPointV1 } from './apply-lineage-qualified-semantic-768-backfill-v1.mjs';
+import { assertSemanticWriterProvenanceReady, buildLineageQualifiedQdrantPointV1 } from './apply-lineage-qualified-semantic-768-backfill-v1.mjs';
 
 const digest = (character) => character.repeat(64);
 const fixture = () => ({
@@ -22,6 +22,13 @@ const fixture = () => ({
   model: 'embeddinggemma:pinned-test',
   candidateSnapshotRevision: `snapshot:${digest('d')}`,
   ordinalMapChecksum: digest('e'),
+});
+
+test('keeps canonical writes blocked until model and vector provenance are durable', () => {
+  assert.throws(
+    () => assertSemanticWriterProvenanceReady(),
+    /SEMANTIC_768_APPLY_BLOCKED:CANONICAL_WRITER_PROVENANCE_INCOMPLETE/,
+  );
 });
 
 test('lineage-qualified Qdrant point binds canonical identity and exact revisions', () => {

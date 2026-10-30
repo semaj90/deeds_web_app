@@ -1,9 +1,9 @@
 {
   "status": "MIGRATION_SAFETY_BLOCKED",
-  "fileCount": 380,
-  "blockCount": 163,
-  "warnCount": 355,
-  "noteCount": 328,
+  "fileCount": 486,
+  "blockCount": 196,
+  "warnCount": 438,
+  "noteCount": 413,
   "findings": [
     {
       "file": "drizzle\\0000_puzzling_mongu.sql",
@@ -5336,7 +5336,7 @@
           "ruleId": "CREATE_INDEX_NO_CONCURRENT",
           "level": "WARN",
           "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
-          "line": 123,
+          "line": 141,
           "snippet": "CREATE INDEX IF NOT EXISTS tsp_source_ref_hash_idx"
         }
       ]
@@ -6526,6 +6526,25 @@
       ]
     },
     {
+      "file": "drizzle\\manual\\20260906_ai_observability_contract_repair.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.intent_eval_runs ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 21,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_intent_eval_runs_run_id"
+        }
+      ]
+    },
+    {
       "file": "drizzle\\manual\\20260906_semantic_768_metadata_reconciliation.sql",
       "findings": [
         {
@@ -6534,6 +6553,1759 @@
           "message": "Idempotent guard (good practice)",
           "line": 21,
           "snippet": "IF NOT EXISTS ("
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260907_canonical_owner_revision_axes_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "ADD COLUMN IF NOT EXISTS source_revision TEXT;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 17,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_packets_source_revision"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260908_execution_reviews_evidence_refs.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 15,
+          "snippet": "ADD COLUMN IF NOT EXISTS evidence_refs jsonb;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260908_task_semantic_packets_production_indexes.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 5,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_task_semantic_packets_workspace_task_created"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_task_semantic_packets_workspace_task_created"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260908_task_semantic_packets_writer_columns_only.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 7,
+          "snippet": "ADD COLUMN IF NOT EXISTS point_kind text NOT NULL DEFAULT 'task_summary',"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260908_tool_call_events_execution_columns.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 34,
+          "snippet": "ADD COLUMN IF NOT EXISTS execution_id uuid,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 48,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_tool_call_events_execution_id"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260909_atlas_packet_write_transaction_outbox.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 19,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_projection_outbox ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 37,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_projection_outbox_unconsumed"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 56,
+          "snippet": "outbox_event_id uuid REFERENCES atlas_projection_outbox (event_id),"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260909_atlas_packets_source_revision.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 21,
+          "snippet": "ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS source_revision text;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260909_atlas_projection_outbox_aggregate_key.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 12,
+          "snippet": "ALTER TABLE atlas_projection_outbox ADD COLUMN IF NOT EXISTS aggregate_key text;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 14,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_projection_outbox_aggregate_key"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260909_graphify_execution_file_membership_v2.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 7,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.graphify_execution_file_membership_v2 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 8,
+          "snippet": "execution_id uuid NOT NULL REFERENCES public.graphify_executions(execution_id) ON DELETE RESTRICT,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 28,
+          "snippet": "CREATE INDEX IF NOT EXISTS graphify_execution_file_membership_v2_workspace_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260909_router_feature_revision_indexes.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 12,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_observation_feature_rows_feature_revision_idx"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 12,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_observation_feature_rows_feature_revision_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260909_uuidv5_identity_contract.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 10,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_projection_outbox_aggregate_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260912_error_embedding_768.sql",
+      "findings": [
+        {
+          "ruleId": "DROP_INDEX",
+          "level": "WARN",
+          "message": "DROP INDEX without CONCURRENTLY holds AccessExclusiveLock; prefer DROP INDEX CONCURRENTLY",
+          "line": 25,
+          "snippet": "DROP INDEX IF EXISTS idx_codebase_chunk_index_error_embedding_hnsw;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 30,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_error_embedding_hnsw"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 30,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_error_embedding_hnsw"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260912_error_embedding_latent_columns.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 22,
+          "snippet": "ADD COLUMN IF NOT EXISTS error_embedding_latent_256 halfvec(256),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 29,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_codebase_chunk_error_embedding_latent_256_hnsw"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260912_latent_128_columns.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 20,
+          "snippet": "ADD COLUMN IF NOT EXISTS latent_128 halfvec(128),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 23,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_codebase_chunk_latent_128_hnsw"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260914_graphify_file_search_bitmap_v2_revisioned.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 14,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_file_search_index_v2 ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 53,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_file_search_index_v2_search_gin ON atlas_file_search_index_v2 USING GIN (search_vector)"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 63,
+          "snippet": "candidate_ordinal bigint NOT NULL REFERENCES atlas_file_search_index_v2(candidate_ordinal) ON DELETE CASCADE,"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260915_atlas_packets_summary_metadata_columns.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 24,
+          "snippet": "ADD COLUMN IF NOT EXISTS summary_model text,"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260915_codebase_chunk_index_whole_file_hash.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 35,
+          "snippet": "ALTER TABLE codebase_chunk_index ADD COLUMN IF NOT EXISTS file_content_hash text;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260915_feature_ontology_tuples_fanout_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 33,
+          "snippet": "CREATE MATERIALIZED VIEW IF NOT EXISTS feature_ontology_tuples_fanout_v1 AS"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 55,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS idx_feature_ontology_tuples_fanout_v1_tuple_id"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 58,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_feature_ontology_tuples_fanout_v1_concept_id"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260915_feature_ontology_tuples_resolution_columns.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 34,
+          "snippet": "ALTER TABLE feature_ontology_tuples ADD COLUMN IF NOT EXISTS resolved_concept_id text;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260916_workspace_event_head_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_workspace_events ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 39,
+          "snippet": "FOREIGN KEY (event_id) REFERENCES public.atlas_workspace_events(event_id)"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 58,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_workspace_events_workspace_sequence_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260920_atlas_ast_nodes_generation.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 17,
+          "snippet": "ALTER TABLE atlas_ast_nodes ADD COLUMN IF NOT EXISTS ast_generation text;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 22,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_ast_nodes_generation"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260920b_atlas_ontology_schema_alters.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 8,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_asv_source_revision ON atlas_symbol_versions (source_revision);"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 8,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_asv_source_revision ON atlas_symbol_versions (source_revision);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260921_graphify_execution_authority_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 21,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS graphify_executions_ws_rev_id_uidx_v1"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 21,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS graphify_executions_ws_rev_id_uidx_v1"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 31,
+          "snippet": "workspace_id       uuid        NOT NULL REFERENCES workspaces(id) ON DELETE RESTRICT,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 74,
+          "snippet": "CREATE INDEX IF NOT EXISTS graphify_executions_input_identity_idx_v1"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260923_external_doc_summaries_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 13,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_external_doc_summaries ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 15,
+          "snippet": "page_id              uuid NOT NULL REFERENCES atlas_external_doc_pages(id) ON DELETE CASCADE,"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 27,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS aeds_identity_uq"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 29,
+          "snippet": "CREATE INDEX IF NOT EXISTS aeds_page_id ON atlas_external_doc_summaries (page_id);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260923b_external_doc_analyses_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 10,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_external_doc_analyses ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 14,
+          "snippet": "REFERENCES atlas_external_doc_chunks (evidence_revision) ON DELETE RESTRICT,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 35,
+          "snippet": "CREATE INDEX IF NOT EXISTS aeda_chunk_evidence ON atlas_external_doc_analyses (chunk_evidence_revision, analysis_type);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 29,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS uq_atlas_packet_alias_v1_storage_to_v2_canonical"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 29,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS uq_atlas_packet_alias_v1_storage_to_v2_canonical"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260925_atlas_packet_identity_alias_v1_storage_to_v2_ROLLBACK.sql",
+      "findings": [
+        {
+          "ruleId": "DROP_INDEX",
+          "level": "WARN",
+          "message": "DROP INDEX without CONCURRENTLY holds AccessExclusiveLock; prefer DROP INDEX CONCURRENTLY",
+          "line": 11,
+          "snippet": "DROP INDEX IF EXISTS public.uq_atlas_packet_alias_v1_storage_to_v2_canonical;"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 15,
+          "snippet": "FOREIGN KEY (canonical_packet_key) REFERENCES public.atlas_packets(packet_key);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260925_codebase_chunk_summary_provenance_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "ADD COLUMN IF NOT EXISTS summary_provenance jsonb;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260925_codebase_chunk_summary_text_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "ADD COLUMN IF NOT EXISTS summary_text text;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260926_atlas_feature_unknowns_PROPOSED.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 19,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_feature_unknowns ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 47,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_feature_unknowns_open"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260926_codebase_chunk_summary_embedding_768_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 11,
+          "snippet": "ADD COLUMN IF NOT EXISTS summary_embedding_meta jsonb;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20260926_unknown_resolution_v2_PROPOSED.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 36,
+          "snippet": "ADD COLUMN IF NOT EXISTS subject_kind          text NOT NULL DEFAULT 'PACKET_IDENTITY',"
+        },
+        {
+          "ruleId": "DROP_INDEX",
+          "level": "WARN",
+          "message": "DROP INDEX without CONCURRENTLY holds AccessExclusiveLock; prefer DROP INDEX CONCURRENTLY",
+          "line": 62,
+          "snippet": "DROP INDEX IF EXISTS public.idx_unknown_identity_unique;"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 63,
+          "snippet": "CREATE UNIQUE INDEX idx_unknown_identity_unique"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 72,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_unknown_gap_open"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261001_openspec_evidence_fabric_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.openspec_changes ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 29,
+          "snippet": "change_id text NOT NULL REFERENCES public.openspec_changes(change_id),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 102,
+          "snippet": "CREATE INDEX IF NOT EXISTS openspec_tasks_workspace_revision_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261001_openspec_evidence_fabric_v2.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.openspec_task_predicate ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 17,
+          "snippet": "FOREIGN KEY (change_id, task_id) REFERENCES public.openspec_tasks(change_id, task_id),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 55,
+          "snippet": "CREATE INDEX IF NOT EXISTS openspec_task_predicate_task_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261001_openspec_evidence_retrieval_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 8,
+          "snippet": "CREATE INDEX IF NOT EXISTS openspec_evidence_chunks_metadata_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261001_openspec_task_identity_history_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "ADD COLUMN IF NOT EXISTS id bigint GENERATED ALWAYS AS IDENTITY,"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 18,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS openspec_tasks_surrogate_id_uidx"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 43,
+          "snippet": "task_row_id bigint NOT NULL REFERENCES public.openspec_tasks(id),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 94,
+          "snippet": "CREATE INDEX IF NOT EXISTS openspec_task_revisions_claim_hash_idx"
+        },
+        {
+          "ruleId": "TRUNCATE",
+          "level": "BLOCK",
+          "message": "Truncates table — all rows deleted",
+          "line": 120,
+          "snippet": "BEFORE UPDATE OR DELETE OR TRUNCATE ON public.openspec_task_revisions"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261003_atlas_packet_incidence_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 1,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_packet_incidence ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 39,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_packet_incidence_subject_revision_v1"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261005_governed_repair_executor_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 10,
+          "snippet": "CREATE TABLE IF NOT EXISTS approved_mutation_plans ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 12,
+          "snippet": "run_id                uuid NOT NULL REFERENCES workflow_runs(id),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 30,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_amp_task_id ON approved_mutation_plans (task_id);"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 120,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS uq_outcome_ledger_lo_execution"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261005_lineage_join_indexes_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 8,
+          "snippet": "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_atlas_pcl_chunk_row_id_proven"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261008_atlas_observation_feature_lineage_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "ADD COLUMN IF NOT EXISTS source_revision text,"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261012_atlas_context_manifest_v2_readbacks.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 4,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_context_manifest_v2_readbacks ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 23,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_context_manifest_v2_readbacks_request_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261012_atlas_directories.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 7,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_directories ("
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 17,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS atlas_directories_repo_path_uq"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 20,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_directories_parent_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_atlas_packets_duplicate_indexes_DROP_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "DROP_INDEX",
+          "level": "WARN",
+          "message": "DROP INDEX without CONCURRENTLY holds AccessExclusiveLock; prefer DROP INDEX CONCURRENTLY",
+          "line": 12,
+          "snippet": "DROP INDEX IF EXISTS idx_atlas_packets_metadata_gin;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_atlas_packets_source_ref_pattern_indexes_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 13,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_packets_source_ref_lower_pattern_idx"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 13,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_packets_source_ref_lower_pattern_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_diagnostic_analysis_tables_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 12,
+          "snippet": "CREATE TABLE IF NOT EXISTS diagnostic_ast_facts ("
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 30,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS diagnostic_ast_facts_identity_uidx"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 33,
+          "snippet": "CREATE INDEX IF NOT EXISTS diagnostic_ast_facts_fingerprint_idx ON diagnostic_ast_facts (fingerprint);"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 50,
+          "snippet": "dag_run_id text NOT NULL REFERENCES diagnostic_dag_runs (run_id),"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_domain_taxonomy_fts_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 17,
+          "snippet": "ADD COLUMN IF NOT EXISTS search_tsv tsvector"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_error_logs_diagnostic_provenance_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 10,
+          "snippet": "ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS diagnostic_run_id text NULL;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 22,
+          "snippet": "CREATE INDEX IF NOT EXISTS error_logs_diagnostic_fingerprint_idx"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 27,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS error_logs_diagnostic_log_line_uidx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_feature_registry_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 17,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.feature_registry ("
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_graph_revision_and_traversal_CONCURRENT_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 41,
+          "snippet": "ADD COLUMN IF NOT EXISTS workspace_revision text,"
+        },
+        {
+          "ruleId": "VALIDATE_CONSTRAINT",
+          "level": "WARN",
+          "message": "VALIDATE CONSTRAINT scans the full table; do during low-traffic window",
+          "line": 86,
+          "snippet": "ALTER TABLE atlas_graph_snapshots_v2 VALIDATE CONSTRAINT atlas_graph_snapshots_v2_workspace_revision_sha256_v2;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261013_parent_atlas_documents_align_declared_columns.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 11,
+          "snippet": "ALTER TABLE public.parent_atlas_documents ADD COLUMN IF NOT EXISTS alias_id text;"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 32,
+          "snippet": "FOREIGN KEY (tree_node_id) REFERENCES public.atlas_tree_nodes (node_id) ON DELETE SET NULL;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261015_atlas_packet_class_lut_validation_receipts_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_packet_class_lut_validation_receipts ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 28,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_packet_class_lut_validation_revision_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261016_atlas_source_locations_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 29,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_source_locations ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 77,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_source_location_conflicts_ref_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261017_atlas_ast_nodes_v2_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 14,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_ast_nodes_v2 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 69,
+          "snippet": "REFERENCES public.atlas_ast_nodes_v2 (tree_node_id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 73,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS atlas_ast_nodes_v2_natural_uidx"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 79,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_ast_nodes_v2_file_rev_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261017_work_item_source_provenance.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 9,
+          "snippet": "ALTER TABLE error_logs   ADD COLUMN IF NOT EXISTS workspace_id    varchar;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 15,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_error_logs_workspace_id   ON error_logs   (workspace_id)  WHERE workspace_id IS NOT NULL;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261017_workspace_event_provenance_v1_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 12,
+          "snippet": "ADD COLUMN IF NOT EXISTS task_id text,"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 41,
+          "snippet": "FOREIGN KEY (supersedes_event_id) REFERENCES public.atlas_workspace_events(event_id);"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 47,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS atlas_workspace_events_idempotency_uidx"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 51,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_workspace_events_task_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261018_atlas_learned_artifact_admission_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 8,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_learned_artifact_admission_v1 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 16,
+          "snippet": "tensor_artifact_id          uuid        REFERENCES atlas_tensor_artifacts (artifact_id),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 45,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_learned_artifact_state"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261018_atlas_nes_lut_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 10,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_nes_lut_v1 ("
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261018_atlas_procedural_sequences_v1_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 3,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_procedural_sequences_v1 ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 32,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_procedural_sequences_v1_feature_admission_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261018_atlas_receipt_verifier_results_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_receipt_verifier_results_v1 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 8,
+          "snippet": "REFERENCES atlas_test_execution_receipts (execution_receipt_id) ON DELETE CASCADE,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 24,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_receipt_verifier_pass"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261018_atlas_retrieval_canary_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 9,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_retrieval_canary_runs_v1 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 37,
+          "snippet": "canary_id        uuid    NOT NULL REFERENCES atlas_retrieval_canary_runs_v1 (canary_id) ON DELETE RESTRICT,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 50,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_retrieval_canary_sequence_v1_hyper"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261018_domain_vocabulary_crosswalk_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 9,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_domain_vocabulary_crosswalk_v1 ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 22,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_domain_vocab_crosswalk_v1_taxonomy"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261018_openspec_task_source_index_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.openspec_task_source_snapshots_v1 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 15,
+          "snippet": "snapshot_id text NOT NULL REFERENCES public.openspec_task_source_snapshots_v1(snapshot_id),"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 29,
+          "snippet": "CREATE INDEX IF NOT EXISTS openspec_task_source_index_v1_source_ref_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261020_atlas_feature_labels_v1.rollback.sql",
+      "findings": [
+        {
+          "ruleId": "DROP_TABLE",
+          "level": "BLOCK",
+          "message": "Drops a table — all data lost",
+          "line": 27,
+          "snippet": "DROP TABLE IF EXISTS atlas_feature_labels;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261020_atlas_feature_labels_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 42,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_feature_labels ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 81,
+          "snippet": "FOREIGN KEY (feature_id) REFERENCES atlas_features (feature_id) ON DELETE RESTRICT;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 95,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_feature_labels_current_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261020_atlas_packet_identity_registry_v1_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_packet_identity_registry_v1 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 8,
+          "snippet": "repository_id UUID NOT NULL REFERENCES public.atlas_repository_identity(repository_id) ON DELETE RESTRICT,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 25,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_packet_identity_registry_v1_source_ref"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261020_canonical_feature_concepts_v1.rollback.sql",
+      "findings": [
+        {
+          "ruleId": "DROP_TABLE",
+          "level": "BLOCK",
+          "message": "Drops a table — all data lost",
+          "line": 21,
+          "snippet": "DROP TABLE IF EXISTS atlas_feature_crosswalk;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261020_canonical_feature_concepts_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 29,
+          "snippet": "CREATE TABLE IF NOT EXISTS canonical_feature_concepts ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 76,
+          "snippet": "FOREIGN KEY (canonical_feature_id) REFERENCES canonical_feature_concepts (canonical_feature_id) ON DELETE RESTRICT;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 82,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_feature_crosswalk_current_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261021_feature_identity_v2.rollback.sql",
+      "findings": [
+        {
+          "ruleId": "DROP_TABLE",
+          "level": "BLOCK",
+          "message": "Drops a table — all data lost",
+          "line": 17,
+          "snippet": "DROP TABLE IF EXISTS atlas_feature_labels;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261021_feature_identity_v2.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 34,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_feature_concepts ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 96,
+          "snippet": "FOREIGN KEY (source_namespace, local_feature_id) REFERENCES atlas_feature_source_identities (source_namespace, local_fea"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 133,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_feature_concept_crosswalk_current_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261025_ace_chunks_upsert_unique_v1.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 16,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS ace_chunks_case_content_type_uq"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 16,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS ace_chunks_case_content_type_uq"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261025_atlas_structural_reference_lineage_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 4,
+          "snippet": "ADD COLUMN IF NOT EXISTS source_ref TEXT,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 15,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_reference_resolution_workspace_source"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261025_retrieval_ranking_index_enhancements_v1.sql",
+      "findings": [
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 25,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_nes_lut_v1_inverse_idx"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 25,
+          "snippet": "CREATE INDEX IF NOT EXISTS atlas_nes_lut_v1_inverse_idx"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261025_route_packet_rewards_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 10,
+          "snippet": "CREATE TABLE IF NOT EXISTS route_packet_rewards ("
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 30,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS route_packet_rewards_packet_uuid_uq"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261025_route_packet_stub_tables_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 11,
+          "snippet": "CREATE TABLE IF NOT EXISTS route_packets ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 21,
+          "snippet": "packet_uuid       uuid         NOT NULL REFERENCES route_packets(packet_uuid) ON DELETE CASCADE,"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261025_route_runtime_packets_packet_uuid_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 19,
+          "snippet": "ADD COLUMN IF NOT EXISTS packet_uuid uuid;"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 21,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS route_runtime_packets_packet_uuid_uq"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261025_route_token_map_and_source_refs_v1.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 4,
+          "snippet": "CREATE TABLE IF NOT EXISTS route_token_map ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 19,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_token_map_feature    ON route_token_map(feature_id);"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 35,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS idx_rpsr_uniq ON route_packet_source_refs(packet_uuid, source_ref);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261027_atlas_graphify_scope_repository_map_v1_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 4,
+          "snippet": "CREATE TABLE IF NOT EXISTS public.atlas_graphify_scope_repository_map_v1 ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 8,
+          "snippet": "repository_id UUID NOT NULL REFERENCES public.atlas_repository_identity(repository_id) ON DELETE RESTRICT,"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261027_atlas_packet_identity_registry_v1_source_guard_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 40,
+          "snippet": "IF NOT EXISTS ("
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261028_align_task_semantic_and_route_runtime_packets_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 26,
+          "snippet": "ADD COLUMN IF NOT EXISTS canonical             boolean     NOT NULL DEFAULT false,"
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 54,
+          "snippet": "ADD COLUMN IF NOT EXISTS tree_node_id           uuid REFERENCES atlas_tree_nodes (node_id) ON DELETE SET NULL;"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261028_atlas_enrichment_kv_v1_covering_index.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 4,
+          "snippet": "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_atlas_enrichment_kv_v1_key_num_covering"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261028_atlas_enrichment_kv_v1_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 13,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_enrichment_kv_v1 ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 35,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_enrichment_kv_v1_subject ON atlas_enrichment_kv_v1 (subject_kind, subject_id);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261028_atlas_enrichment_kv_v2_DRAFT.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 14,
+          "snippet": "CREATE TABLE IF NOT EXISTS atlas_enrichment_kv_v2 ("
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 40,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_atlas_enrichment_kv_v2_subject_revision"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261028_error_logs_message_embedding.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 6,
+          "snippet": "ALTER TABLE error_logs ADD COLUMN IF NOT EXISTS message_embedding vector(768);"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 9,
+          "snippet": "CREATE INDEX IF NOT EXISTS idx_error_logs_message_embedding_hnsw"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261029_duplicate_index_consolidation_v1_rollback.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 7,
+          "snippet": "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_atlas_packet_features_packet_key ON public.atlas_packet_features USING btree"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261029_duplicate_index_consolidation_v2_rollback.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 7,
+          "snippet": "CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_atlas_projection_outbox_aggregate ON public.atlas_projection_outbox USING bt"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\20261029_evidence_vectors_semantic_768.sql",
+      "findings": [
+        {
+          "ruleId": "LOCK_TABLE",
+          "level": "NOTE",
+          "message": "Explicit LOCK TABLE statement",
+          "line": 17,
+          "snippet": "LOCK TABLE public.evidence_vectors IN ACCESS EXCLUSIVE MODE;"
+        },
+        {
+          "ruleId": "DROP_INDEX",
+          "level": "WARN",
+          "message": "DROP INDEX without CONCURRENTLY holds AccessExclusiveLock; prefer DROP INDEX CONCURRENTLY",
+          "line": 37,
+          "snippet": "DROP INDEX IF EXISTS public.evidence_vectors_hnsw_idx;"
+        },
+        {
+          "ruleId": "DROP_COLUMN",
+          "level": "BLOCK",
+          "message": "Drops a column — data loss",
+          "line": 38,
+          "snippet": "ALTER TABLE public.evidence_vectors DROP COLUMN embedding;"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 47,
+          "snippet": "CREATE UNIQUE INDEX evidence_vectors_source_chunk_uq"
         }
       ]
     },
@@ -7132,6 +8904,32 @@
       ]
     },
     {
+      "file": "drizzle\\manual\\codebase_chunk_eg2_embeddings.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 5,
+          "snippet": "CREATE TABLE IF NOT EXISTS codebase_chunk_eg2_embeddings ("
+        },
+        {
+          "ruleId": "NO_CASCADE_FK",
+          "level": "BLOCK",
+          "message": "FK without explicit ON DELETE/UPDATE (use NO ACTION or CASCADE deliberately)",
+          "line": 6,
+          "snippet": "source_id        UUID PRIMARY KEY REFERENCES codebase_chunk_index(id) ON DELETE CASCADE,"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 16,
+          "snippet": "CREATE INDEX IF NOT EXISTS codebase_chunk_eg2_embeddings_hnsw"
+        }
+      ]
+    },
+    {
       "file": "drizzle\\manual\\directory_cluster_checkpoints.sql",
       "findings": [
         {
@@ -7326,6 +9124,32 @@
       ]
     },
     {
+      "file": "drizzle\\manual\\graphify_files_revision_scoped_unique.sql",
+      "findings": [
+        {
+          "ruleId": "DROP_INDEX",
+          "level": "WARN",
+          "message": "DROP INDEX without CONCURRENTLY holds AccessExclusiveLock; prefer DROP INDEX CONCURRENTLY",
+          "line": 33,
+          "snippet": "DROP INDEX IF EXISTS graphify_files_code_source_revision_uq_v2;"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 35,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS graphify_files_code_source_revision_uq_v3"
+        },
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 35,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS graphify_files_code_source_revision_uq_v3"
+        }
+      ]
+    },
+    {
       "file": "drizzle\\manual\\graphify_workspace_owner_backfill.sql",
       "findings": [
         {
@@ -7372,6 +9196,39 @@
           "message": "Idempotent guard (good practice)",
           "line": 18,
           "snippet": "ADD COLUMN IF NOT EXISTS latent_256 halfvec(256);"
+        }
+      ]
+    },
+    {
+      "file": "drizzle\\manual\\legal_corpus_indexes.sql",
+      "findings": [
+        {
+          "ruleId": "IF_NOT_EXISTS",
+          "level": "NOTE",
+          "message": "Idempotent guard (good practice)",
+          "line": 10,
+          "snippet": "ADD COLUMN IF NOT EXISTS tsv tsvector"
+        },
+        {
+          "ruleId": "UNBOUNDED_UPDATE",
+          "level": "WARN",
+          "message": "UPDATE without WHERE clause — check if intentional full-table update",
+          "line": 29,
+          "snippet": "UPDATE legal_nodes SET text_clean = text_clean WHERE tsv IS NULL;"
+        },
+        {
+          "ruleId": "CREATE_INDEX_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT index creation holds AccessShareLock — prefer CREATE INDEX CONCURRENTLY",
+          "line": 32,
+          "snippet": "CREATE INDEX IF NOT EXISTS legal_nodes_tsv_gin ON legal_nodes USING gin (tsv);"
+        },
+        {
+          "ruleId": "CREATE_UNIQUE_NO_CONCURRENT",
+          "level": "WARN",
+          "message": "Non-CONCURRENT unique index holds AccessShareLock",
+          "line": 45,
+          "snippet": "CREATE UNIQUE INDEX IF NOT EXISTS legal_nodes_doc_path_uniq ON legal_nodes (document_id, node_path);"
         }
       ]
     },
@@ -7708,5 +9565,5 @@
       ]
     }
   ],
-  "generatedAt": "2026-09-06T02:49:21.484Z"
+  "generatedAt": "2026-10-29T18:40:23.522Z"
 }

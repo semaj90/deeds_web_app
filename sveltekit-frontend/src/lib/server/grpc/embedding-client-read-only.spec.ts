@@ -59,6 +59,7 @@ describe('embedding client strict read-only cache policy', () => {
     });
 
     expect(result.vectors[0]).toHaveLength(768);
+    expect(result.modelArtifactRevision).toBe(`sha256:${liveDigest.value}`);
     expect(redisMock.get).toHaveBeenCalledTimes(1);
     expect(redisMock.get.mock.calls[0][0]).toMatch(/^embed:v2:sha256:[a-f0-9]{64}$/);
     expect(redisMock.set).not.toHaveBeenCalled();
@@ -128,6 +129,7 @@ describe('embedding client strict read-only cache policy', () => {
       const result = await generateEmbeddings(['query requiring an embedding'], { executionMode: 'READ_ONLY' });
       expect(result.source).toBe('http-openai-compatible');
       expect(result.model).toBe('embeddinggemma-openai-compatible');
+      expect(result.modelArtifactRevision).toBeUndefined();
       expect(result.attempts).toContainEqual(expect.objectContaining({
         transport: 'http-openai-compatible',
         status: 'success',

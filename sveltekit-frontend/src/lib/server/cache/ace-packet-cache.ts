@@ -121,8 +121,21 @@ export function buildRevisionedAcePacketCacheKeyV1(
   );
 }
 
+function canonicalPacketJsonV1(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null';
+  if (Array.isArray(value)) return '[' + value.map((v) => canonicalPacketJsonV1(v)).join(',') + ']';
+  const obj = value as Record<string, unknown>;
+  return '{' + Object.keys(obj).filter((k) => obj[k] !== undefined).sort().map((k) => JSON.stringify(k) + ':' + canonicalPacketJsonV1(obj[k])).join(',') + '}';
+}
+
+/** sha256 over recursively key-sorted JSON of the packet (nested fields included). Compared with identity.artifactChecksum. */
+export function acePacketChecksumV1(packet: AcePacket): string {
+  return 'sha256:' + crypto.createHash('sha256').update(canonicalPacketJsonV1(packet), 'utf8').digest('hex');
+}
+
 export async function redisGetRevisionedAcePacketV1(
   identity: AceBitfrostCacheIdentityV1,
+  options: { verifyPacketChecksum?: boolean } = {},
 ): Promise<AcePacket | null> {
   const cacheKey = buildAceBitfrostCacheKeyV1(identity);
   if (!redis) return null;
@@ -146,6 +159,8 @@ export async function redisGetRevisionedAcePacketV1(
     ) {
       return null;
     }
+    // Opt-in until every writer records a real packet digest (the replay proof script still uses a placeholder).
+    if (options.verifyPacketChecksum && acePacketChecksumV1(parsed.packet) !== identity.artifactChecksum) return null;
     return parsed.packet;
   } catch {
     return null;

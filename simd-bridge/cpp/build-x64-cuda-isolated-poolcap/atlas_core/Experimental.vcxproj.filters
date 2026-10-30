@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda-isolated-poolcap\CMakeFiles\8cb27da7d88b38150db0e9886b59dfb8\Experimental.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\james\Videos\deeds-web-app\native\atlas_core\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build-x64-cuda-isolated-poolcap\atlas_core\CMakeFiles\Experimental" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{4B0DFCEC-6DEE-3397-A5E8-7E1F077F990E}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

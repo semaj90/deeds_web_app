@@ -1,7 +1,7 @@
 /**
  * Multi-Modal Recommendation Ranker
  * Combines 7 signals for legal document recommendation:
- *   1. Vector Similarity (0.30): Cosine similarity to query embedding
+ *   1. Retrieval Relevance (0.30): normalized cosine or source-rank score
  *   2. Tag Overlap (0.18): Shared statute/entity/practice area tags
  *   3. Topic Affinity (0.18): Document membership in query-related topics
  *   4. Graph Centrality (0.12): Neo4j connection strength to related cases/evidence
@@ -21,9 +21,18 @@ import { documentTopics, userInteractionHistory } from '$lib/server/db/schema-po
 import { eq, and, sql } from 'drizzle-orm';
 import { feedbackStore } from '$lib/server/ml/feedback-store.js';
 import { batchCosineSimilarity } from '$lib/server/gpu/libtorch-bridge.js';
+import {
+	clampRankingRelevance,
+	hasCompatibleRankingEmbeddingIdentity,
+	isUsableRankingEmbedding,
+	normalizeCosineRelevance,
+	relevanceFromSignal,
+	type RankingEmbeddingIdentityV1,
+	type RecommendationRetrievalSignalV1
+} from './recommendation-score-contract.js';
 
 export interface RankingSignal {
-	vectorSimilarity: number; // [0, 1] cosine similarity
+	retrievalRelevance: number; // [0, 1], cosine-derived or source-rank-derived
 	tagOverlap: number; // [0, 1] proportion of shared tags
 	topicAffinity: number; // [0, 1] max topic membership probability
 	graphCentrality: number; // [0, 1] normalized Neo4j centrality
@@ -44,7 +53,10 @@ export interface RankedDocument {
 export interface DocumentCandidate {
 	id: string;
 	title: string;
-	embedding: number[];
+	embedding?: number[];
+	retrievalRelevance?: number;
+	retrievalSignal?: RecommendationRetrievalSignalV1;
+	embeddingIdentity?: RankingEmbeddingIdentityV1;
 	tags: string[];
 	topicMemberships?: { topicId: number; probability: number }[];
 	centrality?: number;
@@ -53,7 +65,7 @@ export interface DocumentCandidate {
 
 // Weights for the 7 signals (sum = 1.0)
 const SIGNAL_WEIGHTS = {
-	vectorSimilarity: 0.30,
+	retrievalRelevance: 0.30,
 	tagOverlap: 0.18,
 	topicAffinity: 0.18,
 	graphCentrality: 0.12,
@@ -233,7 +245,8 @@ export class MultiModalRanker {
 		queryEmbedding: number[],
 		queryTags: string[],
 		candidates: DocumentCandidate[],
-		topK = 10
+		topK = 10,
+		queryEmbeddingIdentity?: RankingEmbeddingIdentityV1
 	): Promise<RankedDocument[]> {
 		if (candidates.length === 0) {
 			return [];
@@ -247,10 +260,20 @@ export class MultiModalRanker {
 			this.userProfile = await fetchUserProfileMatch(this.userId);
 		}
 
-		// GPU-accelerated batch vector similarity via LibTorch (100× faster)
-		const allEmbeddings = candidates.map(c => c.embedding);
-		const batchResult = await batchCosineSimilarity(queryEmbedding, allEmbeddings);
-		const vectorSimilarities = batchResult.scores;
+		const embeddingCandidates = candidates
+			.map((candidate, index) => ({ candidate, index }))
+			.filter(({ candidate }) =>
+				hasCompatibleRankingEmbeddingIdentity(queryEmbeddingIdentity, candidate.embeddingIdentity, queryEmbedding.length)
+				&& isUsableRankingEmbedding(candidate.embedding, queryEmbedding.length)
+			);
+		const embeddingScores = embeddingCandidates.length > 0
+			? (await batchCosineSimilarity(queryEmbedding, embeddingCandidates.map(({ candidate }) => candidate.embedding!))).scores
+			: [];
+		const relevanceByIndex = new Map<number, number>();
+		embeddingCandidates.forEach(({ index }, scoreIndex) => {
+			const normalized = normalizeCosineRelevance(embeddingScores[scoreIndex]);
+			if (normalized !== null) relevanceByIndex.set(index, normalized);
+		});
 
 		// Track already-returned embeddings for novelty computation
 		const returnedEmbeddings: number[][] = [];
@@ -259,11 +282,18 @@ export class MultiModalRanker {
 		const rankedWithSignals: RankedDocument[] = [];
 		for (let i = 0; i < candidates.length; i++) {
 			const doc = candidates[i];
-			const precomputedVectorSimilarity = vectorSimilarities[i];
-			// GPU-accelerated batch novelty scoring via LibTorch (100× faster)
-			let noveltyScore = 1.0;
-			if (returnedEmbeddings.length > 0) {
-				const result = await batchCosineSimilarity(doc.embedding, returnedEmbeddings);
+			const usableEmbedding = hasCompatibleRankingEmbeddingIdentity(
+				queryEmbeddingIdentity,
+				doc.embeddingIdentity,
+				queryEmbedding.length
+			) && isUsableRankingEmbedding(doc.embedding, queryEmbedding.length);
+			const retrievalRelevance = relevanceByIndex.get(i)
+				?? (doc.retrievalSignal
+					? relevanceFromSignal(doc.retrievalSignal, queryEmbeddingIdentity)
+					: clampRankingRelevance(doc.retrievalRelevance));
+			let noveltyScore = usableEmbedding ? 1.0 : 0.5;
+			if (usableEmbedding && returnedEmbeddings.length > 0) {
+				const result = await batchCosineSimilarity(doc.embedding!, returnedEmbeddings);
 				const similarities = result.scores;
 				noveltyScore = feedbackStore.getNoveltyPenalty(similarities);
 			}
@@ -273,12 +303,12 @@ export class MultiModalRanker {
 				queryTags,
 				doc,
 				this.userTopicPreferences!,
-				precomputedVectorSimilarity,
+				retrievalRelevance,
 				noveltyScore
 			);
 
 			const finalScore =
-				SIGNAL_WEIGHTS.vectorSimilarity * signals.vectorSimilarity +
+				SIGNAL_WEIGHTS.retrievalRelevance * signals.retrievalRelevance +
 				SIGNAL_WEIGHTS.tagOverlap * signals.tagOverlap +
 				SIGNAL_WEIGHTS.topicAffinity * signals.topicAffinity +
 				SIGNAL_WEIGHTS.graphCentrality * signals.graphCentrality +
@@ -286,7 +316,7 @@ export class MultiModalRanker {
 				SIGNAL_WEIGHTS.feedbackBoost * signals.feedbackBoost +
 				SIGNAL_WEIGHTS.noveltyScore * signals.noveltyScore;
 
-			returnedEmbeddings.push(doc.embedding);
+			if (usableEmbedding) returnedEmbeddings.push(doc.embedding!);
 
 			rankedWithSignals.push({
 				documentId: doc.id,
@@ -311,10 +341,10 @@ export class MultiModalRanker {
 		queryTags: string[],
 		document: DocumentCandidate,
 		userTopicPreferences: Map<number, number>,
-		vectorSimilarity: number,
+		retrievalRelevance: number,
 		noveltyScore = 1.0
 	): RankingSignal {
-		// Signal 1: Vector Similarity (precomputed via GPU batch)
+		// Signal 1: bounded semantic or source-rank relevance
 
 		// Signal 2: Tag Overlap (Jaccard)
 		const tagOverlap = computeTagOverlap(queryTags, document.tags);
@@ -344,7 +374,7 @@ export class MultiModalRanker {
 		// Signal 7: Novelty Score (passed in from caller)
 
 		return {
-			vectorSimilarity,
+			retrievalRelevance,
 			tagOverlap,
 			topicAffinity,
 			graphCentrality,
@@ -357,15 +387,15 @@ export class MultiModalRanker {
 
 	/**
 	 * Generate human-readable explanation tokens for why document was ranked
-	 * Example: ["High Vector Similarity", "Shared Tags: statute, entity"]
+	 * Example: ["High Retrieval Relevance", "Shared Tags: statute, entity"]
 	 */
 	private generateExplanation(signals: RankingSignal): string[] {
 		const tokens: string[] = [];
 
-		if (signals.vectorSimilarity > 0.8) {
-			tokens.push(`High Vector Similarity (${(signals.vectorSimilarity * 100).toFixed(0)}%)`);
-		} else if (signals.vectorSimilarity > 0.6) {
-			tokens.push(`Moderate Vector Similarity (${(signals.vectorSimilarity * 100).toFixed(0)}%)`);
+		if (signals.retrievalRelevance > 0.8) {
+			tokens.push(`High Retrieval Relevance (${(signals.retrievalRelevance * 100).toFixed(0)}%)`);
+		} else if (signals.retrievalRelevance > 0.6) {
+			tokens.push(`Moderate Retrieval Relevance (${(signals.retrievalRelevance * 100).toFixed(0)}%)`);
 		}
 
 		if (signals.tagOverlap > 0.5) {
@@ -409,7 +439,8 @@ export async function rankCombinedResults(
 	ragResults: DocumentCandidate[],
 	graphResults: DocumentCandidate[],
 	tagResults: DocumentCandidate[],
-	topK = 10
+	topK = 10,
+	queryEmbeddingIdentity?: RankingEmbeddingIdentityV1
 ): Promise<RankedDocument[]> {
 	// Deduplicate by document ID while preserving best metadata
 	const deduped = new Map<string, DocumentCandidate>();
@@ -431,6 +462,7 @@ export async function rankCombinedResults(
 		queryEmbedding,
 		queryTags,
 		Array.from(deduped.values()),
-		topK
+		topK,
+		queryEmbeddingIdentity
 	);
 }

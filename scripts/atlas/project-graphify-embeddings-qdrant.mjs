@@ -5,6 +5,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { auditModelArtifactBindingsV1, auditQdrantProjectionRowsV1, isPinnedModelRevisionV1 } from './lib/qdrant-projection-admission-v1.mjs';
 
 const { Pool } = pg;
 const env = loadRepoEnv(process.env);
@@ -76,7 +77,7 @@ async function main() {
     const vectors = collection?.result?.config?.params?.vectors;
     if (!vectors?.[VECTOR_NAME] || Number(vectors[VECTOR_NAME].size) !== 768) throw new Error(`Qdrant ${VECTOR_NAME} named vector is not configured as 768d`);
     const result = await pool.query(`
-      SELECT id::text, qdrant_id, source_ref, repo_id, chunk_id, relative_path, symbol, kind, summary, domain, language, tags, semantic_tags, content_hash, embedding_model, embedding_version, metadata ->> 'packet_key' AS packet_key, metadata ->> 'source_revision' AS source_revision, metadata ->> 'workspace_revision' AS workspace_revision, ${SOURCE_COLUMN}::text AS embedding
+      SELECT id::text, qdrant_id, source_ref, repo_id, chunk_id, relative_path, symbol, kind, summary, domain, language, tags, semantic_tags, content_hash, embedding_model, embedding_version, metadata ->> 'embedding_model_revision' AS model_artifact_revision, metadata ->> 'packet_key' AS packet_key, metadata ->> 'source_revision' AS source_revision, metadata ->> 'workspace_revision' AS workspace_revision, ${SOURCE_COLUMN}::text AS embedding
       FROM codebase_chunk_index
       WHERE ${SOURCE_COLUMN} IS NOT NULL
         AND qdrant_id IS NOT NULL
@@ -98,8 +99,32 @@ async function main() {
       workspaceRevision: countPresent('workspace_revision'),
     };
     report.sample = result.rows.slice(0, 5).map((row) => ({ id: row.id, qdrantId: row.qdrant_id, packetKey: row.packet_key, sourceRef: row.source_ref, contentHash: row.content_hash, sourceRevision: row.source_revision, workspaceRevision: row.workspace_revision }));
-    if (!APPLY) report.status = 'DRY_RUN';
+    const rowAdmissions = auditQdrantProjectionRowsV1(result.rows);
+    const rejectedRows = rowAdmissions.filter((admission) => !admission.admitted);
+    const artifactBindings = auditModelArtifactBindingsV1(result.rows, MODEL_REVISION);
+    report.admission = {
+      requiredFields: ['id', 'qdrant_id', 'packet_key', 'source_ref', 'chunk_id', 'content_hash', 'source_revision', 'workspace_revision', 'embedding_model', 'embedding_version', 'model_artifact_revision'],
+      admitted: rowAdmissions.length - rejectedRows.length,
+      rejected: rejectedRows.length,
+      rejectedRows: rejectedRows.slice(0, 50),
+      modelRevisionPinned: isPinnedModelRevisionV1(MODEL_REVISION),
+      modelArtifactBindings: artifactBindings,
+    };
+    if (!APPLY) report.status = rejectedRows.length || artifactBindings.some((binding) => !binding.admitted) ? 'DRY_RUN_WITH_REJECTIONS' : 'DRY_RUN';
     else {
+      const invalidArtifactBindings = artifactBindings.filter((binding) => !binding.admitted);
+      if (invalidArtifactBindings.length) {
+        report.status = 'BLOCKED_MODEL_ARTIFACT_LINEAGE_MISMATCH';
+        throw new Error(`QDRANT_PROJECTION_BLOCKED_MODEL_ARTIFACT_LINEAGE_MISMATCH:${invalidArtifactBindings.length}`);
+      }
+      if (rejectedRows.length) {
+        report.status = 'BLOCKED_LINEAGE_INCOMPLETE';
+        throw new Error(`QDRANT_PROJECTION_BLOCKED_LINEAGE_INCOMPLETE:${rejectedRows.length}`);
+      }
+      if (!isPinnedModelRevisionV1(MODEL_REVISION)) {
+        report.status = 'BLOCKED_MODEL_REVISION_UNPINNED';
+        throw new Error('QDRANT_PROJECTION_BLOCKED_MODEL_REVISION_UNPINNED');
+      }
       for (let offset = 0; offset < result.rows.length; offset += BATCH) {
         const rows = result.rows.slice(offset, offset + BATCH);
         const existing = await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids: rows.map((row) => pointId(row.qdrant_id)), with_payload: true, with_vector: false }) });
@@ -108,7 +133,7 @@ async function main() {
           const id = pointId(row.qdrant_id);
           const prior = existingPayloads.get(String(id)) ?? {};
           const projectionRevisions = { ...(prior.projection_revisions ?? {}), [VECTOR_NAME]: PROJECTION_REVISION };
-          return { id, vector: { [VECTOR_NAME]: parseVector(row.embedding) }, payload: { ...prior, canonical_id: row.id, packet_key: row.packet_key ?? prior.packet_key ?? null, source_ref: row.source_ref, repo_id: row.repo_id, chunk_id: row.chunk_id, relative_path: row.relative_path, symbol: row.symbol, kind: row.kind, summary: row.summary, domain: row.domain, language: row.language, tags: row.tags, semantic_tags: row.semantic_tags, content_hash: row.content_hash, representation_id: REPRESENTATION_ID, representation_name: REPRESENTATION_ID, representation_revision: REPRESENTATION_REVISION, embedding_dimension: CANONICAL_DIMENSION, model_revision: MODEL_REVISION, projection_revision: PROJECTION_REVISION, [`${VECTOR_NAME}_projection_revision`]: PROJECTION_REVISION, projection_revisions: projectionRevisions, graphify_embedding_projected_at: new Date().toISOString() } };
+          return { id, vector: { [VECTOR_NAME]: parseVector(row.embedding) }, payload: { ...prior, canonical_id: row.id, packet_key: row.packet_key, source_ref: row.source_ref, source_revision: row.source_revision, workspace_revision: row.workspace_revision, repo_id: row.repo_id, chunk_id: row.chunk_id, relative_path: row.relative_path, symbol: row.symbol, kind: row.kind, summary: row.summary, domain: row.domain, language: row.language, tags: row.tags, semantic_tags: row.semantic_tags, content_hash: row.content_hash, embedding_model: row.embedding_model, embedding_version: row.embedding_version, model_artifact_revision: row.model_artifact_revision, representation_id: REPRESENTATION_ID, representation_name: REPRESENTATION_ID, representation_revision: REPRESENTATION_REVISION, embedding_dimension: CANONICAL_DIMENSION, model_revision: row.model_artifact_revision, projection_revision: PROJECTION_REVISION, [`${VECTOR_NAME}_projection_revision`]: PROJECTION_REVISION, projection_revisions: projectionRevisions, graphify_embedding_projected_at: new Date().toISOString() } };
         });
         await jsonFetch(`${QDRANT_URL}/collections/${COLLECTION}/points?wait=true`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ points }) });
         report.projected += points.length;
@@ -121,6 +146,6 @@ async function main() {
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(report, null, 2) + '\n', 'utf8');
   console.log(JSON.stringify({ status: report.status, selected: report.selected, projected: report.projected, scope: report.scope, qdrant: report.qdrant, out: OUT, errors: report.errors }, null, 2));
-  if (report.status === 'FAIL') process.exit(1);
+  if (report.status === 'FAIL' || report.status.startsWith('BLOCKED_')) process.exit(1);
 }
 main();

@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda-isolated-poolcap/cmake_install.cmake",
+		"C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda-isolated-poolcap/atlas_core/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

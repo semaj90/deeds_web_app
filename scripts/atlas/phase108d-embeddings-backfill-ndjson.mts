@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Phase 108D: Qdrant Embeddings Backfill (52,380 chunks) — NDJSON Streaming
+ * RETIRED: this writer allocates point IDs from the current collection count,
+ * so retries are not idempotent. Use the admitted semantic_768 projection owner.
  *
  * Uses REST API with chunked HTTP transfer encoding + NDJSON format.
  * Faster than REST+JSON (no single large JSON payload), simpler than gRPC.
@@ -18,6 +19,9 @@ import { writeFileSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 import { execSync } from 'child_process';
 import { createRequire } from 'module';
+
+console.error('LEGACY_QDRANT_APPEND_BACKFILL_DISABLED: append-derived IDs can duplicate vectors; use the admitted semantic_768 projection owner');
+process.exit(2);
 
 const require_native = createRequire(import.meta.url);
 

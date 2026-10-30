@@ -16,6 +16,7 @@ import { z } from 'zod';
 import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { executeEmbeddingInputV1 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
+import { searchStatuteChunks, searchStatuteChunksText, type StatuteHit } from '$lib/server/legal/statute-search-v1.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
@@ -80,109 +81,42 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: 'Embedding service unavailable' }, { status: 503 });
 	}
 
-	// 2. Build pgvector cosine similarity query
+	// 2. Search legal_chunks (shared read-only owner: $lib/server/legal/statute-search-v1)
 	const searchStart = performance.now();
-	const vectorString = `[${embedding.join(',')}]`;
+	const toResult = (h: StatuteHit) => ({
+		chunkId: h.chunkId,
+		nodeId: h.nodeId,
+		documentId: h.documentId ?? '',
+		title: h.documentTitle ?? '',
+		heading: h.heading ?? '',
+		citationLabel: h.citationLabel,
+		jurisdiction: h.jurisdiction ?? 'Other',
+		category: h.sourceType === 'unregistered' ? null : h.sourceType,
+		sourceType: h.sourceType,
+		chunkIndex: h.chunkIndex,
+		snippet: h.snippet,
+		score: h.score,
+		sourceConfidence: h.sourceConfidence ?? 'medium'
+	});
 
 	try {
-		const res = await pool.query(
-			`SELECT
-				lc.id AS chunk_id,
-				ln.id AS node_id,
-				ld.id AS doc_id,
-				ld.title AS doc_title,
-				ln.heading AS node_heading,
-				ln.citation_label AS citation,
-				j.code AS jurisdiction,
-				ld.corpus_type AS category,
-				ld.source_confidence AS source_confidence,
-				lc.chunk_index,
-				lc.chunk_text AS content,
-				1 - (lc.embedding <=> $1::vector) AS similarity
-			 FROM legal_chunks lc
-			 JOIN legal_nodes ln ON ln.id = lc.legal_node_id
-			 JOIN library_documents ld ON ld.id = ln.document_id
-			 LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
-			 WHERE lc.embedding IS NOT NULL
-			 ORDER BY lc.embedding <=> $1::vector
-			 LIMIT $2`,
-			[vectorString, limit]
-		);
-
+		const found = await searchStatuteChunks(pool, embedding, limit);
+		if (found.status !== 'OK') {
+			return json({ error: 'Embedding incompatible with the legal_chunks space', reason: found.reason, results: [], count: 0, timing }, { status: 422 });
+		}
 		timing.search_ms = Math.round(performance.now() - searchStart);
 		timing.total_ms = Math.round(performance.now() - start);
-
-		return json({
-			results: res.rows.map(r => ({
-				chunkId: String(r.chunk_id),
-				nodeId: String(r.node_id),
-				documentId: String(r.doc_id),
-				title: String(r.doc_title ?? ''),
-				heading: String(r.node_heading ?? ''),
-				citationLabel: r.citation ? String(r.citation) : null,
-				jurisdiction: String(r.jurisdiction ?? 'Other'),
-				category: r.category ? String(r.category) : null,
-				chunkIndex: Number(r.chunk_index),
-				snippet: String(r.content ?? ''),
-				score: Number(r.similarity ?? 0),
-				sourceConfidence: String(r.source_confidence ?? 'medium')
-			})),
-			count: res.rows.length,
-			timing,
-			model: EMBEDDING_MODEL
-		});
+		return json({ results: found.hits.map(toResult), count: found.hits.length, timing, model: EMBEDDING_MODEL });
 	} catch (err) {
 		console.error('[Statutes Search] Vector query failed:', err);
 
-		// Fallback: full-text search
+		// Fallback: OR-style full-text search
 		try {
-			const textRes = await pool.query(
-				`SELECT
-					lc.id AS chunk_id,
-					ln.id AS node_id,
-					ld.id AS doc_id,
-					ld.title AS doc_title,
-					ln.heading AS node_heading,
-					ln.citation_label AS citation,
-					j.code AS jurisdiction,
-					ld.corpus_type AS category,
-					ld.source_confidence AS source_confidence,
-					lc.chunk_index,
-					lc.chunk_text AS content,
-					ts_rank(lc.tsv, plainto_tsquery('english', $1)) AS similarity
-				 FROM legal_chunks lc
-				 JOIN legal_nodes ln ON ln.id = lc.legal_node_id
-				 JOIN library_documents ld ON ld.id = ln.document_id
-				 LEFT JOIN jurisdictions j ON j.id = ld.jurisdiction_id
-				 WHERE lc.tsv @@ plainto_tsquery('english', $1)
-				 ORDER BY similarity DESC
-				 LIMIT $2`,
-				[query, limit]
-			);
-
+			const found = await searchStatuteChunksText(pool, query, limit);
 			timing.search_ms = Math.round(performance.now() - searchStart);
 			timing.total_ms = Math.round(performance.now() - start);
 			timing.fallback = 1;
-
-			return json({
-				results: textRes.rows.map(r => ({
-					chunkId: String(r.chunk_id),
-					nodeId: String(r.node_id),
-					documentId: String(r.doc_id),
-					title: String(r.doc_title ?? ''),
-					heading: String(r.node_heading ?? ''),
-					citationLabel: r.citation ? String(r.citation) : null,
-					jurisdiction: String(r.jurisdiction ?? 'Other'),
-					category: r.category ? String(r.category) : null,
-					chunkIndex: Number(r.chunk_index),
-					snippet: String(r.content ?? ''),
-					score: Number(r.similarity ?? 0),
-					sourceConfidence: String(r.source_confidence ?? 'medium')
-				})),
-				count: textRes.rows.length,
-				timing,
-				model: 'text-search-fallback'
-			});
+			return json({ results: found.hits.map(toResult), count: found.hits.length, timing, model: 'text-search-fallback' });
 		} catch (fallbackErr) {
 			console.error('[Statutes Search] Fallback failed:', fallbackErr);
 			return json({ error: 'Search unavailable', results: [], timing }, { status: 503 });

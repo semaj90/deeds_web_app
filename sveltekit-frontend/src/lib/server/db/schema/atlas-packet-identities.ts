@@ -1,4 +1,4 @@
-import { check, foreignKey, index, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
+import { bigint, check, foreignKey, index, jsonb, pgTable, primaryKey, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { atlasPackets } from './atlas-packets.js';
 
@@ -18,7 +18,88 @@ export const atlasRepositoryIdentity = pgTable('atlas_repository_identity', {
 	parentRepositoryId: uuid('parent_repository_id'),
 	knownCommitOids: text('known_commit_oids').array().notNull(),
 	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => ({
+	repositoryAuthorityUnique: unique('atlas_repository_identity_repository_id_source_authority_re_key').on(
+		table.repositoryId,
+		table.sourceAuthorityRepoId,
+	),
+}));
+
+export const atlasStableFileIdentity = pgTable('atlas_stable_file_identity', {
+	stableFileId: uuid('stable_file_id').primaryKey(),
+	repositoryId: uuid('repository_id').notNull(),
+	lifecycleState: text('lifecycle_state').notNull().default('ACTIVE'),
+	createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+	tombstonedAt: timestamp('tombstoned_at', { withTimezone: true }),
+}, (table) => ({
+	repositoryFk: foreignKey({ name: 'atlas_stable_file_identity_repository_id_fkey', columns: [table.repositoryId], foreignColumns: [atlasRepositoryIdentity.repositoryId] }),
+	repositoryStateIndex: index('idx_atlas_stable_file_identity_repo_state').on(table.repositoryId, table.lifecycleState),
+	lifecycleStateCheck: check('atlas_stable_file_identity_lifecycle_state_check', sql`${table.lifecycleState} IN ('ACTIVE', 'TOMBSTONED')`),
+}));
+
+export const atlasWorkspaceSourceBindingsReadonly = pgTable('atlas_workspace_source_bindings', {
+	repoId: text('repo_id').notNull(),
+	canonicalSourceRef: text('canonical_source_ref').notNull(),
+	sourceRevision: text('source_revision').notNull(),
+	workspaceRevision: text('workspace_revision').notNull(),
+}, (table) => ({
+	sourceWorkspaceUnique: unique('atlas_workspace_source_bindin_repo_id_canonical_source_ref__key').on(
+		table.repoId,
+		table.canonicalSourceRef,
+		table.sourceRevision,
+		table.workspaceRevision,
+	),
+}));
+
+export const atlasStableFileRevisionBinding = pgTable('atlas_stable_file_revision_binding', {
+	stableFileId: uuid('stable_file_id').notNull(),
+	repositoryId: uuid('repository_id').notNull(),
+	sourceAuthorityRepoId: text('source_authority_repo_id').notNull(),
+	canonicalSourceRef: text('canonical_source_ref').notNull(),
+	workspaceRevision: text('workspace_revision').notNull(),
+	sourceRevision: text('source_revision').notNull(),
+	contentDigest: text('content_digest').notNull(),
+	byteLength: bigint('byte_length', { mode: 'number' }).notNull(),
+	sourceIdentityKey: text('source_identity_key').notNull(),
+	observedAt: timestamp('observed_at', { withTimezone: true }).notNull().defaultNow(),
+	provenance: text('provenance').notNull(),
+}, (table) => ({
+	primaryKey: primaryKey({ name: 'atlas_stable_file_revision_bi_stable_file_id_workspace_revi_key', columns: [table.stableFileId, table.workspaceRevision] }),
+	stableFileFk: foreignKey({ name: 'atlas_stable_file_revision_binding_stable_file_id_fkey', columns: [table.stableFileId], foreignColumns: [atlasStableFileIdentity.stableFileId] }),
+	repositoryAuthorityFk: foreignKey({
+		name: 'atlas_stable_file_revision_bi_repository_id_source_authori_fkey',
+		columns: [table.repositoryId, table.sourceAuthorityRepoId],
+		foreignColumns: [atlasRepositoryIdentity.repositoryId, atlasRepositoryIdentity.sourceAuthorityRepoId],
+	}),
+	sourceBindingFk: foreignKey({
+		name: 'atlas_stable_file_revision_bi_source_authority_repo_id_can_fkey',
+		columns: [table.sourceAuthorityRepoId, table.canonicalSourceRef, table.sourceRevision, table.workspaceRevision],
+		foreignColumns: [atlasWorkspaceSourceBindingsReadonly.repoId, atlasWorkspaceSourceBindingsReadonly.canonicalSourceRef, atlasWorkspaceSourceBindingsReadonly.sourceRevision, atlasWorkspaceSourceBindingsReadonly.workspaceRevision],
+	}),
+	scopedPathIndex: index('idx_atlas_stable_file_revision_binding_scoped_path').on(table.repositoryId, table.canonicalSourceRef, table.workspaceRevision),
+	identityKeyIndex: index('idx_atlas_stable_file_revision_binding_identity_key').on(table.sourceIdentityKey),
+	workspaceRevisionCheck: check('atlas_stable_file_revision_binding_workspace_revision_check', sql`${table.workspaceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+	sourceRevisionCheck: check('atlas_stable_file_revision_binding_source_revision_check', sql`${table.sourceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+	contentDigestCheck: check('atlas_stable_file_revision_binding_content_digest_check', sql`${table.contentDigest} ~ '^[0-9a-f]{64}$'`),
+	byteLengthCheck: check('atlas_stable_file_revision_binding_byte_length_check', sql`${table.byteLength} >= 0`),
+	sourceDigestCheck: check('atlas_stable_file_revision_binding_check', sql`${table.sourceRevision} = 'sha256:' || ${table.contentDigest}`),
+}));
+
+export const atlasStableFileAlias = pgTable('atlas_stable_file_alias', {
+	stableFileId: uuid('stable_file_id').notNull(),
+	repositoryId: uuid('repository_id').notNull(),
+	aliasPath: text('alias_path').notNull(),
+	introducedInWorkspaceRevision: text('introduced_in_workspace_revision').notNull(),
+	supersededInWorkspaceRevision: text('superseded_in_workspace_revision'),
+	evidence: jsonb('evidence').notNull().default({}),
+}, (table) => ({
+	primaryKey: primaryKey({ name: 'atlas_stable_file_alias_stable_file_id_alias_path_introduce_key', columns: [table.stableFileId, table.aliasPath, table.introducedInWorkspaceRevision] }),
+	stableFileFk: foreignKey({ name: 'atlas_stable_file_alias_stable_file_id_fkey', columns: [table.stableFileId], foreignColumns: [atlasStableFileIdentity.stableFileId] }),
+	repositoryFk: foreignKey({ name: 'atlas_stable_file_alias_repository_id_fkey', columns: [table.repositoryId], foreignColumns: [atlasRepositoryIdentity.repositoryId] }),
+	pathIndex: index('idx_atlas_stable_file_alias_path').on(table.aliasPath),
+	introducedRevisionCheck: check('atlas_stable_file_alias_introduced_in_workspace_revision_check', sql`${table.introducedInWorkspaceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+	supersededRevisionCheck: check('atlas_stable_file_alias_superseded_in_workspace_revision_check', sql`${table.supersededInWorkspaceRevision} IS NULL OR ${table.supersededInWorkspaceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+}));
 
 export const atlasGraphifyScopeRepositoryMapV1 = pgTable(
 	'atlas_graphify_scope_repository_map_v1',

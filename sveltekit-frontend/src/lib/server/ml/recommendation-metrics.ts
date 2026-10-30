@@ -43,7 +43,7 @@ export interface ABTestConfig {
 	testId: string;
 	variant: 'control' | 'treatment';
 	weights: {
-		vectorSimilarity: number;
+		retrievalRelevance: number;
 		tagOverlap: number;
 		topicAffinity: number;
 		graphCentrality: number;

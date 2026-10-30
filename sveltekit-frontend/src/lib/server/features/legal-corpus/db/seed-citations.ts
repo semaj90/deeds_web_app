@@ -10,6 +10,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq } from 'drizzle-orm';
 import pg from 'pg';
 import * as schema from '../../../db/schema-postgres.js';
+import { generateEmbeddings } from '../../../grpc/embedding-client.js';
 
 import { ENV } from '$lib/server/env.server.js';
 
@@ -149,7 +150,23 @@ async function seedCitations(): Promise<void> {
         .where(eq(citations.citationText, cit.citationText))
         .limit(1);
       if (existing.length === 0) {
-        await db.insert(citations).values(cit);
+			const embeddingResult = await generateEmbeddings([cit.citationText], {
+				taskMode: 'retrieval_document',
+				executionMode: 'READ_ONLY',
+				skipCacheRead: true,
+				skipCacheWrite: true,
+			});
+			const [embedding] = embeddingResult.vectors;
+			if (
+				embeddingResult.dimension !== 768
+				|| embeddingResult.vectors.length !== 1
+				|| !embedding
+				|| embedding.length !== 768
+				|| embedding.some((value) => !Number.isFinite(value))
+			) {
+				throw new Error(`Citation embedding violated semantic_768 contract: ${cit.citationText}`);
+			}
+			await db.insert(citations).values({ ...cit, embedding });
         console.log(`  + Created citation: ${cit.citationText}`);
       } else {
         console.log(`  ~ Exists: ${cit.citationText}`);

@@ -33,6 +33,8 @@
  *   node scripts/atlas/index-full-repo-for-search.mjs --apply --limit=500
  *   node scripts/atlas/index-full-repo-for-search.mjs --apply --target=scripts
  *   node scripts/atlas/index-full-repo-for-search.mjs --apply --roots=sveltekit-frontend,scripts,packages
+ *   node scripts/atlas/index-full-repo-for-search.mjs --dry-run --max-file-bytes=10485760
+ *   node scripts/atlas/index-full-repo-for-search.mjs --dry-run --include-doc-reports
  *   node scripts/atlas/index-full-repo-for-search.mjs --apply --verbose
  */
 
@@ -41,11 +43,16 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import pg from 'pg';
 import { fileURLToPath } from 'node:url';
-import { DEFAULT_SCAN_ROOTS, parseRoots, shouldSkipDirectory } from './lib/repo-scan-roots.mjs';
+import { DEFAULT_SCAN_ROOTS, parseRoots, shouldSkipIndexPath } from './lib/repo-scan-roots.mjs';
+import { filterGitIgnoredFiles } from './lib/git-ignore-file-filter-v1.mjs';
 import { buildTopologyEnvelope, deriveDomainClass, deriveFeatureId, deriveCentroidKeys } from './lib/topology-ontology.mjs';
 import { qualifyChunkSourceSpanV1 } from './lib/chunk-source-span-v1.mjs';
 import { classifyIndexedChunkReuseV1 } from './lib/indexed-chunk-reuse-v1.mjs';
 import { resolveExactIndexFileTargetV1 } from './lib/exact-index-file-target-v1.mjs';
+import {
+  exceedsIndexFileSizeLimit,
+  parseMaxIndexFileBytes,
+} from './lib/index-file-size-policy-v1.mjs';
 import {
   chunkLargeTextAtSourceV1,
   chunkTextAtUtf8BoundariesV1,
@@ -86,14 +93,17 @@ const ROOTS_ARG = getArgValue('--roots');
 const AST_MANIFEST_PATH = getArgValue('--ast-manifest');
 const SOURCE_PLAN_PATH = getArgValue('--source-plan');
 const FILE_ARG = getArgValue('--file');
+const MAX_INDEX_FILE_BYTES = parseMaxIndexFileBytes(getArgValue('--max-file-bytes'));
+const INCLUDE_DOC_REPORTS = argv.includes('--include-doc-reports');
+const skipIndexPath = (value) => shouldSkipIndexPath(value, { includeDocReports: INCLUDE_DOC_REPORTS });
 
 // ── Config ───────────────────────────────────────────────────────────────────
 const OLLAMA_URL   = process.env.OLLAMA_URL   ?? 'http://localhost:11434';
 const EMBEDDING_BACKEND = String(process.env.EMBEDDING_BACKEND ?? 'ollama').toLowerCase();
 const EMBED_SERVER_URL = (process.env.EMBED_SERVER_URL ?? process.env.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:8081').replace(/\/$/, '');
 const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://127.0.0.1:6333';
-const DATABASE_URL = process.env.DATABASE_URL ??
-  'postgres://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) throw new Error('DATABASE_URL_REQUIRED_FOR_FULL_REPO_INDEXER');
 const REDIS_HOST   = process.env.REDIS_HOST     ?? '127.0.0.1';
 const REDIS_PORT   = parseInt(process.env.REDIS_PORT ?? '6379', 10);
 const REDIS_PASS   = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis';
@@ -396,8 +406,9 @@ function nextEmbeddingBatch(chunks, offset) {
 function walk(dir, results = []) {
   if (!fs.existsSync(dir)) return results;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (shouldSkipDirectory(entry.name)) continue;
     const abs = path.join(dir, entry.name);
+    const relativePath = path.relative(REPO_ROOT, abs).split(path.sep).join('/');
+    if (skipIndexPath(entry.name) || skipIndexPath(relativePath)) continue;
     if (entry.isDirectory()) {
       walk(abs, results);
     } else if (entry.isFile()) {
@@ -571,6 +582,13 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
   try {
     fileSize = fs.statSync(absPath).size;
   } catch { return; }
+
+  if (exceedsIndexFileSizeLimit(fileSize, MAX_INDEX_FILE_BYTES)) {
+    stats.skippedLargeFiles++;
+    stats.skippedLargeFileBytes += fileSize;
+    if (VERBOSE) console.log(`  [skip-large-file] ${relPath} (${fileSize} bytes > ${MAX_INDEX_FILE_BYTES})`);
+    return;
+  }
 
   let text;
   let sourceBytes;
@@ -890,6 +908,7 @@ async function main() {
   console.log('║  Full-Repo Indexer (chunks → Postgres + Qdrant)             ║');
   console.log(`║  Mode: ${APPLY ? 'APPLY   ' : 'DRY-RUN '}  Target: ${(FILE_ARG ?? TARGET ?? 'all').padEnd(42)}║`);
   console.log('╚══════════════════════════════════════════════════════════════╝\n');
+  console.log(`Maximum source file size: ${MAX_INDEX_FILE_BYTES} bytes (override with --max-file-bytes)`);
 
   // Collect all files
   console.log('Scanning repo directories...');
@@ -899,11 +918,15 @@ async function main() {
       workspaceRoot: REPO_ROOT,
       relativePath: FILE_ARG,
       indexableExtensions: INDEXABLE_EXTS,
-      skipPath: shouldSkipDirectory,
+      skipPath: skipIndexPath,
     });
     allFiles.push(target.absolutePath);
   } else {
     for (const scanDir of SCAN_DIRS) {
+      if (skipIndexPath(scanDir)) {
+        console.log(`  ${scanDir}/: skipped by index policy`);
+        continue;
+      }
       const absDir = path.join(REPO_ROOT, scanDir);
       const files = walk(absDir);
       console.log(`  ${scanDir}/: ${files.length} indexable files`);
@@ -924,7 +947,8 @@ async function main() {
       const candidates = [sourceRef, `sveltekit-frontend/${sourceRef}`];
       const absPath = candidates.map((candidate) => absByRelativePath.get(candidate)).find(Boolean)
         ?? candidates.map((candidate) => path.resolve(REPO_ROOT, candidate))
-          .find((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile() && INDEXABLE_EXTS.has(path.extname(candidate).toLowerCase()));
+          .find((candidate) => !skipIndexPath(path.relative(REPO_ROOT, candidate))
+            && fs.existsSync(candidate) && fs.statSync(candidate).isFile() && INDEXABLE_EXTS.has(path.extname(candidate).toLowerCase()));
       if (absPath) sourcePlanRefsByPath.set(absPath, sourceRef);
     }
     filesToProcess = allFiles.filter((absPath) => sourcePlanRefsByPath.has(absPath));
@@ -933,6 +957,17 @@ async function main() {
     }
     console.log(`[SOURCE-PLAN] Selected ${filesToProcess.length}/${sourceRefs.length} existing files from ${SOURCE_PLAN_PATH}`);
   }
+
+  if (!FILE_ARG) {
+    const relativePaths = filesToProcess.map((absPath) => normalizeRepoPath(path.relative(REPO_ROOT, absPath)));
+    const gitIgnore = filterGitIgnoredFiles(relativePaths, { cwd: REPO_ROOT });
+    const includedPaths = new Set(gitIgnore.included);
+    filesToProcess = filesToProcess.filter((absPath) =>
+      includedPaths.has(normalizeRepoPath(path.relative(REPO_ROOT, absPath))),
+    );
+    console.log(`[GIT-IGNORE] Excluded ${gitIgnore.ignored.length} ignored files; ${filesToProcess.length} remain`);
+  }
+
   filesToProcess = LIMIT > 0 ? filesToProcess.slice(0, LIMIT) : filesToProcess;
 
   if (DRY_RUN) {
@@ -944,7 +979,7 @@ async function main() {
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
   const stats = {
-    files: 0, chunks: 0, skipped: 0, errors: 0, reuseReasons: {},
+    files: 0, chunks: 0, skipped: 0, skippedLargeFiles: 0, skippedLargeFileBytes: 0, errors: 0, reuseReasons: {},
     // centroid accumulation: domain → float32 vectors[], feature_id → float32 vectors[]
     centroidAcc: {},
     featureCentroidAcc: {},
@@ -980,6 +1015,7 @@ async function main() {
   console.log(`Files processed  : ${stats.files}`);
   console.log(`Chunks indexed   : ${stats.chunks}`);
   console.log(`Files skipped    : ${stats.skipped} (already indexed)`);
+  console.log(`Oversized skipped: ${stats.skippedLargeFiles} (${stats.skippedLargeFileBytes} bytes; not read or embedded)`);
   console.log(`Errors           : ${stats.errors}`);
   if (stats.filesFullyFailed) {
     console.log(`Files 0% indexed : ${stats.filesFullyFailed} (all chunks failed -- see ✗ lines above)`);

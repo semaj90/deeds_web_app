@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-09T17:07:06.002Z",
+  "generated_at": "2026-10-29T16:45:38.930Z",
   "apply_mode": "dry-run",
-  "limit": 100,
+  "limit": 500,
   "offset": 0,
-  "total": 100,
+  "total": 500,
   "top": [
     {
       "feature_id": "scripts.+server.ts",
@@ -100,7 +100,7 @@
       "tree_node_id": null,
       "packet_key": "packet:002b62662acc",
       "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/embed/search/+server.ts.batch1000-backup",
-      "updated_at": "2026-08-09T17:07:05.999Z"
+      "updated_at": "2026-10-29T16:45:38.926Z"
     },
     {
       "feature_id": "scripts.LLMS",
@@ -115,7 +115,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 399,
-      "qdrant_keyed_count": 229,
+      "qdrant_keyed_count": 1425,
       "entity_count": 0,
       "bitfrost_keyed_count": 1429,
       "tree_linked_count": 1177,
@@ -206,7 +206,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0011712c94d1",
       "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/workers/jobs/clean-server/LLMS.md",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "scripts.+server",
@@ -221,7 +221,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 400,
-      "qdrant_keyed_count": 220,
+      "qdrant_keyed_count": 1290,
       "entity_count": 0,
       "bitfrost_keyed_count": 1327,
       "tree_linked_count": 1105,
@@ -315,7 +315,7 @@
       "tree_node_id": null,
       "packet_key": "packet:00548ef34afb",
       "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gpu-error-processing/+server.ts",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.+server",
@@ -330,7 +330,7 @@
       "max_page_rank": 0.7946507,
       "community_id": 25,
       "som_cluster": 399,
-      "qdrant_keyed_count": 649,
+      "qdrant_keyed_count": 774,
       "entity_count": 0,
       "bitfrost_keyed_count": 777,
       "tree_linked_count": 655,
@@ -435,7 +435,7 @@
       "tree_node_id": null,
       "packet_key": "packet:05cbd86d037b",
       "source_ref": "sveltekit-frontend/src/routes/api/phase89/related/[id]/+server.ts",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.LLMS",
@@ -450,7 +450,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 399,
-      "qdrant_keyed_count": 4,
+      "qdrant_keyed_count": 610,
       "entity_count": 0,
       "bitfrost_keyed_count": 639,
       "tree_linked_count": 514,
@@ -540,7 +540,7 @@
       "tree_node_id": null,
       "packet_key": "packet:00581022d8d5",
       "source_ref": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "crates.invoked",
@@ -637,7 +637,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0037e8373280",
       "source_ref": "crates/turbovec-napi/target/release/.fingerprint/bitflags-27a80a92b75ba5f1/invoked.timestamp",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.+page",
@@ -652,7 +652,7 @@
       "max_page_rank": 1,
       "community_id": 25,
       "som_cluster": 400,
-      "qdrant_keyed_count": 304,
+      "qdrant_keyed_count": 321,
       "entity_count": 0,
       "bitfrost_keyed_count": 321,
       "tree_linked_count": 269,
@@ -722,7 +722,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0bb0b068d7e2",
       "source_ref": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.ts",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "simd-bridge.invoked",
@@ -834,7 +834,7 @@
       "tree_node_id": null,
       "packet_key": "packet:01737b3c88bb",
       "source_ref": "simd-bridge/rust-simdjson/target/debug/.fingerprint/cfg-if-ff361e238baac693/invoked.timestamp",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.relationship_map",
@@ -849,7 +849,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 395,
-      "qdrant_keyed_count": 1,
+      "qdrant_keyed_count": 185,
       "entity_count": 0,
       "bitfrost_keyed_count": 185,
       "tree_linked_count": 157,
@@ -932,7 +932,7 @@
       "tree_node_id": null,
       "packet_key": "packet:01ada8fff615",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T05-41-09/relationship_map.json",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.next_actions",
@@ -947,7 +947,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 396,
-      "qdrant_keyed_count": 0,
+      "qdrant_keyed_count": 185,
       "entity_count": 0,
       "bitfrost_keyed_count": 185,
       "tree_linked_count": 159,
@@ -1040,7 +1040,7 @@
       "tree_node_id": null,
       "packet_key": "packet:01d161abc4c9",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T03-00-05/next_actions.md",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.graph_nodes",
@@ -1055,7 +1055,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 397,
-      "qdrant_keyed_count": 0,
+      "qdrant_keyed_count": 181,
       "entity_count": 0,
       "bitfrost_keyed_count": 181,
       "tree_linked_count": 144,
@@ -1135,7 +1135,7 @@
       "tree_node_id": null,
       "packet_key": "packet:02bc64957104",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-17T22-06-54/graph_nodes.json",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.ace_hit_relationships",
@@ -1150,7 +1150,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 382,
-      "qdrant_keyed_count": 1,
+      "qdrant_keyed_count": 178,
       "entity_count": 0,
       "bitfrost_keyed_count": 181,
       "tree_linked_count": 142,
@@ -1252,7 +1252,7 @@
       "tree_node_id": null,
       "packet_key": "packet:01944f78cb50",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-22T01-44-37/ace_hit_relationships.json",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.graph_edges",
@@ -1267,7 +1267,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 397,
-      "qdrant_keyed_count": 1,
+      "qdrant_keyed_count": 181,
       "entity_count": 0,
       "bitfrost_keyed_count": 181,
       "tree_linked_count": 142,
@@ -1359,7 +1359,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0177693e2abf",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-17T22-06-54/graph_edges.json",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.qdrant_cluster_tags",
@@ -1374,7 +1374,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 397,
-      "qdrant_keyed_count": 3,
+      "qdrant_keyed_count": 181,
       "entity_count": 0,
       "bitfrost_keyed_count": 181,
       "tree_linked_count": 154,
@@ -1476,7 +1476,7 @@
       "tree_node_id": null,
       "packet_key": "packet:001d67925876",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T03-08-06/qdrant_cluster_tags.json",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
@@ -1491,7 +1491,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 395,
-      "qdrant_keyed_count": 2,
+      "qdrant_keyed_count": 181,
       "entity_count": 0,
       "bitfrost_keyed_count": 181,
       "tree_linked_count": 144,
@@ -1586,7 +1586,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0003260092b1",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.ingest",
@@ -1601,7 +1601,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 400,
-      "qdrant_keyed_count": 1,
+      "qdrant_keyed_count": 2,
       "entity_count": 0,
       "bitfrost_keyed_count": 185,
       "tree_linked_count": 146,
@@ -1700,7 +1700,7 @@
       "tree_node_id": null,
       "packet_key": "packet:00b8f05ab458",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T02-00-27/ingest.jsonl",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "simd-bridge.LLMS",
@@ -1807,7 +1807,7 @@
       "tree_node_id": null,
       "packet_key": "packet:000f50f509c8",
       "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/LLMS.md",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "crates.run-build-script-build-script-build",
@@ -1920,7 +1920,7 @@
       "tree_node_id": null,
       "packet_key": "packet:021cd447b743",
       "source_ref": "crates/turbovec-napi/target/debug/.fingerprint/serde_json-dc3173aec92f3534/run-build-script-build-script-build.json",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "turbovec.LLMS",
@@ -2027,7 +2027,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0357a34350d2",
       "source_ref": "turbovec/target/release/.fingerprint/faer-198335c47e09d35d/LLMS.md",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": ".python311.__init__",
@@ -2136,7 +2136,7 @@
       "tree_node_id": null,
       "packet_key": "packet:01afa107602c",
       "source_ref": ".python311/lib/python3.11/logging/__init__.py",
-      "updated_at": "2026-08-09T17:07:06.000Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "turbovec.invoked",
@@ -2239,7 +2239,7 @@
       "tree_node_id": null,
       "packet_key": "packet:025dc4d95c6d",
       "source_ref": "turbovec/target/release/.fingerprint/pest-d1bf94ad3e86685d/invoked.timestamp",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "crates.build-script-build-script-build",
@@ -2337,7 +2337,7 @@
       "tree_node_id": null,
       "packet_key": "packet:02eaa5506f6b",
       "source_ref": "crates/atlas_packet_parser/target/release/.fingerprint/atlas-packet-parser-a191fbc42b4e8a45/build-script-build-script-build",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.+page.server",
@@ -2352,7 +2352,7 @@
       "max_page_rank": 0.3675021,
       "community_id": 24,
       "som_cluster": 389,
-      "qdrant_keyed_count": 99,
+      "qdrant_keyed_count": 118,
       "entity_count": 0,
       "bitfrost_keyed_count": 118,
       "tree_linked_count": 99,
@@ -2438,7 +2438,7 @@
       "tree_node_id": null,
       "packet_key": "packet:00848415f727",
       "source_ref": "sveltekit-frontend/src/routes/(app)/yorha-home/+page.server.ts",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.__init__",
@@ -2551,7 +2551,7 @@
       "tree_node_id": null,
       "packet_key": "packet:078c243d08d0",
       "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/packaging/licenses/__init__.py",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.AGENTS.md",
@@ -2660,7 +2660,7 @@
       "tree_node_id": null,
       "packet_key": "packet:030eb81732dd",
       "source_ref": "sveltekit-frontend/src/lib/components/ui/progress/AGENTS.md.bak",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": ".svelte-error-fixes-backup.+page",
@@ -2779,7 +2779,7 @@
       "tree_node_id": null,
       "packet_key": "packet:024b840a53ff",
       "source_ref": ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/(evidence)/main/realtime/+page.svelte",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "simd-bridge.build-script-build-script-build",
@@ -2879,7 +2879,7 @@
       "tree_node_id": null,
       "packet_key": "packet:077dd67d0e9d",
       "source_ref": "simd-bridge/rust/graph-engine/target/release/.fingerprint/quote-01f9bb60f00190e6/build-script-build-script-build.json",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "scripts.report",
@@ -2894,7 +2894,7 @@
       "max_page_rank": 0,
       "community_id": 24,
       "som_cluster": 397,
-      "qdrant_keyed_count": 1,
+      "qdrant_keyed_count": 65,
       "entity_count": 0,
       "bitfrost_keyed_count": 84,
       "tree_linked_count": 72,
@@ -2986,7 +2986,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0089b18e2682",
       "source_ref": "scripts/tests/screenshots/2026-02-22T00-35-12/report.json",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "simd-bridge.run-build-script-build-script-build",
@@ -3097,7 +3097,7 @@
       "tree_node_id": null,
       "packet_key": "packet:01dc30047c29",
       "source_ref": "simd-bridge/rust-simdjson/target/debug/.fingerprint/serde_json-dc3173aec92f3534/run-build-script-build-script-build",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.index",
@@ -3112,7 +3112,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 386,
-      "qdrant_keyed_count": 47,
+      "qdrant_keyed_count": 68,
       "entity_count": 0,
       "bitfrost_keyed_count": 76,
       "tree_linked_count": 67,
@@ -3186,7 +3186,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0046c7db4fb2",
       "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "llama-cpp-turboquant-gemma4.CMakeLists",
@@ -3298,7 +3298,7 @@
       "tree_node_id": null,
       "packet_key": "packet:001d524f1582",
       "source_ref": "llama-cpp-turboquant-gemma4/tools/rpc/CMakeLists.txt",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.plan",
@@ -3313,7 +3313,7 @@
       "max_page_rank": 0,
       "community_id": 24,
       "som_cluster": 385,
-      "qdrant_keyed_count": 1,
+      "qdrant_keyed_count": 73,
       "entity_count": 0,
       "bitfrost_keyed_count": 74,
       "tree_linked_count": 55,
@@ -3400,7 +3400,7 @@
       "tree_node_id": null,
       "packet_key": "packet:003655c2cdf4",
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-08T21-32-08/plan.md",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.llms",
@@ -3415,7 +3415,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 390,
-      "qdrant_keyed_count": 0,
+      "qdrant_keyed_count": 66,
       "entity_count": 0,
       "bitfrost_keyed_count": 68,
       "tree_linked_count": 59,
@@ -3514,7 +3514,7 @@
       "tree_node_id": null,
       "packet_key": "packet:02e490c46f8d",
       "source_ref": "sveltekit-frontend/scripts/phase104-backups/src/lib/server/db/schema/llms.md",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "crates.dep-build-script-build-script-build",
@@ -3603,7 +3603,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0ec93ab0874b",
       "source_ref": "crates/atlas_packet_parser/target/release/.fingerprint/serde_core-086677698551b022/dep-build-script-build-script-build",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": ".svelte-error-fixes-backup.LLMS",
@@ -3618,7 +3618,7 @@
       "max_page_rank": 0,
       "community_id": 23,
       "som_cluster": 393,
-      "qdrant_keyed_count": 1,
+      "qdrant_keyed_count": 19,
       "entity_count": 0,
       "bitfrost_keyed_count": 60,
       "tree_linked_count": 51,
@@ -3710,7 +3710,7 @@
       "tree_node_id": null,
       "packet_key": "packet:00dfb5a920ea",
       "source_ref": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/ai/rag/LLMS.md",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "llama-cpp-turboquant-gemma4.README",
@@ -3799,7 +3799,7 @@
       "tree_node_id": null,
       "packet_key": "packet:139cf07794da",
       "source_ref": "llama-cpp-turboquant-gemma4/examples/debug/README.md",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "turbovec.build-script-build-script-build",
@@ -3893,7 +3893,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0c24d8bc2483",
       "source_ref": "turbovec/target/release/.fingerprint/pyo3-65020eca2d6fceb7/build-script-build-script-build",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.mcp-tool-audit",
@@ -3908,7 +3908,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 377,
-      "qdrant_keyed_count": 0,
+      "qdrant_keyed_count": 50,
       "entity_count": 0,
       "bitfrost_keyed_count": 50,
       "tree_linked_count": 45,
@@ -3984,7 +3984,7 @@
       "tree_node_id": null,
       "packet_key": "packet:058c090ceb9a",
       "source_ref": "sveltekit-frontend/memory/runs/2026-06-06T02-04-19/mcp-tool-audit.md",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "turbovec.run-build-script-build-script-build",
@@ -4089,7 +4089,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0204e00d8d96",
       "source_ref": "turbovec/target/release/.fingerprint/pulp-bc4b97d391c43b96/run-build-script-build-script-build",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "grpc_service",
@@ -4163,7 +4163,7 @@
       "tree_node_id": null,
       "packet_key": "0ba2345cd9c542fa",
       "source_ref": "proto:RetrievalService.Health",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "llama-cpp-turboquant-gemma4.index",
@@ -4273,7 +4273,7 @@
       "tree_node_id": null,
       "packet_key": "packet:04e9ff55d7c2",
       "source_ref": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/alert-dialog/index.ts",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "simd-bridge.dep-build-script-build-script-build",
@@ -4388,7 +4388,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0fb9e0d3b6f8",
       "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_core-5e9c360f096c1cc3/dep-build-script-build-script-build",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.lane3-rerank",
@@ -4403,7 +4403,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 396,
-      "qdrant_keyed_count": 2,
+      "qdrant_keyed_count": 40,
       "entity_count": 0,
       "bitfrost_keyed_count": 40,
       "tree_linked_count": 32,
@@ -4507,7 +4507,7 @@
       "tree_node_id": null,
       "packet_key": "packet:008b7a0156a6",
       "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-09T18-23-55/lane3-rerank.json",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.lane2-graph",
@@ -4522,7 +4522,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 393,
-      "qdrant_keyed_count": 0,
+      "qdrant_keyed_count": 40,
       "entity_count": 0,
       "bitfrost_keyed_count": 40,
       "tree_linked_count": 35,
@@ -4597,7 +4597,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0ebd965777a2",
       "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-31-09/lane2-graph.json",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.lane4-synthesis",
@@ -4612,7 +4612,7 @@
       "max_page_rank": 0,
       "community_id": 24,
       "som_cluster": 399,
-      "qdrant_keyed_count": 2,
+      "qdrant_keyed_count": 40,
       "entity_count": 0,
       "bitfrost_keyed_count": 40,
       "tree_linked_count": 33,
@@ -4687,7 +4687,7 @@
       "tree_node_id": null,
       "packet_key": "packet:00a071a3f48c",
       "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-10T00-10-13/lane4-synthesis.json",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.__id.test",
@@ -4702,7 +4702,7 @@
       "max_page_rank": 0,
       "community_id": 24,
       "som_cluster": 397,
-      "qdrant_keyed_count": 0,
+      "qdrant_keyed_count": 36,
       "entity_count": 0,
       "bitfrost_keyed_count": 36,
       "tree_linked_count": 27,
@@ -4765,7 +4765,7 @@
       "tree_node_id": null,
       "packet_key": "packet:07ffa425f2bb",
       "source_ref": "sveltekit-frontend/tests/routes/auto/api/conversations/__id.test.ts",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "sveltekit-frontend.lane1-retrieval",
@@ -4780,7 +4780,7 @@
       "max_page_rank": 0,
       "community_id": 25,
       "som_cluster": 382,
-      "qdrant_keyed_count": 0,
+      "qdrant_keyed_count": 40,
       "entity_count": 0,
       "bitfrost_keyed_count": 40,
       "tree_linked_count": 28,
@@ -4863,7 +4863,7 @@
       "tree_node_id": null,
       "packet_key": "packet:03f30cb1e797",
       "source_ref": "sveltekit-frontend/scratch/synthesis-runs/2026-05-09T23-28-37/lane1-retrieval.json",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "simd-bridge.VCTargetsPath",
@@ -4975,7 +4975,7 @@
       "tree_node_id": null,
       "packet_key": "packet:03aaea0a12ee",
       "source_ref": "simd-bridge/cpp/build-x64-cuda/CMakeFiles/CheckCUDA/CMakeFiles/4.0.0/VCTargetsPath.vcxproj",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "scripts.dashboard",
@@ -5076,7 +5076,7 @@
       "tree_node_id": null,
       "packet_key": "packet:0c17a76f9165",
       "source_ref": "scripts/tests/screenshots/2026-02-22T00-35-12/dashboard.png",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     },
     {
       "feature_id": "minio-data.xl",
@@ -5168,7 +5168,7 @@
       "tree_node_id": null,
       "packet_key": "packet:12181b460986",
       "source_ref": "minio-data/.minio.sys/buckets/archived-files/.usage-cache.bin.bkp/xl.meta",
-      "updated_at": "2026-08-09T17:07:06.001Z"
+      "updated_at": "2026-10-29T16:45:38.927Z"
     }
   ]
 }

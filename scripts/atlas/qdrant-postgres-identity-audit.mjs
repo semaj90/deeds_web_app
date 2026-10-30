@@ -2,16 +2,16 @@
 /**
  * Qdrant/Postgres Identity Audit — Read-Only Lane Classification
  *
- * Classifies all 54K+ Qdrant points into identity lanes by matching against
+ * Classifies Qdrant points into identity lanes by matching against
  * Postgres atlas_packets and codebase_chunk_index tables.
  *
  * **CRITICAL**: This is READ-ONLY. No Qdrant or Postgres mutations.
  *
  * Usage:
- *   node scripts/atlas/qdrant-postgres-identity-audit.mjs [--ledger output.ndjson] [--dry-run]
+ *   DATABASE_URL=... node scripts/atlas/qdrant-postgres-identity-audit.mjs [--collection=codebase_chunks_768|codebase_chunks_768_v2] [--ledger=output.ndjson] [--ledger-only-unowned-point-id] [--limit=N]
  *
  * Output:
- *   - NDJSON ledger with per-point classification
+ *   - Optional streamed NDJSON ledger with per-point classification
  *   - Summary report with coverage metrics
  *   - Dry-run backfill plan (if --dry-run)
  *
@@ -36,27 +36,48 @@
  */
 
 import { appendFileSync, createReadStream, existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { createWriteStream } from 'node:fs';
 import { createInterface } from 'node:readline';
-import * as path from 'node:path';
 
 // Qdrant client
 import { QdrantClient } from '@qdrant/qdrant-js';
+import {
+  addPacketKeyRowV1,
+  addPointIdRowV1,
+  auditPointPayloadLineageV1,
+  classifyExactPointIdV1,
+  incrementPayloadCohortV1,
+  hasUniquePointIdOwnerV1,
+  lookupPacketKeyV1,
+  markPointIdObservedV1,
+  QDRANT_PROJECTION_LINEAGE_FIELDS_V1,
+  resolveQdrantPageLimitV1,
+  resolveQdrantAuditCollectionV1,
+  resolveQdrantScanLimitV1,
+  summarizePointIdCoverageV1,
+  shouldIncludeAuditLedgerEntryV1,
+} from './lib/qdrant-identity-audit-index-v1.mjs';
 
 // Postgres (pg-promise or direct pool)
 import pg from 'pg';
 
 const argv = process.argv.slice(2);
-const outputLedger = argv.find(a => a.startsWith('--ledger='))?.split('=')[1] || 'qdrant-alignment-ledger.ndjson';
+const outputLedger = argv.find(a => a.startsWith('--ledger='))?.slice('--ledger='.length) || null;
 const checkpointPath = argv.find(a => a.startsWith('--checkpoint='))?.split('=')[1] || null;
 const resume = argv.includes('--resume');
+const ledgerOnlyUnownedPointId = argv.includes('--ledger-only-unowned-point-id');
 const limitArg = argv.find(a => a.startsWith('--limit='))?.split('=')[1];
-const auditLimit = limitArg ? parseInt(limitArg, 10) : null; // null = no limit, otherwise stop after N points
-const isDryRun = argv.includes('--dry-run');
+const auditLimit = limitArg === undefined ? null : Number(limitArg);
+const collectionArg = argv.find(a => a.startsWith('--collection='))?.slice('--collection='.length);
+const QDRANT_COLLECTION = resolveQdrantAuditCollectionV1(collectionArg);
 const isReadOnly = !argv.includes('--apply');
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
-const POSTGRES_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const POSTGRES_URL = process.env.DATABASE_URL;
+
+if (!POSTGRES_URL) throw new Error('DATABASE_URL_REQUIRED_FOR_READ_ONLY_IDENTITY_AUDIT');
+if (ledgerOnlyUnownedPointId && !outputLedger) throw new Error('--ledger-only-unowned-point-id requires --ledger=PATH');
+if (checkpointPath && !outputLedger) throw new Error('--checkpoint requires an explicit --ledger path');
+if (resume && !checkpointPath) throw new Error('--resume requires --checkpoint');
 
 class QdrantPostgresAudit {
   constructor() {
@@ -72,52 +93,60 @@ class QdrantPostgresAudit {
       atlas_packets_with_qdrant_id: 0,
       atlas_packets_without_qdrant_id: 0,
       codebase_chunk_with_qdrant_id: 0,
+      qdrant_payload_field_coverage: Object.fromEntries(QDRANT_PROJECTION_LINEAGE_FIELDS_V1.map((field) => [field, 0])),
+      qdrant_payload_lineage_complete: 0,
+      qdrant_points_with_unique_pg_point_id: 0,
+      qdrant_points_without_unique_pg_point_id: 0,
+      qdrant_payload_cohorts: {},
     };
-    this.ledger = [];
     this.incrementalLedger = Boolean(checkpointPath);
   }
 
-  restoreIncrementalState() {
-    if (!this.incrementalLedger || !resume) return { offset: undefined, seenPointIds: new Set() };
+  async restoreIncrementalState() {
+    if (!this.incrementalLedger || !resume) return { offset: undefined, scannedPoints: 0 };
     if (!existsSync(checkpointPath) || !existsSync(outputLedger)) {
       throw new Error('RESUME_REQUIRES_EXISTING_CHECKPOINT_AND_LEDGER');
     }
     const checkpoint = JSON.parse(readFileSync(checkpointPath, 'utf8'));
+    if (checkpoint.collection !== QDRANT_COLLECTION) {
+      throw new Error('RESUME_COLLECTION_MISMATCH');
+    }
     if (checkpoint.completed === true) {
       throw new Error('RESUME_REFUSES_COMPLETED_AUDIT');
     }
-    const entries = readFileSync(outputLedger, 'utf8')
-      .split(/\r?\n/)
-      .filter(Boolean)
-      .map(line => JSON.parse(line));
-    if (Number.isInteger(checkpoint.auditedPoints) && entries.length !== checkpoint.auditedPoints) {
-      throw new Error(`RESUME_LEDGER_CHECKPOINT_MISMATCH:ledger=${entries.length}:checkpoint=${checkpoint.auditedPoints}`);
-    }
-    const seenPointIds = new Set();
-    for (const entry of entries) {
-      const pointKey = String(entry.qdrant_point_id);
-      if (seenPointIds.has(pointKey)) throw new Error(`RESUME_DUPLICATE_LEDGER_POINT:${pointKey}`);
-      seenPointIds.add(pointKey);
-      this.ledger.push(entry);
+    let entryCount = 0;
+    const lines = createInterface({ input: createReadStream(outputLedger), crlfDelay: Infinity });
+    for await (const line of lines) {
+      if (!line.trim()) continue;
+      const entry = JSON.parse(line);
+      entryCount++;
       this.stats.total_points++;
       this.stats.by_lane[entry.classification_lane] = (this.stats.by_lane[entry.classification_lane] || 0) + 1;
       if (Number(entry.confidence) >= 0.9) this.stats.exact_matches++;
       else if (Number(entry.confidence) >= 0.3) this.stats.ambiguous_matches++;
       else this.stats.unknown_identities++;
     }
-    return { offset: checkpoint.next_page_offset, seenPointIds };
+    if (Number.isInteger(checkpoint.auditedPoints) && entryCount !== checkpoint.auditedPoints) {
+      throw new Error(`RESUME_LEDGER_CHECKPOINT_MISMATCH:ledger=${entryCount}:checkpoint=${checkpoint.auditedPoints}`);
+    }
+    return { offset: checkpoint.next_page_offset, scannedPoints: entryCount };
   }
 
   appendBatch(entries) {
-    if (!this.incrementalLedger || entries.length === 0) return;
-    appendFileSync(outputLedger, entries.map(entry => JSON.stringify(entry) + '\n').join(''), 'utf8');
+    if (!outputLedger || entries.length === 0) return;
+    const selected = entries.filter(entry => shouldIncludeAuditLedgerEntryV1({
+      onlyUnownedPointId: ledgerOnlyUnownedPointId,
+      uniquePointIdOwner: entry.unique_point_id_owner,
+    }));
+    if (selected.length === 0) return;
+    appendFileSync(outputLedger, selected.map(entry => JSON.stringify(entry) + '\n').join(''), 'utf8');
   }
 
   writeCheckpoint(value) {
     if (!this.incrementalLedger) return;
     writeFileSync(checkpointPath, `${JSON.stringify({
       schema: 'atlas.qdrant-postgres-identity-audit-checkpoint.v1',
-      collection: 'codebase_chunks_768',
+      collection: QDRANT_COLLECTION,
       ledger: outputLedger,
       ...value,
     }, null, 2)}\n`, 'utf8');
@@ -135,9 +164,9 @@ class QdrantPostgresAudit {
     this.atlasBySourceRef = new Map();
 
     for (const row of packetResult.rows) {
-      this.atlasPacketsByKey.set(row.packet_key, row);
+      addPacketKeyRowV1(this.atlasPacketsByKey, row);
       if (row.qdrant_point_id) {
-        this.atlasPacketsById.set(row.qdrant_point_id, row);
+        addPointIdRowV1(this.atlasPacketsById, row.qdrant_point_id, row);
       }
       if (!this.atlasBySourceRef.has(row.source_ref)) {
         this.atlasBySourceRef.set(row.source_ref, []);
@@ -154,23 +183,25 @@ class QdrantPostgresAudit {
     console.log(`      - With qdrant_point_id: ${this.stats.atlas_packets_with_qdrant_id}`);
     console.log(`      - Without qdrant_point_id: ${this.stats.atlas_packets_without_qdrant_id}\n`);
 
-    // Load codebase_chunk_index by qdrant_id
+    // Keep the table primary key distinct from the Qdrant projection backlink.
     const chunkResult = await this.pgPool.query(
-      'SELECT qdrant_id, chunk_id, source_ref FROM codebase_chunk_index WHERE qdrant_id IS NOT NULL'
+      'SELECT id::text, qdrant_id, chunk_id, source_ref FROM codebase_chunk_index'
     );
     this.chunksByQdrantId = new Map();
+    this.chunksByPrimaryId = new Map();
     this.chunksBySourceRef = new Map();
 
     for (const row of chunkResult.rows) {
-      this.chunksByQdrantId.set(row.qdrant_id, row);
+      addPointIdRowV1(this.chunksByPrimaryId, row.id, row);
+      if (row.qdrant_id) addPointIdRowV1(this.chunksByQdrantId, row.qdrant_id, row);
       if (!this.chunksBySourceRef.has(row.source_ref)) {
         this.chunksBySourceRef.set(row.source_ref, []);
       }
       this.chunksBySourceRef.get(row.source_ref).push(row);
-      this.stats.codebase_chunk_with_qdrant_id++;
+      if (row.qdrant_id) this.stats.codebase_chunk_with_qdrant_id++;
     }
 
-    console.log(`   ✅ Loaded ${chunkResult.rows.length} codebase_chunk_index rows\n`);
+    console.log(`   ✅ Loaded ${chunkResult.rows.length} codebase_chunk_index rows, including primary IDs\n`);
   }
 
   async classifyPoint(point, payload) {
@@ -186,81 +217,35 @@ class QdrantPostgresAudit {
 
     // Step 2: Exact packet_key match
     if (payload?.packet_key) {
-      const matches = this.atlasPacketsByKey.get(payload.packet_key);
-      if (matches) {
-        // Verify it's truly a single match
-        const allMatches = Array.from(this.atlasPacketsByKey.values()).filter(
-          row => row.packet_key === payload.packet_key
-        );
-        if (allMatches.length === 1) {
+      const match = lookupPacketKeyV1(this.atlasPacketsByKey, payload.packet_key);
+      if (match.kind === 'unique') {
           return {
             lane: 'EXACT_ATLAS_PACKET_KEY',
             confidence: 0.99,
             match_type: 'payload_packet_key',
             evidence: {
               payload_packet_key: payload.packet_key,
-              postgres_packet_key: matches.packet_key,
-              postgres_row: matches.packet_key,
+              postgres_packet_key: match.row.packet_key,
+              postgres_row: match.row.packet_key,
             },
           };
-        } else if (allMatches.length > 1) {
+      } else if (match.kind === 'ambiguous') {
           return {
             lane: 'AMBIGUOUS_PACKET_KEY',
             confidence: 0.3,
             match_type: 'ambiguous',
             evidence: {
               packet_key: payload.packet_key,
-              matching_rows: allMatches.length,
+              matching_rows: match.count,
             },
           };
-        }
       }
     }
 
     // Step 3: Point UUID → atlas_packets.qdrant_point_id
     if (typeof point.id === 'string') {
-      const atlasMatch = this.atlasPacketsById.get(point.id);
-      if (atlasMatch) {
-        return {
-          lane: 'EXACT_ATLAS_QDRANT_ID',
-          confidence: 0.95,
-          match_type: 'qdrant_id_backlink',
-          evidence: {
-            qdrant_point_id: point.id,
-            postgres_table: 'atlas_packets',
-            postgres_row: atlasMatch.packet_key,
-          },
-        };
-      }
-
-      // Step 4: Point UUID → codebase_chunk_index.qdrant_id
-      const chunkMatch = this.chunksByQdrantId.get(point.id);
-      if (chunkMatch) {
-        return {
-          lane: 'EXACT_CHUNK_QDRANT_ID',
-          confidence: 0.90,
-          match_type: 'chunk_qdrant_id_backlink',
-          evidence: {
-            qdrant_point_id: point.id,
-            postgres_table: 'codebase_chunk_index',
-            postgres_row: chunkMatch.chunk_id,
-          },
-        };
-      }
-
-      // Step 5: Check if point is in both tables
-      if (atlasMatch && chunkMatch) {
-        return {
-          lane: 'EXACT_BOTH_TABLES',
-          confidence: 0.98,
-          match_type: 'both_qdrant_id',
-          evidence: {
-            qdrant_point_id: point.id,
-            in_atlas_packets: true,
-            in_codebase_chunk_index: true,
-          },
-        };
-      }
+      const exactIdentity = classifyExactPointIdV1(point.id, this.atlasPacketsById, this.chunksByQdrantId, this.chunksByPrimaryId);
+      if (exactIdentity) return exactIdentity;
     }
 
     // Step 6: Legacy integer point IDs
@@ -339,49 +324,75 @@ class QdrantPostgresAudit {
 
     // Iterate through collection via scroll (paginated)
     // Qdrant scroll API: offset is carried in next_page_offset (numeric)
-    const restored = this.restoreIncrementalState();
+    const restored = await this.restoreIncrementalState();
     let offset = restored.offset;
     let batchCount = 0;
-    const seenPointIds = restored.seenPointIds;
+    let scannedPoints = restored.scannedPoints;
+    const seenCursors = new Set();
 
     // Safety ceiling: do not scan more than expected + 10%
-    const collectionInfo = await this.qdrantClient.getCollection('codebase_chunks_768');
-    const expectedCount = collectionInfo.points_count || 54224;
-    const maximumScan = auditLimit ? Math.min(auditLimit, Math.ceil(expectedCount * 1.1)) : Math.ceil(expectedCount * 1.1);
+    const collectionInfo = await this.qdrantClient.getCollection(QDRANT_COLLECTION);
+    const expectedCount = collectionInfo.points_count;
+    const maximumScan = resolveQdrantScanLimitV1(expectedCount, auditLimit);
+    if (scannedPoints > maximumScan) {
+      throw new Error(`RESUMED_SCAN_EXCEEDS_LIMIT:scanned=${scannedPoints}:limit=${maximumScan}`);
+    }
 
     while (true) {
-      const scrollResult = await this.qdrantClient.scroll('codebase_chunks_768', {
-        limit: 100,
+      const cursorKey = offset === undefined ? 'START' : JSON.stringify(offset);
+      if (seenCursors.has(cursorKey)) throw new Error(`PAGINATION_CURSOR_CYCLE:${cursorKey}`);
+      seenCursors.add(cursorKey);
+      const pageLimit = resolveQdrantPageLimitV1(auditLimit, scannedPoints);
+      if (pageLimit === 0) break;
+      const scrollResult = await this.qdrantClient.scroll(QDRANT_COLLECTION, {
+        limit: pageLimit,
         offset: offset,  // Correct parameter: offset, not point_id_selector
         with_payload: true,
         with_vectors: false,
       });
 
-      if (!scrollResult?.points || scrollResult.points.length === 0) break;
+      if (!scrollResult?.points || scrollResult.points.length === 0) {
+        if (scannedPoints !== expectedCount) {
+          throw new Error(`QDRANT_SCAN_COUNT_MISMATCH:scanned=${scannedPoints}:expected=${expectedCount}`);
+        }
+        this.writeCheckpoint({ completed: true, auditedPoints: scannedPoints, next_page_offset: null });
+        break;
+      }
+      if (scrollResult.points.length > pageLimit) {
+        throw new Error(`QDRANT_PAGE_EXCEEDED_LIMIT:received=${scrollResult.points.length}:limit=${pageLimit}`);
+      }
 
       batchCount++;
       console.log(`   Batch ${batchCount}: processing ${scrollResult.points.length} points`);
 
       const batchEntries = [];
       for (const point of scrollResult.points) {
-        // LIMIT CHECK: Stop after N points if --limit specified
-        if (auditLimit && seenPointIds.size >= auditLimit) {
-          console.log(`   ⏸️  Limit reached (${auditLimit} points). Stopping audit.`);
-          break;
+        scannedPoints++;
+        if (scannedPoints > maximumScan) {
+          throw new Error(`SCAN EXCEEDED SAFETY CEILING: Scanned ${scannedPoints} points but expected ~${expectedCount}. Audit loop may be stuck.`);
         }
 
-        // Cycle detection: ensure no point ID repeats
-        const pointKey = String(point.id);
-        if (seenPointIds.has(pointKey)) {
-          throw new Error(`PAGINATION CYCLE DETECTED: Point ID ${pointKey} was returned twice. Qdrant offset may not be advancing correctly.`);
+        markPointIdObservedV1(this.atlasPacketsById, point.id);
+        markPointIdObservedV1(this.chunksByQdrantId, point.id);
+        markPointIdObservedV1(this.chunksByPrimaryId, point.id);
+        const uniquePointIdOwner = hasUniquePointIdOwnerV1(point.id, this.atlasPacketsById, this.chunksByQdrantId, this.chunksByPrimaryId);
+        if (uniquePointIdOwner) {
+          this.stats.qdrant_points_with_unique_pg_point_id++;
+        } else {
+          this.stats.qdrant_points_without_unique_pg_point_id++;
         }
-        seenPointIds.add(pointKey);
-
-        // Safety check: total scanned > expected
-        if (seenPointIds.size > maximumScan) {
-          throw new Error(`SCAN EXCEEDED SAFETY CEILING: Scanned ${seenPointIds.size} unique points but expected ~${expectedCount}. Audit loop may be stuck.`);
+        const payloadLineage = auditPointPayloadLineageV1(point.payload);
+        for (const field of QDRANT_PROJECTION_LINEAGE_FIELDS_V1) {
+          if (!payloadLineage.missing.includes(field)) this.stats.qdrant_payload_field_coverage[field]++;
         }
-
+        if (payloadLineage.complete) this.stats.qdrant_payload_lineage_complete++;
+        for (const field of ['projection_revision', 'representation_revision', 'model_revision', 'embedding_model']) {
+          incrementPayloadCohortV1(this.stats.qdrant_payload_cohorts, field, point.payload);
+        }
+        const projectedAt = point.payload?.graphify_embedding_projected_at;
+        if (typeof projectedAt === 'string' && /^\d{4}-\d{2}-\d{2}/.test(projectedAt)) {
+          incrementPayloadCohortV1(this.stats.qdrant_payload_cohorts, 'graphify_projection_date', { graphify_projection_date: projectedAt.slice(0, 10) });
+        }
         const classification = await this.classifyPoint(point, point.payload);
         this.stats.total_points++;
 
@@ -406,67 +417,43 @@ class QdrantPostgresAudit {
           id_type: typeof point.id,
           payload_packet_key: point.payload?.packet_key,
           payload_source_ref: point.payload?.source_ref,
+          unique_point_id_owner: uniquePointIdOwner,
           classification_lane: classification.lane,
           confidence: classification.confidence,
           match_type: classification.match_type,
           evidence: classification.evidence,
         };
-        this.ledger.push(entry);
         batchEntries.push(entry);
       }
 
       this.appendBatch(batchEntries);
 
-      // LIMIT CHECK: Break outer loop if limit reached
-      if (auditLimit && seenPointIds.size >= auditLimit) {
-        // Persist the cursor after the completed bounded batch. Without this,
-        // the ledger could contain the batch while the checkpoint still
-        // pointed at its previous page, making resume replay rows.
+      if (scrollResult.next_page_offset === null || scrollResult.next_page_offset === undefined) {
+        if (scannedPoints !== expectedCount) {
+          throw new Error(`QDRANT_SCAN_COUNT_MISMATCH:scanned=${scannedPoints}:expected=${expectedCount}`);
+        }
+        this.writeCheckpoint({ completed: true, auditedPoints: scannedPoints, next_page_offset: null });
+        break;
+      }
+
+      if (auditLimit !== null && scannedPoints >= auditLimit) {
+        console.log(`   ⏸️  Limit reached (${auditLimit} points). Stopping audit.`);
         this.writeCheckpoint({
           completed: false,
-          auditedPoints: seenPointIds.size,
-          next_page_offset: scrollResult.next_page_offset ?? null,
+          auditedPoints: scannedPoints,
+          next_page_offset: scrollResult.next_page_offset,
         });
         break;
       }
 
-      // Advance pagination: next_page_offset is numeric or null/undefined
-      // Explicit null/undefined check to avoid falsey 0
-      if (scrollResult.next_page_offset === null || scrollResult.next_page_offset === undefined) {
-        this.writeCheckpoint({ completed: true, auditedPoints: seenPointIds.size, next_page_offset: null });
-        break;
+      if (JSON.stringify(scrollResult.next_page_offset) === JSON.stringify(offset)) {
+        throw new Error(`PAGINATION_CURSOR_DID_NOT_ADVANCE:${cursorKey}`);
       }
       offset = scrollResult.next_page_offset;
-      this.writeCheckpoint({ completed: false, auditedPoints: seenPointIds.size, next_page_offset: offset });
+      this.writeCheckpoint({ completed: false, auditedPoints: scannedPoints, next_page_offset: offset });
     }
 
-    console.log(`   ✅ Audited ${this.stats.total_points} unique points (scanned ${seenPointIds.size} total)\n`);
-  }
-
-  async writeLedger() {
-    console.log(`📝 Writing NDJSON ledger to ${outputLedger}...`);
-
-    return new Promise((resolve, reject) => {
-      const outStream = createWriteStream(outputLedger);
-      outStream.on('error', reject);
-
-      for (const entry of this.ledger) {
-        // Use replacer to handle BigInt serialization
-        const json = JSON.stringify(entry, (_, value) => {
-          if (typeof value === 'bigint') {
-            return value.toString();
-          }
-          return value;
-        });
-        outStream.write(json + '\n');
-      }
-
-      outStream.end();
-      outStream.on('finish', () => {
-        console.log(`   ✅ Wrote ${this.ledger.length} entries\n`);
-        resolve();
-      });
-    });
+    console.log(`   ✅ Audited ${this.stats.total_points} points (scanned ${scannedPoints} total)\n`);
   }
 
   reportStats() {
@@ -488,12 +475,35 @@ class QdrantPostgresAudit {
     console.log(`  atlas_packets with qdrant_point_id: ${this.stats.atlas_packets_with_qdrant_id} (backfill potential)`);
     console.log(`  atlas_packets without qdrant_point_id: ${this.stats.atlas_packets_without_qdrant_id} (needs backlink)`);
     console.log(`  codebase_chunk_index with qdrant_id: ${this.stats.codebase_chunk_with_qdrant_id}\n`);
+    for (const [table, index] of [
+      ['atlas_packets.qdrant_point_id', this.atlasPacketsById],
+      ['codebase_chunk_index.qdrant_id', this.chunksByQdrantId],
+      ['codebase_chunk_index.id', this.chunksByPrimaryId],
+    ]) {
+      const coverage = summarizePointIdCoverageV1(index);
+      console.log(`  ${table}: distinct=${coverage.distinctIds}, unique=${coverage.uniqueIds}, duplicate IDs=${coverage.duplicateIds}, observed in Qdrant=${coverage.matchedIds}, unique IDs missing from Qdrant=${coverage.missingIds}`);
+    }
+    console.log('  Note: packet-key matches are identity hints, not proof of point-ID or revision parity.\n');
+    console.log(`  Qdrant payloads complete for projection lineage fields: ${this.stats.qdrant_payload_lineage_complete}/${this.stats.total_points}`);
+    console.log(`  Qdrant points with a unique PostgreSQL point-ID owner: ${this.stats.qdrant_points_with_unique_pg_point_id}/${this.stats.total_points}`);
+    console.log(`  Qdrant points without a unique PostgreSQL point-ID owner: ${this.stats.qdrant_points_without_unique_pg_point_id}/${this.stats.total_points}`);
+    console.log('  Payload field coverage (presence only; values are not independently validated):');
+    for (const field of QDRANT_PROJECTION_LINEAGE_FIELDS_V1) {
+      console.log(`    ${field}: ${this.stats.qdrant_payload_field_coverage[field]}/${this.stats.total_points}`);
+    }
+    console.log('  Stored vectors were not fetched, dimension-checked, or checksummed.\n');
+    console.log('  Payload cohort values (top 20; projection timestamps grouped by UTC date):');
+    for (const [field, counts] of Object.entries(this.stats.qdrant_payload_cohorts)) {
+      const top = [...counts.entries()].sort((left, right) => right[1] - left[1]).slice(0, 20);
+      console.log(`    ${field}: ${JSON.stringify(Object.fromEntries(top))}`);
+    }
   }
 
   async run() {
     try {
       console.log('═══════════════════════════════════════════════════════════════');
       console.log('   Qdrant/Postgres Identity Audit (Read-Only)');
+      console.log(`   Collection: ${QDRANT_COLLECTION}`);
       console.log('═══════════════════════════════════════════════════════════════\n');
 
       if (!isReadOnly) {
@@ -501,13 +511,16 @@ class QdrantPostgresAudit {
         process.exit(1);
       }
 
+      if (outputLedger && !resume) {
+        writeFileSync(outputLedger, '', { flag: 'wx' });
+      }
+
       await this.loadPostgresData();
       await this.auditAllPoints();
-      if (!this.incrementalLedger) await this.writeLedger();
       this.reportStats();
 
       console.log('✅ Audit complete.');
-      console.log(`   Ledger: ${outputLedger}`);
+      if (outputLedger) console.log(`   Ledger: ${outputLedger}`);
       console.log(`   Next: Review ledger, then run backfill planner\n`);
 
       await this.pgPool.end();

@@ -28,6 +28,22 @@ export interface RerankResult extends RerankCandidate {
   mla_score?:   number;    // set when MLA path was used
 }
 
+export function isComparableEmbedding(queryEmbedding: number[], candidateEmbedding: number[] | undefined): candidateEmbedding is number[] {
+  if (!Array.isArray(candidateEmbedding) || candidateEmbedding.length !== queryEmbedding.length || candidateEmbedding.length === 0) {
+    return false;
+  }
+  let queryNorm = 0;
+  let candidateNorm = 0;
+  for (let index = 0; index < queryEmbedding.length; index++) {
+    const queryValue = queryEmbedding[index];
+    const candidateValue = candidateEmbedding[index];
+    if (!Number.isFinite(queryValue) || !Number.isFinite(candidateValue)) return false;
+    queryNorm += queryValue * queryValue;
+    candidateNorm += candidateValue * candidateValue;
+  }
+  return queryNorm > 0 && candidateNorm > 0;
+}
+
 function cpuCosSim(a: Float32Array, b: Float32Array): number {
   let dot = 0, na = 0, nb = 0;
   for (let i = 0; i < a.length; i++) {
@@ -45,8 +61,8 @@ export async function rerankCandidates(
   preScoreWeight = 0.4,
   mlaOpts?: MlaFusionOpts
 ): Promise<RerankResult[]> {
-  const withEmbed    = candidates.filter((c) => c.embedding?.length);
-  const withoutEmbed = candidates.filter((c) => !c.embedding?.length);
+  const withEmbed    = candidates.filter((c) => isComparableEmbedding(queryEmbedding, c.embedding));
+  const withoutEmbed = candidates.filter((c) => !isComparableEmbedding(queryEmbedding, c.embedding));
 
   if (!withEmbed.length) {
     return candidates.map((c) => ({ ...c, gpu_score: 0, final_score: c.pre_score }));

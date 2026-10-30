@@ -29,6 +29,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { createQdrantGrpcPayloadClient } from './qdrant-grpc-payload-client.mjs';
+import { resolveExactQdrantPointOwnerId } from './lib/qdrant-exact-point-owner-v1.mjs';
 
 const { Pool } = pg;
 const __dir = dirname(fileURLToPath(import.meta.url));
@@ -268,6 +269,22 @@ async function setQdrantPayload(pointIds, payload) {
   } catch { return false; }
 }
 
+async function getQdrantPointById(pointId) {
+  try {
+    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/retrieve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: [pointId], with_payload: true, with_vector: false }),
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.result ?? []).find((point) => String(point.id) === String(pointId)) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // Verified live 2026-08-25 (see USE_FILTER_WRITE comment above) -- wired
 // into the main apply loop behind --filter-write.
 async function setQdrantPayloadByFilter(filter, payload) {
@@ -369,6 +386,7 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry, packetCo
     : '';
   const result = await pool.query(`
     SELECT
+      cci.id::text AS canonical_chunk_id,
       cci.qdrant_id,
       cci.relative_path AS qdrant_relative_path,
       cci.symbol,
@@ -455,52 +473,28 @@ async function directChunkIndexSync(pool, totalPackets, maxRows, isDry, packetCo
     const batch = rows.slice(i, i + QDRANT_CONCURRENCY);
     await Promise.all(batch.map(async (row) => {
       try {
+        const candidatePointId = typeof row.canonical_chunk_id === 'string' ? row.canonical_chunk_id : null;
+        if (!candidatePointId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidatePointId)) {
+          staleIdSkipped++;
+          return;
+        }
+        const existingPoint = await getQdrantPointById(candidatePointId);
+        const exactPointId = resolveExactQdrantPointOwnerId(row, existingPoint);
+        if (!exactPointId) {
+          staleIdSkipped++;
+          return;
+        }
         const payload = buildPayload(
-          { ...row, qdrant_point_id: row.qdrant_id, som_cluster: row.som_cluster ?? row.qdrant_som_cluster },
+          { ...row, qdrant_point_id: exactPointId, som_cluster: row.som_cluster ?? row.qdrant_som_cluster },
           row.qdrant_relative_path,
           enrichedAt,
         );
-        // row.qdrant_id (from codebase_chunk_index) was confirmed 2026-08-25
-        // to commonly be stale -- it does not resolve via direct point
-        // lookup for rows checked. Resolve real, live point IDs via a
-        // source_ref/relative_path filter scroll instead of trusting the
-        // stored qdrant_id directly, and write payload to those.
-        const refCandidate = row.qdrant_relative_path ?? row.source_ref ?? null;
-        if (!refCandidate) { staleIdSkipped++; return; }
-
-        if (USE_FILTER_WRITE) {
-          // Skips the scroll entirely -- one filtered write per row instead
-          // of one scroll + one write. Can't report an exact points-updated
-          // count (Qdrant's filter set_payload response has no such field),
-          // so this path counts rows written, not points touched.
-          const filter = {
-            should: [
-              { key: 'source_ref', match: { value: refCandidate } },
-              { key: 'source_ref', match: { value: 'sveltekit-frontend/' + refCandidate } },
-            ],
-          };
-          const ok = await setQdrantPayloadByFilter(filter, payload);
-          if (ok) {
-            updated += 1;
-          } else {
-            errors++;
-            if (VERBOSE) console.error(`  ${row.qdrant_id} (${refCandidate}): setQdrantPayloadByFilter returned not-ok`);
-          }
-          return;
-        }
-
-        const realIds = await getQdrantPointIds(refCandidate);
-        if (realIds.length === 0) {
-          staleIdSkipped++;
-          if (VERBOSE) console.error(`  ${row.qdrant_id} (${refCandidate}): no live point resolved, skipped`);
-          return;
-        }
-        const ok = await setQdrantPayload(realIds, payload);
+        const ok = await setQdrantPayload([exactPointId], payload);
         if (ok) {
-          updated += realIds.length;
+          updated += 1;
         } else {
           errors++;
-          if (VERBOSE) console.error(`  ${row.qdrant_id} (${refCandidate}): setQdrantPayload returned not-ok`);
+          if (VERBOSE) console.error(`  ${exactPointId}: setQdrantPayload returned not-ok`);
         }
       } catch (error) {
         errors++;
@@ -600,6 +594,15 @@ async function main() {
     LIMIT 1
   `);
   const hasChunkIndex = chunkTableRows.length > 0;
+
+  if (APPLY && !hasChunkIndex) {
+    await pool.end();
+    throw new Error('REFUSING_PACKET_REFERENCE_APPLY_WITHOUT_CANONICAL_CHUNK_POINT_IDS');
+  }
+  if (APPLY && USE_FILTER_WRITE) {
+    await pool.end();
+    throw new Error('REFUSING_SOURCE_REF_FILTER_WRITE; use exact canonical chunk point ownership');
+  }
 
   const { rows: totalRows } = await pool.query('SELECT COUNT(*)::int AS total FROM atlas_packets');
   const totalPackets = totalRows[0]?.total ?? 0;

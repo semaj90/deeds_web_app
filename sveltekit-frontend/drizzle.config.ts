@@ -77,5 +77,7 @@ export default {
     // Parent Atlas algorithm/backend execution receipts. PostgreSQL stores the
     // durable receipt; Kafka/Valkey are projections only. DDL is manual-owned.
     '!atlas_algorithm_execution_receipts',
+    '!atlas_stable_file_identity', '!atlas_stable_file_revision_binding', '!atlas_stable_file_alias',
+    '!atlas_workspace_source_bindings',
   ],
 } satisfies Config;

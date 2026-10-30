@@ -8,7 +8,7 @@
  *   1. Generate query embedding via gRPC/Ollama
  *   2. Fetch candidates from 3 parallel sources (Qdrant RAG, Neo4j graph, PostgreSQL tags)
  *   3. Enrich RAG candidates with Neo4j centrality
- *   4. Rank combined results with 5-signal multi-modal ranker
+ *   4. Rank combined results with the seven-signal ranker, using bounded retrieval relevance
  *   5. Surface only the top 4 recommendations
  *   6. Persist the overflow into PostgreSQL + RabbitMQ as potential recommendations
  *   7. Store the bounded result set in Redis (5min TTL)
@@ -22,8 +22,10 @@ import { randomUUID } from 'node:crypto';
 import type { DocumentCandidate } from '$lib/server/ml/multi-modal-ranker.js';
 import { z } from 'zod';
 import { rankCombinedResults } from '$lib/server/ml/multi-modal-ranker.js';
+import { relevanceFromRank } from '$lib/server/ml/recommendation-score-contract.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
+import { EvidenceCaseNotFoundError, requireOwnedEvidenceCaseV1 } from '$lib/server/evidence-case-admission-v1.js';
 import { recommendationMetrics } from '$lib/server/ml/recommendation-metrics.js';
 import { encodeRecommendations, glyphsToBase64 } from '$lib/server/ml/recommendation-glyph.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
@@ -173,6 +175,26 @@ export const POST: RequestHandler = async (event) => {
 			);
 		}
 		const body = parsed.data;
+		if (body.caseId) {
+			try {
+				await requireOwnedEvidenceCaseV1(body.caseId, Number(auth.user.id), async (caseId, ownerId) => {
+					const result = await db.execute(sql`
+						SELECT id
+						FROM cases
+						WHERE id = ${caseId}
+							AND (user_id = ${ownerId} OR assigned_attorney = ${ownerId})
+						LIMIT 1
+					`);
+					const rows = result.rows as Array<{ id?: unknown }>;
+					return typeof rows[0]?.id === 'string' ? rows[0].id : null;
+				});
+			} catch (error) {
+				if (error instanceof EvidenceCaseNotFoundError) {
+					return json({ success: false, error: 'Case not found' }, { status: 404 });
+				}
+				return json({ success: false, error: 'Case access unavailable' }, { status: 403 });
+			}
+		}
 		const topK = body.topK ?? 10;
 		const includeExplanations = body.includeExplanations ?? true;
 		const queryTags = body.tags ?? [];
@@ -313,9 +335,9 @@ async function processRecommendationJob(
 
 	// Step 2: Fetch candidates from 3 parallel sources
 	const [ragResults, graphResults, tagResults] = await Promise.all([
-		fetchRAGCandidates(queryEmbedding, topK * 2),
-		fetchGraphCandidates(caseId, topK),
-		fetchTagCandidates(queryTags, topK)
+		fetchRAGCandidates(queryEmbedding, topK * 2, caseId),
+		fetchGraphCandidates(caseId, topK, queryEmbedding),
+		fetchTagCandidates(queryTags, topK, caseId)
 	]);
 
 	console.log(
@@ -460,7 +482,8 @@ async function processRecommendationJob(
 
 async function fetchRAGCandidates(
   queryEmbedding: number[],
-  limit: number
+  limit: number,
+  caseId?: string
 ): Promise<DocumentCandidate[]> {
   try {
     if (typeof qdrant.hybridSearch !== 'function') {
@@ -470,15 +493,23 @@ async function fetchRAGCandidates(
       query: '',
       queryEmbedding,
       collection: 'documents',
+      ...(caseId ? { filters: { case_id: caseId } } : {}),
       limit,
       scoreThreshold: 0.5,
     });
 
     const results = response.results || [];
-    return results.map((result) => ({
+    return results.map((result, rank) => ({
       id: String(result.id),
       title: String(result.payload?.title || result.payload?.filename || 'Untitled'),
-      embedding: queryEmbedding,
+      retrievalSignal: {
+        kind: 'QDRANT_HYBRID' as const,
+        value: result.score,
+        retrievalPolicyRevision: 'qdrant-hybrid-recommendations-v1',
+        rank,
+        resultCount: results.length,
+      },
+      retrievalRelevance: relevanceFromRank(rank, results.length),
       tags:
         ((result.payload?.metadata as Record<string, unknown> | undefined)?.tags as string[]) ?? [],
       topicMemberships: undefined,
@@ -493,7 +524,8 @@ async function fetchRAGCandidates(
 
 async function fetchGraphCandidates(
   id: string | undefined,
-  limit: number
+  limit: number,
+  queryEmbedding: number[]
 ): Promise<DocumentCandidate[]> {
   if (!id) return [];
 
@@ -504,23 +536,23 @@ async function fetchGraphCandidates(
       return graphResult.documents.map((doc) => ({
         id: doc.id,
         title: doc.title,
-        embedding: new Array(768).fill(0),
         tags: [],
         centrality: doc.centrality,
         caseIds: doc.caseIds,
       }));
     }
 
-    return await fetchGraphCandidatesFromQdrant(id, limit);
+    return await fetchGraphCandidatesFromQdrant(id, limit, queryEmbedding);
   } catch (err) {
     console.warn('[recommendations] Graph candidate fetch failed:', err);
-    return await fetchGraphCandidatesFromQdrant(id, limit);
+    return await fetchGraphCandidatesFromQdrant(id, limit, queryEmbedding);
   }
 }
 
 async function fetchGraphCandidatesFromQdrant(
   id: string,
-  limit: number
+  limit: number,
+  queryEmbedding: number[]
 ): Promise<DocumentCandidate[]> {
   try {
     if (typeof qdrant.hybridSearch !== 'function') {
@@ -528,7 +560,7 @@ async function fetchGraphCandidatesFromQdrant(
     }
     const response = await qdrant.hybridSearch({
       query: '',
-      queryEmbedding: new Array(768).fill(0),
+      queryEmbedding,
       collection: 'evidence',
       filters: { case_id: id },
       limit,
@@ -536,12 +568,21 @@ async function fetchGraphCandidatesFromQdrant(
     });
 
     const results = response.results || [];
-    return results.map((result) => {
+    return results.map((result, rank) => {
       const meta = result.payload?.metadata as Record<string, unknown> | null;
+      const embedding = result.payload?.vector;
       return {
         id: String(result.id),
         title: String(result.payload?.title || 'Untitled Evidence'),
-        embedding: (result.payload?.vector as number[]) || new Array(768).fill(0),
+        retrievalSignal: {
+          kind: 'QDRANT_HYBRID' as const,
+          value: result.score,
+          retrievalPolicyRevision: 'qdrant-hybrid-recommendations-v1',
+          rank,
+          resultCount: results.length,
+        },
+        ...(Array.isArray(embedding) ? { embedding: embedding as number[] } : {}),
+        retrievalRelevance: relevanceFromRank(rank, results.length),
         tags: (meta?.tags as string[]) ?? [],
         centrality: 0.5,
         caseIds: [id],
@@ -555,7 +596,8 @@ async function fetchGraphCandidatesFromQdrant(
 
 async function fetchTagCandidates(
 	queryTags: string[],
-	limit: number
+	limit: number,
+	caseId?: string
 ): Promise<DocumentCandidate[]> {
 	if (queryTags.length === 0) return [];
 
@@ -568,7 +610,7 @@ async function fetchTagCandidates(
 				caseId: legalDocuments.caseId
 			})
 			.from(legalDocuments)
-			.where(sql`${legalDocuments.metadata}->>'tags' IS NOT NULL`)
+			.where(sql`${legalDocuments.metadata}->>'tags' IS NOT NULL${caseId ? sql` AND ${legalDocuments.caseId} = ${caseId}` : sql``}`)
 			.limit(limit);
 
 		return docs.map((doc) => {
@@ -576,7 +618,6 @@ async function fetchTagCandidates(
 			return {
 				id: doc.id,
 				title: doc.title || 'Untitled Document',
-				embedding: new Array(768).fill(0),
 				tags: (meta?.tags as string[]) ?? [],
 				caseIds: doc.caseId ? [doc.caseId] : []
 			};

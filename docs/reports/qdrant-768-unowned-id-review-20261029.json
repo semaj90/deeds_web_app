@@ -1,0 +1,98 @@
+{
+  "schema": "parent-atlas.qdrant-unowned-point-id-review.v1",
+  "observedAt": "2026-10-29",
+  "mode": "READ_ONLY",
+  "canonicalAuthority": false,
+  "collection": "codebase_chunks_768",
+  "postgresDatabase": "legal_ai_db",
+  "fullIdentityAudit": {
+    "pointsScanned": 328348,
+    "uniquePostgresPointIdOwner": 225273,
+    "noUniquePostgresPointIdOwner": 103075,
+    "sourceRevisionPresent": 30,
+    "workspaceRevisionPresent": 30,
+    "completeProjectionLineage": 0,
+    "storedVectorsFetchedOrCompared": false,
+    "receipt": "C:/Users/james/AppData/Local/Temp/qdrant-mirror-audit-49b5fb59f20c44208803a92ea848dc14.log"
+  },
+  "unownedPointIdReview": {
+    "ledger": ".tmp/atlas/qdrant-768-unowned-point-id-audit-20261029.ndjson",
+    "points": 103075,
+    "ledgerBytes": 46574896,
+    "pointIdTypes": {
+      "numeric": 53523,
+      "string": 49552
+    },
+    "payloadPacketKeyClassification": {
+      "uniqueAtlasPacketKey": 103019,
+      "sourceRefOnly": 51,
+      "ambiguousSourceRef": 4,
+      "unknownIdentity": 1,
+      "distinctPacketKeys": 4546
+    },
+    "atlasPacketKeyToPointIdComparison": {
+      "pointsWithNoPacketRow": 56,
+      "pointsWithDuplicatePacketRows": 0,
+      "pointsWithNullCanonicalQdrantId": 0,
+      "pointIdsEqualCanonicalAtlasQdrantPointId": 2419,
+      "pointIdsDifferentFromCanonicalAtlasQdrantPointId": 100600,
+      "additionalDistinctQdrantPointsPerPacketKey": 98529,
+      "duplicateQdrantPointIdsWithinPacketKey": 0
+    },
+    "payloadChunkIdToCodebaseChunkComparison": {
+      "missingChunkId": 85067,
+      "uniquePostgresChunkIdMatch": 17024,
+      "ambiguousPostgresChunkIdMatch": 910,
+      "noPostgresChunkIdMatch": 74,
+      "uniqueChunkMatchesWithExactContentHash": 1575,
+      "uniqueChunkMatchesWithDifferentContentHash": 15449,
+      "uniqueChunkMatchesWithExactSourceRef": 16519,
+      "uniqueChunkMatchesWithEqualQdrantId": 127,
+      "hashComparison": "Exact comparison of Qdrant payload content_hash to PostgreSQL codebase_chunk_index.content_hash; no normalization or inferred equivalence applied"
+    },
+    "payloadLineage": {
+      "sourceRevisionPresent": 30,
+      "workspaceRevisionPresent": 30,
+      "modelArtifactRevisionPresent": 0,
+      "payloadVectorDimension768": 103003,
+      "dimensionEvidence": "Payload declaration only; vectors were not fetched or validated"
+    }
+  },
+  "producerCohortEvidence": {
+    "receipt": "docs/reports/qdrant-producer-cohort-census-v1.json",
+    "canonicalAuthority": false,
+    "largestHistoricalCohort": {
+      "points": 219221,
+      "modelRevisionLabel": "embeddinggemma:latest",
+      "lineageQualified": 0,
+      "sampledVectorSource": "FRESH_raw",
+      "sampleSize": 12
+    },
+    "attribution": "UNPROVEN"
+  },
+  "currentWorkspaceSourceSample": {
+    "mode": "READ_ONLY",
+    "selection": "2400 evenly spaced point IDs from the filtered ledger; then 30 unique PostgreSQL chunk-ID matches with exact Qdrant/PostgreSQL chunk-hash equality and 30 with differing hashes",
+    "uniqueChunkOwnerSamples": 60,
+    "sourceFilesRead": 41,
+    "currentDecodedTextMatchesPostgresFileContentHash": 37,
+    "storedChunkTextFoundExactlyOnceInCurrentSource": 33,
+    "storedChunkTextNotFoundInCurrentSource": 8,
+    "multipleCurrentSourceOccurrences": 0,
+    "sourceFileUnavailable": 19,
+    "sourceRevisionVerified": false,
+    "canonicalAuthority": false,
+    "interpretation": "Several differing Qdrant/PostgreSQL chunk hashes coexist with current-source file-hash and exact-substring matches, consistent with different chunk-hash recipes or stale payload fields; the bounded sample does not identify which or prove the indexed historical revision."
+  },
+  "interpretation": [
+    "No-unique-point-ID ownership is not equivalent to no PostgreSQL association: most reviewed points resolve to one atlas_packets row by payload packet_key.",
+    "The packet-key association is one-to-many: 103019 points map to 4546 packet keys, and most point IDs differ from the single atlas_packets.qdrant_point_id value.",
+    "Payload chunk_id and source_ref matches are partial; content hashes disagree for most unique chunk_id matches and their hash scopes are not proven equivalent.",
+    "These observations do not establish that points are duplicates, stale, unused, or safe to delete. No deletion, backfill, or projection is authorized by this audit."
+  ],
+  "writesPerformed": {
+    "postgres": false,
+    "qdrant": false,
+    "canonicalData": false
+  }
+}
