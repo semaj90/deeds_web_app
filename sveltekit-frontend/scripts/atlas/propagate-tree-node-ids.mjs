@@ -20,6 +20,7 @@
 
 import pg from 'pg';
 import { config } from 'dotenv';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 import { resolve } from 'path';
 
 config({ path: resolve('.', '.env') });
@@ -203,6 +204,8 @@ async function validateTreeNodeIdCoverage() {
 }
 
 async function main() {
+  if (!DRY_RUN) assertSummaryIdentityWriteAdmitted('propagate-tree-node-ids');
+
   try {
     // 1. Check current state
     console.log('📊 Current state:\n');

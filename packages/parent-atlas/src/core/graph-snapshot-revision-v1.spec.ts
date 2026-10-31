@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
   GraphSnapshotRevisionV1Schema,
+  admitGraphNodeBindingsToSnapshotRevisionV1,
   assertGraphSnapshotRevisionMatchesHashes,
   bindGraphNodeToSnapshotRevision,
   buildGraphSnapshotRevisionV1,
@@ -70,6 +71,36 @@ describe('GraphSnapshotRevisionV1', () => {
       treeNodeId: null,
       symbolVersionId: null,
     })).toThrow('GRAPH_SNAPSHOT_NODE_REVISION_MISMATCH');
+  });
+
+  it('admits only a complete node set with exact source revisions from the frozen inventory', () => {
+    const current = revision();
+    const sourceRevision = `sha256:${digest('source')}`;
+    const nodes = [
+      { snapshotId: current.snapshotId, nodeKey: 'symbol:foo', sourceRevision, treeNodeId: 'tree:foo', symbolVersionId: null },
+      { snapshotId: current.snapshotId, nodeKey: 'file:bar', sourceRevision, treeNodeId: 'tree:bar', symbolVersionId: null },
+    ];
+
+    expect(admitGraphNodeBindingsToSnapshotRevisionV1(current, nodes, {
+      'symbol:foo': sourceRevision,
+      'file:bar': sourceRevision,
+    })).toEqual(nodes);
+    expect(() => admitGraphNodeBindingsToSnapshotRevisionV1(current, [
+      { ...nodes[0], sourceRevision: null }, nodes[1],
+    ], { 'symbol:foo': sourceRevision, 'file:bar': sourceRevision }))
+      .toThrow('GRAPH_NODE_SOURCE_REVISION_MISSING:symbol:foo');
+    expect(() => admitGraphNodeBindingsToSnapshotRevisionV1(current, [
+      { ...nodes[0], sourceRevision: `sha256:${digest('stale')}` }, nodes[1],
+    ], { 'symbol:foo': sourceRevision, 'file:bar': sourceRevision }))
+      .toThrow('GRAPH_NODE_SOURCE_REVISION_MISMATCH:symbol:foo');
+    expect(() => admitGraphNodeBindingsToSnapshotRevisionV1(current, [nodes[0], nodes[0]], {
+      'symbol:foo': sourceRevision,
+      'file:bar': sourceRevision,
+    })).toThrow('GRAPH_NODE_BINDING_DUPLICATE:symbol:foo');
+    expect(() => admitGraphNodeBindingsToSnapshotRevisionV1(current, [nodes[0]], {
+      'symbol:foo': sourceRevision,
+      'file:bar': sourceRevision,
+    })).toThrow('GRAPH_NODE_INVENTORY_CARDINALITY_MISMATCH');
   });
 
   it('rejects hash drift and receipt tampering', () => {

@@ -8,6 +8,10 @@ vi.mock('$lib/server/web/web-crawl.js', () => ({
   extractWebDocument: mockExtractWebDocument,
 }));
 
+vi.mock('$lib/server/env.server.js', () => ({
+  ENV: { SEARXNG_URL: undefined, FIRECRAWL_API_KEY: undefined },
+}));
+
 describe('ldr/web-search-client', () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -33,5 +37,17 @@ describe('ldr/web-search-client', () => {
       content: 'Shared crawl body',
       wordCount: 3,
     });
+  });
+
+  it('fails closed without a configured SearXNG URL instead of calling reserved port 8888', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { searchViaSearXNG } = await import('./web-search-client.js');
+
+    await expect(searchViaSearXNG('test query')).resolves.toEqual([]);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith('SearXNG search skipped: SEARXNG_URL is not configured');
+    fetchSpy.mockRestore();
+    warnSpy.mockRestore();
   });
 });

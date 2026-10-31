@@ -17,6 +17,7 @@ import {
   createRetryTrackerV1, DEFAULT_MAX_DELIVERY_ATTEMPTS_V1, EMBEDDING_DLQ_NAME_V1, logicalInputKeyV1, processDeliveryV1,
   type DeliveryContextV1,
 } from '../../src/lib/server/queue/embedding-consumer-retry-policy-v1.js';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
@@ -259,6 +260,8 @@ async function processMessage(
 }
 
 async function main() {
+  if (!DRY_RUN) assertSummaryIdentityWriteAdmitted('phase-b-queue-consumer-embedding');
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  Phase B Queue Consumer — EmbeddingGemma Worker                ║');
   console.log('╚════════════════════════════════════════════════════════════════╝\n');

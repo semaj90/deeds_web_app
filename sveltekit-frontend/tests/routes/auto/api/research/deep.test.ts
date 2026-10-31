@@ -1,56 +1,112 @@
 // @vitest-environment node
 /**
- * AUTO-GENERATED TEST STUB — do not edit boilerplate, fill in it.todo() blocks.
- *
  * Route: src/routes/api/research/deep/+server.ts
  * Handlers: POST
- *
- * G26 pattern: node env, vi.hoisted mocks (add as needed), lazy import in
- * beforeEach, 4 baseline cases per handler.
- *
- * Run:  npm run test -- api/research/deep
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Add hoisted mocks here when handler logic is filled in:
-// const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
-// vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
-
 describe('src/routes/api/research/deep/+server.ts', () => {
   describe('POST /api/research/deep', () => {
-    let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
+    let handler: (evt: {
+      request: Request;
+      locals: Record<string, unknown>;
+      url: URL;
+      params: Record<string, string>;
+    }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../src/routes/api/research/deep/+server.js') as Record<string, unknown>;
+      const mod = (await import(
+        '../../../../../src/routes/api/research/deep/+server.js'
+      )) as Record<string, unknown>;
       handler = mod.POST as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/api/research/deep', body !== undefined ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request(
+        'http://localhost/api/research/deep',
+        body !== undefined
+          ? {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            }
+          : {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({}),
+            },
+      );
     }
-    function makeUrl() { return new URL('http://localhost/api/research/deep'); }
+    function makeUrl() {
+      return new URL('http://localhost/api/research/deep');
+    }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
-      // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.
-      let status: number;
-      try {
-        const resp = await handler({ request: makeReq(), locals: {}, url: makeUrl(), params: {} });
-        status = resp.status;
-      } catch (e: unknown) {
-        // SvelteKit HttpError thrown by throw error(401) etc.
-        status = (e as { status?: number }).status ?? 500;
-      }
-      // Acceptable terminals: 200 (public), 401 (guarded), 400/404 (validation),
-      // 500/503 (degraded — upstream DB/Redis offline in test env). The contract
-      // is "handler returns *some* Response or throws HttpError", not a specific status.
-      expect([200, 400, 401, 403, 404, 405, 429, 500, 503]).toContain(status);
+      const resp = await handler({
+        request: makeReq({ query: 'test query' }),
+        locals: {},
+        url: makeUrl(),
+        params: {},
+      });
+      expect(resp.status).toBe(401);
+      const data = await resp.json();
+      expect(data).toEqual({ error: 'Unauthorized' });
     });
 
-    it.todo('400 — bad input shape returns degraded JSON envelope');
-    it.todo('200 — happy path returns expected schema');
-    it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
-  });
+    it('400 — bad input shape returns 400 with validation issues', async () => {
+      const resp = await handler({
+        request: makeReq({ query: 'x' }), // min 3 chars
+        locals: { user: { id: 'usr-test' } },
+        url: makeUrl(),
+        params: {},
+      });
+      expect(resp.status).toBe(400);
+      const data = await resp.json();
+      expect(data.error).toBe('Invalid input');
+      expect(Array.isArray(data.issues)).toBe(true);
+    });
 
+    it('200 — happy path returns expected schema with missionId, plan, answer', async () => {
+      const resp = await handler({
+        request: makeReq({
+          query: 'autonomous tort corporate liability precedent',
+          top_k: 3,
+          writeToObsidian: true,
+        }),
+        locals: { user: { id: 'usr-test' } },
+        url: makeUrl(),
+        params: {},
+      });
+      expect(resp.status).toBe(200);
+      const data = await resp.json();
+      expect(typeof data.missionId).toBe('string');
+      expect(data.missionId.length).toBeGreaterThan(0);
+      expect(data.query).toBe('autonomous tort corporate liability precedent');
+      expect(Array.isArray(data.ranked)).toBe(true);
+      expect(Array.isArray(data.plan.steps)).toBe(true);
+      expect(data.plan.steps.length).toBe(4);
+      expect(typeof data.answer).toBe('string');
+      expect(data.artifacts.obsidianPath).toBe(
+        `vault/research/mission-${data.missionId.slice(0, 8)}.md`,
+      );
+    });
+
+    it('200 — gracefully fallbacks to deterministic synthesis when LLM is unavailable', async () => {
+      const resp = await handler({
+        request: makeReq({
+          query: 'doctrine of promissory estoppel',
+          top_k: 2,
+        }),
+        locals: { user: { id: 'usr-test' } },
+        url: makeUrl(),
+        params: {},
+      });
+      expect(resp.status).toBe(200);
+      const data = await resp.json();
+      expect(data.answer).toBeDefined();
+      expect(data.duration_ms).toBeGreaterThanOrEqual(0);
+    });
+  });
 });

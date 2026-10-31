@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.evidence-writer-ownership.v1",
+  "generatedAt": "2026-10-30T23:55:00.000Z",
+  "semanticVectorContract": {
+    "embeddingType": "evidence_text_semantic_768",
+    "sourceField": "canonical_evidence_text",
+    "dimension": 768,
+    "inputRecipeRevision": "evidence-chunk-text-raw-utf8.v1",
+    "producerGemmaReceipt": "EMB-PROV-01 (llama-server :8081 GGUF SHA-256 bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7)",
+    "pseudoVectorFilter": "looksLikePseudoVector() rejects periodic repeated SHA-256 chunks and constant/zero vectors"
+  },
+  "writers": [
+    {
+      "component": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
+      "callsite": "storeChunkVector() -> persistEvidenceVectorForProjectionV1()",
+      "status": "ACTIVE_PRODUCTION",
+      "runtimeEvidence": "Directly called during evidence upload flow, writes to PostgreSQL evidence_vectors and queues projection in evidence_vector_projection_outbox.",
+      "idempotencyKey": "ON CONFLICT (evidence_id, source_revision, chunk_index) WHERE source_revision IS NOT NULL AND chunk_index IS NOT NULL DO UPDATE SET ... WHERE modelArtifactSha256 and outputChecksum match."
+    },
+    {
+      "component": "sveltekit-frontend/src/lib/server/features/evidence/services/drizzle-stub.ts",
+      "callsite": "upsertEmbedding()",
+      "status": "ACTIVE_STUB",
+      "runtimeEvidence": "Enforces assertEvidenceEmbeddingAdmitted(), validated by Vitest drizzle-stub.spec.ts.",
+      "idempotencyKey": "Checks existing (evidenceId, chunkIndex, sourceRevision, model) before updating/inserting."
+    },
+    {
+      "component": "sveltekit-frontend/src/lib/server/evidence/worker-embed.ts",
+      "callsite": "upsertEmbedding(evidenceId, vector, { textSnippet })",
+      "status": "DORMANT_LEGACY",
+      "runtimeEvidence": "RabbitMQ 'evidence.embed' consumer without provenance parameters; fails closed under assertEvidenceEmbeddingAdmitted(). Not running in production."
+    },
+    {
+      "component": "sveltekit-frontend/src/workers/embedding-worker.ts",
+      "callsite": "qdrant.batchUpsert() with crypto.randomUUID()",
+      "status": "DORMANT_LEGACY_PROJECTION",
+      "runtimeEvidence": "Used random UUIDs for Qdrant points. Must be replaced with deterministic evidenceQdrantPointId() to maintain PostgreSQL-Qdrant bijection."
+    }
+  ],
+  "readers": [
+    {
+      "component": "sveltekit-frontend/src/routes/api/evidence/search/+server.ts",
+      "query": "SELECT ev.evidence_id, ev.chunk_index, ev.content, 1 - (ev.embedding <=> $vector::vector) as score FROM evidence_vectors ev WHERE ev.embedding_type = 'evidence_text_semantic_768'",
+      "status": "ACTIVE_PRODUCTION",
+      "runtimeEvidence": "Searches canonical 768-D lane via pgvector cosine distance operator (<=>)."
+    },
+    {
+      "component": "sveltekit-frontend/src/lib/server/evidence/evidence-vector-projection-worker-v1.ts",
+      "query": "Claims jobs from evidence_vector_projection_outbox, reads canonical vector from evidence_vectors, projects to Qdrant, verifies exact readback.",
+      "status": "ACTIVE_HARNESSED",
+      "runtimeEvidence": "Tested in evidence-vector-projection-worker-v1.spec.ts."
+    }
+  ],
+  "qdrantPointIdContract": {
+    "recipe": "deriveUUID('atlas.evidence-vector.qdrant-point.v1', { embeddingType, evidenceId, sourceRevision, chunkIndex, modelArtifactSha256 })",
+    "deterministic": true,
+    "bijectionVerified": true
+  }
+}

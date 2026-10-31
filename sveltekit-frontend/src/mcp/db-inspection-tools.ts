@@ -40,11 +40,20 @@ function isForbiddenColumn(name: string): boolean {
   return FORBIDDEN_COLUMN_PATTERNS.some(p => p.test(name));
 }
 
-async function withTimeout<T>(pool: any, fn: () => Promise<T>): Promise<T> {
+async function withReadOnlyTransaction<T>(pool: any, fn: (client: any) => Promise<T>): Promise<T> {
   const client = await pool.connect();
+  let transactionOpen = false;
   try {
+    await client.query('BEGIN TRANSACTION READ ONLY');
+    transactionOpen = true;
     await client.query(`SET LOCAL statement_timeout = ${STATEMENT_TIMEOUT_MS}`);
-    return await fn.call({ client });
+    const result = await fn(client);
+    await client.query('COMMIT');
+    transactionOpen = false;
+    return result;
+  } catch (error) {
+    if (transactionOpen) await client.query('ROLLBACK').catch(() => {});
+    throw error;
   } finally {
     client.release();
   }
@@ -81,16 +90,13 @@ export function registerDbInspectionTools(server: McpServer, pool: any, dispatch
           .describe('Include pg_class.reltuples row estimates (default true).'),
         schema: z.string().default('public')
           .describe('Postgres schema to enumerate (default "public").'),
-      })
+      }).strict()
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
       'db.schema_overview',
       sessionId_schema_overview,
-      async ({ include_row_estimates, schema }) => {
-      const client = await pool.connect();
-      try {
-        await client.query(`SET LOCAL statement_timeout = ${STATEMENT_TIMEOUT_MS}`);
+      async ({ include_row_estimates, schema }) => withReadOnlyTransaction(pool, async (client) => {
 
         // Tables + structural flags + row estimate in one shot.
         const sql = `
@@ -146,10 +152,8 @@ export function registerDbInspectionTools(server: McpServer, pool: any, dispatch
             text: JSON.stringify({ schema, tables, summary }, null, 2),
           }],
         };
-      } finally {
-        client.release();
-      }
-      }
+      }),
+      'READ_ONLY'
     )
   );
 
@@ -172,16 +176,13 @@ export function registerDbInspectionTools(server: McpServer, pool: any, dispatch
           .describe('Include index list (default true).'),
         include_foreign_keys: z.boolean().default(true)
           .describe('Include foreign-key references (default true).'),
-      })
+      }).strict()
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
       'db.table_inspect',
       sessionId_table_inspect,
-      async ({ table, schema, include_columns, include_indexes, include_foreign_keys }) => {
-      const client = await pool.connect();
-      try {
-        await client.query(`SET LOCAL statement_timeout = ${STATEMENT_TIMEOUT_MS}`);
+      async ({ table, schema, include_columns, include_indexes, include_foreign_keys }) => withReadOnlyTransaction(pool, async (client) => {
 
         // 1. Validate table exists. If it doesn't, return an error rather than
         //    threading the user-supplied name through subsequent queries.
@@ -276,10 +277,8 @@ export function registerDbInspectionTools(server: McpServer, pool: any, dispatch
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };
-      } finally {
-        client.release();
-      }
-      }
+      }),
+      'READ_ONLY'
     )
   );
 }

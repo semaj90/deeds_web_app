@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { deleteSeaweedFile as deleteFile, uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
 import { buildEvidenceProcessPayloadV1 } from '$lib/server/evidence/evidence-process-payload-v1.js';
 import { db } from '$lib/server/db/client';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress';
 import {
@@ -19,7 +19,6 @@ import {
 } from '$lib/server/evidence-indexing-receipt-v1.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { extractTextHybrid } from '$lib/server/ocr/hybrid.js';
-import { embedTexts } from '$lib/server/batch-embedder.js';
 import { chunkLegalDocument, type LegalChunk } from '$lib/server/indexer/legal-chunker.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
@@ -56,7 +55,10 @@ import {
   evidenceQdrantPointId,
   type EvidenceEmbeddingProvenance,
 } from '$lib/server/evidence/evidence-embedding-contract.js';
-import { persistEvidenceVectorForProjectionV1 } from '$lib/server/evidence/evidence-vector-persistence-v1.js';
+import {
+  persistEvidenceVectorForProjectionV1,
+  type EvidenceVectorDatabaseV1,
+} from '$lib/server/evidence/evidence-vector-persistence-v1.js';
 import { createEvidenceEmbeddingProducer } from '$lib/server/evidence/evidence-embedding-producer.js';
 
 // Strict llama.cpp lane (:8081) bound to the EMB-PROV-01 receipt; re-probed on every call, fails closed.
@@ -71,6 +73,22 @@ const evidenceUploadSchema = z.object({
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
+
+async function updateUploadProgress(jobId: string, update: Parameters<typeof updateJob>[1]): Promise<void> {
+  updateJob(jobId, update);
+
+  const status = update.step === 'complete' ? 'completed' : update.step === 'error' ? 'failed' : 'running';
+  try {
+    await updateAnalysisJob(jobId, {
+      status,
+      progress: String(update.progress ?? 0),
+      ...(update.error ? { error: update.error } : {}),
+      ...(status === 'completed' || status === 'failed' ? { completedAt: new Date() } : {}),
+    });
+  } catch (error) {
+    console.warn('[Upload] Failed to persist progress update:', error);
+  }
+}
 
 /** Min text length before we try OCR fallback for scanned PDFs */
 const MIN_PDF_TEXT_LENGTH = 50;
@@ -276,8 +294,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     );
   }
 
-  const jobId = `job-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+  const jobId = crypto.randomUUID();
   let uploadedObjectKey: string | null = null;
+  let persistedEvidenceId: string | null = null;
 
   try {
     let formData: FormData;
@@ -438,7 +457,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       .returning({ id: evidence.id });
 
     const evidenceId = inserted.id;
-    updateJob(jobId, {
+    persistedEvidenceId = evidenceId;
+    try {
+      await createAnalysisJob({ id: jobId, evidenceId, caseId, jobType: 'upload_pipeline' });
+    } catch (jobError) {
+      console.warn('[Upload] Durable progress record unavailable; keeping in-process progress:', jobError);
+    }
+    await updateUploadProgress(jobId, {
       evidenceId,
       step: 'db-insert',
       progress: 60,
@@ -495,9 +520,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       });
 
     // 5. Fire off text extraction + chunking + embedding (non-blocking)
-    processAndEmbed(jobId, evidenceId, file.name, buffer, caseId, evidenceType).catch((err) => {
+    processAndEmbed(jobId, evidenceId, file.name, buffer, caseId, evidenceType).catch(async (err) => {
       console.error('[Upload] Background processing failed:', err);
-      updateJob(jobId, {
+      await updateUploadProgress(jobId, {
         step: 'error',
         progress: 60,
         message: 'Embedding generation failed (upload succeeded)',
@@ -556,7 +581,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     if (uploadedObjectKey) {
       await deleteFile(BUCKET, uploadedObjectKey).catch(() => false);
     }
-    updateJob(jobId, { step: 'error', progress: 0, message: 'Upload processing failed' });
+    if (persistedEvidenceId) {
+      try {
+        await db.delete(evidence).where(eq(evidence.id, persistedEvidenceId));
+      } catch (cleanupError) {
+        console.error('[Upload] Failed to roll back evidence row after upload failure:', cleanupError);
+      }
+    }
+    await updateUploadProgress(jobId, { step: 'error', progress: 0, message: 'Upload processing failed' });
     return json(
       {
         success: false,
@@ -957,7 +989,7 @@ async function processAndEmbed(
     'Awaiting monocular depth and 3D scene reconstruction'
   );
 
-  updateJob(jobId, { step: 'embedding', progress: 65, message: 'Extracting text...' });
+  await updateUploadProgress(jobId, { step: 'extracting', progress: 65, message: 'Extracting text...' });
 
   // Check extraction cache by file hash (SHA-256 keyed, 7-day TTL)
   const fileHash = crypto.createHash('sha256').update(buffer).digest('hex');
@@ -999,11 +1031,16 @@ async function processAndEmbed(
     evidenceId,
     text: fullText,
     extractionMethod,
+    sourceRevision,
+    skipEmbedding: true,
   });
   if (evidenceProcessPayload) {
     try {
       const { dispatchOrExecuteInline } = await import('$lib/server/queue/dispatch-inline.js');
-      await dispatchOrExecuteInline('evidence.process', evidenceProcessPayload);
+      const dispatchResult = await dispatchOrExecuteInline('evidence.process', evidenceProcessPayload);
+      if (dispatchResult.error || dispatchResult.mode === 'skipped') {
+        console.warn('[Upload] Evidence analysis dispatch did not complete:', dispatchResult.error ?? dispatchResult.mode);
+      }
     } catch (err) {
       console.warn('[Upload] Evidence dispatch failed (non-critical):', (err as Error).message);
     }
@@ -1047,7 +1084,7 @@ async function processAndEmbed(
     `
       )
       .catch(() => {});
-    updateJob(jobId, {
+    await updateUploadProgress(jobId, {
       step: 'complete',
       progress: 100,
       message: 'Upload complete (no text to embed)',
@@ -1110,8 +1147,8 @@ async function processAndEmbed(
   let doclingVlmSections: string[] = [];
 
   if (!doclingBlocks && isPdfOrImage) {
-    updateJob(jobId, {
-      step: 'embedding',
+    await updateUploadProgress(jobId, {
+      step: 'structuring',
       progress: 67,
       message: 'Running structural document analysis (Granite-Docling)...',
     });
@@ -1363,7 +1400,7 @@ async function processAndEmbed(
   }
   const persistedSectionMap = semanticSectionMap.length > 0 ? semanticSectionMap : chunkSectionMap;
 
-  updateJob(jobId, {
+  await updateUploadProgress(jobId, {
     step: 'embedding',
     progress: 70,
     message: `Generating embeddings for ${legalChunks.length} chunk(s)...`,
@@ -1372,13 +1409,7 @@ async function processAndEmbed(
   let embeddedCount = 0;
   let pgVectorStored = 0;
   let vectorStoreFailures = 0;
-  let qdrantIndexFailed = false;
-  let qdrantIndexedCount = 0;
-  const qdrantPoints: Array<{
-    id: string;
-    vector: { content: number[] };
-    payload: Record<string, unknown>;
-  }> = [];
+  let qdrantQueuedCount = 0;
 
   // Track unique sections for graph node creation
   const sectionsSeen = new Map<string, { heading: string; path: string[]; chunkIds: string[] }>();
@@ -1447,53 +1478,7 @@ async function processAndEmbed(
         chunkIndex: chunk.chunkIndex,
         modelArtifactSha256: embeddingProvenance.modelArtifactSha256,
       });
-      qdrantPoints.push({
-        id: chunkUUID,
-        vector: { content: postgresEmbedding },
-        payload: {
-          evidence_id: evidenceId,
-          case_id: caseId,
-          source_revision: sourceRevision,
-          embedding_input_recipe_revision: embeddingProvenance.inputRecipeRevision,
-          embedding_input_sha256: embeddingProvenance.inputSha256,
-          model_artifact_sha256: embeddingProvenance.modelArtifactSha256,
-          embedding_output_sha256: produced.outputChecksum,
-          embedding_type: 'evidence_text_semantic_768',
-          source_field: 'canonical_evidence_text',
-          embedding_provenance: embeddingProvenance,
-          chunk_index: chunk.chunkIndex,
-          file_name: fileName,
-          content_preview: chunk.text.slice(0, 500),
-          extraction_method: extractionMethod,
-          section_path: chunk.sectionPath,
-          heading: chunk.heading,
-          citations: chunk.citations,
-          token_count: chunk.tokenCount,
-          section_type: sectionType,
-          content_type:
-            extractionMethod.startsWith('whisper-') || extractionMethod === 'docling-asr'
-              ? 'audio_transcription'
-              : 'document',
-          created_at: new Date().toISOString(),
-          ...(chunk.doctagTypes && chunk.doctagTypes.length > 0
-            ? { doctag_types: chunk.doctagTypes }
-            : {}),
-          ...(chunk.isTable ? { is_table: true } : {}),
-          ...(chunk.pageStart != null ? { page_start: chunk.pageStart } : {}),
-          ...(chunk.pageEnd != null ? { page_end: chunk.pageEnd } : {}),
-          docling_enriched: Boolean(doclingBlocks),
-          ...(doclingQualityScore != null ? { docling_quality_score: doclingQualityScore } : {}),
-          ...(doclingVlmSections.length > 0 ? { docling_vlm_sections: doclingVlmSections } : {}),
-          // Phase 1A: legal retrieval metadata (RRF / KAG / RAPTOR feed)
-          ...(chunk.legal_section ? { legal_section: chunk.legal_section } : {}),
-          ...(chunk.jurisdiction ? { jurisdiction: chunk.jurisdiction } : {}),
-          ...(chunk.authority_tier != null ? { authority_tier: chunk.authority_tier } : {}),
-          ...(chunk.citation_count != null ? { citation_count: chunk.citation_count } : {}),
-          ...(chunk.extraction_confidence != null
-            ? { extraction_confidence: chunk.extraction_confidence }
-            : {}),
-        },
-      });
+      qdrantQueuedCount++;
 
       if (chunk.sectionPath.length > 0) {
         const sectionKey = chunk.sectionPath.join(' > ');
@@ -1511,7 +1496,7 @@ async function processAndEmbed(
     }
 
     const pct = 70 + Math.round((embeddedCount / legalChunks.length) * 15);
-    updateJob(jobId, {
+    await updateUploadProgress(jobId, {
       step: 'embedding',
       progress: pct,
       message: `Embedded ${embeddedCount}/${legalChunks.length} chunks`,
@@ -1541,47 +1526,30 @@ async function processAndEmbed(
         : `Stored ${pgVectorStored} of ${embeddedCount} chunk vector(s) in PostgreSQL`,
     { embeddedCount, stored: pgVectorStored, failures: vectorStoreFailures }
   );
+  await updateUploadProgress(jobId, {
+    step: 'vector-storage',
+    progress: 87,
+    message: qdrantQueuedCount > 0
+      ? `Canonical vectors stored; ${qdrantQueuedCount} projection event(s) queued`
+      : 'Canonical vector storage finished; no projection events queued',
+  });
 
-  // Batch upsert to Qdrant evidence_items collection
-  if (qdrantPoints.length > 0) {
-    updateJob(jobId, { step: 'embedding', progress: 87, message: 'Indexing in Qdrant...' });
-    try {
-      await qdrant.batchUpsert({
-        collection: 'evidence',
-        points: qdrantPoints,
-      });
-      qdrantIndexedCount = qdrantPoints.length;
-      console.log(`[Upload] Upserted ${qdrantPoints.length} points to Qdrant evidence_items`);
-      markStage(
-        diagnostics,
-        'qdrant_index',
-        'success',
-        `Upserted ${qdrantPoints.length} point(s) to Qdrant`,
-        {
-          pointCount: qdrantPoints.length,
-        }
-      );
-    } catch (err) {
-      qdrantIndexFailed = true;
-      console.warn('[Upload] Qdrant upsert failed; PostgreSQL vector writes are reported independently:', err);
-      markStage(
-        diagnostics,
-        'qdrant_index',
-        'warning',
-        'Qdrant upsert failed; PostgreSQL vector availability is reported separately',
-        {
-          pointCount: qdrantPoints.length,
-        }
-      );
-    }
+  if (qdrantQueuedCount > 0) {
+    markStage(
+      diagnostics,
+      'qdrant_index',
+      'pending',
+      'Committed evidence vectors and reference-only Qdrant projection events to PostgreSQL',
+      { queuedCount: qdrantQueuedCount, indexedCount: 0 }
+    );
   } else {
-    markStage(diagnostics, 'qdrant_index', 'skipped', 'No chunk embeddings available for Qdrant');
+    markStage(diagnostics, 'qdrant_index', 'skipped', 'No canonical evidence vectors were queued for projection');
   }
 
   // Create graph nodes in yorha_evidence_nodes for each section
   if (sectionsSeen.size > 0 && caseId) {
-    updateJob(jobId, {
-      step: 'embedding',
+    await updateUploadProgress(jobId, {
+      step: 'graph',
       progress: 92,
       message: `Building graph (${sectionsSeen.size} sections)...`,
     });
@@ -1621,18 +1589,10 @@ async function processAndEmbed(
   const allCitations = [...new Set(legalChunks.flatMap((c) => c.citations))];
 
   // Create pipeline job in analysis_jobs table (Drizzle ORM)
-  let pipelineJobId: string | null = null;
-  try {
-    pipelineJobId = await createAnalysisJob({ evidenceId, caseId, jobType: 'upload_pipeline' });
-    await updateAnalysisJob(pipelineJobId, { progress: '75' });
-    markStage(diagnostics, 'pipeline_job', 'success', 'Created upload pipeline analysis job');
-  } catch (err) {
-    console.warn('[Upload] Pipeline job creation failed (non-fatal):', err);
-    markStage(diagnostics, 'pipeline_job', 'warning', 'Pipeline analysis job creation failed');
-  }
+  markStage(diagnostics, 'pipeline_job', 'success', 'Using the upload progress job as the pipeline job');
 
   // 6. Entity extraction: LLM structured (primary) + regex (fallback) + dedup
-  updateJob(jobId, { step: 'embedding', progress: 93, message: 'Extracting entities...' });
+  await updateUploadProgress(jobId, { step: 'entity-extraction', progress: 93, message: 'Extracting entities...' });
   let entityJobId: string | null = null;
   try {
     entityJobId = await createAnalysisJob({ evidenceId, caseId, jobType: 'entity_extraction' });
@@ -1796,6 +1756,9 @@ async function processAndEmbed(
       })(),
       // DepthAnything v2 depth estimation from the image-synthesis container
       (async () => {
+        if (!ENV.IMAGE_SYNTHESIS_URL) {
+          return null;
+        }
         const base64Image = buffer.toString('base64');
         const resp = await fetch(`${ENV.IMAGE_SYNTHESIS_URL}/depth`, {
           method: 'POST',
@@ -2001,7 +1964,7 @@ async function processAndEmbed(
 
   // 7. Summarization via Ollama (non-fatal — skipped if Ollama unavailable)
   let summary = '';
-  updateJob(jobId, { step: 'embedding', progress: 95, message: 'Generating summary...' });
+  await updateUploadProgress(jobId, { step: 'summarizing', progress: 95, message: 'Generating summary with Ornith...' });
   let summaryJobId: string | null = null;
   try {
     summaryJobId = await createAnalysisJob({ evidenceId, caseId, jobType: 'summarization' });
@@ -2025,45 +1988,15 @@ async function processAndEmbed(
     markStage(diagnostics, 'summary', 'warning', 'Summarization skipped');
   }
 
-  // 7b. Embed summary for vector retrieval in Qdrant legal_documents (with auto binary cache)
+  // 7b. Generated summaries are not admitted to the canonical evidence-vector lane.
   if (summary && summary.length > 50) {
-    try {
-      const summaryRevision = formatEvidenceSourceRevisionV1(
-        crypto.createHash('sha256').update(summary).digest('hex')
-      );
-      const embeddings = await gated(embedGate, () => embedTexts([summary.slice(0, 4000)]));
-      if (embeddings[0]?.length === 768) {
-        const summaryEmbedding = Array.from(embeddings[0]);
-        await qdrant.storeDocument({
-          id: evidenceId,
-          title: fileName,
-          content: summary,
-          contentEmbedding: summaryEmbedding,
-          metadata: {
-            document_type: 'evidence-summary',
-            case_id: caseId,
-            source_revision: sourceRevision,
-            summary_revision: summaryRevision,
-            evidence_type: finalType,
-            chunk_count: embeddedCount,
-            entity_count: entities.length,
-          },
-        });
-        console.log(`[Upload] Summary embedded in Qdrant legal_documents for ${fileName}`);
-        markStage(
-          diagnostics,
-          'summary_embedding',
-          'success',
-          'Stored summary embedding in legal_documents',
-          {
-            summaryLength: summary.length,
-          }
-        );
-      }
-    } catch (err) {
-      console.warn('[Upload] Summary embedding failed (non-fatal):', err);
-      markStage(diagnostics, 'summary_embedding', 'warning', 'Summary embedding failed');
-    }
+    markStage(
+      diagnostics,
+      'summary_embedding',
+      'skipped',
+      'Generated summary has no canonical PostgreSQL provenance and durable projection contract',
+      { summaryLength: summary.length }
+    );
   } else {
     markStage(
       diagnostics,
@@ -2353,21 +2286,6 @@ async function processAndEmbed(
     );
   }
 
-  // Complete pipeline job
-  if (pipelineJobId) {
-    try {
-      await completeAnalysisJob(pipelineJobId, {
-        chunks: embeddedCount,
-        entities: entities.length,
-        flags: forensicFlags.length,
-        sections: sectionsSeen.size,
-        citations: allCitations.length,
-      });
-    } catch {
-      /* non-fatal */
-    }
-  }
-
   const highSeverity = forensicFlags.filter((f) => f.severity === 'high');
 
   // Mark evidence as complete (was staying 'pending' forever)
@@ -2392,11 +2310,12 @@ async function processAndEmbed(
     embeddedCount,
     pgVectorStored,
     pgVectorFailures: vectorStoreFailures,
-    qdrantPointCount: qdrantIndexedCount,
-    qdrantStatus: qdrantIndexFailed ? 'failed' : qdrantIndexedCount > 0 ? 'indexed' : 'skipped',
+    qdrantPointCount: 0,
+    qdrantQueuedCount,
+    qdrantStatus: qdrantQueuedCount > 0 ? 'queued' : 'skipped',
   });
 
-  updateJob(jobId, {
+  await updateUploadProgress(jobId, {
     step: 'complete',
     progress: 100,
     message: `${indexingReceipt.message}; ${entities.length} entities, ${forensicFlags.length} flags${highSeverity.length ? ` (${highSeverity.length} HIGH)` : ''}, ${sectionsSeen.size} sections, ${allCitations.length} citations (${extractionMethod})`,
@@ -2496,8 +2415,9 @@ async function storeChunkVector(
   if (typeof sourceRevision !== 'string' || typeof model !== 'string' || !provenance) {
     throw new Error('Evidence vector identity or provenance is missing');
   }
+  const evidenceVectorDatabase: EvidenceVectorDatabaseV1 = db;
   return persistEvidenceVectorForProjectionV1(
-    { execute: (query) => db.execute(query) },
+		evidenceVectorDatabase,
     {
       evidenceId,
       sourceRevision,

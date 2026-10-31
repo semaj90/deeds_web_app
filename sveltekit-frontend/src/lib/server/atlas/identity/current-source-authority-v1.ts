@@ -119,8 +119,16 @@ export interface CurrentSourceAuthorityInputV1 {
    * the admission receipt is what binds workspaceRevision -> snapshotRevision.
    */
   snapshot: { snapshotRevision: string; selfDigestValid: boolean; workspaceRevisionClaim: string | null; canonicalAuthorityClaim: boolean; violations: number; membershipChecksum: string | null; sources: SnapshotSourceV1[] };
+  selectionSources?: SnapshotSourceV1[];
   /** The admission's preflight receipt: an independent statement of the same workspaceRevision <-> snapshotRevision binding. */
-  preflight?: { workspaceRevisionCandidate: string | null; snapshotRevision: string | null; sourceCount: number | null; membershipChecksum: string | null } | null;
+  preflight?: {
+    workspaceRevisionCandidate: string | null;
+    snapshotRevision: string | null;
+    sourceCount: number | null;
+    membershipChecksum: string | null;
+    snapshotSourceCount?: number | null;
+    snapshotMembershipChecksum?: number | null;
+  } | null;
   membership: MembershipRowV1[];
   /** Optional registry evidence. repoIdMap maps a Graphify repository_id to the registry repo_id namespace. */
   registry?: { repoIdMap: Record<string, string>; rows: RegistryBindingV1[] };
@@ -148,12 +156,13 @@ const isContentQualified = (revision: string | null, digest: string | null) => r
 
 export function classifyCurrentSourcesV1(input: CurrentSourceAuthorityInputV1) {
   const { admitted, snapshot, membership } = input;
+  const selectionSources = input.selectionSources ?? snapshot.sources;
   const bySnapshot = new Map<string, SnapshotSourceV1[]>();
-  for (const s of snapshot.sources) bySnapshot.set(s.sourceIdentityKey, [...(bySnapshot.get(s.sourceIdentityKey) ?? []), s]);
+  for (const s of selectionSources) bySnapshot.set(s.sourceIdentityKey, [...(bySnapshot.get(s.sourceIdentityKey) ?? []), s]);
   const byMembership = new Map<string, MembershipRowV1[]>();
   for (const m of membership) byMembership.set(keyOf(m.repositoryId, m.repositoryRelativePath), [...(byMembership.get(keyOf(m.repositoryId, m.repositoryRelativePath)) ?? []), m]);
   const refToKeys = new Map<string, Set<string>>();
-  for (const s of snapshot.sources) refToKeys.set(s.sourceRef, (refToKeys.get(s.sourceRef) ?? new Set()).add(s.sourceIdentityKey));
+  for (const s of selectionSources) refToKeys.set(s.sourceRef, (refToKeys.get(s.sourceRef) ?? new Set()).add(s.sourceIdentityKey));
   for (const m of membership) refToKeys.set(m.sourceRef, (refToKeys.get(m.sourceRef) ?? new Set()).add(keyOf(m.repositoryId, m.repositoryRelativePath)));
 
   const registryByKey = new Map<string, RegistryBindingV1[]>();
@@ -196,9 +205,17 @@ export function classifyCurrentSourcesV1(input: CurrentSourceAuthorityInputV1) {
   const count = (c: SourceClass) => classified.filter((s) => s.cls === c).length;
   const cohort = classified.filter((s) => s.membershipState === 'BOTH');
   const toEntries = (rows: Array<{ key: string; revision: string | null; byteLength: number | null }>): SourceSelectionEntry[] => rows.map((r) => ({ sourceIdentityKey: r.key, sourceRevision: String(r.revision), byteLength: Number(r.byteLength) }));
-  const snapshotSelectionChecksum = sourceSelectionChecksumV1(toEntries(snapshot.sources.map((s) => ({ key: s.sourceIdentityKey, revision: s.sourceRevision, byteLength: s.byteLength }))));
+  const snapshotSelectionChecksum = sourceSelectionChecksumV1(toEntries(selectionSources.map((s) => ({ key: s.sourceIdentityKey, revision: s.sourceRevision, byteLength: s.byteLength }))));
   const membershipSelectionChecksum = sourceSelectionChecksumV1(toEntries(membership.map((m) => ({ key: keyOf(m.repositoryId, m.repositoryRelativePath), revision: m.codeSourceRevision, byteLength: m.byteLength }))));
-  const recomputedMembershipSet = membershipSetChecksumV1(snapshot.sources.map((s) => s.sourceIdentityKey));
+  const recomputedMembershipSet = membershipSetChecksumV1(selectionSources.map((s) => s.sourceIdentityKey));
+  const recomputedSnapshotMembershipSet = membershipSetChecksumV1(snapshot.sources.map((s) => s.sourceIdentityKey));
+  const selectionBoundToSnapshot = selectionSources.every((selected) => {
+    const matching = snapshot.sources.filter((source) => source.sourceIdentityKey === selected.sourceIdentityKey);
+    return matching.length === 1
+      && matching[0].sourceRevision === selected.sourceRevision
+      && matching[0].contentDigest === selected.contentDigest
+      && Number(matching[0].byteLength) === Number(selected.byteLength);
+  });
 
   const duplicateKeys = classified.filter((s) => s.reasons.includes('DUPLICATE_SOURCE_IDENTITY_KEY')).length;
   const proof = {
@@ -206,10 +223,14 @@ export function classifyCurrentSourcesV1(input: CurrentSourceAuthorityInputV1) {
     // states the same W<->S<->count<->membership; every joined membership row must carry W (checked per source above). The derivation of W from S is NOT recomputed here.
     workspaceAuthorityProven: admitted.admissionAuthority === true && admitted.admissionStatus === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED'
       && snapshot.snapshotRevision === admitted.snapshotRevision && snapshot.selfDigestValid === true && snapshot.workspaceRevisionClaim === null && snapshot.canonicalAuthorityClaim === false
-      && snapshot.violations === 0 && snapshot.sources.length === admitted.sourceCount && recomputedMembershipSet === admitted.membershipChecksum && snapshot.membershipChecksum === admitted.membershipChecksum
+      && snapshot.violations === 0 && recomputedSnapshotMembershipSet === snapshot.membershipChecksum
+      && snapshot.sources.length === (input.preflight?.snapshotSourceCount ?? input.preflight?.sourceCount ?? snapshot.sources.length)
+      && snapshot.membershipChecksum === (input.preflight?.snapshotMembershipChecksum ?? input.preflight?.membershipChecksum ?? snapshot.membershipChecksum)
+      && selectionSources.length === admitted.sourceCount && selectionBoundToSnapshot && recomputedMembershipSet === admitted.membershipChecksum
       && input.preflight?.workspaceRevisionCandidate === admitted.workspaceRevision && input.preflight?.snapshotRevision === admitted.snapshotRevision
       && input.preflight?.sourceCount === admitted.sourceCount && input.preflight?.membershipChecksum === admitted.membershipChecksum,
-    exactMembershipProven: cohort.length === keys.length && snapshot.sources.length === membership.length && keys.length === admitted.sourceCount,
+    selectedCohortBoundToSnapshot: selectionBoundToSnapshot,
+    exactMembershipProven: cohort.length === keys.length && selectionSources.length === membership.length && keys.length === admitted.sourceCount,
     sourceIdentityProven: duplicateKeys === 0 && count('NAMESPACE_AMBIGUOUS') === 0,
     sourceRevisionProven: count('MISSING_REVISION') === 0 && count('REVISION_MISMATCH') === 0,
     sourceSelectionChecksumProven: snapshotSelectionChecksum === membershipSelectionChecksum,
@@ -228,6 +249,7 @@ export function classifyCurrentSourcesV1(input: CurrentSourceAuthorityInputV1) {
     sourceSelectionChecksum: membershipSelectionChecksum,
     snapshotSelectionChecksum,
     membershipSetChecksum: recomputedMembershipSet,
+    snapshotMembershipSetChecksum: recomputedSnapshotMembershipSet,
     counts: { qualified: count('QUALIFIED'), missingRevision: count('MISSING_REVISION'), revisionMismatch: count('REVISION_MISMATCH'), namespaceAmbiguous: count('NAMESPACE_AMBIGUOUS'), notInAdmittedCohort: count('NOT_IN_ADMITTED_COHORT') },
     proof,
     registryCoverage: registry,

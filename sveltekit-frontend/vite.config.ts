@@ -180,13 +180,6 @@ export default defineConfig(({ mode }) => {
       SVELTEKIT_EMBEDDED__: 'false',
       SVELTEKIT_HAS_SERVER_LOAD__: 'true',
       SVELTEKIT_HAS_UNIVERSAL_LOAD__: 'true',
-      // App version polling
-      SVELTEKIT_APP_VERSION_FILE__: '"_app/version.json"',
-      SVELTEKIT_APP_VERSION_POLL_INTERVAL__: '0',
-      // Adapter info
-      SVELTEKIT_ADAPTER_NAME__: '"@sveltejs/adapter-node"',
-      // Dev mode flag
-      SVELTEKIT_dev: mode === 'development' ? 'true' : 'false',
     },
     plugins: [
       fixPiperWasmExpressions,

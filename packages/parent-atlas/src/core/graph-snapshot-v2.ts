@@ -1,5 +1,10 @@
 import { z } from 'zod';
 import type { Pool, PoolClient } from 'pg';
+import {
+  GraphSnapshotRevisionV1Schema,
+  assertGraphSnapshotRevisionMatchesHashes,
+  verifyGraphSnapshotRevisionV1,
+} from './graph-snapshot-revision-v1.js';
 
 export const GraphSnapshotV2StatusSchema = z.enum(['BUILDING', 'VALIDATED', 'SUPERSEDED', 'FAILED']);
 export const GraphResolutionIssueStatusSchema = z.enum(['OPEN', 'RETRYABLE', 'QUARANTINED', 'IGNORED_BY_POLICY', 'RESOLVED', 'SUPERSEDED']);
@@ -12,8 +17,19 @@ export const GraphSnapshotV2Schema = z.object({
   sourceHash: z.string().min(1),
   topologyHash: z.string().min(1),
   policyHash: z.string().min(1),
+  revision: GraphSnapshotRevisionV1Schema,
   eligibilityPredicate: z.string().min(1),
-}).strict();
+}).strict().superRefine((snapshot, ctx) => {
+  if (snapshot.revision.snapshotId !== snapshot.snapshotId) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['revision', 'snapshotId'], message: 'Revision snapshot ID must match the snapshot.' });
+  }
+  if (snapshot.revision.topologyHash !== snapshot.topologyHash) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['revision', 'topologyHash'], message: 'Revision topology hash must match the snapshot.' });
+  }
+  if (snapshot.revision.policyHash !== snapshot.policyHash) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['revision', 'policyHash'], message: 'Revision policy hash must match the snapshot.' });
+  }
+});
 
 export const GraphResolutionIssueV2Schema = z.object({
   snapshotId: z.string().uuid(),
@@ -58,10 +74,19 @@ export function assertAuthorityRunCanPersist(snapshot: { status: z.infer<typeof 
 export function createGraphSnapshotV2Repository(pool: Pool) {
   async function createBuildingSnapshot(input: GraphSnapshotV2): Promise<void> {
     const snapshot = GraphSnapshotV2Schema.parse(input);
+    const revision = verifyGraphSnapshotRevisionV1(snapshot.revision);
+    assertGraphSnapshotRevisionMatchesHashes(revision, {
+      topologyHash: snapshot.topologyHash,
+      policyHash: snapshot.policyHash,
+      sourceInventoryHash: revision.sourceInventoryHash,
+    });
     await pool.query(
-      `INSERT INTO atlas_graph_snapshots_v2 (snapshot_id, schema_version, status, source_manifest, projection_policy, source_hash, topology_hash, policy_hash, eligibility_predicate)
-       VALUES ($1, $2, 'BUILDING', $3::jsonb, $4::jsonb, $5, $6, $7, $8)`,
-      [snapshot.snapshotId, snapshot.schemaVersion, JSON.stringify(snapshot.sourceManifest), JSON.stringify(snapshot.projectionPolicy), snapshot.sourceHash, snapshot.topologyHash, snapshot.policyHash, snapshot.eligibilityPredicate],
+      `INSERT INTO atlas_graph_snapshots_v2
+        (snapshot_id, schema_version, status, source_manifest, projection_policy, source_hash, topology_hash, policy_hash, eligibility_predicate,
+         workspace_revision, source_inventory_revision, graph_revision, identity_contract_version, parser_contract_version, revision_checksum)
+       VALUES ($1, $2, 'BUILDING', $3::jsonb, $4::jsonb, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+      [snapshot.snapshotId, snapshot.schemaVersion, JSON.stringify(snapshot.sourceManifest), JSON.stringify(snapshot.projectionPolicy), snapshot.sourceHash, snapshot.topologyHash, snapshot.policyHash, snapshot.eligibilityPredicate,
+        revision.workspaceRevision, revision.sourceInventoryRevision, revision.graphRevision, revision.identityContractVersion, revision.parserContractVersion, revision.revisionChecksum],
     );
   }
 

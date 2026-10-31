@@ -14,6 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -24,6 +25,8 @@ const REPORT_MD = path.join(ROOT, 'docs/reports/summary-layer-quality-cleanup.md
 
 const env = loadRepoEnv(process.env);
 Object.assign(process.env, env);
+
+if (APPLY) assertSummaryIdentityWriteAdmitted('clean-summary-layer-quality');
 
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(env),

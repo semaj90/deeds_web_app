@@ -4,7 +4,8 @@ export type EvidenceIndexingReceiptInputV1 = {
   pgVectorStored: number;
   pgVectorFailures: number;
   qdrantPointCount: number;
-  qdrantStatus: 'indexed' | 'failed' | 'skipped';
+  qdrantQueuedCount?: number;
+  qdrantStatus: 'indexed' | 'queued' | 'failed' | 'skipped';
 };
 
 export function validateEvidenceEmbeddingV1(embedding: readonly number[]): 'valid' | 'wrong_dimension' | 'non_finite' {
@@ -31,6 +32,8 @@ export function buildEvidenceIndexingReceiptV1(input: EvidenceIndexingReceiptInp
   const qdrantResult =
     input.qdrantStatus === 'indexed'
       ? `${input.qdrantPointCount} point(s) indexed`
+      : input.qdrantStatus === 'queued'
+        ? `${input.qdrantQueuedCount ?? 0} point(s) durably queued for projection`
       : input.qdrantStatus === 'failed'
         ? `${input.qdrantPointCount} point(s) failed`
         : 'not attempted';

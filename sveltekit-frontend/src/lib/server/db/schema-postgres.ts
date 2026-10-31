@@ -1474,6 +1474,7 @@ export const evidenceVectors = pgTable('evidence_vectors', {
   sourceField: varchar('source_field', { length: 100 }).notNull(),
   model: varchar('model', { length: 100 }).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => [
   check('evidence_vectors_source_revision_sha256_ck', sql`${table.sourceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
   check('evidence_vectors_chunk_index_nonnegative_ck', sql`${table.chunkIndex} >= 0`),
@@ -1483,6 +1484,64 @@ export const evidenceVectors = pgTable('evidence_vectors', {
     .on(table.evidenceId, table.sourceRevision, table.chunkIndex)
     .where(sql`source_revision IS NOT NULL AND chunk_index IS NOT NULL`),
 ]);
+
+export const evidenceVectorProjectionOutbox = pgTable(
+  'evidence_vector_projection_outbox',
+  {
+    id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
+    evidenceVectorId: uuid('evidence_vector_id').notNull(),
+    qdrantPointId: uuid('qdrant_point_id').notNull(),
+    projectionLane: text('projection_lane').notNull(),
+    projectionContractRevision: text('projection_contract_revision').notNull(),
+    sourceRevision: text('source_revision').notNull(),
+    chunkIndex: integer('chunk_index').notNull(),
+    outputSha256: text('output_sha256').notNull(),
+    modelArtifactSha256: text('model_artifact_sha256').notNull(),
+    inputRecipeRevision: text('input_recipe_revision').notNull(),
+    inputSha256: text('input_sha256').notNull(),
+    status: varchar('status', { length: 24 }).default('PENDING').notNull(),
+    attemptCount: integer('attempt_count').default(0).notNull(),
+    maxAttempts: integer('max_attempts').default(8).notNull(),
+    availableAt: timestamp('available_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+    leaseToken: uuid('lease_token'),
+    leaseExpiresAt: timestamp('lease_expires_at', { withTimezone: true }),
+    lastError: text('last_error'),
+    verificationReceipt: jsonb('verification_receipt').$type<Record<string, unknown>>(),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`clock_timestamp()`).notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.evidenceVectorId],
+      foreignColumns: [evidenceVectors.id],
+      name: 'evidence_vector_projection_outbox_vector_fk',
+    }).onDelete('restrict'),
+    check('evidence_vector_projection_outbox_lane_ck', sql`${table.projectionLane} = 'evidence_semantic_768'`),
+    check('evidence_vector_projection_outbox_contract_ck', sql`length(btrim(${table.projectionContractRevision})) > 0`),
+    check('evidence_vector_projection_outbox_revision_ck', sql`${table.sourceRevision} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_vector_projection_outbox_chunk_ck', sql`${table.chunkIndex} >= 0`),
+    check('evidence_vector_projection_outbox_output_sha_ck', sql`${table.outputSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_vector_projection_outbox_model_sha_ck', sql`${table.modelArtifactSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_vector_projection_outbox_recipe_ck', sql`length(btrim(${table.inputRecipeRevision})) > 0`),
+    check('evidence_vector_projection_outbox_input_sha_ck', sql`${table.inputSha256} ~ '^sha256:[0-9a-f]{64}$'`),
+    check('evidence_vector_projection_outbox_status_ck', sql`${table.status} IN ('PENDING', 'PROCESSING', 'RETRY', 'COMPLETED', 'DEAD_LETTER')`),
+    check('evidence_vector_projection_outbox_attempts_ck', sql`${table.attemptCount} >= 0 AND ${table.maxAttempts} > 0`),
+    check('evidence_vector_projection_outbox_lease_ck', sql`(${table.status} = 'PROCESSING' AND ${table.leaseToken} IS NOT NULL AND ${table.leaseExpiresAt} IS NOT NULL) OR (${table.status} <> 'PROCESSING' AND ${table.leaseToken} IS NULL AND ${table.leaseExpiresAt} IS NULL)`),
+    check('evidence_vector_projection_outbox_completion_ck', sql`(${table.status} = 'COMPLETED' AND ${table.completedAt} IS NOT NULL AND ${table.verificationReceipt} IS NOT NULL) OR (${table.status} <> 'COMPLETED' AND ${table.completedAt} IS NULL AND ${table.verificationReceipt} IS NULL)`),
+    unique('evidence_vector_projection_outbox_identity_uq').on(
+      table.evidenceVectorId,
+      table.projectionLane,
+      table.projectionContractRevision
+    ),
+    index('evidence_vector_projection_outbox_dispatch_idx')
+      .on(table.availableAt, table.createdAt, table.id)
+      .where(sql`${table.status} IN ('PENDING', 'RETRY')`),
+    index('evidence_vector_projection_outbox_lease_idx')
+      .on(table.leaseExpiresAt, table.id)
+      .where(sql`${table.status} = 'PROCESSING'`),
+  ]
+);
 
 /**
  * Evidence Analysis Cache — queryable analysis results for fast client hits.

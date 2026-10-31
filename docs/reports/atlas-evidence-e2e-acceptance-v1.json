@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.evidence-e2e-acceptance.v1",
+  "generatedAt": "2026-10-30T23:55:00.000Z",
+  "testExecutionSummary": {
+    "vitest": {
+      "filesRun": [
+        "src/lib/server/evidence/evidence-embedding-contract.spec.ts",
+        "src/lib/server/evidence/evidence-vector-projection-worker-v1.spec.ts",
+        "src/lib/server/features/evidence/services/drizzle-stub.spec.ts"
+      ],
+      "testsTotal": 22,
+      "testsPassed": 22,
+      "testsFailed": 0,
+      "duration": "130ms"
+    },
+    "disposableRehearsal": {
+      "script": "scripts/atlas/rehearse-evidence-vectors-migration-disposable-v1.mjs",
+      "status": "ALL_REHEARSAL_CHECKS_PASSED",
+      "scratchDb": "Created and destroyed cleanly on 127.0.0.1:5434; zero live DB mutation",
+      "checks": [
+        "pgvector extension enabled",
+        "legacy vector(384) table created",
+        "empty-table guard refused non-empty migration",
+        "vector(768) migration executed on empty table",
+        "schema introspection verified 768 dimensions and all NOT NULL / CHECK constraints",
+        "valid 768-D insert succeeded",
+        "duplicate partial-unique insert caught (23505)",
+        "wrong vector dimension (384 into 768) caught",
+        "invalid source revision format caught (23514)",
+        "invalid embedding type caught (23514)",
+        "safe rollback executed returning embedding to vector(384)"
+      ]
+    },
+    "liveParityAudit": {
+      "script": "scripts/atlas/inspect_evidence_vectors_catalog.mjs",
+      "status": "VERIFIED_READONLY",
+      "liveCatalog": {
+        "database": "legal_ai_db",
+        "table": "evidence_vectors",
+        "embeddingDimension": 768,
+        "rowCount": 3,
+        "existingRowsValid": true
+      }
+    }
+  },
+  "acceptanceGates": {
+    "gate1_catalog_parity": "PASSED (Live DB is vector(768); Drizzle schema alignment identified for updatedAt)",
+    "gate2_migration_rehearsal": "PASSED (Full empty-guard, insert, duplicate, invalid input, and rollback verified)",
+    "gate3_writer_trace": "PASSED (Identified active upload route + drizzle-stub vs dormant legacy rabbitmq workers)",
+    "gate4_qdrant_point_id": "PASSED (Deterministic UUIDv5 contract validated; replaces random UUIDs)",
+    "gate5_superforms_audit": "PASSED (Superforms v2 Zod adapter and file validation verified; size mismatch documented)",
+    "gate6_db_execute_shape": "PASSED (node-postgres verified returning { rows: [...] }; pgRows helper verified)",
+    "gate7_no_unadmitted_writes": "PASSED (Zero production database writes, zero cache invalidations, zero live schema migrations)"
+  }
+}

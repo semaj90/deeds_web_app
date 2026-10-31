@@ -4,6 +4,8 @@ import {
   a2aTaskProjectionSchema,
   buildParentAtlasStudioWorkflowProjection,
   buildValidatedWorkflowDispatch,
+  buildValidatedWorkflowDispatchV2,
+  evaluateWorkflowDispatchReadinessV2,
   gpuCodebaseIndexPlanSchema,
   graphifyDailyWorkflowPlanSchema,
   workflowEventToA2aTask,
@@ -86,7 +88,7 @@ test('A2A terminal state cannot omit terminal marker', () => {
   );
 });
 
-test('operational task board stays a noncanonical projection', () => {
+test('operational task board stays noncanonical and receipt IDs alone cannot mark work done', () => {
   const card = workflowEventToTaskBoardCard({
     event: event(),
     title: 'Verify SV-4/SV-6 cross-runtime proof',
@@ -94,7 +96,7 @@ test('operational task board stays a noncanonical projection', () => {
     validation_receipt_ids: ['receipt:validation:1'],
     source_snapshot_revision: 'source:r7',
   });
-  assert.equal(card.column, 'DONE');
+  assert.equal(card.column, 'VERIFY');
   assert.equal(card.feature_board_canonical, false);
   assert.equal(card.canonical_authority, false);
 });
@@ -121,6 +123,134 @@ test('GPU indexing APPLY requires validation and a GPU admission receipt', () =>
     }),
     /GPU index APPLY requires an admitted GPU resource receipt/,
   );
+});
+
+test('dispatch readiness requires current revisions, completed dependency proof, and trusted receipt resolution', async () => {
+  const dispatch = buildValidatedWorkflowDispatchV2({
+    dispatch_id: 'dispatch:readiness',
+    workflow_id: 'wf:readiness',
+    workflow_revision: 3,
+    action_id: 'action:apply',
+    dependency_action_ids: ['action:prepare'],
+    target: 'GRAPHIFY_DAILY',
+    mode: 'DRY_RUN',
+    validation_receipt_ids: ['receipt:plan'],
+    source_snapshot_revision: 'source:r3',
+    graph_revision: 'graph:r3',
+    feature_revision: 'feature:r3',
+    semantic_revision: 'semantic:r3',
+    gpu_resource_receipt_id: null,
+    mutation_plan_id: null,
+    producer_revision: 'producer:r3',
+  });
+  const current = {
+    workflow_revision: 3,
+    source_snapshot_revision: 'source:r3',
+    graph_revision: 'graph:r3',
+    feature_revision: 'feature:r3',
+    semantic_revision: 'semantic:r3',
+    producer_revision: 'producer:r3',
+  };
+  const dependency = {
+    action_id: 'action:prepare',
+    state: 'DONE',
+    workflow_revision: 3,
+    source_snapshot_revision: 'source:r3',
+    validation_receipt_id: 'receipt:dependency',
+  };
+  const authority = ({ currentValue = current, dependencyValue = dependency, trustedReceipts = ['receipt:plan', 'receipt:dependency'] } = {}) => ({
+    resolveCurrentRevisions: async () => currentValue,
+    resolveDependency: async (_workflowId, actionId) => actionId === dependencyValue?.action_id ? dependencyValue : null,
+    verifyValidationReceipt: async ({ receiptId }) => trustedReceipts.includes(receiptId),
+    verifyApplyApproval: async () => false,
+  });
+
+  const ready = await evaluateWorkflowDispatchReadinessV2({ dispatch, approval_receipt_id: null }, authority());
+  assert.equal(ready.decision, 'READY_FOR_REVIEW');
+  assert.equal(ready.canonical_authority, false);
+
+  const stale = await evaluateWorkflowDispatchReadinessV2({ dispatch, approval_receipt_id: null }, authority({
+    currentValue: { ...current, source_snapshot_revision: 'source:r4' },
+  }));
+  assert.equal(stale.decision, 'STALE');
+  assert.ok(stale.reasons.includes('REVISION_STALE:source_snapshot_revision'));
+
+  const blocked = await evaluateWorkflowDispatchReadinessV2({ dispatch, approval_receipt_id: null }, authority({
+    dependencyValue: { ...dependency, state: 'RUNNING' },
+  }));
+  assert.equal(blocked.decision, 'BLOCKED');
+  assert.ok(blocked.reasons.includes('DEPENDENCY_NOT_DONE:action:prepare'));
+
+  const missing = await evaluateWorkflowDispatchReadinessV2({ dispatch, approval_receipt_id: null }, authority({ dependencyValue: null }));
+  assert.equal(missing.decision, 'BLOCKED');
+  assert.ok(missing.reasons.includes('DEPENDENCY_MISSING:action:prepare'));
+
+  const tampered = await evaluateWorkflowDispatchReadinessV2({
+    dispatch: { ...dispatch, dependency_action_ids: [] },
+    approval_receipt_id: null,
+  }, authority());
+  assert.equal(tampered.decision, 'BLOCKED');
+  assert.ok(tampered.reasons.includes('DISPATCH_CHECKSUM_MISMATCH'));
+
+  const unverified = await evaluateWorkflowDispatchReadinessV2({ dispatch, approval_receipt_id: null }, authority({
+    trustedReceipts: ['receipt:dependency'],
+  }));
+  assert.equal(unverified.decision, 'BLOCKED');
+  assert.ok(unverified.reasons.includes('VALIDATION_RECEIPT_UNVERIFIED:receipt:plan'));
+});
+
+test('APPLY dispatch readiness requires a trusted approval bound to the dispatch checksum', async () => {
+  const dispatch = buildValidatedWorkflowDispatchV2({
+    dispatch_id: 'dispatch:apply-approval',
+    workflow_id: 'wf:approval',
+    workflow_revision: 1,
+    action_id: 'action:write',
+    dependency_action_ids: [],
+    target: 'GRAPHIFY_DAILY',
+    mode: 'APPLY',
+    validation_receipt_ids: ['receipt:validated'],
+    source_snapshot_revision: 'source:r1',
+    graph_revision: 'graph:r1',
+    feature_revision: 'feature:r1',
+    semantic_revision: 'semantic:r1',
+    gpu_resource_receipt_id: null,
+    mutation_plan_id: 'plan:write',
+    producer_revision: 'producer:r1',
+  });
+  const context = {
+    workflow_revision: 1,
+    source_snapshot_revision: 'source:r1',
+    graph_revision: 'graph:r1',
+    feature_revision: 'feature:r1',
+    semantic_revision: 'semantic:r1',
+    producer_revision: 'producer:r1',
+  };
+  const authority = ({ approvalIsValid = false } = {}) => ({
+    resolveCurrentRevisions: async () => context,
+    resolveDependency: async () => null,
+    verifyValidationReceipt: async ({ receiptId }) => receiptId === 'receipt:validated',
+    verifyApplyApproval: async ({ receiptId, dispatchChecksum }) => approvalIsValid
+      && receiptId === 'receipt:operator-approval'
+      && dispatchChecksum === dispatch.dispatch_checksum,
+  });
+  const withoutApproval = await evaluateWorkflowDispatchReadinessV2({
+    dispatch,
+    approval_receipt_id: null,
+  }, authority());
+  assert.equal(withoutApproval.decision, 'BLOCKED');
+  assert.ok(withoutApproval.reasons.includes('APPLY_APPROVAL_MISSING_OR_MISMATCHED'));
+
+  const withApproval = await evaluateWorkflowDispatchReadinessV2({
+    dispatch,
+    approval_receipt_id: 'receipt:operator-approval',
+  }, authority({ approvalIsValid: true }));
+  assert.equal(withApproval.decision, 'READY_FOR_REVIEW');
+
+  const mismatchedApproval = await evaluateWorkflowDispatchReadinessV2({
+    dispatch,
+    approval_receipt_id: 'receipt:operator-approval',
+  }, authority());
+  assert.equal(mismatchedApproval.decision, 'BLOCKED');
 });
 
 test('CAGRA codebase index plan requires a cuVS exact oracle and one semantic lane vote', () => {
@@ -157,6 +287,49 @@ test('CAGRA codebase index plan requires a cuVS exact oracle and one semantic la
     ],
   });
   assert.equal(valid.semantic_lane_votes, 1);
+});
+
+test('GPU task DAG rejects cycles, forward dependencies, and oversized plans', () => {
+  const base = {
+    plan_id: 'index:dag-validation',
+    workspace_revision: 'workspace:r1',
+    source_snapshot_revision: 'source:r1',
+    semantic_revision: 'semantic:r1',
+    graph_revision: 'graph:r1',
+    feature_revision: 'feature:r1',
+    row_identity_checksum: checksum,
+    canonical_semantic_dimension: 768,
+    semantic_lane_votes: 1,
+    exact_promotion_required: true,
+    apply_requires_validation: true,
+    producer_revision: 'test:v1',
+  };
+  const stage = (stage_id, ordinal, depends_on) => ({
+    stage_id,
+    ordinal,
+    kind: 'FEATURE_ALIGNMENT',
+    executor: 'CPU',
+    mutating: false,
+    validation_required: true,
+    depends_on,
+  });
+
+  assert.throws(() => gpuCodebaseIndexPlanSchema.parse({
+    ...base,
+    stages: [stage('first', 0, ['second']), stage('second', 1, ['first'])],
+  }), /stage dependencies must be acyclic/);
+  assert.throws(() => gpuCodebaseIndexPlanSchema.parse({
+    ...base,
+    stages: [stage('first', 0, []), stage('second', 1, ['first', 'first'])],
+  }), /duplicate dependency/);
+  assert.throws(() => gpuCodebaseIndexPlanSchema.parse({
+    ...base,
+    stages: [stage('first', 0, ['second']), stage('second', 1, [])],
+  }), /must precede/);
+  assert.throws(() => gpuCodebaseIndexPlanSchema.parse({
+    ...base,
+    stages: Array.from({ length: 257 }, (_, ordinal) => stage(`stage:${ordinal}`, ordinal, [])),
+  }), /Too big/);
 });
 
 test('Graphify daily APPLY stages require validation receipts', () => {

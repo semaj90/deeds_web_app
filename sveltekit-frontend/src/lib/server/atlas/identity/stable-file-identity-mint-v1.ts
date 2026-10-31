@@ -72,6 +72,7 @@ export const StableFileWriterErrorCode = Object.freeze({
   CONTENT_DIGEST_MISMATCH: 'CONTENT_DIGEST_MISMATCH',
   STABLE_FILE_IDENTITY_AMBIGUOUS: 'STABLE_FILE_IDENTITY_AMBIGUOUS',
   REPOSITORY_IDENTITY_AMBIGUOUS: 'REPOSITORY_IDENTITY_AMBIGUOUS',
+  REPOSITORY_IDENTITY_METADATA_CONFLICT: 'REPOSITORY_IDENTITY_METADATA_CONFLICT',
   CROSS_REPOSITORY_IDENTITY_CONFLICT: 'CROSS_REPOSITORY_IDENTITY_CONFLICT',
   TOMBSTONED_IDENTITY_NOT_REUSABLE: 'TOMBSTONED_IDENTITY_NOT_REUSABLE',
 } as const);
@@ -125,6 +126,26 @@ export interface RepositoryIdentityMintOutcomeV1 {
   row: RepositoryIdentityRowV1;
 }
 
+function assertRepositoryIdentityMetadataMatchesV1(
+  row: RepositoryIdentityRowV1,
+  request: RepositoryIdentityMintRequestV1,
+): void {
+  const conflicts = [
+    ['repositoryName', row.repository_name, request.repositoryName],
+    ['repositoryPath', row.repository_path, request.repositoryPath],
+    ['repositoryKind', row.repository_kind, request.repositoryKind],
+    ['gitmoduleName', row.gitmodule_name, request.gitmoduleName ?? null],
+    ['originUrl', row.origin_url, request.originUrl ?? null],
+    ['parentRepositoryId', row.parent_repository_id, request.parentRepositoryId ?? null],
+  ].filter(([, persisted, requested]) => persisted !== requested).map(([field]) => field);
+  if (conflicts.length > 0) {
+    throw typedError(
+      StableFileWriterErrorCode.REPOSITORY_IDENTITY_METADATA_CONFLICT,
+      `source_authority_repo_id=${request.sourceAuthorityRepoId} conflicts on ${conflicts.join(',')}`,
+    );
+  }
+}
+
 /**
  * Idempotent by (source_authority_repo_id): looks up first, mints only if absent. The caller is
  * responsible for wrapping this in a transaction and reading the row back before COMMIT.
@@ -148,6 +169,7 @@ export async function mintOrReuseRepositoryIdentityV1(
     );
   }
   if (decision === 'REUSE_EXISTING') {
+    assertRepositoryIdentityMetadataMatchesV1(existing.rows[0], request);
     return { outcome: 'REUSED_EXISTING', row: existing.rows[0] };
   }
 
@@ -186,7 +208,10 @@ export async function mintOrReuseRepositoryIdentityV1(
           WHERE source_authority_repo_id = $1`,
         [request.sourceAuthorityRepoId],
       );
-      if (reread.rows.length === 1) return { outcome: 'REUSED_EXISTING', row: reread.rows[0] };
+      if (reread.rows.length === 1) {
+        assertRepositoryIdentityMetadataMatchesV1(reread.rows[0], request);
+        return { outcome: 'REUSED_EXISTING', row: reread.rows[0] };
+      }
     }
     throw err;
   }

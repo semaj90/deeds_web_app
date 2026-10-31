@@ -202,6 +202,16 @@ const report = {
         // the explicit owner-decision/apply protocol has completed.
         requiresExplicitAuthorityDecision: true,
       }
+    : candidates.length === 1 && candidates[0]?.sourceMembershipExact
+    ? {
+        type: candidates[0].canonical_authority
+          ? 'SINGLE_EXECUTION_CANONICAL_AUTHORITY_PRESENT'
+          : 'SINGLE_EXECUTION_REQUIRES_EXPLICIT_AUTHORITY',
+        candidateExecutionIds: [candidates[0].execution_id],
+        preferredExecutionId: null,
+        policy: 'SINGLE_VERIFIED_CANDIDATE_OPERATOR_DECISION_REQUIRED',
+        requiresExplicitAuthorityDecision: !candidates[0].canonical_authority,
+      }
     : null,
   status: readError
     ? 'DATABASE_READ_UNAVAILABLE'

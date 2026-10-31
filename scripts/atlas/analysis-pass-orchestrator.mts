@@ -24,6 +24,7 @@ import readline from 'readline';
 import { fileURLToPath } from 'url';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const execAsync = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -235,6 +236,8 @@ async function orchestrateAnalysisPass() {
       console.log('[Analysis Pass] ✅ Dry-run complete');
       return;
     }
+
+    assertSummaryIdentityWriteAdmitted('analysis-pass-orchestrator');
 
     // 4. Execute SQL via docker exec
     console.log('[Analysis Pass] Executing INSERT...');

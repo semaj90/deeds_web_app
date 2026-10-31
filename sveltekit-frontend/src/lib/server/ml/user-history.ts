@@ -23,6 +23,15 @@ import { db } from '$lib/server/db/client';
 import { userInteractionHistory } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function toValidUuidOrNull(val: unknown): string | null {
+	if (typeof val === 'string' && UUID_REGEX.test(val)) {
+		return val;
+	}
+	return null;
+}
+
 
 export interface InteractionRecord {
 	id: string;
@@ -60,22 +69,29 @@ export class UserHistoryTracker {
 		caseId: string,
 		durationSeconds: number,
 		searchContext?: string,
-		inferredTopics?: Array<{ topicId: number; affinity: number }>
+		inferredTopics?: Array<{ topicId: number; affinity: number }>,
+		extraMetadata?: Record<string, unknown>
 	): Promise<void> {
 		try {
+			const validDocId = toValidUuidOrNull(documentId);
+			const validCaseId = toValidUuidOrNull(caseId);
+			const meta: Record<string, unknown> = {
+				source: 'document_detail_panel',
+				viewTimeMs: durationSeconds * 1000,
+				...(extraMetadata || {})
+			};
+			if (!validDocId && documentId) meta.rawDocumentId = documentId;
+			if (!validCaseId && caseId) meta.rawCaseId = caseId;
 			await db.insert(userInteractionHistory).values({
 				id: uuidv4(),
 				userId: Number(this.userId),
-				documentId,
-				caseId,
-				interactionType: 'view',
+				documentId: validDocId,
+				caseId: validCaseId,
+				interactionType: ((typeof extraMetadata?.interactionType === 'string' && extraMetadata.interactionType) || (typeof extraMetadata?.eventType === 'string' && extraMetadata.eventType) || 'view').slice(0, 50),
 				durationSeconds,
 				searchContext,
 				topicPreferences: inferredTopics || [],
-				metadata: {
-					source: 'document_detail_panel',
-					viewTimeMs: durationSeconds * 1000
-				}
+				metadata: meta
 			});
 		} catch (err) {
 			console.error('[UserHistoryTracker] Failed to record view:', err);

@@ -1,4 +1,5 @@
 import { buildGraphifyTaskCandidate, type GraphifyTaskCandidate } from '../contracts/graphify-task-candidate.js';
+import { AGENTIC_ERROR_FIX_ORIGIN } from './agentic-error-fix-lane.js';
 import type { DailyGraphifyBoardData, DailyGraphifyTask } from './daily-graphify-board.js';
 import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../retrieval/qdrant-semantic-projection.js';
 
@@ -31,7 +32,7 @@ export function buildDailyGraphifyTaskCandidates(
 	const generatedAt = context.generatedAt ?? board.generated;
 
 	return board.columns.flatMap((column) =>
-		column.tasks.map((task): GraphifyTaskCandidate =>
+		column.tasks.filter((task) => task.origin !== AGENTIC_ERROR_FIX_ORIGIN).map((task): GraphifyTaskCandidate =>
 			buildGraphifyTaskCandidate({
 				taskId: task.id,
 				priority: priorityFallback(task),

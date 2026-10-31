@@ -557,16 +557,14 @@ export const evidenceProcessingMachine = setup({
 });
 
 export function getProcessingProgress(context: EvidenceProcessingContext): number {
-	const totalSteps = 5;
-	const completedSteps = context.streamingUpdates.filter(
-		(item) => item.status === 'completed'
-	).length;
-	return Math.round((completedSteps / totalSteps) * 100);
+	const latestUpdate = context.streamingUpdates.at(-1);
+	const progress = Number(latestUpdate?.progress ?? 0);
+	return Number.isFinite(progress) ? Math.max(0, Math.min(100, Math.round(progress))) : 0;
 }
 
 export function getCurrentStep(context: EvidenceProcessingContext): string {
 	const latestUpdate = context.streamingUpdates.at(-1);
-	return latestUpdate?.status === 'in_progress' ? latestUpdate.step : 'idle';
+	return latestUpdate?.step ?? 'idle';
 }
 
 export function getStepProgress(context: EvidenceProcessingContext, step: string): number {

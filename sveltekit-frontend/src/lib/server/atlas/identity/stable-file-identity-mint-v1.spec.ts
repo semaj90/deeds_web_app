@@ -210,6 +210,21 @@ describe('mintOrReuseRepositoryIdentityV1', () => {
     expect(db.repositories).toHaveLength(1);
   });
 
+  it('rejects re-registration when immutable repository metadata conflicts', async () => {
+    const db = makeFixtureDb();
+    await mintOrReuseRepositoryIdentityV1(db, {
+      ...REPO_REQUEST,
+      originUrl: 'https://example.test/original',
+    });
+
+    await expect(mintOrReuseRepositoryIdentityV1(db, {
+      ...REPO_REQUEST,
+      repositoryPath: 'different-path',
+      originUrl: 'https://example.test/fork',
+    })).rejects.toThrow(StableFileWriterErrorCode.REPOSITORY_IDENTITY_METADATA_CONFLICT);
+    expect(db.repositories).toHaveLength(1);
+  });
+
   it('mints distinct repositoryIds for distinct sourceAuthorityRepoIds', async () => {
     const db = makeFixtureDb();
     const root = await mintOrReuseRepositoryIdentityV1(db, REPO_REQUEST);
@@ -272,6 +287,34 @@ describe('mintOrReuseRepositoryIdentityV1', () => {
     expect(result.outcome).toBe('REUSED_EXISTING');
     expect(result.row.repository_id).toBe('concurrent-winner-id');
     expect(db.repositories).toHaveLength(1); // exactly one row exists -- no duplicate was created
+  });
+
+  it('rejects conflicting metadata when another concurrent insert wins the unique-key race', async () => {
+    const db = makeFixtureDb();
+    const racingDb: StableFileIdentityDbClient = {
+      async query(sql, params = []) {
+        const statement = sql.trim();
+        if (statement.startsWith('INSERT INTO atlas_repository_identity')) {
+          const winnerParams = [...params];
+          winnerParams[0] = 'concurrent-winner-id';
+          winnerParams[3] = '.';
+          await db.query(
+            `INSERT INTO atlas_repository_identity (repository_id, source_authority_repo_id, repository_name, repository_path, repository_kind, gitmodule_name, origin_url, parent_repository_id)`,
+            winnerParams,
+          );
+          const error = new Error('duplicate key value violates unique constraint') as Error & { code: string };
+          error.code = '23505';
+          throw error;
+        }
+        return db.query(sql, params);
+      },
+    };
+
+    await expect(mintOrReuseRepositoryIdentityV1(racingDb, {
+      ...REPO_REQUEST,
+      repositoryPath: 'different-path',
+    })).rejects.toThrow(StableFileWriterErrorCode.REPOSITORY_IDENTITY_METADATA_CONFLICT);
+    expect(db.repositories).toHaveLength(1);
   });
 });
 

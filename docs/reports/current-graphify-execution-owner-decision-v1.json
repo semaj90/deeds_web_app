@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-execution-owner-decision.v1",
-  "generatedAt": "2026-10-30T02:44:08.422Z",
+  "generatedAt": "2026-10-30T22:17:25.083Z",
   "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
   "mode": "APPLY",
   "authorityTableOwner": "graphify_execution_authority",
@@ -12,7 +12,7 @@
   "before": [
     {
       "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
-      "canonical_authority": false,
+      "canonical_authority": true,
       "workspace_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c"
     }
   ],
@@ -27,7 +27,12 @@
   "applied": {
     "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
     "workspaceRevision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c",
-    "previousAuthority": [],
+    "previousAuthority": [
+      {
+        "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+        "authority_state": "SELECTED"
+      }
+    ],
     "legacy": [
       {
         "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f"
@@ -37,12 +42,12 @@
       {
         "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
         "authority_state": "SELECTED",
-        "selected_by": "James Woodard",
-        "selection_receipt": "operator-instruction:2026-10-30:claude-session-29782ee8;rehearsal=git:7cd65e0daa6;plan-sha256=0adeccd7101a03f61fdcc34f620c98cd7db1e70362b93b5cc99d508876747405",
+        "selected_by": "operator",
+        "selection_receipt": "docs/reports/workspace-revision-tournament-admission-v1.json",
         "imported_at": null,
         "import_receipt": null
       }
     ]
   },
-  "reportChecksum": "b1333462979d0c7487b223c9ebd36d423851c00ba345363852550fab52f83619"
+  "reportChecksum": "0a28d2be01a8cfbea217f3a149cef205e571469925115fcae489a25bcc674bfa"
 }

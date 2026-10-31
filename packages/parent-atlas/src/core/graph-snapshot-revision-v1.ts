@@ -124,6 +124,38 @@ export function bindGraphNodeToSnapshotRevision(
   return node;
 }
 
+export function admitGraphNodeBindingsToSnapshotRevisionV1(
+  revisionInput: GraphSnapshotRevisionV1,
+  nodeInputs: GraphSnapshotNodeBindingV1[],
+  expectedSourceRevisions: Record<string, string>,
+): GraphSnapshotNodeBindingV1[] {
+  const revision = verifyGraphSnapshotRevisionV1(revisionInput);
+  const expectedEntries = Object.entries(expectedSourceRevisions);
+  if (expectedEntries.length === 0) throw new Error('GRAPH_SOURCE_INVENTORY_EMPTY');
+  if (nodeInputs.length !== expectedEntries.length) throw new Error('GRAPH_NODE_INVENTORY_CARDINALITY_MISMATCH');
+
+  const expected = new Map<string, string>();
+  for (const [nodeKey, sourceRevision] of expectedEntries) {
+    if (expected.has(nodeKey)) throw new Error(`GRAPH_SOURCE_INVENTORY_DUPLICATE_NODE:${nodeKey}`);
+    if (!contentRevision.safeParse(sourceRevision).success) throw new Error(`GRAPH_SOURCE_REVISION_INVALID:${nodeKey}`);
+    expected.set(nodeKey, sourceRevision.toLowerCase());
+  }
+
+  const seen = new Set<string>();
+  return nodeInputs.map((input) => {
+    const node = bindGraphNodeToSnapshotRevision(revision, input);
+    if (seen.has(node.nodeKey)) throw new Error(`GRAPH_NODE_BINDING_DUPLICATE:${node.nodeKey}`);
+    seen.add(node.nodeKey);
+    const expectedRevision = expected.get(node.nodeKey);
+    if (!expectedRevision) throw new Error(`GRAPH_NODE_NOT_IN_SOURCE_INVENTORY:${node.nodeKey}`);
+    if (!node.sourceRevision) throw new Error(`GRAPH_NODE_SOURCE_REVISION_MISSING:${node.nodeKey}`);
+    if (node.sourceRevision.toLowerCase() !== expectedRevision) {
+      throw new Error(`GRAPH_NODE_SOURCE_REVISION_MISMATCH:${node.nodeKey}`);
+    }
+    return node;
+  });
+}
+
 export function assertGraphSnapshotRevisionMatchesHashes(
   revisionInput: GraphSnapshotRevisionV1,
   expected: { topologyHash: string; policyHash: string; sourceInventoryHash: string },

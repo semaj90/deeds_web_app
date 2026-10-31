@@ -10,6 +10,7 @@
  */
 
 import { Pool } from 'pg';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
@@ -26,6 +27,8 @@ const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
 const startTime = Date.now();
 
 async function main() {
+  if (APPLY && !DRY_RUN) assertSummaryIdentityWriteAdmitted('kmeans-summary-enrichment');
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  K-Means Clustering + Summary Layer Enrichment                 ║');
   console.log('╚════════════════════════════════════════════════════════════════╝\n');

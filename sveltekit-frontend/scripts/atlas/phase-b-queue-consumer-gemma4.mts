@@ -15,6 +15,7 @@ import { Pool } from 'pg';
 import { createHash } from 'crypto';
 // @ts-ignore shared ESM runtime helper has no local .d.ts
 import { sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
@@ -227,6 +228,8 @@ async function processMessage(
 }
 
 async function main() {
+  if (!DRY_RUN) assertSummaryIdentityWriteAdmitted('phase-b-queue-consumer-gemma4');
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  Phase B Queue Consumer — Gemma4 Worker                        ║');
   console.log('╚════════════════════════════════════════════════════════════════╝\n');

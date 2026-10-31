@@ -21,7 +21,7 @@
 <header class="ev-header">
 	<div class="ev-header-left">
 		<div class="ev-header-icon">
-			<Icon name="folder-open" class="w-6 h-6" />
+			<Icon name="yorha-law-book" class="w-6 h-6" />
 		</div>
 		<div>
 			<h1 class="ev-title">Evidence Management</h1>
@@ -48,7 +48,7 @@
 			Bulk Upload
 		</button>
 		<button type="button" class="ev-btn ev-btn-ghost" onclick={onAiAssistant}>
-			<Icon name="bot" class="w-4 h-4" />
+			<Icon name="yorha-ai-assistant" class="w-4 h-4" />
 			AI Tools
 		</button>
 		<button type="button" class="ev-btn ev-btn-ghost" onclick={onAdvancedTools}>
@@ -153,5 +153,55 @@
 	.ev-btn-ghost:hover {
 		background: rgba(255, 255, 255, 0.08);
 		color: rgba(212, 199, 163, 0.9);
+	}
+	.ev-header {
+		border-bottom-color: #dfceb2;
+		background: linear-gradient(110deg, rgba(255, 252, 244, 0.96), rgba(248, 237, 216, 0.92));
+		box-shadow: 0 1px 0 rgba(111, 43, 40, 0.06);
+	}
+	.ev-header-icon {
+		background: linear-gradient(145deg, #7e292e, #521b24);
+		color: #f5dfad;
+		box-shadow: 0 5px 14px rgba(92, 31, 37, 0.18);
+		position: relative;
+		border: 1px solid rgba(255, 255, 255, 0.28);
+	}
+	.ev-header-icon::after {
+		position: absolute;
+		inset: -5px;
+		border: 1px solid rgba(174, 135, 69, 0.28);
+		border-radius: 15px;
+		content: '';
+		pointer-events: none;
+	}
+	.ev-title { color: #30221e; font-family: Georgia, 'Times New Roman', serif; }
+	.ev-subtitle { color: #74665b; }
+	.ev-case-badge {
+		background: #f5ead6;
+		border-color: #d6bd8d;
+		color: #713034;
+	}
+	.ev-btn { border-radius: 7px; }
+	.ev-btn-primary {
+		background: #7b252b;
+		color: #fff8e9;
+		border-color: #6c2027;
+	}
+	.ev-btn-primary:hover { background: #642027; }
+	.ev-btn-secondary {
+		background: #f5ead6;
+		color: #63272c;
+		border-color: #d6bd8d;
+	}
+	.ev-btn-secondary:hover { background: #efe0c3; }
+	.ev-btn-ghost {
+		background: rgba(255, 255, 255, 0.55);
+		color: #55443b;
+		border-color: #dfceb2;
+	}
+	.ev-btn-ghost:hover { background: #fffaf0; color: #67272d; }
+	@media (max-width: 720px) {
+		.ev-header { padding: 1rem; }
+		.ev-header-actions { width: 100%; }
 	}
 </style>

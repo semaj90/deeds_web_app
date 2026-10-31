@@ -19,6 +19,7 @@
  */
 import Fuse from 'fuse.js';
 import { building } from '$app/environment';
+import { collectBoundedMetadataSnapshot } from './metadata-cache-snapshot-v1.mjs';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { pool } from '$lib/server/db/client';
@@ -110,6 +111,33 @@ const SCROLL_PAYLOAD_FIELDS = [
 // TimeoutError" (Qdrant's Scroll API is meant to be paged, not pulled in one shot). Each page
 // gets its own short per-request timeout; this is the ceiling on the whole loop.
 const SCROLL_TOTAL_DEADLINE_MS = 20_000;
+const SCROLL_MAX_PAGES = 24;
+const METADATA_CACHE_MAX_POINTS = 20_000;
+const METADATA_CACHE_MAX_BYTES = 32 * 1024 * 1024;
+
+function boundedMetadataString(value: unknown, maxLength: number): string {
+  return typeof value === 'string' ? value.slice(0, maxLength) : '';
+}
+
+function mapMetadataPoint(point: { payload?: Record<string, unknown> }): ChunkMetadata {
+  const payload = point.payload ?? {};
+  const tags = Array.isArray(payload.tags)
+    ? payload.tags.slice(0, 12).map((tag) => boundedMetadataString(tag, 128)).filter(Boolean)
+    : [];
+
+  return {
+    path: boundedMetadataString(payload.path, 1024),
+    relativePath: boundedMetadataString(payload.relativePath, 1024),
+    symbol: boundedMetadataString(payload.symbol, 512),
+    kind: boundedMetadataString(payload.kind, 64),
+    httpMethod: boundedMetadataString(payload.httpMethod, 32) || undefined,
+    routeId: boundedMetadataString(payload.routeId, 512) || undefined,
+    tags,
+    signature: boundedMetadataString(payload.signature, 2048),
+    lineStart: typeof payload.lineStart === 'number' ? payload.lineStart : 0,
+    lineEnd: typeof payload.lineEnd === 'number' ? payload.lineEnd : 0,
+  };
+}
 
 export async function refreshMetadataCache(): Promise<void> {
   if (building) return;
@@ -128,47 +156,52 @@ export async function refreshMetadataCache(): Promise<void> {
 
 async function performMetadataRefresh(): Promise<void> {
   try {
-    const points: Array<{ payload: Record<string, unknown> }> = [];
-    let offset: string | number | null = null;
-    const deadline = Date.now() + SCROLL_TOTAL_DEADLINE_MS;
+    const heapBefore = process.memoryUsage().heapUsed;
+    const snapshot = await collectBoundedMetadataSnapshot(
+      async (offset) => {
+        const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            limit: SCROLL_PAGE_SIZE,
+            offset: offset ?? undefined,
+            with_payload: { include: SCROLL_PAYLOAD_FIELDS },
+            with_vector: false,
+          }),
+          signal: AbortSignal.timeout(10_000),
+        });
 
-    do {
-      const res = await fetch(`${ENV.QDRANT_URL}/collections/${QDRANT_COLLECTION}/points/scroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          limit: SCROLL_PAGE_SIZE,
-          offset: offset ?? undefined,
-          with_payload: { include: SCROLL_PAYLOAD_FIELDS },
-          with_vector: false,
-        }),
-        signal: AbortSignal.timeout(10_000),
-      });
+        if (!res.ok) {
+          throw new Error(`QDRANT_SCROLL_HTTP_${res.status}`);
+        }
 
-      if (!res.ok) {
-        console.warn('[codebase-context] Qdrant scroll page failed, using stale cache');
-        return;
-      }
+        const data = await res.json();
+        return {
+          points: data.result?.points ?? [],
+          nextOffset: data.result?.next_page_offset ?? null,
+        };
+      },
+      {
+        maxPoints: METADATA_CACHE_MAX_POINTS,
+        maxBytes: METADATA_CACHE_MAX_BYTES,
+        maxPages: SCROLL_MAX_PAGES,
+        deadlineMs: SCROLL_TOTAL_DEADLINE_MS,
+        now: Date.now,
+        mapPoint: mapMetadataPoint,
+      },
+    );
 
-      const data = await res.json();
-      points.push(...(data.result?.points ?? []));
-      offset = data.result?.next_page_offset ?? null;
-    } while (offset != null && Date.now() < deadline);
+    if (!snapshot.ok) {
+      console.warn(
+        `[codebase-context] Rejected incomplete metadata refresh reason=${(snapshot as { reason?: string }).reason} ` +
+          `points=${snapshot.pointCount} bytes=${snapshot.estimatedBytes} ` +
+          `retainedPoints=${metadataCache.length}`
+      );
+      return;
+    }
 
-    metadataCache = points.map((p) => ({
-      path: p.payload.path as string,
-      relativePath: p.payload.relativePath as string,
-      symbol: p.payload.symbol as string,
-      kind: p.payload.kind as string,
-      httpMethod: p.payload.httpMethod as string | undefined,
-      routeId: p.payload.routeId as string | undefined,
-      tags: (p.payload.tags as string[]) ?? [],
-      signature: (p.payload.signature as string) ?? '',
-      lineStart: p.payload.lineStart as number,
-      lineEnd: p.payload.lineEnd as number,
-    }));
-
-    fuseIndex = new Fuse(metadataCache, {
+    const nextMetadataCache = snapshot.items;
+    const nextFuseIndex = new Fuse(nextMetadataCache, {
       keys: [
         { name: 'symbol', weight: 0.35 },
         { name: 'signature', weight: 0.25 },
@@ -181,9 +214,17 @@ async function performMetadataRefresh(): Promise<void> {
       minMatchCharLength: 2,
     });
 
+    metadataCache = nextMetadataCache;
+    fuseIndex = nextFuseIndex;
     lastRefresh = Date.now();
+    const heapAfter = process.memoryUsage().heapUsed;
+    console.info(
+      `[codebase-context] Metadata cache refreshed points=${snapshot.pointCount} ` +
+        `payloadBytes=${snapshot.estimatedBytes} heapDeltaBytes=${heapAfter - heapBefore} ` +
+        `heapUsedBytes=${heapAfter}`
+    );
   } catch (err) {
-    console.error('[codebase-context] Failed to refresh metadata cache:', err);
+    console.warn('[codebase-context] Metadata refresh failed; retaining previous complete cache:', err);
   }
 }
 
@@ -581,9 +622,11 @@ export async function loadCodebaseContext(query: string): Promise<{
     const recall = await recallChunks(query, 50);
     const goodCandidates = recall.candidates.filter((c) => c.fuseScore >= MIN_RECALL_SCORE);
 
-    if (goodCandidates.length === 0) return null;
-
-    const candidatePaths = goodCandidates.map((c) => c.path);
+    const recalledPaths = [...new Set(goodCandidates.map((candidate) => candidate.path).filter(Boolean))];
+    const candidatePaths = recalledPaths.length > 0 ? recalledPaths : undefined;
+    if (!candidatePaths) {
+      console.info('[codebase-context] Fuse recall unavailable; using bounded semantic Qdrant recall');
+    }
     const multiVectorResult = await rerankChunks(query, {
       candidatePaths,
       limit: 12,
@@ -607,6 +650,9 @@ export async function loadCodebaseContext(query: string): Promise<{
     });
 
     const finalChunks = gemmasResult.results.map((r) => r.doc.chunk);
+    const gemmaScoreByChunk = new Map(
+      gemmasResult.results.map((result) => [result.doc.chunk, result.rerankScore] as const)
+    );
 
     // -- Stage D: Karpathy Wiki Context & Decision Tree ----------------------
     const { getCardsForPaths, formatCardsContext } = await import('$lib/server/agents/agents-context-source');
@@ -616,10 +662,6 @@ export async function loadCodebaseContext(query: string): Promise<{
     const wikiContext = formatCardsContext(cards);
     
     const cardMap = new Map(cards.map(c => [c.dirPath, c]));
-
-    // Fetch cross-encoder scores in batch
-    const { scoreBatchCrossEncoder } = await import('$lib/server/retrieval/triton-reranker');
-    const crossEncoderScores = await scoreBatchCrossEncoder(query, finalChunks.map(c => c.content));
 
     // -- P5: 64d latent similarity for decision-tree f8 signal -----------------
     let queryEncoded64: Float32Array | undefined;
@@ -643,7 +685,7 @@ export async function loadCodebaseContext(query: string): Promise<{
       }
     } catch { /* non-fatal — encodedSimilarity stays undefined */ }
 
-    const contextChunks = await Promise.all(finalChunks.map(async (chunk, idx) => {
+    const contextChunks = await Promise.all(finalChunks.map(async (chunk) => {
         const dirPath = chunk.relativePath.split('/').slice(0, -1).join('/');
         const card = cardMap.get(dirPath);
 
@@ -659,8 +701,7 @@ export async function loadCodebaseContext(query: string): Promise<{
           : undefined;
 
         const signals = await combineRerankSignals(query, {
-            gemmaScore: chunk.score,
-            crossEncoderScore: crossEncoderScores[idx],
+            gemmaScore: gemmaScoreByChunk.get(chunk) ?? chunk.score,
             wikiScore: Math.min(1.0, wikiScore),
             activityScore: card?.activityScore || 0,
             encodedSimilarity,

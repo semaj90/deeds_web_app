@@ -199,6 +199,10 @@ async function inlineEvidenceProcess(data: {
   evidenceId: string;
   text: string;
   contentType?: string;
+  caseId?: string;
+  sourceRevision?: string;
+  skipEmbedding?: boolean;
+  metadata?: Record<string, unknown>;
 }): Promise<void> {
   const { EvidenceProcessWorker } = await import('./queue-worker.js');
   const worker = new EvidenceProcessWorker();

@@ -1,0 +1,79 @@
+{
+  "schema": "atlas.engram-4x4x6-integration-audit-receipt.v1",
+  "generated_at": "2026-10-30T23:05:00.000Z",
+  "mode": "PROPOSAL_ONLY",
+  "canonical_authority": false,
+  "writes_performed": false,
+  "remapper_status": {
+    "module": "scripts/atlas/cudf_feature_json_ingest.py",
+    "test_file": "scripts/atlas/cudf_engram_remap_test.py",
+    "tests_total": 8,
+    "tests_passed": 8,
+    "duration_seconds": 0.031
+  },
+  "axes_semantics": {
+    "axis0": {
+      "name": "som_row_quadrant",
+      "valid_range": [0, 3],
+      "formula": "floor(som_row * 4 / som_rows)"
+    },
+    "axis1": {
+      "name": "som_col_quadrant",
+      "valid_range": [0, 3],
+      "formula": "floor(som_col * 4 / som_cols)"
+    },
+    "axis2": {
+      "name": "domain_bucket",
+      "valid_range": [0, 5],
+      "mapping": {
+        "0": "graph",
+        "1": "documentation",
+        "2": "ui",
+        "3": "test",
+        "4": "gpu",
+        "5": "other"
+      }
+    },
+    "token_id_range": [0, 95],
+    "token_id_formula": "axis0 * 24 + axis1 * 6 + axis2",
+    "unresolved_policy": "FAIL_CLOSED_NONE"
+  },
+  "corpus_coverage": {
+    "total_historical_packets": 61718,
+    "distinct_raw_domain_values": 41,
+    "distinct_normalized_domain_values": 39,
+    "distribution": {
+      "graph": 10066,
+      "documentation": 6782,
+      "ui": 4365,
+      "test": 4228,
+      "gpu": 3876,
+      "other": 32401
+    },
+    "other_bucket_percentage": 52.5,
+    "som_cells_present": 61660,
+    "som_cells_missing": 58
+  },
+  "admission_blockers": [
+    {
+      "id": "BLOCKER-ENGRAM-01",
+      "title": "Unreviewed Domain Class Vocabulary",
+      "detail": "atlas_packets.domain_class has 41 distinct case-inconsistent values. 52.5% fall into 'other' (bucket 5). No canonical 6-value domain taxonomy is formally approved."
+    },
+    {
+      "id": "BLOCKER-ENGRAM-02",
+      "title": "SOM Projection Revision Disconnect",
+      "detail": "Historical packets carry legacy 20x20 SOM coordinates without a binding to som_projection_revision or input embedding digest."
+    },
+    {
+      "id": "BLOCKER-ENGRAM-03",
+      "title": "Missing Canonical Lineage on 5,852 Sources",
+      "detail": "In tournament revision c63620c4..., 5,852 sources are absent from atlas_workspace_source_bindings, preventing canonical packet admission."
+    },
+    {
+      "id": "BLOCKER-ENGRAM-04",
+      "title": "No Production Caller Bound",
+      "detail": "The 4x4x6 remapper is a pure isolated helper without an authorized production write path in SearchRuntime or BitFrost."
+    }
+  ]
+}

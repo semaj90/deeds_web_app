@@ -2,11 +2,11 @@ import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'node:path';
 
-function loadEnvFile(filePath, override = false) {
+function loadEnvFile(filePath, { override = false, inheritedKeys = new Set() } = {}) {
   if (!fs.existsSync(filePath)) return;
   const parsed = dotenv.parse(fs.readFileSync(filePath));
   for (const [key, value] of Object.entries(parsed)) {
-    if (override || process.env[key] === undefined) {
+    if (override || !inheritedKeys.has(key)) {
       process.env[key] = value;
     }
   }
@@ -47,15 +47,16 @@ export function loadRuntimeEnv(options = {}) {
   }
 
   const roots = resolveRuntimeEnvRoots(cwd);
+  const inheritedKeys = new Set(Object.keys(process.env));
   const envFiles = [
     path.join(roots.workspaceRoot, '.env'),
-    path.join(roots.workspaceRoot, '.env.local'),
     path.join(roots.projectRoot, '.env'),
+    path.join(roots.workspaceRoot, '.env.local'),
     path.join(roots.projectRoot, '.env.local'),
   ];
 
   for (const filePath of envFiles) {
-    loadEnvFile(filePath, override);
+    loadEnvFile(filePath, { override, inheritedKeys });
   }
 
   return roots;

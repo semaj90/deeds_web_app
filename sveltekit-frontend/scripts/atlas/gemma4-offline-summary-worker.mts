@@ -17,6 +17,7 @@ import * as https from 'https';
 import * as http from 'http';
 // @ts-ignore shared ESM runtime helper has no local .d.ts
 import { sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
@@ -257,6 +258,8 @@ async function writeSummaryLayer(pool: Pool, packet: PacketRow, summary: string)
 }
 
 async function main() {
+  if (APPLY && !DRY_RUN) assertSummaryIdentityWriteAdmitted('gemma4-offline-summary-worker');
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  Gemma4 Offline Summary Worker (Analysis Pass Logger)          ║');
   console.log('╚════════════════════════════════════════════════════════════════╝\n');

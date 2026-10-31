@@ -22,6 +22,8 @@ export interface QdrantSummarySyncResult {
   pointIds: Array<string | number>;
 }
 
+const MAX_SUMMARY_SYNC_POINTS = 50;
+
 function normalizeQdrantPoints(response: unknown): Array<{ id: string | number }> {
   if (Array.isArray(response)) {
     return response as Array<{ id: string | number }>;
@@ -96,7 +98,7 @@ export async function syncSummaryPayloadToQdrant(
   let pointIds: Array<string | number>;
   try {
     const scrollResponse = await qdrant.client.scroll(collection, {
-      limit: 50,
+      limit: MAX_SUMMARY_SYNC_POINTS + 1,
       with_payload: false,
       with_vector: false,
       filter: revisionFilter,
@@ -111,6 +113,9 @@ export async function syncSummaryPayloadToQdrant(
   }
 
   const ids = pointIds;
+  if (ids.length > MAX_SUMMARY_SYNC_POINTS) {
+    throw new Error(`QDRANT_SUMMARY_MATCH_LIMIT_EXCEEDED:${ids.length}:${MAX_SUMMARY_SYNC_POINTS}`);
+  }
   if (ids.length === 0) {
     return {
       collection,
@@ -127,9 +132,37 @@ export async function syncSummaryPayloadToQdrant(
   };
 
   await qdrant.client.setPayload(collection, {
-    filter: revisionFilter,
+    points: ids,
     payload,
+    wait: true,
   });
+
+  const readback = await qdrant.client.retrieve(collection, {
+    ids,
+    with_payload: true,
+    with_vector: false,
+  });
+  if (readback.length !== ids.length) {
+    throw new Error(`QDRANT_SUMMARY_READBACK_COUNT_MISMATCH:${readback.length}:${ids.length}`);
+  }
+
+  const readbackById = new Map(readback.map((point) => [String(point.id), point]));
+  if (readbackById.size !== ids.length) {
+    throw new Error('QDRANT_SUMMARY_READBACK_DUPLICATE_POINT_ID');
+  }
+  for (const id of ids) {
+    const point = readbackById.get(String(id));
+    if (
+      !point
+      || !point.payload
+      || Object.entries(payload).some(([key, value]) => point.payload?.[key] !== value)
+      || point.payload.packet_key !== input.packetKey
+      || point.payload.source_revision !== input.sourceRevision
+      || point.payload.content_hash !== input.contentHash
+    ) {
+      throw new Error(`QDRANT_SUMMARY_READBACK_MISMATCH:${String(id)}`);
+    }
+  }
 
   return {
     collection,

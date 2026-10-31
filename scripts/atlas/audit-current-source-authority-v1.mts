@@ -7,13 +7,14 @@
  */
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 import { resolveAdmissionSnapshotManifestPathV1 } from './lib/admission-snapshot-manifest-path-v1.mjs';
 import { requireCanonicalWorkspaceIdV1 } from './lib/canonical-workspace-id-v1.mjs';
+import { resolveGraphifyExecutionExpectedCohortV1 } from './lib/graphify-execution-expected-cohort-v1.mjs';
 import { classifyCurrentSourcesV1, classifyLiveDriftV1, membershipSetChecksumV1, type MembershipRowV1, type RegistryBindingV1, type SnapshotSourceV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/current-source-authority-v1.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -34,6 +35,14 @@ const { schema: _schema, snapshotRevision: _snapshotRevision, workspaceRevision:
 const selfDigestValid = snapshot.schema === 'atlas.workspace-source-snapshot-capture.v1' && digest(JSON.stringify(snapshotBody)) === snapshot.snapshotRevision && snapshot.datastoreWritesPerformed === false;
 const preflightRel = admission.preflightPath ? String(admission.preflightPath).split('\\').join('/').replace(/^.*\/docs\/reports\//, 'docs/reports/') : null;
 const preflight = preflightRel && existsSync(resolve(ROOT, preflightRel)) ? readJson(preflightRel) : null;
+if (!preflight?.hygienePath) throw new Error('SOURCE_SELECTION_HYGIENE_PATH_MISSING');
+const hygienePath = resolve(ROOT, preflight.hygienePath);
+const hygieneRelativePath = relative(ROOT, hygienePath);
+if (!hygieneRelativePath || hygieneRelativePath === '..' || hygieneRelativePath.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`)) {
+  throw new Error('SOURCE_SELECTION_HYGIENE_PATH_OUTSIDE_REPOSITORY');
+}
+const hygiene = JSON.parse(readFileSync(hygienePath, 'utf8'));
+const expectedCohort = resolveGraphifyExecutionExpectedCohortV1({ admission, snapshot, hygiene });
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 120000 });
 const client = await pool.connect();
@@ -65,13 +74,18 @@ try {
     sourceIdentityKey: s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`, repositoryId: s.repositoryId, repositoryRelativePath: s.repositoryRelativePath,
     sourceRef: s.sourceRef, sourceRevision: s.sourceRevision ?? null, contentDigest: s.contentDigest ?? null, byteLength: s.byteLength ?? null,
   }));
+  const selectedSnapshotSources: SnapshotSourceV1[] = expectedCohort.sources.map((s: any) => ({
+    sourceIdentityKey: s.sourceIdentityKey, repositoryId: s.repositoryId, repositoryRelativePath: s.repositoryRelativePath,
+    sourceRef: s.sourceRef, sourceRevision: s.sourceRevision ?? null, contentDigest: s.contentDigest ?? null, byteLength: s.byteLength ?? null,
+  }));
 
   // Registry repo namespace differs from Graphify's (`deeds-web-app` vs `repo:root`); the mapping is an ASSUMPTION verified empirically below, not proof.
   const repoIdMap: Record<string, string> = registryRepoIds.length === 1 && membershipRepoIds.includes('repo:root') ? { 'repo:root': registryRepoIds[0] } : {};
   const result = classifyCurrentSourcesV1({
     admitted: { workspaceId, workspaceRevision, snapshotRevision: admission.snapshotRevision, sourceCount: admission.sourceCount, membershipChecksum: admission.sourceSelectionChecksum, admissionStatus: admission.status, admissionAuthority: admission.authority === true },
     snapshot: { snapshotRevision: snapshot.snapshotRevision, selfDigestValid, workspaceRevisionClaim: snapshot.workspaceRevision ?? null, canonicalAuthorityClaim: snapshot.canonicalAuthority !== false, violations: (snapshot.violations ?? []).length, membershipChecksum: snapshot.sourceMembershipChecksum ?? null, sources: snapshotSources },
-    preflight: preflight ? { workspaceRevisionCandidate: preflight.workspaceRevisionCandidate ?? null, snapshotRevision: preflight.snapshotRevision ?? null, sourceCount: preflight.sourceCount ?? null, membershipChecksum: preflight.sourceSelectionChecksum ?? null } : null,
+    selectionSources: selectedSnapshotSources,
+    preflight: preflight ? { workspaceRevisionCandidate: preflight.workspaceRevisionCandidate ?? null, snapshotRevision: preflight.snapshotRevision ?? null, sourceCount: preflight.sourceCount ?? null, membershipChecksum: preflight.sourceSelectionChecksum ?? null, snapshotSourceCount: preflight.snapshotSourceCount ?? null, snapshotMembershipChecksum: preflight.snapshotMembershipChecksum ?? null } : null,
     membership,
     registry: { repoIdMap, rows: bindings },
   });
@@ -80,12 +94,15 @@ try {
   const rawEntries = membership.map((m) => ({ k: Buffer.from(`${m.repositoryId}:${m.repositoryRelativePath}`, 'utf8'), r: m.codeSourceRevision, b: Number(m.byteLength) })).sort((x, y) => Buffer.compare(x.k, y.k));
   const independentJson = `[${rawEntries.map((e) => `{"sourceIdentityKey":${JSON.stringify(e.k.toString('utf8'))},"sourceRevision":${JSON.stringify(e.r)},"byteLength":${e.b}}`).join(',')}]`;
   const independentSelectionChecksum = digest(independentJson);
-  const independentMembershipSet = digest(JSON.stringify(snapshotSources.map((s) => s.sourceIdentityKey).sort()));
+  const independentMembershipSet = digest(JSON.stringify(selectedSnapshotSources.map((s) => s.sourceIdentityKey).sort()));
+  const independentSnapshotMembershipSet = digest(JSON.stringify(snapshotSources.map((s) => s.sourceIdentityKey).sort()));
   const independent = {
     selectionChecksum: independentSelectionChecksum,
     matchesHelper: independentSelectionChecksum === result.sourceSelectionChecksum,
     membershipSetChecksum: independentMembershipSet,
-    membershipSetMatchesAdmission: independentMembershipSet === admission.sourceSelectionChecksum && membershipSetChecksumV1(snapshotSources.map((s) => s.sourceIdentityKey)) === independentMembershipSet,
+    membershipSetMatchesAdmission: independentMembershipSet === admission.sourceSelectionChecksum && membershipSetChecksumV1(selectedSnapshotSources.map((s) => s.sourceIdentityKey)) === independentMembershipSet,
+    snapshotMembershipSetChecksum: independentSnapshotMembershipSet,
+    snapshotMembershipSetMatchesManifest: independentSnapshotMembershipSet === snapshot.sourceMembershipChecksum && membershipSetChecksumV1(snapshotSources.map((s) => s.sourceIdentityKey)) === independentSnapshotMembershipSet,
   };
 
   // ---- blocker census ----
@@ -105,6 +122,7 @@ try {
   if (!ownerAgrees) blockers.push('OWNER_EXECUTION_LEGACY_AUTHORITY_DISAGREE');
   if (!independent.matchesHelper) blockers.push('INDEPENDENT_CHECKSUM_DISAGREES');
   if (!independent.membershipSetMatchesAdmission) blockers.push('ADMISSION_MEMBERSHIP_CHECKSUM_NOT_REPRODUCED');
+  if (!independent.snapshotMembershipSetMatchesManifest) blockers.push('SNAPSHOT_MEMBERSHIP_CHECKSUM_NOT_REPRODUCED');
   for (const [k, v] of Object.entries(result.proof)) if (!v) blockers.push(`PROOF_FLAG_FALSE:${k}`);
   if (result.counts.qualified !== result.sourceCount) blockers.push(`NON_QUALIFIED_SOURCES:${result.sourceCount - result.counts.qualified}`);
   // ---- B. LIVE WORKING-TREE DRIFT: diagnostic only, computed AFTER and never fed back into A (classification, checksum, status). ----

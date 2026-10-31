@@ -1312,12 +1312,14 @@ export class QdrantManager {
   }
 
   async batchUpsert(params: {
-    collection: keyof typeof this.collections;
+    collection: keyof typeof this.collections | (typeof this.collections)[keyof typeof this.collections] | string;
     points: any[];
     batchSize?: number;
   }) {
     const batchSize = params.batchSize ?? 100;
-    const collectionName = this.collections[params.collection];
+    const collectionName =
+      (this.collections as Record<string, string>)[params.collection as keyof typeof this.collections] ??
+      (params.collection as string);
     // If points don't include an id but include canonical payload fields, synthesize a deterministic id
     for (const p of params.points) {
       try {
@@ -1332,6 +1334,17 @@ export class QdrantManager {
         }
       } catch (e) {
         /* non-fatal id synth failure — continue */
+      }
+    }
+
+    // Normalize unnamed vectors if collection schema specifies a single named vector (e.g. 'content', 'description')
+    const colSchema = (VECTOR_CONFIG.COLLECTION_VECTORS as Record<string, any>)[collectionName];
+    if (colSchema?.vectors?.length === 1 && colSchema.vectors[0] !== 'default') {
+      const primaryVecName = colSchema.vectors[0];
+      for (const p of params.points) {
+        if (Array.isArray(p.vector)) {
+          p.vector = { [primaryVecName]: p.vector };
+        }
       }
     }
 
@@ -1813,9 +1826,11 @@ export class QdrantManager {
     }
   }
 
-  async getCollectionInfo(collection: keyof typeof this.collections) {
+  async getCollectionInfo(collection: keyof typeof this.collections | string) {
     try {
-      const collectionName = this.collections[collection];
+      const collectionName =
+        (this.collections as Record<string, string>)[collection as keyof typeof this.collections] ??
+        (collection as string);
       const info = await this.client.getCollection(collectionName);
       return {
         name: collectionName,

@@ -242,6 +242,38 @@
 		color: #60a5fa;
 		background: rgba(96, 165, 250, 0.08);
 	}
+	.toolbar {
+		margin: 0.25rem 1.5rem;
+		padding: 0.85rem;
+		border: 1px solid rgba(196, 169, 117, 0.45);
+		border-radius: 16px;
+		background: rgba(255, 252, 245, 0.66);
+		backdrop-filter: blur(16px) saturate(1.1);
+		box-shadow: 0 8px 24px rgba(77, 49, 32, 0.055), inset 0 1px rgba(255,255,255,0.85);
+	}
+	.toolbar-search :global(.search-icon) { color: #8a6b42; }
+	.toolbar-input {
+		border-color: #ddcdb3;
+		background: rgba(255, 253, 248, 0.9);
+		color: #342621;
+	}
+	.toolbar-input::placeholder { color: #8b7c6e; }
+	.toolbar-input:focus { border-color: #9d793a; background: #fffdf8; }
+	.search-status.searching { color: #7b3034; }
+	.search-status.searching .search-dot { background-color: #7b3034; }
+	.search-status.semantic { color: #765328; }
+	.filter-chip { color: #74665b; }
+	.filter-chip:hover { color: #67272d; background: #f4ead8; }
+	.filter-chip.active { color: #fff8e9; background: #7b252b; border-color: #6a2026; }
+	.filter-toggle, .view-toggle { border-color: #ddcdb3; }
+	.filter-toggle { color: #6e5b4c; background: rgba(255,253,248,0.7); }
+	.filter-toggle:hover { color: #67272d; background: #f5ead6; }
+	.filter-toggle.active { color: #67272d; background: #f1e4c9; border-color: #c9ae7b; }
+	.view-btn { color: #76685b; }
+	.view-btn:first-child { border-right-color: #ddcdb3; }
+	.view-btn:hover { color: #67272d; background: #f5ead6; }
+	.view-btn.active { color: #fff8e9; background: #7b252b; }
+	@media (max-width: 720px) { .toolbar { margin-inline: 1rem; } }
 	@keyframes pulse {
 		0%, 100% { opacity: 1; }
 		50% { opacity: 0.3; }

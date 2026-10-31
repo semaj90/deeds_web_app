@@ -2,10 +2,34 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { and, eq } from 'drizzle-orm';
-import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
+import { and, eq, or } from 'drizzle-orm';
+import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
+
+const generatedSummarySchema = z.string().trim().min(40).max(2_000);
+
+function boundedEvidenceContext(input: {
+	extractedText: string | null;
+	summary: string | null;
+	title: string;
+	description: string | null;
+}): { text: string; source: 'extracted_text' | 'stored_summary' | 'metadata' } {
+	const extractedText = input.extractedText?.trim();
+	if (extractedText) {
+		const maxChars = 24_000;
+		const text = extractedText.length <= maxChars
+			? extractedText
+			: `${extractedText.slice(0, 18_000)}\n\n[Middle of document omitted]\n\n${extractedText.slice(-6_000)}`;
+		return { text, source: 'extracted_text' };
+	}
+	const storedSummary = input.summary?.trim();
+	if (storedSummary) return { text: storedSummary.slice(0, 4_000), source: 'stored_summary' };
+	return {
+		text: [input.title, input.description].filter(Boolean).join('\n').slice(0, 4_000),
+		source: 'metadata',
+	};
+}
 
 /**
  * POST /api/evidence/[id]/suggest-summary
@@ -23,29 +47,39 @@ export const POST: RequestHandler = async ({ params, locals }) => {
         title: evidence.title,
         description: evidence.description,
         summary: evidence.summary,
+        extractedText: evidence.extractedText,
         evidenceType: evidence.evidenceType,
       })
       .from(evidence)
-      .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))))
+      .where(and(
+        eq(evidence.id, evidenceId),
+        or(eq(evidence.uploadedBy, Number(locals.user.id)), eq(evidence.userId, Number(locals.user.id))),
+      ))
       .limit(1);
 
     if (!item) {
       return json({ error: 'Evidence not found' }, { status: 404 });
     }
 
-    const context = [item.title, item.description, item.summary].filter(Boolean).join('\n');
+    const context = boundedEvidenceContext(item);
+    if (!context.text.trim()) {
+      return json({ error: 'No extracted evidence text or description is available to summarize' }, { status: 422 });
+    }
 
-    let suggestedText = `Summary of "${item.title}": ${item.description ?? 'No description available.'}`;
+    let suggestedText = `${context.text.slice(0, 500)}${context.text.length > 500 ? '…' : ''}`;
+    let model = 'excerpt-fallback';
+    let generated = false;
 
     try {
-      const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+      const target = await resolveLlamaInferenceTarget();
+      const llamaRes = await fetch(`${target.baseUrl}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: LOCAL_VLM_MODEL,
+          model: target.model,
           messages: [
-            { role: 'system', content: 'You summarize evidence for legal review. Be concise and direct.' },
-            { role: 'user', content: `Summarize this evidence item for a legal case review. Be concise (2-3 sentences).\n\nEvidence: ${context}` },
+            { role: 'system', content: 'Summarize only the supplied evidence. Do not infer facts absent from it. Separate established facts from uncertainty. This is an informational summary, not legal advice.' },
+            { role: 'user', content: `Write a clear 2-3 sentence summary of this ${item.evidenceType ?? 'evidence'} item. Prioritize the extracted document text; use metadata only as context.\n\nTitle: ${item.title}\nContext source: ${context.source}\nEvidence text:\n${context.text}` },
           ],
           stream: false,
           temperature: 0.2,
@@ -53,21 +87,27 @@ export const POST: RequestHandler = async ({ params, locals }) => {
         }),
         signal: AbortSignal.timeout(30_000),
       });
-      if (ollamaRes.ok) {
-        const data = await ollamaRes.json();
-        const content = data.choices?.[0]?.message?.content ?? '';
-        if (content) suggestedText = content.trim();
+      if (llamaRes.ok) {
+        const data = await llamaRes.json();
+        const parsed = generatedSummarySchema.safeParse(data.choices?.[0]?.message?.content ?? '');
+        if (parsed.success) {
+          suggestedText = parsed.data;
+          model = target.model;
+          generated = true;
+        }
       }
     } catch {
-      // Local model unavailable — use basic summary
+      // Return a clearly labeled excerpt when the configured inference runtime is unavailable.
     }
 
     return json({
       summaryId: crypto.randomUUID(),
       evidenceId,
       suggestedText,
-      confidence: 0.85,
-      model: LLM_MODEL_ID,
+      confidence: generated ? 0.85 : 0,
+      model,
+      generated,
+      contextSource: context.source,
       createdAt: new Date().toISOString(),
     });
   } catch (err) {

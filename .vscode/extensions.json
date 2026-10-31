@@ -1,5 +1,8 @@
 {
     "recommendations": [
-        "github.vscode-github-actions"
+        "github.vscode-github-actions",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "svelte.svelte-vscode"
     ]
 }

@@ -28,8 +28,20 @@ const authorityPath = resolve(reportDir, 'current-graphify-snapshot-authority-v1
 const selectionPath = resolve(reportDir, 'current-source-selection-input-v1.json');
 const admissionPath = resolve(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const selectionPlanPath = resolve(root, 'docs/reports/graphify-source-selection-plan-v1.json');
-const ownerPlanPath = resolve(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
-const ownerPreflightPath = resolve(root, 'docs/reports/selected-graphify-execution-owner-v1.json');
+const scratchPathArgument = (name: string, fallback: string) => {
+  const index = process.argv.findIndex((arg) => arg === `--${name}` || arg.startsWith(`--${name}=`));
+  if (index < 0) return resolve(root, fallback);
+  const raw = process.argv[index] === `--${name}` ? process.argv[index + 1]?.trim() : process.argv[index].slice(name.length + 3).trim();
+  if (!raw) throw new Error(`${name.toUpperCase().replaceAll('-', '_')}_REQUIRED`);
+  const candidate = resolve(root, raw);
+  const rel = relative(scratchReportRoot, candidate);
+  if (rel === '..' || rel.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) || isAbsolute(rel)) {
+    throw new Error(`${name.toUpperCase().replaceAll('-', '_')}_MUST_REMAIN_UNDER_TMP_ATLAS`);
+  }
+  return candidate;
+};
+const ownerPlanPath = scratchPathArgument('owner-plan', 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
+const ownerPreflightPath = scratchPathArgument('owner-preflight', 'docs/reports/selected-graphify-execution-owner-v1.json');
 const executionIdArgIndex = process.argv.indexOf('--execution-id');
 const requestedExecutionId = executionIdArgIndex >= 0
   ? process.argv[executionIdArgIndex + 1]?.trim() || null

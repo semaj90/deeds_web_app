@@ -2,9 +2,23 @@ syntax = "proto3";
 
 package gpubridge;
 
+enum RepresentationKind {
+  REPRESENTATION_KIND_UNSPECIFIED = 0;
+  SEMANTIC_768 = 1;
+  MRL_512 = 2;
+  MRL_256 = 3;
+  MRL_128 = 4;
+  LATENT_256 = 5;
+  LATENT_128 = 6;
+  LATENT_64 = 7;
+}
+
 // LibTorch/CUDA N-API operations. Requires tensorrt_bridge.node.
 // Separate from TurboVecService (ANN index) — these are matrix/GPU workloads.
 service GpuBridgeService {
+  rpc Health (HealthRequest) returns (HealthResponse);
+  rpc EncodeLatentBundle (LatentEncodeRequest) returns (LatentEncodeResponse);
+
   // Batch cosine similarity: one query vs N flattened candidate vectors
   rpc BatchCosine (BatchCosineRequest) returns (BatchCosineResponse);
 
@@ -13,6 +27,28 @@ service GpuBridgeService {
 
   // Assign vectors to SOM BMU cluster IDs
   rpc AssignSom (AssignSomRequest) returns (AssignSomResponse);
+}
+
+message HealthRequest {}
+message HealthResponse {
+  bool ok = 1;
+  string backend = 2;
+  uint32 indexed_count = 3;
+  string active_kmeans_revision = 4;
+}
+
+message LatentEncodeRequest {
+  repeated float semantic_768 = 1; // Strictly 768 floats
+  repeated float mrl_128 = 2;      // Strictly 128 floats
+}
+
+message LatentEncodeResponse {
+  repeated float latent_256 = 1;
+  repeated float latent_128 = 2;
+  repeated float latent_64 = 3;
+  int32 kmeans_cluster_id = 4;
+  int32 nes_lut_byte = 5;
+  string kmeans_revision = 6;
 }
 
 // ── BatchCosine ───────────────────────────────────────────────────────────────

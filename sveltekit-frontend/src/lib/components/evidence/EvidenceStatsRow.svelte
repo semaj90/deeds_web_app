@@ -22,7 +22,7 @@
 
 <div class="stats-row">
 	<span class="stat-pill">
-		<Icon name="archive" class="w-3.5 h-3.5" />
+		<Icon name="yorha-evidence" class="w-3.5 h-3.5" />
 		<span class="stat-value">{totalCount}</span>
 		<span class="stat-label">Total Items</span>
 	</span>
@@ -113,4 +113,21 @@
 		font-family: 'JetBrains Mono', monospace;
 		font-size: 0.7rem;
 	}
+	.stats-row { padding-top: 0.85rem; padding-bottom: 0.85rem; }
+	.stat-divider { background: #ddcdb3; }
+	.stat-pill {
+		background: rgba(255, 252, 245, 0.86);
+		border-color: #e2d3bb;
+		color: #78695c;
+		box-shadow: 0 2px 7px rgba(70, 44, 32, 0.035);
+	}
+	.stat-pill:hover { background: #fffdf8; border-color: #c9ae7b; }
+	.stat-value { color: #33241f; }
+	.stat-label { color: #74665b; }
+	.stat-pill.filtered { border-color: #d5b66e; }
+	.stat-pill.filtered .stat-value { color: #752b31; }
+	.stat-pill.case { border-color: #d6bd8d; }
+	.stat-pill.case .stat-value { color: #74402c; }
+	.stat-pill.semantic { border-color: #d2bd91; }
+	.stat-pill.semantic .stat-value { color: #765328; }
 </style>

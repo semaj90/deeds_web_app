@@ -11,7 +11,7 @@ import { searchViaSearXNG, fetchAndExtractText } from '$lib/server/ldr/web-searc
  * 3. Gemma4 synthesis
  *
  * NOTE: These are integration tests and require:
- * - SearXNG running at SEARXNG_URL (or localhost:8888)
+ * - SearXNG running at SEARXNG_URL (for local host access, port 8889)
  * - Gemma4 llama-server running at :8090
  * - Network access (no mocks)
  */
@@ -19,7 +19,7 @@ import { searchViaSearXNG, fetchAndExtractText } from '$lib/server/ldr/web-searc
 describe('Local Deep Research (LDR) Orchestrator', () => {
   beforeAll(() => {
     // Set test environment variables
-    process.env.SEARXNG_URL = process.env.SEARXNG_URL || 'http://127.0.0.1:8888';
+    process.env.SEARXNG_URL = process.env.SEARXNG_URL || 'http://127.0.0.1:8889';
     process.env.LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1';
     process.env.LLAMA_SERVER_MODEL = process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b';
   });
@@ -27,7 +27,7 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
   describe('Web Search Client', () => {
     it.skip('should search via SearXNG and return results', async () => {
       // SKIP: Requires SearXNG running locally
-      // To run: start SearXNG at localhost:8888, then remove .skip()
+      // To run: start SearXNG with host port 8889 mapped to container port 8080, then remove .skip()
 
       const query = 'evidence admissibility FRE 401';
       const results = await searchViaSearXNG(query, 5);
@@ -205,7 +205,7 @@ describe('Local Deep Research (LDR) Orchestrator', () => {
  * Manual Test Commands (run from sveltekit-frontend/):
  *
  * 1. Start SearXNG (if not running):
- *    docker run -d -p 8888:8888 searxng/searxng
+ *    docker run -d -p 8889:8080 searxng/searxng
  *
  * 2. Verify Gemma4 is running:
  *    curl http://127.0.0.1:8090/v1/models

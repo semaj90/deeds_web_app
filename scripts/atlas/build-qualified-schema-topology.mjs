@@ -2,9 +2,10 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const { Pool } = pg;
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = resolveDatabaseUrl(loadRepoEnv(process.env));
 const OUT_TOPOLOGY = path.resolve('docs/reports/atlas-schema-topology-qualified-2026-10-13.json');
 
 function sha256(data) {
@@ -12,21 +13,78 @@ function sha256(data) {
 }
 
 async function main() {
-  const pool = new Pool({ connectionString: DATABASE_URL });
+  const pool = new Pool({ connectionString: DATABASE_URL, max: 1, statement_timeout: 10000 });
+  const client = await pool.connect();
+  let transactionOpen = false;
+  let rels;
+  let foreignKeys;
+  let viewDependencies;
+  let databaseIdentity;
+  try {
+    await client.query('BEGIN READ ONLY');
+    transactionOpen = true;
+    const readOnlyResult = await client.query('SHOW transaction_read_only');
+    if (readOnlyResult.rows[0]?.transaction_read_only !== 'on') throw new Error('POSTGRES_TRANSACTION_NOT_READ_ONLY');
+    const identityResult = await client.query(`
+      SELECT current_database() AS database,
+        current_setting('server_version') AS server_version,
+        current_setting('server_version_num')::int AS server_version_num,
+        inet_server_addr()::text AS server_address,
+        inet_server_port() AS server_port
+    `);
+    databaseIdentity = identityResult.rows[0];
+    if (databaseIdentity.server_version_num < 180000 || databaseIdentity.server_version_num >= 190000) {
+      throw new Error('POSTGRES_18_REQUIRED');
+    }
 
-  console.log('Querying PostgreSQL catalog for all relations in public schema...');
-  const relsRes = await pool.query(`
-    SELECT
-      c.relname,
-      c.relkind,
-      pg_get_userbyid(c.relowner) AS owner,
-      GREATEST(0, c.reltuples)::bigint AS estimated_rows
-    FROM pg_class c
-    JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE n.nspname = 'public'
-      AND c.relkind IN ('r', 'v', 'm', 'p', 'f')
-    ORDER BY c.relname;
-  `);
+    console.log('Querying PostgreSQL catalog for all relations in public schema...');
+    const relsRes = await client.query(`
+      SELECT
+        c.relname,
+        c.relkind,
+        pg_get_userbyid(c.relowner) AS owner,
+        c.reltuples::bigint AS estimated_rows
+      FROM pg_class c
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public'
+        AND c.relkind IN ('r', 'v', 'm', 'p', 'f')
+      ORDER BY c.relname;
+    `);
+    rels = relsRes.rows;
+
+    console.log('Querying foreign keys from information_schema and pg_constraint...');
+    const fkRes = await client.query(`
+      SELECT
+        tc.table_name AS source_table,
+        kcu.column_name AS source_column,
+        ccu.table_name AS target_table,
+        ccu.column_name AS target_column,
+        tc.constraint_name
+      FROM information_schema.table_constraints tc
+      JOIN information_schema.key_column_usage kcu
+        ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+      JOIN information_schema.constraint_column_usage ccu
+        ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
+      WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_schema = 'public'
+      ORDER BY tc.table_name, tc.constraint_name;
+    `);
+    foreignKeys = fkRes.rows;
+
+    console.log('Querying view dependencies from information_schema.view_table_usage...');
+    const viewRes = await client.query(`
+      SELECT
+        view_name,
+        table_name
+      FROM information_schema.view_table_usage
+      WHERE view_schema = 'public' AND table_schema = 'public'
+      ORDER BY view_name, table_name;
+    `);
+    viewDependencies = viewRes.rows;
+  } finally {
+    if (transactionOpen) await client.query('ROLLBACK').catch(() => undefined);
+    client.release();
+    await pool.end();
+  }
 
   const relkindMap = {
     'r': 'TABLE',
@@ -36,14 +94,15 @@ async function main() {
     'f': 'FOREIGN_TABLE',
   };
 
-  const rels = relsRes.rows;
   console.log(`Found ${rels.length} public relations across catalog.`);
 
   const nodes = [];
   const relMap = new Map();
   for (const r of rels) {
     const kind = relkindMap[r.relkind] || 'OTHER';
-    const rowCount = Number(r.estimated_rows ?? 0);
+    const estimatedRows = Number(r.estimated_rows);
+    const hasEstimate = Number.isFinite(estimatedRows) && estimatedRows >= 0;
+    const rowCount = hasEstimate ? estimatedRows : null;
     const node = {
       id: `postgres:public.${r.relname}`,
       relationName: r.relname,
@@ -52,34 +111,17 @@ async function main() {
       relkind: r.relkind,
       owner: r.owner,
       rowCount,
+      rowCountStatus: !hasEstimate ? 'UNKNOWN_UNANALYZED' : estimatedRows === 0 ? 'ZERO_ESTIMATE' : 'POSITIVE_ESTIMATE',
       rowCountMethod: 'CATALOG_ESTIMATE_RELTUPLES',
     };
     nodes.push(node);
     relMap.set(r.relname, node);
   }
 
-  // Foreign keys
-  console.log('Querying foreign keys from information_schema and pg_constraint...');
-  const fkRes = await pool.query(`
-    SELECT
-      tc.table_name AS source_table,
-      kcu.column_name AS source_column,
-      ccu.table_name AS target_table,
-      ccu.column_name AS target_column,
-      tc.constraint_name
-    FROM information_schema.table_constraints tc
-    JOIN information_schema.key_column_usage kcu
-      ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-    JOIN information_schema.constraint_column_usage ccu
-      ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
-    WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_schema = 'public'
-    ORDER BY tc.table_name, tc.constraint_name;
-  `);
-
   const edges = [];
   const edgeSet = new Set();
 
-  for (const fk of fkRes.rows) {
+  for (const fk of foreignKeys) {
     const sourceNode = `postgres:public.${fk.source_table}`;
     const targetNode = `postgres:public.${fk.target_table}`;
     const edgeKey = `${sourceNode}->${targetNode}:FOREIGN_KEY`;
@@ -99,18 +141,7 @@ async function main() {
     }
   }
 
-  // View dependencies (views querying underlying tables/views)
-  console.log('Querying view dependencies from information_schema.view_table_usage...');
-  const viewRes = await pool.query(`
-    SELECT
-      view_name,
-      table_name
-    FROM information_schema.view_table_usage
-    WHERE view_schema = 'public' AND table_schema = 'public'
-    ORDER BY view_name, table_name;
-  `);
-
-  for (const vd of viewRes.rows) {
+  for (const vd of viewDependencies) {
     const sourceNode = `postgres:public.${vd.view_name}`;
     const targetNode = `postgres:public.${vd.table_name}`;
     const edgeKey = `${sourceNode}->${targetNode}:VIEW_DEPENDENCY`;
@@ -126,8 +157,6 @@ async function main() {
       });
     }
   }
-
-  await pool.end();
 
   // Summary counts by relkind
   const relkindCounts = {};
@@ -145,10 +174,13 @@ async function main() {
     schema: 'atlas.schema-topology.v1',
     snapshotId: `snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}`,
     generatedAt: new Date().toISOString(),
-    database: 'PostgreSQL 18.4 legal_ai_db (public schema)',
+    database: `PostgreSQL ${databaseIdentity.server_version} ${databaseIdentity.database} at ${databaseIdentity.server_address ?? 'local'}:${databaseIdentity.server_port ?? 'unknown'} (public schema)`,
     countsByKind: relkindCounts,
     totalRelations: nodes.length,
     populatedRelations: populatedNodes.length,
+    zeroEstimatedRowRelations: nodes.filter(node => node.rowCountStatus === 'ZERO_ESTIMATE').length,
+    unknownRowEstimateRelations: nodes.filter(node => node.rowCountStatus === 'UNKNOWN_UNANALYZED').length,
+    rowEstimateCaveat: 'pg_class.reltuples is approximate; negative values mean unknown/un-analyzed and zero does not prove current emptiness.',
     qualifiedEdgesCount: edges.length,
     checksums: {
       nodesChecksum: sha256(sortedNodes.map(n => n.id)),

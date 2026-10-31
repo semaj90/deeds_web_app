@@ -309,6 +309,28 @@ describe('Promotion Enrichment Wiring', () => {
     expect(syncSpy).not.toHaveBeenCalled();
     syncSpy.mockRestore();
   });
+
+  it('keeps Qdrant promotion failed when post-update readback rejects', async () => {
+    const { db } = await import('$lib/server/db/client');
+    const qdrantSync = await import('./qdrant-summary-sync.js');
+    const syncSpy = vi.spyOn(qdrantSync, 'syncSummaryPayloadToQdrant');
+    vi.mocked(db.execute).mockResolvedValueOnce({ rows: [{ packet_id: 'canonical-packet-id', summary: 'Current summary' }] } as never);
+    syncSpy.mockRejectedValueOnce(new Error('QDRANT_SUMMARY_READBACK_MISMATCH:point-1'));
+
+    const result = await executePromotionJob({
+      id: 4n,
+      packet_key: 'packet:auth:readback-failed',
+      source_ref: 'src/lib/server/auth.ts',
+      content_hash: `sha256:${'1'.repeat(64)}`,
+      summary: 'Current summary',
+      operation: PromotionOperation.PROMOTE_QDRANT,
+      payload: { source_revision: `sha256:${'2'.repeat(64)}` },
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.stages_failed).toContain('qdrant_payload_update: Error: QDRANT_SUMMARY_READBACK_MISMATCH:point-1');
+    syncSpy.mockRestore();
+  });
 });
 
 describe('Promotion outbox claiming', () => {

@@ -13,6 +13,7 @@ import pg from 'pg';
 import { fileURLToPath } from 'node:url';
 import { buildSummaryContext } from './lib/summary-context-map.mjs';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const { Pool } = pg;
 const ENV = loadRepoEnv(process.env);
@@ -50,6 +51,8 @@ function hasSummaryContext(metadata) {
 }
 
 async function main() {
+  if (APPLY) assertSummaryIdentityWriteAdmitted('backfill-summary-context');
+
   const pool = new Pool({ connectionString: resolveDatabaseUrl(ENV), max: 1 });
   try {
     const preload = await pool.query(`

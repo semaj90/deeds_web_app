@@ -30,6 +30,10 @@ import {
   type PromotionExecutionReceiptV1,
   authorizeTournamentPromotionV1,
 } from '../tournament/openspec-promotion-gate-v1.js';
+import {
+  PATCH_CHECK_VERIFIER_ID,
+  PATCH_CHECK_VERIFIER_REVISION,
+} from '../execution/patch-check-receipt-v1.js';
 
 export const ACE_CONTEXT_PACKET_SCHEMA = 'atlas.ace-context-packet.v1' as const;
 
@@ -341,38 +345,95 @@ export interface TournamentOutcomeTrainingInputV1 {
   queryId: string;
   candidateId: string;
   features: readonly number[];
-  outcomeSuccess: boolean;
-  /**
-   * Provenance gate: Must provide verified tool event evidence or tournament receipt checksum.
-   * If unverified or fabricated, the row is rejected from backpropagation to avoid training on fabricated outcomes.
-   */
-  verifiedEvidenceRef?: string;
-  stageEventHashes?: readonly string[];
+  executionReceiptId: string;
+  stageEventHashes: readonly string[];
+  workspaceRevision: string;
+  sourceRevision: string;
+}
+
+interface VerifiedTrainingReceiptRowV1 {
+  execution_receipt_id: string;
+  report_checksum: string;
+  status: 'passed' | 'failed';
+  source_revision: string;
+  verifier_status: 'VERIFIED_PASS' | 'VERIFIED_FAIL' | 'UNVERIFIED' | 'FABRICATED';
+  evidence_resolved: boolean;
+  computed_digest: string;
+  workspace_revision: string | null;
+  verifier_source_revision: string | null;
+  canonical: boolean;
+  failure_messages: unknown;
 }
 
 /**
  * Adaptive Backpropagation: Updates the 61-parameter FM Rank-4 model from reviewed tournament outcomes.
  * Offline optimization ensures model updates occur without mutating live state mid-request.
- * Strictly requires verified tool evidence refs; rejects fabricated or ungrounded tournament outcomes.
+ * The receipt and independent verifier tables, not agent-provided outcome fields, determine labels.
  */
-export function adaptRankerFromOutcomesV1(
+export async function adaptRankerFromOutcomesV1(
+  pgClient: { query: (sql: string, params?: unknown[]) => Promise<{ rows: unknown[] }> },
   currentModel: FmRank4ModelArtifactV1,
-  outcomes: ReadonlyArray<TournamentOutcomeTrainingInputV1>
-): FmRank4ModelArtifactV1 {
-  const verifiedRows = outcomes.filter(
-    (o) => o.verifiedEvidenceRef && o.stageEventHashes && o.stageEventHashes.length > 0
+  outcomes: ReadonlyArray<TournamentOutcomeTrainingInputV1>,
+  expected: { workspaceRevision: string; sourceRevision: string }
+): Promise<FmRank4ModelArtifactV1> {
+  const receiptIds = [...new Set(outcomes.map((outcome) => outcome.executionReceiptId.trim()).filter(Boolean))];
+  if (receiptIds.length === 0) return currentModel;
+
+  const result = await pgClient.query(
+    `SELECT r.execution_receipt_id, r.report_checksum, r.status, r.source_revision,
+            r.failure_messages, v.verification_status AS verifier_status,
+            v.evidence_resolved, v.computed_digest, v.workspace_revision,
+            v.source_revision AS verifier_source_revision, v.canonical
+       FROM public.atlas_test_execution_receipts r
+       JOIN public.atlas_receipt_verifier_results_v1 v
+         ON v.execution_receipt_id = r.execution_receipt_id
+      WHERE r.execution_receipt_id = ANY($1::text[])
+        AND r.framework LIKE 'patch-check/%'
+        AND v.verifier_id = $2
+        AND v.verifier_revision = $3
+        AND v.verification_status = 'VERIFIED_PASS'
+        AND v.evidence_resolved = true
+        AND v.canonical = false
+        AND v.computed_digest = ('sha256:' || r.report_checksum)`,
+    [receiptIds, PATCH_CHECK_VERIFIER_ID, PATCH_CHECK_VERIFIER_REVISION]
   );
+  const receipts = new Map(
+    (result.rows as VerifiedTrainingReceiptRowV1[]).map((row) => [row.execution_receipt_id, row])
+  );
+  const verifiedRows = outcomes.flatMap((outcome) => {
+    const receipt = receipts.get(outcome.executionReceiptId);
+    const eventsAreChecksummed = outcome.stageEventHashes.length > 0 && outcome.stageEventHashes.every(
+      (hash) => /^sha256:[a-f0-9]{64}$/i.test(hash)
+    );
+    const receiptMatchesRevision = receipt &&
+      receipt.source_revision === expected.sourceRevision &&
+      receipt.verifier_source_revision === expected.sourceRevision &&
+      receipt.workspace_revision === expected.workspaceRevision &&
+      outcome.sourceRevision === expected.sourceRevision &&
+      outcome.workspaceRevision === expected.workspaceRevision;
+    const failureMessages = Array.isArray(receipt?.failure_messages) ? receipt.failure_messages : [];
+    const receiptIsAuthentic = receipt && receipt.verifier_status === 'VERIFIED_PASS' &&
+      receipt.evidence_resolved && !receipt.canonical &&
+      receipt.computed_digest === `sha256:${receipt.report_checksum}`;
+    const recordedResultIsConsistent = receipt?.status === 'passed'
+      ? failureMessages.length === 0
+      : receipt?.status === 'failed' && failureMessages.length > 0;
+    if (!receipt || !receiptMatchesRevision || !receiptIsAuthentic || !recordedResultIsConsistent ||
+        !eventsAreChecksummed || !outcome.stageEventHashes.includes(`sha256:${receipt.report_checksum}`)) {
+      return [];
+    }
+    return [{ outcome, label: receipt.status === 'passed' ? 3 : 0 }];
+  });
 
   if (verifiedRows.length === 0) {
-    // Zero verified outcomes; do not mutate weights with ungrounded data
     return currentModel;
   }
 
-  const trainingRows: QueryCandidateTrainingRowV1[] = verifiedRows.map((o) => ({
-    queryId: o.queryId,
-    candidateId: o.candidateId,
-    features: o.features,
-    label: o.outcomeSuccess ? 3 : 0, // Successful verified tournament outcomes receive high relevance grade
+  const trainingRows: QueryCandidateTrainingRowV1[] = verifiedRows.map(({ outcome, label }) => ({
+    queryId: outcome.queryId,
+    candidateId: outcome.candidateId,
+    features: outcome.features,
+    label,
   }));
 
   return trainFmRank4Model(trainingRows, {

@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.evidence-e2e-03-and-qualified-producer.v1",
+  "generatedAt": "2026-10-31T04:42:00.000Z",
+  "phaseA_evidence_pipeline": {
+    "traceability": {
+      "seaweedfs": "ACTIVE (legal-evidence bucket, presigned GET preview URL generated)",
+      "metadataPersistence": "ACTIVE (public.evidence insert with uploadedBy and caseId)",
+      "jobIdLifecycle": "ACTIVE (randomUUID created in Superforms action, registered with createJob, returned in response payload, passed into dispatchOrExecuteInline metadata)",
+      "queueDispatch": "ACTIVE (RabbitMQ 'evidence.process' / inline execution fallback)",
+      "processingWorker": "ACTIVE (EvidenceProcessWorker -> extractEntities + detectForensicPatterns -> 'document.embed')",
+      "embeddingGeneration": "ACTIVE (EmbeddingGemma 768-D via llama-server / local grpc client)",
+      "canonicalStorage": "ACTIVE (PostgreSQL 18 evidence_vectors 768-D with source_revision check constraint)",
+      "projectionOutbox": "ACTIVE (evidence_vector_projection_outbox claimed by projection worker)",
+      "qdrantPointId": "ACTIVE (deriveUUID deterministic recipe atlas.evidence-vector.qdrant-point.v1)"
+    },
+    "immutabilityAndRollbackReconciliation": {
+      "script": "scripts/atlas/rehearse-evidence-vectors-migration-disposable-v1.mjs",
+      "verdict": "REFUSED_384_ROLLBACK_PRESERVES_MRL",
+      "findings": "Rehearsal code step 11 explicitly asserts that rolling back from vector(768) to legacy vector(384) throws 'Rollback to legacy vector(384) is prohibited'. The embedding column remains permanently vector(768). Earlier summaries mentioning rollback to 384 described pre-MRL rehearsal stubs."
+    },
+    "drizzleSchemaParity": {
+      "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts:1461-1478",
+      "columnsVerified": 13,
+      "updatedAtColumn": "timestamp('updated_at').defaultNow().notNull() PRESENT",
+      "embeddingDimension": 768,
+      "status": "PARITY_VERIFIED_WITHOUT_DDL"
+    },
+    "analyticsUuidSafety": {
+      "file": "sveltekit-frontend/src/lib/server/ml/user-history.ts",
+      "fix": "UUID validator toValidUuidOrNull prevents 22P02 invalid UUID cast on non-UUID strings. Event types (e.g. evidence_uploaded) are preserved in metadata and interactionType rather than defaulting to generic 'view'."
+    },
+    "uploadPolicy": {
+      "maxFileSize": 104857600,
+      "parity": "Superforms action and /api/evidence/upload aligned at 100MB",
+      "completionClaim": "Upload HTTP return reports step 'extracting' (35%), never claims downstream indexing completion."
+    }
+  },
+  "phaseB_native_retrieval_input_authority": {
+    "qualifiedBatchContract": {
+      "schema": "atlas.candidate-ordinal-bitset-selection.v1",
+      "source": "sveltekit-frontend/src/lib/server/atlas/features/candidate-ordinal-bitset-selection-v1.ts",
+      "requiredBindings": [
+        "candidateSnapshotRevision",
+        "workspaceRevision",
+        "ordinalMapChecksum (sha256)",
+        "selectedCount",
+        "byteaSha256 (sha256)"
+      ],
+      "status": "FIXTURE_VERIFIED"
+    },
+    "radixSortProducer": {
+      "export": "radixSortSomCandidateIndicesV1",
+      "guard": "Capped at 65,536 entries; rejects SOM cells >= 400 and mismatched arrays",
+      "callerStatus": "OPT_IN_FIXTURE_PROVEN (Not wired to live retrieval without qualified candidate ordinal batch)"
+    },
+    "simdHammingScorer": {
+      "kernel": "packages/atlas-native-core/include/simd_executors.hpp",
+      "parity": "WSL scalar parity proven on 32,768 candidates",
+      "windowsMsVcStatus": "BLOCKED_ON_CPUID (Requires __cpuidex and _xgetbv OS-state checks before issuing AVX2 intrinsics on MSVC)"
+    }
+  },
+  "phaseC_proof_classification": {
+    "evidence_upload_pipeline": "INTEGRATION_VERIFIED",
+    "postgresql_768_migration_rehearsal": "INTEGRATION_VERIFIED",
+    "drizzle_updatedAt_parity": "SOURCE_PRESENT",
+    "qdrant_deterministic_point_id": "FIXTURE_VERIFIED",
+    "qualified_candidate_bitset_contract": "FIXTURE_VERIFIED",
+    "native_radix_sorter": "FIXTURE_VERIFIED",
+    "avx2_batch_hamming_scorer": "FIXTURE_VERIFIED"
+  }
+}

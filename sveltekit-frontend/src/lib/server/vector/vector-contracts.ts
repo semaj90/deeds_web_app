@@ -15,7 +15,11 @@ export type CodebaseVectorName =
   | 'summary'
   | 'synthesis'
   | 'error'
-  | 'signature';
+  | 'signature'
+  | 'description'
+  | 'message'
+  | 'query'
+  | 'embedding';
 
 export const VECTOR_DIMENSIONS: Record<CodebaseVectorName, number> = {
   semantic_embedding: CANONICAL_EMBEDDING_DIMENSION,
@@ -26,6 +30,10 @@ export const VECTOR_DIMENSIONS: Record<CodebaseVectorName, number> = {
   synthesis: CANONICAL_EMBEDDING_DIMENSION,
   error: CANONICAL_EMBEDDING_DIMENSION,
   signature: CANONICAL_EMBEDDING_DIMENSION,
+  description: CANONICAL_EMBEDDING_DIMENSION,
+  message: CANONICAL_EMBEDDING_DIMENSION,
+  query: CANONICAL_EMBEDDING_DIMENSION,
+  embedding: CANONICAL_EMBEDDING_DIMENSION,
 };
 
 export const VECTOR_STRATEGIES: Record<
@@ -45,6 +53,10 @@ export const VECTOR_STRATEGIES: Record<
   synthesis: { dimension: CANONICAL_EMBEDDING_DIMENSION, distance_metric: 'Cosine', use_case: 'Synthesis-memory similarity', score_threshold: 0.3 },
   error: { dimension: CANONICAL_EMBEDDING_DIMENSION, distance_metric: 'Cosine', use_case: 'Native semantic_768 error relevance', score_threshold: 0.3 },
   signature: { dimension: CANONICAL_EMBEDDING_DIMENSION, distance_metric: 'Cosine', use_case: 'Native semantic_768 structural signature', score_threshold: 0.3 },
+  description: { dimension: CANONICAL_EMBEDDING_DIMENSION, distance_metric: 'Cosine', use_case: 'Case description semantic vector for legal case retrieval', score_threshold: 0.3 },
+  message: { dimension: CANONICAL_EMBEDDING_DIMENSION, distance_metric: 'Cosine', use_case: 'Chat message semantic vector', score_threshold: 0.3 },
+  query: { dimension: CANONICAL_EMBEDDING_DIMENSION, distance_metric: 'Cosine', use_case: 'LLM cache query semantic vector', score_threshold: 0.3 },
+  embedding: { dimension: CANONICAL_EMBEDDING_DIMENSION, distance_metric: 'Cosine', use_case: 'Generic 768 cache vector', score_threshold: 0.3 },
 };
 
 export interface DenseSearchParams {

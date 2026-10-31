@@ -3,7 +3,21 @@
  * Shared between the upload endpoint (writer) and SSE/status endpoints (readers).
  */
 
-export type ProgressStep = 'uploading' | 'storing' | 'hashing' | 'db-insert' | 'embedding' | 'complete' | 'error';
+export type ProgressStep =
+	| 'uploading'
+	| 'storing'
+	| 'hashing'
+	| 'db-insert'
+	| 'extracting'
+	| 'structuring'
+	| 'chunking'
+	| 'embedding'
+	| 'vector-storage'
+	| 'graph'
+	| 'entity-extraction'
+	| 'summarizing'
+	| 'complete'
+	| 'error';
 
 export interface JobProgress {
 	jobId: string;

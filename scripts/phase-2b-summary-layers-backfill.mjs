@@ -22,6 +22,7 @@
  */
 
 import pg from 'pg';
+import { assertSummaryIdentityWriteAdmitted } from './atlas/lib/summary-identity-write-gate-v1.mjs';
 
 const { Pool } = pg;
 
@@ -43,6 +44,8 @@ const pool = new Pool({
 });
 
 async function main() {
+  if (!DRY_RUN) assertSummaryIdentityWriteAdmitted('phase-2b-summary-layers-backfill');
+
   const startTime = Date.now();
   console.log('📋 Phase 2B: Summary Projection → atlas_summary_layers\n');
   console.log(`Mode:  ${DRY_RUN ? 'DRY RUN' : 'APPLY'}`);

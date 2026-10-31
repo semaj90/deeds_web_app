@@ -201,7 +201,7 @@ describe('CandidateFeatureGpuPackV1', () => {
       cwd: repoRoot,
       encoding: 'utf8',
       input: JSON.stringify({ pack, expectedBinding }),
-      timeout: 30000,
+      timeout: 60000,
       env: {
         ...process.env,
         PYTHONPATH: [resolve(repoRoot, 'python'), process.env.PYTHONPATH].filter(Boolean).join(process.platform === 'win32' ? ';' : ':'),

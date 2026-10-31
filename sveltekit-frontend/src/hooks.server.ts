@@ -61,8 +61,10 @@ const MAX_UPLOAD_SIZE = 100 * 1024 * 1024; // 100MB for file uploads
 const UPLOAD_PATHS = ['/api/evidence/upload', '/api/vision/analyze', '/api/persons-of-interest'];
 const shouldRunBootTasks = !building && process.env.NODE_ENV !== 'test';
 
-// Environment variable to skip warmups for faster dev server startup
-const SKIP_BOOT_WARMUP = process.env.SKIP_BOOT_WARMUP === 'true';
+// Development warmups are opt-in; production keeps its existing opt-out behavior.
+const SKIP_BOOT_WARMUP = dev
+  ? process.env.SKIP_BOOT_WARMUP !== 'false'
+  : process.env.SKIP_BOOT_WARMUP === 'true';
 
 // In cluster mode, only worker 1 runs singleton boot tasks (RabbitMQ, Qdrant, warmup)
 // Audit buffer + rate limiting run on ALL workers independently
@@ -383,27 +385,29 @@ function runSingletonBootTasks(): void {
       .catch((err) => console.warn('[Boot] Chat model warmup: failed:', (err as Error).message));
   }
 
-  // Probe all inference backends once so model-router has a warm status cache
-  import('$lib/server/ai/model-loader.js')
-    .then(({ warmupModelLoader }) => warmupModelLoader())
-    .then(() => console.log('[Boot] Model loader: backend status cached'))
-    .catch((err) => console.warn('[Boot] Model loader: probe failed:', (err as Error).message));
+  if (!SKIP_BOOT_WARMUP) {
+    // Probe all inference backends once so model-router has a warm status cache
+    import('$lib/server/ai/model-loader.js')
+      .then(({ warmupModelLoader }) => warmupModelLoader())
+      .then(() => console.log('[Boot] Model loader: backend status cached'))
+      .catch((err) => console.warn('[Boot] Model loader: probe failed:', (err as Error).message));
 
-  // Pre-populate codebase Fuse.js index (avoids cold-start on first search)
-  import('$lib/server/retrieval/codebase-context.js')
-    .then(({ refreshMetadataCache }) => refreshMetadataCache())
-    .then(() => console.log('[Boot] Codebase Fuse index: warmed'))
-    .catch((err) => console.warn('[Boot] Codebase Fuse index: failed:', (err as Error).message));
+    // Pre-populate codebase Fuse.js index (avoids cold-start on first search)
+    import('$lib/server/retrieval/codebase-context.js')
+      .then(({ refreshMetadataCache }) => refreshMetadataCache())
+      .then(() => console.log('[Boot] Codebase Fuse index: warmed'))
+      .catch((err) => console.warn('[Boot] Codebase Fuse index: failed:', (err as Error).message));
 
-  // Pre-populate GPU result cache for top 5 recently active cases (avoid cold GPU pass on first query)
-  import('$lib/server/gpu/background-analyzer.js')
-    .then(({ warmupGpuCache }) => warmupGpuCache(5))
-    .then((s) =>
-      console.log(
-        `[Boot] GPU cache warmup: ${s.warmed} warmed, ${s.skipped} cached, ${s.errors} errors`
+    // Pre-populate GPU result cache for top 5 recently active cases (avoid cold GPU pass on first query)
+    import('$lib/server/gpu/background-analyzer.js')
+      .then(({ warmupGpuCache }) => warmupGpuCache(5))
+      .then((s) =>
+        console.log(
+          `[Boot] GPU cache warmup: ${s.warmed} warmed, ${s.skipped} cached, ${s.errors} errors`
+        )
       )
-    )
-    .catch((err) => console.warn('[Boot] GPU cache warmup: failed:', (err as Error).message));
+      .catch((err) => console.warn('[Boot] GPU cache warmup: failed:', (err as Error).message));
+  }
 
   // CouchDB TTL cleanup: purge inference_log docs >7 days, dag_cache expired docs (6hr interval)
   import('$lib/server/observability/inference-log.js')

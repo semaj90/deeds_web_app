@@ -15,6 +15,7 @@
 import fs from 'fs';
 import readline from 'readline';
 import { Pool } from 'pg';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
@@ -103,6 +104,8 @@ async function importAndValidate() {
     await pgPool.end();
     process.exit(0);
   }
+
+  assertSummaryIdentityWriteAdmitted('validate-5k-batch-partial');
 
   // Apply mode: insert into Postgres
   console.log(`\n💾 Inserting into atlas_summary_layers...\n`);

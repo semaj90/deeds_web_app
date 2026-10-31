@@ -27,6 +27,7 @@
  */
 
 import { Pool } from 'pg';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 import Redis from 'ioredis';
 import { Worker } from 'worker_threads';
 import path from 'path';
@@ -424,6 +425,8 @@ async function importSummaries(summaryFile) {
 // ============================================================================
 
 async function main() {
+  assertSummaryIdentityWriteAdmitted('offline-summary-pipeline');
+
   const redis = new Redis({
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379'),

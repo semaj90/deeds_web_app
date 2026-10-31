@@ -35,11 +35,10 @@
 	let { sessionId, onClose, onApply }: Props = $props();
 
 	let recommendations = $state<StrategyRecommendation[]>([]);
-	let thinking = $state('');
+	let evidenceBasis = $state('');
 	let isAnalyzing = $state(false);
 	let analysisStep = $state('');
 	let timings = $state<SearchTimings | null>(null);
-	let showThinking = $state(false);
 	let error = $state('');
 
 	const ANALYSIS_STEPS = [
@@ -66,7 +65,7 @@
 		isAnalyzing = true;
 		error = '';
 		recommendations = [];
-		thinking = '';
+		evidenceBasis = '';
 		timings = null;
 
 		// Animate through analysis steps
@@ -90,7 +89,7 @@
 
 			const data = await res.json();
 			recommendations = data.recommendations ?? [];
-			thinking = data.thinking ?? '';
+			evidenceBasis = data.evidenceBasis ?? '';
 			timings = data.searchTimings ?? null;
 		} catch (err: any) {
 			error = err.message || 'Failed to generate strategy recommendations';
@@ -120,7 +119,7 @@
 			<!-- Initial state: Analyze button -->
 			<div class="analyze-prompt">
 				<p class="prompt-text">
-					Run the GRPO thinking chain to analyze the case and generate 4 strategic recommendations.
+					Review the case context and generate 4 ranked strategy suggestions with a concise evidence basis.
 				</p>
 				<p class="prompt-detail">
 					Searches legal canon (RAG), knowledge graph (KAG), and similar cases (Semantic), then synthesizes strategies using who/what/why/how.
@@ -214,16 +213,11 @@
 				{/each}
 			</div>
 
-			<!-- Thinking trace (collapsible) -->
-			{#if thinking}
-				<div class="thinking-section">
-					<button class="thinking-toggle" onclick={() => showThinking = !showThinking}>
-						<Icon name={showThinking ? 'chevron-down' : 'chevron-right'} size={14} />
-						Chain-of-Thought
-					</button>
-					{#if showThinking}
-						<pre class="thinking-text">{thinking}</pre>
-					{/if}
+			{#if evidenceBasis}
+				<div class="evidence-basis">
+					<strong class="evidence-basis-title">Evidence basis</strong>
+					<p class="evidence-basis-text">{evidenceBasis}</p>
+					<p class="evidence-basis-note">Review the cited sources and uncertainty; this summary is not legal advice.</p>
 				</div>
 			{/if}
 
@@ -499,39 +493,15 @@
 		background: rgba(146, 204, 65, 0.3);
 	}
 
-	/* Thinking trace */
-	.thinking-section {
+	/* Evidence basis */
+	.evidence-basis {
 		margin-top: 12px;
 		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		padding-top: 8px;
 	}
-	.thinking-toggle {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		background: none;
-		border: none;
-		color: #888;
-		font-size: 8px;
-		font-family: inherit;
-		cursor: pointer;
-		padding: 4px 0;
-	}
-	.thinking-toggle:hover {
-		color: #ccc;
-	}
-	.thinking-text {
-		color: #777;
-		font-size: 7px;
-		line-height: 1.5;
-		white-space: pre-wrap;
-		word-break: break-word;
-		max-height: 200px;
-		overflow-y: auto;
-		padding: 8px;
-		background: rgba(0, 0, 0, 0.3);
-		margin-top: 4px;
-	}
+	.evidence-basis-title { color: #f3d471; font-size: 8px; text-transform: uppercase; letter-spacing: .08em; }
+	.evidence-basis-text { margin: 6px 0 3px; color: #d9e0eb; font-size: 8px; line-height: 1.55; }
+	.evidence-basis-note { margin: 0; color: #8792a5; font-size: 7px; line-height: 1.45; }
 
 	/* Timings */
 	.timings {

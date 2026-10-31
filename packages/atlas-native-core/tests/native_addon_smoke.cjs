@@ -3,6 +3,21 @@ const path = require('node:path');
 
 const addon = require(path.join(path.resolve(process.argv[2]), 'atlas_native_core.node'));
 const { execFileSync } = require('node:child_process');
+const somSortedIndices = addon.radixSortSomCandidateIndicesV1(
+  Uint16Array.from([1, 0, 1]),
+  Uint16Array.from([2, 9, 2]),
+  Uint32Array.from([7, 8, 1]),
+);
+assert.deepEqual(Array.from(somSortedIndices), [1, 2, 0]);
+assert.throws(() => addon.radixSortSomCandidateIndicesV1(
+  Uint16Array.from([1]), Uint16Array.from([400]), Uint32Array.from([0]),
+), /SOM_BMU_ID_OUT_OF_RANGE/);
+assert.throws(() => addon.radixSortSomCandidateIndicesV1(
+  Uint16Array.from([1]), Uint16Array.from([]), Uint32Array.from([0]),
+), /SOM_RADIX_ARRAY_LENGTH_MISMATCH/);
+assert.throws(() => addon.radixSortSomCandidateIndicesV1(
+  Uint16Array.from([1]), Uint16Array.from([1]), Uint16Array.from([0]),
+), /Expected/);
 const detection = addon.detectRfcOrLanguage('detect RFC7519 in session middleware');
 assert.equal(detection.matched, true);
 assert.equal(detection.rfcId, 'RFC-7519');
@@ -33,6 +48,35 @@ const bitsetB = Buffer.alloc(16);
 bitsetA[0] = 0b11000000;
 bitsetB[0] = 0b10100000;
 assert.ok(Math.abs(addon.bitset128JaccardSimilarity(bitsetA, bitsetB) - (1 / 3)) < 1e-6);
+const hammingQuery = Buffer.alloc(16);
+const hammingCandidates = Buffer.concat([
+  Buffer.alloc(16),
+  Buffer.alloc(16, 0xff),
+  Buffer.from([1, ...Array(15).fill(0)]),
+]);
+const hammingBatch = addon.scoreHamming128Batch(hammingQuery, hammingCandidates);
+assert.equal(hammingBatch.schema, 'atlas.hamming128.batch-result.v1');
+assert.equal(hammingBatch.authority, 'PROPOSAL_ONLY');
+assert.equal(hammingBatch.candidateCount, 3);
+assert.ok(['avx2-nibble-popcount', 'avx512-vpopcntdq', 'scalar-64bit-popcount'].includes(hammingBatch.backend));
+assert.ok(hammingBatch.distances instanceof Uint16Array);
+assert.deepEqual(Array.from(hammingBatch.distances), [0, 128, 1]);
+assert.deepEqual(Array.from(addon.scoreHamming128Batch(hammingQuery, Buffer.alloc(0)).distances), []);
+assert.throws(() => addon.scoreHamming128Batch(Buffer.alloc(15), Buffer.alloc(16)), /HAMMING128_BUFFER_LENGTH_INVALID/);
+assert.throws(() => addon.scoreHamming128Batch(Buffer.alloc(16), Buffer.alloc(17)), /HAMMING128_BUFFER_LENGTH_INVALID/);
+assert.deepEqual(
+  Array.from(addon.scoreHamming128Batch(new Uint8Array(16), new Uint8Array(16)).distances),
+  [0],
+);
+const unalignedQuery = Buffer.alloc(17).subarray(1);
+const unalignedCandidates = Buffer.alloc(49).subarray(1);
+unalignedCandidates[0] = 1;
+assert.deepEqual(
+  Array.from(addon.scoreHamming128Batch(unalignedQuery, unalignedCandidates).distances),
+  [1, 0, 0],
+);
+assert.throws(() => addon.scoreHamming128Batch(Buffer.alloc(16), Buffer.alloc((65536 + 1) * 16)), /HAMMING128_CANDIDATE_LIMIT_EXCEEDED/);
+assert.throws(() => addon.scoreHamming128Batch(new Float32Array(4), Buffer.alloc(16)), /Expected/);
 const int2Fixture = Buffer.alloc(32);
 int2Fixture[0] = 0b00011011;
 assert.equal(addon.asymmetricDot2Bit(Float32Array.from({ length: 128 }, () => 1), int2Fixture, 0, 0.5), 3);

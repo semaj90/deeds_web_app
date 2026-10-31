@@ -14,5 +14,7 @@ test('graph snapshot catalog audit uses configured credentials and read-only tra
   assert.match(source, /pg_get_indexdef\(index_class\.oid\) AS indexdef/);
   assert.match(source, /index_state\.indisvalid/);
   assert.match(source, /index_state\.indisready/);
+  assert.match(source, /reltuples::bigint AS estimated_rows/);
+  assert.doesNotMatch(source, /GREATEST\(\s*0\s*,\s*reltuples/i);
   assert.doesNotMatch(source, /password\s*:\s*['"][^'"]+['"]/i);
 });

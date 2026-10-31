@@ -388,6 +388,7 @@ export class DocumentEmbedWorker extends QueueWorker<{
 	documentId: string;
 	text: string;
 	collection?: string;
+	metadata?: Record<string, unknown>;
 }> {
 	readonly queue = 'document.embed' as const;
 
@@ -395,7 +396,28 @@ export class DocumentEmbedWorker extends QueueWorker<{
 		documentId: string;
 		text: string;
 		collection?: string;
+		metadata?: Record<string, unknown>;
 	}): Promise<void> {
+		if (data.collection === 'evidence_items') {
+			const { processEvidenceDocumentCanonicalV1 } = await import(
+				'$lib/server/evidence/process-evidence-document-v1.js'
+			);
+			await processEvidenceDocumentCanonicalV1({
+				evidenceId: data.documentId,
+				text: data.text,
+				fileName:
+					(typeof data.metadata?.fileName === 'string' && data.metadata.fileName) ||
+					(typeof data.metadata?.title === 'string' && data.metadata.title) ||
+					undefined,
+				contentType:
+					(typeof data.metadata?.contentType === 'string' && data.metadata.contentType) ||
+					(typeof data.metadata?.fileType === 'string' && data.metadata.fileType) ||
+					undefined,
+				metadata: data.metadata,
+			});
+			return;
+		}
+
 		const { generateSingleEmbedding } = await import(
 			'$lib/server/grpc/embedding-client.js'
 		);
@@ -421,6 +443,10 @@ export class EvidenceProcessWorker extends QueueWorker<{
 	evidenceId: string;
 	text: string;
 	contentType?: string;
+	caseId?: string;
+	metadata?: Record<string, unknown>;
+	sourceRevision?: string;
+	skipEmbedding?: boolean;
 }> {
 	readonly queue = 'evidence.process' as const;
 
@@ -428,8 +454,54 @@ export class EvidenceProcessWorker extends QueueWorker<{
 		evidenceId: string;
 		text: string;
 		contentType?: string;
+		caseId?: string;
+		metadata?: Record<string, unknown>;
+		sourceRevision?: string;
+		skipEmbedding?: boolean;
 	}): Promise<void> {
 		let processedText = data.text;
+		const meta = data.metadata ?? {};
+		const objectKey =
+			(typeof meta.objectKey === 'string' && meta.objectKey) ||
+			(typeof meta.object_name === 'string' && meta.object_name) ||
+			undefined;
+		const expectedSourceSha256 =
+			(typeof meta.sourceSha256 === 'string' && meta.sourceSha256) ||
+			(typeof meta.source_revision === 'string' && meta.source_revision) ||
+			(typeof data.sourceRevision === 'string' && data.sourceRevision) ||
+			undefined;
+		const bucket =
+			(typeof meta.object_bucket === 'string' && meta.object_bucket) ||
+			'legal-evidence';
+
+		if (objectKey) {
+			const { getSeaweedFile } = await import('$lib/server/seaweed-client.js');
+			const { processDocument } = await import('$lib/server/document-processor.js');
+			const { createHash } = await import('node:crypto');
+
+			const sourceBytes = await getSeaweedFile(bucket, objectKey);
+			const computedSha256 = 'sha256:' + createHash('sha256').update(sourceBytes).digest('hex');
+			if (expectedSourceSha256 && computedSha256 !== expectedSourceSha256) {
+				throw new Error(
+					'EVIDENCE_SOURCE_SHA256_MISMATCH: expected ' + expectedSourceSha256 + ', got ' + computedSha256
+				);
+			}
+			const extracted = await processDocument({
+				buffer: sourceBytes,
+				fileName:
+					typeof meta.fileName === 'string' ? meta.fileName : 'evidence-file',
+				mimeType:
+					data.contentType ??
+					(typeof meta.fileType === 'string'
+						? meta.fileType
+						: 'application/octet-stream'),
+				evidenceId: data.evidenceId,
+				skipEmbedding: true,
+			});
+			if (extracted.rawText && extracted.rawText.trim().length > 0) {
+				processedText = extracted.rawText;
+			}
+		}
 
     // Granite-Docling enrichment: if text is short/empty and evidence is a document,
     // try to re-extract via Granite-Docling for better structure
@@ -456,16 +528,21 @@ export class EvidenceProcessWorker extends QueueWorker<{
 
     // Chain to document embedding — uses dispatch utility so inline fallback works
     const { dispatchOrExecuteInline } = await import('./dispatch-inline.js');
-    await dispatchOrExecuteInline('document.embed', {
+    if (data.skipEmbedding) return;
+    const dispatchResult = await dispatchOrExecuteInline('document.embed', {
       documentId: data.evidenceId,
       text: processedText,
       collection: 'evidence_items',
       metadata: {
+        ...(data.metadata ?? {}),
+        caseId: data.caseId ?? data.metadata?.caseId,
+        source_revision: data.sourceRevision ?? data.metadata?.source_revision,
         entities,
         forensics: { flags: forensics },
         contentType: data.contentType,
       },
     });
+		if (dispatchResult.error) throw new Error(`EVIDENCE_DOCUMENT_EMBED_FAILED:${dispatchResult.error}`);
 	}
 }
 
@@ -505,9 +582,9 @@ export class AnalyticsTrackWorker extends QueueWorker<{
 			try {
 				const { UserHistoryTracker } = await import('$lib/server/ml/user-history.js');
 				const tracker = new UserHistoryTracker(userId);
-				const documentId = (data.payload.documentId ?? data.payload.caseId ?? data.eventType) as string;
-				const caseId = (data.payload.caseId ?? 'general') as string;
-				await tracker.recordView(documentId, caseId, 0);
+				const documentId = ((data.payload.documentId ?? data.payload.evidenceId) || '') as string;
+				const caseId = (data.payload.caseId || '') as string;
+				await tracker.recordView(documentId, caseId, 0, undefined, undefined, { eventType: data.eventType, sourceEvent: data.eventType });
 			} catch {
 				// Non-fatal — recommendation tracking is best-effort
 			}
@@ -530,6 +607,9 @@ export class VectorIndexWorker extends QueueWorker<{
 		collection?: string;
 		metadata?: Record<string, unknown>;
 	}): Promise<void> {
+		if (data.collection === 'evidence_items') {
+			throw new Error('EVIDENCE_QDRANT_DIRECT_INDEX_FORBIDDEN: use evidence_vectors and its projection outbox');
+		}
 		const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 		const collection = data.collection ?? 'legal_documents';
 

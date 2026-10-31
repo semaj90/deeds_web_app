@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-graphify-execution-owner-decision.v1",
-  "generatedAt": "2026-10-30T02:27:45.537Z",
+  "generatedAt": "2026-10-31T04:05:12.173Z",
   "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
   "mode": "REHEARSAL_ROLLED_BACK",
   "authorityTableOwner": "graphify_execution_authority",
@@ -12,7 +12,7 @@
   "before": [
     {
       "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
-      "canonical_authority": false,
+      "canonical_authority": true,
       "workspace_revision": "sha256:c63620c45fca8a3f2b3f17a45876925b7c978d4330bff273821de0d51d29a55c"
     }
   ],
@@ -34,7 +34,12 @@
         "import_receipt": null
       }
     ],
-    "previousAuthority": []
+    "previousAuthority": [
+      {
+        "execution_id": "01a1763a-4355-71d7-9b81-2c7a1814a41f",
+        "authority_state": "SELECTED"
+      }
+    ]
   },
-  "reportChecksum": "a4459f14dcbc4a8d91e962bfb63438fe3e28d7fcbc9963c0d1de4c75f646be4f"
+  "reportChecksum": "55f975c9f842148d9c125d00829b87b84ccb8737e7fcadc292ef2621d4944733"
 }

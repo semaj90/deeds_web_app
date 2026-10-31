@@ -2,6 +2,13 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261031_pgvector_mrl_latent_kmeans_knn.sql",
+      "status": "active_candidate",
+      "reason": "Lock PostgreSQL 18 pgvector to EmbeddingGemma 768 + MRL (512/256/128) + PyTorch Latent (256/128/64) + KMeans Centroid Top-K KNN routing.",
+      "appliedBy": "operator-approved-candidate",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "drizzle/0024_nebulous_mongoose.sql",
       "status": "active_candidate",
       "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply.",
@@ -966,6 +973,15 @@
       "appliedAt": "2026-10-30",
       "requiresJournalEntry": false,
       "validationCommand": "BEGIN..ROLLBACK rehearsal only; do not apply to the live database without explicit operator authorization."
+    },
+    {
+      "file": "manual/20261030_evidence_vector_projection_outbox_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Dedicated, reference-only evidence_vectors-to-Qdrant delivery contract, rehearsed on disposable PostgreSQL 18.4 with rollback guards. Separate from vector_outbox/outbox_events; still unapplied. Do not apply live or activate a consumer without separate approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Apply and rollback only in a disposable PostgreSQL 18 database; verify pending/retry/lease/completion constraints and refusal to roll back when rows exist."
     }
   ]
 }

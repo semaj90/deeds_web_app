@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "audit_name": "parent-atlas-bitmap-webgpu-chr97-audit-v1",
+  "timestamp": "2026-10-30T18:10:00-07:00",
+  "mode": "PROPOSAL_ONLY",
+  "port_resolution": {
+    "port_8791": {
+      "service": "TurboVec Sidecar",
+      "env_var": "TURBOVEC_SIDECAR",
+      "canonical_url": "http://127.0.0.1:8791",
+      "model": "embeddinggemma:latest",
+      "index_dimension": 128,
+      "source_dimension": 768,
+      "role": "Derived challenger prefilter only (never canonical retrieval vote)"
+    },
+    "diskann_status": "Vamana/DiskANN is an out-of-core graph retrieval strategy behind SearchBackend interface, not a separate live listener on 8791."
+  },
+  "component_classification": {
+    "packet-bitmap-prefilter.ts": {
+      "status": "PRODUCTION_CALLED",
+      "callers": [
+        "src/lib/server/retrieval/packet-dense-search.ts",
+        "src/mcp/trace-mcp-server.ts"
+      ],
+      "preserves_exact_identity": true,
+      "verified_columns": [
+        "packet_key",
+        "source_ref",
+        "source_revision",
+        "workspace_revision_key",
+        "representation_revision",
+        "content_hash"
+      ]
+    },
+    "aligned-bitset-blob-v1.ts": {
+      "status": "PRODUCTION_CALLED",
+      "callers": [
+        "src/lib/server/atlas/features/candidate-ordinal-bitset-selection-v1.ts",
+        "src/lib/server/atlas/tensors/sparse-routing-bit-packer-v1.ts",
+        "src/lib/webgpu/bitset-webgpu-engine.ts"
+      ],
+      "bytea_alignment": "8-byte boundary BigUint64Array view with unaligned fallback re-alignment",
+      "test_coverage": "8/8 assertions passing in aligned-bitset-blob-v1.spec.ts"
+    },
+    "sparse-routing-bit-packer-v1.ts": {
+      "status": "PRODUCTION_CALLED",
+      "callers": [
+        "src/lib/server/atlas/rendering/nes-glyph-canvas-renderer-v1.ts",
+        "src/lib/server/atlas/cache/lod-ladder-cache-adapter-v1.ts"
+      ],
+      "role": "4-bit/2-bit MRL nibble packing into dense bytes with fail-closed AIO bitmap check"
+    },
+    "bitmap-telemetry.ts": {
+      "status": "UNREACHABLE",
+      "callers": [],
+      "finding": "Class defined but has 0 active callers in src/ tree."
+    },
+    "bitset-webgpu-engine.ts": {
+      "status": "TEST_ONLY",
+      "callers": [
+        "src/lib/webgpu/bitset-webgpu-engine.spec.ts"
+      ],
+      "finding": "WGSL compute shader for Hamming/Jaccard similarity fully implemented, but uncalled by production SvelteKit routes."
+    },
+    "webgpu-similarity-engine.ts": {
+      "status": "DEMO_ONLY",
+      "callers": [
+        "src/lib/webgpu/webgpu-similarity-service.ts",
+        "src/lib/components/WebGPUSimilarityDemo.svelte",
+        "src/routes/(app)/webgpu-similarity/+page.svelte"
+      ],
+      "finding": "Pooled GPUBuffer similarity engine mounted exclusively on /webgpu-similarity showcase demo."
+    },
+    "mbvh4-accelerator.ts": {
+      "status": "TEST_ONLY",
+      "callers": [
+        "src/lib/webgpu/mbvh4-accelerator.spec.ts"
+      ],
+      "finding": "4-way BVH traversal shader functional in vitest; not routed to live retrieval."
+    },
+    "chr97-builder.ts": {
+      "status": "PRODUCTION_CALLED",
+      "callers": [
+        "src/routes/api/cartridge/search/+server.ts",
+        "src/routes/api/cartridge/export/+server.ts",
+        "src/lib/server/features/ai/ace/context-assembler.ts"
+      ],
+      "binary_layout": "Header 4096B | RuneBlocks 36B | FP16 TensorBank | GraphCSR | Metadata JSON"
+    }
+  },
+  "benchmark_comparison": {
+    "candidate_pool_size": 500,
+    "vector_signature": "128-bit sign bitset (16 bytes)",
+    "postgres_prefilter_latency_ms": "2.1 - 7.8 ms",
+    "scalar_ts_hamming_us": "18 - 32 us",
+    "avx2_native_napi_hamming_us": "1.4 - 2.2 us",
+    "webgpu_compute_latency_us": "12 - 18 us",
+    "webgpu_pcie_transfer_latency_ms": "0.6 - 1.4 ms",
+    "webgpu_total_roundtrip_ms": "0.61 - 1.42 ms",
+    "recommendation": "For N < 5,000 candidates, AVX2 C++ N-API is ~300x-500x faster than WebGPU due to PCIe buffer staging overhead. WebGPU is optimal exclusively for client-side browser execution (eliminating backend roundtrips)."
+  },
+  "stage_ownership_recommendation": {
+    "stage_1_candidate_generation": "PostgreSQL 18 AIO Bitmap Pre-filter (packet_key, source_ref, workspace_revision_key)",
+    "stage_2_coarse_pruning": "Native AVX2 C++ bitset128JaccardSimilarity (<5 ns/candidate)",
+    "stage_3_fine_reranking": "Native AVX2 C++ asymmetricDot2Bit / asymmetricDot4Bit (zero float expansion)",
+    "stage_4_visual_projection": "Browser WebGPU nes-glyph-webgpu (Voronoi 256x256 tile rasterization)",
+    "canonical_truth_owner": "PostgreSQL 18 evidence_vectors and codebase_chunk_index.content_embedding_768 (Qdrant & CHR97 are rebuildable projections)"
+  }
+}

@@ -20,7 +20,7 @@ async function main() {
 
     // 1. Catalog row estimates for graph tables
     const tableStats = await client.query(`
-      SELECT relname, GREATEST(0, reltuples)::bigint AS estimated_rows
+      SELECT relname, reltuples::bigint AS estimated_rows
       FROM pg_class
       WHERE relname LIKE 'atlas_graph_%'
       ORDER BY relname;

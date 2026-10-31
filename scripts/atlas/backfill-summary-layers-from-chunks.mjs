@@ -30,6 +30,7 @@ import {
 } from './lib/gemma4-summary-sanitizer.mjs';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 import { legacyPacketKeyFromSourceRef } from './lib/canonical-source-ref.mjs';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -480,6 +481,8 @@ function writeReport(report) {
 }
 
 async function main() {
+  if (APPLY) assertSummaryIdentityWriteAdmitted('backfill-summary-layers-from-chunks');
+
   const pool = new Pool({ connectionString: resolveDatabaseUrl(ENV), max: 1 });
 
   const report = {

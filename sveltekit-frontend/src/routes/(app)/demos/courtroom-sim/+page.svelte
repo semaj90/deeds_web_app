@@ -13,6 +13,7 @@
 	import { createSessionPresentationStory, sessionActorIdForRole } from '$lib/courtroom/runtime/session-presentation.js';
 	import { makeDialogueRequest, requestDialogue, type DialogueProposal } from '$lib/courtroom/runtime/ai-context.js';
 	import StrategyWizard from '$lib/components/courtroom/StrategyWizard.svelte';
+	import CourtroomDemoTutorial from '$lib/components/courtroom/CourtroomDemoTutorial.svelte';
 	import LoadingAssistant from '$lib/components/courtroom/LoadingAssistant.svelte';
 	import CourtroomActionBar from '$lib/components/courtroom/CourtroomActionBar.svelte';
 	import CourtroomTimelinePanel from '$lib/components/courtroom/CourtroomTimelinePanel.svelte';
@@ -90,6 +91,7 @@
 	let userInputMode = $state(false);
 	let userInputText = $state('');
 	let scriptedMode = $state(false);
+	let showDemoTutorial = $state(false);
 	let scriptedStoryState = $state<StoryState | null>(null);
 	let scriptedPlaying = $state(false);
 	let movementReceipt = $state<{ actorId: string; station: string; outcome: string; position: { x: number; z: number } | null } | null>(null);
@@ -482,6 +484,7 @@
 	async function startScriptedPreview() {
 		stopStoryRuntime();
 		scriptedMode = true;
+		showDemoTutorial = true;
 		scriptedStoryState = null;
 		movementReceipt = null;
 		dialogueProposal = null;
@@ -622,6 +625,11 @@
 
 	function submitScriptedEvidence() {
 		storySimulation?.dispatch({ type: 'SUBMIT_EVIDENCE', id: 'ledger-photo' });
+	}
+
+	function advanceTutorialStory() {
+		advanceScriptedStory();
+		showDemoTutorial = false;
 	}
 
 	/** Load or generate timeline keyframes for the current session */
@@ -859,6 +867,15 @@
 		<!-- ── Progress Bar ── -->
 		{#if scriptedMode && scene.isReady}
 			<CourtroomLevelPanel level={level1} onCamera={(view) => scene.setCameraView(view)} onMove={issueDemoMove} />
+		{/if}
+		{#if scriptedMode && showDemoTutorial}
+			<CourtroomDemoTutorial
+				phase={scriptedStoryState?.phase ?? 'lobby'}
+				evidenceAdded={Boolean(scriptedStoryState?.evidence.includes('ledger-photo'))}
+				onAddEvidence={submitScriptedEvidence}
+				onAdvanceStory={advanceTutorialStory}
+				onClose={() => (showDemoTutorial = false)}
+			/>
 		{/if}
 		<CourtroomProgressOrbit
 			progress={progress}

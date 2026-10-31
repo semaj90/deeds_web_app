@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.superforms-evidence-contract.v1",
+  "generatedAt": "2026-10-30T23:55:00.000Z",
+  "superformsVersion": "sveltekit-superforms v2 (^2.0.0)",
+  "zodAdapter": "zod4 (from sveltekit-superforms/adapters)",
+  "routes": {
+    "pageServer": {
+      "file": "sveltekit-frontend/src/routes/(app)/evidence/+page.server.ts",
+      "actions": ["upload", "delete", "update"],
+      "authGuard": "locals.user?.id verified on SSR load and all mutation actions; redirects 302 to /login on missing session",
+      "uploadActionFlow": [
+        "Read multipart formData",
+        "superValidate(formData, zod(evidenceUploadSchema))",
+        "File validation: file.size, file.type in ALLOWED_MIME_TYPES, file.name check",
+        "Upload raw file buffer to SeaweedFS ('legal-evidence' bucket)",
+        "Insert metadata row into public.evidence table",
+        "Dispatch 'evidence.process' async event (fire-and-forget, non-blocking)",
+        "Generate 24h presigned preview URL and return success"
+      ]
+    },
+    "apiEndpoint": {
+      "file": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts",
+      "authAndRateLimit": "heavyRateLimiter middleware invoked per IP/session",
+      "pipeline": "Full synchronous and queued OCR, chunking, entity extraction, strict llama-server :8081 EmbeddingGemma 768-D embedding, and persistEvidenceVectorForProjectionV1() transactional outbox commit."
+    }
+  },
+  "alignmentAudit": {
+    "fileSizeLimitMismatch": {
+      "superformsPage": "50 MB (MAX_FILE_SIZE = 50 * 1024 * 1024 in routes/(app)/evidence/schema.ts)",
+      "apiEndpoint": "100 MB (MAX_FILE_SIZE = 100 * 1024 * 1024 in routes/api/evidence/upload/+server.ts)",
+      "recommendation": "Unify to shared constant in src/lib/server/evidence/evidence-upload-contract.ts (default 50MB, or configurable via env)."
+    },
+    "schemaFieldParity": {
+      "superformsSchema": "{ title: z.string().min(1).max(256), description: z.string().max(5000).optional(), caseId: z.string().uuid().optional() }",
+      "apiSchema": "Includes optional evidenceType",
+      "recommendation": "Add optional evidenceType to evidenceUploadSchema in routes/(app)/evidence/schema.ts."
+    },
+    "persistenceSeparation": {
+      "rule": "Superforms action owns S3 upload and evidence row creation; vector persistence is strictly owned by persistEvidenceVectorForProjectionV1() via the processing pipeline. No duplicate vector insertion in form action.",
+      "status": "COMPLIANT"
+    }
+  }
+}

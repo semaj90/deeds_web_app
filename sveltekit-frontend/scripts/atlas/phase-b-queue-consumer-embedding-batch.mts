@@ -17,6 +17,7 @@ import {
   type DeliveryContextV1,
 } from '../../src/lib/server/queue/embedding-consumer-retry-policy-v1.js';
 import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
@@ -229,6 +230,8 @@ async function updateSummaryLayerEmbedding(
 }
 
 async function main() {
+  if (!DRY_RUN) assertSummaryIdentityWriteAdmitted('phase-b-queue-consumer-embedding-batch');
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  Phase B Queue Consumer — EmbeddingGemma BATCH Worker          ║');
   console.log('╚════════════════════════════════════════════════════════════════╝\n');

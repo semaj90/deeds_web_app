@@ -45,6 +45,8 @@
     "check:scripts:native": "tsgo -p tsconfig.scripts.json --noEmit",
     "typecheck:retrieval": "tsc --noEmit --skipLibCheck -p tsconfig.retrieval.json 2>&1 | grep 'retrieval/' || true",
     "lint": "eslint .",
+		"lint:svelte": "node scripts/lint-svelte-v1.mjs",
+		"test:svelte-eslint-receipt": "node --test scripts/svelte-eslint-run-receipt-v1.test.mjs",
     "turbo:start": "pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1 -StartupProfile ornith-1.5",
     "turbo:start:detached": "pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1 -StartupProfile ornith-1.5 -Detached",
     "turbo:start:legacy": "pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1 -StartupProfile ornith",

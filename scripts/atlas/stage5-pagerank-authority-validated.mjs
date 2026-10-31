@@ -29,7 +29,7 @@ const FROZEN_SNAPSHOT_FILE = path.join(REPO_ROOT, 'graphify', 'frozen-graph-snap
 const OUTPUT_DIR = path.join(REPO_ROOT, 'docs', 'stage5');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'pagerank_authority.ndjson');
 const VALIDATION_REPORT = path.join(OUTPUT_DIR, 'pagerank-validation-report.json');
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -226,6 +226,9 @@ async function persistFrozenSnapshotAuthority(result) {
   if (!decision.writesAllowed) {
     return { status: decision.status, runId: null, persistedScores: 0, writesPerformed: false };
   }
+  if (!DATABASE_URL) {
+    return { status: 'BLOCKED_DATABASE_URL_NOT_EXPLICIT', runId: null, persistedScores: 0, writesPerformed: false };
+  }
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 1 });
   const runId = crypto.randomUUID();
@@ -249,21 +252,9 @@ async function persistFrozenSnapshotAuthority(result) {
       await client.query('BEGIN');
       await client.query(
         `INSERT INTO atlas_graph_snapshots_v2
-          (snapshot_id, schema_version, status, source_manifest, projection_policy, node_count, edge_count, relation_event_count, excluded_count, unresolved_count, source_hash, topology_hash, policy_hash, eligibility_predicate)
-         VALUES ($1,$2,'BUILDING',$3::jsonb,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13)
-         ON CONFLICT (snapshot_id) DO UPDATE SET
-           schema_version = EXCLUDED.schema_version,
-           source_manifest = EXCLUDED.source_manifest,
-           projection_policy = EXCLUDED.projection_policy,
-           node_count = EXCLUDED.node_count,
-           edge_count = EXCLUDED.edge_count,
-           relation_event_count = EXCLUDED.relation_event_count,
-           excluded_count = EXCLUDED.excluded_count,
-           unresolved_count = EXCLUDED.unresolved_count,
-           source_hash = EXCLUDED.source_hash,
-           topology_hash = EXCLUDED.topology_hash,
-           policy_hash = EXCLUDED.policy_hash,
-           eligibility_predicate = EXCLUDED.eligibility_predicate`,
+          (snapshot_id, schema_version, status, source_manifest, projection_policy, node_count, edge_count, relation_event_count, excluded_count, unresolved_count, source_hash, topology_hash, policy_hash, eligibility_predicate,
+           workspace_revision, source_inventory_revision, graph_revision, identity_contract_version, parser_contract_version, revision_checksum)
+         VALUES ($1,$2,'BUILDING',$3::jsonb,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
         [
           snapshot.graphSnapshot.snapshotId,
           snapshot.graphSnapshot.schemaVersion,
@@ -277,7 +268,13 @@ async function persistFrozenSnapshotAuthority(result) {
           snapshot.graphSnapshot.sourceHash,
           snapshot.graphSnapshot.topologyHash,
           snapshot.graphSnapshot.policyHash,
-          snapshot.graphSnapshot.eligibilityPredicate
+          snapshot.graphSnapshot.eligibilityPredicate,
+          snapshot.revision.workspaceRevision,
+          snapshot.revision.sourceInventoryRevision,
+          snapshot.revision.graphRevision,
+          snapshot.revision.identityContractVersion,
+          snapshot.revision.parserContractVersion,
+          snapshot.revision.revisionChecksum
         ]
       );
 

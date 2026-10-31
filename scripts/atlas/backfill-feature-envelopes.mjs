@@ -13,6 +13,7 @@ import pg from 'pg';
 import { fileURLToPath } from 'node:url';
 import { buildSummaryContext } from './lib/summary-context-map.mjs';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const { Pool } = pg;
 const ENV = loadRepoEnv(process.env);
@@ -136,6 +137,8 @@ function deriveEnvelope(row) {
 }
 
 async function main() {
+  if (APPLY) assertSummaryIdentityWriteAdmitted('backfill-feature-envelopes');
+
   const pool = new Pool({ connectionString: resolveDatabaseUrl(ENV), max: 1 });
   try {
     const { rows } = await pool.query(`

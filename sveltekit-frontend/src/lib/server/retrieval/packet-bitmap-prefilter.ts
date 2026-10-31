@@ -34,6 +34,7 @@ export class PacketBitmapPrefilterValidationError extends Error {
 }
 
 const DEFAULT_CANDIDATE_CAP = 500;
+const MAX_CANDIDATE_CAP = 10_000;
 
 function hasSelectiveFilter(filters: PacketBitmapPrefilterFilters): boolean {
   return Boolean(
@@ -58,6 +59,9 @@ export function buildPacketBitmapPrefilterQuery(
   }
   if (!Number.isInteger(cap) || cap < 1) {
     throw new PacketBitmapPrefilterValidationError('candidateCap must be a positive integer.');
+  }
+  if (cap > MAX_CANDIDATE_CAP) {
+    throw new PacketBitmapPrefilterValidationError(`candidateCap cannot exceed ${MAX_CANDIDATE_CAP}.`);
   }
 
   const conditions: string[] = [];
@@ -107,6 +111,7 @@ export function buildPacketBitmapPrefilterQuery(
            title_id, feature_id, content_hash
     FROM atlas_packets
     WHERE ${where} AND packet_key IS NOT NULL AND source_ref IS NOT NULL
+    ORDER BY packet_key ASC, source_ref ASC
     LIMIT $${p}
   `;
   params.push(cap + 1);

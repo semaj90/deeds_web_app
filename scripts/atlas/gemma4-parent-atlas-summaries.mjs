@@ -35,6 +35,7 @@ import {
 } from './connection-config.mjs';
 import { buildSummaryContext, formatSummaryContext } from './lib/summary-context-map.mjs';
 import { llamaChat } from './lib/llama-inference.mjs';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -1270,6 +1271,8 @@ async function processOne(row, pool, dryRun, cacheRedis) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (APPLY) assertSummaryIdentityWriteAdmitted('gemma4-parent-atlas-summaries');
+
   console.log('\n══ Gemma4 Parent Atlas Summaries ══════════════════════════');
   console.log(`  Mode:        ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
   console.log(`  Limit:       ${LIMIT} files`);

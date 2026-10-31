@@ -21,22 +21,17 @@ import { loadStableFileBackfillClassifierModuleV1 } from './lib/load-stable-file
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const mod = await loadStableFileBackfillClassifierModuleV1();
 
-// -- Load the S01-07 sealed cohort authority (never re-derived; cited exactly) -------------------
-const cohortReceipt = JSON.parse(fs.readFileSync(path.join(root, 'docs/reports/current-source-authority-cohort-v1.json'), 'utf8'));
-if (cohortReceipt.status !== 'CURRENT_SOURCE_AUTHORITY_PROVEN') {
-  console.error(`Refusing to run: S01-07 cohort status is ${cohortReceipt.status}, not CURRENT_SOURCE_AUTHORITY_PROVEN`);
-  process.exit(2);
-}
-const admittedWorkspaceId = cohortReceipt.workspaceId;
-const admittedWorkspaceRevision = cohortReceipt.workspaceRevision;
-const expectedSourceCount = cohortReceipt.sourceCount;
-
 const admissionPath = path.join(root, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const admission = JSON.parse(fs.readFileSync(admissionPath, 'utf8'));
 if (admission.authority !== true) {
   console.error('Refusing to run: workspace-revision-tournament-admission-v1.json does not carry authority=true');
   process.exit(2);
 }
+
+const admittedWorkspaceId = admission.workspaceId;
+const admittedWorkspaceRevision = admission.workspaceRevision;
+const expectedSourceCount = admission.snapshotSourceCount ?? admission.sourceCount;
+
 const snapshotPath = path.join(root, 'docs/reports/workspace-source-snapshots', `${admission.snapshotRevision.replace(/^sha256:/, '')}.json`);
 const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
 // Per S01-07A's own finding #2: the sealed snapshot deliberately claims workspaceRevision: null
@@ -49,7 +44,7 @@ if (snapshot.snapshotRevision !== admission.snapshotRevision) {
   process.exit(2);
 }
 if (snapshot.sources.length !== expectedSourceCount) {
-  console.error(`Refusing to run: snapshot has ${snapshot.sources.length} sources, S01-07 cohort admitted ${expectedSourceCount}`);
+  console.error(`Refusing to run: snapshot has ${snapshot.sources.length} sources, admission expected ${expectedSourceCount}`);
   process.exit(2);
 }
 
@@ -122,8 +117,8 @@ const report = {
   status: reconciles && sumMatches ? 'STABLE_FILE_POPULATION_PREVIEW_READY' : 'STABLE_FILE_POPULATION_PREVIEW_BLOCKED',
 
   authority: {
-    sealedCohortReceipt: 'docs/reports/current-source-authority-cohort-v1.json',
-    sealedCohortStatus: cohortReceipt.status,
+    admissionReceipt: 'docs/reports/workspace-revision-tournament-admission-v1.json',
+    admissionStatus: admission.status,
     admittedWorkspaceId,
     admittedWorkspaceRevision,
     snapshotFile: `docs/reports/workspace-source-snapshots/${path.basename(snapshotPath)}`,

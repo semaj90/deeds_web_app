@@ -47,7 +47,7 @@
 {#if evidence.length === 0}
 	<div class="ev-empty">
 		<div class="ev-empty-icon">
-			<Icon name="folder-open" class="w-10 h-10" />
+			<Icon name="yorha-evidence" class="w-10 h-10" />
 		</div>
 		<p class="ev-empty-title">
 			{hasActiveFilters ? 'No evidence matches your filters' : 'No evidence uploaded yet'}
@@ -106,7 +106,7 @@
 								<Icon name="file-text" class="w-3.5 h-3.5" />
 							</button>
 							<button type="button" onclick={(e) => { e.stopPropagation(); onLegal?.(doc.id, doc.title || doc.fileName || doc.id); }} title="Legal Analysis">
-								<Icon name="scale" class="w-3.5 h-3.5" />
+								<Icon name="yorha-precedent" class="w-3.5 h-3.5" />
 							</button>
 							<button type="button" onclick={(e) => { e.stopPropagation(); onLinkCase?.(doc.id); }} title="Link to Case">
 								<Icon name="link" class="w-3.5 h-3.5" />
@@ -163,7 +163,7 @@
 								<Icon name="file-text" class="w-3.5 h-3.5" />
 							</button>
 							<button type="button" onclick={(e) => { e.stopPropagation(); onLegal?.(doc.id, doc.title || doc.fileName || doc.id); }} title="Legal">
-								<Icon name="scale" class="w-3.5 h-3.5" />
+								<Icon name="yorha-precedent" class="w-3.5 h-3.5" />
 							</button>
 							<button type="button" onclick={(e) => { e.stopPropagation(); onEdit?.(doc.id); }} title="Edit">
 								<Icon name="pencil" class="w-3.5 h-3.5" />
@@ -502,4 +502,43 @@
 		font-size: 0.7rem;
 		color: rgba(212, 199, 163, 0.35);
 	}
+	.ev-empty-icon { color: #9b7b48; filter: drop-shadow(0 5px 12px rgba(174,135,69,0.2)); }
+	.ev-empty-title { color: #382a23; }
+	.ev-empty-sub { color: #786a5d; }
+	.ev-empty-clear {
+		background: #7b252b;
+		border-color: #6a2026;
+		color: #fff8e9;
+	}
+	.ev-empty-clear:hover { background: #642027; }
+	.ev-grid { gap: 1rem; }
+	.ev-card {
+		background: rgba(255, 253, 248, 0.68);
+		border-color: rgba(196, 169, 117, 0.46);
+		border-left-color: #b28a45;
+		border-radius: 16px;
+		backdrop-filter: blur(14px) saturate(1.08);
+		box-shadow: 0 8px 24px rgba(77, 49, 32, 0.055), inset 0 1px rgba(255,255,255,0.88);
+	}
+	.ev-card:hover { background: rgba(255, 253, 248, 0.88); border-color: #c9ae7b; box-shadow: 0 14px 28px rgba(77,49,32,0.1); }
+	.ev-card-title, .ev-row-name { color: #342621; }
+	.ev-type-badge { background: #f5ead6; border-color: #dfceb2; color: #67272d; }
+	.ev-card-size, .ev-card-desc, .ev-row-desc, .ev-row-type, .ev-row-size, .ev-row-date { color: #786a5d; }
+	.ev-card-date { color: #76685b; }
+	.ev-card-actions button, .ev-row-actions button { color: #705e4f; }
+	.ev-card-actions button:hover, .ev-row-actions button:hover { color: #7b252b; background: #f3e7d1; }
+	.ev-card-actions button.action-danger:hover, .ev-row-actions button.action-danger:hover { color: #9a302d; background: #fae9e4; }
+	.ev-table-wrap {
+		border-color: rgba(196, 169, 117, 0.48);
+		background: rgba(255, 253, 248, 0.72);
+		backdrop-filter: blur(14px);
+		box-shadow: 0 8px 24px rgba(77,49,32,0.05);
+	}
+	.ev-table thead tr { border-bottom-color: #dfceb2; background: rgba(245,234,214,0.62); }
+	.ev-table th { color: #76634e; }
+	.ev-row { border-bottom-color: #eee3d0; }
+	.ev-row:hover { background: rgba(245, 234, 214, 0.52); }
+	.ev-load-more-btn { background: #7b252b; border-color: #6a2026; color: #fff8e9; }
+	.ev-load-more-btn:hover:not(:disabled) { background: #642027; border-color: #642027; }
+	.ev-load-more-count { color: #786a5d; }
 </style>

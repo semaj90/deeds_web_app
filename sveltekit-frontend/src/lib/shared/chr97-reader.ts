@@ -37,11 +37,19 @@ export interface ParsedRune {
 	tensorUuid: bigint;
 }
 
+export interface CartridgeCsrGraph {
+	numNodes: number;
+	numEdges: number;
+	rowOffsets: Uint32Array;
+	colIndices: Uint32Array;
+}
+
 export interface ParsedCartridge {
 	header: CartridgeHeader;
 	runes: ParsedRune[];
 	tensors: Float32Array[];
 	metadata: CartridgeMetadata;
+	graph?: CartridgeCsrGraph;
 }
 
 // ─── Reader ──────────────────────────────────────────────────────────────
@@ -129,7 +137,42 @@ export function parseCartridge(data: Uint8Array): ParsedCartridge {
 		};
 	}
 
-	return { header, runes, tensors, metadata };
+	const graph = extractCartridgeCsrGraph(data, header);
+	return { header, runes, tensors, metadata, graph };
+}
+
+export function extractCartridgeCsrGraph(data: Uint8Array, preParsedHeader?: CartridgeHeader): CartridgeCsrGraph {
+	const header = preParsedHeader ?? parseCartridgeHeader(data);
+	const numNodes = header.graphNodeCount;
+	const numEdges = header.graphNodeCount;
+
+	if (numNodes === 0) {
+		return {
+			numNodes: 0,
+			numEdges: 0,
+			rowOffsets: new Uint32Array([0]),
+			colIndices: new Uint32Array(0),
+		};
+	}
+
+	const tensorStart = HEADER_SIZE + header.runeCount * RUNE_BLOCK_SIZE;
+	const graphStart = tensorStart + header.tensorSize;
+	const offsetsStart = graphStart;
+	const edgesStart = graphStart + (numNodes + 1) * 4;
+	const edgesEnd = edgesStart + numEdges * 4;
+
+	const offsetsCopy = new Uint8Array(data.subarray(offsetsStart, edgesStart));
+	const rowOffsets = new Uint32Array(offsetsCopy.buffer, offsetsCopy.byteOffset, numNodes + 1);
+
+	const edgesCopy = new Uint8Array(data.subarray(edgesStart, edgesEnd));
+	const colIndices = new Uint32Array(edgesCopy.buffer, edgesCopy.byteOffset, numEdges);
+
+	return {
+		numNodes,
+		numEdges,
+		rowOffsets,
+		colIndices,
+	};
 }
 
 function fp16ToFloat32(fp16: number): number {

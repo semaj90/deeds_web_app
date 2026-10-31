@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 describe('taxonomy-topology-packet', () => {
   it('requires canonical packet resolution before taxonomy tuple persistence', async () => {
+
     const { resolveTaxonomyPacketKeyV1 } = await import('./taxonomy-topology-packet.js');
 
     await expect(resolveTaxonomyPacketKeyV1(

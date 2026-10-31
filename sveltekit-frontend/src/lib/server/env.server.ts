@@ -17,6 +17,8 @@
  * "not configured", not attempt a connection with an invented target.
  */
 
+import { assertLangGraphProductionAuthV1 } from '$lib/server/config/langgraph-auth-v1.js';
+
 const privateEnv: NodeJS.ProcessEnv = process.env;
 
 function parseBoolean(value: string | undefined, defaultValue = false): boolean {
@@ -42,6 +44,15 @@ function parseBoolean(value: string | undefined, defaultValue = false): boolean 
 
 const nodeEnvironment = privateEnv.NODE_ENV ?? 'development';
 const devBypassAuth = parseBoolean(privateEnv.DEV_BYPASS_AUTH, false);
+const langGraphEnabled = parseBoolean(privateEnv.LANGGRAPH_ENABLED, false);
+const langGraphInternalApiKey = privateEnv.LANGGRAPH_INTERNAL_API_KEY;
+
+assertLangGraphProductionAuthV1(
+	nodeEnvironment,
+	langGraphEnabled,
+	langGraphInternalApiKey,
+	privateEnv.LANGGRAPH_URL
+);
 
 if (nodeEnvironment === 'production' && devBypassAuth) {
   throw new Error('DEV_BYPASS_AUTH_FORBIDDEN_IN_PRODUCTION');
@@ -226,7 +237,8 @@ export const ENV = Object.freeze({
   LANGFUSE_HOST: privateEnv.LANGFUSE_HOST,
   LANGFUSE_PUBLIC_KEY: privateEnv.LANGFUSE_PUBLIC_KEY,
   LANGFUSE_SECRET_KEY: privateEnv.LANGFUSE_SECRET_KEY,
-  LANGGRAPH_ENABLED: parseBoolean(privateEnv.LANGGRAPH_ENABLED, false),
+  LANGGRAPH_ENABLED: langGraphEnabled,
+  LANGGRAPH_INTERNAL_API_KEY: langGraphInternalApiKey,
   LANGGRAPH_URL: privateEnv.LANGGRAPH_URL ?? 'http://127.0.0.1:8091',
   EXPERIMENT_ANALYSIS_SIDECAR_URL: privateEnv.EXPERIMENT_ANALYSIS_SIDECAR_URL ?? privateEnv.LANGGRAPH_URL ?? 'http://127.0.0.1:8091',
   MODEL_ANALYSIS_SIDECAR_URL: privateEnv.MODEL_ANALYSIS_SIDECAR_URL ?? privateEnv.LANGGRAPH_URL ?? 'http://127.0.0.1:8091',

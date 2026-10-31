@@ -13,6 +13,9 @@ import pg from 'pg';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
+
+assertSummaryIdentityWriteAdmitted('backfill-summary-stubs');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

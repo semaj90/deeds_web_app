@@ -102,7 +102,7 @@ export function decideEvidenceEmbedding(candidate: EvidenceEmbeddingCandidate): 
 
 export function assertEvidenceEmbeddingAdmitted(candidate: EvidenceEmbeddingCandidate): Extract<EvidenceEmbeddingDecision, { ok: true }> {
   const decision = decideEvidenceEmbedding(candidate);
-  if (!decision.ok) throw new Error(`EVIDENCE_EMBEDDING_NOT_ADMITTED:${decision.reasons.join(',')}`);
+  if (decision.ok === false) throw new Error(`EVIDENCE_EMBEDDING_NOT_ADMITTED:${decision.reasons.join(',')}`);
   return decision;
 }
 

@@ -6,11 +6,13 @@
  * running audits that depend on them.
  *
  * Usage:
- *   node scripts/atlas/validate-dev-services.mjs [--json] [--strict] [--no-playwright]
+ *   node scripts/atlas/validate-dev-services.mjs [--json] [--strict] [--no-playwright] [--no-report] [--no-mcp-protocol-probe]
  *
  * --strict       Exit 1 if any required service is down
  * --json         Machine-readable output
  * --no-playwright  Skip SvelteKit dev server check (port 5173)
+ * --no-report    Do not write the local JSON report
+ * --no-mcp-protocol-probe  Skip the TRACE MCP HTTP protocol probe
  *
  * Output: docs/reports/dev-service-health-report.json
  */
@@ -18,7 +20,7 @@
 import { createConnection } from 'node:net';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..', '..');
@@ -28,6 +30,16 @@ const ARGS          = process.argv.slice(2);
 const STRICT        = ARGS.includes('--strict');
 const JSON_OUT      = ARGS.includes('--json');
 const NO_PLAYWRIGHT = ARGS.includes('--no-playwright');
+const NO_REPORT     = ARGS.includes('--no-report');
+const NO_MCP_PROTOCOL_PROBE = ARGS.includes('--no-mcp-protocol-probe');
+
+export function rabbitMqHostPort(value = process.env.RABBITMQ_HOST_PORT ?? '5673') {
+  const port = Number(value);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('RABBITMQ_HOST_PORT_INVALID');
+  }
+  return port;
+}
 
 const C = {
   reset: '\x1b[0m', bold: '\x1b[1m',
@@ -64,7 +76,7 @@ const SERVICES = [
     envVar: 'RETRIEVAL_GRPC_URL',
   },
   { name: 'Ollama', host: '127.0.0.1', port: 11434, required: false, envVar: 'OLLAMA_HOST' },
-  { name: 'RabbitMQ', host: '127.0.0.1', port: 5672, required: false, envVar: null },
+  { name: 'RabbitMQ', host: '127.0.0.1', port: rabbitMqHostPort(), required: false, envVar: 'RABBITMQ_HOST_PORT' },
   {
     name: 'SeaweedFS S3',
     host: '127.0.0.1',
@@ -176,7 +188,7 @@ async function main() {
   }
 
   const traceMcpService = results.find((r) => r.name === 'TRACE MCP');
-  if (traceMcpService?.status === 'up') {
+  if (traceMcpService?.status === 'up' && !NO_MCP_PROTOCOL_PROBE) {
     try {
       const details = await traceMcpProtocolProbe('http://127.0.0.1:8788');
       results.push({
@@ -229,8 +241,10 @@ async function main() {
     status: anyRequiredDown ? 'degraded' : 'healthy',
   };
 
-  mkdirSync(REPORTS_DIR, { recursive: true });
-  writeFileSync(join(REPORTS_DIR, 'dev-service-health-report.json'), JSON.stringify(report, null, 2));
+  if (!NO_REPORT) {
+    mkdirSync(REPORTS_DIR, { recursive: true });
+    writeFileSync(join(REPORTS_DIR, 'dev-service-health-report.json'), JSON.stringify(report, null, 2));
+  }
 
   if (JSON_OUT) {
     console.log(JSON.stringify(report, null, 2));
@@ -244,10 +258,12 @@ async function main() {
         .filter(r => r.status === 'down_required')
         .forEach(r => console.log(`    docker start legal-ai-${r.name.toLowerCase().replace(/\s+/g, '-')}`));
     }
-    console.log(`\n  ${C.gray}Report → docs/reports/dev-service-health-report.json${C.reset}\n`);
+    if (!NO_REPORT) console.log(`\n  ${C.gray}Report → docs/reports/dev-service-health-report.json${C.reset}\n`);
   }
 
   if (STRICT && anyRequiredDown) process.exit(1);
 }
 
-main().catch(err => { console.error(err); process.exit(2); });
+if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
+  main().catch(err => { console.error(err); process.exit(2); });
+}

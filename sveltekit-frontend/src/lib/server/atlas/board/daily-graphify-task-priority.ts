@@ -1,4 +1,5 @@
 import type { DailyGraphifyBoardData, DailyGraphifyTask } from './daily-graphify-board.js';
+import { AGENTIC_ERROR_FIX_ORIGIN } from './agentic-error-fix-lane.js';
 
 const PRIORITY_SCORE: Record<DailyGraphifyTask['priority'], number> = {
 	P0: 100,
@@ -23,6 +24,7 @@ export function rankDailyGraphifyBoardTasks(
 ): DailyGraphifyTaskPriorityRow[] {
 	const ordered = board.columns
 		.flatMap((column) => column.tasks)
+		.filter((task) => task.origin !== AGENTIC_ERROR_FIX_ORIGIN)
 		.map((task) => ({ task, priorityScore: PRIORITY_SCORE[task.priority] }))
 		.sort((left, right) =>
 			right.priorityScore - left.priorityScore || left.task.id.localeCompare(right.task.id, 'en'),

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   adaptRankerFromOutcomesV1,
   buildAceContextPacketV1,
@@ -220,47 +220,98 @@ describe('Hermes Agentic Loop & Adaptive Backprop Pipeline V1', () => {
     ).toThrow('NO_ELIGIBLE_TOURNAMENT_WINNER: all candidates failed hard gates');
   });
 
-  it('rejects adaptive backpropagation training when evidence provenance is missing', () => {
+  it('rejects adaptive backpropagation when no authoritative receipt resolves', async () => {
     const fabricatedOutcomes = [
       {
         queryId: 'q_valid_deed',
         candidateId: 'symbol:validateDeedSignature',
         features: candidate.features,
-        outcomeSuccess: true, // Fabricated: no verifiedEvidenceRef or stage hashes
+        executionReceiptId: 'receipt:unverified',
+        stageEventHashes: ['not-a-checksum'],
+        workspaceRevision: 'workspace:current',
+        sourceRevision: 'source:current',
       },
     ];
+    const db = { query: vi.fn(async () => ({ rows: [] })) };
 
-    const modelUnchanged = adaptRankerFromOutcomesV1(mockModel, fabricatedOutcomes);
+    const modelUnchanged = await adaptRankerFromOutcomesV1(db, mockModel, fabricatedOutcomes, {
+      workspaceRevision: 'workspace:current',
+      sourceRevision: 'source:current',
+    });
     // Model should remain identical because fabricated outcomes are dropped
     expect(modelUnchanged.modelRevision).toBe(mockModel.modelRevision);
     expect(modelUnchanged).toBe(mockModel);
+    expect(db.query.mock.calls[0]?.[0]).toContain("r.framework LIKE 'patch-check/%'");
+    expect(db.query.mock.calls[0]?.[1]?.[0]).toEqual(['receipt:unverified']);
   });
 
-  it('performs adaptive backpropagation to update FM Rank-4 weights from verified outcomes offline', () => {
+  it('trains only on independently verified, revision-matched pass and failure receipts', async () => {
     const outcomes = [
       {
         queryId: 'q_valid_deed',
         candidateId: 'symbol:validateDeedSignature',
         features: candidate.features,
-        outcomeSuccess: true, // Successful tournament promotion
-        verifiedEvidenceRef: 'receipt:tourn_hermes_001',
+        executionReceiptId: 'receipt:tourn_hermes_001',
         stageEventHashes: ['sha256:' + 'f'.repeat(64)],
+        workspaceRevision: 'workspace:current',
+        sourceRevision: 'source:current',
       },
       {
         queryId: 'q_valid_deed',
         candidateId: 'symbol:brokenStub',
         features: [0.1, 0.2, 0.0, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.0, 0.0, 0.0],
-        outcomeSuccess: false, // Failing tests
-        verifiedEvidenceRef: 'receipt:tourn_hermes_002',
+        executionReceiptId: 'receipt:tourn_hermes_002',
         stageEventHashes: ['sha256:' + '0'.repeat(64)],
+        workspaceRevision: 'workspace:current',
+        sourceRevision: 'source:current',
       },
     ];
+    const db = { query: vi.fn(async () => ({ rows: [
+      {
+        execution_receipt_id: 'receipt:tourn_hermes_001', report_checksum: 'f'.repeat(64), status: 'passed',
+        source_revision: 'source:current', failure_messages: [], verifier_status: 'VERIFIED_PASS',
+        evidence_resolved: true, computed_digest: 'sha256:' + 'f'.repeat(64),
+        workspace_revision: 'workspace:current', verifier_source_revision: 'source:current', canonical: false,
+      },
+      {
+        execution_receipt_id: 'receipt:tourn_hermes_002', report_checksum: '0'.repeat(64), status: 'failed',
+        source_revision: 'source:current', failure_messages: ['CHECK_FAILED'], verifier_status: 'VERIFIED_PASS',
+        evidence_resolved: true, computed_digest: 'sha256:' + '0'.repeat(64),
+        workspace_revision: 'workspace:current', verifier_source_revision: 'source:current', canonical: false,
+      },
+    ] })) };
 
-    const updatedModel = adaptRankerFromOutcomesV1(mockModel, outcomes);
+    const updatedModel = await adaptRankerFromOutcomesV1(db, mockModel, outcomes, {
+      workspaceRevision: 'workspace:current',
+      sourceRevision: 'source:current',
+    });
 
     expect(updatedModel.schema).toBe('atlas.fm-rank4-model.v1');
     expect(updatedModel.totalParameters).toBe(61);
     expect(updatedModel.modelRevision).not.toBe(mockModel.modelRevision);
     expect(updatedModel.metrics.ndcgAt5).toBe(1.0);
+  });
+
+  it('excludes stale revisions from training even when the receipt is independently verified', async () => {
+    const outcome = {
+      queryId: 'q_valid_deed',
+      candidateId: 'symbol:validateDeedSignature',
+      features: candidate.features,
+      executionReceiptId: 'receipt:timeout',
+      stageEventHashes: ['sha256:' + 'a'.repeat(64)],
+      workspaceRevision: 'workspace:stale',
+      sourceRevision: 'source:current',
+    };
+    const db = { query: vi.fn(async () => ({ rows: [{
+      execution_receipt_id: 'receipt:timeout', report_checksum: 'a'.repeat(64), status: 'passed',
+      source_revision: 'source:current', failure_messages: [], verifier_status: 'VERIFIED_PASS',
+      evidence_resolved: true, computed_digest: 'sha256:' + 'a'.repeat(64),
+      workspace_revision: 'workspace:current', verifier_source_revision: 'source:current', canonical: false,
+    }] })) };
+
+    expect(await adaptRankerFromOutcomesV1(db, mockModel, [outcome], {
+      workspaceRevision: 'workspace:current',
+      sourceRevision: 'source:current',
+    })).toBe(mockModel);
   });
 });

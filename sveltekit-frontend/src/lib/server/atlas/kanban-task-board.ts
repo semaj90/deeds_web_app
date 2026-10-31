@@ -79,8 +79,9 @@ export const KanbanTaskBlockInputSchema = z.object({
 
 export const KanbanTaskCompleteInputSchema = z.object({
   taskId: z.string().min(1),
+  runId: z.string().min(1),
+  executionReceiptId: z.string().min(1),
   workerId: z.string().min(1).optional(),
-  runId: z.string().min(1).optional(),
   validationCommand: z.string().min(1).optional(),
 });
 
@@ -574,9 +575,37 @@ export async function blockKanbanTask(input: { taskId: string; reason?: string }
   });
 }
 
-export async function completeKanbanTask(input: { taskId: string; workerId?: string }): Promise<KanbanTask> {
+export async function completeKanbanTask(input: z.infer<typeof KanbanTaskCompleteInputSchema>): Promise<KanbanTask> {
   const parsed = KanbanTaskCompleteInputSchema.parse(input);
   return withKanbanTransaction(async (tx) => {
+    const proof = await tx.execute(sql`
+      SELECT t.task_id
+      FROM kanban_tasks t
+      JOIN kanban_task_attempts a
+        ON a.task_id = t.task_id
+       AND a.run_id = ${parsed.runId}
+       AND a.execution_receipt_id = ${parsed.executionReceiptId}
+       AND a.success = true
+      JOIN atlas_test_execution_receipts r
+        ON r.execution_receipt_id = a.execution_receipt_id
+       AND r.status = 'passed'
+       AND r.run_revision = a.run_id
+       AND r.source_revision = t.source_revision
+       AND r.source_ref IN (SELECT jsonb_array_elements_text(t.source_refs))
+      JOIN atlas_receipt_verifier_results_v1 v
+        ON v.execution_receipt_id = r.execution_receipt_id
+       AND v.verification_status = 'VERIFIED_PASS'
+       AND v.evidence_resolved = true
+       AND v.computed_digest = 'sha256:' || r.report_checksum
+      WHERE t.task_id = ${parsed.taskId}
+        AND t.status = 'active'
+        AND t.current_run_id = ${parsed.runId}
+        AND t.source_revision IS NOT NULL
+      FOR UPDATE OF t
+    `);
+    if (proof.rows.length !== 1) {
+      throw new Error('KANBAN_COMPLETION_PROOF_REQUIRED: current run needs a successful attempt and independently verified receipt bound to the task source revision');
+    }
     const now = new Date();
     const task = await mutateTask(tx, parsed.taskId, {
       lane: 'done',
@@ -586,16 +615,14 @@ export async function completeKanbanTask(input: { taskId: string; workerId?: str
       claimExpiresAt: null,
       lastHeartbeatAt: now,
       completedAt: now,
-      currentRunId: parsed.runId ?? (parsed.workerId ? `run:${parsed.workerId}` : null),
-      validationCommand:
-        parsed.validationCommand ??
-        (parsed.workerId ? `completed_by:${parsed.workerId}` : 'completed'),
+      currentRunId: parsed.runId,
+      validationCommand: parsed.validationCommand ?? `verified_receipt:${parsed.executionReceiptId}`,
     });
     await appendKanbanTaskEvent(tx, {
       taskId: parsed.taskId,
-      runId: parsed.runId ?? (parsed.workerId ? `run:${parsed.workerId}` : undefined),
+      runId: parsed.runId,
       eventType: 'completed',
-      payload: { workerId: parsed.workerId ?? null },
+      payload: { workerId: parsed.workerId ?? null, executionReceiptId: parsed.executionReceiptId, proof: 'independent_verified_pass' },
     });
     return task;
   });

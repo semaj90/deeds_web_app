@@ -4,7 +4,7 @@ import { executeLDRResearch, formatLDRResultForAgent, validateLDRInput, type LDR
 describe('LDR MCP Tool Integration', () => {
   beforeAll(() => {
     // Set test environment
-    process.env.SEARXNG_URL = process.env.SEARXNG_URL || 'http://127.0.0.1:8888';
+    process.env.SEARXNG_URL = process.env.SEARXNG_URL || 'http://127.0.0.1:8889';
     process.env.LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1';
   });
 

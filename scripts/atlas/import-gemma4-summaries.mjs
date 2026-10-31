@@ -19,6 +19,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { hasGemma4ReasoningLeak, isUsableGemma4Summary, sanitizeGemma4Summary } from './lib/gemma4-summary-sanitizer.mjs';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -36,6 +37,10 @@ const args = {
 if (!args.dryRun && !args.apply) {
   console.log(`\n⚠️  Mode not specified. Use --dry-run or --apply\n`);
   process.exit(1);
+}
+
+if (args.apply && !args.dryRun) {
+  assertSummaryIdentityWriteAdmitted('import-gemma4-summaries');
 }
 
 console.log(`\n📥 Import Gemma4 Summaries`);

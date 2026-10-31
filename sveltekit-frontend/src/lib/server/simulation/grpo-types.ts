@@ -1,7 +1,7 @@
 /**
  * GRPO Strategy Wizard Types
  *
- * Group Relative Policy Optimization "thinking" chain types.
+ * Group Relative Policy Optimization strategy result types.
  * Multi-step reasoning: RAG → KAG → Semantic → LLM Synthesis
  * producing 4 strategic recommendations with who/what/why/how taxonomy.
  */
@@ -35,7 +35,7 @@ export interface SearchTimings {
 
 export interface StrategyResult {
 	recommendations: StrategyRecommendation[];
-	/** Chain-of-thought reasoning trace from the LLM */
-	thinking: string;
+	/** Short user-facing evidence summary; never private reasoning. */
+	evidenceBasis: string;
 	searchTimings: SearchTimings;
 }

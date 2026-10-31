@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
+import { deriveEmbeddingGemmaMrlProjection } from '$lib/server/embedding/embedding-contract-768.js';
 import {
   EVIDENCE_EMBEDDING_TYPE,
   EVIDENCE_INPUT_RECIPE_REVISION,
@@ -78,6 +79,17 @@ describe('evidence embedding contract', () => {
     const decision = decideEvidenceEmbedding(candidate({ vector: realisticVector().slice(0, dimension).concat(new Array(Math.max(0, dimension - 768)).fill(0.1)) }));
     expect(decision).toMatchObject({ ok: false });
     expect((decision as { reasons: string[] }).reasons[0]).toMatch(/^DIMENSION_MISMATCH/);
+  });
+
+  it.each([256, 128] as const)('keeps the %i-D MRL prefix outside canonical evidence persistence', (dimension) => {
+    const projection = deriveEmbeddingGemmaMrlProjection(realisticVector(), dimension);
+    const decision = decideEvidenceEmbedding(candidate({ vector: Array.from(projection.vector) }));
+
+    expect(projection.dimension).toBe(dimension);
+    expect(projection.vector).toHaveLength(dimension);
+    expect(projection.digest).toMatch(/^[0-9a-f]{64}$/);
+    expect(decision).toMatchObject({ ok: false });
+    expect((decision as { reasons: string[] }).reasons).toContain(`DIMENSION_MISMATCH:${dimension}`);
   });
 
   it('rejects non-finite components', () => {

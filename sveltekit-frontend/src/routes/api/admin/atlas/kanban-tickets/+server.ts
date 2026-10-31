@@ -55,8 +55,9 @@ const HeartbeatTicketActionSchema = z.object({
 const CompleteTicketActionSchema = z.object({
 	action: z.literal('complete'),
 	taskId: z.string().min(1),
+	executionReceiptId: z.string().min(1),
 	workerId: z.string().min(1).default('operator-control-panel'),
-	runId: z.string().min(1).optional(),
+	runId: z.string().min(1),
 	validationCommand: z.string().min(1).optional(),
 });
 
@@ -323,6 +324,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			case 'complete': {
 				const task = await completeKanbanTask({
 					taskId: data.taskId,
+					runId: data.runId,
+					executionReceiptId: data.executionReceiptId,
 					workerId: data.workerId,
 				});
 				return json({

@@ -6,6 +6,7 @@ function board(tasks: Array<{
 	id: string;
 	priority: 'P0' | 'P1' | 'P2' | 'P3';
 	status?: string;
+	origin?: string;
 	blockedBy?: string[];
 	source_ref?: string | null;
 }>): DailyGraphifyBoardData {
@@ -46,6 +47,15 @@ describe('daily Graphify task priority projection', () => {
 		expect(ranked.map(({ taskId, priorityScore }) => [taskId, priorityScore])).toEqual([
 			['p0', 100], ['a-p1', 75], ['z-p1', 75], ['p3', 25],
 		]);
+	});
+
+	it('keeps agentic error-fix tasks out of the Graphify task-priority lane', () => {
+		const ranked = rankDailyGraphifyBoardTasks(board([
+			{ id: 'graph', priority: 'P1' },
+			{ id: 'err-fix:runtime', priority: 'P0', origin: 'agentic_error_fixing_v1' },
+		]));
+
+		expect(ranked.map(({ taskId }) => taskId)).toEqual(['graph']);
 	});
 
 	it('preserves blocked and source metadata without changing actionability', () => {

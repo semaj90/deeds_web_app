@@ -26,7 +26,7 @@ export type TaskType =
   | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract'
   | 'graph.bfs' | 'graph.bfs_extended' | 'graph.astar' | 'graph.greedy'
   | 'graph.ast_traverse' | 'tree.predict' | 'manifold.slerp' | 'manifold.interpolate4d'
-  | 'schema.encode';
+  | 'schema.encode' | 'hamming128.proposal';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).

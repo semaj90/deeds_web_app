@@ -7,7 +7,7 @@
 		caseId: string;
 		isOpen: boolean;
 		onClose: () => void;
-		onSuccess?: (evidenceId: string, jobId: string) => void;
+		onSuccess?: (evidenceId: string, jobId: string, filename: string, fileSize: number, startedAt: number) => void;
 	}
 
 	let { caseId, isOpen, onClose, onSuccess }: Props = $props();
@@ -19,22 +19,6 @@
 	let uploadError: string | null = $state(null);
 	let uploadResult: { evidenceId: string; jobId: string; hash: string } | null = $state(null);
 
-	// Pipeline stages (8-stage evidence pipeline)
-	const pipelineStages = [
-		{ id: 'upload', label: 'SeaweedFS Upload', icon: 'upload', desc: 'SHA-256 hash + object storage' },
-		{ id: 'db-insert', label: 'Database Record', icon: 'database', desc: 'PostgreSQL evidence row' },
-		{ id: 'ocr', label: 'Text Extraction', icon: 'file-text', desc: 'pdf-parse → OCR fallback' },
-		{ id: 'chunking', label: 'Legal Chunking', icon: 'file-text', desc: 'ARTICLE/SECTION/§ hierarchy' },
-		{ id: 'embedding', label: 'Embedding (768d)', icon: 'brain', desc: 'embeddinggemma:latest via gRPC' },
-		{ id: 'vector-store', label: 'Dual Vector Storage', icon: 'database', desc: 'pgvector + Qdrant upsert' },
-		{ id: 'entities', label: 'Entity Extraction', icon: 'search', desc: 'LLM + regex (PERSON/ORG/STATUTE)' },
-		{ id: 'forensics', label: 'Forensics + Summary', icon: 'shield', desc: 'PII detection + summarization' }
-	];
-
-	let currentStage = $state(-1);
-	let stageStatuses = $state<('pending' | 'running' | 'done' | 'error')[]>(Array(8).fill('pending'));
-	let enableYolo = $state(false);
-	let enableRag = $state(true);
 	let fileInputEl = $state<HTMLInputElement | null>(null);
 
 	// File validation (inline — no excluded service imports)
@@ -93,18 +77,10 @@
 	const selectFile = (file: File) => {
 		uploadError = null;
 		uploadResult = null;
-		currentStage = -1;
-		stageStatuses = Array(8).fill('pending');
 		const validation = validateFile(file);
 		if (!validation.valid) { uploadError = validation.error || 'Invalid file'; return; }
 		selectedFile = file;
-		if (isImageFile(file)) enableYolo = true;
 	};
-
-	function advanceStage(index: number, status: 'running' | 'done' | 'error') {
-		stageStatuses = stageStatuses.map((s, i) => i === index ? status : s);
-		if (status === 'running') currentStage = index;
-	}
 
 	function formatUploadErrorMessage(message: string | null | undefined): string {
 		if (!message) return 'Upload could not be completed';
@@ -119,16 +95,12 @@
 		isUploading = true;
 		uploadError = null;
 		uploadResult = null;
-		stageStatuses = Array(8).fill('pending');
+		const startedAt = Date.now();
 
 		try {
-			// Stage 0: SeaweedFS Upload
-			advanceStage(0, 'running');
 			const formData = new FormData();
 			formData.append('file', selectedFile);
-			if (caseId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caseId)) {
 			if (caseId) {
-				formData.append('case_id', caseId);
 				formData.append('case_id', caseId);
 				formData.append('caseId', caseId);
 			}
@@ -136,7 +108,6 @@
 			formData.append('enableOcr', 'true');
 			formData.append('enableEmbeddings', 'true');
 			formData.append('enableSummarization', 'true');
-		}
 			formData.append('title', selectedFile.name);
 			formData.append('evidenceType', isImageFile(selectedFile) ? 'photo' : 'document');
 
@@ -146,44 +117,12 @@
 				throw new Error(err.error || err.message || `Upload could not be completed (${res.status})`);
 			}
 			const data = await res.json();
-			advanceStage(0, 'done');
-
-			// Stages 1-7 happen server-side via the upload pipeline
-			// Simulate pipeline progression (server processes asynchronously)
-			for (let i = 1; i <= 7; i++) {
-				advanceStage(i, 'running');
-				await new Promise(r => setTimeout(r, 400 + Math.random() * 300));
-				advanceStage(i, 'done');
-			}
-
-			uploadResult = { evidenceId: data.id || data.evidenceId, jobId: data.jobId || 'async', hash: data.hash || '' };
-
-			// Optional: YOLO analysis for images
-			if (enableYolo && isImageFile(selectedFile)) {
-				try {
-					await fetch('/api/evidence/analyze', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ evidenceId: uploadResult.evidenceId, type: 'yolo' })
-					});
-				} catch { /* non-fatal */ }
-			}
-
-			// Optional: Trigger RAG indexing
-			if (enableRag && uploadResult.evidenceId) {
-				try {
-					await fetch('/api/evidence/search', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ query: selectedFile.name, evidenceId: uploadResult.evidenceId, reindex: true })
-					});
-				} catch { /* non-fatal */ }
-			}
-
-			if (onSuccess) onSuccess(uploadResult.evidenceId, uploadResult.jobId);
+			const evidenceId = data.id || data.evidenceId;
+			const jobId = data.jobId;
+			if (!evidenceId || !jobId) throw new Error('Upload response did not include a trackable processing job');
+			uploadResult = { evidenceId, jobId, hash: data.hash || '' };
+			onSuccess?.(evidenceId, jobId, selectedFile.name, selectedFile.size, startedAt);
 		} catch (error) {
-			const failedStage = stageStatuses.findIndex(s => s === 'running');
-			if (failedStage >= 0) advanceStage(failedStage, 'error');
 			uploadError = formatUploadErrorMessage(error instanceof Error ? error.message : null);
 		} finally {
 			isUploading = false;
@@ -194,8 +133,6 @@
 		selectedFile = null;
 		uploadError = null;
 		uploadResult = null;
-		currentStage = -1;
-		stageStatuses = Array(8).fill('pending');
 		onClose();
 	};
 
@@ -203,8 +140,6 @@
 		selectedFile = null;
 		uploadError = null;
 		uploadResult = null;
-		currentStage = -1;
-		stageStatuses = Array(8).fill('pending');
 	};
 
 	// Keyboard shortcuts
@@ -239,8 +174,8 @@
 			<!-- Header -->
 			<div class="upload-modal-header">
 				<div>
-					<h2 class="text-lg font-semibold text-sand">Evidence Upload Pipeline</h2>
-					<p class="text-xs text-sand/50 mt-0.5">SeaweedFS + embeddinggemma + Qdrant + pgvector</p>
+					<h2 class="text-lg font-semibold text-sand">Upload Evidence</h2>
+					<p class="text-xs text-sand/50 mt-0.5">Processing status appears after the evidence record is accepted.</p>
 				</div>
 				<button type="button" class="upload-modal-close" onclick={handleCancel}>
 					<Icon name="x" size={20} />
@@ -262,7 +197,7 @@
 						tabindex={isUploading ? -1 : 0}
 						aria-disabled={isUploading}
 					>
-						<Icon name="upload" size={48} class="mx-auto text-sand/30 mb-3" />
+					<Icon name="yorha-evidence" size={48} class="mx-auto text-sand/30 mb-3" />
 						<p class="text-sand/80 font-medium">Drag and drop evidence file</p>
 						<p class="text-sand/40 text-sm mt-1">or</p>
 						<button type="button" class="upload-modal-select" onclick={(event) => { event.stopPropagation(); openFilePicker(); }}>
@@ -285,58 +220,14 @@
 							{/if}
 						</div>
 
-						<!-- Pipeline Options -->
-						{#if !isUploading && !uploadResult}
-							<div class="mt-3 flex flex-wrap gap-3 text-xs">
-								<label class="flex items-center gap-1.5 text-sand/60 cursor-pointer">
-									<input type="checkbox" bind:checked={enableRag} class="rounded" />
-									Search indexing
-								</label>
-								{#if isImageFile(selectedFile)}
-									<label class="flex items-center gap-1.5 text-sand/60 cursor-pointer">
-										<input type="checkbox" bind:checked={enableYolo} class="rounded" />
-										Visual review (signatures, seals, tables)
-									</label>
-								{/if}
-							</div>
-						{/if}
 					</div>
-
-					<!-- Pipeline Progress -->
-					{#if isUploading || uploadResult}
-						<div class="space-y-1.5 mb-4">
-							{#each pipelineStages as stage, i (stage.id)}
-								<div class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all
-									{stageStatuses[i] === 'running' ? 'bg-accent/10 border border-accent/20' :
-									 stageStatuses[i] === 'done' ? 'bg-green-900/10' :
-									 stageStatuses[i] === 'error' ? 'bg-red-900/10' : 'opacity-40'}">
-									<div class="shrink-0 w-5 h-5 flex items-center justify-center">
-										{#if stageStatuses[i] === 'running'}
-											<Icon name="loader" size={16} class="text-accent animate-spin" />
-										{:else if stageStatuses[i] === 'done'}
-											<Icon name="circle-check" size={16} class="text-green-500" />
-										{:else if stageStatuses[i] === 'error'}
-											<Icon name="circle-alert" size={16} class="text-red-500" />
-										{:else}
-											<span class="w-2 h-2 rounded-full bg-sand/20"></span>
-										{/if}
-									</div>
-									<div class="flex-1 min-w-0">
-										<span class="text-sand/80 font-medium">{stage.label}</span>
-										<span class="text-sand/30 ml-2 text-xs">{stage.desc}</span>
-									</div>
-									<span class="text-[10px] text-sand/30 shrink-0">{i + 1}/8</span>
-								</div>
-							{/each}
-						</div>
-					{/if}
 
 					<!-- Success Result -->
 					{#if uploadResult}
 						<div class="bg-green-900/10 border border-green-800/20 rounded-lg p-4 text-sm">
 							<div class="flex items-center gap-2 text-green-400 font-medium mb-2">
 								<Icon name="circle-check" size={16} />
-								Upload Complete — Pipeline Processed
+								Upload received; processing queued
 							</div>
 							<div class="grid grid-cols-2 gap-2 text-xs text-sand/50">
 								<span>Evidence ID:</span><span class="text-sand/70 font-mono">{uploadResult.evidenceId}</span>
@@ -345,14 +236,7 @@
 									<span>SHA-256:</span><span class="text-sand/70 font-mono truncate">{uploadResult.hash.slice(0, 16)}...</span>
 								{/if}
 							</div>
-							<div class="mt-3 flex flex-wrap gap-2 text-[10px]">
-								<span class="px-2 py-0.5 bg-accent/10 text-accent rounded">Search ready</span>
-								<span class="px-2 py-0.5 bg-blue-900/20 text-blue-400 rounded">Vector stored</span>
-								<span class="px-2 py-0.5 bg-purple-900/20 text-purple-400 rounded">Fast search ready</span>
-								{#if enableYolo && selectedFile && isImageFile(selectedFile)}
-									<span class="px-2 py-0.5 bg-yellow-900/20 text-yellow-400 rounded">Visual review complete</span>
-								{/if}
-							</div>
+							<p class="mt-3 text-xs text-sand/50">This confirms receipt only. The progress panel tracks processing; it does not claim search indexing is complete.</p>
 						</div>
 					{/if}
 
@@ -382,10 +266,10 @@
 						{#if isUploading}
 							<span class="flex items-center gap-2">
 								<Icon name="loader" size={14} class="animate-spin" />
-								Processing...
+								Uploading...
 							</span>
 						{:else}
-							Upload and process
+							Upload evidence
 						{/if}
 					</button>
 				{/if}
@@ -664,4 +548,32 @@
 			flex-direction: column-reverse;
 		}
 	}
+	.upload-modal-card {
+		background: linear-gradient(155deg, #fffdf8 0%, #f5ead6 100%);
+		border: 1px solid #d8c39a;
+		box-shadow: 0 24px 64px rgba(36, 26, 20, 0.28), inset 0 1px 0 #fff;
+		color: #342621;
+	}
+	.upload-modal-card :global(.text-sand) { color: #342621; }
+	.upload-modal-card :global(.text-sand\/80) { color: #514138; }
+	.upload-modal-card :global(.text-sand\/70) { color: #66554a; }
+	.upload-modal-card :global(.text-sand\/50),
+	.upload-modal-card :global(.text-sand\/40) { color: #796b5d; }
+	.upload-modal-header, .upload-modal-footer { border-color: #e0d1b7; }
+	.upload-modal-close, .upload-modal-change, .upload-modal-secondary {
+		background: #fffaf0;
+		border-color: #ddcdb3;
+		color: #5e4b3e;
+	}
+	.upload-modal-zone {
+		border-color: #cbb789;
+		background: radial-gradient(circle at 92% 8%, rgba(190, 154, 86, 0.12), transparent 34%), linear-gradient(180deg, #fffdf8, #f6eddc);
+		box-shadow: 0 12px 28px rgba(77, 49, 32, 0.08), inset 0 1px 0 #fff;
+	}
+	.upload-modal-zone:hover, .upload-modal-zone.dragging { border-color: #8c3335; background: linear-gradient(180deg, #fffaf0, #f2e3c9); }
+	.upload-modal-select, .upload-modal-primary { background: linear-gradient(135deg, #812a30, #5b1f27); border-color: #6a2026; color: #fff8e9; }
+	.upload-modal-hint { color: #796b5d; }
+	.upload-modal-file-card { background: linear-gradient(180deg, #fffdf7, #f3ead7); border-color: #d6bd8d; box-shadow: inset 0 1px 0 #fff; }
+	.upload-modal-secondary:hover:not(:disabled), .upload-modal-change:hover { background: #f5ead6; border-color: #c9ae7b; color: #67272d; }
+	.upload-modal-close:hover { background: #f5ead6; border-color: #c9ae7b; color: #67272d; }
 </style>

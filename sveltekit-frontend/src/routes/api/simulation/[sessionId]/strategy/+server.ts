@@ -40,7 +40,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
 
 		return json({
 			recommendations: result.recommendations,
-			thinking: result.thinking,
+			evidenceBasis: result.evidenceBasis,
 			searchTimings: result.searchTimings,
 		});
 	} catch (err) {

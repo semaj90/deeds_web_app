@@ -129,6 +129,7 @@ export async function enqueueJob(params: {
  * Kept for backward compat — prefer enqueueJob() for new code.
  */
 export async function createAnalysisJob(params: {
+  id?: string;
   evidenceId: string;
   caseId?: string | null;
   jobType: JobType;
@@ -136,6 +137,7 @@ export async function createAnalysisJob(params: {
   const [row] = await db
     .insert(analysisJobs)
     .values({
+      ...(params.id ? { id: params.id } : {}),
       evidenceId: params.evidenceId,
       caseId: params.caseId ?? null,
       jobType: params.jobType,

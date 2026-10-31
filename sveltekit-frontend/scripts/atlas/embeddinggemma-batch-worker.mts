@@ -17,6 +17,7 @@ import { performance } from 'node:perf_hooks';
 import { Pool } from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 import { CANONICAL_SUMMARY_LEVELS, canonicalSummaryLevelPredicate } from './lib/summary-selection.mjs';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 type SummaryRow = {
   ctid: string;
@@ -384,6 +385,8 @@ async function writeReports(report: Record<string, unknown>) {
 }
 
 async function main() {
+  if (APPLY && !DRY_RUN) assertSummaryIdentityWriteAdmitted('embeddinggemma-batch-worker');
+
   const start = performance.now();
   console.log('EmbeddingGemma Batch Worker');
   console.log(`mode=${DRY_RUN ? 'dry-run' : 'apply'} limit=${LIMIT} batchSize=${BATCH_SIZE} concurrency=${CONCURRENCY}`);

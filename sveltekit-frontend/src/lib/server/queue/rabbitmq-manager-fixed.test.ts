@@ -11,6 +11,10 @@ vi.mock('$lib/server/env.server.js', () => ({
   },
 }));
 
+vi.mock('$lib/server/ai/local-llama-provider.js', () => ({
+  LLAMA_SERVER_BASE_URL: 'http://127.0.0.1:8081/v1',
+}));
+
 vi.mock('$lib/server/gpu/simdjson-bridge.js', () => ({
   fastJsonParse: vi.fn((text: string) => JSON.parse(text)),
 }));

@@ -34,6 +34,7 @@ import { extractKeywordsFromState } from './langgraph-bridge.js';
 import {
   createQueryExecutionPolicyV1,
   createReadOnlySideEffectReceiptBuilderV1,
+  QueryExecutionModeV1Schema,
   type QueryExecutionContextV1,
   type QueryExecutionModeV1,
 } from '$lib/server/execution/query-execution-policy-v1.js';
@@ -157,6 +158,7 @@ export class DispatcherMiddleware {
       operatorGated?: boolean;
     }
   ): (input: unknown) => Promise<unknown> {
+    QueryExecutionModeV1Schema.parse(executionMode);
     if (
       FORBIDDEN_MODEL_TOOLS.has(toolName) ||
       /^shell\./i.test(toolName) ||

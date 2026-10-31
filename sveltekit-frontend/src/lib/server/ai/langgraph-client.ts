@@ -19,6 +19,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { buildLangGraphAuthHeadersV1 } from '../config/langgraph-auth-v1.js';
 
 // ── Types: Identity & Canonical Facts ────────────────────────────────────────
 
@@ -137,7 +138,8 @@ export interface LangGraphDomainClassificationResponse {
 	topology?: TopologyProjectionV1;
 
 	// Retrieval signals (for reranking, NOT as truth)
-	semantic_similarity?: number; // 512-dim MRL candidate (reference only)
+	// REFERENCE_ONLY: 512-dim candidate lane
+	semantic_similarity?: number;
 	lexical_score?: number; // BM25 or BM42
 	structural_score?: number; // Fast-AST
 	kag_neighbors?: number;
@@ -295,7 +297,7 @@ export async function langGraphDomainClassify(
 	try {
 		const res = await fetch(`${ENV.LANGGRAPH_URL}/classify`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: buildLangGraphAuthHeadersV1(ENV.LANGGRAPH_INTERNAL_API_KEY),
 			body: JSON.stringify(req),
 			signal: AbortSignal.timeout(timeoutMs),
 		});
@@ -330,7 +332,7 @@ export async function langGraphSynthesize(
 	try {
 		const res = await fetch(`${ENV.LANGGRAPH_URL}/synthesize`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: buildLangGraphAuthHeadersV1(ENV.LANGGRAPH_INTERNAL_API_KEY),
 			body: JSON.stringify(req),
 			signal: AbortSignal.timeout(timeoutMs),
 		});
@@ -365,7 +367,7 @@ export async function langGraphSynthesizeStream(
 	try {
 		const res = await fetch(`${ENV.LANGGRAPH_URL}/synthesize/stream`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
+			headers: buildLangGraphAuthHeadersV1(ENV.LANGGRAPH_INTERNAL_API_KEY),
 			body: JSON.stringify(req),
 			signal: AbortSignal.timeout(timeoutMs),
 		});
@@ -419,6 +421,7 @@ export async function langGraphHMMStats(): Promise<LangGraphHMMStats | null> {
 	if (!ENV.LANGGRAPH_ENABLED) return null;
 	try {
 		const res = await fetch(`${ENV.LANGGRAPH_URL}/hmm/stats`, {
+			headers: buildLangGraphAuthHeadersV1(ENV.LANGGRAPH_INTERNAL_API_KEY),
 			signal: AbortSignal.timeout(5000),
 		});
 		if (!res.ok) return null;
@@ -434,6 +437,7 @@ export async function langGraphHMMAdapt(): Promise<boolean> {
 	try {
 		const res = await fetch(`${ENV.LANGGRAPH_URL}/hmm/adapt`, {
 			method: 'POST',
+			headers: buildLangGraphAuthHeadersV1(ENV.LANGGRAPH_INTERNAL_API_KEY),
 			signal: AbortSignal.timeout(5000),
 		});
 		return res.ok;
@@ -447,6 +451,7 @@ export async function langGraphCacheStats(): Promise<Record<string, unknown> | n
 	if (!ENV.LANGGRAPH_ENABLED) return null;
 	try {
 		const res = await fetch(`${ENV.LANGGRAPH_URL}/cache/stats`, {
+			headers: buildLangGraphAuthHeadersV1(ENV.LANGGRAPH_INTERNAL_API_KEY),
 			signal: AbortSignal.timeout(5000),
 		});
 		if (!res.ok) return null;

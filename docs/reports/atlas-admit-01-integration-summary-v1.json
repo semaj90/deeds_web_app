@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.admit-01-integration-summary.v1",
+  "generatedAt": "2026-10-31T00:15:00.000Z",
+  "task": "Parent Atlas ADMIT-01: Native/Arrow/Valkey Proposal Admission and Supervisor Integration",
+  "systemHeadroom": {
+    "totalRamKb": 33433204,
+    "freePhysicalRamKb": 3606556,
+    "status": "RESOURCE_GATE_HEEDED",
+    "heavyInferenceSkipped": true
+  },
+  "implementationDiff": {
+    "envelopeContract": "sveltekit-frontend/src/lib/server/atlas/envelope/atlas-tile-envelope-v1.ts (292-byte binary header, length-delimited, 6 SHA-256 digests, HMAC-SHA256 authentication tag, expiration, replay protection)",
+    "envelopeTests": "sveltekit-frontend/src/lib/server/atlas/envelope/atlas-tile-envelope-v1.spec.ts (6/6 tests passed)",
+    "supervisorHandler": "sveltekit-frontend/src/lib/server/atlas/supervisor/proposal-supervisor-v1.ts (ProposalSupervisorV1, SHADOW-state admission, replay protection, Valkey fallback, PostgreSQL staging, canonical=false)",
+    "supervisorTests": "sveltekit-frontend/src/lib/server/atlas/supervisor/proposal-supervisor-v1.spec.ts (8/8 tests passed)",
+    "nativeNapiAddon": "packages/atlas-native-core/src/atlas_native_addon.cc (assembled 128B LOD block, TurboVec packing, pgvector unpacking)",
+    "nativeNapiSmoke": "packages/atlas-native-core/tests/native_addon_smoke.cjs (node_api_smoke=PASS under WSL2)"
+  },
+  "proofMatrix": [
+    {
+      "gate": "ENVELOPE_BINARY_LAYOUT",
+      "requirement": "Explicit lengths, format/version, 6 SHA-256 digests, HMAC authentication tag",
+      "testResult": "PASSED (292B header verified, 6/6 tests)",
+      "authority": "PROPOSAL_ONLY"
+    },
+    {
+      "gate": "STALE_REVISION_REFUSAL",
+      "requirement": "Fail-closed refusal if workspace or model revision is stale",
+      "testResult": "PASSED (REJECTED_STALE_WORKSPACE_REVISION, REJECTED_STALE_MODEL_REVISION)",
+      "authority": "PROPOSAL_ONLY"
+    },
+    {
+      "gate": "REPLAY_PROTECTION",
+      "requirement": "Reject replayed proposal runIds",
+      "testResult": "PASSED (Replay detected on second invocation with identical runId)",
+      "authority": "PROPOSAL_ONLY"
+    },
+    {
+      "gate": "VALKEY_DISPOSABLE_FALLBACK",
+      "requirement": "Valkey cache failure must not fail admission into PostgreSQL",
+      "testResult": "PASSED (ECONNREFUSED caught, valkeyCached=false, DB staging succeeded)",
+      "authority": "PROPOSAL_ONLY"
+    },
+    {
+      "gate": "CANCELLATION_DEADLINE",
+      "requirement": "Honor cancellation tokens before DB writes",
+      "testResult": "PASSED (REJECTED_CANCELLED with 0 DB writes)",
+      "authority": "PROPOSAL_ONLY"
+    },
+    {
+      "gate": "UNAUTHORIZED_PROMOTION_SHIELD",
+      "requirement": "Strictly prevent direct canonical Qdrant writes from supervisor",
+      "testResult": "PASSED (canonicalWriteAttempted: false, canonical: false)",
+      "authority": "PROPOSAL_ONLY"
+    },
+    {
+      "gate": "NATIVE_NAPI_ABI",
+      "requirement": "Node.js C++ addon execution, GC survival, LOD texture assembly",
+      "testResult": "PASSED (node_api_smoke=PASS in WSL2)",
+      "authority": "PROPOSAL_ONLY"
+    },
+    {
+      "gate": "BOUNDED_SCHEDULER_REG04",
+      "requirement": "Priority queue, capacity limits, backpressure, cancellation, deadlines",
+      "testResult": "PASSED (5/5 smoke assertions passed)",
+      "authority": "PROPOSAL_ONLY"
+    }
+  ],
+  "schemaContracts": {
+    "envelope": "AtlasTileEnvelopeV1 (ATLS magic, 292B header, length-delimited payload)",
+    "database": "atlas_learned_artifact_admission_v1 (admission_state='SHADOW', canonical=false)",
+    "tensorArtifact": "atlas_tensor_artifacts (schema_version='atlas.tensor-artifact.v1', canonical=false)",
+    "cache": "valkeyTileKey('atlas:tensor:tile:{workspaceRevision}:{runId}')"
+  },
+  "remainingBlockers": [
+    "Operator tournament decision needed before promoting SHADOW artifacts to CHALLENGER/PROMOTED in atlas_learned_artifact_admission_v1",
+    "G7 root repository scope constraint in 20261020_atlas_packet_identity_registry_v1_DRAFT.sql requires operator approval before registering submodule scopes",
+    "5,852 source files in tournament revision c63620c4... require workspace source binding backfill before full corpus census passes"
+  ],
+  "safeNextCommand": "cd sveltekit-frontend && npx vitest run src/lib/server/atlas/envelope/atlas-tile-envelope-v1.spec.ts src/lib/server/atlas/supervisor/proposal-supervisor-v1.spec.ts"
+}

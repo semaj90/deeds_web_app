@@ -9,7 +9,9 @@ import { isUndefinedTableError, resolvePacketIdentityRegistryV1 } from './packet
 const KEY = computePacketKeyV2({ repositoryScope: 'repo:root', sourceRef: 'src/a.ts', packetKind: 'SOURCE_FILE' });
 
 describe('registry DDL not applied', () => {
-	beforeEach(() => execute.mockReset());
+	beforeEach(() => {
+		execute.mockReset();
+	});
 
 	it('recognises only missing registry-v1 relations, directly or nested in cause', () => {
 		expect(isUndefinedTableError({ code: '42P01', message: 'relation "atlas_packet_identity_registry_v1" does not exist' })).toBe(true);
@@ -21,17 +23,23 @@ describe('registry DDL not applied', () => {
 	});
 
 	it('returns REGISTRY_DDL_NOT_APPLIED instead of crashing when the registry table is missing', async () => {
-		execute.mockRejectedValue(Object.assign(new Error('relation "atlas_packet_identity_registry_v1" does not exist'), { code: '42P01' }));
+		execute.mockImplementation(() => {
+			throw Object.assign(new Error('relation "atlas_packet_identity_registry_v1" does not exist'), { code: '42P01' });
+		});
 		await expect(resolvePacketIdentityRegistryV1(KEY)).rejects.toMatchObject({ code: 'REGISTRY_DDL_NOT_APPLIED', name: 'PacketIdentityRegistryErrorV1' });
 	});
 
 	it('also maps a driver error that nests the SQLSTATE in cause', async () => {
-		execute.mockRejectedValue(Object.assign(new Error('query failed'), { cause: { code: '42P01', message: 'relation "atlas_packet_identity_aliases_v1" does not exist' } }));
+		execute.mockImplementation(() => {
+			throw Object.assign(new Error('query failed'), { cause: { code: '42P01', message: 'relation "atlas_packet_identity_aliases_v1" does not exist' } });
+		});
 		await expect(resolvePacketIdentityRegistryV1(KEY)).rejects.toMatchObject({ code: 'REGISTRY_DDL_NOT_APPLIED' });
 	});
 
 	it('does not hide unrelated database errors', async () => {
-		execute.mockRejectedValue(Object.assign(new Error('connection lost'), { code: '08006' }));
+		execute.mockImplementation(() => {
+			throw Object.assign(new Error('connection lost'), { code: '08006' });
+		});
 		await expect(resolvePacketIdentityRegistryV1(KEY)).rejects.toThrow('connection lost');
 	});
 });

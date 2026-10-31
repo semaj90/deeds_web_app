@@ -105,6 +105,36 @@ describe('CurrentSourceAuthorityV1 — L1 contract', () => {
     expect(r.proof.exactMembershipProven).toBe(false);
   });
 
+  it('proves a selected cohort without treating explicitly excluded snapshot files as membership failures', () => {
+    const selected = source('repo:root', 'src/a.ts', 'A');
+    const excluded = source('repo:root', '.archive/old.md', 'archived');
+    const base = input([selected]);
+    const fullSnapshotSources = [selected.snap, excluded.snap];
+    const fullSnapshotChecksum = membershipSetChecksumV1(fullSnapshotSources.map((entry) => entry.sourceIdentityKey));
+    const result = classifyCurrentSourcesV1({
+      ...base,
+      snapshot: { ...base.snapshot, sources: fullSnapshotSources, membershipChecksum: fullSnapshotChecksum },
+      selectionSources: [selected.snap],
+      preflight: { ...base.preflight!, snapshotSourceCount: fullSnapshotSources.length, snapshotMembershipChecksum: fullSnapshotChecksum },
+    });
+
+    expect(result.status).toBe('CURRENT_SOURCE_AUTHORITY_PROVEN');
+    expect(result.sourceCount).toBe(1);
+    expect(result.proof.exactMembershipProven).toBe(true);
+    expect(result.proof.selectedCohortBoundToSnapshot).toBe(true);
+    expect(result.snapshotMembershipSetChecksum).toBe(fullSnapshotChecksum);
+  });
+
+  it('rejects a selected source whose revision differs from the full snapshot', () => {
+    const selected = source('repo:root', 'src/a.ts', 'A');
+    const fullSnapshot = input([selected]);
+    const changedSelection = { ...selected.snap, sourceRevision: `sha256:${'f'.repeat(64)}` };
+    const result = classifyCurrentSourcesV1({ ...fullSnapshot, selectionSources: [changedSelection] });
+
+    expect(result.proof.selectedCohortBoundToSnapshot).toBe(false);
+    expect(result.proof.workspaceAuthorityProven).toBe(false);
+  });
+
   it('a membership row for a different workspaceRevision is a REVISION_MISMATCH', () => {
     const p = source('repo:root', 'a.ts', 'A');
     p.mem.workspaceRevision = `sha256:${'d'.repeat(64)}`;

@@ -91,6 +91,17 @@ export class YOLOService {
 			if (yoloData.error) {
 				throw new Error(yoloData.error);
 			}
+			if (yoloData.skipped) {
+				console.info(`[YOLO] Skipped inference: ${yoloData.skipped}`);
+				return {
+					text: '',
+					layout: { regions: [] },
+					objects: [],
+					processingTime: Date.now() - startTime,
+					method: 'yolo',
+					modelType: isCoco ? 'coco' : 'doclayout',
+				};
+			}
 
 			const processingTime = Date.now() - startTime;
 			const isCoco = modelPath.includes('yolov8n');
@@ -114,7 +125,34 @@ export class YOLOService {
 	private async runYOLOInference(imagePath: string, outputPath: string, modelPath: string): Promise<any> {
 		// Python script that handles both YOLOv8 COCO (84 x 8400) and doc-layout models
 		const pythonScript = `
-import sys, json, cv2, numpy as np, onnxruntime as ort
+import sys, json
+
+has_cv2 = False
+try:
+    import cv2
+    has_cv2 = True
+except ImportError:
+    pass
+
+has_pil = False
+try:
+    from PIL import Image
+    has_pil = True
+except ImportError:
+    pass
+
+try:
+    import numpy as np
+    import onnxruntime as ort
+except ImportError as e:
+    json.dump({'regions': [], 'objects': [], 'skipped': f'Missing dependency: {e}'}, open(sys.argv[3], 'w'))
+    print(json.dumps({'success': True, 'skipped': str(e)}))
+    sys.exit(0)
+
+if not has_cv2 and not has_pil:
+    json.dump({'regions': [], 'objects': [], 'skipped': 'Neither cv2 nor PIL installed'}, open(sys.argv[3], 'w'))
+    print(json.dumps({'success': True, 'skipped': 'Neither cv2 nor PIL installed'}))
+    sys.exit(0)
 
 COCO_NAMES = [
     'person','bicycle','car','motorcycle','airplane','bus','train','truck','boat',
@@ -166,15 +204,21 @@ def run(image_path, model_path, output_path, conf_thresh, iou_thresh):
     inp = session.get_inputs()[0]
     out_shape = session.get_outputs()[0].shape  # e.g. [1, 84, 8400] for YOLOv8
 
-    img = cv2.imread(image_path)
-    if img is None:
-        raise ValueError(f'Could not read: {image_path}')
-    oh, ow = img.shape[:2]
-
-    # Preprocess
-    resized = cv2.resize(img, (640, 640))
-    blob = resized.astype(np.float32) / 255.0
-    blob = np.transpose(blob, (2, 0, 1))[np.newaxis]
+    if has_cv2:
+        img = cv2.imread(image_path)
+        if img is None:
+            raise ValueError(f'Could not read: {image_path}')
+        oh, ow = img.shape[:2]
+        resized = cv2.resize(img, (640, 640))
+        blob = resized.astype(np.float32) / 255.0
+        blob = np.transpose(blob, (2, 0, 1))[np.newaxis]
+    else:
+        with Image.open(image_path) as im:
+            im = im.convert('RGB')
+            ow, oh = im.size
+            im_resized = im.resize((640, 640))
+            arr = np.array(im_resized, dtype=np.float32) / 255.0
+            blob = np.transpose(arr, (2, 0, 1))[np.newaxis]
 
     outputs = session.run(None, {inp.name: blob})
     pred = outputs[0]  # shape varies by model
@@ -297,11 +341,29 @@ if __name__ == '__main__':
 		return '';
 	}
 
+	private static runtimeAvailable: boolean | null = null;
+
+	static async isRuntimeAvailable(): Promise<boolean> {
+		if (YOLOService.runtimeAvailable !== null) return YOLOService.runtimeAvailable;
+		return new Promise((resolve) => {
+			const proc = spawn('python', ['-c', 'import onnxruntime, numpy']);
+			proc.on('close', (code) => {
+				YOLOService.runtimeAvailable = code === 0;
+				resolve(YOLOService.runtimeAvailable);
+			});
+			proc.on('error', () => {
+				YOLOService.runtimeAvailable = false;
+				resolve(false);
+			});
+		});
+	}
+
 	async isModelAvailable(): Promise<boolean> {
 		try {
 			const modelPath = await this.getModelPath();
 			await fs.access(modelPath);
-			return true;
+			const hasRuntime = await YOLOService.isRuntimeAvailable();
+			return hasRuntime;
 		} catch {
 			return false;
 		}

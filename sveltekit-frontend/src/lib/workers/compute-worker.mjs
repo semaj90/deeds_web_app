@@ -41,6 +41,23 @@ function getNativeBridge() {
 	return nativeBridge;
 }
 
+let atlasNativeCore = null;
+let atlasNativeCoreLoadAttempted = false;
+function getAtlasNativeCore() {
+	if (atlasNativeCoreLoadAttempted) return atlasNativeCore;
+	atlasNativeCoreLoadAttempted = true;
+	const addonPath = process.env.ATLAS_NATIVE_CORE_NODE_PATH
+		?? resolve(__dirname, '../../../../packages/atlas-native-core/build/atlas_native_core.node');
+	if (!existsSync(addonPath)) return null;
+	try {
+		const addon = require(addonPath);
+		if (typeof addon.scoreHamming128Batch === 'function') atlasNativeCore = addon;
+	} catch {
+		atlasNativeCore = null;
+	}
+	return atlasNativeCore;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // MATH PRIMITIVES
 // ═══════════════════════════════════════════════════════════════
@@ -557,6 +574,54 @@ function runHash({ text }) {
 	return { hash };
 }
 
+function runHamming128Proposal({ query, packedCandidates, candidateOrdinals }) {
+	if (!(query instanceof Uint8Array) || query.byteLength !== 16
+		|| !(packedCandidates instanceof Uint8Array)
+		|| !(candidateOrdinals instanceof Uint32Array)
+		|| packedCandidates.byteLength !== candidateOrdinals.length * 16
+		|| candidateOrdinals.length > 4096) {
+		throw new Error('HAMMING128_PROPOSAL_SHAPE_INVALID');
+	}
+	let distances;
+	let backend;
+	const addon = getAtlasNativeCore();
+	if (addon) {
+		const result = addon.scoreHamming128Batch(query, packedCandidates);
+		if (result?.schema !== 'atlas.hamming128.batch-result.v1'
+			|| result?.authority !== 'PROPOSAL_ONLY'
+			|| result?.candidateCount !== candidateOrdinals.length
+			|| !(result?.distances instanceof Uint16Array)
+			|| result.distances.length !== candidateOrdinals.length) {
+			throw new Error('HAMMING128_NATIVE_RESULT_INVALID');
+		}
+		distances = result.distances;
+		backend = result.backend.startsWith('avx2') ? 'AVX2'
+			: result.backend.startsWith('avx512') ? 'AVX512' : 'SCALAR';
+	} else {
+		distances = new Uint16Array(candidateOrdinals.length);
+		for (let candidateIndex = 0; candidateIndex < candidateOrdinals.length; candidateIndex += 1) {
+			let distance = 0;
+			const offset = candidateIndex * 16;
+			for (let byteIndex = 0; byteIndex < 16; byteIndex += 1) {
+				let value = query[byteIndex] ^ packedCandidates[offset + byteIndex];
+				while (value !== 0) {
+					distance += 1;
+					value &= value - 1;
+				}
+			}
+			distances[candidateIndex] = distance;
+		}
+		backend = 'SCALAR';
+	}
+	return {
+		schema: 'atlas.hamming128.worker-result.v1',
+		authority: 'PROPOSAL_ONLY',
+		backend,
+		candidateOrdinals,
+		distances,
+	};
+}
+
 /**
  * Extract lightweight metadata envelope from source text.
  * Regex-based (no AST) — runs ~1ms for a 1000-line file.
@@ -837,6 +902,7 @@ const HANDLERS = {
 	'manifold.interpolate4d': runManifoldInterpolate4D,
 	'graph.json_to_csr':      runJsonToCSR,
 	'schema.encode':          runSchemaEncode,
+	'hamming128.proposal':    runHamming128Proposal,
 };
 
 parentPort?.on('message', (msg) => {

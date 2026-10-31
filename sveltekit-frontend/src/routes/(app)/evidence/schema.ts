@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Max file size: 50MB (matches BODY_SIZE_LIMIT)
-const MAX_FILE_SIZE = 50 * 1024 * 1024;
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB (aligned with /api/evidence/upload)
 const ALLOWED_MIME_TYPES = [
 	'application/pdf',
 	'image/jpeg', 'image/png', 'image/gif', 'image/webp',

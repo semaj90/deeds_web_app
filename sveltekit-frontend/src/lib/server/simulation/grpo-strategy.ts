@@ -1,7 +1,7 @@
 /**
  * GRPO Strategy Engine — 4-Step Reasoning Chain
  *
- * Group Relative Policy Optimization "thinking" for courtroom simulation.
+ * Group Relative Policy Optimization strategy synthesis for courtroom simulation.
  * Runs RAG + KAG + Semantic searches against case data, then synthesizes
  * exactly 4 strategic recommendations via LLM with who/what/why/how taxonomy.
  *
@@ -23,7 +23,7 @@ export type { StrategyRecommendation, StrategyResult };
 
 // Zod schema for structured LLM output
 const strategyOutputSchema = z.object({
-	thinking: z.string().describe('Chain-of-thought reasoning about the case'),
+	evidenceBasis: z.string().min(1).max(500).describe('Concise, user-facing summary of which evidence sources informed the recommendations; no private reasoning'),
 	recommendations: z.array(z.object({
 		role: z.string().describe('Wizard persona name'),
 		who: z.string().describe('Target party this strategy involves'),
@@ -259,7 +259,7 @@ ${semanticBlock}
 
 --- END EVIDENCE ---
 
-Generate your chain-of-thought analysis in "thinking", then produce exactly 4 ranked strategy recommendations.`;
+Return a concise, evidence-grounded "evidenceBasis" summary (no private chain-of-thought), then exactly 4 ranked strategy recommendations.`;
 
 	return { system, user };
 }
@@ -343,7 +343,7 @@ export async function generateStrategyRecommendations(
 
 		return {
 			recommendations,
-			thinking: parsed.thinking,
+			evidenceBasis: parsed.evidenceBasis,
 			searchTimings: {
 				rag_ms: rag.timing_ms,
 				kag_ms: kag.timing_ms,
@@ -357,7 +357,7 @@ export async function generateStrategyRecommendations(
 		const synthesis_ms = Math.round(performance.now() - synthStart);
 		return {
 			recommendations: buildFallbackRecommendations(session, rag, kag, semantic, ragCanonRefs, sourceSets),
-			thinking: `LLM synthesis unavailable. Fallback recommendations generated from ${rag.chunks.length} RAG chunks, ${kag.neighbors.length} KAG neighbors, ${semantic.cases.length} similar cases.`,
+			evidenceBasis: `Available sources: ${rag.chunks.length} legal references, ${kag.neighbors.length} graph links, ${semantic.cases.length} similar cases.`,
 			searchTimings: {
 				rag_ms: rag.timing_ms,
 				kag_ms: kag.timing_ms,

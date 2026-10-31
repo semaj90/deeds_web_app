@@ -26,6 +26,7 @@ import { routePolicy } from '../atlas/policy/policy-router.js';
 import { appendSearchRuntimeTrainingRow, hasNonPlaceholderPolicyTrainingRevisions } from '../atlas/policy/policy-training.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from '../vector/embedding-dimension-guard.js';
 import { normalizeRetrievalLane } from './retrieval-lane-aliases.js';
+import { extractTopKPaginated } from './topk-paginator.js';
 const EMBEDDING_HEALTH_CACHE_MS = 60_000;
 
 let embeddingHealthCache:
@@ -776,8 +777,24 @@ export class SearchRuntime {
       stageTiming.fuse = Date.now() - fuseStart;
 
       if (!embeddingHealthy) {
+        const fallbackCandidates = (function* () {
+          for (const candidate of fused) {
+            yield {
+              id: candidate.packetKey,
+              score: candidate.score,
+              candidateOrdinal: (candidate as { candidateOrdinal?: number }).candidateOrdinal,
+              data: candidate,
+            };
+          }
+        })();
+        const topCandidatesPage = extractTopKPaginated(
+          fallbackCandidates,
+          { k: query.topK }
+        );
         const hydrated = await this.hydrateCandidatesWithProof(
-          fused.slice(0, query.topK).map((candidate) => ({
+          topCandidatesPage.items.map((item) => {
+            const candidate = item.data;
+            return {
             id: candidate.packetKey,
             packetKey: candidate.packetKey,
             symbolVersionId: candidate.symbolVersionId,
@@ -797,7 +814,8 @@ export class SearchRuntime {
             treeNodeId: candidate.treeNodeId,
             pageRankScore: candidate.pageRankScore,
             stableSymbolId: candidate.stableSymbolId,
-          })) as any,
+            };
+          }) as any,
           proofContext,
         );
         const topPackets = hydrated.envelopes;
@@ -911,15 +929,27 @@ export class SearchRuntime {
       });
       stageTiming.score = Date.now() - scoreStart;
 
-      // Sort by blendedScore before hydration so we hydrate the best candidates first
-      const scoredSorted = [...scored].sort(
-        (a, b) => b.blendedScore - a.blendedScore || a.packetKey.localeCompare(b.packetKey)
+      // Extract top-K by blendedScore before hydration via bounded min-heap
+      const scoredCandidates = (function* () {
+        for (const candidate of scored) {
+          yield {
+            id: candidate.packetKey,
+            score: candidate.blendedScore,
+            candidateOrdinal: (candidate as { candidateOrdinal?: number }).candidateOrdinal,
+            data: candidate,
+          };
+        }
+      })();
+      const topCandidatesPage = extractTopKPaginated(
+        scoredCandidates,
+        { k: query.topK }
       );
 
       // Stage 3: Hydrate candidates into feature envelopes (top-K by blended score)
       const hydrateStart = Date.now();
       const hydrated = await this.hydrateCandidatesWithProof(
-        scoredSorted.slice(0, query.topK).map((sc) => {
+        topCandidatesPage.items.map((item) => {
+          const sc = item.data;
           const scoreCandidate = sc as any;
           return {
             id: sc.packetId ?? sc.packetKey,
@@ -952,13 +982,13 @@ export class SearchRuntime {
 
       // DIAGNOSTIC: hydration boundary — envelope count + typed reject reasons
       console.info('[stage:hydrate] output', {
-        inputCount: Math.min(scoredSorted.length, query.topK),
+        inputCount: Math.min(topCandidatesPage.totalCandidates, query.topK),
         envelopeCount: envelopes.length,
         proof: hydrated.proof,
-        sampleCandidates: scoredSorted.slice(0, 3).map((sc) => ({
-          packetKey: sc.packetKey,
-          sourceRef: sc.sourceRef,
-          scoreSource: sc.scoreSource,
+        sampleCandidates: topCandidatesPage.items.slice(0, 3).map((item) => ({
+          packetKey: item.data.packetKey,
+          sourceRef: item.data.sourceRef,
+          scoreSource: item.data.scoreSource,
         })),
       });
 

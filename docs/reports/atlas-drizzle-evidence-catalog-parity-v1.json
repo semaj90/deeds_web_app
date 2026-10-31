@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.drizzle-evidence-catalog-parity.v1",
+  "generatedAt": "2026-10-30T23:55:00.000Z",
+  "authority": "PostgreSQL 18.4 (127.0.0.1:5434/legal_ai_db)",
+  "drizzlePackageVersions": {
+    "drizzle-orm": "0.45.2",
+    "drizzle-kit": "0.31.10",
+    "postgres": "3.4.7",
+    "pg": "8.13.1",
+    "zod": "4.4.3",
+    "sveltekit-superforms": "^2.0.0"
+  },
+  "liveCatalogParity": {
+    "table": "public.evidence_vectors",
+    "rowCount": 3,
+    "columns": {
+      "id": { "liveType": "uuid", "drizzleType": "uuid", "match": true, "primaryKey": true },
+      "evidence_id": { "liveType": "uuid", "drizzleType": "uuid", "match": true, "nullable": false },
+      "chunk_index": { "liveType": "integer", "drizzleType": "integer", "match": true, "nullable": false },
+      "content": { "liveType": "text", "drizzleType": "text", "match": true, "nullable": false },
+      "embedding": { "liveType": "vector(768)", "drizzleType": "vector({ dimensions: 768 })", "match": true, "nullable": false },
+      "analysis_type": { "liveType": "text", "drizzleType": "text", "match": true, "nullable": true },
+      "metadata": { "liveType": "jsonb", "drizzleType": "jsonb", "match": true, "nullable": false },
+      "source_revision": { "liveType": "text", "drizzleType": "text", "match": true, "nullable": false },
+      "embedding_type": { "liveType": "character varying(50)", "drizzleType": "varchar({ length: 50 })", "match": true, "nullable": false },
+      "source_field": { "liveType": "character varying(100)", "drizzleType": "varchar({ length: 100 })", "match": true, "nullable": false },
+      "model": { "liveType": "character varying(100)", "drizzleType": "varchar({ length: 100 })", "match": true, "nullable": false },
+      "created_at": { "liveType": "timestamp without time zone", "drizzleType": "timestamp", "match": true, "nullable": false },
+      "updated_at": { "liveType": "timestamp without time zone", "drizzleType": "MISSING_IN_DRIZZLE", "match": false, "nullable": false, "default": "now()" }
+    },
+    "constraints": [
+      { "name": "evidence_vectors_pkey", "definition": "PRIMARY KEY (id)", "status": "VERIFIED" },
+      { "name": "evidence_vectors_chunk_index_nonnegative_ck", "definition": "CHECK ((chunk_index >= 0))", "status": "VERIFIED" },
+      { "name": "evidence_vectors_source_revision_sha256_ck", "definition": "CHECK ((source_revision ~ '^sha256:[0-9a-f]{64}$'::text))", "status": "VERIFIED" },
+      { "name": "evidence_vectors_embedding_type_ck", "definition": "CHECK (((embedding_type)::text = 'evidence_text_semantic_768'::text))", "status": "VERIFIED" },
+      { "name": "evidence_vectors_source_field_ck", "definition": "CHECK (((source_field)::text = 'canonical_evidence_text'::text))", "status": "VERIFIED" }
+    ],
+    "indexes": [
+      { "name": "evidence_vectors_pkey", "type": "btree (id)", "status": "VERIFIED" },
+      { "name": "evidence_vectors_hnsw_idx", "type": "hnsw (embedding vector_cosine_ops) WITH (m='16', ef_construction='64')", "status": "VERIFIED" },
+      { "name": "evidence_vectors_source_chunk_uq", "type": "btree (evidence_id, source_revision, chunk_index) WHERE source_revision IS NOT NULL AND chunk_index IS NOT NULL", "status": "VERIFIED" }
+    ]
+  },
+  "drizzleKitCheckVersusLive": {
+    "drizzleKitStatus": "drizzle.config.ts configures tablesFilter; manual sidecars in drizzle/manual are tracked in drizzle/sidecar-migrations.json",
+    "sidecarRegistration": "manual/20261029_evidence_vectors_semantic_768.sql registered and applied",
+    "schemaPostgresDrift": "schema-postgres.ts evidenceVectors table is missing updatedAt column which is present with DEFAULT now() in PostgreSQL 18 catalog. Recommendation: add updatedAt: timestamp('updated_at').defaultNow().notNull() to schema-postgres.ts."
+  },
+  "databaseAdapterReturnShape": {
+    "driver": "node-postgres (pg.Pool) via drizzle-orm/node-postgres",
+    "dbExecuteResultShape": "{ command: string, rowCount: number, rows: any[], fields: any[] }",
+    "pgRowsHelper": "pgRows() unwraps result.rows or direct array safely; empirical test confirmed Array.isArray(res.rows) === true",
+    "result": "VERIFIED_ACCORDANT"
+  }
+}

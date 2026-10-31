@@ -296,4 +296,23 @@ describe('test-receipt-ingest-v1 (RECEIPT-OWNER-01 & Verification Boundary)', ()
     expect(outcome.isTrainable).toBe(false);
     expect(outcome.rejectionReason).toBe('COMMAND_MISMATCH');
   });
+
+  it('rejects timed-out runs without creating trainable receipts', () => {
+    const outcome = verifyAndParseVitestExecution({
+      toolEventId: 'event-timeout-111',
+      command: 'npx vitest run patch-tournament.spec.ts --reporter=json',
+      exitCode: 1,
+      timedOut: true,
+      rawStdout: passStdout,
+      stdoutHash: passStdoutHash,
+      workspaceRevision: 'ws-rev-canonical-101',
+      isSimulated: false,
+    }, 'ws-rev-canonical-101');
+
+    expect(outcome.qualified).toBe(false);
+    expect(outcome.verificationStatus).toBe('VERIFIED_FAIL');
+    expect(outcome.isTrainable).toBe(false);
+    expect(outcome.rejectionReason).toBe('TIMED_OUT_PROCESS');
+    expect(outcome.receipts).toEqual([]);
+  });
 });

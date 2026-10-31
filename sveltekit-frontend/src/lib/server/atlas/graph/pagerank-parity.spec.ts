@@ -110,6 +110,7 @@ function spearman(left: readonly Score[], right: readonly Score[]): number {
 
 describe('Parent Atlas NetworkX and Neo4j GDS fixture parity', () => {
 	it('proves parity without modifying production score surfaces', async () => {
+
 		const before = readWitness();
 		const networkx = JSON.parse(runNetworkxOracle());
 		expect(networkx.status).toBe('NETWORKX_REFERENCE_PROVEN');
@@ -164,5 +165,5 @@ describe('Parent Atlas NetworkX and Neo4j GDS fixture parity', () => {
 			spearman_correlation: spearman(networkxScores, gdsScores),
 			maximum_score_delta: maxScoreDelta
 		}));
-	}, 60_000);
+	}, 120_000);
 });

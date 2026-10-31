@@ -28,11 +28,16 @@ export interface ExtractedDocument {
   writesPerformed?: false;
 }
 
-const SEARXNG_URL = ENV.SEARXNG_URL || 'http://127.0.0.1:8888';
+const SEARXNG_URL = ENV.SEARXNG_URL?.replace(/\/+$/, '');
 const FIRECRAWL_API_KEY = ENV.FIRECRAWL_API_KEY;
 const WEB_SEARCH_TIMEOUT = 10000;
 
 export async function searchViaSearXNG(query: string, limit: number = 10): Promise<WebSearchResult[]> {
+  if (!SEARXNG_URL) {
+    console.warn('SearXNG search skipped: SEARXNG_URL is not configured');
+    return [];
+  }
+
   try {
     const params = new URLSearchParams({
       q: query,

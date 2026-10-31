@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Bits from 'bits-ui';
+	
 	import { onMount } from 'svelte';
 	import type {
 		AtlasNode,
@@ -103,6 +104,8 @@
 		docsVersion?: string;
 		cacheStats?: AdminCacheStats | null;
 		workflowStatus?: TaskPacketWorkflowStatus | null;
+		svelteEslintRunReceipt?: import('$lib/server/admin/svelte-eslint-run-receipt-v1.mjs').SvelteEslintRunReceiptV1 | null;
+		svelteEslintRunHistory?: import('$lib/server/admin/svelte-eslint-run-receipt-v1.mjs').SvelteEslintRunReceiptV1[];
 		rotorquantModelPath?: string;
 		hforfModelPath?: string;
 		embeddingOnnxPath?: string;
@@ -122,6 +125,23 @@
 	];
 
 	let { data }: { data: AtlasPageData } = $props();
+	function getKarpathyMetric(value: unknown, key: 'pr' | 'attn'): number | undefined {
+		if (typeof value !== 'object' || value === null) return undefined;
+		const metric = (value as Record<string, unknown>)[key];
+		return typeof metric === 'number' ? metric : undefined;
+	}
+	function exportSvelteEslintReceipt(receipt = data.svelteEslintRunReceipt) {
+		if (!receipt) return;
+		const objectUrl = URL.createObjectURL(new Blob([JSON.stringify(receipt, null, 2)], { type: 'application/json' }));
+		const link = document.createElement('a');
+		link.href = objectUrl;
+		link.download = `svelte-eslint-${receipt.runId}.json`;
+		link.hidden = true;
+		document.body.append(link);
+		link.click();
+		link.remove();
+		window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+	}
 
 	// ── Health & Collections ──────────────────────────────────────────────────
 	let health = $state<AtlasHealthStatus | null>(null);
@@ -844,6 +864,36 @@
 
 		<!-- ── Left Sidebar: Query + Results ─────────────────────────────────── -->
 		<aside class="w-80 flex flex-col border-r border-[#3f3e37] bg-[#23221c] overflow-y-auto shrink-0">
+			{#if data.svelteEslintRunReceipt}
+				<section class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/70 space-y-2" aria-labelledby="svelte-eslint-receipt-title">
+					<div class="flex items-center justify-between gap-2">
+						<p id="svelte-eslint-receipt-title" class="text-[0.68rem] text-[#a39f90] font-bold uppercase tracking-wider">// Svelte ESLint receipt</p>
+						<span class={data.svelteEslintRunReceipt.status === 'PASS' ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>{data.svelteEslintRunReceipt.status}</span>
+					</div>
+					<p class="text-xs text-[#d1cdb8]">{data.svelteEslintRunReceipt.summary.filesChecked} files · {data.svelteEslintRunReceipt.summary.errorCount} errors · {data.svelteEslintRunReceipt.summary.warningCount} warnings</p>
+					<p class="text-[0.6rem] text-[#777365]">Captured {new Date(data.svelteEslintRunReceipt.capturedAt).toLocaleString()} · diagnostic snapshot, not task completion.</p>
+					<p class="break-all text-[0.58rem] text-[#777365]">Manifest {data.svelteEslintRunReceipt.sourceManifestSha256}</p>
+					{#each data.svelteEslintRunReceipt.findings.slice(0, 3) as finding, index (`${finding.filePath}:${finding.line}:${finding.column}:${finding.ruleId}:${index}`)}
+						<div class="border border-[#3f3e37] p-2 text-[0.62rem]">
+							<p class="break-all text-[#d1cdb8]">{finding.filePath}{finding.line ? `:${finding.line}:${finding.column ?? 1}` : ''}</p>
+							<p class="mt-1 text-[#a39f90]">{finding.ruleId ?? finding.severity}: {finding.message}</p>
+						</div>
+					{/each}
+					<button type="button" onclick={() => exportSvelteEslintReceipt()} class="w-full border border-[#5c594c] bg-[#2c2b23] px-2 py-1.5 text-[0.65rem] font-bold text-[#d1cdb8] hover:border-[#d1cdb8]">EXPORT JSON RECEIPT</button>
+					<p class="text-[0.58rem] text-[#777365]">Rerun <code>npm run lint:svelte</code> from the frontend to refresh. Git HEAD alone does not prove a clean worktree.</p>
+					{#if (data.svelteEslintRunHistory?.length ?? 0) > 1}
+						<div class="space-y-1 border-t border-[#3f3e37] pt-2">
+							<p class="text-[0.6rem] font-bold uppercase tracking-wider text-[#a39f90]">Recent run history</p>
+							{#each data.svelteEslintRunHistory.slice(1, 6) as run (run.runId)}
+								<div class="flex items-center justify-between gap-2 text-[0.58rem]">
+									<span class="min-w-0 truncate text-[#a39f90]">{run.status} · {run.summary.errorCount} errors · {new Date(run.capturedAt).toLocaleString()}</span>
+									<button type="button" onclick={() => exportSvelteEslintReceipt(run)} class="shrink-0 text-[#d1cdb8] underline">JSON</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</section>
+			{/if}
 
 			<!-- Runtime Lane Snapshot -->
 			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/55 space-y-3">
@@ -1505,11 +1555,11 @@
 									<div class="text-[#efede4] font-bold">Karpathy Model Metrics:</div>
 									<div class="flex items-center justify-between text-[0.65rem]">
 										<span class="text-[#a39f90]">RAW_PAGE_RANK:</span>
-										<span class="text-[#efede4]">{(inspectorData.karpathy as any).pr?.toFixed(4)}</span>
+										<span class="text-[#efede4]">{getKarpathyMetric(inspectorData.karpathy, 'pr')?.toFixed(4) ?? '—'}</span>
 									</div>
 									<div class="flex items-center justify-between text-[0.65rem]">
 										<span class="text-[#a39f90]">ATTN_ENTROPY:</span>
-										<span class="text-[#efede4]">{(inspectorData.karpathy as any).attn?.toFixed(4)}</span>
+										<span class="text-[#efede4]">{getKarpathyMetric(inspectorData.karpathy, 'attn')?.toFixed(4) ?? '—'}</span>
 									</div>
 								</div>
 							{/if}
@@ -1535,7 +1585,7 @@
 						</button>
 					{/each}
 				</div>
-				<a href="/admin/atlas/task-sources" class="border border-[#5c594c] px-2 py-1 text-[0.62rem] font-bold uppercase tracking-wider text-[#a39f90] hover:border-[#8b9dbb] hover:text-[#efede4]">Task source index</a>
+				<a href='/admin/atlas/task-sources' class="border border-[#5c594c] px-2 py-1 text-[0.62rem] font-bold uppercase tracking-wider text-[#a39f90] hover:border-[#8b9dbb] hover:text-[#efede4]">Task source index</a>
 				{#if activeTab === 'graph' && nodes.length > 0}
 					<div class="flex items-center gap-3 text-xs">
 						<span class="text-[#a39f90] font-bold">{nodes.length} NODES · {edges.length} EDGES</span>
@@ -2091,7 +2141,7 @@
 					<div class="space-y-1">
 						<div class="text-[#a39f90] text-[0.6rem] font-bold">CLUSTER TAGS</div>
 						<div class="flex gap-1.5 flex-wrap items-center">
-							{#each searchTags as tag}
+							{#each searchTags as tag, index (`${tag}:${index}`)}
 								<span class="inline-flex items-center gap-1 px-2 py-0.5 text-[0.6rem] border border-[#8b9dbb] text-[#8b9dbb] font-bold">
 									{tag}
 									<button onclick={() => { searchTags = searchTags.filter(t => t !== tag); }} class="hover:text-[#c25953]">×</button>
@@ -2117,7 +2167,7 @@
 					<!-- Results -->
 					{#if searchResults.length > 0}
 						<div class="space-y-2">
-							{#each searchResults as hit}
+							{#each searchResults as hit (hit.id)}
 								<div class="border border-[#3f3e37] bg-[#1c1b18] p-3 space-y-1.5">
 									<div class="flex items-center justify-between gap-2">
 										<span class="text-[#8b9dbb] text-xs font-bold truncate">{hit.filePath || hit.id}</span>
@@ -2132,7 +2182,7 @@
 										{#if hit.somCluster != null}
 											<span class="px-1.5 py-0.5 text-[0.55rem] border border-[#6b7f8b] text-[#6b7f8b]">SOM:{hit.somCluster}</span>
 										{/if}
-										{#each (hit.tags as string[]).slice(0, 5) as tag}
+										{#each (hit.tags as string[]).slice(0, 5) as tag, index (`${hit.id}:${tag}:${index}`)}
 											<span class="px-1.5 py-0.5 text-[0.55rem] border border-[#3f3e37] text-[#a39f90]">{tag}</span>
 										{/each}
 									</div>

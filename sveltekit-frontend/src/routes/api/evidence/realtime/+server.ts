@@ -100,16 +100,27 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 						if (row.status !== lastStatus || row.progress !== lastProgress) {
 							lastStatus = row.status ?? '';
 							lastProgress = row.progress ?? '';
+							const percent = Math.max(0, Math.min(100, Number.parseInt(row.progress ?? '0', 10) || 0));
+							const step = row.status === 'completed' || percent >= 100 ? 'complete'
+								: row.status === 'failed' ? 'error'
+								: percent < 20 ? 'uploading'
+								: percent < 30 ? 'hashing'
+								: percent < 50 ? 'storing'
+								: percent < 65 ? 'db-insert'
+								: percent < 70 ? 'extracting'
+								: percent < 87 ? 'embedding'
+								: percent < 92 ? 'vector-storage'
+								: percent < 93 ? 'graph'
+								: percent < 95 ? 'entity-extraction'
+								: 'summarizing';
 
 							safeEnqueue(`data: ${JSON.stringify({
 								type: 'progress',
 								jobId,
-								step: row.status === 'completed' ? 'complete'
-									: row.status === 'failed' ? 'error'
-									: row.status === 'running' ? 'embedding'
-									: 'uploading',
-								progress: parseInt(row.progress ?? '0', 10),
-								message: row.error ?? `Job ${row.status} (${row.progress ?? 0}%)`,
+				evidenceId: row.evidenceId,
+								step,
+								progress: percent,
+								message: row.error ?? `Document ${step.replaceAll('-', ' ')} (${percent}%)`,
 								error: row.error ?? undefined,
 							})}\n\n`);
 
@@ -117,6 +128,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 								safeEnqueue(`data: ${JSON.stringify({
 									type: row.status === 'completed' ? 'complete' : 'error',
 									jobId,
+					evidenceId: row.evidenceId,
 									result: row.result,
 									error: row.error ?? undefined,
 								})}\n\n`);

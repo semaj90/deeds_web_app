@@ -42,6 +42,16 @@ test(`local preview at ${size.width}x${size.height}: scene ready, action bar ins
 	await expect(canvas).toHaveAttribute('data-scene-ready', 'true', { timeout: 120_000 });
 	await expect(canvas, 'registered models load or procedural fallback settles').toHaveAttribute('data-models-loaded', 'true', { timeout: 120_000 });
 
+	const tutorial = page.getByTestId('courtroom-demo-tutorial');
+	await expect(tutorial).toContainText('NO CASE CREATED');
+	await tutorial.getByRole('button', { name: 'Continue' }).click();
+	await tutorial.getByRole('button', { name: 'Add fictional ledger photo' }).click();
+	await tutorial.getByRole('button', { name: 'Continue' }).click();
+	await expect(tutorial).toContainText('Story fixture · ledger-photo · local-only');
+	await tutorial.getByRole('button', { name: 'Continue' }).click();
+	await expect(tutorial).toContainText('Current scene:');
+	await tutorial.getByRole('button', { name: 'Close tutorial' }).click();
+
 	const bar = page.getByRole('toolbar', { name: 'Courtroom actions' });
 	await expect(bar).toBeVisible({ timeout: 120_000 });
 	const box = await bar.boundingBox();

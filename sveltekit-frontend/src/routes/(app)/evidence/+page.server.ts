@@ -4,11 +4,13 @@ import { uploadSeaweedFile as uploadFile, getSeaweedClient as getMinioClient } f
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
-import { and, eq, desc } from 'drizzle-orm';
+import { and, eq, or, desc } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import type { Actions, PageServerLoad } from './$types';
 import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
+import { EvidenceProcessPayloadV1Schema } from '$lib/server/evidence/evidence-process-payload-v1.js';
+import { createJob, updateJob } from '$lib/server/evidence-progress.js';
 import {
   evidenceUploadSchema,
   evidenceDeleteSchema,
@@ -42,9 +44,13 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   let evidenceData;
   let loadError: string | null = null;
 
-  // Filter by uploadedBy (integer FK to users.id), not userId (orphan uuid).
-  // See CLAUDE.md "Schema Mismatch" — evidence.user_id is a pre-Lucia legacy column.
-  const conditions = [eq(evidence.uploadedBy, Number(locals.user.id))];
+  // Match either uploadedBy or userId to prevent orphan/legacy user ID mismatches
+  const conditions = [
+    or(
+      eq(evidence.uploadedBy, Number(locals.user.id)),
+      eq(evidence.userId, Number(locals.user.id))
+    )
+  ];
   if (caseId) conditions.push(eq(evidence.caseId, caseId));
 
   evidenceData = await safe(
@@ -104,11 +110,15 @@ export const actions: Actions = {
 
     try {
       const { title, description, caseId } = form.data;
+      const jobId = randomUUID();
+      createJob(jobId, String(locals.user.id));
+      updateJob(jobId, { step: 'uploading', progress: 15, message: `Uploading ${file.name}...` });
 
       // 1. Upload to SeaweedFS
       const fileExt = file.name.split('.').pop() ?? 'bin';
       const objectName = `evidence/${locals.user.id}/${randomUUID()}.${fileExt}`;
       const buffer = Buffer.from(await file.arrayBuffer());
+      const sourceRevision = `sha256:${createHash('sha256').update(buffer).digest('hex')}`;
 
       await uploadFile('legal-evidence', objectName, buffer, {
         'Content-Type': file.type,
@@ -133,19 +143,35 @@ export const actions: Actions = {
         })
         .returning();
 
-      // 3. Enqueue full RAG pipeline (entity extraction → embedding → Qdrant evidence_items)
+      // 3. Queue extraction and canonical PostgreSQL vector indexing; Qdrant is outbox-projected.
       // Fire-and-forget: indexing failure must never block the upload response
-      const indexText = [title || file.name, description].filter(Boolean).join('\n\n');
-      dispatchOrExecuteInline('evidence.process', {
-          evidenceId: newEvidence?.[0]?.id ?? randomUUID(),
-          text: indexText,
+      const evidenceId = newEvidence[0]?.id;
+      if (!evidenceId) throw new Error('EVIDENCE_ROW_ID_MISSING_AFTER_INSERT');
+      const indexText = [title || file.name, description].filter(Boolean).join('\n\n') || file.name;
+      const evidenceJob = EvidenceProcessPayloadV1Schema.parse({
+        evidenceId,
+        text: indexText,
+        fileName: file.name,
+        caseId: caseId ?? undefined,
+        contentType: 'document',
+        sourceRevision,
+        metadata: {
+          userId: locals.user.id,
           fileName: file.name,
-          caseId: caseId ?? undefined,
-          metadata: { userId: locals.user.id, fileName: file.name, fileType: file.type },
-        })
-        .catch((err) =>
-          console.error('[evidence/upload] Evidence dispatch failed (non-fatal):', err)
-        );
+          fileType: file.type,
+          source_revision: sourceRevision,
+          sourceSha256: sourceRevision,
+          object_bucket: 'legal-evidence',
+          object_name: objectName,
+          objectKey: objectName,
+          jobId,
+        },
+      });
+      void dispatchOrExecuteInline('evidence.process', evidenceJob).then((result) => {
+        if (result.error || result.mode === 'skipped') {
+          console.error('[evidence/upload] Evidence indexing dispatch failed:', result.error ?? result.mode);
+        }
+      }).catch((err) => console.error('[evidence/upload] Evidence dispatch failed:', err));
 
       // 4. Generate signed SeaweedFS preview URL (24-hour expiry)
       let previewUrl = '';
@@ -156,9 +182,11 @@ export const actions: Actions = {
         console.warn('[evidence/upload] Failed to generate preview URL (non-fatal):', err);
       }
 
+      updateJob(jobId, { step: 'extracting', progress: 35, message: 'Processing evidence metadata and extraction...' });
       return {
         success: true,
         evidence: newEvidence?.[0] ?? null,
+        jobId,
         previewUrl,
       };
     } catch (err) {
@@ -183,7 +211,15 @@ export const actions: Actions = {
       // Only delete if owned by user
       await db
         .delete(evidence)
-        .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))));
+        .where(
+          and(
+            eq(evidence.id, evidenceId),
+            or(
+              eq(evidence.uploadedBy, Number(locals.user.id)),
+              eq(evidence.userId, Number(locals.user.id))
+            )
+          )
+        );
 
       return { success: true };
     } catch (err) {
@@ -212,7 +248,15 @@ export const actions: Actions = {
           description,
           updatedAt: new Date(),
         })
-        .where(and(eq(evidence.id, evidenceId), eq(evidence.userId, Number(locals.user.id))))
+        .where(
+          and(
+            eq(evidence.id, evidenceId),
+            or(
+              eq(evidence.uploadedBy, Number(locals.user.id)),
+              eq(evidence.userId, Number(locals.user.id))
+            )
+          )
+        )
         .returning();
 
       return {

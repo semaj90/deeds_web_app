@@ -18,5 +18,15 @@ describe('Qdrant administrative-record filter contract', () => {
       must_not: [{ key: ATLAS_SYSTEM_RECORD_KEY, match: { value: true } }],
     });
   });
+
+  it('preserves pre-formed must array filters and appends system record exclusion', () => {
+    const rawFilter = {
+      must: [{ key: 'jurisdiction', match: { value: 'california' } }],
+    };
+    expect(buildAtlasQdrantFilter(rawFilter)).toEqual({
+      must: [{ key: 'jurisdiction', match: { value: 'california' } }],
+      must_not: [{ key: ATLAS_SYSTEM_RECORD_KEY, match: { value: true } }],
+    });
+  });
 });
 

@@ -204,7 +204,7 @@
 			{:else}
 				<div class="upload-state empty">
 					<div class="upload-icon-wrap">
-						<Icon name="cloud-upload" class="w-6 h-6" />
+						<Icon name="yorha-evidence" class="w-6 h-6" />
 					</div>
 					<div>
 						<p class="upload-cta">
@@ -497,4 +497,43 @@
 	@keyframes spin {
 		to { transform: rotate(360deg); }
 	}
+	.upload-section { color: #342621; }
+	.processing-indicator {
+		background: linear-gradient(135deg, #f8efdd, #fffaf0);
+		border-color: #ddc99f;
+		box-shadow: 0 5px 16px rgba(84, 48, 34, 0.06);
+	}
+	.spinner { border-color: #e1d2b7; border-top-color: #7b252b; }
+	.stage-label { color: #35251f; }
+	.stage-hint { color: #77675a; }
+	.upload-zone {
+		border-color: #cbb789;
+		background:
+			radial-gradient(circle at 92% 8%, rgba(190, 154, 86, 0.12), transparent 34%),
+			linear-gradient(180deg, #fffdf8, #f6eddc);
+		backdrop-filter: blur(18px) saturate(1.1);
+		box-shadow: 0 12px 28px rgba(77, 49, 32, 0.08), inset 0 1px 0 #fff;
+	}
+	.upload-zone::before { border-color: rgba(154, 119, 57, 0.12); }
+	.upload-zone:focus-visible { outline-color: #9a6a2a; }
+	.upload-zone.dragging {
+		border-color: #8c3335;
+		background: linear-gradient(180deg, #fffaf0, #f2e3c9);
+		box-shadow: 0 14px 30px rgba(77, 49, 32, 0.12);
+	}
+	.upload-zone.has-file { border-color: #9d793a; background: linear-gradient(180deg, #fffdf7, #f3ead7); }
+	.upload-spinner { border-color: #e1d2b7; border-top-color: #7b252b; }
+	.upload-text, .upload-cta { color: #493930; }
+	.upload-icon-wrap { background: #f4e8d0; border-color: #dbc59a; color: #7a3433; box-shadow: none; }
+	.upload-browse { background: #7b252b; border-color: #6a2026; color: #fff8e9; }
+	.upload-browse:hover { background: #642027; border-color: #642027; }
+	.upload-hint { color: #796b5d; }
+	.file-icon { background: #f2e7d3; box-shadow: none; }
+	.file-name { color: #342621; }
+	.file-size { color: #796b5d; }
+	.upload-submit { background: linear-gradient(135deg, #812a30, #5b1f27); border-color: #6a2026; color: #fff8e9; box-shadow: 0 8px 16px rgba(92, 31, 37, 0.16); }
+	.upload-submit:hover { box-shadow: 0 10px 20px rgba(92, 31, 37, 0.22); }
+	.upload-cancel { background: #fffaf0; border-color: #ddcdb3; color: #5e4b3e; }
+	.upload-cancel:hover { background: #f5ead6; border-color: #c9ae7b; color: #67272d; }
+	.upload-error { background: #fbefeb; border-color: #e5c4b9; color: #8a302b; }
 </style>

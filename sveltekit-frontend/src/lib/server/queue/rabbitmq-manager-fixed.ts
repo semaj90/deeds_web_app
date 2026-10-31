@@ -540,16 +540,28 @@ export class RabbitMQManager extends EventEmitter {
         },
         async () => {
           console.log('📐 Embedding document:', data.documentId ?? 'unknown');
-          const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
-          const embedding = await generateSingleEmbedding(data.text.slice(0, 2048));
-          // Publish vector for indexing
-          if (embedding?.length && data.documentId) {
-            await this.publish(this.exchanges.vector_updates, 'vector.index.document', {
-              documentId: data.documentId,
-              embedding,
-              collection: data.collection ?? 'legal_documents',
+          if (data.collection === 'evidence_items') {
+            const { processEvidenceDocumentCanonicalV1 } = await import(
+              '../evidence/process-evidence-document-v1.js'
+            );
+            await processEvidenceDocumentCanonicalV1({
+              evidenceId: data.documentId,
+              text: data.text,
+              fileName: data.fileName ?? data.metadata?.fileName,
+              contentType: data.contentType ?? data.metadata?.fileType,
               metadata: data.metadata ?? {},
             });
+          } else {
+            const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
+            const embedding = await generateSingleEmbedding(data.text.slice(0, 2048));
+            if (embedding?.length && data.documentId) {
+              await this.publish(this.exchanges.vector_updates, 'vector.index.document', {
+                documentId: data.documentId,
+                embedding,
+                collection: data.collection ?? 'legal_documents',
+                metadata: data.metadata ?? {},
+              });
+            }
           }
         }
       );
@@ -612,12 +624,20 @@ export class RabbitMQManager extends EventEmitter {
       }
 
       // Publish for embedding if text is available
-      if (text.length > 0) {
+      if (text.length > 0 && data.skipEmbedding !== true) {
         await this.publish(this.exchanges.document_processing, 'document.embed', {
           documentId: data.evidenceId,
           text,
           collection: 'evidence_items',
-          metadata: { entities: entities.length, forensicFlags: forensics.length },
+          fileName: data.fileName,
+          contentType: data.contentType,
+          metadata: {
+            ...(data.metadata ?? {}),
+            caseId: data.caseId ?? data.metadata?.caseId,
+            source_revision: data.sourceRevision ?? data.metadata?.source_revision,
+            entities: entities.length,
+            forensicFlags: forensics.length,
+          },
         });
       }
 
@@ -660,6 +680,10 @@ export class RabbitMQManager extends EventEmitter {
         return;
       }
       const collection = data.collection ?? 'documents';
+
+      if (collection === 'evidence_items') {
+        throw new Error('EVIDENCE_QDRANT_DIRECT_INDEX_FORBIDDEN: use evidence_vectors and its projection outbox');
+      }
 
       await traceQueue(
         'consume',

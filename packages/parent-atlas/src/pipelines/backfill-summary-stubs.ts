@@ -14,6 +14,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
 
+throw new Error('SUMMARY_IDENTITY_UNRESOLVED: package summary stub writer is blocked pending an approved row identity contract');
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 

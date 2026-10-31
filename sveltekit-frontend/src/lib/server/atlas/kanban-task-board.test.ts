@@ -135,7 +135,8 @@ describe('kanban-task-board', () => {
         updated_at: '2026-08-13T00:02:00.000Z',
       },
     ]);
-    const completed = await completeKanbanTask({ taskId: 'task-b', workerId: 'worker-1' });
+    dbState.executeResults.push([{ task_id: 'task-b' }]);
+    const completed = await completeKanbanTask({ taskId: 'task-b', workerId: 'worker-1', runId: 'run:worker-1', executionReceiptId: 'receipt-b' });
     expect(completed.status).toBe('completed');
 
     dbState.updateResults.push([
@@ -208,7 +209,7 @@ describe('kanban-task-board', () => {
         updated_at: '2026-08-13T00:40:00.000Z',
       },
     ]);
-    dbState.executeResults.push([
+    dbState.executeResults.push([{ task_id: 'task-event' }], [
       {
         task_id: 'task-event',
         run_id: 'run-1',
@@ -220,7 +221,7 @@ describe('kanban-task-board', () => {
         task_id: 'task-event',
         run_id: 'run-1',
         event_type: 'completed',
-        payload: { workerId: 'worker-1' },
+        payload: { workerId: 'worker-1', executionReceiptId: 'receipt-event', proof: 'independent_verified_pass' },
         created_at: '2026-08-13T00:30:01.000Z',
       },
       {
@@ -233,13 +234,19 @@ describe('kanban-task-board', () => {
     ]);
 
     await claimKanbanTask({ taskId: 'task-event', workerId: 'worker-1', runId: 'run-1', claimToken: 'claim-1' });
-    await completeKanbanTask({ taskId: 'task-event', workerId: 'worker-1', runId: 'run-1' });
+    await completeKanbanTask({ taskId: 'task-event', workerId: 'worker-1', runId: 'run-1', executionReceiptId: 'receipt-event' });
     await retryKanbanTask({ taskId: 'task-event', reason: 'manual' });
 
     const events = await listKanbanTaskEvents({ taskId: 'task-event', limit: 10 });
     expect(events.map((event) => event.eventType)).toEqual(['claimed', 'completed', 'retried']);
     expect(events[0]?.runId).toBe('run-1');
-    expect(events[1]?.payload).toMatchObject({ workerId: 'worker-1' });
+    expect(events[1]?.payload).toMatchObject({ workerId: 'worker-1', executionReceiptId: 'receipt-event', proof: 'independent_verified_pass' });
+  });
+
+  it('refuses completion without an independently verified current-run receipt', async () => {
+    await expect(completeKanbanTask({ taskId: 'task-unproven', runId: 'run-1', executionReceiptId: 'receipt-missing' }))
+      .rejects.toThrow('KANBAN_COMPLETION_PROOF_REQUIRED');
+    expect(dbState.db.update).not.toHaveBeenCalled();
   });
 
   it('lists comments and attempts for a task', async () => {

@@ -19,6 +19,7 @@
 
 import { Pool } from 'pg';
 import { createHash } from 'crypto';
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
@@ -286,6 +287,8 @@ async function generateChrom97FromEnvelopes(pool: Pool, packets: PacketRow[], dr
 }
 
 async function main() {
+  if (APPLY && !DRY_RUN) assertSummaryIdentityWriteAdmitted('bulk-envelope-materialization');
+
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  Bulk Feature Envelope Materialization (58K packets)           ║');
   console.log('╚════════════════════════════════════════════════════════════════╝\n');

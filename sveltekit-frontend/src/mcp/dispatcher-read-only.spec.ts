@@ -53,6 +53,11 @@ describe('DispatcherMiddleware strict READ_ONLY', () => {
 });
 
 describe('DispatcherMiddleware operator gate fails closed', () => {
+	it('rejects an unrecognized execution mode before wrapping a tool', () => {
+		const middleware = new DispatcherMiddleware({ connect: vi.fn() } as any, { recordObservation: vi.fn() } as any, null, false);
+		expect(() => middleware.wrap(vi.fn() as any, 'db.schema_overview', 'session-invalid-mode', 'READ_ONLY ' as any)).toThrow();
+	});
+
 	it('refuses an ops.* tool when no operator token registry is provisioned', async () => {
 		const handler = vi.fn(async () => ({ content: [{ type: 'text', text: 'should not run' }] }));
 		const middleware = new DispatcherMiddleware({ connect: vi.fn() } as any, { recordObservation: vi.fn() } as any, null, false);

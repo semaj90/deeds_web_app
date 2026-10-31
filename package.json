@@ -6,6 +6,7 @@
     "env:discover": "node scripts/env/audit-env-files.mjs --discover",
     "env:audit": "node scripts/env/audit-env-files.mjs",
     "env:audit:services": "node scripts/env/audit-env-files.mjs DATABASE_URL POSTGRES_URL REDIS_URL VALKEY_URL QDRANT_URL NEO4J_URI TRACE_MCP_URL",
+    "services:health": "node scripts/atlas/validate-dev-services.mjs --json --no-report --no-mcp-protocol-probe",
     "audit:drizzle": "node scripts/atlas/audit-postgres-contract-mirrors.mjs",
     "audit:contracts": "node scripts/atlas/audit-contract-map.mjs --json",
     "atlas:feature-lineage:verifier:test": "node --test scripts/atlas/verify-feature-lineage.exit-code.test.mjs",

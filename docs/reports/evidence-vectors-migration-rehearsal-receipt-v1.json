@@ -1,0 +1,27 @@
+{
+  "schema": "atlas.evidence-vectors-migration-rehearsal.v1",
+  "timestamp": "2026-10-31T02:42:33.667Z",
+  "scratchDatabase": "evidence_rehearsal_scratch_1793414553571",
+  "checks": {
+    "pgvector_extension": "ENABLED",
+    "legacy_table_created": "vector(384)",
+    "empty_table_guard": "PASSED_REFUSED_NON_EMPTY",
+    "migration_execution": "SUCCESS",
+    "schema_introspection": {
+      "embedding": "vector(768)",
+      "chunk_index": "integer",
+      "source_revision": "text",
+      "constraints_checked": true
+    },
+    "valid_insert": "SUCCESS",
+    "duplicate_rejection": "PASSED_23505_CAUGHT",
+    "wrong_dimension_rejection": "PASSED_DIM_MISMATCH_CAUGHT",
+    "invalid_revision_check": "PASSED_CHECK_CONSTRAINT_CAUGHT",
+    "invalid_embedding_type_check": "PASSED_CHECK_CONSTRAINT_CAUGHT",
+    "rollback_verification": {
+      "status": "REFUSED_384_ROLLBACK_PRESERVES_MRL",
+      "permanent_embedding_type": "vector(768)"
+    }
+  },
+  "status": "ALL_REHEARSAL_CHECKS_PASSED"
+}

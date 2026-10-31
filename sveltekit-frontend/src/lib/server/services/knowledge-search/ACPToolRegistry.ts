@@ -1951,21 +1951,23 @@ export const TOOLS: Record<string, ACPTool> = {
   },
   'atlas.kanban.complete': {
     name: 'atlas.kanban.complete',
-    description: 'Mark a kanban task completed and move it to done.',
+    description: 'Complete a kanban task only with an independently verified passing execution receipt for the current run.',
     category: 'database',
     inputSchema: {
       type: 'object',
       properties: {
         taskId: { type: 'string' },
+        runId: { type: 'string' },
+        executionReceiptId: { type: 'string' },
         workerId: { type: 'string' },
       },
-      required: ['taskId'],
+      required: ['taskId', 'runId', 'executionReceiptId'],
       additionalProperties: false,
     },
     outputSchema: { type: 'object' },
     examples: [
       {
-        input: { taskId: 'atlas-task-123', workerId: 'worker-1' },
+        input: { taskId: 'atlas-task-123', runId: 'run-123', executionReceiptId: 'receipt-123', workerId: 'worker-1' },
         output: { task: { taskId: 'atlas-task-123' } },
         description: 'Complete a task',
       },

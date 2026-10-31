@@ -3,6 +3,7 @@ import { redirect } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { documentGovernanceSummaryV1Schema } from '$lib/types/document-governance-summary-v1.js';
+import { loadRecentSvelteEslintRunReceiptsV1 } from '$lib/server/admin/svelte-eslint-run-receipt-v1.mjs';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!locals.user) throw redirect(303, '/login?redirect=/admin/atlas');
@@ -75,6 +76,9 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		: Promise.resolve(null);
 
 	const workflowStatus = await workflowStatusPromise;
+	const svelteEslintRunHistory = locals.user.role === 'admin'
+		? await loadRecentSvelteEslintRunReceiptsV1(10)
+		: [];
 
 	return {
 		health,
@@ -90,6 +94,8 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		docsProduct,
 		docsVersion,
 		workflowStatus: workflowStatus?.status ?? null,
+		svelteEslintRunReceipt: svelteEslintRunHistory[0] ?? null,
+		svelteEslintRunHistory,
 		rotorquantModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
 		hforfModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
 		llmModelId: LLM_MODEL_ID,

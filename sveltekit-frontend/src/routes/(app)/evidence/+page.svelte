@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 	import { applyAction, enhance } from '$app/forms';
 	import { invalidateAll, pushState } from '$app/navigation';
 	import { page } from '$app/state';
@@ -25,23 +26,56 @@
 	import EvidenceCRUDModal from '$lib/components/modals/EvidenceCRUDModal.svelte';
 	import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
 	import EvidenceUploadModal from '$lib/components/evidence/EvidenceUploadModal.svelte';
+	import EvidenceUploadProgress from '$lib/components/evidence/EvidenceUploadProgress.svelte';
 	import ActionPopup from '$lib/components/ActionPopup.svelte';
-	import UploadProgress from '$lib/components/UploadProgress.svelte';
-	import UploadProgressCard from '$lib/components/evidence/UploadProgressCard.svelte';
+	import { clearActiveEvidenceUpload, getActiveEvidenceUpload, saveActiveEvidenceUpload, type ActiveEvidenceUploadV1 } from '$lib/components/evidence/upload-progress-storage';
 	import Dialog from '$lib/components/ui/Dialog.svelte';
 	import { analytics } from '$lib/stores/analytics.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
+	$effect(() => {
+		if (form?.success && form?.evidence && form?.jobId) {
+			handleUploadAccepted(
+				form.evidence.id,
+				form.jobId,
+				form.evidence.fileName,
+				form.evidence.fileSize,
+				Date.now()
+			);
+		}
+	});
+
 	// Upload state
 	let selectedFile = $state<File | null>(null);
 	let isUploading = $state(false);
 	let uploadError = $state<string | null>(null);
-	let uploadCard = $state<UploadProgressCard | undefined>(undefined);
-	let uploadProgressPercent = $state(0);
-	let uploadProgressStatus = $state('');
-	let uploadProgressDocId = $state('');
+	let activeEvidenceUpload = $state<ActiveEvidenceUploadV1 | null>(null);
 	let actionPopupFile = $state<{ name: string } | null>(null);
+	const uploadStorageUserId = String(data.user?.id ?? 'anonymous');
+
+	onMount(() => {
+		void getActiveEvidenceUpload(uploadStorageUserId).then((upload) => {
+			if (upload) activeEvidenceUpload = upload;
+		}).catch((error) => console.warn('[Evidence] Could not restore upload progress:', error));
+	});
+
+	function handleUploadAccepted(evidenceId: string, jobId: string, fileName: string, fileSize: number, startedAt: number) {
+		const upload = { evidenceId, jobId, fileName, fileSize, startedAt };
+		activeEvidenceUpload = upload;
+		void saveActiveEvidenceUpload(uploadStorageUserId, upload).catch((error) => {
+			console.warn('[Evidence] Could not save upload resume pointer:', error);
+		});
+		showUploadPipeline = false;
+		void invalidateAll();
+	}
+
+	function handleUploadComplete() {
+		const jobId = activeEvidenceUpload?.jobId;
+		activeEvidenceUpload = null;
+		if (jobId) void clearActiveEvidenceUpload(uploadStorageUserId, jobId).catch(() => {});
+		void invalidateAll();
+	}
 
 	// Search + filter state
 	let searchQuery = $state('');
@@ -355,28 +389,20 @@
 		userId={data.user?.id ?? ''}
 	/>
 
-	<!-- Upload Progress -->
-	{#if uploadProgressStatus && uploadProgressStatus !== 'complete'}
+	{#if activeEvidenceUpload}
 		<div class="progress-bar">
-			<UploadProgress
-				uploadProgress={uploadProgressPercent}
-				uploadStatus={uploadProgressStatus}
-				currentDocId={uploadProgressDocId}
+			<EvidenceUploadProgress
+				jobId={activeEvidenceUpload.jobId}
+				filename={activeEvidenceUpload.fileName}
+				fileSize={activeEvidenceUpload.fileSize}
+				userId={uploadStorageUserId}
+				startedAt={activeEvidenceUpload.startedAt}
+				onComplete={handleUploadComplete}
+				onError={(error) => console.warn('[Evidence] Processing failed:', error)}
 			/>
 		</div>
 	{/if}
 
-	{#if selectedFile}
-		<div class="progress-bar">
-			<UploadProgressCard
-				bind:this={uploadCard}
-				filename={selectedFile.name}
-				fileSize={selectedFile.size}
-				onCancel={() => { selectedFile = null; uploadCard?.failUpload('Cancelled by user'); }}
-				onRetry={() => { uploadCard?.startUpload(); }}
-			/>
-		</div>
-	{/if}
 </div>
 
 <!-- Dialogs & Drawers -->
@@ -432,7 +458,7 @@
 		caseId={activeCaseId || data.evidence?.[0]?.caseId || ''}
 		isOpen={showUploadPipeline}
 		onClose={() => (showUploadPipeline = false)}
-		onSuccess={(evidenceId, jobId) => { showUploadPipeline = false; invalidateAll(); }}
+		onSuccess={handleUploadAccepted}
 	/>
 
 	<Dialog bind:open={showDeleteConfirm} title="Delete Evidence" description="This action cannot be undone.">
@@ -463,16 +489,18 @@
 <style>
 	.evidence-page {
 		min-height: 100vh;
-		background: #0a0b0e;
+		background:
+			radial-gradient(circle at 92% 8%, rgba(190, 154, 86, 0.09), transparent 26rem),
+			linear-gradient(145deg, #fbf5e9 0%, #f4ead7 52%, #efe3ce 100%);
+		color: #342621;
 		display: flex;
 		flex-direction: column;
 		margin: -2.5rem;
 	}
 	.evidence-page :global(h1), .evidence-page :global(h2), .evidence-page :global(h3), .evidence-page :global(h4), .evidence-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
-	.evidence-page :global(a) { color: inherit; border-bottom: none; }
-	.evidence-page :global(button) { text-transform: none; letter-spacing: normal; background: none; border: none; box-shadow: none; padding: 0; color: inherit; }
-	.evidence-page :global(input), .evidence-page :global(select) { background: transparent; border: none; box-shadow: none; color: inherit; }
-	.evidence-page :global(.panel), .evidence-page :global(.card), .evidence-page :global([class*="panel"]) { background: transparent; border: none; box-shadow: none; color: inherit; padding: 0; }
+	.evidence-page :global(a) { color: inherit; }
+	.evidence-page :global(button) { text-transform: none; letter-spacing: normal; }
+	.evidence-page :global(input), .evidence-page :global(select) { color: inherit; }
 	.evidence-content {
 		flex: 1;
 		padding: 0.5rem 0;
@@ -484,28 +512,28 @@
 	.cancel-btn {
 		padding: 0.5rem 1rem;
 		border-radius: 8px;
-		background: rgba(255, 255, 255, 0.06);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		color: rgba(212, 199, 163, 0.7);
+		background: #fffaf0;
+		border: 1px solid #ddcdb3;
+		color: #5e4b3e;
 		font-size: 0.8rem;
 		cursor: pointer;
 		transition: all 0.15s;
 	}
 	.cancel-btn:hover {
-		background: rgba(255, 255, 255, 0.1);
+		background: #f5ead6;
 	}
 	.delete-btn {
 		padding: 0.5rem 1rem;
 		border-radius: 8px;
-		background: rgba(239, 68, 68, 0.15);
-		border: 1px solid rgba(239, 68, 68, 0.25);
-		color: #f87171;
+		background: #812a30;
+		border: 1px solid #6a2026;
+		color: #fff8e9;
 		font-size: 0.8rem;
 		font-weight: 500;
 		cursor: pointer;
 		transition: all 0.15s;
 	}
 	.delete-btn:hover {
-		background: rgba(239, 68, 68, 0.25);
+		background: #642027;
 	}
 </style>

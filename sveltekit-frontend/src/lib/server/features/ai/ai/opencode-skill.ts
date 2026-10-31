@@ -4,6 +4,7 @@ import { engramCards } from '$lib/server/db/schema.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ENV } from '../../../env.server.js';
+import { buildLangGraphAuthHeadersV1 } from '$lib/server/config/langgraph-auth-v1.js';
 import {
   claimNextAgentPickupTask,
   getCachedTaskSemanticPacketRecord,
@@ -80,21 +81,28 @@ async function dispatchLocalDeepResearch(args: {
   const query = `Expand upon references: ${args.sourceRefs.join(', ')}. Context: ${args.reason}`;
 
   // Try LangGraph Synthesis first (port 8091)
-  fetch(`${ENV.LANGGRAPH_URL}/synthesize`, {
+	const startFallbackResearch = () => fetch(`${ENV.LDR_BASE_URL}/api/research/start`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ query, max_iterations: 2 }),
+		signal: AbortSignal.timeout(5000),
+	}).catch(() => {
+		// Silent failure for background research fallback
+	});
+
+	if (!ENV.LANGGRAPH_ENABLED) {
+		void startFallbackResearch();
+		return;
+	}
+
+	fetch(`${ENV.LANGGRAPH_URL}/synthesize`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildLangGraphAuthHeadersV1(ENV.LANGGRAPH_INTERNAL_API_KEY),
     body: JSON.stringify({ query }),
     signal: AbortSignal.timeout(5000),
   }).catch(() => {
     // Fallback to LDR MCP if LangGraph is unavailable
-    fetch(`${ENV.LDR_BASE_URL}/api/research/start`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, max_iterations: 2 }),
-      signal: AbortSignal.timeout(5000),
-    }).catch(() => {
-      // Silent failure for background research fallback
-    });
+    void startFallbackResearch();
   });
 }
 

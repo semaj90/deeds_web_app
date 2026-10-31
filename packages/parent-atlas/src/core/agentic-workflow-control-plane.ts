@@ -124,7 +124,7 @@ export const VALIDATED_WORKFLOW_TARGETS = [
   'GPU_CODEBASE_INDEX',
 ] as const;
 
-export const validatedWorkflowDispatchSchema = z.object({
+const validatedWorkflowDispatchContentSchema = z.object({
   schema: z.literal('atlas.validated-workflow-dispatch.v1').default('atlas.validated-workflow-dispatch.v1'),
   dispatch_id: id,
   workflow_id: id,
@@ -141,9 +141,17 @@ export const validatedWorkflowDispatchSchema = z.object({
   semantic_revision: revision.nullable().default(null),
   gpu_resource_receipt_id: id.nullable().default(null),
   mutation_plan_id: id.nullable().default(null),
-  dispatch_checksum: checksum,
   canonical_authority: z.literal(false).default(false),
   producer_revision: revision,
+}).strict();
+
+const validatedWorkflowDispatchV2ContentSchema = validatedWorkflowDispatchContentSchema.extend({
+  schema: z.literal('atlas.validated-workflow-dispatch.v2'),
+  dependency_action_ids: z.array(id).max(256).default([]),
+}).strict();
+
+export const validatedWorkflowDispatchSchema = validatedWorkflowDispatchContentSchema.extend({
+  dispatch_checksum: checksum,
 }).strict().superRefine((value, ctx) => {
   if (value.mode === 'APPLY' && value.target === 'GPU_CODEBASE_INDEX' && value.gpu_resource_receipt_id === null) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['gpu_resource_receipt_id'], message: 'GPU index APPLY requires an admitted GPU resource receipt' });
@@ -153,6 +161,168 @@ export const validatedWorkflowDispatchSchema = z.object({
   }
 });
 export type ValidatedWorkflowDispatchV1 = z.infer<typeof validatedWorkflowDispatchSchema>;
+
+export const validatedWorkflowDispatchV2Schema = validatedWorkflowDispatchV2ContentSchema.extend({
+  dispatch_checksum: checksum,
+}).strict().superRefine((value, ctx) => {
+  if (value.mode === 'APPLY' && value.target === 'GPU_CODEBASE_INDEX' && value.gpu_resource_receipt_id === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['gpu_resource_receipt_id'], message: 'GPU index APPLY requires an admitted GPU resource receipt' });
+  }
+});
+export type ValidatedWorkflowDispatchV2 = z.infer<typeof validatedWorkflowDispatchV2Schema>;
+
+const workflowDispatchRevisionContextSchema = z.object({
+  workflow_revision: z.number().int().nonnegative(),
+  source_snapshot_revision: revision,
+  graph_revision: revision.nullable(),
+  feature_revision: revision.nullable(),
+  semantic_revision: revision.nullable(),
+  producer_revision: revision,
+}).strict();
+
+const workflowDispatchDependencySchema = z.object({
+  action_id: id,
+  state: z.enum(['DONE', 'BLOCKED', 'FAILED', 'STALE', 'RUNNING']),
+  workflow_revision: z.number().int().nonnegative(),
+  source_snapshot_revision: revision,
+  validation_receipt_id: id.nullable(),
+}).strict();
+
+export const workflowDispatchReadinessV2InputSchema = z.object({
+  dispatch: validatedWorkflowDispatchV2Schema,
+  approval_receipt_id: id.nullable(),
+}).strict();
+
+export const workflowDispatchReadinessV2Schema = z.object({
+  decision: z.enum(['READY_FOR_REVIEW', 'BLOCKED', 'STALE']),
+  reasons: z.array(z.string().min(1)),
+  dispatch_checksum: checksum,
+  canonical_authority: z.literal(false),
+}).strict();
+
+export type WorkflowDispatchReadinessAuthorityV2 = {
+  resolveCurrentRevisions: (dispatch: ValidatedWorkflowDispatchV2) => Promise<z.infer<typeof workflowDispatchRevisionContextSchema> | null>;
+  resolveDependency: (workflowId: string, actionId: string) => Promise<z.infer<typeof workflowDispatchDependencySchema> | null>;
+  verifyValidationReceipt: (input: {
+    receiptId: string;
+    workflowId: string;
+    workflowRevision: number;
+    sourceSnapshotRevision: string;
+    actionId: string;
+  }) => Promise<boolean>;
+  verifyApplyApproval: (input: { receiptId: string; dispatchChecksum: string; workflowId: string; workflowRevision: number }) => Promise<boolean>;
+};
+
+export async function evaluateWorkflowDispatchReadinessV2(
+  input: z.input<typeof workflowDispatchReadinessV2InputSchema>,
+  authority: WorkflowDispatchReadinessAuthorityV2,
+) {
+  const value = workflowDispatchReadinessV2InputSchema.parse(input);
+  const { dispatch } = value;
+  const reasons: string[] = [];
+  const staleReasons: string[] = [];
+  const { dispatch_checksum: suppliedDispatchChecksum, ...dispatchContent } = dispatch;
+  const actualDispatchChecksum = agenticWorkflowChecksum(dispatchContent);
+
+  if (suppliedDispatchChecksum !== actualDispatchChecksum) reasons.push('DISPATCH_CHECKSUM_MISMATCH');
+  let current: z.infer<typeof workflowDispatchRevisionContextSchema> | null = null;
+  try {
+    current = await authority.resolveCurrentRevisions(dispatch);
+  } catch {
+    reasons.push('CURRENT_REVISION_RESOLUTION_FAILED');
+  }
+  if (!current) reasons.push('CURRENT_REVISION_CONTEXT_MISSING');
+  const revisionFields = [
+    'workflow_revision', 'source_snapshot_revision', 'graph_revision', 'feature_revision', 'semantic_revision', 'producer_revision',
+  ] as const;
+  if (current) {
+    for (const field of revisionFields) {
+      if (dispatch[field] !== current[field]) staleReasons.push(`REVISION_STALE:${field}`);
+    }
+  }
+
+  const dependencyActionIds = dispatch.dependency_action_ids;
+  if (new Set(dependencyActionIds).size !== dependencyActionIds.length) {
+    reasons.push('DUPLICATE_DEPENDENCY_ACTION_ID');
+  }
+  for (const actionId of dependencyActionIds) {
+    let dependency: z.infer<typeof workflowDispatchDependencySchema> | null = null;
+    try {
+      dependency = await authority.resolveDependency(dispatch.workflow_id, actionId);
+    } catch {
+      reasons.push(`DEPENDENCY_RESOLUTION_FAILED:${actionId}`);
+    }
+    if (!dependency) {
+      reasons.push(`DEPENDENCY_MISSING:${actionId}`);
+      continue;
+    }
+    if (dependency.state !== 'DONE') reasons.push(`DEPENDENCY_NOT_DONE:${actionId}`);
+    if (dependency.workflow_revision !== dispatch.workflow_revision
+      || dependency.source_snapshot_revision !== dispatch.source_snapshot_revision) {
+      staleReasons.push(`DEPENDENCY_REVISION_STALE:${actionId}`);
+    }
+    if (!dependency.validation_receipt_id) {
+      reasons.push(`DEPENDENCY_RECEIPT_MISSING:${actionId}`);
+    } else {
+      let verified = false;
+      try {
+        verified = await authority.verifyValidationReceipt({
+          receiptId: dependency.validation_receipt_id,
+          workflowId: dispatch.workflow_id,
+          workflowRevision: dispatch.workflow_revision,
+          sourceSnapshotRevision: dispatch.source_snapshot_revision,
+          actionId,
+        });
+      } catch {
+        verified = false;
+      }
+      if (!verified) reasons.push(`DEPENDENCY_RECEIPT_UNVERIFIED:${actionId}`);
+    }
+  }
+  for (const receiptId of dispatch.validation_receipt_ids) {
+    let verified = false;
+    try {
+      verified = await authority.verifyValidationReceipt({
+        receiptId,
+        workflowId: dispatch.workflow_id,
+        workflowRevision: dispatch.workflow_revision,
+        sourceSnapshotRevision: dispatch.source_snapshot_revision,
+        actionId: dispatch.action_id,
+      });
+    } catch {
+      verified = false;
+    }
+    if (!verified) reasons.push(`VALIDATION_RECEIPT_UNVERIFIED:${receiptId}`);
+  }
+  if (dispatch.mode === 'APPLY') {
+    if (!value.approval_receipt_id) {
+      reasons.push('APPLY_APPROVAL_MISSING_OR_MISMATCHED');
+    } else {
+      let verified = false;
+      try {
+        verified = await authority.verifyApplyApproval({
+          receiptId: value.approval_receipt_id,
+          dispatchChecksum: dispatch.dispatch_checksum,
+          workflowId: dispatch.workflow_id,
+          workflowRevision: dispatch.workflow_revision,
+        });
+      } catch {
+        verified = false;
+      }
+      if (!verified) reasons.push('APPLY_APPROVAL_MISSING_OR_MISMATCHED');
+    }
+  }
+
+  const decision = staleReasons.length > 0 ? 'STALE'
+    : reasons.length > 0 ? 'BLOCKED'
+      : 'READY_FOR_REVIEW';
+  return workflowDispatchReadinessV2Schema.parse({
+    decision,
+    reasons: [...staleReasons, ...reasons],
+    dispatch_checksum: dispatch.dispatch_checksum,
+    canonical_authority: false,
+  });
+}
 
 export const workflowTaskBoardCardSchema = z.object({
   schema: z.literal('atlas.workflow-task-board-card.v1').default('atlas.workflow-task-board-card.v1'),
@@ -223,7 +393,7 @@ export const gpuCodebaseIndexPlanSchema = z.object({
   graph_revision: revision,
   feature_revision: revision,
   row_identity_checksum: checksum,
-  stages: z.array(gpuCodebaseIndexStageSchema).min(1),
+  stages: z.array(gpuCodebaseIndexStageSchema).min(1).max(256),
   canonical_semantic_dimension: z.literal(768),
   semantic_lane_votes: z.literal(1),
   exact_promotion_required: z.literal(true),
@@ -232,10 +402,41 @@ export const gpuCodebaseIndexPlanSchema = z.object({
   producer_revision: revision,
 }).strict().superRefine((value, ctx) => {
   const ids = new Set(value.stages.map((stage) => stage.stage_id));
+  const stageById = new Map(value.stages.map((stage) => [stage.stage_id, stage]));
   if (ids.size !== value.stages.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: 'stage_id must be unique' });
   const ordinals = value.stages.map((stage) => stage.ordinal).sort((a, b) => a - b);
   if (ordinals.some((ordinal, index) => ordinal !== index)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: 'stage ordinals must be dense 0..N-1' });
-  for (const stage of value.stages) for (const dependency of stage.depends_on) if (!ids.has(dependency)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: `unknown dependency ${dependency}` });
+  for (const stage of value.stages) {
+    if (new Set(stage.depends_on).size !== stage.depends_on.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: `duplicate dependency in ${stage.stage_id}` });
+    }
+    for (const dependency of stage.depends_on) {
+      const dependencyStage = stageById.get(dependency);
+      if (!dependencyStage) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: `unknown dependency ${dependency}` });
+      } else if (dependencyStage.ordinal >= stage.ordinal) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: `dependency ${dependency} must precede ${stage.stage_id}` });
+      }
+    }
+  }
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  let hasCycle = false;
+  const visit = (stageId: string) => {
+    if (visiting.has(stageId)) {
+      hasCycle = true;
+      return;
+    }
+    if (visited.has(stageId)) return;
+    visiting.add(stageId);
+    for (const dependency of stageById.get(stageId)?.depends_on ?? []) {
+      if (stageById.has(dependency)) visit(dependency);
+    }
+    visiting.delete(stageId);
+    visited.add(stageId);
+  };
+  for (const stage of value.stages) visit(stage.stage_id);
+  if (hasCycle) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: 'stage dependencies must be acyclic' });
   const cagra = value.stages.find((stage) => stage.kind === 'CAGRA_BUILD');
   const exact = value.stages.find((stage) => stage.kind === 'CUVS_EXACT_ORACLE');
   if (cagra && !exact) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['stages'], message: 'CAGRA_BUILD requires CUVS_EXACT_ORACLE in the plan' });
@@ -355,7 +556,7 @@ export function workflowEventToTaskBoardCard(input: {
     : event.kind === 'blocked' ? 'BLOCKED'
     : event.kind === 'failed' ? 'FAILED'
     : event.kind === 'cancelled' ? 'CANCELED'
-    : event.kind === 'completed' ? (event.lane === 'validator' ? 'DONE' : 'VERIFY')
+    : event.kind === 'completed' ? 'VERIFY'
     : event.lane === 'validator' ? 'VERIFY'
     : 'ACTIVE';
   return workflowTaskBoardCardSchema.parse({
@@ -381,6 +582,18 @@ export function workflowEventToTaskBoardCard(input: {
 export function buildValidatedWorkflowDispatch(input: Omit<z.input<typeof validatedWorkflowDispatchSchema>, 'schema' | 'dispatch_checksum' | 'canonical_authority'>): ValidatedWorkflowDispatchV1 {
   const raw = { schema: 'atlas.validated-workflow-dispatch.v1' as const, ...input, canonical_authority: false as const };
   return validatedWorkflowDispatchSchema.parse({ ...raw, dispatch_checksum: agenticWorkflowChecksum(raw) });
+}
+
+export function buildValidatedWorkflowDispatchV2(input: Omit<z.input<typeof validatedWorkflowDispatchV2Schema>, 'schema' | 'dispatch_checksum' | 'canonical_authority'>): ValidatedWorkflowDispatchV2 {
+  const content = validatedWorkflowDispatchV2ContentSchema.parse({
+    schema: 'atlas.validated-workflow-dispatch.v2' as const,
+    ...input,
+    canonical_authority: false as const,
+  });
+  return validatedWorkflowDispatchV2Schema.parse({
+    ...content,
+    dispatch_checksum: agenticWorkflowChecksum(content),
+  });
 }
 
 export function buildParentAtlasStudioWorkflowProjection(input: Omit<z.input<typeof parentAtlasStudioWorkflowProjectionSchema>, 'schema' | 'projection_checksum' | 'canonical_authority'>): ParentAtlasStudioWorkflowProjectionV1 {

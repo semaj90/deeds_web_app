@@ -19,6 +19,21 @@ import { buildPromotionClaimQuery } from './promote-results-outbox.js';
 const url = process.env.OUTBOX_TEST_DATABASE_URL;
 const describeDb = url ? describe : describe.skip;
 
+function parseDisposableOutboxUrl(value: string | undefined): URL {
+  if (!value) throw new Error('OUTBOX_TEST_DATABASE_URL is required');
+  const parsed = new URL(value);
+  if (
+    parsed.protocol !== 'postgres:'
+    || parsed.hostname !== '127.0.0.1'
+    || parsed.port !== '55432'
+    || parsed.pathname !== '/scratch'
+    || decodeURIComponent(parsed.username) !== 'scratch'
+  ) {
+    throw new Error('Disposable outbox proof requires postgres://scratch on loopback port 55432 and database scratch');
+  }
+  return parsed;
+}
+
 const SCHEMA = `
   DROP TABLE IF EXISTS promotion_outbox;
   CREATE TABLE promotion_outbox (
@@ -45,11 +60,39 @@ function claimStatement(batchSize: number) {
   return { text: sql, values: params };
 }
 
+describe('promotion outbox disposable target guard', () => {
+  it('accepts only the documented loopback scratch target', () => {
+    expect(parseDisposableOutboxUrl('postgres://scratch:scratch@127.0.0.1:55432/scratch').pathname).toBe('/scratch');
+  });
+
+  it.each([
+    undefined,
+    'postgres://app:secret@127.0.0.1:5432/production',
+    'postgres://scratch:scratch@example.test:55432/scratch',
+    'postgres://app:scratch@127.0.0.1:55432/scratch',
+    'postgres://scratch:scratch@127.0.0.1:55439/scratch',
+  ])('rejects an unapproved or non-disposable target: %s', (candidate) => {
+    expect(() => parseDisposableOutboxUrl(candidate)).toThrow();
+  });
+});
+
 describeDb('promotion outbox claim (disposable PostgreSQL)', () => {
   let pool: pg.Pool;
 
   beforeAll(async () => {
-    pool = new pg.Pool({ connectionString: url, max: 8 });
+    const parsed = parseDisposableOutboxUrl(url);
+
+    pool = new pg.Pool({ connectionString: parsed.toString(), max: 8, connectionTimeoutMillis: 3000 });
+    const identity = await pool.query<{ database_name: string; version: string }>(
+      "SELECT current_database() AS database_name, current_setting('server_version_num') AS version"
+    );
+    if (identity.rows[0]?.database_name !== 'scratch') {
+      throw new Error('Disposable outbox proof connected to an unexpected database');
+    }
+    const serverVersion = Number(identity.rows[0]?.version);
+    if (!Number.isInteger(serverVersion) || serverVersion < 180000 || serverVersion >= 190000) {
+      throw new Error('Disposable outbox proof requires PostgreSQL 18');
+    }
     await pool.query(SCHEMA);
   });
 

@@ -12,6 +12,7 @@ import { db } from "../../src/lib/server/db/client.js";
 import { atlasPackets, atlasSummaryLayers, analysisPassResults } from "../../src/lib/server/db/schema-postgres.js";
 import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
+import { assertSummaryIdentityWriteAdmitted } from '../../../scripts/atlas/lib/summary-identity-write-gate-v1.mjs';
 
 const EXPORT_DIR = path.join(process.cwd(), "colab-export");
 const SUMMARIES_FILE = path.join(EXPORT_DIR, "summaries.jsonl");
@@ -78,6 +79,8 @@ Mode: ${DRY_RUN ? "DRY-RUN" : "APPLY"}
     }
     return;
   }
+
+  assertSummaryIdentityWriteAdmitted('import-colab-summaries');
 
   // Import
   console.log(`\n📝 Importing ${summaries.length} summaries...`);

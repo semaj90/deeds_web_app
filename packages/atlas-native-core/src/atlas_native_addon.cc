@@ -11,6 +11,7 @@
 #include "../include/turbovec_pack.hpp"
 #include "../include/tile_assembler.hpp"
 #include "../include/pgvector_binary.hpp"
+#include "../include/simd_executors.hpp"
 
 #include <cmath>
 #include <cstdint>
@@ -24,6 +25,9 @@
 #include <napi.h>
 
 namespace atlas::native {
+
+constexpr std::size_t MAX_SOM_RADIX_CANDIDATES_V1 = 65536;
+constexpr std::size_t MAX_HAMMING128_BATCH_CANDIDATES_V1 = 65536;
 
 struct AlignedExternalBufferOwner {
     explicit AlignedExternalBufferOwner(std::size_t length)
@@ -143,6 +147,56 @@ Napi::Value Bitset128JaccardSimilarityNapi(const Napi::CallbackInfo& info) {
     return Napi::Number::New(env, bitset128_jaccard_similarity(a.Data(), b.Data()));
 }
 
+Napi::Value ScoreHamming128BatchNapi(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    const auto is_byte_input = [](const Napi::Value& value) {
+        return value.IsTypedArray() && value.As<Napi::TypedArray>().TypedArrayType() == napi_uint8_array;
+    };
+    if (info.Length() < 2 || !is_byte_input(info[0]) || !is_byte_input(info[1])) {
+        Napi::TypeError::New(env, "Expected (16-byte query Buffer or Uint8Array, packed candidate Buffer or Uint8Array)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    const auto query_bytes = info[0].As<Napi::Uint8Array>();
+    const auto candidate_bytes = info[1].As<Napi::Uint8Array>();
+    const std::uint8_t* query_data = query_bytes.Data();
+    const std::size_t query_length = query_bytes.ElementLength();
+    const std::uint8_t* candidate_data = candidate_bytes.Data();
+    const std::size_t candidate_length = candidate_bytes.ElementLength();
+    constexpr std::size_t bitset_bytes = sizeof(atlas::simd::Bitset128);
+    if (query_length != bitset_bytes || candidate_length % bitset_bytes != 0) {
+        Napi::RangeError::New(env, "HAMMING128_BUFFER_LENGTH_INVALID").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    const std::size_t count = candidate_length / bitset_bytes;
+    if (count > MAX_HAMMING128_BATCH_CANDIDATES_V1) {
+        Napi::RangeError::New(env, "HAMMING128_CANDIDATE_LIMIT_EXCEEDED").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    atlas::simd::Bitset128 query{};
+    std::memcpy(&query, query_data, bitset_bytes);
+    std::vector<atlas::simd::Bitset128> candidates(count);
+    for (std::size_t index = 0; index < count; ++index) {
+        std::memcpy(&candidates[index], candidate_data + index * bitset_bytes, bitset_bytes);
+    }
+    std::vector<std::uint32_t> scores(count);
+    atlas::simd::hamming_distance_128_batch(query, candidates.data(), scores.data(), count);
+
+    auto distances = Napi::Uint16Array::New(env, count);
+    for (std::size_t index = 0; index < count; ++index) {
+        distances[index] = static_cast<std::uint16_t>(scores[index]);
+    }
+    Napi::Object result = Napi::Object::New(env);
+    result.Set("schema", Napi::String::New(env, "atlas.hamming128.batch-result.v1"));
+    result.Set("authority", Napi::String::New(env, "PROPOSAL_ONLY"));
+    result.Set("backend", Napi::String::New(env, atlas::simd::hamming_distance_128_batch_backend()));
+    result.Set("candidateCount", Napi::Number::New(env, count));
+    result.Set("distances", distances);
+    return result;
+}
+
 Napi::Value AsymmetricDot2BitNapi(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 4 || !info[0].IsTypedArray() ||
@@ -208,6 +262,52 @@ Napi::Value UnpackPgvectorBinary768Napi(const Napi::CallbackInfo& info) {
     return output;
 }
 
+Napi::Value RadixSortSomCandidateIndicesNapi(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 3 || !info[0].IsTypedArray() || !info[1].IsTypedArray() || !info[2].IsTypedArray() ||
+        info[0].As<Napi::TypedArray>().TypedArrayType() != napi_uint16_array ||
+        info[1].As<Napi::TypedArray>().TypedArrayType() != napi_uint16_array ||
+        info[2].As<Napi::TypedArray>().TypedArrayType() != napi_uint32_array) {
+        Napi::TypeError::New(env, "Expected (Uint16Array kmeansClusterIds, Uint16Array somBmuIds, Uint32Array candidateOrdinals)").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    const auto kmeans = info[0].As<Napi::Uint16Array>();
+    const auto som = info[1].As<Napi::Uint16Array>();
+    const auto ordinals = info[2].As<Napi::Uint32Array>();
+    const std::size_t count = kmeans.ElementLength();
+    if (som.ElementLength() != count || ordinals.ElementLength() != count) {
+        Napi::RangeError::New(env, "SOM_RADIX_ARRAY_LENGTH_MISMATCH").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+    if (count > MAX_SOM_RADIX_CANDIDATES_V1) {
+        Napi::RangeError::New(env, "SOM_RADIX_CANDIDATE_LIMIT_EXCEEDED").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::vector<SomTileSortEntry> entries(count);
+    for (std::size_t index = 0; index < count; ++index) {
+        if (som[index] >= 400) {
+            Napi::RangeError::New(env, "SOM_BMU_ID_OUT_OF_RANGE").ThrowAsJavaScriptException();
+            return env.Null();
+        }
+        entries[index] = SomTileSortEntry{
+            pack_som_radix_key(kmeans[index], som[index], ordinals[index]),
+            kmeans[index],
+            som[index],
+            ordinals[index],
+            static_cast<std::uint32_t>(index),
+        };
+    }
+
+    radix_sort_som_tiles(entries);
+    auto output = Napi::Uint32Array::New(env, count);
+    for (std::size_t index = 0; index < count; ++index) {
+        output[index] = entries[index].source_index;
+    }
+    return output;
+}
+
 Napi::Value AssembleLodTextureBlockNapi(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     if (info.Length() < 4 || !info[0].IsTypedArray() ||
@@ -256,9 +356,11 @@ Napi::Object InitAtlasNativeCore(Napi::Env env, Napi::Object exports) {
     exports.Set("detectRfcOrLanguage", Napi::Function::New(env, DetectRfcOrLanguageNapi));
     exports.Set("packTurboVecMrl128", Napi::Function::New(env, PackTurboVecMrl128Napi));
     exports.Set("bitset128JaccardSimilarity", Napi::Function::New(env, Bitset128JaccardSimilarityNapi));
+    exports.Set("scoreHamming128Batch", Napi::Function::New(env, ScoreHamming128BatchNapi));
     exports.Set("asymmetricDot2Bit", Napi::Function::New(env, AsymmetricDot2BitNapi));
     exports.Set("asymmetricDot4Bit", Napi::Function::New(env, AsymmetricDot4BitNapi));
     exports.Set("unpackPgvectorBinary768", Napi::Function::New(env, UnpackPgvectorBinary768Napi));
+    exports.Set("radixSortSomCandidateIndicesV1", Napi::Function::New(env, RadixSortSomCandidateIndicesNapi));
     exports.Set("assembleLodTextureBlockV1", Napi::Function::New(env, AssembleLodTextureBlockNapi));
     return exports;
 }

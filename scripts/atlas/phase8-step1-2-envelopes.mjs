@@ -14,6 +14,7 @@
 
 import { Pool } from 'pg';
 import crypto from 'crypto';
+import { assertSummaryIdentityWriteAdmitted } from './lib/summary-identity-write-gate-v1.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
@@ -148,6 +149,8 @@ async function executePhase8Steps12() {
       await pgPool.end();
       return;
     }
+
+    assertSummaryIdentityWriteAdmitted('phase8-step1-2-envelopes');
 
     // Apply mode: update atlas_summary_layers with envelopes
     console.log('💾 Storing envelopes...\n');
