@@ -34,8 +34,22 @@ async function toolReadFile(args: { path: string }) {
 }
 
 async function toolApplyPatch(args: { path: string; search_content: string; replace_content: string }) {
+    // AGENTIC-FIX-SEC-01: direct model-driven edits are DISABLED by default.
+    // This script has no approval, worktree isolation, pre-image check, rollback or ledger
+    // admission. Use the approved isolated-worktree path (patch tournament) instead.
+    if (process.env.PHASE79_ALLOW_UNSAFE_DIRECT_EDIT !== 'true') {
+        return {
+            success: false,
+            error: 'DIRECT_EDIT_DISABLED: set PHASE79_ALLOW_UNSAFE_DIRECT_EDIT=true to override (not recommended)'
+        };
+    }
     try {
-        const fullPath = path.resolve(process.cwd(), args.path);
+        const root = process.cwd();
+        const fullPath = path.resolve(root, args.path);
+        const rel = path.relative(root, fullPath);
+        if (rel.startsWith('..') || path.isAbsolute(rel) || rel.split(path.sep).includes('node_modules')) {
+            return { success: false, error: 'PATH_OUTSIDE_WORKSPACE: refusing to edit outside the workspace' };
+        }
         const content = await fs.readFile(fullPath, 'utf-8');
         
         // Simple string replace for now - can be enhanced to fuzzy match
