@@ -381,7 +381,8 @@ export async function createErrorBrainPatch(data: NewErrorBrainPatch) {
 export async function updatePatchVerificationStatus(
   patchId: string,
   status: string,
-  message?: string
+  message?: string,
+  routeId?: string
 ) {
   const db = getDb();
   const result = await db.update(errorBrainPatch)
@@ -390,7 +391,11 @@ export async function updatePatchVerificationStatus(
       verificationTimestamp: new Date(),
       verificationMessage: message,
     })
-    .where(eq(errorBrainPatch.id, patchId))
+    .where(
+      routeId
+        ? and(eq(errorBrainPatch.id, patchId), eq(errorBrainPatch.routeId, routeId))
+        : eq(errorBrainPatch.id, patchId)
+    )
     .returning();
 
   return result[0];

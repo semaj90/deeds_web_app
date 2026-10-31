@@ -5,10 +5,13 @@
  */
 
 import { updatePatchVerificationStatus } from '$lib/db/queries/route-health-queries.js';
+import { isValidRouteId } from '$lib/server/validation.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 
+// 'passed' is intentionally NOT accepted from callers. It may only be set by a
+// server-owned verifier that validates a matching test receipt (not yet wired).
 const patchVerificationSchema = z.object({
 	verification_status: z.enum(['pending', 'passed', 'failed']),
 	verification_message: z.string().max(5000).optional()
@@ -18,7 +21,10 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
-	const { patchId } = params;
+	const { routeId, patchId } = params;
+	if (!routeId || !isValidRouteId(routeId)) {
+		return json({ error: 'Invalid route ID format' }, { status: 400 });
+	}
 
 	// Validate UUID format to avoid DB errors on non-existent IDs
 	if (!UUID_RE.test(patchId)) {
@@ -36,10 +42,22 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 		}
 		const body = parsed.data;
 
+		if (body.verification_status === 'passed') {
+			return json(
+				{
+					error: 'VERIFICATION_RECEIPT_REQUIRED',
+					message:
+						'A patch can only be marked passed by the server-side verifier from a validated test receipt.'
+				},
+				{ status: 403 }
+			);
+		}
+
 		const updated = await updatePatchVerificationStatus(
 			patchId,
 			body.verification_status,
-			body.verification_message ?? null
+			body.verification_message,
+			routeId
 		);
 
 		if (!updated) {
