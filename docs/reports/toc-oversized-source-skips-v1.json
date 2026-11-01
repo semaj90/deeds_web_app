@@ -2,9 +2,9 @@
   "schema": "atlas.toc-oversized-source-skips.v1",
   "configuredMaxBytes": 16777216,
   "summary": {
-    "totalCandidates": 8519,
-    "includedCount": 8415,
-    "skippedCount": 104
+    "totalCandidates": 8675,
+    "includedCount": 8562,
+    "skippedCount": 113
   },
   "skips": [
     {
@@ -34,6 +34,12 @@
     {
       "sourcePath": "docs/reports/current-graphify-snapshot-binding-recheck-v1.json",
       "byteSize": 43696635,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/current-packet-digest-producer-v1.census.json",
+      "byteSize": 48324693,
       "maxBytes": 16777216,
       "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
     },
@@ -99,7 +105,7 @@
     },
     {
       "sourcePath": "docs/reports/graphify-workspace-snapshot-binding-v1.json",
-      "byteSize": 45411856,
+      "byteSize": 64635176,
       "maxBytes": 16777216,
       "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
     },
@@ -628,6 +634,54 @@
     {
       "sourcePath": "docs/reports/workspace-source-binding-observation.json",
       "byteSize": 25220468,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/3fbe6513423aa6eaabd11ea3f6c26ca77cc970a829ee3b10cc1bed3fd582b554.json",
+      "byteSize": 17758062,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/48eefdff8dd2a66a4513a735fa6e04edee7f529c71eaf31fc633cca776b2670c.json",
+      "byteSize": 17757910,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/4a550ae5b5cec9db0e1986972df05977d854a96d8c6a03de0457324059d51f7f.json",
+      "byteSize": 17757886,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/82807a6dd0a267d0e65499d7ca6900814720de6890ca563fc2ca9cf51df31da0.json",
+      "byteSize": 17758062,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/891a8d9c8a8f656bb4bc553ae77b188f043263b1b8323bbc43f1784010e9c258.json",
+      "byteSize": 17768829,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/a3cc5ccd142d7ce6f7bacc7adb6befbb0240322b8b60e7c1055ec0fe39b3efa5.json",
+      "byteSize": 17722983,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/b8b2611ac638f70da718b7b52566d4566f748d70361aabdc966b9bd338b3c8c1.json",
+      "byteSize": 17764565,
+      "maxBytes": 16777216,
+      "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
+    },
+    {
+      "sourcePath": "docs/reports/workspace-source-snapshots/d8f9a782395d86f17b2e22907f031cace8facd5d06d6a2a36d2bda3a9adc49ed.json",
+      "byteSize": 17764554,
       "maxBytes": 16777216,
       "reason": "EXCEEDS_MAX_TOC_SOURCE_BYTES"
     }

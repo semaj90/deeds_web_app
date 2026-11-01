@@ -88,6 +88,7 @@
 - [CUVS-RESEARCH-SUMMARY](./CUVS-RESEARCH-SUMMARY.md)
 - [DAG-ACP-OPEN-MEMORY-WIRING](./DAG-ACP-OPEN-MEMORY-WIRING.md)
 - [deepseek-engram-architecture-search](./deepseek-engram-architecture-search.md)
+- [DOMAIN-CLASSIFICATION-TAXONOMY](./DOMAIN-CLASSIFICATION-TAXONOMY.md)
 - [domain-registry-contract-v1](./domain-registry-contract-v1.md)
 - [DRIZZLE-TOC](./DRIZZLE-TOC.md)
 - [dual-lane-hot-brain-cold-queue](./dual-lane-hot-brain-cold-queue.md)
