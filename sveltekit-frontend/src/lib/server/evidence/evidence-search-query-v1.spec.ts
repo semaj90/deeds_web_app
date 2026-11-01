@@ -8,6 +8,7 @@ describe('evidence BM25 query builder', () => {
 	it('builds a valid WHERE clause for global search', () => {
 		const query = dialect.sqlToQuery(buildEvidenceBm25QueryV1({ query: 'lease clause', limit: 10 }));
 		expect(query.sql).toContain('FROM evidence');
+		expect(query.sql).toContain('file_name AS "fileName"');
 		expect(query.sql).toContain('WHERE search_vector @@ plainto_tsquery');
 		expect(query.sql).not.toMatch(/FROM evidence\s+AND\b/);
 		expect(query.params).toEqual(['lease clause', 'lease clause', 10]);
