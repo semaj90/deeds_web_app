@@ -30,7 +30,8 @@ const RagSearchBodySchema = z.object({
 export const GET: RequestHandler = async ({ url, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 
-  const query = url.searchParams.get('q')?.trim() ?? '';
+  // `q` is canonical; `query` is accepted because LegalResearchSpellbook.svelte sends it.
+  const query = (url.searchParams.get('q') ?? url.searchParams.get('query'))?.trim() ?? '';
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '10', 10) || 10, 100);
 
   if (!query) {
