@@ -76,23 +76,35 @@
 
 <Dialog.Root bind:open>
   <Dialog.Portal>
-        <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40" />
+    <Dialog.Overlay class="hud-modal-backdrop fixed inset-0 z-[9990] bg-black/80 backdrop-blur-md transition-opacity" />
 
-        <!-- Modal Content -->
-        <div class="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <Dialog.Content class="bg-white dark:bg-neutral-950 rounded-lg shadow-lg max-w-2xl w-full mx-4 pointer-events-auto">
-            <!-- Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-200 dark:border-neutral-800">
-              <div>
-                <Dialog.Title class="text-lg font-semibold">{localFile.source_ref}</Dialog.Title>
-                <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                  {localFile.packet_key}
-                </p>
-              </div>
-              <Dialog.Close class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
-                ✕
-              </Dialog.Close>
-            </div>
+    <!-- Centered Modal Content -->
+    <div class="fixed inset-0 z-[9991] flex items-center justify-center p-4 pointer-events-none">
+      <Dialog.Content class="relative bg-[#131b2a]/95 text-sand border border-[#f3d471]/30 rounded-xl shadow-2xl max-w-2xl w-full mx-4 pointer-events-auto backdrop-blur-xl">
+        <!-- Tactical Corner Notches (Phoenix Justice / YoRHa HUD) -->
+        <span class="hud-notch-tl" aria-hidden="true"></span>
+        <span class="hud-notch-tr" aria-hidden="true"></span>
+        <span class="hud-notch-bl" aria-hidden="true"></span>
+        <span class="hud-notch-br" aria-hidden="true"></span>
+
+        <!-- Top Highlight Bar -->
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#f3d471]/80 to-transparent"></div>
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-[#f3d471]/20">
+          <div>
+            <Dialog.Title class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="text-[#f3d471]">📂</span>
+              <span>{localFile.source_ref}</span>
+            </Dialog.Title>
+            <p class="text-xs font-mono text-[#f3d471]/80 mt-0.5">
+              {localFile.packet_key}
+            </p>
+          </div>
+          <Dialog.Close class="text-neutral-400 hover:text-white p-1 rounded hover:bg-white/10 transition-colors">
+            ✕
+          </Dialog.Close>
+        </div>
 
             <!-- Body -->
             <div class="px-6 py-4 space-y-6">
@@ -257,12 +269,37 @@
 </Dialog.Root>
 
 <style>
-  /* Ensure proper z-indexing for stacked modals */
-  :global(.bits-dialog-overlay) {
-    z-index: 40;
+  .hud-notch-tl,
+  .hud-notch-tr,
+  .hud-notch-bl,
+  .hud-notch-br {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
   }
-
-  :global(.bits-dialog-content) {
-    z-index: 50;
+  .hud-notch-tl {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid #f3d471;
+    border-left: 2px solid #f3d471;
+  }
+  .hud-notch-tr {
+    top: -1px;
+    right: -1px;
+    border-top: 2px solid #f3d471;
+    border-right: 2px solid #f3d471;
+  }
+  .hud-notch-bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom: 2px solid #f3d471;
+    border-left: 2px solid #f3d471;
+  }
+  .hud-notch-br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid #f3d471;
+    border-right: 2px solid #f3d471;
   }
 </style>

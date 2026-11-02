@@ -1,128 +1,119 @@
 <script lang="ts">
-import Icon from '$lib/components/ui/Icon.svelte';
-import type { Snippet } from 'svelte';
+	import { Dialog } from 'bits-ui';
+	import Icon from '$lib/components/ui/Icon.svelte';
+	import type { Snippet } from 'svelte';
 
-interface Props {
-	open?: boolean;
-	onOpenChange?: (open: boolean) => void;
-	title?: string;
-	description?: string;
-	class?: string;
-	children?: Snippet;
-	footer?: Snippet;
-}
-
-let {
-	open = $bindable(false),
-	onOpenChange,
-	title = '',
-	description = '',
-	class: className = '',
-	children,
-	footer
-}: Props = $props();
-
-function handleClose() {
-	open = false;
-	onOpenChange?.(false);
-}
-
-function handleBackdropClick(e: MouseEvent) {
-	if (e.target === e.currentTarget) {
-		handleClose();
+	interface Props {
+		open?: boolean;
+		onOpenChange?: (open: boolean) => void;
+		title?: string;
+		description?: string;
+		class?: string;
+		children?: Snippet;
+		footer?: Snippet;
 	}
-}
 
-function handleKeydown(e: KeyboardEvent) {
-	if (e.key === 'Escape') {
-		handleClose();
+	let {
+		open = $bindable(false),
+		onOpenChange,
+		title = '',
+		description = '',
+		class: className = '',
+		children,
+		footer,
+	}: Props = $props();
+
+	function handleOpenChange(val: boolean) {
+		open = val;
+		onOpenChange?.(val);
 	}
-}
 </script>
 
-<svelte:window onkeydown={open ? handleKeydown : undefined} />
-
-{#if open}
-	<div
-		class="dialog-backdrop fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-		onclick={handleBackdropClick}
-		role="presentation"
-	>
-		<div
-			class="dialog-content bg-white dark:bg-panelSoft rounded-lg shadow-xl max-w-md w-full p-6 {className}"
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby={title ? 'dialog-title'  : undefined}
-			aria-describedby={description ? 'dialog-description'  : undefined}
+<Dialog.Root {open} onOpenChange={handleOpenChange}>
+	<Dialog.Portal>
+		<Dialog.Overlay class="dialog-backdrop fixed inset-0 z-[9990] bg-black/80 backdrop-blur-md transition-opacity" />
+		<Dialog.Content
+			class="dialog-content fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9991] w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#0d0e12]/95 border border-[#2a2e3d] rounded-2xl shadow-2xl p-6 text-neutral-100 font-sans focus:outline-none {className}"
 		>
+			<!-- Tactical Corner Notches -->
+			<span class="hud-notch-tl" aria-hidden="true"></span>
+			<span class="hud-notch-tr" aria-hidden="true"></span>
+			<span class="hud-notch-bl" aria-hidden="true"></span>
+			<span class="hud-notch-br" aria-hidden="true"></span>
+
+			<!-- Gold Top Highlight -->
+			<div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#f3d471] to-transparent opacity-80" aria-hidden="true"></div>
+
 			<div class="dialog-header flex items-start justify-between mb-4">
-				<div class="flex-1">
+				<div class="flex-1 min-w-0 pr-3">
 					{#if title}
-						<h2 id="dialog-title" class="text-xl font-semibold text-sand dark:text-white">
-							{title}
-						</h2>
+						<Dialog.Title class="text-lg font-bold text-neutral-100 flex items-center gap-2 tracking-wide">
+							<span class="text-[#f3d471] font-mono text-sm select-none">§</span>
+							<span class="truncate">{title}</span>
+						</Dialog.Title>
 					{/if}
 					{#if description}
-						<p id="dialog-description" class="text-sm text-sand/60 dark:text-sand/40 mt-1">
+						<Dialog.Description class="text-xs text-neutral-400 mt-1 leading-relaxed">
 							{description}
-						</p>
+						</Dialog.Description>
 					{/if}
 				</div>
-				<button
-					type="button"
-					class="dialog-close text-sand/40 hover:text-sand/60 dark:hover:text-sand/40"
-					onclick={handleClose}
+				<Dialog.Close
+					class="h-8 w-8 rounded-lg bg-neutral-800/60 border border-neutral-700/50 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-700/60 hover:border-[#f3d471]/50 transition-all select-none focus:outline-none cursor-pointer"
 					aria-label="Close dialog"
 				>
-					<Icon name="x" class="w-5 h-5" />
-				</button>
+					<Icon name="x" class="w-4 h-4" />
+				</Dialog.Close>
 			</div>
 
-			<div class="dialog-body">
+			<div class="dialog-body text-sm text-neutral-300">
 				{#if children}
 					{@render children()}
 				{/if}
 			</div>
 
 			{#if footer}
-				<div class="dialog-footer flex gap-2 justify-end mt-6 pt-4 border-t border-sand/20 dark:border-sand/20">
+				<div class="dialog-footer flex gap-2 justify-end mt-6 pt-4 border-t border-[#2a2e3d]">
 					{@render footer()}
 				</div>
 			{/if}
-		</div>
-	</div>
-{/if}
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
 <style>
-	.dialog-backdrop {
-		animation: fadeIn 0.2s ease-out;
+	.hud-notch-tl,
+	.hud-notch-tr,
+	.hud-notch-bl,
+	.hud-notch-br {
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		pointer-events: none;
+		z-index: 10;
 	}
-
-	.dialog-content {
-		animation: slideIn 0.3s ease-out;
+	.hud-notch-tl {
+		top: 3px;
+		left: 3px;
+		border-top: 2px solid #f3d471;
+		border-left: 2px solid #f3d471;
 	}
-
-	@keyframes fadeIn {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
+	.hud-notch-tr {
+		top: 3px;
+		right: 3px;
+		border-top: 2px solid #f3d471;
+		border-right: 2px solid #f3d471;
 	}
-
-	@keyframes slideIn {
-		from {
-			opacity: 0;
-	transform: scale(0.95) translateY(-10px);
-		}
-		to {
-			opacity: 1;
-	transform: scale(1) translateY(0);
-		}
+	.hud-notch-bl {
+		bottom: 3px;
+		left: 3px;
+		border-bottom: 2px solid #f3d471;
+		border-left: 2px solid #f3d471;
+	}
+	.hud-notch-br {
+		bottom: 3px;
+		right: 3px;
+		border-bottom: 2px solid #f3d471;
+		border-right: 2px solid #f3d471;
 	}
 </style>
-
-
-
-

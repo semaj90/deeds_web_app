@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { hasGlyphTopology } from '$lib/analytics/glyph-topology-visibility.js';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import { researchTasks } from '$lib/stores/research-tasks.svelte.js';
@@ -1134,11 +1135,11 @@
 				</div>
 
 				<!-- Glyph Topology Context -->
-				{#if matrixData.glyphContext.totalGlyphs > 0}
+				{#if hasGlyphTopology(matrixData.glyphContext?.totalGlyphs)}
 					<div class="matrix-section">
 						<h4>Glyph Topology ({matrixData.glyphContext.totalGlyphs} glyphs)</h4>
 						<div class="matrix-coverage">
-							{#each matrixData.glyphContext.topSections as sec}
+							{#each matrixData.glyphContext?.topSections ?? [] as sec}
 								<div class="matrix-coverage-item">
 									<span class="matrix-pipe-label">{sec.section}</span>
 									<span class="matrix-pipe-count">{sec.count}</span>

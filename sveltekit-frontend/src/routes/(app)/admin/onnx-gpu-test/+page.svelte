@@ -102,13 +102,16 @@
 		// Test 6: Load Gemma4 E2B ONNX model (new, replaces Gemma3)
 		try {
 			const start = Date.now();
-			const session = await getOnnxSession('/gemma4_e2b_onnx/model.onnx');
+			// The root model.onnx is a stub whose external data (q4) is not on disk; load the q4f16
+			// decoder, which is what gemma4-e2b-session.ts uses and whose .onnx_data is present.
+			const e2bPath = '/gemma4_e2b_onnx/onnx/decoder_model_merged_q4f16.onnx';
+			const session = await getOnnxSession(e2bPath);
 			const duration = Date.now() - start;
 			if (session) {
-				const provider = getProviderLabel('/gemma4_e2b_onnx/model.onnx');
+				const provider = getProviderLabel(e2bPath);
 				addResult('Gemma4 E2B Load', 'pass', `Loaded with ${provider}; inference speed NOT_MEASURED`, duration);
 			} else {
-				addResult('Gemma4 E2B Load', 'skip', 'Model not downloaded yet. Run: bash scripts/download-gemma4-e2b-onnx.sh');
+				addResult('Gemma4 E2B Load', 'skip', 'Model not downloaded yet. Run: bash static/gemma4_e2b_onnx/download.sh');
 			}
 		} catch (e) {
 			addResult('Gemma4 E2B Load', 'skip', 'Model not available: ' + String(e).substring(0, 60));

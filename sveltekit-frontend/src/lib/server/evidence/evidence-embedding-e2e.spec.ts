@@ -13,19 +13,43 @@
 import { createHash } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import pg from 'pg';
 import { PgDialect } from 'drizzle-orm/pg-core';
 import type { SQL } from 'drizzle-orm';
 import { createEvidenceEmbeddingProducer, type EvidenceEmbeddingReceipt } from './evidence-embedding-producer.js';
 import { persistEvidenceVectorForProjectionV1 } from './evidence-vector-persistence-v1.js';
 import { projectEvidenceVectorOutboxBatchV1 } from './evidence-vector-projection-worker-v1.js';
+import { createEvidenceVectorProjectionSchedulerV1 } from './evidence-vector-projection-scheduler-v1.js';
+import { claimBatch, completeAnalysisJob, failAnalysisJob, type JobType } from '../analysis/analysis-jobs.js';
+import { executeAnalysisJobStageV1, startWorker, stopWorker } from '../analysis/worker.js';
+import { searchEvidenceVectorsPgvectorV1 } from '../retrieval/pgvector-semantic-search-v1.js';
 import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
 import {
   assertEvidenceEmbeddingAdmitted,
   evidenceQdrantPointId,
   looksLikePseudoVector,
 } from './evidence-embedding-contract.js';
+
+const uploadWorkerMocks = vi.hoisted(() => ({
+  getSeaweedFile: vi.fn(),
+  uploadSeaweedFile: vi.fn(),
+  getSeaweedClient: vi.fn(() => ({ presignedGetObject: vi.fn(async () => 'https://scratch.invalid/evidence') })),
+  classifyUploadedBytes: vi.fn(),
+  processDocument: vi.fn(),
+  processEvidenceDocumentCanonicalV1: vi.fn(),
+}));
+
+vi.mock('$lib/server/seaweed-client.js', () => ({
+  getSeaweedFile: uploadWorkerMocks.getSeaweedFile,
+  uploadSeaweedFile: uploadWorkerMocks.uploadSeaweedFile,
+  getSeaweedClient: uploadWorkerMocks.getSeaweedClient,
+}));
+vi.mock('$lib/server/ingest/upload-classification-v1.js', () => ({ classifyUploadedBytes: uploadWorkerMocks.classifyUploadedBytes }));
+vi.mock('$lib/server/document-processor.js', () => ({ processDocument: uploadWorkerMocks.processDocument }));
+vi.mock('./process-evidence-document-v1.js', () => ({
+  processEvidenceDocumentCanonicalV1: uploadWorkerMocks.processEvidenceDocumentCanonicalV1,
+}));
 
 const url = process.env.EVIDENCE_E2E_DATABASE_URL;
 const describeDb = url ? describe : describe.skip;
@@ -62,6 +86,7 @@ const MODEL_PATH = 'C:\\models\\embeddinggemma-300m-f16.gguf';
 const ARTIFACT_SHA = 'bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7';
 const NOW = new Date('2026-10-30T00:00:00Z');
 const EVIDENCE_ID = '33333333-3333-4333-8333-333333333333';
+const ANALYSIS_JOB_ID = '44444444-4444-4444-8444-444444444444';
 
 describe('Evidence embedding E2E database safety gate', () => {
   const validUrl = 'postgres://scratch:scratch@127.0.0.1:55441/evidence_e2e_disposable';
@@ -198,10 +223,14 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
   let pool: pg.Pool;
   let llama: StubLlama;
   let qdrant: Awaited<ReturnType<typeof startStubQdrant>>;
+  let scratchWorkerStarted = false;
 
   beforeAll(async () => {
     if (!url) throw new Error('EVIDENCE_E2E_DATABASE_URL is required');
     assertDisposableEvidenceDatabaseUrl(url);
+    if (process.env.DATABASE_URL !== url) {
+      throw new Error('Evidence E2E requires DATABASE_URL to equal the dedicated disposable database URL');
+    }
     pool = new pg.Pool({ connectionString: url, max: 4 });
     const identity = await pool.query<{ database_name: string; version: string }>(
       'SELECT current_database() AS database_name, current_setting(\'server_version_num\') AS version'
@@ -213,28 +242,138 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     if (serverVersion < 180000 || serverVersion >= 190000) {
       throw new Error('Evidence E2E requires PostgreSQL 18');
     }
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS evidence (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+        case_id uuid,
+        user_id integer,
+        uploaded_by integer,
+        title varchar(255) NOT NULL DEFAULT '',
+        description text,
+        file_path varchar(500),
+        file_type varchar(100),
+        file_size bigint,
+        hash varchar(255),
+        source varchar(255),
+        date_obtained timestamptz,
+        chain_of_custody jsonb,
+        criminal_id uuid,
+        evidence_type text,
+        sub_type varchar(50),
+        file_url text,
+        file_name varchar(255),
+        metadata jsonb,
+        canvas_position jsonb DEFAULT '{}'::jsonb,
+        uploaded_at timestamptz,
+        evidence_number varchar(50),
+        type varchar(100),
+        summary text,
+        pos_x integer,
+        pos_y integer,
+        collected_at timestamptz,
+        collected_by varchar(255),
+        mime_type varchar(100),
+        tags jsonb,
+        ai_tags jsonb,
+        ai_analysis jsonb,
+        ai_summary text,
+        verified_at timestamptz,
+        verified boolean DEFAULT false,
+        status varchar(50),
+        extracted_text text,
+        entities jsonb DEFAULT '[]'::jsonb,
+        keywords jsonb DEFAULT '[]'::jsonb,
+        embedding vector(768),
+        deleted_at timestamptz,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        updated_at timestamptz NOT NULL DEFAULT now()
+      )
+    `);
+    await pool.query(`
+      ALTER TABLE evidence
+        ADD COLUMN IF NOT EXISTS case_id uuid,
+        ADD COLUMN IF NOT EXISTS user_id integer,
+        ADD COLUMN IF NOT EXISTS uploaded_by integer,
+        ADD COLUMN IF NOT EXISTS title varchar(255) NOT NULL DEFAULT '',
+        ADD COLUMN IF NOT EXISTS description text,
+        ADD COLUMN IF NOT EXISTS file_path varchar(500),
+        ADD COLUMN IF NOT EXISTS file_type varchar(100),
+        ADD COLUMN IF NOT EXISTS file_size bigint,
+        ADD COLUMN IF NOT EXISTS hash varchar(255),
+        ADD COLUMN IF NOT EXISTS source varchar(255),
+        ADD COLUMN IF NOT EXISTS date_obtained timestamptz,
+        ADD COLUMN IF NOT EXISTS chain_of_custody jsonb,
+        ADD COLUMN IF NOT EXISTS criminal_id uuid,
+        ADD COLUMN IF NOT EXISTS evidence_type text,
+        ADD COLUMN IF NOT EXISTS sub_type varchar(50),
+        ADD COLUMN IF NOT EXISTS file_url text,
+        ADD COLUMN IF NOT EXISTS file_name varchar(255),
+        ADD COLUMN IF NOT EXISTS metadata jsonb,
+        ADD COLUMN IF NOT EXISTS canvas_position jsonb DEFAULT '{}'::jsonb,
+        ADD COLUMN IF NOT EXISTS uploaded_at timestamptz,
+        ADD COLUMN IF NOT EXISTS evidence_number varchar(50),
+        ADD COLUMN IF NOT EXISTS type varchar(100),
+        ADD COLUMN IF NOT EXISTS summary text,
+        ADD COLUMN IF NOT EXISTS pos_x integer,
+        ADD COLUMN IF NOT EXISTS pos_y integer,
+        ADD COLUMN IF NOT EXISTS collected_at timestamptz,
+        ADD COLUMN IF NOT EXISTS collected_by varchar(255),
+        ADD COLUMN IF NOT EXISTS mime_type varchar(100),
+        ADD COLUMN IF NOT EXISTS tags jsonb,
+        ADD COLUMN IF NOT EXISTS ai_tags jsonb,
+        ADD COLUMN IF NOT EXISTS ai_analysis jsonb,
+        ADD COLUMN IF NOT EXISTS ai_summary text,
+        ADD COLUMN IF NOT EXISTS verified_at timestamptz,
+        ADD COLUMN IF NOT EXISTS verified boolean DEFAULT false,
+        ADD COLUMN IF NOT EXISTS status varchar(50),
+        ADD COLUMN IF NOT EXISTS extracted_text text,
+        ADD COLUMN IF NOT EXISTS entities jsonb DEFAULT '[]'::jsonb,
+        ADD COLUMN IF NOT EXISTS keywords jsonb DEFAULT '[]'::jsonb,
+        ADD COLUMN IF NOT EXISTS embedding vector(768),
+        ADD COLUMN IF NOT EXISTS deleted_at timestamptz,
+        ADD COLUMN IF NOT EXISTS created_at timestamptz NOT NULL DEFAULT now(),
+        ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now()
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS analysis_jobs (
+        id uuid PRIMARY KEY,
+        evidence_id uuid NOT NULL,
+        case_id uuid,
+        job_type varchar(64) NOT NULL,
+        status varchar(32) NOT NULL DEFAULT 'queued',
+        progress varchar(32) DEFAULT '0',
+        result jsonb DEFAULT '{}'::jsonb,
+        error text,
+        started_at timestamptz,
+        completed_at timestamptz,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        updated_at timestamptz NOT NULL DEFAULT now()
+      )
+    `);
     llama = await startStubLlama();
     qdrant = await startStubQdrant();
   });
 
   afterAll(async () => {
+    if (scratchWorkerStarted) stopWorker();
     await pool?.end();
     llama?.server.close();
     qdrant?.server.close();
   });
 
   beforeEach(async () => {
+    vi.clearAllMocks();
     llama.setDimension(768);
     llama.setModelPath(MODEL_PATH);
     qdrant.points.clear();
-    await pool.query('TRUNCATE evidence_vector_projection_outbox, evidence_vectors');
+    await pool.query('TRUNCATE analysis_jobs, evidence_vector_projection_outbox, evidence_vectors');
     await pool.query('INSERT INTO evidence (id) VALUES ($1) ON CONFLICT DO NOTHING', [EVIDENCE_ID]);
   });
 
   const producer = (modelReceipt: EvidenceEmbeddingReceipt = receipt) =>
     createEvidenceEmbeddingProducer(llama.baseUrl, { receipt: modelReceipt, tokenizerRevision: 'tok-rev', inputPolicyRevision: 'semantic-input-v1', now: NOW });
 
-  async function persistChunk(text: string, chunkIndex: number, modelReceipt: EvidenceEmbeddingReceipt = receipt, project = true) {
+  async function persistChunk(text: string, chunkIndex: number, modelReceipt: EvidenceEmbeddingReceipt = receipt, project = true, sourceRevision = SOURCE_REVISION, evidenceId = EVIDENCE_ID) {
     const produced = await producer(modelReceipt)(text);
     const database = {
       execute: async (query: SQL) => {
@@ -264,8 +403,8 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
       },
     };
     const canonicalVector = await persistEvidenceVectorForProjectionV1(database, {
-      evidenceId: EVIDENCE_ID,
-      sourceRevision: SOURCE_REVISION,
+      evidenceId,
+      sourceRevision,
       chunkIndex,
       content: text,
       embedding: produced.vector,
@@ -273,13 +412,13 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
       outputChecksum: produced.outputChecksum,
       provenance: produced.provenance,
       metadata: {
-        source_revision: SOURCE_REVISION,
+        source_revision: sourceRevision,
         embedding_provenance: produced.provenance,
       },
     });
     const pointId = await evidenceQdrantPointId({
-      evidenceId: EVIDENCE_ID,
-      sourceRevision: SOURCE_REVISION,
+      evidenceId,
+      sourceRevision,
       chunkIndex,
       modelArtifactSha256: produced.provenance.modelArtifactSha256,
     });
@@ -290,12 +429,335 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
       if (projection.claimed > 0) {
         const failedJobs = projection.completed === projection.claimed
           ? []
-          : (await pool.query('SELECT status, last_error FROM evidence_vector_projection_outbox WHERE evidence_vector_id IN (SELECT id FROM evidence_vectors WHERE evidence_id = $1)', [EVIDENCE_ID])).rows;
+          : (await pool.query('SELECT status, last_error FROM evidence_vector_projection_outbox WHERE evidence_vector_id IN (SELECT id FROM evidence_vectors WHERE evidence_id = $1)', [evidenceId])).rows;
         expect(projection.completed, JSON.stringify({ projection, failedJobs })).toBe(projection.claimed);
       }
     }
     return { produced, pointId, canonicalVector, database };
   }
+
+  it('runs uploaded source bytes through the durable upload processor to PostgreSQL and the projection receipt', async () => {
+    const sourceBytes = Buffer.from('synthetic isolated legal PDF source');
+    const sourceRevision = `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`;
+    const extractedText = 'Synthetic exhibit text: the agreement was signed on May 3.';
+    uploadWorkerMocks.getSeaweedFile.mockResolvedValue(sourceBytes);
+    uploadWorkerMocks.processDocument.mockResolvedValue({ rawText: extractedText, extractionMethod: 'isolated-fixture' });
+    let projectedPointId: string | undefined;
+    uploadWorkerMocks.processEvidenceDocumentCanonicalV1.mockImplementation(async (input: {
+      evidenceId: string;
+      text: string;
+      metadata: { source_revision: string };
+    }) => {
+      const persisted = await persistChunk(input.text, 0, receipt, true, input.metadata.source_revision, input.evidenceId);
+      projectedPointId = persisted.pointId;
+      return { chunkCount: 1, persistedCount: 1, sourceRevision: input.metadata.source_revision };
+    });
+
+    const metadata = {
+      evidenceId: EVIDENCE_ID,
+      caseId: null,
+      objectKey: 'evidence/fixture/verified-upload.pdf',
+      sourceSha256: sourceRevision,
+      fileName: 'verified-upload.pdf',
+      contentType: 'application/pdf',
+      uploadedBy: 1,
+    };
+    await pool.query(
+      `INSERT INTO analysis_jobs (id, evidence_id, case_id, job_type, status, result)
+       VALUES ($1, $2, NULL, 'upload_pipeline', 'queued', $3::jsonb)`,
+      [ANALYSIS_JOB_ID, EVIDENCE_ID, JSON.stringify(metadata)],
+    );
+    const executor = {
+      execute: async (query: SQL) => {
+        const compiled = dialect.sqlToQuery(query);
+        const result = await pool.query(compiled.sql, compiled.params);
+        return { rows: result.rows as Array<Record<string, unknown>> };
+      },
+    };
+    const claimed = await claimBatch('upload_pipeline', 1, executor);
+    expect(claimed).toHaveLength(1);
+    expect((await pool.query('SELECT status FROM analysis_jobs WHERE id = $1', [ANALYSIS_JOB_ID])).rows[0]?.status).toBe('running');
+
+    const result = await executeAnalysisJobStageV1(
+      claimed[0]!.jobType as JobType,
+      claimed[0]!.evidenceId,
+      claimed[0]!.result as Record<string, unknown>,
+      claimed[0]!.id,
+    );
+    await completeAnalysisJob(claimed[0]!.id, result, executor);
+
+    expect(result).toMatchObject({
+      status: 'processed',
+      evidenceId: EVIDENCE_ID,
+      sourceRevision,
+      representationId: 'semantic_768',
+      canonicalStore: 'postgresql.evidence_vectors',
+      chunkCount: 1,
+      persistedCount: 1,
+    });
+    expect(uploadWorkerMocks.getSeaweedFile).toHaveBeenCalledWith('legal-evidence', 'evidence/fixture/verified-upload.pdf');
+    expect(uploadWorkerMocks.processDocument).toHaveBeenCalledWith(expect.objectContaining({
+      buffer: sourceBytes,
+      fileName: 'verified-upload.pdf',
+      mimeType: 'application/pdf',
+      evidenceId: EVIDENCE_ID,
+    }));
+    expect(uploadWorkerMocks.processEvidenceDocumentCanonicalV1).toHaveBeenCalledWith(expect.objectContaining({
+      evidenceId: EVIDENCE_ID,
+      text: extractedText,
+      sourceBytes,
+      metadata: expect.objectContaining({ source_revision: sourceRevision, extractionMethod: 'isolated-fixture' }),
+    }));
+
+    const readback = (await pool.query(
+      `SELECT ev.content, ev.source_revision, vector_dims(ev.embedding) AS dimension,
+              outbox.status AS projection_status, outbox.verification_receipt IS NOT NULL AS projection_verified
+         FROM evidence_vectors ev
+         JOIN evidence_vector_projection_outbox outbox ON outbox.evidence_vector_id = ev.id
+        WHERE ev.evidence_id = $1`,
+      [EVIDENCE_ID],
+    )).rows;
+    expect(readback).toEqual([{
+      content: extractedText,
+      source_revision: sourceRevision,
+      dimension: 768,
+      projection_status: 'COMPLETED',
+      projection_verified: true,
+    }]);
+    expect(projectedPointId).toBeTruthy();
+    expect(qdrant.points.get(projectedPointId!)).toMatchObject({
+      vector: expect.arrayContaining([expect.any(Number)]),
+      payload: { evidence_id: EVIDENCE_ID, source_revision: sourceRevision, chunk_index: 0 },
+    });
+    const completedJob = (await pool.query(
+      'SELECT status, progress, result->>\'status\' AS processing_status FROM analysis_jobs WHERE id = $1',
+      [ANALYSIS_JOB_ID],
+    )).rows[0];
+    expect(completedJob).toEqual({ status: 'completed', progress: '100', processing_status: 'processed' });
+    await expect(claimBatch('upload_pipeline', 1, executor)).resolves.toHaveLength(0);
+  });
+
+  it('writes the actual evidence form upload and durable job to the disposable PostgreSQL target', async () => {
+    const sourceBytes = Buffer.from('%PDF-1.7 isolated scratch upload');
+    const sourceRevision = `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`;
+    const extractedText = 'Scratch upload exhibit: the signed agreement is dated May 3.';
+    uploadWorkerMocks.uploadSeaweedFile.mockResolvedValue(undefined);
+    uploadWorkerMocks.getSeaweedFile.mockResolvedValue(sourceBytes);
+    uploadWorkerMocks.classifyUploadedBytes.mockReturnValue({
+      isQuarantined: false,
+      sourceRevision,
+      observedMime: 'application/pdf',
+      mimeStatus: 'matched',
+      taxonomyGroup: 'legal_document',
+      legalEvidenceTypeProposal: 'document',
+    });
+    uploadWorkerMocks.processDocument.mockResolvedValue({ rawText: extractedText, extractionMethod: 'isolated-fixture' });
+    let projectionDatabase: Awaited<ReturnType<typeof persistChunk>>['database'] | undefined;
+    uploadWorkerMocks.processEvidenceDocumentCanonicalV1.mockImplementation(async (input: {
+      evidenceId: string;
+      text: string;
+      metadata: { source_revision: string };
+    }) => {
+      const persisted = await persistChunk(input.text, 0, receipt, false, input.metadata.source_revision, input.evidenceId);
+      projectionDatabase = persisted.database;
+      return { chunkCount: 1, persistedCount: 1, sourceRevision: input.metadata.source_revision, pointId: persisted.pointId };
+    });
+
+    startWorker();
+    scratchWorkerStarted = true;
+    const listenerDeadline = Date.now() + 10_000;
+    let listenerReady = false;
+    while (Date.now() < listenerDeadline) {
+      const listener = await pool.query<{ ready: boolean }>(
+        `SELECT EXISTS (
+           SELECT 1 FROM pg_stat_activity
+            WHERE application_name = 'parent-atlas-analysis-worker-listener'
+         ) AS ready`,
+      );
+      if (listener.rows[0]?.ready) {
+        listenerReady = true;
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    expect(listenerReady, 'analysis worker LISTEN connection did not start against disposable PostgreSQL').toBe(true);
+
+    const formData = new FormData();
+    formData.set('title', 'Scratch upload exhibit');
+    formData.set('description', 'Disposable integration fixture');
+    formData.set('file', new File([sourceBytes], 'scratch-exhibit.pdf', { type: 'application/pdf' }));
+    const request = new Request('http://localhost/evidence', { method: 'POST', body: formData });
+    const { actions } = await import('../../../routes/(app)/evidence/+page.server.js');
+    const result = await actions.upload({ request, locals: { user: { id: '7' } } } as never) as {
+      success?: boolean;
+      evidence?: { id: string; fileUrl: string };
+      jobId?: string;
+      error?: string;
+    };
+
+    expect(result.success, result.error).toBe(true);
+    expect(result.evidence?.id).toBeTruthy();
+    expect(result.jobId).toBeTruthy();
+    expect(uploadWorkerMocks.uploadSeaweedFile).toHaveBeenCalledWith(
+      'legal-evidence',
+      result.evidence!.fileUrl,
+      sourceBytes,
+      expect.any(Object),
+    );
+    const readback = (await pool.query(
+      'SELECT e.id, e.hash, j.job_type, j.status, j.result FROM evidence e JOIN analysis_jobs j ON j.evidence_id = e.id WHERE e.id = $1 AND j.id = $2',
+      [result.evidence!.id, result.jobId],
+    )).rows[0];
+    expect(readback).toMatchObject({
+      id: result.evidence!.id,
+      hash: sourceRevision,
+      job_type: 'upload_pipeline',
+      status: 'queued',
+      result: expect.objectContaining({ evidenceId: result.evidence!.id, sourceSha256: sourceRevision }),
+    });
+
+    const processingDeadline = Date.now() + 15_000;
+    let processed: Record<string, unknown> | undefined;
+    while (Date.now() < processingDeadline) {
+      const job = (await pool.query<{ status: string; result: Record<string, unknown> }>(
+        'SELECT status, result FROM analysis_jobs WHERE id = $1',
+        [result.jobId],
+      )).rows[0];
+      if (job?.status === 'completed') {
+        processed = job.result;
+        break;
+      }
+      if (job?.status === 'failed') throw new Error(`UPLOAD_PIPELINE_WORKER_FAILED: ${JSON.stringify(job.result)}`);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    expect(processed, 'durable upload job was not completed by the worker listener/poll loop').toBeDefined();
+    stopWorker();
+    scratchWorkerStarted = false;
+    expect(uploadWorkerMocks.getSeaweedFile).toHaveBeenCalledWith('legal-evidence', result.evidence!.fileUrl);
+    expect(uploadWorkerMocks.processDocument).toHaveBeenCalledWith(expect.objectContaining({
+      buffer: sourceBytes,
+      fileName: 'scratch-exhibit.pdf',
+      mimeType: 'application/pdf',
+      evidenceId: result.evidence!.id,
+    }));
+    expect(processed).toMatchObject({
+      status: 'processed',
+      evidenceId: result.evidence!.id,
+      sourceRevision,
+      representationId: 'semantic_768',
+      canonicalStore: 'postgresql.evidence_vectors',
+      chunkCount: 1,
+      persistedCount: 1,
+    });
+    expect((await pool.query(
+      'SELECT status FROM evidence_vector_projection_outbox WHERE evidence_vector_id IN (SELECT id FROM evidence_vectors WHERE evidence_id = $1)',
+      [result.evidence!.id],
+    )).rows).toEqual([{ status: 'PENDING' }]);
+    let resolveScheduledProjection: (() => void) | undefined;
+    const scheduledProjectionFinished = new Promise<void>((resolve) => { resolveScheduledProjection = resolve; });
+    let scheduledProjectionResult: Awaited<ReturnType<typeof projectEvidenceVectorOutboxBatchV1>> | undefined;
+    const scheduler = createEvidenceVectorProjectionSchedulerV1({
+      enabled: true,
+      intervalMs: 60_000,
+      runBatch: async () => {
+        try {
+          if (!projectionDatabase) throw new Error('EVIDENCE_E2E_PROJECTION_DATABASE_MISSING');
+          scheduledProjectionResult = await projectEvidenceVectorOutboxBatchV1(projectionDatabase, qdrant, {
+            resolveCollectionAlias: async (lane) => lane === 'evidence_semantic_768' ? 'evidence_items' : '',
+          });
+        } finally {
+          resolveScheduledProjection?.();
+        }
+      },
+    });
+    expect(scheduler.start()).toBe(true);
+    await scheduledProjectionFinished;
+    await scheduler.stop();
+    expect(scheduledProjectionResult).toMatchObject({ claimed: 1, completed: 1, retried: 0, deadLettered: 0 });
+    const canonicalReadback = (await pool.query(
+      `SELECT ev.content, ev.source_revision, vector_dims(ev.embedding) AS dimension,
+              outbox.status AS projection_status, outbox.verification_receipt IS NOT NULL AS projection_verified,
+              job.status AS job_status
+         FROM evidence_vectors ev
+         JOIN evidence_vector_projection_outbox outbox ON outbox.evidence_vector_id = ev.id
+         JOIN analysis_jobs job ON job.evidence_id = ev.evidence_id AND job.job_type = 'upload_pipeline'
+        WHERE ev.evidence_id = $1`,
+      [result.evidence!.id],
+    )).rows;
+    expect(canonicalReadback).toEqual([{
+      content: extractedText,
+      source_revision: sourceRevision,
+      dimension: 768,
+      projection_status: 'COMPLETED',
+      projection_verified: true,
+      job_status: 'completed',
+    }]);
+    const queryVector = (await producer()(extractedText)).vector;
+    const searchHits = await searchEvidenceVectorsPgvectorV1(queryVector, { limit: 5 }, pool);
+    expect(searchHits).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidenceId: result.evidence!.id, content: extractedText }),
+    ]));
+    expect(searchHits.find((hit) => hit.evidenceId === result.evidence!.id)?.similarity).toBeGreaterThan(0.99);
+  });
+
+  it('does not report completion when the durable job row is missing', async () => {
+    const executor = {
+      execute: async (query: SQL) => {
+        const compiled = dialect.sqlToQuery(query);
+        const result = await pool.query(compiled.sql, compiled.params);
+        return { rows: result.rows as Array<Record<string, unknown>> };
+      },
+    };
+    await expect(completeAnalysisJob(
+      '55555555-5555-4555-8555-555555555555',
+      { status: 'processed' },
+      executor,
+    )).rejects.toThrow('ANALYSIS_JOB_COMPLETION_ROW_MISSING');
+  });
+
+  it('persists an upload processing failure instead of marking the durable job completed', async () => {
+    uploadWorkerMocks.getSeaweedFile.mockRejectedValue(new Error('fixture object store unavailable'));
+    const metadata = {
+      evidenceId: EVIDENCE_ID,
+      caseId: null,
+      objectKey: 'evidence/fixture/failing-upload.pdf',
+      sourceSha256: SOURCE_REVISION,
+      fileName: 'failing-upload.pdf',
+      contentType: 'application/pdf',
+      uploadedBy: 1,
+    };
+    await pool.query(
+      `INSERT INTO analysis_jobs (id, evidence_id, case_id, job_type, status, result)
+       VALUES ($1, $2, NULL, 'upload_pipeline', 'queued', $3::jsonb)`,
+      [ANALYSIS_JOB_ID, EVIDENCE_ID, JSON.stringify(metadata)],
+    );
+    const executor = {
+      execute: async (query: SQL) => {
+        const compiled = dialect.sqlToQuery(query);
+        const result = await pool.query(compiled.sql, compiled.params);
+        return { rows: result.rows as Array<Record<string, unknown>> };
+      },
+    };
+    const [claimed] = await claimBatch('upload_pipeline', 1, executor);
+    expect(claimed).toBeDefined();
+    await expect(executeAnalysisJobStageV1(
+      claimed!.jobType as JobType,
+      claimed!.evidenceId,
+      claimed!.result as Record<string, unknown>,
+      claimed!.id,
+    )).rejects.toThrow('fixture object store unavailable');
+
+    await failAnalysisJob(claimed!.id, 'fixture object store unavailable', executor);
+    const failed = await pool.query(
+      'SELECT status, error, completed_at FROM analysis_jobs WHERE id = $1',
+      [ANALYSIS_JOB_ID],
+    );
+    expect(failed.rows[0]).toMatchObject({
+      status: 'failed',
+      error: 'fixture object store unavailable',
+    });
+    expect(failed.rows[0]?.completed_at).toBeInstanceOf(Date);
+  });
 
   it('matches the Drizzle projection-outbox column and foreign-key contract', async () => {
     const columns = (await pool.query(
@@ -387,7 +849,7 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
   it('retains a PostgreSQL projection event after Qdrant failure and retries to verified completion', async () => {
     const { pointId, database } = await persistChunk('Temporary Qdrant outage fixture', 8, receipt, false);
     qdrant.failNextUpsert();
-    const options = { resolveCollectionAlias: async () => 'evidence_items', retryBaseMs: 100 };
+    const options = { resolveCollectionAlias: async () => 'evidence_items', retryBaseMs: 60_000 };
     const failed = await projectEvidenceVectorOutboxBatchV1(database, qdrant, options);
 
     expect(failed).toMatchObject({ claimed: 1, completed: 0, retried: 1, deadLettered: 0 });
@@ -405,6 +867,67 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     expect(retried).toMatchObject({ claimed: 1, completed: 1, retried: 0, deadLettered: 0 });
     expect((await pool.query('SELECT status, verification_receipt IS NOT NULL AS verified FROM evidence_vector_projection_outbox WHERE qdrant_point_id = $1', [pointId])).rows[0])
       .toEqual({ status: 'COMPLETED', verified: true });
+    expect(qdrant.points.get(pointId)?.vector).toHaveLength(768);
+  });
+
+  it('allows only one concurrent projector to claim and publish a pending evidence vector', async () => {
+    const { pointId, database } = await persistChunk('Concurrent projection claim fixture', 13, receipt, false);
+    const options = { resolveCollectionAlias: async () => 'evidence_items' };
+    const outcomes = await Promise.all([
+      projectEvidenceVectorOutboxBatchV1(database, qdrant, options),
+      projectEvidenceVectorOutboxBatchV1(database, qdrant, options),
+    ]);
+
+    expect(outcomes.reduce((total, result) => total + result.claimed, 0)).toBe(1);
+    expect(outcomes.reduce((total, result) => total + result.completed, 0)).toBe(1);
+    expect(qdrant.points.size).toBe(1);
+    expect(qdrant.points.has(pointId)).toBe(true);
+    expect((await pool.query(
+      'SELECT status, attempt_count, verification_receipt IS NOT NULL AS verified FROM evidence_vector_projection_outbox WHERE qdrant_point_id = $1',
+      [pointId],
+    )).rows).toEqual([{ status: 'COMPLETED', attempt_count: 1, verified: true }]);
+  });
+
+  it('keeps projection disabled without touching the outbox, then drains a scheduled batch to verified Qdrant readback', async () => {
+    const { pointId, database } = await persistChunk('Scheduled projection fixture', 12, receipt, false);
+    const runBatch = vi.fn(async () => projectEvidenceVectorOutboxBatchV1(database, qdrant, {
+      resolveCollectionAlias: async (lane) => lane === 'evidence_semantic_768' ? 'evidence_items' : '',
+    }));
+    const disabled = createEvidenceVectorProjectionSchedulerV1({ enabled: false, runBatch });
+
+    expect(disabled.start()).toBe(false);
+    await disabled.stop();
+    expect(runBatch).not.toHaveBeenCalled();
+    expect((await pool.query(
+      'SELECT status FROM evidence_vector_projection_outbox WHERE qdrant_point_id = $1',
+      [pointId],
+    )).rows).toEqual([{ status: 'PENDING' }]);
+    expect(qdrant.points.has(pointId)).toBe(false);
+
+    let resolveBatch: (() => void) | undefined;
+    const batchFinished = new Promise<void>((resolve) => { resolveBatch = resolve; });
+    let batchResult: Awaited<ReturnType<typeof projectEvidenceVectorOutboxBatchV1>> | undefined;
+    const enabled = createEvidenceVectorProjectionSchedulerV1({
+      enabled: true,
+      intervalMs: 60_000,
+      runBatch: async () => {
+        try {
+          batchResult = await runBatch();
+        } finally {
+          resolveBatch?.();
+        }
+      },
+    });
+    expect(enabled.start()).toBe(true);
+    await batchFinished;
+    await enabled.stop();
+
+    expect(runBatch).toHaveBeenCalledOnce();
+    expect(batchResult).toMatchObject({ claimed: 1, completed: 1, retried: 0, deadLettered: 0 });
+    expect((await pool.query(
+      'SELECT status, verification_receipt IS NOT NULL AS verified FROM evidence_vector_projection_outbox WHERE qdrant_point_id = $1',
+      [pointId],
+    )).rows).toEqual([{ status: 'COMPLETED', verified: true }]);
     expect(qdrant.points.get(pointId)?.vector).toHaveLength(768);
   });
 
@@ -437,11 +960,13 @@ describeDb('evidence embedding lane end to end (stub llama-server, stub Qdrant, 
     await persistChunk('alpha lease agreement', 0);
     await persistChunk('beta witness statement', 1);
     const query = (await producer()('alpha lease agreement')).vector;
-    const top = (await pool.query(
-      `SELECT chunk_index FROM evidence_vectors ORDER BY embedding <=> $1::vector LIMIT 1`,
-      [`[${query.join(',')}]`]
-    )).rows[0];
-    expect(top.chunk_index).toBe(0);
+    const hits = await searchEvidenceVectorsPgvectorV1(query, { limit: 5 }, pool);
+    expect(hits[0]).toMatchObject({
+      evidenceId: EVIDENCE_ID,
+      chunkIndex: 0,
+      content: 'alpha lease agreement',
+    });
+    expect(hits[0]?.similarity).toBeGreaterThan(0.99);
   });
 
   it('fails closed when the receipt is stale', async () => {

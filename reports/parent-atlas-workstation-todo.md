@@ -321,7 +321,7 @@ This is vocabulary and sequencing only. It does not add a new implementation own
 
 | Phase | Status |
 |---|---|
-| Phase 11 Engram/Gemma4 memory wiring | partial |
+| Phase 11 Engram / ACE memory integration (Ornith synthesis consumer) | partial |
 | Phase 12 Parent Atlas codebase index | partial |
 | Phase 13 feature-gap registry completion | partial |
 | Phase 14 Redis exact-card cache policy | implemented |

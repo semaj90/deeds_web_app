@@ -67,7 +67,7 @@ const pool      = new pg.Pool({
   connectionString: DB_URL,
   max: 4,
   connectionTimeoutMillis: 5000,
-  statement_timeout: 30000,
+  statement_timeout: Number(process.env.ATLAS_INDEX_STATEMENT_TIMEOUT_MS || 180000),
   idleTimeoutMillis: 10000,
 });
 pool.on('error', () => {}); // suppress pool errors — main query will catch
@@ -137,7 +137,7 @@ const { rows: files } = await pool.query(`
       community_id,
       enriched_at
     FROM codebase_chunk_index
-    WHERE relative_path IS NOT NULL
+    WHERE relative_path IS NOT NULL AND relative_path <> ''
     ORDER BY relative_path, enriched_at DESC NULLS LAST
   ),
   per_topo AS (
@@ -258,7 +258,7 @@ for (const f of files) {
     f.topo_byte ?? null,                                  // tb
     c ?? '',                                              // c
     Math.round((parseFloat(f.page_rank_score) || 0) * 1e4) / 1e4,  // pr
-    Math.round(ga * 1e4) / 1e4,                           // ga
+    Math.round(Math.min(1, Math.max(0, ga)) * 1e4) / 1e4, // ga (clamped to [0,1]; atlasFileSchema contract)
     hit?.hits ?? 0,                                       // h
     Math.round((hit?.rs ?? 0) * 1e3) / 1e3,               // rs
     a?.dir ?? '',                                         // a

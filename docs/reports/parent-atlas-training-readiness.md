@@ -1,15 +1,15 @@
 # Parent Atlas Training Readiness
 
-Generated: 2026-08-09T00:00:00.000Z
+Generated: 2026-11-02T00:27:11.668Z
 Overall: READY_WITH_BLOCKERS
 
 ## Promotion Decisions
 
 - arrow_batch_export: PASS
 - qlora_semantic_dataset: BLOCKED
-- autoencoder_training: BLOCKED
+- autoencoder_training: PASS
 - packet_jepa_reranker: BLOCKED
-- gpu_topology_mapreduce: BLOCKED
+- gpu_topology_mapreduce: PASS
 - hyperrag_packet_materialization: PASS
 - tree_fanout_full_parity: BLOCKED
 
@@ -17,19 +17,19 @@ Overall: READY_WITH_BLOCKERS
 
 | Gate | Status | Evidence |
 |---|---:|---|
-| packet identity uniqueness | PASS | 58365/58365 distinct packet_key |
-| canonical labels and tree lineage | PASS | tree=100%, feature=100%, domain=100% |
-| lexical and concept evidence | PASS | concepts=99.9914%, lexical=99.9846% |
-| AST structural evidence | WARN | 3.7419% |
-| summary coverage | FAIL | 7.1618% |
-| canonical embedding coverage | FAIL | 0.0171% |
-| SOM 20x20 packet coverage | FAIL | 7.1721% |
+| packet identity uniqueness | PASS | 61718/61718 distinct packet_key |
+| canonical labels and tree lineage | PASS | tree=99.9044%, feature=100%, domain=100% |
+| lexical and concept evidence | PASS | concepts=95.9639%, lexical=99.8866% |
+| AST structural evidence (active code) | PASS | 96.3061% (9125/9475) [raw: 62.0629%] |
+| summary coverage | FAIL | 11.1572% |
+| canonical embedding coverage | PASS | 99.9044% |
+| SOM 20x20 packet coverage | PASS | 99.906% |
 | Arrow IPC replay | PASS | 200 rows, 48 columns, 0 failures |
 | Qdrant tree fan-out mirror | PASS_BOUNDED | 20/20 direct tree IDs matched |
 | Neo4j tree fan-out mirror | PASS_BOUNDED | 18811 HAS_TREE_NODE edges; tree-only=true |
 | native CUDA addon | PASS | C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build\Release\tensorrt_bridge.node |
 | Python CUDA training lane | PASS | 2.13.0+cu130 |
-| JEPA promotion | BLOCKED | MRR 0.7443 vs 0.7761; NDCG@10 0.7818 vs 0.7985 |
+| JEPA promotion | BLOCKED | evaluation missing |
 
 ## Status Model
 
@@ -51,3 +51,4 @@ Overall: READY_WITH_BLOCKERS
 5. Widen Qdrant and Neo4j tree-node mirrors in bounded batches until full parity gates pass.
 6. Install CUDA-enabled PyTorch in the dedicated training environment; keep RAPIDS/cuVS in WSL2.
 7. Re-run JEPA on the same deterministic split and promote only if both MRR and NDCG@10 beat baseline.
+

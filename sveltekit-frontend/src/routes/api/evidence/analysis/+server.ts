@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getWorkerStats } from '$lib/server/analysis/worker.js';
+import { getEvidenceVectorProjectionSchedulerStatusV1 } from '$lib/server/evidence/evidence-vector-projection-scheduler-v1.js';
 import { getJobCounts, getJobsForEvidence, enqueueJob, type JobType } from '$lib/server/analysis/analysis-jobs.js';
 import { z } from 'zod';
 
@@ -28,7 +29,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	try {
 		if (evidenceId) {
 			const jobs = await getJobsForEvidence(evidenceId);
-			return json({ evidenceId, jobs });
+			return json({ available: true, evidenceId, jobs, error: null });
 		}
 
 		const [worker, counts] = await Promise.all([
@@ -36,13 +37,25 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			getJobCounts(),
 		]);
 
-		return json({ worker, jobCounts: counts });
+		return json({
+			available: true,
+			worker,
+			jobCounts: counts,
+			projectionScheduler: getEvidenceVectorProjectionSchedulerStatusV1(),
+			error: null,
+		});
 	} catch (err) {
 		console.error('Evidence analysis GET error:', err);
 		if (evidenceId) {
-			return json({ evidenceId, jobs: [] });
+			return json({ available: false, evidenceId, jobs: [], error: 'ANALYSIS_STATUS_UNAVAILABLE' }, { status: 503 });
 		}
-		return json({ worker: { active: 0, idle: 0, total: 0 }, jobCounts: { pending: 0, running: 0, completed: 0, failed: 0 } });
+		return json({
+			available: false,
+			worker: null,
+			jobCounts: null,
+			projectionScheduler: getEvidenceVectorProjectionSchedulerStatusV1(),
+			error: 'ANALYSIS_STATUS_UNAVAILABLE',
+		}, { status: 503 });
 	}
 }
 

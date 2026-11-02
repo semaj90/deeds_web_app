@@ -1,0 +1,86 @@
+import { z } from 'zod';
+import { EvidenceProcessPayloadV1Schema } from './evidence-process-payload-v1.js';
+import type { EvidenceSynthesisResultV1 } from './synthesis/evidence-synthesis-v1.js';
+
+const sha256Schema = z.string().regex(/^sha256:[a-f0-9]{64}$/);
+
+const AnalysisUploadMetadataV1Schema = z.object({
+	evidenceId: z.string().uuid().optional(),
+	caseId: z.string().uuid().nullable().optional(),
+	objectKey: z.string().min(1).max(1024).refine((value) =>
+		value.startsWith('evidence/') &&
+		!value.includes('\\') &&
+		!value.split('/').some((segment) => segment === '.' || segment === '..'),
+	),
+	sourceSha256: sha256Schema,
+	fileName: z.string().trim().min(1).max(512),
+	contentType: z.string().max(255).nullable().optional(),
+	uploadedBy: z.number().int().positive(),
+}).passthrough();
+
+export function buildAnalysisUploadEvidencePayloadV1(input: {
+	evidenceId: string;
+	analysisJobId: string;
+	metadata: unknown;
+}) {
+	const evidenceId = z.string().uuid().parse(input.evidenceId);
+	const analysisJobId = z.string().uuid().parse(input.analysisJobId);
+	const metadata = AnalysisUploadMetadataV1Schema.parse(input.metadata);
+	if (metadata.evidenceId && metadata.evidenceId !== evidenceId) {
+		throw new Error('ANALYSIS_UPLOAD_EVIDENCE_ID_MISMATCH');
+	}
+	const fileType = metadata.contentType || 'application/octet-stream';
+
+	return EvidenceProcessPayloadV1Schema.parse({
+		evidenceId,
+		text: `Queued source file: ${metadata.fileName}`,
+		contentType: 'document',
+		sourceRevision: metadata.sourceSha256,
+		caseId: metadata.caseId ?? undefined,
+		metadata: {
+			...metadata,
+			fileName: metadata.fileName,
+			fileType,
+			object_bucket: 'legal-evidence',
+			objectKey: metadata.objectKey,
+			object_name: metadata.objectKey,
+			source_revision: metadata.sourceSha256,
+			sourceSha256: metadata.sourceSha256,
+			jobId: analysisJobId,
+		},
+	});
+}
+
+export async function executeAnalysisUploadPipelineV1(input: {
+	evidenceId: string;
+	analysisJobId: string;
+	metadata: unknown;
+	processEvidence: (payload: ReturnType<typeof buildAnalysisUploadEvidencePayloadV1>) => Promise<{
+		chunkCount: number;
+		persistedCount: number;
+		sourceRevision: string;
+		synthesis?: EvidenceSynthesisResultV1;
+	} | null>;
+}): Promise<Record<string, unknown>> {
+	const payload = buildAnalysisUploadEvidencePayloadV1(input);
+	const receipt = await input.processEvidence(payload);
+	if (
+		!receipt ||
+		!Number.isSafeInteger(receipt.chunkCount) ||
+		receipt.chunkCount <= 0 ||
+		receipt.persistedCount !== receipt.chunkCount ||
+		receipt.sourceRevision !== payload.sourceRevision
+	) {
+		throw new Error('ANALYSIS_UPLOAD_CANONICAL_RECEIPT_INVALID');
+	}
+	return {
+		status: 'processed',
+		evidenceId: payload.evidenceId,
+		sourceRevision: payload.sourceRevision,
+		representationId: 'semantic_768',
+		canonicalStore: 'postgresql.evidence_vectors',
+		chunkCount: receipt.chunkCount,
+		persistedCount: receipt.persistedCount,
+		...(receipt.synthesis ? { synthesis: receipt.synthesis } : {}),
+	};
+}

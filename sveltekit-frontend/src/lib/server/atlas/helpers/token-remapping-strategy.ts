@@ -13,7 +13,26 @@ export interface TokenRemapResult {
   strategy: RemapStrategy;
 }
 
+export const TURBO_CTX_PROFILES = {
+  turbo16k: 16_384,
+  turbo65k: 65_536,
+} as const;
+
+export type TurboCtxProfile = keyof typeof TURBO_CTX_PROFILES;
+
 export class TokenRemappingStrategy {
+  adaptContextForProfile(
+    profile: TurboCtxProfile,
+    originalTokenCount: number,
+    requestedCompletionTokens: number,
+  ): TokenRemapResult {
+    return this.adaptContextForGemma4(
+      originalTokenCount,
+      requestedCompletionTokens,
+      TURBO_CTX_PROFILES[profile],
+    );
+  }
+
   /**
    * Adapts token budgets for model context capacity (e.g. 65,536).
    */

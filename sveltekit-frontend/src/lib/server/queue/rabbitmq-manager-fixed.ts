@@ -580,80 +580,16 @@ export class RabbitMQManager extends EventEmitter {
     if (!msg || !channel) return;
     try {
       const data = this.parseMessage(msg);
-      if (!data?.evidenceId) {
+      const { EvidenceProcessPayloadV1Schema } = await import(
+        '../evidence/evidence-process-payload-v1.js'
+      );
+      const payload = EvidenceProcessPayloadV1Schema.parse(data);
+      if (!payload.evidenceId) {
         channel.nack(msg, false, false);
         return;
       }
-      console.log('🔬 Processing evidence:', data.evidenceId);
-      const { extractEntities } = await import('../analysis/entity-extraction.js');
-      const { detectForensicPatterns } = await import('../analysis/forensics.js');
-
-      const text = data.text ?? data.content ?? '';
-      const [entities, forensics] = await Promise.all([
-        extractEntities(text).catch(() => []),
-        Promise.resolve(detectForensicPatterns(text)),
-      ]);
-
-      console.log(
-        `✅ Evidence ${data.evidenceId}: ${entities.length} entities, ${forensics.length} forensic flags`
-      );
-
-      // Run YOLO + LLM analysis pipeline for image evidence (Redis-cached, graph connections)
-      if (
-        data.fileName &&
-        /\.(png|jpg|jpeg|tiff|tif|bmp|webp)$/i.test(data.fileName) &&
-        data.buffer
-      ) {
-        try {
-          const { runEvidenceAnalysisPipeline } = await import(
-            '../analysis/evidence-analysis-pipeline.js'
-          );
-          const pipelineResult = await runEvidenceAnalysisPipeline({
-            evidenceId: data.evidenceId,
-            caseId: data.caseId,
-            fileName: data.fileName,
-            buffer: Buffer.from(data.buffer, 'base64'),
-            existingText: text,
-          });
-          console.log(
-            `🎯 Analysis pipeline: ${pipelineResult.yolo?.objects.length ?? 0} objects, LLM=${pipelineResult.llmEscalated}, graph=${pipelineResult.graphConnectionsCreated}`
-          );
-        } catch (pipelineErr) {
-          console.warn('⚠️ Analysis pipeline failed (non-fatal):', pipelineErr);
-        }
-      }
-
-      // Publish for embedding if text is available
-      if (text.length > 0 && data.skipEmbedding !== true) {
-        await this.publish(this.exchanges.document_processing, 'document.embed', {
-          documentId: data.evidenceId,
-          text,
-          collection: 'evidence_items',
-          fileName: data.fileName,
-          contentType: data.contentType,
-          metadata: {
-            ...(data.metadata ?? {}),
-            caseId: data.caseId ?? data.metadata?.caseId,
-            source_revision: data.sourceRevision ?? data.metadata?.source_revision,
-            entities: entities.length,
-            forensicFlags: forensics.length,
-          },
-        });
-      }
-
-      // Auto-sync case to Neo4j graph (fire-and-forget)
-      if (data.caseId) {
-        import('../graph/pg-neo4j-sync.js')
-          .then(({ syncCaseToGraph }) => syncCaseToGraph(data.caseId))
-          .then((r) => {
-            if (r.errors.length === 0) {
-              console.log(
-                `🔗 Neo4j sync: case ${data.caseId} (${r.relationships} rels, ${r.durationMs}ms)`
-              );
-            }
-          })
-          .catch(() => {}); // Non-fatal — PG data is sufficient
-      }
+      const { EvidenceProcessWorker } = await import('./queue-worker.js');
+      await new EvidenceProcessWorker().process(payload);
 
       if (this.channel !== channel) {
         console.warn('⚠️ Evidence process: channel recycled during processing, skipping ack');

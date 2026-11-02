@@ -43,10 +43,10 @@ export const canonicalServiceProbeDefaults: Record<CanonicalServiceName, {
     role: 'Gemma4 bounded synthesis and LangExtract fallback; Ollama is not used for synthesis.',
   },
   langextract: {
-    url: 'http://127.0.0.1:8096',
-    port: 8096,
+    url: 'http://127.0.0.1:8095',
+    port: 8095,
     transport: 'http',
-    role: 'Feature extraction backed by Gemma4 llama-server.',
+    role: 'FastAPI NLP sidecar for AST, spaCy, LangExtract, and OAK proposals; synthesis model is resolved separately.',
   },
   'turbovec-grpc': {
     url: '127.0.0.1:50062',

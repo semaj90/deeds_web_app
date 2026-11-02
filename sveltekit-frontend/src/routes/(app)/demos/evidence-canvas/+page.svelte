@@ -53,22 +53,27 @@
 
 	// D3 Knowledge Provenance Graph — maps tech stack + evidence relationships
 	const graphEntities = [
-		'SvelteKit 2', 'Svelte 5 Runes', 'Drizzle ORM 0.44', 'PostgreSQL 16',
-		'Qdrant Vector DB', 'Ollama ornith-1.5-9b', 'WebGPU', 'ONNX Runtime',
-		'Fabric.js', 'D3.js v7', 'Canvas API', 'IndexedDB + LokiJS',
-		'Redis Cache', 'RabbitMQ', 'Evidence Pipeline', 'RAG Pipeline'
+		'SvelteKit 2', 'Svelte 5 Runes', 'Drizzle ORM 0.44', 'PostgreSQL 18 + pgvector',
+		'EmbeddingGemma · semantic_768', 'Evidence Pipeline', 'Evidence Vector Outbox',
+		'Qdrant · rebuildable projection', 'llama-server :8090', 'Ornith 1.5 · synthesis',
+		'ACE / Engram hints', 'Redis / Valkey', 'WebGPU', 'ONNX Runtime',
+		'Fabric.js', 'D3.js v7', 'Canvas API', 'IndexedDB + LokiJS', 'RabbitMQ', 'RAG Pipeline'
 	];
 
 	const graphRelationships = [
 		{ from: 'SvelteKit 2', to: 'Svelte 5 Runes', type: 'USES' },
 		{ from: 'SvelteKit 2', to: 'Drizzle ORM 0.44', type: 'DEPENDS_ON' },
-		{ from: 'Drizzle ORM 0.44', to: 'PostgreSQL 16', type: 'DEPENDS_ON' },
-		{ from: 'SvelteKit 2', to: 'Qdrant Vector DB', type: 'USES' },
-		{ from: 'Evidence Pipeline', to: 'Ollama ornith-1.5-9b', type: 'USES' },
-		{ from: 'Evidence Pipeline', to: 'Qdrant Vector DB', type: 'DEPENDS_ON' },
+		{ from: 'Drizzle ORM 0.44', to: 'PostgreSQL 18 + pgvector', type: 'DEPENDS_ON' },
+		{ from: 'Evidence Pipeline', to: 'EmbeddingGemma · semantic_768', type: 'USES' },
+		{ from: 'EmbeddingGemma · semantic_768', to: 'PostgreSQL 18 + pgvector', type: 'DEPENDS_ON' },
+		{ from: 'PostgreSQL 18 + pgvector', to: 'Evidence Vector Outbox', type: 'USES' },
+		{ from: 'Evidence Vector Outbox', to: 'Qdrant · rebuildable projection', type: 'REFERENCES' },
 		{ from: 'Evidence Pipeline', to: 'RabbitMQ', type: 'USES' },
-		{ from: 'RAG Pipeline', to: 'Qdrant Vector DB', type: 'DEPENDS_ON' },
-		{ from: 'RAG Pipeline', to: 'Ollama ornith-1.5-9b', type: 'USES' },
+		{ from: 'RAG Pipeline', to: 'PostgreSQL 18 + pgvector', type: 'DEPENDS_ON' },
+		{ from: 'RAG Pipeline', to: 'Qdrant · rebuildable projection', type: 'REFERENCES' },
+		{ from: 'RAG Pipeline', to: 'llama-server :8090', type: 'USES' },
+		{ from: 'llama-server :8090', to: 'Ornith 1.5 · synthesis', type: 'USES' },
+		{ from: 'ACE / Engram hints', to: 'Redis / Valkey', type: 'USES' },
 		{ from: 'ONNX Runtime', to: 'WebGPU', type: 'USES' },
 		{ from: 'Fabric.js', to: 'Canvas API', type: 'IMPLEMENTS' },
 		{ from: 'D3.js v7', to: 'SvelteKit 2', type: 'IMPLEMENTS' },
@@ -183,14 +188,14 @@
 		],
 		server: [
 			{ name: 'SvelteKit 2 SSR', status: 'active', detail: 'adapter-node for Docker' },
-			{ name: 'Drizzle ORM 0.44', status: 'active', detail: '70+ tables, pgvector' },
+			{ name: 'PostgreSQL 18 + pgvector', status: 'active', detail: 'semantic_768 · 768 dimensions · canonical store' },
 			{ name: 'Redis Cache', status: 'active', detail: 'Configurable TTL, cross-request' },
-			{ name: 'Qdrant Vector DB', status: 'active', detail: '768-dim, 6 collections' },
-			{ name: 'Ollama LLM', status: 'active', detail: 'ornith-1.5-9b + embeddinggemma' }
+			{ name: 'Qdrant projection', status: 'active', detail: 'Rebuildable; activation is separately gated' },
+			{ name: 'Model services', status: 'active', detail: 'Ornith 1.5 synthesis · EmbeddingGemma vectors' }
 		],
 		pipeline: [
 			{ name: 'Evidence Pipeline', status: 'active', detail: '8 stages: upload → embedding' },
-			{ name: 'RAG Pipeline', status: 'active', detail: 'Qdrant search → LLM generation' },
+			{ name: 'RAG Pipeline', status: 'active', detail: 'PostgreSQL canonical retrieval + optional projections → synthesis' },
 			{ name: 'KAG Pipeline', status: 'active', detail: 'Schema validation + W3C checks' },
 			{ name: 'RabbitMQ', status: 'active', detail: '7 queues, 5 exchanges' },
 			{ name: 'FastMCP', status: 'active', detail: '9 agentic tools' }
@@ -310,6 +315,28 @@
 						height={600}
 					/>
 				</div>
+				<section class="ec-terms" aria-labelledby="ec-terms-title">
+					<h3 id="ec-terms-title">Ontology &amp; Source Terms</h3>
+					<div class="ec-terms-grid">
+						{#each [
+							{ term: 'Domain', detail: 'Registered high-level software classification group with an exact ID.' },
+							{ term: 'Subgroup', detail: 'Registered child node linked by parent_group_id.' },
+							{ term: 'Concept', detail: 'Reusable semantic category; canonical only after concept-registry admission.' },
+							{ term: 'Entity', detail: 'One resolved source, file, symbol, evidence item, case, or execution.' },
+							{ term: 'Relation', detail: 'Evidence-backed predicate linking resolved participants.' },
+							{ term: 'Ontology', detail: 'Registered vocabulary and ownership constraints for domains, concepts, entities, and relations.' },
+							{ term: 'Taxonomy', detail: 'Approved IS_A or parent/child hierarchy, not a keyword list.' },
+							{ term: 'Grammar candidate', detail: 'Versioned parser-catalog entry; not proof that it loaded or parsed a file.' },
+							{ term: 'Language profile', detail: 'Extension and tool-routing metadata; not a language server.' },
+							{ term: 'LSP', detail: 'Semantic editor protocol, independent of Tree-sitter syntax recognition.' },
+							{ term: 'MIME', detail: 'Claimed or detected media format; not document genre or domain.' },
+							{ term: 'Canonical', detail: 'Admitted by the authority after source-identity and policy gates.' }
+						] as item (item.term)}
+							<article><h4>{item.term}</h4><p>{item.detail}</p></article>
+						{/each}
+					</div>
+					<p class="ec-terms-note">Workstation-verified baseline (2026-10-31): PostgreSQL 18.4, pgvector 0.8.3, canonical evidence vector dimension 768. Qdrant is a rebuildable projection; projector activation is separately gated. Runtime model: Ornith 1.5-9B through llama-server :8090. EmbeddingGemma is the embedding producer, not the synthesis model.</p>
+				</section>
 			{:else if activeView === 'evidence-board'}
 				<div class="ec-canvas-frame">
 					<EvidenceBoard caseId="CASE-2024-001" />
@@ -472,7 +499,7 @@
 	<div class="ec-footer">
 		<h3 class="ec-footer-title"><Icon name="cpu" size={14} /> Full Tech Stack</h3>
 		<div class="ec-footer-tags">
-			{#each ['Svelte 5 Runes', 'SvelteKit 2', 'Drizzle ORM 0.44', 'PostgreSQL 16 + pgvector', 'Qdrant (768-dim)', 'Ollama ornith-1.5-9b', 'Redis Cache', 'RabbitMQ', 'WebGPU + ONNX', 'IndexedDB + LokiJS', 'Fabric.js', 'D3.js v7', 'Canvas 2D', 'SVG Force', 'XState v5', 'FastMCP (9 tools)'] as tech}
+			{#each ['Svelte 5 Runes', 'SvelteKit 2', 'Drizzle ORM 0.44', 'PostgreSQL 18 + pgvector (semantic_768)', 'Qdrant (rebuildable projection)', 'EmbeddingGemma (embeddings)', 'Ornith 1.5-9B · llama-server :8090 (synthesis)', 'Redis / Valkey hints', 'RabbitMQ', 'WebGPU + ONNX', 'IndexedDB + LokiJS', 'Fabric.js', 'D3.js v7', 'Canvas 2D', 'SVG Force', 'XState v5', 'FastMCP (9 tools)'] as tech (tech)}
 				<span class="ec-footer-tag">{tech}</span>
 			{/each}
 		</div>
@@ -649,6 +676,25 @@
 		padding: 1rem;
 		position: relative;
 	}
+	.ec-terms {
+		margin-top: 1rem;
+		padding: 1rem;
+		border: 1px solid rgba(212, 199, 163, 0.18);
+		border-radius: 0.5rem;
+		background: rgba(20, 22, 28, 0.58);
+	}
+	.ec-terms h3, .ec-terms h4 { color: #e8d9b4; margin: 0; }
+	.ec-terms h3 { font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; }
+	.ec-terms-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+		gap: 0.5rem;
+		margin-top: 0.75rem;
+	}
+	.ec-terms-grid article { padding: 0.65rem; border: 1px solid rgba(212, 199, 163, 0.1); border-radius: 0.35rem; }
+	.ec-terms h4 { font-size: 0.75rem; }
+	.ec-terms p { margin: 0.3rem 0 0; color: rgba(230, 230, 230, 0.72); font-size: 0.72rem; line-height: 1.45; }
+	.ec-terms-note { margin: 0.8rem 0 0 !important; color: rgba(212, 199, 163, 0.78) !important; }
 	.ec-canvas-frame.no-pad {
 		padding: 0;
 		overflow: hidden;

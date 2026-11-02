@@ -23,6 +23,61 @@ const EMBED_CACHE_NAMESPACE = 'server-embed-v1::';
 const EMBED_TIMEOUT_MS = 30_000;
 const BACKEND_LABEL = 'server:/api/embed';
 
+export const CLIENT_EMBED_RECIPE = 'evidence-chunk-text-raw-utf8.v1' as const;
+export const CLIENT_EMBED_MODEL_ID = 'embeddinggemma:latest' as const;
+
+export interface ClientVectorDescriptor {
+	vector: Float32Array;
+	dimensions: 768;
+	recipe: string;
+	modelId: string;
+}
+
+/**
+ * Creates and validates a ClientVectorDescriptor, enforcing 768-d dimension and recipe tracking.
+ */
+export function createClientVectorDescriptor(
+	vector: Float32Array,
+	modelId: string = CLIENT_EMBED_MODEL_ID,
+	recipe: string = CLIENT_EMBED_RECIPE
+): ClientVectorDescriptor {
+	if (vector.length !== CLIENT_EMBEDDING_DIMS) {
+		throw new Error(`CLIENT_EMBED_DIMENSION_MISMATCH: expected ${CLIENT_EMBEDDING_DIMS}, got ${vector.length}`);
+	}
+	return {
+		vector,
+		dimensions: 768,
+		recipe,
+		modelId
+	};
+}
+
+/**
+ * Refuses to mix different recipes or models within one run (CSP-32).
+ */
+export function assertConsistentRunRecipes(
+	descriptors: readonly ClientVectorDescriptor[],
+	expectedRecipe: string = CLIENT_EMBED_RECIPE
+): void {
+	for (const desc of descriptors) {
+		if (desc.recipe !== expectedRecipe) {
+			throw new Error(`CLIENT_EMBED_RECIPE_MISMATCH: expected ${expectedRecipe}, got ${desc.recipe}`);
+		}
+	}
+}
+
+/**
+ * Generates an embedding vector and returns a tracked descriptor with recipe and model ID.
+ */
+export async function embedTextWithDescriptor(
+	text: string,
+	modelId: string = CLIENT_EMBED_MODEL_ID,
+	recipe: string = CLIENT_EMBED_RECIPE
+): Promise<ClientVectorDescriptor> {
+	const vector = await embedText(text);
+	return createClientVectorDescriptor(vector, modelId, recipe);
+}
+
 /**
  * Generate a 768-dim embedding vector for the given text via the canonical server route.
  *

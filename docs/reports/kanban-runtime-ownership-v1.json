@@ -1,8 +1,8 @@
 {
   "schema": "atlas.kanban-runtime-proof.v1",
-  "generated": "2026-10-25T05:30:30.839Z",
+  "generated": "2026-11-01T20:54:03.266Z",
   "taskContractResolved": true,
-  "dispatcherCallerProven": true,
+  "dispatcherCallerProven": false,
   "durableWriterProven": false,
   "claimHeartbeatReclaimProven": false,
   "timelineRevisionLinkProven": false,
@@ -41,6 +41,7 @@
         ],
         "prodImporters": [
           "sveltekit-frontend/src/lib/server/atlas/atlas-index.ts",
+          "sveltekit-frontend/src/lib/server/atlas/board/agentic-error-fix-lane.ts",
           "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts",
           "sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-task-priority.ts",
           "sveltekit-frontend/src/lib/server/atlas/board/fabric-gpu-benchmark.ts",
@@ -58,15 +59,13 @@
       "note": "workflow-action-event-v1/task-run-contract-v1 vs the live board kanban-task-board/kanban-task-event-contracts: count production importers of each."
     },
     "dispatchers": {
-      "executeHermesAgentStepV1_prodCallers": [
-        "sveltekit-frontend/src/routes/api/admin/atlas/kanban-tickets/+server.ts"
-      ],
+      "executeHermesAgentStepV1_prodCallers": [],
       "kanbanErrorFixingAgent_prodCallers": []
     },
     "liveStore": {
       "tableRows": {
-        "kanban_tasks": 167,
-        "kanban_task_events": 160,
+        "kanban_tasks": 4514,
+        "kanban_task_events": 4507,
         "kanban_task_attempts": 0,
         "kanban_task_dependencies": 0,
         "workflow_action_leases": 2,
@@ -78,7 +77,7 @@
       "kanbanTaskStatus": [
         {
           "status": "pending",
-          "n": 161
+          "n": 4508
         },
         {
           "status": "done",
@@ -86,6 +85,10 @@
         }
       ],
       "kanbanEventTypes": [
+        {
+          "event_type": "ticket_created",
+          "n": 4347
+        },
         {
           "event_type": "file_feed_snapshot",
           "n": 143
@@ -106,7 +109,7 @@
       "claimLikeEvents": 0,
       "tasksWithClaimToken": 0,
       "tasksWithHeartbeat": 0,
-      "eventsWithWorkspaceRevision": 0
+      "eventsWithWorkspaceRevision": 4347
     },
     "writers": {
       "prodFilesWritingEventTables": [
@@ -134,14 +137,14 @@
       "sveltekit-frontend/src/routes/dashboard/atlas-control-panel/+page.svelte"
     ],
     "graphify": {
-      "file": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-25.json",
+      "file": "docs/reports/atlas-canonical-projection-fabric-audit-2026-10-31.json",
       "verdict": "NOT_SAFE_TO_PROJECT"
     },
     "fabricatedEvidenceRisk": {
       "file": "sveltekit-frontend/src/lib/server/atlas/agentic/hermes-adaptive-pipeline-v1.ts",
       "hardcodedStagePassLiterals": 0,
       "hardcodedToolVersions": false,
-      "feedsAdaptiveBackprop": true,
+      "feedsAdaptiveBackprop": false,
       "note": "Tournament stage results are literals, not tool output; adaptive backprop labels come from outcomeSuccess."
     }
   },

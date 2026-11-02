@@ -1,18 +1,18 @@
 {
   "schema": "atlas.workboard-postgres-cycle-audit.v1",
-  "generatedAt": "2026-09-21T01:27:37.081Z",
+  "generatedAt": "2026-11-01T21:38:19.411Z",
   "status": "PG_WORKBOARD_DEPENDENCY_CYCLE_PROVEN",
   "proof": {
     "recursiveCteCycleClause": true,
     "cycleRows": 0,
-    "walkRows": 0,
-    "maxCyclePathLength": 0,
+    "walkRows": 10,
+    "maxCyclePathLength": 4,
     "unresolvedRows": 0,
     "duplicateEdgeGroups": 0
   },
   "tables": {
-    "kanbanTasks": 0,
-    "kanbanTaskDependencies": 0
+    "kanbanTasks": 4514,
+    "kanbanTaskDependencies": 4
   },
   "canonicalAuthority": false,
   "writesPerformed": false,

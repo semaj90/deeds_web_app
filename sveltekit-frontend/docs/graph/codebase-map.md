@@ -1,5 +1,5 @@
 # Codebase Map — 20-Gate Deep Audit
-> Generated: 2026-10-17T10:26:30.931Z
+> Generated: 2026-11-01T21:49:09.055Z
 > Mode: `fast-ast` · CPU-only · No GPU required
 > Regenerate: `npm run index:codebase:fast:plan`
 
@@ -8,20 +8,20 @@
 ## Summary
 | Metric | Count |
 |--------|-------|
-| Files scanned | 34183 |
-| Directories analysed | 1668 |
-| Route files | 1220 |
-| Svelte components | 1171 |
-| API handlers | 3336 |
-| API routes without auth | 29 |
-| API routes without Zod | 4 |
+| Files scanned | 36568 |
+| Directories analysed | 1447 |
+| Route files | 1244 |
+| Svelte components | 1198 |
+| API handlers | 3353 |
+| API routes without auth | 31 |
+| API routes without Zod | 2 |
 | SSR-unsafe files | 0 |
 | Svelte 4 legacy patterns | 3 |
-| Hardcoded localhost refs | 1773 |
-| Routes without test pairing | 76 |
-| Cyclic import pairs | 16 |
-| Drizzle table refs | 1678 |
-| TODO/FIXME markers | 991 |
+| Hardcoded localhost refs | 1807 |
+| Routes without test pairing | 84 |
+| Cyclic import pairs | 17 |
+| Drizzle table refs | 1755 |
+| TODO/FIXME markers | 988 |
 
 ---
 
@@ -29,22 +29,22 @@
 
 | Gate | Check | Pass | Fail |
 |------|-------|------|------|
-| G4  | Auth guard on API routes | 926 | 30 |
-| G5  | Zod validation on API routes | 661 | 4 |
-| G11 | No hardcoded localhost (excl env.server) | 32410 | 1773 |
-| G14a | No `export let` (Svelte 4 props) | 34183 | 0 |
-| G14b | No `$:` reactive declarations | 34181 | 2 |
-| G14c | No `on:event=` directives | 34181 | 2 |
-| G14d | No `createEventDispatcher()` | 34183 | 0 |
-| G14e | No runes in plain `.ts` files | 34158 | 25 |
-| G15 | No SSR-unsafe globals (unguarded) | 34183 | 0 |
-| G16 | Server routes have test pairing | 812 | 76 |
-| G17 | Server routes have error handling | 833 | 137 |
-| G20 | Cyclic import pairs | — | 16 |
+| G4  | Auth guard on API routes | 939 | 32 |
+| G5  | Zod validation on API routes | 674 | 2 |
+| G11 | No hardcoded localhost (excl env.server) | 34761 | 1807 |
+| G14a | No `export let` (Svelte 4 props) | 36568 | 0 |
+| G14b | No `$:` reactive declarations | 36566 | 2 |
+| G14c | No `on:event=` directives | 36566 | 2 |
+| G14d | No `createEventDispatcher()` | 36568 | 0 |
+| G14e | No runes in plain `.ts` files | 36543 | 25 |
+| G15 | No SSR-unsafe globals (unguarded) | 36568 | 0 |
+| G16 | Server routes have test pairing | 817 | 84 |
+| G17 | Server routes have error handling | 846 | 139 |
+| G20 | Cyclic import pairs | — | 17 |
 
 ---
 
-## Directory Scorecard (1668 dirs · lowest score = most attention needed)
+## Directory Scorecard (1447 dirs · lowest score = most attention needed)
 
 **Score factors**: Auth/API coverage 25pts · Zod coverage 15pts · Drizzle ref 10pts · No TODOs 15pts · SSR-safe 10pts · No Svelte4 10pts · No localhost 5pts · Error handling 5pts · Non-empty 5pts
 
@@ -57,38 +57,41 @@
 | ⚠️ | `scripts/api-cleanup` | 45 | 40 | 201206 | 2444 | 262/388 | 664 | 🟠lh |
 | ⚠️ | `scripts/api-cleanup/reports` | 45 | 6 | 191646 | 2436 | 262/384 | 662 | 🟠lh |
 | ⚠️ | `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` | 45 | 2148 | 158294 | 1984 | 214/330 | 594 | 🟠lh |
-| ⚠️ | `scripts/graphify/lib` | 50 | 8 | 1014 | 2 | 0/0 | 0 | — |
 | ⚠️ | `sveltekit-frontend/src/routes/.well-known` | 58 | 4 | 541 | 4 | 0/2 | 0 | — |
+| ⚠️ | `scripts/graphify/lib` | 65 | 8 | 1202 | 2 | 0/2 | 0 | — |
 | ⚠️ | `tools/agentic-research/src/local-deep-research` | 68 | 906 | 290768 | 0 | 0/74 | 2 | 🔴ssr 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server` | 70 | 1 | 60689 | 0 | 2/24 | 3 | 🟠lh |
 | ✅ | `scripts/verify` | 70 | 20 | 4466 | 0 | 0/12 | 8 | 🟠lh |
 | ✅ | `atlas-openspec-awareness-v2/src/routes/atlas` | 75 | 3 | 277 | 1 | 1/0 | 0 | — |
-| ✅ | `packages/parent-atlas-core` | 75 | 2 | 1351 | 0 | 0/0 | 5 | — |
-| ✅ | `packages/parent-atlas-core/src` | 75 | 3 | 1287 | 0 | 0/0 | 5 | — |
+| ✅ | `packages/parent-atlas-core` | 75 | 2 | 1384 | 0 | 0/1 | 5 | — |
+| ✅ | `packages/parent-atlas-core/src` | 75 | 3 | 1320 | 0 | 0/1 | 5 | — |
 | ✅ | `sveltekit-frontend/scripts/topology` | 75 | 1 | 207 | 0 | 0/0 | 9 | — |
-| ✅ | `sveltekit-frontend/src/lib/ai` | 75 | 80 | 7944 | 0 | 0/4 | 9 | — |
-| ✅ | `sveltekit-frontend/src/routes/api` | 75 | 863 | 126466 | 833 | 800/638 | 9 | 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/lib/ai` | 75 | 81 | 8036 | 0 | 0/5 | 9 | — |
+| ✅ | `sveltekit-frontend/src/lib/components` | 75 | 687 | 175628 | 0 | 1/50 | 6 | 🔴ssr |
+| ✅ | `sveltekit-frontend/src/routes/api` | 76 | 926 | 133183 | 843 | 820/655 | 9 | 🟠lh ⬜notest |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/webui` | 78 | 435 | 57041 | 0 | 1/18 | 1 | 🟠lh |
 | ✅ | `packages/atlas-core/src/langgraph` | 78 | 13 | 2555 | 0 | 0/6 | 2 | 🟠lh |
 | ✅ | `packages/parent-atlas-retrieval/src/crossencoder` | 78 | 6 | 797 | 0 | 1/2 | 1 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/mcp` | 78 | 51 | 29682 | 0 | 5/43 | 1 | 🔴ssr 🟠lh |
+| ✅ | `sveltekit-frontend/src/mcp` | 78 | 59 | 30643 | 0 | 5/46 | 1 | 🔴ssr 🟠lh |
 | ✅ | `packages/atlas-core/src/evidence` | 80 | 15 | 1177 | 1 | 0/2 | 0 | — |
 | ✅ | `scripts/agent` | 80 | 22 | 5030 | 0 | 0/10 | 4 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/mcp/tools` | 80 | 11 | 3593 | 0 | 0/8 | 0 | 🔴ssr |
+| ✅ | `sveltekit-frontend/src/mcp/tools` | 80 | 11 | 3652 | 0 | 0/8 | 0 | 🔴ssr |
+| ✅ | `sveltekit-frontend/src/routes` | 82 | 6 | 283106 | 852 | 1352/719 | 11 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public_legacy` | 83 | 5 | 1474 | 0 | 0/2 | 2 | — |
 | ✅ | `scripts/benchmark` | 83 | 2 | 774 | 0 | 0/2 | 2 | — |
 | ✅ | `scripts/executive` | 83 | 2 | 1126 | 0 | 0/2 | 2 | — |
-| ✅ | `sveltekit-frontend/src/lib/workers` | 83 | 10 | 2076 | 0 | 0/1 | 2 | — |
+| ✅ | `sveltekit-frontend/src/lib/workers` | 83 | 10 | 2142 | 0 | 0/1 | 2 | — |
 | ✅ | `claude-mem/src/npx-cli` | 85 | 3 | 3852 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `claude-mem/src/npx-cli/commands` | 85 | 6 | 2903 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/bench` | 85 | 1 | 163 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `llama-cpp-turboquant-gemma4/tools/server/public_simplechat` | 85 | 3 | 1409 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `packages/parent-atlas/src/pipelines` | 85 | 11 | 1603 | 0 | 0/1 | 0 | 🟠lh |
+| ✅ | `packages/parent-atlas/src/pipelines` | 85 | 11 | 1605 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `packages/parent-atlas-runtime` | 85 | 2 | 1569 | 0 | 0/0 | 7 | — |
 | ✅ | `packages/parent-atlas-runtime/src` | 85 | 2 | 1520 | 0 | 0/0 | 7 | — |
 | ✅ | `packages/parent-atlas-runtime/src/facade` | 85 | 1 | 277 | 0 | 0/0 | 6 | — |
 | ✅ | `scripts/agentic` | 85 | 12 | 3050 | 0 | 0/12 | 0 | 🟠lh |
 | ✅ | `scripts/ai` | 85 | 8 | 584 | 0 | 0/8 | 0 | 🟠lh |
+| ✅ | `scripts/atlas/babylon-retarget-harness` | 85 | 6 | 288 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `scripts/atlas/ingester` | 85 | 22 | 2496 | 0 | 0/14 | 0 | 🟠lh |
 | ✅ | `scripts/atlas/knowledge-layer` | 85 | 20 | 2452 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `scripts/audit` | 85 | 6 | 2078 | 0 | 0/2 | 0 | 🟠lh |
@@ -100,11 +103,11 @@
 | ✅ | `scripts/operator` | 85 | 6 | 1388 | 0 | 0/4 | 0 | 🟠lh |
 | ✅ | `scripts/phase-b` | 85 | 2 | 778 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `scripts/skills` | 85 | 4 | 1616 | 0 | 0/2 | 0 | 🟠lh |
-| ✅ | `scripts/startup` | 85 | 44 | 9090 | 0 | 2/14 | 0 | 🟠lh |
+| ✅ | `scripts/startup` | 85 | 44 | 9464 | 0 | 2/14 | 0 | 🟠lh |
 | ✅ | `scripts/vector` | 85 | 2 | 246 | 0 | 0/0 | 0 | 🟠lh |
-| ✅ | `scripts/workers` | 85 | 6 | 1190 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `scripts/workers` | 85 | 12 | 1694 | 0 | 0/8 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/.vscode` | 85 | 14 | 6167 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/drizzle` | 85 | 8 | 1021865 | 0 | 0/0 | 24 | — |
+| ✅ | `sveltekit-frontend/drizzle` | 85 | 8 | 1022097 | 0 | 0/0 | 24 | — |
 | ✅ | `sveltekit-frontend/drizzle/introspected` | 85 | 2 | 20357 | 0 | 0/0 | 4 | — |
 | ✅ | `sveltekit-frontend/public` | 85 | 1 | 572 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/public/js` | 85 | 1 | 571 | 0 | 0/0 | 0 | 🟠lh |
@@ -114,20 +117,19 @@
 | ✅ | `sveltekit-frontend/scripts/evaluation` | 85 | 1 | 269 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/kag` | 85 | 1 | 308 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/scenarios` | 85 | 4 | 359 | 0 | 0/3 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/lib/components` | 85 | 665 | 168873 | 0 | 0/47 | 7 | — |
 | ✅ | `sveltekit-frontend/src/lib/gpu` | 85 | 31 | 8498 | 0 | 0/5 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/lib/utils` | 85 | 52 | 7957 | 0 | 2/7 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/src/routes/dev` | 85 | 2 | 524 | 0 | 1/1 | 0 | 🟠lh ⬜notest |
 | ✅ | `sveltekit-frontend/tests/helpers` | 85 | 4 | 440 | 0 | 1/1 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tests/scripts` | 85 | 3 | 104 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/tmp` | 85 | 14 | 162199 | 0 | 0/0 | 0 | 🟠lh |
 | ✅ | `triton-trt-llm/scripts` | 85 | 2 | 738 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `packages/parent-atlas/src` | 88 | 3 | 43673 | 0 | 0/233 | 1 | 🟠lh |
-| ✅ | `packages/parent-atlas/src/core` | 88 | 295 | 40283 | 0 | 0/229 | 1 | 🟠lh |
+| ✅ | `packages/parent-atlas/src` | 88 | 3 | 45228 | 0 | 0/242 | 1 | 🟠lh |
+| ✅ | `packages/parent-atlas/src/core` | 88 | 304 | 41827 | 0 | 0/238 | 1 | 🟠lh |
 | ✅ | `packages/parent-atlas-retrieval` | 88 | 2 | 9090 | 0 | 1/8 | 1 | 🟠lh |
 | ✅ | `packages/parent-atlas-retrieval/src` | 88 | 1 | 7940 | 0 | 1/8 | 1 | 🟠lh |
 | ✅ | `scripts/phase85` | 88 | 54 | 15402 | 0 | 0/14 | 2 | 🟠lh |
 | ✅ | `.archive/2026-10-06-workspace-reseal-historical` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
+| ✅ | `.archive/2026-10-18-4x6-tile` | 90 | 5 | 1085 | 0 | 0/2 | 0 | — |
 | ✅ | `.archive/duplicates-2026-10-13` | 90 | 1 | 33 | 0 | 0/0 | 0 | — |
 | ✅ | `.archive/production-hardening-2026-10-12` | 90 | 1 | 307409 | 0 | 0/0 | 0 | — |
 | ✅ | `.archive/production-hardening-2026-10-12/docs/reports` | 90 | 1 | 307336 | 0 | 0/0 | 0 | — |
@@ -136,7 +138,7 @@
 | ✅ | `.okf/docs/dspy` | 90 | 2 | 44 | 0 | 0/0 | 0 | — |
 | ✅ | `.okf/docs/dspy/snapshots` | 90 | 6 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `.okf/languages` | 90 | 1 | 1503 | 0 | 0/0 | 0 | — |
-| ✅ | `.okf/schemas` | 90 | 5 | 393 | 0 | 0/0 | 0 | — |
+| ✅ | `.okf/schemas` | 90 | 9 | 670 | 0 | 0/0 | 0 | — |
 | ✅ | `.proofs/four-lanes` | 90 | 5 | 170 | 0 | 0/0 | 0 | — |
 | ✅ | `.proofs/p4` | 90 | 1 | 126 | 0 | 0/0 | 0 | — |
 | ✅ | `.vscode/extensions/mcp-context7-assistant/src` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
@@ -260,27 +262,31 @@
 | ✅ | `cypress/e2e` | 90 | 1 | 51 | 0 | 0/0 | 0 | — |
 | ✅ | `data/atlas-ml` | 90 | 5 | 330 | 0 | 0/0 | 0 | — |
 | ✅ | `deeds-web-app/temp_poc_amqp_test` | 90 | 1 | 106 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/.okf` | 90 | 4 | 51864 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf` | 90 | 13 | 55540 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/ast-grep/raw` | 90 | 16 | 1761 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/.okf/dev` | 90 | 18 | 36394 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/dev` | 90 | 24 | 36703 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/dev/.publications` | 90 | 10 | 25339 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/dev/context-engineering-docs-v1` | 90 | 34 | 1777 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/dev/raw` | 90 | 88 | 5242 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/.okf/embeddinggemma2` | 90 | 2 | 28 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/embeddinggemma2` | 90 | 3 | 75 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/engineering-acquisition/utf8-v2` | 90 | 11 | 2598 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/langextract` | 90 | 1 | 316 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/langextract/raw` | 90 | 7 | 161 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/ldr` | 90 | 2 | 350 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/ldr/derived` | 90 | 1 | 28 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/ldr/raw` | 90 | 8 | 136 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/legacy/deeds_lab` | 90 | 1 | 54 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/library-docs/runs` | 90 | 40 | 4896 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/library-module-index` | 90 | 1 | 403 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/oaklib/raw` | 90 | 17 | 920 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/.okf/pinned` | 90 | 1 | 3613 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/pinned` | 90 | 1 | 3684 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/pinned/bits-ui` | 90 | 5 | 435 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/pinned/drizzle-kit` | 90 | 3 | 410 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/pinned/drizzle-orm` | 90 | 5 | 666 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/pinned/pgvector` | 90 | 2 | 264 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/pinned/postgresql-18` | 90 | 6 | 768 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/pinned/svelte5-runes` | 90 | 4 | 502 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/.okf/pinned/sveltekit` | 90 | 5 | 567 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/.okf/pinned/sveltekit` | 90 | 6 | 638 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/registries` | 90 | 1 | 79 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/research/deltanet-swiglu` | 90 | 6 | 333 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/schemas` | 90 | 1 | 167 | 0 | 0/0 | 0 | — |
@@ -291,24 +297,30 @@
 | ✅ | `docs/.okf/trpc-firecrawl-r1/raw` | 90 | 9 | 477 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/.okf/ts-morph/raw` | 90 | 15 | 718 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/ai-os` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/architecture` | 90 | 3 | 679 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/architecture` | 90 | 3 | 700 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/archive/2026-10-15` | 90 | 1 | 16 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/archive/legacy-source-alias-fixture` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/atlas` | 90 | 6 | 55638 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/contracts` | 90 | 3 | 344 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/graph` | 90 | 27 | 1725597 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/graph` | 90 | 27 | 1725593 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/ldr` | 90 | 8 | 173 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/okf` | 90 | 1 | 175 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/packets` | 90 | 1 | 532 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/phase-110-agentic-indexing/schemas` | 90 | 2 | 254 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/phase100` | 90 | 7 | 29520 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/phase107-operations` | 90 | 1 | 68 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/profile-cards/data` | 90 | 23 | 716 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports` | 90 | 3254 | 168720487 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports` | 90 | 3965 | 173668388 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/.openspec-final-wire-20261003` | 90 | 3 | 6 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/admission-readback-current-20261004` | 90 | 1 | 411 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/agentic-diagnostic-repair` | 90 | 6 | 470 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/analysis-pass-staging` | 90 | 4 | 156 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/architecture-temporal-snapshots` | 90 | 1 | 1778 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports/atlas` | 90 | 5 | 1003 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/archive/2026-10-27-okf-pre-revalidation` | 90 | 3 | 1256 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/archive/2026-10-28-postgres-contract-mirrors` | 90 | 1 | 3361 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/archive/2026-10-30-emb-prov-01` | 90 | 1 | 62 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/archive/2026-10-30-owner-decision-rehearsal` | 90 | 1 | 53 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/atlas` | 90 | 5 | 1355 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/atlas-canonical-projection-fabric-audit-followup-20260929` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/atlas-canonical-projection-fabric-deep-audit-20260929` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/atlas-canonical-projection-fabric-post-ordinal-query-rewrite-20260929` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
@@ -325,10 +337,28 @@
 | ✅ | `docs/reports/atlas-canonical-projection-fabric-post-symbol-canary-20260929` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/atlas-canonical-projection-fabric-post-symbol-hung-batch-20260929` | 90 | 1 | 393 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/current-structural-graph-artifact-v2` | 90 | 2 | 25478 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports/dry-run-tests` | 90 | 2 | 180 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/dry-run-tests` | 90 | 4 | 364 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/embedding-tile-artifacts` | 90 | 1 | 24 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/fixtures` | 90 | 6 | 117 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/goal-refresh-20261001` | 90 | 2 | 623 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-51-29-346Z-3a21a9e5` | 90 | 5 | 538 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-51-36-131Z-29941797` | 90 | 5 | 169 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-54-27-008Z-5fe7c85d` | 90 | 5 | 195 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-55-06-493Z-5185e14f` | 90 | 5 | 187 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-55-31-106Z-bd582ef8` | 90 | 5 | 167 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-56-03-696Z-62b61e42` | 90 | 5 | 308 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-56-15-190Z-9fc1e853` | 90 | 5 | 100 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-56-52-821Z-8f397ee9` | 90 | 5 | 97 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-57-08-260Z-8d78886b` | 90 | 5 | 326 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-57-21-432Z-21473405` | 90 | 5 | 9211 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-57-51-195Z-e4839eba` | 90 | 5 | 479 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T22-57-58-137Z-5a8bf078` | 90 | 5 | 9844 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T23-06-01-878Z-0ca9b371` | 90 | 5 | 327 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T23-06-17-731Z-cff90028` | 90 | 5 | 327 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T23-06-24-439Z-057e17d7` | 90 | 5 | 327 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/gb-2026-10-21T23-06-31-471Z-0ebe7bba` | 90 | 5 | 327 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/reconciled-2026-10-21` | 90 | 4 | 9654 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/golden-breadth-retrieval/reconciled-v2-2026-10-21` | 90 | 4 | 9986 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/graphify-current-source-membership-v1-reapply` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/graphify-projection-blocker-deep-audit-20260929/current-continuation` | 90 | 1 | 402 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/graphify-projection-blocker-deep-audit-20260929/goal-refresh-20260930` | 90 | 5 | 2010 | 0 | 0/0 | 0 | — |
@@ -525,10 +555,12 @@
 | ✅ | `docs/reports/openspec-evidence/pipeline-attempt-20261003T0129Z` | 90 | 1 | 435 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/ordinal-map-readback-20261016` | 90 | 1 | 411 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-admission-v1/16ff03a9fa23ad31fcae3753089e0eda20000b79a183c1b3f13efc40b9e94c21` | 90 | 6 | 107257 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/packet-admission-v1/401386c7a3ce7c4f9f8283f63270c8a440c7e563fb883d72be05599e8ba111ec` | 90 | 6 | 131811 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-admission-v1/64122168e998c85c3ac0bd6a97621cd090a7a94938f9029699d584884a1b61da` | 90 | 6 | 106673 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-admission-v1/bf302e0b656d28c009e73842b628ea76a084464f1bdc51b1fdadac237edf6b03` | 90 | 2 | 39 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-key-v2-admission-v1/14b73680764a86af143b602043f59aa0dac4630cce934dcfff94ee72e655cdad` | 90 | 5 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-key-v2-admission-v1/6d8fc6e36d36d9de3c70868671a47b37dde3dfd07319bb2a99c628a901069f6a` | 90 | 5 | 10 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/packet-source-revision-repair-v1/10bdda8dd2ef0b59d76ae01ec719870f34a8e8eab20466deefe632225bb1357d` | 90 | 2 | 5355 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-source-revision-repair-v1/298539da60fa7bb6feedacbc12835c7d9e2d36487d81749cd347c2cf60c7dc91` | 90 | 1 | 32 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-source-revision-repair-v1/9d329c88275df8a78a0f8ceeeabe0b490493cc953fe0bc65b142e68d2038fb0c` | 90 | 1 | 38 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/packet-source-revision-repair-v1/bcb44c72d3cb2232e4068c8543c6bcb6aeb229c32f7afc31bba8075c148ab1eb` | 90 | 1 | 38 | 0 | 0/0 | 0 | — |
@@ -536,7 +568,7 @@
 | ✅ | `docs/reports/parent-atlas` | 90 | 59 | 204380 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/proof-of-truth` | 90 | 11 | 543 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/replay` | 90 | 40 | 11334 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports/schema` | 90 | 5 | 172525 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/schema` | 90 | 5 | 174382 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/semantic-contracts` | 90 | 2 | 1500 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/semantic768` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/smoke-tests` | 90 | 15 | 52868 | 0 | 0/0 | 0 | — |
@@ -571,8 +603,9 @@
 | ✅ | `docs/reports/staging/openspec-pivot-20260926T1656Z` | 90 | 7 | 1392721 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/staging/staging` | 90 | 7 | 394418 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/tool-invocation` | 90 | 1 | 50 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/trace-retrieval-r06` | 90 | 2 | 152 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/reports/vector-lineage` | 90 | 2 | 234 | 0 | 0/0 | 0 | — |
-| ✅ | `docs/reports/workspace-source-snapshots` | 90 | 93 | 23102274 | 0 | 0/0 | 0 | — |
+| ✅ | `docs/reports/workspace-source-snapshots` | 90 | 101 | 25531256 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/stage1` | 90 | 1 | 25805 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/stage4b` | 90 | 1 | 22 | 0 | 0/0 | 0 | — |
 | ✅ | `docs/stage5` | 90 | 1 | 118 | 0 | 0/0 | 0 | — |
@@ -645,12 +678,16 @@
 | ✅ | `packages/atlas-core/src/telemetry` | 90 | 2 | 406 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/atlas-core/src/tools` | 90 | 1 | 255 | 0 | 0/1 | 0 | — |
 | ✅ | `packages/atlas-core/src/types` | 90 | 2 | 201 | 0 | 0/2 | 0 | — |
-| ✅ | `packages/atlas-duckdb` | 90 | 2 | 2100 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/atlas-duckdb/src` | 90 | 12 | 2030 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/atlas-orchestrator` | 90 | 2 | 303 | 0 | 0/2 | 0 | — |
+| ✅ | `packages/atlas-duckdb` | 90 | 2 | 2101 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/atlas-duckdb/src` | 90 | 12 | 2031 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/atlas-native-core/tests` | 90 | 3 | 180 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/atlas-orchestrator` | 90 | 2 | 569 | 0 | 0/3 | 0 | — |
 | ✅ | `packages/atlas-orchestrator/scripts` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/atlas-orchestrator/src/steps` | 90 | 1 | 98 | 0 | 0/1 | 0 | — |
+| ✅ | `packages/atlas-orchestrator/src/tools` | 90 | 2 | 265 | 0 | 0/1 | 0 | — |
 | ✅ | `packages/atlas-orchestrator/src/workflows` | 90 | 1 | 82 | 0 | 0/1 | 0 | — |
+| ✅ | `packages/atlas-svelte-grammar` | 90 | 1 | 53 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/atlas-svelte-grammar/fixtures` | 90 | 1 | 26 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas/docs/reports` | 90 | 1 | 126 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas/fixtures/structured-value` | 90 | 2 | 68 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas/src/adapters` | 90 | 5 | 910 | 0 | 0/2 | 0 | — |
@@ -663,7 +700,7 @@
 | ✅ | `packages/parent-atlas-client/src/mcp` | 90 | 1 | 306 | 0 | 0/1 | 0 | — |
 | ✅ | `packages/parent-atlas-client/test` | 90 | 1 | 81 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-core/src/contracts` | 90 | 5 | 400 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas-core/src/schemas` | 90 | 2 | 63 | 0 | 0/0 | 0 | — |
+| ✅ | `packages/parent-atlas-core/src/schemas` | 90 | 2 | 96 | 0 | 0/1 | 0 | — |
 | ✅ | `packages/parent-atlas-ingest` | 90 | 2 | 476 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-ingest/src` | 90 | 1 | 420 | 0 | 0/0 | 0 | — |
 | ✅ | `packages/parent-atlas-ingest/src/scanner` | 90 | 3 | 406 | 0 | 0/0 | 0 | — |
@@ -708,6 +745,12 @@
 | ✅ | `parent_atlas_tensor_residency_integration_v2/sveltekit-frontend/tests/atlas` | 90 | 8 | 100 | 0 | 0/0 | 0 | — |
 | ✅ | `python/atlas_compute` | 90 | 4 | 224 | 0 | 0/0 | 0 | — |
 | ✅ | `python/atlas_compute/gpu_mini_fabric/fixtures` | 90 | 4 | 30 | 0 | 0/0 | 0 | — |
+| ✅ | `python/tests/fixtures` | 90 | 2 | 922 | 0 | 0/0 | 0 | — |
+| ✅ | `reports/deep-audit/telemetry` | 90 | 3 | 74 | 0 | 0/0 | 0 | — |
+| ✅ | `reports/offline-replay/replay-2026-10-22T00-24-44-081Z-c9bafb6e` | 90 | 2 | 3 | 0 | 0/0 | 0 | — |
+| ✅ | `reports/offline-replay/replay-2026-10-22T00-24-59-043Z-e9499b95` | 90 | 1 | 2 | 0 | 0/0 | 0 | — |
+| ✅ | `reports/offline-replay/replay-2026-10-22T00-25-23-786Z-e9ce4100` | 90 | 1 | 2 | 0 | 0/0 | 0 | — |
+| ✅ | `reports/offline-replay/replay-2026-10-22T00-25-28-519Z-001ffbd0` | 90 | 2 | 3 | 0 | 0/0 | 0 | — |
 | ✅ | `reports/semantic-contracts` | 90 | 3 | 524 | 0 | 0/0 | 0 | — |
 | ✅ | `scratch/index-checkpoints` | 90 | 2 | 196384 | 0 | 0/0 | 0 | — |
 | ✅ | `scratch/obsidian_vault/.obsidian/plugins` | 90 | 2 | 59245 | 0 | 1/1 | 0 | — |
@@ -715,9 +758,11 @@
 | ✅ | `scripts/ai-os` | 90 | 6 | 186 | 0 | 0/4 | 0 | — |
 | ✅ | `scripts/analysis` | 90 | 8 | 398 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/analysis_reports` | 90 | 24 | 10410 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/atlas/ace-radix-01` | 90 | 14 | 1358 | 0 | 0/2 | 0 | — |
+| ✅ | `scripts/atlas/ace-radix-01` | 90 | 18 | 1878 | 0 | 0/2 | 0 | — |
 | ✅ | `scripts/atlas/bitfrost-l2-01` | 90 | 2 | 362 | 0 | 0/2 | 0 | — |
-| ✅ | `scripts/atlas/fixtures` | 90 | 10 | 292 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/atlas/data` | 90 | 2 | 156 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/atlas/diagnostics` | 90 | 2 | 58 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/atlas/fixtures` | 90 | 14 | 570 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/atlas/helpers` | 90 | 12 | 2334 | 0 | 0/6 | 0 | — |
 | ✅ | `scripts/atlas/out` | 90 | 8 | 6782 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/atlas/sparse` | 90 | 2 | 610 | 0 | 0/0 | 0 | — |
@@ -736,7 +781,6 @@
 | ✅ | `scripts/error-resolution/tests` | 90 | 12 | 5436 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/eval/data` | 90 | 2 | 328 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/evals` | 90 | 2 | 800 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/graphify` | 90 | 8 | 2682 | 2 | 0/4 | 0 | — |
 | ✅ | `scripts/graphify/stages` | 90 | 4 | 840 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/mapreduce` | 90 | 4 | 176 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/memory/graphify/gds` | 90 | 16 | 573596 | 0 | 0/0 | 0 | — |
@@ -756,7 +800,7 @@
 | ✅ | `scripts/sidecars` | 90 | 4 | 1400 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/simd` | 90 | 28 | 2310 | 0 | 0/20 | 0 | — |
 | ✅ | `scripts/simdtest` | 90 | 6 | 384 | 0 | 0/6 | 0 | — |
-| ✅ | `scripts/startup/lib` | 90 | 4 | 408 | 0 | 0/4 | 0 | — |
+| ✅ | `scripts/startup/lib` | 90 | 8 | 510 | 0 | 0/4 | 0 | — |
 | ✅ | `scripts/sync-labels` | 90 | 4 | 136 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/test/evaluation` | 90 | 6 | 732 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/agent-investigate-results` | 90 | 22 | 1992 | 0 | 0/0 | 0 | — |
@@ -828,17 +872,18 @@
 | ✅ | `scripts/tests/screenshots/production-proof` | 90 | 2 | 2344 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/tests/vlm-tests` | 90 | 12 | 12 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/unsloth-training/COLAB_PACKAGE/training-datasets` | 90 | 2 | 198 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/validate` | 90 | 2 | 1164 | 0 | 0/2 | 0 | — |
+| ✅ | `scripts/validate` | 90 | 34 | 5178 | 0 | 0/14 | 0 | — |
 | ✅ | `scripts/valkey` | 90 | 6 | 474 | 0 | 0/6 | 0 | — |
 | ✅ | `services/embedding-onnx-webgpu` | 90 | 8 | 2610 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/build-x64-cuda/.cmake/api` | 90 | 68 | 15820 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/build-x64-cuda/CMakeFiles` | 90 | 2 | 18 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/build-x64-cuda/cpp/CMakeFiles` | 90 | 2 | 16 | 0 | 0/0 | 0 | — |
-| ✅ | `simd-bridge/cpp` | 90 | 4 | 1538 | 0 | 0/2 | 0 | — |
+| ✅ | `simd-bridge/cpp` | 90 | 4 | 1572 | 0 | 0/2 | 0 | — |
 | ✅ | `simd-bridge/cpp/build-verify-2026-05-31T08-06-57-567Z/CMakeFiles` | 90 | 2 | 16 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/cpp/build-x64-cuda/CMakeFiles` | 90 | 4 | 34 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles` | 90 | 4 | 32 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/cpp/build-x64-cuda-cuvs/CMakeFiles` | 90 | 4 | 32 | 0 | 0/0 | 0 | — |
+| ✅ | `simd-bridge/cpp/build-x64-cuda-isolated-poolcap/CMakeFiles` | 90 | 4 | 34 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/cpp/build-x64-fallback/CMakeFiles` | 90 | 2 | 18 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/examples` | 90 | 4 | 60 | 0 | 0/0 | 0 | — |
 | ✅ | `simd-bridge/rust/graph-engine` | 90 | 6 | 176 | 0 | 0/0 | 0 | — |
@@ -860,21 +905,21 @@
 | ✅ | `sveltekit-frontend/config` | 90 | 1 | 140 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/data` | 90 | 1 | 27097 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/data/atlas-tensor-proof` | 90 | 6 | 10081 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 15473191 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs` | 90 | 1 | 27756623 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/atlas` | 90 | 2 | 51874 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 3 | 162 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/atlas-index` | 90 | 3 | 433979 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/contracts` | 90 | 1 | 165 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph` | 90 | 20 | 7371911 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/graph/.build` | 90 | 5 | 55 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph` | 90 | 20 | 7699991 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/graph/.build` | 90 | 6 | 68 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/obsidian-vault` | 90 | 2 | 108 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/performance` | 90 | 2 | 39566 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/profile-cards/data` | 90 | 20 | 1588 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/reports` | 90 | 160 | 8007668 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/reports` | 90 | 161 | 19529203 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports/atlas` | 90 | 1 | 216 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports/benchmarks` | 90 | 1 | 49 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports/current-structural-graph-artifact-v1` | 90 | 2 | 143 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports/graph-ordinal-parity-fixture-v1` | 90 | 1 | 10 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/docs/reports/graph-probes` | 90 | 7 | 5861957 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/docs/reports/graph-probes` | 90 | 18 | 17382855 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports/graph-snapshot-parity` | 90 | 11 | 287 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports/ontology-linked-tuple-cugraph-algorithm-fixture-v1` | 90 | 1 | 19 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/docs/reports/ontology-linked-tuple-cugraph-fixture-v1` | 90 | 1 | 12 | 0 | 0/0 | 0 | — |
@@ -1171,8 +1216,8 @@
 | ✅ | `sveltekit-frontend/phase3-pipeline-results` | 90 | 1 | 64 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/phase6-synthesis-results` | 90 | 2 | 44 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/phase7-ace-results` | 90 | 2 | 65 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/reports` | 90 | 7 | 289343 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/reports/batch-a` | 90 | 1 | 41 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/reports` | 90 | 8 | 289571 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/reports/batch-a` | 90 | 4 | 135 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/reports/batch-b` | 90 | 1 | 42 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/reports/batch-c` | 90 | 1 | 55 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/reports/deep-audit` | 90 | 4 | 288683 | 0 | 0/0 | 0 | — |
@@ -1265,7 +1310,7 @@
 | ✅ | `sveltekit-frontend/scripts/reconstruction` | 90 | 4 | 439 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/redis` | 90 | 2 | 93 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/reports` | 90 | 4 | 203 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/rg-atlas` | 90 | 2 | 169 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/rg-atlas` | 90 | 2 | 177 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/sidecars` | 90 | 3 | 14 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/skills` | 90 | 2 | 726 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/synth` | 90 | 3 | 922 | 0 | 0/2 | 0 | — |
@@ -1277,35 +1322,36 @@
 | ✅ | `sveltekit-frontend/scripts/wiki` | 90 | 11 | 2999 | 0 | 0/6 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/workers` | 90 | 3 | 472 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/__fixtures__` | 90 | 1 | 28 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/agent` | 90 | 17 | 1579 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/agent` | 90 | 18 | 1748 | 0 | 0/2 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/analytics` | 90 | 2 | 18 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/cache` | 90 | 5 | 1046 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/canvas` | 90 | 1 | 15 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/client` | 90 | 15 | 1772 | 0 | 0/5 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/collaboration` | 90 | 1 | 267 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/config` | 90 | 9 | 1803 | 0 | 1/2 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/courtroom` | 90 | 4 | 1561 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/config` | 90 | 14 | 1958 | 0 | 1/2 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/courtroom` | 90 | 95 | 10291 | 0 | 0/6 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/demos` | 90 | 3 | 1332 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/env` | 90 | 2 | 27 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/features` | 90 | 6 | 546 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/generated` | 90 | 10 | 38220 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/graph` | 90 | 1 | 54 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/icons` | 90 | 15 | 572 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/machines` | 90 | 11 | 4094 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/mcp` | 90 | 2 | 11 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/machines` | 90 | 13 | 4205 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/mcp` | 90 | 3 | 53 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/messaging` | 90 | 1 | 168 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/runtime-cache` | 90 | 6 | 458 | 0 | 0/4 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/schemas` | 90 | 17 | 2264 | 0 | 0/9 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/services` | 90 | 6 | 763 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/shared` | 90 | 5 | 284 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/services` | 90 | 6 | 761 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/shared` | 90 | 5 | 327 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/state` | 90 | 1 | 8 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/stores` | 90 | 27 | 5137 | 0 | 0/6 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/stores` | 90 | 27 | 5144 | 0 | 0/6 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/test-utils` | 90 | 1 | 11 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/webgpu` | 90 | 28 | 6811 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/webgpu` | 90 | 30 | 7331 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/mcp/zod-to-json-schema-bridge` | 90 | 2 | 99 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/src/routes/(admin)` | 90 | 3 | 634 | 0 | 3/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes/(analysis)` | 90 | 8 | 2992 | 0 | 4/0 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/(analysis)@` | 90 | 8 | 2719 | 0 | 4/0 | 0 | ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/(dev)` | 90 | 13 | 2337 | 0 | 1/1 | 0 | ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/debug` | 90 | 1 | 198 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/routes/dev` | 90 | 3 | 561 | 0 | 1/1 | 0 | ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/minio` | 90 | 1 | 8 | 0 | 0/0 | 0 | ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/seaweed` | 90 | 1 | 7 | 0 | 0/0 | 0 | ⬜notest |
 | ✅ | `sveltekit-frontend/src/shims` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
@@ -1314,18 +1360,18 @@
 | ✅ | `sveltekit-frontend/src/wasm` | 90 | 2 | 524 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/workers` | 90 | 3 | 282 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/test` | 90 | 1 | 63 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/test-results` | 90 | 1 | 4 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/test-results` | 90 | 2 | 254 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/accessibility` | 90 | 2 | 557 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/agent` | 90 | 1 | 154 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/atlas/graph` | 90 | 1 | 87 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/atlas/identity` | 90 | 14 | 1933 | 0 | 0/7 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/atlas/identity` | 90 | 14 | 1937 | 0 | 0/7 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/atlas/tensor-residency` | 90 | 8 | 104 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/e2e/route-forensic` | 90 | 35 | 1750 | 0 | 4/0 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/e2e/route-forensic` | 90 | 35 | 1752 | 0 | 4/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/e2e/utils` | 90 | 3 | 505 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/fixtures` | 90 | 2 | 100 | 0 | 1/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/fixtures/repo-summary-ace` | 90 | 2 | 10 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/gpu` | 90 | 5 | 1334 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/hyperrag` | 90 | 1 | 166 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/hyperrag` | 90 | 1 | 168 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/intent` | 90 | 3 | 498 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/mapreduce` | 90 | 1 | 217 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/okf` | 90 | 1 | 300 | 0 | 0/0 | 0 | — |
@@ -1343,276 +1389,6 @@
 | ✅ | `sveltekit-frontend/tmp/uscode-extracted` | 90 | 1 | 83 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/uploads/audio` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/uploads/transcriptions` | 90 | 2 | 1388 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/aho-corasick-bc86c200794d681e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/allocator-api2-4f80817a93fbc96a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/atlas-packet-parser-84d43970e8d34365` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/atlas-packet-parser-99713ddf4c53dd73` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/atlas-packet-parser-c060d2978a37fee2` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/autocfg-ee0b183a9794409b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/bitflags-018eb6a8769f28ef` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/cc-0d39c8a4fb8b6ce8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/cfg-if-4012590917ed07b2` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/convert_case-1e19143595c88312` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-deque-8584df8d9125e092` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-deque-8a104f478b217722` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-deque-d1ac1ce12bde2b1c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-epoch-6137687cad5d8faf` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-epoch-737390b74c87aa81` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-epoch-96e292bf6196e586` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-utils-474aeeaec568f18f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-utils-96d119fc0e9bb4a9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/crossbeam-utils-e2181e3276d8e595` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/ctor-ad21f856acc2b4f0` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/either-72c737255a12e846` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/equivalent-f9867ec3b95f0550` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/find-msvc-tools-fe4c5cc8ad09b83d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/float-cmp-62b81d20b3358d8f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/foldhash-23722432d1bbb6c0` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/halfbrown-57247b0c95545b87` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/hashbrown-89c99b7de4c63a60` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/itoa-2671aa452abccd39` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/libloading-4d1f46c8a12dbd41` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/memchr-3307b706fd845c51` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/napi-afd0464026489978` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/napi-build-5a4f30ff7b389a69` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/napi-d728cfb0cc0c9a0b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/napi-derive-03641936c3c1130a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/napi-derive-backend-d2da1bcf04ef60e8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/napi-sys-1d899085bfd23929` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/napi-sys-f0c6a4980feca819` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/num-traits-04c98397ed078858` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/num-traits-1509a42175fe9272` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/num-traits-31e06e834ae438fd` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/num-traits-43283f708094b5bc` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/num-traits-b191203b188409b8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/num-traits-ca4b2dc13b8bffcb` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/once_cell-2565311cad9f2da9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/pin-project-lite-f7bef5802155e12f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/proc-macro2-1ee42b6c742a59e7` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/proc-macro2-ca58a38ba27dfb31` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/proc-macro2-f9487b91b7e570b0` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/quote-34a3a0f4e7c216e9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/quote-665e78b465b28693` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/quote-954c5d7ad37e79b1` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/rayon-90958d1a3a2ce81c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/rayon-core-0e1fca6e04198194` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/rayon-core-19a82fea4249ea90` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/rayon-core-4c9162099a852180` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/ref-cast-3a54d1b8f0e1fce4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/ref-cast-94fd31f070f698a7` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/ref-cast-e1d9bb021b908de6` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/ref-cast-impl-0142c891e0ae2cca` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/regex-48f72b56f33c402b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/regex-automata-1646e34df9e8ee6a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/regex-syntax-edf6ca3983062f0c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/rmp-970fc617b1a1ee0e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/rmp-serde-9e9e37d748d7f1cd` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/ryu-b98bae970ed73c83` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/semver-916a15b4720e667e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde-1b47b788d9fda1d3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde-357d3b5b4b9ed41c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde-3d9793cf71552ad4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde-e550357d72c60d01` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_core-39f4109a74a177d2` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_core-4bee13a9cd518e92` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_core-6d72a86fbc029849` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_derive-bf02fca308021c20` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_derive-dbefb4bc99897b0c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_json-263474a6bf72c81a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_json-c243626af514ec1f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/serde_json-fed635937294a5b9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/shlex-1e06b1397622c812` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/simd-json-89b8319116ef6bd7` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/simdutf8-32528fc05f49967d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/simd_bridge_rs-6fa10773e4154e27` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/simd_bridge_rs-a6d5dc3b475e1b51` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/simd_bridge_rs-d61224ec69911ec9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/syn-52ed5a54e9c9ae8b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/syn-5fc9dbda8ed1fae0` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/syn-cb577d60aea957ee` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/tokio-224a61548954722c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/unicode-ident-c4d59c830f3cfbb4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/unicode-segmentation-b118d1ba020d2b37` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/value-trait-9b9ab2c01a8ede4a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/windows-link-d2f160bb0547be5e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/zmij-23e62730429d0958` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/zmij-3cf01cd5a3363f72` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/debug/.fingerprint/zmij-728d2819a489644a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/aho-corasick-2983681f72861fff` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/allocator-api2-10b63ad371e629ae` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/approx-f96a71c61308ca0d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/autocfg-dffea52b2fef0de4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/bitflags-7db5a06aede74825` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/bytemuck-dcf4dcdded1e53ac` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/byteorder-ad1b4350d3041e28` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/cfg-if-167e7ae76158a6d7` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/cfg-if-60c5f5237e319146` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/coe-rs-140500361319daec` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/convert_case-0bf34efbf8436e3d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-deque-658192342e828385` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-deque-734101998450c379` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-deque-bc0636378321967a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-epoch-2e17923fcdd13022` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-epoch-6ae7351e11f1007f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-epoch-acdde96ad1daf855` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-utils-4b9882eb757a3f77` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-utils-9524e36e504c87fc` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/crossbeam-utils-eecd485bce9a7214` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ctor-036a98cef1119827` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/dbgf-777f1a0e65e55698` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/dyn-stack-19f2cc33cb7cf40f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/dyn-stack-4401d7992b482ab6` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/dyn-stack-macros-156446c181357059` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/either-65a6e504f07e829a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/equator-732975220bca3e64` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/equator-9381d2457ff4dd5f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/equator-macro-3be3d57b293d38bc` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/equator-macro-48d5eecc0315924a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/equivalent-6b36a1a246234fb3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/faer-3d13c6e71526269d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/faer-entity-c48dcca96653cf9f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/float-cmp-c7c0a3d7947332d1` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/foldhash-0a2997dcca70d199` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/gemm-40fa23769b292699` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/gemm-c32-42f8ee365df8e944` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/gemm-c64-7fd3172e66b8dc4d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/gemm-common-525906e7b9628190` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/gemm-f32-1ae2d54318212109` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/gemm-f64-e848958c543fb506` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/generativity-2d6a55a7d18b7e57` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/getrandom-dbfa14490e47c3e9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/halfbrown-24763e6682cf44d5` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/hashbrown-3ae2328bf07ee6bb` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/itoa-ac49bc49c0e35dc8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/libloading-3b0e23855926f89b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/libm-09461ba1f39eb432` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/libm-30f6387f5269ca87` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/libm-3508b0f9a6e79f97` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/matrixcompare-47ab2ff256a57603` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/matrixcompare-core-401a42e71e8dbbaf` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/matrixmultiply-8df0f65a15b15ac8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/matrixmultiply-8ef4281dcec05c93` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/matrixmultiply-e5d723dab857c523` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/memchr-7c2f0518e0b47927` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/memchr-82ae25b86da6e69b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nalgebra-69abc5ef8c1b8ccf` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nalgebra-macros-853b7ba91b534245` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-84dbeb6c05c48588` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-c32-721197a46ddd9aa5` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-c32-7b736b175aa1a8e3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-c32-a8d5ed8681906acf` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-c64-7a92dcc797b4874c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-c64-bc37478a9cf6dbcb` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-c64-bea09232cad7d073` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-codegen-2d52a92c6eecf0d5` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-core-b24cd808dc8fde58` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-f32-1508a81e6c443034` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-f32-b39df7c5e72ef620` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-f32-fa4a95ab0303cfab` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-f64-9af305e2c9a66a89` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-f64-d9814cdd33ad3d42` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/nano-gemm-f64-e43290bcd199c32a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/napi-build-d7332897cde4a984` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/napi-derive-07f9583271126062` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/napi-derive-backend-bf34f865c286b300` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/napi-e42e09e5663f1fd4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/napi-sys-ce65ac434e4b315c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ndarray-1c6e294a7f51433d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/npyz-19bb8b2980abb302` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/num-bigint-3c6b9349d90b0d4e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/num-complex-0e77abebc9d87a3e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/num-integer-92b651f086e614bb` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/num-rational-8d3ae59537190fff` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/num-traits-0d209c6ed7adbb9c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/num-traits-8dfac53448569d4c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/num-traits-97f665724ea1c900` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/once_cell-2afcbd1daf9e3394` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/once_cell-bbfd4f2bce8f4e0e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ordered-float-72dd62de075cacb6` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/paste-0b1dd46db813601e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/paste-43c355f4a40038cf` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/paste-c001bbdca7909880` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pest-82ff8766ce5b9f9c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pest-cc3f6f5a862c6a7c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pest_derive-32187d31c4c8f588` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pest_generator-fbe084b7dc63edf3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pest_meta-d0fcb87e41680317` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pin-project-lite-bc3b7cfa74d7bcd3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ppv-lite86-41574960b8c10422` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/proc-macro2-357114fa3fffe789` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/proc-macro2-8545f974460e59e4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/proc-macro2-8aa96fa60b3665c0` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pulp-17ab1b6f864f937d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pulp-4984c96a6783c969` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pulp-8cd1b5dd85727b1b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/pulp-e85da758134ed01c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/py_literal-326c6e663200a5ae` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/quote-48548cb77534fb77` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/quote-56986d9daf06a1a9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/quote-667dac9dbf021bf1` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rand-6952b937864d8e50` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rand_chacha-69e12c056217b535` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rand_core-f43b8dd4df806092` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rand_distr-2edd46b53b18a0be` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/raw-cpuid-0abf27446cf1b8a0` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rawpointer-6611d9244f9d8527` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rayon-core-13e6fde9a41f3709` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rayon-core-1c18410a8d54787f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rayon-core-88eee42ec080f75f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rayon-dd089f12b0cc9f46` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/reborrow-4396c07a03ba5b2e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ref-cast-2ddd9cc480b34b26` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ref-cast-4c85ea0626e9633f` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ref-cast-dea9530db3fe6177` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ref-cast-impl-87c95567c18ec35d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/regex-4df14b9e980bf94d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/regex-automata-eedb146b74153a04` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/regex-syntax-a286c4780aee4796` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rmp-6a262f34f7134261` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rmp-serde-27059f3a6e16a8e8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/rustc-hash-3e6410de95d3cd50` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ryu-e91df3175f362de8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/safe_arch-78b6663923afb5f8` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/semver-501a42469de523e3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/seq-macro-d25230b2641043a0` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde-a58757e1669c87d4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde-a907d0c0ec011b0e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde-af81eaad7752f696` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde_core-7eb8588ce3b569eb` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde_core-c5c76166a63fcb61` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde_core-c8ca852287a2d045` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde_derive-f184aac7db6cf52c` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde_json-0dcb0d6b153c67c4` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde_json-109ec29587a82e18` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/serde_json-234518261557c5f3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/simba-61448c9b0870f44e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/simd-json-2a622b58db900fd1` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/simdutf8-fa2cd73e6fd82227` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/static_assertions-faa57ca076a987f2` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/statrs-5f74206b467c73b3` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/syn-1b5f392ff902fc7d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/syn-1cd211e45d97038e` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/tokio-469a936b0958abda` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/turbovec-b1ca5a96abf42e0d` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/turbovec-napi-006d80527eee553a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/turbovec-napi-02cc996fae4fe6c5` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/turbovec-napi-71d2b65563028ea9` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/twox-hash-05669293d921c089` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/typenum-25a796fb673a0662` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ucd-trie-cd12669c157b8f23` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/ucd-trie-da144abb713fcef7` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/unicode-ident-3d2a4a9b90a2399a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/unicode-segmentation-a6c6c41ac1c98328` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/value-trait-26b73468bd55224a` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/version_check-75290a5d21a10a3b` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/wide-71a0cf468c24f552` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/windows-link-6f10eec86472b1f5` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/zerocopy-3b392b3ad3dbe5df` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/zerocopy-57d6957500d0caa6` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/zerocopy-c66bb89332bea0e1` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/zmij-1f0dde67289876cf` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/zmij-42e1ded69cee9bbd` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
-| ✅ | `target/release/.fingerprint/zmij-9d1ebc0b8399b450` | 90 | 1 | 1 | 0 | 0/0 | 0 | — |
 | ✅ | `test/services` | 90 | 2 | 356 | 0 | 0/2 | 0 | — |
 | ✅ | `tests/atlas` | 90 | 18 | 1984 | 0 | 0/4 | 0 | — |
 | ✅ | `tests/fixtures` | 90 | 2 | 118 | 0 | 0/0 | 0 | — |
@@ -1627,16 +1403,15 @@
 | ✅ | `tools/agentic-research/scaffolds` | 90 | 2 | 34 | 0 | 0/0 | 0 | — |
 | ✅ | `tools/parent-atlas-qdrant-postgres-toolkit/scripts/qdrant` | 90 | 2 | 244 | 0 | 0/2 | 0 | — |
 | ✅ | `triton-trt-llm/reports` | 90 | 1 | 66 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes` | 91 | 6 | 269352 | 842 | 1306/700 | 11 | 🟠lh ⬜notest |
 | ✅ | `packages/parent-atlas-runtime/src/adapters` | 93 | 6 | 1187 | 0 | 0/0 | 1 | — |
 | ✅ | `claude-mem/plugin` | 95 | 2 | 24742 | 0 | 2/10 | 0 | 🟠lh |
 | ✅ | `claude-mem/plugin/scripts` | 95 | 9 | 23096 | 0 | 2/8 | 0 | 🟠lh |
 | ✅ | `packages/atlas-core/src/retrieval` | 95 | 5 | 2227 | 0 | 0/1 | 0 | 🟠lh |
-| ✅ | `scripts/docs-atlas` | 95 | 36 | 7086 | 0 | 0/24 | 0 | 🟠lh |
+| ✅ | `scripts/docs-atlas` | 95 | 38 | 7342 | 0 | 0/26 | 0 | 🟠lh |
 | ✅ | `scripts/graphify-audit` | 95 | 8 | 2830 | 0 | 0/6 | 0 | 🟠lh |
-| ✅ | `scripts/ingest` | 95 | 50 | 6996 | 0 | 0/36 | 0 | 🟠lh |
+| ✅ | `scripts/ingest` | 95 | 52 | 7374 | 0 | 0/38 | 0 | 🟠lh |
 | ✅ | `scripts/memory` | 95 | 10 | 574892 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `scripts/opencode` | 95 | 158 | 22520 | 0 | 0/132 | 0 | 🟠lh |
+| ✅ | `scripts/opencode` | 95 | 160 | 22538 | 0 | 0/132 | 0 | 🟠lh |
 | ✅ | `scripts/qdrant` | 95 | 6 | 604 | 0 | 0/2 | 0 | 🟠lh |
 | ✅ | `scripts/smoke` | 95 | 30 | 4814 | 0 | 0/12 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/.docker-build` | 95 | 2 | 40309 | 0 | 1/39 | 0 | 🟠lh |
@@ -1644,11 +1419,11 @@
 | ✅ | `sveltekit-frontend/.docker-build/scripts/atlas` | 95 | 54 | 8853 | 0 | 1/39 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scratch` | 95 | 54 | 7233 | 0 | 0/7 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/index` | 95 | 10 | 806 | 0 | 0/7 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/mcp` | 95 | 25 | 8267 | 0 | 0/17 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/mcp` | 95 | 26 | 8426 | 0 | 0/17 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/semantic-valkey` | 95 | 2 | 467 | 0 | 1/0 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/smoke` | 95 | 32 | 4361 | 0 | 0/11 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/startup` | 95 | 17 | 3742 | 0 | 0/4 | 0 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/tests` | 95 | 78 | 15958 | 0 | 4/26 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/startup` | 95 | 19 | 3762 | 0 | 0/4 | 0 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/tests` | 95 | 78 | 15951 | 0 | 4/26 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/sveltekit-frontend/scripts` | 95 | 1 | 431 | 0 | 0/1 | 0 | 🟠lh |
 | ✅ | `.claude/hooks` | 100 | 2 | 163 | 0 | 0/2 | 0 | — |
 | ✅ | `atlas-openspec-awareness-v2/scripts/atlas` | 100 | 11 | 1166 | 0 | 0/10 | 0 | — |
@@ -1663,27 +1438,29 @@
 | ✅ | `packages/atlas-core/src/classification` | 100 | 10 | 2677 | 0 | 0/2 | 0 | — |
 | ✅ | `packages/atlas-core/src/queue` | 100 | 2 | 300 | 0 | 0/1 | 0 | — |
 | ✅ | `packages/atlas-core/src/validation` | 100 | 11 | 2913 | 0 | 0/2 | 0 | — |
-| ✅ | `packages/parent-atlas` | 100 | 2 | 55764 | 1 | 0/283 | 1 | 🟠lh |
+| ✅ | `packages/parent-atlas` | 100 | 2 | 59005 | 1 | 0/296 | 1 | 🟠lh |
 | ✅ | `packages/parent-atlas/scripts` | 100 | 2 | 520 | 0 | 0/0 | 0 | — |
-| ✅ | `packages/parent-atlas/test` | 100 | 113 | 11180 | 1 | 0/50 | 0 | — |
+| ✅ | `packages/parent-atlas/test` | 100 | 124 | 12866 | 1 | 0/54 | 0 | — |
 | ✅ | `packages/parent-atlas-retrieval/src/gpu` | 100 | 19 | 5975 | 0 | 0/4 | 0 | — |
 | ✅ | `parent-atlas-capability-census-v5/scripts/atlas` | 100 | 1 | 136 | 0 | 0/0 | 0 | — |
 | ✅ | `parent-atlas-capability-census-v5/scripts/atlas/lib` | 100 | 1 | 58 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/atlas` | 100 | 4790 | 1041500 | 8 | 6/2346 | 42 | 🟠lh |
-| ✅ | `scripts/atlas/lib` | 100 | 780 | 69136 | 4 | 0/96 | 24 | 🟠lh |
-| ✅ | `scripts/atlas/schema` | 100 | 12 | 2918 | 0 | 0/8 | 0 | — |
+| ✅ | `scripts/atlas` | 100 | 5246 | 1162096 | 14 | 10/2686 | 42 | 🟠lh |
+| ✅ | `scripts/atlas/lib` | 100 | 1314 | 118972 | 8 | 0/174 | 24 | 🟠lh |
+| ✅ | `scripts/atlas/schema` | 100 | 12 | 2932 | 0 | 0/8 | 0 | — |
 | ✅ | `scripts/db-tests` | 100 | 12 | 560 | 0 | 0/0 | 0 | — |
+| ✅ | `scripts/graphify` | 100 | 8 | 2870 | 2 | 0/6 | 0 | — |
 | ✅ | `scripts/lib` | 100 | 6 | 654 | 0 | 0/0 | 0 | — |
-| ✅ | `scripts/packets` | 100 | 42 | 8664 | 0 | 0/26 | 0 | — |
+| ✅ | `scripts/ops` | 100 | 6 | 1266 | 0 | 0/6 | 0 | — |
+| ✅ | `scripts/packets` | 100 | 54 | 9460 | 0 | 0/26 | 0 | — |
 | ✅ | `scripts/postgres` | 100 | 2 | 694 | 0 | 0/0 | 0 | — |
 | ✅ | `scripts/promotion` | 100 | 14 | 3746 | 0 | 0/10 | 0 | — |
 | ✅ | `scripts/tests` | 100 | 178 | 91020 | 2 | 4/36 | 0 | 🟠lh |
 | ✅ | `sveltekit-frontend/drizzle/schema` | 100 | 1 | 311 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts` | 100 | 410 | 382901 | 17 | 34/629 | 48 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/agents` | 100 | 5 | 1403 | 0 | 1/2 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts` | 100 | 414 | 384951 | 17 | 34/637 | 48 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/agents` | 100 | 5 | 1405 | 0 | 1/2 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/agents/skills` | 100 | 5 | 546 | 0 | 1/1 | 0 | — |
-| ✅ | `sveltekit-frontend/scripts/atlas` | 100 | 423 | 165269 | 1 | 5/189 | 3 | 🟠lh |
-| ✅ | `sveltekit-frontend/scripts/atlas/lib` | 100 | 15 | 2171 | 0 | 0/5 | 0 | — |
+| ✅ | `sveltekit-frontend/scripts/atlas` | 100 | 435 | 166892 | 1 | 5/196 | 3 | 🟠lh |
+| ✅ | `sveltekit-frontend/scripts/atlas/lib` | 100 | 17 | 2224 | 0 | 0/5 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/atlas/mapreduce` | 100 | 1 | 121 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/audit` | 100 | 1 | 522 | 0 | 0/1 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/docs` | 100 | 1 | 530 | 0 | 0/0 | 0 | — |
@@ -1695,28 +1472,30 @@
 | ✅ | `sveltekit-frontend/scripts/phase104-backups/src` | 100 | 399 | 43970 | 13 | 10/96 | 36 | 🟠lh |
 | ✅ | `sveltekit-frontend/scripts/screenshots` | 100 | 3 | 670 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/scripts/validate` | 100 | 2 | 1554 | 0 | 1/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src` | 100 | 18 | 1245205 | 851 | 1334/2228 | 85 | 🔴ssr 🟠lh ⬜notest |
-| ✅ | `sveltekit-frontend/src/lib` | 100 | 11 | 939564 | 9 | 22/1481 | 73 | 🟠lh |
+| ✅ | `sveltekit-frontend/src` | 100 | 21 | 1332004 | 862 | 1381/2394 | 82 | 🔴ssr 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/lib` | 100 | 11 | 1011495 | 9 | 23/1623 | 70 | 🔴ssr 🟠lh |
 | ✅ | `sveltekit-frontend/src/lib/data` | 100 | 5 | 1687 | 0 | 0/0 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/db` | 100 | 12 | 2562 | 0 | 0/0 | 0 | — |
+| ✅ | `sveltekit-frontend/src/lib/db` | 100 | 13 | 2587 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/intent` | 100 | 1 | 239 | 0 | 0/0 | 0 | — |
 | ✅ | `sveltekit-frontend/src/lib/phase72` | 100 | 1 | 394 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 3850 | 661612 | 9 | 19/1373 | 55 | 🟠lh |
+| ✅ | `sveltekit-frontend/src/lib/server` | 100 | 4187 | 715477 | 9 | 19/1504 | 53 | 🟠lh |
 | ✅ | `sveltekit-frontend/src/lib/shims` | 100 | 11 | 1248 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/src/lib/types` | 100 | 57 | 7435 | 0 | 0/6 | 0 | — |
-| ✅ | `sveltekit-frontend/src/routes/(app)` | 100 | 486 | 125240 | 4 | 486/50 | 2 | 🟠lh ⬜notest |
+| ✅ | `sveltekit-frontend/src/lib/types` | 100 | 57 | 7438 | 0 | 0/6 | 0 | — |
+| ✅ | `sveltekit-frontend/src/routes/(analysis)` | 100 | 8 | 3062 | 0 | 4/0 | 0 | ⬜notest |
+| ✅ | `sveltekit-frontend/src/routes/(analysis)@` | 100 | 8 | 2720 | 0 | 4/0 | 0 | ⬜notest |
+| ✅ | `sveltekit-frontend/src/routes/(app)` | 100 | 511 | 131616 | 4 | 511/52 | 2 | 🔴ssr 🟠lh ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/admin` | 100 | 4 | 2707 | 0 | 2/2 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/atlas` | 100 | 5 | 786 | 1 | 1/1 | 0 | ⬜notest |
-| ✅ | `sveltekit-frontend/src/routes/dashboard` | 100 | 2 | 351 | 0 | 0/0 | 0 | ⬜notest |
+| ✅ | `sveltekit-frontend/src/routes/atlas` | 100 | 5 | 830 | 1 | 1/1 | 0 | ⬜notest |
+| ✅ | `sveltekit-frontend/src/routes/dashboard` | 100 | 2 | 844 | 0 | 1/0 | 0 | ⬜notest |
 | ✅ | `sveltekit-frontend/src/routes/login` | 100 | 3 | 506 | 0 | 1/3 | 0 | — |
 | ✅ | `sveltekit-frontend/src/routes/register` | 100 | 3 | 627 | 0 | 1/2 | 0 | — |
-| ✅ | `sveltekit-frontend/src/types` | 100 | 27 | 947 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/tests` | 100 | 298 | 173991 | 5 | 818/94 | 1 | 🟠lh |
-| ✅ | `sveltekit-frontend/tests/atlas` | 100 | 32 | 6619 | 0 | 0/12 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/e2e` | 100 | 35 | 10110 | 0 | 10/5 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/lane-contracts` | 100 | 4 | 397 | 0 | 0/1 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/routes` | 100 | 33 | 67859 | 2 | 785/14 | 0 | — |
-| ✅ | `sveltekit-frontend/tests/routes/auto` | 100 | 791 | 57245 | 0 | 777/4 | 0 | — |
+| ✅ | `sveltekit-frontend/src/types` | 100 | 27 | 957 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/tests` | 100 | 300 | 176043 | 5 | 819/97 | 1 | 🟠lh |
+| ✅ | `sveltekit-frontend/tests/atlas` | 100 | 32 | 6623 | 0 | 0/12 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/e2e` | 100 | 48 | 11428 | 0 | 11/7 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/lane-contracts` | 100 | 4 | 430 | 0 | 0/1 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/routes` | 100 | 33 | 68342 | 2 | 785/15 | 0 | — |
+| ✅ | `sveltekit-frontend/tests/routes/auto` | 100 | 792 | 57728 | 0 | 777/5 | 0 | — |
 | ✅ | `sveltekit-frontend/tests/unit` | 100 | 15 | 2417 | 0 | 0/3 | 0 | — |
 | ✅ | `tests/classifier` | 100 | 8 | 1854 | 0 | 0/0 | 0 | — |
 | ✅ | `tools/agentic-research/src/firecrawl` | 100 | 1314 | 358196 | 2 | 0/332 | 82 | 🟠lh |
@@ -1724,7 +1503,7 @@
 
 ---
 
-## API Routes (842 total · top 60)
+## API Routes (852 total · top 60)
 
 | Route [params] | Methods | Auth | Zod | Error handling |
 |----------------|---------|------|-----|----------------|
@@ -1776,24 +1555,24 @@
 | `sveltekit-frontend/api/ace/policy-orchestrator/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/ace/stream/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/atlas/cache/+server.ts` | GET, DELETE | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/admin/atlas/ontology-resolution/+server.ts` | GET, POST | ❌ | ❌ | ✅ |
+| `sveltekit-frontend/api/admin/atlas/kanban-tickets/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/admin/atlas/ontology-resolution/+server.ts` | GET, POST | ❌ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/atlas/registry/search/+server.ts` | GET, POST | ❌ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/atlas/taxonomy-candidates/+server.ts` | GET, POST | ❌ | ✅ | ✅ |
+| `sveltekit-frontend/api/admin/atlas/turbovec-prefilter/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
+| `sveltekit-frontend/api/admin/gpu-lease/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/grpo/flush/+server.ts` | GET, POST | ✅ | ✅ | ❌ |
 | `sveltekit-frontend/api/admin/model/validate-checkpoint/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/observability/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/packets/enrich-labels/+server.ts` | GET, POST | ✅ | ❌ | ✅ |
 | `sveltekit-frontend/api/admin/qlora/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 | `sveltekit-frontend/api/admin/retrieval/search/+server.ts` | GET, POST | ❌ | ✅ | ✅ |
-| `sveltekit-frontend/api/admin/retrieval/stream/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/admin/seed-knowledge/+server.ts` | POST, GET | ✅ | ✅ | ✅ |
-| `sveltekit-frontend/api/admin/summaries/scan-quality/+server.ts` | GET, POST | ✅ | ✅ | ✅ |
 
-_…and 782 more. See `codebase-graph.json` for full list._
+_…and 792 more. See `codebase-graph.json` for full list._
 
 ---
 
-## G4 — API Routes Missing Auth Guard (29)
+## G4 — API Routes Missing Auth Guard (31)
 - `sveltekit-frontend/src/routes/api/acp/rpc/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/acp/service-ports/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/atlas/docs-corpus/+server.ts` · GET
@@ -1807,30 +1586,29 @@ _…and 782 more. See `codebase-graph.json` for full list._
 - `sveltekit-frontend/src/routes/api/admin/atlas/registry/search/+server.ts` · GET/POST
 - `sveltekit-frontend/src/routes/api/admin/atlas/synthesize/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/admin/atlas/taxonomy-candidates/+server.ts` · GET/POST
+- `sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/admin/batch-embeddings/packets/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/admin/chat/+server.ts` · POST
+- `sveltekit-frontend/src/routes/api/admin/parents-atlas/actions/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/admin/retrieval/clusters/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/retrieval/search/+server.ts` · GET/POST
-- `sveltekit-frontend/src/routes/api/ai/emotion/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/atlas/studio/redis/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/atlas/token-cache-instructions/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/batch-summary/jobs/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/dispatcher/audit/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/graphify/status/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/metrics/retrieval/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/phase102/retrieval-pipeline/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/retrieval/cache-layers/health/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/retrieval/cache-layers/metrics/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/retrieval/dual-lane/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/telemetry/implementation-clusters/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/trpc/[...procedure]/+server.ts` · GET/POST
-- `sveltekit-frontend/src/routes/atlas/studio/openspec/events/+server.ts` · GET
 
 ---
 
-## G5 — API Routes Missing Zod Validation (4)
-- `sveltekit-frontend/src/routes/api/admin/atlas/ontology-resolution/+server.ts` · GET/POST
-- `sveltekit-frontend/src/routes/api/admin/atlas/ontology-resolution/oak-search/+server.ts` · POST
-- `sveltekit-frontend/src/routes/api/ai/emotion/+server.ts` · POST
+## G5 — API Routes Missing Zod Validation (2)
 - `sveltekit-frontend/src/routes/api/codebase-index/couchdb-pagerank/+server.ts` · POST/GET
+- `sveltekit-frontend/src/routes/api/trpc/[...procedure]/+server.ts` · GET/POST
 
 ---
 
@@ -1846,8 +1624,9 @@ _No unguarded SSR-unsafe globals. ✅_
 
 ---
 
-## G16 — Routes Without Test Pairing (76)
+## G16 — Routes Without Test Pairing (84)
 - `sveltekit-frontend/src/routes/api/admin/ai-chat/[sessionId]/+server.ts` · GET
+- `sveltekit-frontend/src/routes/api/admin/ai-dashboard/runtime-errors/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/atlas/docs-corpus/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/atlas/docs-corpus/local-snapshot/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/atlas/document-governance/+server.ts` · GET
@@ -1865,22 +1644,21 @@ _No unguarded SSR-unsafe globals. ✅_
 - `sveltekit-frontend/src/routes/api/admin/atlas/phase-lanes/proof/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/atlas/retrieval/proof/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/admin/atlas/taxonomy-candidates/+server.ts` · GET/POST
+- `sveltekit-frontend/src/routes/api/admin/gpu-lease/+server.ts` · GET/POST
 - `sveltekit-frontend/src/routes/api/admin/retrieval/clusters/[id]/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/agent-work-receipts/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/ai/analyze/[scope]/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/ai/emotion/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/ai/generate-report/[scope]/+server.ts` · POST
+- `sveltekit-frontend/src/routes/api/ai/screen-analysis/+server.ts` · GET/POST
 - `sveltekit-frontend/src/routes/api/analytics/research-summaries/[id]/+server.ts` · GET/DELETE
 - `sveltekit-frontend/src/routes/api/atlas/cards/[id]/+server.ts` · GET
 - `sveltekit-frontend/src/routes/api/atlas/concept-tagging/+server.ts` · POST
 - `sveltekit-frontend/src/routes/api/atlas/memory-address/[source_ref_id]/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/atlas/studio/cards/[id]/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/audio/analysis/[evidenceId]/+server.ts` · GET
-- `sveltekit-frontend/src/routes/api/audio/progress/[evidenceId]/+server.ts` · GET
 
 ---
 
-## G11 — Hardcoded Localhost References (1773 files)
+## G11 — Hardcoded Localhost References (1807 files)
 - `backfill-neo4j-cell-id.mjs` · http://localhost:7474
 - `backfill-qdrant-by-packet-key.mjs` · http://localhost:6333
 - `backfill-qdrant-identity.mjs` · http://localhost:6333
@@ -1944,33 +1722,34 @@ _No unguarded SSR-unsafe globals. ✅_
 ## G19 — Top Module Fan-In (most imported `$lib` paths)
 | Module | Import Count |
 |--------|-------------|
-| `$lib/server/db/client` | 668 |
+| `$lib/server/db/client` | 679 |
 | `$lib/types` | 662 |
-| `$lib/server/env.server.js` | 484 |
-| `$lib/server/redis.js` | 370 |
+| `$lib/server/env.server.js` | 495 |
+| `$lib/server/redis.js` | 376 |
+| `$lib/components/ui/Icon.svelte` | 279 |
 | `$lib/server/db` | 271 |
-| `$lib/components/ui/Icon.svelte` | 260 |
+| `$lib/server/db/client.js` | 219 |
 | `$lib/server/db/schema-postgres` | 212 |
-| `$lib/server/db/schema-postgres.js` | 191 |
-| `$lib/server/db/client.js` | 191 |
-| `$lib/server/db/schema` | 147 |
-| `$lib/server/ollama.js` | 139 |
-| `$lib/server/llm/runtime-contract.js` | 134 |
+| `$lib/server/db/schema-postgres.js` | 196 |
+| `$lib/server/db/schema` | 145 |
+| `$lib/server/ollama.js` | 138 |
+| `$lib/server/llm/runtime-contract.js` | 137 |
 | `$lib/middleware/redis-orchestrator-middleware` | 123 |
 | `$lib/server/middleware/cache-headers.js` | 111 |
-| `$lib/server/vector/qdrant-manager.js` | 106 |
+| `$lib/server/vector/qdrant-manager.js` | 107 |
 | `$lib/server/grpc/embedding-client.js` | 99 |
-| `$lib/components/ui/Button.svelte` | 95 |
-| `$lib/server/validation.js` | 95 |
+| `$lib/components/ui/Button.svelte` | 96 |
+| `$lib/server/validation.js` | 94 |
 | `$lib/enums` | 88 |
 | `$lib/server/redis` | 78 |
 
 ---
 
-## G20 — Cyclic Import Pairs (16 found · top 20)
+## G20 — Cyclic Import Pairs (17 found · top 20)
 - `claude-mem/src/shared/paths.ts` ↔ `claude-mem/src/utils/logger.ts`
 - `llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/index.ts` ↔ `llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dialog/dialog-content.svelte`
 - `llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/scroll-area/index.ts` ↔ `llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/scroll-area/scroll-area.svelte`
+- `sveltekit-frontend/src/lib/server/graph/graph-dispatcher-proof.ts` ↔ `sveltekit-frontend/src/lib/server/graph/louvain-resolution-receipt.ts`
 - `tools/agentic-research/src/firecrawl/apps/api/src/controllers/v1/types.ts` ↔ `tools/agentic-research/src/firecrawl/apps/api/src/scraper/scrapeURL/index.ts`
 - `tools/agentic-research/src/firecrawl/apps/api/src/controllers/v2/types.ts` ↔ `tools/agentic-research/src/firecrawl/apps/api/src/lib/format-utils.ts`
 - `tools/agentic-research/src/firecrawl/apps/api/src/lib/crawl-redis.ts` ↔ `tools/agentic-research/src/firecrawl/apps/api/src/scraper/scrapeURL/index.ts`
@@ -1987,7 +1766,7 @@ _No unguarded SSR-unsafe globals. ✅_
 
 ---
 
-## Svelte Components (60 shown of 1171)
+## Svelte Components (60 shown of 1198)
 | File | Sub-components | Key `$lib` Imports |
 |------|---------------|---------------------|
 | `atlas-openspec-awareness-v2/src/lib/components/atlas/OpenSpecAwarenessPanel.svelte` |  | $lib/server/atlas/openspec-board/awareness |
@@ -2056,36 +1835,36 @@ _No unguarded SSR-unsafe globals. ✅_
 ## Top External Module Imports
 | Module | Consumer Count |
 |--------|----------------|
-| `node:path` | 4615 |
-| `node:fs` | 3615 |
-| `@sveltejs/kit` | 3464 |
-| `node:url` | 3015 |
-| `node:crypto` | 2786 |
-| `pg` | 2647 |
-| `vitest` | 2599 |
-| `path` | 2063 |
-| `zod` | 1871 |
-| `fs` | 1554 |
-| `drizzle-orm` | 1144 |
-| `node:fs/promises` | 1053 |
-| `node:child_process` | 1003 |
+| `node:path` | 5147 |
+| `node:fs` | 4060 |
+| `@sveltejs/kit` | 3481 |
+| `node:crypto` | 3382 |
+| `node:url` | 3265 |
+| `vitest` | 2924 |
+| `pg` | 2786 |
+| `path` | 2064 |
+| `zod` | 1988 |
+| `fs` | 1558 |
+| `node:assert/strict` | 1253 |
+| `drizzle-orm` | 1174 |
+| `node:test` | 1141 |
+| `node:child_process` | 1139 |
+| `node:fs/promises` | 1107 |
 | `url` | 863 |
-| `dotenv` | 844 |
-| `node:assert/strict` | 824 |
-| `node:test` | 736 |
+| `dotenv` | 848 |
 | `ioredis` | 689 |
 | `crypto` | 680 |
 | `$lib/types` | 662 |
-| `$lib/server/db/client` | 525 |
-| `$lib/server/env.server.js` | 458 |
-| `child_process` | 456 |
+| `$lib/server/db/client` | 524 |
+| `$lib/server/env.server.js` | 471 |
+| `child_process` | 455 |
 | `fs/promises` | 384 |
-| `drizzle-orm/pg-core` | 340 |
-| `svelte` | 318 |
-| `@playwright/test` | 303 |
-| `$lib/server/db` | 267 |
-| `$lib/server/redis.js` | 265 |
-| `node-fetch` | 260 |
+| `drizzle-orm/pg-core` | 356 |
+| `svelte` | 347 |
+| `@playwright/test` | 318 |
+| `node:module` | 301 |
+| `$lib/components/ui/Icon.svelte` | 279 |
+| `$lib/server/redis.js` | 268 |
 
 ---
 
@@ -2093,17 +1872,17 @@ _No unguarded SSR-unsafe globals. ✅_
 - `scripts/api-cleanup` — 664 marker(s), score 45
 - `scripts/api-cleanup/reports` — 662 marker(s), score 45
 - `scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z` — 594 marker(s), score 45
-- `sveltekit-frontend/src` — 85 marker(s), score 100
+- `sveltekit-frontend/src` — 82 marker(s), score 100
 - `tools/agentic-research/src/firecrawl` — 82 marker(s), score 100
-- `sveltekit-frontend/src/lib` — 73 marker(s), score 100
+- `sveltekit-frontend/src/lib` — 70 marker(s), score 100
 - `scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z` — 68 marker(s), score 44
-- `sveltekit-frontend/src/lib/server` — 55 marker(s), score 100
+- `sveltekit-frontend/src/lib/server` — 53 marker(s), score 100
 - `sveltekit-frontend/scripts` — 48 marker(s), score 100
 - `scripts/atlas` — 42 marker(s), score 100
 - `sveltekit-frontend/scripts/phase104-backups/src` — 36 marker(s), score 100
 - `sveltekit-frontend/drizzle` — 24 marker(s), score 85
 - `scripts/atlas/lib` — 24 marker(s), score 100
-- `sveltekit-frontend/src/routes` — 11 marker(s), score 91
+- `sveltekit-frontend/src/routes` — 11 marker(s), score 82
 - `sveltekit-frontend/scripts/topology` — 9 marker(s), score 75
 
 ---

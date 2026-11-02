@@ -130,7 +130,7 @@
   function connectEventStream() {
     if (typeof window === 'undefined' || eventSource) return;
 
-    eventSource = new EventSource('/agentic/events');
+    eventSource = new EventSource('/api/agentic-events');
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);

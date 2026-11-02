@@ -19,7 +19,6 @@
   import { documentProgressStore } from '$lib/stores/dashboard/DocumentProgressStore.svelte';
   import RecentActivity from '$lib/components/yorha/dashboard/RecentActivity.svelte';
   import LegalDisclaimer from '$lib/components/LegalDisclaimer.svelte';
-  import AIAssistantButton from '$lib/components/ai/AIAssistantButton.svelte';
   import ActiveCasesWidget from '$lib/components/yorha/dashboard/ActiveCasesWidget.svelte';
   import YoRHaDataViz from '$lib/components/yorha/_simulations/YoRHaDataViz.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
@@ -511,15 +510,15 @@
             rows="8"
           ></textarea>
           <div class="wwwh-btn-row">
-            <button class="wwwh-btn primary" onclick={parseWWWHNotes}>
+            <button type="button" class="wwwh-btn primary" onclick={parseWWWHNotes}>
               <Icon name="sparkles" size={14} />
               Auto Fill From Notes
             </button>
-            <button class="wwwh-btn ai" onclick={aiAnalyzeWWWH} disabled={wwwhAnalyzing}>
+            <button type="button" class="wwwh-btn ai" onclick={aiAnalyzeWWWH} disabled={wwwhAnalyzing}>
               <Icon name="brain" size={14} />
               {wwwhAnalyzing ? 'Analyzing...' : 'AI Extract'}
             </button>
-            <button class="wwwh-btn" onclick={clearWWWH}>
+            <button type="button" class="wwwh-btn" onclick={clearWWWH}>
               <Icon name="eraser" size={14} />
               Clear All
             </button>
@@ -944,9 +943,6 @@
   {/if}
 </div>
 </div>
-
-<!-- Floating AI Assistant Button -->
-<AIAssistantButton variant="floating" position="bottom-right" />
 
 <!-- Ctrl+N shortcut -->
 <svelte:window onkeydown={handleGlobalKeydown} />
@@ -1781,37 +1777,52 @@
 
   .wwwh-btn-row {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 0.5rem;
     margin-top: 0.625rem;
   }
 
-  .wwwh-btn {
+  .dashboard-dark :global(.wwwh-btn) {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.375rem;
+    flex: 0 1 auto;
+    min-width: 0;
+    min-height: 2.5rem;
     padding: 0.5rem 0.875rem;
     border-radius: 0.375rem;
-    font-size: 0.75rem;
+    font: inherit;
+    font-size: 0.8125rem;
+    line-height: 1.25;
     font-weight: 600;
     border: 1px solid rgba(212, 199, 163, 0.15);
     background: rgba(212, 199, 163, 0.06);
     color: rgba(212, 199, 163, 0.7);
     cursor: pointer;
-    transition: all 0.15s;
+    white-space: normal;
+    text-align: center;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
   }
 
-  .wwwh-btn:hover {
+  .dashboard-dark :global(.wwwh-btn:hover:not(:disabled)) {
     background: rgba(212, 199, 163, 0.1);
     color: rgba(212, 199, 163, 0.9);
   }
 
-  .wwwh-btn.primary {
+  .dashboard-dark :global(.wwwh-btn:focus-visible) {
+    outline: 2px solid rgba(110, 231, 183, 0.9);
+    outline-offset: 2px;
+  }
+
+  .dashboard-dark :global(.wwwh-btn.primary) {
     background: rgba(52, 211, 153, 0.12);
     border-color: rgba(52, 211, 153, 0.3);
     color: rgba(52, 211, 153, 0.95);
   }
 
-  .wwwh-btn.primary:hover {
+  .dashboard-dark :global(.wwwh-btn.primary:hover:not(:disabled)) {
     background: rgba(52, 211, 153, 0.2);
   }
 
@@ -1884,17 +1895,20 @@
   }
 
   /* AI button */
-  .wwwh-btn.ai {
+  .dashboard-dark :global(.wwwh-btn.ai) {
     background: rgba(167, 139, 250, 0.15);
     color: #c4b5fd;
     border-color: rgba(167, 139, 250, 0.3);
   }
-  .wwwh-btn.ai:hover:not(:disabled) {
+  .dashboard-dark :global(.wwwh-btn.ai:hover:not(:disabled)) {
     background: rgba(167, 139, 250, 0.25);
     border-color: rgba(167, 139, 250, 0.5);
   }
-  .wwwh-btn.ai:disabled {
+  .dashboard-dark :global(.wwwh-btn:disabled) {
     opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .dashboard-dark :global(.wwwh-btn.ai:disabled) {
     cursor: wait;
   }
 
@@ -1980,6 +1994,12 @@
   }
 
   @media (max-width: 640px) {
+    .wwwh-btn-row {
+      align-items: stretch;
+    }
+    .dashboard-dark :global(.wwwh-btn) {
+      flex: 1 1 9rem;
+    }
     .wwwh-grid {
       grid-template-columns: 1fr;
     }

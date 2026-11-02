@@ -14,14 +14,14 @@ TURBO_MODEL_PATH=C:\Users\james\Videos\deeds-web-app\vendor\models\gemma4-rotorq
 TURBO_MMPROJ_PATH=C:\Users\james\Videos\deeds-web-app\vendor\models\mmproj-gemma4.gguf
 LLAMA_SERVER_PATH=C:\Users\james\Desktop\llama-server-cuda\llama-server.exe
 TURBO_PROFILE=stock
-TURBO_CTX=16384
+TURBO_CTX=65536
 TURBO_NGL=99
 ```
 
 ### 🧱 Component Breakdown
 1. **Model Core (`gemma4-rotorquant:latest.gguf`)**: A **Gemma4 E4B (4.4B)** base model merged with a specialized **GRPO (Group Relative Policy Optimization)** fine-tuned legal LoRA. Quantized in **Q4_K_M** (5.33 GB) format on disk.
 2. **Vision Tower (`mmproj-gemma4.gguf`)**: A multimodal projector file (991 MB) based on **SigLIP** enabling image inputs and OCR capabilities when the VLM projector tower is active.
-3. **Execution Context (`llama-server-cuda`)**: Runs with complete GPU offloading (`--n-gpu-layers 99`) and a 16k tokens context window (`--ctx-size 16384`).
+3. **Execution Context (`llama-server-cuda`)**: The repository launcher defaults to a 65,536-token context (`--ctx-size 65536`). The actual running context must be confirmed from the server's `/slots` response; configuration alone is not runtime proof.
 
 ---
 
@@ -90,7 +90,7 @@ When Copilot or Claude are unavailable, the workspace has three local LLM lanes 
 | Lane | Model | Server | Context | Purpose |
 |---|---|---|---|---|
 | **A — Hermes** | `gemma4-rotorquant:latest` (Ollama alias of `gemma4-rotorquant:latest`) | Ollama `:11434` | 65 536 | Tool-calling sanity check, web search, agent behavior comparison |
-| **B — TurboQuant** | `gemma4-rotorquant:latest.gguf` via `llama-server.exe` | `:8090` | 16 384 (`TURBO_CTX`) | Long-context code audit, TRACE MCP loop — **default OpenCode lane** |
+| **B — TurboQuant** | `gemma4-rotorquant:latest.gguf` via `llama-server.exe` | `:8090` | 65 536 configured default (`TURBO_CTX`) | Long-context code audit, TRACE MCP loop — **default OpenCode lane** |
 | **C — RotorQuant / IQ4_XS** | `gemma4-rotorquant:latest-iq4xs.gguf` — swap `TURBO_MODEL_PATH` | same binary | same | Testing newer quantizations before promoting to `vendor/models/` |
 
 OpenCode defaults to Lane B. To switch lanes interactively:
@@ -132,13 +132,18 @@ quality regressions on legal text. Run both through `bench:turbo:8k` before deci
 
 ## Context window upgrade
 
-Default `TURBO_CTX=16384`. To extend for deep code audit:
+The current repository default is `TURBO_CTX=65536`, matching the launcher and OpenCode request ceiling. A shorter 16,384-token run is an explicit opt-in for bounded-memory/throughput experiments; set `TURBO_CTX_ALLOW_SHORT_CONTEXT=true` as well, and verify the resulting `/slots` value. It is not the production/default context.
 
 ```
-# 32k — costs ~1 GB extra VRAM for q8_0 KV cache; fits RTX 3060 Ti with IQ4_XS model
-TURBO_CTX=32768
+# Optional shorter experiment — must opt in to bypass the launcher's 65,536 minimum
+TURBO_CTX=16384
+TURBO_CTX_ALLOW_SHORT_CONTEXT=true
 
-# 64k — matches Hermes lane; needs ~2 GB extra; test for OOM before committing
+# 32k — also requires the short-context opt-in
+TURBO_CTX=32768
+TURBO_CTX_ALLOW_SHORT_CONTEXT=true
+
+# 64k — configured default; actual availability depends on model, KV cache, and VRAM
 TURBO_CTX=65536
 ```
 
@@ -213,7 +218,7 @@ curl -s -X POST http://localhost:5173/api/vlm/switch-mode \
 | `TURBO_MODEL_PATH` | — | Path to `.gguf` model file |
 | `TURBO_MMPROJ_PATH` | — | Path to mmproj file (vision tower) |
 | `LLAMA_SERVER_PATH` | `llama-server.exe` | Path to llama-server binary |
-| `TURBO_CTX` | `16384` | Context window size |
+| `TURBO_CTX` | `65536` | Configured launcher default; confirm live value via `/slots` |
 | `TURBO_NGL` | `99` | GPU layers |
 | `TURBO_KV_K` | `q8_0` | K-cache quantization (matches PS1 launcher) |
 | `TURBO_KV_V` | `q8_0` | V-cache quantization (set `turbo3` for TurboQuant) |

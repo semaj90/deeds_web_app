@@ -4,6 +4,9 @@ import {
   buildKernelDagCandidate,
   toTypedRepairDag,
   validateKernelDagCandidate,
+  deriveApprovalPlan,
+  recordApprovalReceipt,
+  assertExecutionApproved,
 } from './lib/kernel-dag-v1.mjs';
 import { validateGroundedKernelDagAdmission } from './lib/grounded-kernel-dag-admission-v1.mjs';
 
@@ -87,7 +90,79 @@ describe('KernelDagCandidate -> validation -> typed DAG (read-only chain)', () =
   });
 });
 
-describe('approval link (not built yet)', () => {
-  todo('an ACCEPTED typed DAG cannot reach a repair execution without a recorded approval whose plan matches the DAG');
-  todo('the approved mutation plan is derived from the typed DAG, not written by hand');
+describe('approval link (verified governance barrier)', () => {
+  const writeNode = {
+    nodeId: 'patch', functionId: 'apply_patch', arguments: { file: 'a.ts' },
+    candidateOrdinals: [1], graphNodeOrdinals: [10], relationIds: [], evidenceRefs: ['evidence:1'],
+  };
+
+  it('the approved mutation plan is derived deterministically from the typed DAG, not written by hand', () => {
+    const candidate = buildKernelDagCandidate({
+      ...base,
+      nodes: [...base.nodes, writeNode],
+      edges: [{ from: 'resolve', to: 'verify' }, { from: 'verify', to: 'patch' }],
+    });
+    const receipt = validate(candidate, { policy: { ...policy, allowedMutationClasses: ['READ', 'WRITE'] } });
+    assert.equal(receipt.status, 'ACCEPTED');
+    const typed = toTypedRepairDag(candidate, receipt);
+
+    const plan = deriveApprovalPlan(typed, kernel);
+    assert.equal(plan.schema, 'atlas.repair-approval-plan.v1');
+    assert.equal(plan.mutationNodes.length, 1);
+    assert.equal(plan.mutationNodes[0].nodeId, 'patch');
+    assert.equal(plan.mutationNodes[0].mutationClass, 'WRITE');
+    assert.equal(plan.validationReceiptChecksum, typed.validationReceiptChecksum);
+    assert.ok(plan.planChecksum);
+  });
+
+  it('an ACCEPTED typed DAG cannot reach a repair execution without a recorded approval whose plan matches the DAG', () => {
+    const candidate = buildKernelDagCandidate({
+      ...base,
+      nodes: [...base.nodes, writeNode],
+      edges: [{ from: 'resolve', to: 'verify' }, { from: 'verify', to: 'patch' }],
+    });
+    const receipt = validate(candidate, { policy: { ...policy, allowedMutationClasses: ['READ', 'WRITE'] } });
+    assert.equal(receipt.status, 'ACCEPTED');
+    const typed = toTypedRepairDag(candidate, receipt);
+
+    const plan = deriveApprovalPlan(typed, kernel);
+
+    // 1. Unapproved execution attempt throws
+    assert.throws(
+      () => assertExecutionApproved(typed, null, kernel),
+      /MUTATION_DAG_REQUIRES_APPROVAL/
+    );
+
+    // 2. Tampered plan in approval receipt throws
+    const tamperedPlan = { ...plan, planChecksum: 'deadbeef'.repeat(8) };
+    const invalidReceipt = recordApprovalReceipt({
+      typedDag: typed,
+      approvalPlan: tamperedPlan,
+      approver: 'operator:lead-eng',
+      reason: 'Approved for test repair',
+    });
+    assert.throws(
+      () => assertExecutionApproved(typed, invalidReceipt, kernel),
+      /APPROVAL_PLAN_CHECKSUM_MISMATCH/
+    );
+
+    // 3. Valid, untampered approval receipt succeeds
+    const validReceipt = recordApprovalReceipt({
+      typedDag: typed,
+      approvalPlan: plan,
+      approver: 'operator:lead-eng',
+      reason: 'Approved for test repair',
+    });
+    assert.equal(validReceipt.schema, 'atlas.repair-approval-receipt.v1');
+    assert.equal(validReceipt.approved, true);
+    assert.equal(assertExecutionApproved(typed, validReceipt, kernel), true);
+  });
+
+  it('read-only typed DAG passes execution check without requiring mutation approval', () => {
+    const candidate = buildKernelDagCandidate(base);
+    const receipt = validate(candidate);
+    assert.equal(receipt.status, 'ACCEPTED');
+    const typed = toTypedRepairDag(candidate, receipt);
+    assert.equal(assertExecutionApproved(typed, null, kernel), true);
+  });
 });

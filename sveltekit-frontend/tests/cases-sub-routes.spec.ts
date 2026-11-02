@@ -831,3 +831,23 @@ describe('/api/cases/[id]/timeline (GET)', () => {
 		expect(res.status).toBe(400);
 	});
 });
+
+describe('/api/cases/[id]/timeline (POST — CSP-102)', () => {
+	it('rejects unauthenticated requests', async () => {
+		const { POST } = await import('../src/routes/api/cases/[id]/timeline/+server.js');
+		const event = makeEvent('POST', '/api/cases/' + TEST_CASE_ID + '/timeline', {
+			locals: { user: null },
+			params: { id: TEST_CASE_ID },
+		});
+		await expect(POST(event as any)).rejects.toThrow();
+	});
+
+	it('returns 400 for invalid case ID', async () => {
+		const { POST } = await import('../src/routes/api/cases/[id]/timeline/+server.js');
+		const event = makeEvent('POST', '/api/cases/bad/timeline', {
+			params: { id: 'not-uuid' },
+		});
+		const res = await POST(event as any);
+		expect(res.status).toBe(400);
+	});
+});

@@ -377,4 +377,66 @@ describe('src/routes/api/courtroom/models/+server.ts', () => {
 			}
 		});
 	});
+
+	describe('CSP-91: environment model exclusion from character actor list', () => {
+		it('excludes environment rows (e.g. room_bathroom, room_myroom) from models and returns them in environments', async () => {
+			mockFrom.mockImplementation(async (table: { __table?: string }) => {
+				if (table.__table === 'courtroom_models') {
+					return [
+						{
+							id: 'm1',
+							name: 'Courtroom Prosecutor',
+							role: 'prosecutor',
+							modelUrl: '/models/courtroom/character_alice.glb',
+							thumbnailUrl: null,
+							skeletonType: 'mixamo',
+							scaleX: 1,
+							scaleY: 1,
+							scaleZ: 1,
+						},
+						{
+							id: 'env-1',
+							name: 'Room - Bathroom',
+							role: 'environment',
+							modelUrl: '/models/courtroom/room_bathroom.glb',
+							thumbnailUrl: null,
+							skeletonType: 'static',
+							scaleX: 1,
+							scaleY: 1,
+							scaleZ: 1,
+						},
+						{
+							id: 'env-2',
+							name: 'Room - My Room',
+							role: 'environment',
+							modelUrl: '/models/courtroom/room_myroom.glb',
+							thumbnailUrl: null,
+							skeletonType: 'static',
+							scaleX: 1,
+							scaleY: 1,
+							scaleZ: 1,
+						},
+					];
+				}
+				if (table.__table === 'courtroom_animations') return [];
+				return [];
+			});
+
+			const handler = await makeHandler();
+			const resp = await handler({
+				request: makeReq(),
+				locals: { user: { id: 'u1' } },
+				url: makeUrl(),
+				params: {},
+			});
+
+			const body = await resp.json();
+			expect(body.models).toHaveLength(1);
+			expect(body.models[0].role).toBe('prosecutor');
+			expect(body.models.some((m: { role: string }) => m.role === 'environment')).toBe(false);
+			expect(body.environments).toHaveLength(2);
+			expect(body.environments[0].name).toBe('Room - Bathroom');
+			expect(body.environments[1].name).toBe('Room - My Room');
+		});
+	});
 });

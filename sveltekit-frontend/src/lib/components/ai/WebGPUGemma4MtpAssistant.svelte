@@ -1,4 +1,4 @@
-<!-- WebGPU Gemma 4 MTP Assistant — Client-side WebGPU Gemma 4 E2B + MTP Speculative Drafter + Server Ornith 1.5 Fallback -->
+<!-- Gemma 4 WebGPU Assistant with an Ornith 1.5 server fallback -->
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
@@ -10,17 +10,7 @@
 		unloadE2B,
 		type E2BStatus
 	} from '$lib/ai/gemma4-e2b-client.js';
-	import {
-		GEMMA4_BROWSER_ROLES_V1,
-		inspectGemma4BrowserMtpReadinessV1,
-		type Gemma4BrowserMtpEvidenceV1
-	} from '$lib/ai/gemma4-browser-mtp-readiness-v1.js';
-	import {
-		CLIENT_E2B_MODEL_ID,
-		CLIENT_E2B_DEVICE,
-		CLIENT_E2B_MIN_GPU_MB,
-		LITERT_E2B_MODEL_ID
-	} from '$lib/ai/model-ids.js';
+	import { CLIENT_E2B_MODEL_ID } from '$lib/ai/model-ids.js';
 
 	interface Props {
 		evidenceId?: string;
@@ -45,30 +35,22 @@
 	let isInitializingEngine = $state(false);
 	let engineInitError = $state('');
 
-	// MTP (Multi-Token Prediction) Speculative Decoding Telemetry
-	let enableMtp = $state(true);
-	let mtpLookaheadK = $state<number>(4); // Speculative heads (1-4)
-	let mtpAcceptanceRate = $state<number>(76.4); // Historical/estimated acceptance %
-	let mtpSpeedupFactor = $state<number>(1.78);
-	let kvRewindEvents = $state<number>(12);
-
 	// Chat / Assistant state
 	interface ChatMessage {
 		id: string;
 		role: 'user' | 'assistant' | 'system';
 		content: string;
-		source?: 'webgpu-gemma4-mtp' | 'ornith-server' | 'cache';
+		source?: 'webgpu-gemma4' | 'ornith-server' | 'cache';
 		latencyMs?: number;
 		tokPerSec?: number;
-		speculativeTokensAccepted?: number;
 	}
 
 	let messages = $state<ChatMessage[]>([
 		{
 			id: 'welcome',
 			role: 'assistant',
-			content: 'Hello! I am your Gemma 4 MTP Assistant powered by in-browser WebGPU speculative decoding with server-side Ornith 1.5 synthesis fallback. How can I assist with your case materials today?',
-			source: 'webgpu-gemma4-mtp'
+			content: 'Hello! I can answer with Gemma 4 in this browser when its WebGPU model is loaded, or use the Ornith 1.5 server fallback. How can I help with your case materials?',
+			source: 'webgpu-gemma4'
 		}
 	]);
 	let promptInput = $state('');
@@ -92,13 +74,13 @@
 	];
 
 	onMount(() => {
-		probeWebGpuAndMtp();
+		probeWebGpuRuntime();
 		return () => {
 			void unloadE2B().catch(() => {});
 		};
 	});
 
-	async function probeWebGpuAndMtp() {
+	async function probeWebGpuRuntime() {
 		try {
 			if (typeof navigator !== 'undefined' && 'gpu' in navigator && navigator.gpu) {
 				const adapter = await navigator.gpu.requestAdapter();
@@ -173,10 +155,9 @@
 					id: 'asst-' + Date.now(),
 					role: 'assistant',
 					content: res.text || currentStreamingText,
-					source: 'webgpu-gemma4-mtp',
+					source: 'webgpu-gemma4',
 					latencyMs: res.durationMs,
-					tokPerSec: res.tokPerSec,
-					speculativeTokensAccepted: Math.round(res.tokensGenerated * 0.76)
+					tokPerSec: res.tokPerSec
 				};
 				messages = [...messages, assistantMsg];
 			} else {
@@ -277,11 +258,11 @@
 			</div>
 			<div>
 				<div class="flex items-center gap-2">
-					<h3 class="header-heading">WebGPU Gemma 4 MTP Assistant</h3>
-					<span class="badge-role">MTP DRAFTER 4x</span>
+					<h3 class="header-heading">Gemma 4 Assistant</h3>
+					<span class="badge-role">WebGPU · on device</span>
 				</div>
 				<p class="header-subtext">
-					Target: <code class="mono-tag">{CLIENT_E2B_MODEL_ID}</code> &middot; Drafter: <code class="mono-tag">{GEMMA4_BROWSER_ROLES_V1['gemma4-e2b-it-assistant']}</code>
+					Model: <code class="mono-tag">{CLIENT_E2B_MODEL_ID}</code> &middot; Speculative decoding is not enabled in this browser runtime.
 				</p>
 			</div>
 		</div>
@@ -315,8 +296,8 @@
 		</div>
 	</header>
 
-	<!-- Hardware & Speculative Decoding Status Bar -->
-	<section class="telemetry-bar" aria-label="WebGPU Hardware Telemetry">
+	<!-- Hardware and runtime status -->
+	<section class="telemetry-bar" aria-label="WebGPU runtime status">
 		<div class="telemetry-item">
 			<span class="tel-label">Adapter:</span>
 			<span class="tel-value">{adapterVendor}</span>
@@ -339,9 +320,8 @@
 		<div class="telemetry-divider"></div>
 
 		<div class="telemetry-item">
-			<span class="tel-label">MTP Speculation:</span>
-			<span class="tel-value text-amber">{mtpLookaheadK} tokens</span>
-			<span class="tel-sub">({mtpAcceptanceRate}% accept &middot; {mtpSpeedupFactor}x boost)</span>
+			<span class="tel-label">Speculative decoding:</span>
+			<span class="tel-value text-amber">Not enabled</span>
 		</div>
 
 		<div class="telemetry-actions">
@@ -388,10 +368,10 @@
 
 						<div class="bubble-cell">
 							<div class="bubble-header">
-								<span class="speaker-name">{msg.role === 'user' ? 'Counsel' : 'Gemma 4 MTP'}</span>
+								<span class="speaker-name">{msg.role === 'user' ? 'Counsel' : msg.source === 'ornith-server' ? 'Ornith 1.5' : 'Gemma 4'}</span>
 								{#if msg.source}
-									<span class="source-tag" class:webgpu={msg.source === 'webgpu-gemma4-mtp'} class:server={msg.source === 'ornith-server'}>
-										{msg.source === 'webgpu-gemma4-mtp' ? 'WebGPU Speculative' : 'Ornith 1.5-9B'}
+									<span class="source-tag" class:webgpu={msg.source === 'webgpu-gemma4'} class:server={msg.source === 'ornith-server'}>
+										{msg.source === 'webgpu-gemma4' ? 'WebGPU' : msg.source === 'ornith-server' ? 'Ornith 1.5 · server' : 'Cache'}
 									</span>
 								{/if}
 								{#if msg.tokPerSec}
@@ -410,7 +390,7 @@
 						</div>
 						<div class="bubble-cell">
 							<div class="bubble-header">
-								<span class="speaker-name">Gemma 4 MTP</span>
+								<span class="speaker-name">Gemma 4</span>
 								<span class="source-tag webgpu">Generating…</span>
 							</div>
 							<div class="bubble-text">{currentStreamingText}</div>
@@ -443,7 +423,7 @@
 					id="gemma4-prompt-input"
 					type="text"
 					class="prompt-input-field"
-					placeholder="Ask Gemma 4 MTP about evidence, statutory rules, or contradictions…"
+					placeholder="Ask Gemma 4 about evidence, statutes, or contradictions…"
 					bind:value={promptInput}
 					disabled={isGenerating}
 				/>

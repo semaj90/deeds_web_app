@@ -18,6 +18,7 @@ services:
     volumes:
       - langfuse_clickhouse_data:/var/lib/clickhouse
       - langfuse_clickhouse_logs:/var/log/clickhouse-server
+      - ./clickhouse/langfuse-config.d/log-retention.xml:/etc/clickhouse-server/config.d/log-retention.xml:ro
     ports:
       - "127.0.0.1:8124:8123"   # HTTP (8124 to avoid conflicts)
       - "127.0.0.1:9009:9000"   # Native (9009 to avoid MinIO on 9000)

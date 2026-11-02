@@ -36,7 +36,6 @@ export interface DispatchResult {
 const INLINE_CAPABLE = new Set<QueueName>([
 	'cache.invalidate',
 	'document.embed',
-	'evidence.process',
 	'vector.index',
 	'chat.context',
 	'analytics.track',
@@ -55,6 +54,10 @@ export async function dispatchOrExecuteInline(
 	queue: QueueName,
 	data: unknown
 ): Promise<DispatchResult> {
+	if (queue === 'evidence.process') {
+		throw new Error('EVIDENCE_PROCESS_REQUIRES_DURABLE_ANALYSIS_JOB');
+	}
+
 	try {
 		const { rabbitmq } = await import('./rabbitmq-manager-fixed.js');
 		if (rabbitmq.isReady()) {
@@ -113,11 +116,6 @@ async function callPublisher(
     case 'document.embed':
       await rabbitmq.publishDocumentEmbed(d as Parameters<typeof rabbitmq.publishDocumentEmbed>[0]);
       break;
-    case 'evidence.process':
-      await rabbitmq.publishEvidenceProcess(
-        d as Parameters<typeof rabbitmq.publishEvidenceProcess>[0]
-      );
-      break;
     case 'vector.index':
       await rabbitmq.publishVectorIndex(d as Parameters<typeof rabbitmq.publishVectorIndex>[0]);
       break;
@@ -159,8 +157,6 @@ async function executeInline(queue: QueueName, data: unknown): Promise<void> {
       return inlineCacheInvalidate(data as Parameters<typeof inlineCacheInvalidate>[0]);
     case 'document.embed':
       return inlineDocumentEmbed(data as Parameters<typeof inlineDocumentEmbed>[0]);
-    case 'evidence.process':
-      return inlineEvidenceProcess(data as Parameters<typeof inlineEvidenceProcess>[0]);
     case 'vector.index':
       return inlineVectorIndex(data as Parameters<typeof inlineVectorIndex>[0]);
     case 'chat.context':
@@ -192,20 +188,6 @@ async function inlineDocumentEmbed(data: {
 }): Promise<void> {
   const { DocumentEmbedWorker } = await import('./queue-worker.js');
   const worker = new DocumentEmbedWorker();
-  await worker.process(data);
-}
-
-async function inlineEvidenceProcess(data: {
-  evidenceId: string;
-  text: string;
-  contentType?: string;
-  caseId?: string;
-  sourceRevision?: string;
-  skipEmbedding?: boolean;
-  metadata?: Record<string, unknown>;
-}): Promise<void> {
-  const { EvidenceProcessWorker } = await import('./queue-worker.js');
-  const worker = new EvidenceProcessWorker();
   await worker.process(data);
 }
 

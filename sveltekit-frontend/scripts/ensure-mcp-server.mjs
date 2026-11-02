@@ -18,8 +18,8 @@ const projectRoot = path.resolve(scriptDir, '..');
 const dotenvMode = process.env.DOTENV_LOAD_MODE ?? (process.env.NODE_ENV === 'production' ? 'process' : 'development');
 loadRuntimeEnv({ cwd: projectRoot, mode: dotenvMode });
 
-const TIMEOUT = 500;
-const RETRIES = 60;
+const TIMEOUT = 5000;
+const RETRIES = 30;
 const REQUIRED_TOOLS = [
   'kag.record_agent_run',
   'kag.ingest_memory_directory',

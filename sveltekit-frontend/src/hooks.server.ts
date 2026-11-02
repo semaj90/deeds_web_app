@@ -240,6 +240,20 @@ function runSingletonBootTasks(): void {
         // Start the analysis worker on server boot (idempotent)
         startWorker();
 
+        if (
+          process.env.QDRANT_ENABLED === 'true' &&
+          process.env.EVIDENCE_VECTOR_PROJECTION_WORKER_ENABLED === 'true'
+        ) {
+          const { startEvidenceVectorProjectionSchedulerV1 } = await import(
+            '$lib/server/evidence/evidence-vector-projection-scheduler-v1.js'
+          );
+          startEvidenceVectorProjectionSchedulerV1();
+        } else {
+          console.info(
+            '[Boot] evidence vector Qdrant projection worker disabled; set QDRANT_ENABLED and EVIDENCE_VECTOR_PROJECTION_WORKER_ENABLED to true to opt in'
+          );
+        }
+
         if (!SKIP_BOOT_WARMUP) {
           // Warm up export cache (pre-generate top 5 recent report exports)
           warmupExportCache()
@@ -1041,8 +1055,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 /**
  * Error handler
  */
-export const handleError: HandleServerError = ({ error, event }) => {
+export const handleError: HandleServerError = ({ error, event, status }) => {
 	const errorId = crypto.randomUUID();
+
+	// An unmatched route (404) is a routing outcome, not a runtime fault. Optional-asset probes
+	// (e.g. phase23 model HEADs) and stale links would otherwise flood error_logs and distort the
+	// runtime-error ranking. Return the standard shape without persisting it.
+	if (status === 404) {
+		return {
+			message: dev ? `${error instanceof Error ? error.message : String(error)}` : 'Not found',
+			code: errorId,
+			requestId: event.locals.requestId,
+			timestamp: new Date().toISOString()
+		};
+	}
 
 	if (dev) {
 		const errMsg = error instanceof Error ? `${error.message}\n${error.stack}` : String(error);
@@ -1099,6 +1125,22 @@ if (typeof process !== 'undefined') {
 			process.exit(1);
 		}, SHUTDOWN_TIMEOUT);
 		hardTimer.unref(); // Don't keep process alive just for this timer
+
+		try {
+			const { stopWorker } = await import('$lib/server/analysis/worker.js');
+			stopWorker();
+		} catch (err) {
+			console.error('[Shutdown] Error stopping analysis worker:', (err as Error).message);
+		}
+
+		try {
+			const { stopEvidenceVectorProjectionSchedulerV1 } = await import(
+				'$lib/server/evidence/evidence-vector-projection-scheduler-v1.js'
+			);
+			await stopEvidenceVectorProjectionSchedulerV1();
+		} catch (err) {
+			console.error('[Shutdown] Error stopping evidence projection scheduler:', (err as Error).message);
+		}
 
 		try {
 			// Close infrastructure connections (Redis, Neo4j, RabbitMQ)

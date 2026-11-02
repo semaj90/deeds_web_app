@@ -1,60 +1,255 @@
 <script lang="ts">
 	import Modal from '$lib/components/ui/Modal.svelte';
+	import ModalLight from '$lib/components/ui/ModalLight.svelte';
 	import ModalAlt from '$lib/components/ui/modal/Modal.svelte';
+	import YoRHaModal from '$lib/components/yorha/YoRHaModal.svelte';
 
 	let modal1Open = $state(false);
 	let modal2Open = $state(false);
 	let modal3Open = $state(false);
-
+	let yorhaModalOpen = $state(false);
+	let lightModalOpen = $state(false);
 </script>
 
-<div class="p-6 max-w-2xl mx-auto">
+<div class="p-6 max-w-3xl mx-auto">
 	<header class="mb-6">
-		<h1 class="text-xl font-bold mb-1">Modal Components</h1>
-		<p class="text-sm opacity-60">Two modal implementations: ui/Modal (226L) with gradient backdrop and keyboard handling, plus modal/Modal (174L) with transitions and size variants.</p>
+		<div class="flex items-center gap-2 mb-1">
+			<span class="text-xs uppercase tracking-widest text-[#f3d471] font-mono">Design System / Primitives</span>
+		</div>
+		<h1 class="text-2xl font-bold tracking-tight text-white mb-2">Bits UI v2 Dialog & HUD Modal Showcase</h1>
+		<p class="text-sm text-sand/70 leading-relaxed">
+			Unified modal architecture powered by <strong>Bits UI v2 Dialog primitives</strong> (<code class="text-xs font-mono bg-black/40 px-1 py-0.5 rounded text-[#f3d471]">Dialog.Root</code>, <code class="text-xs font-mono bg-black/40 px-1 py-0.5 rounded text-[#f3d471]">Dialog.Portal</code>, <code class="text-xs font-mono bg-black/40 px-1 py-0.5 rounded text-[#f3d471]">Dialog.Overlay</code>, <code class="text-xs font-mono bg-black/40 px-1 py-0.5 rounded text-[#f3d471]">Dialog.Content</code>).
+			Fully portaled to <code class="text-xs font-mono bg-black/40 px-1 py-0.5 rounded text-[#7ee7ff]">document.body</code> with <code class="text-xs font-mono bg-black/40 px-1 py-0.5 rounded text-[#7ee7ff]">z-[9990+]</code> to eliminate clipping and sidebar overlap, tactical corner notches, frosted obsidian glass or crisp ivory court parchment, and full keyboard focus trapping.
+		</p>
 	</header>
 
-	<div class="flex gap-3 flex-wrap">
-		<button class="px-4 py-2 rounded border border-sand/30 hover:border-sand/50 text-sm" onclick={() => modal1Open = true}>
-			Open Modal (226L)
+	<div class="flex gap-3 flex-wrap mb-8">
+		<button
+			class="px-4 py-2.5 rounded bg-black/40 border border-[#f3d471]/40 hover:border-[#f3d471] text-xs font-mono uppercase tracking-wider text-[#f3d471] transition-all hover:shadow-[0_0_12px_rgba(243,212,113,0.2)] cursor-pointer"
+			onclick={() => (modal1Open = true)}
+		>
+			⚖️ Canonical Modal (Dark HUD)
 		</button>
-		<button class="px-4 py-2 rounded border border-info/30 hover:border-info/50 text-sm" onclick={() => modal2Open = true}>
-			Open Modal Alt (174L)
+		<button
+			class="px-4 py-2.5 rounded bg-[#fcfbf9] border border-[#c59e2b] hover:border-[#dfb847] text-xs font-mono uppercase tracking-wider text-slate-900 font-bold transition-all shadow-[0_0_14px_rgba(197,158,43,0.3)] hover:scale-102 cursor-pointer"
+			onclick={() => (lightModalOpen = true)}
+		>
+			📜 Custom Modal Light (Parchment)
 		</button>
-		<button class="px-4 py-2 rounded border border-accent/30 hover:border-accent/50 text-sm" onclick={() => modal3Open = true}>
-			Open Large Modal
+		<button
+			class="px-4 py-2.5 rounded bg-black/40 border border-[#7ee7ff]/40 hover:border-[#7ee7ff] text-xs font-mono uppercase tracking-wider text-[#7ee7ff] transition-all hover:shadow-[0_0_12px_rgba(126,231,255,0.2)] cursor-pointer"
+			onclick={() => (modal2Open = true)}
+		>
+			🛡️ Modal Alt (Re-Export)
+		</button>
+		<button
+			class="px-4 py-2.5 rounded bg-black/40 border border-sand/30 hover:border-sand/60 text-xs font-mono uppercase tracking-wider text-sand/80 transition-all cursor-pointer"
+			onclick={() => (modal3Open = true)}
+		>
+			📐 Large Layout Modal
+		</button>
+		<button
+			class="px-4 py-2.5 rounded bg-black/40 border border-[#ffaa00]/40 hover:border-[#ffaa00] text-xs font-mono uppercase tracking-wider text-[#ffaa00] transition-all hover:shadow-[0_0_12px_rgba(255,170,0,0.2)] cursor-pointer"
+			onclick={() => (yorhaModalOpen = true)}
+		>
+			🦊 Phoenix / YoRHa System HUD
 		</button>
 	</div>
 
-	<Modal bind:open={modal1Open} title="ui/Modal Demo" size="md">
-		<p class="text-sm">This is the <strong>ui/Modal.svelte</strong> (226L) — features gradient backdrop, escape key handling, outside-click close, and size variants (sm/md/lg/xl).</p>
+	<!-- Canonical Modal -->
+	<Modal
+		bind:open={modal1Open}
+		title="Canonical Bits UI Modal"
+		subtitle="PORTALED TO BODY • ZERO CLIPPING • CORNER NOTCHES"
+		size="md"
+		variant="courtroom"
+	>
+		<div class="space-y-4">
+			<p class="text-sm leading-relaxed text-zinc-200">
+				This modal runs on <strong>Bits UI v2 Dialog primitives</strong>. Because it is portaled to <code class="font-mono text-xs bg-black/40 px-1 py-0.5 rounded text-[#f3d471]">document.body</code> via <code class="font-mono text-xs bg-black/40 px-1 py-0.5 rounded text-[#f3d471]">Dialog.Portal</code>, it floats cleanly above all drawers, assistant sidebars, and nested overflow layouts.
+			</p>
+			<div class="p-3.5 bg-black/40 border border-[#f3d471]/20 rounded text-xs space-y-2">
+				<div class="flex items-center gap-2 text-[#f3d471] font-mono uppercase tracking-wider">
+					<span>✓ Accessibility Verified</span>
+				</div>
+				<ul class="list-disc pl-4 space-y-1 text-sand/70">
+					<li>Focus trapped automatically inside dialog</li>
+					<li>Escape key dismisses without manual event listeners</li>
+					<li>Outside overlay click dismisses cleanly</li>
+					<li>ARIA roles and labels managed by Bits UI</li>
+				</ul>
+			</div>
+		</div>
 		{#snippet footer()}
 			<div class="flex justify-end gap-2">
-				<button class="px-3 py-1.5 rounded border border-sand/30 text-sm" onclick={() => modal1Open = false}>Close</button>
+				<button
+					class="px-4 py-2 text-xs font-mono uppercase tracking-wider bg-[#f3d471] hover:bg-[#ffe180] text-black font-bold rounded transition-colors shadow-[0_0_10px_rgba(243,212,113,0.3)] cursor-pointer"
+					onclick={() => (modal1Open = false)}
+				>
+					Confirm & Close
+				</button>
 			</div>
 		{/snippet}
 	</Modal>
 
-	<ModalAlt bind:open={modal2Open} title="modal/Modal Demo" description="Alternative modal implementation" size="md">
-		<p class="text-sm">This is the <strong>ui/modal/Modal.svelte</strong> (174L) — features Svelte transitions (fade + scale), close button, overlay click, and 5 size variants (sm/md/lg/xl/full).</p>
+	<!-- Custom Modal Light -->
+	<ModalLight
+		bind:open={lightModalOpen}
+		title="Custom Legal Light Modal"
+		subtitle="PARCHMENT DOSSIER • BURNISHED GOLD NOTCHES • 3D CONTRAST"
+		size="md"
+	>
+		<div class="space-y-4 text-slate-800">
+			<p class="text-sm leading-relaxed">
+				This custom light modal delivers the <strong>crisp legal brief / court dossier presentation</strong> inspired by the classic Phoenix Justice court record and high-contrast light notifications.
+			</p>
+			<div class="p-3.5 bg-[#f5efe6] border border-[#dfd0bd] rounded-lg text-xs space-y-2">
+				<div class="flex items-center gap-2 text-[#966b1a] font-mono font-bold uppercase tracking-wider">
+					<span>⚖ Court Record Specification</span>
+				</div>
+				<ul class="list-disc pl-4 space-y-1 text-slate-700">
+					<li><strong>Ivory Parchment Base:</strong> Clean, high-legibility legal paper aesthetic (<code class="bg-[#ebe2d3] px-1 py-0.5 rounded text-slate-900 font-mono">#fcfbf9</code>).</li>
+					<li><strong>Burnished Gold Notches:</strong> Signature attorney corner accents in <code class="bg-[#ebe2d3] px-1 py-0.5 rounded text-amber-900 font-mono">#c59e2b</code>.</li>
+					<li><strong>3D Scrim Contrast:</strong> Portaled over a softened backdrop blur so white and black modes achieve razor-sharp contrast.</li>
+					<li><strong>Bits UI v2 Foundation:</strong> Identical accessible focus trap, body scroll locking, and Escape key dismissal.</li>
+				</ul>
+			</div>
+		</div>
 		{#snippet footer()}
 			<div class="flex justify-end gap-2">
-				<button class="px-3 py-1.5 rounded border border-sand/30 text-sm" onclick={() => modal2Open = false}>Close</button>
+				<button
+					type="button"
+					class="px-4 py-2 text-xs font-mono uppercase tracking-wider bg-[#ebe2d3] hover:bg-[#ded2c0] text-slate-800 font-semibold rounded-lg transition-colors cursor-pointer"
+					onclick={() => (lightModalOpen = false)}
+				>
+					Dismiss
+				</button>
+				<button
+					type="button"
+					class="px-5 py-2 text-xs font-mono uppercase tracking-wider bg-gradient-to-r from-[#c59e2b] to-[#dfb847] hover:from-[#b58e1b] hover:to-[#cfa837] text-slate-950 font-bold rounded-lg transition-all shadow-sm cursor-pointer"
+					onclick={() => (lightModalOpen = false)}
+				>
+					Accept Precedent
+				</button>
+			</div>
+		{/snippet}
+	</ModalLight>
+
+	<!-- Modal Alt Re-Export -->
+	<ModalAlt
+		bind:open={modal2Open}
+		title="Modal Alt (Forwarded Implementation)"
+		description="Unified with canonical Modal — zero duplication"
+		size="md"
+		variant="legal"
+	>
+		<p class="text-sm text-zinc-200 leading-relaxed mb-3">
+			<code class="font-mono text-xs bg-black/40 px-1 py-0.5 rounded text-[#7ee7ff]">ui/modal/Modal.svelte</code> now safely forwards props to the canonical Bits UI modal implementation.
+		</p>
+		<p class="text-xs text-sand/70 leading-relaxed">
+			This completely resolves the bug where alternative modal implementations had conflicting z-indexes or became obscured behind the floating Legal AI Assistant panel.
+		</p>
+		{#snippet footer()}
+			<div class="flex justify-end gap-2">
+				<button
+					class="px-4 py-2 text-xs font-mono uppercase tracking-wider bg-sand/20 hover:bg-sand/30 text-white rounded transition-colors cursor-pointer"
+					onclick={() => (modal2Open = false)}
+				>
+					Close Alt Modal
+				</button>
 			</div>
 		{/snippet}
 	</ModalAlt>
 
-	<ModalAlt bind:open={modal3Open} title="Large Modal" size="lg">
-		<p class="text-sm mb-4">Large size variant demonstration.</p>
-		<div class="grid grid-cols-2 gap-4">
-			<div class="p-3 rounded border border-sand/20">
-				<h3 class="text-sm font-bold mb-1">Section A</h3>
-				<p class="text-xs opacity-60">Content area for larger layouts.</p>
+	<!-- Large Modal with Multi-Column Content -->
+	<Modal
+		bind:open={modal3Open}
+		title="Case Intelligence Hub — Dossier Audit"
+		subtitle="CASE #2026-CA-0042 • RAG + GRAPH HYPERLINKING"
+		size="xl"
+		variant="legal"
+	>
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+			<div class="p-3 bg-black/30 border border-sand/20 rounded space-y-2">
+				<h4 class="text-xs font-mono uppercase tracking-wider text-[#f3d471]">Active Statutes</h4>
+				<ul class="text-xs space-y-1 text-sand/80 font-mono">
+					<li class="p-1.5 bg-black/20 rounded border border-sand/10">18 U.S.C. § 1030 (CFAA)</li>
+					<li class="p-1.5 bg-black/20 rounded border border-sand/10">18 U.S.C. § 1001 (Statements)</li>
+					<li class="p-1.5 bg-black/20 rounded border border-sand/10">18 U.S.C. § 1343 (Wire Fraud)</li>
+				</ul>
 			</div>
-			<div class="p-3 rounded border border-sand/20">
-				<h3 class="text-sm font-bold mb-1">Section B</h3>
-				<p class="text-xs opacity-60">Side-by-side content in large modal.</p>
+			<div class="p-3 bg-black/30 border border-sand/20 rounded space-y-2">
+				<h4 class="text-xs font-mono uppercase tracking-wider text-[#7ee7ff]">Vector Geometry</h4>
+				<div class="text-xs space-y-1 text-sand/80 font-mono">
+					<div>DIMENSIONS: 768</div>
+					<div>METRIC: COSINE</div>
+					<div>QUANTIZATION: SQ_U8</div>
+					<div>QDRANT POINTS: 328,348</div>
+				</div>
+			</div>
+			<div class="p-3 bg-black/30 border border-sand/20 rounded space-y-2">
+				<h4 class="text-xs font-mono uppercase tracking-wider text-sand">Topology Status</h4>
+				<div class="text-xs space-y-1 text-sand/80 font-mono">
+					<div>AST GRAPH: ONLINE</div>
+					<div>TREE-SITTER: SYNCED</div>
+					<div>ACE PACKETS: READY</div>
+				</div>
 			</div>
 		</div>
-	</ModalAlt>
+		{#snippet footer()}
+			<div class="flex justify-end gap-2">
+				<button
+					class="px-4 py-2 text-xs font-mono uppercase tracking-wider bg-black/40 border border-sand/40 hover:border-sand text-sand rounded transition-colors cursor-pointer"
+					onclick={() => (modal3Open = false)}
+				>
+					Dismiss Dossier
+				</button>
+			</div>
+		{/snippet}
+	</Modal>
+
+	<!-- YoRHa / Phoenix Justice HUD Modal -->
+	<YoRHaModal
+		open={yorhaModalOpen}
+		title="COURT RECORD // EVIDENCE AUDIT"
+		subtitle="PHOENIX JUSTICE PROTOCOL • TRIAL LOG #42"
+		type="system"
+		onClose={() => (yorhaModalOpen = false)}
+	>
+		<div class="space-y-4">
+			<div class="p-3.5 bg-black/40 border border-[#f3d471]/30 rounded text-xs space-y-2">
+				<div class="flex items-center justify-between">
+					<span class="text-[#f3d471] font-mono font-bold uppercase tracking-wider">Tactical System Status</span>
+					<span class="font-mono text-[10px] text-zinc-400">STATUS: ACTIVE</span>
+				</div>
+				<p class="text-zinc-300 leading-relaxed">
+					Equipped with YoRHa gold corner brackets (<code class="text-[#f3d471]">.hud-notch-tl/tr/bl/br</code>), pulsing status indicator, scanline texture, and Bits UI accessible dialog portaling.
+				</p>
+			</div>
+			<div class="grid grid-cols-3 gap-2 text-center font-mono text-xs">
+				<div class="p-2.5 bg-black/30 border border-white/10 rounded">
+					<span class="text-[10px] text-sand/60 block">SPIRIT POWER</span>
+					<span class="text-sm font-bold text-[#7ee7ff]">85 / 100</span>
+				</div>
+				<div class="p-2.5 bg-black/30 border border-white/10 rounded">
+					<span class="text-[10px] text-sand/60 block">LOGIC GAUGE</span>
+					<span class="text-sm font-bold text-[#f3d471]">100 / 100</span>
+				</div>
+				<div class="p-2.5 bg-black/30 border border-white/10 rounded">
+					<span class="text-[10px] text-sand/60 block">COURT RECORD</span>
+					<span class="text-sm font-bold text-white">4 EXHIBITS</span>
+				</div>
+			</div>
+		</div>
+		{#snippet footer()}
+			<div class="flex justify-end gap-2">
+				<button
+					class="px-4 py-2 text-xs font-mono uppercase tracking-wider bg-[#f3d471] hover:bg-[#ffe180] text-black font-bold rounded transition-colors shadow-[0_0_12px_rgba(243,212,113,0.35)] cursor-pointer"
+					onclick={() => (yorhaModalOpen = false)}
+				>
+					Resume Trial
+				</button>
+			</div>
+		{/snippet}
+	</YoRHaModal>
 </div>

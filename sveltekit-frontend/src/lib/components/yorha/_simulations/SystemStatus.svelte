@@ -1,124 +1,51 @@
 <script lang="ts">
   // Migrated to $effect
 
-  let { webgpuReady = false, cpuFallbackReady = false } = $props();
-
-  let systemMetrics = $state({
-    memory: 0,
-    cpu: 0,
-    gpu: 0,
-    network: 0
+  let systemStatus = $state({
+    webgpu: 'Checking' as 'Checking' | 'Available' | 'Unavailable',
+    network: 'Checking' as 'Checking' | 'Online' | 'Offline',
+    memory: 'Not exposed' as string
   });
 
-  let updateInterval: number | undefined;
-
   $effect(() => {
+    systemStatus.webgpu = 'gpu' in navigator ? 'Available' : 'Unavailable';
+    systemStatus.network = navigator.onLine ? 'Online' : 'Offline';
 
-    // Update system metrics every 5 seconds
-    updateInterval = window.setInterval(async () => {
-      try {
-        // Get memory usage
-        if (typeof performance !== 'undefined' && 'memory' in performance) {
-          const memInfo = (performance as any).memory;
-          if (memInfo && memInfo.totalJSHeapSize > 0) {
-              systemMetrics.memory = Math.round((memInfo.usedJSHeapSize / memInfo.totalJSHeapSize) * 100);
-          }
-        } else {
-            // Simulate memory fluctuation
-            systemMetrics.memory = 40 + Math.floor(Math.random() * 20);
-        }
+    const memory = (performance as Performance & { memory?: { usedJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
+    systemStatus.memory = memory?.jsHeapSizeLimit
+      ? `${Math.round((memory.usedJSHeapSize / memory.jsHeapSizeLimit) * 100)}% JS heap`
+      : 'Not exposed';
 
-        // Simulate CPU usage (in real app, would use Performance API more deeply)
-        systemMetrics.cpu = Math.floor(Math.random() * 30) + 20;
-
-        // GPU status simulation based on readiness
-        systemMetrics.gpu = webgpuReady ? (10 + Math.floor(Math.random() * 30)) : (cpuFallbackReady ? 90 : 0);
-
-        // Network status (simplified)
-        systemMetrics.network = typeof navigator !== 'undefined' && navigator.onLine ? 98 : 0;
-
-      } catch (error) {
-        console.warn('Failed to update system metrics:', error);
-      }
-    },
-	5000);
+    const handleOnline = () => (systemStatus.network = 'Online');
+    const handleOffline = () => (systemStatus.network = 'Offline');
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
     return () => {
-      if (updateInterval) {
-        clearInterval(updateInterval);
-      }
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
-  
-});
-
-  function getStatusColor(value: number, inverse = false): string {
-    if (inverse) {
-        if (value < 50) return 'text-danger/80';
-        if (value < 80) return 'text-warning';
-        return 'text-accent';
-    }
-    if (value >= 80) return 'text-danger/80';
-    if (value >= 60) return 'text-warning';
-    return 'text-accent';
-  }
-
-  function getStatusIcon(value: number): string {
-    if (value >= 80) return '🔴';
-    if (value >= 60) return '🟡';
-    return '🟢';
-  }
+  });
 </script>
 
 <div class="system-status p-4 rounded-lg bg-black/40 border border-sand/20 backdrop-blur-sm">
   <div class="grid grid-cols-2 gap-4">
-
-    <!-- CPU -->
     <div class="metric-item flex flex-col">
-      <span class="text-xs text-sand/40 uppercase tracking-wider">CPU Load</span>
-      <div class="flex items-baseline gap-2">
-        <span class="text-xl font-mono {getStatusColor(systemMetrics.cpu)}">{systemMetrics.cpu}%</span>
-        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
-            <div class="h-full bg-current transition-all duration-500" style="width: {systemMetrics.cpu}%"></div>
-        </div>
-      </div>
+      <span class="text-xs text-sand/40 uppercase tracking-wider">CPU usage</span>
+      <span class="text-sm font-mono text-sand/70">Not exposed by browser</span>
     </div>
-
-    <!-- Memory -->
     <div class="metric-item flex flex-col">
-      <span class="text-xs text-sand/40 uppercase tracking-wider">Memory</span>
-      <div class="flex items-baseline gap-2">
-        <span class="text-xl font-mono {getStatusColor(systemMetrics.memory)}">{systemMetrics.memory}%</span>
-        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
-            <div class="h-full bg-current transition-all duration-500" style="width: {systemMetrics.memory}%"></div>
-        </div>
-      </div>
+      <span class="text-xs text-sand/40 uppercase tracking-wider">Browser JS heap</span>
+      <span class="text-sm font-mono text-sand/70">{systemStatus.memory}</span>
     </div>
-
-    <!-- GPU -->
     <div class="metric-item flex flex-col">
-      <span class="text-xs text-sand/40 uppercase tracking-wider">GPU Core</span>
-      <div class="flex items-baseline gap-2">
-        <span class="text-xl font-mono {webgpuReady ? 'text-info/80' : 'text-warning'}">{systemMetrics.gpu}%</span>
-        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
-            <div class="h-full {webgpuReady ? 'bg-info/80' : 'bg-warning/80'} transition-all duration-500" style="width: {systemMetrics.gpu}%"></div>
-        </div>
-      </div>
-       <span class="text-[0.65rem] {webgpuReady ? 'text-accent' : 'text-warning'}">
-          {webgpuReady ? 'ACCELERATED' : (cpuFallbackReady ? 'SOFTWARE FALLBACK' : 'OFFLINE')}
-       </span>
+      <span class="text-xs text-sand/40 uppercase tracking-wider">WebGPU capability</span>
+      <span class="text-sm font-mono text-sand/70">{systemStatus.webgpu}</span>
     </div>
-
-    <!-- Network -->
     <div class="metric-item flex flex-col">
       <span class="text-xs text-sand/40 uppercase tracking-wider">Network</span>
-      <div class="flex items-baseline gap-2">
-        <span class="text-xl font-mono {getStatusColor(systemMetrics.network, true)}">{systemMetrics.network}%</span>
-        <div class="h-1.5 flex-1 bg-panelSoft rounded-full overflow-hidden self-center">
-            <div class="h-full bg-current transition-all duration-500" style="width: {systemMetrics.network}%"></div>
-        </div>
-      </div>
+      <span class="text-sm font-mono text-sand/70">{systemStatus.network}</span>
     </div>
-
   </div>
 </div>
 

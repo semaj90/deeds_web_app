@@ -156,8 +156,13 @@ export const GET: RequestHandler = async ({ locals }) => {
 			animsByType.get(key)!.push(anim);
 		}
 
+		// Filter character models to exclude environment/static room meshes (CSP-91: room_bathroom.glb / room_myroom.glb)
+		// Unknown roles fall back to STATIONS.narrator at {x:0, y:0, z:2}, causing room meshes to render in the foreground.
+		const characterModels = models.filter((m) => m.role !== 'environment');
+		const environmentModels = models.filter((m) => m.role === 'environment');
+
 		return json({
-			models: models.map((m) => ({
+			models: characterModels.map((m) => ({
 				id: m.id,
 				name: m.name,
 				role: m.role,
@@ -172,6 +177,14 @@ export const GET: RequestHandler = async ({ locals }) => {
 							.map((a) => ({ id: a.id, name: a.name, animType: a.animType, animationUrl: a.animationUrl, durationMs: a.durationMs, loop: a.loop })),
 					),
 				),
+			})),
+			environments: environmentModels.map((m) => ({
+				id: m.id,
+				name: m.name,
+				role: m.role,
+				modelUrl: existingModelUrl(m.modelUrl),
+				thumbnailUrl: m.thumbnailUrl,
+				scale: { x: m.scaleX, y: m.scaleY, z: m.scaleZ },
 			})),
 			animations: animations.map((a) => ({
 				id: a.id,

@@ -12,15 +12,17 @@ import { createEvidenceEmbeddingProducer } from './evidence-embedding-producer.j
 import { persistEvidenceVectorForProjectionV1 } from './evidence-vector-persistence-v1.js';
 import { indexEvidenceDocumentCanonicalV1 } from './evidence-document-indexer-v1.js';
 import { analyzeEvidenceImageV1 } from './evidence-visual-analysis-v1.js';
+import { synthesizeEvidenceClaimsV1, type EvidenceSynthesisResultV1 } from './synthesis/evidence-synthesis-v1.js';
 
 export async function processEvidenceDocumentCanonicalV1(input: {
   evidenceId: string;
   text: string;
+  sourceBytes?: Buffer;
   fileName?: string;
   contentType?: string;
   metadata?: Record<string, unknown>;
-}): Promise<{ chunkCount: number; persistedCount: number; sourceRevision: string }> {
-  let sourceBytes: Buffer | undefined;
+}): Promise<{ chunkCount: number; persistedCount: number; sourceRevision: string; synthesis: EvidenceSynthesisResultV1 }> {
+  let sourceBytes: Buffer | undefined = input.sourceBytes;
   let text = input.text;
   let extractionMethod = 'provided-extracted-text';
   let doclingBlocks: Array<Record<string, unknown>> | undefined;
@@ -28,7 +30,7 @@ export async function processEvidenceDocumentCanonicalV1(input: {
   const bucket = metadata.object_bucket;
   const objectName = metadata.object_name;
 
-  if (bucket !== undefined || objectName !== undefined) {
+  if (!sourceBytes && (bucket !== undefined || objectName !== undefined)) {
     if (bucket !== 'legal-evidence' || typeof objectName !== 'string' || !objectName.startsWith('evidence/')) {
       throw new Error('EVIDENCE_OBJECT_REFERENCE_INVALID');
     }
@@ -59,6 +61,13 @@ export async function processEvidenceDocumentCanonicalV1(input: {
       ? claimedSourceRevision.slice('sha256:'.length)
       : computedSourceHash;
   const sourceRevision = `sha256:${sourceHash}`;
+  const synthesis = await synthesizeEvidenceClaimsV1({
+    evidenceId: input.evidenceId,
+    sourceRevision,
+    extractedText: text,
+    caseId: typeof metadata.caseId === 'string' ? metadata.caseId : null,
+    enabled: ENV.LANGEXTRACT_ENABLED,
+  }, sourceBytes);
   const fileName = input.fileName ?? (typeof metadata.fileName === 'string' ? metadata.fileName : undefined) ?? null;
   const contentType = input.contentType ?? (typeof metadata.fileType === 'string' ? metadata.fileType : undefined) ?? '';
   const isImage = /^image\/(png|jpeg|tiff|bmp|webp)$/i.test(contentType)
@@ -119,7 +128,7 @@ export async function processEvidenceDocumentCanonicalV1(input: {
       persist: (persistInput) => persistEvidenceVectorForProjectionV1(db, persistInput),
     },
   });
-  return { ...indexed, sourceRevision };
+  return { ...indexed, sourceRevision, synthesis };
 }
 
 
@@ -130,6 +139,22 @@ export interface BoundedImageAnalysisDeps {
       label: string;
       confidence: number;
       bboxNormalized: [number, number, number, number];
+    }>;
+  }>;
+  runSam2Segmentation?: (
+    bytes: Uint8Array,
+    mimeType: string,
+    boxes: Array<{ label: string; confidence: number; bboxNormalized: [number, number, number, number] }>
+  ) => Promise<{
+    status: 'EXECUTED' | 'MODEL_UNAVAILABLE_SKIPPED' | 'OFFLINE_SKIPPED' | 'FAILED';
+    masks: Array<{
+      artifactKind: 'sam2_alpha_silhouette';
+      maskObjectKey: string;
+      maskSha256: string;
+      targetBoxIndex: number;
+      label: string;
+      iouScore: number;
+      is3DReconstruction: false;
     }>;
   }>;
   runVlmAnalysis?: (bytes: Uint8Array, mimeType: string) => Promise<{
@@ -176,6 +201,14 @@ export async function executeBoundedImageAnalysisV1(
       }))
     : { status: 'MODEL_UNAVAILABLE_SKIPPED' as const, detections: [] };
 
+  // 1b. SAM 2 Silhouette Segmentation (Uses YOLO boxes as prompt inputs)
+  const sam2Res = deps.runSam2Segmentation
+    ? await deps.runSam2Segmentation(input.imageBytes, input.mimeType, yoloRes.detections).catch(() => ({
+        status: 'FAILED' as const,
+        masks: [],
+      }))
+    : { status: 'MODEL_UNAVAILABLE_SKIPPED' as const, masks: [] };
+
   // 2. VLM Scene/OCR Proposal (Marked proposalOnly: true, canonicalAuthority: false)
   const vlmRes = deps.runVlmAnalysis
     ? await deps.runVlmAnalysis(input.imageBytes, input.mimeType).catch(() => ({
@@ -201,6 +234,8 @@ export async function executeBoundedImageAnalysisV1(
     mimeType: input.mimeType.trim().toLowerCase(),
     yoloStatus: yoloRes.status,
     yoloDetections: yoloRes.detections,
+    sam2Status: sam2Res.status,
+    sam2Masks: sam2Res.masks,
     vlmStatus: vlmRes.status,
     vlmProposal: vlmRes.proposal
       ? {

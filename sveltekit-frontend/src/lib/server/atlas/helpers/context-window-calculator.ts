@@ -13,7 +13,28 @@ export interface TokenBudgetResult {
   contextWindowSize: number;
 }
 
+export const CONTEXT_WINDOW_PROFILES = {
+  turbo16k: 16_384,
+  turbo65k: 65_536,
+} as const;
+
+export type ContextWindowProfile = keyof typeof CONTEXT_WINDOW_PROFILES;
+
 export class ContextWindowCalculator {
+  calculateProfileBudget(
+    profile: ContextWindowProfile,
+    queryTokens: number,
+    systemPromptTokens: number,
+    safetyBuffer = 2_000,
+  ): TokenBudgetResult {
+    return this.calculateTokenBudget(
+      queryTokens,
+      systemPromptTokens,
+      CONTEXT_WINDOW_PROFILES[profile],
+      safetyBuffer,
+    );
+  }
+
   /**
    * Calculates safe context token budget given query, system prompt, and context window size.
    *

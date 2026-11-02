@@ -646,7 +646,9 @@
       "Bash(grep -n \"describe\\(\\\\|it\\(\\\\|vi.mock\" tests/tool-ranker.spec.ts)",
       "Bash(cat *)",
       "Bash(git -C .. log -1 --format=%cd -- sveltekit-frontend/docs/graph)",
-      "Skill(atlas-tools-mcp)"
+      "Skill(atlas-tools-mcp)",
+      "Bash(ls -d */ .*/)",
+      "Bash(ls -la)"
     ],
     "deny": [],
     "ask": []

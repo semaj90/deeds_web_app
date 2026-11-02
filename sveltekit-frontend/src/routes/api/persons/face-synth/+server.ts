@@ -21,7 +21,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres.js';
-import { eq, sql, desc } from 'drizzle-orm';
+import { eq, sql, desc, inArray } from 'drizzle-orm';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
@@ -163,7 +163,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const photos = await db
     .select({ poiId: poiPhotos.poiId, thumbnailUrl: poiPhotos.thumbnailUrl, id: poiPhotos.id })
     .from(poiPhotos)
-    .where(sql`${poiPhotos.poiId} = ANY(${poiIdArr})`)
+    // inArray, not sql`= ANY(${arr})`: drizzle expands a JS array in a sql template into a
+    // parenthesised parameter list, so one id became ANY('<uuid>') -> "malformed array literal".
+    // poiIdArr is never empty here (poiList.length === 0 returned above).
+    .where(inArray(poiPhotos.poiId, poiIdArr))
     .orderBy(desc(poiPhotos.uploadedAt));
 
   const photosByPoi = new Map<string, Array<{ id: string; thumbnailUrl: string | null }>>();

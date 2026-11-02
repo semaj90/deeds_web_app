@@ -18,11 +18,37 @@ def test_parameter_artifact_cannot_be_authority_by_default():
     artifact = ParameterArtifactV1(
         parameter_key="retrieval.top_k",
         value=10,
-        input_checksum="sha256:input",
+        # Bare 64-hex digest, matching the TypeScript contract's sha256Hex pattern (sha256 of b"input").
+        input_checksum="c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
         producer_revision="atlas.test.v1",
     )
+    assert artifact.schema_id == "atlas.research-parameter.v1"
     assert artifact.canonical_authority is False
     assert artifact.writes_performed is False
+
+
+def test_parameter_artifact_rejects_prefixed_or_short_checksum():
+    for bad in ("sha256:input", "abc", "sha256:" + "0" * 64, "g" * 64, "A" * 64):
+        with pytest.raises(Exception):
+            ParameterArtifactV1(
+                parameter_key="retrieval.top_k",
+                value=10,
+                input_checksum=bad,
+                producer_revision="atlas.test.v1",
+            )
+
+
+def test_research_parameter_authority_flags_cannot_be_true():
+    with pytest.raises(Exception):
+        ParameterArtifactV1(
+            parameter_key="retrieval.top_k",
+            value=10,
+            input_checksum="0" * 64,
+            producer_revision="atlas.test.v1",
+            canonical_authority=True,
+        )
+    with pytest.raises(Exception):
+        WebSearchEnvelopeV1(query="q", provider="searxng", writes_performed=True)
 
 
 def test_fetched_document_is_bounded_noncanonical_and_checksum_bound():

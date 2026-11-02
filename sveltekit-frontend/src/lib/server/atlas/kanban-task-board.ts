@@ -12,6 +12,7 @@ import {
 import {
   parseKanbanTaskEventCorrelationPayload,
 } from './kanban-task-event-contracts.js';
+import { KanbanAtlasAnalysisEnrichmentSchema } from './kanban-atlas-analysis-enrichment-v1.js';
 
 type KanbanDb = typeof db;
 
@@ -45,16 +46,20 @@ export const KanbanTaskSchema = z.object({
 export type KanbanTask = z.infer<typeof KanbanTaskSchema>;
 
 export const KanbanTaskListInputSchema = z.object({
+  featureId: z.string().trim().min(1).max(255).optional(),
   lane: KanbanTaskLaneSchema.optional(),
   status: KanbanTaskStatusSchema.optional(),
+  readyOnly: z.boolean().optional().default(false),
   limit: z.number().int().min(1).max(500).default(100),
 });
 
-export type KanbanTaskListInput = z.infer<typeof KanbanTaskListInputSchema>;
+export type KanbanTaskListInput = z.input<typeof KanbanTaskListInputSchema>;
 
 export const KanbanTaskListOutputSchema = z.object({
   tasks: z.array(KanbanTaskSchema),
   total: z.number().int().nonnegative(),
+  /** Stored rows that violate KanbanTaskSchema: reported, never silently dropped, never allowed to fail the whole board. */
+  invalid: z.array(z.object({ taskId: z.string(), issues: z.array(z.string()) })).default([]),
 });
 
 export type KanbanTaskListOutput = z.infer<typeof KanbanTaskListOutputSchema>;
@@ -129,6 +134,7 @@ export const KanbanTaskCreateInputSchema = z.object({
   graphifyRevision: z.string().min(1).nullable().optional(),
   featureRevision: z.string().min(1).nullable().optional(),
   permissionMode: z.enum(['read_only', 'proposal_only', 'patch_allowed']).optional(),
+  analysisProposal: KanbanAtlasAnalysisEnrichmentSchema.optional(),
 });
 
 export type KanbanTaskCreateInput = z.infer<typeof KanbanTaskCreateInputSchema>;
@@ -244,29 +250,38 @@ function optionalNumber(value: unknown): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
+// Accepts both raw SQL rows (snake_case, from db.execute) and Drizzle builder rows
+// (camelCase, from db.select()/update().returning()); reading only snake_case turned
+// every Drizzle-sourced taskId into '' and failed KanbanTaskSchema.
 function normalizeRow(row: Record<string, unknown>): KanbanTask {
+  const pick = (snake: string, camel: string): unknown => row[snake] ?? row[camel];
+  const str = (snake: string, camel: string): string | null => {
+    const value = pick(snake, camel);
+    return value == null ? null : String(value);
+  };
+  const sourceRefs = pick('source_refs', 'sourceRefs');
   return KanbanTaskSchema.parse({
-    taskId: String(row.task_id ?? ''),
-    featureId: String(row.feature_id ?? ''),
-    featureLabel: String(row.feature_label ?? ''),
-    sourceRefs: Array.isArray(row.source_refs) ? row.source_refs.map((item) => String(item)) : [],
+    taskId: String(pick('task_id', 'taskId') ?? ''),
+    featureId: String(pick('feature_id', 'featureId') ?? ''),
+    featureLabel: String(pick('feature_label', 'featureLabel') ?? ''),
+    sourceRefs: Array.isArray(sourceRefs) ? sourceRefs.map((item) => String(item)) : [],
     lane: String(row.lane ?? 'todo'),
     status: String(row.status ?? 'pending'),
-    validationCommand: row.validation_command == null ? null : String(row.validation_command),
-    assignee: row.assignee == null ? null : String(row.assignee),
+    validationCommand: str('validation_command', 'validationCommand'),
+    assignee: str('assignee', 'assignee'),
     priority: optionalNumber(row.priority),
-    claimToken: row.claim_token == null ? null : String(row.claim_token),
-    claimExpiresAt: optionalIso(row.claim_expires_at),
-    lastHeartbeatAt: optionalIso(row.last_heartbeat_at),
-    currentRunId: row.current_run_id == null ? null : String(row.current_run_id),
-    attemptCount: optionalNumber(row.attempt_count),
-    failureCount: optionalNumber(row.failure_count),
-    maxRetries: optionalNumber(row.max_retries),
-    startedAt: optionalIso(row.started_at),
-    completedAt: optionalIso(row.completed_at),
-    idempotencyKey: row.idempotency_key == null ? null : String(row.idempotency_key),
-    createdAt: toIso(row.created_at),
-    updatedAt: toIso(row.updated_at),
+    claimToken: str('claim_token', 'claimToken'),
+    claimExpiresAt: optionalIso(pick('claim_expires_at', 'claimExpiresAt')),
+    lastHeartbeatAt: optionalIso(pick('last_heartbeat_at', 'lastHeartbeatAt')),
+    currentRunId: str('current_run_id', 'currentRunId'),
+    attemptCount: optionalNumber(pick('attempt_count', 'attemptCount')),
+    failureCount: optionalNumber(pick('failure_count', 'failureCount')),
+    maxRetries: optionalNumber(pick('max_retries', 'maxRetries')),
+    startedAt: optionalIso(pick('started_at', 'startedAt')),
+    completedAt: optionalIso(pick('completed_at', 'completedAt')),
+    idempotencyKey: str('idempotency_key', 'idempotencyKey'),
+    createdAt: toIso(pick('created_at', 'createdAt')),
+    updatedAt: toIso(pick('updated_at', 'updatedAt')),
   });
 }
 
@@ -456,8 +471,20 @@ function leaseExpiration(hours = 0, minutes = 15): Date {
 export async function listKanbanTasks(input: KanbanTaskListInput): Promise<KanbanTaskListOutput> {
   const parsed = KanbanTaskListInputSchema.parse(input);
   const conditions = [
+    parsed.featureId ? eq(kanbanTasks.featureId, parsed.featureId) : undefined,
     parsed.lane ? eq(kanbanTasks.lane, parsed.lane) : undefined,
     parsed.status ? eq(kanbanTasks.status, parsed.status) : undefined,
+    parsed.readyOnly ? sql`NOT EXISTS (
+      SELECT 1
+      FROM kanban_task_dependencies d
+      LEFT JOIN kanban_tasks parent ON parent.task_id = d.parent_task_id
+      WHERE d.child_task_id = ${kanbanTasks.taskId}
+        AND (
+          parent.task_id IS NULL
+          OR parent.lane IS DISTINCT FROM 'done'
+          OR parent.status IS DISTINCT FROM 'completed'
+        )
+    )` : undefined,
   ].filter((condition): condition is NonNullable<typeof condition> => condition !== undefined);
 
   const rows = conditions.length > 0
@@ -483,10 +510,19 @@ export async function listKanbanTasks(input: KanbanTaskListInput): Promise<Kanba
   const totalRows = await totalQuery;
   const total = Number((totalRows[0] as { total?: number } | undefined)?.total ?? rows.length);
 
-  return {
-    tasks: (rows as Array<Record<string, unknown>>).map(normalizeRow),
-    total,
-  };
+  const tasks: KanbanTask[] = [];
+  const invalid: Array<{ taskId: string; issues: string[] }> = [];
+  for (const row of rows as Array<Record<string, unknown>>) {
+    try {
+      tasks.push(normalizeRow(row));
+    } catch (error) {
+      const issues = error instanceof z.ZodError
+        ? error.issues.map((issue) => `${issue.path.join('.') || '(row)'}: ${issue.message}`)
+        : [error instanceof Error ? error.message : String(error)];
+      invalid.push({ taskId: String(row.taskId ?? row.task_id ?? ''), issues });
+    }
+  }
+  return { tasks, total, invalid };
 }
 
 export async function showKanbanTask(input: { taskId: string }): Promise<KanbanTask | null> {
@@ -524,6 +560,17 @@ export async function claimKanbanTask(input: z.infer<typeof KanbanTaskClaimInput
           eq(kanbanTasks.lane, 'todo'),
           eq(kanbanTasks.status, 'pending'),
           isNull(kanbanTasks.claimToken),
+          sql`NOT EXISTS (
+            SELECT 1
+            FROM kanban_task_dependencies d
+            LEFT JOIN kanban_tasks parent ON parent.task_id = d.parent_task_id
+            WHERE d.child_task_id = ${kanbanTasks.taskId}
+              AND (
+                parent.task_id IS NULL
+                OR parent.lane IS DISTINCT FROM 'done'
+                OR parent.status IS DISTINCT FROM 'completed'
+              )
+          )`,
         ),
       )
       .returning();
@@ -772,6 +819,7 @@ export async function createKanbanTask(input: z.infer<typeof KanbanTaskCreateInp
         graphifyRevision: parsed.graphifyRevision ?? null,
         featureRevision: parsed.featureRevision ?? null,
         permissionMode: parsed.permissionMode ?? 'proposal_only',
+        ...(parsed.analysisProposal ? { analysisProposal: parsed.analysisProposal } : {}),
       },
     });
 
@@ -847,7 +895,13 @@ export async function listKanbanTaskDependencies(input: z.infer<typeof KanbanTas
 
 export async function listKanbanTaskEvents(input: { taskId?: string; runId?: string; limit?: number }): Promise<KanbanTaskEvent[]> {
   const limit = Math.max(1, Math.min(500, input.limit ?? 100));
+  // kanban_task_events also holds observation rows written by other producers
+  // (card_snapshot, file_feed_snapshot, proof_run, probe, code_change). This reader
+  // is the strict lifecycle view, so select only the lifecycle vocabulary instead of
+  // letting one foreign row make the whole parse (and the board) fail.
+  const lifecycleTypes = KanbanTaskEventTypeSchema.options;
   const conditions = [
+    sql`event_type IN (${sql.join(lifecycleTypes.map((type) => sql`${type}`), sql`, `)})`,
     input.taskId ? sql`task_id = ${input.taskId}` : undefined,
     input.runId ? sql`run_id = ${input.runId}` : undefined,
   ].filter((condition): condition is NonNullable<typeof condition> => condition !== undefined);

@@ -62,7 +62,7 @@ const CAMERA_PRESETS: Record<CourtroomView, CameraPreset> = {
 };
 
 // ── Character station positions ──
-const STATIONS: Record<string, { x: number; y: number; z: number }> = {
+export const STATIONS: Record<string, { x: number; y: number; z: number }> = {
 	// Counsel stand behind their tables (tables are 3 x 1.5 at z = 0); the witness stands on the 1.0 high stand and the
 	// judge on the 1.8 high bench platform. Previously prosecutor, defense and witness were inside the props.
 	prosecutor: { x: 4, y: 0, z: 1.3 },
@@ -125,6 +125,12 @@ export interface ModelDef {
 	}>;
 }
 
+export interface CourtroomSceneInitOptions {
+  renderProfile?: 'retro-n64' | 'modern-anti-aliased';
+  antialias?: boolean;
+  powerPreference?: 'high-performance' | 'default' | 'low-power';
+}
+
 export class CourtroomScene {
   // Reactive state (readable from Svelte components)
   isReady = $state(false);
@@ -155,32 +161,42 @@ export class CourtroomScene {
   private cues = new CueTracker();
   private moves = new Map<string, { path: WalkPath; distance: number; speed: number; lastMs: number }>();
 
-  async init(canvas: HTMLCanvasElement): Promise<void> {
+  async init(canvas: HTMLCanvasElement, options?: CourtroomSceneInitOptions): Promise<void> {
     const B = await loadBabylon();
+
+    const isModern = options?.renderProfile === 'modern-anti-aliased';
+    const enableAA = options?.antialias ?? (isModern ? true : false);
+    const powerPref = options?.powerPreference ?? 'high-performance';
 
     // Try WebGPU first, fall back to WebGL2
     try {
-      // Babylon's own probe (adapter + device); constructing WebGPUEngine without it let a failed requestDevice escape
-      // as an unhandled rejection that the app error boundary turned into a full-page crash (measured 2026-10-28).
       const supported = await B.WebGPUEngine.IsSupportedAsync;
       if (!supported) throw new Error('WebGPU not supported');
+      const webgpuPowerPref: GPUPowerPreference | undefined =
+        powerPref === 'low-power' ? 'low-power' : powerPref === 'high-performance' ? 'high-performance' : undefined;
       const webgpuEngine = new B.WebGPUEngine(canvas, {
-        antialias: false, // N64 style: no AA
+        antialias: enableAA,
         adaptToDeviceRatio: true,
+        ...(webgpuPowerPref ? { powerPreference: webgpuPowerPref } : {}),
       });
       await webgpuEngine.initAsync();
       this.engine = webgpuEngine;
       this.engineType = 'webgpu';
     } catch {
-      this.engine = new B.Engine(canvas, false, {
+      this.engine = new B.Engine(canvas, enableAA, {
         adaptToDeviceRatio: true,
-        antialias: false,
+        antialias: enableAA,
+        powerPreference: powerPref,
       });
       this.engineType = 'webgl';
     }
 
     this.scene = new B.Scene(this.engine);
-    this.resizeToN64Profile(canvas);
+    if (isModern) {
+      this.resizeToNative(canvas);
+    } else {
+      this.resizeToN64Profile(canvas);
+    }
     this.scene.clearColor = new B.Color4(0.12, 0.075, 0.045, 1);
 
     // Fog (N64 style)
@@ -272,6 +288,11 @@ export class CourtroomScene {
     this.retargetAssetCache.clear();
 
     for (const modelDef of models) {
+      // Guard against non-character models (e.g. room_bathroom.glb / room_myroom.glb environments) (CSP-91)
+      if (modelDef.role === 'environment' || !STATIONS[modelDef.role]) {
+        console.warn(`[courtroom] Skipping non-character model '${modelDef.role}' from actor load list`);
+        continue;
+      }
       try {
         this.loadingStage = `${modelDef.role}: model`;
         const result = await B.SceneLoader.ImportMeshAsync('', '', modelDef.modelUrl, this.scene);
@@ -1096,6 +1117,14 @@ export class CourtroomScene {
     sealMat.diffuseColor = new B.Color3(0.6, 0.5, 0.2);
     sealMat.specularColor = new B.Color3(0.2, 0.2, 0.1);
     seal.material = sealMat;
+  }
+
+  private resizeToNative(canvas: HTMLCanvasElement): void {
+    if (!this.engine) return;
+    const dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
+    const width = Math.max(1, Math.floor((canvas.clientWidth || 1280) * dpr));
+    const height = Math.max(1, Math.floor((canvas.clientHeight || 720) * dpr));
+    this.engine.setSize(width, height);
   }
 
   private resizeToN64Profile(canvas: HTMLCanvasElement): void {

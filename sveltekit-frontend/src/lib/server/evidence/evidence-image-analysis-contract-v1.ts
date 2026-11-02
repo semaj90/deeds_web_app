@@ -18,6 +18,16 @@ export const YoloDetectionBoxSchemaV1 = z.object({
   ]),
 });
 
+export const Sam2SegmentationMaskSchemaV1 = z.object({
+  artifactKind: z.literal('sam2_alpha_silhouette'),
+  maskObjectKey: z.string().min(1),
+  maskSha256: z.string().regex(/^[a-f0-9]{64}$/i),
+  targetBoxIndex: z.number().int().min(0),
+  label: z.string().min(1),
+  iouScore: z.number().min(0).max(1),
+  is3DReconstruction: z.literal(false),
+});
+
 export const MonocularDepthMapMetadataSchemaV1 = z.object({
   artifactKind: z.literal('monocular_depth_map_2d'),
   is3DReconstruction: z.literal(false),
@@ -46,6 +56,8 @@ export const EvidenceImageAnalysisReceiptSchemaV1 = z.object({
   mimeType: z.enum(ALLOWED_IMAGE_EVIDENCE_MIMES),
   yoloStatus: z.enum(['EXECUTED', 'MODEL_UNAVAILABLE_SKIPPED', 'FAILED']),
   yoloDetections: z.array(YoloDetectionBoxSchemaV1).default([]),
+  sam2Status: z.enum(['EXECUTED', 'MODEL_UNAVAILABLE_SKIPPED', 'OFFLINE_SKIPPED', 'FAILED']).default('OFFLINE_SKIPPED'),
+  sam2Masks: z.array(Sam2SegmentationMaskSchemaV1).default([]),
   vlmStatus: z.enum(['EXECUTED', 'OFFLINE_SKIPPED', 'FAILED']),
   vlmProposal: VlmCaptionProposalSchemaV1.nullable().default(null),
   depthStatus: z.enum(['EXECUTED', 'OFFLINE_SKIPPED', 'FAILED']),

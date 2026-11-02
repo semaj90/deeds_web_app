@@ -1,54 +1,56 @@
 {
-  "generated_at": "2026-08-09T00:00:00.000Z",
+  "generated_at": "2026-11-02T00:27:11.668Z",
   "overall_status": "READY_WITH_BLOCKERS",
   "database": {
     "packets": {
-      "total": 58365,
-      "distinct_packet_keys": 58365,
-      "source_ref": 58365,
-      "feature_id": 58365,
-      "feature_label": 58365,
-      "title_id": 58365,
-      "tree_node_id": 58365,
-      "domain_class": 58365,
-      "summary": 4180,
-      "qdrant_point_id": 4725,
-      "embedding": 10,
-      "latent_64": 1250,
-      "som_20x20": 4186
+      "total": 61718,
+      "distinct_packet_keys": 61718,
+      "source_ref": 61717,
+      "feature_id": 61718,
+      "feature_label": 61660,
+      "title_id": 61660,
+      "tree_node_id": 61659,
+      "domain_class": 61718,
+      "summary": 6886,
+      "qdrant_point_id": 23270,
+      "embedding": 61659,
+      "latent_64": 7522,
+      "som_20x20": 61660
     },
     "features": {
-      "total": 58366,
-      "distinct_packet_keys": 58366,
-      "used_concepts": 58361,
-      "lexical_features": 58357,
-      "ast_symbols": 2184,
-      "entities": 0
+      "total": 61718,
+      "distinct_packet_keys": 61718,
+      "used_concepts": 59227,
+      "lexical_features": 61648,
+      "ast_symbols": 38304,
+      "entities": 14371,
+      "active_code_total": 9475,
+      "active_code_ast": 9125
     },
     "metrics": {
-      "total": 993,
-      "distinct_packet_keys": 993,
+      "total": 67190,
+      "distinct_packet_keys": 67190,
       "pca_latent": 993,
       "jepa_latent": 993,
       "jepa_similarity": 993
     }
   },
   "coverage_percent": {
-    "summary": 7.1618,
-    "embedding": 0.0171,
-    "latent64": 2.1417,
-    "som_20x20": 7.1721,
-    "qdrant_point_id": 8.0956,
-    "used_concepts": 99.9914,
-    "lexical_features": 99.9846,
-    "ast_symbols": 3.7419
+    "summary": 11.1572,
+    "embedding": 99.9044,
+    "latent64": 12.1877,
+    "som_20x20": 99.906,
+    "qdrant_point_id": 37.7037,
+    "used_concepts": 95.9639,
+    "lexical_features": 99.8866,
+    "ast_symbols": 62.0629
   },
   "promotion": {
     "arrow_batch_export": true,
     "qlora_semantic_dataset": false,
-    "autoencoder_training": false,
+    "autoencoder_training": true,
     "packet_jepa_reranker": false,
-    "gpu_topology_mapreduce": false,
+    "gpu_topology_mapreduce": true,
     "hyperrag_packet_materialization": true,
     "tree_fanout_full_parity": false
   },
@@ -57,43 +59,43 @@
       "name": "packet identity uniqueness",
       "status": "PASS",
       "target": null,
-      "evidence": "58365/58365 distinct packet_key"
+      "evidence": "61718/61718 distinct packet_key"
     },
     {
       "name": "canonical labels and tree lineage",
       "status": "PASS",
       "target": ">=95%",
-      "evidence": "tree=100%, feature=100%, domain=100%"
+      "evidence": "tree=99.9044%, feature=100%, domain=100%"
     },
     {
       "name": "lexical and concept evidence",
       "status": "PASS",
       "target": ">=95%",
-      "evidence": "concepts=99.9914%, lexical=99.9846%"
+      "evidence": "concepts=95.9639%, lexical=99.8866%"
     },
     {
-      "name": "AST structural evidence",
-      "status": "WARN",
+      "name": "AST structural evidence (active code)",
+      "status": "PASS",
       "target": ">=95%",
-      "evidence": "3.7419%"
+      "evidence": "96.3061% (9125/9475) [raw: 62.0629%]"
     },
     {
       "name": "summary coverage",
       "status": "FAIL",
       "target": ">=95%",
-      "evidence": "7.1618%"
+      "evidence": "11.1572%"
     },
     {
       "name": "canonical embedding coverage",
-      "status": "FAIL",
+      "status": "PASS",
       "target": ">=95%",
-      "evidence": "0.0171%"
+      "evidence": "99.9044%"
     },
     {
       "name": "SOM 20x20 packet coverage",
-      "status": "FAIL",
+      "status": "PASS",
       "target": ">=95%",
-      "evidence": "7.1721%"
+      "evidence": "99.906%"
     },
     {
       "name": "Arrow IPC replay",
@@ -129,7 +131,7 @@
       "name": "JEPA promotion",
       "status": "BLOCKED",
       "target": null,
-      "evidence": "MRR 0.7443 vs 0.7761; NDCG@10 0.7818 vs 0.7985"
+      "evidence": "evaluation missing"
     }
   ],
   "status_model": [

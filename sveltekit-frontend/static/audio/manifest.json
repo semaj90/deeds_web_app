@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.courtroom-music-manifest.v1",
+  "version": "1.0.0",
+  "tracks": [
+    {
+      "id": "silence",
+      "title": "Silence / Stop Playback",
+      "licence": "CC0-1.0",
+      "loop": false,
+      "mood": "silent"
+    },
+    {
+      "id": "trial-opening",
+      "title": "Courtroom Trial Opening",
+      "file": "/audio/trial-opening.mp3",
+      "licence": "CC0-1.0",
+      "loop": true,
+      "mood": "neutral",
+      "bpm": 110
+    },
+    {
+      "id": "testimony-moderato",
+      "title": "Witness Testimony (Moderato)",
+      "file": "/audio/testimony-moderato.mp3",
+      "licence": "CC0-1.0",
+      "loop": true,
+      "mood": "neutral",
+      "bpm": 95
+    },
+    {
+      "id": "cross-examination",
+      "title": "Cross-Examination (Allegro)",
+      "file": "/audio/cross-examination.mp3",
+      "licence": "CC0-1.0",
+      "loop": true,
+      "mood": "tense",
+      "bpm": 138
+    },
+    {
+      "id": "cornered-presto",
+      "title": "Cornered / Climax",
+      "file": "/audio/cornered-presto.mp3",
+      "licence": "CC0-1.0",
+      "loop": true,
+      "mood": "triumphant",
+      "bpm": 155
+    },
+    {
+      "id": "solemn-verdict",
+      "title": "Verdict / Adjournment",
+      "file": "/audio/solemn-verdict.mp3",
+      "licence": "CC0-1.0",
+      "loop": false,
+      "mood": "solemn",
+      "bpm": 72
+    }
+  ]
+}

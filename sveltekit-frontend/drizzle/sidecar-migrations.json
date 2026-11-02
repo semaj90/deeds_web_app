@@ -983,12 +983,12 @@
     },
     {
       "file": "manual/20261030_evidence_vector_projection_outbox_v1.sql",
-      "status": "planned_sidecar",
-      "reason": "Dedicated, reference-only evidence_vectors-to-Qdrant delivery contract, rehearsed on disposable PostgreSQL 18.4 with rollback guards. Separate from vector_outbox/outbox_events; still unapplied. Do not apply live or activate a consumer without separate approval.",
-      "appliedBy": null,
-      "appliedAt": null,
+      "status": "applied",
+      "reason": "Applied 2026-10-31 after explicit operator authorization. Creates public.evidence_vector_projection_outbox with lease, retry, completion, and cryptographic identity constraints, unblocking live evidence vector outbox persistence on legal-ai-postgres (PG 18.4).",
+      "appliedBy": "operator-approved, session 2026-10-31",
+      "appliedAt": "2026-10-31",
       "requiresJournalEntry": false,
-      "validationCommand": "Apply and rollback only in a disposable PostgreSQL 18 database; verify pending/retry/lease/completion constraints and refusal to roll back when rows exist."
+      "validationCommand": "docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db -c '\\d public.evidence_vector_projection_outbox'"
     }
   ]
 }

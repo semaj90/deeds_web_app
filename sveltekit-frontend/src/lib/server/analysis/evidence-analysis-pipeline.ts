@@ -5,7 +5,8 @@ import { pgRows } from '$lib/server/db/client';
  * Orchestrates: YOLO detection → Redis cache → LLM escalation (ornith-1.5-9b)
  * → graph connection creation → Drizzle analysis cache persist → Qdrant tag update
  *
- * Called from evidence upload route (step 6b) and RabbitMQ evidence.process handler.
+ * Called from the API upload route's optional image-analysis step. Durable evidence
+ * ingestion is owned by analysis_jobs.upload_pipeline and does not use this pipeline.
  */
 
 import crypto from 'crypto';

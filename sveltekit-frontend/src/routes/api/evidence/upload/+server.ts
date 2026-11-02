@@ -58,6 +58,7 @@ import {
   persistEvidenceVectorForProjectionV1,
   type EvidenceVectorDatabaseV1,
 } from '$lib/server/evidence/evidence-vector-persistence-v1.js';
+import { isEvidenceVectorOutboxAvailableV1 } from '$lib/server/evidence/evidence-vector-outbox-readiness-v1.js';
 import { createEvidenceEmbeddingProducer } from '$lib/server/evidence/evidence-embedding-producer.js';
 
 // Strict llama.cpp lane (:8081) bound to the EMB-PROV-01 receipt; re-probed on every call, fails closed.
@@ -361,6 +362,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const enableOcr = parseBooleanField('enableOcr', true);
     const enableEmbeddings = parseBooleanField('enableEmbeddings', true);
     const enableSummarization = parseBooleanField('enableSummarization', true);
+
+    if (enableEmbeddings && !(await isEvidenceVectorOutboxAvailableV1())) {
+      return json({ success: false, error: 'EVIDENCE_PROCESSING_SCHEMA_UNAVAILABLE' }, { status: 503 });
+    }
 
     if (file.size > MAX_FILE_SIZE) {
       return json(

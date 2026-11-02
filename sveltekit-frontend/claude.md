@@ -1102,3 +1102,7 @@ Two hard rules added to `docs/architecture/trace-runtime-split.md` Hard Rules af
   - `scripts/opencode/monitor-claude-mem-poll.mjs`
   - `scripts/memory/import-claude-mem-observations.mjs`
 - Caveat: the local `claude-mem` plugin cache patch is not durable across reinstalls/upgrades. Recheck the local bundle for the `zod/v3` compatibility fix before trusting plugin hooks after an update.
+
+## Production hardening: service-lifecycle gates (2026-11-01)
+
+- Service lifecycle is human-only until `ops.*` auth is real: no MCP/TRACE tool may stop/start/restart `:8090`, Ollama, Docker or any datastore (`requireToken` accepts any non-empty string). Agents may add read-only status tools or write a request record for a human. Embedding seed/backfill scripts must fail closed (no placeholder/hash vectors); normalize `OLLAMA_HOST=0.0.0.0` to `127.0.0.1:11434`. Full rule: `CLAUDE.md` § Production hardening.

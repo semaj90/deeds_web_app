@@ -9,15 +9,10 @@ import type { RequestHandler } from './$types';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
-import { cases, statutes } from '$lib/server/db/schema-postgres.js';
+import { cases, evidence, legalDocuments, statutes } from '$lib/server/db/schema-postgres.js';
 import { crimes } from '$lib/server/db/schema/legal-cases.js';
 import { isNotNull, sql } from 'drizzle-orm';
-import {
-  buildJsonbMetadataLabels,
-  casesJsonb as jsonbCases,
-  evidenceJsonb,
-  legalDocumentsJsonb,
-} from '$lib/server/db/jsonb-legal-schema.js';
+import { buildJsonbMetadataLabels } from '$lib/server/db/jsonb-legal-schema.js';
 
 const querySchema = z.object({
   type: z.enum(['cases', 'laws']).default('laws'),
@@ -30,6 +25,9 @@ function distinctValues(rows: Array<{ value: string | null | undefined }>): stri
 }
 
 async function loadJsonbMetadataLabels(type: 'cases' | 'laws'): Promise<string[]> {
+  const documentType = sql<string>`COALESCE(${legalDocuments.metadata}->>'documentType', ${legalDocuments.metadata}->>'document_type')`;
+  const practiceArea = sql<string>`COALESCE(${legalDocuments.metadata}->>'practiceArea', ${legalDocuments.metadata}->>'practice_area')`;
+
   if (type === 'cases') {
     const [
       documentTypeRows,
@@ -41,33 +39,33 @@ async function loadJsonbMetadataLabels(type: 'cases' | 'laws'): Promise<string[]
       aiMetadataRows,
     ] = await Promise.all([
       db
-        .selectDistinct({ value: legalDocumentsJsonb.documentType })
-        .from(legalDocumentsJsonb)
-        .where(isNotNull(legalDocumentsJsonb.documentType)),
+        .selectDistinct({ value: documentType })
+        .from(legalDocuments)
+        .where(isNotNull(documentType)),
       db
-        .selectDistinct({ value: legalDocumentsJsonb.practiceArea })
-        .from(legalDocumentsJsonb)
-        .where(isNotNull(legalDocumentsJsonb.practiceArea)),
+        .selectDistinct({ value: practiceArea })
+        .from(legalDocuments)
+        .where(isNotNull(practiceArea)),
       db
-        .selectDistinct({ value: jsonbCases.caseNumber })
-        .from(jsonbCases)
-        .where(isNotNull(jsonbCases.caseNumber)),
+        .selectDistinct({ value: cases.caseNumber })
+        .from(cases)
+        .where(isNotNull(cases.caseNumber)),
       db
-        .selectDistinct({ value: evidenceJsonb.evidenceType })
-        .from(evidenceJsonb)
-        .where(isNotNull(evidenceJsonb.evidenceType)),
+        .selectDistinct({ value: evidence.evidenceType })
+        .from(evidence)
+        .where(isNotNull(evidence.evidenceType)),
       db
         .selectDistinct({ value: sql<string>`'admissibility'` })
-        .from(evidenceJsonb)
-        .where(sql`${evidenceJsonb.metadata} -> 'admissibility' IS NOT NULL`),
+        .from(evidence)
+        .where(sql`${evidence.metadata} -> 'admissibility' IS NOT NULL`),
       db
         .selectDistinct({ value: sql<string>`'chainOfCustody'` })
-        .from(evidenceJsonb)
-        .where(sql`${evidenceJsonb.metadata} -> 'chainOfCustody' IS NOT NULL`),
+        .from(evidence)
+        .where(isNotNull(evidence.chainOfCustody)),
       db
         .selectDistinct({ value: sql<string>`'aiMetadata'` })
-        .from(legalDocumentsJsonb)
-        .where(sql`${legalDocumentsJsonb.metadata} -> 'aiMetadata' IS NOT NULL`),
+        .from(legalDocuments)
+        .where(sql`${legalDocuments.metadata} -> 'aiMetadata' IS NOT NULL`),
     ]);
 
     return buildJsonbMetadataLabels({
@@ -83,17 +81,17 @@ async function loadJsonbMetadataLabels(type: 'cases' | 'laws'): Promise<string[]
 
   const [documentTypeRows, practiceAreaRows, aiMetadataRows] = await Promise.all([
     db
-      .selectDistinct({ value: legalDocumentsJsonb.documentType })
-      .from(legalDocumentsJsonb)
-      .where(isNotNull(legalDocumentsJsonb.documentType)),
+      .selectDistinct({ value: documentType })
+      .from(legalDocuments)
+      .where(isNotNull(documentType)),
     db
-      .selectDistinct({ value: legalDocumentsJsonb.practiceArea })
-      .from(legalDocumentsJsonb)
-      .where(isNotNull(legalDocumentsJsonb.practiceArea)),
+      .selectDistinct({ value: practiceArea })
+      .from(legalDocuments)
+      .where(isNotNull(practiceArea)),
     db
       .selectDistinct({ value: sql<string>`'aiMetadata'` })
-      .from(legalDocumentsJsonb)
-      .where(sql`${legalDocumentsJsonb.metadata} -> 'aiMetadata' IS NOT NULL`),
+      .from(legalDocuments)
+      .where(sql`${legalDocuments.metadata} -> 'aiMetadata' IS NOT NULL`),
   ]);
 
   return buildJsonbMetadataLabels({

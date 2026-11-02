@@ -52,7 +52,7 @@
 	let uploadError = $state<string | null>(null);
 	let activeEvidenceUpload = $state<ActiveEvidenceUploadV1 | null>(null);
 	let actionPopupFile = $state<{ name: string } | null>(null);
-	const uploadStorageUserId = String(data.user?.id ?? 'anonymous');
+	const uploadStorageUserId = $derived(String(data.user?.id ?? 'anonymous'));
 
 	onMount(() => {
 		void getActiveEvidenceUpload(uploadStorageUserId).then((upload) => {
@@ -488,14 +488,18 @@
 
 <style>
 	.evidence-page {
-		min-height: 100vh;
+		min-height: 100%;
+		width: 100%;
+		min-width: 0;
+		box-sizing: border-box;
+		overflow-x: clip;
 		background:
 			radial-gradient(circle at 92% 8%, rgba(190, 154, 86, 0.09), transparent 26rem),
 			linear-gradient(145deg, #fbf5e9 0%, #f4ead7 52%, #efe3ce 100%);
 		color: #342621;
 		display: flex;
 		flex-direction: column;
-		margin: -2.5rem;
+		margin: -2.5rem 0 0;
 	}
 	.evidence-page :global(h1), .evidence-page :global(h2), .evidence-page :global(h3), .evidence-page :global(h4), .evidence-page :global(p) { color: inherit; text-transform: none; letter-spacing: normal; margin: 0; }
 	.evidence-page :global(a) { color: inherit; }
@@ -503,7 +507,8 @@
 	.evidence-page :global(input), .evidence-page :global(select) { color: inherit; }
 	.evidence-content {
 		flex: 1;
-		padding: 0.5rem 0;
+		min-width: 0;
+		padding: 0.5rem 0 1.5rem;
 	}
 	.progress-bar {
 		padding: 0 1.5rem;
@@ -535,5 +540,8 @@
 	}
 	.delete-btn:hover {
 		background: #642027;
+	}
+	@media (max-width: 720px) {
+		.evidence-page { margin-top: -1.5rem; }
 	}
 </style>

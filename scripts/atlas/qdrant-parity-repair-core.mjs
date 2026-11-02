@@ -476,6 +476,9 @@ function generateRepairEvents(arg1, arg2, arg3) {
       if (row.completeness?.missing_optional_vectors?.includes('latent64')) {
         pushRepair(row, 'routing_vector_repair', 'missing_optional_vector:latent64', arg2 ?? null);
       }
+      if (row.completeness?.missing_optional_vectors?.includes('error')) {
+        pushRepair(row, 'error_vector_repair', 'missing_optional_vector:error', arg2 ?? null);
+      }
       continue;
     }
     if (row.state === 'identity_contradiction' || row.state === 'projection_contradiction') {

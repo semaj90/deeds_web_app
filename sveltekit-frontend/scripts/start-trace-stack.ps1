@@ -5,7 +5,7 @@
 #   Tier 0 (pre-flight):   Langfuse :3030 health, Bifrost :3040 health
 #                          Bifrost custom plugin/runtime work is WSL2 + Docker
 #                          not Windows-native PowerShell
-#   Tier 1 (parallel):     llama-server.exe :8090  (TurboQuant + Gemma4 GGUF)
+#   Tier 1 (parallel):     llama-server.exe :8090  (canonical Ornith 1.5 profile)
 #                          topology-search  :8101  (4D manifold search engine)
 #   Tier 2 (after Tier 1): TRACE MCP cluster :8788  (TypeScript agentic tools)
 #                          atlas-tools HTTP bridge    :8794 (Bifrost MCP client)
@@ -21,9 +21,8 @@
 #
 # Env overrides:
 #   LLAMA_SERVER_PATH   path to llama-server.exe
-#   TURBO_MODEL_PATH    path to GGUF model blob
-#   TURBO_MMPROJ_PATH   path to mmproj-BF16.gguf
 #   TURBO_PORT          default 8090
+#   TRACE_UNLOAD_OLLAMA_FOR_ORNITH=true to explicitly evict Ollama before loading Ornith
 #   TRACE_MCP_PORT      default 8788
 #   TRACE_MCP_WORKERS   default min(cpuCount, 4)
 #   LANGFUSE_URL        default http://127.0.0.1:3030
@@ -37,8 +36,8 @@
 
 $ErrorActionPreference = 'Continue'
 
-$Root     = Split-Path -Parent $PSScriptRoot
-$Frontend = Join-Path $Root "sveltekit-frontend"
+$Frontend = Split-Path -Parent $PSScriptRoot
+$Root     = Split-Path -Parent $Frontend
 
 # ── Run identity + artifact directory ───────────────────────────────────────
 
@@ -135,22 +134,9 @@ function Wait-Service {
 
 # ── Path resolution (env-overridable, fallback to known locations) ──────────
 
-$LlamaExe = if ($env:LLAMA_SERVER_PATH) { $env:LLAMA_SERVER_PATH }
-            elseif (Test-Path (Join-Path $Frontend "bin\llama-server.exe")) {
-              Join-Path $Frontend "bin\llama-server.exe"
-            } else { "C:\Users\james\Desktop\llama-server-cuda\llama-server.exe" }
-
-$ModelPath = if ($env:TURBO_MODEL_PATH) { $env:TURBO_MODEL_PATH } else {
-  $blob = Join-Path $env:USERPROFILE ".ollama\blobs\sha256-a79de882a921b9c3781a95a8ef555ea51e7c4dd685a8b2854e9bbe73ab081b43"
-  if (Test-Path $blob) { $blob } else { Join-Path $Frontend "models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf" }
-}
-
-$MmprojPath = if ($env:TURBO_MMPROJ_PATH) { $env:TURBO_MMPROJ_PATH } else {
-  $dl = Join-Path $env:USERPROFILE "Downloads\gemma4-mmproj\mmproj-BF16.gguf"
-  if (Test-Path $dl) { $dl } else { $null }
-}
-
 $TurboPort   = if ($env:TURBO_PORT)        { $env:TURBO_PORT }        else { "8090" }
+$TurboStartupProfile = 'ornith-1.5'
+$TurboLauncher = Join-Path $Root 'scripts\launch-turboquant.ps1'
 $McpPort     = if ($env:TRACE_MCP_PORT)    { $env:TRACE_MCP_PORT }    else { "8788" }
 $McpWorkers  = if ($env:TRACE_MCP_WORKERS) { $env:TRACE_MCP_WORKERS } else {
   [Math]::Min([System.Environment]::ProcessorCount, 4)
@@ -263,45 +249,78 @@ $health["go_retrieval"] = @{ url = "http://127.0.0.1:8100/health"; healthy = $re
 if ($retrievalPid) { $pids["go_retrieval"] = $retrievalPid }
 Write-Host ""
 
-# ── TIER 1: TurboQuant + Topology search (parallel, detached) ───────────────
+# ── TIER 1: Ornith chat + Topology search (parallel, detached) ──────────────
 
-Write-Host "[Tier 1] TurboQuant + Topology search" -ForegroundColor Blue
+Write-Host "[Tier 1] Ornith chat + Topology search" -ForegroundColor Blue
 
-# 1a. TurboQuant llama-server.exe :8090
+# 1a. Use the canonical launcher and explicit Ornith profile on :8090.
 $turboUp  = $false
 $turboPid = $null
+$turboModelAlias = $null
 try {
   Invoke-RestMethod "http://127.0.0.1:$TurboPort/health" -TimeoutSec 1 -ErrorAction Stop | Out-Null
-  Write-Host "  v TurboQuant already healthy on :$TurboPort" -ForegroundColor Yellow
+  Write-Host "  v Chat server already healthy on :$TurboPort; preserving the running process" -ForegroundColor Yellow
   $turboUp = $true
 } catch {}
 
 if (-not $turboUp) {
-  if (-not (Test-Path $LlamaExe)) {
-    Write-Host "  x llama-server.exe not found at $LlamaExe" -ForegroundColor Yellow
-    Write-Host "    Set LLAMA_SERVER_PATH env var to override" -ForegroundColor DarkYellow
-  } elseif (-not (Test-Path $ModelPath)) {
-    Write-Host "  x Model not found at $ModelPath" -ForegroundColor Yellow
+  if (-not (Test-Path $TurboLauncher)) {
+    Write-Host "  x Canonical model launcher not found at $TurboLauncher" -ForegroundColor Yellow
   } else {
-    $llamaArgs = @(
-      "-m",  $ModelPath,
-      "--host", "127.0.0.1",
-      "--port", $TurboPort,
-      "-c", "65536",
-      "-ngl", "99",
-      "-fa", "on",
-      "-ctk", "turbo3",
-      "-ctv", "turbo4",
-      "--log-disable"
-    )
-    if ($MmprojPath -and (Test-Path $MmprojPath)) {
-      $llamaArgs += @("--mmproj", $MmprojPath)
-      Write-Host "  -> TurboQuant :$TurboPort  VLM + mmproj, KV turbo3/4, FA on" -ForegroundColor Cyan
+    $pwshCommand = Get-Command pwsh.exe -ErrorAction SilentlyContinue
+    if (-not $pwshCommand) {
+      Write-Host "  x PowerShell 7 (pwsh.exe) is required by the canonical launcher" -ForegroundColor Yellow
     } else {
-      Write-Host "  -> TurboQuant :$TurboPort  text-only, KV turbo3/4, FA on" -ForegroundColor Cyan
+      $launchLog = Join-Path $RunDir 'ornith-launch.out.log'
+      $launchErrorLog = Join-Path $RunDir 'ornith-launch.err.log'
+      $launcherArgs = @(
+        '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"{0}"' -f $TurboLauncher),
+        '-StartupProfile', $TurboStartupProfile, '-Detached'
+      )
+      $ollamaEvictionRequested = $env:TRACE_UNLOAD_OLLAMA_FOR_ORNITH -eq 'true'
+      if (-not $ollamaEvictionRequested) { $launcherArgs += '-NoEvict' }
+      $previousTurboPort = $env:TURBO_PORT
+      $env:TURBO_PORT = [string]$TurboPort
+      try {
+        Write-Host "  -> Loading $TurboStartupProfile through the canonical launcher" -ForegroundColor Cyan
+        if ($ollamaEvictionRequested) {
+          Write-Host "  ! Ollama unload explicitly requested; EmbeddingGemma may be unavailable until reloaded" -ForegroundColor Yellow
+        } else {
+          Write-Host "  -> Preserving Ollama/EmbeddingGemma; set TRACE_UNLOAD_OLLAMA_FOR_ORNITH=true to opt into eviction" -ForegroundColor DarkGray
+        }
+        $launcherProcess = Start-Process -FilePath $pwshCommand.Source -ArgumentList $launcherArgs `
+          -WorkingDirectory $Root -WindowStyle Hidden -PassThru -Wait `
+          -RedirectStandardOutput $launchLog -RedirectStandardError $launchErrorLog
+        if ($launcherProcess.ExitCode -eq 0) {
+          try {
+            Invoke-RestMethod "http://127.0.0.1:$TurboPort/health" -TimeoutSec 2 -ErrorAction Stop | Out-Null
+            $turboUp = $true
+            $listener = Get-NetTCPConnection -LocalPort ([int]$TurboPort) -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($listener) { $turboPid = [int]$listener.OwningProcess }
+            Write-Host "  v $TurboStartupProfile is healthy on :$TurboPort" -ForegroundColor Green
+          } catch {
+            Write-Host "  x Canonical launcher exited successfully but :$TurboPort did not pass health check" -ForegroundColor Yellow
+          }
+        } else {
+          Write-Host "  x Ornith launcher failed (exit $($launcherProcess.ExitCode)); logs: $launchLog, $launchErrorLog" -ForegroundColor Yellow
+        }
+      } finally {
+        if ($null -eq $previousTurboPort) { Remove-Item Env:TURBO_PORT -ErrorAction SilentlyContinue }
+        else { $env:TURBO_PORT = $previousTurboPort }
+      }
     }
-    $turboPid = (Start-Process -FilePath $LlamaExe -ArgumentList $llamaArgs `
-      -WorkingDirectory $Frontend -WindowStyle Minimized -PassThru)?.Id
+  }
+}
+
+if ($turboUp) {
+  try {
+    $modelResponse = Invoke-RestMethod "http://127.0.0.1:$TurboPort/v1/models" -TimeoutSec 3 -ErrorAction Stop
+    $turboModelAlias = [string]$modelResponse.data[0].id
+    if ($turboModelAlias -and $turboModelAlias -notmatch 'ornith-1\.5') {
+      Write-Host "  ! Existing chat server model '$turboModelAlias' is not confirmed as Ornith 1.5; leaving it untouched" -ForegroundColor Yellow
+    }
+  } catch {
+    Write-Host "  ! Chat server is healthy, but its active model alias could not be verified" -ForegroundColor Yellow
   }
 }
 
@@ -320,10 +339,10 @@ if (-not $topoUp -and (Test-Path $TopoScript)) {
     -WorkingDirectory $Frontend -WindowStyle Minimized -PassThru)?.Id
 }
 
-# Wait for TurboQuant before opening MCP (Gemma4 tool calls need it)
+# Wait for the configured chat server before opening MCP.
 if (-not $turboUp) {
   $turboUp = Wait-Service -Url "http://127.0.0.1:$TurboPort/health" `
-    -Label "TurboQuant :$TurboPort" -RetryCount 120 -DelayMs 500
+    -Label "Ornith 1.5 :$TurboPort" -RetryCount 120 -DelayMs 500
 }
 # Quick topo check after brief wait (non-blocking)
 if (-not $topoUp) {
@@ -334,7 +353,7 @@ if (-not $topoUp) {
   } catch {}
 }
 
-$health["turbo_quant"] = @{ url = "http://127.0.0.1:$TurboPort/health"; healthy = $turboUp;  tier = 1; kvProfile = "turbo3/4"; faOn = $true }
+$health["turbo_quant"] = @{ url = "http://127.0.0.1:$TurboPort/health"; healthy = $turboUp; tier = 1; modelProfile = $TurboStartupProfile; expectedModelAlias = 'ornith-1.5-9b'; observedModelAlias = $turboModelAlias; modelLoadedByThisRun = [bool]$turboPid; ollamaEvictionRequested = ($env:TRACE_UNLOAD_OLLAMA_FOR_ORNITH -eq 'true') }
 $health["topo_search"]  = @{ url = "http://127.0.0.1:8101/health";        healthy = $topoUp;  tier = 1 }
 if ($turboPid) { $pids["turbo_quant"] = $turboPid }
 if ($topoPid)  { $pids["topo_search"] = $topoPid }

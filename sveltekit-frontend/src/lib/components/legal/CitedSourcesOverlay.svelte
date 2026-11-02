@@ -2,10 +2,21 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { fly } from 'svelte/transition';
 
+	interface CitedSource {
+		type?: string;
+		label: string;
+		content?: string;
+	}
+
+	interface DefinedTerm {
+		term: string;
+		definition_text: string;
+	}
+
 	let { isOpen = $bindable(false), citations = [], definitions = [] } = $props<{
 		isOpen: boolean;
-		citations: any[];
-		definitions: any[];
+		citations: CitedSource[];
+		definitions: DefinedTerm[];
 	}>();
 </script>
 
@@ -28,8 +39,8 @@
 				<h3>Cited Sources</h3>
 				<span class="count-badge">{citations.length + definitions.length}</span>
 			</div>
-			<button class="close-btn" onclick={() => isOpen = false}>
-				<Icon name="x" size={20} />
+			<button type="button" class="legal-icon-action" onclick={() => isOpen = false} aria-label="Close cited sources" title="Close cited sources">
+				<Icon name="x" size={15} class="transition-transform group-hover:rotate-90" />
 			</button>
 		</div>
 
@@ -38,7 +49,7 @@
 			{#if definitions.length > 0}
 				<div class="source-section">
 					<div class="section-label">Defined Terms</div>
-					{#each definitions as def}
+					{#each definitions as def, index (def.term + index)}
 						<div class="source-card">
 							<div class="card-meta">
 								<span class="type-tag">Definition</span>
@@ -62,7 +73,7 @@
 			{#if citations.length > 0}
 				<div class="source-section">
 					<div class="section-label">Cited Authorities</div>
-					{#each citations as citation}
+					{#each citations as citation, index (citation.label + index)}
 						<div class="source-card">
 							<div class="card-meta">
 								<span class="type-tag">{citation.type || 'Statute'}</span>
@@ -147,19 +158,6 @@
 		padding: 0.1rem 0.4rem;
 		border-radius: 99px;
 		font-family: monospace;
-	}
-
-	.close-btn {
-		background: transparent;
-		border: none;
-		color: rgba(255, 255, 255, 0.4);
-		cursor: pointer;
-		padding: 4px;
-		transition: color 0.15s;
-	}
-
-	.close-btn:hover {
-		color: #e0e0e0;
 	}
 
 	.panel-content {

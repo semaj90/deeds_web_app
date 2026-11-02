@@ -8,7 +8,7 @@
 <div class="p-6 max-w-4xl mx-auto">
 	<header class="mb-6">
 		<h1 class="text-xl font-bold mb-1">YoRHa Terminal + System Status</h1>
-		<p class="text-sm opacity-60">Terminal emulator with command handling and history, plus system metrics display with WebGPU and interval-based updates.</p>
+		<p class="text-sm opacity-60">Terminal emulator with command history and browser capability indicators. CPU utilization is not exposed by the browser.</p>
 	</header>
 
 	<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -20,7 +20,7 @@
 		</div>
 		<div>
 			<h2 class="text-sm font-bold mb-2 opacity-70">System Status (131L)</h2>
-			<SystemStatus webgpuReady={true} />
+			<SystemStatus />
 		</div>
 	</div>
 </div>

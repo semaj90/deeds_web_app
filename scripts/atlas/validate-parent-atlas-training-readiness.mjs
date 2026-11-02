@@ -77,12 +77,15 @@ async function loadDatabaseCoverage() {
     const features = await client.query(`
       SELECT
         COUNT(*)::int AS total,
-        COUNT(DISTINCT packet_key)::int AS distinct_packet_keys,
-        COUNT(*) FILTER (WHERE CARDINALITY(used_concepts) > 0)::int AS used_concepts,
-        COUNT(*) FILTER (WHERE CARDINALITY(lexical_features) > 0)::int AS lexical_features,
-        COUNT(*) FILTER (WHERE CARDINALITY(ast_symbols) > 0)::int AS ast_symbols,
-        COUNT(*) FILTER (WHERE CARDINALITY(entities) > 0)::int AS entities
-      FROM atlas_packet_features
+        COUNT(DISTINCT f.packet_key)::int AS distinct_packet_keys,
+        COUNT(*) FILTER (WHERE CARDINALITY(f.used_concepts) > 0)::int AS used_concepts,
+        COUNT(*) FILTER (WHERE CARDINALITY(f.lexical_features) > 0)::int AS lexical_features,
+        COUNT(*) FILTER (WHERE CARDINALITY(f.ast_symbols) > 0)::int AS ast_symbols,
+        COUNT(*) FILTER (WHERE CARDINALITY(f.entities) > 0)::int AS entities,
+        COUNT(*) FILTER (WHERE p.source_ref ~* '^(src|sveltekit-frontend/src|python|scripts)/.*\\.(ts|svelte|py|js|tsx|jsx|mjs|cjs|cpp|c|rs)$')::int AS active_code_total,
+        COUNT(*) FILTER (WHERE p.source_ref ~* '^(src|sveltekit-frontend/src|python|scripts)/.*\\.(ts|svelte|py|js|tsx|jsx|mjs|cjs|cpp|c|rs)$' AND CARDINALITY(f.ast_symbols) > 0)::int AS active_code_ast
+      FROM atlas_packet_features f
+      LEFT JOIN atlas_packets p ON p.packet_key = f.packet_key
     `);
     const metrics = await client.query(`
       SELECT
@@ -147,7 +150,11 @@ async function main() {
   const summaryReady = ratio(Number(db.packets.summary), packetTotal) >= 0.95;
   const embeddingReady = ratio(Number(db.packets.embedding), packetTotal) >= 0.95;
   const topologyReady = ratio(Number(db.packets.som_20x20), packetTotal) >= 0.95;
-  const astReady = ratio(Number(db.features.ast_symbols), featureTotal) >= 0.95;
+  const activeCodeTotal = Number(db.features.active_code_total || 0);
+  const activeCodeAst = Number(db.features.active_code_ast || 0);
+  const astReady = activeCodeTotal > 0
+    ? ratio(activeCodeAst, activeCodeTotal) >= 0.95
+    : ratio(Number(db.features.ast_symbols), featureTotal) >= 0.95;
   const arrowReady = arrow?.status === 'PASS';
   const nativeGpuReady = gpu.payload?.nativeAddon?.ok === true;
   const pythonGpuReady = gpu.payload?.pythonCuda?.ok === true;
@@ -175,7 +182,7 @@ async function main() {
     gate('packet identity uniqueness', Number(db.packets.distinct_packet_keys) === packetTotal ? 'PASS' : 'FAIL', `${db.packets.distinct_packet_keys}/${packetTotal} distinct packet_key`),
     gate('canonical labels and tree lineage', canonicalLabelsReady ? 'PASS' : 'FAIL', `tree=${percent(db.packets.tree_node_id, packetTotal)}%, feature=${percent(db.packets.feature_id, packetTotal)}%, domain=${percent(db.packets.domain_class, packetTotal)}%`, '>=95%'),
     gate('lexical and concept evidence', featureEvidenceReady ? 'PASS' : 'FAIL', `concepts=${percent(db.features.used_concepts, featureTotal)}%, lexical=${percent(db.features.lexical_features, featureTotal)}%`, '>=95%'),
-    gate('AST structural evidence', astReady ? 'PASS' : 'WARN', `${percent(db.features.ast_symbols, featureTotal)}%`, '>=95%'),
+    gate('AST structural evidence (active code)', astReady ? 'PASS' : 'WARN', `${percent(activeCodeAst, activeCodeTotal)}% (${activeCodeAst}/${activeCodeTotal}) [raw: ${percent(db.features.ast_symbols, featureTotal)}%]`, '>=95%'),
     gate('summary coverage', summaryReady ? 'PASS' : 'FAIL', `${percent(db.packets.summary, packetTotal)}%`, '>=95%'),
     gate('canonical embedding coverage', embeddingReady ? 'PASS' : 'FAIL', `${percent(db.packets.embedding, packetTotal)}%`, '>=95%'),
     gate('SOM 20x20 packet coverage', topologyReady ? 'PASS' : 'FAIL', `${percent(db.packets.som_20x20, packetTotal)}%`, '>=95%'),

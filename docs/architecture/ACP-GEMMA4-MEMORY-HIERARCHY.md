@@ -1,4 +1,4 @@
-# ACP Memory Hierarchy: Infrastructure First, Gemma4 Last
+# ACP Memory Hierarchy: Infrastructure First, Ornith Synthesis Last
 
 > **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — the "infrastructure-first, LLM-last,
 > packets not raw files" principle is still architecturally endorsed (CLAUDE.md explicitly retains
@@ -13,9 +13,9 @@
 
 ## Core Principle
 
-**Gemma4 is NOT the memory system. It is the last stage of a 6-stage pipeline.**
+**The synthesis model is NOT the memory system. It is the last stage of a 6-stage pipeline.**
 
-The ACP (Agent Control Plane) + infrastructure layers handle all memory, search, caching, and packet compaction. Gemma4 receives only a compact, tokenized, validated bundle of packets and performs attention/synthesis.
+The ACP (Agent Control Plane) + infrastructure layers handle retrieval, caching, and packet compaction. The configured synthesis runtime (workstation: Ornith 1.5-9B through llama-server on :8090) receives only a compact, validated context bundle. EmbeddingGemma is a separate embedding model; Engram/ACE are memory and context infrastructure, not model weights or persistent hidden reasoning.
 
 ---
 
@@ -144,9 +144,9 @@ Packet approach:
 
 ---
 
-### Stage 6: ornith 1.5 llama-server 8090 updating rg keyword Gemma4 Synthesis (Last Stage Only)
+### Stage 6: Ornith 1.5 Synthesis (Last Stage Only)
 
-Now Gemma receives:
+The synthesis model receives:
 
 ```
 System prompt
@@ -191,7 +191,7 @@ Just like CPU caches:
 ```
 Your AI Stack              CPU Architecture
 ─────────────────         ──────────────────
-ornith 1.5 llama-server 8090, updatingGemma4                    bitnet? offloading? bitfrost gpu cutile caches titans 2.0 hope, 4d rotations CPU registers
+Ornith 1.5 via llama-server  : synthesis only
      ↓
 BitFrost Redis            L1 cache (32KB, ~5ns)
      ↓

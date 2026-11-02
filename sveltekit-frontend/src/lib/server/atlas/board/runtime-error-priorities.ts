@@ -10,6 +10,13 @@ export interface RuntimeErrorPriority {
 	occurrences: number;
 	lastSeen: string;
 	priorityScore: number;
+	/**
+	 * First application-source file seen in the group's stored stacks (e.g. `src/routes/+page.svelte`),
+	 * newest occurrence first. File path only: browser stacks carry compiled-module line numbers that do
+	 * not map to source lines, so none is exposed. `null` when no stack has an application frame
+	 * (typically dependency-only frames such as Vite pre-bundled Svelte internals).
+	 */
+	firstAppFrame: string | null;
 }
 
 export interface RuntimeErrorPriorityReport {
@@ -38,6 +45,7 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 			occurrences: number;
 			last_seen: Date | string;
 			priority_score: number | string;
+			first_app_frame: string | null;
 			total_count: number | string;
 		}>(`
 			WITH source_events AS (
@@ -47,7 +55,8 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 					kind::text AS kind,
 					CASE lower(severity::text) WHEN 'warning' THEN 'warn' ELSE lower(severity::text) END AS severity,
 					message,
-					collected_at AS occurred_at
+					collected_at AS occurred_at,
+					(regexp_match(stack, '(src[/\\\\](?:routes|lib)[/\\\\][^\\s?:",]+)'))[1] AS first_app_frame
 				FROM error_events
 				WHERE collected_at >= now() - interval '30 days'
 				UNION ALL
@@ -57,7 +66,8 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 					error_category::text AS kind,
 					CASE lower(severity::text) WHEN 'warning' THEN 'warn' ELSE lower(severity::text) END AS severity,
 					message,
-					created_at AS occurred_at
+					created_at AS occurred_at,
+					(regexp_match(stack, '(src[/\\\\](?:routes|lib)[/\\\\][^\\s?:",]+)'))[1] AS first_app_frame
 				FROM error_logs
 				WHERE created_at >= now() - interval '30 days'
 					AND resolved = false
@@ -72,7 +82,8 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 					severity,
 					left(min(message), 400) AS message,
 					count(*)::integer AS occurrences,
-					max(occurred_at) AS last_seen
+					max(occurred_at) AS last_seen,
+						(array_agg(first_app_frame ORDER BY occurred_at DESC) FILTER (WHERE first_app_frame IS NOT NULL))[1] AS first_app_frame
 				FROM source_events
 				GROUP BY 1, 2, 3, 4, 5,
 					regexp_replace(lower(message), '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9]+', '#', 'g')
@@ -85,7 +96,7 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 				FROM grouped
 			)
 			SELECT fingerprint, source, route_path, kind, severity, message, occurrences,
-				last_seen, priority_score, count(*) OVER ()::integer AS total_count
+				last_seen, priority_score, first_app_frame, count(*) OVER ()::integer AS total_count
 			FROM scored
 			ORDER BY priority_score DESC, occurrences DESC, last_seen DESC, fingerprint ASC
 			LIMIT 100
@@ -101,6 +112,7 @@ export async function loadRuntimeErrorPriorities(): Promise<RuntimeErrorPriority
 			occurrences: Number(row.occurrences),
 			lastSeen: new Date(row.last_seen).toISOString(),
 			priorityScore: Number(row.priority_score),
+			firstAppFrame: row.first_app_frame ?? null,
 		}));
 		return {
 			status: 'AVAILABLE',

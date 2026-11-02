@@ -380,10 +380,13 @@ export async function createErrorBrainPatch(data: NewErrorBrainPatch) {
  */
 export async function updatePatchVerificationStatus(
   patchId: string,
-  status: string,
+  status: 'pending' | 'failed',
   message?: string,
   routeId?: string
 ) {
+  if (status !== 'pending' && status !== 'failed') {
+    throw new Error('VERIFICATION_RECEIPT_REQUIRED');
+  }
   const db = getDb();
   const result = await db.update(errorBrainPatch)
     .set({

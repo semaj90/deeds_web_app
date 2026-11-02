@@ -704,7 +704,7 @@
 	}
 
 	/* ─── TypewriterPrompt demo ─── */
-	.typewriter-hint { font-size: 0.7rem; color: #475569; margin: 0.5rem 0 0; font-style: italic; }
+	.typewriter-hint { font-size: 0.7rem; color: #64748b; margin: 0.5rem 0 0; font-style: normal; }
 
 	/* ─── MarkdownSceneViewer demo ─── */
 	.scene-action-log {

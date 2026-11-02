@@ -1,0 +1,227 @@
+/* ═══════════════════════════════════════════════════════════════════
+   YORHA LEGAL-AI & ROYAL DOSSIER × NIER: AUTOMATA GLOBAL STYLESHEET
+   Unified Tokens, Surfaces, Bento Cards, Controls & Telemetry
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Color & Layout Tokens ────────────────────────────────────── */
+:root {
+	--dossier-bg-workspace: #ECE7DC;
+	--dossier-bg-card: #FAF6F0;
+	--dossier-bg-card-alt: #FAF4EC;
+	--dossier-bg-dark: #161412;
+	--dossier-bg-dark-panel: #1A1612;
+	--dossier-border-sand: #D5C6AC;
+	--dossier-border-dark: rgba(212, 175, 55, 0.35);
+	--dossier-gold: #C9A86A;
+	--dossier-gold-light: #FFE59A;
+	--dossier-crimson: #67140F;
+	--dossier-mocha: #483D36;
+	--dossier-text-main: #141312;
+	--dossier-text-muted: #7F7565;
+	--dossier-text-light: #FAF4EC;
+}
+
+/* ── 2. Card Surfaces & Arcana Filigree ──────────────────────────── */
+.dossier-card {
+	position: relative;
+	background: linear-gradient(180deg, #FFFCF9 0%, #FAF4EC 100%);
+	border: 1px solid #DFD3C3;
+	border-radius: 20px;
+	box-shadow: 0 4px 18px rgba(60, 40, 20, 0.06);
+	overflow: hidden;
+	transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dossier-card:hover {
+	box-shadow: 0 8px 24px rgba(60, 40, 20, 0.09);
+	border-color: #C8A24A;
+}
+
+.dossier-card-dark {
+	position: relative;
+	background: #161412;
+	border: 1px solid rgba(212, 175, 55, 0.35);
+	border-radius: 10px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+	overflow: hidden;
+}
+
+.dossier-arcana-inner {
+	position: absolute;
+	inset: 5px;
+	border: 1px solid rgba(185, 127, 98, 0.18);
+	border-radius: 15px;
+	pointer-events: none;
+}
+
+.dossier-star {
+	position: absolute;
+	font-size: 8px;
+	color: #B97F62;
+	opacity: 0.55;
+	line-height: 1;
+	pointer-events: none;
+	user-select: none;
+	z-index: 2;
+}
+.dossier-star-tl { top: 7px; left: 7px; }
+.dossier-star-tr { top: 7px; right: 7px; }
+.dossier-star-bl { bottom: 7px; left: 7px; }
+.dossier-star-br { bottom: 7px; right: 7px; }
+
+/* ── 3. Headers, Plaques & Typography ────────────────────────────── */
+.dossier-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.65rem 1rem;
+	border-bottom: 1px solid rgba(217, 203, 187, 0.55);
+	background: rgba(255, 255, 255, 0.5);
+}
+
+.dossier-plaque {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.25rem 0.65rem;
+	border-radius: 9999px;
+	background: linear-gradient(180deg, #5C493F 0%, #483D36 100%);
+	color: #FAF4EC;
+	box-shadow: 0 2px 6px rgba(45, 35, 30, 0.15);
+}
+
+.dossier-card-title {
+	font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+	font-size: 0.82rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	color: #FAF4EC;
+	margin: 0;
+}
+
+.dossier-card-body {
+	padding: 1rem 1.25rem;
+}
+
+/* ── 4. Tactical HUD Buttons & Pill Switches ─────────────────────── */
+.hud-toolbar-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	height: 28px;
+	padding: 0 0.65rem;
+	border-radius: 9999px;
+	background: #FAF6F0;
+	border: 1px solid #D5C6AC;
+	color: #342D26;
+	font-family: 'Inter', system-ui, sans-serif;
+	font-size: 0.72rem;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	white-space: nowrap;
+}
+
+.hud-toolbar-btn:hover {
+	background: #FFFFFF;
+	border-color: #67140F;
+	color: #67140F;
+	box-shadow: 0 2px 6px rgba(103, 20, 15, 0.12);
+}
+
+.hud-toolbar-btn-gold {
+	background: linear-gradient(180deg, #67140F 0%, #52100C 100%);
+	border-color: #67140F;
+	color: #FFE59A;
+	box-shadow: 0 2px 6px rgba(103, 20, 15, 0.25);
+}
+
+.hud-toolbar-btn-gold:hover {
+	background: linear-gradient(180deg, #7C1812 0%, #67140F 100%);
+	border-color: #FFE59A;
+	color: #FFFFFF;
+}
+
+.dossier-mini-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.68rem;
+	font-family: 'Inter', system-ui, sans-serif;
+	font-weight: 600;
+	padding: 0.2rem 0.55rem;
+	border-radius: 9999px;
+	background: #EFEBE5;
+	border: 1px solid #D3C5B5;
+	color: #5C493F;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.dossier-mini-pill:hover,
+.dossier-mini-pill-active {
+	background: #5C493F;
+	border-color: #5C493F;
+	color: #FAF4EC;
+	box-shadow: 0 1px 4px rgba(45, 35, 30, 0.15);
+}
+
+/* ── 5. Multi-Modal MIME Badges ──────────────────────────────────── */
+.chat-mime-badge {
+	display: inline-flex;
+	align-items: center;
+	font-size: 0.62rem;
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	padding: 1px 5px;
+	border-radius: 3px;
+	white-space: nowrap;
+}
+
+.chat-mime-image { background: #3B2A1E; color: #FFE59A; border: 1px solid #825828; }
+.chat-mime-video { background: #1E2E3B; color: #93C5FD; border: 1px solid #2563EB; }
+.chat-mime-audio { background: #1E3B2E; color: #A7F3D0; border: 1px solid #059669; }
+.chat-mime-pdf { background: #3B1E1E; color: #FCA5A5; border: 1px solid #DC2626; }
+.chat-mime-document { background: #2F2A22; color: #E5C77B; border: 1px solid #78633F; }
+.chat-mime-other { background: #2B2620; color: #D5C6AC; border: 1px solid #4D4133; }
+
+/* ── 6. Bento Telemetry Progress Meters ──────────────────────────── */
+.telemetry-bento-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+	padding: 0.75rem 1rem;
+}
+
+.telemetry-pill-plate {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.45rem 0.65rem;
+	border-radius: 8px;
+	background: #FAF6F0;
+	border: 1px solid #E4DEC8;
+}
+
+.telemetry-track {
+	height: 5px;
+	width: 100%;
+	border-radius: 9999px;
+	background: #EFEBE5;
+	overflow: hidden;
+}
+
+.telemetry-fill {
+	height: 100%;
+	border-radius: 9999px;
+	transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.telemetry-fill-butter { background: linear-gradient(90deg, #FFE59A 0%, #DFBE64 100%); }
+.telemetry-fill-sakura { background: linear-gradient(90deg, #F6C1C8 0%, #DF95A0 100%); }
+.telemetry-fill-sage { background: linear-gradient(90deg, #B7E1D1 0%, #7FC2A9 100%); }
+.telemetry-fill-sky { background: linear-gradient(90deg, #A9D3FF 0%, #79B4F2 100%); }
+.telemetry-fill-mocha { background: linear-gradient(90deg, #E4B396 0%, #B97F62 100%); }

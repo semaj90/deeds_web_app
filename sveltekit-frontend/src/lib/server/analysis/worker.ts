@@ -307,7 +307,19 @@ const stageConfig: Record<string, AnalysisStageConfig> = {
 		backend: 'native-ts',
 		backendVersion: ANALYSIS_WORKER_REVISION,
 		device: 'cpu',
-		run: async () => ({ skipped: true, reason: 'upload_pipeline handled upstream' }),
+		run: async (evidenceId, metadata, analysisJobId) => {
+			const { executeAnalysisUploadPipelineV1 } = await import(
+				'$lib/server/evidence/analysis-upload-pipeline-v1.js'
+			);
+			const { EvidenceProcessWorker } = await import('$lib/server/queue/queue-worker.js');
+			const processor = new EvidenceProcessWorker();
+			return executeAnalysisUploadPipelineV1({
+				evidenceId,
+				analysisJobId,
+				metadata,
+				processEvidence: (payload) => processor.processCanonical(payload),
+			});
+		},
 	},
 	entity_extraction: {
 		gate: entityGate,
@@ -354,6 +366,17 @@ const stageConfig: Record<string, AnalysisStageConfig> = {
 		run: runCodeFeatureRegistry, // Canonical order: after LangExtract
 	},
 };
+
+export async function executeAnalysisJobStageV1(
+	jobType: JobType,
+	evidenceId: string,
+	metadata: Record<string, unknown>,
+	analysisJobId: string,
+): Promise<Record<string, unknown>> {
+	const stage = stageConfig[jobType];
+	if (!stage) throw new Error(`ANALYSIS_JOB_STAGE_UNSUPPORTED:${jobType}`);
+	return stage.run(evidenceId, metadata, analysisJobId);
+}
 
 // --- Worker loop ---
 
@@ -404,11 +427,22 @@ async function pollOnce(): Promise<void> {
 				gated(cfg.gate, async () => {
 					const t0 = Date.now();
 					const startedAt = new Date(t0).toISOString();
+					const heartbeat = setInterval(() => {
+						void updateAnalysisJob(job.id, { progress: '10' }).catch((error) => {
+							console.warn(`[Worker] ${jobType}/${job.id} heartbeat failed:`, error);
+						});
+					}, 60_000);
+					heartbeat.unref?.();
 					try {
 						await updateAnalysisJob(job.id, { progress: '10' });
 						const jobResult = job.result as Record<string, unknown>;
-						const result = await cfg.run(job.evidenceId, job.result, job.id);
-						if (jobType === 'lexical_feature_registry') {
+						const result = await executeAnalysisJobStageV1(
+							jobType,
+							job.evidenceId,
+							job.result as Record<string, unknown>,
+							job.id,
+						);
+						if (jobType === 'lexical_feature_registry' || jobType === 'upload_pipeline') {
 							await completeAnalysisJob(job.id, { ...result, durationMs: Date.now() - t0 });
 							return;
 						}
@@ -508,7 +542,11 @@ async function pollOnce(): Promise<void> {
 						console.log(`[Worker] ${jobType}/${job.id} done in ${Date.now() - t0}ms`);
 					} catch (err) {
 						console.error(`[Worker] ${jobType}/${job.id} failed:`, err);
-						await failAnalysisJob(job.id, String(err)).catch(() => {});
+						await failAnalysisJob(job.id, String(err)).catch((failureError) => {
+							console.error(`[Worker] ${jobType}/${job.id} failure status could not be persisted:`, failureError);
+						});
+					} finally {
+						clearInterval(heartbeat);
 					}
 				}).catch(() => {});
 			}

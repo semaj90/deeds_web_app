@@ -242,9 +242,9 @@
 	/* Grid View */
 	.ev-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
 		gap: 0.75rem;
-		padding: 1rem 1.5rem;
+		padding: 1rem clamp(1rem, 2vw, 1.5rem);
 	}
 	.ev-card {
 		background: rgba(255, 255, 255, 0.025);
@@ -355,10 +355,10 @@
 	.ev-card-actions {
 		display: flex;
 		gap: 0.125rem;
-		opacity: 0;
+		opacity: 0.72;
 		transition: opacity 0.15s;
 	}
-	.ev-card:hover .ev-card-actions {
+	.ev-card:hover .ev-card-actions, .ev-card:focus-within .ev-card-actions {
 		opacity: 1;
 	}
 	.ev-card-actions button {
@@ -381,10 +381,10 @@
 
 	/* Table View */
 	.ev-table-wrap {
-		margin: 0 1.5rem;
+		margin: 0 clamp(1rem, 2vw, 1.5rem);
 		border: 1px solid rgba(255, 255, 255, 0.06);
 		border-radius: 12px;
-		overflow: hidden;
+		overflow-x: auto;
 	}
 	.ev-table {
 		width: 100%;
@@ -516,9 +516,8 @@
 		background: rgba(255, 253, 248, 0.68);
 		border-color: rgba(196, 169, 117, 0.46);
 		border-left-color: #b28a45;
-		border-radius: 16px;
-		backdrop-filter: blur(14px) saturate(1.08);
-		box-shadow: 0 8px 24px rgba(77, 49, 32, 0.055), inset 0 1px rgba(255,255,255,0.88);
+		border-radius: 12px;
+		box-shadow: 0 4px 14px rgba(77, 49, 32, 0.055), inset 0 1px rgba(255,255,255,0.88);
 	}
 	.ev-card:hover { background: rgba(255, 253, 248, 0.88); border-color: #c9ae7b; box-shadow: 0 14px 28px rgba(77,49,32,0.1); }
 	.ev-card-title, .ev-row-name { color: #342621; }

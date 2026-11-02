@@ -199,3 +199,86 @@ export function toTypedRepairDag(candidate, receipt) {
   if (receipt?.schema !== RECEIPT_SCHEMA || receipt.status !== 'ACCEPTED' || !receipt.validatedDagChecksum) throw new Error('TYPED_REPAIR_DAG_REQUIRES_ACCEPTED_VALIDATION');
   return { ...candidate, schema: 'atlas.typed-repair-dag.v1', executable: true, canonicalAuthority: false, validationReceiptChecksum: sha256(receipt) };
 }
+
+
+export function deriveApprovalPlan(typedDag, kernel) {
+  if (typedDag?.schema !== 'atlas.typed-repair-dag.v1') {
+    throw new Error('DERIVE_PLAN_REQUIRES_TYPED_REPAIR_DAG');
+  }
+  const functions = new Map((kernel?.functions ?? []).map((fn) => [fn.functionId, fn]));
+  const mutationNodes = (typedDag.nodes ?? [])
+    .filter((node) => {
+      const fn = functions.get(node.functionId);
+      return fn && (fn.mutationClass ?? 'READ') !== 'READ';
+    })
+    .map((node) => {
+      const fn = functions.get(node.functionId);
+      return {
+        nodeId: node.nodeId,
+        functionId: node.functionId,
+        mutationClass: fn.mutationClass,
+        arguments: node.arguments ?? {},
+        argumentChecksum: sha256(node.arguments ?? {}),
+        evidenceRefs: [...(node.evidenceRefs ?? [])].sort(),
+      };
+    })
+    .sort((a, b) => String(a.nodeId).localeCompare(String(b.nodeId)));
+
+  const basePlan = {
+    schema: 'atlas.repair-approval-plan.v1',
+    validationReceiptChecksum: typedDag.validationReceiptChecksum,
+    mutationNodes,
+  };
+  return {
+    ...basePlan,
+    planChecksum: sha256(basePlan),
+  };
+}
+
+export function recordApprovalReceipt({ typedDag, approvalPlan, approver, reason = 'Operator approved' }) {
+  if (typedDag?.schema !== 'atlas.typed-repair-dag.v1') {
+    throw new Error('APPROVAL_REQUIRES_TYPED_REPAIR_DAG');
+  }
+  if (!approver || typeof approver !== 'string') {
+    throw new Error('APPROVAL_REQUIRES_APPROVER');
+  }
+  if (!approvalPlan || approvalPlan.schema !== 'atlas.repair-approval-plan.v1') {
+    throw new Error('APPROVAL_REQUIRES_VALID_PLAN');
+  }
+  if (approvalPlan.validationReceiptChecksum !== typedDag.validationReceiptChecksum) {
+    throw new Error('APPROVAL_PLAN_DAG_CHECKSUM_MISMATCH');
+  }
+
+  const baseReceipt = {
+    schema: 'atlas.repair-approval-receipt.v1',
+    validationReceiptChecksum: typedDag.validationReceiptChecksum,
+    planChecksum: approvalPlan.planChecksum,
+    approver,
+    reason,
+    approved: true,
+  };
+  return {
+    ...baseReceipt,
+    approvalReceiptChecksum: sha256(baseReceipt),
+  };
+}
+
+export function assertExecutionApproved(typedDag, approvalReceipt, kernel) {
+  if (typedDag?.schema !== 'atlas.typed-repair-dag.v1') {
+    throw new Error('EXECUTION_CHECK_REQUIRES_TYPED_REPAIR_DAG');
+  }
+  const plan = deriveApprovalPlan(typedDag, kernel);
+  if (plan.mutationNodes.length === 0) {
+    return true;
+  }
+  if (!approvalReceipt || approvalReceipt.approved !== true) {
+    throw new Error('MUTATION_DAG_REQUIRES_APPROVAL');
+  }
+  if (approvalReceipt.validationReceiptChecksum !== typedDag.validationReceiptChecksum) {
+    throw new Error('APPROVAL_DAG_CHECKSUM_MISMATCH');
+  }
+  if (approvalReceipt.planChecksum !== plan.planChecksum) {
+    throw new Error('APPROVAL_PLAN_CHECKSUM_MISMATCH');
+  }
+  return true;
+}

@@ -21,6 +21,7 @@ import postgres from 'postgres';
 import * as schema from './schema-postgres.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { QdrantClient } from '@qdrant/js-client-rest';
+import { shouldRunStartupMigrations } from './startup-migration-policy.js';
 
 // Define DocumentMetadata locally since it may not be exported from schema-unified
 interface DocumentMetadata {
@@ -204,8 +205,7 @@ class DatabaseManager {
             await runtimeDb.execute(sql`SELECT 1 as test`);
             console.log('✅ Runtime database connection established');
 
-            // Run migrations in production
-            if (!isDev && process.env.SKIP_MIGRATIONS !== 'true') {
+            if (shouldRunStartupMigrations(isDev, process.env)) {
                 const adminDb = this.getAdminDb();
                 const migrationsFolder = process.env.MIGRATIONS_FOLDER || path.resolve(process.cwd(), 'drizzle');
                 console.log(`🔄 Running database migrations with admin privileges (folder=${migrationsFolder})...`);
@@ -213,8 +213,11 @@ class DatabaseManager {
                     await migrate(adminDb as Parameters<typeof migrate>[0], { migrationsFolder });
                     console.log('✅ Database migrations completed');
                 } catch (err) {
-                    console.warn('⚠️ Migration failed (may already be applied):', err);
+                    console.error('❌ Explicitly enabled startup migration failed:', err);
+                    throw err;
                 }
+            } else if (!isDev) {
+                console.info('ℹ️ Startup migrations skipped; set RUN_STARTUP_MIGRATIONS=true only after migration-history review.');
             }
 
             // Test pgvector extension

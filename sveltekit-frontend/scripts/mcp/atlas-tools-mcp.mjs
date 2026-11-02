@@ -441,8 +441,23 @@ export async function recommendKanbanDagPrefillAlgorithm(
   { featureId, maxPrefillTasks = 16 },
   { trace = callTraceTool } = {},
 ) {
-  const snapshot = await trace('atlas.kanban_dag_snapshot', { featureId, limit: 128 });
-  return selectKanbanDagPrefillAlgorithm(snapshot, { maxPrefillTasks });
+  try {
+    const snapshot = await trace('atlas.kanban_dag_snapshot', { featureId, limit: 128 });
+    return selectKanbanDagPrefillAlgorithm(snapshot, { maxPrefillTasks });
+  } catch (error) {
+    const code = typeof error === 'object' && error !== null && 'code' in error
+      ? String(error.code)
+      : 'TRACE_SNAPSHOT_FAILED';
+    return {
+      schema: 'atlas.kanban-dag-prefill-algorithm-recommendation.v1',
+      status: 'BLOCKED',
+      reasonCode: /^TRACE_[A-Z0-9_]{1,80}$/.test(code) ? code : 'TRACE_SNAPSHOT_FAILED',
+      featureId,
+      sourceSnapshotHash: null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    };
+  }
 }
 
 // ── Tool implementations ────────────────────────────────────────────────────────

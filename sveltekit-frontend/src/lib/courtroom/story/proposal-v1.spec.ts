@@ -1,6 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { ActorSpec } from './engine';
-import { buildGroundedProposal, evaluateGrounding, type EvidenceSnapshot } from './proposal-v1';
+import {
+	buildGroundedProposal,
+	evaluateGrounding,
+	evaluateGroundingAsync,
+	createRuleBasedSupportChecker,
+	createOrnithSupportChecker,
+	type EvidenceSnapshot
+} from './proposal-v1';
 import { compileStory, fnv1a32, replayStory } from './replay-v1';
 
 const actors: ActorSpec[] = [
@@ -53,6 +60,65 @@ describe('grounded story proposal', () => {
 		const r = evaluateGrounding(build(), emptied);
 		expect(r.status).toBe('REJECTED');
 		expect(r.gates.structural.reasons.some((x) => x.startsWith('UNKNOWN_CHUNK'))).toBe(true);
+	});
+});
+
+describe('semantic support checkers (CSP-52)', () => {
+	it('createRuleBasedSupportChecker detects exact matches and contradictions', () => {
+		const check = createRuleBasedSupportChecker();
+
+		// Exact match
+		expect(check('The back door was open at nine.', 'The back door was open at nine.')).toBe('SUPPORTED');
+
+		// High overlap
+		expect(check('The safe was locked on Friday.', 'The ledger was locked in the safe on Friday.')).toBe('SUPPORTED');
+
+		// Negation contradiction
+		expect(check('The back door was not open at nine.', 'The back door was open at nine.')).toBe('UNSUPPORTED');
+
+		// Number/amount contradiction
+		expect(check('The total transferred was $500,000.', 'The total transferred was $5,000.')).toBe('UNSUPPORTED');
+
+		// Unrelated
+		expect(check('The sky was blue.', 'The ledger was locked in the safe.')).toBe('UNKNOWN');
+	});
+
+	it('createOrnithSupportChecker queries local endpoint and handles structured JSON', async () => {
+		const mockFetch = vi.fn().mockResolvedValue({
+			ok: true,
+			json: async () => ({
+				choices: [{ message: { content: '{"verdict": "SUPPORTED", "reason": "Direct statement"}' } }]
+			})
+		});
+
+		const checker = createOrnithSupportChecker({ fetchFn: mockFetch as any });
+		const verdict = await checker('The safe was locked.', 'The safe was locked on Friday.');
+
+		expect(verdict).toBe('SUPPORTED');
+		expect(mockFetch).toHaveBeenCalledWith(
+			'http://127.0.0.1:8090/v1/chat/completions',
+			expect.objectContaining({ method: 'POST' })
+		);
+	});
+
+	it('createOrnithSupportChecker falls back to rule checker when endpoint is unreachable', async () => {
+		const mockFetch = vi.fn().mockRejectedValue(new Error('Connection refused'));
+
+		const checker = createOrnithSupportChecker({ fetchFn: mockFetch as any });
+		// Exact substring in passage should still be verified by fallback rule checker
+		const verdict = await checker('The back door was open at nine.', 'The back door was open at nine.');
+
+		expect(verdict).toBe('SUPPORTED');
+	});
+
+	it('evaluateGroundingAsync verifies proposal with model checker', async () => {
+		const mockChecker = vi.fn().mockResolvedValue('SUPPORTED');
+		const result = await evaluateGroundingAsync(build(), snap(), mockChecker);
+
+		expect(result.status).toBe('VERIFIED');
+		expect(result.gates.structural.ok).toBe(true);
+		expect(result.gates.semantic.ok).toBe(true);
+		expect(result.gates.semantic.unsupported).toHaveLength(0);
 	});
 });
 

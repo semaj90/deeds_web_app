@@ -1,13 +1,26 @@
-# OpenCode Context Window Configuration
+# OpenCode / TurboCtx Context Profiles
 
-> **Doc review (2026-09-04):** STALE_BUT_DIRECTIONALLY_RIGHT — the `n_ctx`/launcher mechanism
-> (`scripts/launch-turboquant.ps1`, `/slots`) is still correct, but the `:8090` model identity this
-> doc's config examples name (`gemma4-legal.gguf`) was swapped to `ornith-1.5-9b` per CLAUDE.md's
-> 2026-09-03 "Chat/synthesis model switch" note.
+> **Status:** This file contains historical launcher observations and is not a live runtime
+> receipt. Verify the active model and allocated window from `GET /v1/models` and `GET /slots`
+> before making operational claims. Application budgeting exposes `turbo16k` (16,384 tokens) and
+> `turbo65k` (65,536 tokens).
+
+## TurboCtx summary profiles
+
+| Profile | Budget | Use |
+|---|---:|---|
+| `turbo16k` | 16,384 tokens | Conservative workstation/context budget |
+| `turbo65k` | 65,536 tokens | Extended budget when server and client settings are both verified |
+
+These are application-side budgeting choices, not proof that llama-server allocated that many
+tokens. Keep prompt, retrieved evidence, summary, and completion reserves within the selected
+budget. Summary generation remains bounded and must use validated, source-grounded claims.
 
 ## Problem
 
-OpenCode (antigravity agent) reports 32k context. The actual running llama-server at `:8090` was launched with `n_ctx: 16384` — confirmed via `GET /slots` returning `"n_ctx": 16384`.
+The client context limit, application budget profile, and llama-server allocation are separate
+values. Historical `:8090` observations in this document conflict, so neither is current runtime
+truth without a fresh read-only probe.
 
 ## Two separate caps — both must be set
 
@@ -36,7 +49,7 @@ Compare with `/v1/models` which returns `meta.n_ctx_train: 131072` — that is t
 { "n_ctx": 65536 }
 ```
 
-The server was **not** launched via `launch-turboquant.ps1` (which defaults `-c 65536`). It was started by some other process or shortcut that didn't load `.env` or passed `-c 16384` directly.
+The server was **not** launched via `launch-turboquant.ps1` (which defaults `-c 65536`). It was started by some other process or shortcut that didn't load `.env` or passed a shorter context such as `-c 16384` directly. Treat 16,384 as an explicit short-context run, not the repository default.
 
 `.env` has `TURBO_CTX=65536` and `LLM_CONTEXT_SIZE=65536` — these are correct but only take effect when launching via the script.
 

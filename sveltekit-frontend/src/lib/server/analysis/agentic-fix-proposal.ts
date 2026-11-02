@@ -1,5 +1,8 @@
 import { handleRepairToolCall } from '../../../mcp/tools/repair_tools.js';
 import { recordAgenticProposalEngram } from '../ai/engram-registry.js';
+import { ENV } from '../env.server.js';
+import { runLangExtractProposalObservationV1 } from './langextract-proposal-observation-v1.js';
+import { rankEvidenceNextStepsV1 } from './evidence-next-step-ranker-v1.js';
 
 type ToolJson = Record<string, unknown>;
 
@@ -86,9 +89,10 @@ export interface AgenticFixProposalResult {
   canonicalEnvelope: ToolJson | null;
   suggestions: Array<{
     suggestion: string;
-    successRate: number;
-    similarError: string;
-    relevance: number;
+    state: string;
+    transitionPrior: number;
+    extractionStatus: 'FACTS_RETURNED' | 'NO_FACTS_RETURNED';
+    admission: 'PROPOSAL_ONLY';
   }>;
   proposalMarkdown: string;
 }
@@ -361,20 +365,6 @@ function buildRerankCandidates(
   }));
 }
 
-function topSuggestion(query: string, orderedStates: string[]): Array<{
-  suggestion: string;
-  successRate: number;
-  similarError: string;
-  relevance: number;
-}> {
-  return orderedStates.slice(0, 5).map((state, index) => ({
-    suggestion: `Route ${state} into the ${index + 1}th repair lane and validate dependencies before edits.`,
-    successRate: Math.max(0.35, 0.9 - index * 0.08),
-    similarError: query.slice(0, 120),
-    relevance: Math.max(0.4, 0.95 - index * 0.1),
-  }));
-}
-
 function computeSessionId(query: string, filePath: string | null, clusterId: number | null): string {
   return [
     'agentic-fix-proposal',
@@ -424,8 +414,15 @@ export async function buildAgenticFixProposal(
     canonicalSourceRef: sourceRef,
   });
 
-  const [langextract, hmm, graphrag, rerank, wiki] = await Promise.all([
-    callTool('langextract_extract_error_facts', { text: query, mode: 'error' }),
+  const extractionText = input.rawText?.trim() || input.errorText?.trim() || query;
+  const langextract = await runLangExtractProposalObservationV1({
+    text: extractionText,
+    enabled: ENV.LANGEXTRACT_ENABLED,
+  });
+  const extractedFactCount = langextract.factCount;
+  observedStates.langextract = extractedFactCount > 0;
+
+  const [hmm, graphrag, rerank, wiki] = await Promise.all([
     callTool('hmm_infer_repair_states', {
       observed: observedStates,
       graphFacts,
@@ -463,21 +460,15 @@ export async function buildAgenticFixProposal(
     missingStates,
   });
 
-  const orderedStates = Array.isArray(asJsonPayload(topologicalSort)?.ordered)
-    ? (asJsonPayload(topologicalSort)?.ordered as Array<{ state?: string }>).map((row) => String(row.state ?? '')).filter(Boolean)
-    : missingStates;
-
-  const laneOrder = [
-    'serialization',
-    'encoding',
-    'indexing',
-    'retrieval',
-    'ranking',
-    'ingestion',
-    'repair',
-  ];
-
-  const suggestionRows = topSuggestion(query, orderedStates.length ? orderedStates : laneOrder);
+  const nextSteps = rankEvidenceNextStepsV1({
+    currentState: 'DIAGNOSE',
+    extractedFactCount,
+  });
+  const suggestionRows = nextSteps.map((step) => ({
+    ...step,
+    suggestion: `Propose ${step.state.toLowerCase()} as the next workflow step; independently verify evidence before any action.`,
+  }));
+  const laneOrder = ['serialization', 'encoding', 'indexing', 'retrieval', 'ranking', 'ingestion', 'repair'];
   const proposalMarkdown = [
     `# Agentic Repair Proposal`,
     ``,
@@ -490,15 +481,13 @@ export async function buildAgenticFixProposal(
       .map(([state, present]) => `- ${state}: ${present ? 'present' : 'missing'}`)
       .join('\n'),
     ``,
-    `## Ordered repair lanes`,
-    laneOrder.map((lane, index) => `${index + 1}. ${lane}`).join('\n'),
+    `## HMM next-step advisory`,
+    `Transition priors are hand-authored, not learned probabilities. This ordering is proposal-only and cannot authorize execution or verification.`,
+    ...suggestionRows.map((row, index) => `${index + 1}. ${row.state} (transition prior ${row.transitionPrior}; ${row.extractionStatus}; ${row.admission})`),
     ``,
-    `## Parallel subagents`,
-    `- LangExtract: parse error facts and candidate evidence`,
-    `- HMM: infer missing states and repair dependencies`,
-    `- GraphRAG: expand neighborhood context`,
-    `- Marco rerank: score extracted chunks`,
-    `- Wiki: search adjacent documentation`,
+    `## Evidence and retrieval tools`,
+    `- LangExtract :8095 status: ${langextract.status}; ${extractedFactCount} bounded observations; source identity and canonical claim admission are not established by this proposal pass.`,
+    `- HMM repair-state helper, GraphRAG context, chunk reranking, and wiki lookup are supporting proposal inputs.`,
     ``,
     `## Evidence snapshot`,
     `### LangExtract`,
@@ -522,13 +511,8 @@ export async function buildAgenticFixProposal(
     `## Proposed next actions`,
     ...suggestionRows.map((row, index) => `${index + 1}. ${row.suggestion}`),
     ``,
-    `## Serialization / encoding / indexing / retrieval / ranking / ingestion order`,
-    `1. Serialization — normalize error payloads into immutable JSON packets.`,
-    `2. Encoding — generate tuple-safe provenance and summaries.`,
-    `3. Indexing — persist canonical rows and labels before write-back.`,
-    `4. Retrieval — route exact-match, semantic, Qdrant, and graph hits.`,
-    `5. Ranking — rerank candidate proposals with provenance scores.`,
-    `6. Ingestion — backfill durable stores only after validation passes.`,
+    `## Boundaries`,
+    `The HMM transition prior reranks suggested workflow steps only. It does not rerank canonical search results, prove a LangExtract sidecar call, validate a repair, or authorize writes.`,
   ].join('\n');
 
   const sessionId = computeSessionId(query, filePath, clusterId);

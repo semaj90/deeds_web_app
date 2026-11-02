@@ -283,6 +283,43 @@ describe('miniforge-nlp-sidecar', () => {
       .toBe('SKIPPED_MISSING_EXPLICIT_LINEAGE');
   });
 
+  it('preserves classifier probability maps as pass artifacts while keeping features numeric', async () => {
+    const now = '2026-11-02T01:00:00.000Z';
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({
+      document_id: 'classifier-fixture',
+      source_type: 'codebase', extraction_mode: 'full',
+      entities: [], relationships: [], concepts: [], chunks: [], features: [], metadata: {},
+      capabilities: { spacy: false, langextract: false, tree_sitter: false, ast_grep: false, torch: false },
+      pass_results: [{
+        request_id: 'classifier-fixture', packet_key: 'packet-fixture',
+        source_ref: 'src/fixture.ts', source_revision: 'sha256:source-fixture',
+        workspace_revision: 'sha256:workspace-fixture', family: 'classify',
+        pass_name: 'domain_classifier', pass_revision: 'model-revision-3',
+        backend: 'sklearn-lr', backend_version: '1.7.2', device: 'cpu',
+        input_hash: 'sha256:input', output_hash: 'sha256:output',
+        started_at: now, completed_at: now, status: 'succeeded',
+        features: { logistic_regression_domain_probability: 0.81, cluster_diversity: 0.5 },
+        artifacts: {
+          label: 'software', logistic_regression_label: 'software', model_revision: 'model-revision-3',
+          logistic_regression_domain_probabilities: { software: 0.81, legal: 0.19 },
+        },
+        evidence: [], warnings: [],
+      }],
+    }), { status: 200 }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const result = await createMiniforgeNlpSidecarClient().analyze({
+      text: 'fixture', documentId: 'classifier-fixture', packetKey: 'packet-fixture',
+      sourceRef: 'src/fixture.ts', sourceRevision: 'sha256:source-fixture',
+      workspaceRevision: 'sha256:workspace-fixture',
+    });
+
+    expect(result.pass_results).toHaveLength(1);
+    expect(result.pass_results?.[0].features.logistic_regression_domain_probability).toBe(0.81);
+    expect(result.pass_results?.[0].artifacts.logistic_regression_domain_probabilities)
+      .toEqual({ software: 0.81, legal: 0.19 });
+  });
+
   it('rejects an AST evidence payload whose scan is partial (fail closed)', async () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({
       schema: 'atlas.ast.evidence.v1',

@@ -1,9 +1,12 @@
+import { createHash } from 'node:crypto';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
+import { ENV } from '$lib/server/env.server.js';
 import type { ResourceEnvelopeV1 } from '$lib/server/retrieval/bounded-resolution.js';
 import {
 	selectGraphAlgorithm,
 	type GraphAlgorithmDecisionV1,
-	type GraphExpansionIntent
+	type GraphExpansionIntent,
+	type GraphExpansionBackend
 } from './graph-algorithm-policy.js';
 import { buildGraphAlgorithmExecutionReceiptV1, type GraphAlgorithmExecutionReceiptV1 } from './graph-algorithm-receipt-v1.js';
 
@@ -40,6 +43,7 @@ export interface AtlasGraphEdge {
 }
 
 export type AtlasGraphExpansionStatus = 'PROVEN' | 'BOUNDARY_EXHAUSTED' | 'ALGORITHM_UNAVAILABLE';
+export type AtlasGraphExecutionStatus = 'EXECUTED' | 'UNAVAILABLE' | 'FAILED' | 'BOUNDARY_EXHAUSTED';
 
 export interface AtlasGraphExpandResult {
 	nodes: AtlasGraphNode[];
@@ -50,6 +54,14 @@ export interface AtlasGraphExpandResult {
 	truncated: boolean;
 	reasonCodes: string[];
 	executionReceipt?: GraphAlgorithmExecutionReceiptV1;
+	requestedBackend: GraphExpansionBackend;
+	effectiveBackend: GraphExpansionBackend | null;
+	executionStatus: AtlasGraphExecutionStatus;
+	fallbackReason: string | null;
+	inputSnapshotChecksum: string | null;
+	graphRevision: string | null;
+	ordinalMapChecksum: string | null;
+	outputChecksum: string | null;
 }
 
 const DEFAULT_MAX_NODES = 64;
@@ -98,11 +110,11 @@ function receiptFor(input: AtlasGraphExpandRequest, decision: GraphAlgorithmDeci
 /**
  * Bounded live-graph executor used by atlas.graph.expand.
  *
- * Only plain BFS / reverse-BFS are executable here today. The policy can name
- * richer algorithms so the contract is forward-compatible, but those choices
- * fail closed until a real cuGraph/GDS/temporal executor is wired and parity
- * proven. This prevents an empty or approximate mock from masquerading as a
- * successful graph result.
+ * Only plain BFS / reverse-BFS on Neo4j are executable here today.
+ * If another backend (e.g. cuGraph or temporal_dp) is requested, or an algorithm
+ * other than plain BFS / reverse-BFS is selected, the adapter fails closed
+ * with ALGORITHM_UNAVAILABLE rather than silently executing Neo4j and retaining
+ * an inaccurate backend label.
  */
 export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<AtlasGraphExpandResult> {
 	const envelope = envelopeFor(input);
@@ -120,7 +132,7 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 		hasTarget: Boolean(input.targetPacketKey),
 		gpuAvailable: input.gpuAvailable,
 		frozenSnapshotAvailable: input.frozenSnapshotAvailable,
-		 envelope: { ...envelope, maxGraphHops: maxHops, maxCandidates: maxNodes }
+		envelope: { ...envelope, maxGraphHops: maxHops, maxCandidates: maxNodes }
 	});
 	const executionReceipt = receiptFor(input, decision);
 
@@ -133,11 +145,19 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 			decision,
 			executionReceipt,
 			truncated: true,
-			reasonCodes: [...decision.reasonCodes, 'ZERO_HOP_ENVELOPE']
+			reasonCodes: [...decision.reasonCodes, 'ZERO_HOP_ENVELOPE'],
+			requestedBackend: decision.backend,
+			effectiveBackend: null,
+			executionStatus: 'BOUNDARY_EXHAUSTED',
+			fallbackReason: null,
+			inputSnapshotChecksum: input.graphOrdinalMapChecksum ?? null,
+			graphRevision: input.graphRevision ?? null,
+			ordinalMapChecksum: input.graphOrdinalMapChecksum ?? null,
+			outputChecksum: null
 		};
 	}
 
-	if (!['bfs', 'reverse_bfs'].includes(decision.algorithm)) {
+	if (decision.backend !== 'neo4j' || !['bfs', 'reverse_bfs'].includes(decision.algorithm)) {
 		return {
 			nodes: [],
 			edges: [],
@@ -146,7 +166,15 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 			decision,
 			executionReceipt,
 			truncated: false,
-			reasonCodes: [...decision.reasonCodes, `EXECUTOR_NOT_WIRED:${decision.backend}:${decision.algorithm}`]
+			reasonCodes: [...decision.reasonCodes, `EXECUTOR_NOT_WIRED:${decision.backend}:${decision.algorithm}`],
+			requestedBackend: decision.backend,
+			effectiveBackend: null,
+			executionStatus: 'UNAVAILABLE',
+			fallbackReason: null,
+			inputSnapshotChecksum: input.graphOrdinalMapChecksum ?? null,
+			graphRevision: input.graphRevision ?? null,
+			ordinalMapChecksum: input.graphOrdinalMapChecksum ?? null,
+			outputChecksum: null
 		};
 	}
 
@@ -211,15 +239,48 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 			}
 		}
 
+		const sortedNodes = [...nodeMap.values()].sort((a, b) => a.id.localeCompare(b.id));
+		const sortedEdges = [...edgeMap.values()].sort((a, b) => `${a.from}:${a.type}:${a.to}`.localeCompare(`${b.from}:${b.type}:${b.to}`));
+		const outputChecksum = createHash('sha256')
+			.update(JSON.stringify({ nodes: sortedNodes.map((n) => n.id), edges: sortedEdges }))
+			.digest('hex');
+
 		return {
-			nodes: [...nodeMap.values()].sort((a, b) => a.id.localeCompare(b.id)),
-			edges: [...edgeMap.values()].sort((a, b) => `${a.from}:${a.type}:${a.to}`.localeCompare(`${b.from}:${b.type}:${b.to}`)),
+			nodes: sortedNodes,
+			edges: sortedEdges,
 			hops: observedHops,
 			status: truncated ? 'BOUNDARY_EXHAUSTED' : 'PROVEN',
 			decision,
 			executionReceipt,
 			truncated,
-			reasonCodes: [...decision.reasonCodes, truncated ? 'RESOURCE_BOUNDARY_REACHED' : 'BOUNDED_NEO4J_EXPANSION']
+			reasonCodes: [...decision.reasonCodes, truncated ? 'RESOURCE_BOUNDARY_REACHED' : 'BOUNDED_NEO4J_EXPANSION'],
+			requestedBackend: decision.backend,
+			effectiveBackend: 'neo4j',
+			executionStatus: truncated ? 'BOUNDARY_EXHAUSTED' : 'EXECUTED',
+			fallbackReason: null,
+			inputSnapshotChecksum: input.graphOrdinalMapChecksum ?? null,
+			graphRevision: input.graphRevision ?? null,
+			ordinalMapChecksum: input.graphOrdinalMapChecksum ?? null,
+			outputChecksum
+		};
+	} catch (error) {
+		return {
+			nodes: [],
+			edges: [],
+			hops: 0,
+			status: 'ALGORITHM_UNAVAILABLE',
+			decision,
+			executionReceipt,
+			truncated: false,
+			reasonCodes: [...decision.reasonCodes, `EXECUTION_FAILED:${error instanceof Error ? error.message : String(error)}`],
+			requestedBackend: decision.backend,
+			effectiveBackend: 'neo4j',
+			executionStatus: 'FAILED',
+			fallbackReason: null,
+			inputSnapshotChecksum: input.graphOrdinalMapChecksum ?? null,
+			graphRevision: input.graphRevision ?? null,
+			ordinalMapChecksum: input.graphOrdinalMapChecksum ?? null,
+			outputChecksum: null
 		};
 	} finally {
 		await session.close();

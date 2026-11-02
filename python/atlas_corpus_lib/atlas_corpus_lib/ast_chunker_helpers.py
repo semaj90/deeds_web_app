@@ -340,3 +340,79 @@ def pack_turbovec_mrl128_bytes(values: Iterable[float], bits_per_value: int = 4)
         sign_bitset_128_bit_string=sign_string,
         sign_bitset_sha256=hashlib.sha256(sign_raw).hexdigest(),
     )
+
+
+# ── Svelte 5 Snippet & Render Template Construct Extractor ─────────────────────
+
+_SVELTE_SNIPPET_REGEX = re.compile(
+    r"\{#snippet\s+([a-zA-Z0-9_$]+)\s*(?:\(([\s\S]*?)\))?\s*\}([\s\S]*?)\{/snippet\}"
+)
+_SVELTE_RENDER_REGEX = re.compile(
+    r"\{@render\s+([a-zA-Z0-9_$]+(?:\.[a-zA-Z0-9_$]+|\?\.)*)\s*(?:\(([\s\S]*?)\))?\s*\}"
+)
+
+
+def extract_svelte_template_construct_spans(source: str | bytes) -> list[dict]:
+    """Extracts Svelte 5 snippet and render statements with exact UTF-8 byte spans.
+
+    Returns a list of dicts:
+      - kind: 'snippet' | 'render'
+      - node_type: 'snippet_statement' | 'render_statement'
+      - symbol_name: str
+      - signature: str
+      - start_byte: int
+      - end_byte: int
+      - text: str
+      - metadata: dict
+    """
+    if isinstance(source, bytes):
+        source_text = source.decode("utf-8", errors="replace")
+    else:
+        source_text = source
+
+    results: list[dict] = []
+
+    # 1. Snippets: {#snippet name(params)} ... {/snippet}
+    for m in _SVELTE_SNIPPET_REGEX.finditer(source_text):
+        name = m.group(1)
+        params = (m.group(2) or "").strip()
+        start_byte = len(source_text[: m.start()].encode("utf-8"))
+        end_byte = len(source_text[: m.end()].encode("utf-8"))
+        snippet_text = source_text[m.start() : m.end()]
+        results.append({
+            "kind": "snippet",
+            "node_type": "snippet_statement",
+            "symbol_name": name,
+            "signature": f"{name}({params})" if params else f"{name}()",
+            "start_byte": start_byte,
+            "end_byte": end_byte,
+            "text": snippet_text,
+            "metadata": {
+                "params": params,
+                "construct": "svelte5_snippet",
+            },
+        })
+
+    # 2. Renders: {@render name(args)}
+    for m in _SVELTE_RENDER_REGEX.finditer(source_text):
+        name = m.group(1)
+        args = (m.group(2) or "").strip()
+        start_byte = len(source_text[: m.start()].encode("utf-8"))
+        end_byte = len(source_text[: m.end()].encode("utf-8"))
+        render_text = source_text[m.start() : m.end()]
+        results.append({
+            "kind": "render",
+            "node_type": "render_statement",
+            "symbol_name": name,
+            "signature": f"{name}({args})" if args else f"{name}()",
+            "start_byte": start_byte,
+            "end_byte": end_byte,
+            "text": render_text,
+            "metadata": {
+                "args": args,
+                "construct": "svelte5_render",
+            },
+        })
+
+    results.sort(key=lambda x: x["start_byte"])
+    return results

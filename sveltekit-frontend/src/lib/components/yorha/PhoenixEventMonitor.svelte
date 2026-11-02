@@ -32,7 +32,7 @@
 
   function connectToEvents() {
     try {
-      eventSource = new EventSource('/agentic/events');
+      eventSource = new EventSource('/api/agentic-events');
 
       eventSource.onopen = () => {
         isConnected = true;

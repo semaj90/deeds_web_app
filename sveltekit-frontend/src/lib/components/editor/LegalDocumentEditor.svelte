@@ -10,6 +10,7 @@
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
   import { Textarea } from '$lib/components/ui/textarea';
+  import TipTapEditor from '$lib/components/editor/TipTapEditor.svelte';
 
   // Icons
   interface Props {
@@ -457,12 +458,19 @@ h1 { margin-bottom: 0.5rem; }
                         </div>
                     {/if}
 
-                    <Textarea
-                        bind:value={content}
-                        disabled={readonly}
-                        placeholder="Start typing your legal document here..."
-                        class="w-full h-[600px] resize-none border-0 focus-visible:ring-0 p-4 font-serif text-lg leading-relaxed"
-                    />
+                    <!-- TipTap Rich Legal Editor -->
+                    <div class="tiptap-legal-wrapper p-2">
+                        <TipTapEditor
+                            initialContent={content}
+                            placeholder="Start typing or drafting your legal brief..."
+                            editable={!readonly}
+                            theme="legal"
+                            onUpdate={(html) => {
+                                content = html;
+                                hasUnsavedChanges = true;
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

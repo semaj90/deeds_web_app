@@ -1,6 +1,7 @@
 <!-- DocumentDetails — Document analysis modal with cache-first strategy -->
 <!-- Session 64: Migrated 8 writable stores → $state runes + fixed corrupted template nesting -->
 <script lang="ts">
+	import { Dialog } from 'bits-ui';
 	import { legalDB } from '$lib/db/client-db.js';
 
 	// Svelte 5 props
@@ -185,32 +186,37 @@
 	}
 </script>
 
-<!-- Document Details Panel (YoRHa / Nier Dark Aesthetic) -->
-{#if isVisible}
-	<div class="fixed inset-0 z-[150] flex items-center justify-center p-4">
-		<!-- Backdrop -->
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div 
-			class="absolute inset-0 bg-black/80 backdrop-blur-md" 
-			onclick={onClose}
-		></div>
+<!-- Document Details Panel (YoRHa / Phoenix Justice HUD Aesthetic) -->
+<Dialog.Root open={isVisible} onOpenChange={(open) => { if (!open) onClose(); }}>
+	<Dialog.Portal>
+		<Dialog.Overlay class="dialog-backdrop fixed inset-0 z-[9990] bg-black/80 backdrop-blur-md transition-opacity" />
+		<Dialog.Content
+			class="dialog-content fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9991] w-full max-w-6xl h-[90vh] bg-[#0c0d12]/95 border border-[#2a2e3d] rounded-2xl shadow-2xl flex flex-col overflow-hidden text-neutral-100 font-sans focus:outline-none"
+		>
+			<!-- Tactical Corner Notches -->
+			<span class="hud-notch-tl" aria-hidden="true"></span>
+			<span class="hud-notch-tr" aria-hidden="true"></span>
+			<span class="hud-notch-bl" aria-hidden="true"></span>
+			<span class="hud-notch-br" aria-hidden="true"></span>
 
-		<!-- Modal Container -->
-		<div class="relative w-full max-w-6xl h-[90vh] bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+			<!-- Gold Top Highlight -->
+			<div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#f3d471] to-transparent opacity-80" aria-hidden="true"></div>
+
 			<!-- Header -->
-			<header class="h-16 border-b border-neutral-800 flex items-center justify-between px-6 bg-neutral-950/50">
+			<header class="h-16 border-b border-[#2a2e3d] flex items-center justify-between px-6 bg-[#12141c]/90 flex-shrink-0">
 				<div class="flex items-center gap-4">
-					<div class="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+					<div class="h-10 w-10 rounded-lg bg-[#f3d471]/10 border border-[#f3d471]/30 flex items-center justify-center text-[#f3d471]">
 						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
 					</div>
 					<div>
-						<h2 class="text-sm font-bold uppercase tracking-widest text-neutral-100">Document Analysis</h2>
-						<p class="text-[10px] text-neutral-500 font-mono uppercase">
+						<Dialog.Title class="text-sm font-bold uppercase tracking-widest text-[#f3d471] flex items-center gap-2">
+							<span>§</span> Document Analysis
+						</Dialog.Title>
+						<p class="text-[10px] text-neutral-400 font-mono uppercase">
 							{#if loadingSource === 'cache'}
-								<span class="text-emerald-400">CACHE HIT</span> ({formatDuration(cacheHitTime)})
+								<span class="text-emerald-400 font-bold">CACHE HIT</span> ({formatDuration(cacheHitTime)})
 							{:else if loadingSource === 'server'}
-								<span class="text-sky-400">SERVER FETCH</span>
+								<span class="text-[#f3d471] font-bold">SERVER FETCH</span>
 							{:else if documentData}
 								ID: {documentId.slice(0, 12)}...
 							{:else}
@@ -221,12 +227,12 @@
 				</div>
 
 				<div class="flex items-center gap-2">
-					<button
-						onclick={onClose}
-						class="h-8 w-8 flex items-center justify-center rounded-full hover:bg-neutral-800 text-neutral-400 hover:text-white transition-all" aria-label="Close document details"
+					<Dialog.Close
+						class="h-8 w-8 flex items-center justify-center rounded-lg bg-neutral-800/60 border border-neutral-700/50 hover:bg-neutral-700/60 hover:border-[#f3d471]/50 text-neutral-400 hover:text-white transition-all cursor-pointer focus:outline-none"
+						aria-label="Close document details"
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-					</button>
+					</Dialog.Close>
 				</div>
 			</header>
 
@@ -438,9 +444,9 @@
 					</div>
 				</div>
 			{/if}
-		</div>
-	</div>
-{/if}
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
 <style>
 	/* Custom scrollbar for premium feel */
@@ -457,5 +463,41 @@
 	.scrollbar-thin::-webkit-scrollbar-thumb:hover {
 		background: #404040;
 	}
+
+	.hud-notch-tl,
+	.hud-notch-tr,
+	.hud-notch-bl,
+	.hud-notch-br {
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		pointer-events: none;
+		z-index: 10;
+	}
+	.hud-notch-tl {
+		top: 3px;
+		left: 3px;
+		border-top: 2px solid #f3d471;
+		border-left: 2px solid #f3d471;
+	}
+	.hud-notch-tr {
+		top: 3px;
+		right: 3px;
+		border-top: 2px solid #f3d471;
+		border-right: 2px solid #f3d471;
+	}
+	.hud-notch-bl {
+		bottom: 3px;
+		left: 3px;
+		border-bottom: 2px solid #f3d471;
+		border-left: 2px solid #f3d471;
+	}
+	.hud-notch-br {
+		bottom: 3px;
+		right: 3px;
+		border-bottom: 2px solid #f3d471;
+		border-right: 2px solid #f3d471;
+	}
+
 </style>
 
