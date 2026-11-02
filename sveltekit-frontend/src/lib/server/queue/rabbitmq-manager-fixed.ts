@@ -138,7 +138,23 @@ export class RabbitMQManager extends EventEmitter {
     });
   }
 
+  private initPromise: Promise<boolean> | null = null;
+
+  /**
+   * Idempotent: a live, initialized manager returns immediately and concurrent
+   * callers share one run. Without this, every dev reload opened a new
+   * connection/channel set until the broker answered "No channels left to allocate".
+   */
   async initialize(): Promise<boolean> {
+    if (this.isInitialized && this.connection && this.channel) return true;
+    if (this.initPromise) return this.initPromise;
+    this.initPromise = this.runInitialize().finally(() => {
+      this.initPromise = null;
+    });
+    return this.initPromise;
+  }
+
+  private async runInitialize(): Promise<boolean> {
     try {
       this.isShuttingDown = false;
       await this.loadServices();
@@ -246,6 +262,17 @@ export class RabbitMQManager extends EventEmitter {
       throw new Error('RabbitMQ connection not available');
     }
 
+    // Release the channel being replaced; the broker may already have closed it.
+    const previous = this.channel;
+    this.channel = null;
+    if (previous) {
+      try {
+        await previous.close();
+      } catch {
+        /* already closed */
+      }
+    }
+
     const channel = await this.connection.createChannel();
     this.attachChannelListeners(channel);
     this.channel = channel;
@@ -291,6 +318,17 @@ export class RabbitMQManager extends EventEmitter {
             connect?(...a: unknown[]): Promise<unknown>;
           }
         ).default?.connect ?? (amqp as { connect?(...a: unknown[]): Promise<unknown> }).connect;
+      // Re-initialize after a lost connection: drop the stale handles first.
+      const stale = this.connection;
+      this.connection = null;
+      this.channel = null;
+      if (stale) {
+        try {
+          await stale.close();
+        } catch {
+          /* already closed */
+        }
+      }
       this.connection = (await connect(this.url)) as AmqpConnection;
       this.channel = await this.connection.createChannel();
       this.attachChannelListeners(this.channel);
@@ -301,10 +339,12 @@ export class RabbitMQManager extends EventEmitter {
         if (this.shouldSilenceError(message)) return;
 
         console.error('❌ RabbitMQ connection error:', message);
+        this.isInitialized = false;
         this.emit('connection_lost');
       });
       this.connection.on('close', () => {
         if (this.isShuttingDown) return;
+        this.isInitialized = false;
         this.emit('connection_lost');
       });
 

@@ -46,3 +46,45 @@ describe('RabbitMQManager dev-reload noise guards', () => {
     warnSpy.mockRestore();
   });
 });
+
+describe('RabbitMQManager initialize() idempotency', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.restoreAllMocks();
+  });
+
+  async function stubbedManager() {
+    const { RabbitMQManager } = await import('./rabbitmq-manager-fixed.js');
+    const manager = new RabbitMQManager() as any;
+    const connect = vi.fn(async () => {
+      manager.connection = { close: vi.fn(async () => {}) };
+      manager.channel = { close: vi.fn(async () => {}) };
+    });
+    manager.loadServices = vi.fn(async () => {});
+    manager.connect = connect;
+    manager.setupInfrastructure = vi.fn(async () => {});
+    manager.startConsumers = vi.fn(async () => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    return { manager, connect };
+  }
+
+  it('opens one connection for concurrent and repeated calls', async () => {
+    const { manager, connect } = await stubbedManager();
+
+    const results = await Promise.all([manager.initialize(), manager.initialize()]);
+    await manager.initialize();
+
+    expect(results).toEqual([true, true]);
+    expect(connect).toHaveBeenCalledTimes(1);
+  });
+
+  it('reconnects after the connection is marked lost', async () => {
+    const { manager, connect } = await stubbedManager();
+
+    await manager.initialize();
+    manager.isInitialized = false; // what the connection close/error handlers now do
+    await manager.initialize();
+
+    expect(connect).toHaveBeenCalledTimes(2);
+  });
+});
