@@ -13,7 +13,8 @@
  *   --batch=<n>      Process at most n ready tasks (default: 5)
  *   --daemon         Run continuously in background polling loop
  *   --poll-ms=<ms>   Polling interval in daemon mode (default: 5000)
- *   --dry-run        Don't actually execute commands, simulate success
+ *   --cohort=<id>    Required OpenSpec feature cohort (openspec:<change>)
+ *   --plan-only      Read ready tasks in a read-only transaction
  */
 
 import { execSync } from 'node:child_process';
@@ -22,31 +23,45 @@ import fs from 'node:fs';
 import path from 'node:path';
 import postgres from 'postgres';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { buildKanbanReadyTaskPlanV1 } from './kanban-ready-task-plan-v1.mjs';
 
 const args = process.argv.slice(2);
-const DRY_RUN = args.includes('--dry-run');
+const PLAN_ONLY = args.includes('--plan-only');
 const DAEMON = args.includes('--daemon');
 
 const batchArg = args.find((a) => a.startsWith('--batch='));
 const BATCH_SIZE = batchArg ? parseInt(batchArg.split('=')[1], 10) : 5;
+const cohortArg = args.find((a) => a.startsWith('--cohort='));
+const COHORT = cohortArg?.slice('--cohort='.length);
 
 const pollArg = args.find((a) => a.startsWith('--poll-ms='));
 const POLL_MS = pollArg ? parseInt(pollArg.split('=')[1], 10) : 5000;
 
+if (args.includes('--dry-run')) {
+  console.error('LEGACY_DRY_RUN_DISABLED: it claims tasks and simulates completion; use --plan-only for a read-only preview.');
+  process.exit(2);
+}
+if (!Number.isInteger(BATCH_SIZE) || BATCH_SIZE < 1 || BATCH_SIZE > 25) {
+  console.error('BATCH_SIZE_OUT_OF_RANGE: expected an integer from 1 through 25.');
+  process.exit(2);
+}
+if (typeof COHORT !== 'string' || !/^openspec:[a-z0-9][a-z0-9._-]*$/.test(COHORT)) {
+  console.error('COHORT_REQUIRED_OR_INVALID: pass --cohort=openspec:<change>.');
+  process.exit(2);
+}
+
 const WORKER_ID = `dispatcher-${process.pid}-${crypto.randomBytes(4).toString('hex')}`;
 
-async function dispatchBatch(sql, batchSize) {
-  const runId = `run-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
-  
-  // 1. Discover ready tasks whose dependencies are all completed
-  const readyTasks = await sql`
+async function selectReadyTasks(sql, batchSize, cohort) {
+  return sql`
     SELECT t.task_id, t.feature_id, t.feature_label, t.lane, t.status, t.priority, t.validation_command, t.max_retries, t.attempt_count
     FROM kanban_tasks t
     WHERE t.status IN ('pending', 'todo')
       AND t.lane = 'todo'
+      AND t.feature_id = ${cohort}
       AND (t.claim_token IS NULL OR t.claim_expires_at < NOW())
       AND NOT EXISTS (
-        SELECT 1 
+        SELECT 1
         FROM kanban_task_dependencies d
         JOIN kanban_tasks p ON p.task_id = d.parent_task_id
         WHERE d.child_task_id = t.task_id
@@ -55,6 +70,11 @@ async function dispatchBatch(sql, batchSize) {
     ORDER BY t.priority ASC, t.created_at ASC
     LIMIT ${batchSize};
   `;
+}
+
+async function dispatchBatch(sql, batchSize, cohort) {
+  const runId = `run-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`;
+  const readyTasks = await selectReadyTasks(sql, batchSize, cohort);
 
   if (readyTasks.length === 0) {
     return { runId, processed: 0, completed: 0, failed: 0 };
@@ -109,7 +129,7 @@ async function dispatchBatch(sql, batchSize) {
     let failureKind = null;
     let stdoutSnippet = '';
 
-    if (task.validation_command && !DRY_RUN) {
+    if (task.validation_command) {
       try {
         console.log(`[${WORKER_ID}] Running validation command for ${task.task_id}: ${task.validation_command.slice(0, 80)}...`);
         // If it is a SQL query vs shell command
@@ -134,7 +154,7 @@ async function dispatchBatch(sql, batchSize) {
       }
     } else {
       // Dry-run / structural verification
-      stdoutSnippet = DRY_RUN ? 'DRY_RUN_ASSERTION_PASS' : 'DEFAULT_PRECONDITION_MET';
+      stdoutSnippet = 'DEFAULT_PRECONDITION_MET';
     }
 
     const receiptId = `receipt-${runId}-${task.task_id.slice(-8)}`;
@@ -238,11 +258,21 @@ async function main() {
   const sql = postgres(dbUrl, { max: 2 });
 
   try {
+    if (PLAN_ONLY) {
+      if (DAEMON) throw new Error('PLAN_ONLY_CANNOT_RUN_AS_DAEMON');
+      const plan = await sql.begin(async (tx) => {
+        await tx`SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY`;
+        const rows = await selectReadyTasks(tx, BATCH_SIZE, COHORT);
+        return buildKanbanReadyTaskPlanV1(rows, BATCH_SIZE, COHORT);
+      });
+      console.log(JSON.stringify(plan, null, 2));
+      return;
+    }
     if (DAEMON) {
       console.log(`Daemon mode active. Polling every ${POLL_MS}ms. Press Ctrl+C to stop.`);
       while (true) {
         try {
-          const res = await dispatchBatch(sql, BATCH_SIZE);
+          const res = await dispatchBatch(sql, BATCH_SIZE, COHORT);
           if (res.processed > 0) {
             console.log(`[${WORKER_ID}] Batch completed: ${res.completed} ok, ${res.failed} failed.`);
           }
@@ -253,7 +283,7 @@ async function main() {
       }
     } else {
       // Single batch execution
-      const res = await dispatchBatch(sql, BATCH_SIZE);
+      const res = await dispatchBatch(sql, BATCH_SIZE, COHORT);
       console.log(`Execution finished: processed ${res.processed}, completed ${res.completed}, failed ${res.failed}.`);
       
       const receiptPath = path.join(REPO_ROOT, 'docs', 'reports', 'kanban-autonomous-dispatcher-receipt.json');
