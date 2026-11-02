@@ -152,3 +152,16 @@ describe('RabbitMQManager lifecycle hardening (fake AMQP, no broker)', () => {
     expect(a).toBe(b);
   });
 });
+
+describe('RabbitMQManager endpoint description', () => {
+  it('reports host and port without credentials', async () => {
+    vi.resetModules();
+    const { RabbitMQManager } = await import('./rabbitmq-manager-fixed.js');
+    const manager = new RabbitMQManager() as any;
+    manager.url = 'amqp://legal_admin:s3cret@127.0.0.1:5673';
+    expect(manager.describeEndpoint()).toBe('127.0.0.1:5673');
+    expect(manager.describeEndpoint()).not.toMatch(/s3cret|legal_admin/);
+    manager.url = 'not a url';
+    expect(manager.describeEndpoint()).toBe('unparseable RABBITMQ_URL');
+  });
+});

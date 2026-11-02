@@ -326,6 +326,16 @@ export class RabbitMQManager extends EventEmitter {
     }
   }
 
+  /** host:port only, never credentials. Tells which broker (Docker :5673 vs native :5672) is in use. */
+  private describeEndpoint(): string {
+    try {
+      const u = new URL(String(this.url));
+      return `${u.hostname}:${u.port || '5672'}`;
+    } catch {
+      return 'unparseable RABBITMQ_URL';
+    }
+  }
+
   private async connect(): Promise<void> {
     try {
       const amqp = await import('amqplib');
@@ -366,7 +376,7 @@ export class RabbitMQManager extends EventEmitter {
         this.emit('connection_lost');
       });
 
-      console.log('✅ RabbitMQ connected');
+      console.log(`✅ RabbitMQ connected (${this.describeEndpoint()})`);
     } catch (error) {
       const message = this.formatError(error);
       if (this.shouldSilenceError(message)) return;
