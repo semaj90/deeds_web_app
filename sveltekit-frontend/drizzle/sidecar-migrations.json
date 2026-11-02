@@ -2,6 +2,13 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261101_atlas_tool_manifest_vectors_v1.sql",
+      "status": "active_candidate",
+      "reason": "Dedicated pgvector table atlas_tool_manifest_vectors_v1 for MCP tool manifests and exact/HNSW vector cosine tool selection (AFC-E2E-97).",
+      "appliedBy": "operator-approved-candidate",
+      "requiresJournalEntry": false
+    },
+    {
       "file": "manual/20261031_pgvector_mrl_latent_kmeans_knn.sql",
       "status": "active_candidate",
       "reason": "Lock PostgreSQL 18 pgvector to EmbeddingGemma 768 + MRL (512/256/128) + PyTorch Latent (256/128/64) + KMeans Centroid Top-K KNN routing.",
