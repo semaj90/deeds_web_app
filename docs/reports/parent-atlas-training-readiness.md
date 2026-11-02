@@ -3,6 +3,15 @@
 Generated: 2026-11-02T00:27:11.668Z
 Overall: READY_WITH_BLOCKERS
 
+## Executive Summary
+
+- Snapshot: 2026-11-02T00:27:11.668Z; these are recorded counts, not a live refresh.
+- Packets: 61,718 total; summaries 6,886 (11.1572%), versus the 95% summary gate.
+- Embeddings: 61,659 of 61,718 (99.9044%); feature labels 61,660 of 61,718.
+- AST: active-code gate PASS (96.3061% (9125/9475) [raw: 62.0629%]); raw corpus coverage 62.0629%.
+- QLoRA dataset: blocked; summary FAIL and AST PASS. This is dataset readiness, not proof a training run completed.
+- JEPA: BLOCKED — evaluation missing. Missing evaluation is not a failed benchmark.
+
 ## Promotion Decisions
 
 - arrow_batch_export: PASS
@@ -37,8 +46,8 @@ Overall: READY_WITH_BLOCKERS
 - Arrow IPC batch transport: PROVEN - 200-row file round-trip with identity/vector checks
 - HyperRAG MsgPack/mmap hot packet path: PROVEN_BOUNDED - bounded materializer dry-run/apply evidence; not a full-corpus promotion
 - tree_node_id fan-out: PROVEN_BOUNDED - Qdrant direct payload readback plus Neo4j HAS_TREE_NODE graphify
-- QLoRA semantic training corpus: WIRED_BLOCKED - labels are complete; summaries and AST evidence remain incomplete
-- Packet-JEPA: PROVEN_NOT_PROMOTED - held-out MRR and NDCG@10 do not beat baseline
+- QLoRA semantic training corpus: WIRED_BLOCKED - summary gate FAIL (11.1572%); active-code AST gate PASS (96.3061% (9125/9475) [raw: 62.0629%]). Dataset readiness does not prove training completion.
+- Packet-JEPA: BLOCKED - evaluation missing; an absent evaluation is blocked/unverified, not a measured regression.
 - native CUDA addon: PROVEN - native addon smoke result
 - Python CUDA / RAPIDS topology workers: PROVEN - repo venv remains CPU-only; RAPIDS stays WSL2-targeted
 

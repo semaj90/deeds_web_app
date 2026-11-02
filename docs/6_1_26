@@ -27,7 +27,7 @@ The WebGPU → WASM SIMD → CPU fallback ladder means it degrades gracefully on
 Legal sensitivity benefit: some queries never leave the device at all.
 TurboQuant llama-server on RTX 3060 Ti
 
-65K context at q8_0/turbo3 in 8GB VRAM that would OOM at f16. The asymmetric K=q8_0, V=turbo3 is the key — you get long-context legal document reasoning that a stock Ollama instance can't do at this VRAM budget.
+Historical configuration note: 65K context with K=q8_0 and V=turbo3 was the intended long-context profile. Treat the VRAM comparison in this note as an estimate, not a measured capacity guarantee. The current launcher default is 65,536; 16,384 is an explicit short-context experiment, not the default. Verify the running server's `/slots` before describing its active context.
 Qdrant + pgvector dual-write
 
 ANN search at <10ms for 35K+ chunks via Qdrant, with Postgres as the authoritative mirror. If Qdrant goes down, the mirror keeps API routes alive in degraded mode.

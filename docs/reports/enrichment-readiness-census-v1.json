@@ -117,5 +117,5 @@
     "existingFailure": "a shared placeholder vector was stored for packets with no summary (July 20-21 run), making embedding presence meaningless",
     "wiring": "not yet wired; graphify-langgraph-pipeline.mjs has uncommitted edits by another session, so the gate is specified as a task, not patched here"
   },
-  "generatedAt": "2026-09-25T21:38:10.742Z"
+  "generatedAt": "2026-11-02T04:57:50.364Z"
 }
