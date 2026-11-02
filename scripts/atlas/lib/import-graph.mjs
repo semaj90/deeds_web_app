@@ -10,7 +10,19 @@ const IMPORT_PATTERNS = [
 
 const EXTENSIONS = ['.ts','.mts','.cts','.js','.mjs','.cjs','.svelte','.json'];
 
-function candidates(sourcePath, spec) {
+// aliases: optional [{ prefix: '$lib/', target: 'sveltekit-frontend/src/lib/' }] (repo-relative, trailing slash).
+// Default is no aliases, so existing callers keep their current edges.
+function candidates(sourcePath, spec, aliases = []) {
+  const alias = aliases.find((a) => spec.startsWith(a.prefix));
+  if (alias) {
+    const raw = path.posix.normalize(alias.target + spec.slice(alias.prefix.length));
+    const out = [raw];
+    if (!path.posix.extname(raw)) {
+      for (const ext of EXTENSIONS) out.push(raw + ext);
+      for (const ext of EXTENSIONS) out.push(path.posix.join(raw, 'index' + ext));
+    }
+    return out;
+  }
   if (!(spec.startsWith('.') || spec.startsWith('/'))) return [];
   const sourceDir = path.posix.dirname(sourcePath);
   const raw = path.posix.normalize(path.posix.join(sourceDir, spec));
@@ -22,7 +34,7 @@ function candidates(sourcePath, spec) {
   return out;
 }
 
-export function buildImportGraph(files) {
+export function buildImportGraph(files, { aliases = [] } = {}) {
   const byPath = new Map(files.map((f) => [f.path, f]));
   const edges = [];
   const externalImports = new Map();
@@ -38,11 +50,11 @@ export function buildImportGraph(files) {
     }
     for (const spec of specs) {
       let target = null;
-      for (const candidate of candidates(file.path, spec)) {
+      for (const candidate of candidates(file.path, spec, aliases)) {
         if (byPath.has(candidate)) { target = candidate; break; }
       }
       if (target) edges.push({ from: file.path, to: target, relation: 'imports' });
-      else if (!spec.startsWith('.') && !spec.startsWith('/')) {
+      else if (!spec.startsWith('.') && !spec.startsWith('/') && !aliases.some((a) => spec.startsWith(a.prefix))) {
         externalImports.set(spec, (externalImports.get(spec) ?? 0) + 1);
       }
     }
