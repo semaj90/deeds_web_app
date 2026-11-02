@@ -4,6 +4,7 @@
 	import GlossaryTermCard from '$lib/components/legal/GlossaryTermCard.svelte';
 
 	let { data }: { data: PageData } = $props();
+	let terms = $derived(Array.isArray(data?.terms) ? data.terms : []);
 
 	let searchQ = $state('');
 	let activeCategory = $state('all');
@@ -29,7 +30,7 @@
 
 	const filteredTerms = $derived.by(() => {
 		if (searchQ.trim() && searchResults.length > 0) return searchResults;
-		return data.terms.filter((t) => {
+		return terms.filter((t) => {
 			if (activeCategory !== 'all' && t.category !== activeCategory) return false;
 			if (searchQ.trim()) {
 				const q = searchQ.toLowerCase();
@@ -82,11 +83,11 @@
 	});
 
 	const uniqueSourceCount = $derived.by(
-		() => new Set(data.terms.flatMap((term) => term.sources)).size
+		() => new Set(terms.flatMap((term) => term.sources)).size
 	);
 
 	const uniqueCategoryCount = $derived.by(
-		() => new Set(data.terms.map((term) => term.category ?? 'general')).size
+		() => new Set(terms.map((term) => term.category ?? 'general')).size
 	);
 
 	const executiveSummary = $derived.by(() => {
@@ -109,7 +110,7 @@
 	});
 
 	const heroStats = $derived.by(() => [
-		{ label: 'Glossary Terms', value: data.terms.length, icon: 'book-open' },
+		{ label: 'Glossary Terms', value: terms.length, icon: 'book-open' },
 		{ label: 'Corpus Excerpts', value: data.corpusDefinitions.length, icon: 'file-text' },
 		{ label: 'Source Titles', value: uniqueSourceCount, icon: 'library-big' },
 	]);
@@ -181,8 +182,8 @@
 	};
 
 	$effect(() => {
-		if (!selectedTerm && data.terms.length > 0) {
-			selectedTerm = data.terms[0];
+		if (!selectedTerm && terms.length > 0) {
+			selectedTerm = terms[0];
 		}
 	});
 
@@ -218,7 +219,7 @@
 	}
 
 	function selectTerm(term: (typeof data.terms)[0] | SearchResult) {
-		const full = data.terms.find((t) => t.id === term.id) ?? term as never;
+		const full = terms.find((t) => t.id === term.id) ?? term as never;
 		selectedTerm = full;
 		activeTab = 'summary';
 	}
@@ -397,7 +398,7 @@
 											variant="light"
 											selected={selectedTerm?.id === term.id}
 											onSelect={(id) => {
-												const found = data.terms.find((t) => t.id === id);
+								const found = terms.find((t) => t.id === id);
 												if (found) selectTerm(found);
 											}}
 										/>
@@ -571,7 +572,7 @@
 									{#if selectedTerm.relatedTerms.length > 0}
 										<div class="mt-4 flex flex-wrap gap-2">
 											{#each selectedTerm.relatedTerms as related}
-												{@const found = data.terms.find((t) => t.term.toLowerCase() === related.toLowerCase())}
+								{@const found = terms.find((t) => t.term.toLowerCase() === related.toLowerCase())}
 												{#if found}
 													<button
 														onclick={() => selectTerm(found)}

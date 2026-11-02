@@ -47,6 +47,7 @@ import { argv, cwd } from 'process';
 import { createHash } from 'crypto';
 import { createRequire } from 'module';
 import { join } from 'path';
+import { requireNonEmptyEmbeddingTextV1 } from './lib/embedding-input-guard-v1.mjs';
 
 const require = createRequire(import.meta.url);
 
@@ -175,6 +176,12 @@ function validSummary(summary) {
 }
 
 async function callEmbeddingGemma(text) {
+  try {
+    requireNonEmptyEmbeddingTextV1(text, 'codebase_chunk_index.summary');
+  } catch (error) {
+    console.error(`Summary embedding skipped: ${error.message}`);
+    return null;
+  }
   // Try Bifrost L1/L2 cache first
   const cacheKey = `embedding:${sha256(text)}`;
   const cached = await redis.get(cacheKey);
@@ -279,7 +286,7 @@ async function stage2SummaryEmbedding(summaryCount) {
   const result = await db.query(`
     SELECT id, summary
     FROM codebase_chunk_index
-    WHERE summary IS NOT NULL AND summary != ''
+    WHERE summary IS NOT NULL AND BTRIM(summary) <> ''
     AND summary_embedding IS NULL
     LIMIT $1
   `, [LIMIT || 40754]);

@@ -8,6 +8,7 @@ test('line classification: direct endpoints vs the app internal route vs comment
   assert.equal(classifyLine("const r = await fetch(`${OLLAMA}/api/embeddings`, {})"), 'DIRECT_API_EMBED');
   assert.equal(classifyLine("await fetch('http://127.0.0.1:8081/v1/embeddings')"), 'V1_EMBEDDINGS');
   assert.equal(classifyLine("await fetch('/api/embed', { method: 'POST' })"), 'INTERNAL_ROUTE');
+  assert.equal(classifyLine("const EMBED_ROUTE = '/api/embed';"), 'INTERNAL_ROUTE');
   assert.equal(classifyLine('// calls /api/embeddings in the old path'), null);
   assert.equal(classifyLine(' * POST /v1/embeddings'), null);
   assert.equal(classifyLine('const x = 1;'), null);

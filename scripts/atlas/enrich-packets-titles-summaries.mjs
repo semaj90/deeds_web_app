@@ -25,6 +25,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
+import { isValidEmbeddingVectorV1, requireNonEmptyEmbeddingTextV1 } from './lib/embedding-input-guard-v1.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const __root = resolve(__dirname, '../../..');
@@ -211,7 +212,12 @@ function validatePackets(packets) {
 // ============================================================================
 
 async function embedText(text) {
-  if (!text) return null;
+  try {
+    requireNonEmptyEmbeddingTextV1(text, 'packet title and summary');
+  } catch (err) {
+    console.warn('[EmbeddingGemma] Skipping invalid input:', err.message);
+    return null;
+  }
 
   try {
     const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
@@ -226,7 +232,11 @@ async function embedText(text) {
 
     if (!res.ok) throw new Error(`Ollama: ${res.status}`);
     const data = await res.json();
-    return data.embedding || null;
+    const vector = data.embedding;
+    if (!isValidEmbeddingVectorV1(vector)) {
+      throw new Error('Invalid EmbeddingGemma vector; expected 768 finite values');
+    }
+    return vector;
   } catch (err) {
     console.warn('[EmbeddingGemma] Error:', err.message);
     return null;
@@ -264,20 +274,25 @@ async function batchEmbedTexts(texts) {
 // ============================================================================
 
 async function upsertToQdrant(packets, embeddings) {
-  if (!packets.length) return { upsertsAttempted: 0, upsertsSucceeded: 0 };
+  if (!packets.length) return { upsertsAttempted: 0, upsertsSucceeded: 0, skippedInvalidEmbedding: 0 };
 
   let upsertsAttempted = 0;
   let upsertsSucceeded = 0;
+  let skippedInvalidEmbedding = 0;
 
   for (let i = 0; i < packets.length; i += QDRANT_BATCH_SIZE) {
     const batch = packets.slice(i, i + QDRANT_BATCH_SIZE);
     const batchEmbeds = embeddings.slice(i, i + QDRANT_BATCH_SIZE);
 
-    const points = batch.map((packet, idx) => ({
+    const points = batch.flatMap((packet, idx) => {
+      const vector = batchEmbeds[idx];
+      if (!isValidEmbeddingVectorV1(vector)) {
+        skippedInvalidEmbedding += 1;
+        return [];
+      }
+      return [{
       id: packet.id,
-      vector: {
-        content: batchEmbeds[idx] || [] // fallback empty vector
-      },
+      vector: { content: vector },
       payload: {
         packet_key: packet.packet_key,
         source_ref: packet.source_ref,
@@ -289,7 +304,10 @@ async function upsertToQdrant(packets, embeddings) {
         content: packet.content?.substring(0, 500) || '',
         metadata: packet.metadata
       }
-    }));
+      }];
+    });
+
+    if (!points.length) continue;
 
     try {
       const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points?wait=true`, {
@@ -302,9 +320,9 @@ async function upsertToQdrant(packets, embeddings) {
       });
 
       if (res.ok) {
-        upsertsSucceeded += batch.length;
+        upsertsSucceeded += points.length;
         if (verbose) {
-          console.log(`[Qdrant] Upserted ${batch.length} points`);
+          console.log(`[Qdrant] Upserted ${points.length} points`);
         }
       } else {
         console.warn(`[Qdrant] Upsert failed: ${res.status} ${res.statusText}`);
@@ -313,10 +331,10 @@ async function upsertToQdrant(packets, embeddings) {
       console.warn('[Qdrant] Upsert error:', err.message);
     }
 
-    upsertsAttempted += batch.length;
+    upsertsAttempted += points.length;
   }
 
-  return { upsertsAttempted, upsertsSucceeded };
+  return { upsertsAttempted, upsertsSucceeded, skippedInvalidEmbedding };
 }
 
 // ============================================================================

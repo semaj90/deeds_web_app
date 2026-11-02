@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
 	embedTextWithResult: vi.fn(),
+  runEmbedding: vi.fn(),
   acquireGpuLease: vi.fn(),
   rateCheck: vi.fn(),
 }));
@@ -11,7 +12,7 @@ vi.mock('$lib/server/inference/gpu-arbiter.js', () => ({ acquireGpuLease: mocks.
 vi.mock('$lib/server/middleware/rate-limiter.js', () => ({
   embedRateLimiter: { check: mocks.rateCheck },
 }));
-vi.mock('$lib/server/ai/onnx-server.js', () => ({ runEmbedding: vi.fn() }));
+vi.mock('$lib/server/ai/onnx-server.js', () => ({ runEmbedding: mocks.runEmbedding }));
 vi.mock('$lib/server/observability/langfuse.js', () => ({ traceEmbedding: vi.fn() }));
 vi.mock('$lib/server/embedding/embedding-provider-v1.js', () => ({
   resolveEmbeddingProviderV1: () => ({ provider: 'ollama' }),
@@ -69,6 +70,20 @@ describe('/api/embed task recipes', () => {
 				vectorChecksum: expect.stringMatching(/^sha256:[a-f0-9]{64}$/),
 			},
 		});
+  });
+
+  it.each([
+    { text: '' },
+    { text: ' \t\n ' },
+    { text: ' \t\n ', taskMode: 'retrieval_query' },
+    { text: ' \t\n ', model: 'mock' },
+  ])('rejects blank request input before acquiring resources: $text', async (body) => {
+    const response = await post(body);
+
+    expect(response.status).toBe(400);
+    expect(mocks.acquireGpuLease).not.toHaveBeenCalled();
+    expect(mocks.embedTextWithResult).not.toHaveBeenCalled();
+    expect(mocks.runEmbedding).not.toHaveBeenCalled();
   });
 
   it('labels an explicitly selected unprompted legacy recipe', async () => {

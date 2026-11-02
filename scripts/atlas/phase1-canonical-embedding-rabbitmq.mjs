@@ -24,6 +24,7 @@
  */
 
 import pg from 'pg';
+import { isNonRetryableEmbeddingInputErrorV1, requireNonEmptyEmbeddingTextV1 } from './lib/embedding-input-guard-v1.mjs';
 import { createRequire } from 'module';
 import { argv } from 'process';
 import { createHash } from 'crypto';
@@ -166,8 +167,10 @@ async function callOllamaEmbedding(text, verbose = false) {
 // ── Provider Priority: ONNX → Ollama ──────────────────────────────────────────
 
 async function callEmbedWithProvider(text, verbose = false) {
-  if (!text || text.length < 5) {
-    if (verbose) log(`  ℹ️  Skipping short summary (${text?.length || 0} chars)`);
+  try {
+    requireNonEmptyEmbeddingTextV1(text, 'atlas_packets.summary');
+  } catch (error) {
+    log(`  ⛔ ${error.message}`);
     return null;
   }
 
@@ -422,6 +425,8 @@ async function enqueueJobs() {
       SELECT packet_id, packet_key, summary
       FROM atlas_packets
       WHERE embedding IS NULL
+        AND summary IS NOT NULL
+        AND BTRIM(summary) <> ''
       ORDER BY created_at DESC
       LIMIT $1
     `, [LIMIT || 7232]);
@@ -501,7 +506,8 @@ async function startWorker() {
 
       try {
         const job = JSON.parse(msg.content.toString());
-        const { packet_id, packet_key, summary } = job;
+        const { packet_id, packet_key, summary: rawSummary } = job;
+        const summary = requireNonEmptyEmbeddingTextV1(rawSummary, `packet ${packet_key ?? packet_id}`);
 
         // Call embedding endpoint (verbose on first 3 jobs to debug)
         const isVerbose = processed < 3;
@@ -629,7 +635,7 @@ async function startWorker() {
         channel.ack(msg);
       } catch (e) {
         log(`  ❌ Job error: ${e.message}`);
-        channel.nack(msg, false, true); // Requeue on error
+        channel.nack(msg, false, !isNonRetryableEmbeddingInputErrorV1(e));
       }
     });
 

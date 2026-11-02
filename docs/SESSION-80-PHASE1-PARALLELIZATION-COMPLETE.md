@@ -292,7 +292,7 @@ Latent vectors (768→64 autoencoder) come AFTER summary embeddings are in place
 **KV Cache Tuning:**
 - Production: `-ctk q8_0 -ctv q8_0` (safest)
 - Experimental: `-ctk q8_0 -ctv turbo3` (3-bit V-cache, saves 1GB)
-- **Use 16K context for Phase 1** (avoids OOM), not 64K
+- **This Phase 1 estimate used 16K context** to reduce the projected KV-cache footprint. It is a historical workload-specific recommendation, not the current launcher default or proof that 65,536 fits every model/KV/GPU combination. Current default: 65,536; 16,384 requires explicit short-context opt-in and live `/slots` verification.
 
 ---
 

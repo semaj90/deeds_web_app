@@ -158,12 +158,12 @@
     {
       "lane": "QLoRA semantic training corpus",
       "status": "WIRED_BLOCKED",
-      "evidence": "labels are complete; summaries and AST evidence remain incomplete"
+      "evidence": "summary gate FAIL (11.1572%); active-code AST gate PASS (96.3061% (9125/9475) [raw: 62.0629%]); dataset readiness only, not training completion"
     },
     {
       "lane": "Packet-JEPA",
-      "status": "PROVEN_NOT_PROMOTED",
-      "evidence": "held-out MRR and NDCG@10 do not beat baseline"
+      "status": "BLOCKED",
+      "evidence": "evaluation missing"
     },
     {
       "lane": "native CUDA addon",

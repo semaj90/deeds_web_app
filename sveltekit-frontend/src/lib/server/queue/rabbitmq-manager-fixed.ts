@@ -26,6 +26,7 @@ interface AmqpChannel {
     handler: (msg: AmqpMessage) => void,
     options?: Record<string, unknown>
   ): Promise<unknown>;
+  cancel(consumerTag: string): Promise<unknown>;
   publish(
     exchange: string,
     routingKey: string,
@@ -65,6 +66,9 @@ export class RabbitMQManager extends EventEmitter {
   private isInitialized = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private channelCreatePromise: Promise<AmqpChannel> | null = null;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly consumerTags = new Set<string>();
   private url: string;
 
   // Services (loaded dynamically)
@@ -138,7 +142,23 @@ export class RabbitMQManager extends EventEmitter {
     });
   }
 
+  private initPromise: Promise<boolean> | null = null;
+
+  /**
+   * Idempotent: a live, initialized manager returns immediately and concurrent
+   * callers share one run. Without this, every dev reload opened a new
+   * connection/channel set until the broker answered "No channels left to allocate".
+   */
   async initialize(): Promise<boolean> {
+    if (this.isInitialized && this.connection && this.channel) return true;
+    if (this.initPromise) return this.initPromise;
+    this.initPromise = this.runInitialize().finally(() => {
+      this.initPromise = null;
+    });
+    return this.initPromise;
+  }
+
+  private async runInitialize(): Promise<boolean> {
     try {
       this.isShuttingDown = false;
       await this.loadServices();
@@ -156,7 +176,7 @@ export class RabbitMQManager extends EventEmitter {
         console.warn('[RabbitMQ] Initialization aborted during dev reload');
         return false;
       }
-      console.error('❌ RabbitMQ initialization failed:', message);
+      console.error(`❌ RabbitMQ initialization failed (${this.describeEndpoint()}):`, message);
       return false;
     }
   }
@@ -235,15 +255,40 @@ export class RabbitMQManager extends EventEmitter {
 
   private async ensureChannel(): Promise<AmqpChannel> {
     if (this.channel) return this.channel;
+    if (this.channelCreatePromise) return this.channelCreatePromise;
     if (!this.connection) {
       throw new Error('RabbitMQ connection not available');
     }
-    return this.recreateChannel();
+    const connection = this.connection;
+    this.channelCreatePromise = connection.createChannel().then((channel) => {
+      if (this.connection !== connection) {
+        void channel.close().catch(() => {});
+        throw new Error('RabbitMQ connection changed while creating channel');
+      }
+      this.attachChannelListeners(channel);
+      this.channel = channel;
+      return channel;
+    }).finally(() => {
+      this.channelCreatePromise = null;
+    });
+    return this.channelCreatePromise;
   }
 
   private async recreateChannel(): Promise<AmqpChannel> {
     if (!this.connection) {
       throw new Error('RabbitMQ connection not available');
+    }
+
+    // Release the channel being replaced; the broker may already have closed it.
+    const previous = this.channel;
+    this.channel = null;
+    this.consumerTags.clear();
+    if (previous) {
+      try {
+        await previous.close();
+      } catch {
+        /* already closed */
+      }
     }
 
     const channel = await this.connection.createChannel();
@@ -281,6 +326,16 @@ export class RabbitMQManager extends EventEmitter {
     }
   }
 
+  /** host:port only, never credentials. Tells which broker (Docker :5673 vs native :5672) is in use. */
+  private describeEndpoint(): string {
+    try {
+      const u = new URL(String(this.url));
+      return `${u.hostname}:${u.port || '5672'}`;
+    } catch {
+      return 'unparseable RABBITMQ_URL';
+    }
+  }
+
   private async connect(): Promise<void> {
     try {
       const amqp = await import('amqplib');
@@ -291,6 +346,17 @@ export class RabbitMQManager extends EventEmitter {
             connect?(...a: unknown[]): Promise<unknown>;
           }
         ).default?.connect ?? (amqp as { connect?(...a: unknown[]): Promise<unknown> }).connect;
+      // Re-initialize after a lost connection: drop the stale handles first.
+      const stale = this.connection;
+      this.connection = null;
+      this.channel = null;
+      if (stale) {
+        try {
+          await stale.close();
+        } catch {
+          /* already closed */
+        }
+      }
       this.connection = (await connect(this.url)) as AmqpConnection;
       this.channel = await this.connection.createChannel();
       this.attachChannelListeners(this.channel);
@@ -301,18 +367,34 @@ export class RabbitMQManager extends EventEmitter {
         if (this.shouldSilenceError(message)) return;
 
         console.error('❌ RabbitMQ connection error:', message);
+        this.isInitialized = false;
         this.emit('connection_lost');
       });
       this.connection.on('close', () => {
         if (this.isShuttingDown) return;
+        this.isInitialized = false;
         this.emit('connection_lost');
       });
 
-      console.log('✅ RabbitMQ connected');
+      console.log(`✅ RabbitMQ connected (${this.describeEndpoint()})`);
     } catch (error) {
+      const failedChannel = this.channel;
+      const failedConnection = this.connection;
+      this.channel = null;
+      this.connection = null;
+      if (failedChannel) {
+        try {
+          await failedChannel.close();
+        } catch {}
+      }
+      if (failedConnection) {
+        try {
+          await failedConnection.close();
+        } catch {}
+      }
       const message = this.formatError(error);
       if (this.shouldSilenceError(message)) return;
-      throw new Error(`RabbitMQ connection failed: ${message}`);
+      throw new Error(`RabbitMQ connection failed (${this.describeEndpoint()}): ${message}`);
     }
   }
 
@@ -422,6 +504,21 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   private async startConsumers(): Promise<void> {
+    const existingTags = new Set(this.consumerTags);
+    try {
+      await this.registerConsumers();
+    } catch (error) {
+      const channel = this.channel;
+      const newTags = [...this.consumerTags].filter((tag) => !existingTags.has(tag));
+      if (channel) {
+        await Promise.allSettled(newTags.map((tag) => channel.cancel(tag)));
+      }
+      for (const tag of newTags) this.consumerTags.delete(tag);
+      throw error;
+    }
+  }
+
+  private async registerConsumers(): Promise<void> {
     const channel = await this.ensureChannel();
 
     // Set prefetch per processing speed:
@@ -454,8 +551,9 @@ export class RabbitMQManager extends EventEmitter {
   }
 
   async consume(queue: string, handler: (msg: AmqpMessage) => Promise<void>, noAck = false) {
-    if (this.channel) {
-      await this.channel.consume(
+    const channel = this.channel;
+    if (channel) {
+      const result = await channel.consume(
         queue,
         async (msg) => {
           try {
@@ -474,6 +572,8 @@ export class RabbitMQManager extends EventEmitter {
         },
         { noAck }
       );
+      const consumerTag = (result as { consumerTag?: string } | undefined)?.consumerTag;
+      if (consumerTag && this.channel === channel) this.consumerTags.add(consumerTag);
     } else {
       throw new Error(`RabbitMQ channel not ready (queue: ${queue})`);
     }
@@ -1753,10 +1853,15 @@ export class RabbitMQManager extends EventEmitter {
   async close(): Promise<void> {
     try {
       this.isShuttingDown = true;
+      if (this.reconnectTimer !== null) {
+        clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = null;
+      }
       if (this.channel) await this.channel.close();
       if (this.connection) await this.connection.close();
       this.channel = null;
       this.connection = null;
+      this.consumerTags.clear();
       this.isInitialized = false;
       console.log('🔌 RabbitMQ connection closed');
     } catch (err) {
@@ -1770,6 +1875,7 @@ export class RabbitMQManager extends EventEmitter {
     if (this.isShuttingDown) {
       return;
     }
+    if (this.reconnectTimer !== null) return;
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error(
         `☠️ RabbitMQ: exhausted ${this.maxReconnectAttempts} reconnect attempts — giving up. ` +
@@ -1786,7 +1892,10 @@ export class RabbitMQManager extends EventEmitter {
     console.warn(
       `🔄 RabbitMQ: reconnect attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${Math.round(delay / 1000)}s`
     );
-    setTimeout(() => this.initialize(), delay);
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      void this.initialize();
+    }, delay);
   }
 
   /**
@@ -1995,7 +2104,7 @@ export class RabbitMQManager extends EventEmitter {
 
     for (const [, queue] of Object.entries(this.queues)) {
       const dlqName = `${queue}.dlq`;
-      await channel.consume(
+      const result = await channel.consume(
         dlqName,
         async (msg) => {
           if (!msg) return;
@@ -2065,6 +2174,8 @@ export class RabbitMQManager extends EventEmitter {
         },
         { noAck: false }
       );
+      const consumerTag = (result as { consumerTag?: string } | undefined)?.consumerTag;
+      if (consumerTag && this.channel === channel) this.consumerTags.add(consumerTag);
     }
     console.log('☠️ DLQ consumers started for all 9 dead-letter queues');
   }

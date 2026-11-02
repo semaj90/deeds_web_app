@@ -134,6 +134,50 @@ try {
 		{ encoding: 'utf8', input: catalogSql, stdio: ['pipe', 'pipe', 'pipe'], timeout: 30000 }
 	).trim();
 } catch (error) {
+	const catalogStatus = error?.code === 'ETIMEDOUT' || error?.killed === true
+		? 'BLOCKED_DB_TIMEOUT'
+		: 'BLOCKED_DB_UNAVAILABLE';
+	const fallbackJournalRows = journal.entries.map((entry) => {
+		const filename = `${entry.tag}.sql`;
+		const sqlPath = path.join(drizzleRoot, filename);
+		const present = existsSync(sqlPath);
+		const content = present ? readFileSync(sqlPath, 'utf8') : '';
+		return {
+			idx: entry.idx,
+			tag: entry.tag,
+			when: entry.when,
+			sqlFilePresent: present,
+			sqlSha256: present ? sha256(content) : null,
+			ledgerRowPresent: null,
+			liveObjectCheck: null
+		};
+	});
+	const fallbackSidecarRows = sidecarDocument.sidecars.map((entry) => {
+		const fileResolution = resolveSidecarReference(entry.file);
+		const resolvedPath = fileResolution.path;
+		const present = Boolean(resolvedPath);
+		const content = present ? readFileSync(resolvedPath, 'utf8') : '';
+		return {
+			file: entry.file,
+			status: entry.status,
+			requiresJournalEntry: entry.requiresJournalEntry ?? null,
+			appliedAt: entry.appliedAt ?? null,
+			sourceFilePresent: present,
+			sourcePathResolution: fileResolution.resolution,
+			resolvedPath: resolvedPath ? path.relative(repositoryRoot, resolvedPath).replaceAll(path.sep, '/') : null,
+			sqlSha256: present ? sha256(content) : null,
+			journalEntryPresent: journalTags.has(path.basename(entry.file)),
+			ledgerRowPresent: null,
+			liveObjectCheck: null,
+			statusInterpretation: !present
+				? 'SOURCE_FILE_MISSING_CLAIM_UNVERIFIABLE'
+				: entry.requiresJournalEntry && !journalTags.has(path.basename(entry.file))
+					? 'REQUIRED_JOURNAL_ENTRY_MISSING'
+					: entry.status?.startsWith('applied')
+						? 'APPLIED_CLAIM_NOT_CHECKED_LIVE_CATALOG_UNAVAILABLE'
+						: 'NON_APPLIED_STATE_REVIEW_AS_PLANNED_OR_CANDIDATE'
+		};
+	});
 	if (existsSync(outputPath)) {
 		const archiveTimestamp = new Date().toISOString().replace(/[:.]/g, '-');
 		const archivePath = path.join(outputDirectory, `drizzle-history-readonly-${archiveTimestamp}.json`);
@@ -145,27 +189,40 @@ try {
 		schema: 'atlas.drizzle-history-readonly-audit.v1',
 		generatedAt: new Date().toISOString(),
 		status: 'BLOCKED_CATALOG_UNAVAILABLE',
-		catalogStatus: 'BLOCKED_DB_TIMEOUT_OR_UNREACHABLE',
+		catalogStatus,
 		readOnly: true,
 		writesPerformed: false,
 		writeBoundary: 'Catalog query failed or timed out before a result; no database writes were issued.',
+		catalogError: {
+			code: typeof error?.code === 'string' ? error.code : 'UNKNOWN',
+			name: typeof error?.name === 'string' ? error.name : 'Error',
+			timedOut: catalogStatus === 'BLOCKED_DB_TIMEOUT'
+		},
 		catalog: {
 			database,
 			container,
 			available: false,
 			errorCode: typeof error?.code === 'string' ? error.code : 'UNKNOWN',
-			errorName: typeof error?.name === 'string' ? error.name : 'Error'
+			errorName: typeof error?.name === 'string' ? error.name : 'Error',
+			ledger: { exists: null, rows: null, hashes: null },
+			relations: null,
+			indexes: null,
+			extensions: null
 		},
 		local: {
-			journalCount: journal.entries.length,
-			journalSqlFilesPresent: journal.entries.filter((entry) => existsSync(path.join(drizzleRoot, `${entry.tag}.sql`))).length,
-			sidecarCount: sidecarDocument.sidecars.length,
+			journalCount: fallbackJournalRows.length,
+			journalSqlFilesPresent: fallbackJournalRows.filter((entry) => entry.sqlFilePresent).length,
+			sidecarCount: fallbackSidecarRows.length,
 			appliedSidecarCount: sidecarDocument.sidecars.filter((entry) => entry.status?.startsWith('applied')).length,
 			sidecarSourcesMissing: sidecarDocument.sidecars.filter((entry) => !resolveSidecarFile(entry.file)).map((entry) => entry.file),
 			sidecarsRequiringJournalMissingEntry: sidecarDocument.sidecars
 				.filter((entry) => entry.requiresJournalEntry && !journalTags.has(path.basename(entry.file)))
-				.map((entry) => entry.file)
+				.map((entry) => entry.file),
+			journalRows: fallbackJournalRows,
+			sidecarRows: fallbackSidecarRows
 		},
+		journalRows: fallbackJournalRows,
+		sidecarRows: fallbackSidecarRows,
 		limitations: ['No live ledger, schema, or migration-application state was verified. Local journal and sidecar counts are not evidence of database application.']
 	};
 	mkdirSync(outputDirectory, { recursive: true });

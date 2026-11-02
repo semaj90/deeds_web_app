@@ -90,7 +90,7 @@ User Query
 ├─────────────────────────────────────────────────────────────────┤
 │ POST :8090/v1/chat/completions                                  │
 │ ├─ Model: gemma4-legal-iq4xs-direct.gguf                        │
-│ ├─ Context: 64K (or 16K for speed)                              │
+│ ├─ Context: 65,536 default; 16,384 only for an explicit short run │
 │ ├─ KV Cache:                                                    │
 │ │   -ctk q8_0  (K-cache: 8-bit quantized)                       │
 │ │   -ctv turbo3 (V-cache: TurboQuant 3-bit)                     │
@@ -467,7 +467,7 @@ curl -s http://127.0.0.1:8090/slots | jq '.[] | {model, n_ctx}'
 ### Alignment Checklist
 
 - [ ] **KV Type**: `-ctk q8_0 -ctv turbo3` (correct for RTX 3060 Ti 8GB)
-- [ ] **Context**: 64K for quality OR 16K for speed (pick one)
+- [ ] **Context**: 65,536 configured default; 16,384 only with `TURBO_CTX_ALLOW_SHORT_CONTEXT=true`. Confirm the actual server value via `/slots`; this checklist is not a runtime receipt.
 - [ ] **Flash Attention**: `-fa on` (GPU optimization)
 - [ ] **Cache Prompt**: `--cache-prompt` (KV reuse)
 - [ ] **Memory**: Verify VRAM stays <7.5 GB under load

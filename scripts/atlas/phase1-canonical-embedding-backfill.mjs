@@ -20,6 +20,7 @@
 
 import pg from 'pg';
 import { argv } from 'process';
+import { requireNonEmptyEmbeddingTextV1 } from './lib/embedding-input-guard-v1.mjs';
 
 const MODE = argv.includes('--apply') ? 'apply' : 'dry';
 const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || '100');
@@ -31,8 +32,11 @@ const db = new pg.Pool({ connectionString: DB_URL, max: 5 });
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 async function callEmbeddingGemma(text) {
-  if (!text || text.length < 5) {
-    return null; // Skip short/empty summaries
+  try {
+    requireNonEmptyEmbeddingTextV1(text, 'atlas_packets.summary');
+  } catch (error) {
+    console.error(`  Embedding skipped: ${error.message}`);
+    return null;
   }
 
   try {
@@ -91,6 +95,8 @@ async function main() {
       SELECT packet_id, summary, feature_id
       FROM atlas_packets
       WHERE embedding IS NULL
+        AND summary IS NOT NULL
+        AND BTRIM(summary) <> ''
       ORDER BY created_at DESC
       LIMIT $1
     `, [LIMIT || 7242]); // Remaining count

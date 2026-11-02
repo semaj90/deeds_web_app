@@ -106,12 +106,63 @@ function gate(name, status, evidence, target = null) {
   return { name, status, target, evidence };
 }
 
+function renderExecutiveSummary(report) {
+  const packets = report.database?.packets ?? {};
+  const features = report.database?.features ?? {};
+  const packetTotal = Number(packets.total ?? 0);
+  const featureTotal = Number(features.total ?? 0);
+  const summaryGate = report.gates?.find((item) => item.name === 'summary coverage');
+  const astGate = report.gates?.find((item) => item.name === 'AST structural evidence (active code)');
+  const jepaGate = report.gates?.find((item) => item.name === 'JEPA promotion');
+  const count = (value) => Number(value ?? 0).toLocaleString('en-US');
+  return [
+    `- Snapshot: ${report.generated_at}; these are recorded counts, not a live refresh.`,
+    `- Packets: ${count(packetTotal)} total; summaries ${count(packets.summary)} (${report.coverage_percent?.summary ?? 0}%), versus the 95% summary gate.`,
+    `- Embeddings: ${count(packets.embedding)} of ${count(packetTotal)} (${report.coverage_percent?.embedding ?? 0}%); feature labels ${count(packets.feature_label)} of ${count(packetTotal)}.`,
+    `- AST: active-code gate ${astGate?.status ?? 'UNKNOWN'} (${astGate?.evidence ?? 'no receipt'}); raw corpus coverage ${report.coverage_percent?.ast_symbols ?? 0}%.`,
+    `- QLoRA dataset: ${report.promotion?.qlora_semantic_dataset ? 'eligible under the recorded gates' : 'blocked'}; summary ${summaryGate?.status ?? 'UNKNOWN'} and AST ${astGate?.status ?? 'UNKNOWN'}. This is dataset readiness, not proof a training run completed.`,
+    `- JEPA: ${jepaGate?.status ?? 'UNKNOWN'} — ${jepaGate?.evidence ?? 'no evaluation receipt'}. Missing evaluation is not a failed benchmark.`,
+  ];
+}
+
+function reconcileSummaryStatus(report) {
+  const summaryGate = report.gates?.find((item) => item.name === 'summary coverage');
+  const astGate = report.gates?.find((item) => item.name === 'AST structural evidence (active code)');
+  const jepaGate = report.gates?.find((item) => item.name === 'JEPA promotion');
+  report.status_model = (report.status_model ?? []).map((item) => {
+    if (item.lane === 'QLoRA semantic training corpus') {
+      return {
+        ...item,
+        status: report.promotion?.qlora_semantic_dataset ? 'ELIGIBLE_NOT_TRAINED' : 'WIRED_BLOCKED',
+        evidence: `summary gate ${summaryGate?.status ?? 'UNKNOWN'} (${summaryGate?.evidence ?? 'no receipt'}); active-code AST gate ${astGate?.status ?? 'UNKNOWN'} (${astGate?.evidence ?? 'no receipt'}); dataset readiness only, not training completion`,
+      };
+    }
+    if (item.lane === 'Packet-JEPA') {
+      const evaluated = jepaGate && !/evaluation missing/i.test(jepaGate.evidence ?? '');
+      return {
+        ...item,
+        status: jepaGate?.status === 'PASS' ? 'PROVEN' : evaluated ? 'PROVEN_NOT_PROMOTED' : 'BLOCKED',
+        evidence: jepaGate?.evidence ?? 'evaluation missing; promotion unverified',
+      };
+    }
+    return item;
+  });
+  return report;
+}
+
 function renderMarkdown(report) {
+  const jepaGate = report.gates?.find((item) => item.name === 'JEPA promotion');
+  const summaryGate = report.gates?.find((item) => item.name === 'summary coverage');
+  const astGate = report.gates?.find((item) => item.name === 'AST structural evidence (active code)');
   return [
     '# Parent Atlas Training Readiness',
     '',
     `Generated: ${report.generated_at}`,
     `Overall: ${report.overall_status}`,
+    '',
+    '## Executive Summary',
+    '',
+    ...renderExecutiveSummary(report),
     '',
     '## Promotion Decisions',
     '',
@@ -125,7 +176,15 @@ function renderMarkdown(report) {
     '',
     '## Status Model',
     '',
-    ...report.status_model.map((item) => `- ${item.lane}: ${item.status} - ${item.evidence}`),
+    ...report.status_model.map((item) => {
+      if (item.lane === 'QLoRA semantic training corpus') {
+        return `- ${item.lane}: ${item.status} - summary gate ${summaryGate?.status ?? 'UNKNOWN'} (${summaryGate?.evidence ?? 'no receipt'}); active-code AST gate ${astGate?.status ?? 'UNKNOWN'} (${astGate?.evidence ?? 'no receipt'}). Dataset readiness does not prove training completion.`;
+      }
+      if (item.lane === 'Packet-JEPA') {
+        return `- ${item.lane}: ${item.status} - ${jepaGate?.evidence ?? item.evidence}; an absent evaluation is blocked/unverified, not a measured regression.`;
+      }
+      return `- ${item.lane}: ${item.status} - ${item.evidence}`;
+    }),
     '',
     '## Next Actions',
     '',
@@ -225,8 +284,8 @@ async function main() {
       { lane: 'Arrow IPC batch transport', status: 'PROVEN', evidence: '200-row file round-trip with identity/vector checks' },
       { lane: 'HyperRAG MsgPack/mmap hot packet path', status: 'PROVEN_BOUNDED', evidence: 'bounded materializer dry-run/apply evidence; not a full-corpus promotion' },
       { lane: 'tree_node_id fan-out', status: qdrantTreeProof && neo4jTreeProof ? 'PROVEN_BOUNDED' : 'WIRED_BLOCKED', evidence: 'Qdrant direct payload readback plus Neo4j HAS_TREE_NODE graphify' },
-      { lane: 'QLoRA semantic training corpus', status: promotion.qlora_semantic_dataset ? 'PROVEN' : 'WIRED_BLOCKED', evidence: 'labels are complete; summaries and AST evidence remain incomplete' },
-      { lane: 'Packet-JEPA', status: 'PROVEN_NOT_PROMOTED', evidence: 'held-out MRR and NDCG@10 do not beat baseline' },
+      { lane: 'QLoRA semantic training corpus', status: promotion.qlora_semantic_dataset ? 'ELIGIBLE_NOT_TRAINED' : 'WIRED_BLOCKED', evidence: `summary gate ${summaryReady ? 'PASS' : 'FAIL'} (${percent(db.packets.summary, packetTotal)}%); active-code AST gate ${astReady ? 'PASS' : 'WARN'} (${percent(activeCodeAst, activeCodeTotal)}% active, ${percent(db.features.ast_symbols, featureTotal)}% raw); dataset readiness only` },
+      { lane: 'Packet-JEPA', status: jepaBeatsBaseline ? 'PROVEN' : (baseline && packetJepa ? 'PROVEN_NOT_PROMOTED' : 'BLOCKED'), evidence: baseline && packetJepa ? `held-out MRR ${packetJepa.mrr.toFixed(4)} vs ${baseline.mrr.toFixed(4)}; NDCG@10 ${packetJepa.ndcg_at_10.toFixed(4)} vs ${baseline.ndcg_at_10.toFixed(4)}` : 'evaluation missing; promotion unverified' },
       { lane: 'native CUDA addon', status: nativeGpuReady ? 'PROVEN' : 'WIRED_BLOCKED', evidence: 'native addon smoke result' },
       { lane: 'Python CUDA / RAPIDS topology workers', status: pythonGpuReady ? 'PROVEN' : 'CREATED_NOT_READY', evidence: 'repo venv remains CPU-only; RAPIDS stays WSL2-targeted' },
     ],
@@ -255,7 +314,19 @@ async function main() {
   }, null, 2));
 }
 
-main()
+const refreshSummaryOnly = process.argv.includes('--refresh-summary-only');
+const run = refreshSummaryOnly
+  ? (async () => {
+      const report = await readJson(REPORT_JSON);
+      if (!report) throw new Error(`Existing report is missing or invalid: ${REPORT_JSON}`);
+      reconcileSummaryStatus(report);
+      await fs.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+      await fs.writeFile(REPORT_MD, `${renderMarkdown(report)}\n`, 'utf8');
+      console.log(JSON.stringify({ status: 'REFRESHED_SUMMARY_FROM_EXISTING_SNAPSHOT', generated_at: report.generated_at, json: path.relative(REPO_ROOT, REPORT_JSON).replace(/\\/g, '/'), markdown: path.relative(REPO_ROOT, REPORT_MD).replace(/\\/g, '/') }, null, 2));
+    })()
+  : main();
+
+run
   .catch((error) => {
     console.error('[validate-parent-atlas-training-readiness] failed:', error?.stack || error?.message || String(error));
     process.exitCode = 1;

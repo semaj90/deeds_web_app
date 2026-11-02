@@ -1,14 +1,9 @@
 <script lang="ts">
-
- // Migrated to $effect
-
- interface CaseStatuteLink { id: string, case_id: string;
- statute_code: string;
-	link_type: string;
- notes?: string;
-	created_at: string;
- updated_at: string;
- }
+	import {
+		countCaseStatuteLinksByType,
+		normalizeCaseStatuteLinks,
+		type CaseStatuteLink,
+	} from './case-statute-link-adapter.js';
 
  let { caseId, showActions = true, ondeleted, onedit, onview }: {
  caseId: string;
@@ -48,8 +43,16 @@ let links: CaseStatuteLink[] = $state([]);
  if (response.ok) {
  const data = await response.json();
  if (data.success) {
- links = data.links;
- stats = data.stats;
+  links = normalizeCaseStatuteLinks(data, caseId);
+  const computedCounts = countCaseStatuteLinksByType(links);
+  const responseStats = data.stats && typeof data.stats === 'object' ? data.stats : {};
+  stats = {
+  total: typeof responseStats.total === 'number' ? responseStats.total : links.length,
+  byLinkType:
+  responseStats.byLinkType && typeof responseStats.byLinkType === 'object'
+  ? responseStats.byLinkType as Record<string, number>
+  : computedCounts,
+  };
  } else {
  error = data.error ?? 'Failed to load links';
  }

@@ -568,7 +568,7 @@
     "vitest": "^3.0.0"
   },
   "overrides": {
-    "zod-to-json-schema": "file:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"
+    "zod-to-json-schema": "file:sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"
   },
   "workspaces": [
     "packages/atlas",

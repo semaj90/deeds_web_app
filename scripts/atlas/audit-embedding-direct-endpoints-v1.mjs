@@ -57,7 +57,9 @@ export function classifyLine(line) {
   const hasEndpoint = /\/v1\/embeddings|\/api\/embeddings|\/api\/embed\b/.test(t);
   if (!hasEndpoint) return null;
   if (/\/v1\/embeddings/.test(t)) return 'V1_EMBEDDINGS';
-  if (/fetch\(\s*[`'"]\/api\/embed/.test(t) || /^[`'"]\/api\/embed[`'"]/.test(t)) return 'INTERNAL_ROUTE';
+  if (/fetch\(\s*[`'"]\/api\/embed/.test(t)
+    || /^[`'"]\/api\/embed[`'"]/.test(t)
+    || /\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*['"]\/api\/embed['"]/.test(t)) return 'INTERNAL_ROUTE';
   return 'DIRECT_API_EMBED';
 }
 

@@ -27,6 +27,7 @@
 import pg from 'pg';
 import { createRequire } from 'module';
 import { argv } from 'process';
+import { requireNonEmptyEmbeddingTextV1 } from './lib/embedding-input-guard-v1.mjs';
 
 const require = createRequire(import.meta.url);
 const amqp = require('amqplib');
@@ -68,6 +69,8 @@ async function enqueueJobs() {
       SELECT id, packet_key, summary
       FROM atlas_packets
       WHERE embedding IS NULL
+        AND summary IS NOT NULL
+        AND BTRIM(summary) <> ''
       ORDER BY created_at DESC
       LIMIT $1
     `, [LIMIT || 7232]);
@@ -88,7 +91,7 @@ async function enqueueJobs() {
         packets: batchPackets.map(p => ({
           id: p.id,
           packet_key: p.packet_key,
-          summary: p.summary
+          summary: requireNonEmptyEmbeddingTextV1(p.summary, `packet ${p.packet_key}`)
         })),
         timestamp: new Date().toISOString()
       };
