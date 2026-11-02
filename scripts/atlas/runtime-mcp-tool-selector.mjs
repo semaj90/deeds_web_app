@@ -264,7 +264,7 @@ const MCP_TO_LLAMA = Object.fromEntries(
  *     hits:        object[]   — raw Qdrant hits with reranked scores
  *     signals:     string[]   — detected ontology signals
  *     embed_ok:    boolean    — whether embedding succeeded
- *     retrieval_source: 'qdrant' | 'registry' | 'default'
+ *     retrieval_source: 'pgvector' | 'qdrant' | 'registry' | 'default'
  *   }
  */
 export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) {
@@ -320,14 +320,18 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
     };
   }
 
-  const raw = vector ? await qdrantSearch(vector, { topK: effectiveTopK }) : [];
+  // pgvector (atlas_tool_manifest_vectors_v1) first; Qdrant tool_manifest is the legacy path.
+  const pgRaw = vector ? await pgvectorSearch(vector, { topK: effectiveTopK }) : [];
+  const raw = pgRaw.length > 0 ? pgRaw : (vector ? await qdrantSearch(vector, { topK: effectiveTopK }) : []);
   let ranked = rerank(raw, signals, effectiveTopK);
-  let retrieval_source = 'qdrant';
+  let retrieval_source = pgRaw.length > 0 ? 'pgvector' : 'qdrant';
 
   if (ranked.length === 0) {
     ranked = await registrySearch(queryText, effectiveTopK);
     retrieval_source = ranked.length > 0 ? 'registry' : 'default';
-  } else {
+  } else if (retrieval_source !== 'pgvector') {
+    // Registry pickup_score is query-independent and outranks cosine scores, so it is only merged
+    // into the legacy Qdrant path, never into pgvector results.
     const registryHits = await registrySearch(queryText, effectiveTopK);
     const merged = new Map();
     for (const hit of [...registryHits, ...ranked]) {
