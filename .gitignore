@@ -496,6 +496,7 @@ neo4j-community-*/
 node_modules/
 pnpm-lock.yaml
 package-lock.json
+!sveltekit-frontend/package-lock.json
 pnpm-store/
 /.turbo/
 /.parcel-cache/
