@@ -100,6 +100,11 @@ export default defineConfig({
     },
   },
   shortcuts: {
+    // SNES book loader (sveltekit-frontend/src/lib/components/ui/SnesBookLoader.svelte). Merged from the package's uno.config.ts.
+    'snes-btn': 'border-2 border-purple-400/60 bg-[#231247] px-3 py-2 text-purple-100 hover:bg-purple-800/80 active:translate-y-0.5 transition-colors cursor-pointer',
+    'snes-btn-active': 'border-2 border-yellow-300 bg-purple-700 px-2 py-2 text-white cursor-pointer',
+    'snes-btn-idle': 'border-2 border-purple-500/50 bg-[#241247] px-2 py-2 text-purple-300 hover:bg-purple-800/60 cursor-pointer',
+    'snes-card': 'border-2 border-purple-500/70 bg-[#160b2e]/95 shadow-[0_8px_0_#070210]',
     'app-shell': 'min-h-screen bg-[#0b0e12] text-zinc-100',
     'app-bg': 'bg-[#0b0e12] text-zinc-100',
     panel: 'rounded-2xl bg-white/4 shadow-lg shadow-black/20 backdrop-blur-xl',
