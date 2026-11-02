@@ -2,9 +2,12 @@
   import SnesBookLoader from '$lib/components/ui/SnesBookLoader.svelte';
 
   // Demo only: a fake 0-100 sweep so the determinate bar is visible. Real callers pass their own value.
-  let progress = $state(0);
+  // Starts null so the server-rendered page shows the indeterminate stripes immediately; in dev the app
+  // takes several seconds to hydrate, and a determinate 0% bar looks like a failed render until then.
+  let progress = $state<number | null>(null);
   $effect(() => {
-    const id = setInterval(() => { progress = progress >= 100 ? 0 : progress + 5; }, 400);
+    progress = 0;
+    const id = setInterval(() => { progress = (progress ?? 0) >= 100 ? 0 : (progress ?? 0) + 5; }, 400);
     return () => clearInterval(id);
   });
 </script>
