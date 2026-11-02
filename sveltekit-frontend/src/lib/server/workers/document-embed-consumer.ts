@@ -9,6 +9,7 @@ import { chatDocumentAttachments, documents } from '$lib/server/db/schema-postgr
 import { eq } from 'drizzle-orm';
 import { readFile } from 'fs/promises';
 import { ENV } from '$lib/server/env.server.js';
+import { requireDocumentEmbeddingV1 } from './document-embedding-guard.js';
 
 interface DocumentEmbedJob {
   documentId: string;
@@ -89,6 +90,8 @@ function chunkText(text: string, chunkSize = 500, overlap = 50): string[] {
  * Embed text chunk using embeddinggemma
  */
 async function embedChunk(text: string): Promise<number[]> {
+  if (!text.trim()) throw new Error('DOCUMENT_EMBEDDING_EMPTY_INPUT');
+
   const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -102,8 +105,11 @@ async function embedChunk(text: string): Promise<number[]> {
     throw new Error(`Embedding failed: ${response.status}`);
   }
 
-  const { embedding } = await response.json();
-  return embedding;
+  const payload: unknown = await response.json();
+  const embedding = typeof payload === 'object' && payload !== null && 'embedding' in payload
+    ? payload.embedding
+    : null;
+  return requireDocumentEmbeddingV1(embedding);
 }
 
 /**

@@ -5,6 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { requireNonEmptyEmbeddingBatchV1 } from './lib/embedding-input-guard-v1.mjs';
 
 const { Pool } = pg;
 const env = loadRepoEnv(process.env);
@@ -26,7 +27,8 @@ function validate(vector) { if (!Array.isArray(vector) || vector.length !== 768 
 function errorText(row) { return `error pattern ${row.relative_path} ${row.kind ?? ''} ${row.symbol ?? ''}\n${String(row.content ?? '').slice(0, 8000)}`; }
 function signatureText(row) { return `code signature ${row.relative_path} ${row.kind ?? ''} ${row.symbol ?? ''}\nAST: ${JSON.stringify(row.ast_symbols ?? [])}\n${String(row.summary ?? '').slice(0, 4000)}\n${String(row.content ?? '').slice(0, 4000)}`; }
 async function embed(texts) {
-  const response = await fetch(`${OLLAMA_URL}/api/embed`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ model: MODEL, input: texts, dimensions: 768, truncate: true, keep_alive: '30m' }), signal: AbortSignal.timeout(120_000) });
+  const guardedTexts = requireNonEmptyEmbeddingBatchV1(texts, 'Graphify RFF embedding inputs');
+  const response = await fetch(`${OLLAMA_URL}/api/embed`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ model: MODEL, input: guardedTexts, dimensions: 768, truncate: true, keep_alive: '30m' }), signal: AbortSignal.timeout(120_000) });
   const body = await response.json();
   if (!response.ok || !Array.isArray(body.embeddings) || body.embeddings.length !== texts.length) throw new Error(`EmbeddingGemma batch failed: HTTP ${response.status}`);
   body.embeddings.forEach(validate);
@@ -68,7 +70,10 @@ async function main() {
         const rows = result.rows.slice(offset, offset + BATCH);
         const errorRows = SIGNATURE_ONLY ? [] : rows.filter((row) => row.missing_error);
         const signatureRows = rows.filter((row) => row.missing_signature);
-        const [errorVectors, signatureVectors] = await Promise.all([embed(errorRows.map(errorText)), embed(signatureRows.map(signatureText))]);
+        const [errorVectors, signatureVectors] = await Promise.all([
+          errorRows.length ? embed(errorRows.map(errorText)) : Promise.resolve([]),
+          signatureRows.length ? embed(signatureRows.map(signatureText)) : Promise.resolve([]),
+        ]);
         report.errorEmbedded += errorVectors.length; report.signatureEmbedded += signatureVectors.length;
         const client = await pool.connect();
         try {

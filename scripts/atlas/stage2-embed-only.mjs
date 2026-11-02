@@ -7,6 +7,7 @@
 import pg from 'pg';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import fetch from 'node-fetch';
+import { requireNonEmptyEmbeddingTextV1 } from './lib/embedding-input-guard-v1.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const LIMIT = parseInt(process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] || '600', 10);
@@ -43,7 +44,7 @@ async function main() {
     const toEmbed = await pool.query(`
       SELECT id, relative_path, summary, qdrant_id
       FROM codebase_chunk_index
-      WHERE summary IS NOT NULL AND summary != ''
+      WHERE summary IS NOT NULL AND BTRIM(summary) <> ''
         AND summary_embedding IS NULL
       ORDER BY id
       LIMIT $1
@@ -53,6 +54,7 @@ async function main() {
 
     for (const chunk of toEmbed.rows) {
       try {
+        requireNonEmptyEmbeddingTextV1(chunk.summary, `chunk ${chunk.id}`);
         // Embed summary with EmbeddingGemma via Ollama
         const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
           method: 'POST',

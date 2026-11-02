@@ -19,6 +19,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import fetch from 'node-fetch';
+import { requireNonEmptyEmbeddingTextV1 } from './lib/embedding-input-guard-v1.mjs';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -235,7 +236,7 @@ async function stage2_embedAndRank(pool, qdrant) {
     const toEmbed = await pool.query(`
       SELECT id, relative_path, summary, qdrant_id
       FROM codebase_chunk_index
-      WHERE summary IS NOT NULL AND summary != ''
+      WHERE summary IS NOT NULL AND BTRIM(summary) <> ''
         AND summary_embedding IS NULL
       ORDER BY id
       LIMIT $1
@@ -245,6 +246,7 @@ async function stage2_embedAndRank(pool, qdrant) {
 
     for (const chunk of toEmbed.rows) {
       try {
+        requireNonEmptyEmbeddingTextV1(chunk.summary, `chunk ${chunk.id}`);
         // Embed via SvelteKit API (uses ONNX client embedding with Ollama fallback)
         // This is more robust than calling Ollama directly since it can fall back to nomic-embed-text
         const embedRes = await fetch('http://127.0.0.1:5173/api/embed', {

@@ -26,7 +26,7 @@ const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const EMBEDDING_PROVIDER_V1 = resolveEmbeddingProviderV1();
 
 const embedRequestSchema = z.object({
-	text: z.string().min(1, 'Text is required').max(50000),
+	text: z.string().min(1, 'Text is required').max(50000).refine((text) => text.trim().length > 0, 'Text cannot be blank'),
 	model: z.enum(['embeddinggemma', 'mock']).optional().default('embeddinggemma'),
 	taskMode: z.enum([...EMBEDDINGGEMMA_TASK_MODES_V1, 'unprompted_legacy']).optional(),
 	title: z.string().max(500).nullable().optional(),
