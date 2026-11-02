@@ -63,7 +63,20 @@ async function main() {
   console.log('[AFC-E2E-97] Loading tool registry index...');
   const registryRaw = fs.readFileSync(REGISTRY_JSON, 'utf8');
   const registry = JSON.parse(registryRaw);
-  const tools = registry.tools || [];
+  // Union of the static registry and the live discovered surface (mcp-tool-surface-live-v1.json).
+  // payload.live_surface marks tools a model can actually call; the selector filters on it.
+  const liveTools = new Map();
+  const livePath = process.env.SEED_LIVE_SURFACE ?? path.join(ROOT, 'docs', 'reports', 'mcp-tool-surface-live-v1.json');
+  const liveDoc = JSON.parse(fs.readFileSync(livePath, 'utf8'));
+  for (const server of Object.values(liveDoc.servers ?? {})) {
+    for (const t of server.surface?.tools ?? []) liveTools.set(t.ref.toolName, t.description ?? '');
+  }
+  if (liveTools.size === 0) throw new Error(`LIVE_SURFACE_EMPTY: ${livePath}`);
+  const tools = [...(registry.tools || [])];
+  const known = new Set(tools.map((t) => t.tool_name));
+  for (const [name, description] of liveTools) {
+    if (!known.has(name)) tools.push({ tool_name: name, description, namespace: name.split('.')[0], ontology: [], layers: [], examples: [] });
+  }
   console.log(`[AFC-E2E-97] Found ${tools.length} tools to ingest.`);
 
   const repoEnv = loadRepoEnv();
@@ -113,6 +126,7 @@ async function main() {
             domain: tool.domain ?? null,
             primary_layer: tool.primary_layer ?? tool.layers?.[0] ?? 'unknown',
             embed_method: method,
+            live_surface: liveTools.has(toolName),
           })},
           clock_timestamp()
         )

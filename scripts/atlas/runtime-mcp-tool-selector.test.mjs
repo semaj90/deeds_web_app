@@ -1,5 +1,6 @@
 // Integration regression for scripts/atlas/runtime-mcp-tool-selector.mjs (AFC-TOOL-ROUTING-01).
 // Needs live Ollama (embeddinggemma) and the atlas_tool_manifest_vectors_v1 table; skips otherwise.
+// Expectations use tools on the LIVE surface only (payload.live_surface); static-only tools are never returned.
 // Guards the 2026-11-01 failure: every query collapsed to the same registry-fallback tool set.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,10 +9,11 @@ import { selectToolsForQuery } from './runtime-mcp-tool-selector.mjs';
 process.env.OLLAMA_HOST = (process.env.OLLAMA_HOST ?? '127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 
 const CASES = [
-  { query: 'search the codebase for a function by name', anyOf: ['codebase.rg_search', 'search.hybrid', 'codebase:rg_search'] },
-  { query: 'expand the graph neighborhood of a file', anyOf: ['graph.expand_neighborhood', 'kb.expand_neighbors'] },
+  { query: 'search the codebase for a function by name', anyOf: ['search.hybrid', 'search.postgres_fts'] },
+  { query: 'expand the graph neighborhood of a file', anyOf: ['graph.expand_neighborhood', 'hypergraph.expand_members'] },
   { query: 'check database schema tables', anyOf: ['db.table_inspect', 'db.schema_overview'] },
-  { query: 'find knowledge base cards about retrieval', anyOf: ['kb.search_cards', 'kb.get_card'] },
+  { query: 'find knowledge base cards about retrieval', anyOf: ['kb.hybrid_search', 'kb.search_notecards', 'kb.trace_search'] },
+  { query: 'classify the intent of a user prompt', anyOf: ['classify_intent'] },
 ];
 
 let live = true;

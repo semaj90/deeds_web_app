@@ -117,6 +117,7 @@ async function pgvectorSearch(vector, { topK = DEFAULT_TOP_K } = {}) {
         payload,
         1 - (embedding <=> ${vectorStr}::vector) AS score
       FROM public.atlas_tool_manifest_vectors_v1
+      WHERE payload->>'live_surface' = 'true' -- only tools a model can actually call
       ORDER BY embedding <=> ${vectorStr}::vector
       LIMIT ${topK * 2};
     `;
