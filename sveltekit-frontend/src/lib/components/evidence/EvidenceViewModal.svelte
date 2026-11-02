@@ -64,7 +64,7 @@
 	let isVideo = $derived(fileType.startsWith('video/'));
 	let isText = $derived(fileType === 'text/plain' || fileType === 'text/csv' || fileName.endsWith('.txt') || fileName.endsWith('.csv'));
 	let isMarkdown = $derived(fileType === 'text/markdown' || fileName.endsWith('.md'));
-	let fileUrl = $derived(doc?.fileUrl ?? doc?.file_url ?? null);
+	let previewUrl = $derived(evidenceId ? `/api/evidence/${encodeURIComponent(evidenceId)}/download?inline=1` : null);
 	let metadata = $derived.by(() => {
 		const value = doc?.metadata;
 		if (!value) return {};
@@ -128,14 +128,14 @@
 	let doclingLoading = $state(false);
 
 	let canRunDocling = $derived(
-		(isPdf || isImage) && !!fileUrl
+		(isPdf || isImage) && !!previewUrl
 	);
 
 	async function openDoclingViewer() {
-		if (!fileUrl) return;
+		if (!previewUrl) return;
 		doclingLoading = true;
 		try {
-			const res = await fetch(fileUrl);
+			const res = await fetch(previewUrl);
 			if (!res.ok) throw new Error('Failed to fetch file');
 			const blob = await res.blob();
 			const reader = new FileReader();
@@ -272,43 +272,43 @@
 					</div>
 				{:else if doc}
 					<!-- File preview (images with lightbox) -->
-					{#if isImage && fileUrl}
+					{#if isImage && previewUrl}
 						<div class="preview-wrap">
 							<button type="button" class="preview-img-btn" onclick={openLightbox} title="Click to zoom">
-								<img src={fileUrl} alt={doc.title ?? 'Evidence'} class="preview-img" />
+								<img src={previewUrl} alt={doc.title ?? 'Evidence'} class="preview-img" />
 								<span class="preview-zoom-hint">
 									<Icon name="zoom-in" class="w-4 h-4" />
 								</span>
 							</button>
 						</div>
-					{:else if isPdf && fileUrl}
+					{:else if isPdf && previewUrl}
 						<div class="preview-wrap pdf-embed-wrap">
 							<iframe
-								src={fileUrl}
+								src={previewUrl}
 								title="PDF Document: {doc.title ?? 'Evidence'}"
 								class="pdf-iframe"
 							></iframe>
 							<div class="pdf-fallback">
-								<a href={fileUrl} target="_blank" rel="noopener noreferrer" class="pdf-link">
+								<a href={previewUrl} target="_blank" rel="noopener noreferrer" class="pdf-link">
 									<Icon name="external-link" class="w-4 h-4" />
 									Open in new tab
 								</a>
 							</div>
 						</div>
-					{:else if isVideo && fileUrl}
+					{:else if isVideo && previewUrl}
 						<div class="preview-wrap media-wrap">
 							<!-- svelte-ignore a11y_media_has_caption -->
 							<video
 								controls
 								preload="metadata"
 								class="video-player"
-								src={fileUrl}
+								src={previewUrl}
 							>
 								<track kind="captions" />
 								Your browser does not support video playback.
 							</video>
 						</div>
-					{:else if isAudio && fileUrl}
+					{:else if isAudio && previewUrl}
 						<div class="preview-wrap media-wrap audio-wrap">
 							<div class="audio-visual">
 								<span class="audio-icon">
@@ -316,7 +316,7 @@
 								</span>
 								<span class="audio-filename">{fileName || 'Audio file'}</span>
 							</div>
-							<audio controls preload="metadata" class="audio-player" src={fileUrl}>
+							<audio controls preload="metadata" class="audio-player" src={previewUrl}>
 								Your browser does not support audio playback.
 							</audio>
 						</div>
@@ -513,9 +513,9 @@
 						Close
 					</button>
 					<div class="footer-actions">
-						{#if fileUrl}
+						{#if previewUrl}
 							<a
-								href={fileUrl}
+								href={previewUrl}
 								download={doc.fileName ?? doc.file_name ?? true}
 								class="footer-btn secondary download"
 								onclick={close}
@@ -560,7 +560,7 @@
 </Dialog.Root>
 
 <!-- Image Lightbox -->
-{#if lightboxOpen && isImage && fileUrl}
+{#if lightboxOpen && isImage && previewUrl}
 	<div
 		class="lightbox-backdrop"
 		role="dialog"
@@ -587,7 +587,7 @@
 		</div>
 		<div class="lightbox-img-wrap">
 			<img
-				src={fileUrl}
+					src={previewUrl}
 				alt={doc?.title ?? 'Evidence'}
 				class="lightbox-img"
 				style="transform: scale({lightboxScale});"

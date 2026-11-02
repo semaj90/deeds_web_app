@@ -7,7 +7,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 import { getSeaweedStream as getStream, statSeaweedObject as statObject } from '$lib/server/seaweed-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
@@ -47,7 +47,7 @@ function extractObjectKey(fileUrl: string): { bucket: string; key: string } | nu
   return null;
 }
 
-export const GET: RequestHandler = async ({ params, locals }) => {
+export const GET: RequestHandler = async ({ params, locals, url }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   if (!isUuid(params.id)) return json({ error: 'Invalid ID format' }, { status: 400 });
 
@@ -62,7 +62,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
         fileSize: evidence.fileSize,
       })
       .from(evidence)
-      .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
+      .where(
+        and(
+          eq(evidence.id, params.id),
+          or(
+            eq(evidence.userId, Number(locals.user.id)),
+            eq(evidence.uploadedBy, Number(locals.user.id)),
+          ),
+        ),
+      )
       .limit(1);
 
     if (!item) {
@@ -94,9 +102,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const contentType = item.mimeType || item.fileType || 'application/octet-stream';
     const fileName = item.fileName || `evidence-${params.id}`;
 
+    const disposition = url.searchParams.get('inline') === '1' ? 'inline' : 'attachment';
     const headers = new Headers({
       'Content-Type': contentType,
-      'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"`,
+      'Content-Disposition': `${disposition}; filename="${encodeURIComponent(fileName)}"`,
       'Cache-Control': 'private, max-age=3600',
     });
     if (contentLength !== undefined) {

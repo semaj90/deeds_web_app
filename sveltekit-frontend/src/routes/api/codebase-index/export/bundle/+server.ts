@@ -30,10 +30,10 @@
 
 import { json, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import IORedis from 'ioredis';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 interface GraphNode {
 	id: string;
@@ -78,24 +78,9 @@ const DEFAULT_LIMIT = 2000;
 const PARTS = ['graph', 'clusters', 'wikiNotes', 'manifold4', 'tileAtlas', 'cacheStats'] as const;
 type Part = (typeof PARTS)[number];
 
-// ── Redis helper with retry on stale pool ──────────────────────────────────
+// ── Shared authenticated Valkey client ─────────────────────────────────────
 
-function getRedisFresh(): IORedis {
-	return new IORedis(ENV.REDIS_URL, {
-		maxRetriesPerRequest: 1,
-		connectTimeout: 3000,
-		lazyConnect: false
-	});
-}
-
-// D16: `await using` wrapper — attaches Symbol.asyncDispose so callers can
-// drop their try/finally redis.disconnect() boilerplate.
-async function getRedisFreshDisposable() {
-	const { attachDispose } = await import('$lib/server/redis-disposable.js');
-	return attachDispose(getRedisFresh());
-}
-
-async function scanKeys(redis: IORedis, pattern: string, limit = 5000): Promise<string[]> {
+async function scanKeys(redis: ReturnType<typeof getValkeyClient>, pattern: string, limit = 5000): Promise<string[]> {
 	const keys: string[] = [];
 	let cursor = '0';
 	do {
@@ -223,8 +208,7 @@ async function buildWikiNotesPart(
 	errors: Record<string, string>,
 	limit: number
 ): Promise<WikiNote[] | null> {
-	// `await using` is a SyntaxError on Node 22 (whole route 500s at load); try/finally is equivalent.
-	const redis = await getRedisFreshDisposable();
+	const redis = getValkeyClient();
 	try {
 		const keys = await scanKeys(redis, 'wiki:note:*', limit);
 		if (keys.length === 0) return [];
@@ -261,8 +245,6 @@ async function buildWikiNotesPart(
 	} catch (err) {
 		errors.wikiNotes = (err as Error).message;
 		return null;
-	} finally {
-		await redis[Symbol.asyncDispose]();
 	}
 }
 
@@ -322,8 +304,7 @@ async function buildTileAtlasPart(
 async function buildCacheStatsPart(
 	errors: Record<string, string>
 ): Promise<Record<string, number> | null> {
-	// `await using` is a SyntaxError on Node 22 (whole route 500s at load); try/finally is equivalent.
-	const redis = await getRedisFreshDisposable();
+	const redis = getValkeyClient();
 	try {
 		const patterns = [
 			'turbo:*',
@@ -346,8 +327,6 @@ async function buildCacheStatsPart(
 	} catch (err) {
 		errors.cacheStats = (err as Error).message;
 		return null;
-	} finally {
-		await redis[Symbol.asyncDispose]();
 	}
 }
 
