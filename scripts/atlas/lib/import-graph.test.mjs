@@ -26,3 +26,12 @@ test('with an alias, $lib resolves (incl. index files) and is not counted as ext
   assert.deepEqual(edges.map((e) => e.to), ['app/src/lib/b.ts', 'app/src/lib/c/index.ts']);
   assert.deepEqual(externalImports.map((e) => e.module), ['left-pad']);
 });
+
+test('jsToTs resolves ./x.js specifiers to x.ts only when enabled', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'import-graph-js-'));
+  const mk = (rel, text) => { const full = path.join(root, rel); fs.mkdirSync(path.dirname(full), { recursive: true }); fs.writeFileSync(full, text); return { path: rel, fullPath: full, extension: path.extname(rel) }; };
+  const files = [mk('a.ts', "import { b } from './b.js';\nimport '$lib/c.js';"), mk('b.ts', 'export const b = 1;'), mk('lib/c.ts', 'export {};')];
+  assert.equal(buildImportGraph(files).edges.length, 0);
+  const on = buildImportGraph(files, { jsToTs: true, aliases: [{ prefix: '$lib/', target: 'lib/' }] });
+  assert.deepEqual(on.edges.map((e) => e.to), ['b.ts', 'lib/c.ts']);
+});

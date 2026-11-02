@@ -12,11 +12,18 @@ const EXTENSIONS = ['.ts','.mts','.cts','.js','.mjs','.cjs','.svelte','.json'];
 
 // aliases: optional [{ prefix: '$lib/', target: 'sveltekit-frontend/src/lib/' }] (repo-relative, trailing slash).
 // Default is no aliases, so existing callers keep their current edges.
-function candidates(sourcePath, spec, aliases = []) {
+// jsToTs: also try the TypeScript source for a .js/.mjs/.cjs specifier (the repo imports .ts files as './x.js').
+const JS_TO_TS = { '.js': ['.ts', '.tsx'], '.mjs': ['.mts'], '.cjs': ['.cts'] };
+function withTsSources(raw, out, jsToTs) {
+  const ext = path.posix.extname(raw);
+  if (jsToTs && JS_TO_TS[ext]) for (const t of JS_TO_TS[ext]) out.push(raw.slice(0, -ext.length) + t);
+}
+function candidates(sourcePath, spec, aliases = [], jsToTs = false) {
   const alias = aliases.find((a) => spec.startsWith(a.prefix));
   if (alias) {
     const raw = path.posix.normalize(alias.target + spec.slice(alias.prefix.length));
     const out = [raw];
+    withTsSources(raw, out, jsToTs);
     if (!path.posix.extname(raw)) {
       for (const ext of EXTENSIONS) out.push(raw + ext);
       for (const ext of EXTENSIONS) out.push(path.posix.join(raw, 'index' + ext));
@@ -27,6 +34,7 @@ function candidates(sourcePath, spec, aliases = []) {
   const sourceDir = path.posix.dirname(sourcePath);
   const raw = path.posix.normalize(path.posix.join(sourceDir, spec));
   const out = [raw];
+  withTsSources(raw, out, jsToTs);
   if (!path.posix.extname(raw)) {
     for (const ext of EXTENSIONS) out.push(raw + ext);
     for (const ext of EXTENSIONS) out.push(path.posix.join(raw, 'index' + ext));
@@ -34,7 +42,7 @@ function candidates(sourcePath, spec, aliases = []) {
   return out;
 }
 
-export function buildImportGraph(files, { aliases = [] } = {}) {
+export function buildImportGraph(files, { aliases = [], jsToTs = false } = {}) {
   const byPath = new Map(files.map((f) => [f.path, f]));
   const edges = [];
   const externalImports = new Map();
@@ -50,7 +58,7 @@ export function buildImportGraph(files, { aliases = [] } = {}) {
     }
     for (const spec of specs) {
       let target = null;
-      for (const candidate of candidates(file.path, spec, aliases)) {
+      for (const candidate of candidates(file.path, spec, aliases, jsToTs)) {
         if (byPath.has(candidate)) { target = candidate; break; }
       }
       if (target) edges.push({ from: file.path, to: target, relation: 'imports' });
