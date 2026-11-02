@@ -21,9 +21,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import Ajv from 'ajv';
 import neo4j from 'neo4j-driver';
 import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
+import { selectKanbanDagPrefillAlgorithm } from './kanban-dag-algorithm-selector-v1.mjs';
 
 const log =(...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
 
@@ -312,7 +314,109 @@ const TOOLS = [
       additionalProperties: false,
     },
   },
+  {
+    name: 'recommend_kanban_dag_prefill_algorithm',
+    description:
+      'Read a bounded OpenSpec cohort snapshot from TRACE/PostgreSQL and recommend a deterministic Kanban DAG prefill algorithm. ' +
+      'Returns proposal-only task IDs and source references; it does not write, claim, dispatch, or mark tasks complete. ' +
+      'A missing, truncated, cyclic, or out-of-cohort graph is BLOCKED.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        featureId: {
+          type: 'string',
+          pattern: '^openspec:[a-z0-9][a-z0-9-]*$',
+          description: 'Exact Kanban cohort feature ID, for example openspec:parent-atlas-agentic-file-compiler.',
+        },
+        maxPrefillTasks: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 32,
+          description: 'Maximum ready task candidates to return. Defaults to 16.',
+        },
+      },
+      required: ['featureId'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'gpu_vram_status',
+    description:
+      'Read-only GPU/VRAM status: nvidia-smi memory, llama-server :8090 /slots idle state and listener PID. Stops nothing.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+  },
+  {
+    name: 'gpu_request_vram_release',
+    description:
+      'Records a REQUEST for a human to free VRAM (appends one line to .tmp/atlas/gpu-vram-release-requests.ndjson). Does NOT stop any process; a human runs the VS Code task "GPU: Prepare cuVS KMeans".',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        reason: { type: 'string', minLength: 3, maxLength: 500 },
+        neededMiB: { type: 'integer', minimum: 256, maximum: 8192 },
+      },
+      required: ['reason', 'neededMiB'],
+      additionalProperties: false,
+    },
+  },
 ];
+
+// ── GPU status / release REQUEST (read-only + request record; never stops a process) ──
+// Rule: CLAUDE.md § "Production hardening: ops.* and service-lifecycle gates".
+const GPU_REQUESTS_PATH = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../../.tmp/atlas/gpu-vram-release-requests.ndjson',
+);
+
+async function gpuVramStatus() {
+  const out = { vram: null, llamaServer8090: null, canonicalAuthority: false, writesPerformed: false };
+  try {
+    const raw = execFileSync(
+      'nvidia-smi',
+      ['--query-gpu=name,memory.used,memory.total', '--format=csv,noheader,nounits'],
+      { encoding: 'utf8', timeout: 5000 },
+    ).trim().split(/\r?\n/)[0];
+    const [name, used, total] = raw.split(',').map((v) => v.trim());
+    out.vram = { name, usedMiB: Number(used), totalMiB: Number(total), freeMiB: Number(total) - Number(used) };
+  } catch (e) {
+    out.vram = { error: `nvidia-smi unavailable: ${e.message}` };
+  }
+  try {
+    const res = await fetch('http://127.0.0.1:8090/slots', { signal: AbortSignal.timeout(3000) });
+    const slots = res.ok ? await res.json() : null;
+    const list = Array.isArray(slots) ? slots : [];
+    out.llamaServer8090 = {
+      reachable: res.ok,
+      slotCount: list.length,
+      allSlotsIdle: list.length > 0 && list.every((s) => s.is_processing === false),
+    };
+  } catch (e) {
+    out.llamaServer8090 = { reachable: false, error: e.message };
+  }
+  out.howToFree =
+    'Human only: VS Code task "GPU: Prepare cuVS KMeans" (requires idle slots). This tool never stops anything.';
+  return out;
+}
+
+function gpuRequestVramRelease(args) {
+  const record = {
+    schema: 'atlas.gpu-vram-release-request.v1',
+    requestedAt: new Date().toISOString(),
+    reason: String(args.reason),
+    neededMiB: Number(args.neededMiB),
+    status: 'PENDING_HUMAN',
+  };
+  fs.mkdirSync(path.dirname(GPU_REQUESTS_PATH), { recursive: true });
+  fs.appendFileSync(GPU_REQUESTS_PATH, JSON.stringify(record) + '\n', 'utf8');
+  return {
+    ...record,
+    requestFile: path.relative(process.cwd(), GPU_REQUESTS_PATH),
+    processStopped: false,
+    canonicalAuthority: false,
+    writesPerformed: true,
+    note: 'Request record only. A human must run the VS Code task to free VRAM.',
+  };
+}
 
 const toolArgumentAjv = new Ajv({ allErrors: true, strict: false });
 const toolArgumentValidators = new Map(
@@ -331,6 +435,14 @@ export function validateToolCallArguments(name, args) {
       message: error.message ?? 'invalid value',
     })),
   };
+}
+
+export async function recommendKanbanDagPrefillAlgorithm(
+  { featureId, maxPrefillTasks = 16 },
+  { trace = callTraceTool } = {},
+) {
+  const snapshot = await trace('atlas.kanban_dag_snapshot', { featureId, limit: 128 });
+  return selectKanbanDagPrefillAlgorithm(snapshot, { maxPrefillTasks });
 }
 
 // ── Tool implementations ────────────────────────────────────────────────────────
@@ -1669,6 +1781,9 @@ export async function dispatch(method, params, id) {
       else if (name === 'find_source_refs') result = await findSourceRefs(args);
       else if (name === 'find_feature') result = await findFeature(args);
       else if (name === 'find_route') result = await findRoute(args);
+      else if (name === 'recommend_kanban_dag_prefill_algorithm') result = await recommendKanbanDagPrefillAlgorithm(args);
+      else if (name === 'gpu_vram_status') result = await gpuVramStatus();
+      else if (name === 'gpu_request_vram_release') result = gpuRequestVramRelease(args);
       else throw new Error(`Unknown tool: ${name}`);
       return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
     } catch (e) {
@@ -1747,6 +1862,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   });
 
   log(
-    'atlas-tools MCP ready (classify_intent, build_agentic_rag_context, build_recommendation, record_outcome, and path trace tools)'
+    'atlas-tools MCP ready (intent, RAG context, recommendations, Kanban DAG prefill, outcomes, and path trace tools)'
   );
 }
