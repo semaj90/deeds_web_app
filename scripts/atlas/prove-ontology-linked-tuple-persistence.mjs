@@ -49,6 +49,7 @@ const GATE_ONLY = argv.includes('--gate-only');
 const GROUNDED = GATE_ONLY || argv.includes('--grounded');
 const opt = (n, d) => (argv.find((a) => a.startsWith(`--${n}=`)) ?? `--${n}=${d}`).split('=').slice(1).join('=');
 const sha256 = (b) => createHash('sha256').update(b).digest('hex');
+const canon = (v) => JSON.stringify(v, (_k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x)); // jsonb reorders object keys
 
 export function buildGroundedTuple({ source, lineStart, lineEnd, root = ROOT }) {
   const bytes = fs.readFileSync(path.join(root, source));
@@ -136,9 +137,9 @@ async function groundedMain() {
     if (r.rowCount !== 1) throw new Error(`expected 1 row, got ${r.rowCount}`);
     const row = r.rows[0];
     const parity = {
-      participants: JSON.stringify(row.participants) === JSON.stringify(t.participants),
-      evidence_refs: JSON.stringify(row.evidence_refs) === JSON.stringify(t.evidenceRefs),
-      evidence_span: JSON.stringify(row.evidence_span) === JSON.stringify(t.evidenceSpan),
+      participants: canon(row.participants) === canon(t.participants),
+      evidence_refs: canon(row.evidence_refs) === canon(t.evidenceRefs),
+      evidence_span: canon(row.evidence_span) === canon(t.evidenceSpan),
       source_revision: row.provenance?.sourceRevision === t.provenance.sourceRevision,
     };
     console.log('GROUNDED_READBACK_PARITY', JSON.stringify(parity));
