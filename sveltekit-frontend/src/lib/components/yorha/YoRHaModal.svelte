@@ -1,17 +1,16 @@
-<!-- YoRHa Modal Component with Terminal Styling -->
+<!-- YoRHa Modal Component with Bits UI v2 Dialog Primitives and Tactical Terminal Styling -->
 <script lang="ts">
-  import type { Snippet } from "svelte";
-  import { quintOut } from "svelte/easing";
-  import { fade, scale } from "svelte/transition";
+  import { Dialog } from 'bits-ui';
+  import type { Snippet } from 'svelte';
 
   interface ModalProps {
     open?: boolean;
     title?: string;
     subtitle?: string;
-    size?: "sm" | "md" | "lg" | "xl" | "fullscreen";
+    size?: 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen';
     closable?: boolean;
     persistent?: boolean;
-    type?: "default" | "confirm" | "alert" | "system";
+    type?: 'default' | 'confirm' | 'alert' | 'system';
     onClose?: () => void;
     onConfirm?: () => void;
     children?: Snippet;
@@ -19,429 +18,347 @@
   }
 
   let {
-    open = false,
-    title = "",
-    subtitle = "",
-    size = "md",
+    open = $bindable(false),
+    title = '',
+    subtitle = '',
+    size = 'md',
     closable = true,
     persistent = false,
-    type = "default",
+    type = 'default',
     onClose = () => {},
-	onConfirm = () => {},
-	children,
+    onConfirm = () => {},
+    children,
     footer
   }: ModalProps = $props();
 
-  let modalElement = $state<HTMLDivElement | null>(null);
+  function handleClose() {
+    if (!persistent) {
+      open = false;
+      onClose();
+    }
+  }
 
-  const sizeClasses = {
-    sm: "max-w-sm w-full",
-    md: "max-w-md w-full",
-    lg: "max-w-2xl w-full",
-    xl: "max-w-4xl w-full",
-    fullscreen: "w-[100vw] h-[100vh]"
+  const sizeClasses: Record<string, string> = {
+    sm: 'w-[min(26rem,calc(100vw-2rem))]',
+    md: 'w-[min(38rem,calc(100vw-2rem))]',
+    lg: 'w-[min(54rem,calc(100vw-2rem))]',
+    xl: 'w-[min(70rem,calc(100vw-2rem))]',
+    fullscreen: 'w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)]'
   };
 
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.key === "Escape" && closable && !persistent) {
-      event.preventDefault();
-      onClose();
+  const typeBorderClass = $derived.by(() => {
+    switch (type) {
+      case 'system':
+        return 'border-[#f3d471] shadow-[0_0_35px_rgba(243,212,113,0.25)]';
+      case 'confirm':
+        return 'border-l-4 border-l-[#ffaa00] border-sand/30';
+      case 'alert':
+        return 'border-l-4 border-l-[#ff0041] border-sand/30';
+      default:
+        return 'border-sand/30';
     }
-  }
-
-  function handleBackdropClick(event: MouseEvent) {
-    if (event.target === event.currentTarget && closable && !persistent) {
-      onClose();
-    }
-  }
-
-  // Body scroll lock
-  $effect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-      modalElement?.focus();
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
   });
 </script>
 
-{#if open}
-<div
-  class="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-  onclick={handleBackdropClick}
-  onkeydown={handleKeydown}
-  transition:fade={{
-	duration: 200 }}
-  role="dialog"
-  aria-modal="true"
-  tabindex="-1"
+<Dialog.Root
+  bind:open
+  onOpenChange={(nextOpen) => {
+    if (!nextOpen) {
+      handleClose();
+    }
+  }}
 >
-  <div
-    bind:this={modalElement}
-    class="bg-panel border-2 border-sand/20 shadow-2xl flex flex-col overflow-hidden relative {sizeClasses[size]} {type === 'system' ? 'border-info/50 shadow-[0_0_30px_rgba(34 211 238 0.1)]' : ''}"
-    transition:scale={{
-	duration: 300, easing: quintOut, start: 0.95 }}
-    tabindex="-1"
-  >
-    <!-- Header -->
-    <div class="px-6 py-4 border-b border-sand/20 bg-panel flex items-start justify-between">
-      <div>
-        {#if title}
-          <h2 class="text-sm font-bold text-sand/40 tracking-[0.2em] uppercase">{ title }</h2>
+  <Dialog.Portal>
+    <Dialog.Overlay class="yorha-modal-backdrop" />
+    <Dialog.Content
+      class="yorha-modal-panel {sizeClasses[size] ?? sizeClasses.md} {typeBorderClass}"
+      interactOutsideBehavior={persistent || !closable ? 'ignore' : 'close'}
+      escapeKeydownBehavior={persistent || !closable ? 'ignore' : 'close'}
+    >
+      <!-- Tactical Corner Notches (Phoenix Justice / YoRHa HUD) -->
+      <div class="hud-notch-tl" aria-hidden="true"></div>
+      <div class="hud-notch-tr" aria-hidden="true"></div>
+      <div class="hud-notch-bl" aria-hidden="true"></div>
+      <div class="hud-notch-br" aria-hidden="true"></div>
+
+      <!-- Top highlight accent -->
+      <div class="yorha-top-line" aria-hidden="true"></div>
+
+      <!-- Header -->
+      <div class="yorha-modal-header">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="yorha-status-indicator">
+            <span class="yorha-status-pulse {type}"></span>
+          </div>
+          <div class="min-w-0">
+            {#if title}
+              <Dialog.Title class="yorha-modal-title">
+                {title}
+              </Dialog.Title>
+            {/if}
+            {#if subtitle}
+              <Dialog.Description class="yorha-modal-subtitle">
+                {subtitle}
+              </Dialog.Description>
+            {/if}
+          </div>
+        </div>
+
+        {#if closable && !persistent}
+          <Dialog.Close
+            onclick={handleClose}
+            class="yorha-modal-close"
+            aria-label="Close modal"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </Dialog.Close>
         {/if}
-        {#if subtitle}
-          <p class="text-[10px] text-sand/60 font-mono uppercase mt-1">{ subtitle }</p>
+      </div>
+
+      <!-- Content -->
+      <div class="yorha-modal-body">
+        {#if children}
+          {@render children()}
         {/if}
       </div>
 
-      {#if closable && !persistent}
-        <button
-          onclick={onClose}
-          class="p-1 hover:bg-panelSoft rounded transition-colors text-sand/60 hover:text-white"
-          aria-label="Close modal"
-        >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+      <!-- Footer -->
+      {#if footer || type !== 'default'}
+        <div class="yorha-modal-footer">
+          {#if footer}
+            {@render footer()}
+          {:else if type === 'confirm'}
+            <button
+              onclick={handleClose}
+              type="button"
+              class="px-4 py-2 text-xs font-mono uppercase text-sand/60 hover:text-white border border-sand/30 hover:border-sand/60 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onclick={() => { onConfirm(); handleClose(); }}
+              type="button"
+              class="px-4 py-2 text-xs font-mono uppercase bg-[#f3d471] text-black font-bold hover:bg-[#ffe180] transition-colors shadow-[0_0_12px_rgba(243,212,113,0.3)]"
+            >
+              Confirm
+            </button>
+          {:else if type === 'alert'}
+            <button
+              onclick={handleClose}
+              type="button"
+              class="px-4 py-2 text-xs font-mono uppercase bg-[#ff0041] text-white font-bold hover:bg-[#ff3366] transition-colors shadow-[0_0_12px_rgba(255,0,65,0.4)]"
+            >
+              Acknowledge
+            </button>
+          {/if}
+        </div>
       {/if}
-    </div>
 
-    <!-- Content -->
-    <div class="flex-1 overflow-y-auto p-6 text-sand/40 text-sm">
-      {#if children}
-        {@render children()}
-      {/if}
-    </div>
+      <!-- Decorative scanline/terminal effect -->
+      <div class="yorha-scanlines" aria-hidden="true"></div>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
 
-    <!-- Footer -->
-    {#if footer || type !== 'default'}
-      <div class="px-6 py-4 border-t border-sand/20 bg-panel/50 flex justify-end gap-3">
-        {#if footer}
-          {@render footer()}
-        {:else if type === 'confirm'}
-          <button
-            onclick={onClose}
-            class="px-4 py-2 text-xs font-mono uppercase text-sand/40 hover:text-white transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onclick={onConfirm}
-            class="px-4 py-2 text-xs font-mono uppercase bg-info hover:bg-info text-white transition-colors"
-          >
-            Confirm
-          </button>
-        {:else if type === 'alert'}
-          <button
-            onclick={onClose}
-            class="px-4 py-2 text-xs font-mono uppercase bg-panelSoft hover:bg-panelSoft text-white transition-colors"
-          >
-            Acknowledge
-          </button>
-        {/if}
-      </div>
-    {/if}
-
-    <!-- Decorative scanline/terminal effect -->
-    <div class="absolute inset-0 pointer-events-none opacity-[0.03] overflow-hidden">
-      <div class="w-full h-full bg-[linear-gradient(rgba(18 16 16 0)_50% rgba(0 0 0 0.25)_50%) linear-gradient(90deg rgba(255 0 0 0.06) rgba(0 255 0 0.02) rgba(0 0 255 0.06))] bg-[length:100%_2px 3px_100%]"></div>
-    </div>
-  </div>
-</div>
-{/if}
 <style>
-  .yorha-modal-backdrop { position: fixed;
-		top: 0;
-    left: 0;
-	right: 0;
-    bottom: 0;
+  :global(.yorha-modal-backdrop) {
+    position: fixed;
+    inset: 0;
     z-index: 10000;
-	display: flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-	background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(2px);
+    background: rgba(3, 6, 12, 0.88);
+    backdrop-filter: blur(12px) saturate(1.15);
+    animation: yorhaFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .yorha-modal { position: relative;
-		background: var(--yorha-bg-secondary, #1a1a1a);
-    border: 2px solid var(--yorha-text-muted, #808080);
+  :global(.yorha-modal-panel) {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10001;
+    background: linear-gradient(180deg, rgba(20, 26, 38, 0.98) 0%, rgba(10, 14, 22, 0.99) 100%);
+    border: 1px solid rgba(212, 199, 163, 0.35);
+    box-shadow:
+      0 0 0 1px rgba(243, 212, 113, 0.1),
+      0 28px 70px -15px rgba(0, 0, 0, 0.9),
+      0 0 50px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(18px) saturate(1.2);
     font-family: var(--yorha-font-primary, "JetBrains Mono", monospace);
     color: var(--yorha-text-primary, #e0e0e0);
-    max-height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2.5rem);
     display: flex;
     flex-direction: column;
-	overflow: hidden;
-    box-shadow: 0 0 0 1px var(--yorha-bg-primary, #0a0a0a), 0 20px 80px rgba(0, 0, 0, 0.9);
+    overflow: hidden;
+    animation: yorhaScaleIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Modal Types */
-  .yorha-modal.system {
-    border-color: var(--yorha-secondary, #ffd700);
-    box-shadow: 0 0 0 1px var(--yorha-secondary, #ffd700), 0 0 30px rgba(255, 215, 0, 0.4), 0 20px 80px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(255, 215, 0, 0.1);
+  .yorha-top-line {
+    position: absolute;
+    top: 0;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(243, 212, 113, 0.95), rgba(126, 231, 255, 0.7), transparent);
+    pointer-events: none;
+    z-index: 3;
   }
 
-  .yorha-modal.confirm {
-    border-left: 4px solid var(--yorha-warning, #ffaa00);
+  /* Tactical corner notches */
+  .hud-notch-tl, .hud-notch-tr, .hud-notch-bl, .hud-notch-br {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+    z-index: 4;
   }
-
-  .yorha-modal.alert {
-    border-left: 4px solid var(--yorha-danger, #ff0041);
-  }
+  .hud-notch-tl { top: -1px; left: -1px; border-top: 2px solid #f3d471; border-left: 2px solid #f3d471; }
+  .hud-notch-tr { top: -1px; right: -1px; border-top: 2px solid #f3d471; border-right: 2px solid #f3d471; }
+  .hud-notch-bl { bottom: -1px; left: -1px; border-bottom: 2px solid #f3d471; border-left: 2px solid #f3d471; }
+  .hud-notch-br { bottom: -1px; right: -1px; border-bottom: 2px solid #f3d471; border-right: 2px solid #f3d471; }
 
   /* Header */
-  .modal-header {
-    background: var(--yorha-bg-primary, #0a0a0a);
-    border-bottom: 2px solid var(--yorha-secondary, #ffd700);
-    padding: 16px 20px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-	position: relative;
-  }
-
-  .header-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .modal-title {
-    color: var(--yorha-secondary, #ffd700);
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-	margin: 0 0 4px 0;
-  }
-
-  .modal-subtitle {
-    color: var(--yorha-text-muted, #808080);
-    font-size: 12px;
-	margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .system-status {
+  .yorha-modal-header {
+    background: rgba(8, 12, 18, 0.65);
+    border-bottom: 1px solid rgba(243, 212, 113, 0.25);
+    padding: 1rem 1.5rem;
     display: flex;
     align-items: center;
-	gap: 8px;
-    margin-right: 16px;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
   }
 
-  .status-indicator { position: relative;
-		width: 12px;
-    height: 12px;
-  }
-
-  .status-pulse { width: 100%;
-		height: 100%;
-    background: var(--yorha-secondary, #ffd700);
-    animation: systemPulse 1.5s infinite;
-  }
-
-  .status-text {
-    font-size: 10px;
-    font-weight: 600;
-	color: var(--yorha-secondary, #ffd700);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .modal-close { width: 32px;
-		height: 32px;
-    background: transparent;
-	border: 2px solid var(--yorha-text-muted, #808080);
-    color: var(--yorha-text-muted, #808080);
-    cursor: pointer;
-	display: flex;
+  .yorha-status-indicator {
+    width: 8px;
+    height: 8px;
+    position: relative;
+    display: flex;
     align-items: center;
     justify-content: center;
-	transition:all 0.2s ease;
     flex-shrink: 0;
   }
 
-  .modal-close:hover {
-    border-color: var(--yorha-danger, #ff0041);
-    color: var(--yorha-danger, #ff0041);
-    background: rgba(255, 0, 65, 0.1);
-    transform: scale(1.05);
-  }
-
-  .close-icon {
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  /* Content */
-  .modal-content { padding: 20px;
-		flex: 1;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--yorha-secondary, #ffd700) var(--yorha-bg-primary, #0a0a0a);
-  }
-
-  .modal-content::-webkit-scrollbar {
+  .yorha-status-pulse {
     width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f3d471;
+    box-shadow: 0 0 8px #f3d471;
+    animation: pulseGlow 2s infinite ease-in-out;
   }
 
-  .modal-content::-webkit-scrollbar-track {
-    background: var(--yorha-bg-primary, #0a0a0a);
+  .yorha-status-pulse.alert {
+    background: #ff0041;
+    box-shadow: 0 0 8px #ff0041;
   }
 
-  .modal-content::-webkit-scrollbar-thumb {
-    background: var(--yorha-secondary, #ffd700);
-    border: 1px solid var(--yorha-bg-primary, #0a0a0a);
+  .yorha-status-pulse.confirm {
+    background: #ffaa00;
+    box-shadow: 0 0 8px #ffaa00;
+  }
+
+  :global(.yorha-modal-title) {
+    color: #f3d471;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 0;
+    text-shadow: 0 0 8px rgba(243, 212, 113, 0.3);
+  }
+
+  :global(.yorha-modal-subtitle) {
+    color: rgba(212, 199, 163, 0.65);
+    font-size: 0.6875rem;
+    margin: 0.15rem 0 0 0;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  :global(.yorha-modal-close) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 199, 163, 0.25);
+    cursor: pointer;
+    padding: 0;
+    color: rgba(212, 199, 163, 0.7);
+    transition: all 0.15s ease;
+  }
+
+  :global(.yorha-modal-close:hover) {
+    color: #f3d471;
+    background: rgba(243, 212, 113, 0.15);
+    border-color: rgba(243, 212, 113, 0.5);
+    box-shadow: 0 0 10px rgba(243, 212, 113, 0.25);
+  }
+
+  /* Body */
+  .yorha-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    color: rgba(233, 240, 255, 0.88);
+    position: relative;
+    z-index: 2;
+  }
+
+  .yorha-modal-body::-webkit-scrollbar {
+    width: 6px;
+  }
+  .yorha-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .yorha-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(212, 199, 163, 0.18);
+    border-radius: 3px;
   }
 
   /* Footer */
-  .modal-footer {
-    background: var(--yorha-bg-primary, #0a0a0a);
-    border-top: 1px solid var(--yorha-text-muted, #808080);
-    padding: 16px 20px;
-  }
-
-  .modal-actions {
+  .yorha-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(212, 199, 163, 0.2);
+    background: rgba(8, 12, 18, 0.55);
     display: flex;
     justify-content: flex-end;
-	gap: 12px;
-  }
-
-  .modal-button {
-    display: flex;
+    gap: 0.75rem;
     align-items: center;
-	gap: 8px;
-    padding: 10px 16px;
-    background: var(--yorha-bg-secondary, #1a1a1a);
-    border: 2px solid var(--yorha-text-muted, #808080);
-    color: var(--yorha-text-secondary, #b0b0b0);
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-	cursor: pointer;
-    transition:all 0.2s ease;
+    position: relative;
+    z-index: 2;
   }
 
-  .modal-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  }
-
-  .modal-button.confirm {
-    border-color: var(--yorha-secondary, #ffd700);
-    color: var(--yorha-secondary, #ffd700);
-  }
-
-  .modal-button.confirm:hover {
-    background: var(--yorha-secondary, #ffd700);
-    color: var(--yorha-bg-primary, #0a0a0a);
-  }
-
-  .modal-button.cancel {
-    border-color: var(--yorha-danger, #ff0041);
-    color: var(--yorha-danger, #ff0041);
-  }
-
-  .modal-button.cancel:hover {
-    background: var(--yorha-danger, #ff0041);
-    color: var(--yorha-text-primary, #e0e0e0);
-  }
-
-  .modal-button.acknowledge {
-    border-color: var(--yorha-accent, #00ff41);
-    color: var(--yorha-accent, #00ff41);
-  }
-
-  .modal-button.acknowledge:hover {
-    background: var(--yorha-accent, #00ff41);
-    color: var(--yorha-bg-primary, #0a0a0a);
-  }
-
-  .button-icon {
-    font-size: 14px;
-  }
-
-  /* Terminal Border Effect */
-  .terminal-borders { position: absolute;
-		inset: 0;
+  /* Scanlines */
+  .yorha-scanlines {
+    position: absolute;
+    inset: 0;
     pointer-events: none;
-	overflow: hidden;
+    opacity: 0.04;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    z-index: 1;
   }
 
-  @keyframes systemPulse {
-    0% {
-      opacity: 1;
-      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
-    }
-    70% {
-      opacity: 0;
-      box-shadow: 0 0 0 8px rgba(255, 215, 0, 0);
-    }
-    100% {
-      opacity: 0;
-      box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
-    }
+  @keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.6; }
   }
 
-  @keyframes scanlines {
-    0% {
-      transform: translateY(-100%);
-    }
-    100% {
-      transform: translateY(100vh);
-    }
+  @keyframes yorhaFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .yorha-modal-backdrop {
-      padding: 1rem;
-    }
-    .yorha-modal {
-      max-height: calc(100vh - 2rem);
-    }
-    .modal-header {
-      padding: 12px 16px;
-      flex-direction: column;
-      align-items: flex-start;
-	gap: 8px;
-    }
-    .system-status {
-      margin-right: 0;
-      margin-bottom: 8px;
-    }
-    .modal-close { position: absolute;
-		top: 8px;
-      right: 8px;
-    }
-    .modal-content {
-      padding: 16px;
-    }
-    .modal-footer {
-      padding: 12px 16px;
-    }
-    .modal-actions {
-      flex-direction: column;
-    }
-    .modal-button {
-      justify-content: center;
-    }
-  }
-
-  .yorha-modal.max-w-none {
-    border-radius: 0;
-    max-height: 100vh;
+  @keyframes yorhaScaleIn {
+    from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   }
 </style>
-
-
-
-
-
-
-

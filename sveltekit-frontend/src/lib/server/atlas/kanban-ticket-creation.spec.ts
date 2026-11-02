@@ -62,6 +62,23 @@ describe('createKanbanTask revision-bound ticket creation', () => {
       graphifyRevision: 'graphify:23413763',
       featureRevision: 'feature:oaklib-v1',
       permissionMode: 'proposal_only',
+      analysisProposal: {
+        schema: 'atlas.kanban-task-analysis-enrichment.v1',
+        taskId: 'task-ticket-v1',
+        featureId: 'feat:oaklib-tuple-gate',
+        sourceRef: 'scripts/atlas/prove_oaklib_ontology_tuple_to_pytorch_loading_v1.py',
+        sourceRevision: `sha256:${'a'.repeat(64)}`,
+        sourceRevisionScope: 'ANALYZED_TASK_TEXT_ONLY',
+        sourceRefStatus: 'WORKBOARD_REFERENCE_NOT_REVALIDATED',
+        contentSha256: `sha256:${'a'.repeat(64)}`,
+        status: 'PROPOSED',
+        authority: 'PROPOSAL_ONLY',
+        canonicalAuthority: false,
+        packetEnvelopeStatus: 'UNAVAILABLE_NO_CANONICAL_PACKET_BINDING',
+        nlp: { service: '8095', route: '/analyze', providerRevision: 'test-revision', entityCount: 1, relationshipCount: 0, conceptCandidates: ['ontology'], classificationHelperAvailable: true },
+        domainProposal: { status: 'PROPOSED', label: 'software', ontologyLabels: ['software'], producerRevision: 'rules-v1', reason: null },
+        learnedClassifiers: { naiveBayes: 'NOT_ADMITTED', logisticRegression: 'NOT_ADMITTED', reason: 'NO_CURRENT_ADMITTED_TRAINING_RECEIPT' },
+      },
     });
 
     expect(created.taskId).toBe('task-ticket-v1');
@@ -77,6 +94,14 @@ describe('createKanbanTask revision-bound ticket creation', () => {
         graphifyRevision: 'graphify:23413763',
         featureRevision: 'feature:oaklib-v1',
         permissionMode: 'proposal_only',
+        analysisProposal: expect.objectContaining({
+          schema: 'atlas.kanban-task-analysis-enrichment.v1',
+          canonicalAuthority: false,
+          sourceRevisionScope: 'ANALYZED_TASK_TEXT_ONLY',
+          sourceRefStatus: 'WORKBOARD_REFERENCE_NOT_REVALIDATED',
+          packetEnvelopeStatus: 'UNAVAILABLE_NO_CANONICAL_PACKET_BINDING',
+          learnedClassifiers: { naiveBayes: 'NOT_ADMITTED', logisticRegression: 'NOT_ADMITTED', reason: 'NO_CURRENT_ADMITTED_TRAINING_RECEIPT' },
+        }),
       }),
     });
   });

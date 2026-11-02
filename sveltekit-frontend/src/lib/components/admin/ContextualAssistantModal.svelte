@@ -107,16 +107,28 @@
 
 <Dialog.Root bind:open>
   <Dialog.Portal>
-    <Dialog.Overlay class="fixed inset-0 z-[99] bg-black/60 backdrop-blur-md" />
+    <!-- Tactical Backdrop -->
+    <Dialog.Overlay class="hud-modal-backdrop fixed inset-0 z-[9990] bg-black/80 backdrop-blur-md transition-opacity" />
+
+    <!-- Centered Modal Content Container -->
     <Dialog.Content
-      class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+      class="fixed inset-0 z-[9991] flex items-center justify-center p-4 sm:p-6 pointer-events-none"
     >
       <div
-        class="relative w-full max-w-2xl h-[600px] flex flex-col bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)]"
+        class="pointer-events-auto relative w-full max-w-2xl h-[600px] flex flex-col bg-[#131b2a]/95 text-sand border border-[#f3d471]/30 rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] backdrop-blur-xl"
         in:fly={{ y: 20, duration: 400 }}
       >
+        <!-- Tactical Corner Notches (Phoenix Justice / YoRHa HUD) -->
+        <span class="hud-notch-tl" aria-hidden="true"></span>
+        <span class="hud-notch-tr" aria-hidden="true"></span>
+        <span class="hud-notch-bl" aria-hidden="true"></span>
+        <span class="hud-notch-br" aria-hidden="true"></span>
+
+        <!-- Top Highlight Bar -->
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#f3d471]/80 to-transparent"></div>
+
         <!-- Header -->
-        <header class="p-8 border-b border-white/5 flex items-center justify-between bg-black/20 backdrop-blur-md">
+        <header class="p-8 border-b border-[#f3d471]/20 flex items-center justify-between bg-black/20 backdrop-blur-md">
           <div class="flex items-center gap-6">
             <div class="relative">
               <div class="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center border border-accent/30 shadow-[0_0_20px_rgba(138,223,255,0.2)]">
@@ -125,10 +137,10 @@
               <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-black"></div>
             </div>
             <div>
-              <h2 class="text-xl font-bold tracking-tight text-white flex items-center gap-3">
+              <Dialog.Title class="text-xl font-bold tracking-tight text-white flex items-center gap-3">
                 TRACE Copilot
                 <span class="px-2 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-[10px] uppercase tracking-widest text-accent font-mono">Read Only</span>
-              </h2>
+              </Dialog.Title>
               <div class="flex items-center gap-3 mt-1.5">
                 <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] font-mono text-white/40 uppercase">
                   <span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>
@@ -150,7 +162,7 @@
               {snapshot.value.toString().toUpperCase()}
             </div>
             <button
-              class="w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all"
+              class="w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all cursor-pointer"
               onclick={() => open = false}
               aria-label="Close assistant"
             >
@@ -241,7 +253,7 @@
         </div>
 
         <!-- Input -->
-        <footer class="p-8 border-t border-white/5 bg-black/40 space-y-4">
+        <footer class="p-8 border-t border-[#f3d471]/20 bg-black/40 space-y-4">
           {#if attachments.length > 0}
             <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {#each attachments as file, idx}
@@ -270,7 +282,7 @@
             <textarea
               bind:value={inputVal}
               placeholder="Command subagents or analyze view..."
-              class="w-full bg-white/5 border border-white/10 rounded-[1.25rem] py-5 pl-16 pr-16 text-sm focus:outline-none focus:border-accent/40 transition-all placeholder:opacity-20 min-h-[64px] max-h-32 resize-none shadow-2xl"
+              class="w-full bg-white/5 border border-white/10 rounded-[1.25rem] py-5 pl-16 pr-16 text-sm focus:outline-none focus:border-[#f3d471]/60 transition-all placeholder:opacity-20 min-h-[64px] max-h-32 resize-none shadow-2xl"
               onkeydown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
               disabled={snapshot.matches('thinking')}
             ></textarea>
@@ -285,7 +297,7 @@
 
             <button
               type="button"
-              class="absolute left-4 bottom-4 w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all"
+              class="absolute left-4 bottom-4 w-10 h-10 rounded-xl hover:bg-white/10 text-white/40 flex items-center justify-center transition-all cursor-pointer"
               onclick={() => fileInput.click()}
               disabled={isUploading || snapshot.matches('thinking')}
             >
@@ -299,7 +311,7 @@
             <button
               type="submit"
               aria-label="Send message"
-              class="absolute right-4 bottom-4 w-12 h-12 rounded-[1rem] bg-accent text-black flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:scale-100 shadow-[0_0_30px_rgba(138,223,255,0.3)]"
+              class="absolute right-4 bottom-4 w-12 h-12 rounded-[1rem] bg-[#f3d471] hover:bg-[#ffe180] text-black font-bold flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:scale-100 shadow-[0_0_20px_rgba(243,212,113,0.3)] cursor-pointer"
               disabled={(!inputVal.trim() && attachments.length === 0) || snapshot.matches('thinking')}
             >
               <span class="i-carbon-send-alt text-2xl"></span>
@@ -348,5 +360,39 @@
 
   .animate-progress {
     animation: progress 2s linear infinite;
+  }
+
+  .hud-notch-tl,
+  .hud-notch-tr,
+  .hud-notch-bl,
+  .hud-notch-br {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+  }
+  .hud-notch-tl {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid #f3d471;
+    border-left: 2px solid #f3d471;
+  }
+  .hud-notch-tr {
+    top: -1px;
+    right: -1px;
+    border-top: 2px solid #f3d471;
+    border-right: 2px solid #f3d471;
+  }
+  .hud-notch-bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom: 2px solid #f3d471;
+    border-left: 2px solid #f3d471;
+  }
+  .hud-notch-br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid #f3d471;
+    border-right: 2px solid #f3d471;
   }
 </style>

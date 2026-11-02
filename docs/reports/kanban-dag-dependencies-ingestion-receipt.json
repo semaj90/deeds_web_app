@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.kanban-dag-dependencies-ingestion.v1",
+  "generatedAt": "2026-11-01T23:29:21.052Z",
+  "mode": "LIVE_APPLY",
+  "canonicalAuthority": false,
+  "writesPerformed": true,
+  "cohortsAnalyzed": 95,
+  "edgesDiscovered": 3021,
+  "edgesSkippedCyclePrevention": 8,
+  "edgesInserted": 3021,
+  "dagIntegrity": {
+    "cycleCount": 0,
+    "maxDepth": 50,
+    "totalEdgesInDb": 3031
+  }
+}

@@ -6,6 +6,7 @@
     import { onMount } from 'svelte';
     import CaseDocumentWriter from '$lib/components/legal-ai/CaseDocumentWriter.svelte';
     import YorhaSidebar from '$lib/components/layout/YorhaSidebar.svelte';
+    import YorhaTopNavBar from '$lib/components/layout/YorhaTopNavBar.svelte';
     import { notificationStore } from '$lib/stores/notifications.svelte';
     import { analytics } from '$lib/stores/analytics.svelte';
     import { page, navigating } from '$app/state';
@@ -14,10 +15,30 @@
     import { registerServiceWorker } from '$lib/client/sw-register';
     import { Toaster, toast } from 'svelte-sonner';
 
-    let { children, data }: { children: Snippet; data: { user?: { id: string } | null } } = $props();
+    let {
+        children,
+        data
+    }: {
+        children: Snippet;
+        data: {
+            user?: {
+                id?: string;
+                email?: string;
+                firstName?: string | null;
+                lastName?: string | null;
+                role?: string;
+                avatarUrl?: string | null;
+            } | null;
+            devBypass?: boolean;
+        };
+    } = $props();
     let showDocumentWriter = $state(false);
     let mounted = $state(false);
-    let showGlobalSidebar = $derived(page.url.pathname !== '/');
+    let isFullscreenAuthRoute = $derived(
+        page.url.pathname.startsWith('/login') || page.url.pathname.startsWith('/register')
+    );
+    let showGlobalSidebar = $derived(page.url.pathname !== '/' && !isFullscreenAuthRoute);
+    let showGlobalNavbar = $derived(!isFullscreenAuthRoute);
 
     function handleGlobalKeydown(e: KeyboardEvent) {
         // Skip shortcuts when typing in inputs
@@ -46,35 +67,8 @@
 
     import GlobalCommandPalette from '$lib/components/ui/GlobalCommandPalette.svelte';
     let showCommandPalette = $state(false);
-    // Import webgpu modules dynamically to avoid SSR issues
-    let webgpu: any = null;
-    let cpuFallback: any = null;
-    let webgpuReady = $state(false);
-    let cpuFallbackReady = $state(false);
-
     $effect(() => {
-        // Initialize Phase 76 Barrel Stores
         initializeStores();
-
-        (async () => {
-            try {
-                const webgpuModule = await import('$lib/webgpu/webgpu-init');
-                webgpu = webgpuModule.webgpu;
-                await webgpu.initialize();
-                webgpuReady = true;
-            } catch (error) {
-                console.warn('WebGPU initialization failed:', error);
-            }
-
-            try {
-                const cpuFallbackModule = await import('$lib/webgpu/webgpu-cpu-fallback');
-                cpuFallback = cpuFallbackModule.cpuFallback;
-                await cpuFallback.initialize();
-                cpuFallbackReady = true;
-            } catch (error) {
-                console.warn('CPU fallback initialization failed:', error);
-            }
-        })();
     });
 
     // Bridge existing notificationStore → svelte-sonner toasts
@@ -106,11 +100,8 @@
 
     import CaseOverviewModal from '$lib/components/cases/CaseOverviewModal.svelte';
     import DocumentDetailModal from '$lib/components/DocumentDetailModal.svelte';
-    import AIAssistantButton from '$lib/components/ai/AIAssistantButton.svelte';
-    import FloatingChatModal from '$lib/components/ai/FloatingChatModal.svelte';
+    import ContextualScreenAssistantDock from '$lib/components/ai/ContextualScreenAssistantDock.svelte';
     import CitationSaveTooltip from '$lib/components/legal/CitationSaveTooltip.svelte';
-
-    let showAIChat = $state(false);
 
     // Extract caseId from URL when on a case route (/cases/[id]/...)
     let activeCaseId = $derived.by(() => {
@@ -130,16 +121,20 @@
                 description: 'Switched to CPU fallback mode for compute operations',
                 duration: 8000,
             });
-            // CPU fallback is already initialized in the $effect above
-            webgpuReady = false;
+        };
+
+        const handleOpenCommandPalette = () => {
+            showCommandPalette = true;
         };
 
         window.addEventListener('webgpu-device-lost', handleDeviceLost);
+        window.addEventListener('yorha:open-command-palette', handleOpenCommandPalette);
 
         return () => {
             analytics.destroy();
             cleanupStores();
             window.removeEventListener('webgpu-device-lost', handleDeviceLost);
+            window.removeEventListener('yorha:open-command-palette', handleOpenCommandPalette);
         };
     });
 
@@ -153,10 +148,10 @@
 </script>
 
 <svelte:window onkeydown={handleGlobalKeydown} />
-<Toaster />
+<Toaster theme="dark" richColors closeButton position="bottom-right" />
 <GlobalCommandPalette bind:open={showCommandPalette} />
 
-<!-- YoRHa Detective Sidebar -->
+<!-- YoRHa Legal Crest Sidebar / Minimizable Rail -->
 {#if showGlobalSidebar}
     <YorhaSidebar />
 {/if}
@@ -169,6 +164,16 @@
 <!-- Main Content Area -->
 <div class="app-shell" class:with-global-sidebar={showGlobalSidebar} class:without-global-sidebar={!showGlobalSidebar}>
     <main class="main-content">
+        {#if showGlobalNavbar}
+            <YorhaTopNavBar
+                user={data?.user}
+                devBypass={data?.devBypass}
+                onOpenCommandPalette={() => {
+                    showCommandPalette = true;
+                }}
+            />
+        {/if}
+
         {#if appState.globalError}
             <div class="error-toast">{appState.globalError}</div>
         {/if}
@@ -182,12 +187,7 @@
 {#if mounted}
     <CitationSaveTooltip caseId={activeCaseId} />
     <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
-    <AIAssistantButton
-        variant="floating"
-        position="bottom-right"
-        onclick={() => showAIChat = !showAIChat}
-    />
-    <FloatingChatModal bind:open={showAIChat} caseId={activeCaseId} currentRoute={page.url.pathname} />
+    <ContextualScreenAssistantDock caseId={activeCaseId} currentRoute={page.url.pathname} />
 {/if}
 
 {#if page.state.showCaseModal && page.state.caseId}
@@ -231,7 +231,7 @@
     :global(body) {
         background: var(--t-bg, #060a12);
         color: var(--t-text, var(--shell-text));
-        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
         margin: 0;
         padding: 0;
         overflow-x: hidden;
@@ -242,25 +242,29 @@
 
     .app-shell {
         min-height: 100vh;
-        transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: padding-left 0.26s cubic-bezier(0.22, 1, 0.36, 1);
         background:
-            radial-gradient(circle at top left, rgba(126, 231, 255, 0.14), transparent 30%),
-            radial-gradient(circle at top right, rgba(255, 212, 121, 0.12), transparent 24%),
-            radial-gradient(circle at bottom right, rgba(83, 183, 255, 0.12), transparent 30%),
+            radial-gradient(circle at top left, rgba(126, 231, 255, 0.1), transparent 30%),
+            radial-gradient(circle at top right, rgba(255, 212, 121, 0.1), transparent 24%),
             linear-gradient(180deg, #101728 0%, #0a0f1c 52%, #060910 100%);
         position: relative;
     }
 
+    /* Default to minimized 56px slim icon rail on SSR frame-0 to match YorhaSidebar default collapsed=true */
     .app-shell.with-global-sidebar {
-        padding-left: 210px;
+        padding-left: var(--shell-sidebar-rail-w, 56px);
+    }
+
+    :global(body:has(.yorha-sidebar:not(.collapsed))) .app-shell.with-global-sidebar {
+        padding-left: var(--shell-sidebar-w, 216px);
+    }
+
+    :global(body:has(.yorha-sidebar.collapsed)) .app-shell.with-global-sidebar {
+        padding-left: var(--shell-sidebar-rail-w, 56px);
     }
 
     .app-shell.without-global-sidebar {
         padding-left: 0;
-    }
-
-    :global(body:has(.yorha-sidebar.collapsed)) .app-shell {
-        padding-left: 60px;
     }
 
     .app-shell::before {
@@ -278,33 +282,43 @@
             );
         mix-blend-mode: screen;
         opacity: 0.45;
-        transition: inset 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: inset 0.26s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .app-shell.with-global-sidebar::before {
-        inset: 0 0 0 210px;
+        inset: 0 0 0 var(--shell-sidebar-rail-w, 56px);
+    }
+
+    :global(body:has(.yorha-sidebar:not(.collapsed))) .app-shell.with-global-sidebar::before {
+        inset: 0 0 0 var(--shell-sidebar-w, 216px);
+    }
+
+    :global(body:has(.yorha-sidebar.collapsed)) .app-shell.with-global-sidebar::before {
+        inset: 0 0 0 var(--shell-sidebar-rail-w, 56px);
     }
 
     .app-shell.without-global-sidebar::before {
         inset: 0;
     }
 
-    :global(body:has(.yorha-sidebar.collapsed)) .app-shell::before {
-		inset: 0 0 0 60px;
-    }
-
     .main-content {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-		position: relative;
-		z-index: 1;
+        position: relative;
+        z-index: 1;
     }
 
     .content {
         flex: 1;
-		padding: 2rem 2.5rem;
+        padding: 2rem 2.5rem;
         max-width: 100%;
+    }
+
+    /* Flush alignment for all (app) routes using YorhaTopNavBar — eliminates outer moat */
+    :global(body:has(.yorha-top-navbar)) .content,
+    :global(body:has(#main-content.app-content)) .content {
+        padding: 0;
     }
 
     .error-toast {
@@ -341,7 +355,7 @@
         right: 0;
         height: 3px;
         z-index: 9999;
-        background: linear-gradient(90deg, transparent, var(--t-accent, #ffd700), transparent);
+        background: linear-gradient(90deg, transparent, var(--shell-gold, #C8A24A), transparent);
         animation: navProgress 1.5s ease-in-out infinite;
     }
 
@@ -361,13 +375,13 @@
 
     /* Branded text selection */
     :global(::selection) {
-        background: rgba(126, 231, 255, 0.22);
-        color: #f5fbff;
+        background: rgba(200, 162, 74, 0.28);
+        color: #141312;
     }
 
     /* Accessible focus ring — visible only on keyboard nav */
     :global(:focus-visible) {
-        outline: 2px solid rgba(126, 231, 255, 0.42);
+        outline: 2px solid rgba(200, 162, 74, 0.55);
         outline-offset: 2px;
     }
 
@@ -378,60 +392,59 @@
         outline: none;
     }
 
-    /* Typography Hierarchy */
-    :global(h1) {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 2rem;
+    /* Typography Hierarchy (zero-specificity :where defaults — clean editorial sans/serif, no pixel font bleed) */
+    :global(:where(h1)) {
+        font-family: Georgia, 'Times New Roman', ui-serif, serif;
+        font-style: normal;
+        font-size: 1.75rem;
         font-weight: 700;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: #e8e4c8;
-        margin: 0 0 1.5rem 0;
-        line-height: 1.2;
+        letter-spacing: 0.025em;
+        color: #f4efe6;
+        margin: 0 0 1.25rem 0;
+        line-height: 1.22;
     }
 
-    :global(h2) {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 1.5rem;
+    :global(:where(h2)) {
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
+        font-size: 1.35rem;
         font-weight: 700;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: #ddd7b8;
-        margin: 0 0 1rem 0;
+        letter-spacing: 0.03em;
+        color: #ebe5d8;
+        margin: 0 0 0.85rem 0;
         line-height: 1.3;
     }
 
-    :global(h3) {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 1.25rem;
+    :global(:where(h3)) {
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
+        font-size: 1.1rem;
         font-weight: 600;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: #c9c39f;
-        margin: 0 0 0.75rem 0;
+        letter-spacing: 0.03em;
+        color: #dbd3c2;
+        margin: 0 0 0.65rem 0;
         line-height: 1.4;
     }
 
-    :global(h4, h5, h6) {
-        font-family: 'JetBrains Mono', monospace;
+    :global(:where(h4, h5, h6)) {
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
         font-weight: 600;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        color: #bdb691;
+        letter-spacing: 0.03em;
+        color: #cfc6b4;
         margin: 0 0 0.5rem 0;
     }
 
-    :global(p) {
-        font-family: 'JetBrains Mono', monospace;
-		color: var(--shell-text-soft);
+    :global(:where(p)) {
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
+        color: var(--shell-text-soft);
         margin: 0 0 1rem 0;
         line-height: 1.6;
     }
 
-    /* Professional Panels & Cards — glassmorphism, borderless */
-    :global(.panel),
-    :global(.card),
-    :global([class*="panel"]) {
+    /* Professional Panels & Cards — glassmorphism fallback */
+    :global(:where(.panel, .card, [class*="panel"]:not([class*="dossier-"]):not([class*="navbar-"]))) {
         background: linear-gradient(180deg, rgba(18, 24, 38, 0.72) 0%, rgba(8, 12, 22, 0.78) 100%);
         border: none;
         border-radius: var(--shell-radius-lg);
@@ -445,24 +458,24 @@
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    :global(.panel:hover),
-    :global(.card:hover) {
+    :global(:where(.panel:hover, .card:hover)) {
         box-shadow:
             0 24px 56px rgba(0, 0, 0, 0.48),
             inset 0 1px 0 rgba(255, 255, 255, 0.06);
-        background: linear-gradient(180deg, rgba(22, 30, 46, 0.78) 0%, rgba(10, 15, 26, 0.82) 100%a(22, 30, 46, 0.78) 0%, rgba(10, 15, 26, 0.82) 100%);
+        background: linear-gradient(180deg, rgba(22, 30, 46, 0.78) 0%, rgba(10, 15, 26, 0.82) 100%);
         transform: translateY(-1px);
     }
 
-    /* Professional Input Styling */
-    :global(input),
-    :global(textarea),
-    :global(select) {
+    /* Professional Input Styling — zero-specificity :where fallback */
+    :global(:where(input:not([class*="navbar-"]):not([class*="dossier-"]):not([data-unstyled]))),
+    :global(:where(textarea:not([class*="dossier-"]):not([data-unstyled]))),
+    :global(:where(select:not([class*="dossier-"]):not([data-unstyled]))) {
         background: rgba(8, 12, 22, 0.6);
         border: none;
         border-radius: var(--shell-radius-sm);
         color: var(--shell-text);
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
         font-size: 0.875rem;
         padding: 0.75rem 1rem;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -472,9 +485,9 @@
             0 8px 16px rgba(0, 0, 0, 0.15);
     }
 
-    :global(input:focus),
-    :global(textarea:focus),
-    :global(select:focus) {
+    :global(:where(input:not([class*="navbar-"]):not([class*="dossier-"]):not([data-unstyled]):focus)),
+    :global(:where(textarea:not([class*="dossier-"]):not([data-unstyled]):focus)),
+    :global(:where(select:not([class*="dossier-"]):not([data-unstyled]):focus)) {
         outline: none;
         box-shadow:
             0 0 0 2px rgba(126, 231, 255, 0.18),
@@ -482,93 +495,94 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
-    :global(input::placeholder),
-    :global(textarea::placeholder) {
-		color: var(--shell-muted);
+    :global(:where(input:not([class*="navbar-"])::placeholder)),
+    :global(:where(textarea::placeholder)) {
+        color: var(--shell-muted);
     }
 
-    :global(input[type='file']) {
-		padding: 0.625rem;
-		border-style: none;
-		background: rgba(10, 15, 25, 0.5);
+    :global(:where(input[type='file'])) {
+        padding: 0.625rem;
+        border-style: none;
+        background: rgba(10, 15, 25, 0.5);
     }
 
-    :global(input[type='file']::file-selector-button) {
-		margin-right: 0.85rem;
-		padding: 0.625rem 1rem;
-		border: none;
-		border-radius: 999px;
-		background: rgba(126, 231, 255, 0.12);
-		color: var(--shell-text);
-		font: inherit;
-		font-size: 0.75rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		cursor: pointer;
+    :global(:where(input[type='file']::file-selector-button)) {
+        margin-right: 0.85rem;
+        padding: 0.625rem 1rem;
+        border: none;
+        border-radius: 999px;
+        background: rgba(126, 231, 255, 0.12);
+        color: var(--shell-text);
+        font: inherit;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
     }
 
-    :global(input[type='file']::file-selector-button:hover) {
-		background: rgba(126, 231, 255, 0.2);
+    :global(:where(input[type='file']::file-selector-button:hover)) {
+        background: rgba(126, 231, 255, 0.2);
     }
 
-    /* Professional Button Styling */
-    :global(button),
-    :global(a[class*="btn"]),
-    :global(a.empty-action) {
+    /* Professional Button Styling — zero-specificity fallback so tabs, Bits UI triggers, navbar, and utility classes win cleanly */
+    :global(:where(button:not([role="tab"]):not([role="menuitem"]):not([role="switch"]):not([role="checkbox"]):not([role="radio"]):not([data-unstyled]):not([data-bits-tooltip-trigger]):not([data-tooltip-trigger]):not([data-dialog-close]):not([class*="dossier-"]):not([class*="navbar-"]):not([class*="hud-"]):not([class*="modal-light-"]):not([class*="legal-icon-"]))),
+    :global(:where(a[class*="btn"])),
+    :global(:where(a.empty-action)) {
         position: relative;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 0.55rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.8125rem;
+        gap: 0.45rem;
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
+        font-size: 0.75rem;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-		border: 1px solid rgba(126, 231, 255, 0.12);
-        border-radius: var(--shell-radius-md);
-		background: rgba(18, 25, 40, 0.6);
-		color: var(--shell-text);
-        padding: 0.75rem 1.5rem;
+        border: 1px solid rgba(126, 231, 255, 0.14);
+        border-radius: 8px;
+        background: rgba(18, 25, 40, 0.65);
+        color: var(--shell-text);
+        padding: 0.45rem 0.95rem;
         cursor: pointer;
         text-decoration: none;
         border-bottom: none;
         overflow: hidden;
         isolation: isolate;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        backdrop-filter: blur(12px);
+        transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
         box-shadow:
-			0 12px 24px rgba(0, 0, 0, 0.2),
-			inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            0 4px 12px rgba(0, 0, 0, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
-    :global(button)::before,
-    :global(a[class*="btn"])::before,
-    :global(a.empty-action)::before {
+    :global(:where(button:not([role="tab"]):not([role="menuitem"]):not([role="switch"]):not([role="checkbox"]):not([role="radio"]):not([data-unstyled]):not([data-bits-tooltip-trigger]):not([data-tooltip-trigger]):not([data-dialog-close]):not([class*="dossier-"]):not([class*="navbar-"]):not([class*="hud-"]):not([class*="modal-light-"]):not([class*="legal-icon-"])))::before,
+    :global(:where(a[class*="btn"]))::before,
+    :global(:where(a.empty-action))::before {
         content: '';
         position: absolute;
         inset: 1px;
-        border-radius: calc(var(--shell-radius-md) - 4px);
+        border-radius: 6px;
         background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 38%),
-            linear-gradient(90deg, rgba(126, 231, 255, 0.08), transparent 42%, rgba(255, 212, 121, 0.06));
+            linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 38%),
+            linear-gradient(90deg, rgba(126, 231, 255, 0.06), transparent 42%, rgba(255, 212, 121, 0.05));
         pointer-events: none;
     }
 
-    :global(button:hover:not(:disabled)),
-    :global(a[class*="btn"]:hover),
-    :global(a.empty-action:hover) {
-        background: rgba(26, 36, 56, 0.72);
-        border-color: rgba(126, 231, 255, 0.22);
+    :global(:where(button:not([role="tab"]):not([role="menuitem"]):not([role="switch"]):not([role="checkbox"]):not([role="radio"]):not([data-unstyled]):not([data-bits-tooltip-trigger]):not([data-tooltip-trigger]):not([data-dialog-close]):not([class*="dossier-"]):not([class*="navbar-"]):not([class*="hud-"]):not([class*="modal-light-"]):not([class*="legal-icon-"])):hover:not(:disabled)),
+    :global(:where(a[class*="btn"]:hover)),
+    :global(:where(a.empty-action:hover)) {
+        background: rgba(26, 36, 56, 0.78);
+        border-color: rgba(197, 158, 43, 0.45);
         box-shadow:
-            0 16px 32px rgba(0, 0, 0, 0.28),
+            0 8px 20px rgba(0, 0, 0, 0.24),
             inset 0 1px 0 rgba(255, 255, 255, 0.06);
         transform: translateY(-1px);
     }
 
-    :global(button:active:not(:disabled)) {
-        transform: translateY(1px) scale(0.98);
+    :global(:where(button:not([role="tab"]):not([data-unstyled]):not([class*="dossier-"]):not([class*="navbar-"]):not([class*="hud-"])):active:not(:disabled)) {
+        transform: translateY(1px) scale(0.99);
         box-shadow:
             0 0px 1px rgba(0, 0, 0, 0.4),
             inset 0 2px 4px rgba(0, 0, 0, 0.15);
@@ -613,21 +627,22 @@
             inset 0 1px 0 rgba(255, 255, 255, 0.18);
     }
 
-    /* Link Styling */
-    :global(a) {
+    /* Link Styling (zero-specificity :where fallback) */
+    :global(:where(a)) {
         color: rgba(183, 224, 255, 0.88);
         text-decoration: none;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
         font-weight: 500;
         border-bottom: none;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    :global(a:hover) {
-		color: #f6fbff;
+    :global(:where(a:hover)) {
+        color: #f6fbff;
     }
 
-    :global(a:active) {
+    :global(:where(a:active)) {
         opacity: 0.7;
     }
 
@@ -638,32 +653,33 @@
     }
 
     :global(::-webkit-scrollbar-track) {
-		background: rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.03);
         border-radius: 5px;
     }
 
     :global(::-webkit-scrollbar-thumb) {
-		background: linear-gradient(180deg, rgba(83, 183, 255, 0.42) 0%, rgba(120, 160, 220, 0.46) 100%);
+        background: linear-gradient(180deg, rgba(200, 162, 74, 0.42) 0%, rgba(127, 117, 101, 0.46) 100%);
         border-radius: 5px;
         border: 2px solid transparent;
         background-clip: padding-box;
     }
 
     :global(::-webkit-scrollbar-thumb:hover) {
-		background: linear-gradient(180deg, rgba(126, 231, 255, 0.52) 0%, rgba(255, 212, 121, 0.42) 100%);
+        background: linear-gradient(180deg, rgba(229, 199, 123, 0.62) 0%, rgba(103, 20, 15, 0.55) 100%);
         background-clip: padding-box;
     }
 
     /* Table Styling */
-    :global(table) {
+    :global(:where(table)) {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: var(--yorha-font-ui, 'Inter', system-ui, -apple-system, sans-serif);
+        font-style: normal;
         font-size: 0.875rem;
     }
 
-    :global(th) {
+    :global(:where(th)) {
         background: rgba(18, 26, 42, 0.7);
         color: rgba(213, 233, 255, 0.88);
         font-weight: 700;
@@ -674,25 +690,22 @@
         border-bottom: 1px solid rgba(126, 231, 255, 0.08);
     }
 
-    :global(td) {
+    :global(:where(td)) {
         padding: 0.75rem 1rem;
         border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         color: rgba(214, 226, 248, 0.82);
     }
 
-    :global(tr:nth-child(even)) {
+    :global(:where(tr:nth-child(even))) {
         background: rgba(120, 160, 220, 0.025);
     }
 
-    :global(tr:hover) {
+    :global(:where(tr:hover)) {
         background: rgba(126, 231, 255, 0.06);
     }
 
-    /* Badge/Tag Styling */
-    :global(.badge),
-    :global(.tag),
-    :global([class*="badge"]),
-    :global([class*="tag"]) {
+    /* Badge/Tag Styling — zero-specificity :where fallback */
+    :global(:where(.badge, .tag, [class*="badge"], [class*="tag"])) {
         display: inline-flex;
         align-items: center;
         padding: 0.25rem 0.75rem;
@@ -757,22 +770,27 @@
     /* Mobile Responsiveness */
     @media (max-width: 768px) {
         .app-shell.with-global-sidebar {
-            padding-left: 60px;
+            padding-left: var(--shell-sidebar-rail-w, 56px);
         }
 
         .content {
             padding: 1.5rem;
         }
 
-		.app-shell::before {
-            inset: 0 0 0 60px;
-		}
+        :global(body:has(.yorha-top-navbar)) .content,
+        :global(body:has(#main-content.app-content)) .content {
+            padding: 0;
+        }
 
-        :global(h1) {
+        .app-shell.with-global-sidebar::before {
+            inset: 0 0 0 var(--shell-sidebar-rail-w, 56px);
+        }
+
+        :global(:where(h1)) {
             font-size: 1.5rem;
         }
 
-        :global(h2) {
+        :global(:where(h2)) {
             font-size: 1.25rem;
         }
     }

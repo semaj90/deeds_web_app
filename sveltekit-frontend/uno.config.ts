@@ -113,6 +113,40 @@ export default defineConfig({
     'btn-ghost': 'btn bg-white/6 hover:bg-white/10',
     input:
       'w-full rounded-xl bg-black/20 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-400/30',
+    'legal-action':
+      'inline-flex min-h-9 items-center justify-center gap-2 rounded-md border border-slate-700 bg-slate-900 px-3 py-2 font-mono text-xs text-slate-200 transition-colors hover:border-slate-500 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300 disabled:cursor-not-allowed disabled:opacity-50',
+    'legal-action-primary':
+      'border-blue-500/60 bg-blue-600 text-white hover:border-blue-400 hover:bg-blue-500',
+    'legal-action-danger':
+      'border-rose-500/40 bg-rose-950/50 text-rose-200 hover:border-rose-400/70 hover:bg-rose-900/70',
+    'legal-action-selected': 'border-blue-400 bg-blue-950 text-blue-200',
+    'legal-action-sm': 'min-h-8 px-2 py-1 text-[11px]',
+    'legal-action-xs': 'min-h-7 px-2 py-1 text-[10px]',
+    'legal-icon-action':
+      'group inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-700 bg-slate-900 text-slate-400 transition-colors hover:border-amber-300/50 hover:bg-slate-800 hover:text-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300 disabled:cursor-not-allowed disabled:opacity-50',
+    'legal-icon-action-danger':
+      'group inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-rose-500/40 bg-rose-950/50 text-rose-200 transition-colors hover:border-rose-400/70 hover:bg-rose-900/70 hover:text-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-300 disabled:cursor-not-allowed disabled:opacity-50',
+    'legal-notes-backdrop':
+      'fixed inset-0 z-[1000] flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm',
+    'legal-notes-frame':
+      'relative flex h-[85vh] max-h-[90dvh] w-[750px] max-w-[90vw] flex-col overflow-hidden border border-slate-600 bg-slate-950 text-slate-100 shadow-2xl',
+    'legal-notes-titlebar':
+      'flex min-h-12 items-center justify-between gap-3 border-b border-slate-700 bg-slate-900 px-4 py-2',
+    'legal-notes-label': 'font-mono text-xs tracking-[0.15em] text-slate-300 uppercase',
+    'legal-notes-id': 'font-mono text-[10px] text-slate-500',
+    'legal-notes-content': 'min-h-0 flex-1 overflow-hidden',
+    'legal-dialog-backdrop':
+      'fixed inset-0 z-[1000] flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm',
+    'legal-dialog-panel':
+      'relative max-h-[90dvh] overflow-y-auto border border-slate-600 bg-slate-950 text-slate-100 shadow-2xl',
+    'legal-dialog-header':
+      'flex min-h-12 items-center justify-between gap-4 border-b border-slate-700 bg-slate-900 px-5 py-3',
+    'legal-dialog-title': 'm-0 font-mono text-sm font-semibold tracking-wide text-slate-100',
+    'legal-dialog-form': 'flex flex-col gap-6 bg-parchment p-6 text-ink',
+    'legal-dialog-body': 'p-6 text-sm leading-relaxed text-slate-200',
+    'legal-dialog-footer': 'border-t border-slate-700 px-6 py-4',
+    'legal-dialog-actions':
+      'flex flex-wrap items-center justify-end gap-2 border-t border-stone-300 pt-4',
 
     // ═══════════════════════════════════════════════════════════════════════
     // NES COMMAND CENTER SCREEN

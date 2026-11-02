@@ -93,49 +93,46 @@
  }
  </script>
 
- <!-- NES.css Framework via CDN for faster loading -->
- <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet" />
-
- <!-- Preconnect for performance -->
+ <!-- Preconnect for performance: Classical Legal Serif (Cinzel + Cormorant Garamond) + NieR Clean Sans (Inter) -->
  <link rel="preconnect" href="https://fonts.googleapis.com" />
  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
  <link
- href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Press+Start+2P&display=swap"
+ href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
  rel="stylesheet"
  />
 
- <!-- Preload local fonts (place .woff2 files in static/fonts/) -->
- <!-- Inter is present in static/fonts/ and used as the primary sans fallback -->
- <link rel="preload" href="/fonts/inter-7.woff2" as="font" type="font/woff2" crossorigin />
- <link rel="preload" href="/fonts/jetbrains-mono-6.woff2" as="font" type="font/woff2" crossorigin />
-
- <!-- Register local fonts (safe fallbacks pointing to actual files in static/fonts/) -->
+ <!-- Register offline local fallbacks under distinct aliases so Google Fonts Inter 300..700 weights never get faux-bolded -->
  <style>
  @font-face {
- font-family: 'Inter';
+ font-family: 'InterLocal';
  src: url('/fonts/inter-7.woff2') format('woff2');
  font-weight: 400;
  font-style: normal;
  font-display: swap;
  }
  @font-face {
- font-family: 'JetBrains Mono';
+ font-family: 'JetBrainsMonoLocal';
  src: url('/fonts/jetbrains-mono-6.woff2') format('woff2');
  font-weight: 400;
  font-style: normal;
  font-display: swap;
  }
  :root {
- --app-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
- --app-mono: 'JetBrains Mono', ui-monospace, SFMo-Regular, Menlo, Monaco, 'Roboto Mono';
+ --font-royal-serif: 'Cinzel', 'Cormorant Garamond', Georgia, 'Palatino Linotype', serif;
+ --font-editorial-serif: 'Cormorant Garamond', Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+ --app-sans: 'Inter', 'InterLocal', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+ --app-mono: 'JetBrains Mono', 'JetBrainsMonoLocal', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
  }
  html,
  body {
  font-family: var(--app-sans);
  margin: 0;
  min-height: 100%;
- background: #0a0a0a;
- color: #e0e0e0;
+ background: #14181f;
+ color: #ebe6dc;
+ -webkit-font-smoothing: antialiased;
+ -moz-osx-font-smoothing: grayscale;
+ text-rendering: optimizeLegibility;
  }
  code,
  pre {
@@ -170,8 +167,8 @@
 
  /* YoRHa Terminal Fonts */
  --yorha-font-primary: 'JetBrains Mono', 'Courier New', monospace;
- --yorha-font-secondary: 'Orbitron', 'Arial', sans-serif;
- --yorha-font-ui: 'Rajdhani', 'Arial', sans-serif;
+ --yorha-font-secondary: var(--font-royal-serif);
+ --yorha-font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
  /* Shadcn-compatible theme variables (YoRHa themed) */
  --background: 0 0% 4%;
@@ -213,10 +210,10 @@
  --t-panel-noise: 0.02;
  --t-focus-ring: #ffd700;
  --t-font-primary: 'JetBrains Mono', 'Courier New', monospace;
- --t-font-heading: 'Orbitron', 'Arial', sans-serif;
+ --t-font-heading: var(--font-royal-serif);
  --t-grid-color: rgba(255, 215, 0, 0.05);
  --t-scrollbar-thumb: linear-gradient(180deg, #ffd700 0%, #cc8800 100%);
- --t-heading-glow: 0 0 10px #ffd700;
+ --t-heading-glow: none;
  }
 
  /* YoRHa Dark — explicit selector (inherits :root vars, sets contract) */
@@ -250,8 +247,8 @@
 
   /* YoRHa Terminal Fonts - Same as default */
   --yorha-font-primary: 'JetBrains Mono', 'Courier New', monospace;
-  --yorha-font-secondary: 'Orbitron', 'Arial', sans-serif;
-  --yorha-font-ui: 'Rajdhani', 'Arial', sans-serif;
+  --yorha-font-secondary: var(--font-royal-serif);
+  --yorha-font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   /* Shadcn-compatible theme variables (B/W variant) */
   --background: 0 0% 0%;
@@ -293,10 +290,10 @@
   --t-panel-noise: 0;
   --t-focus-ring: #ffffff;
   --t-font-primary: 'JetBrains Mono', 'Courier New', monospace;
-  --t-font-heading: 'Orbitron', 'Arial', sans-serif;
+  --t-font-heading: var(--font-royal-serif);
   --t-grid-color: rgba(255, 255, 255, 0.05);
   --t-scrollbar-thumb: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
-  --t-heading-glow: 0 0 10px rgba(255,255,255,0.5);
+  --t-heading-glow: none;
  }
 
  /* ═══ Parchment Archive — Legal Research ═══ */
@@ -383,8 +380,8 @@
   --yorha-text-muted: #6b6354;
   --yorha-text-accent: #c4a35a;
   --yorha-font-primary: 'JetBrains Mono', 'Courier New', monospace;
-  --yorha-font-secondary: 'Rajdhani', 'Arial', sans-serif;
-  --yorha-font-ui: 'Rajdhani', 'Arial', sans-serif;
+  --yorha-font-secondary: var(--font-royal-serif);
+  --yorha-font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --background: 213 32% 6%;
   --foreground: 36 28% 85%;
   --card: 215 22% 11%;
@@ -422,7 +419,7 @@
   --t-panel-noise: 0.01;
   --t-focus-ring: #c4a35a;
   --t-font-primary: 'JetBrains Mono', 'Courier New', monospace;
-  --t-font-heading: 'Rajdhani', 'Arial', sans-serif;
+  --t-font-heading: var(--font-royal-serif);
   --t-grid-color: rgba(196, 163, 90, 0.04);
   --t-scrollbar-thumb: linear-gradient(180deg, #c4a35a 0%, #a88a3e 100%);
   --t-heading-glow: 0 0 8px rgba(196, 163, 90, 0.4);
@@ -511,9 +508,9 @@
   --yorha-text-secondary: #d4c9a9;
   --yorha-text-muted: #6b7280;
   --yorha-text-accent: #ffcc66;
-  --yorha-font-primary: 'Press Start 2P', 'JetBrains Mono', monospace;
-  --yorha-font-secondary: 'Press Start 2P', monospace;
-  --yorha-font-ui: 'Press Start 2P', monospace;
+  --yorha-font-primary: var(--app-mono);
+  --yorha-font-secondary: var(--font-royal-serif);
+  --yorha-font-ui: var(--app-sans);
   --background: 210 6% 9%;
   --foreground: 40 52% 93%;
   --card: 210 5% 12%;
@@ -550,8 +547,8 @@
   --t-scanline-opacity: 0.06;
   --t-panel-noise: 0;
   --t-focus-ring: #ffcc66;
-  --t-font-primary: 'Press Start 2P', 'JetBrains Mono', monospace;
-  --t-font-heading: 'Press Start 2P', monospace;
+  --t-font-primary: var(--app-mono);
+  --t-font-heading: var(--font-royal-serif);
   --t-grid-color: rgba(248, 244, 227, 0.04);
   --t-scrollbar-thumb: linear-gradient(180deg, #ffcc66 0%, #e0a830 100%);
   --t-heading-glow: none;
@@ -650,7 +647,7 @@
  /* Chrome Windows GPU Acceleration */
  -webkit-font-smoothing: antialiased;
  -moz-osx-font-smoothing: grayscale;
- text-rendering: optimizeSpeed;
+ text-rendering: optimizeLegibility;
  image-rendering: -webkit-optimize-contrast;
 
  /* Hardware acceleration for smooth scrolling */
@@ -698,45 +695,37 @@
 
  /* YoRHa Terminal Scrollbar */
  ::-webkit-scrollbar {
- width: 12px;
- height: 12px;
+ width: 8px;
+ height: 8px;
  }
 
  ::-webkit-scrollbar-track {
- background: var(--yorha-bg-primary);
- border: 2px solid var(--yorha-bg-tertiary);
+ background: rgba(20, 24, 31, 0.08);
  }
 
  ::-webkit-scrollbar-thumb {
- background: linear-gradient(180deg, var(--yorha-secondary) 0%, var(--yorha-secondary-dark) 100%);
- border-radius: 0;
- border: 1px solid var(--yorha-text-muted);
+ background: rgba(158, 144, 123, 0.55);
+ border-radius: 4px;
  }
 
  ::-webkit-scrollbar-thumb:hover {
- background: linear-gradient(180deg, var(--yorha-accent) 0%, var(--yorha-accent-dark) 100%);
+ background: rgba(122, 27, 24, 0.78);
  }
 
  /* YoRHa Terminal Typography */
- h1,
- h2,
- h3,
- h4,
- h5,
- h6 {
- font-family: var(--yorha-font-secondary);
- color: var(--yorha-text-primary);
- text-transform: uppercase;
- letter-spacing: 2px;
- font-weight: 400;
- }
+  /* Global Typography Normalization */
+  h1, h2, h3, h4, h5, h6, button, .nav-item, .hud-title, .section-desc, .subtitle {
+    font-style: normal;
+  }
 
- h1 {
- font-size: 2.5rem;
- font-weight: 700;
- text-shadow: 0 0 10px var(--yorha-secondary);
- border-bottom: 2px solid var(--yorha-secondary);
- padding-bottom: 0.5rem;
+ :where(h1, h2, h3, h4, h5, h6) {
+ font-family: var(--font-royal-serif);
+ color: inherit;
+ letter-spacing: 0.04em;
+ font-weight: 600;
+ font-style: normal;
+ text-shadow: none;
+ border-bottom: none;
  }
 
  /* NES.css Integration with YoRHa Terminal Styles */
@@ -832,28 +821,16 @@
  background: var(--yorha-bg-tertiary) !important;
  }
 
- /* Default select styling for non-NES elements */
- select:not(.nes-select > select) {
- font-family: 'Press Start 2P', var(--yorha-font-primary), monospace !important;
- background: var(--yorha-bg-secondary) !important;
- color: var(--yorha-text-primary) !important;
- border: 2px solid var(--yorha-text-muted) !important;
- padding: 8px 12px !important;
- font-size: 12px !important;
+ /* Clean default select & anchor baselines (zero-specificity so components style cleanly) */
+ :where(select:not(.nes-select > select)) {
+ font-family: var(--app-sans);
+ font-size: 0.85rem;
  }
 
- /* YoRHa Terminal Link Styles */
- a {
- color: var(--yorha-secondary);
+ :where(a) {
+ color: inherit;
  text-decoration: none;
- transition: all 0.2s ease;
- border-bottom: 1px solid transparent;
- }
-
- a:hover {
- color: var(--yorha-accent);
- text-shadow: 0 0 4px currentColor;
- border-bottom: 1px solid currentColor;
+ transition: color 0.16s ease, border-color 0.16s ease;
  }
 
  /* GPU Acceleration Utility Classes for Chrome Windows */
@@ -875,7 +852,7 @@
  .gpu-optimized-text {
  -webkit-font-smoothing: antialiased;
  -moz-osx-font-smoothing: grayscale;
- text-rendering: optimizeSpeed;
+ text-rendering: optimizeLegibility;
  }
 
  /* 3D Transform Performance Optimizations */
@@ -932,11 +909,7 @@
   background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
  }
 
- /* YoRHa B/W Theme - Override heading text-shadow to white */
- [data-theme="yorha-bw"] h1 {
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  border-bottom: 2px solid #ffffff;
- }
+ /* YoRHa B/W Theme - Clean heading baseline */
  </style>
 
  %sveltekit.head%

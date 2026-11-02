@@ -114,7 +114,7 @@
     <div class="flex justify-between items-end">
       <div>
         <h1 class="text-4xl font-bold tracking-tight text-white mb-4">
-          Knowledge Base <span class="text-accent italic">Manager</span>
+          Knowledge Base <span class="text-accent font-semibold">Manager</span>
         </h1>
         <p class="text-lg text-white/50 max-w-2xl leading-relaxed">
           Centralized administration for the Deeds Web App codebase synthesis.

@@ -550,8 +550,7 @@ async function turboVecPrefilter(
  * STAGE 2 (executor): Postgres pgvector dense search, READ ONLY. Postgres is canonical truth, so this executor returns the canonical
  * codebase_chunk_index.id and revision columns directly instead of relying on a Qdrant id mapping. Same lane as qdrantSearch (lane != executor); never a second vote.
  * One representation only: semantic_768 = content_embedding_768 (raw vector). The older halfvec column content_embedding uses a different recipe and row population, so
- * cosine scores from the two are not interchangeable and are never merged here; it would be a separate executor if ever enabled. content_embedding_768 has no ANN index,
- * so this is an exact scan (measured slow; an HNSW index is a separate schema decision).
+ * cosine scores from the two are not interchangeable and are never merged here; it would be a separate executor if ever enabled. Uses the verified HNSW index idx_codebase_chunk_content_embedding_768_hnsw (vector_cosine_ops, m=16, ef_construction=64).
  * Uses the shared repository pool (no per-query Pool). Filters this executor cannot honour fail the lane instead of being silently dropped.
  * packet_key is attached only when exactly one atlas_packets row exists for the source_ref; that binding is source_ref-only and NOT revision-qualified
  * (atlas_packets.chunk_id is a different id space: 0 of codebase_chunk_index.id match), so it is labelled packet_binding=SOURCE_REF_UNIQUE.

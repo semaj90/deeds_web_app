@@ -13,7 +13,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { databaseMethods, externalMethods } = vi.hoisted(() => ({
+const { databaseMethods, externalMethods, outboxReadiness, uploadSeaweedFile } = vi.hoisted(() => ({
   databaseMethods: {
     execute: vi.fn(),
     select: vi.fn(),
@@ -28,7 +28,10 @@ const { databaseMethods, externalMethods } = vi.hoisted(() => ({
     invalidateACEChunksCache: vi.fn(),
     getRedis: vi.fn(),
     deleteSeaweedFile: vi.fn(),
+    uploadSeaweedFile: vi.fn(),
   },
+  outboxReadiness: vi.fn(),
+  uploadSeaweedFile: vi.fn(),
 }));
 
 vi.mock('$lib/server/db/client', () => ({ db: databaseMethods }));
@@ -41,7 +44,10 @@ vi.mock('$lib/server/cache/invalidation.js', () => ({
 vi.mock('$lib/server/redis.js', () => ({ getRedis: externalMethods.getRedis }));
 vi.mock('$lib/server/seaweed-client.js', () => ({
   deleteSeaweedFile: externalMethods.deleteSeaweedFile,
-  uploadSeaweedFile: vi.fn(),
+  uploadSeaweedFile,
+}));
+vi.mock('$lib/server/evidence/evidence-vector-outbox-readiness-v1.js', () => ({
+  isEvidenceVectorOutboxAvailableV1: outboxReadiness,
 }));
 vi.mock('$lib/server/graph/pg-neo4j-sync.js', () => ({ syncCaseToGraph: vi.fn() }));
 vi.mock('$lib/server/features/evidence/audit/evidence-audit.js', () => ({ logEvidenceAction: vi.fn() }));
@@ -54,6 +60,8 @@ describe('src/routes/api/evidence/upload/+server.ts', () => {
       vi.resetAllMocks();
       Object.values(databaseMethods).forEach((method) => method.mockReset());
       Object.values(externalMethods).forEach((method) => method.mockReset());
+      outboxReadiness.mockReset().mockResolvedValue(true);
+      uploadSeaweedFile.mockReset();
       databaseMethods.execute.mockResolvedValue({ rows: [{ id: '22222222-2222-4222-8222-222222222222' }] });
       databaseMethods.insert.mockReturnValue({
         values: vi.fn(() => ({ returning: vi.fn().mockResolvedValue([{ id: '11111111-1111-4111-8111-111111111111' }]) })),
@@ -126,6 +134,7 @@ describe('src/routes/api/evidence/upload/+server.ts', () => {
     });
 
     it('201 — accepts an authenticated multipart upload and returns the queued-processing envelope', async () => {
+      outboxReadiness.mockResolvedValue(false);
       const form = new FormData();
       form.set('caseId', '22222222-2222-4222-8222-222222222222');
       form.set('description', 'fixture upload');
@@ -151,12 +160,38 @@ describe('src/routes/api/evidence/upload/+server.ts', () => {
         evidenceId: '11111111-1111-4111-8111-111111111111',
         fileId: '33333333-3333-4333-8333-333333333333',
         caseId: '22222222-2222-4222-8222-222222222222',
-        status: 'uploaded',
-        data: { status: 'uploaded' },
+        status: 'queued',
+        data: { status: 'queued' },
       });
       expect(databaseMethods.execute).toHaveBeenCalled();
       expect(databaseMethods.insert).toHaveBeenCalled();
       expect(externalMethods.createUploadedFile).toHaveBeenCalledOnce();
+      expect(outboxReadiness).not.toHaveBeenCalled();
+    });
+
+    it('503 — refuses embedding uploads before storage or evidence insertion when the outbox schema is absent', async () => {
+      outboxReadiness.mockResolvedValue(false);
+      const form = new FormData();
+      form.set('caseId', '22222222-2222-4222-8222-222222222222');
+      form.set('description', 'fixture upload');
+      form.set('evidenceType', 'document');
+      form.set('file', new File(['fixture'], 'fixture.txt', { type: 'text/plain' }));
+
+      const response = await handler({
+        request: makeMultipartReq(form),
+        locals: { user: { id: 42 } },
+        url: makeUrl(),
+        params: {},
+      });
+
+      expect(response.status).toBe(503);
+      await expect(response.json()).resolves.toEqual({
+        success: false,
+        error: 'EVIDENCE_PROCESSING_SCHEMA_UNAVAILABLE',
+      });
+      expect(databaseMethods.insert).not.toHaveBeenCalled();
+      expect(externalMethods.createUploadedFile).not.toHaveBeenCalled();
+      expect(uploadSeaweedFile).not.toHaveBeenCalled();
     });
 
     it('500 — storage failure removes the staged object and inserted evidence row', async () => {

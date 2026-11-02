@@ -2,10 +2,14 @@
  * featureRegistryVectors — sidecar schema
  *
  * Auto-extracted from drizzle-kit introspect (2026-05-30 drift remediation).
- * Live DB table: `feature_registry_vectors`
+ * Live DB table: ABSENT (declaration-only) — checked 2026-11-01 against
+ * legal_ai_db (PostgreSQL 18.4); no migration in drizzle/ or drizzle/manual/
+ * creates it. See docs/reports/atlas-migration-owner-audit-v1.json
+ * (classification DECLARATION_ONLY).
  *
- * NOTE: this file mirrors the LIVE DB shape. If you change the schema here,
- * make a matching SQL migration in drizzle/manual/ to keep the DB in sync.
+ * NOTE: this file does NOT currently mirror a live table. It does not
+ * authorize creating one: any DDL needs an explicit owner decision and a
+ * reviewed SQL migration in drizzle/manual/ first.
  */
 
 import { index, jsonb, pgTable, text, timestamp, vector } from 'drizzle-orm/pg-core';

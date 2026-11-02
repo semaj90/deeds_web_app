@@ -17,7 +17,7 @@ Define a buildable inference stack where the local RotorQuant GGUF handles gener
 | Key | Canonical value | Notes |
 |-----|-----------------|-------|
 | `TURBO_PROFILE` | `stock` | default until patched llama-server is validated |
-| `TURBO_CTX` | `16384` | working baseline for this session |
+| `TURBO_CTX` | `65536` | current repository/launcher default; verify live `/slots` before claiming runtime state |
 | `ROTORQUANT_MODEL_PATH` | `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | canonical local chat GGUF |
 | `TURBO_MODEL_PATH` | `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | alias to the same local chat artifact |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | legacy/fallback Ollama lane |
@@ -61,7 +61,7 @@ Define a buildable inference stack where the local RotorQuant GGUF handles gener
 | `LANGFUSE_URL` | `http://127.0.0.1:3030` | traces UI |
 | `TURBO_PORT` | `8090` | deployment docs still use this for the host port |
 | `TURBO_PROFILE` | `stock` | default KV profile until patched binary is validated |
-| `TURBO_CTX` | `16384` | working baseline |
+| `TURBO_CTX` | `65536` | current repository/launcher default; 16,384 is an explicit short-context experiment requiring `TURBO_CTX_ALLOW_SHORT_CONTEXT=true` |
 | `LLAMACP_URL` | local llama.cpp lane | appears in repo-root atlas env inventory |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | fallback LLM / embeddings lane |
 | `ROTORQUANT_MODEL_PATH` | `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | canonical local GGUF path |

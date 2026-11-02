@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
 import hashlib
-
+from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic.alias_generators import to_camel
+
+
+class StrictCamelContract(BaseModel):
+    """Base contract enforcing camelCase JSON wire format and extra='forbid'."""
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        alias_generator=to_camel,
+    )
 
 
 class WebSearchResultV1(BaseModel):
@@ -28,8 +37,8 @@ class WebSearchEnvelopeV1(BaseModel):
     query: str = Field(min_length=1, max_length=4096)
     provider: str = Field(min_length=1, max_length=128)
     results: list[WebSearchResultV1] = Field(default_factory=list, max_length=50)
-    canonical_authority: bool = False
-    writes_performed: bool = False
+    canonical_authority: Literal[False] = False
+    writes_performed: Literal[False] = False
 
 
 class FetchedResearchDocumentV1(BaseModel):
@@ -61,16 +70,48 @@ class FetchedResearchDocumentV1(BaseModel):
         return self
 
 
-class ParameterArtifactV1(BaseModel):
-    """Receipt-qualified DAG parameters; values are inputs, not authority."""
+class ResearchParameterArtifactV1(StrictCamelContract):
+    """Renamed from atlas.parameter-artifact.v1 to resolve collision with TS kernel binding."""
+    schema_id: Literal["atlas.research-parameter.v1"] = Field(
+        default="atlas.research-parameter.v1", alias="schema"
+    )
+    parameter_key: str
+    value: str | int | float | bool
+    input_checksum: str = Field(min_length=64, max_length=64, pattern=r"^[a-f0-9]{64}$")
+    producer_revision: str
+    evidence_refs: list[str] = Field(default_factory=list)
+    canonical_authority: Literal[False] = False
+    writes_performed: Literal[False] = False
 
-    model_config = ConfigDict(extra="forbid")
 
-    schema_: str = Field(default="atlas.parameter-artifact.v1", alias="schema")
-    parameter_key: str = Field(min_length=1, max_length=256)
-    value: Any
-    input_checksum: str = Field(min_length=1, max_length=256)
-    producer_revision: str = Field(min_length=1, max_length=256)
-    evidence_refs: list[str] = Field(default_factory=list, max_length=100)
-    canonical_authority: bool = False
-    writes_performed: bool = False
+class DagPrefillNodeV1(StrictCamelContract):
+    node_id: str
+    relative_path: str
+    topo_class: str
+    graph_authority: float = Field(ge=0.0, le=1.0)
+    pagerank: float = Field(ge=0.0, le=1.0)
+    agents_dir: str
+    error_signatures: list[str] = Field(default_factory=list)
+
+
+class AcpKanbanErrorTaskV1(StrictCamelContract):
+    """End-to-end payload emitted by :8095 LangGraph synthesis for ACP/A2A Kanban agents."""
+    schema_id: Literal["atlas.acp-kanban-error-task.v1"] = Field(
+        default="atlas.acp-kanban-error-task.v1", alias="schema"
+    )
+    task_id: str
+    board_column: Literal["backlog", "prefilled", "in_progress", "verify", "blocked"]
+    source_agent: str
+    target_agent: str
+    relative_path: str
+    extracted_spans: list[str]
+    dag_prefill_nodes: list[DagPrefillNodeV1]
+    prompt_cards: list[str]
+    recommended_fix_actions: list[str]
+    db_schema_verified: bool
+    canonical_authority: Literal[False] = False
+    writes_performed: Literal[False] = False
+
+
+# Backward-compatibility alias
+ParameterArtifactV1 = ResearchParameterArtifactV1

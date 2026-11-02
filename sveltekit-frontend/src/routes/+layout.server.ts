@@ -5,7 +5,7 @@ export const load: LayoutServerLoad = async ({ locals, setHeaders }) => {
 	// - Authenticated users: no-store (private data)
 	// - Public/unauthenticated: public + max-age (static content)
 	try {
-		if (locals?.user&& locals.session) {
+		if (locals?.user && locals.session) {
 			// Authenticated - never cache (sensitive data)
 			setHeaders({
 				'Cache-Control': 'private, no-cache, no-store, must-revalidate',
@@ -25,7 +25,6 @@ export const load: LayoutServerLoad = async ({ locals, setHeaders }) => {
 	return {
 		user: locals.user,
 		session: locals.session,
+		devBypass: process.env.DEV_BYPASS_AUTH === 'true',
 	};
 };
-
-

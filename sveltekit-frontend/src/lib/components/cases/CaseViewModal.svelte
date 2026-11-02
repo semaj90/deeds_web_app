@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Dialog } from 'bits-ui';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import { goto } from '$app/navigation';
 
@@ -35,7 +36,7 @@
 			const body = await res.json();
 			// API returns { success: true, data: {...} }
 			caseData = body.data ?? body;
-		} catch (e) {
+		} catch {
 			loadError = 'Failed to load case.';
 		} finally {
 			isLoading = false;
@@ -45,10 +46,6 @@
 	function close() {
 		open = false;
 		onClose();
-	}
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') close();
 	}
 
 	function openFullCase() {
@@ -81,22 +78,19 @@
 	};
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<Dialog.Root bind:open onOpenChange={(v) => { if (!v) close(); }}>
+	<Dialog.Portal>
+		<Dialog.Overlay class="case-modal-backdrop" />
+		<Dialog.Content class="case-modal-panel">
+			<!-- Tactical HUD Corner Notches -->
+			<div class="hud-notch-tl" aria-hidden="true"></div>
+			<div class="hud-notch-tr" aria-hidden="true"></div>
+			<div class="hud-notch-bl" aria-hidden="true"></div>
+			<div class="hud-notch-br" aria-hidden="true"></div>
 
-{#if open}
-	<!-- Backdrop -->
-	<div
-		class="case-modal-backdrop"
-		role="presentation"
-		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
-	>
-		<div
-			class="case-modal-panel"
-			role="dialog"
-			aria-modal="true"
-			aria-label="Case details"
-			tabindex="-1"
-		>
+			<!-- Top accent line -->
+			<div class="case-modal-top-line" aria-hidden="true"></div>
+
 			<!-- Header -->
 			<div class="case-modal-header">
 				<div class="case-modal-title-row">
@@ -105,16 +99,16 @@
 						{#if isLoading}
 							<span class="loading-text">Loading case...</span>
 						{:else if caseData}
-							<h2 class="case-title">{caseData.title}</h2>
+							<Dialog.Title class="case-title">{caseData.title}</Dialog.Title>
 							{#if caseData.caseNumber}
 								<span class="case-number">Case #{caseData.caseNumber}</span>
 							{/if}
 						{:else}
-							<span class="loading-text">Case Details</span>
+							<Dialog.Title class="loading-text">Case Details</Dialog.Title>
 						{/if}
 					</div>
 				</div>
-				<button type="button" class="modal-close" onclick={close} aria-label="Close">✕</button>
+				<Dialog.Close class="modal-close" onclick={close} aria-label="Close">✕</Dialog.Close>
 			</div>
 
 			<!-- Body -->
@@ -227,43 +221,79 @@
 					</div>
 				</div>
 			{/if}
-		</div>
-	</div>
-{/if}
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
 <style>
-	.case-modal-backdrop {
+	:global(.case-modal-backdrop) {
 		position: fixed;
 		inset: 0;
-		z-index: 60;
+		z-index: 10000;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.72);
-		backdrop-filter: blur(4px);
+		background: rgba(3, 6, 12, 0.85);
+		backdrop-filter: blur(12px) saturate(1.15);
 		padding: 1rem;
+		animation: caseModalFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 	}
-	.case-modal-panel {
-		width: 100%;
-		max-width: 640px;
+
+	:global(.case-modal-panel) {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		z-index: 10001;
+		width: min(44rem, calc(100vw - 2rem));
 		max-height: 90vh;
 		display: flex;
 		flex-direction: column;
-		background: #131519;
-		border: 1px solid rgba(212, 199, 163, 0.12);
+		background: linear-gradient(180deg, rgba(19, 27, 42, 0.98) 0%, rgba(8, 12, 20, 0.99) 100%);
+		border: 1px solid rgba(243, 212, 113, 0.3);
 		border-radius: 10px;
-		box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+		box-shadow:
+			0 0 0 1px rgba(243, 212, 113, 0.08),
+			0 24px 64px rgba(0, 0, 0, 0.85),
+			0 0 35px rgba(243, 212, 113, 0.1);
 		overflow: hidden;
+		animation: caseModalScale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 	}
+
+	.case-modal-top-line {
+		position: absolute;
+		top: 0;
+		left: 1.5rem;
+		right: 1.5rem;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, rgba(243, 212, 113, 0.9), rgba(126, 231, 255, 0.6), transparent);
+		pointer-events: none;
+		z-index: 2;
+	}
+
+	.hud-notch-tl, .hud-notch-tr, .hud-notch-bl, .hud-notch-br {
+		position: absolute;
+		width: 8px;
+		height: 8px;
+		pointer-events: none;
+		z-index: 3;
+	}
+	.hud-notch-tl { top: -1px; left: -1px; border-top: 2px solid #f3d471; border-left: 2px solid #f3d471; }
+	.hud-notch-tr { top: -1px; right: -1px; border-top: 2px solid #f3d471; border-right: 2px solid #f3d471; }
+	.hud-notch-bl { bottom: -1px; left: -1px; border-bottom: 2px solid #f3d471; border-left: 2px solid #f3d471; }
+	.hud-notch-br { bottom: -1px; right: -1px; border-bottom: 2px solid #f3d471; border-right: 2px solid #f3d471; }
+
 	.case-modal-header {
 		display: flex;
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: 1rem;
 		padding: 1.25rem 1.5rem;
-		border-bottom: 1px solid rgba(212, 199, 163, 0.1);
-		background: rgba(255, 255, 255, 0.02);
+		border-bottom: 1px solid rgba(243, 212, 113, 0.2);
+		background: rgba(0, 0, 0, 0.35);
 		flex-shrink: 0;
+		position: relative;
+		z-index: 1;
 	}
 	.case-modal-title-row {
 		display: flex;
@@ -275,7 +305,7 @@
 	:global(.header-icon) {
 		width: 1.25rem;
 		height: 1.25rem;
-		color: rgba(212, 199, 163, 0.7);
+		color: #f3d471;
 		flex-shrink: 0;
 		margin-top: 3px;
 	}
@@ -283,35 +313,44 @@
 		flex: 1;
 		min-width: 0;
 	}
-	.case-title {
+	:global(.case-title) {
 		font-size: 1.125rem;
 		font-weight: 700;
-		color: rgba(212, 199, 163, 0.95);
+		color: #f3d471;
 		margin: 0 0 0.2rem;
 		line-height: 1.3;
 		word-break: break-word;
+		letter-spacing: 0.05em;
 	}
 	.case-number {
 		font-size: 0.75rem;
-		color: rgba(212, 199, 163, 0.45);
+		color: rgba(212, 199, 163, 0.6);
+		font-family: var(--font-mono, monospace);
 	}
 	.loading-text {
 		font-size: 1rem;
 		color: rgba(212, 199, 163, 0.5);
 	}
-	.modal-close {
+	:global(.modal-close) {
 		flex-shrink: 0;
-		background: none;
-		border: none;
-		color: rgba(212, 199, 163, 0.4);
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(243, 212, 113, 0.25);
+		color: rgba(212, 199, 163, 0.6);
 		cursor: pointer;
-		font-size: 1rem;
-		padding: 0.25rem;
-		line-height: 1;
+		font-size: 0.875rem;
+		width: 1.875rem;
+		height: 1.875rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		border-radius: 4px;
-		transition: color 0.15s;
+		transition: all 0.15s ease;
 	}
-	.modal-close:hover { color: rgba(212, 199, 163, 0.9); }
+	:global(.modal-close:hover) {
+		color: #f3d471;
+		background: rgba(243, 212, 113, 0.15);
+		border-color: rgba(243, 212, 113, 0.5);
+	}
 
 	.case-modal-body {
 		flex: 1;
@@ -320,6 +359,13 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.25rem;
+	}
+	.case-modal-body::-webkit-scrollbar {
+		width: 6px;
+	}
+	.case-modal-body::-webkit-scrollbar-thumb {
+		background: rgba(243, 212, 113, 0.18);
+		border-radius: 3px;
 	}
 	.loading-state {
 		display: flex;
@@ -332,8 +378,8 @@
 	.spinner {
 		width: 1.25rem;
 		height: 1.25rem;
-		border: 2px solid rgba(212, 199, 163, 0.15);
-		border-top-color: rgba(212, 199, 163, 0.6);
+		border: 2px solid rgba(243, 212, 113, 0.2);
+		border-top-color: #f3d471;
 		border-radius: 50%;
 		animation: spin 0.7s linear infinite;
 	}
@@ -367,7 +413,7 @@
 	}
 	.case-description {
 		font-size: 0.875rem;
-		color: rgba(212, 199, 163, 0.7);
+		color: rgba(212, 199, 163, 0.8);
 		line-height: 1.6;
 		margin: 0;
 		white-space: pre-wrap;
@@ -386,7 +432,7 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.07em;
-		color: rgba(212, 199, 163, 0.4);
+		color: rgba(212, 199, 163, 0.45);
 		font-weight: 600;
 	}
 	.detail-value {
@@ -400,8 +446,8 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 1rem 1.5rem;
-		border-top: 1px solid rgba(212, 199, 163, 0.1);
-		background: rgba(255, 255, 255, 0.02);
+		border-top: 1px solid rgba(243, 212, 113, 0.15);
+		background: rgba(0, 0, 0, 0.35);
 		flex-shrink: 0;
 	}
 	.footer-actions {
@@ -423,27 +469,38 @@
 	}
 	.footer-btn.ghost {
 		background: transparent;
-		border-color: rgba(212, 199, 163, 0.2);
-		color: rgba(212, 199, 163, 0.55);
+		border-color: rgba(212, 199, 163, 0.25);
+		color: rgba(212, 199, 163, 0.7);
 	}
 	.footer-btn.ghost:hover {
-		background: rgba(212, 199, 163, 0.06);
-		color: rgba(212, 199, 163, 0.85);
+		background: rgba(212, 199, 163, 0.1);
+		color: #f3d471;
 	}
 	.footer-btn.secondary {
-		background: rgba(212, 199, 163, 0.07);
-		border-color: rgba(212, 199, 163, 0.25);
-		color: rgba(212, 199, 163, 0.8);
+		background: rgba(212, 199, 163, 0.08);
+		border-color: rgba(212, 199, 163, 0.3);
+		color: rgba(212, 199, 163, 0.9);
 	}
 	.footer-btn.secondary:hover {
-		background: rgba(212, 199, 163, 0.14);
+		background: rgba(212, 199, 163, 0.16);
 	}
 	.footer-btn.primary {
-		background: rgba(52, 211, 153, 0.15);
-		border-color: rgba(52, 211, 153, 0.4);
-		color: #6ee7b7;
+		background: rgba(243, 212, 113, 0.15);
+		border-color: rgba(243, 212, 113, 0.5);
+		color: #f3d471;
 	}
 	.footer-btn.primary:hover {
-		background: rgba(52, 211, 153, 0.25);
+		background: rgba(243, 212, 113, 0.25);
+		box-shadow: 0 0 12px rgba(243, 212, 113, 0.2);
+	}
+
+	@keyframes caseModalFade {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	@keyframes caseModalScale {
+		from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+		to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 	}
 </style>

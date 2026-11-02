@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
@@ -42,7 +42,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
     const [item] = await db
       .select()
       .from(evidence)
-      .where(and(eq(evidence.id, params.id), eq(evidence.userId, Number(locals.user.id))))
+      .where(and(eq(evidence.id, params.id), or(eq(evidence.userId, Number(locals.user.id)), eq(evidence.uploadedBy, Number(locals.user.id)))))
       .limit(1);
 
     if (!item) {

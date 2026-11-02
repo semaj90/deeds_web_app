@@ -14,7 +14,11 @@ const outputPath = path.resolve(process.argv[3] ?? path.join(root, 'docs/reports
 const maxFiles = Number(process.env.ATLAS_AUDIT_MAX_FILES ?? 5000);
 
 const files = walkFiles(root, { maxFiles });
-const { edges, externalImports } = buildImportGraph(files);
+// .js specifiers resolve to .ts sources; $lib resolves when the SvelteKit app is under this root.
+const importAliases = fs.existsSync(path.join(root, 'sveltekit-frontend/src/lib'))
+  ? [{ prefix: '$lib/', target: 'sveltekit-frontend/src/lib/' }]
+  : [];
+const { edges, externalImports } = buildImportGraph(files, { aliases: importAliases, jsToTs: true });
 const degree = graphDegrees(files, edges);
 const graphify = readGraphifyEvidence(root, files.map((f) => f.path));
 const graphifyFiles = new Set(graphify.edges.flatMap((e) => [e.from, e.to]));

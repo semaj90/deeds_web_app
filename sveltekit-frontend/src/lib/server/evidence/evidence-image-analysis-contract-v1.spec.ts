@@ -21,6 +21,20 @@ describe('EvidenceImageAnalysisReceiptSchemaV1 & executeBoundedImageAnalysisV1',
           status: 'EXECUTED',
           detections: [{ label: 'document_seal', confidence: 0.94, bboxNormalized: [0.1, 0.2, 0.4, 0.5] }],
         }),
+        runSam2Segmentation: async () => ({
+          status: 'EXECUTED',
+          masks: [
+            {
+              artifactKind: 'sam2_alpha_silhouette',
+              maskObjectKey: 'masks/seal_mask.png',
+              maskSha256: 'c'.repeat(64),
+              targetBoxIndex: 0,
+              label: 'document_seal',
+              iouScore: 0.96,
+              is3DReconstruction: false,
+            },
+          ],
+        }),
         runVlmAnalysis: async () => ({
           status: 'EXECUTED',
           proposal: {
@@ -44,6 +58,9 @@ describe('EvidenceImageAnalysisReceiptSchemaV1 & executeBoundedImageAnalysisV1',
     );
 
     expect(receipt.canonicalAuthority).toBe(false);
+    expect(receipt.sam2Status).toBe('EXECUTED');
+    expect(receipt.sam2Masks[0].artifactKind).toBe('sam2_alpha_silhouette');
+    expect(receipt.sam2Masks[0].is3DReconstruction).toBe(false);
     expect(receipt.vlmProposal?.proposalOnly).toBe(true);
     expect(receipt.depthMap?.artifactKind).toBe('monocular_depth_map_2d');
     expect(receipt.depthMap?.is3DReconstruction).toBe(false);

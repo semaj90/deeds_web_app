@@ -1,16 +1,20 @@
-import { db } from '$lib/server/db/client';
-import { evidence } from '$lib/server/db/schema';
+import { db } from '$lib/server/db/client.js';
+import { cases, evidence, analysisJobs, type NewAnalysisJob } from '$lib/server/db/schema-postgres.js';
+import {
+  ANALYSIS_JOBS_NOTIFY_CHANNEL,
+  normalizeAnalysisJobPayload,
+} from '$lib/server/analysis/analysis-jobs.js';
 import { uploadSeaweedFile as uploadFile, getSeaweedClient as getMinioClient } from '$lib/server/seaweed-client.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
 import { zod4 as zod } from 'sveltekit-superforms/adapters';
-import { and, eq, or, desc } from 'drizzle-orm';
+import { and, eq, or, desc, sql } from 'drizzle-orm';
 import { Buffer } from 'node:buffer';
 import { createHash, randomUUID } from 'node:crypto';
-import type { Actions, PageServerLoad } from './$types';
-import { dispatchOrExecuteInline } from '$lib/server/queue/dispatch-inline.js';
-import { EvidenceProcessPayloadV1Schema } from '$lib/server/evidence/evidence-process-payload-v1.js';
+import type { Actions, PageServerLoad } from './$types.js';
 import { createJob, updateJob } from '$lib/server/evidence-progress.js';
+import { isEvidenceVectorOutboxAvailableV1 } from '$lib/server/evidence/evidence-vector-outbox-readiness-v1.js';
+import { classifyUploadedBytes } from '$lib/server/ingest/upload-classification-v1.js';
 import {
   evidenceUploadSchema,
   evidenceDeleteSchema,
@@ -21,11 +25,41 @@ import {
 
 const PAGE_SIZE = 50;
 
+/**
+ * 1. Canonical Actor Guard: Reject unauthenticated or non-integer user IDs fail-closed.
+ */
+function requireCanonicalActorId(locals: App.Locals): number {
+  const rawId = locals.user?.id;
+  const actorId = typeof rawId === 'number' ? rawId : Number(rawId);
+  if (!Number.isInteger(actorId) || actorId <= 0) {
+    throw new Error('EVIDENCE_ACTOR_UNAUTHORIZED');
+  }
+  return actorId;
+}
+
+/**
+ * 2. Server-Side Case ACL Check: Verify the authenticated actor owns the target caseId.
+ */
+async function assertActorOwnsCase(actorId: number, caseId: string | null | undefined): Promise<void> {
+  if (!caseId) return;
+  const [matchedCase] = await db
+    .select({ id: cases.id })
+    .from(cases)
+    .where(and(eq(cases.id, caseId), eq(cases.userId, actorId)))
+    .limit(1);
+
+  if (!matchedCase) {
+    throw new Error('EVIDENCE_CASE_ACCESS_DENIED');
+  }
+}
+
 export const load: PageServerLoad = async ({ url, locals }) => {
   const caseId = url.searchParams.get('caseId');
 
-  // Phase 96: SSR Authentication Guard
-  if (!locals.user?.id) {
+  let actorId: number;
+  try {
+    actorId = requireCanonicalActorId(locals);
+  } catch {
     return {
       evidence: [],
       caseId,
@@ -35,25 +69,38 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     };
   }
 
+  if (caseId) {
+    try {
+      await assertActorOwnsCase(actorId, caseId);
+    } catch {
+      return {
+        evidence: [],
+        caseId,
+        user: locals.user,
+        loadError: 'EVIDENCE_CASE_ACCESS_DENIED',
+        form: await superValidate(zod(evidenceUploadSchema)),
+      };
+    }
+  }
+
   const safe = <T>(p: Promise<T>, fallback: T, timeoutMs = 5000): Promise<T> =>
     Promise.race([
       p,
       new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs)),
     ]).catch(() => fallback);
 
-  let evidenceData;
   let loadError: string | null = null;
 
-  // Match either uploadedBy or userId to prevent orphan/legacy user ID mismatches
+  // Match either uploadedBy or userId to support legacy data gracefully
   const conditions = [
     or(
-      eq(evidence.uploadedBy, Number(locals.user.id)),
-      eq(evidence.userId, Number(locals.user.id))
+      eq(evidence.uploadedBy, actorId),
+      eq(evidence.userId, actorId)
     )
   ];
   if (caseId) conditions.push(eq(evidence.caseId, caseId));
 
-  evidenceData = await safe(
+  const evidenceData = await safe(
     db
       .select()
       .from(evidence)
@@ -76,11 +123,13 @@ export const load: PageServerLoad = async ({ url, locals }) => {
   };
 };
 
-// Phase 96: Form Actions for mutations (replaces API endpoints)
 export const actions: Actions = {
   // Upload new evidence
   upload: async ({ request, locals }) => {
-    if (!locals.user?.id) {
+    let actorId: number;
+    try {
+      actorId = requireCanonicalActorId(locals);
+    } catch {
       throw redirect(302, '/login');
     }
 
@@ -110,68 +159,118 @@ export const actions: Actions = {
 
     try {
       const { title, description, caseId } = form.data;
+      if (caseId) {
+        await assertActorOwnsCase(actorId, caseId);
+      }
+
+      if (!(await isEvidenceVectorOutboxAvailableV1())) {
+        return fail(503, { form, error: 'EVIDENCE_PROCESSING_SCHEMA_UNAVAILABLE' });
+      }
+
       const jobId = randomUUID();
-      createJob(jobId, String(locals.user.id));
+      createJob(jobId, String(actorId));
       updateJob(jobId, { step: 'uploading', progress: 15, message: `Uploading ${file.name}...` });
 
-      // 1. Upload to SeaweedFS
-      const fileExt = file.name.split('.').pop() ?? 'bin';
-      const objectName = `evidence/${locals.user.id}/${randomUUID()}.${fileExt}`;
+      // 1. Classification & Security Preflight (Parent Atlas Gates A & B)
       const buffer = Buffer.from(await file.arrayBuffer());
-      const sourceRevision = `sha256:${createHash('sha256').update(buffer).digest('hex')}`;
+      const classification = classifyUploadedBytes({
+        filename: file.name,
+        declaredMime: file.type,
+        bytes: buffer,
+      });
+
+      if (classification.isQuarantined) {
+        return fail(400, {
+          form,
+          error: `EVIDENCE_SECURITY_QUARANTINE: ${classification.quarantineReason ?? 'Disguised executable or MIME mismatch'}`,
+        });
+      }
+
+      const sourceRevision = classification.sourceRevision;
+
+      // 2. Upload to SeaweedFS
+      const fileExt = file.name.split('.').pop() ?? 'bin';
+      const objectName = `evidence/${actorId}/${randomUUID()}.${fileExt}`;
 
       await uploadFile('legal-evidence', objectName, buffer, {
-        'Content-Type': file.type,
+        'Content-Type': classification.observedMime ?? file.type,
         'Original-Filename': file.name,
       });
 
-      // 2. Create DB Record
-      const newEvidence = await db
-        .insert(evidence)
-        .values({
-          userId: Number(locals.user.id),
-          uploadedBy: Number(locals.user.id),
-          caseId: caseId ?? null,
-          title: title || file.name,
-          description,
-          fileName: file.name,
-          fileSize: file.size,
-          fileType: file.type,
-          fileUrl: objectName,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .returning();
+      const safeTitle = title || file.name;
+      const safeFileName = file.name;
 
-      // 3. Queue extraction and canonical PostgreSQL vector indexing; Qdrant is outbox-projected.
-      // Fire-and-forget: indexing failure must never block the upload response
-      const evidenceId = newEvidence[0]?.id;
-      if (!evidenceId) throw new Error('EVIDENCE_ROW_ID_MISSING_AFTER_INSERT');
-      const indexText = [title || file.name, description].filter(Boolean).join('\n\n') || file.name;
-      const evidenceJob = EvidenceProcessPayloadV1Schema.parse({
-        evidenceId,
-        text: indexText,
-        fileName: file.name,
-        caseId: caseId ?? undefined,
-        contentType: 'document',
-        sourceRevision,
-        metadata: {
-          userId: locals.user.id,
-          fileName: file.name,
-          fileType: file.type,
-          source_revision: sourceRevision,
-          sourceSha256: sourceRevision,
-          object_bucket: 'legal-evidence',
-          object_name: objectName,
-          objectKey: objectName,
-          jobId,
-        },
-      });
-      void dispatchOrExecuteInline('evidence.process', evidenceJob).then((result) => {
-        if (result.error || result.mode === 'skipped') {
-          console.error('[evidence/upload] Evidence indexing dispatch failed:', result.error ?? result.mode);
+      // 3. Atomic Transaction + No `?? randomUUID()` Fallback
+      const insertedRecord = await db.transaction(async (tx) => {
+        const evidenceKind = classification.legalEvidenceTypeProposal ?? (
+          classification.observedMime?.startsWith('image/') || file.type.startsWith('image/')
+            ? 'photo'
+            : classification.observedMime?.startsWith('video/') || file.type.startsWith('video/')
+              ? 'video'
+              : classification.observedMime?.startsWith('audio/') || file.type.startsWith('audio/')
+                ? 'audio'
+                : 'document'
+        );
+
+        const [created] = await tx
+          .insert(evidence)
+          .values({
+            caseId: caseId ?? null,
+            userId: actorId,
+            uploadedBy: actorId, // Canonical owner column everywhere
+            evidenceType: evidenceKind,
+            title: safeTitle,
+            description: description ?? '',
+            fileName: safeFileName,
+            fileType: file.type,
+            fileSize: file.size,
+            fileUrl: objectName,
+            hash: sourceRevision,
+            status: 'processing_queued',
+            metadata: {
+              source_revision: sourceRevision,
+              observed_mime: classification.observedMime,
+              mime_status: classification.mimeStatus,
+              taxonomy_group: classification.taxonomyGroup,
+            },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .returning();
+
+        // NEVER fall back to `?? randomUUID()` - fail closed if insert returned no row
+        if (!created?.id) {
+          throw new Error('EVIDENCE_INSERT_FAILED_NO_ID');
         }
-      }).catch((err) => console.error('[evidence/upload] Evidence dispatch failed:', err));
+
+        const jobValues = {
+          id: jobId,
+          evidenceId: created.id,
+          caseId: caseId ?? null,
+          jobType: 'upload_pipeline',
+          status: 'queued',
+          progress: '0',
+          result: normalizeAnalysisJobPayload(
+            {
+              evidenceId: created.id,
+              caseId: caseId ?? null,
+              objectKey: objectName,
+              sourceSha256: sourceRevision,
+              fileName: safeFileName,
+              contentType: file.type,
+              uploadedBy: actorId,
+            },
+            'upload_pipeline'
+          ),
+        } satisfies NewAnalysisJob;
+
+        await tx.insert(analysisJobs).values(jobValues);
+        await tx.execute(
+          sql`SELECT pg_notify(${ANALYSIS_JOBS_NOTIFY_CHANNEL}, ${JSON.stringify({ jobType: 'upload_pipeline' })})`
+        );
+
+        return created;
+      });
 
       // 4. Generate signed SeaweedFS preview URL (24-hour expiry)
       let previewUrl = '';
@@ -182,21 +281,26 @@ export const actions: Actions = {
         console.warn('[evidence/upload] Failed to generate preview URL (non-fatal):', err);
       }
 
-      updateJob(jobId, { step: 'extracting', progress: 35, message: 'Processing evidence metadata and extraction...' });
+      updateJob(jobId, { step: 'storing', progress: 20, message: 'Upload stored; queued for extraction and indexing.' });
       return {
         success: true,
-        evidence: newEvidence?.[0] ?? null,
+        evidence: insertedRecord,
         jobId,
         previewUrl,
       };
     } catch (err) {
       console.error('Upload failed:', err);
-      return fail(500, { form, error: 'Upload failed' });
+      const message = err instanceof Error ? err.message : 'Upload failed';
+      return fail(500, { form, error: message });
     }
   },
+
   // Delete evidence
   delete: async ({ request, locals }) => {
-    if (!locals.user?.id) {
+    let actorId: number;
+    try {
+      actorId = requireCanonicalActorId(locals);
+    } catch {
       throw redirect(302, '/login');
     }
 
@@ -208,18 +312,23 @@ export const actions: Actions = {
     try {
       const { evidenceId } = form.data;
 
-      // Only delete if owned by user
-      await db
+      // 4. Reconcile legacy `userId` -> `uploadedBy` & Require Affected-Row Check
+      const deleted = await db
         .delete(evidence)
         .where(
           and(
             eq(evidence.id, evidenceId),
             or(
-              eq(evidence.uploadedBy, Number(locals.user.id)),
-              eq(evidence.userId, Number(locals.user.id))
+              eq(evidence.uploadedBy, actorId),
+              eq(evidence.userId, actorId)
             )
           )
-        );
+        )
+        .returning({ id: evidence.id });
+
+      if (deleted.length === 0) {
+        return fail(404, { form, error: 'EVIDENCE_NOT_FOUND_OR_UNAUTHORIZED' });
+      }
 
       return { success: true };
     } catch (err) {
@@ -227,9 +336,13 @@ export const actions: Actions = {
       return fail(500, { form, error: 'Delete failed' });
     }
   },
+
   // Update evidence metadata
   update: async ({ request, locals }) => {
-    if (!locals.user?.id) {
+    let actorId: number;
+    try {
+      actorId = requireCanonicalActorId(locals);
+    } catch {
       throw redirect(302, '/login');
     }
 
@@ -252,16 +365,20 @@ export const actions: Actions = {
           and(
             eq(evidence.id, evidenceId),
             or(
-              eq(evidence.uploadedBy, Number(locals.user.id)),
-              eq(evidence.userId, Number(locals.user.id))
+              eq(evidence.uploadedBy, actorId),
+              eq(evidence.userId, actorId)
             )
           )
         )
         .returning();
 
+      if (updated.length === 0) {
+        return fail(404, { form, error: 'EVIDENCE_NOT_FOUND_OR_UNAUTHORIZED' });
+      }
+
       return {
         success: true,
-        evidence: updated?.[0] ?? null,
+        evidence: updated[0] ?? null,
       };
     } catch (err) {
       console.error('Update failed:', err);

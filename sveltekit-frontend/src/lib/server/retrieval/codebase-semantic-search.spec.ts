@@ -8,7 +8,9 @@ import { QDRANT_SEMANTIC_COLLECTION } from '$lib/server/atlas/retrieval/qdrant-s
 import { searchCodebaseSemanticContext } from './codebase-semantic-search.js';
 
 describe('searchCodebaseSemanticContext', () => {
-	beforeEach(() => searchQdrantCodeStrictV1.mockReset());
+	beforeEach(() => {
+		searchQdrantCodeStrictV1.mockReset();
+	});
 
 	it('uses canonical search results, preserves semantic ranking, and respects top-K', async () => {
 		const vector = Array.from({ length: 768 }, (_, index) => index + 1);

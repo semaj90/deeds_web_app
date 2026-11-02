@@ -181,6 +181,10 @@
 		</div>
 	</div>
 
+	{#if data.loadError}
+		<div class="load-warning" role="status">Cache stats unavailable: {data.loadError}. Showing empty values; use Refresh to retry.</div>
+	{/if}
+
 	<!-- Overview Cards -->
 	<div class="overview-grid">
 		<div class="stat-card">
@@ -1060,5 +1064,15 @@
 		to {
 			transform: rotate(360deg);
 		}
+	}
+
+	.load-warning {
+		margin: 0 0 1rem;
+		padding: 0.6rem 0.9rem;
+		border: 1px solid rgba(250, 204, 21, 0.45);
+		border-left-width: 3px;
+		border-radius: 6px;
+		background: rgba(250, 204, 21, 0.08);
+		font-size: 0.85rem;
 	}
 </style>

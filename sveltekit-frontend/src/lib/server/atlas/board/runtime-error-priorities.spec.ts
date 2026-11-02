@@ -39,6 +39,44 @@ describe('runtime error priority projection', () => {
 		expect(query.mock.calls[0]?.[0]).toContain("WHEN 'warning' THEN 'warn'");
 	});
 
+	it('maps firstAppFrame (null when a group has only dependency frames)', async () => {
+		query.mockResolvedValue({
+			rows: [
+				{ fingerprint: 'a', source: 'error_events', route_path: '/', kind: 'runtime', severity: 'error', message: 'm',
+					occurrences: 2, last_seen: '2026-10-18T00:00:00.000Z', priority_score: 3, first_app_frame: 'src/routes/+page.svelte', total_count: 2 },
+				{ fingerprint: 'b', source: 'error_events', route_path: '/', kind: 'runtime', severity: 'error', message: 'm',
+					occurrences: 1, last_seen: '2026-10-18T00:00:00.000Z', priority_score: 2, first_app_frame: null, total_count: 2 },
+			],
+		});
+
+		const report = await loadRuntimeErrorPriorities();
+
+		expect(report.top100[0]?.firstAppFrame).toBe('src/routes/+page.svelte');
+		expect(report.top100[1]?.firstAppFrame).toBeNull();
+	});
+
+	it('extracts the first application-source file (path only) from real stack shapes', async () => {
+		query.mockResolvedValue({ rows: [] });
+		await loadRuntimeErrorPriorities();
+		const sql = String(query.mock.calls[0]?.[0]);
+		const pattern = sql.match(/regexp_match\(stack, '([^']+)'\)/)?.[1];
+		expect(pattern, 'regexp_match pattern present in both source selects').toBeTruthy();
+		expect(sql.match(/regexp_match\(stack,/g)).toHaveLength(2);
+		const frame = (stack: string) => new RegExp(pattern!).exec(stack)?.[1] ?? null;
+
+		// browser stack: compiled-module line numbers must not leak into the path
+		expect(frame('TypeError: x\n    at Root (http://localhost:5173/src/routes/(app)/demos/+page.svelte:577:17)'))
+			.toBe('src/routes/(app)/demos/+page.svelte');
+		// Windows server stack
+		expect(frame('Error\n    at validate (C:\\Users\\james\\app\\src\\lib\\server\\lucia.ts:12:3)')).toBe('src\\lib\\server\\lucia.ts');
+		// JSON-quoted stack must stop at the closing quote
+		expect(frame('["at a (/x/src/lib/server/minio-client.ts","C:/other"]')).toBe('src/lib/server/minio-client.ts');
+		// first (topmost) application frame wins
+		expect(frame('at a (http://h/src/lib/a.ts:1:1)\n at b (http://h/src/routes/b.svelte:2:2)')).toBe('src/lib/a.ts');
+		// dependency-only frames (Vite pre-bundled Svelte internals) yield no app frame
+		expect(frame('at get_next_sibling (http://localhost:5173/node_modules/.vite/deps/chunk-5KD435UJ.js?v=a5cfe636:1376:25)')).toBeNull();
+	});
+
 	it('fails closed to an unavailable empty diagnostic lane', async () => {
 		query.mockRejectedValueOnce(new Error('database unavailable'));
 

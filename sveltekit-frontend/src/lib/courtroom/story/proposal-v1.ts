@@ -1,5 +1,5 @@
-import { validateStory, type ActorSpec, type Story } from './engine';
-import { validateGrounding } from './grounding-v1';
+import { validateStory, type ActorSpec, type Story } from './engine.js';
+import { validateGrounding } from './grounding-v1.js';
 
 /** What the author of a story is allowed to cite: one authorized case and one frozen evidence snapshot. */
 export interface EvidenceSnapshot {
@@ -114,4 +114,190 @@ export function evaluateGrounding(proposal: GroundedStoryProposal, snapshot: Evi
 	const semantic = { ok: structural.ok && unsupported.length === 0 && unknown.length === 0, unsupported, unknown };
 	const status: GroundingStatus = !structural.ok || unsupported.length ? 'REJECTED' : semantic.ok ? 'VERIFIED' : 'PROPOSED';
 	return { status, gates: { structural, semantic } };
+}
+
+/**
+ * Async grounding evaluation supporting async/local-model support checkers.
+ */
+export async function evaluateGroundingAsync(
+	proposal: GroundedStoryProposal,
+	snapshot: EvidenceSnapshot,
+	checkAsync?: (line: string, passage: string) => Promise<SupportVerdict>
+): Promise<{ status: GroundingStatus; gates: GroundingGates }> {
+	const reasons: string[] = [];
+	if (!validateStory(proposal.story)) reasons.push('STORY_INVALID');
+	if (proposal.sourceSnapshotDigest !== snapshot.digest) reasons.push('SNAPSHOT_DIGEST_MISMATCH');
+	if (proposal.caseScope !== snapshot.caseScope) reasons.push('CASE_SCOPE_MISMATCH');
+	const g = validateGrounding(proposal.story, snapshot.chunks.keys());
+	if (g.missing.length) reasons.push(`UNCITED:${g.missing.join(',')}`);
+	if (g.unknownChunk.length) reasons.push(`UNKNOWN_CHUNK:${g.unknownChunk.join(',')}`);
+	const structural = { ok: reasons.length === 0, reasons };
+
+	const unsupported: string[] = [];
+	const unknown: string[] = [];
+	if (structural.ok) {
+		for (const cue of proposal.story.cues) {
+			if (cue.kind !== 'dialogue') continue;
+			const passage = snapshot.chunks.get(cue.requiredEvidence!)!.text;
+			const verdict = checkAsync ? await checkAsync(cue.value, passage) : 'UNKNOWN';
+			if (verdict === 'UNSUPPORTED') unsupported.push(cue.id);
+			else if (verdict !== 'SUPPORTED') unknown.push(cue.id);
+		}
+	}
+	const semantic = { ok: structural.ok && unsupported.length === 0 && unknown.length === 0, unsupported, unknown };
+	const status: GroundingStatus = !structural.ok || unsupported.length ? 'REJECTED' : semantic.ok ? 'VERIFIED' : 'PROPOSED';
+	return { status, gates: { structural, semantic } };
+}
+
+const STOP_WORDS = new Set([
+	'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+	'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
+	'to', 'was', 'were', 'will', 'with'
+]);
+
+const NEGATION_WORDS = new Set([
+	'not', 'never', 'no', 'none', 'neither', 'nor', 'cannot', "can't",
+	"didn't", "wasn't", "weren't", "isn't", "aren't", 'denies', 'denied'
+]);
+
+function extractTokens(text: string): string[] {
+	return text
+		.toLowerCase()
+		.replace(/[^a-z0-9\s]/g, ' ')
+		.split(/\s+/)
+		.filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+}
+
+function extractNumbersAndDates(text: string): string[] {
+	const matches = text.match(/\b\d+(?:[.,]\d+)*(?:\$|%|st|nd|rd|th)?\b/gi);
+	return matches ? matches.map((m) => m.toLowerCase().replace(/,/g, '')) : [];
+}
+
+/**
+ * Deterministic rule-based semantic support checker.
+ * Evaluates text containment, polarity/negation consistency, and numeric consistency.
+ * Embedding similarity alone must not answer SUPPORTED.
+ */
+export function createRuleBasedSupportChecker(): SupportChecker {
+	return (line: string, passage: string): SupportVerdict => {
+		const cleanLine = line.trim().toLowerCase();
+		const cleanPassage = passage.trim().toLowerCase();
+
+		if (!cleanLine || !cleanPassage) return 'UNKNOWN';
+
+		// Exact substring match gives direct support
+		if (cleanPassage.includes(cleanLine)) {
+			return 'SUPPORTED';
+		}
+
+		// Check negation polarity
+		const lineWords = line.toLowerCase().split(/\s+/);
+		const passageWords = passage.toLowerCase().split(/\s+/);
+
+		const lineNegated = lineWords.some((w) => NEGATION_WORDS.has(w));
+		const passageNegated = passageWords.some((w) => NEGATION_WORDS.has(w));
+
+		if (lineNegated !== passageNegated) {
+			// One is negated and the other is affirmative -> potential contradiction
+			const lineTokens = extractTokens(line);
+			const passageTokens = new Set(extractTokens(passage));
+			const shared = lineTokens.filter((t) => passageTokens.has(t));
+			if (shared.length >= 2) {
+				return 'UNSUPPORTED';
+			}
+		}
+
+		// Check numbers and numeric dates
+		const lineNumbers = extractNumbersAndDates(line);
+		const passageNumbers = new Set(extractNumbersAndDates(passage));
+		for (const num of lineNumbers) {
+			if (!passageNumbers.has(num)) {
+				// Line mentions specific figure or date absent from passage
+				return 'UNSUPPORTED';
+			}
+		}
+
+		// Check content token overlap
+		const contentTokens = extractTokens(line);
+		if (contentTokens.length === 0) return 'UNKNOWN';
+
+		const pTokens = new Set(extractTokens(passage));
+		const overlapCount = contentTokens.filter((t) => pTokens.has(t)).length;
+		const overlapRatio = overlapCount / contentTokens.length;
+
+		if (overlapRatio >= 0.85 && lineNegated === passageNegated) {
+			return 'SUPPORTED';
+		}
+
+		return 'UNKNOWN';
+	};
+}
+
+export interface OrnithSupportCheckerOptions {
+	endpoint?: string;
+	model?: string;
+	timeoutMs?: number;
+	fetchFn?: typeof fetch;
+}
+
+/**
+ * Creates an Ornith 1.5 local-model (:8090) semantic support checker.
+ * Falls back to the rule-based checker if the local endpoint is unreachable.
+ */
+export function createOrnithSupportChecker(
+	options: OrnithSupportCheckerOptions = {}
+): (line: string, passage: string) => Promise<SupportVerdict> {
+	const endpoint = options.endpoint ?? 'http://127.0.0.1:8090/v1/chat/completions';
+	const model = options.model ?? 'ornith-1.5-9b';
+	const timeoutMs = options.timeoutMs ?? 2500;
+	const fetchImpl = options.fetchFn ?? fetch;
+	const fallbackChecker = createRuleBasedSupportChecker();
+
+	return async (line: string, passage: string): Promise<SupportVerdict> => {
+		try {
+			const prompt = `Analyze whether the following evidence passage strictly supports the spoken line.
+Evidence passage:
+"${passage}"
+
+Spoken line:
+"${line}"
+
+Respond with ONLY a JSON object: {"verdict": "SUPPORTED" | "UNSUPPORTED" | "UNKNOWN"}`;
+
+			const response = await fetchImpl(endpoint, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					model,
+					messages: [
+						{
+							role: 'system',
+							content: 'You are an evidence verification engine. Return valid JSON only with verdict.'
+						},
+						{ role: 'user', content: prompt }
+					],
+					temperature: 0.0,
+					max_tokens: 64
+				}),
+				signal: AbortSignal.timeout(timeoutMs)
+			});
+
+			if (!response.ok) {
+				return fallbackChecker(line, passage);
+			}
+
+			const data = (await response.json()) as any;
+			const content = data?.choices?.[0]?.message?.content ?? '';
+			const jsonMatch = content.match(/\{[\s\S]*\}/);
+			if (jsonMatch) {
+				const parsed = JSON.parse(jsonMatch[0]);
+				if (parsed.verdict === 'SUPPORTED' || parsed.verdict === 'UNSUPPORTED' || parsed.verdict === 'UNKNOWN') {
+					return parsed.verdict;
+				}
+			}
+			return fallbackChecker(line, passage);
+		} catch {
+			return fallbackChecker(line, passage);
+		}
+	};
 }

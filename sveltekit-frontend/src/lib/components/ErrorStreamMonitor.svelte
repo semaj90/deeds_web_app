@@ -36,37 +36,50 @@
 
 });
 
+  // EventSource fires a native 'error' Event with no data on connection loss, so event.data may be undefined.
+  function parseEventData(event: Event): any | null {
+    const raw = (event as MessageEvent).data;
+    if (typeof raw !== 'string' || raw === '') return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
   function connect() {
     try {
+      eventSource?.close();
       eventSource = new EventSource('/api/errors/stream');
 
-      eventSource.addEventListener('error', (event: MessageEvent) => {
-        const data = JSON.parse(event.data);
-        errorMessage = data.message;
+      eventSource.addEventListener('error', (event: Event) => {
+        const data = parseEventData(event);
+        errorMessage = data?.message ?? 'Connection to error stream lost';
         connected = false;
-        console.error('Stream error:', data);
+        console.error('Stream error:', data ?? event);
+        eventSource?.close();
 
         setTimeout(connect, 5000);
       });
 
       eventSource.addEventListener('status', (event: MessageEvent) => {
-        const data = JSON.parse(event.data);
-        if (data.status === 'connected') {
+        const data = parseEventData(event);
+        if (data?.status === 'connected') {
           connected = true;
           errorMessage = null;
         }
       });
 
       eventSource.addEventListener('error-data', (event: MessageEvent) => {
-        const data = JSON.parse(event.data);
-        if (data.code) {
+        const data = parseEventData(event);
+        if (data?.code) {
           errors.set(data.code, data);
           errors = new Map(errors);
         }
       });
 
       eventSource.addEventListener('summary', (event: MessageEvent) => {
-        summary = JSON.parse(event.data);
+        summary = parseEventData(event) ?? summary;
       });
     } catch (err) {
       errorMessage = err instanceof Error ? err.message : 'Connection failed';

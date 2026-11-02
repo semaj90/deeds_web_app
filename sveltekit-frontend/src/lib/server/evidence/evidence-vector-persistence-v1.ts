@@ -1,5 +1,7 @@
+import { createHash } from 'node:crypto';
 import { sql, type SQL } from 'drizzle-orm';
 import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
+import { deriveCanonicalMrlBundleV1 } from '$lib/server/embeddings/embeddinggemma-canonical-contract-v1.js';
 import {
   assertEvidenceEmbeddingAdmitted,
   EVIDENCE_EMBEDDING_TYPE,
@@ -58,7 +60,22 @@ export async function persistEvidenceVectorForProjectionV1(
   if (input.outputChecksum !== expectedOutputChecksum) {
     throw new Error('EVIDENCE_VECTOR_PRODUCER_CHECKSUM_MISMATCH');
   }
-  const metadata = { ...input.metadata, embedding_output_sha256: expectedOutputChecksum };
+  const mrlBundle = deriveCanonicalMrlBundleV1(producerVector);
+  const digestFloat32 = (arr: Float32Array) =>
+    createHash('sha256')
+      .update(Buffer.from(arr.buffer, arr.byteOffset, arr.byteLength))
+      .digest('hex');
+  const metadata = {
+    ...input.metadata,
+    embedding_output_sha256: expectedOutputChecksum,
+    mrl_representations: {
+      semantic_768_sha256: digestFloat32(mrlBundle.semantic_768),
+      mrl_512_sha256: digestFloat32(mrlBundle.mrl_512),
+      mrl_256_sha256: digestFloat32(mrlBundle.mrl_256),
+      mrl_128_sha256: digestFloat32(mrlBundle.mrl_128),
+      bitset128_hex: mrlBundle.bitset128Hex,
+    },
+  };
   const vectorLiteral = `[${Array.from(producerVector).join(',')}]`;
 
   return database.transaction(async (transaction) => {

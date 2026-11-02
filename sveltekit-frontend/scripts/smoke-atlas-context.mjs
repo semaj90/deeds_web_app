@@ -162,7 +162,7 @@ await check('provenance.atlas in {redis, fs, cache, empty}', () => {
 
 await check('provenance.sources lists ≥1 origin', () => {
   const s = ctx.provenance?.sources ?? [];
-  if (s.length === 0) throw new Error('empty sources');
+  if (s.length === 0) throw new Error(ctx.provenance?.atlas === 'empty' ? 'WARN: empty sources (atlas cold; no peers/hit-demand yet)' : 'empty sources');
   return s.join(', ');
 });
 

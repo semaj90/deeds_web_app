@@ -51,7 +51,7 @@ function makeCanonicalCollectionInfo() {
   };
 }
 
-function makeCanonicalPoint(overrides = {}) {
+function makeCanonicalPoint(overrides: any = {}) {
   return {
     id: 'point-1',
     payload: {
@@ -61,26 +61,19 @@ function makeCanonicalPoint(overrides = {}) {
       qdrant_point_id: 'point-1',
       feature_id: 'feature-1',
       qdrant_payload_version: 'v1',
-      bm42: { indices: [1], values: [1] }, // Canonical sparse vector name per qdrant-collection-contracts.ts
       ...overrides.payload,
     },
     vector: {
-      content_384: new Array(384).fill(0),
-      summary_384: new Array(384).fill(0),
-      signature_384: new Array(384).fill(0),
-      latent64: new Array(64).fill(0),
-    },
-    sparse_vectors: {
-      bm42: { // Canonical sparse vector name per qdrant-collection-contracts.ts
-        indices: [1],
-        values: [1],
-      },
+      content: new Array(768).fill(0),
+      signature: new Array(768).fill(0),
+      error: new Array(768).fill(0),
+      ...overrides.vector,
     },
     ...overrides.point,
   };
 }
 
-describe('qdrant component parity logic', () => {
+describe('qdrant component parity logic (768-dim canonical)', () => {
   it('resolves sample configuration in precedence order', () => {
     const cli = resolveSampleConfiguration(['node', 'x', '--sample', '12'], {});
     expect(cli.value).toBe(12);
@@ -130,23 +123,23 @@ describe('qdrant component parity logic', () => {
     };
     const point = makeCanonicalPoint();
 
-    expect(classifyParity({ row, point: null, contract: COLLECTION_CONTRACTS.codebase_chunks_384 }).state).toBe('missing_point');
+    expect(classifyParity({ row, point: null, contract: COLLECTION_CONTRACTS.codebase_chunks_768_v2 }).state).toBe('missing_point');
     expect(classifyParity({
       row,
       point: makeCanonicalPoint({ payload: { packet_key: 'packet:other' } }),
-      contract: COLLECTION_CONTRACTS.codebase_chunks_384,
+      contract: COLLECTION_CONTRACTS.codebase_chunks_768_v2,
     }).state).toBe('identity_contradiction');
     expect(classifyParity({
       row,
       point: makeCanonicalPoint({ payload: { qdrant_point_id: 'wrong-point' } }),
-      contract: COLLECTION_CONTRACTS.codebase_chunks_384,
+      contract: COLLECTION_CONTRACTS.codebase_chunks_768_v2,
     }).state).toBe('identity_contradiction');
     expect(classifyParity({
       row,
-      point: makeCanonicalPoint({ point: { vector: { summary_384: new Array(768).fill(0) } } }),
-      contract: COLLECTION_CONTRACTS.codebase_chunks_384,
+      point: makeCanonicalPoint({ point: { vector: { content: new Array(384).fill(0) } } }),
+      contract: COLLECTION_CONTRACTS.codebase_chunks_768_v2,
     }).state).toBe('projection_contradiction');
-    expect(classifyParity({ row, point, contract: COLLECTION_CONTRACTS.codebase_chunks_384 }).state).toBe('ok');
+    expect(classifyParity({ row, point, contract: COLLECTION_CONTRACTS.codebase_chunks_768_v2 }).state).toBe('ok');
   });
 
   it('computes overall status from contradiction and coverage debt', () => {
@@ -157,7 +150,7 @@ describe('qdrant component parity logic', () => {
     expect(computeOverallStatus({})).toBe('PASS');
   });
 
-  it('generates bounded repair events and rejects quarantine payload application', () => {
+  it('generates bounded repair events for 768 canonical vectors and rejects quarantine payload application', () => {
     const classifiedRows = [
       { state: 'missing_point', packet_id: 'p1', packet_key: 'packet:1', qdrant_point_id: 'q1', reasons: ['missing_point'] },
       { state: 'stale_point', packet_id: 'p2', packet_key: 'packet:2', qdrant_point_id: 'q2', reasons: ['aggregate_version_mismatch'] },
@@ -170,17 +163,17 @@ describe('qdrant component parity logic', () => {
           required_complete: true,
           optional_complete: false,
           missing_required_vectors: [],
-          missing_optional_vectors: ['summary_384'],
+          missing_optional_vectors: ['error'],
         },
-        reasons: ['missing optional vector "summary_384"'],
+        reasons: ['missing optional vector "error"'],
       },
       { state: 'identity_contradiction', packet_id: 'p4', packet_key: 'packet:4', qdrant_point_id: 'q4', reasons: ['packet_key_mismatch'] },
     ];
-    const events = generateRepairEvents({ collection: 'codebase_chunks_384', classifiedRows });
+    const events = generateRepairEvents({ collection: 'codebase_chunks_768_v2', classifiedRows });
     expect(events.map((event) => event.kind)).toEqual([
       'full_projection',
       'payload_repair',
-      'summary_vector_repair',
+      'error_vector_repair',
       'quarantine',
     ]);
     expect(() => applyPayloadRepair({ kind: 'quarantine' })).toThrow(/quarantine/i);

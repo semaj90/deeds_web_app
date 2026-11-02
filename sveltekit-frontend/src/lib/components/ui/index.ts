@@ -28,7 +28,7 @@ export { default as CardHeader } from './card/CardHeader.svelte';
 export { default as CardTitle } from './card/CardTitle.svelte';
 export { default as Svelte5Card } from './card/Card.svelte';
 
-// Dialog
+// Dialog & Modal (Unified Bits UI v2 Dialog Primitives)
 export { default as Dialog } from './dialog/Dialog.svelte';
 export { default as DialogComponent } from './dialog/Dialog.svelte';
 export { default as DialogContent } from './dialog/DialogContent.svelte';
@@ -36,6 +36,8 @@ export { default as DialogDescription } from './dialog/DialogDescription.svelte'
 export { default as DialogHeader } from './dialog/DialogHeader.svelte';
 export { default as DialogTitle } from './dialog/DialogTitle.svelte';
 export { default as DialogTrigger } from './dialog/DialogTrigger.svelte';
+export { default as Modal } from './Modal.svelte';
+export { default as ModalLight } from './ModalLight.svelte';
 
 // Avatar
 export { default as Avatar } from './avatar/Avatar.svelte';

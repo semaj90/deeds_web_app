@@ -328,12 +328,12 @@
 	<div class="cne-header">
 		<h2>Case Notes</h2>
 		<div class="cne-header-actions">
-			<button class="cne-btn cne-btn-primary" onclick={startNewNote}>
+			<button class="legal-action legal-action-primary" onclick={startNewNote}>
 				<Icon name="plus" size={14} /> New
 			</button>
 			{#if onClose}
-				<button class="cne-btn" onclick={onClose}>
-					<Icon name="x" size={14} />
+				<button class="legal-icon-action" onclick={onClose} aria-label="Close notes" title="Close notes">
+					<Icon name="x" size={14} class="transition-transform group-hover:rotate-90" />
 				</button>
 			{/if}
 		</div>
@@ -381,30 +381,32 @@
 					<div class="cne-toolbar-actions">
 						{#if selectedNote}
 							<button
-								class="cne-btn cne-btn-sm"
+								class="legal-icon-action"
 								onclick={() => togglePin(selectedNote)}
 								title={selectedNote.isPinned ? 'Unpin' : 'Pin'}
+								aria-label={selectedNote.isPinned ? 'Unpin note' : 'Pin note'}
 							>
-								<Icon name="pin" size={14} />
+								<Icon name="pin" size={14} class="transition-transform group-hover:-translate-y-0.5" />
 							</button>
 							<button
-								class="cne-btn cne-btn-sm"
-								class:active={showVersions}
+								class="legal-action legal-action-sm"
+								class:legal-action-selected={showVersions}
 								onclick={toggleVersionHistory}
 								title="Version History"
 							>
 								<Icon name="git-branch" size={14} /> History
 							</button>
 							<button
-								class="cne-btn cne-btn-sm cne-btn-danger"
+								class="legal-icon-action-danger"
 								onclick={() => deleteNote(selectedNote.id)}
 								title="Delete"
+								aria-label="Delete note"
 							>
-								<Icon name="trash-2" size={14} />
+								<Icon name="trash-2" size={14} class="transition-transform group-hover:scale-110" />
 							</button>
 						{/if}
 						<button
-							class="cne-btn cne-btn-primary cne-btn-sm"
+							class="legal-action legal-action-primary legal-action-sm"
 							onclick={saveNote}
 							disabled={isSaving}
 						>
@@ -440,7 +442,7 @@
 											<span class="cne-version-date">{formatDate(v.createdAt)}</span>
 											<span class="cne-version-preview">{truncate(v.content, 100)}</span>
 										</button>
-										<button class="cne-btn cne-btn-xs" onclick={() => restoreVersion(v)}>
+						<button class="legal-action legal-action-xs" onclick={() => restoreVersion(v)}>
 											<Icon name="rotate-ccw" size={11} /> Restore
 										</button>
 									</div>
@@ -460,15 +462,15 @@
 												<span class="cne-diff-stat-removed">-{diffStats.removed}</span>
 											</span>
 											<button
-												class="cne-btn cne-btn-xs"
-												class:active={showDiffView}
+								class="legal-action legal-action-xs"
+								class:legal-action-selected={showDiffView}
 												onclick={() => showDiffView = true}
 											>
 												Diff
 											</button>
 											<button
-												class="cne-btn cne-btn-xs"
-												class:active={!showDiffView}
+								class="legal-action legal-action-xs"
+								class:legal-action-selected={!showDiffView}
 												onclick={() => showDiffView = false}
 											>
 												Full
@@ -480,7 +482,7 @@
 									{/if}
 									{#if showDiffView}
 										<div class="cne-diff-lines">
-											{#each diffLines as line}
+											{#each diffLines as line, lineIndex (lineIndex)}
 												<div class="cne-diff-line cne-diff-{line.type}">
 													<span class="cne-diff-prefix">{line.type === 'added' ? '+' : line.type === 'removed' ? '-' : ' '}</span>{line.text}
 												</div>
@@ -643,71 +645,6 @@
 		outline: none;
 	}
 
-	.cne-btn {
-		padding: 0.4rem 0.75rem;
-		background: #374151;
-		color: #d1d5db;
-		border: none;
-		border-radius: 0.25rem;
-		cursor: pointer;
-		font-size: 0.8rem;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.25rem;
-		transition: background-color 0.15s;
-	}
-
-	.cne-btn:hover {
-		background: #4b5563;
-	}
-
-	.cne-btn-primary {
-		background: #2563eb;
-		color: #ffffff;
-	}
-
-	.cne-btn-primary:hover {
-		background: #1d4ed8;
-	}
-
-	.cne-btn-danger {
-		background: #7f1d1d;
-		color: #fecaca;
-	}
-
-	.cne-btn-danger:hover {
-		background: #991b1b;
-	}
-
-	.cne-btn-sm {
-		padding: 0.25rem 0.5rem;
-		font-size: 0.75rem;
-	}
-
-	.cne-btn-sm.active {
-		background: #1e3a5f;
-		color: #93c5fd;
-	}
-
-	.cne-btn-xs {
-		padding: 0.15rem 0.4rem;
-		font-size: 0.7rem;
-		background: #374151;
-		color: #93c5fd;
-		border: none;
-		border-radius: 0.2rem;
-		cursor: pointer;
-	}
-
-	.cne-btn-xs:hover {
-		background: #4b5563;
-	}
-
-	.cne-btn:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
 	.cne-placeholder {
 		flex: 1;
 		display: flex;
@@ -868,11 +805,6 @@
 
 	.cne-diff-stat-removed {
 		color: #f87171;
-	}
-
-	.cne-btn-xs.active {
-		background: #1e3a5f;
-		color: #93c5fd;
 	}
 
 	.cne-diff-lines {

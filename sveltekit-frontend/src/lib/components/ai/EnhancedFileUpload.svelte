@@ -5,6 +5,7 @@
 	import type { ProcessingPipeline } from '$lib/types/upload';
 	import { toast } from '$lib/utils/toast';
 	import { createActor } from 'xstate';
+	import { untrack } from 'svelte';
 
 	interface Props {
 		onUploadComplete?: (doc: unknown) => void;
@@ -287,11 +288,17 @@
 		}
 	});
 
+	// Run once on mount: untrack so state touched by these calls is not a dependency
+	// (re-running caused effect_update_depth_exceeded).
 	$effect(() => {
-		(async () => {
+		untrack(() => {
 			connectStatusSocket();
-			await checkSystemStatus();
-		})();
+			void checkSystemStatus();
+		});
+		return () => {
+			statusSocket?.close();
+			statusSocket = null;
+		};
 	});
 
 	const machineState = $state<any>(uploadMachineActor.getSnapshot());

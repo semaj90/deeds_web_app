@@ -13,6 +13,7 @@ import {
   buildCodebaseFileLookupKeys,
   collapseDependencyRows,
   findDependencies,
+  recommendKanbanDagPrefillAlgorithm,
   validateToolCallArguments,
   dispatch,
 } from './atlas-tools-mcp.mjs';
@@ -38,6 +39,70 @@ test('MCP call arguments are validated against the exact schema advertised by to
   }, 2);
   assert.equal(validCall.isError, undefined);
   assert.equal(JSON.parse(validCall.content[0].text).intent, 'repair');
+});
+
+test('Kanban DAG recommender fetches the exact bounded OpenSpec cohort and returns proposal-only selection', async () => {
+  const calls = [];
+  const snapshotHash = 'b'.repeat(64);
+  const result = await recommendKanbanDagPrefillAlgorithm({
+    featureId: 'openspec:parent-atlas-agentic-file-compiler',
+    maxPrefillTasks: 1,
+  }, {
+    trace: async (name, args) => {
+      calls.push({ name, args });
+      return {
+        schema: 'atlas.kanban-task-dag-snapshot.v1',
+        status: 'READY',
+        featureId: args.featureId,
+        snapshotAt: '2026-11-02T00:00:00.000Z',
+        snapshotHash,
+        tasks: [
+          { taskId: 'task-b', featureLabel: 'Task B', lane: 'todo', status: 'pending', priority: 1, sourceRefs: ['openspec/changes/change/tasks.md'] },
+          { taskId: 'task-a', featureLabel: 'Task A', lane: 'todo', status: 'pending', priority: 2, sourceRefs: ['openspec/changes/change/tasks.md'] },
+        ],
+        dependencies: [],
+        sourceAuthority: 'KANBAN_TASKS_POSTGRES_READ_ONLY_SNAPSHOT',
+        canonicalAuthority: false,
+        writesPerformed: false,
+      };
+    },
+  });
+  assert.deepEqual(calls, [{
+    name: 'atlas.kanban_dag_snapshot',
+    args: { featureId: 'openspec:parent-atlas-agentic-file-compiler', limit: 128 },
+  }]);
+  assert.equal(result.status, 'PROPOSED');
+  assert.deepEqual(result.readyTaskIds, ['task-a']);
+  assert.equal(result.omittedReadyTaskCount, 1);
+  assert.equal(result.sourceSnapshotHash, snapshotHash);
+  assert.equal(result.canonicalAuthority, false);
+  assert.equal(result.writesPerformed, false);
+});
+
+test('Kanban DAG recommender tool rejects non-cohort scope and appears in the advertised tool list', async () => {
+  assert.equal(validateToolCallArguments('recommend_kanban_dag_prefill_algorithm', {
+    featureId: 'all',
+  }).valid, false);
+  assert.equal(validateToolCallArguments('recommend_kanban_dag_prefill_algorithm', {
+    featureId: 'openspec:parent-atlas-agentic-file-compiler',
+    maxPrefillTasks: 33,
+  }).valid, false);
+  const listed = await dispatch('tools/list', {}, 1);
+  assert.ok(listed.tools.some((tool) => tool.name === 'recommend_kanban_dag_prefill_algorithm'));
+});
+
+test('Kanban DAG recommender normalizes TRACE failures into an explicit blocked proposal', async () => {
+  const result = await recommendKanbanDagPrefillAlgorithm({
+    featureId: 'openspec:parent-atlas-evidence-agent-proposals',
+  }, {
+    trace: async () => {
+      throw Object.assign(new Error('snapshot tool is not registered'), { code: 'TRACE_TOOL_ERROR' });
+    },
+  });
+  assert.equal(result.status, 'BLOCKED');
+  assert.equal(result.reasonCode, 'TRACE_TOOL_ERROR');
+  assert.equal(result.canonicalAuthority, false);
+  assert.equal(result.writesPerformed, false);
 });
 
 test('every input form of one file resolves to the same canonical key', () => {

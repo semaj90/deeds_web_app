@@ -2,7 +2,6 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import crypto from 'crypto';
 import { deleteSeaweedFile as deleteFile, uploadSeaweedFile as uploadFile } from '$lib/server/seaweed-client.js';
-import { buildEvidenceProcessPayloadV1 } from '$lib/server/evidence/evidence-process-payload-v1.js';
 import { db } from '$lib/server/db/client';
 import { eq, sql } from 'drizzle-orm';
 import { evidence } from '$lib/server/db/schema-postgres.js';
@@ -59,6 +58,7 @@ import {
   persistEvidenceVectorForProjectionV1,
   type EvidenceVectorDatabaseV1,
 } from '$lib/server/evidence/evidence-vector-persistence-v1.js';
+import { isEvidenceVectorOutboxAvailableV1 } from '$lib/server/evidence/evidence-vector-outbox-readiness-v1.js';
 import { createEvidenceEmbeddingProducer } from '$lib/server/evidence/evidence-embedding-producer.js';
 
 // Strict llama.cpp lane (:8081) bound to the EMB-PROV-01 receipt; re-probed on every call, fails closed.
@@ -363,6 +363,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const enableEmbeddings = parseBooleanField('enableEmbeddings', true);
     const enableSummarization = parseBooleanField('enableSummarization', true);
 
+    if (enableEmbeddings && !(await isEvidenceVectorOutboxAvailableV1())) {
+      return json({ success: false, error: 'EVIDENCE_PROCESSING_SCHEMA_UNAVAILABLE' }, { status: 503 });
+    }
+
     if (file.size > MAX_FILE_SIZE) {
       return json(
         { success: false, error: `File too large. Maximum ${MAX_FILE_SIZE / 1024 / 1024}MB.` },
@@ -458,18 +462,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     const evidenceId = inserted.id;
     persistedEvidenceId = evidenceId;
-    try {
-      await createAnalysisJob({ id: jobId, evidenceId, caseId, jobType: 'upload_pipeline' });
-    } catch (jobError) {
-      console.warn('[Upload] Durable progress record unavailable; keeping in-process progress:', jobError);
-    }
-    await updateUploadProgress(jobId, {
-      evidenceId,
-      step: 'db-insert',
-      progress: 60,
-      message: 'Database record created',
-    });
-
     const uploadedFile = await createUploadedFile({
       file,
       bytes: buffer,
@@ -491,6 +483,29 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       allowInsertFailure: true,
     });
     const uploadedFileId = uploadedFile.file?.id ?? null;
+
+    await enqueueJob({
+      id: jobId,
+      evidenceId,
+      caseId,
+      jobType: 'upload_pipeline',
+      result: {
+        evidenceId,
+        caseId,
+        objectKey,
+        object_bucket: BUCKET,
+        sourceSha256: formatEvidenceSourceRevisionV1(fileHash),
+        fileName: file.name,
+        contentType: file.type,
+        uploadedBy: uploaderIntId,
+      },
+    });
+    updateJob(jobId, {
+      evidenceId,
+      step: 'queued',
+      progress: 0,
+      message: 'Document stored; durable processing job queued',
+    });
 
     if (enableOcr && evidenceType === 'PDF') {
       await registerPdfOcrWorkflowRun({
@@ -519,17 +534,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         /* audit is non-critical */
       });
 
-    // 5. Fire off text extraction + chunking + embedding (non-blocking)
-    processAndEmbed(jobId, evidenceId, file.name, buffer, caseId, evidenceType).catch(async (err) => {
-      console.error('[Upload] Background processing failed:', err);
-      await updateUploadProgress(jobId, {
-        step: 'error',
-        progress: 60,
-        message: 'Embedding generation failed (upload succeeded)',
-        error: 'Processing failed',
-      });
-    });
-
     // 7. Invalidate evidence and case caches
     await Promise.all([
       invalidateEvidenceCache(evidenceId, caseId, 'evidence_create'),
@@ -552,7 +556,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       fileId: uploadedFileId,
       caseId,
       jobId,
-      status: 'uploaded',
+      status: 'queued',
+      processingStatus: 'queued',
       fileName: file.name,
       minioKey: objectKey,
       hash: fileHash,
@@ -1027,25 +1032,6 @@ async function processAndEmbed(
 
   const { text: fullText, method: extractionMethod } = extractionResult;
   let { doclingBlocks } = extractionResult;
-  const evidenceProcessPayload = buildEvidenceProcessPayloadV1({
-    evidenceId,
-    text: fullText,
-    extractionMethod,
-    sourceRevision,
-    skipEmbedding: true,
-  });
-  if (evidenceProcessPayload) {
-    try {
-      const { dispatchOrExecuteInline } = await import('$lib/server/queue/dispatch-inline.js');
-      const dispatchResult = await dispatchOrExecuteInline('evidence.process', evidenceProcessPayload);
-      if (dispatchResult.error || dispatchResult.mode === 'skipped') {
-        console.warn('[Upload] Evidence analysis dispatch did not complete:', dispatchResult.error ?? dispatchResult.mode);
-      }
-    } catch (err) {
-      console.warn('[Upload] Evidence dispatch failed (non-critical):', (err as Error).message);
-    }
-  }
-
   if (!fullText.trim()) {
     markStage(diagnostics, 'chunking', 'skipped', 'No text extracted');
     markStage(diagnostics, 'embedding', 'skipped', 'No text extracted');

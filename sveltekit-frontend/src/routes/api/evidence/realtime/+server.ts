@@ -1,7 +1,11 @@
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { subscribe, getJob, isJobOwnedBy } from '$lib/server/evidence-progress';
-import { getAnalysisJob, getAnalysisJobForOwner } from '$lib/server/analysis/analysis-jobs.js';
+import { getAnalysisJobForOwner } from '$lib/server/analysis/analysis-jobs.js';
+import {
+	buildEvidenceProcessingCompletionV1,
+	formatEvidenceProgressSseEventV1,
+} from '$lib/server/evidence/evidence-progress-sse-v1.js';
 
 const querySchema = z.object({
 	jobId: z.string().min(1, 'Missing jobId parameter').max(200)
@@ -25,17 +29,17 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	}
 	const { jobId } = parsed.data;
 	const ownerId = String(locals.user.id);
+	const numericOwnerId = Number(ownerId);
 	const memJob = getJob(jobId);
-	if (memJob && !isJobOwnedBy(jobId, ownerId)) {
-		return new Response('Job not found', { status: 404 });
+	let ownedJob = null;
+	if (Number.isSafeInteger(numericOwnerId) && numericOwnerId > 0) {
+		ownedJob = await getAnalysisJobForOwner(jobId, numericOwnerId).catch((error) => {
+			console.warn('[EvidenceRealtime] database ownership lookup failed:', error);
+			return null;
+		});
 	}
-	if (!memJob) {
-		const numericOwnerId = Number(ownerId);
-		const ownedJob = Number.isSafeInteger(numericOwnerId) && numericOwnerId > 0
-			? await getAnalysisJobForOwner(jobId, numericOwnerId)
-			: null;
-		if (!ownedJob) return new Response('Job not found', { status: 404 });
-	}
+	if (!ownedJob && memJob && !isJobOwnedBy(jobId, ownerId)) return new Response('Job not found', { status: 404 });
+	if (!ownedJob && !memJob) return new Response('Job not found', { status: 404 });
 
 	const encoder = new TextEncoder();
 	let isClosed = false;
@@ -54,6 +58,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 					cleanup();
 				}
 			};
+			const emitEvent = (event: 'connected' | 'progress' | 'complete' | 'error', payload: Record<string, unknown>) => {
+				safeEnqueue(formatEvidenceProgressSseEventV1(event, payload));
+			};
 
 			const cleanup = () => {
 				if (unsubscribe) { unsubscribe(); unsubscribe = null; }
@@ -68,16 +75,16 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			};
 
 			// Send initial connection event
-			safeEnqueue(`data: ${JSON.stringify({ type: 'connected', jobId })}\n\n`);
+			emitEvent('connected', { jobId });
 
-			// Try in-memory store first (fast path — same-process uploads)
-			if (memJob) {
+			// Durable DB jobs own processing status; memory is only the pre-enqueue upload fallback.
+			if (!ownedJob && memJob) {
 				// Subscribe to in-memory progress updates
 				unsubscribe = subscribe(jobId, (progress) => {
-					safeEnqueue(`data: ${JSON.stringify({ type: 'progress', ...progress })}\n\n`);
+					emitEvent('progress', progress as unknown as Record<string, unknown>);
 
 					if (progress.step === 'complete' || progress.step === 'error') {
-						safeEnqueue(`data: ${JSON.stringify({ type: progress.step, ...progress })}\n\n`);
+						emitEvent(progress.step === 'complete' ? 'complete' : 'error', progress as unknown as Record<string, unknown>);
 						closeStream();
 					}
 				});
@@ -89,9 +96,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 				const pollDb = async () => {
 					if (isClosed) return;
 					try {
-						const row = await getAnalysisJob(jobId);
+						const row = await getAnalysisJobForOwner(jobId, numericOwnerId);
 						if (!row) {
-							safeEnqueue(`data: ${JSON.stringify({ type: 'error', message: 'Job not found' })}\n\n`);
+							emitEvent('error', { message: 'Job not found' });
 							closeStream();
 							return;
 						}
@@ -101,7 +108,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 							lastStatus = row.status ?? '';
 							lastProgress = row.progress ?? '';
 							const percent = Math.max(0, Math.min(100, Number.parseInt(row.progress ?? '0', 10) || 0));
-							const step = row.status === 'completed' || percent >= 100 ? 'complete'
+							const step = row.status === 'queued' ? 'queued'
+								: row.status === 'completed' || percent >= 100 ? 'complete'
 								: row.status === 'failed' ? 'error'
 								: percent < 20 ? 'uploading'
 								: percent < 30 ? 'hashing'
@@ -114,24 +122,32 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 								: percent < 95 ? 'entity-extraction'
 								: 'summarizing';
 
-							safeEnqueue(`data: ${JSON.stringify({
-								type: 'progress',
+								emitEvent('progress', {
 								jobId,
-				evidenceId: row.evidenceId,
+								evidenceId: row.evidenceId,
 								step,
 								progress: percent,
 								message: row.error ?? `Document ${step.replaceAll('-', ' ')} (${percent}%)`,
 								error: row.error ?? undefined,
-							})}\n\n`);
+							});
 
 							if (row.status === 'completed' || row.status === 'failed') {
-								safeEnqueue(`data: ${JSON.stringify({
-									type: row.status === 'completed' ? 'complete' : 'error',
-									jobId,
-					evidenceId: row.evidenceId,
-									result: row.result,
-									error: row.error ?? undefined,
-								})}\n\n`);
+								if (row.status === 'completed') {
+									emitEvent('complete', buildEvidenceProcessingCompletionV1({
+										jobId,
+										evidenceId: row.evidenceId,
+										result: row.result,
+										projectionSchedulerEnabled:
+											process.env.QDRANT_ENABLED === 'true' &&
+											process.env.EVIDENCE_VECTOR_PROJECTION_WORKER_ENABLED === 'true',
+									}));
+								} else {
+									emitEvent('error', {
+										jobId,
+										evidenceId: row.evidenceId,
+										error: row.error ?? undefined,
+									});
+								}
 								closeStream();
 							}
 						}

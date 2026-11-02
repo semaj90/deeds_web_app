@@ -400,11 +400,11 @@
 				<span>All systems operational</span>
 			</div>
 			<div class="statusbar-right">
-				<span>PostgreSQL 16</span>
+				<span>PostgreSQL 18 · pgvector</span>
 				<span class="sep">|</span>
-				<span>Qdrant v1.15</span>
+				<span>Qdrant · rebuildable projection</span>
 				<span class="sep">|</span>
-				<span>Ollama GPU</span>
+				<span>Ornith 1.5 · llama-server :8090</span>
 				<span class="sep">|</span>
 				<span>Uptime 2d 14h</span>
 			</div>

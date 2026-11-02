@@ -220,7 +220,7 @@ Verbatim original (forensic trace of the 5 policy flips, live Qdrant census, lat
 - **Qdrant collection inventory is volatile:** earlier counts and point totals are historical. The 2026-10-12 live inventory reported 18 collections and did not include `codebase_chunks_384` or `codebase_chunks_384_hybrid`; verify the live endpoint before relying on collection existence or counts. Do not merge, delete or cut over 768 collections without the owning gate.
 - **`embedding_dimension` metadata column is unreliable** (was mistagged 384 on 52,402 real 768-dim rows; backfilled 2026-08-30). Never gate an audit/backfill on it — verify with `vector_dims(col::vector)` or the column type.
 - **Hard rules:** (1) 768 from embeddinggemma is the primary source for Qdrant and Postgres; (2) any 512/256/128 projection comes from an indexed, validated 768 source; (3) projection lanes are optional and never block retrieval; (4) no truncated lane is the primary retrieval authority; (5) no 384 lane; (6) don't silently re-decide.
-- **Retrieval decision tree:** embed (recipe-stamped) → Qdrant ANN `codebase_chunks_768` (top-20) → Postgres join (`source_ref`, summary, …) → optional Neo4j expansion → rerank (GPU cosine) → optional 512d MRL routing cache (miss ⇒ use 768 score) → top-10 to the ACE context assembler. Never answer from Qdrant payloads alone.
+- **Retrieval decision tree (2026-11-01 operator decision: pgvector canonical; Qdrant `codebase_chunks_768(_v2)` is a rebuildable mirror/challenger, never the authority):** embed (recipe-stamped) → pgvector HNSW on `codebase_chunk_index` (canonical, PostgreSQL 18: bitmap prefilter on B-tree/JSONB filters, async I/O is planner behavior; top-20) → Postgres join (`source_ref`, summary, …) → optional Neo4j expansion → rerank (GPU cosine) → optional 512d MRL routing cache (miss ⇒ use 768 score) → top-10 to the ACE context assembler. Never answer from Qdrant payloads alone.
 - New scripts follow `REDIS_CONNECTION_FIXES.md` (host/port/password options, not URL strings).
 
 
@@ -1971,3 +1971,11 @@ Open:
 - Run the receipt-writing validators first. Only after they finish, correct status docs (`master_feature_todo_*.md`, `tasks.md`) and cite each receipt by its `docs/reports/...` file path.
 - Before a validator overwrites an existing receipt, copy the old file to `docs/reports/archive/<date>-<slug>/`. Never delete it.
 - Pass dated output paths where the script accepts an output argument. Use repo-root paths, because the shell's working directory persists between calls.
+
+## Production hardening: `ops.*` and service-lifecycle gates (2026-11-01)
+
+- **No MCP/TRACE tool may stop, start or restart a service or process** (llama-server `:8090`, Ollama, Docker, Postgres, Qdrant, Neo4j, Valkey) until `requireToken` verifies a real credential. Today it accepts any non-empty string (probe: `.tmp/atlas/trace-ops-gate-probe-v1.json`), so the "OPERATOR-GATED" label is documentation only.
+- **Until then:** GPU/service lifecycle stays human-run (VS Code tasks, e.g. `GPU: Prepare cuVS KMeans`). Agents may add read-only status tools (VRAM, `/slots` idle state, PID) and tools that write a request record for a human; they may not execute the stop.
+- **Lifting this rule needs all of:** verified authentication (token checked against a stored secret, not presence), a typed single-purpose tool (no generic shell/Docker), a `/slots`-idle precheck, PID scoping to the exact `--port`, an audit receipt with `writesPerformed`, and a negative test (fake token refused). Record the decision in the owning OpenSpec `tasks.md`.
+- **Seed/backfill scripts fail closed:** a script that writes embeddings must not substitute a placeholder or hash vector when the embedding service fails (the 2026-11-01 `seed-tool-manifest-vectors.mjs` incident wrote 337 pseudo-vectors silently). Fixtures may opt in explicitly (`SEED_ALLOW_PSEUDO_VECTORS=1`) and must label the rows.
+- **Ollama host normalization:** `OLLAMA_HOST=0.0.0.0` has no port; normalize to `127.0.0.1:11434` before building URLs.

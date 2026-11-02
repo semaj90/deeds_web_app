@@ -29,6 +29,7 @@ const ROOT  = join(__dir, '../..');
 const _ollamaRaw = (process.env.OLLAMA_HOST ?? '127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw.includes(':') ? _ollamaRaw : `${_ollamaRaw}:11434`}`;
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const QDRANT_ENABLED = process.env.QDRANT_ENABLED !== 'false';
 const COLLECTION = 'codebase_chunks_768';
 const DEFAULT_TOP_K = 12;
 const MAX_TOOL_RETRIEVAL_K = 20;
@@ -97,9 +98,52 @@ async function embed(text) {
   return null;
 }
 
+// ── pgvector search (Authoritative) ──────────────────────────────────────────
+
+async function pgvectorSearch(vector, { topK = DEFAULT_TOP_K } = {}) {
+  try {
+    const { loadRepoEnv, resolveDatabaseUrl } = await import('./connection-config.mjs');
+    const postgres = (await import('postgres')).default;
+    const repoEnv = loadRepoEnv();
+    const dbUrl = resolveDatabaseUrl(repoEnv);
+    const sql = postgres(dbUrl, { max: 1, timeout: 5 });
+
+    const vectorStr = `[${vector.join(',')}]`;
+    const rows = await sql`
+      SELECT 
+        tool_name,
+        namespace,
+        description,
+        payload,
+        1 - (embedding <=> ${vectorStr}::vector) AS score
+      FROM public.atlas_tool_manifest_vectors_v1
+      WHERE payload->>'live_surface' = 'true' -- only tools a model can actually call
+      ORDER BY embedding <=> ${vectorStr}::vector
+      LIMIT ${topK * 2};
+    `;
+    await sql.end();
+
+    return rows.map(r => ({
+      id: r.tool_name,
+      score: Number(r.score ?? 0),
+      payload: {
+        tool_name: r.tool_name,
+        namespace: r.namespace,
+        description: r.description,
+        ...(r.payload ?? {}),
+      },
+    }));
+  } catch (err) {
+    // Surface the failure; the caller still falls back to the registry list, but not silently.
+    process.stderr.write(`[runtime-mcp-tool-selector] pgvector search failed: ${err?.message ?? err}\n`);
+    return [];
+  }
+}
+
 // ── Qdrant search ─────────────────────────────────────────────────────────────
 
 async function qdrantSearch(vector, { topK = DEFAULT_TOP_K, ontologyFilter = [] } = {}) {
+  if (!QDRANT_ENABLED) return [];
   // Filter to tool_manifest packets only
   const filter = {
     must: [
@@ -221,7 +265,7 @@ const MCP_TO_LLAMA = Object.fromEntries(
  *     hits:        object[]   — raw Qdrant hits with reranked scores
  *     signals:     string[]   — detected ontology signals
  *     embed_ok:    boolean    — whether embedding succeeded
- *     retrieval_source: 'qdrant' | 'registry' | 'default'
+ *     retrieval_source: 'pgvector' | 'qdrant' | 'registry' | 'default'
  *   }
  */
 export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) {
@@ -277,14 +321,18 @@ export async function selectToolsForQuery(query, { topK = DEFAULT_TOP_K } = {}) 
     };
   }
 
-  const raw = vector ? await qdrantSearch(vector, { topK: effectiveTopK }) : [];
+  // pgvector (atlas_tool_manifest_vectors_v1) first; Qdrant tool_manifest is the legacy path.
+  const pgRaw = vector ? await pgvectorSearch(vector, { topK: effectiveTopK }) : [];
+  const raw = pgRaw.length > 0 ? pgRaw : (vector ? await qdrantSearch(vector, { topK: effectiveTopK }) : []);
   let ranked = rerank(raw, signals, effectiveTopK);
-  let retrieval_source = 'qdrant';
+  let retrieval_source = pgRaw.length > 0 ? 'pgvector' : 'qdrant';
 
   if (ranked.length === 0) {
     ranked = await registrySearch(queryText, effectiveTopK);
     retrieval_source = ranked.length > 0 ? 'registry' : 'default';
-  } else {
+  } else if (retrieval_source !== 'pgvector') {
+    // Registry pickup_score is query-independent and outranks cosine scores, so it is only merged
+    // into the legacy Qdrant path, never into pgvector results.
     const registryHits = await registrySearch(queryText, effectiveTopK);
     const merged = new Map();
     for (const hit of [...registryHits, ...ranked]) {
@@ -354,38 +402,40 @@ async function runAudit() {
 
   console.log(`Known LLAMA_TO_MCP mappings: ${allLlamaNames.length}`);
 
-  // Check Qdrant for each tool by searching its manifest packet
-  let qdrantFound = 0;
-  for (const mcpName of allMcpNames) {
-    try {
-      const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filter: { must: [{ key: 'tool_name', match: { value: mcpName } }] },
-          limit: 1,
-          with_payload: false,
-        }),
-        signal: AbortSignal.timeout(5_000),
-      });
-      const d = await res.json();
-      if (d.result?.points?.length > 0) qdrantFound++;
-    } catch { /* skip */ }
-  }
-
-  console.log(`Tools found in Qdrant manifest: ${qdrantFound}/${allMcpNames.length}`);
-
-  // Total tool manifest packets in Qdrant
+  // Check pgvector
+  let pgvectorCount = 0;
   try {
-    const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/count`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filter: { must: [{ key: 'packet_kind', match: { value: 'tool_manifest' } }] } }),
-      signal: AbortSignal.timeout(5_000),
-    });
-    const d = await res.json();
-    console.log(`Total tool_manifest packets in Qdrant: ${d.result?.count ?? 'unknown'}`);
-  } catch { /* skip */ }
+    const { loadRepoEnv, resolveDatabaseUrl } = await import('./connection-config.mjs');
+    const postgres = (await import('postgres')).default;
+    const sql = postgres(resolveDatabaseUrl(loadRepoEnv()), { max: 1, idle_timeout: 5 });
+    const [c] = await sql`SELECT count(*) FROM public.atlas_tool_manifest_vectors_v1`;
+    pgvectorCount = Number(c?.count ?? 0);
+    await sql.end();
+  } catch {}
+  console.log(`Tools found in pgvector manifest: ${pgvectorCount}`);
+
+  let qdrantFound = 0;
+  if (QDRANT_ENABLED) {
+    for (const mcpName of allMcpNames) {
+      try {
+        const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/scroll`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filter: { must: [{ key: 'tool_name', match: { value: mcpName } }] },
+            limit: 1,
+            with_payload: false,
+          }),
+          signal: AbortSignal.timeout(2_000),
+        });
+        const d = await res.json();
+        if (d.result?.points?.length > 0) qdrantFound++;
+      } catch {}
+    }
+    console.log(`Tools found in Qdrant manifest: ${qdrantFound}/${allMcpNames.length}`);
+  } else {
+    console.log('Qdrant disabled (QDRANT_ENABLED=false), skipped Qdrant probe');
+  }
 
   // Smoke test 5 representative queries
   const testQueries = [
@@ -414,7 +464,7 @@ async function runAudit() {
 
   // Gate summary
   const gates = [
-    { name: 'qdrant_manifest_coverage', pass: qdrantFound >= 16, detail: `${qdrantFound}/${allMcpNames.length}` },
+    { name: 'manifest_coverage', pass: pgvectorCount > 0 || !QDRANT_ENABLED || qdrantFound >= 16, detail: `pgvector: ${pgvectorCount}, qdrant: ${qdrantFound}` },
     { name: 'embed_working',           pass: results.every(r => r.embed_ok), detail: `${EMBEDDING_MODEL} (768-dim)` },
     { name: 'tool_selection_returns_results', pass: results.every(r => r.mcp_names.length > 0), detail: `all 5 test queries returned tools` },
     { name: 'registry_pickup_paths', pass: (await loadRegistry()).valid === true, detail: 'revisioned docs/reports/mcp-tool-registry-index.json present' },

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Dialog } from 'bits-ui';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -27,92 +28,93 @@
 		}
 	});
 
-	function handleClose() {
-		open = false;
-		onClose();
+	function handleOpenChange(val: boolean) {
+		open = val;
+		if (!val) {
+			onClose();
+		}
 	}
 </script>
 
-{#if open}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="modal-overlay" role="presentation" onclick={handleClose}></div>
-	<div
-		class="modal-content"
-		role="dialog"
-		aria-modal="true"
-		aria-labelledby={title ? 'dialog-title' : undefined}
-		aria-describedby={description ? 'dialog-desc' : undefined}
-	>
-		{#if title}
-			<h2 id="dialog-title" class="modal-title">{title}</h2>
-		{/if}
-		{#if description}
-			<p id="dialog-desc" class="modal-description">{description}</p>
-		{/if}
-		<div class="modal-body">
-			{#if children}
-				{@render children()}
-			{/if}
-		</div>
-		<button class="modal-close" type="button" onclick={handleClose} aria-label="Close dialog">
-			&times;
-		</button>
-	</div>
-{/if}
+<Dialog.Root {open} onOpenChange={handleOpenChange}>
+	<Dialog.Portal>
+		<Dialog.Overlay class="modal-overlay fixed inset-0 z-[9990] bg-black/80 backdrop-blur-md transition-opacity" />
+		<Dialog.Content
+			class="modal-content fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9991] w-full max-w-md max-h-[90vh] overflow-y-auto bg-[#0d0e12]/95 border border-[#2a2e3d] rounded-2xl shadow-2xl p-6 text-neutral-100 font-sans focus:outline-none"
+		>
+			<!-- Tactical Corner Notches -->
+			<span class="hud-notch-tl" aria-hidden="true"></span>
+			<span class="hud-notch-tr" aria-hidden="true"></span>
+			<span class="hud-notch-bl" aria-hidden="true"></span>
+			<span class="hud-notch-br" aria-hidden="true"></span>
+
+			<!-- Gold Top Highlight -->
+			<div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#f3d471] to-transparent opacity-80" aria-hidden="true"></div>
+
+			<div class="flex items-start justify-between mb-4">
+				<div class="flex-1 min-w-0 pr-3">
+					{#if title}
+						<Dialog.Title class="text-lg font-bold text-neutral-100 flex items-center gap-2 tracking-wide">
+							<span class="text-[#f3d471] font-mono text-sm select-none">§</span>
+							<span class="truncate">{title}</span>
+						</Dialog.Title>
+					{/if}
+					{#if description}
+						<Dialog.Description class="text-xs text-neutral-400 mt-1 leading-relaxed">
+							{description}
+						</Dialog.Description>
+					{/if}
+				</div>
+				<Dialog.Close
+					class="h-8 w-8 rounded-lg bg-neutral-800/60 border border-neutral-700/50 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-700/60 hover:border-[#f3d471]/50 transition-all select-none focus:outline-none cursor-pointer"
+					aria-label="Close dialog"
+				>
+					&times;
+				</Dialog.Close>
+			</div>
+
+			<div class="modal-body text-sm text-neutral-300">
+				{#if children}
+					{@render children()}
+				{/if}
+			</div>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
 <style>
-	.modal-overlay {
-		position: fixed;
-		inset: 0;
-		background: rgba(0, 0, 0, 0.6);
-		z-index: 40;
-	}
-
-	.modal-content {
-		position: fixed;
-		left: 50%;
-		top: 50%;
-		z-index: 50;
-		width: 100%;
-		max-width: 28rem;
-		transform: translate(-50%, -50%);
-		background: var(--nier-surface, #0f172a);
-		border: 1px solid var(--nier-border, #334155);
-		border-radius: 0.5rem;
-		padding: 1.5rem;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-	}
-
-	.modal-title {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: var(--nier-accent, #38bdf8);
-		margin-bottom: 0.5rem;
-	}
-
-	.modal-description {
-		color: var(--nier-text-muted, #cbd5e1);
-		margin-bottom: 1rem;
-	}
-
-	.modal-close {
+	.hud-notch-tl,
+	.hud-notch-tr,
+	.hud-notch-bl,
+	.hud-notch-br {
 		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		width: 2rem;
-		height: 2rem;
-		border-radius: 9999px;
-		background: var(--nier-surface-light, #1f2937);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: var(--nier-text-muted, #94a3b8);
-		cursor: pointer;
-		transition: background-color 0.15s ease, color 0.15s ease;
+		width: 10px;
+		height: 10px;
+		pointer-events: none;
+		z-index: 10;
 	}
-
-	.modal-close:hover {
-		background: var(--nier-surface-lighter, #374151);
-		color: var(--nier-white, #ffffff);
+	.hud-notch-tl {
+		top: 3px;
+		left: 3px;
+		border-top: 2px solid #f3d471;
+		border-left: 2px solid #f3d471;
+	}
+	.hud-notch-tr {
+		top: 3px;
+		right: 3px;
+		border-top: 2px solid #f3d471;
+		border-right: 2px solid #f3d471;
+	}
+	.hud-notch-bl {
+		bottom: 3px;
+		left: 3px;
+		border-bottom: 2px solid #f3d471;
+		border-left: 2px solid #f3d471;
+	}
+	.hud-notch-br {
+		bottom: 3px;
+		right: 3px;
+		border-bottom: 2px solid #f3d471;
+		border-right: 2px solid #f3d471;
 	}
 </style>

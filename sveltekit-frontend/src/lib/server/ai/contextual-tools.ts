@@ -803,7 +803,7 @@ export async function executeContextualTool(
 
         const { db } = await import('$lib/server/db/client');
         const { personsOfInterest, poiPhotos } = await import('$lib/server/db/schema-postgres.js');
-        const { and, eq, ne, isNull, or, desc, sql } = await import('drizzle-orm');
+        const { and, eq, ne, isNull, or, desc, inArray } = await import('drizzle-orm');
         const { LLAMA_SERVER_BASE_URL, getActiveLocalVlmModel } = await import('./local-llama-provider.js');
 
         const limit = Math.min(30, Math.max(1, Number(args.limit ?? 10)));
@@ -868,7 +868,7 @@ export async function executeContextualTool(
                   thumbnailUrl: poiPhotos.thumbnailUrl,
                 })
                 .from(poiPhotos)
-                .where(sql`${poiPhotos.poiId} = ANY(${candIds})`)
+                .where(inArray(poiPhotos.poiId, candIds)) // not sql`= ANY(${arr})`: drizzle expands a JS array into a parenthesised list -> ANY('<uuid>') fails
                 .orderBy(desc(poiPhotos.uploadedAt))
             : [];
 

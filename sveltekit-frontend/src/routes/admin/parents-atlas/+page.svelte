@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
+	import AgenticWorkflowProposalBoard from '$lib/components/atlas/AgenticWorkflowProposalBoard.svelte';
 
 	// Server Page Props (from load function)
 	const { data } = $props<{
@@ -27,7 +28,7 @@
 	}>();
 
 	// State Runes
-	let activeTab = $state<'pipeline' | 'hyperrag' | 'topology' | 'graphrag' | 'wiki'>('pipeline');
+	let activeTab = $state<'pipeline' | 'hyperrag' | 'topology' | 'graphrag' | 'wiki' | 'proposals'>('pipeline');
 	let isExecuting = $state(false);
 	let consoleLogs = $state<string[]>([]);
 
@@ -249,6 +250,10 @@
 				<button class:active={activeTab === 'wiki'} onclick={() => activeTab = 'wiki'}>
 					<Icon name="book-open" />
 					<span>Karpathy LLM Wiki Ranks</span>
+				</button>
+				<button class:active={activeTab === 'proposals'} onclick={() => activeTab = 'proposals'}>
+					<Icon name="list-checks" />
+					<span>Agentic Proposals</span>
 				</button>
 			</nav>
 
@@ -550,6 +555,10 @@
 							{/if}
 						</div>
 					</div>
+				</div>
+			{:else if activeTab === 'proposals'}
+				<div class="tab-pane animate-slide-up">
+					<AgenticWorkflowProposalBoard />
 				</div>
 			{/if}
 		</section>

@@ -1,6 +1,6 @@
 # Unified ACE / Engram / NES Pipeline
 
-This document ties together the current codebase semantic indexing, ACE packet generation, autoencoder backfill, Engram token memory, and Gemma4/OpenCode assistant path.
+This document ties together codebase semantic indexing, ACE packet generation, autoencoder backfill, Engram query hints, and the configured OpenCode assistant path. The workstation synthesis runtime is Ornith 1.5-9B via llama-server on :8090; EmbeddingGemma is a separate embedding model.
 
 Offline batch promotion is documented separately in `docs/architecture/offline-synthesis-parent-atlas.md`.
 
@@ -21,7 +21,7 @@ flowchart LR
   Z["Identity Lane Classification"] --> A
   A["Codebase semantic indexing"] --> B["Parent atlas / document atlas"]
   B --> C["ACE packet build"]
-  C --> D["Gemma4 assistant / tool loop"]
+  C --> D["Ornith 1.5 assistant / tool loop"]
   D --> E["Token-map / Engram / NES memory swap"]
   E --> F["Hot retrieval / cluster overlays"]
   F --> G["Qdrant / Neo4j / Postgres"]
@@ -38,7 +38,7 @@ flowchart LR
 
 **Identity Lane Gate** (upstream of all lanes):
 - Routes packets to 5 lanes (canonical + recovery + quarantine)
-- Only **canonical lane** packets feed ACE/Engram/Gemma4 pipeline
+- Only **canonical lane** packets feed the ACE context path; Engram contributes optional query hints and is not the synthesis model or canonical memory store.
 - **Recoverable lane** packets flag for offline promotion
 - **Quarantine lane** packets blocked from all downstream use
 - See `docs/architecture/identity-lane-architecture.md` for full taxonomy
@@ -115,7 +115,7 @@ Responsibilities:
 - bias assistant memory swaps with Engram and cluster overlays
 - keep the Qdrant / Redis / Postgres lane aligned with the assistant packet
 
-### 5. Gemma4 / OpenCode assistant
+### 5. Ornith 1.5 / OpenCode assistant
 
 Current entry points:
 - `src/lib/server/llm/gemma4-tool-loop.ts`
@@ -154,7 +154,7 @@ If a lane does not affect:
 - codebase semantic indexing,
 - ACE packet construction,
 - Engram / token-map memory swaps, or
-- Gemma4 tool routing,
+- Ornith 1.5 tool routing through the configured llama-server runtime,
 
 then it should stay outside the canonical assistant path until promoted.
 

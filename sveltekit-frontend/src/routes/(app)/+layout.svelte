@@ -10,7 +10,6 @@
 	import { notificationStore } from '$lib/stores/unified/notification-store.svelte.js';
 	import { authStore } from '$lib/stores/auth-store.svelte.js';
 	import OfflineIndicator from '$lib/components/cache/OfflineIndicator.svelte';
-	import Breadcrumbs from '$lib/components/ui/Breadcrumbs.svelte';
 	import { initTypingDetector } from '$lib/utils/telemetry.js';
 	import { analytics } from '$lib/stores/analytics.svelte.js';
 	import { analysisPanel } from '$lib/stores/analysis-panel.svelte.js';
@@ -30,27 +29,24 @@
 	let showAssistant = $state(false);
 	// Dynamic imports to avoid SSR TDZ crashes (browser-only components)
 	let AccessibilityPanel = $state<typeof import('$lib/components/ui/AccessibilityPanel.svelte').default | null>(null);
-	let AIChatWidget = $state<typeof import('$lib/components/ai/AIChatWidget.svelte').default | null>(null);
 	let ContextualAssistantModal = $state<typeof import('$lib/components/admin/ContextualAssistantModal.svelte').default | null>(null);
 	let SetupWizard = $state<typeof import('$lib/components/onboarding/SetupWizard.svelte').default | null>(null);
 	let KeyboardShortcutsPanel = $state<typeof import('$lib/components/KeyboardShortcutsPanel.svelte').default | null>(null);
 	let AnalysisPanelComp = $state<typeof import('$lib/components/analysis/AnalysisPanel.svelte').default | null>(null);
 	let ResearchTaskPanel = $state<typeof import('$lib/components/research/ResearchTaskPanel.svelte').default | null>(null);
 	let AuthModal = $state<typeof import('$lib/components/ui/AuthModal.svelte').default | null>(null);
+
 	onMount(() => {
-		// Dynamic imports (async, no cleanup return)
 		Promise.all([
 			import('$lib/components/ui/AccessibilityPanel.svelte').catch(() => null),
-			import('$lib/components/ai/AIChatWidget.svelte').catch(() => null),
 			import('$lib/components/admin/ContextualAssistantModal.svelte').catch(() => null),
 			import('$lib/components/onboarding/SetupWizard.svelte').catch(() => null),
 			import('$lib/components/KeyboardShortcutsPanel.svelte').catch(() => null),
 			import('$lib/components/analysis/AnalysisPanel.svelte').catch(() => null),
 			import('$lib/components/research/ResearchTaskPanel.svelte').catch(() => null),
 			import('$lib/components/ui/AuthModal.svelte').catch(() => null),
-		]).then(([accMod, chatMod, contextMod, wizardMod, shortcutsMod, analysisMod, tasksMod, authMod]) => {
+		]).then(([accMod, contextMod, wizardMod, shortcutsMod, analysisMod, tasksMod, authMod]) => {
 			if (accMod) AccessibilityPanel = accMod.default;
-			if (chatMod) AIChatWidget = chatMod.default;
 			if (contextMod) ContextualAssistantModal = contextMod.default;
 			if (wizardMod) SetupWizard = wizardMod.default;
 			if (shortcutsMod) KeyboardShortcutsPanel = shortcutsMod.default;
@@ -59,15 +55,22 @@
 			if (authMod) AuthModal = authMod.default;
 		}).catch(() => { /* non-fatal: optional UI components */ });
 
-		// Load research tasks from server (auth) or localStorage (anon)
 		researchTasks.load(!!data.user);
 
 		const handleOpenAnalysis = () => { showAnalysisPanel = true; };
+		const handleOpenShortcuts = () => { showShortcuts = true; };
+		const handleOpenAuthModal = () => { showAuthModal = true; };
 		window.addEventListener('yorha:open-analysis', handleOpenAnalysis);
-		return () => window.removeEventListener('yorha:open-analysis', handleOpenAnalysis);
+		window.addEventListener('yorha:open-shortcuts', handleOpenShortcuts);
+		window.addEventListener('yorha:open-auth-modal', handleOpenAuthModal);
+		return () => {
+			window.removeEventListener('yorha:open-analysis', handleOpenAnalysis);
+			window.removeEventListener('yorha:open-shortcuts', handleOpenShortcuts);
+			window.removeEventListener('yorha:open-auth-modal', handleOpenAuthModal);
+		};
 	});
 
-	// Hydrate client-side auth store from server layout data (avoids extra /api/auth/me fetch)
+	// Hydrate client-side auth store from server layout data
 	$effect(() => {
 		if (data.user) {
 			authStore.session = {
@@ -79,7 +82,7 @@
 		}
 	});
 
-	// Initialize user activity telemetry (typing/idle detection) + analytics
+	// Initialize user activity telemetry + analytics
 	$effect(() => {
 		if (browser) {
 			let sid = sessionStorage.getItem('yorha-session-id');
@@ -107,7 +110,6 @@
 			e.preventDefault();
 			showAnalysisPanel = !showAnalysisPanel;
 		}
-		// Alt+D — navigate to Analytics deep-research tab
 		if (e.altKey && e.key.toLowerCase() === 'd' && !e.ctrlKey) {
 			e.preventDefault();
 			window.dispatchEvent(new CustomEvent('yorha:nav-analytics', { detail: { tab: 'deep-research' } }));
@@ -115,7 +117,6 @@
 				window.location.href = '/analytics';
 			}
 		}
-		// Alt+R — navigate to Research Playground tab
 		if (e.altKey && e.key.toLowerCase() === 'r' && !e.ctrlKey) {
 			e.preventDefault();
 			window.dispatchEvent(new CustomEvent('yorha:nav-analytics', { detail: { tab: 'playground' } }));
@@ -123,17 +124,14 @@
 				window.location.href = '/analytics';
 			}
 		}
-		// Alt+T — toggle research task panel
 		if (e.altKey && e.key.toLowerCase() === 't' && !e.ctrlKey) {
 			e.preventDefault();
 			researchTasks.panelOpen = !researchTasks.panelOpen;
 		}
-		// Alt+C — toggle contextual assistant
 		if (e.altKey && e.key.toLowerCase() === 'c' && !e.ctrlKey) {
 			e.preventDefault();
 			showAssistant = !showAssistant;
 		}
-		// ? key toggles keyboard shortcuts panel (only when not typing in an input)
 		if (e.key === '?' && !e.ctrlKey && !e.altKey) {
 			const tag = (e.target as HTMLElement)?.tagName;
 			if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !(e.target as HTMLElement)?.isContentEditable) {
@@ -146,26 +144,19 @@
 
 <svelte:window onkeydown={handleGlobalKeydown} />
 
-<Tooltip.Provider delayDuration={500}>
-{#if data.devBypass}
-	<div class="dev-banner">
-		DEV MODE: Authentication bypassed (DEV_BYPASS_AUTH=true)
-	</div>
-{/if}
-
+<Tooltip.Provider delayDuration={300}>
 <!-- Skip to main content (WCAG 2.4.1) -->
 <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:outline-none">
 	Skip to main content
 </a>
 
-<!-- Main Content (Sidebar is in root layout) -->
+<!-- Main Content (Flush-aligned with YorhaSidebar & Global YorhaTopNavBar) -->
 <main id="main-content" class="app-content">
-	<div class="breadcrumb-bar">
-		<Breadcrumbs />
+	<div class="app-workspace">
+		<ErrorBoundary showDetails={data.devBypass}>
+			{@render children?.()}
+		</ErrorBoundary>
 	</div>
-	<ErrorBoundary showDetails={data.devBypass}>
-		{@render children?.()}
-	</ErrorBoundary>
 </main>
 
 <CaseDocumentWriter bind:isOpen={showDocumentWriter} />
@@ -177,9 +168,6 @@
 {/if}
 {#if ContextualAssistantModal && data.user?.role === 'admin'}
 	<ContextualAssistantModal bind:open={showAssistant} />
-{/if}
-{#if AIChatWidget}
-	<AIChatWidget currentRoute={page.url.pathname} />
 {/if}
 {#if SetupWizard && data.user}
 	<SetupWizard
@@ -216,7 +204,7 @@
 		{#each notificationStore.toasts as toast (toast.id)}
 			<div class="toast toast-{toast.type}" role="alert">
 				<span class="toast-msg">{toast.message}</span>
-				<button class="toast-dismiss" onclick={() => notificationStore.dismissToast(toast.id)} aria-label="Dismiss">&times;</button>
+				<button data-unstyled class="toast-dismiss" onclick={() => notificationStore.dismissToast(toast.id)} aria-label="Dismiss">&times;</button>
 			</div>
 		{/each}
 	</div>
@@ -224,33 +212,17 @@
 </Tooltip.Provider>
 
 <style>
-	.dev-banner {
-		background: rgba(12, 18, 31, 0.65);
-		color: rgba(255, 221, 145, 0.96);
-		border-bottom: none;
-		padding: 0.375rem 1rem;
-		text-align: center;
-		font-size: 0.75rem;
-		font-family: 'JetBrains Mono', monospace;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		position: sticky;
-		top: 0;
-		z-index: 100;
-		backdrop-filter: blur(12px);
-	}
-
 	.app-content {
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 	}
 
-	.breadcrumb-bar {
-		padding: 0.5rem 2rem 0.25rem;
-		border-bottom: none;
-		background: linear-gradient(180deg, rgba(9, 14, 23, 0.48) 0%, transparent 100%);
-		backdrop-filter: blur(18px);
+	.app-workspace {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
 	}
 
 	/* ═══ Toast Notifications ═══ */
@@ -274,8 +246,7 @@
 		font-size: 0.75rem;
 		font-family: 'JetBrains Mono', monospace;
 		border: none;
-		box-shadow:
-			0 18px 34px rgba(0, 0, 0, 0.35);
+		box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
 		animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 		backdrop-filter: blur(16px);
 	}

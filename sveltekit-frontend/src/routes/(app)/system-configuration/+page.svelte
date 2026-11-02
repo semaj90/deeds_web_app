@@ -521,7 +521,7 @@
       <div class="form-group">
        <label for="db-type">Database Type</label>
        <select id="db-type" bind:value={config.database.type}>
-        <option value="postgresql">PostgreSQL 16 + pgvector</option>
+        <option value="postgresql">PostgreSQL 18 + pgvector</option>
         <option value="sqlite">SQLite (dev only)</option>
        </select>
       </div>
@@ -550,7 +550,7 @@
      </div>
      <div class="status-card success">
       <h3>Connection Status</h3>
-      <p>PostgreSQL 16 — 70+ tables, pgvector 0.7, Drizzle ORM 0.44</p>
+      <p>PostgreSQL 18 — pgvector semantic_768 (768 dimensions), Drizzle ORM</p>
      </div>
     </section>
    {/if}

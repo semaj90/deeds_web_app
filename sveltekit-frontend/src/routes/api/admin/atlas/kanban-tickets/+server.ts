@@ -124,6 +124,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 		tasks: [] as unknown[],
 		total: 0,
 		events: [] as unknown[],
+		invalidTasks: [] as unknown[],
 		canonicalAuthority: false as const,
 		error: null as string | null,
 	};
@@ -150,6 +151,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 			tasks: board.tasks,
 			total: board.total,
 			events: recentEvents,
+			invalidTasks: board.invalid,
 			canonicalAuthority: false as const,
 			error: null,
 		});

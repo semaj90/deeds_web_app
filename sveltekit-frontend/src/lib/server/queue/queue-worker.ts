@@ -16,6 +16,7 @@
  *   const worker = new MyWorker();
  *   await worker.start();
  */
+import type { EvidenceSynthesisResultV1 } from '../evidence/synthesis/evidence-synthesis-v1.js';
 
 type QueueName =
 	| 'cache.invalidate'
@@ -439,6 +440,7 @@ export class DocumentEmbedWorker extends QueueWorker<{
 }
 
 /** Evidence processing worker */
+
 export class EvidenceProcessWorker extends QueueWorker<{
 	evidenceId: string;
 	text: string;
@@ -459,8 +461,29 @@ export class EvidenceProcessWorker extends QueueWorker<{
 		sourceRevision?: string;
 		skipEmbedding?: boolean;
 	}): Promise<void> {
+		void data;
+		throw new Error('EVIDENCE_PROCESS_REQUIRES_DURABLE_ANALYSIS_JOB');
+	}
+
+	async processCanonical(data: {
+		evidenceId: string;
+		text: string;
+		contentType?: string;
+		caseId?: string;
+		metadata?: Record<string, unknown>;
+		sourceRevision?: string;
+		skipEmbedding?: boolean;
+	}): Promise<{ chunkCount: number; persistedCount: number; sourceRevision: string; synthesis?: EvidenceSynthesisResultV1 } | null> {
 		let processedText = data.text;
+		let sourceBytes: Buffer | undefined;
+		let extractionMethod: string | undefined;
 		const meta = data.metadata ?? {};
+		const mimeType =
+			typeof meta.fileType === 'string' && meta.fileType.includes('/')
+				? meta.fileType
+				: data.contentType && data.contentType.includes('/')
+					? data.contentType
+					: undefined;
 		const objectKey =
 			(typeof meta.objectKey === 'string' && meta.objectKey) ||
 			(typeof meta.object_name === 'string' && meta.object_name) ||
@@ -475,13 +498,26 @@ export class EvidenceProcessWorker extends QueueWorker<{
 			'legal-evidence';
 
 		if (objectKey) {
+			if (
+				bucket !== 'legal-evidence' ||
+				!objectKey.startsWith('evidence/') ||
+				objectKey.includes('\\') ||
+				objectKey.split('/').some((segment) => segment === '.' || segment === '..')
+			) {
+				throw new Error('EVIDENCE_OBJECT_REFERENCE_INVALID');
+			}
+
 			const { getSeaweedFile } = await import('$lib/server/seaweed-client.js');
 			const { processDocument } = await import('$lib/server/document-processor.js');
 			const { createHash } = await import('node:crypto');
 
-			const sourceBytes = await getSeaweedFile(bucket, objectKey);
+			if (!expectedSourceSha256 || !/^sha256:[a-f0-9]{64}$/.test(expectedSourceSha256)) {
+				throw new Error('EVIDENCE_SOURCE_SHA256_REQUIRED');
+			}
+
+			sourceBytes = await getSeaweedFile(bucket, objectKey);
 			const computedSha256 = 'sha256:' + createHash('sha256').update(sourceBytes).digest('hex');
-			if (expectedSourceSha256 && computedSha256 !== expectedSourceSha256) {
+			if (computedSha256 !== expectedSourceSha256) {
 				throw new Error(
 					'EVIDENCE_SOURCE_SHA256_MISMATCH: expected ' + expectedSourceSha256 + ', got ' + computedSha256
 				);
@@ -490,16 +526,15 @@ export class EvidenceProcessWorker extends QueueWorker<{
 				buffer: sourceBytes,
 				fileName:
 					typeof meta.fileName === 'string' ? meta.fileName : 'evidence-file',
-				mimeType:
-					data.contentType ??
-					(typeof meta.fileType === 'string'
-						? meta.fileType
-						: 'application/octet-stream'),
+				mimeType: mimeType ?? 'application/octet-stream',
 				evidenceId: data.evidenceId,
 				skipEmbedding: true,
 			});
+			extractionMethod = extracted.extractionMethod;
 			if (extracted.rawText && extracted.rawText.trim().length > 0) {
 				processedText = extracted.rawText;
+			} else {
+				throw new Error('EVIDENCE_TEXT_EXTRACTION_EMPTY');
 			}
 		}
 
@@ -526,23 +561,42 @@ export class EvidenceProcessWorker extends QueueWorker<{
       Promise.resolve(detectForensicPatterns(processedText)),
     ]);
 
-    // Chain to document embedding — uses dispatch utility so inline fallback works
-    const { dispatchOrExecuteInline } = await import('./dispatch-inline.js');
-    if (data.skipEmbedding) return;
-    const dispatchResult = await dispatchOrExecuteInline('document.embed', {
-      documentId: data.evidenceId,
+		if (data.skipEmbedding) return null;
+		if (!objectKey) throw new Error('EVIDENCE_SOURCE_OBJECT_REFERENCE_REQUIRED');
+
+    const { processEvidenceDocumentCanonicalV1 } = await import(
+      '$lib/server/evidence/process-evidence-document-v1.js'
+    );
+		const safeMetadata = { ...meta };
+		delete safeMetadata.objectKey;
+		delete safeMetadata.object_name;
+		delete safeMetadata.object_bucket;
+		delete safeMetadata.sourceSha256;
+		const result = await processEvidenceDocumentCanonicalV1({
+      evidenceId: data.evidenceId,
       text: processedText,
-      collection: 'evidence_items',
+      sourceBytes,
+      fileName: typeof meta.fileName === 'string' ? meta.fileName : undefined,
+      contentType: mimeType,
       metadata: {
-        ...(data.metadata ?? {}),
-        caseId: data.caseId ?? data.metadata?.caseId,
-        source_revision: data.sourceRevision ?? data.metadata?.source_revision,
+        ...safeMetadata,
+        extractionMethod,
+        caseId: data.caseId ?? meta.caseId,
+        source_revision: expectedSourceSha256 ?? data.sourceRevision ?? meta.source_revision,
         entities,
         forensics: { flags: forensics },
         contentType: data.contentType,
       },
     });
-		if (dispatchResult.error) throw new Error(`EVIDENCE_DOCUMENT_EMBED_FAILED:${dispatchResult.error}`);
+		if (
+			!Number.isSafeInteger(result.chunkCount) ||
+			result.chunkCount <= 0 ||
+			result.persistedCount !== result.chunkCount ||
+			result.sourceRevision !== expectedSourceSha256
+		) {
+			throw new Error('EVIDENCE_CANONICAL_PERSISTENCE_RECEIPT_INVALID');
+		}
+		return result;
 	}
 }
 

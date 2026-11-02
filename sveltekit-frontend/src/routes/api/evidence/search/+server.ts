@@ -28,6 +28,7 @@ import { sql } from 'drizzle-orm';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { createEvidenceEmbeddingProducer } from '$lib/server/evidence/evidence-embedding-producer.js';
 import { EVIDENCE_EMBEDDING_TYPE } from '$lib/server/evidence/evidence-embedding-contract.js';
+import { buildEvidenceBm25QueryV1 } from '$lib/server/evidence/evidence-search-query-v1.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { getVectorCache, setVectorCache } from '$lib/server/vector-cache.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -507,19 +508,7 @@ async function searchBm25(
 	limit: number
 ): Promise<SearchResult[]> {
 	// Simple BM25-like search using ts_rank_cd on evidence table
-	const conditions = [];
-	if (caseId) conditions.push(sql`case_id = ${caseId}`);
-	const where = conditions.length > 0 ? sql`WHERE ${sql.join(conditions, sql` AND `)}` : sql``;
-
-	const sqlQuery = sql`
-		SELECT id, title, description, summary, fileName,
-			ts_rank_cd(search_vector, plainto_tsquery('english', ${query})) AS rank
-		FROM evidence
-		${where}
-		AND search_vector @@ plainto_tsquery('english', ${query})
-		ORDER BY rank DESC
-		LIMIT ${limit}
-	`;
+	const sqlQuery = buildEvidenceBm25QueryV1({ caseId, query, limit });
 
 	const result = await db.execute(sqlQuery);
 	const rows = extractRows(result);

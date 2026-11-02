@@ -21,7 +21,15 @@ const FLUSH_INTERVAL_MS = 10_000;
 let errorBuffer: ClientError[] = [];
 let flushTimer: ReturnType<typeof setInterval> | null = null;
 
+// Dev-server-only failures (stale HMR chunks after an edit, Vite transport timeouts, SvelteKit
+// build-time globals missing from a pre-bundled dep). They are not application faults and
+// otherwise dominate the runtime-error ranking. Filtered in dev only: in production a failed
+// dynamic import is a real signal (stale chunk after a deploy) and must still be reported.
+const DEV_SERVER_NOISE =
+  /Failed to fetch dynamically imported module|transport invoke timed out|__SVELTEKIT_(?:APP_VERSION|DEV)__ is not defined/;
+
 function pushError(err: ClientError): void {
+  if (dev && DEV_SERVER_NOISE.test(err.message)) return;
   if (errorBuffer.length >= ERROR_BUFFER_MAX) errorBuffer.shift();
   errorBuffer.push(err);
 }
@@ -57,13 +65,16 @@ export function init(): void {
 
 export const handleError: HandleClientError = ({ error, event, status, message }) => {
   console.error('Client error:', error);
-  pushError({
-    message: error instanceof Error ? error.message : String(error),
-    stack: error instanceof Error ? (error.stack ?? '') : '',
-    url: typeof window !== 'undefined' ? window.location.pathname : '',
-    timestamp: new Date().toISOString(),
-    type: 'handleError',
-  });
+  // An unmatched route is a routing outcome, not a runtime fault (mirrors hooks.server.ts).
+  if (status !== 404) {
+    pushError({
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? (error.stack ?? '') : '',
+      url: typeof window !== 'undefined' ? window.location.pathname : '',
+      timestamp: new Date().toISOString(),
+      type: 'handleError',
+    });
+  }
   return {
     message: dev ? String(error) : 'An unexpected error occurred'
   };

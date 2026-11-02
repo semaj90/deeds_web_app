@@ -11,7 +11,7 @@ import {
   coercePersistedPayloadEnvelope,
   type PersistedEnvelope,
 } from '$lib/shared/schemas/protocol.js';
-import { and, eq, or, sql } from 'drizzle-orm';
+import { and, eq, or, sql, type SQL } from 'drizzle-orm';
 import { postgresErrorDetails } from '$lib/server/db/postgres-error-details.js';
 import { classifyPostgresError } from '$lib/server/db/readiness.js';
 
@@ -23,9 +23,9 @@ export const ANALYSIS_JOBS_NOTIFY_CHANNEL = 'atlas_analysis_jobs';
 let analysisJobsTableMissing = false;
 let loggedMissingAnalysisJobsTable = false;
 
-type AnalysisJobPayload = PersistedEnvelope | Record<string, unknown>;
+export type AnalysisJobPayload = PersistedEnvelope | Record<string, unknown>;
 
-function normalizeAnalysisJobPayload(
+export function normalizeAnalysisJobPayload(
   value: AnalysisJobPayload | undefined,
   lane: string,
   ok: boolean = true
@@ -98,6 +98,7 @@ async function notifyAnalysisJobs(payload: Record<string, unknown>): Promise<voi
  * The worker loop will claim it via claimNextJob().
  */
 export async function enqueueJob(params: {
+  id?: string;
   evidenceId: string;
   caseId?: string | null;
   jobType: JobType;
@@ -106,6 +107,7 @@ export async function enqueueJob(params: {
   const [row] = await db
     .insert(analysisJobs)
     .values({
+      ...(params.id ? { id: params.id } : {}),
       evidenceId: params.evidenceId,
       caseId: params.caseId ?? null,
       jobType: params.jobType,
@@ -133,6 +135,7 @@ export async function createAnalysisJob(params: {
   evidenceId: string;
   caseId?: string | null;
   jobType: JobType;
+  result?: AnalysisJobPayload;
 }): Promise<string> {
   const [row] = await db
     .insert(analysisJobs)
@@ -144,7 +147,7 @@ export async function createAnalysisJob(params: {
       status: 'running',
       startedAt: new Date(),
       progress: '0',
-      result: normalizeAnalysisJobPayload({}, params.jobType),
+      result: normalizeAnalysisJobPayload(params.result, params.jobType),
     })
     .returning({ id: analysisJobs.id });
   return row.id;
@@ -174,7 +177,8 @@ export async function claimNextJob(jobType?: JobType): Promise<{
  */
 export async function claimBatch(
   jobType: JobType | undefined,
-  limit: number
+  limit: number,
+  executor: { execute(query: SQL): Promise<unknown> } = db
 ): Promise<Array<{
   id: string;
   evidenceId: string;
@@ -194,7 +198,7 @@ export async function claimBatch(
   try {
     const typeFilter = jobType ? sql`AND job_type = ${jobType}` : sql``;
 
-    const rows = await db.execute(sql`
+    const rows = await executor.execute(sql`
       WITH picked AS (
         SELECT id
         FROM analysis_jobs
@@ -314,7 +318,7 @@ export async function getAnalysisJobForOwner(id: string, ownerId: number) {
  */
 export async function getJobsForEvidence(evidenceId: string) {
   if (analysisJobsTableMissing) {
-    return [];
+    throw new Error('ANALYSIS_JOBS_TABLE_UNAVAILABLE');
   }
 
   try {
@@ -322,7 +326,7 @@ export async function getJobsForEvidence(evidenceId: string) {
   } catch (err) {
     if (isMissingAnalysisJobsTableError(err)) {
       markAnalysisJobsUnavailable();
-      return [];
+      throw new Error('ANALYSIS_JOBS_TABLE_UNAVAILABLE', { cause: err });
     }
     throw err;
   }
@@ -330,7 +334,7 @@ export async function getJobsForEvidence(evidenceId: string) {
 
 /**
  * Reset stale 'running' jobs back to 'queued' (crash recovery).
- * Jobs stuck in 'running' for more than `staleMinutes` are re-queued.
+ * Jobs without a heartbeat update for more than `staleMinutes` are re-queued.
  */
 export async function resetStaleJobs(staleMinutes: number = 10): Promise<number> {
   if (analysisJobsTableMissing) {
@@ -342,7 +346,7 @@ export async function resetStaleJobs(staleMinutes: number = 10): Promise<number>
 		UPDATE analysis_jobs
 		SET status = 'queued', started_at = NULL, updated_at = NOW()
 		WHERE status = 'running'
-		  AND started_at < NOW() - make_interval(mins => ${staleMinutes})
+		  AND updated_at < NOW() - make_interval(mins => ${staleMinutes})
 	`);
     return (result as any).rowCount ?? 0;
   } catch (err) {
@@ -379,21 +383,38 @@ export async function updateAnalysisJob(
     .where(eq(analysisJobs.id, id));
 }
 
-export async function completeAnalysisJob(id: string, result: AnalysisJobPayload): Promise<void> {
-  await updateAnalysisJob(id, {
-    status: 'completed',
-    progress: '100',
-    result: normalizeAnalysisJobPayload(result, 'analysis', true),
-    completedAt: new Date(),
-  });
+export async function completeAnalysisJob(
+  id: string,
+  result: AnalysisJobPayload,
+  executor: { execute(query: SQL): Promise<unknown> } = db
+): Promise<void> {
+  const normalizedResult = normalizeAnalysisJobPayload(result, 'analysis', true);
+  const updated = await executor.execute(sql`
+    UPDATE analysis_jobs
+    SET status = 'completed', progress = '100', result = ${JSON.stringify(normalizedResult)}::jsonb,
+        completed_at = NOW(), updated_at = NOW()
+    WHERE id = ${id}::uuid
+    RETURNING id
+  `);
+  if (pgRows(updated).length !== 1) {
+    throw new Error('ANALYSIS_JOB_COMPLETION_ROW_MISSING');
+  }
 }
 
-export async function failAnalysisJob(id: string, error: string): Promise<void> {
-  await updateAnalysisJob(id, {
-    status: 'failed',
-    error,
-    completedAt: new Date(),
-  });
+export async function failAnalysisJob(
+  id: string,
+  error: string,
+  executor: { execute(query: SQL): Promise<unknown> } = db
+): Promise<void> {
+  const updated = await executor.execute(sql`
+    UPDATE analysis_jobs
+    SET status = 'failed', error = ${error}, completed_at = NOW(), updated_at = NOW()
+    WHERE id = ${id}::uuid
+    RETURNING id
+  `);
+  if (pgRows(updated).length !== 1) {
+    throw new Error('ANALYSIS_JOB_FAILURE_ROW_MISSING');
+  }
 }
 
 /**
@@ -403,7 +424,7 @@ export async function getJobCounts(): Promise<Record<string, number>> {
   const result: Record<string, number> = { queued: 0, running: 0, completed: 0, failed: 0 };
 
   if (analysisJobsTableMissing) {
-    return result;
+    throw new Error('ANALYSIS_JOBS_TABLE_UNAVAILABLE');
   }
 
   try {
@@ -418,7 +439,7 @@ export async function getJobCounts(): Promise<Record<string, number>> {
   } catch (err) {
     if (isMissingAnalysisJobsTableError(err)) {
       markAnalysisJobsUnavailable();
-      return result;
+      throw new Error('ANALYSIS_JOBS_TABLE_UNAVAILABLE', { cause: err });
     }
     throw err;
   }

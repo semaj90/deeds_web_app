@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Dialog } from 'bits-ui';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import TagInput from '$lib/components/ui/TagInput.svelte';
 	import DoclingExtractionViewer from './DoclingExtractionViewer.svelte';
@@ -202,15 +203,16 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-{#if open}
-	<!-- Backdrop -->
-	<div
-		class="modal-backdrop"
-		role="presentation"
-		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
-	>
-		<!-- Modal panel -->
-		<div class="modal-panel" role="dialog" aria-modal="true" aria-label="Evidence Detail" tabindex="-1">
+<Dialog.Root bind:open onOpenChange={(next) => { if (!next) close(); }}>
+	<Dialog.Portal>
+		<Dialog.Overlay class="modal-backdrop" />
+		<Dialog.Content class="modal-panel">
+			<!-- Corner Notches and Top Highlight -->
+			<span class="hud-notch-tl" aria-hidden="true"></span>
+			<span class="hud-notch-tr" aria-hidden="true"></span>
+			<span class="hud-notch-bl" aria-hidden="true"></span>
+			<span class="hud-notch-br" aria-hidden="true"></span>
+			<div class="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#f3d471] to-transparent opacity-80" aria-hidden="true"></div>
 			<!-- Type accent strip -->
 			<div class="modal-accent-strip" style="background: {accentColor.strip};"></div>
 
@@ -221,9 +223,9 @@
 						<span class="modal-file-icon">{doc ? getIcon(fileType) : '📄'}</span>
 					</div>
 					<div class="modal-title-text">
-						<h2 class="modal-title">
+						<Dialog.Title class="modal-title">
 							{#if isLoading}Loading…{:else if doc}{doc.title || doc.fileName || doc.file_name || 'Untitled'}{:else}Evidence Detail{/if}
-						</h2>
+						</Dialog.Title>
 						{#if doc}
 							<div class="modal-subtitle-row">
 								<span class="modal-type-badge" style="background: {accentColor.bg}; border-color: {accentColor.border}; color: {accentColor.text};">
@@ -553,9 +555,9 @@
 					</div>
 				</div>
 			{/if}
-		</div>
-	</div>
-{/if}
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
 <!-- Image Lightbox -->
 {#if lightboxOpen && isImage && fileUrl}
@@ -603,32 +605,39 @@
 />
 
 <style>
-	.modal-backdrop {
+	:global(.modal-backdrop) {
 		position: fixed;
 		inset: 0;
-		z-index: 60;
+		z-index: 9990;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.65);
-		backdrop-filter: blur(4px);
+		background: rgba(4, 6, 12, 0.78);
+		backdrop-filter: blur(14px) saturate(1.1);
 		padding: 1rem;
 		animation: fadeIn 0.15s ease;
 	}
 	@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-	.modal-panel {
-		width: 100%;
-		max-width: 960px;
+	:global(.modal-panel) {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: min(960px, calc(100vw - 2rem));
 		max-height: 92vh;
-		background: #131519;
-		border: 1px solid rgba(212, 199, 163, 0.1);
+		background: linear-gradient(180deg, rgba(19, 27, 42, 0.98) 0%, rgba(8, 12, 20, 0.99) 100%);
+		border: 1px solid rgba(212, 199, 163, 0.28);
 		border-radius: 14px;
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
+		z-index: 9991;
 		animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-		box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03);
+		box-shadow:
+			0 0 0 1px rgba(126, 231, 255, 0.05),
+			0 28px 60px -18px rgba(0, 0, 0, 0.85),
+			0 0 45px rgba(243, 212, 113, 0.1);
 	}
 	@keyframes slideUp { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 

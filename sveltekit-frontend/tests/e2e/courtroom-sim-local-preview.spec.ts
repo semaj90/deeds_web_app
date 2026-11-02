@@ -81,6 +81,38 @@ test(`local preview at ${size.width}x${size.height}: scene ready, action bar ins
 	await page.keyboard.press('i');
 	await expect(page.getByText('In the room')).toBeVisible();
 	await expect(page.getByText('YOU')).toBeVisible();
+	await page.keyboard.press('Escape');
+
+	// G toggles the coordinates/positions readout (CSP-96 Gate B)
+	await page.keyboard.press('g');
+	const readout = page.getByTestId('coordinate-readout');
+	await expect(readout).toBeVisible();
+	await expect(readout).toContainText('Floor Plan');
+
+	// Verify loading / story progression bar
+	const progressBar = page.locator('.progress-orbit [role="progressbar"]').first();
+	await expect(progressBar).toBeVisible();
+
+	// E toggles the evidence sidebar (CSP-92)
+	await page.keyboard.press('e');
+	const sidebar = page.getByTestId('evidence-sidebar');
+	await expect(sidebar).toBeVisible();
+	await expect(sidebar).toContainText('CASE BRIEF');
+
+	// L toggles the transcript dialogue log (CSP-92)
+	await page.keyboard.press('l');
+	const dialogueLog = page.getByTestId('dialogue-log');
+	await expect(dialogueLog).toBeVisible();
+	await expect(dialogueLog).toContainText('TRANSCRIPT');
+
+	// Independent scrolling verification (CSP-92):
+	// Scrolling the evidence sidebar does not affect the dialogue log
+	await sidebar.evaluate((el) => { el.scrollTop = 50; });
+	const sidebarScroll = await sidebar.evaluate((el) => el.scrollTop);
+	const logScroll = await dialogueLog.evaluate((el) => el.scrollTop);
+	expect(sidebarScroll).toBeGreaterThan(0);
+	expect(logScroll).toBe(0);
+
 	expect(pageErrors, 'no uncaught page errors').toEqual([]);
 	expect(consoleErrors, 'no browser console errors').toEqual([]);
 	expect(failedAssets, 'no failed model or shader requests').toEqual([]);

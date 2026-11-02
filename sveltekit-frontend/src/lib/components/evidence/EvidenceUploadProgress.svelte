@@ -43,6 +43,7 @@ let actorSubscription: { unsubscribe: () => void } | undefined;
 
 // Progress is an observation from the server, not a prediction of completed work.
 const STAGES = [
+	{ id: 'queued', label: 'Queued for Analysis', icon: 'clock-3', color: '#344967' },
 	{ id: 'uploading', label: 'Uploading File', icon: 'file-up', color: '#7b2735' },
 	{ id: 'hashing', label: 'Verifying File', icon: 'fingerprint', color: '#9a7037' },
 	{ id: 'storing', label: 'Securing Original', icon: 'archive', color: '#344967' },
@@ -50,11 +51,11 @@ const STAGES = [
 	{ id: 'extracting', label: 'Extracting Text', icon: 'file-search', color: '#9a7037' },
 	{ id: 'structuring', label: 'Structuring Record', icon: 'list-tree', color: '#344967' },
 	{ id: 'embedding', label: 'Generating Embeddings', icon: 'sparkles', color: '#7b2735' },
-	{ id: 'vector-storage', label: 'Saving Search Projection', icon: 'database', color: '#9a7037' },
+	{ id: 'vector-storage', label: 'Saving Canonical PostgreSQL Vectors', icon: 'database', color: '#9a7037' },
 	{ id: 'graph', label: 'Linking Case Relations', icon: 'network', color: '#344967' },
 	{ id: 'entity-extraction', label: 'Extracting Entities', icon: 'scale', color: '#7b2735' },
 	{ id: 'summarizing', label: 'Preparing Summary', icon: 'scroll', color: '#9a7037' },
-	{ id: 'complete', label: 'Processing Complete', icon: 'badge-check', color: '#3c6b57' },
+	{ id: 'complete', label: 'PostgreSQL Indexed', icon: 'badge-check', color: '#3c6b57' },
 	{ id: 'error', label: 'Processing Issue', icon: 'circle-x', color: '#9a3540' }
 ] as const;
 
@@ -291,7 +292,7 @@ onDestroy(() => {
 		<div class="success-container">
 			<Icon name="yorha-integrity" size={22} class="status-emblem success-emblem" />
 			<div class="success-message">
-				<strong>Processing complete</strong>
+				<strong>Canonical PostgreSQL indexing complete</strong>
 				<p class="evidence-id">Evidence reference · {evidenceId.slice(0, 8)}…</p>
 			</div>
 		</div>

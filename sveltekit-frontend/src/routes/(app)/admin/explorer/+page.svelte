@@ -72,7 +72,7 @@
 		try {
 			const response = await fetch('/api/admin/routes');
 			const data = await response.json();
-			routes = data.routes;
+			routes = Array.isArray(data.routes) ? data.routes : [];
 			loading = false;
 		} catch (error) {
 			console.error('Failed to load routes:', error);

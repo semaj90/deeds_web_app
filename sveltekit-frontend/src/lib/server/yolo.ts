@@ -91,6 +91,7 @@ export class YOLOService {
 			if (yoloData.error) {
 				throw new Error(yoloData.error);
 			}
+			const isCoco = modelPath.includes('yolov8n');
 			if (yoloData.skipped) {
 				console.info(`[YOLO] Skipped inference: ${yoloData.skipped}`);
 				return {
@@ -104,7 +105,6 @@ export class YOLOService {
 			}
 
 			const processingTime = Date.now() - startTime;
-			const isCoco = modelPath.includes('yolov8n');
 
 			return {
 				text: this.extractTextFromRegions(yoloData?.regions ?? []),

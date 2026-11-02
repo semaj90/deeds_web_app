@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import GPUMetrics from '$lib/components/yorha/dashboard/GPUMetrics.svelte';
+	import InferenceRouterStatus from '$lib/components/yorha/dashboard/InferenceRouterStatus.svelte';
+	import EvidenceStreamDeck from '$lib/components/yorha/dashboard/EvidenceStreamDeck.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -77,7 +80,8 @@
 				sourceTables: ['error_events', 'error_logs'],
 				ordering: ['priorityScore DESC', 'occurrences DESC', 'lastSeen DESC', 'fingerprint ASC'],
 				scoring: 'severity × logarithmic repeat count × 14-day exponential recency decay; diagnostic heuristic only',
-				stackTracesIncluded: false,
+				fullStackTracesIncluded: false,
+				applicationFramesIncluded: true,
 				refreshedAt: runtimeErrorsUpdatedAt,
 			},
 			records: runtimeErrorPriorities.top100.map((record, index) => ({ rank: index + 1, ...record })),
@@ -218,6 +222,12 @@
 		</a>
 	</section>
 
+	<section class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6" aria-label="Hardware & VRAM Orchestration">
+		<GPUMetrics />
+		<InferenceRouterStatus />
+		<EvidenceStreamDeck />
+	</section>
+
 	<section class="board-shell">
 		<div class="board-header">
 			<div>
@@ -271,11 +281,11 @@
 				<p class="runtime-error-count">Showing {showAllRuntimeErrors ? runtimeErrorPriorities.top100.length : runtimeErrorPriorities.top10.length} of up to {runtimeErrorPriorities.total} ranked groups.</p>
 				<div class="runtime-error-list">
 					{#each (showAllRuntimeErrors ? runtimeErrorPriorities.top100 : runtimeErrorPriorities.top10) as item, index (item.fingerprint)}
-						<article class="runtime-error-card">
+						<article class="runtime-error-card" data-severity={item.severity}>
 							<div class="task-topline"><span>#{index + 1} · {item.source} · {item.kind}/{item.severity}</span><span class="task-status">score {item.priorityScore}</span></div>
 							<h4>{item.routePath}</h4>
 							<p>{item.message}</p>
-							<div class="chip-row"><span class="chip">{item.occurrences} occurrences</span><span class="chip">last seen {new Date(item.lastSeen).toLocaleString()}</span></div>
+							<div class="chip-row"><span class="chip">{item.occurrences} occurrences</span><span class="chip">last seen {new Date(item.lastSeen).toLocaleString()}</span>{#if item.firstAppFrame}<span class="chip chip-frame" title="First application-source file in the stored stacks">{item.firstAppFrame}</span>{/if}</div>
 							<div class="task-actions">
 								<button class="workflow-button" type="button" onclick={() => exportRuntimeErrorSummary(item)}>
 									Export JSON
@@ -748,6 +758,52 @@
 		border: 1px solid var(--atlas-border);
 		border-radius: 10px;
 		background: rgba(8, 11, 23, 0.52);
+	}
+
+	.runtime-error-card[data-severity] {
+		border-left: 3px solid var(--atlas-border);
+	}
+
+	.runtime-error-card[data-severity="error"],
+	.runtime-error-card[data-severity="fatal"] {
+		border-left-color: #ef4444;
+	}
+
+	.runtime-error-card[data-severity="warn"] {
+		border-left-color: #f59e0b;
+	}
+
+	.chip-frame {
+		font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+		overflow-wrap: anywhere;
+		max-width: 100%;
+	}
+
+	.runtime-error-card[data-severity="info"] {
+		border-left-color: #38bdf8;
+	}
+
+	.runtime-error-card {
+		transition: background-color 0.15s ease, border-color 0.15s ease;
+	}
+
+	.runtime-error-card:hover {
+		background: rgba(14, 18, 36, 0.78);
+		border-top-color: var(--atlas-muted);
+		border-right-color: var(--atlas-muted);
+		border-bottom-color: var(--atlas-muted);
+	}
+
+	.runtime-error-controls button:focus-visible,
+	.runtime-error-card .workflow-button:focus-visible {
+		outline: 2px solid #38bdf8;
+		outline-offset: 2px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.runtime-error-card {
+			transition: none;
+		}
 	}
 
 	.runtime-error-card h4,

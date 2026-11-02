@@ -1393,6 +1393,32 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 "dependencies": [],
             })
             existing_spans.add(key)
+    if language == "svelte":
+        existing_spans = {
+            (int(normalized.get("byte_start")), int(normalized.get("byte_end")), normalized.get("name"))
+            for raw in raw_chunks
+            for normalized in [normalize_treesitter_chunker_chunk(raw)]
+            if normalized.get("byte_start") is not None
+            and normalized.get("byte_end") is not None
+        }
+        for template_chunk in legacy._svelte_template_chunks(req.source):
+            key = (int(template_chunk.start), int(template_chunk.end), template_chunk.symbol)
+            if key in existing_spans:
+                continue
+            raw_chunks.append({
+                "node_type": template_chunk.kind,
+                "name": template_chunk.symbol,
+                "byte_start": int(template_chunk.start),
+                "byte_end": int(template_chunk.end),
+                "content": req.source.encode("utf-8")[template_chunk.start:template_chunk.end],
+                "calls": [],
+                "imports": [],
+                "exports": [],
+                "dependencies": [],
+                "metadata": template_chunk.metadata,
+            })
+            existing_spans.add(key)
+
 
     if raw_chunks and not identity_path_preserved:
         diagnostics.append(

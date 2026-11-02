@@ -56,4 +56,36 @@ describe('analysis job batch claiming boundary', () => {
 	const statement = execute.mock.calls[0]?.[0] as { values?: unknown[] } | undefined;
 	expect(statement?.values).toContain(4);
 	});
+
+	it('recovers stale jobs by heartbeat age, not original start time', async () => {
+		execute.mockResolvedValue({ rowCount: 2 });
+		const { resetStaleJobs } = await import('../../src/lib/server/analysis/analysis-jobs.js');
+
+		await expect(resetStaleJobs(10)).resolves.toBe(2);
+		const statement = execute.mock.calls[0]?.[0] as { strings?: string[] } | undefined;
+		expect(statement?.strings?.join(' ')).toContain('updated_at < NOW()');
+		expect(statement?.strings?.join(' ')).not.toContain('started_at < NOW()');
+	});
+
+	it('preserves source identity in the durable upload job envelope', async () => {
+		const { normalizeAnalysisJobPayload } = await import('../../src/lib/server/analysis/analysis-jobs.js');
+		const job = normalizeAnalysisJobPayload({
+			evidenceId: '11111111-1111-4111-8111-111111111111',
+			caseId: null,
+			objectKey: 'evidence/42/source.pdf',
+			object_bucket: 'legal-evidence',
+			sourceSha256: `sha256:${'a'.repeat(64)}`,
+			fileName: 'source.pdf',
+			contentType: 'application/pdf',
+			uploadedBy: 42,
+		}, 'upload_pipeline');
+
+		expect(job).toMatchObject({
+			lane: 'upload_pipeline',
+			evidenceId: '11111111-1111-4111-8111-111111111111',
+			objectKey: 'evidence/42/source.pdf',
+			object_bucket: 'legal-evidence',
+			sourceSha256: `sha256:${'a'.repeat(64)}`,
+		});
+	});
 });

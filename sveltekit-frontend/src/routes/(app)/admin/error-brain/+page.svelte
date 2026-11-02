@@ -298,7 +298,7 @@ import SuggestionsList from '../../../(admin)/error-brain/components/Suggestions
 	<Card class="mb-4">
 		<CardHeader>
 			<CardTitle>Phoenix AI Event Monitor</CardTitle>
-			<CardDescription>SSE-based real-time event stream from /agentic/events</CardDescription>
+			<CardDescription>SSE-based real-time event stream from /api/agentic-events</CardDescription>
 		</CardHeader>
 		<CardContent>
 			<PhoenixEventMonitor show={showPhoenixMonitor} />

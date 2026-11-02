@@ -105,6 +105,7 @@ Startup has Redis/Valkey cache on `:6379` enabled for transient ACE and RLM pack
 - `drizzle/meta/` must contain only JSON snapshot/journal files — no `.md` or `.txt`.
 - Sidecar migrations in `drizzle/` that are not in `_journal.json` must be listed in `drizzle/sidecar-migrations.json`.
 - WSL2/miniforge/conda/cuVS/RAPIDS GPU work: the 8 GiB card cannot hold the Ornith vision server on `:8090` too. Free it first with the VS Code task `GPU: Prepare cuVS KMeans` (graceful, only `--port 8090`; ask the operator and check `/slots` is idle), run the job with `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python`, then run `TurboQuant: Start (vision, CPU projector, :8090)`. Details: `codex.md` and `CLAUDE.md`. Never `taskkill /IM llama-server.exe`.
+- Service lifecycle is human-only until `ops.*` auth is real: no MCP/TRACE tool may stop/start/restart `:8090`, Ollama, Docker or any datastore (`requireToken` accepts any non-empty string). Agents may add read-only status tools or write a request record for a human. Embedding seed/backfill scripts must fail closed (no placeholder/hash vectors); normalize `OLLAMA_HOST=0.0.0.0` to `127.0.0.1:11434`. Full rule: `CLAUDE.md` § Production hardening.
 
 ## Parent Atlas verified retrieval and analysis fabric (2026-08-29)
 

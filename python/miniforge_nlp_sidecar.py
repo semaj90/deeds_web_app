@@ -1683,6 +1683,62 @@ def _cpp_function_declaration_chunks(text: str) -> list[Chunk]:
         ))
     return chunks
 
+_SVELTE_SNIPPET_REGEX = re.compile(
+    r"\{#snippet\s+([a-zA-Z0-9_$]+)\s*(?:\(([\s\S]*?)\))?\s*\}([\s\S]*?)\{/snippet\}"
+)
+_SVELTE_RENDER_REGEX = re.compile(
+    r"\{@render\s+([a-zA-Z0-9_$]+(?:\.[a-zA-Z0-9_$]+|\?\.)*)\s*(?:\(([\s\S]*?)\))?\s*\}"
+)
+
+
+def _svelte_template_chunks(text: str) -> list[Chunk]:
+    chunks: list[Chunk] = []
+
+    # 1. Snippets: {#snippet name(params)} ... {/snippet}
+    for m in _SVELTE_SNIPPET_REGEX.finditer(text):
+        name = m.group(1)
+        params = (m.group(2) or "").strip()
+        start_byte = len(text[: m.start()].encode("utf-8"))
+        end_byte = len(text[: m.end()].encode("utf-8"))
+        snippet_text = text[m.start() : m.end()].strip()
+        if not snippet_text:
+            continue
+        chunks.append(
+            Chunk(
+                kind="snippet_statement",
+                text=snippet_text[:10_000],
+                start=start_byte,
+                end=end_byte,
+                symbol=name,
+                language="svelte",
+                metadata={"params": params, "construct": "svelte5_snippet"},
+            )
+        )
+
+    # 2. Renders: {@render name(args)}
+    for m in _SVELTE_RENDER_REGEX.finditer(text):
+        name = m.group(1)
+        args = (m.group(2) or "").strip()
+        start_byte = len(text[: m.start()].encode("utf-8"))
+        end_byte = len(text[: m.end()].encode("utf-8"))
+        render_text = text[m.start() : m.end()].strip()
+        if not render_text:
+            continue
+        chunks.append(
+            Chunk(
+                kind="render_statement",
+                text=render_text[:10_000],
+                start=start_byte,
+                end=end_byte,
+                symbol=name,
+                language="svelte",
+                metadata={"args": args, "construct": "svelte5_render"},
+            )
+        )
+
+    return chunks
+
+
 
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
     # Canonical structural chunking prefers the installed treesitter-chunker package in the
@@ -1760,6 +1816,13 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
                         for declaration in _cpp_function_declaration_chunks(text)
                         if (declaration.start, declaration.end) not in existing_spans
                     )
+                if language.lower() == "svelte":
+                    existing_spans = {(chunk.start, chunk.end) for chunk in chunks}
+                    chunks.extend(
+                        tmpl
+                        for tmpl in _svelte_template_chunks(text)
+                        if (tmpl.start, tmpl.end) not in existing_spans
+                    )
                 return chunks
 
     if not TREE_SITTER_AVAILABLE:
@@ -1801,6 +1864,13 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
             declaration
             for declaration in _cpp_function_declaration_chunks(text)
             if (declaration.start, declaration.end) not in existing_spans
+        )
+    if language.lower() == "svelte":
+        existing_spans = {(chunk.start, chunk.end) for chunk in chunks}
+        chunks.extend(
+            tmpl
+            for tmpl in _svelte_template_chunks(text)
+            if (tmpl.start, tmpl.end) not in existing_spans
         )
     return chunks
 
@@ -2711,7 +2781,7 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
             proba = nb.predict_proba(feature_vector)[0]
             idx = int(proba.argmax())
             nb_label, nb_score = labels[idx], float(proba[idx])
-            nb_probabilities = {str(labels[int(class_index)]): float(score) for class_index, score in zip(nb.classes_, proba)}
+            nb_probabilities = {str(class_name): float(score) for class_name, score in zip(nb.classes_, proba)}
         except Exception:
             pass
 
@@ -2724,7 +2794,7 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
             proba = lr.predict_proba(feature_vector)[0]
             idx = int(proba.argmax())
             lr_label, lr_score = labels[idx], float(proba[idx])
-            lr_probabilities = {str(labels[int(class_index)]): float(score) for class_index, score in zip(lr.classes_, proba)}
+            lr_probabilities = {str(class_name): float(score) for class_name, score in zip(lr.classes_, proba)}
         except Exception:
             pass
 
@@ -2745,8 +2815,6 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
     features_map: dict[str, Any] = {
         "naive_bayes_domain_probability": nb_score,
         "logistic_regression_domain_probability": lr_score,
-        "naive_bayes_domain_probabilities": nb_probabilities,
-        "logistic_regression_domain_probabilities": lr_probabilities,
         # Deprecated compatibility aliases -- do not add new readers of these.
         "naive_bayes_score": nb_score,
         "logistic_regression_score": lr_score,
@@ -2756,6 +2824,8 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
         "label": final_label,
         "naive_bayes_label": nb_label,
         "logistic_regression_label": lr_label,
+        "naive_bayes_domain_probabilities": nb_probabilities,
+        "logistic_regression_domain_probabilities": lr_probabilities,
         "model_revision": checkpoint.get("model_revision", "unknown"),
     }
     warnings = [] if final_label else ["checkpoint present but produced no confident label"]

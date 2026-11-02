@@ -1,11 +1,10 @@
 """Read-only NLP classification adapter for Parent Atlas.
 
-This module reuses the existing deterministic documentation domain/ontology
-rules and exposes an optional FastAPI seam for bounded analysis.  It does not
-own source identity, packet identity, training, or any durable store.  The
-logistic-regression/naive-Bayes trainer remains a later offline challenger;
-this adapter only reports whether a checkpoint is available and never writes
-one.
+This module reuses deterministic documentation domain/ontology rules and
+exposes an optional FastAPI seam for bounded analysis. It does not own source
+identity, packet identity, or durable storage. The separate offline
+``train_domain_classifier.py`` job owns NB/LR training; this helper only reports
+checkpoint availability and never loads, trains, or writes a model.
 """
 
 from __future__ import annotations

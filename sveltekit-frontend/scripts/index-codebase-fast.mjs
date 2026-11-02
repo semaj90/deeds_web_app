@@ -41,6 +41,7 @@ import path from 'path';
 import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
 import { analyzeRouteHandlers } from '../../scripts/atlas/lib/route-handler-ast-analyzer-v1.mjs';
+import { canonicalPublishBlockerV1, isSvelteKitSourcePathV1 } from './lib/index-codebase-fast-contract-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SVELTEKIT_ROOT = path.resolve(__dirname, '..');
@@ -85,12 +86,21 @@ const relativeRoot = SNAPSHOT_SOURCE_ROOT ?? ROOT;
 const RUN_ID = `${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`;
 const IS_CANONICAL_SCOPE = SNAPSHOT_SOURCE_ROOT === null && SRC_OVERRIDE === null && !NO_EXTRA_INDEX_DIRS;
 const PUBLISH_CANONICAL_REQUESTED = process.argv.includes('--publish-canonical');
-const PUBLISH_CANONICAL = PUBLISH_CANONICAL_REQUESTED && IS_CANONICAL_SCOPE;
+const CANONICAL_PUBLISH_BLOCKER = canonicalPublishBlockerV1({
+  requested: PUBLISH_CANONICAL_REQUESTED,
+  canonicalScope: IS_CANONICAL_SCOPE,
+  workspaceRevision: SNAPSHOT_WORKSPACE_REVISION,
+});
+const PUBLISH_CANONICAL = PUBLISH_CANONICAL_REQUESTED && CANONICAL_PUBLISH_BLOCKER === null;
 if (PUBLISH_CANONICAL_REQUESTED && !IS_CANONICAL_SCOPE) {
   console.warn(
     `⚠️  --publish-canonical requested but scope is not canonical (--src or --no-extra-index-dirs set) — ` +
     `downgraded to probe-only output. Canonical publication requires the true full-repo scope.`
   );
+}
+if (PUBLISH_CANONICAL_REQUESTED && CANONICAL_PUBLISH_BLOCKER === 'WORKSPACE_REVISION_REQUIRED') {
+  console.error('❌ Refusing canonical publish: ATLAS_GRAPHIFY_EXPECTED_WORKSPACE_REVISION must pin the intended source revision.');
+  process.exit(2);
 }
 const BUILD_DIR = path.resolve(SVELTEKIT_ROOT, 'docs', 'graph', '.build');
 const LOCK_PATH  = path.resolve(SVELTEKIT_ROOT, 'docs', 'graph', '.codebase-graph.lock');
@@ -1156,7 +1166,7 @@ const gateStats = {
   sv4DispatchCount:   files.filter(f => f.sv4Dispatch).length,
   runeInTsCount:      files.filter(f => f.runeInTs).length,
   // G15
-  ssrUnsafeCount:     files.filter(f => f.ssrUnsafe && f.rel.startsWith('src/')).length,
+  ssrUnsafeCount:     files.filter(f => f.ssrUnsafe && isSvelteKitSourcePathV1(f.rel)).length,
   // G16
   routesWithTest:     files.filter(f => f.isServerRoute && f.hasPairedTest).length,
   routesWithoutTest:  files.filter(f => f.isServerRoute && !f.hasPairedTest && f.routeHandlers.length).length,
@@ -1242,13 +1252,11 @@ if (PUBLISH_CANONICAL) {
   // the rename leaves the previous canonical artifact untouched.
   fs.mkdirSync(BUILD_DIR, { recursive: true });
   const tmpPath = path.join(BUILD_DIR, `codebase-graph.${RUN_ID}.tmp.json`);
-  const receiptPath = path.join(BUILD_DIR, `codebase-graph.${RUN_ID}.receipt.json`);
   fs.writeFileSync(tmpPath, graphJsonSerialized);
 
   // Validate before publishing — round-trip parse + basic shape/count sanity.
   const parsed = JSON.parse(fs.readFileSync(tmpPath, 'utf8'));
   const valid = Array.isArray(parsed.files) && parsed.files.length === files.length && parsed.files.length > 0;
-  fs.writeFileSync(receiptPath, JSON.stringify({ ...provenance, validated: valid }, null, 2));
   if (!valid) {
     console.error(`❌ Validation failed for run ${RUN_ID} (fileCount mismatch or empty) — canonical artifact NOT replaced.`);
     process.exit(1);
@@ -1283,7 +1291,7 @@ const noAuthApis = apiFiles.filter(f => {
   return true;
 });
 const noZodApis  = apiFiles.filter(f => !f.hasZod && f.parsesBody);
-const ssrUnsafeFiles = files.filter(f => f.ssrUnsafe && !f.isTest && f.rel.startsWith('src/'));
+const ssrUnsafeFiles = files.filter(f => f.ssrUnsafe && !f.isTest && isSvelteKitSourcePathV1(f.rel));
 const sv4Files   = files.filter(f => f.sv4Props || f.sv4Reactive || f.sv4Events || f.sv4Dispatch);
 const lhFiles    = files.filter(f => f.localhostRefs.length && !f.rel.includes('env.server'));
 const noTestRoutes = files.filter(f => f.isServerRoute && !f.hasPairedTest && f.routeHandlers.length);
@@ -1577,6 +1585,14 @@ if (PUBLISH_CANONICAL) {
   const mapTmpPath = path.join(BUILD_DIR, `codebase-map.${RUN_ID}.tmp.md`);
   fs.writeFileSync(mapTmpPath, codebaseMap);
   fs.renameSync(mapTmpPath, mapPath);
+  const receiptPath = path.join(BUILD_DIR, `codebase-graph.${RUN_ID}.receipt.json`);
+  fs.writeFileSync(receiptPath, JSON.stringify({
+    ...provenance,
+    validated: true,
+    published: true,
+    graphSha256: createHash('sha256').update(fs.readFileSync(graphJsonPath)).digest('hex'),
+    mapSha256: createHash('sha256').update(fs.readFileSync(mapPath)).digest('hex'),
+  }, null, 2));
   console.log(`🗺️  Codebase map (CANONICAL) → ${path.relative(ROOT, mapPath)}`);
 } else {
   fs.mkdirSync(PROBE_DIR, { recursive: true });

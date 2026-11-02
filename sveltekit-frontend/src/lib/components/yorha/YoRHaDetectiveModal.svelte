@@ -1,135 +1,127 @@
-<!-- YoRHa Detective Modal Component -->
+<!-- YoRHa Detective Modal Component with Bits UI v2 Dialog primitives -->
 <script lang="ts">
+  import { Dialog } from 'bits-ui';
   import type { Snippet } from 'svelte';
 
   let {
-    showModal = false,
+    showModal = $bindable(false),
     title = '',
     onClose = () => {},
-	children
+    children
   }: {
-	showModal: boolean;
+    showModal: boolean;
     title: string;
-	onClose: () => void;
+    onClose?: () => void;
     children?: Snippet;
   } = $props();
 
-  // Handle escape key
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && showModal) {
-      onClose();
-    }
+  function close() {
+    showModal = false;
+    onClose?.();
   }
-
-  // Handle backdrop click
-  function handleBackdrop(event: MouseEvent) {
-    if (event.target === event.currentTarget) {
-      onClose();
-    }
-  }
-
-  $effect(() => {
-    if (showModal) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeydown);
-    } else {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeydown);
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeydown);
-    }
-  });
 </script>
 
-{#if showModal}
-  <!-- Modal Backdrop -->
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-  <div
-    class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-    onclick={handleBackdrop}
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="modal-title"
-    tabindex="-1"
-  >
-    <!-- Modal Panel -->
-    <div class="modal-panel bg-yorha-dark border border-yorha-accent-warm/30 rounded-lg shadow-xl w-full max-w-2xl mx-4 transform transition-all p-6 relative">
+<Dialog.Root bind:open={showModal} onOpenChange={(v) => { if (!v) close(); }}>
+  <Dialog.Portal>
+    <Dialog.Overlay class="ydm-backdrop" />
+    <Dialog.Content class="ydm-panel">
+      <!-- Tactical Corner Notches -->
+      <div class="hud-notch-tl" aria-hidden="true"></div>
+      <div class="hud-notch-tr" aria-hidden="true"></div>
+      <div class="hud-notch-bl" aria-hidden="true"></div>
+      <div class="hud-notch-br" aria-hidden="true"></div>
+
+      <!-- Top accent line -->
+      <div class="ydm-top-line" aria-hidden="true"></div>
+
       <!-- Header -->
-      <div class="modal-header flex items-center justify-between mb-4 pb-2 border-b border-yorha-accent-warm/20">
-        <h2 id="modal-title" class="modal-title text-xl font-bold text-yorha-light">{title}</h2>
-        <button class="modal-close text-yorha-muted hover:text-yorha-accent-warm transition-colors text-2xl leading-none"
-                onclick={onClose}
-                aria-label="Close modal">
+      <div class="ydm-header">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-2 h-2 rounded-full bg-[#f3d471] shadow-[0_0_6px_#f3d471]"></span>
+          <Dialog.Title class="ydm-title">{title}</Dialog.Title>
+        </div>
+        <Dialog.Close class="ydm-close" onclick={close} aria-label="Close modal">
           &times;
-        </button>
+        </Dialog.Close>
       </div>
 
       <!-- Content -->
-      <div class="modal-content text-yorha-light">
+      <div class="ydm-content">
         {#if children}
           {@render children()}
         {:else}
-           <p class="text-yorha-muted text-center py-4">No content</p>
+          <p class="text-sand/50 text-center py-4 font-mono text-xs">No content available</p>
         {/if}
       </div>
-    </div>
-  </div>
-{/if}
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>
 
 <style>
-  /* Minimal custom styles, using Tailwind mostly */
-  .modal-panel {
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+  :global(.ydm-backdrop) {
+    position: fixed; inset: 0; z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(4, 7, 14, 0.85); backdrop-filter: blur(12px) saturate(1.15); padding: 1rem;
+    animation: ydmFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .modal-header {
-    justify-content: space-between;
-    align-items: center;
-	padding: 1.5rem;
-    border-bottom: 1px solid #D1CFC7;}
-  .modal-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-	color: #3D3D3D;
-    margin: 0;}
-  .modal-close {
-    background: none;
-	border: none;
-    font-size: 1.5rem;
-	color: #666;
-    cursor: pointer;
-	padding: 0.25rem;
-    line-height: 1;
-	transition:color 0.2s ease;}
-  .modal-close:hover {
-    color: #3D3D3D}
-  .modal-content { padding: 1.5rem;
-    overflow-y: auto;
-    max-height: calc(90vh - 5rem)}
-  @keyframes fadeIn {
-    from {
-      opacity: 0;}
-    to {
-      opacity: 1;}
+
+  :global(.ydm-panel) {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 10001;
+    width: min(44rem, calc(100vw - 2rem)); max-height: 88vh;
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, rgba(18, 24, 36, 0.98) 0%, rgba(9, 13, 20, 0.99) 100%);
+    border: 1px solid rgba(243, 212, 113, 0.32);
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px rgba(243, 212, 113, 0.08), 0 28px 70px -15px rgba(0, 0, 0, 0.9), 0 0 40px rgba(243, 212, 113, 0.1);
+    backdrop-filter: blur(20px); overflow: hidden;
+    animation: ydmScale 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  @keyframes slideIn {
-    from { transform: scale(0.9);
-	opacity: 0;}
-    to { transform: scale(1);
-	opacity: 1;}
+
+  .ydm-top-line {
+    position: absolute; top: 0; left: 1.5rem; right: 1.5rem; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(243, 212, 113, 0.9), rgba(126, 231, 255, 0.6), transparent);
+    pointer-events: none; z-index: 2;
   }
-/* Responsive */ @media (max-width: 640px) {
-    .modal-panel {
-      max-width: 95vw
-     ;margin: 1rem;}
-.modal-header, .modal-content {
-      padding: 1rem;}
+
+  .hud-notch-tl, .hud-notch-tr, .hud-notch-bl, .hud-notch-br {
+    position: absolute; width: 8px; height: 8px; pointer-events: none; z-index: 3;
   }
+  .hud-notch-tl { top: -1px; left: -1px; border-top: 2px solid #f3d471; border-left: 2px solid #f3d471; }
+  .hud-notch-tr { top: -1px; right: -1px; border-top: 2px solid #f3d471; border-right: 2px solid #f3d471; }
+  .hud-notch-bl { bottom: -1px; left: -1px; border-bottom: 2px solid #f3d471; border-left: 2px solid #f3d471; }
+  .hud-notch-br { bottom: -1px; right: -1px; border-bottom: 2px solid #f3d471; border-right: 2px solid #f3d471; }
+
+  .ydm-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.125rem 1.5rem;
+    border-bottom: 1px solid rgba(243, 212, 113, 0.2);
+    background: rgba(0, 0, 0, 0.35); flex-shrink: 0;
+    position: relative; z-index: 1;
+  }
+
+  :global(.ydm-title) {
+    font-size: 1rem; font-weight: 700; color: #f3d471;
+    margin: 0; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  :global(.ydm-close) {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(243, 212, 113, 0.25);
+    color: rgba(212, 199, 163, 0.7); cursor: pointer; font-size: 1.1rem;
+    width: 1.875rem; height: 1.875rem; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s ease; line-height: 1;
+  }
+  :global(.ydm-close:hover) {
+    color: #f3d471; background: rgba(243, 212, 113, 0.15); border-color: rgba(243, 212, 113, 0.5);
+  }
+
+  .ydm-content {
+    padding: 1.5rem; overflow-y: auto; flex: 1; color: rgba(233, 240, 255, 0.88);
+  }
+  .ydm-content::-webkit-scrollbar { width: 6px; }
+  .ydm-content::-webkit-scrollbar-thumb { background: rgba(243, 212, 113, 0.18); border-radius: 3px; }
+
+  @keyframes ydmFade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes ydmScale { from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 </style>
-
-
-
-
-

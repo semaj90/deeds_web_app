@@ -2,6 +2,9 @@
 @unocss preflights;
 @unocss default;
 
+/* Global YoRHa Legal-AI & Royal Dossier Design System */
+@import './lib/styles/dossier-global.css';
+
 /* Custom properties for theming */
 @layer base {
   :root {
@@ -25,6 +28,24 @@
     --color-nier-text: #e0e0e0;
     --color-nier-border: #606060;
     --color-nier-accent: #b0b0b0;
+
+    /* Canonical Shell & Royal Dossier × NieR HUD Tokens */
+    --shell-sidebar-w: 224px;
+    --shell-sidebar-rail-w: 56px;
+    --shell-navbar-h: 46px;
+    --shell-crimson: #7A1B18;
+    --shell-crimson-deep: #58100E;
+    --shell-gold: #C9A86A;
+    --shell-gold-light: #E5C77B;
+    --shell-obsidian: #181E26;
+    --shell-prussian: #1E2530;
+    --shell-parchment: #F3EFE6;
+    --shell-swirl: #EAE3D5;
+    --shell-bronco: #B5A792;
+    --shell-pablo: #6E6355;
+    --font-royal-serif: 'Cinzel', 'Cormorant Garamond', Georgia, 'Palatino Linotype', serif;
+    --font-editorial-serif: 'Cormorant Garamond', Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+    --font-clean-ui: 'Inter', 'InterLocal', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
     /* Shadcn/UI CSS Variables for UnoCSS compatibility */
     --background: 10 10 10; /* #0a0a0a */
@@ -227,4 +248,46 @@
   .animate-pulse {
     display: none !important;
   }
+}
+
+/* ─── Unified HUD Modal & Tactical Toast Styling ─── */
+.hud-modal-backdrop {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast] {
+  background: rgba(19, 27, 42, 0.96) !important;
+  border: 1px solid rgba(243, 212, 113, 0.35) !important;
+  color: #f3d471 !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(243, 212, 113, 0.15) !important;
+  border-radius: 0.75rem !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast] [data-title] {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: rgba(220, 215, 200, 0.75) !important;
+  font-size: 0.75rem !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-type="error"] {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(239, 68, 68, 0.2) !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-type="success"] {
+  border-color: rgba(34, 197, 94, 0.5) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(34, 197, 94, 0.2) !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-type="warning"] {
+  border-color: rgba(234, 179, 8, 0.5) !important;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(234, 179, 8, 0.2) !important;
 }

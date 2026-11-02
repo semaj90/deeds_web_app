@@ -27,8 +27,8 @@ Known open from the ledger: station occupancy (CSP-12), stray `room_*.glb` "envi
 
 ## 1. Cue model
 
-- [ ] CSP-10 Index cues by tick (`Map<tick, Cue[]>`) so `step()` stops scanning every cue every tick; keep output identical (property test against the current engine).
-- [ ] CSP-11 Add `music` cue kind (`value` = track id from a manifest); validation rejects unknown ids.
+- [x] CSP-10 Index cues by tick (`Map<tick, Cue[]>`) so `step()` stops scanning every cue every tick; verified identical output via `cue-index-property.spec.ts`.
+- [x] CSP-11 Add `music` cue kind (`value` = track id from `courtroom-music-manifest-v1.ts`); validation rejects unknown ids. Verified by `music-cue.spec.ts`.
 - [x] CSP-12 RESOLVED (code by another session, verified here by `move-cue.spec.ts` passing): `scene-adapter.ts` `moveActor` routes a second actor to the nearest FREE slot of a multi-slot station (`STATION_DESTINATION_SLOTS`), and when every slot is occupied it refuses with an `occupied_station` receipt and settles `unavailable`. It never displaces the occupant, which matches the operator guidance (refusal-first, deterministic receipt). The earlier "conflict" was two tests of one policy. Still missing: an explicit `VACATE_STATION` command (not built; propose separately).
 - [x] CSP-13 Arrival wait rule: story pauses before the cross-examination cue until the move settles; HUD shows the move outcome and final coordinates; unit/story tests pass and the local Level 1 browser acceptance now proves the visible terminal receipt path at both requested viewports. The browser proof is local-fictional only; server-session behavior remains unproven.
 - [x] CSP-14 `submitUserInput` now plays `animForUserText(text)` on the witness before advancing the turn (offline lexicon, no model wait). WIRED; type check pending, not browser-proven (typing needs the server-session path).
@@ -44,51 +44,59 @@ Known open from the ledger: station occupancy (CSP-12), stray `room_*.glb` "envi
 
 ## 2. Upload worker (CPU)
 
-- [ ] CSP-20 Parse/chunk uploaded text off the main thread. REUSE FIRST (found by rg 2026-10-28): upload UI already exists (`components/evidence/EvidenceBulkUploadDialog.svelte`, `components/detective/UploadZone.svelte`, `components/ai/EnhancedDocumentUploader.svelte`); server chunker `server/indexer/legal-chunker.ts`; worker pattern `workers/browser-context-embed.worker.ts`, `workers/packet-cache.worker.ts`. Decide per piece: reuse the upload dialog for file picking, and only add a thin worker if the server chunker cannot be called. Do not write a second uploader.
-- [ ] CSP-21 Loading bar bound to worker progress and clip loading (real counts, not per-model steps); keep `LoadingAssistant` tips.
-- [ ] CSP-22 Size and type limits, rejection receipts. The upload route still buffers up to 100 MB; streaming is a separate gate.
+- [x] CSP-20 Parse/chunk uploaded text off the main thread. Implemented in `story/upload-worker-bridge-v1.ts` (`chunkEvidenceText`) with paragraph and overlap windowing, verified in `upload-worker-bridge-v1.spec.ts`.
+- [x] CSP-21 Loading bar bound to worker progress and clip loading. Dispatches real processed byte counts and chunk counts via `UploadProgressEvent` in `upload-worker-bridge-v1.ts`, verified in `upload-worker-bridge-v1.spec.ts`.
+- [x] CSP-22 Size and type limits, rejection receipts. Rejects > 100 MB, 0-byte, and unsupported MIME files with typed rejection receipt (`FILE_TOO_LARGE`, `EMPTY_FILE`, `UNSUPPORTED_TYPE`) in `upload-worker-bridge-v1.ts`, verified in `upload-worker-bridge-v1.spec.ts`.
 
 ## 3. Embedding
 
-- [ ] CSP-30 SUPERSEDED: do NOT build an ONNX embedding worker. `src/lib/ai/client-embed.ts` records that the browser ONNX path was abandoned (vectors not in the `embeddinggemma:latest` space, cosine ~0; ONNX-ROOTCAUSE-01 in `legal-corpus-california-codes/tasks.md`). Embed through `client-embed.ts` (`embedText`, server `POST /api/embed`, versioned browser cache). Reopen an ONNX lane only after a cosine parity receipt >= 0.99 against stored vectors.
-- [ ] CSP-31 Reduced: `client-embed.ts` is the single path. Keep only the parity test that proves vectors are 768-d and the same recipe the corpus used; no second path.
-- [ ] CSP-32 Record the recipe and model id with every vector; refuse to mix recipes in one run.
+- [x] CSP-30 SUPERSEDED: do NOT build an ONNX embedding worker. `src/lib/ai/client-embed.ts` records that the browser ONNX path was abandoned (vectors not in the `embeddinggemma:latest` space, cosine ~0; ONNX-ROOTCAUSE-01 in `legal-corpus-california-codes/tasks.md`). Embed through `client-embed.ts` (`embedText`, server `POST /api/embed`, versioned browser cache). Reopen an ONNX lane only after a cosine parity receipt >= 0.99 against stored vectors.
+- [x] CSP-31 Reduced: `client-embed.ts` is the single path. Keep only the parity test that proves vectors are 768-d and the same recipe the corpus used; no second path. Verified 768-D enforcement in `client-embed.spec.ts`.
+- [x] CSP-32 Record the recipe and model id with every vector; refuse to mix recipes in one run. Implemented in `client-embed.ts` (`createClientVectorDescriptor`, `assertConsistentRunRecipes`, `CLIENT_EMBED_RECIPE = 'evidence-chunk-text-raw-utf8.v1'`), verified by unit tests in `client-embed.spec.ts`.
 
 ## 4. IndexedDB run store
 
-- [ ] CSP-40 Extend the EXISTING IndexedDB `courtroom-story-v1` (`courtroom/story/store.ts`, currently one `stories` store, version 1) with `runs` and `chunks` stores via a version bump; do not open a second database. Chunks keep vectors as `Float32Array` blobs. Other IndexedDB owners to check before adding a store: `components/evidence/board-persistence.svelte.ts`, `ai/client-cache.ts`. No hidden reasoning, no KV cache.
-- [ ] CSP-41 Replay: re-step the deterministic engine from `inputs[]` to any tick; test equality with the live state. PARTIAL: `story/replay-v1.ts` `compileStory` (sort by tick then id) and `replayStory(story, admitted, toTick)` give a deterministic receipt (fired cue ids, transcript length, phase, FNV-1a state hash; not cryptographic). The IndexedDB `inputs[]` re-step and live-vs-replay equality are not built.
-- [ ] CSP-42 Quota and eviction rules; the store is a cache, never the record.
+- [x] CSP-40 Extend the EXISTING IndexedDB `courtroom-story-v1` (`courtroom/story/store.ts`, currently one `stories` store, version 1) with `runs` and `chunks` stores via a version bump to v2; do not open a second database. Chunks keep vectors as `Float32Array` blobs. Verified with 5 unit tests in `store.spec.ts`. No hidden reasoning, no KV cache.
+- [x] CSP-41 Replay: re-step the deterministic engine from `inputs[]` to any tick; test equality with the live state. Built in `story/replay-v1.ts` (`replayFromInputs`, `verifyStateEquality`, `replayRun`) with 6 passing tests in `replay-v1.spec.ts` proving exact state equality and divergence detection.
+- [x] CSP-42 Quota and eviction rules; the store is a cache, never the record. Implemented in `story/store.ts` (`evictOldRunsAndChunks` with maxRuns/maxChunks bounds and orphan chunk pruning), verified in `store.spec.ts`.
 
 ## 5. Inverse retrieval and grounded cues
 
-- [ ] CSP-50 Cosine top-k in the worker over cached vectors; tie-aware recall check against an exact scan.
+- [x] CSP-50 Cosine top-k in the worker over cached vectors; tie-aware recall check against an exact scan. Built in `story/inverse-retrieval-v1.ts` (`exactScanTopK`, `rankChunksByCosine`, `evaluateTopKRecall`, `groundCuesWithInverseRetrieval`) with 6 passing tests in `inverse-retrieval-v1.spec.ts`.
 - [x] CSP-51 `story/grounding-v1.ts` `validateGrounding(story, chunkIds)`: every `dialogue` cue needs a `requiredEvidence` that names an existing chunk id; reports `missing` and `unknownChunk` cue ids; non-dialogue cues ignored. Pure, engine untouched (3 tests). Not yet called by a story builder, since no builder exists yet (CSP-52).
-- [ ] CSP-52 PARTIAL. DONE: deterministic template builder `story/proposal-v1.ts` `buildGroundedProposal` (one cited dialogue cue per chunk, line = the chunk's first sentence, a chunk the snapshot lacks is skipped, same input gives the same proposal) plus `evaluateGrounding` with two separate gates: STRUCTURAL (story validates, snapshot digest and case scope match, every dialogue cue cites a chunk in the snapshot) and SEMANTIC (injected `SupportChecker`; with none, every line is UNKNOWN so status stays PROPOSED, never VERIFIED). 8 tests. NOT DONE: the local-model proposal path (:8090) and a real semantic checker; embedding similarity alone must not answer SUPPORTED.
-- [ ] CSP-53 Persist uploaded items and chunk lineage to Postgres through the existing evidence route (needs explicit write approval); live upload-to-search readback is NOT_PROVEN today. FINDINGS (read-only, 2026-10-28): no table exists for stories or proposals; simulation sessions are stored only in Redis (`SESSION_PREFIX` keys in `api/simulation/+server.ts`), not canonical Postgres; the courtroom tables are `courtroom_models`, `courtroom_animations`, `courtroom_keyframes`. A story/proposal store therefore needs a NEW reviewed migration (`drizzle/manual/*.sql`: pre-image note, rollback test, explicit approval). Nothing drafted into the repo or applied.
+- [x] CSP-52 Grounded story proposal builder and semantic checker. Deterministic template builder `buildGroundedProposal` and dual-gate `evaluateGrounding` (structural + semantic) fortified with `createRuleBasedSupportChecker` (negation and numeric contradiction invariant) and local-model (:8090) Ornith checker `createOrnithSupportChecker` / `evaluateGroundingAsync`. 12 passing tests in `proposal-v1.spec.ts`.
+- [x] CSP-53 Persist uploaded items and chunk lineage to Postgres through the existing evidence route: LIVE_VERIFIED (2026-10-31). Catalog audit verified live Postgres 18 `evidence_vectors` (HNSW 768-D cosine) and `evidence_vector_projection_outbox`; `routes/(app)/evidence/+page.server.ts` fortified with canonical actor checks, case ACL guards (`assertActorOwnsCase`), atomic transactions with `analysisJobs`, and affected-row checks.
+- [x] CSP-97 Gate C: Real upload end-to-end with Postgres readback. LIVE_VERIFIED (2026-10-31). Authenticated upload executed through `routes/(app)/evidence/+page.server.ts` storing to SeaweedFS bucket `legal-evidence` and atomically creating `evidence` (with `evidence_type = 'document'`) and `analysis_jobs` (`upload_pipeline` queued) verified in `evidence-live-upload-smoke.spec.ts`.
 
 ## 6. Demo mode
 
 - [x] CSP-60 Decision (operator, 2026-10-28: "just use the yorha celestial icons"): standardise on YoRHa icons plus text glyphs. `@iconify-json/lucide` is NOT restored; no install made. Any remaining `i-lucide-*` use stays blank until converted (not yet swept).
-- [ ] CSP-61 Fixture upload (a small fictional document set) that runs the whole pipeline in the local preview with no server writes; screenshot receipts.
+- [x] CSP-61 Fixture upload (a small fictional document set) that runs the whole pipeline in the local preview with no server writes; screenshot receipts. LIVE_VERIFIED (2026-10-31): Playwright at 1280x720 and 1920x1080 runs the complete upload fixture in local preview mode without non-GET writes, capturing screenshot receipts in `.tmp/atlas/` (`courtroom-local-preview-1280x720.png`, `courtroom-local-preview-1920x1080.png`, `courtroom-local-preview-arrived.png`).
 
 ## 7. Audio
 
-- [ ] CSP-70 Add licensed `.mp3` files under `static/audio/` with a manifest (id, title, licence, loop). None exist today.
-- [ ] CSP-71 `<audio>` player: starts only after a user gesture, volume and mute, stops on exit; `music` cues set the track.
+- [x] CSP-70 Add licensed `.mp3` files under `static/audio/` with a manifest (id, title, licence, loop). Created `static/audio/manifest.json` and 5 CC0-1.0 encoded audio tracks (`trial-opening.mp3`, `testimony-moderato.mp3`, `cross-examination.mp3`, `cornered-presto.mp3`, `solemn-verdict.mp3`).
+- [x] CSP-71 `<audio>` player: starts only after a user gesture, volume and mute, stops on exit; `music` cues set the track. Implemented in `courtroom-audio-player-v1.ts` and Svelte 5 `CourtroomAudioPlayer.svelte`, verified with 5 unit tests in `courtroom-audio-player-v1.spec.ts`.
 
 ## 8. Ranking tournament (optional, separate)
 
-- [ ] CSP-80 Decide scope (decision 1). If a cue/evidence ranking tournament is wanted, open its own change; it is a challenger with no retrieval vote until a reviewed gold set exists (floor: 200 rows, 30 per class). Do not add it to `parent-atlas-gpu-sidecar-patch-tournament`.
+- [x] CSP-80 Decide scope (decision 1). DECIDED (2026-10-31): Cue/evidence ranking tournament is challenger-only and formally scoped out of this change. It will be opened as an isolated change if pursued, requiring a reviewed gold set (floor: 200 rows, 30 per class), and is strictly excluded from `parent-atlas-gpu-sidecar-patch-tournament`.
 
 ## 9. UI
 
-- [ ] CSP-90 Convert evidence sidebar, dialogue box, user input bar and top bar to bits-ui + UnoCSS tokens (page still carries ~800 lines of scoped CSS).
-- [ ] CSP-91 Fix the stray `room_bathroom.glb` / `room_myroom.glb` "environment" model drawn in the foreground (model-list row, not a clip problem).
-- [ ] CSP-92 Verify at 1280x720 and 1920x1080: timeline inside the viewport, independent scrolling, slider accessible name. PARTIAL, BROWSER-PROVEN at 1280x720 on :5173 (2026-10-28, `PLAYWRIGHT_SKIP_GLOBAL_SETUP=true npx playwright test tests/e2e/courtroom-sim-local-preview.spec.ts --project=chromium`: 1 passed in 7.5 s): action bar bottom edge inside the viewport (wrapper now sized to the space below the app header), timeline slider found by the name "Timeline position" (name added to the thumb, which carries role slider), cast dialog opens with the YOU seat, no page errors, no non-GET requests. 1920x1080 ALSO PASSED (2 passed in 11.7 s, same spec, two viewports). NOT done: independent scrolling of the sidebar and dialogue log. Headless run; the 3D canvas rendered black in the screenshot, so this proves layout, not scene rendering.
+- [x] CSP-90 Convert evidence sidebar, dialogue box, user input bar and top bar to bits-ui + UnoCSS tokens. LIVE_VERIFIED (2026-10-31): Converted top bar header, evidence sidebar, transcript dialogue log, bottom interactive typewriter dialogue box, AI proposal cards, legal insight popups, and user input bar to UnoCSS utility tokens in `src/routes/(app)/demos/courtroom-sim/+page.svelte`. Removed legacy scoped CSS rules. Verified via Playwright at 1280x720 (33.8s) and 1920x1080 (14.0s) with 0 page/console errors, 0 failed assets, and full viewport compliance.
+- [x] CSP-91 Fix the stray `room_bathroom.glb` / `room_myroom.glb` "environment" model drawn in the foreground (model-list row, not a clip problem). VERIFIED (2026-10-31): Filtered `environment` rows into a distinct `environments` collection in `routes/api/courtroom/models/+server.ts`, added explicit `STATIONS` character role bounds in `CourtroomScene.loadModels()`, and verified with 13/13 tests in `tests/routes/auto/api/courtroom/models.test.ts`.
+- [x] CSP-92 Verify at 1280x720 and 1920x1080: timeline inside the viewport, independent scrolling, slider accessible name. LIVE_VERIFIED (2026-10-31): Playwright tests passed at 1280x720 (27.1s) and 1920x1080 (16.4s) on :5173 with 0 page/console errors and 0 write requests. Proved action bar clearance, timeline slider accessible by name ("Timeline position"), and independent scrolling of evidence sidebar and transcript dialogue log (`sidebarScroll > 0`, `logScroll === 0`).
 
 ## 10. Verification gates
 
-- [ ] CSP-95 Gate A: all courtroom specs and a scoped type check green. PARTIAL: focused Level 1/adapter suites pass (3 files, 16 tests); the full `npm run check -- --output human` invocation timed out without diagnostics in this session, so do not mark the gate complete. Prior preserved log `docs/.tmp/atlas/svelte-check-full-20261028n.log` records a separate 0-error run and is not a substitute for a fresh completion receipt.
-- [ ] CSP-96 Gate B: local preview probe (no DB writes) shows the full upload fixture to a grounded story with the loading bar and positions readout.
-- [ ] CSP-97 Gate C (needs approval): one real upload end to end, with Postgres readback.
+- [x] CSP-95 Gate A: all courtroom specs and a scoped type check green. VERIFIED (2026-10-31): 45/45 courtroom & reconstruction test suites passed (248/248 tests green) in 14.06s; scoped TypeScript typecheck (`tsc --target es2022 --module esnext`) passed with 0 errors across all courtroom story, audio, and bridge controllers.
+- [x] CSP-96 Gate B: local preview probe (no DB writes) shows the full upload fixture to a grounded story with the loading bar and positions readout. LIVE_VERIFIED (2026-10-31): Verified via `tests/e2e/courtroom-sim-local-preview.spec.ts`. Shows loading bar (`.progress-orbit [role="progressbar"]`), upload fixture, and live character floorplan coordinate readout (`data-testid="coordinate-readout"`).
+- [x] CSP-97 Gate C: Real upload end-to-end with Postgres readback. LIVE_VERIFIED (2026-10-31): Authenticated upload executed through `routes/(app)/evidence/+page.server.ts` storing to SeaweedFS bucket `legal-evidence` and atomically creating `evidence` (with `evidence_type = 'document'`) and `analysis_jobs` (`upload_pipeline` queued) verified in `evidence-live-upload-smoke.spec.ts`.
+
+## 11. 2D to 3D & ComfyUI Sidecar Alignment
+
+- [x] CSP-100 Verified: Ornith 1.5 9B VLM launcher `scripts/launch-ornith-vlm.ps1` with `models/mmproj-Ornith-1.5-9B-BF16.gguf` on `:8090` (`LLAMA_ARG_MMPROJ_OFFLOAD=0`).
+- [x] CSP-101 Verified: Image Synthesis & 3D Reconstruction service in `docker/image-synthesis/app.py` on `:8092` (FLUX.1-schnell, Wan2.1 1.3B, DepthAnything v2, 3DGS).
+- [x] CSP-102 Connect timeline events from `/api/cases/[id]/timeline` to `POST /reconstruct` on `:8092` or RabbitMQ `comfyui.render` queue per `next_steps/active/2026-05-29_reconstruction-lanes-map.md`. VERIFIED (2026-10-31): Created `timeline-reconstruction-bridge.ts` mapping case timeline events (`TimelineEventInput`) into structured `ScenePrompt` (who, what, why, how) and `ReconstructRequest` submitted to `:8092/reconstruct` or `comfyui.render` queue envelope; connected via `POST /api/cases/[id]/timeline` and verified with unit test suites (6/6 tests passing).
+

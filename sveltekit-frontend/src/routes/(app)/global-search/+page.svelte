@@ -38,6 +38,7 @@
 	let contextConfirmData = $state<{ context_id: string; source: string; score: number; snippet: string; range?: { from_msg_id: number; to_msg_id: number }; timestamp?: string } | null>(null);
 	import { getConfidenceLevel, formatProcessingTime } from '$lib/utils';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import type { RetrievalContext, RankedChunk } from '$lib/machines/retrieval-machine.js';
 
 	interface SearchResult {
@@ -164,6 +165,16 @@
 		persons: true,
 	});
 
+	let lastAppliedUrlQuery = $state('');
+	$effect(() => {
+		const qParam = (page.url.searchParams.get('q') ?? '').trim();
+		if (qParam && qParam !== lastAppliedUrlQuery) {
+			lastAppliedUrlQuery = qParam;
+			searchQuery = qParam;
+			void performSearch();
+		}
+	});
+
 	// Load filter facets on mount
 	$effect(() => {
 		if (!facetsLoaded) {
@@ -277,7 +288,7 @@
 	async function searchLibrary() {
 		const params = new URLSearchParams({ q: searchQuery, limit: '20' });
 		if (statuteSearchFilters.jurisdiction) params.set('jurisdiction', statuteSearchFilters.jurisdiction);
-		const res = await fetch(`/api/library/search?${params}`);
+		const res = await fetch(`/api/library/search?${params}`, { signal: AbortSignal.timeout(4000) });
 		if (!res.ok) throw new Error(`Library search failed: ${res.status}`);
 		const data = await res.json();
 		libraryResults = data.hits ?? data.results ?? [];
@@ -820,7 +831,7 @@
 					<p>{searchError}</p>
 					<p class="error-hint">Ensure Qdrant and Ollama services are running.</p>
 				</div>
-			{:else if isSearching}
+			{:else if isSearching && platformHits.length === 0 && libraryResults.length === 0 && caseResults.length === 0 && evidenceBundles.length === 0 && ragResults.length === 0}
 				<div class="loading-state">
 					<span class="animate-spin"><Icon name="loader-circle" size={32} /></span>
 					<p>Running {searchMode === 'evidence' ? 'RAG+KAG+DAG' : searchMode === 'rag' ? 'RAG' : 'typed Drizzle'} pipeline...</p>
@@ -1633,11 +1644,11 @@
 	.search-page {
 		display: flex;
 		flex-direction: column;
-		height: 100vh;
+		height: calc(100vh - var(--shell-navbar-h, 44px));
 		background: #1a1610;
 		color: #d4c9a9;
-		font-family: 'JetBrains Mono', monospace;
-		margin: -2.5rem;
+		font-family: 'Inter', 'InterLocal', system-ui, -apple-system, sans-serif;
+		margin: 0;
 		padding: 0;
 	}
 
@@ -1706,9 +1717,13 @@
 
 	.header-title h1 {
 		margin: 0;
-		font-size: 1.25rem;
-		letter-spacing: 0.15em;
+		font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+		font-size: 1.22rem;
+		letter-spacing: 0.1em;
 		color: #f8f0d9;
+		border-bottom: none;
+		text-shadow: none;
+		padding-bottom: 0;
 	}
 
 	.header-sub {

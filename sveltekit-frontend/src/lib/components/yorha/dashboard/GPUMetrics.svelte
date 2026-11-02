@@ -1,296 +1,166 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 
-  // TODO: Future GPU Dev Metrics (Session 93r17 planned)
-  // - WebGPU Compute Status: DeedsGPUCompute pipeline status (shader compilation, buffer alloc, dispatch count)
-  // - ONNX Inference Monitor: Model load time, inference latency, token/s, session backend (WebGPU/WASM/CPU)
-  // - Triton/TRT-LLM Inference: Port 8099 health, batch queue depth, INT4 throughput, model versions
-  // - LLM Eval Dashboard: ornith-1.5-9b response quality metrics, hallucination rate, citation accuracy
-  // - Admin Testing: One-click inference benchmarks, A/B model comparison, GPU memory profiling
+	type InferenceStatus = {
+		status: 'checking' | 'online' | 'offline';
+		model: string | null;
+		ctxUsed: number;
+		ctxMax: number;
+		slotsIdle: boolean | null;
+		slotCount: number;
+		activeSlots: number;
+	};
 
-  /** Real WebGPU capabilities detected from the browser */
-  interface GPUCapabilities {
-    available: boolean;
-    backend: 'webgpu' | 'none';
-    vendor: string;
-    architecture: string;
-    device: string;
-    description: string;
-    features: string[];
-    limits: Record<string, number>;
-  }
+	let inference = $state<InferenceStatus>({
+		status: 'checking', model: null, ctxUsed: 0, ctxMax: 0, slotsIdle: null, slotCount: 0, activeSlots: 0,
+	});
+	let refreshing = $state(false);
 
-  /** Compute pipeline metrics from gpu-compute-pipeline.ts */
-  interface ComputeMetrics {
-    backend: string;
-    shadersLoaded: number;
-    pipelinesCached: number;
-  }
+	async function refreshStatus() {
+		if (refreshing || document.visibilityState !== 'visible') return;
+		refreshing = true;
+		try {
+			const response = await fetch('/api/admin/inference-lane', {
+				headers: { accept: 'application/json' },
+				cache: 'no-store',
+				signal: AbortSignal.timeout(4000),
+			});
+			const data = await response.json();
+			if (!response.ok || (data.status !== 'online' && data.status !== 'offline')) {
+				throw new Error('Inference status unavailable');
+			}
+			inference = {
+				status: data.status,
+				model: typeof data.model === 'string' ? data.model : null,
+				ctxUsed: Number.isFinite(data.ctxUsed) ? data.ctxUsed : 0,
+				ctxMax: Number.isFinite(data.ctxMax) ? data.ctxMax : 0,
+				slotsIdle: typeof data.slotsIdle === 'boolean' ? data.slotsIdle : null,
+				slotCount: Number.isFinite(data.slotCount) ? data.slotCount : 0,
+				activeSlots: Number.isFinite(data.activeSlots) ? data.activeSlots : 0,
+			};
+		} catch {
+			inference = { ...inference, status: 'offline', model: null, slotsIdle: null, slotCount: 0, activeSlots: 0 };
+		} finally {
+			refreshing = false;
+		}
+	}
 
-  let capabilities = $state<GPUCapabilities | null>(null);
-  let computeMetrics = $state<ComputeMetrics | null>(null);
-  let loading = $state(true);
-  let error: string | null = $state(null);
+	onMount(() => {
+		void refreshStatus();
+		const timer = window.setInterval(() => void refreshStatus(), 15_000);
+		return () => window.clearInterval(timer);
+	});
 
-  /** Performance history for cosine similarity operations */
-  let performanceHistory = $state(Array.from({ length: 20 }, () => ({
-    time: 0,
-    durationMs: 0
-  })));
-
-  async function detectGPU() {
-    if (!browser) {
-      capabilities = { available: false, backend: 'none', vendor: '', architecture: '', device: '', description: '', features: [], limits: {} };
-      loading = false;
-      return;
-    }
-
-    try {
-      loading = true;
-      error = null;
-
-      // Detect real WebGPU capabilities from browser
-      if (typeof navigator !== 'undefined' && navigator.gpu) {
-        const gpu = navigator.gpu as GPU;
-        const adapter = await gpu.requestAdapter({ powerPreference: 'high-performance' });
-
-        if (adapter) {
-          const info = await adapter.requestAdapterInfo();
-          const features = Array.from(adapter.features) as string[];
-
-          capabilities = {
-            available: true,
-            backend: 'webgpu',
-            vendor: info.vendor || 'Unknown',
-            architecture: info.architecture || '',
-            device: info.device || '',
-            description: info.description || '',
-            features,
-            limits: {
-              maxBufferSize: adapter.limits.maxBufferSize,
-              maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
-              maxComputeWorkgroupsPerDimension: adapter.limits.maxComputeWorkgroupsPerDimension,
-              maxComputeInvocationsPerWorkgroup: adapter.limits.maxComputeInvocationsPerWorkgroup,
-              maxComputeWorkgroupSizeX: adapter.limits.maxComputeWorkgroupSizeX,
-              maxComputeWorkgroupSizeY: adapter.limits.maxComputeWorkgroupSizeY,
-              maxComputeWorkgroupSizeZ: adapter.limits.maxComputeWorkgroupSizeZ,
-            }
-          };
-        } else {
-          capabilities = { available: false, backend: 'none', vendor: '', architecture: '', device: '', description: 'No WebGPU adapter found', features: [], limits: {} };
-        }
-      } else {
-        capabilities = { available: false, backend: 'none', vendor: '', architecture: '', device: '', description: 'WebGPU not supported', features: [], limits: {} };
-      }
-
-      // Try to load DeedsGPUCompute pipeline info
-      try {
-        const { getGPUCompute } = await import('$lib/gpu/gpu-compute-pipeline.js');
-        const compute = await getGPUCompute();
-        computeMetrics = {
-          backend: compute.backend ?? 'unknown',
-          shadersLoaded: 3, // cosine, normalize, matmul
-          pipelinesCached: 0,
-        };
-      } catch {
-        computeMetrics = null;
-      }
-    } catch (err) {
-      console.error('GPU detection failed:', err);
-      error = 'GPU detection failed';
-      capabilities = { available: false, backend: 'none', vendor: '', architecture: '', device: '', description: '', features: [], limits: {} };
-    } finally {
-      loading = false;
-    }
-  }
-
-  /** Run a benchmark cosine similarity to measure real GPU perf */
-  async function runBenchmark() {
-    if (!browser || !capabilities?.available) return;
-
-    try {
-      const { getGPUCompute } = await import('$lib/gpu/gpu-compute-pipeline.js');
-      const compute = await getGPUCompute();
-
-      // 768-dim vectors (same as embeddinggemma)
-      const query = new Float32Array(768).map(() => Math.random());
-      const docs = new Float32Array(768 * 10).map(() => Math.random());
-
-      const start = performance.now();
-      await compute.cosineSimilarity(query, docs, 10);
-      const durationMs = performance.now() - start;
-
-      performanceHistory = [
-        ...performanceHistory.slice(1),
-        { time: Date.now(), durationMs: Math.round(durationMs * 100) / 100 }
-      ];
-    } catch (err) {
-      console.warn('Benchmark failed:', err);
-    }
-  }
-
-  $effect(() => {
-    detectGPU();
-  });
-
-  function formatBytes(bytes: number): string {
-    if (bytes >= 1073741824) return `${(bytes / 1073741824).toFixed(1)} GB`;
-    if (bytes >= 1048576) return `${(bytes / 1048576).toFixed(0)} MB`;
-    return `${bytes} B`;
-  }
+	const statusLabel = $derived(
+		inference.status === 'checking' ? 'Checking' : inference.status === 'online' ? 'Online' : 'Unavailable',
+	);
 </script>
 
-<div class="bg-panelSoft/50 backdrop-blur rounded-lg p-6 border border-sand/50">
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="text-xl font-semibold text-info">GPU Status</h2>
-    <div class="flex items-center gap-2">
-      {#if capabilities?.available}
-        <button onclick={runBenchmark} class="px-2 py-1 text-xs bg-info/20 text-info rounded hover:bg-info/30 transition-colors">
-          Benchmark
-        </button>
-      {/if}
-      {#if loading}
-        <div class="w-4 h-4 border-2 border-info/80 border-t-transparent rounded-full animate-spin"></div>
-      {/if}
-    </div>
-  </div>
+<section class="gpu-runtime" aria-labelledby="gpu-runtime-title" aria-busy={refreshing}>
+	<header class="gpu-runtime__header">
+		<div>
+			<p class="gpu-runtime__eyebrow">INFERENCE RUNTIME</p>
+			<h3 id="gpu-runtime-title">Model service</h3>
+		</div>
+		<span class="gpu-runtime__status" data-status={inference.status}>
+			<span aria-hidden="true"></span>{statusLabel}
+		</span>
+	</header>
 
-  {#if error}
-    <div class="text-center py-4 mb-4">
-      <div class="text-danger/80 text-sm">{error}</div>
-    </div>
-  {/if}
+	<dl class="gpu-runtime__details">
+		<div>
+			<dt>Model</dt>
+			<dd>{inference.model ?? 'Not confirmed'}</dd>
+		</div>
+		<div>
+			<dt>Inference slots</dt>
+			<dd>
+				{#if inference.slotsIdle === true}
+					Idle · {inference.slotCount} available
+				{:else if inference.slotsIdle === false}
+					Busy · {inference.activeSlots} active
+				{:else}
+					Unknown
+				{/if}
+			</dd>
+		</div>
+		<div>
+			<dt>Context</dt>
+			<dd>{inference.ctxMax > 0 ? `${inference.ctxUsed.toLocaleString()} / ${inference.ctxMax.toLocaleString()}` : 'Not reported'}</dd>
+		</div>
+		<div>
+			<dt>VRAM</dt>
+			<dd>Not reported by model service</dd>
+		</div>
+	</dl>
 
-  {#if capabilities}
-    <!-- Status Badge -->
-    <div class="flex items-center gap-2 mb-4">
-      <div class="w-2 h-2 rounded-full {capabilities.available ? 'bg-green-400' : 'bg-red-400'}"></div>
-      <span class="text-sm {capabilities.available ? 'text-green-400' : 'text-danger/80'}">
-        {capabilities.available ? 'WebGPU Active' : 'WebGPU Unavailable'}
-      </span>
-      {#if capabilities.vendor}
-        <span class="text-xs text-sand/40">({capabilities.vendor})</span>
-      {/if}
-    </div>
+	<p class="gpu-runtime__note">
+		Read-only status. This panel does not load or unload models; use the managed launcher for model changes.
+	</p>
+</section>
 
-    {#if capabilities.available}
-      <!-- Adapter Info -->
-      <div class="space-y-3">
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-panelSoft/30 rounded-lg p-3">
-            <div class="text-xs text-sand/40 mb-1">Vendor</div>
-            <div class="text-sm font-medium text-sand">{capabilities.vendor || 'Unknown'}</div>
-          </div>
-          <div class="bg-panelSoft/30 rounded-lg p-3">
-            <div class="text-xs text-sand/40 mb-1">Architecture</div>
-            <div class="text-sm font-medium text-sand">{capabilities.architecture || 'N/A'}</div>
-          </div>
-        </div>
+<style>
+	.gpu-runtime {
+		--runtime-border: color-mix(in srgb, currentColor 14%, transparent);
+		padding: 1rem;
+		border: 1px solid var(--runtime-border);
+		border-radius: 0.75rem;
+		background: color-mix(in srgb, #0b1220 92%, transparent);
+		color: #e2e8f0;
+	}
 
-        {#if capabilities.device || capabilities.description}
-          <div class="bg-panelSoft/30 rounded-lg p-3">
-            <div class="text-xs text-sand/40 mb-1">Device</div>
-            <div class="text-sm font-medium text-sand">{capabilities.description || capabilities.device || 'N/A'}</div>
-          </div>
-        {/if}
+	.gpu-runtime__header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--runtime-border);
+	}
 
-        <!-- Compute Limits -->
-        <div class="pt-3 border-t border-sand/50">
-          <h3 class="text-sm font-medium text-sand/40 mb-2">Compute Limits</h3>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            {#if capabilities.limits.maxBufferSize}
-              <div class="flex justify-between">
-                <span class="text-sand/40">Max Buffer</span>
-                <span class="text-sand">{formatBytes(capabilities.limits.maxBufferSize)}</span>
-              </div>
-            {/if}
-            {#if capabilities.limits.maxStorageBufferBindingSize}
-              <div class="flex justify-between">
-                <span class="text-sand/40">Max Storage</span>
-                <span class="text-sand">{formatBytes(capabilities.limits.maxStorageBufferBindingSize)}</span>
-              </div>
-            {/if}
-            {#if capabilities.limits.maxComputeWorkgroupSizeX}
-              <div class="flex justify-between">
-                <span class="text-sand/40">Workgroup X</span>
-                <span class="text-sand">{capabilities.limits.maxComputeWorkgroupSizeX}</span>
-              </div>
-            {/if}
-            {#if capabilities.limits.maxComputeInvocationsPerWorkgroup}
-              <div class="flex justify-between">
-                <span class="text-sand/40">Invocations/WG</span>
-                <span class="text-sand">{capabilities.limits.maxComputeInvocationsPerWorkgroup}</span>
-              </div>
-            {/if}
-          </div>
-        </div>
+	.gpu-runtime__eyebrow {
+		margin: 0 0 0.25rem;
+		color: #94a3b8;
+		font-size: 0.65rem;
+		letter-spacing: 0.12em;
+	}
 
-        <!-- Compute Pipeline Status -->
-        {#if computeMetrics}
-          <div class="pt-3 border-t border-sand/50">
-            <h3 class="text-sm font-medium text-sand/40 mb-2">Compute Pipeline</h3>
-            <div class="grid grid-cols-3 gap-3 text-center">
-              <div class="bg-panelSoft/30 rounded-lg p-2">
-                <div class="text-lg font-bold text-info/80">{computeMetrics.backend}</div>
-                <div class="text-xs text-sand/40">Backend</div>
-              </div>
-              <div class="bg-panelSoft/30 rounded-lg p-2">
-                <div class="text-lg font-bold text-accent">{computeMetrics.shadersLoaded}</div>
-                <div class="text-xs text-sand/40">Shaders</div>
-              </div>
-              <div class="bg-panelSoft/30 rounded-lg p-2">
-                <div class="text-lg font-bold text-info/80">{computeMetrics.pipelinesCached}</div>
-                <div class="text-xs text-sand/40">Cached</div>
-              </div>
-            </div>
-          </div>
-        {/if}
+	h3 { margin: 0; font-size: 0.95rem; font-weight: 650; }
 
-        <!-- Benchmark History -->
-        {#if performanceHistory.some(p => p.durationMs > 0)}
-          <div class="pt-3 border-t border-sand/50">
-            <h3 class="text-sm font-medium text-sand/40 mb-2">Cosine Similarity Benchmark (768-dim x 10)</h3>
-            <div class="h-16 bg-panelSoft/30 rounded flex items-end space-x-1 p-2">
-              {#each performanceHistory as point}
-                {#if point.durationMs > 0}
-                  {@const maxMs = Math.max(...performanceHistory.map(p => p.durationMs))}
-                  <div
-                    class="bg-info/60 rounded-sm flex-1 transition-all duration-200"
-                    style="height: {(point.durationMs / (maxMs || 1)) * 100}%"
-                    title="{point.durationMs}ms"
-                  ></div>
-                {:else}
-                  <div class="bg-panelSoft/20 rounded-sm flex-1" style="height: 2px"></div>
-                {/if}
-              {/each}
-            </div>
-            <div class="flex justify-between text-xs text-sand/40 mt-1">
-              <span>Duration (ms)</span>
-              <span>{performanceHistory.filter(p => p.durationMs > 0).at(-1)?.durationMs ?? 0}ms latest</span>
-            </div>
-          </div>
-        {/if}
+	.gpu-runtime__status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.75rem;
+		color: #cbd5e1;
+	}
 
-        <!-- Features -->
-        <div class="pt-3 border-t border-sand/50">
-          <h3 class="text-sm font-medium text-sand/40 mb-2">Adapter Features ({capabilities.features.length})</h3>
-          <div class="flex flex-wrap gap-1">
-            {#each capabilities.features.slice(0, 12) as feature}
-              <span class="px-2 py-1 bg-info/20 text-info text-xs rounded">{feature}</span>
-            {/each}
-            {#if capabilities.features.length > 12}
-              <span class="px-2 py-1 bg-sand/20 text-sand/60 text-xs rounded">+{capabilities.features.length - 12} more</span>
-            {/if}
-          </div>
-        </div>
-      </div>
+	.gpu-runtime__status span {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: #94a3b8;
+	}
 
-    {:else}
-      <!-- No GPU Available -->
-      <div class="text-center py-6">
-        <div class="text-sand/40 text-sm mb-2">{capabilities.description || 'WebGPU is not available in this browser'}</div>
-        <div class="text-xs text-sand/30">Compute operations will use WASM SIMD or CPU fallback</div>
-      </div>
-    {/if}
-  {/if}
-</div>
+	.gpu-runtime__status[data-status='online'] span { background: #34d399; }
+	.gpu-runtime__status[data-status='offline'] span { background: #f87171; }
+
+	.gpu-runtime__details {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.8rem 1rem;
+		margin: 0;
+		padding: 0.9rem 0;
+	}
+
+	.gpu-runtime__details div { min-width: 0; }
+	.gpu-runtime__details dt { color: #94a3b8; font-size: 0.7rem; }
+	.gpu-runtime__details dd { margin: 0.2rem 0 0; overflow-wrap: anywhere; font-size: 0.8rem; }
+	.gpu-runtime__note { margin: 0; color: #94a3b8; font-size: 0.7rem; line-height: 1.45; }
+
+	@media (prefers-reduced-motion: no-preference) {
+		.gpu-runtime__status[data-status='checking'] span { animation: status-pulse 1.4s ease-in-out infinite; }
+	}
+
+	@keyframes status-pulse { 50% { opacity: 0.35; } }
+</style>

@@ -1,8 +1,8 @@
 {
   "schema": "atlas.feature-registry-baseline-neighborhood.v1",
   "status": "READ_ONLY_CENSUS_COMPLETE",
-  "startedAt": "2026-09-06T00:14:24.756Z",
-  "completedAt": "2026-09-06T00:14:24.844Z",
+  "startedAt": "2026-11-01T19:35:17.868Z",
+  "completedAt": "2026-11-01T19:35:17.952Z",
   "safety": {
     "transactionMode": "READ ONLY",
     "databaseMutationAttempted": false,

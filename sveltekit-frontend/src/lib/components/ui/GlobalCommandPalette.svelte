@@ -43,7 +43,7 @@
 			{ label: 'Global Search', desc: 'Platform-wide search', icon: 'scan-search', href: '/global-search' },
 			{ label: 'AI Dashboard', desc: 'AI model status and tools', icon: 'brain', href: '/admin/ai-dashboard' },
 			{ label: 'Terminal', desc: 'AI assistant terminal', icon: 'terminal', href: '/terminal' },
-			{ label: 'Memory Palace', desc: 'Knowledge graph visualization', icon: 'landmark', href: '/memory-palace' },
+			{ label: 'Memory Palace', desc: 'Knowledge graph visualization', icon: 'landmark', href: '/demos/memory-palace' },
 			{ label: 'All Routes', desc: 'Full application route map', icon: 'map', href: '/admin/all-routes' },
 			{ label: 'Demos', desc: 'Feature demonstrations', icon: 'gamepad-2', href: '/demos' },
 		],
@@ -84,7 +84,7 @@
 			{ label: 'Dev Tools', desc: 'Developer utilities', icon: 'code', href: '/admin/dev-tools' },
 			{ label: 'AST Topology', desc: 'Abstract syntax tree viewer', icon: 'network', href: '/admin/ast-topology' },
 			{ label: 'Error Brain', desc: 'Error analysis system', icon: 'bug', href: '/admin/error-brain' },
-			{ label: 'Agentic Errors', desc: 'AI-detected error patterns', icon: 'bot', href: '/agentic-errors' },
+			{ label: 'Agentic Errors', desc: 'AI-detected error patterns', icon: 'bot', href: '/demos/agentic-errors' },
 		],
 	};
 

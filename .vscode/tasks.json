@@ -3,6 +3,12 @@
   "version": "2.0.0",
   "inputs": [
     {
+      "id": "gpuJobScript",
+      "type": "promptString",
+      "description": "Repo-relative job to run while :8090 is stopped (.ps1, .mjs or .py), e.g. scripts/atlas/my-gpu-job.mjs",
+      "default": ""
+    },
+    {
       "id": "rgSearchQuery",
       "type": "promptString",
       "description": "Enter the ripgrep query (regex or literal) to search for",
@@ -2089,7 +2095,7 @@
     {
       "label": "🗂️ Startup: Parent Atlas Refresh (promote + wire-qdrant)",
       "type": "shell",
-      "command": "$stamp = 'logs/task-output/.parent-atlas-refresh-last-run'; $cooldownSec = 3600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🗂️ parent-atlas refresh skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run atlas:parent-atlas:refresh 2>&1 | Tee-Object logs/task-output/parent-atlas-refresh-latest.log | Select-Object -Last 10; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🗂️ parent-atlas refresh complete' } else { Write-Host '🗂️ parent-atlas refresh FAILED — check logs/task-output/parent-atlas-refresh-latest.log' } }",
+      "command": "$stamp = 'logs/task-output/.parent-atlas-refresh-last-run'; $cooldownSec = 3600; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🗂️ parent-atlas refresh skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm --prefix sveltekit-frontend run atlas:parent-atlas:refresh 2>&1 | Tee-Object logs/task-output/parent-atlas-refresh-latest.log | Select-Object -Last 10; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🗂️ parent-atlas refresh complete' } else { Write-Host '🗂️ parent-atlas refresh FAILED — check logs/task-output/parent-atlas-refresh-latest.log' } }",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -2378,7 +2384,7 @@
     {
       "label": "🩺 Startup: Atlas Smoke Gate (16 probes, detached)",
       "type": "shell",
-      "command": "$stamp = 'logs/task-output/.atlas-smoke-last-run'; $cooldownSec = 1800; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🩺 atlas smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; $output = (npm run smoke:atlas 2>&1 | Tee-Object -FilePath logs/task-output/smoke-atlas-startup.log | Out-String); if ($LASTEXITCODE -eq 0) { if ($output -match 'SKIP GET /api/ace/recommendations responds — dev server down') { Write-Host '🩺 atlas smoke skipped — dev server down' } else { Set-Content $stamp (Get-Date -Format o); Write-Host '🩺 atlas smoke green' } } else { Write-Host '🩺 atlas smoke FAILED — atlas/MCP/HTTP regression detected' } }",
+      "command": "$stamp = 'logs/task-output/.atlas-smoke-last-run'; $cooldownSec = 1800; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🩺 atlas smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; $output = (npm run smoke:atlas 2>&1 | Tee-Object -FilePath logs/task-output/smoke-atlas-startup.log | Out-String); if ($LASTEXITCODE -eq 0) { if ($output -match 'SKIP GET /api/ace/recommendations responds — dev server down') { Write-Host '🩺 atlas smoke BLOCKED — dev server down (prerequisite missing; NOT a pass)'; exit 1 } else { Set-Content $stamp (Get-Date -Format o); Write-Host '🩺 atlas smoke green' } } else { Write-Host '🩺 atlas smoke FAILED — atlas/MCP/HTTP regression detected' } }",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -2410,7 +2416,6 @@
         "instanceLimit": 1
       },
       "isBackground": true,
-      "dependsOn": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
       "problemMatcher": [],
       "presentation": {
         "echo": false,
@@ -2425,7 +2430,7 @@
     {
       "label": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
       "type": "shell",
-      "command": "$stamp = 'logs/task-output/.opencode-sidecar-smoke-last-run'; $cooldownSec = 900; $portsReady = (Test-NetConnection 127.0.0.1 -Port 8791 -InformationLevel Quiet) -and (Test-NetConnection 127.0.0.1 -Port 8792 -InformationLevel Quiet) -and (Test-NetConnection 127.0.0.1 -Port 8793 -InformationLevel Quiet); if (-not $portsReady) { Write-Host '🧪 sidecar smoke skipped — one or more sidecar ports are down (:8791/:8792/:8793)'; exit 0 } elseif ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🧪 sidecar smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run smoke:mcp:opencode-sidecars 2>&1 | Tee-Object -FilePath logs/task-output/smoke-opencode-sidecars-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🧪 sidecar smoke green' } else { Write-Host '🧪 sidecar smoke FAILED — sidecar MCP regression detected' } }",
+      "command": "$stamp = 'logs/task-output/.opencode-sidecar-smoke-last-run'; $cooldownSec = 900; $portsReady = (Test-NetConnection 127.0.0.1 -Port 8791 -InformationLevel Quiet); if (-not $portsReady) { Write-Host '🧪 sidecar smoke BLOCKED — TurboVec :8791 is down (prerequisite missing; NOT a pass)'; exit 1 } elseif ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('🧪 sidecar smoke skipped — last run ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalMinutes + ' min ago (cooldown ' + ($cooldownSec/60) + ' min)') } else { New-Item -Path logs/task-output -ItemType Directory -Force | Out-Null; npm run smoke:mcp:opencode-sidecars 2>&1 | Tee-Object -FilePath logs/task-output/smoke-opencode-sidecars-startup.log; if ($LASTEXITCODE -eq 0) { Set-Content $stamp (Get-Date -Format o); Write-Host '🧪 sidecar smoke green' } else { Write-Host '🧪 sidecar smoke FAILED — sidecar MCP regression detected' } }",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -2452,10 +2457,6 @@
       "command": "node scripts/startup-gpu-bridge-probe.mjs 2>&1 | Tee-Object -FilePath logs/task-output/gpu-bridge-probe-startup.log; if ($LASTEXITCODE -eq 0) { Write-Host '🧪 GPU bridge: addon live + CUDA active' } else { Write-Host '⚠️  GPU bridge: running in CPU fallback — check .tmp/gpu-bridge-probe.json' }",
       "options": {
         "cwd": "${workspaceFolder}"
-      },
-      "runOptions": {
-        "runOn": "folderOpen",
-        "instanceLimit": 1
       },
       "isBackground": true,
       "dependsOn": "🧪 Startup: OpenCode Sidecars Smoke (detached)",
@@ -3809,6 +3810,22 @@
       },
       "problemMatcher": [],
       "detail": "Requires at least KMEANS_MIN_FREE_RAM_GIB (default 4) Windows free RAM, then measures VRAM. If VRAM is low it verifies only the :8090 process, requires idle /slots, and prompts before stopping that PID. It never unloads Ollama or starts KMeans."
+    },
+    {
+      "label": "🧮 GPU: Run job in VRAM window (free :8090 → job → restore)",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        "${workspaceFolder}\\scripts\\gpu\\run-with-vram-window.ps1",
+        "-JobScript",
+        "${input:gpuJobScript}"
+      ],
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": false },
+      "problemMatcher": [],
+      "detail": "Human-run. Prepare (idle-slot check, only --port 8090) → run ONE repo job (.ps1/.mjs/.py) → always restore :8090 via launch-turboquant (ornith-1.5-vlm, CPU projector) and write .tmp/atlas/gpu-vram-window-receipt-v1.json. Not exposed to MCP."
     },
     {
       "label": "⚡ TurboQuant: Test Inference (hearsay query)",
@@ -11976,9 +11993,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "problemMatcher": [],
       "presentation": {
         "echo": true,
@@ -12020,9 +12034,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "problemMatcher": [],
       "presentation": {
         "echo": true,
@@ -12042,9 +12053,6 @@
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "problemMatcher": [],
       "presentation": {
         "echo": true,
@@ -12185,6 +12193,91 @@
       "dependsOrder": "sequence",
       "problemMatcher": [],
       "detail": "Validates the unified graph Top-K, OAKLIB ontology sidecar, and SearchRuntime integration."
+    },
+    {
+      "label": "Workstation: Capture inventory (quick)",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\ops\\capture-workstation-inventory.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Captures disk, Docker, Drizzle, and read-only PostgreSQL inventory without scanning node_modules."
+    },
+    {
+      "label": "Workstation: Full node_modules scan",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\ops\\capture-workstation-inventory.ps1",
+        "-ScanNodeModules",
+        "-ScanGitIgnored",
+        "-MaxNodeModulesScanSeconds",
+        "300"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Runs bounded node_modules and Git-ignored-file inventories (up to five minutes each) and writes reports outside the repository."
+    },
+    {
+      "label": "Workstation: Validate latest inventory",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\ops\\validate-workstation-inventory.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Checks the latest report for PG18/pgvector, evidence outbox, Drizzle alignment, scan completeness, and warnings."
+    },
+    {
+      "label": "Workstation: Git-ignored breakdown (extended)",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\ops\\capture-workstation-inventory.ps1",
+        "-ScanGitIgnored",
+        "-MaxNodeModulesScanSeconds",
+        "1800"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "detail": "Produces ranked top-level ignored-file totals only, with a 30-minute hard bound; writes reports outside the repository."
+    },
+    {
+      "label": "Workstation: Full scan + validate",
+      "dependsOn": [
+        "Workstation: Full node_modules scan",
+        "Workstation: Validate latest inventory"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "detail": "Runs the bounded full inventory, then validates its newest snapshot. Warnings are reported without failing the task."
     }
   ]
 }

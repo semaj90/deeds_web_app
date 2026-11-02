@@ -1,6 +1,7 @@
 <!--
   FileUploadModal - Drag-drop file upload dialog
   Used for uploading audio/documents to chat context
+  Migrated to Bits UI v2 Dialog primitives + Tactical HUD Aesthetic
 -->
 <script lang="ts">
   import { Dialog } from 'bits-ui';
@@ -130,101 +131,149 @@
 
 <Dialog.Root bind:open>
   <Dialog.Portal>
-    <Dialog.Overlay class="fixed inset-0 bg-black/50 z-50" />
-    <Dialog.Content
-      class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl max-h-[85vh] bg-panel border border-sand/20 rounded-lg shadow-lg overflow-hidden"
-    >
-      <div class="flex flex-col h-full max-h-[85vh]">
-        <!-- Header -->
-        <div class="px-6 py-4 border-b border-sand/20 flex items-center justify-between">
-          <Dialog.Title class="text-lg font-semibold flex items-center gap-2">
-            <Icon name="upload" class="w-5 h-5" />
-            Upload Files to Chat
-          </Dialog.Title>
-          <Dialog.Close
-            class="p-1 hover:bg-sand/10 rounded transition-colors"
-            aria-label="Close dialog"
-          >
-            <Icon name="x" class="w-5 h-5" />
-          </Dialog.Close>
-        </div>
+    <!-- Tactical Backdrop -->
+    <Dialog.Overlay class="hud-modal-backdrop fixed inset-0 z-[9990] bg-black/80 backdrop-blur-md transition-opacity" />
 
-        <!-- Body -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
-          <Dialog.Description class="text-sm text-sand/70">
-            Upload documents, images, or audio files to add context to your conversation.
-            Maximum {maxFiles} files, {maxSizeMB}MB each.
-          </Dialog.Description>
+    <!-- Centered Modal Content Container -->
+    <div class="fixed inset-0 z-[9991] flex items-center justify-center p-4 pointer-events-none">
+      <Dialog.Content
+        class="pointer-events-auto relative w-full max-w-2xl max-h-[85vh] bg-[#131b2a]/95 text-sand border border-[#f3d471]/30 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl"
+      >
+        <!-- Tactical Corner Notches (Phoenix Justice / YoRHa HUD) -->
+        <span class="hud-notch-tl" aria-hidden="true"></span>
+        <span class="hud-notch-tr" aria-hidden="true"></span>
+        <span class="hud-notch-bl" aria-hidden="true"></span>
+        <span class="hud-notch-br" aria-hidden="true"></span>
 
-          <!-- Drop Zone -->
-          <div
-            class="border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer {isDragOver ? 'border-info bg-info/5' : 'border-sand/20 hover:border-sand/40'}"
-            ondragover={handleDragOver}
-            ondragleave={handleDragLeave}
-            ondrop={handleDrop}
-            onclick={() => fileInput?.click()}
-            onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && fileInput?.click()}
-            role="button"
-            tabindex="0"
-          >
-            <Icon name="upload-cloud" class="w-12 h-12 mx-auto text-sand/40 mb-4" />
-            <p class="text-base font-medium mb-1">
-              Drop files here or click to browse
-            </p>
-            <p class="text-sm text-sand/60">
-              PDF, Documents, Images, Audio, Video
-            </p>
-          </div>
+        <!-- Top Highlight Bar -->
+        <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#f3d471]/80 to-transparent"></div>
 
-          <!-- Hidden file input -->
-          <input
-            bind:this={fileInput}
-            type="file"
-            multiple
-            accept={acceptedTypes.join(',')}
-            onchange={handleFileSelect}
-            class="hidden"
-          />
-
-          <!-- Selected Files -->
-          {#if selectedFiles.length > 0}
-            <div class="space-y-3">
-              <h4 class="font-medium text-sm">
-                Selected Files ({selectedFiles.length}/{maxFiles})
-              </h4>
-              <div class="grid gap-2">
-                {#each selectedFiles as file (file.name)}
-                  <DocumentChip
-                    fileName={file.name}
-                    fileSize={file.size}
-                    fileType={file.type}
-                    previewUrl={previews[file.name]}
-                    onremove={() => removeFile(file.name)}
-                  />
-                {/each}
-              </div>
-            </div>
-          {/if}
-        </div>
-
-        <!-- Footer -->
-        <div class="px-6 py-4 border-t border-sand/20 flex items-center justify-between">
-          <p class="text-sm text-sand/60">
-            {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''} selected
-          </p>
-          <div class="flex gap-2">
-            <Button onclick={handleClose}>Cancel</Button>
-            <Button
-              onclick={handleSubmit}
-              disabled={selectedFiles.length === 0}
-              class="min-w-24"
+        <div class="flex flex-col h-full max-h-[85vh]">
+          <!-- Header -->
+          <div class="px-6 py-4 border-b border-[#f3d471]/20 flex items-center justify-between">
+            <Dialog.Title class="text-base font-bold text-white flex items-center gap-2">
+              <span class="text-[#f3d471]">📂</span>
+              <span>Upload Files to Chat</span>
+            </Dialog.Title>
+            <Dialog.Close
+              class="p-1 text-neutral-400 hover:text-white rounded hover:bg-white/10 transition-colors"
+              aria-label="Close dialog"
             >
-              <Icon name="check" class="w-4 h-4 mr-2" />
-              Add Files
-            </Button>
+              <Icon name="x" class="w-5 h-5" />
+            </Dialog.Close>
+          </div>
+
+          <!-- Body -->
+          <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <Dialog.Description class="text-sm text-sand/70">
+              Upload documents, images, or audio files to add context to your conversation.
+              Maximum {maxFiles} files, {maxSizeMB}MB each.
+            </Dialog.Description>
+
+            <!-- Drop Zone -->
+            <div
+              class="border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer {isDragOver ? 'border-[#f3d471] bg-[#f3d471]/10' : 'border-sand/20 hover:border-[#f3d471]/40'}"
+              ondragover={handleDragOver}
+              ondragleave={handleDragLeave}
+              ondrop={handleDrop}
+              onclick={() => fileInput?.click()}
+              onkeydown={(e) => e.key === 'Enter' && fileInput?.click()}
+              role="button"
+              tabindex="0"
+            >
+              <input
+                bind:this={fileInput}
+                type="file"
+                multiple
+                accept={acceptedTypes.join(',')}
+                class="hidden"
+                onchange={handleFileSelect}
+              />
+              <Icon name="upload" class="w-12 h-12 mx-auto mb-4 text-[#f3d471]/80" />
+              <p class="text-sm text-sand/90 mb-1">
+                Drag and drop files here, or <span class="text-[#f3d471] underline font-semibold">browse</span>
+              </p>
+              <p class="text-xs text-sand/50 font-mono">
+                Supports PDF, DOCX, TXT, Images, Audio, Video
+              </p>
+            </div>
+
+            <!-- Previews / Selected Files -->
+            {#if selectedFiles.length > 0}
+              <div class="space-y-3">
+                <h4 class="text-xs font-semibold text-[#f3d471] uppercase tracking-wider font-mono">
+                  Attached Files ({selectedFiles.length}/{maxFiles})
+                </h4>
+                <div class="grid gap-2">
+                  {#each selectedFiles as file (file.name)}
+                    <DocumentChip
+                      fileName={file.name}
+                      fileSize={file.size}
+                      fileType={file.type}
+                      previewUrl={previews[file.name]}
+                      onremove={() => removeFile(file.name)}
+                    />
+                  {/each}
+                </div>
+              </div>
+            {/if}
+          </div>
+
+          <!-- Footer -->
+          <div class="px-6 py-4 border-t border-[#f3d471]/20 flex items-center justify-between bg-black/20">
+            <p class="text-xs text-sand/60 font-mono">
+              {selectedFiles.length} file{selectedFiles.length !== 1 ? 's' : ''} selected
+            </p>
+            <div class="flex gap-2">
+              <Button onclick={handleClose} variant="ghost">Cancel</Button>
+              <Button
+                onclick={handleSubmit}
+                disabled={selectedFiles.length === 0}
+                class="min-w-24 bg-[#f3d471] hover:bg-[#ffe180] text-black font-bold uppercase tracking-wider text-xs"
+              >
+                <Icon name="check" class="w-4 h-4 mr-2" />
+                Add Files
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-    </Dialog.Content>
+      </Dialog.Content>
+    </div>
   </Dialog.Portal>
 </Dialog.Root>
+
+<style>
+  .hud-notch-tl,
+  .hud-notch-tr,
+  .hud-notch-bl,
+  .hud-notch-br {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+  }
+  .hud-notch-tl {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid #f3d471;
+    border-left: 2px solid #f3d471;
+  }
+  .hud-notch-tr {
+    top: -1px;
+    right: -1px;
+    border-top: 2px solid #f3d471;
+    border-right: 2px solid #f3d471;
+  }
+  .hud-notch-bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom: 2px solid #f3d471;
+    border-left: 2px solid #f3d471;
+  }
+  .hud-notch-br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid #f3d471;
+    border-right: 2px solid #f3d471;
+  }
+</style>

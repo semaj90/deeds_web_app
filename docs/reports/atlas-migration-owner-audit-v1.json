@@ -1,6 +1,6 @@
 {
   "schema": "atlas_migration_owner_audit_v1",
-  "generatedAt": "2026-10-25T23:30:12.786Z",
+  "generatedAt": "2026-11-02T02:47:25.856Z",
   "writes": false,
   "live": {
     "reachable": true,
@@ -29,11 +29,23 @@
           "created_at",
           "updated_at"
         ],
+        "indexes": [
+          "graphify_files_code_source_revision_compat_v1",
+          "graphify_files_code_source_revision_idx_v2",
+          "graphify_files_code_source_revision_uq_v3",
+          "graphify_files_content_hash_idx_v2",
+          "graphify_files_last_seen_run_id_idx_v2",
+          "graphify_files_legacy_source_revision_provenance_idx_v2",
+          "graphify_files_pkey",
+          "graphify_files_source_ref_idx_v2",
+          "graphify_files_workspace_source_compat_v1"
+        ],
         "rowCount": 0
       },
       "atlas_file_search_index_v1": {
         "exists": false,
         "columns": [],
+        "indexes": [],
         "rowCount": null
       },
       "atlas_callable_search": {
@@ -70,6 +82,22 @@
           "inferred_uses",
           "enrichment_metadata"
         ],
+        "indexes": [
+          "atlas_callable_search_calls_gin",
+          "atlas_callable_search_domain_idx",
+          "atlas_callable_search_enrichment_metadata_gin",
+          "atlas_callable_search_imports_gin",
+          "atlas_callable_search_inferred_uses_gin",
+          "atlas_callable_search_metadata_gin",
+          "atlas_callable_search_node_kind_idx",
+          "atlas_callable_search_packet_ordinal_idx",
+          "atlas_callable_search_parameter_names_gin",
+          "atlas_callable_search_parameter_types_gin",
+          "atlas_callable_search_pkey",
+          "atlas_callable_search_qualified_name_idx",
+          "atlas_callable_search_search_vector_gin",
+          "atlas_callable_search_source_revision_idx"
+        ],
         "rowCount": 0
       },
       "atlas_observation_feature_rows": {
@@ -104,6 +132,22 @@
           "source_revision",
           "registry_revision"
         ],
+        "indexes": [
+          "atlas_observation_feature_rows_ast_gin",
+          "atlas_observation_feature_rows_community_idx",
+          "atlas_observation_feature_rows_extract_gin",
+          "atlas_observation_feature_rows_feature_revision_idx",
+          "atlas_observation_feature_rows_kmeans_idx",
+          "atlas_observation_feature_rows_ontology_gin",
+          "atlas_observation_feature_rows_pk",
+          "atlas_observation_feature_rows_representation_idx",
+          "atlas_observation_feature_rows_som_idx",
+          "atlas_observation_feature_rows_source_ref_idx",
+          "atlas_observation_feature_rows_tags_gin",
+          "atlas_observation_feature_rows_tree_node_idx",
+          "atlas_observation_feature_rows_workspace_feature_idx",
+          "atlas_observation_feature_rows_workspace_packet_idx"
+        ],
         "rowCount": 0
       },
       "atlas_symbol_registry": {
@@ -123,19 +167,105 @@
           "created_at",
           "updated_at"
         ],
+        "indexes": [
+          "atlas_symbol_registry_canonical_key_key",
+          "atlas_symbol_registry_pkey",
+          "idx_atlas_symbol_registry_kind",
+          "idx_atlas_symbol_registry_name"
+        ],
         "rowCount": 0
       },
       "feature_registry": {
         "exists": false,
         "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "evidence_board_edges": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "saved_citation_annotations": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "agent_progress_log": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "feature_tasks": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "documents_atlas_entries": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "feature_index_entries": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "retrieval_cache_traces": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null
+      },
+      "atlas_svg_glyphs": {
+        "exists": true,
+        "columns": [
+          "id",
+          "packet_key",
+          "source_ref",
+          "glyph_id",
+          "glyph_type",
+          "created_at"
+        ],
+        "indexes": [
+          "atlas_svg_glyphs_packet_key_key",
+          "atlas_svg_glyphs_pkey",
+          "idx_svg_glyphs_glyph_id",
+          "idx_svg_glyphs_packet_key"
+        ],
+        "rowCount": 0
+      },
+      "feature_registry_vectors": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
         "rowCount": null
       }
     }
   },
+  "historyReport": {
+    "path": "C:\\Users\\james\\AppData\\Local\\DeedsWebApp\\inventory\\drizzle-history-readonly-latest.json",
+    "sha256": "125fcc545ad0062795f02d1bb16f9a24417e7ff5d1a11318dbf23040acbf928d",
+    "ledgerRows": 0
+  },
   "results": [
     {
+      "liveState": "PRESENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "OWNED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
       "id": "graphify_source_inventory",
       "table": "graphify_files",
+      "sourceKind": "sidecar",
       "expectedStatus": "active_candidate",
       "sql": {
         "files": [
@@ -226,14 +356,34 @@
           "created_at",
           "updated_at"
         ],
+        "indexes": [
+          "graphify_files_code_source_revision_compat_v1",
+          "graphify_files_code_source_revision_idx_v2",
+          "graphify_files_code_source_revision_uq_v3",
+          "graphify_files_content_hash_idx_v2",
+          "graphify_files_last_seen_run_id_idx_v2",
+          "graphify_files_legacy_source_revision_provenance_idx_v2",
+          "graphify_files_pkey",
+          "graphify_files_source_ref_idx_v2",
+          "graphify_files_workspace_source_compat_v1"
+        ],
         "rowCount": 0,
-        "expectedMissing": []
+        "expectedMissing": [],
+        "expectedIndexesMissing": []
       },
       "classification": "LIVE_SHAPE_ALIGNED"
     },
     {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
       "id": "graphify_file_search_projection",
       "table": "atlas_file_search_index_v1",
+      "sourceKind": "sidecar",
       "expectedStatus": "active_candidate",
       "sql": {
         "files": [
@@ -302,6 +452,7 @@
       "live": {
         "exists": false,
         "columns": [],
+        "indexes": [],
         "rowCount": null,
         "expectedMissing": [
           "candidate_ordinal",
@@ -309,13 +460,22 @@
           "embedding",
           "feature_bitmap",
           "search_vector"
-        ]
+        ],
+        "expectedIndexesMissing": []
       },
-      "classification": "SIDEcar_UNAPPLIED"
+      "classification": "SIDECAR_UNAPPLIED"
     },
     {
+      "liveState": "PRESENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "OWNED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
       "id": "callable_search_projection",
       "table": "atlas_callable_search",
+      "sourceKind": "sidecar",
       "expectedStatus": "active_candidate",
       "sql": {
         "files": [
@@ -418,14 +578,39 @@
           "inferred_uses",
           "enrichment_metadata"
         ],
+        "indexes": [
+          "atlas_callable_search_calls_gin",
+          "atlas_callable_search_domain_idx",
+          "atlas_callable_search_enrichment_metadata_gin",
+          "atlas_callable_search_imports_gin",
+          "atlas_callable_search_inferred_uses_gin",
+          "atlas_callable_search_metadata_gin",
+          "atlas_callable_search_node_kind_idx",
+          "atlas_callable_search_packet_ordinal_idx",
+          "atlas_callable_search_parameter_names_gin",
+          "atlas_callable_search_parameter_types_gin",
+          "atlas_callable_search_pkey",
+          "atlas_callable_search_qualified_name_idx",
+          "atlas_callable_search_search_vector_gin",
+          "atlas_callable_search_source_revision_idx"
+        ],
         "rowCount": 0,
-        "expectedMissing": []
+        "expectedMissing": [],
+        "expectedIndexesMissing": []
       },
       "classification": "LIVE_SHAPE_ALIGNED"
     },
     {
+      "liveState": "PRESENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "OWNED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
       "id": "observation_feature_rows_active",
       "table": "atlas_observation_feature_rows",
+      "sourceKind": "sidecar",
       "expectedStatus": "active_candidate",
       "sql": {
         "files": [
@@ -527,14 +712,39 @@
           "source_revision",
           "registry_revision"
         ],
+        "indexes": [
+          "atlas_observation_feature_rows_ast_gin",
+          "atlas_observation_feature_rows_community_idx",
+          "atlas_observation_feature_rows_extract_gin",
+          "atlas_observation_feature_rows_feature_revision_idx",
+          "atlas_observation_feature_rows_kmeans_idx",
+          "atlas_observation_feature_rows_ontology_gin",
+          "atlas_observation_feature_rows_pk",
+          "atlas_observation_feature_rows_representation_idx",
+          "atlas_observation_feature_rows_som_idx",
+          "atlas_observation_feature_rows_source_ref_idx",
+          "atlas_observation_feature_rows_tags_gin",
+          "atlas_observation_feature_rows_tree_node_idx",
+          "atlas_observation_feature_rows_workspace_feature_idx",
+          "atlas_observation_feature_rows_workspace_packet_idx"
+        ],
         "rowCount": 0,
-        "expectedMissing": []
+        "expectedMissing": [],
+        "expectedIndexesMissing": []
       },
       "classification": "LIVE_SHAPE_ALIGNED"
     },
     {
+      "liveState": "PRESENT_SHAPE_DRIFT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "OWNED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
       "id": "observation_feature_rows_superseded_candidate",
       "table": "atlas_observation_feature_rows",
+      "sourceKind": "sidecar",
       "expectedStatus": "superseded_unapplied",
       "sql": {
         "files": [
@@ -625,18 +835,43 @@
           "source_revision",
           "registry_revision"
         ],
+        "indexes": [
+          "atlas_observation_feature_rows_ast_gin",
+          "atlas_observation_feature_rows_community_idx",
+          "atlas_observation_feature_rows_extract_gin",
+          "atlas_observation_feature_rows_feature_revision_idx",
+          "atlas_observation_feature_rows_kmeans_idx",
+          "atlas_observation_feature_rows_ontology_gin",
+          "atlas_observation_feature_rows_pk",
+          "atlas_observation_feature_rows_representation_idx",
+          "atlas_observation_feature_rows_som_idx",
+          "atlas_observation_feature_rows_source_ref_idx",
+          "atlas_observation_feature_rows_tags_gin",
+          "atlas_observation_feature_rows_tree_node_idx",
+          "atlas_observation_feature_rows_workspace_feature_idx",
+          "atlas_observation_feature_rows_workspace_packet_idx"
+        ],
         "rowCount": 0,
         "expectedMissing": [
           "candidate_id",
           "semantic_768",
           "row_ordinal"
-        ]
+        ],
+        "expectedIndexesMissing": []
       },
       "classification": "SUPERSEDED_TABLE_NAME_COLLISION"
     },
     {
+      "liveState": "PRESENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "OWNED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
       "id": "symbol_registry",
       "table": "atlas_symbol_registry",
+      "sourceKind": "sidecar",
       "expectedStatus": "active_candidate",
       "sql": {
         "files": [
@@ -718,28 +953,57 @@
           "created_at",
           "updated_at"
         ],
+        "indexes": [
+          "atlas_symbol_registry_canonical_key_key",
+          "atlas_symbol_registry_pkey",
+          "idx_atlas_symbol_registry_kind",
+          "idx_atlas_symbol_registry_name"
+        ],
         "rowCount": 0,
-        "expectedMissing": []
+        "expectedMissing": [],
+        "expectedIndexesMissing": []
       },
       "classification": "LIVE_SHAPE_ALIGNED"
     },
     {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": {
+        "tags": [
+          "0024_nebulous_mongoose",
+          "0025_yellow_tony_stark"
+        ],
+        "ledgerRowPresent": [
+          false,
+          false
+        ]
+      },
+      "writesPerformed": false,
       "id": "feature_registry",
       "table": "feature_registry",
+      "sourceKind": "journal_chain",
       "expectedStatus": "active_candidate",
       "sql": {
         "files": [
-          "drizzle/0024_nebulous_mongoose.sql"
+          "drizzle/0024_nebulous_mongoose.sql",
+          "drizzle/0025_yellow_tony_stark.sql"
         ],
         "columns": [
+          "chunk_ids",
           "cluster_id",
           "code_refs",
           "description",
           "feature_key",
           "id",
           "last_verified_at",
+          "retry_queries",
           "source_refs",
           "status",
+          "summary",
+          "tags",
           "test_refs",
           "title",
           "trust_tier"
@@ -779,23 +1043,697 @@
       "live": {
         "exists": false,
         "columns": [],
+        "indexes": [],
         "rowCount": null,
         "expectedMissing": [
           "id",
           "feature_key",
           "title",
+          "description",
           "status",
-          "source_refs"
+          "summary",
+          "source_refs",
+          "chunk_ids",
+          "tags",
+          "code_refs",
+          "test_refs",
+          "retry_queries",
+          "cluster_id",
+          "trust_tier",
+          "last_verified_at"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": {
+        "tags": [
+          "0024_nebulous_mongoose"
+        ],
+        "ledgerRowPresent": [
+          false
         ]
       },
-      "classification": "SIDEcar_UNAPPLIED"
+      "writesPerformed": false,
+      "id": "journal_0024_evidence_board_edges",
+      "table": "evidence_board_edges",
+      "sourceKind": "journal_chain",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0024_nebulous_mongoose.sql"
+        ],
+        "columns": [
+          "annotation_id",
+          "board_id",
+          "citation_id",
+          "confidence",
+          "created_at",
+          "from_node_id",
+          "id",
+          "metadata",
+          "relation_type",
+          "to_node_id"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/0024_nebulous_mongoose.sql",
+            "entry": {
+              "status": "active_candidate",
+              "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "id"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": {
+        "tags": [
+          "0024_nebulous_mongoose"
+        ],
+        "ledgerRowPresent": [
+          false
+        ]
+      },
+      "writesPerformed": false,
+      "id": "journal_0024_saved_citation_annotations",
+      "table": "saved_citation_annotations",
+      "sourceKind": "journal_chain",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0024_nebulous_mongoose.sql"
+        ],
+        "columns": [
+          "annotation_type",
+          "body",
+          "chunk_ids",
+          "citation_id",
+          "created_at",
+          "id",
+          "llm_output",
+          "logic",
+          "metadata",
+          "source_refs",
+          "token_map",
+          "updated_at",
+          "user_id"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/0024_nebulous_mongoose.sql",
+            "entry": {
+              "status": "active_candidate",
+              "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "id"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": {
+        "tags": [
+          "0024_nebulous_mongoose"
+        ],
+        "ledgerRowPresent": [
+          false
+        ]
+      },
+      "writesPerformed": false,
+      "id": "journal_0024_agent_progress_log",
+      "table": "agent_progress_log",
+      "sourceKind": "journal_chain",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0024_nebulous_mongoose.sql"
+        ],
+        "columns": [
+          "attempted_fix",
+          "commands_run",
+          "created_at",
+          "error_signature",
+          "feature_key",
+          "files_changed",
+          "id",
+          "query",
+          "result",
+          "retry_query",
+          "run_id"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/0024_nebulous_mongoose.sql",
+            "entry": {
+              "status": "active_candidate",
+              "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "id"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": {
+        "tags": [
+          "0024_nebulous_mongoose"
+        ],
+        "ledgerRowPresent": [
+          false
+        ]
+      },
+      "writesPerformed": false,
+      "id": "journal_0024_feature_tasks",
+      "table": "feature_tasks",
+      "sourceKind": "journal_chain",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0024_nebulous_mongoose.sql"
+        ],
+        "columns": [
+          "checkbox_text",
+          "created_at",
+          "feature_key",
+          "id",
+          "priority",
+          "source_ref",
+          "status",
+          "suggested_command"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/0024_nebulous_mongoose.sql",
+            "entry": {
+              "status": "active_candidate",
+              "reason": "Drizzle journal migration 0024_nebulous_mongoose.sql defining evidence_board_edges, saved_citation_annotations, agent_progress_log, feature_registry, and feature_tasks. Live table feature_registry pending transactional apply."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "id"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED_REPLAY_BLOCKED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": "DESTRUCTIVE_DDL_DROP_AFTER_BACKFILL",
+      "journalHistory": {
+        "tags": [
+          "0023_exotic_wrecker"
+        ],
+        "ledgerRowPresent": [
+          false
+        ]
+      },
+      "writesPerformed": false,
+      "id": "journal_0023_documents_atlas_entries",
+      "table": "documents_atlas_entries",
+      "sourceKind": "journal_chain",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0023_exotic_wrecker.sql"
+        ],
+        "columns": [
+          "ast_relations",
+          "bifrost_model_id",
+          "cache_signals",
+          "exported_symbols",
+          "feature_families",
+          "feature_family",
+          "hits",
+          "imported_symbols",
+          "keywords",
+          "labels",
+          "latency_ms",
+          "libraries",
+          "metadata",
+          "owning_library",
+          "packet_id",
+          "path",
+          "programming_language",
+          "protocol_detected",
+          "protocols",
+          "query_hash",
+          "recommendation",
+          "route_kind",
+          "run_id",
+          "selected",
+          "source_ref",
+          "stable_key",
+          "sveltekit_route",
+          "token_estimate",
+          "toon_bytes"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": []
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "source_ref",
+          "path"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED_REPLAY_BLOCKED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": "DESTRUCTIVE_DDL_DROP_AFTER_BACKFILL",
+      "journalHistory": {
+        "tags": [
+          "0023_exotic_wrecker"
+        ],
+        "ledgerRowPresent": [
+          false
+        ]
+      },
+      "writesPerformed": false,
+      "id": "journal_0023_feature_index_entries",
+      "table": "feature_index_entries",
+      "sourceKind": "journal_chain",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0023_exotic_wrecker.sql"
+        ],
+        "columns": [
+          "ast_relations",
+          "bifrost_model_id",
+          "cache_signals",
+          "exported_symbols",
+          "feature_families",
+          "feature_family",
+          "hits",
+          "imported_symbols",
+          "keywords",
+          "labels",
+          "latency_ms",
+          "libraries",
+          "metadata",
+          "owning_library",
+          "packet_id",
+          "path",
+          "programming_language",
+          "protocol_detected",
+          "protocols",
+          "query_hash",
+          "recommendation",
+          "route_kind",
+          "run_id",
+          "selected",
+          "source_ref",
+          "stable_key",
+          "sveltekit_route",
+          "token_estimate",
+          "toon_bytes"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": []
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "stable_key",
+          "path"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "REVIEW_REQUIRED_REPLAY_BLOCKED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": "DESTRUCTIVE_DDL_DROP_AFTER_BACKFILL",
+      "journalHistory": {
+        "tags": [
+          "0023_exotic_wrecker"
+        ],
+        "ledgerRowPresent": [
+          false
+        ]
+      },
+      "writesPerformed": false,
+      "id": "journal_0023_retrieval_cache_traces",
+      "table": "retrieval_cache_traces",
+      "sourceKind": "journal_chain",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0023_exotic_wrecker.sql"
+        ],
+        "columns": [
+          "ast_relations",
+          "bifrost_model_id",
+          "cache_signals",
+          "exported_symbols",
+          "feature_families",
+          "feature_family",
+          "hits",
+          "imported_symbols",
+          "keywords",
+          "labels",
+          "latency_ms",
+          "libraries",
+          "metadata",
+          "owning_library",
+          "packet_id",
+          "path",
+          "programming_language",
+          "protocol_detected",
+          "protocols",
+          "query_hash",
+          "recommendation",
+          "route_kind",
+          "run_id",
+          "selected",
+          "source_ref",
+          "stable_key",
+          "sveltekit_route",
+          "token_estimate",
+          "toon_bytes"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": []
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "run_id",
+          "query_hash"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "JOURNALED_OBJECT_ABSENT"
+    },
+    {
+      "liveState": "PRESENT_SHAPE_DRIFT",
+      "historyState": "HISTORY_UNRESOLVED",
+      "ownershipState": "OWNED",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
+      "id": "sidecar_0099_atlas_svg_glyphs",
+      "table": "atlas_svg_glyphs",
+      "sourceKind": "sidecar",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [
+          "drizzle/0099_atlas_svg_glyphs.sql"
+        ],
+        "columns": [
+          "created_at",
+          "glyph_id",
+          "glyph_type",
+          "id",
+          "packet_key",
+          "source_ref",
+          "updated_at"
+        ],
+        "expectedMissing": []
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [],
+        "present": false
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": [
+          {
+            "file": "drizzle/0099_atlas_svg_glyphs.sql",
+            "entry": {
+              "status": "applied",
+              "reason": "Existing additive atlas_svg_glyphs table and lookup indexes were found live but were not registered in the sidecar manifest. Applied date is not inferred from current evidence."
+            }
+          }
+        ]
+      },
+      "live": {
+        "exists": true,
+        "columns": [
+          "id",
+          "packet_key",
+          "source_ref",
+          "glyph_id",
+          "glyph_type",
+          "created_at"
+        ],
+        "indexes": [
+          "atlas_svg_glyphs_packet_key_key",
+          "atlas_svg_glyphs_pkey",
+          "idx_svg_glyphs_glyph_id",
+          "idx_svg_glyphs_packet_key"
+        ],
+        "rowCount": 0,
+        "expectedMissing": [
+          "updated_at"
+        ],
+        "expectedIndexesMissing": [
+          "idx_svg_glyphs_source_ref",
+          "idx_svg_glyphs_glyph_type"
+        ]
+      },
+      "classification": "LIVE_SHAPE_MISMATCH"
+    },
+    {
+      "liveState": "ABSENT",
+      "historyState": "NO_DDL_HISTORY",
+      "ownershipState": "UNOWNED_DECLARATION",
+      "proposedAction": "NO_DDL",
+      "replayBlocked": null,
+      "journalHistory": null,
+      "writesPerformed": false,
+      "id": "feature_registry_vectors",
+      "table": "feature_registry_vectors",
+      "sourceKind": "drizzle_declaration",
+      "expectedStatus": "active_candidate",
+      "sql": {
+        "files": [],
+        "columns": [],
+        "expectedMissing": [
+          "embedding",
+          "owner_file",
+          "status"
+        ]
+      },
+      "competingDefinitions": {
+        "files": [],
+        "present": [],
+        "excludedFromOwnership": true
+      },
+      "drizzle": {
+        "files": [
+          "src/lib/server/db/schema/feature-registry-vectors.ts"
+        ],
+        "present": true
+      },
+      "manifest": {
+        "allRegistered": true,
+        "entries": []
+      },
+      "live": {
+        "exists": false,
+        "columns": [],
+        "indexes": [],
+        "rowCount": null,
+        "expectedMissing": [
+          "embedding",
+          "owner_file",
+          "status"
+        ],
+        "expectedIndexesMissing": []
+      },
+      "classification": "DECLARATION_ONLY"
     }
   ],
   "summary": {
     "missingManifestRegistration": [],
     "sidecarUnapplied": [
-      "graphify_file_search_projection",
-      "feature_registry"
+      "graphify_file_search_projection"
+    ],
+    "journaledObjectAbsent": [
+      "feature_registry",
+      "journal_0024_evidence_board_edges",
+      "journal_0024_saved_citation_annotations",
+      "journal_0024_agent_progress_log",
+      "journal_0024_feature_tasks",
+      "journal_0023_documents_atlas_entries",
+      "journal_0023_feature_index_entries",
+      "journal_0023_retrieval_cache_traces"
     ],
     "liveShapeAligned": [
       "graphify_source_inventory",
@@ -803,8 +1741,31 @@
       "observation_feature_rows_active",
       "symbol_registry"
     ],
+    "liveShapeDrift": [
+      "sidecar_0099_atlas_svg_glyphs"
+    ],
     "superseded": [
       "observation_feature_rows_superseded_candidate"
+    ],
+    "declarationOnly": [
+      "feature_registry_vectors"
+    ],
+    "historyUnresolved": [
+      "graphify_source_inventory",
+      "graphify_file_search_projection",
+      "callable_search_projection",
+      "observation_feature_rows_active",
+      "observation_feature_rows_superseded_candidate",
+      "symbol_registry",
+      "feature_registry",
+      "journal_0024_evidence_board_edges",
+      "journal_0024_saved_citation_annotations",
+      "journal_0024_agent_progress_log",
+      "journal_0024_feature_tasks",
+      "journal_0023_documents_atlas_entries",
+      "journal_0023_feature_index_entries",
+      "journal_0023_retrieval_cache_traces",
+      "sidecar_0099_atlas_svg_glyphs"
     ]
   }
 }

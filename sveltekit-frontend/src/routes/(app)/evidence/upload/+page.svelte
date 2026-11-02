@@ -342,10 +342,6 @@
 		transform: scale(1.02);
 	}
 
-	.upload-icon {
-		font-size: 3rem;
-		margin-bottom: 1rem;
-	}
 
 	.upload-zone h2 {
 		margin: 0 0 0.5rem 0;
@@ -358,11 +354,6 @@
 		color: #666;
 	}
 
-	.file-types {
-		font-size: 0.9rem;
-		color: #999;
-		margin-top: 1rem;
-	}
 
 	.progress-container {
 		margin-top: 2rem;

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { PgDialect } from 'drizzle-orm/pg-core';
 
 type Row = Record<string, unknown>;
 
@@ -7,11 +8,16 @@ const dbState = vi.hoisted(() => {
   const updateResults: Row[][] = [];
   const insertResults: Row[][] = [];
   const executeResults: Row[][] = [];
+  const selectWhereConditions: unknown[] = [];
+  const updateWhereConditions: unknown[] = [];
 
   const makeQuery = (rows: Row[]) => {
     const query: any = {
       from: vi.fn(() => query),
-      where: vi.fn(() => query),
+      where: vi.fn((condition: unknown) => {
+        selectWhereConditions.push(condition);
+        return query;
+      }),
       orderBy: vi.fn(() => query),
       limit: vi.fn(() => Promise.resolve(rows)),
     };
@@ -23,9 +29,12 @@ const dbState = vi.hoisted(() => {
     select: vi.fn(() => makeQuery(selectResults.shift() ?? [])),
     update: vi.fn(() => ({
       set: vi.fn(() => ({
-        where: vi.fn(() => ({
+        where: vi.fn((condition: unknown) => {
+          updateWhereConditions.push(condition);
+          return {
           returning: vi.fn(() => Promise.resolve(updateResults.shift() ?? [])),
-        })),
+          };
+        }),
       })),
     })),
     insert: vi.fn(() => ({
@@ -37,7 +46,7 @@ const dbState = vi.hoisted(() => {
     transaction: vi.fn(async (fn: (tx: typeof db) => Promise<unknown>) => fn(db as typeof db)),
   };
 
-  return { db, selectResults, updateResults, insertResults, executeResults };
+  return { db, selectResults, updateResults, insertResults, executeResults, selectWhereConditions, updateWhereConditions };
 });
 
 vi.mock('$lib/server/db/client.js', () => ({
@@ -74,6 +83,8 @@ describe('kanban-task-board', () => {
     dbState.updateResults.length = 0;
     dbState.insertResults.length = 0;
     dbState.executeResults.length = 0;
+    dbState.selectWhereConditions.length = 0;
+    dbState.updateWhereConditions.length = 0;
   });
 
   it('lists tasks from the mocked board', async () => {
@@ -102,6 +113,27 @@ describe('kanban-task-board', () => {
     expect(formatKanbanTaskSummary(result.tasks[0]!)).toContain('Feature A');
   });
 
+  it('compiles cohort filtering and fail-closed dependency readiness into the task query', async () => {
+    dbState.selectResults.push([], [{ total: 0 }]);
+
+    await listKanbanTasks({
+      featureId: 'openspec:parent-atlas-agentic-file-compiler',
+      lane: 'todo',
+      status: 'pending',
+      readyOnly: true,
+      limit: 5,
+    });
+
+    const compiled = new PgDialect().sqlToQuery(dbState.selectWhereConditions[0] as never);
+    expect(compiled.sql).toContain('feature_id');
+    expect(compiled.sql).toContain('NOT EXISTS');
+    expect(compiled.sql).toContain('kanban_task_dependencies');
+    expect(compiled.sql).toContain('parent.task_id IS NULL');
+    expect(compiled.sql).toContain("parent.lane IS DISTINCT FROM 'done'");
+    expect(compiled.sql).toContain("parent.status IS DISTINCT FROM 'completed'");
+    expect(compiled.params).toContain('openspec:parent-atlas-agentic-file-compiler');
+  });
+
   it('supports task lifecycle mutations', async () => {
     dbState.updateResults.push([
       {
@@ -121,6 +153,12 @@ describe('kanban-task-board', () => {
     expect(claimed.task.validationCommand).toContain('claimed_by:worker-1');
     expect(claimed.claimToken).toContain('claim:');
     expect(claimed.runId).toContain('run:');
+    const claimPredicate = new PgDialect().sqlToQuery(dbState.updateWhereConditions[0] as never).sql;
+    expect(claimPredicate).toContain('NOT EXISTS');
+    expect(claimPredicate).toContain('kanban_task_dependencies');
+    expect(claimPredicate).toContain('parent.task_id IS NULL');
+    expect(claimPredicate).toContain("parent.lane IS DISTINCT FROM 'done'");
+    expect(claimPredicate).toContain("parent.status IS DISTINCT FROM 'completed'");
 
     dbState.updateResults.push([
       {

@@ -1,11 +1,11 @@
 {
-  "generated": "2026-09-11T05:25:53.960Z",
+  "generated": "2026-11-01T23:18:27.438Z",
   "qdrantFound": 0,
   "gates": [
     {
-      "name": "qdrant_manifest_coverage",
-      "pass": false,
-      "detail": "0/20"
+      "name": "manifest_coverage",
+      "pass": true,
+      "detail": "pgvector: 339, qdrant: 0"
     },
     {
       "name": "embed_working",
@@ -67,7 +67,10 @@
       ],
       "embed_ok": true,
       "registry_ok": true,
-      "retrieval_source": "registry"
+      "retrieval_source": "registry",
+      "requested_top_k": 5,
+      "effective_top_k": 5,
+      "candidate_budget": "BOUNDED_RETRIEVAL_SHORTLIST"
     },
     {
       "query": "search codebase for embedding timeout errors",
@@ -115,7 +118,10 @@
       ],
       "embed_ok": true,
       "registry_ok": true,
-      "retrieval_source": "registry"
+      "retrieval_source": "registry",
+      "requested_top_k": 5,
+      "effective_top_k": 5,
+      "candidate_budget": "BOUNDED_RETRIEVAL_SHORTLIST"
     },
     {
       "query": "inspect the parent atlas packet contract report",
@@ -158,7 +164,10 @@
       ],
       "embed_ok": true,
       "registry_ok": true,
-      "retrieval_source": "registry"
+      "retrieval_source": "registry",
+      "requested_top_k": 5,
+      "effective_top_k": 5,
+      "candidate_budget": "BOUNDED_RETRIEVAL_SHORTLIST"
     },
     {
       "query": "trace KAG search over legal evidence",
@@ -210,7 +219,10 @@
       ],
       "embed_ok": true,
       "registry_ok": true,
-      "retrieval_source": "registry"
+      "retrieval_source": "registry",
+      "requested_top_k": 5,
+      "effective_top_k": 5,
+      "candidate_budget": "BOUNDED_RETRIEVAL_SHORTLIST"
     },
     {
       "query": "expand graph neighborhood from database module",
@@ -257,7 +269,10 @@
       ],
       "embed_ok": true,
       "registry_ok": true,
-      "retrieval_source": "registry"
+      "retrieval_source": "registry",
+      "requested_top_k": 5,
+      "effective_top_k": 5,
+      "candidate_budget": "BOUNDED_RETRIEVAL_SHORTLIST"
     }
   ]
 }

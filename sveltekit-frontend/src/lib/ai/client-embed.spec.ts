@@ -7,7 +7,16 @@ const cache = vi.hoisted(() => ({
 }));
 vi.mock('./client-cache.js', () => ({ clientCache: cache }));
 
-import { embedText, isEmbeddingModelReady, preloadEmbeddingModel } from './client-embed.js';
+import {
+	embedText,
+	isEmbeddingModelReady,
+	preloadEmbeddingModel,
+	createClientVectorDescriptor,
+	assertConsistentRunRecipes,
+	embedTextWithDescriptor,
+	CLIENT_EMBED_RECIPE,
+	CLIENT_EMBED_MODEL_ID
+} from './client-embed.js';
 
 const vec = (n = 768, v = 0.01) => Array.from({ length: n }, () => v);
 const okResponse = (embedding: unknown) =>
@@ -74,5 +83,24 @@ describe('client-embed (server-backed)', () => {
 	it('keeps the readiness/preload API without loading any local model', async () => {
 		expect(typeof isEmbeddingModelReady()).toBe('boolean');
 		await expect(preloadEmbeddingModel()).resolves.toBeUndefined();
+	});
+
+	it('records recipe and model id with vectors and refuses mixed recipes (CSP-32)', async () => {
+		vi.spyOn(globalThis, 'fetch').mockResolvedValue(okResponse(vec()));
+
+		const descA = await embedTextWithDescriptor('witness statement parcel 44');
+		expect(descA.dimensions).toBe(768);
+		expect(descA.recipe).toBe(CLIENT_EMBED_RECIPE);
+		expect(descA.modelId).toBe(CLIENT_EMBED_MODEL_ID);
+		expect(descA.vector).toBeInstanceOf(Float32Array);
+
+		const descB = createClientVectorDescriptor(Float32Array.from(vec()), 'embeddinggemma:latest', CLIENT_EMBED_RECIPE);
+
+		// Consistent recipes passes
+		expect(() => assertConsistentRunRecipes([descA, descB])).not.toThrow();
+
+		// Refuse mixed recipe in one run
+		const descLegacy = createClientVectorDescriptor(Float32Array.from(vec()), 'legacy-model', 'legacy-recipe-v0');
+		expect(() => assertConsistentRunRecipes([descA, descLegacy])).toThrow(/CLIENT_EMBED_RECIPE_MISMATCH/);
 	});
 });

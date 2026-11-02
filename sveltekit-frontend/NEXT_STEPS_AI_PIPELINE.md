@@ -141,7 +141,7 @@ Transform the codebase from a set of files into a time-aware, topologically-orde
 - **Tasks:**
   - Implement MCP tool `context.prefetch_feature_context`.
   - Use GPU SOM/manifold4 coordinates for neighborhood lookup in Qdrant.
-  - Incorporate "Knowledge Delta" (Gemma4 belief vs. actual AST truth).
+  - Incorporate "Knowledge Delta" (ornith 1.5 Gemma4 belief vs. actual AST truth).
 - **Effort:** 4 hrs
 ### P6-C Activity-Aware Prefetch (VS Code + rg)
 - **Goal:** Log developer activity (files opened, symbols selected) to steer prefetch relevance.

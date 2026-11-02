@@ -334,7 +334,10 @@ export default defineConfig(({ mode }) => {
         'bits-ui',
         '@internationalized/date',
         'drizzle-orm',
+        'idb',
+        'lokijs',
         'svelte',
+        'svelte-sonner',
         'onnxruntime-web',
       ],
       esbuildOptions: {

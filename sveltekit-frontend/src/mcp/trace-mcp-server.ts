@@ -76,6 +76,10 @@ import { recordToolCallBegin } from '../lib/server/telemetry/tool-call-recorder.
 import { asUuid, buildTraceDynamicContextRecommendation } from '../lib/server/mcp/trace-dynamic-context-audit.js';
 import { parseTraceMcpEnv } from '../lib/server/config/trace-mcp-env.js';
 import { ATLAS_CANONICAL_SEMANTIC_REPRESENTATION as SEMANTIC_REPRESENTATION_ID } from '../lib/server/atlas/retrieval/qdrant-semantic-projection.js';
+import {
+  acpKanbanErrorTaskInputV1Schema,
+  acpKanbanErrorTaskV1Schema,
+} from '../lib/server/atlas/kanban-acp-dag-contracts.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
 import type { LangGraphBridge } from './langgraph-bridge.js';
 import { extractKeywordsFromState } from './langgraph-bridge.js';
@@ -125,6 +129,10 @@ import { registerAtlasKeywordCorpusTools } from './atlas-keyword-corpus-tools.js
 import { registerAtlasTodoInverseDagTool } from './atlas-todo-inverse-dag.js';
 import { registerNativeAccelerationTools } from './native-acceleration-tools.js';
 import { registerLlamaRuntimeTools } from './llama-runtime-tools.js';
+import { registerKanbanDagSnapshotTool } from './kanban-dag-snapshot.js';
+import { registerKanbanDagPrefillRecommendationTool } from './kanban-dag-prefill-recommendation.js';
+import { FeatureRegistryLookupV1Schema } from '../lib/server/atlas/contracts/feature-resolution-v1.js';
+import { resolveFeatureRegistryReadOnlyTransactionV1 } from '../lib/server/atlas/feature-resolution-adapter-v1.js';
 import { tracedQuery, withCanonicalReadOnlyQueryBudget } from '../lib/server/db/client.js';
 import {
   atlasCoverageInputSchema,
@@ -651,6 +659,8 @@ registerAtlasEmbeddingTools(server, REDIS_URL, dispatcherMiddleware);
 registerOpenSpecEvidenceTools(server);
 registerAtlasKeywordCorpusTools(server);
 registerAtlasTodoInverseDagTool(server, pool);
+registerKanbanDagSnapshotTool(server, pool);
+registerKanbanDagPrefillRecommendationTool(server, pool);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server, dispatcherMiddleware);
   registerResearchTools(server, dispatcherMiddleware);
@@ -9710,6 +9720,72 @@ server.registerTool(
   },
 );
 
+// ── atlas.summary_priority_matrix_describe (read-only) ──────────────────────
+// Describes the latest draft chunk-level feature matrix built by
+// scripts/atlas/build-summary-priority-matrix-v1.mjs (AFC-SCHED): versioned column registry,
+// observed fractions, population rule, blockers, and the reserved token-remap hook. Optionally
+// re-hashes the raw files against the descriptor. Reads only .tmp/atlas/summary-priority-matrix-v1;
+// never touches a datastore; advisory input, canonicalAuthority:false.
+server.registerTool(
+  'atlas.summary_priority_matrix_describe',
+  {
+    description:
+      'Read-only description of the latest draft summarization-priority feature matrix (column registry, observed ' +
+      'fractions, population, blockers, token-remap hook) with optional sha256 verification of the raw files. ' +
+      'Advisory; never canonical identity. Writes nothing.',
+    inputSchema: z.object({
+      verify_checksums: z.boolean().default(true),
+    }),
+  },
+  async ({ verify_checksums = true }) => {
+    try {
+      const fs = await import('node:fs');
+      const candidates = [
+        path.resolve(import.meta.dirname ?? process.cwd(), '..', '..', '..'),
+        path.resolve(process.cwd(), '..'),
+        process.cwd(),
+      ];
+      const root = candidates.find((c) => fs.existsSync(path.join(c, '.tmp', 'atlas', 'summary-priority-matrix-v1')));
+      if (!root) {
+        return { content: [{ type: 'text', text: JSON.stringify({ ok: false, state: 'MATRIX_NOT_BUILT', hint: 'run scripts/atlas/build-summary-priority-matrix-v1.mjs', writesPerformed: false }) }] };
+      }
+      const base = path.join(root, '.tmp', 'atlas', 'summary-priority-matrix-v1');
+      const runs = fs.readdirSync(base).filter((d) => fs.existsSync(path.join(base, d, 'descriptor.json'))).sort();
+      const latest = runs.at(-1);
+      if (!latest) {
+        return { content: [{ type: 'text', text: JSON.stringify({ ok: false, state: 'MATRIX_NOT_BUILT', writesPerformed: false }) }] };
+      }
+      const dir = path.join(base, latest);
+      const descriptor = JSON.parse(fs.readFileSync(path.join(dir, 'descriptor.json'), 'utf8'));
+      const verification: Record<string, string> = {};
+      let allMatch = true;
+      for (const [name, meta] of Object.entries(descriptor.files ?? {}) as Array<[string, { bytes: number; sha256: string }]>) {
+        const file = path.join(dir, name);
+        if (!fs.existsSync(file)) { verification[name] = 'MISSING'; allMatch = false; continue; }
+        const size = fs.statSync(file).size;
+        if (size !== meta.bytes) { verification[name] = `SIZE_MISMATCH ${size}!=${meta.bytes}`; allMatch = false; continue; }
+        if (!verify_checksums) { verification[name] = 'SIZE_OK_NOT_HASHED'; continue; }
+        const ok = createHash('sha256').update(fs.readFileSync(file)).digest('hex') === meta.sha256;
+        verification[name] = ok ? 'SHA256_OK' : 'SHA256_MISMATCH';
+        if (!ok) allMatch = false;
+      }
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            ok: allMatch, state: allMatch ? 'MATRIX_DESCRIBED' : 'MATRIX_FILES_DO_NOT_MATCH_DESCRIPTOR',
+            run: latest, runsAvailable: runs.length, verification,
+            descriptor: { ...descriptor, files: undefined },
+            canonicalAuthority: false, writesPerformed: false,
+          }),
+        }],
+      };
+    } catch (err) {
+      return { content: [{ type: 'text', text: JSON.stringify({ ok: false, error: (err as Error).message, writesPerformed: false }) }], isError: true };
+    }
+  },
+);
+
 server.registerTool(
   'atlas.packet_search',
   {
@@ -10227,6 +10303,43 @@ server.registerTool(
       return { status: 'error', error: errorMsg.slice(0, 500) };
     }
   }
+);
+
+server.registerTool(
+  'atlas.feature_resolution_readonly',
+  {
+    description:
+      'Resolve one exact feature key and source reference against the current public.feature_registry catalog. ' +
+      'Runs bounded SELECT-only inspection in a PostgreSQL READ ONLY transaction; returns proposal/unresolved states only and cannot admit canonical identity.',
+    inputSchema: FeatureRegistryLookupV1Schema.describe('Exact feature key plus source reference for bounded read-only registry inspection.'),
+  },
+  async (input: Record<string, unknown>) => {
+    let client: Awaited<ReturnType<typeof pool.connect>> | undefined;
+    try {
+      const parsed = FeatureRegistryLookupV1Schema.parse(input);
+      client = await pool.connect();
+      const inspection = await resolveFeatureRegistryReadOnlyTransactionV1(parsed, {
+        async query(text, values) {
+          const result = await client!.query(text, values as never);
+          return { rows: result.rows as Record<string, unknown>[] };
+        },
+      });
+      return { content: [{ type: 'text' as const, text: JSON.stringify(inspection) }] };
+    } catch {
+      return {
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            databaseName: null,
+            serverVersion: null,
+            resolution: { state: 'UNRESOLVED', reason: 'REGISTRY_UNAVAILABLE', canonicalAuthority: false },
+          }),
+        }],
+      };
+    } finally {
+      client?.release();
+    }
+  },
 );
 
 server.registerTool(
@@ -11282,6 +11395,47 @@ server.registerTool(
       entities: result.entities.slice(0, 20),
       metadata: result.metadata,
       processing_time: result.processing_time,
+    };
+  }
+);
+
+// ── acp.kanban_prefill_error_task ─────────────────────────────────────────────
+// Synthesizes a Zod+Pydantic validated ACP/A2A Kanban error-fixing task with
+// :8095 AST extractions, Atlas DAG neighborhood prefill, and prompt cards.
+// Read-only (writesPerformed=false).
+
+server.registerTool(
+  'acp.kanban_prefill_error_task',
+  {
+    description:
+      'Returns a proposal-only Kanban prefill. This tool does not read source bytes, run LangExtract, verify database schema, or dispatch work.',
+    inputSchema: acpKanbanErrorTaskInputV1Schema,
+  },
+  async ({ relativePath, errorSignature, targetAgent = 'a2a-error-fixer' }) => {
+    const taskPayload = acpKanbanErrorTaskV1Schema.parse({
+      schema: 'atlas.acp-kanban-error-task.v1',
+      taskId: `kanban-${Date.now()}`,
+      boardColumn: 'blocked',
+      sourceAgent: 'trace-mcp-8788',
+      targetAgent: targetAgent ?? 'a2a-error-fixer',
+      relativePath,
+      errorSignature,
+      sourceSha256: null,
+      sourceRevision: null,
+      status: 'BLOCKED_SOURCE_BYTES_UNAVAILABLE',
+      admission: 'PROPOSAL_ONLY',
+      extractionStatus: 'NOT_RUN',
+      extractedSpans: [],
+      dagPrefillNodes: [],
+      promptCards: [],
+      recommendedFixActions: [],
+      dbSchemaStatus: 'NOT_CHECKED',
+      canonicalAuthority: false,
+      writesPerformed: false,
+    });
+
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(taskPayload, null, 2) }],
     };
   }
 );

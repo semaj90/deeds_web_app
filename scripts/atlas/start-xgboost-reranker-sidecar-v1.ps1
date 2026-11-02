@@ -37,8 +37,8 @@ if (-not (Test-Path -LiteralPath $modelPath -PathType Leaf)) {
 }
 
 New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
-Start-Process -FilePath 'python' `
-    -ArgumentList @('scripts/atlas/serve-xgboost-reranker.py') `
+Start-Process -FilePath 'py' `
+    -ArgumentList @('-3.13', 'scripts/atlas/serve-xgboost-reranker.py') `
     -WorkingDirectory $repoRoot `
     -WindowStyle Hidden `
     -Environment @{ PYTHONIOENCODING = 'utf-8' } `

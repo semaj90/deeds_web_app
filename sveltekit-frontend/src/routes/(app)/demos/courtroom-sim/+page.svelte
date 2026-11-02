@@ -219,11 +219,25 @@
 			if (view !== 'courtroom' || userInputMode) return;
 			if (scriptedMode) {
 				if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advanceScriptedStory(); }
-				if (e.key === 'Escape') { backToLobby(); }
+				if (e.key === 'Escape') {
+					if (showCast || showTimeline || showCoords || showEvidence || showLog || showStrategy || insight) {
+						showCast = false;
+						showTimeline = false;
+						showCoords = false;
+						showEvidence = false;
+						showLog = false;
+						showStrategy = false;
+						insight = null;
+					} else {
+						backToLobby();
+					}
+				}
 				// View-only toggles also work in the local preview (they change what is shown, never the story).
 				if (e.key === 'p' || e.key === 'P') showTimeline = !showTimeline;
 				if (e.key === 'i' || e.key === 'I') showCast = !showCast;
 				if (e.key === 'g' || e.key === 'G') showCoords = !showCoords;
+				if (e.key === 'e' || e.key === 'E') showEvidence = !showEvidence;
+				if (e.key === 'l' || e.key === 'L') showLog = !showLog;
 				return;
 			}
 			if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advanceTurn('next_turn'); }
@@ -462,7 +476,9 @@
 			}
 			const data = await res.json();
 			if (data.models?.length > 0 && scene.isReady) {
-				const modelDefs: ModelDef[] = data.models.map((m: any) => ({
+				const modelDefs: ModelDef[] = data.models
+					.filter((m: any) => m.role !== 'environment')
+					.map((m: any) => ({
 					role: m.role,
 					modelUrl: m.modelUrl,
 					scale: m.scale,
@@ -822,44 +838,44 @@
 		></canvas>
 
 		<!-- ── Top Bar ── -->
-		<div class="overlay-top">
-			<button class="btn-icon" onclick={backToLobby} title="Back to lobby" aria-label="Back to lobby">
+		<div class="overlay-top absolute top-0 inset-x-0 z-10 flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-slate-950/95 via-slate-900/85 to-slate-900/40 border-b border-[#8bdfff]/20 shadow-[0_8px_28px_rgba(0,0,0,0.24)] backdrop-blur-md">
+			<button class="btn-icon flex items-center justify-center w-8.5 h-8.5 rounded border border-[#bad0ff]/20 bg-[#141d30]/75 text-[#c4d2e6] hover:text-[#8bdfff] hover:border-[#8bdfff]/70 hover:bg-[#1b2740]/90 transition" onclick={backToLobby} title="Back to lobby" aria-label="Back to lobby">
 				<Icon name="arrow-left" size={16} />
 			</button>
-			<div class="top-case-info">
-				<span class="top-case-num">{sessionData?.caseData?.caseNumber ?? ''}</span>
-				<span class="top-charge">{sessionData?.caseData?.charge ?? ''}</span>
-				<span class="top-defendant">v. {sessionData?.caseData?.defendantName ?? ''}</span>
+			<div class="top-case-info flex-1 flex items-center gap-3 text-xs">
+				<span class="top-case-num font-mono text-neutral-400">{sessionData?.caseData?.caseNumber ?? ''}</span>
+				<span class="top-charge font-semibold text-neutral-100">{sessionData?.caseData?.charge ?? ''}</span>
+				<span class="top-defendant text-neutral-400">v. {sessionData?.caseData?.defendantName ?? ''}</span>
 			</div>
-			<div class="top-phase">
+			<div class="top-phase font-mono text-xs text-[#ffcc66] tracking-wider">
 				{#if scriptedMode}
 					LOCAL STORY · {(scriptedStoryState?.phase ?? 'lobby').replace(/_/g, ' ').toUpperCase()} · TICK {scriptedStoryState?.tick ?? 0}
 					{#if movementReceipt}
-						<span class="movement-receipt" data-testid="movement-receipt"> · MOVE {movementReceipt.actorId.toUpperCase()} → {movementReceipt.station.toUpperCase()}: {movementReceipt.outcome.toUpperCase()}{movementReceipt.position ? ` @ ${movementReceipt.position.x.toFixed(1)},${movementReceipt.position.z.toFixed(1)}` : ''}</span>
+						<span class="movement-receipt text-[#80f3ce]" data-testid="movement-receipt"> · MOVE {movementReceipt.actorId.toUpperCase()} → {movementReceipt.station.toUpperCase()}: {movementReceipt.outcome.toUpperCase()}{movementReceipt.position ? ` @ ${movementReceipt.position.x.toFixed(1)},${movementReceipt.position.z.toFixed(1)}` : ''}</span>
 					{/if}
 				{:else}
 					Phase {(sessionData?.currentPhase ?? 0) + 1}/{sessionData?.phases?.length ?? 0}:
 					{currentPhaseName.replace(/_/g, ' ').toUpperCase()}
 				{/if}
 			</div>
-			<div class="top-controls">
-				<button class="btn-icon" class:active={crtEnabled} onclick={() => (crtEnabled = !crtEnabled)} title="CRT filter [C]" aria-label="Toggle CRT filter">
+			<div class="top-controls flex items-center gap-1.5">
+				<button class="btn-icon flex items-center justify-center w-8.5 h-8.5 rounded border border-[#bad0ff]/20 bg-[#141d30]/75 text-[#c4d2e6] hover:text-[#8bdfff] hover:border-[#8bdfff]/70 hover:bg-[#1b2740]/90 transition {crtEnabled ? 'text-[#f3d471] border-[#f3d471] shadow-[0_0_10px_rgba(243,212,113,0.2)]' : ''}" onclick={() => (crtEnabled = !crtEnabled)} title="CRT filter [C]" aria-label="Toggle CRT filter">
 					<Icon name="monitor" size={16} />
 				</button>
-				<button class="btn-icon" class:active={showEvidence} onclick={() => (showEvidence = !showEvidence)} title="Evidence [E]" aria-label="Toggle evidence panel">
+				<button class="btn-icon flex items-center justify-center w-8.5 h-8.5 rounded border border-[#bad0ff]/20 bg-[#141d30]/75 text-[#c4d2e6] hover:text-[#8bdfff] hover:border-[#8bdfff]/70 hover:bg-[#1b2740]/90 transition {showEvidence ? 'text-[#f3d471] border-[#f3d471] shadow-[0_0_10px_rgba(243,212,113,0.2)]' : ''}" onclick={() => (showEvidence = !showEvidence)} title="Evidence [E]" aria-label="Toggle evidence panel">
 					<Icon name="yorha-evidence" size={16} />
 				</button>
-				<button class="btn-icon" class:active={showLog} onclick={() => (showLog = !showLog)} title="Dialogue log [L]" aria-label="Toggle transcript">
+				<button class="btn-icon flex items-center justify-center w-8.5 h-8.5 rounded border border-[#bad0ff]/20 bg-[#141d30]/75 text-[#c4d2e6] hover:text-[#8bdfff] hover:border-[#8bdfff]/70 hover:bg-[#1b2740]/90 transition {showLog ? 'text-[#f3d471] border-[#f3d471] shadow-[0_0_10px_rgba(243,212,113,0.2)]' : ''}" onclick={() => (showLog = !showLog)} title="Dialogue log [L]" aria-label="Toggle transcript">
 					<Icon name="yorha-citation" size={16} />
 				</button>
-				<button class="btn-icon" class:active={showTimeline} onclick={() => (showTimeline = !showTimeline)} title="Timeline playback [P]" aria-label="Toggle timeline">
+				<button class="btn-icon flex items-center justify-center w-8.5 h-8.5 rounded border border-[#bad0ff]/20 bg-[#141d30]/75 text-[#c4d2e6] hover:text-[#8bdfff] hover:border-[#8bdfff]/70 hover:bg-[#1b2740]/90 transition {showTimeline ? 'text-[#f3d471] border-[#f3d471] shadow-[0_0_10px_rgba(243,212,113,0.2)]' : ''}" onclick={() => (showTimeline = !showTimeline)} title="Timeline playback [P]" aria-label="Toggle timeline">
 					<Icon name="yorha-timeline" size={16} />
 				</button>
 				{#if scene.modelsLoaded}
-					<span class="badge-3d">3D</span>
+					<span class="badge-3d text-[0.6rem] px-1.5 py-0.5 bg-[#7c4dff] text-white rounded font-bold tracking-wider">3D</span>
 				{/if}
 				{#if sessionData?.status === 'completed'}
-					<span class="badge-done">COMPLETED</span>
+					<span class="badge-done text-[0.6rem] px-1.5 py-0.5 bg-emerald-600 text-white rounded font-bold tracking-wider">COMPLETED</span>
 				{/if}
 			</div>
 		</div>
@@ -884,41 +900,69 @@
 		/>
 
 		<!-- ── Evidence Sidebar (left) ── -->
-		{#if showEvidence && sessionData}
-			<div class="evidence-sidebar">
-				<h3>CASE BRIEF</h3>
+		{#if showEvidence && (sessionData || scriptedMode)}
+			<div class="evidence-sidebar absolute top-[50px] left-0 bottom-12 w-[280px] bg-gradient-to-b from-slate-950/92 via-slate-900/85 to-slate-950/95 border-r border-[#8bdfff]/20 overflow-y-auto z-10 p-3.5 text-xs shadow-[6px_0_24px_rgba(0,0,0,0.35)]" data-testid="evidence-sidebar">
+				<h3 class="text-xs font-semibold tracking-wider text-[#8bdfff] uppercase pb-1.5 mb-3 border-b border-[#8bdfff]/25">CASE BRIEF</h3>
 				<CourtroomEvidenceSearch caseId={typeof sessionData?.caseId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionData.caseId) ? sessionData.caseId : undefined} localPreview={scriptedMode} />
-				{#if sessionData.charges?.length}
-					<div class="evidence-group">
-						<h4>CHARGES</h4>
+				{#if sessionData?.charges?.length}
+					<div class="evidence-group mb-3.5">
+						<h4 class="text-[0.7rem] text-[#8fa5c4] uppercase tracking-wider my-2 pb-1 border-b border-white/10">CHARGES</h4>
 						{#each sessionData.charges as charge}
-							<div class="evidence-item">
-								<strong>{charge.chargeName}</strong>
+							<div class="evidence-item p-2 bg-[#121929]/65 border border-[#bad0ff]/12 rounded mb-1.5 flex flex-col gap-0.5">
+								<strong class="text-neutral-100">{charge.chargeName}</strong>
 								{#if charge.statute}
-									<span class="statute-ref">{charge.statute}</span>
+									<span class="statute-ref font-mono text-[0.65rem] text-[#ffcc66]">{charge.statute}</span>
 								{/if}
 							</div>
 						{/each}
 					</div>
+				{:else if scriptedMode}
+					<div class="evidence-group mb-3.5">
+						<h4 class="text-[0.7rem] text-[#8fa5c4] uppercase tracking-wider my-2 pb-1 border-b border-white/10">CHARGES</h4>
+						<div class="evidence-item p-2 bg-[#121929]/65 border border-[#bad0ff]/12 rounded mb-1.5 flex flex-col gap-0.5">
+							<strong class="text-neutral-100">Accounting Discrepancy & Conversion</strong>
+							<span class="statute-ref font-mono text-[0.65rem] text-[#ffcc66]">Fictional Civil Code § 404</span>
+						</div>
+					</div>
 				{/if}
-				{#if sessionData.actors?.length}
-					<div class="evidence-group">
-						<h4>PARTIES</h4>
+				{#if sessionData?.actors?.length}
+					<div class="evidence-group mb-3.5">
+						<h4 class="text-[0.7rem] text-[#8fa5c4] uppercase tracking-wider my-2 pb-1 border-b border-white/10">PARTIES</h4>
 						{#each sessionData.actors as actor}
-							<div class="evidence-item">
-								<span class="actor-role" style="color: {ROLE_COLORS[actor.role] ?? '#7c7c7c'}">{actor.role}</span>
-								<span>{actor.name}</span>
+							<div class="evidence-item p-2 bg-[#121929]/65 border border-[#bad0ff]/12 rounded mb-1.5 flex flex-col gap-0.5">
+								<span class="actor-role text-[0.65rem] font-bold uppercase tracking-wider" style="color: {ROLE_COLORS[actor.role] ?? '#7c7c7c'}">{actor.role}</span>
+								<span class="text-neutral-200">{actor.name}</span>
+							</div>
+						{/each}
+					</div>
+				{:else if scriptedMode}
+					<div class="evidence-group mb-3.5">
+						<h4 class="text-[0.7rem] text-[#8fa5c4] uppercase tracking-wider my-2 pb-1 border-b border-white/10">PARTIES</h4>
+						{#each sampleStory.actors as actor}
+							<div class="evidence-item p-2 bg-[#121929]/65 border border-[#bad0ff]/12 rounded mb-1.5 flex flex-col gap-0.5">
+								<span class="actor-role text-[0.65rem] font-bold uppercase tracking-wider" style="color: {ROLE_COLORS[actor.role] ?? '#7c7c7c'}">{actor.role}</span>
+								<span class="text-neutral-200">{actor.name}</span>
 							</div>
 						{/each}
 					</div>
 				{/if}
-				{#if sessionData.events?.length}
-					<div class="evidence-group">
-						<h4>TIMELINE</h4>
+				{#if sessionData?.events?.length}
+					<div class="evidence-group mb-3.5">
+						<h4 class="text-[0.7rem] text-[#8fa5c4] uppercase tracking-wider my-2 pb-1 border-b border-white/10">TIMELINE</h4>
 						{#each sessionData.events.slice(0, 8) as evt}
-							<div class="evidence-item timeline">
-								<span class="evt-type">{evt.eventType.replace(/_/g, ' ')}</span>
-								<span class="evt-desc">{evt.description.slice(0, 80)}...</span>
+							<div class="evidence-item timeline p-2 bg-[#121929]/65 border border-[#bad0ff]/12 rounded mb-1.5 flex flex-col gap-0.5 text-[0.7rem]">
+								<span class="evt-type text-[0.65rem] font-semibold text-[#ff80df] uppercase">{evt.eventType.replace(/_/g, ' ')}</span>
+								<span class="evt-desc text-neutral-400">{evt.description.slice(0, 80)}...</span>
+							</div>
+						{/each}
+					</div>
+				{:else if scriptedMode}
+					<div class="evidence-group mb-3.5">
+						<h4 class="text-[0.7rem] text-[#8fa5c4] uppercase tracking-wider my-2 pb-1 border-b border-white/10">TIMELINE</h4>
+						{#each sampleStory.cues.slice(0, 8) as cue}
+							<div class="evidence-item timeline p-2 bg-[#121929]/65 border border-[#bad0ff]/12 rounded mb-1.5 flex flex-col gap-0.5 text-[0.7rem]">
+								<span class="evt-type text-[0.65rem] font-semibold text-[#ff80df] uppercase">{cue.kind} (T{cue.tick})</span>
+								<span class="evt-desc text-neutral-400">{cue.value.slice(0, 80)}</span>
 							</div>
 						{/each}
 					</div>
@@ -928,17 +972,17 @@
 
 		<!-- ── Dialogue Log (scrollable history) ── -->
 		{#if showLog}
-			<div class="dialogue-log">
-				<div class="log-header">
-					<h3>TRANSCRIPT</h3>
-					<span class="log-count">{dialogue.length} entries</span>
+			<div class="dialogue-log absolute top-[50px] right-0 bottom-12 w-[300px] bg-gradient-to-b from-slate-950/92 via-slate-900/85 to-slate-950/95 border-l border-[#8bdfff]/20 z-10 flex flex-col shadow-[-6px_0_24px_rgba(0,0,0,0.35)]" data-testid="dialogue-log">
+				<div class="log-header flex items-center justify-between p-3 border-b border-[#8bdfff]/20">
+					<h3 class="text-xs font-semibold tracking-wider text-[#8bdfff] uppercase m-0">TRANSCRIPT</h3>
+					<span class="log-count font-mono text-[0.65rem] text-[#8fa5c4]">{dialogue.length} entries</span>
 				</div>
-				<div class="log-entries">
+				<div class="log-entries flex-1 overflow-y-auto p-2 flex flex-col gap-1" data-testid="log-entries">
 					{#each dialogue as entry, i}
-						<button class="log-entry" onclick={() => handleDialogueEntryClick(entry)}>
-							<span class="log-turn">T{entry.turn}</span>
-							<span class="log-speaker" style="color: {roleColor(entry.role)}">{entry.speaker}</span>
-							<span class="log-preview">{entry.content.slice(0, 80)}{entry.content.length > 80 ? '...' : ''}</span>
+						<button class="log-entry flex items-baseline gap-1.5 p-2 bg-[#121929]/65 border border-[#bad0ff]/10 rounded cursor-pointer text-left font-inherit text-xs text-neutral-300 hover:bg-[#1c2842]/85 hover:border-[#8bdfff]/30 transition" onclick={() => handleDialogueEntryClick(entry)}>
+							<span class="log-turn font-mono text-[0.6rem] text-[#7c4dff] whitespace-nowrap">T{entry.turn}</span>
+							<span class="log-speaker text-[0.65rem] font-bold uppercase whitespace-nowrap" style="color: {roleColor(entry.role)}">{entry.speaker}</span>
+							<span class="log-preview flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-neutral-400">{entry.content.slice(0, 80)}{entry.content.length > 80 ? '...' : ''}</span>
 						</button>
 					{/each}
 				</div>
@@ -960,35 +1004,35 @@
 		<!-- ── Dialogue Box (Bottom — interactive) ── -->
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div class="dialogue-box" bind:this={dialogueBoxEl} onclick={handleTextClick}>
+		<div class="dialogue-box absolute bottom-14 left-1/2 -translate-x-1/2 w-[min(720px,calc(100%-2rem))] bg-gradient-to-br from-[#141d30]/92 to-[#0a0d1b]/88 border border-[#8bdfff]/30 rounded-md px-5 py-3.5 z-20 shadow-[0_8px_32px_rgba(0,0,0,0.45)] backdrop-blur-md cursor-pointer hover:border-[#8bdfff]/60 transition" bind:this={dialogueBoxEl} onclick={handleTextClick}>
 			{#if currentSpeaker}
-				<div class="speaker-plate" style="background: {roleColor(currentRole)}">
-					<span class="speaker-name">{currentSpeaker}</span>
-					<span class="speaker-role">{currentRole}</span>
+				<div class="speaker-plate inline-flex items-center gap-2 px-2.5 py-0.5 text-white font-bold tracking-wider uppercase mb-1.5 rounded-sm" style="background: {roleColor(currentRole)}">
+					<span class="speaker-name text-xs">{currentSpeaker}</span>
+					<span class="speaker-role text-[0.6rem] opacity-70">{currentRole}</span>
 				</div>
 			{/if}
-			<div class="dialogue-text">
+			<div class="dialogue-text text-sm leading-relaxed text-neutral-100 font-mono whitespace-pre-wrap max-h-[90px] overflow-y-auto">
 				{displayedText}
 				{#if textAnimating}
-					<span class="text-cursor">▌</span>
+					<span class="text-cursor animate-pulse text-[#8bdfff]">▌</span>
 				{/if}
 			</div>
 			{#if !textAnimating && displayedText}
-				<div class="dialogue-hint">Select text to analyze | SPACE to continue</div>
+				<div class="dialogue-hint text-[0.6rem] text-[#9baac0] mt-1.5 tracking-wider">Select text to analyze | SPACE to continue</div>
 			{/if}
 			{#if scriptedMode}
 				{#if dialogueProposalError}
-					<div class="dialogue-proposal-status" role="status">{dialogueProposalError}</div>
+					<div class="dialogue-proposal-status mt-1.5 text-[#f7d51d] text-xs" role="status">{dialogueProposalError}</div>
 				{/if}
 				{#if dialogueProposal}
-					<div class="dialogue-proposal" role="status">
-						<strong>AI PROPOSAL · NOT PART OF THE STORY</strong>
-						<p>{dialogueProposal.text}</p>
-						<small>{dialogueProposal.intent} · {dialogueProposal.emotion ?? 'neutral'} · {dialogueProposal.modelRevision}</small>
+					<div class="dialogue-proposal mt-2 border-l-2 border-lime-400 p-2 bg-emerald-950/30 font-mono text-xs" role="status">
+						<strong class="text-lime-300 text-[0.6rem] tracking-wider block mb-0.5">AI PROPOSAL · NOT PART OF THE STORY</strong>
+						<p class="my-1 text-neutral-100 text-xs">{dialogueProposal.text}</p>
+						<small class="text-neutral-400 text-[0.6rem]">{dialogueProposal.intent} · {dialogueProposal.emotion ?? 'neutral'} · {dialogueProposal.modelRevision}</small>
 						{#if dialogueProposalAccepted}
-							<p class="dialogue-proposal-status">Added to the local story transcript.</p>
+							<p class="dialogue-proposal-status mt-1 text-[#f7d51d] text-xs">Added to the local story transcript.</p>
 						{:else}
-							<button type="button" onclick={acceptScriptedDialogueProposal}>Add suggestion to story</button>
+							<button type="button" class="mt-1 px-2 py-0.5 bg-lime-700/50 hover:bg-lime-700 text-lime-200 rounded text-xs transition" onclick={acceptScriptedDialogueProposal}>Add suggestion to story</button>
 						{/if}
 					</div>
 				{/if}
@@ -996,9 +1040,9 @@
 			{#if dialogue.length > 0}
 				{@const latest = dialogue[dialogue.length - 1]}
 				{#if latest.canonRefs?.length > 0}
-					<div class="canon-refs">
+					<div class="canon-refs flex flex-wrap gap-1 mt-1.5">
 						{#each latest.canonRefs as ref}
-							<span class="canon-tag">{ref}</span>
+							<span class="canon-tag text-[0.6rem] px-1.5 py-0.5 bg-[#ffcc66]/15 text-[#ffcc66] rounded-sm font-mono">{ref}</span>
 						{/each}
 					</div>
 				{/if}
@@ -1006,17 +1050,17 @@
 
 			<!-- Insight popup (click-to-analyze) -->
 			{#if insight}
-				<div class="insight-popup" style="left: {Math.min(insight.x, 300)}px; top: {Math.max(insight.y, 0)}px">
-					<div class="insight-header">
+				<div class="insight-popup absolute w-[280px] bg-slate-950/95 border border-[#8bdfff] rounded-md p-3 z-30 shadow-[0_4px_20px_rgba(0,0,0,0.5)]" style="left: {Math.min(insight.x, 300)}px; top: {Math.max(insight.y, 0)}px">
+					<div class="insight-header flex items-center gap-1.5 mb-1.5 text-[#8bdfff] text-[0.65rem] uppercase tracking-wider">
 						<Icon name="brain" size={12} />
 						<span>LEGAL ANALYSIS</span>
-						<button class="insight-close" onclick={() => (insight = null)}>×</button>
+						<button class="insight-close ml-auto text-neutral-400 hover:text-white text-base leading-none" onclick={() => (insight = null)}>×</button>
 					</div>
-					<div class="insight-quote">"{insight.text}"</div>
+					<div class="insight-quote italic text-neutral-400 text-xs p-1.5 bg-white/5 border-l-2 border-[#8bdfff] mb-1.5">"{insight.text}"</div>
 					{#if insight.loading}
-						<div class="insight-loading">Analyzing...</div>
+						<div class="insight-loading text-[#8bdfff] text-xs animate-pulse">Analyzing...</div>
 					{:else}
-						<div class="insight-body">{insight.analysis}</div>
+						<div class="insight-body text-xs text-neutral-300 leading-relaxed max-h-[150px] overflow-y-auto">{insight.analysis}</div>
 					{/if}
 				</div>
 			{/if}
@@ -1024,17 +1068,17 @@
 
 		<!-- ── User Input Bar ── -->
 		{#if userInputMode}
-			<div class="user-input-bar">
-				<span class="input-label">YOUR RESPONSE:</span>
+			<div class="user-input-bar absolute bottom-12 inset-x-0 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#141d30]/90 to-[#0a0d1b]/85 backdrop-blur-md border-t border-[#c2aaff]/70 z-25">
+				<span class="input-label text-[0.65rem] text-[#7c4dff] uppercase tracking-wider whitespace-nowrap">YOUR RESPONSE:</span>
 				<input
 					type="text"
-					class="user-input"
+					class="user-input flex-1 px-3 py-1.5 bg-white/5 border border-white/15 focus:border-[#8bdfff] focus:shadow-[0_0_10px_rgba(131,225,255,0.35)] rounded text-neutral-100 text-xs font-mono outline-none"
 					placeholder="Type your argument, question, or objection..."
 					bind:value={userInputText}
 					onkeydown={(e) => { if (e.key === 'Enter') submitUserInput(); if (e.key === 'Escape') { userInputMode = false; } }}
 				/>
-				<button class="input-send" onclick={submitUserInput}>SUBMIT</button>
-				<button class="input-cancel" onclick={() => (userInputMode = false)}>ESC</button>
+				<button class="input-send px-3 py-1.5 bg-gradient-to-r from-[#b4a0ff] to-[#8cb7ff] text-[#0a0d1b] font-bold text-xs rounded hover:brightness-110 cursor-pointer tracking-wider" onclick={submitUserInput}>SUBMIT</button>
+				<button class="input-cancel px-2.5 py-1.5 border border-white/20 text-neutral-400 rounded text-xs hover:text-white cursor-pointer" onclick={() => (userInputMode = false)}>ESC</button>
 			</div>
 		{/if}
 
@@ -1130,83 +1174,12 @@
 	.courtroom-wrapper { position: relative; width: 100%; height: calc(100vh - 60px); overflow: hidden; background: #0a0a0c; }
 	.courtroom-canvas { width: 100%; height: 100%; display: block; }
 
-	/* ── Top Bar ── */
-	.overlay-top { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 1rem; background: linear-gradient(110deg, rgba(9,13,24,0.94), rgba(13,19,33,0.82) 72%, rgba(13,19,33,0.35)); border-bottom: 1px solid rgba(139,223,255,0.2); box-shadow: 0 8px 28px rgba(0,0,0,0.24); backdrop-filter: blur(12px); z-index: 10; }
-	.btn-icon { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid rgba(186,208,255,0.2); border-radius: 3px; background: rgba(20,29,48,0.72); color: #c4d2e6; cursor: pointer; font-family: inherit; transition: color 120ms ease, border-color 120ms ease, background 120ms ease; }
-	.btn-icon:hover { color: #8bdfff; border-color: rgba(139,223,255,0.7); background: rgba(27,39,64,0.92); }
-	.btn-icon.active { color: #f3d471; border-color: #f3d471; box-shadow: 0 0 10px rgba(243,212,113,0.16); }
-	.top-case-info { flex: 1; display: flex; align-items: center; gap: 0.75rem; font-size: 0.8rem; }
-	.top-case-num { font-family: monospace; color: #888; }
-	.top-charge { font-weight: 600; color: #eee; }
-	.top-defendant { color: #999; }
-	.top-phase { font-size: 0.68rem; color: #c2aaff; text-transform: uppercase; letter-spacing: 0.09em; white-space: nowrap; }
-	.top-controls { display: flex; gap: 0.35rem; align-items: center; }
-	.badge-done { font-size: 0.65rem; padding: 0.2rem 0.5rem; background: var(--t-accent); color: #000; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; }
-
-	/* ── Progress ── */
-
-	/* ── Evidence Sidebar (left) ── */
-	.evidence-sidebar { position: absolute; top: 50px; left: 0; width: 280px; max-height: calc(100% - 200px); overflow-y: auto; background: linear-gradient(135deg, rgba(20,29,48,0.86), rgba(10,13,27,0.82)); backdrop-filter: blur(14px); border-right: 1px solid rgba(186,208,255,0.22); box-shadow: 0 10px 28px rgba(0,0,0,0.4); padding: 1rem; z-index: 15; }
-	.evidence-sidebar h3 { font-size: 0.8rem; color: #f3d471; letter-spacing: 0.06em; margin: 0 0 0.75rem; }
-	.evidence-group { margin-bottom: 1rem; }
-	.evidence-group h4 { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-	.evidence-item { font-size: 0.75rem; color: #ccc; padding: 0.25rem 0; display: flex; flex-direction: column; gap: 0.1rem; }
-	.statute-ref { font-family: monospace; color: var(--t-accent); font-size: 0.7rem; }
-	.actor-role { font-size: 0.65rem; text-transform: uppercase; font-weight: 600; }
-	.evidence-item.timeline { border-left: 2px solid rgba(255,255,255,0.1); padding-left: 0.5rem; margin-bottom: 0.3rem; }
-	.evt-type { font-size: 0.65rem; color: var(--t-accent); text-transform: uppercase; }
-	.evt-desc { font-size: 0.7rem; color: #999; }
-
-	/* ── Dialogue Log (right overlay) ── */
-	.dialogue-log { position: absolute; top: 50px; right: 0; width: 320px; max-height: calc(100% - 200px); background: linear-gradient(135deg, rgba(20,29,48,0.86), rgba(10,13,27,0.82)); backdrop-filter: blur(14px); border-left: 1px solid rgba(186,208,255,0.22); box-shadow: 0 10px 28px rgba(0,0,0,0.4); z-index: 15; display: flex; flex-direction: column; }
-	.log-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-	.log-header h3 { font-size: 0.8rem; color: var(--t-accent); letter-spacing: 0.06em; margin: 0; }
-	.log-count { font-size: 0.65rem; color: #666; }
-	.log-entries { flex: 1; overflow-y: auto; padding: 0.5rem; }
-	.log-entry { display: flex; gap: 0.5rem; align-items: baseline; width: 100%; padding: 0.4rem 0.5rem; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.04); color: #ccc; font-family: inherit; font-size: 0.72rem; text-align: left; cursor: pointer; }
-	.log-entry:hover { background: rgba(255,255,255,0.05); }
-	.log-turn { font-size: 0.6rem; color: #555; min-width: 24px; font-family: monospace; }
-	.log-speaker { font-size: 0.65rem; font-weight: 600; min-width: 60px; text-transform: uppercase; }
-	.log-preview { color: #999; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-	/* ── Dialogue Box ── */
-	.dialogue-box { position: absolute; bottom: 48px; left: 0; right: 0; min-height: 120px; max-height: 200px; background: linear-gradient(110deg, rgba(9,13,24,0.94), rgba(15,20,36,0.9)); backdrop-filter: blur(14px); border-top: 1px solid rgba(243,212,113,0.62); box-shadow: 0 -8px 30px rgba(0,0,0,0.28); padding: 0.75rem 1.5rem; z-index: 20; cursor: text; user-select: text; }
-	.speaker-plate { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.2rem 0.8rem; font-size: 0.75rem; font-weight: 700; color: #000; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 0.4rem; border-radius: 2px; }
-	.speaker-name { font-size: 0.75rem; }
-	.speaker-role { font-size: 0.6rem; opacity: 0.7; }
-	.dialogue-text { font-size: 0.92rem; line-height: 1.55; color: #f0f0f0; font-family: 'Courier New', monospace; white-space: pre-wrap; max-height: 90px; overflow-y: auto; }
-	.dialogue-text::selection { background: rgba(146, 204, 65, 0.4); color: #fff; }
-	.text-cursor { animation: blink 0.6s infinite; color: var(--t-accent); }
-	@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-	.dialogue-hint { font-size: 0.6rem; color: #9baac0; margin-top: 0.3rem; letter-spacing: 0.04em; }
-	.dialogue-proposal-status { margin-top: 0.35rem; color: #f7d51d; font-size: 0.65rem; }
-	.dialogue-proposal { margin-top: 0.45rem; border-left: 2px solid #92cc41; padding: 0.3rem 0.55rem; background: rgba(26,58,10,0.32); font-family: 'Courier New', monospace; }
-	.dialogue-proposal strong { color: #b7e884; font-size: 0.6rem; letter-spacing: 0.05em; }
-	.dialogue-proposal p { margin: 0.2rem 0; color: #f0f0f0; font-size: 0.78rem; }
-	.dialogue-proposal small { color: #8f9b85; font-size: 0.58rem; }
-	.canon-refs { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.3rem; }
-	.canon-tag { font-size: 0.6rem; padding: 0.1rem 0.35rem; background: rgba(255,204,102,0.15); color: #ffcc66; border-radius: 2px; font-family: monospace; }
-
-	/* ── Insight Popup ── */
-	.insight-popup { position: absolute; width: 280px; background: rgba(10,15,25,0.97); border: 1px solid var(--t-accent); border-radius: 6px; padding: 0.75rem; z-index: 30; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-	.insight-header { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; color: var(--t-accent); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; }
-	.insight-close { margin-left: auto; background: none; border: none; color: #888; font-size: 1rem; cursor: pointer; padding: 0; line-height: 1; }
-	.insight-close:hover { color: #fff; }
-	.insight-quote { font-style: italic; color: #aaa; font-size: 0.75rem; padding: 0.3rem 0.5rem; background: rgba(255,255,255,0.04); border-left: 2px solid var(--t-accent); margin-bottom: 0.4rem; }
-	.insight-loading { color: var(--t-accent); font-size: 0.7rem; animation: pulse-text 1s infinite; }
-	@keyframes pulse-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-	.insight-body { font-size: 0.72rem; color: #ccc; line-height: 1.5; max-height: 150px; overflow-y: auto; }
-
-	/* ── User Input Bar ── */
-	.user-input-bar { position: absolute; bottom: 48px; left: 0; right: 0; display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: linear-gradient(135deg, rgba(20,29,48,0.86), rgba(10,13,27,0.82)); backdrop-filter: blur(14px); border-top: 1px solid rgba(194,170,255,0.7); z-index: 25; }
-	.input-label { font-size: 0.65rem; color: #7c4dff; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
-	.user-input { flex: 1; padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #f0f0f0; font-size: 0.85rem; font-family: 'Courier New', monospace; outline: none; }
-	.user-input:focus { border-color: #8bdfff; box-shadow: 0 0 10px rgba(131,225,255,0.35); }
-	.input-send { padding: 0.45rem 1rem; background: linear-gradient(135deg, #b4a0ff, #8cb7ff); color: #0a0d1b; border: none; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer; font-family: inherit; letter-spacing: 0.04em; }
-	.input-send:hover { filter: brightness(1.12); }
-	.input-cancel { padding: 0.45rem 0.75rem; background: none; border: 1px solid rgba(255,255,255,0.2); color: #888; border-radius: 4px; font-size: 0.7rem; cursor: pointer; font-family: inherit; }
-
-	/* ── Action Bar (horizontal bottom) ── */
+	/* ── Misc ── */
+	.overlay-disclaimer { position: absolute; top: 52px; left: 50%; transform: translateX(-50%); font-size: 0.55rem; color: rgba(255,204,102,0.4); letter-spacing: 0.1em; text-transform: uppercase; z-index: 10; pointer-events: none; }
+	.overlay-fps { position: absolute; bottom: 52px; left: 4px; font-size: 0.6rem; color: rgba(255,255,255,0.3); font-family: monospace; z-index: 10; pointer-events: none; }
+	.overlay-error { position: absolute; top: 55px; left: 50%; transform: translateX(-50%); padding: 0.4rem 1rem; background: rgba(248,56,0,0.85); color: #fff; font-size: 0.75rem; border-radius: 4px; z-index: 30; }
+	.overlay-model-loading { position: absolute; top: 55px; right: 8px; font-size: 0.65rem; color: var(--t-accent); padding: 0.3rem 0.75rem; background: rgba(0,0,0,0.8); border: 1px solid var(--t-accent); border-radius: 4px; z-index: 10; }
+	.badge-3d { font-size: 0.6rem; padding: 0.15rem 0.4rem; background: #7c4dff; color: #fff; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; }
 
 
 	/* ── Misc ── */
