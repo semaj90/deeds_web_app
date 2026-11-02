@@ -55,6 +55,14 @@ test('samples are redacted, and --no-sample omits them', () => {
   assert.equal(dedupeLines([l], { sample: false }).templates[0].sample, undefined);
 });
 
+test('redacts JSON-style quoted secret keys', async () => {
+  const { redact } = await import('./docker-log-dedupe-v1.mjs');
+  const output = redact('{"api_key":"sk-123456789","password":"hunter2"}');
+  assert.doesNotMatch(output, /sk-123456789|hunter2/);
+  assert.match(output, /"api_key":<redacted>/);
+  assert.match(output, /"password":<redacted>/);
+});
+
 test('streaming push matches batch dedupe', async () => {
   const { createDeduper } = await import('./docker-log-dedupe-v1.mjs');
   const lines = Array.from({ length: 30 }, (_, i) => err(i, i));

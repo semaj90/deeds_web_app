@@ -39,7 +39,7 @@ export function redact(text) {
   return text
     .replace(/(\b[a-z][a-z0-9+.-]*:\/\/)[^\s/:@]+:[^\s/@]+@/gi, '$1<redacted>@')
     .replace(/\b(bearer)\s+[A-Za-z0-9._~+/=-]{8,}/gi, '$1 <redacted>')
-    .replace(/\b(password|passwd|pwd|secret|token|api[_-]?key|access[_-]?key)(\s*[=:]\s*)('[^']*'|"[^"]*"|\S+)/gi, '$1$2<redacted>');
+    .replace(/(["']?\b(password|passwd|pwd|secret|token|api[_-]?key|access[_-]?key)\b["']?)(\s*[=:]\s*)("[^"]*"|'[^']*'|[^,\s}\]]+)/gi, '$1$3<redacted>');
 }
 
 export function templateOf(line) {
