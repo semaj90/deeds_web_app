@@ -132,7 +132,9 @@ async function pgvectorSearch(vector, { topK = DEFAULT_TOP_K } = {}) {
         ...(r.payload ?? {}),
       },
     }));
-  } catch {
+  } catch (err) {
+    // Surface the failure; the caller still falls back to the registry list, but not silently.
+    process.stderr.write(`[runtime-mcp-tool-selector] pgvector search failed: ${err?.message ?? err}\n`);
     return [];
   }
 }
