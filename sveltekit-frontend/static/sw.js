@@ -447,9 +447,11 @@ self.addEventListener('fetch', (event) => {
       fetch(req)
         .then((res) => {
           if (res.status === 200 && req.method === 'GET') {
+            // Clone synchronously: inside the async cache.open callback the page may already
+            // have consumed `res`, which threw "Response body is already used".
+            const clonedRes = res.clone();
             caches.open(API_CACHE).then((cache) => {
               // Cache successful GET responses with TTL headers
-              const clonedRes = res.clone();
               const headers = new Headers(clonedRes.headers);
               headers.set('sw-cached', new Date().toISOString());
               headers.set('cache-control', 'max-age=300'); // 5 min TTL

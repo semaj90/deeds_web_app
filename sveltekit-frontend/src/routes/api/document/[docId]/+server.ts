@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { isUuid } from '$lib/server/validation.js';
@@ -18,7 +18,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 		const [doc] = await db
       .select()
       .from(evidence)
-      .where(and(eq(evidence.id, docId), eq(evidence.userId, Number(locals.user.id))))
+      // Uploads set uploaded_by and leave user_id NULL, so match either (same rule as /api/evidence/[id] GET).
+      .where(and(eq(evidence.id, docId), or(eq(evidence.userId, Number(locals.user.id)), eq(evidence.uploadedBy, Number(locals.user.id)))))
       .limit(1);
 
 		if (!doc) {
