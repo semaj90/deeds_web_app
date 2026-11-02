@@ -23,13 +23,65 @@
  * connection instead.
  *
  * Usage (run from repo root or sveltekit-frontend/):
- *   node scripts/atlas/prove-ontology-linked-tuple-persistence.mjs
+ *   node scripts/atlas/prove-ontology-linked-tuple-persistence.mjs                 # original ungrounded probe
+ *   node scripts/atlas/prove-ontology-linked-tuple-persistence.mjs --gate-only     # grounded tuple + admission gate, NO database access
+ *   node scripts/atlas/prove-ontology-linked-tuple-persistence.mjs --grounded      # same row written inside the rollback transaction,
+ *                                                                                  # with field-parity readback of participants/evidence_*
+ * Options for the grounded modes: --source=<repo path> --line-start=N --line-end=N
+ *
+ * The admission gate is stricter than the Zod contract (which defaults participants/evidenceRefs to [] and makes
+ * evidenceSpan optional): non-empty participants, evidenceRefs and evidenceSpan, and the span and file must re-hash to
+ * provenance.evidenceSpanChecksum / sourceRevision. A passing gate proves persistence shape only: not :8095 extraction,
+ * not canonical truth.
  */
+import { createHash } from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const DATABASE_URL = resolveDatabaseUrl(loadRepoEnv());
 const TUPLE_ID = 'tuple:live-probe-2026-08-25';
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const argv = process.argv.slice(2);
+const GATE_ONLY = argv.includes('--gate-only');
+const GROUNDED = GATE_ONLY || argv.includes('--grounded');
+const opt = (n, d) => (argv.find((a) => a.startsWith(`--${n}=`)) ?? `--${n}=${d}`).split('=').slice(1).join('=');
+const sha256 = (b) => createHash('sha256').update(b).digest('hex');
+const canon = (v) => JSON.stringify(v, (_k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x)); // jsonb reorders object keys
+
+export function buildGroundedTuple({ source, lineStart, lineEnd, root = ROOT }) {
+  const bytes = fs.readFileSync(path.join(root, source));
+  const lines = bytes.toString('utf8').split('\n');
+  if (lineStart < 1 || lineEnd < lineStart || lineEnd > lines.length) throw new Error('LINE_RANGE_OUT_OF_BOUNDS');
+  const start = Buffer.from(lines.slice(0, lineStart - 1).map((l) => l + '\n').join(''), 'utf8').length;
+  const spanText = lines.slice(lineStart - 1, lineEnd).join('\n');
+  const span = Buffer.from(spanText, 'utf8');
+  const fileDigest = `sha256:${sha256(bytes)}`;
+  return {
+    tupleId: `tuple:grounded-probe:${sha256([source, lineStart, lineEnd, fileDigest].join('\0')).slice(0, 24)}`,
+    sourceRef: source, label: path.basename(source), surfaceText: spanText.slice(0, 200) || path.basename(source),
+    participants: [{ entityId: source, entityKind: 'source_ref', role: 'source', label: path.basename(source) }],
+    evidenceRefs: [`${source}#L${lineStart}-L${lineEnd}`],
+    evidenceSpan: { sourceRef: source, start, end: start + span.length },
+    provenance: { sourceTables: [], labelerVersion: null, taggerVersion: null, ontologyVersion: null, nlpVersion: null,
+      sourceRevision: fileDigest, evidenceSpanChecksum: `sha256:${sha256(span)}`, producerId: 'probe.prove-ontology-linked-tuple-persistence' },
+  };
+}
+
+export function admissionGate(t, root = ROOT) {
+  const errors = [];
+  if (!t.participants?.length) errors.push('EMPTY_PARTICIPANTS');
+  if (!t.evidenceRefs?.length) errors.push('EMPTY_EVIDENCE_REFS');
+  if (!t.evidenceSpan) errors.push('MISSING_EVIDENCE_SPAN');
+  else {
+    const bytes = fs.readFileSync(path.join(root, t.evidenceSpan.sourceRef));
+    if (`sha256:${sha256(bytes.subarray(t.evidenceSpan.start, t.evidenceSpan.end))}` !== t.provenance?.evidenceSpanChecksum) errors.push('SPAN_CHECKSUM_MISMATCH');
+    if (`sha256:${sha256(bytes)}` !== t.provenance?.sourceRevision) errors.push('SOURCE_REVISION_MISMATCH');
+  }
+  return errors;
+}
 
 const UPSERT_SQL = `INSERT INTO atlas_ontology_linked_tuples (
          tuple_id, schema_version, packet_key, source_ref, tree_node_id, document_id, title_id,
@@ -54,7 +106,60 @@ function probeValues(label) {
   ];
 }
 
+function groundedValues(t) {
+  return [
+    t.tupleId, 'ontology-linked-tuple.v1', null, t.sourceRef, null, null, null,
+    t.surfaceText, null, null, t.label, 'tag', 'manual',
+    [], [], JSON.stringify(t.participants), t.evidenceRefs, null,
+    JSON.stringify(t.evidenceSpan), 1, 'REFERENCE_ONLY', 'OBSERVED', JSON.stringify(t.provenance), 'grounded-probe:v1',
+  ];
+}
+
+async function groundedMain() {
+  const t = buildGroundedTuple({ source: opt('source', 'sveltekit-frontend/src/lib/server/env.server.ts'), lineStart: Number(opt('line-start', '1')), lineEnd: Number(opt('line-end', '15')) });
+  const errors = admissionGate(t);
+  const negatives = [
+    ['EMPTY_PARTICIPANTS', { ...t, participants: [] }],
+    ['EMPTY_EVIDENCE_REFS', { ...t, evidenceRefs: [] }],
+    ['MISSING_EVIDENCE_SPAN', { ...t, evidenceSpan: undefined }],
+    ['SPAN_CHECKSUM_MISMATCH', { ...t, provenance: { ...t.provenance, evidenceSpanChecksum: `sha256:${'0'.repeat(64)}` } }],
+  ].map(([expect, bad]) => `${expect}:${admissionGate(bad).includes(expect) ? 'rejected' : 'ACCEPTED'}`);
+  console.log('GATE', errors.length ? `FAIL ${errors}` : 'PASS', JSON.stringify(negatives));
+  if (errors.length || negatives.some((n) => n.endsWith('ACCEPTED'))) throw new Error('admission gate failed');
+  if (GATE_ONLY) { console.log('GATE_ONLY_NO_DATABASE_ACCESS'); return; }
+
+  const pool = new pg.Pool({ connectionString: DATABASE_URL });
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query(UPSERT_SQL, groundedValues(t));
+    const r = await client.query('SELECT participants, evidence_refs, evidence_span, provenance FROM atlas_ontology_linked_tuples WHERE tuple_id = $1', [t.tupleId]);
+    if (r.rowCount !== 1) throw new Error(`expected 1 row, got ${r.rowCount}`);
+    const row = r.rows[0];
+    const parity = {
+      participants: canon(row.participants) === canon(t.participants),
+      evidence_refs: canon(row.evidence_refs) === canon(t.evidenceRefs),
+      evidence_span: canon(row.evidence_span) === canon(t.evidenceSpan),
+      source_revision: row.provenance?.sourceRevision === t.provenance.sourceRevision,
+    };
+    console.log('GROUNDED_READBACK_PARITY', JSON.stringify(parity));
+    if (!Object.values(parity).every(Boolean)) throw new Error('grounded readback parity failed');
+    await client.query('ROLLBACK');
+    const residual = await pool.query('SELECT count(*)::int AS n FROM atlas_ontology_linked_tuples WHERE tuple_id = $1', [t.tupleId]);
+    if (residual.rows[0].n !== 0) throw new Error(`residual rows after rollback: ${residual.rows[0].n}`);
+    console.log('ZERO_RESIDUAL_ROWS');
+    console.log('GROUNDED_PROOF_PASSED');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+    await pool.end();
+  }
+}
+
 async function main() {
+  if (GROUNDED) return groundedMain();
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
   const client = await pool.connect();
   try {
