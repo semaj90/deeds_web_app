@@ -79,6 +79,7 @@ describe('RabbitMQManager initialize() idempotency', () => {
   });
 
   it('reconnects after the connection is marked lost', async () => {
+    // (see the lifecycle-hardening suite below for the race tests)
     const { manager, connect } = await stubbedManager();
 
     await manager.initialize();
@@ -86,5 +87,68 @@ describe('RabbitMQManager initialize() idempotency', () => {
     await manager.initialize();
 
     expect(connect).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('RabbitMQManager lifecycle hardening (fake AMQP, no broker)', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  async function freshManager() {
+    const { RabbitMQManager } = await import('./rabbitmq-manager-fixed.js');
+    return new RabbitMQManager() as any;
+  }
+
+  it('schedules only one reconnect when connection error is followed by close', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const manager = await freshManager();
+    const initialize = vi.spyOn(manager, 'initialize').mockResolvedValue(true);
+
+    manager.emit('connection_lost'); // error handler
+    manager.emit('connection_lost'); // close handler for the same outage
+    await vi.advanceTimersByTimeAsync(120_000);
+
+    expect(initialize).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it('cancels already-registered consumers when startConsumers fails part-way', async () => {
+    const manager = await freshManager();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    let n = 0;
+    const cancel = vi.fn(async () => {});
+    manager.channel = {
+      prefetch: vi.fn(async () => {}),
+      cancel,
+      consume: vi.fn(async () => {
+        n += 1;
+        if (n === 3) throw new Error('consume failed on third queue');
+        return { consumerTag: `tag-${n}` };
+      }),
+    };
+
+    await expect(manager.startConsumers()).rejects.toThrow('consume failed');
+
+    expect(cancel.mock.calls.map((c: any[]) => c[0]).sort()).toEqual(['tag-1', 'tag-2']);
+  });
+
+  it('allocates one channel for concurrent ensureChannel() calls', async () => {
+    const manager = await freshManager();
+    const createChannel = vi.fn(async () => {
+      await new Promise((r) => setTimeout(r, 5));
+      return { on: vi.fn(), close: vi.fn(async () => {}) };
+    });
+    manager.connection = { createChannel };
+    manager.channel = null;
+
+    const [a, b] = await Promise.all([manager.ensureChannel(), manager.ensureChannel()]);
+
+    expect(createChannel).toHaveBeenCalledTimes(1);
+    expect(a).toBe(b);
   });
 });
