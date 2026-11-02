@@ -18,6 +18,8 @@
 		toId: string;
 		type: 'similarity' | 'temporal' | 'causal' | 'reference';
 		strength: number;
+		/** UNSCORED = no model-derived score exists; strength 0 is a placeholder, not a measurement. */
+		scoreStatus?: 'EMBEDDING_COSINE' | 'UNSCORED';
 		metadata?: { reason?: string; confidence?: number };
 	}
 
@@ -86,7 +88,8 @@
 			const toEv = evidenceList.find(e => e.id === toId);
 			if (!fromEv || !toEv) throw new Error('Evidence not found');
 
-			let similarity = 0.5 + Math.random() * 0.5;
+			// Never fabricated: stays null unless a real embedding cosine is computed below.
+			let similarity: number | null = null;
 
 			// Try to get real similarity via embedding API
 			try {
@@ -103,18 +106,24 @@
 						similarity = calculateCosineSimilarity(fromData.embedding, toData.embedding);
 					}
 				}
-			} catch { /* fallback to random similarity */ }
+			} catch { /* embeddings unavailable: connection stays UNSCORED (no random fallback) */ }
+
+			// Cosine similarity is only a meaningful score for 'similarity' links; it cannot establish a temporal or causal relation.
+			const score = connectionType === 'similarity' && similarity !== null && Number.isFinite(similarity) ? similarity : null;
 
 			const newConn: EvidenceConnection = {
 				id: crypto.randomUUID(),
 				fromId,
 				toId,
 				type: connectionType,
-				strength: similarity,
-				metadata: { reason: `${connectionType} connection`, confidence: similarity }
+				strength: score ?? 0,
+				scoreStatus: score === null ? 'UNSCORED' : 'EMBEDDING_COSINE',
+				metadata: { reason: `${connectionType} connection`, ...(score !== null ? { confidence: score } : {}) }
 			};
 			connections = [...connections, newConn];
-			statusMessage = `Created ${connectionType} connection (${Math.round(similarity * 100)}% similarity)`;
+			statusMessage = score === null
+				? `Created ${connectionType} connection (unscored: ${connectionType === 'similarity' ? 'embeddings unavailable' : 'similarity does not establish this relation'})`
+				: `Created ${connectionType} connection (${Math.round(score * 100)}% similarity)`;
 		} catch (err) {
 			console.error('Failed to create connection:', err);
 			statusMessage = 'Failed to create connection';
