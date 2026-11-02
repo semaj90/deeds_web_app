@@ -4,11 +4,16 @@
  * This does not apply SQL, alter schemas, or backfill rows. It compares the
  * reviewed SQL owner, Drizzle mirror, sidecar manifest, and live table shape.
  */
+import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import {
+  migrationOwnerAuditHasBlockerV1,
+  summarizeMigrationOwnerResultsV1,
+} from './lib/migration-owner-audit-summary-v1.mjs';
 
 const { Pool } = pg;
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -79,16 +84,79 @@ const targets = [
   {
     id: 'feature_registry',
     table: 'feature_registry',
+    sourceKind: 'journal_chain',
     sql: [
       'drizzle/0024_nebulous_mongoose.sql',
+      'drizzle/0025_yellow_tony_stark.sql',
     ],
-    // This proposal defines a different text-oriented feature_registry shape
-    // and several unrelated task/agent tables. It is intentionally reported
-    // as competing evidence, never as an owner or migration input.
+    manifestSql: ['drizzle/0024_nebulous_mongoose.sql'],
+    // The journaled owner is the 0024 base table plus the 0025 additions.
+    // The October draft is a consolidated snapshot of that resulting shape;
+    // the May proposal is a separate, incompatible hierarchy proposal.
     competingSql: ['drizzle/manual/proposed_20260530_task_semantic_packets.sql'],
     drizzle: ['src/lib/server/db/schema/feature-registry.ts'],
-    expectedColumns: ['id', 'feature_key', 'title', 'status', 'source_refs'],
+    expectedColumns: [
+      'id', 'feature_key', 'title', 'description', 'status', 'summary',
+      'source_refs', 'chunk_ids', 'tags', 'code_refs', 'test_refs',
+      'retry_queries', 'cluster_id', 'trust_tier', 'last_verified_at',
+    ],
     expectedStatus: 'active_candidate',
+    journalTags: ['0024_nebulous_mongoose', '0025_yellow_tony_stark'],
+  },
+  // Sibling relations declared by journal entry 0024 (absent per the 2026-11-01 history audit).
+  ...[
+    ['evidence_board_edges', ['id']],
+    ['saved_citation_annotations', ['id']],
+    ['agent_progress_log', ['id']],
+    ['feature_tasks', ['id']],
+  ].map(([table, expectedColumns]) => ({
+    id: `journal_0024_${table}`,
+    table,
+    sourceKind: 'journal_chain',
+    sql: ['drizzle/0024_nebulous_mongoose.sql'],
+    manifestSql: ['drizzle/0024_nebulous_mongoose.sql'],
+    drizzle: [],
+    expectedColumns,
+    journalTags: ['0024_nebulous_mongoose'],
+  })),
+  // 0023 only ALTERs these tables and drops columns/constraints after data
+  // transformation: replay is blocked, so this is evidence only.
+  ...[
+    ['documents_atlas_entries', ['source_ref', 'path']],
+    ['feature_index_entries', ['stable_key', 'path']],
+    ['retrieval_cache_traces', ['run_id', 'query_hash']],
+  ].map(([table, expectedColumns]) => ({
+    id: `journal_0023_${table}`,
+    table,
+    sourceKind: 'journal_chain',
+    sql: ['drizzle/0023_exotic_wrecker.sql'],
+    manifestSql: [], // journal file, not a sidecar: no sidecar-manifest registration applies
+    drizzle: [],
+    expectedColumns,
+    journalTags: ['0023_exotic_wrecker'],
+    replayBlocked: 'DESTRUCTIVE_DDL_DROP_AFTER_BACKFILL',
+  })),
+  {
+    id: 'sidecar_0099_atlas_svg_glyphs',
+    table: 'atlas_svg_glyphs',
+    sql: ['drizzle/0099_atlas_svg_glyphs.sql'],
+    drizzle: [],
+    expectedColumns: ['id', 'packet_key', 'source_ref', 'glyph_id', 'glyph_type', 'created_at', 'updated_at'],
+    expectedIndexes: [
+      'idx_svg_glyphs_packet_key',
+      'idx_svg_glyphs_source_ref',
+      'idx_svg_glyphs_glyph_id',
+      'idx_svg_glyphs_glyph_type',
+    ],
+  },
+  // TypeScript declaration with no DDL owner anywhere in drizzle/.
+  {
+    id: 'feature_registry_vectors',
+    table: 'feature_registry_vectors',
+    sourceKind: 'drizzle_declaration',
+    sql: [],
+    drizzle: ['src/lib/server/db/schema/feature-registry-vectors.ts'],
+    expectedColumns: ['embedding', 'owner_file', 'status'],
   },
 ];
 
@@ -127,8 +195,29 @@ function columnsFromSql(text, table) {
 }
 
 function manifestStatus(manifest, file) {
-  const item = manifest.find((entry) => entry.file === `manual/${file.split('/').pop()}` || entry.file === file);
+  const base = file.split('/').pop();
+  const item = manifest.find((entry) => entry.file === `manual/${base}` || entry.file === file || entry.file === base);
   return item ? { status: item.status, reason: item.reason ?? null } : null;
+}
+
+// Optional input: the report written by scripts/ops/audit-drizzle-history-readonly.mjs.
+// Read-only; absence leaves every journal-backed history as HISTORY_UNRESOLVED.
+async function loadHistoryReport() {
+  const base = process.env.LOCALAPPDATA;
+  if (!base) return null;
+  const file = path.join(base, 'DeedsWebApp', 'inventory', 'drizzle-history-readonly-latest.json');
+  try {
+    const text = await fs.readFile(file, 'utf8');
+    const parsed = JSON.parse(text);
+    return {
+      path: file,
+      sha256: createHash('sha256').update(text).digest('hex'),
+      ledgerRows: parsed.catalog?.ledger?.rows ?? null,
+      journal: new Map((parsed.journalRows ?? []).map((row) => [row.tag, row])),
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function liveAudit() {
@@ -136,33 +225,54 @@ async function liveAudit() {
   const connectionString = resolveDatabaseUrl(env);
   if (!connectionString) return { reachable: false, error: 'DATABASE_URL_UNAVAILABLE', tables: {} };
   const pool = new Pool({ connectionString, connectionTimeoutMillis: 3000, max: 1 });
+  let client;
+  let readOnlyTransactionOpen = false;
   try {
+    client = await pool.connect();
+    await client.query('BEGIN READ ONLY');
+    readOnlyTransactionOpen = true;
     const names = targets.map((target) => target.table);
-    const result = await pool.query(
+    const result = await client.query(
       `SELECT c.table_name, c.column_name, c.ordinal_position
        FROM information_schema.columns c
        WHERE c.table_schema = 'public' AND c.table_name = ANY($1::text[])
        ORDER BY c.table_name, c.ordinal_position`,
       [names],
     );
-    const rows = await pool.query(
+    const indexes = await client.query(
+      `SELECT tablename AS table_name, indexname
+       FROM pg_indexes
+       WHERE schemaname = 'public' AND tablename = ANY($1::text[])
+       ORDER BY tablename, indexname`,
+      [names],
+    );
+    const rows = await client.query(
       `SELECT table_name, (xpath('/row/count/text()', query_to_xml(format('SELECT count(*) AS count FROM public.%I', table_name), true, false, '')))[1]::text::bigint AS row_count
        FROM unnest($1::text[]) AS table_name
        WHERE to_regclass('public.' || table_name) IS NOT NULL`,
       [names],
     );
     const tables = {};
-    for (const name of names) tables[name] = { exists: false, columns: [], rowCount: null };
+    for (const name of names) tables[name] = { exists: false, columns: [], indexes: [], rowCount: null };
     for (const row of result.rows) {
-      tables[row.table_name] ??= { exists: true, columns: [], rowCount: null };
+      tables[row.table_name] ??= { exists: true, columns: [], indexes: [], rowCount: null };
       tables[row.table_name].exists = true;
       tables[row.table_name].columns.push(row.column_name);
     }
+    for (const row of indexes.rows) {
+      tables[row.table_name] ??= { exists: true, columns: [], indexes: [], rowCount: null };
+      tables[row.table_name].exists = true;
+      tables[row.table_name].indexes.push(row.indexname);
+    }
     for (const row of rows.rows) if (tables[row.table_name]) tables[row.table_name].rowCount = Number(row.row_count);
+    await client.query('ROLLBACK');
+    readOnlyTransactionOpen = false;
     return { reachable: true, tables };
   } catch (error) {
+    if (client && readOnlyTransactionOpen) await client.query('ROLLBACK').catch(() => {});
     return { reachable: false, error: error instanceof Error ? error.message : String(error), tables: {} };
   } finally {
+    client?.release();
     await pool.end().catch(() => {});
   }
 }
@@ -172,6 +282,7 @@ async function main() {
   const parsedManifest = JSON.parse(manifestText);
   const manifest = parsedManifest.sidecars ?? parsedManifest.migrations ?? parsedManifest;
   const live = await liveAudit();
+  const history = await loadHistoryReport();
   const results = [];
   for (const target of targets) {
     const sqlTexts = await Promise.all(target.sql.map(readOptional));
@@ -179,14 +290,37 @@ async function main() {
     const drizzleTexts = await Promise.all(target.drizzle.map(readOptional));
     const sqlColumns = [...new Set(sqlTexts.flatMap((text) => columnsFromSql(text, target.table)))].sort();
     const drizzlePresent = drizzleTexts.some(Boolean);
-    const manifestEntries = target.sql.map((file) => ({ file, entry: manifestStatus(manifest, file) }));
-    const table = live.tables[target.table] ?? { exists: false, columns: [], rowCount: null };
+    const manifestFiles = target.manifestSql ?? target.sql;
+    const manifestEntries = manifestFiles.map((file) => ({ file, entry: manifestStatus(manifest, file) }));
+    const table = live.tables[target.table] ?? { exists: false, columns: [], indexes: [], rowCount: null };
     const expectedMissing = target.expectedColumns.filter((column) => !sqlColumns.includes(column));
     const liveMissing = target.expectedColumns.filter((column) => !table.columns.includes(column));
+    const liveIndexMissing = (target.expectedIndexes ?? []).filter((index) => !table.indexes.includes(index));
     const allRegistered = manifestEntries.every(({ entry }) => entry !== null);
+    const declarationOnly = target.sourceKind === 'drizzle_declaration';
+    const tags = target.journalTags ?? [];
+    const ledgerRows = tags.map((tag) => history?.journal.get(tag)?.ledgerRowPresent ?? null);
+    // Deployment provenance is tracked separately from current existence: an
+    // absent object does not prove its migration never ran, and an empty
+    // Drizzle ledger does not prove it did not.
+    const liveState = table.exists ? (liveMissing.length || liveIndexMissing.length ? 'PRESENT_SHAPE_DRIFT' : 'PRESENT') : 'ABSENT';
+    const historyState = declarationOnly ? 'NO_DDL_HISTORY'
+      : tags.length && ledgerRows.every((value) => value === true) ? 'LEDGER_RECORDED'
+        : 'HISTORY_UNRESOLVED';
+    const ownershipState = declarationOnly ? 'UNOWNED_DECLARATION'
+      : target.replayBlocked ? 'REVIEW_REQUIRED_REPLAY_BLOCKED'
+        : (!table.exists || !allRegistered ? 'REVIEW_REQUIRED' : 'OWNED');
     results.push({
+      liveState,
+      historyState,
+      ownershipState,
+      proposedAction: 'NO_DDL',
+      replayBlocked: target.replayBlocked ?? null,
+      journalHistory: tags.length ? { tags, ledgerRowPresent: ledgerRows } : null,
+      writesPerformed: false,
       id: target.id,
       table: target.table,
+      sourceKind: target.sourceKind ?? 'sidecar',
       expectedStatus: target.expectedStatus ?? 'active_candidate',
       sql: { files: target.sql, columns: sqlColumns, expectedMissing },
       competingDefinitions: {
@@ -196,10 +330,20 @@ async function main() {
       },
       drizzle: { files: target.drizzle.map((file) => rel(path.join(FRONTEND, file))), present: drizzlePresent },
       manifest: { allRegistered, entries: manifestEntries },
-      live: { exists: table.exists, columns: table.columns, rowCount: table.rowCount, expectedMissing: liveMissing },
+      live: {
+        exists: table.exists,
+        columns: table.columns,
+        indexes: table.indexes,
+        rowCount: table.rowCount,
+        expectedMissing: liveMissing,
+        expectedIndexesMissing: liveIndexMissing,
+      },
       classification: target.expectedStatus === 'superseded_unapplied'
         ? (table.exists ? 'SUPERSEDED_TABLE_NAME_COLLISION' : 'SUPERSEDED_UNAPPLIED')
-        : (!allRegistered ? 'MISSING_MANIFEST_REGISTRATION' : !table.exists ? 'SIDEcar_UNAPPLIED' : liveMissing.length ? 'LIVE_COLUMN_MISMATCH' : 'LIVE_SHAPE_ALIGNED'),
+        : declarationOnly ? (table.exists ? (liveMissing.length || liveIndexMissing.length ? 'LIVE_SHAPE_MISMATCH' : 'LIVE_SHAPE_ALIGNED') : 'DECLARATION_ONLY')
+        : (!allRegistered ? 'MISSING_MANIFEST_REGISTRATION'
+          : !table.exists ? (target.sourceKind === 'journal_chain' ? 'JOURNALED_OBJECT_ABSENT' : 'SIDECAR_UNAPPLIED')
+            : liveMissing.length || liveIndexMissing.length ? 'LIVE_SHAPE_MISMATCH' : 'LIVE_SHAPE_ALIGNED'),
     });
   }
   const report = {
@@ -207,18 +351,18 @@ async function main() {
     generatedAt: new Date().toISOString(),
     writes: false,
     live,
+    historyReport: history ? { path: history.path, sha256: history.sha256, ledgerRows: history.ledgerRows } : null,
     results,
     summary: {
-      missingManifestRegistration: results.filter((item) => item.classification === 'MISSING_MANIFEST_REGISTRATION').map((item) => item.id),
-      sidecarUnapplied: results.filter((item) => item.classification === 'SIDEcar_UNAPPLIED').map((item) => item.id),
-      liveShapeAligned: results.filter((item) => item.classification === 'LIVE_SHAPE_ALIGNED').map((item) => item.id),
-      superseded: results.filter((item) => item.classification.startsWith('SUPERSEDED')).map((item) => item.id),
+      ...summarizeMigrationOwnerResultsV1(results),
+      declarationOnly: results.filter((item) => item.classification === 'DECLARATION_ONLY').map((item) => item.id),
+      historyUnresolved: results.filter((item) => item.historyState === 'HISTORY_UNRESOLVED').map((item) => item.id),
     },
   };
   await fs.mkdir(path.dirname(REPORT), { recursive: true });
   await fs.writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`);
   console.log(JSON.stringify({ report: path.relative(ROOT, REPORT), writes: false, live: live.reachable, summary: report.summary }, null, 2));
-  if (results.some((item) => ['MISSING_MANIFEST_REGISTRATION', 'LIVE_COLUMN_MISMATCH', 'SUPERSEDED_REQUIRES_REVIEW'].includes(item.classification))) process.exitCode = 1;
+  if (migrationOwnerAuditHasBlockerV1(results)) process.exitCode = 1;
 }
 
 main().catch((error) => {
