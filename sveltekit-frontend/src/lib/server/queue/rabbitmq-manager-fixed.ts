@@ -176,7 +176,7 @@ export class RabbitMQManager extends EventEmitter {
         console.warn('[RabbitMQ] Initialization aborted during dev reload');
         return false;
       }
-      console.error('❌ RabbitMQ initialization failed:', message);
+      console.error(`❌ RabbitMQ initialization failed (${this.describeEndpoint()}):`, message);
       return false;
     }
   }
@@ -378,9 +378,23 @@ export class RabbitMQManager extends EventEmitter {
 
       console.log(`✅ RabbitMQ connected (${this.describeEndpoint()})`);
     } catch (error) {
+      const failedChannel = this.channel;
+      const failedConnection = this.connection;
+      this.channel = null;
+      this.connection = null;
+      if (failedChannel) {
+        try {
+          await failedChannel.close();
+        } catch {}
+      }
+      if (failedConnection) {
+        try {
+          await failedConnection.close();
+        } catch {}
+      }
       const message = this.formatError(error);
       if (this.shouldSilenceError(message)) return;
-      throw new Error(`RabbitMQ connection failed: ${message}`);
+      throw new Error(`RabbitMQ connection failed (${this.describeEndpoint()}): ${message}`);
     }
   }
 

@@ -164,4 +164,28 @@ describe('RabbitMQManager endpoint description', () => {
     manager.url = 'not a url';
     expect(manager.describeEndpoint()).toBe('unparseable RABBITMQ_URL');
   });
+
+  it('closes a connection when initial channel allocation fails', async () => {
+    vi.resetModules();
+    const connection = {
+      createChannel: vi.fn(async () => {
+        throw new Error('No channels left to allocate');
+      }),
+      close: vi.fn(async () => {}),
+    };
+    const connect = vi.fn(async () => connection);
+    vi.doMock('amqplib', () => ({ default: { connect } }));
+
+    const { RabbitMQManager } = await import('./rabbitmq-manager-fixed.js');
+    const manager = new RabbitMQManager() as any;
+    manager.url = 'amqp://legal_admin:s3cret@127.0.0.1:5673';
+
+    await expect(manager.connect()).rejects.toThrow(
+      'RabbitMQ connection failed (127.0.0.1:5673): No channels left to allocate',
+    );
+    expect(connection.close).toHaveBeenCalledTimes(1);
+    expect(manager.connection).toBeNull();
+    expect(manager.channel).toBeNull();
+    vi.doUnmock('amqplib');
+  });
 });
