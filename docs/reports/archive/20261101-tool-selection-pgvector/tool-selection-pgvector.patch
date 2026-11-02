@@ -1,0 +1,72 @@
+diff --git a/sveltekit-frontend/src/lib/server/ai/tool-selection.ts b/sveltekit-frontend/src/lib/server/ai/tool-selection.ts
+index 2aebbfa1f3f..644c3d5b3fb 100644
+--- a/sveltekit-frontend/src/lib/server/ai/tool-selection.ts
++++ b/sveltekit-frontend/src/lib/server/ai/tool-selection.ts
+@@ -45,7 +45,7 @@ export interface ToolSelectionResult {
+   tool_defs: ToolDefinitionEntry[];
+   signals: string[];
+   embed_ok: boolean;
+-  source: 'qdrant' | 'fallback';
++  source: 'pgvector' | 'qdrant' | 'fallback';
+   top_k: number;
+   bootstrap: boolean;
+   always_include: string[];
+@@ -60,7 +60,7 @@ export interface ToolSelectionTrace {
+   state_source: 'DETERMINISTIC_QUERY_HEURISTIC';
+   candidate_count: number;
+   selected_tools: string[];
+-  selector_source: 'qdrant' | 'fallback';
++  selector_source: 'pgvector' | 'qdrant' | 'fallback';
+   embedding_dimension: 768 | null;
+   read_only: true;
+ }
+@@ -600,6 +600,29 @@ async function embedQuery(text: string): Promise<number[] | null> {
+   return null;
+ }
+ 
++// Ranking source #1: pgvector atlas_tool_manifest_vectors_v1 (real embeddinggemma vectors; live_surface = discoverable on atlas-tools/TRACE).
++// Returns [] on any failure so the caller falls back to Qdrant, then to FALLBACK_TOOLS.
++async function searchToolManifestPg(
++  vector: number[],
++  topK: number
++): Promise<Array<{ tool_name: string; score: number }>> {
++  try {
++    const { db } = await import('$lib/server/db/client');
++    const { sql } = await import('drizzle-orm');
++    const vectorLiteral = `[${vector.join(',')}]`;
++    const rows = (await db.execute(
++      sql`SELECT tool_name, 1 - (embedding <=> ${vectorLiteral}::vector) AS score
++          FROM public.atlas_tool_manifest_vectors_v1
++          WHERE payload->>'live_surface' = 'true'
++          ORDER BY embedding <=> ${vectorLiteral}::vector
++          LIMIT ${topK * 2}`
++    )) as unknown as Array<{ tool_name: string; score: number | string }>;
++    return rows.map((r) => ({ tool_name: String(r.tool_name), score: Number(r.score) })).slice(0, topK);
++  } catch {
++    return [];
++  }
++}
++
+ async function searchToolManifest(
+   vector: number[],
+   signals: string[],
+@@ -681,10 +704,16 @@ export async function selectToolsForQuery(input: ToolSelectionInput): Promise<To
+   let source: ToolSelectionResult['source'] = 'fallback';
+ 
+   if (vector) {
+-    const hits = await searchToolManifest(vector, signals, topK);
+-    rankedNames = hits.map((hit) => hit.tool_name);
++    const pgHits = await searchToolManifestPg(vector, topK);
++    rankedNames = pgHits.map((hit) => hit.tool_name);
+     if (rankedNames.length > 0) {
+-      source = 'qdrant';
++      source = 'pgvector';
++    } else {
++      const hits = await searchToolManifest(vector, signals, topK);
++      rankedNames = hits.map((hit) => hit.tool_name);
++      if (rankedNames.length > 0) {
++        source = 'qdrant';
++      }
+     }
+   }
+ 
