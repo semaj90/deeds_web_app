@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 
 import app as legacy
+from fastapi import Response
 from ornith_vlm_client import (
     ORNITH_VLM_BASE_URL,
     ORNITH_VLM_MODEL,
@@ -54,16 +55,24 @@ legacy.app.router.routes[:] = [
 ]
 
 
+@legacy.app.get("/live")
+async def liveness_check():
+    return {"status": "alive"}
+
+
 @legacy.app.get("/health", response_model=legacy.HealthResponse)
-async def health_check():
+@legacy.app.get("/ready", response_model=legacy.HealthResponse)
+async def readiness_check(response: Response):
     vlm = await asyncio.get_event_loop().run_in_executor(None, get_ornith_vlm_health)
+    ready = bool(vlm.get("healthy"))
+    response.status_code = 200 if ready else 503
     return legacy.HealthResponse(
-        status="healthy" if vlm.get("healthy") else "degraded",
+        status="healthy" if ready else "degraded",
         services={
-            "docling": legacy.get_docling_parser() is not None,
-            "whisper": legacy.get_whisper_model() is not None,
-            "yolo": legacy.get_yolo_model() is not None,
-            "vlm_ocr": bool(vlm.get("healthy")),
+            "docling": legacy.docling_parser is not None,
+            "whisper": legacy.whisper_model is not None,
+            "yolo": legacy.yolo_model is not None,
+            "vlm_ocr": ready,
         },
         config={
             "vlm_model": ORNITH_VLM_MODEL,
