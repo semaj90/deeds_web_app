@@ -179,6 +179,9 @@ export function createTestCaseRegistryRepository(pool: Pool) {
     }): Promise<{ resolution: TestCaseResolutionV1; version: TestCaseVersionV1 }> {
       if (!input.allow_create) throw new Error('TEST_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE');
       const existing = await resolveNomination({ nomination: input.nomination, registry_revision: input.registry_revision });
+      if (existing.status === 'ambiguous') {
+        throw new Error(`TEST_PROMOTION_REJECTED_AMBIGUOUS_RESOLUTION:${existing.candidate_ids.join(',')}`);
+      }
       const stableId = existing.status === 'canonical' && existing.stable_test_id
         ? existing.stable_test_id
         : stableTestId(input.nomination);

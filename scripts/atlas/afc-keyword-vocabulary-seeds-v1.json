@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.afc-keyword-vocabulary-seeds.v1",
+  "reviewStatus": "DRAFT_UNREVIEWED_FIXTURE_DERIVED",
+  "reviewNote": "Initial seeds copied from the fixture vocabulary in helper-routing-v1.spec.ts. term -> helperRefs have NOT been reviewed by the AFC owners. domainRefs use ONLY active domain_taxonomy_v1 domain_id values; fixture labels with no taxonomy domain (source-code, robotics, documentation) are left empty rather than invented. Edit this file, rebuild, and review the diff.",
+  "entries": [
+    { "term": "called", "domainRefs": [], "helperRefs": ["rg-exact", "ast-grep-structural", "lsp-references"] },
+    { "term": "references", "domainRefs": [], "helperRefs": ["rg-exact", "ast-grep-structural", "lsp-references"] },
+    { "term": "update", "domainRefs": [], "helperRefs": ["rg-exact", "ast-grep-structural", "ts-morph-symbol", "lsp-definition"] },
+    { "term": "callback", "domainRefs": [], "helperRefs": ["rg-exact", "ast-grep-structural", "lsp-definition", "lsp-references"] },
+    { "term": "definition", "domainRefs": [], "helperRefs": ["rg-exact", "ast-grep-structural", "lsp-definition", "docs-corpus-search"] },
+    { "term": "ros2", "domainRefs": [], "helperRefs": ["rg-exact", "ast-grep-structural", "lsp-references", "docs-corpus-search"] },
+    { "term": "docs", "domainRefs": [], "helperRefs": ["docs-corpus-search", "postgres-fts"] },
+    { "term": "cagra", "domainRefs": ["retrieval"], "helperRefs": ["docs-corpus-search", "postgres-fts", "semantic-768"] },
+    { "term": "indexing", "domainRefs": ["retrieval"], "helperRefs": ["docs-corpus-search", "postgres-fts", "semantic-768"] },
+    { "term": "parameters", "domainRefs": ["retrieval"], "helperRefs": ["docs-corpus-search", "postgres-fts"] },
+    { "term": "qdrant", "domainRefs": ["retrieval"], "helperRefs": ["postgres-fts", "semantic-768"] },
+    { "term": "semanticrevision", "domainRefs": ["retrieval"], "helperRefs": ["rg-exact", "postgres-fts", "semantic-768"] },
+    { "term": "hnsw", "domainRefs": ["retrieval"], "helperRefs": ["postgres-fts", "docs-corpus-search", "semantic-768"] },
+    { "term": "cache", "domainRefs": ["cache"], "helperRefs": ["rg-exact", "postgres-fts", "postgres-trigram"] },
+    { "term": "stale", "domainRefs": ["cache"], "helperRefs": ["rg-exact", "postgres-fts", "postgres-trigram"] },
+    { "term": "graphify", "domainRefs": ["graph"], "helperRefs": ["rg-exact", "postgres-fts", "semantic-768", "graph-ppr"] },
+    { "term": "postgres", "domainRefs": ["database.postgresql"], "helperRefs": ["rg-exact", "postgres-fts", "postgres-trigram", "docs-corpus-search"] }
+  ],
+  "prefixRules": [
+    { "prefix": "qdr", "allowedExpansions": ["qdrant"] },
+    { "prefix": "graph", "allowedExpansions": ["graphify"] },
+    { "prefix": "ref", "allowedExpansions": ["references"] },
+    { "prefix": "call", "allowedExpansions": ["called", "callback"] }
+  ]
+}

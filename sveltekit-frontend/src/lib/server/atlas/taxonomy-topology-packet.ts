@@ -12,6 +12,7 @@ import { deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1 } from './taxono
 import { persistTaxonomyAssignmentCandidates } from './kag-taxonomy-candidate-postgres.js';
 import { resolvePacketKeyResolutionV2 } from './identity/packet-identity-resolver.js';
 import { PACKET_KEY_V2_PATTERN } from './identity/packet-key-v2.js';
+import type { OntologyLinkedTupleV1 } from './contracts/ontology-linked-tuple-v1.js';
 
 export const TaxonomyTupleSchema = z.object({
   source: z.string().min(1),
@@ -62,6 +63,19 @@ export function buildTaxonomyReferenceTuplesV1(
       nlpVersion: null,
     },
   }));
+}
+
+export function filterGroundedOntologyTuplesForPersistenceV1(
+  tuples: readonly OntologyLinkedTupleV1[],
+): OntologyLinkedTupleV1[] {
+  return tuples.filter((tuple) =>
+    tuple.participants.length > 0
+    && tuple.evidenceRefs.length > 0
+    && Boolean(tuple.evidenceSpan?.sourceRef.trim())
+    && Boolean(tuple.provenance.sourceRevision?.trim())
+    && Boolean(tuple.provenance.workspaceRevision?.trim())
+    && tuple.evidenceState === 'ACTIVE_VERIFIED'
+  );
 }
 
 export const TaxonomyClassifierEvidenceSchema = z.object({
@@ -504,14 +518,15 @@ export async function buildTaxonomyTopologyPacket(
         ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
       },
     }));
+  const persistableOntologyLinkedTuples = filterGroundedOntologyTuplesForPersistenceV1(rawOntologyLinkedTuples);
 
   const workspaceRevision = resolveTaxonomyWorkspaceRevisionV1(process.env);
-  const ontologyCachePlan = workspaceRevision && canonicalPacketKey ? buildOntologyLinkedTupleCachePlan({
+  const ontologyCachePlan = persistableOntologyLinkedTuples.length > 0 && workspaceRevision && canonicalPacketKey ? buildOntologyLinkedTupleCachePlan({
     packetId: canonicalPacketKey,
     packetRevision: packet.packet_ulid,
     featureId,
     sourceRef: `taxonomy:${summary.nodeKey}`,
-    tuples: rawOntologyLinkedTuples,
+    tuples: persistableOntologyLinkedTuples,
     centroid: {
       domainClass: summary.classifier.domainClass ?? 'unknown',
       domainCentroidKey: `atlas:centroid:domain:${summary.classifier.domainClass ?? 'unknown'}`,
@@ -542,10 +557,10 @@ export async function buildTaxonomyTopologyPacket(
   // exist in canonical storage, which breaks "Postgres is truth" outright.
   // Fail-open at the MCP-response level (a persistence failure must not
   // break this tool's response), but never fail-open on what gets cached.
-  const persistence = rawOntologyLinkedTuples.length > 0
-    ? await persistOntologyLinkedTuples(rawOntologyLinkedTuples, 'taxonomy-topology-packet:v1').catch((err) => {
+  const persistence = persistableOntologyLinkedTuples.length > 0
+    ? await persistOntologyLinkedTuples(persistableOntologyLinkedTuples, 'taxonomy-topology-packet:v1').catch((err) => {
         console.warn('[taxonomy-topology-packet] Postgres tuple persistence failed (DEGRADED_PERSISTENCE, no Redis cache this cycle):', err);
-        return { attempted: rawOntologyLinkedTuples.length, written: 0, errors: rawOntologyLinkedTuples.map((tuple) => ({ tupleId: tuple.tupleId, message: 'persistOntologyLinkedTuples threw' })) };
+        return { attempted: persistableOntologyLinkedTuples.length, written: 0, errors: persistableOntologyLinkedTuples.map((tuple) => ({ tupleId: tuple.tupleId, message: 'persistOntologyLinkedTuples threw' })) };
     })
     : { attempted: 0, written: 0, errors: [] };
 
@@ -557,10 +572,10 @@ export async function buildTaxonomyTopologyPacket(
   }
 
   const failedTupleIds = new Set(persistence.errors.map((error) => error.tupleId));
-  const persistedTuples = rawOntologyLinkedTuples.filter((tuple) => !failedTupleIds.has(tuple.tupleId));
+  const persistedTuples = persistableOntologyLinkedTuples.filter((tuple) => !failedTupleIds.has(tuple.tupleId));
 
   if (persistedTuples.length > 0 && ontologyCachePlan && workspaceRevision) {
-    const cacheableCachePlan = persistedTuples.length === rawOntologyLinkedTuples.length
+    const cacheableCachePlan = persistedTuples.length === persistableOntologyLinkedTuples.length
       ? ontologyCachePlan
       : buildOntologyLinkedTupleCachePlan({
           packetId: canonicalPacketKey!,

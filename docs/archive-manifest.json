@@ -759,5 +759,52 @@
     "file_count": 2267,
     "archived": "2026-10-25T18:54:33.788Z",
     "reason": "Root Cargo workspace build output (root Cargo.toml defines the workspace; target/ is regenerable via cargo build). Moved before the manifest entry was written; entry added after verification. Docker sveltekit build copies simd_bridge_rs.node from target/release and regenerates it. Restore by moving back to target/."
+  },
+  {
+    "path": "sveltekit-frontend/temp_upload.svelte",
+    "archive_path": "docs/archive/2026-11-02/phase104-loose-root-tests/temp_upload.svelte",
+    "sha256": "5393d64ddcbb3e44a6fd894fa79eebd95e26a2ec22e0cec04be36edc4c318f1d",
+    "archived": "2026-11-02T19:27:37Z",
+    "reason": "Loose root-level Svelte upload test component; not referenced by active source or task configuration. Preserved byte-for-byte outside the app source tree. Historical lineage/report artifacts refer to the original path; regenerate or reconcile derived indexes before treating them as current. Restore by moving the archived file back to the original path."
+  },
+  {
+    "path": "sveltekit-frontend/test-errors-validation.svelte",
+    "archive_path": "docs/archive/2026-11-02/phase104-loose-root-tests/test-errors-validation.svelte",
+    "sha256": "8b083bbc8b99188eb67bf92a4638997455a2bb2c5886003958ad0446371e404e",
+    "archived": "2026-11-02T19:27:37Z",
+    "reason": "Loose root-level Svelte error-validation test component; not referenced by active source or task configuration. Preserved byte-for-byte outside the app source tree. Historical lineage/report artifacts refer to the original path; regenerate or reconcile derived indexes before treating them as current. Restore by moving the archived file back to the original path."
+  },
+  {
+    "path": "sveltekit-frontend/test-errors.svelte",
+    "archive_path": "docs/archive/2026-11-02/phase104-loose-root-tests/test-errors.svelte",
+    "sha256": "a13f460f6f4663164dc29bbb4f790afd50c2f759bc0b6d40f18addef6ebf457f",
+    "archived": "2026-11-02T19:27:37Z",
+    "reason": "Loose root-level Svelte error test component; not referenced by active source or task configuration. Preserved byte-for-byte outside the app source tree. Historical lineage/report artifacts refer to the original path; regenerate or reconcile derived indexes before treating them as current. Restore by moving the archived file back to the original path."
+  },
+  {
+    "path": "openspec/changes/parent-atlas-test-registry-ingestion",
+    "archive_path": "docs/archive/2026-11-02/parent-atlas-test-registry-ingestion-draft",
+    "type": "directory",
+    "file_count": 4,
+    "files": [
+      {
+        "path": "docs/archive/2026-11-02/parent-atlas-test-registry-ingestion-draft/design.md",
+        "sha256": "22016dd78ccb7098ae134464ffd46d480e9dce25ac0eec22b5367817e3ba1bb8"
+      },
+      {
+        "path": "docs/archive/2026-11-02/parent-atlas-test-registry-ingestion-draft/proposal.md",
+        "sha256": "cd8597622ade53af44718c5f89a6d350143b4574518a0c2a50177351cfa422b9"
+      },
+      {
+        "path": "docs/archive/2026-11-02/parent-atlas-test-registry-ingestion-draft/specs/test-registry-ingestion/spec.md",
+        "sha256": "8e623ececccfff192dfdced1ae530e1d9617969e78e560daa88560ddd7342597"
+      },
+      {
+        "path": "docs/archive/2026-11-02/parent-atlas-test-registry-ingestion-draft/tasks.md",
+        "sha256": "1616355536e3a80284b97daffa716dc4d00f9e79764a01c324cea79fa017b3cc"
+      }
+    ],
+    "archived": "2026-11-02T19:40:00Z",
+    "reason": "Draft OpenSpec change folded into RECEIPT-WRITER-01 (parent-atlas-ace-rlm-bitfrost-integration/tasks.md) per operator direction to extend the existing task, not keep a duplicate plan. design.md was written into this folder by a concurrent session at 11:33; preserved unchanged. Restore by moving the folder back to openspec/changes/."
   }
 ]

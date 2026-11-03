@@ -445,6 +445,7 @@
 	<EvidenceViewModal
 		bind:open={showViewModal}
 		evidenceId={viewEvidenceId}
+		caseId={activeCaseId || data.evidence?.[0]?.caseId || null}
 		onClose={() => {
 			showViewModal = false;
 			viewEvidenceId = null;

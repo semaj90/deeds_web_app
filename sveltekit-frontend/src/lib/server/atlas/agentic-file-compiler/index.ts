@@ -18,3 +18,9 @@ export * from './workflow-action-event-writer.js';
 export * from './validation-barrier.js';
 export * from './invalidation-plan.js';
 export * from './model-route-map.js';
+// AFC-ROUTING-PROMOTE-01 (option A, 2026-11-02): the owner-verified v1 helper-routing contracts.
+// The isolated routing-review-v2 candidate is NOT exported (design record; see tasks.md).
+export * from './helper-registry-v1.js';
+export * from './helper-capability-snapshot-v1.js';
+export * from './keyword-recognition-v1.js';
+export * from './helper-eligibility-v1.js';

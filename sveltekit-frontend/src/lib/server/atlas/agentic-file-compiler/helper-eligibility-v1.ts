@@ -19,6 +19,12 @@ export const HelperEligibilityV1Schema = z.object({
 	keywordRecognitionChecksum: z.string().regex(/^[a-f0-9]{64}$/),
 	helperRegistryChecksum: z.string().regex(/^[a-f0-9]{64}$/),
 	capabilitySnapshotChecksums: z.array(z.string().regex(/^[a-f0-9]{64}$/)),
+	classifierRevision: z.string().min(1),
+	taxonomyRevision: z.string().min(1),
+	vocabularyRevision: z.string().min(1),
+	normalizationRevision: z.string().min(1),
+	helperRegistryRevision: z.string().min(1),
+	expansionPolicyRevision: z.string().min(1),
 	retrievalPolicyRevision: z.string().min(1),
 	decisions: z.array(HelperEligibilityDecisionSchema),
 	checksum: z.string().regex(/^[a-f0-9]{64}$/),
@@ -32,6 +38,7 @@ export type HelperEligibilityV1 = z.infer<typeof HelperEligibilityV1Schema>;
 export function buildHelperEligibilityV1(input: {
 	keywordRecognition: KeywordRecognitionV1;
 	capabilitySnapshots: HelperCapabilitySnapshotV1[];
+	expansionPolicyRevision: string;
 	retrievalPolicyRevision: string;
 	registry?: HelperRegistryV1;
 }): HelperEligibilityV1 {
@@ -74,6 +81,12 @@ export function buildHelperEligibilityV1(input: {
 		keywordRecognitionChecksum: recognition.checksum,
 		helperRegistryChecksum: registry.checksum,
 		capabilitySnapshotChecksums: snapshots.map((snapshot) => snapshot.checksum),
+		classifierRevision: recognition.classifierRevision,
+		taxonomyRevision: recognition.taxonomyRevision,
+		vocabularyRevision: recognition.vocabularyRevision,
+		normalizationRevision: recognition.normalizationRevision,
+		helperRegistryRevision: registry.revision,
+		expansionPolicyRevision: input.expansionPolicyRevision,
 		retrievalPolicyRevision: input.retrievalPolicyRevision,
 		decisions,
 		executionAuthorized: false as const,

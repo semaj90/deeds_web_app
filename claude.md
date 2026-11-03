@@ -1979,3 +1979,26 @@ Open:
 - **Lifting this rule needs all of:** verified authentication (token checked against a stored secret, not presence), a typed single-purpose tool (no generic shell/Docker), a `/slots`-idle precheck, PID scoping to the exact `--port`, an audit receipt with `writesPerformed`, and a negative test (fake token refused). Record the decision in the owning OpenSpec `tasks.md`.
 - **Seed/backfill scripts fail closed:** a script that writes embeddings must not substitute a placeholder or hash vector when the embedding service fails (the 2026-11-01 `seed-tool-manifest-vectors.mjs` incident wrote 337 pseudo-vectors silently). Fixtures may opt in explicitly (`SEED_ALLOW_PSEUDO_VECTORS=1`) and must label the rows.
 - **Ollama host normalization:** `OLLAMA_HOST=0.0.0.0` has no port; normalize to `127.0.0.1:11434` before building URLs.
+
+## Service capability ranking hook (2026-11-02)
+
+`scripts/atlas/service-capability-rank-v1.mjs` ranks `:8100 :8791 :8090 :8097 :8095`, runs bounded read-only functional checks, and persists to `service_capabilities` (empty before; `/api/health` only UPDATEs by `service_name`, so rows must be seeded). The broad prober stays `probe-parent-atlas-services.mjs` (no DB writes; its Aug 31 report is stale).
+
+| Mode | Behavior |
+|---|---|
+| default | dry-run: plan, checks, pre-image; writes only a unique exclusive-create receipt `.tmp/atlas/service-capability-rank-v1.<mode>.<stamp>.receipt.json` (the retrieval check now allows 20 s and retries once: cold FTS takes 2-3 s) |
+| `--rehearse` | upsert in a transaction, post-checks, always `ROLLBACK` (verified 2026-11-02: passed, table stayed at 0 rows) |
+| `--apply` | needs `SERVICE_CAPABILITY_APPLY_AUTHORIZED=1`; commits only if post-checks pass, else rolls back; failed post-commit readback restores the pre-image. **APPLIED 2026-11-02**: 5 rows committed and read back (`service_capabilities` was 0 rows). Both failure branches fault-injected via `SERVICE_CAPABILITY_FAULT=postcheck|readback` (test-only; ignored in dry-run): rollback and restore each left 0 rows. The first readback fault run exposed a real bug (pool `max: 1` starved by the open transaction client, so readback and restore timed out and left 5 committed rows); fixed with `max: 2` and a loud `RESTORE FAILED` path, and the 5 test rows were deleted by marker before the clean run |
+
+- `--refresh` (schedule-safe, 2026-11-02): UPDATEs only `last_health_*` and metadata on rows already seeded by this hook (`metadata.source` = marker); never inserts, never touches `tier`/`is_required`; rolls back and exits 1 if any of the 5 rows is missing (guard fault-tested: 4/5 rows -> rolled back, timestamps unchanged). npm: `atlas:services:refresh` (and `atlas:services:rank` for the dry-run), run from `sveltekit-frontend/`. No scheduler is installed; the table is only as fresh as the last run.
+- Upsert changes only health fields and metadata; `tier` and `is_required` are never overwritten. Enum `service_tier` = `core|data|inference|future`.
+- Functional checks (2026-11-02, all 5 PASS): `:8097` `/embed` 768-d deterministic; `:8791` `indexed` 274,428, dim 128, 128-d `/search`; `:8090` streamed to `[DONE]` (thin: 3 chunks); `:8095` `/ast/chunk` COMPLETE+CLEAN; `:8100` `/search/bm25` returned results (Postgres FTS, `trueBm25:false`; identity `REVIEW_REQUIRED` / `ATLAS_FTS_REVISION_INCOMPLETE`, informational).
+- TurboVec count resolved 2026-11-02: `codebase_chunk_index` has 274,428 of 274,465 rows with `content_embedding_768`, equal to TurboVec `indexed`. The 219,998 figure above (2026-10-20) is stale; the embedding backfill progressed. `content_embedding` (halfvec) is 57,243 rows.
+- `/api/health` only UPDATEs rows named for its own checks (`ollama`, `qdrant`, `redis`, `postgres`, …), so the five seeded rows are refreshed by re-running this hook, not by that route.
+- Do not seed `atlas_test_registry` or `atlas_test_execution_receipts` by hand: they are written through `packages/parent-atlas/src/core/test-case-registry.ts` and `test-execution-repository.ts` (nomination, resolution, append-only receipts).
+
+## Embedding validity guard + summary queue dry-run (2026-11-02)
+
+- `scripts/atlas/embedding-validity-guard-v1.mjs` (read-only, ~42 s): `NO_PLACEHOLDER_SIGNATURE_FOUND` on 274,428 embedded chunks: 0 wrong dims, 0 zero/non-unit norm, 6,231 exact-duplicate vector groups all benign (same trimmed text), re-embed parity 40/40 cosine >= 0.99996 via `:8097`. It detects specific signatures only; it is not proof of validity.
+- Live counts (supersede the 219,998 / 560 figures above): 274,465 chunks; 274,428 embedded; 40,306 summarized; 234,159 embedded and unsummarized. 219,239 embedded rows have no `embedding_version`. `embedding_eligible` (true for 52,379) is a lineage-stamp flag, not a validity signal.
+- `scripts/atlas/summary-work-queue-dryrun-v1.mjs` (read-only): the revision-qualified summary queue is EMPTY: 0 of 234,159 eligible chunks have `source_revision`. No ranking exists (weights unset; `token_count`, `enriched_at` empty). Blocked on `source_revision` backfill, deferred until after Phase 20.

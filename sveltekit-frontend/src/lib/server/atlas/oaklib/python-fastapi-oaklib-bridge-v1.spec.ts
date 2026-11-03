@@ -64,7 +64,9 @@ describe('python-fastapi-oaklib-bridge-v1', () => {
 
 		expect(adapted.length).toBe(2);
 		expect(adapted[0].schemaVersion).toBe('ontology-linked-tuple.v1');
-		expect(adapted[0].evidenceState).toBe('ACTIVE_VERIFIED');
+		expect(adapted[0].evidenceState).toBe('REFERENCE_ONLY');
+		expect(adapted[0].participants).toEqual([]);
+		expect(adapted[0].evidenceRefs).toEqual([]);
 		expect(adapted[0].label).toBe('governed_by');
 		expect(adapted[0].ontologyIds).toEqual(['legal:bankruptcy', 'statute:usc_title_11']);
 		expect(adapted[0].confidence).toBe(0.98);
@@ -72,14 +74,14 @@ describe('python-fastapi-oaklib-bridge-v1', () => {
 		expect(adapted[0].provenance.labelerVersion).toBe('oaklib-sidecar');
 	});
 
-	it('builds centroid-addressed cache plan for Valkey / Redis', () => {
+	it('rejects cache planning for raw reference-only OakLib tuples', () => {
 		const persistedTuples = adaptRawOaklibTuplesToOntologyLinkedTuplesV1({
 			rawTuples: sampleTuples,
 			packetKey: 'packet:test_123',
 			sourceRef: 'corpus/statutes/title11.txt',
 		});
 
-		const cachePlan = buildOaklibOntologyCachePlan({
+		expect(() => buildOaklibOntologyCachePlan({
 			packetId: 'packet:test_123',
 			packetRevision: 'rev-456',
 			featureId: 'feature-bankruptcy-code',
@@ -90,12 +92,6 @@ describe('python-fastapi-oaklib-bridge-v1', () => {
 			somCluster: '2:5',
 			workspaceRevision: 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc',
 			ontologyVersion: '2026.10',
-		});
-
-		expect(cachePlan.records[0].centroid.domainCentroidKey).toBe('atlas:centroid:domain:bankruptcy');
-		expect(cachePlan.records[0].centroid.kmeansCentroidKey).toBe('atlas:centroid:kmeans:3');
-		expect(cachePlan.records[0].centroid.somCentroidKey).toBe('atlas:centroid:som:2:5');
-		expect(cachePlan.records.length).toBe(2);
-		expect(cachePlan.records[0].tupleId).toBe(persistedTuples[0].tupleId);
+		})).toThrow('OAKLIB_CACHE_GROUNDED_LINEAGE_REQUIRED');
 	});
 });

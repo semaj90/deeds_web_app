@@ -2,6 +2,8 @@
   import { onMount, onDestroy } from 'svelte';
   import { env as publicEnv } from '$env/dynamic/public';
   import Icon from '$lib/components/ui/Icon.svelte';
+  import DepthReliefViewer from '$lib/components/evidence/DepthReliefViewer.svelte';
+  import { makeSampleReliefPair } from '$lib/components/evidence/relief-sample.js';
 
   // ── Scene inputs ──────────────────────────────────────────────────────────
   let who   = $state('');
@@ -20,6 +22,27 @@
   let videoPrompt = $state('');
   let pointCount  = $state(0);
   let errorMsg    = $state('');
+
+  // ── Render mode: solid textured surface is the default; the point cloud is a diagnostic view ──
+  let renderMode = $state<'solid' | 'pointcloud'>('solid');
+  // Colour + depth of the SAME frame (service sends both from one object). Never paired from different frames.
+  let reliefImageUrl = $state<string | null>(null);
+  let reliefDepthUrl = $state<string | null>(null);
+  let reliefNote = $state('');
+  let reliefSource = $state<'none' | 'service' | 'sample'>('none');
+  let revokeSample: (() => void) | null = null;
+  const solidReady = $derived(!!reliefImageUrl && !!reliefDepthUrl);
+
+  async function loadSample() {
+    revokeSample?.();
+    const pair = await makeSampleReliefPair();
+    revokeSample = pair.revoke;
+    reliefImageUrl = pair.imageUrl;
+    reliefDepthUrl = pair.depthUrl;
+    reliefSource = 'sample';
+    reliefNote = '';
+    renderMode = 'solid';
+  }
 
   // ── WebGPU state ──────────────────────────────────────────────────────────
   let canvas: HTMLCanvasElement;
@@ -359,6 +382,8 @@
     stage = 'running';
     progress = { prompt: 'pending', keyframe: 'pending', video: 'pending', depth: 'pending' };
     videoUrl = null; keyframeUrl = null; videoPrompt = ''; errorMsg = '';
+    if (reliefSource === 'service') { reliefImageUrl = null; reliefDepthUrl = null; reliefSource = 'none'; }
+    reliefNote = '';
 
     try {
       const resp = await fetch(`${IMAGE_SVC}/reconstruct/stream`, {
@@ -408,6 +433,16 @@
 
           if (s === 'depth' && status === 'done') {
             if (evt.pointcloud) uploadPointCloud(evt.pointcloud);
+            if (evt.depth_base64 && evt.frame_base64) {
+              revokeSample?.(); revokeSample = null;
+              reliefImageUrl = `data:image/png;base64,${evt.frame_base64}`;
+              reliefDepthUrl = `data:image/png;base64,${evt.depth_base64}`;
+              reliefSource = 'service';
+              reliefNote = '';
+            } else if (evt.depth_base64) {
+              // Depth without its own frame: the keyframe is a different image, so do NOT pair them.
+              reliefNote = 'The service returned a depth map but not the frame it was computed from, so no solid surface is shown. Update the image-synthesis service.';
+            }
           }
 
           if (s === 'complete') stage = 'done';
@@ -482,6 +517,7 @@
   onDestroy(() => {
     cancelAnimationFrame(animFrame);
     clearInterval(playTimer);
+    revokeSample?.();
     gpuDevice?.destroy();
     pointBuffer?.destroy();
     cameraBuffer?.destroy();
@@ -641,6 +677,45 @@
         onmouseleave={onMouseUp}
         onwheel={onWheel}
       ></canvas>
+
+      <!-- Solid textured surface (default). The point-cloud canvas above stays alive as the diagnostic view. -->
+      {#if renderMode === 'solid' && solidReady}
+        <div class="absolute inset-0 z-10 bg-[#0d0e10] p-2" data-testid="solid-surface">
+          <DepthReliefViewer imageUrl={reliefImageUrl!} depthUrl={reliefDepthUrl!} />
+        </div>
+      {:else if renderMode === 'solid'}
+        <div class="absolute inset-x-0 top-14 z-10 mx-auto w-fit max-w-md px-3 py-2 rounded bg-[#181a1c]/90 border border-[#2e2e2e] text-[11px] text-[#aaa]" data-testid="solid-hint">
+          {reliefNote || 'Run a reconstruction, or load the sample scene, to see the solid textured surface. The point cloud is available as a diagnostic view.'}
+        </div>
+      {/if}
+
+      <div class="absolute top-3 left-3 z-20 flex items-center gap-2 text-[10px] uppercase tracking-widest" role="group" aria-label="Render mode">
+        <button
+          type="button"
+          data-testid="mode-solid"
+          aria-pressed={renderMode === 'solid'}
+          class="px-2.5 py-1 rounded border {renderMode === 'solid' ? 'border-[#c4a35a] bg-[#c4a35a]/20 text-[#e8dcc8]' : 'border-[#2e2e2e] bg-[#111213] text-[#888]'}"
+          onclick={() => (renderMode = 'solid')}
+        >Solid surface</button>
+        <button
+          type="button"
+          data-testid="mode-pointcloud"
+          aria-pressed={renderMode === 'pointcloud'}
+          class="px-2.5 py-1 rounded border {renderMode === 'pointcloud' ? 'border-amber-500/70 bg-amber-950/40 text-amber-300' : 'border-[#2e2e2e] bg-[#111213] text-[#888]'}"
+          onclick={() => { renderMode = 'pointcloud'; scheduleRender(); }}
+        >Diagnostic point cloud</button>
+        <button
+          type="button"
+          data-testid="load-sample"
+          class="px-2.5 py-1 rounded border border-[#2e2e2e] bg-[#111213] text-[#888] hover:text-[#c4a35a]"
+          onclick={loadSample}
+        >Load sample</button>
+        {#if solidReady && renderMode === 'solid'}
+          <span class="px-2 py-1 rounded bg-[#111213]/80 border border-[#4a473b] text-[#b5af94] normal-case tracking-normal" data-testid="derived-label">
+            Derived view · {reliefSource === 'sample' ? 'synthetic sample' : 'frame-bound depth estimate'} · not measured
+          </span>
+        {/if}
+      </div>
 
       <!-- Overlay: video preview (bottom-right) -->
       {#if videoUrl}

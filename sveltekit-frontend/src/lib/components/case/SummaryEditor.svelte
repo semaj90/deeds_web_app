@@ -42,9 +42,13 @@
  </div>
  {:else}
  <div class="content">
+ {#if summary.text.trim()}
  <div class="text">
  {summary.text}
  </div>
+ {:else}
+ <p class="empty-summary">No case summary has been written yet.</p>
+ {/if}
 
  {#if summary.holding}
  <div class="section">
@@ -120,6 +124,7 @@
 <style>
  .summary-editor {
  background: white;
+	color: #2c2c2c;
 	border: 1px solid #e0e0e0;
  border-radius: 4px;
 	padding: 1.5rem;
@@ -163,6 +168,13 @@
  white-space: pre-wrap;
  word-wrap: break-word;
  }
+
+	.empty-summary {
+		color: #665b54;
+		font-style: italic;
+		line-height: 1.6;
+		margin: 0 0 1.5rem;
+	}
 
  .section {
  margin-bottom: 1.5rem;

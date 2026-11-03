@@ -8,6 +8,7 @@
 	import StreamingAnalysisPanel from '$lib/components/cases/StreamingAnalysisPanel.svelte';
 	import { onMount } from "svelte";
 import EvidenceUploadPreview from '$lib/components/evidence/EvidenceUploadPreview.svelte';
+import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
 import SummaryReviewPanel from '$lib/components/evidence/SummaryReviewPanel.svelte';
 import WysiwygEditor from '$lib/components/editor/WysiwygEditor.svelte';
 import TipTapEditor from '$lib/components/TipTapEditor.svelte';
@@ -44,10 +45,10 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
 
  interface Evidence { id: string, fileName: string;
  documentType: string;
-	inferenceConfidence: number;
+	inferenceConfidence: number | null;
  status: 'pending' | 'approved' | 'rejected';
  createdAt: string;
- metadata?: Record<string, unknown>;
+ metadata?: Record<string, unknown> | null;
  }
 
  let { data } = $props<{
@@ -102,6 +103,7 @@ import type { BoardSnapshotSchema } from '$lib/schemas/board';
  let error = $state('');
  let isUploading = $state(false);
  let selectedEvidence = $state<Evidence | null>(null);
+ let showEvidenceViewer = $state(false);
  let suggestedSummary = $state<any>(null);
  let isGeneratingSummary = $state(false);
  let showNotesPanel = $state(false);
@@ -253,19 +255,49 @@ function normalizeCaseResponse(payload: unknown): Case | null {
  return null;
 }
 
+function normalizeInferenceConfidence(value: unknown): number | null {
+ const confidence = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : null;
+ return confidence !== null && Number.isFinite(confidence) && confidence >= 0 && confidence <= 1 ? confidence : null;
+}
+
 function normalizeEvidenceResponse(payload: unknown): Evidence[] {
- if (Array.isArray(payload)) {
-  return payload as Evidence[];
- }
+ const list = Array.isArray(payload)
+  ? payload
+  : payload && typeof payload === 'object'
+   ? ((payload as Record<string, unknown>).evidence ?? (payload as Record<string, unknown>).data)
+   : null;
 
- if (!payload || typeof payload !== 'object') {
-  return [];
- }
+ if (!Array.isArray(list)) return [];
 
- const response = payload as Record<string, unknown>;
- const list = response.evidence ?? response.data;
+ return list.flatMap((item): Evidence[] => {
+  if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
+  const row = item as Record<string, unknown>;
+  if (typeof row.id !== 'string' || !row.id) return [];
 
- return Array.isArray(list) ? (list as Evidence[]) : [];
+  const metadata = row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata)
+   ? row.metadata as Record<string, unknown>
+   : {};
+  const fileSize = row.fileSize ?? row.file_size ?? row.sizeBytes ?? metadata.fileSize;
+  const documentType = [row.documentType, row.evidenceType, row.type, row.fileType, row.mimeType]
+   .find((value): value is string => typeof value === 'string' && value.trim().length > 0);
+  const status = row.status === 'approved' || row.status === 'rejected' ? row.status : 'pending';
+
+  return [{
+   ...row,
+   id: row.id,
+   fileName: [row.fileName, row.filename, row.title]
+    .find((value): value is string => typeof value === 'string' && value.trim().length > 0) ?? 'Untitled evidence',
+   documentType: documentType ?? 'Unknown type',
+   inferenceConfidence: normalizeInferenceConfidence(row.inferenceConfidence ?? row.inference_confidence),
+   status,
+   createdAt: typeof row.createdAt === 'string' ? row.createdAt : '',
+   metadata: { ...metadata, fileSize: metadata.fileSize ?? fileSize ?? null },
+  } as Evidence];
+ });
+}
+
+function formatInferenceConfidence(value: number | null): string {
+ return value === null ? 'Not scored' : `${Math.round(value * 100)}% conf`;
 }
 
  function resolveCaseId() {
@@ -472,7 +504,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
  // Try cache first
  const cached = await cache.get<Evidence[]>(cacheKey);
  if (cached) {
- evidence = Array.isArray(cached) ? cached : [];
+ evidence = normalizeEvidenceResponse(cached);
  isLoading = false;
  return;
  }
@@ -1305,7 +1337,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
                         <div class="min-w-0">
                           <p class="text-[13px] font-semibold text-[#141312] truncate">{item.fileName}</p>
                           <p class="text-[11px] font-mono text-[#7F7565] mt-0.5 uppercase tracking-wide">
-                            {item.documentType} &bull; {(item.inferenceConfidence * 100).toFixed(0)}% conf
+                            {item.documentType} &bull; {formatInferenceConfidence(item.inferenceConfidence)}
                           </p>
                         </div>
                       </div>
@@ -1338,7 +1370,7 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
             <div class="dossier-card-body">
               <CaseEvidenceOrganizer
                 {caseId}
-                initialEvidence={evidence.map(e => ({ id: e.id, title: e.fileName, type: e.documentType, status: e.status, confidence: e.inferenceConfidence, createdAt: e.createdAt }))}
+                initialEvidence={evidence.map(e => ({ id: e.id, title: e.fileName, type: e.documentType, status: e.status, ...(e.inferenceConfidence !== null ? { confidence: e.inferenceConfidence } : {}), createdAt: e.createdAt }))}
                 onselectevidence={(data) => { if (data.evidence.length > 0) { const first = data.evidence[0]; selectedEvidence = evidence.find(e => e.id === first.id) ?? null; } activeTab = 'evidence'; }}
               />
             </div>
@@ -1569,6 +1601,13 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
         <StreamingAnalysisPanel {caseId} />
 
         {#if selectedEvidence}
+			<button
+				type="button"
+				onclick={() => (showEvidenceViewer = true)}
+				class="w-full px-4 py-2 border border-[#c9b794] text-[#46382e] rounded-lg bg-[#faf7f1] hover:bg-[#f1e9dc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8d6821] font-medium transition"
+			>
+				Open original evidence
+			</button>
           {#if !suggestedSummary}
             <EvidenceUploadPreview
               evidenceId={selectedEvidence.id}
@@ -1724,6 +1763,12 @@ function normalizeEvidenceResponse(payload: unknown): Evidence[] {
     </div>
   </main>
 
+	<EvidenceViewModal
+		bind:open={showEvidenceViewer}
+		evidenceId={selectedEvidence?.id ?? null}
+		{caseId}
+		onClose={() => (showEvidenceViewer = false)}
+	/>
 
  <!-- Statute Detail Modal -->
  {#if showStatuteModal}

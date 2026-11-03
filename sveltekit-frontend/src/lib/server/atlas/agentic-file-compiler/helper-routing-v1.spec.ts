@@ -42,7 +42,7 @@ function snapshots(overrides: Record<string, boolean> = {}): HelperCapabilitySna
 function route(query: string, caps = snapshots()) {
 	const classification = classifyAtlasQuery({ requestId: 'fixture-routing', query, producerRevision: 'query-classifier-fixture-v1' });
 	const recognition = buildKeywordRecognitionV1({ classification, taxonomyRevision: 'taxonomy-fixture-v1', vocabulary });
-	const eligibility = buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: caps, retrievalPolicyRevision: 'retrieval-policy-fixture-v1' });
+	const eligibility = buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: caps, expansionPolicyRevision: 'expansion-policy-fixture-v1', retrievalPolicyRevision: 'retrieval-policy-fixture-v1' });
 	return { classification, recognition, eligibility };
 }
 
@@ -101,13 +101,13 @@ describe('bounded helper routing contracts', () => {
 	it('fails closed on stale or duplicate capability observations', () => {
 		const recognition = route('qdrant').recognition;
 		const current = snapshots();
-		expect(() => buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: [current[0]!, current[0]!], retrievalPolicyRevision: 'p1' })).toThrow('DUPLICATE_CAPABILITY_SNAPSHOT');
+		expect(() => buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: [current[0]!, current[0]!], expansionPolicyRevision: 'expansion-policy-fixture-v1', retrievalPolicyRevision: 'p1' })).toThrow('DUPLICATE_CAPABILITY_SNAPSHOT');
 		const semanticSnapshot = current.find((snapshot) => snapshot.helperId === 'semantic-768')!;
 		const { checksum: _oldChecksum, ...semanticSnapshotBody } = semanticSnapshot;
 		const staleBody = { ...semanticSnapshotBody, helperRevision: '0'.repeat(64) };
 		const staleSnapshot = { ...staleBody, checksum: sha256Stable(staleBody) };
-		expect(() => buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: current.map((snapshot) => snapshot.helperId === 'semantic-768' ? staleSnapshot : snapshot), retrievalPolicyRevision: 'p1' })).toThrow('CAPABILITY_REVISION_MISMATCH:semantic-768');
-		expect(() => buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: current.map((snapshot) => snapshot.helperId === 'semantic-768' ? { ...snapshot, available: !snapshot.available } : snapshot), retrievalPolicyRevision: 'p1' })).toThrow('CAPABILITY_CHECKSUM_MISMATCH:semantic-768');
-		expect(() => buildHelperEligibilityV1({ keywordRecognition: { ...recognition, helperRefs: [] }, capabilitySnapshots: current, retrievalPolicyRevision: 'p1' })).toThrow('KEYWORD_RECOGNITION_CHECKSUM_MISMATCH');
+		expect(() => buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: current.map((snapshot) => snapshot.helperId === 'semantic-768' ? staleSnapshot : snapshot), expansionPolicyRevision: 'expansion-policy-fixture-v1', retrievalPolicyRevision: 'p1' })).toThrow('CAPABILITY_REVISION_MISMATCH:semantic-768');
+		expect(() => buildHelperEligibilityV1({ keywordRecognition: recognition, capabilitySnapshots: current.map((snapshot) => snapshot.helperId === 'semantic-768' ? { ...snapshot, available: !snapshot.available } : snapshot), expansionPolicyRevision: 'expansion-policy-fixture-v1', retrievalPolicyRevision: 'p1' })).toThrow('CAPABILITY_CHECKSUM_MISMATCH:semantic-768');
+		expect(() => buildHelperEligibilityV1({ keywordRecognition: { ...recognition, helperRefs: [] }, capabilitySnapshots: current, expansionPolicyRevision: 'expansion-policy-fixture-v1', retrievalPolicyRevision: 'p1' })).toThrow('KEYWORD_RECOGNITION_CHECKSUM_MISMATCH');
 	});
 });

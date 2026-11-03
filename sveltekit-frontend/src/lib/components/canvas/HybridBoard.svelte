@@ -68,6 +68,7 @@
 		onDirtyChange?: ((dirty: boolean) => void) | null;
 		onCanvasClick?: ((world: Vec2) => void) | null;
 		onNodeSelect?: ((node: BoardNode | null) => void) | null;
+		onNodeOpen?: ((node: BoardNode) => void) | null;
 		onConnectionCreated?: ((fromId: string, toId: string) => void) | null;
 		onContextMenu?: ((node: BoardNode, screen: Vec2) => void) | null;
 	}
@@ -81,6 +82,7 @@
 		onDirtyChange = null,
 		onCanvasClick = null,
 		onNodeSelect = null,
+		onNodeOpen = null,
 		onConnectionCreated = null,
 		onContextMenu = null,
 	}: Props = $props();
@@ -817,6 +819,10 @@
 		const n = getNodeById(hitId);
 		if (!n) return;
 		selected = new Set([hitId]);
+		if (n.kind === 'evidence' && onNodeOpen) {
+			onNodeOpen(n);
+			return;
+		}
 		editing = { id: hitId, value: n.body ?? '', mode: 'body' };
 	}
 
@@ -1097,6 +1103,13 @@
 		ondragleave={handleDragLeave}
 		ondrop={handleDrop}
 	></canvas>
+	{#if isDragOver}
+		<div class="pointer-events-none absolute inset-3 z-30 grid place-items-center rounded-2xl border-2 border-dashed border-amber-300/80 bg-slate-950/65 backdrop-blur-sm" role="status" aria-live="polite">
+			<span class="rounded-full border border-amber-200/40 bg-slate-950/90 px-5 py-3 text-sm font-semibold tracking-wide text-amber-100 shadow-2xl">
+				Drop evidence to place it here
+			</span>
+		</div>
+	{/if}
 
 	<!-- DOM overlay -->
 	<div class="absolute inset-0 pointer-events-none">

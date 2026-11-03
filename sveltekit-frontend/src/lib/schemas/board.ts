@@ -10,7 +10,7 @@ export const boardViewportSchema = z.object({
 
 export const boardNodeSchema = z.object({
     id: z.string(),
-    kind: z.enum(['note', 'image', 'pdf', 'link', 'evidence']),
+    kind: z.enum(['note', 'image', 'pdf', 'link', 'evidence', 'marker']),
     x: z.number(),
     y: z.number(),
     w: z.number(),

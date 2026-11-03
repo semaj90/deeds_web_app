@@ -71,7 +71,7 @@ const evidenceUploadSchema = z.object({
   evidenceType: insertEvidenceSchema.shape.evidenceType,
 });
 
-const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
+const BUCKET = ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET;
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 async function updateUploadProgress(jobId: string, update: Parameters<typeof updateJob>[1]): Promise<void> {
@@ -255,7 +255,7 @@ async function setCachedExtraction(
 
 /**
  * POST /api/evidence/upload
- * Pipeline: MinIO → PostgreSQL → text extraction (pdf-parse + OCR fallback) → chunk → embed → pgvector + Qdrant
+ * Pipeline: SeaweedFS S3 → PostgreSQL → text extraction (pdf-parse + OCR fallback) → chunk → embed → pgvector + Qdrant
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
   const devBypass = ENV.DEV_BYPASS_AUTH;
@@ -386,15 +386,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     updateJob(jobId, { step: 'hashing', progress: 20, message: 'Computing file hash...' });
     const fileHash = crypto.createHash('sha256').update(buffer).digest('hex');
 
-    // 3. Upload to MinIO
-    updateJob(jobId, { step: 'storing', progress: 30, message: 'Storing in MinIO...' });
+    // 3. Upload to SeaweedFS S3
+    updateJob(jobId, { step: 'storing', progress: 30, message: 'Storing in SeaweedFS...' });
     const ext = file.name.split('.').pop() ?? 'bin';
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const objectKey = `evidence/${caseId ?? 'default'}/${timestamp}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
 
     uploadedObjectKey = objectKey;
 
-    const minioUrl = `minio://${BUCKET}/${objectKey}`;
+    const storageUrl = `minio://${BUCKET}/${objectKey}`;
 
     // 4. Insert into PostgreSQL via Drizzle ORM
     updateJob(jobId, { step: 'db-insert', progress: 50, message: 'Saving to database...' });
@@ -438,7 +438,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         evidenceType: safeEvidenceType,
         fileType: file.type,
         mimeType: file.type || null,
-        fileUrl: minioUrl,
+        fileUrl: storageUrl,
         fileName: file.name,
         fileSize: file.size,
         hash: 'sha256:' + fileHash,
@@ -955,6 +955,7 @@ async function processAndEmbed(
   const diagnostics = createProcessingDiagnostics();
   let depthAnalysis: {
     depthMapUrl: string;
+    sourceRevision: string;
     width: number;
     height: number;
     processingTimeMs: number;
@@ -1760,7 +1761,7 @@ async function processAndEmbed(
           throw new Error('Depth estimation response missing depth_base64');
         }
 
-        // Upload the generated depth map back to MinIO/SeaweedFS
+        // Store the generated depth map in SeaweedFS S3.
         const depthBuffer = Buffer.from(data.depth_base64, 'base64');
         const depthKey = `evidence/${caseId ?? 'default'}/${evidenceId}-depth.png`;
         await uploadFile(BUCKET, depthKey, depthBuffer, {
@@ -1771,6 +1772,7 @@ async function processAndEmbed(
 
         return {
           depthMapUrl: `minio://${BUCKET}/${depthKey}`,
+          sourceRevision: formatEvidenceSourceRevisionV1(fileHash),
           width: data.width,
           height: data.height,
           processingTimeMs: data.processing_time_ms,

@@ -33,11 +33,13 @@
  */
 
 import Redis from 'ioredis';
+import { randomUUID } from 'node:crypto';
 
 const VERBOSE = process.argv.includes('--verbose');
 const INDEX_NAME = 'atlas_hot_vectors_v1';
 const KEY_PREFIX = 'atlas:hot-vector:';
 const TEST_PREFIX = `${KEY_PREFIX}smoke:`;
+const TEST_KEY_TTL_SECONDS = 300;
 const VECTOR_FIELD = 'vector';
 const DIMENSIONS = 768;
 const DISTANCE_METRIC = 'COSINE';
@@ -193,8 +195,9 @@ async function main() {
     // ── Gates: write two deterministic vectors under the TEST prefix ────────
     const vecA = deterministicVector(1);
     const vecB = deterministicVector(2);
-    const keyA = `${TEST_PREFIX}a`;
-    const keyB = `${TEST_PREFIX}b`;
+    const runId = randomUUID();
+    const keyA = `${TEST_PREFIX}${runId}:a`;
+    const keyB = `${TEST_PREFIX}${runId}:b`;
     const cleanupKeys = [keyA, keyB];
 
     try {
@@ -207,15 +210,22 @@ async function main() {
         return finish();
       }
 
-      await redis.hset(keyA, {
-        [VECTOR_FIELD]: toBuffer(vecA),
-        representation_id: REPRESENTATION_ID,
-      });
-      await redis.hset(keyB, {
-        [VECTOR_FIELD]: toBuffer(vecB),
-        representation_id: REPRESENTATION_ID,
-      });
-      ok('write', `wrote 2 temporary test hashes under "${TEST_PREFIX}"`);
+      const writeResults = await redis.multi()
+        .hset(keyA, {
+          [VECTOR_FIELD]: toBuffer(vecA),
+          representation_id: REPRESENTATION_ID,
+        })
+        .expire(keyA, TEST_KEY_TTL_SECONDS)
+        .hset(keyB, {
+          [VECTOR_FIELD]: toBuffer(vecB),
+          representation_id: REPRESENTATION_ID,
+        })
+        .expire(keyB, TEST_KEY_TTL_SECONDS)
+        .exec();
+      if (!writeResults || writeResults.some(([error]) => error)) {
+        throw new Error('Valkey smoke key write or expiry failed');
+      }
+      ok('write', `wrote 2 run-scoped temporary hashes with ${TEST_KEY_TTL_SECONDS}s expiry`);
 
       // ── Gate: KNN search ranks the exact match first ───────────────────────
       const searchResult = await redis.call(

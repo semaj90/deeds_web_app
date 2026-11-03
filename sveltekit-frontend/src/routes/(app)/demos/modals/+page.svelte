@@ -92,45 +92,89 @@
 		{/snippet}
 	</Modal>
 
-	<!-- Custom Modal Light -->
+	<!-- Custom Modal Light with Celestial Legal-AI Styling -->
 	<ModalLight
 		bind:open={lightModalOpen}
 		title="Custom Legal Light Modal"
 		subtitle="PARCHMENT DOSSIER • BURNISHED GOLD NOTCHES • 3D CONTRAST"
-		size="md"
+		coordBadge="LEX ET IUSTITIA • CONST-768"
+		icon="celestial"
+		size="lg"
 	>
 		<div class="space-y-4 text-slate-800">
-			<p class="text-sm leading-relaxed">
-				This custom light modal delivers the <strong>crisp legal brief / court dossier presentation</strong> inspired by the classic Phoenix Justice court record and high-contrast light notifications.
-			</p>
-			<div class="p-3.5 bg-[#f5efe6] border border-[#dfd0bd] rounded-lg text-xs space-y-2">
-				<div class="flex items-center gap-2 text-[#966b1a] font-mono font-bold uppercase tracking-wider">
-					<span>⚖ Court Record Specification</span>
+			<div class="flex items-center justify-between pb-2 border-b border-[#eedfca]">
+				<div class="flex items-center gap-2">
+					<span class="text-amber-700 text-sm">✦</span>
+					<span class="text-xs font-mono uppercase tracking-widest text-[#8c6a23] font-bold">Parent Atlas Constellation Docket</span>
 				</div>
-				<ul class="list-disc pl-4 space-y-1 text-slate-700">
-					<li><strong>Ivory Parchment Base:</strong> Clean, high-legibility legal paper aesthetic (<code class="bg-[#ebe2d3] px-1 py-0.5 rounded text-slate-900 font-mono">#fcfbf9</code>).</li>
-					<li><strong>Burnished Gold Notches:</strong> Signature attorney corner accents in <code class="bg-[#ebe2d3] px-1 py-0.5 rounded text-amber-900 font-mono">#c59e2b</code>.</li>
-					<li><strong>3D Scrim Contrast:</strong> Portaled over a softened backdrop blur so white and black modes achieve razor-sharp contrast.</li>
-					<li><strong>Bits UI v2 Foundation:</strong> Identical accessible focus trap, body scroll locking, and Escape key dismissal.</li>
-				</ul>
+				<span class="text-[11px] font-mono text-slate-500 bg-[#efe5d6] px-2 py-0.5 rounded border border-[#dfd0bd]">REV: sha256:768-d</span>
+			</div>
+
+			<p class="text-sm leading-relaxed text-slate-700">
+				This celestial light modal delivers the <strong>crisp legal brief / court dossier presentation</strong> inspired by the Parent Atlas Detective Constellation and high-contrast light notifications.
+			</p>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+				<div class="p-3.5 bg-[#f5efe6] border border-[#dfd0bd] rounded-lg text-xs space-y-2">
+					<div class="flex items-center gap-1.5 text-[#966b1a] font-mono font-bold uppercase tracking-wider">
+						<span>✦ Court Record Specification</span>
+					</div>
+					<ul class="list-disc pl-4 space-y-1 text-slate-700">
+						<li><strong>Ivory Parchment Base:</strong> Clean legal aesthetic (<code class="bg-[#ebe2d3] px-1 py-0.5 rounded text-slate-900 font-mono">#fcfbf9</code>).</li>
+						<li><strong>Celestial Notches:</strong> Signature attorney gold accents in <code class="bg-[#ebe2d3] px-1 py-0.5 rounded text-amber-900 font-mono">#c59e2b</code> with crosshairs.</li>
+						<li><strong>3D Scrim Contrast:</strong> Portaled over a softened backdrop blur for razor-sharp contrast.</li>
+						<li><strong>Bits UI v2 Primitives:</strong> Accessible focus trap, body scroll locking, and Escape key dismissal.</li>
+					</ul>
+				</div>
+
+				<div class="p-3.5 bg-[#f5efe6] border border-[#dfd0bd] rounded-lg text-xs space-y-2">
+					<div class="flex items-center gap-1.5 text-[#966b1a] font-mono font-bold uppercase tracking-wider">
+						<span>⚖ Legal-AI Verification Envelope</span>
+					</div>
+					<div class="space-y-1.5 text-slate-700 font-mono text-[11px]">
+						<div class="flex justify-between py-0.5 border-b border-[#e5dccf]">
+							<span class="text-slate-500">CANONICAL STORE:</span>
+							<span class="font-bold text-slate-900">PostgreSQL 18.4 (pgvector)</span>
+						</div>
+						<div class="flex justify-between py-0.5 border-b border-[#e5dccf]">
+							<span class="text-slate-500">EMBEDDING LANE:</span>
+							<span class="text-emerald-800 font-bold">EmbeddingGemma 768-D</span>
+						</div>
+						<div class="flex justify-between py-0.5 border-b border-[#e5dccf]">
+							<span class="text-slate-500">GRAPH TRAVERSAL:</span>
+							<span class="text-amber-800 font-bold">KAG AST Lineage Bound</span>
+						</div>
+						<div class="flex justify-between py-0.5">
+							<span class="text-slate-500">AUDIT PROOF:</span>
+							<span class="text-blue-800 font-bold">Zero Residual Rows</span>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		{#snippet footer()}
-			<div class="flex justify-end gap-2">
-				<button
-					type="button"
-					class="px-4 py-2 text-xs font-mono uppercase tracking-wider bg-[#ebe2d3] hover:bg-[#ded2c0] text-slate-800 font-semibold rounded-lg transition-colors cursor-pointer"
-					onclick={() => (lightModalOpen = false)}
-				>
-					Dismiss
-				</button>
-				<button
-					type="button"
-					class="px-5 py-2 text-xs font-mono uppercase tracking-wider bg-gradient-to-r from-[#c59e2b] to-[#dfb847] hover:from-[#b58e1b] hover:to-[#cfa837] text-slate-950 font-bold rounded-lg transition-all shadow-sm cursor-pointer"
-					onclick={() => (lightModalOpen = false)}
-				>
-					Accept Precedent
-				</button>
+			<div class="flex justify-between items-center w-full">
+				<div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-500">
+					<span class="text-[#c59e2b]">✧</span>
+					<span>Constellation Node: #E-002 • Witness Statement</span>
+				</div>
+				<div class="flex gap-2">
+					<button
+						type="button"
+						class="px-4 py-2 text-xs font-mono uppercase tracking-wider bg-[#ebe2d3] hover:bg-[#ded2c0] text-slate-800 font-semibold rounded-lg transition-colors cursor-pointer"
+						onclick={() => (lightModalOpen = false)}
+					>
+						Dismiss
+					</button>
+					<button
+						type="button"
+						class="px-5 py-2 text-xs font-mono uppercase tracking-wider bg-gradient-to-r from-[#c59e2b] to-[#dfb847] hover:from-[#b58e1b] hover:to-[#cfa837] text-slate-950 font-bold rounded-lg transition-all shadow-sm cursor-pointer flex items-center gap-1.5"
+						onclick={() => (lightModalOpen = false)}
+					>
+						<span>✦</span>
+						<span>Accept Precedent</span>
+					</button>
+				</div>
 			</div>
 		{/snippet}
 	</ModalLight>

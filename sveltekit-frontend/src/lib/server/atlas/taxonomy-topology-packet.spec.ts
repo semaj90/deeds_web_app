@@ -60,4 +60,27 @@ describe('taxonomy-topology-packet', () => {
     expect(buildTaxonomyReferenceTuplesV1(null, 'node-1', input)).toEqual([]);
     expect(buildTaxonomyReferenceTuplesV1('ace:packet:generated', 'node-1', input)).toEqual([]);
   });
+
+  it('excludes reference-only taxonomy tuples from persistence admission', async () => {
+    const { buildTaxonomyReferenceTuplesV1, filterGroundedOntologyTuplesForPersistenceV1 } = await import('./taxonomy-topology-packet.js');
+    const reference = buildTaxonomyReferenceTuplesV1(
+      'packet:12345678-1234-5234-9234-123456789abc',
+      'node-1',
+      [{ source: 'node-1', relation: 'HAS_ONTOLOGY_TAG', target: 'tag:contracts' }],
+    );
+
+    expect(filterGroundedOntologyTuplesForPersistenceV1(reference)).toEqual([]);
+    expect(filterGroundedOntologyTuplesForPersistenceV1([{
+      ...reference[0],
+      participants: [{ entityId: 'node-1', entityKind: 'topology_node', role: 'topology' }],
+      evidenceRefs: ['src/example.ts#L1-L2'],
+      evidenceSpan: { sourceRef: 'src/example.ts', start: 0, end: 16 },
+      evidenceState: 'ACTIVE_VERIFIED',
+      provenance: {
+        ...reference[0].provenance,
+        sourceRevision: `sha256:${'a'.repeat(64)}`,
+        workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      },
+    }])).toHaveLength(1);
+  });
 });
