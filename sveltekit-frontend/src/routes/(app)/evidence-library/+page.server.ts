@@ -17,7 +17,28 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		}
 
 		const items = await db
-			.select()
+			.select({
+				id: evidence.id,
+				caseId: evidence.caseId,
+				title: evidence.title,
+				description: evidence.description,
+				fileType: evidence.fileType,
+				fileSize: evidence.fileSize,
+				metadata: evidence.metadata,
+				createdAt: evidence.createdAt,
+				updatedAt: evidence.updatedAt,
+				evidenceType: evidence.evidenceType,
+				fileUrl: evidence.fileUrl,
+				fileName: evidence.fileName,
+				uploadedBy: evidence.uploadedBy,
+				uploadedAt: evidence.uploadedAt,
+				type: evidence.type,
+				summary: evidence.summary,
+				collectedAt: evidence.collectedAt,
+				mimeType: evidence.mimeType,
+				tags: evidence.tags,
+				aiSummary: evidence.aiSummary
+			})
 			.from(evidence)
 			.where(and(...conditions))
 			.orderBy(desc(evidence.createdAt))

@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   }
 
   // Client view cache check
-  const vKey = clientKey.view(userId, id, 'board');
+  const vKey = clientKey.view(userId, id, 'board-v2');
   const memHit = getFromMemoryCache(vKey);
   if (memHit.found && memHit.value) return memHit.value as any;
   try {
@@ -69,13 +69,23 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       evidence: evidenceItems.map((item) => {
         const meta = (item.metadata || {}) as Record<string, any>;
         const analysis = (item.aiAnalysis || {}) as Record<string, any>;
+        const depthAnalysis = analysis.depthAnalysis as { sourceRevision?: string } | undefined;
+        const sourceRevision = typeof item.hash === 'string'
+          ? item.hash.startsWith('sha256:') ? item.hash : `sha256:${item.hash}`
+          : null;
+        const hasSourceBoundDepth = Boolean(
+          depthAnalysis?.sourceRevision && depthAnalysis.sourceRevision === sourceRevision
+        );
         return {
           id: item.id,
           title: item.title || 'Untitled Evidence',
           type: item.evidenceType || 'document',
           date: item.uploadedAt?.split('T')[0] || '',
           location: meta.location || '',
-          thumbnail: item.fileUrl || null,
+          thumbnail: `/api/evidence/${encodeURIComponent(item.id)}/download?inline=1&caseId=${encodeURIComponent(id)}`,
+          depthMapUrl: hasSourceBoundDepth
+            ? `/api/evidence/${encodeURIComponent(item.id)}/depth-map`
+            : null,
           description: item.description || '',
           fileType: item.fileType || '',
           confidence: meta.confidence || 0,

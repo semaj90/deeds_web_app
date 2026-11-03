@@ -6,6 +6,7 @@
 	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
 	import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
 	import ModalLight from '$lib/components/ui/ModalLight.svelte';
+	import BoardTopToolbar from '$lib/components/evidence/BoardTopToolbar.svelte';
 	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
 	import {
 		scheduleSave,
@@ -47,8 +48,9 @@
 	let activeView = $state<'wall' | 'line' | 'file' | 'list'>('wall');
 	let selectedEvidence = $state<any>(null);
 	let showEvidenceViewer = $state(false);
+	let evidenceViewerInitialView = $state<'original' | 'relief'>('original');
 	let showAddEvidence = $state(false);
-	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note'>('select');
+	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note' | 'marker'>('select');
 	let showAIChat = $state(false);
 	let isGeneratingLayout = $state(false);
 
@@ -298,6 +300,8 @@
 	let isRecording = $state(false);
 	let mediaRecorder: MediaRecorder | null = null;
 
+	let snapOn = $state(false);
+
 	// AI Summary Modal
 	let showSummaryModal = $state(false);
 	let summaryEvidenceId = $state<string | null>(null);
@@ -342,6 +346,9 @@
 				selectedEvidence = null;
 			}
 			activeTool = 'select';
+		} else if (activeTool === 'marker' && board) {
+			board.addMarker(world.x, world.y);
+			activeTool = 'select';
 		} else if (activeTool === 'evidence' && board && selectedEvidence) {
 			board.addEvidenceNode(selectedEvidence.id, selectedEvidence.title, world.x, world.y, selectedEvidence.fileType);
 			activeTool = 'select';
@@ -370,10 +377,15 @@
 			const match = evidenceItems.find((item: any) => item.id === node.evidenceId);
 			if (!match) return;
 			selectedEvidence = match;
-			showEvidenceViewer = true;
+			openEvidenceViewer('original');
 			return;
 		}
 		openDocumentationModal(node);
+	}
+
+	function openEvidenceViewer(view: 'original' | 'relief' = 'original') {
+		evidenceViewerInitialView = view;
+		showEvidenceViewer = true;
 	}
 
 	// Save note edits back to the board
@@ -715,6 +727,8 @@
 			activeTool = 'connection';
 		} else if (e.key === 'n') {
 			activeTool = 'note';
+		} else if (e.key === 'm') {
+			activeTool = 'marker';
 		}
 		// View shortcuts
 		else if (e.key === '1') {
@@ -1058,6 +1072,9 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</div>
 
 		<div class="header-actions">
+			<a class="action-btn" href={`/cases/${caseId}/board/relief`} title="Textured 2.5D relief demo for this case's images" data-testid="relief-demo-link">
+				3D Relief Demo
+			</a>
 			<!-- Case Switcher -->
 			<div class="case-switcher">
 				<button
@@ -1303,9 +1320,23 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						onConnectionCreated={handleConnectionCreated}
 						onContextMenu={handleBoardContextMenu}
 						{activeTool}
+						snapToGrid={snapOn}
 						{caseId}
 					/>
 				{/key}
+				<BoardTopToolbar
+					bind:activeTool
+					bind:snapOn
+					canUndo={boardHistory.canUndo}
+					canRedo={boardHistory.canRedo}
+					onUndo={undo}
+					onRedo={redo}
+					onZoomIn={() => board?.zoomBy(1.2)}
+					onZoomOut={() => board?.zoomBy(1 / 1.2)}
+					onFit={() => board?.zoomToFit()}
+					onExportPNG={exportPNG}
+					onExportCSV={exportCSV}
+				/>
 				<!-- WebGPU Particle + CRT Overlay -->
 				<WebGPUParticleOverlay
 					particleCount={2048}
@@ -1358,6 +1389,16 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 							>
 								<Icon name="sticky-note" size={15} />
 								<span class="dock-label">Note</span>
+							</button>
+							<button
+								class="dock-btn"
+								class:active={activeTool === "marker"}
+								onclick={() => (activeTool = "marker")}
+								title="Numbered Marker (M)"
+								data-testid="dock-marker"
+							>
+								<Icon name="map-pin" size={15} />
+								<span class="dock-label">Marker</span>
 							</button>
 						</div>
 
@@ -1554,7 +1595,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					<div class="details-header-actions">
 						<button
 							class="details-nav-btn open-evidence-viewer-btn"
-							onclick={() => (showEvidenceViewer = true)}
+							onclick={() => openEvidenceViewer('original')}
 							title="Open evidence viewer"
 						>
 							Open viewer
@@ -1636,6 +1677,11 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 							<Icon name="sparkles" />
 							AI Summary
 						</button>
+						{#if isEvidenceImage(selectedEvidence.fileType)}
+			<button class="action-btn" onclick={() => openEvidenceViewer('relief')}>
+								3D Relief View
+							</button>
+						{/if}
 					</div>
 
 					<div class="detail-section">
@@ -1861,6 +1907,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		bind:open={showEvidenceViewer}
 		evidenceId={selectedEvidence?.id ?? null}
 		{caseId}
+		initialView={evidenceViewerInitialView}
 		onClose={() => (showEvidenceViewer = false)}
 	/>
 

@@ -17,6 +17,12 @@ export interface BoardLayout {
 	timestamp: number;
 }
 
+export function toPlainBoardLayout(layout: BoardLayout): BoardLayout {
+	const serialized = JSON.stringify(layout);
+	if (!serialized) throw new Error('Board layout is not serializable');
+	return JSON.parse(serialized) as BoardLayout;
+}
+
 // ── IndexedDB ──────────────────────────────────────────────────
 
 const DB_NAME = 'deeds-evidence-board';
@@ -40,9 +46,10 @@ function getDB(): Promise<IDBPDatabase> {
 
 export async function saveLayout(layout: BoardLayout): Promise<void> {
 	try {
+		const snapshot = toPlainBoardLayout(layout);
 		const db = await getDB();
-		await db.put(STORE_NAME, { ...layout, timestamp: Date.now() });
-		updateLokiCache(layout);
+		await db.put(STORE_NAME, { ...snapshot, timestamp: Date.now() });
+		updateLokiCache(snapshot);
 	} catch (err) {
 		console.error('[board-persistence] IndexedDB save failed:', err);
 	}
@@ -108,6 +115,7 @@ function getLokiCache(caseId: string): BoardLayout | null {
 }
 
 function updateLokiCache(layout: BoardLayout): void {
+	layout = toPlainBoardLayout(layout);
 	const coll = ensureLoki();
 	const existing = coll.findOne({ caseId: layout.caseId });
 	if (existing) {
@@ -131,9 +139,9 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null;
 let pendingLayout: BoardLayout | null = null;
 
 export function scheduleSave(layout: BoardLayout): void {
-	pendingLayout = layout;
+	pendingLayout = toPlainBoardLayout(layout);
 	// Update LokiJS immediately for fast reads
-	updateLokiCache(layout);
+	updateLokiCache(pendingLayout);
 
 	if (saveTimer) clearTimeout(saveTimer);
 	saveTimer = setTimeout(async () => {

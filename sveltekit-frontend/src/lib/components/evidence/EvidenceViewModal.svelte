@@ -4,12 +4,14 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import TagInput from '$lib/components/ui/TagInput.svelte';
 	import DoclingExtractionViewer from './DoclingExtractionViewer.svelte';
+	import Evidence3DModal from './Evidence3DModal.svelte';
 	import { formatFileSize, formatDate, getIcon, getTypeLabel } from './evidence-utils.js';
 
 	let {
 		evidenceId,
 		caseId = null,
 		open = $bindable(false),
+		initialView = 'original',
 		onClose = () => {},
 		onEdit,
 		onAnalyze
@@ -17,19 +19,23 @@
 		evidenceId: string | null;
 		caseId?: string | null;
 		open?: boolean;
+		initialView?: 'original' | 'relief';
 		onClose?: () => void;
 		onEdit?: (id: string) => void;
 		onAnalyze?: (doc: any) => void;
 	} = $props();
 
 	let doc = $state<any>(null);
+	let showRelief = $state(false);
 	let isLoading = $state(false);
 	let loadError = $state<string | null>(null);
 
 	$effect(() => {
 		if (open && evidenceId) {
+			showRelief = initialView === 'relief';
 			loadDoc(evidenceId);
 		} else if (!open) {
+			showRelief = false;
 			// reset after close animation
 			setTimeout(() => { doc = null; loadError = null; }, 200);
 		}
@@ -72,6 +78,17 @@
 		if (!evidenceId || !previewCaseId) return null;
 		const query = new URLSearchParams({ inline: '1', caseId: previewCaseId });
 		return `/api/evidence/${encodeURIComponent(evidenceId)}/download?${query}`;
+	});
+	let depthMapUrl = $derived.by(() => {
+		const hash = doc?.hash;
+		const analysis = doc?.aiAnalysis ?? doc?.ai_analysis;
+		const depth = analysis?.depthAnalysis ?? analysis?.depth_analysis;
+		const revision = depth?.sourceRevision ?? depth?.source_revision;
+		if (typeof hash !== 'string' || typeof revision !== 'string') return null;
+		const sourceRevision = hash.startsWith('sha256:') ? hash : `sha256:${hash}`;
+		return sourceRevision === revision && evidenceId
+			? `/api/evidence/${encodeURIComponent(evidenceId)}/depth-map`
+			: null;
 	});
 	let metadata = $derived.by(() => {
 		const value = doc?.metadata;
@@ -261,7 +278,7 @@
 			</div>
 
 			<!-- Body -->
-			<div class="modal-body">
+			<div class="modal-body" class:relief-open={showRelief}>
 				{#if isLoading}
 					<div class="modal-skeleton">
 						<div class="skel-line skel-w-60"></div>
@@ -282,12 +299,29 @@
 					<!-- File preview (images with lightbox) -->
 					{#if isImage && previewUrl}
 						<div class="preview-wrap">
-							<button type="button" class="preview-img-btn" onclick={openLightbox} title="Click to zoom">
-								<img src={previewUrl} alt={doc.title ?? 'Evidence'} class="preview-img" />
-								<span class="preview-zoom-hint">
-									<Icon name="zoom-in" class="w-4 h-4" />
-								</span>
-							</button>
+							<div class="evidence-preview-modes" role="group" aria-label="Evidence view mode">
+								<button type="button" aria-pressed={!showRelief} onclick={() => (showRelief = false)}>Original</button>
+								<button type="button" aria-pressed={showRelief} onclick={() => (showRelief = true)}>3D relief</button>
+							</div>
+							{#if showRelief}
+								<div class="evidence-relief-embed">
+									<Evidence3DModal
+										open={true}
+										embedded
+										title={doc.title ?? fileName ?? 'Evidence relief'}
+										{evidenceId}
+										imageUrl={previewUrl}
+										depthUrl={depthMapUrl}
+									/>
+								</div>
+							{:else}
+								<button type="button" class="preview-img-btn" onclick={openLightbox} title="Click to zoom">
+									<img src={previewUrl} alt={doc.title ?? 'Evidence'} class="preview-img" />
+									<span class="preview-zoom-hint">
+										<Icon name="zoom-in" class="w-4 h-4" />
+									</span>
+								</button>
+							{/if}
 						</div>
 					{:else if isPdf && previewUrl}
 						<div class="preview-wrap pdf-embed-wrap">

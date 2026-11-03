@@ -2,6 +2,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import { analyzeEvidenceImage, requestEvidenceUpscale, type EvidenceImageAnalysis } from './evidence-image-tools';
 
 	interface Props {
 		caseId: string;
@@ -18,6 +19,12 @@
 	let isUploading = $state(false);
 	let uploadError: string | null = $state(null);
 	let uploadResult: { evidenceId: string; jobId: string; hash: string } | null = $state(null);
+	let imageToolError: string | null = $state(null);
+	let imageAnalysis: EvidenceImageAnalysis | null = $state(null);
+	let isAnalyzingImage = $state(false);
+	let isUpscalingImage = $state(false);
+	let upscaledPreviewUrl: string | null = $state(null);
+	let upscaledDimensions: string | null = $state(null);
 
 	let fileInputEl = $state<HTMLInputElement | null>(null);
 
@@ -75,12 +82,50 @@
 	}
 
 	const selectFile = (file: File) => {
+		clearImageTools();
 		uploadError = null;
 		uploadResult = null;
 		const validation = validateFile(file);
 		if (!validation.valid) { uploadError = validation.error || 'Invalid file'; return; }
 		selectedFile = file;
 	};
+
+	function clearImageTools() {
+		if (upscaledPreviewUrl) URL.revokeObjectURL(upscaledPreviewUrl);
+		upscaledPreviewUrl = null;
+		upscaledDimensions = null;
+		imageAnalysis = null;
+		imageToolError = null;
+	}
+
+	async function handleImageAnalysis() {
+		if (!selectedFile || !uploadResult || !isImageFile(selectedFile)) return;
+		isAnalyzingImage = true;
+		imageToolError = null;
+		try {
+			imageAnalysis = await analyzeEvidenceImage(selectedFile, caseId, uploadResult.evidenceId);
+		} catch (error) {
+			imageToolError = error instanceof Error ? error.message : 'Image analysis failed';
+		} finally {
+			isAnalyzingImage = false;
+		}
+	}
+
+	async function handleImageUpscale() {
+		if (!uploadResult || !selectedFile || !isImageFile(selectedFile)) return;
+		isUpscalingImage = true;
+		imageToolError = null;
+		try {
+			const preview = await requestEvidenceUpscale(uploadResult.evidenceId);
+			if (upscaledPreviewUrl) URL.revokeObjectURL(upscaledPreviewUrl);
+			upscaledPreviewUrl = URL.createObjectURL(preview.blob);
+			upscaledDimensions = preview.dimensions;
+		} catch (error) {
+			imageToolError = error instanceof Error ? error.message : 'Image upscale failed';
+		} finally {
+			isUpscalingImage = false;
+		}
+	}
 
 	function formatUploadErrorMessage(message: string | null | undefined): string {
 		if (!message) return 'Upload could not be completed';
@@ -130,6 +175,7 @@
 	};
 
 	const handleCancel = () => {
+		clearImageTools();
 		selectedFile = null;
 		uploadError = null;
 		uploadResult = null;
@@ -137,6 +183,7 @@
 	};
 
 	const resetUpload = () => {
+		clearImageTools();
 		selectedFile = null;
 		uploadError = null;
 		uploadResult = null;
@@ -215,7 +262,7 @@
 								<p class="text-sand font-medium text-sm truncate">{selectedFile.name}</p>
 								<p class="text-sand/40 text-xs">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB &middot; {selectedFile.type || 'unknown type'}</p>
 							</div>
-							{#if !isUploading}
+							{#if !isUploading && !uploadResult}
 								<button type="button" class="upload-modal-change" onclick={resetUpload}>Change</button>
 							{/if}
 						</div>
@@ -237,6 +284,32 @@
 								{/if}
 							</div>
 							<p class="mt-3 text-xs text-sand/50">This confirms receipt only. The progress panel tracks processing; it does not claim search indexing is complete.</p>
+							{#if selectedFile && isImageFile(selectedFile)}
+								<div class="mt-4 flex flex-wrap gap-2 border-t border-sand/15 pt-3">
+									<button type="button" class="upload-modal-secondary" onclick={handleImageAnalysis} disabled={isAnalyzingImage || isUpscalingImage}>
+										{isAnalyzingImage ? 'Analyzing image…' : 'Analyze image'}
+									</button>
+									<button type="button" class="upload-modal-secondary" onclick={handleImageUpscale} disabled={isAnalyzingImage || isUpscalingImage}>
+										{isUpscalingImage ? 'Creating preview…' : 'Upscale preview'}
+									</button>
+								</div>
+								<p class="mt-2 text-xs text-sand/50">Analysis is an AI suggestion for review. Upscaling uses Lanczos resampling, adds no real detail, and does not replace the original.</p>
+								{#if imageToolError}<p class="mt-2 text-sm text-red-700" role="alert">{imageToolError}</p>{/if}
+								{#if imageAnalysis}
+									<div class="mt-3 rounded-md border border-amber-700/30 bg-amber-50/70 p-3 text-sm text-stone-800" aria-live="polite">
+										<p class="font-semibold">Suggested image analysis · review required</p>
+										<p class="mt-1">{imageAnalysis.analysis.summary}</p>
+										{#if imageAnalysis.analysis.keyFindings.length}<ul class="mt-2 list-disc pl-5">{#each imageAnalysis.analysis.keyFindings as finding}<li>{finding}</li>{/each}</ul>{/if}
+									</div>
+								{/if}
+								{#if upscaledPreviewUrl}
+									<div class="mt-3 rounded-md border border-sand/30 p-3">
+										<p class="text-xs text-sand/70">Upscaled preview{upscaledDimensions ? ` · ${upscaledDimensions}` : ''}</p>
+										<img class="mt-2 max-h-72 max-w-full rounded object-contain" src={upscaledPreviewUrl} alt="Upscaled preview generated from the original upload" />
+										<a class="mt-2 inline-block text-sm underline" href={upscaledPreviewUrl} download={`${selectedFile.name.replace(/\.[^.]+$/, '')}-upscaled.png`}>Download preview</a>
+									</div>
+								{/if}
+							{/if}
 						</div>
 					{/if}
 

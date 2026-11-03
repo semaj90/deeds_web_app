@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { cases, evidence } from '$lib/server/db/schema-postgres.js';
-import { and, eq, or, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, isNotNull, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
@@ -40,9 +40,20 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 
   try {
     const [item] = await db
-      .select()
+      .select(getTableColumns(evidence))
       .from(evidence)
-      .where(and(eq(evidence.id, params.id), or(eq(evidence.userId, Number(locals.user.id)), eq(evidence.uploadedBy, Number(locals.user.id)))))
+      .leftJoin(cases, eq(evidence.caseId, cases.id))
+      .where(and(
+        eq(evidence.id, params.id),
+        or(
+          eq(evidence.userId, Number(locals.user.id)),
+          eq(evidence.uploadedBy, Number(locals.user.id)),
+          and(
+            isNotNull(evidence.caseId),
+            or(eq(cases.userId, Number(locals.user.id)), eq(cases.assignedAttorney, Number(locals.user.id))),
+          ),
+        ),
+      ))
       .limit(1);
 
     if (!item) {

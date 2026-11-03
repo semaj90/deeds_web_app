@@ -7,15 +7,15 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
-import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { cases, evidence } from '$lib/server/db/schema-postgres.js';
+import { and, eq, isNotNull, or } from 'drizzle-orm';
 import { getSeaweedFile as getFile } from '$lib/server/seaweed-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 import { getVlmState, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 
-const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
+const EVIDENCE_BUCKET = ENV.SEAWEED_S3_BUCKET || ENV.MINIO_EVIDENCE_BUCKET;
 
 function extractObjectKey(fileUrl: string): { bucket: string; key: string } | null {
   if (!fileUrl) return null;
@@ -58,6 +58,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
   if (!isUuid(evidenceId)) return json({ error: 'Invalid evidence ID' }, { status: 400 });
 
   // Look up evidence record
+  const userId = Number(locals.user.id);
   const [row] = await db
     .select({
       fileUrl: evidence.fileUrl,
@@ -66,7 +67,18 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
       title: evidence.title,
     })
     .from(evidence)
-    .where(eq(evidence.id, evidenceId))
+    .leftJoin(cases, eq(evidence.caseId, cases.id))
+    .where(and(
+      eq(evidence.id, evidenceId),
+      or(
+        eq(evidence.userId, userId),
+        eq(evidence.uploadedBy, userId),
+        and(
+          isNotNull(evidence.caseId),
+          or(eq(cases.userId, userId), eq(cases.assignedAttorney, userId)),
+        ),
+      ),
+    ))
     .limit(1);
 
   if (!row) return json({ error: 'Evidence not found' }, { status: 404 });
