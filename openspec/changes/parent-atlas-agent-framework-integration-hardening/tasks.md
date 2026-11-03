@@ -227,3 +227,12 @@ State read from disk, all UNCOMMITTED. Modal files last changed 22:10-22:12; a p
 - [ ] 14.15 After 14.10-14.13 pass: persistent marker editing linked to the detective timeline, then animation export. Do not start either earlier.
 
 Demo URLs (`npm run dev`, port 5173 unverified): `/demos/depth-relief`, `/demos/crime-reconstruction`, `/cases/<caseId>/board/relief`.
+
+### 14.C Status update (2026-11-02, late)
+
+- Committed `b341a6e1dad` (37 files) and pushed to `origin/handoff/working-tree-2026-10-25`. NOT pushed to `main`: the branch is 1 ahead / 14 behind `origin/main` (non-fast-forward). Operator will merge/update; do not force-push.
+- Left uncommitted on purpose (other sessions or unrelated): submodules, `.claude/settings.local.json`, `docker/image-synthesis/app.py` (`frame_base64`, syntax-checked only), `dev-gpu-runtime.mjs`, `workspace-metadata-extractor.ts`, `atlas-kanban-tasks.json`, `parent-atlas-ace-bitfrost-cache-correctness/tasks.md`.
+- 14.10 overlap: code fix is present (`EvidenceViewModal.svelte:281` `class:relief-open`; `evidence-document-modal.css:247` hides all but `.preview-wrap`). NOT CONFIRMED in a browser.
+- Marker e2e (`evidence-3d-modal-markers.spec.ts`) FAILED at setup (line 21): no image evidence card on the seeded board (`.evidence-card` matching png/jpg/screenshot/fugitivedex), so the modal never opened. Markers, delete, slider and close/reopen were not exercised. Next: seed or upload an image evidence item for the test case, then rerun.
+- Earlier rerun was piped through `tail`, so its exit code 0 meant nothing; always write Playwright output to a log file.
+- Unit specs pass (relief-grid, evidence-image-tools, board-persistence: 12 tests). 14.11-14.15 are still open; `DepthReliefViewer` has no marker API and the modal still uses its own Three.js scene.
