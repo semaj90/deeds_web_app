@@ -103,10 +103,18 @@ const GraphExpandOutputSchema = z.object({
   nodes: z.array(z.object({ id: z.string(), labels: z.array(z.string()) })),
   edges: z.array(z.object({ from: z.string(), to: z.string(), type: z.string() })),
   hops: z.number().int().nonnegative(),
-  status: z.enum(['PROVEN', 'BOUNDARY_EXHAUSTED', 'ALGORITHM_UNAVAILABLE']),
+  status: z.enum(['PROVEN', 'EXECUTED_UNPROVEN', 'BOUNDARY_EXHAUSTED', 'ALGORITHM_UNAVAILABLE']),
   decision: GraphAlgorithmDecisionSchema,
   truncated: z.boolean(),
   reasonCodes: z.array(z.string()),
+  requestedBackend: z.enum(['neo4j', 'cugraph', 'networkx', 'temporal_dp']),
+  effectiveBackend: z.enum(['neo4j', 'cugraph', 'networkx', 'temporal_dp']).nullable(),
+  executionStatus: z.enum(['EXECUTED', 'UNAVAILABLE', 'FAILED', 'BOUNDARY_EXHAUSTED']),
+  fallbackReason: z.string().nullable(),
+  inputSnapshotChecksum: z.string().nullable(),
+  graphRevision: z.string().nullable(),
+  ordinalMapChecksum: z.string().nullable(),
+  outputChecksum: z.string().nullable(),
 });
 export type GraphExpandOutput = z.infer<typeof GraphExpandOutputSchema>;
 

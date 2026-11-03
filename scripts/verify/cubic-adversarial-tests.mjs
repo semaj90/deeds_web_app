@@ -1,16 +1,15 @@
 #!/usr/bin/env node
-import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 
-import { loadRepoEnv } from '../atlas/connection-config.mjs';
+import { writeLaneReportV1 } from './lane-report-v1.mjs';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
-const GEMMA_URL  = 'http://127.0.0.1:8090';
+const DEPENDENCY_TIMEOUT_MS = 20_000;
 
 async function main() {
   console.log('\n=== Cubic Adversarial Tests Lane ===\n');
@@ -24,30 +23,57 @@ async function main() {
 
   let hasFailures = false;
 
-  // 1. Boundary Value Check: Empty Embedding Query
-  console.log('1. Testing Ollama embedding with empty query…');
-  try {
-    const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'embeddinggemma:latest',
-        prompt: '',
-      }),
-      signal: AbortSignal.timeout(5000),
-    });
-    // Even if it returns 400 or fails, we check how it fails
-    const status = res.status;
-    const body = await res.json().catch(() => ({}));
-    report.checks.ollama_empty = { status: 'PASS', detail: { http_status: status, response: body } };
-    console.log(`  ✅ Ollama empty prompt response: HTTP ${status}`);
-  } catch (err) {
-    report.checks.ollama_empty = { status: 'PASS', detail: `offline_or_error: ${err.message}` };
-    console.log(`  ⚠️  Ollama empty prompt skipped/failed (optional): ${err.message}`);
-  }
+  // 1. Application boundary checks: blank embedding and chat inputs are rejected before inference.
+  const frontendRoot = path.join(ROOT, 'sveltekit-frontend');
+  const vitestEntrypoint = path.join(frontendRoot, 'node_modules', 'vitest', 'vitest.mjs');
+  console.log('1. Testing blank embedding and chat inputs at the application boundary…');
+  const boundaryTest = spawnSync(process.execPath, [
+    vitestEntrypoint,
+    'run',
+    'src/routes/api/embed/server.route.spec.ts',
+    'src/routes/api/ai/chat/server.route.spec.ts',
+  ], {
+    cwd: frontendRoot,
+    encoding: 'utf8',
+    timeout: 120000,
+    maxBuffer: 4 * 1024 * 1024,
+  });
+  const boundaryOutput = `${boundaryTest.stdout ?? ''}\n${boundaryTest.stderr ?? ''}`;
+  const testSummary = [...boundaryOutput.matchAll(/Tests\s+\d+\s+passed[^\r\n]*/g)].at(-1)?.[0] ?? null;
+  const boundaryPassed = boundaryTest.status === 0 && testSummary !== null;
+  report.checks.application_input_boundaries = {
+    status: boundaryPassed ? 'PASS' : boundaryTest.error || boundaryTest.status === null ? 'BLOCKED' : 'FAIL',
+    detail: { exitCode: boundaryTest.status, testSummary, error: boundaryTest.error?.message ?? null },
+  };
+  if (boundaryTest.stdout) process.stdout.write(boundaryTest.stdout);
+  if (boundaryTest.stderr) process.stderr.write(boundaryTest.stderr);
+  console.log(`  ${boundaryPassed ? '✅' : report.checks.application_input_boundaries.status === 'BLOCKED' ? '⚠️' : '❌'} Application input boundaries: ${testSummary ?? report.checks.application_input_boundaries.status}`);
 
-  // 2. Boundary Value Check: Non-existent Qdrant points
-  console.log('\n2. Testing Qdrant scroll with non-existent filter…');
+  console.log('\n2. Testing Neo4j failure handling without a fallback executor…');
+  const fallbackTest = spawnSync(process.execPath, [
+    vitestEntrypoint,
+    'run',
+    'src/lib/server/atlas/graph/graph-expansion-adapter.spec.ts',
+    'src/lib/server/atlas/graph/graph-expansion-adapter.unavailable.integration.spec.ts',
+  ], {
+    cwd: frontendRoot,
+    encoding: 'utf8',
+    timeout: 120000,
+    maxBuffer: 4 * 1024 * 1024,
+  });
+  const fallbackOutput = `${fallbackTest.stdout ?? ''}\n${fallbackTest.stderr ?? ''}`;
+  const fallbackSummary = [...fallbackOutput.matchAll(/Tests\s+\d+\s+passed[^\r\n]*/g)].at(-1)?.[0] ?? null;
+  const fallbackPassed = fallbackTest.status === 0 && fallbackSummary !== null;
+  report.checks.fallback_simulation = {
+    status: fallbackPassed ? 'PASS' : fallbackTest.error || fallbackTest.status === null ? 'BLOCKED' : 'FAIL',
+    detail: { scope: 'adapter_no_fallback_fixture_plus_isolated_real_Bolt_refusal', exitCode: fallbackTest.status, testSummary: fallbackSummary, error: fallbackTest.error?.message ?? null },
+  };
+  if (fallbackTest.stdout) process.stdout.write(fallbackTest.stdout);
+  if (fallbackTest.stderr) process.stderr.write(fallbackTest.stderr);
+  console.log(`  ${fallbackPassed ? '✅' : report.checks.fallback_simulation.status === 'BLOCKED' ? '⚠️' : '❌'} Neo4j failure/no-fallback fixture: ${fallbackSummary ?? report.checks.fallback_simulation.status}`);
+
+  // 3. Boundary Value Check: Non-existent Qdrant points
+  console.log('\n3. Testing Qdrant scroll with non-existent filter…');
   try {
     const res = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
       method: 'POST',
@@ -55,77 +81,52 @@ async function main() {
       body: JSON.stringify({
         limit: 1,
         filter: {
-          must: [{ key: 'canonicalSourceRef', match: { value: 'non_existent_file_path_xyz.ts' } }]
+          must: [{ key: 'source_ref', match: { value: '__codex_nonexistent_probe_20261103__' } }]
         }
       }),
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(DEPENDENCY_TIMEOUT_MS),
     });
-    if (!res.ok) throw new Error(`Qdrant scroll HTTP ${res.status}`);
+    if (!res.ok) {
+      report.checks.qdrant_nonexistent = { status: 'BLOCKED', detail: { http_status: res.status } };
+      console.log(`  ⚠️ Qdrant dependency returned HTTP ${res.status}; probe blocked.`);
+    } else {
     const data = await res.json();
     const points = data.result?.points ?? [];
-    report.checks.qdrant_nonexistent = { status: 'PASS', detail: { found: points.length } };
-    console.log(`  ✅ Qdrant returned ${points.length} points for non-existent file path.`);
-  } catch (err) {
-    hasFailures = true;
-    report.checks.qdrant_nonexistent = { status: 'FAIL', detail: err.message };
-    console.log(`  ❌ Qdrant non-existent filter query failed: ${err.message}`);
-  }
-
-  // 3. Gemma4 Synthesis Boundary Check
-  console.log('\n3. Testing Gemma4 Synthesis endpoint resilience…');
-  try {
-    const res = await fetch(`${GEMMA_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
-        messages: [{ role: 'user', content: '' }], // empty prompt
-      }),
-      signal: AbortSignal.timeout(5000),
-    });
-    const status = res.status;
-    const body = await res.json().catch(() => ({}));
-    report.checks.gemma_empty = { status: 'PASS', detail: { http_status: status, response: body } };
-    console.log(`  ✅ Gemma4 empty message response: HTTP ${status}`);
-  } catch (err) {
-    report.checks.gemma_empty = { status: 'PASS', detail: `offline_or_error: ${err.message}` };
-    console.log(`  ⚠️  Gemma4 empty message skipped/failed (optional): ${err.message}`);
-  }
-
-  // 4. Mock Dependency Fallback Simulation (Neo4j Drop)
-  console.log('\n4. Simulating fallback search path (Neo4j unreachable)…');
-  // We check if we can query Qdrant and Postgres successfully as a fallback lane
-  try {
-    const qdrantRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/scroll`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ limit: 5 }),
-      signal: AbortSignal.timeout(5000),
-    });
-    const qdrantOk = qdrantRes.ok;
-    report.checks.fallback_simulation = {
-      status: qdrantOk ? 'PASS' : 'FAIL',
-      detail: { fallback_qdrant_ok: qdrantOk }
-    };
-    if (qdrantOk) {
-      console.log('  ✅ Fallback Qdrant search path is functional.');
-    } else {
-      hasFailures = true;
-      console.log('  ❌ Fallback Qdrant search path is broken.');
+    report.checks.qdrant_nonexistent = { status: points.length === 0 ? 'PASS' : 'FAIL', detail: { found: points.length } };
+    console.log(`  ${points.length === 0 ? '✅' : '❌'} Qdrant returned ${points.length} points for non-existent file path.`);
+    if (points.length > 0) hasFailures = true;
     }
   } catch (err) {
-    hasFailures = true;
-    report.checks.fallback_simulation = { status: 'FAIL', detail: err.message };
-    console.log(`  ❌ Fallback search path simulation failed: ${err.message}`);
+    report.checks.qdrant_nonexistent = { status: 'BLOCKED', detail: `unavailable: ${err.message}` };
+    console.log(`  ⚠️ Qdrant non-existent filter probe blocked: ${err.message}`);
   }
 
-  report.status = hasFailures ? 'FAIL' : 'PASS';
+  console.log('\n4. Recording the declared graph failure policy…');
+  report.checks.fallback_behavior = {
+    status: 'BLOCKED',
+    detail: {
+      scope: 'production_retrieval_fallback_not_exercised',
+      liveNeo4jInterrupted: false,
+      alternateExecutorInvoked: false,
+      expectedOutcome: 'BLOCKED_PRODUCTION_FALLBACK_UNEXERCISED',
+      testSummary: fallbackSummary,
+      adapterFailClosedEvidence: fallbackPassed ? 'PASS' : 'NOT_PROVEN',
+      note: 'Adapter fail-closed tests do not prove that the production retrieval route selects and invokes its configured fallback with provenance.'
+    }
+  };
+  console.log(`  ⚠️ Production retrieval fallback: BLOCKED; adapter fixture ${fallbackPassed ? 'passed' : 'not proven'}.`);
+
+  const checkStatuses = Object.values(report.checks).map((check) => check.status);
+  report.status = hasFailures || checkStatuses.includes('FAIL')
+    ? 'FAIL'
+    : checkStatuses.length > 0 && checkStatuses.every((status) => status === 'PASS')
+      ? 'PASS'
+      : 'PARTIAL';
+  if (report.status !== 'PASS') process.exitCode = 1;
 
   // Save report
-  const tmpDir = path.join(ROOT, '.tmp');
-  mkdirSync(tmpDir, { recursive: true });
-  writeFileSync(path.join(tmpDir, 'verify-cubic.json'), JSON.stringify(report, null, 2));
-  console.log(`\nCubic adversarial lane report saved to .tmp/verify-cubic.json with status: ${report.status}`);
+  const reportPath = writeLaneReportV1('cubic', report);
+  console.log(`\nCubic adversarial lane report saved to ${path.relative(ROOT, reportPath)} with status: ${report.status}`);
 }
 
 main().catch((err) => {

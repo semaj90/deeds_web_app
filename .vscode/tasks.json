@@ -12278,6 +12278,25 @@
       "dependsOrder": "sequence",
       "problemMatcher": [],
       "detail": "Runs the bounded full inventory, then validates its newest snapshot. Warnings are reported without failing the task."
+    },
+    {
+      "label": "Atlas: Refresh service capability health (manual)",
+      "type": "shell",
+      "command": "npm run atlas:services:refresh",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Manual on-demand refresh only. Not run on folder open and not exposed as an MCP writer. Rechecks services including the GPU-backed :8090 probe; skips that probe when its slot is busy."
     }
   ]
 }

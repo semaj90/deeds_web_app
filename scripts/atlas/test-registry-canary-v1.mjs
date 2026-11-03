@@ -72,6 +72,10 @@ export function hasStableResolutionReplay(first, second) {
     && second.unresolved === first.unresolved;
 }
 
+export function allCanaryChecksPassed(checks) {
+  return checks.every((check) => check.ok === true && check.status !== 'NOT_EXERCISED');
+}
+
 async function main() {
   if (!reportPath) { console.error('--report=<vitest json> is required'); process.exitCode = 2; return; }
   if (receiptLabel && !/^[A-Za-z0-9._-]+$/.test(receiptLabel)) { console.error('--receipt-label may contain only letters, numbers, dot, underscore, and hyphen'); process.exitCode = 2; return; }
@@ -114,7 +118,7 @@ async function main() {
       const { t } = await resolveAll(regm.createTestCaseRegistryRepository(pool));
       receipt.resolution = t;
       check('no-ambiguous', t.ambiguous === 0, t);
-      receipt.status = receipt.checks.every((c) => c.ok) ? 'DRY_RUN_OK' : 'DRY_RUN_FAILED';
+      receipt.status = allCanaryChecksPassed(receipt.checks) ? 'DRY_RUN_OK' : 'DRY_RUN_FAILED';
       return finish(receipt);
     }
     if (pre.receipts !== 0) throw new Error('CANARY_RECEIPT_IDS_ALREADY_EXIST');
@@ -168,13 +172,13 @@ async function main() {
       if (canonicalIndices.length >= 2) {
         await expectThrow('key-mismatch-throws', () => exe.persist({ observation: execs[canonicalIndices[1]], resolution: second.out[canonicalIndices[0]], producer_revision: producerRevision }), 'TEST_EXECUTION_RESOLUTION_KEY_MISMATCH');
       } else {
-        check('key-mismatch-negative-test-skipped', true, 'requires two canonical fixtures; current cohort has fewer');
+        receipt.checks.push({ name: 'key-mismatch-negative-test', ok: false, status: 'NOT_EXERCISED', detail: 'requires two canonical fixtures; current cohort has fewer' });
       }
       const afterNeg = await counts(q, runRevision, receiptIds);
       check('negative-tests-wrote-nothing', JSON.stringify(afterNeg) === JSON.stringify(afterSecond));
       receipt.stableTestIds = stableIds; receipt.countsInside = afterNeg;
 
-      const allOk = receipt.checks.every((c) => c.ok);
+      const allOk = allCanaryChecksPassed(receipt.checks);
       if (MODE === 'apply' && allOk) { await client.query('COMMIT'); committed = true; receipt.writesCommitted = true; }
       else await client.query('ROLLBACK');
       receipt.status = MODE === 'apply' ? (allOk ? 'APPLIED' : 'ROLLED_BACK_CHECKS_FAILED') : (allOk ? 'REHEARSAL_OK_ROLLED_BACK' : 'REHEARSAL_FAILED_ROLLED_BACK');
@@ -191,9 +195,9 @@ async function main() {
     } else {
       const expectedLinked = firstCanonicalCount(receipt);
       check('independent-readback-linked-receipts', post.linked === expectedLinked && post.unlinked === receipt.tests - expectedLinked, { ...post, expectedLinked });
-      if (!receipt.checks.every((c) => c.ok)) receipt.status = 'APPLIED_POSTCHECK_FAILED';
+      if (!allCanaryChecksPassed(receipt.checks)) receipt.status = 'APPLIED_POSTCHECK_FAILED';
     }
-    if (!receipt.checks.every((c) => c.ok)) process.exitCode = process.exitCode || 1;
+    if (!allCanaryChecksPassed(receipt.checks)) process.exitCode = process.exitCode || 1;
     finish(receipt);
   } finally { await pool.end().catch(() => {}); }
 }
@@ -205,7 +209,7 @@ function firstCanonicalCount(receipt) {
 function finish(receipt) {
   fs.mkdirSync(path.dirname(RECEIPT), { recursive: true });
   fs.writeFileSync(RECEIPT, JSON.stringify(receipt, null, 2), { flag: 'wx' });
-  for (const c of receipt.checks) console.log(`${c.ok ? 'PASS' : 'FAIL'}  ${c.name}`);
+  for (const c of receipt.checks) console.log(`${c.status ?? (c.ok ? 'PASS' : 'FAIL')}  ${c.name}`);
   console.log(`mode=${receipt.mode} status=${receipt.status} tests=${receipt.tests} writesCommitted=${receipt.writesCommitted}`);
   console.log(`receipt: ${path.relative(REPO_ROOT, RECEIPT)}`);
 }

@@ -116,7 +116,7 @@ export function mapLangExtractDocumentationFactsToTupleProposalsV1(input: {
 			participantResolution: 'UNRESOLVED_CANDIDATES',
 			canonicalAuthority: false,
 			writesPerformed: false,
-		};
+		} satisfies LangExtractTupleProposalV1;
 	});
 	return {
 		schema: 'atlas.langextract-tuple-proposal-batch.v1',

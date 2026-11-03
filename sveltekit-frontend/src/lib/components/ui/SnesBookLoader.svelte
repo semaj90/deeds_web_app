@@ -303,7 +303,7 @@
             <div class="flex items-center gap-2">
               <Slider.Root type="single" min={0.2} max={2} step={0.05} bind:value={barSpeed} class="snes-slider relative flex h-6 min-w-0 flex-1 items-center" aria-label="Stripe animation duration">
                 <Slider.Range class="snes-slider-range absolute left-0 h-[6px] bg-purple-400" />
-                <Slider.Thumb class="snes-slider-thumb block h-[16px] w-[12px] border-2 border-yellow-200 bg-purple-600 focus-visible:outline-2 focus-visible:outline-yellow-300" />
+                <Slider.Thumb index={0} class="snes-slider-thumb block h-[16px] w-[12px] border-2 border-yellow-200 bg-purple-600 focus-visible:outline-2 focus-visible:outline-yellow-300" />
               </Slider.Root>
               <button type="button" aria-pressed={stepped} class="shrink-0 border border-purple-400 bg-[#241247] px-2 py-2 text-[8px] text-purple-200 hover:bg-purple-700" onclick={() => (stepped = !stepped)}>
                 {stepped ? '8-STEP' : 'SMOOTH'}

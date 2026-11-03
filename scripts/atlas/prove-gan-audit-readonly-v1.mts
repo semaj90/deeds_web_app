@@ -21,6 +21,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { adaptGanLineageReadinessV1 } from './lib/gan-lineage-readiness-adapter-v1.mjs';
+import { hashReceiptSample, validateGanReadonlyProofInputs } from './lib/gan-readonly-proof-inputs-v1.mjs';
 import { validatePacketForAtlasV2 } from '../../packages/atlas-core/src/validation/packet-adversarial-validator-v2.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -55,6 +56,7 @@ function namedReceipt(flag: string): { path: string; sha256: string; body: Recor
 const adversarial = namedReceipt('--adversarial-receipt');
 const inventory = namedReceipt('--inventory-receipt');
 const lineageReadiness = namedReceipt('--lineage-readiness');
+validateGanReadonlyProofInputs({ adversarial: adversarial?.body, inventory: inventory?.body, lineageReadiness: lineageReadiness?.body });
 const normalizedLineage = lineageReadiness ? adaptGanLineageReadinessV1(lineageReadiness.body) : null;
 const lineageMeasured = normalizedLineage !== null;
 const chunkQualified = lineageMeasured
@@ -85,13 +87,13 @@ try {
     await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
     let writeRefused = false;
     let refusalCode: string | null = null;
-    try { await client.query('UPDATE atlas_packets SET updated_at = updated_at WHERE false'); } catch (e) { writeRefused = true; refusalCode = (e as { code?: string }).code ?? null; }
+    try { await client.query('UPDATE public.atlas_packets SET updated_at = updated_at WHERE false'); } catch (e) { writeRefused = true; refusalCode = (e as { code?: string }).code ?? null; }
     await client.query('ROLLBACK');
     if (!writeRefused) finish('BLOCKED_READ_ONLY_NOT_ENFORCED', { blocker: 'READ_ONLY_NOT_ENFORCED' }, 2);
 
     // 2) census, one snapshot
     await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
-    const have = new Set((await client.query(`SELECT column_name FROM information_schema.columns WHERE table_name = 'atlas_packets'`)).rows.map((r: { column_name: string }) => r.column_name));
+    const have = new Set((await client.query(`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'atlas_packets'`)).rows.map((r: { column_name: string }) => r.column_name));
     const missingColumns = ORCHESTRATOR_ASSUMED_COLUMNS.filter((c) => !have.has(c));
 
     // Order-independent SQL mirror of SourceRefValidationV1, for rows with a non-blank packet_key (the validator checks packet_key first).
@@ -113,7 +115,7 @@ try {
         count(*) FILTER (WHERE embedding IS NULL)::int AS null_embedding,
         count(DISTINCT packet_key)::int AS distinct_packet_keys,
         count(*) FILTER (WHERE packet_id IS NOT NULL AND packet_key IS NOT NULL AND packet_id <> packet_key)::int AS packet_id_differs_from_packet_key
-      FROM atlas_packets`)).rows[0];
+      FROM public.atlas_packets`)).rows[0];
     if (!sqlAgg || sqlAgg.total === 0) { await client.query('ROLLBACK'); finish('BLOCKED_ZERO_ROW_PROOF', { blocker: 'ZERO_ROWS_READ' }, 2); }
 
     const keyFormats = (await client.query(String.raw`
@@ -124,11 +126,11 @@ try {
         WHEN packet_key ~ '^[0-9a-f]{16}$' THEN 'bare 16hex'
         WHEN packet_key IS NULL OR btrim(packet_key) = '' THEN '(missing)'
         ELSE 'other' END AS format, count(*)::int AS n
-      FROM atlas_packets GROUP BY 1 ORDER BY 2 DESC`)).rows;
+      FROM public.atlas_packets GROUP BY 1 ORDER BY 2 DESC`)).rows;
 
     // 3) the SAME validator over EVERY row (server-side cursor; no field prefilter)
     await client.query(`DECLARE gan_cur NO SCROLL CURSOR FOR
-      SELECT packet_key, source_ref, feature_id, left(summary, 64) AS summary, (embedding IS NOT NULL) AS has_embedding FROM atlas_packets ORDER BY created_at DESC, packet_key`);
+      SELECT packet_key, source_ref, feature_id, left(summary, 64) AS summary, (embedding IS NOT NULL) AS has_embedding FROM public.atlas_packets ORDER BY created_at DESC, packet_key`);
     let rowsRead = 0, hardFailureCount = 0, passedCount = 0;
     const hardByCode: Record<string, number> = {};
     const softByWarning: Record<string, number> = {};
@@ -145,7 +147,7 @@ try {
         if (verdict.status === 'HARD_FAIL') {
           hardFailureCount++;
           hardByCode[verdict.hardFailure.code] = (hardByCode[verdict.hardFailure.code] ?? 0) + 1;
-          if (hardSamples.length < 10) hardSamples.push({ packet_key: row.packet_key, code: verdict.hardFailure.code, source_ref: row.source_ref });
+          if (hardSamples.length < 10) hardSamples.push({ packet_key_sha256: hashReceiptSample(row.packet_key, sha), code: verdict.hardFailure.code, source_ref_sha256: hashReceiptSample(row.source_ref, sha) });
         } else {
           passedCount++;
           for (const w of verdict.warnings) softByWarning[w] = (softByWarning[w] ?? 0) + 1;
@@ -155,7 +157,7 @@ try {
           const newRejects = verdict.status === 'HARD_FAIL' && verdict.hardFailure.code === 'ERR_INVALID_SOURCE_REF';
           if (legacyRejects && newRejects) cross.bothRejected++;
           else if (legacyRejects && !newRejects) cross.legacyRejectedNewAccepted++;
-          else if (!legacyRejects && newRejects) { cross.legacyAcceptedNewRejected++; if (legacyAcceptedNewRejectedSamples.length < 10) legacyAcceptedNewRejectedSamples.push(row.source_ref); }
+          else if (!legacyRejects && newRejects) { cross.legacyAcceptedNewRejected++; if (legacyAcceptedNewRejectedSamples.length < 10) legacyAcceptedNewRejectedSamples.push(hashReceiptSample(row.source_ref, sha)); }
           else cross.bothAccepted++;
         }
       }

@@ -1,22 +1,27 @@
 import type { PageServerLoad } from './$types';
+import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
-import { evidence } from '$lib/server/db/schema-postgres.js';
-import { eq, desc } from 'drizzle-orm';
+import { cases, evidence } from '$lib/server/db/schema-postgres.js';
+import { and, eq, desc, or } from 'drizzle-orm';
 
-export const load: PageServerLoad = async ({ params, parent }) => {
+export const load: PageServerLoad = async ({ params, parent, locals }) => {
 	await parent();
+	const actorId = Number(locals.user?.id);
+	if (!Number.isInteger(actorId) || actorId <= 0) throw error(401, 'Unauthorized');
 
-	const safe = <T>(p: Promise<T>, fallback: T): Promise<T> => p.catch(() => fallback);
+	const [authorizedCase] = await db
+		.select({ id: cases.id })
+		.from(cases)
+		.where(and(eq(cases.id, params.id), or(eq(cases.userId, actorId), eq(cases.assignedAttorney, actorId))))
+		.limit(1);
+	if (!authorizedCase) throw error(404, 'Case not found');
 
-	const evidenceRows = await safe(
-		db
-			.select()
-			.from(evidence)
-			.where(eq(evidence.caseId, params.id))
-			.orderBy(desc(evidence.createdAt))
-			.limit(100),
-		[]
-	);
+	const evidenceRows = await db
+		.select()
+		.from(evidence)
+		.where(eq(evidence.caseId, params.id))
+		.orderBy(desc(evidence.createdAt))
+		.limit(100);
 
 	return {
 		evidenceRows: evidenceRows.map((ev) => ({

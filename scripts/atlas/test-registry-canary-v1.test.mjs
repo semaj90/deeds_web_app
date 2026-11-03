@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { counts, hasStableResolutionReplay } from './test-registry-canary-v1.mjs';
+import { allCanaryChecksPassed, counts, hasStableResolutionReplay } from './test-registry-canary-v1.mjs';
+
+test('a skipped negative probe cannot satisfy the canary promotion gate', () => {
+  assert.equal(allCanaryChecksPassed([{ name: 'ordinary-check', ok: true }]), true);
+  assert.equal(allCanaryChecksPassed([{ name: 'key-mismatch', ok: false, status: 'NOT_EXERCISED' }]), false);
+  assert.equal(allCanaryChecksPassed([{ name: 'key-mismatch', ok: true, status: 'NOT_EXERCISED' }]), false);
+});
 
 test('canary census queries only its run and exact receipt IDs', async () => {
   let captured;

@@ -4,6 +4,8 @@
 	import { ChatSession } from '$lib/models/ChatSession.svelte.js';
 	import TypewriterResponse from '$lib/components/ai/TypewriterResponse.svelte';
 	import AISummaryMiniModal from '$lib/components/legal/AISummaryMiniModal.svelte';
+	import EvidenceViewModal from '$lib/components/evidence/EvidenceViewModal.svelte';
+	import ModalLight from '$lib/components/ui/ModalLight.svelte';
 	import { boardHistory } from '$lib/components/evidence/board-history.svelte.js';
 	import {
 		scheduleSave,
@@ -44,10 +46,87 @@
 	}
 	let activeView = $state<'wall' | 'line' | 'file' | 'list'>('wall');
 	let selectedEvidence = $state<any>(null);
+	let showEvidenceViewer = $state(false);
 	let showAddEvidence = $state(false);
 	let activeTool = $state<'select' | 'evidence' | 'connection' | 'note'>('select');
 	let showAIChat = $state(false);
 	let isGeneratingLayout = $state(false);
+
+	// Celestial ModalLight Graph Documentation State
+	let showModalLight = $state(false);
+	let modalLightNode = $state<any>(null);
+	let modalLightEvidence = $state<any>(null);
+	let docEditLabel = $state("");
+	let docEditType = $state("document");
+	let docEditNotes = $state("");
+	let docEditConfidence = $state(90);
+	let docEditTag = $state("REVIEW REQUIRED");
+	let docActiveColor = $state("#c59e2b");
+
+	function openDocumentationModal(node?: any) {
+		const targetNode = node ?? selectedNode;
+		modalLightNode = targetNode;
+		if (targetNode?.kind === "note") {
+			docEditLabel = targetNode.title || "Investigative Note";
+			docEditType = "note";
+			docEditNotes = targetNode.body || "";
+			docEditTag = "HYPOTHESIS";
+			modalLightEvidence = null;
+		} else if (targetNode?.evidenceId || selectedEvidence) {
+			const ev = selectedEvidence || evidenceItems.find((e: any) => e.id === targetNode?.evidenceId);
+			modalLightEvidence = ev;
+			docEditLabel = ev?.title || targetNode?.title || "Evidence Documentation";
+			docEditType = ev?.type || ev?.fileType || "document";
+			docEditNotes = ev?.description || ev?.notes || "";
+			docEditTag = "VERIFIED CLAIM";
+		} else {
+			docEditLabel = "Constellation Investigation";
+			docEditType = "constellation";
+			docEditNotes = "";
+			docEditTag = "SYNTHETIC REVIEW";
+			modalLightEvidence = null;
+		}
+		showModalLight = true;
+	}
+
+	function saveDocumentationEdits() {
+		if (modalLightNode && board) {
+			if (modalLightNode.kind === "note") {
+				board.updateNodeTitle(modalLightNode.id, docEditLabel);
+				board.updateNodeBody(modalLightNode.id, docEditNotes);
+			} else {
+				if (typeof (board as any).updateNodeLabel === "function") {
+					(board as any).updateNodeLabel(modalLightNode.id, docEditLabel);
+				}
+			}
+			isDirty = true;
+		}
+		showModalLight = false;
+		notificationStore.add({
+			type: "success",
+			message: `Updated documentation for "${docEditLabel}"`,
+		});
+	}
+	// Dynamic connected graph edges for the selected node in ModalLight
+	let nodeEdges = $derived.by(() => {
+		if (!modalLightNode && !modalLightEvidence) return [];
+		const targetId = modalLightNode?.id || modalLightEvidence?.id;
+		if (!targetId || !board) return [];
+		const allEdges = board.getEdges();
+		const allNodes = board.getNodes();
+		return allEdges
+			.filter((e: any) => e.fromId === targetId || e.toId === targetId)
+			.map((e: any) => {
+				const otherId = e.fromId === targetId ? e.toId : e.fromId;
+				const otherNode = allNodes.find((n: any) => n.id === otherId);
+				return {
+					edgeId: e.id,
+					relation: e.label || e.connectionType || "connected",
+					targetLabel: otherNode?.title || otherNode?.body || otherId,
+					strength: e.strength ?? 1.0,
+				};
+			});
+	});
 
 	// File type detection helpers for media preview
 	function isEvidenceAudio(ft: string | undefined): boolean {
@@ -286,6 +365,17 @@
 		}
 	}
 
+	function handleNodeOpen(node: any) {
+		if (node.kind === 'evidence' && node.evidenceId) {
+			const match = evidenceItems.find((item: any) => item.id === node.evidenceId);
+			if (!match) return;
+			selectedEvidence = match;
+			showEvidenceViewer = true;
+			return;
+		}
+		openDocumentationModal(node);
+	}
+
 	// Save note edits back to the board
 	function saveNoteEdits() {
 		if (!board || !selectedNode) return;
@@ -395,11 +485,7 @@
 	function ctxSummarize() {
 		if (!contextMenu) return;
 		const n = contextMenu.node;
-		if (n.evidenceId) {
-			summaryEvidenceId = n.evidenceId;
-			summaryEvidenceTitle = n.title ?? null;
-			showSummaryModal = true;
-		}
+		openDocumentationModal(n);
 		closeContextMenu();
 	}
 
@@ -1061,104 +1147,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</button>
 	</div>
 
-	<!-- Tools Toolbar (inspired by CollaborativeEvidenceCanvas) -->
-	<div class="tools-toolbar">
-		<div class="tool-group">
-			<button
-				class="tool-btn"
-				class:active={activeTool === 'select'}
-				onclick={() => (activeTool = 'select')}
-				title="Select Tool (V)"
-			>
-				<Icon name="mouse-pointer-2" />
-			</button>
-			<button
-				class="tool-btn"
-				class:active={activeTool === 'evidence'}
-				onclick={() => (activeTool = 'evidence')}
-				title="Add Evidence (E)"
-			>
-				<Icon name="file-plus" />
-			</button>
-			<button
-				class="tool-btn"
-				class:active={activeTool === 'connection'}
-				onclick={() => (activeTool = 'connection')}
-				title="Draw Connection (C)"
-			>
-				<Icon name="git-branch" />
-			</button>
-			<button
-				class="tool-btn"
-				class:active={activeTool === 'note'}
-				onclick={() => (activeTool = 'note')}
-				title="Add Note (N)"
-			>
-				<Icon name="sticky-note" />
-			</button>
-		</div>
-
-		<div class="tool-group">
-			<button
-				class="tool-btn"
-				onclick={undo}
-				disabled={!boardHistory.canUndo}
-				title="Undo (Ctrl+Z)"
-			>
-				<Icon name="undo" />
-			</button>
-			<button
-				class="tool-btn"
-				onclick={redo}
-				disabled={!boardHistory.canRedo}
-				title="Redo (Ctrl+Shift+Z)"
-			>
-				<Icon name="redo" />
-			</button>
-		</div>
-
-		<div class="tool-group">
-			<button
-				class="tool-btn"
-				onclick={() => board?.zoomToFit()}
-				title="Zoom to Fit (Ctrl+0)"
-			>
-				<Icon name="maximize" />
-			</button>
-		</div>
-
-		<div class="tool-group">
-			<button class="tool-btn" onclick={exportPNG} title="Export as PNG">
-				<Icon name="image" />
-			</button>
-			<button class="tool-btn" onclick={exportCSV} title="Export as CSV">
-				<Icon name="download" />
-			</button>
-		</div>
-
-		<div class="tool-group fx-toggles">
-			<button
-				class="tool-btn"
-				class:active={particlesEnabled}
-				onclick={() => (particlesEnabled = !particlesEnabled)}
-				title="Toggle Particles (P)"
-			>
-				<Icon name="sparkles" />
-			</button>
-			<button
-				class="tool-btn"
-				class:active={crtEnabled}
-				onclick={() => (crtEnabled = !crtEnabled)}
-				title="Toggle CRT Effect (O)"
-			>
-				<Icon name="monitor" />
-			</button>
-		</div>
-
-		<div class="keyboard-hint">
-			<span class="hint-text">↑↓=Nav • Enter=Place • Home/End=Jump • ⌘K=Switch • V=Select • C=Connect • N=Note • Drag=Marquee • Alt+Drag=Quick Connect</span>
-		</div>
-	</div>
+	<!-- Top Tools Toolbar relocated to bottom floating dock -->
 
 	<!-- Main Content Area -->
 	<div class="board-content">
@@ -1310,6 +1299,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						onDirtyChange={(d) => { isDirty = d; refreshPlacedIds(); }}
 						onCanvasClick={handleCanvasClick}
 						onNodeSelect={handleNodeSelect}
+						onNodeOpen={handleNodeOpen}
 						onConnectionCreated={handleConnectionCreated}
 						onContextMenu={handleBoardContextMenu}
 						{activeTool}
@@ -1327,6 +1317,137 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					isDragging={isDraggingNode}
 					boardZoom={boardZoom}
 				/>
+
+				<!-- Floating Celestial Bottom Dock Toolbar (LiquidText / Evidence Constellation Style) -->
+				<div class="celestial-bottom-dock">
+					<div class="dock-pill">
+						<!-- Primary Interaction Tools -->
+						<div class="dock-group">
+							<button
+								class="dock-btn"
+								class:active={activeTool === "select"}
+								onclick={() => (activeTool = "select")}
+								title="Select Tool (V)"
+							>
+								<Icon name="mouse-pointer-2" size={15} />
+								<span class="dock-label">Select</span>
+							</button>
+							<button
+								class="dock-btn"
+								class:active={activeTool === "evidence"}
+								onclick={() => (activeTool = "evidence")}
+								title="Place Evidence (E)"
+							>
+								<Icon name="file-plus" size={15} />
+								<span class="dock-label">Evidence</span>
+							</button>
+							<button
+								class="dock-btn"
+								class:active={activeTool === "connection"}
+								onclick={() => (activeTool = "connection")}
+								title="Link Relationship (C)"
+							>
+								<Icon name="git-branch" size={15} />
+								<span class="dock-label">Link</span>
+							</button>
+							<button
+								class="dock-btn"
+								class:active={activeTool === "note"}
+								onclick={() => (activeTool = "note")}
+								title="Sticky Note (N)"
+							>
+								<Icon name="sticky-note" size={15} />
+								<span class="dock-label">Note</span>
+							</button>
+						</div>
+
+						<div class="dock-divider"></div>
+
+						<!-- Graph Documentation Popout Tool -->
+						<div class="dock-group">
+							<button
+								class="dock-btn accent-gold"
+								onclick={() => openDocumentationModal()}
+								title="Graph Documentation & Node Edit (D)"
+							>
+								<span class="dock-celestial-glyph">✦</span>
+								<span class="dock-label">Doc Edit</span>
+							</button>
+						</div>
+
+						<div class="dock-divider"></div>
+
+						<!-- LiquidText Swatch Color Palette -->
+						<div class="dock-group color-palette">
+							{#each [
+								{ name: "Celestial Gold", color: "#c59e2b" },
+								{ name: "Cyber Cyan", color: "#7ee7ff" },
+								{ name: "Emerald Veritas", color: "#4ade80" },
+								{ name: "YoRHa Amethyst", color: "#c4b5fd" },
+								{ name: "Disputed Coral", color: "#f87171" }
+							] as swatch}
+								<button
+									class="swatch-btn"
+									class:selected={docActiveColor === swatch.color}
+									style="--swatch-color: {swatch.color};"
+									onclick={() => (docActiveColor = swatch.color)}
+									title={swatch.name}
+								></button>
+							{/each}
+						</div>
+
+						<div class="dock-divider"></div>
+
+						<!-- History & Navigation -->
+						<div class="dock-group">
+							<button
+								class="dock-btn icon-only"
+								onclick={undo}
+								disabled={!boardHistory.canUndo}
+								title="Undo (Ctrl+Z)"
+							>
+								<Icon name="undo" size={14} />
+							</button>
+							<button
+								class="dock-btn icon-only"
+								onclick={redo}
+								disabled={!boardHistory.canRedo}
+								title="Redo (Ctrl+Shift+Z)"
+							>
+								<Icon name="redo" size={14} />
+							</button>
+							<button
+								class="dock-btn icon-only"
+								onclick={() => board?.zoomToFit()}
+								title="Zoom to Fit (Ctrl+0)"
+							>
+								<Icon name="maximize" size={14} />
+							</button>
+						</div>
+
+						<div class="dock-divider"></div>
+
+						<!-- AI & VFX Controls -->
+						<div class="dock-group">
+							<button
+								class="dock-btn icon-only"
+								class:active={particlesEnabled}
+								onclick={() => (particlesEnabled = !particlesEnabled)}
+								title="Toggle WebGPU Particles (P)"
+							>
+								<Icon name="sparkles" size={14} />
+							</button>
+							<button
+								class="dock-btn icon-only"
+								class:active={crtEnabled}
+								onclick={() => (crtEnabled = !crtEnabled)}
+								title="Toggle CRT Scanlines (O)"
+							>
+								<Icon name="monitor" size={14} />
+							</button>
+						</div>
+					</div>
+				</div>
 			{:else if activeView === 'line'}
 				<div class="alt-view">
 					<h3 class="alt-view-title">Timeline View</h3>
@@ -1431,6 +1552,13 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						{/if}
 					</div>
 					<div class="details-header-actions">
+						<button
+							class="details-nav-btn open-evidence-viewer-btn"
+							onclick={() => (showEvidenceViewer = true)}
+							title="Open evidence viewer"
+						>
+							Open viewer
+						</button>
 						{#if filteredEvidence.length > 1}
 							<button class="details-nav-btn" onclick={() => navEvidence(-1)} title="Previous (↑)">
 								<Icon name="chevron-up" size={14} />
@@ -1503,7 +1631,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					<div class="detail-section">
 						<button
 							class="action-btn"
-							onclick={() => { summaryEvidenceId = selectedEvidence.id; summaryEvidenceTitle = selectedEvidence.title; showSummaryModal = true; }}
+							onclick={() => openDocumentationModal(selectedEvidence)}
 						>
 							<Icon name="sparkles" />
 							AI Summary
@@ -1632,9 +1760,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 							</button>
 							<button class="quick-btn" onclick={() => {
 								if (selectedEvidence) {
-									summaryEvidenceId = selectedEvidence.id;
-									summaryEvidenceTitle = selectedEvidence.title;
-									showSummaryModal = true;
+									openDocumentationModal(selectedEvidence);
 								}
 							}} disabled={!selectedEvidence}>
 								<Icon name="brain" />
@@ -1730,6 +1856,128 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			summaryEvidenceTitle = null;
 		}}
 	/>
+
+	<EvidenceViewModal
+		bind:open={showEvidenceViewer}
+		evidenceId={selectedEvidence?.id ?? null}
+		{caseId}
+		onClose={() => (showEvidenceViewer = false)}
+	/>
+
+	<!-- Celestial Legal-AI Modal for Graph Documentation & Node Edits -->
+	<ModalLight
+		bind:open={showModalLight}
+		title={docEditLabel || "Evidence Documentation"}
+		subtitle="PARENT ATLAS • CELESTIAL GRAPH DOCUMENTATION • LEGAL-AI DOSSIER"
+		coordBadge="CONST-NODE • REV: 768-D"
+		icon="celestial"
+		size="lg"
+	>
+		<div class="space-y-4 text-slate-800">
+			<!-- Header Info Bar -->
+			<div class="flex items-center justify-between p-2.5 bg-[#f5efe6] border border-[#dfd0bd] rounded-lg text-xs font-mono">
+				<div class="flex items-center gap-2">
+					<span class="text-[#c59e2b] text-sm">✦</span>
+					<span class="text-slate-900 font-bold uppercase">{docEditType}</span>
+					<span class="text-slate-400">•</span>
+					<span class="text-slate-600">ID: {modalLightEvidence?.id ?? modalLightNode?.id ?? "SYNTHETIC-NODE"}</span>
+				</div>
+				<span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider"
+					style="background: {docActiveColor}22; color: {docActiveColor}; border: 1px solid {docActiveColor}66;">
+					{docEditTag}
+				</span>
+			</div>
+
+			<!-- Dual-Pane Documentation Layout -->
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<!-- Left Pane: Source Document / Excerpt Preview -->
+				<div class="space-y-3">
+					<p class="block text-xs font-mono uppercase tracking-wider text-[#8c6a23] font-bold">
+						Source Document Excerpt
+					</p>
+					<div class="p-3 bg-[#fcfbf9] border border-[#d8cdb8] rounded-lg min-h-[160px] max-h-[240px] overflow-y-auto text-xs font-mono text-slate-800 leading-relaxed shadow-inner">
+						{#if modalLightEvidence?.description || modalLightEvidence?.text}
+							{modalLightEvidence?.description || modalLightEvidence?.text}
+						{:else if modalLightNode?.body}
+							{modalLightNode?.body}
+						{:else}
+							<div class="text-slate-400 italic py-6 text-center">
+								No raw text transcript attached. Connect to a verified PDF or Whisper audio segment to display ground-truth excerpt.
+							</div>
+						{/if}
+					</div>
+					<div class="text-[11px] font-mono text-slate-500 flex justify-between">
+						<span>CANONICAL: pgvector 768-D</span>
+						<span>PROVENANCE: PG18 Verified</span>
+					</div>
+				</div>
+
+				<!-- Right Pane: Graph Documentation & Metadata Edits -->
+				<div class="space-y-3">
+					<div>
+						<p class="block text-xs font-mono uppercase tracking-wider text-[#8c6a23] font-bold mb-1">
+							Node Label / Title
+						</p>
+						<input
+							type="text"
+							class="w-full px-3 py-1.5 text-xs font-mono bg-white border border-[#d8cdb8] rounded-md text-slate-900 focus:outline-none focus:border-[#c59e2b]"
+							bind:value={docEditLabel}
+							placeholder="Enter node title..."
+						/>
+					</div>
+
+					<div>
+						<p class="block text-xs font-mono uppercase tracking-wider text-[#8c6a23] font-bold mb-1">
+							Investigative Notes & Claims
+						</p>
+						<textarea
+							class="w-full px-3 py-1.5 text-xs font-mono bg-white border border-[#d8cdb8] rounded-md text-slate-900 focus:outline-none focus:border-[#c59e2b] resize-none"
+							rows="4"
+							bind:value={docEditNotes}
+							placeholder="Add hypothesis, contradictions, or supporting citations..."
+						></textarea>
+					</div>
+
+					<div class="flex items-center justify-between text-xs font-mono text-slate-700">
+						<span>Confidence: <strong>{docEditConfidence}%</strong></span>
+						<input
+							type="range"
+							min="0"
+							max="100"
+							bind:value={docEditConfidence}
+							class="w-32 accent-[#c59e2b]"
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{#snippet footer()}
+			<div class="flex justify-between items-center w-full">
+				<div class="flex items-center gap-1.5 text-[11px] font-mono text-slate-500">
+					<span class="text-[#c59e2b]">✧</span>
+					<span>Constellation State: LIVE_DRAFT</span>
+				</div>
+				<div class="flex gap-2">
+					<button
+						type="button"
+						class="px-4 py-1.5 text-xs font-mono uppercase tracking-wider bg-[#ebe2d3] hover:bg-[#ded2c0] text-slate-800 font-semibold rounded-lg transition-colors cursor-pointer"
+						onclick={() => (showModalLight = false)}
+					>
+						Cancel
+					</button>
+					<button
+						type="button"
+						class="px-5 py-1.5 text-xs font-mono uppercase tracking-wider bg-gradient-to-r from-[#c59e2b] to-[#dfb847] hover:from-[#b58e1b] hover:to-[#cfa837] text-slate-950 font-bold rounded-lg transition-all shadow-sm cursor-pointer flex items-center gap-1.5"
+						onclick={saveDocumentationEdits}
+					>
+						<span>✦</span>
+						<span>Save Documentation</span>
+					</button>
+				</div>
+			</div>
+		{/snippet}
+	</ModalLight>
 
 	<!-- Context Menu Overlay -->
 	{#if contextMenu}
@@ -2789,6 +3037,8 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		background: white;
 		display: flex;
 		flex-direction: column;
+		min-height: 0;
+		min-width: 0;
 		overflow: hidden;
 	}
 
@@ -2863,7 +3113,10 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	.details-content {
 		flex: 1;
+		min-height: 0;
+		min-width: 0;
 		overflow-y: auto;
+		overscroll-behavior: contain;
 		padding: 1rem;
 	}
 
@@ -3549,4 +3802,127 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	.list-table tr.selected { background: #eff6ff; }
 
 	.list-title { font-weight: 600; color: #1f2937; }
+
+	/* Floating Celestial Bottom Dock Toolbar */
+	.celestial-bottom-dock {
+		position: absolute;
+		bottom: 1.25rem;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 50;
+		pointer-events: auto;
+		user-select: none;
+	}
+
+	.dock-pill {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 0.85rem;
+		background: rgba(22, 19, 14, 0.92);
+		border: 1px solid rgba(197, 158, 43, 0.45);
+		border-radius: 9999px;
+		box-shadow:
+			0 16px 36px -8px rgba(0, 0, 0, 0.6),
+			0 0 24px rgba(197, 158, 43, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(14px) saturate(1.2);
+	}
+
+	.dock-group {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
+	.dock-divider {
+		width: 1px;
+		height: 18px;
+		background: rgba(197, 158, 43, 0.25);
+		margin: 0 0.15rem;
+	}
+
+	.dock-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.3rem 0.65rem;
+		border-radius: 9999px;
+		background: transparent;
+		border: 1px solid transparent;
+		color: #dfd5c0;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		cursor: pointer;
+		transition: all 0.15s ease;
+		outline: none;
+	}
+
+	.dock-btn:hover:not(:disabled) {
+		background: rgba(197, 158, 43, 0.15);
+		border-color: rgba(197, 158, 43, 0.35);
+		color: #fff;
+	}
+
+	.dock-btn.active {
+		background: #c59e2b;
+		border-color: #dfb847;
+		color: #1a1408;
+		font-weight: 700;
+		box-shadow: 0 0 12px rgba(197, 158, 43, 0.5);
+	}
+
+	.dock-btn.accent-gold {
+		background: rgba(197, 158, 43, 0.2);
+		border-color: #c59e2b;
+		color: #f3d471;
+	}
+
+	.dock-btn.accent-gold:hover {
+		background: #c59e2b;
+		color: #1a1408;
+		box-shadow: 0 0 14px rgba(197, 158, 43, 0.6);
+	}
+
+	.dock-celestial-glyph {
+		font-size: 0.85rem;
+		line-height: 1;
+	}
+
+	.dock-btn.icon-only {
+		padding: 0.35rem;
+		width: 28px;
+		height: 28px;
+		justify-content: center;
+	}
+
+	.dock-btn:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+
+	/* Color Swatches */
+	.swatch-btn {
+		width: 16px;
+		height: 16px;
+		border-radius: 9999px;
+		background-color: var(--swatch-color);
+		border: 2px solid transparent;
+		cursor: pointer;
+		transition: transform 0.15s, border-color 0.15s;
+		outline: none;
+	}
+
+	.swatch-btn:hover {
+		transform: scale(1.2);
+	}
+
+	.swatch-btn.selected {
+		border-color: #ffffff;
+		transform: scale(1.25);
+		box-shadow: 0 0 8px var(--swatch-color);
+	}
 </style>

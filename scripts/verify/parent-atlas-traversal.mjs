@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -9,10 +8,24 @@ const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 
 import { loadRepoEnv, resolveRedisConfig } from '../atlas/connection-config.mjs';
-import { queryNeo4jHttp } from '../atlas/lib/neo4j-http.mjs';
+import { countNeo4jRelationship } from '../atlas/lib/neo4j-http.mjs';
+import { writeLaneReportV1 } from './lane-report-v1.mjs';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
+
+async function scanCount(client, pattern, maxPages = 100) {
+  let cursor = '0';
+  let count = 0;
+  let pages = 0;
+  do {
+    const result = await client.scan(cursor, 'MATCH', pattern, 'COUNT', '1000');
+    cursor = String(result[0]);
+    count += result[1].length;
+    pages += 1;
+  } while (cursor !== '0' && pages < maxPages);
+  return { count, complete: cursor === '0', pages };
+}
 
 async function main() {
   console.log('\n=== Parent Atlas Traversal Lane ===\n');
@@ -48,7 +61,7 @@ async function main() {
     }
 
     report.checks.qdrant_payload = {
-      status: missingRequired > 0 ? 'FAIL' : 'PASS',
+      status: missingRequired > 0 ? 'FAIL' : points.length === 0 ? 'BLOCKED' : 'PASS',
       detail: {
         scanned: points.length,
         missing_required: missingRequired,
@@ -61,17 +74,17 @@ async function main() {
       console.log(`  ✅ Scanned ${points.length} points, all contain packet_key, source_ref, and feature_id.`);
     }
   } catch (err) {
-    report.checks.qdrant_payload = { status: 'FAIL', detail: err.message };
-    hasFailures = true;
-    console.log(`  ❌ Qdrant payload check failed: ${err.message}`);
+    report.checks.qdrant_payload = { status: 'PARTIAL', detail: err.message };
+    console.log(`  ⚠️  Qdrant payload check blocked: ${err.message}`);
   }
 
   // 2. Query Valkey/Redis cache
   console.log('\n2. Querying Valkey/Redis active cache keys…');
   const env = loadRepoEnv(process.env);
   const redisConfig = resolveRedisConfig(env);
+  let client;
   try {
-    const client = new IORedis.default({
+    client = new IORedis.default({
       host: redisConfig.host,
       port: redisConfig.port,
       password: redisConfig.password || 'redis',
@@ -83,43 +96,55 @@ async function main() {
     client.on('error', () => {});
     await client.connect();
 
-    // Look for centroid keys, semantic cache keys, or reward sets
-    const rewardKeys = await client.keys('reward:*');
-    const centroidKeys = await client.keys('centroid:*');
-    const semanticKeys = await client.keys('semantic:*');
-    const allKeys = await client.keys('*');
+    const rewardKeys = await scanCount(client, 'reward:*');
+    const centroidKeys = await scanCount(client, 'centroid:*');
+    const semanticKeys = await scanCount(client, 'semantic:*');
+    const allKeys = await scanCount(client, '*');
 
     await client.quit().catch(() => {});
 
     report.checks.redis_cache = {
-      status: 'PASS',
+      status: [rewardKeys, centroidKeys, semanticKeys, allKeys].every((result) => result.complete) ? 'PASS' : 'BLOCKED',
       detail: {
-        total_keys: allKeys.length,
-        reward_keys: rewardKeys.length,
-        centroid_keys: centroidKeys.length,
-        semantic_keys: semanticKeys.length,
+        total_keys: allKeys.count,
+        reward_keys: rewardKeys.count,
+        centroid_keys: centroidKeys.count,
+        semantic_keys: semanticKeys.count,
+        bounded_scan_pages: { all: allKeys.pages, reward: rewardKeys.pages, centroid: centroidKeys.pages, semantic: semanticKeys.pages },
+        scan_complete: [rewardKeys, centroidKeys, semanticKeys, allKeys].every((result) => result.complete),
       }
     };
-    console.log(`  ✅ Valkey reachable. Total keys: ${allKeys.length}. Rewards: ${rewardKeys.length}. Centroids: ${centroidKeys.length}.`);
+    console.log(`  ${report.checks.redis_cache.status === 'PASS' ? '✅' : '⚠️'} Valkey scan ${report.checks.redis_cache.status.toLowerCase()}. Total keys: ${allKeys.count}. Rewards: ${rewardKeys.count}. Centroids: ${centroidKeys.count}.`);
   } catch (err) {
     report.checks.redis_cache = { status: 'PARTIAL', detail: err.message };
     console.log(`  ⚠️  Valkey check degraded: ${err.message}`);
+  } finally {
+    await client?.quit().catch(() => {});
   }
 
   // 3. Query Neo4j relationship paths
   console.log('\n3. Querying Neo4j relationship paths…');
   try {
-    const neo4jResponse = await queryNeo4jHttp({
-      statement: 'MATCH (p:Packet)-[r:USED_CONCEPT]->(c:Concept) RETURN count(r) AS count LIMIT 1',
-    });
+    const neo4jResponse = await countNeo4jRelationship({ relationshipType: 'USED_CONCEPT' });
 
     if (neo4jResponse && neo4jResponse.ok) {
-      const results = neo4jResponse.result?.results?.[0]?.data?.[0]?.row?.[0] ?? 0;
+      const hasValidCount = neo4jResponse.columns?.includes('count')
+        && neo4jResponse.rows?.length === 1
+        && Number.isSafeInteger(neo4jResponse.count);
+      if (!hasValidCount) {
+        report.checks.neo4j_relations = {
+          status: 'BLOCKED',
+          detail: { reason: 'MALFORMED_NEO4J_COUNT_RESPONSE' },
+        };
+        console.log('  ⚠️ Neo4j count response did not match the expected schema.');
+      } else {
+        const results = neo4jResponse.count;
       report.checks.neo4j_relations = {
-        status: 'PASS',
+        status: Number(results) > 0 ? 'PASS' : 'BLOCKED',
         detail: { used_concept_count: results }
       };
-      console.log(`  ✅ Neo4j relationships: MATCH (p:Packet)-[USED_CONCEPT]->(c:Concept) count = ${results}.`);
+        console.log(`  ${Number(results) > 0 ? '✅' : '⚠️'} Neo4j USED_CONCEPT edge count = ${results}.`);
+      }
     } else {
       const errDetail = neo4jResponse?.error || 'Unknown HTTP query error';
       report.checks.neo4j_relations = { status: 'PARTIAL', detail: errDetail };
@@ -130,13 +155,17 @@ async function main() {
     console.log(`  ⚠️  Neo4j check degraded: ${err.message}`);
   }
 
-  report.status = hasFailures ? 'FAIL' : 'PASS';
+  const checkStatuses = Object.values(report.checks).map((check) => check.status);
+  report.status = hasFailures || checkStatuses.includes('FAIL')
+    ? 'FAIL'
+    : checkStatuses.length > 0 && checkStatuses.every((status) => status === 'PASS')
+      ? 'PASS'
+      : 'PARTIAL';
+  if (report.status !== 'PASS') process.exitCode = 1;
 
   // Save report
-  const tmpDir = path.join(ROOT, '.tmp');
-  mkdirSync(tmpDir, { recursive: true });
-  writeFileSync(path.join(tmpDir, 'verify-atlas.json'), JSON.stringify(report, null, 2));
-  console.log(`\nParent Atlas traversal lane report saved to .tmp/verify-atlas.json with status: ${report.status}`);
+  const reportPath = writeLaneReportV1('atlas', report);
+  console.log(`\nParent Atlas traversal lane report saved to ${path.relative(ROOT, reportPath)} with status: ${report.status}`);
 }
 
 main().catch((err) => {

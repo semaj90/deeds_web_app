@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+import { DEFAULT_ROUTER_MATRIX, getSignalMatrix, type SignalType } from './router-matrix.js';
 
 // Define the structure for the final, structured output packet.
 export interface QueryRouteResult {
@@ -99,12 +100,6 @@ export function classifyQuery(input: QueryClassificationInput): QueryRouteResult
  * @returns {object} - The defined routing matrix for that signal.
  */
 export function getRouterMatrix(signalType: string): { [key: string]: { weight: number, lane: string } } | null {
-    // This function will be populated by the logic in router-matrix.ts
-    if (signalType === 'semantic_concept') {
-        return {
-            qdrant_semantic: { weight: 0.9, lane: 'qdrant_semantic' },
-            gemma4_rerank: { weight: 0.6, lane: 'gemma4_rerank' }
-        };
-    }
-    return null;
+    if (!Object.hasOwn(DEFAULT_ROUTER_MATRIX, signalType)) return null;
+    return getSignalMatrix(signalType as SignalType);
 }

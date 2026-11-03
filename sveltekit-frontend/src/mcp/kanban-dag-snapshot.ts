@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { Pool } from 'pg';
+import type { Pool, PoolClient } from 'pg';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
@@ -32,7 +32,7 @@ export async function readKanbanDagSnapshotV1(
   input: KanbanDagSnapshotInputV1,
 ) {
   const parsed = KanbanDagSnapshotInputV1Schema.parse(input);
-  let client: Awaited<ReturnType<Queryable['connect']>>;
+  let client: PoolClient;
   try {
     client = await pool.connect();
   } catch {

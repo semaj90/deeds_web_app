@@ -60,7 +60,8 @@ export function parseOaklibPayload(rawBody: string | Buffer): unknown {
 
 /**
  * Adapts raw Python OakLib tuples [subject, predicate, object, confidence?] into
- * canonical OntologyLinkedTupleV1 records suitable for database persistence.
+ * reference-only OntologyLinkedTupleV1 records. Raw triples do not establish
+ * source spans, revision bindings, or verified participants.
  */
 export function adaptRawOaklibTuplesToOntologyLinkedTuplesV1(input: {
 	rawTuples: RawOaklibTuple[];
@@ -104,7 +105,7 @@ export function adaptRawOaklibTuplesToOntologyLinkedTuplesV1(input: {
 			ontologyIds: [subject, object],
 			conceptIds: [`concept:${subject}`, `concept:${object}`],
 			confidence: Math.max(0, Math.min(1, confidence)),
-			evidenceState: 'ACTIVE_VERIFIED' as const,
+			evidenceState: 'REFERENCE_ONLY' as const,
 			provenance: {
 				sourceTables: ['taxonomy_nodes', 'taxonomy_edges'],
 				labelerVersion: 'oaklib-sidecar',
@@ -136,6 +137,17 @@ export function buildOaklibOntologyCachePlan(input: {
 	workspaceRevision: string;
 	ontologyVersion?: string | null;
 }): OntologyLinkedTupleCachePlan {
+	const hasGroundedLineage = input.persistedTuples.every((tuple) =>
+		tuple.evidenceState === 'ACTIVE_VERIFIED' &&
+		tuple.participants.length > 0 &&
+		tuple.evidenceRefs.length > 0 &&
+		tuple.evidenceSpan != null &&
+		tuple.provenance.sourceRevision != null &&
+		tuple.provenance.workspaceRevision != null &&
+		tuple.provenance.evidenceSpanChecksum != null
+	);
+	if (!hasGroundedLineage) throw new Error('OAKLIB_CACHE_GROUNDED_LINEAGE_REQUIRED');
+
 	const domainClass = input.domainClass || 'unknown';
 
 	return buildOntologyLinkedTupleCachePlan({

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from 'node:child_process';
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import net from 'node:net';
@@ -11,6 +11,7 @@ const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 
 import { loadRepoEnv, resolveRedisConfig } from '../atlas/connection-config.mjs';
+import { writeLaneReportV1 } from './lane-report-v1.mjs';
 
 function pingPort(host, port, timeout = 2000) {
   return new Promise((resolve) => {
@@ -67,7 +68,7 @@ async function main() {
   // 1. package.json checks
   console.log('1. Checking package.json script registrations…');
   try {
-    const pkgPath = path.join(ROOT, 'package.json');
+    const pkgPath = path.join(ROOT, 'sveltekit-frontend', 'package.json');
     const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
     const requiredScripts = [
       'verify:smoke',
@@ -83,10 +84,19 @@ async function main() {
         missing.push(script);
       }
     }
-    if (missing.length > 0) {
-      report.checks.scripts = { status: 'FAIL', detail: `Missing scripts: ${missing.join(', ')}` };
+    const expectedCommands = {
+      'verify:smoke': 'node ../scripts/verify/smoke-validation.mjs',
+      'verify:story': 'node ../scripts/verify/feature-memory-story.mjs',
+      'verify:atlas': 'node ../scripts/verify/parent-atlas-traversal.mjs',
+      'verify:cubic': 'node ../scripts/verify/cubic-adversarial-tests.mjs',
+      'verify:verdict': 'node ../scripts/verify/strict-verdict.mjs',
+      'verify:full': 'node ../scripts/verify/run-verification.mjs',
+    };
+    const invalidCommands = Object.entries(expectedCommands).filter(([name, command]) => pkg.scripts?.[name] !== command).map(([name]) => name);
+    if (missing.length > 0 || invalidCommands.length > 0) {
+      report.checks.scripts = { status: 'FAIL', detail: { missing, invalidCommands } };
       hasFailures = true;
-      console.log(`  ❌ Missing: ${missing.join(', ')}`);
+      console.log(`  ❌ Missing scripts: ${missing.join(', ') || 'none'}; invalid aliases: ${invalidCommands.join(', ') || 'none'}`);
     } else {
       report.checks.scripts = { status: 'PASS', detail: 'All 6 verify scripts registered' };
       console.log('  ✅ All verification scripts registered.');
@@ -124,7 +134,12 @@ async function main() {
   // Qdrant
   const qdrantUrl = env.QDRANT_URL || 'http://127.0.0.1:6333';
   pings.qdrant = await pingHttp(`${qdrantUrl}/readyz`).catch(() => 'closed');
-  console.log(`  Qdrant (${qdrantUrl}): ${pings.qdrant === 'open' ? '✅' : '❌'} (${pings.qdrant})`);
+  let qdrantTarget = 'configured';
+  try {
+    const parsed = new URL(qdrantUrl);
+    qdrantTarget = `${parsed.protocol}//${parsed.hostname}:${parsed.port || (parsed.protocol === 'https:' ? '443' : '80')}`;
+  } catch {}
+  console.log(`  Qdrant (${qdrantTarget}): ${pings.qdrant === 'open' ? '✅' : '❌'} (${pings.qdrant})`);
 
   // Postgres
   const dbUrl = env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
@@ -198,9 +213,18 @@ async function main() {
   console.log('\n4. Running TypeScript/Svelte compilation check…');
   try {
     const svelteRoot = path.join(ROOT, 'sveltekit-frontend');
-    const out = execSync('npx svelte-check --threshold error', { cwd: svelteRoot, stdio: 'pipe' }).toString();
-    report.checks.typescript = { status: 'PASS', detail: 'svelte-check completed without errors', errors: [] };
-    console.log('  ✅ TypeScript/Svelte check passed.');
+    // The authoritative check includes .svelte files. TS-only tsgo is an opt-in
+    // partial diagnostic and must not make the smoke lane pass.
+    const full = process.env.SMOKE_FAST_CHECK !== '1';
+    const cmd = full ? 'npx svelte-check --threshold error' : 'npm run --silent check:fast';
+    const out = execSync(cmd, { cwd: svelteRoot, stdio: 'pipe', timeout: full ? 480000 : 180000 }).toString();
+    report.checks.typescript = {
+      status: full ? 'PASS' : 'PARTIAL',
+      lane: full ? 'FULL_CHECK_PASSED' : 'FAST_CHECK_PARTIAL',
+      detail: full ? 'svelte-check completed without errors' : 'tsgo --noEmit completed without errors (.svelte not covered)',
+      errors: [],
+    };
+    console.log(`  ${full ? '✅' : '⚠️'} TypeScript check ${full ? 'passed' : 'partial'} (${full ? 'full svelte-check' : 'fast tsgo; .svelte not covered'}).`);
   } catch (err) {
     const outputMsg = err.stdout ? err.stdout.toString() : err.message;
     const parsedErrors = parseSvelteCheckErrors(outputMsg);
@@ -214,13 +238,16 @@ async function main() {
     console.log(outputMsg.slice(0, 1000));
   }
 
-  report.status = hasFailures ? 'FAIL' : (report.checks.services.status === 'PARTIAL' ? 'PARTIAL' : 'PASS');
+  report.status = hasFailures ? 'FAIL' : (
+    report.checks.services.status === 'PARTIAL' || report.checks.typescript.status === 'PARTIAL'
+      ? 'PARTIAL'
+      : 'PASS'
+  );
+  if (report.status !== 'PASS') process.exitCode = 1;
 
   // Save report
-  const tmpDir = path.join(ROOT, '.tmp');
-  mkdirSync(tmpDir, { recursive: true });
-  writeFileSync(path.join(tmpDir, 'verify-smoke.json'), JSON.stringify(report, null, 2));
-  console.log(`\nSmoke validation lane report saved to .tmp/verify-smoke.json with status: ${report.status}`);
+  const reportPath = writeLaneReportV1('smoke', report);
+  console.log(`\nSmoke validation lane report saved to ${path.relative(ROOT, reportPath)} with status: ${report.status}`);
 }
 
 function parseSvelteCheckErrors(output) {
